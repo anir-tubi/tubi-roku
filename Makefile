@@ -15,9 +15,9 @@ MANIFEST_FILE=manifest
 TESTS=source/tests
 
 ifeq ($(ROKU_PROFILE), production)
-RSYNC_EXCLUDE=--exclude source/tests
+RSYNC_EXCLUDE=--exclude source/tests --exclude '.keep'
 else
-RSYNC_EXCLUDE=
+RSYNC_EXCLUDE=--exclude '.keep'
 endif
 
 build: rsync gen zip

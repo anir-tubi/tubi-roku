@@ -80,3 +80,23 @@ The code will run all the test suites defined in ``src/source/tests`` only. Run 
 
 You can set `DEV_PASSWORD` with the developer password set on the roku device if it is something other than the default `1234`
 
+## Project Layout
+
+
+| Path | Usage |
+| ---- | ----- |
+| Makefile| Main project Makefile.  This builds and install the channel |
+| /build | build output goes here.  This is not checked in to git. |
+| /config | Run-time environment settings for the channel. |
+| /docs | Supplemental documentation for the channel |
+| /spec | Black box tests for the channel |
+| /src | Sources and assets which will be selectively included in the channe zip file, depending on build configuration. |
+| /src/components | SceneGraph components and accompanying code |
+| /src/components/controllers | "Controller"-type scene graph components which control visibility and flow of the application |
+| /src/components/lib | Custom Scene-Graph components which are not full screen, i.e. keyboard, left-hand menu |
+| /src/components/screens | Custom SceneGraph components which are full screen, usually managed as a stack or workflow from a controller |
+| /src/components/tasks | Components derived from Task node which are related to background threads |
+| /src/images | Packaged channel image assets |
+| /src/source | Non-SceneGraph BrightScript code; Libraries and non-SceneGraph screens |
+| /src/source/tests | Unit tests for non-SceneGraph Brightscript code |
+| /tools | These are build-time tools based on node.  They are launched from the Makefile. |
