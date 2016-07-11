@@ -55,6 +55,11 @@ to your ~/.bash_profile, and run ``source ~/.bashrc`` on current shell. For any 
 
 You can also tune the ``ROKU_PROFILE`` with envar. By default it is ``dev``. You can change it to ``production``, ``staging`` and ``test``. Their difference can be found in ``config/*``.
 
+
+You can set `DEV_PASSWORD` with the developer password set on the roku device if it is something other than the default `1234`
+
+### Run unit tests
+
 ``test`` profile is just for testing purpose. If you run this:
 
 ```
