@@ -96,6 +96,7 @@ You can set `DEV_PASSWORD` with the developer password set on the roku device if
 | /docs | Supplemental documentation for the channel |
 | /spec | Black box tests for the channel |
 | /src | Sources and assets which will be selectively included in the channe zip file, depending on build configuration. |
+| /src/3rdparty | 3rd party brightscript sources |
 | /src/components | SceneGraph components and accompanying code |
 | /src/components/controllers | "Controller"-type scene graph components which control visibility and flow of the application |
 | /src/components/lib | Custom Scene-Graph components which are not full screen, i.e. keyboard, left-hand menu |

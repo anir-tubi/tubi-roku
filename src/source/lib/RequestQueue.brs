@@ -1,0 +1,150 @@
+'''''''''''''''''
+' createHTTPRequestQueue - create and initialize a request queue
+'
+' port - the message port used by the caller's main loop, where roUrlTransfer objects will send events
+' maxSize - the maximum depth of queue, or 0 if no limit
+' timeout - seconds before expiring the request, default 30
+'
+Function createHTTPRequestQueue(port As Object, maxSize=0 As integer, timeout=30 As Integer) As Object
+  return {
+    'public
+    pushRequest: tubiq_pushRequest
+    handleEvent: tubiq_handleEvent
+    count: tubiq_count
+    clear: tubiq_clear
+    ' private
+    wrapRequest_: tubiq_wrapRequest_
+    advanceQueue_: tubiq_advanceQueue_
+    findRequestById_: tubiq_findRequestById_
+    queue: []
+    maxSize: maxSize
+    timeout: timeout
+    port: port
+  }
+End Function
+
+
+''''''''''''''''
+' pushRequest - add a request to the queue and start the request
+'
+' request - a request created by createAsyncHTTPRequest
+' 
+Function tubiq_pushRequest(request As Object) As Object
+  ' make room first
+  m.AdvanceQueue_()
+
+  if request["klass"] <> "TubiAsyncHTTPRequest"
+    tubiLog("Invalid object attempted to push to request queue")
+    return invalid
+  else
+    ' push to queue only if there is room
+    if m.maxSize = 0 or m.queue.Count() < m.maxSize then
+      m.queue.Push(m.WrapRequest_(request))
+      m.AdvanceQueue_()
+      return request
+    endif
+  end if
+  return invalid
+End Function
+
+
+'''''''''''''''''
+' handleEvent - Handle a roUrlEvent received by the message port, returns the request id which had changed.
+'
+' event - an event received on the message port assigned to this queue; events besides roUrlEvent will
+'         be ignored
+'
+Function tubiq_handleEvent(event As Object) As Object
+  if type(event) <> "roUrlEvent" then return invalid
+  id = event.GetSourceIdentity()
+  index = m.findRequestById_(id)
+  result = invalid
+  if index <> -1 then
+    entry = m.queue[index]
+    response = entry.request.handleEvent(event)
+    if response <> invalid then
+      result = response
+      m.queue.Delete(index)
+    end if
+  end if
+  m.AdvanceQueue_()
+  return result
+End Function
+
+
+'''''''''''''''''
+' count - Return the number of requests currently in the queue
+'
+Function tubiq_count()
+  m.AdvanceQueue_()
+  return m.queue.Count()
+End Function
+
+'''''''''''''''''
+' clear - Cancel all outstanding requests
+'
+Function tubiq_clear()
+  for each entry in m.queue
+    if entry.urltransfer <> invalid then
+      entry.urltransfer.AsyncCancel()
+    end if
+  end for
+  m.queue.Clear()
+End Function
+
+
+' Make our own object out of the initial reqeust
+Function tubiq_wrapRequest_(request As Object) As Object
+  datetime = CreateObject("roDateTime")
+  now = datetime.AsSeconds()
+  return {
+    request: request
+    urltransfer: invalid
+    startTime: now
+  }
+End Function
+
+
+'Start any queued requests if there is room in the active queue
+Function tubiq_advanceQueue_()
+  datetime = CreateObject("roDateTime")
+  now = datetime.AsSeconds()
+
+  ' Expire any active requests.  These may still be in transit or be complete
+  ' but response not processed
+  i = 0
+  while i < m.queue.Count()
+    entry = m.queue[i]
+    if m.timeout <> invalid and m.timeout <> 0 then
+      if now - entry.startTime > m.timeout then
+        entry.request.cancel()
+        m.queue.Delete(i)        
+        i = i - 1 'to account for shift
+      end if
+    end if
+    i = i + 1
+  end while
+
+  ' Start requests
+  ' TODO(chris): incorporate an 'max active' to control a pool of roUrltransfer objects
+  for i=0 to m.queue.Count()-1
+    entry = m.queue[i]
+    if entry.urltransfer = invalid
+      entry.urltransfer = CreateObject("roUrlTransfer")
+      entry.urltransfer.SetPort(m.port)
+      entry.request.start(entry.urltransfer)
+    end if
+  end for
+    
+End Function
+
+' Find a request in the queue by its unique id. 
+'
+' returns the index in the queue
+Function tubiq_findRequestById_(id As Integer) As Integer
+  for i=0 to m.queue.Count() - 1
+    entry = m.queue[i]
+    if entry.urltransfer <> invalid and entry.urltransfer.GetIdentity() = id then return i
+  end for
+  return -1
+End Function
