@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="MetadataFetchTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
+
+    <interface>
+      <!--
+      -
+      - The request param should have the following form:
+      - {
+      -   node: <node to receive content>
+      -   field: <field name on which to receive response>
+      -   url: <url to fetch>
+      -   options: <options to pass to createAsyncHTTPRequest>
+      -   name: <name to pass to createAsyncHTTPRequest>
+      - }
+      -
+      -->
+      <field id="request" type="assocarray" alwaysNotify="true"/>
+    </interface>
+</component>

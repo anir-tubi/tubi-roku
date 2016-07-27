@@ -58,12 +58,12 @@ End Function
 
 Function testMethods(t As Object)
   port = CreateObject("roMessagePort")
-  server = createTestServer(65535)
+  server = createTestServer(65534)
   server.SetMessagePort(port)
 
   ' Go through each method, verifying from the server side that the method in the request is correct
   for each method in [ "GET", "PUT", "POST", "PATCH", "DELETE" ]
-    request = createAsyncHTTPRequest("http://127.0.0.1:65535/", "", { method: method })
+    request = createAsyncHTTPRequest("http://127.0.0.1:65534/", "", { method: method })
     request.start(port)
     while true
       msg = wait(500, port)
