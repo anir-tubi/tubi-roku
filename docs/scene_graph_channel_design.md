@@ -203,7 +203,7 @@ UI work will be addressed by incrementally adding screens and functionality. The
 * Search Screen
     * APIs: Search
     * Custom components: keyboard
-    * Sign In / Sign Up flow
+* Sign In / Sign Up flow
     * APIs: Log in, Generate Code, Code Status
     * Screens: sign in disambiguation, continue as guest, sign in/register online, sign in email, sign in pw, sign in error
     * Sign In Controller
