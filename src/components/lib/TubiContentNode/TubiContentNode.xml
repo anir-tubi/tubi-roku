@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "TubiContentNode" extends="ContentNode">
+  <interface>
+    <field id="type" type="string" />
+    <field id="parentType" type="string" />
+    <field id="parentTitle" type="string" />
+    <field id="parentId" type="string" />
+    <field id="longdescription" type="string" />
+    <field id="landscape" type="string" />
+    <field id="portrait" type="string" />
+    <field id="genres" type="stringarray" />
+    <field id="heros" type="stringarray" />
+    <field id="showsubtitles" type="boolean" />
+  </interface>
+</component>

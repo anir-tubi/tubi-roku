@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - ContentController
+ -
+ - This is the primary scene of the application which will manage
+ - CategoryScreen and DetailScreen.
+ -
+ - Scene Startup Sequence:
+ -  1) This component is created and init() is run
+ -  2) During ContentController.init(), the MetadataFetchTask is set to "RUN", creating its long-lived thread
+ -     that will answer requests for metdata from the primary scene graph thread.
+ -  3) The MetadataFetchTask sets a 'ready' field to "true" indicating that it is available
+ -  4) This component dynamically creates the CategoryScreen which begins making metadata requests
+ -
+ -  This startup sequence will ensure that the OS-level thread for MetadataTaskThread is ready
+ -  and we don't have race conditions when populating the CategoryScreen.
+ -
+ -->
+<component name="ContentController" extends="Scene">
+
+  <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ContentController.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- Watched by the main brightscript thread to indicate video playback should start -->
+    <field id="playContent" type="node" alwaysNotify="true" />
+
+    <!-- Show the detail screen for the item indicated.  This may come from the main menu or from a deep link request -->
+    <field id="itemDetail" type="node" alwaysNotify="true" />
+
+  </interface>
+        
+    <children>
+      <Rectangle
+        id="ContentBackground"
+        color="0x000000"
+        width="1920"
+        height="1080"
+        translation="[0,0]" />
+
+      <MetadataFetchTask 
+        id="MetadataFetchTask" />
+
+    </children>
+
+</component>
+

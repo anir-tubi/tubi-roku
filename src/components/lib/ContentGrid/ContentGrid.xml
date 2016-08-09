@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+ - ContentGrid
+ -
+ - A 2D Scrolling grid of same-sized items.
+ - Scrolling happens whenever list items are outside of the
+ - boundaries set by 'width' or 'height'. Scrolling only happens
+ - in one direction, keyed on 'fillDirection'.  Onfilling the grid,
+ - the 'numColumns' and 'numRows' dimensions will be used to stripe
+ - the items in a "Z" (fill rows first) or "W" (fill columns first)
+ - pattern.
+ -
+ - Key handling for scrolling has 2 features: 
+ -   a) navigation buttons pressed in quick succession will
+ -      supress 'itemFocused' updates until button presses slow down
+ -   b) press and hold navigation will scroll until the button is
+ -      released, supressing 'itemFocused' updates until the release
+ -
+ -->
+<component name="ContentGrid" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/ContentGrid/ContentGrid.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <field id="content" type="node" />
+    
+    <!-- Renderable items should have the following fields:
+    -
+    - width
+    - height
+    - index
+    - itemContent
+    - focusPercent
+    -
+    - These mimic MarkupGrid: https://sdkdocs.roku.com/display/sdkdoc/MarkupGrid
+    -->
+    <field id="itemComponentName" type="string" value=""/>
+    
+    <!-- Grid dimensions -->
+    <field id="itemSize" type="vector2d" value="[0,0]"/>
+    <field id="itemSpacing" type="vector2d" value="[0,0]"/>
+    
+    <!-- 
+    - if numColumns is defined and numRows is zero, columns will expand 
+    - if numRows is defined and numColumns is zero, rows will expand
+    - if both are defined, rows are filled first.  Content will be ignored past (numColumns*numRows)
+    -
+    - fillDirection:
+    -   "Z" fills rows first
+    -   "W" fills columns first
+    -
+    -->
+    <field id="numColumns" type="integer" value="0" />
+    <field id="numRows" type="integer" value="0" />
+    <field id="fillDirection" type="string" value="W" />
+    
+    <!-- boundaries used for scrolling -->
+    <field id="width" type="float" />
+    <field id="height" type="float" />
+
+    <!-- Focus control -->
+    <field id="itemSelected" type="integer" value="-1" alwaysNotify="true"/>
+    <field id="itemFocused" type="integer" value="-1" alwaysNotify="true"/>
+  </interface>
+  
+  <children>
+    <Group
+      id="ContentsMask">
+      <Group
+        id="Contents" >
+        <!--
+        -
+        - Components of type m.top.itemComponentName will be added here to
+        - fit m.top.content in to.
+        -
+        -->
+      </Group>
+    </Group>
+    <Animation
+     id="ScrollAnimation"
+     duration="0.25">
+      <Vector2DFieldInterpolator
+        id="TranslationInterpolator"
+        fieldToInterp="Contents.translation" />
+      <Vector2DFieldInterpolator
+        id="FocusBoxInterpolator"
+        fieldToInterp="FocusBox.translation" />
+    </Animation>
+    <Group
+     id="FocusBox"
+     translation="[0,0]"
+     visible="false">
+      <Poster
+       id="FocusBoxPoster"
+       uri="pkg:/images/frame-glow-hd3.9.png"
+       translation="[-13,-13]" 
+       loadDisplayMode="scaleToFit"/>
+    </Group>
+  </children>
+</component>

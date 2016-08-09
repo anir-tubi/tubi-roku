@@ -28,16 +28,25 @@ Function Main()
   sgGlobal.addField("constants", "assocarray", false)
   sgGlobal.constants = m.global.constants
 
-  'TODO(Chris): replace this empty scene with the real compoments later
-  controller = screen.CreateScene("Scene")
+  controller = screen.CreateScene("ContentController")
   screen.show()
+
+  ' THIS ONLY WORKS ON 7.1+ firmware!
+  controller.observeField("playContent", port)
 
   while(true)
     msg = wait(0, port)
     msgType = type(msg)
     if msgType = "roSGScreenEvent"
       if msg.isScreenClosed() then return 0
+    else if msgType = "roSGNodeEvent"
+      playVideo()
     end if
+
   end while
 
 end Function
+
+Function playVideo()
+  ' TODO(Chris): this will launch a roVideoPlayer based on ContentController.playContent
+End Function

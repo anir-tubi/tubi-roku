@@ -43,6 +43,7 @@ manifest:
   minor_version: 3
   build_version: 1
   bs_libs_required: roku_ads_lib
+  ui_resolutions: "fhd"
 
 theme:
   ThemeType: "flat-movie"

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - ContentGridItem
+ -
+ - Individual items used for ContentGrid when simply displaying 
+ - a poster image.
+ -
+ -->
+<component name="ContentGridItem" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/ContentGridItem/ContentGridItem.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="index" type="integer" />
+    <field id="focusPercent" type="float" />
+    <field id="width" alias="Poster.width" />
+    <field id="height" alias="Poster.height" />
+  </interface>
+  
+  <children>
+    <Poster
+     id="Poster" 
+     width="227"
+     loadWidth="227"
+     height="326"
+     loadHeight="326"
+     loadDisplayMode="scaleToZoom"
+     loadingBitmapUri="pkg:/images/placeholder.png"/>
+  </children>
+</component>

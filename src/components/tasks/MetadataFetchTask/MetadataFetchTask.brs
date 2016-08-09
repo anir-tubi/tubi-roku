@@ -14,6 +14,10 @@ Function fetchLoop()
   m.port = CreateObject("roMessagePort")
   m.queue = createHTTPRequestQueue(m.port)
   m.top.observeField("request", m.port)
+  m.constants = m.global.constants   ' this should grab a thread-local copy
+
+  ' Signal that we're ready for requests
+  m.top.ready = true
 
   while true
     msg = wait(0, m.port)
@@ -73,7 +77,20 @@ Function handleResponse(message)
     ' double check that we have our context
     if handledRequest.node <> invalid and handledRequest.field <> invalid and handledRequest.response <> invalid then
       tubiLog("MetadataFetchTask.handleResponse setting response field " + handledRequest.field)
-      handledRequest.node[handledRequest.field] = handledRequest.response.data
+      handledRequest.node[handledRequest.field] = convertToContentMetadata(handledRequest.response.data)
     end if
   end if
+End Function
+
+' TODO(Chris): Capture this somewhere else if we use it in other places than this task node
+Function convertToContentMetadata(data) As Object
+  parsed = ParseJSON(data)
+  if parsed = invalid then
+    tubiLog("MetadataFetchTask.convertToContentMetadata failed to parse JSON response")
+    return invalid
+  end if
+
+  parentNode = translateMetadata(parsed)
+   
+  return parentNode
 End Function

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - CategoryListItem
+ -
+ - Items used in a ScrollingList for showing categories.  These
+ - are labels which can wrap text and also display a cursor when
+ - the scrollinglist has focus.
+ -
+ -->
+<component name="CategoryListItem" extends="Group" >
+  <script type="text/brightscript" uri="pkg:/components/lib/CategoryListItem/CategoryListItem.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <field id="focusPercent" type="float" value="0.0"/>
+    <field id="content" type="node" />
+    <field id="listHasFocus" type="boolean" value="false" />
+  </interface>
+  
+  <children>
+    <LayoutGroup
+      layoutDirection="horiz"
+      itemSpacings="[10]" 
+      vertAlignment="center">
+    <Rectangle 
+      id="categoryListCursor" 
+      color="0xFF9933FF"
+      height="22"
+      width="5"
+      visible="true"
+      opacity="0.0"/>
+    <Label 
+      id="categoryText" 
+      horizAlign="left"
+      wrap="true"
+      color="0xFFFFFF"
+      width="342"
+      lineSpacing="0"
+      maxLines="2">
+      <Font
+      role="font"
+      size="31"
+      uri="pkg:/fonts/OpenSans-Regular.ttf" />
+    </Label>
+    </LayoutGroup>
+  </children>
+</component>

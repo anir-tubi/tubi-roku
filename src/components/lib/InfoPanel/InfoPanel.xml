@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - InfoPanel
+ -
+ - This is a panel of metadata about a piece of content or
+ - a content category.  There are 3 modes:
+ -    1) 'category' - shows only title and description
+ -    2) 'item' - shows short content item description with releasedate, rating, etc.
+ -    3) 'detail' - shows full details including cast and crew
+ -
+ -->
+<component name="InfoPanel" extends="LayoutGroup">
+
+  <script type="text/brightscript" uri="pkg:/components/lib/InfoPanel/InfoPanel.brs" />
+
+  <interface>
+    <field id="content" type="node" />
+      
+    <!-- mode is either: 'category', 'item', or 'detail' -->
+    <field id="mode" type="string" value="category" />
+  </interface>
+
+  <children>
+
+    <Label
+      id="Title"
+      width="0"
+      height="73.2"
+      translation="[0, 0]"
+      vertAlign="bottom">
+      <Font
+        role="font"
+        uri="pkg:/fonts/OpenSans-Semibold.ttf"
+        size="45" />
+    </Label>
+
+    <Label
+      id="OneLineInfo"
+      color="0x999999" >
+      <Font
+        id="Regular29Font"
+        role="font"
+        uri="pkg:/fonts/OpenSans-Regular.ttf"
+        size="29" />
+    </Label>
+    
+    <LayoutGroup
+      id="TwoLineInfo"
+      layoutDirection="vert"
+      visible="false">
+      <Label
+        id="Line1"
+        color="0x999999" >
+        <Font
+          id="TwoLineInfoFont"
+          role="font"
+          uri="pkg:/fonts/OpenSans-Regular.ttf"
+          size="25" />
+      </Label>
+      <Label
+        id="Line2"
+        font="dictionary:TwoLineInfoFont"
+        color="0x999999" />
+    </LayoutGroup>
+    
+    <Label
+      id="Description"
+      font="dictionary:Regular29Font"
+      width="1215"
+      height="148"
+      translation="[0,73.5]"
+      lineSpacing="0"
+      wrap="true"/>
+    <Label
+      id="Director"
+      font="dictionary:Regular29Font"
+      visible="false" />
+    <Label
+      id="Starring"
+      font="dictionary:Regular29Font"
+      visible="false" />
+    
+  </children>
+
+</component>
