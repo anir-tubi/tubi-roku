@@ -22,15 +22,15 @@
     <Poster 
       id="Background" 
       loadingBitmapUri="pkg:/images/loading_feature.png"
-      width="464"
-      height="210"
+      width="392"
+      height="196"
       loadDisplayMode="scaleToZoom"
       translation="[0,0]" />
 
     <Poster
       id="TitleShade"
       uri="pkg:/images/rectangle-53.png"
-      width="464"
+      width="392"
       height="65"
       translation="[0,155]"/>
 

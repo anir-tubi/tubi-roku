@@ -6,7 +6,10 @@
  - a content category.  There are 3 modes:
  -    1) 'category' - shows only title and description
  -    2) 'item' - shows short content item description with releasedate, rating, etc.
- -    3) 'detail' - shows full details including cast and crew
+ -    3) 'movie' - shows full details including cast and crew
+ -    4) 'series' - shows full details including cast and crew
+ -    5) 'season' - shows full details including cast and crew
+ -    6) 'episode' - shows full details including cast and crew
  -
  -->
 <component name="InfoPanel" extends="LayoutGroup">
@@ -16,7 +19,7 @@
   <interface>
     <field id="content" type="node" />
       
-    <!-- mode is either: 'category', 'item', or 'detail' -->
+    <!-- mode is either: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
     <field id="mode" type="string" value="category" />
   </interface>
 
@@ -25,60 +28,112 @@
     <Label
       id="Title"
       width="0"
-      height="73.2"
+      height="73"
       translation="[0, 0]"
       vertAlign="bottom">
       <Font
         role="font"
-        uri="pkg:/fonts/OpenSans-Semibold.ttf"
-        size="45" />
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="67" />
     </Label>
 
     <Label
-      id="OneLineInfo"
-      color="0x999999" >
+      id="Episode">
       <Font
-        id="Regular29Font"
         role="font"
-        uri="pkg:/fonts/OpenSans-Regular.ttf"
-        size="29" />
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="33" />
     </Label>
+
+    <LayoutGroup
+      id="CategoryDetails"
+      layoutDirection="vert"
+      itemSpacings="[10]"
+      opacity="0.5"
+      visible="true">
+      <Label
+        id="CategoryLine1">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="22" />
+      </Label>
+      <Label
+        id="CategoryLine2"
+        font="dictionary:Vaud22px"/>
+    </LayoutGroup>
     
     <LayoutGroup
       id="TwoLineInfo"
       layoutDirection="vert"
-      visible="false">
+      itemSpacings="[10]"
+      opacity="0.5"
+      visible="true">
       <Label
-        id="Line1"
-        color="0x999999" >
+        id="Line1">
         <Font
-          id="TwoLineInfoFont"
+          id="Vaud22px"
           role="font"
-          uri="pkg:/fonts/OpenSans-Regular.ttf"
-          size="25" />
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="22" />
       </Label>
       <Label
         id="Line2"
-        font="dictionary:TwoLineInfoFont"
-        color="0x999999" />
+        font="dictionary:Vaud22px"/>
     </LayoutGroup>
     
     <Label
       id="Description"
-      font="dictionary:Regular29Font"
       width="1215"
       height="148"
       translation="[0,73.5]"
-      lineSpacing="0"
-      wrap="true"/>
-    <Label
-      id="Director"
-      font="dictionary:Regular29Font"
-      visible="false" />
-    <Label
-      id="Starring"
-      font="dictionary:Regular29Font"
-      visible="false" />
+      lineSpacing="13"
+      maxLines="4"
+      wrap="true">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="27" />
+    </Label>
+    <LayoutGroup
+      id="DirectorGroup"
+      layoutDirection="horiz">
+      <Label
+        id="DirectorTag"
+        text="Directed by"
+        font="dictionary:Vaud22px"
+        visible="true" 
+        opacity="0.5"/>
+      <Rectangle 
+        id="DirectorRect"
+        opacity="0.2"
+        width="43"
+        height="1"/>
+      <Label
+        id="Director"
+        font="dictionary:Vaud22px"
+        visible="true" />
+    </LayoutGroup>
+    <LayoutGroup
+      id="StarringGroup"
+      layoutDirection="horiz">
+      <Label
+        id="StarringTag"
+        text="Starring"
+        font="dictionary:Vaud22px"
+        visible="true" 
+        opacity="0.5"/>
+      <Rectangle 
+        id="StarringRect"
+        opacity="0.2"
+        width="77"
+        height="1"/>
+      <Label
+        id="Starring"
+        font="dictionary:Vaud22px"
+        visible="true" />
+    </LayoutGroup>
     
   </children>
 

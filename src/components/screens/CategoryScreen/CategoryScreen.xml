@@ -23,6 +23,9 @@
     -
     -->
     <field id="content" type="node" />
+    
+    <!-- set to the tubi content id of the item which was clicked on -->
+    <field id="contentSelected" type="node" alwaysNotify="true"/>
   </interface>
 
   <children>
@@ -43,30 +46,30 @@
     
     <ScrollingList
       id="CategoryList"
-      translation="[54, 355]"
-      width="357"
-      height="684"
+      translation="[40, 422]"
+      width="445"
+      height="617"
       visible="true" 
-      itemSpacings="[30]"
-      itemComponentName="CategoryListItem"/>
+      itemSpacings="[0]"
+      itemComponentName="CategoryListItem"
+      focusBitmapUri="pkg:/images/menu-focus.png"/>
     
     <InfoPanel
       id="InfoPanel"
-      translation="[66,44]"
+      translation="[82,59]"
       visible="true" />
     
     <Group
-      translation="[435,366]" >
+      translation="[525,424]" >
     <!-- TODO(Chris): How do we trigger feature vs. poster grid -->
       
       <ContentGrid
        id="FeatureGrid"
        numRows="3"
-       numColumns="3"
        width="1455"
        height="693"
-       itemSize="[464,210]"
-       itemSpacing="[21,21]"
+       itemSize="[392,196]"
+       itemSpacing="[10,10]"
        itemComponentName="FeaturePoster"
        fillDirection="W"
        visible="false" 
@@ -74,10 +77,10 @@
     <ContentGrid
       id="PosterGrid"
       numRows="2"
-      width="1472"
-      height="674"
-      itemSize="[227,326]"
-      itemSpacing="[22,22]"
+      width="1310"
+      height="610"
+      itemSize="[210,300]"
+      itemSpacing="[10,10]"
       itemComponentName="ContentGridItem"
       fillDirection="W"
       visible="true"

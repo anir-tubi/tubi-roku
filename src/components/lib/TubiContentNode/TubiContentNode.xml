@@ -12,5 +12,16 @@
     <field id="genres" type="stringarray" />
     <field id="heros" type="stringarray" />
     <field id="showsubtitles" type="boolean" />
+    <field id="subtitles" type="assocarray" />
+    <field id="language" type="string" />
+    <field id="pubid" type="string" />
+    <field id="country" type="string" />
+    <field id="introcuepoint" type="int" />
+    <field id="creditscuepoint" type="int" />
+    <field id="backgrounds" type="stringarray" />
+    
+    <!-- these will come in for paginated responses -->
+    <field id="totalCount" type="int" />
+    <field id="more" type="boolean" />
   </interface>
 </component>

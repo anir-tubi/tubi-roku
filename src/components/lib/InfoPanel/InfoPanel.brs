@@ -1,9 +1,12 @@
 Function init()
   m.Title = m.top.findNode("Title")
-  m.Description = m.top.findNode("Description")
-  m.OneLineInfo = m.top.findNode("OneLineInfo")
+  m.Episode = m.top.findNode("Episode")
+  m.CategoryDetails = m.top.findNode("CategoryDetails")
   m.TwoLineInfo = m.top.findNode("TwoLineInfo")
+  m.Description = m.top.findNode("Description")
   m.Director = m.top.findNode("Director")
+  m.DirectorGroup = m.top.findNode("DirectorGroup")
+  m.StarringGroup = m.top.findNode("StarringGroup")
   m.Starring = m.top.findNode("Starring")
 
   m.top.observeField("content", "onContentChange")
@@ -21,31 +24,56 @@ Function onContentChange()
   print "InfoPanel.onContentChange"
   content = m.top.content
   if content <> invalid then
-    m.Title.text = content.title
-    m.Description.text = content.description
 
-    ' OneLineInfo
-    info = []
-    if content.categories <> invalid and content.categories.count() > 0 then info.push(UCase(content.categories[0]))
-    ' TODO(Chris): What format will this come back as? We want only the year
-    if content.releasedate <> invalid then info.push(content.releasedate)
-    if content.length <> invalid then info.push(formatLengthAsTimestamp(content.length))
-    if content.rating <> invalid then info.push(content.rating)
-    m.OneLineInfo.text = joinStringArray(info, "   ")
-  
+    ' Title
+    m.Title.text = content.title
+
+    ' CategoryDetails
+    categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
+    if content.getChildCount() > 0
+      categoryLine1.text = stri(content.getChildCount()).trim() + " titles in this category"
+    else
+      categoryLine1.text = ""
+    end if
+    categoryLine2 = m.CategoryDetails.findNode("CategoryLine2")
+    'TODO(Chris): Where in the API can we get "last updated" information?
+    'categoryLine2.text = "Updated on Wednesday"
+
     ' TwoLineInfo
     line1Label = m.TwoLineInfo.findNode("Line1")
-    line1Label.text = "(" + content.releasedate + ") " + Chr(&hc2) + Chr(&hb7) + " " + formatLengthAsEnglish(content.length) + " " + content.rating
+    line1Label.text = ""
+    if content.releasedate <> invalid and content.releasedate <> "" then
+      line1Label.text = "(" + content.releasedate + ") "
+    end if
+    if content.length <> invalid and content.length <> 0 then
+      ' add 'dot' spacer only if we had a release date
+      if line1Label.text.len() > 0 then 
+        line1Label.text = line1Label.text + Chr(&hb7) + " "
+      end if
+      line1Label.text = line1Label.text + formatLengthAsEnglish(content.length) + " "
+    end if
+    if content.rating <> invalid and content.rating <> "" then
+      line1Label.text = line1Label.text + content.rating
+    end if
     line2Label = m.TwoLineInfo.findNode("Line2")
-    line2Label.text = content.category
-    if content.categories <> invalid and content.categories.count() > 0 then
-      line2Label.text = joinStringArray(content.categories, ", ")
+    if content.genres <> invalid and content.genres.count() > 0 then
+      capitalGenres = []
+      for each c in content.genres
+        capitalGenres.push(capitalize(c))
+      end for
+      line2Label.text = joinStringArray(capitalGenres, ", ")
     end if
   
+    ' Description
+    m.Description.text = content.description
+
+    ' Directors
     m.Director.text = content.director
     if content.directors <> invalid and content.directors.count() > 0 then
       m.Director.text = joinStringArray(content.directors, ", ")
     end if
+
+    ' Actors
     m.Starring.text = content.actor
     if content.actors <> invalid and content.actors.count() > 0 then
       m.Starring.text = joinStringArray(content.actors, ", ")
@@ -63,28 +91,53 @@ Function onModeChange()
   print "InfoPanel.onModeChange"
   m.top.removeChildrenIndex(m.top.getChildCount(), 0)
 
-  if m.top.mode = "detail" then
+  if m.top.mode= "category" then
+    m.top.appendChildren([
+      m.Title
+      m.CategoryDetails
+      m.Description
+    ])
+    m.top.itemSpacings = [44, 19]
+  else if m.top.mode = "item" then
     m.top.appendChildren([
       m.Title
       m.TwoLineInfo
       m.Description
-      m.Director
-      m.Starring
     ])
-  else if m.top.mode = "item" then
+    m.top.itemSpacings = [44, 19]
+  else if m.top.mode = "movie" then
     m.top.appendChildren([
       m.Title
-      m.OneLineInfo
+      m.TwoLineInfo
       m.Description
+      m.DirectorGroup
+      m.StarringGroup
     ])
-  else ' category
-    m.top.mode = "category" ' in case an invalid value was set
+    m.top.itemSpacings = [44, 19, 28, 12]
+  else if m.top.mode = "series" then
     m.top.appendChildren([
       m.Title
+      m.Episode
+      m.TwoLineInfo
+      m.Description
+      m.DirectorGroup
+      m.StarringGroup
+    ])
+    m.top.itemSpacings = [20, 22, 19, 28, 12]
+  else if m.top.mode = "season" then
+    m.top.appendChildren([
+      m.Title
+    ])
+    m.top.itemSpacings = []
+  else if m.top.mode = "episode" then
+    m.top.appendChildren([
+      m.Title
+      m.Episode
+      m.TwoLineInfo
       m.Description
     ])
+    m.top.itemSpacings = [19, 20, 19]
   end if
-  print "InfoPanel has " + stri(m.top.getChildCount()) + " nodes"
 End Function
 
 
@@ -113,6 +166,7 @@ End Function
 ' take an integer length in seconds and give it an English descriptions like "1 h 36 min"
 'TODO(Chris): Move this to common library
 Function formatLengthAsEnglish(length As Dynamic) As String
+  if type(length) = "Float" or type(length) = "Double" then length = Int(length)
   if type(length) = "Integer"
     hours = length \ 3600
     minutes = (length mod 3600) \ 60
@@ -157,4 +211,17 @@ Function joinStringArray(a As Object, c As String)
     result = result + c + a[i]
   end for
   return result
+End Function
+
+
+''''''''''
+' capitalize
+'
+' Make the first letter uppercase, the reset lowercase
+Function capitalize(s As String)
+  if s.len() > 0 then
+    return Ucase(Left(s, 1)) + LCase(Right(s, s.len() - 1))
+  else
+    return ""
+  end if
 End Function

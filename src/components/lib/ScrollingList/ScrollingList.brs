@@ -5,9 +5,13 @@ Function init()
   m.top.observeField("content", "onContentChange")
   m.top.observeField("animateToItem", "onAnimateToItem")
   m.items = m.top.findNode("Items")
+  m.focusImage = m.top.findNode("FocusImage")
   m.scrollAnimation = m.top.findNode("ScrollAnimation")
   m.translationInterpolator = m.top.findNode("TranslationInterpolator")
   m.focusInterpolator = m.top.findNode("FocusInterpolator")
+  m.focusImageInterpolator = m.top.findNode("FocusImageInterpolator")
+  m.focusImageWidthInterpolator = m.top.findNode("FocusImageWidthInterpolator")
+  m.focusImageHeightInterpolator = m.top.findNode("FocusImageHeightInterpolator")
   m.unfocusInterpolator = m.top.findNode("UnfocusInterpolator")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.internalItemFocused = m.top.itemFocused  ' separate from event emitter
@@ -80,6 +84,11 @@ Function onComponentFocusChange()
       m.top.itemFocused = m.internalItemFocused
     end if
   end if
+  if m.top.isInFocusChain() then
+    m.focusImage.visible = true
+  else
+    m.focusImage.visible = false
+  end if
 End Function
 
 ''''''''''''''''''''''
@@ -96,6 +105,10 @@ Function onKeyEvent(key As Object, press As Boolean) As Boolean
   if press and m.items.getChildCount() <> 0 then
     if m.scrollAnimation.state = "running" then 
       m.overlappedKeypress = key
+      return true
+    end if
+    if key = "OK" and m.scrollAnimation.state = "stopped" then
+      m.top.itemSelected = m.internalItemFocused
       return true
     end if
     if scrollList(key) then
@@ -205,13 +218,20 @@ Function startChangeFocus(newFocusedIndex As Integer) As Void
   end if
 
   ' Start scroll animation
-  m.translationInterpolator.key=[ 0.0, 1.0 ]
-  m.translationInterpolator.keyvalue=[ m.items.translation, newPosition ]
-  m.focusInterpolator.fieldToInterp= + focusedItem.id + ".focusPercent"
+  m.translationInterpolator.key = [ 0.0, 1.0 ]
+  m.translationInterpolator.keyvalue = [ m.items.translation, newPosition ]
+  m.focusInterpolator.fieldToInterp = + focusedItem.id + ".focusPercent"
   if unfocusedItem <> invalid then
     ' we may have just received content
     m.unfocusInterpolator.fieldToInterp= unfocusedItem.id + ".focusPercent"
   end if
+  newFocusImagePosition = [ 
+    itemRect.x + newPosition[0]
+    itemRect.y + newPosition[1]
+  ]
+  m.focusImageInterpolator.keyvalue = [ m.focusImage.translation, newFocusImagePosition ]
+  m.focusImageWidthInterpolator.keyvalue = [ m.focusImage.width, itemRect.width ]
+  m.focusImageHeightInterpolator.keyvalue = [ m.focusImage.height, itemRect.height ]
   m.scrollAnimation.observeField("state", "endChangeFocus")
   m.scrollAnimation.control = "start"
 End Function

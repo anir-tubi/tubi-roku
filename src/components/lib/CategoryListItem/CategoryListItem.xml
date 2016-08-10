@@ -7,7 +7,7 @@
  - the scrollinglist has focus.
  -
  -->
-<component name="CategoryListItem" extends="Group" >
+<component name="CategoryListItem" extends="Rectangle" >
   <script type="text/brightscript" uri="pkg:/components/lib/CategoryListItem/CategoryListItem.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
@@ -18,30 +18,17 @@
   </interface>
   
   <children>
-    <LayoutGroup
-      layoutDirection="horiz"
-      itemSpacings="[10]" 
-      vertAlignment="center">
-    <Rectangle 
-      id="categoryListCursor" 
-      color="0xFF9933FF"
-      height="22"
-      width="5"
-      visible="true"
-      opacity="0.0"/>
     <Label 
       id="categoryText" 
       horizAlign="left"
-      wrap="true"
-      color="0xFFFFFF"
+      vertAlign="center"
       width="342"
-      lineSpacing="0"
-      maxLines="2">
+      height="80"
+      translation="[44,0]">
       <Font
       role="font"
-      size="31"
-      uri="pkg:/fonts/OpenSans-Regular.ttf" />
+      size="33"
+      uri="pkg:/fonts/Vaud-SemiBold.ttf" />
     </Label>
-    </LayoutGroup>
   </children>
 </component>

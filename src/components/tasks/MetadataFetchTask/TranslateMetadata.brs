@@ -12,17 +12,13 @@ Function translateMetadata(contentToTranslate) As Object
     'expect a list of categories with one category filled with content or a list of contents
     if type(contentToTranslate) = "roArray"
       for each content in contentToTranslate
-        translateRecursive(content, translated)
+        node = translated.createChild("TubiContentNode")
+        translateRecursive(content, node)
       end for
 
     'expect a single piece of content, or several (as an associative array)
     else if type(contentToTranslate) = "roAssociativeArray"
-      for each id in contentToTranslate
-        'the uapi/contents API might return a piece of content as invalid (chris: ?)
-        if contentToTranslate[id] <> invalid
-          translateRecursive(contentToTranslate[id], translated)
-        end if
-      end for
+      translateRecursive(contentToTranslate, translated)
     end if
   end if
 
@@ -34,10 +30,10 @@ end Function
 ' translateRecursive
 '
 ' This is a recursive function that does the heavy lifting for translateContentFromServer
-Function translateRecursive(contentFromServer, parent) As Void
+'this is a recursive function that does the heavy lifting for translateContentFromServer
+Function translateRecursive(contentFromServer, translatedContent) As Void
   if contentFromServer = invalid then return
 
-  translatedContent = parent.createChild("TubiContentNode")
   constants = m.constants
 
   typeVar = "type"
@@ -55,6 +51,7 @@ Function translateRecursive(contentFromServer, parent) As Void
 
     'record keeping needed for adding series to bookmarks and previously viewed
     ' if translatedContent.type = constants.ui.contentTypes.video and parent <> invalid and parent.parentType = constants.ui.contentTypes.series
+    parent = translatedContent.getParent()
     if parent.parentId <> invalid
       translatedContent.parentId = parent.parentId
     else
@@ -95,7 +92,7 @@ Function translateRecursive(contentFromServer, parent) As Void
     end if
     
     if contentFromServer.directors <> invalid and contentFromServer.directors.count() > 0
-      translatedContent.director = contentFromServer.directors[0]
+      translatedContent.directors = contentFromServer.directors
     end if
 
     if contentFromServer.credit_cuepoints <> invalid
@@ -120,6 +117,10 @@ Function translateRecursive(contentFromServer, parent) As Void
       translatedContent.heros = contentFromServer.hero_images
     end if
 
+    if contentFromServer.backgrounds <> invalid and type(contentFromServer.backgrounds) = "roArray" and contentFromServer.backgrounds.count() > 0
+      translatedContent.backgrounds = contentFromServer.backgrounds
+    end if
+
     if contentFromServer.ratings <> invalid and contentFromServer.ratings[0] <> invalid and contentFromServer.ratings[0].value <> invalid
       translatedContent.rating = contentFromServer.ratings[0].value
     end if
@@ -136,19 +137,20 @@ Function translateRecursive(contentFromServer, parent) As Void
 
     'take care of any subtitles if they exist - should only happen on videos
     if contentFromServer.subtitles <> invalid and type(contentFromServer.subtitles) = "roArray" and contentFromServer.subtitles.count() > 0
-      translatedContent.subtitles = {}
-      translatedContent.subtitles.languages = []
+      translatedContent.subtitles = {
+        languages: []
+      }
       for each subtitle in contentFromServer.subtitles
-        translatedContent.subtitles.languages.push({
+        translatedContent.subtitles["languages"].push({
           url: subtitle.url
           name: subtitle.lang
         })
       end for
       
       'set the default subtitles if there is only one set of subtitles
-      if translatedContent.subtitles.languages.count() = 1
-        translatedContent.subtitles.default = translatedContent.subtitles.languages[0].url
-        translatedContent.subtitleUrl = translatedContent.subtitles.languages[0].url
+      if translatedContent.subtitles["languages"].count() = 1
+        translatedContent.subtitles.default = translatedContent.subtitles["languages"][0].url
+        translatedContent.subtitleUrl = translatedContent.subtitles.["languages"][0].url
       end if
     end if
 
@@ -161,11 +163,16 @@ Function translateRecursive(contentFromServer, parent) As Void
       end if
     end if
 
+    'if this content is actually just a paginated response, set pagination data
+    if contentFromServer.total_count <> invalid then translatedContent.totalCount = contentFromServer.total_count
+    if contentFromServer.more <> invalid then translatedContent.more = contentFromServer.more
+
     'take care of any children the content might have
     if contentFromServer.children <> invalid and contentFromServer.children.count() > 0
 
       for each childContent in contentFromServer.children
-        translatedChildContent = translateRecursive(childContent, translatedContent)
+        node = translatedContent.createChild("TubiContentNode")
+        translatedChildContent = translateRecursive(childContent, node)
       end for
 
     end if

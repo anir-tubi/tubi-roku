@@ -5,12 +5,34 @@ Function init()
   m.ContentGrid = m.top.findNode("PosterGrid")
   m.Hero = m.top.findNode("HeroBackground")
   m.top.observeField("content", "onContentChange")
+  m.top.observeField("focusedChild", "onScreenFocusChange")
   m.CategoryList.observeField("itemFocused","onCategoryChange")
   m.ContentGrid.observeField("itemFocused","onGridFocusChange")
   m.ContentGrid.observeField("itemSelected","onGridItemSelected")
+  m.FeatureGrid = m.top.findNode("FeatureGrid")
+  m.FeatureGrid.observeField("itemFocused","onGridFocusChange")
+  m.FeatureGrid.observeField("itemSelected","onGridItemSelected")
   m.defaultHeroUri = "pkg:/images/background-not-on-selection.png"
 
+  ' track the last focused screen component so that we can go back
+  ' to it when focus is taken away
+  m.lastFocusedComponent = m.CategoryList
+
   loadAllCategories()
+End Function
+
+
+''''''''''''''''''''
+' onScreenFocusChange
+'
+' Set focus back to category list or component group if the
+' screen has lost focus, usually due to another screen or dialog
+' being shown.
+Function onScreenFocusChange()
+  if m.top.hasFocus() then
+    ' defaulted to screen, move to a subcomponent
+    m.ContentGrid.setFocus(true)
+  end if
 End Function
 
 
@@ -68,6 +90,7 @@ Function onCategoryChange() As Void
   if not m.CategoryList.isInFocusChain() or m.CategoryList.content = invalid then return
   newCategory = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
   m.InfoPanel.content = newCategory
+  m.InfoPanel.mode = "category"
   m.Hero.uri = m.defaultHeroUri
 
   if newCategory.id <> m.ContentGrid.id then
@@ -112,7 +135,7 @@ End Function
 
 Function onGridItemSelected() As Void
   tubiLog("CategoryScreen.onGridItemSelected")
-  'TODO(Chris): Launch details screen here
+  m.top.contentSelected = m.ContentGrid.content.getChild(m.ContentGrid.itemSelected)
 End Function
 
 

@@ -24,13 +24,21 @@
     <field id="height" type="float" />
     <field id="content" type="node" />
     <field id="itemFocused" type="int" value="-1" alwaysNotify="true"/>
+    <field id="itemSelected" type="int" value="-1" alwaysNotify="true"/>
     <field id="itemComponentName" type="string" />
     <field id="itemSpacings" alias="Items.itemSpacings" />
     <field id="layoutDirection" alias="Items.layoutDirection" value="vert"/>
     <field id="animateToItem" type="int" value="-1" alwaysNotify="true"/>
+    <field id="focusBitmapUri" type="uri" alias="FocusImage.uri" />
   </interface>
   
   <children>
+    <Poster
+     id="FocusImage"
+     translation="[0,0]"
+     visible="true" 
+     loadDisplayMode="scaleToFit"
+     uri="" />
     <LayoutGroup 
      id="Items"
      translation="[0,0]"/>
@@ -49,6 +57,18 @@
         id="UnfocusInterpolator"
         key="[0.0,1.0]"
         keyValue="[1.0,0.0]"  />
+      <Vector2DFieldInterpolator
+        id="FocusImageInterpolator"
+        key="[0.0,1.0]"
+        fieldToInterp="FocusImage.translation" />
+      <FloatFieldInterpolator
+        id="FocusImageWidthInterpolator"
+        key="[0.0,1.0]"
+        fieldToInterp="FocusImage.width" />
+      <FloatFieldInterpolator
+        id="FocusImageHeightInterpolator"
+        key="[0.0,1.0]"
+        fieldToInterp="FocusImage.height" />
     </Animation>
   </children>
 </component>

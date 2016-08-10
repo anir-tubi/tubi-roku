@@ -80,7 +80,7 @@ Function onContentChange() As Void
 
   content = m.top.content
   if content = invalid or content.getChildCount() = 0 then 
-    m.internalItemFocused = -1
+    m.internalItemFocused = [-1, -1]
     m.itemFocused = -1
     return
   end if

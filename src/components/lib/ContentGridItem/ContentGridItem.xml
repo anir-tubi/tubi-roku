@@ -20,10 +20,10 @@
   <children>
     <Poster
      id="Poster" 
-     width="227"
-     loadWidth="227"
-     height="326"
-     loadHeight="326"
+     width="210"
+     loadWidth="210"
+     height="300"
+     loadHeight="300"
      loadDisplayMode="scaleToZoom"
      loadingBitmapUri="pkg:/images/placeholder.png"/>
   </children>
