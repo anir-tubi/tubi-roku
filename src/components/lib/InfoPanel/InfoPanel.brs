@@ -28,6 +28,9 @@ Function onContentChange()
     ' Title
     m.Title.text = content.title
 
+    ' Episode
+    m.Episode.text = content.episode_title
+
     ' CategoryDetails
     categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
     if content.getChildCount() > 0

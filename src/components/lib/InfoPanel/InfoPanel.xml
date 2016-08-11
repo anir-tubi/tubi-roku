@@ -3,13 +3,23 @@
  - InfoPanel
  -
  - This is a panel of metadata about a piece of content or
- - a content category.  There are 3 modes:
+ - a content category.  There are 6 modes:
  -    1) 'category' - shows only title and description
  -    2) 'item' - shows short content item description with releasedate, rating, etc.
  -    3) 'movie' - shows full details including cast and crew
  -    4) 'series' - shows full details including cast and crew
  -    5) 'season' - shows full details including cast and crew
  -    6) 'episode' - shows full details including cast and crew
+ -
+ -
+ - The InfoPanel has 6 'regions' whose text are mapped as follows:
+ -    Title - Uses content.title
+ -    Episode - Uses content.episode_title
+ -    CategoryDetails - uses content.getChildCount()
+ -    TwoLineInfo - uses content.releasedate, content.length, content.rating, content.category/categories, 
+ -    Description - uses content.description
+ -    DirectorGroup - uses content.director/directors
+ -    StarringGroup - uses content.actor/actors
  -
  -->
 <component name="InfoPanel" extends="LayoutGroup">
@@ -29,7 +39,6 @@
       id="Title"
       width="0"
       height="73"
-      translation="[0, 0]"
       vertAlign="bottom">
       <Font
         role="font"
@@ -86,8 +95,6 @@
     <Label
       id="Description"
       width="1215"
-      height="148"
-      translation="[0,73.5]"
       lineSpacing="13"
       maxLines="4"
       wrap="true">
@@ -96,9 +103,12 @@
         uri="pkg:/fonts/Vaud-Medium.ttf"
         size="27" />
     </Label>
+
     <LayoutGroup
       id="DirectorGroup"
-      layoutDirection="horiz">
+      layoutDirection="horiz"
+      vertAlignment="bottom"
+      itemSpacings="[5,5]">
       <Label
         id="DirectorTag"
         text="Directed by"
@@ -109,15 +119,18 @@
         id="DirectorRect"
         opacity="0.2"
         width="43"
-        height="1"/>
+        height="2"/>
       <Label
         id="Director"
         font="dictionary:Vaud22px"
         visible="true" />
     </LayoutGroup>
+
     <LayoutGroup
       id="StarringGroup"
-      layoutDirection="horiz">
+      layoutDirection="horiz"
+      vertAlignment="bottom"
+      itemSpacings="[5,5]">
       <Label
         id="StarringTag"
         text="Starring"
@@ -128,7 +141,7 @@
         id="StarringRect"
         opacity="0.2"
         width="77"
-        height="1"/>
+        height="2"/>
       <Label
         id="Starring"
         font="dictionary:Vaud22px"

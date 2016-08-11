@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="DetailScreen" extends="Group" initialFocus="Menu" >
+
+  <script type="text/brightscript" uri="pkg:/components/screens/DetailScreen/DetailScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  
+  <interface>
+    <!-- Full content of the item to show details for -->
+    <field id="content" type="node" />
+    
+    <!-- Setting shortContent triggers a metadata fetch for the full details of the content item -->
+    <field id="shortContent" type="node" />
+
+    <!-- Set to true when the user has selected the play button -->
+    <field id="playSelected" type="boolean" value="false" alwaysNotify="true" />
+
+    <!-- Set to true when the user has selected the resume button -->
+    <field id="resumeSelected" type="boolean" value="false" alwaysNotify="true" />
+
+    <!-- Set to true when the user has selected the 'Episodes list' button for a series -->
+    <field id="episodesSelected" type="boolean" value="false" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <!-- All the potential menu items, will be dynamically added or removed based on 'content' -->
+    <ContentNode
+      id="ResumeMenuItem"
+      title="Resume" 
+      url="pkg:/images/icon-resume.png"
+      playstart="20"
+      length="120"/>
+    <ContentNode
+      id="PlayMenuItem"
+      title="Play"
+      url="pkg:/images/icon-play.png" />
+    <ContentNode
+      id="EpisodesMenuItem"
+      title="Episodes list"
+      url="pkg:/images/icon-all-episodes.png" />
+    <ContentNode
+      id="AddQueueMenuItem"
+      title="Add to queue"
+      url="pkg:/images/icon-add-to-queue.png" />
+    <ContentNode
+      id="RemoveQueueMenuItem"
+      title="Remove from queue"
+      url="pkg:/images/icon-remove-from-queue.png" />
+    <ContentNode
+      id="RemoveHistoryMenuItem"
+      title="Remove from history"
+      url="pkg:/images/icon-remove-from-history.png" />
+
+    <Poster
+      id="HeroBackground"
+      loadWidth="1920"
+      loadHeight="1080"
+      uri=""
+      loadDisplayMode="scaleToZoom"
+      translation="[0,0]"/>
+    
+    <Poster
+      id="HeroShade"
+      loadWidth="1920"
+      loadHeight="1080"
+      loadDisplayMode="scaleToZoom"
+      uri="pkg:/images/detail-mask-480x270.png"
+      translation="[0,0]"/>
+    
+    <LayoutGroup
+      translation="[84,59]"
+      itemSpacings="[47]">
+      <InfoPanel
+        id="InfoPanel"
+        mode="detail"
+        visible="true" />
+    
+      <ScrollingList
+        id="Menu"
+        width="465"
+        height="527"
+        itemSpacings="[4]"
+        itemComponentName="DetailMenuItem"
+        focusBitmapUri="pkg:/images/menu-focus.png"
+        visible="false">
+      </ScrollingList>
+    </LayoutGroup>
+    
+  </children>
+</component>

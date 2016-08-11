@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="DetailMenuItem" extends="Rectangle" >
+  <script type="text/brightscript" uri="pkg:/components/lib/DetailMenuItem/DetailMenuItem.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- hide the progress bar when focus changes -->
+    <field id="focusPercent" alias="ResumeProgressBar.opacity" />
+    
+    <!-- Content expected for a DetailMenuItem:
+     -
+     - title - The label text
+     - url - The icon uri
+     - playstart/length - both of these need to be present and the
+     -                    progress bar will be displayed
+     -
+     -->
+    <field id="content" type="node" />
+    <field id="listHasFocus" type="boolean" value="false" />
+  </interface>
+  
+  <children>
+    <Poster
+     id="Icon" 
+     translation="[47,29]"
+     loadWidth="37"
+     loadHeight="37"
+     loadDisplayMode="scaleToFit" />
+    
+    <Label
+     id="Text"
+     translation="[97,15]" 
+     vertAlign="center"
+     horizAlign="left" 
+     height="80">
+      <Font
+       role="font"
+       uri="pkg:/fonts/Vaud-SemiBold.ttf"
+       size="33" />
+       
+    </Label>
+    
+    <Rectangle 
+      id="ResumeProgressBar" 
+      height="6"
+      width="0"
+      translation="[4,70]"
+      visible="false" />
+  </children>
+</component>

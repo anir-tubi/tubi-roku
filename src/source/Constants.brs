@@ -188,6 +188,7 @@ Function getConstants()
 
     constants.ui.colors = {}
       'template colors
+      constants.ui.colors.transparent = "0x00000000"
       constants.ui.colors.backgroundColor = "0x000000FF"
       constants.ui.colors.focused = "0xFF9933FF"
       constants.ui.colors.unfocused = "0xFFFFFFFF"
