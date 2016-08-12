@@ -207,6 +207,8 @@ UI work will be addressed by incrementally adding screens and functionality. The
     * APIs: Log in, Generate Code, Code Status
     * Screens: sign in disambiguation, continue as guest, sign in/register online, sign in email, sign in pw, sign in error
     * Sign In Controller
+* Add History & Queue functionality
+    * APIs: Get History/Recently Viewed, Get Queue/Bookmark, Set History/Recent, Set Queue/Bookmark
 * Add Deep Linking
 * About Screen
 * Analytics/Events sweep
