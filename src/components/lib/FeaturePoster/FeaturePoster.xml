@@ -29,21 +29,21 @@
 
     <Poster
       id="TitleShade"
-      uri="pkg:/images/rectangle-53.png"
+      uri="pkg:/images/feature-gradient.png"
       width="392"
-      height="65"
-      translation="[0,155]"/>
+      height="196"
+      translation="[0,0]"/>
 
     <Label
       id="Title"
       width="323.6"
       height="50.4"
       vertAlign="bottom"
-      translation="[24.3,145]">
+      translation="[19,142]">
       <Font
         role="font"
-        uri="pkg:/fonts/OpenSans-Regular.ttf"
-        size="31" />
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="22" />
     </Label>
   </children>
 

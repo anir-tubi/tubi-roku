@@ -46,9 +46,9 @@
     
     <ScrollingList
       id="CategoryList"
-      translation="[40, 422]"
+      translation="[41, 423]"
       width="445"
-      height="617"
+      height="616"
       visible="true" 
       itemSpacings="[0]"
       itemComponentName="CategoryListItem"
@@ -56,18 +56,18 @@
     
     <InfoPanel
       id="InfoPanel"
-      translation="[82,59]"
+      translation="[85,59]"
       visible="true" />
     
     <Group
-      translation="[525,424]" >
+      translation="[525,423]" >
     <!-- TODO(Chris): How do we trigger feature vs. poster grid -->
       
       <ContentGrid
        id="FeatureGrid"
        numRows="3"
-       width="1455"
-       height="693"
+       width="1196"
+       height="608"
        itemSize="[392,196]"
        itemSpacing="[10,10]"
        itemComponentName="FeaturePoster"

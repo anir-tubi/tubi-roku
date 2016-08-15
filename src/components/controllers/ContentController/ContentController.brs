@@ -45,9 +45,8 @@ Function onContentSelected()
   if m.categoryScreen.contentSelected <> invalid then
     m.detailScreen = m.top.createChild("DetailScreen")
     m.detailScreen.shortContent = m.categoryScreen.contentSelected
-    m.detailScreen.observeField("playSelected", "onPlay")
-    m.detailScreen.observeField("resumeSelected", "onResume")
-    m.detailScreen.observeField("episodesSelected", "onEpisodes")
+    m.detailScreen.observeField("playContent", "onPlay")
+    m.detailScreen.observeField("resumeContent", "onResume")
     m.detailScreen.setFocus(true)
   end if
 
@@ -59,6 +58,7 @@ End Function
 '
 ' Notify the main Brightscript thread to invoke the video player
 Function onPlay()
+  tubiLog("ContentController.onPlay")
   content = m.detailScreen.content
   content.playstart = 0.0 'reset the start position
   'TODO(Chris): For unauthenticated users, we need to reset any resume 
@@ -74,16 +74,9 @@ End Function
 '
 ' Notify the main Brightscript thread to invoke the video player, resuming at the indicated location
 Function onResume()
-  content = m.detailScreen.content
+  tubiLog("ContentController.onResume")
+  content = m.detailScreen.resumeContent
   m.top.playContent = content
-End Function
-
-'''''''''''
-' onEpisodes
-'
-' show the episode list
-Function onEpisodes()
-  'TODO(Chris): create the episode list screen here, added to the screen 'stack'
 End Function
 
 '''''''''''''''''''''''
@@ -92,10 +85,9 @@ End Function
 ' Back pressed on detail screen should close it
 Function onKeyEvent(key As String, press As Boolean)
   if press then
-    if key = "back" and m.detailScreen <> invalid
-      m.detailScreen.unobserveField("playSelected")
-      m.detailScreen.unobserveField("resumeSelected")
-      m.detailScreen.unobserveField("episodesSelected")
+    if key = "back" and m.detailScreen <> invalid then
+      m.detailScreen.unobserveField("playContent")
+      m.detailScreen.unobserveField("resumeContent")
       m.top.removeChild(m.detailScreen)
       m.detailScreen = invalid
       m.categoryScreen.visible = true

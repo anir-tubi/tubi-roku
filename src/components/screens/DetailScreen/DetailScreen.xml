@@ -11,14 +11,11 @@
     <!-- Setting shortContent triggers a metadata fetch for the full details of the content item -->
     <field id="shortContent" type="node" />
 
-    <!-- Set to true when the user has selected the play button -->
-    <field id="playSelected" type="boolean" value="false" alwaysNotify="true" />
+    <!-- Set to the selected movie or episode which should be played -->
+    <field id="playContent" type="node" alwaysNotify="true" />
 
-    <!-- Set to true when the user has selected the resume button -->
-    <field id="resumeSelected" type="boolean" value="false" alwaysNotify="true" />
-
-    <!-- Set to true when the user has selected the 'Episodes list' button for a series -->
-    <field id="episodesSelected" type="boolean" value="false" alwaysNotify="true" />
+    <!-- Set to the selected movie or episode which should be resumed -->
+    <field id="resumeContent" type="node" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -66,22 +63,34 @@
       uri="pkg:/images/detail-mask-480x270.png"
       translation="[0,0]"/>
     
+    <!-- These are in a layout group together because this menu should float up -->
     <LayoutGroup
-      translation="[84,59]"
+      translation="[40,59]"
       itemSpacings="[47]">
+      <LayoutGroup
+        layoutDirection="horiz">
+      <!-- Since we can't translate items in a LayoutGroup we have to put a rectangle here to
+        - push the InfoPanel over
+        -->
+      <Rectangle
+        width="45"
+        height="10"
+        color="0x00000000"/>
       <InfoPanel
         id="InfoPanel"
         mode="detail"
-        visible="true" />
+        visible="true"/>
+      </LayoutGroup>
     
       <ScrollingList
         id="Menu"
         width="465"
-        height="527"
+        height="500"
         itemSpacings="[4]"
         itemComponentName="DetailMenuItem"
         focusBitmapUri="pkg:/images/menu-focus.png"
-        visible="false">
+        visible="false"
+        translation="[0, 0]">
       </ScrollingList>
     </LayoutGroup>
     

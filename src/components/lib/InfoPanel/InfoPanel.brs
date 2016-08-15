@@ -71,15 +71,25 @@ Function onContentChange()
     m.Description.text = content.description
 
     ' Directors
+    m.DirectorGroup.visible = true
     m.Director.text = content.director
     if content.directors <> invalid and content.directors.count() > 0 then
       m.Director.text = joinStringArray(content.directors, ", ")
     end if
+    if m.Director.text = invalid or m.Director.text = "" then
+      ' hide the whole group if no directors listed
+      m.DirectorGroup.visible = false
+    end if
 
     ' Actors
+    m.StarringGroup.visible = true
     m.Starring.text = content.actor
     if content.actors <> invalid and content.actors.count() > 0 then
       m.Starring.text = joinStringArray(content.actors, ", ")
+    end if
+    if m.Starring.text = invalid or m.Starring.text = "" then
+      ' hide the whole group if no directors listed
+      m.StarringGroup.visible = false
     end if
   end if
 End Function
@@ -175,8 +185,8 @@ Function formatLengthAsEnglish(length As Dynamic) As String
     minutes = (length mod 3600) \ 60
     seconds = length mod 60
     result = ""
-    if hours > 0 then result = stri(hours) + " h "
-    result  = result + stri(minutes) + " min"    
+    if hours > 0 then result = stri(hours).trim() + " h "
+    result  = result + stri(minutes).trim() + " min"    
     return result
   else
     return ""

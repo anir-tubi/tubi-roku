@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - EpisodeGridItem
+ -
+ - An item used in the episodes ContentGrid
+ -->
+<component name="EpisodeGridItem" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/EpisodeGridItem/EpisodeGridItem.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="index" type="integer" />
+    <field id="focusPercent" type="float" />
+    <field id="width" alias="Poster.width" />
+    <field id="height" alias="Poster.height" />
+  </interface>
+  
+  <children>
+    <Poster
+     id="Poster" 
+     width="392"
+     loadWidth="392"
+     height="196"
+     loadHeight="196"
+     loadDisplayMode="scaleToZoom"
+     loadingBitmapUri="pkg:/images/placeholder.png"/>
+  </children>
+  
+</component>

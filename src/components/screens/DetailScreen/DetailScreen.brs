@@ -21,8 +21,6 @@ End Function
 Function onContentChange()
   tubiLog("DetailScreen.onContentChange")
   
-  'TODO(Chris): If type is "season", resolve which episode to focus on, change the Info.mode to "episode"
-
   if m.top.content.type = "video"
     m.Info.mode = "movie"
     m.Info.content = m.top.content
@@ -42,7 +40,6 @@ Function onContentChange()
       end if
     end if
     infoPanelContent.setFields(episode.getFields())
-    infoPanelContent.addField("episode_title", "string", false)
     infoPanelContent.episode_title = episode.title
     infoPanelContent.title = m.top.content.title
     infoPanelContent.description = m.top.content.description
@@ -100,24 +97,71 @@ Function setMenuItems()
   m.Menu.setFocus(true)
 End Function
 
+''''''''''''''''''''''''
+' onMenuItemSelected
+'
 Function onMenuItemSelected()
   tubiLog("DetailScreen.onMenuItemSelected")
 
-  selectedItem = m.Menu.content.getChild(m.Menu.itemSelected)
-  if selectedItem <> invalid then
-    selection = selectedItem.id
-    print "Menu item selected: " + selection
+  selection = m.Menu.content.getChild(m.Menu.itemSelected)
+  if selection <> invalid then
+    print "Menu item selected: " + selection.title
 
-    if selection = "resume" then
-      m.top.resumeSelected = true
-    else if selection = "play" then
-      m.top.playSelected = true
-    else if selection = "episodes" then
-      m.top.episodesSelected = true
-    else if selection = "addQueue" then
-    else if selection = "removeQueue" then
-    else if selection = "removeHistory" then
+    if selection.id = "ResumeMenuItem" then
+      if m.top.content.type = "series" then
+        m.top.resumeContent = getEpisodeContent(m.episodeSelection)
+      else
+        m.top.resumeContent = m.top.content
+      end if
+    else if selection.id = "PlayMenuItem" then
+      if m.top.content.type = "series" then
+        content = getEpisodeContent(m.episodeSelection)
+      else
+        content = m.top.content
+      end if
+      ' TODO: Reset not just the local resume position but also where it persists
+      m.top.playContent = content
+    else if selection.id = "EpisodesMenuItem"
+      showEpisodes()
+    else if selection.id = "AddQueueMenuItem" then
+      'TODO(Chris): Add queue management here
+    else if selection.id = "RemoveQueueMenuItem" then
+      'TODO(Chris): Add queue management here
+    else if selection.id = "RemoveHistoyMenuItem" then
+      'TODO(Chris): Add history management here
     end if
+  end if
+End Function
+
+''''''''''''''''''''
+' showEpisodes
+'
+Function showEpisodes()
+  m.episodesScreen = m.top.createChild("EpisodesScreen")
+  m.episodesScreen.content = m.top.content
+  m.episodesScreen.observeField("episodeSelected", "onEpisodeSelected")
+  m.episodesScreen.setFocus(true)
+End Function
+
+
+''''''''''''
+' onEpisodeSelected
+'
+' Play the episode.  
+' TODO(Chris): Or show the details screen for the specific episode?
+Function onEpisodeSelected()
+  tubiLog("DetailScreen.onEpisodeSelected")
+  m.episodeSelection = m.episodesScreen.episodeSelected
+  closeEpisodesScreen()
+  onContentChange() ' Info panel and menu items all need updating here
+End Function
+
+Function closeEpisodesScreen()
+  if m.episodesScreen <> invalid then
+    m.episodesScreen.unobserveField("episodeSelected")
+    m.top.removeChild(m.episodesScreen)
+    m.episodesScreen = invalid
+    m.Menu.setFocus(true)
   end if
 End Function
 
@@ -143,4 +187,12 @@ Function loadContentDetails()
     name: "getSingleContent"    
   }
   m.global.metadataFetchTask.request = request
+End Function
+
+Function onKeyEvent(key As String, press As Boolean) As Boolean
+  if press and key = "back" and m.episodesScreen <> invalid then
+    closeEpisodesScreen()
+    return true
+  end if
+  return false 
 End Function

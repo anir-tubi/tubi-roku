@@ -58,10 +58,13 @@ Function onContentChange() As Void
   if m.top.content = invalid then return
   for i=0 to m.top.content.getChildCount()-1
     newItem = CreateObject("roSGNode", m.top.itemComponentName)
-    newItem.content = m.top.content.getChild(i)
-    'TODO(Chris): does this id guarantee uniqueness for the animation?
-    newItem.id = newItem.content.id
-    m.items.appendChild(newItem)
+    ' may be invalid if itemComponentName incorrectly set
+    if newItem <> invalid then
+      newItem.content = m.top.content.getChild(i)
+      'TODO(Chris): does this id guarantee uniqueness for the animation?
+      newItem.id = newItem.content.id
+      m.items.appendChild(newItem)
+    end if
   end for
 
   ' Default focus to first item

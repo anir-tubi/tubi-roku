@@ -40,13 +40,20 @@ Function Main()
     if msgType = "roSGScreenEvent"
       if msg.isScreenClosed() then return 0
     else if msgType = "roSGNodeEvent"
-      playVideo()
+      content = controller.getField("playContent")
+      contentAA = content.getFields()
+      playVideo(contentAA)
     end if
 
   end while
 
 end Function
 
-Function playVideo()
-  ' TODO(Chris): this will launch a roVideoPlayer based on ContentController.playContent
+
+'''''''''''''''
+' playVideo
+'
+'
+Function playVideo(content As Object)
+  ' TODO(Chris): Replace this with our real video player
 End Function

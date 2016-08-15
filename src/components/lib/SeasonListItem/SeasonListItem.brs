@@ -1,5 +1,5 @@
 Function init()
-  m.label = m.top.findNode("categoryText")
+  m.label = m.top.findNode("seasonText")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("listHasFocus", "onListFocusChange")
   m.top.width = 445
@@ -23,8 +23,8 @@ End Function
 ''''''''''''''''''''
 ' onContentChange
 '
-' Set the label text on receiving the category name
+' Set the label text on receiving the season name
 Function onContentChange()
-  tubiLog("CategoryListItem.onContentChange")
+  tubiLog("SeasonListItem.onContentChange")
   m.label.text = m.top.content.title
 End Function
