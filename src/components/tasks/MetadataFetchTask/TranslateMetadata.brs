@@ -79,6 +79,8 @@ Function translateRecursive(contentFromServer, translatedContent) As Void
       translatedContent.genres = contentFromServer.tags 'array of genres
       translatedContent.categories = contentFromServer.tags 'array of genres
     end if
+    
+    if contentFromServer.slug <> invalid then translatedContent.slug = contentFromServer.slug
     if contentFromServer.lang <> invalid then translatedContent.language = contentFromServer.lang
     if contentFromServer.publisher_id <> invalid then translatedContent.pubId = contentFromServer.publisher_id
     if contentFromServer.country <> invalid then translatedContent.country = contentFromServer.country
@@ -126,7 +128,12 @@ Function translateRecursive(contentFromServer, translatedContent) As Void
     end if
 
     if contentFromServer.url <> invalid
-      translatedContent.streams = [{url: contentFromServer.url}]
+      translatedContent.Stream = {
+        url: contentFromServer.url
+        quality: true
+        contentId: translatedContent.id
+      }
+
       translatedContent.url = contentFromServer.url
       if contentFromServer.url.instr(1,".m3u8") > 0
         translatedContent.streamformat = "hls"

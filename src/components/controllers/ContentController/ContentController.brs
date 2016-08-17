@@ -1,4 +1,6 @@
 Function init()
+  tubiLog(" ")
+  tubiLog("Init Scenegraph----------------")
   ' save a global reference to the fetch task for nodes to access
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
   m.global.addField("metadataFetchTask", "node", false)

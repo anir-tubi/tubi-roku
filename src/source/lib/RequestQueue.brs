@@ -1,3 +1,18 @@
+Function TubiRequestQueue()
+  return {
+    create: createHTTPRequestQueue
+    pushRequest: tubiq_pushRequest
+    handleEvent: tubiq_handleEvent
+    count: tubiq_count
+    clear: tubiq_clear
+    wrapRequest: tubiq_wrapRequest_
+    advanceQueue: tubiq_advanceQueue_
+    findRequestById: tubiq_findRequestById_
+  }
+End Function
+
+
+
 '''''''''''''''''
 ' createHTTPRequestQueue - create and initialize a request queue
 '
@@ -8,14 +23,14 @@
 Function createHTTPRequestQueue(port As Object, maxSize=0 As integer, timeout=30 As Integer) As Object
   return {
     'public
-    pushRequest: tubiq_pushRequest
-    handleEvent: tubiq_handleEvent
-    count: tubiq_count
-    clear: tubiq_clear
+    pushRequest: m.pushRequest
+    handleEvent: m.handleEvent
+    count: m.count
+    clear: m.clear
     ' private
-    wrapRequest_: tubiq_wrapRequest_
-    advanceQueue_: tubiq_advanceQueue_
-    findRequestById_: tubiq_findRequestById_
+    wrapRequest_: m.wrapRequest
+    advanceQueue_: m.advanceQueue
+    findRequestById_: m.findRequestById
     queue: []
     maxSize: maxSize
     timeout: timeout

@@ -1,3 +1,6 @@
+'Add Library for Roku Ad Framework
+Library "Roku_Ads.brs"
+
 ''''''''''''''''''''
 ' Simple main to launch the unit tests if mode is "test".
 ' Otherwise, exit immediately.
@@ -23,10 +26,25 @@ Function Main()
   '
   m.global = {} ' important syntactically to keep the settings at m.global.settings, whether
                 ' used from the main Brightscript thread or the SceneGraph thread
-  m.global["constants"] = getConstants()
+  
+  request = TubiRequest()
+  requestQueue = TubiRequestQueue()
+  tracking = TubiTracking(request)
+
+  m.global.utils = {
+    constants: getConstants()
+    tracking: tracking
+    request: request
+    requestQueue: requestQueue
+    ' auth: TubiAuth()
+    ' log: TubiLog()
+  }
+
+  m.global.player = TubiPlayer(m.global.utils)
+
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
-  sgGlobal.constants = m.global.constants
+  sgGlobal.constants = m.global.utils.constants
 
   controller = screen.CreateScene("ContentController")
   screen.show()
@@ -37,23 +55,29 @@ Function Main()
   while(true)
     msg = wait(0, port)
     msgType = type(msg)
+    
     if msgType = "roSGScreenEvent"
       if msg.isScreenClosed() then return 0
+    
     else if msgType = "roSGNodeEvent"
-      content = controller.getField("playContent")
-      contentAA = content.getFields()
-      playVideo(contentAA)
+      node = msg.getNode()
+      field = msg.getField()
+      data = msg.getData()
+      
+      if field = "playContent"
+        playerContent = data.getFields()
+        playerContent.stream = {url: playerContent.url}
+        playerResult = m.global.player.playVideo(playerContent)
+
+        if playerResult = m.global.utils.constants.player.playerResult.completed
+          'TODO: BRYAN, Update a field (TBD) to tell the scene graph that the video has completed
+          '             So that the scene graph can advance the episode or category grids
+        end if
+
+        'TODO: BRYAN, Update the content node with new nowPos/playStart values so the scene graph can update the resume views
+      end if 
     end if
 
   end while
 
 end Function
-
-
-'''''''''''''''
-' playVideo
-'
-'
-Function playVideo(content As Object)
-  ' TODO(Chris): Replace this with our real video player
-End Function

@@ -1,5 +1,21 @@
+Function TubiRequest()
+  return {
+    createAsync: createAsyncHTTPRequest
+    start: tubihttp_start
+    handleEvent: tubihttp_handleEvent
+    runSynchronous: tubihttp_runSynchronous
+    cancel: tubihttp_cancel
+    isHttps: tubihttp_isHttps_
+    addParamsToUrl: tubihttp_addParamsToUrl_
+  }
+End Function
+
+
+
+
+
 ''''''''''''''''''''''''
-' createAsyncHTTPRequest() - helper to create an async reqeust
+' createAsyncHTTPRequest() - helper to create an async request
 '
 ' url - The URL (with or without query params) to request
 ' name (optional) - a human readable name for the request, to track in logs
@@ -39,16 +55,17 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} A
 
   o = {
     ' public
-    isHttps: tubihttp_isHttps_(url) ' boolean, not member function
+    isHttps: m.isHttps(url) ' boolean, not member function
     url: url
-    start: tubihttp_start
-    handleEvent: tubihttp_handleEvent
-    cancel: tubihttp_cancel
+    start: m.start
+    handleEvent: m.handleEvent
+    runSynchronous: m.runSynchronous
+    cancel: m.cancel
     name: name  ' human-friendly name for the request
     response: invalid
 
     ' private
-    addParamsToUrl_: tubihttp_addParamsToUrl_
+    addParamsToUrl_: m.addParamsToUrl
     urltransfer: invalid
     klass: "TubiAsyncHTTPRequest"   ' Just a sentinel for verification by Request Queue
   }
@@ -56,6 +73,7 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} A
   return o
 
 End Function
+
 
 '''''''''''''''''''''''
 ' start - Prep the roUrlTransfer object and initiate the request
@@ -112,6 +130,44 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
 End Function
 
 
+'''''''''''''''''''''''
+' runSynchronous - starts, waits for, and handles the response for a synchrynous style request
+'   @timeout: integer, the max amount of time to wait for a response
+'
+' returns just the data of the response, not the code or fail reason
+'
+Function tubihttp_runSynchronous(timeout = 5 as Integer) As Object
+  timer = CreateObject("roTimespan")
+  res = invalid
+  msgPort = CreateObject("roMessagePort")
+
+  'prevent m.start() from running if we've already made the request previously
+  didStart = false
+  if m.urltransfer = invalid
+    didStart = m.start(msgPort)
+  end if
+
+  if didStart = true
+    while true
+      msg = wait(0, msgPort)
+      request = m.handleEvent(msg)
+
+      if request <> invalid and request.response <> invalid and request.response.data.len() > 0
+        res = request.response.data
+        exit while
+      end if
+
+      if timer.totalMilliseconds() > (timeout * 1000)
+        exit while
+      end if
+
+    end while
+  end if
+
+  return res
+End Function
+
+
 
 '''''''''''''''''''''''
 ' handleEvent - ingest a received message.  If the message is not
@@ -157,6 +213,7 @@ Function tubihttp_handleEvent(message As Object) As Object
   end if
   return invalid
 End Function
+
 
 
 '''''''''''''''''''''''

@@ -27,13 +27,21 @@ Function getConstants()
       countryCode = invalid
     end if
 
+    if di.GetDisplayType() = "HDTV"
+      definition = "hd"
+    else
+      definition = "sd"
+    end if
+
     constants.deviceInfo.deviceId = di.GetDeviceUniqueId()
     constants.deviceInfo.deviceAdId = deviceAdId 'will be invalid if ad tracking is turned off by user or old version of firmware
     constants.deviceInfo.ipAddresses = di.GetIPAddrs() 'array of network interface ip addresses (normally will only contain 1 element)
     constants.deviceInfo.firmwareVersion = firmwareVersion
     constants.deviceInfo.firmwareBuild = firmwareBuild
     constants.deviceInfo.userAgent = "Roku/DVP-" + firmwareVersionMajor.toStr() + "." + firmwareVersionMinor.toStr() + " (" + firmware + ")"
+    constants.deviceInfo.userAgentModel = "Roku/DVP-" + firmwareVersionMajor.toStr() + "." + firmwareVersionMinor.toStr() + " (" + firmware + ") " + di.GetModel() 
     constants.deviceInfo.model = di.GetModel()
+    constants.deviceInfo.definition = definition
     constants.deviceInfo.displayType = di.GetDisplayType()
     constants.deviceInfo.displayMode = di.GetDisplayMode()
     constants.deviceInfo.aspectRatio = di.GetDisplayAspectRatio()
@@ -110,14 +118,44 @@ Function getConstants()
     constants.uapiActions.add = "add"
     constants.uapiActions.remove = "remove"
 
-  'video player returns one of the following
-  constants.playerResults = {}
-    constants.playerResults.completed = "COMPLETED"
-    constants.playerResults.closed = "CLOSED"
-    constants.playerResults.failed = "FAILED"
-    'used internal to the player, should never be returned
-    constants.playerResults.commercial = "STOPFORCOMMERCIAL"
-    constants.playerResults.ignore = "IGNORE"
+
+  'constants needed for the video player
+  constants.player = {}
+
+    'how often the video player sends play progress events
+    constants.player.pingFrequency = 10
+
+    'video player returns one of the following
+    constants.player.playerResults = {}
+      constants.player.playerResults.completed = "COMPLETED"
+      constants.player.playerResults.closed = "CLOSED"
+      constants.player.playerResults.failed = "FAILED"
+      'used internal to the player, should never be returned
+      constants.player.playerResults.commercial = "STOPFORCOMMERCIAL"
+      constants.player.playerResults.ignore = "IGNORE"
+      constants.player.playerResults.resumePlay = "RESUMEPLAY"
+
+    'urls for the images that are required for the transport
+    constants.player.transportImages = {}
+      constants.player.transportImages.hd = {}
+      constants.player.transportImages.hd.rw = "pkg://images/transport/hd/rw.png"
+      constants.player.transportImages.hd.rwOrange = "pkg://images/transport/hd/rw_orange.png"
+      constants.player.transportImages.hd.ff = "pkg://images/transport/hd/ff.png"
+      constants.player.transportImages.hd.ffOrange = "pkg://images/transport/hd/ff_orange.png"
+      constants.player.transportImages.hd.star = "pkg://images/transport/hd/star.png"
+      constants.player.transportImages.hd.play = "pkg://images/transport/hd/play.png"
+      constants.player.transportImages.hd.pauseSmall = "pkg://images/transport/hd/pause_small.png"
+      constants.player.transportImages.hd.pauseBig = "pkg://images/transport/hd/pause_big.png"
+
+      constants.player.transportImages.sd = {}
+      constants.player.transportImages.sd.rw = "pkg://images/transport/sd/rw.png"
+      constants.player.transportImages.sd.rwOrange = "pkg://images/transport/sd/rw_orange.png"
+      constants.player.transportImages.sd.ff = "pkg://images/transport/sd/ff.png"
+      constants.player.transportImages.sd.ffOrange = "pkg://images/transport/sd/ff_orange.png"
+      constants.player.transportImages.sd.star = "pkg://images/transport/sd/star.png"
+      constants.player.transportImages.sd.play = "pkg://images/transport/sd/play.png"
+      constants.player.transportImages.sd.pauseSmall = "pkg://images/transport/sd/pause_small.png"
+      constants.player.transportImages.sd.pauseBig = "pkg://images/transport/sd/pause_big.png"      
 
 
   'UI properties that should be passed into the scene graph

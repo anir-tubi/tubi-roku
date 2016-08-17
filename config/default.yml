@@ -9,8 +9,8 @@ settings:
   shortAppName: "tubitv"
   GridStyle: "Flat-Movie"
   SetPosterStyle: "rounded-rect-16x9-generic"
-  adrise_bg: "#222223"
-  adrise_fontcolor: "#EBEBEB"
+  adLoadingBackgroundColor: "#222223"
+  adLoadingFontColor: "#EBEBEB"
   show_details_screen: true
   subscription: false
   vezoSubscription: false
@@ -28,6 +28,8 @@ settings:
   SplashHD: "pkg:/images/FREETVMOVIES_Tubi_icon_1280x720.jpg"
   SplashSD: "pkg:/images/FREETVMOVIES_Tubi_icon_720x480.jpg"
   appName: "Tubi TV"
+  isLiveTVOn: true
+  isRokuAdFrameworkOn: false
   migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"
 
 manifest:

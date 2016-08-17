@@ -12,7 +12,7 @@ End Function
 Function fetchLoop()
   tubiLog("MetadataFetchTask.fetchLoop started")
   m.port = CreateObject("roMessagePort")
-  m.queue = createHTTPRequestQueue(m.port)
+  m.queue = TubiRequestQueue().create(m.port)
   m.top.observeField("request", m.port)
   m.constants = m.global.constants   ' this should grab a thread-local copy
 
@@ -49,7 +49,7 @@ Function beginRequest(metadataRequest) As Void
     return
   end if
 
-  httpRequest = createAsyncHTTPRequest(metadataRequest.url, metadataRequest.name, metadataRequest.options)
+  httpRequest = TubiRequest().createAsync(metadataRequest.url, metadataRequest.name, metadataRequest.options)
   if httpRequest = invalid then
     tubiLog("MetadataFetchTask.beginRequest: createAsyncHTTPRequest returned invalid")
     return

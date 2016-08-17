@@ -1,29 +1,29 @@
 Function testCreateAsyncHTTPReqeust(t As Object)
-  request = createAsyncHTTPRequest("http://localhost/")
+  request = TubiRequest().createAsync("http://localhost/")
   t.assertNotInvalid(request)
 End Function
 
 Function testStartWithPort(t As Object)
-  request = createAsyncHTTPRequest("http://localhost/")
+  request = TubiRequest().createAsync("http://localhost/")
   port = CreateObject("roMessagePort")
   t.assertTrue(request.start(port))
 End Function
 
 Function testStartWithUrlTransfer(t As Object)
-  request = createAsyncHTTPRequest("http://localhost/")
+  request = TubiRequest().createAsync("http://localhost/")
   urltransfer = CreateObject("roUrlTransfer")
   t.assertTrue(request.start(urltransfer))
 End Function
 
 Function testCancel(t As Object)
-  request = createAsyncHTTPRequest("http://localhost/")
+  request = TubiRequest().createAsync("http://localhost/")
   urltransfer = CreateObject("roUrlTransfer")
   t.assertTrue(request.start(urltransfer))
   request.cancel()
 End Function
 
 Function testHandleEvent(t As Object)
-  request = createAsyncHTTPRequest("http://127.0.0.1:65535/", "", { retries: 0 })
+  request = TubiRequest().createAsync("http://127.0.0.1:65535/", "", { retries: 0 })
   port = CreateObject("roMessagePort")
   t.assertTrue(request.start(port))
   msg = wait(1000, port)
@@ -33,7 +33,7 @@ Function testHandleEvent(t As Object)
 End Function
 
 Function testAddParamsToUrl(t As Object)
-  request = createAsyncHTTPRequest("http://localhost/")
+  request = TubiRequest().createAsync("http://localhost/")
   request.urltransfer = CreateObject("roUrlTransfer")
 
   testCases = [
@@ -50,9 +50,9 @@ Function testAddParamsToUrl(t As Object)
 End Function
 
 Function testIsHttps(t As Object)
-  request = createAsyncHTTPRequest("http://localhost/")
+  request = TubiRequest().createAsync("http://localhost/")
   t.assertFalse(request.isHttps)
-  request = createAsyncHTTPRequest("https://localhost/")
+  request = TubiRequest().createAsync("https://localhost/")
   t.assertTrue(request.isHttps)
 End Function
 
@@ -63,7 +63,7 @@ Function testMethods(t As Object)
 
   ' Go through each method, verifying from the server side that the method in the request is correct
   for each method in [ "GET", "PUT", "POST", "PATCH", "DELETE" ]
-    request = createAsyncHTTPRequest("http://127.0.0.1:65534/", "", { method: method })
+    request = TubiRequest().createAsync("http://127.0.0.1:65534/", "", { method: method })
     request.start(port)
     while true
       msg = wait(500, port)
