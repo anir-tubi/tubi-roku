@@ -128,12 +128,6 @@ Function translateRecursive(contentFromServer, translatedContent) As Void
     end if
 
     if contentFromServer.url <> invalid
-      translatedContent.Stream = {
-        url: contentFromServer.url
-        quality: true
-        contentId: translatedContent.id
-      }
-
       translatedContent.url = contentFromServer.url
       if contentFromServer.url.instr(1,".m3u8") > 0
         translatedContent.streamformat = "hls"

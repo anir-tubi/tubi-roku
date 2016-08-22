@@ -432,8 +432,8 @@ end function
 function adriseAds_getAdsList(episode)
   url = m.populateUrl(episode)
 
-  adRequest = m.utils.request.createSynchrynous(url, "getAdsList")
-  adResponse = adRequest.runSynchrynous()
+  adRequest = m.utils.request.createAsync(url, "getAdsList")
+  adResponse = adRequest.runSynchronous(5)
 
   adUnitsList = m.getAdUnitsListTraditional(episode, adResponse)
 
@@ -1105,8 +1105,8 @@ function adriseAds_getCuepoints(episode)
   cuepointUrl = m.constants.urls.cuepointsBaseUrl + "?format=json&pubid=" + episode.pubId + "&platform=roku&cid=" + episode.id
   
   'get the cuepoints synchronously
-  cuepointsReq = m.utils.request.createSynchrynous(cuepointUrl, "getCuePoints", {timeout: 5})
-  cuepointsJson = cuepointsReq.runSynchrynous()
+  cuepointsReq = m.utils.request.createAsync(cuepointUrl, "getCuePoints")
+  cuepointsJson = cuepointsReq.runSynchronous(5)
 
   'parse the returned JSON to a Brightscript object - should return an array
   if cuepointsJson <> invalid
