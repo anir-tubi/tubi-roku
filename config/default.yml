@@ -1,32 +1,14 @@
 settings:
   mode: "production"
-  skipAdTracking: false
-  pubid: "00000000_DEFAULT_PUB_ID_00000000"
-  zoneid: "tubitv_roku"
-  imageSize: "214x306"
-  imageSizeEpisodes: "306x214"
   contentType: "hls"
   shortAppName: "tubitv"
+  platformName: "roku"
   GridStyle: "Flat-Movie"
   SetPosterStyle: "rounded-rect-16x9-generic"
   adLoadingBackgroundColor: "#222223"
   adLoadingFontColor: "#EBEBEB"
-  show_details_screen: true
-  subscription: false
-  vezoSubscription: false
-  newThumbnailStrategy: false
-  allowVezoSubscription: false
   registerWithTubi: true
-  vezoServer: "http://vezo.tv"
-  allowRentals: true
-  show_language: false
-  show_country: false
-  proxyUrl: "none"
-  proxyFolder: "none"
   hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/11.brs"
-  adrise_loadingurl: "pkg:/images/FREETVMOVIES_Tubi_icon_no-background_336x201"
-  SplashHD: "pkg:/images/FREETVMOVIES_Tubi_icon_1280x720.jpg"
-  SplashSD: "pkg:/images/FREETVMOVIES_Tubi_icon_720x480.jpg"
   appName: "Tubi TV"
   isLiveTVOn: true
   isRokuAdFrameworkOn: false

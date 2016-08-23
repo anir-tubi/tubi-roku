@@ -26,7 +26,7 @@ End Function
 '               body - PUT or POST body as string
 '               headers - assoc array of headers and their values
 '
-Function createAsyncHTTPRequest(url as String, name = "" as String, options={} As Object) as Object
+Function createAsyncHTTPRequest(url as String, name = "" as String, options={} as Object) as Object
 
   ' sanitize
   validRequestTypes = {
@@ -189,7 +189,23 @@ Function tubihttp_handleEvent(message As Object) As Object
       if message.GetInt() = 1 then 
         ' 1. Check success or failure?
         code = message.GetResponseCode()
-        if code < 0 and m.retries > 0 then
+
+        'server said our auth token was not valid
+        if m.authInfo <> invalid and code = 403
+          m.authInfo = m.refreshAuthToken(m.authInfo)
+
+          'replace any necessary new auth info in the headers and try again
+          authHeaders = m.getAuthHeaders(m.authInfo.accessToken)
+          if authHeaders <> invalid
+            for each header in authHeaders
+              m.headers[header] = authHeaders[header]
+            end for
+          end if
+
+          m.retries = m.retries - 1
+          m.start(m.urltransfer)
+
+        else if code < 0 and m.retries > 0 then
           m.retries = m.retries - 1    
           m.start(m.urltransfer) ' fire off the request again
         else

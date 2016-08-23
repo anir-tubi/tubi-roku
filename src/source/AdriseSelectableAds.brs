@@ -1,4 +1,4 @@
-function AdriseSelectableAds (utils)
+function AdriseSelectableAds(utils)
   return {
     getUserChoice: adriseSelectableAds_getUserChoice
 	  showUserSelectedVideoAd: adriseSelectableAds_showUserSelectedVideoAd

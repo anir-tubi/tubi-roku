@@ -27,16 +27,19 @@ Function Main()
   m.global = {} ' important syntactically to keep the settings at m.global.settings, whether
                 ' used from the main Brightscript thread or the SceneGraph thread
   
+  constants = getConstants()
   request = TubiRequest()
   requestQueue = TubiRequestQueue()
   tracking = TubiTracking(request)
+  auth = TubiAuth(constants, request)
+
 
   m.global.utils = {
-    constants: getConstants()
-    tracking: tracking
+    constants: constants
     request: request
     requestQueue: requestQueue
-    ' auth: TubiAuth()
+    tracking: tracking
+    auth: auth
     ' log: TubiLog()
   }
 

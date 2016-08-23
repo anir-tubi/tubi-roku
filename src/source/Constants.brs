@@ -79,10 +79,13 @@ Function getConstants()
     'users url
     constants.urls.users = {}
       constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
+      constants.urls.users.refreshToken = constants.urls.users.urlBase + "/login/refresh"
+      constants.urls.users.migrateLogin = constants.urls.users.urlBase + "/login/migrate"
       constants.urls.users.queues = constants.urls.users.urlBase + "/queues"
       constants.urls.users.queuesNoPage = constants.urls.users.queues + "?page_enabled=false"
       constants.urls.users.history = constants.urls.users.urlBase + "/histories"
-      constants.urls.users.historyNoPage = constants.urls.users.history + "?page_enabled=false"    
+      constants.urls.users.historyNoPage = constants.urls.users.history + "?page_enabled=false"
+
 
     'search url
     constants.urls.searchBaseUrl = "http://cms.adrise.com/"
