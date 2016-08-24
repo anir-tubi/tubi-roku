@@ -17,6 +17,7 @@ Function init()
   m.internalItemFocused = m.top.itemFocused  ' separate from event emitter
   m.overlappedKeypress = invalid 'track when a key is pressed during animation
   m.pressAndHold = invalid 'track when a key is being held down without release
+  m.focusImage.visible = m.top.isInFocusChain()
 End Function
 
 ''''''''''''''''''''''

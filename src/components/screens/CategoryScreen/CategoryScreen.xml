@@ -26,9 +26,35 @@
     
     <!-- set to the tubi content id of the item which was clicked on -->
     <field id="contentSelected" type="node" alwaysNotify="true"/>
+
+    <!-- set to true when the user has selected the "Search" button -->
+    <field id="searchSelected" type="boolean" alwaysNotify="true"/>
+
+    <!-- set to true when the user has selected the "Sign In" button -->
+    <field id="signInSelected" type="boolean" alwaysNotify="true"/>
+
+    <!-- set to true when the user has selected the "Sign In" button -->
+    <field id="aboutSelected" type="boolean" alwaysNotify="true"/>
   </interface>
 
   <children>
+    <!-- Special category menu items. These will be merged with category list -->
+    <ContentNode
+      id="SpecialCategories">
+      <ContentNode
+        id="RecentlyViewed"
+        title="Recently Viewed"
+        description=""/>
+      <ContentNode
+        id="MyQueue"
+        title="My Queue"
+        description=""/>
+      <ContentNode
+        id="SearchSignIn"
+        title="Search &amp; Sign In"
+        description="Find titles on TubiTV, Sign In and more."/>
+    </ContentNode>
+
     <Poster
       id="HeroBackground"
       uri=""
@@ -52,7 +78,9 @@
       visible="true" 
       itemSpacings="[0]"
       itemComponentName="CategoryListItem"
-      focusBitmapUri="pkg:/images/menu-focus.png"/>
+      focusBitmapUri="pkg:/images/menu-focus.png">
+
+    </ScrollingList>
     
     <InfoPanel
       id="InfoPanel"
@@ -60,6 +88,7 @@
       visible="true" />
     
     <Group
+      id="ContentArea"
       translation="[525,423]" >
     <!-- TODO(Chris): How do we trigger feature vs. poster grid -->
       
@@ -85,8 +114,34 @@
       fillDirection="W"
       visible="true"
       translation="[0,0]"/>
-      <LabelList 
-       id="FakeLabelList"/>
+
+    <!-- Shown when Search & Sign In special category is selected -->
+    <!-- TODO(Chris): Rename the DetailMenuItem since it is reused -->
+    <ScrollingList
+      id="SearchSignInList"
+      width="465"
+      height="250"
+      itemSpacings="[4]"
+      itemComponentName="DetailMenuItem"
+      focusBitmapUri="pkg:/images/menu-focus.png"
+      visible="false">
+      <ContentNode
+        role="content">
+        <ContentNode
+          id="SearchMenuItem"
+          title="Search" 
+          url="pkg:/images/icon-search.png"/>
+        <ContentNode
+          id="SignInMenuItem"
+          title="Sign In"
+          url="pkg:/images/icon-sign-in.png" />
+        <ContentNode
+          id="AboutMenuItem"
+          title="About Tubi TV"
+          url="pkg:/images/icon-about.png" />
+      </ContentNode>
+    </ScrollingList>
+
     </Group>
     
   </children>

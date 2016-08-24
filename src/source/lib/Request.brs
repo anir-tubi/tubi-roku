@@ -99,7 +99,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   end if
 
   if m.params.Count() > 0 then
-    m.urltransfer.SetUrl(m.AddParamsToUrl(m.url, m.params))
+    m.urltransfer.SetUrl(m.addParamsToUrl_(m.url, m.params))
   else
     m.urltransfer.SetUrl(m.url)
   end if

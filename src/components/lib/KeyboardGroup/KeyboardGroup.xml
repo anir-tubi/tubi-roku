@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - KeyboardGroup
+ -
+ - This is a custom keyboard widget whose interface is somewhat like
+ - the Keyboard node provided by Roku.  Rather than emitting keypresses
+ - and expecting the parent to contstruct the string, it is managed
+ - internally and the parent can just listen to changes in the 'text'
+ - field to update any related presentation widget.
+ -
+ -->
+<component name="KeyboardGroup" extends="Group">
+
+  <script type="text/brightscript" uri="pkg:/components/lib/KeyboardGroup/KeyboardGroup.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- 
+      - The text that is manipulated by the keyboard. This can be written to so the
+      - keyboard can be seeded with a value from elsewhere. 
+      -->
+    <field id="text" type="string" value="" alwaysNotify="true" />
+    
+    <!-- The maximum number of characters before keypresses are ignored -->
+    <field id="maxLength" type="int" value="128" />
+  </interface>
+  
+  <children>
+    
+    <ScrollingList
+      id="SymbolMenu"
+      width="502"
+      height="80"
+      visible="true" 
+      itemSpacings="[2]"
+      itemComponentName="KeyboardMenuItem"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
+      translation="[709,65]"
+      layoutDirection="horiz">
+      <ContentNode
+        role="content">
+        <ContentNode
+          id="Uppercase"
+          title="ABC"/>
+        <ContentNode
+          id="Lowercase"
+          title="abc"/>
+        <ContentNode
+          id="Numeric"
+          title="123"/>
+        <ContentNode
+          id="Symbolic1"
+          title="@#!"/>
+      </ContentNode>
+    </ScrollingList>
+    
+    <ScrollingList
+      id="UppercaseKeyboard"
+      width="1920"
+      height="80"
+      visible="true"
+      itemSpacings="[2]"
+      itemComponentName="KeyboardItem"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
+      translation="[66,147]"
+      layoutDirection="horiz">
+      <ContentNode
+        role="content">
+        <ContentNode title="A"/>
+        <ContentNode title="B"/>
+        <ContentNode title="C"/>
+        <ContentNode title="D"/>
+        <ContentNode title="E"/>
+        <ContentNode title="F"/>
+        <ContentNode title="G"/>
+        <ContentNode title="H"/>
+        <ContentNode title="I"/>
+        <ContentNode title="J"/>
+        <ContentNode title="K"/>
+        <ContentNode title="L"/>
+        <ContentNode title="M"/>
+        <ContentNode title="N"/>
+        <ContentNode title="O"/>
+        <ContentNode title="P"/>
+        <ContentNode title="Q"/>
+        <ContentNode title="R"/>
+        <ContentNode title="S"/>
+        <ContentNode title="T"/>
+        <ContentNode title="U"/>
+        <ContentNode title="V"/>
+        <ContentNode title="W"/>
+        <ContentNode title="X"/>
+        <ContentNode title="Y"/>
+        <ContentNode title="Z"/>
+        <ContentNode title=" "/>
+        <ContentNode title="&#x7F;"/>
+      </ContentNode>
+    </ScrollingList>
+    
+    <ScrollingList
+      id="LowercaseKeyboard"
+      width="1920"
+      height="80"
+      visible="false"
+      itemSpacings="[2]"
+      itemComponentName="KeyboardItem"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
+      translation="[66,147]"
+      layoutDirection="horiz">
+      <ContentNode
+        role="content">
+        <ContentNode title="a"/>
+        <ContentNode title="b"/>
+        <ContentNode title="c"/>
+        <ContentNode title="d"/>
+        <ContentNode title="e"/>
+        <ContentNode title="f"/>
+        <ContentNode title="g"/>
+        <ContentNode title="h"/>
+        <ContentNode title="i"/>
+        <ContentNode title="j"/>
+        <ContentNode title="k"/>
+        <ContentNode title="l"/>
+        <ContentNode title="m"/>
+        <ContentNode title="n"/>
+        <ContentNode title="o"/>
+        <ContentNode title="p"/>
+        <ContentNode title="q"/>
+        <ContentNode title="r"/>
+        <ContentNode title="s"/>
+        <ContentNode title="t"/>
+        <ContentNode title="u"/>
+        <ContentNode title="v"/>
+        <ContentNode title="w"/>
+        <ContentNode title="x"/>
+        <ContentNode title="y"/>
+        <ContentNode title="z"/>
+        <ContentNode title=" "/>
+        <ContentNode title="&#x7F;"/>
+      </ContentNode>
+    </ScrollingList>
+    
+    <ScrollingList
+      id="NumericKeyboard"
+      width="1920"
+      height="80"
+      visible="false"
+      itemSpacings="[2]"
+      itemComponentName="KeyboardItem"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
+      translation="[588,147]"
+      layoutDirection="horiz">
+      <ContentNode
+        role="content">
+        <ContentNode title="1"/>
+        <ContentNode title="2"/>
+        <ContentNode title="3"/>
+        <ContentNode title="4"/>
+        <ContentNode title="5"/>
+        <ContentNode title="6"/>
+        <ContentNode title="7"/>
+        <ContentNode title="8"/>
+        <ContentNode title="9"/>
+        <ContentNode title="0"/>
+        <ContentNode title=" "/>
+        <ContentNode title="&#x7F;"/>
+      </ContentNode>
+    </ScrollingList>
+    
+    <ScrollingList
+      id="Symbolic1Keyboard"
+      width="1920"
+      height="80"
+      visible="false"
+      itemSpacings="[2]"
+      itemComponentName="KeyboardItem"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
+      translation="[66,147]"
+      layoutDirection="horiz">
+      <ContentNode
+        role="content">
+        <ContentNode title="@"/>
+        <ContentNode title="#"/>
+        <ContentNode title="!"/>
+        <ContentNode title="?"/>
+        <ContentNode title="&amp;"/>
+        <ContentNode title="*"/>
+        <ContentNode title="^"/>
+        <ContentNode title="("/>
+        <ContentNode title=")"/>
+        <ContentNode title="\"/>
+        <ContentNode title="/"/>
+        <ContentNode title="["/>
+        <ContentNode title="]"/>
+        <ContentNode title="|"/>
+        <ContentNode title="&lt;"/>
+        <ContentNode title="&gt;"/>
+        <ContentNode title="{"/>
+        <ContentNode title="}"/>
+        <ContentNode title="+"/>
+        <ContentNode title="-"/>
+        <ContentNode title="="/>
+        <ContentNode title="_"/>
+        <ContentNode title=","/>
+        <ContentNode title="."/>
+        <ContentNode title=":"/>
+        <ContentNode title=";"/>
+        <ContentNode title=" "/>
+        <ContentNode title="&#x7F;"/>
+      </ContentNode>
+    </ScrollingList>
+    
+    <ScrollingList
+      id="Symbolic2Keyboard"
+      width="1920"
+      height="80"
+      visible="false"
+      itemSpacings="[2]"
+      itemComponentName="KeyboardItem"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
+      translation="[747,227]"
+      layoutDirection="horiz">
+      <ContentNode
+        role="content">
+        <ContentNode title="$"/>
+        <ContentNode title="%"/>
+        <ContentNode title="&quot;"/>
+        <ContentNode title="'"/>
+        <ContentNode title="`"/>
+        <ContentNode title="~"/>
+      </ContentNode>
+    </ScrollingList>
+  </children>
+</component>

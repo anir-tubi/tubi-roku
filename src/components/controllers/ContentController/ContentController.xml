@@ -41,6 +41,8 @@
       <MetadataFetchTask 
         id="MetadataFetchTask" />
 
+      <Group
+       id="ScreenStack"/>
     </children>
 
 </component>

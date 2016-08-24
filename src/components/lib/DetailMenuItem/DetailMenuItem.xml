@@ -22,14 +22,14 @@
   <children>
     <Poster
      id="Icon" 
-     translation="[47,29]"
-     loadWidth="37"
-     loadHeight="37"
-     loadDisplayMode="scaleToFit" />
+     translation="[47,20]"
+     loadWidth="40"
+     loadHeight="40"
+     loadDisplayMode="scaleToZoom" />
     
     <Label
      id="Text"
-     translation="[97,15]" 
+     translation="[97,0]" 
      vertAlign="center"
      horizAlign="left" 
      height="80">

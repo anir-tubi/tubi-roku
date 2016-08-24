@@ -3,7 +3,7 @@ CURL=curl
 MAKE=make
 TOOL_CLI=node tools/cli.js
 
-NAME=adrise_roku
+NAME=tubitv_roku
 SRC_DIR=src
 TARGET_DIR=build
 TARGET=$(NAME).zip

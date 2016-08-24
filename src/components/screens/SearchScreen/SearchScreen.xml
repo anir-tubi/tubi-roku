@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SearchScreen" extends="Group" initialFocus="Keyboard">
+
+  <script type="text/brightscript" uri="pkg:/components/screens/SearchScreen/SearchScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- set to the tubi content id of the item which was clicked on -->
+    <field id="contentSelected" type="node" alwaysNotify="true"/>
+
+    <!-- where the search results are stored -->
+    <field id="content" alias="ResultGrid.content" />
+  </interface>
+  
+  <children>
+    <Poster
+      id="HeroBackground"
+      loadWidth="1920"
+      loadHeight="1080"
+      uri="pkg:/images/search-gradient.png"
+      loadDisplayMode="scaleToZoom"
+      translation="[0,0]"/>
+    
+    <!-- The keyboard: upper, lower, numbers, symbols -->
+    <KeyboardGroup
+      id="Keyboard"
+      translation="[0,0]"/>
+
+    <!-- The search label and icon that appear when the keyboard goes off-screen -->
+    <Rectangle
+      id="SearchHint"
+      translation="[886,70]"
+      opacity="0.0"
+      visible="true">
+      <Poster
+       id="SearchHintIcon" 
+       uri="pkg:/images/icon-search.png"
+       translation="[0,20]"
+       height="40"
+       width="40"
+       loadDisplayMode="scaleToZoom" />
+    
+      <Label
+       id="SearchHintText"
+       translation="[46,0]" 
+       vertAlign="center"
+       horizAlign="left" 
+       height="80"
+       text="Search">
+        <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-SemiBold.ttf"
+         size="33" />
+       
+      </Label>
+    </Rectangle>
+    
+    <!-- Live text entry box with a non-blinking "cursor" -->
+    <LayoutGroup
+      id="TextEntryGroup"
+      layoutDirection="horiz"
+      translation="[85,315]"
+      itemSpacings="[2]">
+      <Label
+        id="SearchText"
+        text=""
+        vertAlign="center"
+        height="74">
+        <Font
+        id="SearchTextFont"
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"     
+        size="67"/>
+      </Label>
+      <Rectangle
+        id="Cursor"
+        height="70"
+        width="2"/>
+    </LayoutGroup>
+
+    <!-- Infopanel visible once the results grid is focused -->
+    <InfoPanel
+      id="InfoPanel"
+      mode="item"
+      visible="true"
+      opacity="0.0"
+      translation="[85,283]"/>
+    
+    <ContentGrid
+      id="ResultGrid"
+      numColumns="8"
+      numRows="4"
+      width="1750"
+      height="390"
+      itemSize="[210,300]"
+      itemSpacing="[10,10]"
+      itemComponentName="ContentGridItem"
+      fillDirection="Z"
+      visible="true"
+      translation="[85,648]"/>
+
+    <Animation
+      id="TextEntryAnimation"
+      duration="0.25">
+      <FloatFieldInterpolator
+        id="TextEntryScaleInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[1.0, 0.5]"
+        fieldToInterp=""/>
+      <FloatFieldInterpolator
+        id="InfoPanelOpacityInterpolator"
+        key="[0.0, 1.0]"
+        fieldToInterp="InfoPanel.opacity"/>
+      <FloatFieldInterpolator
+        id="SearchHintOpacityInterpolator"
+        key="[0.0, 1.0]"
+        fieldToInterp="SearchHint.opacity"/>
+      <Vector2DFieldInterpolator
+        id="TextEntryTranslationInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[[85,315],[85,151]]"
+        fieldToInterp="TextEntryGroup.translation"/>
+      <Vector2DFieldInterpolator
+        id="KeyboardTranslationInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[[0,0],[0,0]]"
+        fieldToInterp="Keyboard.translation"/>
+    </Animation>
+
+  </children>
+</component>

@@ -2,16 +2,23 @@ Function init()
   tubiLog("CategoryScreen.init")
   m.CategoryList = m.top.findNode("CategoryList")
   m.InfoPanel = m.top.findNode("InfoPanel")
-  m.ContentGrid = m.top.findNode("PosterGrid")
+  m.SpecialCategories = m.top.findNode("SpecialCategories")
   m.Hero = m.top.findNode("HeroBackground")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.CategoryList.observeField("itemFocused","onCategoryChange")
-  m.ContentGrid.observeField("itemFocused","onGridFocusChange")
-  m.ContentGrid.observeField("itemSelected","onGridItemSelected")
+
+  'Content area
+  m.PosterGrid = m.top.findNode("PosterGrid")
+  m.PosterGrid.observeField("itemFocused","onGridFocusChange")
+  m.PosterGrid.observeField("itemSelected","onGridItemSelected")
   m.FeatureGrid = m.top.findNode("FeatureGrid")
   m.FeatureGrid.observeField("itemFocused","onGridFocusChange")
   m.FeatureGrid.observeField("itemSelected","onGridItemSelected")
+  m.SignInMenu = m.top.findNode("SearchSignInList")
+  m.SignInMenu.observeField("itemSelected", "onSignInMenuItemSelected")
+  m.ContentGrid = m.PosterGrid  ' alias to simplify the code
+
   m.defaultHeroUri = "pkg:/images/background-not-on-selection.png"
 
   ' track the last focused screen component so that we can go back
@@ -22,6 +29,21 @@ Function init()
 End Function
 
 
+'''''''''''''''''''''''''''
+' onSignInMenuItemSelected
+'
+Function onSignInMenuItemSelected()
+  tubiLog("CategoryScreen.onSignInMenuItemSelected")
+  selectedItem = m.SignInMenu.content.getChild(m.SignInMenu.itemSelected)
+  if selectedItem.id = "SearchMenuItem" then
+    m.top.searchSelected = true
+  else if selectedItem.id = "SignInMenuItem" then
+    m.top.signInSelected = true
+  else if selectedItem.id = "AboutInMenuItem" then
+    m.top.aboutSelected = true
+  end if
+End Function
+
 ''''''''''''''''''''
 ' onScreenFocusChange
 '
@@ -31,7 +53,11 @@ End Function
 Function onScreenFocusChange()
   if m.top.hasFocus() then
     ' defaulted to screen, move to a subcomponent
-    m.ContentGrid.setFocus(true)
+    if m.ContentGrid.visible = true then
+      m.ContentGrid.setFocus(true)
+    else if m.SignInMenu.visible = true then
+      m.SignInMenu.setFocus(true)
+    end if
   end if
 End Function
 
@@ -43,12 +69,16 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("CategoryScreen.onKeyEvent")
   if press then
     if key = "right" and m.CategoryList.isInFocusChain() then
-      m.ContentGrid.setFocus(true)
+      if m.ContentGrid.visible = true then
+        m.ContentGrid.setFocus(true)
+      else if m.SignInMenu.visible = true then
+        m.SignInMenu.setFocus(true)
+      end if
       return true
-    else if key = "left" and m.ContentGrid.isInFocusChain() then
+    else if key = "left" and not m.CategoryList.isInFocusChain() then
       m.CategoryList.setFocus(true)
       return true
-    else if (key = "down" or key = "up") and m.ContentGrid.isInFocusChain() then
+    else if (key = "down" or key = "up") and not m.CategoryList.isInFocusChain() then
       m.CategoryList.setFocus(true)
       if key = "up" then m.CategoryList.animateToItem = m.CategoryList.itemFocused - 1
       if key = "down" then m.CategoryList.animateToItem = m.CategoryList.itemFocused + 1
@@ -66,6 +96,12 @@ End Function
 ' Handle category list received
 Function onContentChange() As Void
   tubiLog("CategoryScreen.onContentChange")
+
+  ' Prepend special categories 
+  while m.SpecialCategories.getChildCount() > 0
+    m.top.content.insertChild(m.SpecialCategories.getChild(0), 0)
+  end while
+
   m.CategoryList.content = m.top.content
   m.InfoPanel.content = m.top.content.getChild(m.CategoryList.itemFocused)
   m.CategoryList.setFocus(true)
@@ -94,17 +130,21 @@ Function onCategoryChange() As Void
   m.Hero.uri = m.defaultHeroUri
 
   if newCategory.id <> m.ContentGrid.id then
+    m.SignInMenu.visible = false
     m.ContentGrid.content = invalid
+    m.ContentGrid.visible = false
 
-    ' TODO(Chris): Flip between feature and poster grids here
+    ' Flip between feature grid, poster grid, and sign in menu
     if newCategory.title = "Featured"
-      print "Changing to featured grid"
-      m.ContentGrid.visible = false
       m.ContentGrid = m.top.findNode("FeatureGrid")
       m.ContentGrid.visible = true
+    else if newCategory.title = "Recently Viewed"
+      'TODO(Chris): Show recently viewed grid here
+    else if newCategory.title = "My Queue"
+      'TODO(Chris): Show user's queue here
+    else if newCategory.title = "Search & Sign In"
+      m.SignInMenu.visible = true
     else
-      print "Changing to poster grid"
-      m.ContentGrid.visible = false
       m.ContentGrid = m.top.findNode("PosterGrid")
       m.ContentGrid.visible = true
     end if

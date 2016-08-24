@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - KeyboardItem
+ -
+ - These are the actual keyboard keys: numbers, letters, symbols, backspace
+ -
+ -->
+<component name="KeyboardItem" extends="Rectangle" >
+  <script type="text/brightscript" uri="pkg:/components/lib/KeyboardItem/KeyboardItem.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- hide the progress bar when focus changes -->
+    <field id="focusPercent" type="float"/>
+    
+    <!-- Content expected for a KeyboardItem:
+     -
+     - title - The label text
+     -
+     -->
+    <field id="content" type="node" />
+    <field id="listHasFocus" type="boolean" value="false" />
+  </interface>
+
+  <children>
+    <Poster
+     id="Image"
+     visible="false"
+     loadHeight="40"
+     loadWidth="60"
+     height="40"
+     width="60"
+     translation="[0,20]"/>
+    
+    <Label
+     id="Text"
+     height="80"
+     width="60"
+     horizAlign="center"
+     vertAlign="center">
+      <Font
+       role="font"
+       uri="pkg:/fonts/Vaud-SemiBold.ttf"
+       size="37" />
+    </Label>
+  </children>
+</component>
+    

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - KeyboardMenuItem
+ -
+ - These are menu items representing the choices of uppercase, lowercase, numbers, and symbols
+ -
+ -->
+<component name="KeyboardMenuItem" extends="Label" >
+  <script type="text/brightscript" uri="pkg:/components/lib/KeyboardMenuItem/KeyboardMenuItem.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- hide the progress bar when focus changes -->
+    <field id="focusPercent" type="float"/>
+    
+    <!-- Content expected for a KeyboardMenuItem:
+     -
+     - title - The label text
+     -
+     -->
+    <field id="content" type="node" />
+    <field id="listHasFocus" type="boolean" value="false" />
+  </interface>
+
+  <children>
+    <Font
+     role="font"
+     uri="pkg:/fonts/Vaud-SemiBold.ttf"
+     size="43" />
+  </children>
+</component>
+    
