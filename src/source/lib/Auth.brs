@@ -134,10 +134,12 @@ End Function
 '@authToken can be the server access_token or refresh_token depending on the call being made
 function tubiAuth_getAuthHeaders(authToken)
   if type(authToken) = "String" or type(authToken) = "roString"
-    return {
-      "Content-Type": "application/json"
-      Authorization: "Bearer " + authToken 
+    headers = {
+      Authorization: "Bearer " + authToken
     }
+    headers.append(m.constants.headers.json)
+
+    return headers
   else
     return invalid
   end if

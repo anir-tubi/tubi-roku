@@ -72,9 +72,9 @@ Function getConstants()
     constants.urls.adsBaseUrl = "http://ads.adrise.tv/"
 
     'contents url
-    constants.urls.contents = {}
-      constants.urls.contents.isHttps = true
-      constants.urls.contents.urlBase = "https://uapi.adrise.tv/cms"
+    constants.urls.cms = {}
+      constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
+      constants.urls.cms.contents = constants.urls.cms.urlBase + "/contents"
 
     'users url
     constants.urls.users = {}
@@ -82,9 +82,7 @@ Function getConstants()
       constants.urls.users.refreshToken = constants.urls.users.urlBase + "/login/refresh"
       constants.urls.users.migrateLogin = constants.urls.users.urlBase + "/login/migrate"
       constants.urls.users.queues = constants.urls.users.urlBase + "/queues"
-      constants.urls.users.queuesNoPage = constants.urls.users.queues + "?page_enabled=false"
       constants.urls.users.history = constants.urls.users.urlBase + "/histories"
-      constants.urls.users.historyNoPage = constants.urls.users.history + "?page_enabled=false"
 
 
     'search url
@@ -112,6 +110,10 @@ Function getConstants()
     constants.reqTypes.post = "POST"
     constants.reqTypes.put = "PUT"
     constants.reqTypes.del = "DELETE"
+
+  'common http request headers
+  constants.headers = {}
+    constants.headers.json = {"Content-Type": "application/json"}
 
   'content type strings that we might get returned from uapi
   constants.uapiContentTypes = {}

@@ -168,7 +168,7 @@ End Function
 Function loadContentDetails()
   tubiLog("DetailScreen.loadDetails")
   settings = m.global.constants.settings
-  urlBase = m.global.constants.urls.contents.urlBase
+  urlBase = m.global.constants.urls.cms.urlBase
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
 

@@ -193,7 +193,7 @@ Function loadAllCategories()
 
   ' TODO(Chris): This should move to a shim layer which hides specifics of the Tubi v4 API
   settings = m.global.constants.settings
-  urlBase = m.global.constants.urls.contents.urlBase
+  urlBase = m.global.constants.urls.cms.urlBase
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
   url = urlBase + "/categories?app_id=" + settings.shortAppName + "&platform=" + platform + "&device_id=" + deviceInfo.deviceId + "&page_enabled=false"
@@ -214,7 +214,7 @@ End Function
 ' Load a single category's content
 Function loadOneCategory(categoryId As String)
   settings = m.global.constants.settings
-  urlBase = m.global.constants.urls.contents.urlBase
+  urlBase = m.global.constants.urls.cms.urlBase
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
   request = {
