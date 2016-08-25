@@ -171,8 +171,6 @@ Function onGridFocusChange() As Void
 
   if focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
     m.Hero.uri = focusedContent.backgrounds[0]
-  else if focusedContent.heros <> invalid and focusedContent.heros.count() > 0 then
-    m.Hero.uri = focusedContent.heros[0]
   else
     m.Hero.uri = m.defaultHeroUri
   end if

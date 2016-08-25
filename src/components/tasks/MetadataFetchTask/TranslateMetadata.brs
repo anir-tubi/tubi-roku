@@ -115,10 +115,6 @@ Function translateRecursive(contentFromServer, translatedContent) As Void
       translatedContent.HDGRIDPOSTERURL = contentFromServer.posterarts[0]
     end if
 
-    if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
-      translatedContent.heros = contentFromServer.hero_images
-    end if
-
     if contentFromServer.backgrounds <> invalid and type(contentFromServer.backgrounds) = "roArray" and contentFromServer.backgrounds.count() > 0
       translatedContent.backgrounds = contentFromServer.backgrounds
     end if

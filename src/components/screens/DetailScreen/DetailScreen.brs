@@ -47,8 +47,6 @@ Function onContentChange()
   end if
   if m.top.content.backgrounds <> invalid and m.top.content.backgrounds.count() > 0 then
     m.Hero.uri = m.top.content.backgrounds[0]
-  else if m.top.content.heros <> invalid and m.top.content.heros.count() > 0 then 
-    m.Hero.uri = m.top.content.heros[0]
   else
     m.Hero.uri = m.defaultHeroUri
   end if
