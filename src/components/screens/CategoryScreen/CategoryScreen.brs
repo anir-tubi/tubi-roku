@@ -39,7 +39,7 @@ Function onSignInMenuItemSelected()
     m.top.searchSelected = true
   else if selectedItem.id = "SignInMenuItem" then
     m.top.signInSelected = true
-  else if selectedItem.id = "AboutInMenuItem" then
+  else if selectedItem.id = "AboutMenuItem" then
     m.top.aboutSelected = true
   end if
 End Function

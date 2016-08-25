@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - RegistrationTask
+ -
+ - This is a short-lived task for invoking registration-oriented API calls.
+ - Callers should set the frequency and expiration and:
+ -   1) observe 'code' to detect the registration code having been generated
+ -   2) observe 'response' to check when code changes state to "registered"
+ -   3) observe 'state' to detect if the task exists upon reaching the expiration time
+ -
+ --> 
+<component name="RegistrationCodeTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/tasks/RegistrationCodeTask/RegistrationCodeTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+
+    <interface>
+      <!-- once the registration code has been generated, it will be stored here -->
+      <field id="code" type="string" value="" alwaysNotify="true" />
+      
+      <!-- Set the poll frequency for registration code status updates -->
+      <field id="frequency" type="int" value="2000" alwaysNotify="true" />
+      
+      <!-- Set the expiration time in seconds after which the task will stop polling status -->
+      <field id="expiration" type="int" value="300" alwaysNotify="false" />
+      
+      <!-- Set to the response body of the status call. -->
+      <field id="response" type="assocarray" alwaysNotify="true" />
+      
+      <!-- Set this to true in order to cancel the polling loop and exit the thread function -->
+      <field id="cancel" type="boolean" value="false" alwaysNotify="true" />
+    </interface>
+</component>

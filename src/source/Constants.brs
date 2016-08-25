@@ -103,6 +103,9 @@ Function getConstants()
     constants.urls.linearPosterSDUrl = "http://cdn.adrise.com/hotpatches/roku/LinearTV-beta-SD.jpg"
     constants.urls.linearPosterHDUrl = "http://cdn.adrise.com/hotpatches/roku/LinearTV-beta-HD.jpg"
 
+    ' splash video
+    constants.urls.splashVideoUrl = "http://c11.adrise.tv/v2/sources/content-owners/adrise-no-ads/321538/v201608050030-1280x720-,425,1062,1760,2128,3114,k.mp4.m3u8"
+
   'http request types
   constants.reqTypes = {}
     constants.reqTypes.get = "GET"
@@ -235,6 +238,12 @@ Function getConstants()
       constants.ui.colors.unfocused = "0xFFFFFFFF"
       constants.ui.colors.primaryText = "0xFFFFFFFF"
       constants.ui.colors.secondaryText = "0x777777FF"
+
+      'textbox text colors
+      constants.ui.colors.unselectedEntryText = "0x191919FF"
+      constants.ui.colors.selectedEntryText = "0xFF9933FF"
+      constants.ui.colors.selectedEntryBox = "0xF4D8BCFF"
+      constants.ui.colors.unselectedEntryBox = "0xFFFFFFFF"
       
       'colors for individual elements - can be made individual or controlled by template colors
       constants.ui.colors.heroFilter = constants.ui.colors.backgroundColor

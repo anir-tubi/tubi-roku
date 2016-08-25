@@ -17,7 +17,6 @@ Function init()
   m.internalItemFocused = m.top.itemFocused  ' separate from event emitter
   m.overlappedKeypress = invalid 'track when a key is pressed during animation
   m.pressAndHold = invalid 'track when a key is being held down without release
-  m.focusImage.visible = m.top.isInFocusChain()
 End Function
 
 ''''''''''''''''''''''
@@ -54,6 +53,7 @@ Function onContentChange() As Void
   for i=0 to m.items.getChildCount()-1
     m.items.removeChild(i)
   end for
+  m.focusImage.visible = false
 
   ' add new children for content
   if m.top.content = invalid then return
@@ -69,7 +69,12 @@ Function onContentChange() As Void
   end for
 
   ' Default focus to first item
-  startChangeFocus(0)
+  if m.top.content.getChildCount() > 0 then
+    itemRect = m.items.getChild(0).boundingRect()
+    m.focusImage.width = itemRect.width
+    m.focusImage.height = itemRect.height
+    startChangeFocus(0)
+  end if
 End Function
 
 ''''''''''''''''''''''
@@ -88,7 +93,7 @@ Function onComponentFocusChange()
       m.top.itemFocused = m.internalItemFocused
     end if
   end if
-  if m.top.isInFocusChain() then
+  if m.top.isInFocusChain() and m.items.getChildCount() > 0 and m.scrollAnimation.state = "stopped" then
     m.focusImage.visible = true
   else
     m.focusImage.visible = false
@@ -137,7 +142,7 @@ Function scrollList(direction As String)
   if m.top.layoutDirection = "vert" then
     forward = "down"
     backward = "up"
-  else if m.top.layoutDirection = "horiz" then
+  else
     forward = "right"
     backward = "left"
   end if
@@ -252,6 +257,9 @@ Function endChangeFocus()
     m.scrollAnimation.unobserveField("state")
     focusedItem = m.items.getChild(m.internalItemFocused)
     focusedItem.focusPercent = 1.0  ' in case animation didn't set this, force it
+
+    ' may be invisible there was no content previously
+    if m.top.isInFocusChain() then m.focusImage.visible = true
 
     ' emit event only if key events aren't happening, or they're being ignored
     ' because we're at the end of the list

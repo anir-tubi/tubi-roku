@@ -211,7 +211,7 @@ Function tubihttp_handleEvent(message As Object) As Object
         else
           ' Here on success or on retry limit
           m.response = {
-            code: message.GetInt()
+            code: code
             data: message.GetString()
             failReason: message.GetFailureReason()
           }

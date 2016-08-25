@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - TextEntryBox
+ -
+ - This component is used for all 480x80 buttons within the sign-in flow.
+ -
+ -->
+<component name="TextEntryBox" extends="Rectangle" >
+  <script type="text/brightscript" uri="pkg:/components/lib/TextEntryBox/TextEntryBox.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- The text to display.  This is not wired up to anything by default -->
+    <field id="text" type="string" value=""/>
+    
+    <!-- Hint text to display when 'text' is empty -->
+    <field id="hint" type="string" value=""/>
+    
+    <!-- Text attributes, not applied to 'hint' -->
+    <field id="textColor" alias="Text.color" />
+    <field id="textOpacity" alias="Text.opacity" />
+  </interface>
+
+  <children>
+    <Label
+      id="Text"
+      text=""
+      height="80"
+      horizAlign="left"
+      vertAlign="center"
+      clippingRect="[0,0,428,80]"
+      translation="[26,0]"
+      width="0"
+      numLines="1"
+      maxLines="1">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="33" />
+    </Label>
+  </children>
+</component>

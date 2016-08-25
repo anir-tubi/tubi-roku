@@ -8,7 +8,7 @@ Function init()
 
   m.metadataFetchTask.observeField("ready", "onMetadataTaskReady")
   m.global.metadataFetchTask.control = "RUN"
-  m.ScreenStack = m.top.findNode("ScreenStack")
+  initScreenStack(m.top.findNode("ScreenStack"))
 
 End Function
 
@@ -24,17 +24,50 @@ Function onMetadataTaskReady()
   tubiLog("ContentController.onMetadataTaskReady")
 
   if m.metadataFetchTask.ready = true then
-    ' Create the cateogry screen only after the task thread is ready
-    m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
-    m.categoryScreen.observeField("contentSelected", "onContentSelected")
-    m.categoryScreen.observeField("searchSelected", "onSearchSelected")
-    m.categoryScreen.observeField("signInSelected", "onSignInSelected")
-    m.categoryScreen.observeField("aboutSelected", "onAboutSelected")
-    pushScreen(m.categoryScreen)
-
-    ' only do this once
+    'TODO(Chris): Check if user is logged in here, then skip sign in 
+    startSignIn()
     m.metadataFetchTask.unobserveField("ready")
   end if
+End Function
+
+
+''''''''''''''''''''''''
+' startSignIn
+'
+' Defer to the sign-in controller for sign in experience
+Function startSignIn()
+  m.SignIn = m.top.createChild("SignInController")
+  m.SignIn.observeField("guestPass", "onSignInComplete")
+  m.SignIn.observeField("signedIn", "onSignInComplete")
+  m.SignIn.observeField("registered", "onSignInComplete")
+  m.SignIn.setFocus(true)
+End Function
+
+
+'''''''''''''''''''''''''
+' onSignInComplete
+'
+' The sign-in flow has ended, do what comes next
+Function onSignInComplete()
+  m.SignIn.unobserveField("guestPass")
+  m.SignIn.unobserveField("signedIn")
+  m.SignIn.unobserveField("registered")
+  m.top.removeChild(m.SignIn)
+  m.SignIn = invalid
+
+  ' flush the screenstack in any case where the user has successfully
+  ' gone through the sign-in.  If they 'back' out of it, the screen
+  ' stack will stay intact and this function will not be called
+  while currentScreen() <> invalid
+    popScreen()
+  end while
+
+  m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
+  m.categoryScreen.observeField("contentSelected", "onContentSelected")
+  m.categoryScreen.observeField("searchSelected", "onSearchSelected")
+  m.categoryScreen.observeField("signInSelected", "onSignInSelected")
+  m.categoryScreen.observeField("aboutSelected", "onAboutSelected")
+  pushScreen(m.categoryScreen)
 End Function
 
 
@@ -73,6 +106,7 @@ End Function
 ' Launch the Sign In experience
 Function onSignInSelected()
   tubiLog("ContentController.onSignInSelected")
+  startSignIn()
 End Function
 
 
@@ -82,6 +116,24 @@ End Function
 ' Show the about screen
 Function onAboutSelected()
   tubiLog("ContentController.onAboutSelected")
+  m.aboutScreen = CreateObject("roSGNode", "ModalDialogScreen")
+  m.aboutScreen.title = "About Tubi TV"
+  message = "(C) 2016 Tubi TV" + Chr(10) ' + Chr(13)
+  message = message + "All rights reserved." + Chr(10) '+ Chr(13)
+  message = message + "Tubi TV related marks are trademarks of Tubi TV, an adRise Company."
+  m.aboutScreen.message = message
+  m.aboutScreen.buttons = ["Close"]
+  m.aboutScreen.observeField("buttonSelected", "onCloseAbout")
+  pushModal(m.aboutScreen)
+End Function
+
+'''''''''''''''''''
+' onCloseAbout
+'
+' Dismiss the About modal
+Function onCloseAbout()
+  popScreen()
+  m.aboutScreen = invalid
 End Function
 
 
@@ -109,66 +161,4 @@ Function onResume()
   tubiLog("ContentController.onResume")
   content = m.detailScreen.resumeContent
   m.top.playContent = content
-End Function
-
-'''''''''''''''''''''''
-' onKeyEvent
-'
-' Back pressed on detail screen should close it
-Function onKeyEvent(key As String, press As Boolean)
-  if press then
-    if key = "back" and m.ScreenStack.getChildCount() > 1 then
-      popScreen()
-      return true
-    end if
-  end if
-  return false
-End Function
-
-
-''''''''''''''''''''''
-' pushScreen
-'
-' Push a screen on to the stack, allowing the back button to retrace steps
-Function pushScreen(screen As Object)
-  top = m.ScreenStack.getChild(m.ScreenStack.getChildCount()-1)
-  if top <> invalid then
-    top.visible = false
-    top.opacity = 0.0
-    top.setFocus(false)
-  end if
-  m.ScreenStack.appendChild(screen) 
-  screen.setFocus(true)
-  screen.visible = true
-  screen.opacity = 1.0
-End Function
-
-
-''''''''''''''''''''
-' popScreen
-'
-' Remove the top-most screen of the stack, making the previous screen visible
-Function popScreen()
-  top = m.ScreenStack.getChild(m.ScreenStack.getChildCount()-1)
-  fields = top.getFields()
-  for each f in fields
-    ' make sure the controller completely dereferences the screen
-    top.unobserveField(f)
-  end for
-  m.ScreenStack.removeChild(top)
-  newTop = m.ScreenStack.getChild(m.ScreenStack.getChildCount()-1)
-  if newTop <> invalid then
-    ' just in case empty the whole stack
-    newTop.visible = true
-    newTop.opacity = 1.0
-    newTop.setFocus(true)
-  end if
-End Function
-
-''''''''''''''''''''
-' currentScreen
-'
-' Get the current top of the screen stack 
-Function currentScreen()
-  return m.ScreenStack.getChild(m.ScreenStack.getChildCount()-1)
 End Function
