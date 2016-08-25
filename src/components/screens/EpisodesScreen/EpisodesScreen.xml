@@ -32,16 +32,16 @@
     
     <InfoPanel
       id="InfoPanel"
-      translation="[85,59]"
+      translation="[85,61]"
       mode="detail"
       visible="true" />
     
     <ScrollingList
       id="Menu"
-      translation="[41, 423]"
+      translation="[41, 424]"
       width="445"
       height="616"
-      itemSpacings="[0]"
+      itemSpacings="[9]"
       itemComponentName="SeasonListItem"
       visible="false"
       focusBitmapUri="pkg:/images/menu-focus.png"/>

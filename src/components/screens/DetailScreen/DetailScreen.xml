@@ -86,7 +86,7 @@
         id="Menu"
         width="465"
         height="500"
-        itemSpacings="[4]"
+        itemSpacings="[9]"
         itemComponentName="DetailMenuItem"
         focusBitmapUri="pkg:/images/menu-focus.png"
         visible="false"

@@ -98,9 +98,11 @@ Function onContentChange() As Void
   tubiLog("CategoryScreen.onContentChange")
 
   ' Prepend special categories 
-  while m.SpecialCategories.getChildCount() > 0
-    m.top.content.insertChild(m.SpecialCategories.getChild(0), 0)
-  end while
+  m.top.content.insertChild(m.SpecialCategories.findNode("SearchSignIn"), 0)
+    
+  'TODO(Chris): Show these once a user is logged in and we can fill them with content
+  'm.top.content.insertChild(m.SpecialCategories.findNode("ContinueWatching"), 1)
+  'm.top.content.insertChild(m.SpecialCategories.findNode("My Queue")
 
   m.CategoryList.content = m.top.content
   m.InfoPanel.content = m.top.content.getChild(m.CategoryList.itemFocused)
@@ -138,7 +140,7 @@ Function onCategoryChange() As Void
     if newCategory.title = "Featured"
       m.ContentGrid = m.top.findNode("FeatureGrid")
       m.ContentGrid.visible = true
-    else if newCategory.title = "Recently Viewed"
+    else if newCategory.title = "Continue Watching"
       'TODO(Chris): Show recently viewed grid here
     else if newCategory.title = "My Queue"
       'TODO(Chris): Show user's queue here
@@ -166,7 +168,10 @@ Function onGridFocusChange() As Void
   focusedContent = m.ContentGrid.content.getChild(m.ContentGrid.itemFocused)
   m.InfoPanel.content = focusedContent
   m.InfoPanel.mode = "item"
-  if focusedContent.heros <> invalid and focusedContent.heros.count() > 0 then 
+
+  if focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
+    m.Hero.uri = focusedContent.backgrounds[0]
+  else if focusedContent.heros <> invalid and focusedContent.heros.count() > 0 then
     m.Hero.uri = focusedContent.heros[0]
   else
     m.Hero.uri = m.defaultHeroUri

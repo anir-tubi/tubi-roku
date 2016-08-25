@@ -42,8 +42,8 @@
     <ContentNode
       id="SpecialCategories">
       <ContentNode
-        id="RecentlyViewed"
-        title="Recently Viewed"
+        id="ContinueWatching"
+        title="Continue Watching"
         description=""/>
       <ContentNode
         id="MyQueue"
@@ -76,7 +76,7 @@
       width="445"
       height="616"
       visible="true" 
-      itemSpacings="[0]"
+      itemSpacings="[9]"
       itemComponentName="CategoryListItem"
       focusBitmapUri="pkg:/images/menu-focus.png">
 
@@ -120,8 +120,8 @@
     <ScrollingList
       id="SearchSignInList"
       width="465"
-      height="250"
-      itemSpacings="[4]"
+      height="280"
+      itemSpacings="[9]"
       itemComponentName="DetailMenuItem"
       focusBitmapUri="pkg:/images/menu-focus.png"
       visible="false">

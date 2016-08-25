@@ -3,6 +3,7 @@ Function init()
   m.Episode = m.top.findNode("Episode")
   m.CategoryDetails = m.top.findNode("CategoryDetails")
   m.TwoLineInfo = m.top.findNode("TwoLineInfo")
+  m.Rating = m.top.findNode("Rating")
   m.Description = m.top.findNode("Description")
   m.Director = m.top.findNode("Director")
   m.DirectorGroup = m.top.findNode("DirectorGroup")
@@ -56,7 +57,10 @@ Function onContentChange()
       line1Label.text = line1Label.text + formatLengthAsEnglish(content.length) + " "
     end if
     if content.rating <> invalid and content.rating <> "" then
-      line1Label.text = line1Label.text + content.rating
+      'line1Label.text = line1Label.text + content.rating
+      m.Rating.uri = "pkg:/images/rating-" + Ucase(content.rating) + ".png"
+    else
+      m.Rating.uri = ""
     end if
     line2Label = m.TwoLineInfo.findNode("Line2")
     if content.genres <> invalid and content.genres.count() > 0 then
@@ -92,6 +96,7 @@ Function onContentChange()
       m.StarringGroup.visible = false
     end if
   end if
+
 End Function
 
 
@@ -110,14 +115,14 @@ Function onModeChange()
       m.CategoryDetails
       m.Description
     ])
-    m.top.itemSpacings = [44, 19]
+    m.top.itemSpacings = [53, 36]
   else if m.top.mode = "item" then
     m.top.appendChildren([
       m.Title
       m.TwoLineInfo
       m.Description
     ])
-    m.top.itemSpacings = [44, 19]
+    m.top.itemSpacings = [46, 36]
   else if m.top.mode = "movie" then
     m.top.appendChildren([
       m.Title
@@ -126,7 +131,7 @@ Function onModeChange()
       m.DirectorGroup
       m.StarringGroup
     ])
-    m.top.itemSpacings = [44, 19, 28, 12]
+    m.top.itemSpacings = [46, 41, 42, 12]
   else if m.top.mode = "series" then
     m.top.appendChildren([
       m.Title
@@ -136,7 +141,7 @@ Function onModeChange()
       m.DirectorGroup
       m.StarringGroup
     ])
-    m.top.itemSpacings = [20, 22, 19, 28, 12]
+    m.top.itemSpacings = [30, 27, 40, 38, 12]
   else if m.top.mode = "season" then
     m.top.appendChildren([
       m.Title
@@ -149,7 +154,7 @@ Function onModeChange()
       m.TwoLineInfo
       m.Description
     ])
-    m.top.itemSpacings = [19, 20, 19]
+    m.top.itemSpacings = [30, 21, 38]
   end if
 End Function
 
