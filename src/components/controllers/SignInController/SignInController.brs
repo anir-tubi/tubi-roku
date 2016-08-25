@@ -4,6 +4,9 @@ Function init()
   m.Disambiguation.setFocus(true)
   m.Disambiguation.observeField("signInButtonSelected", "onDisambiguationSignIn")
   m.Disambiguation.observeField("guestPassButtonSelected", "onDisambiguationGuestPass")
+  m.Background = m.top.findNode("SignInBackground")
+  m.Background.color = m.global.constants.ui.colors.backgroundColor
+
   initScreenStack(m.top.findNode("ScreenStack"))
   pushScreen(m.Disambiguation)
 End Function

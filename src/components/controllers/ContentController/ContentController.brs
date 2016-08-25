@@ -5,6 +5,9 @@ Function init()
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
   m.global.addField("metadataFetchTask", "node", false)
   m.global.metadataFetchTask = m.metadataFetchTask
+  
+  m.background = m.top.findNode("ContentBackground")
+  m.background.color = m.global.constants.ui.colors.backgroundColor
 
   m.metadataFetchTask.observeField("ready", "onMetadataTaskReady")
   m.global.metadataFetchTask.control = "RUN"
