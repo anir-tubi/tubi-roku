@@ -21,7 +21,7 @@
   <children>
     <Poster 
       id="Background" 
-      loadingBitmapUri="pkg:/images/loading_feature.png"
+      loadingBitmapUri="pkg:/images/placeholder-featured.png"
       width="392"
       height="196"
       loadDisplayMode="scaleToZoom"

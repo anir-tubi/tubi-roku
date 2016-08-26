@@ -11,8 +11,61 @@ Function init()
 
   m.metadataFetchTask.observeField("ready", "onMetadataTaskReady")
   m.global.metadataFetchTask.control = "RUN"
+
+  m.authTask = m.top.findNode("AuthTask")
+  m.authTask.observeField("authInfo", "onAuthInfoReceived")
+  m.authInfoReceived = false
+  m.authTask.control = "RUN"
+
+  m.logOutTask = m.top.findNode("LogOutTask")
+
   initScreenStack(m.top.findNode("ScreenStack"))
 
+End Function
+
+
+'''''''''''''''''''''''''
+' startUserExperience
+'
+' Only once we have a metadata task ready AND the user's login status
+' will we launch the UI
+Function startUserExperience()
+  tubiLog("ContentController.startUserExperience")
+  if m.metadataFetchTask.ready and m.authInfoReceived then
+    if m.authTask.authInfo = invalid then
+      startSignIn()
+    else
+      startCategoryScreen()
+      m.categoryScreen.signedIn = true
+    end if
+  end if
+End Function
+
+
+'''''''''''''''''''''''
+' startCategoryScreen
+'
+' On either app start (if user is signed in) or after the sign in
+' flow is complete, create and show the category screen.
+Function startCategoryScreen()
+  m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
+  m.categoryScreen.observeField("contentSelected", "onContentSelected")
+  m.categoryScreen.observeField("searchSelected", "onSearchSelected")
+  m.categoryScreen.observeField("signInSelected", "onSignInSelected")
+  m.categoryScreen.observeField("signOutSelected", "onSignOutSelected")
+  m.categoryScreen.observeField("aboutSelected", "onAboutSelected")
+  pushScreen(m.categoryScreen)
+End Function
+
+
+'''''''''''''''''''''''
+' onAuthInfoReceived
+'
+'
+Function onAuthInfoReceived()
+  tubiLog("ContentController.onAuthInfoReceived")
+  m.authInfoReceived = true
+  startUserExperience()
 End Function
 
 
@@ -27,9 +80,8 @@ Function onMetadataTaskReady()
   tubiLog("ContentController.onMetadataTaskReady")
 
   if m.metadataFetchTask.ready = true then
-    'TODO(Chris): Check if user is logged in here, then skip sign in 
-    startSignIn()
     m.metadataFetchTask.unobserveField("ready")
+    startUserExperience()
   end if
 End Function
 
@@ -39,6 +91,7 @@ End Function
 '
 ' Defer to the sign-in controller for sign in experience
 Function startSignIn()
+  tubiLog("ContentController.startSignIn")
   m.SignIn = m.top.createChild("SignInController")
   m.SignIn.observeField("guestPass", "onSignInComplete")
   m.SignIn.observeField("signedIn", "onSignInComplete")
@@ -52,11 +105,7 @@ End Function
 '
 ' The sign-in flow has ended, do what comes next
 Function onSignInComplete()
-  m.SignIn.unobserveField("guestPass")
-  m.SignIn.unobserveField("signedIn")
-  m.SignIn.unobserveField("registered")
-  m.top.removeChild(m.SignIn)
-  m.SignIn = invalid
+  tubiLog("ContentController.onSignInComplete")
 
   ' flush the screenstack in any case where the user has successfully
   ' gone through the sign-in.  If they 'back' out of it, the screen
@@ -65,12 +114,16 @@ Function onSignInComplete()
     popScreen()
   end while
 
-  m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
-  m.categoryScreen.observeField("contentSelected", "onContentSelected")
-  m.categoryScreen.observeField("searchSelected", "onSearchSelected")
-  m.categoryScreen.observeField("signInSelected", "onSignInSelected")
-  m.categoryScreen.observeField("aboutSelected", "onAboutSelected")
-  pushScreen(m.categoryScreen)
+  startCategoryScreen()
+  if m.SignIn.signedIn or m.SignIn.registered then
+    m.categoryScreen.signedIn = true
+  end if
+
+  m.SignIn.unobserveField("guestPass")
+  m.SignIn.unobserveField("signedIn")
+  m.SignIn.unobserveField("registered")
+  m.top.removeChild(m.SignIn)
+  m.SignIn = invalid
 End Function
 
 
@@ -79,6 +132,7 @@ End Function
 '
 ' Show the detail screen for the selected content
 Function onContentSelected()
+  tubiLog("ContentController.onContentSelected")
   top = currentScreen()
   
   if top <> invalid and top.contentSelected <> invalid then
@@ -112,6 +166,16 @@ Function onSignInSelected()
   startSignIn()
 End Function
 
+''''''''''''''''''''
+' onSignOutSelected
+'
+' Log the user out, update screens
+Function onSignOutSelected()
+  tubiLog("ContentController.onSignOutSelected")
+  if m.categoryScreen <> invalid then
+    m.categoryScreen.signedIn = false
+  end if
+End Function
 
 ''''''''''''''''''''
 ' onAboutSelected
@@ -135,6 +199,7 @@ End Function
 '
 ' Dismiss the About modal
 Function onCloseAbout()
+  tubiLog("ContentController.onCloseAbout")
   popScreen()
   m.aboutScreen = invalid
 End Function

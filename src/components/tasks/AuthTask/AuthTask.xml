@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - AuthTask
+ -
+ - Retrieve the auth info, which may be stored and might be refreshed from the auth server.
+ -
+ --> 
+<component name="AuthTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/tasks/AuthTask/AuthTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+
+    <interface>
+      <!-- Set to the response body -->
+      <field id="authInfo" type="assocarray" alwaysNotify="true" />
+    </interface>
+</component>

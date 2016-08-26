@@ -34,7 +34,13 @@
     <field id="signInSelected" type="boolean" alwaysNotify="true"/>
 
     <!-- set to true when the user has selected the "Sign In" button -->
+    <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
+
+    <!-- set to true when the user has selected the "Sign In" button -->
     <field id="aboutSelected" type="boolean" alwaysNotify="true"/>
+    
+    <!-- set to true if the user is signed in and we want to change the experience based on that -->
+    <field id="signedIn" type="boolean" value="false" />
   </interface>
 
   <children>
@@ -55,6 +61,26 @@
         description="Find titles on TubiTV, Sign In and more."/>
     </ContentNode>
 
+    <ContentNode
+      id="SearchSignInContent">
+      <ContentNode
+        id="SearchMenuItem"
+        title="Search" 
+        url="pkg:/images/icon-search.png"/>
+      <ContentNode
+        id="SignInMenuItem"
+        title="Sign In"
+        url="pkg:/images/icon-sign-in.png" />
+      <ContentNode
+        id="SignOutMenuItem"
+        title="Sign Out"
+        url="pkg:/images/icon-sign-in.png" />
+      <ContentNode
+        id="AboutMenuItem"
+        title="About Tubi TV"
+        url="pkg:/images/icon-about.png" />
+    </ContentNode>
+    
     <Poster
       id="HeroBackground"
       uri=""
@@ -125,21 +151,6 @@
       itemComponentName="DetailMenuItem"
       focusBitmapUri="pkg:/images/menu-focus.png"
       visible="false">
-      <ContentNode
-        role="content">
-        <ContentNode
-          id="SearchMenuItem"
-          title="Search" 
-          url="pkg:/images/icon-search.png"/>
-        <ContentNode
-          id="SignInMenuItem"
-          title="Sign In"
-          url="pkg:/images/icon-sign-in.png" />
-        <ContentNode
-          id="AboutMenuItem"
-          title="About Tubi TV"
-          url="pkg:/images/icon-about.png" />
-      </ContentNode>
     </ScrollingList>
 
     </Group>

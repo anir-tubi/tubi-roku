@@ -50,9 +50,9 @@ End Function
 Function onContentChange() As Void
   tubiLog("ScrollingList.onContentChange")
   ' first clear the existing children
-  for i=0 to m.items.getChildCount()-1
-    m.items.removeChild(i)
-  end for
+  while m.items.getChildCount() > 0
+    m.items.removeChildIndex(0)
+  end while
   m.focusImage.visible = false
 
   ' add new children for content

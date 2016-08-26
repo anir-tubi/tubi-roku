@@ -40,6 +40,12 @@
 
       <MetadataFetchTask 
         id="MetadataFetchTask" />
+      
+      <AuthTask
+        id="AuthTask" />
+      
+      <LogOutTask
+        id="LogOutTask" />
 
       <Group
        id="ScreenStack"/>

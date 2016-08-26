@@ -6,6 +6,7 @@ Function init()
   m.Hero = m.top.findNode("HeroBackground")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
+  m.top.observeField("signedIn", "onSignedInChange")
   m.CategoryList.observeField("itemFocused","onCategoryChange")
 
   'Content area
@@ -19,11 +20,20 @@ Function init()
   m.SignInMenu.observeField("itemSelected", "onSignInMenuItemSelected")
   m.ContentGrid = m.PosterGrid  ' alias to simplify the code
 
+  'Sign-in menu items
+  m.SearchSignInContent = m.top.findNode("SearchSignInContent")
+  m.SearchMenuItem = m.SearchSignInContent.findNode("SearchMenuItem")
+  m.SignInMenuItem = m.SearchSignInContent.findNode("SignInMenuItem")
+  m.SignOutMenuItem = m.SearchSignInContent.findNode("SignOutMenuItem")
+  m.AboutMenuItem = m.SearchSignInContent.findNode("AboutMenuItem")
+
   m.defaultHeroUri = "pkg:/images/background-not-on-selection.png"
 
   ' track the last focused screen component so that we can go back
   ' to it when focus is taken away
   m.lastFocusedComponent = m.CategoryList
+
+  onSignedInChange()  ' seed the search & sign in menu
 
   loadAllCategories()
 End Function
@@ -39,6 +49,8 @@ Function onSignInMenuItemSelected()
     m.top.searchSelected = true
   else if selectedItem.id = "SignInMenuItem" then
     m.top.signInSelected = true
+  else if selectedItem.id = "SignOutMenuItem" then
+    m.top.signOutSelected = true
   else if selectedItem.id = "AboutMenuItem" then
     m.top.aboutSelected = true
   end if
@@ -51,6 +63,7 @@ End Function
 ' screen has lost focus, usually due to another screen or dialog
 ' being shown.
 Function onScreenFocusChange()
+  tubiLog("CategoryScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     ' defaulted to screen, move to a subcomponent
     if m.ContentGrid.visible = true then
@@ -157,6 +170,31 @@ Function onCategoryChange() As Void
     loadOneCategory(newCategory.id)
   end if
 End Function
+
+
+'''''''''''''''''''''''''''
+' onSignedInChange
+'
+' Create a new content node tree for the sign in menu, based on the template SearchSignInContent.
+' We do this so that we can keep a reference to all possible menu options, even when the sign in
+' menu is showing a subset.
+Function onSignedInChange()
+  tubiLog("CategoryScreen.onSignedInChange")
+  content = CreateObject("roSGNode", "ContentNode")
+  content.appendChild(m.SearchMenuItem)
+  if m.top.signedIn = true then
+    print "SIGNED IN"
+    content.appendChild(m.SignOutMenuItem)
+  else
+    print "SIGNED OUT"
+    content.appendChild(m.SignInMenuItem)
+  end if  
+  content.appendChild(m.AboutMenuItem)
+  m.SignInMenu.content = content
+
+  'TODO(Chris): also show My Queue and Continue Watching once those features arrive
+End Function
+
 
 '''''''''''''''''''''
 ' onGridFocusChange

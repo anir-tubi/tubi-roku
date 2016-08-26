@@ -10,6 +10,7 @@ Function init()
 End Function
 
 Function onContentChange()
+  tubiLog("DetailMenuItem.onContenChange")
   if m.top.content <> invalid then
     m.Text.text = m.top.content.title
     m.Icon.uri = m.top.content.url
@@ -22,6 +23,7 @@ Function onContentChange()
 End Function
 
 Function showProgressBar(percentage As Double)
+  tubiLog("DetailMenuItem.showProgressBar")
   if percentage > 1.0 then percentage = 1.0
   if percentage < 0.0 then percentage = 0.0
   ' width of menu item is 465, 4 pixel margin for progress bar
