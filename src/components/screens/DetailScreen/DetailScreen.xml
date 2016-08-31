@@ -65,8 +65,8 @@
     
     <!-- These are in a layout group together because this menu should float up -->
     <LayoutGroup
-      translation="[40,59]"
-      itemSpacings="[47]">
+      translation="[40,61]"
+      itemSpacings="[50]">
       <LayoutGroup
         layoutDirection="horiz">
       <!-- Since we can't translate items in a LayoutGroup we have to put a rectangle here to
@@ -86,7 +86,7 @@
         id="Menu"
         width="465"
         height="500"
-        itemSpacings="[9]"
+        itemSpacings="[8]"
         itemComponentName="DetailMenuItem"
         focusBitmapUri="pkg:/images/menu-focus.png"
         visible="false"

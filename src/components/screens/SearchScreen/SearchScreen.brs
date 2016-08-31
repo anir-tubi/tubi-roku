@@ -94,7 +94,7 @@ End Function
 '
 ' Animate the keyboard off screen, show the info panel, and focus on the content grid
 Function startFocusResultGrid()
-  m.TranslationInterpolator.keyValue = [[85,315],[85,151]]
+  m.TranslationInterpolator.keyValue = [[85,315],[85,138]]
   m.SearchText.font.size = 33
   m.Cursor.visible = false
   keyboardRect = m.Keyboard.boundingRect()
@@ -124,7 +124,7 @@ End Function
 '
 ' Hide the info panel and bring back the keyboard
 Function startFocusKeyboard()
-  m.TranslationInterpolator.keyValue = [[85,151],[85,315]]
+  m.TranslationInterpolator.keyValue = [[85,138],[85,315]]
   m.SearchText.font.size = 67
   keyboardRect = m.Keyboard.boundingRect()
   m.InfoPanelOpacityInterpolator.keyValue = [1.0, 0.0]

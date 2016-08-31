@@ -5,6 +5,7 @@ Function init()
   m.SpecialCategories = m.top.findNode("SpecialCategories")
   m.Hero = m.top.findNode("HeroBackground")
   m.top.observeField("content", "onContentChange")
+  m.top.observeField("categoryContent", "onCategoryContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.CategoryList.observeField("itemFocused","onCategoryChange")
@@ -19,6 +20,7 @@ Function init()
   m.SignInMenu = m.top.findNode("SearchSignInList")
   m.SignInMenu.observeField("itemSelected", "onSignInMenuItemSelected")
   m.ContentGrid = m.PosterGrid  ' alias to simplify the code
+  m.Spinner = m.top.findNode("Spinner")
 
   'Sign-in menu items
   m.SearchSignInContent = m.top.findNode("SearchSignInContent")
@@ -110,27 +112,34 @@ End Function
 Function onContentChange() As Void
   tubiLog("CategoryScreen.onContentChange")
 
+  ' Force Featured to the top of the list
+  for i=0 to m.top.content.getChildCount()-1
+    category = m.top.content.getChild(i)
+    if category.title = "Featured"
+      m.top.content.removeChild(category)
+      m.top.content.insertChild(category, 0)
+      exit for
+    end if
+  end for
+
   ' Prepend special categories 
   m.top.content.insertChild(m.SpecialCategories.findNode("SearchSignIn"), 0)
     
-  'TODO(Chris): Show these once a user is logged in and we can fill them with content
-  'm.top.content.insertChild(m.SpecialCategories.findNode("ContinueWatching"), 1)
-  'm.top.content.insertChild(m.SpecialCategories.findNode("My Queue")
-
-  m.CategoryList.content = m.top.content
-  m.InfoPanel.content = m.top.content.getChild(m.CategoryList.itemFocused)
-  m.CategoryList.setFocus(true)
   m.InfoPanel.mode = "category"
+  m.CategoryList.content = m.top.content
+  m.CategoryList.setFocus(true)
 
-  ' bootstrap the grid content by finding the populated category
-  for i=0 to m.top.content.getChildCount()-1
-    category = m.top.content.getChild(i)
-    if category.getChildCount() > 0 then
-      m.ContentGrid.content = category
-      m.ContentGrid.id = category.id
-    end if
-  end for
 End Function
+
+
+''''''''''''''''''''''''''
+' onCategoryContentChange
+'
+Function onCategoryContentChange() As Void
+  m.Spinner.visible = false
+  m.ContentGrid.content = m.top.categoryContent
+End Function
+
 
 '''''''''''''''''''''
 ' onCategoryChange
@@ -150,24 +159,25 @@ Function onCategoryChange() As Void
     m.ContentGrid.visible = false
 
     ' Flip between feature grid, poster grid, and sign in menu
-    if newCategory.title = "Featured"
-      m.ContentGrid = m.top.findNode("FeatureGrid")
-      m.ContentGrid.visible = true
-    else if newCategory.title = "Continue Watching"
-      'TODO(Chris): Show recently viewed grid here
-    else if newCategory.title = "My Queue"
-      'TODO(Chris): Show user's queue here
-    else if newCategory.title = "Search & Sign In"
+    if newCategory.title = "Search & Sign In"
       m.SignInMenu.visible = true
     else
-      m.ContentGrid = m.top.findNode("PosterGrid")
-      m.ContentGrid.visible = true
+      if newCategory.title = "Featured"
+        m.ContentGrid = m.top.findNode("FeatureGrid")
+        m.ContentGrid.visible = true
+      else if newCategory.title = "Continue Watching"
+        'TODO(Chris): Show recently viewed grid here
+      else if newCategory.title = "My Queue"
+        'TODO(Chris): Show user's queue here
+      else
+        m.ContentGrid = m.top.findNode("PosterGrid")
+        m.ContentGrid.visible = true
+      end if
+      m.Spinner.visible = true
+      loadOneCategory(newCategory.id)
     end if
 
     m.ContentGrid.id = m.CategoryList.content.getChild(m.CategoryList.itemFocused).id
-    ' Don't reload if the category id's match
-    'TODO(Chris): We need a "loading experience here before content shows up
-    loadOneCategory(newCategory.id)
   end if
 End Function
 
@@ -202,6 +212,7 @@ End Function
 ' On grid focus change, update the info panel
 Function onGridFocusChange() As Void
   tubiLog("CategoryScreen.onGridFocusChange")
+
   if not m.ContentGrid.isInFocusChain() then return
   focusedContent = m.ContentGrid.content.getChild(m.ContentGrid.itemFocused)
   m.InfoPanel.content = focusedContent
@@ -255,8 +266,8 @@ Function loadOneCategory(categoryId As String)
   deviceInfo = m.global.constants.deviceInfo
   request = {
     url: urlBase + "/categories?app_id=" + settings.shortAppName + "&platform=" + platform + "&device_id=" + deviceInfo.deviceId + "&cat_id=" + categoryId + "&all=false&page_enabled=false"
-    node: m.ContentGrid
-    field: "content"
+    node: m.top
+    field: "categoryContent"
     options: {}
     name: "getCategory"    
   }

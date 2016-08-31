@@ -76,7 +76,7 @@
     <LayoutGroup
       id="TwoLineInfo"
       layoutDirection="vert"
-      itemSpacings="[2]"
+      itemSpacings="[4]"
       visible="true">
       <LayoutGroup
         id="FirstLineGroup"
@@ -95,7 +95,7 @@
         id="Rating"
         height="36"
         loadHeight="36"
-        loadDisplayMode="noScale"/>
+        loadDisplayMode="scaleToFit"/>
       </LayoutGroup>
       <Label
         id="Line2"
@@ -106,8 +106,8 @@
     <Label
       id="Description"
       width="1215"
-      lineSpacing="13"
-      maxLines="4"
+      lineSpacing="16"
+      maxLines="3"
       wrap="true">
       <Font
         role="font"
@@ -137,7 +137,7 @@
         <Rectangle 
           opacity="0.0"
           width="43"
-          height="2"/>
+          height="5"/>
       </LayoutGroup>
       <Label
         id="Director"
@@ -166,7 +166,7 @@
         <Rectangle 
           opacity="0.0"
           width="77"
-          height="2"/>
+          height="5"/>
       </LayoutGroup>
       <Label
         id="Starring"

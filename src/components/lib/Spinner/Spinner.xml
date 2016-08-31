@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - Spinner
+ -
+ - This is a Rectangle with a spinner graphic vertically and horizontally centered
+ -
+ -->
+<component name="Spinner" extends="Rectangle" >
+  <script type="text/brightscript" uri="pkg:/components/lib/Spinner/Spinner.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <field id="showBox" alias="SpinnerBox.visible" value="false"/>
+    <field id="showShade" alias="Shade.visible" value="false"/>
+  </interface>
+
+  <children>
+    <Rectangle
+      id="Shade"
+      opacity="0.8"/>
+    <Rectangle
+      id="SpinnerBox"
+      height="200"
+      width="200"
+      translation="[0,0]">
+    </Rectangle>
+
+    <Poster
+      id="Spinner"
+      scaleRotateCenter="[33,33]"
+      uri="pkg:/images/spinner.png"
+      height="66"
+      width="66"
+      translation="[69,70]"/>
+    
+    <Animation
+      id="SpinnerAnimation"
+      duration="2.0"
+      repeat="true"
+      easeFunction="linear">
+      <FloatFieldInterpolator
+        id="SpinnerRotationInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[0.0, 6.28]"
+        fieldToInterp="Spinner.rotation"/>
+    </Animation>
+  </children>
+</component>

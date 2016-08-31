@@ -56,7 +56,7 @@
       translation="[525,423]"
       itemSize="[392,196]"
       itemSpacing="[10,10]"
-      itemComponentName="EpisodeGridItem" />
+      itemComponentName="FeaturePoster" />
     
   </children>
 </component>

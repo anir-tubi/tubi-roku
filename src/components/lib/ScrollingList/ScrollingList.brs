@@ -212,6 +212,8 @@ End Function
 '   2) Focus the new item, incrementally
 '   3) Scroll the list as necessary
 Function startChangeFocus(newFocusedIndex As Integer) As Void
+  tubiLog("ScrollingList.startChangeFocus")
+
   unfocusedItem = m.items.getChild(m.internalItemFocused)
 
   focusedItem = m.items.getChild(newFocusedIndex)
@@ -242,6 +244,11 @@ Function startChangeFocus(newFocusedIndex As Integer) As Void
   m.focusImageWidthInterpolator.keyvalue = [ m.focusImage.width, itemRect.width ]
   m.focusImageHeightInterpolator.keyvalue = [ m.focusImage.height, itemRect.height ]
   m.scrollAnimation.observeField("state", "endChangeFocus")
+  if m.pressAndHold <> invalid
+    m.scrollAnimation.duration = 0.1
+  else
+    m.scrollAnimation.duration = 0.25
+  end if
   m.scrollAnimation.control = "start"
 End Function
 
@@ -252,7 +259,7 @@ End Function
 ' Animation is done.  If we aren't repeating keys or
 ' press-and-hold, the send the itemFocused update.
 Function endChangeFocus()
-  'TODO(Chris): supress this event if another keypress has come in
+  tubiLog("ScrollingList.endChangeFocus")
   if m.scrollAnimation.state = "stopped" then
     m.scrollAnimation.unobserveField("state")
     focusedItem = m.items.getChild(m.internalItemFocused)

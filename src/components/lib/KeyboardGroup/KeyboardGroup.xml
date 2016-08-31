@@ -40,11 +40,11 @@
       <ContentNode
         role="content">
         <ContentNode
-          id="Uppercase"
-          title="ABC"/>
-        <ContentNode
           id="Lowercase"
           title="abc"/>
+        <ContentNode
+          id="Uppercase"
+          title="ABC"/>
         <ContentNode
           id="Numeric"
           title="123"/>

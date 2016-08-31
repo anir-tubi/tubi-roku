@@ -23,6 +23,8 @@
     -
     -->
     <field id="content" type="node" />
+
+    <field id="categoryContent" type="node" />
     
     <!-- set to the tubi content id of the item which was clicked on -->
     <field id="contentSelected" type="node" alwaysNotify="true"/>
@@ -50,11 +52,11 @@
       <ContentNode
         id="ContinueWatching"
         title="Continue Watching"
-        description=""/>
+        description="The Movies and TV Shows you have started watching can be found here"/>
       <ContentNode
         id="MyQueue"
         title="My Queue"
-        description=""/>
+        description="The Movies and TV Shows you have added to your Queue can be found here"/>
       <ContentNode
         id="SearchSignIn"
         title="Search &amp; Sign In"
@@ -98,11 +100,11 @@
     
     <ScrollingList
       id="CategoryList"
-      translation="[41, 423]"
+      translation="[41, 424]"
       width="445"
       height="616"
       visible="true" 
-      itemSpacings="[9]"
+      itemSpacings="[8]"
       itemComponentName="CategoryListItem"
       focusBitmapUri="pkg:/images/menu-focus.png">
 
@@ -110,7 +112,7 @@
     
     <InfoPanel
       id="InfoPanel"
-      translation="[85,59]"
+      translation="[85,61]"
       visible="true" />
     
     <Group
@@ -140,6 +142,13 @@
       fillDirection="W"
       visible="true"
       translation="[0,0]"/>
+    <Spinner
+      id="Spinner"
+      width="1310"
+      height="610"
+      visible="false"
+      showBox="false"
+      showShade="false"/>
 
     <!-- Shown when Search & Sign In special category is selected -->
     <!-- TODO(Chris): Rename the DetailMenuItem since it is reused -->

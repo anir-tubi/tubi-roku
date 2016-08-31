@@ -29,7 +29,7 @@
     <!-- The search label and icon that appear when the keyboard goes off-screen -->
     <Rectangle
       id="SearchHint"
-      translation="[886,70]"
+      translation="[877,48]"
       opacity="0.0"
       visible="true">
       <Poster
@@ -42,7 +42,7 @@
     
       <Label
        id="SearchHintText"
-       translation="[46,0]" 
+       translation="[55,0]" 
        vertAlign="center"
        horizAlign="left" 
        height="80"
@@ -84,7 +84,7 @@
       mode="item"
       visible="true"
       opacity="0.0"
-      translation="[85,283]"/>
+      translation="[85,285]"/>
     
     <ContentGrid
       id="ResultGrid"
@@ -118,7 +118,7 @@
       <Vector2DFieldInterpolator
         id="TextEntryTranslationInterpolator"
         key="[0.0, 1.0]"
-        keyValue="[[85,315],[85,151]]"
+        keyValue="[[85,315],[85,138]]"
         fieldToInterp="TextEntryGroup.translation"/>
       <Vector2DFieldInterpolator
         id="KeyboardTranslationInterpolator"

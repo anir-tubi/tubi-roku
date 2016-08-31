@@ -115,14 +115,14 @@ Function onModeChange()
       m.CategoryDetails
       m.Description
     ])
-    m.top.itemSpacings = [53, 36]
+    m.top.itemSpacings = [52, 31]
   else if m.top.mode = "item" then
     m.top.appendChildren([
       m.Title
       m.TwoLineInfo
       m.Description
     ])
-    m.top.itemSpacings = [46, 36]
+    m.top.itemSpacings = [44, 30]
   else if m.top.mode = "movie" then
     m.top.appendChildren([
       m.Title
@@ -131,7 +131,7 @@ Function onModeChange()
       m.DirectorGroup
       m.StarringGroup
     ])
-    m.top.itemSpacings = [46, 41, 42, 12]
+    m.top.itemSpacings = [44, 30, 34, 11]
   else if m.top.mode = "series" then
     m.top.appendChildren([
       m.Title
@@ -141,7 +141,7 @@ Function onModeChange()
       m.DirectorGroup
       m.StarringGroup
     ])
-    m.top.itemSpacings = [30, 27, 40, 38, 12]
+    m.top.itemSpacings = [26, 27, 30, 34, 11]
   else if m.top.mode = "season" then
     m.top.appendChildren([
       m.Title
@@ -154,7 +154,7 @@ Function onModeChange()
       m.TwoLineInfo
       m.Description
     ])
-    m.top.itemSpacings = [30, 21, 38]
+    m.top.itemSpacings = [26, 27, 30]
   end if
 End Function
 
