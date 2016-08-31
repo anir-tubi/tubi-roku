@@ -54,4 +54,7 @@ endif
 discover:
 	@$(TOOL_CLI) discover
 
-.PHONY: build zip rsync install dev gen discover
+test:
+	NODE_PATH=${PWD}/tools/node_modules jasmine
+
+.PHONY: build zip rsync install dev gen discover test

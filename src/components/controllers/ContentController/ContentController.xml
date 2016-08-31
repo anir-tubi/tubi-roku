@@ -26,7 +26,12 @@
     <!-- Watched by the main brightscript thread to indicate video playback should start -->
     <field id="playContent" type="node" alwaysNotify="true" />
 
-    <!-- Show the detail screen for the item indicated.  This may come from the main menu or from a deep link request -->
+    <!-- Show the detail screen for the item indicated 
+      - 
+      - The node should have 2 fields set:
+      -    id    - the content requested
+      -    type  - the type of content: "series", "video", or "episode"
+      -->
     <field id="itemDetail" type="node" alwaysNotify="true" />
 
   </interface>

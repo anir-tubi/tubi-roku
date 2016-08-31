@@ -18,13 +18,47 @@ Function init()
   m.episodeSelection = [0,0]
 End Function
 
-Function onContentChange()
+
+'''''''''''''''''''
+' onContentChange
+'
+' Full content description has arrived
+Function onContentChange() As Void
   tubiLog("DetailScreen.onContentChange")
-  
+
   if m.top.content.type = "video"
-    m.Info.mode = "movie"
-    m.Info.content = m.top.content
+    ' Special case here.  If this video is an episode of a series, load the full series content
+    if m.top.content.seriesId <> invalid and m.top.content.seriesId <> "" then
+      tubiLog("DetailScreen detected episode, loading full series")
+      seriesContent = CreateObject("roSGNode", "TubiContentNode")
+      seriesContent.id = m.top.content.seriesId
+      seriesContent.type = "series"
+      loadContentDetails(seriesContent)
+      return
+    else
+      m.Info.mode = "movie"
+      m.Info.content = m.top.content
+    end if
   else if m.top.content.type = "series"
+
+    ' Set the episode selection appropriately
+    if m.top.shortContent.id <> m.top.content.id then
+      tubiLog("Finding episode " + m.top.shortContent.id + " in series " + m.top.content.id)
+      ' arrived here from an episode link
+      for i=0 to m.top.content.getChildCount()-1
+        season = m.top.content.getChild(i)
+        for j=0 to season.getChildCount()-1
+          episode = season.getChild(j)
+          if episode.id = m.top.shortContent.id then
+            tubiLog("Episode is [" + stri(i) + "," + stri(j) + "]")
+            m.episodeSelection = [i,j]
+          end if
+        end for
+      end for
+    endif
+
+    'TODO(Chris): Also check if there was a resume we can apply
+
     m.Info.mode = "series"
     ' clone the content object since we want the SERIES title & description, but the EPISODE details
     infoPanelContent = CreateObject("roSGNode", "TubiContentNode")   
@@ -53,6 +87,7 @@ Function onContentChange()
   setMenuItems()
 End Function
 
+
 ''''''''''''''''''''''
 ' getEpisodeContent
 Function getEpisodeContent(selection As Object) As Object
@@ -64,10 +99,20 @@ Function getEpisodeContent(selection As Object) As Object
   return invalid
 End Function
 
+
+''''''''''''''''''''''''
+' onShortContentChange
+'
+' Seed for content received, retrieve the full content details
 Function onShortContentChange()
-  if m.top.shortContent <> invalid then loadContentDetails()
+  if m.top.shortContent <> invalid then loadContentDetails(m.top.shortContent)
 End Function
 
+
+''''''''''''''''''''''
+' setMenuItems
+'
+' Add appropriate menu items for the selection
 Function setMenuItems()
   tubiLog("DetailScreen.setMenuItems")
   menuItems = CreateObject("roSGNode", "ContentNode")
@@ -94,6 +139,7 @@ Function setMenuItems()
   m.Menu.visible = "true"
   m.Menu.setFocus(true)
 End Function
+
 
 ''''''''''''''''''''''''
 ' onMenuItemSelected
@@ -131,6 +177,7 @@ Function onMenuItemSelected()
   end if
 End Function
 
+
 ''''''''''''''''''''
 ' showEpisodes
 '
@@ -142,7 +189,7 @@ Function showEpisodes()
 End Function
 
 
-''''''''''''
+'''''''''''''''''''''
 ' onEpisodeSelected
 '
 ' Play the episode.  
@@ -154,6 +201,10 @@ Function onEpisodeSelected()
   onContentChange() ' Info panel and menu items all need updating here
 End Function
 
+
+''''''''''''''''''''
+' closeEpisodesScreen
+'
 Function closeEpisodesScreen()
   if m.episodesScreen <> invalid then
     m.episodesScreen.unobserveField("episodeSelected")
@@ -163,7 +214,12 @@ Function closeEpisodesScreen()
   end if
 End Function
 
-Function loadContentDetails()
+
+'''''''''''''''''''''''''''
+' loadContentDetails
+'
+'
+Function loadContentDetails(content)
   tubiLog("DetailScreen.loadDetails")
   settings = m.global.constants.settings
   urlBase = m.global.constants.urls.cms.urlBase
@@ -171,9 +227,9 @@ Function loadContentDetails()
   deviceInfo = m.global.constants.deviceInfo
 
   ' expect that the content here was the bootstrapped content from category list
-  contentId = m.top.shortContent.id
+  contentId = content.id
 
-  if m.top.shortContent.type = "series" then
+  if content.type = "series" then
     contentId = "0" + contentId
   end if
 
@@ -187,6 +243,10 @@ Function loadContentDetails()
   m.global.metadataFetchTask.request = request
 End Function
 
+
+'''''''''''''''''''''''''
+' onKeyEvent
+'
 Function onKeyEvent(key As String, press As Boolean) As Boolean
   if press and key = "back" and m.episodesScreen <> invalid then
     closeEpisodesScreen()

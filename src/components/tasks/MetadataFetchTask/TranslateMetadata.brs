@@ -87,6 +87,7 @@ Function translateRecursive(contentFromServer, translatedContent) As Void
     if contentFromServer.year <> invalid and contentFromServer.year <> 0 then translatedContent.releaseDate = contentFromServer.year.ToStr()
     if contentFromServer.currentEpisodeId <> invalid then translatedContent.currentEpisodeId = contentFromServer.currentEpisodeId
     if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
+    if contentFromServer.series_id <> invalid then translatedContent.seriesId = contentFromServer.series_id
     
     if contentFromServer.description <> invalid
       translatedContent.description = contentFromServer.description

@@ -17,6 +17,8 @@ Function init()
   m.authInfoReceived = false
   m.authTask.control = "RUN"
 
+  m.top.observeField("itemDetail", "onItemDetailChange")
+
   m.logOutTask = m.top.findNode("LogOutTask")
 
   initScreenStack(m.top.findNode("ScreenStack"))
@@ -32,7 +34,16 @@ End Function
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
   if m.metadataFetchTask.ready and m.authInfoReceived then
-    if m.authTask.authInfo = invalid then
+    if m.top.itemDetail <> invalid then
+      tubiLog("ContentController detected deep link request")
+      ' we were asked to deep link into a content item. Go to it
+      ' whether we were logged in or not.  Make sure the category
+      ' screen is loaded too
+      startCategoryScreen()
+      onItemDetailChange()
+      'TODO(Chris): capture the 'back' button when the screen stack is empty so
+      ' that we can show the category screen without haveing to preload it here
+    else if m.authTask.authInfo = invalid then
       startSignIn()
     else
       startCategoryScreen()
@@ -136,11 +147,7 @@ Function onContentSelected()
   top = currentScreen()
   
   if top <> invalid and top.contentSelected <> invalid then
-    m.detailScreen = CreateObject("roSGNode", "DetailScreen")
-    m.detailScreen.shortContent = top.contentSelected
-    m.detailScreen.observeField("playContent", "onPlay")
-    m.detailScreen.observeField("resumeContent", "onResume")
-    pushScreen(m.detailScreen)
+    showDetailScreen(top.contentSelected)
   end if
 End Function
 
@@ -229,4 +236,32 @@ Function onResume()
   tubiLog("ContentController.onResume")
   content = m.detailScreen.resumeContent
   m.top.playContent = content
+End Function
+
+
+'''''''''''''''''''''
+' onItemDetailChange
+'
+' Show the detail screen for the content id
+Function onItemDetailChange()
+  tubiLog("onItemDetailChange")
+  if m.metadataFetchTask.ready and m.authInfoReceived and m.top.itemDetail <> invalid then
+    'TODO(Chris): Supplement this content with history & queue status once we have it
+    testLog("Deep link contentId = " + m.top.itemDetail.id)
+    testLog("Deep link type = " + m.top.itemDetail.type)
+    showDetailScreen(m.top.itemDetail)
+  end if
+End Function
+
+
+'''''''''''''''''''''
+' showDetailScreen
+'
+'
+Function showDetailScreen(content)
+  m.detailScreen = CreateObject("roSGNode", "DetailScreen")
+  m.detailScreen.shortContent = content
+  m.detailScreen.observeField("playContent", "onPlay")
+  m.detailScreen.observeField("resumeContent", "onResume")
+  pushScreen(m.detailScreen)
 End Function

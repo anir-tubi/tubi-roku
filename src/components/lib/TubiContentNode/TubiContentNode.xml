@@ -20,6 +20,7 @@
     <field id="backgrounds" type="stringarray" />
     <field id="slug" type="string" />
     <field id="bookmarkId" type="string" />
+    <field id="seriesId" type="string" />
     
     <!-- these will come in for paginated responses -->
     <field id="totalCount" type="int" />

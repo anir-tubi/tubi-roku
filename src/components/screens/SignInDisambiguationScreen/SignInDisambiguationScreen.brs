@@ -1,7 +1,6 @@
 Function init()
   m.ButtonGroup = m.top.findNode("SignInOrGuestButtons")
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.ButtonGroup.setFocus(true)
   m.ButtonGroup.observeField("itemSelected", "onButtonSelected")
 
   content = CreateObject("roSGNode", "ContentNode")

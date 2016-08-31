@@ -8,7 +8,13 @@
     <!-- Full content of the item to show details for -->
     <field id="content" type="node" />
     
-    <!-- Setting shortContent triggers a metadata fetch for the full details of the content item -->
+    <!-- Setting shortContent triggers a metadata fetch for the full details of the content item 
+      - 
+      - shortContent should have a minumum of:
+      -     contentId - the content id
+      -     type - "video", "series", "season", "category" (video may be an episode)
+      - 
+      -->
     <field id="shortContent" type="node" />
 
     <!-- Set to the selected movie or episode which should be played -->

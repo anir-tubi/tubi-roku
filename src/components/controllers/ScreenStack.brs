@@ -15,9 +15,9 @@ End Function
 Function onKeyEvent(key As String, press As Boolean)
   tubiLog("ScreenStack.onKeyEvent")
   if press then
-    if key = "back" and m.ScreenStack_.getChildCount() > 1 then
-      popScreen()
-      return true
+    if key = "back" 
+      if m.ScreenStack_.getChildCount() > 1 then popScreen()
+      return true  ' unhandled back button will exit the app. prevent that by returning true
     end if
   end if
   return false
