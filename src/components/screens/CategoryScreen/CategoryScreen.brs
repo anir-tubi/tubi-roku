@@ -8,7 +8,9 @@ Function init()
   m.top.observeField("categoryContent", "onCategoryContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
+  m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
   m.CategoryList.observeField("itemFocused","onCategoryChange")
+  m.authTask = m.top.findNode("CategoryAuthTask")
 
   'Content area
   m.PosterGrid = m.top.findNode("PosterGrid")
@@ -37,9 +39,27 @@ Function init()
 
   onSignedInChange()  ' seed the search & sign in menu
 
+  loadUserCategories()
   loadAllCategories()
 End Function
 
+
+
+''''''''''''''''''''''''''''
+' onDirtyUserCategories
+'
+' if one of the user categories is showing, reload it
+Function onDirtyUserCategories()
+  tubiLog("CategoryScreen.onDirtyUserCategories")
+  category = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
+  if category.title = m.global.constants.ui.categoryNames.history
+    m.ContentGrid.content = invalid  ' hide the current content so it doesn't jump when updated
+    loadHistory(category.id)      
+  else if category.title = m.global.constants.ui.categoryNames.queue
+    m.ContentGrid.content = invalid  ' hide the current content so it doesn't jump when updated
+    loadBookmarks(category.id)  
+  end if
+End Function
 
 '''''''''''''''''''''''''''
 ' onSignInMenuItemSelected
@@ -126,6 +146,11 @@ Function onContentChange() As Void
   m.top.content.insertChild(m.SpecialCategories.findNode("SearchSignIn"), 0)
     
   m.InfoPanel.mode = "category"
+  if m.top.signedIn then
+    m.top.content.insertChild(m.SpecialCategories.findNode("ContinueWatching"), 1)
+    m.top.content.insertChild(m.SpecialCategories.findNode("MyQueue"), 2)
+  end if
+
   m.CategoryList.content = m.top.content
   m.CategoryList.setFocus(true)
 
@@ -148,6 +173,12 @@ End Function
 Function onCategoryChange() As Void
   tubiLog("CategoryScreen.onCategoryChange")
   if not m.CategoryList.isInFocusChain() or m.CategoryList.content = invalid then return
+
+  'unobserve historyOrder and bookmarkOrder fields since if we are changing category,
+  'we are no longer concerned about any categories we may have been waiting for
+  m.global.unobserveField("bookmarkOrder")
+  m.global.unobserveField("historyOrder")
+
   newCategory = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
   m.InfoPanel.content = newCategory
   m.InfoPanel.mode = "category"
@@ -159,21 +190,31 @@ Function onCategoryChange() As Void
     m.ContentGrid.visible = false
 
     ' Flip between feature grid, poster grid, and sign in menu
-    if newCategory.title = "Search & Sign In"
+    if newCategory.title = m.global.constants.ui.categoryNames.topCategory
+      m.ContentGrid = m.top.findNode("FeatureGrid")
+      m.ContentGrid.visible = true
+      loadOneCategory(newCategory.id)
+
+    'Search and Sign In
+    else if newCategory.title = m.global.constants.ui.categoryNames.tools
       m.SignInMenu.visible = true
+
+    'Continue Watching
+    else if newCategory.title = m.global.constants.ui.categoryNames.history
+      m.ContentGrid = m.top.findNode("PosterGrid")
+      m.ContentGrid.visible = true
+      loadHistory(newCategory.id)      
+
+    'My Queue
+    else if newCategory.title = m.global.constants.ui.categoryNames.queue
+      m.ContentGrid = m.top.findNode("PosterGrid")
+      m.ContentGrid.visible = true
+      loadBookmarks(newCategory.id)  
+
+    'any normal category
     else
-      if newCategory.title = "Featured"
-        m.ContentGrid = m.top.findNode("FeatureGrid")
-        m.ContentGrid.visible = true
-      else if newCategory.title = "Continue Watching"
-        'TODO(Chris): Show recently viewed grid here
-      else if newCategory.title = "My Queue"
-        'TODO(Chris): Show user's queue here
-      else
-        m.ContentGrid = m.top.findNode("PosterGrid")
-        m.ContentGrid.visible = true
-      end if
-      m.Spinner.visible = true
+      m.ContentGrid = m.top.findNode("PosterGrid")
+      m.ContentGrid.visible = true
       loadOneCategory(newCategory.id)
     end if
 
@@ -193,16 +234,28 @@ Function onSignedInChange()
   content = CreateObject("roSGNode", "ContentNode")
   content.appendChild(m.SearchMenuItem)
   if m.top.signedIn = true then
-    print "SIGNED IN"
     content.appendChild(m.SignOutMenuItem)
   else
-    print "SIGNED OUT"
     content.appendChild(m.SignInMenuItem)
   end if  
   content.appendChild(m.AboutMenuItem)
   m.SignInMenu.content = content
 
-  'TODO(Chris): also show My Queue and Continue Watching once those features arrive
+  ' Note that these are idempotent.  The findNode calls will return invalid if 
+  ' the categories are already where they should be
+  if m.top.content <> invalid then
+    if m.top.signedIn = true then
+      m.CategoryList.content = invalid
+      m.top.content.insertChild(m.SpecialCategories.findNode("ContinueWatching"), 1)
+      m.top.content.insertChild(m.SpecialCategories.findNode("MyQueue"), 2)
+      m.CategoryList.content = m.top.content  ' just to trigger refresh
+    else
+      m.CategoryList.content = invalid
+      m.top.content.removeChild(m.top.content.findNode("ContinueWatching"))
+      m.top.content.removeChild(m.top.content.findNode("MyQueue"))
+      m.CategoryList.content = m.top.content  ' just to trigger refresh
+    end if
+  end if
 End Function
 
 
@@ -240,17 +293,22 @@ Function loadAllCategories()
 
   ' TODO(Chris): This should move to a shim layer which hides specifics of the Tubi v4 API
   settings = m.global.constants.settings
-  urlBase = m.global.constants.urls.cms.urlBase
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
-  url = urlBase + "/categories?app_id=" + settings.shortAppName + "&platform=" + platform + "&device_id=" + deviceInfo.deviceId + "&page_enabled=false"
-
+  url = m.global.constants.urls.cms.categories
   request = {
     url: url
     node: m.top
     field: "content"
-    options: {}
     name: "getAllCategories"
+    options: {
+      params: {
+        "app_id": settings.shortAppName
+        platform: platform
+        "device_id": deviceInfo.deviceId
+        page_enabled: false
+      }
+    }
   }
   m.global.metadataFetchTask.request = request
 End Function
@@ -260,16 +318,157 @@ End Function
 '
 ' Load a single category's content
 Function loadOneCategory(categoryId As String)
+  tubiLog("CategoryScreen.loadOneCategory")
   settings = m.global.constants.settings
-  urlBase = m.global.constants.urls.cms.urlBase
+  url = m.global.constants.urls.cms.categories
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
+  constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(constants, Request)
+  Bookmarks = TubiBookmarks(Request, Auth, constants)
+
+  historyOrder = m.global.historyOrder
+  bookmarkOrder = m.global.bookmarkOrder
+
   request = {
-    url: urlBase + "/categories?app_id=" + settings.shortAppName + "&platform=" + platform + "&device_id=" + deviceInfo.deviceId + "&cat_id=" + categoryId + "&all=false&page_enabled=false"
+    url: url
+    name: "getCategory"    
     node: m.top
     field: "categoryContent"
-    options: {}
-    name: "getCategory"    
+    options: {
+      params: {
+        "app_id": settings.shortAppName
+        platform: platform
+        "device_id": deviceInfo.deviceId
+        "cat_id": categoryId
+        all: false
+        page_enabled: false
+      }
+    }
   }
+
   m.global.metadataFetchTask.request = request
+End Function
+
+
+'''''''''''''''''''''
+' loadHistory
+'
+' Load the user's history content for "Continue Watching"
+Function loadHistory(categoryId As String)
+  constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(constants, Request)
+  Bookmarks = TubiBookmarks(Request, Auth, constants)
+
+  historyOrder = m.global.historyOrder
+
+  if historyOrder <> invalid
+    'get the full user's bookmark category
+    request = Bookmarks.getFullHistoryReq(historyOrder)
+
+    request.node = m.top
+    request.field = "categoryContent"
+    
+    m.global.metadataFetchTask.request = request
+
+  'we haven't gotten a response for the initial bookmarks yet
+  'so we're gonna listen and run this again once we get a response
+  'we need to make sure we unobserve this field once the category changes though
+  else
+    m.global.observeField("historyOrder", "loadHistory")
+  end if
+
+End Function
+
+
+'''''''''''''''''''''
+' loadBookmarks
+'
+' Load the user's history content for "Continue Watching"
+Function loadBookmarks(categoryId As String)
+  constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(constants, Request)
+  Bookmarks = TubiBookmarks(Request, Auth, constants)
+
+  bookmarkOrder = m.global.bookmarkOrder
+
+  if bookmarkOrder <> invalid
+    'get the full user's history category
+    request = Bookmarks.getFullHistoryReq(bookmarkOrder)
+
+    request.node = m.top
+    request.field = "categoryContent"
+
+    m.global.metadataFetchTask.request = request
+  
+  'we haven't gotten a response for the initial bookmarks yet
+  'so we're gonna listen and run this again once we get a response
+  'we need to make sure we unobserve this field once the category changes though
+  else
+    m.global.observeField("bookmarkOrder", "loadBookmarks")
+  end if
+
+End Function
+
+
+'''''''''''''''''''''
+' loadUserCategories
+'
+' Load the Queue and View History user categories
+Function loadUserCategories()
+  tubiLog("CategoryScreen.loadUserCategories")
+  'make the initial calls to the user's queue and view history
+  m.authTask.observeField("initialBookmarks", "handleInitialBookmarks")
+  m.authTask.observeField("initialHistory", "handleInitialHistory")
+
+  m.authTask.functionName = "getInitialUserCategories"
+  m.authTask.control = "RUN"
+End Function
+
+
+'''''''''''
+' handleInitialBookmarks
+'
+' Use the metadataFetchTask to populate the content for the user's "My Queue" category
+Function handleInitialBookmarks()
+  tubiLog("CategoryScreen.handleInitialBookmarks")
+  constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(constants, Request)
+  Bookmarks = TubiBookmarks(Request, Auth, constants)
+
+  if m.authTask.initialBookmarks <> invalid
+    initialBookmarks = m.authTask.initialBookmarks
+    bookmarkData = Bookmarks.handleInitialBookmarks(initialBookmarks)
+
+    m.global.bookmarkIds = bookmarkData.bookmarkIds
+    m.global.bookmarkOrder = bookmarkData.bookmarkOrder
+
+  end if
+End Function
+
+
+'''''''''''
+' handleInitialHistory
+'
+' Use the metadataFetchTask to populate the content for the user's "My Queue" category
+Function handleInitialHistory()
+  tubiLog("CategoryScreen.handleInitialHistory")
+  constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(constants, Request)
+  Bookmarks = TubiBookmarks(Request, Auth, constants)
+
+  if m.authTask.initialHistory <> invalid
+
+    initialHistory = m.authTask.initialHistory
+    historyData = Bookmarks.handleInitialHistory(initialHistory)
+
+    m.global.historyIds = historyData.historyIds
+    m.global.historyOrder = historyData.historyOrder
+
+  end if
 End Function

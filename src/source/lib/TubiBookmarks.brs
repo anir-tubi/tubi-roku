@@ -16,13 +16,14 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object) a
     getInitialHistoryReq: tubiBookmarks_getInitialHistoryReq
     getFullBookmarksReq: tubiBookmarks_getFullBookmarksReq
     getFullHistoryReq: tubiBookmarks_getFullHistoryReq
+    handleInitialBookmarks: tubiBookmarks_handleInitialBookmarks
+    handleInitialHistory: tubiBookmarks_handleInitialHistory
 
     'private methods
     createBookmarksRequest: tubiBookmarks_createBookmarksRequest_
     createHistoryRequest: tubiBookmarks_createHistoryRequest_
     getFullBookmarkOrHistory: tubiBookmarks_getFullBookmarkOrHistory_
   }
-  
 End Function
 
 
@@ -33,25 +34,24 @@ function tubiBookmarks_addBookmarkReq(content as Object) as Object
   bookmarkReq = invalid
 
   if content <> invalid
-
     'translate internal content type to UAPI content type
     contentType = invalid
+    idToServe = content.id
     if content["type"] = m.constants.ui.contentTypes.video
       contentType = m.constants.uapiContentTypes.movie
-    end if
-
-
-    idToServe = content.id
-    if idToServe <> invalid
-
       'if episodes was passed in, we need to get the id of the parent series since we don't bookmarks series
-      if content.parentId <> invalid
+      if content.parentId <> invalid and content.parentId <> ""
         idToServe = content.parentId
         contentType = m.constants.uapiContentTypes.series
       end if
-
-      bookmarkReq = m.createBookmarksRequest(idToServe, "add", contentType)
+    else if content["type"] = m.constants.ui.contentTypes.series
+      contentType = m.constants.uapiContentTypes.series
+    else
+      tubiLog("ERROR: Can't bookmark content that isn't a video, series, or episode")
+      return invalid
     end if
+
+    bookmarkReq = m.createBookmarksRequest(idToServe, "add", contentType)
   end if
 
   return bookmarkReq
@@ -68,19 +68,22 @@ function tubiBookmarks_removeBookmarkReq(content as Object, bookmarkIdList as Ob
     idToCheck = content.id
     
     'if episodes was passed in, we need to get the id of the parent series since we don't bookmarks series
-    if content.parentId <> invalid
+    idToServe = content.bookmarkId
+    if content.parentId <> invalid and content.parentId <> ""
       idToCheck = content.parentId
     end if
-    
-    'get the "bookmark server id" that is expected by the API to delete the bookmark on the server
-    'the "bookmark server id" is returned to us from the server when we add the bookmark or get all bookmarks
-    idToServe = invalid
-    if bookmarkIdList <> invalid
-      idToServe = bookmarkIdList[idToCheck]
-    end if
 
+    if bookmarkIdList <> invalid then
+      idToServe = bookmarkIdList.videos[idToCheck]
+      if idToServe = invalid then
+        idToServe = bookmarkIdList.series[idToCheck]
+      end if
+    end if
+    
     if idToServe <> invalid
       bookmarkReq = m.createBookmarksRequest(idToServe, "delete")
+    else
+      tubiLog("idToServe was invalid, not found in bookmarkIdList")
     end if
   end if
 
@@ -97,7 +100,7 @@ end function
 '@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
 function tubiBookmarks_createBookmarksRequest_(id as String, action as String, contentType = "" as String) as Object
   authInfo = m.auth.getAuthInfo()  'from registry
-  if authInfo.accessToken = invalid
+  if authInfo = invalid or authInfo.accessToken = invalid
     return invalid
   end if
 
@@ -133,9 +136,6 @@ function tubiBookmarks_createBookmarksRequest_(id as String, action as String, c
   return bookmarkReq
 end function
 
-
-
-
 'returns a request object that can be used to add a history to the server
 '@content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
 function tubiBookmarks_addHistoryReq(content as Object, position as Integer) as Object
@@ -145,15 +145,17 @@ function tubiBookmarks_addHistoryReq(content as Object, position as Integer) as 
     idToServe = content.id
     parentId = content.parentId 'is ok if parentId is invalid (ie. for movies)
 
-
-    if idToServe <> invalid
+    if content["type"] = m.constants.ui.contentTypes.video
       contentType = m.constants.uapiContentTypes.movie
-      if parentId <> invalid
-        contentType = m.constants.uapiContentTypes.episode
-      end if
-
-      historyReq = m.createHistoryRequest(idToServe, parentId, position, "add", contentType)
+      if parentId <> invalid and parentId <> ""
+         contentType = m.constants.uapiContentTypes.episode
+       end if
+    else
+      ' can't have history for a series, only episodes and movies
+      return invalid
     end if
+
+    historyReq = m.createHistoryRequest(idToServe, parentId, position, "add", contentType)
   end if
 
   return historyReq
@@ -169,24 +171,21 @@ function tubiBookmarks_removeHistoryReq(content as Object, historyIdList as Obje
   if content <> invalid
     idToCheck = content.id
 
+    idToServe = content.historyId
+
     'set the episode's parent id as the id to check for the "history server id", since when we remove a history,
     'we remove the whole series not just the episode
-    if content.parentId <> invalid
+    if content.parentId <> invalid and content.parentId <> ""
       idToCheck = content.parentId 
-    end if
-
-    idToServe = historyIdList[idToCheck]
-
-    if idToServe <> invalid
-      'translate internal content types to UAPI content types
-      contentType = m.constants.uapiContentTypes.movie
-      if content.parentId <> invalid
-        contentType = m.constants.uapiContentTypes.episode
+      
+      if historyIdList <> invalid
+        idToServe = historyIdList.series[idToCheck].serverId
       end if
-
-      historyReq = m.createHistoryRequest(idToServe, invalid, invalid, "delete")
     end if
 
+    if idToServe <> invalid then
+      historyReq = m.createHistoryRequest(idToServe, invalid, 0, "delete")
+    end if
   end if
 
   return historyReq
@@ -202,7 +201,7 @@ end function
 '@action: string (should be "add" or "delete")
 '@contentType: string (should be "series" or "movie") - not necessary for deletes
 '@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
-function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, position as Integer, action as String, contentType = "" as String) as Object
+function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, position as Dynamic, action as String, contentType = "" as String) as Object
   authInfo = m.auth.getAuthInfo()  'from memory
   if authInfo.accessToken = invalid
     return invalid
@@ -246,8 +245,8 @@ function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, 
 end function
 
 
-
-function tubiBookmarks_getInitialBookmarksReq() as Object
+'@localId: string, a string used to identify req when a response is received
+function tubiBookmarks_getInitialBookmarksReq(localId) as Object
   authInfo = m.auth.getAuthInfo()  'from registry
 
   'if the user is not logged in (aka doesn't have an accessToken in local memory),
@@ -266,12 +265,14 @@ function tubiBookmarks_getInitialBookmarksReq() as Object
   }
 
   initialBookmarkReq = m.auth.createAuthRequest(url, "getInitialBookmarks", options)
+  initialBookmarkReq.localId = localId
 
   return initialBookmarkReq
 end function
 
 
-function tubiBookmarks_getInitialHistoryReq() as Object
+'@localId: string, a string used to identify req when a response is received
+function tubiBookmarks_getInitialHistoryReq(localId) as Object
   authInfo = m.auth.getAuthInfo()  'from registry
 
   'if the user is not logged in (aka doesn't have an accessToken in local memory),
@@ -290,15 +291,21 @@ function tubiBookmarks_getInitialHistoryReq() as Object
   }
 
   initialHistoryReq = m.auth.createAuthRequest(url, "getInitialHistory", options)
+  initialHistoryReq.localId = localId
 
   return initialHistoryReq
 end function
 
 
 'returns a request to use to get the full data for all bookmarked content
-'@basicsFromServer: string, the unparsed data returned from the server after making a call to the request created by m.getInitialBookmarksReq()
-function tubiBookmarks_getFullBookmarksReq(basicsFromServer as String) as Object
-  fullBookmarksReq = m.getFullBookmarkOrHistory(basicsFromServer, "Bookmarks")
+'@orderList: array, an array (typically stored on content controller) that has the order of all content in the user's bookmarks
+'                each item in the array looks like:
+'                           {
+'                             cid: contentId
+'                             type: contentType ("series" or "movie")
+'                           }
+function tubiBookmarks_getFullBookmarksReq(orderList as Object) as Object
+  fullBookmarksReq = m.getFullBookmarkOrHistory(orderList, "Bookmarks")
 
   return fullBookmarksReq
 end function
@@ -306,66 +313,147 @@ end function
 
 
 'returns a request to use to get the full data for all content stored in a user's history
-'@basicsFromServer: string, the unparsed data returned from the server after making a call to the request created by m.getInitialHistoryReq()
-function tubiBookmarks_getFullHistoryReq(basicsFromServer as String) as Object
-  fullHistoryReq = m.getFullBookmarkOrHistory(basicsFromServer, "History")
+'@orderList: array, an array (typically stored on content controller) that has the order of all content in the user's history
+'                each item in the array looks like:
+'                           {
+'                             cid: contentId
+'                             type: contentType ("series" or "movie")
+'                           }
+function tubiBookmarks_getFullHistoryReq(orderList as Object) as Object
+  fullHistoryReq = m.getFullBookmarkOrHistory(orderList, "History")
   
   return fullHistoryReq
 end function
 
 
 
-'@basicsFromServer: string, the unparsed data returned from the server after making a call to the
-'   request created by m.getInitialHistoryReq() or m.getInitialBookmarksReq()
+'@orderList: array of assocArrays, an array that contains basic information returned from the initial call to get bookmarks or history and 
+'                 retains the order of the contents
 '@playlistType: string, just an identifier, not used in any logic. Typically would expect either "Bookmarks" or "History"
-function tubiBookmarks_getFullBookmarkOrHistory_(basicsFromServer as String, playlistType as String) as Object
-  if basicsFromServer <> invalid and basicsFromServer.len() > 0
-    basicsFromServer = ParseJson(basicsFromServer)
-  else
-    return invalid
-  end if
+'
+'returns an object that contains all the content for a metadataTaskThread, except the node and field properties (to be added after this function returns)
+function tubiBookmarks_getFullBookmarkOrHistory_(orderList as Object, playlistType as String) as Object
 
   fullReq = invalid
 
-  if basicsFromServer <> invalid
-    if basicsFromServer.total_count <> invalid and basicsFromServer.total_count > 0
-      basicItems = basicsFromServer.items '[]'
-
-      if basicItems <> invalid
-        ids = ""
-        
-        for each item in basicItems
-
-          if item.content_type = "series"
-            id = "0" + item.content_id.toStr()
-            ids = ids + "," + id
-          else if item.content_type = "movie" or item.content_type = "video"
-            id = item.content_id.toStr()
-            ids = ids + "," + id
-          end if
-        end for
-        
-        ids = Right(ids, ids.len()-1)
-
-        url = m.constants.urls.cms.contents
-
-        options = {
-          method: m.constants.reqTypes.get
-          headers: m.constants.headers.json
-          params: {
-            platform: m.constants.platform
-            "content_ids": ids
-            "page_enabled": false
-            fields: "*(id,type,title,duration,ratings,description,year,posterarts,subtitles,lang,url,publisher_id,actors,directors,tags,children,credit_cuepoints)"
-          }
-        }
-
-        fullReq = m.request.createAsync(url, "getFull" + playlistType, options)
-      end if
-
+  ids = ""
+  for each item in orderList
+    if type(item) = "roString" or type(item) = "String"
+      ids = ids + "," + item
     end if
-  end if
+  end for
+  
+  ids = Right(ids, ids.len()-1)
+
+  fullReq = {
+    url: m.constants.urls.cms.contents
+    name: "getFull" + playlistType
+    options: {
+      method: m.constants.reqTypes.get
+      headers: m.constants.headers.json
+      params: {
+        platform: m.constants.platform
+        "content_ids": ids
+        "page_enabled": false
+        fields: "*(id,type,title,duration,ratings,description,year,posterarts,subtitles,lang,url,publisher_id,actors,directors,tags,children,credit_cuepoints)"
+      }
+    }
+  }
 
   return fullReq
 end function
 
+
+'@initialBookmarks: string, JSON server response when making the first call to UAPI to get a user's basic bookmark info
+'returns an object with 2 keys, bookmarkIds and bookmarkOrder
+'   bookmarkIds: assocArray, a map of contentIds to server bookmarksIds
+'   bookmarkOrder: an array of contentIds (series have pre-pended 0), that keeps the order of bookmarks as returned from the server
+function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
+  parsedInitialBookmarks = ParseJson(initialBookmarks)
+
+  bookmarkOrder = []
+
+  bookmarkIds = {
+    'each videos and series assocArray should look like:
+    '{contentId: bookmarkServerId, ...}
+    videos: {}
+    series: {}
+  }
+
+  for each bookmark in parsedInitialBookmarks.items
+    if bookmark.content_type = m.constants.uapiContentTypes.movie
+      bookmarkIds.videos[bookmark.content_id.toStr()] = bookmark.id
+
+      bookmarkOrder.push(bookmark.content_id.toStr())
+
+    else if bookmark.content_type = m.constants.uapiContentTypes.series
+      bookmarkIds.series[bookmark.content_id.toStr()] = bookmark.id
+
+      bookmarkOrder.push("0" + bookmark.content_id.toStr())
+    end if
+  end for
+
+  return {
+    bookmarkOrder: bookmarkOrder
+    bookmarkIds: bookmarkIds
+  }
+
+end function
+
+
+
+'@initialHistory: string, JSON server response when making the first call to UAPI to get a user's basic bookmark info
+'returns an object with 2 keys, historyIds and historyOrder
+'   historyIds: assocArray, a map of contentIds to server historysIds
+'   historyOrder: an array of contentIds (series have pre-pended 0), that keeps the order of history as returned from the server
+function tubiBookmarks_handleInitialHistory(initialHistory)
+  parsedInitialHistory = ParseJson(initialHistory)
+    'parse the initial bookmark response and create a list of bookmark server ids that will persist in the content controller
+    parsedInitialHistory = ParseJson(initialHistory)
+
+    historyOrder = []
+
+    historyIds = {
+      'each videos and series assocArray should look like:
+      '{contentId: {
+      '   serverId: historyServerId
+      '   position: 365
+      '  }
+      '}
+      videos: {}
+      series: {}
+    }
+
+    for each history in parsedInitialHistory.items
+      if history.content_type = m.constants.uapiContentTypes.movie
+        historyIds.videos[history.content_id.toStr()] = {
+          serverId: history.id
+          position: history.position
+        }
+
+        historyOrder.push(history.content_id.toStr())
+
+      else if history.content_type = m.constants.uapiContentTypes.series
+        historyIds.series[history.content_id.toStr()] = {
+          serverId: history.id
+          currentEpisodeId: history.episodes[history.position].content_id.toStr()
+        }
+
+        for each episode in history.episodes
+          historyIds.videos[episode.content_id.toStr()] = {
+            serverId: episode.id
+            position: episode.position
+          }
+        end for
+
+        historyOrder.push("0" + history.content_id.toStr())
+
+      end if
+    end for
+
+    return {
+      historyOrder: historyOrder
+      historyIds: historyIds
+    }
+
+end function

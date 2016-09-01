@@ -2,8 +2,10 @@ Function init()
   m.Info = m.top.findNode("InfoPanel")
   m.Hero = m.top.findNode("HeroBackground")
   m.Menu = m.top.findNode("Menu")
+  m.AuthTask = m.top.findNode("AuthTask")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("shortContent", "onShortContentChange")
+  m.top.observeField("signedIn", "onSignedInChange")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
   m.defaultHeroUri = "pkg:/images/background-not-on-selection.png"
 
@@ -25,7 +27,6 @@ End Function
 ' Full content description has arrived
 Function onContentChange() As Void
   tubiLog("DetailScreen.onContentChange")
-
   if m.top.content.type = "video"
     ' Special case here.  If this video is an episode of a series, load the full series content
     if m.top.content.seriesId <> invalid and m.top.content.seriesId <> "" then
@@ -89,7 +90,15 @@ End Function
 
 
 ''''''''''''''''''''''
+' onSignedInChange
+'
+Function onSignedInChange()
+  setMenuItems()
+End Function
+
+''''''''''''''''''''''
 ' getEpisodeContent
+'
 Function getEpisodeContent(selection As Object) As Object
   series = m.top.content.getChild(m.episodeSelection[0])
   if series <> invalid then
@@ -113,12 +122,23 @@ End Function
 ' setMenuItems
 '
 ' Add appropriate menu items for the selection
-Function setMenuItems()
+Function setMenuItems() As Void
   tubiLog("DetailScreen.setMenuItems")
+
+  ' if content is not set, don't show a menu
+  if m.top.content = invalid then 
+    return
+  else
+    m.Menu.content = invalid
+  end if
+
   menuItems = CreateObject("roSGNode", "ContentNode")
-  
-  'TODO(Chris): Add resume button here when applicable, format text as needed for series
-  menuItems.appendChild(m.ResumeMenuItem)
+
+  if m.top.shortContent.nowPos <> invalid and m.top.shortContent.nowPos <> 0 then
+    m.ResumeMenuItem.playstart = m.top.shortContent.nowPos
+    m.ResumeMenuItem.length = m.top.shortContent.length
+    menuItems.appendChild(m.ResumeMenuItem)
+  end if
 
   if m.top.content.type = "video" then
     menuItems.appendChild(m.PlayMenuItem)
@@ -130,10 +150,16 @@ Function setMenuItems()
   end if
 
   'TODO(Chris): Change this to 'Remove' if already in queue
-  menuItems.appendChild(m.AddQueueMenuItem)
+  if m.top.signedIn = true and m.top.shortContent.bookmarkId <> invalid and m.top.shortContent.bookmarkId <> "" then
+    menuItems.appendChild(m.RemoveQueueMenuItem)
+  else 
+    menuItems.appendChild(m.AddQueueMenuItem)
+  end if
 
   'TODO(Chris): Remove this if item is not in users history
-  menuItems.appendChild(m.RemoveHistoryMenuItem)
+  if m.top.shortContent.historyId <> invalid and m.top.shortContent.historyId <> "" then
+    menuItems.appendChild(m.RemoveHistoryMenuItem)
+  end if
 
   m.Menu.content = menuItems
   m.Menu.visible = "true"
@@ -168,12 +194,37 @@ Function onMenuItemSelected()
     else if selection.id = "EpisodesMenuItem"
       showEpisodes()
     else if selection.id = "AddQueueMenuItem" then
-      'TODO(Chris): Add queue management here
+      if m.top.signedIn = true then
+        'TODO(Chris): bookmark the content and update 'shortContent' which is owned by the controller
+        addToQueue()
+      else
+        m.Dialog = m.top.createChild("ModalDialogScreen")
+        m.Dialog.title = "Whoops!"
+        m.Dialog.message = "You must be signed in in order to add a title to your queue."
+        m.Dialog.buttons = ["Sign In or Register", "Cancel"]
+        m.Dialog.observeField("buttonSelected", "onDialogButton")
+        m.Dialog.setFocus(true)
+      end if
     else if selection.id = "RemoveQueueMenuItem" then
-      'TODO(Chris): Add queue management here
-    else if selection.id = "RemoveHistoyMenuItem" then
-      'TODO(Chris): Add history management here
+      removeFromQueue()
+    else if selection.id = "RemoveHistoryMenuItem" then
+      removeFromHistory()
     end if
+  end if
+End Function
+
+
+''''''''''''''''''''
+' onDialogButton
+'
+Function onDialogButton()
+  buttonSelected = m.Dialog.buttonSelected
+  m.top.removeChild(m.Dialog)
+  m.Dialog.unobserveField("buttonSelected")
+  m.Dialog = invalid
+  m.Menu.setFocus(true)
+  if buttonSelected = 0 then
+    m.top.signInSelected = true
   end if
 End Function
 
@@ -222,7 +273,7 @@ End Function
 Function loadContentDetails(content)
   tubiLog("DetailScreen.loadDetails")
   settings = m.global.constants.settings
-  urlBase = m.global.constants.urls.cms.urlBase
+  url = m.global.constants.urls.cms.singleContent
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
 
@@ -234,11 +285,19 @@ Function loadContentDetails(content)
   end if
 
   request = {
-    url: urlBase + "/content?app_id=" + settings.shortAppName + "&platform=" + platform + "&content_id=" + contentId
+    url: url
     node: m.top
     field: "content"
-    options: {}
-    name: "getSingleContent"    
+    options: {
+      params: {
+        "app_id": settings.shortAppName
+        platform: platform
+        "content_id": contentId
+        ' "content_ids": contentId
+        ' fields: "*(id,type,title,duration,ratings,description,year,posterarts,subtitles,lang,url,publisher_id,actors,directors,tags,children,credit_cuepoints)"
+      }
+    }
+    name: "getSingleContent"
   }
   m.global.metadataFetchTask.request = request
 End Function
@@ -253,4 +312,196 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     return true
   end if
   return false 
+End Function
+
+Function addToQueue()
+  tubiLog("DetailScreen.addToQueue")
+  m.AuthTask.functionName = "addToQueue"  
+  m.AuthTask.content = m.top.content
+  m.AuthTask.observeField("bookmarkId", "onBookmarked")
+  m.AuthTask.control = "RUN"
+End Function
+
+
+'''''''''''''''''''
+' onBookmarked
+'
+Function onBookmarked()
+  tubiLog("DetailScreen.onBookmarked")
+  'TODO(Chris): add bookmark id to global tree
+  m.AuthTask.unobserveField("bookmarkId")
+
+  tubiLog("Got bookmarkId " + m.AuthTask.bookmarkId + " for content " + m.top.content.id)
+
+  m.top.content.bookmarkId = m.AuthTask.bookmarkId
+  m.top.shortContent.bookmarkId = m.AuthTask.bookmarkId
+
+  ' TODO(Chris): Move management of this global list off to a library
+  ' or task
+  bookmarkIds = m.global.bookmarkIds
+  if bookmarkIds <> invalid
+    if m.top.shortContent.type = "series"
+      tubiLog("Appending series to bookmarks")
+      newSeries = {}
+      newSeries[m.top.shortContent.id] = m.top.content.bookmarkId
+      newSeries.append(bookmarkIds.series)
+      videos = bookmarkIds.videos
+      m.global.bookmarkIds = {
+        series: newSeries
+        videos: videos
+      }
+    else if m.top.shortContent.type = "video"
+      newVideos = {}
+      newVideos[m.top.shortContent.id] = m.top.content.bookmarkId
+      newVideos.append(bookmarkIds.videos)
+      series = bookmarkIds.series
+      m.global.bookmarkIds = {
+        series: series
+        videos: newVideos
+      }
+    end if
+  end if
+  bookmarkOrder = m.global.bookmarkOrder
+  if bookmarkOrder <> invalid
+    if m.top.shortContent.type = "series" then
+      newBookmarkOrder = ["0"+m.top.content.id]
+    else
+      newBookmarkOrder = [m.top.content.id]
+    end if
+    newBookmarkOrder.append(m.global.bookmarkOrder)
+    m.global.bookmarkOrder = newBookmarkOrder
+  end if
+  setMenuItems()
+
+  ' Notify the controller so that it can react
+  m.top.addToQueueSelected = true
+End Function
+
+
+'''''''''''''''''''''
+' removeFromQueue
+'
+' This is not ideal.  We have to remove from 3 places: local content node, 
+' m.global bookmarks, and the server
+Function removeFromQueue()
+  tubiLog("DetailScreen.removeFromQueue")
+  m.AuthTask.functionName = "removeFromQueue"  
+  m.AuthTask.content = m.top.content
+  m.AuthTask.observeField("result", "onBookmarkRemoved")
+  m.AuthTask.control = "RUN"
+  'TODO(Chris): show spinner
+End Function
+
+Function onBookmarkRemoved()
+  tubiLog("DetailScreen.onBookmarkRemoved")
+  'TODO(Chris): consume return values and handle errors here
+  m.AuthTask.unobserveField("result")
+  m.top.shortContent.bookmarkId = ""
+  m.top.content.bookmarkId = ""
+
+  ' TODO(Chris): Move management of this global list off to a library
+  ' or task
+  bookmarkIds = m.global.bookmarkIds
+  'remove the bookmark
+  if bookmarkIds <> invalid
+    if m.top.shortContent.type = "series"
+      tubiLog("Removing series to bookmarks")
+      newSeries = {}
+      newSeries.append(bookmarkIds.series)
+      newSeries.delete(m.top.shortContent.id)
+      videos = bookmarkIds.videos
+      m.global.bookmarkIds = {
+        series: newSeries
+        videos: videos
+      }
+    else if m.top.shortContent.type = "video"
+      newVideos = {}
+      newVideos.append(bookmarkIds.videos)
+      newVideos.delete(m.top.shortContent.id)
+      series = bookmarkIds.series
+      m.global.bookmarkIds = {
+        series: series
+        videos: newVideos
+      }
+    end if
+  end if
+  bookmarkOrder = m.global.bookmarkOrder
+  if bookmarkOrder <> invalid
+    newBookmarkOrder = []
+    newBookmarkOrder.append(bookmarkOrder)
+    for i=0 to newBookmarkOrder.count()-1
+      if m.top.shortContent.type = m.global.constants.ui.contentTypes.series and newBookmarkOrder[i] = "0"+m.top.shortContent.id then newBookmarkOrder.delete(i)
+      if m.top.shortContent.type = m.global.constants.ui.contentTypes.video and newBookmarkOrder[i] = m.top.shortContent.id then newBookmarkOrder.delete(i)
+    end for
+    m.global.bookmarkOrder = newBookmarkOrder
+  end if
+  setMenuItems()
+
+  ' Notify the controller so that it can react
+  m.top.removeFromQueueSelected = true
+End Function
+
+
+'''''''''''''''''''''''
+' removeFromHistory
+'
+Function removeFromHistory()
+  tubiLog("DetailScreen.removeFromHistory")
+  m.AuthTask.functionName = "removeFromHistory"  
+  m.AuthTask.content = m.top.content
+  m.AuthTask.observeField("result", "onHistoryRemoved")
+  m.AuthTask.control = "RUN"
+End Function
+
+Function onHistoryRemoved()
+  tubiLog("DetailScreen.onHistoryRemoved")
+  m.AuthTask.unobserveField("result")
+  m.top.shortContent.historyId = ""
+  m.top.content.historyId = ""
+  m.top.shortContent.nowPos = invalid
+  m.top.content.nowPos = invalid
+
+  ' TODO(Chris): Move management of this global list off to a library
+  ' or task
+  historyIds = m.global.historyIds
+  if historyIds <> invalid
+    if m.top.shortContent.type = "series"
+      if historyIds.series[m.top.shortContent.id] <> invalid
+        newSeries = {}
+        newSeries.append(historyIds.series)
+        newSeries.delete(m.top.shortContent.id)
+        videos = historyIds.videos
+        m.global.historyIds = {
+          series: newSeries
+          videos: videos
+        }
+      end if
+    else if m.top.shortContent.type = "video"
+      if historyIds.videos[m.top.shortContent.id] <> invalid
+        newVideos = {}
+        newVideos.append(historyIds.videos)
+        newVideos.delete(m.top.shortContent.id)
+        series = historyIds.series
+        m.global.historyIds = {
+          series: series
+          videos: newVideos
+        }
+      end if
+    end if
+  end if
+  historyOrder = m.global.historyOrder
+  if historyOrder <> invalid
+    newHistoryOrder = []
+    newHistoryOrder.append(historyOrder)
+
+    for i=0 to newHistoryOrder.count()-1
+      if m.top.shortContent.type = m.global.constants.ui.contentTypes.series and newHistoryOrder[i] = "0"+m.top.shortContent.id then newHistoryOrder.delete(i)
+      if m.top.shortContent.type = m.global.constants.ui.contentTypes.video and newHistoryOrder[i] = m.top.shortContent.id then newHistoryOrder.delete(i)
+    end for
+    m.global.historyOrder = newHistoryOrder
+  end if
+  setMenuItems()
+
+  ' Notify the controller so that it can react
+  m.top.removeFromHistorySelected = true
 End Function

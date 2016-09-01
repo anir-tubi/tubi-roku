@@ -22,6 +22,21 @@
 
     <!-- Set to the selected movie or episode which should be resumed -->
     <field id="resumeContent" type="node" alwaysNotify="true" />
+    
+    <!-- set to true if the user is signed in and we want to change the experience based on that -->
+    <field id="signedIn" type="boolean" value="false" />
+    
+    <!-- set to true if the user elected to sign in from the add to queue modal -->
+    <field id="signInSelected" type="boolean" alwaysNotify="true"/>
+    
+    <!-- set to true when the user adds the title to their queue -->
+    <field id="addToQueueSelected" type="boolean" alwaysNotify="true" />
+    
+    <!-- set to true when the user removes the title from their queue -->
+    <field id="removeFromQueueSelected" type="boolean" alwaysNotify="true" />
+    
+    <!-- set to true when the user removes the title from their history -->
+    <field id="removeFromHistorySelected" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -29,9 +44,7 @@
     <ContentNode
       id="ResumeMenuItem"
       title="Resume" 
-      url="pkg:/images/icon-resume.png"
-      playstart="20"
-      length="120"/>
+      url="pkg:/images/icon-resume.png"/>
     <ContentNode
       id="PlayMenuItem"
       title="Play"
@@ -100,5 +113,7 @@
       </ScrollingList>
     </LayoutGroup>
     
+    <AuthTask
+      id="AuthTask"/>
   </children>
 </component>

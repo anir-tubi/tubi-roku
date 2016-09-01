@@ -19,6 +19,8 @@ Function fetchLoop()
   ' Signal that we're ready for requests
   m.top.ready = true
 
+  'when the request field for the metadata task field is updated, the event is heard in this loop
+  'and beginRequest() is called
   while true
     msg = wait(0, m.port)
     if type(msg) = "roSGNodeEvent" then
@@ -77,13 +79,34 @@ Function handleResponse(message)
     ' double check that we have our context
     if handledRequest.node <> invalid and handledRequest.field <> invalid and handledRequest.response <> invalid then
       tubiLog("MetadataFetchTask.handleResponse setting response field " + handledRequest.field)
-      handledRequest.node[handledRequest.field] = convertToContentMetadata(handledRequest.response.data)
+
+      'indicates a request from the details screen. this request needs to be handled slightly differently
+      if handledRequest.name = "getSingleContent"
+        handledRequest.node[handledRequest.field] = convertDetailsMetadata(handledRequest.response.data)
+      else
+        handledRequest.node[handledRequest.field] = convertToContentMetadata(handledRequest.response.data)
+      end if
     end if
   end if
 End Function
 
+
+'convert the server response to meta data node as expected by the details screen
+Function convertDetailsMetadata(data As String) As Object
+  parsed = ParseJSON(data)
+  if parsed = invalid then
+    tubiLog("MetadataFetchTask.convertDetailsMetadata failed to parse JSON response")
+    return invalid
+  end if
+
+  parentNode = translateDetailsMetadata(parsed)
+  
+  return parentNode
+End Function
+
+
 ' TODO(Chris): Capture this somewhere else if we use it in other places than this task node
-Function convertToContentMetadata(data) As Object
+Function convertToContentMetadata(data As String) As Object
   parsed = ParseJSON(data)
   if parsed = invalid then
     tubiLog("MetadataFetchTask.convertToContentMetadata failed to parse JSON response")
@@ -91,6 +114,6 @@ Function convertToContentMetadata(data) As Object
   end if
 
   parentNode = translateMetadata(parsed)
-   
+  
   return parentNode
 End Function

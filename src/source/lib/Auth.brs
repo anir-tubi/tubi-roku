@@ -166,7 +166,11 @@ function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
     authHeaders = m.getAuthHeaders(authInfo.accessToken)
 
     if authHeaders <> invalid
-      options.headers.append(authHeaders)
+      if options.headers <> invalid
+        options.headers.append(authHeaders)
+      else
+        options.headers = authHeaders
+      end if
     end if
 
     authReq = m.request.createAsync(url, name, options)

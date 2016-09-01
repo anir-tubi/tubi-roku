@@ -75,6 +75,8 @@ Function getConstants()
     constants.urls.cms = {}
       constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
       constants.urls.cms.contents = constants.urls.cms.urlBase + "/contents"
+      constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
+      constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
 
     'users url
     constants.urls.users = {}
@@ -172,7 +174,7 @@ Function getConstants()
     'static - pre defined category names
     constants.ui.categoryNames = {}
       constants.ui.categoryNames.topCategory = "Featured"
-      constants.ui.categoryNames.tools = "Tools"
+      constants.ui.categoryNames.tools = "Search & Sign In"
       constants.ui.categoryNames.history = "Continue Watching"
       constants.ui.categoryNames.queue = "My Queue"
 

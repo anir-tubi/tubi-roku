@@ -18,12 +18,40 @@ Function translateMetadata(contentToTranslate) As Object
 
     'expect a single piece of content, or several (as an associative array)
     else if type(contentToTranslate) = "roAssociativeArray"
-      translateRecursive(contentToTranslate, translated)
+
+      'expect this to happen just for the search API
+      if contentToTranslate.children <> invalid
+        translateRecursive(contentToTranslate, translated)
+      
+      'expect this to happen for detail page content and history/queue content
+      else
+        for each content in contentToTranslate
+          if contentToTranslate[content] <> invalid
+            node = translated.createChild("TubiContentNode")
+            translateRecursive(contentToTranslate[content], node)
+          end if
+        end for
+      end if
     end if
   end if
 
   return translated
 end Function
+
+
+''''''''''''''''''''''
+' translateDetailsMetadata
+'
+' Translates content from server into format that roku understands, specifically for details screen
+' contentToTranslate should be parsed from JSON before it hits this function
+Function translateDetailsMetadata(contentToTranslate) As Object
+  translated = CreateObject("roSGNode", "TubiContentNode")
+
+  'will affect/update the translated node that is passed in
+  translateRecursive(contentToTranslate, translated)
+
+  return translated
+End Function
 
 
 '''''''''''''''''''''
@@ -35,144 +63,182 @@ Function translateRecursive(contentFromServer, translatedContent) As Void
   if contentFromServer = invalid then return
 
   constants = m.constants
+  bookmarkIds = m.global.bookmarkIds
+  historyIds = m.global.historyIds
 
   typeVar = "type"
-    if contentFromServer[typeVar] <> invalid
-      if contentFromServer[typeVar] = "c"
-        translatedContent[typeVar] = constants.ui.contentTypes.category
-      else if contentFromServer[typeVar] = "v"
-        translatedContent[typeVar] = constants.ui.contentTypes.video
-      else if contentFromServer[typeVar] = "s"
-        translatedContent[typeVar] = constants.ui.contentTypes.series
-      else if contentFromServer[typeVar] = "a"
-        translatedContent[typeVar] = constants.ui.contentTypes.season
-      end if
+  if contentFromServer[typeVar] <> invalid
+    if contentFromServer[typeVar] = "c"
+      translatedContent[typeVar] = constants.ui.contentTypes.category
+    else if contentFromServer[typeVar] = "v"
+      translatedContent[typeVar] = constants.ui.contentTypes.video
+    else if contentFromServer[typeVar] = "s"
+      translatedContent[typeVar] = constants.ui.contentTypes.series
+    else if contentFromServer[typeVar] = "a"
+      translatedContent[typeVar] = constants.ui.contentTypes.season
     end if
+  end if
 
-    'record keeping needed for adding series to bookmarks and previously viewed
-    ' if translatedContent.type = constants.ui.contentTypes.video and parent <> invalid and parent.parentType = constants.ui.contentTypes.series
-    parent = translatedContent.getParent()
-    if parent.parentId <> invalid
-      translatedContent.parentId = parent.parentId
+  'record keeping needed for adding series to bookmarks and previously viewed
+  ' if translatedContent.type = constants.ui.contentTypes.video and parent <> invalid and parent.parentType = constants.ui.contentTypes.series
+  parent = translatedContent.getParent()
+  if parent.parentId <> invalid
+    translatedContent.parentId = parent.parentId
+  else
+    translatedContent.parentId = parent.id
+  end if
+  ' No parent if the parent.id is the task node
+  if translatedContent.parentId = "MetadataFetchTask" then translatedContent.parentId = invalid
+
+  if parent.parentType <> invalid
+    translatedContent.parentType = parent.parentType
+  else
+    translatedContent.parentType = parent[typeVar]
+  end if
+
+  if parent.parentTitle <> invalid
+    translatedContent.parentTitle = parent.parentTitle
+  else
+    translatedContent.parentTitle = parent.title
+  end if
+  
+  'translate all the stuff from the server
+  if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
+  if contentFromServer.title <> invalid then translatedContent.title = contentFromServer.title
+  if contentFromServer.duration <> invalid then translatedContent.length = contentFromServer.duration
+  if contentFromServer.actors <> invalid then translatedContent.actors = contentFromServer.actors 'array of actors
+  if contentFromServer.tags <> invalid then 
+    translatedContent.genres = contentFromServer.tags 'array of genres
+    translatedContent.categories = contentFromServer.tags 'array of genres
+  end if
+  
+  if contentFromServer.slug <> invalid then translatedContent.slug = contentFromServer.slug
+  if contentFromServer.lang <> invalid then translatedContent.language = contentFromServer.lang
+  if contentFromServer.publisher_id <> invalid then translatedContent.pubId = contentFromServer.publisher_id
+  if contentFromServer.country <> invalid then translatedContent.country = contentFromServer.country
+  if contentFromServer.year <> invalid and contentFromServer.year <> 0 then translatedContent.releaseDate = contentFromServer.year.ToStr()
+  if contentFromServer.currentEpisodeId <> invalid then translatedContent.currentEpisodeId = contentFromServer.currentEpisodeId
+  if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
+  if contentFromServer.series_id <> invalid then translatedContent.seriesId = contentFromServer.series_id
+  
+  if contentFromServer.description <> invalid
+    translatedContent.description = contentFromServer.description
+    translatedContent.longDescription = contentFromServer.description
+  end if
+  
+  if contentFromServer.directors <> invalid and contentFromServer.directors.count() > 0
+    translatedContent.directors = contentFromServer.directors
+  end if
+
+  if contentFromServer.credit_cuepoints <> invalid
+    if contentFromServer.credit_cuepoints.prologue <> invalid
+      translatedContent.introCuepoint = contentFromServer.credit_cuepoints.prologue
+    end if
+    if contentFromServer.credit_cuepoints.postlude <> invalid
+      translatedContent.creditsCuepoint = contentFromServer.credit_cuepoints.postlude
+    end if
+  end if
+
+  if contentFromServer.thumbnails <> invalid and type(contentFromServer.thumbnails) = "roArray" and contentFromServer.thumbnails.count() > 0
+    translatedContent.landscape = contentFromServer.thumbnails[0]
+  end if
+
+  if contentFromServer.posterarts <> invalid and type(contentFromServer.posterarts) = "roArray" and contentFromServer.posterarts.count() > 0
+    translatedContent.portrait = contentFromServer.posterarts[0]
+    translatedContent.HDGRIDPOSTERURL = contentFromServer.posterarts[0]
+  end if
+
+  if contentFromServer.backgrounds <> invalid and type(contentFromServer.backgrounds) = "roArray" and contentFromServer.backgrounds.count() > 0
+    translatedContent.backgrounds = contentFromServer.backgrounds
+  end if
+
+  if contentFromServer.ratings <> invalid and contentFromServer.ratings[0] <> invalid and contentFromServer.ratings[0].value <> invalid
+    translatedContent.rating = contentFromServer.ratings[0].value
+  end if
+
+  if contentFromServer.url <> invalid
+    translatedContent.url = contentFromServer.url
+    if contentFromServer.url.instr(1,".m3u8") > 0
+      translatedContent.streamformat = "hls"
+    else if contentFromServer.url.instr(1,".mp4") > 0
+      translatedContent.streamformat = "mp4"
+    end if
+  end if
+
+  'take care of any subtitles if they exist - should only happen on videos
+  if contentFromServer.subtitles <> invalid and type(contentFromServer.subtitles) = "roArray" and contentFromServer.subtitles.count() > 0
+    translatedContent.subtitles = {
+      languages: []
+    }
+    for each subtitle in contentFromServer.subtitles
+      translatedContent.subtitles["languages"].push({
+        url: subtitle.url
+        name: subtitle.lang
+      })
+    end for
+    
+    'set the default subtitles if there is only one set of subtitles
+    if translatedContent.subtitles["languages"].count() = 1
+      translatedContent.subtitles.default = translatedContent.subtitles["languages"][0].url
+      translatedContent.subtitleUrl = translatedContent.subtitles.["languages"][0].url
+    end if
+  end if
+
+  'set the inital subtitle on/off state for the video
+  if translatedContent.type = "video"
+    if constants.deviceInfo.captionsMode = "On"
+      translatedContent.showSubtitles = true
     else
-      translatedContent.parentId = parent.id
+      translatedContent.showSubtitles = false
     end if
+  end if
 
-    if parent.parentType <> invalid
-      translatedContent.parentType = parent.parentType
-    else
-      translatedContent.parentType = parent[typeVar]
-    end if
-
-    if parent.parentTitle <> invalid
-      translatedContent.parentTitle = parent.parentTitle
-    else
-      translatedContent.parentTitle = parent.title
-    end if
-    
-    'translate all the stuff from the server
-    if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
-    if contentFromServer.title <> invalid then translatedContent.title = contentFromServer.title
-    if contentFromServer.duration <> invalid then translatedContent.length = contentFromServer.duration
-    if contentFromServer.actors <> invalid then translatedContent.actors = contentFromServer.actors 'array of actors
-    if contentFromServer.tags <> invalid then 
-      translatedContent.genres = contentFromServer.tags 'array of genres
-      translatedContent.categories = contentFromServer.tags 'array of genres
-    end if
-    
-    if contentFromServer.slug <> invalid then translatedContent.slug = contentFromServer.slug
-    if contentFromServer.lang <> invalid then translatedContent.language = contentFromServer.lang
-    if contentFromServer.publisher_id <> invalid then translatedContent.pubId = contentFromServer.publisher_id
-    if contentFromServer.country <> invalid then translatedContent.country = contentFromServer.country
-    if contentFromServer.year <> invalid and contentFromServer.year <> 0 then translatedContent.releaseDate = contentFromServer.year.ToStr()
-    if contentFromServer.currentEpisodeId <> invalid then translatedContent.currentEpisodeId = contentFromServer.currentEpisodeId
-    if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
-    if contentFromServer.series_id <> invalid then translatedContent.seriesId = contentFromServer.series_id
-    
-    if contentFromServer.description <> invalid
-      translatedContent.description = contentFromServer.description
-      translatedContent.longDescription = contentFromServer.description
-    end if
-    
-    if contentFromServer.directors <> invalid and contentFromServer.directors.count() > 0
-      translatedContent.directors = contentFromServer.directors
-    end if
-
-    if contentFromServer.credit_cuepoints <> invalid
-      if contentFromServer.credit_cuepoints.prologue <> invalid
-        translatedContent.introCuepoint = contentFromServer.credit_cuepoints.prologue
+  'add the bookmarkId if it exists
+  if bookmarkIds <> invalid
+    if translatedContent[typeVar] = constants.ui.contentTypes.series
+      if bookmarkIds.series[translatedContent.id] <> invalid
+        translatedContent.bookmarkId = bookmarkIds.series[translatedContent.id]
       end if
-      if contentFromServer.credit_cuepoints.postlude <> invalid
-        translatedContent.creditsCuepoint = contentFromServer.credit_cuepoints.postlude
+
+    else if translatedContent[typeVar] = constants.ui.contentTypes.video
+      if bookmarkIds.videos[translatedContent.id] <> invalid
+        translatedContent.bookmarkId = bookmarkIds.videos[translatedContent.id]
       end if
     end if
+  end if
 
-    if contentFromServer.thumbnails <> invalid and type(contentFromServer.thumbnails) = "roArray" and contentFromServer.thumbnails.count() > 0
-      translatedContent.landscape = contentFromServer.thumbnails[0]
-    end if
 
-    if contentFromServer.posterarts <> invalid and type(contentFromServer.posterarts) = "roArray" and contentFromServer.posterarts.count() > 0
-      translatedContent.portrait = contentFromServer.posterarts[0]
-      translatedContent.HDGRIDPOSTERURL = contentFromServer.posterarts[0]
-    end if
-
-    if contentFromServer.backgrounds <> invalid and type(contentFromServer.backgrounds) = "roArray" and contentFromServer.backgrounds.count() > 0
-      translatedContent.backgrounds = contentFromServer.backgrounds
-    end if
-
-    if contentFromServer.ratings <> invalid and contentFromServer.ratings[0] <> invalid and contentFromServer.ratings[0].value <> invalid
-      translatedContent.rating = contentFromServer.ratings[0].value
-    end if
-
-    if contentFromServer.url <> invalid
-      translatedContent.url = contentFromServer.url
-      if contentFromServer.url.instr(1,".m3u8") > 0
-        translatedContent.streamformat = "hls"
-      else if contentFromServer.url.instr(1,".mp4") > 0
-        translatedContent.streamformat = "mp4"
+  'add the history info (historyId, currentEpisodeId, nowPos) if it exists
+  if historyIds <> invalid 
+    if translatedContent[typeVar] = constants.ui.contentTypes.series
+      if historyIds.series[translatedContent.id] <> invalid
+        translatedContent.historyId = historyIds.series[translatedContent.id].serverId
+        translatedContent.currentEpisodeId = historyIds.series[translatedContent.id].currentEpisodeId
       end if
-    end if
 
-    'take care of any subtitles if they exist - should only happen on videos
-    if contentFromServer.subtitles <> invalid and type(contentFromServer.subtitles) = "roArray" and contentFromServer.subtitles.count() > 0
-      translatedContent.subtitles = {
-        languages: []
-      }
-      for each subtitle in contentFromServer.subtitles
-        translatedContent.subtitles["languages"].push({
-          url: subtitle.url
-          name: subtitle.lang
-        })
-      end for
-      
-      'set the default subtitles if there is only one set of subtitles
-      if translatedContent.subtitles["languages"].count() = 1
-        translatedContent.subtitles.default = translatedContent.subtitles["languages"][0].url
-        translatedContent.subtitleUrl = translatedContent.subtitles.["languages"][0].url
-      end if
-    end if
-
-    'set the inital subtitle on/off state for the video
-    if translatedContent.type = "video"
-      if constants.deviceInfo.captionsMode = "On"
-        translatedContent.showSubtitles = true
-      else
-        translatedContent.showSubtitles = false
-      end if
-    end if
-
-    'if this content is actually just a paginated response, set pagination data
-    if contentFromServer.total_count <> invalid then translatedContent.totalCount = contentFromServer.total_count
-    if contentFromServer.more <> invalid then translatedContent.more = contentFromServer.more
-
-    'take care of any children the content might have
-    if contentFromServer.children <> invalid and contentFromServer.children.count() > 0
-
-      for each childContent in contentFromServer.children
-        node = translatedContent.createChild("TubiContentNode")
-        translatedChildContent = translateRecursive(childContent, node)
-      end for
+    else if translatedContent[typeVar] = constants.ui.contentTypes.video
+      if historyIds.videos[translatedContent.id] <> invalid
+        translatedContent.historyId = historyIds.videos[translatedContent.id].serverId
+        translatedContent.nowPos = historyIds.videos[translatedContent.id].position
+      end if      
 
     end if
+  end if
+
+
+
+  'if this content is actually just a paginated response, set pagination data
+  if contentFromServer.total_count <> invalid then translatedContent.totalCount = contentFromServer.total_count
+  if contentFromServer.more <> invalid then translatedContent.more = contentFromServer.more
+
+  'take care of any children the content might have
+  if contentFromServer.children <> invalid and contentFromServer.children.count() > 0
+
+    for each childContent in contentFromServer.children
+      node = translatedContent.createChild("TubiContentNode")
+      translatedChildContent = translateRecursive(childContent, node)
+    end for
+
+  end if
   
 end Function

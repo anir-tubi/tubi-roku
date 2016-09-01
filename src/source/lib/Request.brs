@@ -3,6 +3,7 @@ Function TubiRequest()
     createAsync: createAsyncHTTPRequest
     start: tubihttp_start
     handleEvent: tubihttp_handleEvent
+    hasData: tubihttp_hasData
     runSynchronous: tubihttp_runSynchronous
     cancel: tubihttp_cancel
     isHttps: tubihttp_isHttps_
@@ -59,6 +60,7 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     url: url
     start: m.start
     handleEvent: m.handleEvent
+    hasData: m.hasData
     runSynchronous: m.runSynchronous
     cancel: m.cancel
     name: name  ' human-friendly name for the request
@@ -99,7 +101,9 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   end if
 
   if m.params.Count() > 0 then
-    m.urltransfer.SetUrl(m.addParamsToUrl_(m.url, m.params))
+    fullUrl = m.addParamsToUrl_(m.url, m.params)
+    m.urltransfer.SetUrl(fullUrl)
+    m.url = fullUrl
   else
     m.urltransfer.SetUrl(m.url)
   end if
@@ -230,6 +234,18 @@ Function tubihttp_handleEvent(message As Object) As Object
   return invalid
 End Function
 
+
+'''''''''''''''''''''''
+' hasData
+'
+' small helper to check if the request has returned data and can be acted on
+Function tubihttp_hasData() as Boolean
+  if m.response <> invalid and m.response.data <> invalid and m.response.data.len() > 0
+    return true
+  end if
+
+  return false
+End Function
 
 
 '''''''''''''''''''''''

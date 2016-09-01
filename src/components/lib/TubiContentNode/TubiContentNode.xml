@@ -21,6 +21,9 @@
     <field id="slug" type="string" />
     <field id="bookmarkId" type="string" />
     <field id="seriesId" type="string" />
+    <field id="nowPos" type="int" />
+    <field id="historyId" type="string" />
+    <field id="currentEpisodeId" type="string" />
     
     <!-- these will come in for paginated responses -->
     <field id="totalCount" type="int" />

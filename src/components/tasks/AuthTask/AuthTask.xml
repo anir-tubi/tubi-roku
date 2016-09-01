@@ -12,9 +12,19 @@
     <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
 
     <interface>
       <!-- Set to the response body -->
       <field id="authInfo" type="assocarray" alwaysNotify="true" />
+      <field id="initialBookmarks" type="string" alwaysNotify="true" />
+      <field id="initialHistory" type="string" alwaysNotify="true" />
+      
+      <!-- addBookmark -->
+      <field id="content" type="node" />
+      <field id="bookmarkId" type="string" alwaysNotify="true" />
+      
+      <!-- removeFromHistory, removeFromQueue -->
+      <field id="result" type="assocarray" alwaysNotify="true" />
     </interface>
 </component>

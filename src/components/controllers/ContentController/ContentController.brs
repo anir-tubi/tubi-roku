@@ -9,6 +9,15 @@ Function init()
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.global.constants.ui.colors.backgroundColor
 
+  m.global.addField("bookmarkIds", "assocarray", false)
+  m.global.addField("historyIds", "assocarray", false)
+  m.global.addField("bookmarkOrder", "stringarray", false)
+  m.global.addField("historyOrder", "stringarray", false)
+  m.global.bookmarkIds = invalid 'these are set in handleInitialBookmarks(), once a user has logged in
+  m.global.historyIds = invalid  'these are set in handleInitialHistory(), once a user has logged in
+  m.global.bookmarkOrder = invalid  'this are set in handleInitialBookmarks(), once a user has logged in
+  m.global.historyOrder = invalid  'this are set in handleInitialHistory(), once a user has logged in
+
   m.metadataFetchTask.observeField("ready", "onMetadataTaskReady")
   m.global.metadataFetchTask.control = "RUN"
 
@@ -22,7 +31,6 @@ Function init()
   m.logOutTask = m.top.findNode("LogOutTask")
 
   initScreenStack(m.top.findNode("ScreenStack"))
-
 End Function
 
 
@@ -153,6 +161,15 @@ End Function
 
 
 ''''''''''''''''''''
+' onHistoryQueueChange
+'
+'
+Function onHistoryQueueChange()
+  if m.categoryScreen <> invalid then m.categoryScreen.dirtyUserCategories = true
+End Function
+
+
+''''''''''''''''''''
 ' onSearchSelected
 '
 ' Show the search screen
@@ -181,6 +198,9 @@ Function onSignOutSelected()
   tubiLog("ContentController.onSignOutSelected")
   if m.categoryScreen <> invalid then
     m.categoryScreen.signedIn = false
+  end if
+  if m.detailScreen <> invalid then
+    m.detailScreen.signedIn = false
   end if
 End Function
 
@@ -254,6 +274,52 @@ Function onItemDetailChange()
 End Function
 
 
+'''''''''''
+' handleInitialBookmarks
+'
+' Use the metadataFetchTask to populate the content for the user's "My Queue" category
+Function handleInitialBookmarks()
+  if m.authTask.initialBookmarks <> invalid
+    initialBookmarks = m.authTask.initialBookmarks
+    
+    'parse the initial bookmark response and create a list of bookmark server ids that will persist in the content controller
+    parsedInitialBookmarks = ParseJson(initialBookmarks)
+
+    bookmarkOrder = []
+
+    bookmarkIds = {
+      'each videos and series assocArray should look like:
+      '{contentId: bookmarkServerId, ...}
+      videos: {}
+      series: {}
+    }
+
+    for each bookmark in parsedInitialBookmarks.items
+      if bookmark.contentType = m.global.constants.uapiContentTypes.movie
+        bookmarkIds.videos[bookmark.content_id.toStr()] = bookmark.id
+
+        bookmarkOrder.push({
+          cid: history.content_id.toStr()
+          "type": m.global.constants.uapiContentTypes.movie
+        })
+
+      else if bookmark.contentType = m.global.constants.uapiContentTypes.series
+        bookmarkIds.series[bookmark.content_id.toStr()] = bookmark.id
+
+        bookmarkOrder.push({
+          cid: history.content_id.toStr()
+          "type": m.global.constants.uapiContentTypes.series
+        })
+      end if
+    end for
+
+    m.global.bookmarkIds = bookmarkIds
+    m.global.bookmarkOrder = bookmarkOrder
+
+  end if
+End Function
+
+
 '''''''''''''''''''''
 ' showDetailScreen
 '
@@ -263,5 +329,75 @@ Function showDetailScreen(content)
   m.detailScreen.shortContent = content
   m.detailScreen.observeField("playContent", "onPlay")
   m.detailScreen.observeField("resumeContent", "onResume")
+  m.detailScreen.observeField("signInSelected", "onSignInSelected")
+  m.detailScreen.observeField("addToQueueSelected", "onHistoryQueueChange")
+  m.detailScreen.observeField("removeFromQueueSelected", "onHistoryQueueChange")
+  m.detailScreen.observeField("removeFromHistorySelected", "onHistoryQueueChange")
+  m.detailScreen.signedIn = m.categoryScreen.signedIn
   pushScreen(m.detailScreen)
+End Function
+
+
+'''''''''''
+' handleInitialHistory
+'
+' Use the metadataFetchTask to populate the content for the user's "My Queue" category
+Function handleInitialHistory()
+  if m.authTask.initialHistory <> invalid
+
+    initialHistory = m.authTask.initialHistory
+    
+    'parse the initial bookmark response and create a list of bookmark server ids that will persist in the content controller
+    parsedInitialHistory = ParseJson(initialHistory)
+
+    historyOrder = []
+
+    historyIds = {
+      'each videos and series assocArray should look like:
+      '{contentId: {
+      '   serverId: historyServerId
+      '   position: 365
+      '  }
+      '}
+      videos: {}
+      series: {}
+    }
+
+    for each history in parsedInitialHistory.items
+      if history.contentType = m.global.constants.uapiContentTypes.movie
+        historyIds.videos[history.content_id.toStr()] = {
+          serverId: history.id
+          position: history.position
+        }
+
+        historyOrder.push({
+          cid: history.content_id.toStr()
+          "type": m.global.constants.uapiContentTypes.movie
+        })
+
+      else if history.contentType = m.global.constants.uapiContentTypes.series
+        historyIds.series[history.content_id.toStr()] = {
+          serverId: history.id
+          position: history.position          
+        }
+
+        for each episode in history.episodes
+          historyIds.videos[episode.content_id.toStr()] = {
+            serverId: episode.id
+            position: episode.position
+          }
+        end for
+
+        historyOrder.push({
+          cid: history.content_id.toStr()
+          "type": m.global.constants.uapiContentTypes.series
+        })
+
+      end if
+    end for
+
+    m.global.historyIds = historyIds
+    m.global.historyOrder = historyOrder
+
+  end if
 End Function
