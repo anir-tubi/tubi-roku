@@ -72,6 +72,10 @@
         id="SearchSignIn"
         title="Search &amp; Sign In"
         description="Find titles on TubiTV, Sign In and more."/>
+      <ContentNode
+        id="SearchSignOut"
+        title="Search &amp; Sign Out"
+        description="Find titles on TubiTV, Sign Out and more."/>
     </ContentNode>
 
     <ContentNode
@@ -145,8 +149,9 @@
     <ContentGrid
       id="PosterGrid"
       numRows="2"
-      width="1310"
+      width="1395"
       height="610"
+      scrollWidth="1310"
       itemSize="[210,300]"
       itemSpacing="[10,10]"
       itemComponentName="ContentGridItem"

@@ -1,6 +1,8 @@
 Function init()
   m.top.observeField("width", "onDimensionChange")
   m.top.observeField("height", "onDimensionChange")
+  m.top.observeField("scrollWidth", "onDimensionChange")
+  m.top.observeField("scrollHeight", "onDimensionChange")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("itemSize", "onItemSizeChange")
@@ -161,8 +163,10 @@ Function startChangeFocus(newFocusedIndex As Object) As Void
   rowRect = focusedRow.boundingRect() ' for testing Y direction
 
   ' Vertical scrolling
-  if (rowRect.y + rowRect.height + m.contents.translation[1]) > m.top.height then
-    newY = m.top.height - rowRect.y - rowRect.height
+  vertLimit = m.top.scrollHeight
+  if vertLimit = 0 then vertLimit = m.top.height
+  if (rowRect.y + rowRect.height + m.contents.translation[1]) > vertLimit then
+    newY = vertLimit - rowRect.y - rowRect.height
   else if (rowRect.y + m.contents.translation[1]) < 0 then
     newY = -rowRect.y
   else
@@ -170,8 +174,10 @@ Function startChangeFocus(newFocusedIndex As Object) As Void
   end if
 
   ' Horizontal scrolling
-  if (itemRect.x + itemRect.width + m.contents.translation[0]) > m.top.width then
-    newX = m.top.width - itemRect.x - itemRect.width
+  horizLimit = m.top.scrollWidth
+  if horizLimit = 0 then horizLimit = m.top.width
+  if (itemRect.x + itemRect.width + m.contents.translation[0]) > horizLimit then
+    newX = horizLimit - itemRect.x - itemRect.width
   else if (itemRect.x + m.contents.translation[0]) < 0 then
     newX = -itemRect.x
   else

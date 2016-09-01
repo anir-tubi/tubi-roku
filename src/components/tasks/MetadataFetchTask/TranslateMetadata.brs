@@ -8,12 +8,37 @@
 Function translateMetadata(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
 
+  ' Cache a few values we don't want to look up from m.global each call to translateRecursive.
+  ' Timings here were reduced from 33ms to 2ms per content item by not referencing m.global in
+  ' the recursive function below.
+  if m.global.bookmarkIds <> invalid then
+    m.bookmarkIds = {
+      series: {}
+      videos: {}
+    }
+    m.bookmarkIds.series.append(m.global.bookmarkIds.series)
+    m.bookmarkIds.videos.append(m.global.bookmarkIds.videos)
+  end if
+  if m.global.historyIds <> invalid then
+    m.historyIds = {
+      series: {}
+      videos: {}
+    }
+    m.historyIds.series.append(m.global.historyIds.series)
+    m.historyIds.videos.append(m.global.historyIds.videos)
+  end if
+  m.captionMode = m.global.constants.deviceInfo.captionsMode
+  m.contentTypes = {}
+  m.contentTypes.append(m.global.constants.ui.contentTypes)
+
+  node_count = 0
+
   if contentToTranslate <> invalid
     'expect a list of categories with one category filled with content or a list of contents
     if type(contentToTranslate) = "roArray"
       for each content in contentToTranslate
         node = translated.createChild("TubiContentNode")
-        translateRecursive(content, node)
+        node_count = node_count + translateRecursive(content, node)
       end for
 
     'expect a single piece of content, or several (as an associative array)
@@ -21,20 +46,21 @@ Function translateMetadata(contentToTranslate) As Object
 
       'expect this to happen just for the search API
       if contentToTranslate.children <> invalid
-        translateRecursive(contentToTranslate, translated)
+        node_count = translateRecursive(contentToTranslate, translated)
       
       'expect this to happen for detail page content and history/queue content
       else
         for each content in contentToTranslate
           if contentToTranslate[content] <> invalid
             node = translated.createChild("TubiContentNode")
-            translateRecursive(contentToTranslate[content], node)
+            node_count = node_count + translateRecursive(contentToTranslate[content], node)
           end if
         end for
       end if
     end if
   end if
 
+  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
 end Function
 
@@ -59,28 +85,27 @@ End Function
 '
 ' This is a recursive function that does the heavy lifting for translateContentFromServer
 'this is a recursive function that does the heavy lifting for translateContentFromServer
-Function translateRecursive(contentFromServer, translatedContent) As Void
-  if contentFromServer = invalid then return
+Function translateRecursive(contentFromServer As Object, translatedContent As Object) As Integer
+  if contentFromServer = invalid then return 0
 
-  constants = m.constants
-  bookmarkIds = m.global.bookmarkIds
-  historyIds = m.global.historyIds
+  count = 1
+  'bookmarkIds = m.global.bookmarkIds
+  'historyIds = m.global.historyIds
 
   typeVar = "type"
   if contentFromServer[typeVar] <> invalid
     if contentFromServer[typeVar] = "c"
-      translatedContent[typeVar] = constants.ui.contentTypes.category
+      translatedContent[typeVar] = m.contentTypes.category
     else if contentFromServer[typeVar] = "v"
-      translatedContent[typeVar] = constants.ui.contentTypes.video
+      translatedContent[typeVar] = m.contentTypes.video
     else if contentFromServer[typeVar] = "s"
-      translatedContent[typeVar] = constants.ui.contentTypes.series
+      translatedContent[typeVar] = m.contentTypes.series
     else if contentFromServer[typeVar] = "a"
-      translatedContent[typeVar] = constants.ui.contentTypes.season
+      translatedContent[typeVar] = m.contentTypes.season
     end if
   end if
 
   'record keeping needed for adding series to bookmarks and previously viewed
-  ' if translatedContent.type = constants.ui.contentTypes.video and parent <> invalid and parent.parentType = constants.ui.contentTypes.series
   parent = translatedContent.getParent()
   if parent.parentId <> invalid
     translatedContent.parentId = parent.parentId
@@ -186,7 +211,7 @@ Function translateRecursive(contentFromServer, translatedContent) As Void
 
   'set the inital subtitle on/off state for the video
   if translatedContent.type = "video"
-    if constants.deviceInfo.captionsMode = "On"
+    if m.captionsMode = "On"
       translatedContent.showSubtitles = true
     else
       translatedContent.showSubtitles = false
@@ -194,32 +219,32 @@ Function translateRecursive(contentFromServer, translatedContent) As Void
   end if
 
   'add the bookmarkId if it exists
-  if bookmarkIds <> invalid
-    if translatedContent[typeVar] = constants.ui.contentTypes.series
-      if bookmarkIds.series[translatedContent.id] <> invalid
-        translatedContent.bookmarkId = bookmarkIds.series[translatedContent.id]
+  if m.bookmarkIds <> invalid
+    if translatedContent[typeVar] = m.contentTypes.series
+      if m.bookmarkIds.series[translatedContent.id] <> invalid
+        translatedContent.bookmarkId = m.bookmarkIds.series[translatedContent.id]
       end if
 
-    else if translatedContent[typeVar] = constants.ui.contentTypes.video
-      if bookmarkIds.videos[translatedContent.id] <> invalid
-        translatedContent.bookmarkId = bookmarkIds.videos[translatedContent.id]
+    else if translatedContent[typeVar] = m.contentTypes.video
+      if m.bookmarkIds.videos[translatedContent.id] <> invalid
+        translatedContent.bookmarkId = m.bookmarkIds.videos[translatedContent.id]
       end if
     end if
   end if
 
 
   'add the history info (historyId, currentEpisodeId, nowPos) if it exists
-  if historyIds <> invalid 
-    if translatedContent[typeVar] = constants.ui.contentTypes.series
-      if historyIds.series[translatedContent.id] <> invalid
-        translatedContent.historyId = historyIds.series[translatedContent.id].serverId
-        translatedContent.currentEpisodeId = historyIds.series[translatedContent.id].currentEpisodeId
+  if m.historyIds <> invalid 
+    if translatedContent[typeVar] = m.contentTypes.series
+      if m.historyIds.series[translatedContent.id] <> invalid
+        translatedContent.historyId = m.historyIds.series[translatedContent.id].serverId
+        translatedContent.currentEpisodeId = m.historyIds.series[translatedContent.id].currentEpisodeId
       end if
 
-    else if translatedContent[typeVar] = constants.ui.contentTypes.video
-      if historyIds.videos[translatedContent.id] <> invalid
-        translatedContent.historyId = historyIds.videos[translatedContent.id].serverId
-        translatedContent.nowPos = historyIds.videos[translatedContent.id].position
+    else if translatedContent[typeVar] = m.contentTypes.video
+      if m.historyIds.videos[translatedContent.id] <> invalid
+        translatedContent.historyId = m.historyIds.videos[translatedContent.id].serverId
+        translatedContent.nowPos = m.historyIds.videos[translatedContent.id].position
       end if      
 
     end if
@@ -236,9 +261,11 @@ Function translateRecursive(contentFromServer, translatedContent) As Void
 
     for each childContent in contentFromServer.children
       node = translatedContent.createChild("TubiContentNode")
-      translatedChildContent = translateRecursive(childContent, node)
+      count = count + translateRecursive(childContent, node)
     end for
 
   end if
-  
+
+  ' return the total number of children converted
+  return count  
 end Function

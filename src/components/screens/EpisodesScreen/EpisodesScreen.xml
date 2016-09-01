@@ -48,7 +48,8 @@
 
     <ContentGrid
       id="EpisodeGrid"
-      width="1196"
+      scrollWidth="1196"
+      width="1395"
       height="608"
       numRows="3"
       fillDirection="W"

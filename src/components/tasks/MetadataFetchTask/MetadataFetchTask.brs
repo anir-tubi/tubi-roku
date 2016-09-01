@@ -15,6 +15,9 @@ Function fetchLoop()
   m.queue = TubiRequestQueue().create(m.port)
   m.top.observeField("request", m.port)
   m.constants = m.global.constants   ' this should grab a thread-local copy
+  m.timespan = CreateObject("roTimeSpan")
+  m.timespan.mark()
+  m.epoch = m.timespan.TotalMilliseconds()
 
   ' Signal that we're ready for requests
   m.top.ready = true
@@ -60,6 +63,7 @@ Function beginRequest(metadataRequest) As Void
   ' store some context in the request object
   httpRequest.node = metadataRequest.node
   httpRequest.field = metadataRequest.field
+  httpRequest.request_start_time = m.timespan.TotalMilliseconds()
 
   m.queue.pushRequest(httpRequest)
 End Function
@@ -76,16 +80,21 @@ Function handleResponse(message)
 
   ' invalid can be returned if request is being retried
   if handledRequest <> invalid then
+    handledRequest.request_end_time = m.timespan.TotalMilliseconds()
     ' double check that we have our context
     if handledRequest.node <> invalid and handledRequest.field <> invalid and handledRequest.response <> invalid then
       tubiLog("MetadataFetchTask.handleResponse setting response field " + handledRequest.field)
+      tubiLog("MetadataFetchTask request duration = " + tostr(handledRequest.request_end_time - handledRequest.request_start_time))
 
       'indicates a request from the details screen. this request needs to be handled slightly differently
       if handledRequest.name = "getSingleContent"
-        handledRequest.node[handledRequest.field] = convertDetailsMetadata(handledRequest.response.data)
+        convertedMetadata = convertDetailsMetadata(handledRequest.response.data)
       else
-        handledRequest.node[handledRequest.field] = convertToContentMetadata(handledRequest.response.data)
+        convertedMetadata = convertToContentMetadata(handledRequest.response.data)
       end if
+      handledRequest.convert_end_time = m.timespan.TotalMilliseconds()
+      tubiLog("MetadataFetchTask convert duration = " + tostr(handledRequest.convert_end_time - handledRequest.request_end_time))
+      handledRequest.node[handledRequest.field] = convertedMetadata
     end if
   end if
 End Function

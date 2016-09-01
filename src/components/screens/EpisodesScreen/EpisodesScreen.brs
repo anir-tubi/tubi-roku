@@ -42,7 +42,6 @@ Function onEpisodeFocused()
     infoPanelContent.setFields(episode.getFields())
     infoPanelContent.episode_title = episode.title
     infoPanelContent.title = m.top.content.title
-    infoPanelContent.description = m.top.content.description
     m.Info.content = infoPanelContent
   end if
 End Function

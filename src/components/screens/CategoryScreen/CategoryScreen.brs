@@ -143,7 +143,11 @@ Function onContentChange() As Void
   end for
 
   ' Prepend special categories 
-  m.top.content.insertChild(m.SpecialCategories.findNode("SearchSignIn"), 0)
+  if m.top.signedIn then
+    m.top.content.insertChild(m.SpecialCategories.findNode("SearchSignOut"), 0)
+  else
+    m.top.content.insertChild(m.SpecialCategories.findNode("SearchSignIn"), 0)
+  end if
     
   m.InfoPanel.mode = "category"
   if m.top.signedIn then
@@ -196,7 +200,7 @@ Function onCategoryChange() As Void
       loadOneCategory(newCategory.id)
 
     'Search and Sign In
-    else if newCategory.title = m.global.constants.ui.categoryNames.tools
+    else if newCategory.title = m.global.constants.ui.categoryNames.signedInTools or newCategory.title = m.global.constants.ui.categoryNames.signedOutTools
       m.SignInMenu.visible = true
 
     'Continue Watching

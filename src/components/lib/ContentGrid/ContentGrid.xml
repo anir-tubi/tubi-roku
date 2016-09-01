@@ -55,9 +55,20 @@
     <field id="numRows" type="integer" value="0" />
     <field id="fillDirection" type="string" value="W" />
     
-    <!-- boundaries used for scrolling -->
+    <!-- boundaries
+    -
+    - width and height are the true visible limits of the component. scrollWidth and
+    - scrollHeight should be smaller in order to bound the limits of the focus image.
+    - This allows for content to be hanging outside the focusable area as a hint that
+    - the content can scroll further.
+    - If scrollWidth or scrollHeight are 0, they will expand to equal width or height.
+    -
+    -->
+
     <field id="width" type="float" />
     <field id="height" type="float" />
+    <field id="scrollWidth" type="float" value="0.0"/>
+    <field id="scrollHeight" type="float" value="0.0"/>
 
     <!-- Focus control -->
     <field id="itemSelected" type="integer" value="-1" alwaysNotify="true"/>

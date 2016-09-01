@@ -174,7 +174,8 @@ Function getConstants()
     'static - pre defined category names
     constants.ui.categoryNames = {}
       constants.ui.categoryNames.topCategory = "Featured"
-      constants.ui.categoryNames.tools = "Search & Sign In"
+      constants.ui.categoryNames.signedOutTools = "Search & Sign In"
+      constants.ui.categoryNames.signedInTools = "Search & Sign Out"
       constants.ui.categoryNames.history = "Continue Watching"
       constants.ui.categoryNames.queue = "My Queue"
 

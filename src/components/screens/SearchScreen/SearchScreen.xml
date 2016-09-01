@@ -92,6 +92,7 @@
       numRows="4"
       width="1750"
       height="390"
+      scrollHeight="300"
       itemSize="[210,300]"
       itemSpacing="[10,10]"
       itemComponentName="ContentGridItem"
