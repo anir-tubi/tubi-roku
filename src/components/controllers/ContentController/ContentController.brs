@@ -202,6 +202,8 @@ Function onSignOutSelected()
   if m.detailScreen <> invalid then
     m.detailScreen.signedIn = false
   end if
+  m.AuthTask.functionName = "execSignOut"
+  m.AuthTask.control = "RUN"
 End Function
 
 ''''''''''''''''''''

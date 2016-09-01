@@ -16,15 +16,13 @@ Function execGetAuthInfo()
   m.top.authInfo = Auth.getAuthInfo()
 End Function
 
-
-Function execLogOut()
-  tubiLog("AuthTask.execLogout")
-  constants = m.global.constants
+Function execSignOut()
+  tubiLog("AuthTask.execSignOut")
+  constants = m.global.constants 'single thread-local reference to avoid thread rendevue
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
-  Auth.logout() 
+  Auth.logout()
 End Function
-
 
 Function getInitialUserCategories()
   tubiLog("AuthTask.getUserCategories")
