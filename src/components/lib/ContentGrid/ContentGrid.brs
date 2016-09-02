@@ -33,12 +33,12 @@ End Function
 ''''''''''''''''''''''
 ' onItemSizeChange
 '
-' the 9-patch focus image is 13 pixels padding on each side, so we set focus image 
+' the 9-patch focus image is 7 pixels padding on each side, so we set focus image 
 ' translation and  width to account for that.
 Function onItemSizeChange() As Void
   focusPoster = m.focusBox.findNode("FocusBoxPoster")
-  focusPoster.width = m.top.itemSize[0] + 26
-  focusPoster.height = m.top.itemSize[1] + 26
+  focusPoster.width = m.top.itemSize[0] + 14
+  focusPoster.height = m.top.itemSize[1] + 14
 End Function
 
 

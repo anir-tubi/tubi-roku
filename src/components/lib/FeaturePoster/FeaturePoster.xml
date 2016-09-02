@@ -22,28 +22,28 @@
     <Poster 
       id="Background" 
       loadingBitmapUri="pkg:/images/placeholder-featured.png"
-      width="560"
-      height="280"
+      width="456"
+      height="295"
       loadDisplayMode="scaleToZoom"
       translation="[0,0]" />
 
     <Poster
       id="TitleShade"
-      uri="pkg:/images/feature-gradient-square.png"
-      width="560"
-      height="140"
-      translation="[0,140]"/>
+      uri="pkg:/images/feature-gradient.png"
+      width="456"
+      height="80"
+      translation="[0,215]"/>
 
     <Label
       id="Title"
-      width="560"
-      height="50"
-      vertAlign="bottom"
-      translation="[19,220]">
+      width="456"
+      height="45"
+      vertAlign="center"
+      translation="[19,251]">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="27" />
+        size="22" />
     </Label>
   </children>
 

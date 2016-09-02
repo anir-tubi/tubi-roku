@@ -50,13 +50,13 @@
       id="EpisodeGrid"
       scrollWidth="1196"
       width="1395"
-      height="608"
-      numRows="3"
+      height="612"
+      numRows="2"
       fillDirection="W"
       visible="false"
       translation="[525,423]"
-      itemSize="[392,196]"
-      itemSpacing="[10,10]"
+      itemSize="[456,295]"
+      itemSpacing="[20,20]"
       itemComponentName="FeaturePoster" />
     
   </children>

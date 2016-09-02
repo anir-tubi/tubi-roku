@@ -104,8 +104,8 @@
      visible="false">
       <Poster
        id="FocusBoxPoster"
-       uri="pkg:/images/frame-glow-hd3.9.png"
-       translation="[-13,-13]" 
+       uri="pkg:/images/selector.9.png"
+       translation="[-7,-7]" 
        loadDisplayMode="scaleToFit"/>
     </Group>
   </children>
