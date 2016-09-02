@@ -714,7 +714,6 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
 
   player = CreateObject("roVideoPlayer")
   player.SetMessagePort(adPort)
-  player.SetDestinationRect(canvas.GetCanvasRect())
   player.SetPositionNotificationPeriod(1)
 
   houseAdDialog = CreateObject("roMessageDialog")
@@ -1012,7 +1011,6 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
           m.videoAdErrorCount = m.videoAdErrorCount + 1
           player = CreateObject("roVideoPlayer")
           player.SetMessagePort(adPort)
-          player.SetDestinationRect(canvas.GetCanvasRect())
           player.SetPositionNotificationPeriod(1)
           player.AddContent(adUnit)
           player.Play()
