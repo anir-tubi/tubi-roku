@@ -68,9 +68,11 @@
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="22" />
       </Label>
+      <!-- This is supposed to say "Updated Wednesday" or some other data we don't have yet.
       <Label
         id="CategoryLine2"
         font="dictionary:Vaud22px"/>
+      -->
     </LayoutGroup>
     
     <LayoutGroup

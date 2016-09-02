@@ -1,7 +1,5 @@
 Function init()
   m.top.color = m.global.constants.ui.colors.transparent 
-  m.top.width = "200"
-  m.top.height = "200"
   m.top.opacity = "0.8"
   m.top.observeField("width", "onDimensionsChange")
   m.top.observeField("height", "onDimensionsChange")
@@ -31,7 +29,7 @@ Function onDimensionsChange()
   newX = (m.top.width - 200) / 2
   newY = (m.top.height - 200) / 2
   spinnerBox.translation = [newX, newY]
-  spinner = m.top.findNode("Spinner")
+  spinner = m.top.findNode("SpinnerPoster")
   newX = (m.top.width - 66) / 2
   newY = (m.top.height - 66) / 2
   spinner.translation = [newX, newY]  

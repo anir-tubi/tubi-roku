@@ -2,6 +2,8 @@ Function init()
   m.Background = m.top.findNode("Background")
   m.Title = m.top.findNode("Title")
   m.top.observeField("itemContent", "onContentChange")
+  ' this is so we can enlarge the Shade but not overhang our rect
+  m.top.clippingRect = [0.0, 0.0, 560.0, 280.0]
 End Function
 
 

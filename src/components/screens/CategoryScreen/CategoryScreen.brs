@@ -22,7 +22,7 @@ Function init()
   m.SignInMenu = m.top.findNode("SearchSignInList")
   m.SignInMenu.observeField("itemSelected", "onSignInMenuItemSelected")
   m.ContentGrid = m.PosterGrid  ' alias to simplify the code
-  m.Spinner = m.top.findNode("Spinner")
+  m.Spinner = m.top.findNode("CategorySpinner")
 
   'Sign-in menu items
   m.SearchSignInContent = m.top.findNode("SearchSignInContent")
@@ -166,7 +166,16 @@ End Function
 '
 Function onCategoryContentChange() As Void
   m.Spinner.visible = false
+
+  if m.ContentGrid.isSameNode(m.PosterGrid) then
+    if m.top.categoryContent.getChildCount() > 8 then
+      m.ContentGrid.numRows = 2
+    else
+      m.ContentGrid.numRows = 1
+    end if
+  end if
   m.ContentGrid.content = m.top.categoryContent
+
   if m.CategoryList.isInFocusChain() then
     m.InfoPanel.content.totalCount = m.top.categoryContent.getChildCount()
   end if

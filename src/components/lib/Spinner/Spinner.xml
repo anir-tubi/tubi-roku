@@ -28,11 +28,13 @@
     </Rectangle>
 
     <Poster
-      id="Spinner"
+      id="SpinnerPoster"
       scaleRotateCenter="[33,33]"
       uri="pkg:/images/spinner.png"
       height="66"
       width="66"
+      loadWidth="66"
+      loadHeight="66"
       translation="[69,70]"/>
     
     <Animation
@@ -44,7 +46,7 @@
         id="SpinnerRotationInterpolator"
         key="[0.0, 1.0]"
         keyValue="[0.0, 6.28]"
-        fieldToInterp="Spinner.rotation"/>
+        fieldToInterp="SpinnerPoster.rotation"/>
     </Animation>
   </children>
 </component>
