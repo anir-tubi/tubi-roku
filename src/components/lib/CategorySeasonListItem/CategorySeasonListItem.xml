@@ -7,8 +7,8 @@
  - the scrollinglist has focus.
  -
  -->
-<component name="CategoryListItem" extends="Rectangle" >
-  <script type="text/brightscript" uri="pkg:/components/lib/CategoryListItem/CategoryListItem.brs" />
+<component name="CategorySeasonListItem" extends="Rectangle" >
+  <script type="text/brightscript" uri="pkg:/components/lib/CategorySeasonListItem/CategorySeasonListItem.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
@@ -24,7 +24,7 @@
       vertAlign="center"
       width="342"
       height="80"
-      translation="[44,0]">
+      translation="[19,0]">
       <Font
       role="font"
       size="33"

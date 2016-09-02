@@ -4,7 +4,7 @@ Function init()
   m.Text = m.top.findNode("Text")
   m.Progress = m.top.findNode("ResumeProgressBar")
   ' Force a static size, which ScrollingList will pick up since it internal uses LayoutGroup for spacing
-  m.top.width = 465
+  m.top.width = 440
   m.top.height = 80
   m.top.color = m.global.constants.ui.colors.transparent
 End Function
@@ -26,7 +26,7 @@ Function showProgressBar(percentage As Double)
   tubiLog("DetailMenuItem.showProgressBar")
   if percentage > 1.0 then percentage = 1.0
   if percentage < 0.0 then percentage = 0.0
-  ' width of menu item is 465, 4 pixel margin for progress bar
-  m.Progress.width = 457.0 * percentage
+  ' width of menu item is 440, 4 pixel margin for progress bar
+  m.Progress.width = (m.top.width - 8.0) * percentage
   m.Progress.visible = true
 End Function

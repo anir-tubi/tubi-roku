@@ -38,11 +38,11 @@
     
     <ScrollingList
       id="Menu"
-      translation="[41, 424]"
-      width="445"
+      translation="[65, 424]"
+      width="440"
       height="616"
       itemSpacings="[9]"
-      itemComponentName="SeasonListItem"
+      itemComponentName="CategorySeasonListItem"
       visible="false"
       focusBitmapUri="pkg:/images/menu-focus.png"/>
 

@@ -34,8 +34,8 @@ Function onContentChange()
 
     ' CategoryDetails
     categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
-    if content.getChildCount() > 0
-      categoryLine1.text = stri(content.getChildCount()).trim() + " titles in this category"
+    if content.totalCount <> invalid and content.totalCount > 0 then
+      categoryLine1.text = stri(content.totalCount).trim() + " titles in this category"
     else
       categoryLine1.text = ""
     end if

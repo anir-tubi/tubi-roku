@@ -84,7 +84,7 @@
     
     <!-- These are in a layout group together because this menu should float up -->
     <LayoutGroup
-      translation="[40,61]"
+      translation="[65,61]"
       itemSpacings="[50]">
       <LayoutGroup
         layoutDirection="horiz">
@@ -92,7 +92,7 @@
         - push the InfoPanel over
         -->
       <Rectangle
-        width="45"
+        width="20"
         height="10"
         color="0x00000000"/>
       <InfoPanel
@@ -103,7 +103,7 @@
     
       <ScrollingList
         id="Menu"
-        width="465"
+        width="440"
         height="500"
         itemSpacings="[8]"
         itemComponentName="DetailMenuItem"

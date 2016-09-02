@@ -17,12 +17,14 @@
   <children>
     <Rectangle
       id="Shade"
-      opacity="0.8"/>
+      opacity="0.8"
+      visible="false"/>
     <Rectangle
       id="SpinnerBox"
       height="200"
       width="200"
-      translation="[0,0]">
+      translation="[0,0]"
+      visible="false">
     </Rectangle>
 
     <Poster

@@ -115,12 +115,12 @@
     
     <ScrollingList
       id="CategoryList"
-      translation="[41, 424]"
-      width="445"
+      translation="[65, 424]"
+      width="440"
       height="616"
       visible="true" 
       itemSpacings="[8]"
-      itemComponentName="CategoryListItem"
+      itemComponentName="CategorySeasonListItem"
       focusBitmapUri="pkg:/images/menu-focus.png">
 
     </ScrollingList>
@@ -135,17 +135,18 @@
       translation="[525,423]" >
     <!-- TODO(Chris): How do we trigger feature vs. poster grid -->
       
-      <ContentGrid
-       id="FeatureGrid"
-       numRows="3"
-       width="1196"
-       height="608"
-       itemSize="[392,196]"
-       itemSpacing="[10,10]"
-       itemComponentName="FeaturePoster"
-       fillDirection="W"
-       visible="false" 
-       translation="[0,0]"/>
+    <ContentGrid
+      id="FeatureGrid"
+      numRows="3"
+      width="1395"
+      scrollWidth="1310"
+      height="608"
+      itemSize="[392,196]"
+      itemSpacing="[10,10]"
+      itemComponentName="FeaturePoster"
+      fillDirection="W"
+      visible="false" 
+      translation="[0,0]"/>
     <ContentGrid
       id="PosterGrid"
       numRows="2"
@@ -162,9 +163,7 @@
       id="Spinner"
       width="1310"
       height="610"
-      visible="false"
-      showBox="false"
-      showShade="false"/>
+      visible="false"/>
 
     <!-- Shown when Search & Sign In special category is selected -->
     <!-- TODO(Chris): Rename the DetailMenuItem since it is reused -->

@@ -31,7 +31,7 @@ Function init()
   m.SignOutMenuItem = m.SearchSignInContent.findNode("SignOutMenuItem")
   m.AboutMenuItem = m.SearchSignInContent.findNode("AboutMenuItem")
 
-  m.defaultHeroUri = "pkg:/images/background-not-on-selection.png"
+  m.defaultHeroUri = "pkg:/images/bg-poster-tiles-merged.png"
 
   ' track the last focused screen component so that we can go back
   ' to it when focus is taken away
@@ -167,6 +167,9 @@ End Function
 Function onCategoryContentChange() As Void
   m.Spinner.visible = false
   m.ContentGrid.content = m.top.categoryContent
+  if m.CategoryList.isInFocusChain() then
+    m.InfoPanel.content.totalCount = m.top.categoryContent.getChildCount()
+  end if
 End Function
 
 
@@ -197,6 +200,7 @@ Function onCategoryChange() As Void
     if newCategory.title = m.global.constants.ui.categoryNames.topCategory
       m.ContentGrid = m.top.findNode("FeatureGrid")
       m.ContentGrid.visible = true
+      m.Spinner.visible = true
       loadOneCategory(newCategory.id)
 
     'Search and Sign In
@@ -207,6 +211,7 @@ Function onCategoryChange() As Void
     else if newCategory.title = m.global.constants.ui.categoryNames.history
       m.ContentGrid = m.top.findNode("PosterGrid")
       m.ContentGrid.visible = true
+      m.Spinner.visible = true
       loadHistory(newCategory.id)      
 
     'My Queue
@@ -219,6 +224,7 @@ Function onCategoryChange() As Void
     else
       m.ContentGrid = m.top.findNode("PosterGrid")
       m.ContentGrid.visible = true
+      m.Spinner.visible = true
       loadOneCategory(newCategory.id)
     end if
 

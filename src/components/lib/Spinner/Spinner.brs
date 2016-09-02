@@ -1,5 +1,5 @@
 Function init()
-  m.top.color = m.global.constants.ui.colors.shade 
+  m.top.color = m.global.constants.ui.colors.transparent 
   m.top.width = "200"
   m.top.height = "200"
   m.top.opacity = "0.8"
