@@ -75,7 +75,7 @@ Function Main(args As Dynamic)
         playerContent.stream = {url: playerContent.url}
         playerResult = m.global.player.playVideo(playerContent)
 
-        if playerResult = m.global.utils.constants.player.playerResult.completed
+        if playerResult = m.global.utils.constants.player.playerResults.completed
           'TODO: BRYAN, Update a field (TBD) to tell the scene graph that the video has completed
           '             So that the scene graph can advance the episode or category grids
         end if
