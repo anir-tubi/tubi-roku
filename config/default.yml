@@ -7,6 +7,7 @@ settings:
   SetPosterStyle: "rounded-rect-16x9-generic"
   adLoadingBackgroundColor: "#222223"
   adLoadingFontColor: "#EBEBEB"
+  loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
   registerWithTubi: true
   hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/11.brs"
   appName: "Tubi TV"

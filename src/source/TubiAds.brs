@@ -736,10 +736,10 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
     totalAds: adDetails.totalAds
     backgroundColor: m.constants.settings.adLoadingBackgroundColor
     fontColor: m.constants.settings.adLoadingFontColor
-    loadingUrl: m.constants.settings.loadingurl
+    loadingImageUrl: m.constants.settings.loadingImageUrl
     appId: m.constants.settings.appid
   }
-  
+
   m.showAdLoadingLayer(canvas, loadingOptions)
   canvas.Show()
 
@@ -1210,13 +1210,14 @@ end function
 '   loadingImageUrl: string, url to the background image
 '   appid: string, constants.settings.appShortName (ie. "tubitv")
 function adriseAds_showAdLoadingLayer (canvas, options)
-  displaySize = options.displaySize
+  displaySize = canvas.getCanvasRect()
   secondsLeft = options.secondsLeft
   count = options.count
   totalAds = options.totalAds
   backgroundColor = options.backgroundColor
   fontColor = options.fontColor
   loadingImageUrl = options.loadingImageUrl
+
   appId = options.appId
 
   background = {

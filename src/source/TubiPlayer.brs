@@ -366,7 +366,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
       'log an error if the video fails to play
       if msg.isRequestFailed()
 
-        errorMsg = "video with id: " + episode.id + "failed. Segment Url: " + msg.getInfo().url + " Stream Bitrate: " + msg.getInfo().streamBitrate.toStr() + " Measured Bitrate: " + msg.getInfo().measuredBitrate.toStr()  +  " Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
+        errorMsg = "video with id: " + episode.id + "failed. Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
         ' m.utils.log.error(m.playerPort, "video-fail", errorMsg)
         TubiLog("video fail")
 
