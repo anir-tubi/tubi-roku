@@ -276,52 +276,6 @@ Function onItemDetailChange()
 End Function
 
 
-'''''''''''
-' handleInitialBookmarks
-'
-' Use the metadataFetchTask to populate the content for the user's "My Queue" category
-Function handleInitialBookmarks()
-  if m.authTask.initialBookmarks <> invalid
-    initialBookmarks = m.authTask.initialBookmarks
-    
-    'parse the initial bookmark response and create a list of bookmark server ids that will persist in the content controller
-    parsedInitialBookmarks = ParseJson(initialBookmarks)
-
-    bookmarkOrder = []
-
-    bookmarkIds = {
-      'each videos and series assocArray should look like:
-      '{contentId: bookmarkServerId, ...}
-      videos: {}
-      series: {}
-    }
-
-    for each bookmark in parsedInitialBookmarks.items
-      if bookmark.contentType = m.global.constants.uapiContentTypes.movie
-        bookmarkIds.videos[bookmark.content_id.toStr()] = bookmark.id
-
-        bookmarkOrder.push({
-          cid: history.content_id.toStr()
-          "type": m.global.constants.uapiContentTypes.movie
-        })
-
-      else if bookmark.contentType = m.global.constants.uapiContentTypes.series
-        bookmarkIds.series[bookmark.content_id.toStr()] = bookmark.id
-
-        bookmarkOrder.push({
-          cid: history.content_id.toStr()
-          "type": m.global.constants.uapiContentTypes.series
-        })
-      end if
-    end for
-
-    m.global.bookmarkIds = bookmarkIds
-    m.global.bookmarkOrder = bookmarkOrder
-
-  end if
-End Function
-
-
 '''''''''''''''''''''
 ' showDetailScreen
 '
@@ -341,6 +295,28 @@ End Function
 
 
 '''''''''''
+' handleInitialBookmarks
+'
+' Use the metadataFetchTask to populate the content for the user's "My Queue" category
+Function handleInitialBookmarks()
+  if m.authTask.initialBookmarks <> invalid
+    initialBookmarks = m.authTask.initialBookmarks
+
+    constants = m.global.constants
+    Request = TubiRequest()
+    Auth = TubiAuth(constants, Request)
+    Bookmarks = TubiBookmarks(Request, Auth, constants)
+
+    bookmarkInfo = Bookmarks.handleInitialBookmarks(initialBookmarks)
+
+    m.global.bookmarkIds = bookmarkInfo.bookmarkIds
+    m.global.bookmarkOrder = bookmarkInfo.bookmarkOrder
+
+  end if
+End Function
+
+
+'''''''''''
 ' handleInitialHistory
 '
 ' Use the metadataFetchTask to populate the content for the user's "My Queue" category
@@ -348,58 +324,16 @@ Function handleInitialHistory()
   if m.authTask.initialHistory <> invalid
 
     initialHistory = m.authTask.initialHistory
-    
-    'parse the initial bookmark response and create a list of bookmark server ids that will persist in the content controller
-    parsedInitialHistory = ParseJson(initialHistory)
 
-    historyOrder = []
+    constants = m.global.constants
+    Request = TubiRequest()
+    Auth = TubiAuth(constants, Request)
+    Bookmarks = TubiBookmarks(Request, Auth, constants)
 
-    historyIds = {
-      'each videos and series assocArray should look like:
-      '{contentId: {
-      '   serverId: historyServerId
-      '   position: 365
-      '  }
-      '}
-      videos: {}
-      series: {}
-    }
+    historyInfo = Bookmarks.handleInitialHistory(initialHistory)
 
-    for each history in parsedInitialHistory.items
-      if history.contentType = m.global.constants.uapiContentTypes.movie
-        historyIds.videos[history.content_id.toStr()] = {
-          serverId: history.id
-          position: history.position
-        }
-
-        historyOrder.push({
-          cid: history.content_id.toStr()
-          "type": m.global.constants.uapiContentTypes.movie
-        })
-
-      else if history.contentType = m.global.constants.uapiContentTypes.series
-        historyIds.series[history.content_id.toStr()] = {
-          serverId: history.id
-          position: history.position          
-        }
-
-        for each episode in history.episodes
-          historyIds.videos[episode.content_id.toStr()] = {
-            serverId: episode.id
-            position: episode.position
-          }
-        end for
-
-        historyOrder.push({
-          cid: history.content_id.toStr()
-          "type": m.global.constants.uapiContentTypes.series
-        })
-
-      end if
-    end for
-
-    m.global.historyIds = historyIds
-    m.global.historyOrder = historyOrder
+    m.global.historyIds = historyInfo.historyIds
+    m.global.historyOrder = historyInfo.historyOrder
 
   end if
 End Function

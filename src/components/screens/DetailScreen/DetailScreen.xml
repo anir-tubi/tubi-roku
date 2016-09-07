@@ -37,6 +37,8 @@
     
     <!-- set to true when the user removes the title from their history -->
     <field id="removeFromHistorySelected" type="boolean" alwaysNotify="true" />
+
+
   </interface>
 
   <children>

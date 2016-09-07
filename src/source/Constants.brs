@@ -55,11 +55,9 @@ Function getConstants()
   constants.startScene = "AppScene"
 
   'the names of the registry memory sections that will save bookmark and previously viewed info
-  constants.registries = {}
-    constants.registries.bookmarks = "bookmarks" 'what queue used to be called - needed for one time content synchs
-    constants.registries.previouslyViewed = "previous" 'what history used to be called - needed for one time content synchs
-    constants.registries.queue = "queue"
-    constants.registries.history = "history"
+  constants.reqNames = {}
+    constants.reqNames.getFullBookmarks = "getFullBookmarks" 
+    constants.reqNames.getFullHistory = "getFullHistory"
 
   'Nielsen ID token for integrating with Nielsen DAR
   constants.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"

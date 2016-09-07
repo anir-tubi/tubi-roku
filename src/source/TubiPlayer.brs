@@ -111,7 +111,7 @@ function AdrisePlayer_playVideo(episode as Object)
     status = m.ads.showCommercialBreakViaRoku(canvas)
   else
     videoAdsList = m.ads.getAdsList(episode)
-    status = m.ads.showCommercialBreak(canvas, videoAdsList)
+    status = m.ads.showCommercialBreak(canvas, videoAdsList) 'videoAdsList can be invalid
   end if
 
   if status = m.constants.player.playerResults.closed
@@ -367,7 +367,8 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
       if msg.isRequestFailed()
 
         errorMsg = "video with id: " + episode.id + "failed. Segment Url: " + msg.getInfo().url + " Stream Bitrate: " + msg.getInfo().streamBitrate.toStr() + " Measured Bitrate: " + msg.getInfo().measuredBitrate.toStr()  +  " Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
-        m.utils.log.error(m.playerPort, "video-fail", errorMsg)
+        ' m.utils.log.error(m.playerPort, "video-fail", errorMsg)
+        TubiLog("video fail")
 
         m.canvas.close()
         return m.constants.player.playerResults.failed
@@ -377,7 +378,8 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
       if msg.isStreamStarted()
         if msg.getInfo().isUnderrun = true
           warningMsg = "Video buffered mid stream. Segment Url: " + msg.getInfo().url + " Stream Bitrate: " + msg.getInfo().streamBitrate.toStr() + " Measured Bitrate: " + msg.getInfo().measuredBitrate.toStr()
-          m.utils.log.warn(m.playerPort, "video-rebuffer",  warningMsg)
+          ' m.utils.log.warn(m.playerPort, "video-rebuffer",  warningMsg)
+          TubiLog("video rebuffer")
         end if
       end if
 
@@ -403,7 +405,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
         'this should give the user a reasonably correct place to resume if they hit the home button or the app crashes
         'otherwise we are saving the most recent position when ads play or they back out of the player
         if msg.GetIndex() > playerStates.lastsavedPosition + 60 or msg.GetIndex() < playerStates.lastsavedPosition - 60
-          ' m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)        
+          m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)        
           playerStates.lastsavedPosition = playerStates.nowPos
         end if
 
@@ -417,7 +419,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           list = m.ads.getCachedAdsList(episode)
           if list <> invalid
             'save the last position to memory
-            ' m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)
+            m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)
 
             'tell the video player we are stopping and going to play a set of ads
             m.canvas.close()
@@ -472,7 +474,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           'close the screen
           m.canvas.close()
           'save the last position to memory
-          ' m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)
+          m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)
           m.canvas.close()
           return m.constants.player.playerResults.closed
         end if
@@ -1109,88 +1111,13 @@ function AdrisePlayer_handleVideoFailure(episode)
 end function
 
 function AdrisePlayer_savePreviouslyViewedUpdate(episode, nowPos)
-  settings = m.utils.getSettings()
-  if m.cp = invalid
-    m.cp = GetGlobalAA().app.cp
-  end if
 
-  'set the appropriate info based on if it's a movie or episode
-  parentId = invalid
-  localUpdateId = episode.id
-  contentType = "movie"
-  userPlaylistsStore = "userPlaylistVideos"
-  contentToStore = episode
-
-  if episode.isParentSeries = true
-    parentId = episode.parentId
-    localUpdateId = parentId
-    contentType = "episode"
-    userPlaylistsStore = "userPlaylistSeries"
-    contentToStore = m.cp.getContentFromLocalPlaylists(parentId, "series")
-  end if
-
-
-  'add the content to our local stores if it doesn't already exist
-  if m.cp[userPlaylistsStore][localUpdateId] = invalid
-    m.cp[userPlaylistsStore][localUpdateId] = contentToStore
-  end if
-
-  stopLoop = false
-  'save the nowPos on our local stores so we can reference later
-  if episode.isParentSeries = true
-    'update the nowPos for the correct episode in the series
-    parentInStore = m.cp[userPlaylistsStore][localUpdateId]
-    if parentInStore <> invalid and parentInStore.playlist <> invalid and parentInStore.playlist.episodes <> invalid and parentInStore.playlist.episodes.count() > 0
-
-      for i=0 to parentInStore.playlist.episodes.count()-1 step 1
-        season = parentInStore.playlist.episodes[i]
-        if season.playlist <> invalid and season.playlist.episodes <> invalid and season.playlist.episodes.count() > 0
-
-          for j=0 to season.playlist.episodes.count()-1 step 1
-            child = season.playlist.episodes[j]
-            if child.id = episode.id
-              'update the new previously viewed/history info locally
-              child.nowPos = nowPos
-              stopLoop = true
-              exit for
-            end if
-          end for
-        end if
-
-        if stopLoop = true
-          exit for
-        end if
-      end for
-    end if
-
-  else
-    'update the nowPos for the current video
-    m.cp[userPlaylistsStore][localUpdateId].nowPos = nowPos
-  end if
-  
   'only do the following if the user is logged in
-  authInfo = m.utils.getAuthInfo()
+  authInfo = m.utils.auth.getAuthInfo()
   if authInfo.accessToken <> invalid
   
-    'send the newest nowPos to the server. we will listen for the response in the main player port event loop
-    addPreviouslyViewedReqId = m.utils.updatePreviouslyViewed(episode.id, parentId, nowPos, "add", contentType, m.playerPort)
-    if addPreviouslyViewedReqId <> invalid
-      m.previouslyViewedReqIds[addPreviouslyViewedReqId.toStr()] = true
-    end if
-    
-    'updates both video and series
-    m.cp[userPlaylistsStore][localUpdateId].isPreviouslyViewed = true
-
-    'add to the previouslyViewed episodes array so it will be included in the category on the gridscreen
-    count = 0
-    for each previousEpisode in m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes
-      if previousEpisode.id = localUpdateId
-        m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.delete(count) 'since we want to move it to the front of the list
-        exit for
-      end if
-      count = count + 1
-    end for
-    m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.unshift(m.cp[userPlaylistsStore][localUpdateId])
+    newHistoryReq = m.utils.bookmarks.addHistoryReq(episode, nowPos)
+    m.playerRequestQueue.pushRequest(newHistoryReq)
   end if
 
 end function

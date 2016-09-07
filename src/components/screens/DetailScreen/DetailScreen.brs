@@ -453,6 +453,7 @@ Function removeFromHistory()
   m.AuthTask.control = "RUN"
 End Function
 
+
 Function onHistoryRemoved()
   tubiLog("DetailScreen.onHistoryRemoved")
   m.AuthTask.unobserveField("result")
@@ -505,3 +506,6 @@ Function onHistoryRemoved()
   ' Notify the controller so that it can react
   m.top.removeFromHistorySelected = true
 End Function
+
+
+

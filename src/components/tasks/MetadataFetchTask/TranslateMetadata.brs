@@ -48,7 +48,7 @@ Function translateMetadata(contentToTranslate) As Object
       if contentToTranslate.children <> invalid
         node_count = translateRecursive(contentToTranslate, translated)
       
-      'expect this to happen for detail page content and history/queue content
+      'expect this to happen for history/queue content
       else
         for each content in contentToTranslate
           if contentToTranslate[content] <> invalid
@@ -80,6 +80,38 @@ Function translateDetailsMetadata(contentToTranslate) As Object
 End Function
 
 
+''''''''''''''''''''''
+' translateBookmarkMetadata
+'
+' Translates content from server into format that roku understands, specifically for bookmarks AND history
+' We need to run the logic a little different to keep the order as specified in m.global.bookmarkOrder or m.global.historyOrder
+' contentToTranslate should be parsed from JSON before it hits this function
+Function translateBookmarkMetadata(contentToTranslate, orderType) As Object
+  translated = CreateObject("roSGNode", "TubiContentNode")
+  nodeCount = 0
+
+  idOrder = []
+  if orderType = "bookmarks" and m.global.bookmarkOrder <> invalid
+    idOrder.append(m.global.bookmarkOrder)
+
+  else if orderType = "history" and m.global.historyOrder <> invalid
+    idOrder.append(m.global.historyOrder)
+
+  end if
+
+  for each cid in idOrder
+    content = contentToTranslate[cid]
+    if content <> invalid
+      node = translated.createChild("TubiContentNode")
+      nodeCount = nodeCount + translateRecursive(content, node)
+    end if
+  end for
+
+  return translated
+End Function
+
+
+
 '''''''''''''''''''''
 ' translateRecursive
 '
@@ -89,8 +121,6 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
   if contentFromServer = invalid then return 0
 
   count = 1
-  'bookmarkIds = m.global.bookmarkIds
-  'historyIds = m.global.historyIds
 
   typeVar = "type"
   if contentFromServer[typeVar] <> invalid

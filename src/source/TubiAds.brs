@@ -39,7 +39,7 @@ function TubiAds (utils, playerRequestQueue)
     playerRequestQueue: playerRequestQueue
 
     baseUrl: "http://ads.adrise.tv/"
-    ' baseUrl: "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
+    baseUrl: "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
 
     ' methods
     reset: adriseAds_reset
@@ -119,7 +119,7 @@ function adriseAds_cacheAdsList(episode, breakPos)
       res = m.getAdsList(episode)
     end if
 
-    if res.count() = 0
+    if res <> invalid and res.count() = 0
       res = invalid
     end if
 
@@ -435,7 +435,11 @@ function adriseAds_getAdsList(episode)
   adRequest = m.utils.request.createAsync(url, "getAdsList")
   adResponse = adRequest.runSynchronous(5)
 
-  adUnitsList = m.getAdUnitsListTraditional(episode, adResponse)
+  adUnitsList = invalid
+
+  if adResponse <> invalid
+    adUnitsList = m.getAdUnitsListTraditional(episode, adResponse)
+  end if
 
   return adUnitsList
 end function
@@ -614,34 +618,38 @@ end function
 '
 ' ----------------------------------------------
 function adriseAds_showCommercialBreak(canvas, videoAdsArray)
+
   status = "COMPLETED"
 
-  adDetails = {
-    totalAds : videoAdsArray.Count()
-    secondsLeft : m.commercialDuration
-    adCounter : 0
-  }
+  if videoAdsArray <> invalid
+    adDetails = {
+      totalAds : videoAdsArray.Count()
+      secondsLeft : m.commercialDuration
+      adCounter : 0
+    }
 
-  adCounter = 0
-  while adCounter < videoAdsArray.Count()
-    adDetails.adCounter = adDetails.adCounter + 1
-    
-      status = m.showVideoAd(canvas, videoAdsArray[adCounter], adDetails)
+    adCounter = 0
+    while adCounter < videoAdsArray.Count()
+      adDetails.adCounter = adDetails.adCounter + 1
+      
+        status = m.showVideoAd(canvas, videoAdsArray[adCounter], adDetails)
 
-    if status = "CLOSED"
-      return status
-    end if
+      if status = "CLOSED"
+        return status
+      end if
 
-    adDetails.secondsLeft = adDetails.secondsLeft - videoAdsArray[adCounter].Duration.toInt()
+      adDetails.secondsLeft = adDetails.secondsLeft - videoAdsArray[adCounter].Duration.toInt()
 
-    if status = "COMPLETED"
-      adCounter = adCounter + 1
-    else
-      canvas.Close()
-      exit while
-    end if
-  end while
+      if status = "COMPLETED"
+        adCounter = adCounter + 1
+      else
+        canvas.Close()
+        exit while
+      end if
+    end while
 
+  end if
+  
   return status
 end function
 
@@ -1077,7 +1085,7 @@ function adriseAds_checkForCommercialBreak(nowpos, episode)
 			if (breakpoint <> invalid)
         'if the player is within 4 to 7 seconds before the cue point being iterated over
         'we will only make the ad call once (logic is in m.cacheAdsList)
-				if((nowpos > breakpoint-7) and (nowpos < breakpoint-4))
+				if(nowpos = breakpoint - 5)
           'make a call to the server to get ads, and save ads in "cache" or memory
 					m.cacheAdsList(episode, breakpoint)	
 				end if
@@ -1136,7 +1144,7 @@ function adriseAds_getResumingPlayAds(episode, player)
     end if
   else
     adsList = m.getAdsList(episode)
-    if adsList.count() > 0
+    if adsList <> invalid and adsList.count() > 0
       player.resumePlayAdsList = adsList
       shouldBreak = true
     end if

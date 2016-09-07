@@ -18,6 +18,7 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object) a
     getFullHistoryReq: tubiBookmarks_getFullHistoryReq
     handleInitialBookmarks: tubiBookmarks_handleInitialBookmarks
     handleInitialHistory: tubiBookmarks_handleInitialHistory
+    updateNowPos: tubiBookmarks_updateNowPos
 
     'private methods
     createBookmarksRequest: tubiBookmarks_createBookmarksRequest_
@@ -143,13 +144,21 @@ function tubiBookmarks_addHistoryReq(content as Object, position as Integer) as 
 
   if content <> invalid
     idToServe = content.id
-    parentId = content.parentId 'is ok if parentId is invalid (ie. for movies)
+    parentId = content.parentId
 
     if content["type"] = m.constants.ui.contentTypes.video
       contentType = m.constants.uapiContentTypes.movie
-      if parentId <> invalid and parentId <> ""
-         contentType = m.constants.uapiContentTypes.episode
-       end if
+
+      'set the parentId to an intenger or invalid as needed (expect to receive it as a string which is not compatible with API)
+      if type(parentId) = "string" or type(parentId) = "roString"
+        if parentId.len() = 0
+          parentId = invalid    'is ok if parentId is invalid (ie. for movies)
+        else
+          parentId = parentId.toInt()          
+          contentType = m.constants.uapiContentTypes.episode
+        end if
+      end if
+
     else
       ' can't have history for a series, only episodes and movies
       return invalid
@@ -305,7 +314,7 @@ end function
 '                             type: contentType ("series" or "movie")
 '                           }
 function tubiBookmarks_getFullBookmarksReq(orderList as Object) as Object
-  fullBookmarksReq = m.getFullBookmarkOrHistory(orderList, "Bookmarks")
+  fullBookmarksReq = m.getFullBookmarkOrHistory(orderList, m.constants.reqNames.getFullBookmarks)
 
   return fullBookmarksReq
 end function
@@ -320,7 +329,7 @@ end function
 '                             type: contentType ("series" or "movie")
 '                           }
 function tubiBookmarks_getFullHistoryReq(orderList as Object) as Object
-  fullHistoryReq = m.getFullBookmarkOrHistory(orderList, "History")
+  fullHistoryReq = m.getFullBookmarkOrHistory(orderList, m.constants.reqNames.getFullHistory)
   
   return fullHistoryReq
 end function
@@ -329,10 +338,10 @@ end function
 
 '@orderList: array of assocArrays, an array that contains basic information returned from the initial call to get bookmarks or history and 
 '                 retains the order of the contents
-'@playlistType: string, just an identifier, not used in any logic. Typically would expect either "Bookmarks" or "History"
+'@reqName: string, the name that will be used by the request, also used to match the request in the metadataFetchTask
 '
 'returns an object that contains all the content for a metadataTaskThread, except the node and field properties (to be added after this function returns)
-function tubiBookmarks_getFullBookmarkOrHistory_(orderList as Object, playlistType as String) as Object
+function tubiBookmarks_getFullBookmarkOrHistory_(orderList as Object, reqName as String) as Object
 
   fullReq = invalid
 
@@ -347,7 +356,7 @@ function tubiBookmarks_getFullBookmarkOrHistory_(orderList as Object, playlistTy
 
   fullReq = {
     url: m.constants.urls.cms.contents
-    name: "getFull" + playlistType
+    name: reqName
     options: {
       method: m.constants.reqTypes.get
       headers: m.constants.headers.json
@@ -455,5 +464,38 @@ function tubiBookmarks_handleInitialHistory(initialHistory)
       historyOrder: historyOrder
       historyIds: historyIds
     }
+
+end function
+
+
+'@videoId: string, the content id for a video content (movie or episode)
+'@nowPos: integer, the time in seconds that the content was last watched to
+'@historyIds: assocArray, historyIds as stored on scenegraphs m.global.historyIds. Also returned from m.handleInitialHistory().historyIds
+function tubiBookmarks_updateNowPos(videoId, nowPos, historyIds)
+
+  if historyIds <> invalid
+    
+    newHistoryIds = {
+      videos: {}
+      series: {}
+    }
+
+    for each oldSeries in historyIds.series
+      newHistoryIds.series[oldSeries] = historyIds.series[oldSeries]
+    end for
+
+    for each oldVideo in historyIds.videos
+      newHistoryIds.videos[oldVideo] = historyIds.videos[oldVideo]
+
+      if videoId = oldVideo
+        newHistoryIds.videos[oldVideo].position = nowPos
+      end if
+    end for
+    
+  else
+    return invalid
+  end if
+
+  return newHistoryIds
 
 end function

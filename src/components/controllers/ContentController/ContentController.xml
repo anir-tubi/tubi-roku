@@ -37,6 +37,7 @@
       -->
     <field id="itemDetail" type="node" alwaysNotify="true" />
 
+
   </interface>
         
     <children>

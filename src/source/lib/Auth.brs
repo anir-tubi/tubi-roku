@@ -44,7 +44,7 @@ function tubiAuth_getAuthInfo()
   tubiLog("tubiAuth_getAuthInfo")
   authInfo = RegReadAll(m.authRegKey) 'returns empty assocArray if nothing in the auth registry
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
-    authInfo.expireTime = val(authInfo.expireTime)
+    authInfo.expireTime = authInfo.expireTime.toInt()
     isExpired = m.checkIfAuthExpired(authInfo)
 
     if isExpired = true
@@ -99,7 +99,7 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
   authPort = CreateObject("roMessagePort")
 
   refreshReq = m.requestTokenRefresh(authInfo, authPort)
-  
+
   if refreshReq <> invalid
 
     timer = CreateObject("roTimespan")
@@ -222,10 +222,10 @@ function tubiAuth_checkIfAuthExpired_(authInfo)
   dateTime = CreateObject("roDateTime")
   timeInSecs = dateTime.asSeconds()
 
-  if (type(authInfo.expireTime) = "Integer" or type(authInfo.expireTime) = "roInt") and timeInSecs < authInfo.expireTime
+  if (type(authInfo.expireTime) = "Integer" or type(authInfo.expireTime) = "roInteger") and timeInSecs < authInfo.expireTime
     isExpired = false
   end if
-     
+
   return isExpired
 end function
 

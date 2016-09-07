@@ -89,6 +89,14 @@ Function handleResponse(message)
       'indicates a request from the details screen. this request needs to be handled slightly differently
       if handledRequest.name = "getSingleContent"
         convertedMetadata = convertDetailsMetadata(handledRequest.response.data)
+
+      'indicates a request for the full data for bookmarks - we need to handle differently because we may need to re-arrange content order
+      else if handledRequest.name = m.constants.reqNames.getFullBookmarks
+        convertedMetadata = convertBookmarkMetadata(handledRequest.response.data, "bookmarks")
+
+      else if handledRequest.name = m.constants.reqNames.getFullBookmarks
+        convertedMetadata = convertBookmarkMetadata(handledRequest.response.data, "history")
+
       else
         convertedMetadata = convertToContentMetadata(handledRequest.response.data)
       end if
@@ -109,6 +117,20 @@ Function convertDetailsMetadata(data As String) As Object
   end if
 
   parentNode = translateDetailsMetadata(parsed)
+  
+  return parentNode
+End Function
+
+
+'convert the server response to meta data node as expected by the details screen
+Function convertBookmarkMetadata(data As String, orderType As String) As Object
+  parsed = ParseJSON(data)
+  if parsed = invalid then
+    tubiLog("MetadataFetchTask.convertBookmarkMetadata failed to parse JSON response")
+    return invalid
+  end if
+
+  parentNode = translateBookmarkMetadata(parsed, orderType)
   
   return parentNode
 End Function

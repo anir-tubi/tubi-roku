@@ -33,6 +33,7 @@ Function Main(args As Dynamic)
   requestQueue = TubiRequestQueue()
   tracking = TubiTracking(request)
   auth = TubiAuth(constants, request)
+  bookmarks = TubiBookmarks(request, auth, constants)
 
 
   m.global.utils = {
@@ -41,6 +42,7 @@ Function Main(args As Dynamic)
     requestQueue: requestQueue
     tracking: tracking
     auth: auth
+    bookmarks: bookmarks
     ' log: TubiLog()
   }
 
@@ -69,7 +71,7 @@ Function Main(args As Dynamic)
       node = msg.getNode()
       field = msg.getField()
       data = msg.getData()
-      
+
       if field = "playContent"
         playerContent = data.getFields()
         playerContent.stream = {url: playerContent.url}
@@ -80,7 +82,6 @@ Function Main(args As Dynamic)
           '             So that the scene graph can advance the episode or category grids
         end if
 
-        'TODO: BRYAN, Update the content node with new nowPos/playStart values so the scene graph can update the resume views
       end if 
     end if
 

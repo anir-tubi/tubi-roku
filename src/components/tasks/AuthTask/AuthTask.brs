@@ -1,11 +1,5 @@
 Function init()
   m.top.functionName = "execGetAuthInfo"
-  ' module loading
-  m.constants = m.global.constants  'single thread-local reference to avoid thread rendevue
-  m.Request = TubiRequest()
-  m.Queue = TubiRequestQueue()
-  m.Auth = TubiAuth(m.constants, m.Request)
-  m.Bookmarks = TubiBookmarks(m.Request, m.Auth, m.constants)  'handles user queue and view history requests
 End Function
 
 Function execGetAuthInfo()
