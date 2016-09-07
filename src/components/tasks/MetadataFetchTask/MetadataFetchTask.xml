@@ -20,18 +20,32 @@
 
     <interface>
       <!--
-      -
-      - The request param should have the following form:
-      - {
-      -   node: <node to receive content>
-      -   field: <field name on which to receive response>
-      -   url: <url to fetch>
-      -   options: <options to pass to createAsyncHTTPRequest>
-      -   name: <name to pass to createAsyncHTTPRequest>
-      - }
-      -
-      -->
+       -
+       - The request param should have the following form:
+       - {
+       -   node: <node to receive content>
+       -   field: <field name on which to receive response>
+       -   url: <url to fetch>
+       -   options: <options to pass to createAsyncHTTPRequest>
+       -   name: <name to pass to createAsyncHTTPRequest>
+       - }
+       -
+       -->
       <field id="request" type="assocarray" alwaysNotify="true"/>
+      
+      <!-- 
+       -
+       - Cancel an outstanding request that matches the node and
+       - field passed in.
+       - 
+       - Expected format:
+       - {
+       -   node: <node to receive content>
+       -   field: <field name on which to receive response>
+       - }
+       -        
+       -->
+      <field id="cancel" type="assocarray" alwaysNotify="true"/>
       
       <!-- Notify that the thread loop is up and listening
        - for requests

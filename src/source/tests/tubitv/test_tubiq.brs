@@ -9,6 +9,15 @@ Function testPushRequest(t As Object)
   t.assertEqual(q.Count(), 1)
 End Function
 
+Function testCancelRequest(t As Object)
+  q = TubiRequestQueue().create(CreateObject("roMessagePort"))
+  request = TubiRequest().createAsync("http://localhost/")
+  id = q.pushRequest(request)
+  t.assertEqual(q.Count(), 1)
+  q.cancelRequest(request)
+  t.assertEqual(q.Count(), 0)
+End Function
+
 Function testClear(t As Object)
   q = TubiRequestQueue().create(CreateObject("roMessagePort"))
   request = TubiRequest().createAsync("http://localhost/")

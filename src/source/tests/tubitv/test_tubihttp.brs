@@ -20,6 +20,8 @@ Function testCancel(t As Object)
   urltransfer = CreateObject("roUrlTransfer")
   t.assertTrue(request.start(urltransfer))
   request.cancel()
+  ' sets urltransfer to invalid after cancelling it
+  t.assertInvalid(request.urltransfer)
 End Function
 
 Function testHandleEvent(t As Object)

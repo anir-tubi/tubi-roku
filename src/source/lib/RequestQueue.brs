@@ -5,9 +5,11 @@ Function TubiRequestQueue()
     handleEvent: tubiq_handleEvent
     count: tubiq_count
     clear: tubiq_clear
+    cancelRequest: tubiq_cancelRequest
     wrapRequest: tubiq_wrapRequest_
     advanceQueue: tubiq_advanceQueue_
     findRequestById: tubiq_findRequestById_
+    findRequestByUuid: tubiq_findRequestByUuid_
   }
 End Function
 
@@ -27,10 +29,12 @@ Function createHTTPRequestQueue(port As Object, maxSize=0 As integer, timeout=30
     handleEvent: m.handleEvent
     count: m.count
     clear: m.clear
+    cancelRequest: m.cancelRequest
     ' private
     wrapRequest_: m.wrapRequest
     advanceQueue_: m.advanceQueue
     findRequestById_: m.findRequestById
+    findRequestByUuid_: m.findRequestByUuid
     queue: []
     maxSize: maxSize
     timeout: timeout
@@ -87,6 +91,22 @@ Function tubiq_handleEvent(event As Object) As Object
 End Function
 
 
+''''''''''''''''''
+' cancelRequest
+'
+' Cancel a request and remove it from the queue.  We have to add this here because
+' a Request object that is cancelled does not emit an event on which handleEvent could
+' clean up the queue.
+Function tubiq_cancelRequest(request As Object) As Boolean
+  if request <> invalid and request.uuid <> invalid then
+    i = m.findRequestByUuid_(request.uuid)
+    if i <> -1 then
+      m.queue[i].request.cancel()
+      m.queue.Delete(i)
+    end if
+  end if
+End Function
+
 '''''''''''''''''
 ' count - Return the number of requests currently in the queue
 '
@@ -109,7 +129,7 @@ Function tubiq_clear()
 End Function
 
 
-' Make our own object out of the initial reqeust
+' Make our own object out of the initial request
 Function tubiq_wrapRequest_(request As Object) As Object
   datetime = CreateObject("roDateTime")
   now = datetime.AsSeconds()
@@ -154,13 +174,21 @@ Function tubiq_advanceQueue_()
     
 End Function
 
-' Find a request in the queue by its unique id. 
+' Find a request in the queue by its urltransfer id. This is a helper for handleRequest().
 '
 ' returns the index in the queue
 Function tubiq_findRequestById_(id As Integer) As Integer
   for i=0 to m.queue.Count() - 1
     entry = m.queue[i]
     if entry.urltransfer <> invalid and entry.urltransfer.GetIdentity() = id then return i
+  end for
+  return -1
+End Function
+
+Function tubiq_findRequestByUuid_(uuid As String) As Integer
+  for i=0 to m.queue.Count() - 1
+    entry = m.queue[i]
+    if entry.request.uuid <> invalid and entry.request.uuid = uuid then return i
   end for
   return -1
 End Function

@@ -29,6 +29,8 @@ End Function
 '
 Function createAsyncHTTPRequest(url as String, name = "" as String, options={} as Object) as Object
 
+  deviceInfo = CreateObject("roDeviceInfo")
+
   ' sanitize
   validRequestTypes = {
     POST: true
@@ -65,6 +67,9 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     cancel: m.cancel
     name: name  ' human-friendly name for the request
     response: invalid
+    uuid: deviceInfo.GetRandomUUID()  ' since this object is not 1-to-1 with roUrlTransfer
+                                      ' instance, we create our own unique id, helpful for
+                                      ' cancellations
 
     ' private
     addParamsToUrl_: m.addParamsToUrl

@@ -14,6 +14,7 @@ Function fetchLoop()
   m.port = CreateObject("roMessagePort")
   m.queue = TubiRequestQueue().create(m.port)
   m.top.observeField("request", m.port)
+  m.top.observeField("cancel", m.port)
   m.constants = m.global.constants   ' this should grab a thread-local copy
   m.timespan = CreateObject("roTimeSpan")
   m.timespan.mark()
@@ -30,6 +31,8 @@ Function fetchLoop()
       if msg.GetField() = "request" then
         tubiLog("Received roSGNodeEvent for field " + msg.GetField())
         beginRequest(msg.GetData())
+      else if msg.GetField() = "cancel" then
+        cancelRequests(msg.GetData())
       end if
     else if type(msg) = "roUrlEvent" then
       handleResponse(msg)
@@ -44,6 +47,7 @@ End Function
 ' process an incoming for metadata
 '
 Function beginRequest(metadataRequest) As Void
+  tubiLog("MetadataFetchTask.beginRequest")
   if metadataRequest.node = invalid or type(metadataRequest.node) <> "roSGNode" then
     tubiLog("MetadataFetchTask.beginRequest: invalid 'node' argument")
     return
@@ -66,6 +70,22 @@ Function beginRequest(metadataRequest) As Void
   httpRequest.request_start_time = m.timespan.TotalMilliseconds()
 
   m.queue.pushRequest(httpRequest)
+End Function
+
+
+'''''''''''''''''''''''
+' cancelRequests
+'
+' Cancel outstanding requests
+Function cancelRequests(metadataRequest As Object) As Void
+  tubiLog("MetadataFetchTask.cancelRequests")
+  for each entry in m.queue.queue
+    if entry.request.node.isSameNode(metadataRequest.node) and entry.request.field = metadataRequest.field then
+      tubiLog("CANCELLING REQUEST")
+      m.queue.cancelRequest(entry.request)
+    end if
+  end for
+  tubiLog("Queue size = " + stri(m.queue.count()))
 End Function
 
 

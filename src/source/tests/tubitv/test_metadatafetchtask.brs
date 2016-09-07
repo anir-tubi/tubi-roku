@@ -6,6 +6,11 @@ Function testSGMetadataFetchTask(t As Object)
   screen.SetMessagePort(port)
   screen.Show()
 
+  ' MetadataFetchTask expects constants to be set
+  sgGlobal = screen.getGlobalNode()
+  sgGlobal.addField("constants", "assocarray", false)
+  sgGlobal.constants = getConstants()
+
   ' add a place to catch the response
   scene.addField("content1", "string", true)
   scene.addField("content2", "string", true)
@@ -43,10 +48,12 @@ Function testSGMetadataFetchTask(t As Object)
     if type(msg) = "roSocketEvent" then
       connection = server.accept()
       buffer = connection.receiveStr(1024)
-      json = FormatJSON({
-        name: "content"
-        value: "12345"
-      })
+      json = FormatJSON([
+        {
+          type: "v"
+          title: "12345"
+         }
+      ])
 
       response =            "HTTP/1.1 200 OK" + Chr(13) + Chr(10)
       response = response + "Content-length: " + stri(json.len()) + Chr(13) + Chr(10)
@@ -67,7 +74,7 @@ Function testSGMetadataFetchTask(t As Object)
   task.control = "STOP" 
   screen.close()
   server.close()
-  if responses < 2 then t.fail()
+  if responses < 2 then t.fail("Reseponse < 2")
 End Function
 
 

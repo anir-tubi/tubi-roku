@@ -366,7 +366,8 @@ Function loadOneCategory(categoryId As String)
       }
     }
   }
-
+  ' first cancel any outstanding metadata requests for this screen
+  m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
   m.global.metadataFetchTask.request = request
 End Function
 
@@ -390,6 +391,8 @@ Function loadHistory(categoryId As String)
     request.node = m.top
     request.field = "categoryContent"
     
+    ' first cancel any outstanding metadata requests for this screen
+    m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
     m.global.metadataFetchTask.request = request
 
   'we haven't gotten a response for the initial bookmarks yet
@@ -421,6 +424,8 @@ Function loadBookmarks(categoryId As String)
     request.node = m.top
     request.field = "categoryContent"
 
+    ' first cancel any outstanding metadata requests for this screen
+    m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
     m.global.metadataFetchTask.request = request
   
   'we haven't gotten a response for the initial bookmarks yet
