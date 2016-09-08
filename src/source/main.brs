@@ -73,9 +73,21 @@ Function Main(args As Dynamic)
       data = msg.getData()
 
       if field = "playContent"
-        playerContent = data.getFields()
+        playerContent = data
         playerContent.stream = {url: playerContent.url}
         playerResult = m.global.player.playVideo(playerContent)
+
+        'pass the new nowPos and historyId (if necessary) to scenegraph thread
+        infoToPass = {
+          nowPos: playerContent.nowPos
+        }
+
+        if playerContent.historyId <> invalid
+          infoToPass.historyId = playerContent.historyId
+        end if
+        
+        controller.playerInfo = infoToPass
+
 
         if playerResult = m.global.utils.constants.player.playerResults.completed
           'TODO: BRYAN, Update a field (TBD) to tell the scene graph that the video has completed

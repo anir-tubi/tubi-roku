@@ -27,6 +27,7 @@ Function init()
   m.authTask.control = "RUN"
 
   m.top.observeField("itemDetail", "onItemDetailChange")
+  m.top.observeField("playerInfo", "onPlayerInfo")
 
   m.logOutTask = m.top.findNode("LogOutTask")
 
@@ -223,6 +224,7 @@ Function onAboutSelected()
   pushModal(m.aboutScreen)
 End Function
 
+
 '''''''''''''''''''
 ' onCloseAbout
 '
@@ -240,13 +242,20 @@ End Function
 ' Notify the main Brightscript thread to invoke the video player
 Function onPlay()
   tubiLog("ContentController.onPlay")
-  content = m.detailScreen.content
-  content.playstart = 0.0 'reset the start position
-  'TODO(Chris): For unauthenticated users, we need to reset any resume 
-  ' position that might have been set.  Also, when we come back from
-  ' playback, we want to redraw the detail screen to reflect the new
-  ' resume position.
-  m.top.playContent = content
+  content = getDetailScreenContent()
+  if content <> invalid then
+    content.playstart = 0.0 'reset the start position
+
+    'TODO(Chris): For unauthenticated users, we need to reset any resume 
+    ' position that might have been set.  Also, when we come back from
+    ' playback, we want to redraw the detail screen to reflect the new
+    ' resume position.
+
+    ' Don't give main BRS a reference to the contentNode
+    m.top.playContent = content.getFields()
+  else
+    tubiLog("ERROR: Play selected but content is invalid")
+  end if
 End Function
 
 
@@ -256,8 +265,31 @@ End Function
 ' Notify the main Brightscript thread to invoke the video player, resuming at the indicated location
 Function onResume()
   tubiLog("ContentController.onResume")
-  content = m.detailScreen.resumeContent
-  m.top.playContent = content
+  content = getDetailScreenContent()
+  if content <> invalid then
+    m.top.playContent = content.getFields()
+  else
+    tubiLog("ERROR: Resume selected but content is invalid")
+  end if
+End Function
+
+'
+' Helper to deduce the content, video or episode, to play or resume
+Function getDetailScreenContent()
+  content = invalid
+  if m.detailScreen.content.type = m.global.constants.ui.contentTypes.video then
+    content = m.detailScreen.content
+  else
+    selection = m.detailScreen.episodeSelection
+    series = m.detailScreen.content.getChild(selection[0])
+    if series <> invalid then
+      episode = series.getChild(selection[1])
+      if episode <> invalid then
+        content = episode
+      end if
+    end if
+  end if
+  return content
 End Function
 
 
@@ -279,12 +311,41 @@ End Function
 '''''''''''''''''''''
 ' showDetailScreen
 '
+' Is called when the nowPos is updated from the player
+Function onPlayerInfo()
+  playerInfo = m.top.playerInfo
+  tubiLog("onPlayerInfo: " + playerInfo.nowPos.toStr())
+  content = m.top.playContent
+
+  constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(constants, Request)
+  Bookmarks = TubiBookmarks(Request, Auth, constants)
+
+  'update the nowPos in the global historyIds store
+  m.global.historyIds = Bookmarks.updateNowPos(content.id, playerInfo, m.global.historyIds)
+
+  if m.detailScreen <> invalid
+    'update the nowPos on the contentNode
+    m.detailScreen.content.nowPos = playerInfo.nowPos
+
+    if playerInfo.historyId <> invalid
+      m.detailScreen.content.historyId = playerInfo.historyId
+    end if
+  end if
+
+End Function
+
+
+'''''''''''''''''''''
+' showDetailScreen
+'
 '
 Function showDetailScreen(content)
   m.detailScreen = CreateObject("roSGNode", "DetailScreen")
   m.detailScreen.shortContent = content
-  m.detailScreen.observeField("playContent", "onPlay")
-  m.detailScreen.observeField("resumeContent", "onResume")
+  m.detailScreen.observeField("playSelected", "onPlay")
+  m.detailScreen.observeField("resumeSelected", "onResume")
   m.detailScreen.observeField("signInSelected", "onSignInSelected")
   m.detailScreen.observeField("addToQueueSelected", "onHistoryQueueChange")
   m.detailScreen.observeField("removeFromQueueSelected", "onHistoryQueueChange")

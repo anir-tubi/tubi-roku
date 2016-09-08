@@ -17,11 +17,11 @@
       -->
     <field id="shortContent" type="node" />
 
-    <!-- Set to the selected movie or episode which should be played -->
-    <field id="playContent" type="node" alwaysNotify="true" />
+    <!-- set to true when the suer selects the 'Play' menu button -->
+    <field id="playSelected" type="boolean" alwaysNotify="true" />
 
-    <!-- Set to the selected movie or episode which should be resumed -->
-    <field id="resumeContent" type="node" alwaysNotify="true" />
+    <!-- set to true when the suer selects the 'Resume' menu button -->
+    <field id="resumeSelected" type="boolean" alwaysNotify="true" />
     
     <!-- set to true if the user is signed in and we want to change the experience based on that -->
     <field id="signedIn" type="boolean" value="false" />
@@ -38,6 +38,8 @@
     <!-- set to true when the user removes the title from their history -->
     <field id="removeFromHistorySelected" type="boolean" alwaysNotify="true" />
 
+    <!-- Set the to current episode selection, when 'content' field is type 'series' -->
+    <field id="episodeSelection" type="intarray" value="[-1,-1]"/>
 
   </interface>
 

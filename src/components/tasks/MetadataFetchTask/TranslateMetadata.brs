@@ -11,25 +11,7 @@ Function translateMetadata(contentToTranslate) As Object
   ' Cache a few values we don't want to look up from m.global each call to translateRecursive.
   ' Timings here were reduced from 33ms to 2ms per content item by not referencing m.global in
   ' the recursive function below.
-  if m.global.bookmarkIds <> invalid then
-    m.bookmarkIds = {
-      series: {}
-      videos: {}
-    }
-    m.bookmarkIds.series.append(m.global.bookmarkIds.series)
-    m.bookmarkIds.videos.append(m.global.bookmarkIds.videos)
-  end if
-  if m.global.historyIds <> invalid then
-    m.historyIds = {
-      series: {}
-      videos: {}
-    }
-    m.historyIds.series.append(m.global.historyIds.series)
-    m.historyIds.videos.append(m.global.historyIds.videos)
-  end if
-  m.captionMode = m.global.constants.deviceInfo.captionsMode
-  m.contentTypes = {}
-  m.contentTypes.append(m.global.constants.ui.contentTypes)
+  setTranslateGlobalsToLocal()
 
   node_count = 0
 
@@ -72,6 +54,7 @@ end Function
 ' contentToTranslate should be parsed from JSON before it hits this function
 Function translateDetailsMetadata(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
+  setTranslateGlobalsToLocal()
 
   'will affect/update the translated node that is passed in
   translateRecursive(contentToTranslate, translated)
@@ -88,6 +71,8 @@ End Function
 ' contentToTranslate should be parsed from JSON before it hits this function
 Function translateBookmarkMetadata(contentToTranslate, orderType) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
+  setTranslateGlobalsToLocal()
+  
   nodeCount = 0
 
   idOrder = []
@@ -264,7 +249,7 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
 
 
   'add the history info (historyId, currentEpisodeId, nowPos) if it exists
-  if m.historyIds <> invalid 
+  if m.historyIds <> invalid
     if translatedContent[typeVar] = m.contentTypes.series
       if m.historyIds.series[translatedContent.id] <> invalid
         translatedContent.historyId = m.historyIds.series[translatedContent.id].serverId
@@ -298,4 +283,27 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
 
   ' return the total number of children converted
   return count  
+end Function
+
+
+Function setTranslateGlobalsToLocal()
+  if m.global.bookmarkIds <> invalid then
+    m.bookmarkIds = {
+      series: {}
+      videos: {}
+    }
+    m.bookmarkIds.series.append(m.global.bookmarkIds.series)
+    m.bookmarkIds.videos.append(m.global.bookmarkIds.videos)
+  end if
+  if m.global.historyIds <> invalid then
+    m.historyIds = {
+      series: {}
+      videos: {}
+    }
+    m.historyIds.series.append(m.global.historyIds.series)
+    m.historyIds.videos.append(m.global.historyIds.videos)
+  end if
+  m.captionMode = m.global.constants.deviceInfo.captionsMode
+  m.contentTypes = {}
+  m.contentTypes.append(m.global.constants.ui.contentTypes)
 end Function

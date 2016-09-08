@@ -16,8 +16,6 @@ Function init()
   m.RemoveQueueMenuItem = m.top.findNode("RemoveQueueMenuItem")
   m.RemoveHistoryMenuItem = m.top.findNode("RemoveHistoryMenuItem")
 
-  ' The [season, episode] index when the content type is "series"
-  m.episodeSelection = [0,0]
 End Function
 
 
@@ -52,23 +50,22 @@ Function onContentChange() As Void
           episode = season.getChild(j)
           if episode.id = m.top.shortContent.id then
             tubiLog("Episode is [" + stri(i) + "," + stri(j) + "]")
-            m.episodeSelection = [i,j]
+            m.top.episodeSelection = [i,j]
           end if
         end for
       end for
     endif
 
     'TODO(Chris): Also check if there was a resume we can apply
-
     m.Info.mode = "series"
     ' clone the content object since we want the SERIES title & description, but the EPISODE details
     infoPanelContent = CreateObject("roSGNode", "TubiContentNode")   
-    episode = getEpisodeContent(m.episodeSelection)
+    episode = getEpisodeContent(m.top.episodeSelection)
     episode_title = ""
     if episode = invalid then
       ' something failed, try to get the first season-episode
-      m.episodeSelection = [0,0]
-      episode = getEpisodeContent(m.episodeSelection)
+      m.top.episodeSelection = [0,0]
+      episode = getEpisodeContent(m.top.episodeSelection)
       if episode = invalid then
         ' Protect against a series with empty season/episode content
         episode = m.top.content
@@ -100,9 +97,9 @@ End Function
 ' getEpisodeContent
 '
 Function getEpisodeContent(selection As Object) As Object
-  series = m.top.content.getChild(m.episodeSelection[0])
+  series = m.top.content.getChild(m.top.episodeSelection[0])
   if series <> invalid then
-    episode = series.getChild(m.episodeSelection[1])
+    episode = series.getChild(m.top.episodeSelection[1])
     if episode <> invalid then return episode
   end if
   return invalid
@@ -134,9 +131,12 @@ Function setMenuItems() As Void
 
   menuItems = CreateObject("roSGNode", "ContentNode")
 
-  if m.top.shortContent.nowPos <> invalid and m.top.shortContent.nowPos <> 0 then
-    m.ResumeMenuItem.playstart = m.top.shortContent.nowPos
+  if (m.top.shortContent.nowPos <> invalid and m.top.shortContent.nowPos <> 0) or (m.top.content.nowPos <> invalid and m.top.content.nowPos <> 0) then
     m.ResumeMenuItem.length = m.top.shortContent.length
+    m.ResumeMenuItem.playstart = m.top.shortContent.nowPos
+    if m.top.content.nowPos <> invalid and m.top.content.nowPos <> 0
+      m.ResumeMenuItem.playstart = m.top.content.nowPos
+    end if
     menuItems.appendChild(m.ResumeMenuItem)
   end if
 
@@ -178,19 +178,9 @@ Function onMenuItemSelected()
     print "Menu item selected: " + selection.title
 
     if selection.id = "ResumeMenuItem" then
-      if m.top.content.type = "series" then
-        m.top.resumeContent = getEpisodeContent(m.episodeSelection)
-      else
-        m.top.resumeContent = m.top.content
-      end if
+      m.top.resumeSelected = true
     else if selection.id = "PlayMenuItem" then
-      if m.top.content.type = "series" then
-        content = getEpisodeContent(m.episodeSelection)
-      else
-        content = m.top.content
-      end if
-      ' TODO: Reset not just the local resume position but also where it persists
-      m.top.playContent = content
+      m.top.playSelected = true
     else if selection.id = "EpisodesMenuItem"
       showEpisodes()
     else if selection.id = "AddQueueMenuItem" then
@@ -247,7 +237,7 @@ End Function
 ' TODO(Chris): Or show the details screen for the specific episode?
 Function onEpisodeSelected()
   tubiLog("DetailScreen.onEpisodeSelected")
-  m.episodeSelection = m.episodesScreen.episodeSelected
+  m.top.episodeSelection = m.episodesScreen.episodeSelected
   closeEpisodesScreen()
   onContentChange() ' Info panel and menu items all need updating here
 End Function

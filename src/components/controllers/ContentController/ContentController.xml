@@ -27,7 +27,7 @@
 
   <interface>
     <!-- Watched by the main brightscript thread to indicate video playback should start -->
-    <field id="playContent" type="node" alwaysNotify="true" />
+    <field id="playContent" type="assocarray" alwaysNotify="true" />
 
     <!-- Show the detail screen for the item indicated 
       - 
@@ -37,6 +37,8 @@
       -->
     <field id="itemDetail" type="node" alwaysNotify="true" />
 
+    <!-- Used to communicate the new nowPos of a video that has been played in the player -->
+    <field id="playerInfo" type="assocarray" alwaysNotify="true" />
 
   </interface>
         

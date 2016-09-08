@@ -469,28 +469,43 @@ end function
 
 
 '@videoId: string, the content id for a video content (movie or episode)
-'@nowPos: integer, the time in seconds that the content was last watched to
+'@playerInfo: assocArray, contains the new nowPos as an integer and potentially a historyId as a string
+'       {
+'         nowPos: int, the position that the content was watched to in the player
+'         historyId: string (optional), a history id as returned by the UAPI server
+'       }
 '@historyIds: assocArray, historyIds as stored on scenegraphs m.global.historyIds. Also returned from m.handleInitialHistory().historyIds
-function tubiBookmarks_updateNowPos(videoId, nowPos, historyIds)
+function tubiBookmarks_updateNowPos(videoId, playerInfo, historyIds)
 
-  if historyIds <> invalid
+  if historyIds <> invalid and playerInfo <> invalid and videoId <> invalid
     
     newHistoryIds = {
       videos: {}
       series: {}
     }
 
-    for each oldSeries in historyIds.series
-      newHistoryIds.series[oldSeries] = historyIds.series[oldSeries]
-    end for
+    if historyIds.series <> invalid
+      newHistoryIds.series.append(historyIds.series)
+    end if
 
-    for each oldVideo in historyIds.videos
-      newHistoryIds.videos[oldVideo] = historyIds.videos[oldVideo]
+    if historyIds.videos <> invalid
+      newHistoryIds.videos.append(historyIds.videos)
 
-      if videoId = oldVideo
-        newHistoryIds.videos[oldVideo].position = nowPos
+      'we only want to update if we have either an existing historyId or a new historyId
+      if (newHistoryIds.videos[videoId] <> invalid and newHistoryIds.videos[videoId].serverId <> invalid) or playerInfo.historyId <> invalid
+        'we have a new historyId so we can re-write the whole thing
+        if playerInfo.historyId <> invalid
+          newHistoryIds.videos[videoId] = {
+            serverId: playerInfo.historyId
+            position: playerInfo.nowPos
+          }
+
+        'we don't have a new historyId so we just update the nowPos
+        else 
+          newHistoryIds.videos[videoId].position = playerInfo.nowPos
+        end if
       end if
-    end for
+    end if
     
   else
     return invalid

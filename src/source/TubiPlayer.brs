@@ -66,7 +66,6 @@ function AdrisePlayer_playVideo(episode as Object)
   end if
 
   m.ads.reset()
-  episode.nowPos = 0
   m.lastPingTime = 0
   m.shouldResetPing = false
 
@@ -80,8 +79,8 @@ function AdrisePlayer_playVideo(episode as Object)
     vidOrSeries = "series"
   end if
 
-  if episode.playStart <> invalid
-    episode.nowPos = episode.playStart
+  if episode.nowPos <> invalid
+    episode.playStart = episode.nowPos
   end if
 
   m.utils.tracking.trackEvent({
@@ -475,6 +474,8 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           m.canvas.close()
           'save the last position to memory
           m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)
+          episode.nowPos = playerStates.nowPos
+
           m.canvas.close()
           return m.constants.player.playerResults.closed
         end if
@@ -646,33 +647,18 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
     'handle any async responses (usually responses to playProgress and other user events, or responses to addHistory calls
     'but can be a response to outstanding ad pixel calls)
     else if type(msg) = "roUrlEvent"
-      handled = m.playerRequestQueue.handleEvent(msg)
+      handled = m.playerRequestQueue.handleEvent(msg)  'a request object that has been handled
 
-      respObj = invalid
+      resp = invalid
       if handled <> invalid and handled.response <> invalid and handled.response.data.len() > 0
-        respObj = handled.response.data
+        resp = handled.response.data
+        parsedResp = parseJson(resp)
+
+        'check if we have the response for a history API call
+        if parsedResp <> invalid and handled.url = m.constants.urls.users.history and parsedResp.id <> invalid
+          episode.historyId = parsedResp.id
+        end if
       end if
-
-      'TODO: BRYAN, refactor when doing queue and view history  
-      ' if respObj <> invalid and m.previouslyViewedReqIds[respObj.id.toStr()] <> invalid
-      '   'we know we have a response from updating previously viewed - so update the previouslyViewedServerId where necessary
-      '   'this is necessary to make the "Remove from History" button work on the details page
-      '   if respObj.data <> invalid and respObj.data.len() > 0
-      '     addPreviouslyViewedResponse = parseJson(respObj.data)
-      '     if addPreviouslyViewedResponse.content_type <> invalid
-
-      '       if addPreviouslyViewedResponse.content_type = "series"
-      '         m.cp.userPlaylistSeries[addPreviouslyViewedResponse.content_id.toStr()].previouslyViewedServerId = addPreviouslyViewedResponse.id
-      '       else if addPreviouslyViewedResponse.content_type = "movie"
-      '         m.cp.userPlaylistVideos[addPreviouslyViewedResponse.content_id.toStr()].previouslyViewedServerId = addPreviouslyViewedResponse.id
-      '       end if
-
-      '     end if
-      '   end if
-
-      '   'since we already got a response for this request id, we don't need to store the id anymore
-      '   m.previouslyViewedReqIds.delete(respObj.id.toStr())
-      ' end if
     end if
   end while
 
