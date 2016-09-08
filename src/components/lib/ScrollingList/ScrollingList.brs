@@ -85,11 +85,14 @@ End Function
 Function onComponentFocusChange()
   tubiLog("ScrollingList.onComponentFocusChange")
   if m.top.content <> invalid and m.top.content.getChildCount() > 0 then
+    ' inform all children of focus change, in case they need to respond to it
     for i=0 to m.items.getChildCount()-1
       m.items.getChild(i).listHasFocus = m.top.isInFocusChain() 
     end for
-    ' provide a bump for listeners when focus comes back to this component
-    if m.top.isInFocusChain() then
+    ' provide a bump for listeners when focus comes back to this component. 
+    ' DON'T do it if there is a focus change in progress.  The itemFocused
+    ' event will emit on the end of the animation.
+    if m.top.isInFocusChain() and m.scrollAnimation.state = "stopped" then
       m.top.itemFocused = m.internalItemFocused
     end if
   end if

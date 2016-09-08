@@ -36,6 +36,7 @@ Function init()
   ' track the last focused screen component so that we can go back
   ' to it when focus is taken away
   m.lastFocusedComponent = m.CategoryList
+  m.featureCategoryFocused = false
 
   onSignedInChange()  ' seed the search & sign in menu
 
@@ -131,6 +132,7 @@ End Function
 ' Handle category list received
 Function onContentChange() As Void
   tubiLog("CategoryScreen.onContentChange")
+  m.CategoryList.visible = false
 
   ' Force Featured to the top of the list
   for i=0 to m.top.content.getChildCount()-1
@@ -157,7 +159,7 @@ Function onContentChange() As Void
 
   m.CategoryList.content = m.top.content
   m.CategoryList.setFocus(true)
-
+  m.featureCategoryFocused = false
 End Function
 
 
@@ -189,6 +191,25 @@ End Function
 Function onCategoryChange() As Void
   tubiLog("CategoryScreen.onCategoryChange")
   if not m.CategoryList.isInFocusChain() or m.CategoryList.content = invalid then return
+
+  ' Only on the first trigger of 'itemFocused' from the category list,
+  ' set the focus to Featured.  This has to be done here and not when
+  ' 'content' is set on ScrollingList due to a race condition.
+  if m.featureCategoryFocused = false then
+    for i=0 to m.CategoryList.content.getChildCount()-1
+      category = m.CategoryList.content.getChild(i)
+      if category.title = "Featured" then
+        tubiLog("Setting focus on Featured category")
+        m.CategoryList.animateToItem = i
+        exit for
+      end if
+    end for
+    m.featureCategoryFocused = true
+    return
+  else
+    ' We keep the categorylist hidden until Feature is focused
+    m.CategoryList.visible = true
+  end if
 
   'unobserve historyOrder and bookmarkOrder fields since if we are changing category,
   'we are no longer concerned about any categories we may have been waiting for

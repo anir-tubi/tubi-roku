@@ -118,12 +118,10 @@
       translation="[65, 424]"
       width="440"
       height="616"
-      visible="true" 
+      visible="false" 
       itemSpacings="[8]"
       itemComponentName="CategorySeasonListItem"
-      focusBitmapUri="pkg:/images/menu-focus.png">
-
-    </ScrollingList>
+      focusBitmapUri="pkg:/images/menu-focus.png"/>
     
     <InfoPanel
       id="InfoPanel"
