@@ -31,7 +31,7 @@ Function init()
   m.SignOutMenuItem = m.SearchSignInContent.findNode("SignOutMenuItem")
   m.AboutMenuItem = m.SearchSignInContent.findNode("AboutMenuItem")
 
-  m.defaultHeroUri = "pkg:/images/grid-default-blurred.png"
+  m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
 
   ' track the last focused screen component so that we can go back
   ' to it when focus is taken away

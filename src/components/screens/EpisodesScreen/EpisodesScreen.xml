@@ -18,7 +18,7 @@
       id="HeroBackground"
       loadWidth="1920"
       loadHeight="1080"
-      uri="pkg:/images/background-not-on-selection.png"
+      uri="pkg:/images/background-not-on-selection.jpg"
       loadDisplayMode="scaleToZoom"
       translation="[0,0]"/>
     

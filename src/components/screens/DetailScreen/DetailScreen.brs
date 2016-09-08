@@ -7,7 +7,7 @@ Function init()
   m.top.observeField("shortContent", "onShortContentChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
-  m.defaultHeroUri = "pkg:/images/grid-default-blurred.png"
+  m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
 
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
   m.PlayMenuItem = m.top.findNode("PlayMenuItem")

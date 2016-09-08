@@ -12,7 +12,7 @@
   <children>
     <Poster
       id="Background"
-      uri="pkg:/images/background-sign-in.png"
+      uri="pkg:/images/background-sign-in.jpg"
       width="1920"
       height="1080"
       translation="[0,0]"/>

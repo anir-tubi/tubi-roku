@@ -8,7 +8,7 @@ Function init()
   m.top.observeField("content", "onContentChange")
   m.EpisodeGrid.observeField("itemSelected", "onEpisodeSelected")
   m.EpisodeGrid.observeField("itemFocused", "onEpisodeFocused")
-  m.defaultHeroUri = "pkg:/images/grid-default-blurred.png"
+  m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
 End Function
 
 Function onSeasonChange()
