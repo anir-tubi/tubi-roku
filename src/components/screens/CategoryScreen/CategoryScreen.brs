@@ -5,10 +5,11 @@ Function init()
   m.SpecialCategories = m.top.findNode("SpecialCategories")
   m.Hero = m.top.findNode("HeroBackground")
   m.top.observeField("content", "onContentChange")
-  m.top.observeField("categoryContent", "onCategoryContentChange")
+  m.top.observeField("categoryResponse", "onCategoryContentReceived")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
+  m.top.observeField("categoryListResponse", "onCategoriesReceived")
   m.CategoryList.observeField("itemFocused","onCategoryChange")
   m.authTask = m.top.findNode("CategoryAuthTask")
 
@@ -45,6 +46,26 @@ Function init()
 End Function
 
 
+''''''''''''''''''''''''''''''
+' onCategoriesReceived
+'
+Function onCategoriesReceived()
+  tubiLog("CategoryScreen.onCategoriesReceived")
+  if m.top.categoryListResponse <> invalid then
+    response = m.top.categoryListResponse.response
+    if response.code >= 200 and response.code < 300 then
+      m.top.content = m.top.categoryListResponse.convertedMetadata
+    else
+      testLog("Category list returned " + stri(response.code))
+      showErrorModal(response.code, response.failReason, retryCategoryList, retryCategoryList)
+    end if
+  end if
+End Function
+
+' We retry in the cancel or retry cases, since there is nowhere else to go
+Function retryCategoryList()
+  loadAllCategories()
+End Function
 
 ''''''''''''''''''''''''''''
 ' onDirtyUserCategories
@@ -133,7 +154,6 @@ End Function
 Function onContentChange() As Void
   tubiLog("CategoryScreen.onContentChange")
   m.CategoryList.visible = false
-
   ' Force Featured to the top of the list
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
@@ -164,23 +184,43 @@ End Function
 
 
 ''''''''''''''''''''''''''
-' onCategoryContentChange
+' onCategoryContentReceived
 '
-Function onCategoryContentChange() As Void
-  m.Spinner.visible = false
+Function onCategoryContentReceived() As Void
+  tubiLog("CategoryScreen.onCategoryContentReceived")
+  response = m.top.categoryResponse.response
+  if response.code >= 200 and response.code < 300 then 
+    content = m.top.categoryResponse.convertedMetadata
+    m.Spinner.visible = false
 
-  if m.ContentGrid.isSameNode(m.PosterGrid) then
-    if m.top.categoryContent.getChildCount() > 8 then
-      m.ContentGrid.numRows = 2
-    else
-      m.ContentGrid.numRows = 1
+    if m.ContentGrid.isSameNode(m.PosterGrid) then
+      if content.getChildCount() > 8 then
+        m.ContentGrid.numRows = 2
+      else
+        m.ContentGrid.numRows = 1
+      end if
     end if
-  end if
-  m.ContentGrid.content = m.top.categoryContent
+    m.ContentGrid.content = content
 
-  if m.CategoryList.isInFocusChain() then
-    m.InfoPanel.content.totalCount = m.top.categoryContent.getChildCount()
+    if m.CategoryList.isInFocusChain() then
+      m.InfoPanel.content.totalCount = content.getChildCount()
+    end if
+  else
+    testLog("Category content returned " + stri(response.code))
+    showErrorModal(response.code, response.failReason, retryCategoryContent, cancelCategoryContent)
   end if
+End Function
+
+' try to reload the current category
+Function retryCategoryContent()
+  m.CategoryList.setFocus(true)
+  m.ContentGrid.id = ""  ' won't retry unless this doesn't match
+  onCategoryChange()
+End Function
+
+' Just set focus to category list
+Function cancelCategoryContent()
+  m.CategoryList.setFocus(true)
 End Function
 
 
@@ -329,7 +369,7 @@ End Function
 '
 ' Load category list plus one populated category
 Function loadAllCategories()
-  tubiLog("CategoryScreen.loadCategories")
+  tubiLog("CategoryScreen.loadAllCategories")
 
   ' TODO(Chris): This should move to a shim layer which hides specifics of the Tubi v4 API
   settings = m.global.constants.settings
@@ -339,7 +379,7 @@ Function loadAllCategories()
   request = {
     url: url
     node: m.top
-    field: "content"
+    field: "categoryListResponse"
     name: "getAllCategories"
     options: {
       params: {
@@ -375,7 +415,7 @@ Function loadOneCategory(categoryId As String)
     url: url
     name: "getCategory"    
     node: m.top
-    field: "categoryContent"
+    field: "categoryResponse"
     options: {
       params: {
         "app_id": settings.shortAppName
@@ -410,7 +450,7 @@ Function loadHistory(categoryId As String)
     request = Bookmarks.getFullHistoryReq(historyOrder)
 
     request.node = m.top
-    request.field = "categoryContent"
+    request.field = "categoryResponse"
     
     ' first cancel any outstanding metadata requests for this screen
     m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
@@ -443,7 +483,7 @@ Function loadBookmarks(categoryId As String)
     request = Bookmarks.getFullHistoryReq(bookmarkOrder)
 
     request.node = m.top
-    request.field = "categoryContent"
+    request.field = "categoryResponse"
 
     ' first cancel any outstanding metadata requests for this screen
     m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }

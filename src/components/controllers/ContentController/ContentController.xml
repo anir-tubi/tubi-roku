@@ -20,6 +20,7 @@
 
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ContentController.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ScreenStack.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ErrorModalDialog.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />

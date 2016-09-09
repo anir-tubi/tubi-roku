@@ -80,6 +80,7 @@ Function Main(args As Dynamic)
         'pass the new nowPos and historyId (if necessary) to scenegraph thread
         infoToPass = {
           nowPos: playerContent.nowPos
+          result: playerResult
         }
 
         if playerContent.historyId <> invalid
@@ -87,13 +88,6 @@ Function Main(args As Dynamic)
         end if
         
         controller.playerInfo = infoToPass
-
-
-        if playerResult = m.global.utils.constants.player.playerResults.completed
-          'TODO: BRYAN, Update a field (TBD) to tell the scene graph that the video has completed
-          '             So that the scene graph can advance the episode or category grids
-        end if
-
       end if 
     end if
 

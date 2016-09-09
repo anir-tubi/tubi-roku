@@ -101,8 +101,12 @@ Function handleResponse(message)
   ' invalid can be returned if request is being retried
   if handledRequest <> invalid then
     handledRequest.request_end_time = m.timespan.TotalMilliseconds()
+
     ' double check that we have our context
     if handledRequest.node <> invalid and handledRequest.field <> invalid and handledRequest.response <> invalid then
+      ' response should have fields: code, data, failReason
+      tubiLog("MetadataFetchTask response code was " + stri(handledRequest.response.code))
+
       tubiLog("MetadataFetchTask.handleResponse setting response field " + handledRequest.field)
       tubiLog("MetadataFetchTask request duration = " + tostr(handledRequest.request_end_time - handledRequest.request_start_time))
 
@@ -121,9 +125,12 @@ Function handleResponse(message)
         convertedMetadata = convertToContentMetadata(handledRequest.response.data)
       end if
       handledRequest.convert_end_time = m.timespan.TotalMilliseconds()
+      handledRequest.convertedMetadata = convertedMetadata
       tubiLog("MetadataFetchTask convert duration = " + tostr(handledRequest.convert_end_time - handledRequest.request_end_time))
-      handledRequest.node[handledRequest.field] = convertedMetadata
+      handledRequest.node[handledRequest.field] = handledRequest
     end if
+  else
+    tubiLog("Request handled but response was empty or node/field was invalid")
   end if
 End Function
 

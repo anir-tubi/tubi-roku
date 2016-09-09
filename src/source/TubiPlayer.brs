@@ -132,18 +132,11 @@ function AdrisePlayer_playVideo(episode as Object)
     
     status = m.showSpanOfContentVideoNew(episode)
 
-    while status = m.constants.player.playerResults.failed
-      failHandlerStatus = m.handleVideoFailure(episode)
-      if failHandlerStatus = m.constants.player.playerResults.closed
-        canvas.close()
-        return m.constants.player.playerResults.closed
-      else if failHandlerStatus = m.constants.player.playerResults.ignore
-        exit while
-      else
-        status = failHandlerStatus
-        exit while
-      end if
-    end while
+    ' return to scene graph if player failed
+    if status = m.constants.player.playerResults.failed
+      canvas.close()
+      return status
+    end if
 
     'if STOPFORCOMMERCIAL we already have a validated cached ads list, so run the ads in the cache
     if status = m.constants.player.playerResults.commercial

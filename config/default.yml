@@ -29,6 +29,7 @@ manifest:
   build_version: 1
   bs_libs_required: roku_ads_lib
   ui_resolutions: "fhd"
+  rsg_version: 1.0
 
 theme:
   ThemeType: "flat-movie"

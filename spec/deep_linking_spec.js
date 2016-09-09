@@ -1,41 +1,43 @@
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
 
-var RokuTest = require('roku-test');
-var ip = require('ip');
-var fs = require('fs');
-
-var device = new RokuTest(process.env.ROKU_DEV_TARGET, process.env.DEV_PASSWORD, RokuTest.SG);
-var testAppName = 'dev';  // this will be 'dev' for sideloaded channels
-var channelZipFile = __dirname + '/../build/tubitv_roku.zip'
-
-function launchChannel(args) {
-  console.log('Returning home');
-  device.press(RokuTest.HOME);
-  device.delay(1000);
-  console.log('Launching channel');
-  device.launchWithArgs(testAppName, args);
-  device.delay(1000);
-}
-
 describe("deep-linking", function() {
 
+  const RokuTest = require('roku-test');
+  const ip = require('ip');
+  const fs = require('fs');
+  const testAppName = 'dev';  // this will be 'dev' for sideloaded channels
+  const channelZipFile = __dirname + '/../build/tubitv_roku.zip'
+
   beforeAll(function(done) {
+    this.device = new RokuTest(process.env.ROKU_DEV_TARGET, process.env.DEV_PASSWORD, RokuTest.SG);
+
+    this.launchChannel = function(args) {
+      // helper to start the channel
+      console.log('Returning home');
+      this.device.press(RokuTest.HOME);
+      this.device.delay(1000);
+      console.log('Launching channel');
+      this.device.launchWithArgs(testAppName, args);
+      this.device.delay(1000);
+    }
+
     console.log(">> Installing test channel");
     device.install(fs.createReadStream(channelZipFile));
+    this.device.press(RokuTest.HOME);
+    this.device.delay(1000);
     done();
   });
 
   afterAll(function() {
-    device.destroyDebug();
+    this.device.destroyDebug();
   });
 
   afterEach(function() {
     // whether tests pass or fail, we don't want callbacks hanging around
-    device.removeAllListeners('debugData');
+    this.device.removeAllListeners('debugData');
     // exit the channel
-    device.press(RokuTest.HOME);
+    this.device.press(RokuTest.HOME);
   });
-
 
   ///////////////////////
   // Tests
@@ -60,7 +62,7 @@ describe("deep-linking", function() {
         done();
       }
     }); 
-    launchChannel({
+    this.launchChannel({
       contentId: "123456",
       mediaType: "movie",
       source: "meta-search"
@@ -78,12 +80,12 @@ describe("deep-linking", function() {
    */
   it("should show detail screen for series", function(done) {
     var contentId = "1079";
-    device.on('debugData', function(data) {
-      if (data.toString().match('Deep link contentId = ' + contentId) !== null) {
+    this.device.on('debugData', function(data) {
+      if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
         done();
       }
     }); 
-    launchChannel({
+    this.launchChannel({
       contentId: contentId,
       mediaType: "series",
       source: "meta-search"
@@ -103,12 +105,12 @@ describe("deep-linking", function() {
    
   it("should show detail screen for movie", function(done) {
     var contentId = "321221";
-    device.on('debugData', function(data) {
-      if (data.toString().match('Deep link contentId = ' + contentId) !== null) {
+    this.device.on('debugData', function(data) {
+      if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
         done();
       }
     }); 
-    launchChannel({
+    this.launchChannel({
       contentId: contentId,
       mediaType: "movie",
       source: "meta-search"
@@ -124,13 +126,13 @@ describe("deep-linking", function() {
    * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=episode"
    */
   it("should show detail screen with correct episode", function(done) {
-    var contentId = "321221";
-    device.on('debugData', function(data) {
-      if (data.toString().match('Deep link contentId = ' + contentId) !== null) {
+    var contentId = "302800";
+    this.device.on('debugData', function(data) {
+      if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
         done();
       }
     }); 
-    launchChannel({
+    this.launchChannel({
       contentId: contentId,
       mediaType: "episode",
       source: "meta-search"

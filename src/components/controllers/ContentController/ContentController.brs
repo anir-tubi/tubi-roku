@@ -236,6 +236,27 @@ Function onCloseAbout()
 End Function
 
 
+'''''''''''''''''''
+' onPlayerError
+'
+Function showPlayerError(errorMessage As String)
+  tubiLog("ContentController.showPlayerError")
+  showErrorModal(0, errorMessage, onRetryPlayerError, onCancelPlayerError)
+End Function
+
+Function onRetryPlayerError()
+  ' try to resume the video from the last checkpoint
+  onResume()
+End Function
+
+Function onCancelPlayerError()
+  top = currentScreen()
+  if top <> invalid then
+    top.setFocus(true)
+  end if
+End Function
+
+
 '''''''''''
 ' onPlay
 '
@@ -334,6 +355,11 @@ Function onPlayerInfo()
     end if
   end if
 
+  if playerInfo.result = m.global.constants.player.playerResults.failed then
+    showPlayerError(playerInfo.result)
+  end if
+
+  'TODO: BRYAN, advance the episode
 End Function
 
 

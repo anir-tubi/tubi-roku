@@ -31,3 +31,8 @@ Function formatDialog()
   newY = (1080 - m.DialogBox.height) / 2.0
   m.DialogBox.translation = [m.DialogBox.translation[0], newY]
 End Function
+
+Function onKeyEvent(key As String, press As Boolean) As Boolean
+  ' absorb all key presses when modal is showing
+  return true
+End Function

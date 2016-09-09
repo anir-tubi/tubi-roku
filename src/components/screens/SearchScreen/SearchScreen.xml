@@ -10,6 +10,8 @@
 
     <!-- where the search results are stored -->
     <field id="content" alias="ResultGrid.content" />
+    
+    <field id="searchResponse" type="assocarray" alwaysNotify="true"/>
   </interface>
   
   <children>

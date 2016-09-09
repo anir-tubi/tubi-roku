@@ -18,11 +18,23 @@ Function init()
   m.SearchHintOpacityInterpolator = m.top.findNode("SearchHintOpacityInterpolator")
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
+  m.top.observeField("searchResponse", "onSearchResultsReceived")
 
   ' While we aren't loading a seeded "Trending Searches", set the text to focus color
   m.SearchText.color = m.global.constants.ui.colors.focused ' default is white when no search term is entered
 End Function
 
+
+Function onSearchResultsReceived()
+  tubiLog("SearchScreen.onSearchResultsReceived")
+  response = m.top.searchResponse.response
+  if response.code >= 200 and response.code < 300 then 
+    m.top.content = m.top.searchResponse.convertedMetadata
+  else
+    'TODO(Chris): Show error modal here
+      testLog("Search results returned " + stri(response.code))
+  end if
+End Function
 
 '''''''''''''''''''''''''
 ' onScreenFocusChange
@@ -162,7 +174,7 @@ Function loadSearchResults()
   request = {
     url: urlBase + "/search"
     node: m.top
-    field: "content"
+    field: "searchResponse"
     options: {
       params: {
         app_id: settings.shortAppName

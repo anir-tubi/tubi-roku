@@ -6,6 +6,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ErrorModalDialog.brs" />
   
   <interface>
     <!-- The only content expected by the CategoryScreen is the
@@ -27,7 +28,11 @@
     -->
     <field id="content" type="node" />
 
-    <field id="categoryContent" type="node" />
+    <!-- MetadataFetchTask response for single category content -->
+    <field id="categoryResponse" type="assocarray" alwaysNotify="true"/>
+    
+    <!-- MetadataFetchTask response for category list -->
+    <field id="categoryListResponse" type="assocarray" alwaysNotify="true"/>
 
     <!-- will be populated with the full (unparsed) bookmark response -->
     <field id="bookmarks" type="string" />

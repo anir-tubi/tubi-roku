@@ -6,6 +6,8 @@ Function init()
   m.top.observeField("content", "onContentChange")
   m.top.observeField("shortContent", "onShortContentChange")
   m.top.observeField("signedIn", "onSignedInChange")
+  m.top.observeField("contentDetailResponse", "onContentReceived")
+  m.top.observeField("focusedChild", "onScreenFocusChange")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
   m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
 
@@ -16,6 +18,35 @@ Function init()
   m.RemoveQueueMenuItem = m.top.findNode("RemoveQueueMenuItem")
   m.RemoveHistoryMenuItem = m.top.findNode("RemoveHistoryMenuItem")
 
+End Function
+
+Function onScreenFocusChange()
+  tubiLog("DetailScreen.onScreenFocusChange")
+  if m.top.hasFocus() then
+    ' defaulted to screen, move to a subcomponent
+    m.Menu.setFocus(true)
+  end if
+End Function
+
+Function onContentReceived()
+  response = m.top.contentDetailResponse.response
+  if response.code >= 200 and response.code < 300 then 
+    m.top.content = m.top.contentDetailResponse.convertedMetadata
+  else
+    'TODO(Chris): Show error modal here
+    testLog("Content detail returned " + stri(response.code))
+    showErrorModal(response.code, response.failReason, retryContentDetail, cancelContentDetail)
+  end if
+End Function
+
+' Trigger reload via shortContent field
+Function retryContentDetail()
+  m.top.shortContent = m.top.shortContent
+End Function
+
+' If we can't get content, nothing else to do but exit
+Function cancelContentDetail()
+  m.top.setFocus(true)
 End Function
 
 
@@ -277,7 +308,7 @@ Function loadContentDetails(content)
   request = {
     url: url
     node: m.top
-    field: "content"
+    field: "contentDetailResponse"
     options: {
       params: {
         "app_id": settings.shortAppName
