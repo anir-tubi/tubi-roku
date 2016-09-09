@@ -48,10 +48,13 @@ Function Main(args As Dynamic)
 
   m.global.player = TubiPlayer(m.global.utils)
 
+  ' apply hotpatch to main brightscript thread
+  Hotpatch(settings.hotPatchUrl)
+
+  ' start teh scene graph UI
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
   sgGlobal.constants = m.global.utils.constants
-
   controller = screen.CreateScene("ContentController")
   screen.show()
 
@@ -94,6 +97,42 @@ Function Main(args As Dynamic)
   end while
 
 end Function
+
+
+''''''''''''''
+' Hotpatch
+'
+' Download .brs code from a hotpatch URL and execute it 
+Function Hotpatch(hotPatchUrl)
+  if len(hotPatchUrl) > 5
+    port = CreateObject("roMessagePort")
+    transfer = CreateObject("roUrlTransfer")
+    transfer.SetMessagePort(port)
+    transfer.setUrl(hotPatchUrl)
+    transfer.AsyncGetToString()
+    msg = wait(3000, transfer.GetMessagePort())
+    if type(msg) = "roUrlEvent"
+      if msg.GetResponseCode() = 200 'all good, server responded back with a hotpatch file
+        evalString = msg.GetString()
+
+        ' Eval the downloaded script
+        if len(evalString) > 10
+          errCode = eval(evalString)
+          if Type(errCode) = "Integer" and errCode=252
+            print "(hp len: " + str(len(evalString)) + ")"
+          else
+            print "evalError "; errCode
+          end if
+        end if
+      else if msg.GetResponseCode() > 0 'server responded with 403 error or similar - couldn't find the file but server up
+        print "No file at hotpatch location"
+      end if
+    else if msg = invalid
+      'no response back from hotpatch server - either server completely down or more likely user's internet is not connected
+      print "Timeout downloading hotpatch file"
+    end if
+  end if
+End Function
 
 
 '''''''''''''''
