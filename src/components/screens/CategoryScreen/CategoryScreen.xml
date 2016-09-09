@@ -139,7 +139,7 @@
       width="1395"
       scrollWidth="1310"
       height="612"
-      itemSize="[456,295]"
+      itemSize="[524,295]"
       itemSpacing="[20,20]"
       itemComponentName="FeaturePoster"
       fillDirection="W"

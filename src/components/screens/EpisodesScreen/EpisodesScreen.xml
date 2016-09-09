@@ -55,7 +55,7 @@
       fillDirection="W"
       visible="false"
       translation="[525,423]"
-      itemSize="[456,295]"
+      itemSize="[524,295]"
       itemSpacing="[20,20]"
       itemComponentName="FeaturePoster" />
     

@@ -22,7 +22,7 @@
     <Poster 
       id="Background" 
       loadingBitmapUri="pkg:/images/placeholder-featured.png"
-      width="456"
+      width="524"
       height="295"
       loadDisplayMode="scaleToZoom"
       translation="[0,0]" />
@@ -30,13 +30,13 @@
     <Poster
       id="TitleShade"
       uri="pkg:/images/feature-gradient.png"
-      width="456"
+      width="524"
       height="80"
       translation="[0,215]"/>
 
     <Label
       id="Title"
-      width="456"
+      width="524"
       height="45"
       vertAlign="center"
       translation="[19,251]">
