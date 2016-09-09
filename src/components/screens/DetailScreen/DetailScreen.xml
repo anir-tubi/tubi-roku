@@ -27,6 +27,9 @@
     <!-- set to true when the suer selects the 'Resume' menu button -->
     <field id="resumeSelected" type="boolean" alwaysNotify="true" />
     
+    <!-- set to true when the user selects the 'Episode List' menu button -->
+    <field id="episodeListSelected" type="boolean" alwaysNotify="true" />
+    
     <!-- set to true if the user is signed in and we want to change the experience based on that -->
     <field id="signedIn" type="boolean" value="false" />
     

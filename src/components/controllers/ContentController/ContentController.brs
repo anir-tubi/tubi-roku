@@ -294,6 +294,23 @@ Function onResume()
   end if
 End Function
 
+Function onEpisodeList()
+  m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
+  m.episodesScreen.content = m.detailScreen.content
+  m.episodesScreen.observeField("episodeSelected", "onEpisodeSelected")
+  pushScreen(m.episodesScreen)
+End Function
+
+Function onEpisodeSelected()
+  m.detailScreen.episodeSelection = m.episodesScreen.episodeSelected
+  popScreen()
+  m.episodesScreen = invalid
+
+  ' Autoplay the selected episode
+  onResume()
+End Function
+
+
 '
 ' Helper to deduce the content, video or episode, to play or resume
 Function getDetailScreenContent()
@@ -372,6 +389,7 @@ Function showDetailScreen(content)
   m.detailScreen.shortContent = content
   m.detailScreen.observeField("playSelected", "onPlay")
   m.detailScreen.observeField("resumeSelected", "onResume")
+  m.detailScreen.observeField("episodeListSelected", "onEpisodeList")
   m.detailScreen.observeField("signInSelected", "onSignInSelected")
   m.detailScreen.observeField("addToQueueSelected", "onHistoryQueueChange")
   m.detailScreen.observeField("removeFromQueueSelected", "onHistoryQueueChange")

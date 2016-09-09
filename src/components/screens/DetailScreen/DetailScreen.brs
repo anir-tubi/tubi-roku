@@ -8,6 +8,7 @@ Function init()
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("contentDetailResponse", "onContentReceived")
   m.top.observeField("focusedChild", "onScreenFocusChange")
+  m.top.observeField("episodeSelection", "onEpisodeSelectionChange")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
   m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
 
@@ -213,7 +214,7 @@ Function onMenuItemSelected()
     else if selection.id = "PlayMenuItem" then
       m.top.playSelected = true
     else if selection.id = "EpisodesMenuItem"
-      showEpisodes()
+      m.top.episodeListSelected = true
     else if selection.id = "AddQueueMenuItem" then
       if m.top.signedIn = true then
         'TODO(Chris): bookmark the content and update 'shortContent' which is owned by the controller
@@ -250,40 +251,13 @@ Function onDialogButton()
 End Function
 
 
-''''''''''''''''''''
-' showEpisodes
-'
-Function showEpisodes()
-  m.episodesScreen = m.top.createChild("EpisodesScreen")
-  m.episodesScreen.content = m.top.content
-  m.episodesScreen.observeField("episodeSelected", "onEpisodeSelected")
-  m.episodesScreen.setFocus(true)
-End Function
-
-
 '''''''''''''''''''''
-' onEpisodeSelected
+' onEpisodeSelectionChange
 '
-' Play the episode.  
-' TODO(Chris): Or show the details screen for the specific episode?
-Function onEpisodeSelected()
-  tubiLog("DetailScreen.onEpisodeSelected")
-  m.top.episodeSelection = m.episodesScreen.episodeSelected
-  closeEpisodesScreen()
+' Show details for the selected episode
+Function onEpisodeSelectionChange()
+  tubiLog("DetailScreen.onEpisodeSelectionChange")
   onContentChange() ' Info panel and menu items all need updating here
-End Function
-
-
-''''''''''''''''''''
-' closeEpisodesScreen
-'
-Function closeEpisodesScreen()
-  if m.episodesScreen <> invalid then
-    m.episodesScreen.unobserveField("episodeSelected")
-    m.top.removeChild(m.episodesScreen)
-    m.episodesScreen = invalid
-    m.Menu.setFocus(true)
-  end if
 End Function
 
 
