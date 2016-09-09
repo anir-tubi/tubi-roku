@@ -110,7 +110,7 @@
       id="HeroShade"
       loadWidth="1920"
       loadHeight="1080"
-      uri="pkg:/images/grid-gradient.jpg" 
+      uri="pkg:/images/grid-gradient.png" 
       translation="[0,0]"/>
     
     <ScrollingList

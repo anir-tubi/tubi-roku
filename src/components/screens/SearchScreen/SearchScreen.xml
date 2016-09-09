@@ -17,7 +17,7 @@
       id="HeroBackground"
       loadWidth="1920"
       loadHeight="1080"
-      uri="pkg:/images/search-gradient.jpg"
+      uri="pkg:/images/search-gradient.png"
       loadDisplayMode="scaleToZoom"
       translation="[0,0]"/>
     
