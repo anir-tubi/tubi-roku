@@ -38,9 +38,6 @@ function TubiAds (utils, playerRequestQueue)
     'for any async responses that we expect back
     playerRequestQueue: playerRequestQueue
 
-    baseUrl: "http://ads.adrise.tv/"
-    baseUrl: "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
-
     ' methods
     reset: adriseAds_reset
     getCommaDelimitedMidrolls: adriseAds_getCommaDelimitedMidrolls
@@ -175,7 +172,7 @@ function adriseAds_populateUrl(episode)
   end if
 
   'create the url to be used for ad calls'
-  url = m.baseUrl + "?platform=roku&appid=" + m.constants.settings.shortAppName + "&sdk=" + adSdk + "&cid=" + episode.id + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + episode.pubId + "&content-type=" + episode["type"] + isLinear + "&_=" + RND(1000000000000).ToStr()
+  url =  m.constants.urls.adsBaseUrl + "?platform=roku&appid=" + m.constants.settings.shortAppName + "&sdk=" + adSdk + "&cid=" + episode.id + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + episode.pubId + "&content-type=" + episode["type"] + isLinear + "&_=" + RND(1000000000000).ToStr()
 
   return url
 end function
