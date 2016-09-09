@@ -13,7 +13,7 @@ End Function
 
 Function onSeasonChange()
   tubiLog("EpisodesScreen.onSeasonChange")
-  m.Info.content = m.top.content.getChild(m.Menu.itemFocused)   ' season
+  setSeasonInfo(m.Menu.itemFocused)
   m.EpisodeGrid.content = m.top.content.getChild(m.Menu.itemFocused) ' season children will be shown in grid
 End Function
 
@@ -46,13 +46,23 @@ Function onEpisodeFocused()
   end if
 End Function
 
+Function setSeasonInfo(season As Integer)
+  ' Display the series description when the season is being selected
+  seasonContent = m.top.content.getChild(season)   ' season
+  infoContent = CreateObject("roSGNode", "TubiContentNode")
+  infoContent.setFields(seasonContent.getFields())
+  infoContent.description = m.top.content.description ' series description
+  infoContent.totalCount = seasonContent.getChildCount()
+  m.Info.mode = "season"
+  m.Info.content = infoContent
+End Function
+
 Function onContentChange()
   tubiLog("EpisodesScreen.onContentChange")
 
   ' The Scrolling list will be the seasons, the grid will be the episodes
   m.Menu.content = m.top.content
-  m.Info.mode = "season"
-  m.Info.content = m.top.content.getChild(0)   ' season
+  setSeasonInfo(0)
   m.EpisodeGrid.content = m.top.content.getChild(0) ' season children will be shown in grid
   if m.top.content.backgrounds <> invalid and m.top.content.backgrounds.count() > 0 then 
     m.Hero.uri = m.top.content.backgrounds[0]

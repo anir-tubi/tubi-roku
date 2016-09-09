@@ -76,6 +76,22 @@
     </LayoutGroup>
     
     <LayoutGroup
+      id="SeasonDetails"
+      layoutDirection="vert"
+      itemSpacings="[10]"
+      opacity="0.5"
+      visible="true">
+      <Label
+        id="SeasonLine1">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="22" />
+      </Label>
+    </LayoutGroup>
+    
+    <LayoutGroup
       id="TwoLineInfo"
       layoutDirection="vert"
       itemSpacings="[4]"

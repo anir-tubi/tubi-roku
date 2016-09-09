@@ -2,6 +2,7 @@ Function init()
   m.Title = m.top.findNode("Title")
   m.Episode = m.top.findNode("Episode")
   m.CategoryDetails = m.top.findNode("CategoryDetails")
+  m.SeasonDetails = m.top.findNode("SeasonDetails")
   m.TwoLineInfo = m.top.findNode("TwoLineInfo")
   m.Rating = m.top.findNode("Rating")
   m.Description = m.top.findNode("Description")
@@ -42,6 +43,14 @@ Function onContentChange()
     categoryLine2 = m.CategoryDetails.findNode("CategoryLine2")
     'TODO(Chris): Where in the API can we get "last updated" information?
     'categoryLine2.text = "Updated on Wednesday"
+
+    ' SeasonDetails
+    seasonLabel = m.SeasonDetails.findNode("SeasonLine1")
+    if content.totalCount <> invalid and content.totalCount > 0 then
+      seasonLabel.text = stri(content.totalCount).trim() + " episodes"
+    else
+      seasonLabel.text = ""
+    end if
 
     ' TwoLineInfo
     line1Label = m.TwoLineInfo.findNode("Line1")
@@ -145,8 +154,10 @@ Function onModeChange()
   else if m.top.mode = "season" then
     m.top.appendChildren([
       m.Title
+      m.SeasonDetails
+      m.Description
     ])
-    m.top.itemSpacings = []
+    m.top.itemSpacings = [52, 31]
   else if m.top.mode = "episode" then
     m.top.appendChildren([
       m.Title
