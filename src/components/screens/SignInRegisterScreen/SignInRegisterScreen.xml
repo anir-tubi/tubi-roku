@@ -18,6 +18,9 @@
     
     <!-- Set to true if the user selects the register button -->
     <field id="registerButtonSelected" type="boolean" value="false" alwaysNotify="true"/>
+
+    <!-- keeps the uri used for user tracking -->
+    <field id="trackingUri" type="string"  value="" />    
   </interface>
 
   <children>

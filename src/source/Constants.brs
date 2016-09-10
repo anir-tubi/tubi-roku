@@ -65,6 +65,9 @@ Function getConstants()
   'platform is used when communitcating with CMS API
   constants.platform = "roku"
 
+  'previously found in settings as "shortAppName"
+  constants.appName = "tubitv"
+
   constants.urls = {}
     'ad server url
     constants.urls.adsBaseUrl = "http://ads.adrise.tv/"
@@ -90,7 +93,9 @@ Function getConstants()
     constants.urls.searchBaseUrl = "http://cms.adrise.com/"
 
     'user event tracking url
-    constants.urls.trackBaseUrl = "http://cms.adrise.com/extEvent?events="
+    constants.urls.dataScience = {}
+      constants.urls.dataScience.urlBase = "https://staging-uapi.adrise.tv/datascience"
+      constants.urls.datascience.event = constants.urls.dataScience.urlBase + "/event"
 
     'cuepoints url
     constants.urls.cuepointsBaseUrl = "http://ads.adrise.tv/cue-points/"
@@ -216,11 +221,10 @@ Function getConstants()
       constants.ui.rebuilds.episode = "episode"
       constants.ui.rebuilds.closePlayer = "closePlayer"
 
-    'pages or views in the UI
-    constants.ui.pages = {}
-      constants.ui.pages.home = "home"
-      constants.ui.pages.options = "options"
-      constants.ui.pages.episodes = "episodes"
+    'screen ids in the UI
+    constants.ui.screenIds = {}
+      constants.ui.screenIds.details = "detailScreen"
+      constants.ui.screenIds.category = "categoryScreen"
 
     constants.ui.urls = {}
       'background gradient urls

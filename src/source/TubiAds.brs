@@ -740,7 +740,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
   m.showAdLoadingLayer(canvas, loadingOptions)
   canvas.Show()
 
-  m.utils.tracking.trackEvent({
+  m.utils.tracking.trackAdEvent({
     trackType:  "imp"
     adUnit: adUnit
     requestQ: adRequestQueue
@@ -878,7 +878,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
           '         bookmarkReqId = m.utils.updateBookmarks(bookmarkContent.id, "add", serverType, GetGlobalAA().app.detailScreen.detailsPort)
           '         GetGlobalAA().app.detailScreen.addBookmarkReqIds[bookmarkReqId.toStr()] = true
 
-          '         m.utils.tracking.trackEvent({
+          '         m.utils.tracking.trackUserEvent({
           '           trackType: "addBookmark"
           '           value: bookmarkContent.id
           '           ctx: "/house/" + bookmarkContent["type"] + "/" + bookmarkContent.id + "/ad/" + adUnit.id
@@ -950,7 +950,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
       else if msg.isFullResult()
         if (m.videoAdErrorCount = 0)
           if (positionPercentage >= 75)
-            m.utils.tracking.trackEvent({
+            m.utils.tracking.trackAdEvent({
               trackType: "viewthru"
               adUnit: adUnit
               adPercentage: 100
@@ -973,7 +973,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
             m.skippableOverlay.setup()
           end if
 
-          m.utils.tracking.trackEvent({
+          m.utils.tracking.trackAdEvent({
             trackType: "viewthru"
             adUnit: adUnit
             adPercentage: positionPercentage
@@ -993,7 +993,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
             lastSavedPos = nowpos
             positionPercentage = positionPercentage + 25
             if (positionPercentage < 100)
-              m.utils.tracking.trackEvent({
+              m.utils.tracking.trackAdEvent({
                 adUnit: adUnit
                 trackType: "viewthru"
                 adPercentage: positionPercentage
@@ -1027,7 +1027,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
             errorVal = adUnit.companionOverlay.url
           end if
 
-          m.utils.tracking.trackEvent({
+          m.utils.tracking.trackAdEvent({
             trackType: "adFailure"
             value:  errorVal  'the ad url
             ctx: msg.GetMessage()
@@ -1293,7 +1293,7 @@ end function
 
 function adriseAds_brightlineOnStart(roVideoPlayerEvent)
   print "BRIGHTLINE AD START EVENT"
-  m.app.utils.trackEvent({
+  m.app.utils.tracking.trackAdEvent({
     trackType:  "imp"
     adUnit: m.app.player.ads.currentAdUnit
     requestQ: m.global.player.ads.playerRequestQueue
@@ -1307,7 +1307,7 @@ end function
 function adriseAds_brightlineOnComplete (roVideoPlayerEvent)
   print "BRIGHTLINE AD COMPLETE EVENT"
   m.app.player.ads.currentAdUnit.status = "COMPLETED"
-  m.app.utils.trackEvent({
+  m.app.utils.tracking.trackAdEvent({
     trackType:  "viewthru"
     adUnit: m.app.player.ads.currentAdUnit
     adPercentage: 100
@@ -1327,7 +1327,7 @@ function adriseAds_brightlineOnPosition (roVideoPlayerEvent)
   nowPos = roVideoPlayerEvent.GetIndex()
 
   if nowPos = 0
-    m.app.utils.trackEvent({
+    m.app.utils.tracking.trackAdEvent({
       adUnit: adUnit
       trackType: "viewthru"
       adPercentage: positionPercentage
@@ -1338,7 +1338,7 @@ function adriseAds_brightlineOnPosition (roVideoPlayerEvent)
     m.app.player.ads.currentAdUnit.positionPoints.positionPercentage = positionPercentage + 25
     positionPercentage = positionPercentage + 25
     if (positionPercentage < 100)
-      m.app.utils.trackEvent({
+      m.app.utils.tracking.trackAdEvent({
           adUnit: adUnit
           trackType: "viewthru"
           adPercentage: positionPercentage

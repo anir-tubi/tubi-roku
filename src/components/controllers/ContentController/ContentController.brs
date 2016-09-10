@@ -5,6 +5,12 @@ Function init()
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
   m.global.addField("metadataFetchTask", "node", false)
   m.global.metadataFetchTask = m.metadataFetchTask
+
+  m.trackingTask = m.top.findNode("TrackingTask")
+  m.global.addField("trackingTask", "node", false)
+  m.global.trackingTask = m.trackingTask
+  m.trackingTask.observeField("ready", "onTrackingReady")
+  m.global.trackingTask.control = "RUN"
   
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.global.constants.ui.colors.backgroundColor
@@ -36,13 +42,30 @@ End Function
 
 
 '''''''''''''''''''''''''
+' onTrackingReady
+'
+' Only once we have a metadata task ready AND the user's login status
+' will we launch the UI
+Function onTrackingReady()
+  if m.trackingTask.ready = true
+    m.trackingTask.unobserveField("ready")
+    
+    m.trackingTask.trackEvent = {
+      trackType: "startApp"
+    }
+
+    startUserExperience()
+  end if
+End Function
+
+'''''''''''''''''''''''''
 ' startUserExperience
 '
 ' Only once we have a metadata task ready AND the user's login status
 ' will we launch the UI
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
-  if m.metadataFetchTask.ready and m.authInfoReceived then
+  if m.metadataFetchTask.ready and m.authInfoReceived and m.trackingTask.ready then
     if m.top.itemDetail <> invalid then
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
@@ -294,12 +317,21 @@ Function onResume()
   end if
 End Function
 
+
+
 Function onEpisodeList()
   m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
   m.episodesScreen.content = m.detailScreen.content
   m.episodesScreen.observeField("episodeSelected", "onEpisodeSelected")
+
+  if m.episodesScreen.content <> invalid and m.episodesScreen.content.id <> invalid
+    m.episodesScreen.trackingUri = m.episodesScreen.trackingUri + m.episodesScreen.content.id
+  end if
+  
   pushScreen(m.episodesScreen)
 End Function
+
+
 
 Function onEpisodeSelected()
   m.detailScreen.episodeSelection = m.episodesScreen.episodeSelected

@@ -40,6 +40,15 @@ Function pushScreen(screen As Object)
   screen.setFocus(true)
   screen.visible = true
   screen.opacity = 1.0
+  
+  'handle user tracking for navigating to screen
+  if top <> invalid
+    screenTrackingNavigate(top, screen)
+  end if
+  
+  'handle user tracking for loading screen
+  screenTrackingLoad(screen)
+
 End Function
 
 
@@ -81,7 +90,18 @@ Function popScreen()
     newTop.opacity = 1.0
     newTop.setFocus(true)
   end if
+
+  'handle user tracking for navigating to screen
+  if top <> invalid and newTop <> invalid
+    screenTrackingNavigate(top, newTop)
+  end if
+
+  'handle user tracking for loading screen
+  if newTop <> invalid
+    screenTrackingLoad(newTop)
+  end if
 End Function
+
 
 ''''''''''''''''''''
 ' currentScreen
@@ -89,4 +109,50 @@ End Function
 ' Get the current top of the screen stack 
 Function currentScreen()
   return m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-1)
+End Function
+
+
+''''''''''''''''''''
+' screenTrackingNavigate
+'
+' Get the current top of the screen stack 
+Function screenTrackingNavigate(oldScreen, newScreen)
+  'tracking for navigating to a screen
+  sourceUri = ""
+  if oldScreen.trackingUri <> invalid
+    sourceUri = oldScreen.trackingUri
+  end if
+
+  destinationUri = invalid
+  if newScreen.trackingUri <> invalid
+    destinationUri = newScreen.trackingUri
+  end if
+
+  if destinationUri <> invalid 
+    m.global.TrackingTask.trackEvent = {
+      trackType: "navigate"
+      value: destinationUri
+      ctx: sourceUri
+    }
+  end if
+End Function
+
+
+''''''''''''''''''''
+' screenTrackingLoad
+'
+' Get the current top of the screen stack 
+Function screenTrackingLoad(newScreen)
+  destinationUri = invalid
+  if newScreen.trackingUri <> invalid
+    destinationUri = newScreen.trackingUri
+  end if
+
+  'tracking for loading screen
+  if destinationUri <> invalid
+    m.global.TrackingTask.trackEvent = {
+      trackType: "pageLoad"
+      value: destinationUri
+    }
+  end if
 End Function

@@ -10,6 +10,9 @@
 
     <!-- Set to the content of the episode that was clicked on -->
     <field id="episodeSelected" type="intarray" alwaysNotify="true"/>
+
+    <!-- keeps the uri used for user tracking -->
+    <field id="trackingUri" type="string"  value="/series/episodelist/" />
   </interface>
 
   <children>

@@ -83,7 +83,7 @@ function AdrisePlayer_playVideo(episode as Object)
     episode.playStart = episode.nowPos
   end if
 
-  m.utils.tracking.trackEvent({
+  m.utils.tracking.trackUserEvent({
     trackType: "videoPlay"
     value: episode.id
     ctx: episode.nowPos
@@ -123,7 +123,7 @@ function AdrisePlayer_playVideo(episode as Object)
   ' (or there was no pre-roll because it is a subscription app), play the content
   while true
 
-    m.utils.tracking.trackEvent({
+    m.utils.tracking.trackUserEvent({
       trackType: "resumeAfterAds"
       value: episode.nowPos
       ctx: episode.id
@@ -259,7 +259,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
     player.pause()
     scrubTimer.Mark() 'set the time we start scrubbing
 
-    m.global.utils.tracking.trackEvent({
+    m.global.utils.tracking.trackUserEvent({
       trackType: "playProgress"
       ctx: episode.id
       value: playerStates.nowPos
@@ -285,7 +285,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
     m.global.player.shouldResetPing = true
 
-    m.global.utils.tracking.trackEvent({
+    m.global.utils.tracking.trackUserEvent({
       trackType: "seek"
       ctx: episode.id
       value: playerStates.nowPos
@@ -434,7 +434,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
             }
           end if
 
-          m.utils.tracking.trackEvent(playProgressEvent)
+          m.utils.tracking.trackUserEvent(playProgressEvent)
 
           m.lastPingTime = playerStates.nowPos
         end if
@@ -558,7 +558,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
             playerStates.isTransportShowing = false
             if playerStates.isPaused = true
             
-              m.utils.tracking.trackEvent({
+              m.utils.tracking.trackUserEvent({
                 trackType: "pauseToggle"
                 ctx: episode.id
                 value: "resumed"
@@ -610,7 +610,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
               player.pause()
               m.paintToCanvas(progressPercent, playerStates, episode)
 
-              m.utils.tracking.trackEvent({
+              m.utils.tracking.trackUserEvent({
                 trackType: "pauseToggle"
                 ctx: episode.id
                 value: "paused"
@@ -620,7 +620,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
             'if not scrubbing but paused, resume the show and remove the transport overlay
             'but first check if we should play a set of ads
             else
-              m.utils.tracking.trackEvent({
+              m.utils.tracking.trackUserEvent({
                 trackType: "pauseToggle"
                 ctx: episode.id
                 value: "resumed"
@@ -1093,7 +1093,7 @@ function AdrisePlayer_savePreviouslyViewedUpdate(episode, nowPos)
 
   'only do the following if the user is logged in
   authInfo = m.utils.auth.getAuthInfo()
-  if authInfo.accessToken <> invalid
+  if authInfo <> invalid and authInfo.accessToken <> invalid
   
     newHistoryReq = m.utils.bookmarks.addHistoryReq(episode, nowPos)
     m.playerRequestQueue.pushRequest(newHistoryReq)

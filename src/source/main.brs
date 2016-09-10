@@ -31,8 +31,8 @@ Function Main(args As Dynamic)
   constants = getConstants()
   request = TubiRequest()
   requestQueue = TubiRequestQueue()
-  tracking = TubiTracking(request)
   auth = TubiAuth(constants, request)
+  tracking = TubiTracking(constants, request, auth)
   bookmarks = TubiBookmarks(request, auth, constants)
 
 
@@ -51,7 +51,7 @@ Function Main(args As Dynamic)
   ' apply hotpatch to main brightscript thread
   Hotpatch(settings.hotPatchUrl)
 
-  ' start teh scene graph UI
+  ' start the scene graph UI
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
   sgGlobal.constants = m.global.utils.constants

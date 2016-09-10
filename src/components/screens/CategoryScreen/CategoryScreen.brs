@@ -10,6 +10,7 @@ Function init()
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
   m.top.observeField("categoryListResponse", "onCategoriesReceived")
+  m.top.observeField("trackingUri", "onTrackingUriChange")
   m.CategoryList.observeField("itemFocused","onCategoryChange")
   m.authTask = m.top.findNode("CategoryAuthTask")
 
@@ -299,6 +300,15 @@ Function onCategoryChange() As Void
     end if
 
     m.ContentGrid.id = m.CategoryList.content.getChild(m.CategoryList.itemFocused).id
+
+    'update the tracking URI for user tracking purposes
+    catPos = (m.CategoryList.itemFocused + 1).toStr()
+    catSlug = ""
+    if newCategory.slug <> invalid
+      catSlug = newCategory.slug
+    end if
+    m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug
+
   end if
 End Function
 
@@ -356,6 +366,29 @@ Function onGridFocusChange() As Void
   else
     m.Hero.uri = m.defaultHeroUri
   end if
+
+  'update the tracking URI
+  catSlug = ""
+  if m.CategoryList.content.getChild(m.CategoryList.itemFocused) <> invalid
+    if m.CategoryList.content.getChild(m.CategoryList.itemFocused).slug <> invalid
+      catSlug = m.CategoryList.content.getChild(m.CategoryList.itemFocused).slug + "/"
+    end if
+  end if
+  catPos = (m.CategoryList.itemFocused + 1).toStr()
+  
+  row = 0
+  col = 0
+  if m.CategoryList.itemFocused >= 0
+    'row and column should be 1-indexed
+    modulus = m.ContentGrid.itemFocused MOD m.ContentGrid.numRows
+    row = modulus + 1 
+    col = Int(m.ContentGrid.itemFocused / m.ContentGrid.numRows) + 1
+  end if
+
+  row = row.toStr() + "/"
+  col = col.toStr()
+  m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug + row + col
+
 End Function
 
 Function onGridItemSelected() As Void
@@ -556,4 +589,17 @@ Function handleInitialHistory()
     m.global.historyOrder = historyData.historyOrder
 
   end if
+End Function
+
+
+'''''''''''
+' onTrackingUriChange
+'
+' send the navigateInPage (navigate_within_page) tracking event
+Function onTrackingUriChange()
+  m.global.trackingTask.trackEvent = {
+    trackType: "navigateInPage"
+    value: 0
+    ctx: m.top.trackingUri
+  }
 End Function

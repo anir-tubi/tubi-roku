@@ -114,6 +114,7 @@ Function onContentChange() As Void
   else
     m.Hero.uri = m.defaultHeroUri
   end if
+
   setMenuItems()
 End Function
 
@@ -143,7 +144,33 @@ End Function
 '
 ' Seed for content received, retrieve the full content details
 Function onShortContentChange()
-  if m.top.shortContent <> invalid then loadContentDetails(m.top.shortContent)
+  if m.top.shortContent <> invalid
+    loadContentDetails(m.top.shortContent)
+
+    'set the tracking URI
+    trackUri = invalid
+    content = m.top.shortContent
+    if content["type"] = m.global.constants.ui.contentTypes.series
+      trackUri = "/series/"
+
+      if content.id <> invalid
+        trackUri = trackUri + content.id
+
+        if content.currentEpisodeId <> invalid and content.currentEpisodeId.len() > 0
+          trackUri = trackUri + "/" + content.currentEpisodeId
+        end if
+      end if
+
+    else if content["type"] = m.global.constants.ui.contentTypes.video
+      trackUri = "/video/"
+      
+      if content.id <> invalid
+        trackUri = trackUri + content.id
+      end if
+    end if
+
+    if trackUri <> invalid then m.top.trackingUri = trackUri
+  end if
 End Function
 
 
@@ -368,6 +395,13 @@ Function onBookmarked()
   end if
   setMenuItems()
 
+  'user tracking
+  m.global.trackingTask.trackEvent = {
+    trackType: "addBookmark"
+    value: m.top.content.id
+    ctx: m.top.trackingUri
+  }
+
   ' Notify the controller so that it can react
   m.top.addToQueueSelected = true
 End Function
@@ -431,6 +465,12 @@ Function onBookmarkRemoved()
     m.global.bookmarkOrder = newBookmarkOrder
   end if
   setMenuItems()
+
+  'user tracking
+  m.global.trackingTask.trackEvent = {
+    trackType: "deleteBookmark"
+    value: m.top.content.id
+  }
 
   ' Notify the controller so that it can react
   m.top.removeFromQueueSelected = true

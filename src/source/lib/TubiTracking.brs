@@ -1,16 +1,21 @@
-Function TubiTracking (request)
+Function TubiTracking (constants, request, auth)
   return {
+    constants: constants
     request: request
-    trackEvent: tubiTracking_trackEvent
+    auth: auth
+    trackUserEvent: tubiTracking_trackUserEvent
+    trackAdEvent: tubiTracking_trackAdEvent
     getTrackingTags: tubiTracking_getTrackingTags
     getTrackData: tubiTracking_getTrackData
+    getUserTrackingRequest: tubiTracking_getUserTrackingRequest
   }
 End Function
 
+
 ' --------------------------------------------------------
-' .trackEvent(evt)
+' .trackAdEvent(evt)
 ' --------------------------------------------------------
-function tubiTracking_trackEvent(evt)
+function tubiTracking_trackAdEvent(evt)
 
   ' ------------AdUnit Events------------------
   if evt.trackType = "click" then
@@ -37,21 +42,34 @@ function tubiTracking_trackEvent(evt)
       viewThruRequest = m.request.createAsync(trackUrl, "trackViewThru")
       evt.requestQ.pushRequest(viewThruRequest)      
     end for
+  end if
+end function
 
-  'event tracking for non ad events
-  else if evt.trackType <> invalid
-    ' trackData = m.getTrackData(evt.trackType, evt.value, evt.ctx, evt.extraCtx)
 
-    ' options = {
-    '   method: "POST"
-    '   body: FormatJson(trackData)
-    ' }
+'@evt: assocArray: has the following fields
+'           trackType: string, corresponds to one of the eventTypes found in getTrackingTags
+'           value: dynamic, depends on the eventType
+'           ctx: dynamic, depends on the eventType
+'           extraCtx: dynamic, depends on the eventType
+'           requestQ: a requestQueue object as created by TubiRequestQueue().create()
+'
+' please refer to the following url for more info on evt.value, evt.ctx, evt.extraCtx:
+' https://tubitv.atlassian.net/wiki/pages/viewpage.action?spaceKey=EC&title=Analytics+Events
+'
+function tubiTracking_trackUserEvent(evt as Object)
+  if evt.trackType <> invalid
+    trackData = m.getTrackData(evt.trackType, evt.value, evt.ctx, evt.extraCtx)
 
-    ' userRequest = m.request.createAsync(trackUrl, "track" + evt.trackType, options)
-    ' evt.requestQ.pushRequest(userRequest)
+    userRequest = m.getUserTrackingRequest(trackData)
+
+    if userRequest <> invalid and evt.requestQ <> invalid
+      evt.requestQ.pushRequest(userRequest)
+    end if
   end if
 
 end function
+
+
 
 ' --------------------------------------------------------
 ' .getTrackingTags (xml_tags)
@@ -67,9 +85,8 @@ function tubiTracking_getTrackingTags(xml_tags)
 end function
 
 
-'function tubiTracking_getTrackData(eventType, contentId = 0, progressPercent = 0, playerPosition = 0, deepLinkSource = "", errorMessage = "")
-function tubiTracking_getTrackData(eventType, value=0, ctx=invalid, extraCtx=invalid)
-  authInfo = m.getAuthInfo()
+function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=invalid as Dynamic, extraCtx=invalid as Dynamic) as Object
+  authInfo = m.auth.getAuthInfo()
   if authInfo <> invalid and authInfo.userId <> invalid
     userID = authInfo.userId
   else
@@ -78,9 +95,9 @@ function tubiTracking_getTrackData(eventType, value=0, ctx=invalid, extraCtx=inv
 
   eventTypes = {
     startApp: {
-      value: m.deviceInfo.userAgent + " " + m.deviceInfo.model
+      value: m.constants.deviceInfo.userAgentModel
       key: "active"
-      ctx: m.deviceInfo.model
+      ctx: m.constants.deviceInfo.model
     }
     pageLoad: {
       value: value
@@ -160,7 +177,7 @@ function tubiTracking_getTrackData(eventType, value=0, ctx=invalid, extraCtx=inv
 
   trackData = CreateObject("roAssociativeArray")
   trackData.SetModeCaseSensitive()
-  trackData.AddReplace("app_id", m.appName + "-roku")
+  trackData.AddReplace("app_id", m.constants.appName + "-roku")
   trackData.AddReplace("value", eventTypes[eventType].value)
   trackData.AddReplace("key", eventTypes[eventType].key)
   if eventTypes[eventType].ctx <> invalid
@@ -170,7 +187,7 @@ function tubiTracking_getTrackData(eventType, value=0, ctx=invalid, extraCtx=inv
     trackData.AddReplace("extra_ctx", eventTypes[eventType].extraCtx)
   end if
   trackData.AddReplace("user_id", userID)
-  trackData.AddReplace("device_id", m.deviceInfo.deviceId)
+  trackData.AddReplace("device_id", m.constants.deviceInfo.deviceId)
   'trackData looks like:
   ' trackData = {
   '   app : "tubitv-roku",
@@ -182,4 +199,20 @@ function tubiTracking_getTrackData(eventType, value=0, ctx=invalid, extraCtx=inv
   '   deviceID : m.deviceInfo.deviceId
   ' }.SetModeCaseSensitive()
   return trackData
+end function
+
+
+
+'@trackData: assocArray, object returned from m.getTrackData()
+function tubiTracking_getUserTrackingRequest(trackData as Object) as Object
+  trackUrl = m.constants.urls.datascience.event
+
+    options = {
+      method: m.constants.reqTypes.post
+      body: FormatJson(trackData)
+    }
+
+    userRequest = m.request.createAsync(trackUrl, "track" + trackData.key, options)
+
+    return userRequest
 end function

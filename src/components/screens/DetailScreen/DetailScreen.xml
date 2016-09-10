@@ -23,6 +23,9 @@
 
     <!-- MetadataFetchTask response for single content -->
     <field id="contentDetailResponse" type="assocarray" alwaysNotify="true"/>
+    
+    <!-- keeps the uri used for user tracking -->
+    <field id="trackingUri" type="string"  value="" />
 
     <!-- set to true when the suer selects the 'Resume' menu button -->
     <field id="resumeSelected" type="boolean" alwaysNotify="true" />

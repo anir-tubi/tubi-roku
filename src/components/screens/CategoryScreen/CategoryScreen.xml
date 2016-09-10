@@ -33,6 +33,9 @@
     
     <!-- MetadataFetchTask response for category list -->
     <field id="categoryListResponse" type="assocarray" alwaysNotify="true"/>
+    
+    <!-- keeps the uri used for user tracking -->
+    <field id="trackingUri" type="string"  value="/home" alwaysNotify="true"/>
 
     <!-- will be populated with the full (unparsed) bookmark response -->
     <field id="bookmarks" type="string" />
