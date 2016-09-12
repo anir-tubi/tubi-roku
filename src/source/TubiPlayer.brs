@@ -649,7 +649,12 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
         'check if we have the response for a history API call
         if parsedResp <> invalid and handled.url = m.constants.urls.users.history and parsedResp.id <> invalid
-          episode.historyId = parsedResp.id
+          if parsedResp.episodes <> invalid and type(parsedResp.episodes) = "roArray" and parsedResp.episodes.count() > 0
+            episode.historyId = parsedResp.episodes[0].id
+            episode.parentHistoryId = parsedResp.id
+          else
+            episode.historyId = parsedResp.id
+          end if
         end if
       end if
     end if

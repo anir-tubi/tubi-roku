@@ -468,49 +468,70 @@ function tubiBookmarks_handleInitialHistory(initialHistory)
 end function
 
 
-'@videoId: string, the content id for a video content (movie or episode)
+'@content: content, the video content (movie or episode)
 '@playerInfo: assocArray, contains the new nowPos as an integer and potentially a historyId as a string
 '       {
 '         nowPos: int, the position that the content was watched to in the player
 '         historyId: string (optional), a history id as returned by the UAPI server
+'         parentHistoryId: string (optional), a history id for a series as returned by the UAPI server
 '       }
 '@historyIds: assocArray, historyIds as stored on scenegraphs m.global.historyIds. Also returned from m.handleInitialHistory().historyIds
-function tubiBookmarks_updateNowPos(videoId, playerInfo, historyIds)
+function tubiBookmarks_updateNowPos(content, playerInfo, historyIds, historyOrder)
 
-  if historyIds <> invalid and playerInfo <> invalid and videoId <> invalid
+  if historyIds <> invalid and playerInfo <> invalid and content.id <> invalid
     
     newHistoryIds = {
       videos: {}
       series: {}
     }
+    if historyIds.series <> invalid then newHistoryIds.series.append(historyIds.series)
+    if historyIds.videos <> invalid then newHistoryIds.videos.append(historyIds.videos)
 
-    if historyIds.series <> invalid
-      newHistoryIds.series.append(historyIds.series)
-    end if
+    newHistoryOrder = []
+    newHistoryOrder.append(historyOrder)
 
-    if historyIds.videos <> invalid
-      newHistoryIds.videos.append(historyIds.videos)
+    if playerInfo.historyId <> invalid and playerInfo.historyId <> ""
+      tubiLog("Bookmarks.updateNowPos Storing historyId for " + content.id + " to " + playerInfo.historyId)
 
-      'we only want to update if we have either an existing historyId or a new historyId
-      if (newHistoryIds.videos[videoId] <> invalid and newHistoryIds.videos[videoId].serverId <> invalid) or playerInfo.historyId <> invalid
-        'we have a new historyId so we can re-write the whole thing
-        if playerInfo.historyId <> invalid
-          newHistoryIds.videos[videoId] = {
-            serverId: playerInfo.historyId
-            position: playerInfo.nowPos
-          }
-
-        'we don't have a new historyId so we just update the nowPos
-        else 
-          newHistoryIds.videos[videoId].position = playerInfo.nowPos
-        end if
+      ' store the series if video was an episode
+      if content.parentId <> invalid and content.parentId <> "" and playerInfo.parentHistoryId <> invalid and playerInfo.parentHistoryId <> "" then
+        tubiLog("Bookmarks.updateNowPos Storing parentHistoryId for " + content.parentId + " to " + playerInfo.parentHistoryId)
+        newHistoryIds.series[content.parentId] = {
+          serverId: playerInfo.parentHistoryId
+          currentEpisodeId: content.id
+        }
+        newHistoryIds.videos[content.id] = {
+          serverId: playerInfo.historyId
+          position: playerInfo.nowPos
+        }
+        orderId = "0" + content.parentId
+      else
+        ' here if video was a movie or episode already had a previous history
+        newHistoryIds.videos[content.id] = {
+          serverId: playerInfo.historyId
+          position: playerInfo.nowPos
+        }
+        orderId = content.id
       end if
+
+      ' clear any existing series/movie from history and put the new entry at the top
+      for i=0 to newHistoryOrder.count()-1
+        if newHistoryOrder[i] = orderId then newHistoryOrder.delete(i)
+      end for
+      newHistoryOrder.unshift(orderId)
+
+    'we don't have a new historyId, but we have an existing entry
+    else if (newHistoryIds.videos[content.id] <> invalid and newHistoryIds.videos[content.id].serverId <> invalid) 
+      newHistoryIds.videos[content.id].position = playerInfo.nowPos
+    else
+      tubiLog("Bookmarks.updateNowPos Ignoring empty historyId")
     end if
-    
+
+    return {
+      historyOrder: newHistoryOrder
+      historyIds: newHistoryIds
+    }
   else
     return invalid
   end if
-
-  return newHistoryIds
-
 end function

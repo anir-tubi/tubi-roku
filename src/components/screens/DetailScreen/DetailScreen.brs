@@ -66,29 +66,48 @@ Function onContentChange() As Void
       seriesContent.type = "series"
       loadContentDetails(seriesContent)
       return
-    else
-      m.Info.mode = "movie"
-      m.Info.content = m.top.content
     end if
   else if m.top.content.type = "series"
 
-    ' Set the episode selection appropriately
+    ' Deep link gave us only the episode, seek to it
     if m.top.shortContent.id <> m.top.content.id then
       tubiLog("Finding episode " + m.top.shortContent.id + " in series " + m.top.content.id)
       ' arrived here from an episode link
-      for i=0 to m.top.content.getChildCount()-1
-        season = m.top.content.getChild(i)
-        for j=0 to season.getChildCount()-1
-          episode = season.getChild(j)
-          if episode.id = m.top.shortContent.id then
-            tubiLog("Episode is [" + stri(i) + "," + stri(j) + "]")
-            m.top.episodeSelection = [i,j]
-          end if
-        end for
-      end for
+      m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id)
+    else if m.top.content.currentEpisodeId <> invalid and m.top.content.currentEpisodeId <> "" then
+      tubiLog("Finding current episode " + m.top.shortContent.id + " in series " + m.top.content.id)
+      m.top.episodeSelection = findEpisodeInSeries(m.top.content.currentEpisodeId)
     endif
+  end if
 
-    'TODO(Chris): Also check if there was a resume we can apply
+  drawSubComponents()
+End Function
+
+
+Function findEpisodeInSeries(episodeId As String)
+  for i=0 to m.top.content.getChildCount()-1
+    season = m.top.content.getChild(i)
+    for j=0 to season.getChildCount()-1
+      episode = season.getChild(j)
+      if episode.id = episodeId then
+        tubiLog("Episode is [" + stri(i) + "," + stri(j) + "]")
+        return [i,j]
+      end if
+    end for
+  end for
+  return [0,0]
+End Function
+
+
+'''''''''''''''''''''''
+' drawSubComponents
+'
+' Decouple from onContentChange since episode selection also needs this
+Function drawSubComponents()
+  if m.top.content.type = "video"
+    m.Info.mode = "movie"
+    m.Info.content = m.top.content
+  else if m.top.content.type = "series"
     m.Info.mode = "series"
     ' clone the content object since we want the SERIES title & description, but the EPISODE details
     infoPanelContent = CreateObject("roSGNode", "TubiContentNode")   
@@ -109,6 +128,7 @@ Function onContentChange() As Void
     infoPanelContent.description = m.top.content.description
     m.Info.content = infoPanelContent
   end if
+
   if m.top.content.backgrounds <> invalid and m.top.content.backgrounds.count() > 0 then
     m.Hero.uri = m.top.content.backgrounds[0]
   else
@@ -117,6 +137,7 @@ Function onContentChange() As Void
 
   setMenuItems()
 End Function
+
 
 
 ''''''''''''''''''''''
@@ -190,33 +211,40 @@ Function setMenuItems() As Void
 
   menuItems = CreateObject("roSGNode", "ContentNode")
 
-  if (m.top.shortContent.nowPos <> invalid and m.top.shortContent.nowPos <> 0) or (m.top.content.nowPos <> invalid and m.top.content.nowPos <> 0) then
-    m.ResumeMenuItem.length = m.top.shortContent.length
-    m.ResumeMenuItem.playstart = m.top.shortContent.nowPos
-    if m.top.content.nowPos <> invalid and m.top.content.nowPos <> 0
-      m.ResumeMenuItem.playstart = m.top.content.nowPos
+  if m.top.content.type = "video" then
+    focusedContent = m.top.content
+  else if m.top.content.type = "series" then
+    focusedContent = m.top.content
+    season = m.top.content.getChild(m.top.episodeSelection[0])
+    if season <> invalid then
+      episode = season.getChild(m.top.episodeSelection[1])
+      if episode <> invalid then
+        focusedContent = episode
+      end if
     end if
+  end if
+
+  if focusedContent.nowPos <> invalid and focusedContent.nowPos <> 0 then
+    m.ResumeMenuItem.length = focusedContent.length
+    m.ResumeMenuItem.playstart = focusedContent.nowPos
     menuItems.appendChild(m.ResumeMenuItem)
   end if
 
-  if m.top.content.type = "video" then
-    menuItems.appendChild(m.PlayMenuItem)
-  else if m.top.content.type = "series" then
-    menuItems.appendChildren([
-      m.PlayMenuItem
-      m.EpisodesMenuItem 
-    ])
+  menuItems.appendChild(m.PlayMenuItem)
+
+  if m.top.content.type = "series" then
+    menuItems.appendChild(m.EpisodesMenuItem)
   end if
 
-  'TODO(Chris): Change this to 'Remove' if already in queue
-  if m.top.signedIn = true and m.top.shortContent.bookmarkId <> invalid and m.top.shortContent.bookmarkId <> "" then
+  ' bookmarks follow series or movie, so don't use focusedContent here
+  if m.top.signedIn = true and m.top.content.bookmarkId <> invalid and m.top.content.bookmarkId <> "" then
     menuItems.appendChild(m.RemoveQueueMenuItem)
   else 
     menuItems.appendChild(m.AddQueueMenuItem)
   end if
 
-  'TODO(Chris): Remove this if item is not in users history
-  if m.top.shortContent.historyId <> invalid and m.top.shortContent.historyId <> "" then
+  ' history will be set on the series if any of the episodes have history, so look at m.top.content
+  if m.top.content.historyId <> invalid and m.top.content.historyId <> "" then
     menuItems.appendChild(m.RemoveHistoryMenuItem)
   end if
 
@@ -284,7 +312,8 @@ End Function
 ' Show details for the selected episode
 Function onEpisodeSelectionChange()
   tubiLog("DetailScreen.onEpisodeSelectionChange")
-  onContentChange() ' Info panel and menu items all need updating here
+  tubiLog("Episode [" + stri(m.top.episodeSelection[0]) + "," + stri(m.top.episodeSelection[1]) + "] selected")
+  drawSubComponents()
 End Function
 
 
@@ -492,10 +521,6 @@ End Function
 Function onHistoryRemoved()
   tubiLog("DetailScreen.onHistoryRemoved")
   m.AuthTask.unobserveField("result")
-  m.top.shortContent.historyId = ""
-  m.top.content.historyId = ""
-  m.top.shortContent.nowPos = invalid
-  m.top.content.nowPos = invalid
 
   ' TODO(Chris): Move management of this global list off to a library
   ' or task
@@ -507,11 +532,22 @@ Function onHistoryRemoved()
         newSeries.append(historyIds.series)
         newSeries.delete(m.top.shortContent.id)
         videos = historyIds.videos
-        m.global.historyIds = {
-          series: newSeries
-          videos: videos
-        }
       end if
+      ' remove episodes' nowPos
+      newVideos = {}
+      newVideos.append(historyIds.videos)
+      for i=0 to m.top.content.getChildCount()-1
+        season = m.top.content.getChild(i)
+        for j=0 to season.getChildCount()-1
+          episode = season.getChild(j)
+          newVideos.delete(episode.id)
+        end for
+      end for
+      m.global.historyIds = {
+        series: newSeries
+        videos: newVideos
+      }
+
     else if m.top.shortContent.type = "video"
       if historyIds.videos[m.top.shortContent.id] <> invalid
         newVideos = {}
@@ -536,10 +572,12 @@ Function onHistoryRemoved()
     end for
     m.global.historyOrder = newHistoryOrder
   end if
-  setMenuItems()
 
   ' Notify the controller so that it can react
   m.top.removeFromHistorySelected = true
+
+  ' force reload the content, which will clear all the history and nowPos
+  m.top.shortContent = m.top.shortContent
 End Function
 
 

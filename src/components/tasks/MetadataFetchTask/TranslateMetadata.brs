@@ -55,7 +55,6 @@ end Function
 Function translateDetailsMetadata(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
   setTranslateGlobalsToLocal()
-
   'will affect/update the translated node that is passed in
   translateRecursive(contentToTranslate, translated)
 
@@ -122,7 +121,7 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
 
   'record keeping needed for adding series to bookmarks and previously viewed
   parent = translatedContent.getParent()
-  if parent.parentId <> invalid
+  if parent.parentId <> invalid and parent.parentId <> "" then
     translatedContent.parentId = parent.parentId
   else
     translatedContent.parentId = parent.id
@@ -130,16 +129,22 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
   ' No parent if the parent.id is the task node
   if translatedContent.parentId = "MetadataFetchTask" then translatedContent.parentId = invalid
 
-  if parent.parentType <> invalid
+  if parent.parentType <> invalid and parent.parentType <> "" then
     translatedContent.parentType = parent.parentType
   else
     translatedContent.parentType = parent[typeVar]
   end if
 
-  if parent.parentTitle <> invalid
+  if parent.parentTitle <> invalid and parent.parentTitle <> "" then
     translatedContent.parentTitle = parent.parentTitle
   else
     translatedContent.parentTitle = parent.title
+  end if
+
+  if parent.parentHistoryId <> invalid and parent.parentHistoryId <> "" then
+    translatedContent.parentHistoryId = parent.parentHistoryId
+  else
+    translatedContent.parentHistoryId = parent.historyId
   end if
   
   'translate all the stuff from the server

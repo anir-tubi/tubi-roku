@@ -6,6 +6,7 @@
     <field id="parentType" type="string" />
     <field id="parentTitle" type="string" />
     <field id="parentId" type="string" />
+    <field id="parentHistoryId" type="string" />
     <field id="longdescription" type="string" />
     <field id="landscape" type="string" />
     <field id="portrait" type="string" />

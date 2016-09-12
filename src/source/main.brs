@@ -89,6 +89,9 @@ Function Main(args As Dynamic)
         if playerContent.historyId <> invalid
           infoToPass.historyId = playerContent.historyId
         end if
+        if playerContent.parentHistoryId <> invalid
+          infoToPass.parentHistoryId = playerContent.parentHistoryId
+        end if
         
         controller.playerInfo = infoToPass
       end if 

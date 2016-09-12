@@ -288,7 +288,7 @@ Function onPlay()
   tubiLog("ContentController.onPlay")
   content = getDetailScreenContent()
   if content <> invalid then
-    content.playstart = 0.0 'reset the start position
+    content.nowPos = 0 'reset the start position
 
     'TODO(Chris): For unauthenticated users, we need to reset any resume 
     ' position that might have been set.  Also, when we come back from
@@ -384,7 +384,13 @@ End Function
 ' Is called when the nowPos is updated from the player
 Function onPlayerInfo()
   playerInfo = m.top.playerInfo
-  tubiLog("onPlayerInfo: " + playerInfo.nowPos.toStr())
+  tubiLog("onPlayerInfo: nowPos = " + playerInfo.nowPos.toStr())
+  if playerInfo.historyId <> invalid and playerInfo.historyId <> "" then
+    tubiLog("onPlayerInfo: historyId = " + playerInfo.historyId.toStr())
+  end if
+  if playerInfo.parentHistoryId <> invalid and playerInfo.parentHistoryId <> "" then
+    tubiLog("onPlayerInfo: parentHistoryId = " + playerInfo.parentHistoryId.toStr())
+  end if
   content = m.top.playContent
 
   constants = m.global.constants
@@ -393,15 +399,13 @@ Function onPlayerInfo()
   Bookmarks = TubiBookmarks(Request, Auth, constants)
 
   'update the nowPos in the global historyIds store
-  m.global.historyIds = Bookmarks.updateNowPos(content.id, playerInfo, m.global.historyIds)
+  newHistory = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds, m.global.historyOrder)
+  m.global.historyIds = newHistory.historyIds
+  m.global.historyOrder = newHistory.historyOrder
+  if m.categoryScreen <> invalid then m.categoryScreen.dirtyUserCategories = true
 
   if m.detailScreen <> invalid
-    'update the nowPos on the contentNode
-    m.detailScreen.content.nowPos = playerInfo.nowPos
-
-    if playerInfo.historyId <> invalid
-      m.detailScreen.content.historyId = playerInfo.historyId
-    end if
+    m.detailScreen.shortContent = m.detailScreen.shortContent ' force a reload to get nowPos and history id set
   end if
 
   if playerInfo.result = m.global.constants.player.playerResults.failed then
