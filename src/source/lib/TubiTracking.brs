@@ -161,12 +161,16 @@ function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=
       key: "remove_bookmark"
     }
     registerFail:{
-      key: "register_device_fail"
       value: value
+      key: "register_device_fail"
     }
     registerSuccess:{
+      value: true
       key: "register_device_success"
-      value: value
+    }
+    signIn:{
+      value: "email"
+      key: "sign_in"
     }
     search:{
       value: value

@@ -124,7 +124,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
 
   ' Start the request
 
-  ' tubiLog("sending a " + m.method + "request to " + m.url)
+  ' tubiLog("sending a " + m.method + " request to " + m.url)
   ' print m.body  
   if m.method = "POST" or m.method = "PUT" or m.method = "PATCH"
     if m.urltransfer.AsyncPostFromString(m.body) = false
@@ -143,7 +143,7 @@ End Function
 
 
 '''''''''''''''''''''''
-' runSynchronous - starts, waits for, and handles the response for a synchrynous style request
+' runSynchronous - starts, waits for, and handles the response for a synchronous style request
 '   @timeout: integer, the max amount of time to wait for a response
 '
 ' returns just the data of the response, not the code or fail reason

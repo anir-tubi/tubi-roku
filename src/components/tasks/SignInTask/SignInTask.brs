@@ -44,6 +44,9 @@ Function execSignIn() As Void
           if parsed <> invalid then
             ' persist the access token before we notify the scene graph
             Auth.handleRegistration(parsed)
+            m.global.trackingTask.trackEvent = {
+              trackType: "signIn"
+            }
           else
             tubiLog("Bad response JSON")
             return

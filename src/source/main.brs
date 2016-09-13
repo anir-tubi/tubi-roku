@@ -61,7 +61,7 @@ Function Main(args As Dynamic)
   ' THIS ONLY WORKS ON 7.1+ firmware!
   controller.observeField("playContent", port)
 
-  deepLink(args, controller)
+  deepLink(args, controller, m.global.utils)
 
   while(true)
     msg = wait(0, port)
@@ -160,7 +160,7 @@ End Function
 '
 ' NOTE: 'entry' seems undocumented and may have been added special for adRise by Roku
 
-Function deepLink(args, controller)
+Function deepLink(args, controller, utils)
 
   'handle/set up any deep linking that may have occurred
   if (args.contentID <> invalid)
@@ -184,6 +184,7 @@ Function deepLink(args, controller)
       deepLinkSource = args.entry
     end if
 
+    trackingUri = "/video"
     ' if deep linked from Roku search it's possible that we are deep linking to a series, instead of actual video content
     ' deep links from search for series should like:
     ' contentID=335&mediaType=series
@@ -191,11 +192,13 @@ Function deepLink(args, controller)
     ' See full list of mediaType at https://sdkdocs.roku.com/display/sdkdoc/External+Control+Guide
     if args.mediaType = "series"
       content.type = "series"
+      trackingUri = "/series"
     else if args.mediaType = "movie"
       content.type = "video"
     else if args.mediaType = "episode"
       content.type = "video"
     end if
+
 
     ' remove any 0s that might be prepended to the content id
     if deepLinkSource = "search"
@@ -209,7 +212,33 @@ Function deepLink(args, controller)
       end while
     end if
 
+    if content.id <> invalid
+      trackingUri = trackingUri + "/" + args.contentID
+    end if
+
+    'see tubitv.atlassian.net/wiki/display/EC/Referrals
+    deeplinkMedium = "partnership"
+    if args.medium <> invalid
+      deeplinkMedium = args.medium
+    end if
+
+    'see tubitv.atlassian.net/wiki/display/EC/Referrals
+    deeplinkCampaign = "default-campaign"
+    if args.campaign <> invalid
+      deeplinkCampaign = args.campaign
+    end if
+
+    extraCtx = {
+      source: deepLinkSource
+      campaign: deeplinkCampaign
+      medium: deeplinkMedium
+    }
+
     controller.itemDetail = content
+
+    trackData = utils.tracking.getTrackData("deeplink", invalid, trackingUri, extraCtx)
+    trackReq = utils.tracking.getUserTrackingRequest(trackData)
+    trackReq.runSynchronous(1)
 
   end if
 End Function

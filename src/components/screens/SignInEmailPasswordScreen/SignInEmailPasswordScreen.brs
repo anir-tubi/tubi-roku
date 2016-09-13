@@ -217,11 +217,10 @@ Function onSignInResult()
   m.SignIn.unobserveField("response")
   m.Spinner.visible = false
   m.SpinnerAnimation.control = "stop"
+
   if m.SignIn.response.code <> invalid and m.SignIn.response.code = 200 then
-    'TODO(Chris): persist credentials, or let the library do it
     m.top.signInSuccess = true
   else
-    'TODO(Chris): show failure dialog
     m.Dialog = m.top.createChild("ModalDialogScreen")
     m.Dialog.title = "Sign In Failed"
     m.Dialog.message = "The email and password combination you provided is not valid."

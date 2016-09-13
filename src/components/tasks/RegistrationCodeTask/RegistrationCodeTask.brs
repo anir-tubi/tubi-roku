@@ -55,6 +55,10 @@ Function registrationLoop() As Void
     ' Check for cancellation on every loop, rather than isolating in a roSGNodeEvent check
     if m.top.cancel = true then 
       tubiLog("Registration cancelled")
+      m.global.trackingTask.trackEvent = {
+        trackType: "registerFail"
+        value: "registration-cancelled"
+      }
       return
     end if
   end while
@@ -97,6 +101,10 @@ Function registrationLoop() As Void
                 ' persist the registration information before we notify the scene graph
                 auth.handleRegistration(parsed)
                 m.top.response = parsed  ' status may be "pending" or "registered"
+                m.global.trackingTask.trackEvent = {
+                  trackType: "registerSuccess"
+                  value: true
+                }  
                 return  ' end the thread
               else
                 m.top.response = parsed  ' status may be "pending" or "registered"
@@ -104,10 +112,18 @@ Function registrationLoop() As Void
               end if
             else
               tubiLog("Bad response polling reg code status")
+              m.global.trackingTask.trackEvent = {
+                trackType: "registerFail"
+                value: "bad-response-status"
+              }              
               return
             end if
           else
             tubiLog("Reg code polling failed " + stri(result.code))
+            m.global.trackingTask.trackEvent = {
+              trackType: "registerFail"
+              value: "polling-response-failure"
+            }            
             return 
           end if
         else
@@ -116,6 +132,10 @@ Function registrationLoop() As Void
       end if
       if m.top.cancel = true then 
         tubiLog("Registration cancelled")
+        m.global.trackingTask.trackEvent = {
+          trackType: "registerFail"
+          value: "registration-cancelled"
+        }
         return
       end if
     end while
