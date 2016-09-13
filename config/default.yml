@@ -24,8 +24,8 @@ manifest:
   mm_icon_side_sd: "pkg:/images/FREETVMOVIES_Tubi_icon_80x46.jpg"
   splash_screen_hd: "pkg:/images/FREETVMOVIES_Tubi_icon_1280x720.jpg"
   splash_screen_sd: "pkg:/images/FREETVMOVIES_Tubi_icon_720x480.jpg"
-  major_version: 1
-  minor_version: 3
+  major_version: 2
+  minor_version: 0
   build_version: 1
   bs_libs_required: roku_ads_lib
   ui_resolutions: "fhd"
