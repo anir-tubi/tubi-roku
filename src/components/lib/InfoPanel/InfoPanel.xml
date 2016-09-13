@@ -109,11 +109,17 @@
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="22" />
       </Label>
-      <Poster
-        id="Rating"
-        height="36"
-        loadHeight="36"
-        loadDisplayMode="scaleToFit"/>
+      <Rectangle
+        height="40"
+        width="72"
+        color="0x00000000">
+        <Poster
+          id="Rating"
+          height="36"
+          loadHeight="36"
+          loadDisplayMode="scaleToFit"
+          translation="[0,0]"/>
+      </Rectangle>
       </LayoutGroup>
       <Label
         id="Line2"
