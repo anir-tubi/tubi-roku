@@ -20,7 +20,9 @@
     <Poster
       id="HeroBackground"
       loadWidth="1920"
+      width="1920"
       loadHeight="1080"
+      height="1080"
       uri="pkg:/images/background-not-on-selection.jpg"
       loadDisplayMode="scaleToZoom"
       translation="[0,0]"/>
@@ -28,9 +30,11 @@
     <Poster
       id="HeroShade"
       loadWidth="1920"
+      width="1920"
       loadHeight="1080"
+      height="1080"
       loadDisplayMode="scaleToZoom"
-      uri="pkg:/images/detail-mask-480x270.png"
+      uri="pkg:/images/detail-gradient-25.png"
       translation="[0,0]"/>
     
     <InfoPanel

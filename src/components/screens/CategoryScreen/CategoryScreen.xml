@@ -109,16 +109,20 @@
     <Poster
       id="HeroBackground"
       uri=""
-      loadWidth="1920"
-      loadHeight="1080"
+      loadWidth="1615"
+      width="1615"
+      loadHeight="909"
+      height="909"
       loadDisplayMode="scaleToZoom"
-      translation="[0,0]"/>
+      translation="[305,0]"/>
     
     <Poster
       id="HeroShade"
       loadWidth="1920"
+      width="1920"
       loadHeight="1080"
-      uri="pkg:/images/grid-gradient.png" 
+      height="1080"
+      uri="pkg:/images/home-gradient-25.png" 
       translation="[0,0]"/>
     
     <ScrollingList
