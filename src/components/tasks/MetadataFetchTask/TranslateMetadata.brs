@@ -184,7 +184,9 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
     end if
   end if
 
-  if contentFromServer.thumbnails <> invalid and type(contentFromServer.thumbnails) = "roArray" and contentFromServer.thumbnails.count() > 0
+  if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
+    translatedContent.landscape = contentFromServer.hero_images[0]
+  else if contentFromServer.thumbnails <> invalid and type(contentFromServer.thumbnails) = "roArray" and contentFromServer.thumbnails.count() > 0
     translatedContent.landscape = contentFromServer.thumbnails[0]
   end if
 
