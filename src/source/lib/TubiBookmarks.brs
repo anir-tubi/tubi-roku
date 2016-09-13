@@ -364,7 +364,7 @@ function tubiBookmarks_getFullBookmarkOrHistory_(orderList as Object, reqName as
         platform: m.constants.platform
         "content_ids": ids
         "page_enabled": false
-        fields: "*(id,type,title,duration,ratings,description,year,posterarts,subtitles,lang,url,publisher_id,actors,directors,tags,children,credit_cuepoints)"
+        fields: "*(id,type,title,duration,ratings,description,year,posterarts,subtitles,lang,url,publisher_id,actors,directors,tags,children,credit_cuepoints,backgrounds)"
       }
     }
   }
