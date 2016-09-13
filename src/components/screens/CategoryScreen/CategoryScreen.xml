@@ -68,11 +68,12 @@
     <!-- Special category menu items. These will be merged with category list -->
     <ContentNode
       id="SpecialCategories">
-      <ContentNode
+      <!-- TubiContentNode here so it can contain the totalcount for the Info Panel -->
+      <TubiContentNode
         id="ContinueWatching"
         title="Continue Watching"
         description="The Movies and TV Shows you have started watching can be found here"/>
-      <ContentNode
+      <TubiContentNode
         id="MyQueue"
         title="My Queue"
         description="The Movies and TV Shows you have added to your Queue can be found here"/>
