@@ -384,9 +384,6 @@ Function onBookmarked()
 
   tubiLog("Got bookmarkId " + m.AuthTask.bookmarkId + " for content " + m.top.content.id)
 
-  m.top.content.bookmarkId = m.AuthTask.bookmarkId
-  m.top.shortContent.bookmarkId = m.AuthTask.bookmarkId
-
   ' TODO(Chris): Move management of this global list off to a library
   ' or task
   bookmarkIds = m.global.bookmarkIds
@@ -394,7 +391,7 @@ Function onBookmarked()
     if m.top.shortContent.type = "series"
       tubiLog("Appending series to bookmarks")
       newSeries = {}
-      newSeries[m.top.shortContent.id] = m.top.content.bookmarkId
+      newSeries[m.top.shortContent.id] = m.AuthTask.bookmarkId
       newSeries.append(bookmarkIds.series)
       videos = bookmarkIds.videos
       m.global.bookmarkIds = {
@@ -403,7 +400,7 @@ Function onBookmarked()
       }
     else if m.top.shortContent.type = "video"
       newVideos = {}
-      newVideos[m.top.shortContent.id] = m.top.content.bookmarkId
+      newVideos[m.top.shortContent.id] = m.AuthTask.bookmarkId
       newVideos.append(bookmarkIds.videos)
       series = bookmarkIds.series
       m.global.bookmarkIds = {
@@ -422,7 +419,8 @@ Function onBookmarked()
     newBookmarkOrder.append(m.global.bookmarkOrder)
     m.global.bookmarkOrder = newBookmarkOrder
   end if
-  setMenuItems()
+  ' force reload the content, which will clear all the history and nowPos
+  m.top.shortContent = m.top.shortContent
 
   'user tracking
   m.global.trackingTask.trackEvent = {
@@ -454,8 +452,6 @@ Function onBookmarkRemoved()
   tubiLog("DetailScreen.onBookmarkRemoved")
   'TODO(Chris): consume return values and handle errors here
   m.AuthTask.unobserveField("result")
-  m.top.shortContent.bookmarkId = ""
-  m.top.content.bookmarkId = ""
 
   ' TODO(Chris): Move management of this global list off to a library
   ' or task
@@ -493,7 +489,8 @@ Function onBookmarkRemoved()
     end for
     m.global.bookmarkOrder = newBookmarkOrder
   end if
-  setMenuItems()
+  ' force reload the content, which will clear all the history and nowPos
+  m.top.shortContent = m.top.shortContent
 
   'user tracking
   m.global.trackingTask.trackEvent = {
