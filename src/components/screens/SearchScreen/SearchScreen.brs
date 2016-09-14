@@ -69,7 +69,12 @@ End Function
 Function onKeyboardTextChanged()
   tubiLog("SearchScreen.onSearchTextChanged")
   m.SearchText.text = m.Keyboard.text  
-  loadSearchResults()
+  if m.Keyboard.text <> invalid and m.Keyboard.text.len() > 0 then
+    loadSearchResults()
+  else
+    ' if the text was empty, clear out any existing results
+    m.top.content = invalid
+  end if
 End Function
 
 
@@ -89,7 +94,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("SearchScreen.onKeyEvent")
   if press then
     ' Only focus on content grid if animation is not in process, and if there is actually content there
-    if key = "down" and m.Keyboard.isInFocusChain() and m.TextEntryAnimation.state = "stopped" and m.top.content.getChildCount() > 0 then
+    if key = "down" and m.Keyboard.isInFocusChain() and m.TextEntryAnimation.state = "stopped" and m.top.content <> invalid and m.top.content.getChildCount() > 0 then
       startFocusResultGrid()
       return true
     else if key = "up" and m.ResultGrid.isInFocusChain() and m.TextEntryAnimation.state = "stopped" then
@@ -184,5 +189,7 @@ Function loadSearchResults()
     }
     name: "searchAPI"    
   }
+  ' cancel any in-flight requests
+  m.global.metadataFetchTask.cancel = { node: m.top, field: "searchResponse"}
   m.global.metadataFetchTask.request = request
 End Function
