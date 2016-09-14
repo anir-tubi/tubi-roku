@@ -37,7 +37,7 @@ Function execSignIn() As Void
     msg = wait(0, port)
     if type(msg) = "roUrlEvent" then
       result = request.handleEvent(msg)
-      if result <> invalid then
+      if result <> invalid and result.response <> invalid then
         tubiLog("Received sign in response")
         if result.response.code >= 200 and result.response.code < 300 then
           parsed = ParseJSON(result.response.data)
@@ -49,11 +49,9 @@ Function execSignIn() As Void
             }
           else
             tubiLog("Bad response JSON")
-            return
           end if
         else
-          tubiLog("Sign in failed " + stri(result.code))
-          return 
+          tubiLog("Sign in failed " + stri(result.response.code))
         end if
         m.top.response = result.response
       end if

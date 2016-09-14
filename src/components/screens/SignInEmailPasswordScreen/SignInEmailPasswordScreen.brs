@@ -178,7 +178,8 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
         m.PasswordTextBox.setFocus(false)
         startShowKeyboard()
         return true
-      else if m.SignInButton.hasFocus()
+      else if m.SignInButton.hasFocus() and m.SignInButtonFocus.visible = true then
+        ' only sign-in if button is enabled
         signIn()
         return true
       end if
