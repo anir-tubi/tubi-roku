@@ -33,6 +33,12 @@ Function init()
   m.SignOutMenuItem = m.SearchSignInContent.findNode("SignOutMenuItem")
   m.AboutMenuItem = m.SearchSignInContent.findNode("AboutMenuItem")
 
+  'Special categories
+  m.ContinueWatchingCategory = m.SpecialCategories.findNode("ContinueWatching")
+  m.MyQueueCategory = m.SpecialCategories.findNode("MyQueue")
+  m.SearchSignInCategory = m.SpecialCategories.findNode("SearchSignIn")
+  m.SearchSignOutCategory = m.SpecialCategories.findNode("SearchSignOut")
+
   m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
 
   ' track the last focused screen component so that we can go back
@@ -155,6 +161,7 @@ End Function
 Function onContentChange() As Void
   tubiLog("CategoryScreen.onContentChange")
   m.CategoryList.visible = false
+  m.CategoryList.content = invalid  ' since alwaysNotify=false on scrollinglist
   ' Force Featured to the top of the list
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
@@ -165,17 +172,18 @@ Function onContentChange() As Void
     end if
   end for
 
-  ' Prepend special categories 
-  if m.top.signedIn then
-    m.top.content.insertChild(m.SpecialCategories.findNode("SearchSignOut"), 0)
-  else
-    m.top.content.insertChild(m.SpecialCategories.findNode("SearchSignIn"), 0)
-  end if
-    
+  ' Prepend special categories, taking care to remove them if they already are there
   m.InfoPanel.mode = "category"
   if m.top.signedIn then
-    m.top.content.insertChild(m.SpecialCategories.findNode("ContinueWatching"), 1)
-    m.top.content.insertChild(m.SpecialCategories.findNode("MyQueue"), 2)
+    m.top.content.removeChild(m.SearchSignInCategory)
+    m.top.content.insertChild(m.SearchSignOutCategory, 0)
+    m.top.content.insertChild(m.ContinueWatchingCategory, 1)
+    m.top.content.insertChild(m.MyQueueCategory, 2)
+  else
+    m.top.content.removeChild(m.SearchSignOutCategory)
+    m.top.content.removeChild(m.ContinueWatchingCategory)
+    m.top.content.removeChild(m.MyQueueCategory)
+    m.top.content.insertChild(m.SearchSignInCategory, 0)
   end if
 
   m.CategoryList.content = m.top.content
@@ -331,20 +339,8 @@ Function onSignedInChange()
   content.appendChild(m.AboutMenuItem)
   m.SignInMenu.content = content
 
-  ' Note that these are idempotent.  The findNode calls will return invalid if 
-  ' the categories are already where they should be
   if m.top.content <> invalid then
-    if m.top.signedIn = true then
-      m.CategoryList.content = invalid
-      m.top.content.insertChild(m.SpecialCategories.findNode("ContinueWatching"), 1)
-      m.top.content.insertChild(m.SpecialCategories.findNode("MyQueue"), 2)
-      m.CategoryList.content = m.top.content  ' just to trigger refresh
-    else
-      m.CategoryList.content = invalid
-      m.top.content.removeChild(m.top.content.findNode("ContinueWatching"))
-      m.top.content.removeChild(m.top.content.findNode("MyQueue"))
-      m.CategoryList.content = m.top.content  ' just to trigger refresh
-    end if
+    onContentChange()
   end if
 End Function
 
