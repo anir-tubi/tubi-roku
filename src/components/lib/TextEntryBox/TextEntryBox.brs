@@ -4,6 +4,10 @@ Function init()
   m.top.observeField("text", "formatTextBox")
   m.top.width = 480
   m.top.height = 80
+
+  ' character to mask the password with.  Chr(&hb7) is dot, but it's very skinny in
+  ' the font we currently use
+  m.passwordPlaceholder = "*"
 End Function
 
 ''''''''''''''''
@@ -20,7 +24,16 @@ Function formatTextBox()
   if m.top.text = invalid or m.top.text = "" then
     m.Text.text = m.top.hint
   else
-    m.Text.text = m.top.text
+    if m.top.passwordMode = true then
+      passwordText = ""
+      for i=0 to m.top.text.len()-2
+        passwordText = passwordText + m.passwordPlaceholder
+      end for
+      passwordText = passwordText + Right(m.top.text, 1)
+      m.Text.text = passwordText
+    else
+      m.Text.text = m.top.text
+    end if
   end if
 
   textRect = m.Text.localBoundingRect()

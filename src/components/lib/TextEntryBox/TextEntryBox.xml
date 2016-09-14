@@ -19,6 +19,9 @@
     <!-- Text attributes, not applied to 'hint' -->
     <field id="textColor" alias="Text.color" />
     <field id="textOpacity" alias="Text.opacity" />
+    
+    <!-- Password mode will only display the last character entered -->
+    <field id="passwordMode" type="boolean" value="false" />
   </interface>
 
   <children>
