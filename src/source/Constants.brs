@@ -70,8 +70,8 @@ Function getConstants()
 
   constants.urls = {}
     'ad server url
+    ' constants.urls.adsBaseUrl = "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
     constants.urls.adsBaseUrl = "http://ads.adrise.tv/"
-                                '"http://ads.adrise1.tv/" 'use to avoid getting ads during testing
 
     'contents url
     constants.urls.cms = {}

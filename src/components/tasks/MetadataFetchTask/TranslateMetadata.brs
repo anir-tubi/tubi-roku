@@ -214,20 +214,24 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
 
   'take care of any subtitles if they exist - should only happen on videos
   if contentFromServer.subtitles <> invalid and type(contentFromServer.subtitles) = "roArray" and contentFromServer.subtitles.count() > 0
-    translatedContent.subtitles = {
-      languages: []
-    }
+    subtitleLanguages = []
+    subtitleUrls = []
+
     for each subtitle in contentFromServer.subtitles
-      translatedContent.subtitles["languages"].push({
-        url: subtitle.url
-        name: subtitle.lang
-      })
+      subtitleLanguages.push(subtitle.lang)
+      subtitleUrls.push(subtitle.url)
     end for
+
+    translatedContent.subtitleLanguages = subtitleLanguages
+    translatedContent.subtitleUrls = subtitleUrls
     
     'set the default subtitles if there is only one set of subtitles
-    if translatedContent.subtitles["languages"].count() = 1
-      translatedContent.subtitles.default = translatedContent.subtitles["languages"][0].url
-      translatedContent.subtitleUrl = translatedContent.subtitles.["languages"][0].url
+    if contentFromServer.subtitles.count() = 1
+      translatedContent.subtitleDefault = contentFromServer.subtitles[0].url
+      translatedContent.subtitleUrl = contentFromServer.subtitles.[0].url
+    end if
+
+    if translatedContent.id = "304771"
     end if
   end if
 

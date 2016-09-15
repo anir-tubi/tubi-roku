@@ -32,6 +32,7 @@ function TubiPlayer(utils)
     getTransportTime: AdrisePlayer_getTransportTime
     handleVideoFailure: AdrisePlayer_handleVideoFailure
     savePreviouslyViewedUpdate: AdrisePlayer_savePreviouslyViewedUpdate
+    showCaptionsDialog: AdrisePlayer_showCaptionsDialog
   }
 end function
 
@@ -575,18 +576,18 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
         '* button
         if msg.GetIndex() = 10
-          ' playerStates.isPaused = true
-          ' player.pause()
+          playerStates.isPaused = true
+          player.pause()
           
-          ' 'show a dialog that will let users turn on/off captions
-          ' if GetGlobalAA().app.detailScreen.showCaptionsDialog(episode) = true
-          '   captions.showSubtitle(true)
+          'show a dialog that will let users turn on/off captions
+          if m.showCaptionsDialog(episode) = true
+            captions.showSubtitle(true)
           
-          ' else
-          '   captions.showSubtitle(false)
-          ' end if
-          ' playerStates.isPaused = false
-          ' player.resume()
+          else
+            captions.showSubtitle(false)
+          end if
+          playerStates.isPaused = false
+          player.resume()
         end if
 
         'play/pause button
@@ -1094,6 +1095,7 @@ function AdrisePlayer_handleVideoFailure(episode)
   return ""
 end function
 
+
 function AdrisePlayer_savePreviouslyViewedUpdate(episode, nowPos)
 
   'only do the following if the user is logged in
@@ -1104,4 +1106,104 @@ function AdrisePlayer_savePreviouslyViewedUpdate(episode, nowPos)
     m.playerRequestQueue.pushRequest(newHistoryReq)
   end if
 
+end function
+
+
+'@episode: assocArray, a video object from that has been passed into the player
+function AdrisePlayer_showCaptionsDialog(episode as Object) as Boolean
+  port = CreateObject("roMessagePort")
+  dialog = CreateObject("roMessageDialog")
+  dialog.SetMessagePort(port)
+
+  globalCaptions = m.constants.deviceInfo.captionsMode
+
+  'if we have subtitles set the appropriate text
+  if episode.subtitleLanguages <> invalid and episode.subtitleUrls <> invalid
+    dialog.SetText("Set subtitles for " + episode.title)
+
+    curr = episode.subtitleDefault
+    if episode.subtitlesCurrent <> invalid
+      curr = episode.subtitlesCurrent
+    end if
+
+    currIndex = 0
+    if episode.subtitleLanguages.count() = 1
+      dialog.AddButton(0, "Off")
+      dialog.AddButton(1, "On")
+      if curr = episode.subtitleUrls[0]
+        currIndex = 1
+      end if
+
+    else
+      dialog.AddButton(0, "No subtitles")
+      for i=0 to episode.subtitleLanguages.count()-1 step 1
+        language = episode.subtitleLanguages[i]
+        count = i + 1
+        dialog.AddButton(count, language)
+
+        if curr <> invalid and curr = episode.subtitleUrls[i]
+          currIndex = count
+        end if
+      end for
+    end if
+
+    'makes sure that the highlighted selection always starts at off if episode.showSubtitles is currently set to false
+    'in other words, the initial selection will be what the current state is
+    if episode.showSubtitles = false
+      currIndex = 0
+    end if
+
+  'there are no captions/subtitles so let the user know - this should only happen if user presses star while watching content
+  else
+    dialog.SetText("Sorry, there are no captions available for this video.")
+    dialog.AddButton(0, "Ok")
+    currIndex = 0
+  end if
+
+  dialog.SetFocusedMenuItem(currIndex)
+
+  dialog.EnableBackButton(true)
+  dialog.EnableOverlay(true)
+  dialog.Show()
+
+  while true
+    dlgMsg = wait(0, port)
+
+    if type(dlgMsg) = "roMessageDialogEvent"
+      if dlgMsg.isButtonPressed()
+        buttonIndex = dlgMsg.GetIndex()
+        if buttonIndex = 0
+          episode.showSubtitles = false
+
+          m.utils.tracking.trackUserEvent({
+            trackType: "subtitles"
+            ctx: episode.id
+            value: "off"
+            requestQ: m.playerRequestQueue
+          })
+
+          ' m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles disabled")
+          return false
+        else
+          episode.subtitlesCurrent = episode.subtitleUrls[buttonIndex-1]
+          episode.subtitleUrl = episode.subtitleUrls[buttonIndex-1]
+          episode.showSubtitles = true
+          
+          m.utils.tracking.trackUserEvent({
+            trackType: "subtitles"
+            ctx: episode.id
+            value: "on"
+            requestQ: m.playerRequestQueue
+          })
+
+          ' m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles set to " + episode.subtitlesCurrent)
+          return true
+        end if
+      end if
+      if dlgMsg.isScreenClosed()
+        return false
+      end if
+    else
+    end if
+  end while
 end function
