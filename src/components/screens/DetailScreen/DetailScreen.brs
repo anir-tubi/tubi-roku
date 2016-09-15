@@ -249,8 +249,8 @@ Function setMenuItems() As Void
   end if
 
   m.Menu.content = menuItems
-  m.Menu.visible = "true"
-  m.Menu.setFocus(true)
+  m.Menu.visible = true
+  if m.top.isInFocusChain() then m.Menu.setFocus(true)
 End Function
 
 

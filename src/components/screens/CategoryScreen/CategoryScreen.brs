@@ -64,7 +64,8 @@ Function onCategoriesReceived()
       m.top.content = m.top.categoryListResponse.convertedMetadata
     else
       testLog("Category list returned " + stri(response.code))
-      showErrorModal(response.code, response.failReason, retryCategoryList, retryCategoryList)
+      ' if we were loading in the background, don't show an error modal
+      if m.top.isInFocusChain() then showErrorModal(response.code, response.failReason, retryCategoryList, retryCategoryList)
     end if
   end if
 End Function
@@ -121,6 +122,8 @@ Function onScreenFocusChange()
       m.ContentGrid.setFocus(true)
     else if m.SignInMenu.visible = true then
       m.SignInMenu.setFocus(true)
+    else
+      m.CategoryList.setFocus(true)
     end if
   end if
 End Function
@@ -187,7 +190,7 @@ Function onContentChange() As Void
   end if
 
   m.CategoryList.content = m.top.content
-  m.CategoryList.setFocus(true)
+  if m.top.isInFocusChain() then m.CategoryList.setFocus(true)
   m.featureCategoryFocused = false
 End Function
 
@@ -216,7 +219,7 @@ Function onCategoryContentReceived() As Void
     end if
   else
     testLog("Category content returned " + stri(response.code))
-    showErrorModal(response.code, response.failReason, retryCategoryContent, cancelCategoryContent)
+    if m.top.isInFocusChain() then showErrorModal(response.code, response.failReason, retryCategoryContent, cancelCategoryContent)
   end if
 End Function
 

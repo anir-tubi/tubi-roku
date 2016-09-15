@@ -73,7 +73,7 @@ Function onContentChange()
   ' Set visibility and focus
   m.EpisodeGrid.visible = true
   m.Menu.visible = true
-  m.Menu.setFocus(true)
+  if m.top.isInFocusChain() then m.Menu.setFocus(true)
 End Function
 
 ''''''''''''''''''''
