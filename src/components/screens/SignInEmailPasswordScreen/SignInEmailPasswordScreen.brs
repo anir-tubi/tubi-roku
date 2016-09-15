@@ -179,9 +179,11 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
         startShowKeyboard()
         return true
       else if m.SignInButton.hasFocus() and m.SignInButtonFocus.visible = true then
-        ' only sign-in if button is enabled
-        signIn()
-        return true
+        if m.SignIn = invalid then
+          ' only sign-in if button is enabled and task isn't running
+          signIn()
+          return true
+        end if
       end if
     end if
   end if
@@ -229,6 +231,7 @@ Function onSignInResult()
     m.Dialog.observeField("buttonSelected", "onCloseError")
     m.Dialog.setFocus(true)
   end if
+  m.SignIn = invalid  ' free the task
 End Function
 
 
