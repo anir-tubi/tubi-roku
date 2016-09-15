@@ -345,6 +345,15 @@ Function onSignedInChange()
   if m.top.content <> invalid then
     onContentChange()
   end if
+
+  ' Clear out the history and queue
+  m.global.bookmarkIds = {}
+  m.global.bookmarkOrder = []
+  m.global.historyIds = {}
+  m.global.historyOrder = []
+  if m.top.signedIn = true then
+    loadUserCategories()
+  end if
 End Function
 
 

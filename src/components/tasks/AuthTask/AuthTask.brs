@@ -43,10 +43,12 @@ Function getInitialUserCategories()
     handledReq = queue.handleEvent(msg)
 
     if handledReq <> invalid
-      if handledReq.localId = localBookmarkReqId and handledReq.hasData() = true
-        m.top.initialBookmarks = handledReq.response.data
-      else if handledReq.localId = localHistoryReqId
-        m.top.initialHistory = handledReq.response.data
+        if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
+        if handledReq.localId = localBookmarkReqId
+          m.top.initialBookmarks = handledReq.response.data
+        else if handledReq.localId = localHistoryReqId
+          m.top.initialHistory = handledReq.response.data
+        end if
       end if
     end if
 

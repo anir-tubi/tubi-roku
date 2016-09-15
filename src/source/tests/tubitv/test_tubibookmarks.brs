@@ -197,3 +197,283 @@ Function xtestHandleInitialHistory(t As Object)
   'TODO(Chris)
 End Function
 
+''''''''''''''
+' updateNowPos
+'
+' Permutations:
+'   signed in vs. signed out - playerInfo.historyId will be empty or invalid for signed out
+'   movie vs. episode () - episode will have playerInfo.parentHistoryId
+'   new vs. existing - historyIds{}/historyOrder[] will already contain a matching entry for existing
+''''''''''''''
+Function testUpdateNowPosSignedInMovieNew(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Authorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  historyIds = {
+    series: {}
+    videos: {}
+  }
+  historyOrder = []
+  content = CreateObject("roSGNode", "TubiContentNode")
+  content.type = "video"
+  content.id = "321221"
+  content.title = "We Are Young"
+  playerInfo = {
+    nowPos: 145
+    historyId: "AABBCCDDEEFFGG"
+  }
+  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
+  
+  t.assertEqual(result.historyOrder.count(), 1)
+  t.assertEqual(result.historyOrder[0], "321221")
+  t.assertEqual(result.historyIds.series.count(), 0)
+  t.assertEqual(result.historyIds.videos.count(), 1)
+  t.assertEqual(result.historyIds.videos["321221"].serverId, "AABBCCDDEEFFGG")
+  t.assertEqual(result.historyIds.videos["321221"].position, 145)
+End Function
+
+Function testUpdateNowPosSignedInEpisodeNew(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Authorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  historyIds = {
+    series: {}
+    videos: {}
+  }
+  historyOrder = []
+  content = CreateObject("roSGNode", "TubiContentNode")
+  content.type = "video"
+  content.id = "302800"
+  content.title = "S02:E05 - You, I'll Be Following"
+  content.parentId = "1079"
+  playerInfo = {
+    nowPos: 145
+    historyId: "AABBCCDDEEFFGG"
+    parentHistoryId: "TTUUVVWWXXYYZZ"
+  }
+  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
+  
+  t.assertEqual(result.historyOrder.count(), 1)
+  t.assertEqual(result.historyOrder[0], "01079")
+  t.assertEqual(result.historyIds.series.count(), 1)
+  t.assertEqual(result.historyIds.series["1079"].serverId, "TTUUVVWWXXYYZZ")
+  t.assertEqual(result.historyIds.series["1079"].currentEpisodeId, "302800")
+  t.assertEqual(result.historyIds.videos.count(), 1)
+  t.assertEqual(result.historyIds.videos["302800"].serverId, "AABBCCDDEEFFGG")
+  t.assertEqual(result.historyIds.videos["302800"].position, 145)
+End Function
+
+Function testUpdateNowPosSignedOutMovieNew(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Unauthorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  historyIds = {
+    series: {}
+    videos: {}
+  }
+  historyOrder = []
+  content = CreateObject("roSGNode", "TubiContentNode")
+  content.type = "video"
+  content.id = "321221"
+  content.title = "We Are Young"
+  playerInfo = {
+    nowPos: 145
+  }
+  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
+  
+  t.assertEqual(result.historyOrder.count(), 1)
+  t.assertEqual(result.historyOrder[0], "321221")
+  t.assertEqual(result.historyIds.series.count(), 0)
+  t.assertEqual(result.historyIds.videos.count(), 1)
+  t.assertInvalid(result.historyIds.videos["321221"].serverId)
+  t.assertEqual(result.historyIds.videos["321221"].position, 145)
+End Function
+
+Function testUpdateNowPosSignedOutEpisodeNew(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Unauthorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  historyIds = {
+    series: {}
+    videos: {}
+  }
+  historyOrder = []
+  content = CreateObject("roSGNode", "TubiContentNode")
+  content.type = "video"
+  content.id = "302800"
+  content.title = "S02:E05 - You, I'll Be Following"
+  content.parentId = "1079"
+  playerInfo = {
+    nowPos: 145
+  }
+  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
+  
+  t.assertEqual(result.historyOrder.count(), 1)
+  t.assertEqual(result.historyOrder[0], "01079")
+  t.assertEqual(result.historyIds.series.count(), 1)
+  t.assertInvalid(result.historyIds.series["1079"].serverId)
+  t.assertEqual(result.historyIds.series["1079"].currentEpisodeId, "302800")
+  t.assertEqual(result.historyIds.videos.count(), 1)
+  t.assertInvalid(result.historyIds.videos["302800"].serverId)
+  t.assertEqual(result.historyIds.videos["302800"].position, 145)
+End Function
+
+Function testUpdateNowPosSignedInMovieExisting(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Authorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  historyIds = {
+    series: {}
+    videos: {
+      "321221": {
+        nowPos: 10
+        serverId: "AABBCCDDEEFFGG"
+      }
+    }
+  }
+  historyOrder = ["321221"]
+  content = CreateObject("roSGNode", "TubiContentNode")
+  content.type = "video"
+  content.id = "321221"
+  content.title = "We Are Young"
+  playerInfo = {
+    nowPos: 145
+    historyId: "AABBCCDDEEFFGG"
+  }
+  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
+  
+  t.assertEqual(result.historyOrder.count(), 1)
+  t.assertEqual(result.historyOrder[0], "321221")
+  t.assertEqual(result.historyIds.series.count(), 0)
+  t.assertEqual(result.historyIds.videos.count(), 1)
+  t.assertEqual(result.historyIds.videos["321221"].serverId, "AABBCCDDEEFFGG")
+  t.assertEqual(result.historyIds.videos["321221"].position, 145)
+End Function
+
+Function testUpdateNowPosSignedInEpisodeExisting(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Authorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  historyIds = {
+    series: {
+      "1079": {
+        serverId: "TTUUVVWWXXYYZZ"
+        currentEpisodeId: "302800"
+      }
+    }
+    videos: {
+      "302800": {
+        serverId: "AABBCCDDEEFFGG"
+        nowPos: 15
+      }
+    }
+  }
+  historyOrder = ["01079"]
+  content = CreateObject("roSGNode", "TubiContentNode")
+  content.type = "video"
+  content.id = "302800"
+  content.title = "S02:E05 - You, I'll Be Following"
+  content.parentId = "1079"
+  playerInfo = {
+    nowPos: 145
+    historyId: "AABBCCDDEEFFGG"
+    parentHistoryId: "TTUUVVWWXXYYZZ"
+  }
+  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
+  
+  t.assertEqual(result.historyOrder.count(), 1)
+  t.assertEqual(result.historyOrder[0], "01079")
+  t.assertEqual(result.historyIds.series.count(), 1)
+  t.assertEqual(result.historyIds.series["1079"].serverId, "TTUUVVWWXXYYZZ")
+  t.assertEqual(result.historyIds.series["1079"].currentEpisodeId, "302800")
+  t.assertEqual(result.historyIds.videos.count(), 1)
+  t.assertEqual(result.historyIds.videos["302800"].serverId, "AABBCCDDEEFFGG")
+  t.assertEqual(result.historyIds.videos["302800"].position, 145)
+End Function
+
+Function testUpdateNowPosSignedOutMovieExisting(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Unauthorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  historyIds = {
+    series: {}
+    videos: {
+      "321221": {
+        nowPos: 10
+        serverId: invalid
+      }
+    }
+  }
+  historyOrder = ["321221"]
+  content = CreateObject("roSGNode", "TubiContentNode")
+  content.type = "video"
+  content.id = "321221"
+  content.title = "We Are Young"
+  playerInfo = {
+    nowPos: 145
+  }
+  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
+  
+  t.assertEqual(result.historyOrder.count(), 1)
+  t.assertEqual(result.historyOrder[0], "321221")
+  t.assertEqual(result.historyIds.series.count(), 0)
+  t.assertEqual(result.historyIds.videos.count(), 1)
+  t.assertInvalid(result.historyIds.videos["321221"].serverId)
+  t.assertEqual(result.historyIds.videos["321221"].position, 145)
+End Function
+
+Function testUpdateNowPosSignedOutEpisodeExisting(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Unauthorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  historyIds = {
+    series: {
+      "1079": {
+        serverId: invalid
+        currentEpisodeId: "302800"
+      }
+    }
+    videos: {
+      "302800": {
+        serverId: invalid
+        nowPos: 15
+      }
+    }
+  }
+  historyOrder = ["01079"]
+  content = CreateObject("roSGNode", "TubiContentNode")
+  content.type = "video"
+  content.id = "302800"
+  content.title = "S02:E05 - You, I'll Be Following"
+  content.parentId = "1079"
+  playerInfo = {
+    nowPos: 145
+  }
+  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
+  
+  t.assertEqual(result.historyOrder.count(), 1)
+  t.assertEqual(result.historyOrder[0], "01079")
+  t.assertEqual(result.historyIds.series.count(), 1)
+  t.assertInvalid(result.historyIds.series["1079"].serverId)
+  t.assertEqual(result.historyIds.series["1079"].currentEpisodeId, "302800")
+  t.assertEqual(result.historyIds.videos.count(), 1)
+  t.assertInvalid(result.historyIds.videos["302800"].serverId)
+  t.assertEqual(result.historyIds.videos["302800"].position, 145)
+End Function
+
+Function xtestUpdateNowPosInvalidHistoryIds(t As Object)
+End Function
+
+Function xtestUpdateNowPosInvalidHistoryOrder(t As Object)
+End Function
+
+Function xtestUpdateNowPosInvalidPlayerInfo(t As Object)
+End Function

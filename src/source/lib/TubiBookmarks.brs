@@ -378,10 +378,7 @@ end function
 '   bookmarkIds: assocArray, a map of contentIds to server bookmarksIds
 '   bookmarkOrder: an array of contentIds (series have pre-pended 0), that keeps the order of bookmarks as returned from the server
 function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
-  parsedInitialBookmarks = ParseJson(initialBookmarks)
-
   bookmarkOrder = []
-
   bookmarkIds = {
     'each videos and series assocArray should look like:
     '{contentId: bookmarkServerId, ...}
@@ -389,18 +386,18 @@ function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
     series: {}
   }
 
-  for each bookmark in parsedInitialBookmarks.items
-    if bookmark.content_type = m.constants.uapiContentTypes.movie
-      bookmarkIds.videos[bookmark.content_id.toStr()] = bookmark.id
-
-      bookmarkOrder.push(bookmark.content_id.toStr())
-
-    else if bookmark.content_type = m.constants.uapiContentTypes.series
-      bookmarkIds.series[bookmark.content_id.toStr()] = bookmark.id
-
-      bookmarkOrder.push("0" + bookmark.content_id.toStr())
-    end if
-  end for
+  parsedInitialBookmarks = ParseJson(initialBookmarks)
+  if parsedInitialBookmarks <> Invalid
+    for each bookmark in parsedInitialBookmarks.items
+      if bookmark.content_type = m.constants.uapiContentTypes.movie
+        bookmarkIds.videos[bookmark.content_id.toStr()] = bookmark.id
+        bookmarkOrder.push(bookmark.content_id.toStr())
+      else if bookmark.content_type = m.constants.uapiContentTypes.series
+        bookmarkIds.series[bookmark.content_id.toStr()] = bookmark.id
+        bookmarkOrder.push("0" + bookmark.content_id.toStr())
+      end if
+    end for
+  end if
 
   return {
     bookmarkOrder: bookmarkOrder
@@ -416,30 +413,27 @@ end function
 '   historyIds: assocArray, a map of contentIds to server historysIds
 '   historyOrder: an array of contentIds (series have pre-pended 0), that keeps the order of history as returned from the server
 function tubiBookmarks_handleInitialHistory(initialHistory)
+  historyOrder = []
+  historyIds = {
+    'each videos and series assocArray should look like:
+    '{contentId: {
+    '   serverId: historyServerId
+    '   position: 365
+    '  }
+    '}
+    videos: {}
+    series: {}
+  }
+
+  'parse the initial bookmark response and create a list of bookmark server ids that will persist in the content controller
   parsedInitialHistory = ParseJson(initialHistory)
-    'parse the initial bookmark response and create a list of bookmark server ids that will persist in the content controller
-    parsedInitialHistory = ParseJson(initialHistory)
-
-    historyOrder = []
-
-    historyIds = {
-      'each videos and series assocArray should look like:
-      '{contentId: {
-      '   serverId: historyServerId
-      '   position: 365
-      '  }
-      '}
-      videos: {}
-      series: {}
-    }
-
+  if parsedInitialHistory <> invalid then
     for each history in parsedInitialHistory.items
       if history.content_type = m.constants.uapiContentTypes.movie
         historyIds.videos[history.content_id.toStr()] = {
           serverId: history.id
           position: history.position
         }
-
         historyOrder.push(history.content_id.toStr())
 
       else if history.content_type = m.constants.uapiContentTypes.series
@@ -447,23 +441,21 @@ function tubiBookmarks_handleInitialHistory(initialHistory)
           serverId: history.id
           currentEpisodeId: history.episodes[history.position].content_id.toStr()
         }
-
         for each episode in history.episodes
           historyIds.videos[episode.content_id.toStr()] = {
             serverId: episode.id
             position: episode.position
           }
         end for
-
         historyOrder.push("0" + history.content_id.toStr())
-
       end if
     end for
+  end if
 
-    return {
-      historyOrder: historyOrder
-      historyIds: historyIds
-    }
+  return {
+    historyOrder: historyOrder
+    historyIds: historyIds
+  }
 
 end function
 
@@ -490,25 +482,28 @@ function tubiBookmarks_updateNowPos(content, playerInfo, historyIds, historyOrde
     newHistoryOrder = []
     newHistoryOrder.append(historyOrder)
 
-    if playerInfo.historyId <> invalid and playerInfo.historyId <> ""
-      tubiLog("Bookmarks.updateNowPos Storing historyId for " + content.id + " to " + playerInfo.historyId)
+    if newHistoryIds.videos[content.id] <> invalid 
+      tubiLog("Bookmarks.updateNowPos updating historyId for " + content.id)
+      newHistoryIds.videos[content.id].position = playerInfo.nowPos
+    else
+      tubiLog("Bookmarks.updateNowPos Storing historyId for " + content.id)
 
       ' store the series if video was an episode
-      if content.parentId <> invalid and content.parentId <> "" and playerInfo.parentHistoryId <> invalid and playerInfo.parentHistoryId <> "" then
-        tubiLog("Bookmarks.updateNowPos Storing parentHistoryId for " + content.parentId + " to " + playerInfo.parentHistoryId)
+      if content.parentId <> invalid and content.parentId <> "" then
+        tubiLog("Bookmarks.updateNowPos Storing parentHistoryId for " + content.parentId)
         newHistoryIds.series[content.parentId] = {
-          serverId: playerInfo.parentHistoryId
+          serverId: playerInfo.parentHistoryId   ' may be invalid for signed-out user
           currentEpisodeId: content.id
         }
         newHistoryIds.videos[content.id] = {
-          serverId: playerInfo.historyId
+          serverId: playerInfo.historyId        ' may be invalid for signed-out user
           position: playerInfo.nowPos
         }
         orderId = "0" + content.parentId
       else
-        ' here if video was a movie or episode already had a previous history
+        ' update if the video was a movie
         newHistoryIds.videos[content.id] = {
-          serverId: playerInfo.historyId
+          serverId: playerInfo.historyId        ' may be invalid for signed-out user
           position: playerInfo.nowPos
         }
         orderId = content.id
@@ -519,12 +514,6 @@ function tubiBookmarks_updateNowPos(content, playerInfo, historyIds, historyOrde
         if newHistoryOrder[i] = orderId then newHistoryOrder.delete(i)
       end for
       newHistoryOrder.unshift(orderId)
-
-    'we don't have a new historyId, but we have an existing entry
-    else if (newHistoryIds.videos[content.id] <> invalid and newHistoryIds.videos[content.id].serverId <> invalid) 
-      newHistoryIds.videos[content.id].position = playerInfo.nowPos
-    else
-      tubiLog("Bookmarks.updateNowPos Ignoring empty historyId")
     end if
 
     return {
@@ -532,6 +521,10 @@ function tubiBookmarks_updateNowPos(content, playerInfo, historyIds, historyOrde
       historyIds: newHistoryIds
     }
   else
-    return invalid
+    ' one of the arguments was invalid, just return what we were passed in
+    return {
+      historyOrder: historyOrder      
+      historyIds: historyIds
+    }
   end if
 end function
