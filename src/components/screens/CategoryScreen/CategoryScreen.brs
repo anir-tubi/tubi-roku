@@ -477,21 +477,25 @@ Function loadHistory(categoryId As String)
 
   historyOrder = m.global.historyOrder
 
-  if historyOrder <> invalid
-    'get the full user's bookmark category
-    request = Bookmarks.getFullHistoryReq(historyOrder)
+  if historyOrder <> invalid then
+    if historyOrder.count() > 0 then
+      'get the full user's bookmark category
+      request = Bookmarks.getFullHistoryReq(historyOrder)
 
-    request.node = m.top
-    request.field = "categoryResponse"
+      request.node = m.top
+      request.field = "categoryResponse"
     
-    ' first cancel any outstanding metadata requests for this screen
-    m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
-    m.global.metadataFetchTask.request = request
+      ' first cancel any outstanding metadata requests for this screen
+      m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
+      m.global.metadataFetchTask.request = request
+    else
+      m.Spinner.visible = false
+    end if
 
-  'we haven't gotten a response for the initial bookmarks yet
-  'so we're gonna listen and run this again once we get a response
-  'we need to make sure we unobserve this field once the category changes though
   else
+    'we haven't gotten a response for the initial bookmarks yet
+    'so we're gonna listen and run this again once we get a response
+    'we need to make sure we unobserve this field once the category changes though
     m.global.observeField("historyOrder", "loadHistory")
   end if
 
@@ -510,21 +514,25 @@ Function loadBookmarks(categoryId As String)
 
   bookmarkOrder = m.global.bookmarkOrder
 
-  if bookmarkOrder <> invalid
-    'get the full user's history category
-    request = Bookmarks.getFullHistoryReq(bookmarkOrder)
+  if bookmarkOrder <> invalid then 
+    if bookmarkOrder.count() > 0 then
+      'get the full user's history category
+      request = Bookmarks.getFullHistoryReq(bookmarkOrder)
 
-    request.node = m.top
-    request.field = "categoryResponse"
+      request.node = m.top
+      request.field = "categoryResponse"
 
-    ' first cancel any outstanding metadata requests for this screen
-    m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
-    m.global.metadataFetchTask.request = request
+      ' first cancel any outstanding metadata requests for this screen
+      m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
+      m.global.metadataFetchTask.request = request
+    else
+      m.Spinner.visible = false
+    end if
   
-  'we haven't gotten a response for the initial bookmarks yet
-  'so we're gonna listen and run this again once we get a response
-  'we need to make sure we unobserve this field once the category changes though
   else
+    'we haven't gotten a response for the initial bookmarks yet
+    'so we're gonna listen and run this again once we get a response
+    'we need to make sure we unobserve this field once the category changes though
     m.global.observeField("bookmarkOrder", "loadBookmarks")
   end if
 
