@@ -286,7 +286,7 @@ function tubiBookmarks_getInitialHistoryReq(localId) as Object
 
   'if the user is not logged in (aka doesn't have an accessToken in local memory),
   'then don't get any history items
-  if authInfo.accessToken = invalid
+  if authInfo = invalid or authInfo.accessToken = invalid
     return invalid
   end if
 

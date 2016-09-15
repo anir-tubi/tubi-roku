@@ -33,30 +33,33 @@ Function getInitialUserCategories()
   localHistoryReqId = "history"
 
   initialBookmarksReq = Bookmarks.getInitialBookmarksReq(localBookmarkReqId)
-  queue.pushRequest(initialBookmarksReq)
+  if initialBookmarksReq <> invalid then queue.pushRequest(initialBookmarksReq)
 
   initialHistoryReq = Bookmarks.getInitialHistoryReq(localHistoryReqId)
-  queue.pushRequest(initialHistoryReq)
+  if initialHistoryReq <> invalid then queue.pushRequest(initialHistoryReq)
 
-  while true
-    msg = wait(0, queuePort)
-    handledReq = queue.handleEvent(msg)
+  if queue.count() > 0 then
 
-    if handledReq <> invalid
+    while true
+      msg = wait(0, queuePort)
+      handledReq = queue.handleEvent(msg)
+
+      if handledReq <> invalid
         if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
-        if handledReq.localId = localBookmarkReqId
-          m.top.initialBookmarks = handledReq.response.data
-        else if handledReq.localId = localHistoryReqId
-          m.top.initialHistory = handledReq.response.data
+          if handledReq.localId = localBookmarkReqId
+            m.top.initialBookmarks = handledReq.response.data
+          else if handledReq.localId = localHistoryReqId
+            m.top.initialHistory = handledReq.response.data
+          end if
         end if
       end if
-    end if
 
-    'once we've received all our initial responses, shut down this loop
-    if queue.count() = 0
-      exit while
-    end if
-  end while
+      'once we've received all our initial responses, shut down this loop
+      if queue.count() = 0
+        exit while
+      end if
+    end while
+  end if
 
 End Function
 

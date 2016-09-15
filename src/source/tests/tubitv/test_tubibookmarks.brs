@@ -181,12 +181,40 @@ Function xtestRemoveHistoryReq(t As Object)
   'TODO(Chris)
 End Function
 
-Function xtestGetInitialBookmarksReq(t As Object)
-  'TODO(Chris)
+Function testGetInitialBookmarksReqSignedOut(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Unauthorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  req = BM.getInitialBookmarksReq("1234")
+  t.assertInvalid(req)
 End Function
 
-Function xtestGetInitialHistoryReq(t As Object)
-  'TODO(Chris)
+Function testGetInitialBookmarksReqSignedIn(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Authorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  req = BM.getInitialBookmarksReq("1234")
+  t.assertNotInvalid(req)
+End Function
+
+Function testGetInitialHistoryReqSignedOut(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Unauthorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  req = BM.getInitialHistoryReq("1234")
+  t.assertInvalid(req)
+End Function
+
+Function testGetInitialHistoryReqSignedIn(t As Object)
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = mockAuth_Authorized(constants, REQUEST)
+  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  req = BM.getInitialHistoryReq("1234")
+  t.assertNotInvalid(req)
 End Function
 
 Function xtestHandleInitialBookmarks(t As Object)

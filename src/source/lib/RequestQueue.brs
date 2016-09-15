@@ -52,7 +52,7 @@ Function tubiq_pushRequest(request As Object) As Object
   ' make room first
   m.AdvanceQueue_()
 
-  if request["klass"] <> "TubiAsyncHTTPRequest"
+  if request = invalid or request["klass"] <> "TubiAsyncHTTPRequest"
     tubiLog("Invalid object attempted to push to request queue")
     return invalid
   else
