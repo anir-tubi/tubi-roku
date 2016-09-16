@@ -81,13 +81,17 @@ End Function
 ' if one of the user categories is showing, reload it
 Function onDirtyUserCategories()
   tubiLog("CategoryScreen.onDirtyUserCategories")
-  category = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
-  if category.title = m.global.constants.ui.categoryNames.history
-    m.ContentGrid.content = invalid  ' hide the current content so it doesn't jump when updated
-    loadHistory(category.id)      
-  else if category.title = m.global.constants.ui.categoryNames.queue
-    m.ContentGrid.content = invalid  ' hide the current content so it doesn't jump when updated
-    loadBookmarks(category.id)  
+  if m.CategoryList.content <> invalid then
+    category = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
+    if category <> invalid
+      if category.title = m.global.constants.ui.categoryNames.history
+        m.ContentGrid.content = invalid  ' hide the current content so it doesn't jump when updated
+        loadHistory(category.id)
+      else if category.title = m.global.constants.ui.categoryNames.queue
+        m.ContentGrid.content = invalid  ' hide the current content so it doesn't jump when updated
+        loadBookmarks(category.id)
+      end if
+    end if
   end if
 End Function
 
@@ -346,11 +350,6 @@ Function onSignedInChange()
     onContentChange()
   end if
 
-  ' Clear out the history and queue
-  m.global.bookmarkIds = {}
-  m.global.bookmarkOrder = []
-  m.global.historyIds = {}
-  m.global.historyOrder = []
   if m.top.signedIn = true then
     loadUserCategories()
   end if

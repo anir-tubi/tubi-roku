@@ -19,10 +19,10 @@ Function init()
   m.global.addField("historyIds", "assocarray", false)
   m.global.addField("bookmarkOrder", "stringarray", false)
   m.global.addField("historyOrder", "stringarray", false)
-  m.global.bookmarkIds = invalid 'these are set in handleInitialBookmarks(), once a user has logged in
-  m.global.historyIds = invalid  'these are set in handleInitialHistory(), once a user has logged in
-  m.global.bookmarkOrder = invalid  'this are set in handleInitialBookmarks(), once a user has logged in
-  m.global.historyOrder = invalid  'this are set in handleInitialHistory(), once a user has logged in
+  m.global.bookmarkIds = {series: {}, videos: {}} 'these are set in handleInitialBookmarks(), once a user has logged in
+  m.global.historyIds = {series: {}, videos: {}}  'these are set in handleInitialHistory(), once a user has logged in
+  m.global.bookmarkOrder = []  'this are set in handleInitialBookmarks(), once a user has logged in
+  m.global.historyOrder = []  'this are set in handleInitialHistory(), once a user has logged in
 
   m.metadataFetchTask.observeField("ready", "onMetadataTaskReady")
   m.global.metadataFetchTask.control = "RUN"
