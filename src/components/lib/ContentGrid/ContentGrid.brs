@@ -78,7 +78,9 @@ End Function
 Function onContentChange() As Void
   tubiLog("ContentGrid.onContentChange")
   ' Remove all existing children except the focus box
-  m.contents.removeChildrenIndex(m.contents.getChildCount(), 0)
+  while m.contents.getChildCount() > 0
+    m.contents.removeChildIndex(0)
+  end while
 
   content = m.top.content
   if content = invalid or content.getChildCount() = 0 then 
@@ -104,7 +106,10 @@ Function onContentChange() As Void
   ' Set dimensions and translation for each item
   x = 0
   y = 0
-  rows = m.contents.createChildren(numRows, "Group")
+  rows = []
+  for i=0 to numRows-1
+    rows.push(m.contents.createChild("Group"))
+  end for
   for i=0 to numItems - 1 
     item = CreateObject("roSGNode", m.top.itemComponentName)
     item.width = m.top.itemSize[0]

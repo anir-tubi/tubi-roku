@@ -116,55 +116,45 @@ End Function
 ' the children for rendering
 Function onModeChange()
   print "InfoPanel.onModeChange"
-  m.top.removeChildrenIndex(m.top.getChildCount(), 0)
+  while m.top.getChildCount() > 0
+    m.top.removeChildIndex(0)
+  end while
 
   if m.top.mode= "category" then
-    m.top.appendChildren([
-      m.Title
-      m.CategoryDetails
-      m.Description
-    ])
+    m.top.appendChild(m.Title)
+    m.top.appendChild(m.CategoryDetails)
+    m.top.appendChild(m.Description)
     m.top.itemSpacings = [52, 31]
   else if m.top.mode = "item" then
-    m.top.appendChildren([
-      m.Title
-      m.TwoLineInfo
-      m.Description
-    ])
+    m.top.appendChild(m.Title)
+    m.top.appendChild(m.TwoLineInfo)
+    m.top.appendChild(m.Description)
     m.top.itemSpacings = [42, 30]
   else if m.top.mode = "movie" then
-    m.top.appendChildren([
-      m.Title
-      m.TwoLineInfo
-      m.Description
-      m.DirectorGroup
-      m.StarringGroup
-    ])
+    m.top.appendChild(m.Title)
+    m.top.appendChild(m.TwoLineInfo)
+    m.top.appendChild(m.Description)
+    m.top.appendChild(m.DirectorGroup)
+    m.top.appendChild(m.StarringGroup)
     m.top.itemSpacings = [42, 30, 34, 11]
   else if m.top.mode = "series" then
-    m.top.appendChildren([
-      m.Title
-      m.Episode
-      m.TwoLineInfo
-      m.Description
-      m.DirectorGroup
-      m.StarringGroup
-    ])
+    m.top.appendChild(m.Title)
+    m.top.appendChild(m.Episode)
+    m.top.appendChild(m.TwoLineInfo)
+    m.top.appendChild(m.Description)
+    m.top.appendChild(m.DirectorGroup)
+    m.top.appendChild(m.StarringGroup)
     m.top.itemSpacings = [26, 25, 30, 34, 11]
   else if m.top.mode = "season" then
-    m.top.appendChildren([
-      m.Title
-      m.SeasonDetails
-      m.Description
-    ])
+    m.top.appendChild(m.Title)
+    m.top.appendChild(m.SeasonDetails)
+    m.top.appendChild(m.Description)
     m.top.itemSpacings = [52, 31]
   else if m.top.mode = "episode" then
-    m.top.appendChildren([
-      m.Title
-      m.Episode
-      m.TwoLineInfo
-      m.Description
-    ])
+    m.top.appendChild(m.Title)
+    m.top.appendChild(m.Episode)
+    m.top.appendChild(m.TwoLineInfo)
+    m.top.appendChild(m.Description)
     m.top.itemSpacings = [26, 25, 30]
   end if
 End Function
