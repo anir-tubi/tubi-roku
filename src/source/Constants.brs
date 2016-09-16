@@ -36,13 +36,16 @@ Function getConstants()
     ' 256MB models, so we can reduce our expectations
     lowMemoryModels = {
       "2400X": true
-	  "2450X": true
-	  "2500X": true
-	  "3000X": true
-	  "3050X": true
-	  "3100X": true
-	  "3400X": true
-	  "3420X": true
+  	  "2450X": true
+      "2500X": true
+      "2700X": true
+      "2710X": true
+      "2720X": true
+      "3000X": true
+      "3050X": true
+      "3100X": true
+      "3400X": true
+      "3420X": true
     }
     if lowMemoryModels[di.GetModel()] <> invalid
       lowMemory = true
