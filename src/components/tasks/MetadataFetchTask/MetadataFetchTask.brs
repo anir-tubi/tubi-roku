@@ -118,7 +118,7 @@ Function handleResponse(message)
       else if handledRequest.name = m.constants.reqNames.getFullBookmarks
         convertedMetadata = convertBookmarkMetadata(handledRequest.response.data, "bookmarks")
 
-      else if handledRequest.name = m.constants.reqNames.getFullBookmarks
+      else if handledRequest.name = m.constants.reqNames.getFullHistory
         convertedMetadata = convertBookmarkMetadata(handledRequest.response.data, "history")
 
       else

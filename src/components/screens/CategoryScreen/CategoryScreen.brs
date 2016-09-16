@@ -532,7 +532,7 @@ Function loadBookmarks(categoryId As String)
   if bookmarkOrder <> invalid then 
     if bookmarkOrder.count() > 0 then
       'get the full user's history category
-      request = Bookmarks.getFullHistoryReq(bookmarkOrder)
+      request = Bookmarks.getFullBookmarksReq(bookmarkOrder)
 
       request.node = m.top
       request.field = "categoryResponse"
