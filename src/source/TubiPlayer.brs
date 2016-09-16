@@ -169,6 +169,11 @@ function AdrisePlayer_playVideo(episode as Object)
         status = m.ads.showCommercialBreak(canvas, m.resumePlayAdsList)
       end if
 
+      if status = m.constants.player.playerResults.closed
+        canvas.close()
+        return status
+      end if
+
     else
       canvas.close()
       return status

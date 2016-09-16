@@ -588,12 +588,12 @@ function adriseAds_showCommercialBreakViaRoku(canvas)
           isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList, screenCount)
           if isCompleted = false
             print "RAF ads not completed"
-            return "CLOSED"
+            return m.constants.player.playerResults.closed
           end if
           currentAdPosition = currentAdPosition + adUnitsListContainer.adUnitsList.count()
         else if adUnitsListContainer.type <> invalid and adUnitsListContainer.type = "adrise"
           status = m.showCommercialBreak(canvas, adUnitsListContainer.adUnitsList)
-          if status = "CLOSED"
+          if status = m.constants.player.playerResults.closed
             return status
           end if
           currentAdPosition = currentAdPosition + adUnitsListContainer.adUnitsList.count()
@@ -602,7 +602,7 @@ function adriseAds_showCommercialBreakViaRoku(canvas)
     end for
   end if
   
-  return "COMPLETED"
+  return m.constants.player.playerResults.completed
 end function
 
 
@@ -616,7 +616,7 @@ end function
 ' ----------------------------------------------
 function adriseAds_showCommercialBreak(canvas, videoAdsArray)
 
-  status = "COMPLETED"
+  status = m.constants.player.playerResults.completed
 
   if videoAdsArray <> invalid
     adDetails = {
@@ -631,13 +631,13 @@ function adriseAds_showCommercialBreak(canvas, videoAdsArray)
       
         status = m.showVideoAd(canvas, videoAdsArray[adCounter], adDetails)
 
-      if status = "CLOSED"
+      if status = m.constants.player.playerResults.closed
         return status
       end if
 
       adDetails.secondsLeft = adDetails.secondsLeft - videoAdsArray[adCounter].Duration.toInt()
 
-      if status = "COMPLETED"
+      if status = m.constants.player.playerResults.completed
         adCounter = adCounter + 1
       else
         canvas.Close()
@@ -672,7 +672,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
     return la.doEventLoop()
   end if
 
-  status = "COMPLETED"
+  status = m.constants.player.playerResults.completed
   
   'check if ad is Brightline companion overlay type by checking if companionOverlay property exists
   'since Brighltine throws errors on 3.1 firmware, only serve Brightline ads on greater than 3.1 firmware
@@ -714,7 +714,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
   if type(adUnit) <> "roAssociativeArray"
     houseAdDialog.close()
     canvas.close()
-    return "COMPLETED"
+    return m.constants.player.playerResults.completed
   end if
 
   player = CreateObject("roVideoPlayer")
@@ -796,7 +796,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
           'if ok is pressed during a skippable ad, after the skip time has elapsed
           if adUnit.adIsSkippable = true
             if m.skippableOverlay <> invalid and m.skippableOverlay.time >= m.skippableOverlay.skipTime
-              status = "COMPLETED"
+              status = m.constants.player.playerResults.completed
               print "skipped ad"
 
               'send tracking for skipped ad
@@ -929,7 +929,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
           player.Stop()
           houseAdDialog.close()
           canvas.close()
-          status = "CLOSED"
+          status = m.constants.player.playerResults.closed
           return status
         else if (i = 3)
           print "Pressed down"
@@ -1006,7 +1006,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
       '---------------------------------
       else if msg.isPartialResult()
         print "isPartialResult"
-        status = "COMPLETED"
+        status = m.constants.player.playerResults.completed
         exit while
 
       '---------------------------------
@@ -1027,12 +1027,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails)
             errorVal = adUnit.companionOverlay.url
           end if
 
-          m.utils.tracking.trackAdEvent({
-            trackType: "adFailure"
-            value:  errorVal  'the ad url
-            ctx: msg.GetMessage()
-            requestQ: m.playerRequestQueue
-          })
+          TubiLog("adriseAds_showVideoAd, ad failure")
 
           m.videoAdErrorCount = 0
           exit while
@@ -1367,13 +1362,13 @@ function adriseAds_showInnovidAd(adUnit as Object) as String
   tag_      = adUnit.companionOverlay.url
   tracking_ = adRiseAds_innovidAd_fetchTracking(adUnit)
   handler_  = {
-    status : "COMPLETED",
+    status : m.constants.player.playerResults.completed,
     handleRemoteKeyPressed : function(msg_, iroll_) as Object
       if msg_.GetIndex() <> 0 then
         return { doExit : false }
       end if
 
-      m.status = "CLOSED"
+      m.status = m.constants.player.playerResults.closed
 
       return { doExit : true }
     end function
