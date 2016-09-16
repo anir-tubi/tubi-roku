@@ -33,6 +33,23 @@ Function getConstants()
       definition = "sd"
     end if
 
+    ' 256MB models, so we can reduce our expectations
+    lowMemoryModels = {
+      "2400X": true
+	  "2450X": true
+	  "2500X": true
+	  "3000X": true
+	  "3050X": true
+	  "3100X": true
+	  "3400X": true
+	  "3420X": true
+    }
+    if lowMemoryModels[di.GetModel()] <> invalid
+      lowMemory = true
+    else
+      lowMemory = false
+    end if
+
     constants.deviceInfo.deviceId = di.GetDeviceUniqueId()
     constants.deviceInfo.deviceAdId = deviceAdId 'will be invalid if ad tracking is turned off by user or old version of firmware
     constants.deviceInfo.ipAddresses = di.GetIPAddrs() 'array of network interface ip addresses (normally will only contain 1 element)
@@ -50,6 +67,7 @@ Function getConstants()
     constants.deviceInfo.displayHeight = di.GetDisplaySize().h
     constants.deviceInfo.captionsMode = di.GetCaptionsMode()
     constants.deviceInfo.countryCode = countryCode ' will be invalid if old version of firmware
+    constants.deviceInfo.lowMemory = lowMemory
 
   'the name of the top level scene in the scene graph XML
   constants.startScene = "AppScene"

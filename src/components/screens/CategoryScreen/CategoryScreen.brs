@@ -468,6 +468,12 @@ Function loadOneCategory(categoryId As String)
       }
     }
   }
+
+  if constants.deviceInfo.lowMemory then
+    request.options.params.page_enabled = true
+    request.options.params.per_page = 100
+  end if
+
   ' first cancel any outstanding metadata requests for this screen
   m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
   m.global.metadataFetchTask.request = request
