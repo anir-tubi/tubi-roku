@@ -24,7 +24,7 @@ manifest:
   mm_icon_side_sd: "pkg:/images/FREETVMOVIES_Tubi_icon_80x46.jpg"
   splash_screen_fhd: "pkg:/images/splash-1920.jpg"
   splash_screen_hd: "pkg:/images/splash-1280.jpg"
-  splash_screen_sd: "pkg:/images/splash-720.jpg""
+  splash_screen_sd: "pkg:/images/splash-720.jpg"
   major_version: 2
   minor_version: 0
   build_version: 6
