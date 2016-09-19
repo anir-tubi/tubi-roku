@@ -115,7 +115,7 @@ Function getConstants()
 
     'user event tracking url
     constants.urls.dataScience = {}
-      constants.urls.dataScience.urlBase = "https://staging-uapi.adrise.tv/datascience"
+      constants.urls.dataScience.urlBase = "https://uapi.adrise.tv/datascience"
       constants.urls.datascience.event = constants.urls.dataScience.urlBase + "/event"
 
     'cuepoints url

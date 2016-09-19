@@ -9,7 +9,7 @@ settings:
   adLoadingFontColor: "#EBEBEB"
   loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
   registerWithTubi: true
-  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/11.brs"
+  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/14.brs"
   appName: "Tubi TV"
   isLiveTVOn: true
   isRokuAdFrameworkOn: false
@@ -22,8 +22,9 @@ manifest:
   mm_icon_side_hd: "pkg:/images/FREETVMOVIES_Tubi_icon_108x69.jpg"
   mm_icon_focus_sd: "pkg:/images/FREETVMOVIES_Tubi_icon_248x140.jpg"
   mm_icon_side_sd: "pkg:/images/FREETVMOVIES_Tubi_icon_80x46.jpg"
-  splash_screen_hd: "pkg:/images/FREETVMOVIES_Tubi_icon_1280x720.jpg"
-  splash_screen_sd: "pkg:/images/FREETVMOVIES_Tubi_icon_720x480.jpg"
+  splash_screen_fhd: "pkg:/images/splash-1920.jpg"
+  splash_screen_hd: "pkg:/images/splash-1280.jpg"
+  splash_screen_sd: "pkg:/images/splash-720.jpg""
   major_version: 2
   minor_version: 0
   build_version: 5

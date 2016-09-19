@@ -22,7 +22,7 @@ function TubiAds (utils, playerRequestQueue)
     constants: utils.constants
 	  doTest: true
     roAdFramework: roAdFramework
-    isRokuAdFrameworkOn: false 'use to turn Roku Ad Framework on or off
+    isRokuAdFrameworkOn: true 'use to turn Roku Ad Framework on or off
 
     allAdUnitsList:[]
     totalAdBreakAds: 0
