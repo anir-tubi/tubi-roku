@@ -352,6 +352,12 @@ Function onSignedInChange()
 
   if m.top.signedIn = true then
     loadUserCategories()
+  else
+    'If user logged out, don't track their history or queue
+    m.global.bookmarkIds = {series: {}, videos: {}}
+    m.global.historyIds = {series: {}, videos: {}}
+    m.global.bookmarkOrder = []
+    m.global.historyOrder = []
   end if
 End Function
 
