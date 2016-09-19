@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - ErrorController
+ -
+ - This is the primary scene of the application which will manage
+ - CategoryScreen and DetailScreen.
+ -
+ - Scene Startup Sequence:
+ -  1) This component is created and init() is run
+ -  2) During ContentController.init(), the MetadataFetchTask is set to "RUN", creating its long-lived thread
+ -     that will answer requests for metdata from the primary scene graph thread.
+ -  3) The MetadataFetchTask sets a 'ready' field to "true" indicating that it is available
+ -  4) This component dynamically creates the CategoryScreen which begins making metadata requests
+ -
+ -  This startup sequence will ensure that the OS-level thread for MetadataTaskThread is ready
+ -  and we don't have race conditions when populating the CategoryScreen.
+ -
+ -->
+<component name="ErrorController" extends="Scene">
+
+  <script type="text/brightscript" uri="pkg:/components/controllers/ErrorController/ErrorController.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ErrorModalDialog.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  
+  <interface>
+    <!--
+      - error = {
+      -   title: ...
+      -   message: ...
+      -   buttonText: ...
+      - }
+      -
+      -->
+    <field id="error" type="assocarray" />
+    
+    <field id="buttonSelected" type="boolean" alwaysNotify="true"/>
+  </interface>
+
+</component>

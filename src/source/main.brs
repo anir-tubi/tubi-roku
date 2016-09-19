@@ -49,7 +49,12 @@ Function Main(args As Dynamic)
   m.global.player = TubiPlayer(m.global.utils)
 
   ' apply hotpatch to main brightscript thread
-  Hotpatch(settings.hotPatchUrl)
+  ' this also verifies startup network connectivity
+  if Hotpatch(settings.hotPatchUrl) <> 0 then
+    showErrorDialog()
+    return -1 ' exit the app on error.  scene graph exits anyway once
+              ' we destroy a Scene and try to create it again.
+  end if
 
   ' start the scene graph UI
   sgGlobal = screen.getGlobalNode()
@@ -106,14 +111,19 @@ end Function
 ' Hotpatch
 '
 ' Download .brs code from a hotpatch URL and execute it 
-Function Hotpatch(hotPatchUrl)
+'
+' return codes:
+'  0 patch applied, or no patch available
+' -1 network error downloading patch file (not 404)
+'
+Function Hotpatch(hotPatchUrl) As Integer
   if len(hotPatchUrl) > 5
     port = CreateObject("roMessagePort")
     transfer = CreateObject("roUrlTransfer")
     transfer.SetMessagePort(port)
     transfer.setUrl(hotPatchUrl)
     transfer.AsyncGetToString()
-    msg = wait(3000, transfer.GetMessagePort())
+    msg = wait(10000, transfer.GetMessagePort())
     if type(msg) = "roUrlEvent"
       if msg.GetResponseCode() = 200 'all good, server responded back with a hotpatch file
         evalString = msg.GetString()
@@ -129,14 +139,46 @@ Function Hotpatch(hotPatchUrl)
         end if
       else if msg.GetResponseCode() > 0 'server responded with 403 error or similar - couldn't find the file but server up
         print "No file at hotpatch location"
+      else
+        ' some network failure
+        print "Network error downloading hotpatch file"
+        return -1
       end if
     else if msg = invalid
       'no response back from hotpatch server - either server completely down or more likely user's internet is not connected
       print "Timeout downloading hotpatch file"
+      return -1
     end if
   end if
+  return 0
 End Function
 
+
+Function showErrorDialog()
+  screen = CreateObject("roSGScreen")
+  port = CreateObject("roMessagePort")
+  screen.setMessagePort(port)
+  sgGlobal = screen.getGlobalNode()
+  sgGlobal.addField("constants", "assocarray", false)
+  sgGlobal.constants = m.global.utils.constants
+  controller = screen.CreateScene("ErrorController")
+  screen.show()
+  controller.observeField("buttonSelected", port)
+  controller.error = {
+    title: "Network Error"
+    message: "Please check your network connection and try again"
+    buttonText: "Exit"
+  }
+
+  while(true)
+    msg = wait(0, port)
+    msgType = type(msg)
+    if msgType <> invalid then exit while
+  end while
+
+  screen.close()
+
+End Function
 
 '''''''''''''''
 ' deepLink
