@@ -5,7 +5,7 @@ function TubiAds (utils, playerRequestQueue)
   
   'set the preferences for the Roku Advertising Framework so we never use their ad server if our server returns no ads
   'and max 2 retries if there is no ads returned from our server
-  roAdFramework.setAdPrefs(false, 2)
+  roAdFramework.setAdPrefs(false, 1)
   
   'turn Nielsen DAR on for the Roku Advertising Framework
   roAdFramework.enableNielsenDAR(true)
