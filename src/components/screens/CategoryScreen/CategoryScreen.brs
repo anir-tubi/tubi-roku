@@ -206,9 +206,30 @@ Function onCategoryContentReceived() As Void
   tubiLog("CategoryScreen.onCategoryContentReceived")
   response = m.top.categoryResponse.response
   if response.code >= 200 and response.code < 300 then 
+
+    ' Check if the visible category matches the request
+    ' TODO(Chris): This depends on some bad assumptions about things that get passed through
+    '              the MetadataFetchTask
+
+    if m.top.categoryResponse.name = "getCategory" then
+      if m.top.categoryResponse.params <> invalid then
+        categoryId = m.top.categoryResponse.params.cat_id
+        if categoryId <> m.ContentGrid.id then
+          tubiLog("Ignoring late response for category content")
+          return
+        end if
+      end if
+    else if m.top.categoryResponse.name = "getFullBookmarks" then
+      if m.ContentGrid.id <> m.MyQueueCategory.id then return
+    else if m.top.categoryResponse.name = "getFullHistory" then
+      if m.ContentGrid.id <> m.ContinueWatchingCategory.id then return
+    end if
+
+    tubiLog("Received response for category " + m.ContentGrid.id)
     content = m.top.categoryResponse.convertedMetadata
     m.Spinner.visible = false
 
+    ' For the 2-row poster grid, collapse to 1 row if fewer than 8 items come back
     if m.ContentGrid.isSameNode(m.PosterGrid) then
       if content.getChildCount() > 8 then
         m.ContentGrid.numRows = 2
@@ -314,7 +335,7 @@ Function onCategoryChange() As Void
       loadOneCategory(newCategory.id)
     end if
 
-    m.ContentGrid.id = m.CategoryList.content.getChild(m.CategoryList.itemFocused).id
+    m.ContentGrid.id = newCategory.id
 
     'update the tracking URI for user tracking purposes
     catPos = (m.CategoryList.itemFocused + 1).toStr()
