@@ -152,11 +152,10 @@ function adriseAds_populateUrl(episode)
 
   'add TubiTV user/registration id to ad call url
   urlTubiId = ""
-  'TODO: Bryan, uncomment when auth is merged'
-  ' authInfo = m.utils.auth.getAuthInfo()
-  ' if authInfo <> invalid and authInfo.userId <> invalid
-  '   urlTubiId = "&tubitvid=" + authInfo.userId
-  ' end if
+  authInfo = m.utils.auth.getAuthInfo()
+  if authInfo <> invalid and authInfo.userId <> invalid
+    urlTubiId = "&tubitvid=" + authInfo.userId
+  end if
 
   'add if Linear/Live TV is on or off to ad call url
   isLinear = ""
@@ -172,7 +171,7 @@ function adriseAds_populateUrl(episode)
   end if
 
   'create the url to be used for ad calls'
-  url =  m.constants.urls.adsBaseUrl + "?platform=roku&appid=" + m.constants.settings.shortAppName + "&sdk=" + adSdk + "&cid=" + episode.id + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + episode.pubId + "&content-type=" + episode["type"] + isLinear + "&_=" + RND(1000000000000).ToStr()
+  url =  m.constants.urls.adsBaseUrl + "?platform=roku&appid=" + m.constants.settings.shortAppName + "&sdk=" + adSdk + "&cid=" + episode.id + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + episode.pubId + "&content-type=hls" + isLinear + "&_=" + RND(1000000000000).ToStr()
 
   return url
 end function
@@ -204,8 +203,6 @@ function adriseAds_getAdsListViaRoku(episode)
 
   'get the url for making the ad call
   url = m.populateUrl(episode)
-  ' url = "http://ads.adrise.tv/test/hardcoded-response.php?n=8"
-
 
   'set the url for the Roku Advertising Framework
   m.roAdFramework.setAdUrl(url)
@@ -214,7 +211,8 @@ function adriseAds_getAdsListViaRoku(episode)
   'adUnits are called adPods in RAF documentation
   currentAdUnitsList = m.roAdFramework.getAds()
 
-  ' ShowVarSimple(currentAdUnitsList, "Ad Unit List")
+  ' print currentAdUnitsList
+  ' stop
 
   'check to see if the ad server returns an ad that can be used by RAF or needs to use our ad SDK
   'traditional version of xml is in the clickThrough property/clickThrough VAST tag
