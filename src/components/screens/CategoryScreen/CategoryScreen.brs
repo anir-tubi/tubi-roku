@@ -237,7 +237,13 @@ Function onCategoryContentReceived() As Void
         m.ContentGrid.numRows = 1
       end if
     end if
+
+    ' timer here since large categories can take a while to be set
+    timer = CreateObject("roTimespan")
+    timer.Mark()
     m.ContentGrid.content = content
+    delta = timer.TotalMilliseconds()
+    tubiLog("Set " + stri(content.getChildCount()) + " content grid items in " + stri(delta) + "ms")
 
     if m.CategoryList.isInFocusChain() then
       m.InfoPanel.content.totalCount = content.getChildCount()
@@ -429,7 +435,6 @@ Function onGridItemSelected() As Void
   tubiLog("CategoryScreen.onGridItemSelected")
   m.top.contentSelected = m.ContentGrid.content.getChild(m.ContentGrid.itemSelected)
 End Function
-
 
 '''''''''''''''''''''
 ' loadAllCategories

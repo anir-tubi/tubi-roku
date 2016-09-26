@@ -8,6 +8,7 @@
  -->
 <component name="ContentGridItem" extends="Group">
   <script type="text/brightscript" uri="pkg:/components/lib/ContentGridItem/ContentGridItem.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
     <field id="itemContent" type="node" />

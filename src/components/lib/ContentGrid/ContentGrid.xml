@@ -79,7 +79,7 @@
     <Group
       id="ContentsMask">
       <Group
-        id="Contents" >
+        id="Items" >
         <!--
         -
         - Components of type m.top.itemComponentName will be added here to
@@ -93,7 +93,7 @@
      duration="0.25">
       <Vector2DFieldInterpolator
         id="TranslationInterpolator"
-        fieldToInterp="Contents.translation" />
+        fieldToInterp="Items.translation" />
       <Vector2DFieldInterpolator
         id="FocusBoxInterpolator"
         fieldToInterp="FocusBox.translation" />
