@@ -217,9 +217,6 @@ UI work will be addressed by incrementally adding screens and functionality. The
 
 ## Open Issues
 
-- Hotpatching of library functions won't work across the thread boundaries
-- Global settings for Scene Graph need to be set before initializing the graph nodes, but ideally after being hotpatched
-- Metadata cache needs to a method for communicating responses to the requesting node.
 
 ## Reference
 
