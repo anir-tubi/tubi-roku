@@ -29,7 +29,7 @@ Function watchLoop()
         trackSceneGraphEvent(msg.GetData())
       end if
     else if type(msg) = "roUrlEvent" then
-      m.queue.handleEvent(msg)
+      handledRequest = m.queue.handleEvent(msg)
     end if
   end while
 End Function

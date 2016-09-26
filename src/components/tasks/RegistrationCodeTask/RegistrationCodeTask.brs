@@ -55,10 +55,6 @@ Function registrationLoop() As Void
     ' Check for cancellation on every loop, rather than isolating in a roSGNodeEvent check
     if m.top.cancel = true then 
       tubiLog("Registration cancelled")
-      m.global.trackingTask.trackEvent = {
-        trackType: "registerFail"
-        value: "registration-cancelled"
-      }
       return
     end if
   end while
@@ -132,10 +128,6 @@ Function registrationLoop() As Void
       end if
       if m.top.cancel = true then 
         tubiLog("Registration cancelled")
-        m.global.trackingTask.trackEvent = {
-          trackType: "registerFail"
-          value: "registration-cancelled"
-        }
         return
       end if
     end while

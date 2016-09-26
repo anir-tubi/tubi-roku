@@ -165,7 +165,6 @@ function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=
       key: "register_device_fail"
     }
     registerSuccess:{
-      value: true
       key: "register_device_success"
     }
     signIn:{
@@ -182,8 +181,10 @@ function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=
   trackData = CreateObject("roAssociativeArray")
   trackData.SetModeCaseSensitive()
   trackData.AddReplace("app_id", m.constants.appName + "-roku")
-  trackData.AddReplace("value", eventTypes[eventType].value)
   trackData.AddReplace("key", eventTypes[eventType].key)
+  if eventTypes[eventType].value <> invalid
+    trackData.AddReplace("value", eventTypes[eventType].value)
+  end if
   if eventTypes[eventType].ctx <> invalid
     trackData.AddReplace("ctx", eventTypes[eventType].ctx)
   end if

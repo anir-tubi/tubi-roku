@@ -11,6 +11,7 @@ Function init()
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
   m.top.observeField("categoryListResponse", "onCategoriesReceived")
   m.top.observeField("trackingUri", "onTrackingUriChange")
+  m.trackingCount = 0
   m.CategoryList.observeField("itemFocused","onCategoryChange")
   m.authTask = m.top.findNode("CategoryAuthTask")
 
@@ -142,15 +143,19 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     if key = "right" and m.CategoryList.isInFocusChain() then
       if m.ContentGrid.visible = true then
         m.ContentGrid.setFocus(true)
+        m.trackingCount = 0
       else if m.SignInMenu.visible = true then
         m.SignInMenu.setFocus(true)
+        m.trackingCount = 0
       end if
       return true
     else if key = "left" and not m.CategoryList.isInFocusChain() then
       m.CategoryList.setFocus(true)
+      m.trackingCount = 0
       return true
     else if (key = "down" or key = "up") and not m.CategoryList.isInFocusChain() then
       m.CategoryList.setFocus(true)
+      m.trackingCount = 0
       if key = "up" then m.CategoryList.animateToItem = m.CategoryList.itemFocused - 1
       if key = "down" then m.CategoryList.animateToItem = m.CategoryList.itemFocused + 1
       return true
@@ -344,6 +349,7 @@ Function onCategoryChange() As Void
     m.ContentGrid.id = newCategory.id
 
     'update the tracking URI for user tracking purposes
+    m.trackingCount = m.trackingCount + 1
     catPos = (m.CategoryList.itemFocused + 1).toStr()
     catSlug = ""
     if newCategory.slug <> invalid
@@ -425,6 +431,8 @@ Function onGridFocusChange() As Void
     col = Int(m.ContentGrid.itemFocused / m.ContentGrid.numRows) + 1
   end if
 
+  'set the user event tracking info
+  m.trackingCount = m.trackingCount + 1
   row = row.toStr() + "/"
   col = col.toStr()
   m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug + row + col
@@ -652,7 +660,7 @@ End Function
 Function onTrackingUriChange()
   m.global.trackingTask.trackEvent = {
     trackType: "navigateInPage"
-    value: 0
+    value: m.trackingCount
     ctx: m.top.trackingUri
   }
 End Function
