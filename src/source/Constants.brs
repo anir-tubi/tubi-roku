@@ -89,6 +89,9 @@ Function getConstants()
   'previously found in settings as "shortAppName"
   constants.appName = "tubitv"
 
+  ' for Facebook AN4TV Application Detection library
+  constants.fban4tvtoken = "1722980957943658|67139dcc7c459bada13b13bcd3cc51ee"
+
   constants.urls = {}
     'ad server url
     ' constants.urls.adsBaseUrl = "http://ads.adrise1.tv/" 'use to avoid getting ads during testing

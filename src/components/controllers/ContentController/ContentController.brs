@@ -32,6 +32,12 @@ Function init()
   m.authInfoReceived = false
   m.authTask.control = "RUN"
 
+  if m.global.constants.settings.isFBApplicationDetectionOn then
+    ' We don't need to know the state of this for our app to proceed, just start it
+    m.fbapplicationDetectionTask = m.top.findNode("FBApplicationDetectionTask")
+    m.fbapplicationDetectionTask.control = "RUN"
+  end if
+
   m.top.observeField("itemDetail", "onItemDetailChange")
   m.top.observeField("playerInfo", "onPlayerInfo")
 
