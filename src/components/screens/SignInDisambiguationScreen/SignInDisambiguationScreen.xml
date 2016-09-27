@@ -50,16 +50,17 @@
       height="82"
       translation="[816,360]"/>
     
-    <Label
+    <RotatingLabel
       id="Slogan"
-      translation="[449,544]"
-      text="The largest library of free  TV Shows and Movies">
+      horizAlign="center"
+      width="1920"
+      translation="[0,544]">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="43" />
-    </Label>
-       
+    </RotatingLabel>
+    
     <ScrollingList
       id="SignInOrGuestButtons"
       layoutDirection="horiz"

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - RotatingLabel
+ -
+ - This is a "Label"-like component that will crossfade different texts
+ -
+ -->
+<component name="RotatingLabel" extends="Label" >
+  <script type="text/brightscript" uri="pkg:/components/lib/RotatingLabel/RotatingLabel.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <field id="texts" type="stringarray" />
+    <field id="crossfadeDuration" alias="RotatingLabelCrossfade.duration" value="1.0"/>
+    <field id="displayDuration" alias="DisplayTimer.duration" value="5.0"/>
+  </interface>
+
+  <children>
+    <!-- Visible labels will inherit the properties of this parent label, though the
+         text of this parent label will alway be empty -->
+    <Label
+      id="OldLabel"/>
+    <Label
+      id="NewLabel"/>
+
+    <Animation
+      id="RotatingLabelCrossfade"
+      easeFunction="linear">
+      <FloatFieldInterpolator
+        id="FadeOut"
+        key="[0.0, 0.5, 1.0]"
+        keyValue="[1.0, 0.0, 0.0]"
+        fieldtoInterp="OldLabel.opacity"/>
+      <FloatFieldInterpolator
+        id="FadeIn"
+        key="[0.0, 0.5, 1.0]"
+        keyValue="[0.0, 0.0, 1.0]"
+        fieldtoInterp="NewLabel.opacity"/>
+    </Animation>
+      
+    <Timer
+     id="DisplayTimer"/>
+  </children>
+</component>

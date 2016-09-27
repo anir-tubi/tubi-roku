@@ -11,6 +11,13 @@ Function init()
   m.Video.content = content
   m.Video.control = "play"
   m.Video.observeField("state", "onVideoStateChange")
+
+  m.Slogan = m.top.findNode("Slogan")
+  m.Slogan.texts =  [
+    "The largest collection of free movies and TV shows (with ads)."
+    "Classic hits from US film studios and TV broadcasters, always free!"
+    "Register to watch on all devices" 
+  ]
 End Function
 
 
