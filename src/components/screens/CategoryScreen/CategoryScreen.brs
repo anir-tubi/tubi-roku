@@ -74,6 +74,7 @@ End Function
 ' We retry in the cancel or retry cases, since there is nowhere else to go
 Function retryCategoryList()
   loadAllCategories()
+  m.top.setFocus(true)
 End Function
 
 ''''''''''''''''''''''''''''
