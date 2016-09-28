@@ -130,9 +130,9 @@ Function drawSubComponents()
   end if
 
   if m.top.content.backgrounds <> invalid and m.top.content.backgrounds.count() > 0 then
-    m.Hero.uri = m.top.content.backgrounds[0]
+    m.top.backgroundUri = m.top.content.backgrounds[0]
   else
-    m.Hero.uri = m.defaultHeroUri
+    m.top.backgroundUri = m.defaultHeroUri
   end if
 
   setMenuItems()

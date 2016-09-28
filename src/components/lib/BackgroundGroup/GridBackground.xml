@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+ - Grid Background
+ -
+ - Handles animations and layout for backgrounds on the category screen and episode screen
+ -
+ -->
+<component name="GridBackground" extends="Group">
+  <interface />
+
+  <children>
+    <Poster
+      id="BackgroundImage"
+      loadWidth="1615"
+      width="1615"
+      loadHeight="909"
+      height="909"
+      uri="pkg:/images/grid-default-blurred.jpg"
+      loadDisplayMode="scaleToZoom"
+      translation="[305,0]"
+      opacity="0.0"
+      visible="true" />
+    <Poster
+      id="BackgroundGradient"
+      loadWidth="1920"
+      width="1920"
+      loadHeight="1080"
+      height="1080"
+      uri="pkg:/images/home-gradient-25.png"
+      loadDisplayMode="scaleToZoom"
+      translation="[0,0]"
+      visible="true" />      
+    <Animation
+      id="TransitionIn"
+      duration="0.9"
+      easeFunction="inOutCubic">
+      <Vector2DFieldInterpolator
+        id="TranslationInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[[143, -91],[305,0]]"
+        fieldToInterp="BackgroundImage.translation" />
+      <FloatFieldInterpolator
+        id="ShrinkWidthInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[1938, 1615]"
+        fieldToInterp="BackgroundImage.width" />
+      <FloatFieldInterpolator
+        id="ShrinkHeightInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[1091, 909]"
+        fieldToInterp="BackgroundImage.height" />
+      <FloatFieldInterpolator
+        id="FadeInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[0, 1]"
+        fieldToInterp="BackgroundImage.opacity" />
+    </Animation>
+    <Animation
+      id="FadeInOnly"
+      duration="0.9"
+      easeFunction="inOutCubic">
+      <FloatFieldInterpolator
+        id="FadeInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[0, 1]"
+        fieldToInterp="BackgroundImage.opacity" />
+    </Animation>    
+    <Animation
+      id="TransitionOut"
+      duration="0.9"
+      easeFunction="outCubic">
+      <FloatFieldInterpolator
+        id="FadeInterpolator"
+        key="[1.0,0.0]"
+        keyValue="[0, 1]"
+        fieldToInterp="BackgroundImage.opacity" />
+    </Animation>
+  </children>
+</component>

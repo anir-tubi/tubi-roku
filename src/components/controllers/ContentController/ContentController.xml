@@ -50,6 +50,10 @@
         height="1080"
         translation="[0,0]" />
 
+      <!--Handles the background images -->
+      <BackgroundGroup
+        id="BackgroundGroup" />
+
       <MetadataFetchTask 
         id="MetadataFetchTask" />
 

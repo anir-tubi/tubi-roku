@@ -3,7 +3,6 @@ Function init()
   m.CategoryList = m.top.findNode("CategoryList")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.SpecialCategories = m.top.findNode("SpecialCategories")
-  m.Hero = m.top.findNode("HeroBackground")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("categoryResponse", "onCategoryContentReceived")
   m.top.observeField("focusedChild", "onScreenFocusChange")
@@ -308,7 +307,7 @@ Function onCategoryChange() As Void
   newCategory = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
   m.InfoPanel.content = newCategory
   m.InfoPanel.mode = "category"
-  m.Hero.uri = m.defaultHeroUri
+  m.top.backgroundUri = m.defaultHeroUri
 
   if newCategory.id <> m.ContentGrid.id then
     m.SignInMenu.visible = false
@@ -409,9 +408,9 @@ Function onGridFocusChange() As Void
   m.InfoPanel.mode = "item"
 
   if focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
-    m.Hero.uri = focusedContent.backgrounds[0]
+    m.top.backgroundUri = focusedContent.backgrounds[0]
   else
-    m.Hero.uri = m.defaultHeroUri
+    m.top.backgroundUri = m.defaultHeroUri
   end if
 
   'update the tracking URI

@@ -250,17 +250,10 @@ Function getConstants()
       constants.ui.screenIds.details = "detailScreen"
       constants.ui.screenIds.category = "categoryScreen"
 
-    constants.ui.urls = {}
+    constants.ui.uris = {}
       'background gradient urls
-      constants.ui.urls.homeBackgroundGradientUrl = "pkg://images/scenegraph/home-hero-gradient.png"
-      constants.ui.urls.detailBackgroundGradientUrl = "pkg://images/scenegraph/details-hero-gradient.png"
-      constants.ui.urls.posterGradientUrl = "pkg://images/scenegraph/poster-label-gradient.png"
-
-      'logo image url
-      constants.ui.urls.logoUrl = "pkg://images/scenegraph/tubitv-logo-corner.png"
-
-      'default hero image when content doesn't have a hero image
-      constants.ui.urls.defaultHeroUrl = "http://cdn.adrise.com/hotpatches/roku/uiV2_images/default_hero.jpg"
+      constants.ui.uris.homeBackgroundGradient = "pkg:/images/home-gradient-25.png"
+      constants.ui.uris.detailBackgroundGradient = "pkg:/images/detail-gradient-25.png"
 
     constants.ui.colors = {}
       'template colors

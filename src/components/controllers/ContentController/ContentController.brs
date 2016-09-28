@@ -15,6 +15,8 @@ Function init()
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.global.constants.ui.colors.backgroundColor
 
+  m.backgroundGroup = m.top.findNode("BackgroundGroup")
+
   m.global.addField("bookmarkIds", "assocarray", false)
   m.global.addField("historyIds", "assocarray", false)
   m.global.addField("bookmarkOrder", "stringarray", false)
@@ -42,6 +44,10 @@ Function init()
   m.top.observeField("playerInfo", "onPlayerInfo")
 
   m.logOutTask = m.top.findNode("LogOutTask")
+
+  m.backgroundGradient = m.top.findNode("BackgroundGradient")
+  m.partialBackground = m.top.findNode("PartialBackground")
+  m.fullBackground = m.top.findNode("FullBackground")
 
   initScreenStack(m.top.findNode("ScreenStack"))
 End Function
@@ -103,6 +109,7 @@ Function startCategoryScreen()
   m.categoryScreen.observeField("signInSelected", "onSignInSelected")
   m.categoryScreen.observeField("signOutSelected", "onSignOutSelected")
   m.categoryScreen.observeField("aboutSelected", "onAboutSelected")
+  m.categoryScreen.observeField("backgroundUri", "onGridBackgroundChange")
   pushScreen(m.categoryScreen)
 End Function
 
@@ -329,6 +336,7 @@ Function onEpisodeList()
   m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
   m.episodesScreen.content = m.detailScreen.content
   m.episodesScreen.observeField("episodeSelected", "onEpisodeSelected")
+  m.episodesScreen.observeField("backgroundUri", "onGridBackgroundChange")
 
   if m.episodesScreen.content <> invalid and m.episodesScreen.content.id <> invalid
     m.episodesScreen.trackingUri = m.episodesScreen.trackingUri + m.episodesScreen.content.id
@@ -385,7 +393,7 @@ End Function
 
 
 '''''''''''''''''''''
-' showDetailScreen
+' onPlayerInfo
 '
 ' Is called when the nowPos is updated from the player
 Function onPlayerInfo()
@@ -436,6 +444,29 @@ Function showDetailScreen(content)
   m.detailScreen.observeField("addToQueueSelected", "onHistoryQueueChange")
   m.detailScreen.observeField("removeFromQueueSelected", "onHistoryQueueChange")
   m.detailScreen.observeField("removeFromHistorySelected", "onHistoryQueueChange")
+  m.detailScreen.observeField("backgroundUri", "onDetailBackgroundChange")
   m.detailScreen.signedIn = m.categoryScreen.signedIn
   pushScreen(m.detailScreen)
+End Function
+
+
+'''''''''''''''''''''
+' onGridBackgroundChange
+'
+'
+Function onGridBackgroundChange()
+  TubiLog("ContentController.onGridBackgroundChange")
+  m.backgroundGroup.backgroundUri = m.CategoryScreen.backgroundUri
+  m.backgroundGroup.newBackgroundType = "grid"
+End Function
+
+
+'''''''''''''''''''''
+' onDetailBackgrounChange
+'
+'
+Function onDetailBackgroundChange()
+  TubiLog("ContentController.onDetailBackgroundChange")
+  m.backgroundGroup.backgroundUri = m.DetailScreen.backgroundUri
+  m.backgroundGroup.newBackgroundType = "details"
 End Function

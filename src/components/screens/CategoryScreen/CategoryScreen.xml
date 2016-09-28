@@ -42,6 +42,9 @@
     
     <!-- will be populated with the full (unparsed) history response -->
     <field id="history" type="string" />
+
+    <!-- will be used to change the background images on the content controller -->
+    <field id="backgroundUri" type="string" alwaysNotify="true" />
     
     <!-- set to the tubi content id of the item which was clicked on -->
     <field id="contentSelected" type="node" alwaysNotify="true"/>
@@ -107,25 +110,6 @@
         url="pkg:/images/icon-about.png" />
     </ContentNode>
     
-    <Poster
-      id="HeroBackground"
-      uri=""
-      loadWidth="1615"
-      width="1615"
-      loadHeight="909"
-      height="909"
-      loadDisplayMode="scaleToZoom"
-      translation="[305,0]"/>
-    
-    <Poster
-      id="HeroShade"
-      loadWidth="1920"
-      width="1920"
-      loadHeight="1080"
-      height="1080"
-      uri="pkg:/images/home-gradient-25.png" 
-      translation="[0,0]"/>
-    
     <ScrollingList
       id="CategoryList"
       translation="[65, 424]"
@@ -144,7 +128,6 @@
     <Group
       id="ContentArea"
       translation="[525,423]" >
-    <!-- TODO(Chris): How do we trigger feature vs. poster grid -->
       
     <ContentGrid
       id="FeatureGrid"

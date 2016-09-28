@@ -2,7 +2,6 @@ Function init()
   tubiLog("EpisodesScreen.init")
   m.Info = m.top.findNode("InfoPanel")
   m.Menu = m.top.findNode("Menu")
-  m.Hero = m.top.findNode("HeroBackground")
   m.EpisodeGrid = m.top.findNode("EpisodeGrid")
   m.Menu.observeField("itemFocused", "onSeasonChange")
   m.top.observeField("content", "onContentChange")
@@ -65,9 +64,9 @@ Function onContentChange()
   setSeasonInfo(0)
   m.EpisodeGrid.content = m.top.content.getChild(0) ' season children will be shown in grid
   if m.top.content.backgrounds <> invalid and m.top.content.backgrounds.count() > 0 then 
-    m.Hero.uri = m.top.content.backgrounds[0]
+    m.top.backgroundUri = m.top.content.backgrounds[0]
   else
-    m.Hero.uri = m.defaultHeroUri
+    m.top.backgroundUri = m.defaultHeroUri
   end if
 
   ' Set visibility and focus

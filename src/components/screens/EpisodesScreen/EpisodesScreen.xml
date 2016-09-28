@@ -10,33 +10,15 @@
 
     <!-- Set to the content of the episode that was clicked on -->
     <field id="episodeSelected" type="intarray" alwaysNotify="true"/>
-
+    
+    <!-- will be used to change the background images on the content controller -->
+    <field id="backgroundUri" type="string" alwaysNotify="true" /> 
+    
     <!-- keeps the uri used for user tracking -->
     <field id="trackingUri" type="string"  value="/series/episodelist/" />
   </interface>
 
   <children>
-    <!-- background to hide the detail screen -->
-    <Poster
-      id="HeroBackground"
-      loadWidth="1920"
-      width="1920"
-      loadHeight="1080"
-      height="1080"
-      uri="pkg:/images/background-not-on-selection.jpg"
-      loadDisplayMode="scaleToZoom"
-      translation="[0,0]"/>
-    
-    <Poster
-      id="HeroShade"
-      loadWidth="1920"
-      width="1920"
-      loadHeight="1080"
-      height="1080"
-      loadDisplayMode="scaleToZoom"
-      uri="pkg:/images/detail-gradient-25.png"
-      translation="[0,0]"/>
-    
     <InfoPanel
       id="InfoPanel"
       translation="[85,61]"

@@ -27,6 +27,9 @@
     <!-- keeps the uri used for user tracking -->
     <field id="trackingUri" type="string"  value="" />
 
+    <!-- will be used to change the background images on the content controller -->
+    <field id="backgroundUri" type="string" alwaysNotify="true" />    
+
     <!-- set to true when the suer selects the 'Resume' menu button -->
     <field id="resumeSelected" type="boolean" alwaysNotify="true" />
     
@@ -79,25 +82,7 @@
       id="RemoveHistoryMenuItem"
       title="Remove from history"
       url="pkg:/images/icon-remove-from-history.png" />
-
-    <Poster
-      id="HeroBackground"
-      loadWidth="1920"
-      loadHeight="1080"
-      uri=""
-      loadDisplayMode="scaleToZoom"
-      translation="[0,0]"/>
-    
-    <Poster
-      id="HeroShade"
-      loadWidth="1920"
-      width="1920"
-      loadHeight="1080"
-      height="1080"
-      loadDisplayMode="scaleToZoom"
-      uri="pkg:/images/detail-gradient-25.png"
-      translation="[0,0]"/>
-    
+  
     <!-- These are in a layout group together because this menu should float up -->
     <LayoutGroup
       translation="[65,61]"
