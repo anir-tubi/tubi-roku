@@ -132,7 +132,7 @@ Function getConstants()
     constants.urls.linearPosterHDUrl = "http://cdn.adrise.com/hotpatches/roku/LinearTV-beta-HD.jpg"
 
     ' splash video
-    constants.urls.splashVideoUrl = "http://c11.adrise.tv/v2/sources/content-owners/adrise-no-ads/321538/v201608050030-1280x720-,425,1062,1760,2128,3114,k.mp4.m3u8"
+    constants.urls.splashVideoUrl = "http://c11.adrise.tv/v2/sources/content-owners/adrise-no-ads/325254/v20169072053-1920x1080-,341,836,1388,1667,2413,k.mp4.m3u8"
 
   'http request types
   constants.reqTypes = {}
