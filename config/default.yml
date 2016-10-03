@@ -19,15 +19,15 @@ settings:
 manifest:
   title: "Tubi TV"
   subtitle: "What TV was meant to be"
-  mm_icon_focus_fhd: "pkg:/images/channel-icon-fhd-504x315.png"
-  mm_icon_focus_hd: "pkg:/images/channel-icon-hd-336x210.png"
-  mm_icon_focus_sd: "pkg:/images/channel-icon-sd-248x140.png"
+  mm_icon_focus_fhd: "pkg:/images/channel-icon-fhd-540x405.png"
+  mm_icon_focus_hd: "pkg:/images/channel-icon-hd-290x218.png"
+  mm_icon_focus_sd: "pkg:/images/channel-icon-sd-214x144.png"
   splash_screen_fhd: "pkg:/images/splash-1920.jpg"
   splash_screen_hd: "pkg:/images/splash-1280.jpg"
   splash_screen_sd: "pkg:/images/splash-720.jpg"
   major_version: 2
   minor_version: 0
-  build_version: 8
+  build_version: 9
   bs_libs_required: roku_ads_lib
   ui_resolutions: "fhd"
   rsg_version: 1.0
