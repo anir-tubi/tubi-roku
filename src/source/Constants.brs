@@ -72,8 +72,6 @@ Function getConstants()
     constants.deviceInfo.countryCode = countryCode ' will be invalid if old version of firmware
     constants.deviceInfo.lowMemory = lowMemory
 
-  'the name of the top level scene in the scene graph XML
-  constants.startScene = "AppScene"
 
   'the names of the registry memory sections that will save bookmark and previously viewed info
   constants.reqNames = {}
@@ -132,7 +130,7 @@ Function getConstants()
     constants.urls.linearPosterHDUrl = "http://cdn.adrise.com/hotpatches/roku/LinearTV-beta-HD.jpg"
 
     ' splash video
-    constants.urls.splashVideoUrl = "http://c11.adrise.tv/v2/sources/content-owners/adrise-no-ads/325254/v20169072053-1920x1080-,341,836,1388,1667,2413,k.mp4.m3u8"
+    constants.urls.splashVideoUrl = "http://c11.adrise.tv/v2/sources/content-owners/adrise-no-ads/328128/v20169300123-1280x714-,386,951,1592,1956,2833,k.mp4.m3u8"
 
   'http request types
   constants.reqTypes = {}
