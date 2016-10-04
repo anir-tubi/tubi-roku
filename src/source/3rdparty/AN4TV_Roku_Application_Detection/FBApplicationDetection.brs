@@ -4,7 +4,7 @@
 '*************************************************************
 
 ' Creates an FBApplicationDetection object that listens for application detection requests.
-'   accessToken - this is the app token provided for you application from https://developers.facebook.com/tools/accesstoken/
+'   accessToken - this is a combination of App ID and Client Token (“<appID>|<clientToken>”)
 '   trackingEnabled - boolean to control ad targeting
 '   msgPort - listening port for incoming messages
 '   loggedInEmail - optional, use false as default; non-hashed email of logged-in user. Email will be hashed using SHA256
@@ -23,7 +23,9 @@ Function FBApplicationDetectionInit(accessToken, trackingEnabled, msgPort, logge
 
     HandleError: errorCB,
     HandleEvent: FBApplicationDetectionHandleEvent,
-    setMessagePort: FBApplicationDetectionSetMessagePort
+    setMessagePort: FBApplicationDetectionSetMessagePort,
+    updateTrackingEnabled: FBApplicationDetectionUpdateTracking,
+    updateLoggedInEmail: FBApplicationDetectionUpdateEmail
   }
 
   FBApplicationDetectionGetDeviceID(FBApplicationDetection)
@@ -114,7 +116,7 @@ Function FBApplicationDetectionGetDeviceID(FBApplicationDetection)
   FBApplicationDetection._idfa = idfa
   FBApplicationDetection._trackingEnabled = trackingEnabled 
   params = "platform=roku&advertising_identifier=" + idfa + "&access_token=" + FBApplicationDetection._accessToken + "&advertising_tracking_enabled=" + trackingEnabled.ToStr()
-  if FBApplicationDetection._email
+  if type(FBApplicationDetection._email) = "roString" and FBApplicationDetection._email <> "false"
     params = params + "&logged_in_email=" + HashEmail(FBApplicationDetection._email)
   end if
   FBApplicationDetectionGraphAPICall(FBApplicationDetection, "/app/connected_devices", params, FBApplicationDetectionHandleDeviceIDResponse)
@@ -207,17 +209,34 @@ Function FBApplicationDetectionHandleTCPEvent(FBApplicationDetection, event)
   return false
 end Function
 
-Function HashEmail(email) 
-  if type(email) = "roString"
-    ba1 = CreateObject("roByteArray")
-    ba2 = CreateObject("roByteArray")
-    ba2.FromAsciiString(email)
-    digest = CreateObject("roEVPDigest")
-    digest.Setup("sha256")
-    digest.Update(ba1)
-    digest.Update(ba2)
-    return digest.Final()
-  else
-    return email.ToStr()
+
+Function FBApplicationDetectionUpdateTracking(trackingEnabled)
+  if m._clientTrackingEnabled <> trackingEnabled
+    m._clientTrackingEnabled = trackingEnabled
+    m._deviceID = Invalid
+    FBApplicationDetectionGetDeviceID(m)
   end if
+  return m
+end Function
+
+
+Function FBApplicationDetectionUpdateEmail(email)
+  if m._email <> email
+    m._email = email
+    m._deviceID = Invalid
+    FBApplicationDetectionGetDeviceID(m)
+  end if
+  return m
+end Function
+  
+
+Function HashEmail(email) 
+  ba1 = CreateObject("roByteArray")
+  ba2 = CreateObject("roByteArray")
+  ba2.FromAsciiString(email)
+  digest = CreateObject("roEVPDigest")
+  digest.Setup("sha256")
+  digest.Update(ba1)
+  digest.Update(ba2)
+  return digest.Final()
 end Function
