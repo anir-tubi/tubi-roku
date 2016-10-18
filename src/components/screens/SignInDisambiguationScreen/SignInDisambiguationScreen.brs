@@ -34,9 +34,13 @@ End Function
 ' onScreenFocusChange
 '
 ' If screen is out of focus, no need to play the video
+'
+' NOTE: Explicitly setting the video node visibility here gets around
+'       a bug in 7.5.0 beta (build 4053-17) which leaves the video visible on top of all other screens
 Function onScreenFocusChange()
   tubiLog("SignInDisambiguationScreen.onScreenFocusChange")
   if m.top.isInFocusChain() then
+    m.Video.visible = true
     if m.Video.state = "paused" then
       m.Video.control = "resume"
     else
@@ -47,6 +51,7 @@ Function onScreenFocusChange()
     end if
   else
     m.Video.control = "pause"
+    m.Video.visible = false
   end if
 End Function
 
