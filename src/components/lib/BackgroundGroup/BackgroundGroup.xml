@@ -13,10 +13,17 @@
   
   <interface>
     <!-- newBackgroundType can be "grid", "details" -->
-    <field id="newBackgroundType" type="string" alwaysNotify="true" />
+    <field id="newBackgroundType" type="string" value="grid" alwaysNotify="true" />
 
     <!-- used to set the uri for the background image -->
-    <field id="backgroundUri" type="string" />
+    <field id="backgroundUriList" type="stringarray" />
+    
+    <!-- flag to notify if the user is opening the category screen from the sign in screens -->
+    <field id="enterFromSignIn" type="boolean" value="false" alwaysNotify="true" />
+
+    <!-- flag to notify if the user is opening the category screen from the sign in screens -->
+    <field id="catScreenStart" type="boolean" value="false" alwaysNotify="true" />
+
   </interface>
 
   <children />

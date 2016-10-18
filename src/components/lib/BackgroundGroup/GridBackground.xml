@@ -5,22 +5,65 @@
  -
  - Handles animations and layout for backgrounds on the category screen and episode screen
  -
+ - Expect the GridBackground to have a structure like the following
+ -
+ - <GridBackground>
+ -   <Group id="BackgroundImages">
+ -     <Group>
+ -       <GridPoster>
+ -         <Poster id="BackgroundPoster" />
+ -         <Animation id="TransitionIn"><...Interpolators....></Animation>
+ -         <Animation id="FadeInOnly"><...Interpolators....></Animation>
+ -         <Animation id="TransitionOut"><...Interpolators....></Animation>
+ -       </GridPoster>
+ -       <GridPoster>
+ -         <Poster id="BackgroundPoster" />
+ -         <Animation id="TransitionIn"><...Interpolators....></Animation>
+ -         <Animation id="FadeInOnly"><...Interpolators....></Animation>
+ -         <Animation id="TransitionOut"><...Interpolators....></Animation>
+ -       </GridPoster>
+ -       <GridPoster>
+ -         <Poster id="BackgroundPoster" />
+ -         <Animation id="TransitionIn"><...Interpolators....></Animation>
+ -         <Animation id="FadeInOnly"><...Interpolators....></Animation>
+ -         <Animation id="TransitionOut"><...Interpolators....></Animation>
+ -       </GridPoster>
+ -     </Group>   
+ -
+ -     <Group>  >>> We only expect to have multiple groups here when transitioning, as one fades in and the other fades out
+ -       <GridPoster>
+ -         <Poster id="BackgroundPoster" />
+ -         <Animation id="TransitionIn"><...Interpolators....></Animation>
+ -         <Animation id="FadeInOnly"><...Interpolators....></Animation>
+ -         <Animation id="TransitionOut"><...Interpolators....></Animation>
+ -       </GridPoster>
+ -       <GridPoster>
+ -         <Poster id="BackgroundPoster" />
+ -         <Animation id="TransitionIn"><...Interpolators....></Animation>
+ -         <Animation id="FadeInOnly"><...Interpolators....></Animation>
+ -         <Animation id="TransitionOut"><...Interpolators....></Animation>
+ -       </GridPoster>
+ -       <GridPoster>
+ -         <Poster id="BackgroundPoster" />
+ -         <Animation id="TransitionIn"><...Interpolators....></Animation>
+ -         <Animation id="FadeInOnly"><...Interpolators....></Animation>
+ -         <Animation id="TransitionOut"><...Interpolators....></Animation>
+ -       </GridPoster>     
+ -     </Group>
+ -   </Group>
+ -   <Poster id="BackgroundGradient">
+ -     <Animation id="GradientFadeIn"><...Interpolators....></Animation>
+ -     <Animation id="GradientFadeOut"><...Interpolators....></Animation>
+ -   </Poster>
+ - </GridBackground>
+ - 
  -->
 <component name="GridBackground" extends="Group">
   <interface />
 
   <children>
-    <Poster
-      id="BackgroundImage"
-      loadWidth="1615"
-      width="1615"
-      loadHeight="909"
-      height="909"
-      uri="pkg:/images/grid-default-blurred.jpg"
-      loadDisplayMode="scaleToZoom"
-      translation="[305,0]"
-      opacity="0.0"
-      visible="true" />
+    <Group
+      id="BackgroundImages" />
     <Poster
       id="BackgroundGradient"
       loadWidth="1920"
@@ -30,51 +73,27 @@
       uri="pkg:/images/home-gradient-25.png"
       loadDisplayMode="scaleToZoom"
       translation="[0,0]"
-      visible="true" />      
+      opacity="1.0"
+      visible="true" />
     <Animation
-      id="TransitionIn"
-      duration="0.9"
-      easeFunction="inOutCubic">
-      <Vector2DFieldInterpolator
-        id="TranslationInterpolator"
-        key="[0.0,1.0]"
-        keyValue="[[143, -91],[305,0]]"
-        fieldToInterp="BackgroundImage.translation" />
-      <FloatFieldInterpolator
-        id="ShrinkWidthInterpolator"
-        key="[0.0,1.0]"
-        keyValue="[1938, 1615]"
-        fieldToInterp="BackgroundImage.width" />
-      <FloatFieldInterpolator
-        id="ShrinkHeightInterpolator"
-        key="[0.0,1.0]"
-        keyValue="[1091, 909]"
-        fieldToInterp="BackgroundImage.height" />
-      <FloatFieldInterpolator
-        id="FadeInterpolator"
-        key="[0.0,1.0]"
-        keyValue="[0, 1]"
-        fieldToInterp="BackgroundImage.opacity" />
-    </Animation>
-    <Animation
-      id="FadeInOnly"
+      id="GradientFadeIn"
       duration="0.9"
       easeFunction="inOutCubic">
       <FloatFieldInterpolator
         id="FadeInterpolator"
         key="[0.0,1.0]"
         keyValue="[0, 1]"
-        fieldToInterp="BackgroundImage.opacity" />
+        fieldToInterp="BackgroundGradient.opacity" />
     </Animation>    
     <Animation
-      id="TransitionOut"
+      id="GradientFadeOut"
       duration="0.9"
-      easeFunction="outCubic">
+      easeFunction="inCubic">
       <FloatFieldInterpolator
         id="FadeInterpolator"
         key="[1.0,0.0]"
         keyValue="[0, 1]"
-        fieldToInterp="BackgroundImage.opacity" />
+        fieldToInterp="BackgroundGradient.opacity" />
     </Animation>
   </children>
 </component>

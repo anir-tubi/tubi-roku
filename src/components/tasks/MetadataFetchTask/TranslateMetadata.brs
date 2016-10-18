@@ -196,7 +196,7 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
   end if
 
   if contentFromServer.backgrounds <> invalid and type(contentFromServer.backgrounds) = "roArray" and contentFromServer.backgrounds.count() > 0
-    translatedContent.backgrounds = contentFromServer.backgrounds
+    translatedContent.backgrounds = dedupeBackgrounds(contentFromServer.backgrounds)
   end if
 
   if contentFromServer.ratings <> invalid and contentFromServer.ratings[0] <> invalid and contentFromServer.ratings[0].value <> invalid
@@ -318,3 +318,15 @@ Function setTranslateGlobalsToLocal()
   m.contentTypes = {}
   m.contentTypes.append(m.global.constants.ui.contentTypes)
 end Function
+
+
+Function dedupeBackgrounds(backgroundsFromServer) as Object
+  deduped = {}
+
+  for each background in backgroundsFromServer
+    deduped[background] = true
+  end for
+
+  return deduped.keys()
+
+End Function

@@ -28,7 +28,7 @@
     <field id="trackingUri" type="string"  value="" />
 
     <!-- will be used to change the background images on the content controller -->
-    <field id="backgroundUri" type="string" alwaysNotify="true" />    
+    <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />    
 
     <!-- set to true when the suer selects the 'Resume' menu button -->
     <field id="resumeSelected" type="boolean" alwaysNotify="true" />

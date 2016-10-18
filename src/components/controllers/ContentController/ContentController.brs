@@ -45,10 +45,6 @@ Function init()
 
   m.logOutTask = m.top.findNode("LogOutTask")
 
-  m.backgroundGradient = m.top.findNode("BackgroundGradient")
-  m.partialBackground = m.top.findNode("PartialBackground")
-  m.fullBackground = m.top.findNode("FullBackground")
-
   initScreenStack(m.top.findNode("ScreenStack"))
 End Function
 
@@ -84,6 +80,7 @@ Function startUserExperience()
       ' whether we were logged in or not.  Make sure the category
       ' screen is loaded too
       startCategoryScreen()
+      m.backgroundGroup.catScreenStart = true
       onItemDetailChange()
       'TODO(Chris): capture the 'back' button when the screen stack is empty so
       ' that we can show the category screen without haveing to preload it here
@@ -91,6 +88,7 @@ Function startUserExperience()
       startSignIn()
     else
       startCategoryScreen()
+      m.backgroundGroup.catScreenStart = true
       m.categoryScreen.signedIn = true
     end if
   end if
@@ -109,7 +107,7 @@ Function startCategoryScreen()
   m.categoryScreen.observeField("signInSelected", "onSignInSelected")
   m.categoryScreen.observeField("signOutSelected", "onSignOutSelected")
   m.categoryScreen.observeField("aboutSelected", "onAboutSelected")
-  m.categoryScreen.observeField("backgroundUri", "onGridBackgroundChange")
+  m.categoryScreen.observeField("backgroundUriList", "onGridBackgroundChange")
   pushScreen(m.categoryScreen)
 End Function
 
@@ -171,6 +169,7 @@ Function onSignInComplete()
   end while
 
   startCategoryScreen()
+  m.backgroundGroup.catScreenStart = true  
   if m.SignIn.signedIn or m.SignIn.registered then
     m.categoryScreen.signedIn = true
   end if
@@ -225,6 +224,10 @@ End Function
 Function onSignInSelected()
   tubiLog("ContentController.onSignInSelected")
   startSignIn()
+
+  'preloads the unblurred background so when we hit the category screen
+  'we can just start the timer for countdown to transition to the blurred background
+  m.backgroundGroup.enterFromSignIn = true
 End Function
 
 ''''''''''''''''''''
@@ -336,7 +339,7 @@ Function onEpisodeList()
   m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
   m.episodesScreen.content = m.detailScreen.content
   m.episodesScreen.observeField("episodeSelected", "onEpisodeSelected")
-  m.episodesScreen.observeField("backgroundUri", "onGridBackgroundChange")
+  m.episodesScreen.observeField("backgroundUriList", "onEpisodeBackgroundChange")
 
   if m.episodesScreen.content <> invalid and m.episodesScreen.content.id <> invalid
     m.episodesScreen.trackingUri = m.episodesScreen.trackingUri + m.episodesScreen.content.id
@@ -444,7 +447,7 @@ Function showDetailScreen(content)
   m.detailScreen.observeField("addToQueueSelected", "onHistoryQueueChange")
   m.detailScreen.observeField("removeFromQueueSelected", "onHistoryQueueChange")
   m.detailScreen.observeField("removeFromHistorySelected", "onHistoryQueueChange")
-  m.detailScreen.observeField("backgroundUri", "onDetailBackgroundChange")
+  m.detailScreen.observeField("backgroundUriList", "onDetailBackgroundChange")
   m.detailScreen.signedIn = m.categoryScreen.signedIn
   pushScreen(m.detailScreen)
 End Function
@@ -456,7 +459,7 @@ End Function
 '
 Function onGridBackgroundChange()
   TubiLog("ContentController.onGridBackgroundChange")
-  m.backgroundGroup.backgroundUri = m.CategoryScreen.backgroundUri
+  m.backgroundGroup.backgroundUriList = m.categoryScreen.backgroundUriList
   m.backgroundGroup.newBackgroundType = "grid"
 End Function
 
@@ -467,6 +470,17 @@ End Function
 '
 Function onDetailBackgroundChange()
   TubiLog("ContentController.onDetailBackgroundChange")
-  m.backgroundGroup.backgroundUri = m.DetailScreen.backgroundUri
+  m.backgroundGroup.backgroundUriList = m.detailScreen.backgroundUriList
   m.backgroundGroup.newBackgroundType = "details"
+End Function
+
+
+'''''''''''''''''''''
+' onEpisodeBackgroundChange
+'
+'
+Function onEpisodeBackgroundChange()
+  TubiLog("ContentController.onEpisodeBackgroundChange")
+  m.backgroundGroup.backgroundUriList = m.episodesScreen.backgroundUriList
+  m.backgroundGroup.newBackgroundType = "grid"
 End Function

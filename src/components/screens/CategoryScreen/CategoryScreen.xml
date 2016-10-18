@@ -44,7 +44,7 @@
     <field id="history" type="string" />
 
     <!-- will be used to change the background images on the content controller -->
-    <field id="backgroundUri" type="string" alwaysNotify="true" />
+    <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
     
     <!-- set to the tubi content id of the item which was clicked on -->
     <field id="contentSelected" type="node" alwaysNotify="true"/>

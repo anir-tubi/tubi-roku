@@ -307,7 +307,7 @@ Function onCategoryChange() As Void
   newCategory = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
   m.InfoPanel.content = newCategory
   m.InfoPanel.mode = "category"
-  m.top.backgroundUri = m.defaultHeroUri
+  m.top.backgroundUriList = [m.defaultHeroUri]
 
   if newCategory.id <> m.ContentGrid.id then
     m.SignInMenu.visible = false
@@ -408,9 +408,9 @@ Function onGridFocusChange() As Void
   m.InfoPanel.mode = "item"
 
   if focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
-    m.top.backgroundUri = focusedContent.backgrounds[0]
+    m.top.backgroundUriList = focusedContent.backgrounds
   else
-    m.top.backgroundUri = m.defaultHeroUri
+    m.top.backgroundUriList = [m.defaultHeroUri]
   end if
 
   'update the tracking URI

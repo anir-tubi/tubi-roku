@@ -64,9 +64,9 @@ Function onContentChange()
   setSeasonInfo(0)
   m.EpisodeGrid.content = m.top.content.getChild(0) ' season children will be shown in grid
   if m.top.content.backgrounds <> invalid and m.top.content.backgrounds.count() > 0 then 
-    m.top.backgroundUri = m.top.content.backgrounds[0]
+    m.top.backgroundUriList = m.top.content.backgrounds
   else
-    m.top.backgroundUri = m.defaultHeroUri
+    m.top.backgroundUriList = [m.defaultHeroUri]
   end if
 
   ' Set visibility and focus
