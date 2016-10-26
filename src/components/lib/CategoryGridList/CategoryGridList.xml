@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="CategoryGridList" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/CategoryGridList/CategoryGridList.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!--
+    - 'content' should be a 2-level tree similar to RowList native component.  
+    -
+    - * The root node is ignored
+    -
+    - * The children of the root node are categories with the following relevant metadata fields:
+    -    - totalCount - total number of items in the category
+    -    - offset - the offset into the total categorof the first 
+    -
+    -->
+    <field id="content" type="node"/>
+    <field id="itemSelected" type="node" alwaysNotify="true"/>
+    <field id="itemFocused" type="node" alwaysNotify="true"/>
+    <field id="cursorPosition" type="intarray" value="[-1,-1]"/>
+
+    <field id="categoryFocused" type="integer" value="-1"/>
+    <field id="preCategoryFocused" type="integer" value="-1"/>
+    <field id="animateToCategory" alias="ScrollingList.animateToItem"/>
+    
+    <!-- set when we need to purge and reload history and queue -->
+    <field id="dirtyUserCategories" type="boolean" value="false" alwaysNotify="true"/>
+    
+    <!-- incoming metadata from MetadataFetchTask -->
+    <field id="metadataFetchTaskResponse" type="assocarray" />
+    
+    <!-- if a fetch error occurred, error is set with the following information
+     -      {
+     -        code: response.code
+     -        failReason: response.failReason
+     -      }
+    -->
+    <field id="error" type="assocarray" alwaysNotify="true" />
+  </interface>
+  
+  <children>
+    <ScrollingList
+      id="ScrollingList"
+      width="1395"
+      height="624"
+      itemSpacings="[50]"
+      itemComponentName="CategoryContentGrid"
+      focusBitmapUri=""
+      focusChangeDuration="0.6"
+      translation="[0,-7]"/>
+  </children>
+</component>
+      

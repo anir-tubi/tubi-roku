@@ -18,7 +18,7 @@ End Function
 
 Function onEpisodeSelected()
   tubiLog("EpisodesScreen.onEpisodeSelected")
-  m.top.episodeSelected = [ m.Menu.itemFocused, m.EpisodeGrid.itemSelected ]
+  m.top.episodeSelected = [ m.Menu.itemFocused, m.EpisodeGrid.cursorIndex ]
 End Function
 
 Function onEpisodeFocused()
@@ -27,7 +27,7 @@ Function onEpisodeFocused()
     
     m.Info.mode = "episode"
     infoPanelContent = CreateObject("roSGNode", "TubiContentNode")   
-    episode = m.EpisodeGrid.content.getChild(m.EpisodeGrid.itemFocused)
+    episode = m.EpisodeGrid.itemFocused
     episode_title = ""
     if episode = invalid then
       ' something failed, try to get the first season-episode

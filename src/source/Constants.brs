@@ -33,19 +33,21 @@ Function getConstants()
       definition = "sd"
     end if
 
-    ' 256MB models, so we can reduce our expectations
+    ' 256MB models, or slow CPU, so we can reduce our expectations
+    ' Find details at https://en.wikipedia.org/wiki/Roku#Feature_comparison
     lowMemoryModels = {
-      "2400X": true
-  	  "2450X": true
-      "2500X": true
-      "2700X": true
-      "2710X": true
-      "2720X": true
-      "3000X": true
-      "3050X": true
-      "3100X": true
-      "3400X": true
-      "3420X": true
+      "2400X": true  ' LT (2011)
+      "2450X": true  ' LT (2012)
+      "2500X": true  ' HD
+      "2700X": true  ' LT (2013)
+      "2710X": true  ' 1 / SE
+      "2720X": true  ' 2 (2013)
+      "3000X": true  ' 2 HD
+      "3050X": true  ' 2 XD
+      "3100X": true  ' 2 XS
+      "3400X": true  ' MHL Stick
+      "3420X": true  ' MHL Stick
+      "3500X": true  ' HDMI Stick (2014)
     }
     if lowMemoryModels[di.GetModel()] <> invalid
       lowMemory = true
@@ -428,6 +430,62 @@ Function getConstants()
       constants.ui.booleans.isPosterLabelVisible = false
       constants.ui.booleans.isPosterLabelVisibleFeatured = true
       constants.ui.booleans.isEpisodeLabelVisible = true
+
+    ' Set some performance parementers based on device profile
+    constants.performance = {}
+      constants.performance.categoryGridList = {}
+      constants.performance.contentGrid = {}
+      if lowMemory
+        '
+        ' Estimated metadata memory usage:
+        '
+        ' blocks-in-memory = (current category blocks) + (categoryWindowSize * 2)
+        ' blocks-in-memory = (2) + (2 * 2) = 6
+        ' items-in-memory = Max(blocks-in-memory, metadataCacheMaxEntries) * blockSize
+        ' items-in-memory = Max(6,8) * 40 = 480
+        ' memory-usage = average-item-memory * items-in-memory
+        ' memory-usage = 25kb * 480 = 12MB
+        '
+        ' Estimated poster VRAM usage (2-row content grid):
+        '
+        ' posters-in-VRAM = Min(numColumns, (visible width + 2 * overhang)) * Min(numRows, (visible height + 2 * overhang)) * (2 categories visible when animating)
+        ' posters-in-VRAM = Min(n, (7 + 2 * 1)) * Min(2, (2 + 2 * 1)) * 2
+        ' posters-in-VRAM = 9 * 2 * 2 = 36
+        ' poster-memory-usage = posters-in-VRAM * VRAM-per-poster
+        ' poster-memory-usage = 36 * (210*270*4Bpp) = 36 * 226KB ~= 8MB
+        '
+        ' Notes:
+        ' - lowMemory devices may have 512MB but will have 256MB minimum.
+        ' - the player needs about 70MB headroom to function well (calculated as free+cached)
+        ' - the OS on a 256MB device only takes about 70MB on startup
+        ' - VRAM on 256MB device is limited to 63MB and starts relieving pressure at ~90% full
+        ' - Total app memory available = 256MB - 63MB - 70MB - 70MB = 53MB
+        constants.performance.categoryGridList.blockSize = 40  ' 40 is about 2s to convert metadata in the MetadataFetchTask, so don't go any higher
+        constants.performance.categoryGridList.triggerSize = 30  ' make trigger large so horizontal scrolling has plenty of lead time
+        constants.performance.categoryGridList.categoryWindowSize = 3
+        constants.performance.categoryGridList.metadataCacheMaxEntries = 10  ' this is the biggest impact on number of nodes in memory
+        constants.performance.categoryGridList.categoryAnimationDuration = 0.75
+        constants.performance.categoryGridList.gridAnimationDuration = 0.4
+        constants.performance.contentGrid.overhang = 1
+        constants.performance.contentGrid.continuousEvents = false
+      else
+        'constants.performance.categoryGridList.blockSize = 30
+        'constants.performance.categoryGridList.triggerSize = 15
+        'constants.performance.categoryGridList.categoryWindowSize = 3
+        'constants.performance.categoryGridList.metadataCacheMaxEntries = 14
+        'constants.performance.categoryGridList.categoryAnimationDuration = 0.75
+        'constants.performance.categoryGridList.gridAnimationDuration = 0.4
+        'constants.performance.contentGrid.overhang = 3
+      ' Roku 4 and better
+        constants.performance.categoryGridList.blockSize = 30
+        constants.performance.categoryGridList.triggerSize = 10
+        constants.performance.categoryGridList.categoryWindowSize = 4
+        constants.performance.categoryGridList.metadataCacheMaxEntries = 20
+        constants.performance.categoryGridList.categoryAnimationDuration = 0.75
+        constants.performance.categoryGridList.gridAnimationDuration = 0.4
+        constants.performance.contentGrid.overhang = 2
+        constants.performance.contentGrid.continuousEvents = true
+      end if
 
   return constants  
 end Function

@@ -31,6 +31,7 @@
     <!-- these will come in for paginated responses -->
     <field id="totalCount" type="int" />
     <field id="more" type="boolean" />
+    <field id="offset" type="int" />
 
     <!-- these are not from the service but used internally for Scene Graph components -->
     <field id="episode_title" type="string" />

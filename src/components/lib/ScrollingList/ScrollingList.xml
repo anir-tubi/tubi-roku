@@ -24,12 +24,14 @@
     <field id="height" type="float" />
     <field id="content" type="node" />
     <field id="itemFocused" type="int" value="-1" alwaysNotify="true"/>
+    <field id="preItemFocused" type="int" value="-1" alwaysNotify="true"/>
     <field id="itemSelected" type="int" value="-1" alwaysNotify="true"/>
     <field id="itemComponentName" type="string" />
-    <field id="itemSpacings" alias="Items.itemSpacings" />
-    <field id="layoutDirection" alias="Items.layoutDirection" value="vert"/>
+    <field id="itemSpacings" type="floatarray" value="[]"/>
+    <field id="layoutDirection" type="string" value="vert"/>
     <field id="animateToItem" type="int" value="-1" alwaysNotify="true"/>
     <field id="focusBitmapUri" type="uri" alias="FocusImage.uri" />
+    <field id="focusChangeDuration" alias="ScrollAnimation.duration" value="0.25"/>
   </interface>
   
   <children>
@@ -39,13 +41,12 @@
      visible="false" 
      loadDisplayMode="scaleToFit"
      uri="" />
-    <LayoutGroup 
+    <Group 
      id="Items"
      translation="[0,0]"/>
     
     <Animation
-      id="ScrollAnimation"
-      duration="0.25" >
+      id="ScrollAnimation">
       <Vector2DFieldInterpolator
         id="TranslationInterpolator"
         fieldToInterp="Items.translation" />

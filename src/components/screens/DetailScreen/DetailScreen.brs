@@ -250,7 +250,7 @@ Function setMenuItems() As Void
 
   m.Menu.content = menuItems
   m.Menu.visible = true
-  if m.top.isInFocusChain() then m.Menu.setFocus(true)
+  if m.top.hasFocus() then m.Menu.setFocus(true)
 End Function
 
 
@@ -353,17 +353,6 @@ Function loadContentDetails(content)
   m.global.metadataFetchTask.request = request
 End Function
 
-
-'''''''''''''''''''''''''
-' onKeyEvent
-'
-Function onKeyEvent(key As String, press As Boolean) As Boolean
-  if press and key = "back" and m.episodesScreen <> invalid then
-    closeEpisodesScreen()
-    return true
-  end if
-  return false 
-End Function
 
 Function addToQueue()
   tubiLog("DetailScreen.addToQueue")

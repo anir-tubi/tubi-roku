@@ -24,11 +24,11 @@ End Function
 '
 ' Callback for 'animateToItem' field
 Function onAnimateToItem() As Void
-  if m.top.animateToItem >= 0 and m.top.animateToItem < m.items.getChildCount() then
+  tubiLog("ScrollingList.animateToItem " + stri(m.top.animateToItem))
+  if m.top.animateToItem < m.items.getChildCount() then
     startChangeFocus(m.top.animateToItem)
   end if
 End Function
-
 
 ''''''''''''''''''''''
 ' onDimensionsChange
@@ -55,15 +55,38 @@ Function onContentChange() As Void
   end while
   m.focusImage.visible = false
 
+  m.internalItemFocused = -1
+
   ' add new children for content
-  if m.top.content = invalid then return
+  if m.top.content = invalid or m.top.content.getChildCount = 0 then return
+
+  nextItemPosition = 0
   for i=0 to m.top.content.getChildCount()-1
     newItem = CreateObject("roSGNode", m.top.itemComponentName)
     ' may be invalid if itemComponentName incorrectly set
     if newItem <> invalid then
       newItem.content = m.top.content.getChild(i)
-      'TODO(Chris): does this id guarantee uniqueness for the animation?
       newItem.id = newItem.content.id
+      newItem.listHasFocus = m.top.isInFocusChain()
+
+      if m.top.itemSpacings.count() = 0 then
+        spacing = 0
+      else
+        spacing = m.top.itemSpacings[i \ m.top.itemSpacings.count()]
+      end if
+
+      itemRect = newItem.boundingRect()
+      if m.top.layoutDirection = "horiz" then
+        x = nextItemPosition
+        y = 0
+          nextItemPosition = nextItemPosition + itemRect.width + m.top.itemSpacings[i MOD m.top.itemSpacings.count()]
+      else
+        x = 0
+        y = nextItemPosition
+        nextItemPosition = nextItemPosition + itemRect.height + m.top.itemSpacings[i MOD m.top.itemSpacings.count()]
+      end if
+
+      newItem.translation = [x,y]
       m.items.appendChild(newItem)
     end if
   end for
@@ -92,7 +115,7 @@ Function onComponentFocusChange()
     ' provide a bump for listeners when focus comes back to this component. 
     ' DON'T do it if there is a focus change in progress.  The itemFocused
     ' event will emit on the end of the animation.
-    if m.top.isInFocusChain() and m.scrollAnimation.state = "stopped" then
+    if m.top.hasFocus() and m.scrollAnimation.state = "stopped" then
       m.top.itemFocused = m.internalItemFocused
     end if
   end if
@@ -235,9 +258,11 @@ Function startChangeFocus(newFocusedIndex As Integer) As Void
   m.translationInterpolator.key = [ 0.0, 1.0 ]
   m.translationInterpolator.keyvalue = [ m.items.translation, newPosition ]
   m.focusInterpolator.fieldToInterp = + focusedItem.id + ".focusPercent"
-  if unfocusedItem <> invalid then
+  if unfocusedItem <> invalid and unfocusedItem.focusPercent <> 0.0
     ' we may have just received content
-    m.unfocusInterpolator.fieldToInterp= unfocusedItem.id + ".focusPercent"
+    m.unfocusInterpolator.fieldToInterp = unfocusedItem.id + ".focusPercent"
+  else
+    m.unfocusInterpolator.fieldToInterp = ""
   end if
   newFocusImagePosition = [ 
     itemRect.x + newPosition[0]
@@ -247,12 +272,10 @@ Function startChangeFocus(newFocusedIndex As Integer) As Void
   m.focusImageWidthInterpolator.keyvalue = [ m.focusImage.width, itemRect.width ]
   m.focusImageHeightInterpolator.keyvalue = [ m.focusImage.height, itemRect.height ]
   m.scrollAnimation.observeField("state", "endChangeFocus")
-  if m.pressAndHold <> invalid
-    m.scrollAnimation.duration = 0.1
-  else
-    m.scrollAnimation.duration = 0.25
-  end if
   m.scrollAnimation.control = "start"
+
+  ' send out a pre-focus trigger in case observers want to react early to focus change
+  m.top.preItemFocused = m.internalItemFocused
 End Function
 
 
@@ -266,7 +289,9 @@ Function endChangeFocus()
   if m.scrollAnimation.state = "stopped" then
     m.scrollAnimation.unobserveField("state")
     focusedItem = m.items.getChild(m.internalItemFocused)
-    focusedItem.focusPercent = 1.0  ' in case animation didn't set this, force it
+    if focusedItem <> invalid then
+      focusedItem.focusPercent = 1.0  ' in case animation didn't set this, force it
+    end if
 
     ' may be invisible there was no content previously
     if m.top.isInFocusChain() then m.focusImage.visible = true
@@ -282,7 +307,7 @@ Function endChangeFocus()
     end if
 
     ' TODO(Chris): be careful here if content has changed
-    if not keyHandled and m.internalItemFocused < m.items.getChildCount() then
+    if not keyHandled and focusedItem <> invalid then
       m.top.itemFocused = m.internalItemFocused
     end if
   end if

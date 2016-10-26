@@ -99,7 +99,7 @@
       scrollHeight="300"
       itemSize="[210,300]"
       itemSpacing="[10,10]"
-      itemComponentName="ContentGridItem"
+      itemComponentName="Poster"
       fillDirection="Z"
       visible="true"
       translation="[85,648]"/>

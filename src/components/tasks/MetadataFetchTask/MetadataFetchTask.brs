@@ -65,6 +65,7 @@ Function beginRequest(metadataRequest) As Void
   end if
 
   ' store some context in the request object
+  if metadataRequest.id <> invalid then httpRequest.mftId = metadataRequest.id
   httpRequest.node = metadataRequest.node
   httpRequest.field = metadataRequest.field
   httpRequest.request_start_time = m.timespan.TotalMilliseconds()
@@ -76,13 +77,21 @@ End Function
 '''''''''''''''''''''''
 ' cancelRequests
 '
-' Cancel outstanding requests
+' Cancel outstanding requests, scoped to node, field, and optionally request id
 Function cancelRequests(metadataRequest As Object) As Void
   tubiLog("MetadataFetchTask.cancelRequests")
   for each entry in m.queue.queue
     if entry.request.node.isSameNode(metadataRequest.node) and entry.request.field = metadataRequest.field then
-      tubiLog("CANCELLING REQUEST")
-      m.queue.cancelRequest(entry.request)
+      if metadataRequest.id <> invalid and entry.request.mftId <> invalid then
+        if entry.request.mftId = metadataRequest.id then
+          tubiLog("CANCELLING REQUEST")
+          m.queue.cancelRequest(entry.request)
+        end if
+      else
+        ' don't match id if it was never given
+        tubiLog("CANCELLING REQUEST")
+        m.queue.cancelRequest(entry.request)
+      end if
     end if
   end for
   tubiLog("Queue size = " + stri(m.queue.count()))
@@ -110,68 +119,30 @@ Function handleResponse(message)
       tubiLog("MetadataFetchTask.handleResponse setting response field " + handledRequest.field)
       tubiLog("MetadataFetchTask request duration = " + tostr(handledRequest.request_end_time - handledRequest.request_start_time))
 
+      parsed = ParseJSON(handledRequest.response.data)
+      if parsed = invalid then
+        tubiLog("MetadataFetchTask failed to parse JSON response")
+        return invalid
+      end if
+
       'indicates a request from the details screen. this request needs to be handled slightly differently
       if handledRequest.name = "getSingleContent"
-        convertedMetadata = convertDetailsMetadata(handledRequest.response.data)
+        handledRequest.convertedMetadata = translateDetailsMetadata(parsed)
 
       'indicates a request for the full data for bookmarks - we need to handle differently because we may need to re-arrange content order
       else if handledRequest.name = m.constants.reqNames.getFullBookmarks
-        convertedMetadata = convertBookmarkMetadata(handledRequest.response.data, "bookmarks")
-
+        handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, "bookmarks")
       else if handledRequest.name = m.constants.reqNames.getFullHistory
-        convertedMetadata = convertBookmarkMetadata(handledRequest.response.data, "history")
-
+        handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, "history")
       else
-        convertedMetadata = convertToContentMetadata(handledRequest.response.data)
+        handledRequest.convertedMetadata = translateMetadata(parsed)
       end if
       handledRequest.convert_end_time = m.timespan.TotalMilliseconds()
-      handledRequest.convertedMetadata = convertedMetadata
+      handledRequest.id = handledRequest.mftId
       tubiLog("MetadataFetchTask convert duration = " + tostr(handledRequest.convert_end_time - handledRequest.request_end_time))
       handledRequest.node[handledRequest.field] = handledRequest
     end if
   else
     tubiLog("Request handled but response was empty or node/field was invalid")
   end if
-End Function
-
-
-'convert the server response to meta data node as expected by the details screen
-Function convertDetailsMetadata(data As String) As Object
-  parsed = ParseJSON(data)
-  if parsed = invalid then
-    tubiLog("MetadataFetchTask.convertDetailsMetadata failed to parse JSON response")
-    return invalid
-  end if
-
-  parentNode = translateDetailsMetadata(parsed)
-  
-  return parentNode
-End Function
-
-
-'convert the server response to meta data node as expected by the details screen
-Function convertBookmarkMetadata(data As String, orderType As String) As Object
-  parsed = ParseJSON(data)
-  if parsed = invalid then
-    tubiLog("MetadataFetchTask.convertBookmarkMetadata failed to parse JSON response")
-    return invalid
-  end if
-
-  parentNode = translateBookmarkMetadata(parsed, orderType)
-  
-  return parentNode
-End Function
-
-
-' TODO(Chris): Capture this somewhere else if we use it in other places than this task node
-Function convertToContentMetadata(data As String) As Object
-  parsed = ParseJSON(data)
-  if parsed = invalid then
-    tubiLog("MetadataFetchTask.convertToContentMetadata failed to parse JSON response")
-    return invalid
-  end if
-
-  parentNode = translateMetadata(parsed)
-  
-  return parentNode
 End Function

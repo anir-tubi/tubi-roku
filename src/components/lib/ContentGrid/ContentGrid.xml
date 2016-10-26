@@ -23,7 +23,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
-    <field id="content" type="node" />
+    <field id="content" type="node" alwaysNotify="true"/>
     
     <!-- Renderable items should have the following fields:
     -
@@ -71,8 +71,13 @@
     <field id="scrollHeight" type="float" value="0.0"/>
 
     <!-- Focus control -->
-    <field id="itemSelected" type="integer" value="-1" alwaysNotify="true"/>
-    <field id="itemFocused" type="integer" value="-1" alwaysNotify="true"/>
+    <field id="itemSelected" type="node" alwaysNotify="true"/>
+    <field id="itemFocused" type="node" alwaysNotify="true"/>
+    <field id="cursorPosition" type="intarray" value="[-1,-1]"/>
+    <field id="cursorIndex" type="integer" value="-1"/>
+    
+    <field id="focusChangeDuration" alias="ScrollAnimation.duration" value="0.3" />
+
   </interface>
   
   <children>
@@ -90,13 +95,15 @@
     </Group>
     <Animation
      id="ScrollAnimation"
-     duration="0.25">
+     easeFunction="inOutQuad">
       <Vector2DFieldInterpolator
         id="TranslationInterpolator"
-        fieldToInterp="Items.translation" />
+        fieldToInterp="Items.translation"
+        key="[0.0,1.0]" />
       <Vector2DFieldInterpolator
         id="FocusBoxInterpolator"
-        fieldToInterp="FocusBox.translation" />
+        fieldToInterp="FocusBox.translation"
+        key="[0.0,1.0]" />
     </Animation>
     <Group
      id="FocusBox"

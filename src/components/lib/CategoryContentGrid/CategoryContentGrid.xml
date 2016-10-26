@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="CategoryContentGrid" extends="Rectangle">
+  <script type="text/brightscript" uri="pkg:/components/lib/CategoryContentGrid/CategoryContentGrid.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- Incoming interface for encapsulation in a ScrollingList -->
+    <field id="focusPercent" type="float" value="0.0"/>
+    <field id="listHasFocus" type="boolean" value="false" />
+    <field id="content" type="node" alwaysNotify="true"/>
+    
+    <!-- Outgoing interface proxying the internal ContentGrid -->
+    <field id="itemSelected" type="node" alwaysNotify="true"/>
+    <field id="itemFocused" type="node" alwaysNotify="true"/>
+    <field id="cursorPosition" type="intarray" value="[-1,-1]"/>
+    <field id="cursorIndex" type="integer" value="-1"/>
+  </interface>
+  
+  <children>
+    <Spinner
+      id="Spinner"
+      width="1395"
+      height="610"
+      visible="false"/>
+    <!-- force height so that even before we get content to fill the ContentGrid, boundingRect() will return the
+         correct height.
+    -->
+    <ContentGrid
+      id="PosterGrid"
+      numRows="2"
+      width="1395"
+      height="610"
+      scrollWidth="210"
+      itemSize="[210,300]"
+      itemSpacing="[10,10]"
+      itemComponentName="Poster"
+      fillDirection="W"
+      visible="false"
+      translation="[7,7]"/>
+    <ContentGrid
+      id="FeatureGrid"
+      numRows="2"
+      width="1395"
+      scrollWidth="524"
+      height="612"
+      itemSize="[524,295]"
+      itemSpacing="[20,20]"
+      itemComponentName="FeaturePoster"
+      fillDirection="W"
+      visible="false" 
+      translation="[7,7]"/>
+  </children>
+</component>

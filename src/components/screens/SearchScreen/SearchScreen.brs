@@ -57,7 +57,7 @@ End Function
 ' Handle content grid item selected
 Function onResultSelected()
   tubiLog("SearchScreen.onResultSelected")
-  selectedItem = m.ResultGrid.content.getChild(m.ResultGrid.itemSelected)
+  selectedItem = m.ResultGrid.itemSelected
   m.top.contentSelected = selectedItem
 End Function
 
@@ -83,7 +83,7 @@ End Function
 '
 ' Update the info panel when a result item is focused
 Function onItemFocused()
-  m.InfoPanel.content = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
+  m.InfoPanel.content = m.ResultGrid.itemFocused
 End Function
 
 

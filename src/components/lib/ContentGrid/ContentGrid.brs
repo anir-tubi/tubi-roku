@@ -9,8 +9,10 @@ Function init()
   m.top.observeField("numRows", "onContentChange")
   m.top.observeField("numColumns", "onContentChange")
   m.top.observeField("fillDirection", "onContentChange")
+  m.top.observeField("visible", "onVisibleChange")
   m.mask = m.top.findNode("ContentsMask")
   m.scrollAnimation = m.top.findNode("ScrollAnimation")
+  m.scrollAnimation.observeField("state", "endChangeFocus")
   m.translationInterpolator = m.top.findNode("TranslationInterpolator")
   m.focusBoxInterpolator = m.top.findNode("FocusBoxInterpolator")
   m.focusBox = m.top.findNode("FocusBox")
@@ -28,6 +30,7 @@ Function init()
   ' use this for focus navigation.
   m.internalNumColumns = 0
   m.internalNumRows = 0
+  m.numItems = 0  ' cached for performance
 
   ' focus handling
   m.internalItemFocused = [-1,-1]   ' this moves immediately, not after animation. This way we
@@ -49,12 +52,23 @@ Function init()
   ' hit for rendering too many posters.  
   '
   ' Example: If visible window is 2x2 and overhang = 1, 4x4=16 posters will be rendered.
-  m.overhang = 1
+  m.overhang = m.global.constants.performance.contentGrid.overhang
+
+  ' Send cursor events during scrolling or only when scrolling stops and item is focused
+  m.continuousEvents = m.global.constants.performance.contentGrid.continuousEvents
 
   ' For reporting timing to the console
   m.timer = CreateObject("roTimespan")
 End Function
 
+Function onVisibleChange()
+  if m.top.visible = false then
+    'only remove children, freeing posters and associated HTTP and VRAM resources
+    m.items.removeChildrenIndex(m.items.getChildCount(), 0)
+  else
+    loadVisiblePosters(false) ' assuming there were no posters when invisible, skip cache check
+  end if
+End Function
 
 ''''''''''''''''''''''
 ' onItemSizeChange
@@ -85,9 +99,11 @@ End Function
 '
 Function onComponentFocusChange()
   tubiLog("ContentGrid.onComponentFocusChange")
-  if m.top.content <> invalid and m.top.content.getChildCount() > 0 and m.top.isInFocusChain() then
+  if m.top.content <> invalid and m.numItems > 0 and m.top.isInFocusChain() then
     m.focusBox.visible = true
-    m.top.itemFocused = gridIndexToItemIndex(m.internalItemFocused)
+    m.top.itemFocused = getContent(gridIndexToItemIndex(m.internalItemFocused))
+    m.top.cursorPosition = [m.internalItemFocused[0], m.internalItemFocused[1]]
+    m.top.cursorIndex = gridIndexToItemIndex(m.internalItemFocused)
   else
     m.focusBox.visible = false
   end if
@@ -102,31 +118,32 @@ End Function
 Function onContentChange() As Void
   tubiLog("ContentGrid.onContentChange")
 
-  m.timer.Mark()
-
-  ' Remove all existing children except the focus box
-  while m.items.getChildCount() > 0
-    m.items.removeChildIndex(0)
-  end while
 
   content = m.top.content
-  if content = invalid or content.getChildCount() = 0 then 
+  if content = invalid or content.getChildCount() = 0 then
     m.internalItemFocused = [-1, -1]
-    m.itemFocused = -1
+    m.top.itemSelected = invalid
+    m.top.itemFocused = invalid
+    m.top.cursorPosition = [-1, -1]
+    m.top.cursorIndex = -1
+    ' Remove all existing itemComponents
+    while m.items.getChildCount() > 0
+      m.items.removeChildIndex(0)
+    end while
     return
   end if
-  numItems = content.getChildCount()
+  m.numItems = getContentCount()
 
   ' Resolve the real grid size
   numRows = m.top.numRows
   numColumns = m.top.numColumns
   if m.top.fillDirection = "W" and numRows > 0
     ' if rows = 0, draw nothing. if rows > 0, expand columns, ignoring numColumns
-    numColumns = numItems \ numRows
-    if numItems MOD numRows > 0 then numColumns = numColumns + 1
+    numColumns = m.numItems \ numRows
+    if m.numItems MOD numRows > 0 then numColumns = numColumns + 1
   else if m.top.fillDirection = "Z" and numColumns > 0 then
-    numRows = numItems \ numColumns
-    if numItems MOD numColumns > 0 then numRows = numRows + 1
+    numRows = m.numItems \ numColumns
+    if m.numItems MOD numColumns > 0 then numRows = numRows + 1
   end if
   m.internalNumRows = numRows
   m.internalNumColumns = numColumns
@@ -137,8 +154,13 @@ Function onContentChange() As Void
 
   if m.top.isInFocusChain() then m.focusBox.visible = true
 
-  'print "First content loaded in " + stri(m.timer.TotalMilliseconds()) + " ms"
-  startChangeFocus([0,0])
+  if m.internalItemFocused[0] = -1 and m.internalItemFocused[1] = -1 then
+    ' zoom to beginning only if this was the first content
+    startChangeFocus([0,0])
+  else if m.numItems <= gridIndexToItemIndex(m.internalItemFocused) then
+    'if numItems is less than location of focus box, move focus box to the end
+    startChangeFocus(itemIndexToGridIndex(m.numItems-1))
+  end if
 End Function
 
 
@@ -147,8 +169,14 @@ End Function
 '
 ' Determine which content items are in the visible window, then render those in 
 ' the m.items cache
-Function loadVisiblePosters(useCache=true As Boolean)
-  m.timer.Mark()
+Function loadVisiblePosters(useCache=true As Boolean) As Void
+
+  ' quick out if the component is not visible, they'll be loaded once visibility changes
+  if not m.top.visible then 
+    print "Delaying item creation because invisible"
+    return
+  end if
+
   ' find the visible items by comparing the clipping window to the m.items offset
   ' these are all grid indices, not pixel coords
   x =  -m.items.translation[0] \ (m.top.itemSize[0] + m.top.itemSpacing[0])
@@ -168,28 +196,45 @@ Function loadVisiblePosters(useCache=true As Boolean)
   if (x + width) > m.internalNumColumns then width = m.internalNumColumns - x
   if (y + height) > m.internalNumRows then height = m.internalNumRows - y
 
+  ' Primarily for a complete reset of the content, such as initial loading
+  if not useCache
+    purgedItems = m.items.getChildren(m.items.getChildCount(), 0)
+    m.items.removeChildrenIndex(m.items.getChildCount(), 0)
+  end if
+
   tubiLog("ContentGrid loading " + stri(width * height) + " visible items")
   for i=x to x+width-1
     for j=y to y+height-1
       index = gridIndexToItemIndex([i,j])
+
+      ' If we're beyond the end of the total items, don't create more components
+      if index >= m.numItems then
+        exit for
+      end if
+
       item = invalid
+
       if useCache then
+        ' First see if we already have the item rendered, reset its cache position
         item = m.items.findNode(stri(index))
-        if item <> invalid then
-          'print "Found cached item " + stri(index)
-          m.items.appendChild(item)  ' FIFO, push it to the end
+      else
+        ' Use an already created object
+        item = purgedItems.shift()
+        if item <> invalid then 
+          item = createItemComponent(index, item)
         end if
       end if
+
       if item = invalid then
-        item = createItemComponent(index)
-        m.items.appendChild(item)
+        item = createItemComponent(index, CreateObject("roSGNode", m.top.itemComponentName))
       end if
+      m.items.appendChild(item)  ' push to end of the FIFO
     end for
   end for
 
   ' keep cache size down
   for i=0 to (m.items.getChildCount() - (width * height) - 1)
-    m.items.removeChildIndex(0)  ' for each one we add, remove one
+    m.items.removeChildIndex(0)
   end for
 
   'print "Visible items resolved in " + stri(m.timer.TotalMilliseconds()) + " ms"
@@ -204,16 +249,19 @@ End Function
 ' it into the cache. If cache size has grown, remove the oldest cache entry.  If
 ' the item is alread in the cache, reset it's FIFO position and don't create it
 ' again.
-Function createItemComponent(index) As Object
-  item = CreateObject("roSGNode", m.top.itemComponentName)
+Function createItemComponent(index As Integer, item As Object) As Object
   item.id = stri(index)
   item.width = m.top.itemSize[0]
   item.height = m.top.itemSize[1]
-  item.index = index
-  item.visible = true
-  content = m.top.content
-  if content = invalid then return invalid ' could be that content was just changed
-  item.itemContent = m.top.content.getChild(index)
+  content = getContent(index)
+  ' Special case here.  If we use Poster node type directly, it has a 'uri' field instead of
+  ' an 'itemContent' field.
+  if content = invalid then return invalid
+  if item.hasField("itemContent") then 
+    item.itemContent = content
+  else if item.hasField("uri") then 
+    item.uri = content.hdgridposterurl
+  end if
   gridIndex = itemIndexToGridIndex(index)
   itemRect = getGridItemRect(gridIndex)
   item.translation = [itemRect.x,itemRect.y]
@@ -234,9 +282,7 @@ Function startChangeFocus(newFocusedIndex As Object) As Void
 
   itemIndex = gridIndexToItemIndex(newFocusedIndex)
   ' check out of bounds, avoids scrolling to a missing corner when content is not neatly divible by the row/column span
-  if itemIndex >= m.top.content.getChildCount() then
-    return 
-  end if
+  if itemIndex >= m.numItems then return
 
   itemRect = getGridItemRect(newFocusedIndex)
   'print "Scrolling to item " +  "[" + str(newFocusedIndex[0]) + "," + str(newFocusedIndex[1]) + "] at [" + str(itemRect.x) + "," + str(itemRect.y) + "]"
@@ -267,11 +313,8 @@ Function startChangeFocus(newFocusedIndex As Object) As Void
   'print "Scrolling items to [" + str(newX) + "," + str(newY) + "]"
 
   ' Start scroll animation
-  m.translationInterpolator.key=[ 0.0, 1.0 ]
   m.translationInterpolator.keyvalue=[ m.items.translation, [newX,newY] ]
-  m.focusBoxInterpolator.key=[0.0,1.0]
   m.focusBoxInterpolator.keyvalue=[ m.focusBox.translation, [itemRect.x + newX, itemRect.y + newY] ]
-  m.scrollAnimation.observeField("state", "endChangeFocus")
   m.scrollAnimation.control = "start"
 End Function
 
@@ -284,8 +327,6 @@ End Function
 Function endChangeFocus()
   tubiLog("ContentGrid.endChangeFocus")
   if m.scrollAnimation.state = "stopped" then
-    m.scrollAnimation.unobserveField("state")
-
     ' emit event only if key events aren't happening, or they're being ignored
     ' because we're at the end of the list
     keyHandled = false
@@ -296,13 +337,22 @@ Function endChangeFocus()
       keyHandled = scrollGrid(m.pressAndHold)
     end if
 
-    if not keyHandled then 
-      m.top.itemFocused = gridIndexToItemIndex(m.internalItemFocused)
-      ' TODO(Chris): This seems to work well enough to only refresh
-      '              the poster cache when keypresses have settled. If
-      '              we want to be more aggressive, we can move the
-      '              loadVisiblePosters() call outside of this if statement.
+    ' If we're using a reasonably high-powered device, send messages while scrolling,
+    ' otherwise send messages only when settled.
+    if m.continuousEvents then
+      m.top.cursorPosition = [m.internalItemFocused[0], m.internalItemFocused[1]]
+      m.top.cursorIndex = gridIndexToItemIndex(m.internalItemFocused)
       loadVisiblePosters()
+    end if
+
+    ' Once things have settled, set itemFocused
+    if not keyHandled then 
+      if not m.continuousEvents then
+        m.top.cursorPosition = [m.internalItemFocused[0], m.internalItemFocused[1]]
+        m.top.cursorIndex = gridIndexToItemIndex(m.internalItemFocused)
+        loadVisiblePosters()
+      end if
+      m.top.itemFocused = getContent(m.top.cursorIndex)
     end if
   end if
 End Function
@@ -319,6 +369,9 @@ End Function
 Function onKeyEvent(key As Object, press As Boolean) As Boolean
   tubiLog("ContentGrid.onKeyEvent")
 
+  ' Don't process any keypresses if there aren't any items
+  if m.top.cursorIndex = -1 then return false
+
   if press then
     if m.scrollAnimation.state = "running" then 
       m.overlappedKeypress = key
@@ -329,7 +382,7 @@ Function onKeyEvent(key As Object, press As Boolean) As Boolean
       m.pressAndHold = key
       return true
     else if key = "OK" or key = "play" then
-      m.top.itemSelected = gridIndexToItemIndex(m.internalItemFocused)
+      m.top.itemSelected = getContent(gridIndexToItemIndex(m.internalItemFocused))
       return true
     end if
   else if m.pressAndHold <> invalid then
@@ -385,7 +438,7 @@ End Function
 '''''''''''''''''''''''''
 ' itemIndexToGridIndex
 '
-' Convert a scalar m.top.content index to a 2d array 
+' Convert a scalar content index to a 2d grid index
 ' index into the content grid.
 Function itemIndexToGridIndex(index As Integer) As Object
   if m.top.fillDirection = "W" then
@@ -402,12 +455,49 @@ End Function
 ''''''''''''''''''''''''''
 ' gridIndexToItemIndex
 '
-' Convert a 2d array content grid index into a scalar
-' index into m.top.content
+' Convert a 2d grid index into a scalar content index
 Function gridIndexToItemIndex(itemIndex As Object) As Integer
   if m.top.fillDirection = "W" then
     return (itemIndex[0]*m.internalNumRows + itemIndex[1])
   else if m.top.fillDirection = "Z" then
     return (itemIndex[1]*m.internalNumColumns + itemIndex[0])
   end if
+End Function
+
+'''''''''''''''''''''''''
+' getContentCount
+'
+' Support for windowing the content
+Function getContentCount()
+  if m.top.content <> invalid then
+    numItems = m.top.content.getChildCount()
+    if m.top.content.totalCount <> invalid then
+      numItems = m.top.content.totalCount
+    end if
+    if m.top.content.offset <> invalid then
+      n = m.top.content.offset + m.top.content.getChildCount()
+      if n > numItems then
+        numItems = n
+      end if
+    end if
+  else
+    numItems = 0
+  end if
+  return numItems
+End Function
+
+''''''''''''''''
+' getContent()
+Function getContent(index)
+  if m.top.content <> invalid then
+    if m.top.content.offset <> invalid
+      adjustedIndex = index - m.top.content.offset
+    else
+      adjustedIndex = index
+    end if
+    item = m.top.content.getChild(adjustedIndex)
+  else
+    item = invalid
+  end if
+  return item
 End Function

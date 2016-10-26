@@ -43,7 +43,7 @@ Function onScreenFocusChange()
     m.Video.visible = true
     if m.Video.state = "paused" then
       m.Video.control = "resume"
-    else
+    else if m.Video.state <> "playing" then
       m.Video.control = "play"
     end if  
     if m.top.hasFocus() then

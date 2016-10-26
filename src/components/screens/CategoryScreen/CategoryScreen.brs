@@ -4,27 +4,24 @@ Function init()
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.SpecialCategories = m.top.findNode("SpecialCategories")
   m.top.observeField("content", "onContentChange")
-  m.top.observeField("categoryResponse", "onCategoryContentReceived")
+  m.top.observeField("categoryPreviewResponse", "onCategoryPreviewReceived")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
   m.top.observeField("categoryListResponse", "onCategoriesReceived")
   m.top.observeField("trackingUri", "onTrackingUriChange")
   m.trackingCount = 0
-  m.CategoryList.observeField("itemFocused","onCategoryChange")
+  m.CategoryList.observeField("itemFocused","onCategoryMenuChange")
+  m.CategoryList.observeField("preItemFocused","onPreCategoryMenuChange")
   m.authTask = m.top.findNode("CategoryAuthTask")
 
   'Content area
-  m.PosterGrid = m.top.findNode("PosterGrid")
-  m.PosterGrid.observeField("itemFocused","onGridFocusChange")
-  m.PosterGrid.observeField("itemSelected","onGridItemSelected")
-  m.FeatureGrid = m.top.findNode("FeatureGrid")
-  m.FeatureGrid.observeField("itemFocused","onGridFocusChange")
-  m.FeatureGrid.observeField("itemSelected","onGridItemSelected")
+  m.CategoryGridList = m.top.findNode("CategoryGridList")
+  m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
+  m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
+  m.CategoryGridList.observeField("preCategoryFocused", "onPreGridCategoryChange")
   m.SignInMenu = m.top.findNode("SearchSignInList")
   m.SignInMenu.observeField("itemSelected", "onSignInMenuItemSelected")
-  m.ContentGrid = m.PosterGrid  ' alias to simplify the code
-  m.Spinner = m.top.findNode("CategorySpinner")
 
   'Sign-in menu items
   m.SearchSignInContent = m.top.findNode("SearchSignInContent")
@@ -44,12 +41,12 @@ Function init()
   ' track the last focused screen component so that we can go back
   ' to it when focus is taken away
   m.lastFocusedComponent = m.CategoryList
-  m.featureCategoryFocused = false
 
   onSignedInChange()  ' seed the search & sign in menu
 
   loadUserCategories()
   loadAllCategories()
+
 End Function
 
 
@@ -82,18 +79,7 @@ End Function
 ' if one of the user categories is showing, reload it
 Function onDirtyUserCategories()
   tubiLog("CategoryScreen.onDirtyUserCategories")
-  if m.CategoryList.content <> invalid then
-    category = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
-    if category <> invalid
-      if category.title = m.global.constants.ui.categoryNames.history
-        m.ContentGrid.content = invalid  ' hide the current content so it doesn't jump when updated
-        loadHistory(category.id)
-      else if category.title = m.global.constants.ui.categoryNames.queue
-        m.ContentGrid.content = invalid  ' hide the current content so it doesn't jump when updated
-        loadBookmarks(category.id)
-      end if
-    end if
-  end if
+  m.CategoryGridList.dirtyUserCategories = true
 End Function
 
 '''''''''''''''''''''''''''
@@ -121,10 +107,10 @@ End Function
 ' being shown.
 Function onScreenFocusChange()
   tubiLog("CategoryScreen.onScreenFocusChange")
-  if m.top.hasFocus() then
+ if m.top.hasFocus() then
     ' defaulted to screen, move to a subcomponent
-    if m.ContentGrid.visible = true then
-      m.ContentGrid.setFocus(true)
+    if m.CategoryGridList.visible = true then
+      m.CategoryGridList.setFocus(true)
     else if m.SignInMenu.visible = true then
       m.SignInMenu.setFocus(true)
     else
@@ -141,8 +127,8 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("CategoryScreen.onKeyEvent")
   if press then
     if key = "right" and m.CategoryList.isInFocusChain() then
-      if m.ContentGrid.visible = true then
-        m.ContentGrid.setFocus(true)
+      if m.CategoryGridList.visible = true then
+        m.CategoryGridList.setFocus(true)
         m.trackingCount = 0
       else if m.SignInMenu.visible = true then
         m.SignInMenu.setFocus(true)
@@ -172,7 +158,6 @@ End Function
 ' Handle category list received
 Function onContentChange() As Void
   tubiLog("CategoryScreen.onContentChange")
-  m.CategoryList.visible = false
   m.CategoryList.content = invalid  ' since alwaysNotify=false on scrollinglist
   ' Force Featured to the top of the list
   for i=0 to m.top.content.getChildCount()-1
@@ -187,117 +172,67 @@ Function onContentChange() As Void
   ' Prepend special categories, taking care to remove them if they already are there
   m.InfoPanel.mode = "category"
   if m.top.signedIn then
-    m.top.content.removeChild(m.SearchSignInCategory)
-    m.top.content.insertChild(m.SearchSignOutCategory, 0)
-    m.top.content.insertChild(m.ContinueWatchingCategory, 1)
-    m.top.content.insertChild(m.MyQueueCategory, 2)
+    m.top.content.insertChild(m.ContinueWatchingCategory, 0)
+    m.top.content.insertChild(m.MyQueueCategory, 1)
+    featureGridIndex = 2
   else
-    m.top.content.removeChild(m.SearchSignOutCategory)
     m.top.content.removeChild(m.ContinueWatchingCategory)
     m.top.content.removeChild(m.MyQueueCategory)
-    m.top.content.insertChild(m.SearchSignInCategory, 0)
+    featureGridIndex = 0
   end if
 
-  m.CategoryList.content = m.top.content
+  setMenuContent()
+  m.CategoryGridList.content = m.top.content  ' should be the category list
+  m.CategoryGridList.animateToCategory = featureGridIndex
+  m.CategoryList.animateToItem = featureGridIndex+1  'CategoryList has one extra item
   if m.top.isInFocusChain() then m.CategoryList.setFocus(true)
-  m.featureCategoryFocused = false
 End Function
 
 
-''''''''''''''''''''''''''
-' onCategoryContentReceived
+'''''''''''''''''''
+' setMenuContent
 '
-Function onCategoryContentReceived() As Void
-  tubiLog("CategoryScreen.onCategoryContentReceived")
-  response = m.top.categoryResponse.response
-  if response.code >= 200 and response.code < 300 then 
-
-    ' Check if the visible category matches the request
-    ' TODO(Chris): This depends on some bad assumptions about things that get passed through
-    '              the MetadataFetchTask
-
-    if m.top.categoryResponse.name = "getCategory" then
-      if m.top.categoryResponse.params <> invalid then
-        categoryId = m.top.categoryResponse.params.cat_id
-        if categoryId <> m.ContentGrid.id then
-          tubiLog("Ignoring late response for category content")
-          return
-        end if
-      end if
-    else if m.top.categoryResponse.name = "getFullBookmarks" then
-      if m.ContentGrid.id <> m.MyQueueCategory.id then return
-    else if m.top.categoryResponse.name = "getFullHistory" then
-      if m.ContentGrid.id <> m.ContinueWatchingCategory.id then return
-    end if
-
-    tubiLog("Received response for category " + m.ContentGrid.id)
-    content = m.top.categoryResponse.convertedMetadata
-    m.Spinner.visible = false
-
-    ' For the 2-row poster grid, collapse to 1 row if fewer than 8 items come back
-    if m.ContentGrid.isSameNode(m.PosterGrid) then
-      if content.getChildCount() > 8 then
-        m.ContentGrid.numRows = 2
-      else
-        m.ContentGrid.numRows = 1
-      end if
-    end if
-
-    ' timer here since large categories can take a while to be set
-    timer = CreateObject("roTimespan")
-    timer.Mark()
-    m.ContentGrid.content = content
-    delta = timer.TotalMilliseconds()
-    tubiLog("Set " + stri(content.getChildCount()) + " content grid items in " + stri(delta) + "ms")
-
-    if m.CategoryList.isInFocusChain() then
-      m.InfoPanel.content.totalCount = content.getChildCount()
-    end if
+' The category menu has an extra entry for search and sign-in which doesn't have a
+' corresponding content grid.  We create a separate ContentNode tree for the menu
+' separate from the CategoryGridList content data
+Function setMenuContent()
+  categories = CreateObject("roSGNode", "ContentNode")
+  ' copy categories as-is, which will include MyQueue and ContinueWatching if signed in
+  for i=0 to m.top.content.getChildCount()-1
+    category = categories.createChild("ContentNode")
+    category.id = m.top.content.getChild(i).id
+    category.title = m.top.content.getChild(i).title
+  end for
+  if m.top.signedIn then
+    categories.insertChild(m.SearchSignOutCategory, 0)
   else
-    testLog("Category content returned " + stri(response.code))
-    if m.top.isInFocusChain() then showErrorModal(response.code, response.failReason, retryCategoryContent, cancelCategoryContent)
+    categories.insertChild(m.SearchSignInCategory, 0)
   end if
+  m.CategoryList.content = categories
 End Function
 
-' try to reload the current category
-Function retryCategoryContent()
-  m.CategoryList.setFocus(true)
-  m.ContentGrid.id = ""  ' won't retry unless this doesn't match
-  onCategoryChange()
-End Function
 
-' Just set focus to category list
-Function cancelCategoryContent()
-  m.CategoryList.setFocus(true)
+' Use this trigger to synchronize menu and grid
+Function onPreCategoryMenuChange()
+  ' special handling for Search&SignIn menu here
+  if m.CategoryList.preItemFocused = 0 then
+    m.CategoryGridList.visible = false
+    m.SignInMenu.visible = true
+  else
+    if m.CategoryGridList.visible = false then m.CategoryGridList.visible = true
+    m.SignInMenu.visible = false
+    m.CategoryGridList.animateToCategory = m.CategoryList.preItemFocused - 1
+  end if
 End Function
 
 
 '''''''''''''''''''''
-' onCategoryChange
+' onCategoryMenuChange
 '
 ' On category focus change, update the info panel
-Function onCategoryChange() As Void
-  tubiLog("CategoryScreen.onCategoryChange")
+Function onCategoryMenuChange() As Void
+  tubiLog("CategoryScreen.onCategoryMenuChange")
   if not m.CategoryList.isInFocusChain() or m.CategoryList.content = invalid then return
-
-  ' Only on the first trigger of 'itemFocused' from the category list,
-  ' set the focus to Featured.  This has to be done here and not when
-  ' 'content' is set on ScrollingList due to a race condition.
-  if m.featureCategoryFocused = false then
-    for i=0 to m.CategoryList.content.getChildCount()-1
-      category = m.CategoryList.content.getChild(i)
-      if category.title = "Featured" then
-        tubiLog("Setting focus on Featured category")
-        m.CategoryList.animateToItem = i
-        exit for
-      end if
-    end for
-    m.featureCategoryFocused = true
-    return
-  else
-    ' We keep the categorylist hidden until Feature is focused
-    m.CategoryList.visible = true
-  end if
 
   'unobserve historyOrder and bookmarkOrder fields since if we are changing category,
   'we are no longer concerned about any categories we may have been waiting for
@@ -309,55 +244,14 @@ Function onCategoryChange() As Void
   m.InfoPanel.mode = "category"
   m.top.backgroundUriList = [m.defaultHeroUri]
 
-  if newCategory.id <> m.ContentGrid.id then
-    m.SignInMenu.visible = false
-    m.ContentGrid.content = invalid
-    m.ContentGrid.visible = false
-
-    ' Flip between feature grid, poster grid, and sign in menu
-    if newCategory.title = m.global.constants.ui.categoryNames.topCategory
-      m.ContentGrid = m.top.findNode("FeatureGrid")
-      m.ContentGrid.visible = true
-      m.Spinner.visible = true
-      loadOneCategory(newCategory.id)
-
-    'Search and Sign In
-    else if newCategory.title = m.global.constants.ui.categoryNames.signedInTools or newCategory.title = m.global.constants.ui.categoryNames.signedOutTools
-      m.SignInMenu.visible = true
-
-    'Continue Watching
-    else if newCategory.title = m.global.constants.ui.categoryNames.history
-      m.ContentGrid = m.top.findNode("PosterGrid")
-      m.ContentGrid.visible = true
-      m.Spinner.visible = true
-      loadHistory(newCategory.id)      
-
-    'My Queue
-    else if newCategory.title = m.global.constants.ui.categoryNames.queue
-      m.ContentGrid = m.top.findNode("PosterGrid")
-      m.ContentGrid.visible = true
-      loadBookmarks(newCategory.id)  
-
-    'any normal category
-    else
-      m.ContentGrid = m.top.findNode("PosterGrid")
-      m.ContentGrid.visible = true
-      m.Spinner.visible = true
-      loadOneCategory(newCategory.id)
-    end if
-
-    m.ContentGrid.id = newCategory.id
-
-    'update the tracking URI for user tracking purposes
-    m.trackingCount = m.trackingCount + 1
-    catPos = (m.CategoryList.itemFocused + 1).toStr()
-    catSlug = ""
-    if newCategory.slug <> invalid
-      catSlug = newCategory.slug
-    end if
-    m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug
-
+  'update the tracking URI for user tracking purposes
+  m.trackingCount = m.trackingCount + 1
+  catPos = (m.CategoryList.itemFocused + 1).toStr()
+  catSlug = ""
+  if newCategory.slug <> invalid
+    catSlug = newCategory.slug
   end if
+  m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug
 End Function
 
 
@@ -395,6 +289,14 @@ Function onSignedInChange()
 End Function
 
 
+Function onPreGridCategoryChange() As Void
+  ' Don't sync if CategoryList has focus and most likely triggered the grid category change
+  if m.CategoryGridList.isInFocusChain() and m.CategoryGridList.content <> invalid then
+    m.CategoryList.animateToItem = m.CategoryGridList.preCategoryFocused + 1 ' CategoryList has one extra item
+  end if
+End Function
+
+
 '''''''''''''''''''''
 ' onGridFocusChange
 '
@@ -402,12 +304,12 @@ End Function
 Function onGridFocusChange() As Void
   tubiLog("CategoryScreen.onGridFocusChange")
 
-  if not m.ContentGrid.isInFocusChain() then return
-  focusedContent = m.ContentGrid.content.getChild(m.ContentGrid.itemFocused)
+  if not m.CategoryGridList.isInFocusChain() then return
+  focusedContent = m.CategoryGridList.itemFocused
   m.InfoPanel.content = focusedContent
   m.InfoPanel.mode = "item"
 
-  if focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
+  if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
     m.top.backgroundUriList = focusedContent.backgrounds
   else
     m.top.backgroundUriList = [m.defaultHeroUri]
@@ -425,10 +327,8 @@ Function onGridFocusChange() As Void
   row = 0
   col = 0
   if m.CategoryList.itemFocused >= 0
-    'row and column should be 1-indexed
-    modulus = m.ContentGrid.itemFocused MOD m.ContentGrid.numRows
-    row = modulus + 1 
-    col = Int(m.ContentGrid.itemFocused / m.ContentGrid.numRows) + 1
+    row = m.CategoryGridList.cursorPosition[0] + 1
+    col = m.CategoryGridList.cursorPosition[1] + 1
   end if
 
   'set the user event tracking info
@@ -441,7 +341,7 @@ End Function
 
 Function onGridItemSelected() As Void
   tubiLog("CategoryScreen.onGridItemSelected")
-  m.top.contentSelected = m.ContentGrid.content.getChild(m.ContentGrid.itemSelected)
+  m.top.contentSelected = m.CategoryGridList.itemSelected
 End Function
 
 '''''''''''''''''''''
@@ -471,125 +371,6 @@ Function loadAllCategories()
     }
   }
   m.global.metadataFetchTask.request = request
-End Function
-
-'''''''''''''''''''''
-' loadOneCategory
-'
-' Load a single category's content
-Function loadOneCategory(categoryId As String)
-  tubiLog("CategoryScreen.loadOneCategory")
-  settings = m.global.constants.settings
-  url = m.global.constants.urls.cms.categories
-  platform = m.global.constants.platform
-  deviceInfo = m.global.constants.deviceInfo
-  constants = m.global.constants
-  Request = TubiRequest()
-  Auth = TubiAuth(constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, constants)
-
-  historyOrder = m.global.historyOrder
-  bookmarkOrder = m.global.bookmarkOrder
-
-  request = {
-    url: url
-    name: "getCategory"    
-    node: m.top
-    field: "categoryResponse"
-    options: {
-      params: {
-        "app_id": settings.shortAppName
-        platform: platform
-        "device_id": deviceInfo.deviceId
-        "cat_id": categoryId
-        all: false
-        page_enabled: false
-      }
-    }
-  }
-
-  if constants.deviceInfo.lowMemory then
-    request.options.params.page_enabled = true
-    request.options.params.per_page = 100
-  end if
-
-  ' first cancel any outstanding metadata requests for this screen
-  m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
-  m.global.metadataFetchTask.request = request
-End Function
-
-
-'''''''''''''''''''''
-' loadHistory
-'
-' Load the user's history content for "Continue Watching"
-Function loadHistory(categoryId As String)
-  constants = m.global.constants
-  Request = TubiRequest()
-  Auth = TubiAuth(constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, constants)
-
-  historyOrder = m.global.historyOrder
-
-  if historyOrder <> invalid then
-    if historyOrder.count() > 0 then
-      'get the full user's bookmark category
-      request = Bookmarks.getFullHistoryReq(historyOrder)
-
-      request.node = m.top
-      request.field = "categoryResponse"
-    
-      ' first cancel any outstanding metadata requests for this screen
-      m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
-      m.global.metadataFetchTask.request = request
-    else
-      m.Spinner.visible = false
-    end if
-
-  else
-    'we haven't gotten a response for the initial bookmarks yet
-    'so we're gonna listen and run this again once we get a response
-    'we need to make sure we unobserve this field once the category changes though
-    m.global.observeField("historyOrder", "loadHistory")
-  end if
-
-End Function
-
-
-'''''''''''''''''''''
-' loadBookmarks
-'
-' Load the user's history content for "Continue Watching"
-Function loadBookmarks(categoryId As String)
-  constants = m.global.constants
-  Request = TubiRequest()
-  Auth = TubiAuth(constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, constants)
-
-  bookmarkOrder = m.global.bookmarkOrder
-
-  if bookmarkOrder <> invalid then 
-    if bookmarkOrder.count() > 0 then
-      'get the full user's history category
-      request = Bookmarks.getFullBookmarksReq(bookmarkOrder)
-
-      request.node = m.top
-      request.field = "categoryResponse"
-
-      ' first cancel any outstanding metadata requests for this screen
-      m.global.metadataFetchTask.cancel = { node: request.node, field: request.field }
-      m.global.metadataFetchTask.request = request
-    else
-      m.Spinner.visible = false
-    end if
-  
-  else
-    'we haven't gotten a response for the initial bookmarks yet
-    'so we're gonna listen and run this again once we get a response
-    'we need to make sure we unobserve this field once the category changes though
-    m.global.observeField("bookmarkOrder", "loadBookmarks")
-  end if
-
 End Function
 
 

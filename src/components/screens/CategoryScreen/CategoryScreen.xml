@@ -31,6 +31,9 @@
     <!-- MetadataFetchTask response for single category content -->
     <field id="categoryResponse" type="assocarray" alwaysNotify="true"/>
     
+    <!-- MetadataFetchTask response for single category content -->
+    <field id="categoryPreviewResponse" type="assocarray" alwaysNotify="true"/>
+    
     <!-- MetadataFetchTask response for category list -->
     <field id="categoryListResponse" type="assocarray" alwaysNotify="true"/>
     
@@ -115,7 +118,6 @@
       translation="[65, 424]"
       width="440"
       height="616"
-      visible="false" 
       itemSpacings="[8]"
       itemComponentName="CategorySeasonListItem"
       focusBitmapUri="pkg:/images/menu-focus.png"/>
@@ -128,54 +130,31 @@
     <Group
       id="ContentArea"
       translation="[525,423]" >
+      <CategoryGridList
+        id="CategoryGridList"/>
       
-    <ContentGrid
-      id="FeatureGrid"
-      numRows="2"
-      width="1395"
-      scrollWidth="1310"
-      height="612"
-      itemSize="[524,295]"
-      itemSpacing="[20,20]"
-      itemComponentName="FeaturePoster"
-      fillDirection="W"
-      visible="false" 
-      translation="[0,0]"/>
-    <ContentGrid
-      id="PosterGrid"
-      numRows="2"
-      width="1395"
-      height="610"
-      scrollWidth="1310"
-      itemSize="[210,300]"
-      itemSpacing="[10,10]"
-      itemComponentName="ContentGridItem"
-      fillDirection="W"
-      visible="true"
-      translation="[0,0]"/>
-    <Spinner
-      id="CategorySpinner"
-      width="1310"
-      height="610"
-      visible="false"
-      translation="[0,0]"/>
-
-    <!-- Shown when Search & Sign In special category is selected -->
-    <!-- TODO(Chris): Rename the DetailMenuItem since it is reused -->
-    <ScrollingList
-      id="SearchSignInList"
-      width="465"
-      height="280"
-      itemSpacings="[9]"
-      itemComponentName="DetailMenuItem"
-      focusBitmapUri="pkg:/images/menu-focus.png"
-      visible="false">
-    </ScrollingList>
-
+      <!-- Shown when Search & Sign In special category is selected -->
+      <!-- TODO(Chris): Rename the DetailMenuItem since it is reused -->
+      <ScrollingList
+        id="SearchSignInList"
+        width="465"
+        height="280"
+        itemSpacings="[9]"
+        itemComponentName="DetailMenuItem"
+        focusBitmapUri="pkg:/images/menu-focus.png"
+        visible="false">
+      </ScrollingList>
     </Group>
     
     <AuthTask
       id="CategoryAuthTask" />
 
+    <!-- At request of backend, deferring these requests gives the backend time to
+      - cache the responses
+      -->
+    <Timer
+      id="CategoryPreloadTimer"
+      duration="2.0"/>
+    
   </children>
 </component>

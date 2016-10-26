@@ -23,6 +23,7 @@
        -
        - The request param should have the following form:
        - {
+       -   id: <unique id assigned by the caller to be used in request cancelations>
        -   node: <node to receive content>
        -   field: <field name on which to receive response>
        -   url: <url to fetch>
@@ -40,6 +41,7 @@
        - 
        - Expected format:
        - {
+       -   id: <id sent in the request>
        -   node: <node to receive content>
        -   field: <field name on which to receive response>
        - }

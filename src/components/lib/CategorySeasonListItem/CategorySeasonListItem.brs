@@ -1,7 +1,8 @@
 Function init()
   m.label = m.top.findNode("categoryText")
   m.top.observeField("content", "onContentChange")
-  m.top.observeField("listHasFocus", "onListFocusChange")
+  m.top.observeField("listHasFocus", "onFocusChange")
+  m.top.observeField("focusPercent", "onFocusChange")
   m.top.width = 440
   m.top.height = 80
   m.top.color = m.global.constants.ui.colors.transparent
@@ -9,13 +10,20 @@ End Function
 
 
 ''''''''''''''''''''
-' onListFocusChange
+' onFocusChange
 '
-Function onListFocusChange()
+' Either list or item focus has changed
+Function onFocusChange()
   if m.top.listHasFocus then
+    ' all text is white when there is a focus image
     m.label.color = m.global.constants.ui.colors.unfocused
-  else if m.top.focusPercent = 1.0 then
-    m.label.color = m.global.constants.ui.colors.focused
+  else 
+    if m.top.focusPercent = 1.0 then
+      ' text color changes to indicate focused item when list is not focused
+      m.label.color = m.global.constants.ui.colors.focused
+    else
+      m.label.color = m.global.constants.ui.colors.unfocused
+    end if
   end if
 End Function
 
