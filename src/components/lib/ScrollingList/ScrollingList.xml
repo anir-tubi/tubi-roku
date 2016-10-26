@@ -22,6 +22,8 @@
   <interface>
     <field id="width" type="float" />
     <field id="height" type="float" />
+    <field id="scrollWidth" type="float" value="0.0"/>
+    <field id="scrollHeight" type="float" value="0.0"/>
     <field id="content" type="node" />
     <field id="itemFocused" type="int" value="-1" alwaysNotify="true"/>
     <field id="preItemFocused" type="int" value="-1" alwaysNotify="true"/>

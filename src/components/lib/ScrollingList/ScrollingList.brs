@@ -189,11 +189,13 @@ End Function
 ' Calculate where the content group will scroll to
 ' in order to make the new focus item visible
 Function newPositionVertical(itemRect As Object)
-  if (itemRect.y + itemRect.height + m.items.translation[1]) > m.top.height then
+  vertLimit = m.top.scrollHeight
+  if vertLimit = 0 then vertLimit = m.top.height
+  if (itemRect.y + itemRect.height + m.items.translation[1]) > vertLimit then
     ' scroll up just enough to show the next item
     newPosition = [
       m.items.translation[0]
-      m.top.height - itemRect.y - itemRect.height
+      vertLimit - itemRect.y - itemRect.height
     ]
   else if (itemRect.y + m.items.translation[1]) < 0 then
     newPosition = [
@@ -212,11 +214,13 @@ End Function
 ' Calculate where the content group will scroll to
 ' in order to make the new focus item visible
 Function newPositionHorizontal(itemRect As Object)
-  if (itemRect.x + itemRect.width + m.items.translation[0]) > m.top.width then
+  horizLimit = m.top.scrollWidth
+  if horizLimit = 0 then horizLimit = m.top.width
+  if (itemRect.x + itemRect.width + m.items.translation[0]) > horizLimit then
     ' scroll up just enough to show the next item
     newPosition = [
       m.items.translation[1]
-      m.top.width - itemRect.x - itemRect.width
+      horizLimit - itemRect.x - itemRect.width
     ]
   else if (itemRect.x + m.items.translation[0]) < 0 then
     newPosition = [
