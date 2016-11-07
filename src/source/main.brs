@@ -14,10 +14,6 @@ Function Main(args As Dynamic)
     END
   endif
 
-  ' Load scene graph
-  screen = CreateObject("roSGScreen")
-  port = CreateObject("roMessagePort")
-  screen.setMessagePort(port)
 
   ' Set up the global settings.  SceneGraph will receive a clone object, not a reference.
   ' Sources used in both BRS & SG threads will use:
@@ -34,7 +30,8 @@ Function Main(args As Dynamic)
   auth = TubiAuth(constants, request)
   tracking = TubiTracking(constants, request, auth)
   bookmarks = TubiBookmarks(request, auth, constants)
-
+  experiments = TubiExperiments(request, constants)
+  experiments.init()
 
   m.global.utils = {
     constants: constants
@@ -43,10 +40,18 @@ Function Main(args As Dynamic)
     tracking: tracking
     auth: auth
     bookmarks: bookmarks
+    experiments: experiments
     ' log: TubiLog()
   }
 
   m.global.player = TubiPlayer(m.global.utils)
+
+
+  ' Load scene graph
+  screen = CreateObject("roSGScreen")
+  port = CreateObject("roMessagePort")
+  screen.setMessagePort(port)
+
 
   ' apply hotpatch to main brightscript thread
   ' this also verifies startup network connectivity
@@ -59,7 +64,7 @@ Function Main(args As Dynamic)
   ' start the scene graph UI
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
-  sgGlobal.constants = m.global.utils.constants
+  sgGlobal.constants = m.global.utils.constants 
   controller = screen.CreateScene("ContentController")
   screen.show()
 

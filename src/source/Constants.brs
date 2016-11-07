@@ -92,6 +92,10 @@ Function getConstants()
   ' for Facebook AN4TV Application Detection library
   constants.fban4tvtoken = "1722980957943658|67139dcc7c459bada13b13bcd3cc51ee"
 
+  'experiment information will be placed here
+  constants.experiments = {}
+    constants.experiments.info = invalid    'will be replaced in main.brs
+
   constants.urls = {}
     'ad server url
     ' constants.urls.adsBaseUrl = "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
@@ -118,8 +122,10 @@ Function getConstants()
 
     'user event tracking url
     constants.urls.dataScience = {}
+      ' constants.urls.dataScience.urlBase = "https://staging-uapi.adrise.tv/datascience"
       constants.urls.dataScience.urlBase = "https://uapi.adrise.tv/datascience"
       constants.urls.datascience.event = constants.urls.dataScience.urlBase + "/event"
+      constants.urls.datascience.experiment = constants.urls.dataScience.urlBase + "/evaluate/namespaces"
 
     'cuepoints url
     constants.urls.cuepointsBaseUrl = "http://ads.adrise.tv/cue-points/"
