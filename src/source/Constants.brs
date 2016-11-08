@@ -96,6 +96,10 @@ Function getConstants()
   constants.experiments = {}
     constants.experiments.info = invalid    'will be replaced in main.brs
 
+  'external configuration options will be placed here
+  constants.externalConfig = {}
+    constants.externalConfig.info = invalid   'will be replaced in main.brs
+
   constants.urls = {}
     'ad server url
     ' constants.urls.adsBaseUrl = "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
@@ -115,6 +119,7 @@ Function getConstants()
       constants.urls.users.migrateLogin = constants.urls.users.urlBase + "/login/migrate"
       constants.urls.users.queues = constants.urls.users.urlBase + "/queues"
       constants.urls.users.history = constants.urls.users.urlBase + "/histories"
+      constants.urls.users.config = constants.urls.users.urlBase + "/config/" + constants.platform
 
 
     'search url

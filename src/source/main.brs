@@ -32,6 +32,8 @@ Function Main(args As Dynamic)
   bookmarks = TubiBookmarks(request, auth, constants)
   experiments = TubiExperiments(request, constants)
   experiments.init()
+  externalConfig = TubiExternalConfig(request, constants)
+  externalConfig.init()
 
   m.global.utils = {
     constants: constants
