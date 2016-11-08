@@ -22,7 +22,7 @@ describe("deep-linking", function() {
     }
 
     console.log(">> Installing test channel");
-    device.install(fs.createReadStream(channelZipFile));
+    this.device.install(fs.createReadStream(channelZipFile));
     this.device.press(RokuTest.HOME);
     this.device.delay(1000);
     done();
@@ -118,25 +118,52 @@ describe("deep-linking", function() {
   });
   
   
-  /*
-   * CONTENT ID: 302800
-   * Title: S02:E05 - You, I'll Be Following
-   * Type: Episode
-   *
-   * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=episode"
-   */
-  it("should show detail screen with correct episode", function(done) {
-    var contentId = "302800";
-    this.device.on('debugData', function(data) {
-      if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
-        done();
-      }
-    }); 
-    this.launchChannel({
-      contentId: contentId,
-      mediaType: "episode",
-      source: "meta-search"
+  describe("should show detail screen with correct episode", function(done) {
+    /*
+    * CONTENT ID: 302800
+    * Title: S02:E05 - You, I'll Be Following
+    * Type: Episode
+    *
+    * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=episode"
+    */
+    it("when mediatype is episode", function(done) {
+      var contentId = "302800";
+      this.device.on('debugData', function(data) {
+        if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
+          done();
+        }
+      }); 
+      this.launchChannel({
+        contentId: contentId,
+        mediaType: "episode",
+        source: "meta-search"
+      });
+    });
+  
+    /*
+    * CONTENT ID: 302800
+    * Title: S02:E05 - You, I'll Be Following
+    * Type: Series
+    *
+    * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=series"
+    * 
+    * SEE CLIEN-1352 bug.  This combination of episode id and 'series' mediatype can come from
+    *                      the Roku mobile app.
+    * 
+    */
+    it("when mediatype is series", function(done) {
+      var contentId = "302800";
+      this.device.on('debugData', function(data) {
+        if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
+          done();
+        }
+      }); 
+      this.launchChannel({
+        contentId: contentId,
+        mediaType: "series",
+        source: "meta-search"
+      });
     });
   });
-  
+
 });

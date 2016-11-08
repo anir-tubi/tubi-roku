@@ -122,20 +122,19 @@ Function handleResponse(message)
       parsed = ParseJSON(handledRequest.response.data)
       if parsed = invalid then
         tubiLog("MetadataFetchTask failed to parse JSON response")
-        return invalid
-      end if
-
-      'indicates a request from the details screen. this request needs to be handled slightly differently
-      if handledRequest.name = "getSingleContent"
-        handledRequest.convertedMetadata = translateDetailsMetadata(parsed)
-
-      'indicates a request for the full data for bookmarks - we need to handle differently because we may need to re-arrange content order
-      else if handledRequest.name = m.constants.reqNames.getFullBookmarks
-        handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, "bookmarks")
-      else if handledRequest.name = m.constants.reqNames.getFullHistory
-        handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, "history")
       else
-        handledRequest.convertedMetadata = translateMetadata(parsed)
+        'indicates a request from the details screen. this request needs to be handled slightly differently
+        if handledRequest.name = "getSingleContent"
+          handledRequest.convertedMetadata = translateDetailsMetadata(parsed)
+
+        'indicates a request for the full data for bookmarks - we need to handle differently because we may need to re-arrange content order
+        else if handledRequest.name = m.constants.reqNames.getFullBookmarks
+          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, "bookmarks")
+        else if handledRequest.name = m.constants.reqNames.getFullHistory
+          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, "history")
+        else
+          handledRequest.convertedMetadata = translateMetadata(parsed)
+        end if
       end if
       handledRequest.convert_end_time = m.timespan.TotalMilliseconds()
       handledRequest.id = handledRequest.mftId

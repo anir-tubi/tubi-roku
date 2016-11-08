@@ -30,13 +30,23 @@ Function onScreenFocusChange()
 End Function
 
 Function onContentReceived()
+  tubiLog("DetailScreen.onContentReceived")
   response = m.top.contentDetailResponse.response
   if response.code >= 200 and response.code < 300 then 
     m.top.content = m.top.contentDetailResponse.convertedMetadata
   else
     'TODO(Chris): Show error modal here
     testLog("Content detail returned " + stri(response.code))
-    showErrorModal(response.code, response.failReason, retryContentDetail, cancelContentDetail)
+
+    ' NOTE: Special case here.  Deep links can send episode ids with series type, so try again.
+    if m.top.shortContent.type = "series" then
+      videoContent = CreateObject("roSGNode", "TubiContentNode")
+      videoContent.id = m.top.shortContent.id
+      videoContent.type = "video"
+      loadContentDetails(videoContent)
+    else
+      showErrorModal(response.code, response.failReason, retryContentDetail, cancelContentDetail)
+    end if
   end if
 End Function
 
