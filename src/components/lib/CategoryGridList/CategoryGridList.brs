@@ -162,7 +162,7 @@ Function onCursorIndexChange() As Void
   if (m.ContentGrid.cursorIndex MOD m.blockSize) >= (m.blockSize - m.triggerSize) and (m.ContentGrid.content.totalCount > (m.ContentGrid.content.offset + m.ContentGrid.content.getChildCount())) then
     ' next window
     fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize + 2)
-  else if m.ContentGrid.content.offset > 0 and (m.ContentGrid.cursorIndex MOD m.blockSize) < m.triggerSize then
+  else if m.ContentGrid.content.offset <> invalid and m.ContentGrid.content.offset > 0 and (m.ContentGrid.cursorIndex MOD m.blockSize) < m.triggerSize then
     ' previous window
     fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize)
   end if
@@ -250,6 +250,8 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
       request = bookmarksRequest()
     else if categoryId = "ContinueWatching" then
       request = historyRequest()
+    else if categoryId = "SearchSignIn" or categoryId = "SearchSignOut" then
+      ' NO-OP
     else
       request = categoryRequest(categoryId)
     end if

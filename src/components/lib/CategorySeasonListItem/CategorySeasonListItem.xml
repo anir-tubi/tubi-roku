@@ -19,7 +19,20 @@
   
   <children>
     <Label 
-      id="categoryText" 
+      id="categoryUnfocusedText" 
+      horizAlign="left"
+      vertAlign="center"
+      width="342"
+      height="79"
+      translation="[19,1]"
+      opacity="0.0">
+      <Font
+      role="font"
+      size="33"
+      uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+    </Label>
+    <Label 
+      id="categoryFocusedText" 
       horizAlign="left"
       vertAlign="center"
       width="342"
@@ -30,5 +43,27 @@
       size="33"
       uri="pkg:/fonts/Vaud-SemiBold.ttf" />
     </Label>
+    
+    <Group
+      id="categoryCountGroup"
+      opacity="0.0"
+      translation="[361,16]">
+      <Poster
+        id="categoryCountBackground"
+        width="48"
+        height="48"
+        uri="pkg:/images/count-background.png"
+        translation="[0,0]"/>
+      <Label
+        id="categoryCountText"
+        horizAlign="center"
+        width="48"
+        translation="[-2,15]">
+        <Font
+        role="font"
+        size="22"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+      </Label>
+    </Group>
   </children>
 </component>

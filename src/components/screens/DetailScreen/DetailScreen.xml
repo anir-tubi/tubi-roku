@@ -58,30 +58,36 @@
 
   <children>
     <!-- All the potential menu items, will be dynamically added or removed based on 'content' -->
-    <ContentNode
+    <DetailMenuItemContentNode
       id="ResumeMenuItem"
       title="Resume" 
-      url="pkg:/images/icon-resume.png"/>
-    <ContentNode
+      unfocusiconurl="pkg:/images/icon-resume.png"
+      focusiconurl="pkg:/images/icon-resume-on.png"/>
+    <DetailMenuItemContentNode
       id="PlayMenuItem"
       title="Play"
-      url="pkg:/images/icon-play.png" />
-    <ContentNode
+      unfocusiconurl="pkg:/images/icon-play.png"
+      focusiconurl="pkg:/images/icon-play-on.png" />
+    <DetailMenuItemContentNode
       id="EpisodesMenuItem"
       title="Episodes list"
-      url="pkg:/images/icon-all-episodes.png" />
-    <ContentNode
+      unfocusiconurl="pkg:/images/icon-all-episodes.png"
+      focusiconurl="pkg:/images/icon-all-episodes-on.png" />
+    <DetailMenuItemContentNode
       id="AddQueueMenuItem"
       title="Add to queue"
-      url="pkg:/images/icon-add-to-queue.png" />
-    <ContentNode
+      unfocusiconurl="pkg:/images/icon-add-to-queue.png"
+      focusiconurl="pkg:/images/icon-add-to-queue-on.png" />
+    <DetailMenuItemContentNode
       id="RemoveQueueMenuItem"
       title="Remove from queue"
-      url="pkg:/images/icon-remove-from-queue.png" />
-    <ContentNode
+      unfocusiconurl="pkg:/images/icon-remove-from-queue.png"
+      focusiconurl="pkg:/images/icon-remove-from-queue-on.png" />
+    <DetailMenuItemContentNode
       id="RemoveHistoryMenuItem"
       title="Remove from history"
-      url="pkg:/images/icon-remove-from-history.png" />
+      unfocusiconurl="pkg:/images/icon-remove-from-history.png"
+      focusiconurl="pkg:/images/icon-remove-from-history-on.png" />
   
     <!-- These are in a layout group together because this menu should float up -->
     <LayoutGroup

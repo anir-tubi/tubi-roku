@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - FeaturePoster
+ -
+ - Item in a ContentGrid for the 16:9 aspect ratio
+ -
+ -->
+<component name="FeaturePosterSingleRow" extends="Group">
+
+  <script type="text/brightscript" uri="pkg:/components/lib/FeaturePoster/FeaturePoster.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    
+    <!-- these are ignored but here for compatibility with ContentGrid -->
+    <field id="index" type="integer" />
+    <field id="width" type="float" />
+    <field id="height" type="float" />
+  </interface>
+
+  <children>
+    <Poster 
+      id="Background" 
+      loadingBitmapUri="pkg:/images/placeholder-featured.png"
+      width="430"
+      height="256"
+      loadDisplayMode="scaleToZoom"
+      translation="[0,0]" />
+
+    <Label
+      id="Title"
+      color="0xFFFFFFFF"
+      width="430"
+      height="35"
+      vertAlign="top"
+      translation="[0,270]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="22" />
+    </Label>
+  </children>
+
+</component>

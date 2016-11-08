@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SignInPosterSingleRow" extends="FeaturePosterSingleRow">
+
+  <script type="text/brightscript" uri="pkg:/components/lib/SignInPoster/SignInPosterSingleRow.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+</component>

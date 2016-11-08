@@ -68,6 +68,7 @@ Function onContentChange() As Void
       newItem.content = m.top.content.getChild(i)
       newItem.id = newItem.content.id
       newItem.listHasFocus = m.top.isInFocusChain()
+      newItem.focusPercent = 0.0
 
       if m.top.itemSpacings.count() = 0 then
         spacing = 0

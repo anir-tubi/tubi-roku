@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - InfoPanel
+ -
+ - This is a panel of metadata about a piece of content or
+ - a content category.  There are 6 modes:
+ -    1) 'category' - shows only title and description
+ -    2) 'item' - shows short content item description with releasedate, rating, etc.
+ -    3) 'movie' - shows full details including cast and crew
+ -    4) 'series' - shows full details including cast and crew
+ -    5) 'season' - shows full details including cast and crew
+ -    6) 'episode' - shows full details including cast and crew
+ -
+ -
+ - The InfoPanel has 6 'regions' whose text are mapped as follows:
+ -    Title - Uses content.title
+ -    Episode - Uses content.episode_title
+ -    CategoryDetails - uses content.getChildCount()
+ -    TwoLineInfo - uses content.releasedate, content.length, content.rating, content.category/categories, 
+ -    Description - uses content.description
+ -    DirectorGroup - uses content.director/directors
+ -    StarringGroup - uses content.actor/actors
+ -
+ -->
+<component name="InfoPanelSingleRow" extends="LayoutGroup">
+
+  <script type="text/brightscript" uri="pkg:/components/lib/InfoPanel/InfoPanelSingleRow.brs" />
+
+  <interface>
+    <field id="content" type="node" />
+      
+    <!-- mode is either: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
+    <field id="mode" type="string" value="category" />
+  </interface>
+
+  <children>
+
+    <Label
+      id="Title"
+      width="0"
+      height="73"
+      vertAlign="bottom">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="67" />
+    </Label>
+
+    <Label
+      id="Episode">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="33" />
+    </Label>
+
+    <LayoutGroup
+      id="CategoryDetails"
+      layoutDirection="vert"
+      itemSpacings="[10]"
+      opacity="0.5"
+      visible="true">
+      <Label
+        id="CategoryLine1">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="22" />
+      </Label>
+      <!-- This is supposed to say "Updated Wednesday" or some other data we don't have yet.
+      <Label
+        id="CategoryLine2"
+        font="dictionary:Vaud22px"/>
+      -->
+    </LayoutGroup>
+    
+    <LayoutGroup
+      id="SeasonDetails"
+      layoutDirection="vert"
+      itemSpacings="[10]"
+      opacity="0.5"
+      visible="true">
+      <Label
+        id="SeasonLine1">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="22" />
+      </Label>
+    </LayoutGroup>
+    
+    <LayoutGroup
+      id="TwoLineInfo"
+      layoutDirection="vert"
+      itemSpacings="[4]"
+      visible="true">
+      <LayoutGroup
+        id="FirstLineGroup"
+        layoutDirection="horiz"
+        vertAlignment="center">
+      <Label
+        id="Line1"
+        opacity="0.5">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="22" />
+      </Label>
+      <Rectangle
+        height="40"
+        width="72"
+        color="0x00000000">
+        <Poster
+          id="Rating"
+          height="36"
+          loadHeight="36"
+          loadDisplayMode="scaleToFit"
+          translation="[0,0]"/>
+      </Rectangle>
+      </LayoutGroup>
+      <Label
+        id="Line2"
+        opacity="0.5"
+        font="dictionary:Vaud22px"/>
+    </LayoutGroup>
+    
+    <Label
+      id="Description"
+      width="1215"
+      lineSpacing="16"
+      maxLines="3"
+      wrap="true">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="27" />
+    </Label>
+
+    <LayoutGroup
+      id="DirectorGroup"
+      layoutDirection="horiz"
+      vertAlignment="bottom"
+      itemSpacings="[5,5]">
+      <Label
+        id="DirectorTag"
+        text="Directed by"
+        font="dictionary:Vaud22px"
+        visible="true" 
+        opacity="0.5"/>
+      <!-- this layout group pushes the separator rectangle up 2 pixels -->
+      <LayoutGroup
+        layoutDirection="vert">
+        <Rectangle 
+          id="DirectorRect"
+          opacity="0.2"
+          width="43"
+          height="2"/>
+        <Rectangle 
+          opacity="0.0"
+          width="43"
+          height="5"/>
+      </LayoutGroup>
+      <Label
+        id="Director"
+        font="dictionary:Vaud22px"
+        visible="true" />
+    </LayoutGroup>
+
+    <LayoutGroup
+      id="StarringGroup"
+      layoutDirection="horiz"
+      vertAlignment="bottom"
+      itemSpacings="[5,5]">
+      <Label
+        id="StarringTag"
+        text="Starring"
+        font="dictionary:Vaud22px"
+        visible="true" 
+        opacity="0.5"/>
+      <LayoutGroup
+        layoutDirection="vert">
+        <Rectangle 
+          id="StarringRect"
+          opacity="0.2"
+          width="77"
+          height="2"/>
+        <Rectangle 
+          opacity="0.0"
+          width="77"
+          height="5"/>
+      </LayoutGroup>
+      <Label
+        id="Starring"
+        font="dictionary:Vaud22px"
+        visible="true" />
+    </LayoutGroup>
+    
+  </children>
+
+</component>

@@ -480,22 +480,24 @@ Function getConstants()
         constants.performance.contentGrid.overhang = 1
         constants.performance.contentGrid.continuousEvents = false
       else
-        'constants.performance.categoryGridList.blockSize = 30
-        'constants.performance.categoryGridList.triggerSize = 15
-        'constants.performance.categoryGridList.categoryWindowSize = 3
-        'constants.performance.categoryGridList.metadataCacheMaxEntries = 14
-        'constants.performance.categoryGridList.categoryAnimationDuration = 0.75
-        'constants.performance.categoryGridList.gridAnimationDuration = 0.4
-        'constants.performance.contentGrid.overhang = 3
-      ' Roku 4 and better
+        ' single-row-poster-memory-usage = 9 visible posters * 7 = 63 * 226KB = 14MB
         constants.performance.categoryGridList.blockSize = 30
-        constants.performance.categoryGridList.triggerSize = 10
-        constants.performance.categoryGridList.categoryWindowSize = 4
-        constants.performance.categoryGridList.metadataCacheMaxEntries = 20
+        constants.performance.categoryGridList.triggerSize = 15
+        constants.performance.categoryGridList.categoryWindowSize = 3
+        constants.performance.categoryGridList.metadataCacheMaxEntries = 10
         constants.performance.categoryGridList.categoryAnimationDuration = 0.75
         constants.performance.categoryGridList.gridAnimationDuration = 0.4
-        constants.performance.contentGrid.overhang = 2
+        constants.performance.contentGrid.overhang = 1
         constants.performance.contentGrid.continuousEvents = true
+      ' Roku 4 and better
+        'constants.performance.categoryGridList.blockSize = 30
+        'constants.performance.categoryGridList.triggerSize = 10
+        'constants.performance.categoryGridList.categoryWindowSize = 4
+        'constants.performance.categoryGridList.metadataCacheMaxEntries = 20
+        'constants.performance.categoryGridList.categoryAnimationDuration = 0.75
+        'constants.performance.categoryGridList.gridAnimationDuration = 0.4
+        'constants.performance.contentGrid.overhang = 2
+        'constants.performance.contentGrid.continuousEvents = true
       end if
 
   return constants  

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="CategoryContentGridSingleRow" extends="Rectangle">
+  <script type="text/brightscript" uri="pkg:/components/lib/CategoryContentGrid/CategoryContentGridSingleRow.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- Incoming interface for encapsulation in a ScrollingList -->
+    <field id="focusPercent" type="float" value="0.0"/>
+    <field id="listHasFocus" type="boolean" value="false" />
+    <field id="content" type="node" alwaysNotify="true"/>
+    
+    <!-- Outgoing interface proxying the internal ContentGrid -->
+    <field id="itemSelected" type="node" alwaysNotify="true"/>
+    <field id="itemFocused" type="node" alwaysNotify="true"/>
+    <field id="cursorPosition" type="intarray" value="[-1,-1]"/>
+    <field id="cursorIndex" type="integer" value="-1"/>
+  </interface>
+  
+  <children>
+    <!-- force height so that even before we get content to fill the ContentGrid, boundingRect() will return the
+         correct height.
+    -->
+    <Label
+      id="CategoryName"
+      height="40"
+      width="1000"
+      translation="[0,0]"
+      color="0xFF9933FF" >
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="34" />
+    </Label>
+    
+    <LayoutGroup
+      id="CategoryCount"
+      layoutDirection="horiz"
+      horizAlignment="right"
+      translation="[1755,10]">
+      <Label
+        id="FocusIndex"
+        text=""
+        height="40"
+        horizAlign="right"
+        color="0xFF9933FF" >
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="27" />
+      </Label>
+      <Label
+        id="ItemCount"
+        text=""
+        height="40"
+        horizAlign="right">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="27" />
+      </Label>
+    </LayoutGroup>
+
+    <ContentGrid
+      id="PosterGrid"
+      numRows="1"
+      width="1835"
+      height="300"
+      scrollWidth="210"
+      itemSize="[210,300]"
+      itemSpacing="[10,10]"
+      itemComponentName="Poster"
+      fillDirection="W"
+      visible="false"
+      translation="[7,53]"/>
+    <ContentGrid
+      id="FeatureGrid"
+      numRows="1"
+      width="1835"
+      height="300"
+      scrollWidth="430"
+      itemSize="[430,256]"
+      itemSpacing="[10,10]"
+      itemComponentName="FeaturePosterSingleRow"
+      fillDirection="W"
+      visible="false" 
+      translation="[7,63]"/>
+    <ContentGrid
+      id="SignInGrid"
+      numRows="1"
+      width="1835"
+      height="300"
+      scrollWidth="1835"
+      itemSize="[430,256]"
+      itemSpacing="[10,10]"
+      itemComponentName="SignInPosterSingleRow"
+      fillDirection="W"
+      visible="false"
+      translation="[7,63]"/>
+  </children>
+</component>

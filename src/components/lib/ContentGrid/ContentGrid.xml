@@ -21,6 +21,8 @@
 <component name="ContentGrid" extends="Group">
   <script type="text/brightscript" uri="pkg:/components/lib/ContentGrid/ContentGrid.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  
 
   <interface>
     <field id="content" type="node" alwaysNotify="true"/>

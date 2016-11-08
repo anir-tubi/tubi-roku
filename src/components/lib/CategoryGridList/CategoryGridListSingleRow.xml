@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<component name="CategoryGridList" extends="Group">
+<component name="CategoryGridListSingleRow" extends="Group">
   <script type="text/brightscript" uri="pkg:/components/lib/CategoryGridList/CategoryGridList.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
@@ -46,12 +46,13 @@
     <ScrollingList
       id="ScrollingList"
       width="1835"
-      height="624"
-      itemSpacings="[50]"
-      itemComponentName="CategoryContentGrid"
+      height="503"
+      scrollHeight="370"
+      itemSpacings="[29]"
+      itemComponentName="CategoryContentGridSingleRow"
       focusBitmapUri=""
       focusChangeDuration="0.6"
-      translation="[0,-7]"/>
+      translation="[0,0]"/>
   </children>
 </component>
       

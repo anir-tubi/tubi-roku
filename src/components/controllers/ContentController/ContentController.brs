@@ -101,7 +101,13 @@ End Function
 ' On either app start (if user is signed in) or after the sign in
 ' flow is complete, create and show the category screen.
 Function startCategoryScreen()
-  m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
+  singleRow = true
+  if singleRow = true
+    m.categoryScreen = CreateObject("roSGNode", "CategoryScreenSingleRow")
+  else
+    m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
+  end if
+
   m.categoryScreen.observeField("contentSelected", "onContentSelected")
   m.categoryScreen.observeField("searchSelected", "onSearchSelected")
   m.categoryScreen.observeField("signInSelected", "onSignInSelected")
@@ -236,12 +242,16 @@ End Function
 ' Log the user out, update screens
 Function onSignOutSelected()
   tubiLog("ContentController.onSignOutSelected")
-  if m.categoryScreen <> invalid then
-    m.categoryScreen.signedIn = false
-  end if
-  if m.detailScreen <> invalid then
-    m.detailScreen.signedIn = false
-  end if
+  ' flush the screenstack in any case where the user has successfully
+  ' gone through the sign-in.  If they 'back' out of it, the screen
+  ' stack will stay intact and this function will not be called
+  while currentScreen() <> invalid
+    popScreen()
+  end while
+  m.categoryScreen = invalid
+
+  startCategoryScreen()
+  m.backgroundGroup.catScreenStart = true
   m.AuthTask.functionName = "execSignOut"
   m.AuthTask.control = "RUN"
 End Function

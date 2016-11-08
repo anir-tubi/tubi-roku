@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<component name="CategoryScreen" extends="Group" initialFocus="CategoryList">
+<component name="CategoryScreenSingleRow" extends="Group" initialFocus="CategoryList">
 
   <script type="text/brightscript" uri="pkg:/components/screens/CategoryScreen/CategoryScreen.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
@@ -72,69 +72,85 @@
   </interface>
 
   <children>
-    <!-- Special category menu items. These will be merged with category list -->
-    <ContentNode
-      id="SpecialCategories">
-      <!-- TubiContentNode here so it can contain the totalcount for the Info Panel -->
-      <TubiContentNode
-        id="ContinueWatching"
-        title="Continue Watching"
-        description="The Movies and TV Shows you have started watching can be found here"/>
-      <TubiContentNode
-        id="MyQueue"
-        title="My Queue"
-        description="The Movies and TV Shows you have added to your Queue can be found here"/>
-      <ContentNode
-        id="SearchSignIn"
-        title="Search &amp; Sign In"
-        description="Find titles on TubiTV, Sign In and more."/>
-      <ContentNode
-        id="SearchSignOut"
-        title="Search &amp; Sign Out"
-        description="Find titles on TubiTV, Sign Out and more."/>
-    </ContentNode>
 
-    <ContentNode
-      id="SearchSignInContent">
+  <MaskGroup
+    translation="[0,0]"
+    maskUri="pkg:/images/poster-mask-pixel.png"
+    maskSize="[0,1080]"
+    maskOffset="[1840,0]">
+
+
+      <!-- Special category menu items. These will be merged with category list -->
       <ContentNode
-        id="SearchMenuItem"
-        title="Search" 
-        hdgridposterurl="pkg:/images/icon-search-large.png"/>
+        id="SpecialCategories">
+        <!-- TubiContentNode here so it can contain the totalcount for the Info Panel -->
+        <TubiContentNode
+          id="ContinueWatching"
+          title="Continue Watching"
+          description="The Movies and TV Shows you have started watching can be found here"/>
+        <TubiContentNode
+          id="MyQueue"
+          title="My Queue"
+          description="The Movies and TV Shows you have added to your Queue can be found here"/>
+        <ContentNode
+          id="SearchSignIn"
+          title="Search &amp; Sign In"
+          description="Find titles on TubiTV, Sign In and more."/>
+        <ContentNode
+          id="SearchSignOut"
+          title="Search &amp; Sign Out"
+          description="Find titles on TubiTV, Sign Out and more."/>
+      </ContentNode>
+
       <ContentNode
-        id="SignInMenuItem"
-        title="Sign In"
-        hdgridposterurl="pkg:/images/icon-sign-in-large.png" />
-      <ContentNode
-        id="SignOutMenuItem"
-        title="Sign Out"
-        hdgridposterurl="pkg:/images/icon-sign-in-large.png" />
-      <ContentNode
-        id="AboutMenuItem"
-        title="About Tubi TV"
-        hdgridposterurl="pkg:/images/icon-about-large.png" />
-    </ContentNode>
+        id="SearchSignInContent">
+        <ContentNode
+          id="SearchMenuItem"
+          title="Search" 
+          hdgridposterurl="pkg:/images/icon-search-large.png"/>
+        <ContentNode
+          id="SignInMenuItem"
+          title="Sign In"
+          hdgridposterurl="pkg:/images/icon-sign-in-large.png" />
+        <ContentNode
+          id="SignOutMenuItem"
+          title="Sign Out"
+          hdgridposterurl="pkg:/images/icon-sign-in-large.png" />
+        <ContentNode
+          id="AboutMenuItem"
+          title="About Tubi TV"
+          hdgridposterurl="pkg:/images/icon-about-large.png" />
+      </ContentNode>
+
+      <ScrollingList
+        id="CategoryList"
+        translation="[-380, 640]"
+        width="425"
+        height="440"
+        itemSpacings="[8]"
+        itemComponentName="CategorySeasonListItem"
+        focusBitmapUri="pkg:/images/menu-focus.png"/>
+
+      <InfoPanelSingleRow
+        id="InfoPanel"
+        translation="[85,229]"
+        visible="true" />
+
+      <Group
+        id="ContentArea"
+        translation="[85,588]" >
+        <CategoryGridListSingleRow
+          id="CategoryGridList"/>
+      </Group>
+    </MaskGroup>
+
+    <Poster
+      id="tubiLogo"
+      height="43"
+      width="149"
+      uri="pkg:/images/logo.png"
+      translation="[1671,969]" />
     
-    <ScrollingList
-      id="CategoryList"
-      translation="[-440, 424]"
-      width="440"
-      height="616"
-      itemSpacings="[8]"
-      itemComponentName="CategorySeasonListItem"
-      focusBitmapUri="pkg:/images/menu-focus.png"/>
-    
-    <InfoPanel
-      id="InfoPanel"
-      translation="[85,61]"
-      visible="true" />
-    
-    <Group
-      id="ContentArea"
-      translation="[85,423]" >
-      <CategoryGridList
-        id="CategoryGridList"/>
-    </Group>
-      
     <AuthTask
       id="CategoryAuthTask" />
 

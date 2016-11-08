@@ -101,11 +101,16 @@ Function onComponentFocusChange()
   tubiLog("ContentGrid.onComponentFocusChange")
   if m.top.content <> invalid and m.numItems > 0 and m.top.isInFocusChain() then
     m.focusBox.visible = true
+
+    if m.focusBox.opacity <> 1.0
+      fade(m.focusBox, "in", 0.3)
+    end if
+
     m.top.itemFocused = getContent(gridIndexToItemIndex(m.internalItemFocused))
     m.top.cursorPosition = [m.internalItemFocused[0], m.internalItemFocused[1]]
     m.top.cursorIndex = gridIndexToItemIndex(m.internalItemFocused)
   else
-    m.focusBox.visible = false
+    fade(m.focusBox, "out", 0.3)
   end if
 End Function
 
@@ -152,7 +157,10 @@ Function onContentChange() As Void
   ' for faster visibility of initial content
   loadVisiblePosters(false)
 
-  if m.top.isInFocusChain() then m.focusBox.visible = true
+  if m.top.isInFocusChain()
+    m.focusBox.visible = true
+    m.focusBox.opacity = 1.0
+  end if
 
   if m.internalItemFocused[0] = -1 and m.internalItemFocused[1] = -1 then
     ' zoom to beginning only if this was the first content
@@ -265,6 +273,7 @@ Function createItemComponent(index As Integer, item As Object) As Object
   gridIndex = itemIndexToGridIndex(index)
   itemRect = getGridItemRect(gridIndex)
   item.translation = [itemRect.x,itemRect.y]
+
   'print "Rendering item " + stri(index) + " at [" + str(itemRect.x) + "," + str(itemRect.y) + "]"
   'print "Item " + stri(index) + " has dimensions [" + str(item.width) + "," + str(item.height) + "]"
   'print "Item " + stri(index) + " has uri " + content.portrait
@@ -355,6 +364,7 @@ Function endChangeFocus()
       m.top.itemFocused = getContent(m.top.cursorIndex)
     end if
   end if
+
 End Function
 
 

@@ -1,5 +1,6 @@
 Function init()
   tubiLog("CategoryScreen.init")
+  m.ContentArea = m.top.findNode("ContentArea")
   m.CategoryList = m.top.findNode("CategoryList")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.SpecialCategories = m.top.findNode("SpecialCategories")
@@ -13,6 +14,7 @@ Function init()
   m.trackingCount = 0
   m.CategoryList.observeField("itemFocused","onCategoryMenuChange")
   m.CategoryList.observeField("preItemFocused","onPreCategoryMenuChange")
+  m.CategoryList.observeFIeld("itemSelected", "onCategoryMenuSelected")
   m.authTask = m.top.findNode("CategoryAuthTask")
 
   'Content area
@@ -20,8 +22,6 @@ Function init()
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
   m.CategoryGridList.observeField("preCategoryFocused", "onPreGridCategoryChange")
-  m.SignInMenu = m.top.findNode("SearchSignInList")
-  m.SignInMenu.observeField("itemSelected", "onSignInMenuItemSelected")
 
   'Sign-in menu items
   m.SearchSignInContent = m.top.findNode("SearchSignInContent")
@@ -82,23 +82,6 @@ Function onDirtyUserCategories()
   m.CategoryGridList.dirtyUserCategories = true
 End Function
 
-'''''''''''''''''''''''''''
-' onSignInMenuItemSelected
-'
-Function onSignInMenuItemSelected()
-  tubiLog("CategoryScreen.onSignInMenuItemSelected")
-  selectedItem = m.SignInMenu.content.getChild(m.SignInMenu.itemSelected)
-  if selectedItem.id = "SearchMenuItem" then
-    m.top.searchSelected = true
-  else if selectedItem.id = "SignInMenuItem" then
-    m.top.signInSelected = true
-  else if selectedItem.id = "SignOutMenuItem" then
-    m.top.signOutSelected = true
-  else if selectedItem.id = "AboutMenuItem" then
-    m.top.aboutSelected = true
-  end if
-End Function
-
 ''''''''''''''''''''
 ' onScreenFocusChange
 '
@@ -107,18 +90,16 @@ End Function
 ' being shown.
 Function onScreenFocusChange()
   tubiLog("CategoryScreen.onScreenFocusChange")
- if m.top.hasFocus() then
+  if m.top.hasFocus() then
     ' defaulted to screen, move to a subcomponent
-    if m.CategoryGridList.visible = true then
-      m.CategoryGridList.setFocus(true)
-    else if m.SignInMenu.visible = true then
-      m.SignInMenu.setFocus(true)
-    else
-      m.CategoryList.setFocus(true)
-    end if
+    m.CategoryGridList.setFocus(true)
   end if
 End Function
 
+' We do this here becase the ScrollingList component swallows the 'ok' keypress
+Function onCategoryMenuSelected()
+  m.CategoryGridList.setFocus(true)
+End Function
 
 ''''''''''''''''''''
 ' onKeyEvent
@@ -126,28 +107,20 @@ End Function
 Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("CategoryScreen.onKeyEvent")
   if press then
-    if key = "right" and m.CategoryList.isInFocusChain() then
-      if m.CategoryGridList.visible = true then
-        m.CategoryGridList.setFocus(true)
-        m.trackingCount = 0
-      else if m.SignInMenu.visible = true then
-        m.SignInMenu.setFocus(true)
-        m.trackingCount = 0
-      end if
-      return true
-    else if key = "left" and not m.CategoryList.isInFocusChain() then
-      m.CategoryList.setFocus(true)
+    if (key = "right" or key = "ok") and m.CategoryList.isInFocusChain() then
+      m.CategoryGridList.setFocus(true)
+      slideTo(m.ContentArea, [85,m.ContentArea.translation[1]], 0.5)
+      slideTo(m.CategoryList, [-380,m.CategoryList.translation[1]], 0.5)
       m.trackingCount = 0
       return true
-    else if (key = "down" or key = "up") and not m.CategoryList.isInFocusChain() then
+    else if (key = "left" or key = "back") and not m.CategoryList.isInFocusChain() then
       m.CategoryList.setFocus(true)
+      slideTo(m.ContentArea, [525,m.ContentArea.translation[1]], 0.5)
+      slideTo(m.CategoryList, [85,m.CategoryList.translation[1]], 0.5)
       m.trackingCount = 0
-      if key = "up" then m.CategoryList.animateToItem = m.CategoryList.itemFocused - 1
-      if key = "down" then m.CategoryList.animateToItem = m.CategoryList.itemFocused + 1
       return true
     end if
   end if
-
   return false
 End Function
 
@@ -172,59 +145,35 @@ Function onContentChange() As Void
   ' Prepend special categories, taking care to remove them if they already are there
   m.InfoPanel.mode = "category"
   if m.top.signedIn then
-    m.top.content.insertChild(m.ContinueWatchingCategory, 0)
-    m.top.content.insertChild(m.MyQueueCategory, 1)
+    m.top.content.insertChild(m.SearchSignOutCategory, 0)
+    m.SearchSignOutCategory.appendChild(m.SearchMenuItem)
+    m.SearchSignOutCategory.appendChild(m.SignOutMenuItem)
+    m.SearchSignOutCategory.appendChild(m.AboutMenuItem)
+    m.top.content.insertChild(m.ContinueWatchingCategory, 1)
+    m.top.content.insertChild(m.MyQueueCategory, 2)
     featureGridIndex = 2
   else
+    m.top.content.insertChild(m.SearchSignInCategory, 0)
+    m.SearchSignInCategory.appendChild(m.SearchMenuItem)
+    m.SearchSignInCategory.appendChild(m.SignInMenuItem)
+    m.SearchSignInCategory.appendChild(m.AboutMenuItem)
     m.top.content.removeChild(m.ContinueWatchingCategory)
     m.top.content.removeChild(m.MyQueueCategory)
     featureGridIndex = 0
   end if
 
-  setMenuContent()
+  m.CategoryList.content = m.top.content
   m.CategoryGridList.content = m.top.content  ' should be the category list
   m.CategoryGridList.animateToCategory = featureGridIndex
-  m.CategoryList.animateToItem = featureGridIndex+1  'CategoryList has one extra item
-  if m.top.isInFocusChain() then m.CategoryList.setFocus(true)
-End Function
-
-
-'''''''''''''''''''
-' setMenuContent
-'
-' The category menu has an extra entry for search and sign-in which doesn't have a
-' corresponding content grid.  We create a separate ContentNode tree for the menu
-' separate from the CategoryGridList content data
-Function setMenuContent()
-  categories = CreateObject("roSGNode", "ContentNode")
-  ' copy categories as-is, which will include MyQueue and ContinueWatching if signed in
-  for i=0 to m.top.content.getChildCount()-1
-    category = categories.createChild("ContentNode")
-    category.id = m.top.content.getChild(i).id
-    category.title = m.top.content.getChild(i).title
-  end for
-  if m.top.signedIn then
-    categories.insertChild(m.SearchSignOutCategory, 0)
-  else
-    categories.insertChild(m.SearchSignInCategory, 0)
-  end if
-  m.CategoryList.content = categories
+  m.CategoryList.animateToItem = featureGridIndex  'CategoryList has one extra item
+  if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
 End Function
 
 
 ' Use this trigger to synchronize menu and grid
 Function onPreCategoryMenuChange()
-  ' special handling for Search&SignIn menu here
-  if m.CategoryList.preItemFocused = 0 then
-    m.CategoryGridList.visible = false
-    m.SignInMenu.visible = true
-  else
-    if m.CategoryGridList.visible = false then m.CategoryGridList.visible = true
-    m.SignInMenu.visible = false
-    m.CategoryGridList.animateToCategory = m.CategoryList.preItemFocused - 1
-  end if
+  m.CategoryGridList.animateToCategory = m.CategoryList.preItemFocused
 End Function
-
 
 '''''''''''''''''''''
 ' onCategoryMenuChange
@@ -263,16 +212,6 @@ End Function
 ' menu is showing a subset.
 Function onSignedInChange()
   tubiLog("CategoryScreen.onSignedInChange")
-  content = CreateObject("roSGNode", "ContentNode")
-  content.appendChild(m.SearchMenuItem)
-  if m.top.signedIn = true then
-    content.appendChild(m.SignOutMenuItem)
-  else
-    content.appendChild(m.SignInMenuItem)
-  end if  
-  content.appendChild(m.AboutMenuItem)
-  m.SignInMenu.content = content
-
   if m.top.content <> invalid then
     onContentChange()
   end if
@@ -292,7 +231,7 @@ End Function
 Function onPreGridCategoryChange() As Void
   ' Don't sync if CategoryList has focus and most likely triggered the grid category change
   if m.CategoryGridList.isInFocusChain() and m.CategoryGridList.content <> invalid then
-    m.CategoryList.animateToItem = m.CategoryGridList.preCategoryFocused + 1 ' CategoryList has one extra item
+    m.CategoryList.animateToItem = m.CategoryGridList.preCategoryFocused ' CategoryList has one extra item
   end if
 End Function
 
@@ -341,7 +280,19 @@ End Function
 
 Function onGridItemSelected() As Void
   tubiLog("CategoryScreen.onGridItemSelected")
-  m.top.contentSelected = m.CategoryGridList.itemSelected
+  selectedItem = m.CategoryGridList.itemSelected
+  if selectedItem = invalid then return
+  if selectedItem.id = "SearchMenuItem" then
+    m.top.searchSelected = true
+  else if selectedItem.id = "SignInMenuItem" then
+    m.top.signInSelected = true
+  else if selectedItem.id = "SignOutMenuItem" then
+    m.top.signOutSelected = true
+  else if selectedItem.id = "AboutMenuItem" then
+    m.top.aboutSelected = true
+  else
+    m.top.contentSelected = selectedItem
+  end if
 End Function
 
 '''''''''''''''''''''

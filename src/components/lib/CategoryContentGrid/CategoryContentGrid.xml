@@ -29,7 +29,7 @@
     <ContentGrid
       id="PosterGrid"
       numRows="2"
-      width="1395"
+      width="1835"
       height="610"
       scrollWidth="210"
       itemSize="[210,300]"
@@ -41,7 +41,7 @@
     <ContentGrid
       id="FeatureGrid"
       numRows="2"
-      width="1395"
+      width="1835"
       scrollWidth="524"
       height="612"
       itemSize="[524,295]"
@@ -49,6 +49,18 @@
       itemComponentName="FeaturePoster"
       fillDirection="W"
       visible="false" 
+      translation="[7,7]"/>
+    <ContentGrid
+      id="SignInGrid"
+      numRows="1"
+      width="1835"
+      scrollWidth="1835"
+      height="612"
+      itemSize="[524,295]"
+      itemSpacing="[20,20]"
+      itemComponentName="SignInPoster"
+      fillDirection="W"
+      visible="false"
       translation="[7,7]"/>
   </children>
 </component>

@@ -21,23 +21,44 @@
   
   <children>
     <Poster
-     id="Icon" 
+     id="FocusedIcon" 
      translation="[22,20]"
      loadWidth="40"
      loadHeight="40"
-     loadDisplayMode="scaleToZoom" />
+     loadDisplayMode="scaleToZoom" 
+     opacity="0.0"/>
+    
+    <Poster
+     id="UnfocusedIcon" 
+     translation="[22,20]"
+     loadWidth="40"
+     loadHeight="40"
+     loadDisplayMode="scaleToZoom" 
+     opacity="1.0"/>
     
     <Label
-     id="Text"
+     id="FocusedText"
      translation="[72,0]" 
      vertAlign="center"
      horizAlign="left" 
-     height="80">
+     height="80"
+     opacity="0.0">
       <Font
        role="font"
        uri="pkg:/fonts/Vaud-SemiBold.ttf"
        size="33" />
-       
+    </Label>
+    <Label
+     id="UnfocusedText"
+     translation="[72,0]" 
+     vertAlign="center"
+     horizAlign="left" 
+     height="80"
+     opacity="1.0">
+      <Font
+       role="font"
+       uri="pkg:/fonts/Vaud-SemiBold.ttf"
+       size="33" />
     </Label>
     
     <Rectangle 
