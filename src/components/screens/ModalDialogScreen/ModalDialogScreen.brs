@@ -2,9 +2,12 @@ Function init()
   m.top.observeField("buttons", "formatDialog")
   m.top.observeField("title", "formatDialog")
   m.top.observeField("message", "formatDialog")
+  m.top.observeField("scrollable", "formatDialog")
   m.ButtonList = m.top.findNode("ButtonList")
   m.ContentArea = m.top.findNode("ContentArea")
   m.DialogBox = m.top.findNode("DialogBox")
+  m.Message = m.top.findNode("Message")
+  m.ScrollableMessage = m.top.findNode("ScrollableMessage")
 End Function
 
 
@@ -26,6 +29,20 @@ Function formatDialog()
     m.ButtonList.content = newContent
   end if
 
+  'text area
+  if m.top.scrollable then
+    m.ScrollableMessage.visible = true
+    m.ScrollableMessage.height = 300
+    m.Message.visible = false
+    m.ScrollableMessage.text = m.top.message
+  else
+    m.ScrollableMessage.visible = false
+    m.ScrollableMessage.height = 0
+    m.Message.visible = true
+    m.Message.text = m.top.message
+  end if
+
+  ' Position the dialog vertically and horizontally centered on the screen
   contentRect = m.ContentArea.boundingRect()
   m.DialogBox.height = contentRect.height + 65 + 24
   newY = (1080 - m.DialogBox.height) / 2.0
@@ -33,6 +50,13 @@ Function formatDialog()
 End Function
 
 Function onKeyEvent(key As String, press As Boolean) As Boolean
+  if press and m.top.scrollable then
+    if key = "up" and m.ButtonList.hasFocus() then
+      m.ScrollableMessage.setFocus(true)
+    else if (key = "down" or key = "left" or key = "right") and m.ScrollableMessage.hasFocus() then
+      m.ButtonList.setFocus(true)
+    end if
+  end if
   ' absorb all key presses when modal is showing
   return true
 End Function

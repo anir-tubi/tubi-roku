@@ -29,6 +29,7 @@ Function init()
   m.SignInMenuItem = m.SearchSignInContent.findNode("SignInMenuItem")
   m.SignOutMenuItem = m.SearchSignInContent.findNode("SignOutMenuItem")
   m.AboutMenuItem = m.SearchSignInContent.findNode("AboutMenuItem")
+  m.PrivacyMenuItem = m.SearchSignInContent.findNode("PrivacyMenuItem")
 
   'Special categories
   m.ContinueWatchingCategory = m.SpecialCategories.findNode("ContinueWatching")
@@ -149,6 +150,7 @@ Function onContentChange() As Void
     m.SearchSignOutCategory.appendChild(m.SearchMenuItem)
     m.SearchSignOutCategory.appendChild(m.SignOutMenuItem)
     m.SearchSignOutCategory.appendChild(m.AboutMenuItem)
+    m.SearchSignOutCategory.appendChild(m.PrivacyMenuItem)
     m.top.content.insertChild(m.ContinueWatchingCategory, 1)
     m.top.content.insertChild(m.MyQueueCategory, 2)
     featureGridIndex = 3
@@ -157,6 +159,7 @@ Function onContentChange() As Void
     m.SearchSignInCategory.appendChild(m.SearchMenuItem)
     m.SearchSignInCategory.appendChild(m.SignInMenuItem)
     m.SearchSignInCategory.appendChild(m.AboutMenuItem)
+    m.SearchSignInCategory.appendChild(m.PrivacyMenuItem)
     m.top.content.removeChild(m.ContinueWatchingCategory)
     m.top.content.removeChild(m.MyQueueCategory)
     featureGridIndex = 0
@@ -290,6 +293,8 @@ Function onGridItemSelected() As Void
     m.top.signOutSelected = true
   else if selectedItem.id = "AboutMenuItem" then
     m.top.aboutSelected = true
+  else if selectedItem.id = "PrivacyMenuItem" then
+    m.top.privacySelected = true
   else
     m.top.contentSelected = selectedItem
   end if

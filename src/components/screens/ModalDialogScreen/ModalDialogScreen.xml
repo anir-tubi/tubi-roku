@@ -21,7 +21,9 @@
     <field id="title" alias="Title.text"/>
            
     <!-- Secondary message, multiple lines -->
-    <field id="message" alias="Message.text"/>
+    <field id="message" type="string" value=""/>
+    
+    <field id="scrollable" type="boolean" value="false"/>
 
   </interface>
 
@@ -53,16 +55,31 @@
             size="43" />
         </Label>
         
-        <Label
-          id="Message"
-          width="763"
-          wrap="true"
-          maxLines="4">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
+        <Group
+          id="MessageGroup">
+          <Label
+            id="Message"
+            width="763"
+            wrap="true"
+            maxLines="4"
+            translation="[0,0]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+          <ScrollableText
+            id="ScrollableMessage"
+            width="763"
+            height="300"
+            visible="false"
+            translation="[0,0]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="22" />
+          </ScrollableText>
+        </Group>
         
         <ScrollingList
           id="ButtonList"

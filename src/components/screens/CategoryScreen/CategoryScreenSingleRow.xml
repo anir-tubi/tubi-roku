@@ -59,11 +59,14 @@
     <!-- set to true when the user has selected the "Sign In" button -->
     <field id="signInSelected" type="boolean" alwaysNotify="true"/>
 
-    <!-- set to true when the user has selected the "Sign In" button -->
+    <!-- set to true when the user has selected the "Sign Out" button -->
     <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
 
-    <!-- set to true when the user has selected the "Sign In" button -->
+    <!-- set to true when the user has selected the "About" button -->
     <field id="aboutSelected" type="boolean" alwaysNotify="true"/>
+    
+    <!-- set to true when the user has selected the "Privacy" button -->
+    <field id="privacySelected" type="boolean" alwaysNotify="true"/>
     
     <!-- set to true if the user is signed in and we want to change the experience based on that -->
     <field id="signedIn" type="boolean" value="false" />
@@ -120,6 +123,10 @@
           id="AboutMenuItem"
           title="About Tubi TV"
           hdgridposterurl="pkg:/images/icon-about-large.png" />
+        <ContentNode
+          id="PrivacyMenuItem"
+          title="Privacy"
+          hdgridposterurl="pkg:/images/icon-privacy-large.png" />
       </ContentNode>
 
       <ScrollingList

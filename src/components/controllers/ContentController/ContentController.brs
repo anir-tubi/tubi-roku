@@ -114,6 +114,7 @@ Function startCategoryScreen()
   m.categoryScreen.observeField("signInSelected", "onSignInSelected")
   m.categoryScreen.observeField("signOutSelected", "onSignOutSelected")
   m.categoryScreen.observeField("aboutSelected", "onAboutSelected")
+  m.categoryScreen.observeField("privacySelected", "onPrivacySelected")
   m.categoryScreen.observeField("backgroundUriList", "onGridBackgroundChange")
   pushScreen(m.categoryScreen)
 End Function
@@ -270,19 +271,34 @@ Function onAboutSelected()
   message = message + "Tubi TV related marks are trademarks of Tubi TV, an adRise Company."
   m.aboutScreen.message = message
   m.aboutScreen.buttons = ["Close"]
-  m.aboutScreen.observeField("buttonSelected", "onCloseAbout")
+  m.aboutScreen.observeField("buttonSelected", "onCloseModal")
   pushModal(m.aboutScreen)
 End Function
 
 
 '''''''''''''''''''
-' onCloseAbout
+' onCloseModal
 '
-' Dismiss the About modal
-Function onCloseAbout()
+' Dismiss a modal dialog
+Function onCloseModal()
   tubiLog("ContentController.onCloseAbout")
   popScreen()
   m.aboutScreen = invalid
+End Function
+
+
+Function onPrivacySelected()
+  tubiLog("ContentController.onPrivacySelecte")
+  m.privacyText = CreateObject("roSGNode", "ModalDialogScreen")
+  m.privacyText.title = "Tubi TV Privacy Policy"
+  m.privacyText.scrollable = true
+  m.privacyText.message = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+  m.privacyText.message = m.privacyText.message + "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+  m.privacyText.message = m.privacyText.message + "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+  m.privacyText.message = m.privacyText.message + "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+  m.privacyText.buttons = ["Close"]
+  m.privacyText.observeField("buttonSelected", "onCloseModal")
+  pushModal(m.privacyText)
 End Function
 
 
