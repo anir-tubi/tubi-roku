@@ -171,6 +171,8 @@ Function getConstants()
   'constants needed for the video player
   constants.player = {}
 
+    constants.player.creditsDuration = 180
+
     'how often the video player sends play progress events
     constants.player.pingFrequency = 10
 

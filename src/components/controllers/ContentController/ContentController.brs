@@ -380,15 +380,17 @@ End Function
 ' Helper to deduce the content, video or episode, to play or resume
 Function getDetailScreenContent()
   content = invalid
-  if m.detailScreen.content.type = m.global.constants.ui.contentTypes.video then
-    content = m.detailScreen.content
-  else
-    selection = m.detailScreen.episodeSelection
-    series = m.detailScreen.content.getChild(selection[0])
-    if series <> invalid then
-      episode = series.getChild(selection[1])
-      if episode <> invalid then
-        content = episode
+  if m.detailScreen.content <> invalid then
+    if m.detailScreen.content.type = m.global.constants.ui.contentTypes.video then
+      content = m.detailScreen.content
+    else
+      selection = m.detailScreen.episodeSelection
+      series = m.detailScreen.content.getChild(selection[0])
+      if series <> invalid then
+        episode = series.getChild(selection[1])
+        if episode <> invalid then
+          content = episode
+        end if
       end if
     end if
   end if
@@ -415,7 +417,7 @@ End Function
 ' onPlayerInfo
 '
 ' Is called when the nowPos is updated from the player
-Function onPlayerInfo()
+Function onPlayerInfo() As Void
   playerInfo = m.top.playerInfo
   tubiLog("onPlayerInfo: nowPos = " + playerInfo.nowPos.toStr())
   if playerInfo.historyId <> invalid and playerInfo.historyId <> "" then
@@ -424,7 +426,7 @@ Function onPlayerInfo()
   if playerInfo.parentHistoryId <> invalid and playerInfo.parentHistoryId <> "" then
     tubiLog("onPlayerInfo: parentHistoryId = " + playerInfo.parentHistoryId.toStr())
   end if
-  content = m.top.playContent
+  content = m.top.playContent 'video
 
   constants = m.global.constants
   Request = TubiRequest()
@@ -435,17 +437,103 @@ Function onPlayerInfo()
   newHistory = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds, m.global.historyOrder)
   m.global.historyIds = newHistory.historyIds
   m.global.historyOrder = newHistory.historyOrder
-  if m.categoryScreen <> invalid then m.categoryScreen.dirtyUserCategories = true
-
-  if m.detailScreen <> invalid
-    m.detailScreen.shortContent = m.detailScreen.shortContent ' force a reload to get nowPos and history id set
-  end if
 
   if playerInfo.result = m.global.constants.player.playerResults.failed then
     showPlayerError(playerInfo.result)
+    return
   end if
 
-  'TODO: BRYAN, advance the episode
+  if playerInfo.result = constants.player.playerResults.completed
+
+    ' autoplay feature
+    lastContent = m.detailScreen.content
+
+    ' find the next episode in a series
+    if lastContent <> invalid and lastContent.type = m.global.constants.ui.contentTypes.series then
+      tubiLog("Autoplay: Series")
+
+      nextEpisode = invalid
+      selection = m.detailScreen.episodeSelection  '2d array
+      season = m.detailScreen.content.getChild(selection[0])
+
+      if season <> invalid
+        if season.getChild(selection[1] + 1) <> invalid
+          nextEpisode = [selection[0], selection[1] + 1]
+
+        else
+          nextSeason = m.detailScreen.content.getChild(selection[0] + 1)
+          if nextSeason <> invalid and nextSeason.getChild(0) <> invalid
+            nextEpisode = [selection[0] + 1, 0]
+          end if
+        end if
+      end if      
+
+      if nextEpisode <> invalid
+        m.detailScreen.episodeSelection = nextEpisode
+        onPlay()
+        return
+      end if
+
+    ' find the next movie in a category
+    else if lastContent <> invalid and lastContent.type = m.global.constants.ui.contentTypes.video then
+      ' NOTE: be careful here in case of deep links, where the
+      ' last title launched was not related to a category on 
+      ' the category screen.  In that case we'll just skip
+      ' autoplay.
+      '
+      ' NOTE2: m.top.playContent comes from the detailscreen,
+      '        so we map it back to the categoryscreen via 'shortContent'
+      tubiLog("Autoplay: Movie")
+      parent = m.detailScreen.shortContent.getParent()
+      if parent <> invalid and parent.type = m.global.constants.ui.contentTypes.category then
+        for i=0 to parent.getChildCount()-1
+          child = parent.getChild(i)
+          if child.isSameNode(m.detailScreen.shortContent) then
+            nextContent = parent.getChild(i+1)
+            if nextContent <> invalid then
+              ' set the detail screen to focus on the next movie. Note that this will take some 
+              ' time to populate so we don't use it for launching the player
+              m.detailScreen.observeField("content", "onAutoplayContentReady")
+              m.detailScreen.shortContent = nextContent
+              return
+            end if
+          end if
+        end for
+      end if
+    end if
+  end if
+
+  ' no autoplay available, so force a details screen reload to get nowPos and history id set
+  if m.detailScreen <> invalid
+    ' Because of a race condition, earlier detail screen won't redraw itself if we just show it,
+    ' so we rebuild it new.  This may lose the episode selection, but it might be set by currentEpisode
+    ' from the service
+    content = m.detailScreen.shortContent 
+    popScreen()
+    showDetailScreen(content)
+  end if
+
+  if m.categoryScreen <> invalid then 
+    m.categoryScreen.dirtyUserCategories = true
+  end if
+
+End Function
+
+
+'''''''''''''''''''''''''
+' onAutoplayContentReady
+'
+'
+Function onAutoplayContentReady()
+  tubiLog("ContentController.onAutoplayContentReady")
+  content = getDetailScreenContent()
+  if content <> invalid then
+    content.nowPos = 0 'reset the start position
+    m.top.playContent = content.getFields()
+    if m.detailScreen <> invalid then
+      m.detailScreen.unobserveField("content")
+    end if
+  end if
 End Function
 
 

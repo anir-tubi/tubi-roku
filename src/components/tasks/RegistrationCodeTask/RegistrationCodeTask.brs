@@ -115,7 +115,7 @@ Function registrationLoop() As Void
               return
             end if
           else
-            tubiLog("Reg code polling failed " + stri(result.code))
+            tubiLog("Reg code polling failed " + stri(result.response.code))
             m.global.trackingTask.trackEvent = {
               trackType: "registerFail"
               value: "polling-response-failure"

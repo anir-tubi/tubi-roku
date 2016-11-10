@@ -184,6 +184,11 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
     end if
   end if
 
+  'add fake credit cuepoints for episodes - we can remove this once we get actual credits cue points for content
+  if translatedContent.parentId <> invalid and translatedContent[typeVar] = m.contentTypes.video and translatedContent.length <> invalid
+    translatedContent.creditsCuepoint = translatedContent.length - m.creditsDuration
+  end if
+
   if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
     translatedContent.landscape = contentFromServer.hero_images[0]
   else if contentFromServer.thumbnails <> invalid and type(contentFromServer.thumbnails) = "roArray" and contentFromServer.thumbnails.count() > 0
@@ -229,9 +234,6 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
     if contentFromServer.subtitles.count() = 1
       translatedContent.subtitleDefault = contentFromServer.subtitles[0].url
       translatedContent.subtitleUrl = contentFromServer.subtitles.[0].url
-    end if
-
-    if translatedContent.id = "304771"
     end if
   end if
 
@@ -322,6 +324,7 @@ Function setTranslateGlobalsToLocal()
   m.captionMode = m.global.constants.deviceInfo.captionsMode
   m.contentTypes = {}
   m.contentTypes.append(m.global.constants.ui.contentTypes)
+  m.creditsDuration = m.global.constants.player.creditsDuration
 end Function
 
 

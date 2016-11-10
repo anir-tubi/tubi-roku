@@ -85,7 +85,7 @@ Function onContentChange() As Void
       ' arrived here from an episode link
       m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id)
     else if m.top.content.currentEpisodeId <> invalid and m.top.content.currentEpisodeId <> "" then
-      tubiLog("Finding current episode " + m.top.shortContent.id + " in series " + m.top.content.id)
+      tubiLog("Finding current episode " + m.top.content.currentEpisodeId + " in series " + m.top.content.id)
       m.top.episodeSelection = findEpisodeInSeries(m.top.content.currentEpisodeId)
     endif
   end if
@@ -175,6 +175,7 @@ End Function
 '
 ' Seed for content received, retrieve the full content details
 Function onShortContentChange()
+  tubiLog("DetailScreen.onShortContentChange")  
   if m.top.shortContent <> invalid
     loadContentDetails(m.top.shortContent)
 

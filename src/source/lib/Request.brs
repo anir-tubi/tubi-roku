@@ -125,7 +125,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   ' Start the request
 
   ' tubiLog("sending a " + m.method + " request to " + m.url)
-  ' print m.body  
+  ' print m.body
   if m.method = "POST" or m.method = "PUT" or m.method = "PATCH"
     if m.urltransfer.AsyncPostFromString(m.body) = false
       tubiLog(m.method + " request failed. " + url)

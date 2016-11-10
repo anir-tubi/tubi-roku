@@ -485,6 +485,12 @@ function tubiBookmarks_updateNowPos(content, playerInfo, historyIds, historyOrde
     if newHistoryIds.videos[content.id] <> invalid 
       tubiLog("Bookmarks.updateNowPos updating historyId for " + content.id)
       newHistoryIds.videos[content.id].position = playerInfo.nowPos
+
+      ' update the currentEpisodeId if an episode was just played
+      if content.parentId <> invalid and content.parentId <> "" then
+        tubiLog("Bookmarks.updateNowPos updating currentEpisodeId for " + content.parentId)
+        newHistoryIds.series[content.parentId].currentEpisodeId = content.id
+      end if
     else
       tubiLog("Bookmarks.updateNowPos Storing historyId for " + content.id)
 
