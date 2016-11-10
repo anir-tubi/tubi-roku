@@ -162,7 +162,7 @@ Function onContentChange() As Void
     m.SearchSignInCategory.appendChild(m.PrivacyMenuItem)
     m.top.content.removeChild(m.ContinueWatchingCategory)
     m.top.content.removeChild(m.MyQueueCategory)
-    featureGridIndex = 0
+    featureGridIndex = 1
   end if
 
   m.CategoryList.content = m.top.content
