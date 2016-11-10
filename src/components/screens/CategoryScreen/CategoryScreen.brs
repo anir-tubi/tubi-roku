@@ -151,7 +151,7 @@ Function onContentChange() As Void
     m.SearchSignOutCategory.appendChild(m.AboutMenuItem)
     m.top.content.insertChild(m.ContinueWatchingCategory, 1)
     m.top.content.insertChild(m.MyQueueCategory, 2)
-    featureGridIndex = 2
+    featureGridIndex = 3
   else
     m.top.content.insertChild(m.SearchSignInCategory, 0)
     m.SearchSignInCategory.appendChild(m.SearchMenuItem)

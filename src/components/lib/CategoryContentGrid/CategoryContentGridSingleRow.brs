@@ -61,22 +61,10 @@ Function onContentChange()
     m.CategoryName.text = m.top.content.title
 
     if m.top.content.title = "Featured" or m.top.content["type"] = m.global.constants.ui.contentTypes.season then
-      m.top.removeChild(m.PosterGrid)
-      m.PosterGrid = invalid
-      m.top.removeChild(m.SignInGrid)
-      m.SignInGrid = invalid
       m.ContentGrid = m.FeatureGrid
     else if m.top.content.id = "SearchSignIn" or m.top.content.id = "SearchSignOut" then
-      m.top.removeChild(m.PosterGrid)
-      m.PosterGrid = invalid
-      m.top.removeChild(m.FeatureGrid)
-      m.FeatureGrid = invalid
       m.ContentGrid = m.SignInGrid
     else
-      m.top.removeChild(m.FeatureGrid)
-      m.FeatureGrid = invalid
-      m.top.removeChild(m.SignInGrid)
-      m.SignInGrid = invalid
       m.ContentGrid = m.PosterGrid
     end if
     m.ContentGrid.visible = true
@@ -85,6 +73,7 @@ Function onContentChange()
     m.ContentGrid.observeField("itemFocused", "onItemFocusedChange")
     m.ContentGrid.observeField("cursorIndex", "onCursorIndexChange")
     m.ContentGrid.content = m.top.content
+    if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)  ' be careful when removing children that we don't remove a focused item
     drawItemCount()
   end if
 End Function

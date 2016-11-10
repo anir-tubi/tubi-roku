@@ -45,22 +45,10 @@ Function onContentChange()
     m.ContentGrid.unobserveField("itemFocused")
     m.ContentGrid.unobserveField("cursorIndex")
     if m.top.content.title = "Featured" then
-      m.top.removeChild(m.PosterGrid)
-      m.PosterGrid = invalid
-      m.top.removeChild(m.SignInGrid)
-      m.SignInGrid = invalid
       m.ContentGrid = m.FeatureGrid
     else if m.top.content.id = "SearchSignIn" or m.top.content.id = "SearchSignOut" then
-      m.top.removeChild(m.PosterGrid)
-      m.PosterGrid = invalid
-      m.top.removeChild(m.FeatureGrid)
-      m.FeatureGrid = invalid
       m.ContentGrid = m.SignInGrid
     else
-      m.top.removeChild(m.FeatureGrid)
-      m.FeatureGrid = invalid
-      m.top.removeChild(m.SignInGrid)
-      m.SignInGrid = invalid
       m.ContentGrid = m.PosterGrid
 
       ' For the 2-row poster grid, collapse to 1 row if fewer than 8 items come back
@@ -80,7 +68,8 @@ Function onContentChange()
     m.ContentGrid.content = m.top.content
 
     ' make sure it becomes visible; there's a race condition between setting content and setting focus percent above
-    if m.top.focusPercent > 0 then m.ContentGrid.visible = true
+    if m.top.focusPercent > 0 then  m.ContentGrid.visible = true
+    if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)  ' be careful when removing children that we don't remove a focused item
     m.Spinner.visible = false
   else
     m.Spinner.visible = true
