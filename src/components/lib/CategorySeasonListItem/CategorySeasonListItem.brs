@@ -11,7 +11,6 @@ Function init()
   m.categoryCountText.color = m.global.constants.ui.colors.focused
 End Function
 
-
 ''''''''''''''''''''
 ' onFocusChange
 '
@@ -24,7 +23,7 @@ Function onFocusChange()
   end if
   m.focusedText.opacity = m.top.focusPercent
   m.unfocusedText.opacity = 1.0 - m.top.focusPercent
-  if m.top.content.totalCount <> invalid and m.top.content.totalCount > 0 then
+  if m.top.listHasFocus and m.top.content.totalCount <> invalid and m.top.content.totalCount > 0 then
     ' while the focus box is sliding, it looks funny to have this group be visible too early.
     ' slow it down by not doing linear fade
     m.categoryCountGroup.opacity = m.top.focusPercent^3
@@ -45,7 +44,7 @@ Function onContentChange()
     m.unfocusedText.text = m.top.content.title
     if m.top.content.totalCount <> invalid and m.top.content.totalCount > 0 then
       m.categoryCountText.text = stri(m.top.content.totalCount)
-      m.categoryCountGroup.opacity = m.top.focusPercent^3  ' in case of category being focused before content was set
     end if
   end if
+  onFocusChange()  ' to force a reset of the opacities
 End Function
