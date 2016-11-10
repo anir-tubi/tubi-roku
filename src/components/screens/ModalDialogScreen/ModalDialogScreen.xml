@@ -59,7 +59,7 @@
           id="MessageGroup">
           <Label
             id="Message"
-            width="763"
+            width="822"
             wrap="true"
             maxLines="4"
             translation="[0,0]">
@@ -68,17 +68,23 @@
               uri="pkg:/fonts/Vaud-Medium.ttf"
               size="27" />
           </Label>
+          <Rectangle
+            id="ScrollableBackground"
+            color="0x191919FF"
+            height="320"
+            width="822">
           <ScrollableText
             id="ScrollableMessage"
-            width="763"
+            width="802"
             height="300"
             visible="false"
-            translation="[0,0]">
+            translation="[10,10]">
             <Font
               role="font"
               uri="pkg:/fonts/Vaud-Medium.ttf"
               size="22" />
           </ScrollableText>
+          </Rectangle>
         </Group>
         
         <ScrollingList

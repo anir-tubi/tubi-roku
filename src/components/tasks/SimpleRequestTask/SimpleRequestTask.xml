@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - SimpleRequestTask
+ -
+ - This is a task to make an HTTP request, the result body of which will be stored in a field on this object
+ -
+ --> 
+<component name="SimpleRequestTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/tasks/SimpleRequestTask/SimpleRequestTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+
+    <interface>
+      <!-- input -->
+      <field id="uri" type="uri"/>
+      <!-- optional input -->
+      <field id="node" type="node" />
+      <field id="field" type="string" value="" />
+      
+      <!-- Set to the response body -->
+      <field id="response" type="string" />
+    </interface>
+</component>

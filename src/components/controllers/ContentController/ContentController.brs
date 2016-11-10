@@ -292,13 +292,15 @@ Function onPrivacySelected()
   m.privacyText = CreateObject("roSGNode", "ModalDialogScreen")
   m.privacyText.title = "Tubi TV Privacy Policy"
   m.privacyText.scrollable = true
-  m.privacyText.message = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-  m.privacyText.message = m.privacyText.message + "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-  m.privacyText.message = m.privacyText.message + "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-  m.privacyText.message = m.privacyText.message + "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+  'm.privacyText.message = legal
   m.privacyText.buttons = ["Close"]
   m.privacyText.observeField("buttonSelected", "onCloseModal")
   pushModal(m.privacyText)
+  m.privacyRequestTask = CreateObject("roSGNOde", "SimpleRequestTask")
+  m.privacyRequestTask.uri = m.global.constants.urls.privacyUrl 
+  m.privacyRequestTask.node = m.privacyText
+  m.privacyRequestTask.field = "message"
+  m.privacyRequestTask.control = "RUN"
 End Function
 
 

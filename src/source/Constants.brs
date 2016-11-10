@@ -145,6 +145,8 @@ Function getConstants()
     ' splash video
     constants.urls.splashVideoUrl = "http://c11.adrise.tv/v2/sources/content-owners/adrise-no-ads/328128/v20169300123-1280x714-,386,951,1592,1956,2833,k.mp4.m3u8"
 
+    constants.urls.privacyUrl = "http://cdn.adrise.tv/legal/TubiTVPrivacyPolicy.txt"
+
   'http request types
   constants.reqTypes = {}
     constants.reqTypes.get = "GET"
