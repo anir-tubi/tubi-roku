@@ -35,6 +35,7 @@
       translation="[-375, 640]"
       width="425"
       height="440"
+      scrollHeight="80"
       itemSpacings="[8]"
       itemComponentName="CategorySeasonListItemSingleRow"
       visible="false"

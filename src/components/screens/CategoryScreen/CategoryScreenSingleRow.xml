@@ -134,6 +134,7 @@
         translation="[-380, 640]"
         width="425"
         height="440"
+        scrollHeight="80"
         itemSpacings="[8]"
         itemComponentName="CategorySeasonListItemSingleRow"
         focusBitmapUri="pkg:/images/menu-focus.png"/>
