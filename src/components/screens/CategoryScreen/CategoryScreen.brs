@@ -117,7 +117,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     else if (key = "left" or key = "back") and not m.CategoryList.isInFocusChain() then
       m.CategoryList.setFocus(true)
       slideTo(m.ContentArea, [525,m.ContentArea.translation[1]], 0.5)
-      slideTo(m.CategoryList, [85,m.CategoryList.translation[1]], 0.5)
+      slideTo(m.CategoryList, [60,m.CategoryList.translation[1]], 0.5)
       m.trackingCount = 0
       return true
     end if
