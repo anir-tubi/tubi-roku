@@ -19,7 +19,16 @@ Function tubiExternalConfig_init()
 End Function
 
 
-
+' Example JSON response from the service:
+'
+' {
+'   "livetv": false,
+'   "intro_landscape_hibpr": "http://c12.adrise.tv/v2/sources/content-owners/adrise-no-ads/325254/v20169072053-1920x1080-2413k.mp4",
+'   "intro_landscape_lowbpr": "http://c12.adrise.tv/v2/sources/content-owners/adrise-no-ads/325254/v20169072053-1920x1080-341k.mp4",
+'   "intro_portrait_hibpr": "http://c12.adrise.tv/v2/sources/content-owners/adrise-no-ads/325255/v20169072050-1080x1920-2624k.mp4",
+'   "intro_portrait_lowbpr": "http://c12.adrise.tv/v2/sources/content-owners/adrise-no-ads/325255/v20169072050-1080x1920-335k.mp4"
+' }
+'
 Function tubiExternalConfig_getConfigs_()
   url = m.constants.urls.users.config
   options = {
@@ -43,5 +52,4 @@ End Function
 ' @configs: assocArray, configs as sent from the UAPI and json parsed
 Function tubiExternalConfig_storeConfigs_(configs)
   m.constants.externalConfig.info = configs
-  
 End Function

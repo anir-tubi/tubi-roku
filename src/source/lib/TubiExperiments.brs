@@ -53,6 +53,78 @@ Function tubiExperiments_init()
 End Function
 
 
+' Example JSON response from the service:
+'
+'[
+' {
+'   "name": "UserNamespace",
+'   "unit": "deviceId",
+'   "segments": 100,
+'   "default_experiment": "UserDefaults",
+'   "experiment_sequence": [
+'     {
+'       "action": "add",
+'       "definition": "PreRollAt90",
+'       "name": "PreRollAt90.1",
+'       "segments": 10
+'     }
+'   ],
+'   "experiment_definitions": [
+'     {
+'       "name": "PreRollAt90",
+'       "salt": "PreRollAt90",
+'       "assign": "preroll_at_90 = uniformChoice(choices=['0', '90'], unit=deviceId);\n",
+'       "compiled": {
+'         "op": "seq",
+'         "seq": [
+'           {
+'             "op": "set",
+'             "var": "preroll_at_90",
+'             "value": {
+'               "choices": {
+'                 "op": "array",
+'                 "values": [
+'                   "0",
+'                   "90"
+'                 ]
+'               },
+'               "unit": {
+'                 "op": "get",
+'                 "var": "deviceId"
+'               },
+'               "op": "uniformChoice"
+'             }
+'           }
+'         ]
+'       },
+'       "auto_log_exposure": true
+'     },
+'     {
+'       "name": "UserDefaults",
+'       "salt": "UserDefaults",
+'       "assign": "preroll_at_90 = false;\n",
+'       "compiled": {
+'         "op": "seq",
+'         "seq": [
+'           {
+'             "op": "set",
+'             "var": "preroll_at_90",
+'             "value": false
+'           }
+'         ]
+'       },
+'       "auto_log_exposure": false
+'     }
+'   ],
+'   "evaluated_experiment_name": "UserDefaults",
+'   "evaluated_experiment_salt": "UserDefaults",
+'   "evaluated_params": {
+'     "preroll_at_90": false
+'   },
+'   "evaluated_default": true
+' }
+']
+
 'Returns an Array of namespaces from UAPI.
 'We expect to return an array containing a single or multiple namespace assocArrays
 Function tubiExperiments_getNamespaces_()
