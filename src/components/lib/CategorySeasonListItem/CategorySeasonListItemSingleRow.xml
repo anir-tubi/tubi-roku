@@ -27,7 +27,7 @@
       id="categoryUnfocusedText" 
       horizAlign="left"
       vertAlign="center"
-      width="342"
+      width="322"
       height="79"
       translation="[19,1]"
       opacity="0.0">
@@ -40,7 +40,7 @@
       id="categoryFocusedText" 
       horizAlign="left"
       vertAlign="center"
-      width="342"
+      width="322"
       height="79"
       translation="[19,1]">
       <Font
