@@ -98,7 +98,7 @@ End Function
 
 ' We do this here becase the ScrollingList component swallows the 'ok' keypress
 Function onCategoryMenuSelected()
-  m.CategoryGridList.setFocus(true)
+  onKeyEvent("ok", true)
 End Function
 
 ''''''''''''''''''''
