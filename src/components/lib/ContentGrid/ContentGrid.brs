@@ -111,6 +111,11 @@ Function onComponentFocusChange()
     m.top.cursorIndex = gridIndexToItemIndex(m.internalItemFocused)
   else
     fade(m.focusBox, "out", 0.3)
+    ' If we don't have focus, clear out any keypresses.  This fixes an
+    ' issue where we get a press but focus changes before we get the
+    ' release, which causes an unfocused grid to continue scrolling.
+    m.overlappedKeypress = invalid
+    m.pressAndHold = invalid
   end if
 End Function
 
