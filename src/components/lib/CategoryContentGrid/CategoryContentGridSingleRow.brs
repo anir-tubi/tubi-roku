@@ -60,7 +60,7 @@ Function onContentChange()
    
     m.CategoryName.text = m.top.content.title
 
-    if m.top.content.title = "Featured" then
+    if m.top.content.title = "Featured" or m.top.content["type"] = m.global.constants.ui.contentTypes.season then
       m.top.removeChild(m.PosterGrid)
       m.PosterGrid = invalid
       m.top.removeChild(m.SignInGrid)

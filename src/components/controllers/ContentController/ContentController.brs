@@ -6,6 +6,8 @@ Function init()
   m.global.addField("metadataFetchTask", "node", false)
   m.global.metadataFetchTask = m.metadataFetchTask
 
+  m.singleRow = true
+
   m.trackingTask = m.top.findNode("TrackingTask")
   m.global.addField("trackingTask", "node", false)
   m.global.trackingTask = m.trackingTask
@@ -101,8 +103,7 @@ End Function
 ' On either app start (if user is signed in) or after the sign in
 ' flow is complete, create and show the category screen.
 Function startCategoryScreen()
-  singleRow = true
-  if singleRow = true
+  if m.singleRow = true
     m.categoryScreen = CreateObject("roSGNode", "CategoryScreenSingleRow")
   else
     m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
@@ -346,7 +347,12 @@ End Function
 
 
 Function onEpisodeList()
-  m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
+  if m.singleRow = true
+    m.episodesScreen = CreateObject("roSGNode", "EpisodesScreenSingleRow")
+  else
+    m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
+  end if
+  
   m.episodesScreen.content = m.detailScreen.content
   m.episodesScreen.observeField("episodeSelected", "onEpisodeSelected")
   m.episodesScreen.observeField("backgroundUriList", "onEpisodeBackgroundChange")

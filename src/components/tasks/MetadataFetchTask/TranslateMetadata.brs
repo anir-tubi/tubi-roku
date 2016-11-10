@@ -280,10 +280,15 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
 
   'if this content is actually just a paginated response, set pagination data
   if contentFromServer.total_count <> invalid then translatedContent.totalCount = contentFromServer.total_count
+
   if contentFromServer.more <> invalid then translatedContent.more = contentFromServer.more
 
   'take care of any children the content might have
   if contentFromServer.children <> invalid and contentFromServer.children.count() > 0
+
+    if translatedContent.totalCount = 0
+      translatedContent.totalCount = contentFromServer.children.count()
+    end if
 
     for each childContent in contentFromServer.children
       node = translatedContent.createChild("TubiContentNode")

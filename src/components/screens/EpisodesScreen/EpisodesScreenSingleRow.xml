@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="EpisodesScreenSingleRow" extends="Group" initialFocus="Menu" >
+
+  <script type="text/brightscript" uri="pkg:/components/screens/EpisodesScreen/EpisodesScreenSingleRow.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  
+  <interface>
+    <!-- Full content of the item to show details for -->
+    <field id="content" type="node" />
+
+    <!-- Full content of the item to show details for -->
+    <field id="seasonFocused" type="integer" value="-1" />    
+
+    <!-- Set to the content of the episode that was clicked on -->
+    <field id="episodeSelected" type="intarray" alwaysNotify="true"/>
+    
+    <!-- will be used to change the background images on the content controller -->
+    <field id="backgroundUriList" type="stringarray" alwaysNotify="true" /> 
+    
+    <!-- keeps the uri used for user tracking -->
+    <field id="trackingUri" type="string"  value="/series/episodelist/" />
+  </interface>
+
+  <children>
+    <InfoPanel
+      id="InfoPanel"
+      translation="[85,61]"
+      mode="detail"
+      visible="true" />
+    
+    <ScrollingList
+      id="EpisodeMenu"
+      translation="[-375, 640]"
+      width="425"
+      height="440"
+      itemSpacings="[8]"
+      itemComponentName="CategorySeasonListItemSingleRow"
+      visible="false"
+      focusBitmapUri="pkg:/images/menu-focus-short.png" />
+
+    <ScrollingList
+      id="SeasonRows"
+      width="1835"
+      height="503"
+      scrollHeight="370"
+      itemSpacings="[29]"
+      itemComponentName="CategoryContentGridSingleRow"
+      focusBitmapUri=""
+      focusChangeDuration="0.6"
+      translation="[85,588]" />
+    
+  </children>
+</component>

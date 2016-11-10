@@ -7,7 +7,7 @@
  - the scrollinglist has focus.
  -
  -->
-<component name="CategorySeasonListItem" extends="Rectangle" >
+<component name="CategorySeasonListItemSingleRow" extends="Rectangle" >
   <script type="text/brightscript" uri="pkg:/components/lib/CategorySeasonListItem/CategorySeasonListItem.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
@@ -15,7 +15,7 @@
     <field id="focusPercent" type="float" value="0.0"/>
     <field id="content" type="node" />
     <field id="listHasFocus" type="boolean" value="false" />
-    <field id="width" alias="ForceDimensions.width" value="440.0" />
+    <field id="width" alias="ForceDimensions.width" value="425.0" />
     <field id="height" alias="ForceDimensions.height" value="80.0" />
   </interface>
   

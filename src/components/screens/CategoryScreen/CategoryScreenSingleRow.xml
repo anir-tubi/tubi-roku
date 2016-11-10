@@ -128,7 +128,7 @@
         width="425"
         height="440"
         itemSpacings="[8]"
-        itemComponentName="CategorySeasonListItem"
+        itemComponentName="CategorySeasonListItemSingleRow"
         focusBitmapUri="pkg:/images/menu-focus.png"/>
 
       <InfoPanelSingleRow
