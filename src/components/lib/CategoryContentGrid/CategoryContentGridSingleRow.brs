@@ -2,7 +2,7 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusPercent", "onFocusPercentChange")
-  m.top.observeField("listHasFocus", "onFocusPercentChange")
+  m.top.observeField("listHasFocus", "onListHasFocus")
   m.CategoryName = m.top.findNode("CategoryName")
   m.PosterGrid = m.top.findNode("PosterGrid")
   m.FeatureGrid = m.top.findNode("FeatureGrid")
@@ -48,6 +48,18 @@ Function onFocusPercentChange()
   m.CategoryCount.opacity = m.top.focusPercent
   m.top.opacity = 0.20 + (0.80 * m.top.focusPercent)
 End Function
+
+
+Function onListHasFocus()
+  if m.top.focusPercent = 1
+    if m.top.listHasFocus = true
+      fade(m.CategoryName, "in", 0.5)
+    else
+      fade(m.CategoryName, "out", 0.5)
+    end if
+  end if
+End Function
+
 
 Function onContentChange()
   tubiLog("CategoryContentGrid.onContentChange")
