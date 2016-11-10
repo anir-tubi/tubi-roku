@@ -72,6 +72,7 @@ Function onContentChange()
       m.Rating.uri = ""
     end if
     line2Label = m.TwoLineInfo.findNode("Line2")
+    line2Label.text = ""
     if content.genres <> invalid and content.genres.count() > 0 then
       capitalGenres = []
       for each c in content.genres
