@@ -22,17 +22,33 @@
     <!-- force height so that even before we get content to fill the ContentGrid, boundingRect() will return the
          correct height.
     -->
+    <Group
+      id="CategoryName">
     <Label
-      id="CategoryName"
+      id="FocusedCategoryName"
       height="40"
       width="1000"
       translation="[0,0]"
-      color="0xFF9933FF" >
+      color="0xFF9933FF"
+      opacity="0.0">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="34" />
     </Label>
+    <Label
+      id="UnfocusedCategoryName"
+      height="40"
+      width="1000"
+      translation="[0,0]"
+      color="0xFFFFFFFF"
+      opacity="1.0">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="34" />
+    </Label>
+    </Group>
     
     <LayoutGroup
       id="CategoryCount"

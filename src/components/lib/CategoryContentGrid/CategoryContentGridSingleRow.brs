@@ -4,6 +4,8 @@ Function init()
   m.top.observeField("focusPercent", "onFocusPercentChange")
   m.top.observeField("listHasFocus", "onListHasFocus")
   m.CategoryName = m.top.findNode("CategoryName")
+  m.FocusedCategoryName = m.top.findNode("FocusedCategoryName")
+  m.UnfocusedCategoryName = m.top.findNode("UnfocusedCategoryName")
   m.PosterGrid = m.top.findNode("PosterGrid")
   m.FeatureGrid = m.top.findNode("FeatureGrid")
   m.SignInGrid = m.top.findNode("SignInGrid")
@@ -45,6 +47,9 @@ Function onFocusPercentChange()
     m.CategoryName.opacity = 1.0
   end if
 
+  m.FocusedCategoryName.opacity = m.top.focusPercent
+  m.UnfocusedCategoryName.opacity = 1.0 - m.top.focusPercent
+
   m.CategoryCount.opacity = m.top.focusPercent
   m.top.opacity = 0.20 + (0.80 * m.top.focusPercent)
 End Function
@@ -70,7 +75,8 @@ Function onContentChange()
     m.ContentGrid.unobserveField("itemFocused")
     m.ContentGrid.unobserveField("cursorIndex")
    
-    m.CategoryName.text = m.top.content.title
+    m.FocusedCategoryName.text = m.top.content.title
+    m.UnfocusedCategoryName.text = m.top.content.title
 
     if m.top.content.title = "Featured" or m.top.content["type"] = m.global.constants.ui.contentTypes.season then
       m.ContentGrid = m.FeatureGrid
