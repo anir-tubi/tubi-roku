@@ -107,7 +107,7 @@
       numRows="1"
       width="1835"
       height="300"
-      scrollWidth="1835"
+      scrollWidth="430"
       itemSize="[430,256]"
       itemSpacing="[10,10]"
       itemComponentName="SignInPosterSingleRow"
