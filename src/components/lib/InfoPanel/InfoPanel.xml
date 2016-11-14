@@ -129,7 +129,7 @@
     
     <Label
       id="Description"
-      width="1215"
+      width="1090"
       lineSpacing="16"
       maxLines="3"
       wrap="true">
@@ -196,7 +196,7 @@
         id="Starring"
         font="dictionary:Vaud22px"
         ellipsizeOnBoundary="true"
-        width="1576"
+        width="915"
         visible="true" />
     </LayoutGroup>
     

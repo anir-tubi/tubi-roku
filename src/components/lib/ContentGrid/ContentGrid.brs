@@ -274,7 +274,7 @@ Function createItemComponent(index As Integer, item As Object) As Object
     item.itemContent = content
   else if item.hasField("uri") then 
     item.loadDisplayMode = "scaleToZoom"
-    item.loadingBitmapUri = "pkg:/images/placeholder.png"
+    item.loadingBitmapUri = "pkg:/images/placeholder.jpg"
     item.uri = content.hdgridposterurl
   end if
   gridIndex = itemIndexToGridIndex(index)

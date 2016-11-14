@@ -84,60 +84,51 @@
       <Label
         id="SeasonLine1">
         <Font
-          id="Vaud22px"
+          id="Vaud27px"
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="22" />
+          size="27" />
       </Label>
     </LayoutGroup>
     
     <LayoutGroup
       id="TwoLineInfo"
       layoutDirection="vert"
-      itemSpacings="[4]"
+      itemSpacings="[8]"
       visible="true">
       <LayoutGroup
         id="FirstLineGroup"
         layoutDirection="horiz"
         vertAlignment="center">
-      <Label
-        id="Line1"
-        opacity="0.5">
-        <Font
-          id="Vaud22px"
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="22" />
-      </Label>
-      <Rectangle
-        height="40"
-        width="72"
-        color="0x00000000">
-        <Poster
-          id="Rating"
-          height="36"
-          loadHeight="36"
-          loadDisplayMode="scaleToFit"
-          translation="[0,0]"/>
-      </Rectangle>
+        <Label
+          id="Line1"
+          opacity="0.5"
+          font="dictionary:Vaud27px"/>
+        <Rectangle
+          height="40"
+          width="72"
+          color="0x00000000">
+          <Poster
+            id="Rating"
+            height="36"
+            loadHeight="36"
+            loadDisplayMode="scaleToFit"
+            translation="[0,0]"/>
+        </Rectangle>
       </LayoutGroup>
       <Label
         id="Line2"
         opacity="0.5"
-        font="dictionary:Vaud22px"/>
+        font="dictionary:Vaud27px"/>
     </LayoutGroup>
     
     <Label
       id="Description"
-      width="1215"
+      width="875"
       lineSpacing="16"
-      maxLines="3"
-      wrap="true">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="27" />
-    </Label>
+      maxLines="5"
+      wrap="true"
+      font="dictionary:Vaud27px" />
 
     <LayoutGroup
       id="DirectorGroup"
@@ -196,7 +187,7 @@
         id="Starring"
         font="dictionary:Vaud22px"
         ellipsizeOnBoundary="true"
-        width="1576"
+        width="875"
         visible="true" />
     </LayoutGroup>
     
