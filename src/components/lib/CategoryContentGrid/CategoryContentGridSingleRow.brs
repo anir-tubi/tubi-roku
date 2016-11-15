@@ -13,6 +13,7 @@ Function init()
   m.FeatureGrid.focusChangeDuration = m.global.constants.performance.categoryGridList.gridAnimationDuration
   m.SignInGrid.focusChangeDuration = m.global.constants.performance.categoryGridList.gridAnimationDuration
   m.ContentGrid = m.PosterGrid  ' this will change based on content title
+  m.Spinner = m.top.findNode("Spinner")
 
   ' the count of contents on the top right of the category grid
   m.CategoryCount = m.top.findNode("CategoryCount")
@@ -69,30 +70,35 @@ End Function
 Function onContentChange()
   tubiLog("CategoryContentGrid.onContentChange")
   if m.top.content <> invalid then
-    ' we have to release these first, they'll be set to to appropriate grid
-    ' below
-    m.ContentGrid.unobserveField("itemSelected")
-    m.ContentGrid.unobserveField("itemFocused")
-    m.ContentGrid.unobserveField("cursorIndex")
-   
     m.FocusedCategoryName.text = m.top.content.title
     m.UnfocusedCategoryName.text = m.top.content.title
 
-    if m.top.content.title = "Featured" or m.top.content["type"] = m.global.constants.ui.contentTypes.season then
-      m.ContentGrid = m.FeatureGrid
-    else if m.top.content.id = "SearchSignIn" or m.top.content.id = "SearchSignOut" then
-      m.ContentGrid = m.SignInGrid
-    else
-      m.ContentGrid = m.PosterGrid
-    end if
-    m.ContentGrid.visible = true
+    if m.top.content.getChildCount() > 0 then
+      ' we have to release these first, they'll be set to to appropriate grid
+      ' below
+      m.ContentGrid.unobserveField("itemSelected")
+      m.ContentGrid.unobserveField("itemFocused")
+      m.ContentGrid.unobserveField("cursorIndex")
+   
+      if m.top.content.title = "Featured" or m.top.content["type"] = m.global.constants.ui.contentTypes.season then
+        m.ContentGrid = m.FeatureGrid
+      else if m.top.content.id = "SearchSignIn" or m.top.content.id = "SearchSignOut" then
+        m.ContentGrid = m.SignInGrid
+      else
+        m.ContentGrid = m.PosterGrid
+      end if
+      m.ContentGrid.visible = true
 
-    m.ContentGrid.observeField("itemSelected", "onItemSelectedChange")
-    m.ContentGrid.observeField("itemFocused", "onItemFocusedChange")
-    m.ContentGrid.observeField("cursorIndex", "onCursorIndexChange")
-    m.ContentGrid.content = m.top.content
-    if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)  ' be careful when removing children that we don't remove a focused item
-    drawItemCount()
+      m.ContentGrid.observeField("itemSelected", "onItemSelectedChange")
+      m.ContentGrid.observeField("itemFocused", "onItemFocusedChange")
+      m.ContentGrid.observeField("cursorIndex", "onCursorIndexChange")
+      m.ContentGrid.content = m.top.content
+      if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)  ' be careful when removing children that we don't remove a focused item
+      drawItemCount()
+      m.Spinner.visible = false
+    else
+      m.Spinner.visible = true
+    end if
   end if
 End Function
 

@@ -78,6 +78,12 @@
       </Label>
     </LayoutGroup>
 
+    <Spinner
+      id="Spinner"
+      width="1895"
+      height="300"
+      visible="false"
+      translation="[7,63]"/>
     <ContentGrid
       id="PosterGrid"
       numRows="1"
