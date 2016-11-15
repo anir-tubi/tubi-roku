@@ -42,6 +42,7 @@ Function translateMetadata(contentToTranslate) As Object
     end if
   end if
 
+  setTotalCount(translated)
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
 end Function
@@ -58,6 +59,7 @@ Function translateDetailsMetadata(contentToTranslate) As Object
   'will affect/update the translated node that is passed in
   translateRecursive(contentToTranslate, translated)
 
+  setTotalCount(translated)
   return translated
 End Function
 
@@ -91,6 +93,7 @@ Function translateBookmarkMetadata(contentToTranslate, orderType) As Object
     end if
   end for
 
+  setTotalCount(translated)
   return translated
 End Function
 
@@ -337,4 +340,10 @@ Function dedupeBackgrounds(backgroundsFromServer) as Object
 
   return deduped.keys()
 
+End Function
+
+Function setTotalCount(metadata As Object)
+  if metadata.totalCount = 0 and metadata.getChildCount() <> 0 then
+    metadata.totalCount = metadata.getChildCount()
+  end if
 End Function
