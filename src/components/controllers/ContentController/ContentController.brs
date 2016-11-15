@@ -79,9 +79,7 @@ Function startUserExperience()
     if m.top.itemDetail <> invalid then
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
-      ' whether we were logged in or not.  Make sure the category
-      ' screen is loaded too
-      startCategoryScreen()
+      ' whether we were logged in or not.
       m.backgroundGroup.catScreenStart = true
       onItemDetailChange()
       'TODO(Chris): capture the 'back' button when the screen stack is empty so
@@ -570,7 +568,8 @@ Function showDetailScreen(content)
   m.detailScreen.observeField("removeFromQueueSelected", "onHistoryQueueChange")
   m.detailScreen.observeField("removeFromHistorySelected", "onHistoryQueueChange")
   m.detailScreen.observeField("backgroundUriList", "onDetailBackgroundChange")
-  m.detailScreen.signedIn = m.categoryScreen.signedIn
+  m.detailScreen.observeField("itemFailed", "onDetailItemFailed")
+  m.detailScreen.signedIn = (m.authTask.authInfo <> invalid)
   pushScreen(m.detailScreen)
 End Function
 
@@ -605,4 +604,18 @@ Function onEpisodeBackgroundChange()
   TubiLog("ContentController.onEpisodeBackgroundChange")
   m.backgroundGroup.backgroundUriList = m.episodesScreen.backgroundUriList
   m.backgroundGroup.newBackgroundType = "grid"
+End Function
+
+'''''''''''''''''''''''
+' onDetailItemFailed
+'
+' Handle a detail screen failure to fetch detailed metadata.  This could be due
+' to a title becoming unavailable, or a problem with a deep link.
+Function onDetailItemFailed()
+  popScreen()
+
+  ' If a deep-link occurred, we skipped category screen creation so create it here
+  if currentScreen() = invalid then
+    startCategoryScreen()
+  end if
 End Function

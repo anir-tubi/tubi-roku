@@ -57,7 +57,7 @@ End Function
 
 ' If we can't get content, nothing else to do but exit
 Function cancelContentDetail()
-  m.top.setFocus(true)
+  m.top.itemFailed = true
 End Function
 
 
