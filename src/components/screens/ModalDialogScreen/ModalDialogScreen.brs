@@ -58,10 +58,11 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   if press and m.top.scrollable then
     if key = "up" and m.ButtonList.hasFocus() then
       m.ScrollableMessage.setFocus(true)
+      return true
     else if (key = "down" or key = "left" or key = "right") and m.ScrollableMessage.hasFocus() then
       m.ButtonList.setFocus(true)
+      return true
     end if
   end if
-  ' absorb all key presses when modal is showing
-  return true
+  return false
 End Function
