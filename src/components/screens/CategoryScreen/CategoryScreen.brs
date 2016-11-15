@@ -151,9 +151,8 @@ Function onContentChange() As Void
     m.SearchSignOutCategory.appendChild(m.SignOutMenuItem)
     m.SearchSignOutCategory.appendChild(m.AboutMenuItem)
     m.SearchSignOutCategory.appendChild(m.PrivacyMenuItem)
-    m.top.content.insertChild(m.ContinueWatchingCategory, 1)
-    m.top.content.insertChild(m.MyQueueCategory, 2)
-    featureGridIndex = 3
+    m.top.content.insertChild(m.ContinueWatchingCategory, 2)
+    m.top.content.insertChild(m.MyQueueCategory, 3)
   else
     m.top.content.insertChild(m.SearchSignInCategory, 0)
     m.SearchSignInCategory.appendChild(m.SearchMenuItem)
@@ -162,13 +161,12 @@ Function onContentChange() As Void
     m.SearchSignInCategory.appendChild(m.PrivacyMenuItem)
     m.top.content.removeChild(m.ContinueWatchingCategory)
     m.top.content.removeChild(m.MyQueueCategory)
-    featureGridIndex = 1
   end if
 
   m.CategoryList.content = m.top.content
   m.CategoryGridList.content = m.top.content  ' should be the category list
-  m.CategoryGridList.animateToCategory = featureGridIndex
-  m.CategoryList.animateToItem = featureGridIndex  'CategoryList has one extra item
+  m.CategoryGridList.animateToCategory = 1
+  m.CategoryList.animateToItem = 1  ' Set on feature category
   if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
 End Function
 
