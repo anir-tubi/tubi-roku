@@ -33,7 +33,7 @@
     <field id="layoutDirection" type="string" value="vert"/>
     <field id="animateToItem" type="int" value="-1" alwaysNotify="true"/>
     <field id="focusBitmapUri" type="uri" alias="FocusImage.uri" />
-    <field id="focusChangeDuration" alias="ScrollAnimation.duration" value="0.25"/>
+    <field id="focusChangeDuration" type="float" value="0.25"/>
   </interface>
   
   <children>

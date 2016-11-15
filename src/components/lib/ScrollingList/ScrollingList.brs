@@ -277,6 +277,14 @@ Function startChangeFocus(newFocusedIndex As Integer) As Void
   m.focusImageWidthInterpolator.keyvalue = [ m.focusImage.width, itemRect.width ]
   m.focusImageHeightInterpolator.keyvalue = [ m.focusImage.height, itemRect.height ]
   m.scrollAnimation.observeField("state", "endChangeFocus")
+  ' 2-speed scroll here.  If the duration is fast, the user will have a hard time making single item focus changes because
+  ' scrolling will kick in too quickly.  So we only use the custom focus duration value after at least one normal-speed focus
+  ' change.
+  if m.pressAndHold = invalid and m.top.focusChangeDuration < 0.25
+    m.scrollAnimation.duration = 0.25
+  else
+    m.scrollAnimation.duration = m.top.focusChangeDuration
+  end if
   m.scrollAnimation.control = "start"
 
   ' send out a pre-focus trigger in case observers want to react early to focus change

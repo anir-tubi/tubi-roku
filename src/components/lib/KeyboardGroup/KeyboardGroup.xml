@@ -35,7 +35,6 @@
       itemSpacings="[2]"
       itemComponentName="KeyboardMenuItem"
       focusBitmapUri="pkg:/images/menu-focus.9.png"
-      focusAnimationDuration="0.1"
       translation="[709,65]"
       layoutDirection="horiz">
       <ContentNode
@@ -63,7 +62,7 @@
       itemSpacings="[2]"
       itemComponentName="KeyboardItem"
       focusBitmapUri="pkg:/images/menu-focus.9.png"
-      focusAnimationDuration="0.1"
+      focusChangeDuration="0.1"
       translation="[66,147]"
       layoutDirection="horiz">
       <ContentNode
@@ -107,7 +106,7 @@
       itemSpacings="[2]"
       itemComponentName="KeyboardItem"
       focusBitmapUri="pkg:/images/menu-focus.9.png"
-      focusAnimationDuration="0.1"
+      focusChangeDuration="0.1"
       translation="[66,147]"
       layoutDirection="horiz">
       <ContentNode
@@ -151,7 +150,7 @@
       itemSpacings="[2]"
       itemComponentName="KeyboardItem"
       focusBitmapUri="pkg:/images/menu-focus.9.png"
-      focusAnimationDuration="0.1"
+      focusChangeDuration="0.1"
       translation="[588,147]"
       layoutDirection="horiz">
       <ContentNode
@@ -179,7 +178,7 @@
       itemSpacings="[2]"
       itemComponentName="KeyboardItem"
       focusBitmapUri="pkg:/images/menu-focus.9.png"
-      focusAnimationDuration="0.1"
+      focusChangeDuration="0.1"
       translation="[66,147]"
       layoutDirection="horiz">
       <ContentNode
@@ -223,7 +222,7 @@
       itemSpacings="[2]"
       itemComponentName="KeyboardItem"
       focusBitmapUri="pkg:/images/menu-focus.9.png"
-      focusAnimationDuration="0.1"
+      focusChangeDuration="0.1"
       translation="[747,227]"
       layoutDirection="horiz">
       <ContentNode
