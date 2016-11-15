@@ -26,6 +26,7 @@ Function formatDialog()
     for each b in m.top.buttons
       button = newContent.createChild("ContentNode")      
       button.title = b
+      button.id = b
     end for
     m.ButtonList.content = newContent
   end if
