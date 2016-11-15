@@ -110,22 +110,27 @@
         <ContentNode
           id="SearchMenuItem"
           title="Search" 
+          description="Search Tubi TV using the name of a Movie or TV Show. You can also search by Actor Name or Keyword"
           hdgridposterurl="pkg:/images/icon-search-large.png"/>
         <ContentNode
           id="SignInMenuItem"
           title="Sign In"
+          description="Sign In to Tubi TV. Access your Queue and View History across your devices"
           hdgridposterurl="pkg:/images/icon-sign-in-large.png" />
         <ContentNode
           id="SignOutMenuItem"
           title="Sign Out"
+          description="Sign Out of Tubi TV"
           hdgridposterurl="pkg:/images/icon-sign-in-large.png" />
         <ContentNode
           id="AboutMenuItem"
           title="About Tubi TV"
+          description="View general information about Tubi TV including the version number of this app"
           hdgridposterurl="pkg:/images/icon-about-large.png" />
         <ContentNode
           id="PrivacyMenuItem"
           title="Privacy"
+          description="Review Tubi TV's privacy policy"
           hdgridposterurl="pkg:/images/icon-privacy-large.png" />
       </ContentNode>
 
