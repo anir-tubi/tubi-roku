@@ -102,11 +102,11 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
         end if
         return true
       end if
-    else if key = "rewind" then
+    else if key = "rewind" or key = "right" then
       if m.CurrentKeyboard.hasFocus() then
         m.CurrentKeyboard.animateToItem = 0
       end if
-    else if key = "fastforward" then
+    else if key = "fastforward" or key = "left" then
       if m.CurrentKeyboard.hasFocus() then
         m.CurrentKeyboard.animateToItem = m.CurrentKeyboard.content.getChildCount() - 1
       end if
