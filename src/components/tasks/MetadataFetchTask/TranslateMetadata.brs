@@ -241,7 +241,7 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
   end if
 
   'set the inital subtitle on/off state for the video
-  if translatedContent.type = "video"
+  if translatedContent["type"] = "video"
     if m.captionsMode = "On"
       translatedContent.showSubtitles = true
     else
@@ -324,7 +324,7 @@ Function setTranslateGlobalsToLocal()
     m.historyIds.series.append(m.global.historyIds.series)
     m.historyIds.videos.append(m.global.historyIds.videos)
   end if
-  m.captionMode = m.global.constants.deviceInfo.captionsMode
+  m.captionsMode = m.global.constants.deviceInfo.captionsMode
   m.contentTypes = {}
   m.contentTypes.append(m.global.constants.ui.contentTypes)
   m.creditsDuration = m.global.constants.player.creditsDuration
