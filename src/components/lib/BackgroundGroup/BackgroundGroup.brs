@@ -56,11 +56,20 @@ Function updateBackground()
       end while
 
       addNewBackground()
-      m.oldTransitionOut = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex).findNode("TransitionOut")
-      m.oldTransitionOut.control = "start"
-      m.top.getChild(0).findNode("GradientFadeOut").control = "start"
-      
-      posterGroup = m.top.getChild(1).findNode("BackgroundImages").getChild(0).getChild(0)
+
+      m.oldTransitionOut = invalid
+      if m.top.getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages") <> invalid and m.top.getChild(0).findNode("BackgroundImages").getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex) <> invalid
+        m.oldTransitionOut = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex).findNode("TransitionOut")
+      end if
+
+      if m.oldTransitionOut <> invalid and m.top.getChild(0) <> invalid and m.top.getChild(0).findNode("GradientFadeOut") <> invalid
+        m.oldTransitionOut.control = "start"
+        m.top.getChild(0).findNode("GradientFadeOut").control = "start"
+      end if
+
+      if m.top.getChild(1) <> invalid and m.top.getChild(1).findNode("BackgroundImages") <> invalid and m.top.getChild(1).findNode("BackgroundImages").getChild(0) <> invalid
+        posterGroup = m.top.getChild(1).findNode("BackgroundImages").getChild(0).getChild(0)
+      end if
 
       if posterGroup <> invalid
         m.newBackgroundPoster = posterGroup.findNode("BackgroundPoster")
@@ -81,8 +90,9 @@ Function updateBackground()
         end if
       end if
       
-      m.oldTransitionOut.observeField("state", "removeBackground")
-
+      if m.oldTransitionOut <> invalid 
+        m.oldTransitionOut.observeField("state", "removeBackground")
+      end if
 
 
     else
@@ -112,27 +122,44 @@ Function updateBackground()
       m.imageIndex = 0
       addNewImageList()
 
-      m.oldTransitionOut = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex).findNode("TransitionOut")
-      m.oldTransitionOut.control = "start"
+      m.oldTransitionOut = invalid
+      if m.top.getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages") <> invalid
+        if m.top.getChild(0).findNode("BackgroundImages").getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex) <> invalid
+          m.oldTransitionOut = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex).findNode("TransitionOut")
 
-      posterGroup = m.top.getChild(0).findNode("BackgroundImages").getChild(1).getChild(0)
+          if m.oldTransitionOut <> invalid
+            m.oldTransitionOut.control = "start"
+          end if
+        end if
+
+        if  m.top.getChild(0).findNode("BackgroundImages").getChild(1) <> invalid
+          posterGroup = m.top.getChild(0).findNode("BackgroundImages").getChild(1).getChild(0)
+
+          if posterGroup <> invalid
+            m.newBackgroundPoster = posterGroup.findNode("BackgroundPoster")
       
-      m.newBackgroundPoster = posterGroup.findNode("BackgroundPoster")
+            if m.newBackgroundPoster <> invalid
+              if m.newBackgroundPoster.uri = m.blurredDefaultBackground
+                m.newBackgroundAnimation = posterGroup.findNode("FadeInOnly")
+              else
+                m.newBackgroundAnimation = posterGroup.findNode("TransitionIn")
+              end if
 
-      if m.newBackgroundPoster.uri = m.blurredDefaultBackground
-        m.newBackgroundAnimation = posterGroup.findNode("FadeInOnly")
-      else
-        m.newBackgroundAnimation = posterGroup.findNode("TransitionIn")
+              if m.newBackgroundPoster.loadStatus = "ready"
+                m.newBackgroundAnimation.observeField("state", "onTransitionComplete")
+                m.newBackgroundAnimation.control = "start"
+              else
+                m.newBackgroundPoster.observeField("loadStatus", "onBackgroundPosterReady")
+              end if
+            end if
+          end if
+        end if
       end if
 
-      if m.newBackgroundPoster.loadStatus = "ready"
-        m.newBackgroundAnimation.observeField("state", "onTransitionComplete")
-        m.newBackgroundAnimation.control = "start"
-      else
-        m.newBackgroundPoster.observeField("loadStatus", "onBackgroundPosterReady")
+
+      if m.oldTransitionOut <> invalid
+        m.oldTransitionOut.observeField("state", "removeImageList")
       end if
-      
-      m.oldTransitionOut.observeField("state", "removeImageList")
 
     end if
   end if
@@ -150,8 +177,11 @@ Function setUpBackground()
 
   'set the unblurred background and make it visible
   addNewBackground(true)
-  m.top.getChild(0).findNode("BackgroundGradient").opacity = 1.0
-  m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(0).findNode("BackgroundPoster").opacity = 1.0
+
+  if m.top.getChild(0) <> invalid
+    m.top.getChild(0).findNode("BackgroundGradient").opacity = 1.0
+    m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(0).findNode("BackgroundPoster").opacity = 1.0
+  end if
 
   m.top.backgroundUriList = [m.blurredDefaultBackground]
 
@@ -274,15 +304,30 @@ Function rotateBackgrounds()
     futureIndex = m.imageIndex + 1
   end if
 
-  fadeOut = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex).findNode("TransitionOut")
-  fadeIn = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(futureIndex).findNode("FadeInOnly")
+  fadeOut = invalid
+  fadeIn = invalid
 
-  fadeIn.observeField("state", "onTransitionComplete")
-  m.newBackgroundPoster = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(futureIndex).findNode("BackgroundPoster")
-  m.newBackgroundAnimation = fadeIn
+  if m.top.getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages") <> invalid and m.top.getChild(0).findNode("BackgroundImages").getChild(0) <> invalid
+    if m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex) <> invalid
+      fadeOut = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex).findNode("TransitionOut")
+    end if
+
+    if m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(futureIndex) <> invalid
+      fadeIn = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(futureIndex).findNode("FadeInOnly")
+      fadeIn.observeField("state", "onTransitionComplete")
+      m.newBackgroundPoster = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(futureIndex).findNode("BackgroundPoster")
+      m.newBackgroundAnimation = fadeIn
+    end if
+  end if
+
   
-  fadeOut.control = "start"
-  fadeIn.control = "start"
+  if fadeOut <> invalid
+    fadeOut.control = "start"
+  end if
+
+  if fadeIn <> invalid
+    fadeIn.control = "start"
+  end if
 
   m.imageIndex = futureIndex
 End Function
