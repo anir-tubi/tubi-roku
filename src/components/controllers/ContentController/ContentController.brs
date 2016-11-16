@@ -6,8 +6,6 @@ Function init()
   m.global.addField("metadataFetchTask", "node", false)
   m.global.metadataFetchTask = m.metadataFetchTask
 
-  m.singleRow = true
-
   m.trackingTask = m.top.findNode("TrackingTask")
   m.global.addField("trackingTask", "node", false)
   m.global.trackingTask = m.trackingTask
@@ -99,6 +97,17 @@ End Function
 ' On either app start (if user is signed in) or after the sign in
 ' flow is complete, create and show the category screen.
 Function startCategoryScreen()
+  request = TubiRequest()
+  experiments = TubiExperiments(request, m.global.constants)
+  expResult = experiments.getExperimentValue("RokuNamespace", "single_row") 'should always return at least a default value for expResult.experimentValue
+
+  m.singleRow = expResult.experimentValue
+
+  'send user event tracking for experiment
+  if expResult.trackInfo <> invalid
+    m.global.TrackingTask.trackEvent = expResult.trackInfo  
+  end if
+
   if m.singleRow = true
     m.categoryScreen = CreateObject("roSGNode", "CategoryScreenSingleRow")
   else

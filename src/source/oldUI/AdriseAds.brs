@@ -1,11 +1,11 @@
-function TubiAds (utils, playerRequestQueue)
+function AdriseAds (utils, playerPort)
 
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
   
   'set the preferences for the Roku Advertising Framework so we never use their ad server if our server returns no ads
-  'set to 0 retries - 1 max request, even if there are no ads returned from our server
-  roAdFramework.setAdPrefs(false, 1)
+  'and max 2 retries if there is no ads returned from our server
+  roAdFramework.setAdPrefs(false, 2)
   
   'turn Nielsen DAR on for the Roku Advertising Framework
   roAdFramework.enableNielsenDAR(true)
@@ -14,15 +14,13 @@ function TubiAds (utils, playerRequestQueue)
   roAdFramework.setNielsenAppId("PC60BD376-8551-4688-BEF4-E8B45A39D4C7")
 
   'turn on debug output for RAF
-  roAdFramework.setDebugOutput(true)
+  ' roAdFramework.setDebugOutput(true)
 
 
   return {
-	  utils: utils
-    constants: utils.constants
-	  doTest: true
     roAdFramework: roAdFramework
-    isRokuAdFrameworkOn: true 'use to turn Roku Ad Framework on or off
+    ' isRokuAdFrameworkOn: false 'use to turn Roku Ad Framework on or off
+    isRokuAdFrameworkOn: true
 
     allAdUnitsList:[]
     totalAdBreakAds: 0
@@ -36,42 +34,46 @@ function TubiAds (utils, playerRequestQueue)
     'each ad will have it's own port for ad video events like video start and video end as well as impression and view through < 100 ad pixels
     'this should minimize the number of roUrlTransfer objects stored in memory at any given time, as well as allow the various ports to listen
     'for any async responses that we expect back
-    playerRequestQueue: playerRequestQueue
+    playerPort: playerPort
+
+    baseUrl: "http://ads.adrise.tv/"
+    ' baseUrl: "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
 
     ' methods
-    reset: tubiAds_reset
-    getCommaDelimitedMidrolls: tubiAds_getCommaDelimitedMidrolls
-    getAdsList: tubiAds_getAdsList
-    getAdsListViaRoku: tubiAds_getAdsListViaRoku
-    getAdUnitsListTraditional: tubiAds_getAdUnitsListTraditional
-    getAdUnitFromXml: tubiAds_getAdUnitFromXml
-    getCompanionOverlay: tubiAds_getCompanionOverlay
-    cacheAdsList: tubiAds_cacheAdsList
-    getCachedAdsList: tubiAds_getCachedAdsList
-    showVideoAd: tubiAds_showVideoAd
-    showCommercialBreak: tubiAds_showCommercialBreak
-    showCommercialBreakViaRoku: tubiAds_showCommercialBreakViaRoku
-    checkForCommercialBreak: tubiAds_checkForCommercialBreak
-    getCuePoints: tubiAds_getCuepoints
-    populateUrl: tubiAds_populateUrl
-    getResumingPlayAds: tubiAds_getResumingPlayAds
-    showAdLoadingLayer: tubiAds_showAdLoadingLayer
+	  reset: adriseAds_reset
+    getCommaDelimitedMidrolls: adriseAds_getCommaDelimitedMidrolls
+    getAdsList: adriseAds_getAdsList
+	  getAdsListViaRoku: adriseAds_getAdsListViaRoku
+    getAdUnitsListTraditional: adriseAds_getAdUnitsListTraditional
+	  getAdUnitFromXml: adriseAds_getAdUnitFromXml
+    getCompanionOverlay: adriseAds_getCompanionOverlay
+    cacheAdsList: adriseAds_cacheAdsList
+    getCachedAdsList: adriseAds_getCachedAdsList
+    showVideoAd: adriseAds_showVideoAd
+    showCommercialBreak: adriseAds_showCommercialBreak
+    showCommercialBreakViaRoku: adriseAds_showCommercialBreakViaRoku
+    checkForCommercialBreak: adriseAds_checkForCommercialBreak
+    getCuePoints: adriseAds_getCuepoints
+    populateUrl: adriseAds_populateUrl
+    getResumingPlayAds: adriseAds_getResumingPlayAds
 
     ' innovid irolls
-    showInnovidAd : tubiAds_showInnovidAd,
+    showInnovidAd : adriseAds_showInnovidAd,
 
-    ' selectable ad items
-    selectableAds: TubiSelectableAds(utils)
+	  ' selectable ad items
+	  selectableAds: AdriseSelectableAds(utils)
 
     createSkippableAd: createSkippableAd
     skippableOverlay: invalid
 
-    adIsLexusInteractive: function(adUnit)
+	  adIsLexusInteractive: function(adUnit)
       return false
     end function
 
     currentAdUnit: {}
 
+	  utils: utils
+	  doTest: true
   }
 end function
 
@@ -80,7 +82,7 @@ end function
 '  call when starting a content video to
 '  clear everything out
 ' ----------------------------------------------
-function tubiAds_reset()
+function adriseAds_reset()
   m.allAdUnitsList = []
   m.midrolls = []
   m.videoAdErrorCount = 0
@@ -89,7 +91,7 @@ function tubiAds_reset()
 end function
 
 'create an array of midrolls from a comma delimited string of midrolls - for ex. "100,300,600,850"
-function tubiAds_getCommaDelimitedMidrolls(midrollsString)
+function adriseAds_getCommaDelimitedMidrolls(midrollsString)
   midrolls = []
   splitter = CreateObject("roRegex", ",", "")
   midrollsTimes = splitter.Split(midrollsString)
@@ -104,19 +106,19 @@ end function
 
 'cache an ads list for an ad break - typically occurs 4-7 seconds before an ad break actually runs
 'we keep the most recently cached ad break at m.lastAdsList
-function tubiAds_cacheAdsList(episode, breakPos)
+function adriseAds_cacheAdsList(episode, breakPos, playerSettings)
 	if(m.lastAdsList = invalid or m.lastAdsList.breakPos <> breakPos or m.lastAdsList.cid <> episode.adrise_contentId) 
     tmp = episode.nowPos
     episode.nowPos = breakPos
 
     if m.isRokuAdFrameworkOn = true
-      m.getAdsListViaRoku(episode)
+      m.getAdsListViaRoku(episode, playerSettings)
       res = m.allAdUnitsList
     else
-      res = m.getAdsList(episode)
+      res = m.getAdsList(episode, playerSettings)
     end if
 
-    if res <> invalid and res.count() = 0
+    if res.count() = 0
       res = invalid
     end if
 
@@ -130,7 +132,7 @@ function tubiAds_cacheAdsList(episode, breakPos)
   end if
 end function
 
-function tubiAds_getCachedAdsList(episode)
+function adriseAds_getCachedAdsList(episode)
   if m.lastAdsList <> invalid and episode.id = m.lastAdsList.cid and episode.nowPos = m.lastAdsList.breakPos
     return m.lastAdsList.list
   end if
@@ -138,10 +140,10 @@ function tubiAds_getCachedAdsList(episode)
 end function
 
 'create the url needed to make ad calls
-function tubiAds_populateUrl(episode)
-  deviceId = m.constants.deviceInfo.deviceId
-  deviceAdId = m.constants.deviceInfo.deviceAdId
-  model = m.constants.deviceInfo.model
+function adriseAds_populateUrl(episode, playerSettings)
+  deviceId = m.utils.deviceInfo.deviceId
+  deviceAdId = m.utils.deviceInfo.deviceAdId
+  model = m.utils.deviceInfo.model
 
   ' add Roku Advertiser Id (RIDA) to ad call url  
   if deviceAdId <> invalid
@@ -151,18 +153,18 @@ function tubiAds_populateUrl(episode)
   end if
 
   'add TubiTV user/registration id to ad call url
-  urlTubiId = ""
-  authInfo = m.utils.auth.getAuthInfo()
-  if authInfo <> invalid and authInfo.userId <> invalid
-    urlTubiId = "&tubitvid=" + authInfo.userId
+  userData = m.utils.getUserData()
+  if userData <> invalid and userData.token <> invalid
+    urlTubiId = "&tubitvid=" + userData.token
+  else
+    urlTubiId = ""
   end if
 
   'add if Linear/Live TV is on or off to ad call url
   isLinear = ""
-  'TODO: Bryan, uncomment when linear/live tv is added
-  ' if GetGlobalAA().app.linearTV.linearTvOn = true
-  '   isLinear = "&linear=1"
-  ' end if
+  if GetGlobalAA().app.linearTV.linearTvOn = true
+    isLinear = "&linear=1"
+  end if
 
   'select the ad sdk
   adSdk = "5.0_video"
@@ -171,15 +173,16 @@ function tubiAds_populateUrl(episode)
   end if
 
   'create the url to be used for ad calls'
-  url =  m.constants.urls.adsBaseUrl + "?platform=roku&appid=" + m.constants.settings.shortAppName + "&sdk=" + adSdk + "&cid=" + episode.id + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + episode.pubId + "&content-type=hls" + isLinear + "&_=" + RND(1000000000000).ToStr()
+  url = m.baseUrl + "?platform=roku&appid=" + playerSettings.appId + "&sdk=" + adSdk + "&cid=" + episode.adrise_contentId + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + playerSettings.pubId + "&content-type=" + playerSettings.contentType + isLinear + "&_=" + RND(1000000000000).ToStr()
+  ' url = m.baseUrl + "?platform=roku&appid=" + playerSettings.appId + "&sdk=test&cid=" + episode.adrise_contentId + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + playerSettings.pubId + "&content-type=" + playerSettings.contentType + isLinear + "&_=" + RND(1000000000000).ToStr()
 
   return url
 end function
 
 ' ----------------------------------------------
-'  m.getAdsListViaRoku(episode)
+'  m.getAdsListViaRoku(episode, playerSettings)
 ' ----------------------------------------------
-function tubiAds_getAdsListViaRoku(episode)
+function adriseAds_getAdsListViaRoku(episode, playerSettings)
   m.allAdUnitsList = []
 
   'set the content length (as stated in RAF documentation for Nielsen functionality)
@@ -202,7 +205,9 @@ function tubiAds_getAdsListViaRoku(episode)
   end if
 
   'get the url for making the ad call
-  url = m.populateUrl(episode)
+  url = m.populateUrl(episode, playerSettings)
+  ' url = "http://ads.adrise.tv/test/hardcoded-response.php?n=8"
+
 
   'set the url for the Roku Advertising Framework
   m.roAdFramework.setAdUrl(url)
@@ -211,8 +216,7 @@ function tubiAds_getAdsListViaRoku(episode)
   'adUnits are called adPods in RAF documentation
   currentAdUnitsList = m.roAdFramework.getAds()
 
-  ' print currentAdUnitsList
-  ' stop
+  ' ShowVarSimple(currentAdUnitsList, "Ad Unit List")
 
   'check to see if the ad server returns an ad that can be used by RAF or needs to use our ad SDK
   'traditional version of xml is in the clickThrough property/clickThrough VAST tag
@@ -256,7 +260,7 @@ function tubiAds_getAdsListViaRoku(episode)
           'get the adrise adUnit object from the xml passed through the ClickThrough tag
           'and push it to the adUnitsList in the adUnitsListContainer'
           traditionalAdXmlString = adUnit.clickThrough
-          adriseAdUnitsList = m.getAdUnitsListTraditional(episode, traditionalAdXmlString) 'in most cases this should return back an adUnitsList with one adUnit it it'
+          adriseAdUnitsList = m.getAdUnitsListTraditional(episode, playerSettings, traditionalAdXmlString) 'in most cases this should return back an adUnitsList with one adUnit it it'
           
           'add duration to m.commercialDuration
           for each adUnit in adriseAdUnitsList
@@ -356,7 +360,7 @@ function tubiAds_getAdsListViaRoku(episode)
   ' print m.midrolls
 end function
 
-function tubiAds_getAdUnitsListTraditional(episode, traditionalAdXmlString)
+function adriseAds_getAdUnitsListTraditional(episode, playerSettings, traditionalAdXmlString)
 
   'replace HTLM encoding of special characters with actual characters (ie. &lt; becomes < )
   traditionalAdXmlString = traditionalAdXmlString.Replace("&lt;", "<")
@@ -369,8 +373,8 @@ function tubiAds_getAdUnitsListTraditional(episode, traditionalAdXmlString)
 
   ' make sure that the xml pulled from the clickThrough RAF XML doc is valid and useable
   if not xml.Parse(traditionalAdXmlString) or xml.GetName() <> "feed" or islist(xml.GetBody()) = false
-    ' m.utils.log.info(m.playerRequestQueue, "no-ads-in-xml", "error with traditional ad xml - nothing returned")
-    ' print ""
+    m.utils.log.info(playerSettings.playerPort, "no-ads-in-xml", "error with traditional ad xml - nothing returned")
+    print ""
     return []
   end if
 
@@ -381,7 +385,7 @@ function tubiAds_getAdUnitsListTraditional(episode, traditionalAdXmlString)
 
   '<<<<<<<<<< USED FOR SELECTABLE ADS >>>>>>>>>>>>>>'
   if(adOptions.count() > 1)
-    chosenAdIndex = m.selectableAds.getUserChoice(adOptions, xml.metadata.duration.getText().toInt(), m.constants.deviceInfo.definition)
+    chosenAdIndex = m.selectableAds.getUserChoice(adOptions, xml.metadata.duration.getText().toInt(), playerSettings)
   end if
   '<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>'
 
@@ -423,24 +427,20 @@ function tubiAds_getAdUnitsListTraditional(episode, traditionalAdXmlString)
   return adUnitsList
 end function
 
-'Get ads from 5.0_video sdk. Only to be used if we turn off Roku Advertising Framework
-function tubiAds_getAdsList(episode)
-  url = m.populateUrl(episode)
+'The old way of getting ads. Only to be used if we turn off Roku Advertising Framework
+function adriseAds_getAdsList(episode, playerSettings)
+  url = m.populateUrl(episode, playerSettings)
 
-  adRequest = m.utils.request.createAsync(url, "getAdsList")
-  adResponse = adRequest.runSynchronous(5)
+  playerSettings.lastAdUrl = url
+  adResponse = m.utils.getTextFile(url, "getAdsList")
 
-  adUnitsList = invalid
-
-  if adResponse <> invalid
-    adUnitsList = m.getAdUnitsListTraditional(episode, adResponse)
-  end if
+  adUnitsList = m.getAdUnitsListTraditional(episode, playerSettings, adResponse)
 
   return adUnitsList
 end function
 
 'parse the ad response xml into a brightscript object that we can use
-function tubiAds_getAdUnitFromXml(adXml)
+function adriseAds_getAdUnitFromXml(adXml)
     streams = []
 
     if adXml.media.renditions <> invalid
@@ -462,11 +462,11 @@ function tubiAds_getAdUnitFromXml(adXml)
     end if
 
     viewthru = []
-    viewthru[0]  = m.utils.tracking.getTrackingTags(adXml.media.trackingevents.tracking_0)
-    viewthru[25] = m.utils.tracking.getTrackingTags(adXml.media.trackingevents.tracking_25)
-    viewthru[50] = m.utils.tracking.getTrackingTags(adXml.media.trackingevents.tracking_50)
-    viewthru[75] = m.utils.tracking.getTrackingTags(adXml.media.trackingevents.tracking_75)
-    viewthru[100]= m.utils.tracking.getTrackingTags(adXml.media.trackingevents.tracking_100)
+    viewthru[0]  = m.utils.getTrackingTags(adXml.media.trackingevents.tracking_0)
+    viewthru[25] = m.utils.getTrackingTags(adXml.media.trackingevents.tracking_25)
+    viewthru[50] = m.utils.getTrackingTags(adXml.media.trackingevents.tracking_50)
+    viewthru[75] = m.utils.getTrackingTags(adXml.media.trackingevents.tracking_75)
+    viewthru[100]= m.utils.getTrackingTags(adXml.media.trackingevents.tracking_100)
 
     adUnit = {
       streams : streams
@@ -489,9 +489,9 @@ function tubiAds_getAdUnitFromXml(adXml)
       sDPosterUrl : adXml@sdImg
       hDPosterUrl : adXml@hdImg
 
-      impTrack : m.utils.tracking.getTrackingTags(adXml.imptracking)
+      impTrack : m.utils.getTrackingTags(adXml.imptracking)
 
-      clickTrack : m.utils.tracking.getTrackingTags(adXml.clicktracking)
+      clickTrack : m.utils.getTrackingTags(adXml.clicktracking)
 
       duration : adXml.media.duration.GetText()
       pluginID : adXml.media.pluginID.GetText()
@@ -509,7 +509,7 @@ function tubiAds_getAdUnitFromXml(adXml)
 
     'Determine if there are any type of companion ads running
     if adXml.companion_ad.GetAttributes().type <> invalid
-      ' m.utils.log.info(m.playerRequestQueue, "companion-ad", "THERE IS A COMPANION AD")
+      m.utils.log.info(m.playerPort, "companion-ad", "THERE IS A COMPANION AD")
       companionAttributes = adXml.companion_ad.GetAttributes()
 
       'if the companion ad is Brightline, add Brightline information for companion ads to adUnit object.
@@ -540,13 +540,15 @@ function tubiAds_getAdUnitFromXml(adXml)
         adUnit.adIsSelectable = true
       end if
 
-    'check if there are any bookmarkable house ads
     else if adXml.companion_ad.bookmark.GetText().len() > 0
       adUnit.companionOverlay = m.getCompanionOverlay(adXml)
       if adUnit.companionOverlay.bookmarkId <> invalid
         adUnit.isHouseAd = true
       end if
     end if
+
+    'check if there are any bookmarkable house ads
+    ' if (adXml.companion_ad.cli)
 
     
     if (adXml.interactivebar <> invalid)
@@ -569,7 +571,7 @@ function tubiAds_getAdUnitFromXml(adXml)
 end function
 
 
-function tubiAds_showCommercialBreakViaRoku(canvas)
+function adriseAds_showCommercialBreakViaRoku(canvas, playerSettings)
   ' ShowVariable(m.allAdUnitsList, "ALL AD UNITS LIST", 4)
   if m.allAdUnitsList.count() > 0
     currentAdPosition = 1
@@ -584,14 +586,16 @@ function tubiAds_showCommercialBreakViaRoku(canvas)
           }
 
           isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList, screenCount)
+          m.roadframework.mediator.util.xfers = []
+
           if isCompleted = false
             print "RAF ads not completed"
-            return m.constants.player.playerResults.closed
+            return "CLOSED"
           end if
           currentAdPosition = currentAdPosition + adUnitsListContainer.adUnitsList.count()
         else if adUnitsListContainer.type <> invalid and adUnitsListContainer.type = "adrise"
-          status = m.showCommercialBreak(canvas, adUnitsListContainer.adUnitsList)
-          if status = m.constants.player.playerResults.closed
+          status = m.showCommercialBreak(canvas, adUnitsListContainer.adUnitsList, playerSettings)
+          if status = "CLOSED"
             return status
           end if
           currentAdPosition = currentAdPosition + adUnitsListContainer.adUnitsList.count()
@@ -600,69 +604,83 @@ function tubiAds_showCommercialBreakViaRoku(canvas)
     end for
   end if
   
-  return m.constants.player.playerResults.completed
+  return "COMPLETED"
 end function
 
 
 ' ----------------------------------------------
-' showCommercialBreak(canvas, videoAdsArray)
+' showCommercialBreak(canvas, videoAdsArray, playerSettings)
 '
 ' calls showVideoAd in a loop
 ' returns:
 ' COMPLETED or CLOSED
 '
 ' ----------------------------------------------
-function tubiAds_showCommercialBreak(canvas, videoAdsArray)
+function adriseAds_showCommercialBreak(canvas, videoAdsArray, playerSettings)
+  status = "COMPLETED"
 
-  status = m.constants.player.playerResults.completed
+  adDetails = {
+    totalAds : videoAdsArray.Count()
+    secondsLeft : m.commercialDuration
+    adCounter : 0
+  }
 
-  if videoAdsArray <> invalid
-    adDetails = {
-      totalAds : videoAdsArray.Count()
-      secondsLeft : m.commercialDuration
-      adCounter : 0
-    }
+  adCounter = 0
+  while adCounter < videoAdsArray.Count()
+    adDetails.adCounter = adDetails.adCounter + 1
+    
+      status = m.showVideoAd(canvas, videoAdsArray[adCounter], adDetails, playerSettings)
 
-    adCounter = 0
-    while adCounter < videoAdsArray.Count()
-      adDetails.adCounter = adDetails.adCounter + 1
-      
-        status = m.showVideoAd(canvas, videoAdsArray[adCounter], adDetails)
+    if status = "CLOSED"
+      return status
+    end if
 
-      if status = m.constants.player.playerResults.closed
-        return status
-      end if
+    adDetails.secondsLeft = adDetails.secondsLeft - videoAdsArray[adCounter].Duration.toInt()
 
-      adDetails.secondsLeft = adDetails.secondsLeft - videoAdsArray[adCounter].Duration.toInt()
+    if status = "COMPLETED"
+      adCounter = adCounter + 1
+    else
+      canvas.Close()
+      exit while
+    end if
+  end while
 
-      if status = m.constants.player.playerResults.completed
-        adCounter = adCounter + 1
-      else
-        canvas.Close()
-        exit while
-      end if
-    end while
-
-  end if
-  
   return status
 end function
 
 
 ' ----------------------------------------------
-'  m.showVideoAd(canvas, adUnit, adDetails)
+'  m.showVideoAd(canvas, adUnit, adDetails, playerSettings)
 '
 ' returns "COMPLETED" or "CLOSED"
 ' ----------------------------------------------
-function tubiAds_showVideoAd(canvas, adUnit, adDetails)
+function adriseAds_showVideoAd(canvas, adUnit, adDetails, playerSettings)
+  settings = m.utils.getSettings()
   m.currentAdUnit = adUnit
 
   ' print "AD UNIT------------------ : "
   ' print adUnit
   ' print "----------------------------"
 
+  if type(adUnit) <> "roAssociativeArray"
+    houseAdDialog.close()
+    canvas.close()
+    return "COMPLETED"
+  end if
 
 
+  'canvas used for ad pre load screen and skippable ads
+  canvas = CreateObject("roImageCanvas")
+  adPort = CreateObject("roMessagePort")
+  canvas.SetMessagePort(adPort)
+
+
+  ' set up some messaging to display while the ad buffers
+  m.utils.showAdLoadingLayer(canvas, playerSettings.displaySize, adDetails.secondsLeft, adDetails.adCounter, adDetails.totalAds, playerSettings.background, playerSettings.fontColor, playerSettings.loadingurl, playerSettings.appid)
+  canvas.Show()
+
+  
+  'handle any special (interactive) ad cases
   if m.adIsLexusInteractive(adUnit)
     la = m.lexusAd(adUnit)
     la.setUpCanvas(true)
@@ -670,21 +688,21 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
     return la.doEventLoop()
   end if
 
-  status = m.constants.player.playerResults.completed
+  status = "COMPLETED"
   
   'check if ad is Brightline companion overlay type by checking if companionOverlay property exists
   'since Brighltine throws errors on 3.1 firmware, only serve Brightline ads on greater than 3.1 firmware
-  version = m.constants.deviceInfo.firmwareVersion
+  version = m.utils.deviceInfo.firmwareVersion
   major = Int(version)
   
   if adUnit.isBrightline = true
     ip = BL_InteractivePreroll()
 
     ip.Append({
-      onVideoPlayerStreamStarted: tubiAds_brightlineOnStartWrapper
-      onVideoPlayerFullResult: tubiAds_brightlineOnCompleteWrapper
-      onVideoPlayerPlaybackPosition: tubiAds_brightlineOnPositionWrapper
-      onVideoPlayerPartialResult: tubiAds_brightlineOnExitWrapper
+      onVideoPlayerStreamStarted: adriseAds_brightlineOnStartWrapper
+      onVideoPlayerFullResult: adriseAds_brightlineOnCompleteWrapper
+      onVideoPlayerPlaybackPosition: adriseAds_brightlineOnPositionWrapper
+      onVideoPlayerPartialResult: adriseAds_brightlineOnExitWrapper
     })
     ip.initialize(adUnit)
 
@@ -703,52 +721,32 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
   
   end if
   
-  canvas = CreateObject("roImageCanvas")
-  adPort = CreateObject("roMessagePort")
-  canvas.SetMessagePort(adPort)
 
-  adRequestQueue = m.utils.requestQueue.create(adPort)
+  ' print "show video ad"
+  ' ShowVarSimple(adUnit, "ad")
 
-  if type(adUnit) <> "roAssociativeArray"
-    houseAdDialog.close()
-    canvas.close()
-    return m.constants.player.playerResults.completed
-  end if
 
   player = CreateObject("roVideoPlayer")
   player.SetMessagePort(adPort)
+  player.SetDestinationRect(canvas.GetCanvasRect())
   player.SetPositionNotificationPeriod(1)
 
   houseAdDialog = CreateObject("roMessageDialog")
   houseAdDialog.SetMessagePort(adPort)
   houseAdDialog.AddButton(0, "Ok")
 
-  ' set up some messaging to display while the pre-roll buffers
-  loadingOptions = {
-    displaySize: m.constants.deviceInfo.displaySize
-    secondsLeft: adDetails.secondsLeft
-    count: adDetails.adCounter
-    totalAds: adDetails.totalAds
-    backgroundColor: m.constants.settings.adLoadingBackgroundColor
-    fontColor: m.constants.settings.adLoadingFontColor
-    loadingImageUrl: m.constants.settings.loadingImageUrl
-    appId: m.constants.settings.appid
-  }
 
-  m.showAdLoadingLayer(canvas, loadingOptions)
-  canvas.Show()
-
-  m.utils.tracking.trackAdEvent({
+  m.utils.trackEvent({
     trackType:  "imp"
     adUnit: adUnit
-    requestQ: adRequestQueue
-  })
+    port: adPort
+    })
   player.AddContent(adUnit)
 
   player.Play()
   print "play ad start"
 
-  lastSavedPos = 0
+  lastSavedPos   = 0
   positionPercentage = 0
   statusInterval = adUnit.Duration.toInt() / 4
 
@@ -771,11 +769,7 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
     'respObj is not used anywhere here since we don't care about the ad pixel responses
     'but calling getAsyncResponse is necessary to prevent memory leaks, so don't remove!!!
     if type(msg) = "roUrlEvent"
-      handled = adRequestQueue.handleEvent(msg)
-
-      if handled <> invalid
-        respObj = handled.response
-      end if
+      respObj = m.utils.getAsyncResponse(msg, 0)
     end if
 
     if type(msg) = "roImageCanvasEvent"
@@ -794,7 +788,7 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
           'if ok is pressed during a skippable ad, after the skip time has elapsed
           if adUnit.adIsSkippable = true
             if m.skippableOverlay <> invalid and m.skippableOverlay.time >= m.skippableOverlay.skipTime
-              status = m.constants.player.playerResults.completed
+              status = "COMPLETED"
               print "skipped ad"
 
               'send tracking for skipped ad
@@ -841,68 +835,61 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
             m.selectableAds.handleAdClick(adUnit)
           end if
 
-          ' if adUnit.isHouseAd = true
-          '   authInfo = m.utils.getAuthInfo()
-          '   if authInfo.accessToken <> invalid
-          '     if adUnit.companionOverlay.bookmarkId <> invalid and adUnit.companionOverlay.bookmarkType <> invalid
-          '       cp = GetGlobalAA().app.cp
-          '       bookmarkContent = cp.getContentFromLocalPlaylists(adUnit.companionOverlay.bookmarkId, adUnit.companionOverlay.bookmarkType)
+          if adUnit.isHouseAd = true
+            authInfo = m.utils.getAuthInfo()
+            if authInfo.accessToken <> invalid
+              if adUnit.companionOverlay.bookmarkId <> invalid and adUnit.companionOverlay.bookmarkType <> invalid
+                cp = GetGlobalAA().app.cp
+                bookmarkContent = cp.getContentFromLocalPlaylists(adUnit.companionOverlay.bookmarkId, adUnit.companionOverlay.bookmarkType)
 
-          '       if bookmarkContent <> invalid and bookmarkContent.id <> invalid
-          '         bookmarkContent.isBookmark = true
+                if bookmarkContent <> invalid and bookmarkContent.id <> invalid
+                  bookmarkContent.isBookmark = true
                   
-          '         'if house ad content is already bookmarked, remove it locally so we can add it to the front of the bookmarks list again
-          '         for i=0 to cp.userPlaylists[m.constants.settings.bookmarkRegistry].episodes.count()-1
-          '           checkingBookmark = cp.userPlaylists.bookmarks.episodes[i]
-          '           if checkingBookmark.id <> invalid and checkingBookmark.id = bookmarkContent.id and checkingBookmark["type"] = bookmarkContent["type"]
-          '             cp.userPlaylists.bookmarks.episodes.delete(i)
-          '             exit for
-          '           end if
-          '         end for
+                  'if house ad content is already bookmarked, remove it locally so we can add it to the front of the bookmarks list again
+                  for i=0 to cp.userPlaylists[settings.bookmarkRegistry].episodes.count()-1
+                    checkingBookmark = cp.userPlaylists.bookmarks.episodes[i]
+                    if checkingBookmark.id <> invalid and checkingBookmark.id = bookmarkContent.id and checkingBookmark["type"] = bookmarkContent["type"]
+                      cp.userPlaylists.bookmarks.episodes.delete(i)
+                      exit for
+                    end if
+                  end for
 
 
-          '         serverType = "movie"
-          '         userPlaylistStore = "userPlaylistVideos"
-          '         if adUnit.companionOverlay.bookmarkType = "series"
-          '           serverType = "series"
-          '           userPlaylistStore = "userPlaylistSeries"
-          '         end if
+                  serverType = "movie"
+                  userPlaylistStore = "userPlaylistVideos"
+                  if adUnit.companionOverlay.bookmarkType = "series"
+                    serverType = "series"
+                    userPlaylistStore = "userPlaylistSeries"
+                  end if
                   
-          '         'add the bookmark to the local store and populate the bookmarks playlist
-          '         cp[userPlaylistStore][bookmarkContent.id] = bookmarkContent
-          '         cp.userPlaylists.bookmarks.episodes.unshift(cp[userPlaylistStore][bookmarkContent.id])
+                  'add the bookmark to the local store and populate the bookmarks playlist
+                  cp[userPlaylistStore][bookmarkContent.id] = bookmarkContent
+                  cp.userPlaylists.bookmarks.episodes.unshift(cp[userPlaylistStore][bookmarkContent.id])
 
-          '         'add the bookmark to the server
-          '         bookmarkReqId = m.utils.updateBookmarks(bookmarkContent.id, "add", serverType, GetGlobalAA().app.detailScreen.detailsPort)
-          '         GetGlobalAA().app.detailScreen.addBookmarkReqIds[bookmarkReqId.toStr()] = true
+                  'add the bookmark to the server
+                  bookmarkReqId = m.utils.updateBookmarks(bookmarkContent.id, "add", serverType, GetGlobalAA().app.detailScreen.detailsPort)
+                  GetGlobalAA().app.detailScreen.addBookmarkReqIds[bookmarkReqId.toStr()] = true
 
-          '         m.utils.tracking.trackUserEvent({
-          '           trackType: "addBookmark"
-          '           value: bookmarkContent.id
-          '           ctx: "/house/" + bookmarkContent["type"] + "/" + bookmarkContent.id + "/ad/" + adUnit.id
-          '           requestQ: m.playerRequestQueue
-          '         })
-
-          '         houseAdDialog.updateText(bookmarkContent.title + " has been added to your queue.")
-          '         ' m.utils.log.info(adRequestQueue, "house-ad-bookmark-success", "Bookmark added from house ad for content id " + bookmarkContent.id)
+                  houseAdDialog.updateText(bookmarkContent.title + " has been added to your queue.")
+                  m.utils.log.info(adPort, "house-ad-bookmark-success", "Bookmark added from house ad for content id " + bookmarkContent.id)
                   
-          '       else
-          '         houseAdDialog.updateText("Sorry, we could not update your bookmark")
-          '         ' m.utils.log.warn(adRequestQueue, "house-ad-bookmark-fail", "Could not ad bookmark from house ad due to not finding content")
-          '       end if
+                else
+                  houseAdDialog.updateText("Sorry, we could not update your bookmark")
+                  m.utils.log.warn(adPort, "house-ad-bookmark-fail", "Could not ad bookmark from house ad due to not finding content")
+                end if
               
-          '     else
-          '       houseAdDialog.updateText("Sorry, we could not update your bookmark")
-          '       ' m.utils.log.warn(adRequestQueue, "house-ad-bookmark-fail", "Could not ad bookmark from house ad due to incomplete data")
-          '     end if
+              else
+                houseAdDialog.updateText("Sorry, we could not update your bookmark")
+                m.utils.log.warn(adPort, "house-ad-bookmark-fail", "Could not ad bookmark from house ad due to incomplete data")
+              end if
             
-          '   else
-          '     houseAdDialog.updateText("You must be logged in to add content to your queue.")
-          '     ' m.utils.log.info(adRequestQueue, "house-ad-bookmark-fail", "Bookmark not added because user not logged in")
+            else
+              houseAdDialog.updateText("You must be logged in to add content to your queue.")
+              m.utils.log.info(adPort, "house-ad-bookmark-fail", "Bookmark not added because user not logged in")
 
-          '   end if
-          '   houseAdDialog.show()
-          ' end if
+            end if
+            houseAdDialog.show()
+          end if
 
         else if (i = 4 or i = 5) ' left or right
           if adUnit.adIsSelectable
@@ -927,7 +914,7 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
           player.Stop()
           houseAdDialog.close()
           canvas.close()
-          status = m.constants.player.playerResults.closed
+          status = "CLOSED"
           return status
         else if (i = 3)
           print "Pressed down"
@@ -948,11 +935,11 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
       else if msg.isFullResult()
         if (m.videoAdErrorCount = 0)
           if (positionPercentage >= 75)
-            m.utils.tracking.trackAdEvent({
+            m.utils.trackEvent({
               trackType: "viewthru"
               adUnit: adUnit
               adPercentage: 100
-              requestQ: m.playerRequestQueue
+              port: m.playerPort
             })
             houseAdDialog.close()
             canvas.close()
@@ -971,11 +958,11 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
             m.skippableOverlay.setup()
           end if
 
-          m.utils.tracking.trackAdEvent({
+          m.utils.trackEvent({
             trackType: "viewthru"
             adUnit: adUnit
             adPercentage: positionPercentage
-            requestQ: m.playerRequestQueue
+            port: m.playerPort
             })
         else if nowpos > 0
           if m.skippableOverlay <> invalid
@@ -984,18 +971,18 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
 
           if adUnit.totalOptions > 0 and adUnit.adBar[currOption].img <> ""
             filename = adUnit.adBar[currOption].img + "?" + RND(10000000).ToStr()
-            canvas.SetLayer(10, {Url: filename, TargetRect: {x: 0 , y: 30, w: m.constants.deviceInfo.displaySize.w, h: 80}, CompositionMode: "Source_over" })
+            canvas.SetLayer(10, {Url: filename, TargetRect: {x: 0 , y: 30, w: playerSettings.displaySize.w, h: 80}, CompositionMode: "Source_over" })
             canvas.Show()
           end if
           if abs(nowpos - lastSavedPos) >= statusInterval and positionPercentage < 75
             lastSavedPos = nowpos
             positionPercentage = positionPercentage + 25
             if (positionPercentage < 100)
-              m.utils.tracking.trackAdEvent({
+              m.utils.trackEvent({
                 adUnit: adUnit
                 trackType: "viewthru"
                 adPercentage: positionPercentage
-                requestQ: adRequestQueue
+                port: adPort
               })
             end if
           end if
@@ -1004,7 +991,7 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
       '---------------------------------
       else if msg.isPartialResult()
         print "isPartialResult"
-        status = m.constants.player.playerResults.completed
+        status = "COMPLETED"
         exit while
 
       '---------------------------------
@@ -1014,6 +1001,7 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
           m.videoAdErrorCount = m.videoAdErrorCount + 1
           player = CreateObject("roVideoPlayer")
           player.SetMessagePort(adPort)
+          player.SetDestinationRect(canvas.GetCanvasRect())
           player.SetPositionNotificationPeriod(1)
           player.AddContent(adUnit)
           player.Play()
@@ -1025,7 +1013,8 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
             errorVal = adUnit.companionOverlay.url
           end if
 
-          TubiLog("tubiAds_showVideoAd, ad failure")
+          errorMsg = "Video(AD) request failure on ad id: " + adUnit.id + "error index: " + msg.GetIndex() + " data: " + msg.GetData() +  " message: " + msg.GetMessage() +  " error type: " +  msg.GetType() + " ad url: " + errorVal
+          m.utils.log.error(m.playerPort, "ad-video-failure", errorMsg)
 
           m.videoAdErrorCount = 0
           exit while
@@ -1055,7 +1044,7 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
 end function
 
 ' ----------------------------------------------
-' m.checkForCommercialBreak(nowpos, episode)
+' m.checkForCommercialBreak(nowpos, episode, playerSettings)
 '
 ' returns break time if it's time to break for commercials, otherwise -1
 ' (break time should be close to nowpos)
@@ -1067,17 +1056,17 @@ end function
 ' modifies
 '  m.midrolls
 ' ----------------------------------------------
-function tubiAds_checkForCommercialBreak(nowpos, episode)
+function adriseAds_checkForCommercialBreak(nowpos, episode, playerSettings)
   if m.midrolls.count() > 0
     'iterate over each cue point
 		for i=0 to m.midrolls.count()-1 step +1
 			breakpoint = m.midrolls[i]
 			if (breakpoint <> invalid)
-        'if the player is within 4 to 7 seconds before the cue point being iterated over
+        'if the player is 5 seconds before the cue point being iterated over
         'we will only make the ad call once (logic is in m.cacheAdsList)
-				if(nowpos = breakpoint - 5)
+          if(nowPos = breakpoint-5)
           'make a call to the server to get ads, and save ads in "cache" or memory
-					m.cacheAdsList(episode, breakpoint)	
+					m.cacheAdsList(episode, breakpoint, playerSettings)	
 				end if
 
         'if the player is at the cue point being iterated and we haven't previously played this cuepoint
@@ -1096,18 +1085,16 @@ end function
 
 
 'gets the cuepoints for the passed in episode and attach them to ads object
-function tubiAds_getCuepoints(episode)
+function adriseAds_getCuepoints(episode)
+  settings = m.utils.getSettings()
   'set the url to get the cuepoints
-  cuepointUrl = m.constants.urls.cuepointsBaseUrl + "?format=json&pubid=" + episode.pubId + "&platform=roku&cid=" + episode.id
+  cuepointUrl = settings.cuepointsUrlBase + "?format=json&pubid=" + episode.pubId + "&platform=roku&cid=" + episode.id
   
   'get the cuepoints synchronously
-  cuepointsReq = m.utils.request.createAsync(cuepointUrl, "getCuePoints")
-  cuepointsJson = cuepointsReq.runSynchronous(5)
+  cuepointsJson = m.utils.getTextFile(cuepointUrl, "getCuePoints")
 
   'parse the returned JSON to a Brightscript object - should return an array
-  if cuepointsJson <> invalid
-    cuepoints = ParseJson(cuepointsJson)
-  end if
+  cuepoints = ParseJson(cuepointsJson)
 
   if type(cuepoints) = "roArray" and cuepoints.count() > 0
     m.midrolls = cuepoints
@@ -1123,19 +1110,17 @@ end function
 '(usually due to the user pressing play or the user fast forwarding or rewinding). This function
 'will make a call to the ads server and if it gets ads, store them in an appropriate place
 'returns true if there are ads and false if there are no ads (aka the player can resume playing immediately without closing the player)
-'SIDE EFFECT: updates the resumePlayAdsList property on the player object that is passed in
-'(expect that the player object will be the main video player for the channel)
-function tubiAds_getResumingPlayAds(episode, player)
+function adriseAds_getResumingPlayAds(episode, playerSettings)
   shouldBreak = false
   if m.isRokuAdFrameworkOn = true
-    m.getAdsListViaRoku(episode)
+    m.getAdsListViaRoku(episode, playerSettings)
     if m.allAdUnitsList.count() > 0
       shouldBreak = true
     end if
   else
-    adsList = m.getAdsList(episode)
-    if adsList <> invalid and adsList.count() > 0
-      player.resumePlayAdsList = adsList
+    adsList = m.getAdsList(episode, playerSettings)
+    if adsList.count() > 0
+      playerSettings.resumePlayAdsList = adsList
       shouldBreak = true
     end if
   end if
@@ -1146,7 +1131,7 @@ end function
 
 'get any companion overlay info that might be contained within a companion ad tag in the ad xml response
 '@adXml: roXMLElement, should be the roXMLElement of the ad response (5.0_video has a companion_ad tag)
-function tubiAds_getCompanionOverlay (adXml)
+function adriseAds_getCompanionOverlay (adXml)
   companionOverlay = {}
 
   if type(adXml) = "roXMLElement"
@@ -1183,136 +1168,40 @@ function tubiAds_getCompanionOverlay (adXml)
 end function
 
 
-'builds and displays the ad loading screen
-'@canvas: roImageCanvas
-'@options: assocArray
-'options should have the following keys/values
-'   displaySize: assocArray as pulled from deviceInfo.displaySize
-'     {
-'       h: 1280 (int)
-'       w: 720 (int)
-'     }
-'   secondsLeft: int, the number of seconds remaining in the ad break
-'   count: int, the nth ad in the break
-'   totalAds: int, the number of ads in the break
-'   backgroundColor: string, hex color (ie. "#222223")
-'   fontColor: string, hex color (ie. "#EBEBEB")
-'   loadingImageUrl: string, url to the background image
-'   appid: string, constants.settings.appShortName (ie. "tubitv")
-function tubiAds_showAdLoadingLayer (canvas, options)
-  displaySize = canvas.getCanvasRect()
-  secondsLeft = options.secondsLeft
-  count = options.count
-  totalAds = options.totalAds
-  backgroundColor = options.backgroundColor
-  fontColor = options.fontColor
-  loadingImageUrl = options.loadingImageUrl
-
-  appId = options.appId
-
-  background = {
-    Color: backgroundColor
-  }
-
-  loadingImage = {
-    Url: loadingImageUrl
-    TargetRect: {
-      x: Int( displaySize.w / 2 ) - Int( 336 / 2 ),
-      y: Int( displaySize.h / 2 ) - Int( 210 / 2 ),
-      w: 336,
-      h: 210
-    }
-  }
-
-  sec = secondsLeft
-  min = int(sec/60)
-  sec = sec - (min*60)
-  if type(sec) = "Float"
-    sec = int(sec)
-  end if
-  
-  if (sec < 10)
-      str_sec = "0" + sec.ToStr()
-  else
-      str_sec = sec.ToStr()
-  end if
-
-
-  loadingText = {
-    Text: "Your program will begin in 0" + min.ToStr() + ":" + str_sec,
-    TextAttrs: {
-        Font: "Medium"
-        VAlign: "Bottom"
-        Color: fontColor
-    },
-    TargetRect: {
-        x: loadingImage.TargetRect.x - 125,
-        y: loadingImage.TargetRect.y + 250,
-        w: loadingImage.TargetRect.w + 250,
-        h: 30
-    }
-  }
-  adsByAdriseText = {
-    Text: "Ads by adRise",
-    TextAttrs: {
-        Font: "small",
-        VAlign: "Bottom",
-        Color: fontColor,
-    },
-    TargetRect: {
-        x: loadingImage.TargetRect.x - 125,
-        y: loadingImage.TargetRect.y + 290,
-        w: loadingImage.TargetRect.w + 250,
-        h: 30
-    }
-  }
-
-  if appid = "tubitv"
-    adsByAdriseText.Text = ""
-  end if
-
-  if totalAds > 1
-    loadingText.Text = "Ad " + count.ToStr() + " of " + totalAds.ToStr() + ": " + loadingText.Text
-  end if
-  canvas.SetLayer(2, [background, loadingImage, loadingText, adsByAdriseText])
-end function
-
-
-
 'creates the companion overlay object for Brightline ads
-function tubiAds_brightlineOnStartWrapper (roVideoPlayerEvent)
-  tubiAds_brightlineOnStart(roVideoPlayerEvent)
+function adriseAds_brightlineOnStartWrapper (roVideoPlayerEvent)
+  adriseAds_brightlineOnStart(roVideoPlayerEvent)
 end function
 
-function tubiAds_brightlineOnStart(roVideoPlayerEvent)
+function adriseAds_brightlineOnStart(roVideoPlayerEvent)
   print "BRIGHTLINE AD START EVENT"
-  m.app.utils.tracking.trackAdEvent({
+  m.app.utils.trackEvent({
     trackType:  "imp"
     adUnit: m.app.player.ads.currentAdUnit
-    requestQ: m.global.player.ads.playerRequestQueue
+    port: m.app.player.ads.playerPort
   })
 end function
 
-function tubiAds_brightlineOnCompleteWrapper (roVideoPlayerEvent)
-  tubiAds_brightlineOnComplete(roVideoPlayerEvent)
+function adriseAds_brightlineOnCompleteWrapper (roVideoPlayerEvent)
+  adriseAds_brightlineOnComplete(roVideoPlayerEvent)
 end function  
 
-function tubiAds_brightlineOnComplete (roVideoPlayerEvent)
+function adriseAds_brightlineOnComplete (roVideoPlayerEvent)
   print "BRIGHTLINE AD COMPLETE EVENT"
   m.app.player.ads.currentAdUnit.status = "COMPLETED"
-  m.app.utils.tracking.trackAdEvent({
+  m.app.utils.trackEvent({
     trackType:  "viewthru"
     adUnit: m.app.player.ads.currentAdUnit
     adPercentage: 100
-    requestQ: m.global.player.ads.playerRequestQueue
+    port: m.app.player.ads.playerPort
   })
 end function  
 
-function tubiAds_brightlineOnPositionWrapper (roVideoPlayerEvent)
-  tubiAds_brightlineOnPosition(roVideoPlayerEvent)
+function adriseAds_brightlineOnPositionWrapper (roVideoPlayerEvent)
+  adriseAds_brightlineOnPosition(roVideoPlayerEvent)
 end function
 
-function tubiAds_brightlineOnPosition (roVideoPlayerEvent)
+function adriseAds_brightlineOnPosition (roVideoPlayerEvent)
   adUnit = m.app.player.ads.currentAdUnit
   statusInterval = adUnit.Duration.toInt() / 4
   lastSavedPos = adUnit.positionPoints.lastSavedPos
@@ -1320,32 +1209,32 @@ function tubiAds_brightlineOnPosition (roVideoPlayerEvent)
   nowPos = roVideoPlayerEvent.GetIndex()
 
   if nowPos = 0
-    m.app.utils.tracking.trackAdEvent({
+    m.app.utils.trackEvent({
       adUnit: adUnit
       trackType: "viewthru"
       adPercentage: positionPercentage
-      requestQ: m.global.player.ads.playerRequestQueue
+      port: m.app.player.ads.playerPort
     })
   else if abs(nowPos - lastSavedPos) > statusInterval and positionPercentage < 75
     m.app.player.ads.currentAdUnit.positionPoints.lastSavedPos = nowpos
     m.app.player.ads.currentAdUnit.positionPoints.positionPercentage = positionPercentage + 25
     positionPercentage = positionPercentage + 25
     if (positionPercentage < 100)
-      m.app.utils.tracking.trackAdEvent({
+      m.app.utils.trackEvent({
           adUnit: adUnit
           trackType: "viewthru"
           adPercentage: positionPercentage
-          requestQ: m.global.player.ads.playerRequestQueue
+          port: m.app.player.ads.playerPort
         })
     end if
   end if
 end function
 
-function tubiAds_brightlineOnExitWrapper (isExited)
-  tubiAds_brightlineOnExit(isExited)
+function adriseAds_brightlineOnExitWrapper (isExited)
+  adriseAds_brightlineOnExit(isExited)
 end function  
 
-function tubiAds_brightlineOnExit (isExited)
+function adriseAds_brightlineOnExit (isExited)
   print "BRIGHTLINE AD EXITED EVENT"
   if (isExited = true)
     m.app.player.ads.currentAdUnit.status = "COMPLETED"
@@ -1356,17 +1245,17 @@ end function
 
 
 'sets up the functionality for Innovid iroll ads
-function tubiAds_showInnovidAd(adUnit as Object) as String
+function adriseAds_showInnovidAd(adUnit as Object) as String
   tag_      = adUnit.companionOverlay.url
-  tracking_ = tubiAds_innovidAd_fetchTracking(adUnit)
+  tracking_ = adRiseAds_innovidAd_fetchTracking(adUnit)
   handler_  = {
-    status : m.constants.player.playerResults.completed,
+    status : "COMPLETED",
     handleRemoteKeyPressed : function(msg_, iroll_) as Object
       if msg_.GetIndex() <> 0 then
         return { doExit : false }
       end if
 
-      m.status = m.constants.player.playerResults.closed
+      m.status = "CLOSED"
 
       return { doExit : true }
     end function
@@ -1382,7 +1271,7 @@ function tubiAds_showInnovidAd(adUnit as Object) as String
 end function
 
 'parses the adUnit data structure for tracking pixels into a format that iroll functionality requires
-function tubiAds_innovidAd_fetchTracking(adUnit) as Object
+function adRiseAds_innovidAd_fetchTracking(adUnit) as Object
   tracking_ = []
 
   ' playback position tracking

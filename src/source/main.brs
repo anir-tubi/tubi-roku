@@ -1,11 +1,94 @@
 'Add Library for Roku Ad Framework
 Library "Roku_Ads.brs"
 
+
+'The Main function serves to run any remote config and experiment API calls and then choose the appropriate UI
+Function Main(startupArgs as Dynamic)
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+  tracking = TubiTracking(constants, request, auth)  
+
+  isNewUI = false
+
+  'run config first to see if we get new or old UI
+  externalConfig = TubiExternalConfig(request, constants)
+  externalConfig.init() 'sets external config values on constants
+
+  if constants.externalConfig.info <> invalid and constants.externalConfig.info.newUI <> invalid
+    isNewUI = constants.externalConfig.info.newUI
+  else
+    isNewUI = not constants.deviceInfo.lowMemory
+  end if
+  
+
+  if isNewUI = true
+    MainNewUI(startupArgs, constants)
+  else
+    MainOldUI(startupArgs)
+  end if
+
+End Function
+
+
+
+
+
+
+Sub MainOldUI(params as Dynamic)
+  placeholderCanvas = CreateObject( "roImageCanvas" )
+  placeholderCanvas.SetMessagePort(CreateObject("roMessagePort"))
+  placeholderCanvas.Show()
+
+  app = AdriseApp(params)
+  m.app = app
+
+  ' This will only run for the test mode
+  if app.settings.mode = "test"
+    print "Starting all the tests..."
+    RunTest()
+    return
+  end if
+
+  ' apply hotpatch to main brightscript thread
+  ' this also verifies startup network connectivity
+  if Hotpatch(app.settings.hotPatchUrlOldUI) <> 0 then
+    showErrorDialog()
+    return ' exit the app on error.  scene graph exits anyway once
+              ' we destroy a Scene and try to create it again.
+  end if
+
+  ' Set up the scene graph that will create a persistent task thread for Facebook recognition
+  if m.app.facebookDetection = true
+    constants = getConstants()
+    screen = CreateObject("roSGScreen")
+    screen.CreateScene("FBScene")
+
+    sgGlobal = screen.getGlobalNode()
+    sgGlobal.addField("constants", "assocarray", false)
+    sgGlobal.constants = {
+      fban4tvtoken: constants.fban4tvtoken
+    }
+    screen.show()
+  end if
+
+  app.runApp()
+  placeholderCanvas.close()
+
+end Sub
+
+
+
+
+
+
+
+
 ''''''''''''''''''''
 ' Simple main to launch the unit tests if mode is "test".
 ' Otherwise, exit immediately.
 '
-Function Main(args As Dynamic)
+Function MainNewUI(args As Dynamic, constants As Object)
 
   settings = getSettings()
 
@@ -24,17 +107,16 @@ Function Main(args As Dynamic)
   m.global = {} ' important syntactically to keep the settings at m.global.settings, whether
                 ' used from the main Brightscript thread or the SceneGraph thread
   
-  constants = getConstants()
   request = TubiRequest()
   requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
   tracking = TubiTracking(constants, request, auth)
   bookmarks = TubiBookmarks(request, auth, constants)
-  experiments = TubiExperiments(request, constants)
-  experiments.init()
-  externalConfig = TubiExternalConfig(request, constants)
-  externalConfig.init()
 
+  'set up all experiments
+  experiments = TubiExperiments(request, constants)
+  experiments.init() 'sets experiment values on constants
+  
   m.global.utils = {
     constants: constants
     request: request
@@ -47,6 +129,8 @@ Function Main(args As Dynamic)
   }
 
   m.global.player = TubiPlayer(m.global.utils)
+
+
 
 
   ' Load scene graph
@@ -114,6 +198,7 @@ Function Main(args As Dynamic)
 end Function
 
 
+
 ''''''''''''''
 ' Hotpatch
 '
@@ -144,11 +229,35 @@ Function Hotpatch(hotPatchUrl) As Integer
             print "evalError "; errCode
           end if
         end if
+
       else if msg.GetResponseCode() > 0 'server responded with 403 error or similar - couldn't find the file but server up
         print "No file at hotpatch location"
+      
       else
         ' some network failure
         print "Network error downloading hotpatch file"
+        print msg.getFailureReason()
+
+        'make sure there are constants on the global utils if we are using the old UI,
+        'as they are needed for the error message
+        if m.global <> invalid
+          if m.global.utils <> invalid
+            if m.global.utils.constants = invalid
+              m.global.utils.constants = getConstants()
+            end if
+          else
+            m.global.utils = {
+              constants: getConstants()
+            }
+          end if
+        else
+          m.global = {
+            utils: {
+              constants: getConstants()
+            }
+          }
+        end if
+
         return -1
       end if
     else if msg = invalid

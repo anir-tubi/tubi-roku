@@ -1,4 +1,4 @@
-function AdriseSelectableAds(utils)
+function AdriseSelectableAds (utils)
   return {
     getUserChoice: adriseSelectableAds_getUserChoice
 	  showUserSelectedVideoAd: adriseSelectableAds_showUserSelectedVideoAd
@@ -75,7 +75,7 @@ end function
 ' getUserChoice(adOptions, duration)
 ' returns index of ad selected, or -1
 ' ******************************************************
-function adriseSelectableAds_getUserChoice(adOptions, duration, definition)
+function adriseSelectableAds_getUserChoice(adOptions, duration, playerSettings)
   ' Create canvas to display images. Based on user selection
   ' return the id of the ad_option
   port = CreateObject("roMessagePort")
@@ -89,7 +89,7 @@ function adriseSelectableAds_getUserChoice(adOptions, duration, definition)
   for i=0 to numberOfOptions-1 step +1
     hdOrSdImages = adOptions[i].ad_images.image
     which = 0
-    if(hdOrSdImages[0]@type = definition)
+    if(hdOrSdImages[0]@type = playerSettings.definition)
       which = 1
     end if
     images[i] = hdOrSdImages[which].getText().trim()

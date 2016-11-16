@@ -3,18 +3,40 @@ settings:
   contentType: "hls"
   shortAppName: "tubitv"
   platformName: "roku"
-  GridStyle: "Flat-Movie"
-  SetPosterStyle: "rounded-rect-16x9-generic"
   adLoadingBackgroundColor: "#222223"
   adLoadingFontColor: "#EBEBEB"
   loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
-  registerWithTubi: true
   hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/14.brs"
   appName: "Tubi TV"
   isLiveTVOn: true
   isRokuAdFrameworkOn: false
   migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"
   isFBApplicationDetectionOn: false
+
+  #the settings below are exclusively used for the old UI version of the app that runs on low powered devices
+  pubid: "00000000_DEFAULT_PUB_ID_00000000"
+  zoneid: "tubitv_roku"
+  imageSize: "214x306"
+  GridStyle: "Flat-Movie"
+  SetPosterStyle: "rounded-rect-16x9-generic"
+  adrise_bg: "#222223"
+  adrise_fontcolor: "#EBEBEB"
+  show_details_screen: true
+  subscription: false
+  vezoSubscription: false
+  newThumbnailStrategy: false
+  allowVezoSubscription: false
+  registerWithTubi: true
+  vezoServer: "http://vezo.tv"
+  allowRentals: false
+  show_language: false
+  show_country: false
+  proxyUrl: "none"
+  proxyFolder: "none"
+  hotPatchUrlOldUI: "http://cdn.adrise.com/hotpatches/roku/13.brs"
+  # hotPatchUrlOldUI: "http://192.168.1.180:8080/rokuHotpatches/13.brs"
+  adrise_loadingurl: "pkg:/images/FREETVMOVIES_Tubi_icon_no-background_336x201"
+
 
 manifest:
   title: "Tubi TV"
@@ -74,17 +96,17 @@ theme:
   OverhangOffsetHD_Y: "0"
   OverhangPrimaryLogoOffsetHD_X: "0"
   OverhangPrimaryLogoOffsetHD_Y: "0"
-  GridScreenLogoHD: "pkg:/images/TubiTV_GridscreenLogo_HD_1280x65.jpg"
-  GridScreenLogoSD: "pkg:/images/TubiTV_GridscreenLogo_SD_720x45.jpg"
-  TallBannerHD: "pkg:/images/TubiTV_TallBanner_HD_1280x135.jpg"
-  TallBannerSD: "pkg:/images/TubiTV_TallBanner_SD_720x125.jpg"
-  GridScreenFocusBorderHD: "pkg:/images/frame-glow-hd3.png"
-  GridScreenFocusBorderSD: "pkg:/images/frame-glow-sd3.png"
-  GridScreenDescriptionImageHD: "pkg:/images/bubble-hd.png"
-  GridScreenDescriptionImageSD: "pkg:/images/bubble-sd.png"
+  GridScreenLogoHD: "pkg:/images/oldUI/TubiTV_GridscreenLogo_HD_1280x65.jpg"
+  GridScreenLogoSD: "pkg:/images/oldUI/TubiTV_GridscreenLogo_SD_720x45.jpg"
+  TallBannerHD: "pkg:/images/oldUI/TubiTV_TallBanner_HD_1280x135.jpg"
+  TallBannerSD: "pkg:/images/oldUI/TubiTV_TallBanner_SD_720x125.jpg"
+  GridScreenFocusBorderHD: "pkg:/images/oldUI/frame-glow-hd3.png"
+  GridScreenFocusBorderSD: "pkg:/images/oldUI/frame-glow-sd3.png"
+  GridScreenDescriptionImageHD: "pkg:/images/oldUI/bubble-hd.png"
+  GridScreenDescriptionImageSD: "pkg:/images/oldUI/bubble-sd.png"
   GridScreenOverhangHeightHD: "65"
   GridScreenOverhangHeightSD: "45"
-  OverhangLogoHD: "pkg:/images/TubiTV_TallBanner_HD_1280x135.jpg"
-  OverhangLogoSD: "pkg:/images/TubiTV_TallBanner_SD_720x125.jpg"
+  OverhangLogoHD: "pkg:/images/oldUI/TubiTV_TallBanner_HD_1280x135.jpg"
+  OverhangLogoSD: "pkg:/images/oldUI/TubiTV_TallBanner_SD_720x125.jpg"
 
 

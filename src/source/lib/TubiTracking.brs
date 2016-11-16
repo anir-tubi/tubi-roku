@@ -177,7 +177,10 @@ function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=
       ctx: "search_dialog"
     }
     experiment: {
+      value: value
       key: "exposure"
+      ctx: ctx
+      extraCtx: extraCtx
     }
   }
 

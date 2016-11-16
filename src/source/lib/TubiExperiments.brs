@@ -15,7 +15,9 @@ Function TubiExperiments(request as Object, constants as Object) as Object
     '   }
     ' }
     defaultValues: {
-
+      RokuNamespace: {
+        single_row: true
+      }
     }
 
     'public methods
@@ -203,6 +205,7 @@ Function tubiExperiments_getExperimentValue(namespaceName as string, parameterNa
   if experimentValue <> invalid
     if experimentDef <> invalid and experimentDef.auto_log_exposure = true
 
+      'trackInfo can be sent into TubiTracking().getTrackData() in order to make a tracking API call
       trackInfo = {
         trackType: "experiment"
         value: experimentName

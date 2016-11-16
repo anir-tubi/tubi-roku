@@ -1,38 +1,86 @@
 ' --------------------------------------------------------
-'  TubiPlayer
-function TubiPlayer(utils)
+'  AdrisePlayer
+'  appId: string, required.
+'  pubId: string, required.  Will be overwritten by pubId in video, if
+'     it exists
+'  background: string, optional, color of background, defaults to empty string
+'  fontColor: string, optional, color of text, defaults to empty string
+'  loadingUrl: string, optional, filename of loading image, defaults to empty string
+'  cp: contentProvider object
+'THIS IS CURRENTLY NOT USED... AdrisePlayerInternal is called directly from AdriseApp
+function AdrisePlayer (appId as String, pubId as String, background = "" as String, fontColor = "" as String, loadingUrl = "" as String, loadingBackground = "")
+    return AdrisePlayerInternal ({
+      appId: appId
+      pubId : pubId
+      background : background
+      fontColor : fontColor
+      loadingUrl : loadingUrl
+      loadingBackground: loadingBackground
+      subscription: false
+      contentType: "hls"
+      pingFrequency: 10
+      utils: AdriseUtils(appId)
+    })
+end function
+
+function AdrisePlayerInternal(config)
+  displaySize = config.utils.deviceInfo.displaySize
+  if config.utils.deviceInfo.displayType = "HDTV"
+    definition = "hd"
+  else
+    definition = "sd"
+  end if
+
+  version = config.utils.deviceInfo.firmwareVersion
+  major = Int(version)
+  if major = 3
+    contentType = "mp4"
+  else
+    contentType = "hls"
+  end if
 
   'a single message port used whenever a video or ad is playing
   'in order to make sure we delete async url objects, we need to make sure we always use this port
   playerPort = CreateObject("roMessagePort")
-  playerRequestQueue = utils.requestQueue.create(playerPort)
 
   return {
-    utils: utils
-    constants: utils.constants
-    pingFrequency: utils.constants.player.pingFrequency
+    ' failCount : 0
+    appId: config.appId
+    pubId : config.pubId
+    background : config.background
+    fontColor : config.fontColor
+    loadingUrl : config.loadingUrl
+    loadingBackground: config.loadingBackground
+    subscription: config.subscription
+    contentType: contentType
+    displaySize : displaySize
+    definition : definition
+    pingFrequency: config.pingFrequency
     playerPort: playerPort
-    playerRequestQueue: playerRequestQueue
     resumePlayAdsList: invalid
 
     ' ads module
-    ads : TubiAds(utils, playerRequestQueue)
+    ads : AdriseAds(config.utils, playerPort)
+
+    utils: config.utils
 
     'stores the request ids everytime we make a call to add a new position for previously viewed/history content
     previouslyViewedReqIds: {}
 
     ' public methods
-    playVideo: tubiPlayer_playVideo
+    playVideo: AdrisePlayer_playVideo
+    getPubId: function()
+        return m.pubId
+      end function
 
     ' private methods
-    showSpanOfContentVideoNew: tubiPlayer_showSpanOfContentVideoNew
-    paintToCanvas: tubiPlayer_paintToCanvas
-    getTransportRects: tubiPlayer_getTransportRects
-    getPauseRect: tubiPlayer_getPauseRect
-    getTransportTime: tubiPlayer_getTransportTime
-    handleVideoFailure: tubiPlayer_handleVideoFailure
-    savePreviouslyViewedUpdate: tubiPlayer_savePreviouslyViewedUpdate
-    showCaptionsDialog: tubiPlayer_showCaptionsDialog
+    showSpanOfContentVideoNew: AdrisePlayer_showSpanOfContentVideoNew
+    paintToCanvas: AdrisePlayer_paintToCanvas
+    getTransportRects: AdrisePlayer_getTransportRects
+    getPauseRect: AdrisePlayer_getPauseRect
+    getTransportTime: AdrisePlayer_getTransportTime
+    handleVideoFailure: AdrisePlayer_handleVideoFailure
+    savePreviouslyViewedUpdate: AdrisePlayer_savePreviouslyViewedUpdate
   }
 end function
 
@@ -48,15 +96,15 @@ end function
 '      ahead play the next video automatically)
 '    CLOSED means it was stopped explicitly
 ' --------------------------------------------------------
-function tubiPlayer_playVideo(episode as Object)
+function AdrisePlayer_playVideo(episode as Object)
 
   'updates the episode with a new url right before a video is about to play
   'this should prevent a user from running up against an expired DRM token in most cases
-  ' episode = GetGlobalAA().app.cp.getUpdatedUrlForEpisode(episode)
+  episode = GetGlobalAA().app.cp.getUpdatedUrlForEpisode(episode)
 
   episode.SwitchingStrategy="full-adaptation"
 
-  if m.constants.deviceInfo.definition = "sd"
+  if m.definition = "sd"
       episode.isHD = false
       episode.hdBranded = false
       if episode.streams <> invalid
@@ -67,12 +115,13 @@ function tubiPlayer_playVideo(episode as Object)
   end if
 
   m.ads.reset()
+  episode.nowPos = 0
   m.lastPingTime = 0
   m.shouldResetPing = false
 
 
   'get the state of the app - ie. where is the player coming from? linear TV? bookmarks? previously viewed?
-  ' m.linearTvOn = GetGlobalAA().app.linearTV.linearTvOn
+  m.linearTvOn = GetGlobalAA().app.linearTV.linearTvOn
 
   'send tracking event that the video started playing
   vidOrSeries = "video"
@@ -80,11 +129,11 @@ function tubiPlayer_playVideo(episode as Object)
     vidOrSeries = "series"
   end if
 
-  if episode.nowPos <> invalid
-    episode.playStart = episode.nowPos
+  if episode.playStart <> invalid
+    episode.nowPos = episode.playStart
   end if
 
-  m.utils.tracking.trackUserEvent({
+  m.utils.trackEvent({
     trackType: "videoPlay"
     value: episode.id
     ctx: episode.nowPos
@@ -92,7 +141,7 @@ function tubiPlayer_playVideo(episode as Object)
       subtitles: episode.showSubtitles
       livetv: m.linearTvOn
     }
-    requestQ: m.playerRequestQueue
+    port: m.playerPort
   })
 
   ' set up a video ad
@@ -101,22 +150,28 @@ function tubiPlayer_playVideo(episode as Object)
   canvas.SetLayer(1, {color: "#000000"})
   canvas.Show()
 
-  'make a synchrynous call to get cuepoints, if any
-  cuepoints = m.ads.getCuepoints(episode)
+  if m.subscription = false
+    if episode.pubId <> invalid and episode.pubId <> ""
+      m.pubId = episode.pubId
+    end if
 
-  'otherwise if the user is starting from beginning or resuming on a cue point, show ads
-  'attempt to get list of ads and play them for preroll
-  if m.ads.isRokuAdFrameworkOn = true
-    m.ads.getAdsListViaRoku(episode)
-    status = m.ads.showCommercialBreakViaRoku(canvas)
-  else
-    videoAdsList = m.ads.getAdsList(episode)
-    status = m.ads.showCommercialBreak(canvas, videoAdsList) 'videoAdsList can be invalid
-  end if
+    'make a synchrynous call to get cuepoints, if any
+    cuepoints = m.ads.getCuepoints(episode)
 
-  if status = m.constants.player.playerResults.closed
-    canvas.close()
-    return m.constants.player.playerResults.closed
+    'otherwise if the user is starting from beginning or resuming on a cue point, show ads
+    'attempt to get list of ads and play them for preroll
+    if m.ads.isRokuAdFrameworkOn = true
+      m.ads.getAdsListViaRoku(episode, m)
+      status = m.ads.showCommercialBreakViaRoku(canvas, m)
+    else
+      videoAdsList = m.ads.getAdsList(episode, m)
+      status = m.ads.showCommercialBreak(canvas, videoAdsList, m)
+    end if
+
+    if status = "CLOSED"
+      canvas.close()
+      return "CLOSED"
+    end if
   end if
 
 
@@ -124,23 +179,30 @@ function tubiPlayer_playVideo(episode as Object)
   ' (or there was no pre-roll because it is a subscription app), play the content
   while true
 
-    m.utils.tracking.trackUserEvent({
+    m.utils.trackEvent({
       trackType: "resumeAfterAds"
       value: episode.nowPos
       ctx: episode.id
-      requestQ: m.playerRequestQueue
+      port: m.playerPort
     })
     
     status = m.showSpanOfContentVideoNew(episode)
 
-    ' return to scene graph if player failed
-    if status = m.constants.player.playerResults.failed
-      canvas.close()
-      return status
-    end if
+    while status = "FAILED"
+      failHandlerStatus = m.handleVideoFailure(episode)
+      if failHandlerStatus = "CLOSE"
+        canvas.close()
+        return "CLOSE"
+      else if failHandlerStatus = "IGNORE"
+        exit while
+      else
+        status = failHandlerStatus
+        exit while
+      end if
+    end while
 
     'if STOPFORCOMMERCIAL we already have a validated cached ads list, so run the ads in the cache
-    if status = m.constants.player.playerResults.commercial
+    if status = "STOPFORCOMMERCIAL"
       Sleep(500) ' to ensure proper playback of the midroll
 
       canvas.SetMessagePort(m.playerPort)
@@ -149,29 +211,29 @@ function tubiPlayer_playVideo(episode as Object)
 
       'get list of ads and play them
       if m.ads.isRokuAdFrameworkOn = true
-        status = m.ads.showCommercialBreakViaRoku(canvas)
+        status = m.ads.showCommercialBreakViaRoku(canvas, m)
       else
         videoAdsList = m.ads.getCachedAdsList(episode)
-        status = m.ads.showCommercialBreak(canvas, videoAdsList)
+        status = m.ads.showCommercialBreak(canvas, videoAdsList, m)
       end if
 
-      if status = m.constants.player.playerResults.closed
+      if status = "CLOSED"
         canvas.close()
-        return m.constants.player.playerResults.closed
+        return "CLOSED"
       end if
 
     'if RESUMEPLAY, means we are resuming play after pausing or seeking/scrubbing
     'we have already made a call to get a list of ads to play and stored them in m.resumePlayAdsList, so just run them
-    else if status = m.constants.player.playerResults.resumePlay
+    else if status = "RESUMEPLAY"
       if m.ads.isRokuAdFrameworkOn = true
-        status = m.ads.showCommercialBreakViaRoku(canvas)
+        status = m.ads.showCommercialBreakViaRoku(canvas, m)
       else
-        status = m.ads.showCommercialBreak(canvas, m.resumePlayAdsList)
+        status = m.ads.showCommercialBreak(canvas, m.resumePlayAdsList, m)
       end if
 
-      if status = m.constants.player.playerResults.closed
+      if status = "CLOSED"
         canvas.close()
-        return status
+        return "CLOSED"
       end if
 
     else
@@ -204,10 +266,10 @@ end function
 '   and which will set episode.playStart so the video will start at the
 '   correct start point following the commercial)
 ' --------------------------------------------------------
-function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
+function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
   if type(episode) <> "roAssociativeArray"
     print "invalid data passed to showVideoScreen"
-    return m.constants.player.playerResults.completed
+    return "COMPLETED"
   end if
 
   m.canvas = CreateObject("roImageCanvas")
@@ -225,6 +287,9 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
   'set how often the player gives info on play progress (in seconds)
   player.SetPositionNotificationPeriod(1)
   
+  'set the size of the video player
+  player.SetDestinationRect(targetRect)
+
   'add the video to the player
   player.SetContentList([episode])
 
@@ -252,7 +317,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
     scrubToPoint: 0
     scrubPercent: 0
     nowPos: 0
-    displayWidth: m.constants.deviceInfo.displayWidth
+    displayWidth: m.utils.deviceInfo.displayWidth
     lastsavedPosition: episode.nowPos
   }
 
@@ -265,12 +330,12 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
     player.pause()
     scrubTimer.Mark() 'set the time we start scrubbing
 
-    m.global.utils.tracking.trackUserEvent({
+    m.app.utils.trackEvent({
       trackType: "playProgress"
       ctx: episode.id
       value: playerStates.nowPos
-      extraCtx: {interval: playerStates.nowPos - m.global.player.lastPingTime}
-      requestQ: m.global.player.playerRequestQueue
+      extraCtx: {interval: playerStates.nowPos - m.app.player.lastPingTime}
+      port: m.app.player.playerPort
     })
   end function
 
@@ -289,19 +354,19 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
     episode.nowPos = playerStates.nowPos
     episode.playStart = playerStates.nowPos
 
-    m.global.player.shouldResetPing = true
+    m.app.player.shouldResetPing = true
 
-    m.global.utils.tracking.trackUserEvent({
+    m.app.utils.trackEvent({
       trackType: "seek"
       ctx: episode.id
       value: playerStates.nowPos
-      requestQ: m.global.player.playerRequestQueue
+      port: m.playerPort
     })
     
     'when resuming to play after ending scrubbing, we need to ask the ad server if there are any ads
-    'getResumingPlayAds will store ads in either m.global.player.resumePlayAdsList or m.global.player.ads.allAdUnitsList
+    'getResumingPlayAds will store ads in either m.app.player.resumePlayAdsList or m.app.player.ads.allAdUnitsList
     'depending on if RAF is off or on
-    shouldBreak = m.global.player.ads.getResumingPlayAds(episode, m.global.player)
+    shouldBreak = m.app.player.ads.getResumingPlayAds(episode, m.app.player)
     if shouldBreak = true
       return shouldBreak
     end if
@@ -364,27 +429,25 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
       'log an error if the video fails to play
       if msg.isRequestFailed()
 
-        errorMsg = "video with id: " + episode.id + "failed. Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
-        ' m.utils.log.error(m.playerPort, "video-fail", errorMsg)
-        TubiLog("video fail")
+        errorMsg = "video with id: " + episode.id + " failed. Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
+        m.utils.log.error(m.playerPort, "video-fail", errorMsg)
 
         m.canvas.close()
-        return m.constants.player.playerResults.failed
+        return "FAILED"
       end if
 
       'log any re-buffers that user might encounter
       if msg.isStreamStarted()
         if msg.getInfo().isUnderrun = true
-          warningMsg = "Video buffered mid stream. Segment Url: " + msg.getInfo().url + " Stream Bitrate: " + msg.getInfo().streamBitrate.toStr() + " Measured Bitrate: " + msg.getInfo().measuredBitrate.toStr()
-          ' m.utils.log.warn(m.playerPort, "video-rebuffer",  warningMsg)
-          TubiLog("video rebuffer")
+          warningMsg = "Video with id: " + episode.id + " buffered mid stream. Segment Url: " + msg.getInfo().url + " Stream Bitrate: " + msg.getInfo().streamBitrate.toStr() + " Measured Bitrate: " + msg.getInfo().measuredBitrate.toStr()
+          m.utils.log.warn(m.playerPort, "video-rebuffer",  warningMsg)
         end if
       end if
 
       'if event is that the video content has reached the end
       if msg.isFullResult()
         m.canvas.close()
-        return m.constants.player.playerResults.completed
+        return "COMPLETED"
       end if
 
       'if the player sends an event updating the position withing the movie (it should be set to fire every second)
@@ -403,14 +466,14 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
         'this should give the user a reasonably correct place to resume if they hit the home button or the app crashes
         'otherwise we are saving the most recent position when ads play or they back out of the player
         if msg.GetIndex() > playerStates.lastsavedPosition + 60 or msg.GetIndex() < playerStates.lastsavedPosition - 60
-          m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)        
+          m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)          
           playerStates.lastsavedPosition = playerStates.nowPos
         end if
 
         'checks if there is a commercial break about to occur (4 to 7 seconds before a cue point)
         'if there is, caches an appropriate set of ads for the ad break depending on which framework is being used
         'if a breakPos is returned, it means that we should play an ad that has previously been cached so we stop for commercial
-        breakPos = m.ads.checkForCommercialBreak(playerStates.nowPos, episode)
+        breakPos = m.ads.checkForCommercialBreak(playerStates.nowPos, episode, m)
         if breakPos <> -1
           episode.nowPos = breakPos
           episode.playStart = breakPos
@@ -421,7 +484,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
 
             'tell the video player we are stopping and going to play a set of ads
             m.canvas.close()
-            return m.constants.player.playerResults.commercial
+            return "STOPFORCOMMERCIAL"
           end if
         end if
 
@@ -431,7 +494,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
             trackType: "playProgress"
             ctx: episode.id
             value: playerStates.nowPos
-            requestQ: m.playerRequestQueue
+            port: m.playerPort
           }
 
           if m.linearTvOn = true
@@ -440,7 +503,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
             }
           end if
 
-          m.utils.tracking.trackUserEvent(playProgressEvent)
+          m.utils.trackEvent(playProgressEvent)
 
           m.lastPingTime = playerStates.nowPos
         end if
@@ -473,10 +536,8 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
           m.canvas.close()
           'save the last position to memory
           m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)
-          episode.nowPos = playerStates.nowPos
-
           m.canvas.close()
-          return m.constants.player.playerResults.closed
+          return "CLOSED"
         end if
         
         'left button or rewind
@@ -501,7 +562,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
                 episode.nowPos = playerStates.nowPos
                 episode.playStart = playerStates.nowPos
                 m.canvas.close()
-                return m.constants.player.playerResults.resumePlay
+                return "RESUMEPLAY"
               end if
             else
               'updates the screen with the new amount of scrubbing
@@ -532,7 +593,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
                 episode.nowPos = playerStates.nowPos
                 episode.playStart = playerStates.nowPos
                 m.canvas.close()
-                return m.constants.player.playerResults.resumePlay
+                return "RESUMEPLAY"
               end if
             else
               'updates the screen with the new amount of scrubbing
@@ -551,7 +612,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
               episode.nowPos = playerStates.nowPos
               episode.playStart = playerStates.nowPos
               m.canvas.close()
-              return m.constants.player.playerResults.resumePlay
+              return "RESUMEPLAY"
             end if
 
           'show the transport overlay while continuing the show
@@ -564,11 +625,11 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
             playerStates.isTransportShowing = false
             if playerStates.isPaused = true
             
-              m.utils.tracking.trackUserEvent({
+              m.utils.trackEvent({
                 trackType: "pauseToggle"
                 ctx: episode.id
                 value: "resumed"
-                requestQ: m.playerRequestQueue
+                port: m.playerPort
               })
 
               playerStates.isPaused = false
@@ -585,7 +646,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
           player.pause()
           
           'show a dialog that will let users turn on/off captions
-          if m.showCaptionsDialog(episode) = true
+          if GetGlobalAA().app.detailScreen.showCaptionsDialog(episode) = true
             captions.showSubtitle(true)
           
           else
@@ -604,7 +665,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
               episode.nowPos = playerStates.nowPos
               episode.playStart = playerStates.nowPos
               m.canvas.close()
-              return m.constants.player.playerResults.resumePlay
+              return "RESUMEPLAY"
             end if
 
           'if not scrubbing, 
@@ -616,21 +677,21 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
               player.pause()
               m.paintToCanvas(progressPercent, playerStates, episode)
 
-              m.utils.tracking.trackUserEvent({
+              m.utils.trackEvent({
                 trackType: "pauseToggle"
                 ctx: episode.id
                 value: "paused"
-                requestQ: m.playerRequestQueue
+                port: m.playerPort
               })
 
             'if not scrubbing but paused, resume the show and remove the transport overlay
             'but first check if we should play a set of ads
             else
-              m.utils.tracking.trackUserEvent({
+              m.utils.trackEvent({
                 trackType: "pauseToggle"
                 ctx: episode.id
                 value: "resumed"
-                requestQ: m.playerRequestQueue
+                port: m.playerPort
               })
                 
               playerStates.isTransportShowing = false
@@ -646,32 +707,43 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
     'handle any async responses (usually responses to playProgress and other user events, or responses to addHistory calls
     'but can be a response to outstanding ad pixel calls)
     else if type(msg) = "roUrlEvent"
-      handled = m.playerRequestQueue.handleEvent(msg)  'a request object that has been handled
+      respObj = m.utils.getAsyncResponse(msg, 0)
+  
+      if m.previouslyViewedReqIds[respObj.id.toStr()] <> invalid
+        'we know we have a response from updating previously viewed - so update the previouslyViewedServerId where necessary
+        'this is necessary to make the "Remove from History" button work on the details page
+        if respObj.data <> invalid and respObj.data.len() > 0
+          addPreviouslyViewedResponse = parseJson(respObj.data)
+          if addPreviouslyViewedResponse.content_type <> invalid
 
-      resp = invalid
-      if handled <> invalid and handled.response <> invalid and handled.response.data.len() > 0
-        resp = handled.response.data
-        parsedResp = parseJson(resp)
+            if addPreviouslyViewedResponse.content_type = "series"
+              if m.cp.userPlaylistSeries[addPreviouslyViewedResponse.content_id.toStr()] <> invalid
+                m.cp.userPlaylistSeries[addPreviouslyViewedResponse.content_id.toStr()].previouslyViewedServerId = addPreviouslyViewedResponse.id
+              end if
+            else if addPreviouslyViewedResponse.content_type = "movie"
+              if m.cp.userPlaylistVideos[addPreviouslyViewedResponse.content_id.toStr()] <> invalid
+                m.cp.userPlaylistVideos[addPreviouslyViewedResponse.content_id.toStr()].previouslyViewedServerId = addPreviouslyViewedResponse.id
+              end if
+            end if
 
-        'check if we have the response for a history API call
-        if parsedResp <> invalid and handled.url = m.constants.urls.users.history and parsedResp.id <> invalid
-          if parsedResp.episodes <> invalid and type(parsedResp.episodes) = "roArray" and parsedResp.episodes.count() > 0
-            episode.historyId = parsedResp.episodes[0].id
-            episode.parentHistoryId = parsedResp.id
-          else
-            episode.historyId = parsedResp.id
           end if
         end if
+
+        'since we already got a response for this request id, we don't need to store the id anymore
+        m.previouslyViewedReqIds.delete(respObj.id.toStr())
       end if
     end if
   end while
 
 end function
 
-function tubiPlayer_paintToCanvas(progressPercent, playerStates, episode)
+function AdrisePlayer_paintToCanvas(progressPercent, playerStates, episode)
 
-  'display is used to select HD or SD sized transport buttons
-  display = m.constants.deviceInfo.definition
+  'set the folders for the transport buttons - assume HD and test for SD
+  display = "720"
+  if playerStates.displayWidth = 720
+    display = "480"
+  end if
 
   'each layer on the screen is represented by an array - we will iterate over all the layers to add them to the screen
   'if you need more layers, add more arrays to the layers array
@@ -754,9 +826,9 @@ function tubiPlayer_paintToCanvas(progressPercent, playerStates, episode)
     })
 
     'the rewind button below the transport bar
-    rewindUrl = m.constants.player.transportImages[display].rw
+    rewindUrl = "pkg:/images/oldUI/" + display + "/transport/rw.png"    'looks like pkg:/720/transport/rw.png
     if playerStates.scrubAmount < 0
-      rewindUrl = m.constants.player.transportImages[display].rwOrange
+      rewindUrl = "pkg:/images/oldUI/" + display + "/transport/rw_orange.png"
     end if
     layers[1].Push({
       Url: rewindUrl
@@ -764,9 +836,9 @@ function tubiPlayer_paintToCanvas(progressPercent, playerStates, episode)
     })
 
     'the fast forward button below the transport bar
-    forwardUrl = m.constants.player.transportImages[display].ff
+    forwardUrl = "pkg:/images/oldUI/" + display + "/transport/ff.png"
     if playerStates.scrubAmount > 0
-      forwardUrl = m.constants.player.transportImages[display].ffOrange
+      forwardUrl = "pkg:/images/oldUI/" + display + "/transport/ff_orange.png"
     end if
     layers[1].Push({
       Url: forwardUrl
@@ -775,7 +847,7 @@ function tubiPlayer_paintToCanvas(progressPercent, playerStates, episode)
 
     'the star button below the transport bar
     layers[1].Push({
-      Url: m.constants.player.transportImages[display].star
+      Url: "pkg:/images/oldUI/" + display + "/transport/star.png"
       TargetRect: m.getTransportRects(m.canvas.GetCanvasRect(), playerStates).star
     })
 
@@ -783,7 +855,7 @@ function tubiPlayer_paintToCanvas(progressPercent, playerStates, episode)
     if playerStates.isPaused = false
       'the pause button below the transport bar
       layers[1].Push({
-        Url: m.constants.player.transportImages[display].pauseSmall
+        Url: "pkg:/images/oldUI/" + display + "/transport/pause_small.png"
         TargetRect: m.getTransportRects(m.canvas.GetCanvasRect(), playerStates).pause
       }) 
     
@@ -791,7 +863,7 @@ function tubiPlayer_paintToCanvas(progressPercent, playerStates, episode)
     else
       'the play button below the transport bar
       layers[1].Push({
-        Url: m.constants.player.transportImages[display].play
+        Url: "pkg:/images/oldUI/" + display + "/transport/play.png"
         TargetRect: m.getTransportRects(m.canvas.GetCanvasRect(), playerStates).play
       })
     end if
@@ -809,7 +881,8 @@ function tubiPlayer_paintToCanvas(progressPercent, playerStates, episode)
     else if playerStates.isScrubbing = false and playerStates.isPaused = true
       'add the paused symbol to the screen
       layers[1].Push({
-        Url: m.constants.player.transportImages[display].pauseBig
+        ' Url: "pkg:/720/transport/pause_big_orange.png"
+        Url: "pkg:/images/oldUI/" + display + "/transport/pause_big.png"
         TargetRect: m.getPauseRect(m.canvas.GetCanvasRect())
       })
     end if
@@ -829,7 +902,7 @@ function tubiPlayer_paintToCanvas(progressPercent, playerStates, episode)
   end for
 end function
 
-function tubiPlayer_getTransportRects(canvasRect, playerStates)
+function AdrisePlayer_getTransportRects(canvasRect, playerStates)
   'set the width and height of the transport bar as percentages fo the screen width and height
   transportWidthPercent = 0.85
   transportHeightPercent = 0.013
@@ -1001,7 +1074,7 @@ function tubiPlayer_getTransportRects(canvasRect, playerStates)
   }
 end function
 
-function tubiPlayer_getPauseRect(canvasRect)
+function AdrisePlayer_getPauseRect(canvasRect)
   'expect an image that is exactly 55 x 83 pixels
   'using percentages to render image - will render correctly on 1280w x 720h screens
 
@@ -1015,7 +1088,7 @@ end function
 
 
 'builds the string that will display the time under the transport bar when a video is paused
-function tubiPlayer_getTransportTime(seconds)
+function AdrisePlayer_getTransportTime(seconds)
 
   'helper function to create a string that looks like 00:32:17 from 1937 seconds
   'expects seconds to be an integer, not a string
@@ -1049,7 +1122,7 @@ function tubiPlayer_getTransportTime(seconds)
 end function
 
 '------------------------------------------------------------------
-function tubiPlayer_handleVideoFailure(episode)
+function AdrisePlayer_handleVideoFailure(episode)
   dialog = CreateObject("roMessageDialog")
   dialog.SetMessagePort(m.playerPort)
 
@@ -1063,7 +1136,7 @@ function tubiPlayer_handleVideoFailure(episode)
   dialog.EnableBackButton(true)
   dialog.Show()
 
-  ' episode = GetGlobalAA().app.cp.getUpdatedUrlForEpisode(episode)
+  episode = GetGlobalAA().app.cp.getUpdatedUrlForEpisode(episode)
 
   m.utils.log.warn(m.playerPort, "playback-message-shown", "User was shown the video playback failed pop up message")
 
@@ -1083,132 +1156,110 @@ function tubiPlayer_handleVideoFailure(episode)
         button = dlgMsg.GetIndex()
         if (button = 1)
           episode.playStart = episode.nowPos
-          status = m.showSpanOfContentVideoNew(episode)
+          if m.useCustomPlayer = false
+            status = m.showSpanOfContentVideo(episode)
+          else
+            status = m.showSpanOfContentVideoNew(episode)
+          end if
           return status
         else if (button = 2)
-          return m.constants.player.playerResults.ignore
+          return "IGNORE"
         else if (button = 3)
-          return m.constants.player.playerResults.closed
+          return "CLOSE"
         end if
       end if
 
       if dlgMsg.isScreenClosed()
-        return m.constants.player.playerResults.ignore
+        return "IGNORE"
       end if
     end if
   end while
   return ""
 end function
 
-
-function tubiPlayer_savePreviouslyViewedUpdate(episode, nowPos)
-
-  'only do the following if the user is logged in
-  authInfo = m.utils.auth.getAuthInfo()
-  if authInfo <> invalid and authInfo.accessToken <> invalid
-  
-    newHistoryReq = m.utils.bookmarks.addHistoryReq(episode, nowPos)
-    m.playerRequestQueue.pushRequest(newHistoryReq)
+function AdrisePlayer_savePreviouslyViewedUpdate(episode, nowPos)
+  settings = m.utils.getSettings()
+  if m.cp = invalid
+    m.cp = GetGlobalAA().app.cp
   end if
 
-end function
+  'set the appropriate info based on if it's a movie or episode
+  parentId = invalid
+  localUpdateId = episode.id
+  contentType = "movie"
+  userPlaylistsStore = "userPlaylistVideos"
+  contentToStore = episode
+
+  if episode.isParentSeries = true
+    parentId = episode.parentId
+    localUpdateId = parentId
+    contentType = "episode"
+    userPlaylistsStore = "userPlaylistSeries"
+    contentToStore = m.cp.getContentFromLocalPlaylists(parentId, "series")
+  end if
 
 
-'@episode: assocArray, a video object from that has been passed into the player
-function tubiPlayer_showCaptionsDialog(episode as Object) as Boolean
-  port = CreateObject("roMessagePort")
-  dialog = CreateObject("roMessageDialog")
-  dialog.SetMessagePort(port)
+  'add the content to our local stores if it doesn't already exist
+  if m.cp[userPlaylistsStore][localUpdateId] = invalid
+    m.cp[userPlaylistsStore][localUpdateId] = contentToStore
+  end if
 
-  globalCaptions = m.constants.deviceInfo.captionsMode
+  stopLoop = false
+  'save the nowPos on our local stores so we can reference later
+  if episode.isParentSeries = true
+    'update the nowPos for the correct episode in the series
+    parentInStore = m.cp[userPlaylistsStore][localUpdateId]
+    if parentInStore <> invalid and parentInStore.playlist <> invalid and parentInStore.playlist.episodes <> invalid and parentInStore.playlist.episodes.count() > 0
 
-  'if we have subtitles set the appropriate text
-  if episode.subtitleLanguages <> invalid and episode.subtitleUrls <> invalid
-    dialog.SetText("Set subtitles for " + episode.title)
+      for i=0 to parentInStore.playlist.episodes.count()-1 step 1
+        season = parentInStore.playlist.episodes[i]
+        if season.playlist <> invalid and season.playlist.episodes <> invalid and season.playlist.episodes.count() > 0
 
-    curr = episode.subtitleDefault
-    if episode.subtitlesCurrent <> invalid
-      curr = episode.subtitlesCurrent
-    end if
+          for j=0 to season.playlist.episodes.count()-1 step 1
+            child = season.playlist.episodes[j]
+            if child.id = episode.id
+              'update the new previously viewed/history info locally
+              child.nowPos = nowPos
+              stopLoop = true
+              exit for
+            end if
+          end for
+        end if
 
-    currIndex = 0
-    if episode.subtitleLanguages.count() = 1
-      dialog.AddButton(0, "Off")
-      dialog.AddButton(1, "On")
-      if curr = episode.subtitleUrls[0]
-        currIndex = 1
-      end if
-
-    else
-      dialog.AddButton(0, "No subtitles")
-      for i=0 to episode.subtitleLanguages.count()-1 step 1
-        language = episode.subtitleLanguages[i]
-        count = i + 1
-        dialog.AddButton(count, language)
-
-        if curr <> invalid and curr = episode.subtitleUrls[i]
-          currIndex = count
+        if stopLoop = true
+          exit for
         end if
       end for
     end if
 
-    'makes sure that the highlighted selection always starts at off if episode.showSubtitles is currently set to false
-    'in other words, the initial selection will be what the current state is
-    if episode.showSubtitles = false
-      currIndex = 0
-    end if
-
-  'there are no captions/subtitles so let the user know - this should only happen if user presses star while watching content
   else
-    dialog.SetText("Sorry, there are no captions available for this video.")
-    dialog.AddButton(0, "Ok")
-    currIndex = 0
+    'update the nowPos for the current video
+    m.cp[userPlaylistsStore][localUpdateId].nowPos = nowPos
+  end if
+  
+  'only do the following if the user is logged in
+  authInfo = m.utils.getAuthInfo()
+  if authInfo.accessToken <> invalid
+  
+    'send the newest nowPos to the server. we will listen for the response in the main player port event loop
+    addPreviouslyViewedReqId = m.utils.updatePreviouslyViewed(episode.id, parentId, nowPos, "add", contentType, m.playerPort)
+    if addPreviouslyViewedReqId <> invalid
+      m.previouslyViewedReqIds[addPreviouslyViewedReqId.toStr()] = true
+    end if
+    
+    'updates both video and series
+    m.cp[userPlaylistsStore][localUpdateId].isPreviouslyViewed = true
+
+    'add to the previouslyViewed episodes array so it will be included in the category on the gridscreen
+    count = 0
+    for each previousEpisode in m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes
+      if previousEpisode.id = localUpdateId
+        m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.delete(count) 'since we want to move it to the front of the list
+        exit for
+      end if
+      count = count + 1
+    end for
+    m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.unshift(m.cp[userPlaylistsStore][localUpdateId])
   end if
 
-  dialog.SetFocusedMenuItem(currIndex)
-
-  dialog.EnableBackButton(true)
-  dialog.EnableOverlay(true)
-  dialog.Show()
-
-  while true
-    dlgMsg = wait(0, port)
-
-    if type(dlgMsg) = "roMessageDialogEvent"
-      if dlgMsg.isButtonPressed()
-        buttonIndex = dlgMsg.GetIndex()
-        if buttonIndex = 0
-          episode.showSubtitles = false
-
-          m.utils.tracking.trackUserEvent({
-            trackType: "subtitles"
-            ctx: episode.id
-            value: "off"
-            requestQ: m.playerRequestQueue
-          })
-
-          ' m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles disabled")
-          return false
-        else
-          episode.subtitlesCurrent = episode.subtitleUrls[buttonIndex-1]
-          episode.subtitleUrl = episode.subtitleUrls[buttonIndex-1]
-          episode.showSubtitles = true
-          
-          m.utils.tracking.trackUserEvent({
-            trackType: "subtitles"
-            ctx: episode.id
-            value: "on"
-            requestQ: m.playerRequestQueue
-          })
-
-          ' m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles set to " + episode.subtitlesCurrent)
-          return true
-        end if
-      end if
-      if dlgMsg.isScreenClosed()
-        return false
-      end if
-    else
-    end if
-  end while
 end function
