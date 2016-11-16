@@ -274,7 +274,9 @@ function tubiBookmarks_getInitialBookmarksReq(localId) as Object
   }
 
   initialBookmarkReq = m.auth.createAuthRequest(url, "getInitialBookmarks", options)
-  initialBookmarkReq.localId = localId
+  if initialBookmarkReq <> invalid then
+    initialBookmarkReq.localId = localId
+  end if
 
   return initialBookmarkReq
 end function
@@ -300,7 +302,9 @@ function tubiBookmarks_getInitialHistoryReq(localId) as Object
   }
 
   initialHistoryReq = m.auth.createAuthRequest(url, "getInitialHistory", options)
-  initialHistoryReq.localId = localId
+  if initialHistoryReq <> invalid then
+    initialHistoryReq.localId = localId
+  end if
 
   return initialHistoryReq
 end function

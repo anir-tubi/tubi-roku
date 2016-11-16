@@ -162,7 +162,7 @@ end function
 function tubiAuth_createAuthRequest(url as String, name = "" as String, options={} as Object) as Object
   authReq = invalid
   authInfo = m.getAuthInfo()
-  if authInfo.accessToken <> invalid
+  if authInfo <> invalid and authInfo.accessToken <> invalid
     authHeaders = m.getAuthHeaders(authInfo.accessToken)
 
     if authHeaders <> invalid
