@@ -216,8 +216,6 @@ Function setMenuItems() As Void
   ' if content is not set, don't show a menu
   if m.top.content = invalid then 
     return
-  else
-    m.Menu.content = invalid
   end if
 
   menuItems = CreateObject("roSGNode", "ContentNode")

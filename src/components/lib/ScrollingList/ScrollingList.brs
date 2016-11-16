@@ -53,12 +53,14 @@ Function onContentChange() As Void
   while m.items.getChildCount() > 0
     m.items.removeChildIndex(0)
   end while
-  m.focusImage.visible = false
 
-  m.internalItemFocused = -1
+  'm.internalItemFocused = -1
 
   ' add new children for content
-  if m.top.content = invalid or m.top.content.getChildCount = 0 then return
+  if m.top.content = invalid or m.top.content.getChildCount() = 0 then 
+    m.focusImage.visible = false
+    return
+  end if
 
   nextItemPosition = 0
   for i=0 to m.top.content.getChildCount()-1
@@ -93,12 +95,18 @@ Function onContentChange() As Void
   end for
 
   ' Default focus to first item
-  if m.top.content.getChildCount() > 0 then
-    itemRect = m.items.getChild(0).boundingRect()
-    m.focusImage.width = itemRect.width
-    m.focusImage.height = itemRect.height
-    startChangeFocus(0)
+  if m.internalItemFocused = -1 then
+    focus = 0
+  else if m.internalItemFocused >= m.top.content.getChildCount() then
+    focus = m.top.content.getChildCount()-1
+  else
+    ' content for the item may have changed, so go through the animations to get focusPercent set right
+    focus = m.internalItemFocused
   end if
+  itemRect = m.items.getChild(focus).boundingRect()
+  m.focusImage.width = itemRect.width
+  m.focusImage.height = itemRect.height
+  startChangeFocus(focus)
 End Function
 
 ''''''''''''''''''''''
