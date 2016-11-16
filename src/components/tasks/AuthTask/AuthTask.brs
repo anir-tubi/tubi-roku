@@ -16,6 +16,7 @@ Function execSignOut()
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
   Auth.logout()
+  m.top.authInfo = invalid
 End Function
 
 Function getInitialUserCategories()

@@ -34,6 +34,7 @@ Function init()
   m.authTask = m.top.findNode("AuthTask")
   m.authTask.observeField("authInfo", "onAuthInfoReceived")
   m.authInfoReceived = false
+  m.authTask.functionName = "execGetAuthInfo"
   m.authTask.control = "RUN"
 
   if m.global.constants.settings.isFBApplicationDetectionOn then
@@ -80,16 +81,13 @@ Function startUserExperience()
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
       ' whether we were logged in or not.
-      m.backgroundGroup.catScreenStart = true
       onItemDetailChange()
-      'TODO(Chris): capture the 'back' button when the screen stack is empty so
-      ' that we can show the category screen without haveing to preload it here
+      m.top.itemDetail = invalid  ' reset it so when we come back through here on state change, we don't follow deep links again
     else if m.authTask.authInfo = invalid then
       startSignIn()
     else
       startCategoryScreen()
       m.backgroundGroup.catScreenStart = true
-      m.categoryScreen.signedIn = true
     end if
   end if
 End Function
@@ -114,6 +112,7 @@ Function startCategoryScreen()
   m.categoryScreen.observeField("aboutSelected", "onAboutSelected")
   m.categoryScreen.observeField("privacySelected", "onPrivacySelected")
   m.categoryScreen.observeField("backgroundUriList", "onGridBackgroundChange")
+  m.categoryScreen.signedIn = (m.authTask.authInfo <> invalid)
   pushScreen(m.categoryScreen)
 End Function
 
@@ -174,10 +173,14 @@ Function onSignInComplete()
     popScreen()
   end while
 
-  startCategoryScreen()
-  m.backgroundGroup.catScreenStart = true  
-  if m.SignIn.signedIn or m.SignIn.registered then
-    m.categoryScreen.signedIn = true
+  if m.SignIn.guestPass then
+    ' start the categoryscreen right away
+    startCategoryScreen()
+    m.backgroundGroup.catScreenStart = true
+  else
+    ' retrieve the credentials on the AuthTask before starting the UI. This reduces jank.
+    m.authTask.functionName = "execGetAuthInfo"
+    m.authTask.control = "RUN"
   end if
 
   m.SignIn.unobserveField("guestPass")
@@ -249,9 +252,6 @@ Function onSignOutSelected()
     popScreen()
   end while
   m.categoryScreen = invalid
-
-  startCategoryScreen()
-  m.backgroundGroup.catScreenStart = true
   m.AuthTask.functionName = "execSignOut"
   m.AuthTask.control = "RUN"
 End Function
