@@ -2,9 +2,10 @@
 ' initScreenStack
 '
 ' Set the screen stack parent object. This should be an empty Group
-Function initScreenStack(stack As Object)
+Function initScreenStack(stack As Object, stackEmptyCallback=invalid As Object)
   tubiLog("ScreenStack.initScreenStack")
   m.ScreenStack_ = stack
+  m.ScreenStackEmptyCallback_ = stackEmptyCallback
 End Function
 
 
@@ -16,7 +17,13 @@ Function onKeyEvent(key As String, press As Boolean)
   tubiLog("ScreenStack.onKeyEvent")
   if press then
     if key = "back" 
-      if m.ScreenStack_.getChildCount() > 1 then popScreen()
+      if m.ScreenStack_.getChildCount() > 1 then 
+        popScreen()
+      else if m.ScreenStackEmptyCallback_ <> invalid and type(m.ScreenStackEmptyCallback_) = "roFunction" then
+       ' only remove the last item if we have a valid callback
+        popScreen()
+        m.ScreenStackEmptyCallback_()
+      end if
       return true  ' unhandled back button will exit the app. prevent that by returning true
     end if
   end if

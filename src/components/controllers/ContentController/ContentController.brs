@@ -46,7 +46,7 @@ Function init()
 
   m.logOutTask = m.top.findNode("LogOutTask")
 
-  initScreenStack(m.top.findNode("ScreenStack"))
+  initScreenStack(m.top.findNode("ScreenStack"), startCategoryScreen)
 End Function
 
 

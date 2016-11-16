@@ -120,6 +120,9 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       slideTo(m.CategoryList, [60,m.CategoryList.translation[1]], 0.5)
       m.trackingCount = 0
       return true
+    else if key = "back"
+      ' capture this so screen stack doesn't remove this screen. it's always the top level
+      return true
     end if
   end if
   return false
