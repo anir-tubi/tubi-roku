@@ -11,6 +11,7 @@ Function init()
   m.top.color = m.global.constants.ui.colors.transparent
   m.FocusedText.color = m.global.constants.ui.colors.shade
   m.UnfocusedText.color = m.global.constants.ui.colors.unfocused
+  m.Progress.color = m.global.constants.ui.colors.focusedText
   m.top.observeField("focusPercent", "onFocusChange")
   m.top.observeField("listHasFocus", "onFocusChange")
 End Function

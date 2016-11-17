@@ -62,10 +62,10 @@
     </Label>
     
     <Rectangle 
-      id="ResumeProgressBar" 
+      id="ResumeProgressBar"
       height="6"
       width="0"
-      translation="[4,70]"
+      translation="[4,68]"
       visible="false" />
   </children>
 </component>
