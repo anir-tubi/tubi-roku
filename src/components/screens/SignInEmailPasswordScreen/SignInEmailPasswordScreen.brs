@@ -124,11 +124,14 @@ Function setColors()
   'Sign In button
   m.SignInButtonDisabledFocus.visible = false
   m.SignInButtonFocus.visible = false
+  m.SignInButton.findNode("focusedText").color = m.global.constants.ui.colors.unfocused
+  m.SignInButton.opacity = 1.0
   if m.PasswordTextBox.text <> "" and m.EmailTextBox.text <> "" then
-    m.SignInButton.opacity = 1.0
-    if m.SignInButton.isInFocusChain() then m.SignInButtonFocus.visible = true
+    if m.SignInButton.isInFocusChain()
+      m.SignInButtonFocus.visible = true
+      m.SignInButton.findNode("focusedText").color = m.global.constants.ui.colors.focusedText
+    end if
   else
-    m.SignInButton.opacity = 0.5
     if m.SignInButton.isInFocusChain() then m.SignInButtonDisabledFocus.visible = true
   end if
 End Function

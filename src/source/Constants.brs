@@ -278,6 +278,7 @@ Function getConstants()
       constants.ui.colors.unfocused = "0xFFFFFFFF"
       constants.ui.colors.primaryText = "0xFFFFFFFF"
       constants.ui.colors.secondaryText = "0x777777FF"
+      constants.ui.colors.focusedText = "0x000000FF"
       constants.ui.colors.shade = "0x191919FF"
       constants.ui.colors.spinnerBox = "0x2C2C2CFF"
 
