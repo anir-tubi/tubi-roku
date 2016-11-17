@@ -489,8 +489,8 @@ Function getConstants()
         constants.performance.categoryGridList.triggerSize = 15
         constants.performance.categoryGridList.categoryWindowSize = 3
         constants.performance.categoryGridList.metadataCacheMaxEntries = 10
-        constants.performance.categoryGridList.categoryAnimationDuration = 0.75
-        constants.performance.categoryGridList.gridAnimationDuration = 0.4
+        constants.performance.categoryGridList.categoryAnimationDuration = 0.5
+        constants.performance.categoryGridList.gridAnimationDuration = 0.25
         constants.performance.contentGrid.overhang = 1
         constants.performance.contentGrid.continuousEvents = true
       ' Roku 4 and better
