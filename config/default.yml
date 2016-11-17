@@ -48,8 +48,8 @@ manifest:
   splash_screen_hd: "pkg:/images/splash-1280.jpg"
   splash_screen_sd: "pkg:/images/splash-720.jpg"
   major_version: 2
-  minor_version: 0
-  build_version: 9
+  minor_version: 1
+  build_version: 1
   bs_libs_required: roku_ads_lib
   ui_resolutions: "fhd"
   rsg_version: 1.0
