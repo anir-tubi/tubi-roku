@@ -1056,7 +1056,7 @@ function tubiPlayer_handleVideoFailure(episode)
   dialog.SetText("Video playback failed.")
   dialog.SetText("Would you like to try resuming?")
 
-  dialog.SetText("If problem persists, please visit adrise.tv/support")
+  dialog.SetText("If problem persists, please visit tubitv.com/support")
   dialog.AddButton(1, "Try resuming")
   dialog.AddButton(2, "Ignore error")
   dialog.AddButton(3, "Exit video")

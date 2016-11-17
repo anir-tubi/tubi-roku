@@ -174,7 +174,6 @@ function adriseAds_populateUrl(episode, playerSettings)
 
   'create the url to be used for ad calls'
   url = m.baseUrl + "?platform=roku&appid=" + playerSettings.appId + "&sdk=" + adSdk + "&cid=" + episode.adrise_contentId + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + playerSettings.pubId + "&content-type=" + playerSettings.contentType + isLinear + "&_=" + RND(1000000000000).ToStr()
-  ' url = m.baseUrl + "?platform=roku&appid=" + playerSettings.appId + "&sdk=test&cid=" + episode.adrise_contentId + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + playerSettings.pubId + "&content-type=" + playerSettings.contentType + isLinear + "&_=" + RND(1000000000000).ToStr()
 
   return url
 end function
