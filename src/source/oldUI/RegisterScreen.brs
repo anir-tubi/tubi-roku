@@ -666,7 +666,7 @@ function RegisterScreen(uniqueId, utils)
       end if
 
       layers.Push({
-        Url: "pkg:/" + m.res + "/btn_" + button + "_" + action + ".png"
+        Url: "pkg:/images/oldUI/" + m.res + "/btn_" + button + "_" + action + ".png"
         TargetRect: rOuter
         compositionMode: "Source_over"
       })
