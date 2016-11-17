@@ -196,7 +196,11 @@ Function onMetadataFetchTaskResponse() As Void
   contentGrid = m.metadataCache[entry].componentNode
 
   ' set the offset of this block
-  newContent.offset = m.top.metadataFetchTaskResponse.params.per_page *  (m.top.metadataFetchTaskResponse.params.page - 1)
+  if m.top.metadataFetchTaskResponse.params.per_page <> invalid and m.top.metadataFetchTaskResponse.params.page <> invalid
+    newContent.offset = m.top.metadataFetchTaskResponse.params.per_page *  (m.top.metadataFetchTaskResponse.params.page - 1)
+  else
+    newContent.offset = 0
+  end if
 
   '#####
   'print "Received offset " + stri(newContent.offset)
@@ -238,6 +242,12 @@ End Function
 Function fetch(component As Object, categoryId As String, field="categoryResponse" As String, per_page=0 As Integer, page=1 As Integer) As Void
   tubiLog("CategoryGridList.fetch " + categoryId)
   offset = per_page * (page - 1)
+
+  if categoryId = "MyQueue" or categoryId = "ContinueWatching" then
+    ' special categories can have deprecated ids in them, causing trouble
+    ' with pagination. Here we just force it to always grab the whole category
+    per_page = 0
+  end if
 
   requestId = categoryId + "-" + stri(offset).trim()
 
