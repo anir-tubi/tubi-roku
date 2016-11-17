@@ -109,7 +109,7 @@ Function onContentChange()
   end if
 
   'vertically center the info panel
-  translationY = (577 - m.top.BoundingRect().height) \ 2
+  translationY = (m.top.maxHeight - m.top.BoundingRect().height) \ 2
   m.top.translation = [m.top.translation[0], translationY]
 
 End Function

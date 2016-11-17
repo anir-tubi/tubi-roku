@@ -147,6 +147,7 @@
       <InfoPanelSingleRow
         id="InfoPanel"
         translation="[85,229]"
+        maxHeight="577"
         visible="true" />
 
       <Group

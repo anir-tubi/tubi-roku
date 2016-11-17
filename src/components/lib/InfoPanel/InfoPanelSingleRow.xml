@@ -31,6 +31,9 @@
       
     <!-- mode is either: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
     <field id="mode" type="string" value="category" />
+    <!-- maxHeight is the area in which the content should be centered -->
+    <field id="maxHeight" type="int"  />
+
   </interface>
 
   <children>
@@ -63,10 +66,10 @@
       <Label
         id="CategoryLine1">
         <Font
-          id="Vaud22px"
+          id="Vaud27px"
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="22" />
+          size="27" />
       </Label>
       <!-- This is supposed to say "Updated Wednesday" or some other data we don't have yet.
       <Label
@@ -82,13 +85,8 @@
       opacity="0.5"
       visible="true">
       <Label
-        id="SeasonLine1">
-        <Font
-          id="Vaud27px"
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="27" />
-      </Label>
+        id="SeasonLine1"
+        font="dictionary:Vaud27px"/>        
     </LayoutGroup>
     
     <LayoutGroup
@@ -138,7 +136,7 @@
       <Label
         id="DirectorTag"
         text="Directed by"
-        font="dictionary:Vaud22px"
+        font="dictionary:Vaud27px"
         visible="true" 
         opacity="0.5"/>
       <!-- this layout group pushes the separator rectangle up 2 pixels -->
@@ -156,7 +154,7 @@
       </LayoutGroup>
       <Label
         id="Director"
-        font="dictionary:Vaud22px"
+        font="dictionary:Vaud27px"
         visible="true" />
     </LayoutGroup>
 
@@ -168,7 +166,7 @@
       <Label
         id="StarringTag"
         text="Starring"
-        font="dictionary:Vaud22px"
+        font="dictionary:Vaud27px"
         visible="true" 
         opacity="0.5"/>
       <LayoutGroup
@@ -185,7 +183,7 @@
       </LayoutGroup>
       <Label
         id="Starring"
-        font="dictionary:Vaud22px"
+        font="dictionary:Vaud27px"
         ellipsizeOnBoundary="true"
         width="875"
         visible="true" />

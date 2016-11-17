@@ -567,7 +567,12 @@ End Function
 '
 '
 Function showDetailScreen(content)
-  m.detailScreen = CreateObject("roSGNode", "DetailScreen")
+  if m.singleRow = true
+    m.detailScreen = CreateObject("roSGNode", "DetailScreenSingleRow")
+  else
+    m.detailScreen = CreateObject("roSGNode", "DetailScreen")
+  end if
+
   m.detailScreen.shortContent = content
   m.detailScreen.observeField("playSelected", "onPlay")
   m.detailScreen.observeField("resumeSelected", "onResume")
