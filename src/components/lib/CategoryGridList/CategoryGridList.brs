@@ -229,7 +229,11 @@ Function onMetadataFetchTaskResponse() As Void
   end if
 
   ' Add totalCount which we only get from pagination APIs
-  contentGrid.content.totalCount = newContent.totalCount
+  if newContent.totalCount <> invalid and newContent.totalCount <> -1 then
+    contentGrid.content.totalCount = newContent.totalCount
+  else
+    contentGrid.content.totalCount = contentGrid.content.getChildCount()
+  end if
   contentGrid.content = contentGrid.content  ' force redraw
 End Function
 

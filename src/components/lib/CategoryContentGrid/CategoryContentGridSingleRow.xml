@@ -120,5 +120,18 @@
       fillDirection="W"
       visible="false"
       translation="[7,63]"/>
+    <Label
+      id="EmptyPlaceholder"
+      width="1000"
+      height="300"
+      wrap="true"
+      translation="[37,63]"
+      vertAlign="center"
+      visible="false">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="34" />
+    </Label>
   </children>
 </component>

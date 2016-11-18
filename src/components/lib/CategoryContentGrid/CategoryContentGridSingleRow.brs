@@ -9,6 +9,7 @@ Function init()
   m.PosterGrid = m.top.findNode("PosterGrid")
   m.FeatureGrid = m.top.findNode("FeatureGrid")
   m.SignInGrid = m.top.findNode("SignInGrid")
+  m.EmptyPlaceholder = m.top.findNode("EmptyPlaceholder")
   m.PosterGrid.focusChangeDuration = m.global.constants.performance.categoryGridList.gridAnimationDuration
   m.FeatureGrid.focusChangeDuration = m.global.constants.performance.categoryGridList.gridAnimationDuration
   m.SignInGrid.focusChangeDuration = m.global.constants.performance.categoryGridList.gridAnimationDuration
@@ -32,8 +33,10 @@ End Function
 
 Function onComponentFocusChange()
   tubiLog("CategoryContentGrid.onComponentFocusChange")
-  if m.top.hasFocus() then
+  if m.top.hasFocus() and m.ContentGrid.visible then
     m.ContentGrid.setFocus(true)
+  else
+    m.top.itemFocused = m.top.content
   end if
 End Function
 
@@ -88,6 +91,7 @@ Function onContentChange()
         m.ContentGrid = m.PosterGrid
       end if
       m.ContentGrid.visible = true
+      m.EmptyPlaceholder.visible = false
 
       m.ContentGrid.observeField("itemSelected", "onItemSelectedChange")
       m.ContentGrid.observeField("itemFocused", "onItemFocusedChange")
@@ -96,8 +100,16 @@ Function onContentChange()
       if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)  ' be careful when removing children that we don't remove a focused item
       drawItemCount()
       m.Spinner.visible = false
+    else if m.top.content.totalCount <> invalid and m.top.content.totalCount = 0
+      m.ContentGrid.visible = false
+      m.EmptyPlaceholder.visible = true
+      m.EmptyPlaceholder.text = m.top.content.placeholderText
+      m.Spinner.visible = false
     else
+      ' metadata is pending
       m.Spinner.visible = true
+      m.ContentGrid.visible = false
+      m.EmptyPlaceholder.visible = false
     end if
   end if
 End Function

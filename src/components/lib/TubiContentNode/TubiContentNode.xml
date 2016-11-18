@@ -27,9 +27,12 @@
     <field id="nowPos" type="int" />
     <field id="historyId" type="string" />
     <field id="currentEpisodeId" type="string" />
+
+    <!-- text to display for a category whose content is empty -->
+    <field id="placeholderText" type="string" />
     
     <!-- these will come in for paginated responses -->
-    <field id="totalCount" type="int" />
+    <field id="totalCount" type="int" value="-1"/>
     <field id="more" type="boolean" />
     <field id="offset" type="int" />
 
