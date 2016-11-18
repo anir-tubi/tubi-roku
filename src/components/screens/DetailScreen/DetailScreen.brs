@@ -19,6 +19,8 @@ Function init()
   m.RemoveQueueMenuItem = m.top.findNode("RemoveQueueMenuItem")
   m.RemoveHistoryMenuItem = m.top.findNode("RemoveHistoryMenuItem")
 
+  m.isWaitingForServerResponse = false
+
 End Function
 
 Function onScreenFocusChange()
@@ -260,6 +262,8 @@ Function setMenuItems() As Void
   m.Menu.content = menuItems
   m.Menu.visible = true
   if m.top.hasFocus() then m.Menu.setFocus(true)
+
+  m.isWaitingForServerResponse = false
 End Function
 
 
@@ -365,10 +369,13 @@ End Function
 
 Function addToQueue()
   tubiLog("DetailScreen.addToQueue")
-  m.AuthTask.functionName = "addToQueue"  
-  m.AuthTask.content = m.top.content
-  m.AuthTask.observeField("bookmarkId", "onBookmarked")
-  m.AuthTask.control = "RUN"
+  if m.isWaitingForServerResponse = false
+    m.AuthTask.functionName = "addToQueue"
+    m.AuthTask.content = m.top.content
+    m.AuthTask.observeField("bookmarkId", "onBookmarked")
+    m.AuthTask.control = "RUN"
+    m.isWaitingForServerResponse = true
+  end if
 End Function
 
 
@@ -429,6 +436,7 @@ Function onBookmarked()
 
   ' Notify the controller so that it can react
   m.top.addToQueueSelected = true
+
 End Function
 
 
@@ -439,11 +447,14 @@ End Function
 ' m.global bookmarks, and the server
 Function removeFromQueue()
   tubiLog("DetailScreen.removeFromQueue")
-  m.AuthTask.functionName = "removeFromQueue"  
-  m.AuthTask.content = m.top.content
-  m.AuthTask.observeField("result", "onBookmarkRemoved")
-  m.AuthTask.control = "RUN"
-  'TODO(Chris): show spinner
+  if m.isWaitingForServerResponse = false
+    m.AuthTask.functionName = "removeFromQueue"
+    m.AuthTask.content = m.top.content
+    m.AuthTask.observeField("result", "onBookmarkRemoved")
+    m.AuthTask.control = "RUN"
+    m.isWaitingForServerResponse = true
+    'TODO(Chris): show spinner
+  end if
 End Function
 
 Function onBookmarkRemoved()
@@ -498,6 +509,7 @@ Function onBookmarkRemoved()
 
   ' Notify the controller so that it can react
   m.top.removeFromQueueSelected = true
+
 End Function
 
 
@@ -506,10 +518,13 @@ End Function
 '
 Function removeFromHistory()
   tubiLog("DetailScreen.removeFromHistory")
-  m.AuthTask.functionName = "removeFromHistory"  
-  m.AuthTask.content = m.top.content
-  m.AuthTask.observeField("result", "onHistoryRemoved")
-  m.AuthTask.control = "RUN"
+  if m.isWaitingForServerResponse = false
+    m.AuthTask.functionName = "removeFromHistory"
+    m.AuthTask.content = m.top.content
+    m.AuthTask.observeField("result", "onHistoryRemoved")
+    m.AuthTask.control = "RUN"
+    m.isWaitingForServerResponse = true
+  end if
 End Function
 
 
@@ -573,6 +588,7 @@ Function onHistoryRemoved()
 
   ' force reload the content, which will clear all the history and nowPos
   m.top.shortContent = m.top.shortContent
+
 End Function
 
 
