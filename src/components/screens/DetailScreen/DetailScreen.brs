@@ -263,6 +263,14 @@ Function setMenuItems() As Void
   m.Menu.visible = true
   if m.top.hasFocus() then m.Menu.setFocus(true)
 
+  'set the position menu cursor to be stationary if there are more than 4 menu items
+  tempMenuItem = CreateObject("roSGNode", m.Menu.itemComponentName) 'should be a DetailMenuItem.xml component
+  itemsPerMenu = m.Menu.height \ tempMenuItem.height
+
+  if m.Menu.content.getChildCount() > itemsPerMenu
+    m.Menu.scrollHeight = (m.Menu.height \ itemsPerMenu)
+  end if
+  
   m.isWaitingForServerResponse = false
 End Function
 

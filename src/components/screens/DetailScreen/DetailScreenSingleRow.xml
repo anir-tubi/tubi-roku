@@ -102,7 +102,7 @@
     <ScrollingList
       id="Menu"
       width="465"
-      height="400"
+      height="320"
       itemSpacings="[8]"
       itemComponentName="DetailMenuItem"
       focusBitmapUri="pkg:/images/menu-focus.png"
