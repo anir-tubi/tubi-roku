@@ -30,7 +30,6 @@ function AdriseUtils (appName)
     updatePreviouslyViewed: adriseUtils_updatePreviouslyViewed
     sluggify: adriseUtils_sluggify
     deviceInfo: adriseUtils_getDeviceInfo()
-    getAppVersion: adriseUtils_getAppVersion
     appName: appName
 
     generateUniqueHex: function(length, uuid=false)
@@ -1186,6 +1185,7 @@ function adriseUtils_getTrackData(eventType, value=0, ctx=invalid, extraCtx=inva
   end if
   trackData.AddReplace("user_id", userID)
   trackData.AddReplace("device_id", m.deviceInfo.deviceId)
+  trackData.AddReplace("client_version", m.deviceInfo.clientVersion)
   'trackData looks like:
   ' trackData = {
   '   app : "tubitv-roku",
@@ -1250,24 +1250,56 @@ function adriseUtils_getDeviceInfo()
     countryCode = invalid
   end if
 
-  rokuTwos = {
-    "2400X": true
-    "2450X": true
-    "2500X": true
-    "2720X": true
-    "3000X": true
-    "3050X": true
-    "3100X": true
-    "3400X": true
-    "3420X": true
-    "3500X": true
+  ' 256MB models, or slow CPU, so we can reduce our expectations
+  ' Find details at https://en.wikipedia.org/wiki/Roku#Feature_comparison
+  lowMemoryModels = {
+    "2400X": true  ' LT (2011)
+    "2450X": true  ' LT (2012)
+    "2500X": true  ' HD
+    "2700X": true  ' LT (2013)
+    "2710X": true  ' 1 / SE
+    "2720X": true  ' 2 (2013)
+    "3000X": true  ' 2 HD
+    "3050X": true  ' 2 XD
+    "3100X": true  ' 2 XS
+    "3400X": true  ' MHL Stick
+    "3420X": true  ' MHL Stick
+    "3500X": true  ' HDMI Stick (2014)
+    "3700X": true  ' Express
+    "3710X": true  ' Express+
+    "5000X": true  ' TV (low specs)
   }
 
-  if rokuTwos[di.GetModel()] = true
-    isTwo = true
+  if lowMemoryModels[di.GetModel()] <> invalid
+    lowMemory = true
   else
-    isTwo = false
+    lowMemory = false
   end if
+
+
+  'get client version from manifest
+  clientVersionNums = ["", "", ""]
+
+  manifest = ReadASCIIFile("pkg:/manifest")
+  lines = manifest.Tokenize(Chr(10))
+  for each line in lines
+    props = line.Tokenize("=")
+    if props[0] = "major_version"
+      clientVersionNums[0] = props[1]
+
+    else if props[0] = "minor_version"
+      clientVersionNums[1] = props[1]
+
+    else if props[0] = "build_version"
+      clientVersionNums[2] = props[1]
+    end if
+  end for
+
+  clientVersion = ""
+  for i=0 to clientVersionNums.count()-1
+    clientVersion = clientVersion + clientVersionNums[i] + "."
+  end for
+  clientVersion = clientVersion + "oldui"
 
   userAgent = "Roku/DVP-" + firmwareVersionMajor.toStr() + "." + firmwareVersionMinor.toStr() + " (" + firmware + ")"
 
@@ -1288,34 +1320,7 @@ function adriseUtils_getDeviceInfo()
     displayHeight: di.GetDisplaySize().h
     captionsMode: di.GetCaptionsMode()
     countryCode: countryCode ' will be invalid if old version of firmware
-    rokuTwo: isTwo
+    lowMemory: lowMemory
+    clientVersion: clientVersion
   }
-end function
-
-
-'grabs the internal version of the app from the manifest
-function adriseUtils_getAppVersion()
-  versionNums = ["", "", ""]
-
-  manifest = ReadASCIIFile("pkg:/manifest")
-  lines = manifest.Tokenize(Chr(10))
-  for each line in lines
-    props = line.Tokenize("=")
-    if props[0] = "major_version"
-      versionNums[0] = props[1]
-    
-    else if props[0] = "minor_version"
-      versionNums[1] = props[1]
-    
-    else if props[0] = "build_version"
-      versionNums[2] = props[1]
-    end if
-  end for
-
-  version = ""
-  for i=0 to versionNums.count()-1
-    version = version + versionNums[i]
-  end for
-
-  return version
 end function

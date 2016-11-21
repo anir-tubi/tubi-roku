@@ -48,12 +48,40 @@ Function getConstants()
       "3400X": true  ' MHL Stick
       "3420X": true  ' MHL Stick
       "3500X": true  ' HDMI Stick (2014)
+      "3700X": true  ' Express
+      "3710X": true  ' Express+
+      "5000X": true  ' TV (low specs)
     }
+
     if lowMemoryModels[di.GetModel()] <> invalid
       lowMemory = true
     else
       lowMemory = false
     end if
+
+    'get client version from manifest
+    clientVersionNums = ["", "", ""]
+
+    manifest = ReadASCIIFile("pkg:/manifest")
+    lines = manifest.Tokenize(Chr(10))
+    for each line in lines
+      props = line.Tokenize("=")
+      if props[0] = "major_version"
+        clientVersionNums[0] = props[1]
+
+      else if props[0] = "minor_version"
+        clientVersionNums[1] = props[1]
+
+      else if props[0] = "build_version"
+        clientVersionNums[2] = props[1]
+      end if
+    end for
+
+    clientVersion = ""
+    for i=0 to clientVersionNums.count()-1
+      clientVersion = clientVersion + clientVersionNums[i] + "."
+    end for
+      clientVersion = clientVersion + "newui"
 
     constants.deviceInfo.deviceId = di.GetDeviceUniqueId()
     constants.deviceInfo.deviceAdId = deviceAdId 'will be invalid if ad tracking is turned off by user or old version of firmware
@@ -73,6 +101,7 @@ Function getConstants()
     constants.deviceInfo.captionsMode = di.GetCaptionsMode()
     constants.deviceInfo.countryCode = countryCode ' will be invalid if old version of firmware
     constants.deviceInfo.lowMemory = lowMemory
+    constants.deviceInfo.clientVersion  = clientVersion
 
 
   'the names of the registry memory sections that will save bookmark and previously viewed info

@@ -3,6 +3,11 @@ Function TubiExternalConfig(request as Object, constants as Object) as Object
     request: request
     constants: constants
 
+    'default values should just be a simple key/value associative array
+    defaultValues: {
+      roku_new_ui: 0
+    }
+
     ' public methods
     init: tubiExternalConfig_init
 
@@ -15,7 +20,12 @@ End Function
 
 Function tubiExternalConfig_init()
   configs = m.getConfigs()
-  m.storeConfigs(configs)
+
+  if configs <> invalid
+    m.storeConfigs(configs)
+  else
+    m.storeConfigs(m.defaultValues)
+  end if
 End Function
 
 

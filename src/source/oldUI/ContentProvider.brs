@@ -266,8 +266,8 @@ function ContentProvider_getPlaylistFromXmlObj(obj, imageSize, depth, parent, so
       count = count + 1
     end if
 
-    'limits the number of contents per category in older "roku 2" models (as defined in m.utils.deviceInfo)
-    if m.utils.deviceInfo.rokuTwo <> true or count < m.maxContent
+    'limits the number of contents per category in the lower memory models (as defined in m.utils.deviceInfo)
+    if m.utils.deviceInfo.lowMemory <> true or count < m.maxContent
 
       id = child.id.getText()
 

@@ -199,6 +199,7 @@ function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=
   end if
   trackData.AddReplace("user_id", userID)
   trackData.AddReplace("device_id", m.constants.deviceInfo.deviceId)
+  trackData.AddReplace("client_version", m.constants.deviceInfo.clientVersion)
   'trackData looks like:
   ' trackData = {
   '   app : "tubitv-roku",
@@ -206,8 +207,9 @@ function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=
   '   key : eventTypes[eventType].key
   '   ctx : eventTypes[eventType].ctx
   '   extra_ctx: eventTypes[eventType].extraCtx
-  '   userID : userID
-  '   deviceID : m.deviceInfo.deviceId
+  '   user_id : userID
+  '   device_id : m.constants.deviceInfo.deviceId
+  '   client_version: m.constants.deviceInfo.clientVersion
   ' }.SetModeCaseSensitive()
   return trackData
 end function

@@ -9,20 +9,18 @@ Function Main(startupArgs as Dynamic)
   auth = TubiAuth(constants, request)
   tracking = TubiTracking(constants, request, auth)  
 
-  isNewUI = false
+  isNewUI = 0 'remote config will send as 1 or 0
 
-  'run config first to see if we get new or old UI
-  externalConfig = TubiExternalConfig(request, constants)
-  externalConfig.init() 'sets external config values on constants
+  'only run remote config for new UI if we have a model that can handle it
+  if constants.deviceInfo.lowMemory = false
+    'run config first to see if we get new or old UI
+    externalConfig = TubiExternalConfig(request, constants)
+    externalConfig.init() 'sets external config values on constants
 
-  if constants.externalConfig.info <> invalid and constants.externalConfig.info.newUI <> invalid
-    isNewUI = constants.externalConfig.info.newUI
-  else
-    isNewUI = not constants.deviceInfo.lowMemory
+    isNewUI = constants.externalConfig.info.roku_new_ui
   end if
-  
 
-  if isNewUI = true
+  if isNewUI = 1
     MainNewUI(startupArgs, constants)
   else
     MainOldUI(startupArgs)

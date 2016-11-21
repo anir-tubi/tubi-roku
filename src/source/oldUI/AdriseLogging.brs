@@ -100,7 +100,7 @@ function adriseLogging_sendLogging(port, options)
         platform: "roku"
         device_id: m.utils.deviceInfo.deviceId
         ua: m.utils.deviceInfo.userAgentPlusModel
-        version: m.utils.getAppVersion()
+        version: m.utils.deviceInfo.clientVersion
       }
       loggingInfo.append(options)
 
