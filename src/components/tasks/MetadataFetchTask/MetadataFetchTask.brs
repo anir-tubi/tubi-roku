@@ -15,7 +15,13 @@ Function fetchLoop()
   m.queue = TubiRequestQueue().create(m.port)
   m.top.observeField("request", m.port)
   m.top.observeField("cancel", m.port)
-  m.constants = m.global.constants   ' this should grab a thread-local copy
+  while true
+    m.constants = m.global.getField("constants")   ' this should grab a thread-local copy
+    if m.constants <> invalid then
+      exit while
+    end if
+    tubiLog("WARNING: Rendezvous failed for constants")
+  end while
   m.timespan = CreateObject("roTimeSpan")
   m.timespan.mark()
   m.epoch = m.timespan.TotalMilliseconds()
@@ -139,7 +145,10 @@ Function handleResponse(message)
       handledRequest.convert_end_time = m.timespan.TotalMilliseconds()
       handledRequest.id = handledRequest.mftId
       tubiLog("MetadataFetchTask convert duration = " + tostr(handledRequest.convert_end_time - handledRequest.request_end_time))
-      handledRequest.node[handledRequest.field] = handledRequest
+      success = handledRequest.node.setField(handledRequest.field, handledRequest)
+      if not success
+        tubiLog("WARNING: Rendezvous failed to set response field " + handledRequest.field)
+      end if
     end if
   else
     tubiLog("Request handled but response was empty or node/field was invalid")

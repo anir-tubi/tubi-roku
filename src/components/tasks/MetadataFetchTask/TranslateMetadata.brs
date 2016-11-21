@@ -77,11 +77,21 @@ Function translateBookmarkMetadata(contentToTranslate, orderType) As Object
   nodeCount = 0
 
   idOrder = []
-  if orderType = "bookmarks" and m.global.bookmarkOrder <> invalid
-    idOrder.append(m.global.bookmarkOrder)
+  if orderType = "bookmarks"
+    bookmarkOrder = m.global.getField("bookmarkOrder")
+    if bookmarkOrder <> invalid
+      idOrder.append(bookmarkOrder)
+    else
+      tubiLog("WARNING: Rendezvous failed for m.global.bookmarkOrder")
+    end if
 
-  else if orderType = "history" and m.global.historyOrder <> invalid
-    idOrder.append(m.global.historyOrder)
+  else if orderType = "history"
+    historyOrder = m.global.getField("historyOrder")
+    if historyOrder <> invalid
+      idOrder.append(historyOrder)
+    else
+      tubiLog("WARNING: Rendezvous failed for m.global.historyOrder")
+    end if
 
   end if
 
@@ -123,31 +133,41 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
   end if
 
   'record keeping needed for adding series to bookmarks and previously viewed
+
+  ' NOTE: getParent() can return invalid due to Rendezvous error.  If it's the root TubiContentNode
+  '       it will by default have a parent of this Task node.  Apparently there is a rendezvous copy
+  '       of the parent task node made when getParent() is called, and that can end up being invalid
+  '       if the primary thread is stuck.
+  '
   parent = translatedContent.getParent()
-  if parent.parentId <> invalid and parent.parentId <> "" then
-    translatedContent.parentId = parent.parentId
-  else
-    translatedContent.parentId = parent.id
-  end if
-  ' No parent if the parent.id is the task node
-  if translatedContent.parentId = "MetadataFetchTask" then translatedContent.parentId = invalid
+  if parent <> invalid then
+    if parent.parentId <> invalid and parent.parentId <> "" then
+      translatedContent.parentId = parent.parentId
+    else
+      translatedContent.parentId = parent.id
+    end if
+    ' No parent if the parent.id is the task node
+    if translatedContent.parentId = "MetadataFetchTask" then translatedContent.parentId = invalid
 
-  if parent.parentType <> invalid and parent.parentType <> "" then
-    translatedContent.parentType = parent.parentType
-  else
-    translatedContent.parentType = parent[typeVar]
-  end if
+    if parent.parentType <> invalid and parent.parentType <> "" then
+      translatedContent.parentType = parent.parentType
+    else
+      translatedContent.parentType = parent[typeVar]
+    end if
 
-  if parent.parentTitle <> invalid and parent.parentTitle <> "" then
-    translatedContent.parentTitle = parent.parentTitle
-  else
-    translatedContent.parentTitle = parent.title
-  end if
+    if parent.parentTitle <> invalid and parent.parentTitle <> "" then
+      translatedContent.parentTitle = parent.parentTitle
+    else
+      translatedContent.parentTitle = parent.title
+    end if
 
-  if parent.parentHistoryId <> invalid and parent.parentHistoryId <> "" then
-    translatedContent.parentHistoryId = parent.parentHistoryId
+    if parent.parentHistoryId <> invalid and parent.parentHistoryId <> "" then
+      translatedContent.parentHistoryId = parent.parentHistoryId
+    else
+      translatedContent.parentHistoryId = parent.historyId
+    end if
   else
-    translatedContent.parentHistoryId = parent.historyId
+    translatedContent.parentId = invalid
   end if
   
   'translate all the stuff from the server
@@ -308,26 +328,31 @@ end Function
 
 
 Function setTranslateGlobalsToLocal()
-  if m.global.bookmarkIds <> invalid then
-    m.bookmarkIds = {
-      series: {}
-      videos: {}
-    }
-    m.bookmarkIds.series.append(m.global.bookmarkIds.series)
-    m.bookmarkIds.videos.append(m.global.bookmarkIds.videos)
+  m.bookmarkIds = {
+    series: {}
+    videos: {}
+  }
+  globalBookmarkIds = m.global.getField("bookmarkIds")
+  if globalBookmarkIds <> invalid then
+    m.bookmarkIds.series.append(globalBookmarkIds.series)
+    m.bookmarkIds.videos.append(globalBookmarkIds.videos)
+  else
+    tubiLog("WARNING: Rendezvous failed for m.global.bookmarkIds")
   end if
-  if m.global.historyIds <> invalid then
-    m.historyIds = {
-      series: {}
-      videos: {}
-    }
-    m.historyIds.series.append(m.global.historyIds.series)
-    m.historyIds.videos.append(m.global.historyIds.videos)
+  m.historyIds = {
+    series: {}
+    videos: {}
+  }
+  globalHistoryIds = m.global.getField("historyIds")
+  if globalHistoryIds <> invalid then
+    m.historyIds.series.append(globalHistoryIds.series)
+    m.historyIds.videos.append(globalHistoryIds.videos)
+  else
+    tubiLog("WARNING: Rendezvous failed for m.global.historyIds")
   end if
-  m.captionsMode = m.global.constants.deviceInfo.captionsMode
-  m.contentTypes = {}
-  m.contentTypes.append(m.global.constants.ui.contentTypes)
-  m.creditsDuration = m.global.constants.player.creditsDuration
+  m.contentTypes = m.constants.ui.contentTypes
+  m.captionsMode = m.constants.deviceInfo.captionsMode
+  m.creditsDuration = m.constants.player.creditsDuration
 end Function
 
 
