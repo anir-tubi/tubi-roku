@@ -2,7 +2,7 @@ function RegisterScreen(uniqueId, utils)
   mode = utils.deviceInfo.displayMode
 
   res = "720"
-  if mode <> "720p"
+  if mode <> "1080p" and mode <> "720p"
     res = "480"
   end if
 

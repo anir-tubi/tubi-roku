@@ -281,15 +281,9 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
   'put the canvas on the screen - the canvas is the container for the player
   m.canvas.show()
 
-  'get the size as an assocArray of the imageCanvas, aka the screen
-  targetRect = m.canvas.GetCanvasRect()
-
   'set how often the player gives info on play progress (in seconds)
   player.SetPositionNotificationPeriod(1)
   
-  'set the size of the video player
-  player.SetDestinationRect(targetRect)
-
   'add the video to the player
   player.SetContentList([episode])
 
