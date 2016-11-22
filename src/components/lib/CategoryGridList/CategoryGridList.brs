@@ -97,6 +97,7 @@ Function onListFocusChange()
     m.ContentGrid.observeField("itemFocused", "onItemFocused")
     m.ContentGrid.observeField("cursorIndex", "onCursorIndexChange")
     m.ContentGrid.observeField("cursorPosition", "onCursorPositionChange")
+    m.top.cursorPosition = m.ContentGrid.cursorPosition
     if m.ContentGrid.cursorIndex = -1 then
       ' seed the first items
       fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, 1)

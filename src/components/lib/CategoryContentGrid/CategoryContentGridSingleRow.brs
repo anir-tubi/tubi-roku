@@ -82,6 +82,7 @@ Function onContentChange()
       m.ContentGrid.unobserveField("itemSelected")
       m.ContentGrid.unobserveField("itemFocused")
       m.ContentGrid.unobserveField("cursorIndex")
+      m.ContentGrid.unobserveField("cursorPosition")
    
       if m.top.content.title = "Featured" or m.top.content["type"] = m.global.constants.ui.contentTypes.season then
         m.ContentGrid = m.FeatureGrid
@@ -96,6 +97,7 @@ Function onContentChange()
       m.ContentGrid.observeField("itemSelected", "onItemSelectedChange")
       m.ContentGrid.observeField("itemFocused", "onItemFocusedChange")
       m.ContentGrid.observeField("cursorIndex", "onCursorIndexChange")
+      m.ContentGrid.observeField("cursorPosition", "onCursorPositionChange")
       m.ContentGrid.content = m.top.content
       if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)  ' be careful when removing children that we don't remove a focused item
       drawItemCount()
@@ -126,6 +128,10 @@ End Function
 
 Function onCursorIndexChange()
   m.top.cursorIndex = m.ContentGrid.cursorIndex
+End Function
+
+Function onCursorPositionChange()
+  m.top.cursorPosition = m.ContentGrid.cursorPosition
 End Function
 
 Function drawItemCount()

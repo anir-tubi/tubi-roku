@@ -270,8 +270,8 @@ Function onGridFocusChange() As Void
   row = 0
   col = 0
   if m.CategoryList.itemFocused >= 0
-    row = m.CategoryGridList.cursorPosition[0] + 1
-    col = m.CategoryGridList.cursorPosition[1] + 1
+    col = m.CategoryGridList.cursorPosition[0] + 1
+    row = m.CategoryGridList.cursorPosition[1] + 1
   end if
 
   'set the user event tracking info

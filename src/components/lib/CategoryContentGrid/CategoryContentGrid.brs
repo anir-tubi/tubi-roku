@@ -88,3 +88,7 @@ End Function
 Function onCursorIndexChange()
   m.top.cursorIndex = m.ContentGrid.cursorIndex
 End Function
+
+Function onCursorPositionChange()
+  m.top.cursorPosition = m.ContentGrid.cursorPosition
+End Function
