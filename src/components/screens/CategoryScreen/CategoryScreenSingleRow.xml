@@ -91,12 +91,14 @@
           id="ContinueWatching"
           title="Continue Watching"
           description="The Movies and TV Shows you have started watching can be found here"
-          placeholderText="You haven't watched anything yet. The content you watch will appear here."/>
+          placeholderText="You haven't watched anything yet. The content you watch will appear here."
+          slug="continue_watching" />
         <TubiContentNode
           id="MyQueue"
           title="My Queue"
           description="The Movies and TV Shows you have added to your Queue can be found here"
-          placeholderText="You don’t have anything in your Queue yet. Get started by adding Movies and TV Shows that interest you to your Queue."/>
+          placeholderText="You don’t have anything in your Queue yet. Get started by adding Movies and TV Shows that interest you to your Queue."
+          slug="my_queue" />
         <TubiContentNode
           id="SearchSignIn"
           title="Search &amp; Sign In"
