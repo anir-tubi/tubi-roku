@@ -19,6 +19,8 @@
   <children>
     <Poster
       id="HeroBackground"
+      width="1920"
+      height="1080"      
       loadWidth="1920"
       loadHeight="1080"
       uri="pkg:/images/search-gradient.png"
