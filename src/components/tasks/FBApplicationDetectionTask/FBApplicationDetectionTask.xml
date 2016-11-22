@@ -10,4 +10,11 @@
     <script type="text/brightscript" uri="pkg:/components/tasks/FBApplicationDetectionTask/FBApplicationDetectionTask.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/AN4TV_Roku_Application_Detection/FBApplicationDetection.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  
+    <interface>
+      <!-- Notify that the thread loop is up and listening
+      - for requests
+      -->
+      <field id="ready" type="boolean" value="false" />
+    </interface>
 </component>

@@ -60,7 +60,7 @@ Sub MainOldUI(params as Dynamic)
   if m.app.facebookDetection = true
     constants = getConstants()
     screen = CreateObject("roSGScreen")
-    screen.CreateScene("FBScene")
+    fbscene = screen.CreateScene("FBScene")
 
     sgGlobal = screen.getGlobalNode()
     sgGlobal.addField("constants", "assocarray", false)
@@ -68,6 +68,13 @@ Sub MainOldUI(params as Dynamic)
       fban4tvtoken: constants.fban4tvtoken
     }
     screen.show()
+    
+    print "Waiting for FBTask thread to be ready..."
+    while true
+      if fbscene.ready then exit while
+      sleep(500)
+    end while
+    print "                                        ...done"
   end if
 
   app.runApp()
