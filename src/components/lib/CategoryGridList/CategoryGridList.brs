@@ -174,13 +174,22 @@ Function onMetadataFetchTaskResponse() As Void
   response = m.top.metadataFetchTaskResponse.response
 
   ' TODO(Chris): handle this better.  if we set an error it should also be reset hwen the category is next fetched
+  newContent = invalid
   if response.code < 200 or response.code >= 300 then 
     testLog("Category content returned " + stri(response.code))
     m.top.error = {
       code: response.code
       failReason: response.failReason
     }
-    return
+
+    ' Fake an empty response on 400s, which may be due to empty user categories
+    if response.code = 400 then
+      newContent = CreateObject("roSGNode", "TubiContentNode")
+    else
+      return
+    end if
+  else
+    newContent = m.top.metadataFetchTaskResponse.convertedMetadata
   end if
 
   entry = metadataCacheHasEntry(m.top.metadataFetchTaskResponse.id)
@@ -191,7 +200,6 @@ Function onMetadataFetchTaskResponse() As Void
   end if
 
   tubiLog("Received response for request id " + m.top.metadataFetchTaskResponse.id)
-  newContent = m.top.metadataFetchTaskResponse.convertedMetadata
   m.metadataCache[entry].contentNode = newContent.getChild(0)
   contentGrid = m.metadataCache[entry].componentNode
 
@@ -334,10 +342,8 @@ Function historyRequest()
   historyOrder = m.global.historyOrder
 
   if historyOrder <> invalid then
-    if historyOrder.count() > 0 then
-      'get the full user's bookmark category
-      return Bookmarks.getFullHistoryReq(historyOrder)
-    end if
+    'get the full user's bookmark category
+    return Bookmarks.getFullHistoryReq(historyOrder)
   end if
   return invalid
 End Function
@@ -356,10 +362,8 @@ Function bookmarksRequest() As Object
   bookmarkOrder = m.global.bookmarkOrder
 
   if bookmarkOrder <> invalid then
-    if bookmarkOrder.count() > 0 then
-      'get the full user's history category
-      return Bookmarks.getFullBookmarksReq(bookmarkOrder)
-    end if
+    'get the full user's history category
+    return Bookmarks.getFullBookmarksReq(bookmarkOrder)
   end if
   return invalid
 End Function
