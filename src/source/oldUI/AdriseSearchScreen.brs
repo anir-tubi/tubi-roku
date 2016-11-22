@@ -117,6 +117,11 @@ function SearchScreen_show()
 
         searchResultsXml = m.utils.getXml(url, "getSearchResults")
 
+        ' Empty placeholder for failed results. User will see an empty screen but can go back and retry the search
+        if searchResultsXml = invalid then
+          searchResultsXml = CreateObject("roXMLElement")
+        end if
+
         m.utils.trackEvent({
           trackType: "search"
           value: Left(searchString, 1000)
