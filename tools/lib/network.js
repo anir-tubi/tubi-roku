@@ -3,6 +3,19 @@ const request = require('request');
 const Rx = require('rx');
 const SSDPClient = require('node-ssdp').Client;
 
+exports.keypress = function(key, address, password) {
+  console.log("Sending keypress '" + key + "'");
+  return new Promise((res, rej) => {
+    const url =`http://${address}:8060/keypress/${key}`;
+    const data = { };
+    request.post({url: url, formData: data}, (err, response, body) => {
+      if (err) {
+        rej(err);
+      }
+      res(body);
+    });
+  });
+};
 
 /**
  * upload roku pkg to target roku box

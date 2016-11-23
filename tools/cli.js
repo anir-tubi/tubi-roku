@@ -28,10 +28,13 @@ program
   .command('upload <pkgfile> <address> <password>')
   .description('upload image file to address')
   .action((pkgfile, address, password) => {
-    network.uploadPkg(pkgfile, address, password).then(data => {
-      console.log('Upload %s to %s successfully.', pkgfile, address);
-    }).catch(err => {
-      console.log(err);
+    network.keypress('home', address, password).then(() => {
+      console.log('Uploading %s to %s...', pkgfile, address);
+      network.uploadPkg(pkgfile, address, password).then(data => {
+        console.log('Upload %s to %s successfully.', pkgfile, address);
+      }).catch(err => {
+        console.log(err);
+      });
     });
   });
 
