@@ -231,6 +231,7 @@ Function onSearchSelected()
   tubiLog("ContentController.onSearchSelected")
   m.searchScreen = CreateObject("roSGNode", "SearchScreen")
   m.searchScreen.observeField("contentSelected", "onContentSelected")
+  m.searchScreen.observeField("backgroundUriList", "onSearchBackgroundChange")
   pushScreen(m.searchScreen)
 End Function
 
@@ -617,6 +618,13 @@ End Function
 Function onEpisodeBackgroundChange()
   TubiLog("ContentController.onEpisodeBackgroundChange")
   m.backgroundGroup.backgroundUriList = m.episodesScreen.backgroundUriList
+  m.backgroundGroup.newBackgroundType = "grid"
+End Function
+
+
+Function onSearchBackgroundChange()
+  TubiLog("ContentController.onSearchBackgroundChange")
+  m.backgroundGroup.backgroundUriList = m.searchScreen.backgroundUriList
   m.backgroundGroup.newBackgroundType = "grid"
 End Function
 

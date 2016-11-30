@@ -22,6 +22,10 @@ Function init()
 
   ' While we aren't loading a seeded "Trending Searches", set the text to focus color
   m.SearchText.color = m.global.constants.ui.colors.focused ' default is white when no search term is entered
+
+  m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
+
+  m.top.backgroundUriList = [m.defaultHeroUri]
 End Function
 
 
@@ -84,6 +88,14 @@ End Function
 ' Update the info panel when a result item is focused
 Function onItemFocused()
   m.InfoPanel.content = m.ResultGrid.itemFocused
+  focusedContent = m.ResultGrid.itemFocused
+
+  if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
+    m.top.backgroundUriList = focusedContent.backgrounds
+  else
+    m.top.backgroundUriList = [m.defaultHeroUri]
+  end if
+
 End Function
 
 

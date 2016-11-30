@@ -14,19 +14,12 @@
 
     <!-- keeps the uri used for user tracking -->
     <field id="trackingUri" type="string"  value="/search" />    
+
+    <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
+
   </interface>
   
   <children>
-    <Poster
-      id="HeroBackground"
-      width="1920"
-      height="1080"      
-      loadWidth="1920"
-      loadHeight="1080"
-      uri="pkg:/images/search-gradient.png"
-      loadDisplayMode="scaleToZoom"
-      translation="[0,0]"/>
-    
     <!-- The keyboard: upper, lower, numbers, symbols -->
     <KeyboardGroup
       id="Keyboard"
