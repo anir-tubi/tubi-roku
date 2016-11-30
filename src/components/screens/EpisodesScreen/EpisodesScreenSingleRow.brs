@@ -45,24 +45,20 @@ Function onSeasonFocused()
   setSeasonInfo(m.top.seasonFocused)
 
   m.top.categoryFocused = m.SeasonRows.itemFocused
-  ' Stop listening to old category grid
+  ' Stop listening to old episode grid
   if m.EpisodeGrid <> invalid then
     m.EpisodeGrid.unobserveField("itemSelected")
     m.EpisodeGrid.unobserveField("itemFocused")
-    ' m.EpisodeGrid.unobserveField("cursorIndex")
-    ' m.EpisodeGrid.unobserveField("cursorPosition")
   end if
 
-  m.EpisodeGrid = m.SeasonRows.findNode("Items").getChild(m.top.seasonFocused).findNode("FeatureGrid")
-  m.EpisodeGrid.content = m.top.content.getChild(m.top.seasonFocused) ' season children will be shown in grid
+  m.EpisodeGrid = m.SeasonRows.findNode("Items").getChild(m.top.seasonFocused)
 
   if m.EpisodeGrid <> invalid then 
     m.EpisodeGrid.observeField("itemSelected", "onEpisodeSelected")
     m.EpisodeGrid.observeField("itemFocused", "onEpisodeFocused")
-  end if
-
-  if m.Menu.hasFocus() <> true
-    m.EpisodeGrid.setFocus(true)
+    if m.Menu.hasFocus() <> true
+      m.EpisodeGrid.setFocus(true)
+    end if
   end if
 
 End Function
