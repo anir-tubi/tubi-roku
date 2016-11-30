@@ -84,6 +84,11 @@ Function onContentChange() As Void
       newItem.content = m.top.content.getChild(i)
       newItem.id = newItem.content.id
 
+      ' listHasFocus should default to "false" for itemComponent types
+      if m.top.isInFocusChain() then
+        newItem.listHasFocus = true
+      end if
+
       if m.top.itemSpacings.count() = 0 then
         spacing = 0
       else
