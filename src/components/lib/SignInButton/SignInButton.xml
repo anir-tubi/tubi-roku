@@ -11,7 +11,7 @@
 
   <interface>
     <!-- hide the progress bar when focus changes -->
-    <field id="focusPercent" type="float"/>
+    <field id="focusPercent" type="float" value="0.0"/>
     
     <!-- Content expected for a KeyboardMenuItem:
      -

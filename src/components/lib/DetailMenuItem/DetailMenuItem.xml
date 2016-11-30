@@ -5,7 +5,7 @@
 
   <interface>
     <!-- hide the progress bar when focus changes -->
-    <field id="focusPercent" alias="ResumeProgressBar.opacity" />
+    <field id="focusPercent" alias="ResumeProgressBar.opacity" value="0.0"/>
     
     <!-- Content expected for a DetailMenuItem:
      -

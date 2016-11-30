@@ -46,19 +46,19 @@ Function init()
   ' until the button is released.  The value of this is the key which is held.
   m.pressAndHold = invalid
 
+  constants = m.global.constants  ' minor performance improvement by not referencing m.global twice
+
   ' This is the number of content items outside of the visible window which we
   ' will render.  We want it large enough to 'preload' posters which will
   ' be scrolled into view, but small enough that we aren't taking a performance
   ' hit for rendering too many posters.  
   '
   ' Example: If visible window is 2x2 and overhang = 1, 4x4=16 posters will be rendered.
-  m.overhang = m.global.constants.performance.contentGrid.overhang
+  m.overhang = constants.performance.contentGrid.overhang
 
   ' Send cursor events during scrolling or only when scrolling stops and item is focused
-  m.continuousEvents = m.global.constants.performance.contentGrid.continuousEvents
+  m.continuousEvents = constants.performance.contentGrid.continuousEvents
 
-  ' For reporting timing to the console
-  m.timer = CreateObject("roTimespan")
 End Function
 
 Function onVisibleChange()
@@ -250,7 +250,6 @@ Function loadVisiblePosters(useCache=true As Boolean) As Void
     m.items.removeChildIndex(0)
   end for
 
-  'print "Visible items resolved in " + stri(m.timer.TotalMilliseconds()) + " ms"
   'print "Item cache has " + stri(m.items.getChildCount()) + " children"
 End Function
 

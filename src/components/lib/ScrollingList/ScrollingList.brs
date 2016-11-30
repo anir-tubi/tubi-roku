@@ -49,14 +49,28 @@ End Function
 ' for inclusion in the list.
 Function onContentChange() As Void
   tubiLog("ScrollingList.onContentChange")
-  ' first clear the existing children
-  while m.items.getChildCount() > 0
-    m.items.removeChildIndex(0)
-  end while
 
-  'm.internalItemFocused = -1
+  ' try to reuse existing children, or create new children in one call
+  oldNumItems = m.items.getChildCount()
+  if m.top.content = invalid
+    newNumItems = 0
+  else
+    newNumItems = m.top.content.getChildCount()
+  end if
 
-  ' add new children for content
+  ' add or remove children as necessary
+  if newNumItems > oldNumItems
+    for i=0 to (newNumItems - oldNumItems)-1
+      m.items.createChild(m.top.itemComponentName)
+    end for
+  else if newNumItems < oldNumItems
+    for i=oldNumItems-1 to newNumItems step -1
+      m.items.removeChildIndex(i)
+    end for
+  end if
+
+  ' early out if there are no items.  This mimics the behavior of internal components, where
+  ' itemFocused and other fields are left with the last value rather than reset to, e.g., -1
   if m.top.content = invalid or m.top.content.getChildCount() = 0 then 
     m.focusImage.visible = false
     return
@@ -64,13 +78,11 @@ Function onContentChange() As Void
 
   nextItemPosition = 0
   for i=0 to m.top.content.getChildCount()-1
-    newItem = CreateObject("roSGNode", m.top.itemComponentName)
+    newItem = m.items.getChild(i)
     ' may be invalid if itemComponentName incorrectly set
     if newItem <> invalid then
       newItem.content = m.top.content.getChild(i)
       newItem.id = newItem.content.id
-      newItem.listHasFocus = m.top.isInFocusChain()
-      newItem.focusPercent = 0.0
 
       if m.top.itemSpacings.count() = 0 then
         spacing = 0
@@ -90,7 +102,6 @@ Function onContentChange() As Void
       end if
 
       newItem.translation = [x,y]
-      m.items.appendChild(newItem)
     end if
   end for
 

@@ -179,5 +179,12 @@
       id="CategoryPreloadTimer"
       duration="2.0"/>
     
+    <Spinner
+      id="Spinner"
+      width="1920"
+      height="1080"
+      visible="true"
+      translation="[0,0]"/>
+    
   </children>
 </component>

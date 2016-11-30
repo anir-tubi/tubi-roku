@@ -1,10 +1,7 @@
 Function init()
-  m.top.color = m.global.constants.ui.colors.transparent 
   m.top.opacity = "0.8"
   m.top.observeField("width", "onDimensionsChange")
   m.top.observeField("height", "onDimensionsChange")
-  m.top.findNode("Shade").color = m.global.constants.ui.colors.shade 
-  m.top.findNode("SpinnerBox").color = m.global.constants.ui.colors.spinnerBox 
 
   m.Animation = m.top.findNode("SpinnerAnimation")
   m.top.observeField("visible", "onVisibilityChange")

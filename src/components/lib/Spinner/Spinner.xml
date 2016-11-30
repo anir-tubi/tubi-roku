@@ -5,27 +5,30 @@
  - This is a Rectangle with a spinner graphic vertically and horizontally centered
  -
  -->
-<component name="Spinner" extends="Rectangle" >
+<component name="Spinner" extends="Group" >
   <script type="text/brightscript" uri="pkg:/components/lib/Spinner/Spinner.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
     <field id="showBox" alias="SpinnerBox.visible" value="false"/>
     <field id="showShade" alias="Shade.visible" value="false"/>
+    <field id="width" alias="Shade.width"/>
+    <field id="height" alias="Shade.height"/>
   </interface>
 
   <children>
     <Rectangle
       id="Shade"
       opacity="0.8"
-      visible="false"/>
+      visible="false"
+      color="0x191919FF"/>
     <Rectangle
       id="SpinnerBox"
       height="200"
       width="200"
       translation="[0,0]"
-      visible="false">
-    </Rectangle>
+      visible="false"
+      color="0x2C2C2CFF"/>
 
     <Poster
       id="SpinnerPoster"

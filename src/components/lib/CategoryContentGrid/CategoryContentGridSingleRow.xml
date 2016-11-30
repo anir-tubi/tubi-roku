@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<component name="CategoryContentGridSingleRow" extends="Rectangle">
+<component name="CategoryContentGridSingleRow" extends="Group">
   <script type="text/brightscript" uri="pkg:/components/lib/CategoryContentGrid/CategoryContentGridSingleRow.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
@@ -12,18 +12,26 @@
     <field id="content" type="node" alwaysNotify="true"/>
     
     <!-- Outgoing interface proxying the internal ContentGrid -->
-    <field id="itemSelected" type="node" alwaysNotify="true"/>
-    <field id="itemFocused" type="node" alwaysNotify="true"/>
-    <field id="cursorPosition" type="intarray" value="[-1,-1]"/>
-    <field id="cursorIndex" type="integer" value="-1"/>
+    <field id="itemSelected" alias="ContentGrid.itemSelected"/>
+    <field id="itemFocused" alias="ContentGrid.itemFocused"/>
+    <field id="cursorPosition" alias="ContentGrid.cursorPosition"/>
+    <field id="cursorIndex" alias="ContentGrid.cursorIndex"/>
+    <field id="focusChangeDuration" alias="ContentGrid.focusChangeDuration"/>
   </interface>
   
   <children>
+    <Rectangle
+      id="ForceBackgroundSize"
+      color="0x00000000"
+      width="1395"
+      height="369"
+      translation="[0,0]"/>
     <!-- force height so that even before we get content to fill the ContentGrid, boundingRect() will return the
          correct height.
     -->
     <Group
-      id="CategoryName">
+      id="CategoryName"
+      translation="[0,0]">
     <Label
       id="FocusedCategoryName"
       height="40"
@@ -85,41 +93,17 @@
       visible="false"
       translation="[7,63]"/>
     <ContentGrid
-      id="PosterGrid"
+      id="ContentGrid"
       numRows="1"
       width="1835"
       height="300"
+      fillDirection="W"
+      visible="true"
+      translation="[7,53]"
+      itemSpacing="[10,10]"
       scrollWidth="210"
       itemSize="[210,300]"
-      itemSpacing="[10,10]"
-      itemComponentName="Poster"
-      fillDirection="W"
-      visible="false"
-      translation="[7,53]"/>
-    <ContentGrid
-      id="FeatureGrid"
-      numRows="1"
-      width="1835"
-      height="300"
-      scrollWidth="430"
-      itemSize="[430,256]"
-      itemSpacing="[10,10]"
-      itemComponentName="FeaturePosterSingleRow"
-      fillDirection="W"
-      visible="false" 
-      translation="[7,63]"/>
-    <ContentGrid
-      id="SignInGrid"
-      numRows="1"
-      width="1835"
-      height="300"
-      scrollWidth="430"
-      itemSize="[430,256]"
-      itemSpacing="[10,10]"
-      itemComponentName="SignInPosterSingleRow"
-      fillDirection="W"
-      visible="false"
-      translation="[7,63]"/>
+      itemComponentName="Poster"/>
     <Label
       id="EmptyPlaceholder"
       width="1000"

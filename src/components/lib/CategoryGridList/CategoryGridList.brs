@@ -19,19 +19,21 @@ Function init()
   '
   m.metadataCache = []
 
+  constants = m.global.constants
+
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
-  m.blockSize = m.global.constants.performance.categoryGridList.blockSize
-  m.triggerSize = m.global.constants.performance.categoryGridList.triggerSize
-  m.categoryWindowSize = m.global.constants.performance.categoryGridList.categoryWindowSize
+  m.blockSize = constants.performance.categoryGridList.blockSize
+  m.triggerSize = constants.performance.categoryGridList.triggerSize
+  m.categoryWindowSize = constants.performance.categoryGridList.categoryWindowSize
 
   ' The most cached blocks we can have.  This should balance out with blockSize and expectations on
   ' network performance and metadata decode speed.
   ' Max total posters at any time is (m.blockSize * (2 * m.categoryWindowsSize + 2))
-  m.metadataCacheMaxEntries = m.global.constants.performance.categoryGridList.metadataCacheMaxEntries
+  m.metadataCacheMaxEntries = constants.performance.categoryGridList.metadataCacheMaxEntries
 
-  m.ScrollingList.focusChangeDuration = m.global.constants.performance.categoryGridList.categoryAnimationDuration
-
+  m.ScrollingList.focusChangeDuration = constants.performance.categoryGridList.categoryAnimationDuration
+  m.gridAnimationDuration = constants.performance.categoryGridList.gridAnimationDuration
 End Function
 
 
@@ -62,7 +64,19 @@ End Function
 
 
 Function onContentChange()
+  tubiLog("CategoryGridList.onContentChange")
   m.ScrollingList.content = m.top.content
+  
+  contentGridsParent = m.ScrollingList.findNode("Items")
+  ' Set some particulars to the content grids.  We do this here so
+  ' that we can consolidate control of these parameters and references
+  ' to m.global where they come from.  m.global references take a performance
+  ' hit each time they happen
+
+  for i=0 to contentGridsParent.getChildCount()-1
+    categoryContentGrid = contentGridsParent.getChild(i)    
+    categoryContentGrid.focusChangeDuration = m.gridAnimationDuration
+  end for
 End Function
 
 Function onDirtyUserCategories()

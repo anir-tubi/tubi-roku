@@ -4,6 +4,7 @@ Function init()
   m.CategoryList = m.top.findNode("CategoryList")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.SpecialCategories = m.top.findNode("SpecialCategories")
+  m.Spinner = m.top.findNode("Spinner")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("categoryPreviewResponse", "onCategoryPreviewReceived")
   m.top.observeField("focusedChild", "onScreenFocusChange")
@@ -233,6 +234,7 @@ End Function
 
 
 Function onPreGridCategoryChange() As Void
+
   ' Don't sync if CategoryList has focus and most likely triggered the grid category change
   if m.CategoryGridList.isInFocusChain() and m.CategoryGridList.content <> invalid then
     m.CategoryList.animateToItem = m.CategoryGridList.preCategoryFocused ' CategoryList has one extra item
@@ -246,6 +248,9 @@ End Function
 ' On grid focus change, update the info panel
 Function onGridFocusChange() As Void
   tubiLog("CategoryScreen.onGridFocusChange")
+
+  ' If spinner was visible, turn it off here
+  m.Spinner.visible = false
 
   if not m.CategoryGridList.isInFocusChain() then return
   focusedContent = m.CategoryGridList.itemFocused

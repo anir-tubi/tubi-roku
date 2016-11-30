@@ -6,9 +6,6 @@ Function init()
   m.top.observeField("content", "onContentChange")
   m.top.observeField("listHasFocus", "onFocusChange")
   m.top.observeField("focusPercent", "onFocusChange")
-  m.unfocusedText.color = m.global.constants.ui.colors.unfocused
-  m.focusedText.color = m.global.constants.ui.colors.shade
-  m.categoryCountText.color = m.global.constants.ui.colors.focused
 End Function
 
 ''''''''''''''''''''
