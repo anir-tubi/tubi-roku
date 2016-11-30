@@ -24,7 +24,7 @@
   </interface>
 
   <children>
-    <InfoPanel
+    <InfoPanelSingleRow
       id="InfoPanel"
       translation="[85,61]"
       maxHeight="577"

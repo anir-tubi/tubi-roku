@@ -174,7 +174,7 @@
         <Rectangle 
           id="StarringRect"
           opacity="0.2"
-          width="77"
+          width="84"
           height="2"/>
         <Rectangle 
           opacity="0.0"
@@ -185,7 +185,7 @@
         id="Starring"
         font="dictionary:Vaud27px"
         ellipsizeOnBoundary="true"
-        width="875"
+        width="710"
         visible="true" />
     </LayoutGroup>
     
