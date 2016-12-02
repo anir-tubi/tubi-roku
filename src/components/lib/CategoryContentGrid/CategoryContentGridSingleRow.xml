@@ -10,6 +10,9 @@
     <field id="focusPercent" type="float" value="0.0"/>
     <field id="listHasFocus" type="boolean" value="false" />
     <field id="content" type="node" alwaysNotify="true"/>
+
+    <!-- Incoming interface for sending info to the internal ContentGrid -->
+    <field id="itemToFocus" alias="ContentGrid.externalItemFocused"/>
     
     <!-- Outgoing interface proxying the internal ContentGrid -->
     <field id="itemSelected" alias="ContentGrid.itemSelected"/>

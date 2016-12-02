@@ -85,9 +85,11 @@ Function onContentChange() As Void
       tubiLog("Finding episode " + m.top.shortContent.id + " in series " + m.top.content.id)
       ' arrived here from an episode link
       m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id)
+      return   'prevent drawSubComponents() from running 2x since it will run when m.top.episodeSelection is set
     else if m.top.content.currentEpisodeId <> invalid and m.top.content.currentEpisodeId <> "" then
       tubiLog("Finding current episode " + m.top.content.currentEpisodeId + " in series " + m.top.content.id)
       m.top.episodeSelection = findEpisodeInSeries(m.top.content.currentEpisodeId)
+      return   'prevent drawSubComponents() from running 2x since it will run when m.top.episodeSelection is set
     endif
   end if
 
@@ -115,6 +117,7 @@ End Function
 '
 ' Decouple from onContentChange since episode selection also needs this
 Function drawSubComponents()
+  tubiLog("DetailScreen.drawSubComponents")
   if m.top.content.type = "video"
     m.Info.mode = "movie"
     m.Info.content = m.top.content
@@ -162,9 +165,9 @@ End Function
 ' getEpisodeContent
 '
 Function getEpisodeContent(selection As Object) As Object
-  series = m.top.content.getChild(m.top.episodeSelection[0])
-  if series <> invalid then
-    episode = series.getChild(m.top.episodeSelection[1])
+  season = m.top.content.getChild(m.top.episodeSelection[0])
+  if season <> invalid then
+    episode = season.getChild(m.top.episodeSelection[1])
     if episode <> invalid then return episode
   end if
   return invalid

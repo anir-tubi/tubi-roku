@@ -10,6 +10,7 @@ Function init()
   m.top.observeField("numColumns", "onContentChange")
   m.top.observeField("fillDirection", "onContentChange")
   m.top.observeField("visible", "onVisibleChange")
+  m.top.observeField("animateToItem", "onAnimateToItem")
   m.mask = m.top.findNode("ContentsMask")
   m.scrollAnimation = m.top.findNode("ScrollAnimation")
   m.scrollAnimation.observeField("state", "endChangeFocus")
@@ -371,6 +372,19 @@ Function endChangeFocus()
     end if
   end if
 
+End Function
+
+
+
+''''''''''''''''''''
+' onAnimateToItem
+'
+' expect m.top.animateToItem to equal a 2d array like [x, y]
+' in a single row, horizontal grid, to jump to the 5th item in the grid, set m.top.animateToItem = [4, 0]
+Function onAnimateToItem()
+  tubiLog("ContentGrid.onAnimateToItem")
+  m.internalItemFocused = m.top.animateToItem
+  startChangeFocus(m.top.animateToItem)
 End Function
 
 

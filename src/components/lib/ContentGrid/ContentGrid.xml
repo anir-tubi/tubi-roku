@@ -78,6 +78,10 @@
     <field id="cursorPosition" type="intarray" value="[-1,-1]"/>
     <field id="cursorIndex" type="integer" value="-1"/>
     
+    <!-- animateToItem is a 2d array similar to internalItemFocused in ContentGrid.brs
+         but allows us to change the focus to a specific item from a source external to the ContentGrid -->
+    <field id="animateToItem" type="intarray" alwaysNotify="true"/>
+
     <field id="focusChangeDuration" alias="ScrollAnimation.duration" value="0.3" />
 
   </interface>

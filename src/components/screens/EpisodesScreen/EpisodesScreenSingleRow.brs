@@ -4,6 +4,7 @@ Function init()
   
   m.top.observeField("content", "onContentChange")
   m.top.observeField("seasonFocused", "onSeasonFocused")
+  m.top.observeField("episodeToFocus", "onEpisodeToFocus")
   m.top.observeField("focusedChild", "onScreenFocusChange")
 
   m.SeasonRows = m.top.findNode("SeasonRows")
@@ -51,7 +52,7 @@ Function onSeasonFocused()
     m.EpisodeGrid.unobserveField("itemFocused")
   end if
 
-  m.EpisodeGrid = m.SeasonRows.findNode("Items").getChild(m.top.seasonFocused)
+  m.EpisodeGrid = m.SeasonRows.findNode("Items").getChild(m.top.seasonFocused)  'should be a CategoryContentGridSingleRow.xml component
 
   if m.EpisodeGrid <> invalid then 
     m.EpisodeGrid.observeField("itemSelected", "onEpisodeSelected")
@@ -62,6 +63,31 @@ Function onSeasonFocused()
   end if
 
 End Function
+
+
+
+Function onEpisodeToFocus()
+  tubiLog("EpisodesScreen.onEpisodeToFocus")
+
+  'gives focus and observes the appropriate EpisodeGrid
+  m.top.seasonFocused = m.top.episodeToFocus[0]
+
+  'animate the season rows and season menu to the appropriate position
+  m.Menu.animateToItem = m.top.episodeToFocus[0]
+  m.SeasonRows.animateToItem = m.top.episodeToFocus[0]
+  
+  'm.EpisodeGrid hasn't necessarily been updated by onSeasonFocused() running (as a result of setting m.top.seasonFocused)
+  'so we need to find the appropriate episode grid (CategoryContentGridSingleRow) component to set itemToFocus on
+  episodeGridToFocus = m.SeasonRows.findNode("Items").getChild(m.top.episodeToFocus[0])
+
+  if episodeGridToFocus <> invalid
+    episodeGridToFocus.itemToFocus = [m.top.episodeToFocus[1], 0]
+  end if
+  
+  'set the appropriate episode info in the info panel
+  onEpisodeFocused()
+End Function
+
 
 
 Function onEpisodeSelected()
@@ -134,7 +160,10 @@ Function onContentChange()
   m.EpisodeGrid.observeField("itemSelected", "onEpisodeSelected")
   m.EpisodeGrid.observeField("itemFocused", "onEpisodeFocused")
 
+  'set info panel
   setSeasonInfo(0)
+
+  'set backgrounds
   if m.top.content.backgrounds <> invalid and m.top.content.backgrounds.count() > 0 then 
     m.top.backgroundUriList = m.top.content.backgrounds
   else
@@ -142,7 +171,7 @@ Function onContentChange()
   end if
 
 
-  ' Set visibility and focus
+  ' Set visibility and component focus
   m.SeasonRows.visible = true
   m.Menu.visible = true
   if m.top.isInFocusChain() then m.SeasonRows.setFocus(true)

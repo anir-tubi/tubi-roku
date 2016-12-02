@@ -386,6 +386,8 @@ Function onEpisodeList()
   if m.episodesScreen.content <> invalid and m.episodesScreen.content.id <> invalid
     m.episodesScreen.trackingUri = m.episodesScreen.trackingUri + m.episodesScreen.content.id
   end if
+
+  m.episodesScreen.episodeToFocus = m.detailScreen.episodeSelection   'episodeToFocus should be [seasonIndex, episodeIndex]
   
   pushScreen(m.episodesScreen)
 End Function

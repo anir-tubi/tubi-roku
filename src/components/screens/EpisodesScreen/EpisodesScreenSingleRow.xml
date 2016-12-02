@@ -10,8 +10,12 @@
     <!-- Full content of the item to show details for -->
     <field id="content" type="node" />
 
-    <!-- Full content of the item to show details for -->
-    <field id="seasonFocused" type="integer" value="-1" />    
+    <!-- Index of the season that is currently in focus -->
+    <field id="seasonFocused" type="integer" value="-1" />
+
+    <!-- interface to tell the episode screen to focus a specific series episode;
+         2d array describing the episode that needs to be focused with [seasonIndex, episodeIndex] -->
+    <field id="episodeToFocus" type="intarray" /> 
 
     <!-- Set to the content of the episode that was clicked on -->
     <field id="episodeSelected" type="intarray" alwaysNotify="true"/>
