@@ -18,6 +18,7 @@ Function init()
   m.AddQueueMenuItem = m.top.findNode("AddQueueMenuItem")
   m.RemoveQueueMenuItem = m.top.findNode("RemoveQueueMenuItem")
   m.RemoveHistoryMenuItem = m.top.findNode("RemoveHistoryMenuItem")
+  m.WatchTrailerMenuItem = m.top.findNode("WatchTrailerMenuItem")
 
   m.isWaitingForServerResponse = false
 End Function
@@ -245,6 +246,10 @@ Function setMenuItems() As Void
 
   menuItems.appendChild(m.PlayMenuItem)
 
+  if m.top.content.trailerUrls <> invalid and m.top.content.trailerUrls.count() > 0 then
+    menuItems.appendChild(m.WatchTrailerMenuItem)
+  end if
+
   if m.top.content.type = "series" then
     menuItems.appendChild(m.EpisodesMenuItem)
   end if
@@ -291,6 +296,8 @@ Function onMenuItemSelected()
       m.top.resumeSelected = true
     else if selection.id = "PlayMenuItem" then
       m.top.playSelected = true
+    else if selection.id = "WatchTrailerMenuItem" then
+      m.top.watchTrailerSelected = true
     else if selection.id = "EpisodesMenuItem"
       m.top.episodeListSelected = true
     else if selection.id = "AddQueueMenuItem" then

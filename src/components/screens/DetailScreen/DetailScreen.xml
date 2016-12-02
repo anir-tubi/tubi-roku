@@ -50,6 +50,9 @@
     
     <!-- set to true when the user removes the title from their history -->
     <field id="removeFromHistorySelected" type="boolean" alwaysNotify="true" />
+    
+    <!-- set to true when the user wants to see the trailer for the content -->
+    <field id="watchTrailerSelected" type="boolean" alwaysNotify="true" />
 
     <!-- Set the to current episode selection, when 'content' field is type 'series' -->
     <field id="episodeSelection" type="intarray" value="[-1,-1]"/>
@@ -91,6 +94,12 @@
       title="Remove from history"
       unfocusiconurl="pkg:/images/icon-remove-from-history.png"
       focusiconurl="pkg:/images/icon-remove-from-history-on.png" />
+    <DetailMenuItemContentNode
+      id="WatchTrailerMenuItem"
+      title="Watch Trailer"
+      unfocusiconurl="pkg:/images/icon-trailer.png"
+      focusiconurl="pkg:/images/icon-trailer-on.png" />
+                               
   
     <!-- These are in a layout group together because this menu should float up -->
     <LayoutGroup

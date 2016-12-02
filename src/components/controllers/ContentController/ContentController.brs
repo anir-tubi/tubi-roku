@@ -371,6 +371,24 @@ Function onResume()
 End Function
 
 
+Function onWatchTrailer()
+  tubiLog("ContentController.onWatchTrailer")
+  content = getDetailScreenContent()
+  if content <> invalid then
+    trailerContent = CreateObject("roSGNode", "ContentNode")
+    trailerContent.url = content.trailerUrls[0]
+    trailerContent.streamformat="hls"
+    trailerScreen = CreateObject("roSGNode", "TrailerScreen")
+    trailerScreen.observeField("trailerFinished", "onTrailerFinished")
+    trailerScreen.content = trailerContent
+    pushScreen(trailerScreen)
+  end if
+End Function
+
+Function onTrailerFinished()
+  tubiLog("ContentController.onTrailerFinished")
+  popScreen()  ' from trailer screen back to detail screen
+End Function
 
 Function onEpisodeList()
   if m.singleRow = true
@@ -579,6 +597,7 @@ Function showDetailScreen(content)
   m.detailScreen.shortContent = content
   m.detailScreen.observeField("playSelected", "onPlay")
   m.detailScreen.observeField("resumeSelected", "onResume")
+  m.detailScreen.observeField("watchTrailerSelected", "onWatchTrailer")
   m.detailScreen.observeField("episodeListSelected", "onEpisodeList")
   m.detailScreen.observeField("signInSelected", "onSignInSelected")
   m.detailScreen.observeField("addToQueueSelected", "onHistoryQueueChange")

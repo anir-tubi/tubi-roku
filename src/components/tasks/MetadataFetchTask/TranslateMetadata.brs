@@ -301,7 +301,11 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
     end if
   end if
 
-
+  ' trailers
+  if contentFromServer.trailers <> invalid and type(contentFromServer.trailers) = "roArray" and contentFromServer.trailers.count() > 0
+    trailer = contentFromServer.trailers[0]
+    if trailer.url <> invalid and (type(trailer.url) = "roString" or type(trailer.url) = "String") then translatedContent.trailerUrls = [trailer.url]
+  end if
 
   'if this content is actually just a paginated response, set pagination data
   if contentFromServer.total_count <> invalid then translatedContent.totalCount = contentFromServer.total_count
