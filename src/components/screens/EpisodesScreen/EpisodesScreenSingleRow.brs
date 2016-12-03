@@ -187,7 +187,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     if key = "right" and m.Menu.isInFocusChain() then
       focusGrid()
       return true
-    else if (key = "left" or key = "back") and m.SeasonRows.isInFocusChain() then
+    else if (key = "left") and m.SeasonRows.isInFocusChain() then
       focusMenu()
       return true
     end if
