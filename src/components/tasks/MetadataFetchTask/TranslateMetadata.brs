@@ -315,7 +315,7 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
   'take care of any children the content might have
   if contentFromServer.children <> invalid and contentFromServer.children.count() > 0
 
-    if translatedContent.totalCount = 0
+    if translatedContent.totalCount = -1
       translatedContent.totalCount = contentFromServer.children.count()
     end if
 
@@ -372,7 +372,7 @@ Function dedupeBackgrounds(backgroundsFromServer) as Object
 End Function
 
 Function setTotalCount(metadata As Object)
-  if metadata.totalCount = 0 and metadata.getChildCount() <> 0 then
+  if metadata.totalCount = -1 and metadata.getChildCount() <> 0 then
     metadata.totalCount = metadata.getChildCount()
   end if
 End Function
