@@ -85,6 +85,38 @@ The code will run all the test suites defined in ``src/source/tests`` only. Run 
 
 You can set `DEV_PASSWORD` with the developer password set on the roku device if it is something other than the default `1234`
 
+
+### Prepare Release
+
+Running `make release` will take care of a few steps for prepping a release build.  These include
+
+* Cleaning up any previous builds from the build directory to avoid stale sources
+* Verifying a clean build directory to avoid uncommited changes in the build
+* Incrementing the build number in the manifest and generated Settings.brs file
+* Tagging the source tree
+
+The following is example output of running the release target:
+
+
+```
+$ make release
+Incremented the build number to 2.1.33
+[release_target c76bb0a] incrementbuild: Bump build number
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+Tagging 2_1_33
+Generated the file: build/source/Settings.brs.
+Generated the file build/manifest.
+Project tubitv_roku.zip is built with profile production.
+
+If you are intending this to be a formal release, create a pull request for the current branch
+    git branch release_2_1_33
+    git push origin release_2_1_33
+Remember to push the new tag to remote with 'git push --tags origin'
+
+```
+
+
+
 ## Project Layout
 
 

@@ -6,6 +6,7 @@ const yaml = require('js-yaml');
 
 const cwd = path.join(process.cwd(), 'config');
 const defaultProfile = 'default';
+const buildProfile = 'build';
 
 bluebird.promisifyAll(fs);
 
@@ -65,7 +66,8 @@ function genConfigFunction(name, data) {
 function load(env) {
   var data = parse(defaultProfile);
   var envData = parse(env);
-  return extend(true, data, envData);
+  var build = parse(buildProfile);
+  return extend(true, data, envData, build);
 }
 
 /**
@@ -121,6 +123,27 @@ function genManifest(env, filename) {
   })
 }
 
+function incrementBuildNumber() {
+  var build = parse(buildProfile);
+  build.manifest.build_version = build.manifest.build_version + 1
+  const filename = path.join(cwd, buildProfile + '.yml');
+  fs.openAsync(filename, 'w').then(fd => {
+    const data = yaml.dump(build);
+    return fs.writeAsync(fd, data);
+  }).then(() => {
+    console.log('Incremented the build number to %d.%d.%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version);
+  }).catch(err => {
+    console.log(err);
+  })
+}
+
+function getBuildTag() {
+  var build = parse(buildProfile);
+  console.log('%d_%d_%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version);
+}
+
 exports.load = load;
 exports.save = save;
 exports.genManifest = genManifest;
+exports.incrementBuildNumber = incrementBuildNumber;
+exports.getBuildTag = getBuildTag;

@@ -48,4 +48,19 @@ program
     )
     console.log('Press Ctrl+C to stop auto discovery.');
   });
+
+program
+  .command('increment-build-number')
+  .description('bump the build number for a release')
+  .action(() => {
+    config.incrementBuildNumber()
+  });
+
+program
+  .command('get-build-tag')
+  .description('dump a git-friendly version number to use as a tag')
+  .action(() => {
+    config.getBuildTag()
+  });
+
 program.parse(process.argv);
