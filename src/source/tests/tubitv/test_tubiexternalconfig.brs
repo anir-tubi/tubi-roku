@@ -13,10 +13,15 @@ Function testExternalConfigInitFailed(t As Object)
   constants = getConstants()
   request = TubiRequest()
   config = TubiExternalConfig(request, constants)
+  defaultConfig = {
+      somevalue: "yes"
+    }
+  config.defaultValues = defaultConfig
   config.getConfigs = MockGetInvalidConfigs
   t.assertInvalid(constants.externalConfig.info)
   config.init()
-  t.assertInvalid(constants.externalConfig.info)
+  t.assertNotInvalid(constants.externalConfig.info)
+  t.assertEqual(constants.externalConfig.info, defaultConfig)
 End Function
 
 ' Mock that the server did not respond, or response was invalid

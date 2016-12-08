@@ -44,7 +44,7 @@ Sub MainOldUI(params as Dynamic)
   ' This will only run for the test mode
   if app.settings.mode = "test"
     print "Starting all the tests..."
-    RunTest()
+    BrsTestMain()
     return
   end if
 
