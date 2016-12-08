@@ -315,4 +315,47 @@ Function testHandleRefreshResponse(t as Object)
 End Function
 
 
+Function testCreateAuthRequest(t as Object)
+  constants = getConstants()
+  requestObj = TubiRequest()
+  auth = TubiAuth(constants, requestObj)
 
+  url = "https://somefakeurl.com"
+
+
+  'a good set of authInfo... should create a valid auth request
+  auth.getAuthInfo = function()
+    return {
+      expireTime: 123456
+      accessToken: "Some555Other666String777d"
+      refreshToken: "Some111Refresh999String000w"
+      userId: "6739"
+    }
+  end function
+
+
+  authRequest = auth.createAuthRequest(url, "goodAuthRequest")
+  t.assertNotInvalid(authRequest)
+  t.assertNotInvalid(authRequest.getAuthHeaders)
+  t.assertNotInvalid(authRequest.refreshAuthToken)
+  t.assertNotInvalid(authRequest.updateAuthInfo)
+  t.assertNotInvalid(authRequest.saveAuthInfo)
+  t.assertNotInvalid(authRequest.handleRefreshResponse)
+  t.assertNotInvalid(authRequest.constants)
+  t.assertNotInvalid(authRequest.request)
+  t.assertNotInvalid(authRequest.authInfo)
+
+  'a bad set of authInfo... should create an invalid auth request
+  auth.getAuthInfo = function()
+    return {
+      expireTime: 123456
+      refreshToken: "Some111Refresh999String000w"
+      userId: "6739"
+    }
+  end function
+
+  authRequest = auth.createAuthRequest(url, "badAuthRequest")
+  t.assertInvalid(authRequest)
+
+
+End Function

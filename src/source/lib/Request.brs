@@ -95,6 +95,11 @@ End Function
 '
 Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
 
+  isRetry = false
+  if m.urltransfer <> invalid
+    isRetry = true
+  end if
+
   if type(urltransfer_or_messageport) = "roUrlTransfer" then
     ' use default assigned port
     m.urltransfer = urltransfer_or_messageport
@@ -105,7 +110,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
     return false
   end if
 
-  if m.params.Count() > 0 then
+  if m.params.Count() > 0  and isRetry = false then
     fullUrl = m.addParamsToUrl_(m.url, m.params)
     m.urltransfer.SetUrl(fullUrl)
     m.url = fullUrl
@@ -117,9 +122,8 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   if m.isHttps then
     m.urltransfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
   end if
-  for each h in m.headers
-    m.urltransfer.addHeader(h, m.headers[h])
-  end for
+
+  m.urltransfer.setHeaders(m.headers)
   m.urltransfer.setRequest(m.method)
 
   ' Start the request
@@ -203,19 +207,31 @@ Function tubihttp_handleEvent(message As Object) As Object
         code = message.GetResponseCode()
 
         'server said our auth token was not valid
-        if m.authInfo <> invalid and code = 403
-          m.authInfo = m.refreshAuthToken(m.authInfo)
+        if m.authInfo <> invalid and code = 403 and m.retries > 0
+          newAuthInfo = m.refreshAuthToken(m.authInfo, 100)
 
-          'replace any necessary new auth info in the headers and try again
-          authHeaders = m.getAuthHeaders(m.authInfo.accessToken)
-          if authHeaders <> invalid
-            for each header in authHeaders
-              m.headers[header] = authHeaders[header]
-            end for
+          if newAuthInfo <> invalid
+            'replace any necessary new auth info in the headers and try again
+            authHeaders = m.getAuthHeaders(newAuthInfo.accessToken)
+            
+            if authHeaders <> invalid
+              for each header in authHeaders
+                m.headers[header] = authHeaders[header]
+              end for
+              
+              m.retries = m.retries - 1
+              m.start(m.urltransfer)
+            end if
+
+          else  ' refreshing the auth token failed so just attach the response info and finish
+            m.response = {
+              code: code
+              data: message.GetString()
+              failReason: message.GetFailureReason()
+            }
+            m.urltransfer = invalid ' release reference in case this will be reused
+            return m
           end if
-
-          m.retries = m.retries - 1
-          m.start(m.urltransfer)
 
         else if code < 0 and m.retries > 0 then
           m.retries = m.retries - 1    
@@ -226,7 +242,10 @@ Function tubihttp_handleEvent(message As Object) As Object
             code: code
             data: message.GetString()
             failReason: message.GetFailureReason()
+            name: m.name
+
           }
+
           m.urltransfer = invalid ' release reference in case this will be reused
           return m
         end if

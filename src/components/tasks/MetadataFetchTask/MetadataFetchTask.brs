@@ -120,7 +120,7 @@ Function handleResponse(message)
     ' double check that we have our context
     if handledRequest.node <> invalid and handledRequest.field <> invalid and handledRequest.response <> invalid then
       ' response should have fields: code, data, failReason
-      tubiLog("MetadataFetchTask response code was " + stri(handledRequest.response.code))
+      tubiLog("MetadataFetchTask response code was " + stri(handledRequest.response.code) + " for " + handledRequest.name)
 
       tubiLog("MetadataFetchTask.handleResponse setting response field " + handledRequest.field)
       tubiLog("MetadataFetchTask request duration = " + tostr(handledRequest.request_end_time - handledRequest.request_start_time))

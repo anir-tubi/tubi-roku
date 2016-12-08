@@ -44,9 +44,8 @@ Function init()
   ' to it when focus is taken away
   m.lastFocusedComponent = m.CategoryList
 
-  onSignedInChange()  ' seed the search & sign in menu
+  onSignedInChange()  ' seed the search & sign in menu - also calls loadUserCategories() if necessary
 
-  loadUserCategories()
   loadAllCategories()
 
 End Function
@@ -369,6 +368,9 @@ Function handleInitialBookmarks()
     m.global.bookmarkIds = bookmarkData.bookmarkIds
     m.global.bookmarkOrder = bookmarkData.bookmarkOrder
 
+    'it's possible that the call to get the full bookmarks content can occur before the
+    'bookmark id/order are set, so just in case, set user categories as dirty to load them again
+    onDirtyUserCategories()
   end if
 End Function
 
@@ -392,6 +394,9 @@ Function handleInitialHistory()
     m.global.historyIds = historyData.historyIds
     m.global.historyOrder = historyData.historyOrder
 
+    'it's possible that the call to get the full bookmarks content can occur before the
+    'bookmark id/order are set, so just in case, set user categories as dirty to load them again
+    onDirtyUserCategories()
   end if
 End Function
 

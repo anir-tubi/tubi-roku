@@ -48,9 +48,9 @@ Function getInitialUserCategories()
       if handledReq <> invalid
         if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
           if handledReq.localId = localBookmarkReqId
-            m.top.initialBookmarks = handledReq.response.data
+            m.top.setField("initialBookmarks", handledReq.response.data)
           else if handledReq.localId = localHistoryReqId
-            m.top.initialHistory = handledReq.response.data
+            m.top.setField("initialHistory", handledReq.response.data)
           end if
         end if
       end if

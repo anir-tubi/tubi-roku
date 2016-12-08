@@ -43,23 +43,19 @@ End Function
 function tubiAuth_getAuthInfo()
   tubiLog("tubiAuth_getAuthInfo")
   authInfo = RegReadAll(m.authRegKey) 'returns empty assocArray if nothing in the auth registry
+  newAuthInfo = invalid
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
     authInfo.expireTime = authInfo.expireTime.toInt()
     isExpired = m.checkIfAuthExpired(authInfo)
 
     if isExpired = true
-      authPort = CreateObject("roMessagePort")
-      refreshRequest = m.requestTokenRefresh(authInfo, authPort)
-
-      if refreshRequest <> invalid
-        authInfo = m.refreshAuthToken(authInfo, 3)
-      end if
-
+      newAuthInfo = m.refreshAuthToken(authInfo, 3) 'can return invalid
+    else
+      newAuthInfo = authInfo
     end if
-  else
-    authInfo = invalid
   end if
-  return authInfo
+
+  return newAuthInfo  'can return invalid
 end function
 
 
@@ -93,13 +89,14 @@ End Function
 '}
 '@timeout: integer, the max amount of time to wait for a response from the server
 '
-'returns the new authInfo if updated or the old authInfo if there was a problem receiving or updating the new authInfo
+'returns the new authInfo if updated or invalid if there was a problem receiving or updating the new authInfo
 'side effects... overwrites the old authInfo in the registry with the new authInfo
 Function tubiAuth_refreshAuthToken(authInfo, timeout)
   authPort = CreateObject("roMessagePort")
 
   refreshReq = m.requestTokenRefresh(authInfo, authPort)
 
+  newAuthInfo = invalid
   if refreshReq <> invalid
 
     timer = CreateObject("roTimespan")
@@ -112,10 +109,6 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
         newAuthInfo = m.updateAuthInfo(newAccess, authInfo)
         newAuthInfo = m.saveAuthInfo(authInfo) 'returns invalid if not saved to the registry
 
-        if newAuthInfo <> invalid
-          authInfo = newAuthInfo
-        end if
-
         exit while
       end if
 
@@ -127,7 +120,7 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
     end while
   end if
 
-  return authInfo
+  return newAuthInfo 'may return invalid
 End Function
 
 
@@ -176,6 +169,12 @@ function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
     authReq = m.request.createAsync(url, name, options)
     authReq.getAuthHeaders = m.getAuthHeaders
     authReq.refreshAuthToken = m.refreshAuthToken
+    authReq.requestTokenRefresh = m.requestTokenRefresh
+    authReq.updateAuthInfo = m.updateAuthInfo
+    authReq.saveAuthInfo = m.saveAuthInfo
+    authReq.handleRefreshResponse = m.handleRefreshResponse
+    authReq.constants = m.constants
+    authReq.request = m.request
     authReq.authInfo = authInfo
   end if
 
@@ -267,6 +266,7 @@ function tubiAuth_requestTokenRefresh_(authInfo, port)
     method: "POST"
     body: bodyJson
     headers: headers
+    retries: 0
   }
 
   newTokenReq = m.request.createAsync(m.constants.urls.users.refreshToken, "getNewAccessToken", reqOptions)
@@ -285,6 +285,7 @@ function tubiAuth_handleRefreshResponse_(msg, refreshRequest)
   newAccess = invalid
 
   responseInfo = refreshRequest.handleEvent(msg)
+
   if responseInfo <> invalid and responseInfo.response <> invalid and responseInfo.response.data <> invalid
     if responseInfo.response.data.len() > 0
       newAccess = ParseJson(responseInfo.response.data)

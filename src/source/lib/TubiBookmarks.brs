@@ -333,6 +333,7 @@ end function
 '                             type: contentType ("series" or "movie")
 '                           }
 function tubiBookmarks_getFullHistoryReq(orderList as Object) as Object
+  tubiLog("TubiBookmarks.getFullHistoryReq")
   fullHistoryReq = m.getFullBookmarkOrHistory(orderList, m.constants.reqNames.getFullHistory)
   
   return fullHistoryReq
@@ -417,6 +418,7 @@ end function
 '   historyIds: assocArray, a map of contentIds to server historysIds
 '   historyOrder: an array of contentIds (series have pre-pended 0), that keeps the order of history as returned from the server
 function tubiBookmarks_handleInitialHistory(initialHistory)
+  tubiLog("TubiBookmarks.handleInitialHistory")
   historyOrder = []
   historyIds = {
     'each videos and series assocArray should look like:
