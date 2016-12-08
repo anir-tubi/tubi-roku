@@ -193,10 +193,11 @@ Function loadVisiblePosters(useCache=true As Boolean) As Void
 
   ' find the visible items by comparing the clipping window to the m.items offset
   ' these are all grid indices, not pixel coords
-  x =  -m.items.translation[0] \ (m.top.itemSize[0] + m.top.itemSpacing[0])
-  y =  -m.items.translation[1] \ (m.top.itemSize[1] + m.top.itemSpacing[1])
-  width =  m.top.width \ (m.top.itemSize[0] + m.top.itemSpacing[0]) + 1 ' always add one so we show overhang
-  height =  m.top.height \ (m.top.itemSize[1] + m.top.itemSpacing[1]) + 1
+  visibleItems = getVisibleItemWindow()
+  x = visibleItems.x
+  y = visibleItems.y
+  width = visibleItems.width
+  height = visibleItems.height
 
   ' expand to preload a few outside of the visible window
   x = x - m.overhang
@@ -205,6 +206,7 @@ Function loadVisiblePosters(useCache=true As Boolean) As Void
   height = height + m.overhang * 2
 
   ' cap at the extremeties
+  ' TODO(Chris): Wraparound would be accounted for here if we want to add that
   if x < 0 then x = 0
   if y < 0 then y = 0
   if (x + width) > m.internalNumColumns then width = m.internalNumColumns - x
@@ -443,6 +445,18 @@ Function scrollGrid(direction As String) As Boolean
   else if direction = "right" and m.internalItemFocused[0] < m.internalNumColumns-1 then
     startChangeFocus([m.internalItemFocused[0] + 1, m.internalItemFocused[1]])
     return true
+  else if direction = "fastforward" and m.internalItemFocused[0] < m.internalNumColumns-1 then
+    visibleItems = getVisibleItemWindow()
+    newX = m.internalItemFocused[0] + (visibleItems.width - 2)  ' subtract 2 since there may be overscan
+    if newX > m.internalNumColumns-1 then newX = m.internalNumColumns-1
+    startChangeFocus([newX, m.internalItemFocused[1]])
+    return false
+  else if direction = "rewind" and m.internalItemFocused[0] > 0 then
+    visibleItems = getVisibleItemWindow()
+    newX = m.internalItemFocused[0] - (visibleItems.width - 2)  ' subtract 2 since there may be overscan
+    if newX < 0 then newX = 0
+    startChangeFocus([newX, m.internalItemFocused[1]])
+    return false
   else
     return false
   end if
@@ -530,4 +544,25 @@ Function getContent(index)
     item = invalid
   end if
   return item
+End Function
+
+
+'''''''''''''''
+' getVisibleItemWindow
+'
+' Return grid index for visible items.  This is in item coordinates, not screen coordinates.
+' NOTE: This will always have a valid x and y, though the width and height may be more than
+'       the number of items available so the caller should clamp or account for item wrapping.
+Function getVisibleItemWindow()
+  x =  -m.items.translation[0] \ (m.top.itemSize[0] + m.top.itemSpacing[0])
+  y =  -m.items.translation[1] \ (m.top.itemSize[1] + m.top.itemSpacing[1])
+  width =  m.top.width \ (m.top.itemSize[0] + m.top.itemSpacing[0]) + 1 ' always add one so we show overhang
+  height =  m.top.height \ (m.top.itemSize[1] + m.top.itemSpacing[1]) + 1
+
+  return {
+    x: x
+    y: y
+    width: width
+    height: height
+  }
 End Function
