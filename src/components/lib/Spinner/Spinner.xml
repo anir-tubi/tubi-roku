@@ -47,7 +47,7 @@
       easeFunction="linear">
       <FloatFieldInterpolator
         id="SpinnerRotationInterpolator"
-        key="[0.0, 1.0]"
+        key="[1.0, 0.0]"
         keyValue="[0.0, 6.28]"
         fieldToInterp="SpinnerPoster.rotation"/>
     </Animation>
