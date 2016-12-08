@@ -21,6 +21,7 @@ Function onScreenFocusChange()
   tubiLog("SignInEmailPasswordScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.EmailTextBox.setFocus(true)
+    m.EmailTextBoxFocus.visible = true
   end if
   setColors()
 End Function

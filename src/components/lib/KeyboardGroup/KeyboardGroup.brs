@@ -16,7 +16,6 @@ Function init()
   m.CurrentKeyboard = m.UppercaseKeyboard
   m.top.observeField("focusedChild", "onKeyboardFocusChange")
 
-  m.SymbolMenu.setFocus(true)
   m.lastFocusedItem = m.SymbolMenu
 
   m.BACKSPACE = Chr(&h7F)
