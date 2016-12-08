@@ -74,6 +74,12 @@ Function onContentChange()
         m.ContentGrid.scrollWidth = 430
         m.ContentGrid.itemSize = [430,256]
         m.ContentGrid.itemComponentName = "FeaturePosterSingleRow"
+      else if m.top.content.id = "ContinueWatching" then
+        ' Regular poster size, but with resume bar overlay
+        m.ContentGrid.scrollWidth = 210
+        m.ContentGrid.itemSize = [210,300]
+        m.ContentGrid.itemComponentName = "ResumePoster"
+        
       else if m.top.content.id = "SearchSignIn" or m.top.content.id = "SearchSignOut" then
         m.ContentGrid.scrollWidth = 430
         m.ContentGrid.itemSize = [430,256]
