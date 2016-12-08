@@ -89,12 +89,14 @@
         <!-- TubiContentNode here so it can contain the totalcount for the Info Panel -->
         <TubiContentNode
           id="ContinueWatching"
+          type="category"
           title="Continue Watching"
           description="The Movies and TV Shows you have started watching can be found here"
           placeholderText="You haven't watched anything yet. The content you watch will appear here."
           slug="continue_watching" />
         <TubiContentNode
           id="MyQueue"
+          type="category"
           title="My Queue"
           description="The Movies and TV Shows you have added to your Queue can be found here"
           placeholderText="You don’t have anything in your Queue yet. Get started by adding Movies and TV Shows that interest you to your Queue."
