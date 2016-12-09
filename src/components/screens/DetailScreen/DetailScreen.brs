@@ -257,13 +257,16 @@ Function setMenuItems() As Void
   ' bookmarks follow series or movie, so don't use focusedContent here
   if m.top.signedIn = true and m.top.content.bookmarkId <> invalid and m.top.content.bookmarkId <> "" then
     menuItems.appendChild(m.RemoveQueueMenuItem)
+    m.RemoveQueueMenuItem.title = "Remove from queue"
   else 
     menuItems.appendChild(m.AddQueueMenuItem)
+    m.AddQueueMenuItem.title = "Add to queue"  ' reset this for the next time it shows
   end if
 
   ' history will be set on the series if any of the episodes have history, so look at m.top.content
   if m.top.content.historyId <> invalid and m.top.content.historyId <> "" then
     menuItems.appendChild(m.RemoveHistoryMenuItem)
+    m.RemoveHistoryMenuItem.title = "Remove from history"
   end if
 
   m.Menu.content = menuItems
@@ -392,6 +395,7 @@ Function addToQueue()
     m.AuthTask.observeField("bookmarkId", "onBookmarked")
     m.AuthTask.control = "RUN"
     m.isWaitingForServerResponse = true
+    m.AddQueueMenuItem.title = "Adding ..."
   end if
 End Function
 
@@ -470,7 +474,7 @@ Function removeFromQueue()
     m.AuthTask.observeField("result", "onBookmarkRemoved")
     m.AuthTask.control = "RUN"
     m.isWaitingForServerResponse = true
-    'TODO(Chris): show spinner
+    m.RemoveQueueMenuItem.title = "Removing ..."
   end if
 End Function
 
@@ -541,6 +545,7 @@ Function removeFromHistory()
     m.AuthTask.observeField("result", "onHistoryRemoved")
     m.AuthTask.control = "RUN"
     m.isWaitingForServerResponse = true
+    m.RemoveHistoryMenuItem.title = "Removing ..."
   end if
 End Function
 
