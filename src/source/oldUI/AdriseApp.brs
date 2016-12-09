@@ -414,8 +414,11 @@ Function AdriseApp_handleItemPicked(playlist, listIndex, itemIndex, source)
             exit while
           end if
 
-          episode = m.cp.getEpisodeInPlaylist(playlist, episodeCounter)
-          episode.PlayStart = 0
+          newEpisode = m.cp.getEpisodeInPlaylist(playlist, episodeCounter)
+          if newEpisode <> invalid
+            episode = newEpisode
+            episode.PlayStart = 0
+          end if
         else
           'set linearTvOn status to false and leave linear tv
           m.linearTv.linearTvOn = false
