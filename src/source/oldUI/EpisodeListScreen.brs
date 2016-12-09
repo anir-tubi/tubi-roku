@@ -23,6 +23,13 @@ function EpisodeListScreen_show(series)
   '   haveAllEpisodes: true
   '   episodes: []   << all the seasons for the series 
   ' }
+
+  if series = invalid or series.playlist = invalid
+    print "no series with a playist passed to episodeListScreen.show()"
+    return invalid
+  end if
+
+
   playlist = series.playlist
   landscape = true
   handleItemSource = "episodeListScreen"
@@ -31,8 +38,7 @@ function EpisodeListScreen_show(series)
   'if appSettings.isLandscape = true
 
   thumbRatio = invalid
-
-	if playlist.episodes.count() > 0
+	if playlist.episodes <> invalid and playlist.episodes.count() > 0
     if playlist.episodes[0].thumbnailRatio <> invalid
       thumbRatio = playlist.episodes[0].thumbnailRatio
     else if playlist.episodes[0].episodes <> invalid and playlist.episodes[0].episodes.count() > 0 and playlist.episodes[0].episodes[0].thumbnailRatio <> invalid
