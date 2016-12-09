@@ -551,7 +551,11 @@ function RegisterScreen(uniqueId, utils)
             value: "/deviceregistration/sms"
             port: GetGlobalAA().app.gridScreen.gridPort
           })
-          m.showMessage("Thank you", "You are now registered as " + regOutput.fn + " " + regOutput.ln + ".")
+          if regOutput.fn <> invalid and regOutput.ln <> invalid
+            m.showMessage("Thank you", "You are now registered as " + regOutput.fn + " " + regOutput.ln + ".")
+          else
+            m.showMessage("Thank you", "You are now a registered Tubi TV user.")
+          end if
           m.token = invalid
         end if
       end if
