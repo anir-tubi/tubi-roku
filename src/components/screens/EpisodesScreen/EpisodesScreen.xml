@@ -2,11 +2,20 @@
 <component name="EpisodesScreen" extends="Group" initialFocus="Menu" >
 
   <script type="text/brightscript" uri="pkg:/components/screens/EpisodesScreen/EpisodesScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
   
   <interface>
     <!-- Full content of the item to show details for -->
     <field id="content" type="node" />
+
+    <!-- Index of the season that is currently in focus -->
+    <field id="seasonFocused" type="integer" value="-1" />
+
+    <!-- interface to tell the episode screen to focus a specific series episode;
+         2d array describing the episode that needs to be focused with [seasonIndex, episodeIndex] -->
+    <field id="episodeToFocus" type="intarray" /> 
 
     <!-- Set to the content of the episode that was clicked on -->
     <field id="episodeSelected" type="intarray" alwaysNotify="true"/>
@@ -22,31 +31,31 @@
     <InfoPanel
       id="InfoPanel"
       translation="[85,61]"
+      maxHeight="577"
       mode="detail"
       visible="true" />
     
     <ScrollingList
-      id="Menu"
-      translation="[65, 424]"
-      width="440"
-      height="616"
-      itemSpacings="[9]"
+      id="EpisodeMenu"
+      translation="[-375, 640]"
+      width="425"
+      height="440"
+      scrollHeight="80"
+      itemSpacings="[8]"
       itemComponentName="CategorySeasonListItem"
       visible="false"
-      focusBitmapUri="pkg:/images/menu-focus.png"/>
+      focusBitmapUri="pkg:/images/menu-focus-short.png" />
 
-    <ContentGrid
-      id="EpisodeGrid"
-      scrollWidth="1196"
-      width="1395"
-      height="612"
-      numRows="2"
-      fillDirection="W"
-      visible="false"
-      translation="[525,423]"
-      itemSize="[524,295]"
-      itemSpacing="[20,20]"
-      itemComponentName="FeaturePoster" />
+    <ScrollingList
+      id="SeasonRows"
+      width="1835"
+      height="503"
+      scrollHeight="370"
+      itemSpacings="[29]"
+      itemComponentName="CategoryContentGrid"
+      focusBitmapUri=""
+      focusChangeDuration="0.6"
+      translation="[85,588]" />
     
   </children>
 </component>

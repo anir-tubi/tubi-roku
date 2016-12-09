@@ -50,7 +50,7 @@
     
     <!-- set to true when the user removes the title from their history -->
     <field id="removeFromHistorySelected" type="boolean" alwaysNotify="true" />
-    
+
     <!-- set to true when the user wants to see the trailer for the content -->
     <field id="watchTrailerSelected" type="boolean" alwaysNotify="true" />
 
@@ -99,40 +99,25 @@
       title="Watch Trailer"
       unfocusiconurl="pkg:/images/icon-trailer.png"
       focusiconurl="pkg:/images/icon-trailer-on.png" />
-                               
   
-    <!-- These are in a layout group together because this menu should float up -->
-    <LayoutGroup
-      translation="[65,61]"
-      itemSpacings="[50]">
-      <LayoutGroup
-        layoutDirection="horiz">
-      <!-- Since we can't translate items in a LayoutGroup we have to put a rectangle here to
-        - push the InfoPanel over
-        -->
-      <Rectangle
-        width="20"
-        height="10"
-        color="0x00000000"/>
-      <InfoPanel
-        id="InfoPanel"
-        mode="detail"
-        visible="true"/>
-      </LayoutGroup>
-    
-      <ScrollingList
-        id="Menu"
-        width="440"
-        height="500"
-        itemSpacings="[8]"
-        itemComponentName="DetailMenuItem"
-        focusBitmapUri="pkg:/images/menu-focus.png"
-        visible="false"
-        translation="[0, 0]">
-      </ScrollingList>
-    </LayoutGroup>
+    <InfoPanel
+      id="InfoPanel"
+      mode="detail"
+      translation="[85,229]"
+      maxHeight="680"
+      visible="true" />
+  
+    <ScrollingList
+      id="Menu"
+      width="465"
+      height="352"
+      itemSpacings="[8]"
+      itemComponentName="DetailMenuItem"
+      focusBitmapUri="pkg:/images/menu-focus.png"
+      visible="false"
+      translation="[60, 680]" />
     
     <AuthTask
-      id="AuthTask"/>
+      id="AuthTask" />
   </children>
 </component>

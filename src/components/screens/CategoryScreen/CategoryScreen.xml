@@ -75,78 +75,102 @@
   </interface>
 
   <children>
-    <!-- Special category menu items. These will be merged with category list -->
-    <ContentNode
-      id="SpecialCategories">
-      <!-- TubiContentNode here so it can contain the totalcount for the Info Panel -->
-      <TubiContentNode
-        id="ContinueWatching"
-        title="Continue Watching"
-        description="The Movies and TV Shows you have started watching can be found here"/>
-      <TubiContentNode
-        id="MyQueue"
-        title="My Queue"
-        description="The Movies and TV Shows you have added to your Queue can be found here"/>
-      <ContentNode
-        id="SearchSignIn"
-        title="Search &amp; Sign In"
-        description="Find titles on TubiTV, Sign In and more."/>
-      <ContentNode
-        id="SearchSignOut"
-        title="Search &amp; Sign Out"
-        description="Find titles on TubiTV, Sign Out and more."/>
-    </ContentNode>
 
-    <ContentNode
-      id="SearchSignInContent">
+  <MaskGroup
+    translation="[0,0]"
+    maskUri="pkg:/images/poster-mask-pixel.png"
+    maskSize="[0,1080]"
+    maskOffset="[1840,0]">
+
+
+      <!-- Special category menu items. These will be merged with category list -->
       <ContentNode
-        id="SearchMenuItem"
-        title="Search" 
-        description="Search Tubi TV using the name of a Movie or TV Show. You can also search by Actor Name or Keyword"
-        hdgridposterurl="pkg:/images/icon-search-large.png"/>
+        id="SpecialCategories">
+        <!-- TubiContentNode here so it can contain the totalcount for the Info Panel -->
+        <TubiContentNode
+          id="ContinueWatching"
+          type="category"
+          title="Continue Watching"
+          description="The Movies and TV Shows you have started watching can be found here"
+          placeholderText="You haven't watched anything yet. The content you watch will appear here."
+          slug="continue_watching" />
+        <TubiContentNode
+          id="MyQueue"
+          type="category"
+          title="My Queue"
+          description="The Movies and TV Shows you have added to your Queue can be found here"
+          placeholderText="You don’t have anything in your Queue yet. Get started by adding Movies and TV Shows that interest you to your Queue."
+          slug="my_queue" />
+        <TubiContentNode
+          id="SearchSignIn"
+          title="Search &amp; Sign In"
+          description="Find titles on TubiTV, Sign In and more."/>
+        <TubiContentNode
+          id="SearchSignOut"
+          title="Search &amp; Sign Out"
+          description="Find titles on TubiTV, Sign Out and more."/>
+      </ContentNode>
+
       <ContentNode
-        id="SignInMenuItem"
-        title="Sign In"
-        description="Sign In to Tubi TV. Access your Queue and View History across your devices"
-        hdgridposterurl="pkg:/images/icon-sign-in-large.png" />
-      <ContentNode
-        id="SignOutMenuItem"
-        title="Sign Out"
-        description="Sign Out of Tubi TV"
-        hdgridposterurl="pkg:/images/icon-sign-in-large.png" />
-      <ContentNode
-        id="AboutMenuItem"
-        title="About Tubi TV"
-        description="View general information about Tubi TV including the version number of this app"
-        hdgridposterurl="pkg:/images/icon-about-large.png" />
-      <ContentNode
-        id="PrivacyMenuItem"
-        title="Privacy"
-        description="Review Tubi TV's privacy policy"
-        hdgridposterurl="pkg:/images/icon-privacy-large.png" />
-    </ContentNode>
+        id="SearchSignInContent">
+        <ContentNode
+          id="SearchMenuItem"
+          title="Search" 
+          description="Search Tubi TV using the name of a Movie or TV Show. You can also search by Actor Name or Keyword"
+          hdgridposterurl="pkg:/images/icon-search-large.png"/>
+        <ContentNode
+          id="SignInMenuItem"
+          title="Sign In"
+          description="Sign In to Tubi TV. Access your Queue and View History across your devices"
+          hdgridposterurl="pkg:/images/icon-sign-in-large.png" />
+        <ContentNode
+          id="SignOutMenuItem"
+          title="Sign Out"
+          description="Sign Out of Tubi TV"
+          hdgridposterurl="pkg:/images/icon-sign-in-large.png" />
+        <ContentNode
+          id="AboutMenuItem"
+          title="About Tubi TV"
+          description="View general information about Tubi TV including the version number of this app"
+          hdgridposterurl="pkg:/images/icon-about-large.png" />
+        <ContentNode
+          id="PrivacyMenuItem"
+          title="Privacy"
+          description="Review Tubi TV's privacy policy"
+          hdgridposterurl="pkg:/images/icon-privacy-large.png" />
+      </ContentNode>
+
+      <ScrollingList
+        id="CategoryList"
+        translation="[-380, 640]"
+        width="425"
+        height="440"
+        scrollHeight="80"
+        itemSpacings="[8]"
+        itemComponentName="CategorySeasonListItem"
+        focusBitmapUri="pkg:/images/menu-focus.png"/>
+
+      <InfoPanel
+        id="InfoPanel"
+        translation="[85,229]"
+        maxHeight="577"
+        visible="true" />
+
+      <Group
+        id="ContentArea"
+        translation="[85,588]" >
+        <CategoryGridList
+          id="CategoryGridList"/>
+      </Group>
+    </MaskGroup>
+
+    <Poster
+      id="tubiLogo"
+      height="43"
+      width="149"
+      uri="pkg:/images/logo.png"
+      translation="[1688,969]" />
     
-    <ScrollingList
-      id="CategoryList"
-      translation="[-440, 424]"
-      width="440"
-      height="616"
-      itemSpacings="[8]"
-      itemComponentName="CategorySeasonListItem"
-      focusBitmapUri="pkg:/images/menu-focus.png"/>
-    
-    <InfoPanel
-      id="InfoPanel"
-      translation="[85,61]"
-      visible="true" />
-    
-    <Group
-      id="ContentArea"
-      translation="[85,423]" >
-      <CategoryGridList
-        id="CategoryGridList"/>
-    </Group>
-      
     <AuthTask
       id="CategoryAuthTask" />
 
@@ -156,6 +180,13 @@
     <Timer
       id="CategoryPreloadTimer"
       duration="2.0"/>
+    
+    <Spinner
+      id="Spinner"
+      width="1920"
+      height="1080"
+      visible="true"
+      translation="[0,0]"/>
     
   </children>
 </component>

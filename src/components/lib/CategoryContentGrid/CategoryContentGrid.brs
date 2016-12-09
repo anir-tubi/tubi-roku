@@ -1,94 +1,127 @@
 Function init()
+  tubiLog("CategoryContentGrid.init")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusPercent", "onFocusPercentChange")
-  m.PosterGrid = m.top.findNode("PosterGrid")
-  m.FeatureGrid = m.top.findNode("FeatureGrid")
-  m.SignInGrid = m.top.findNode("SignInGrid")
-  m.PosterGrid.focusChangeDuration = m.global.constants.performance.categoryGridList.gridAnimationDuration
-  m.FeatureGrid.focusChangeDuration = m.global.constants.performance.categoryGridList.gridAnimationDuration
-  m.SignInGrid.focusChangeDuration = m.global.constants.performance.categoryGridList.gridAnimationDuration
-  m.ContentGrid = m.PosterGrid  ' this will change based on content title
+  m.top.observeField("listHasFocus", "onListHasFocus")
+  m.CategoryName = m.top.findNode("CategoryName")
+  m.FocusedCategoryName = m.top.findNode("FocusedCategoryName")
+  m.UnfocusedCategoryName = m.top.findNode("UnfocusedCategoryName")
+  m.ContentGrid = m.top.findNode("ContentGrid")
+  m.ContentGrid.observeField("itemFocused", "onItemFocusedChange")
+  m.EmptyPlaceholder = m.top.findNode("EmptyPlaceholder")
   m.Spinner = m.top.findNode("Spinner")
 
-  ' Set Rectangle attributes which force bounding box size, affecting 
-  ' layout within the ScrollingList
-  m.top.color = m.global.constants.ui.colors.transparent
-  m.top.width = "1395"
-  m.top.height = "624"
+  ' the count of contents on the top right of the category grid
+  m.CategoryCount = m.top.findNode("CategoryCount")
+  m.ItemCount = m.top.findNode("ItemCount")
+  m.FocusIndex = m.top.findNode("FocusIndex")
+
+  ' initialize CategoryName visibility
+  onFocusPercentChange()
 End Function
 
 Function onComponentFocusChange()
   tubiLog("CategoryContentGrid.onComponentFocusChange")
-  if m.top.hasFocus() then
+  if m.top.hasFocus() and m.ContentGrid.visible then
     m.ContentGrid.setFocus(true)
+  else
+    m.top.itemFocused = m.top.content
   end if
 End Function
 
 Function onFocusPercentChange()
-  ' The 'visible' flag is key to keeping the number of Poster instances in memory low.
-  ' When a grid is not being shown on screen it can keep the metadata intact while
-  ' freeing VRAM used for posters
-  if m.top.focusPercent > 0 and m.ContentGrid.visible = false then
-    m.ContentGrid.visible = true
-  else if m.top.focusPercent = 0 and m.ContentGrid.visible = true then
-    m.ContentGrid.visible = false
+  tubiLog("CategoryContentGrid.onFocusPercentChange")
+  if m.top.focusPercent > 0 and not m.top.listHasFocus then
+    m.CategoryName.opacity = 1.0 - m.top.focusPercent
+
+  else if m.top.focusPercent > 0 and m.top.listHasFocus then
+    fade(m.CategoryName, "in", 0.5)
+
+  else
+    m.CategoryName.opacity = 1.0
+  end if
+
+  m.FocusedCategoryName.opacity = m.top.focusPercent
+  m.UnfocusedCategoryName.opacity = 1.0 - m.top.focusPercent
+
+  m.CategoryCount.opacity = m.top.focusPercent
+  m.top.opacity = 0.20 + (0.80 * m.top.focusPercent)
+End Function
+
+
+Function onListHasFocus()
+  tubiLog("CategoryContentGrid.onListHasFocus")
+  if m.top.focusPercent = 1
+    if m.top.listHasFocus = true
+      fade(m.CategoryName, "in", 0.5)
+    else
+      fade(m.CategoryName, "out", 0.5)
+    end if
   end if
 End Function
+
 
 Function onContentChange()
   tubiLog("CategoryContentGrid.onContentChange")
-  if m.top.content <> invalid and m.top.content.getChildCount() > 0 then
-    ' we have to release these first, they'll be set to to appropriate grid
-    ' below
-    m.ContentGrid.unobserveField("itemSelected")
-    m.ContentGrid.unobserveField("itemFocused")
-    m.ContentGrid.unobserveField("cursorIndex")
-    if m.top.content.title = "Featured" then
-      m.ContentGrid = m.FeatureGrid
-    else if m.top.content.id = "SearchSignIn" or m.top.content.id = "SearchSignOut" then
-      m.ContentGrid = m.SignInGrid
-    else
-      m.ContentGrid = m.PosterGrid
+  if m.top.content <> invalid then
+    m.FocusedCategoryName.text = m.top.content.title
+    m.UnfocusedCategoryName.text = m.top.content.title
 
-      ' For the 2-row poster grid, collapse to 1 row if fewer than 8 items come back
-      ' Be careful of a category which may not have totalCount set, such as error or special category
-      if m.top.content.totalCount <> invalid and m.top.content.totalCount > 0 and m.top.content.totalCount <= 8 then
-        m.ContentGrid.numRows = 1
-      else if m.top.content.totalCount = invalid or m.top.content.totalCount = 0 and m.top.content.getChildCount() <= 8 then
-        m.ContentGrid.numRows = 1
+    if m.top.content.getChildCount() > 0 then
+   
+      if m.top.content.title = "Featured" or m.top.content["type"] = m.global.constants.ui.contentTypes.season then
+        m.ContentGrid.scrollWidth = 430
+        m.ContentGrid.itemSize = [430,256]
+        m.ContentGrid.itemComponentName = "FeaturePoster"
+      else if m.top.content.id = "ContinueWatching" then
+        ' Regular poster size, but with resume bar overlay
+        m.ContentGrid.scrollWidth = 210
+        m.ContentGrid.itemSize = [210,300]
+        m.ContentGrid.itemComponentName = "ResumePoster"
+        
+      else if m.top.content.id = "SearchSignIn" or m.top.content.id = "SearchSignOut" then
+        m.ContentGrid.scrollWidth = 430
+        m.ContentGrid.itemSize = [430,256]
+        m.ContentGrid.itemComponentName = "SignInPoster"
       else
-        m.ContentGrid.numRows = 2
+        m.ContentGrid.scrollWidth = 210
+        m.ContentGrid.itemSize = [210,300]
+        m.ContentGrid.itemComponentName = "Poster"
       end if
+      m.ContentGrid.visible = true
+      m.EmptyPlaceholder.visible = false
+
+      m.ContentGrid.content = m.top.content
+      if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)  ' be careful when removing children that we don't remove a focused item
+      drawItemCount()
+      m.Spinner.visible = false
+    else if m.top.content.totalCount <> invalid and m.top.content.totalCount = 0
+      m.ContentGrid.visible = false
+      m.EmptyPlaceholder.visible = true
+      m.EmptyPlaceholder.text = m.top.content.placeholderText
+      m.Spinner.visible = false
+    else
+      ' metadata is pending
+      m.Spinner.visible = true
+      m.ContentGrid.visible = false
+      m.EmptyPlaceholder.visible = false
     end if
-
-    m.ContentGrid.observeField("itemSelected", "onItemSelectedChange")
-    m.ContentGrid.observeField("itemFocused", "onItemFocusedChange")
-    m.ContentGrid.observeField("cursorIndex", "onCursorIndexChange")
-    m.ContentGrid.content = m.top.content
-
-    ' make sure it becomes visible; there's a race condition between setting content and setting focus percent above
-    if m.top.focusPercent > 0 then  m.ContentGrid.visible = true
-    if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)  ' be careful when removing children that we don't remove a focused item
-    m.Spinner.visible = false
-  else
-    m.Spinner.visible = true
   end if
 End Function
 
-Function onItemSelectedChange()
-  m.top.itemSelected = m.ContentGrid.itemSelected
-End Function
-
 Function onItemFocusedChange()
-  'tubiLog("CategoryContentGrid.onItemFocusedChange")
-  m.top.itemFocused = m.ContentGrid.itemFocused
+  tubiLog("CategoryContentGrid.onItemFocusedChange")
+  drawItemCount()
 End Function
 
-Function onCursorIndexChange()
-  m.top.cursorIndex = m.ContentGrid.cursorIndex
-End Function
-
-Function onCursorPositionChange()
-  m.top.cursorPosition = m.ContentGrid.cursorPosition
+Function drawItemCount()
+  if m.top.content.totalCount <> invalid and m.top.content.totalCount > 0 and m.ContentGrid.cursorIndex <> -1 then
+    m.ItemCount.text = " " + Chr(&hb7) + " " + stri(m.top.content.totalCount).trim()
+    m.FocusIndex.text = stri(m.ContentGrid.cursorIndex + 1).trim()
+  else 
+    ' It's odd to see '0 of 0' so we hide the counter
+    m.ItemCount.text = ""
+    m.FocusIndex.text = ""
+  endif
 End Function

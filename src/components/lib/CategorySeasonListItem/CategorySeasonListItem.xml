@@ -15,7 +15,7 @@
     <field id="focusPercent" type="float" value="0.0"/>
     <field id="content" type="node" />
     <field id="listHasFocus" type="boolean" value="false" />
-    <field id="width" alias="ForceDimensions.width" value="440.0" />
+    <field id="width" alias="ForceDimensions.width" value="425.0" />
     <field id="height" alias="ForceDimensions.height" value="80.0" />
   </interface>
   
@@ -27,10 +27,11 @@
       id="categoryUnfocusedText" 
       horizAlign="left"
       vertAlign="center"
-      width="342"
+      width="322"
       height="79"
       translation="[19,1]"
-      opacity="0.0">
+      opacity="0.0"
+      color="0xFFFFFFFF">
       <Font
       role="font"
       size="33"
@@ -40,9 +41,10 @@
       id="categoryFocusedText" 
       horizAlign="left"
       vertAlign="center"
-      width="342"
+      width="322"
       height="79"
-      translation="[19,1]">
+      translation="[19,1]"
+      color="0x191919FF">
       <Font
       role="font"
       size="33"
@@ -63,7 +65,8 @@
         id="categoryCountText"
         horizAlign="center"
         width="48"
-        translation="[-2,15]">
+        translation="[-2,15]"
+        color="0xFF9933FF">
         <Font
         role="font"
         size="22"

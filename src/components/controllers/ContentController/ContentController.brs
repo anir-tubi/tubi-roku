@@ -98,22 +98,8 @@ End Function
 ' flow is complete, create and show the category screen.
 Function startCategoryScreen()
   request = TubiRequest()
-  experiments = TubiExperiments(request, m.global.constants)
-  expResult = experiments.getExperimentValue("RokuNamespace", "single_row") 'should always return at least a default value for expResult.experimentValue
 
-  m.singleRow = expResult.experimentValue
-
-  'send user event tracking for experiment
-  if expResult.trackInfo <> invalid
-    m.global.TrackingTask.trackEvent = expResult.trackInfo  
-  end if
-
-  if m.singleRow = true
-    m.categoryScreen = CreateObject("roSGNode", "CategoryScreenSingleRow")
-  else
-    m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
-  end if
-
+  m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
   m.categoryScreen.observeField("contentSelected", "onContentSelected")
   m.categoryScreen.observeField("searchSelected", "onSearchSelected")
   m.categoryScreen.observeField("signInSelected", "onSignInSelected")
@@ -391,12 +377,7 @@ Function onTrailerFinished()
 End Function
 
 Function onEpisodeList()
-  if m.singleRow = true
-    m.episodesScreen = CreateObject("roSGNode", "EpisodesScreenSingleRow")
-  else
-    m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
-  end if
-  
+  m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
   m.episodesScreen.content = m.detailScreen.content
   m.episodesScreen.observeField("episodeSelected", "onEpisodeSelected")
   m.episodesScreen.observeField("backgroundUriList", "onEpisodeBackgroundChange")
@@ -588,11 +569,7 @@ End Function
 '
 '
 Function showDetailScreen(content)
-  if m.singleRow = true
-    m.detailScreen = CreateObject("roSGNode", "DetailScreenSingleRow")
-  else
-    m.detailScreen = CreateObject("roSGNode", "DetailScreen")
-  end if
+  m.detailScreen = CreateObject("roSGNode", "DetailScreen")
 
   m.detailScreen.shortContent = content
   m.detailScreen.observeField("playSelected", "onPlay")

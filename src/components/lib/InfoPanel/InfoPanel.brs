@@ -56,7 +56,8 @@ Function onContentChange()
     line1Label = m.TwoLineInfo.findNode("Line1")
     line1Label.text = ""
     if content.releasedate <> invalid and content.releasedate <> "" then
-      line1Label.text = "(" + content.releasedate + ") "
+      ' line1Label.text = "(" + content.releasedate + ") "
+      line1Label.text = content.releasedate + " "
     end if
     if content.length <> invalid and content.length <> 0 then
       ' add 'dot' spacer only if we had a release date
@@ -106,6 +107,10 @@ Function onContentChange()
       m.StarringGroup.visible = false
     end if
   end if
+
+  'vertically center the info panel
+  translationY = (m.top.maxHeight - m.top.BoundingRect().height) \ 2
+  m.top.translation = [m.top.translation[0], translationY]
 
 End Function
 

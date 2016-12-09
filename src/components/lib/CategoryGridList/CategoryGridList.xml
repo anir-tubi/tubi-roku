@@ -46,12 +46,13 @@
     <ScrollingList
       id="ScrollingList"
       width="1835"
-      height="624"
-      itemSpacings="[50]"
+      height="503"
+      scrollHeight="370"
+      itemSpacings="[29]"
       itemComponentName="CategoryContentGrid"
       focusBitmapUri=""
       focusChangeDuration="0.6"
-      translation="[0,-7]"/>
+      translation="[0,0]"/>
   </children>
 </component>
       

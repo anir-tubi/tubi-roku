@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
-<component name="CategoryContentGrid" extends="Rectangle">
+<component name="CategoryContentGrid" extends="Group">
   <script type="text/brightscript" uri="pkg:/components/lib/CategoryContentGrid/CategoryContentGrid.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
@@ -9,58 +10,115 @@
     <field id="focusPercent" type="float" value="0.0"/>
     <field id="listHasFocus" type="boolean" value="false" />
     <field id="content" type="node" alwaysNotify="true"/>
+
+    <!-- Incoming interface for sending info to the internal ContentGrid -->
+    <field id="itemToFocus" alias="ContentGrid.animateToItem"/>
     
     <!-- Outgoing interface proxying the internal ContentGrid -->
-    <field id="itemSelected" type="node" alwaysNotify="true"/>
-    <field id="itemFocused" type="node" alwaysNotify="true"/>
-    <field id="cursorPosition" type="intarray" value="[-1,-1]"/>
-    <field id="cursorIndex" type="integer" value="-1"/>
+    <field id="itemSelected" alias="ContentGrid.itemSelected"/>
+    <field id="itemFocused" alias="ContentGrid.itemFocused"/>
+    <field id="cursorPosition" alias="ContentGrid.cursorPosition"/>
+    <field id="cursorIndex" alias="ContentGrid.cursorIndex"/>
+    <field id="focusChangeDuration" alias="ContentGrid.focusChangeDuration"/>
   </interface>
   
   <children>
-    <Spinner
-      id="Spinner"
+    <Rectangle
+      id="ForceBackgroundSize"
+      color="0x00000000"
       width="1395"
-      height="610"
-      visible="false"/>
+      height="369"
+      translation="[0,0]"/>
     <!-- force height so that even before we get content to fill the ContentGrid, boundingRect() will return the
          correct height.
     -->
-    <ContentGrid
-      id="PosterGrid"
-      numRows="2"
-      width="1835"
-      height="610"
-      scrollWidth="210"
-      itemSize="[210,300]"
-      itemSpacing="[10,10]"
-      itemComponentName="Poster"
-      fillDirection="W"
+    <Group
+      id="CategoryName"
+      translation="[0,0]">
+    <Label
+      id="FocusedCategoryName"
+      height="40"
+      width="1000"
+      translation="[0,0]"
+      color="0xFF9933FF"
+      opacity="0.0">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="34" />
+    </Label>
+    <Label
+      id="UnfocusedCategoryName"
+      height="40"
+      width="1000"
+      translation="[0,0]"
+      color="0xFFFFFFFF"
+      opacity="1.0">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="34" />
+    </Label>
+    </Group>
+    
+    <LayoutGroup
+      id="CategoryCount"
+      layoutDirection="horiz"
+      horizAlignment="right"
+      translation="[1755,10]">
+      <Label
+        id="FocusIndex"
+        text=""
+        height="40"
+        horizAlign="right"
+        color="0xFF9933FF" >
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="27" />
+      </Label>
+      <Label
+        id="ItemCount"
+        text=""
+        height="40"
+        horizAlign="right">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="27" />
+      </Label>
+    </LayoutGroup>
+
+    <Spinner
+      id="Spinner"
+      width="1895"
+      height="300"
       visible="false"
-      translation="[7,7]"/>
+      translation="[7,63]"/>
     <ContentGrid
-      id="FeatureGrid"
-      numRows="2"
-      width="1835"
-      scrollWidth="524"
-      height="612"
-      itemSize="[524,295]"
-      itemSpacing="[20,20]"
-      itemComponentName="FeaturePoster"
-      fillDirection="W"
-      visible="false" 
-      translation="[7,7]"/>
-    <ContentGrid
-      id="SignInGrid"
+      id="ContentGrid"
       numRows="1"
       width="1835"
-      scrollWidth="1835"
-      height="612"
-      itemSize="[524,295]"
-      itemSpacing="[20,20]"
-      itemComponentName="SignInPoster"
+      height="300"
       fillDirection="W"
-      visible="false"
-      translation="[7,7]"/>
+      visible="true"
+      translation="[7,53]"
+      itemSpacing="[10,10]"
+      scrollWidth="210"
+      itemSize="[210,300]"
+      itemComponentName="Poster"/>
+    <Label
+      id="EmptyPlaceholder"
+      width="1000"
+      height="300"
+      wrap="true"
+      translation="[7,63]"
+      vertAlign="center"
+      visible="false">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="34" />
+    </Label>
   </children>
 </component>
