@@ -657,7 +657,7 @@ function ContentProvider_getContentFromLocalPlaylists(contentId, contentType)
 
   for each playlist in m.playlists
     for each content in playlist.episodes
-      if content.id = contentId
+      if content <> invalid and content.id = contentId
         
         if contentType = "series" and content["type"] = "level"
           return content
