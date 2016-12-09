@@ -221,6 +221,8 @@ Function Hotpatch(hotPatchUrl) As Integer
     transfer.setUrl(hotPatchUrl)
     transfer.AsyncGetToString()
     msg = wait(10000, transfer.GetMessagePort())
+
+    hotpatchResult = 0
     if type(msg) = "roUrlEvent"
       if msg.GetResponseCode() = 200 'all good, server responded back with a hotpatch file
         evalString = msg.GetString()
@@ -232,46 +234,28 @@ Function Hotpatch(hotPatchUrl) As Integer
             print "(hp len: " + str(len(evalString)) + ")"
           else
             print "evalError "; errCode
+            hotpatchResult = -1
           end if
         end if
 
       else if msg.GetResponseCode() > 0 'server responded with 403 error or similar - couldn't find the file but server up
         print "No file at hotpatch location"
+        hotpatchResult = -1
       
       else
         ' some network failure
         print "Network error downloading hotpatch file"
         print msg.getFailureReason()
-
-        'make sure there are constants on the global utils if we are using the old UI,
-        'as they are needed for the error message
-        if m.global <> invalid
-          if m.global.utils <> invalid
-            if m.global.utils.constants = invalid
-              m.global.utils.constants = getConstants()
-            end if
-          else
-            m.global.utils = {
-              constants: getConstants()
-            }
-          end if
-        else
-          m.global = {
-            utils: {
-              constants: getConstants()
-            }
-          }
-        end if
-
-        return -1
+        hotpatchResult = -1
       end if
     else if msg = invalid
       'no response back from hotpatch server - either server completely down or more likely user's internet is not connected
       print "Timeout downloading hotpatch file"
-      return -1
+      hotpatchResult = -1
     end if
   end if
-  return 0
+
+  return hotpatchResult
 End Function
 
 
@@ -281,6 +265,29 @@ Function showErrorDialog()
   screen.setMessagePort(port)
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
+
+
+  ' make sure there are constants on the global utils (ie. we are using the old UI),
+  ' as they are needed for the error message
+  if m.global <> invalid
+    if m.global.utils <> invalid
+      if m.global.utils.constants = invalid
+        m.global.utils.constants = getConstants()
+      end if
+    else
+      m.global.utils = {
+        constants: getConstants()
+      }
+    end if
+  else
+    m.global = {
+      utils: {
+        constants: getConstants()
+      }
+    }
+  end if
+
+
   sgGlobal.constants = m.global.utils.constants
   controller = screen.CreateScene("ErrorController")
   screen.show()
