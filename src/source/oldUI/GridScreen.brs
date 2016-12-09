@@ -385,7 +385,7 @@ function GridScreen (utils)
       if cp.getPlaylist(0) <> invalid and cp.getPlaylist(0).name <> toolsName
         cp.prependPlaylistToPlaylists(playlist)
       else
-        if playlist <> invalid
+        if playlist <> invalid and cp.playlists <> invalid
           cp.playlists.shift()
           cp.prependPlaylistToPlaylists(playlist)
         end if
