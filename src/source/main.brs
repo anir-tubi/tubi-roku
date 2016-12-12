@@ -62,19 +62,30 @@ Sub MainOldUI(params as Dynamic)
     screen = CreateObject("roSGScreen")
     fbscene = screen.CreateScene("FBScene")
 
-    sgGlobal = screen.getGlobalNode()
-    sgGlobal.addField("constants", "assocarray", false)
-    sgGlobal.constants = {
-      fban4tvtoken: constants.fban4tvtoken
-    }
-    screen.show()
-    
-    print "Waiting for FBTask thread to be ready..."
-    while true
-      if fbscene.ready then exit while
-      sleep(500)
-    end while
-    print "                                        ...done"
+    if fbscene <> invalid
+      sgGlobal = screen.getGlobalNode()
+      sgGlobal.addField("constants", "assocarray", false)
+      sgGlobal.constants = {
+        fban4tvtoken: constants.fban4tvtoken
+      }
+      screen.show()
+
+      print "Waiting for FBTask thread to be ready..."
+
+      fbReadyTimer = CreateObject("roTimespan")
+      while true
+        isFbReady = fbscene.getField("ready")
+        if isFbReady <> invalid
+          if isFbReady = true then exit while
+          sleep(500)
+        end if
+        if fbReadyTimer.totalMilliseconds() > 5000 then
+          print "                  ...while loop timed out ..."
+          exit while
+        end if
+      end while
+      print "                                        ...done"
+    end if
   end if
 
   app.runApp()
