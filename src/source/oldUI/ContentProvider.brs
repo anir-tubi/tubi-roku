@@ -175,7 +175,7 @@ end function
 
 '--------- method: getEpisodeFromServer() ----------
 function ContentProvider_GetEpisodeFromServer(videoId as String) as Object
-	xml = m.utils.getXml(m.urls.GetVideos + videoId, "getEpisode_v2")
+	xml = m.utils.getXml(m.urls.getVideos + videoId, "getEpisode_v2")
 	if xml = invalid or xml.GetName() <> "videos"
     return invalid
   end if
@@ -188,10 +188,12 @@ end function
 '--------- method: getUpdatedUrlForEpisode() ----------
 function ContentProvider_getUpdatedUrlForEpisode(episode as Object) as Object
   'get roXml object
-  episodeFromServer = m.getEpisodeFromServer(episode.id)
+  if episode.id <> invalid and (type(episode.id) = "roString" or type(episode.id) = "String")
+    episodeFromServer = m.getEpisodeFromServer(episode.id)
 
-  if type(episodeFromServer) = "roXMLList" and episodeFromServer.url.getText().len() > 0
-    episode.streams = [{url: episodeFromServer.url.getText()}]
+    if type(episodeFromServer) = "roXMLList" and episodeFromServer.url.getText().len() > 0
+      episode.streams = [{url: episodeFromServer.url.getText()}]
+    end if
   end if
 
   return episode
