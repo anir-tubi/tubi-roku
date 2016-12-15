@@ -19,15 +19,41 @@ Function onVisibilityChange()
 End Function
 
 Function onDimensionsChange()
+  ' shade always takes up full size of bounding rect
   shade = m.top.findNode("Shade")
   shade.width = m.top.width
   shade.height = m.top.height
+
+  ' max size 200x200 for box
   spinnerBox = m.top.findNode("SpinnerBox")
-  newX = (m.top.width - 200) / 2
-  newY = (m.top.height - 200) / 2
-  spinnerBox.translation = [newX, newY]
+  rect = calculateRect(200)
+  spinnerBox.translation = [rect.x, rect.y]
+  spinnerBox.width = rect.width
+  spinnerBox.height = rect.height
+
+  ' max size 66x66 for spinner graphic
   spinner = m.top.findNode("SpinnerPoster")
-  newX = (m.top.width - 66) / 2
-  newY = (m.top.height - 66) / 2
-  spinner.translation = [newX, newY]  
+  rect = calculateRect(66)
+  spinner.translation = [rect.x, rect.y]
+  spinner.width = rect.width
+  spinner.height = rect.height
+  spinner.scaleRotateCenter=[rect.width / 2, rect.height / 2]
+End Function
+
+
+' Get a bounding rect of a centered square with boundary of max size 'max'. If the max is greater
+' than the total size of this Spinner component, the component size is used
+Function calculateRect(max As Integer)
+  if m.top.width < max
+    x = 0
+    y = 0
+    width = m.top.width
+    height = m.top.height
+  else
+    x = (m.top.width - max) / 2
+    y = (m.top.height - max) / 2
+    width = max
+    height = max
+  end if
+  return { x: x, y: y, width: width, height: height }
 End Function

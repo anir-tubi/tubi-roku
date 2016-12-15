@@ -7,8 +7,10 @@ Function init()
   m.ResultGrid = m.top.findNode("ResultGrid")
   m.ResultGrid.observeField("itemSelected", "onResultSelected")
   m.ResultGrid.observeField("itemFocused", "onItemFocused")
+  m.NoResultsMessage = m.top.findNode("NoResultsMessage")
   m.Cursor = m.top.findNode("Cursor")
-  m.InfoPanel = m.top.findNode("InfoPanel")
+  m.InfoPanel = m.top.findNode("SearchInfoPanel")
+  m.UpdatingMessage = m.top.findNode("UpdatingMessage")
 
   m.TextEntryAnimation = m.top.findNode("TextEntryAnimation")
   m.TranslationInterpolator = m.top.findNode("TextEntryTranslationInterpolator")
@@ -33,7 +35,15 @@ Function onSearchResultsReceived()
   tubiLog("SearchScreen.onSearchResultsReceived")
   response = m.top.searchResponse.response
   if response.code >= 200 and response.code < 300 then 
+    m.UpdatingMessage.visible = false
     m.top.content = m.top.searchResponse.convertedMetadata
+    if m.top.searchResponse.convertedMetadata <> invalid and m.top.searchResponse.convertedMetadata.getChildCount() > 0 then
+      m.ResultGrid.visible = true
+      m.NoResultsMessage.visible = false
+    else
+      m.ResultGrid.visible = false
+      m.NoResultsMessage.visible = true
+    end if
   else
     'TODO(Chris): Show error modal here
       testLog("Search results returned " + stri(response.code))
@@ -71,7 +81,7 @@ End Function
 '
 ' Launch a search when the keyboard text has changed
 Function onKeyboardTextChanged()
-  tubiLog("SearchScreen.onSearchTextChanged")
+  tubiLog("SearchScreen.onSearchTextChanged " + m.Keyboard.text)
   m.SearchText.text = m.Keyboard.text  
   if m.Keyboard.text <> invalid and m.Keyboard.text.len() > 0 then
     loadSearchResults()
@@ -204,4 +214,6 @@ Function loadSearchResults()
   ' cancel any in-flight requests
   m.global.metadataFetchTask.cancel = { node: m.top, field: "searchResponse"}
   m.global.metadataFetchTask.request = request
+
+  m.UpdatingMessage.visible = true
 End Function
