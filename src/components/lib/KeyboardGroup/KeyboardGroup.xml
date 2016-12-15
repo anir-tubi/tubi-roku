@@ -55,54 +55,10 @@
     </ScrollingList>
     
     <ScrollingList
-      id="UppercaseKeyboard"
-      width="1920"
-      height="80"
-      visible="true"
-      itemSpacings="[2]"
-      itemComponentName="KeyboardItem"
-      focusBitmapUri="pkg:/images/menu-focus.9.png"
-      focusChangeDuration="0.1"
-      translation="[66,147]"
-      layoutDirection="horiz">
-      <ContentNode
-        role="content">
-        <ContentNode title="A"/>
-        <ContentNode title="B"/>
-        <ContentNode title="C"/>
-        <ContentNode title="D"/>
-        <ContentNode title="E"/>
-        <ContentNode title="F"/>
-        <ContentNode title="G"/>
-        <ContentNode title="H"/>
-        <ContentNode title="I"/>
-        <ContentNode title="J"/>
-        <ContentNode title="K"/>
-        <ContentNode title="L"/>
-        <ContentNode title="M"/>
-        <ContentNode title="N"/>
-        <ContentNode title="O"/>
-        <ContentNode title="P"/>
-        <ContentNode title="Q"/>
-        <ContentNode title="R"/>
-        <ContentNode title="S"/>
-        <ContentNode title="T"/>
-        <ContentNode title="U"/>
-        <ContentNode title="V"/>
-        <ContentNode title="W"/>
-        <ContentNode title="X"/>
-        <ContentNode title="Y"/>
-        <ContentNode title="Z"/>
-        <ContentNode title=" "/>
-        <ContentNode title="&#x7F;"/>
-      </ContentNode>
-    </ScrollingList>
-    
-    <ScrollingList
       id="LowercaseKeyboard"
       width="1920"
       height="80"
-      visible="false"
+      visible="true"
       itemSpacings="[2]"
       itemComponentName="KeyboardItem"
       focusBitmapUri="pkg:/images/menu-focus.9.png"
@@ -137,6 +93,50 @@
         <ContentNode title="x"/>
         <ContentNode title="y"/>
         <ContentNode title="z"/>
+        <ContentNode title=" "/>
+        <ContentNode title="&#x7F;"/>
+      </ContentNode>
+    </ScrollingList>
+    
+    <ScrollingList
+      id="UppercaseKeyboard"
+      width="1920"
+      height="80"
+      visible="false"
+      itemSpacings="[2]"
+      itemComponentName="KeyboardItem"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
+      focusChangeDuration="0.1"
+      translation="[66,147]"
+      layoutDirection="horiz">
+      <ContentNode
+        role="content">
+        <ContentNode title="A"/>
+        <ContentNode title="B"/>
+        <ContentNode title="C"/>
+        <ContentNode title="D"/>
+        <ContentNode title="E"/>
+        <ContentNode title="F"/>
+        <ContentNode title="G"/>
+        <ContentNode title="H"/>
+        <ContentNode title="I"/>
+        <ContentNode title="J"/>
+        <ContentNode title="K"/>
+        <ContentNode title="L"/>
+        <ContentNode title="M"/>
+        <ContentNode title="N"/>
+        <ContentNode title="O"/>
+        <ContentNode title="P"/>
+        <ContentNode title="Q"/>
+        <ContentNode title="R"/>
+        <ContentNode title="S"/>
+        <ContentNode title="T"/>
+        <ContentNode title="U"/>
+        <ContentNode title="V"/>
+        <ContentNode title="W"/>
+        <ContentNode title="X"/>
+        <ContentNode title="Y"/>
+        <ContentNode title="Z"/>
         <ContentNode title=" "/>
         <ContentNode title="&#x7F;"/>
       </ContentNode>
