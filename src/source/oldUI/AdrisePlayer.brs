@@ -1246,14 +1246,16 @@ function AdrisePlayer_savePreviouslyViewedUpdate(episode, nowPos)
 
     'add to the previouslyViewed episodes array so it will be included in the category on the gridscreen
     count = 0
-    for each previousEpisode in m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes
-      if previousEpisode <> invalid and previousEpisode.id = localUpdateId
-        m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.delete(count) 'since we want to move it to the front of the list
-        exit for
-      end if
-      count = count + 1
-    end for
-    m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.unshift(m.cp[userPlaylistsStore][localUpdateId])
+    if m.cp.userPlaylists[settings.previouslyViewedRegistry] <> invalid and m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes <> invalid
+      for each previousEpisode in m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes
+        if previousEpisode <> invalid and previousEpisode.id = localUpdateId
+          m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.delete(count) 'since we want to move it to the front of the list
+          exit for
+        end if
+        count = count + 1
+      end for
+      m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.unshift(m.cp[userPlaylistsStore][localUpdateId])
+    end if
   end if
 
 end function
