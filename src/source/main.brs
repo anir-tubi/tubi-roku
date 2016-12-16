@@ -128,6 +128,7 @@ Function MainNewUI(args As Dynamic, constants As Object)
   auth = TubiAuth(constants, request)
   tracking = TubiTracking(constants, request, auth)
   bookmarks = TubiBookmarks(request, auth, constants)
+  log = TubiLogger(constants, request, auth)
 
   'set up all experiments
   experiments = TubiExperiments(request, constants)
@@ -141,7 +142,7 @@ Function MainNewUI(args As Dynamic, constants As Object)
     auth: auth
     bookmarks: bookmarks
     experiments: experiments
-    ' log: TubiLog()
+    log: log
   }
 
   m.global.player = TubiPlayer(m.global.utils)

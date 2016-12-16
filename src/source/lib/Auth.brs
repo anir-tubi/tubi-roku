@@ -41,7 +41,6 @@ End Function
 '   userId: userId(Integer as String)
 '}
 function tubiAuth_getAuthInfo()
-  tubiLog("tubiAuth_getAuthInfo")
   authInfo = RegReadAll(m.authRegKey) 'returns empty assocArray if nothing in the auth registry
   newAuthInfo = invalid
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry

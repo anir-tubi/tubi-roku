@@ -14,7 +14,7 @@ function TubiAds (utils, playerRequestQueue)
   roAdFramework.setNielsenAppId("PC60BD376-8551-4688-BEF4-E8B45A39D4C7")
 
   'turn on debug output for RAF
-  roAdFramework.setDebugOutput(true)
+  roAdFramework.setDebugOutput(false)
 
 
   return {
@@ -1034,7 +1034,7 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
             errorVal = adUnit.companionOverlay.url
           end if
 
-          TubiLog("tubiAds_showVideoAd, ad failure")
+          m.utils.log.error("tubiAds_showVideoAd, ad failure", "adError", "request_failed", m.playerRequestQueue)
 
           m.videoAdErrorCount = 0
           exit while

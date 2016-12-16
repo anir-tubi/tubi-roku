@@ -406,7 +406,7 @@ End Function
 '
 ' send the navigateInPage (navigate_within_page) tracking event
 Function onTrackingUriChange()
-  m.global.trackingTask.trackEvent = {
+  m.global.trackingLoggingTask.trackEvent = {
     trackType: "navigateInPage"
     value: m.trackingCount
     ctx: m.top.trackingUri

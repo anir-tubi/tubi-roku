@@ -6,11 +6,11 @@ Function init()
   m.global.addField("metadataFetchTask", "node", false)
   m.global.metadataFetchTask = m.metadataFetchTask
 
-  m.trackingTask = m.top.findNode("TrackingTask")
-  m.global.addField("trackingTask", "node", false)
-  m.global.trackingTask = m.trackingTask
-  m.trackingTask.observeField("ready", "onTrackingReady")
-  m.global.trackingTask.control = "RUN"
+  m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
+  m.global.addField("trackingLoggingTask", "node", false)
+  m.global.trackingLoggingTask = m.trackingLoggingTask
+  m.trackingLoggingTask.observeField("ready", "onTrackingLoggingReady")
+  m.global.trackingLoggingTask.control = "RUN"
   
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.global.constants.ui.colors.backgroundColor
@@ -51,15 +51,15 @@ End Function
 
 
 '''''''''''''''''''''''''
-' onTrackingReady
+' onTrackingLoggingReady
 '
 ' Only once we have a metadata task ready AND the user's login status
 ' will we launch the UI
-Function onTrackingReady()
-  if m.trackingTask.ready = true
-    m.trackingTask.unobserveField("ready")
+Function onTrackingLoggingReady()
+  if m.trackingLoggingTask.ready = true
+    m.trackingLoggingTask.unobserveField("ready")
     
-    m.trackingTask.trackEvent = {
+    m.trackingLoggingTask.trackEvent = {
       trackType: "startApp"
     }
 
@@ -74,7 +74,7 @@ End Function
 ' will we launch the UI
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
-  if m.metadataFetchTask.ready and m.authInfoReceived and m.trackingTask.ready then
+  if m.metadataFetchTask.ready and m.authInfoReceived and m.trackingLoggingTask.ready then
     if m.top.itemDetail <> invalid then
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it

@@ -362,9 +362,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
       if msg.isRequestFailed()
 
         errorMsg = "video with id: " + episode.id + "failed. Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
-        ' m.utils.log.error(m.playerPort, "video-fail", errorMsg)
-        TubiLog("video fail")
-
+        m.utils.log.error(errorMsg, "videoPlayback", "video_segment_failure", m.playerRequestQueue)
         m.canvas.close()
         return m.constants.player.playerResults.failed
       end if
@@ -373,8 +371,7 @@ function tubiPlayer_showSpanOfContentVideoNew(episode As Object)
       if msg.isStreamStarted()
         if msg.getInfo().isUnderrun = true
           warningMsg = "Video buffered mid stream. Segment Url: " + msg.getInfo().url + " Stream Bitrate: " + msg.getInfo().streamBitrate.toStr() + " Measured Bitrate: " + msg.getInfo().measuredBitrate.toStr()
-          ' m.utils.log.warn(m.playerPort, "video-rebuffer",  warningMsg)
-          TubiLog("video rebuffer")
+          m.utils.log.warn(warningMsg, "videoBuffer", "video_buffer", m.playerRequestQueue)
         end if
       end if
 

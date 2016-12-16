@@ -122,9 +122,8 @@ End Function
 ''''''''''''''''''''
 ' screenTrackingNavigate
 '
-' Get the current top of the screen stack 
+' 'tracking for navigating to a screen
 Function screenTrackingNavigate(oldScreen, newScreen)
-  'tracking for navigating to a screen
   sourceUri = ""
   if oldScreen.trackingUri <> invalid
     sourceUri = oldScreen.trackingUri
@@ -136,7 +135,7 @@ Function screenTrackingNavigate(oldScreen, newScreen)
   end if
 
   if destinationUri <> invalid 
-    m.global.TrackingTask.trackEvent = {
+    m.global.trackingLoggingTask.trackEvent = {
       trackType: "navigate"
       value: destinationUri
       ctx: sourceUri
@@ -148,7 +147,7 @@ End Function
 ''''''''''''''''''''
 ' screenTrackingLoad
 '
-' Get the current top of the screen stack 
+' tracking for loading a new screen
 Function screenTrackingLoad(newScreen)
   destinationUri = invalid
   if newScreen.trackingUri <> invalid
@@ -157,7 +156,7 @@ Function screenTrackingLoad(newScreen)
 
   'tracking for loading screen
   if destinationUri <> invalid
-    m.global.TrackingTask.trackEvent = {
+    m.global.trackingLoggingTask.trackEvent = {
       trackType: "pageLoad"
       value: destinationUri
     }

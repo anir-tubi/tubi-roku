@@ -449,7 +449,7 @@ Function onBookmarked()
   m.top.shortContent = m.top.shortContent
 
   'user tracking
-  m.global.trackingTask.trackEvent = {
+  m.global.trackingLoggingTask.trackEvent = {
     trackType: "addBookmark"
     value: m.top.content.id
     ctx: m.top.trackingUri
@@ -523,7 +523,7 @@ Function onBookmarkRemoved()
   m.top.shortContent = m.top.shortContent
 
   'user tracking
-  m.global.trackingTask.trackEvent = {
+  m.global.trackingLoggingTask.trackEvent = {
     trackType: "deleteBookmark"
     value: m.top.content.id
   }

@@ -129,6 +129,13 @@ Function getConstants()
   constants.externalConfig = {}
     constants.externalConfig.info = invalid   'will be replaced in main.brs
 
+  'a list of device ids that will send debug and info logs to the logging API - this will be populated by hotpatch
+  'idsToLog is expected to look like {
+  '  13GSC41289Y: true
+  '  YY00763924H: true
+  '}  
+  constants.idsToLog = {}
+
   constants.urls = {}
     'ad server url
     ' constants.urls.adsBaseUrl = "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
@@ -160,6 +167,7 @@ Function getConstants()
       constants.urls.dataScience.urlBase = "https://uapi.adrise.tv/datascience"
       constants.urls.datascience.event = constants.urls.dataScience.urlBase + "/event"
       constants.urls.datascience.experiment = constants.urls.dataScience.urlBase + "/evaluate/namespaces"
+      constants.urls.datascience.logging = constants.urls.dataScience.urlBase + "/logging"
 
     'cuepoints url
     constants.urls.cuepointsBaseUrl = "http://ads.adrise.tv/cue-points/"

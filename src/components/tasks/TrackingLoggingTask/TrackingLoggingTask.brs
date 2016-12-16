@@ -10,10 +10,11 @@ End Function
 ' the "trackEvent" field
 '
 Function watchLoop()
-  tubiLog("TrackingTask.watchLoop started")
+  tubiLog("TrackingLoggingTask.watchLoop started")
   m.port = CreateObject("roMessagePort")
   m.queue = TubiRequestQueue().create(m.port)
   m.top.observeField("trackEvent", m.port)
+  m.top.observeField("logMsg", m.port)
   m.constants = m.global.constants   ' this should grab a thread-local copy
 
   ' Signal that we're ready for requests
@@ -27,6 +28,10 @@ Function watchLoop()
       if msg.GetField() = "trackEvent" then
         tubiLog("Received roSGNodeEvent for field " + msg.GetField())
         trackSceneGraphEvent(msg.GetData())
+
+      else if msg.GetField() = "logMsg" then
+        sendSceneGraphLog(msg.GetData())
+
       end if
     else if type(msg) = "roUrlEvent" then
       handledRequest = m.queue.handleEvent(msg)
@@ -49,4 +54,15 @@ Function trackSceneGraphEvent(evt)
   evt.requestQ = m.queue
   Tracking.trackUserEvent(evt)  'creates a request and adds it to the requestQueue
 
+End Function
+
+
+Function sendSceneGraphLog(logInfo)
+  constants = m.global.constants
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+  logger = TubiLogger(constants, request, auth)
+
+  'runs the appropriate method (debug, error, etc.) from the logger object and add the log request to the tracking/logging queue
+  logger[logInfo.level](logInfo.message, logInfo.serverTypeName, logInfo.subtype, m.queue)
 End Function

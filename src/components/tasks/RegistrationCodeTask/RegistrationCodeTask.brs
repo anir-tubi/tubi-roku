@@ -97,7 +97,7 @@ Function registrationLoop() As Void
                 ' persist the registration information before we notify the scene graph
                 auth.handleRegistration(parsed)
                 m.top.response = parsed  ' status may be "pending" or "registered"
-                m.global.trackingTask.trackEvent = {
+                m.global.trackingLoggingTask.trackEvent = {
                   trackType: "registerSuccess"
                   value: true
                 }  
@@ -108,7 +108,7 @@ Function registrationLoop() As Void
               end if
             else
               tubiLog("Bad response polling reg code status")
-              m.global.trackingTask.trackEvent = {
+              m.global.trackingLoggingTask.trackEvent = {
                 trackType: "registerFail"
                 value: "bad-response-status"
               }              
@@ -116,7 +116,7 @@ Function registrationLoop() As Void
             end if
           else
             tubiLog("Reg code polling failed " + stri(result.response.code))
-            m.global.trackingTask.trackEvent = {
+            m.global.trackingLoggingTask.trackEvent = {
               trackType: "registerFail"
               value: "polling-response-failure"
             }            

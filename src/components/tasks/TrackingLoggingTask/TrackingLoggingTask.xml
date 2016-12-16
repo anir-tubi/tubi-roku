@@ -5,8 +5,8 @@
  - Retrieve the auth info, which may be stored and might be refreshed from the auth server.
  -
  --> 
-<component name="TrackingTask" extends="Task">
-    <script type="text/brightscript" uri="pkg:/components/tasks/TrackingTask/TrackingTask.brs" />
+<component name="TrackingLoggingTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/tasks/TrackingLoggingTask/TrackingLoggingTask.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
@@ -17,7 +17,7 @@
     <interface>
       <!--
       -
-      - The trackEvent param should have the following form:
+      - The trackEvent field should have the following form:
       - {
       -   trackType: <node to receive content>
       -   value: dynamic, depends on the eventType
@@ -30,6 +30,20 @@
       -->
 
       <field id="trackEvent" type="assocarray" alwaysNotify="true"/>
+
+
+      <!--
+      -
+      - The logMsg field should have the following form:
+      - {
+      -   message: string, the message to be logged
+      -   level: string, the type of debug, must be one of "debug", "error", "info", "warn"
+      -   serverType: string, a string specified as one that is in TubiLogger().logConsts
+      -   subtype: string, a small string used to differentiate log messages
+      - }
+      -
+      -->      
+      <field id="logMsg" type="assocarray" alwaysNotify="true"/>
       
       <field id="ready" type="boolean" value="false" />
     </interface>

@@ -58,8 +58,8 @@
       <MetadataFetchTask 
         id="MetadataFetchTask" />
 
-      <TrackingTask
-        id="TrackingTask" />
+      <TrackingLoggingTask
+        id="TrackingLoggingTask" />
       
       <AuthTask
         id="AuthTask" />
