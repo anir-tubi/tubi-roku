@@ -1086,8 +1086,24 @@ end function
 'gets the cuepoints for the passed in episode and attach them to ads object
 function adriseAds_getCuepoints(episode)
   settings = m.utils.getSettings()
+
+  'set default values for the pub id and episode id
+  pubId = settings.pubid
+  epId = "0"
   'set the url to get the cuepoints
-  cuepointUrl = settings.cuepointsUrlBase + "?format=json&pubid=" + episode.pubId + "&platform=roku&cid=" + episode.id
+
+
+  if episode <> invalid
+    if type(episode.pubId) = "String" or type(episode.pubId) = "roString"
+      pubId = episode.pubId
+    end if
+    
+    if type(episode.id) = "String" or type(episode.id) = "roString"
+      epId = episode.id
+    end if
+  end if
+
+  cuepointUrl = settings.cuepointsUrlBase + "?format=json&pubid=" + pubId + "&platform=roku&cid=" + epId
   
   'get the cuepoints synchronously
   cuepointsJson = m.utils.getTextFile(cuepointUrl, "getCuePoints")
