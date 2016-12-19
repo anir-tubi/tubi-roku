@@ -167,7 +167,7 @@ function DetailScreen (cp, settings, utils, player)
             if button = 4 or button = 5
             	newItemIndex = m.moveForwardBackward(itemIndex, maxIndex, (button = 5))
               newEpisode = m.cp.getEpisodeInPlaylist(playlist, newItemIndex)
-              if(newEpisode.type = "video")
+              if newEpisode <> invalid and newEpisode.type = "video"
                 episode = newEpisode
                 itemIndex = newItemIndex
 	              m.update(screen, episode, showRentButton, m.detailsPort)
