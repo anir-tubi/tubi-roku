@@ -231,7 +231,7 @@ end function
 
 '--------- ContentProvider_getAllPlaylistsCount() ----------
 function ContentProvider_getAllPlaylistsCount()
-  if m.playlists.Count() <> invalid
+  if m.playlists <> invalid
     return m.playlists.Count()
   end if
   return 0
