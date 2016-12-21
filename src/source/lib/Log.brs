@@ -82,13 +82,18 @@ Function tubiLog(message="" as String, level="debug" as String, serverTypeName="
   end if
 
   if message <> ""
-    if m.global <> invalid and  m.global.trackingLoggingTask <> invalid
+    if serverTypeName = ""
+      'if we can't send this to the server anyways, no need to involve the trackingLogging task, so just print to the console
+      print tubiLog_getLogPrintout_(level, subtype, message)
+
+    else if m.global <> invalid and  m.global.trackingLoggingTask <> invalid
       m.global.trackingLoggingTask.logMsg = {
         message: message
         serverTypeName: serverTypeName
         subtype: subtype
         level: level
       }
+    
     else
       'if the trackingLoggingTask is not ready, just print to the console
       print tubiLog_getLogPrintout_(level, subtype, message)
