@@ -25,7 +25,7 @@ Function onComponentFocusChange()
   tubiLog("CategoryContentGrid.onComponentFocusChange")
   if m.top.hasFocus() and m.ContentGrid.visible then
     m.ContentGrid.setFocus(true)
-  else
+  else if m.top.isInFocusChain() then
     m.top.itemFocused = m.top.content
   end if
 End Function
@@ -34,9 +34,6 @@ Function onFocusPercentChange()
   tubiLog("CategoryContentGrid.onFocusPercentChange")
   if m.top.focusPercent > 0 and not m.top.listHasFocus then
     m.CategoryName.opacity = 1.0 - m.top.focusPercent
-
-  else if m.top.focusPercent > 0 and m.top.listHasFocus then
-    fade(m.CategoryName, "in", 0.5)
 
   else
     m.CategoryName.opacity = 1.0

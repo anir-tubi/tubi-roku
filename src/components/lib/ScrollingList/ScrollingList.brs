@@ -7,6 +7,7 @@ Function init()
   m.items = m.top.findNode("Items")
   m.focusImage = m.top.findNode("FocusImage")
   m.scrollAnimation = m.top.findNode("ScrollAnimation")
+  m.scrollAnimation.observeField("state", "endChangeFocus")
   m.translationInterpolator = m.top.findNode("TranslationInterpolator")
   m.focusInterpolator = m.top.findNode("FocusInterpolator")
   m.focusImageInterpolator = m.top.findNode("FocusImageInterpolator")
@@ -15,7 +16,6 @@ Function init()
   m.unfocusInterpolator = m.top.findNode("UnfocusInterpolator")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.internalItemFocused = m.top.itemFocused  ' separate from event emitter
-  m.overlappedKeypress = invalid 'track when a key is pressed during animation
   m.pressAndHold = invalid 'track when a key is being held down without release
 End Function
 
@@ -163,10 +163,6 @@ Function onKeyEvent(key As Object, press As Boolean) As Boolean
   tubiLog("ScrollingList.onKeyEvent")
 
   if press and m.items.getChildCount() <> 0 then
-    if m.scrollAnimation.state = "running" then 
-      m.overlappedKeypress = key
-      return true
-    end if
     if key = "OK" and m.scrollAnimation.state = "stopped" then
       m.top.itemSelected = m.internalItemFocused
       return true
@@ -269,6 +265,10 @@ End Function
 Function startChangeFocus(newFocusedIndex As Integer) As Void
   tubiLog("ScrollingList.startChangeFocus")
 
+  ' Stop any currently running animations.  This affects target components immediately so their 
+  ' animated field values can be used throughout the rest of this function.
+  if m.scrollAnimation.state = "running" then m.scrollAnimation.control = "finish"
+
   unfocusedItem = m.items.getChild(m.internalItemFocused)
 
   focusedItem = m.items.getChild(newFocusedIndex)
@@ -300,7 +300,6 @@ Function startChangeFocus(newFocusedIndex As Integer) As Void
   m.focusImageInterpolator.keyvalue = [ m.focusImage.translation, newFocusImagePosition ]
   m.focusImageWidthInterpolator.keyvalue = [ m.focusImage.width, itemRect.width ]
   m.focusImageHeightInterpolator.keyvalue = [ m.focusImage.height, itemRect.height ]
-  m.scrollAnimation.observeField("state", "endChangeFocus")
   ' 2-speed scroll here.  If the duration is fast, the user will have a hard time making single item focus changes because
   ' scrolling will kick in too quickly.  So we only use the custom focus duration value after at least one normal-speed focus
   ' change.
@@ -324,7 +323,6 @@ End Function
 Function endChangeFocus()
   tubiLog("ScrollingList.endChangeFocus")
   if m.scrollAnimation.state = "stopped" then
-    m.scrollAnimation.unobserveField("state")
     focusedItem = m.items.getChild(m.internalItemFocused)
     if focusedItem <> invalid then
       focusedItem.focusPercent = 1.0  ' in case animation didn't set this, force it
@@ -336,10 +334,7 @@ Function endChangeFocus()
     ' emit event only if key events aren't happening, or they're being ignored
     ' because we're at the end of the list
     keyHandled = false
-    if m.overlappedKeypress <> invalid then
-      keyHandled = scrollList(m.overlappedKeypress)
-      m.overlappedKeypress = invalid
-    else if m.pressAndHold <> invalid then
+    if m.pressAndHold <> invalid then
       keyHandled = onKeyEvent(m.pressAndHold, true)
     end if
 

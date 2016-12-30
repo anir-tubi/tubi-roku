@@ -3,10 +3,13 @@ Function init()
   m.top.observeField("width", "onDimensionsChange")
   m.top.observeField("height", "onDimensionsChange")
 
-  m.Animation = m.top.findNode("SpinnerAnimation")
-  m.top.observeField("visible", "onVisibilityChange")
-  if m.top.visible then
-    m.Animation.control = "start"
+  ' Non-OpenGL slow devices look really poor with clunky spinner
+  if m.global.constants.deviceInfo.lowMemory = false
+    m.Animation = m.top.findNode("SpinnerAnimation")
+    m.top.observeField("visible", "onVisibilityChange")
+    if m.top.visible then
+      m.Animation.control = "start"
+    end if
   end if
 End Function
 

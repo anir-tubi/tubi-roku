@@ -11,6 +11,7 @@ Function init()
   m.top.observeField("fillDirection", "onContentChange")
   m.top.observeField("visible", "onVisibleChange")
   m.top.observeField("animateToItem", "onAnimateToItem")
+  m.top.observeField("itemComponentName", "onItemComponentNameChange")
   m.mask = m.top.findNode("ContentsMask")
   m.scrollAnimation = m.top.findNode("ScrollAnimation")
   m.scrollAnimation.observeField("state", "endChangeFocus")
@@ -60,14 +61,40 @@ Function init()
   ' Send cursor events during scrolling or only when scrolling stops and item is focused
   m.continuousEvents = constants.performance.contentGrid.continuousEvents
 
+  m.itemPool = createNodePool(m.top.itemComponentName, 0)
+
+  ' An internal reference to a parent content node of m.top.content.  This is that
+  ' onContentChange can check if we have a new set of content, invalidating all
+  ' grid items, or just the children of the same content node have been updated.
+  m.internalContent = invalid
+End Function
+
+Function onItemComponentNameChange()
+  m.itemPool = createNodePool(m.top.itemComponentName, 0)
+  ' we have to recalculate all the internal dimensions and recreate all children
+  onContentChange()
+End Function
+
+' Remove an item from its parent and return it to the free pool
+' TODO(Chris): Should the NodePool mixin remove from parent?
+Function removeAndRelease(item As Object)
+  m.items.removeChild(item)
+  ' clear out references to content or cached poster images
+  if item.hasField("content") then item.content = invalid
+  if item.hasField("itemContent") then item.itemContent = invalid
+  if item.hasField("uri") then item.uri = ""
+  m.itemPool.release(item)
 End Function
 
 Function onVisibleChange()
+  tubiLog("ContentGrid.onVisibleChange")
   if m.top.visible = false then
-    'only remove children, freeing posters and associated HTTP and VRAM resources
-    m.items.removeChildrenIndex(m.items.getChildCount(), 0)
-  else
-    loadVisiblePosters(false) ' assuming there were no posters when invisible, skip cache check
+    'remove children, freeing posters and associated HTTP and VRAM resources
+    for i=0 to m.items.getChildCount()-1
+      removeAndRelease(m.items.getChild(0))
+    end for
+  else if m.items.getChildCount() = 0 then
+    loadVisiblePosters()
   end if
 End Function
 
@@ -129,7 +156,6 @@ End Function
 Function onContentChange() As Void
   tubiLog("ContentGrid.onContentChange")
 
-
   content = m.top.content
   if content = invalid or content.getChildCount() = 0 then
     m.internalItemFocused = [-1, -1]
@@ -137,10 +163,11 @@ Function onContentChange() As Void
     m.top.itemFocused = invalid
     m.top.cursorPosition = [-1, -1]
     m.top.cursorIndex = -1
-    ' Remove all existing itemComponents
-    while m.items.getChildCount() > 0
-      m.items.removeChildIndex(0)
-    end while
+    ' Remove all existing itemComponents, returning them to the pool
+    for i=0 to m.items.getChildCount()-1
+      removeAndRelease(m.items.getChild(0))
+    end for
+    m.internalContent = invalid
     return
   end if
   m.numItems = getContentCount()
@@ -159,9 +186,13 @@ Function onContentChange() As Void
   m.internalNumRows = numRows
   m.internalNumColumns = numColumns
 
-  ' preload the visible content, skipping a cache check
-  ' for faster visibility of initial content
-  loadVisiblePosters(false)
+  ' preload the visible content
+  if m.internalContent <> invalid and m.internalContent.isSameNode(content) then
+    loadVisiblePosters(true)
+  else
+    loadVisiblePosters(false)
+  end if
+  m.internalContent = content
 
   if m.top.isInFocusChain()
     m.focusBox.visible = true
@@ -184,7 +215,6 @@ End Function
 ' Determine which content items are in the visible window, then render those in 
 ' the m.items cache
 Function loadVisiblePosters(useCache=true As Boolean) As Void
-
   ' quick out if the component is not visible, they'll be loaded once visibility changes
   if not m.top.visible then 
     print "Delaying item creation because invisible"
@@ -212,45 +242,39 @@ Function loadVisiblePosters(useCache=true As Boolean) As Void
   if (x + width) > m.internalNumColumns then width = m.internalNumColumns - x
   if (y + height) > m.internalNumRows then height = m.internalNumRows - y
 
+  tubiLog("ContentGrid loading " + stri(width * height) + " visible items")
+
   ' Primarily for a complete reset of the content, such as initial loading
   if not useCache
-    purgedItems = m.items.getChildren(m.items.getChildCount(), 0)
-    m.items.removeChildrenIndex(m.items.getChildCount(), 0)
+    for i=0 to m.items.getChildCount()-1
+      removeAndRelease(m.items.getChild(0))
+    end for
   end if
 
-  tubiLog("ContentGrid loading " + stri(width * height) + " visible items")
   for i=x to x+width-1
     for j=y to y+height-1
       index = gridIndexToItemIndex([i,j])
-
+      content = getContent(index)
       ' If we're beyond the end of the total items, don't create more components
-      if index >= m.numItems then
-        exit for
-      end if
+      if index < m.numItems and content <> invalid then
 
-      item = invalid
-
-      if useCache then
-        ' First see if we already have the item rendered, reset its cache position
-        item = m.items.findNode(stri(index))
-      else
-        ' Use an already created object
-        item = purgedItems.shift()
-        if item <> invalid then 
-          item = createItemComponent(index, item)
+        item = invalid
+        if useCache then
+          ' First see if we already have the item rendered, reset its cache position
+          item = m.items.findNode(stri(index))
         end if
-      end if
 
-      if item = invalid then
-        item = createItemComponent(index, CreateObject("roSGNode", m.top.itemComponentName))
+        if item = invalid then
+          item = createItemComponent(index, content, m.itemPool.get())
+        end if
+        m.items.appendChild(item)  ' push to end of the FIFO
       end if
-      m.items.appendChild(item)  ' push to end of the FIFO
     end for
   end for
 
   ' keep cache size down
   for i=0 to (m.items.getChildCount() - (width * height) - 1)
-    m.items.removeChildIndex(0)
+    removeAndRelease(m.items.getChild(0))
   end for
 
   'print "Item cache has " + stri(m.items.getChildCount()) + " children"
@@ -264,24 +288,34 @@ End Function
 ' it into the cache. If cache size has grown, remove the oldest cache entry.  If
 ' the item is alread in the cache, reset it's FIFO position and don't create it
 ' again.
-Function createItemComponent(index As Integer, item As Object) As Object
-  item.id = stri(index)
-  item.width = m.top.itemSize[0]
-  item.height = m.top.itemSize[1]
-  content = getContent(index)
-  ' Special case here.  If we use Poster node type directly, it has a 'uri' field instead of
-  ' an 'itemContent' field.
-  if content = invalid then return invalid
-  if item.hasField("itemContent") then 
-    item.itemContent = content
-  else if item.hasField("uri") then 
-    item.loadDisplayMode = "scaleToZoom"
-    item.loadingBitmapUri = "pkg:/images/placeholder.jpg"
-    item.uri = content.hdgridposterurl
-  end if
+Function createItemComponent(index As Integer, content As Object, item As Object) As Object
+
   gridIndex = itemIndexToGridIndex(index)
   itemRect = getGridItemRect(gridIndex)
-  item.translation = [itemRect.x,itemRect.y]
+
+  if item.hasField("itemContent") then 
+    fields = {
+      id: stri(index)  
+      width: m.top.itemSize[0]
+      height: m.top.itemSize[1]
+      itemContent: content
+      translation: [itemRect.x,itemRect.y]
+    }
+    item.setFields(fields)
+  else if item.hasField("uri") then 
+    ' Special case here.  If we use Poster node type directly, it has a 'uri' field instead of
+    ' an 'itemContent' field.
+    fields = {
+      id: stri(index)  
+      width: m.top.itemSize[0]
+      height: m.top.itemSize[1]
+      loadDisplayMode: "scaleToZoom"
+      loadingBitmapUri: "pkg:/images/placeholder.jpg"
+      uri: content.hdgridposterurl
+      translation: [itemRect.x,itemRect.y]
+    }
+    item.setFields(fields)
+  end if
 
   'print "Rendering item " + stri(index) + " at [" + str(itemRect.x) + "," + str(itemRect.y) + "]"
   'print "Item " + stri(index) + " has dimensions [" + str(item.width) + "," + str(item.height) + "]"

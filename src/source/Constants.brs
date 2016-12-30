@@ -513,10 +513,10 @@ Function getConstants()
         ' - the OS on a 256MB device only takes about 70MB on startup
         ' - VRAM on 256MB device is limited to 63MB and starts relieving pressure at ~90% full
         ' - Total app memory available = 256MB - 63MB - 70MB - 70MB = 53MB
-        constants.performance.categoryGridList.blockSize = 40  ' 40 is about 2s to convert metadata in the MetadataFetchTask, so don't go any higher
-        constants.performance.categoryGridList.triggerSize = 30  ' make trigger large so horizontal scrolling has plenty of lead time
+        constants.performance.categoryGridList.blockSize = 20  ' 40 is about 2s to convert metadata in the MetadataFetchTask, so don't go any higher
+        constants.performance.categoryGridList.triggerSize = 15  ' make trigger large so horizontal scrolling has plenty of lead time
         constants.performance.categoryGridList.categoryWindowSize = 3
-        constants.performance.categoryGridList.metadataCacheMaxEntries = 10  ' this is the biggest impact on number of nodes in memory
+        constants.performance.categoryGridList.metadataCacheMaxEntries = 40  ' this is the biggest impact on number of nodes in memory
         constants.performance.categoryGridList.categoryAnimationDuration = 0.75
         constants.performance.categoryGridList.gridAnimationDuration = 0.4
         constants.performance.contentGrid.overhang = 1

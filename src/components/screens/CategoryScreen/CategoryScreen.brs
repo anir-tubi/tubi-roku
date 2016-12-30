@@ -176,7 +176,10 @@ End Function
 
 ' Use this trigger to synchronize menu and grid
 Function onPreCategoryMenuChange()
-  m.CategoryGridList.animateToCategory = m.CategoryList.preItemFocused
+  ' Don't sync if CategoryList has focus and most likely triggered the grid category change
+  if m.CategoryList.isInFocusChain() and m.CategoryList.content <> invalid then
+    m.CategoryGridList.animateToCategory = m.CategoryList.preItemFocused
+  end if
 End Function
 
 '''''''''''''''''''''
@@ -234,7 +237,7 @@ End Function
 
 Function onPreGridCategoryChange() As Void
 
-  ' Don't sync if CategoryList has focus and most likely triggered the grid category change
+  ' Don't sync if CategoryGridList has focus and most likely triggered the grid category change
   if m.CategoryGridList.isInFocusChain() and m.CategoryGridList.content <> invalid then
     m.CategoryList.animateToItem = m.CategoryGridList.preCategoryFocused ' CategoryList has one extra item
   end if
