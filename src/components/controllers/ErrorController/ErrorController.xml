@@ -20,7 +20,6 @@
 
   <script type="text/brightscript" uri="pkg:/components/controllers/ErrorController/ErrorController.brs" />
   <script type="text/brightscript" uri="pkg:/components/screens/ErrorModalDialog.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   
   <interface>
     <!--
@@ -35,5 +34,16 @@
     
     <field id="buttonSelected" type="boolean" alwaysNotify="true"/>
   </interface>
+
+  <children>
+    <!-- give something more than a grey background for the error modal -->
+    <Poster
+      id="ErrorBackground"
+      loadSync="true"
+      width="1920"
+      height="1080"
+      uri="pkg:/images/splash-1920.jpg"/>
+
+  </children>
 
 </component>

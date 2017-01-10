@@ -8,7 +8,6 @@
 <component name="ModalDialogScreen" extends="Group" initialFocus="ButtonList">
 
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogScreen/ModalDialogScreen.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   
   <interface>
     <!-- The text of buttons.  The button list will grow to the size of this array -->
@@ -87,15 +86,15 @@
           </Rectangle>
         </Group>
         
-        <ScrollingList
+        <InstalledScrollingList
           id="ButtonList"
           width="490"
           height="1080"
           layoutDirection="vert"
           focusBitmapUri="pkg:/images/menu-focus.9.png"
-          itemComponentName="CategorySeasonListItem"
+          itemComponentName="InstalledCategorySeasonListItem"
           itemSpacings="[6]">
-        </ScrollingList>
+        </InstalledScrollingList>
       </LayoutGroup>
     </Rectangle>
 

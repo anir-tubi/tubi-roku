@@ -147,9 +147,6 @@ Function MainNewUI(args As Dynamic, constants As Object)
 
   m.global.player = TubiPlayer(m.global.utils)
 
-
-
-
   ' Load scene graph
   screen = CreateObject("roSGScreen")
   port = CreateObject("roMessagePort")
@@ -168,10 +165,38 @@ Function MainNewUI(args As Dynamic, constants As Object)
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
   sgGlobal.constants = m.global.utils.constants 
-  controller = screen.CreateScene("ContentController")
+  tubiScene = screen.CreateScene("TubiScene")
   screen.show()
 
-  ' THIS ONLY WORKS ON 7.1+ firmware!
+
+  'TODO(Chris): Check constants.externalConfig.info.... for flag to enable vs. disable remote components loading
+  enableRemoteComponents = false
+
+  if enableRemoteComponents then
+    ' Dynamic Component Library loading
+    remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
+
+    print "TubiRemoteLibrary loading from " + m.global.utils.constants.settings.remoteComponentsUrl
+    ' NOTE: Dynamically setting uri here only works for HTTPS or signed packages.  HTTP will give loadStatus 'none'
+    remoteLibrary.uri = m.global.utils.constants.settings.remoteComponentsUrl
+    print "TubiRemoteLibrary status is " + remoteLibrary.loadStatus
+
+    'Listen for when the remote loading has completed
+    while remoteLibrary.loadStatus <> "ready"
+      msg = wait(1000, port)
+      if type(msgType) = "roSGScreenEvent" and msg.isScreenClosed() then return 0
+
+      print "TubiRemoteLibrary status is " + remoteLibrary.loadStatus
+      if remoteLibrary.loadStatus = "failed"
+        showErrorDialog()
+        return 0
+      end if
+    end while
+    controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
+  else
+    controller = tubiScene.createChild("ContentController")
+  end if
+
   controller.observeField("playContent", port)
 
   deepLink(args, controller, m.global.utils)

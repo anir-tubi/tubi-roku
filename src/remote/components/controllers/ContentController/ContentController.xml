@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - ContentController
+ -
+ - This is the primary controller of the application which will manage
+ - CategoryScreen and DetailScreen.
+ -
+ - Scene Startup Sequence:
+ -  1) This component is created and init() is run
+ -  2) During ContentController.init(), the MetadataFetchTask is set to "RUN", creating its long-lived thread
+ -     that will answer requests for metdata from the primary scene graph thread.
+ -  3) The MetadataFetchTask sets a 'ready' field to "true" indicating that it is available
+ -  4) This component dynamically creates the CategoryScreen which begins making metadata requests
+ -
+ -  This startup sequence will ensure that the OS-level thread for MetadataTaskThread is ready
+ -  and we don't have race conditions when populating the CategoryScreen.
+ -
+ -->
+<component name="ContentController" extends="Group">
+
+  <script type="text/brightscript" uri="libpkg:/components/controllers/ContentController/ContentController.brs" />
+  <script type="text/brightscript" uri="libpkg:/components/controllers/ScreenStack.brs" />
+  <script type="text/brightscript" uri="libpkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="libpkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="libpkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="libpkg:/source/lib/TubiBookmarks.brs" />
+  <script type="text/brightscript" uri="libpkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ErrorModalDialog.brs" />
+
+  <interface>
+    <!-- Watched by the main brightscript thread to indicate video playback should start -->
+    <field id="playContent" type="assocarray" alwaysNotify="true" />
+
+    <!-- Show the detail screen for the item indicated 
+      - 
+      - The node should have 2 fields set:
+      -    id    - the content requested
+      -    type  - the type of content: "series", "video", or "episode"
+      -->
+    <field id="itemDetail" type="node" alwaysNotify="true" />
+
+    <!-- Used to communicate the new nowPos of a video that has been played in the player -->
+    <field id="playerInfo" type="assocarray" alwaysNotify="true" />
+
+  </interface>
+        
+    <children>
+      <Rectangle
+        id="ContentBackground"
+        width="1920"
+        height="1080"
+        translation="[0,0]" />
+
+      <!--Handles the background images -->
+      <BackgroundGroup
+        id="BackgroundGroup" />
+
+      <MetadataFetchTask 
+        id="MetadataFetchTask" />
+
+      <TrackingLoggingTask
+        id="TrackingLoggingTask" />
+      
+      <AuthTask
+        id="AuthTask" />
+      
+      <FBApplicationDetectionTask
+        id="FBApplicationDetectionTask" />
+
+      <Group
+       id="ScreenStack"/>
+    </children>
+
+</component>
+

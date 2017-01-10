@@ -11,11 +11,11 @@
  --> 
 <component name="RegistrationCodeTask" extends="Task">
     <script type="text/brightscript" uri="pkg:/components/tasks/RegistrationCodeTask/RegistrationCodeTask.brs" />
-    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
       <!-- once the registration code has been generated, it will be stored here -->

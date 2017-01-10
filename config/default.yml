@@ -8,6 +8,7 @@ settings:
   loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
   hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/14.brs"
   # hotPatchUrl: "http://192.168.1.180:8080/rokuHotpatches/14.brs"
+  remoteComponentsUrl: "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components.zip"
   appName: "Tubi TV"
   isLiveTVOn: true
   isRokuAdFrameworkOn: false
@@ -51,6 +52,15 @@ manifest:
   bs_libs_required: roku_ads_lib
   ui_resolutions: "fhd"
   rsg_version: 1.0
+
+component_library_manifest:
+  title: "Tubi TV Component Library"
+  subtitle: "Remote loading for scenegraph components"
+  major_version: 2
+  minor_version: 3
+  build_version: 1
+  sg_component_libs_provided: "TubiRemoteLibrary"
+  hidden: 1
 
 theme:
   ThemeType: "flat-movie"

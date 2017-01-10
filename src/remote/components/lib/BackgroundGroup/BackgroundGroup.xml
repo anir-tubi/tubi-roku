@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+ - Background Group
+ -
+ - A group that handles any background transitions
+ - As well as switching between the different background types - grid (category, episode screens), details (detail, search screens)
+ -
+ -->
+<component name="BackgroundGroup" extends="Group">
+  <script type="text/brightscript" uri="libpkg:/components/lib/BackgroundGroup/BackgroundGroup.brs" />
+  <script type="text/brightscript" uri="libpkg:/source/lib/Log.brs" />
+  
+  <interface>
+    <!-- newBackgroundType can be "grid", "details" -->
+    <field id="newBackgroundType" type="string" value="grid" alwaysNotify="true" />
+
+    <!-- used to set the uri for the background image -->
+    <field id="backgroundUriList" type="stringarray" />
+    
+    <!-- flag to notify if the user is opening the category screen from the sign in screens -->
+    <field id="enterFromSignIn" type="boolean" value="false" alwaysNotify="true" />
+
+    <!-- flag to notify if the user is opening the category screen from the sign in screens -->
+    <field id="catScreenStart" type="boolean" value="false" alwaysNotify="true" />
+
+  </interface>
+
+  <children />
+</component>

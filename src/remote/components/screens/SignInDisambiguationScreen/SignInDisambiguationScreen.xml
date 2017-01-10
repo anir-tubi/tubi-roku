@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - SignInDisambiguationScreen
+ -
+ -
+ - The first screen of the sign-in flow, it asks whether the user wants to sign in or
+ - use a guest pass to view content.
+ -
+ -->
+<component name="SignInDisambiguationScreen" extends="Group">
+
+  <script type="text/brightscript" uri="libpkg:/components/screens/SignInDisambiguationScreen/SignInDisambiguationScreen.brs" />
+  <script type="text/brightscript" uri="libpkg:/source/lib/Log.brs" />
+  
+  <interface>
+    <!-- Set to true if the user selected the sign in button -->
+    <field id="signInButtonSelected" type="boolean" value="false" alwaysNotify="true"/>
+    
+    <!-- Set to true if the user selected the guest pass button -->
+    <field id="guestPassButtonSelected" type="boolean" value="false" alwaysNotify="true"/>
+
+    <!-- keeps the uri used for user tracking -->
+    <field id="trackingUri" type="string"  value="/login-choice" />    
+  </interface>
+
+  <children>
+    <Video
+      id="VideoBackground"
+      width="1920"
+      height="1080"
+      translation="[0,0]"
+      enableUI="false"
+      loop="true"
+      enableTrickPlay="false"
+      notificationInterval="0"
+      mute="true">
+    </Video>
+    
+    <Poster
+      id="HeroShade"
+      width="1920"
+      height="1080"
+      uri="pkg:/images/sign-in-disambiguation-mask-480x270.png"
+      translation="[0,0]"/>
+    
+    <Poster
+      id="Logo"
+      uri="pkg:/images/logo.png"
+      width="286"
+      height="82"
+      translation="[816,360]"/>
+    
+    <RotatingLabel
+      id="Slogan"
+      horizAlign="center"
+      width="1920"
+      translation="[0,544]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="43" />
+    </RotatingLabel>
+    
+    <ScrollingList
+      id="SignInOrGuestButtons"
+      layoutDirection="horiz"
+      translation="[450,720]"
+      height="80"
+      width="986"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
+      itemComponentName="SignInButton"
+      itemSpacings="[26]">
+      <ContentNode role="content">
+        <ContentNode id="signin" title="Sign In Or Register"/>
+        <ContentNode id="guestpass" title="Guest Pass"/>
+      </ContentNode>
+    </ScrollingList>
+  </children>
+</component>

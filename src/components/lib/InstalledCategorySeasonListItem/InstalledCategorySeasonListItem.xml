@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - InstalledCategorySeasonListItem
+ - This is a copy of the CategorySeasonListItem, only it is added to the installed pkg
+ - and will not be able to be modified as part of the external component library.
+ -
+ - Items used in a ScrollingList for showing categories.  These
+ - are labels which can wrap text and also display a cursor when
+ - the scrollinglist has focus.
+ -
+ -->
+<component name="InstalledCategorySeasonListItem" extends="Rectangle" >
+  <script type="text/brightscript" uri="pkg:/components/lib/InstalledCategorySeasonListItem/InstalledCategorySeasonListItem.brs" />
+
+  <interface>
+    <field id="focusPercent" type="float" value="0.0"/>
+    <field id="content" type="node" />
+    <field id="listHasFocus" type="boolean" value="false" />
+    <field id="width" alias="ForceDimensions.width" value="425.0" />
+    <field id="height" alias="ForceDimensions.height" value="80.0" />
+  </interface>
+  
+  <children>
+    <Rectangle
+      id="ForceDimensions"
+      color="0x00000000"/>
+    <Label 
+      id="categoryUnfocusedText" 
+      horizAlign="left"
+      vertAlign="center"
+      width="322"
+      height="79"
+      translation="[19,1]"
+      opacity="0.0"
+      color="0xFFFFFFFF">
+      <Font
+      role="font"
+      size="33"
+      uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+    </Label>
+    <Label 
+      id="categoryFocusedText" 
+      horizAlign="left"
+      vertAlign="center"
+      width="322"
+      height="79"
+      translation="[19,1]"
+      color="0x191919FF">
+      <Font
+      role="font"
+      size="33"
+      uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+    </Label>
+    
+    <Group
+      id="categoryCountGroup"
+      opacity="0.0"
+      translation="[361,16]">
+      <Poster
+        id="categoryCountBackground"
+        width="48"
+        height="48"
+        uri="pkg:/images/count-background.png"
+        translation="[0,0]"/>
+      <Label
+        id="categoryCountText"
+        horizAlign="center"
+        width="48"
+        translation="[-2,15]"
+        color="0xFF9933FF">
+        <Font
+        role="font"
+        size="22"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+      </Label>
+    </Group>
+  </children>
+</component>

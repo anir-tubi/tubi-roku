@@ -3,7 +3,6 @@
 ' in a <script> tag.
 
 Function showErrorModal(errorCode As Integer, errorMessage As String, tryAgainCallback=invalid As Dynamic, cancelCallback=invalid As Dynamic) As Void
-  testLog("showErrorModal: code = " + stri(errorCode))
   modal = CreateObject("roSGNode", "ModalDialogScreen")
   modal.title = "Something went wrong"
   modal.message = "Error " + stri(errorCode) + Chr(10) + errorMessage

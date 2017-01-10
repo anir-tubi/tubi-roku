@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - FBApplicationDetectionTask
+ -
+ - This is a long-lived task which will respond to FB mobile apps looking for
+ - devices which show FB ads.
+ -
+ --> 
+<component name="FBApplicationDetectionTask" extends="Task">
+    <script type="text/brightscript" uri="libpkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="libpkg:/components/tasks/FBApplicationDetectionTask/FBApplicationDetectionTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/AN4TV_Roku_Application_Detection/FBApplicationDetection.brs" />
+  
+    <interface>
+      <!-- Notify that the thread loop is up and listening
+      - for requests
+      -->
+      <field id="ready" type="boolean" value="false" />
+    </interface>
+</component>

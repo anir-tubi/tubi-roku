@@ -1,17 +1,36 @@
-ZIP=zip --quiet -x Makefile -9 -r
+ZIPBIG=zip --quiet -x Makefile '*remote*' '*simple*' -9 -r
+ZIPSMALL=zip --quiet -x Makefile -9 -r
 CURL=curl
 MAKE=make
 TOOL_CLI=node tools/cli.js
 
 NAME=tubitv_roku
+REMOTE_LOAD_NAME=tubitv_remote_components
 SRC_DIR=src
+TARGET_REMOTE_DIR=$(TARGET_DIR)/remote
 TARGET_DIR=build
 TARGET=$(NAME).zip
+REMOTE_LOAD_ZIP=$(REMOTE_LOAD_NAME).zip
+REMOTE_LOAD_PKG=$(REMOTE_LOAD_NAME).pkg
+REMOTE_LOAD_SOURCE=remote
+REMOTE_LOAD_PORT=8090
+REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
+  --include 'source/lib' \
+  --include 'source/lib/**' \
+  --include 'source/3rdparty' \
+  --include 'source/3rdparty/**' \
+  --include 'components' \
+  --include 'components/screens' \
+  --include 'components/screens/**' \
+  --exclude '*'
 DEV_PORT=8085
 DEV_PASSWORD?=1234
+PKG_PASSWORD?=ABCD
 ROKU_PROFILE?=dev
 SETTING_FILE=source/Settings.brs
 MANIFEST_FILE=manifest
+ORIGINAL_MANIFEST_NAME=manifest
+REMOTE_LOAD_NAME_MANIFEST_NAME=component_library_manifest
 TESTS=source/tests
 
 ifeq ($(ROKU_PROFILE), production)
@@ -25,22 +44,41 @@ build: rsync gen zip
 
 zip:
 	@rm -f ./$(TARGET_DIR)/$(TARGET)
-	@cd $(TARGET_DIR); $(ZIP) $(TARGET) .
+	@rm -f ./$(TARGET_DIR)/$(REMOTE_LOAD_ZIP)
+
+	@cd $(TARGET_DIR); $(ZIPBIG) $(TARGET) .
+	@cd $(TARGET_DIR)/$(REMOTE_LOAD_SOURCE); $(ZIPSMALL) ../$(REMOTE_LOAD_ZIP) .
+
 
 rsync:
 	@rm -rf ./$(TARGET_DIR)/$(TESTS)
 	@rm -f ./$(TARGET_DIR)/$(SETTING_FILE)
 	@rsync -arvq $(RSYNC_EXCLUDE) $(SRC_DIR)/* $(TARGET_DIR)
+	@rsync -arvq $(REMOTE_LOAD_RSYNC_INCLUDE) $(SRC_DIR)/* $(TARGET_REMOTE_DIR)
 
 gen:
 	@$(TOOL_CLI) create-config $(ROKU_PROFILE) $(TARGET_DIR)/$(SETTING_FILE)
-	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_DIR)/$(MANIFEST_FILE)
+	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_DIR)/$(MANIFEST_FILE) $(ORIGINAL_MANIFEST_NAME)
+	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_DIR)/$(REMOTE_LOAD_SOURCE)/$(MANIFEST_FILE) $(REMOTE_LOAD_NAME_MANIFEST_NAME)
 
-install: env build
+host:
+	@$(TOOL_CLI) host-components $(TARGET_DIR)/$(REMOTE_LOAD_PKG) $(REMOTE_LOAD_PORT)
+
+install: env build pkg-components
 	@echo "Installing $(NAME) to host $(ROKU_DEV_TARGET)...(this might take up to a minute)"
 	@#$(CURL)  -H 'Connection: close' --digest -u "rokudev:1234" -F "mysubmit=Install" -F "archive=@$(TARGET_DIR)/$(TARGET)" http://$(ROKU_DEV_TARGET)/plugin_install | grep "<font color" | sed "s/<font color=\"red\">//"
 	@$(TOOL_CLI) upload $(TARGET_DIR)/$(TARGET) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
-	@$(MAKE) dev
+	@$(MAKE) -j2 dev host
+
+pkg-components:
+	@echo "Signing $(REMOTE_LOAD_ZIP) on host $(ROKU_DEV_TARGET)"
+	@$(TOOL_CLI) upload $(TARGET_DIR)/$(REMOTE_LOAD_ZIP) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
+	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(REMOTE_LOAD_NAME) $(TARGET_DIR)
+
+pkg: pkg-components
+	@echo "Signing $(TARGET) on host $(ROKU_DEV_TARGET)"
+	@$(TOOL_CLI) upload $(TARGET_DIR)/$(TARGET) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
+	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(NAME) $(TARGET_DIR)
 
 dev: env
 	@echo "Telnet to $(ROKU_DEV_TARGET) 8085"
@@ -81,4 +119,4 @@ release: clean verifyrepo
 	@echo "Remember to push the new tag to remote with 'git push --tags origin'"
 	@echo
 
-.PHONY: build zip rsync install dev gen discover test clean verifyrepo release
+.PHONY: build zip rsync install dev gen discover test clean verifyrepo release pkg

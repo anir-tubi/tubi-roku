@@ -1,2 +1,3 @@
 settings:
   mode: "dev"
+  remoteComponentsUrl: "http://<<URI-TO-REPLACE>>/tubitv_remote_components.pkg"

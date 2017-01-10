@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - TrailerScreen
+ -
+ -->
+<component name="TrailerScreen" extends="Group">
+
+  <script type="text/brightscript" uri="libpkg:/components/screens/TrailerScreen/TrailerScreen.brs" />
+  <script type="text/brightscript" uri="libpkg:/source/lib/Log.brs" />
+  
+  <interface>
+    <field id="content" alias="TrailerVideo.content" />
+    <field id="trailerFinished" type="boolean" value="false" />
+  </interface>
+
+  <children>
+    <Spinner
+     id="TrailerLoadingSpinner"
+     visible="true"
+     width="1920"
+     height="1280"/>
+    <Video
+      id="TrailerVideo"
+      width="1920"
+      height="1080"
+      translation="[0,0]"
+      enableUI="false"
+      enableTrickPlay="false"
+      visible="false"
+      notificationInterval="0"/>
+    <Poster
+      id="PauseOverlay"
+      width="55"
+      height="83"
+      uri="pkg:/images/transport/hd/pause_big.png"
+      translation="[932,598]"
+      visible="false"/>
+    
+  </children>
+</component>

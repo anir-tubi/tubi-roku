@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - SignInRegisterScreen
+ -
+ - Present the user with an option to register via the web site or enter
+ - credentials directly.
+ -
+ -->
+
+<component name="SignInRegisterScreen" extends="Group">
+
+  <script type="text/brightscript" uri="libpkg:/components/screens/SignInRegisterScreen/SignInRegisterScreen.brs" />
+  <script type="text/brightscript" uri="libpkg:/source/lib/Log.brs" />
+  
+  <interface>
+    <!-- Set to true if the user selects the sign-in button -->
+    <field id="signInButtonSelected" type="boolean" value="false" alwaysNotify="true"/>
+    
+    <!-- Set to true if the user selects the register button -->
+    <field id="registerButtonSelected" type="boolean" value="false" alwaysNotify="true"/>
+
+    <!-- keeps the uri used for user tracking -->
+    <field id="trackingUri" type="string"  value="/login-choice/signin-or-online" />    
+  </interface>
+
+  <children>
+    <Poster
+      id="Background"
+      uri="pkg:/images/non-blurred-default-background.jpg"
+      width="1920"
+      height="1080"
+      translation="[0,0]"/>
+
+    <Poster
+      id="BackgroundGradient"
+      uri="pkg:/images/sign-in-gradient.png"
+      width="1920"
+      height="1080"
+      translation="[0,0]"/>
+    
+    <Label
+      translation="[478,188]"
+      text="Sign in or Register on Tubi TV"
+      horizAlign="center"
+      width="964">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="67" />
+    </Label>
+    
+    <LayoutGroup
+      itemSpacings="[206]"
+      translation="[540,419]"
+      layoutDirection="horiz">
+      <LayoutGroup
+        layoutDirection="vert">
+        <Rectangle
+         height="33"
+         width="300"
+         color="0x00000000"/>
+        <Poster
+         uri="pkg:/images/picto-sign-in.png"
+         width="300"
+         height="144"/>
+      </LayoutGroup>
+      <Poster
+       uri="pkg:/images/picto-register.png"
+       width="302"
+       height="192"/>
+    </LayoutGroup>
+       
+    <ScrollingList
+      id="SignInOrRegisterButtons"
+      layoutDirection="horiz"
+      translation="[450,720]"
+      height="80"
+      width="986"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
+      itemComponentName="SignInButton"
+      itemSpacings="[26]">
+      <ContentNode role="content">
+        <ContentNode id="signin" title="Sign In via Email"/>
+        <ContentNode id="register" title="Register Online"/>
+      </ContentNode>
+    </ScrollingList>
+    
+    <LayoutGroup
+      translation="[450,833]"
+      layoutDirection="horiz"
+      itemSpacings="[26]"
+      opacity="0.5">
+     <Label
+       text="Use your email and password for your existing account"
+       wrap="true"
+       width="480">
+       <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-Medium.ttf"
+         size="22"/>
+     </Label>
+     <Label
+       text="Register at tubitv.com or sign in into an existing account"
+       wrap="true"
+       width="480">
+       <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-Medium.ttf"
+         size="22"/>
+     </Label>
+    </LayoutGroup>
+    
+  </children>
+</component>

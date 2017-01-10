@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - TubiScene
+ -
+ - This the main scene that remotely loads the ContentController which in turn builds the CategoryScreen and the DetailsScreen, etc.
+ - In order for remote loading of the scenegraph app to work, we have to sign the package, that is downloaded via the url in the
+ - ComponentLibrary tag, with the same developer id as is used to create the Tubi TV app.
+ -
+ - Please see https://sdkdocs.roku.com/display/sdkdoc/ComponentLibrary for more info on remotely loading scenegraph components 
+ -
+ -
+ - The ComponentLibary's uri field is populated in the build process.
+ - The URI-TO-REPLACE value will be set to the value of remoteComponentDir in the 
+ - settings section of default.yml when in production mode, and will be set to the local ip of the computer
+ - doing the build when in dev mode. Change from production or dev mode by setting
+ - the ROKU_PROFILE environment variable.
+ -->
+<component name="TubiScene" extends="Scene">
+
+  <children>
+    <Poster
+      id="LoaderBackground"
+      loadSync="true"
+      width="1920"
+      height="1080"
+      uri="pkg:/images/splash-1920.jpg"/>
+
+    <ComponentLibrary
+      id="TubiRemoteLibrary"/>
+  </children>
+
+</component>
+

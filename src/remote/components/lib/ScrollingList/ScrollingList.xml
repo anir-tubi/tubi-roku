@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - ScrollingList
+ -
+ - This is a 1D list of items which may be of varying sizes.  
+ - Scrolling happens whenever a list item is outside of the
+ - boundaries set by 'width' or 'height'. Scrolling only happens
+ - in one direction, keyed on 'layoutDirection'.  The other dimension
+ - will just clip the items.
+ -
+ - Key handling for scrolling has 2 features: 
+ -   a) navigation buttons pressed in quick succession will
+ -      supress 'itemFocused' updates until button presses slow down
+ -   b) press and hold navigation will scroll until the button is
+ -      released, supressing 'itemFocused' updates until the release
+ -
+ -->
+<component name="ScrollingList" extends="Group" >
+  <script type="text/brightscript" uri="libpkg:/components/lib/ScrollingList/ScrollingList.brs" />
+  <script type="text/brightscript" uri="libpkg:/source/lib/Log.brs" />
+
+  <interface>
+    <field id="width" type="float" />
+    <field id="height" type="float" />
+    <field id="scrollWidth" type="float" value="0.0"/>
+    <field id="scrollHeight" type="float" value="0.0"/>
+    <field id="content" type="node" />
+    <field id="itemFocused" type="int" value="-1" alwaysNotify="true"/>
+    <field id="preItemFocused" type="int" value="-1" alwaysNotify="true"/>
+    <field id="itemSelected" type="int" value="-1" alwaysNotify="true"/>
+    <field id="itemComponentName" type="string" />
+    <field id="itemSpacings" type="floatarray" value="[]"/>
+    <field id="layoutDirection" type="string" value="vert"/>
+    <field id="animateToItem" type="int" value="-1" alwaysNotify="true"/>
+    <field id="focusBitmapUri" type="uri" alias="FocusImage.uri" />
+    <field id="focusChangeDuration" type="float" value="0.25"/>
+  </interface>
+  
+  <children>
+    <Poster
+     id="FocusImage"
+     translation="[0,0]"
+     visible="false" 
+     loadDisplayMode="scaleToFit"
+     uri="" />
+    <Group 
+     id="Items"
+     translation="[0,0]"/>
+    
+    <Animation
+      id="ScrollAnimation">
+      <Vector2DFieldInterpolator
+        id="TranslationInterpolator"
+        fieldToInterp="Items.translation" />
+      <FloatFieldInterpolator
+        id="FocusInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[0.0,1.0]"  />
+      <FloatFieldInterpolator
+        id="UnfocusInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[1.0,0.0]"  />
+      <Vector2DFieldInterpolator
+        id="FocusImageInterpolator"
+        key="[0.0,1.0]"
+        fieldToInterp="FocusImage.translation" />
+      <FloatFieldInterpolator
+        id="FocusImageWidthInterpolator"
+        key="[0.0,1.0]"
+        fieldToInterp="FocusImage.width" />
+      <FloatFieldInterpolator
+        id="FocusImageHeightInterpolator"
+        key="[0.0,1.0]"
+        fieldToInterp="FocusImage.height" />
+    </Animation>
+  </children>
+</component>

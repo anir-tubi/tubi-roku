@@ -18,10 +18,10 @@ program
   });
 
 program
-  .command('create-manifest <env> <filename>')
+  .command('create-manifest <env> <filename> <manifestname>')
   .description('create roku manifest file')
-  .action((env, filename) => {
-    config.genManifest(env, filename)
+  .action((env, filename, manifestname) => {
+    config.genManifest(env, filename, manifestname)
   });
 
 program
@@ -35,6 +35,17 @@ program
       }).catch(err => {
         console.log(err);
       });
+    });
+  });
+
+program
+  .command('sign-package <address> <dev_password> <sign_password> <appname> <outputpath>')
+  .description('sign and download pkg file')
+  .action((address, devPassword, signPassword, appName, pkgPath) => {
+    network.signPkg(address, devPassword, signPassword, appName, pkgPath).then(path => {
+      console.log("Signed package at %s.", path);
+    }).catch(err => {
+      console.log(err);
     });
   });
 
@@ -61,6 +72,13 @@ program
   .description('dump a git-friendly version number to use as a tag')
   .action(() => {
     config.getBuildTag()
+  });
+
+program
+  .command('host-components <zippath> <port>')
+  .description('set up a temporary service that will return the externally loaded components')
+  .action((zippath, port) => {
+    network.hostComponents(zippath, port)
   });
 
 program.parse(process.argv);

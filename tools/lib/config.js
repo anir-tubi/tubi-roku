@@ -3,6 +3,7 @@ const extend = require('node.extend');
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const localIp = require('my-local-ip')();
 
 const cwd = path.join(process.cwd(), 'config');
 const defaultProfile = 'default';
@@ -11,14 +12,20 @@ const buildProfile = 'build';
 bluebird.promisifyAll(fs);
 
 /**
- * Parse a yml file. If it does not exist, return {}.
+ * Parse a yml file, inserting special values. If it does not exist, return {}.
  * @param profile: ['default', 'dev', 'staging', 'production']
  * @returns {*}
  */
 function parse(profile) {
   const filename = path.join(cwd, profile + '.yml');
   if (!fs.existsSync(filename)) return {};
-  return yaml.load(fs.readFileSync(filename));
+  const raw = fs.readFileSync(filename, { encoding: 'utf8' });
+
+  /* URI-TO-REPLACE is the localhost server of dynamic components zip */
+  let remoteComponentDir = localIp + ':8090';
+  rendered = raw.replace('<<URI-TO-REPLACE>>', remoteComponentDir);
+  
+  return yaml.load(rendered);
 }
 
 /**
@@ -109,9 +116,9 @@ function save(env, filename) {
  * @param env: environment, dev, staging, or production
  * @param filename
  */
-function genManifest(env, filename) {
+function genManifest(env, filename, manifestName) {
   fs.openAsync(filename, 'w').then(fd => {
-    const data = load(env).manifest;
+    const data = load(env)[manifestName];
     const content = Object.keys(data).map(key => {
       return `${key}=${data[key]}`;
     }).join('\n');

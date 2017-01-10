@@ -13,10 +13,10 @@
 <component name="MetadataFetchTask" extends="Task">
     <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTask.brs" />
     <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/TranslateMetadata.brs" />
-    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
       <!--

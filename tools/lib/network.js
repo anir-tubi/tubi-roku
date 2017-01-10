@@ -1,3 +1,5 @@
+const path = require('path');
+const http = require('http');
 const fs = require('fs');
 const request = require('request');
 const Rx = require('rx');
@@ -46,6 +48,57 @@ exports.uploadPkg = function(pkgfile, address, password) {
 };
 
 /**
+ * sign and download pkg from target roku box
+ *
+ * @param address roku device IP
+ * @param devPassword roku dev user password
+ * @param signPassword genkey password for the developer id
+ * @param pkgpath download path for signed pkg file
+ */
+exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath) {
+  return new Promise((res, rej) => {
+    const url = `http://${address}/plugin_package`;
+    const auth = {
+      user: 'rokudev',
+      pass: devPassword,
+      sendImmediately: false
+    };
+    const data = {
+      mysubmit: 'Package',
+      app_name: `${appName}/1.0.0`,
+      passwd: signPassword,
+      pkg_time: '',
+    };
+    request.post({url: url, auth: auth, formData: data}, (err, response, body) => {
+      if (err) {
+        rej(err);
+      }
+      else {
+        console.log("Got " + body.length + " bytes response");
+        var packages = body.match(/pkgs\/\/([^\"]*)/)
+        if (packages === null) {
+          console.log("No downloadable packages found!");
+          return;
+        }       
+        const url = `http://${address}/pkgs/${packages[1]}`;
+        const auth = {
+          user: 'rokudev',
+          pass: devPassword,
+          sendImmediately: false
+        };
+        var writePath = `${pkgPath}/${appName}.pkg`;
+        request.get({url: url, auth: auth}, (err, response, body) => {
+          if (err) {
+            rej(err);
+          }
+          res(writePath);
+        }).pipe(fs.createWriteStream(writePath));
+      }
+    });
+  });
+};
+
+/**
  * Find roku devices
  */
 exports.autoDiscover = function() {
@@ -59,4 +112,32 @@ exports.autoDiscover = function() {
     });
     ssdp.search('roku:ecp');
   });  
+};
+
+
+/**
+ * Host external component library for development
+ */
+exports.hostComponents = function(zippath, port){
+  console.log('SERVER: hostComponents has started');
+
+  if (typeof(port) === 'string'){
+    port = parseInt(port, 10);
+  }
+
+  const server = http.createServer((req, res) => {
+    const nodePath = path.dirname(require.main.filename);
+    const fullZipPath = nodePath + '/../' + zippath;
+
+    const stream = fs.createReadStream(fullZipPath);
+
+    stream
+      .on('open', () => {
+        console.log('SERVER: external component stream has started');
+      })
+      .on('end', () => {
+        console.log('SERVER: external component stream has ended');     
+      });
+    stream.pipe(res);
+  }).listen(port);
 };
