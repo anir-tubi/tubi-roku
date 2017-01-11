@@ -23,6 +23,7 @@
       uri="pkg:/images/non-blurred-default-background.jpg"
       width="1920"
       height="1080"
+      loadSync="true"
       translation="[0,0]"/>
 
     <Poster
@@ -30,6 +31,7 @@
       uri="pkg:/images/sign-in-gradient.png"
       width="1920"
       height="1080"
+      loadSync="true"
       translation="[0,0]"/>
     
     <Poster

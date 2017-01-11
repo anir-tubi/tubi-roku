@@ -41,6 +41,7 @@
       width="1920"
       height="1080"
       uri="pkg:/images/sign-in-disambiguation-mask-480x270.png"
+      loadSync="true"
       translation="[0,0]"/>
     
     <Poster
@@ -48,6 +49,7 @@
       uri="pkg:/images/logo.png"
       width="286"
       height="82"
+      loadSync="true"
       translation="[816,360]"/>
     
     <RotatingLabel
