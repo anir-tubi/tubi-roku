@@ -168,11 +168,10 @@ Function MainNewUI(args As Dynamic, constants As Object)
   tubiScene = screen.CreateScene("TubiScene")
   screen.show()
 
+  'flag to enable vs. disable remote components loading
+  enableRemoteComponents = constants.externalConfig.info.remote_components
 
-  'TODO(Chris): Check constants.externalConfig.info.... for flag to enable vs. disable remote components loading
-  enableRemoteComponents = false
-
-  if enableRemoteComponents then
+  if enableRemoteComponents <> invalid and enableRemoteComponents = 1 then
     ' Dynamic Component Library loading
     remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
 
