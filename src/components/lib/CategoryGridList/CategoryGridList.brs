@@ -118,19 +118,18 @@ Function onListFocusChange()
     else
       fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize + 1)
     end if
+
+    ' Make sure adjacent categories are warm
+    for i = m.ScrollingList.itemFocused - m.categoryWindowSize to m.ScrollingList.itemFocused + m.categoryWindowSize
+      adjacent = m.ScrollingList.findNode("Items").getChild(i)
+      if adjacent <> invalid then
+        fetch(adjacent, adjacent.content.id, "metadataFetchTaskResponse", m.blockSize, adjacent.cursorIndex \ m.blockSize + 1)
+      end if
+    end for
+
+    ' Finally, set focus on the grid so user can scroll
+    if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)
   end if
-
-  ' Make sure adjacent categories are warm
-  for i = m.ScrollingList.itemFocused - m.categoryWindowSize to m.ScrollingList.itemFocused + m.categoryWindowSize
-    adjacent = m.ScrollingList.findNode("Items").getChild(i)
-    if adjacent <> invalid then
-      fetch(adjacent, adjacent.content.id, "metadataFetchTaskResponse", m.blockSize, adjacent.cursorIndex \ m.blockSize + 1)
-    end if
-  end for
-
-  ' Finally, set focus on the grid so user can scroll
-  if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)
-
 End Function
 
 
