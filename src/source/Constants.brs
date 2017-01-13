@@ -524,9 +524,9 @@ Function getConstants()
       else
         ' single-row-poster-memory-usage = 9 visible posters * 7 = 63 * 226KB = 14MB
         constants.performance.categoryGridList.blockSize = 30
-        constants.performance.categoryGridList.triggerSize = 15
+        constants.performance.categoryGridList.triggerSize = 10
         constants.performance.categoryGridList.categoryWindowSize = 3
-        constants.performance.categoryGridList.metadataCacheMaxEntries = 10
+        constants.performance.categoryGridList.metadataCacheMaxEntries = 30
         constants.performance.categoryGridList.categoryAnimationDuration = 0.5
         constants.performance.categoryGridList.gridAnimationDuration = 0.25
         constants.performance.contentGrid.overhang = 1
