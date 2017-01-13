@@ -109,7 +109,7 @@ Function getConstants()
     for i=0 to clientVersionNums.count()-1
       clientVersion = clientVersion + clientVersionNums[i] + "."
     end for
-    clientVersion = clientVersion + "newui"
+    clientVersion = clientVersion + "newui.local"
 
     constants.deviceInfo.deviceId = di.GetDeviceUniqueId()
     constants.deviceInfo.deviceAdId = deviceAdId 'will be invalid if ad tracking is turned off by user or old version of firmware

@@ -1291,7 +1291,7 @@ function adriseUtils_getDeviceInfo()
   for i=0 to clientVersionNums.count()-1
     clientVersion = clientVersion + clientVersionNums[i] + "."
   end for
-  clientVersion = clientVersion + "oldui"
+  clientVersion = clientVersion + "oldui.local"
 
   userAgent = "Roku/DVP-" + firmwareVersionMajor.toStr() + "." + firmwareVersionMinor.toStr() + " (" + firmware + ")"
 
