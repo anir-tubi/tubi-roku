@@ -236,6 +236,8 @@ Function getConstants()
     constants.uapiActions.add = "add"
     constants.uapiActions.remove = "remove"
 
+  constants.timers = {}
+    constants.timers.remoteComponentTimeout = 30000
 
   'constants needed for the video player
   constants.player = {}

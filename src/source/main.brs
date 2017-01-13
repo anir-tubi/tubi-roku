@@ -184,13 +184,21 @@ Function MainNewUI(args As Dynamic, constants As Object)
     remoteLibrary.uri = m.global.utils.constants.settings.remoteComponentsUrl
     print "TubiRemoteLibrary status is " + remoteLibrary.loadStatus
 
+
+    componentTimer = CreateObject("roTimespan")
     'Listen for when the remote loading has completed
     while remoteLibrary.loadStatus <> "ready"
       msg = wait(1000, port)
       if type(msgType) = "roSGScreenEvent" and msg.isScreenClosed() then return 0
 
-      print "TubiRemoteLibrary status is " + remoteLibrary.loadStatus
-      if remoteLibrary.loadStatus = "failed"
+      loadStatus = remoteLibrary.loadStatus
+      print "TubiRemoteLibrary status is " + loadStatus
+
+      if componentTimer.totalMilliseconds() > constants.timers.remoteComponentTimeout then
+        loadStatus = "failed"
+      end if
+
+      if loadStatus = "failed"
         showErrorDialog()
         return 0
       end if
