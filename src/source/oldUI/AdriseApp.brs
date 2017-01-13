@@ -59,7 +59,6 @@ function AdriseApp (params)
     runApp: AdriseApp_runApp
 
     params: params
-    facebookDetectionOn: false
   }
 
   if s.zoneId <> ""

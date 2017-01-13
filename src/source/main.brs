@@ -60,38 +60,6 @@ Sub MainOldUI(params as Dynamic)
               ' we destroy a Scene and try to create it again.
   end if
 
-  ' Set up the scene graph that will create a persistent task thread for Facebook recognition
-  if m.app.facebookDetection = true
-    constants = getConstants()
-    screen = CreateObject("roSGScreen")
-    fbscene = screen.CreateScene("FBScene")
-
-    if fbscene <> invalid
-      sgGlobal = screen.getGlobalNode()
-      sgGlobal.addField("constants", "assocarray", false)
-      sgGlobal.constants = {
-        fban4tvtoken: constants.fban4tvtoken
-      }
-      screen.show()
-
-      print "Waiting for FBTask thread to be ready..."
-
-      fbReadyTimer = CreateObject("roTimespan")
-      while true
-        isFbReady = fbscene.getField("ready")
-        if isFbReady <> invalid
-          if isFbReady = true then exit while
-          sleep(500)
-        end if
-        if fbReadyTimer.totalMilliseconds() > 5000 then
-          print "                  ...while loop timed out ..."
-          exit while
-        end if
-      end while
-      print "                                        ...done"
-    end if
-  end if
-
   app.runApp()
   placeholderCanvas.close()
 

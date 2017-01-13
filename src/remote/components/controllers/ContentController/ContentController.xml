@@ -64,9 +64,6 @@
       <AuthTask
         id="AuthTask" />
       
-      <FBApplicationDetectionTask
-        id="FBApplicationDetectionTask" />
-
       <Group
        id="ScreenStack"/>
     </children>

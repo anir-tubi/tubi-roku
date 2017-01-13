@@ -148,9 +148,6 @@ Function getConstants()
   'previously found in settings as "shortAppName"
   constants.appName = "tubitv"
 
-  ' for Facebook AN4TV Application Detection library
-  constants.fban4tvtoken = "1722980957943658|67139dcc7c459bada13b13bcd3cc51ee"
-
   'experiment information will be placed here
   constants.experiments = {}
     constants.experiments.info = invalid    'will be replaced in main.brs
