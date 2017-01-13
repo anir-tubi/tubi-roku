@@ -58,7 +58,7 @@ function ContentProvider(pubId as String, shortAppName as String, imageSize as S
     server: "http://cms.adrise.com"
 
     shortAppName: shortAppName
-    maxContent: 100    'max contents in each category for older 'roku 2' devices
+    maxContent: 50    'max contents in each category for 256MB devices
 
     imageSize: imageSize
 

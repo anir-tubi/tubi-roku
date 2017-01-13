@@ -33,9 +33,21 @@ Function getConstants()
       definition = "sd"
     end if
 
-    ' 256MB models, or slow CPU, so we can reduce our expectations
+    ' 256MB models, needed to reduce the number of contents per category
     ' Find details at https://en.wikipedia.org/wiki/Roku#Feature_comparison
     lowMemoryModels = {
+      "2400X": true  ' LT (2011)
+      "2450X": true  ' LT (2012)
+      "2500X": true  ' HD
+      "3000X": true  ' 2 HD
+      "3050X": true  ' 2 XD
+      "3100X": true  ' 2 XS
+      "3400X": true  ' MHL Stick
+      "3420X": true  ' MHL Stick      
+    }
+
+    'all models that are not in this list will run the new UI
+    oldUIModels = {
       "2400X": true  ' LT (2011)
       "2450X": true  ' LT (2012)
       "2500X": true  ' HD
@@ -50,6 +62,10 @@ Function getConstants()
       "3500X": true  ' HDMI Stick (2014)
       "3700X": true  ' Express
       "3710X": true  ' Express+
+    }
+
+    'models that can run the new ui, but need some functionality reduced - like backgrounds and animations, etc.
+    limitedNewUIModels = {
       "5000X": true  ' TV (low specs)
     }
 
@@ -57,6 +73,18 @@ Function getConstants()
       lowMemory = true
     else
       lowMemory = false
+    end if
+
+    if oldUIModels[di.GetModel()] <> invalid
+      newUi = false
+    else
+      newUi = true
+    end if
+
+    if limitedNewUIModels[di.GetModel()] <> invalid
+      limitedNewUi = true
+    else
+      limitedNewUi = false
     end if
 
     'get client version from manifest
@@ -81,7 +109,7 @@ Function getConstants()
     for i=0 to clientVersionNums.count()-1
       clientVersion = clientVersion + clientVersionNums[i] + "."
     end for
-      clientVersion = clientVersion + "newui"
+    clientVersion = clientVersion + "newui"
 
     constants.deviceInfo.deviceId = di.GetDeviceUniqueId()
     constants.deviceInfo.deviceAdId = deviceAdId 'will be invalid if ad tracking is turned off by user or old version of firmware
@@ -101,6 +129,8 @@ Function getConstants()
     constants.deviceInfo.captionsMode = di.GetCaptionsMode()
     constants.deviceInfo.countryCode = countryCode ' will be invalid if old version of firmware
     constants.deviceInfo.lowMemory = lowMemory
+    constants.deviceInfo.newUi = newUi
+    constants.deviceInfo.limitedNewUi  = limitedNewUi
     constants.deviceInfo.clientVersion  = clientVersion
 
 
@@ -488,7 +518,7 @@ Function getConstants()
     constants.performance = {}
       constants.performance.categoryGridList = {}
       constants.performance.contentGrid = {}
-      if lowMemory
+      if limitedNewUi
         '
         ' Estimated metadata memory usage:
         '

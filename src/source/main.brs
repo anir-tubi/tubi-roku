@@ -7,20 +7,24 @@ Function Main(startupArgs as Dynamic)
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
-  tracking = TubiTracking(constants, request, auth)  
+  tracking = TubiTracking(constants, request, auth)
 
-  isNewUI = 0 'remote config will send as 1 or 0
-
-  'only run remote config for new UI if we have a model that can handle it
-  if constants.deviceInfo.lowMemory = false
-    'run config first to see if we get new or old UI
+  if constants.deviceInfo.newUi = true
+    'run remote config for devices in the newUI - anything not in the oldUI models list
     externalConfig = TubiExternalConfig(request, constants)
     externalConfig.init() 'sets external config values on constants
-
-    isNewUI = constants.externalConfig.info.roku_new_ui
   end if
 
-  if isNewUI = 1
+  'check external config values to see if limitedNewUi (ie. Roku TVs - 5000X) get the new ui or old ui
+  if constants.deviceInfo.limitedNewUi = true
+    'default the models that require limited versions of the new ui to receive the old ui
+    constants.deviceInfo.newUi = false
+    if constants.externalConfig.info.rokutv_newui = 1
+      constants.deviceInfo.newUi = true
+    end if
+  end if
+
+  if constants.deviceInfo.newUi = true
     MainNewUI(startupArgs, constants)
   else
     MainOldUI(startupArgs)
@@ -171,7 +175,7 @@ Function MainNewUI(args As Dynamic, constants As Object)
   'flag to enable vs. disable remote components loading
   enableRemoteComponents = constants.externalConfig.info.remote_components
 
-  if enableRemoteComponents <> invalid and enableRemoteComponents = 1 then
+  if enableRemoteComponents = 1 then
     ' Dynamic Component Library loading
     remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
 

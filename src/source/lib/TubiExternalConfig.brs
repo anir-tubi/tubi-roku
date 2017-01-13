@@ -6,6 +6,8 @@ Function TubiExternalConfig(request as Object, constants as Object) as Object
     'default values should just be a simple key/value associative array
     defaultValues: {
       roku_new_ui: 0
+      rokutv_newui: 0
+      remote_components: 0
     }
 
     ' public methods

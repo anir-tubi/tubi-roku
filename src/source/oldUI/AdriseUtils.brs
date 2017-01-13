@@ -1250,24 +1250,16 @@ function adriseUtils_getDeviceInfo()
     countryCode = invalid
   end if
 
-  ' 256MB models, or slow CPU, so we can reduce our expectations
-  ' Find details at https://en.wikipedia.org/wiki/Roku#Feature_comparison
+  '256MB models that will be limited by cp.maxContent
   lowMemoryModels = {
     "2400X": true  ' LT (2011)
     "2450X": true  ' LT (2012)
     "2500X": true  ' HD
-    "2700X": true  ' LT (2013)
-    "2710X": true  ' 1 / SE
-    "2720X": true  ' 2 (2013)
     "3000X": true  ' 2 HD
     "3050X": true  ' 2 XD
     "3100X": true  ' 2 XS
     "3400X": true  ' MHL Stick
-    "3420X": true  ' MHL Stick
-    "3500X": true  ' HDMI Stick (2014)
-    "3700X": true  ' Express
-    "3710X": true  ' Express+
-    "5000X": true  ' TV (low specs)
+    "3420X": true  ' MHL Stick 
   }
 
   if lowMemoryModels[di.GetModel()] <> invalid

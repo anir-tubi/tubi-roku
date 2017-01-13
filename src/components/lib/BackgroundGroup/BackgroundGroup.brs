@@ -24,8 +24,8 @@ Function updateBackground()
   TubiLog("BackgroundGroup.updateBackground")
   m.updateCount = m.updateCount + 1
 
-  if m.global.constants.deviceInfo.lowMemory = true
-    ' we have a low memory device that won't handle transitions so make it basic
+  if m.global.constants.deviceInfo.limitedNewUi = true
+    ' we have a low spec device that won't handle transitions so make it basic
     if m.top.getChildCount() = 0
       addLowMemBackground()
     else
