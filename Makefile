@@ -110,8 +110,9 @@ release: clean verifyrepo
 	@git commit -m "incrementbuild: Bump build number" config/build.yml
 	@echo "Tagging $$($(TOOL_CLI) get-build-tag)"
 	@$(TOOL_CLI) get-build-tag | xargs git tag
-	@$(MAKE) ROKU_PROFILE=production build
+	@$(MAKE) ROKU_PROFILE=production build pkg
 	@$(TOOL_CLI) get-build-tag | xargs -I %% mv ./$(TARGET_DIR)/$(TARGET) ./$(TARGET_DIR)/$(NAME)_%%.zip
+	@$(TOOL_CLI) get-build-tag | xargs -I %% mv ./$(TARGET_DIR)/$(REMOTE_LOAD_ZIP) ./$(TARGET_DIR)/$(REMOTE_LOAD_NAME)_%%.zip
 	@echo
 	@echo "If you are intending this to be a formal release, create a pull request for the current branch"
 	@echo "    git branch release_$$($(TOOL_CLI) get-build-tag)"
