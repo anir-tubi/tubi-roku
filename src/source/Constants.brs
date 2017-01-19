@@ -350,7 +350,7 @@ Function getConstants()
 
       'textbox text colors
       constants.ui.colors.unselectedEntryText = "0x191919FF"
-      constants.ui.colors.selectedEntryText = "0xFF9933FF"
+      constants.ui.colors.selectedEntryText = "0x191919FF"
       constants.ui.colors.selectedEntryBox = "0xF4D8BCFF"
       constants.ui.colors.unselectedEntryBox = "0xFFFFFFFF"
       
