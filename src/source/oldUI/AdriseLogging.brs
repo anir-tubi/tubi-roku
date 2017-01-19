@@ -104,6 +104,7 @@ function adriseLogging_sendLogging(port, options)
       }
       loggingInfo.append(options)
 
+      loggingInfo["user_id"] = 0
       if m.utils.getAuthInfo() <> invalid and m.utils.getAuthInfo().userId <> invalid
         loggingInfo["user_id"] = m.utils.getAuthInfo().userId
       end if

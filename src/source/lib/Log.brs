@@ -210,6 +210,7 @@ Function tubiLog_getLoggingRequest_(logInfo as Object) as Object
   }
   loggingReqBody.append(logInfo)
 
+  loggingReqBody["user_id"] = 0
   if m.auth.getAuthInfo() <> invalid and m.auth.getAuthInfo().userId <> invalid
     loggingReqBody["user_id"] = m.auth.getAuthInfo().userId.ToInt()
   end if
