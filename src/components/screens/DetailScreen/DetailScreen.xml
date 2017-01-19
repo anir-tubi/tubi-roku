@@ -55,7 +55,7 @@
     <field id="watchTrailerSelected" type="boolean" alwaysNotify="true" />
 
     <!-- Set the to current episode selection, when 'content' field is type 'series' -->
-    <field id="episodeSelection" type="intarray" value="[-1,-1]"/>
+    <field id="episodeSelection" type="intarray" value="[-1,-1]" alwaysNotify="true"/>
     
     <!-- Set to true if the fetch of detailed metadata for the item in shortContent fails -->
     <field id="itemFailed" type="boolean" value="false" alwaysNotify="true"/>
