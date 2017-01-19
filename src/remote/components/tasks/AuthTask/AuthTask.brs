@@ -48,9 +48,14 @@ Function getInitialUserCategories()
       if handledReq <> invalid
         if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
           if handledReq.localId = localBookmarkReqId
-            m.top.setField("initialBookmarks", handledReq.response.data)
+            while m.top.setField("initialBookmarks", handledReq.response.data) = false
+              tubiLog("initialBookmarks not set", "warn")
+            end while
+
           else if handledReq.localId = localHistoryReqId
-            m.top.setField("initialHistory", handledReq.response.data)
+            while m.top.setField("initialHistory", handledReq.response.data) = false
+              tubiLog("initialHistory not set", "warn")
+            end while
           end if
         end if
       end if
