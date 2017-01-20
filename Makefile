@@ -1,5 +1,4 @@
-ZIPBIG=zip --quiet -x Makefile '*remote*' '*simple*' -9 -r
-ZIPSMALL=zip --quiet -x Makefile -9 -r
+ZIP=zip --quiet -x Makefile -9 -r
 CURL=curl
 MAKE=make
 TOOL_CLI=node tools/cli.js
@@ -7,12 +6,12 @@ TOOL_CLI=node tools/cli.js
 NAME=tubitv_roku
 REMOTE_LOAD_NAME=tubitv_remote_components
 SRC_DIR=src
-TARGET_REMOTE_DIR=$(TARGET_DIR)/remote
-TARGET_DIR=build
+BUILD_DIR=build
+TARGET_DIR=$(BUILD_DIR)/local
+TARGET_REMOTE_DIR=$(BUILD_DIR)/remote
 TARGET=$(NAME).zip
 REMOTE_LOAD_ZIP=$(REMOTE_LOAD_NAME).zip
 REMOTE_LOAD_PKG=$(REMOTE_LOAD_NAME).pkg
-REMOTE_LOAD_SOURCE=remote
 REMOTE_LOAD_PORT=8090
 REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
   --include 'source/lib' \
@@ -20,8 +19,7 @@ REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
   --include 'source/3rdparty' \
   --include 'source/3rdparty/**' \
   --include 'components' \
-  --include 'components/screens' \
-  --include 'components/screens/**' \
+  --include 'components/**' \
   --exclude '*'
 DEV_PORT=8085
 DEV_PASSWORD?=1234
@@ -43,42 +41,46 @@ build: rsync gen zip
 	@echo "Project $(TARGET) is built with profile $(ROKU_PROFILE)."
 
 zip:
-	@rm -f ./$(TARGET_DIR)/$(TARGET)
-	@rm -f ./$(TARGET_DIR)/$(REMOTE_LOAD_ZIP)
+	@rm -f ./$(BUILD_DIR)/$(TARGET)
+	@rm -f ./$(BUILD_DIR)/$(REMOTE_LOAD_ZIP)
 
-	@cd $(TARGET_DIR); $(ZIPBIG) $(TARGET) .
-	@cd $(TARGET_DIR)/$(REMOTE_LOAD_SOURCE); $(ZIPSMALL) ../$(REMOTE_LOAD_ZIP) .
+	@cd $(TARGET_DIR); $(ZIP) ../$(TARGET) .
+	@cd $(TARGET_REMOTE_DIR); $(ZIP) ../$(REMOTE_LOAD_ZIP) .
 
 
 rsync:
+	@mkdir -p ./$(TARGET_DIR)
+	@mkdir -p ./$(TARGET_REMOTE_DIR)
 	@rm -rf ./$(TARGET_DIR)/$(TESTS)
 	@rm -f ./$(TARGET_DIR)/$(SETTING_FILE)
 	@rsync -arvq $(RSYNC_EXCLUDE) $(SRC_DIR)/* $(TARGET_DIR)
 	@rsync -arvq $(REMOTE_LOAD_RSYNC_INCLUDE) $(SRC_DIR)/* $(TARGET_REMOTE_DIR)
+	@find ./$(TARGET_REMOTE_DIR)/components -name '*.xml' | xargs sed -i '' 's|<script type="text/brightscript" uri="pkg:|<script type="text/brightscript" uri="libpkg:|'
 
 gen:
 	@$(TOOL_CLI) create-config $(ROKU_PROFILE) $(TARGET_DIR)/$(SETTING_FILE)
 	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_DIR)/$(MANIFEST_FILE) $(ORIGINAL_MANIFEST_NAME)
-	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_DIR)/$(REMOTE_LOAD_SOURCE)/$(MANIFEST_FILE) $(REMOTE_LOAD_NAME_MANIFEST_NAME)
+	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_REMOTE_DIR)/$(MANIFEST_FILE) $(REMOTE_LOAD_NAME_MANIFEST_NAME)
+	@touch $(TARGET_REMOTE_DIR)/source/main.brs
 
 host:
-	@$(TOOL_CLI) host-components $(TARGET_DIR)/$(REMOTE_LOAD_PKG) $(REMOTE_LOAD_PORT)
+	@$(TOOL_CLI) host-components $(BUILD_DIR)/$(REMOTE_LOAD_PKG) $(REMOTE_LOAD_PORT)
 
 install: env build pkg-components
 	@echo "Installing $(NAME) to host $(ROKU_DEV_TARGET)...(this might take up to a minute)"
 	@#$(CURL)  -H 'Connection: close' --digest -u "rokudev:1234" -F "mysubmit=Install" -F "archive=@$(TARGET_DIR)/$(TARGET)" http://$(ROKU_DEV_TARGET)/plugin_install | grep "<font color" | sed "s/<font color=\"red\">//"
-	@$(TOOL_CLI) upload $(TARGET_DIR)/$(TARGET) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
+	@$(TOOL_CLI) upload $(BUILD_DIR)/$(TARGET) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
 	@$(MAKE) -j2 dev host
 
 pkg-components:
 	@echo "Signing $(REMOTE_LOAD_ZIP) on host $(ROKU_DEV_TARGET)"
-	@$(TOOL_CLI) upload $(TARGET_DIR)/$(REMOTE_LOAD_ZIP) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
-	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(REMOTE_LOAD_NAME) $(TARGET_DIR)
+	@$(TOOL_CLI) upload $(BUILD_DIR)/$(REMOTE_LOAD_ZIP) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
+	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(REMOTE_LOAD_NAME) $(BUILD_DIR)
 
 pkg: pkg-components
 	@echo "Signing $(TARGET) on host $(ROKU_DEV_TARGET)"
-	@$(TOOL_CLI) upload $(TARGET_DIR)/$(TARGET) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
-	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(NAME) $(TARGET_DIR)
+	@$(TOOL_CLI) upload $(BUILD_DIR)/$(TARGET) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
+	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(NAME) $(BUILD_DIR)
 
 dev: env
 	@echo "Telnet to $(ROKU_DEV_TARGET) 8085"
@@ -96,7 +98,7 @@ test:
 	NODE_PATH=${PWD}/tools/node_modules jasmine
 
 clean:
-	@rm -rf ./$(TARGET_DIR)
+	@rm -rf ./$(BUILD_DIR)
 
 verifyrepo:
 	@clean=$$(git status --porcelain); \
@@ -111,8 +113,8 @@ release: clean verifyrepo
 	@echo "Tagging $$($(TOOL_CLI) get-build-tag)"
 	@$(TOOL_CLI) get-build-tag | xargs git tag
 	@$(MAKE) ROKU_PROFILE=production build pkg
-	@$(TOOL_CLI) get-build-tag | xargs -I %% mv ./$(TARGET_DIR)/$(TARGET) ./$(TARGET_DIR)/$(NAME)_%%.zip
-	@$(TOOL_CLI) get-build-tag | xargs -I %% mv ./$(TARGET_DIR)/$(REMOTE_LOAD_ZIP) ./$(TARGET_DIR)/$(REMOTE_LOAD_NAME)_%%.zip
+	@$(TOOL_CLI) get-build-tag | xargs -I %% mv ./$(BUILD_DIR)/$(TARGET) ./$(BUILD_DIR)/$(NAME)_%%.zip
+	@$(TOOL_CLI) get-build-tag | xargs -I %% mv ./$(BUILD_DIR)/$(REMOTE_LOAD_ZIP) ./$(BUILD_DIR)/$(REMOTE_LOAD_NAME)_%%.zip
 	@echo
 	@echo "If you are intending this to be a formal release, create a pull request for the current branch"
 	@echo "    git branch release_$$($(TOOL_CLI) get-build-tag)"

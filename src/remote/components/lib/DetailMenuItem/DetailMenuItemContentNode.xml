@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!-- Extend the ContentNode so we can add some custom fields -->
-<component name = "DetailMenuItemContentNode" extends="ContentNode">
-  <interface>
-    <field id="focusIconUrl" type="string" value=""/>
-    <field id="unfocusIconUrl" type="string" value=""/>
-  </interface>
-</component>
