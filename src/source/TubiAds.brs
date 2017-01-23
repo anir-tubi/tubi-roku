@@ -140,14 +140,17 @@ end function
 'create the url needed to make ad calls
 function tubiAds_populateUrl(episode)
   deviceId = m.constants.deviceInfo.deviceId
-  deviceAdId = m.constants.deviceInfo.deviceAdId
   model = m.constants.deviceInfo.model
 
-  ' add Roku Advertiser Id (RIDA) to ad call url  
-  if deviceAdId <> invalid
-    urlAdId = "&advid=" + deviceAdId
-  else
-    urlAdId = ""
+  ' add Roku Advertiser Id (RIDA) to ad call url
+  urlAdId = ""
+  if m.constants.deviceInfo.deviceAdId <> invalid
+    urlAdId = "&advid=" + m.constants.deviceInfo.deviceAdId
+  end if
+
+  optOut = "0"
+  if m.constants.deviceInfo.isAdIdTrackingDisabled = true
+    optOut = "1"
   end if
 
   'add TubiTV user/registration id to ad call url
@@ -171,7 +174,7 @@ function tubiAds_populateUrl(episode)
   end if
 
   'create the url to be used for ad calls'
-  url =  m.constants.urls.adsBaseUrl + "?platform=roku&appid=" + m.constants.settings.shortAppName + "&sdk=" + adSdk + "&cid=" + episode.id + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + episode.pubId + "&content-type=hls" + isLinear + "&_=" + RND(1000000000000).ToStr()
+  url =  m.constants.urls.adsBaseUrl + "?platform=roku&appid=" + m.constants.settings.shortAppName + "&sdk=" + adSdk + "&cid=" + episode.id + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + "&opt-out=" + optOut + urlAdId + urlTubiId + "&pubid=" + episode.pubId + "&content-type=hls" + isLinear + "&_=" + RND(1000000000000).ToStr()
 
   return url
 end function

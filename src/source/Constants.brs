@@ -15,12 +15,6 @@ Function getConstants()
     firmwareVersionMinor = Val(Mid(firmware, 5, 2))  '8'  integer
     firmwareBuild = Mid(firmware, 9, 4) '01185'  string
 
-    if firmwareVersion >= 6.01 and not di.IsAdIdTrackingDisabled()
-      deviceAdId = di.GetAdvertisingId()
-    else
-      deviceAdId = invalid
-    end if
-
     if firmwareVersion >= 4.3
       countryCode = di.GetCountryCode()
     else
@@ -112,7 +106,8 @@ Function getConstants()
     clientVersion = clientVersion + "newui.local"
 
     constants.deviceInfo.deviceId = di.GetDeviceUniqueId()
-    constants.deviceInfo.deviceAdId = deviceAdId 'will be invalid if ad tracking is turned off by user or old version of firmware
+    constants.deviceInfo.deviceAdId = di.GetAdvertisingId()
+    constants.deviceInfo.isAdIdTrackingDisabled = di.IsAdIdTrackingDisabled()
     constants.deviceInfo.ipAddresses = di.GetIPAddrs() 'array of network interface ip addresses (normally will only contain 1 element)
     constants.deviceInfo.firmwareVersion = firmwareVersion
     constants.deviceInfo.firmwareBuild = firmwareBuild

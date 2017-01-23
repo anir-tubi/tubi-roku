@@ -1297,7 +1297,8 @@ function adriseUtils_getDeviceInfo()
 
   return {
     deviceId: di.GetDeviceUniqueId()
-    deviceAdId: deviceAdId 'will be invalid if ad tracking is turned off by user or old version of firmware
+    deviceAdId: di.GetAdvertisingId()
+    isAdIdTrackingDisabled: di.IsAdIdTrackingDisabled()
     ipAddresses: di.GetIPAddrs() 'array of network interface ip addresses (normally will only contain 1 element)
     firmwareVersion: firmwareVersion
     firmwareBuild: firmwareBuild

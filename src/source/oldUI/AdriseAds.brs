@@ -142,14 +142,17 @@ end function
 'create the url needed to make ad calls
 function adriseAds_populateUrl(episode, playerSettings)
   deviceId = m.utils.deviceInfo.deviceId
-  deviceAdId = m.utils.deviceInfo.deviceAdId
   model = m.utils.deviceInfo.model
 
   ' add Roku Advertiser Id (RIDA) to ad call url  
-  if deviceAdId <> invalid
-    urlAdId = "&advid=" + deviceAdId
-  else
-    urlAdId = ""
+  urlAdId = ""
+  if m.utils.deviceInfo.deviceAdId <> invalid
+    urlAdId = "&advid=" + m.utils.deviceInfo.deviceAdId
+  end if
+
+  optOut = "0"
+  if m.utils.deviceInfo.isAdIdTrackingDisabled = true
+    optOut = "1"
   end if
 
   'add TubiTV user/registration id to ad call url
@@ -173,8 +176,8 @@ function adriseAds_populateUrl(episode, playerSettings)
   end if
 
   'create the url to be used for ad calls'
-  url = m.baseUrl + "?platform=roku&appid=" + playerSettings.appId + "&sdk=" + adSdk + "&cid=" + episode.adrise_contentId + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + urlAdId + urlTubiId + "&pubid=" + playerSettings.pubId + "&content-type=" + playerSettings.contentType + isLinear + "&_=" + RND(1000000000000).ToStr()
-
+  url = m.baseUrl + "?platform=roku&appid=" + playerSettings.appId + "&sdk=" + adSdk + "&cid=" + episode.adrise_contentId + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId +  "&opt-out=" + optOut + urlAdId + urlTubiId + "&pubid=" + playerSettings.pubId + "&content-type=" + playerSettings.contentType + isLinear + "&_=" + RND(1000000000000).ToStr()
+  
   return url
 end function
 
