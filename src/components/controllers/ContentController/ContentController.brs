@@ -40,7 +40,10 @@ Function init()
 
   m.logOutTask = m.top.findNode("LogOutTask")
 
-  initScreenStack(m.top.findNode("ScreenStack"), startCategoryScreen)
+  m.ScreenStack = m.top.findNode("ScreenStack")
+  initScreenStack(m.ScreenStack, startCategoryScreen)
+
+  m.videoPlayer = m.top.findNode("VideoPlayer")
 End Function
 
 
@@ -358,16 +361,34 @@ Function onWatchTrailer()
     trailerContent = CreateObject("roSGNode", "ContentNode")
     trailerContent.url = content.trailerUrls[0]
     trailerContent.streamformat="hls"
-    trailerScreen = CreateObject("roSGNode", "TrailerScreen")
-    trailerScreen.observeField("trailerFinished", "onTrailerFinished")
-    trailerScreen.content = trailerContent
-    pushScreen(trailerScreen)
+
+    m.videoPlayer.visible = true
+    m.videoPlayer.observeField("state", "onTrailerFinished")
+    m.videoPlayer.observeField("backButtonPressed", "onTrailerFinished")
+    m.videoPlayer.setFocus(true)
+    m.videoPlayer.content = trailerContent
+    m.ScreenStack.visible = false
   end if
 End Function
 
-Function onTrailerFinished()
+Function onTrailerFinished(msg As Object)
   tubiLog("ContentController.onTrailerFinished")
-  popScreen()  ' from trailer screen back to detail screen
+  endTrailer = false
+  if msg.getField() = "state" and (msg.getData() = "error" or msg.getData() = "finished") then
+    print "Trailer finished"
+    endTrailer = true
+  else if msg.getField() = "backButtonPressed" then
+    print "Back button pressed"
+    endTrailer = true
+  end if
+  if endTrailer then
+    m.videoPlayer.unobserveField("backButtonPressed")
+    m.videoPlayer.unobserveField("state")
+    m.videoPlayer.visible = false
+    m.videoPlayer.control = "stop"
+    m.ScreenStack.visible = true
+    currentScreen().setFocus(true)
+  end if
 End Function
 
 Function onEpisodeList()

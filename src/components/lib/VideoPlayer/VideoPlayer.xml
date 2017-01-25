@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="VideoPlayer" extends="Group" >
+  <script type="text/brightscript" uri="pkg:/components/lib/VideoPlayer/VideoPlayer.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- Set to true if the back button was pressed while the video player has focus -->
+    <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
+     
+    <!-- Alias fields for the video node -->
+    <field id="content" alias="VideoNode.content"/>
+    <field id="state" alias="VideoNode.state"/>
+    <field id="control" alias="VideoNode.control"/>
+  </interface>
+
+  <children>
+    <Video
+      id="VideoNode"
+      width="1920"
+      height="1080"
+      translation="[0,0]"
+      enableUI="false"
+      enableTrickPlay="false"
+      visible="true"
+      notificationInterval="0"/>
+    
+    <Group
+      id="Transport"
+      visible="false">
+    <Rectangle
+      id="ProgressBarBackground"
+      height="16"
+      width="1752"
+      color="0xffffff"
+      opacity="0.2"
+      translation="[85,896]"/>
+    <!-- ProgressBarForeground width will be set based on current position -->
+    <Rectangle
+      id="ProgressBarForeground"
+      color="0xff9933"
+      height="16"
+      translation="[85,896]"/>
+    
+    <!-- Time -->
+    <Label
+      id="ElapsedLabel"
+      text="00:00:00"
+      width="500"
+      translation="[85,848]"/>
+    <Label
+      id="RemainingLabel"
+      text="-00:00:00"
+      horizAlign="right"
+      width="500"
+      translation="[85,1837]"/>
+    
+   <!-- Transport buttons -->
+    <Poster
+      id="PreviousButton"
+      width="60"
+      height="60"
+      uri="pkg:/images/icon-to-start.png"
+      translation="[540,958]"/>
+    <Poster
+      id="RewindButton"
+      width="60"
+      height="60"
+      uri="pkg:/images/icon-rew.png"
+      translation="[670,958]"/>
+    <Poster
+      id="HopBackButton"
+      width="60"
+      height="60"
+      uri="pkg:/images/icon-to-start.png"
+      translation="[800,958]"/>
+    <!-- play/pause uri will update based on playing state of video -->
+    <Poster
+      id="PlayPauseButton"
+      width="60"
+      height="60"
+      uri="pkg:/images/icon-play.png"
+      translation="[930,958]"/>
+    <Poster
+      id="HopForwardButton"
+      width="60"
+      height="60"
+      uri="pk:/images/icon-fwd-30s.png"
+      translation="[1060,958]"/>
+    <Poster
+      id="FastForwardButton"
+      width="60"
+      height="60"
+      uri="pkg:/images/icon-ffw.png"
+      translation="[1190,958]"/>
+    <Poster
+      id="NextButton"
+      width="60"
+      height="60"
+      uri="pkg:/images/icon-to-end.png"
+      translation="[1320,958]"/>
+    
+    <!-- Closed Caption -->
+    <Poster
+      id="ClosedCaption"
+      width="140"
+      height="60"
+      uri="pkg:/images/cc-toggle.png"
+      translation="[1697,958]"/>
+   </Group>           
+  </children>
+</component>
