@@ -100,6 +100,7 @@ function ContentProvider(pubId as String, shortAppName as String, imageSize as S
     isRegWall: false
     regWallContent: []
 
+    allowAfterHours: true
 	}
 
   obj.setUrlsWithContentType(videoContentType)
@@ -221,10 +222,12 @@ function ContentProvider_getAllPlaylistsFromServer()
     end if
   	m.playlistCounter = 0
     for each child in xml.children.level
-    	m.path[0] = m.playlistCounter + rowOffset
+      if child.title.getText() <> "After Hours" or m.allowAfterHours = true
+      	m.path[0] = m.playlistCounter + rowOffset
 
-      m.playlists.push(m.getPlaylistFromXmlObj(child, m.imageSize, 1, invalid, "gridscreen"))
-      m.playlistCounter = m.playlistCounter + 1
+        m.playlists.push(m.getPlaylistFromXmlObj(child, m.imageSize, 1, invalid, "gridscreen"))
+        m.playlistCounter = m.playlistCounter + 1
+      end if
     end for
   end if
 end function

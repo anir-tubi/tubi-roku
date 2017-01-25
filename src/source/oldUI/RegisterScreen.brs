@@ -519,21 +519,6 @@ function RegisterScreen(uniqueId, utils)
       if(l<10)
         m.showMessage("Phone number too short", "Please enter the 10-digit number of your mobile phone.")
       else
-        ' h = CreateObject("roUrlTransfer")
-        ' h.SetPort(CreateObject("roMessagePort"))
-        ' h.SetCertificatesFile("common:/certs/ca-bundle.crt")
-
-        ' url = "http://192.168.1.87/submitPhoneNumber"
-
-        ' h.SetUrl(url)
-        ' h.AddHeader("Content-Type", "application/x-www-form-urlencoded")
-
-        ' body = h.escape("Please visit http://www.tubitv.com/app/?d=Roku&did=" + m.uniqueId + "&num=" + m.currNumber + " to complete your registration.")
-
-
-        ' ps = "phonenumber=" + m.currNumber + "&uniqueid=" + m.uniqueId
-        ' resp = h.PostFromString(ps)
-        ' print resp
         regOutput = m.showRegistrationInProgress()
         m.isComplete = true
 

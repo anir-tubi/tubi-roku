@@ -19,8 +19,10 @@ Function translateMetadata(contentToTranslate) As Object
     'expect a list of categories with one category filled with content or a list of contents
     if type(contentToTranslate) = "roArray"
       for each content in contentToTranslate
-        node = translated.createChild("TubiContentNode")
-        node_count = node_count + translateRecursive(content, node)
+        if content.title <> "After Hours" or m.allowAfterHours = true
+          node = translated.createChild("TubiContentNode")
+          node_count = node_count + translateRecursive(content, node)
+        end if
       end for
 
     'expect a single piece of content, or several (as an associative array)
@@ -357,6 +359,7 @@ Function setTranslateGlobalsToLocal()
   m.contentTypes = m.constants.ui.contentTypes
   m.captionsMode = m.constants.deviceInfo.captionsMode
   m.creditsDuration = m.constants.player.creditsDuration
+  m.allowAfterHours = m.constants.settings.allowAfterHours
 end Function
 
 

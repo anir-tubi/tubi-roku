@@ -756,7 +756,7 @@ function adriseUtils_sendAsyncRequest(url as String, port, name = "" as String, 
     if m.asynchRequests = invalid
       m.asynchRequests = {}
     end if
-    m.asynchRequests[str(id)] = urlXfer
+    m.asynchRequests[id.ToStr()] = urlXfer
 
     if url <> settings.loggingUrl
       m.log.info(port, "stored-async-request-objects", "async request objects stored = " +  m.asynchRequests.count().toStr())
@@ -784,10 +784,10 @@ function adriseUtils_getAsyncResponse (msg as Object, id as Integer) as Object
           data : msg.GetString()
           id : currId
           responseCode : msg.GetResponseCode()
-          obj: m.asynchRequests[str(currId)]
+          obj: m.asynchRequests[currId.toStr()]
           failReason: msg.GetFailureReason()
         }
-      m.asynchRequests.delete(str(currId))
+      m.asynchRequests.delete(currId.toStr())
       return out
     end if
   end if

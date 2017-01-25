@@ -6,14 +6,14 @@ settings:
   adLoadingBackgroundColor: "#222223"
   adLoadingFontColor: "#EBEBEB"
   loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
-  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/14.brs"
-  # hotPatchUrl: "http://192.168.1.180:8080/rokuHotpatches/14.brs"
+  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/16.brs"
+  # hotPatchUrl: "http://192.168.1.180:8080/rokuHotpatches/16.brs"
   remoteComponentsUrl: "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components.pkg"
   appName: "Tubi TV"
   isLiveTVOn: true
   isRokuAdFrameworkOn: false
   migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"
-  isFBApplicationDetectionOn: false
+  allowAfterHours: true
 
   #the settings below are exclusively used for the old UI version of the app that runs on low powered devices
   pubid: "00000000_DEFAULT_PUB_ID_00000000"
@@ -35,8 +35,8 @@ settings:
   show_country: false
   proxyUrl: "none"
   proxyFolder: "none"
-  hotPatchUrlOldUI: "http://cdn.adrise.com/hotpatches/roku/13.brs"
-  # hotPatchUrlOldUI: "http://192.168.1.180:8080/rokuHotpatches/13.brs"
+  hotPatchUrlOldUI: "http://cdn.adrise.com/hotpatches/roku/15.brs"
+  # hotPatchUrlOldUI: "http://192.168.1.180:8080/rokuHotpatches/15.brs"
   adrise_loadingurl: "pkg:/images/FREETVMOVIES_Tubi_icon_no-background_336x201"
 
 
