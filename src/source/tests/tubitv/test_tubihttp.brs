@@ -34,20 +34,43 @@ Function testHandleEvent(t As Object)
   t.assertNotInvalid(response)
 End Function
 
+Function testAddParamsToUrlAsModuleFunction(t As Object)
+  ' Verify that we don't need to use the createAsync factory method in order to use this function
+  module = TubiRequest()
+  t.assertEqual( module.addParamsToUrl("http://adrise.tv/", { uid: 0}), "http://adrise.tv/?uid=0")
+End Function
+
 Function testAddParamsToUrl(t As Object)
   request = TubiRequest().createAsync("http://localhost/")
-  request.urltransfer = CreateObject("roUrlTransfer")
 
   testCases = [
     ' URL                     Params        Expected Result
-    [ "http://aaa/",          {},           "http://aaa/" ]
-    [ "http://bbb/",          { a: 1 },     "http://bbb/?a=1" ]
-    [ "http://ccc/?a=1",      { b: 2 },     "http://ccc/?a=1&b=2" ],
-    [ "http://ddd/?a=1&",     { b: 2 },     "http://ddd/?a=1&b=2" ],
-    [ "http://eee/",          { y: 1, z: 2 },     "http://eee/?y=1&z=2" ],
+    
+    ' Test various forms of params
+    [ "http://aaa/",          invalid,         "http://aaa/" ]
+    [ "http://aaa/",          {},              "http://aaa/" ]
+    [ "http://bbb/",          { a: 1 },        "http://bbb/?a=1" ]
+    [ "http://bbb/",          { "a": 1 },      "http://bbb/?a=1" ]
+    [ "http://bbb/",          { " a": 1 },     "http://bbb/?a=1" ]
+    [ "http://bbb/",          { "a": 1.2 },    "http://bbb/?a=1.2" ]
+    [ "http://bbb/",          { "a": "1" },    "http://bbb/?a=1" ]
+    [ "http://bbb/",          { "a": invalid },"http://bbb/?a=" ]
+    [ "http://bbb/",          { invalid: 0 },  "http://bbb/?invalid=0" ]  ' this is funny... invalid is changed into a string by the compiler
+    [ "http://eee/",          { y: 1, z: 2 },  "http://eee/?y=1&z=2" ],
+
+    ' Test handling of query string existence in base url
+    [ "http://adrise.tv",        { a: 1 },     "http://adrise.tv?a=1" ],
+    [ "http://adrise.tv/",       { b: 1 },     "http://adrise.tv/?b=1" ],
+    [ "http://adrise.tv/?x",     { c: 1 },     "http://adrise.tv/?x&c=1" ],
+    [ "http://adrise.tv/?x&",    { d: 1 },     "http://adrise.tv/?x&d=1" ],
+    [ "http://adrise.tv/?x=",    { e: 1 },     "http://adrise.tv/?x=&e=1" ],
+    [ "http://adrise.tv/?x=&",   { f: 1 },     "http://adrise.tv/?x=&f=1" ],
+    [ "http://adrise.tv/?x=1",   { g: 1 },     "http://adrise.tv/?x=1&g=1" ],
+    [ "http://adrise.tv/?x=1&",  { h: 1 },     "http://adrise.tv/?x=1&h=1" ],
   ]
+
   for each test in testCases
-    t.assertEqual(request.addParamsToUrl_(test[0], test[1]), test[2])
+    t.assertEqual( request.addParamsToUrl_(test[0], test[1]), test[2])
   end for
 End Function
 

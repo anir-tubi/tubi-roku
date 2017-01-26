@@ -13,8 +13,6 @@ End Function
 
 
 
-
-
 ''''''''''''''''''''''''
 ' createAsyncHTTPRequest() - helper to create an async request
 '
@@ -301,20 +299,50 @@ End Function
 '''''''''''''''''''''''
 ' addParamsToUrl - helper function to construct the full url
 '
-' NOTE: This should only be used AFTER the urltransfer object has been set.
+' NOTE: Don't use 'm' references in here so that we can use it as a module function
 Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
   if params = invalid or params.Count() = 0 then return url
 
-  hasParams = url.Instr("?")
-  if hasParams = -1
-    url = url + "?"
+  ' Safety - backward compatible for firmware < 7.5
+  if FindMemberFunction(url, "EncodeUriComponentXXX") <> invalid then
+    hasEncode = true
+    tempUrlTransfer = invalid
+  else
+    hasEncode = false
+    tempUrlTransfer = CreateObject("roUrlTransfer")
+  end if
+
+  ' allow a dangling '?' or '&' in the base url, e.g. "http://something.net/?"
+  '         Example                  Case
+  '             ...net                2
+  '             ...net/               2
+  '             ...net/?              1
+  '             ...net/?x             3
+  '             ...net/?x=            3
+  '             ...net/?x=&           1
+  '             ...net/?x=1           3
+  '             ...net/?x=1&          1
+  if url.Right(1) = "&" or url.Right(1) = "?" then
+    separator = ""
+  else if url.Instr("?") = -1
+    separator = "?"
+  else
+    separator = "&"
   end if
 
   for each p in params
-    if url.Right(1) <> "&" and url.Right(1) <> "?" then
-      url = url + "&"
+    key = tostr(p).trim()
+    if params[p] = invalid then 
+      value = ""  ' don't send any string literal "invalid"
+    else
+      value = tostr(params[p]).trim()
     end if
-    url = url + m.urltransfer.Escape(tostr(p)) + "=" + m.urltransfer.Escape(tostr(params[p]))
+    if hasEncode then
+      url = url + separator + key.EncodeUriComponent() + "=" + value.EncodeUriComponent()
+    else
+      url = url + separator + tempUrlTransfer.Escape(key) + "=" + tempUrlTransfer.Escape(value)
+    end if
+    separator = "&"
   end for
 
   return url

@@ -138,45 +138,52 @@ function tubiAds_getCachedAdsList(episode)
 end function
 
 'create the url needed to make ad calls
-function tubiAds_populateUrl(episode)
-  deviceId = m.constants.deviceInfo.deviceId
-  model = m.constants.deviceInfo.model
+function tubiAds_populateUrl(episode) As String
+
+  'create the url to be used for ad calls'
+  params = {
+    "platform": "roku"
+    "appid": m.constants.settings.shortAppName
+    "cid": episode.id
+    "nowpos": episode.nowpos.ToStr()
+    "model": m.constants.deviceInfo.model
+    "deviceid": m.constants.deviceInfo.deviceId
+    "pubid": episode.pubId
+    "content-type": "hls"
+    "_": RND(1000000000000).ToStr()
+  }
 
   ' add Roku Advertiser Id (RIDA) to ad call url
-  urlAdId = ""
   if m.constants.deviceInfo.deviceAdId <> invalid
-    urlAdId = "&advid=" + m.constants.deviceInfo.deviceAdId
+    params["advid"] = m.constants.deviceInfo.deviceAdId
   end if
 
-  optOut = "0"
   if m.constants.deviceInfo.isAdIdTrackingDisabled = true
-    optOut = "1"
+    params["opt-out"] = "1"
+  else
+    params["opt-out"] = "0"
   end if
 
   'add TubiTV user/registration id to ad call url
-  urlTubiId = ""
   authInfo = m.utils.auth.getAuthInfo()
   if authInfo <> invalid and authInfo.userId <> invalid
-    urlTubiId = "&tubitvid=" + authInfo.userId
+    params["tubitvid"] = authInfo.userId
   end if
 
   'add if Linear/Live TV is on or off to ad call url
-  isLinear = ""
   'TODO: Bryan, uncomment when linear/live tv is added
   ' if GetGlobalAA().app.linearTV.linearTvOn = true
-  '   isLinear = "&linear=1"
+  '   params["linear"] = "1"
   ' end if
 
   'select the ad sdk
-  adSdk = "5.0_video"
   if m.isRokuAdFrameworkOn = true
-    adSdk = "raf_vast"
+    params["sdk"] = "raf_vast"
+  else
+    params["sdk"] = "5.0_video"
   end if
 
-  'create the url to be used for ad calls'
-  url =  m.constants.urls.adsBaseUrl + "?platform=roku&appid=" + m.constants.settings.shortAppName + "&sdk=" + adSdk + "&cid=" + episode.id + "&nowpos=" + episode.nowpos.ToStr() + "&model=" + model + "&deviceid=" + deviceId + "&opt-out=" + optOut + urlAdId + urlTubiId + "&pubid=" + episode.pubId + "&content-type=hls" + isLinear + "&_=" + RND(1000000000000).ToStr()
-
-  return url
+  return m.utils.request.addParamsToUrl(m.constants.urls.adsBaseUrl, params)
 end function
 
 ' ----------------------------------------------
@@ -1109,11 +1116,16 @@ end function
 
 'gets the cuepoints for the passed in episode and attach them to ads object
 function tubiAds_getCuepoints(episode)
-  'set the url to get the cuepoints
-  cuepointUrl = m.constants.urls.cuepointsBaseUrl + "?format=json&pubid=" + episode.pubId + "&platform=roku&cid=" + episode.id
-  
   'get the cuepoints synchronously
-  cuepointsReq = m.utils.request.createAsync(cuepointUrl, "getCuePoints")
+  options = {
+    params: {
+      format: "json"
+      pubid: episode.pubId
+      platform: "roku"
+      cid: episode.id
+    }
+  }
+  cuepointsReq = m.utils.request.createAsync(m.constants.urls.cuepointsBaseUrl, "getCuePoints", options)
   cuepointsJson = cuepointsReq.runSynchronous(5)
 
   'parse the returned JSON to a Brightscript object - should return an array
