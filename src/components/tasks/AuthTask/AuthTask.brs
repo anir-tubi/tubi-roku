@@ -164,3 +164,33 @@ Function removeFromHistory()
   end if
   tubiLog("EXIT AuthTask.removeFromHistory")
 End Function
+
+Function updateHistory()
+  tubiLog("AuthTask.updateHistory")
+  Request = TubiRequest()
+  Auth = TubiAuth(m.global.constants, Request)
+  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants)
+
+  'only do the following if the user is logged in
+  if m.top.content <> invalid and m.top.authInfo <> invalid and m.top.authInfo.accessToken <> invalid
+    tubiLog("Adding content " + m.top.content.id + " from history at position " + stri(m.top.nowPos))
+    newHistoryReq = Bookmarks.addHistoryReq(m.top.content, m.top.nowPos)
+    result = newHistoryReq.runSynchronous()  ' timeout default is 5 seconds
+    historyResult = {}
+    if result <> invalid then
+      parsedResp = parseJson(result)
+
+      'check if we have the response for a history API call
+      if parsedResp <> invalid and parsedResp.id <> invalid
+        if parsedResp.episodes <> invalid and type(parsedResp.episodes) = "roArray" and parsedResp.episodes.count() > 0
+          historyResult.historyId = parsedResp.episodes[0].id
+          historyResult.parentHistoryId = parsedResp.id
+        else
+          historyResult.historyId = parsedResp.id
+        end if
+      end if
+    end if
+    m.top.historyResult = historyResult  ' with result
+    tubiLog("EXIT AuthTask.updateHistory")
+  end if
+End Function

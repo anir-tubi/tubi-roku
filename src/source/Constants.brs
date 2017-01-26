@@ -239,6 +239,9 @@ Function getConstants()
     'how often the video player sends play progress events
     constants.player.pingFrequency = 10
 
+    'how often the video player records history
+    constants.player.historyFrequency = 60
+
     'video player returns one of the following
     constants.player.playerResults = {}
       constants.player.playerResults.completed = "COMPLETED"

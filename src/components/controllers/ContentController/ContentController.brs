@@ -325,14 +325,7 @@ Function onPlay()
   content = getDetailScreenContent()
   if content <> invalid then
     content.nowPos = 0 'reset the start position
-
-    'TODO(Chris): For unauthenticated users, we need to reset any resume 
-    ' position that might have been set.  Also, when we come back from
-    ' playback, we want to redraw the detail screen to reflect the new
-    ' resume position.
-
-    ' Don't give main BRS a reference to the contentNode
-    m.top.playContent = content.getFields()
+    playVideoContent(content)
   else
     tubiLog("ERROR: Play selected but content is invalid")
   end if
@@ -347,11 +340,92 @@ Function onResume()
   tubiLog("ContentController.onResume")
   content = getDetailScreenContent()
   if content <> invalid then
-    m.top.playContent = content.getFields()
+    playVideoContent(content)
   else
     tubiLog("ERROR: Resume selected but content is invalid")
   end if
 End Function
+
+
+'''''''''''''''''''''
+' playVideoContent
+'
+' Helper function for onResume and onPlay to launch content
+Function playVideoContent(content As Object)
+  m.videoPlayer.visible = true
+  m.videoPlayer.observeField("state", "onEpisodeFinished")
+  m.videoPlayer.observeField("historyPosition", "onEpisodePosition")
+  m.videoPlayer.observeField("backButtonPressed", "onEpisodeFinished")
+  m.videoPlayer.setFocus(true)
+  
+  ' Clone the content so we don't have listeners affecting it
+  localContent = CreateObject("roSGNode", "TubiContentNode")
+  localContent.setFields(content.getFields())
+
+  m.videoPlayer.content = localContent
+  m.ScreenStack.visible = false
+
+  ' For position history tracking
+  m.authTask.content = localContent
+End Function
+
+
+''''''''''''''''''''''
+' onEpisodePosition
+'
+' Update the resume position
+Function onEpisodePosition()
+  tubiLog("ContentController.onEpisodePosition")
+  ' Only run a new task if the previous task is done.  Priority of resume states is
+  ' pretty low and we don't mind losing a few.
+  if m.authTask.state <> "RUN" then
+    m.authTask.nowPos = m.videoPlayer.historyPosition
+    m.authTask.functionName = "updateHistory"
+    m.authTask.control = "RUN"
+  end if
+End Function
+
+
+'''''''''''''''''''''''
+' onEpisodeFinished
+'
+' A series episode or feature film has finished playing
+Function onEpisodeFinished(msg As Object)
+  tubiLog("ContentController.onEpisodeFinished")
+  endEpisode = false
+  playerInfo = {}
+  if msg.getField() = "state" and (msg.getData() = "error" or msg.getData() = "finished") then
+    print "Episode finished"
+    if msg.getData() = "error" then playerInfo.result = m.global.constants.player.playerResults.failed 
+    if msg.getData() = "finished" then playerInfo.result = m.global.constants.player.playerResults.completed
+    endEpisode = true
+  else if msg.getField() = "backButtonPressed" then
+    print "Back button pressed"
+    playerInfo.result = m.global.constants.player.playerResults.closed
+    endEpisode = true
+  end if
+  if endEpisode then
+    m.videoPlayer.unobserveField("backButtonPressed")
+    m.videoPlayer.unobserveField("state")
+    m.videoPlayer.unobserveField("historyPosition")
+    m.videoPlayer.visible = false
+    m.videoPlayer.control = "stop"
+
+    playerInfo.nowPos = m.videoPlayer.historyPosition
+    if m.authtask.historyResult <> invalid
+      playerInfo.historyId = m.authtask.historyResult.historyId
+      playerInfo.parentHistoryId = m.authtask.historyResult.parentHistoryId
+    end if
+
+    m.ScreenStack.visible = true
+    currentScreen().setFocus(true)
+
+    ' trigger onPlayerInfo callback for remainder of logic
+    m.top.playerInfo = playerInfo
+  end if
+End Function
+
+
 
 
 Function onWatchTrailer()
@@ -468,7 +542,7 @@ Function onPlayerInfo() As Void
   if playerInfo.parentHistoryId <> invalid and playerInfo.parentHistoryId <> "" then
     tubiLog("onPlayerInfo: parentHistoryId = " + playerInfo.parentHistoryId.toStr())
   end if
-  content = m.top.playContent 'video
+  content = m.videoPlayer.content 'm.top.playContent 'video
 
   constants = m.global.constants
   Request = TubiRequest()
@@ -568,13 +642,9 @@ End Function
 '
 Function onAutoplayContentReady()
   tubiLog("ContentController.onAutoplayContentReady")
-  content = getDetailScreenContent()
-  if content <> invalid then
-    content.nowPos = 0 'reset the start position
-    m.top.playContent = content.getFields()
-    if m.detailScreen <> invalid then
-      m.detailScreen.unobserveField("content")
-    end if
+  onPlay()
+  if m.detailScreen <> invalid then
+    m.detailScreen.unobserveField("content")
   end if
 End Function
 

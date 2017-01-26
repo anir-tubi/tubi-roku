@@ -11,6 +11,11 @@
     <field id="content" alias="VideoNode.content"/>
     <field id="state" alias="VideoNode.state"/>
     <field id="control" alias="VideoNode.control"/>
+    
+    <!-- Reading the video position for updates to history -->
+    <field id="historyPosition" type="integer" value="0" />
+    
+    <field id="analyticsInterval" type="integer" value="0"/>
   </interface>
 
   <children>
@@ -21,8 +26,8 @@
       translation="[0,0]"
       enableUI="false"
       enableTrickPlay="false"
-      visible="true"
-      notificationInterval="0"/>
+      notificationInterval="1"
+      visible="true"/>
     
     <Group
       id="Transport"
@@ -107,5 +112,9 @@
       uri="pkg:/images/cc-toggle.png"
       translation="[1697,958]"/>
    </Group>           
+    
+   <AuthTask
+      id="VideoPlayerAuthTask" />
+
   </children>
 </component>

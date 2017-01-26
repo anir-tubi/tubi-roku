@@ -26,5 +26,9 @@
       
       <!-- removeFromHistory, removeFromQueue -->
       <field id="result" type="assocarray" alwaysNotify="true" />
+      
+      <!-- updateHistory -->
+      <field id="nowPos" type="integer" />
+      <field id="historyResult" type="assocarray" alwaysNotify="true" />
     </interface>
 </component>
