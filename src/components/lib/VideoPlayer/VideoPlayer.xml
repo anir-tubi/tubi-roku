@@ -2,6 +2,7 @@
 <component name="VideoPlayer" extends="Group" >
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPlayer/VideoPlayer.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
 
   <interface>
     <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -9,12 +10,11 @@
      
     <!-- Alias fields for the video node -->
     <field id="content" alias="VideoNode.content"/>
-    <field id="state" alias="VideoNode.state"/>
     <field id="control" alias="VideoNode.control"/>
+    <field id="state" alias="VideoNode.state"/>
     
     <!-- Reading the video position for updates to history -->
     <field id="historyPosition" type="integer" value="0" />
-    
     <field id="analyticsInterval" type="integer" value="0"/>
   </interface>
 
@@ -27,94 +27,135 @@
       enableUI="false"
       enableTrickPlay="false"
       notificationInterval="1"
-      visible="true"/>
+      visible="true" />
+
+    <Label
+      id="BufferText"
+      width="1920"
+      height="1080"
+      wrap="true"
+      vertAlign="center"
+      horizAlign="center">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="67" />
+    </Label>
     
     <Group
       id="Transport"
-      visible="false">
-    <Rectangle
-      id="ProgressBarBackground"
-      height="16"
-      width="1752"
-      color="0xffffff"
-      opacity="0.2"
-      translation="[85,896]"/>
-    <!-- ProgressBarForeground width will be set based on current position -->
-    <Rectangle
-      id="ProgressBarForeground"
-      color="0xff9933"
-      height="16"
-      translation="[85,896]"/>
-    
-    <!-- Time -->
-    <Label
-      id="ElapsedLabel"
-      text="00:00:00"
-      width="500"
-      translation="[85,848]"/>
-    <Label
-      id="RemainingLabel"
-      text="-00:00:00"
-      horizAlign="right"
-      width="500"
-      translation="[85,1837]"/>
-    
-   <!-- Transport buttons -->
-    <Poster
-      id="PreviousButton"
-      width="60"
-      height="60"
-      uri="pkg:/images/icon-to-start.png"
-      translation="[540,958]"/>
-    <Poster
-      id="RewindButton"
-      width="60"
-      height="60"
-      uri="pkg:/images/icon-rew.png"
-      translation="[670,958]"/>
-    <Poster
-      id="HopBackButton"
-      width="60"
-      height="60"
-      uri="pkg:/images/icon-to-start.png"
-      translation="[800,958]"/>
-    <!-- play/pause uri will update based on playing state of video -->
-    <Poster
-      id="PlayPauseButton"
-      width="60"
-      height="60"
-      uri="pkg:/images/icon-play.png"
-      translation="[930,958]"/>
-    <Poster
-      id="HopForwardButton"
-      width="60"
-      height="60"
-      uri="pk:/images/icon-fwd-30s.png"
-      translation="[1060,958]"/>
-    <Poster
-      id="FastForwardButton"
-      width="60"
-      height="60"
-      uri="pkg:/images/icon-ffw.png"
-      translation="[1190,958]"/>
-    <Poster
-      id="NextButton"
-      width="60"
-      height="60"
-      uri="pkg:/images/icon-to-end.png"
-      translation="[1320,958]"/>
-    
-    <!-- Closed Caption -->
-    <Poster
-      id="ClosedCaption"
-      width="140"
-      height="60"
-      uri="pkg:/images/cc-toggle.png"
-      translation="[1697,958]"/>
-   </Group>           
-    
-   <AuthTask
-      id="VideoPlayerAuthTask" />
+      visible="false" >
+      <Rectangle
+        id="VideoOverlay"
+        width="1920"
+        height="1080"
+        translation="[0,0]"
+        color="0x000000"
+        opacity="0.4" />
+      <Rectangle
+        id="ProgressBarBackground"
+        height="16"
+        width="1752"
+        color="0xffffff"
+        opacity="0.25"
+        translation="[85,896]"/>
+      <!-- ProgressBarForeground width will be set based on current position -->
+      <Rectangle
+        id="ProgressBarForeground"
+        color="0xff9933"
+        height="16"
+        translation="[85,896]"/>
+
+      <!-- Time -->
+      <Label
+        id="ElapsedLabel"
+        text="00:00:00"
+        width="500"
+        translation="[74,848]"/>
+      <Label
+        id="RemainingLabel"
+        text="-00:00:00"
+        width="500"
+        translation="[1696,848]"/>
+
+     <!-- Transport buttons - Transport buttons must be in the order they appear on the screen (from left to right) -->
+      <Group
+        id="TransportButtons" >
+        <TransportButton
+          id="StartButton"
+          width="60"
+          height="60"
+          uri="pkg:/images/transport/sgplayer/icon-to-start.png"
+          unfocusedUri="pkg:/images/transport/sgplayer/icon-to-start.png"
+          focusedUri="pkg:/images/transport/sgplayer/icon-to-start-focus.png"
+          translation="[540,958]"/>
+        <TransportButton
+          id="RewindButton"
+          width="60"
+          height="60"
+          uri="pkg:/images/transport/sgplayer/icon-rew.png"
+          unfocusedUri="pkg:/images/transport/sgplayer/icon-rew.png"
+          focusedUri="pkg:/images/transport/sgplayer/icon-rew-focus.png"          
+          translation="[670,958]"/>
+        <TransportButton
+          id="HopBackButton"
+          width="60"
+          height="60"
+          uri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
+          unfocusedUri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
+          focusedUri="pkg:/images/transport/sgplayer/icon-rew-30s-focus.png"           
+          translation="[800,958]"/>
+        <!-- play/pause uri will update based on playing state of video -->
+        <TransportButton
+          id="PlayPauseButton"
+          width="60"
+          height="60"
+          uri="pkg:/images/transport/sgplayer/icon-play.png"
+          unfocusedUri="pkg:/images/transport/sgplayer/icon-play.png"
+          focusedUri="pkg:/images/transport/sgplayer/icon-play-focus.png"            
+          translation="[930,958]"/>
+        <TransportButton
+          id="HopForwardButton"
+          width="60"
+          height="60"
+          uri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
+          unfocusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
+          focusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s-focus.png"            
+          translation="[1060,958]"/>
+        <TransportButton
+          id="FastForwardButton"
+          width="60"
+          height="60"
+          uri="pkg:/images/transport/sgplayer/icon-ffw.png"
+          unfocusedUri="pkg:/images/transport/sgplayer/icon-ffw.png"
+          focusedUri="pkg:/images/transport/sgplayer/icon-ffw-focus.png"            
+          translation="[1190,958]"/>
+        <TransportButton
+          id="EndButton"
+          width="60"
+          height="60"
+          uri="pkg:/images/transport/sgplayer/icon-to-end.png"
+          unfocusedUri="pkg:/images/transport/sgplayer/icon-to-end.png"
+          focusedUri="pkg:/images/transport/sgplayer/icon-to-end-focus.png"            
+          translation="[1320,958]"/>
+      </Group>
+
+      <!-- Closed Caption -->
+      <Poster
+        id="ClosedCaption"
+        width="140"
+        height="60"
+        uri="pkg:/images/transport/sgplayer/cc-toggle.png"
+        translation="[1697,958]"/>
+    </Group>
+  
+  <Timer
+    id="ScrubTimer"
+    duration="0.25"
+    repeat="true" />
+
+  <AuthTask
+    id="VideoPlayerAuthTask" />
 
   </children>
 </component>

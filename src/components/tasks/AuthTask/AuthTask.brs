@@ -177,6 +177,7 @@ Function updateHistory()
     newHistoryReq = Bookmarks.addHistoryReq(m.top.content, m.top.nowPos)
     result = newHistoryReq.runSynchronous()  ' timeout default is 5 seconds
     historyResult = {}
+
     if result <> invalid then
       parsedResp = parseJson(result)
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="TransportButton" extends="Poster" >
+  <script type="text/brightscript" uri="pkg:/components/lib/TransportButton/TransportButton.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- image uri's that will update the official uri upon focus or unfocus state change -->
+    <field id="focusedUri" type="string" />
+    <field id="unfocusedUri" type="string" />
+
+    <!-- boolean indicates if the button is focused or not -->
+    <field id="focusState" type="boolean" alwaysNotify="true" />
+  </interface>
+</component>

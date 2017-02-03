@@ -25,6 +25,7 @@
 <component name="InfoPanel" extends="LayoutGroup">
 
   <script type="text/brightscript" uri="pkg:/components/lib/InfoPanel/InfoPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />  
 
   <interface>
     <field id="content" type="node" />

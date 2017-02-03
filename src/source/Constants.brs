@@ -204,7 +204,30 @@ Function getConstants()
     ' splash video
     constants.urls.splashVideoUrl = "http://c11.adrise.tv/v2/sources/content-owners/adrise-no-ads/328128/v20169300123-1280x714-,386,951,1592,1956,2833,k.mp4.m3u8"
 
+    'privacy statement text
     constants.urls.privacyUrl = "http://cdn.adrise.tv/legal/TubiTVPrivacyPolicy.txt"
+
+    constants.urls.transportButtons = {}
+      constants.urls.transportButtons.fastForward = "pkg:/images/transport/sgplayer/icon-ffw.png"
+      constants.urls.transportButtons.fastForwardFocus = [
+        "pkg:/images/transport/sgplayer/icon-ffw-1-focus.png",
+        "pkg:/images/transport/sgplayer/icon-ffw-2-focus.png",
+        "pkg:/images/transport/sgplayer/icon-ffw-3-focus.png"
+      ]
+      constants.urls.transportButtons.rewind = "pkg:/images/transport/sgplayer/icon-rew.png"
+      constants.urls.transportButtons.rewindFocus = [
+        "pkg:/images/transport/sgplayer/icon-rew-1-focus.png",
+        "pkg:/images/transport/sgplayer/icon-rew-2-focus.png",
+        "pkg:/images/transport/sgplayer/icon-rew-3-focus.png"
+      ]
+      constants.urls.transportButtons.pause = "pkg:/images/transport/sgplayer/icon-pause.png"
+      constants.urls.transportButtons.pauseFocus = "pkg:/images/transport/sgplayer/icon-pause-focus.png"
+      constants.urls.transportButtons.play = "pkg:/images/transport/sgplayer/icon-play.png"
+      constants.urls.transportButtons.playFocus = "pkg:/images/transport/sgplayer/icon-play-focus.png"
+      constants.urls.transportButtons.toEnd = "pkg:/images/transport/sgplayer/icon-to-end.png"
+      constants.urls.transportButtons.toEndFocus = "pkg:/images/transport/sgplayer/icon-to-end-focus.png"
+      constants.urls.transportButtons.toStart = "pkg:/images/transport/sgplayer/icon-to-start.png"
+      constants.urls.transportButtons.toStartFocus = "pkg:/images/transport/sgplayer/icon-to-start-focus.png"
 
   'http request types
   constants.reqTypes = {}
@@ -242,6 +265,12 @@ Function getConstants()
     'how often the video player records history
     constants.player.historyFrequency = 60
 
+    'the max number of distinct speeds at which the player can scrub (fast forward or rewind), 0 based
+    constants.player.maxScrub = 2 
+
+    'list of scrub multipliers, the number of options should match the maxScrub above
+    constants.player.scrubMultipliers = [8, 64, 128]
+
     'video player returns one of the following
     constants.player.playerResults = {}
       constants.player.playerResults.completed = "COMPLETED"
@@ -253,26 +282,43 @@ Function getConstants()
       constants.player.playerResults.resumePlay = "RESUMEPLAY"
 
     'urls for the images that are required for the transport
-    constants.player.transportImages = {}
-      constants.player.transportImages.hd = {}
-      constants.player.transportImages.hd.rw = "pkg://images/transport/hd/rw.png"
-      constants.player.transportImages.hd.rwOrange = "pkg://images/transport/hd/rw_orange.png"
-      constants.player.transportImages.hd.ff = "pkg://images/transport/hd/ff.png"
-      constants.player.transportImages.hd.ffOrange = "pkg://images/transport/hd/ff_orange.png"
-      constants.player.transportImages.hd.star = "pkg://images/transport/hd/star.png"
-      constants.player.transportImages.hd.play = "pkg://images/transport/hd/play.png"
-      constants.player.transportImages.hd.pauseSmall = "pkg://images/transport/hd/pause_small.png"
-      constants.player.transportImages.hd.pauseBig = "pkg://images/transport/hd/pause_big.png"
+    constants.player.transportButtons = {}
+      constants.player.transportButtons.fastForward = "pkg:/images/transport/sgplayer/icon-ffw.png"
+      constants.player.transportButtons.fastForwardFocus = "pkg:/images/transport/sgplayer/icon-ffw-focus.png"
+      constants.player.transportButtons.fastForwardLevels = [
+        "pkg:/images/transport/sgplayer/icon-ffw-1.png",
+        "pkg:/images/transport/sgplayer/icon-ffw-2.png",
+        "pkg:/images/transport/sgplayer/icon-ffw-3.png"
+      ]      
+      constants.player.transportButtons.fastForwardLevelsFocus = [
+        "pkg:/images/transport/sgplayer/icon-ffw-1-focus.png",
+        "pkg:/images/transport/sgplayer/icon-ffw-2-focus.png",
+        "pkg:/images/transport/sgplayer/icon-ffw-3-focus.png"
+      ]
 
-      constants.player.transportImages.sd = {}
-      constants.player.transportImages.sd.rw = "pkg://images/transport/sd/rw.png"
-      constants.player.transportImages.sd.rwOrange = "pkg://images/transport/sd/rw_orange.png"
-      constants.player.transportImages.sd.ff = "pkg://images/transport/sd/ff.png"
-      constants.player.transportImages.sd.ffOrange = "pkg://images/transport/sd/ff_orange.png"
-      constants.player.transportImages.sd.star = "pkg://images/transport/sd/star.png"
-      constants.player.transportImages.sd.play = "pkg://images/transport/sd/play.png"
-      constants.player.transportImages.sd.pauseSmall = "pkg://images/transport/sd/pause_small.png"
-      constants.player.transportImages.sd.pauseBig = "pkg://images/transport/sd/pause_big.png"      
+      constants.player.transportButtons.rewind = "pkg:/images/transport/sgplayer/icon-rew.png"
+      constants.player.transportButtons.rewindFocus = "pkg:/images/transport/sgplayer/icon-rew-focus.png"
+      constants.player.transportButtons.rewindLevels = [
+        "pkg:/images/transport/sgplayer/icon-rew-1.png",
+        "pkg:/images/transport/sgplayer/icon-rew-2.png",
+        "pkg:/images/transport/sgplayer/icon-rew-3.png"
+      ]
+      constants.player.transportButtons.rewindLevelsFocus = [
+        "pkg:/images/transport/sgplayer/icon-rew-1-focus.png",
+        "pkg:/images/transport/sgplayer/icon-rew-2-focus.png",
+        "pkg:/images/transport/sgplayer/icon-rew-3-focus.png"
+      ]
+
+      constants.player.transportButtons.pause = "pkg:/images/transport/sgplayer/icon-pause.png"
+      constants.player.transportButtons.pauseFocus = "pkg:/images/transport/sgplayer/icon-pause-focus.png"
+      constants.player.transportButtons.play = "pkg:/images/transport/sgplayer/icon-play.png"
+      constants.player.transportButtons.playFocus = "pkg:/images/transport/sgplayer/icon-play-focus.png"
+      constants.player.transportButtons.toEnd = "pkg:/images/transport/sgplayer/icon-to-end.png"
+      constants.player.transportButtons.toEndFocus = "pkg:/images/transport/sgplayer/icon-to-end-focus.png"
+      constants.player.transportButtons.toStart = "pkg:/images/transport/sgplayer/icon-to-start.png"
+      constants.player.transportButtons.toStartFocus = "pkg:/images/transport/sgplayer/icon-to-start-focus.png"
+      constants.player.transportButtons.hopForward = "pkg:/images/transport/sgplayer/icon-fwd-30s.png"
+      constants.player.transportButtons.hopBack = "pkg:/images/transport/sgplayer/icon-rew-30s.png"
 
 
   'UI properties that should be passed into the scene graph
