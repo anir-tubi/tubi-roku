@@ -554,6 +554,10 @@ Function jumpToPosition(position)
   end if
 
   m.Video.seek = position
+
+  m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
+  m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
+  m.PlayPauseButton.focusState = false
 End Function
 
 
