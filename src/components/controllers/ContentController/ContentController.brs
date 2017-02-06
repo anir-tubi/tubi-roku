@@ -363,6 +363,9 @@ Function playVideoContent(content As Object)
   localContent.setFields(content.getFields())
 
   m.videoPlayer.content = localContent
+  m.videoPlayer.enableAds = true
+  m.videoPlayer.enableTracking = true
+  m.videoPlayer.control = "play"
   m.ScreenStack.visible = false
 
   ' For position history tracking
@@ -441,6 +444,9 @@ Function onWatchTrailer()
     m.videoPlayer.observeField("backButtonPressed", "onTrailerFinished")
     m.videoPlayer.setFocus(true)
     m.videoPlayer.content = trailerContent
+    m.videoPlayer.enableAds = false
+    m.videoPlayer.enableTracking = false
+    m.videoPlayer.control = "play"
     m.ScreenStack.visible = false
   end if
 End Function

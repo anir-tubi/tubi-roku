@@ -117,13 +117,13 @@ Function MainNewUI(args As Dynamic, constants As Object)
     log: log
   }
 
-  m.global.player = TubiPlayer(m.global.utils)
-
   ' Load scene graph
   screen = CreateObject("roSGScreen")
   port = CreateObject("roMessagePort")
   screen.setMessagePort(port)
 
+  ' also populates m.global.sgAdShim.ads
+  m.global.adShim = TubiSGAdShim(m.global.utils, port)
 
   ' apply hotpatch to main brightscript thread
   ' this also verifies startup network connectivity
@@ -180,45 +180,9 @@ Function MainNewUI(args As Dynamic, constants As Object)
     controller = tubiScene.createChild("ContentController")
   end if
 
-  controller.observeField("playContent", port)
-
   deepLink(args, controller, m.global.utils)
 
-  while(true)
-    msg = wait(0, port)
-    msgType = type(msg)
-    
-    if msgType = "roSGScreenEvent"
-      if msg.isScreenClosed() then return 0
-    
-    else if msgType = "roSGNodeEvent"
-      node = msg.getNode()
-      field = msg.getField()
-      data = msg.getData()
-
-      if field = "playContent"
-        playerContent = data
-        playerContent.stream = {url: playerContent.url}
-        playerResult = m.global.player.playVideo(playerContent)
-
-        'pass the new nowPos and historyId (if necessary) to scenegraph thread
-        infoToPass = {
-          nowPos: playerContent.nowPos
-          result: playerResult
-        }
-
-        if playerContent.historyId <> invalid
-          infoToPass.historyId = playerContent.historyId
-        end if
-        if playerContent.parentHistoryId <> invalid
-          infoToPass.parentHistoryId = playerContent.parentHistoryId
-        end if
-        
-        controller.playerInfo = infoToPass
-      end if 
-    end if
-
-  end while
+  m.global.adShim.run(controller)
 
 end Function
 

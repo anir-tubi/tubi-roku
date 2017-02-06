@@ -10,12 +10,52 @@
      
     <!-- Alias fields for the video node -->
     <field id="content" alias="VideoNode.content"/>
-    <field id="control" alias="VideoNode.control"/>
     <field id="state" alias="VideoNode.state"/>
-    
-    <!-- Reading the video position for updates to history -->
+
+    <!-- Only support play and stop for simple external interface -->
+    <field id="control" type="string" value="none"/>
+
+    <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
     <field id="historyPosition" type="integer" value="0" />
+
+    <!-- interval in seconds for sending position data to the tracking server -->
     <field id="analyticsInterval" type="integer" value="0"/>
+
+
+    <!-- Enable/disable ads breaks.  This can be changed during playback in order to
+      -  postpone midrolls when there is an overlay (e.g. EPG) that the user is
+      -  interacting with and we don't want to interrupt
+      -->
+    <field id="enableAds" type="boolean" value="true"/>
+
+    <!-- Enable/disable tracking and history.  If true, historyPosition will
+      -  be set at regular intervals and tracking events internally will be
+      -  sent at regular intervals.  If false, no tracking or history events
+      -  will happen
+      -->
+    <field id="enableTracking" type="boolean" value="true"/>
+
+    <!--
+      -
+      - Ad playback interface to main Brightscript thread
+      -
+      -->
+
+    <!--
+      - Written to by the main brightscript thread.
+      - Possible values:  init, fetching, noads, adspending, adsplaying, adsclosed
+      -->
+    <field id="adState" type="string" value=""/>
+    <!--
+      - Written to by the scene graph thread.
+      - Possible values:  preroll, midroll, seek, play, stop
+      -->
+    <field id="adControl" type="string" value="" alwaysNotify="true"/>
+    
+    <!--
+      - List of midrolls as time in seconds.  This will be written to by main brightscript thread.
+      -->
+    <field id="midrolls" type="intarray" value="[]" />
   </interface>
 
   <children>
@@ -95,7 +135,7 @@
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-rew.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-rew.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-rew-focus.png"          
+          focusedUri="pkg:/images/transport/sgplayer/icon-rew-focus.png"
           translation="[670,958]"/>
         <TransportButton
           id="HopBackButton"
@@ -103,7 +143,7 @@
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-rew-30s-focus.png"           
+          focusedUri="pkg:/images/transport/sgplayer/icon-rew-30s-focus.png"
           translation="[800,958]"/>
         <!-- play/pause uri will update based on playing state of video -->
         <TransportButton
@@ -112,7 +152,7 @@
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-play.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-play.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-play-focus.png"            
+          focusedUri="pkg:/images/transport/sgplayer/icon-play-focus.png"
           translation="[930,958]"/>
         <TransportButton
           id="HopForwardButton"
@@ -120,7 +160,7 @@
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s-focus.png"            
+          focusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s-focus.png"
           translation="[1060,958]"/>
         <TransportButton
           id="FastForwardButton"
@@ -128,7 +168,7 @@
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-ffw.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-ffw.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-ffw-focus.png"            
+          focusedUri="pkg:/images/transport/sgplayer/icon-ffw-focus.png"
           translation="[1190,958]"/>
         <TransportButton
           id="EndButton"
@@ -136,7 +176,7 @@
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-to-end.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-to-end.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-to-end-focus.png"            
+          focusedUri="pkg:/images/transport/sgplayer/icon-to-end-focus.png"
           translation="[1320,958]"/>
       </Group>
 
@@ -148,7 +188,7 @@
         uri="pkg:/images/transport/sgplayer/cc-toggle.png"
         translation="[1697,958]"/>
     </Group>
-  
+
   <Timer
     id="ScrubTimer"
     duration="0.25"

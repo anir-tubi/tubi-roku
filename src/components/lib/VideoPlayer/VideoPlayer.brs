@@ -38,7 +38,7 @@
 '
 '      - when user exits the ad or video by pressing 'back'
 '      - right before a mid-roll
-'      - every 60 seconds of watching (hard-coded in TubiPlayer.brs)
+'      - every 60 seconds of watching
 '
 
 
@@ -47,14 +47,16 @@ Function init()
   m.BufferText = m.top.findNode("BufferText")
   m.Transport = m.top.findNode("Transport")
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
+  m.Video.observeField("position", "onVideoPositionChange")
+  m.top.observeField("control", "onControlChange")
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.ProgressBar = m.top.findNode("ProgressBarForeground")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
 
   'm.VideoState is source of truth for the state of the video player for the UI
-  'possible values are "play", "pause", "rew", "ffw"
-  m.VideoState = m.Video.state
+  'possible values are "play", "pause", "rew", "ffw", "stop"
+  m.VideoState = "stop"
   m.scrubAmt = -1
   m.playerPosition = 0
   m.maxScrub = m.global.constants.player.maxScrub
@@ -75,12 +77,12 @@ Function init()
   m.focusedButtonIndex = m.defaultButton
 
   m.Video.observeField("bufferingStatus", "onBufferStatus")
-  m.Video.observeField("position", "updatePlayerPosition")
-  m.top.observeField("content", "onContentChange")
   m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
+  m.top.observeField("adState", "onAdStateChange")
 
   m.lastPingTime = 0
-  m.lastsavedPosition = 0
+  m.lastSavedPosition = 0
+  m.adPrefetchTime = 5
 
   m.analyticsInterval = m.global.constants.player.pingFrequency
   m.historyInterval = m.global.constants.player.historyFrequency
@@ -90,7 +92,7 @@ End Function
 Function onBufferStatus()
   if m.Video.bufferingStatus <> invalid
     m.BufferText.visible = true
-    text = "Loading... " 
+    text = "Loading... "
     if m.Video.bufferingStatus.percentage <> invalid
       text = text + m.Video.bufferingStatus.percentage.toStr() + "%"
     end if
@@ -160,24 +162,47 @@ End Function
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
 Function onVideoPositionChange()
-  tubiLog("VideoPlayer.onVideoPositionChange")
-  if m.Video.position >= m.lastPingTime + m.analyticsInterval then
-    m.global.trackingLoggingTask.trackEvent = {
+  tubiLog("VideoPlayer.onVideoPositionChange position =" + stri(m.Video.position))
+
+  updatePlayerPosition()
+
+  ' Analytics
+  if m.playerPosition >= m.lastPingTime + m.analyticsInterval then
+    trackEvent({
       trackType: "playProgress"
       ctx: m.Video.content.id
       value: m.playerPosition
       extraCtx: {
         interval: m.playerPosition - m.lastPingTime
       }
-    }
+    })
     m.lastPingTime = m.playerPosition
-    'TODO(Chris): When scrubbing shows up, lastPingTime should be reset once playback resumes
   end if
 
+  ' User history
   if m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval
-    m.top.historyPosition = m.playerPosition
-    m.lastSavedPosition = m.playerPosition
+    historyPosition()
   end if
+
+  if m.top.enableAds and m.top.midrolls <> invalid and m.top.midrolls.count() > 0 then
+    for each cuepoint in m.top.midrolls
+
+      if m.playerPosition = (cuepoint - m.adPrefetchTime)
+        m.top.adControl = "midroll"
+      end if
+
+      ' Fire up the midroll
+      if m.playerPosition = cuepoint and m.top.adState = "adspending" then
+        ' We must stop the video here, not just pause it, in order to release
+        ' system resources to the RAF video player
+        m.Video.control = "stop"
+        m.top.content.nowPos = m.playerPosition
+        m.top.adControl = "play"
+        ' store latest history
+        historyPosition()
+      end if
+    end for
+  end if 
 End Function
 
 
@@ -189,27 +214,29 @@ Function onCaptionModeChange()
     else
       value = "on"
     end if
-    m.global.trackingLoggingTask.trackEvent = {
+    trackEvent({
       trackType: "subtitles"
       ctx: m.Video.content.id
       value: value
-    }
+    })
   end if
 End Function
 
-
-Function onContentChange()
-  tubiLog("VideoPlayer.onContentChange")
-  if m.Video.content <> invalid and m.Video.state <> "playing" then
+Function onControlChange()
+  tubiLog("VideoPlayer.onControlChange")
+  if m.Video.content <> invalid and m.Video.state <> "playing" and m.top.control = "play" then
     if m.Video.content.nowPos <> invalid then
       m.Video.seek = m.Video.content.nowPos
+      m.lastSavedPosition = m.Video.content.nowPos
+      m.lastPingTime = m.Video.content.nowPos
+    else
+      m.lastPingTime = 0
+      m.lastSavedPosition = 0
     end if
-
-    m.lastsavedPosition = m.Video.content.nowPos
-    m.Video.control = "play"
+    m.top.midrolls = []  ' Always reset midrolls when we first start playback.  Preroll will populate these
     m.VideoState = "play"
     
-    m.global.trackingLoggingTask.trackEvent = {
+    trackEvent({
       trackType: "videoPlay"
       value: m.Video.content.id
       ctx: m.Video.content.nowPos
@@ -217,7 +244,18 @@ Function onContentChange()
         subtitles: m.Video.content.showSubtitles
         livetv: false  ' TODO(Chris): remove this if unnecessary
       }
-    }
+    })
+
+    if m.top.enableAds then
+      ' Start pre-roll fetch
+      m.top.adControl = "preroll"
+    else
+      m.Video.control = "play"
+    end if
+  else if m.top.control = "stop" then
+    'TODO: If ad break is happening, abort it.  I don't think it's possible, though
+    m.Video.control = "stop"
+    m.VideoState = "stop"
   end if
 End Function
 
@@ -246,12 +284,12 @@ Function onKeyEvent(key As String, press As Boolean)
           goToEnd()
         end if
       end if
- 
+
     else if key = "play" then
       handlePlayPause()
 
     else if key = "fastforward"
-      handleFastForward()     
+      handleFastForward()
 
     else if key = "rewind"
       handleRewind()
@@ -268,7 +306,7 @@ Function onKeyEvent(key As String, press As Boolean)
         if m.focusedButtonIndex - 1 >= 0
           currentButton = m.TransportButtons.getChild(m.focusedButtonIndex)
           currentButton.focusState = false
-          
+
           m.focusedButtonIndex = m.focusedButtonIndex - 1
           newCurrentButton = m.TransportButtons.getChild(m.focusedButtonIndex)
           newCurrentButton.focusState = true
@@ -279,12 +317,12 @@ Function onKeyEvent(key As String, press As Boolean)
       if m.Transport.visible = false
         showTransport()
 
-      else    
+      else
         'navigate the transport buttons
         if m.focusedButtonIndex + 1 < m.TransportButtons.getChildCount()
           currentButton = m.TransportButtons.getChild(m.focusedButtonIndex)
           currentButton.focusState = false
-          
+
           m.focusedButtonIndex = m.focusedButtonIndex + 1
           newCurrentButton = m.TransportButtons.getChild(m.focusedButtonIndex)
           newCurrentButton.focusState = true
@@ -299,8 +337,7 @@ Function onKeyEvent(key As String, press As Boolean)
     else if key = "back" then
       if m.VideoState = "play"
         if m.Transport.visible = false
-          'exit the video player
-          m.top.backButtonPressed = true
+          backButtonExit()
 
         else if m.Transport.visible = true
           'close the transport
@@ -321,6 +358,45 @@ Function onKeyEvent(key As String, press As Boolean)
   return true
 End Function
 
+' onAdStateChange
+'
+' TODO(Chris): Once we have things like EPG overlay, add a way to postpone
+' the showing of ads until the EPG overlay is hidden
+Function onAdStateChange()
+  print "VideoPlayer.onAdStateChange state = " m.top.adState
+  ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
+  ' video playback stopped and should play right away when we get adspending.
+  if m.top.adState = "adspending" and (m.top.adControl = "preroll" or m.top.adControl = "seek") and m.top.enableAds then
+    ' pre-roll. Play ads right away
+    m.top.adControl = "play"
+  else if m.top.adState = "noads" and m.Video.state <> "playing" then
+    ' came back from an ad break
+    m.Video.seek = m.playerPosition
+    m.Video.control = "play"
+    trackEvent({
+      trackType: "resumeAfterAds"
+      value: m.Video.content.nowPos
+      ctx: m.Video.content.id
+    })
+  else if m.top.adState = "adsclosed"
+    backButtonExit()
+  end if
+End Function
+
+' Helper function to check enableTracking field before sending tracking events
+Function trackEvent(event As Object)
+  if m.top.enableTracking then
+    m.global.trackingLoggingTask.trackEvent = event
+  end if
+End Function
+
+' Helper function to check enableTracking before updating historyPosition
+Function historyPosition()
+  if m.top.enableTracking then
+    m.top.historyPosition = m.playerPosition
+    m.lastSavedPosition = m.playerPosition
+  end if
+End Function
 
 'show transport
 Function showTransport()
@@ -351,11 +427,11 @@ Function pauseVideo()
   m.focusedButtonIndex = m.defaultButton
   m.Transport.visible = true
   updateTransport()
-  m.global.trackingLoggingTask.trackEvent = {
+  trackEvent({
     trackType: "pauseToggle"
     ctx: m.Video.content.id
     value: "paused"
-  }  
+  })
 End Function
 
 
@@ -366,11 +442,11 @@ Function resumeFromPause()
   m.VideoState = "play"
   resetTransportButtons()
   m.PlayPauseButton.uri = m.buttonUris.play
-  m.global.trackingLoggingTask.trackEvent = {
+  trackEvent({
     trackType: "pauseToggle"
     ctx: m.Video.content.id
     value: "resumed"
-  }
+  })
 End Function
 
 
@@ -380,13 +456,13 @@ Function resetTransportButtons()
   m.RewindButton.focusedUri = m.buttonUris.rewindFocus
   m.RewindButton.unfocusedUri = m.buttonUris.rewind
   m.RewindButton.focusState = false
-  
+
   m.HopBackButton.focusState = false
-  
+
   m.PlayPauseButton.focusedUri = m.buttonUris.playFocus
   m.PlayPauseButton.unfocusedUri = m.buttonUris.play
   m.PlayPauseButton.focusState = false
-  
+
   m.HopForwardButton.focusState = false
 
   m.FastForwardButton.focusedUri = m.buttonUris.fastForwardFocus
@@ -425,11 +501,17 @@ Function endScrub()
   m.scrubAmt = -1 'reset just in case it somehow got to less than -1
   m.ScrubTimer.control = "stop"
   m.ScrubTimer.unobserveField("fire")
-  m.Video.seek = m.playerPosition 'will load and play the video at the seeked to point
   m.Transport.visible = false
   m.VideoState = "play"
+  ' Resent periodic event trackers
+  m.lastSavedPosition = m.playerPosition
+  m.lastPingTime = m.playerPosition
   resetTransportButtons()
   m.focusedButtonIndex = m.defaultButton
+  ' resume ad break
+  m.Video.control = "stop"
+  m.top.content.nowPos = m.playerPosition
+  m.top.adControl = "seek"
 End Function
 
 
@@ -454,7 +536,7 @@ Function handlePlayPause()
   else if m.VideoState = "pause" then
     resumeFromPause()
   else if m.VideoState = "rew" or m.VideoState = "ffw"
-    endScrub()      
+    endScrub()
   end if
 End Function
 
@@ -492,7 +574,7 @@ Function handleFastForward()
   'always remove focus from other buttons and add focus to fast forward button
   m.TransportButtons.getChild(m.focusedButtonIndex).focusState = false 'in case a user has left/righted to another button
   m.FastForwardButton.focusState = true
-  setFocusedButtonIndex(m.FastForwardButton) 
+  setFocusedButtonIndex(m.FastForwardButton)
 End Function
 
 
@@ -568,4 +650,13 @@ Function setFocusedButtonIndex(TransportButton)
       m.focusedButtonIndex = i
     end if
   end for
+End Function
+
+'exit the video player due to back button while no transport displaying, or during ad break
+Function backButtonExit()
+  historyPosition()
+  ' minor detail... set backButtonPressed first so that observers get that event before any video state change
+  m.top.backButtonPressed = true
+  m.Video.control = "stop"
+  m.VideoState = "stop"
 End Function
