@@ -435,9 +435,10 @@ Function onWatchTrailer()
   tubiLog("ContentController.onWatchTrailer")
   content = getDetailScreenContent()
   if content <> invalid then
-    trailerContent = CreateObject("roSGNode", "ContentNode")
+    trailerContent = CreateObject("roSGNode", "TubiContentNode")
     trailerContent.url = content.trailerUrls[0]
     trailerContent.streamformat="hls"
+    trailerContent.nowPos = 0
 
     m.videoPlayer.visible = true
     m.videoPlayer.observeField("state", "onTrailerFinished")

@@ -509,9 +509,13 @@ Function endScrub()
   resetTransportButtons()
   m.focusedButtonIndex = m.defaultButton
   ' resume ad break
-  m.Video.control = "stop"
-  m.top.content.nowPos = m.playerPosition
-  m.top.adControl = "seek"
+  if m.top.enableAds then
+    m.Video.control = "stop"
+    m.top.content.nowPos = m.playerPosition
+    m.top.adControl = "seek"
+  else
+    m.Video.seek = m.playerPosition 'will load and play the video at the seeked to point
+  end if
 End Function
 
 
