@@ -150,7 +150,8 @@ Function updateTransport()
     'update the position bar width
     if m.Video.duration > 0
       maxWidth = m.top.findNode("ProgressBarBackground").width
-      m.ProgressBar.width = (m.playerPosition / m.Video.duration) * maxWidth
+      minWidth = m.ProgressBar.bitmapWidth
+      m.ProgressBar.width = minWidth + (m.playerPosition / m.Video.duration) * (maxWidth - minWidth)
     end if
   end if
 End Function

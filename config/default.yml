@@ -51,6 +51,7 @@ manifest:
   splash_screen_sd: "pkg:/images/splash-720.jpg"
   bs_libs_required: roku_ads_lib
   ui_resolutions: "fhd"
+  uri_resolution_autosub: "$$RES$$,sd,hd,fhd"
   rsg_version: 1.0
 
 component_library_manifest:
