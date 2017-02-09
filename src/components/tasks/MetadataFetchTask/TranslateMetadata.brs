@@ -258,7 +258,7 @@ Function translateRecursive(contentFromServer As Object, translatedContent As Ob
     'set the default subtitles if there is only one set of subtitles
     if contentFromServer.subtitles.count() = 1
       translatedContent.subtitleDefault = contentFromServer.subtitles[0].url
-      translatedContent.subtitleUrl = contentFromServer.subtitles.[0].url
+      translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles.[0].url}
     end if
   end if
 

@@ -271,6 +271,9 @@ Function getConstants()
     'list of scrub multipliers, the number of options should match the maxScrub above
     constants.player.scrubMultipliers = [8, 64, 128]
 
+    'the number of seconds before the video player transport autohides during playback
+    constants.player.transportAutoHideTime = 5
+
     'video player returns one of the following
     constants.player.playerResults = {}
       constants.player.playerResults.completed = "COMPLETED"
@@ -319,6 +322,10 @@ Function getConstants()
       constants.player.transportButtons.toStartFocus = "pkg:/images/transport/sgplayer/icon-to-start-focus.png"
       constants.player.transportButtons.hopForward = "pkg:/images/transport/sgplayer/icon-fwd-30s.png"
       constants.player.transportButtons.hopBack = "pkg:/images/transport/sgplayer/icon-rew-30s.png"
+      constants.player.transportButtons.closedCaptionOn = "pkg:/images/transport/sgplayer/cc-toggle-on.png"
+      constants.player.transportButtons.closedCaptionOnFocus = "pkg:/images/transport/sgplayer/cc-toggle-on-focus.png"
+      constants.player.transportButtons.closedCaptionOff = "pkg:/images/transport/sgplayer/cc-toggle.png"
+      constants.player.transportButtons.closedCaptionOffFocus = "pkg:/images/transport/sgplayer/cc-toggle-focus.png"
 
 
   'UI properties that should be passed into the scene graph

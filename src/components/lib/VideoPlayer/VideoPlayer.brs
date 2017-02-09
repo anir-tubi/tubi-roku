@@ -44,7 +44,8 @@
 
 Function init()
   tubiLog("VideoPlayer.init")
-  m.BufferText = m.top.findNode("BufferText")
+  ' m.BufferText = m.top.findNode("BufferText")
+  m.Spinner = m.top.findNode("BufferSpinner")
   m.Transport = m.top.findNode("Transport")
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
@@ -62,6 +63,8 @@ Function init()
   m.maxScrub = m.global.constants.player.maxScrub
   m.scrubMultipliers = m.global.constants.player.scrubMultipliers
   m.scrubTimespan = CreateObject("roTimespan")
+  m.lastButtonPressPos = 0
+  m.transportAutoHideTime = m.global.constants.player.transportAutoHideTime
 
   'buttons
   m.TransportButtons = m.top.findNode("TransportButtons")
@@ -72,9 +75,10 @@ Function init()
   m.HopForwardButton = m.TransportButtons.findNode("HopForwardButton")
   m.FastForwardButton = m.TransportButtons.findNode("FastForwardButton")
   m.EndButton = m.TransportButtons.findNode("EndButton")
+  m.ClosedCaption = m.TransportButtons.findNode("ClosedCaption")
   m.buttonUris = m.global.constants.player.transportButtons
-  m.defaultButton = 3
-  m.focusedButtonIndex = m.defaultButton
+  m.focusedButtonIndex = 0
+  setFocusedButtonIndex(m.PlayPauseButton)
 
   m.Video.observeField("bufferingStatus", "onBufferStatus")
   m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
@@ -86,20 +90,21 @@ Function init()
 
   m.analyticsInterval = m.global.constants.player.pingFrequency
   m.historyInterval = m.global.constants.player.historyFrequency
+
+  'if global captions are turned on, update default closed caption toggle images
+  if m.Video.globalCaptionMode = "On"
+    m.ClosedCaption.unfocusedUri = m.buttonUris.closedCaptionOn
+    m.ClosedCaption.focusedUri = m.buttonUris.closedCaptionOnFocus
+    m.ClosedCaption.focusState = false
+  end if
 End Function
 
 
 Function onBufferStatus()
   if m.Video.bufferingStatus <> invalid
-    m.BufferText.visible = true
-    text = "Loading... "
-    if m.Video.bufferingStatus.percentage <> invalid
-      text = text + m.Video.bufferingStatus.percentage.toStr() + "%"
-    end if
-    text = text + Chr(10) + m.Video.content.title
-    m.BufferText.text = text
+    m.Spinner.visible = true
   else
-    m.BufferText.visible = false
+    m.Spinner.visible = false
   end if
 End Function
 
@@ -167,6 +172,12 @@ Function onVideoPositionChange()
 
   updatePlayerPosition()
 
+  ' Auto hide transport
+  if m.VideoState = "play" and m.Transport.visible = true and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
+    m.Transport.visible = false
+    resetTransportButtons()
+  end if
+
   ' Analytics
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval then
     trackEvent({
@@ -209,12 +220,19 @@ End Function
 
 Function onCaptionModeChange()
   tubiLog("VideoPlayer.onCaptionModeChange")
+  if m.Video.globalCaptionMode = "On"
+    m.ClosedCaption.unfocusedUri = m.buttonUris.closedCaptionOn
+    m.ClosedCaption.focusedUri = m.buttonUris.closedCaptionOnFocus
+    m.ClosedCaption.focusState = true
+    value = "on"
+  else  'handles "Off", "Instant replay", and "When mute"
+    m.ClosedCaption.unfocusedUri = m.buttonUris.closedCaptionOff
+    m.ClosedCaption.focusedUri = m.buttonUris.closedCaptionOffFocus
+    m.ClosedCaption.focusState = true
+    value = "off"
+  end if
+  
   if m.Video.content <> invalid then
-    if m.Video.globalCaptionMode <> "Off" then
-      value = "off"
-    else
-      value = "on"
-    end if
     trackEvent({
       trackType: "subtitles"
       ctx: m.Video.content.id
@@ -262,7 +280,9 @@ End Function
 
 Function onKeyEvent(key As String, press As Boolean)
   tubiLog("VideoPlayer.onKeyEvent key = " + key)
-  if press 
+  if press
+    m.lastButtonPressPos = m.playerPosition
+
     if key = "OK"
       if m.Transport.visible = false
         showTransport()
@@ -283,6 +303,8 @@ Function onKeyEvent(key As String, press As Boolean)
           handleFastForward()
         else if focusButtonId = m.EndButton.id
           goToEnd()
+        else if focusButtonId = m.ClosedCaption.id
+          handleClosedCaption()
         end if
       end if
 
@@ -351,6 +373,7 @@ Function onKeyEvent(key As String, press As Boolean)
         resumeFromPause()
 
       else if m.VideoState = "rew" or m.VideoState = "ffw"
+        setFocusedButtonIndex(m.PlayPauseButton)
         endScrub()
       end if
     end if
@@ -358,6 +381,7 @@ Function onKeyEvent(key As String, press As Boolean)
   ' Consume all key presses
   return true
 End Function
+
 
 ' onAdStateChange
 '
@@ -384,12 +408,14 @@ Function onAdStateChange()
   end if
 End Function
 
+
 ' Helper function to check enableTracking field before sending tracking events
 Function trackEvent(event As Object)
   if m.top.enableTracking then
     m.global.trackingLoggingTask.trackEvent = event
   end if
 End Function
+
 
 ' Helper function to check enableTracking before updating historyPosition
 Function historyPosition()
@@ -399,11 +425,12 @@ Function historyPosition()
   end if
 End Function
 
+
 'show transport
 Function showTransport()
   m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
   m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
-  m.focusedButtonIndex = m.defaultButton
+  setFocusedButtonIndex(m.PlayPauseButton)
   m.PlayPauseButton.focusState = true
   updateTransportTimes()
   m.Transport.visible = true
@@ -425,7 +452,7 @@ Function pauseVideo()
   m.PlayPauseButton.focusedUri = m.buttonUris.playFocus
   m.PlayPauseButton.unfocusedUri = m.buttonUris.play
   m.PlayPauseButton.focusState = true
-  m.focusedButtonIndex = m.defaultButton
+  setFocusedButtonIndex(m.PlayPauseButton)
   m.Transport.visible = true
   updateTransport()
   trackEvent({
@@ -502,13 +529,22 @@ Function endScrub()
   m.scrubAmt = -1 'reset just in case it somehow got to less than -1
   m.ScrubTimer.control = "stop"
   m.ScrubTimer.unobserveField("fire")
-  m.Transport.visible = false
   m.VideoState = "play"
   ' Resent periodic event trackers
   m.lastSavedPosition = m.playerPosition
   m.lastPingTime = m.playerPosition
+
+  'since the player will begin playing at the start of the HLS segment, player position will round to the nearest preceding 10 seconds
+  'so we need to set the m.lastButtonPressPos to this interval, so the translation autohides after the appropriate amount of time
+  remainder = m.playerPosition MOD 10
+  m.playerPosition = m.playerPosition - remainder
+  m.lastButtonPressPos = m.playerPosition
+
   resetTransportButtons()
-  m.focusedButtonIndex = m.defaultButton
+  m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
+  m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
+  m.PlayPauseButton.focusState = true
+
   ' resume ad break
   if m.top.enableAds then
     m.Video.control = "stop"
@@ -523,6 +559,10 @@ End Function
 'handles StartButton selection
 'moves the player to the 0:00:00 position
 Function goToStart()
+  if m.VideoState = "ffw" or m.VideoState = "rew"
+    endScrub()
+    m.StartButton.focusState = true
+  end if
   jumpToPosition(0)
 End Function
 
@@ -530,6 +570,10 @@ End Function
 'handles EndButton selection
 'moves the player to 5 seconds before the end of the video
 Function goToEnd()
+  if m.VideoState = "ffw" or m.VideoState = "rew"
+    endScrub()
+    m.EndButton.focusState = true
+  end if
   jumpToPosition(m.Video.duration - 5)
 End Function
 
@@ -541,6 +585,7 @@ Function handlePlayPause()
   else if m.VideoState = "pause" then
     resumeFromPause()
   else if m.VideoState = "rew" or m.VideoState = "ffw"
+    setFocusedButtonIndex(m.PlayPauseButton)
     endScrub()
   end if
 End Function
@@ -622,13 +667,33 @@ End Function
 
 'handles HopForward button selection
 Function handleHopForward()
+  if m.VideoState = "ffw" or m.VideoState = "rew"
+    endScrub()
+    m.HopForwardButton.focusState = true
+  end if
   jumpToPosition(m.playerPosition + 30)
 End Function
 
 
 'handles HopBack button selection
 Function handleHopBack()
+  setFocusedButtonIndex(m.HopBackButton)  'necessary because there is a dedicated hop back button on certain roku remotes
+  if m.VideoState = "ffw" or m.VideoState = "rew"
+    endScrub()
+    m.HopBackButton.focusState = true
+  end if
   jumpToPosition(m.playerPosition - 30)
+End Function
+
+
+'handles ClosedCaption button/toggle selection
+Function handleClosedCaption()
+  'setting the globalCaptionMode will trigger a callback that updates the images and does user tracking
+  if m.Video.globalCaptionMode = "On"
+    m.Video.globalCaptionMode = "Off"
+  else if m.Video.globalCaptionMode = "Off"
+    m.Video.globalCaptionMode = "On"
+  end if
 End Function
 
 
@@ -640,7 +705,15 @@ Function jumpToPosition(position)
     position = 0
   end if
 
+  'since the player will begin playing at the start of the HLS segment, player position will round to the nearest preceding 10 seconds
+  'so we need to set the m.lastButtonPressPos to this interval, so the translation autohides after the appropriate amount of time
+  remainder = position MOD 10
+  position = position - remainder
+  m.lastButtonPressPos = position
+  m.playerPosition = position
+
   m.Video.seek = position
+  m.VideoState = "play"
 
   m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
   m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
@@ -653,6 +726,7 @@ Function setFocusedButtonIndex(TransportButton)
   for i=0 to m.TransportButtons.getChildCount()-1
     if TransportButton.id = m.TransportButtons.getChild(i).id
       m.focusedButtonIndex = i
+      exit for
     end if
   end for
 End Function

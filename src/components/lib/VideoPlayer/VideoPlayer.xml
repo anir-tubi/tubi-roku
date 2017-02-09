@@ -70,30 +70,21 @@
       notificationInterval="1"
       visible="true" />
 
-    <Label
-      id="BufferText"
+    <Spinner
+      id="BufferSpinner"
+      visible="false"
       width="1920"
-      height="1080"
-      wrap="true"
-      vertAlign="center"
-      horizAlign="center">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="67" />
-    </Label>
-    
+      height="1080"/>
+
     <Group
       id="Transport"
       visible="false" >
-      <Rectangle
+      <Poster
         id="VideoOverlay"
         width="1920"
         height="1080"
         translation="[0,0]"
-        color="0x000000"
-        opacity="0.4" />
-      
+        uri="pkg:/images/transport/sgplayer/transport-gradient.png" />
       
       <!--
         - ProgressBarBackground and ProgressBarForeground use 9-patch images which have
@@ -127,9 +118,16 @@
         id="ElapsedLabel"
         text="00:00:00"
         width="500"
-        translation="[74,848]"/>
+        translation="[74,848]" >
+        <Font
+          id="Vaud34px"
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="34" />
+      </Label>
       <Label
         id="RemainingLabel"
+        font="dictionary:Vaud34px"
         text="-00:00:00"
         width="500"
         translation="[1696,848]"/>
@@ -194,15 +192,16 @@
           unfocusedUri="pkg:/images/transport/sgplayer/icon-to-end.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-to-end-focus.png"
           translation="[1320,958]"/>
+        <TransportButton
+          id="ClosedCaption"
+          width="140"
+          height="60"
+          uri="pkg:/images/transport/sgplayer/cc-toggle.png"
+          unfocusedUri="pkg:/images/transport/sgplayer/cc-toggle.png"
+          focusedUri="pkg:/images/transport/sgplayer/cc-toggle-focus.png"
+          translation="[1697,958]"/>
       </Group>
 
-      <!-- Closed Caption -->
-      <Poster
-        id="ClosedCaption"
-        width="140"
-        height="60"
-        uri="pkg:/images/transport/sgplayer/cc-toggle.png"
-        translation="[1697,958]"/>
     </Group>
 
   <Timer
