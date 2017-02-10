@@ -3,6 +3,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPlayer/VideoPlayer.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
 
   <interface>
     <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -76,15 +77,17 @@
       width="1920"
       height="1080"/>
 
+    <Poster
+      id="VideoOverlay"
+      width="1920"
+      height="1080"
+      translation="[0,0]"
+      uri="pkg:/images/transport/sgplayer/transport-gradient.png" />
+
     <Group
       id="Transport"
-      visible="false" >
-      <Poster
-        id="VideoOverlay"
-        width="1920"
-        height="1080"
-        translation="[0,0]"
-        uri="pkg:/images/transport/sgplayer/transport-gradient.png" />
+      visible="true"
+      opacity="0.0" >
       
       <!--
         - ProgressBarBackground and ProgressBarForeground use 9-patch images which have

@@ -53,6 +53,7 @@ Function init()
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.ProgressBar = m.top.findNode("ProgressBarForeground")
+  m.Overlay = m.top.findNode("VideoOverlay")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
 
   'm.VideoState is source of truth for the state of the video player for the UI
@@ -65,6 +66,7 @@ Function init()
   m.scrubTimespan = CreateObject("roTimespan")
   m.lastButtonPressPos = 0
   m.transportAutoHideTime = m.global.constants.player.transportAutoHideTime
+  m.ignoreOptionsKey = m.global.constants.deviceInfo.firmwareCaptionMenu
 
   'buttons
   m.TransportButtons = m.top.findNode("TransportButtons")
@@ -78,7 +80,7 @@ Function init()
   m.ClosedCaption = m.TransportButtons.findNode("ClosedCaption")
   m.buttonUris = m.global.constants.player.transportButtons
   m.focusedButtonIndex = 0
-  setFocusedButtonIndex(m.PlayPauseButton)
+  setFocusedButton(m.PlayPauseButton)
 
   m.Video.observeField("bufferingStatus", "onBufferStatus")
   m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
@@ -146,18 +148,14 @@ End Function
 
 ' Set the timestamps and position indicator
 Function updateTransport()
-  ' only update the transport when it's visible
-  if m.Transport.visible = true then
+  'update the position and remaining time text
+  updateTransportTimes()
 
-    'update the position and remaining time text
-    updateTransportTimes()
-
-    'update the position bar width
-    if m.Video.duration > 0
-      maxWidth = m.top.findNode("ProgressBarBackground").width
-      minWidth = m.ProgressBar.bitmapWidth
-      m.ProgressBar.width = minWidth + (m.playerPosition / m.Video.duration) * (maxWidth - minWidth)
-    end if
+  'update the position bar width
+  if m.Video.duration > 0
+    maxWidth = m.top.findNode("ProgressBarBackground").width
+    minWidth = m.ProgressBar.bitmapWidth
+    m.ProgressBar.width = minWidth + (m.playerPosition / m.Video.duration) * (maxWidth - minWidth)
   end if
 End Function
 
@@ -173,9 +171,8 @@ Function onVideoPositionChange()
   updatePlayerPosition()
 
   ' Auto hide transport
-  if m.VideoState = "play" and m.Transport.visible = true and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
-    m.Transport.visible = false
-    resetTransportButtons()
+  if m.VideoState = "play" and m.Transport.opacity > 0 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
+    animateTransport("out")
   end if
 
   ' Analytics
@@ -223,12 +220,10 @@ Function onCaptionModeChange()
   if m.Video.globalCaptionMode = "On"
     m.ClosedCaption.unfocusedUri = m.buttonUris.closedCaptionOn
     m.ClosedCaption.focusedUri = m.buttonUris.closedCaptionOnFocus
-    m.ClosedCaption.focusState = true
     value = "on"
   else  'handles "Off", "Instant replay", and "When mute"
     m.ClosedCaption.unfocusedUri = m.buttonUris.closedCaptionOff
     m.ClosedCaption.focusedUri = m.buttonUris.closedCaptionOffFocus
-    m.ClosedCaption.focusState = true
     value = "off"
   end if
   
@@ -284,7 +279,7 @@ Function onKeyEvent(key As String, press As Boolean)
     m.lastButtonPressPos = m.playerPosition
 
     if key = "OK"
-      if m.Transport.visible = false
+      if m.Transport.opacity = 0
         showTransport()
       else
         'do action based on the current focused button
@@ -320,60 +315,54 @@ Function onKeyEvent(key As String, press As Boolean)
     else if key = "replay"
       handleHopBack()
 
+    else if key = "options"
+      if m.ignoreOptionsKey = false then
+        handleClosedCaption()
+      end if
+
     else if key = "left"
-      if m.Transport.visible = false
+      if m.Transport.opacity = 0
         showTransport()
 
       else
         'navigate the transport buttons
         if m.focusedButtonIndex - 1 >= 0
-          currentButton = m.TransportButtons.getChild(m.focusedButtonIndex)
-          currentButton.focusState = false
-
-          m.focusedButtonIndex = m.focusedButtonIndex - 1
-          newCurrentButton = m.TransportButtons.getChild(m.focusedButtonIndex)
-          newCurrentButton.focusState = true
+          setFocusedButton(m.TransportButtons.getChild(m.focusedButtonIndex-1))
         end if
       end if
 
     else if key = "right"
-      if m.Transport.visible = false
+      if m.Transport.opacity = 0
         showTransport()
 
       else
         'navigate the transport buttons
         if m.focusedButtonIndex + 1 < m.TransportButtons.getChildCount()
-          currentButton = m.TransportButtons.getChild(m.focusedButtonIndex)
-          currentButton.focusState = false
-
-          m.focusedButtonIndex = m.focusedButtonIndex + 1
-          newCurrentButton = m.TransportButtons.getChild(m.focusedButtonIndex)
-          newCurrentButton.focusState = true
+          setFocusedButton(m.TransportButtons.getChild(m.focusedButtonIndex+1))
         end if
       end if
 
     else if key = "up" or key = "down"
-      if m.transport.visible = false
+      if m.transport.opacity = 0
         showTransport()
       end if
 
     else if key = "back" then
       if m.VideoState = "play"
-        if m.Transport.visible = false
+        if m.transport.opacity = 0
           backButtonExit()
 
-        else if m.Transport.visible = true
+        else if m.transport.opacity > 0
           'close the transport
-          m.Transport.visible = false
+          animateTransport("out")
           resetTransportButtons()
-          ' m.PlayPauseButton.uri = m.buttonUris.play
         end if
 
       else if m.VideoState = "pause"
         resumeFromPause()
 
       else if m.VideoState = "rew" or m.VideoState = "ffw"
-        setFocusedButtonIndex(m.PlayPauseButton)
+        setFocusedButton(m.PlayPauseButton)
         endScrub()
       end if
     end if
@@ -428,12 +417,19 @@ End Function
 
 'show transport
 Function showTransport()
+  resetTransportButtons()
   m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
   m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
-  setFocusedButtonIndex(m.PlayPauseButton)
-  m.PlayPauseButton.focusState = true
-  updateTransportTimes()
-  m.Transport.visible = true
+  setFocusedButton(m.PlayPauseButton)
+  animateTransport("in")
+End Function
+
+
+'aggregates all the animation for showing/hiding the transport
+'@direction: string, value may be "out" or "in"
+Function animateTransport(direction)
+  slideFade(m.Transport, "below", direction, 0.6)
+  fade(m.Overlay, direction, 0.6)
 End Function
 
 
@@ -441,19 +437,22 @@ End Function
 Function playVideo()
   m.Video.control = "play"
   m.VideoState = "play"
-  m.Transport.visible = false
+  animateTransport("out")
 End Function
 
 
-'load pause the video player
+'pause the video player
 Function pauseVideo()
   m.Video.control = "pause"
   m.VideoState = "pause"
   m.PlayPauseButton.focusedUri = m.buttonUris.playFocus
   m.PlayPauseButton.unfocusedUri = m.buttonUris.play
-  m.PlayPauseButton.focusState = true
-  setFocusedButtonIndex(m.PlayPauseButton)
-  m.Transport.visible = true
+  setFocusedButton(m.PlayPauseButton)
+
+  if m.Transport.opacity < 1.0
+    animateTransport("in")
+  end if
+  
   updateTransport()
   trackEvent({
     trackType: "pauseToggle"
@@ -465,11 +464,14 @@ End Function
 
 'Resume play from a paused state
 Function resumeFromPause()
-  m.Transport.visible = false
+  m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
+  m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
+  setFocusedButton(m.PlayPauseButton)
+
+  animateTransport("out")
   m.Video.control = "resume"
   m.VideoState = "play"
-  resetTransportButtons()
-  m.PlayPauseButton.uri = m.buttonUris.play
+
   trackEvent({
     trackType: "pauseToggle"
     ctx: m.Video.content.id
@@ -499,6 +501,8 @@ Function resetTransportButtons()
 
   m.EndButton.focusState = false
 
+  m.ClosedCaption.focusState = false
+
   'also upate the transport timestamps
   updateTransportTimes()
 End Function
@@ -519,7 +523,10 @@ Function beginScrub()
   resetTransportButtons()
   m.ScrubTimer.observeField("fire", "updateScrubTime")
   m.ScrubTimer.control = "start"
-  m.Transport.visible = true
+
+  if m.Transport.opacity < 1.0
+    animateTransport("in")
+  end if
   m.scrubTimespan.mark()
 End Function
 
@@ -561,7 +568,7 @@ End Function
 Function goToStart()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub()
-    m.StartButton.focusState = true
+    setFocusedButton(m.StartButton)
   end if
   jumpToPosition(0)
 End Function
@@ -572,7 +579,7 @@ End Function
 Function goToEnd()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub()
-    m.EndButton.focusState = true
+    setFocusedButton(m.EndButton)
   end if
   jumpToPosition(m.Video.duration - 5)
 End Function
@@ -585,7 +592,7 @@ Function handlePlayPause()
   else if m.VideoState = "pause" then
     resumeFromPause()
   else if m.VideoState = "rew" or m.VideoState = "ffw"
-    setFocusedButtonIndex(m.PlayPauseButton)
+    setFocusedButton(m.PlayPauseButton)
     endScrub()
   end if
 End Function
@@ -599,7 +606,6 @@ Function handleFastForward()
     m.scrubAmt = 0
     m.RewindButton.focusedUri = m.buttonUris.rewindFocus
     m.RewindButton.unfocusedUri = m.buttonUris.rewind
-    m.RewindButton.focusState = false
     m.FastForwardButton.focusedUri = m.buttonUris.fastForwardLevelsFocus[0]
     m.FastForwardButton.unfocusedUri = m.buttonUris.fastForwardLevels[0]
 
@@ -621,10 +627,7 @@ Function handleFastForward()
     m.FastForwardButton.unfocusedUri = m.buttonUris.fastForwardLevels[0]
   end if
 
-  'always remove focus from other buttons and add focus to fast forward button
-  m.TransportButtons.getChild(m.focusedButtonIndex).focusState = false 'in case a user has left/righted to another button
-  m.FastForwardButton.focusState = true
-  setFocusedButtonIndex(m.FastForwardButton)
+  setFocusedButton(m.FastForwardButton)
 End Function
 
 
@@ -636,7 +639,6 @@ Function handleRewind()
     m.scrubAmt = 0
     m.FastForwardButton.focusedUri = m.buttonUris.fastforwardFocus
     m.FastForwardButton.unfocusedUri = m.buttonUris.fastforward
-    m.FastForwardButton.focusState = false
     m.RewindButton.focusedUri = m.buttonUris.rewindLevelsFocus[0]
     m.RewindButton.unfocusedUri = m.buttonUris.rewindLevels[0]
 
@@ -658,10 +660,7 @@ Function handleRewind()
     m.RewindButton.unfocusedUri = m.buttonUris.rewindLevels[0]
   end if
 
-  'always remove focus from other buttons and add focus to rewind button
-  m.TransportButtons.getChild(m.focusedButtonIndex).focusState = false    'in case a user has left/righted to another button
-  m.RewindButton.focusState = true
-  setFocusedButtonIndex(m.RewindButton)
+  setFocusedButton(m.RewindButton)
 End Function
 
 
@@ -669,7 +668,7 @@ End Function
 Function handleHopForward()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub()
-    m.HopForwardButton.focusState = true
+    setFocusedButton(m.HopForwardButton)
   end if
   jumpToPosition(m.playerPosition + 30)
 End Function
@@ -677,10 +676,10 @@ End Function
 
 'handles HopBack button selection
 Function handleHopBack()
-  setFocusedButtonIndex(m.HopBackButton)  'necessary because there is a dedicated hop back button on certain roku remotes
+  setFocusedButton(m.HopBackButton)  'necessary because there is a dedicated hop back button on certain roku remotes
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub()
-    m.HopBackButton.focusState = true
+    setFocusedButton(m.HopBackButton)
   end if
   jumpToPosition(m.playerPosition - 30)
 End Function
@@ -688,10 +687,16 @@ End Function
 
 'handles ClosedCaption button/toggle selection
 Function handleClosedCaption()
+  if m.Transport.opacity < 1.0
+    animateTransport("in")
+  end if
+
+  setFocusedButton(m.ClosedCaption)
+
   'setting the globalCaptionMode will trigger a callback that updates the images and does user tracking
   if m.Video.globalCaptionMode = "On"
     m.Video.globalCaptionMode = "Off"
-  else if m.Video.globalCaptionMode = "Off"
+  else ' If "When mute" or "Instant replay", also turn it on
     m.Video.globalCaptionMode = "On"
   end if
 End Function
@@ -717,16 +722,20 @@ Function jumpToPosition(position)
 
   m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
   m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
-  m.PlayPauseButton.focusState = false
+  setFocusedButton(m.PlayPauseButton)
 End Function
 
 
 'Finds the 'index' of the passed in transport button node and sets it on m.focusedButtonIndex
-Function setFocusedButtonIndex(TransportButton)
+'Additionally updates the image of the button to the focused version and all other buttons to the unfocused version
+Function setFocusedButton(TransportButton)
   for i=0 to m.TransportButtons.getChildCount()-1
-    if TransportButton.id = m.TransportButtons.getChild(i).id
+    button = m.TransportButtons.getChild(i)
+    if TransportButton.id = button.id
       m.focusedButtonIndex = i
-      exit for
+      button.focusState = true
+    else
+      button.focusState = false
     end if
   end for
 End Function

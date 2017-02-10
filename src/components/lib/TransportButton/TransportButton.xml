@@ -9,6 +9,6 @@
     <field id="unfocusedUri" type="string" />
 
     <!-- boolean indicates if the button is focused or not -->
-    <field id="focusState" type="boolean" alwaysNotify="true" />
+    <field id="focusState" type="boolean" />
   </interface>
 </component>

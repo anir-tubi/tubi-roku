@@ -63,6 +63,15 @@ Function getConstants()
       "5000X": true  ' TV (low specs)
     }
 
+    ' models which are TVs have a built-in caption menu we need to handle specially
+    firmwareCaptionMenuModels = {
+      "4620X": true    ' Premiere
+      "4630X": true    ' Premiere Plus
+      "4640X": true    ' Ultra (TBD)
+      "5000X": true    ' Roku TV
+      "6000X": true    ' 4K Roku TV
+    }
+
     if lowMemoryModels[di.GetModel()] <> invalid
       lowMemory = true
     else
@@ -79,6 +88,12 @@ Function getConstants()
       limitedNewUi = true
     else
       limitedNewUi = false
+    end if
+
+    if firmwareCaptionMenuModels[di.GetModel()] <> invalid
+      firmwareCaptionMenu = true
+    else
+      firmwareCaptionMenu = false
     end if
 
     'get client version from manifest
@@ -125,6 +140,7 @@ Function getConstants()
     constants.deviceInfo.countryCode = countryCode ' will be invalid if old version of firmware
     constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.newUi = newUi
+    constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
     constants.deviceInfo.limitedNewUi  = limitedNewUi
     constants.deviceInfo.clientVersion  = clientVersion
 

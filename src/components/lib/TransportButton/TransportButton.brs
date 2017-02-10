@@ -1,5 +1,7 @@
 Function init()
   m.top.observeField("focusState", "onFocusUpdate")
+  m.top.observeField("focusedUri", "onFocusUpdate")
+  m.top.observeField("unfocusedUri", "onFocusUPdate")
 End Function
 
 Function onFocusUpdate()
