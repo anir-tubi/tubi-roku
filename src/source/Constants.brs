@@ -338,11 +338,9 @@ Function getConstants()
       constants.player.transportButtons.toStartFocus = "pkg:/images/transport/sgplayer/icon-to-start-focus.png"
       constants.player.transportButtons.hopForward = "pkg:/images/transport/sgplayer/icon-fwd-30s.png"
       constants.player.transportButtons.hopBack = "pkg:/images/transport/sgplayer/icon-rew-30s.png"
-      constants.player.transportButtons.closedCaptionOn = "pkg:/images/transport/sgplayer/cc-toggle-on.png"
-      constants.player.transportButtons.closedCaptionOnFocus = "pkg:/images/transport/sgplayer/cc-toggle-on-focus.png"
-      constants.player.transportButtons.closedCaptionOff = "pkg:/images/transport/sgplayer/cc-toggle.png"
-      constants.player.transportButtons.closedCaptionOffFocus = "pkg:/images/transport/sgplayer/cc-toggle-focus.png"
-
+      constants.player.transportButtons.closedCaption = "pkg:/images/transport/sgplayer/cc-icon.png"
+      constants.player.transportButtons.closedCaptionFocus = "pkg:/images/transport/sgplayer/cc-icon-focus.png"
+      constants.player.transportButtons.closedCaptionDisabled = "pkg:/images/transport/sgplayer/cc-icon-disabled.png"
 
   'UI properties that should be passed into the scene graph
   constants.ui = {}

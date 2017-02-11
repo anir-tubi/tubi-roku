@@ -197,13 +197,42 @@
           translation="[1320,958]"/>
         <TransportButton
           id="ClosedCaption"
-          width="140"
+          width="60"
           height="60"
-          uri="pkg:/images/transport/sgplayer/cc-toggle.png"
-          unfocusedUri="pkg:/images/transport/sgplayer/cc-toggle.png"
-          focusedUri="pkg:/images/transport/sgplayer/cc-toggle-focus.png"
-          translation="[1697,958]"/>
+          uri="pkg:/images/transport/sgplayer/cc-icon.png"
+          unfocusedUri="pkg:/images/transport/sgplayer/cc-icon.png"
+          focusedUri="pkg:/images/transport/sgplayer/cc-icon-focus.png"
+          translation="[1697,958]" >
+            <Poster
+              id="CCRailOff"
+              width="80"
+              height="60"
+              opacity="1.0"
+              uri="pkg:/images/transport/sgplayer/cc-rail-off.png"
+              translation="[60,0]" />
+            <Poster
+              id="CCRailOn"
+              width="80"
+              height="60"
+              opacity="0.0"
+              uri="pkg:/images/transport/sgplayer/cc-rail-on.png"
+              translation="[60,0]" />
+            <Poster
+              id="CCNipple"
+              width="60"
+              height="60"
+              uri="pkg:/images/transport/sgplayer/cc-nipple.png"
+              translation="[58,0]" />
+        </TransportButton>
       </Group>
+
+      <Poster
+        id="ClosedCaptionDisabled"
+        width="140"
+        height="60"
+        uri="pkg:/images/transport/sgplayer/cc-icon-disabled.png"
+        translation="[1697,958]"
+        visible="false" />
 
     </Group>
 

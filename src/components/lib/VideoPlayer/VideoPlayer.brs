@@ -44,12 +44,12 @@
 
 Function init()
   tubiLog("VideoPlayer.init")
-  ' m.BufferText = m.top.findNode("BufferText")
   m.Spinner = m.top.findNode("BufferSpinner")
   m.Transport = m.top.findNode("Transport")
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.top.observeField("control", "onControlChange")
+  m.top.observeField("content", "onContentChange")
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.ProgressBar = m.top.findNode("ProgressBarForeground")
@@ -78,9 +78,13 @@ Function init()
   m.FastForwardButton = m.TransportButtons.findNode("FastForwardButton")
   m.EndButton = m.TransportButtons.findNode("EndButton")
   m.ClosedCaption = m.TransportButtons.findNode("ClosedCaption")
+  m.CCRailOn = m.TransportButtons.findNode("CCRailOn")
+  m.CCRailOff = m.TransportButtons.findNode("CCRailOff")
+  m.CCNipple = m.TransportButtons.findNode("CCNipple")
   m.buttonUris = m.global.constants.player.transportButtons
   m.focusedButtonIndex = 0
   setFocusedButton(m.PlayPauseButton)
+  m.ClosedCaptionDisabled = m.top.findNode("ClosedCaptionDisabled")
 
   m.Video.observeField("bufferingStatus", "onBufferStatus")
   m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
@@ -93,11 +97,12 @@ Function init()
   m.analyticsInterval = m.global.constants.player.pingFrequency
   m.historyInterval = m.global.constants.player.historyFrequency
 
-  'if global captions are turned on, update default closed caption toggle images
+  'if global captions are turned on, slide the closed caption toggle to on position
+  m.CCSlideAmt = 31
   if m.Video.globalCaptionMode = "On"
-    m.ClosedCaption.unfocusedUri = m.buttonUris.closedCaptionOn
-    m.ClosedCaption.focusedUri = m.buttonUris.closedCaptionOnFocus
-    m.ClosedCaption.focusState = false
+    m.CCRailOn.opacity = 1.0
+    m.CCRailOff.opacity = 0.0
+    m.CCNipple.translation = [m.CCNipple.translation[0] + m.CCSlideAmt, m.CCNipple.translation[1]]
   end if
 End Function
 
@@ -107,6 +112,20 @@ Function onBufferStatus()
     m.Spinner.visible = true
   else
     m.Spinner.visible = false
+  end if
+End Function
+
+
+Function onContentChange()
+  'there are no subtitles so grey out the captions button
+  if m.top.content.subtitleUrls.count() = 0
+    m.TransportButtons.removeChild(m.ClosedCaption)
+    m.ClosedCaptionDisabled.visible = true
+  
+  'there are subtitles, so check if captions button has been greyed out previously
+  else if m.TransportButtons.findNode("ClosedCaption") = invalid
+    m.TransportButtons.appendNode(m.ClosedCaption)
+    m.ClosedCaptionDisabled.visible = false
   end if
 End Function
 
@@ -218,12 +237,14 @@ End Function
 Function onCaptionModeChange()
   tubiLog("VideoPlayer.onCaptionModeChange")
   if m.Video.globalCaptionMode = "On"
-    m.ClosedCaption.unfocusedUri = m.buttonUris.closedCaptionOn
-    m.ClosedCaption.focusedUri = m.buttonUris.closedCaptionOnFocus
+    fade(m.CCRailOn, "in", 0.5)
+    fade(m.CCRailOff, "out", 0.5)
+    slideTo(m.CCNipple, [m.CCNipple.translation[0] + m.CCSlideAmt, m.CCNipple.translation[1]], 0.5)
     value = "on"
   else  'handles "Off", "Instant replay", and "When mute"
-    m.ClosedCaption.unfocusedUri = m.buttonUris.closedCaptionOff
-    m.ClosedCaption.focusedUri = m.buttonUris.closedCaptionOffFocus
+    fade(m.CCRailOn, "out", 0.5)
+    fade(m.CCRailOff, "in", 0.5)
+    slideTo(m.CCNipple, [m.CCNipple.translation[0] - m.CCSlideAmt, m.CCNipple.translation[1]], 0.5)
     value = "off"
   end if
   
@@ -722,7 +743,6 @@ Function jumpToPosition(position)
 
   m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
   m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
-  setFocusedButton(m.PlayPauseButton)
 End Function
 
 
