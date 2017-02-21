@@ -4,11 +4,15 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
 
   <interface>
     <!-- Set to true if the back button was pressed while the video player has focus -->
     <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
-     
+
+    <!-- Set to true if the skip trailer button was pressed -->
+    <field id="skipTrailer" type="boolean" value="false" alwaysNotify="true" />
+
     <!-- Alias fields for the video node -->
     <field id="content" alias="VideoNode.content"/>
     <field id="state" alias="VideoNode.state"/>
@@ -82,6 +86,7 @@
       width="1920"
       height="1080"
       translation="[0,0]"
+      opacity="0.0"
       uri="pkg:/images/transport/sgplayer/transport-gradient.png" />
 
     <Group
@@ -133,11 +138,28 @@
         font="dictionary:Vaud34px"
         text="-00:00:00"
         width="500"
-        translation="[1696,848]"/>
+        translation="[1696,848]" />
 
      <!-- Transport buttons - Transport buttons must be in the order they appear on the screen (from left to right) -->
       <Group
         id="TransportButtons" >
+        <TransportButton
+          id="SkipTrailerButton"
+          width="260"
+          height="80"
+          uri=""
+          unfocusedUri=""
+          focusedUri="pkg:/images/transport/sgplayer/skip-trailer-button.png"
+          translation="[85,949]" >
+          <Label
+            id="SkipTrailerButtonLabel"
+            text="Skip Trailer"
+            font="dictionary:Vaud34px"
+            width="260"
+            height="86"
+            horizAlign="center"
+            vertAlign="center" />
+        </TransportButton>
         <TransportButton
           id="StartButton"
           width="60"
@@ -145,7 +167,7 @@
           uri="pkg:/images/transport/sgplayer/icon-to-start.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-to-start.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-to-start-focus.png"
-          translation="[540,958]"/>
+          translation="[540,958]" />
         <TransportButton
           id="RewindButton"
           width="60"
@@ -153,7 +175,7 @@
           uri="pkg:/images/transport/sgplayer/icon-rew.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-rew.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-rew-focus.png"
-          translation="[670,958]"/>
+          translation="[670,958]" />
         <TransportButton
           id="HopBackButton"
           width="60"
@@ -161,7 +183,7 @@
           uri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-rew-30s-focus.png"
-          translation="[800,958]"/>
+          translation="[800,958]" />
         <!-- play/pause uri will update based on playing state of video -->
         <TransportButton
           id="PlayPauseButton"
@@ -170,7 +192,7 @@
           uri="pkg:/images/transport/sgplayer/icon-play.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-play.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-play-focus.png"
-          translation="[930,958]"/>
+          translation="[930,958]" />
         <TransportButton
           id="HopForwardButton"
           width="60"
@@ -178,7 +200,7 @@
           uri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s-focus.png"
-          translation="[1060,958]"/>
+          translation="[1060,958]" />
         <TransportButton
           id="FastForwardButton"
           width="60"
@@ -186,7 +208,7 @@
           uri="pkg:/images/transport/sgplayer/icon-ffw.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-ffw.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-ffw-focus.png"
-          translation="[1190,958]"/>
+          translation="[1190,958]" />
         <TransportButton
           id="EndButton"
           width="60"
@@ -194,7 +216,7 @@
           uri="pkg:/images/transport/sgplayer/icon-to-end.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-to-end.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-to-end-focus.png"
-          translation="[1320,958]"/>
+          translation="[1320,958]" />
         <TransportButton
           id="ClosedCaption"
           width="60"

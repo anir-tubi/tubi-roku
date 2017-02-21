@@ -70,6 +70,7 @@ Function init()
 
   'buttons
   m.TransportButtons = m.top.findNode("TransportButtons")
+  m.SkipTrailerButton = m.TransportButtons.findNode("SkipTrailerButton")
   m.StartButton = m.TransportButtons.findNode("StartButton")
   m.RewindButton = m.TransportButtons.findNode("RewindButton")
   m.HopBackButton = m.TransportButtons.findNode("HopBackButton")
@@ -117,15 +118,26 @@ End Function
 
 
 Function onContentChange()
+  tubiLog("VideoPlayer.onContentChange")
   'there are no subtitles so grey out the captions button
   if m.top.content.subtitleUrls.count() = 0
     m.TransportButtons.removeChild(m.ClosedCaption)
     m.ClosedCaptionDisabled.visible = true
   
   'there are subtitles, so check if captions button has been greyed out previously
-  else if m.TransportButtons.findNode("ClosedCaption") = invalid
-    m.TransportButtons.appendNode(m.ClosedCaption)
+  else if doesChildExist(m.TransportButtons, m.ClosedCaption) = false
+    m.TransportButtons.appendChild(m.ClosedCaption)
     m.ClosedCaptionDisabled.visible = false
+  end if
+
+  'if it's not a trailer, remove the skip trailer button
+  if m.top.content.isTrailer = false
+    m.TransportButtons.removeChild(m.SkipTrailerButton)
+    setFocusedButton(m.PlayPauseButton)
+
+  'add the skip trailer button if it's a trailer and it doesn't already exist on the transport
+  else if doesChildExist(m.TransportButtons, m.SkipTrailerButton) = false
+    m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
   end if
 End Function
 
@@ -305,7 +317,9 @@ Function onKeyEvent(key As String, press As Boolean)
       else
         'do action based on the current focused button
         focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
-        if focusButtonId = m.StartButton.id
+        if focusButtonId = m.SkipTrailerButton.id
+          handleSkipTrailer()
+        else if focusButtonId = m.StartButton.id
           goToStart()
         else if focusButtonId = m.RewindButton.id
           handleRewind()
@@ -502,6 +516,8 @@ End Function
 
 
 Function resetTransportButtons()
+  m.SkipTrailerButton.focusState = false
+
   m.StartButton.focusState = false
 
   m.RewindButton.focusedUri = m.buttonUris.rewindFocus
@@ -575,6 +591,13 @@ Function endScrub()
   else
     m.Video.seek = m.playerPosition 'will load and play the video at the seeked to point
   end if
+End Function
+
+
+'handles the Skip Trailer selection
+'triggers callback on ContentController to play the full video
+Function handleSkipTrailer()
+  m.top.skipTrailer = true
 End Function
 
 

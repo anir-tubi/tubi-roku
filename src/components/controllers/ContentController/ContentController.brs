@@ -429,8 +429,6 @@ Function onEpisodeFinished(msg As Object)
 End Function
 
 
-
-
 Function onWatchTrailer()
   tubiLog("ContentController.onWatchTrailer")
   content = getDetailScreenContent()
@@ -439,10 +437,12 @@ Function onWatchTrailer()
     trailerContent.url = content.trailerUrls[0]
     trailerContent.streamformat="hls"
     trailerContent.nowPos = 0
+    trailerContent.isTrailer = true
 
     m.videoPlayer.visible = true
     m.videoPlayer.observeField("state", "onTrailerFinished")
     m.videoPlayer.observeField("backButtonPressed", "onTrailerFinished")
+    m.videoPlayer.observeField("skipTrailer", "onTrailerFinished")
     m.videoPlayer.setFocus(true)
     m.videoPlayer.content = trailerContent
     m.videoPlayer.enableAds = false
@@ -452,18 +452,32 @@ Function onWatchTrailer()
   end if
 End Function
 
+
 Function onTrailerFinished(msg As Object)
   tubiLog("ContentController.onTrailerFinished")
   endTrailer = false
-  if msg.getField() = "state" and (msg.getData() = "error" or msg.getData() = "finished") then
-    print "Trailer finished"
-    endTrailer = true
+  if msg.getField() = "state"
+    if msg.getData() = "error" or msg.getData() = "finished" then
+      print "Trailer finished"
+      endTrailer = true
+    end if
+
   else if msg.getField() = "backButtonPressed" then
     print "Back button pressed"
     endTrailer = true
+
+  else if msg.getField() = "skipTrailer"
+    print "Trailer skipped"  'now we need to play the main video
+    m.videoPlayer.unobserveField("backButtonPressed")
+    m.videoPlayer.unobserveField("skipTrailer")
+    m.videoPlayer.unobserveField("state")
+    m.videoPlayer.observeField("state", "onTrailerStopped")
+    m.videoPlayer.control = "stop"
   end if
+
   if endTrailer then
     m.videoPlayer.unobserveField("backButtonPressed")
+    m.videoPlayer.unobserveField("skipTrailer")
     m.videoPlayer.unobserveField("state")
     m.videoPlayer.visible = false
     m.videoPlayer.control = "stop"
@@ -471,6 +485,16 @@ Function onTrailerFinished(msg As Object)
     currentScreen().setFocus(true)
   end if
 End Function
+
+
+Function onTrailerStopped()
+  if m.videoPlayer.state = "stopped"
+    m.videoPlayer.unobserveField("state")
+    content = getDetailScreenContent()
+    playVideoContent(content)
+  end if
+End Function
+
 
 Function onEpisodeList()
   m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
@@ -488,7 +512,6 @@ Function onEpisodeList()
 End Function
 
 
-
 Function onEpisodeSelected()
   m.detailScreen.episodeSelection = m.episodesScreen.episodeSelected
   popScreen()
@@ -499,7 +522,6 @@ Function onEpisodeSelected()
 End Function
 
 
-'
 ' Helper to deduce the content, video or episode, to play or resume
 Function getDetailScreenContent()
   content = invalid

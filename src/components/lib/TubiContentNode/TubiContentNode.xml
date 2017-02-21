@@ -27,6 +27,7 @@
     <field id="nowPos" type="int" />
     <field id="historyId" type="string" />
     <field id="currentEpisodeId" type="string" />
+    <field id="isTrailer" type="boolean" value="false" />
     <field id="trailerUrls" type="stringArray" />
 
     <!-- text to display for a category whose content is empty -->
