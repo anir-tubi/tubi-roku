@@ -562,12 +562,6 @@ Function endScrub()
   m.lastSavedPosition = m.playerPosition
   m.lastPingTime = m.playerPosition
 
-  'since the player will begin playing at the start of the HLS segment, player position will round to the nearest preceding 10 seconds
-  'so we need to set the m.lastButtonPressPos to this interval, so the translation autohides after the appropriate amount of time
-  remainder = m.playerPosition MOD 10
-  m.playerPosition = m.playerPosition - remainder
-  m.lastButtonPressPos = m.playerPosition
-
   resetTransportButtons()
   m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
   m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
@@ -731,13 +725,7 @@ Function jumpToPosition(position)
     position = 0
   end if
 
-  'since the player will begin playing at the start of the HLS segment, player position will round to the nearest preceding 10 seconds
-  'so we need to set the m.lastButtonPressPos to this interval, so the translation autohides after the appropriate amount of time
-  remainder = position MOD 10
-  position = position - remainder
-  m.lastButtonPressPos = position
   m.playerPosition = position
-
   m.Video.seek = position
   m.VideoState = "play"
 
