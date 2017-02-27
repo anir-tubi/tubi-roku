@@ -781,9 +781,11 @@ function ContentProvider_getBookmarksAndPreviouslyViewedFromServer()
   'get previously viewed from server
   previouslyViewedId = m.utils.sendAsyncRequest(settings.previouslyViewedUrlNoPage, getBookmarksPort, "getAllPreviouslyViewed", "GET", true, invalid, headers)
 
-  hasBookmarks = false
-  hasPreviouslyViewed = false
-  basicPreviouslyViewed = invalid
+  bookmarkContinue = false
+  previousContinue = false
+  bookmarkRetries = 0
+  previousRetries = 0
+
   while true
     msg = wait(0, getBookmarksPort)
     if type(msg) = "roUrlEvent"
@@ -791,25 +793,47 @@ function ContentProvider_getBookmarksAndPreviouslyViewedFromServer()
 
       if response.id = bookmarksId
         basicBookmarks = invalid
-        if response.data <> invalid and response.data <> ""
-          basicBookmarks = response.data
+        print "Bookmarks "; bookmarkRetries; " : "; response
+        if response.responseCode >= 200 and response.responseCode < 300
+          if response.data <> invalid and response.data <> ""
+            basicBookmarks = response.data
+          end if
+          basicUserPlaylistData.bookmarks = basicBookmarks
+          bookmarkContinue = true
+          m.handleGetUserPlaylists(settings.bookmarkRegistry, response.data)
+
+        else
+          if bookmarkRetries >= 2 ' means max of 3 total attempts, one regular and 2 retries
+            bookmarkContinue = true
+          else
+            bookmarksId = m.utils.sendAsyncRequest(settings.bookmarksUrlNoPage, getBookmarksPort, "getAllBookmarks", "GET", true, invalid, headers)
+            bookmarkRetries = bookmarkRetries + 1
+          end if
         end if
-        basicUserPlaylistData.bookmarks = basicBookmarks
-        hasBookmarks = true
-        m.handleGetUserPlaylists(settings.bookmarkRegistry, response.data)
 
       else if response.id = previouslyViewedId
         basicPreviouslyViewed = invalid
-        if response.data <> invalid and response.data <> ""
-          basicPreviouslyViewed = response.data
+        print "Previous "; previousRetries; " : " response
+        if response.responseCode >= 200 and response.responseCode < 300
+          if response.data <> invalid and response.data <> ""
+            basicPreviouslyViewed = response.data
+          end if
+          basicUserPlaylistData.previouslyViewed = basicPreviouslyViewed
+          previousContinue = true
+          m.handleGetUserPlaylists(settings.previouslyViewedRegistry, response.data)
+
+        else
+          if previousRetries >= 2 ' means max of 3 total attempts, one regular and 2 retries
+            previousContinue = true
+          else
+            previouslyViewedId = m.utils.sendAsyncRequest(settings.previouslyViewedUrlNoPage, getBookmarksPort, "getAllPreviouslyViewed", "GET", true, invalid, headers)
+            previousRetries = previousRetries + 1
+          end if
         end if
-        basicUserPlaylistData.previouslyViewed = basicPreviouslyViewed
-        hasPreviouslyViewed = true
-        m.handleGetUserPlaylists(settings.previouslyViewedRegistry, response.data)
       end if
     end if
 
-    if hasBookmarks = true and hasPreviouslyViewed = true
+    if (bookmarkContinue = true and previousContinue = true)
       exit while
     end if
 
@@ -826,7 +850,6 @@ end function
 ' function ContentProvider_handleGetUserPlaylists(playlistType, responseData, port)
 function ContentProvider_handleGetUserPlaylists(playlistType, responseData)
   settings = m.utils.getSettings()
-  print playlistType + " RESPONSE "; responseData
 
   basicsFromServer = invalid
   if responseData <> invalid and responseData.len() > 0
