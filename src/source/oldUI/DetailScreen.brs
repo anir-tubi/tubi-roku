@@ -441,7 +441,11 @@ function DetailScreen_showCaptionsDialog(episode)
         end if
       end if
       if dlgMsg.isScreenClosed()
-        return false
+        if episode.showSubtitles <> invalid
+          return episode.showSubtitles
+        else
+          return false
+        end if
       end if
     else
     end if

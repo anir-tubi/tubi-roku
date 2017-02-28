@@ -81,6 +81,7 @@ function AdrisePlayerInternal(config)
     getTransportTime: AdrisePlayer_getTransportTime
     handleVideoFailure: AdrisePlayer_handleVideoFailure
     savePreviouslyViewedUpdate: AdrisePlayer_savePreviouslyViewedUpdate
+    cancelInstantReplay: AdrisePlayer_cancelInstantReplay
   }
 end function
 
@@ -311,6 +312,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
     scrubToPoint: 0
     scrubPercent: 0
     nowPos: 0
+    replayEnd: 0
     displayWidth: m.utils.deviceInfo.displayWidth
     lastsavedPosition: episode.nowPos
   }
@@ -501,6 +503,16 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
           m.lastPingTime = playerStates.nowPos
         end if
+
+        'turns the captions off if instant replay captions have been activated and 30s has elapsed
+        if playerStates.replayEnd > 0 and playerStates.nowPos > playerStates.replayEnd
+          playerStates.replayEnd = 0
+
+          'only turn off the captions if the user hasn't set captions for this specific video to on
+          if episode.showSubtitles = false
+            captions.showSubtitle(false)
+          end if
+        end if
       end if
 
       'show a loading screen while the video buffers
@@ -537,6 +549,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
         'left button or rewind
         if msg.GetIndex() = 4 or msg.GetIndex() = 8
           if playerStates.isScrubbing = false
+            m.cancelInstantReplay(playerStates, episode, captions)
             startScrub(player, scrubTimer, playerStates, episode)
           end if
           'update the speed of scrubbing with max ff or rw at 6
@@ -568,6 +581,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
         'right button or fast forward
         if msg.GetIndex() = 5 or msg.GetIndex() = 9
           if playerStates.isScrubbing = false
+            m.cancelInstantReplay(playerStates, episode, captions)
             startScrub(player, scrubTimer, playerStates, episode)
           end if
           'update the speed of scrubbing with max ff or rw at 6
@@ -630,6 +644,40 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
               player.resume()
             end if
             
+            m.paintToCanvas(progressPercent, playerStates, episode)
+          end if
+        end if
+
+        'instant replay button
+        if msg.GetIndex() = 7
+          'stop any active scrubbing before jumping back due to instant replay button
+          if playerStates.isScrubbing = true
+            shouldBreak = endScrub(player, playerStates, episode)
+            if shouldBreak = true
+              episode.nowPos = playerStates.nowPos
+              episode.playStart = playerStates.nowPos
+              m.canvas.close()
+              return "RESUMEPLAY"
+            end if
+          end if
+
+          'jump back 30s in the video
+          if playerStates.nowPos - 30 < 0
+            playerStates.nowPos = 0
+          else
+            playerStates.nowPos = playerStates.nowPos - 30
+          end if
+          episode.nowPos = playerStates.nowPos
+          player.Seek(playerStates.nowPos * 1000)
+
+          'set up captions for 30s if the user has instant replay captions set globally
+          if m.utils.deviceInfo.captionsMode = "Instant replay"
+            captions.showSubtitle(true)
+            playerStates.replayEnd = playerStates.nowPos + 30
+          end if
+
+          if playerStates.isTransportShowing = true
+            playerStates.isTransportShowing = false
             m.paintToCanvas(progressPercent, playerStates, episode)
           end if
         end if
@@ -1259,3 +1307,16 @@ function AdrisePlayer_savePreviouslyViewedUpdate(episode, nowPos)
   end if
 
 end function
+
+
+Function AdrisePlayer_cancelInstantReplay(playerStates, episode, captions)
+  'if the video was in an instant replay state, cancel the replay
+  if playerStates.replayEnd > 0
+    playerStates.replayEnd = 0
+
+    'only turn off the captions if the user hasn't set captions for this specific video to on
+    if episode.showSubtitles = false
+      captions.showSubtitle(false)
+    end if
+  end if
+End Function
