@@ -661,24 +661,26 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
             end if
           end if
 
-          'jump back 30s in the video
-          if playerStates.nowPos - 30 < 0
-            playerStates.nowPos = 0
-          else
-            playerStates.nowPos = playerStates.nowPos - 30
-          end if
-          episode.nowPos = playerStates.nowPos
-          player.Seek(playerStates.nowPos * 1000)
+          'jump back 30s in the video - only if the video has started playing (ie. ignore during loading)
+          if playerStates.loadProgress = 100
+            if playerStates.nowPos - 30 < 0
+              playerStates.nowPos = 0
+            else
+              playerStates.nowPos = playerStates.nowPos - 30
+            end if
+            episode.nowPos = playerStates.nowPos
+            player.Seek(playerStates.nowPos * 1000)
 
-          'set up captions for 30s if the user has instant replay captions set globally
-          if m.utils.deviceInfo.captionsMode = "Instant replay"
-            captions.showSubtitle(true)
-            playerStates.replayEnd = playerStates.nowPos + 30
-          end if
+            'set up captions for 30s if the user has instant replay captions set globally
+            if m.utils.deviceInfo.captionsMode = "Instant replay"
+              captions.showSubtitle(true)
+              playerStates.replayEnd = playerStates.nowPos + 30
+            end if
 
-          if playerStates.isTransportShowing = true
-            playerStates.isTransportShowing = false
-            m.paintToCanvas(progressPercent, playerStates, episode)
+            if playerStates.isTransportShowing = true
+              playerStates.isTransportShowing = false
+              m.paintToCanvas(progressPercent, playerStates, episode)
+            end if
           end if
         end if
 
