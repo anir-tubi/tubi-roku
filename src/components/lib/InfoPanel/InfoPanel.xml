@@ -87,22 +87,35 @@
       visible="true">
       <Label
         id="SeasonLine1"
-        font="dictionary:Vaud27px"/>        
+        font="dictionary:Vaud27px" />
     </LayoutGroup>
     
     <LayoutGroup
       id="TwoLineInfo"
       layoutDirection="vert"
       itemSpacings="[8]"
-      visible="true">
+      visible="true" >
       <LayoutGroup
         id="FirstLineGroup"
         layoutDirection="horiz"
-        vertAlignment="center">
+        vertAlignment="center" >
         <Label
           id="Line1"
           opacity="0.5"
-          font="dictionary:Vaud27px"/>
+          font="dictionary:Vaud27px" />
+        <Rectangle
+          id="ClosedCaptionRectangle"
+          height="40"
+          width="72"
+          color="0x00000000">
+          <Poster
+            id="ClosedCaptionPoster"
+            loadHeight="36"
+            loadDisplayMode="scaleToFit"
+            translation="[3,0]"
+            loadSync="true"
+            uri="pkg://images/icon-closed-caption.png" />
+        </Rectangle>
         <Rectangle
           height="40"
           width="72"
@@ -112,13 +125,14 @@
             height="36"
             loadHeight="36"
             loadDisplayMode="scaleToFit"
-            translation="[0,0]"/>
+            loadSync="true"
+            translation="[0,0]" />
         </Rectangle>
       </LayoutGroup>
       <Label
         id="Line2"
         opacity="0.5"
-        font="dictionary:Vaud27px"/>
+        font="dictionary:Vaud27px" />
     </LayoutGroup>
     
     <Label

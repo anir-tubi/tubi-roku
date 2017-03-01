@@ -4,6 +4,7 @@ Function init()
   m.CategoryDetails = m.top.findNode("CategoryDetails")
   m.SeasonDetails = m.top.findNode("SeasonDetails")
   m.TwoLineInfo = m.top.findNode("TwoLineInfo")
+  m.ClosedCaptions = m.top.findNode("ClosedCaptionRectangle")
   m.Rating = m.top.findNode("Rating")
   m.Description = m.top.findNode("Description")
   m.Director = m.top.findNode("Director")
@@ -53,6 +54,7 @@ Function onContentChange()
     end if
 
     ' TwoLineInfo
+    firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
     line1Label = m.TwoLineInfo.findNode("Line1")
     line1Label.text = ""
     if content.releasedate <> invalid and content.releasedate <> "" then
@@ -66,8 +68,15 @@ Function onContentChange()
       end if
       line1Label.text = line1Label.text + formatLengthAsEnglish(content.length) + " "
     end if
+
+    'add closed captions if they are available
+    if content.subtitleUrls = invalid or content.subtitleUrls.count() = 0
+      firstLineGroup.removeChild(m.ClosedCaptions)
+    else if content.subtitleUrls <> invalid and content.subtitleUrls.count() > 0
+      firstLineGroup.insertChild(m.ClosedCaptions, 1)
+    end if
+
     if content.rating <> invalid and content.rating <> "" then
-      'line1Label.text = line1Label.text + content.rating
       m.Rating.uri = "pkg:/images/rating-" + Ucase(content.rating) + ".png"
     else
       m.Rating.uri = ""
