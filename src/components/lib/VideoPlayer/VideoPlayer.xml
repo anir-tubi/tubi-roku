@@ -150,6 +150,7 @@
           uri=""
           unfocusedUri=""
           focusedUri="pkg:/images/transport/sgplayer/skip-trailer-button.png"
+          loadSync="true"
           translation="[85,949]" >
           <Label
             id="SkipTrailerButtonLabel"
@@ -167,6 +168,7 @@
           uri="pkg:/images/transport/sgplayer/icon-to-start.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-to-start.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-to-start-focus.png"
+          loadSync="true"
           translation="[540,958]" />
         <TransportButton
           id="RewindButton"
@@ -175,6 +177,7 @@
           uri="pkg:/images/transport/sgplayer/icon-rew.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-rew.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-rew-focus.png"
+          loadSync="true"
           translation="[670,958]" />
         <TransportButton
           id="HopBackButton"
@@ -183,6 +186,7 @@
           uri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-rew-30s-focus.png"
+          loadSync="true"
           translation="[800,958]" />
         <!-- play/pause uri will update based on playing state of video -->
         <TransportButton
@@ -192,6 +196,7 @@
           uri="pkg:/images/transport/sgplayer/icon-play.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-play.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-play-focus.png"
+          loadSync="true"
           translation="[930,958]" />
         <TransportButton
           id="HopForwardButton"
@@ -200,6 +205,7 @@
           uri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s-focus.png"
+          loadSync="true"
           translation="[1060,958]" />
         <TransportButton
           id="FastForwardButton"
@@ -208,6 +214,7 @@
           uri="pkg:/images/transport/sgplayer/icon-ffw.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-ffw.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-ffw-focus.png"
+          loadSync="true"
           translation="[1190,958]" />
         <TransportButton
           id="EndButton"
@@ -216,6 +223,7 @@
           uri="pkg:/images/transport/sgplayer/icon-to-end.png"
           unfocusedUri="pkg:/images/transport/sgplayer/icon-to-end.png"
           focusedUri="pkg:/images/transport/sgplayer/icon-to-end-focus.png"
+          loadSync="true"
           translation="[1320,958]" />
         <TransportButton
           id="ClosedCaption"
@@ -224,6 +232,7 @@
           uri="pkg:/images/transport/sgplayer/cc-icon.png"
           unfocusedUri="pkg:/images/transport/sgplayer/cc-icon.png"
           focusedUri="pkg:/images/transport/sgplayer/cc-icon-focus.png"
+          loadSync="true"
           translation="[1697,958]" >
             <Poster
               id="CCRailOff"
@@ -231,6 +240,7 @@
               height="60"
               opacity="1.0"
               uri="pkg:/images/transport/sgplayer/cc-rail-off.png"
+              loadSync="true"
               translation="[60,0]" />
             <Poster
               id="CCRailOn"
@@ -238,12 +248,14 @@
               height="60"
               opacity="0.0"
               uri="pkg:/images/transport/sgplayer/cc-rail-on.png"
+              loadSync="true"
               translation="[60,0]" />
             <Poster
               id="CCNipple"
               width="60"
               height="60"
               uri="pkg:/images/transport/sgplayer/cc-nipple.png"
+              loadSync="true"
               translation="[58,0]" />
         </TransportButton>
       </Group>
@@ -253,6 +265,7 @@
         width="140"
         height="60"
         uri="pkg:/images/transport/sgplayer/cc-icon-disabled.png"
+        loadSync="true"
         translation="[1697,958]"
         visible="false" />
 
