@@ -354,8 +354,8 @@ function DetailScreen_showCaptionsDialog(episode)
   dialog = CreateObject("roMessageDialog")
   dialog.SetMessagePort(port)
 
-  globalCaptions = m.utils.deviceInfo.captionsMode
-
+  deviceInfo = CreateObject("roDeviceInfo")
+  globalCaptions = deviceInfo.GetCaptionsMode()
 
   'if we have subtitles set the appropriate text
   if episode.subtitles <> invalid and episode.subtitles.languages <> invalid
@@ -391,9 +391,9 @@ function DetailScreen_showCaptionsDialog(episode)
 
     'makes sure that the highlighted selection always starts at off if episode.showSubtitles is currently set to false
     'in other words, the initial selection will be what the current state is
-    if episode.showSubtitles = "Off"
+    if globalCaptions = "Off"
       currIndex = 0
-    else if episode.showSubtitles = "Instant replay"
+    else if globalCaptions = "Instant replay"
       currIndex = 1
     end if
 
@@ -417,7 +417,7 @@ function DetailScreen_showCaptionsDialog(episode)
       if dlgMsg.isButtonPressed()
         buttonIndex = dlgMsg.GetIndex()
         if buttonIndex = 0
-          episode.showSubtitles = "Off"
+          deviceInfo.setCaptions("Off")
 
           m.utils.trackEvent({
             trackType: "subtitles"
@@ -427,16 +427,14 @@ function DetailScreen_showCaptionsDialog(episode)
           })
 
           m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles disabled")
-          return "Off"
         else if buttonIndex = 1
-          episode.showSubtitles = "Instant replay"
+          deviceInfo.setCaptions("Instant replay")
           m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles set to Instant replay")
-          return "Instant replay"
         else
           episode.subtitles.current = episode.subtitles.languages[buttonIndex-2].name
           episode.subtitleUrl = episode.subtitles.languages[buttonIndex-2].url
-          episode.showSubtitles = "On"
-          
+          deviceInfo.setCaptions("On")
+
           m.utils.trackEvent({
             trackType: "subtitles"
             ctx: episode.id
@@ -445,17 +443,13 @@ function DetailScreen_showCaptionsDialog(episode)
           })
 
           m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles set to " + episode.subtitles.current)
-          return "On"
         end if
+        return deviceInfo.GetCaptionsMode()
       end if
+
       if dlgMsg.isScreenClosed()
-        if episode.showSubtitles <> invalid
-          return episode.showSubtitles
-        else
-          return "Off"
-        end if
+        return deviceInfo.GetCaptionsMode()
       end if
-    else
     end if
   end while
 end function
