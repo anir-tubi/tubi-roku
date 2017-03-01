@@ -417,7 +417,7 @@ function DetailScreen_showCaptionsDialog(episode)
       if dlgMsg.isButtonPressed()
         buttonIndex = dlgMsg.GetIndex()
         if buttonIndex = 0
-          deviceInfo.setCaptions("Off")
+          deviceInfo.setCaptionsMode("Off")
 
           m.utils.trackEvent({
             trackType: "subtitles"
@@ -428,12 +428,12 @@ function DetailScreen_showCaptionsDialog(episode)
 
           m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles disabled")
         else if buttonIndex = 1
-          deviceInfo.setCaptions("Instant replay")
+          deviceInfo.setCaptionsMode("Instant replay")
           m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles set to Instant replay")
         else
           episode.subtitles.current = episode.subtitles.languages[buttonIndex-2].name
           episode.subtitleUrl = episode.subtitles.languages[buttonIndex-2].url
-          deviceInfo.setCaptions("On")
+          deviceInfo.setCaptionsMode("On")
 
           m.utils.trackEvent({
             trackType: "subtitles"
