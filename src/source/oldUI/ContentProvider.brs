@@ -562,12 +562,13 @@ sub ContentProvider_getAllEpisodesForPlaylistFromServer (playlist, source)
             languages: []
           }
 
-          'set the inital subtitle on/off state for the video
-          if m.utils.deviceInfo.captionsMode = "On"
-            playlist.videosPrelim[xmlId].showSubtitles = true
-          else
-            playlist.videosPrelim[xmlId].showSubtitles = false
+          'set the inital subtitle On/Off/Instant replay state for the video
+          if m.utils.deviceInfo.captionsMode = "On" or m.utils.deviceInfo.captionsMode = "Instant replay"
+            playlist.videosPrelim[xmlId].showSubtitles = m.utils.deviceInfo.captionsMode
+          else 
+            playlist.videosPrelim[xmlId].showSubtitles = "Off"
           end if
+
 
           'if there is only one subtitle make it the default'
           if videoDetails.subtitles.count() = 1
@@ -1218,10 +1219,10 @@ function ContentProvider_translate(contentFromServer, parentId, parentType)
 
     'set the inital subtitle on/off state for the video
     if translatedContent.type = "video"
-      if m.utils.deviceInfo.captionsMode = "On"
-        translatedContent.showSubtitles = true
+      if m.utils.deviceInfo.captionsMode = "On" or m.utils.deviceInfo.captionsMode = "Instant replay"
+        translatedContent.showSubtitles = m.utils.deviceInfo.captionsMode
       else
-        translatedContent.showSubtitles = false
+        translatedContent.showSubtitles = "Off"
       end if
     end if
 

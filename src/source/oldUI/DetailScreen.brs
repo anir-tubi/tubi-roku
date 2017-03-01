@@ -370,14 +370,16 @@ function DetailScreen_showCaptionsDialog(episode)
     currIndex = 0
     if languages.count() = 1
       dialog.AddButton(0, "Off")
-      dialog.AddButton(1, "On")
+      dialog.AddButton(1, "Instant replay")
+      dialog.AddButton(2, "On")
       if curr = languages[0].name
-        currIndex = 1
+        currIndex = 2
       end if
 
     else
       dialog.AddButton(0, "No subtitles")
-      count = 1
+      dialog.AddButton(1, "Instant replay")
+      count = 2
       For Each n In languages
         dialog.AddButton(count, n.name)
         if curr = n.name
@@ -389,8 +391,10 @@ function DetailScreen_showCaptionsDialog(episode)
 
     'makes sure that the highlighted selection always starts at off if episode.showSubtitles is currently set to false
     'in other words, the initial selection will be what the current state is
-    if episode.showSubtitles = false
+    if episode.showSubtitles = "Off"
       currIndex = 0
+    else if episode.showSubtitles = "Instant replay"
+      currIndex = 1
     end if
 
   'there are no captions/subtitles so let the user know - this should only happen if user presses star while watching content
@@ -413,7 +417,7 @@ function DetailScreen_showCaptionsDialog(episode)
       if dlgMsg.isButtonPressed()
         buttonIndex = dlgMsg.GetIndex()
         if buttonIndex = 0
-          episode.showSubtitles = false
+          episode.showSubtitles = "Off"
 
           m.utils.trackEvent({
             trackType: "subtitles"
@@ -423,11 +427,15 @@ function DetailScreen_showCaptionsDialog(episode)
           })
 
           m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles disabled")
-          return false
+          return "Off"
+        else if buttonIndex = 1
+          episode.showSubtitles = "Instant replay"
+          m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles set to Instant replay")
+          return "Instant replay"
         else
-          episode.subtitles.current = episode.subtitles.languages[buttonIndex-1].name
-          episode.subtitleUrl = episode.subtitles.languages[buttonIndex-1].url
-          episode.showSubtitles = true
+          episode.subtitles.current = episode.subtitles.languages[buttonIndex-2].name
+          episode.subtitleUrl = episode.subtitles.languages[buttonIndex-2].url
+          episode.showSubtitles = "On"
           
           m.utils.trackEvent({
             trackType: "subtitles"
@@ -437,14 +445,14 @@ function DetailScreen_showCaptionsDialog(episode)
           })
 
           m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles set to " + episode.subtitles.current)
-          return true
+          return "On"
         end if
       end if
       if dlgMsg.isScreenClosed()
         if episode.showSubtitles <> invalid
           return episode.showSubtitles
         else
-          return false
+          return "Off"
         end if
       end if
     else

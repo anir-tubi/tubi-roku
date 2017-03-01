@@ -139,7 +139,7 @@ function AdrisePlayer_playVideo(episode as Object)
     value: episode.id
     ctx: episode.nowPos
     extraCtx: {
-      subtitles: episode.showSubtitles
+      subtitles: episode.showSubtitles = "On"
       livetv: m.linearTvOn
     }
     port: m.playerPort
@@ -294,7 +294,11 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
   captions.SetMode(1)
   captions.SetMessagePort(m.playerPort)
   'show the subtitles if the episode says we should
-  captions.showSubtitle(episode.showSubtitles)
+  if episode.showSubtitles = "On"
+    captions.showSubtitle(true)
+  else
+    captions.showSubtitle(false)
+  end if
 
   'object that will help us determine how long we've been scrubbing for
   scrubTimer = CreateObject("roTimespan")
@@ -509,7 +513,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           playerStates.replayEnd = 0
 
           'only turn off the captions if the user hasn't set captions for this specific video to on
-          if episode.showSubtitles = false
+          if episode.showSubtitles <> "On"
             captions.showSubtitle(false)
           end if
         end if
@@ -672,7 +676,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
             player.Seek(playerStates.nowPos * 1000)
 
             'set up captions for 30s if the user has instant replay captions set globally
-            if m.utils.deviceInfo.captionsMode = "Instant replay"
+            if episode.showSubtitles = "Instant replay"
               captions.showSubtitle(true)
               playerStates.replayEnd = playerStates.nowPos + 30
             end if
@@ -690,9 +694,8 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           player.pause()
           
           'show a dialog that will let users turn on/off captions
-          if GetGlobalAA().app.detailScreen.showCaptionsDialog(episode) = true
+          if GetGlobalAA().app.detailScreen.showCaptionsDialog(episode) = "On"
             captions.showSubtitle(true)
-          
           else
             captions.showSubtitle(false)
           end if
@@ -1317,7 +1320,7 @@ Function AdrisePlayer_cancelInstantReplay(playerStates, episode, captions)
     playerStates.replayEnd = 0
 
     'only turn off the captions if the user hasn't set captions for this specific video to on
-    if episode.showSubtitles = false
+    if episode.showSubtitles <> "On"
       captions.showSubtitle(false)
     end if
   end if
