@@ -395,7 +395,7 @@ Function addToQueue()
     m.AuthTask.observeField("bookmarkId", "onBookmarked")
     m.AuthTask.control = "RUN"
     m.isWaitingForServerResponse = true
-    m.AddQueueMenuItem.title = "Adding ..."
+    m.AddQueueMenuItem.title = "Adding..."
   end if
 End Function
 
@@ -474,7 +474,7 @@ Function removeFromQueue()
     m.AuthTask.observeField("result", "onBookmarkRemoved")
     m.AuthTask.control = "RUN"
     m.isWaitingForServerResponse = true
-    m.RemoveQueueMenuItem.title = "Removing ..."
+    m.RemoveQueueMenuItem.title = "Removing..."
   end if
 End Function
 
@@ -545,7 +545,7 @@ Function removeFromHistory()
     m.AuthTask.observeField("result", "onHistoryRemoved")
     m.AuthTask.control = "RUN"
     m.isWaitingForServerResponse = true
-    m.RemoveHistoryMenuItem.title = "Removing ..."
+    m.RemoveHistoryMenuItem.title = "Removing..."
   end if
 End Function
 
