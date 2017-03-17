@@ -132,7 +132,9 @@
       <Label
         id="Line2"
         opacity="0.5"
-        font="dictionary:Vaud27px" />
+        width="875"
+        ellipsizeOnBoundary="true"
+        font="dictionary:Vaud27px "/>
     </LayoutGroup>
     
     <Label
@@ -170,6 +172,8 @@
       <Label
         id="Director"
         font="dictionary:Vaud27px"
+        ellipsizeOnBoundary="true"
+        width="710"        
         visible="true" />
     </LayoutGroup>
 

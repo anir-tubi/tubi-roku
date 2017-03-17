@@ -62,11 +62,6 @@ Function init()
   m.continuousEvents = constants.performance.contentGrid.continuousEvents
 
   m.itemPool = createNodePool(m.top.itemComponentName, 0)
-
-  ' An internal reference to a parent content node of m.top.content.  This is that
-  ' onContentChange can check if we have a new set of content, invalidating all
-  ' grid items, or just the children of the same content node have been updated.
-  m.internalContent = invalid
 End Function
 
 Function onItemComponentNameChange()
@@ -167,7 +162,6 @@ Function onContentChange() As Void
     for i=0 to m.items.getChildCount()-1
       removeAndRelease(m.items.getChild(0))
     end for
-    m.internalContent = invalid
     return
   end if
   m.numItems = getContentCount()
@@ -187,12 +181,7 @@ Function onContentChange() As Void
   m.internalNumColumns = numColumns
 
   ' preload the visible content
-  if m.internalContent <> invalid and m.internalContent.isSameNode(content) then
-    loadVisiblePosters(true)
-  else
-    loadVisiblePosters(false)
-  end if
-  m.internalContent = content
+  loadVisiblePosters(false)
 
   if m.top.isInFocusChain()
     m.focusBox.visible = true

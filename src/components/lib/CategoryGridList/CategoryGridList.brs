@@ -244,7 +244,8 @@ Function onMetadataFetchTaskResponse() As Void
       ' append new items to existing content
       if newContent.offset <= (contentGrid.content.offset + contentGrid.content.getChildCount()) then
         overlap = (contentGrid.content.offset + contentGrid.content.getChildCount()) - newContent.offset
-        append = newContent.getChildren(newContent.getChildCount() - overlap, overlap)
+        contentGrid.content.removeChildrenIndex(overlap, contentGrid.content.getChildCount()-overlap)
+        append = newContent.getChildren(newContent.getChildCount(), 0)
         contentGrid.content.appendChildren(append)
       end if        
     end if

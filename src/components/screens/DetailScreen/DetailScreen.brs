@@ -414,19 +414,19 @@ Function onBookmarked()
   ' or task
   bookmarkIds = m.global.bookmarkIds
   if bookmarkIds <> invalid
-    if m.top.shortContent.type = "series"
+    if m.top.content.type = "series"
       tubiLog("Appending series to bookmarks")
       newSeries = {}
-      newSeries[m.top.shortContent.id] = m.AuthTask.bookmarkId
+      newSeries[m.top.content.id] = m.AuthTask.bookmarkId
       newSeries.append(bookmarkIds.series)
       videos = bookmarkIds.videos
       m.global.bookmarkIds = {
         series: newSeries
         videos: videos
       }
-    else if m.top.shortContent.type = "video"
+    else if m.top.content.type = "video"
       newVideos = {}
-      newVideos[m.top.shortContent.id] = m.AuthTask.bookmarkId
+      newVideos[m.top.content.id] = m.AuthTask.bookmarkId
       newVideos.append(bookmarkIds.videos)
       series = bookmarkIds.series
       m.global.bookmarkIds = {
@@ -437,7 +437,7 @@ Function onBookmarked()
   end if
   bookmarkOrder = m.global.bookmarkOrder
   if bookmarkOrder <> invalid
-    if m.top.shortContent.type = "series" then
+    if m.top.content.type = "series" then
       newBookmarkOrder = ["0"+m.top.content.id]
     else
       newBookmarkOrder = [m.top.content.id]
@@ -488,20 +488,20 @@ Function onBookmarkRemoved()
   bookmarkIds = m.global.bookmarkIds
   'remove the bookmark
   if bookmarkIds <> invalid
-    if m.top.shortContent.type = "series"
+    if m.top.content.type = "series"
       tubiLog("Removing series to bookmarks")
       newSeries = {}
       newSeries.append(bookmarkIds.series)
-      newSeries.delete(m.top.shortContent.id)
+      newSeries.delete(m.top.content.id)
       videos = bookmarkIds.videos
       m.global.bookmarkIds = {
         series: newSeries
         videos: videos
       }
-    else if m.top.shortContent.type = "video"
+    else if m.top.content.type = "video"
       newVideos = {}
       newVideos.append(bookmarkIds.videos)
-      newVideos.delete(m.top.shortContent.id)
+      newVideos.delete(m.top.content.id)
       series = bookmarkIds.series
       m.global.bookmarkIds = {
         series: series
@@ -514,8 +514,8 @@ Function onBookmarkRemoved()
     newBookmarkOrder = []
     newBookmarkOrder.append(bookmarkOrder)
     for i=0 to newBookmarkOrder.count()-1
-      if m.top.shortContent.type = m.global.constants.ui.contentTypes.series and newBookmarkOrder[i] = "0"+m.top.shortContent.id then newBookmarkOrder.delete(i)
-      if m.top.shortContent.type = m.global.constants.ui.contentTypes.video and newBookmarkOrder[i] = m.top.shortContent.id then newBookmarkOrder.delete(i)
+      if m.top.content.type = m.global.constants.ui.contentTypes.series and newBookmarkOrder[i] = "0"+m.top.content.id then newBookmarkOrder.delete(i)
+      if m.top.content.type = m.global.constants.ui.contentTypes.video and newBookmarkOrder[i] = m.top.content.id then newBookmarkOrder.delete(i)
     end for
     m.global.bookmarkOrder = newBookmarkOrder
   end if
