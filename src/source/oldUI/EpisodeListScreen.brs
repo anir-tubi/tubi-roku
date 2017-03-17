@@ -4,9 +4,10 @@ function EpisodeListScreen(cp, appSettings, utils)
     appSettings: appSettings
     utils: utils
     show: EpisodeListScreen_show
-    autoPlay: function(series, item1, item2)
+    autoPlay: function(series, item1, item2, isSeason)
 			m.autoplayItem1 = item1
 			m.autoplayItem2 = item2
+      m.autoplayIsSeason = isSeason
 			m.show(series)
 		end function
 
@@ -67,7 +68,7 @@ function EpisodeListScreen_show(series)
 
   'set the content on to the screen - also gets all the series season/episode meta data
   if child.playlist <> invalid
-    m.set2Level(screen, invalid, series)
+    m.set2Level(screen, invalid, invalid, series)
     isTwoLevel = true
   else 'this should not happen if series are given seasons (all series should have at least 1 season)
     list = []
@@ -99,15 +100,19 @@ function EpisodeListScreen_show(series)
   		listIndex = m.autoplayItem1
   		itemIndex =  m.autoplayItem2
   		isTwoLevel = true
-  		m.set2Level(screen, listIndex, series)
+  		m.set2Level(screen, listIndex, itemIndex, series)
   	  subList = m.cp.getChildItem(playlist, listIndex)
 			m.autoplayItem1 = invalid
 			m.autoplayItem2 = invalid
-			itemIndex = GetGlobalAA().app.handleItemPicked(subList.playlist, listIndex, itemIndex, handleItemSource)
+
+      if m.autoplayIsSeason = false
+			 itemIndex = GetGlobalAA().app.handleItemPicked(subList.playlist, listIndex, itemIndex, handleItemSource)
+      end if
+
     else
-    	listIndex = invalid
   		itemIndex =  m.autoplayItem1
 			m.autoplayItem1 = invalid
+      m.set2Level(screen, listIndex, itemIndex, series)
   	  itemIndex = GetGlobalAA().app.handleItemPicked(playlist, listIndex, itemIndex, handleItemSource)
     end if
 
@@ -132,7 +137,13 @@ function EpisodeListScreen_show(series)
         isTwoLevel = true
         listIndex = msg.getIndex()
 
-        m.set2Level(screen, listIndex, series)
+        'setting item index here and after the m.set2Level call allows for deep linking to work accurately
+        'while also letting the user's view history take affect.
+        if itemIndex = 0
+          itemIndex = invalid
+        end if
+        m.set2Level(screen, listIndex, itemIndex, series)
+        itemIndex = 0
 
         ' 'populate the content for the season/playlist if we don't have it yet
         ' if playlist.episodes[listIndex].playlist.haveAllEpisodes <> true
@@ -203,21 +214,24 @@ function EpisodeListScreen_getActiveEpisode(episodes)
   return best
 end function
 
-function EpisodeListScreen_set2Level(screen, listIndex, series)
+function EpisodeListScreen_set2Level(screen, listIndex, itemIndex, series)
   playlist = series.playlist
 
   activeContent = m.getActiveContent(series, invalid, invalid)
-  
+
   activeSeason = 0
   activeEpisode = 0
 
   if listIndex <> invalid
     activeSeason = listIndex
-  
+
+    if itemIndex <> invalid
+      activeEpisode = itemIndex
+
     'if we are on the season that contains the 'current episode' then focus on it - otherwise focus on the first episode in the season
-    if listIndex = activeContent.season
+    else if listIndex = activeContent.season
       activeEpisode = activeContent.episode
-    end if 
+    end if
   
   else
     activeSeason = activeContent.season

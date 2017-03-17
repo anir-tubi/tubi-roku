@@ -298,6 +298,7 @@ End Function
 ' Parse launch arguments for any deep linking hints then redirect 
 ' scene graph to that content.
 '
+' Feed: http://cms.adrise.com/roku/partnerSearch/xml
 '
 ' ARGUMENTS TO ROKU MAIN():
 '
@@ -309,7 +310,7 @@ End Function
 ' Deep link args:
 '   contentId   - string identifier
 '   entry       - 'banner' or omitted for search source
-'   mediaType   - "series", "episode", "movie", "shortform", and "live"
+'   mediaType   - "season", "series", "episode", "movie", "shortform", and "live"
 '   source      - 'meta-search', 'external-control'
 '
 ' NOTE: 'entry' seems undocumented and may have been added special for adRise by Roku
@@ -344,7 +345,7 @@ Function deepLink(args, controller, utils)
     ' contentID=335&mediaType=series
     '
     ' See full list of mediaType at https://sdkdocs.roku.com/display/sdkdoc/External+Control+Guide
-    if args.mediaType = "series"
+    if args.mediaType = "series" or args.mediaType = "season"
       content.type = "series"
       trackingUri = "/series"
     else if args.mediaType = "movie"

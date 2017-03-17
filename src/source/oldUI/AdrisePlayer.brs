@@ -315,6 +315,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
     loadProgress: 0
     isTransportShowing: false
     isPaused: false
+    isInHopMode: false
     isScrubbing: false
     maxScrub: 7
     scrubAmount: 0
@@ -378,14 +379,16 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
       return shouldBreak
     end if
 
-    player.Seek(playerStates.scrubToPoint * 1000)
-    playerStates.isTransportShowing = false
-    playerStates.isPaused = false
+    if playerStates.isInHopMode = false
+      player.Seek(playerStates.scrubToPoint * 1000)
+      playerStates.isTransportShowing = false
+      playerStates.isPaused = false
+    end if
+
     playerStates.isScrubbing = false
     playerStates.scrubAmount = 0
     playerStates.totalScrubTime = 0
     playerStates.scrubToPoint = 0
-
 
     return shouldBreak 'false
   end function
@@ -552,8 +555,12 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           return "CLOSED"
         end if
         
-        'left button or rewind
-        if msg.GetIndex() = 4 or msg.GetIndex() = 8
+        'rewind
+        if msg.GetIndex() = 8
+          if playerStates.isInHopMode = true
+            playerStates.isInHopMode = false
+          end if
+
           if playerStates.isScrubbing = false
             m.cancelInstantReplay(playerStates, deviceInfo.GetCaptionsMode(), captions)
             startScrub(player, scrubTimer, playerStates, episode)
@@ -584,8 +591,12 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           end if
         end if
   
-        'right button or fast forward
-        if msg.GetIndex() = 5 or msg.GetIndex() = 9
+        'fast forward
+        if msg.GetIndex() = 9
+          if playerStates.isInHopMode = true
+            playerStates.isInHopMode = false
+          end if
+
           if playerStates.isScrubbing = false
             m.cancelInstantReplay(playerStates, deviceInfo.GetCaptionsMode(), captions)
             startScrub(player, scrubTimer, playerStates, episode)
@@ -616,6 +627,53 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           end if
         end if
 
+        'left/right buttons: 10 second hop back/forth
+        if msg.GetIndex() = 4 or msg.GetIndex() = 5
+          playerStates.isInHopMode = true
+
+          'if user is fast forwarding or rewinding stop the scrub
+          if playerStates.isScrubbing = true
+            shouldBreak = endScrub(player, playerStates, episode)
+            if shouldBreak = true
+              episode.nowPos = playerStates.nowPos
+              episode.playStart = playerStates.nowPos
+              m.canvas.close()
+              return "RESUMEPLAY"
+            end if
+
+          'if the user is in normal playback mode then show the transport
+          else
+            if playerStates.isTransportShowing = false
+              playerStates.isTransportShowing = true
+            end if
+
+            playerStates.isPaused = true
+            player.pause()
+          end if
+
+          if msg.GetIndex() = 4
+            'hop back
+            print playerStates
+            if playerStates.nowPos - 10 < 0
+               playerStates.nowPos = 0
+            else
+              playerStates.nowPos = playerStates.nowPos - 10
+            end if
+          else
+            'hop forward
+            if playerStates.nowPos + 10 > episode.length - 5
+               playerStates.nowPos = episode.length - 5
+            else
+              playerStates.nowPos = playerStates.nowPos + 10
+            end if
+          end if
+
+          episode.nowPos = playerStates.nowPos
+          episode.playStart = playerStates.nowPos
+
+          m.paintToCanvas(progressPercent, playerStates, episode)
+        end if
+
         'ok/select
         if msg.GetIndex() = 6
 
@@ -628,6 +686,14 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
               m.canvas.close()
               return "RESUMEPLAY"
             end if
+
+          'hop to the position the user has chosen and close the transport
+          else if playerStates.isInHopMode = true
+            playerStates.isPaused = false
+            playerStates.isInHopMode = false
+            playerStates.isTransportShowing = false
+            player.seek(playerStates.nowPos * 1000)
+            m.paintToCanvas(progressPercent, playerStates, episode)
 
           'show the transport overlay while continuing the show
           else if playerStates.isTransportShowing = false
@@ -718,7 +784,15 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
               return "RESUMEPLAY"
             end if
 
-          'if not scrubbing, 
+          'hop to the position the user has chosen and close the transport
+          else if playerStates.isInHopMode = true
+            playerStates.isPaused = false
+            playerStates.isInHopMode = false
+            playerStates.isTransportShowing = false
+            player.seek(playerStates.nowPos * 1000)
+            m.paintToCanvas(progressPercent, playerStates, episode)
+
+          'if not scrubbing or hopping
           else
             'and not paused, then pause the show and show the transport overlay
             if playerStates.isPaused = false

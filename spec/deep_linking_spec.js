@@ -91,7 +91,7 @@ describe("deep-linking", function() {
       source: "meta-search"
     });
   });
-
+  
   
   /*
    * CONTENT ID: 321221
@@ -161,6 +161,29 @@ describe("deep-linking", function() {
       this.launchChannel({
         contentId: contentId,
         mediaType: "series",
+        source: "meta-search"
+      });
+    });
+  });
+
+   /*
+    * CONTENT ID: 302800
+    * Title: S02:E05 - You, I'll Be Following
+    * Type: Season
+    *
+    * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=season"
+    * 
+    */
+    it("when mediatype is series", function(done) {
+      var contentId = "302800";
+      this.device.on('debugData', function(data) {
+        if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
+          done();
+        }
+      }); 
+      this.launchChannel({
+        contentId: contentId,
+        mediaType: "season",
         source: "meta-search"
       });
     });

@@ -161,10 +161,16 @@ function AdriseApp_runApp()
       'start building the appropriate URI for deeplink user event
       destination = "/video/" + m.params.contentID
 
-      'if deep linked from Roku search it's possible that we are deep linking to a series, instead of actual video content
-      'deep links from search for series should like:
-      'contentID=335&MediaType=series
-      if m.params.MediaType = "series"
+      'if deep linked from Roku search it's possible that we are deep linking to a series/season, instead of actual video content
+      'deep links from search for season should like:
+      'contentID=340262&MediaType=season
+      if m.params.MediaType = "season"
+        m.cp.autoplayIsSeason = true
+        destination = "/series/episodelist/"
+
+      'this is supposedly deprecated but I don't trust that it doesn't still exist
+      'contentID=335&MediaType=series'
+      else if m.params.MediaType = "series"
         m.cp.autoplayIsSeries = true
         destination = "/series/episodelist/" + m.params.contentID
       end if
@@ -474,9 +480,16 @@ Function AdriseApp_handleItemPicked(playlist, listIndex, itemIndex, source)
         })      
 	    
         m.episodeListScreen.show(episode)
-      else
-      	m.episodeListScreen.autoPlay(episode, m.cp.autoplayData.path[2], m.cp.autoplayData.path[3])
+
+      else if m.cp.autoplayIsSeries = true
+        'm.cp.autoplayIsSeries = true if deeplinking occurred with the mediaType="series" parameter
+        m.episodeListScreen.autoPlay(episode, m.cp.autoplayData.path[2], m.cp.autoplayData.path[3], m.cp.autoplayIsSeries)
       	m.cp.autoplayData = invalid
+
+      else
+        'm.cp.autoplayIsSeason = true if deeplinking occurred with the mediaType="season" parameter
+        m.episodeListScreen.autoPlay(episode, m.cp.autoplayData.path[2], m.cp.autoplayData.path[3], m.cp.autoplayIsSeason)
+        m.cp.autoplayData = invalid
       end if
     end if
   end if

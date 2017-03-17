@@ -919,6 +919,7 @@ function RegisterScreen(uniqueId, utils)
         end if
 
         if (webRegAsyncId <> 0)
+          codeRetryCount = 0
         
           while true
             'keep running through this loop(listening for events) - if we are polling and 2 seconds have passed since the last poll
@@ -950,24 +951,30 @@ function RegisterScreen(uniqueId, utils)
                       haveRegistrationCode = true
                       exit while
                     
+                    'did not successfully get a code from the server - so retry
                     else
-                      m.showMessage("We're sorry", "Could not get code from server.")
-                      
-                      m.utils.trackEvent({
-                        trackType: "registerFail"
-                        value: "bad-server-response-code"
-                        port: webRegPort
-                      })
+                      if codeRetryCount <= 3
+                        webRegAsyncId = m.utils.sendAsyncRequest(webRegUrlGetCode, webRegPort, "webRegistration", "POST", true, getCodeBodyJson, getCodeHeaders)
+                        
+                        m.utils.trackEvent({
+                          trackType: "registerFail"
+                          value: "bad-server-response-code"
+                          port: webRegPort
+                        })
 
-                      m.utils.trackEvent({
-                        trackType: "navigate"
-                        value: "/home"
-                        ctx: "/deviceregistration/code"
-                        port: webRegPort
-                      })
+                        codeRetryCount = codeRetryCount + 1
+                      else
+                        m.utils.trackEvent({
+                          trackType: "navigate"
+                          value: "/home"
+                          ctx: "/deviceregistration/code"
+                          port: webRegPort
+                        })
 
-                      webRegScreen.Close()
-                      return false
+                        m.showMessage("We're sorry", "Could not get code from server.")
+                        webRegScreen.Close()
+                        return false
+                      end if
                     end if
                   end if
                 else if haveRegistrationCode = true 'means the current response is to a get confirmation request (polling)

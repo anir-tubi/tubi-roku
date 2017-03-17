@@ -65,6 +65,7 @@ function ContentProvider(pubId as String, shortAppName as String, imageSize as S
     path: []
     autoplayId : 0
     autoplayIsSeries: false
+    autoplayIsSeason: false
 
 
     appNameToFilter: appNameToFilter
@@ -336,16 +337,22 @@ function ContentProvider_getPlaylistFromXmlObj(obj, imageSize, depth, parent, so
           end if
         end if
         
-        'set up autoplay for videos (from deeplinking usually or maybe from search screen)
-        if(id = m.autoplayId and m.autoplayIsSeries = false)
-        	p = []
-        	for i=0 to depth-1 step +1
-        		p[i] = m.path[i]
-        	end for
-        	p.push(count)
-        	m.autoplayData = { item: item, path: p, depth: depth }
-        	m.autoplayId = invalid
-        	print "have autoplay---------------------"
+        'set up autoplay for videos and series episodes(from deeplinking usually or maybe from search screen)
+        if id = m.autoplayId
+          p = []
+          for i=0 to depth-1 step +1
+           p[i] = m.path[i]
+          end for
+          p.push(count)
+          m.autoplayId = invalid
+
+          if m.autoplayIsSeason = false
+            m.autoplayData = { item: item, path: p, depth: depth }
+            print "have video autoplay---------------------"
+          else if m.autoplayIsSeason = true
+            m.autoplayData = { item: parent, path: p, depth: depth }
+            print "have season autoplay---------------------"
+          end if
         end if
 
       else 'child.getName() = 'level' -> means it is a series
@@ -409,7 +416,7 @@ function ContentProvider_getPlaylistFromXmlObj(obj, imageSize, depth, parent, so
           end if
         end if
 
-        'set up autoplay for series (from deeplinking usually or maybe from search screen)
+       'set up autoplay for series (from deeplinking usually or maybe from search screen)
         if(id = m.autoplayId and m.autoplayIsSeries = true)
           p = []
           for i=0 to depth-1 step +1
@@ -418,9 +425,8 @@ function ContentProvider_getPlaylistFromXmlObj(obj, imageSize, depth, parent, so
           p.push(count)
           m.autoplayData = { item: item, path: p, depth: depth }
           m.autoplayId = invalid
-          print "have autoplay---------------------"
+          print "have autoplay series ---------------------"
         end if
-
       end if
     end if
 

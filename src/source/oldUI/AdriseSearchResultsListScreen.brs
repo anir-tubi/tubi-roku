@@ -96,7 +96,7 @@ function SearchResults_showVertical(searchList)
 
               episodeScreen.show(episode)
             else
-              episodeScreen.autoPlay(episode.playlist, m.cp.autoplayData.path[2], m.cp.autoplayData.path[3])
+              episodeScreen.autoPlay(episode.playlist, m.cp.autoplayData.path[2], m.cp.autoplayData.path[3], false)
               m.cp.autoplayData = invalid
             end if
           end if
