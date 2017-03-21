@@ -179,6 +179,7 @@ Function MainNewUI(args As Dynamic, constants As Object)
   else
     controller = tubiScene.createChild("ContentController")
   end if
+  controller.observeField("exitApp", port)
 
   deepLink(args, controller, m.global.utils)
 

@@ -7,7 +7,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/screens/ErrorModalDialog.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   
   <interface>
     <!-- The only content expected by the CategoryScreen is the

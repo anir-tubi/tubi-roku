@@ -10,6 +10,7 @@
   <script type="text/brightscript" uri="pkg:/components/controllers/SignInController/SignInController.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ScreenStack.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
 
   <interface>
     <!-- Set to 'true' when a user has chosen to use a guest pass -->
@@ -20,6 +21,9 @@
     
     <!-- Set to 'true' when a user has newly registered from the site -->
     <field id="registered" type="boolean" value="false" alwaysNotify="true"/>
+
+    <!-- Content controller listens to this and will relay to the main thread to exit the app if set to true -->
+    <field id="exitApp" type="boolean" value="false" />    
   </interface>
         
     <children>

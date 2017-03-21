@@ -3,7 +3,7 @@
 
   <script type="text/brightscript" uri="pkg:/components/screens/DetailScreen/DetailScreen.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="pkg:/components/screens/ErrorModalDialog.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
 
   <interface>
     <!-- Full content of the item to show details for -->

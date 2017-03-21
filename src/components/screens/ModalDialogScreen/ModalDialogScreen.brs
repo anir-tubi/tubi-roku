@@ -56,12 +56,19 @@ Function formatDialog()
 End Function
 
 Function onKeyEvent(key As String, press As Boolean) As Boolean
-  if press and m.top.scrollable then
-    if key = "up" and m.ButtonList.hasFocus() then
-      m.ScrollableMessage.setFocus(true)
-      return true
-    else if (key = "down" or key = "left" or key = "right") and m.ScrollableMessage.hasFocus() then
-      m.ButtonList.setFocus(true)
+  if press 
+    if m.top.scrollable then
+      if key = "up" and m.ButtonList.hasFocus() then
+        m.ScrollableMessage.setFocus(true)
+        return true
+      else if (key = "down" or key = "left" or key = "right") and m.ScrollableMessage.hasFocus() then
+        m.ButtonList.setFocus(true)
+        return true
+      end if 
+    end if
+
+    if key = "back"
+      ' eat all the back button presses... force the user to choose a button on the dialog
       return true
     end if
   end if

@@ -40,6 +40,7 @@ Function init()
 
   m.logOutTask = m.top.findNode("LogOutTask")
 
+  m.enteredFromDeepLink = false
   m.ScreenStack = m.top.findNode("ScreenStack")
   initScreenStack(m.ScreenStack, startCategoryScreen)
 
@@ -64,6 +65,7 @@ Function onTrackingLoggingReady()
   end if
 End Function
 
+
 '''''''''''''''''''''''''
 ' startUserExperience
 '
@@ -76,6 +78,7 @@ Function startUserExperience()
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
       ' whether we were logged in or not.
+      m.enteredFromDeepLink = true
       onItemDetailChange()
       m.top.itemDetail = invalid  ' reset it so when we come back through here on state change, we don't follow deep links again
     else if m.authTask.authInfo = invalid then
@@ -147,6 +150,7 @@ Function startSignIn()
   m.SignIn.observeField("guestPass", "onSignInComplete")
   m.SignIn.observeField("signedIn", "onSignInComplete")
   m.SignIn.observeField("registered", "onSignInComplete")
+  m.SignIn.observeField("exitApp", "onSignInExitApp")
   m.SignIn.setFocus(true)
 End Function
 
@@ -180,6 +184,15 @@ Function onSignInComplete()
   m.SignIn.unobserveField("registered")
   m.top.removeChild(m.SignIn)
   m.SignIn = invalid
+End Function
+
+
+'''''''''''''''''''''''''
+' onSignInExitApp
+'
+' The sign-in controller says the user wants to exit the app so tell the main thread we want to exit
+Function onSignInExitApp()
+  m.top.exitApp = true
 End Function
 
 

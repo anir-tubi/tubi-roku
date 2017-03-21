@@ -58,6 +58,8 @@ Function tubiSGAdShim_run(scene As Object) As boolean
         position = Int(position)
         if position = invalid then position = episode.nowPos  ' may happen if preroll
         m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
+      else if msg.GetField() = "exitApp"
+        if msg.GetData() = true then return true
       end if
     end if
 

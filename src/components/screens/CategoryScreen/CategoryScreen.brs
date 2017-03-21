@@ -15,7 +15,8 @@ Function init()
   m.trackingCount = 0
   m.CategoryList.observeField("itemFocused","onCategoryMenuChange")
   m.CategoryList.observeField("preItemFocused","onPreCategoryMenuChange")
-  m.CategoryList.observeFIeld("itemSelected", "onCategoryMenuSelected")
+  m.CategoryList.observeField("itemSelected", "onCategoryMenuSelected")
+  m.categoryListIsFocused = false
   m.authTask = m.top.findNode("CategoryAuthTask")
 
   'Content area
@@ -91,9 +92,14 @@ End Function
 ' being shown.
 Function onScreenFocusChange()
   tubiLog("CategoryScreen.onScreenFocusChange")
-  if m.top.hasFocus() then
+  if m.top.hasFocus()
+    if m.categoryListIsFocused = false
     ' defaulted to screen, move to a subcomponent
-    m.CategoryGridList.setFocus(true)
+      m.CategoryGridList.setFocus(true)
+    else
+      m.CategoryList.setFocus(true)
+      m.categoryListIsFocused = true
+    end if
   end if
 End Function
 
@@ -110,19 +116,20 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   if press then
     if (key = "right" or key = "ok") and m.CategoryList.isInFocusChain() then
       m.CategoryGridList.setFocus(true)
+      m.categoryListIsFocused = false
       slideTo(m.ContentArea, [85,m.ContentArea.translation[1]], 0.5)
       slideTo(m.CategoryList, [-380,m.CategoryList.translation[1]], 0.5)
       m.trackingCount = 0
       return true
     else if (key = "left" or key = "back") and not m.CategoryList.isInFocusChain() then
       m.CategoryList.setFocus(true)
+      m.categoryListIsFocused = true
       slideTo(m.ContentArea, [525,m.ContentArea.translation[1]], 0.5)
       slideTo(m.CategoryList, [60,m.CategoryList.translation[1]], 0.5)
       m.trackingCount = 0
       return true
     else if key = "back"
-      ' capture this so screen stack doesn't remove this screen. it's always the top level
-      return true
+      ' this will get sent back to the screen stack which should close the app (or ask user if they want to close the app)
     end if
   end if
   return false

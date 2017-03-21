@@ -25,7 +25,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="pkg:/components/screens/ErrorModalDialog.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
 
   <interface>
     <!-- Watched by the main brightscript thread to indicate video playback should start -->
@@ -41,6 +41,9 @@
 
     <!-- Used to communicate the new nowPos of a video that has been played in the player -->
     <field id="playerInfo" type="assocarray" alwaysNotify="true" />
+
+    <!-- Main thread listens to this and will exit the app if set to true -->
+    <field id="exitApp" type="boolean" value="false" />
 
   </interface>
         
