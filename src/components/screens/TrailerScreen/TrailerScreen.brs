@@ -5,11 +5,13 @@ Function init()
   m.top.observeField("content", "onContentChange")
 End Function
 
+
 Function onContentChange()
   if m.top.content <> invalid then
     m.Video.control = "play"
   end if
 End Function
+
 
 Function onVideoStateChange()
   if m.Video.state = "playing"
@@ -19,6 +21,7 @@ Function onVideoStateChange()
     m.top.trailerFinished = true
   end if
 End Function
+
 
 Function onKeyEvent(key As String, press As Boolean)
   if press and key = "play" then

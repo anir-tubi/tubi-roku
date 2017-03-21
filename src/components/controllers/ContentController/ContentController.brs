@@ -666,6 +666,9 @@ Function onWatchTrailer()
   content = getDetailScreenContent()
   if content <> invalid then
     trailerContent = CreateObject("roSGNode", "TubiContentNode")
+    if content.id <> invalid
+      trailerContent.id = content.id
+    end if
     trailerContent.url = content.trailerUrls[0]
     trailerContent.streamformat="hls"
     trailerContent.nowPos = 0
@@ -681,6 +684,12 @@ Function onWatchTrailer()
     m.videoPlayer.enableTracking = false
     m.videoPlayer.control = "play"
     m.ScreenStack.visible = false
+
+    m.global.trackingLoggingTask.trackEvent = {
+      trackType: "startTrailer"
+      value: trailerContent.id
+    }
+
   end if
 End Function
 

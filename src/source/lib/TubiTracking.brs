@@ -185,6 +185,10 @@ function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=
       ctx: ctx
       extraCtx: extraCtx
     }
+    startTrailer: {
+      value: value
+      key: "start_trailer"
+    }
   }
 
   trackData = CreateObject("roAssociativeArray")
