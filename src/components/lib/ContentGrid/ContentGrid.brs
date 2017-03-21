@@ -433,8 +433,8 @@ Function onKeyEvent(key As Object, press As Boolean) As Boolean
       return true
     end if
     if scrollGrid(key) then
-      ' we only do scrolling if its a key that affects the grid
-      m.pressAndHold = key
+      ' we only do repeat if its a key that affects the grid, and also don't repeat ff and rew hops
+      if key <> "fastforward" and key <> "rewind" then m.pressAndHold = key
       return true
     else if key = "OK" or key = "play" then
       m.top.itemSelected = getContent(gridIndexToItemIndex(m.internalItemFocused))
@@ -473,13 +473,13 @@ Function scrollGrid(direction As String) As Boolean
     newX = m.internalItemFocused[0] + (visibleItems.width - 2)  ' subtract 2 since there may be overscan
     if newX > m.internalNumColumns-1 then newX = m.internalNumColumns-1
     startChangeFocus([newX, m.internalItemFocused[1]])
-    return false
+    return true
   else if direction = "rewind" and m.internalItemFocused[0] > 0 then
     visibleItems = getVisibleItemWindow()
     newX = m.internalItemFocused[0] - (visibleItems.width - 2)  ' subtract 2 since there may be overscan
     if newX < 0 then newX = 0
     startChangeFocus([newX, m.internalItemFocused[1]])
-    return false
+    return true
   else
     return false
   end if
