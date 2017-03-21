@@ -121,7 +121,7 @@ End Function
 ' Called when the ContentGrid itself has gained/lost focus
 '
 Function onComponentFocusChange()
-  tubiLog("ContentGrid.onComponentFocusChange")
+  tubiLog("ContentGrid.onComponentFocusChange " + focusState(m.top))
   if m.top.content <> invalid and m.numItems > 0 and m.top.isInFocusChain() then
     m.focusBox.visible = true
 

@@ -26,7 +26,8 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
-
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  
   <interface>
     <!-- Watched by the main brightscript thread to indicate video playback should start -->
     <field id="playContent" type="assocarray" alwaysNotify="true" />
@@ -42,7 +43,12 @@
     <!-- Used to communicate the new nowPos of a video that has been played in the player -->
     <field id="playerInfo" type="assocarray" alwaysNotify="true" />
 
-    <!-- Main thread listens to this and will exit the app if set to true -->
+    <!-- Interface for receiving Live TV content from the main Brightscript thread -->
+    <field id="liveTvContent" type="node" />
+    
+    <field id="contentRefreshBeforePlay" type="assocarray"/>
+
+    <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->
     <field id="exitApp" type="boolean" value="false" />
 
   </interface>

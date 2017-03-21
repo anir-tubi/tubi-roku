@@ -67,11 +67,6 @@ end Sub
 
 
 
-
-
-
-
-
 ''''''''''''''''''''
 ' Simple main to launch the unit tests if mode is "test".
 ' Otherwise, exit immediately.
@@ -98,6 +93,8 @@ Function MainNewUI(args As Dynamic, constants As Object)
   request = TubiRequest()
   requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
+  translate = TubiMetadataTranslate(constants)
+  metadataFetch = TubiMetadataFetch(constants, request, translate)
   tracking = TubiTracking(constants, request, auth)
   bookmarks = TubiBookmarks(request, auth, constants)
   log = TubiLogger(constants, request, auth)
@@ -114,8 +111,10 @@ Function MainNewUI(args As Dynamic, constants As Object)
     auth: auth
     bookmarks: bookmarks
     experiments: experiments
+    metadataFetch: metadataFetch
     log: log
   }
+
 
   ' Load scene graph
   screen = CreateObject("roSGScreen")
@@ -132,6 +131,9 @@ Function MainNewUI(args As Dynamic, constants As Object)
     return -1 ' exit the app on error.  scene graph exits anyway once
               ' we destroy a Scene and try to create it again.
   end if
+
+  'get live tv content metadata
+  liveTvContent = m.global.utils.metadataFetch.liveTv()
 
   ' start the scene graph UI
   sgGlobal = screen.getGlobalNode()
@@ -176,8 +178,10 @@ Function MainNewUI(args As Dynamic, constants As Object)
     m.global.utils.constants.deviceInfo.clientVersion = m.global.utils.constants.deviceInfo.clientVersion.Replace("local", "remote")
 
     controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
+    controller.liveTvContent = liveTvContent
   else
     controller = tubiScene.createChild("ContentController")
+    controller.liveTvContent = liveTvContent
   end if
   controller.observeField("exitApp", port)
 

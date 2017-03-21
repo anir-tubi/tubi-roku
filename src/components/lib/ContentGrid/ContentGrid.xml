@@ -23,6 +23,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/NodePoolMixin.brs" />  
+  <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
 
   <interface>
     <field id="content" type="node" alwaysNotify="true"/>

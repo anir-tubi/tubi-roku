@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="EPG" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/EPG/EPG.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- read-only: the current content playlistfor live tv 
+      -
+      - Structured like:
+      -  <CN liveTVCursor="[0,0,0]">
+      -    <CN id="LiveChannel1">
+      -      <CN id="Content1"/>
+      -      <CN id="Content2"/>
+      -    </CN>
+      -    <CN id="LiveChannel2">
+      -      <CN id="Content9"/>
+      -      <CN id="Content10"/>
+      -    </CN>
+      -  </CN>
+      -
+      -->
+    <field id="content" type="node" alwaysNotify="true"/>
+    
+    <field id="channelSelected" alias="Channels.itemSelected"/>
+  </interface>
+
+  <children>
+   <Rectangle
+      id="Background"
+      width="1920"
+      height="1080"
+      color="0x00000000"/>
+    
+    <Poster
+      id="EPGGradient"
+      uri="pkg:/images/live-tv-epg-overlay-gradient.9.png"
+      width="1920"
+      height="987"
+      translation="[0,93]"/>
+     
+    <LayoutGroup
+      id="CurrentlyPlayingGroup"
+      layoutDirection="horiz"
+      vertAlignment="top"
+      itemSpacings="[59]"
+      translation="[85,155]"
+      visible="true">
+      <Poster
+        id="DVDPoster"
+        width="210"
+        height="300"/>
+      <InfoPanel
+        id="Info"
+        mode="item"
+        maxHeight="300"/>
+    </LayoutGroup> 
+    
+    <Group
+      id="Grid"
+      translation="[85,592]">
+    <Rectangle
+      id="GridHeader"
+      width="1750"
+      height="69"
+      color="0x242424FF">
+      <Poster
+        id="LiveIcon"
+        uri="pkg:/images/icon-on-now.png"
+        width="115"
+        height="55"
+        translation="[48,6]"/>
+      <Label 
+        id="Hour1"
+        width="210"
+        height="69"
+        vertAlign="center"
+        translation="[220,0]">
+        <Font
+          role="font"
+          id="Vaud20px"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="20" />
+      </Label>
+      <Label 
+        id="Hour2"
+        width="210"
+        height="69"
+        vertAlign="center"
+        font="dictionary:Vaud20px"
+        translation="[660,0]"/>
+      <Label 
+        id="Hour3"
+        width="210"
+        height="69"
+        vertAlign="center"
+        font="dictionary:Vaud20px"
+        translation="[1100,0]"/>
+      <Label 
+        id="Hour4"
+        width="210"
+        height="69"
+        vertAlign="center"
+        font="dictionary:Vaud20px"
+        translation="[1540,0]"/>
+    </Rectangle>
+    <ScrollingList
+      id="Channels"
+      width="1750"
+      height="244"
+      scrollHeight="244"
+      itemSpacings="[2]"
+      itemComponentName="EPGChannelItem"
+      focusBitmapUri="pkg:/images/selector.9.png"
+      focusAbove="true"
+      translation="[0,69]"/>
+    </Group>
+
+    <Group
+      id="CloseHint"
+      translation="[908,955]">
+      <Poster
+        id="LeftTriangle"
+        uri="pkg:/images/left-arrow.png"
+        visible="true"
+        width="10"
+        height="15"
+        translation="[0,9]"/>
+      <Label
+        text="CLOSE"
+        height="40"
+        vertAlign="center"
+        translation="[26,0]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+    </Group>
+
+  </children>
+</component>
+    

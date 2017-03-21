@@ -1,10 +1,9 @@
 Function init()
   tubiLog("CategoryScreen.init")
   m.ContentArea = m.top.findNode("ContentArea")
-  m.CategoryList = m.top.findNode("CategoryList")
+  m.CategoryList = m.top.findNode("CategoryList") 'aka category menu
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.SpecialCategories = m.top.findNode("SpecialCategories")
-  m.Spinner = m.top.findNode("Spinner")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("categoryPreviewResponse", "onCategoryPreviewReceived")
   m.top.observeField("focusedChild", "onScreenFocusChange")
@@ -25,25 +24,11 @@ Function init()
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
   m.CategoryGridList.observeField("preCategoryFocused", "onPreGridCategoryChange")
 
-  'Sign-in menu items
-  m.SearchSignInContent = m.top.findNode("SearchSignInContent")
-  m.SearchMenuItem = m.SearchSignInContent.findNode("SearchMenuItem")
-  m.SignInMenuItem = m.SearchSignInContent.findNode("SignInMenuItem")
-  m.SignOutMenuItem = m.SearchSignInContent.findNode("SignOutMenuItem")
-  m.AboutMenuItem = m.SearchSignInContent.findNode("AboutMenuItem")
-  m.PrivacyMenuItem = m.SearchSignInContent.findNode("PrivacyMenuItem")
-
   'Special categories
   m.ContinueWatchingCategory = m.SpecialCategories.findNode("ContinueWatching")
   m.MyQueueCategory = m.SpecialCategories.findNode("MyQueue")
-  m.SearchSignInCategory = m.SpecialCategories.findNode("SearchSignIn")
-  m.SearchSignOutCategory = m.SpecialCategories.findNode("SearchSignOut")
 
   m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
-
-  ' track the last focused screen component so that we can go back
-  ' to it when focus is taken away
-  m.lastFocusedComponent = m.CategoryList
 
   onSignedInChange()  ' seed the search & sign in menu - also calls loadUserCategories() if necessary
 
@@ -91,7 +76,7 @@ End Function
 ' screen has lost focus, usually due to another screen or dialog
 ' being shown.
 Function onScreenFocusChange()
-  tubiLog("CategoryScreen.onScreenFocusChange")
+  tubiLog("CategoryScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus()
     if m.categoryListIsFocused = false
     ' defaulted to screen, move to a subcomponent
@@ -156,27 +141,15 @@ Function onContentChange() As Void
   ' Prepend special categories, taking care to remove them if they already are there
   m.InfoPanel.mode = "category"
   if m.top.signedIn then
-    m.top.content.insertChild(m.SearchSignOutCategory, 0)
-    m.SearchSignOutCategory.appendChild(m.SearchMenuItem)
-    m.SearchSignOutCategory.appendChild(m.SignOutMenuItem)
-    m.SearchSignOutCategory.appendChild(m.AboutMenuItem)
-    m.SearchSignOutCategory.appendChild(m.PrivacyMenuItem)
-    m.top.content.insertChild(m.ContinueWatchingCategory, 2)
-    m.top.content.insertChild(m.MyQueueCategory, 3)
+    m.top.content.insertChild(m.ContinueWatchingCategory, 1)
+    m.top.content.insertChild(m.MyQueueCategory, 2)
   else
-    m.top.content.insertChild(m.SearchSignInCategory, 0)
-    m.SearchSignInCategory.appendChild(m.SearchMenuItem)
-    m.SearchSignInCategory.appendChild(m.SignInMenuItem)
-    m.SearchSignInCategory.appendChild(m.AboutMenuItem)
-    m.SearchSignInCategory.appendChild(m.PrivacyMenuItem)
     m.top.content.removeChild(m.ContinueWatchingCategory)
     m.top.content.removeChild(m.MyQueueCategory)
   end if
 
   m.CategoryList.content = m.top.content
   m.CategoryGridList.content = m.top.content  ' should be the category list
-  m.CategoryGridList.animateToCategory = 1
-  m.CategoryList.animateToItem = 1  ' Set on feature category
   if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
 End Function
 
@@ -187,6 +160,9 @@ Function onPreCategoryMenuChange()
   if m.CategoryList.isInFocusChain() and m.CategoryList.content <> invalid then
     m.CategoryGridList.animateToCategory = m.CategoryList.preItemFocused
   end if
+
+  'removes the "On Now" and arrow if the top most category is not focused
+  removeLiveTvHint(m.CategoryList.preItemFocused)
 End Function
 
 '''''''''''''''''''''
@@ -221,9 +197,6 @@ End Function
 '''''''''''''''''''''''''''
 ' onSignedInChange
 '
-' Create a new content node tree for the sign in menu, based on the template SearchSignInContent.
-' We do this so that we can keep a reference to all possible menu options, even when the sign in
-' menu is showing a subset.
 Function onSignedInChange()
   tubiLog("CategoryScreen.onSignedInChange")
   if m.top.content <> invalid then
@@ -248,6 +221,10 @@ Function onPreGridCategoryChange() As Void
   if m.CategoryGridList.isInFocusChain() and m.CategoryGridList.content <> invalid then
     m.CategoryList.animateToItem = m.CategoryGridList.preCategoryFocused ' CategoryList has one extra item
   end if
+
+  'removes the "On Now" and arrow if the top most category is not focused
+  removeLiveTvHint(m.CategoryGridList.preCategoryFocused)
+
 End Function
 
 
@@ -257,9 +234,6 @@ End Function
 ' On grid focus change, update the info panel
 Function onGridFocusChange() As Void
   tubiLog("CategoryScreen.onGridFocusChange")
-
-  ' If spinner was visible, turn it off here
-  m.Spinner.visible = false
 
   if not m.CategoryGridList.isInFocusChain() then return
   focusedContent = m.CategoryGridList.itemFocused
@@ -299,18 +273,7 @@ End Function
 Function onGridItemSelected() As Void
   tubiLog("CategoryScreen.onGridItemSelected")
   selectedItem = m.CategoryGridList.itemSelected
-  if selectedItem = invalid then return
-  if selectedItem.id = "SearchMenuItem" then
-    m.top.searchSelected = true
-  else if selectedItem.id = "SignInMenuItem" then
-    m.top.signInSelected = true
-  else if selectedItem.id = "SignOutMenuItem" then
-    m.top.signOutSelected = true
-  else if selectedItem.id = "AboutMenuItem" then
-    m.top.aboutSelected = true
-  else if selectedItem.id = "PrivacyMenuItem" then
-    m.top.privacySelected = true
-  else
+  if selectedItem <> invalid then 
     m.top.contentSelected = selectedItem
   end if
 End Function
@@ -421,4 +384,19 @@ Function onTrackingUriChange()
     value: m.trackingCount
     ctx: m.top.trackingUri
   }
+End Function
+
+
+
+Function removeLiveTvHint(categoryIndex as integer)
+  triangle = m.top.findNode("LiveUpTriangle")
+  onNowIcon = m.top.findNode("onNowIcon")
+
+  if categoryIndex = 0
+    if triangle.opacity < 1.0 then fade(triangle, "in", 0.4)
+    if onNowIcon.opacity < 1.0 then fade(onNowIcon, "in", 0.4)
+  else
+    if triangle.opacity > 0.0 then fade(triangle, "out", 0.4)
+    if onNowIcon.opacity > 0.0 then fade(onNowIcon, "out", 0.4)
+  end if
 End Function

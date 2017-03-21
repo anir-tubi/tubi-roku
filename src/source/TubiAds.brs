@@ -130,8 +130,8 @@ function tubiAds_cacheAdsList(episode, breakPos)
   end if
 end function
 
-function tubiAds_getCachedAdsList(episode)
-  if m.lastAdsList <> invalid and episode.id = m.lastAdsList.cid and episode.nowPos = m.lastAdsList.breakPos
+function tubiAds_getCachedAdsList(episode, breakPos)
+  if m.lastAdsList <> invalid and episode.id = m.lastAdsList.cid and breakPos = m.lastAdsList.breakPos
     return m.lastAdsList.list
   end if
   return invalid

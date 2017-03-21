@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="LiveTVScreen" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/screens/LiveTVScreen/LiveTVScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/PlaylistMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  
+  <interface>
+    <field id="signedIn" type="boolean" value="false" />
+        
+    <!-- will be used to change the background images on the content controller -->
+    <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
+    
+    <field id="focusTarget" type="node"/>
+    
+    <field id="hideUI" alias="LiveTV.watchNowSelected"/>
+    
+    <field id="showEPG" type="boolean" alwaysNotify="true"/>
+    
+    <field id="liveTVContent" alias="LiveTV.content"/>
+    
+    <!-- Tune to current cursor and start playing -->
+    <field id="playLiveTV" type="boolean" alwaysNotify="true"/>
+  </interface>
+  
+  <children>
+    <ToolsMenu
+      id="ToolsMenu"
+      visible="true"
+      opacity="0.0"
+      translation="[0,0]"/>
+    
+    <LiveTV
+      id="LiveTV"
+      visible="true"
+      translation="[0,0]"/>
+    
+    <CategoryScreen
+      id="CategoryScreen"
+      translation="[0,392]"
+      infoVisible="false"
+      visible="true"
+      opacity="0.2"/>
+    
+    <EPG
+      id="EPG"
+      visible="false"
+      translation="[0,0]"/>
+    
+    <Poster
+      id="tubiLogo"
+      height="43"
+      width="149"
+      uri="pkg:/images/logo.png"
+      translation="[1688,933]" />
+    
+    <Timer
+      id="Autohide"
+      repeat="true"
+      duration="2"/>
+  </children>
+</component>

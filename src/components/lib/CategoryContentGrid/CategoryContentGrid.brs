@@ -39,10 +39,10 @@ Function onFocusPercentChange()
     m.CategoryName.opacity = 1.0
   end if
 
+  m.CategoryCount.opacity = m.top.focusPercent
   m.FocusedCategoryName.opacity = m.top.focusPercent
   m.UnfocusedCategoryName.opacity = 1.0 - m.top.focusPercent
 
-  m.CategoryCount.opacity = m.top.focusPercent
   m.top.opacity = 0.20 + (0.80 * m.top.focusPercent)
 End Function
 
@@ -52,8 +52,10 @@ Function onListHasFocus()
   if m.top.focusPercent = 1
     if m.top.listHasFocus = true
       fade(m.CategoryName, "in", 0.5)
+      m.CategoryCount.opacity = 1.0
     else
       fade(m.CategoryName, "out", 0.5)
+      m.CategoryCount.opacity = 0.0
     end if
   end if
 End Function

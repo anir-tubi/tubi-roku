@@ -14,6 +14,7 @@ Function TubiSGAdShim(utils, port)
     videoAdsList: invalid
     resumePlayAdsList: invalid
     handleControlMessage: tubiSGAdShim_handleControlMessage
+    cuepoints: tubiSGAdShim_cuepoints
     preroll: tubiSGAdShim_preroll
     playAds: tubiSGAdShim_playAds
     reset: tubiSGAdShim_reset
@@ -31,6 +32,9 @@ End Function
 ' This is a blocking call
 Function tubiSGAdShim_run(scene As Object) As boolean
   if type(scene) <> "roSGNode" return false
+
+  'expect that scene is the content controller
+  scene.observeField("exitApp", m.port)
 
   m.videoPlayerNode = scene.findNode("VideoPlayer")
   if m.videoPlayerNode = invalid then 
@@ -50,7 +54,11 @@ Function tubiSGAdShim_run(scene As Object) As boolean
     
     else if msgType = "roSGNodeEvent"
       tubiLog("TubiSGAdShim got roSGNodeEvent for " + msg.GetField())
-      if msg.GetField() = "adControl"
+      if msg.GetField() = "exitApp"
+        print "we want to exit the apppppppppppppp"
+        if msg.GetData() = true then return true
+
+      else if msg.GetField() = "adControl"
         value = msg.GetData()        
         episode = m.videoPlayerNode.content.getFields()  ' clone the content node into a local AA to avoid messing with it
         tubiLog("TubiSGAdShim: adControl = " + value)
@@ -75,6 +83,7 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
 
   stateMachine = {
     init: {
+      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: "preroll"
       seek: "preroll"
@@ -82,6 +91,7 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       stop: invalid
     }
     fetching: {
+      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: invalid
       seek: "midroll"
@@ -89,6 +99,7 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       stop: "reset"
     }
     noads: {
+      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: "midroll"
       seek: "resume"
@@ -96,6 +107,7 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       stop: "reset"
     }
     adspending: {
+      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: "midroll"
       seek: "resume"
@@ -103,6 +115,7 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       stop: "reset"
     }
     adsplaying: {
+      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: invalid
       seek: invalid
@@ -110,6 +123,7 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       stop: "reset"
     }
     adsclosed: {
+      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: invalid
       seek: invalid
@@ -140,7 +154,26 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
     'always update midroll list since TubiAds can
     'make modifications to it throughout playback
     m.videoPlayerNode.midrolls = m.ads.midrolls
+    for each time in m.ads.midrolls
+      print "MIDROLL: " + stri(time)
+    end for
   end if
+End Function
+
+
+''''''''''''''''''
+' cuepoints
+'
+' Similar to preroll, this is used primarily at the start of playback and
+' intended to reset the state of ads.
+Function tubiSGAdShim_cuepoints(episode As Object, cuepoint As Integer)
+  m.videoplayernode.adstate = "fetching"
+  m.ads.reset()
+
+  'make a synchrynous call to get cuepoints, if any
+  m.ads.getCuepoints(episode)
+
+  m.videoPlayerNode.adState = "noads"
 End Function
 
 
@@ -153,7 +186,7 @@ Function tubiSGAdShim_preroll(episode As Object, cuepoint As Integer)
   m.ads.reset()
 
   'make a synchrynous call to get cuepoints, if any
-  m.cuepoints = m.ads.getCuepoints(episode)
+  m.ads.getCuepoints(episode)
 
   'otherwise if the user is starting from beginning or resuming on a cue point, show ads
   'attempt to get list of ads and play them for preroll
@@ -222,7 +255,7 @@ End Function
 Function tubiSGAdShim_midroll(episode As Object, cuepoint As Integer)
   m.videoplayernode.adstate = "fetching"
   m.ads.cacheAdsList(episode, cuepoint)
-  if m.ads.getCachedAdsList(episode) <> invalid then
+  if m.ads.getCachedAdsList(episode, cuepoint) <> invalid then
     m.videoPlayerNode.adState = "adspending"
   else
     m.videoPlayerNode.adState = "noads"

@@ -130,6 +130,19 @@ Function onContentChange()
     m.ClosedCaptionDisabled.visible = false
   end if
 
+  liveTVGroup = m.top.findNode("LiveTVGroup")
+  if m.top.content.isLiveTV then
+    liveTVGroup.visible = true
+    m.HopForwardButton.enabled = false
+    m.FastForwardButton.enabled = false
+    m.EndButton.enabled = false
+  else
+    liveTVGroup.visible = false
+    m.HopForwardButton.enabled = true
+    m.FastForwardButton.enabled = true
+    m.EndButton.enabled = true
+  end if
+
   'if it's not a trailer, remove the skip trailer button
   if m.top.content.isTrailer = false
     m.TransportButtons.removeChild(m.SkipTrailerButton)
@@ -214,6 +227,7 @@ Function onVideoPositionChange()
       value: m.playerPosition
       extraCtx: {
         interval: m.playerPosition - m.lastPingTime
+        livetv: m.Video.content.isLiveTV
       }
     })
     m.lastPingTime = m.playerPosition
@@ -235,9 +249,7 @@ Function onVideoPositionChange()
       if m.playerPosition = cuepoint and m.top.adState = "adspending" then
         ' We must stop the video here, not just pause it, in order to release
         ' system resources to the RAF video player
-        m.Video.control = "stop"
-        m.top.content.nowPos = m.playerPosition
-        m.top.adControl = "play"
+        showAdBreak()
         ' store latest history
         historyPosition()
       end if
@@ -265,6 +277,9 @@ Function onCaptionModeChange()
       trackType: "subtitles"
       ctx: m.Video.content.id
       value: value
+      extraCtx: {
+        livetv: m.Video.content.isLiveTV
+      }
     })
   end if
 End Function
@@ -274,6 +289,7 @@ Function onControlChange()
   if m.Video.content <> invalid and m.Video.state <> "playing" and m.top.control = "play" then
     if m.Video.content.nowPos <> invalid then
       m.Video.seek = m.Video.content.nowPos
+      m.playerPosition = m.Video.content.nowPos
       m.lastSavedPosition = m.Video.content.nowPos
       m.lastPingTime = m.Video.content.nowPos
     else
@@ -283,26 +299,31 @@ Function onControlChange()
     m.top.midrolls = []  ' Always reset midrolls when we first start playback.  Preroll will populate these
     m.VideoState = "play"
     
-    trackEvent({
-      trackType: "videoPlay"
-      value: m.Video.content.id
-      ctx: m.Video.content.nowPos
-      extraCtx: {
-        subtitles: m.Video.content.showSubtitles
-        livetv: false  ' TODO(Chris): remove this if unnecessary
-      }
-    })
+    if m.video.content.isLiveTV = false then
+      trackEvent({
+        trackType: "videoPlay"
+        value: m.Video.content.id
+        ctx: m.Video.content.nowPos
+        extraCtx: {
+          subtitles: m.Video.content.showSubtitles
+        }
+      })
+    end if
 
     if m.top.enableAds then
       ' Start pre-roll fetch
       m.top.adControl = "preroll"
     else
       m.Video.control = "play"
+      m.top.adControl = "cuepoints"
     end if
   else if m.top.control = "stop" then
     'TODO: If ad break is happening, abort it.  I don't think it's possible, though
     m.Video.control = "stop"
     m.VideoState = "stop"
+  else if m.top.control = "pause" then
+    m.Video.control = "pause"
+    m.VideoState = "pause"
   end if
 End Function
 
@@ -339,16 +360,24 @@ Function onKeyEvent(key As String, press As Boolean)
       end if
 
     else if key = "play" then
-      handlePlayPause()
+      if m.PlayPauseButton.enabled then
+        handlePlayPause()
+      end if
 
     else if key = "fastforward"
-      handleFastForward()
+      if m.FastForwardButton.enabled then
+        handleFastForward()
+      end if
 
     else if key = "rewind"
-      handleRewind()
+      if m.RewindButton.enabled then
+        handleRewind()
+      end if
 
     else if key = "replay"
-      handleHopBack()
+      if m.HopBackButton.enabled then
+        handleHopBack()
+      end if
 
     else if key = "options"
       if m.ignoreOptionsKey = false then
@@ -360,10 +389,14 @@ Function onKeyEvent(key As String, press As Boolean)
         showTransport()
 
       else
-        'navigate the transport buttons
-        if m.focusedButtonIndex - 1 >= 0
-          setFocusedButton(m.TransportButtons.getChild(m.focusedButtonIndex-1))
-        end if
+        'navigate the transport buttons, skipping disabled ones
+        for i=m.focusedButtonIndex-1 to 0 step -1
+          button = m.TransportButtons.getChild(i)
+          if button.enabled then
+            setFocusedButton(button)
+            exit for
+          end if
+        end for
       end if
 
     else if key = "right"
@@ -371,15 +404,24 @@ Function onKeyEvent(key As String, press As Boolean)
         showTransport()
 
       else
-        'navigate the transport buttons
-        if m.focusedButtonIndex + 1 < m.TransportButtons.getChildCount()
-          setFocusedButton(m.TransportButtons.getChild(m.focusedButtonIndex+1))
-        end if
+        'navigate the transport buttons, skipping disabled ones
+        for i=m.focusedButtonIndex+1 to m.TransportButtons.getChildCount()-1
+          button = m.TransportButtons.getChild(i)
+          if button.enabled then
+            setFocusedButton(button)
+            exit for
+          end if
+        end for
       end if
 
     else if key = "up" or key = "down"
       if m.transport.opacity = 0
         showTransport()
+      else
+        if m.top.content.isLiveTV then
+          m.top.upButtonPressed = true
+          animateTransport("out")
+        end if
       end if
 
     else if key = "back" then
@@ -409,16 +451,17 @@ End Function
 
 ' onAdStateChange
 '
-' TODO(Chris): Once we have things like EPG overlay, add a way to postpone
-' the showing of ads until the EPG overlay is hidden
+' adState values are: init, fetching, adspending, noads, adsplaying, adsclosed, noads
 Function onAdStateChange()
-  print "VideoPlayer.onAdStateChange state = " m.top.adState
+  tubiLog("VideoPlayer.onAdStateChange adState = " + m.top.adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
   ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
   ' video playback stopped and should play right away when we get adspending.
   if m.top.adState = "adspending" and (m.top.adControl = "preroll" or m.top.adControl = "seek") and m.top.enableAds then
-    ' pre-roll. Play ads right away
-    m.top.adControl = "play"
-  else if m.top.adState = "noads" and m.Video.state <> "playing" then
+    ' pre-roll or resume-roll. Play ads right away
+    showAdBreak()
+  ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
+  'TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
+  else if m.top.adState = "noads" and m.VideoState = "play" and m.Video.state <> "playing" and m.Video.state <> "buffering" then
     ' came back from an ad break
     m.Video.seek = m.playerPosition
     m.Video.control = "play"
@@ -426,6 +469,9 @@ Function onAdStateChange()
       trackType: "resumeAfterAds"
       value: m.Video.content.nowPos
       ctx: m.Video.content.id
+      extraCtx: {
+        livetv: m.Video.content.isLiveTV
+      }
     })
   else if m.top.adState = "adsclosed"
     backButtonExit()
@@ -493,6 +539,9 @@ Function pauseVideo()
     trackType: "pauseToggle"
     ctx: m.Video.content.id
     value: "paused"
+    extraCtx: {
+      livetv: m.Video.content.isLiveTV
+    }
   })
 End Function
 
@@ -511,6 +560,9 @@ Function resumeFromPause()
     trackType: "pauseToggle"
     ctx: m.Video.content.id
     value: "resumed"
+    extraCtx: {
+      livetv: m.Video.content.isLiveTV
+    }
   })
 End Function
 
@@ -776,6 +828,11 @@ Function backButtonExit()
   historyPosition()
   ' minor detail... set backButtonPressed first so that observers get that event before any video state change
   m.top.backButtonPressed = true
+End Function
+
+' Make sure the Video node is stopped and we have an accurate playback position before launching ads
+Function showAdBreak()
   m.Video.control = "stop"
-  m.VideoState = "stop"
+  m.top.content.nowPos = m.playerPosition
+  m.top.adControl = "play"
 End Function

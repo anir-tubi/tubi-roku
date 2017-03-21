@@ -41,7 +41,8 @@
 
     <Label
       id="Title"
-      width="0"
+      width="875"
+      wrap="false"
       height="73"
       vertAlign="bottom">
       <Font

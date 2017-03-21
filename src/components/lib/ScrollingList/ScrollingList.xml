@@ -17,6 +17,7 @@
  -->
 <component name="ScrollingList" extends="Group" >
   <script type="text/brightscript" uri="pkg:/components/lib/ScrollingList/ScrollingList.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
@@ -34,6 +35,7 @@
     <field id="animateToItem" type="int" value="-1" alwaysNotify="true"/>
     <field id="focusBitmapUri" type="uri" alias="FocusImage.uri" />
     <field id="focusChangeDuration" type="float" value="0.25"/>
+    <field id="focusAbove" type="boolean" value="false"/>
   </interface>
   
   <children>

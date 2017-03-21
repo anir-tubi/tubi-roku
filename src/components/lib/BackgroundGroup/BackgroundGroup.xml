@@ -21,9 +21,6 @@
     <!-- flag to notify if the user is opening the category screen from the sign in screens -->
     <field id="enterFromSignIn" type="boolean" value="false" alwaysNotify="true" />
 
-    <!-- flag to notify if the user is opening the category screen from the sign in screens -->
-    <field id="catScreenStart" type="boolean" value="false" alwaysNotify="true" />
-
   </interface>
 
   <children />

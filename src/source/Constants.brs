@@ -207,6 +207,14 @@ Function getConstants()
       constants.urls.datascience.experiment = constants.urls.dataScience.urlBase + "/evaluate/namespaces"
       constants.urls.datascience.logging = constants.urls.dataScience.urlBase + "/logging"
 
+    'matrix API urls
+    constants.urls.matrix = {}
+      constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
+
+    'live tv urls
+    constants.urls.liveTv = {}
+      constants.urls.liveTv.getAll = constants.urls.matrix.urlBase + "/mock/livetv"
+
     'cuepoints url
     constants.urls.cuepointsBaseUrl = "http://ads.adrise.tv/cue-points/"
 

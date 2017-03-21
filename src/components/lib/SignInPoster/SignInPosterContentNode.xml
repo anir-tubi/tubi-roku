@@ -1,0 +1,7 @@
+<!-- TODO(Chris): Consolidate this and DetailPosterContentNode -->
+<component name = "SignInPosterContentNode" extends="ContentNode">
+  <interface>
+    <field id="focusIconUrl" type="string" value=""/>
+    <field id="unfocusIconUrl" type="string" value=""/>
+  </interface>
+</component>

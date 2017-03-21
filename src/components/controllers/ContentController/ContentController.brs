@@ -1,6 +1,10 @@
 Function init()
   tubiLog(" ")
   tubiLog("Init Scenegraph----------------")
+  'first things first, observe the live tv content field
+  m.top.observeField("liveTvContent", "onLiveTvContent")
+
+
   ' save a global reference to the fetch task for nodes to access
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
   m.global.addField("metadataFetchTask", "node", false)
@@ -42,7 +46,7 @@ Function init()
 
   m.enteredFromDeepLink = false
   m.ScreenStack = m.top.findNode("ScreenStack")
-  initScreenStack(m.ScreenStack, startCategoryScreen)
+  initScreenStack(m.ScreenStack)
 
   m.videoPlayer = m.top.findNode("VideoPlayer")
 End Function
@@ -83,9 +87,8 @@ Function startUserExperience()
       m.top.itemDetail = invalid  ' reset it so when we come back through here on state change, we don't follow deep links again
     else if m.authTask.authInfo = invalid then
       startSignIn()
-    else
-      startCategoryScreen()
-      m.backgroundGroup.catScreenStart = true
+    else if m.top.liveTvContent <> invalid
+      startLiveTV()
     end if
   end if
 End Function
@@ -97,8 +100,6 @@ End Function
 ' On either app start (if user is signed in) or after the sign in
 ' flow is complete, create and show the category screen.
 Function startCategoryScreen()
-  request = TubiRequest()
-
   m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
   m.categoryScreen.observeField("contentSelected", "onContentSelected")
   m.categoryScreen.observeField("searchSelected", "onSearchSelected")
@@ -119,6 +120,16 @@ End Function
 Function onAuthInfoReceived()
   tubiLog("ContentController.onAuthInfoReceived")
   m.authInfoReceived = true
+  startUserExperience()
+End Function
+
+
+'''''''''''''''''''''''
+' onLiveTvContent
+'
+Function onLiveTvContent()
+  tubiLog("ContentController.onLiveTvContent")
+  m.top.unobserveField("liveTvContent")
   startUserExperience()
 End Function
 
@@ -170,9 +181,8 @@ Function onSignInComplete()
   end while
 
   if m.SignIn.guestPass then
-    ' start the categoryscreen right away
-    startCategoryScreen()
-    m.backgroundGroup.catScreenStart = true
+    ' start the live tv right away
+    startLiveTV()
   else
     ' retrieve the credentials on the AuthTask before starting the UI. This reduces jank.
     m.authTask.functionName = "execGetAuthInfo"
@@ -200,13 +210,10 @@ End Function
 ' onContentSelected
 '
 ' Show the detail screen for the selected content
-Function onContentSelected()
+Function onContentSelected(msg As Object)
   tubiLog("ContentController.onContentSelected")
-  top = currentScreen()
-  
-  if top <> invalid and top.contentSelected <> invalid then
-    showDetailScreen(top.contentSelected)
-  end if
+  content = msg.GetData()  
+  showDetailScreen(content)
 End Function
 
 
@@ -359,6 +366,218 @@ Function onResume()
   end if
 End Function
 
+
+Function startLiveTV()
+  tubiLog("ContentController.startLiveTV")
+  ' meta-screen, really just to allow screenstack to function.  we interact
+  ' with the child groups directly instead of the parent group
+  m.liveTVScreen = CreateObject("roSGNode", "LiveTVScreen")
+  m.liveTVScreen.observeField("backgroundUriList", "onStopLiveTV")
+  m.liveTVScreen.observeField("hideUI", "hideLiveTVUI")
+
+  m.liveTV = m.liveTVScreen.findNode("LiveTV")  ' automatically fetches channels
+  m.liveTVScreen.observeField("playLiveTV", "onPlayLiveTV")
+
+  m.toolsMenu = m.liveTVScreen.findNode("ToolsMenu")
+  m.toolsMenu.observeField("searchSelected", "onSearchSelected")
+  m.toolsMenu.observeField("signInSelected", "onSignInSelected")
+  m.toolsMenu.observeField("signOutSelected", "onSignOutSelected")
+  m.toolsMenu.observeField("aboutSelected", "onAboutSelected")
+  m.toolsMenu.observeField("privacySelected", "onPrivacySelected")
+  m.toolsMenu.observeField("backgroundUriList", "onStopLiveTV")
+
+  m.categoryScreen = m.liveTVScreen.findNode("CategoryScreen")
+  m.categoryScreen.observeField("contentSelected", "onContentSelected")
+
+  m.liveTVScreen.signedIn = (m.authTask.authInfo <> invalid)
+  pushScreen(m.liveTVScreen)
+  m.liveTVScreen.liveTVContent = m.top.liveTvContent
+End Function
+
+Function onStopLiveTV()
+  tubiLog("ContentController.onStopLiveTV")
+
+  'store the current episode since the video player doesn't like to pause and be invisible
+  cursor = m.liveTVScreen.liveTVcontent.liveTVCursor
+  cursor[2] = m.videoPlayer.position
+  m.liveTVScreen.liveTVcontent.liveTVCursor = cursor
+  tubiLog("LiveTVCursor = [" + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[0])  + "," + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[1]) + "," + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[2]) + "]")
+
+  m.videoPlayer.control = "stop"
+  m.videoPlayer.visible = false
+  m.videoPlayer.unobserveField("state")
+  m.videoPlayer.unobserveField("backButtonPressed")
+  m.videoPlayer.unobserveField("upButtonPressed")
+  m.top.unobserveField("contentRefreshBeforePlay")
+
+  m.backgroundGroup.backgroundUriList = m.liveTVScreen.backgroundUriList
+  m.backgroundGroup.newBackgroundType = "grid"
+End Function
+
+Function onContentRefreshBeforePlay(msg As Object) As Void
+  tubiLog("ContentController.onContentRefreshBeforePlay")
+  data = msg.GetData()
+  if data <> invalid then
+    if data.response.code >= 200 and data.response.code < 300 then 
+      content = data.convertedMetadata
+      ' make sure that the content response is not stale
+      if m.videoPlayer.content.id = content.id then
+        content.nowPos = m.videoPlayer.content.nowPos
+        content.isLiveTV = m.videoPlayer.content.isLiveTV
+        m.videoPlayer.content = content
+        m.videoPlayer.control = "play"
+        return
+      end if
+    end if
+  end if
+  ' here if error; fake a Video node success so we can autoplay the next item
+  msg = {
+    getField: Function()
+        return "state"
+      End Function
+    getData: Function()
+        return "finished"
+      End Function
+  }
+  onLiveTVState(msg)
+End Function
+
+Function refreshBeforePlay(content)
+  tubiLog("ContentController.refreshBeforePlay")
+  settings = m.global.constants.settings
+  url = m.global.constants.urls.cms.singleContent
+  platform = m.global.constants.platform
+  deviceInfo = m.global.constants.deviceInfo
+
+  ' expect that the content here was the bootstrapped content from category list
+  contentId = content.id
+
+  if content.type = "series" then
+    contentId = "0" + contentId
+  end if
+
+  request = {
+    url: url
+    node: m.top
+    field: "contentRefreshBeforePlay"
+    options: {
+      params: {
+        "app_id": settings.shortAppName
+        platform: "web" 'platform
+        "content_id": contentId
+      }
+    }
+    name: "getSingleContent"
+  }
+  m.metadataFetchTask.request = request
+End Function
+
+Function onPlayLiveTV() As Void
+  tubiLog("ContentController.onPlayLiveTV")
+
+  ' It may be that live tv is already playing and playLiveTV is just tuning to a new station
+  m.videoPlayer.control = "stop"
+  m.videoPlayer.visible = false
+  m.videoPlayer.unobserveField("state")
+  m.videoPlayer.unobserveField("backButtonPressed")
+  m.videoPlayer.unobserveField("upButtonPressed")
+  m.top.unobserveField("contentRefreshBeforePlay")
+
+  tubiLog("LiveTVCursor = [" + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[0])  + "," + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[1]) + "," + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[2]) + "]")
+
+  channel = m.liveTVScreen.liveTVcontent.getChild(m.liveTVScreen.liveTVcontent.liveTVCursor[0])
+  if channel <> invalid then
+    episode = channel.getChild(m.liveTVScreen.liveTVcontent.liveTVCursor[1])
+    if episode <> invalid then
+      episode.nowPos = m.liveTVScreen.liveTVcontent.liveTVCursor[2]
+
+      ' start the video player, but leave the LiveTV group with focus
+      m.videoPlayer.visible = true
+      m.videoPlayer.observeField("state", "onLiveTVState")
+      m.videoPlayer.observeField("backButtonPressed", "onLiveTVButton")
+      m.videoPlayer.observeField("upButtonPressed", "onLiveTVButton")
+      m.videoPlayer.content = episode
+      m.videoPlayer.enableAds = false  ' disable ads to start.  they'll go enabled once the user elects into live tv
+      m.videoPlayer.enableTracking = true
+      m.top.observeField("contentRefreshBeforePlay", "onContentRefreshBeforePlay")
+      refreshBeforePlay(episode)
+      'm.videoPlayer.control = "play"
+
+      'TODO(Chris): find a better way to set focus
+      m.liveTV.findNode("WatchOrTuneMenu").setFocus(true)
+      return
+    end if
+  end if
+  tubiLog("ERROR: Couldn't start live TV")
+End Function
+
+Function onLiveTVState(msg As Object) As Void
+  tubiLog("ContentController.onLiveTVState state = " + m.videoPlayer.state)
+  playerInfo = {}
+  if msg.getField() = "state" and msg.getData() = "finished" or msg.getData() = "error" then
+    if msg.getField() = "state" and msg.getData() = "error" then
+      tubiLog("ERROR: Live TV error")
+      print "Video error"; m.videoPlayer.findNode("VideoNode").errorMsg
+    else
+      print "Episode finished"
+    end if
+
+    ' find the next episode
+    tubiLog("Autoplay: LiveTV")
+
+    cursor = m.liveTVScreen.liveTVcontent.liveTVCursor
+    channel = m.liveTVScreen.liveTVcontent.getChild(cursor[0])
+    if channel <> invalid then
+      cursor[1] = cursor[1] + 1
+      nextEpisode = channel.getChild(cursor[1])
+      if nextEpisode = invalid then
+        cursor[1] = 0  ' wrap playlist
+        nextEpisode = channel.getChild(cursor[1])
+      end if
+      if nextEpisode <> invalid then
+        cursor[2] = 0
+
+        m.liveTVScreen.liveTVcontent.liveTVCursor = cursor  ' also triggers redraw of live tv UI
+
+  tubiLog("LiveTVCursor = [" + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[0])  + "," + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[1]) + "," + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[2]) + "]")
+
+        'TODO(Chris) Don't use nowPos as a trigger for videoplayer.  it's too prone to overloaded use
+        nextEpisode.nowPos = 0
+        m.videoPlayer.content = nextEpisode
+        refreshBeforePlay(nextEpisode)
+        return
+      end if
+    end if
+    tubiLog("ERROR: Couldn't advance live TV")
+  end if
+End Function
+
+Function hideLiveTVUI()
+  tubiLog("ContentController.hideLiveTVUI")
+  m.ScreenStack.visible = false
+  m.videoPlayer.enableAds = true
+  m.videoPlayer.setFocus(true)
+End Function
+
+Function onLiveTVButton(msg As Object)
+  tubiLog("ContentController.onLiveTVButton")
+  m.ScreenStack.visible = true
+  m.videoPlayer.enableAds = false  ' don't trigger ads when UI is showing
+
+  cursor = m.liveTVScreen.liveTVcontent.liveTVCursor
+  cursor[2] = m.videoPlayer.position
+  m.liveTVScreen.liveTVcontent.liveTVCursor = cursor
+
+  tubiLog("LiveTVCursor = [" + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[0])  + "," + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[1]) + "," + stri(m.liveTVScreen.liveTVcontent.liveTVCursor[2]) + "]")
+
+  m.liveTVScreen.liveTVContent = m.liveTVScreen.liveTVContent  ' kick the redraw
+
+  if msg.GetField() = "upButtonPressed" then
+    m.liveTVScreen.showEPG = true
+  end if
+
+  m.liveTVScreen.setFocus(true)
+End Function
 
 '''''''''''''''''''''
 ' playVideoContent

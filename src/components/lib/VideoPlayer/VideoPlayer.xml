@@ -9,7 +9,8 @@
   <interface>
     <!-- Set to true if the back button was pressed while the video player has focus -->
     <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
-
+    <field id="upButtonPressed" type="boolean" value="false" alwaysNotify="true" />
+     
     <!-- Set to true if the skip trailer button was pressed -->
     <field id="skipTrailer" type="boolean" value="false" alwaysNotify="true" />
 
@@ -19,7 +20,7 @@
     <field id="position" alias="VideoNode.position"/>
 
     <!-- Only support play and stop for simple external interface -->
-    <field id="control" type="string" value="none"/>
+    <field id="control" type="string" value="none" alwaysNotify="true"/>
 
     <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
     <field id="historyPosition" type="integer" value="0" />
@@ -94,6 +95,37 @@
       visible="true"
       opacity="0.0" >
       
+      <Group
+       id="LiveTVGroup"
+       visible="false">
+        <Poster
+          id="OnNowBug"
+          uri="pkg:/images/icon-on-now.png"
+          width="115"
+          height="55"
+          translation="[85,961]"/>
+        <Poster
+          id="LiveUpTriangle"
+          uri="pkg:/images/up-arrow.png"
+          visible="true"
+          width="15"
+          height="10"
+          translation="[953,782]"/>
+        <Label
+          id="AllChannels"
+          text="ALL CHANNELS"
+          horizAlign="center"
+          vertAlign="center"
+          width="1920"
+          height="40"
+          translation="[0,797]">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+      </Group>
+
       <!--
         - ProgressBarBackground and ProgressBarForeground use 9-patch images which have
         - special undocumented handling (bugs?).  For manifest with ui_resolution=fhd, we

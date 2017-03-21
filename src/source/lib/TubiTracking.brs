@@ -123,6 +123,7 @@ function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=
       value: value
       key: "resume_after_break"
       ctx: ctx
+      extraCtx: extraCtx
     }
     playProgress: {
       value: value
@@ -139,11 +140,13 @@ function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=
       value: value
       key: "pause_toggle"
       ctx: ctx      
+      extraCtx: extraCtx
     }
     subtitles: {
       value: value
       key: "subtitles_toggle"
       ctx: ctx
+      extraCtx: extraCtx
     }    
     deepLink: {
       value: "deeplink"

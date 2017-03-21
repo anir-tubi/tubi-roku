@@ -92,6 +92,7 @@ Function onContentChange()
     end if
   
     ' Description
+    m.Description.height = 0  ' reset for calculations below
     m.Description.text = content.description
 
     ' Directors
@@ -115,6 +116,12 @@ Function onContentChange()
       ' hide the whole group if no directors listed
       m.StarringGroup.visible = false
     end if
+  end if
+
+  ' try to shorten description to fit max height
+  if m.top.maxHeight <> 0 and m.top.maxHeight < m.top.BoundingRect().height then
+    m.Description.height = m.Description.boundingRect().height - (m.top.BoundingRect().height - m.top.maxHeight)
+    if m.Description.height < 0 then m.Description.height = 0
   end if
 
   'vertically center the info panel

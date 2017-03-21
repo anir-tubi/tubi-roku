@@ -4,6 +4,7 @@ Function init()
   m.top.observeField("height", "onDimensionChange")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("animateToItem", "onAnimateToItem")
+  m.top.observeField("focusAbove", "onFocusAboveChange")
   m.items = m.top.findNode("Items")
   m.focusImage = m.top.findNode("FocusImage")
   m.scrollAnimation = m.top.findNode("ScrollAnimation")
@@ -39,6 +40,18 @@ End Function
 Function onDimensionChange() As Void
   'TODO(Chris): The clipping is quite harsh. Use opacity or mask here
   m.top.clippingRect = [0,0,m.top.width,m.top.height]
+End Function
+
+
+''''''''''''''''''''''
+' onFocusAboveChange
+'
+Function onFocusAboveChange()
+  if m.top.focusAbove then
+    m.top.appendChild(m.focusImage)  ' set z order to last
+  else
+    m.top.insertChild(0, m.focusImage)
+  end if
 End Function
 
 
@@ -82,7 +95,10 @@ Function onContentChange() As Void
     ' may be invalid if itemComponentName incorrectly set
     if newItem <> invalid then
       newItem.content = m.top.content.getChild(i)
-      newItem.id = newItem.content.id
+      ' may be invalid if component doesn't have a 'content' field
+      if newItem.content <> invalid then
+        newItem.id = newItem.content.id
+      end if
 
       ' listHasFocus should default to "false" for itemComponent types
       if m.top.isInFocusChain() then
@@ -131,7 +147,7 @@ End Function
 ' When focus is gained or lost on this component, notify the
 ' child items so they can draw or hide something.
 Function onComponentFocusChange()
-  tubiLog("ScrollingList.onComponentFocusChange")
+ tubiLog("ScrollingList.onComponentFocusChange " + focusState(m.top))
   if m.top.content <> invalid and m.top.content.getChildCount() > 0 then
     ' inform all children of focus change, in case they need to respond to it
     for i=0 to m.items.getChildCount()-1

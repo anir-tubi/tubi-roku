@@ -2,7 +2,6 @@ Function init()
   TubiLog("BackgroundGroup.init")
   m.top.observeField("newBackgroundType", "updateBackground")
   m.top.observeField("enterFromSignIn", "setUnblurred")
-  m.top.observeField("catScreenStart", "startTimer")
 
   m.newBackgroundPoster = invalid
   m.newBackgroundAnimation = invalid
@@ -15,7 +14,6 @@ Function init()
   m.timer = CreateObject("roSGNode", "Timer")
   m.timer.duration = 3
 
-  setUpBackground()
   m.updateCount = 0
 End Function
 
@@ -34,13 +32,6 @@ Function updateBackground()
 
   else
     'we have a roku model that can handle images fading without getting clunky and stuck
-
-    'we don't want to transition the background on the first jump to the featured category
-    if m.updateCount < 2
-      return false
-    end if
-
-
     if m.top.newBackgroundType <> m.currentBackgroundType
       'we are creating a new gradient overlay and updating the background image
       'ie. moving from the category screen to details screen or vice versa
@@ -55,20 +46,23 @@ Function updateBackground()
         m.top.removeChildIndex(0)
       end while
 
-      addNewBackground()
-
       m.oldTransitionOut = invalid
       if m.top.getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages") <> invalid and m.top.getChild(0).findNode("BackgroundImages").getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex) <> invalid
         m.oldTransitionOut = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex).findNode("TransitionOut")
       end if
+
+      addNewBackground()
+      posterGroup = invalid
 
       if m.oldTransitionOut <> invalid and m.top.getChild(0) <> invalid and m.top.getChild(0).findNode("GradientFadeOut") <> invalid
         m.oldTransitionOut.control = "start"
         m.top.getChild(0).findNode("GradientFadeOut").control = "start"
       end if
 
-      if m.top.getChild(1) <> invalid and m.top.getChild(1).findNode("BackgroundImages") <> invalid and m.top.getChild(1).findNode("BackgroundImages").getChild(0) <> invalid
-        posterGroup = m.top.getChild(1).findNode("BackgroundImages").getChild(0).getChild(0)
+
+      lastAddedPoster = m.top.getChildCount() - 1
+      if m.top.getChild(lastAddedPoster) <> invalid and m.top.getChild(lastAddedPoster).findNode("BackgroundImages") <> invalid and m.top.getChild(lastAddedPoster).findNode("BackgroundImages").getChild(0) <> invalid
+        posterGroup = m.top.getChild(lastAddedPoster).findNode("BackgroundImages").getChild(0).getChild(0)
       end if
 
       if posterGroup <> invalid
@@ -79,8 +73,6 @@ Function updateBackground()
         else
           m.newBackgroundAnimation = posterGroup.findNode("TransitionIn")
         end if
-
-        ' m.top.getChild(1).findNode("GradientFadeIn").control = "start"
 
         if m.newBackgroundPoster.loadStatus = "ready"
           m.newBackgroundAnimation.observeField("state", "onTransitionComplete")
@@ -98,7 +90,6 @@ Function updateBackground()
     else
       'we are not changing the gradient overlay because the background types are the same
       'so we are just updating the background image list
-
       m.timer.unobserveField("fire")
 
       'don't update the background image if it hasn't changed (ie. changing categories)
@@ -115,9 +106,11 @@ Function updateBackground()
       end while
 
       'remove any image groups/lists that might be still transitioning when we want to start our new transition
-      while m.top.getChild(0).findNode("BackgroundImages").getChildCount() > 1
-        m.top.getChild(0).findNode("BackgroundImages").removeChildIndex(0)
-      end while
+      if m.top.getChild(0) <> invalid
+        while m.top.getChild(0).findNode("BackgroundImages").getChildCount() > 1
+          m.top.getChild(0).findNode("BackgroundImages").removeChildIndex(0)
+        end while
+      end if
 
       m.imageIndex = 0
       addNewImageList()
@@ -190,16 +183,6 @@ Function setUpBackground()
 End Function
 
 
-'this is used specifically when we are listening for if the category screen was loaded via the catScreenStart field
-Function startTimer()
-  TubiLog("BackgroundGroup.startTimer on CategoryScreen start")
-  m.timer.unobserveField("fire")
-  m.timer.control = "stop"
-  m.timer.observeField("fire", "blurBackground")
-  m.timer.control = "start"
-End Function
-
-
 Function addNewBackground(isIntro=false as Boolean)
   'we have a new background type, so we need to switch out the whole background including the gradient
   if isIntro = true
@@ -244,6 +227,10 @@ Function addNewImageList()
     posterType = "DetailsPoster"
   else
     return false
+  end if
+
+  if m.top.getChild(0) = invalid
+    addNewBackground()
   end if
 
   backgroundImages = m.top.getChild(0).findNode("BackgroundImages")
@@ -355,37 +342,19 @@ Function setUnblurred()
 End Function
 
 
-Function blurBackground()
-  TubiLog("BackgroundGroup.blurBackground")
-  m.timer.unobserveField("fire")
-  current = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(0)
-  
-  if current <> invalid and current.findNode("BackgroundPoster").uri = m.unblurredDefaultBackground
-    future = m.top.getChild(0).findNode("BackgroundImages").getChild(1).getChild(0)
-    fadeOut = current.findNode("TransitionOut")
-    fadeIn = future.findNode("FadeInOnly")
-
-    fadeOut.control = "start"
-    fadeIn.control = "start"
-
-    m.newBackgroundPoster = future.findNode("BackgroundPoster")
-    m.newBackgroundAnimation = fadeIn
-  end if
-End Function
-
-
 Function addLowMemBackground()
   if m.top.newBackgroundType = "grid"
     newBackground = CreateObject("roSGNode", "GridBackground")
-  
+    newBackground.findNode("BackgroundImages").createChild("Group").createChild("GridPoster")
   else if m.top.newBackgroundType = "details"
     newBackground = CreateObject("roSGNode", "DetailsBackground")
-
+    newBackground.findNode("BackgroundImages").createChild("Group").createChild("DetailsPoster")
   end if
 
   newBackground.findNode("BackgroundPoster").uri = m.top.backgroundUriList[0]
-
   m.top.appendChild(newBackground)
+  m.top.getChild(0).findNode("BackgroundGradient").opacity = 1.0
+  m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(0).findNode("BackgroundPoster").opacity = 1.0
 End Function
 
 

@@ -16,8 +16,8 @@ End Function
 Function onKeyEvent(key As String, press As Boolean)
   tubiLog("ScreenStack.onKeyEvent")
   if press then
-    if key = "back"
-      if m.ScreenStack_.getChildCount() > 1 then 
+    if key = "back" 
+      if m.ScreenStack_.getChildCount() > 1 then
         popScreen()
       else if m.ScreenStackEmptyCallback_ <> invalid and type(m.ScreenStackEmptyCallback_) = "roFunction" and m.enteredFromDeepLink = true then
         ' only remove the last item if we have a valid callback
@@ -29,7 +29,6 @@ Function onKeyEvent(key As String, press As Boolean)
         exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")
         return true
       end if
-      return true  ' unhandled back button will exit the app. prevent that by returning true
     end if
   end if
   return false

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="ToolsMenu" extends="Group" >
+  <script type="text/brightscript" uri="pkg:/components/lib/ToolsMenu/ToolsMenu.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- read/write field -->
+    <field id="signedIn" type="boolean" value="false" />
+    
+    <!-- read fields -->
+    <field id="itemSelected" alias="Menu.itemSelected" />
+    <field id="content" alias="Menu.content" />
+    
+    <field id="downButtonPressed" type="boolean" alwaysNotify="true" />
+    
+    <!-- set to true when the user has selected the "Search" button -->
+    <field id="searchSelected" type="boolean" alwaysNotify="true"/>
+
+    <!-- set to true when the user has selected the "Sign In" button -->
+    <field id="signInSelected" type="boolean" alwaysNotify="true"/>
+
+    <!-- set to true when the user has selected the "Sign Out" button -->
+    <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
+
+    <!-- set to true when the user has selected the "About" button -->
+    <field id="aboutSelected" type="boolean" alwaysNotify="true"/>
+    
+    <!-- set to true when the user has selected the "Privacy" button -->
+    <field id="privacySelected" type="boolean" alwaysNotify="true"/>
+    
+    <!-- will be used to change the background images on the content controller -->
+    <field id="backgroundUriList" 
+           type="stringarray" 
+           value="[&quot;pkg:/images/grid-default-blurred.jpg&quot;]"
+           alwaysNotify="true" />
+    
+    
+  </interface>
+
+  <children>
+    <ScrollingList
+      id="Menu"
+      layoutDirection="horiz"
+      width="1760"
+      height="500"
+      visible="true"
+      translation="[85,257]"
+      itemSpacings="[10]"
+      scrollWidth="1760"
+      scrollHeight="500"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
+      itemComponentName="SignInPoster"/>
+    
+    <SignInPosterContentNode
+      id="SearchSignInContent">
+      <SignInPosterContentNode
+        id="SearchMenuItem"
+        title="Search" 
+        description="Search Tubi TV using the name of a Movie or TV Show. You can also search by Actor Name or Keyword"
+        focusIconUrl="pkg:/images/icon-search-large-on.png"
+        unfocusIconUrl="pkg:/images/icon-search-large.png"/>
+      <SignInPosterContentNode
+        id="SignInOutMenuItem"
+        title="Sign Out"
+        description="Sign Out of Tubi TV"
+        focusIconUrl="pkg:/images/icon-sign-in-large-on.png"
+        unfocusIconUrl="pkg:/images/icon-sign-in-large.png"/>
+      <SignInPosterContentNode
+        id="AboutMenuItem"
+        title="About"
+        description="View general information about Tubi TV including the version number of this app"
+        focusIconUrl="pkg:/images/icon-about-large-on.png"
+        unfocusIconUrl="pkg:/images/icon-about-large.png"/>
+      <SignInPosterContentNode
+        id="PrivacyMenuItem"
+        title="Privacy"
+        description="Review Tubi TV's privacy policy"
+        focusIconUrl="pkg:/images/icon-privacy-large-on.png"
+        unfocusIconUrl="pkg:/images/icon-privacy-large.png"/>
+    </SignInPosterContentNode>
+    
+    <Label
+      id="Description"
+      text=""
+      width="870"
+      height="80"
+      wrap="true"
+      horizAlign="center"
+      translation="[525,707]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="30"/>
+    </Label>
+  </children>
+</component>

@@ -17,13 +17,24 @@
  -->
 <component name="TubiScene" extends="Scene">
 
+  <script type="text/brightscript" uri="pkg:/components/controllers/TubiScene/TubiScene.brs" />
+
   <children>
-    <Poster
-      id="LoaderBackground"
-      loadSync="true"
+    <Rectangle
       width="1920"
       height="1080"
-      uri="pkg:/images/splash-1920.jpg"/>
+      color="0x000000FF"/>
+
+    <!-- Show a loading spinner only if it takes more than 3 seconds to load -->
+    <Spinner
+      id="LoadingSpinner"
+      visible="false"
+      width="1920"
+      height="1080"/>
+
+    <Timer
+      id="LoadingTimer"
+      duration="3"/>
 
     <ComponentLibrary
       id="TubiRemoteLibrary"/>
