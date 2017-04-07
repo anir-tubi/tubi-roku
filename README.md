@@ -138,3 +138,11 @@ Remember to push the new tag to remote with 'git push --tags origin'
 | /src/source | Non-SceneGraph BrightScript code; Libraries and non-SceneGraph screens |
 | /src/source/tests | Unit tests for non-SceneGraph Brightscript code |
 | /tools | These are build-time tools based on node.  They are launched from the Makefile. |
+
+
+
+
+## Tubi TV Brightscript Style Guide
+Please reference the following style guide for best practices:
+
+[Tubi TV Brightscript Style Guide] (https://gist.github.com/brybott-adrise/ba0233b203a8f5c3ff75d7a59a7ee6e5)
