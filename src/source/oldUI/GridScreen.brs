@@ -5,11 +5,17 @@ function GridScreen (utils)
     isLogoutButtonShown: false
     isFocusSet: false
     isShownAfterAutoPlay: false
+    basicUserPlaylistData: invalid
 
     'create the roTimespan object to be used for 'on focus' tracking
     'we want to see if the user has focused on something for at least a second
     timer: CreateObject("roTimespan")
     focusCount: 0
+
+    'keeps track of calls to get user playlist info
+    httpIds: {}
+    bookmarksRetryCount: 0
+    previouslyViewedRetryCount: 0
 
     utils: utils
     populatePlaylistWithEpisodes: GridScreen_populatePlaylistWithEpisodes
@@ -39,13 +45,12 @@ function GridScreen (utils)
 
       'Get the bookmarks and the previously viewed content from server (queue and history)
       'but only the first time the grid screen loads once the user is logged in!
-      basicUserPlaylistData = invalid
       if m.isLogoutButtonShown = false or m.isShownAfterAutoPlay = true
-        basicUserPlaylistData = m.cp.getBookmarksAndPreviouslyViewedFromServer()
+        m.basicUserPlaylistData = m.cp.getBookmarksAndPreviouslyViewedFromServer()
         m.isShownAfterAutoPlay = false
       end if
       
-      m.initGrid(m.rokuGridScreen, cp, basicUserPlaylistData)
+      m.initGrid(m.rokuGridScreen, cp)
 
       m.playlistsCount = cp.getAllPlaylistsCount()
 
@@ -57,7 +62,6 @@ function GridScreen (utils)
       end if
 
       playlists =[]
-      httpIds = {}
 
       'get all episode data for each row/playlist
       rowNum = 0
@@ -66,17 +70,17 @@ function GridScreen (utils)
       while true
         if rowNum = m.rowOffset + 2
           'before loading the 3rd/5th row (depending on if logged in), make the calls for the user playlists
-          if basicUserPlaylistData <> invalid and basicUserPlaylistData.bookmarks <> invalid
-            fullBookmarksId = m.cp.getFullUserPlaylistContent(basicUserPlaylistData.bookmarks, settings.bookmarkRegistry, msgPort)
+          if m.basicUserPlaylistData <> invalid and m.basicUserPlaylistData.bookmarks <> invalid and m.cp.userPlaylists.bookmarks.isLoaded = false
+            fullBookmarksId = m.cp.getFullUserPlaylistContent(m.basicUserPlaylistData.bookmarks, settings.bookmarkRegistry, msgPort)
             if fullBookmarksId <> invalid
-              httpIds.fullBookmarksId = fullBookmarksId
+              m.httpIds.fullBookmarksId = fullBookmarksId
             end if
           end if
 
-          if basicUserPlaylistData <> invalid and basicUserPlaylistData.previouslyViewed <> invalid
-            fullPreviouslyViewedId = m.cp.getFullUserPlaylistContent(basicUserPlaylistData.previouslyViewed, settings.bookmarkRegistry, msgPort)
+          if m.basicUserPlaylistData <> invalid and m.basicUserPlaylistData.previouslyViewed <> invalid and m.cp.userPlaylists.previous.isLoaded = false
+            fullPreviouslyViewedId = m.cp.getFullUserPlaylistContent(m.basicUserPlaylistData.previouslyViewed, settings.previouslyViewedRegistry, msgPort)
             if fullPreviouslyViewedId <> invalid
-              httpIds.fullPreviouslyViewedId = fullPreviouslyViewedId
+              m.httpIds.fullPreviouslyViewedId = fullPreviouslyViewedId
             end if
           end if
         end if
@@ -156,7 +160,7 @@ function GridScreen (utils)
         m.isShown = true
 
         'stop early if user selects something or exits
-        status = m.checkForInput(selItem, msgPort, 10, playlists, httpIds, basicUserPlaylistData)
+        status = m.checkForInput(selItem, msgPort, 10, playlists)
 
         'do the appropriate action based on any remote input received
         inputResult = m.handleInput(status, rokuGridScreen, playlists, selItem, msgPort)
@@ -181,7 +185,7 @@ function GridScreen (utils)
       ' loop until user selects something or exits
       while true
         'stop early if user selects something or exits
-        status = m.checkForInput(selItem, msgPort, 0, playlists, httpIds, basicUserPlaylistData)
+        status = m.checkForInput(selItem, msgPort, 0, playlists)
 
 
         'do the appropriate action based on any remote input received'
@@ -195,7 +199,7 @@ function GridScreen (utils)
       end while
     end function
 
-    checkForInput: function (selItem, msgPort, time, playlists, httpIds=invalid, basicUserPlaylistData=invalid)
+    checkForInput: function (selItem, msgPort, time, playlists)
       settings = m.utils.getSettings()
       status = {
         message: ""
@@ -210,33 +214,58 @@ function GridScreen (utils)
           respObj = m.utils.getAsyncResponse(msg, 0)
 
           'check for and handle any responses for user user playlists from the content API
-          if httpIds <> invalid
-            if httpIds.fullBookmarksId <> invalid
-              if respObj.id = httpIds.fullBookmarksId
-                bookmarkEpisodes = m.cp.parseAndSaveBookmarks(respObj.data, basicUserPlaylistData.bookmarks)
+          if m.httpIds <> invalid
+            if m.httpIds.fullBookmarksId <> invalid
+              if respObj.id = m.httpIds.fullBookmarksId
+                if respObj.responseCode >= 200 and respObj.responseCode < 300
+                  bookmarkEpisodes = m.cp.parseAndSaveBookmarks(respObj.data, m.basicUserPlaylistData.bookmarks)
 
-                if bookmarkEpisodes <> invalid
-                  m.cp.playlists[m.bookmarkRowNum].episodes = bookmarkEpisodes
-                end if
+                  if bookmarkEpisodes <> invalid
+                    m.cp.playlists[m.bookmarkRowNum].episodes = bookmarkEpisodes
+                    m.cp.userPlaylists[settings.bookmarkRegistry].isLoaded = true
+                  end if
 
-                bookmarkPlaylist = m.cp.getPlaylist(m.bookmarkRowNum)
-                if bookmarkPlaylist <> invalid and bookmarkPlaylist.episodes <> invalid
-                  m.rokuGridScreen.SetContentList(m.bookmarkRowNum, bookmarkPlaylist.episodes)
+                  bookmarkPlaylist = m.cp.getPlaylist(m.bookmarkRowNum)
+                  if bookmarkPlaylist <> invalid and bookmarkPlaylist.episodes <> invalid
+                    m.rokuGridScreen.SetContentList(m.bookmarkRowNum, bookmarkPlaylist.episodes)
+                  end if
+                else
+                  'retry
+                  if m.bookmarksRetryCount < 20
+                    fullBookmarksId = m.cp.getFullUserPlaylistContent(m.basicUserPlaylistData.bookmarks, settings.bookmarkRegistry, msgPort)
+                    if fullBookmarksId <> invalid
+                      m.httpIds.fullBookmarksId = fullBookmarksId
+                    end if
+                    m.bookmarksRetryCount = m.bookmarksRetryCount + 1
+                  end if
                 end if
               end if
             end if
 
-            if httpIds.fullPreviouslyViewedId <> invalid
-              if respObj.id = httpIds.fullPreviouslyViewedId
-                previouslyViewedEpisodes = m.cp.parseAndSavePreviouslyViewed(respObj.data, basicUserPlaylistData.previouslyViewed)
+            if m.httpIds.fullPreviouslyViewedId <> invalid
+              if respObj.id = m.httpIds.fullPreviouslyViewedId
 
-                if previouslyViewedEpisodes <> invalid
-                  m.cp.playlists[m.previouslyViewedRowNum].episodes = previouslyViewedEpisodes
-                end if
-                
-                previouslyViewedPlaylist = m.cp.getPlaylist(m.previouslyViewedRowNum)
-                if previouslyViewedPlaylist <> invalid and previouslyViewedPlaylist.episodes <> invalid
-                  m.rokuGridScreen.SetContentList(m.previouslyViewedRowNum, previouslyViewedPlaylist.episodes)
+                if respObj.responseCode >= 200 and respObj.responseCode < 300
+                  previouslyViewedEpisodes = m.cp.parseAndSavePreviouslyViewed(respObj.data, m.basicUserPlaylistData.previouslyViewed)
+
+                  if previouslyViewedEpisodes <> invalid
+                    m.cp.playlists[m.previouslyViewedRowNum].episodes = previouslyViewedEpisodes
+                    m.cp.userPlaylists[settings.previouslyViewedRegistry].isLoaded = true
+                  end if
+
+                  previouslyViewedPlaylist = m.cp.getPlaylist(m.previouslyViewedRowNum)
+                  if previouslyViewedPlaylist <> invalid and previouslyViewedPlaylist.episodes <> invalid
+                    m.rokuGridScreen.SetContentList(m.previouslyViewedRowNum, previouslyViewedPlaylist.episodes)
+                  end if
+                else
+                  'retry
+                  if m.previouslyViewedRetryCount < 20
+                    fullPreviouslyViewedId = m.cp.getFullUserPlaylistContent(m.basicUserPlaylistData.previouslyViewed, settings.previouslyViewedRegistry, msgPort)
+                    if fullPreviouslyViewedId <> invalid
+                      m.httpIds.fullPreviouslyViewedId = fullPreviouslyViewedId
+                    end if
+                    m.previouslyViewedRetryCount = m.previouslyViewedRetryCount + 1
+                  end if
                 end if
               end if              
             end if
@@ -397,7 +426,7 @@ function GridScreen (utils)
     'This function is called every time a user navigates back to the gridscreen.
     'The 2nd time the gridscreen is generated, cp.playlists already exists (including the tools row)
     'and the 'Tools' name doesn't need to be pre added
-    initGrid: function (rokuGridScreen as Object, cp as Object, basicUserPlaylistData=invalid)
+    initGrid: function (rokuGridScreen as Object, cp as Object)
       settings = m.utils.getSettings()
 
       oldOffset = m.rowOffset
@@ -418,12 +447,12 @@ function GridScreen (utils)
       basicBookmarksData = invalid
       basicPrevioulsyViewedData = invalid
 
-      if basicUserPlaylistData <> invalid
-        if basicUserPlaylistData.bookmarks <> invalid
-          basicBookmarksData = ParseJson(basicUserPlaylistData.bookmarks)
+      if m.basicUserPlaylistData <> invalid
+        if m.basicUserPlaylistData.bookmarks <> invalid and m.cp.userPlaylists.bookmarks.isLoaded = false
+          basicBookmarksData = ParseJson(m.basicUserPlaylistData.bookmarks)
         end if
-        if basicUserPlaylistData.previouslyViewed <> invalid
-          basicPrevioulsyViewedData = ParseJson(basicUserPlaylistData.previouslyViewed)
+        if m.basicUserPlaylistData.previouslyViewed <> invalid and m.cp.userPlaylists.previous.isLoaded = false
+          basicPrevioulsyViewedData = ParseJson(m.basicUserPlaylistData.previouslyViewed)
         end if
       end if
 
@@ -548,7 +577,7 @@ function Gridscreen_loadOnNewFocus(playlists, selItem)
     end for
 
     if playlists[newCurrentRow].isSubsetted <> true
-      m.utils.log.info(invalid, "1: current-row-not-subsetted-on-new-focus", newCurrentRow)
+      m.utils.log.info(invalid, "clientInfo", "1: current-row-not-subsetted-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow, playlists[newCurrentRow].episodes, 0, 8)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow, playlists[newCurrentRow].episodes, playlists[newCurrentRow].episodes.count() - 3, 3)
       m.rokuGridScreen.SetListOffset(selItem.listIndex, selItem.itemIndex)
@@ -556,33 +585,33 @@ function Gridscreen_loadOnNewFocus(playlists, selItem)
     end if
 
     if isLast = false and playlists[newCurrentRow + 1].isSubsetted <> true
-      m.utils.log.info(invalid, "2: next-row-not-subsetted-on-new-focus", newCurrentRow)
+      m.utils.log.info(invalid, "clientInfo", "2: next-row-not-subsetted-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow + 1, playlists[newCurrentRow + 1].episodes, 0, 8)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow + 1, playlists[newCurrentRow + 1].episodes, playlists[newCurrentRow + 1].episodes.count() - 3, 3)
       playlists[newCurrentRow + 1].isSubsetted = true
     end if
 
     if playlists[newCurrentRow].isComplete <> true 
-      m.utils.log.info(invalid, "3: current-row-not-complete-on-new-focus", newCurrentRow)
+      m.utils.log.info(invalid, "clientInfo", "3: current-row-not-complete-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow, playlists[newCurrentRow].episodes, 8, playlists[newCurrentRow].episodes.count() - 11)
       playlists[newCurrentRow].isComplete = true
     end if
 
     if isLast = false and playlists[newCurrentRow + 1].isComplete <> true
-      m.utils.log.info(invalid, "4: next-row-not-complete-on-new-focus", newCurrentRow)
+      m.utils.log.info(invalid, "clientInfo", "4: next-row-not-complete-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow + 1, playlists[newCurrentRow + 1].episodes, 8, playlists[newCurrentRow + 1].episodes.count() - 11)
       playlists[newCurrentRow + 1].isComplete = true
     end if
 
     if playlists[newCurrentRow - 1].isSubsetted <> true
-      m.utils.log.info(invalid, "5: previous-row-not-subsetted-on-new-focus", newCurrentRow)
+      m.utils.log.info(invalid, "clientInfo", "5: previous-row-not-subsetted-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow - 1, playlists[newCurrentRow - 1].episodes, 0, 8)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow - 1, playlists[newCurrentRow - 1].episodes, playlists[newCurrentRow - 1].episodes.count() - 3, 3)
       playlists[newCurrentRow - 1].isSubsetted = true
     end if
 
     if playlists[newCurrentRow - 1].isComplete <> true
-      m.utils.log.info(invalid, "6: current-row-not-complete-on-new-focus", newCurrentRow)
+      m.utils.log.info(invalid, "clientInfo", "6: current-row-not-complete-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow - 1, playlists[newCurrentRow - 1].episodes, 8, playlists[newCurrentRow - 1].episodes.count() - 11)
       playlists[newCurrentRow - 1].isComplete = true
     end if

@@ -7,22 +7,48 @@ function AdriseLogging (utils)
       debug: {
         name: "debug"
         printed: "DEBUG"
-        server: "CLIENT:DEBUG"
+        logType: {
+          clientDebug: "CLIENT:DEBUG"
+          apiDebug: "API:DEBUG"
+          videoDebug: "VIDEO:DEBUG"
+          adDebug: "AD:DEBUG"
+        }
       }
+
       error: {
         name: "error"
         printed: "ERROR"
-        server: "CLIENT:ERROR"
+        logType: {
+          apiError: "API:ERROR"
+          apiBad: "API:BAD_RESPONSE"
+          videoPlayback: "VIDEO:PLAYBACK"
+          videoLoad: "VIDEO:LOAD"
+          adError: "AD:ERROR"
+        }
       }
+
       info: {
         name: "info"
         printed: "INFO"
-        server: "CLIENT:INFO"
+        logType: {
+          clientInfo: "CLIENT:INFO"
+          apiInfo: "API:INFO"
+          videoInfo: "VIDEO:INFO"
+          adInfo: "AD:INFO"
+        }
       }
+
       warn: {
         name: "warn"
         printed: "WARN"
-        server: "CLIENT:WARN"
+        logType: {
+          apiSlow: "API:SLOW"
+          apiTimeout: "API:TIMEOUT"
+          adTimeout: "AD:TIMEOUT"
+          adBadResponse: "AD:BAD_RESPONSE"
+          videoBuffer: "VIDEO:BUFFER"
+          clientWarn: "CLIENT:WARN"
+        }
       }
     } 
 
@@ -38,38 +64,38 @@ end function
 
 'debug is used to track a specific user's device
 'debug will only send logging if the device id is in m.idsToLog
-function adriseLogging_debug(port, subtype as string, message as string)
-  options = m.buildOptions(subtype, message, m.logConsts.debug.name, m.logConsts.debug.server, m.logConsts.debug.printed)
+function adriseLogging_debug(port, logType as string, subtype as string, message as string)
+  options = m.buildOptions(subtype, message, m.logConsts.debug.name, m.logConsts.debug.logType[logType], m.logConsts.debug.printed)
   m.sendLogging(port, options)
 end function
 
 
-function adriseLogging_error(port, subtype, message)
-  options = m.buildOptions(subtype, message,m.logConsts.error.name, m.logConsts.error.server, m.logConsts.error.printed)
+function adriseLogging_error(port, logType, subtype, message)
+  options = m.buildOptions(subtype, message,m.logConsts.error.name, m.logConsts.error.logType[logType], m.logConsts.error.printed)
   m.sendLogging(port, options)  
 end function
 
 
-function adriseLogging_info(port, subtype, message)
-  options = m.buildOptions(subtype, message, m.logConsts.info.name, m.logConsts.info.server, m.logConsts.info.printed)
+function adriseLogging_info(port, logType, subtype, message)
+  options = m.buildOptions(subtype, message, m.logConsts.info.name, m.logConsts.info.logType[logType], m.logConsts.info.printed)
   m.sendLogging(port, options)  
 end function
 
 
-function adriseLogging_warn(port, subtype, message)
-  options = m.buildOptions(subtype, message, m.logConsts.warn.name, m.logConsts.warn.server, m.logConsts.warn.printed)
+function adriseLogging_warn(port, logType, subtype, message)
+  options = m.buildOptions(subtype, message, m.logConsts.warn.name, m.logConsts.warn.logType[logType], m.logConsts.warn.printed)
   m.sendLogging(port, options)  
 end function
 
 
-function adriseLogging_buildOptions(subtype, message, level, serverType, printed)
+function adriseLogging_buildOptions(subtype, message, level, logType, printed)
   options = {
     level: level
     subtype: subtype
     message: message
     printed: printed
   }
-  options["type"] = serverType
+  options["type"] = logType
 
   return options
 end function
@@ -102,6 +128,8 @@ function adriseLogging_sendLogging(port, options)
         ua: m.utils.deviceInfo.userAgentPlusModel
         version: m.utils.deviceInfo.clientVersion
       }
+
+      options.delete("printed")
       loggingInfo.append(options)
 
       loggingInfo["user_id"] = 0

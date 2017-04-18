@@ -36,8 +36,8 @@ function AdriseAds (utils, playerPort)
     'for any async responses that we expect back
     playerPort: playerPort
 
-    baseUrl: "http://ads.adrise.tv/"
     ' baseUrl: "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
+    baseUrl: "http://ads.adrise.tv/"
 
     ' methods
 	  reset: adriseAds_reset
@@ -375,7 +375,7 @@ function adriseAds_getAdUnitsListTraditional(episode, playerSettings, traditiona
 
   ' make sure that the xml pulled from the clickThrough RAF XML doc is valid and useable
   if not xml.Parse(traditionalAdXmlString) or xml.GetName() <> "feed" or islist(xml.GetBody()) = false
-    m.utils.log.info(playerSettings.playerPort, "no-ads-in-xml", "error with traditional ad xml - nothing returned")
+    m.utils.log.info(playerSettings.playerPort, "apiBad", "no-ads-in-xml", "error with traditional ad xml - nothing returned")
     print ""
     return []
   end if
@@ -511,7 +511,7 @@ function adriseAds_getAdUnitFromXml(adXml)
 
     'Determine if there are any type of companion ads running
     if adXml.companion_ad.GetAttributes().type <> invalid
-      m.utils.log.info(m.playerPort, "companion-ad", "THERE IS A COMPANION AD")
+      m.utils.log.info(m.playerPort, "clientInfo", "companion-ad", "THERE IS A COMPANION AD")
       companionAttributes = adXml.companion_ad.GetAttributes()
 
       'if the companion ad is Brightline, add Brightline information for companion ads to adUnit object.
@@ -873,21 +873,21 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails, playerSettings)
                   GetGlobalAA().app.detailScreen.addBookmarkReqIds[bookmarkReqId.toStr()] = true
 
                   houseAdDialog.updateText(bookmarkContent.title + " has been added to your queue.")
-                  m.utils.log.info(adPort, "house-ad-bookmark-success", "Bookmark added from house ad for content id " + bookmarkContent.id)
+                  m.utils.log.info(adPort, "clientInfo", "house-ad-bookmark-success", "Bookmark added from house ad for content id " + bookmarkContent.id)
                   
                 else
                   houseAdDialog.updateText("Sorry, we could not update your bookmark")
-                  m.utils.log.warn(adPort, "house-ad-bookmark-fail", "Could not ad bookmark from house ad due to not finding content")
+                  m.utils.log.warn(adPort, "clientWarn", "house-ad-bookmark-fail", "Could not ad bookmark from house ad due to not finding content")
                 end if
               
               else
                 houseAdDialog.updateText("Sorry, we could not update your bookmark")
-                m.utils.log.warn(adPort, "house-ad-bookmark-fail", "Could not ad bookmark from house ad due to incomplete data")
+                m.utils.log.warn(adPort, "clientWarn", "house-ad-bookmark-fail", "Could not ad bookmark from house ad due to incomplete data")
               end if
             
             else
               houseAdDialog.updateText("You must be logged in to add content to your queue.")
-              m.utils.log.info(adPort, "house-ad-bookmark-fail", "Bookmark not added because user not logged in")
+              m.utils.log.info(adPort, "clientInfo", "house-ad-bookmark-fail", "Bookmark not added because user not logged in")
 
             end if
             houseAdDialog.show()
@@ -1016,7 +1016,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails, playerSettings)
           end if
 
           errorMsg = "Video(AD) request failure on ad id: " + adUnit.id + "error index: " + msg.GetIndex() + " data: " + msg.GetData() +  " message: " + msg.GetMessage() +  " error type: " +  msg.GetType() + " ad url: " + errorVal
-          m.utils.log.error(m.playerPort, "ad-video-failure", errorMsg)
+          m.utils.log.error(m.playerPort, "adError", "ad-video-failure", errorMsg)
 
           m.videoAdErrorCount = 0
           exit while

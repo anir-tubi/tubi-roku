@@ -23,7 +23,6 @@ Function TubiLogger(constants, request, auth)
           apiBadResponse: "API:BAD_RESPONSE"
           videoPlayback: "VIDEO:PLAYBACK"
           videoLoad: "VIDEO:LOAD"
-          videoBuffer: "VIDEO:BUFFER"
           adError: "AD:ERROR"
         }
       }
@@ -44,6 +43,7 @@ Function TubiLogger(constants, request, auth)
           clientMemory: "CLIENT:MEMORY"
           clientCpu: "CLIENT:CPU"
           clientDisk: "CLIENT:DISK"
+          clientWarn: "CLIENT:WARN"
           adTimeout: "AD:TIMEOUT"
           adBadResponse: "AD:BAD_RESPONSE"
           videoBuffer: "VIDEO:BUFFER"

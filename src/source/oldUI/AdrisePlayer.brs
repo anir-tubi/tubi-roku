@@ -440,7 +440,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
       if msg.isRequestFailed()
 
         errorMsg = "video with id: " + episode.id + " failed. Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
-        m.utils.log.error(m.playerPort, "video-fail", errorMsg)
+        m.utils.log.error(m.playerPort, "videoPlayback", "video-fail", errorMsg)
 
         m.canvas.close()
         return "FAILED"
@@ -450,7 +450,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
       if msg.isStreamStarted()
         if msg.getInfo().isUnderrun = true
           warningMsg = "Video with id: " + episode.id + " buffered mid stream. Segment Url: " + msg.getInfo().url + " Stream Bitrate: " + msg.getInfo().streamBitrate.toStr() + " Measured Bitrate: " + msg.getInfo().measuredBitrate.toStr()
-          m.utils.log.warn(m.playerPort, "video-rebuffer",  warningMsg)
+          m.utils.log.warn(m.playerPort, "videoBuffer", "video-rebuffer",  warningMsg)
         end if
       end if
 
@@ -520,7 +520,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
         'turns the captions off if instant replay captions have been activated and 30s has elapsed
         if playerStates.replayEnd > 0 and playerStates.nowPos > playerStates.replayEnd
-          m.cancelInstantReplay(playerStates, deviceInfo.GetCaptionsMode(), captions)
+          m.cancelInstantReplay(playerStates, captions)
         end if
       end if
 
@@ -543,8 +543,14 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
 
     else if type(msg) = "roImageCanvasEvent"
+      if msg.isScreenClosed()
+        ' This is only relevant when the user exits the channel.  From testing, I
+        ' found that this event fires before the VM is shut down which is just
+        ' enough time to fix the global caption state.
+        m.cancelInstantReplay(playerStates, captions)
+
       'the user pressed a button on the remote
-      if msg.isRemoteKeyPressed()
+      else if msg.isRemoteKeyPressed()
         'back button
         if msg.GetIndex() = 0
           'close the screen
@@ -552,6 +558,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           'save the last position to memory
           m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)
           m.canvas.close()
+          m.cancelInstantReplay(playerStates, captions)
           return "CLOSED"
         end if
         
@@ -562,7 +569,8 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           end if
 
           if playerStates.isScrubbing = false
-            m.cancelInstantReplay(playerStates, deviceInfo.GetCaptionsMode(), captions)
+            playerStates.nowPosAtScrub = playerStates.nowPos
+            m.cancelInstantReplay(playerStates, captions)
             startScrub(player, scrubTimer, playerStates, episode)
           end if
           'update the speed of scrubbing with max ff or rw at 6
@@ -598,7 +606,8 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           end if
 
           if playerStates.isScrubbing = false
-            m.cancelInstantReplay(playerStates, deviceInfo.GetCaptionsMode(), captions)
+            playerStates.nowPosAtScrub = playerStates.nowPos
+            m.cancelInstantReplay(playerStates, captions)
             startScrub(player, scrubTimer, playerStates, episode)
           end if
           'update the speed of scrubbing with max ff or rw at 6
@@ -629,6 +638,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
         'left/right buttons: 10 second hop back/forth
         if msg.GetIndex() = 4 or msg.GetIndex() = 5
+          m.cancelInstantReplay(playerStates, captions)
           playerStates.isInHopMode = true
 
           'if user is fast forwarding or rewinding stop the scrub
@@ -747,6 +757,9 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
             'set up captions for 30s if the user has instant replay captions set globally
             if globalCaptions = "Instant replay"
               captions.showSubtitle(true)
+              ' For RokuTV: The showSubtitle call is ignored if global caption state is not "on", so
+              ' a temporary change has to be made at the global "device" level, then switched back later.
+              deviceInfo.SetCaptionsMode("On")
               playerStates.replayEnd = playerStates.nowPos + 30
             end if
 
@@ -763,6 +776,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
           player.pause()
           
           'show a dialog that will let users turn on/off captions
+          m.cancelInstantReplay(playerStates, captions)  ' set up the caption dialog by interrupting any instant replay captions
           if GetGlobalAA().app.detailScreen.showCaptionsDialog(episode) = "On"
             captions.showSubtitle(true)
           else
@@ -1262,7 +1276,7 @@ function AdrisePlayer_handleVideoFailure(episode)
 
   episode = GetGlobalAA().app.cp.getUpdatedUrlForEpisode(episode)
 
-  m.utils.log.warn(m.playerPort, "playback-message-shown", "User was shown the video playback failed pop up message")
+  m.utils.log.warn(m.playerPort, "clientWarn", "playback-message-shown", "User was shown the video playback failed pop up message")
 
   while true
     dlgMsg = wait(0, m.playerPort)
@@ -1374,31 +1388,35 @@ function AdrisePlayer_savePreviouslyViewedUpdate(episode, nowPos)
     'updates both video and series
     m.cp[userPlaylistsStore][localUpdateId].isPreviouslyViewed = true
 
-    'add to the previouslyViewed episodes array so it will be included in the category on the gridscreen
-    count = 0
-    if m.cp.userPlaylists[settings.previouslyViewedRegistry] <> invalid and m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes <> invalid
-      for each previousEpisode in m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes
-        if previousEpisode <> invalid and previousEpisode.id = localUpdateId
-          m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.delete(count) 'since we want to move it to the front of the list
-          exit for
-        end if
-        count = count + 1
-      end for
-      m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.unshift(m.cp[userPlaylistsStore][localUpdateId])
+    'only add the content to the previouslyViewed episodes array if we've loaded the previously viewed category on the gridscreen already
+    'this prevents the content from appearing twice in the case of deeplinking
+    if m.cp.userPlaylists[settings.previouslyViewedRegistry] <> invalid and m.cp.userPlaylists[settings.previouslyViewedRegistry].isLoaded = true
+      'add to the previouslyViewed episodes array so it will be included in the category on the gridscreen
+      count = 0
+      if m.cp.userPlaylists[settings.previouslyViewedRegistry] <> invalid and m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes <> invalid
+        for each previousEpisode in m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes
+          if previousEpisode <> invalid and previousEpisode.id = localUpdateId
+            m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.delete(count) 'since we want to move it to the front of the list
+            exit for
+          end if
+          count = count + 1
+        end for
+        m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes.unshift(m.cp[userPlaylistsStore][localUpdateId])
+      end if
     end if
   end if
 
 end function
 
 
-Function AdrisePlayer_cancelInstantReplay(playerStates, captionsMode, captions)
+Function AdrisePlayer_cancelInstantReplay(playerStates, captions)
   'if the video was in an instant replay state, cancel the replay
   if playerStates.replayEnd > 0
     playerStates.replayEnd = 0
 
-    'only turn off the captions if the user hasn't set captions for this specific video to on
-    if captionsMode <> "On"
-      captions.showSubtitle(false)
-    end if
+    ' replayEnd was only set if Instant replay was
+    deviceInfo = CreateObject("roDeviceInfo")
+    deviceInfo.SetCaptionMode("Instant replay")
+    captions.showSubtitle(false)
   end if
 End Function

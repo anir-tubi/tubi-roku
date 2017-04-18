@@ -260,7 +260,9 @@ function AdriseApp_runApp()
     end if
     
     if authInfo.accessToken = invalid
-      m.registerScreen.show()
+      if not m.registerScreen.show()
+        return false
+      end if
     end if
   
     'one time sync to send stored bookmarks and previously viewed to server
@@ -484,12 +486,9 @@ Function AdriseApp_handleItemPicked(playlist, listIndex, itemIndex, source)
       else if m.cp.autoplayIsSeries = true
         'm.cp.autoplayIsSeries = true if deeplinking occurred with the mediaType="series" parameter
         m.episodeListScreen.autoPlay(episode, m.cp.autoplayData.path[2], m.cp.autoplayData.path[3], m.cp.autoplayIsSeries)
-      	m.cp.autoplayData = invalid
-
       else
         'm.cp.autoplayIsSeason = true if deeplinking occurred with the mediaType="season" parameter
         m.episodeListScreen.autoPlay(episode, m.cp.autoplayData.path[2], m.cp.autoplayData.path[3], m.cp.autoplayIsSeason)
-        m.cp.autoplayData = invalid
       end if
     end if
   end if

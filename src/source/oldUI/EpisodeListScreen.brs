@@ -5,6 +5,10 @@ function EpisodeListScreen(cp, appSettings, utils)
     utils: utils
     show: EpisodeListScreen_show
     autoPlay: function(series, item1, item2, isSeason)
+      'don't remove autoplay data if it's an episode, so the video will autoplay from the detail screen
+      if isSeason = true
+        m.cp.autoplayData = invalid
+      end if
 			m.autoplayItem1 = item1
 			m.autoplayItem2 = item2
       m.autoplayIsSeason = isSeason

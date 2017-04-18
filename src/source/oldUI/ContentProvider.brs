@@ -84,6 +84,7 @@ function ContentProvider(pubId as String, shortAppName as String, imageSize as S
         seriesPrelim: {}
         episodes: []
         videosIdString: ""
+        isLoaded: false
       }
       previous: {
         name: "Previously Viewed"
@@ -92,6 +93,7 @@ function ContentProvider(pubId as String, shortAppName as String, imageSize as S
         seriesPrelim: {}
         episodes: []
         videosIdString: ""
+        isLoaded: false
       }
     }
 
@@ -417,7 +419,7 @@ function ContentProvider_getPlaylistFromXmlObj(obj, imageSize, depth, parent, so
         end if
 
        'set up autoplay for series (from deeplinking usually or maybe from search screen)
-        if(id = m.autoplayId and m.autoplayIsSeries = true)
+        if(parent = invalid and id = m.autoplayId and m.autoplayIsSeries = true)
           p = []
           for i=0 to depth-1 step +1
             p[i] = m.path[i]
@@ -803,7 +805,7 @@ function ContentProvider_getBookmarksAndPreviouslyViewedFromServer()
           m.handleGetUserPlaylists(settings.bookmarkRegistry, response.data)
 
         else
-          if bookmarkRetries >= 2 ' means max of 3 total attempts, one regular and 2 retries
+          if bookmarkRetries >= 20 ' means max of 21 total attempts, one regular and 20 retries
             bookmarkContinue = true
           else
             bookmarksId = m.utils.sendAsyncRequest(settings.bookmarksUrlNoPage, getBookmarksPort, "getAllBookmarks", "GET", true, invalid, headers)
@@ -823,7 +825,7 @@ function ContentProvider_getBookmarksAndPreviouslyViewedFromServer()
           m.handleGetUserPlaylists(settings.previouslyViewedRegistry, response.data)
 
         else
-          if previousRetries >= 2 ' means max of 3 total attempts, one regular and 2 retries
+          if previousRetries >= 20 ' means max of 21 total attempts, one regular and 20 retries
             previousContinue = true
           else
             previouslyViewedId = m.utils.sendAsyncRequest(settings.previouslyViewedUrlNoPage, getBookmarksPort, "getAllPreviouslyViewed", "GET", true, invalid, headers)
@@ -1013,7 +1015,6 @@ end function
 
 '-------------_contentProvider.parseAndSaveBookmarks()------------
 function ContentProvider_parseAndSaveBookmarks(bookmarksFullFromServer, basicBookmarks)
-  print "bookmarksFullFromServer "; bookmarksFullFromServer
   if bookmarksFullFromServer <> invalid and bookmarksFullFromServer.len() > 0
     bookmarksFullFromServer = ParseJson(bookmarksFullFromServer)
   else

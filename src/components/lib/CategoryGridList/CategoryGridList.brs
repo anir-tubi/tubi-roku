@@ -403,7 +403,6 @@ End Function
 '
 ' returns true if entry was expired, or false if a categoryId was given and no entries matched
 Function metadataCacheExpireOne(categoryId="" As String) As Boolean
-
   expired = invalid
   ' expire one entry
   if categoryId="" then

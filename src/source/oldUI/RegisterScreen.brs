@@ -18,6 +18,8 @@ function RegisterScreen(uniqueId, utils)
     utils: utils
     baseUrl: "http://tubitv.com"
 
+    setupInitialScreen: RegisterScreen_setupInitialScreen
+
     '1st set of numbers describes SD. 2nd set of numbers describes HD
     rects: {
         bg :  [
@@ -301,10 +303,7 @@ function RegisterScreen(uniqueId, utils)
         m = GetGlobalAA().app.registerScreen
       end if
 
-      m.isInitialScreen = true
-      m.row = 5
-      m.col = 0
-      m.isComplete = false
+
       g = GetGlobalAA()
 
       m.canvas = CreateObject("roImageCanvas")
@@ -312,22 +311,15 @@ function RegisterScreen(uniqueId, utils)
 
       m.canvas.SetMessagePort(port)
 
-
-      loadingImage = {
-        Url: "pkg:/images/oldUI/" + m.res + "/bg_initial.jpg"
-        TargetRect: m.getRect("bg", 0)
-        compositionMode: "Source"
-      }
+      'sets state on m and returns the layers array
+      layers = m.setupInitialScreen()
 
       'change the background for any registration walls
       if regWall = "premiere"
-        loadingImage.Url = "pkg:/images/oldUI/" + m.res + "/bg_premiere_wall.jpg"
+        layers[0].Url = "pkg:/images/oldUI/" + m.res + "/bg_premiere_wall.jpg"
       end if
 
-      layers = [loadingImage]
       m.canvas.SetLayer(0, layers)
-
-      ' layers = []
       m.paint()
 
       m.canvas.Show()
@@ -374,7 +366,7 @@ function RegisterScreen(uniqueId, utils)
               if (index = 0) ' back
                 m.canvas.close()
                 m.canvas = invalid
-                return true
+                return false
               else if (index = 6) ' ok button on remote
                 if(m.col = 0) 'selected OK button on screen
                   loadingImage = {
@@ -415,11 +407,27 @@ function RegisterScreen(uniqueId, utils)
               end if
               m.paint()
 
+            'enter phone number screen
             else
               if (index = 0) ' back
-                m.canvas.close()
-                m.canvas = invalid
-                return true
+                layers = m.setupInitialScreen()
+                m.canvas.SetLayer(0, layers)
+
+                m.utils.trackEvent({
+                  trackType: "navigate"
+                  value: "/deviceregistration/"
+                  ctx: "/deviceregistration/sms"
+                  port: port
+                })
+
+                m.utils.trackEvent({
+                  trackType: "pageLoad"
+                  value: "/deviceregistration/"
+                  port: port
+                })
+
+                m.paint()
+
               else if (index = 6) ' ok
                 m.pressedItem = {
                   row: m.row
@@ -447,8 +455,12 @@ function RegisterScreen(uniqueId, utils)
 
                   sleep(300) 'pause just for a tiny bit to show the button turn color
                   isRegistered = m.webRegister()
-                  m.isComplete = true
-                  m.canvas.close()
+                  
+                  print "shutting web register screen and isRegistered = "; isRegistered
+                  if isRegistered = true
+                    m.isComplete = true
+                    m.canvas.close()
+                  end if
                 end if
               else
                 if (index = 5) ' right
@@ -790,7 +802,7 @@ function RegisterScreen(uniqueId, utils)
               port: GetGlobalAA().app.gridScreen.gridPort
             })
 
-            return invalid        
+            return invalid
           end if
         end if
 
@@ -866,7 +878,7 @@ function RegisterScreen(uniqueId, utils)
       })
 
       'close the phone register screen since we will never return to it from this screen
-      m.canvas.Close()
+      ' m.canvas.Close()
 
       'get code from server and add it to screen
 
@@ -1111,7 +1123,7 @@ function RegisterScreen(uniqueId, utils)
                     exit while
                   end if
                 else if msg.isScreenClosed() 'don't think this is necessary
-                  return false
+                  ' return false
                 end if
               end if
             end if
@@ -1122,3 +1134,21 @@ function RegisterScreen(uniqueId, utils)
     end function
   }
 end function
+
+
+
+Function RegisterScreen_setupInitialScreen()
+  m.isInitialScreen = true
+  m.row = 5
+  m.col = 0
+  m.isComplete = false
+  m.currNumber = ""
+
+  loadingImage = {
+    Url: "pkg:/images/oldUI/" + m.res + "/bg_initial.jpg"
+    TargetRect: m.getRect("bg", 0)
+    compositionMode: "Source"
+  }
+
+  return [loadingImage]
+End Function

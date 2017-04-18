@@ -10,6 +10,7 @@ function DetailScreen (cp, settings, utils, player)
     moveForwardBackward : DetailScreen_moveForwardBackward
     saveBookmark: DetailScreen_saveBookmark
     removeBookmarkOrPreviouslyViewed: DetailScreen_removeBookmarkOrPreviouslyViewed
+    playPlaylist: DetailScreen_playPlaylist
 
     utils: utils
     settings: settings
@@ -46,6 +47,13 @@ function DetailScreen (cp, settings, utils, player)
       screen.Show()
 
       settings = m.utils.getSettings()
+
+      'play deeplinked content
+      if m.cp.autoplayData <> invalid
+        m.cp.autoplayData = invalid
+        itemIndex = m.playPlaylist(screen, playlist, episode, itemIndex, maxIndex)
+      end if
+
       while true
         msg = wait(0, m.detailsPort)
 
@@ -117,27 +125,7 @@ function DetailScreen (cp, settings, utils, player)
                   end if
 
                   ' play till end of playlist
-                  while true
-										ret = m.player.playVideo(episode)
-
-                    'move the details page to the next item in the playlist
-                    if (ret <> "CLOSED" and itemIndex < maxIndex)
-
-                      itemIndex = itemIndex + 1
-                      episode = m.cp.getEpisodeInPlaylist(playlist, itemIndex)
-                      episode.PlayStart = 0
-
-                      'check if the newly advanced content is also a video, if not go back to the previous one
-                      if (episode.type <> "video")
-                        itemIndex = itemIndex - 1
-                        episode = m.cp.getEpisodeInPlaylist(playlist, itemIndex)
-                        exit while
-                      end if
-											m.update(screen, episode, showRentButton, m.detailsPort)
-										else
-											exit while
-										end if
-									end while
+                  itemIndex = m.playPlaylist(screen, playlist, episode, itemIndex, maxIndex)
 									m.updateButtons(screen, episode, showRentButton)
                 end if
               end if
@@ -185,6 +173,35 @@ function DetailScreen (cp, settings, utils, player)
     end function
   }
 end function
+
+
+function DetailScreen_playPlaylist(screen, playlist, episode, itemIndex, maxIndex)
+  showRentButton = (m.settings.allowRentals=true)
+
+  while true
+    ret = m.player.playVideo(episode)
+
+    'move the details page to the next item in the playlist
+    if (ret <> "CLOSED" and itemIndex < maxIndex)
+
+      itemIndex = itemIndex + 1
+      episode = m.cp.getEpisodeInPlaylist(playlist, itemIndex)
+      episode.PlayStart = 0
+
+      'check if the newly advanced content is also a video, if not go back to the previous one
+      if (episode.type <> "video")
+        itemIndex = itemIndex - 1
+        episode = m.cp.getEpisodeInPlaylist(playlist, itemIndex)
+        exit while
+      end if
+      m.update(screen, episode, showRentButton, m.detailsPort)
+    else
+      exit while
+    end if
+  end while
+  return itemIndex
+end function
+
 
 '------------------------------------------------------------------
 function DetailScreen_episodeWithLongDescription (episode)
@@ -426,10 +443,10 @@ function DetailScreen_showCaptionsDialog(episode)
             port: m.detailsPort
           })
 
-          m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles disabled")
+          m.utils.log.info(m.detailsPort, "clientInfo", "subtitles-off", "Subtitles disabled")
         else if buttonIndex = 1
           deviceInfo.setCaptionsMode("Instant replay")
-          m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles set to Instant replay")
+          m.utils.log.info(m.detailsPort, "clientInfo", "subtitles-off", "Subtitles set to Instant replay")
         else
           episode.subtitles.current = episode.subtitles.languages[buttonIndex-2].name
           episode.subtitleUrl = episode.subtitles.languages[buttonIndex-2].url
@@ -442,7 +459,7 @@ function DetailScreen_showCaptionsDialog(episode)
             port: m.detailsPort
           })
 
-          m.utils.log.info(m.detailsPort, "subtitles-off", "Subtitles set to " + episode.subtitles.current)
+          m.utils.log.info(m.detailsPort, "clientInfo", "subtitles-off", "Subtitles set to " + episode.subtitles.current)
         end if
         return deviceInfo.GetCaptionsMode()
       end if
@@ -495,8 +512,11 @@ function DetailScreen_saveBookmark(episode, msgPort)
     end if
   end if
 
-  'add the bookmark data to the Bookmark category playlist (as a reference to the userPlaylist stores)
-  m.cp.userPlaylists[settings.bookmarkRegistry].episodes.unshift(contentToAdd)
+  'don't add if .isLoaded = false, otherwise we get multiples of the same content when deep linking
+  if m.cp.userPlaylists[settings.bookmarkRegistry].isLoaded = true
+    'add the bookmark data to the Bookmark category playlist (as a reference to the userPlaylist stores)
+    m.cp.userPlaylists[settings.bookmarkRegistry].episodes.unshift(contentToAdd)
+  end if
 
   'changing the "Add to Queue" button to say "Remove from Queue" happens after this function completes
 

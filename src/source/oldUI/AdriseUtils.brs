@@ -659,7 +659,7 @@ function adriseUtils_getTextFile(url as String, name = "" as String) as Object
   h = CreateObject("roUrlTransfer")
   h.SetPort(CreateObject("roMessagePort"))
 
-  m.log.info(invalid, name, url)
+  m.log.info(invalid, "clientInfo", name, url)
   print ""
 
   url = m.buildUrl(url, name, h)
@@ -691,12 +691,12 @@ function adriseUtils_sendAsyncRequest(url as String, port, name = "" as String, 
 
   'if we send logging for logging API requests, we end up in an infinite loop
   if url <> settings.loggingUrl
-    m.log.info(port, "send-async-request-id", urlXfer.GetIdentity().toStr())
-    m.log.info(port, "send-async-request-name", name)
-    m.log.info(port, "send-async-request-type", reqType)
-    m.log.info(port, "send-async-request-url", url)
-    m.log.info(port, "send-async-request-body", body)
-    m.log.info(port, "send-async-request-headers", headers)
+    m.log.info(port, "clientInfo", "send-async-request-id", urlXfer.GetIdentity().toStr())
+    m.log.info(port, "clientInfo", "send-async-request-name", name)
+    m.log.info(port, "clientInfo", "send-async-request-type", reqType)
+    m.log.info(port, "clientInfo", "send-async-request-url", url)
+    m.log.info(port, "clientInfo", "send-async-request-body", body)
+    m.log.info(port, "clientInfo", "send-async-request-headers", headers)
   end if
 
   url = m.buildUrl(url, name, urlXfer)
@@ -759,7 +759,7 @@ function adriseUtils_sendAsyncRequest(url as String, port, name = "" as String, 
     m.asynchRequests[id.ToStr()] = urlXfer
 
     if url <> settings.loggingUrl
-      m.log.info(port, "stored-async-request-objects", "async request objects stored = " +  m.asynchRequests.count().toStr())
+      m.log.info(port, "clientInfo", "stored-async-request-objects", "async request objects stored = " +  m.asynchRequests.count().toStr())
       print ""
     end if
   end if
