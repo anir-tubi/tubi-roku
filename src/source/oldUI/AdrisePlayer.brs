@@ -317,6 +317,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
     isPaused: false
     isInHopMode: false
     isScrubbing: false
+    nowPosAtScrub: 0
     maxScrub: 7
     scrubAmount: 0
     scrubMultiplier: 0
@@ -371,18 +372,21 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
       port: m.playerPort
     })
     
-    'when resuming to play after ending scrubbing, we need to ask the ad server if there are any ads
+    'when resuming to play after ending fast forward, we need to ask the ad server if there are any ads
     'getResumingPlayAds will store ads in either m.app.player.resumePlayAdsList or m.app.player.ads.allAdUnitsList
     'depending on if RAF is off or on
-    shouldBreak = m.app.player.ads.getResumingPlayAds(episode, m.app.player)
-    if shouldBreak = true
-      return shouldBreak
-    end if
-
     if playerStates.isInHopMode = false
+      if playerStates.nowPos > playerStates.nowPosAtScrub
+        shouldBreak = m.app.player.ads.getResumingPlayAds(episode, m.app.player)
+        if shouldBreak = true
+          return true
+        end if
+      end if
+
       player.Seek(playerStates.scrubToPoint * 1000)
       playerStates.isTransportShowing = false
       playerStates.isPaused = false
+      playerStates.nowPosAtScrub = 0
     end if
 
     playerStates.isScrubbing = false
@@ -390,7 +394,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
     playerStates.totalScrubTime = 0
     playerStates.scrubToPoint = 0
 
-    return shouldBreak 'false
+    return false
   end function
 
   'scrubbing amount can be from -3 to 3, not including 0 (-3 is max rewind, 3 is max fast forward)
@@ -570,7 +574,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
           if playerStates.isScrubbing = false
             playerStates.nowPosAtScrub = playerStates.nowPos
-            m.cancelInstantReplay(playerStates, captions)
+            m.cancelInstantReplay(playerStates, deviceInfo.GetCaptionsMode(), captions)
             startScrub(player, scrubTimer, playerStates, episode)
           end if
           'update the speed of scrubbing with max ff or rw at 6
@@ -607,7 +611,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
           if playerStates.isScrubbing = false
             playerStates.nowPosAtScrub = playerStates.nowPos
-            m.cancelInstantReplay(playerStates, captions)
+            m.cancelInstantReplay(playerStates, deviceInfo.GetCaptionsMode(), captions)
             startScrub(player, scrubTimer, playerStates, episode)
           end if
           'update the speed of scrubbing with max ff or rw at 6
@@ -640,6 +644,9 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
         if msg.GetIndex() = 4 or msg.GetIndex() = 5
           m.cancelInstantReplay(playerStates, captions)
           playerStates.isInHopMode = true
+          if playerStates.nowPosAtScrub = 0
+            playerStates.nowPosAtScrub = playerStates.nowPos
+          end if
 
           'if user is fast forwarding or rewinding stop the scrub
           if playerStates.isScrubbing = true
@@ -663,7 +670,6 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
           if msg.GetIndex() = 4
             'hop back
-            print playerStates
             if playerStates.nowPos - 10 < 0
                playerStates.nowPos = 0
             else
@@ -699,6 +705,18 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
           'hop to the position the user has chosen and close the transport
           else if playerStates.isInHopMode = true
+            'if result of hopping is ultimately advancing the nowPos, test for ads
+            print "now pos "; playerStates.nowPos; " > now pos at scrub "; playerStates.nowPosAtScrub
+            if playerStates.nowPos > playerStates.nowPosAtScrub
+              shouldBreak = m.ads.getResumingPlayAds(episode, m)
+              if shouldBreak = true
+                episode.nowPos = playerStates.nowPos
+                episode.playStart = playerStates.nowPos
+                m.canvas.close()
+                return "RESUMEPLAY"
+              end if
+            end if
+            playerStates.nowPosAtScrub = 0
             playerStates.isPaused = false
             playerStates.isInHopMode = false
             playerStates.isTransportShowing = false
@@ -800,6 +818,18 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
           'hop to the position the user has chosen and close the transport
           else if playerStates.isInHopMode = true
+            'if result of hopping is ultimately advancing the nowPos, test for ads
+            if playerStates.nowPos > playerStates.nowPosAtScrub
+              shouldBreak = m.ads.getResumingPlayAds(episode, m)
+              if shouldBreak = true
+                episode.nowPos = playerStates.nowPos
+                episode.playStart = playerStates.nowPos
+                m.canvas.close()
+                return "RESUMEPLAY"
+              end if
+            end if
+
+            playerStates.nowPosAtScrub = 0
             playerStates.isPaused = false
             playerStates.isInHopMode = false
             playerStates.isTransportShowing = false
