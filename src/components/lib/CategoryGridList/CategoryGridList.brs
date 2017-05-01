@@ -13,6 +13,7 @@ Function init()
   '  {
   '    id: "<category>-<offset>"
   '    offset: <offset into category items>
+  '    length: <length of block>
   '    contentNode: <node reference to first item in the block>
   '    componentNode: <node reference to grid component assigned to this content block>
   '  }
@@ -215,6 +216,7 @@ Function onMetadataFetchTaskResponse() As Void
 
   tubiLog("Received response for request id " + m.top.metadataFetchTaskResponse.id)
   m.metadataCache[entry].contentNode = newContent.getChild(0)
+  m.metadataCache[entry].length = newContent.getChildCount()
   contentGrid = m.metadataCache[entry].componentNode
 
   ' set the offset of this block
@@ -270,10 +272,28 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
   tubiLog("CategoryGridList.fetch " + categoryId)
   offset = per_page * (page - 1)
 
-  if categoryId = "MyQueue" or categoryId = "ContinueWatching" then
-    ' special categories can have deprecated ids in them, causing trouble
-    ' with pagination. Here we just force it to always grab the whole category
+  ' special categories can have deprecated ids in them, causing trouble
+  ' with pagination. Here we just force it to always grab the whole category
+
+  request = invalid
+  if categoryId = "MyQueue" then
+    request = bookmarksRequest()
+    offset = 0
     per_page = 0
+  else if categoryId = "ContinueWatching" then
+    request = historyRequest()
+    offset = 0
+    per_page = 0
+  else if categoryId = "SearchSignIn" or categoryId = "SearchSignOut" then
+    ' NO-OP
+  else
+    request = categoryRequest(categoryId)
+  end if
+
+  ' If global bookmark or history ids are unavailable then we will get invalid
+  if request = invalid then
+    tubiLog("Unvailable request for category " + categoryId)
+    return
   end if
 
   requestId = categoryId + "-" + stri(offset).trim()
@@ -282,23 +302,6 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
   if metadataCacheHasEntry(requestId) <> -1 then
     tubiLog("Skipping duplicate request for " + requestId)
   else
-    request = invalid
-    if categoryId = "MyQueue" then
-      request = bookmarksRequest()
-    else if categoryId = "ContinueWatching" then
-      request = historyRequest()
-    else if categoryId = "SearchSignIn" or categoryId = "SearchSignOut" then
-      ' NO-OP
-    else
-      request = categoryRequest(categoryId)
-    end if
-
-    ' If global bookmark or history ids are unavailable then we will get invalid
-    if request = invalid then
-      tubiLog("Unvailable request for category " + categoryId)
-      return
-    end if
-
     request.id = requestId
     request.node = m.top
     request.field = field
@@ -447,19 +450,19 @@ Function metadataCacheExpireOne(categoryId="" As String) As Boolean
       ' - expired nodes are in the middle of the items in the category, need to expire another block as well? we have a 
       '   constraint of only allowing contiguous blocks
       if parent.offset = expired.offset then
-        if parent.getChildCount() <= m.blockSize then
+        if parent.getChildCount() <= expired.length then
           'print "EXPIRE A " + expired.id
           parent.removeChildrenIndex(parent.getChildCount(), 0)
           parent.offset = 0
         else
           'print "EXPIRE B " + expired.id
-          parent.removeChildrenIndex(m.blockSize, 0)
-          parent.offset = parent.offset + m.blockSize
+          parent.removeChildrenIndex(expired.length, 0)
+          parent.offset = parent.offset + expired.length
         end if
       else
-        if ((parent.offset + parent.getChildCount()) - expired.offset) <= m.blockSize then
+        if ((parent.offset + parent.getChildCount()) - expired.offset) <= expired.length then
           'print "EXPIRE C " + expired.id
-          parent.removeChildrenIndex(m.blockSize, expired.offset)
+          parent.removeChildrenIndex(expired.length, expired.offset)
         else
           'print "EXPIRE D " + expired.id
           ' Here if this block is in-between two other blocks.  The proper way would be to delete all 
@@ -493,6 +496,7 @@ Function metadataCachePush(component As Object, categoryId As String, offset As 
     entry = {
       id: id
       offset: offset
+      length: 0    ' will be filled when the response arrives
       contentNode: invalid
       componentNode: component
     }

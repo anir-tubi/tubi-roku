@@ -9,7 +9,7 @@ describe("deep-linking", function() {
   const channelZipFile = __dirname + '/../build/tubitv_roku.zip'
 
   beforeAll(function(done) {
-    this.device = new RokuTest(process.env.ROKU_DEV_TARGET, process.env.DEV_PASSWORD, RokuTest.SG);
+    this.device = new RokuTest(process.env.ROKU_DEV_TARGET, process.env.DEV_PASSWORD, RokuTest.MAIN);
 
     this.launchChannel = function(args) {
       // helper to start the channel
@@ -43,45 +43,34 @@ describe("deep-linking", function() {
   // Tests
   ///////////////////////
 
-  it("should accept deep link parameters", function(done) {
-    var mainConsole = new RokuTest(process.env.ROKU_DEV_TARGET, process.env.DEV_PASSWORD, RokuTest.MAIN);
+    /*
+     * CONTENT ID: 01079
+     * Title: Crash
+     * Type: Series/Season
+     *
+     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=1079&MediaType=series"
+     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=1079&MediaType=season"
+     *
+     * NOTE:  This is not an expected combination of contentId and MediaType but we
+     *        are making sure the deep link accepts it
+     */
+  it("should show detail screen for series content id and mediatype series", function(done) {
+    var contentId = "1079";
     var contentIdReceived = false;
     var mediaTypeReceived = false;
-    var sourceReceived = false;
-    
-    mainConsole.on('debugData', function(data) {
-      log = data.toString();
-      if (log.match('mediaType =') !== null) {
-        mediaTypeReceived = true;
-      } else if (log.match('contentId =') !== null) {
-        contentIdReceived = true;
-      } else if (log.match('source =') !== null) {
-        sourceReceived = true;
-      }
-      if (mediaTypeReceived && contentIdReceived && sourceReceived) {
-        done();
-      }
-    }); 
-    this.launchChannel({
-      contentId: "123456",
-      mediaType: "movie",
-      source: "meta-search"
-    });
-  });
-  
-  
-  /*
-   * CONTENT ID: 01079
-   * Title: Crash
-   * Type: Series
-   *
-   * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=1079&MediaType=series"
-   *
-   */
-  it("should show detail screen for series", function(done) {
-    var contentId = "1079";
+    var detailScreenReceived = false;
     this.device.on('debugData', function(data) {
-      if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
+      if (data.match('TEST: Deep link contentId = ' + contentId) !== null) {
+        contentIdReceived = true;
+      }
+      // Note that 'season' gets translated to 'series' before reporting on the console
+      if (data.match('TEST: Deep link type = series') !== null) {
+        mediaTypeReceived = true;
+      }
+      if (data.match('') !== null) {
+        detailScreenReceived = true;        
+      }
+      if (mediaTypeReceived && contentIdReceived && detailScreenReceived) {
         done();
       }
     }); 
@@ -90,102 +79,100 @@ describe("deep-linking", function() {
       mediaType: "series",
       source: "meta-search"
     });
-  });
+  }); 
   
-  
-  /*
-   * CONTENT ID: 321221
-   * Title: We Are Young
-   * Type: Movie
-   *
-   * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=321221&MediaType=movie"
-   *
-   */
-  
-   
-  it("should show detail screen for movie", function(done) {
-    var contentId = "321221";
-    this.device.on('debugData', function(data) {
-      if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
-        done();
+
+  describe("should show video player", function() {
+    
+    beforeEach(function() {
+      this.showVideoPlayerHelper = function(contentId, mediaType, done) {
+        var contentIdReceived = false;
+        var mediaTypeReceived = false;
+        var onPlayReceived = false;
+        this.device.on('debugData', function(data) {
+          if (data.match('TEST: Deep link contentId = ' + contentId) !== null) {
+            contentIdReceived = true;
+          }
+          if (data.match('TEST: Deep link type = video') !== null) {
+            mediaTypeReceived = true;
+          }
+          if (data.match('ContentController.onPlay') !== null) {
+            onPlayReceived = true;        
+          }
+          if (mediaTypeReceived && contentIdReceived && onPlayReceived) {
+            done();
+          }
+        }); 
+        this.launchChannel({
+          contentId: contentId,
+          mediaType: mediaType,
+          source: "meta-search"
+        });
       }
-    }); 
-    this.launchChannel({
-      contentId: contentId,
-      mediaType: "movie",
-      source: "meta-search"
     });
+    
+    /*
+     * CONTENT ID: 321221
+     * Title: We Are Young
+     * Type: Movie
+     *
+     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=321221&MediaType=movie"
+     *
+     */
+    it("for movie", function(done) {
+      this.showVideoPlayerHelper("321221", "movie", done);
+    });
+
+  
+    /*
+     * CONTENT ID: 302800
+     * Title: S02:E05 - You, I'll Be Following
+     * Type: Episode
+     *
+     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=episode"
+     */
+    it("for episode", function(done) {
+      this.showVideoPlayerHelper("302800", "episode", done);
+    });
+  
   });
-  
-  
-  describe("should show detail screen with correct episode", function(done) {
+
+    
     /*
     * CONTENT ID: 302800
     * Title: S02:E05 - You, I'll Be Following
-    * Type: Episode
+    * Type: Series/Season
     *
-    * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=episode"
-    */
-    it("when mediatype is episode", function(done) {
-      var contentId = "302800";
-      this.device.on('debugData', function(data) {
-        if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
-          done();
-        }
-      }); 
-      this.launchChannel({
-        contentId: contentId,
-        mediaType: "episode",
-        source: "meta-search"
-      });
-    });
-  
-    /*
-    * CONTENT ID: 302800
-    * Title: S02:E05 - You, I'll Be Following
-    * Type: Series
-    *
-    * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=series"
+    * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=season"
     * 
     * SEE CLIEN-1352 bug.  This combination of episode id and 'series' mediatype can come from
     *                      the Roku mobile app.
     * 
     */
-    it("when mediatype is series", function(done) {
-      var contentId = "302800";
-      this.device.on('debugData', function(data) {
-        if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
-          done();
-        }
-      }); 
-      this.launchChannel({
-        contentId: contentId,
-        mediaType: "series",
-        source: "meta-search"
-      });
+  it("should show episode screeen when mediatype is season", function(done) {
+    var contentId = "302800";
+    var contentIdReceived = false;
+    var mediaTypeReceived = false;
+    var episodeScreenReceived = false;
+    this.device.on('debugData', function(data) {
+      if (data.match('TEST: Deep link contentId = ' + contentId) !== null) {
+        contentIdReceived = true;
+      }
+      // Note that 'season' gets translated to 'series' before reporting on the console
+      if (data.match('TEST: Deep link type = series') !== null) {
+        mediaTypeReceived = true;
+      }
+      if (data.match('EpisodesScreen.onEpisodeSelected') !== null) {
+        episodeScreenReceived = true;
+      }
+      if (mediaTypeReceived && contentIdReceived && episodeScreenReceived) {
+        done();
+      }
     });
-  });
-
-   /*
-    * CONTENT ID: 302800
-    * Title: S02:E05 - You, I'll Be Following
-    * Type: Season
-    *
-    * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=season"
-    * 
-    */
-    it("when mediatype is series", function(done) {
-      var contentId = "302800";
-      this.device.on('debugData', function(data) {
-        if (data.toString().match('TEST: Deep link contentId = ' + contentId) !== null) {
-          done();
-        }
-      }); 
-      this.launchChannel({
-        contentId: contentId,
-        mediaType: "season",
-        source: "meta-search"
-      });
+    this.launchChannel({
+      contentId: contentId,
+      mediaType: "season",
+      source: "meta-search"
     });
   });
 

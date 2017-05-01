@@ -187,7 +187,7 @@ function tubiBookmarks_removeHistoryReq(content as Object, historyIdList as Obje
     if content.parentId <> invalid and content.parentId <> ""
       idToCheck = content.parentId 
       
-      if historyIdList <> invalid
+      if historyIdList <> invalid and historyIdList.series[idToCheck] <> invalid
         idToServe = historyIdList.series[idToCheck].serverId
       end if
     end if
@@ -495,7 +495,9 @@ function tubiBookmarks_updateNowPos(content, playerInfo, historyIds, historyOrde
       ' update the currentEpisodeId if an episode was just played
       if content.parentId <> invalid and content.parentId <> "" then
         tubiLog("Bookmarks.updateNowPos updating currentEpisodeId for " + content.parentId)
-        newHistoryIds.series[content.parentId].currentEpisodeId = content.id
+        if newHistoryIds.series[content.parentId] <> invalid
+          newHistoryIds.series[content.parentId].currentEpisodeId = content.id
+        end if
       end if
     else
       tubiLog("Bookmarks.updateNowPos Storing historyId for " + content.id)

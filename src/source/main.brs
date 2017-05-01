@@ -350,13 +350,20 @@ Function deepLink(args, controller, utils)
     ' contentID=335&mediaType=series
     '
     ' See full list of mediaType at https://sdkdocs.roku.com/display/sdkdoc/External+Control+Guide
-    if args.mediaType = "series" or args.mediaType = "season"
+    if args.mediaType = "series"
       content.type = "series"
+      content.deeplinkType = "series"
+      trackingUri = "/series"
+    else if args.mediaType = "season"
+      content.type = "series"
+      content.deeplinkType = "season"
       trackingUri = "/series"
     else if args.mediaType = "movie"
       content.type = "video"
+      content.deeplinkType = "movie"
     else if args.mediaType = "episode"
       content.type = "video"
+      content.deeplinkType = "episode"
     end if
 
 
@@ -394,7 +401,7 @@ Function deepLink(args, controller, utils)
       medium: deeplinkMedium
     }
 
-    controller.itemDetail = content
+    controller.deepLinkContent = content
 
     trackData = utils.tracking.getTrackData("deeplink", invalid, trackingUri, extraCtx)
     trackReq = utils.tracking.getUserTrackingRequest(trackData)

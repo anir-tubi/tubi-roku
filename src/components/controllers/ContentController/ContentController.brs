@@ -39,12 +39,12 @@ Function init()
   m.authTask.functionName = "execGetAuthInfo"
   m.authTask.control = "RUN"
 
-  m.top.observeField("itemDetail", "onItemDetailChange")
+  m.top.observeField("deepLinkContent", "onDeepLinkContentReceived")
   m.top.observeField("playerInfo", "onPlayerInfo")
 
   m.logOutTask = m.top.findNode("LogOutTask")
 
-  m.enteredFromDeepLink = false
+  m.enteredFromDeepLink = false 'used to determine back button behavior in screen stack
   m.ScreenStack = m.top.findNode("ScreenStack")
   initScreenStack(m.ScreenStack)
 
@@ -78,13 +78,12 @@ End Function
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
   if m.metadataFetchTask.ready and m.authInfoReceived and m.trackingLoggingTask.ready then
-    if m.top.itemDetail <> invalid then
+    if m.top.deepLinkContent <> invalid then
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
       ' whether we were logged in or not.
-      m.enteredFromDeepLink = true
-      onItemDetailChange()
-      m.top.itemDetail = invalid  ' reset it so when we come back through here on state change, we don't follow deep links again
+      onDeepLinkContentReceived()
+      m.top.deepLinkContent = invalid  ' reset it so when we come back through here on state change, we don't follow deep links again
     else if m.authTask.authInfo = invalid then
       startSignIn()
     else if m.top.liveTvContent <> invalid
@@ -785,16 +784,17 @@ End Function
 
 
 '''''''''''''''''''''
-' onItemDetailChange
+' onDeepLinkContentReceived
 '
-' Show the detail screen for the content id
-Function onItemDetailChange()
-  tubiLog("onItemDetailChange")
-  if m.metadataFetchTask.ready and m.authInfoReceived and m.top.itemDetail <> invalid then
+' Show the detail screen for the content id that was deeplinked to
+Function onDeepLinkContentReceived()
+  tubiLog("onDeepLinkContentReceived")
+  if m.metadataFetchTask.ready and m.authInfoReceived and m.top.deepLinkContent <> invalid then
     'TODO(Chris): Supplement this content with history & queue status once we have it
-    testLog("Deep link contentId = " + m.top.itemDetail.id)
-    testLog("Deep link type = " + m.top.itemDetail.type)
-    showDetailScreen(m.top.itemDetail)
+    testLog("Deep link contentId = " + m.top.deepLinkContent.id)
+    testLog("Deep link type = " + m.top.deepLinkContent.type)
+    m.enteredFromDeepLink = true
+    showDetailScreen(m.top.deepLinkContent)
   end if
 End Function
 
@@ -925,6 +925,12 @@ End Function
 '
 Function showDetailScreen(content)
   m.detailScreen = CreateObject("roSGNode", "DetailScreen")
+  if m.top.deepLinkContent <> invalid
+    m.detailScreen.deepLinkHandled = false
+    m.top.deepLinkContent = invalid
+  else
+    m.detailScreen.deepLinkHandled = true
+  end if
 
   m.detailScreen.shortContent = content
   m.detailScreen.observeField("playSelected", "onPlay")

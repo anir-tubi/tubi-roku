@@ -80,7 +80,14 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       translatedContent.parentId = parent.id
     end if
     ' No parent if the parent.id is the task node
-    if translatedContent.parentId = "MetadataFetchTask" then translatedContent.parentId = invalid
+    if translatedContent.parentId = "MetadataFetchTask" then 
+      translatedContent.parentId = invalid
+
+      'this happens on deep link with mediaType = episode
+      if contentFromServer.series_id <> invalid
+        translatedContent.parentId = contentFromServer.series_id
+      end if
+    end if
 
     if parent.parentType <> invalid and parent.parentType <> "" then
       translatedContent.parentType = parent.parentType
@@ -99,6 +106,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     else
       translatedContent.parentHistoryId = parent.historyId
     end if
+
+  else if contentFromServer.series_id <> invalid
+    translatedContent.parentId = contentFromServer.series_id
+
   else
     translatedContent.parentId = invalid
   end if

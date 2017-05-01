@@ -38,7 +38,7 @@
       -    id    - the content requested
       -    type  - the type of content: "series", "video", or "episode"
       -->
-    <field id="itemDetail" type="node" alwaysNotify="true" />
+    <field id="deepLinkContent" type="node" alwaysNotify="true" />
 
     <!-- Used to communicate the new nowPos of a video that has been played in the player -->
     <field id="playerInfo" type="assocarray" alwaysNotify="true" />

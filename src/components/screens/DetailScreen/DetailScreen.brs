@@ -34,21 +34,26 @@ End Function
 Function onContentReceived()
   tubiLog("DetailScreen.onContentReceived")
   response = m.top.contentDetailResponse.response
-  if response.code >= 200 and response.code < 300 then 
-    m.top.content = m.top.contentDetailResponse.convertedMetadata
+  if response.code >= 200 and response.code < 300 then
+    fullContent = m.top.contentDetailResponse.convertedMetadata
+    deeplinkType = m.top.shortContent.deeplinkType
+    
+    'we got the response for an episode, but we need the whole series due to deeplink requirements
+    'fullContent.parentId will be empty string for the series response even if  m.top.shortContent.deeplinkType = "season"
+    if (deeplinkType = "season" or deeplinkType = "episode") and fullContent.parentId <> ""
+      seriesContent = CreateObject("roSGNode", "TubiContentNode")
+      seriesContent.id = fullContent.parentId
+      seriesContent.type = "series"
+      loadContentDetails(seriesContent)
+
+    else
+      m.top.content = fullContent
+    end if
+
   else
     'TODO(Chris): Show error modal here
     testLog("Content detail returned " + stri(response.code))
-
-    ' NOTE: Special case here.  Deep links can send episode ids with series type, so try again.
-    if m.top.shortContent.type = "series" then
-      videoContent = CreateObject("roSGNode", "TubiContentNode")
-      videoContent.id = m.top.shortContent.id
-      videoContent.type = "video"
-      loadContentDetails(videoContent)
-    else
-      showErrorModal(response.code, response.failReason, retryContentDetail, cancelContentDetail)
-    end if
+    showErrorModal(response.code, response.failReason, retryContentDetail, cancelContentDetail)
   end if
 End Function
 
@@ -70,23 +75,26 @@ End Function
 Function onContentChange() As Void
   tubiLog("DetailScreen.onContentChange")
   if m.top.content.type = "video"
-    ' Special case here.  If this video is an episode of a series, load the full series content
-    if m.top.content.seriesId <> invalid and m.top.content.seriesId <> "" then
-      tubiLog("DetailScreen detected episode, loading full series")
-      seriesContent = CreateObject("roSGNode", "TubiContentNode")
-      seriesContent.id = m.top.content.seriesId
-      seriesContent.type = "series"
-      loadContentDetails(seriesContent)
-      return
+    'auto start deep link content if it's a video
+    if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "movie"
+      m.top.playSelected = true
     end if
   else if m.top.content.type = "series"
 
-    ' Deep link gave us only the episode, seek to it
-    if m.top.shortContent.id <> m.top.content.id then
+    ' Deep link gave us the episode id we need to seek to
+    if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "season"
       tubiLog("Finding episode " + m.top.shortContent.id + " in series " + m.top.content.id)
-      ' arrived here from an episode link
       m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id)
+
+      'tell the controller to open the episode selection page
+      m.top.episodeListSelected = true
       return   'prevent drawSubComponents() from running 2x since it will run when m.top.episodeSelection is set
+
+    else if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "episode"
+      m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id)
+      m.top.playSelected = true
+      return 'prevent drawSubComponents() from running 2x since it will run when m.top.episodeSelection is set
+
     else if m.top.content.currentEpisodeId <> invalid and m.top.content.currentEpisodeId <> "" then
       tubiLog("Finding current episode " + m.top.content.currentEpisodeId + " in series " + m.top.content.id)
       m.top.episodeSelection = findEpisodeInSeries(m.top.content.currentEpisodeId)
@@ -364,7 +372,8 @@ Function loadContentDetails(content)
   ' expect that the content here was the bootstrapped content from category list
   contentId = content.id
 
-  if content.type = "series" then
+  'deeplinkType of season means an episode id was passed in
+  if content.type = "series" and content.deeplinkType <> "season" then
     contentId = "0" + contentId
   end if
 

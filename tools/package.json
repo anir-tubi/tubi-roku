@@ -26,7 +26,7 @@
     "node-ssdp": "^2.7.0",
     "node.extend": "^1.1.5",
     "request": "^2.67.0",
-    "roku-test": "veeta-tv/node-roku-test#31d9792",
+    "roku-test": "veeta-tv/node-roku-test#5171b3f",
     "rx": "^4.0.7",
     "my-local-ip": "^1.0.0"
   }

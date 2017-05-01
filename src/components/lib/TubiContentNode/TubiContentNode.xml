@@ -29,6 +29,7 @@
     <field id="currentEpisodeId" type="string" />
     <field id="isTrailer" type="boolean" value="false" />
     <field id="trailerUrls" type="stringArray" />
+    <field id="deeplinkType" type="string" />
 
     <!-- text to display for a category whose content is empty -->
     <field id="placeholderText" type="string" />
