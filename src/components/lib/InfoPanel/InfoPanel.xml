@@ -117,11 +117,12 @@
           font="dictionary:Vaud27px" />
         <Rectangle
           id="ClosedCaptionRectangle"
-          height="40"
+          height="36"
           width="72"
           color="0x00000000">
           <Poster
             id="ClosedCaptionPoster"
+            height="36"
             loadHeight="36"
             loadDisplayMode="scaleToFit"
             translation="[3,0]"
