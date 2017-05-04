@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="OnNowOverlay" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/OnNowOverlay/OnNowOverlay.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!--
+      - OUTPUTS
+      -->
+
+    <!-- updated to indicate a user has changed the content they are watching: [<playlist>,<episode>] -->
+    <field id="contentFocused" type="int" value="0"/>
+    
+    <!-- if the user presses "OK" for the current content item, this event will be raised -->
+    <field id="contentSelected" type="int" alwaysNotify="true" />
+   
+    
+    <!--
+      - INPUTS
+      -->
+    
+    <!-- expect content to be a playlist node -->
+    <field id="content" type="node" alwaysNotify="true"/>
+    <!-- sets the overlay to show the playlist/content at the indicated index. -->
+    <field id="jumpToIndex" type="int" />
+
+  </interface>  
+
+  <children>
+    
+    <RowList
+      id="LeftGrid"
+      itemComponentName="FeaturePoster"
+      itemSize="[515,256]"
+      numRows="1"
+      rowItemSize="[[430,256]]"
+      rowItemSpacing="[[10,0]]"
+      focusXOffset="85"
+      focusBitmapUri=""
+      translation="[0,0]"
+      rowFocusAnimationStyle="floatingFocus"/>
+    <Poster
+      id="FocusBox"
+      width="430"
+      height="256"
+      uri="pkg:/images/selector.9.png"
+      translation="[85,0]"/>
+
+    <InfoPanel
+    id="Info"
+    mode="item"
+    width="817"
+    maxHeight="356"
+    maxTitleLines="3"
+    titleFontSize="43"
+    translation="[550,0]"/>
+    
+    <RowList
+      id="RightGrid"
+      itemComponentName="FeaturePoster"
+      itemSize="[514,256]"
+      numRows="1"
+      rowItemSize="[[430,256]]"
+      rowItemSpacing="[[10,0]]"
+      focusBitmapUri=""
+      translation="[1406,0]"
+      rowFocusAnimationStyle="floatingFocus"/>
+    <Label
+      id="NextItemTitle"
+      translation="[1406,276]"
+      width="410"
+      height="118"
+      wrap="true">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="27" />
+    </Label>
+  </children>
+</component>

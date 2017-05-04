@@ -106,8 +106,8 @@
     <InfoPanel
       id="InfoPanel"
       mode="detail"
-      translation="[85,229]"
-      maxHeight="680"
+      translation="[85,123]"
+      maxHeight="477"
       visible="true" />
   
     <ScrollingList

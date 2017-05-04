@@ -11,3 +11,25 @@ Function doesChildExist(parent, child)
     return false
   end if
 End Function
+
+Function rootNode()
+  if m.top <> invalid then
+    parent = m.top
+    while true
+      nextParent = parent.getParent()
+      if nextParent = invalid then return parent
+      parent = nextParent
+    end while
+  end if
+  return invalid
+End Function
+
+Function clone(source)
+  target = CreateObject("roSGNode", source.subType())
+  fields = source.getFields()
+  ' blacklisted fields
+  fields.delete("change")
+  fields.delete("focusedChild")
+  target.setFields(fields)
+  return target  
+End Function

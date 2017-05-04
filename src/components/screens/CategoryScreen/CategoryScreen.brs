@@ -11,6 +11,7 @@ Function init()
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
   m.top.observeField("categoryListResponse", "onCategoriesReceived")
   m.top.observeField("trackingUri", "onTrackingUriChange")
+  m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.trackingCount = 0
   m.CategoryList.observeField("itemFocused","onCategoryMenuChange")
   m.CategoryList.observeField("preItemFocused","onPreCategoryMenuChange")
@@ -99,25 +100,47 @@ End Function
 Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("CategoryScreen.onKeyEvent")
   if press then
-    if (key = "right" or key = "ok") and m.CategoryList.isInFocusChain() then
-      m.CategoryGridList.setFocus(true)
-      m.categoryListIsFocused = false
-      slideTo(m.ContentArea, [85,m.ContentArea.translation[1]], 0.5)
-      slideTo(m.CategoryList, [-380,m.CategoryList.translation[1]], 0.5)
-      m.trackingCount = 0
+    if (key = "right" or key = "ok") then
+      hideCategoryMenu()
       return true
-    else if (key = "left" or key = "back") and not m.CategoryList.isInFocusChain() then
-      m.CategoryList.setFocus(true)
-      m.categoryListIsFocused = true
-      slideTo(m.ContentArea, [525,m.ContentArea.translation[1]], 0.5)
-      slideTo(m.CategoryList, [60,m.CategoryList.translation[1]], 0.5)
-      m.trackingCount = 0
+    else if key = "left" then
+      showCategoryMenu()
       return true
-    else if key = "back"
-      ' this will get sent back to the screen stack which should close the app (or ask user if they want to close the app)
     end if
   end if
   return false
+End Function
+
+
+' onCategoryMenuVisible
+Function onCategoryMenuVisible()
+  if m.top.categoryMenuVisible
+    showCategoryMenu()
+  else
+    hideCategoryMenu()
+  end if
+End Function
+
+Function showCategoryMenu()
+  if not m.CategoryList.isInFocusChain()
+    m.CategoryList.setFocus(true)
+    m.categoryListIsFocused = true
+    slideTo(m.ContentArea, [525,m.ContentArea.translation[1]], 0.5)
+    slideTo(m.CategoryList, [60,m.CategoryList.translation[1]], 0.5)
+    m.trackingCount = 0
+    m.top.categoryMenuVisible = true
+  end if
+End Function
+
+Function hideCategoryMenu()
+  if m.CategoryList.isInFocusChain()
+    m.CategoryGridList.setFocus(true)
+    m.categoryListIsFocused = false
+    slideTo(m.ContentArea, [85,m.ContentArea.translation[1]], 0.5)
+    slideTo(m.CategoryList, [-380,m.CategoryList.translation[1]], 0.5)
+    m.trackingCount = 0
+    m.top.categoryMenuVisible = false
+  end if
 End Function
 
 

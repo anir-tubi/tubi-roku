@@ -16,14 +16,20 @@ End Function
 Function onKeyEvent(key As String, press As Boolean)
   tubiLog("ScreenStack.onKeyEvent")
   if press then
-    if key = "back" 
+    ' for autohide support, bring the UI back on any keypress
+    if m.ScreenStack_.opacity < 1.0 and type(unAutohide) = "Function"
+      unAutohide()
+      return true
+    else if key = "back"
       if m.ScreenStack_.getChildCount() > 1 then
         popScreen()
+        return true
       else if m.ScreenStackEmptyCallback_ <> invalid and type(m.ScreenStackEmptyCallback_) = "roFunction" and m.enteredFromDeepLink = true then
         ' only remove the last item if we have a valid callback
         m.enteredFromDeepLink = false
         popScreen()
         m.ScreenStackEmptyCallback_()
+        return true
       else
         exitModal = showExitAppModal()
         exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")

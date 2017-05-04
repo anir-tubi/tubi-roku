@@ -629,6 +629,7 @@ End Function
 ' Hijack any back button presses before they make it to the screen stack if we are waiting for a server
 ' response from any of add/remove queue/history so that we make sure the category screen can update with new user category content
 Function onKeyEvent(key As String, press As Boolean)
+  tubiLog("DetailScreen.onKeyEvent key = " + key)
   if press then
     if key = "back"
       if m.isWaitingForServerResponse = true

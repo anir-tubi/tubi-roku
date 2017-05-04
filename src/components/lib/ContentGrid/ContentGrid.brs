@@ -1,8 +1,7 @@
 Function init()
   m.top.observeField("width", "onDimensionChange")
   m.top.observeField("height", "onDimensionChange")
-  m.top.observeField("scrollWidth", "onDimensionChange")
-  m.top.observeField("scrollHeight", "onDimensionChange")
+  m.top.observeField("scrollBounds", "onDimensionChange")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("itemSize", "onItemSizeChange")
@@ -330,23 +329,25 @@ Function startChangeFocus(newFocusedIndex As Object) As Void
   m.internalItemFocused = newFocusedIndex
 
   ' Vertical scrolling
-  vertLimit = m.top.scrollHeight
-  if vertLimit = 0 then vertLimit = m.top.height
-  if (itemRect.y + itemRect.height + m.items.translation[1]) > vertLimit then
-    newY = vertLimit - itemRect.y - itemRect.height
-  else if (itemRect.y + m.items.translation[1]) < 0 then
-    newY = -itemRect.y
+  topLimit = m.top.scrollBounds[1]
+  bottomLimit = m.top.scrollBounds[3]
+  if bottomLimit = 0 then bottomLimit = m.top.height
+  if (itemRect.y + itemRect.height + m.items.translation[1]) > bottomLimit then
+    newY = bottomLimit - itemRect.y - itemRect.height
+  else if (itemRect.y + m.items.translation[1]) < topLimit then
+    newY = topLimit - itemRect.y
   else
     newY = m.items.translation[1]
   end if
 
   ' Horizontal scrolling
-  horizLimit = m.top.scrollWidth
-  if horizLimit = 0 then horizLimit = m.top.width
-  if (itemRect.x + itemRect.width + m.items.translation[0]) > horizLimit then
-    newX = horizLimit - itemRect.x - itemRect.width
-  else if (itemRect.x + m.items.translation[0]) < 0 then
-    newX = -itemRect.x
+  rightLimit = m.top.scrollBounds[2]
+  leftLimit = m.top.scrollBounds[0]
+  if rightLimit = 0 then rightLimit = m.top.width
+  if (itemRect.x + itemRect.width + m.items.translation[0]) > rightLimit then
+    newX = rightLimit - itemRect.x - itemRect.width
+  else if (itemRect.x + m.items.translation[0]) < leftLimit then
+    newX = leftLimit - itemRect.x
   else
     newX = m.items.translation[0]
   end if
@@ -436,7 +437,7 @@ Function onKeyEvent(key As Object, press As Boolean) As Boolean
       ' we only do repeat if its a key that affects the grid, and also don't repeat ff and rew hops
       if key <> "fastforward" and key <> "rewind" then m.pressAndHold = key
       return true
-    else if key = "OK" or key = "play" then
+    else if key = "OK" or (m.top.playIsSelect and key = "play") then
       m.top.itemSelected = getContent(gridIndexToItemIndex(m.internalItemFocused))
       return true
     end if

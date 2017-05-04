@@ -41,7 +41,7 @@ Function slideFade(target As Object, startOrEndLocation As String, inOrOut As St
     slideOrigin = target.translation
     slideDestination = [slideX, slideY]
   end if
-  animate(target, slideOrigin, slideDestination, targetOpacity, 1.0, duration, delay)
+  return animate(target, slideOrigin, slideDestination, targetOpacity, 1.0, duration, delay)
 End Function
 
 
@@ -50,7 +50,7 @@ End Function
 '
 ' simple helper to slide the component to the destination.
 Function slideTo(target As Object, destination As Object, duration As Float)
-  animate(target, target.translation, destination, target.opacity, 1.0, duration)
+  return animate(target, target.translation, destination, target.opacity, 1.0, duration)
 End Function
 
 
@@ -60,16 +60,16 @@ End Function
 ' Effect to reveal by scaling from 0 to 1
 Function bubbleIn(target As Object, duration As Float)
   target.scale = [0.0, 0.0]
-  animate(target, target.translation, target.translation, target.opacity, 1.0, duration)
+  return animate(target, target.translation, target.translation, target.opacity, 1.0, duration)
 End Function
 
 
 
 Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 As Float)
   if outOrIn = "out"
-    animate(target, target.translation, target.translation, 0.0, 1.0, duration, delay)
+    return animate(target, target.translation, target.translation, 0.0, 1.0, duration, delay)
   else if outOrIn = "in"
-    animate(target, target.translation, target.translation, 1.0, 1.0, duration, delay)
+    return animate(target, target.translation, target.translation, 1.0, 1.0, duration, delay)
   end if
 End Function
 

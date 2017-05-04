@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="VideoPlayer" extends="Group" >
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPlayer/VideoPlayer.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/VideoPlayer/VideoPlaylist.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
@@ -14,6 +15,11 @@
     <!-- Set to true if the skip trailer button was pressed -->
     <field id="skipTrailer" type="boolean" value="false" alwaysNotify="true" />
 
+    <!-- the playlist parent content node -->
+    <field id="playlist" type="node" />
+    <field id="playlistIndex" type="integer" value="-1"/>
+    <field id="seekPlaylist" type="intarray" value="-1" alwaysNotify="true"/>
+    
     <!-- Alias fields for the video node -->
     <field id="content" alias="VideoNode.content"/>
     <field id="state" alias="VideoNode.state"/>
@@ -28,6 +34,11 @@
     <!-- interval in seconds for sending position data to the tracking server -->
     <field id="analyticsInterval" type="integer" value="0"/>
 
+    <!-- WRITE-ONLY field which hides overlay and transport.  This is not a persistent state -->
+    <field id="dock" type="boolean" value="false" alwaysNotify="true"/>
+    
+    <field id="width" alias="VideoNode.width"/>
+    <field id="height" alias="VideoNode.height"/>
 
     <!-- Enable/disable ads breaks.  This can be changed during playback in order to
       -  postpone midrolls when there is an overlay (e.g. EPG) that the user is
@@ -59,10 +70,16 @@
       -->
     <field id="adControl" type="string" value="" alwaysNotify="true"/>
     
+    <!-- field for communicating playback position to the ad shim -->
+    <field id="adPosition" type="int" />
+
     <!--
       - List of midrolls as time in seconds.  This will be written to by main brightscript thread.
       -->
     <field id="midrolls" type="intarray" value="[]" />
+
+    <!-- force transport to display or hide -->
+    <field id="showTransport" type="boolean" alwaysNotify="true"/>
   </interface>
 
   <children>
@@ -82,50 +99,104 @@
       width="1920"
       height="1080"/>
 
-    <Poster
-      id="VideoOverlay"
-      width="1920"
-      height="1080"
-      translation="[0,0]"
-      opacity="0.0"
-      uri="pkg:/images/transport/sgplayer/transport-gradient.png" />
-
     <Group
-      id="Transport"
+      id="VideoOverlay"
+      opacity="0.0">
+      <Poster
+        id="TransportGradient"
+        width="1920"
+        height="1080"
+        translation="[0,0]"
+        opacity="0.0"
+        uri="pkg:/images/playback-gradient.png"/>
+      <Poster
+        id="PickerGradient"
+        width="1920"
+        height="1080"
+        translation="[0,0]"
+        opacity="0.0"
+        uri="pkg:/images/browse-picker-gradient.png"/>
+      <Poster
+        uri="pkg:/images/back.png"
+        width="47"
+        height="47"
+        translation="[822,58]"/>
+      <Label
+        text="PRESS BACK TO EXIT"
+        translation="[870,61]"
+        height="47"
+        vertAlign="center">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+    </Group>
+    
+    <Group
+      id="HUD"
       visible="true"
       opacity="0.0" >
       
       <Group
-       id="LiveTVGroup"
-       visible="false">
+        id="Picker"
+        visible="true"
+        opacity="0.0">
         <Poster
-          id="OnNowBug"
-          uri="pkg:/images/icon-on-now.png"
-          width="115"
-          height="55"
-          translation="[85,961]"/>
-        <Poster
-          id="LiveUpTriangle"
-          uri="pkg:/images/up-arrow.png"
-          visible="true"
-          width="15"
-          height="10"
-          translation="[953,782]"/>
+          uri="pkg:/images/down-arrow.png"
+          width="47"
+          height="47"
+          translation="[76,521]"/>
         <Label
-          id="AllChannels"
-          text="ALL CHANNELS"
-          horizAlign="center"
+          text="PRESS DOWN TO HIDE"
           vertAlign="center"
-          width="1920"
-          height="40"
-          translation="[0,797]">
+          height="47"
+          translation="[125,521]">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="22" />
+             id="Vaud22px"
+             role="font"
+             uri="pkg:/fonts/Vaud-SemiBold.ttf"
+             size="22" />
         </Label>
+        <VideoPicker
+          id="VideoPicker"
+          translation="[0,616]"
+          visible="true"/>
       </Group>
 
+      
+      <Group
+        id="Transport"
+        opacity="1.0">
+        <Group
+         id="LiveTVGroup"
+         visible="false">
+          <Poster
+            id="OnNowBug"
+            uri="pkg:/images/icon-on-now.png"
+            width="115"
+            height="55"
+            translation="[85,961]"/>
+        </Group>
+
+      <Poster
+        uri="pkg:/images/up-arrow.png"
+        width="47"
+        height="47"
+        translation="[76,769]"/>
+      <Label
+        text="PRESS UP FOR MORE"
+        vertAlign="center"
+        height="47"
+        translation="[125,769]">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+      
       <!--
         - ProgressBarBackground and ProgressBarForeground use 9-patch images which have
         - special undocumented handling (bugs?).  For manifest with ui_resolution=fhd, we
@@ -301,8 +372,9 @@
         translation="[1697,958]"
         visible="false" />
 
-    </Group>
-
+      </Group>  <!-- Transport -->
+    </Group>  <!-- HUD -->
+    
   <Timer
     id="ScrubTimer"
     duration="0.25"
@@ -310,6 +382,11 @@
 
   <AuthTask
     id="VideoPlayerAuthTask" />
-
+  
+  <Timer
+    id="PickerDebounce"
+    duration="0.6"
+    repeat="false"/>
+  
   </children>
 </component>

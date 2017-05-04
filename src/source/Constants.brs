@@ -213,7 +213,7 @@ Function getConstants()
 
     'live tv urls
     constants.urls.liveTv = {}
-      constants.urls.liveTv.getAll = constants.urls.matrix.urlBase + "/mock/livetv"
+      constants.urls.liveTv.getAll = constants.urls.matrix.urlBase + "/livetv"
 
     'cuepoints url
     constants.urls.cuepointsBaseUrl = "http://ads.adrise.tv/cue-points/"

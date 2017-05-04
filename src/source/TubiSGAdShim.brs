@@ -61,10 +61,8 @@ Function tubiSGAdShim_run(scene As Object) As boolean
       else if msg.GetField() = "adControl"
         value = msg.GetData()        
         episode = m.videoPlayerNode.content.getFields()  ' clone the content node into a local AA to avoid messing with it
-        tubiLog("TubiSGAdShim: adControl = " + value)
-        position = m.videoPlayerNode.position
-        position = Int(position)
-        if position = invalid then position = episode.nowPos  ' may happen if preroll
+        position = m.videoPlayerNode.adPosition
+        tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position))
         m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
       else if msg.GetField() = "exitApp"
         if msg.GetData() = true then return true

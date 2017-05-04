@@ -104,7 +104,7 @@
       visible="true"
       translation="[7,53]"
       itemSpacing="[10,10]"
-      scrollWidth="210"
+      scrollBounds="[0,0,210,0]"
       itemSize="[210,300]"
       itemComponentName="Poster"/>
     <Label

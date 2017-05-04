@@ -11,11 +11,21 @@ Function init()
   m.DirectorGroup = m.top.findNode("DirectorGroup")
   m.StarringGroup = m.top.findNode("StarringGroup")
   m.Starring = m.top.findNode("Starring")
+  m.Offset = m.top.findNode("Offset")
 
   m.top.observeField("content", "onContentChange")
   m.top.observeField("mode", "onModeChange")
+  m.top.observeField("width", "onWidthChange")
 
   onModeChange()  ' kickstart the mode
+  onWidthChange()
+End Function
+
+Function onWidthChange()
+  m.Title.width = m.top.width
+  m.Description.width = m.top.width
+  m.Starring.width = m.top.width - 165
+  m.Director.width = m.top.width - 165
 End Function
 
 
@@ -24,7 +34,7 @@ End Function
 '
 ' Format content for an item or category into the various fields
 Function onContentChange()
-  print "InfoPanel.onContentChange"
+  tubiLog("InfoPanel.onContentChange")
   content = m.top.content
   if content <> invalid then
 
@@ -92,6 +102,7 @@ Function onContentChange()
     end if
   
     ' Description
+    m.Description.visible = true
     m.Description.height = 0  ' reset for calculations below
     m.Description.text = content.description
 
@@ -119,14 +130,18 @@ Function onContentChange()
   end if
 
   ' try to shorten description to fit max height
-  if m.top.maxHeight <> 0 and m.top.maxHeight < m.top.BoundingRect().height then
-    m.Description.height = m.Description.boundingRect().height - (m.top.BoundingRect().height - m.top.maxHeight)
-    if m.Description.height < 0 then m.Description.height = 0
+  if m.top.maxHeight <> 0 and m.top.maxHeight < m.offset.BoundingRect().height then
+    m.Description.height = m.Description.boundingRect().height - (m.offset.BoundingRect().height - m.top.maxHeight)
+    if m.Description.height <= 0 then m.Description.text = ""
   end if
 
   'vertically center the info panel
-  translationY = (m.top.maxHeight - m.top.BoundingRect().height) \ 2
-  m.top.translation = [m.top.translation[0], translationY]
+  offsetY = (m.top.maxHeight - m.offset.BoundingRect().height) \ 2
+  if offsetY > 0
+    m.offset.translation = [0, offsetY]
+  else
+    m.offset.translation = [0, 0]
+  end if
 
 End Function
 
@@ -137,46 +152,46 @@ End Function
 ' Make various fields visible or invisible by removing them from
 ' the children for rendering
 Function onModeChange()
-  print "InfoPanel.onModeChange"
-  while m.top.getChildCount() > 0
-    m.top.removeChildIndex(0)
+  tubiLog("InfoPanel.onModeChange")
+  while m.offset.getChildCount() > 0
+    m.offset.removeChildIndex(0)
   end while
 
   if m.top.mode= "category" then
-    m.top.appendChild(m.Title)
-    m.top.appendChild(m.CategoryDetails)
-    m.top.appendChild(m.Description)
-    m.top.itemSpacings = [52, 31]
+    m.offset.appendChild(m.Title)
+    m.offset.appendChild(m.CategoryDetails)
+    m.offset.appendChild(m.Description)
+    m.offset.itemSpacings = [52, 31]
   else if m.top.mode = "item" then
-    m.top.appendChild(m.Title)
-    m.top.appendChild(m.TwoLineInfo)
-    m.top.appendChild(m.Description)
-    m.top.itemSpacings = [42, 30]
+    m.offset.appendChild(m.Title)
+    m.offset.appendChild(m.TwoLineInfo)
+    m.offset.appendChild(m.Description)
+    m.offset.itemSpacings = [42, 30]
   else if m.top.mode = "movie" then
-    m.top.appendChild(m.Title)
-    m.top.appendChild(m.TwoLineInfo)
-    m.top.appendChild(m.Description)
-    m.top.appendChild(m.DirectorGroup)
-    m.top.appendChild(m.StarringGroup)
-    m.top.itemSpacings = [42, 30, 34, 11]
+    m.offset.appendChild(m.Title)
+    m.offset.appendChild(m.TwoLineInfo)
+    m.offset.appendChild(m.Description)
+    m.offset.appendChild(m.DirectorGroup)
+    m.offset.appendChild(m.StarringGroup)
+    m.offset.itemSpacings = [42, 30, 34, 11]
   else if m.top.mode = "series" then
-    m.top.appendChild(m.Title)
-    m.top.appendChild(m.Episode)
-    m.top.appendChild(m.TwoLineInfo)
-    m.top.appendChild(m.Description)
-    m.top.appendChild(m.DirectorGroup)
-    m.top.appendChild(m.StarringGroup)
-    m.top.itemSpacings = [26, 25, 30, 34, 11]
+    m.offset.appendChild(m.Title)
+    m.offset.appendChild(m.Episode)
+    m.offset.appendChild(m.TwoLineInfo)
+    m.offset.appendChild(m.Description)
+    m.offset.appendChild(m.DirectorGroup)
+    m.offset.appendChild(m.StarringGroup)
+    m.offset.itemSpacings = [26, 25, 30, 34, 11]
   else if m.top.mode = "season" then
-    m.top.appendChild(m.Title)
-    m.top.appendChild(m.SeasonDetails)
-    m.top.appendChild(m.Description)
-    m.top.itemSpacings = [52, 31]
+    m.offset.appendChild(m.Title)
+    m.offset.appendChild(m.SeasonDetails)
+    m.offset.appendChild(m.Description)
+    m.offset.itemSpacings = [52, 31]
   else if m.top.mode = "episode" then
-    m.top.appendChild(m.Title)
-    m.top.appendChild(m.Episode)
-    m.top.appendChild(m.TwoLineInfo)
-    m.top.appendChild(m.Description)
-    m.top.itemSpacings = [26, 25, 30]
+    m.offset.appendChild(m.Title)
+    m.offset.appendChild(m.Episode)
+    m.offset.appendChild(m.TwoLineInfo)
+    m.offset.appendChild(m.Description)
+    m.offset.itemSpacings = [26, 25, 30]
   end if
 End Function

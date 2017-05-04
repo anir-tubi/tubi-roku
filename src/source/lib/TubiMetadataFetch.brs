@@ -18,10 +18,13 @@ Function TubiMetadataFetch_liveTv()
   request = m.getliveTvRequest()
   
   res = request.runSynchronous()
-  liveTvContentRes = ParseJson(res)
-
-  organizedRes = m.organizeLiveTvContent(liveTvContentRes)
-  return organizedRes
+  if res <> invalid
+    liveTvContentRes = ParseJson(res)
+    organizedRes = m.organizeLiveTvContent(liveTvContentRes)
+    return organizedRes
+  else
+    return invalid
+  end if
 End Function
 
 
@@ -85,18 +88,29 @@ Function TubiMetadataFetch_organizeLiveTvContent(liveTvResponse)
         if contents[id] <> invalid
           child = contents[id]
           child.isLiveTV = true
+
+          if child["type"] = "c"  'indicates "clip" or short form type
+            child["type"] = "clip"   'need to change the type, since we already use type="c" to indicate categories
+          end if
           channel.children.push(child)
         end if
       end for
-      if container.cursor <> invalid
-        channels.liveTvCursor = [0, 0, container.cursor]
-      end if
     end if
+
     channels.children.push(channel)
   end for
 
   parent = CreateObject("roSGNode", "TubiContentNode")
   nodeCount = m.translate.translateRecursive(channels, parent)
   parent.liveTvCursor = channels.liveTvCursor
+
+  ' For now we force short-form channel to be active
+  for i=0 to parent.getChildCount()-1
+    if parent.getChild(i).liveTvChannelType = "short_form"
+      parent.liveTvCursor = [i, parent.liveTvCursor[1], parent.liveTvCursor[2]]
+      exit for
+    end if
+  end for
+
   return parent
 End Function

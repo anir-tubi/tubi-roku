@@ -60,18 +60,20 @@
     
     <!-- boundaries
     -
-    - width and height are the true visible limits of the component. scrollWidth and
-    - scrollHeight should be smaller in order to bound the limits of the focus image.
+    - width and height are the true visible limits of the component. scrollBounds
+    - should be smaller in order to bound the limits of the focus image.
     - This allows for content to be hanging outside the focusable area as a hint that
     - the content can scroll further.
-    - If scrollWidth or scrollHeight are 0, they will expand to equal width or height.
-    -
+    - scrollBounds indices are:
+    -  0: left-side boundary
+    -  1: top boundary
+    -  2: right-side boundary (value of 0 means full width)
+    -  3: bottom boundary (value of 0 means full height)
     -->
 
     <field id="width" type="float" />
     <field id="height" type="float" />
-    <field id="scrollWidth" type="float" value="0.0"/>
-    <field id="scrollHeight" type="float" value="0.0"/>
+    <field id="scrollBounds" type="floatarray" value="[0,0,0,0]"/>
 
     <!-- Focus control -->
     <field id="itemSelected" type="node" alwaysNotify="true"/>
@@ -84,6 +86,9 @@
     <field id="animateToItem" type="intarray" alwaysNotify="true"/>
 
     <field id="focusChangeDuration" alias="ScrollAnimation.duration" value="0.3" />
+
+    <!-- If true, play button presses will be interpreted like "ok" and select the content -->
+    <field id="playIsSelect" type="boolean" value="true" />
 
   </interface>
   

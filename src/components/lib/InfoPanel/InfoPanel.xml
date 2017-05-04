@@ -22,10 +22,12 @@
  -    StarringGroup - uses content.actor/actors
  -
  -->
-<component name="InfoPanel" extends="LayoutGroup">
+<component name="InfoPanel" extends="Group">
 
   <script type="text/brightscript" uri="pkg:/components/lib/InfoPanel/InfoPanel.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />  
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
 
   <interface>
     <field id="content" type="node" />
@@ -33,19 +35,28 @@
     <!-- mode is either: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
     <field id="mode" type="string" value="category" />
     <!-- maxHeight is the area in which the content should be centered -->
-    <field id="maxHeight" type="int"  />
+    <field id="maxHeight" type="int" value="0" />
 
+    <field id="maxTitleLines" type="integer" alias="Title.maxLines"/>
+    <field id="titleFontSize" alias="TitleFont.size"/>
+
+    <field id="width" type="float" value="875" />
   </interface>
 
   <children>
+    <LayoutGroup
+      id="Offset"
+      layoutDirection="vert"
+      translation="[0,0]">
 
     <Label
       id="Title"
       width="875"
-      wrap="false"
-      height="73"
+      wrap="true"
+      maxLines="1"
       vertAlign="bottom">
       <Font
+        id="TitleFont"
         role="font"
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="67" />
@@ -135,7 +146,7 @@
         opacity="0.5"
         width="875"
         ellipsizeOnBoundary="true"
-        font="dictionary:Vaud27px "/>
+        font="dictionary:Vaud27px"/>
     </LayoutGroup>
     
     <Label
@@ -208,7 +219,7 @@
         width="710"
         visible="true" />
     </LayoutGroup>
-    
+    </LayoutGroup>
   </children>
 
 </component>

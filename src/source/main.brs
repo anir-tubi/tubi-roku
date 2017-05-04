@@ -133,7 +133,7 @@ Function MainNewUI(args As Dynamic, constants As Object)
   end if
 
   'get live tv content metadata
-  liveTvContent = m.global.utils.metadataFetch.liveTv()
+  onNowContent = m.global.utils.metadataFetch.liveTv()
 
   ' start the scene graph UI
   sgGlobal = screen.getGlobalNode()
@@ -178,10 +178,10 @@ Function MainNewUI(args As Dynamic, constants As Object)
     m.global.utils.constants.deviceInfo.clientVersion = m.global.utils.constants.deviceInfo.clientVersion.Replace("local", "remote")
 
     controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
-    controller.liveTvContent = liveTvContent
+    controller.onNowContent = onNowContent
   else
     controller = tubiScene.createChild("ContentController")
-    controller.liveTvContent = liveTvContent
+    controller.onNowContent = onNowContent
   end if
   controller.observeField("exitApp", port)
 

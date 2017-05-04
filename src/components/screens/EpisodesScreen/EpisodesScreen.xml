@@ -31,7 +31,7 @@
     <InfoPanel
       id="InfoPanel"
       translation="[85,61]"
-      maxHeight="577"
+      maxHeight="511"
       mode="detail"
       visible="true" />
     

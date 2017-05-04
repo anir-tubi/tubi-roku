@@ -56,7 +56,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer[typeVar] <> invalid
     if contentFromServer[typeVar] = "c"
       translatedContent[typeVar] = m.contentTypes.category
-    else if contentFromServer[typeVar] = "v"
+    else if contentFromServer[typeVar] = "v" or contentFromServer[typeVar] = "clip"
       translatedContent[typeVar] = m.contentTypes.video
     else if contentFromServer[typeVar] = "s"
       translatedContent[typeVar] = m.contentTypes.series

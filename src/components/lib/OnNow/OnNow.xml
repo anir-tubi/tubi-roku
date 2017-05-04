@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="OnNow" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/OnNow/OnNow.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/PlaylistMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AutohideMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- read-only: the current content playlistfor live tv 
+      -
+      - Structured like:
+      -  <CN>
+      -    <CN id="LiveChannel1">
+      -      <CN id="Content1"/>
+      -      <CN id="Content2"/>
+      -    </CN>
+      -    <CN id="LiveChannel2">
+      -      <CN id="Content9"/>
+      -      <CN id="Content10"/>
+      -    </CN>
+      -  </CN>
+      -
+      -->
+    <field id="content" type="node" alwaysNotify="true"/>
+
+    <!-- play, stop, dock -->
+    <field id="control" type="string" value=""/> 
+    
+  </interface>
+
+  <children>
+    <Poster
+      id="OnNowGradient"
+      uri="pkg:/images/browse-picker-gradient.png"
+      width="1920"
+      height="1080"
+      translation="[0,0]"/>
+      
+    <OnNowOverlay
+      id="OnNowOverlay"
+      translation="[0,576]" />
+    
+    <Label
+      id="Unavailable"
+      text="On Now content currently unavailable.  Please check back later."
+      visible="false"
+      width="1920"
+      translation="[0,576]"
+      horizAlign="center">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="33" />
+    </Label>
+
+    <Group
+     id="SearchSignOutHint">
+      <Poster
+        id="LiveUpTriangle"
+        uri="pkg:/images/up-arrow.png"
+        visible="true"
+        width="47"
+        height="47"
+        translation="[843,57]" />
+      <Label
+        id="AllChannels"
+        text="SEARCH &amp; MORE"
+        vertAlign="center"
+        height="47"
+        translation="[892,61]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+    </Group>
+
+    <Poster
+      uri="pkg:/images/icon-on-now.png"
+      width="115"
+      height="55"
+      translation="[243,53]" />
+
+    <Timer
+      id="Debounce"
+      repeat="false"
+      duration="0.6" />      
+    
+  </children>
+</component>
+    

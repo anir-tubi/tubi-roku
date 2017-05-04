@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<component name="LiveTVScreen" extends="Group">
-  <script type="text/brightscript" uri="pkg:/components/screens/LiveTVScreen/LiveTVScreen.brs" />
+<!-- This 'screen' is used as a vertical view scroller, encompassing 3 views: 
+-    The tools menu, the OnNow screen and the CategoryScreen 
+-->
+
+<component name="HomeScreen" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/screens/HomeScreen/HomeScreen.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/PlaylistMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   
@@ -14,14 +19,12 @@
     
     <field id="focusTarget" type="node"/>
     
-    <field id="hideUI" alias="LiveTV.watchNowSelected"/>
+    <!-- TODO: Plumb this to OnNowOverlay when the play button is selected -->
+    <field id="hideUI" type="boolean"/>
     
     <field id="showEPG" type="boolean" alwaysNotify="true"/>
     
-    <field id="liveTVContent" alias="LiveTV.content"/>
-    
-    <!-- Tune to current cursor and start playing -->
-    <field id="playLiveTV" type="boolean" alwaysNotify="true"/>
+    <field id="onNowContent" alias="OnNow.content"/>
   </interface>
   
   <children>
@@ -31,8 +34,8 @@
       opacity="0.0"
       translation="[0,0]"/>
     
-    <LiveTV
-      id="LiveTV"
+    <OnNow
+      id="OnNow"
       visible="true"
       translation="[0,0]"/>
     
@@ -43,21 +46,11 @@
       visible="true"
       opacity="0.2"/>
     
-    <EPG
-      id="EPG"
-      visible="false"
-      translation="[0,0]"/>
-    
     <Poster
       id="tubiLogo"
       height="43"
       width="149"
       uri="pkg:/images/logo.png"
-      translation="[1688,933]" />
-    
-    <Timer
-      id="Autohide"
-      repeat="true"
-      duration="2"/>
+      translation="[85,56]" />
   </children>
 </component>

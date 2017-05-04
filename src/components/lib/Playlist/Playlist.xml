@@ -1,0 +1,7 @@
+<!--
+  - Playlist - A simple formality for making playlists a real type
+  -
+  - Playlists are a parent to a list of TubiContentNodes.  These represent
+  - a linear order for episodes to be played by the VideoPlayer component.
+  -->
+<component name="Playlist" extends="TubiContentNode" />

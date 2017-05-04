@@ -27,6 +27,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
   
   <interface>
     <!-- Watched by the main brightscript thread to indicate video playback should start -->
@@ -44,7 +45,7 @@
     <field id="playerInfo" type="assocarray" alwaysNotify="true" />
 
     <!-- Interface for receiving Live TV content from the main Brightscript thread -->
-    <field id="liveTvContent" type="node" />
+    <field id="onNowContent" type="node" />
     
     <field id="contentRefreshBeforePlay" type="assocarray"/>
 
@@ -79,6 +80,9 @@
       
       <Group
        id="ScreenStack"/>
+      
+      <Timer
+       id="AutohideTimer"/>
     </children>
 
 </component>

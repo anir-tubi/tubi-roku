@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - DetailMetadataTask
+ -
+ - This is a task to get detail metadata 
+ -
+ --> 
+<component name="DetailMetadataTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/tasks/DetailMetadataTask/DetailMetadataTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+
+    <interface>
+      <!-- input -->
+      <field id="contentFragment" type="node"/>
+      
+      <!-- Set to the parsed response -->
+      <field id="response" type="node" />
+      
+      <!-- Set when an error occurs -->
+      <field id="error" type="assocarray" />
+    </interface>
+</component>

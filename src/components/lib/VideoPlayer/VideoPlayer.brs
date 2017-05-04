@@ -48,16 +48,31 @@ Function init()
   m.Transport = m.top.findNode("Transport")
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
+  m.Video.observeField("state", "onVideoStateChange")
   m.top.observeField("control", "onControlChange")
   m.top.observeField("content", "onContentChange")
+  m.top.observeField("playlist", "onPlaylistChange")
+  m.top.observeField("seekPlaylist", "onSeekPlaylist")
+  m.top.observeField("focusedChild", "onComponentFocusChange")
+  m.top.observeField("docked", "onDockedChange")
+  m.top.observeField("showTransport", "onShowTransport")
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.ProgressBar = m.top.findNode("ProgressBarForeground")
   m.Overlay = m.top.findNode("VideoOverlay")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
+  m.PickerGroup = m.top.findNode("Picker")
+  m.HUD = m.top.findNode("HUD")
+  m.TransportGradient = m.top.findNode("TransportGradient")
+  m.PickerGradient = m.top.findNode("PickerGradient")
+  m.VideoPicker = m.top.findNode("VideoPicker")
+  m.VideoPicker.observeField("contentFocused", "onVideoPickerFocused")
+  m.VideoPicker.observeField("contentSelected", "onVideoPickerSelected")
+  m.PickerDebounce = m.top.findNode("PickerDebounce")
+  m.PickerDebounce.observeField("fire", "onVideoPickerDebounce")
 
   'm.VideoState is source of truth for the state of the video player for the UI
-  'possible values are "play", "pause", "rew", "ffw", "stop"
+  'possible values are "play", "pause", "rew", "ffw", "stop", "refresh"
   m.VideoState = "stop"
   m.scrubAmt = -1
   m.playerPosition = 0
@@ -107,6 +122,24 @@ Function init()
   end if
 End Function
 
+Function onComponentFocusChange()
+  if m.top.isInFocusChain()
+    button = m.TransportButtons.getChild(m.focusedButtonIndex)
+    if m.top.hasFocus()
+      button.focusState = true
+    else  
+      button.focusState = false
+    end if
+  end if
+End Function
+
+Function onDockedChange()
+  if m.top.docked
+    ' immediately hide all HUD components
+    m.Overlay.opacity = 0.0
+    m.HUD.opacity = 0.0
+  end if
+End Function
 
 Function onBufferStatus()
   if m.Video.bufferingStatus <> invalid
@@ -117,8 +150,10 @@ Function onBufferStatus()
 End Function
 
 
-Function onContentChange()
+Function onContentChange() As Void
   tubiLog("VideoPlayer.onContentChange")
+  if m.top.content = invalid then return
+
   'there are no subtitles so grey out the captions button
   if m.top.content.subtitleUrls.count() = 0
     m.TransportButtons.removeChild(m.ClosedCaption)
@@ -131,16 +166,14 @@ Function onContentChange()
   end if
 
   liveTVGroup = m.top.findNode("LiveTVGroup")
+
   if m.top.content.isLiveTV then
     liveTVGroup.visible = true
-    m.HopForwardButton.enabled = false
-    m.FastForwardButton.enabled = false
-    m.EndButton.enabled = false
+    m.VideoPicker.content = m.top.playlist
+    m.VideoPicker.jumpToIndex = m.top.playlistIndex
   else
     liveTVGroup.visible = false
-    m.HopForwardButton.enabled = true
-    m.FastForwardButton.enabled = true
-    m.EndButton.enabled = true
+    m.VideoPicker.content = invalid
   end if
 
   'if it's not a trailer, remove the skip trailer button
@@ -153,6 +186,35 @@ Function onContentChange()
     m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
   end if
 End Function
+
+Function onVideoPickerFocused()
+  tubiLog("VideoPlayer.onVideoPickerFocused")
+  if m.VideoPicker.contentFocused <> -1
+    m.PickerDebounce.control = "start"
+    m.lastButtonPressPos = m.playerPosition
+  end if
+End Function
+
+Function onVideoPickerDebounce()
+  tubiLog("VideoPlayer.onVideoPickerDebounce " + stri(m.VideoPicker.contentFocused))
+  m.top.seekPlaylist = [m.VideoPicker.contentFocused, 0]
+End Function
+
+
+Function onVideoPickerSelected()
+  tubiLog("VideoPlayer.onVideoPickerSelected " + stri(m.VideoPicker.contentSelected))
+  if m.VideoPicker.contentFocused <> -1
+    animateTransport("out")
+    if m.VideoPicker.contentSelected <> m.top.playlistIndex
+      m.top.seekPlaylist = [m.VideoPicker.contentSelected, 0]
+    else
+      if m.Video.state = "paused"
+        resumeFromPause()
+      end if
+    end if
+  end if
+End Function
+
 
 
 ' m.playerPosition is the main source of truth for position.
@@ -215,7 +277,7 @@ Function onVideoPositionChange()
   updatePlayerPosition()
 
   ' Auto hide transport
-  if m.VideoState = "play" and m.Transport.opacity > 0 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
+  if m.VideoState = "play" and m.HUD.opacity > 0 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
     animateTransport("out")
   end if
 
@@ -238,10 +300,12 @@ Function onVideoPositionChange()
     historyPosition()
   end if
 
+  'Advertisements
   if m.top.enableAds and m.top.midrolls <> invalid and m.top.midrolls.count() > 0 then
     for each cuepoint in m.top.midrolls
 
       if m.playerPosition = (cuepoint - m.adPrefetchTime)
+        m.top.adPosition = m.playerPosition
         m.top.adControl = "midroll"
       end if
 
@@ -284,39 +348,47 @@ Function onCaptionModeChange()
   end if
 End Function
 
-Function onControlChange()
-  tubiLog("VideoPlayer.onControlChange")
-  if m.Video.content <> invalid and m.Video.state <> "playing" and m.top.control = "play" then
-    if m.Video.content.nowPos <> invalid then
-      m.Video.seek = m.Video.content.nowPos
-      m.playerPosition = m.Video.content.nowPos
-      m.lastSavedPosition = m.Video.content.nowPos
-      m.lastPingTime = m.Video.content.nowPos
-    else
-      m.lastPingTime = 0
-      m.lastSavedPosition = 0
-    end if
-    m.top.midrolls = []  ' Always reset midrolls when we first start playback.  Preroll will populate these
-    m.VideoState = "play"
-    
-    if m.video.content.isLiveTV = false then
-      trackEvent({
-        trackType: "videoPlay"
-        value: m.Video.content.id
-        ctx: m.Video.content.nowPos
-        extraCtx: {
-          subtitles: m.Video.content.showSubtitles
-        }
-      })
-    end if
 
-    if m.top.enableAds then
-      ' Start pre-roll fetch
-      m.top.adControl = "preroll"
-    else
-      m.Video.control = "play"
-      m.top.adControl = "cuepoints"
-    end if
+Function playContent()
+  if m.Video.content.nowPos <> invalid then
+    m.Video.seek = m.Video.content.nowPos
+    m.playerPosition = m.Video.content.nowPos
+    m.lastSavedPosition = m.Video.content.nowPos
+    m.lastPingTime = m.Video.content.nowPos
+  else
+    m.lastPingTime = 0
+    m.lastSavedPosition = 0
+  end if
+  m.top.midrolls = []  ' Always reset midrolls when we first start playback.  Preroll will populate these
+    
+  if m.video.content.isLiveTV = false then
+    trackEvent({
+      trackType: "videoPlay"
+      value: m.Video.content.id
+      ctx: m.Video.content.nowPos
+      extraCtx: {
+        subtitles: m.Video.content.showSubtitles
+      }
+    })
+  end if
+
+  m.top.adPosition = 0
+  m.VideoState = "play"
+  if m.top.enableAds then
+    ' Start pre-roll fetch
+    m.top.adControl = "preroll"
+  else
+    m.Video.control = "play"
+    m.top.adControl = "cuepoints"
+  end if
+End Function
+
+
+Function onControlChange()
+  tubiLog("VideoPlayer.onControlChange " + m.top.control)
+  if currentPlaylistContent() <> invalid and m.Video.state <> "playing" and m.top.control = "play" then
+    refreshContent(currentPlaylistContent().nowPos)
+
   else if m.top.control = "stop" then
     'TODO: If ad break is happening, abort it.  I don't think it's possible, though
     m.Video.control = "stop"
@@ -333,7 +405,7 @@ Function onKeyEvent(key As String, press As Boolean)
     m.lastButtonPressPos = m.playerPosition
 
     if key = "OK"
-      if m.Transport.opacity = 0
+      if m.HUD.opacity = 0
         showTransport()
       else
         'do action based on the current focused button
@@ -385,7 +457,7 @@ Function onKeyEvent(key As String, press As Boolean)
       end if
 
     else if key = "left"
-      if m.Transport.opacity = 0
+      if m.HUD.opacity = 0
         showTransport()
 
       else
@@ -400,7 +472,7 @@ Function onKeyEvent(key As String, press As Boolean)
       end if
 
     else if key = "right"
-      if m.Transport.opacity = 0
+      if m.HUD.opacity = 0
         showTransport()
 
       else
@@ -415,21 +487,24 @@ Function onKeyEvent(key As String, press As Boolean)
       end if
 
     else if key = "up" or key = "down"
-      if m.transport.opacity = 0
+      if m.Overlay.opacity = 0
         showTransport()
       else
         if m.top.content.isLiveTV then
-          m.top.upButtonPressed = true
-          animateTransport("out")
+          if m.top.hasFocus()
+            focusVideoPicker(true)
+          else
+            focusVideoPicker(false)
+          end if
         end if
       end if
 
     else if key = "back" then
       if m.VideoState = "play"
-        if m.transport.opacity = 0
+        if m.HUD.opacity = 0
           backButtonExit()
 
-        else if m.transport.opacity > 0
+        else
           'close the transport
           animateTransport("out")
           resetTransportButtons()
@@ -461,7 +536,7 @@ Function onAdStateChange()
     showAdBreak()
   ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
   'TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
-  else if m.top.adState = "noads" and m.VideoState = "play" and m.Video.state <> "playing" and m.Video.state <> "buffering" then
+  else if m.top.adState = "noads" and m.VideoState = "play" and m.Video.state <> "playing" then
     ' came back from an ad break
     m.Video.seek = m.playerPosition
     m.Video.control = "play"
@@ -474,6 +549,20 @@ Function onAdStateChange()
       }
     })
   else if m.top.adState = "adsclosed"
+    ' We want to allow the UI to decide what to do when user hits "Back".  The best
+    ' way is to resume the playback so live content is playing.  The controlling node
+    ' should set control = "stop" if they want to exit video playback entirely
+    m.Video.seek = m.playerPosition
+    m.Video.control = "play"
+    trackEvent({
+      trackType: "resumeAfterAds"
+      value: m.Video.content.nowPos
+      ctx: m.Video.content.id
+      extraCtx: {
+        livetv: m.Video.content.isLiveTV
+      }
+    })
+
     backButtonExit()
   end if
 End Function
@@ -502,6 +591,12 @@ Function showTransport()
   m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
   m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
+  m.PickerGroup.opacity = 0.0
+  m.PickerGroup.translation = [0,0]
+  m.Transport.opacity = 1.0
+  m.Transport.translation = [0,0]
+  m.PickerGradient.opacity = 0.0
+  m.TransportGradient.opacity = 1.0
   animateTransport("in")
 End Function
 
@@ -509,10 +604,42 @@ End Function
 'aggregates all the animation for showing/hiding the transport
 '@direction: string, value may be "out" or "in"
 Function animateTransport(direction)
-  slideFade(m.Transport, "below", direction, 0.6)
+  slideFade(m.HUD, "below", direction, 0.6)
   fade(m.Overlay, direction, 0.6)
+  
+  ' always set focus back to here when hiding transport, that way left/right won't navigate VideoPicker overlay
+  if m.top.isInFocusChain()
+    if direction = "out" and m.PickerGroup.opacity > 0
+      m.VideoPicker.setFocus(false)
+      m.top.setFocus(true)
+    end if
+    if direction = "in" and m.Transport.opacity = 0
+      m.VideoPicker.setFocus(true)
+    end if
+  end if
 End Function
 
+Function focusVideoPicker(focus)
+  print "VideoPlayer.focusVideoPicker "; focus
+  transportButton = m.TransportButtons.getChild(m.focusedButtonIndex)
+  if not focus
+    ' I'm not sure why we have to setFocus(false) here, but it doesn't work otherwise
+    slideFade(m.PickerGroup, "below", "out", 0.6)
+    slideFade(m.Transport, "below", "in", 0.6)
+    fade(m.PickerGradient, "out", 0.6)
+    fade(m.TransportGradient, "in", 0.6)
+    transportButton.focusState = true
+    m.VideoPicker.setFocus(false)
+    m.top.setFocus(true)
+  else if focus and m.top.hasFocus()
+    slideFade(m.PickerGroup, "below", "in", 0.6)
+    slideFade(m.Transport, "below", "out", 0.6)
+    fade(m.PickerGradient, "in", 0.6)
+    fade(m.TransportGradient, "out", 0.6)
+    m.VideoPicker.setFocus(true)
+    transportButton.focusState = false
+  end if
+End Function
 
 'load Video player and play
 Function playVideo()
@@ -526,13 +653,17 @@ End Function
 Function pauseVideo()
   m.Video.control = "pause"
   m.VideoState = "pause"
+
+  if m.HUD.opacity < 1.0
+    showTransport()
+  else
+    ' make sure transport is showing
+    focusVideoPicker(false)
+  end if
+
   m.PlayPauseButton.focusedUri = m.buttonUris.playFocus
   m.PlayPauseButton.unfocusedUri = m.buttonUris.play
   setFocusedButton(m.PlayPauseButton)
-
-  if m.Transport.opacity < 1.0
-    animateTransport("in")
-  end if
   
   updateTransport()
   trackEvent({
@@ -613,7 +744,7 @@ Function beginScrub()
   m.ScrubTimer.observeField("fire", "updateScrubTime")
   m.ScrubTimer.control = "start"
 
-  if m.Transport.opacity < 1.0
+  if m.HUD.opacity < 1.0
     animateTransport("in")
   end if
   m.scrubTimespan.mark()
@@ -638,7 +769,7 @@ Function endScrub()
   ' resume ad break
   if m.top.enableAds then
     m.Video.control = "stop"
-    m.top.content.nowPos = m.playerPosition
+    m.top.adPosition = m.playerPosition
     m.top.adControl = "seek"
   else
     m.Video.seek = m.playerPosition 'will load and play the video at the seeked to point
@@ -671,7 +802,7 @@ Function goToEnd()
     endScrub()
     setFocusedButton(m.EndButton)
   end if
-  jumpToPosition(m.Video.duration - 5)
+  advancePlaylist()
 End Function
 
 
@@ -682,9 +813,9 @@ Function handlePlayPause()
   else if m.VideoState = "pause" then
     resumeFromPause()
   else if m.VideoState = "rew" or m.VideoState = "ffw"
-    setFocusedButton(m.PlayPauseButton)
     endScrub()
   end if
+  setFocusedButton(m.PlayPauseButton, true)
 End Function
 
 
@@ -717,7 +848,7 @@ Function handleFastForward()
     m.FastForwardButton.unfocusedUri = m.buttonUris.fastForwardLevels[0]
   end if
 
-  setFocusedButton(m.FastForwardButton)
+  setFocusedButton(m.FastForwardButton, true)
 End Function
 
 
@@ -750,7 +881,7 @@ Function handleRewind()
     m.RewindButton.unfocusedUri = m.buttonUris.rewindLevels[0]
   end if
 
-  setFocusedButton(m.RewindButton)
+  setFocusedButton(m.RewindButton, true)
 End Function
 
 
@@ -769,7 +900,10 @@ Function handleHopBack()
   setFocusedButton(m.HopBackButton)  'necessary because there is a dedicated hop back button on certain roku remotes
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub()
-    setFocusedButton(m.HopBackButton)
+  end if
+  setFocusedButton(m.HopBackButton, true)
+  if m.HUD.opacity > 0.0
+    animateTransport("out")
   end if
   jumpToPosition(m.playerPosition - 30)
 End Function
@@ -777,11 +911,11 @@ End Function
 
 'handles ClosedCaption button/toggle selection
 Function handleClosedCaption()
-  if m.Transport.opacity < 1.0
+  if m.HUD.opacity < 1.0
     animateTransport("in")
   end if
 
-  setFocusedButton(m.ClosedCaption)
+  setFocusedButton(m.ClosedCaption, true)
 
   'setting the globalCaptionMode will trigger a callback that updates the images and does user tracking
   if m.Video.globalCaptionMode = "On"
@@ -811,12 +945,23 @@ End Function
 
 'Finds the 'index' of the passed in transport button node and sets it on m.focusedButtonIndex
 'Additionally updates the image of the button to the focused version and all other buttons to the unfocused version
-Function setFocusedButton(TransportButton)
+'
+' If keyFocus is true it will forcefully set focus to the transport
+Function setFocusedButton(TransportButton, keyFocus=false)
+  if keyfocus
+    m.VideoPicker.setFocus(false)
+    m.top.setFocus(true)
+  end if
   for i=0 to m.TransportButtons.getChildCount()-1
     button = m.TransportButtons.getChild(i)
     if TransportButton.id = button.id
       m.focusedButtonIndex = i
-      button.focusState = true
+      ' if overlay has focus, don't set the icon to yellow
+      if m.top.hasFocus()
+        button.focusState = true
+      else
+        button.focusState = false
+      end if
     else
       button.focusState = false
     end if
@@ -833,6 +978,16 @@ End Function
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads
 Function showAdBreak()
   m.Video.control = "stop"
-  m.top.content.nowPos = m.playerPosition
+  m.top.adPosition = m.playerPosition
   m.top.adControl = "play"
+End Function
+
+
+Function onShowTransport()
+  if m.top.showTransport then
+    m.lastButtonPressPos = m.playerPosition
+    showTransport()
+  else
+    animateTransport("out")
+  end if
 End Function

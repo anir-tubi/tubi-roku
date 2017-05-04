@@ -29,8 +29,12 @@ Function formatLengthAsEnglish(length As Dynamic) As String
     minutes = (length mod 3600) \ 60
     seconds = length mod 60
     result = ""
-    if hours > 0 then result = stri(hours).trim() + " h "
-    result  = result + stri(minutes).trim() + " min"    
+    if hours = 0 and minutes = 0 then
+      result = stri(seconds).trim() + " sec"
+    else
+      if hours > 0 then result = stri(hours).trim() + " h "
+      result  = result + stri(minutes).trim() + " min"
+    end if
     return result
   else
     return ""

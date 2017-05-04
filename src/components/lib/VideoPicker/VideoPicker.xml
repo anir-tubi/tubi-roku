@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="VideoPicker" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/VideoPicker/VideoPicker.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!--
+      - OUTPUTS
+      -->
+
+    <!-- updated to indicate a user has changed the content they are watching: [<playlist>,<episode>] -->
+    <field id="contentFocused" type="int" value="0"/>
+    
+    <!-- if the user presses "OK" for the current content item, this event will be raised -->
+    <field id="contentSelected" type="int" alwaysNotify="true" />
+   
+    
+    <!--
+      - INPUTS
+      -->
+    
+    <!-- expect content to be a playlist node -->
+    <field id="content" alias="ContentGrid.content"/>
+    <!-- sets the overlay to show the playlist/content at the indicated index. -->
+    <field id="jumpToIndex" type="int" />
+
+  </interface>  
+
+  <children>
+    <ContentGrid
+      id="ContentGrid"
+      numRows="1"
+      width="1920"
+      height="394"
+      fillDirection="W"
+      visible="true"
+      translation="[0,0]"
+      itemSpacing="[10,10]"
+      scrollBounds="[85,0,515,0]"
+      itemSize="[430,256]"
+      playIsSelect="false"
+      itemComponentName="VideoPickerPoster"/>
+  </children>
+</component>

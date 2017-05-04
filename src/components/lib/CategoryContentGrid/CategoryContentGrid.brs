@@ -70,21 +70,21 @@ Function onContentChange()
     if m.top.content.getChildCount() > 0 then
    
       if m.top.content.title = "Featured" or m.top.content["type"] = m.global.constants.ui.contentTypes.season then
-        m.ContentGrid.scrollWidth = 430
+        m.ContentGrid.scrollBounds = [0,0,430,0]
         m.ContentGrid.itemSize = [430,256]
         m.ContentGrid.itemComponentName = "FeaturePoster"
       else if m.top.content.id = "ContinueWatching" then
         ' Regular poster size, but with resume bar overlay
-        m.ContentGrid.scrollWidth = 210
+        m.ContentGrid.scrollBounds = [0,0,210,0]
         m.ContentGrid.itemSize = [210,300]
         m.ContentGrid.itemComponentName = "ResumePoster"
         
       else if m.top.content.id = "SearchSignIn" or m.top.content.id = "SearchSignOut" then
-        m.ContentGrid.scrollWidth = 430
+        m.ContentGrid.scrollBounds = [0,0,430,0]
         m.ContentGrid.itemSize = [430,256]
         m.ContentGrid.itemComponentName = "SignInPoster"
       else
-        m.ContentGrid.scrollWidth = 210
+        m.ContentGrid.scrollBounds = [0,0,210,0]
         m.ContentGrid.itemSize = [210,300]
         m.ContentGrid.itemComponentName = "Poster"
       end if
