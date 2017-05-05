@@ -114,12 +114,17 @@ Function init()
   m.historyInterval = m.global.constants.player.historyFrequency
 
   'if global captions are turned on, slide the closed caption toggle to on position
-  m.CCSlideAmt = 31
+  m.CCNippleOnTranslation = [89,0]
+  m.CCNippleOffTranslation = [58,0]
+
   if m.Video.globalCaptionMode = "On"
     m.CCRailOn.opacity = 1.0
     m.CCRailOff.opacity = 0.0
-    m.CCNipple.translation = [m.CCNipple.translation[0] + m.CCSlideAmt, m.CCNipple.translation[1]]
+    m.CCNipple.translation = m.CCNippleOnTranslation
   end if
+
+  ' set to the end position of replay if caption mode is temporarily turned on during a replay
+  m.replayCaptionEnd = 0
 End Function
 
 Function onComponentFocusChange()
@@ -152,6 +157,7 @@ End Function
 
 Function onContentChange() As Void
   tubiLog("VideoPlayer.onContentChange")
+  cancelReplayCaptions()
   if m.top.content = invalid then return
 
   'there are no subtitles so grey out the captions button
@@ -281,6 +287,11 @@ Function onVideoPositionChange()
     animateTransport("out")
   end if
 
+  ' Cancel temporary captions
+  if m.replayCaptionEnd <> 0 and m.playerPosition >= m.replayCaptionEnd
+    cancelReplayCaptions()
+  end if
+
   ' Analytics
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval then
     trackEvent({
@@ -327,12 +338,12 @@ Function onCaptionModeChange()
   if m.Video.globalCaptionMode = "On"
     fade(m.CCRailOn, "in", 0.5)
     fade(m.CCRailOff, "out", 0.5)
-    slideTo(m.CCNipple, [m.CCNipple.translation[0] + m.CCSlideAmt, m.CCNipple.translation[1]], 0.5)
+    slideTo(m.CCNipple, m.CCNippleOnTranslation, 0.5)
     value = "on"
   else  'handles "Off", "Instant replay", and "When mute"
     fade(m.CCRailOn, "out", 0.5)
     fade(m.CCRailOff, "in", 0.5)
-    slideTo(m.CCNipple, [m.CCNipple.translation[0] - m.CCSlideAmt, m.CCNipple.translation[1]], 0.5)
+    slideTo(m.CCNipple, m.CCNippleOffTranslation, 0.5)
     value = "off"
   end if
   
@@ -387,9 +398,11 @@ End Function
 Function onControlChange()
   tubiLog("VideoPlayer.onControlChange " + m.top.control)
   if currentPlaylistContent() <> invalid and m.Video.state <> "playing" and m.top.control = "play" then
+    cancelReplayCaptions()
     refreshContent(currentPlaylistContent().nowPos)
 
   else if m.top.control = "stop" then
+    cancelReplayCaptions()
     'TODO: If ad break is happening, abort it.  I don't think it's possible, though
     m.Video.control = "stop"
     m.VideoState = "stop"
@@ -417,7 +430,7 @@ Function onKeyEvent(key As String, press As Boolean)
         else if focusButtonId = m.RewindButton.id
           handleRewind()
         else if focusButtonId = m.HopBackButton.id
-          handleHopBack()
+          handleHopBack(false)
         else if focusButtonId = m.PlayPauseButton.id
           handlePlayPause()
         else if focusButtonId = m.HopForwardButton.id
@@ -448,7 +461,7 @@ Function onKeyEvent(key As String, press As Boolean)
 
     else if key = "replay"
       if m.HopBackButton.enabled then
-        handleHopBack()
+        handleHopBack(true)
       end if
 
     else if key = "options"
@@ -896,7 +909,7 @@ End Function
 
 
 'handles HopBack button selection
-Function handleHopBack()
+Function handleHopBack(remoteReplayButton)
   setFocusedButton(m.HopBackButton)  'necessary because there is a dedicated hop back button on certain roku remotes
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub()
@@ -905,12 +918,28 @@ Function handleHopBack()
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
+  oldPosition = m.playerPosition
   jumpToPosition(m.playerPosition - 30)
+  if remoteReplayButton and m.Video.globalCaptionMode = "Instant replay"
+    tubilog("Turning on replay captions")
+    m.replayCaptionEnd = oldPosition
+    m.video.globalCaptionMode = "On"
+  end if
+End Function
+
+
+Function cancelReplayCaptions()
+  if m.video.globalCaptionMode = "On" and m.replayCaptionEnd <> 0
+    tubilog("Turning off replay captions")
+    m.replayCaptionEnd = 0
+    m.video.globalCaptionMode = "Instant replay"
+  end if
 End Function
 
 
 'handles ClosedCaption button/toggle selection
 Function handleClosedCaption()
+  cancelReplayCaptions()
   if m.HUD.opacity < 1.0
     animateTransport("in")
   end if
@@ -928,6 +957,8 @@ End Function
 
 'handles replay key press or HopBack button selection
 Function jumpToPosition(position)
+  cancelReplayCaptions() ' on any jump we cancel any temporary caption modifications
+
   if position > (m.Video.duration - 5)
     position = m.Video.duration - 5
   else if position < 0
