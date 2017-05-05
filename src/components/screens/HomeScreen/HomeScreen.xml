@@ -22,8 +22,6 @@
     <!-- TODO: Plumb this to OnNowOverlay when the play button is selected -->
     <field id="hideUI" type="boolean"/>
     
-    <field id="showEPG" type="boolean" alwaysNotify="true"/>
-    
     <field id="onNowContent" alias="OnNow.content"/>
   </interface>
   

@@ -44,7 +44,7 @@
     
     <!-- live tv -->
     <field id="isLiveTV" type="boolean" value="false"/>
-    <!-- 3-entry array for EPG containing [channel, episode, position] -->
+    <!-- 3-entry array containing [channel, episode, position] -->
     <field id="liveTVCursor" type="intarray" value="[-1,-1,-1]"/>
     <field id="liveTVChannelType" type="string" value=""/>
   </interface>

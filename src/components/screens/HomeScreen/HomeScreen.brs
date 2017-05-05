@@ -1,7 +1,6 @@
 Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
-  m.top.observeField("showEPG", "onShowEPG")
   m.ToolsMenu = m.top.findNode("ToolsMenu")
   m.OnNow = m.top.findNode("OnNow")
   m.CategoryScreen = m.top.findNode("CategoryScreen")
