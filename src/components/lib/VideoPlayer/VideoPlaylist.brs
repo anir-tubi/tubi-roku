@@ -8,7 +8,6 @@ Function onPlaylistChange(msg) As Void
   
   m.top.playlistIndex = 0
   m.Video.control = "stop"
-  m.Video.content = invalid
   m.VideoState = "stop"
 End Function
 
@@ -31,7 +30,6 @@ Function onSeekPlaylist(msg) As Void
 
   m.top.playlistIndex = newIndex[0]
   m.Video.control = "stop"  ' refresh will start this when complete
-  m.Video.content = invalid
   m.VideoState = "stop"
   refreshContent(newIndex[1])
 End Function

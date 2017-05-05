@@ -12,17 +12,20 @@ Function init()
   m.playlistIndex = 0
   m.autohideSeconds = 3
   m.internalState = "stop"
+  m.adSuppressionDuration = 5 * 60  ' seconds until ads start showing
+  m.adSuppressionExpire = 0 'Uptime(0) + m.adSuppressionDuration
 End Function
 
 Function autohideWhenPlaying()
   if m.videoPlayer <> invalid and m.videoPlayer.state = "playing"
-    autohideStart(m.autohideSeconds, false)
+    autohideStart(m.autohideSeconds, false, 3.0)
   end if
 End Function
 
 Function onComponentFocusChange()
   tubiLog("OnNow.onComponentFocusChange " + focusState(m.top))
   if m.top.isInFocusChain() and m.top.hasFocus() then
+    m.adSuppressionExpire = 0
     m.onNowOverlay.setFocus(true)
     autohideWhenPlaying()
   end if
@@ -30,6 +33,8 @@ End Function
 
 Function onControlChange()
   tubiLog("OnNow.onControlChange control = " + m.top.control + " state = " + m.internalState)
+  m.adSuppressionExpire = 0
+  if m.videoPlayer <> invalid then m.videoPlayer.enableAds = false
   if m.top.control = "play"
     if m.internalState = "stop" then showOnNow()
     dockVideo(false)
@@ -48,6 +53,7 @@ End Function
 
 Function onContentChange()
   tubiLog("OnNow.onContentChange")
+  m.adSuppressionExpire = 0
   if m.top.content = invalid then
     m.Unavailable.visible = true
     m.onNowOverlay.visible = false
@@ -125,7 +131,6 @@ Function dockVideo(dock)
       m.videoPlayer.width = 430
       m.videoPlayer.height = 256
       m.videoPlayer.dock = true
-      m.videoPlayer.enableAds = false
     else
       m.videoPlayer.translation = [0,0]
       m.videoPlayer.width = 1920
@@ -149,6 +154,7 @@ End Function
 Function onOverlayContentSelected()
   tubiLog("OnNow.onOverlayContentSelected")
   autohideStart(0, true, 0.5)  ' hide right away
+  m.adSuppressionExpire = Uptime(0) + m.adSuppressionDuration
 End Function
 
 
@@ -171,6 +177,10 @@ End Function
 Function onVideoPlayerPlaylistIndexChange()
   tubiLog("OnNow.onVideoPlayerPlaylistIndexChange")
   m.onNowOverlay.jumpToIndex = m.videoPlayer.playlistIndex
+  if m.adSuppressionExpire <> 0 and m.adSuppressionExpire <= Uptime(0)
+    tubiLog("Enabling ads for OnNow")
+    m.videoPlayer.enableAds = true
+  end if
 End Function
 
 Function onVideoPlayerState()

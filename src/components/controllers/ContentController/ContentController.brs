@@ -60,7 +60,6 @@ Function onAutohide()
   if m.autohideTimer.fadeTime <> invalid then fadeTime = m.autohideTimer.fadeTime
   m.autohideAnimation = fade(m.ScreenStack, "out", fadeTime)
   if m.autohideTimer.focusVideo = invalid or m.autohideTimer.focusVideo = true
-    m.videoPlayer.enableAds = true
     m.videoPlayer.enableTracking = true
     m.videoPlayer.setFocus(true)
     m.videoPlayer.observeField("backButtonPressed", "unAutohide")

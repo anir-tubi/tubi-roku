@@ -60,10 +60,14 @@ Function tubiSGAdShim_run(scene As Object) As boolean
 
       else if msg.GetField() = "adControl"
         value = msg.GetData()        
-        episode = m.videoPlayerNode.content.getFields()  ' clone the content node into a local AA to avoid messing with it
-        position = m.videoPlayerNode.adPosition
-        tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position))
-        m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
+        if m.videoPlayerNode.content <> invalid
+          episode = m.videoPlayerNode.content.getFields()  ' clone the content node into a local AA to avoid messing with it
+          position = m.videoPlayerNode.adPosition
+          tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position))
+          m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
+        else
+          m.videoPlayer.adState = "noads"  ' if video player content was changed before we got here, return no ads
+        end if
       else if msg.GetField() = "exitApp"
         if msg.GetData() = true then return true
       end if
