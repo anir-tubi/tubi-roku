@@ -769,6 +769,7 @@ Function endScrub()
   m.scrubAmt = -1 'reset just in case it somehow got to less than -1
   m.ScrubTimer.control = "stop"
   m.ScrubTimer.unobserveField("fire")
+  oldVideoState = m.VideoState
   m.VideoState = "play"
   ' Resent periodic event trackers
   m.lastSavedPosition = m.playerPosition
@@ -780,7 +781,7 @@ Function endScrub()
   m.PlayPauseButton.focusState = true
 
   ' resume ad break
-  if m.top.enableAds then
+  if m.top.enableAds and oldVideoState = "ffw" then
     m.Video.control = "stop"
     m.top.adPosition = m.playerPosition
     m.top.adControl = "seek"
