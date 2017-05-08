@@ -61,7 +61,7 @@
 
     <field id="infoVisible" alias="StuffThatsInvisibleDuringLiveTV.visible"/>
 
-    <field id="dockedVideoFrameVisible" alias="DockedVideoFrame.visible"/>
+    <field id="dockedVideoFrameVisible" alias="DockOverlay.visible"/>
 
     <field id="categoryMenuVisible" type="boolean"/>
   </interface>
@@ -70,32 +70,59 @@
 
     <Group
       id="StuffThatsInvisibleDuringLiveTV">
-      <Poster
-        id="LiveUpTriangle"
-        uri="pkg:/images/up-arrow.png"
-        visible="true"
-        width="47"
-        height="47"
-        translation="[881,57]"/>
-      <Poster
-        id="onNowIcon"
-        uri="pkg:/images/icon-on-now.png"
-        visible="true"
-        width="115"
-        height="55"
-        translation="[929,55]"/>
+      <Group
+        id="OnNowHint">
+        <Poster
+          id="LiveUpTriangle"
+          uri="pkg:/images/up-arrow.png"
+          visible="true"
+          width="47"
+          height="47"
+          translation="[881,57]"
+          opacity="0.5"/>
+        <Poster
+          id="onNowIcon"
+          uri="pkg:/images/icon-on-now.png"
+          visible="true"
+          width="115"
+          height="55"
+          translation="[929,55]"
+          opacity="0.5"/>
+      </Group>
       <InfoPanel
         id="InfoPanel"
         translation="[85,163]"
         maxHeight="325"
         visible="true" />
+      <Group
+        id="DockOverlay">
       <Poster
         id="DockedVideoFrame"
-        uri="pkg:/images/on-now-docked-frame.png"
-        width="502"
-        height="328"
+        uri="pkg:/images/selector-white.9.png"
+        width="467"
+        height="268"
         visible="true"
-        translation="[1369,125]"/>
+        translation="[1384,145]"/>
+      <Poster
+        id="DockedBackToCloseHint"
+        uri="pkg:/images/back.png"
+        width="29"
+        height="29"
+        translation="[1419,426]"
+        opacity="0.5"/>
+      <Label
+        id="DockedBackToCloseText"
+        text="PRESS BACK TO CLOSE"
+        vertAlign="center"
+        height="47"
+        translation="[1459,421]"
+        opacity="0.5">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+      </Group>
     </Group>
 
 

@@ -412,14 +412,10 @@ End Function
 
 
 Function removeLiveTvHint(categoryIndex as integer)
-  triangle = m.top.findNode("LiveUpTriangle")
-  onNowIcon = m.top.findNode("onNowIcon")
-
+  onNowHint = m.top.findNode("OnNowHint")
   if categoryIndex = 0
-    if triangle.opacity < 1.0 then fade(triangle, "in", 0.4)
-    if onNowIcon.opacity < 1.0 then fade(onNowIcon, "in", 0.4)
+    if onNowHint.opacity < 1.0 then fade(onNowHint, "in", 0.4)
   else
-    if triangle.opacity > 0.0 then fade(triangle, "out", 0.4)
-    if onNowIcon.opacity > 0.0 then fade(onNowIcon, "out", 0.4)
+    if onNowHint.opacity > 0.0 then fade(onNowHint, "out", 0.4)
   end if
 End Function

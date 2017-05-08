@@ -128,8 +128,8 @@ Function dockVideo(dock)
   tubiLog("OnNow.dockVideo")
   if m.videoPlayer <> invalid
     if dock
-      m.videoPlayer.translation = [1405,151]
-      m.videoPlayer.width = 430
+      m.videoPlayer.translation = [1390,151]
+      m.videoPlayer.width = 455
       m.videoPlayer.height = 256
       m.videoPlayer.dock = true
     else
