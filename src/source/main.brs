@@ -176,6 +176,7 @@ Function MainNewUI(args As Dynamic, constants As Object)
 
     'change the client version so we tracking knows we are using the remote components
     m.global.utils.constants.deviceInfo.clientVersion = m.global.utils.constants.deviceInfo.clientVersion.Replace("local", "remote")
+    sgGlobal.setField("constants", m.global.utils.constants)
 
     controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
     controller.onNowContent = onNowContent
