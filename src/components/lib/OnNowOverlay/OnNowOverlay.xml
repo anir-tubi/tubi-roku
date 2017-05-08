@@ -30,7 +30,7 @@
     
     <RowList
       id="LeftGrid"
-      itemComponentName="FeaturePoster"
+      itemComponentName="VideoPickerPoster"
       itemSize="[515,256]"
       numRows="1"
       rowItemSize="[[430,256]]"
@@ -51,13 +51,13 @@
     mode="item"
     width="817"
     maxHeight="356"
-    maxTitleLines="3"
+    numTitleLines="3"
     titleFontSize="43"
     translation="[550,0]"/>
     
     <RowList
       id="RightGrid"
-      itemComponentName="FeaturePoster"
+      itemComponentName="VideoPickerPoster"
       itemSize="[514,256]"
       numRows="1"
       rowItemSize="[[430,256]]"
@@ -67,9 +67,10 @@
       rowFocusAnimationStyle="floatingFocus"/>
     <Label
       id="NextItemTitle"
-      translation="[1406,276]"
+      translation="[1406,290]"
       width="410"
       height="118"
+      lineSpacing="16"
       wrap="true">
       <Font
         role="font"

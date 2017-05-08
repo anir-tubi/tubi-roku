@@ -37,7 +37,8 @@
     <!-- maxHeight is the area in which the content should be centered -->
     <field id="maxHeight" type="int" value="0" />
 
-    <field id="maxTitleLines" type="integer" alias="Title.maxLines"/>
+    <field id="maxTitleLines" alias="Title.maxLines"/>
+    <field id="numTitleLines" alias="Title.numLines"/>
     <field id="titleFontSize" alias="TitleFont.size"/>
 
     <field id="width" type="float" value="875" />
