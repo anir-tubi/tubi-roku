@@ -19,6 +19,7 @@
     <field id="playlist" type="node" />
     <field id="playlistIndex" type="integer" value="-1"/>
     <field id="seekPlaylist" type="intarray" value="-1" alwaysNotify="true"/>
+    <field id="loopPlaylist" type="boolean" value="false"/>
     
     <!-- Alias fields for the video node -->
     <field id="content" alias="VideoNode.content"/>

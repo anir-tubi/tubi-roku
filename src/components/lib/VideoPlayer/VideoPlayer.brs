@@ -814,7 +814,7 @@ Function goToEnd()
     endScrub()
     setFocusedButton(m.EndButton)
   end if
-  advancePlaylist()
+  jumpToPosition(m.Video.duration)
 End Function
 
 

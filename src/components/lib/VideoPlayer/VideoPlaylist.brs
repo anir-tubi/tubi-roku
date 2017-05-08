@@ -55,11 +55,17 @@ Function onVideoStateChange(msg)
   end if
 End Function
 
-Function advancePlaylist()
+Function advancePlaylist() As Void
   ' advance the playlist
   if m.top.playlist <> invalid
     newIndex = m.top.playlistIndex + 1
-    if newIndex >= m.top.playlist.getChildCount() then newIndex = 0
+    if newIndex >= m.top.playlist.getChildCount()
+      if m.top.loopPlaylist
+        newIndex = 0
+      else
+        return
+      end if
+    end if
     m.top.playlistIndex = newIndex
     refreshContent(0)
   end if

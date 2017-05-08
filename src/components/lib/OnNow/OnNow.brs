@@ -102,6 +102,7 @@ Function showOnNow() As Void
     m.videoPlayer.visible = true
     m.videoPlayer.enableAds = false  ' disable ads to start.  they'll go enabled once the user elects into live tv
     m.videoPlayer.enableTracking = true
+    m.videoPlayer.loopPlaylist = true
     m.videoPlayer.seekPlaylist = [
       m.playlistInfo[m.playlistIndex].contentIndex
       m.playlistInfo[m.playlistIndex].nowPos

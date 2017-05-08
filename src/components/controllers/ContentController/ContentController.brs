@@ -508,6 +508,7 @@ Function playVideoContent(content As Object)
   m.videoPlayer.playlist = parent
   m.videoPlayer.enableAds = true
   m.videoPlayer.enableTracking = true
+  m.videoPlayer.loopPlaylist = false
   m.videoPlayer.seekPlaylist = [0, localContent.nowPos]
   m.ScreenStack.visible = false
 
@@ -594,6 +595,7 @@ Function onWatchTrailer()
     m.videoPlayer.playlist = playlist
     m.videoPlayer.enableAds = false
     m.videoPlayer.enableTracking = false
+    m.videoPlayer.loopPlaylist = "false"
     m.videoPlayer.control = "play"
     m.ScreenStack.visible = false
 
