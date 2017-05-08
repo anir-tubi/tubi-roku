@@ -502,8 +502,8 @@ Function playVideoContent(content As Object)
   
   ' Clone the content so we don't have listeners affecting it
   parent = CreateObject("roSGNode", "TubiContentNode")
-  localContent = parent.createChild("TubiContentNode")
-  localContent.setFields(content.getFields())
+  localContent = clone(content)
+  parent.appendChild(localContent)
 
   m.videoPlayer.playlist = parent
   m.videoPlayer.enableAds = true

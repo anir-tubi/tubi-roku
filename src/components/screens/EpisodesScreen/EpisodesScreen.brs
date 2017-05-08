@@ -100,7 +100,6 @@ Function onEpisodeFocused()
   if m.EpisodeGrid.isInFocusChain() then 
     
     m.Info.mode = "episode"
-    infoPanelContent = CreateObject("roSGNode", "TubiContentNode")   
     episode = m.EpisodeGrid.itemFocused
     episode_title = ""
     if episode = invalid then
@@ -112,7 +111,7 @@ Function onEpisodeFocused()
         episode = m.top.content
       end if
     end if
-    infoPanelContent.setFields(episode.getFields())
+    infoPanelContent = clone(episode)
     infoPanelContent.episode_title = episode.title
     infoPanelContent.title = m.top.content.title
     m.Info.content = infoPanelContent
@@ -141,8 +140,7 @@ End Function
 Function setSeasonInfo(season As Integer)
   ' Display the series description when the season is being selected
   seasonContent = m.top.content.getChild(season)   ' season
-  infoContent = CreateObject("roSGNode", "TubiContentNode")
-  infoContent.setFields(seasonContent.getFields())
+  infoContent = clone(seasonContent)
   infoContent.description = m.top.content.description ' series description
   infoContent.totalCount = seasonContent.getChildCount()
   m.Info.mode = "season"

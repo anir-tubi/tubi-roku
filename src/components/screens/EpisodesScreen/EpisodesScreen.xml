@@ -4,7 +4,7 @@
   <script type="text/brightscript" uri="pkg:/components/screens/EpisodesScreen/EpisodesScreen.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-
+  <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
   
   <interface>
     <!-- Full content of the item to show details for -->

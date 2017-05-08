@@ -133,7 +133,6 @@ Function drawSubComponents()
   else if m.top.content.type = "series"
     m.Info.mode = "series"
     ' clone the content object since we want the SERIES title & description, but the EPISODE details
-    infoPanelContent = CreateObject("roSGNode", "TubiContentNode")   
     episode = getEpisodeContent(m.top.episodeSelection)
     episode_title = ""
     if episode = invalid then
@@ -145,7 +144,7 @@ Function drawSubComponents()
         episode = m.top.content
       end if
     end if
-    infoPanelContent.setFields(episode.getFields())
+    infoPanelContent = clone(episode)
     infoPanelContent.episode_title = episode.title
     infoPanelContent.title = m.top.content.title
     infoPanelContent.description = m.top.content.description

@@ -83,10 +83,9 @@ Function refreshContent(nowPos)
         m.refreshTask.unobserveField("error")
       end if
       m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
-      fragment = CreateObject("roSGNode", "TubiContentNode")
-      fragment.setFields(content.getFields())  ' clone the node
+      fragment = clone(content)
       fragment.nowPos = nowPos  ' we have to pass this along since it is relevant after the refresh, but may
-                              ' have come from numerous places, e.g. m.top.seekPlaylist or advancePlaylist
+                                ' have come from numerous places, e.g. m.top.seekPlaylist or advancePlaylist
       m.refreshTask.contentFragment = fragment
       m.refreshTask.observeField("response", "onRefreshResponse")
       m.refreshTask.observeField("error", "onRefreshError")
