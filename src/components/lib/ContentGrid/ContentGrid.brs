@@ -72,12 +72,14 @@ End Function
 ' Remove an item from its parent and return it to the free pool
 ' TODO(Chris): Should the NodePool mixin remove from parent?
 Function removeAndRelease(item As Object)
-  m.items.removeChild(item)
-  ' clear out references to content or cached poster images
-  if item.hasField("content") then item.content = invalid
-  if item.hasField("itemContent") then item.itemContent = invalid
-  if item.hasField("uri") then item.uri = ""
-  m.itemPool.release(item)
+  if item <> invalid
+    m.items.removeChild(item)
+    ' clear out references to content or cached poster images
+    if item.hasField("content") then item.content = invalid
+    if item.hasField("itemContent") then item.itemContent = invalid
+    if item.hasField("uri") then item.uri = ""
+    m.itemPool.release(item)
+  end if
 End Function
 
 Function onVisibleChange()
@@ -227,8 +229,14 @@ Function loadVisiblePosters(useCache=true As Boolean) As Void
   ' TODO(Chris): Wraparound would be accounted for here if we want to add that
   if x < 0 then x = 0
   if y < 0 then y = 0
-  if (x + width) > m.internalNumColumns then width = m.internalNumColumns - x
-  if (y + height) > m.internalNumRows then height = m.internalNumRows - y
+  if (x + width) > m.internalNumColumns then
+    width = m.internalNumColumns - x
+    if width < 0 then width = 0
+  end if
+  if (y + height) > m.internalNumRows then
+    height = m.internalNumRows - y
+    if height < 0 then height = 0
+  end if
 
   tubiLog("ContentGrid loading " + stri(width * height) + " visible items")
 
