@@ -62,11 +62,13 @@ Function showContent(index) As Void
     nextIndex = (currentIndex + 1) MOD length
     currentContent = m.top.content.getChild(currentIndex)
     if currentContent <> invalid then 
-      m.top.contentFocused = currentIndex
       m.leftGrid.jumpToRowItem = [0,currentIndex]
       m.rightGrid.jumpToRowItem = [0,nextIndex]
       nextContent = m.top.content.getChild(nextIndex)
       if nextContent <> invalid then m.nextItemTitle.text = nextContent.title
+      ' NOTE: Only emit focused events when this component has focus, so we
+      ' avoid feedback loops with the video player
+      if m.top.isInFocusChain() then  m.top.contentFocused = currentIndex
     end if
   end if
   m.info.content = currentContent

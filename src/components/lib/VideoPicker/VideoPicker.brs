@@ -14,7 +14,11 @@ End Function
 
 Function onItemFocused()
   tubiLog("VideoPicker.onItemFocused " + stri(m.contentGrid.cursorIndex))
-  m.top.contentFocused = m.contentGrid.cursorIndex
+  ' NOTE: We only emit events if in focus, that way we don't create
+  ' feedback loops when the video player advancing (either autoplay or another control)
+  ' tells this component to jump to index, which then emits and event to
+  ' the video player, and on and on...
+  if m.top.isInFocusChain() then m.top.contentFocused = m.contentGrid.cursorIndex
 End Function
 
 Function onItemSelected()
@@ -23,5 +27,6 @@ Function onItemSelected()
 End Function
 
 Function onJumpToIndex()
+  tubiLog("VideoPicker.onJumpToIndex" + stri(m.top.jumpToIndex))
   m.contentGrid.animateToItem = [m.top.jumpToIndex, 0]
 End Function

@@ -175,11 +175,8 @@ Function onContentChange() As Void
 
   if m.top.content.isLiveTV then
     liveTVGroup.visible = true
-    m.VideoPicker.content = m.top.playlist
-    m.VideoPicker.jumpToIndex = m.top.playlistIndex
   else
     liveTVGroup.visible = false
-    m.VideoPicker.content = invalid
   end if
 
   'if it's not a trailer, remove the skip trailer button
@@ -194,7 +191,7 @@ Function onContentChange() As Void
 End Function
 
 Function onVideoPickerFocused()
-  tubiLog("VideoPlayer.onVideoPickerFocused")
+  tubiLog("VideoPlayer.onVideoPickerFocused = " + stri(m.VideoPicker.contentFocused))
   if m.VideoPicker.contentFocused <> -1
     m.PickerDebounce.control = "start"
     m.lastButtonPressPos = m.playerPosition
@@ -203,7 +200,7 @@ End Function
 
 Function onVideoPickerDebounce()
   tubiLog("VideoPlayer.onVideoPickerDebounce " + stri(m.VideoPicker.contentFocused))
-  m.top.seekPlaylist = [m.VideoPicker.contentFocused, 0]
+  if m.top.playlistIndex <> m.VideoPicker.contentFocused then m.top.seekPlaylist = [m.VideoPicker.contentFocused, 0]
 End Function
 
 
@@ -645,6 +642,7 @@ Function focusVideoPicker(focus)
     m.VideoPicker.setFocus(false)
     m.top.setFocus(true)
   else if focus and m.top.hasFocus()
+    m.VideoPicker.jumpToIndex = m.top.playlistIndex
     slideFade(m.PickerGroup, "below", "in", 0.6)
     slideFade(m.Transport, "below", "out", 0.6)
     fade(m.PickerGradient, "in", 0.6)

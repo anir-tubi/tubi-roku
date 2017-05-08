@@ -9,6 +9,7 @@ Function onPlaylistChange(msg) As Void
   m.top.playlistIndex = 0
   m.Video.control = "stop"
   m.VideoState = "stop"
+  m.VideoPicker.content = m.top.playlist
 End Function
 
 
