@@ -727,7 +727,7 @@ Function onPlayerInfo() As Void
   if playerInfo.parentHistoryId <> invalid and playerInfo.parentHistoryId <> "" then
     tubiLog("onPlayerInfo: parentHistoryId = " + playerInfo.parentHistoryId.toStr())
   end if
-  content = m.videoPlayer.content 'm.top.playContent 'video
+  content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
 
   constants = m.global.constants
   Request = TubiRequest()
