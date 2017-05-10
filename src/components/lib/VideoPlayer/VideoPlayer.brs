@@ -632,7 +632,7 @@ End Function
 Function focusVideoPicker(focus)
   print "VideoPlayer.focusVideoPicker "; focus
   transportButton = m.TransportButtons.getChild(m.focusedButtonIndex)
-  if not focus
+  if not focus and m.VideoPicker.isInFocusChain()
     ' I'm not sure why we have to setFocus(false) here, but it doesn't work otherwise
     slideFade(m.PickerGroup, "below", "out", 0.6)
     slideFade(m.Transport, "below", "in", 0.6)
