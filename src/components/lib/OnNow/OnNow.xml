@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="OnNow" extends="Group">
   <script type="text/brightscript" uri="pkg:/components/lib/OnNow/OnNow.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/PlaylistMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AutohideMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />

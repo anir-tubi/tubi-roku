@@ -8,7 +8,6 @@
   <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/PlaylistMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   
   <interface>

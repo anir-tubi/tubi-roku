@@ -427,67 +427,6 @@ Function onNowStopped()
   m.backgroundGroup.newBackgroundType = "grid"
 End Function
 
-Function onContentRefreshBeforePlay(msg As Object) As Void
-  tubiLog("ContentController.onContentRefreshBeforePlay")
-  data = msg.GetData()
-  if data <> invalid then
-    if data.response.code >= 200 and data.response.code < 300 then 
-      content = data.convertedMetadata
-      ' make sure that the content response is not stale
-      if m.videoPlayer.content.id = content.id then
-        content.nowPos = m.videoPlayer.content.nowPos
-        content.isLiveTV = m.videoPlayer.content.isLiveTV
-        m.videoPlayer.content = content
-        m.videoPlayer.translation = [0,0]
-        m.videoPlayer.control = "play"
-        return
-      end if
-    end if
-  end if
-  ' here if error; fake a Video node success so we can autoplay the next item
-  msg = {
-    getField: Function()
-        return "state"
-      End Function
-    getData: Function()
-        return "finished"
-      End Function
-  }
-  onLiveTVState(msg)
-End Function
-
-
-Function refreshBeforePlay(content)
-  tubiLog("ContentController.refreshBeforePlay")
-  settings = m.global.constants.settings
-  url = m.global.constants.urls.cms.singleContent
-  platform = m.global.constants.platform
-  deviceInfo = m.global.constants.deviceInfo
-
-  ' expect that the content here was the bootstrapped content from category list
-  contentId = content.id
-
-  if content.type = "series" then
-    contentId = "0" + contentId
-  end if
-
-  request = {
-    url: url
-    node: m.top
-    field: "contentRefreshBeforePlay"
-    options: {
-      params: {
-        "app_id": settings.shortAppName
-        platform: "web" 'platform
-        "content_id": contentId
-      }
-    }
-    name: "getSingleContent"
-  }
-  m.metadataFetchTask.request = request
-End Function
-
-
 
 '''''''''''''''''''''
 ' playVideoContent
