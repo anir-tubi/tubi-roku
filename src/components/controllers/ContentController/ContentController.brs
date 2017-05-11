@@ -46,7 +46,7 @@ Function init()
 
   m.enteredFromDeepLink = false 'used to determine back button behavior in screen stack
   m.ScreenStack = m.top.findNode("ScreenStack")
-  initScreenStack(m.ScreenStack)
+  initScreenStack(m.ScreenStack, startOnNow)
 
   m.videoPlayer = m.top.findNode("VideoPlayer")
 
