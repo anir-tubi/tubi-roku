@@ -847,10 +847,11 @@ End Function
 ' Handle a detail screen failure to fetch detailed metadata.  This could be due
 ' to a title becoming unavailable, or a problem with a deep link.
 Function onDetailItemFailed()
+  tubiLog("ContentController.onDetailItemFailed")
   popScreen()
 
   ' If a deep-link occurred, we skipped category screen creation so create it here
   if currentScreen() = invalid then
-    startCategoryScreen()
+    startOnNow()
   end if
 End Function
