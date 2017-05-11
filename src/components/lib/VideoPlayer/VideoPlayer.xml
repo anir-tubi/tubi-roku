@@ -179,24 +179,24 @@
             width="115"
             height="55"
             translation="[85,961]"/>
-        </Group>
 
-      <Poster
-        uri="pkg:/images/up-arrow.png"
-        width="47"
-        height="47"
-        translation="[76,769]"/>
-      <Label
-        text="PRESS UP FOR MORE"
-        vertAlign="center"
-        height="47"
-        translation="[125,769]">
-        <Font
-          id="Vaud22px"
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="22" />
-      </Label>
+          <Poster
+            uri="pkg:/images/up-arrow.png"
+            width="47"
+            height="47"
+            translation="[76,769]"/>
+          <Label
+            text="PRESS UP FOR MORE"
+            vertAlign="center"
+            height="47"
+            translation="[125,769]">
+            <Font
+              id="Vaud22px"
+              role="font"
+              uri="pkg:/fonts/Vaud-SemiBold.ttf"
+              size="22" />
+          </Label>
+        </Group>
       
       <!--
         - ProgressBarBackground and ProgressBarForeground use 9-patch images which have
