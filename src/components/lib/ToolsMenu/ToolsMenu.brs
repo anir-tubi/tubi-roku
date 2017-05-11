@@ -7,6 +7,8 @@ Function init()
   m.Menu.content = content
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.Description = m.top.findNode("Description")
+
+  onSignedInChange()  ' initialize the sign in/out text
 End Function
 
 Function onComponentFocusChange()
@@ -41,7 +43,7 @@ Function onItemSelected()
   end if
 End Function
 
-Function onSignedInChanged()
+Function onSignedInChange()
   tubiLog("ToolsMenu.onSignedInChanged")
   content = m.top.findNode("SignInOutMenuItem")
   if m.top.signedIn then

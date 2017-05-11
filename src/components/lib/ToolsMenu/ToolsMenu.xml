@@ -61,8 +61,8 @@
         unfocusIconUrl="pkg:/images/icon-search-large.png"/>
       <SignInPosterContentNode
         id="SignInOutMenuItem"
-        title="Sign Out"
-        description="Sign Out of Tubi TV"
+        title="Sign In"
+        description="Sign In to Tubi TV. Access your Queue and View History across your devices"
         focusIconUrl="pkg:/images/icon-sign-in-large-on.png"
         unfocusIconUrl="pkg:/images/icon-sign-in-large.png"/>
       <SignInPosterContentNode
