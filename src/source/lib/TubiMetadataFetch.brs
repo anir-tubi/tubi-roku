@@ -62,6 +62,7 @@ Function TubiMetadataFetch_organizeLiveTvContent(liveTvResponse)
       title: ""
       children: []
       liveTvChannelType: "regular"
+      slug: "default-slug"
     }
 
     container = containers[i]
@@ -81,6 +82,10 @@ Function TubiMetadataFetch_organizeLiveTvContent(liveTvResponse)
 
       if container.type <> invalid then
         channel.liveTvChannelType = container.type
+      end if
+
+      if container.slug <> invalid
+        channel.slug = container.slug
       end if
 
       'set the children

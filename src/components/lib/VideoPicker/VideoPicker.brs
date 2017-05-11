@@ -4,11 +4,14 @@ Function init()
   m.contentGrid.observeField("itemSelected", "onItemSelected")
   m.top.observeField("jumpToIndex", "onJumpToIndex")
   m.top.observeField("focusedChild", "onChildFocused")
+  m.top.observeField("contentFocused", "onContentFocused")
 End Function
 
 Function onChildFocused()
   if m.top.isInFocusChain() and m.top.hasFocus()
     m.contentGrid.setFocus(true)
+  else
+    m.top.navigations = 0
   end if
 End Function
 

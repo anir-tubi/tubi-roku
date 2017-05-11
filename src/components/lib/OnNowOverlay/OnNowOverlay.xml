@@ -14,6 +14,8 @@
     <!-- if the user presses "OK" for the current content item, this event will be raised -->
     <field id="contentSelected" type="int" alwaysNotify="true" />
    
+    <!-- used for analytics tracking - the number of times a user selects left/right while the onNow overlay is showing -->
+    <field id="navigations" type="int" />
     
     <!--
       - INPUTS
@@ -21,8 +23,11 @@
     
     <!-- expect content to be a playlist node -->
     <field id="content" type="node" alwaysNotify="true"/>
+
     <!-- sets the overlay to show the playlist/content at the indicated index. -->
     <field id="jumpToIndex" type="int" />
+
+
 
   </interface>  
 

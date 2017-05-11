@@ -5,7 +5,17 @@ Function init()
   m.nextItemTitle = m.top.findNode("NextItemTitle")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("jumpToIndex", "onJumpToIndexChange")
+  m.top.observeField("focusedChild", "onChildFocused")
+  m.navigations = m.top.navigations
 End Function
+
+
+Function onChildFocused()
+  if not m.top.isInFocusChain() or not m.top.hasFocus()
+    m.navigations = 0
+  end if
+End Function
+
 
 'currently expect this will only happen at app start up
 Function onContentChange()
@@ -48,11 +58,13 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       return true
     else if key = "OK"
       m.top.contentSelected = m.top.contentFocused
+      m.navigations = 0
       return true
     end if
   end if
   return false
 End Function
+
 
 Function showContent(index) As Void
   currentContent = invalid
@@ -72,4 +84,10 @@ Function showContent(index) As Void
     end if
   end if
   m.info.content = currentContent
+End Function
+
+
+' Helper function to make trackEvent calls prettier
+Function trackEvent(event As Object) As Void
+  m.global.trackingLoggingTask.trackEvent = event
 End Function

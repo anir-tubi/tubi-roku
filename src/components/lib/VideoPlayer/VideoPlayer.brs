@@ -195,6 +195,16 @@ Function onVideoPickerFocused()
   if m.VideoPicker.contentFocused <> -1
     m.PickerDebounce.control = "start"
     m.lastButtonPressPos = m.playerPosition
+
+    'content grid naturally debounces the content selections, so trackEvent and naviatations increment
+    'only happen when a user has settled on a content
+    m.VideoPicker.navigations = m.VideoPicker.navigations + 1
+    
+    trackEvent({
+      trackType: "navigateInPage"
+      value: m.VideoPicker.navigations
+      ctx: "/on_now/" + m.top.content.slug + "/1/" + m.VideoPicker.contentFocused.toStr()
+    })
   end if
 End Function
 
@@ -291,14 +301,26 @@ Function onVideoPositionChange()
 
   ' Analytics
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval then
+    extraCtx = {
+      interval: m.playerPosition - m.lastPingTime
+    }
+
+    if m.top.analyticsMode = "onnow-autoplay"
+      extraCtx.on_now = true
+      extraCtx.livetv = true
+    else if m.top.analyticsMode = "onnow-engaged"
+      extraCtx.on_now = true
+    else if m.top.analyticsMode = "onnow-docked"
+      extraCtx.embedded = true
+      extraCtx.on_now = true
+      extraCtx.livetv = true
+    end if
+
     trackEvent({
       trackType: "playProgress"
       ctx: m.Video.content.id
       value: m.playerPosition
-      extraCtx: {
-        interval: m.playerPosition - m.lastPingTime
-        livetv: m.Video.content.isLiveTV
-      }
+      extraCtx: extraCtx
     })
     m.lastPingTime = m.playerPosition
   end if
@@ -369,16 +391,38 @@ Function playContent()
   end if
   m.top.midrolls = []  ' Always reset midrolls when we first start playback.  Preroll will populate these
     
-  if m.video.content.isLiveTV = false then
+
+  'start_video user event analytics
+  if m.top.analyticsMode = "trailer"
+    trackEvent({
+      trackType: "startTrailer"
+      value: m.Video.content.id
+    })
+  else
+    extraCtx = {subtitles: m.Video.content.showSubtitles}
+
+    if m.top.analyticsMode = "onnow-autoplay" 
+      'onnow-autoplay signifies the onnow video started without input from the user (ie. when the on now screen loads)
+      extraCtx.on_now = true
+      extraCtx.livetv = true  'server uses this flag to determine if viewing should be part of CVT
+    else if m.top.analyticsMode = "onnow-engaged"
+      'onnow-engaged signifies the on now video started while the user has been "engaged" (ie. they selected an on now video, or an on now video autoplayed)
+      extraCtx.on_now = true
+    else if m.top.analyticsMode = "onnow-docked"
+      'onnow-docked signifies the on now video started while while in docked mode
+      extraCtx.on_now = true
+      extraCtx.livetv = true
+      extraCtx.embedded = true
+    end if
+
     trackEvent({
       trackType: "videoPlay"
       value: m.Video.content.id
       ctx: m.Video.content.nowPos
-      extraCtx: {
-        subtitles: m.Video.content.showSubtitles
-      }
+      extraCtx: extraCtx
     })
   end if
+
 
   m.top.adPosition = 0
   m.VideoState = "play"
@@ -387,7 +431,6 @@ Function playContent()
     m.top.adControl = "preroll"
   else
     m.Video.control = "play"
-    m.top.adControl = "cuepoints"
   end if
 End Function
 
@@ -578,17 +621,17 @@ Function onAdStateChange()
 End Function
 
 
-' Helper function to check enableTracking field before sending tracking events
+' Helper function to prevent tracking events being sent for trailers
 Function trackEvent(event As Object)
-  if m.top.enableTracking then
+  if m.top.analyticsMode <> "trailer" or event.trackType = "startTrailer" then
     m.global.trackingLoggingTask.trackEvent = event
   end if
 End Function
 
 
-' Helper function to check enableTracking before updating historyPosition
+' Helper function to prevent historyPosition being sent during  trailers
 Function historyPosition()
-  if m.top.enableTracking then
+  if m.top.analyticsMode = "normal" then
     m.top.historyPosition = m.playerPosition
     m.lastSavedPosition = m.playerPosition
   end if
@@ -630,7 +673,6 @@ Function animateTransport(direction)
 End Function
 
 Function focusVideoPicker(focus)
-  print "VideoPlayer.focusVideoPicker "; focus
   transportButton = m.TransportButtons.getChild(m.focusedButtonIndex)
   if not focus and m.VideoPicker.isInFocusChain()
     ' I'm not sure why we have to setFocus(false) here, but it doesn't work otherwise

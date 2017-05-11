@@ -47,12 +47,16 @@
       -->
     <field id="enableAds" type="boolean" value="true"/>
 
-    <!-- Enable/disable tracking and history.  If true, historyPosition will
-      -  be set at regular intervals and tracking events internally will be
-      -  sent at regular intervals.  If false, no tracking or history events
-      -  will happen
+    <!-- State that lets the player know how it is being used, so it can determine
+      -  how it should do tracking.
+      -  Allowed modes are:
+      -  'normal'
+      -  'trailer'
+      -  'onnow-autoplay'
+      -  'onnow-engaged'
+      -  'onnow-docked'
       -->
-    <field id="enableTracking" type="boolean" value="true"/>
+    <field id="analyticsMode" type="string" value="true" />
 
     <!--
       -

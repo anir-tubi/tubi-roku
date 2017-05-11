@@ -100,6 +100,7 @@ Function showOnNow() As Void
   if playlist <> invalid
     m.videoPlayer.playlist = playlist
     m.videoPlayer.visible = true
+    m.videoPlayer.analyticsMode = "onnow-autoplay"
     m.videoPlayer.enableAds = false  ' disable ads to start.  they'll go enabled once the user elects into live tv
     m.videoPlayer.enableTracking = true
     m.videoPlayer.loopPlaylist = true
@@ -128,14 +129,28 @@ Function dockVideo(dock)
   tubiLog("OnNow.dockVideo")
   if m.videoPlayer <> invalid
     if dock
+      m.videoPlayer.analyticsMode = "onnow-docked"
       m.videoPlayer.translation = [1390,151]
       m.videoPlayer.width = 455
       m.videoPlayer.height = 256
       m.videoPlayer.dock = true
+
+      trackEvent({
+        trackType: "generic"
+        value: "video_dock"
+        ctx: "on"
+      })
     else
+      m.videoPlayer.analyticsMode = "onnow-autoplay"
       m.videoPlayer.translation = [0,0]
       m.videoPlayer.width = 1920
-      m.videoPlayer.height = 1080 
+      m.videoPlayer.height = 1080
+
+      trackEvent({
+        trackType: "generic"
+        value: "video_dock"
+        ctx: "off"
+      })
     end if
   end if
 End Function
@@ -155,7 +170,14 @@ End Function
 Function onOverlayContentSelected()
   tubiLog("OnNow.onOverlayContentSelected")
   autohideStart(0, true, 0.5)  ' hide right away
+  'analyticsMode = onnow-engaged for the video player is handled in contentController onAutohide which occurs when the autohide concludes
   m.adSuppressionExpire = Uptime(0) + m.adSuppressionDuration
+
+  trackEvent({
+    trackType: "navigate"
+    value: "/home/1/cat/" + m.top.content.getChild(m.playlistIndex).slug + "/1/" + m.onNowOverlay.contentSelected.toStr()
+    ctx: "/on_now/" + m.top.content.getChild(m.playlistIndex).slug + "/1/" + m.onNowOverlay.contentSelected.toStr()
+  })
 End Function
 
 
@@ -166,6 +188,8 @@ Function onOverlayContentFocused()
   index = m.onNowOverlay.contentFocused
   tubiLog("OnNow overlay contentFocused = " + stri(index))
 
+  m.videoPlayer.analyticsMode = "onnow-engaged"
+
   ' content changed, use start of new content
   m.playlistInfo[m.playlistIndex].contentIndex = index
   m.playlistInfo[m.playlistIndex].nowPos = 0
@@ -173,6 +197,7 @@ Function onOverlayContentFocused()
   'debounce the content selection button presses (from overlay) so we only start the video once the user stops clicking
   m.DebounceTimer.control = "start"  ' restarts if already running
 End Function
+
 
 'tell the on now overlay that the video player has changed the content in the playlist
 Function onVideoPlayerPlaylistIndexChange()
@@ -184,6 +209,7 @@ Function onVideoPlayerPlaylistIndexChange()
   end if
 End Function
 
+
 Function onVideoPlayerState()
   if m.videoPlayer.state = "playing" and m.top.control = "play" then
     autohideWhenPlaying()
@@ -192,9 +218,25 @@ Function onVideoPlayerState()
   end if
 End Function
 
+
 Function onDebounceDone()
   tubiLog("OnNow.onDebounceDone")
-  index = m.playlistInfo[m.playlistIndex]
+  currentPlaylistState = m.playlistInfo[m.playlistIndex]
   m.videoPlayer.playlist = m.top.content.getChild(m.playlistIndex)
-  m.videoPlayer.seekPlaylist = [index.contentIndex, index.nowPos]
+  m.videoPlayer.seekPlaylist = [currentPlaylistState.contentIndex, currentPlaylistState.nowPos]
+
+  ' debounce the onNowOverlay navigations count so it is consistent with the videoPicker which utilizes a contentGrid component
+  ' utilizes a contentGrid component which naturally debounces the navigations count
+  m.onNowOverlay.navigations = m.onNowOverlay.navigations + 1
+  trackEvent({
+    trackType: "navigateInPage"
+    value: m.onNowOverlay.navigations
+    ctx: "/home/1/cat/" + m.top.content.getChild(m.playlistIndex).slug + "/1/" + currentPlaylistState.contentIndex.toStr()
+  })
+End Function
+
+
+' Helper function to make trackEvent calls prettier
+Function trackEvent(event As Object) As Void
+  m.global.trackingLoggingTask.trackEvent = event
 End Function

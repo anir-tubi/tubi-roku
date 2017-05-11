@@ -56,27 +56,45 @@ End Function
 
 
 Function onAutohide()
+  tubiLog("ContentController.onAutohide")
   fadeTime = 3.0  ' default
   if m.autohideTimer.fadeTime <> invalid then fadeTime = m.autohideTimer.fadeTime
   m.autohideAnimation = fade(m.ScreenStack, "out", fadeTime)
+
   if m.autohideTimer.focusVideo = invalid or m.autohideTimer.focusVideo = true
-    m.videoPlayer.enableTracking = true
+    'the user has gone into the onnow player experience
     m.videoPlayer.setFocus(true)
     m.videoPlayer.observeField("backButtonPressed", "unAutohide")
     m.videoPlayer.showTransport = true
   else
     currentScreen().setFocus(false)
-    m.top.setFocus(true)
+
+    'if autohiding the on now overlay after autoplay - we want the player to treat the user as engaged for analytics purposes
+    if m.videoPlayer.analyticsMode = "onnow-autoplay"
+      m.videoPlayer.analyticsMode = "onnow-engaged"
+    end if
+
+    m.top.setFocus(true)  'key presses go to the screen stack
   end if
 End Function
 
 Function unAutohide()
   if m.autohideAnimation <> invalid then m.autohideAnimation.control = "stop"
+
+  'the user is bringing back the on now home UI after returning from the on now player experience
+  if m.autohideTimer.focusVideo = true
+    videoPicker = m.VideoPlayer.findNode("VideoPicker")
+    m.trackingLoggingTask.trackEvent = {
+      trackType: "navigate"
+      value: "/on_now/" + m.VideoPlayer.playlist.slug + "/1/" + videoPicker.contentFocused.toStr()
+      ctx: "/home/1/cat/" + m.VideoPlayer.playlist.slug + "/1/" + videoPicker.contentFocused.toStr()
+    }
+  end if
+
   m.ScreenStack.visible = true
   m.ScreenStack.opacity = 1.0
   currentScreen().setFocus(true)
   m.videoPlayer.enableAds = false
-  m.videoPlayer.enableTracking = false
   m.videoPlayer.showTransport = false
 End Function
 
@@ -434,6 +452,7 @@ End Function
 ' Helper function for onResume and onPlay to launch content
 Function playVideoContent(content As Object)
   m.videoPlayer.visible = true
+  m.videoPlayer.analyticsMode = "normal"
   m.videoPlayer.observeField("state", "onEpisodeFinished")
   m.videoPlayer.observeField("historyPosition", "onEpisodePosition")
   m.videoPlayer.observeField("backButtonPressed", "onEpisodeFinished")
@@ -446,7 +465,6 @@ Function playVideoContent(content As Object)
 
   m.videoPlayer.playlist = parent
   m.videoPlayer.enableAds = true
-  m.videoPlayer.enableTracking = true
   m.videoPlayer.loopPlaylist = false
   m.videoPlayer.seekPlaylist = [0, localContent.nowPos]
   m.ScreenStack.visible = false
@@ -527,22 +545,16 @@ Function onWatchTrailer()
     trailerContent.isTrailer = true
 
     m.videoPlayer.visible = true
+    m.videoPlayer.analyticsMode = "trailer"
     m.videoPlayer.observeField("state", "onTrailerFinished")
     m.videoPlayer.observeField("backButtonPressed", "onTrailerFinished")
     m.videoPlayer.observeField("skipTrailer", "onTrailerFinished")
     m.videoPlayer.setFocus(true)
     m.videoPlayer.playlist = playlist
     m.videoPlayer.enableAds = false
-    m.videoPlayer.enableTracking = false
     m.videoPlayer.loopPlaylist = "false"
     m.videoPlayer.control = "play"
     m.ScreenStack.visible = false
-
-    m.global.trackingLoggingTask.trackEvent = {
-      trackType: "startTrailer"
-      value: trailerContent.id
-    }
-
   end if
 End Function
 
