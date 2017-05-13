@@ -92,7 +92,7 @@ Function unAutohide()
   end if
 
   m.ScreenStack.visible = true
-  m.ScreenStack.opacity = 1.0
+  m.autohideAnimation = fade(m.ScreenStack, "in", 0.5)
   currentScreen().setFocus(true)
   m.videoPlayer.enableAds = false
   m.videoPlayer.showTransport = false
