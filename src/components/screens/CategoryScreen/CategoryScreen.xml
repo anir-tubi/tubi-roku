@@ -106,9 +106,9 @@
       <Poster
         id="DockedBackToCloseHint"
         uri="pkg:/images/back.png"
-        width="29"
-        height="29"
-        translation="[1419,426]"
+        width="47"
+        height="47"
+        translation="[1410,417]"
         opacity="0.5"/>
       <Label
         id="DockedBackToCloseText"
