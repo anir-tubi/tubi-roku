@@ -42,6 +42,8 @@
     <field id="titleFontSize" alias="TitleFont.size"/>
 
     <field id="width" type="float" value="875" />
+
+    <field id="ratingVisible" alias="Rating.visible"/>
   </interface>
 
   <children>

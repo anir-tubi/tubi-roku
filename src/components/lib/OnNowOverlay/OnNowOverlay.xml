@@ -58,7 +58,8 @@
     maxHeight="356"
     numTitleLines="3"
     titleFontSize="43"
-    translation="[550,0]"/>
+    translation="[550,0]"
+    ratingVisible="false"/>
     
     <RowList
       id="RightGrid"
