@@ -443,9 +443,13 @@ Function onControlChange()
 
   else if m.top.control = "stop" then
     cancelReplayCaptions()
-    'TODO: If ad break is happening, abort it.  I don't think it's possible, though
     m.Video.control = "stop"
     m.VideoState = "stop"
+
+    'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed
+    if m.top.adState = "fetching" or m.top.adState = "adsPending"
+      m.top.adControl = "stop"
+    end if
   else if m.top.control = "pause" then
     m.Video.control = "pause"
     m.VideoState = "pause"
@@ -692,13 +696,6 @@ Function focusVideoPicker(focus)
     m.VideoPicker.setFocus(true)
     transportButton.focusState = false
   end if
-End Function
-
-'load Video player and play
-Function playVideo()
-  m.Video.control = "play"
-  m.VideoState = "play"
-  animateTransport("out")
 End Function
 
 

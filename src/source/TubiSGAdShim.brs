@@ -55,7 +55,6 @@ Function tubiSGAdShim_run(scene As Object) As boolean
     else if msgType = "roSGNodeEvent"
       tubiLog("TubiSGAdShim got roSGNodeEvent for " + msg.GetField())
       if msg.GetField() = "exitApp"
-        print "we want to exit the apppppppppppppp"
         if msg.GetData() = true then return true
 
       else if msg.GetField() = "adControl"
@@ -68,8 +67,6 @@ Function tubiSGAdShim_run(scene As Object) As boolean
         else
           m.videoPlayer.adState = "noads"  ' if video player content was changed before we got here, return no ads
         end if
-      else if msg.GetField() = "exitApp"
-        if msg.GetData() = true then return true
       end if
     end if
 
