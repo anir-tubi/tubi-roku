@@ -93,6 +93,7 @@
         id="InfoPanel"
         translation="[85,163]"
         maxHeight="325"
+        maxTitleLines="2"
         visible="true" />
       <Group
         id="DockOverlay">

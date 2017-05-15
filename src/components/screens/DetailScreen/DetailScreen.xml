@@ -109,6 +109,7 @@
       mode="detail"
       translation="[85,123]"
       maxHeight="477"
+      maxTitleLines="2"
       visible="true" />
   
     <ScrollingList
