@@ -71,8 +71,10 @@ End Function
 ' Handle content grid item selected
 Function onResultSelected()
   tubiLog("SearchScreen.onResultSelected")
-  selectedItem = m.ResultGrid.itemSelected
-  m.top.contentSelected = selectedItem
+  if m.ResultGrid.itemSelected <> invalid
+    selectedItem = m.ResultGrid.itemSelected
+    m.top.contentSelected = selectedItem
+  end if
 End Function
 
 
