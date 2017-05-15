@@ -862,6 +862,7 @@ End Function
 
 'handles play key press or PlayPause button selection
 Function handlePlayPause()
+  tubiLog("VideoPlayer.handlePlayPause VideoState = " + m.VideoState)
   if m.VideoState = "play" then
     pauseVideo()
   else if m.VideoState = "pause" then
@@ -1021,8 +1022,7 @@ End Function
 ' If keyFocus is true it will forcefully set focus to the transport
 Function setFocusedButton(TransportButton, keyFocus=false)
   if keyfocus
-    m.VideoPicker.setFocus(false)
-    m.top.setFocus(true)
+    focusVideoPicker(false)
   end if
   for i=0 to m.TransportButtons.getChildCount()-1
     button = m.TransportButtons.getChild(i)
