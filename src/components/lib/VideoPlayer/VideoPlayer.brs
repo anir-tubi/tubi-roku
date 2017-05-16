@@ -182,7 +182,6 @@ Function onContentChange() As Void
   'if it's not a trailer, remove the skip trailer button
   if m.top.content.isTrailer = false
     m.TransportButtons.removeChild(m.SkipTrailerButton)
-    setFocusedButton(m.PlayPauseButton)
 
   'add the skip trailer button if it's a trailer and it doesn't already exist on the transport
   else if doesChildExist(m.TransportButtons, m.SkipTrailerButton) = false
@@ -832,6 +831,7 @@ End Function
 'triggers callback on ContentController to play the full video
 Function handleSkipTrailer()
   m.top.skipTrailer = true
+  setFocusedButton(m.PlayPauseButton)
 End Function
 
 
@@ -853,7 +853,12 @@ Function goToEnd()
     endScrub()
     setFocusedButton(m.EndButton)
   end if
-  jumpToPosition(m.Video.duration)
+  if not advancePlaylist() then
+    'the end of the video playback
+    m.VideoState = "stop"
+    m.video.control = "stop"
+    m.top.state = "finished"
+  end if
 End Function
 
 

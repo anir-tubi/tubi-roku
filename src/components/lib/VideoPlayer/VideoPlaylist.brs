@@ -46,16 +46,15 @@ End Function
 Function onVideoStateChange(msg)
   tubiLog("VideoPlayer.onVideoStateChange")
   state = msg.GetData()
-  if state = "finished" or state = "error"
-    if m.VideoState = "play"
-      advancePlaylist()
-    end if
+  if (state = "finished" or state = "error") and m.VideoState = "play"
+    ' hide "finished" and "error" states if we are advancing the playlist
+    if not advancePlaylist() then m.top.state = state
   else
-    ' TODO(Chris): push this state up to the VideoPlayer node
+    m.top.state = state
   end if
 End Function
 
-Function advancePlaylist() As Void
+Function advancePlaylist() As Boolean
   ' advance the playlist
   if m.top.playlist <> invalid
     newIndex = m.top.playlistIndex + 1
@@ -63,11 +62,14 @@ Function advancePlaylist() As Void
       if m.top.loopPlaylist
         newIndex = 0
       else
-        return
+        return false
       end if
     end if
     m.top.playlistIndex = newIndex
     refreshContent(0)
+    return true
+  else
+    return false
   end if
 End Function
 

@@ -23,7 +23,7 @@
     
     <!-- Alias fields for the video node -->
     <field id="content" alias="VideoNode.content"/>
-    <field id="state" alias="VideoNode.state"/>
+    <field id="state" type="string" />
     <field id="position" alias="VideoNode.position"/>
 
     <!-- Only support play and stop for simple external interface -->
