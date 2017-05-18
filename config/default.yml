@@ -61,6 +61,7 @@ component_library_manifest:
   minor_version: 3
   build_version: 1
   sg_component_libs_provided: "TubiRemoteLibrary"
+  rsg_version: 1
   hidden: 1
 
 theme:
