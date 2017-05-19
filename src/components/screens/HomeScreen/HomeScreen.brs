@@ -1,6 +1,7 @@
 Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
+  m.top.observeField("showCategoryScreen", "showCategoryScreen")
   m.ToolsMenu = m.top.findNode("ToolsMenu")
   m.OnNow = m.top.findNode("OnNow")
   m.CategoryScreen = m.top.findNode("CategoryScreen")
@@ -39,7 +40,6 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       if m.OnNow.isInFocusChain() then
         'send the back button press to the screen stack (for category screen and sign in/search list)
         showCategoryScreen()
-        m.OnNow.control = "dock"
         return true
       else if m.CategoryScreen.isInFocusChain() then
         ' first back button closes docked player, second press shows category menu, third invokes the exit dialog
@@ -82,8 +82,6 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
         return true
       else if m.OnNow.isInFocusChain() then
         showCategoryScreen()
-        m.OnNow.control = "dock"
-        m.CategoryScreen.dockedVideoFrameVisible = true
         return true
       end if
     end if
@@ -93,6 +91,8 @@ End Function
 
 Function showCategoryScreen()
   if m.OnNow.isInFocusChain() then
+    m.OnNow.control = "dock"
+    m.CategoryScreen.dockedVideoFrameVisible = true
     slideFade(m.OnNow, "above", "out", 0.4)
     animate(m.CategoryScreen, m.CategoryScreen.translation, [0, 0], 1.0, 1.0, 0.4)
     m.CategoryScreen.infoVisible = true

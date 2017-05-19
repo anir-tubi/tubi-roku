@@ -22,6 +22,9 @@
     <field id="hideUI" type="boolean"/>
     
     <field id="onNowContent" alias="OnNow.content"/>
+    
+    <!-- WRITE-ONLY: setting this field to true causes the category screen to be navigated to -->
+    <field id="showCategoryScreen" type="boolean" value="false" alwaysNotify="true"/>
   </interface>
   
   <children>

@@ -79,6 +79,7 @@ Function onAutohide()
 End Function
 
 Function unAutohide()
+  tubiLog("ContentController.unAutohide")
   if m.autohideAnimation <> invalid then m.autohideAnimation.control = "stop"
 
   'the user is bringing back the on now home UI after returning from the on now player experience
@@ -98,6 +99,10 @@ Function unAutohide()
   m.videoPlayer.showTransport = false
 End Function
 
+Function showUI(key)
+  unAutohide()
+  if key = "back" then m.homeScreen.showCategoryScreen = true
+End Function
 
 '''''''''''''''''''''''''
 ' onTrackingLoggingReady

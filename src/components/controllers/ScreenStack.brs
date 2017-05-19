@@ -18,7 +18,7 @@ Function onKeyEvent(key As String, press As Boolean)
   if press then
     ' for autohide support, bring the UI back on any keypress
     if m.ScreenStack_.opacity < 1.0 and type(unAutohide) = "Function"
-      unAutohide()
+      showUI(key)
       return true
     else if key = "back"
       if m.ScreenStack_.getChildCount() > 1 then
