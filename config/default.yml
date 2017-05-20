@@ -6,9 +6,9 @@ settings:
   adLoadingBackgroundColor: "#222223"
   adLoadingFontColor: "#EBEBEB"
   loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
-  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/16.brs"
+  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/17.brs"
   # hotPatchUrl: "http://192.168.1.180:8080/rokuHotpatches/16.brs"
-  remoteComponentsUrl: "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components.pkg"
+  remoteComponentsUrl: "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_2_2_7.pkg"
   appName: "Tubi TV"
   isLiveTVOn: true
   isRokuAdFrameworkOn: false
