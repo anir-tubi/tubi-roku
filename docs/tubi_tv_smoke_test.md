@@ -9,13 +9,15 @@
 	- Signed Out state
 		- Signed Out state doesn't show user categories
 		- Signed Out state lands on feature grid by default on start
-		- Add to Queue is shown on details screen but leads to a modal
+		- newUI: Add to Queue is shown on details screen but leads to a modal
+		- oldUI: Add to Queue and Remove From History do not appear on details screens
 		- signed out state persists across channel launches, lands on Sign-In disambiguation screen
 	- Transitions
 		- After successful sign in, feature grid is shown
+		- After successful sign in, user categories are shown
 		- After successful sign out, feature grid is shown
 		- Sign in succeeds when launched from category screen
-		- Sign in succeeds when launched from detail screen adding to queue
+		- newUI: Sign in succeeds when launched from detail screen adding to queue
 - "My Queue"
 	- Can add videos to my queue, show up on web
 	- Can add series to my queue, show up on web
@@ -31,54 +33,79 @@
 - Search
 	- search results show up
 	- search results are updated on each key entry
-	- can launch detail scren and playback from search menu
+	- can launch detail screen and playback from search menu
 	- returning from play of search result item goes back to search result screen
 - Video playback
 	- videos play with pre-roll, mid-roll ads
 	- video is full-screen, even on Roku 4
 	- transport works: pause/play/ff/rew
+	- oldUI: left/right works as 10s scrub
 	- subtitles menu pops up on "*", both when paused and during playback
+	- oldUI: live tv playback works
 - Ads
 	- play full screen
 	- can be paused
 	- cannot be ff or rew
 	- back goes to detail screen
-- Trailers
+- Trailers (new ui only)
 	- trailers show on detail screen menu for movies which have them
 	- trailers return to detail screen after finished playing
 - Network error handling
 - Deep Linking
-	- [series](curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=1079&MediaType=series")
-	- [movie](curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=321221&MediaType=movie")
-	- [episode](curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=series”)
+	- Season shows episode picker: http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=111770&mediaType=season
+	- Movie automatically plays: http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=348932&mediaType=movie
+	- Episode automatically plays: http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=111770&mediaType=episode
+	- Backward-compatibility
+		- Series shows Detail screen http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=11&MediaType=series
 	- shows main grid on content not found
 - Closed Captions
 	- subtitles work (all dogs go to heaven has working subtitles)
+	- instant replay subtitles work
 	- subtitles default to system setting
 	    - on
 	    - off
+	    - instant replay
+	- oldUI: subtitles selection on detail page changes global caption setting
+	- oldUI/software (Roku LT):
+		- on
+		- off
+		- instant replay
+	- oldUI/firmware (Roku TV):
+		- on
+		- off
+		- instant replay
 - Autoplay
 	- movies
 	- series
-- Old UI
+- Old UI specific
 	- Low-spec devices show old ui by default
 	- playback shows pre-roll and mid-roll ads
 	- categories are limited to 80 items
 	- no crashes after 2 ad breaks
 
-## Screens
-- Grid Screen
-- Detail Screen
-	- Play
-	- Resume
-- Episode Selection Screen
-- Sign in username/password
-- Sign in reg code
-- About
-- Privacy
-- Sign in Disambiguation
-- Sign in
-
+## Screens - verify visually
+- New UI
+    - Grid Screen
+    - Detail Screen
+	    - Play
+	    - Resume
+    - Episode Selection Screen
+    - Sign in username/password
+    - Sign in reg code
+    - About
+    - Privacy
+    - Sign in Disambiguation
+    - Sign in
+- Old UI
+  - Grid Screen
+  - Detail Screen
+  - Series/Episode Screen
+  - Search Screen
+  - Search Results Screen
+  - Privacy Policy
+  - Sign in disambiguation
+  - Sign in smart phone
+  - Sign in reg code
 
 ## Negative testing
 - Fast navigation; fast button pressing
@@ -91,7 +118,7 @@
 
 
 ## Dev features
-
 - Tracking info
 - Hotpatching
 - Remote configuration
+- Remote components

@@ -133,6 +133,7 @@ function genManifest(env, filename, manifestName) {
 function incrementBuildNumber() {
   var build = parse(buildProfile);
   build.manifest.build_version = build.manifest.build_version + 1
+  build.component_library_manifest.build_version = build.manifest.build_version
   const filename = path.join(cwd, buildProfile + '.yml');
   fs.openAsync(filename, 'w').then(fd => {
     const data = yaml.dump(build);

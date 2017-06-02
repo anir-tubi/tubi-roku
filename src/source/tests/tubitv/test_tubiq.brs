@@ -61,21 +61,21 @@ End Function
 Function testTimeout(t As Object)
   ' t = 0
   port = CreateObject("roMessagePort")
-  q = TubiRequestQueue().create(port, 10, 1)
+  q = TubiRequestQueue().create(port, 10, 3)
   request = TubiRequest().createAsync("http://127.0.0.1:65535/")
   q.pushRequest(request)
   t.assertEqual(q.Count(), 1)
-  sleep(500)
+  sleep(2000)
 
   ' t = 1
   request = TubiRequest().createAsync("http://127.0.0.1:65535/")
   q.pushRequest(request)
   t.assertEqual(q.Count(), 2)
-  sleep(1000)
+  sleep(2000)
 
   ' t = 3
   t.assertEqual(q.Count(), 1)
-  sleep(1000)
+  sleep(2000)
 
   ' t = 4
   t.assertEqual(q.Count(), 0)

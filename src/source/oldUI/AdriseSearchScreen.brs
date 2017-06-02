@@ -5,7 +5,7 @@ function AdriseSearchScreen(utils, cp, searchResultsScreen)
     cp: cp
     utils: utils
     searchResultsScreen: searchResultsScreen
-    urlBase: "http://cms.adrise.com/"
+    urlBase: "https://uapi.adrise.tv"
     searchPort:CreateObject("roMessagePort")
     throttleTime: 500 'in ms
 
@@ -74,13 +74,13 @@ function SearchScreen_show()
             'send async request to search API
             'if the request is send succesfully wait 1 second for a response
             'if a response happens within that time get the response and act on it'
-            asyncId = m.utils.sendAsyncRequest(url, localPort, "searchAPI")
+            asyncId = m.utils.sendAuthAsyncRequest(url, localPort, "searchAPI", invalid, true)
 
             m.utils.trackEvent({
               trackType: "search"
               value: Left(searchString, 1000)
               port: localPort
-            })     
+            })
             if (asyncId <> 0)
               while true
                 msg = wait(1000, localPort)
@@ -126,7 +126,7 @@ function SearchScreen_show()
           trackType: "search"
           value: Left(searchString, 1000)
           port: port
-        })        
+        })
 
         searchPlaylist = m.cp.getPlaylistFromXmlObj(searchResultsXml.children.level, "250x250", 1, invalid, "search")
         m.cp.getAllEpisodesForPlaylistFromServer(searchPlaylist, "search")
@@ -146,7 +146,7 @@ function SearchScreen_show()
         print "Unknown event: "; msg.GetType(); " msg: "; msg.GetMessage()
       end if
     end if
-  end while 
+  end while
 
 end function
 
@@ -155,7 +155,8 @@ end function
 function SearchScreen_setSearchUrl(searchString)
   'replace spaces with "%20"
   searchstring = searchString.Replace(" ", "%20")
-  apiString = "v2/app.php?&id=" + m.cp.shortAppName + "&platform=roku&content-type=hls&video-fields=title&sdk=3.0&format=xml&search-mode=t&search="
+
+  apiString = "/legacy_cms/v2/search/xml?platform=roku&search="
   url = m.urlBase + apiString + searchString
   return url
-end function
+End Function

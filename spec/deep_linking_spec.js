@@ -44,18 +44,17 @@ describe("deep-linking", function() {
   ///////////////////////
 
     /*
-     * CONTENT ID: 01079
-     * Title: Crash
+     * CONTENT ID: 011
+     * Title: Transformers Generation 1
      * Type: Series/Season
      *
-     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=1079&MediaType=series"
-     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=1079&MediaType=season"
+     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=11&MediaType=series"
      *
      * NOTE:  This is not an expected combination of contentId and MediaType but we
      *        are making sure the deep link accepts it
      */
   it("should show detail screen for series content id and mediatype series", function(done) {
-    var contentId = "1079";
+    var contentId = "11";
     var contentIdReceived = false;
     var mediaTypeReceived = false;
     var detailScreenReceived = false;
@@ -112,45 +111,45 @@ describe("deep-linking", function() {
     });
     
     /*
-     * CONTENT ID: 321221
-     * Title: We Are Young
+     * CONTENT ID: 348932
+     * Title: Escape Plan
      * Type: Movie
      *
-     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=321221&MediaType=movie"
+     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=348932&MediaType=movie"
      *
      */
     it("for movie", function(done) {
-      this.showVideoPlayerHelper("321221", "movie", done);
+      this.showVideoPlayerHelper("348932", "movie", done);
     });
 
   
     /*
-     * CONTENT ID: 302800
-     * Title: S02:E05 - You, I'll Be Following
+     * CONTENT ID: 111770
+     * Title: Transformers Generation 1 -- S01:E01 - More Than Meets The Eye, Part 1
      * Type: Episode
      *
-     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=episode"
+     * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=111770&MediaType=episode"
      */
     it("for episode", function(done) {
-      this.showVideoPlayerHelper("302800", "episode", done);
+      this.showVideoPlayerHelper("111770", "episode", done);
     });
   
   });
 
     
     /*
-    * CONTENT ID: 302800
-    * Title: S02:E05 - You, I'll Be Following
+    * CONTENT ID: 111770
+    * Title: Tranformers Generation 1
     * Type: Series/Season
     *
-    * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=302800&MediaType=season"
+    * curl -d '' "http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=111770&MediaType=season"
     * 
     * SEE CLIEN-1352 bug.  This combination of episode id and 'series' mediatype can come from
     *                      the Roku mobile app.
     * 
     */
   it("should show episode screeen when mediatype is season", function(done) {
-    var contentId = "302800";
+    var contentId = "111770";
     var contentIdReceived = false;
     var mediaTypeReceived = false;
     var episodeScreenReceived = false;

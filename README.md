@@ -58,6 +58,13 @@ You can also tune the ``ROKU_PROFILE`` with envar. By default it is ``dev``. You
 
 You can set `DEV_PASSWORD` with the developer password set on the roku device if it is something other than the default `1234`
 
+
+## Test
+
+### Smoke tests
+
+[Smoke tests](docs/tubi_tv_smoke_test.md) should be manually run for each release.
+
 ### Run unit tests
 
 ``test`` profile is just for testing purpose. If you run this:
@@ -86,7 +93,49 @@ The code will run all the test suites defined in ``src/source/tests`` only. Run 
 You can set `DEV_PASSWORD` with the developer password set on the roku device if it is something other than the default `1234`
 
 
-### Prepare Release
+## Release Process
+
+### Testing
+
+- Smoke tests (manual)
+- Run unit tests (white box)
+- Run jasmine tests (black box)
+
+### Versioning and Building
+
+- For every submission cycle to Roku:
+  - Bump the minor version number, e.g.
+  - Reset the build number to 1
+  - Set the hotpatchUrl in settings to `http://.../<major>.<minor>.newUI.brs`
+  - Set the hotPatchUrlOldUI in settings to `http://.../<major>.<minor>.oldUI.brs`
+  - Merge contents of n-1 hotpatches to source base
+  - Create new empty hotpatch files
+- For every bugfix update, either via internal QA or Roku QA:
+  - Bump the build number in build.yml by running `make release`
+  - make the build with ROKU_PROFILE=production (`make release` does this)
+  - Bump the build number for `remoteComponentsUrl` to `"http://.../tubitv_remote_components_<major>_<minor>_<build>.pkg"`
+
+### Deployment and Internal QA
+
+- Rekey and run `make pkg`
+- For major versions
+    1. Collect build artifacts
+        - tubitv\_remote\_components-\<major\>.\<minor\>.\<build\>.zip (remote components for \<major\>.\<minor\>.\<build\>)
+        - tubitv_roku.zip
+        - \<major\>.\<minor\>.oldui.brs (oldUI hotpatch)
+        - \<major\>.\<minor\>.newui.brs (newUI hotpatch)
+    2. Deploy remote components to CDN
+    3. Deploy hotpatch files to CDN
+- git tag the release
+- Push tags to repo
+- Create github release for the tag
+
+
+### Roku Submission
+
+- Send build via Roku portal
+
+### (needs update) Tag the release
 
 Running `make release` will take care of a few steps for prepping a release build.  These include
 
@@ -96,6 +145,7 @@ Running `make release` will take care of a few steps for prepping a release buil
 * Tagging the source tree
 
 The following is example output of running the release target:
+
 
 
 ```

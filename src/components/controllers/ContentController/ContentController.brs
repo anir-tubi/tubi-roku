@@ -440,7 +440,20 @@ Function startOnNow()
   m.categoryScreen.observeField("contentSelected", "onContentSelected")
 
   m.homeScreen.signedIn = (m.authTask.authInfo <> invalid)
-  m.onNow.content = m.top.onNowContent
+
+  ' If configured for OnNow, set the content
+  if m.global.constants.externalConfig.info.roku_onnow <> invalid and m.global.constants.externalConfig.info.roku_onnow = 1
+    m.onNow.content = m.top.onNowContent
+    m.onNow.visible = true
+    m.categoryScreen.onNowHintVisible = true
+    m.categoryScreen.searchSignOutHintVisible = false
+  else
+    m.onNow.content = invalid
+    m.onNow.visible = false
+    m.homeScreen.showCategoryScreen = true
+    m.categoryScreen.onNowHintVisible = false
+    m.categoryScreen.searchSignOutHintVisible = true
+  end if
   pushScreen(m.homeScreen)
 End Function
 

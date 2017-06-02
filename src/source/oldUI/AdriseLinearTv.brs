@@ -1,7 +1,7 @@
 function AdriseLinearTv(utils, player)
   return {
     utils: utils
-    showLinearTv: false
+    showLinearTv: true
     linearTvOn: false
     sdposterurl: "http://cdn.adrise.com/hotpatches/roku/LinearTV-beta-SD.jpg"
     hdposterurl: "http://cdn.adrise.com/hotpatches/roku/LinearTV-beta-HD.jpg"

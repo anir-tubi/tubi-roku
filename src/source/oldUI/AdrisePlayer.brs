@@ -58,6 +58,7 @@ function AdrisePlayerInternal(config)
     pingFrequency: config.pingFrequency
     playerPort: playerPort
     resumePlayAdsList: invalid
+    useCustomPlayer: true
 
     ' ads module
     ads : AdriseAds(config.utils, playerPort)
@@ -574,7 +575,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
           if playerStates.isScrubbing = false
             playerStates.nowPosAtScrub = playerStates.nowPos
-            m.cancelInstantReplay(playerStates, deviceInfo.GetCaptionsMode(), captions)
+            m.cancelInstantReplay(playerStates, captions)
             startScrub(player, scrubTimer, playerStates, episode)
           end if
           'update the speed of scrubbing with max ff or rw at 6
@@ -611,7 +612,7 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
 
           if playerStates.isScrubbing = false
             playerStates.nowPosAtScrub = playerStates.nowPos
-            m.cancelInstantReplay(playerStates, deviceInfo.GetCaptionsMode(), captions)
+            m.cancelInstantReplay(playerStates, captions)
             startScrub(player, scrubTimer, playerStates, episode)
           end if
           'update the speed of scrubbing with max ff or rw at 6

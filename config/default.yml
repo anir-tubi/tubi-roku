@@ -6,9 +6,8 @@ settings:
   adLoadingBackgroundColor: "#222223"
   adLoadingFontColor: "#EBEBEB"
   loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
-  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/17.brs"
-  # hotPatchUrl: "http://192.168.1.180:8080/rokuHotpatches/16.brs"
-  remoteComponentsUrl: "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_2_2_7.pkg"
+  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/2.2.newui.brs"
+  remoteComponentsUrl: "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_2_2_9.pkg"
   appName: "Tubi TV"
   isLiveTVOn: true
   isRokuAdFrameworkOn: false
@@ -35,8 +34,7 @@ settings:
   show_country: false
   proxyUrl: "none"
   proxyFolder: "none"
-  hotPatchUrlOldUI: "http://cdn.adrise.com/hotpatches/roku/15.brs"
-  # hotPatchUrlOldUI: "http://192.168.1.180:8080/rokuHotpatches/15.brs"
+  hotPatchUrlOldUI: "http://cdn.adrise.com/hotpatches/roku/2.2.oldui.brs"
   adrise_loadingurl: "pkg:/images/FREETVMOVIES_Tubi_icon_no-background_336x201"
 
 
@@ -57,9 +55,6 @@ manifest:
 component_library_manifest:
   title: "Tubi TV Component Library"
   subtitle: "Remote loading for scenegraph components"
-  major_version: 2
-  minor_version: 3
-  build_version: 1
   sg_component_libs_provided: "TubiRemoteLibrary"
   rsg_version: 1
   hidden: 1

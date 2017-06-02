@@ -141,7 +141,7 @@ function adriseLogging_sendLogging(port, options)
       loggingJson = FormatJson(loggingInfo)
 
       'url as String, port, name = "" as String, reqType = invalid, isHttps = false, body = invalid, headers = invalid
-      loggingId = m.utils.sendAsyncRequest(url, port, "sendLogging", "POST", true, loggingJson, invalid)
+      loggingId = m.utils.sendAuthAsyncRequest(url, port, "sendLogging", "POST", true, loggingJson, invalid)
     end if
   end if
 end function

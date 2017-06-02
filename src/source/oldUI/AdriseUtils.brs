@@ -3,6 +3,7 @@ function AdriseUtils (appName)
     getTextFile: adriseUtils_getTextFile
     getXml: adriseUtils_getXml
     sendAsyncRequest: adriseUtils_sendAsyncRequest
+    sendAuthAsyncRequest: adriseUtils_sendAuthAsyncRequest
     getAsyncResponse: adriseUtils_getAsyncResponse
     showErrorMessage: adriseUtils_showErrorMessage
     showAdLoadingLayer: adriseUtils_showAdLoadingLayer
@@ -638,8 +639,8 @@ end function
 ' .getXml
 ' --------------------------------------------------------
 ' name is optional, for debugging (prints url and name to debug console)
-function adriseUtils_getXml(url as String, name = "" as String) as Object
-  text = m.getTextFile(url, name)
+function adriseUtils_getXml(url as String, name = "" as String, auth = false As Boolean) as Object
+  text = m.getTextFile(url, name, auth)
   xml = CreateObject("roXMLElement")
 
   if not xml.Parse(text)
@@ -655,21 +656,52 @@ end function
 ' --------------------------------------------------------
 ' .getTextFile
 ' --------------------------------------------------------
-function adriseUtils_getTextFile(url as String, name = "" as String) as Object
+function adriseUtils_getTextFile(url as String, name = "" as String, auth = false As Boolean) as Object
   h = CreateObject("roUrlTransfer")
   h.SetPort(CreateObject("roMessagePort"))
 
   m.log.info(invalid, "clientInfo", name, url)
   print ""
 
+  if url.Left(5) = "https"
+    h.SetCertificatesFile("common:/certs/ca-bundle.crt")
+    h.AddHeader("X-Roku-Reserved-Dev-Id", "")
+  end if
+
   url = m.buildUrl(url, name, h)
   h.SetUrl(url)
+
+  'add auth header
+  if auth
+    authInfo = m.getAuthInfo()  'from memory
+    if authInfo.accessToken <> invalid
+      authInfo = m.checkIfAuthExpired(authInfo)
+      headers = m.getAuthHeaders(authInfo.accessToken)
+      for each headerType in headers
+        h.addHeader(headerType, headers[headerType])
+      end for
+    end if
+  end if
 
   h.AddHeader("Content-Type", "application/x-www-form-urlencoded")
   h.AddHeader("User-Agent", m.deviceInfo.userAgent + " " + m.deviceInfo.model)
   h.EnableEncodings(true)
   rsp = h.GetToString()
   return rsp
+end function
+
+' --------------------------------------------------------
+' .sendAuthAsyncRequest
+' --------------------------------------------------------
+function adriseUtils_sendAuthAsyncRequest(url as String, port, name = "" as String, reqType = invalid, isHttps = false, body = invalid, headers = invalid) as Integer
+  authInfo = m.getAuthInfo()  'from memory
+  if authInfo.accessToken <> invalid
+    authInfo = m.checkIfAuthExpired(authInfo)
+    authHeaders = m.getAuthHeaders(authInfo.accessToken)
+    if headers = invalid then headers = {}
+    headers.append(authHeaders)
+  end if
+  return m.sendAsyncRequest(url, port, name, reqType, isHttps, body, headers)
 end function
 
 ' --------------------------------------------------------
@@ -898,7 +930,7 @@ function adriseUtils_trackEvent(evt)
     trackingDataToSendJSON = FormatJson(trackData)
 
     'url as String, port, name = "" as String, reqType = invalid, isHttps = false, body = invalid, headers = invalid
-    asyncId = m.sendAsyncRequest(settings.userEventUrl, evt.port, "track" + evt.trackType, "POST", true, trackingDataToSendJSON, invalid)
+    asyncId = m.sendAuthAsyncRequest(settings.userEventUrl, evt.port, "track" + evt.trackType, "POST", true, trackingDataToSendJSON, invalid)
   end if
 
 end function

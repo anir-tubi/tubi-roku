@@ -412,10 +412,10 @@ End Function
 
 
 Function removeLiveTvHint(categoryIndex as integer)
-  onNowHint = m.top.findNode("OnNowHint")
+  hintGroup = m.top.findNode("UpHintGroup")
   if categoryIndex = 0
-    if onNowHint.opacity < 1.0 then fade(onNowHint, "in", 0.4)
+    if hintGroup.opacity < 1.0 then fade(hintGroup, "in", 0.4)
   else
-    if onNowHint.opacity > 0.0 then fade(onNowHint, "out", 0.4)
+    if hintGroup.opacity > 0.0 then fade(hintGroup, "out", 0.4)
   end if
 End Function

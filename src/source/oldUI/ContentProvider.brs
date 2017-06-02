@@ -55,7 +55,7 @@ function ContentProvider(pubId as String, shortAppName as String, imageSize as S
     isHD: utils.deviceInfo.displayType = "HDTV"
 
     ' server: "http://192.168.1.159:5000"
-    server: "http://cms.adrise.com"
+    server: "https://uapi.adrise.tv"
 
     shortAppName: shortAppName
     maxContent: 50    'max contents in each category for 256MB devices
@@ -132,12 +132,20 @@ function ContentProvider_setUrlsWithContentType(contentType as String)
   end if
 
   model = m.utils.deviceInfo.model
+  authInfo = m.utils.getAuthInfo()
+
+  userIdQueryString = ""
+  if authInfo.userId <> invalid
+    userIdQueryString = "&user_id=" + authInfo.userId
+  end if
+
+  deviceIdQueryString = "&device_id=" + m.utils.deviceInfo.deviceId
 
   m.urls = {
-    getPlaylists: m.server + "/v2/app.php?id=" + m.shortAppName + "&platform=roku&format=xml&content-type=" + contentType + "&model=" + model + "&video-fields=title&sdk=5.0"
-    getVideos: m.server + "/v2/videos.php?app-id=" + m.shortAppName + "&platform=roku&content-type=" + contentType + "&model=" + model + "&format=xml&id="
+    getPlaylists: m.server + "/legacy_cms/v2/app/xml?platform=roku&model=" + model + userIdQueryString + deviceIdQueryString
+    getVideos: m.server + "/legacy_cms/v2/videos/xml?platform=roku" + userIdQueryString + deviceIdQueryString + "&content_ids="
   }
-end function
+End Function
 
 '--------- method: getPlaylist() ----------
 function ContentProvider_getPlaylist(index as Integer) as Object
@@ -179,7 +187,7 @@ end function
 
 '--------- method: getEpisodeFromServer() ----------
 function ContentProvider_GetEpisodeFromServer(videoId as String) as Object
-	xml = m.utils.getXml(m.urls.getVideos + videoId, "getEpisode_v2")
+	xml = m.utils.getXml(m.urls.getVideos + videoId, "getEpisode_v2", true)
 	if xml = invalid or xml.GetName() <> "videos"
     return invalid
   end if
@@ -207,7 +215,7 @@ end function
 '--------- ContentProvider_getAllPlaylistsFromServer() ----------
 function ContentProvider_getAllPlaylistsFromServer()
 
-  xml = m.utils.getXml(m.urls.getPlaylists, "getApp_v2")
+  xml = m.utils.getXml(m.urls.getPlaylists, "getApp_v2", true)
 
 	if xml = invalid or xml.GetName() <> "app"
     return false
@@ -460,7 +468,7 @@ sub ContentProvider_getAllEpisodesForPlaylistFromServer (playlist, source)
       playlist.videosIdString = playlist.videosIdString.mid(1)
     end if
 
-    xml = m.utils.getXml(m.urls.getVideos + playlist.videosIdString, "getVideos_v2")
+    xml = m.utils.getXml(m.urls.getVideos + playlist.videosIdString, "getVideos_v2", true)
 
     defaultVideoPath = invalid
     defaultStaticPath = invalid
