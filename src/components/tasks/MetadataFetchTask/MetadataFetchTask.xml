@@ -12,6 +12,7 @@
  --> 
 <component name="MetadataFetchTask" extends="Task">
     <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />

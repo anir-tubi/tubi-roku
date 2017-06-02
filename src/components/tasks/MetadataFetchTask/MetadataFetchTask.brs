@@ -29,6 +29,10 @@ Function fetchLoop()
   ' Ready the translator
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
 
+  ' Prepare the auth module
+  m.Request = TubiRequest()
+  m.Auth = TubiAuth(m.constants, m.Request)  
+
   ' Signal that we're ready for requests
   m.top.ready = true
 
@@ -67,7 +71,14 @@ Function beginRequest(metadataRequest) As Void
     return
   end if
 
-  httpRequest = TubiRequest().createAsync(metadataRequest.url, metadataRequest.name, metadataRequest.options)
+  ' if the user is logged in, create an auth request for parental control purposes.
+  ' If there is no auth info, a regular request will be created below
+  httpRequest = m.Auth.createAuthRequest(metadataRequest.url, metadataRequest.name, metadataRequest.options)
+
+  if httpRequest = invalid
+    httpRequest = m.Request.createAsync(metadataRequest.url, metadataRequest.name, metadataRequest.options)
+  end if
+
   if httpRequest = invalid then
     tubiLog("MetadataFetchTask.beginRequest: createAsyncHTTPRequest returned invalid")
     return
