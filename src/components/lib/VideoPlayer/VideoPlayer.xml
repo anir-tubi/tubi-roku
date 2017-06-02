@@ -388,10 +388,5 @@
   <AuthTask
     id="VideoPlayerAuthTask" />
   
-  <Timer
-    id="PickerDebounce"
-    duration="0.6"
-    repeat="false"/>
-  
   </children>
 </component>

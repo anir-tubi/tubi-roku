@@ -24,7 +24,7 @@
     <!-- expect content to be a playlist node -->
     <field id="content" alias="ContentGrid.content"/>
     <!-- sets the overlay to show the playlist/content at the indicated index. -->
-    <field id="jumpToIndex" type="int" />
+    <field id="jumpToIndex" type="int" alwaysNotify="true"/>
 
   </interface>  
 

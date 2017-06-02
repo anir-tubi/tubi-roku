@@ -68,8 +68,6 @@ Function init()
   m.VideoPicker = m.top.findNode("VideoPicker")
   m.VideoPicker.observeField("contentFocused", "onVideoPickerFocused")
   m.VideoPicker.observeField("contentSelected", "onVideoPickerSelected")
-  m.PickerDebounce = m.top.findNode("PickerDebounce")
-  m.PickerDebounce.observeField("fire", "onVideoPickerDebounce")
 
   'm.VideoState is source of truth for the state of the video player for the UI
   'possible values are "play", "pause", "rew", "ffw", "stop", "refresh"
@@ -192,7 +190,6 @@ End Function
 Function onVideoPickerFocused()
   tubiLog("VideoPlayer.onVideoPickerFocused = " + stri(m.VideoPicker.contentFocused))
   if m.VideoPicker.contentFocused <> -1
-    m.PickerDebounce.control = "start"
     m.lastButtonPressPos = m.playerPosition
 
     'content grid naturally debounces the content selections, so trackEvent and naviatations increment
@@ -207,16 +204,12 @@ Function onVideoPickerFocused()
   end if
 End Function
 
-Function onVideoPickerDebounce()
-  tubiLog("VideoPlayer.onVideoPickerDebounce " + stri(m.VideoPicker.contentFocused))
-  if m.top.playlistIndex <> m.VideoPicker.contentFocused then m.top.seekPlaylist = [m.VideoPicker.contentFocused, 0]
-End Function
-
-
 Function onVideoPickerSelected()
   tubiLog("VideoPlayer.onVideoPickerSelected " + stri(m.VideoPicker.contentSelected))
   if m.VideoPicker.contentFocused <> -1
     animateTransport("out")
+    m.lastButtonPressPos = m.playerPosition
+
     if m.VideoPicker.contentSelected <> m.top.playlistIndex
       m.top.seekPlaylist = [m.VideoPicker.contentSelected, 0]
     else
@@ -660,6 +653,7 @@ End Function
 'aggregates all the animation for showing/hiding the transport
 '@direction: string, value may be "out" or "in"
 Function animateTransport(direction)
+  tubiLog("VideoPlayer.AnimateTransport")
   slideFade(m.HUD, "below", direction, 0.6)
   fade(m.Overlay, direction, 0.6)
   
@@ -671,11 +665,13 @@ Function animateTransport(direction)
     end if
     if direction = "in" and m.Transport.opacity = 0
       m.VideoPicker.setFocus(true)
+      m.VideoPicker.jumpToIndex = m.top.playlistIndex
     end if
   end if
 End Function
 
 Function focusVideoPicker(focus)
+  tubiLog("VideoPlayerFocusVideoPicker")
   transportButton = m.TransportButtons.getChild(m.focusedButtonIndex)
   if not focus and m.VideoPicker.isInFocusChain()
     ' I'm not sure why we have to setFocus(false) here, but it doesn't work otherwise
