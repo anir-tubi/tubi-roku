@@ -16,5 +16,5 @@ print "hotpatch roku_onnow config = "; m.global.utils.constants.externalConfig.i
 
 ' Set the most current remote components URL.  These should only increment build number.  Minor or major version number differences indicate
 ' incompatible architectural changes.
-m.global.utils.constants.settings.remoteComponentsUrl = "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_2_2_10.pkg"
+m.global.utils.constants.settings.remoteComponentsUrl = "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_2_2_11.pkg"
 
