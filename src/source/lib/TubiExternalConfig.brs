@@ -8,7 +8,6 @@ Function TubiExternalConfig(request as Object, constants as Object) as Object
       roku_new_ui: 0
       rokutv_newui: 0
       remote_components: 0
-      roku_onnow: 0
     }
 
     ' public methods

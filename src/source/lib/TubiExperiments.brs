@@ -16,7 +16,7 @@ Function TubiExperiments(request as Object, constants as Object) as Object
     ' }
     defaultValues: {
       RokuNamespace: {
-        single_row: true
+        roku_on_now: 0
       }
     }
 
@@ -210,10 +210,7 @@ Function tubiExperiments_getExperimentValue(namespaceName as string, parameterNa
         trackType: "experiment"
         value: experimentName
         ctx: namespace.evaluated_experiment_salt
-        extraCtx: {
-          "is_default": namespace.evaluated_default
-          "param_name": parameterName
-        }
+        extraCtx: namespace.evaluated_params
       }
 
     end if
