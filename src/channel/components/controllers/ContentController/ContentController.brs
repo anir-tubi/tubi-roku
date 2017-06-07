@@ -442,7 +442,7 @@ Function startOnNow()
   m.homeScreen.signedIn = (m.authTask.authInfo <> invalid)
 
   ' If experiment calls for OnNow, set the content
-  if getExperimentValue("RokuNamespace", "roku_on_now") = 1
+  if getExperimentValue("UserNamespace", "roku_on_now") = 1
     m.onNow.content = m.top.onNowContent
     m.onNow.visible = true
     m.categoryScreen.onNowHintVisible = true
