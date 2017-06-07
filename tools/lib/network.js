@@ -118,8 +118,8 @@ exports.autoDiscover = function() {
 /**
  * Host external component library for development
  */
-exports.hostComponents = function(zippath, port){
-  console.log('SERVER: hostComponents has started');
+exports.hostComponents = function(serverPath, port){
+  console.log('SERVER: hostComponents has started on port ' + port);
 
   if (typeof(port) === 'string'){
     port = parseInt(port, 10);
@@ -127,17 +127,22 @@ exports.hostComponents = function(zippath, port){
 
   const server = http.createServer((req, res) => {
     const nodePath = path.dirname(require.main.filename);
-    const fullZipPath = nodePath + '/../' + zippath;
-
-    const stream = fs.createReadStream(fullZipPath);
+    const requestPath = require('url').parse(req.url).pathname;
+    const fullPath = nodePath + '/../' + serverPath + requestPath;
+    const stream = fs.createReadStream(fullPath);
 
     stream
       .on('open', () => {
-        console.log('SERVER: external component stream has started');
+        console.log('SERVER: external component stream has started ' + requestPath);
       })
       .on('end', () => {
-        console.log('SERVER: external component stream has ended');     
-      });
+        console.log('SERVER: external component stream has ended ' + requestPath);
+      })
+      .on('error', () => {
+        console.log('SERVER: error serving ' + requestPath);
+        res.statusCode = 404;
+        res.end();
+      })
     stream.pipe(res);
   }).listen(port);
 };

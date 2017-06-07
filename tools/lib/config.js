@@ -23,7 +23,7 @@ function parse(profile) {
 
   /* URI-TO-REPLACE is the localhost server of dynamic components zip */
   let remoteComponentDir = localIp + ':8090';
-  rendered = raw.replace('<<URI-TO-REPLACE>>', remoteComponentDir);
+  rendered = raw.replace(/<<URI-TO-REPLACE>>/g, remoteComponentDir);
   
   return yaml.load(rendered);
 }

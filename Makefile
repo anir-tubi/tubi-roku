@@ -6,10 +6,12 @@ LANG=C
 
 NAME=tubitv_roku
 REMOTE_LOAD_NAME=tubitv_remote_components
-SRC_DIR=src
+SRC_DIR=src/channel
 BUILD_DIR=build
+SRC_HOTPATCH_DIR=src/hotpatch
 TARGET_DIR=$(BUILD_DIR)/local
 TARGET_REMOTE_DIR=$(BUILD_DIR)/remote
+TARGET_HOTPATCH_DIR=$(BUILD_DIR)/hotpatch
 TARGET=$(NAME).zip
 REMOTE_LOAD_ZIP=$(REMOTE_LOAD_NAME).zip
 REMOTE_LOAD_PKG=$(REMOTE_LOAD_NAME).pkg
@@ -53,10 +55,12 @@ zip:
 rsync:
 	@mkdir -p ./$(TARGET_DIR)
 	@mkdir -p ./$(TARGET_REMOTE_DIR)
+	@mkdir -p ./$(TARGET_HOTPATCH_DIR)
 	@rm -rf ./$(TARGET_DIR)/$(TESTS)
 	@rm -f ./$(TARGET_DIR)/$(SETTING_FILE)
 	@rsync -arvq $(RSYNC_EXCLUDE) $(SRC_DIR)/* $(TARGET_DIR)
 	@rsync -arvq $(REMOTE_LOAD_RSYNC_INCLUDE) $(SRC_DIR)/* $(TARGET_REMOTE_DIR)
+	@rsync -arvq $(SRC_HOTPATCH_DIR)/* $(TARGET_HOTPATCH_DIR)
 
 	# Swap script references from pkg:/ to libpkg:/
 	@find ./$(TARGET_REMOTE_DIR)/components -name '*.xml' | xargs sed -i '' 's|<script type="text/brightscript" uri="pkg:|<script type="text/brightscript" uri="libpkg:|'
@@ -78,7 +82,7 @@ gen:
 	@touch $(TARGET_REMOTE_DIR)/source/main.brs
 
 host:
-	@$(TOOL_CLI) host-components $(BUILD_DIR)/$(REMOTE_LOAD_PKG) $(REMOTE_LOAD_PORT)
+	@$(TOOL_CLI) host-components $(BUILD_DIR) $(REMOTE_LOAD_PORT)
 
 install: env build pkg-components
 	@echo "Installing $(NAME) to host $(ROKU_DEV_TARGET)...(this might take up to a minute)"
