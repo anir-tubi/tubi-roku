@@ -2,10 +2,11 @@
 ' initScreenStack
 '
 ' Set the screen stack parent object. This should be an empty Group
-Function initScreenStack(stack As Object, stackEmptyCallback=invalid As Object)
+Function initScreenStack(stack As Object, stackEmptyCallback=invalid As Object, showExitModal=true)
   tubiLog("ScreenStack.initScreenStack")
   m.ScreenStack_ = stack
   m.ScreenStackEmptyCallback_ = stackEmptyCallback
+  m.ScreenStackShowExitModal_ = showExitModal
 End Function
 
 
@@ -14,7 +15,7 @@ End Function
 '
 ' Back pressed on detail screen should close it
 Function onKeyEvent(key As String, press As Boolean)
-  tubiLog("ScreenStack.onKeyEvent")
+  tubiLog("ScreenStack.onKeyEvent key = " + key)
   if press then
     ' for autohide support, bring the UI back on any keypress
     if m.ScreenStack_.opacity < 1.0 and type(unAutohide) = "Function"
@@ -31,8 +32,11 @@ Function onKeyEvent(key As String, press As Boolean)
         m.ScreenStackEmptyCallback_()
         return true
       else
-        exitModal = showExitAppModal()
-        exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")
+        if m.ScreenStackShowExitModal_ then
+          ' only remove the last item if we have a valid callback
+          exitModal = showExitAppModal()
+          exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")
+        end if
         return true
       end if
     end if

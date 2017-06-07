@@ -7,7 +7,7 @@ Function init()
   m.Background = m.top.findNode("SignInBackground")
   m.Background.color = m.global.constants.ui.colors.backgroundColor
 
-  initScreenStack(m.top.findNode("ScreenStack"))
+  initScreenStack(m.top.findNode("ScreenStack"), invalid, false)
   pushScreen(m.Disambiguation)
 End Function
 
