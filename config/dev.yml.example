@@ -1,0 +1,13 @@
+' In order to use this dev.yml create a new file called dev.yml in the config directory,
+' using this .example file as a template.
+'
+' dev.yml will overwrite any of the configuration settings in default.yml if the ROKU_PROFILE environment variable is set to "dev"
+'
+' <<URI-TO-REPLACE>> will be replaced by the local IP of a server that starts during "make install" so that the various files
+' below will be served from local sources rather than the CDN.
+
+settings:
+  mode: "dev"
+  hotPatchUrl: "http://<<URI-TO-REPLACE>>/hotpatch/dev.newui.brs"
+  hotPatchUrlOldUI: "http://<<URI-TO-REPLACE>>/hotpatch/dev.oldui.brs"
+  remoteComponentsUrl: "http://<<URI-TO-REPLACE>>/tubitv_remote_components.pkg"

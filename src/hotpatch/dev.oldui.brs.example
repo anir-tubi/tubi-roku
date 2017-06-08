@@ -1,0 +1,9 @@
+' This hotpatch is for local developer use
+'
+' In order to use this dev version of the hotpatch create a file called dev.newui.brs in the hotpatch directory,
+' using this .example file as a template.
+'
+' When you run "make ROKU_PROFILE=dev install", the dev hotpatch will be loaded from a local server,
+' instead of loading the production hotpatch from the CDN.
+
+print "Hot Patch 2.2.oldui"

@@ -1,3 +1,6 @@
 build/*
 tools/node_modules/*
 .DS_Store
+config/dev.yml
+src/hotpatch/dev.newui.brs
+src/hotpatch/dev.oldui.brs

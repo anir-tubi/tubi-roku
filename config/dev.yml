@@ -1,5 +1,0 @@
-settings:
-  mode: "dev"
-  hotPatchUrl: "http://<<URI-TO-REPLACE>>/hotpatch/dev.newui.brs"
-  hotPatchUrlOldUI: "http://<<URI-TO-REPLACE>>/hotpatch/dev.oldui.brs"
-  remoteComponentsUrl: "http://<<URI-TO-REPLACE>>/tubitv_remote_components.pkg"
