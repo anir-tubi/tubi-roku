@@ -366,7 +366,7 @@ function RegisterScreen(uniqueId, utils)
               if (index = 0) ' back
                 m.canvas.close()
                 m.canvas = invalid
-                return false
+                return true
               else if (index = 6) ' ok button on remote
                 if(m.col = 0) 'selected OK button on screen
                   loadingImage = {

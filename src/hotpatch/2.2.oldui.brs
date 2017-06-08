@@ -71,3 +71,223 @@ m.app.player.ads.populateUrl = function(episode, playerSettings)
 
   return url
 end function
+
+
+
+
+
+'don't let users leave the app by pressing back from the sign in screen
+m.app.registerScreen.show = function(regWall = "")
+    
+  'necessary when calling the show() method from detail screen
+  '(ie. for registration walls)
+  if m.res = invalid
+    m = GetGlobalAA().app.registerScreen
+  end if
+
+
+  g = GetGlobalAA()
+
+  m.canvas = CreateObject("roImageCanvas")
+  port = CreateObject("roMessagePort")
+
+  m.canvas.SetMessagePort(port)
+
+  'sets state on m and returns the layers array
+  layers = m.setupInitialScreen()
+
+  'change the background for any registration walls
+  if regWall = "premiere"
+    layers[0].Url = "pkg:/images/oldUI/" + m.res + "/bg_premiere_wall.jpg"
+  end if
+
+  m.canvas.SetLayer(0, layers)
+  m.paint()
+
+  m.canvas.Show()
+  m.utils.trackEvent({
+    trackType: "pageLoad"
+    value: "/deviceregistration"
+    port: port
+  })
+
+  while(true)
+    msg = wait(30, port)
+
+    if (m.pressedItem <> invalid)
+      m.pressedItem.count = m.pressedItem.count -1
+      if (m.pressedItem.count < 1)
+        m.pressedItem = invalid
+        m.paint()
+      end if
+    end if
+
+     'r = g.app.utils.getAsyncResponse (msg, id)
+     'if r <> invalid
+     '  print "got id " ; id
+     '  print r.data
+     'end if
+    if m.isComplete = true
+      m.isComplete = false
+      m.canvas = invalid
+      m.pressedItem = invalid
+      return true
+    end if
+
+    if type(msg) = "roUrlEvent"
+      respObj = m.utils.getAsyncResponse(msg, 0)
+
+    else if type(msg) = "roImageCanvasEvent"
+      if msg.isRemoteKeyPressed()
+        index = msg.GetIndex()
+
+        'show initial "skip/ok" screen if appropriate
+        if(m.isInitialScreen = true)
+
+
+          if (index = 0) ' back
+            m.canvas.close()
+            m.canvas = invalid
+            return true
+          else if (index = 6) ' ok button on remote
+            if(m.col = 0) 'selected OK button on screen
+              loadingImage = {
+                Url: "pkg:/images/oldUI/" + m.res + "/bg_entry.jpg"
+                TargetRect: m.getRect("bg", 0)
+                compositionMode: "Source"
+              }
+              layers = [loadingImage]
+              m.canvas.SetLayer(0, layers)
+              m.isInitialScreen = false
+              m.row = 1
+              m.col = 1
+              m.pressedItem = invalid
+
+              m.utils.trackEvent({
+                trackType: "navigate"
+                value: "/deviceregistration/sms"
+                ctx: "/deviceregistration/"
+                port: port
+              })
+
+              m.utils.trackEvent({
+                trackType: "pageLoad"
+                value: "/deviceregistration/sms"
+                port: port
+              })
+              
+              m.paint()
+            else 'selected No Thanks button
+              m.canvas.close()
+              m.canvas = invalid
+              return true
+            end if
+          else if (index = 5 and m.col=0) ' right
+            m.col = 1
+          else if (index = 4 and m.col=1) ' left
+            m.col = 0
+          end if
+          m.paint()
+
+        'enter phone number screen
+        else
+          if (index = 0) ' back
+            layers = m.setupInitialScreen()
+            m.canvas.SetLayer(0, layers)
+
+            m.utils.trackEvent({
+              trackType: "navigate"
+              value: "/deviceregistration/"
+              ctx: "/deviceregistration/sms"
+              port: port
+            })
+
+            m.utils.trackEvent({
+              trackType: "pageLoad"
+              value: "/deviceregistration/"
+              port: port
+            })
+
+            m.paint()
+
+          else if (index = 6) ' ok
+            m.pressedItem = {
+              row: m.row
+              col: m.col
+              count: 8
+            }
+            m.paint()
+            if(m.row < 3)
+              m.addDigit(((m.row*3)+(m.col+1)))
+            else if (m.row = 3 and m.col = 1)
+              m.addDigit(0)
+            else if (m.row = 3 and m.col = 0)
+              m.deleteCharacter()
+            else if  (m.row = 4 and m.col = 0)
+              m.cancel()
+            else if  (m.row = 4 and m.col = 1)
+              m.submit()
+            else if (m.row = 4 and m.col = 2) 'register with no phone
+              m.utils.trackEvent({
+                trackType: "navigate"
+                value: "/deviceregistration/code"
+                ctx: "/deviceregistration/sms"
+                port: port
+              })
+
+              sleep(300) 'pause just for a tiny bit to show the button turn color
+              isRegistered = m.webRegister()
+              
+              print "shutting web register screen and isRegistered = "; isRegistered
+              if isRegistered = true
+                m.isComplete = true
+                m.canvas.close()
+              end if
+            end if
+          else
+            if (index = 5) ' right
+              m.col = m.col + 1
+            else if (index = 2) ' up
+              m.row = m.row - 1
+            else if (index = 4) ' left
+              m.col = m.col - 1
+            else if (index = 3) ' down
+              m.row = m.row + 1
+            end if
+
+            'control for cases where user tries to move left or right out of the grid
+            if m.col < 0
+              if m.row <> 4
+                m.col = 0
+              else
+                m.col = 2
+              end if
+            else if m.col > 2
+              if m.row <> 4
+                m.col = 2
+              else
+                m.col = 0
+              end if
+            end if
+
+            'control for cases where user tries to move up or down out of the grid'
+            if m.row > 4
+              m.row = 4
+            else if m.row < 0
+              m.row = 0
+            end if
+            
+            if((m.row = 3) and m.col = 2)
+              m.col = 1
+            end if
+
+          end if
+          m.paint()
+        end if
+      end if
+    end if
+  end while
+
+  m.canvas = invalid
+  return true
+end function
