@@ -1,6 +1,6 @@
 print "Hot Patch 2.2.newui"
 
-m.global.utils.constants.settings.allowAfterHours = false
+m.global.utils.constants.settings.allowAfterHours = true
 
 ' m.global.utils.constants.idsToLog = {
 '   "YY00G1976937": true
