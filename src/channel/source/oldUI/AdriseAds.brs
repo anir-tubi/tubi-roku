@@ -14,7 +14,7 @@ function AdriseAds (utils, playerPort)
   roAdFramework.setNielsenAppId("PC60BD376-8551-4688-BEF4-E8B45A39D4C7")
 
   'turn on debug output for RAF
-  ' roAdFramework.setDebugOutput(true)
+  roAdFramework.setDebugOutput(false)
 
 
   return {
@@ -176,12 +176,12 @@ function adriseAds_populateUrl(episode, playerSettings)
     adSdk = "&sdk=raf_vast"
   end if
 
-  appId = "&appId=" + settings.shortAppName
+  appId = "&appid=" + settings.shortAppName
   pubId = "&pubid=" + settings.pubId  'default pub id from settings
   contentType = "&content-type=hls"
   if playerSettings <> invalid
     if type(playerSettings.appId) = "String" or type(playerSettings.appId) = "roString"
-      appId = "&appId=" + playerSettings.appId
+      appId = "&appid=" + playerSettings.appId
     end if
 
     if type(playerSettings.pubId) = "String" or type(playerSettings.pubId) = "roString"

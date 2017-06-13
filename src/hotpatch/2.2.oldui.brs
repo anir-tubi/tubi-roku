@@ -37,21 +37,41 @@ m.app.player.ads.populateUrl = function(episode, playerSettings)
     adSdk = "&sdk=raf_vast"
   end if
 
-  appId = "&appId=" + settings.shortAppName
+  appId = "&appid=" + settings.shortAppName
   pubId = "&pubid=" + settings.pubId  'default pub id from settings
   contentType = "&content-type=hls"
   if playerSettings <> invalid
     if type(playerSettings.appId) = "String" or type(playerSettings.appId) = "roString"
-      appId = "&appId=" + playerSettings.appId
+      appId = "&appid=" + playerSettings.appId
+    else
+      'send debug log in the case that there is no appId on playerSettings
+      message = "No app id as string in the player settings"
+      message = m.addLogIdentifier(message, episode)
+      m.utils.log.warn(m.playerPort, "clientWarn", "missing-appId", message)
     end if
 
     if type(playerSettings.pubId) = "String" or type(playerSettings.pubId) = "roString"
       pubId = "&pubid=" + playerSettings.pubId
+    else
+      'send debug log in the case that there is no pubId on playerSettings
+      message = "No pub id as string in the player settings"
+      message = m.addLogIdentifier(message, episode)
+      m.utils.log.warn(m.playerPort, "clientWarn", "missing-pubId", message)
     end if
 
     if type(playerSettings.contentType) = "String" or type(playerSettings.contentType) = "roString"
       contentType = "&content-type=" + playerSettings.contentType
+    else
+      'send debug log in the case that there is no contentType on playerSettings
+      message = "No content type as string in the player settings"
+      message = m.addLogIdentifier(message, episode)
+      m.utils.log.warn(m.playerPort, "clientWarn", "missing-contentType", message)
     end if
+  else
+    'send debug log in the case that there is no player settings
+    message = "No player settings in oldUI ads.populateUrl()"
+    message = m.addLogIdentifier(message, episode)
+    m.utils.log.warn(m.playerPort, "clientWarn", "missing-playerSettings", message)
   end if
 
   cid = ""
@@ -59,11 +79,26 @@ m.app.player.ads.populateUrl = function(episode, playerSettings)
   if episode <> invalid
     if type(episode.id) = "String" or type(episode.id) = "roString"
       cid = "&cid=" + episode.id
+    else
+      'send debug log in the case that there is no id on episode
+      message = "No id as string on the video"
+      message = m.addLogIdentifier(message, episode)
+      m.utils.log.warn(m.playerPort, "clientWarn", "missing-cid", message)
     end if
 
     if type(episode.nowPos) = "roFloat" or type(episode.nowPos) = "roInteger"
       nowPos = "&nowpos=" + Int(episode.nowPos).ToStr()
+    else
+      'send debug log in the case that the episode wasn't sent to ads
+      message = "No nowPos as float or integer on the video"
+      message = m.addLogIdentifier(message, episode)
+      m.utils.log.warn(m.playerPort, "clientWarn", "missing-nowPos", message)
     end if
+  else
+    'send debug log in the case that the episode wasn't sent to ads
+    message = "No video sent to ads.populateUrl()"
+    message = m.addLogIdentifier(message, episode)
+    m.utils.log.warn(m.playerPort, "clientWarn", "missing-video", message)
   end if
 
   'create the url to be used for ad calls'
@@ -73,6 +108,21 @@ m.app.player.ads.populateUrl = function(episode, playerSettings)
 end function
 
 
+m.app.player.ads.addLogIdentifier = Function(message, episode)
+  if episode <> invalid
+    if type(episode.id) = "String" or type(episode.id) = "roString"
+      message = message + " for video with id = " + episode.id
+    else if episode.title <> invalid and episode.title.len() > 0
+      message = message + " for video with title = " + episode.title
+    else if episode.description <> invalid and episode.description.len() > 0
+      message = message + " for video with description = " + episode.description
+    end if
+  else
+    message = message + " and no video info was sent to ad player."
+  end if
+
+  return message
+End Function
 
 
 
