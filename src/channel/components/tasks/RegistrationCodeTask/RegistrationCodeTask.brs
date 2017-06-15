@@ -99,7 +99,6 @@ Function registrationLoop() As Void
                 m.top.response = parsed  ' status may be "pending" or "registered"
                 m.global.trackingLoggingTask.trackEvent = {
                   trackType: "registerSuccess"
-                  value: true
                 }  
                 return  ' end the thread
               else
