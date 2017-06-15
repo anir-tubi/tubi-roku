@@ -34,7 +34,7 @@
         translation="[0,0]" />
 
       <Group
-       id="ScreenStack"/>
+       id="SignInScreenStack"/>
     </children>
 
 </component>

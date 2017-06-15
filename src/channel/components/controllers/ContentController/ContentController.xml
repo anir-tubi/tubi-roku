@@ -46,7 +46,7 @@
     <field id="playerInfo" type="assocarray" alwaysNotify="true" />
 
     <!-- Interface for receiving Live TV content from the main Brightscript thread -->
-    <field id="onNowContent" type="node" />
+    <field id="onNowContent" type="node" alwaysNotify="true"/>
     
     <field id="contentRefreshBeforePlay" type="assocarray"/>
 
@@ -80,7 +80,7 @@
         id="AuthTask" />
       
       <Group
-       id="ScreenStack"/>
+       id="ContentScreenStack"/>
       
       <Timer
        id="AutohideTimer"/>

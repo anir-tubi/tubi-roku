@@ -3,6 +3,7 @@ Function init()
   tubiLog("Init Scenegraph----------------")
   'first things first, observe the live tv content field which comes from the main thread
   m.top.observeField("onNowContent", "onOnNowContent")
+  m.onNowReceived = false
 
 
   ' save a global reference to the fetch task for nodes to access
@@ -40,12 +41,13 @@ Function init()
   m.authTask.control = "RUN"
 
   m.top.observeField("deepLinkContent", "onDeepLinkContentReceived")
+  m.deepLinkEvaluated = false
   m.top.observeField("playerInfo", "onPlayerInfo")
 
   m.logOutTask = m.top.findNode("LogOutTask")
 
   m.enteredFromDeepLink = false 'used to determine back button behavior in screen stack
-  m.ScreenStack = m.top.findNode("ScreenStack")
+  m.ScreenStack = m.top.findNode("ContentScreenStack")
   initScreenStack(m.ScreenStack, startOnNow)
 
   m.videoPlayer = m.top.findNode("VideoPlayer")
@@ -110,6 +112,7 @@ End Function
 ' Only once we have a metadata task ready AND the user's login status
 ' will we launch the UI
 Function onTrackingLoggingReady()
+  tubiLog("ContentController.onTrackingLoggingReady")
   if m.trackingLoggingTask.ready = true
     m.trackingLoggingTask.unobserveField("ready")
     
@@ -129,13 +132,16 @@ End Function
 ' will we launch the UI
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
-  if m.metadataFetchTask.ready and m.authInfoReceived and m.trackingLoggingTask.ready then
+  if m.metadataFetchTask.ready and m.authInfoReceived and m.trackingLoggingTask.ready and m.onNowReceived and m.deepLinkEvaluated then
     if m.top.deepLinkContent <> invalid then
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
       ' whether we were logged in or not.
-      onDeepLinkContentReceived()
-      m.top.deepLinkContent = invalid  ' reset it so when we come back through here on state change, we don't follow deep links again
+      testLog("Deep link contentId = " + m.top.deepLinkContent.id)
+      testLog("Deep link type = " + m.top.deepLinkContent.type)
+      m.enteredFromDeepLink = true
+      showDetailScreen(m.top.deepLinkContent)
+
     else if m.authTask.authInfo = invalid then
       startSignIn()
     else if m.top.onNowContent <> invalid
@@ -181,6 +187,7 @@ End Function
 Function onOnNowContent()
   tubiLog("ContentController.onOnNowContent")
   m.top.unobserveField("onNowContent")
+  m.onNowReceived = true
   startUserExperience()
 End Function
 
@@ -673,13 +680,8 @@ End Function
 ' Show the detail screen for the content id that was deeplinked to
 Function onDeepLinkContentReceived()
   tubiLog("onDeepLinkContentReceived")
-  if m.metadataFetchTask.ready and m.authInfoReceived and m.top.deepLinkContent <> invalid then
-    'TODO(Chris): Supplement this content with history & queue status once we have it
-    testLog("Deep link contentId = " + m.top.deepLinkContent.id)
-    testLog("Deep link type = " + m.top.deepLinkContent.type)
-    m.enteredFromDeepLink = true
-    showDetailScreen(m.top.deepLinkContent)
-  end if
+  m.deepLinkEvaluated = true
+  startUserExperience()
 End Function
 
 

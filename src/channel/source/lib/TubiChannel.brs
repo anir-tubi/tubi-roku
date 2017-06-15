@@ -187,6 +187,7 @@ Function tubiChannel_deepLink(args, controller, tracking)
     trackData = tracking.getTrackData("deeplink", invalid, trackingUri, extraCtx)
     trackReq = tracking.getUserTrackingRequest(trackData)
     trackReq.runSynchronous(1)
-
+  else
+    controller.deepLinkContent = invalid
   end if
 End Function
