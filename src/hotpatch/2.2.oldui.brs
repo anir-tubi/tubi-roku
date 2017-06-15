@@ -1,5 +1,9 @@
 print "Hot Patch 2.2.oldui"
 
+
+' Disallow SMS for activation
+m.app.registerScreen.allowSMS = false
+
 'add protection to the url generating function in order to fix crashes as seen in roku's crash repoport UI
 m.app.player.ads.populateUrl = function(episode, playerSettings)
   settings = m.utils.getSettings()
@@ -201,32 +205,50 @@ m.app.registerScreen.show = function(regWall = "")
             return true
           else if (index = 6) ' ok button on remote
             if(m.col = 0) 'selected OK button on screen
-              loadingImage = {
-                Url: "pkg:/images/oldUI/" + m.res + "/bg_entry.jpg"
-                TargetRect: m.getRect("bg", 0)
-                compositionMode: "Source"
-              }
-              layers = [loadingImage]
-              m.canvas.SetLayer(0, layers)
-              m.isInitialScreen = false
-              m.row = 1
-              m.col = 1
-              m.pressedItem = invalid
+              if m.allowSMS <> invalid and m.allowSMS = false
+                m.utils.trackEvent({
+                  trackType: "navigate"
+                  value: "/deviceregistration/code"
+                  ctx: "/deviceregistration/"
+                  port: port
+                })
 
-              m.utils.trackEvent({
-                trackType: "navigate"
-                value: "/deviceregistration/sms"
-                ctx: "/deviceregistration/"
-                port: port
-              })
+                sleep(300) 'pause just for a tiny bit to show the button turn color
+                isRegistered = m.webRegister()
 
-              m.utils.trackEvent({
-                trackType: "pageLoad"
-                value: "/deviceregistration/sms"
-                port: port
-              })
-              
-              m.paint()
+                print "shutting web register screen and isRegistered = "; isRegistered
+                if isRegistered = true
+                  m.isComplete = true
+                  m.canvas.close()
+                end if
+              else
+                loadingImage = {
+                  Url: "pkg:/images/oldUI/" + m.res + "/bg_entry.jpg"
+                  TargetRect: m.getRect("bg", 0)
+                  compositionMode: "Source"
+                }
+                layers = [loadingImage]
+                m.canvas.SetLayer(0, layers)
+                m.isInitialScreen = false
+                m.row = 1
+                m.col = 1
+                m.pressedItem = invalid
+
+                m.utils.trackEvent({
+                  trackType: "navigate"
+                  value: "/deviceregistration/sms"
+                  ctx: "/deviceregistration/"
+                  port: port
+                })
+
+                m.utils.trackEvent({
+                  trackType: "pageLoad"
+                  value: "/deviceregistration/sms"
+                  port: port
+                })
+
+                m.paint()
+              end if
             else 'selected No Thanks button
               m.canvas.close()
               m.canvas = invalid
@@ -341,3 +363,4 @@ m.app.registerScreen.show = function(regWall = "")
   m.canvas = invalid
   return true
 end function
+
