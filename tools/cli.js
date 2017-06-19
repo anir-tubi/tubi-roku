@@ -71,7 +71,7 @@ program
   .command('get-build-tag')
   .description('dump a git-friendly version number to use as a tag')
   .action(() => {
-    config.getBuildTag()
+    config.getBuildTagExternal()
   });
 
 program

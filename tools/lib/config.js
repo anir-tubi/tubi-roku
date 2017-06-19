@@ -14,19 +14,46 @@ bluebird.promisifyAll(fs);
 /**
  * Parse a yml file, inserting special values. If it does not exist, return {}.
  * @param profile: ['default', 'dev', 'staging', 'production']
+ * @param withReplace: boolean, dictates if replacing functionality will be performed
  * @returns {*}
  */
-function parse(profile) {
+function parse(profile, withReplace) {
   const filename = path.join(cwd, profile + '.yml');
   if (!fs.existsSync(filename)) return {};
   const raw = fs.readFileSync(filename, { encoding: 'utf8' });
 
-  /* URI-TO-REPLACE is the localhost server of dynamic components zip */
-  let remoteComponentDir = localIp + ':8090';
-  rendered = raw.replace(/<<URI-TO-REPLACE>>/g, remoteComponentDir);
+  if (withReplace){
+    /* URI-TO-REPLACE is the localhost server of dynamic components zip */
+    const remoteComponentDir = localIp + ':8090';
+    let rendered = raw.replace(/<<URI-TO-REPLACE>>/g, remoteComponentDir);
+
+    const version = getBuildTag();
+    rendered = rendered.replace(/<<VER-TO-REPLACE>>/g, version);
+    return yaml.load(rendered);
+  }
   
-  return yaml.load(rendered);
+  return yaml.load(raw);
 }
+
+
+/**
+ * A simple function that returns the version number as defined in build.yml
+ * @returns string (ex. '2_1_3')
+ */
+function getBuildTag() {
+  var build = parse(buildProfile, false);
+  return `${build.manifest.major_version}_${build.manifest.minor_version}_${build.manifest.build_version}`;
+}
+
+
+/**
+ * Prints the version number as defined in build.yml
+ * @returns string (ex. '2_1_3')
+ */
+function getBuildTagExternal() {
+  console.log(getBuildTag());
+}
+
 
 /**
  * A simple stringify function to generate equivalent brs value
@@ -41,6 +68,7 @@ function stringify(value) {
     default: return JSON.stringify(value);
   }
 }
+
 
 /**
  * generate a brs function for a configuration section
@@ -71,9 +99,9 @@ function genConfigFunction(name, data) {
  * @returns {*}
  */
 function load(env) {
-  var data = parse(defaultProfile);
-  var envData = parse(env);
-  var build = parse(buildProfile);
+  var data = parse(defaultProfile, true);
+  var envData = parse(env, true);
+  var build = parse(buildProfile, true);
   return extend(true, data, envData, build);
 }
 
@@ -131,27 +159,25 @@ function genManifest(env, filename, manifestName) {
 }
 
 function incrementBuildNumber() {
-  var build = parse(buildProfile);
+  let build = parse(buildProfile, true);
+
   build.manifest.build_version = build.manifest.build_version + 1
   build.component_library_manifest.build_version = build.manifest.build_version
-  const filename = path.join(cwd, buildProfile + '.yml');
-  fs.openAsync(filename, 'w').then(fd => {
+  const buildPath = path.join(cwd, buildProfile + '.yml');
+
+  fs.openAsync(buildPath, 'w').then(fd => {
     const data = yaml.dump(build);
     return fs.writeAsync(fd, data);
   }).then(() => {
     console.log('Incremented the build number to %d.%d.%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version);
   }).catch(err => {
     console.log(err);
-  })
+  });
 }
 
-function getBuildTag() {
-  var build = parse(buildProfile);
-  console.log('%d_%d_%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version);
-}
 
 exports.load = load;
 exports.save = save;
 exports.genManifest = genManifest;
 exports.incrementBuildNumber = incrementBuildNumber;
-exports.getBuildTag = getBuildTag;
+exports.getBuildTagExternal = getBuildTagExternal;

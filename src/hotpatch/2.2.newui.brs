@@ -1,4 +1,9 @@
-print "Hot Patch 2.2.newui"
+print "Hot Patch 2.2.newui dev"
+
+'settings.version must be updated manually in the new ui hotpatch file
+'when a new remote components version is released
+m.global.utils.constants.settings.version = "2_2_13"
+
 
 m.global.utils.constants.settings.allowAfterHours = true
 
@@ -11,12 +16,9 @@ if m.global.utils.constants.externalConfig.info.remote_components = 1
   m.global.utils.constants.deviceInfo.clientVersion = m.global.utils.constants.deviceInfo.clientVersion.Replace("local", "remote")
 end if
 
-'determine the appropriate remote components to use if server remote config says to allow On Now
-print "hotpatch roku_onnow config = "; m.global.utils.constants.externalConfig.info.roku_onnow
-
 ' Set the most current remote components URL.  These should only increment build number.  Minor or major version number differences indicate
 ' incompatible architectural changes.
-m.global.utils.constants.settings.remoteComponentsUrl = "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_2_2_13.pkg"
+m.global.utils.constants.settings.remoteComponentsUrl = "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_" + m.global.utils.constants.settings.version + ".pkg"
 
 ' Patch the deep link to set controller.deepLinkContent field even if there is no deep link
 m.global.channel.deepLink = Function(args, controller, tracking)

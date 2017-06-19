@@ -335,7 +335,8 @@ Function onAboutSelected()
   tubiLog("ContentController.onAboutSelected")
   m.aboutScreen = CreateObject("roSGNode", "ModalDialogScreen")
   m.aboutScreen.title = "About Tubi TV"
-  message = "(C) 2016 Tubi TV" + Chr(10) ' + Chr(13)
+  message = "v" + m.global.constants.settings.version + Chr(10)
+  message = message + Chr(169) + " 2017 Tubi TV" + Chr(10) ' + Chr(13)
   message = message + "All rights reserved." + Chr(10) '+ Chr(13)
   message = message + "Tubi TV related marks are trademarks of Tubi TV, an adRise Company."
   m.aboutScreen.message = message
