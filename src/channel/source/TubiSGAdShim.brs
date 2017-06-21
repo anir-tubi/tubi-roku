@@ -139,7 +139,7 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
     for each cuepoint in m.ads.midrolls
       ' We'll give an allowance of 15 seconds here.  I don't expect any cuepoints to be
       ' within 15 seconds of each other so this should be safe
-      if Abs(position - cuepoint) < 15 then
+      if Abs(position - cuepoint) < 20 then
         normalizedPosition = cuepoint
         exit for
       end if

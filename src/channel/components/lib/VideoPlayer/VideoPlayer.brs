@@ -68,6 +68,8 @@ Function init()
   m.VideoPicker = m.top.findNode("VideoPicker")
   m.VideoPicker.observeField("contentFocused", "onVideoPickerFocused")
   m.VideoPicker.observeField("contentSelected", "onVideoPickerSelected")
+  m.AdHeadsUp = m.top.findNode("AdHeadsUp")
+  m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
 
   'm.VideoState is source of truth for the state of the video player for the UI
   'possible values are "play", "pause", "rew", "ffw", "stop", "refresh"
@@ -106,7 +108,8 @@ Function init()
 
   m.lastPingTime = 0
   m.lastSavedPosition = 0
-  m.adPrefetchTime = 5
+  m.adPrefetchTime = 15
+  m.adHeadsUpTime = 10
 
   m.analyticsInterval = m.global.constants.player.pingFrequency
   m.historyInterval = m.global.constants.player.historyFrequency
@@ -156,6 +159,7 @@ End Function
 Function onContentChange() As Void
   tubiLog("VideoPlayer.onContentChange")
   cancelReplayCaptions()
+  m.AdHeadsUp.visible = false
   if m.top.content = invalid then return
 
   'there are no subtitles so grey out the captions button
@@ -324,11 +328,17 @@ Function onVideoPositionChange()
 
   'Advertisements
   if m.top.enableAds and m.top.midrolls <> invalid and m.top.midrolls.count() > 0 then
+    m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
     for each cuepoint in m.top.midrolls
 
       if m.playerPosition = (cuepoint - m.adPrefetchTime)
         m.top.adPosition = m.playerPosition
         m.top.adControl = "midroll"
+      end if
+
+      if m.playerPosition >= (cuepoint - m.adHeadsUpTime)and m.playerPosition < cuepoint and m.top.adState = "adspending"
+        m.AdHeadsUp.visible = true
+        m.AdHeadsUpText.text = " " + Chr(&hb7) + " Starts in " + stri(cuepoint - m.playerPosition).trim() + " s"
       end if
 
       ' Fire up the midroll

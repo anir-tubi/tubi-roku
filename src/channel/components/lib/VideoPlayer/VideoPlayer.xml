@@ -105,6 +105,69 @@
       height="1080"/>
 
     <Group
+      id="AdHeadsUp"
+      visible="false"
+      opacity="1.0">
+      <Poster
+        id="AdHeadsUpGradient"
+        loadWidth="1920"
+        width="1920"
+        loadHidth="317"
+        height="317"
+        translation="[0,0]"
+        uri="pkg:/images/ads-countdown-gradient.png"/>
+      <Poster
+        id="AdHeadsUpCircle"
+        loadWidth="66"
+        width="66"
+        loadHeight="66"
+        height="66"
+        translation="[85,71]"
+        uri="pkg:/images/circle.png"
+        opacity="0.4">
+      </Poster>
+      <Label
+        translation="[87,74]"
+        width="66"
+        height="66"
+        horizAlign="center"
+        vertAlign="center"
+        text="AD">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="27"/>
+      </Label>
+      <LayoutGroup
+        translation="[131,72]"
+        layoutDirection="horiz">
+        <Label
+          height="66"
+          vertAlign="center"
+          color="0xFF9933FF"
+          text="   break">
+          <Font
+            id="Vaud34px"
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="34"/>
+        </Label>
+        <Label
+          id="AdHeadsUpText"
+          height="66"
+          vertAlign="center"
+          translation="[131,72]"
+          text="">
+          <Font
+            id="Vaud34px"
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="34"/>
+        </Label>
+      </LayoutGroup>
+    </Group>
+
+    <Group
       id="VideoOverlay"
       opacity="0.0">
       <Poster
