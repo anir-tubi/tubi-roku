@@ -8,7 +8,7 @@ m.app.registerScreen.allowSMS = false
 m.app.player.ads.populateUrl = function(episode, playerSettings)
   settings = m.utils.getSettings()
 
-  deviceId = "&deviceId=" + m.utils.deviceInfo.deviceId
+  deviceId = "&deviceid=" + m.utils.deviceInfo.deviceId
   model = "&model=" + m.utils.deviceInfo.model
 
   ' add Roku Advertiser Id (RIDA) to ad call url  

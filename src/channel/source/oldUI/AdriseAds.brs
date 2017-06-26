@@ -143,7 +143,7 @@ end function
 function adriseAds_populateUrl(episode, playerSettings)
   settings = m.utils.getSettings()
 
-  deviceId = "&deviceId=" + m.utils.deviceInfo.deviceId
+  deviceId = "&deviceid=" + m.utils.deviceInfo.deviceId
   model = "&model=" + m.utils.deviceInfo.model
 
   ' add Roku Advertiser Id (RIDA) to ad call url  
