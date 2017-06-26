@@ -6,6 +6,8 @@ m.global.utils.constants.settings.version = "2_2_13"
 
 
 m.global.utils.constants.settings.allowAfterHours = true
+m.global.utils.constants.ui.signIn.skipContinueScreen = true
+
 
 ' m.global.utils.constants.idsToLog = {
 '   "YY00G1976937": true

@@ -10,7 +10,7 @@ Function execSignIn() As Void
   Auth = TubiAuth(constants, Request)
 
   ' Get Registration code
-  url = constants.urls.users.urlBase + "/login"
+  url = constants.urls.users.login
   params = {
     type: "email"
     platform: constants.platform  

@@ -6,6 +6,7 @@ Function init()
   m.Disambiguation.observeField("guestPassButtonSelected", "onDisambiguationGuestPass")
   m.Background = m.top.findNode("SignInBackground")
   m.Background.color = m.global.constants.ui.colors.backgroundColor
+  m.skipContinueScreen = m.global.constants.ui.signIn.skipContinueScreen
 
   initScreenStack(m.top.findNode("SignInScreenStack"), invalid, false)
   pushScreen(m.Disambiguation)
@@ -41,11 +42,14 @@ End Function
 ' 
 ' User chose a guest pass, prompt them once more with a feature list
 Function onDisambiguationGuestPass()
-  tubiLog("SignInController.onDisambiguationGuestPass")
-  m.ContinueAsGuest = CreateObject("roSGNode", "ContinueAsGuestScreen")
-  m.ContinueAsGuest.observeField("signInButtonSelected", "onContinueSignIn")
-  m.ContinueAsGuest.observeField("guestPassButtonSelected", "onContinueGuestPass")
-  pushScreen(m.ContinueAsGuest)
+  if m.skipContinueScreen = true
+    m.top.guestPass = true
+  else
+    m.ContinueAsGuest = CreateObject("roSGNode", "ContinueAsGuestScreen")
+    m.ContinueAsGuest.observeField("signInButtonSelected", "onContinueSignIn")
+    m.ContinueAsGuest.observeField("guestPassButtonSelected", "onContinueGuestPass")
+    pushScreen(m.ContinueAsGuest)
+  end if
 End Function
 
 

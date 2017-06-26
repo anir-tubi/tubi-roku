@@ -189,6 +189,7 @@ Function getConstants()
     'users url
     constants.urls.users = {}
       constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
+      constants.urls.users.login = constants.urls.users.urlBase + "/login"
       constants.urls.users.refreshToken = constants.urls.users.urlBase + "/login/refresh"
       constants.urls.users.migrateLogin = constants.urls.users.urlBase + "/login/migrate"
       constants.urls.users.queues = constants.urls.users.urlBase + "/queues"
@@ -352,6 +353,9 @@ Function getConstants()
 
   'UI properties that should be passed into the scene graph
   constants.ui = {}
+    'constants needed for sign in flow experimentation
+    constants.ui.signIn = {}
+    constants.ui.signIn.skipContinueScreen = false
 
     'static - pre defined category names
     constants.ui.categoryNames = {}
@@ -391,13 +395,6 @@ Function getConstants()
       constants.ui.options.removeQueue = "removeQueue"
       constants.ui.options.addQueue = "addQueue"
       constants.ui.options.removeHistory = "removeHistory"
-
-    'allowed options for stateNode.rebuild
-    constants.ui.rebuilds = {}
-      constants.ui.rebuilds.clear = ""
-      constants.ui.rebuilds.season = "season"
-      constants.ui.rebuilds.episode = "episode"
-      constants.ui.rebuilds.closePlayer = "closePlayer"
 
     'screen ids in the UI
     constants.ui.screenIds = {}
