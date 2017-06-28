@@ -106,10 +106,12 @@ You can set `DEV_PASSWORD` with the developer password set on the roku device if
 - For every submission cycle to Roku:
   - Bump the minor version number, e.g.
   - Reset the build number to 1
-  - Set the hotpatchUrl in settings to `http://.../<major>.<minor>.newUI.brs`
-  - Set the hotPatchUrlOldUI in settings to `http://.../<major>.<minor>.oldUI.brs`
+  - Update default.yml and staging.yml
+	  - Set the hotpatchUrl to `http://.../<major>.<minor>.newUI.brs`
+	  - Set the hotPatchUrlOldUI to `http://.../<major>.<minor>.oldUI.brs`
   - Merge contents of n-1 hotpatches to source base
   - Create new empty hotpatch files
+  - Update staging.yml
 - For every bugfix update, either via internal QA or Roku QA:
   - Bump the build number in build.yml by running `make release`
   - make the build with ROKU_PROFILE=production (`make release` does this)
@@ -129,7 +131,7 @@ You can set `DEV_PASSWORD` with the developer password set on the roku device if
 - git tag the release
 - Push tags to repo
 - Create github release for the tag
-
+- Publish staging build to private channel
 
 ### Roku Submission
 
