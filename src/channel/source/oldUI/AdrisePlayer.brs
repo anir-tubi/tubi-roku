@@ -444,7 +444,11 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
       'log an error if the video fails to play
       if msg.isRequestFailed()
 
-        errorMsg = "video with id: " + episode.id + " failed. Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
+        if episode <> invalid and episode.id <> invalid
+          errorMsg = "video with id: " + episode.id + " failed. Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
+        else
+          errorMsg = "video has no id and likely no video url. Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
+        end if
         m.utils.log.error(m.playerPort, "videoPlayback", "video-fail", errorMsg)
 
         m.canvas.close()

@@ -390,6 +390,15 @@ Function AdriseApp_handleItemPicked(playlist, listIndex, itemIndex, source)
     linearPlaylist = m.linearTv.getLinearPlaylist()
     m.cp.getAllEpisodesForPlaylistFromServer(linearPlaylist, "gridscreen")
 
+    'remove any content that might be out of window
+    validEpisodes = []
+    for each episode in linearPlaylist.episodes
+      if episode.id <> invalid and episode.streams <> invalid and episode.streams[0] <> invalid
+        validEpisodes.push(episode)
+      end if
+    end for
+    linearPlaylist.episodes = validEpisodes
+
     'determine correct episode and correct start time
     initialEpisodeInfo = m.linearTv.getCurrentEpisode(linearPlaylist)
 

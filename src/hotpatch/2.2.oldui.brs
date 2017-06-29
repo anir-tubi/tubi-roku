@@ -364,3 +364,848 @@ m.app.registerScreen.show = function(regWall = "")
   return true
 end function
 
+
+'fix live tv in the case where some videos are out of window
+m.app.handleItemPicked = Function(playlist, listIndex, itemIndex, source)
+  settings = m.utils.getSettings()
+  episode = m.cp.getEpisodeInPlaylist(playlist, itemIndex)
+
+  if episode.type = "tubiLogin" or episode.type = "bookmarks"
+    authInfo = m.utils.getAuthInfo()
+    if (authInfo.accessToken = invalid)
+      'user wants to log in
+      
+      m.utils.trackEvent({
+        trackType: "navigate"
+        value: "/deviceregistration"
+        ctx: "/home/cat/" + m.utils.sluggify(playlist.name)
+        port: m.registerScreen.registerPort
+      })
+
+      m.registerScreen.show()
+
+      'if the user has successfully logged in, lets see if we need to do a one time sync
+      authInfo = m.utils.getAuthInfo()
+      if authInfo.accessToken <> invalid
+        m.utils.oneTimeBookmarkSync()
+        m.utils.oneTimePreviouslyViewedSync()
+        'since we are removing the bookmarks button, we need to reset the itemIndex
+        itemIndex = 0
+      end if
+
+    'bookmarks button is only shown if the user is logged out already
+    'so this else block should never run if bookmarks is selected
+    else
+      'user wants to log out - send logout to server - listen for response - if ok, delete auth info locally
+      logoutPort = CreateObject("roMessagePort")
+      logoutUrl = m.settings.logoutUrl
+      logoutBody = {
+        user_id: authInfo.userId
+        device_id: m.utils.deviceInfo.deviceId
+        platform: "roku"
+      }
+      logoutBodyJson = FormatJson(logoutBody)
+      logoutHeaders = m.utils.getAuthHeaders(authInfo.refreshToken)
+      logoutReqId = m.utils.sendAsyncRequest(logoutUrl, logoutPort, "logout", "POST", true, logoutBodyJson, logoutHeaders)
+
+      while true
+        msg = wait(0, logoutPort)
+        if type(msg) = "roUrlEvent"
+          logoutRes = m.utils.getAsyncResponse(msg, 0)
+          print logoutRes
+          if logoutRes <> invalid and logoutRes.data <> invalid and logoutRes.data.len() = 0
+            'remove local storage of auth tokens
+            m.utils.deleteAuthInfo()
+            
+            'remove local bookmarks and previously viewed info - so that we won't build those categories after logout
+            m.cp.bookmarkIds = []
+            m.cp.previouslyViewedIds = []
+
+            m.cp.userPlaylists[settings.bookmarkRegistry].episodes = []
+            m.cp.userPlaylists[settings.previouslyViewedRegistry].episodes = []
+
+            m.cp.userPlaylistVideos = {}
+            m.cp.userPlaylistSeries = {}
+
+            'set state so we know if we need to add the user playlists rows if the user logs back in
+            m.gridScreen.isShownAfterLogin = false
+
+            exit while
+          end if
+        end if
+      end while
+    end if
+  else if episode.type = "vezo"
+    m.serverLink.connectToAccount(true)
+    if(m.player.subscription)
+      m.utils.showErrorMessage (m.utils.getSettings().adrise_bg, m.utils.getSettings().adrise_fontcolor, m.utils.getSettings().adrise_loadingurl, "You are subscribed to " + m.utils.getSettings().appName)
+    end if
+  else if episode.type = "search" 'load a search screen
+    
+    m.utils.trackEvent({
+      trackType: "navigate"
+      value: "/search"
+      ctx: "/home/cat/" + m.utils.sluggify(playlist.name)
+      port: m.searchScreen.searchPort
+    })  
+    
+    m.searchScreen.show()
+  else if episode.type = "linear" 'play linear tv
+    'get episode content for linear episodes
+    linearPlaylist = m.linearTv.getLinearPlaylist()
+    m.cp.getAllEpisodesForPlaylistFromServer(linearPlaylist, "gridscreen")
+
+    'remove any content that might be out of window
+    validEpisodes = []
+    for each episode in linearPlaylist.episodes
+      if episode.id <> invalid and episode.streams <> invalid and episode.streams[0] <> invalid
+        validEpisodes.push(episode)
+      end if
+    end for
+    linearPlaylist.episodes = validEpisodes
+
+    'determine correct episode and correct start time
+    initialEpisodeInfo = m.linearTv.getCurrentEpisode(linearPlaylist)
+
+    'make sure we have episodes to play
+    if initialEpisodeInfo.initialEpisodeIndex <> invalid
+      episodeCounter = initialEpisodeInfo.initialEpisodeIndex
+      startTime = initialEpisodeInfo.startTime
+      linearPlaylist.episodes[episodeCounter].playStart = startTime  'sets start time of first episode to play
+
+      'set linearTvOn status to true
+      m.linearTv.linearTvOn = true
+
+      'play video
+      maxIndex = m.cp.getPlaylistLength(linearPlaylist) - 1
+
+      'tell the player to treat this first video (only) as one that is being resumed (ie. not starting from very beginning)
+      linearPlaylist.episodes[episodeCounter].isResumed = true
+      
+      while true
+        ret = m.player.playVideo(linearPlaylist.episodes[episodeCounter])
+
+        'play next video in linear tv cue
+        if ret <> "CLOSED"
+          if episodeCounter < maxIndex
+            episodeCounter = episodeCounter + 1
+          else if episodeCounter = maxIndex
+            episodeCounter = 0
+          else
+            exit while
+          end if
+
+          newEpisode = m.cp.getEpisodeInPlaylist(playlist, episodeCounter)
+          if newEpisode <> invalid
+            episode = newEpisode
+            episode.PlayStart = 0
+          end if
+        else
+          'set linearTvOn status to false and leave linear tv
+          m.linearTv.linearTvOn = false
+          exit while
+        end if
+      end while
+    else
+      'Add some messaging so the user knows there is no Live TV content for them.
+    end if
+
+  else if episode.type = "policy"
+    m.policyScreen.show()
+
+  else if episode.type = "video"   'episode is a movie
+    ' does this app have you go through a details screen?
+    if m.utils.getSettings().show_details_screen
+      context = "/home/" + (listIndex + 1).toStr() + "/cat/" + m.utils.sluggify(playlist.name) + "/1/" + (itemIndex + 1).toStr()
+      if source = "episodeListScreen"
+        context = "/series/episodelist"
+        if episode.parentId <> invalid
+          context = context + "/" + episode.parentId
+        end if
+      end if
+      m.utils.trackEvent({
+        trackType: "navigate"
+        value: "/video/" + episode.id
+        ctx: context
+        port: m.detailScreen.detailsPort
+      })
+
+      itemIndex = m.detailScreen.show(episode, playlist, itemIndex)
+    else
+      while episode <> invalid
+        episode.PlayStart = 0
+        if m.player.playVideo(episode) = "CLOSED"
+          exit while
+        end if
+        episode = m.cp.getEpisodeInPlaylist(playlist, itemIndex+1)
+        if episode <> invalid
+          itemIndex = itemIndex + 1
+        end if
+      end while
+    end if
+
+  else   'episode is a series
+    if episode.playlist <> invalid
+      if (m.cp.autoplayData = invalid)
+
+        m.utils.trackEvent({
+          trackType: "navigate"
+          value: "/series/episodelist/" + episode.id
+          ctx: "/home/" + (listIndex + 1).toStr() + "/cat/" + m.utils.sluggify(playlist.name) + "/1/" + (itemIndex + 1).toStr()
+          port: m.episodeListScreen.episodePort
+        })      
+      
+        m.episodeListScreen.show(episode)
+
+      else if m.cp.autoplayIsSeries = true
+        'm.cp.autoplayIsSeries = true if deeplinking occurred with the mediaType="series" parameter
+        m.episodeListScreen.autoPlay(episode, m.cp.autoplayData.path[2], m.cp.autoplayData.path[3], m.cp.autoplayIsSeries)
+      else
+        'm.cp.autoplayIsSeason = true if deeplinking occurred with the mediaType="season" parameter
+        m.episodeListScreen.autoPlay(episode, m.cp.autoplayData.path[2], m.cp.autoplayData.path[3], m.cp.autoplayIsSeason)
+      end if
+    end if
+  end if
+  return itemIndex
+end Function
+
+
+
+m.app.player.showSpanOfContentVideoNew = Function(episode As Object)
+  if type(episode) <> "roAssociativeArray"
+    print "invalid data passed to showVideoScreen"
+    return "COMPLETED"
+  end if
+
+  m.canvas = CreateObject("roImageCanvas")
+  player = CreateObject("roVideoPlayer")
+
+  m.canvas.SetMessagePort(m.playerPort)
+  player.SetMessagePort(m.playerPort)
+
+  'put the canvas on the screen - the canvas is the container for the player
+  m.canvas.show()
+
+  'set how often the player gives info on play progress (in seconds)
+  player.SetPositionNotificationPeriod(1)
+  
+  'add the video to the player
+  player.SetContentList([episode])
+
+  'set up the subtitles/captions renderer
+  captions = player.getCaptionRenderer()
+  captions.SetScreen(m.canvas)
+  captions.SetMode(1)
+  captions.SetMessagePort(m.playerPort)
+  
+
+  'show the subtitles if the episode says we should
+  deviceInfo = CreateObject("roDeviceInfo")
+  globalCaptions = deviceInfo.GetCaptionsMode()
+  if globalCaptions = "On"
+    captions.showSubtitle(true)
+  else
+    captions.showSubtitle(false)
+  end if
+
+  'object that will help us determine how long we've been scrubbing for
+  scrubTimer = CreateObject("roTimespan")
+  
+  'holds the state of the player
+  playerStates = {
+    loadProgress: 0
+    isTransportShowing: false
+    isPaused: false
+    isInHopMode: false
+    isScrubbing: false
+    nowPosAtScrub: 0
+    maxScrub: 7
+    scrubAmount: 0
+    scrubMultiplier: 0
+    totalScrubTime: 0
+    scrubToPoint: 0
+    scrubPercent: 0
+    nowPos: 0
+    replayEnd: 0
+    displayWidth: m.utils.deviceInfo.displayWidth
+    lastsavedPosition: episode.nowPos
+  }
+
+  'globally scoped function to do the necessary tasks related to start scrubbing
+  startScrub = function(player, scrubTimer, playerStates, episode)
+    playerStates.isTransportShowing = true
+    playerStates.isPaused = true
+    playerStates.isScrubbing = true
+    playerStates.scrubStartPos = playerStates.nowPos
+    player.pause()
+    scrubTimer.Mark() 'set the time we start scrubbing
+
+    m.app.utils.trackEvent({
+      trackType: "playProgress"
+      ctx: episode.id
+      value: playerStates.nowPos
+      extraCtx: {interval: playerStates.nowPos - m.app.player.lastPingTime}
+      port: m.app.player.playerPort
+    })
+  end function
+
+
+  'globally scoped function to do the necessary tasks related to end of scrubbing/re-start video
+  endScrub = function(player, playerStates, episode)
+    playerStates.scrubToPoint = playerStates.scrubStartPos + playerStates.totalScrubTime
+    
+    'prevents the user from rewinding past the beginning of the video or fast forwarding past the end of the video
+    if playerStates.scrubToPoint >= episode.length
+      playerStates.scrubToPoint = episode.length - 4
+    end if
+    if playerStates.scrubToPoint < 0
+      playerStates.scrubToPoint = 0
+    end if
+    playerStates.nowPos = Int(playerStates.scrubToPoint)
+    episode.nowPos = playerStates.nowPos
+    episode.playStart = playerStates.nowPos
+
+    m.app.player.shouldResetPing = true
+
+    m.app.utils.trackEvent({
+      trackType: "seek"
+      ctx: episode.id
+      value: playerStates.nowPos
+      port: m.playerPort
+    })
+    
+    'when resuming to play after ending fast forward, we need to ask the ad server if there are any ads
+    'getResumingPlayAds will store ads in either m.app.player.resumePlayAdsList or m.app.player.ads.allAdUnitsList
+    'depending on if RAF is off or on
+    if playerStates.isInHopMode = false
+      if playerStates.nowPos > playerStates.nowPosAtScrub
+        shouldBreak = m.app.player.ads.getResumingPlayAds(episode, m.app.player)
+        if shouldBreak = true
+          return true
+        end if
+      end if
+
+      player.Seek(playerStates.scrubToPoint * 1000)
+      playerStates.isTransportShowing = false
+      playerStates.isPaused = false
+      playerStates.nowPosAtScrub = 0
+    end if
+
+    playerStates.isScrubbing = false
+    playerStates.scrubAmount = 0
+    playerStates.totalScrubTime = 0
+    playerStates.scrubToPoint = 0
+
+    return false
+  end function  
+  'scrubbing amount can be from -3 to 3, not including 0 (-3 is max rewind, 3 is max fast forward)
+  'each strength needs a specific multiplier, of how fast we move through the video while scrubbing
+  'can be 2x, 4x, 6x
+
+  'start the playing of the video
+  player.play()
+
+  'instantiate progressPercent
+  progressPercent = 0
+
+  while true
+    'total scrub time is the number of ms we have moved forward or backwards since scrubbing began.
+    if playerStates.isTransportShowing = true
+
+      'scrubbing will always have the transport showing so this will always run if scrubbing
+      if playerStates.isScrubbing = true
+        playerStates.totalScrubTime = playerStates.totalScrubTime + scrubTimer.TotalMilliseconds() * playerStates.scrubMultiplier / 1000
+        playerStates.scrubToPoint = playerStates.scrubStartPos + playerStates.totalScrubTime
+
+        'prevents the time in the bottom left of the screen from going negative or going above length of video
+        if playerStates.scrubToPoint >= episode.length
+          playerStates.scrubToPoint = episode.length
+        end if
+        if playerStates.scrubToPoint < 0
+          playerStates.scrubToPoint = 0
+        end if
+
+        playerStates.nowPos = playerStates.scrubToPoint
+        scrubTimer.Mark()
+      end if
+      
+      'update the transport overlay with new time and progress on the bar
+      playerStates.scrubPercent = 1
+      if episode.length > 0
+        playerStates.scrubPercent = playerStates.nowPos / episode.length 'updates the transport bar percent filled
+      end if
+
+      m.paintToCanvas(progressPercent, playerStates, episode)
+    end if
+
+    msg = wait(200, m.playerPort)
+
+    if type(msg) = "roVideoPlayerEvent"
+      'log an error if the video fails to play
+      if msg.isRequestFailed()
+
+        if episode <> invalid and episode.id <> invalid
+          errorMsg = "video with id: " + episode.id + " failed. Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
+        else
+          errorMsg = "video has no id and likely no video url. Error Index " + msg.getIndex().toStr() +  " : " + msg.getMessage()
+        end if
+        m.utils.log.error(m.playerPort, "videoPlayback", "video-fail", errorMsg)
+
+        m.canvas.close()
+        return "FAILED"
+      end if
+
+      'log any re-buffers that user might encounter
+      if msg.isStreamStarted()
+        if msg.getInfo().isUnderrun = true
+          warningMsg = "Video with id: " + episode.id + " buffered mid stream. Segment Url: " + msg.getInfo().url + " Stream Bitrate: " + msg.getInfo().streamBitrate.toStr() + " Measured Bitrate: " + msg.getInfo().measuredBitrate.toStr()
+          m.utils.log.warn(m.playerPort, "videoBuffer", "video-rebuffer",  warningMsg)
+        end if
+      end if
+
+      'if event is that the video content has reached the end
+      if msg.isFullResult()
+        m.canvas.close()
+        return "COMPLETED"
+      end if
+
+      'if the player sends an event updating the position withing the movie (it should be set to fire every second)
+      'then store the position in the movie that the player has played to
+      if msg.isPlaybackPosition()
+        playerStates.nowPos = msg.GetIndex()
+
+        'when ending sync, the video restarts at the last 10 second interval. 
+        'the code below will reset our last ping time to be in line with the actual nowPos
+        if m.shouldResetPing = true
+          m.lastPingTime = playerStates.nowPos
+          m.shouldResetPing = false
+        end if
+
+        'if the nowPos has changed by more than 60 seconds since the last time we saved nowPos to memory, save again
+        'this should give the user a reasonably correct place to resume if they hit the home button or the app crashes
+        'otherwise we are saving the most recent position when ads play or they back out of the player
+        if msg.GetIndex() > playerStates.lastsavedPosition + 60 or msg.GetIndex() < playerStates.lastsavedPosition - 60
+          m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)          
+          playerStates.lastsavedPosition = playerStates.nowPos
+        end if
+
+        'checks if there is a commercial break about to occur (4 to 7 seconds before a cue point)
+        'if there is, caches an appropriate set of ads for the ad break depending on which framework is being used
+        'if a breakPos is returned, it means that we should play an ad that has previously been cached so we stop for commercial
+        breakPos = m.ads.checkForCommercialBreak(playerStates.nowPos, episode, m)
+        if breakPos <> -1
+          episode.nowPos = breakPos
+          episode.playStart = breakPos
+          list = m.ads.getCachedAdsList(episode)
+          if list <> invalid
+            'save the last position to memory
+            m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)
+
+            'tell the video player we are stopping and going to play a set of ads
+            m.canvas.close()
+            return "STOPFORCOMMERCIAL"
+          end if
+        end if
+
+        'sends a play progress tracking event if enough time has elapsed
+        if playerStates.nowPos >= m.lastPingTime + m.pingFrequency
+          playProgressEvent = {
+            trackType: "playProgress"
+            ctx: episode.id
+            value: playerStates.nowPos
+            port: m.playerPort
+          }
+
+          if m.linearTvOn = true
+            playProgressEvent.extraCtx = {
+              URI: "home/livetv/roku"
+            }
+          end if
+
+          m.utils.trackEvent(playProgressEvent)
+
+          m.lastPingTime = playerStates.nowPos
+        end if
+
+        'turns the captions off if instant replay captions have been activated and 30s has elapsed
+        if playerStates.replayEnd > 0 and playerStates.nowPos > playerStates.replayEnd
+          m.cancelInstantReplay(playerStates, captions)
+        end if
+      end if
+
+      'show a loading screen while the video buffers
+      if msg.isStatusMessage() and msg.GetMessage() = "startup progress"
+        playerStates.isPaused = false
+        progressPercent = msg.GetIndex() / 10
+        if playerStates.loadProgress <> progressPercent
+          playerStates.loadProgress = progressPercent
+          m.paintToCanvas(progressPercent, playerStates, episode)
+        end if
+      end if
+
+    'listens if we need to update the subtitles/captions
+    else if type(msg) = "roCaptionRendererEvent"
+      if msg.isCaptionUpdateRequest()
+        player.clear(&h00)
+        captions.UpdateCaption()
+      end if
+
+
+    else if type(msg) = "roImageCanvasEvent"
+      if msg.isScreenClosed()
+        ' This is only relevant when the user exits the channel.  From testing, I
+        ' found that this event fires before the VM is shut down which is just
+        ' enough time to fix the global caption state.
+        m.cancelInstantReplay(playerStates, captions)
+
+      'the user pressed a button on the remote
+      else if msg.isRemoteKeyPressed()
+        'back button
+        if msg.GetIndex() = 0
+          'close the screen
+          m.canvas.close()
+          'save the last position to memory
+          m.savePreviouslyViewedUpdate(episode, playerStates.nowPos)
+          m.canvas.close()
+          m.cancelInstantReplay(playerStates, captions)
+          return "CLOSED"
+        end if
+        
+        'rewind
+        if msg.GetIndex() = 8
+          if playerStates.isInHopMode = true
+            playerStates.isInHopMode = false
+          end if
+
+          if playerStates.isScrubbing = false
+            playerStates.nowPosAtScrub = playerStates.nowPos
+            m.cancelInstantReplay(playerStates, captions)
+            startScrub(player, scrubTimer, playerStates, episode)
+          end if
+          'update the speed of scrubbing with max ff or rw at 6
+          if playerStates.scrubAmount > (playerStates.maxScrub * -1)
+            playerStates.scrubAmount = playerStates.scrubAmount - 1
+
+            if playerStates.scrubAmount < 0
+              playerStates.scrubMultiplier = -2 ^ (-1 * playerStates.scrubAmount)
+            else if playerStates.scrubAmount > 0
+              playerStates.scrubMultiplier = 2 ^ playerStates.scrubAmount
+            end if
+
+            'happens if after rewinding, user then hits fast forward to slow down back to play
+            if playerStates.scrubAmount = 0
+              shouldBreak = endScrub(player, playerStates, episode)
+              if shouldBreak = true
+                episode.nowPos = playerStates.nowPos
+                episode.playStart = playerStates.nowPos
+                m.canvas.close()
+                return "RESUMEPLAY"
+              end if
+            else
+              'updates the screen with the new amount of scrubbing
+              m.paintToCanvas(progressPercent, playerStates, episode)
+            end if
+          end if
+        end if
+  
+        'fast forward
+        if msg.GetIndex() = 9
+          if playerStates.isInHopMode = true
+            playerStates.isInHopMode = false
+          end if
+
+          if playerStates.isScrubbing = false
+            playerStates.nowPosAtScrub = playerStates.nowPos
+            m.cancelInstantReplay(playerStates, captions)
+            startScrub(player, scrubTimer, playerStates, episode)
+          end if
+          'update the speed of scrubbing with max ff or rw at 6
+          if playerStates.scrubAmount < playerStates.maxScrub
+            playerStates.scrubAmount = playerStates.scrubAmount + 1
+
+            if playerStates.scrubAmount < 0
+              playerStates.scrubMultiplier = -2 ^ (-1 * playerStates.scrubAmount)
+            else if playerStates.scrubAmount > 0
+              playerStates.scrubMultiplier = 2 ^ playerStates.scrubAmount
+            end if
+
+            'happens if after rewinding, user then hits fast forward to slow down back to play
+            if playerStates.scrubAmount = 0
+              shouldBreak = endScrub(player, playerStates, episode)
+              if shouldBreak = true
+                episode.nowPos = playerStates.nowPos
+                episode.playStart = playerStates.nowPos
+                m.canvas.close()
+                return "RESUMEPLAY"
+              end if
+            else
+              'updates the screen with the new amount of scrubbing
+              m.paintToCanvas(progressPercent, playerStates, episode)
+            end if
+          end if
+        end if
+
+        'left/right buttons: 10 second hop back/forth
+        if msg.GetIndex() = 4 or msg.GetIndex() = 5
+          m.cancelInstantReplay(playerStates, captions)
+          playerStates.isInHopMode = true
+          if playerStates.nowPosAtScrub = 0
+            playerStates.nowPosAtScrub = playerStates.nowPos
+          end if
+
+          'if user is fast forwarding or rewinding stop the scrub
+          if playerStates.isScrubbing = true
+            shouldBreak = endScrub(player, playerStates, episode)
+            if shouldBreak = true
+              episode.nowPos = playerStates.nowPos
+              episode.playStart = playerStates.nowPos
+              m.canvas.close()
+              return "RESUMEPLAY"
+            end if
+
+          'if the user is in normal playback mode then show the transport
+          else
+            if playerStates.isTransportShowing = false
+              playerStates.isTransportShowing = true
+            end if
+
+            playerStates.isPaused = true
+            player.pause()
+          end if
+
+          if msg.GetIndex() = 4
+            'hop back
+            if playerStates.nowPos - 10 < 0
+               playerStates.nowPos = 0
+            else
+              playerStates.nowPos = playerStates.nowPos - 10
+            end if
+          else
+            'hop forward
+            if playerStates.nowPos + 10 > episode.length - 5
+               playerStates.nowPos = episode.length - 5
+            else
+              playerStates.nowPos = playerStates.nowPos + 10
+            end if
+          end if
+
+          episode.nowPos = playerStates.nowPos
+          episode.playStart = playerStates.nowPos
+
+          m.paintToCanvas(progressPercent, playerStates, episode)
+        end if
+
+        'ok/select
+        if msg.GetIndex() = 6
+
+          'if user is fast forwarding or rewinding stop the scrub and resume playing
+          if playerStates.isScrubbing = true
+            shouldBreak = endScrub(player, playerStates, episode)
+            if shouldBreak = true
+              episode.nowPos = playerStates.nowPos
+              episode.playStart = playerStates.nowPos
+              m.canvas.close()
+              return "RESUMEPLAY"
+            end if
+
+          'hop to the position the user has chosen and close the transport
+          else if playerStates.isInHopMode = true
+            'if result of hopping is ultimately advancing the nowPos, test for ads
+            print "now pos "; playerStates.nowPos; " > now pos at scrub "; playerStates.nowPosAtScrub
+            if playerStates.nowPos > playerStates.nowPosAtScrub
+              shouldBreak = m.ads.getResumingPlayAds(episode, m)
+              if shouldBreak = true
+                episode.nowPos = playerStates.nowPos
+                episode.playStart = playerStates.nowPos
+                m.canvas.close()
+                return "RESUMEPLAY"
+              end if
+            end if
+            playerStates.nowPosAtScrub = 0
+            playerStates.isPaused = false
+            playerStates.isInHopMode = false
+            playerStates.isTransportShowing = false
+            player.seek(playerStates.nowPos * 1000)
+            m.paintToCanvas(progressPercent, playerStates, episode)
+
+          'show the transport overlay while continuing the show
+          else if playerStates.isTransportShowing = false
+            playerStates.isTransportShowing = true
+            m.paintToCanvas(progressPercent, playerStates, episode)
+
+          'close the transport overlay while continuing the show
+          else
+            playerStates.isTransportShowing = false
+            if playerStates.isPaused = true
+            
+              m.utils.trackEvent({
+                trackType: "pauseToggle"
+                ctx: episode.id
+                value: "resumed"
+                port: m.playerPort
+              })
+
+              playerStates.isPaused = false
+              player.resume()
+            end if
+            
+            m.paintToCanvas(progressPercent, playerStates, episode)
+          end if
+        end if
+
+        'instant replay button
+        if msg.GetIndex() = 7
+          globalCaptions = deviceInfo.GetCaptionsMode()
+          'stop any active scrubbing before jumping back due to instant replay button
+          if playerStates.isScrubbing = true
+            shouldBreak = endScrub(player, playerStates, episode)
+            if shouldBreak = true
+              episode.nowPos = playerStates.nowPos
+              episode.playStart = playerStates.nowPos
+              m.canvas.close()
+              return "RESUMEPLAY"
+            end if
+          end if
+
+          'jump back 30s in the video - only if the video has started playing (ie. ignore during loading)
+          if playerStates.loadProgress = 100
+            if playerStates.nowPos - 30 < 0
+              playerStates.nowPos = 0
+            else
+              playerStates.nowPos = playerStates.nowPos - 30
+            end if
+            episode.nowPos = playerStates.nowPos
+            player.Seek(playerStates.nowPos * 1000)
+
+            'set up captions for 30s if the user has instant replay captions set globally
+            if globalCaptions = "Instant replay"
+              captions.showSubtitle(true)
+              ' For RokuTV: The showSubtitle call is ignored if global caption state is not "on", so
+              ' a temporary change has to be made at the global "device" level, then switched back later.
+              deviceInfo.SetCaptionsMode("On")
+              playerStates.replayEnd = playerStates.nowPos + 30
+            end if
+
+            if playerStates.isTransportShowing = true
+              playerStates.isTransportShowing = false
+              m.paintToCanvas(progressPercent, playerStates, episode)
+            end if
+          end if
+        end if
+
+        '* button
+        if msg.GetIndex() = 10
+          playerStates.isPaused = true
+          player.pause()
+          
+          'show a dialog that will let users turn on/off captions
+          m.cancelInstantReplay(playerStates, captions)  ' set up the caption dialog by interrupting any instant replay captions
+          if GetGlobalAA().app.detailScreen.showCaptionsDialog(episode) = "On"
+            captions.showSubtitle(true)
+          else
+            captions.showSubtitle(false)
+          end if
+          playerStates.isPaused = false
+          player.resume()
+        end if
+
+        'play/pause button
+        if msg.GetIndex() = 13
+          'if scrubbing, stop the scrubbing and resume the show
+          if playerStates.isScrubbing = true
+            shouldBreak = endScrub(player, playerStates, episode)
+            if shouldBreak = true
+              episode.nowPos = playerStates.nowPos
+              episode.playStart = playerStates.nowPos
+              m.canvas.close()
+              return "RESUMEPLAY"
+            end if
+
+          'hop to the position the user has chosen and close the transport
+          else if playerStates.isInHopMode = true
+            'if result of hopping is ultimately advancing the nowPos, test for ads
+            if playerStates.nowPos > playerStates.nowPosAtScrub
+              shouldBreak = m.ads.getResumingPlayAds(episode, m)
+              if shouldBreak = true
+                episode.nowPos = playerStates.nowPos
+                episode.playStart = playerStates.nowPos
+                m.canvas.close()
+                return "RESUMEPLAY"
+              end if
+            end if
+
+            playerStates.nowPosAtScrub = 0
+            playerStates.isPaused = false
+            playerStates.isInHopMode = false
+            playerStates.isTransportShowing = false
+            player.seek(playerStates.nowPos * 1000)
+            m.paintToCanvas(progressPercent, playerStates, episode)
+
+          'if not scrubbing or hopping
+          else
+            'and not paused, then pause the show and show the transport overlay
+            if playerStates.isPaused = false
+              playerStates.isTransportShowing = true
+              playerStates.isPaused = true
+              player.pause()
+              m.paintToCanvas(progressPercent, playerStates, episode)
+
+              m.utils.trackEvent({
+                trackType: "pauseToggle"
+                ctx: episode.id
+                value: "paused"
+                port: m.playerPort
+              })
+
+            'if not scrubbing but paused, resume the show and remove the transport overlay
+            'but first check if we should play a set of ads
+            else
+              m.utils.trackEvent({
+                trackType: "pauseToggle"
+                ctx: episode.id
+                value: "resumed"
+                port: m.playerPort
+              })
+                
+              playerStates.isTransportShowing = false
+              playerStates.isPaused = false
+              player.resume()
+              m.paintToCanvas(progressPercent, playerStates, episode)
+  
+            end if
+          end if
+        end if
+      end if
+
+    'handle any async responses (usually responses to playProgress and other user events, or responses to addHistory calls
+    'but can be a response to outstanding ad pixel calls)
+    else if type(msg) = "roUrlEvent"
+      respObj = m.utils.getAsyncResponse(msg, 0)
+  
+      if m.previouslyViewedReqIds[respObj.id.toStr()] <> invalid
+        'we know we have a response from updating previously viewed - so update the previouslyViewedServerId where necessary
+        'this is necessary to make the "Remove from History" button work on the details page
+        if respObj.data <> invalid and respObj.data.len() > 0
+          addPreviouslyViewedResponse = parseJson(respObj.data)
+          if addPreviouslyViewedResponse.content_type <> invalid
+
+            if addPreviouslyViewedResponse.content_type = "series"
+              if m.cp.userPlaylistSeries[addPreviouslyViewedResponse.content_id.toStr()] <> invalid
+                m.cp.userPlaylistSeries[addPreviouslyViewedResponse.content_id.toStr()].previouslyViewedServerId = addPreviouslyViewedResponse.id
+              end if
+            else if addPreviouslyViewedResponse.content_type = "movie"
+              if m.cp.userPlaylistVideos[addPreviouslyViewedResponse.content_id.toStr()] <> invalid
+                m.cp.userPlaylistVideos[addPreviouslyViewedResponse.content_id.toStr()].previouslyViewedServerId = addPreviouslyViewedResponse.id
+              end if
+            end if
+
+          end if
+        end if
+
+        'since we already got a response for this request id, we don't need to store the id anymore
+        m.previouslyViewedReqIds.delete(respObj.id.toStr())
+      end if
+    end if
+  end while
+
+end function
