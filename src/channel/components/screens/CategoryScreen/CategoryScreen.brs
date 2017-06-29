@@ -196,11 +196,6 @@ Function onCategoryMenuChange() As Void
   tubiLog("CategoryScreen.onCategoryMenuChange")
   if not m.CategoryList.isInFocusChain() or m.CategoryList.content = invalid then return
 
-  'unobserve historyOrder and bookmarkOrder fields since if we are changing category,
-  'we are no longer concerned about any categories we may have been waiting for
-  m.global.unobserveField("bookmarkOrder")
-  m.global.unobserveField("historyOrder")
-
   newCategory = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
   m.InfoPanel.content = newCategory
   m.InfoPanel.mode = "category"
@@ -230,10 +225,8 @@ Function onSignedInChange()
     loadUserCategories()
   else
     'If user logged out, don't track their history or queue
-    m.global.bookmarkIds = {series: {}, videos: {}}
-    m.global.historyIds = {series: {}, videos: {}}
-    m.global.bookmarkOrder = []
-    m.global.historyOrder = []
+    m.global.bookmarkIds = CreateObject("TubiContentNode")
+    m.global.historyIds = CreateObject("TubiContentNode")
   end if
 End Function
 
@@ -341,6 +334,9 @@ Function loadUserCategories()
   m.authTask.observeField("initialBookmarks", "handleInitialBookmarks")
   m.authTask.observeField("initialHistory", "handleInitialHistory")
 
+  m.global.bookmarkIds = invalid
+  m.global.historyIds = invalid
+
   m.authTask.functionName = "getInitialUserCategories"
   m.authTask.control = "RUN"
 End Function
@@ -358,11 +354,7 @@ Function handleInitialBookmarks()
   Bookmarks = TubiBookmarks(Request, Auth, constants)
 
   if m.authTask.initialBookmarks <> invalid
-    initialBookmarks = m.authTask.initialBookmarks
-    bookmarkData = Bookmarks.handleInitialBookmarks(initialBookmarks)
-
-    m.global.bookmarkIds = bookmarkData.bookmarkIds
-    m.global.bookmarkOrder = bookmarkData.bookmarkOrder
+    m.global.bookmarkIds = Bookmarks.handleInitialBookmarks(m.authTask.initialBookmarks)
 
     'it's possible that the call to get the full bookmarks content can occur before the
     'bookmark id/order are set, so just in case, set user categories as dirty to load them again
@@ -383,12 +375,7 @@ Function handleInitialHistory()
   Bookmarks = TubiBookmarks(Request, Auth, constants)
 
   if m.authTask.initialHistory <> invalid
-
-    initialHistory = m.authTask.initialHistory
-    historyData = Bookmarks.handleInitialHistory(initialHistory)
-
-    m.global.historyIds = historyData.historyIds
-    m.global.historyOrder = historyData.historyOrder
+    m.global.historyIds = Bookmarks.handleInitialHistory(m.authTask.initialHistory)
 
     'it's possible that the call to get the full bookmarks content can occur before the
     'bookmark id/order are set, so just in case, set user categories as dirty to load them again

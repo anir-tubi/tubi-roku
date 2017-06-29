@@ -4,12 +4,6 @@ End Function
 
 Function execGetDetailMetadata()
   tubiLog("DetailMetadataTask.execGetDetailMetadata")
-  ' expect that the content here was the bootstrapped content from category list
-  contentId = m.top.contentFragment.id
-
-  if m.top.contentFragment.type <> invalid and m.top.contentFragment.type = "series" then
-    contentId = "0" + contentId
-  end if
 
   appName = m.global.constants.settings.shortAppName
   url = m.global.constants.urls.cms.singleContent
@@ -18,7 +12,7 @@ Function execGetDetailMetadata()
     params: {
       "app_id": appName
       platform: platform
-      "content_id": contentId
+      "content_id": m.top.contentFragment.id
     }
   }
   request = TubiRequest().createAsync(url, "getSingleContent", options)

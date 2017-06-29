@@ -28,8 +28,13 @@ End Function
 
 
 Function drawProgressBar()
-  if m.top.itemContent <> invalid and m.top.itemContent.nowPos <> invalid and m.top.itemContent.nowPos <> 0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0 then
-    percentage = m.top.itemContent.nowPos / m.top.itemContent.length
+  history = invalid
+  if m.top.itemContent <> invalid and m.global.historyids <> invalid then
+    history = m.global.historyIds.findNode(m.top.itemContent.id)
+  end if
+
+  if m.top.itemContent <> invalid and history <> invalid and history.nowPos <> invalid and history.nowPos <> 0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0 then
+    percentage = history.nowPos / m.top.itemContent.length
     if percentage > 1.0 then percentage = 1.0
     if percentage < 0.0 then percentage = 0.0
     m.resumeProgressBar.width = (m.top.width - (2 * m.resumeMargin)) * percentage

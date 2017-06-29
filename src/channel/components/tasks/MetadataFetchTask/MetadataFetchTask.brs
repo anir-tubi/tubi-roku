@@ -33,6 +33,11 @@ Function fetchLoop()
   m.Request = TubiRequest()
   m.Auth = TubiAuth(m.constants, m.Request)  
 
+  ' Cache a few values we don't want to look up from m.global each call to translateRecursive.
+  ' Timings here were reduced from 33ms to 2ms per content item by not referencing m.global in
+  ' the recursive function below.
+  setTranslateGlobalsToLocal()  ' do this once up front
+
   ' Signal that we're ready for requests
   m.top.ready = true
 
@@ -149,9 +154,9 @@ Function handleResponse(message)
 
         'indicates a request for the full data for bookmarks - we need to handle differently because we may need to re-arrange content order
         else if handledRequest.name = m.constants.reqNames.getFullBookmarks
-          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, "bookmarks")
+          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed)
         else if handledRequest.name = m.constants.reqNames.getFullHistory
-          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, "history")
+          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed)
         else
           handledRequest.convertedMetadata = translateMetadata(parsed)
         end if
@@ -182,11 +187,6 @@ End Function
 ' contentToTranslate should be parsed from JSON before it hits this function
 Function translateMetadata(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
-
-  ' Cache a few values we don't want to look up from m.global each call to translateRecursive.
-  ' Timings here were reduced from 33ms to 2ms per content item by not referencing m.global in
-  ' the recursive function below.
-  setTranslateGlobalsToLocal()
 
   node_count = 0
 
@@ -232,10 +232,8 @@ end Function
 ' contentToTranslate should be parsed from JSON before it hits this function
 Function translateDetailsMetadata(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
-  setTranslateGlobalsToLocal()
   'will affect/update the translated node that is passed in
   m.metadataTranslate.translateRecursive(contentToTranslate, translated)
-
   setTotalCount(translated)
   return translated
 End Function
@@ -245,76 +243,27 @@ End Function
 ' translateBookmarkMetadata
 '
 ' Translates content from server into format that roku understands, specifically for bookmarks AND history
-' We need to run the logic a little different to keep the order as specified in m.global.bookmarkOrder or m.global.historyOrder
-' contentToTranslate should be parsed from JSON before it hits this function
-Function translateBookmarkMetadata(contentToTranslate, orderType) As Object
+Function translateBookmarkMetadata(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
-  setTranslateGlobalsToLocal()
-  
   nodeCount = 0
-
-  idOrder = []
-  if orderType = "bookmarks"
-    bookmarkOrder = m.global.getField("bookmarkOrder")
-    if bookmarkOrder <> invalid
-      idOrder.append(bookmarkOrder)
-    else
-      tubiLog("WARNING: Rendezvous failed for m.global.bookmarkOrder")
-    end if
-
-  else if orderType = "history"
-    historyOrder = m.global.getField("historyOrder")
-    if historyOrder <> invalid
-      idOrder.append(historyOrder)
-    else
-      tubiLog("WARNING: Rendezvous failed for m.global.historyOrder")
-    end if
-
-  end if
-
-  for each cid in idOrder
-    content = contentToTranslate[cid]
-    if content <> invalid
+  for each contentId in contentToTranslate
+    if contentToTranslate[contentId] <> invalid
       node = translated.createChild("TubiContentNode")
-      nodeCount = nodeCount + m.metadataTranslate.translateRecursive(content, node)
+      nodeCount = nodeCount + m.metadataTranslate.translateRecursive(contentToTranslate[contentId], node)
     end if
   end for
-
   setTotalCount(translated)
   return translated
 End Function
 
 
 Function setTranslateGlobalsToLocal()
-  m.bookmarkIds = {
-    series: {}
-    videos: {}
-  }
-  globalBookmarkIds = m.global.getField("bookmarkIds")
-  if globalBookmarkIds <> invalid then
-    m.bookmarkIds.series.append(globalBookmarkIds.series)
-    m.bookmarkIds.videos.append(globalBookmarkIds.videos)
-  else
-    tubiLog("WARNING: Rendezvous failed for m.global.bookmarkIds")
-  end if
-  m.historyIds = {
-    series: {}
-    videos: {}
-  }
-  globalHistoryIds = m.global.getField("historyIds")
-  if globalHistoryIds <> invalid then
-    m.historyIds.series.append(globalHistoryIds.series)
-    m.historyIds.videos.append(globalHistoryIds.videos)
-  else
-    tubiLog("WARNING: Rendezvous failed for m.global.historyIds")
-  end if
-  m.metadataTranslate.setBookmarks(m.bookmarkIds)
-  m.metadataTranslate.setHistory(m.historyIds)
   m.contentTypes = m.global.constants.ui.contentTypes
   m.captionsMode = m.global.constants.deviceInfo.captionsMode
   m.creditsDuration = m.global.constants.player.creditsDuration
   m.allowAfterHours = m.global.constants.settings.allowAfterHours
 end Function
+
 
 Function setTotalCount(metadata As Object)
   if metadata.totalCount = -1 and metadata.getChildCount() <> 0 then

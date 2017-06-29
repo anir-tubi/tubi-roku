@@ -109,7 +109,7 @@ Function removeFromQueue()
   Bookmarks = TubiBookmarks(Request, Auth, m.global.constants)
 
   tubiLog("Removing bookmark id " + m.top.content.bookmarkId + " for content " + m.top.content.id)
-  request = Bookmarks.removeBookmarkReq(m.top.content, m.global.bookmarkIds)
+  request = Bookmarks.removeBookmarkReq(m.top.content)
   port = CreateObject("roMessagePort")
   if request <> invalid then
     request.start(port)
@@ -135,13 +135,13 @@ End Function
 
 
 Function removeFromHistory()
-  tubiLog("AuthTask.removeFromQueue")
+  tubiLog("AuthTask.removeFromHistory")
   Request = TubiRequest()
   Auth = TubiAuth(m.global.constants, Request)
   Bookmarks = TubiBookmarks(Request, Auth, m.global.constants)
 
   tubiLog("Removing content " + m.top.content.id + " from history")
-  request = Bookmarks.removeHistoryReq(m.top.content, m.global.historyIds)
+  request = Bookmarks.removeHistoryReq(m.top.content)
   port = CreateObject("roMessagePort")
   if request <> invalid then
     request.start(port)

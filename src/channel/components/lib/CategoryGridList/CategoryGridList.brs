@@ -156,6 +156,16 @@ Function onCursorPositionChange()
   m.top.cursorPosition = m.ContentGrid.cursorPosition
 End Function
 
+
+Function sortUserContent(unsortedContent, order)
+  for i=0 to order.getChildCount()-1
+    orderItem = order.getChild(i)
+    contentItem = unsortedContent.findNode(orderItem.id)
+    ' push it to bottom, it will behave like a stack
+    if contentItem <> invalid then unsortedContent.appendChild(contentItem)
+  end for
+End Function
+
 '''''''''''''''''''''''''
 ' onCursorPositionChange
 '
@@ -212,6 +222,18 @@ Function onMetadataFetchTaskResponse() As Void
     'entry was expired before reponse made it here, ignore it
     tubiLog("Ignoring response for expired block " + m.top.metadataFetchTaskResponse.id)
     return
+  end if
+
+  ' we apply order to the bookmarks and history categories here since they come back from
+  ' the server in any order
+  if newContent <> invalid
+    if Left(m.top.metadataFetchTaskResponse.id, 7) = "MyQueue" and m.global.bookmarkIds <> invalid then
+      tubiLog("Sorting queue content")
+      sortUserContent(newContent, m.global.bookmarkIds)
+    else if Left(m.top.metadataFetchTaskResponse.id, 16) = "ContinueWatching" and m.global.historyIds <> invalid then
+      tubiLog("Sorting history content")
+      sortUserContent(newContent, m.global.historyIds)
+    end if
   end if
 
   tubiLog("Received response for request id " + m.top.metadataFetchTaskResponse.id)
@@ -356,12 +378,13 @@ Function historyRequest()
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
   Bookmarks = TubiBookmarks(Request, Auth, constants)
-
-  historyOrder = m.global.historyOrder
-
-  if historyOrder <> invalid then
-    'get the full user's bookmark category
-    return Bookmarks.getFullHistoryReq(historyOrder)
+  historyIds = m.global.historyIds
+  if historyIds <> invalid then
+    idList = []
+    for i=0 to historyIds.getChildCount()-1
+      idList.push(historyIds.getChild(i).id)
+    end for
+    return Bookmarks.getFullHistoryReq(idList)
   end if
   return invalid
 End Function
@@ -376,12 +399,13 @@ Function bookmarksRequest() As Object
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
   Bookmarks = TubiBookmarks(Request, Auth, constants)
-
-  bookmarkOrder = m.global.bookmarkOrder
-
-  if bookmarkOrder <> invalid then
-    'get the full user's history category
-    return Bookmarks.getFullBookmarksReq(bookmarkOrder)
+  bookmarkIds = m.global.bookmarkIds
+  if bookmarkIds <> invalid then
+    idList = []
+    for i=0 to bookmarkIds.getChildCount()-1
+      idList.push(bookmarkIds.getChild(i).id)
+    end for
+    return Bookmarks.getFullBookmarksReq(idList)
   end if
   return invalid
 End Function

@@ -1,8 +1,6 @@
 Function TubiMetadataTranslate(constants As Object)
   return {
     ' public
-    setBookmarks: tubiMetadataTranslate_setBookmarks
-    setHistory: tubiMetadataTranslate_setHistory
     translateRecursive: tubiMetadataTranslate_translateRecursive
     
     ' private
@@ -15,14 +13,6 @@ Function TubiMetadataTranslate(constants As Object)
     dedupeBackgrounds: tubiMetadataTranslate_dedupeBackgrounds
     setTotalCount: tubiMetadataTranslate_setTotalCount
   }
-End Function
-
-Function tubiMetadataTranslate_setBookmarks(bookmarkIds)
-  m.bookmarkIds = bookmarkIds
-End Function
-
-Function tubiMetadataTranslate_setHistory(historyIds)
-  m.historyIds = historyIds
 End Function
 
 Function tubiMetadataTranslate_dedupeBackgrounds(backgroundsFromServer) as Object
@@ -52,6 +42,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   count = 1
 
+  if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
+
   typeVar = "type"
   if contentFromServer[typeVar] <> invalid
     if contentFromServer[typeVar] = "c"
@@ -60,8 +52,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       translatedContent[typeVar] = m.contentTypes.video
     else if contentFromServer[typeVar] = "s"
       translatedContent[typeVar] = m.contentTypes.series
+      ' prefix "0" to series
+      if translatedContent.id <> "" then translatedContent.id = "0" + translatedContent.id
     else if contentFromServer[typeVar] = "a"
       translatedContent[typeVar] = m.contentTypes.season
+      ' prefix "0" to series
+      if translatedContent.id <> "" then translatedContent.id = "0" + translatedContent.id
     end if
   end if
 
@@ -85,7 +81,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
       'this happens on deep link with mediaType = episode
       if contentFromServer.series_id <> invalid
-        translatedContent.parentId = contentFromServer.series_id
+        translatedContent.parentId = "0" + contentFromServer.series_id
       end if
     end if
 
@@ -108,14 +104,13 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     end if
 
   else if contentFromServer.series_id <> invalid
-    translatedContent.parentId = contentFromServer.series_id
+    translatedContent.parentId = "0" + contentFromServer.series_id
 
   else
     translatedContent.parentId = invalid
   end if
   
   'translate all the stuff from the server
-  if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
   if contentFromServer.title <> invalid then translatedContent.title = contentFromServer.title
   if contentFromServer.duration <> invalid then translatedContent.length = contentFromServer.duration
   if contentFromServer.actors <> invalid then translatedContent.actors = contentFromServer.actors 'array of actors
@@ -131,7 +126,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.year <> invalid and contentFromServer.year <> 0 then translatedContent.releaseDate = contentFromServer.year.ToStr()
   if contentFromServer.currentEpisodeId <> invalid then translatedContent.currentEpisodeId = contentFromServer.currentEpisodeId
   if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
-  if contentFromServer.series_id <> invalid then translatedContent.seriesId = contentFromServer.series_id
+  if contentFromServer.series_id <> invalid then translatedContent.seriesId = "0" + contentFromServer.series_id
   if contentFromServer.isLiveTV <> invalid then translatedContent.isLiveTV = contentFromServer.isLiveTV
   if contentFromServer.liveTvChannelType <> invalid then translatedContent.liveTvChannelType = contentFromServer.liveTvChannelType
   
@@ -212,38 +207,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       translatedContent.showSubtitles = true
     else
       translatedContent.showSubtitles = false
-    end if
-  end if
-
-  'add the bookmarkId if it exists
-  if m.bookmarkIds <> invalid
-    if translatedContent[typeVar] = m.contentTypes.series
-      if m.bookmarkIds.series[translatedContent.id] <> invalid
-        translatedContent.bookmarkId = m.bookmarkIds.series[translatedContent.id]
-      end if
-
-    else if translatedContent[typeVar] = m.contentTypes.video
-      if m.bookmarkIds.videos[translatedContent.id] <> invalid
-        translatedContent.bookmarkId = m.bookmarkIds.videos[translatedContent.id]
-      end if
-    end if
-  end if
-
-
-  'add the history info (historyId, currentEpisodeId, nowPos) if it exists
-  if m.historyIds <> invalid
-    if translatedContent[typeVar] = m.contentTypes.series
-      if m.historyIds.series[translatedContent.id] <> invalid
-        translatedContent.historyId = m.historyIds.series[translatedContent.id].serverId
-        translatedContent.currentEpisodeId = m.historyIds.series[translatedContent.id].currentEpisodeId
-      end if
-
-    else if translatedContent[typeVar] = m.contentTypes.video
-      if m.historyIds.videos[translatedContent.id] <> invalid
-        translatedContent.historyId = m.historyIds.videos[translatedContent.id].serverId
-        translatedContent.nowPos = m.historyIds.videos[translatedContent.id].position
-      end if      
-
     end if
   end if
 

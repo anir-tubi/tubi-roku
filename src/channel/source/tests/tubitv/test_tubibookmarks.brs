@@ -70,7 +70,7 @@ Function testAddBookmarkReqSeries(t As Object)
   BM = TubiBookmarks(REQUEST, AUTH, constants)
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "series"
-  content.id = "1079"
+  content.id = "01079"
   content.title = "S02:E05 - You, I'll Be Following"
   req = BM.addBookmarkReq(content)
   t.assertNotInvalid(req)
@@ -85,7 +85,7 @@ Function testAddBookmarkReqEpisodeWithParent(t As Object)
   content.type = "video"
   content.id = "302800"
   content.title = "S02:E05 - You, I'll Be Following"
-  content.parentId = "1079"
+  content.parentId = "01079"
   req = BM.addBookmarkReq(content)
   t.assertNotInvalid(req)
 End Function
@@ -101,15 +101,10 @@ Function testRemoveBookmarkReq(t As Object)
   BM = TubiBookmarks(REQUEST, AUTH, constants)
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "series"
-  content.id = "1079"
+  content.id = "01079"
   content.title = "S02:E05 - You, I'll Be Following"
-  bookmarkList = { 
-    videos: {}
-    series: {
-      "1079": "AABBCCDD"
-    }
-  }
-  req = BM.removeBookmarkReq(content, bookmarkList)
+  content.bookmarkId = "AABBCCDD"
+  req = BM.removeBookmarkReq(content)
   t.assertNotInvalid(req)
 End Function
 
@@ -233,16 +228,13 @@ End Function
 '   movie vs. episode () - episode will have playerInfo.parentHistoryId
 '   new vs. existing - historyIds{}/historyOrder[] will already contain a matching entry for existing
 ''''''''''''''
+
 Function testUpdateNowPosSignedInMovieNew(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
   BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = {
-    series: {}
-    videos: {}
-  }
-  historyOrder = []
+  historyIds = CreateObject("roSGNode", "TubiContentNode")
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "321221"
@@ -251,14 +243,12 @@ Function testUpdateNowPosSignedInMovieNew(t As Object)
     nowPos: 145
     historyId: "AABBCCDDEEFFGG"
   }
-  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
-  
-  t.assertEqual(result.historyOrder.count(), 1)
-  t.assertEqual(result.historyOrder[0], "321221")
-  t.assertEqual(result.historyIds.series.count(), 0)
-  t.assertEqual(result.historyIds.videos.count(), 1)
-  t.assertEqual(result.historyIds.videos["321221"].serverId, "AABBCCDDEEFFGG")
-  t.assertEqual(result.historyIds.videos["321221"].position, 145)
+  result = BM.updateNowPos(content, playerInfo, historyIds)
+  t.assertEqual(result.getChildCount(), 1)
+  t.assertEqual(result.getChild(0).id, "321221")
+  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.video)
+  t.assertEqual(result.getChild(0).historyId, "AABBCCDDEEFFGG")
+  t.assertEqual(result.getChild(0).nowPos, 145)
 End Function
 
 Function testUpdateNowPosSignedInEpisodeNew(t As Object)
@@ -266,11 +256,7 @@ Function testUpdateNowPosSignedInEpisodeNew(t As Object)
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
   BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = {
-    series: {}
-    videos: {}
-  }
-  historyOrder = []
+  historyIds = CreateObject("roSGNode", "TubiContentNode")
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "302800"
@@ -281,16 +267,16 @@ Function testUpdateNowPosSignedInEpisodeNew(t As Object)
     historyId: "AABBCCDDEEFFGG"
     parentHistoryId: "TTUUVVWWXXYYZZ"
   }
-  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
-  
-  t.assertEqual(result.historyOrder.count(), 1)
-  t.assertEqual(result.historyOrder[0], "01079")
-  t.assertEqual(result.historyIds.series.count(), 1)
-  t.assertEqual(result.historyIds.series["1079"].serverId, "TTUUVVWWXXYYZZ")
-  t.assertEqual(result.historyIds.series["1079"].currentEpisodeId, "302800")
-  t.assertEqual(result.historyIds.videos.count(), 1)
-  t.assertEqual(result.historyIds.videos["302800"].serverId, "AABBCCDDEEFFGG")
-  t.assertEqual(result.historyIds.videos["302800"].position, 145)
+  result = BM.updateNowPos(content, playerInfo, historyIds)
+  t.assertEqual(result.getChildCount(), 1)
+  t.assertEqual(result.getChild(0).id, "1079")
+  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.series)
+  t.assertEqual(result.getChild(0).historyId, "TTUUVVWWXXYYZZ")
+  t.assertEqual(result.getChild(0).currentEpisodeId, "302800")
+  t.assertEqual(result.getChild(0).getChildCount(), 1)
+  t.assertEqual(result.getChild(0).getChild(0).id, "302800")
+  t.assertEqual(result.getChild(0).getChild(0).historyId, "AABBCCDDEEFFGG")
+  t.assertEqual(result.getChild(0).getChild(0).nowPos, 145)
 End Function
 
 Function testUpdateNowPosSignedOutMovieNew(t As Object)
@@ -298,11 +284,7 @@ Function testUpdateNowPosSignedOutMovieNew(t As Object)
   REQUEST = TubiRequest()
   AUTH = mockAuth_Unauthorized(constants, REQUEST)
   BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = {
-    series: {}
-    videos: {}
-  }
-  historyOrder = []
+  historyIds = CreateObject("roSGNode", "TubiContentNode")
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "321221"
@@ -310,14 +292,12 @@ Function testUpdateNowPosSignedOutMovieNew(t As Object)
   playerInfo = {
     nowPos: 145
   }
-  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
-  
-  t.assertEqual(result.historyOrder.count(), 1)
-  t.assertEqual(result.historyOrder[0], "321221")
-  t.assertEqual(result.historyIds.series.count(), 0)
-  t.assertEqual(result.historyIds.videos.count(), 1)
-  t.assertInvalid(result.historyIds.videos["321221"].serverId)
-  t.assertEqual(result.historyIds.videos["321221"].position, 145)
+  result = BM.updateNowPos(content, playerInfo, historyIds)
+  t.assertEqual(result.getChildCount(), 1)
+  t.assertEqual(result.getChild(0).id, "321221")
+  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.video)
+  t.assertEqual(result.getChild(0).historyId, "")
+  t.assertEqual(result.getChild(0).nowPos, 145)
 End Function
 
 Function testUpdateNowPosSignedOutEpisodeNew(t As Object)
@@ -325,11 +305,7 @@ Function testUpdateNowPosSignedOutEpisodeNew(t As Object)
   REQUEST = TubiRequest()
   AUTH = mockAuth_Unauthorized(constants, REQUEST)
   BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = {
-    series: {}
-    videos: {}
-  }
-  historyOrder = []
+  historyIds = CreateObject("roSGNode", "TubiContentNode")
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "302800"
@@ -338,16 +314,16 @@ Function testUpdateNowPosSignedOutEpisodeNew(t As Object)
   playerInfo = {
     nowPos: 145
   }
-  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
-  
-  t.assertEqual(result.historyOrder.count(), 1)
-  t.assertEqual(result.historyOrder[0], "01079")
-  t.assertEqual(result.historyIds.series.count(), 1)
-  t.assertInvalid(result.historyIds.series["1079"].serverId)
-  t.assertEqual(result.historyIds.series["1079"].currentEpisodeId, "302800")
-  t.assertEqual(result.historyIds.videos.count(), 1)
-  t.assertInvalid(result.historyIds.videos["302800"].serverId)
-  t.assertEqual(result.historyIds.videos["302800"].position, 145)
+  result = BM.updateNowPos(content, playerInfo, historyIds)
+  t.assertEqual(result.getChildCount(), 1)
+  t.assertEqual(result.getChild(0).id, "1079")
+  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.series)
+  t.assertEqual(result.getChild(0).historyId, "")
+  t.assertEqual(result.getChild(0).currentEpisodeId, "302800")
+  t.assertEqual(result.getChild(0).getChildCount(), 1)
+  t.assertEqual(result.getChild(0).getChild(0).id, "302800")
+  t.assertEqual(result.getChild(0).getChild(0).historyId, "")
+  t.assertEqual(result.getChild(0).getChild(0).nowPos, 145)
 End Function
 
 Function testUpdateNowPosSignedInMovieExisting(t As Object)
@@ -355,16 +331,12 @@ Function testUpdateNowPosSignedInMovieExisting(t As Object)
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
   BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = {
-    series: {}
-    videos: {
-      "321221": {
-        nowPos: 10
-        serverId: "AABBCCDDEEFFGG"
-      }
-    }
-  }
-  historyOrder = ["321221"]
+  historyIds = CreateObject("roSGNode", "TubiContentNode")
+  video = historyIds.createChild("TubiContentNode")
+  video.id = "321221"
+  video.type = "video"
+  video.historyId = "AABBCCDDEEFFGG"
+  video.nowPos = 10
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "321221"
@@ -373,14 +345,12 @@ Function testUpdateNowPosSignedInMovieExisting(t As Object)
     nowPos: 145
     historyId: "AABBCCDDEEFFGG"
   }
-  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
-  
-  t.assertEqual(result.historyOrder.count(), 1)
-  t.assertEqual(result.historyOrder[0], "321221")
-  t.assertEqual(result.historyIds.series.count(), 0)
-  t.assertEqual(result.historyIds.videos.count(), 1)
-  t.assertEqual(result.historyIds.videos["321221"].serverId, "AABBCCDDEEFFGG")
-  t.assertEqual(result.historyIds.videos["321221"].position, 145)
+  result = BM.updateNowPos(content, playerInfo, historyIds)
+  t.assertEqual(result.getChildCount(), 1)
+  t.assertEqual(result.getChild(0).id, "321221")
+  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.video)
+  t.assertEqual(result.getChild(0).historyId, "AABBCCDDEEFFGG")
+  t.assertEqual(result.getChild(0).nowPos, 145)
 End Function
 
 Function testUpdateNowPosSignedInEpisodeExisting(t As Object)
@@ -388,21 +358,17 @@ Function testUpdateNowPosSignedInEpisodeExisting(t As Object)
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
   BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = {
-    series: {
-      "1079": {
-        serverId: "TTUUVVWWXXYYZZ"
-        currentEpisodeId: "302800"
-      }
-    }
-    videos: {
-      "302800": {
-        serverId: "AABBCCDDEEFFGG"
-        nowPos: 15
-      }
-    }
-  }
-  historyOrder = ["01079"]
+  historyIds = CreateObject("roSGNode", "TubiContentNode")
+  series = historyIds.createChild("TubiContentNode")
+  series.id = "01079"
+  series.type = "series"
+  series.historyId = "TTUUVVWWXXYYZZ"
+  series.currentEpisodeId = "302800"
+  episode = series.createChild("TubiContentNode")
+  episode.id = "302800"
+  episode.type = "video"
+  episode.historyId = "AABBCCDDEEFFGG"
+  episode.nowPos = 15
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "302800"
@@ -413,16 +379,19 @@ Function testUpdateNowPosSignedInEpisodeExisting(t As Object)
     historyId: "AABBCCDDEEFFGG"
     parentHistoryId: "TTUUVVWWXXYYZZ"
   }
-  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
-  
-  t.assertEqual(result.historyOrder.count(), 1)
-  t.assertEqual(result.historyOrder[0], "01079")
-  t.assertEqual(result.historyIds.series.count(), 1)
-  t.assertEqual(result.historyIds.series["1079"].serverId, "TTUUVVWWXXYYZZ")
-  t.assertEqual(result.historyIds.series["1079"].currentEpisodeId, "302800")
-  t.assertEqual(result.historyIds.videos.count(), 1)
-  t.assertEqual(result.historyIds.videos["302800"].serverId, "AABBCCDDEEFFGG")
-  t.assertEqual(result.historyIds.videos["302800"].position, 145)
+
+
+  result = BM.updateNowPos(content, playerInfo, historyIds)
+  t.assertEqual(result.getChildCount(), 1)
+  t.assertEqual(result.getChild(0).id, "01079")
+  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.series)
+  t.assertEqual(result.getChild(0).historyId, "TTUUVVWWXXYYZZ")
+  t.assertEqual(result.getChild(0).currentEpisodeId, "302800")
+  t.assertEqual(result.getChild(0).getChildCount(), 1)
+  t.assertEqual(result.getChild(0).getChild(0).id, "302800")
+  t.assertEqual(result.getChild(0).getChild(0).type, constants.ui.contentTypes.video)
+  t.assertEqual(result.getChild(0).getChild(0).historyId, "AABBCCDDEEFFGG")
+  t.assertEqual(result.getChild(0).getChild(0).nowPos, 145)
 End Function
 
 Function testUpdateNowPosSignedOutMovieExisting(t As Object)
@@ -430,16 +399,11 @@ Function testUpdateNowPosSignedOutMovieExisting(t As Object)
   REQUEST = TubiRequest()
   AUTH = mockAuth_Unauthorized(constants, REQUEST)
   BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = {
-    series: {}
-    videos: {
-      "321221": {
-        nowPos: 10
-        serverId: invalid
-      }
-    }
-  }
-  historyOrder = ["321221"]
+  historyIds = CreateObject("roSGNode", "TubiContentNode")
+  movie = historyIds.createChild("TubiContentNode")
+  movie.id = "321221"
+  movie.type = "video"
+  movie.nowPos = 10
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "321221"
@@ -447,14 +411,12 @@ Function testUpdateNowPosSignedOutMovieExisting(t As Object)
   playerInfo = {
     nowPos: 145
   }
-  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
-  
-  t.assertEqual(result.historyOrder.count(), 1)
-  t.assertEqual(result.historyOrder[0], "321221")
-  t.assertEqual(result.historyIds.series.count(), 0)
-  t.assertEqual(result.historyIds.videos.count(), 1)
-  t.assertInvalid(result.historyIds.videos["321221"].serverId)
-  t.assertEqual(result.historyIds.videos["321221"].position, 145)
+  result = BM.updateNowPos(content, playerInfo, historyIds)
+  t.assertEqual(result.getChildCount(), 1)
+  t.assertEqual(result.getChild(0).id, "321221")
+  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.video)
+  t.assertEqual(result.getChild(0).historyId, "")
+  t.assertEqual(result.getChild(0).nowPos, 145)
 End Function
 
 Function testUpdateNowPosSignedOutEpisodeExisting(t As Object)
@@ -462,21 +424,15 @@ Function testUpdateNowPosSignedOutEpisodeExisting(t As Object)
   REQUEST = TubiRequest()
   AUTH = mockAuth_Unauthorized(constants, REQUEST)
   BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = {
-    series: {
-      "1079": {
-        serverId: invalid
-        currentEpisodeId: "302800"
-      }
-    }
-    videos: {
-      "302800": {
-        serverId: invalid
-        nowPos: 15
-      }
-    }
-  }
-  historyOrder = ["01079"]
+  historyIds = CreateObject("roSGNode", "TubiContentNode")
+  series = historyIds.createChild("TubiContentNode")
+  series.id = "01079"
+  series.type = "series"
+  series.currentEpisodeId = "302800"
+  episode = series.createChild("TubiContentNode")
+  episode.id = "302800"
+  episode.type = "video"
+  episode.nowPos = 15
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "302800"
@@ -485,16 +441,16 @@ Function testUpdateNowPosSignedOutEpisodeExisting(t As Object)
   playerInfo = {
     nowPos: 145
   }
-  result = BM.updateNowPos(content, playerInfo, historyIds, historyOrder)
-  
-  t.assertEqual(result.historyOrder.count(), 1)
-  t.assertEqual(result.historyOrder[0], "01079")
-  t.assertEqual(result.historyIds.series.count(), 1)
-  t.assertInvalid(result.historyIds.series["1079"].serverId)
-  t.assertEqual(result.historyIds.series["1079"].currentEpisodeId, "302800")
-  t.assertEqual(result.historyIds.videos.count(), 1)
-  t.assertInvalid(result.historyIds.videos["302800"].serverId)
-  t.assertEqual(result.historyIds.videos["302800"].position, 145)
+  result = BM.updateNowPos(content, playerInfo, historyIds)
+  t.assertEqual(result.getChildCount(), 1)
+  t.assertEqual(result.getChild(0).id, "01079")
+  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.series)
+  t.assertEqual(result.getChild(0).historyId, "")
+  t.assertEqual(result.getChild(0).currentEpisodeId, "302800")
+  t.assertEqual(result.getChild(0).getChildCount(), 1)
+  t.assertEqual(result.getChild(0).getChild(0).id, "302800")
+  t.assertEqual(result.getChild(0).getChild(0).historyId, "")
+  t.assertEqual(result.getChild(0).getChild(0).nowPos, 145)
 End Function
 
 Function xtestUpdateNowPosInvalidHistoryIds(t As Object)

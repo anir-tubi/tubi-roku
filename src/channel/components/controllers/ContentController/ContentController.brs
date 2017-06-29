@@ -22,14 +22,8 @@ Function init()
 
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
 
-  m.global.addField("bookmarkIds", "assocarray", false)
-  m.global.addField("historyIds", "assocarray", false)
-  m.global.addField("bookmarkOrder", "stringarray", false)
-  m.global.addField("historyOrder", "stringarray", false)
-  m.global.bookmarkIds = {series: {}, videos: {}} 'these are set in handleInitialBookmarks(), once a user has logged in
-  m.global.historyIds = {series: {}, videos: {}}  'these are set in handleInitialHistory(), once a user has logged in
-  m.global.bookmarkOrder = []  'this are set in handleInitialBookmarks(), once a user has logged in
-  m.global.historyOrder = []  'this are set in handleInitialHistory(), once a user has logged in
+  m.global.addField("bookmarkIds", "node", false)
+  m.global.addField("historyIds", "node", false)
 
   m.metadataFetchTask.observeField("ready", "onMetadataTaskReady")
   m.global.metadataFetchTask.control = "RUN"
@@ -176,6 +170,11 @@ End Function
 '
 Function onAuthInfoReceived()
   tubiLog("ContentController.onAuthInfoReceived")
+  if m.authTask.authInfo = invalid
+    ' user is logged out, so initialize empty bookmarks and history
+    m.global.bookmarkIds = CreateObject("roSGNode", "TubiContentNode")
+    m.global.historyIds = CreateObject("roSGNode", "TubiContentNode")
+  end if
   m.authInfoReceived = true
   startUserExperience()
 End Function
@@ -419,6 +418,11 @@ Function onResume()
   tubiLog("ContentController.onResume")
   content = getDetailScreenContent()
   if content <> invalid then
+    ' find the position in global history
+    if m.global.historyIds <> invalid then
+      history = m.global.historyIds.findNode(content.id)
+      if history <> invalid then content.nowPos = history.nowPos
+    end if
     playVideoContent(content)
   else
     tubiLog("ERROR: Resume selected but content is invalid")
@@ -635,7 +639,8 @@ Function onEpisodeList()
   m.episodesScreen.observeField("backgroundUriList", "onEpisodeBackgroundChange")
 
   if m.episodesScreen.content <> invalid and m.episodesScreen.content.id <> invalid
-    m.episodesScreen.trackingUri = m.episodesScreen.trackingUri + m.episodesScreen.content.id
+    contentId = Mid(m.episodesScreen.content.id, 2)  ' trim leading "0" off series id
+    m.episodesScreen.trackingUri = m.episodesScreen.trackingUri + contentId
   end if
 
   m.episodesScreen.episodeToFocus = m.detailScreen.episodeSelection   'episodeToFocus should be [seasonIndex, episodeIndex]
@@ -707,9 +712,7 @@ Function onPlayerInfo() As Void
   Bookmarks = TubiBookmarks(Request, Auth, constants)
 
   'update the nowPos in the global historyIds store
-  newHistory = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds, m.global.historyOrder)
-  m.global.historyIds = newHistory.historyIds
-  m.global.historyOrder = newHistory.historyOrder
+  m.global.historyIds = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds)
 
   if playerInfo.result = m.global.constants.player.playerResults.failed then
     showPlayerError(playerInfo.result)

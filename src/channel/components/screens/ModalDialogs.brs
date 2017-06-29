@@ -19,6 +19,7 @@ End Function
 Function onErrorModalButtonSelected()
   m.errorModal_.setFocus(false)
   m.top.removeChild(m.errorModal_)
+  m.top.setFocus(true)
   if m.errorModal_.buttonSelected = 0 then
     ' try again
     if m.errorModalTryAgainCallback_ <> invalid then m.errorModalTryAgainCallback_()

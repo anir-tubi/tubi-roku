@@ -79,7 +79,9 @@ Function onContentChange() As Void
     if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "movie"
       m.top.playSelected = true
     end if
+    drawSubComponents()
   else if m.top.content.type = "series"
+     'don't call drawSubComponents() here since it will run when m.top.episodeSelection is set
 
     ' Deep link gave us the episode id we need to seek to
     if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "season"
@@ -88,21 +90,24 @@ Function onContentChange() As Void
 
       'tell the controller to open the episode selection page
       m.top.episodeListSelected = true
-      return   'prevent drawSubComponents() from running 2x since it will run when m.top.episodeSelection is set
 
     else if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "episode"
+      tubiLog("Finding episode " + m.top.shortContent.id + " in series " + m.top.content.id)
       m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id)
       m.top.playSelected = true
-      return 'prevent drawSubComponents() from running 2x since it will run when m.top.episodeSelection is set
 
-    else if m.top.content.currentEpisodeId <> invalid and m.top.content.currentEpisodeId <> "" then
-      tubiLog("Finding current episode " + m.top.content.currentEpisodeId + " in series " + m.top.content.id)
-      m.top.episodeSelection = findEpisodeInSeries(m.top.content.currentEpisodeId)
-      return   'prevent drawSubComponents() from running 2x since it will run when m.top.episodeSelection is set
+    else
+      episodeSelection = [0,0]
+      if m.global.historyIds <> invalid then
+        history = m.global.historyIds.findNode(m.top.content.id)
+        if history <> invalid and history.currentEpisodeId <> invalid and history.currentEpisodeId <> "" then
+          tubiLog("Finding current episode " + history.currentEpisodeId + " in series " + m.top.content.id)
+          episodeSelection = findEpisodeInSeries(history.currentEpisodeId)
+        end if
+      end if
+      m.top.episodeSelection = episodeSelection
     endif
   end if
-
-  drawSubComponents()
 End Function
 
 
@@ -198,10 +203,14 @@ Function onShortContentChange()
       trackUri = "/series/"
 
       if content.id <> invalid
-        trackUri = trackUri + content.id
+        ' trim leading "0" off series id
+        trackUri = trackUri + Mid(content.id, 2)
 
-        if content.currentEpisodeId <> invalid and content.currentEpisodeId.len() > 0
-          trackUri = trackUri + "/" + content.currentEpisodeId
+        if m.global.historyIds <> invalid then
+          history = m.global.historyIds.findNode(content.id)
+          if history <> invalid and history.currentEpisodeId <> invalid and history.currentEpisodeId.len() > 0
+            trackUri = trackUri + "/" + history.currentEpisodeId
+          end if
         end if
       end if
 
@@ -245,9 +254,20 @@ Function setMenuItems() As Void
     end if
   end if
 
-  if focusedContent.nowPos <> invalid and focusedContent.nowPos <> 0 then
+  history = invalid
+  bookmark = invalid
+  if m.global.historyids <> invalid then
+    ' history should always deal with videos (movies or episodes)
+    history = m.global.historyIds.findNode(focusedContent.id)
+  end if
+  if m.global.bookmarkIds <> invalid then
+    ' bookmarks always deal with movie or series, not episodes
+    bookmark = m.global.bookmarkIds.findNode(m.top.content.id)
+  end if
+
+  if history <> invalid and history.nowPos <> invalid and history.nowPos <> 0 then
     m.ResumeMenuItem.length = focusedContent.length
-    m.ResumeMenuItem.playstart = focusedContent.nowPos
+    m.ResumeMenuItem.playstart = history.nowPos
     menuItems.appendChild(m.ResumeMenuItem)
   end if
 
@@ -262,7 +282,7 @@ Function setMenuItems() As Void
   end if
 
   ' bookmarks follow series or movie, so don't use focusedContent here
-  if m.top.signedIn = true and m.top.content.bookmarkId <> invalid and m.top.content.bookmarkId <> "" then
+  if m.top.signedIn = true and bookmark <> invalid and bookmark.bookmarkId <> "" then
     menuItems.appendChild(m.RemoveQueueMenuItem)
     m.RemoveQueueMenuItem.title = "Remove from queue"
   else 
@@ -271,7 +291,7 @@ Function setMenuItems() As Void
   end if
 
   ' history will be set on the series if any of the episodes have history, so look at m.top.content
-  if m.top.content.historyId <> invalid and m.top.content.historyId <> "" then
+  if history <> invalid then
     menuItems.appendChild(m.RemoveHistoryMenuItem)
     m.RemoveHistoryMenuItem.title = "Remove from history"
   end if
@@ -368,14 +388,6 @@ Function loadContentDetails(content)
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
 
-  ' expect that the content here was the bootstrapped content from category list
-  contentId = content.id
-
-  'deeplinkType of season means an episode id was passed in
-  if content.type = "series" and content.deeplinkType <> "season" then
-    contentId = "0" + contentId
-  end if
-
   request = {
     url: url
     node: m.top
@@ -384,7 +396,7 @@ Function loadContentDetails(content)
       params: {
         "app_id": settings.shortAppName
         platform: platform
-        "content_id": contentId
+        "content_id": content.id
         ' "content_ids": contentId
         ' fields: "*(id,type,title,duration,ratings,description,year,posterarts,subtitles,lang,url,publisher_id,actors,directors,tags,children,credit_cuepoints)"
       }
@@ -411,49 +423,34 @@ End Function
 '''''''''''''''''''
 ' onBookmarked
 '
-Function onBookmarked()
+Function onBookmarked() As Void
   tubiLog("DetailScreen.onBookmarked")
   'TODO(Chris): add bookmark id to global tree
   m.AuthTask.unobserveField("bookmarkId")
+
+  if m.AuthTask.bookmarkId = invalid then
+    code = -1
+    reason = "Unknown"
+    tubiLog("addToQueue returned " + stri(code))
+    m.isWaitingForServerResponse = false
+    showErrorModal(code, reason, addToQueue, cancelHistoryQueueChange)
+    return
+  end if
 
   tubiLog("Got bookmarkId " + m.AuthTask.bookmarkId + " for content " + m.top.content.id)
 
   ' TODO(Chris): Move management of this global list off to a library
   ' or task
-  bookmarkIds = m.global.bookmarkIds
-  if bookmarkIds <> invalid
-    if m.top.content.type = "series"
-      tubiLog("Appending series to bookmarks")
-      newSeries = {}
-      newSeries[m.top.content.id] = m.AuthTask.bookmarkId
-      newSeries.append(bookmarkIds.series)
-      videos = bookmarkIds.videos
-      m.global.bookmarkIds = {
-        series: newSeries
-        videos: videos
-      }
-    else if m.top.content.type = "video"
-      newVideos = {}
-      newVideos[m.top.content.id] = m.AuthTask.bookmarkId
-      newVideos.append(bookmarkIds.videos)
-      series = bookmarkIds.series
-      m.global.bookmarkIds = {
-        series: series
-        videos: newVideos
-      }
-    end if
+
+  ' if deep linked here, we may not have the bookmarks loaded.  Also, there is the chance
+  ' of a race condition where bookmarks are in flight.
+  if m.global.bookmarkIds <> invalid
+    newBookmark = CreateObject("roSGNode", "TubiContentNode")
+    newBookmark.id = m.top.content.id
+    newBookmark.type = m.top.content.type
+    newBookmark.bookmarkId = m.AuthTask.bookmarkId
+    m.global.bookmarkIds.insertChild(newBookmark, 0)
   end if
-  bookmarkOrder = m.global.bookmarkOrder
-  if bookmarkOrder <> invalid
-    if m.top.content.type = "series" then
-      newBookmarkOrder = ["0"+m.top.content.id]
-    else
-      newBookmarkOrder = [m.top.content.id]
-    end if
-    newBookmarkOrder.append(m.global.bookmarkOrder)
-    m.global.bookmarkOrder = newBookmarkOrder
-  end if
-  ' force reload the content, which will clear all the history and nowPos
   m.top.shortContent = m.top.shortContent
 
   'user tracking
@@ -465,7 +462,11 @@ Function onBookmarked()
 
   ' Notify the controller so that it can react
   m.top.addToQueueSelected = true
+End Function
 
+Function cancelHistoryQueueChange()
+  m.isWaitingForServerResponse = false
+  setMenuItems()
 End Function
 
 
@@ -478,7 +479,18 @@ Function removeFromQueue()
   tubiLog("DetailScreen.removeFromQueue")
   if m.isWaitingForServerResponse = false
     m.AuthTask.functionName = "removeFromQueue"
-    m.AuthTask.content = m.top.content
+    content = clone(m.top.content)
+'#####
+print "***** Removing content "; content.id; " from queue"
+'#####
+    if m.global.bookmarkIds <> invalid then
+      bookmark = m.global.bookmarkIds.findNode(content.id)
+      content.bookmarkId = bookmark.bookmarkId
+'#####
+print "***** Removing bookmark "; content.bookmarkId; " from queue"
+'#####
+    end if
+    m.AuthTask.content = content
     m.AuthTask.observeField("result", "onBookmarkRemoved")
     m.AuthTask.control = "RUN"
     m.isWaitingForServerResponse = true
@@ -486,48 +498,29 @@ Function removeFromQueue()
   end if
 End Function
 
-Function onBookmarkRemoved()
+Function onBookmarkRemoved() As Void
   tubiLog("DetailScreen.onBookmarkRemoved")
-  'TODO(Chris): consume return values and handle errors here
   m.AuthTask.unobserveField("result")
 
-  ' TODO(Chris): Move management of this global list off to a library
-  ' or task
-  bookmarkIds = m.global.bookmarkIds
-  'remove the bookmark
-  if bookmarkIds <> invalid
-    if m.top.content.type = "series"
-      tubiLog("Removing series to bookmarks")
-      newSeries = {}
-      newSeries.append(bookmarkIds.series)
-      newSeries.delete(m.top.content.id)
-      videos = bookmarkIds.videos
-      m.global.bookmarkIds = {
-        series: newSeries
-        videos: videos
-      }
-    else if m.top.content.type = "video"
-      newVideos = {}
-      newVideos.append(bookmarkIds.videos)
-      newVideos.delete(m.top.content.id)
-      series = bookmarkIds.series
-      m.global.bookmarkIds = {
-        series: series
-        videos: newVideos
-      }
+  if m.AuthTask.result = invalid or m.AuthTask.result.response.code <> 204 then
+    if m.AuthTask.result <> invalid
+      code = m.AuthTask.result.response.code
+      reason = m.AuthTask.result.response.failReason
+    else
+      code = -1
+      reason = "Unknown"
     end if
+    tubiLog("removeFromQueue returned " + stri(code))
+    m.isWaitingForServerResponse = false
+    showErrorModal(code, reason, removeFromQueue, cancelHistoryQueueChange)
+    return
   end if
-  bookmarkOrder = m.global.bookmarkOrder
-  if bookmarkOrder <> invalid
-    newBookmarkOrder = []
-    newBookmarkOrder.append(bookmarkOrder)
-    for i=0 to newBookmarkOrder.count()-1
-      if m.top.content.type = m.global.constants.ui.contentTypes.series and newBookmarkOrder[i] = "0"+m.top.content.id then newBookmarkOrder.delete(i)
-      if m.top.content.type = m.global.constants.ui.contentTypes.video and newBookmarkOrder[i] = m.top.content.id then newBookmarkOrder.delete(i)
-    end for
-    m.global.bookmarkOrder = newBookmarkOrder
+
+  if m.global.bookmarkIds <> invalid
+    bookmarkNode = m.global.bookmarkIds.findNode(m.top.content.id)
+    if bookmarkNode <> invalid then m.global.bookmarkIds.removeChild(bookmarkNode)
   end if
-  ' force reload the content, which will clear all the history and nowPos
+  'TODO(Chris): remove this and rely on global bookmarkIds for rendering proper menu (rather than needing a fully-realized content rendered by metadatafetchtask)
   m.top.shortContent = m.top.shortContent
 
   'user tracking
@@ -538,9 +531,7 @@ Function onBookmarkRemoved()
 
   ' Notify the controller so that it can react
   m.top.removeFromQueueSelected = true
-
 End Function
-
 
 '''''''''''''''''''''''
 ' removeFromHistory
@@ -549,7 +540,12 @@ Function removeFromHistory()
   tubiLog("DetailScreen.removeFromHistory")
   if m.isWaitingForServerResponse = false
     m.AuthTask.functionName = "removeFromHistory"
-    m.AuthTask.content = m.top.content
+    content = clone(m.top.content)
+    if m.global.historyIds <> invalid then
+      history = m.global.historyIds.findNode(m.top.content.id)
+      content.historyId = history.historyId
+    end if
+    m.AuthTask.content = content
     m.AuthTask.observeField("result", "onHistoryRemoved")
     m.AuthTask.control = "RUN"
     m.isWaitingForServerResponse = true
@@ -557,68 +553,34 @@ Function removeFromHistory()
   end if
 End Function
 
-
-Function onHistoryRemoved()
+Function onHistoryRemoved() As Void
   tubiLog("DetailScreen.onHistoryRemoved")
   m.AuthTask.unobserveField("result")
 
-  ' TODO(Chris): Move management of this global list off to a library
-  ' or task
-  historyIds = m.global.historyIds
-  if historyIds <> invalid
-    if m.top.shortContent.type = "series"
-      if historyIds.series[m.top.shortContent.id] <> invalid
-        newSeries = {}
-        newSeries.append(historyIds.series)
-        newSeries.delete(m.top.shortContent.id)
-        videos = historyIds.videos
-      end if
-      ' remove episodes' nowPos
-      newVideos = {}
-      newVideos.append(historyIds.videos)
-      for i=0 to m.top.content.getChildCount()-1
-        season = m.top.content.getChild(i)
-        for j=0 to season.getChildCount()-1
-          episode = season.getChild(j)
-          newVideos.delete(episode.id)
-        end for
-      end for
-      m.global.historyIds = {
-        series: newSeries
-        videos: newVideos
-      }
+  if m.AuthTask.result = invalid or m.AuthTask.result.response.code <> 204 then
+    if m.AuthTask.result <> invalid
+      code = m.AuthTask.result.response.code
+      reason = m.AuthTask.result.response.failReason
+    else
+      code = -1
+      reason = "Unknown"
+    end if
+    tubiLog("removeFromHistory returned " + stri(code))
+    m.isWaitingForServerResponse = false
+    showErrorModal(code, reason, removeFromHistory, cancelHistoryQueueChange)
+    return
+  end if
 
-    else if m.top.shortContent.type = "video"
-      if historyIds.videos[m.top.shortContent.id] <> invalid
-        newVideos = {}
-        newVideos.append(historyIds.videos)
-        newVideos.delete(m.top.shortContent.id)
-        series = historyIds.series
-        m.global.historyIds = {
-          series: series
-          videos: newVideos
-        }
-      end if
+  if m.global.historyIds <> invalid
+    historyNode = m.global.historyIds.findNode(m.top.shortContent.id)
+    if historyNode <> invalid
+      m.global.historyIds.removeChild(historyNode)
     end if
   end if
-  historyOrder = m.global.historyOrder
-  if historyOrder <> invalid
-    newHistoryOrder = []
-    newHistoryOrder.append(historyOrder)
-
-    for i=0 to newHistoryOrder.count()-1
-      if m.top.shortContent.type = m.global.constants.ui.contentTypes.series and newHistoryOrder[i] = "0"+m.top.shortContent.id then newHistoryOrder.delete(i)
-      if m.top.shortContent.type = m.global.constants.ui.contentTypes.video and newHistoryOrder[i] = m.top.shortContent.id then newHistoryOrder.delete(i)
-    end for
-    m.global.historyOrder = newHistoryOrder
-  end if
-
-  ' Notify the controller so that it can react
   m.top.removeFromHistorySelected = true
 
   ' force reload the content, which will clear all the history and nowPos
   m.top.shortContent = m.top.shortContent
-
 End Function
 
 

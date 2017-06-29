@@ -33,61 +33,29 @@ End Function
 '     send either the video or the episode as the content, not the parent series
 function tubiBookmarks_addBookmarkReq(content as Object) as Object
   bookmarkReq = invalid
-
   if content <> invalid
     'translate internal content type to UAPI content type
-    contentType = invalid
-    idToServe = content.id
     if content["type"] = m.constants.ui.contentTypes.video
-      contentType = m.constants.uapiContentTypes.movie
-      'if episodes was passed in, we need to get the id of the parent series since we don't bookmarks series
-      if content.parentId <> invalid and content.parentId <> ""
-        idToServe = content.parentId
-        contentType = m.constants.uapiContentTypes.series
-      end if
+      bookmarkReq = m.createBookmarksRequest(content.id, "add", m.constants.uapiContentTypes.movie)
     else if content["type"] = m.constants.ui.contentTypes.series
-      contentType = m.constants.uapiContentTypes.series
+      bookmarkReq = m.createBookmarksRequest(content.id, "add", m.constants.uapiContentTypes.series)
     else
-      tubiLog("ERROR: Can't bookmark content that isn't a video, series, or episode")
-      return invalid
+      tubiLog("ERROR: Can't bookmark content that isn't a video or series")
     end if
-
-    bookmarkReq = m.createBookmarksRequest(idToServe, "add", contentType)
   end if
-
   return bookmarkReq
 end function
 
 
 'returns a request object that can be used to remove a bookmark from the server
 '@content: can be a content node from scene graph or a content object from the main thread - expect videos/movies or episodes, no series
-'@bookmarkIdList: assocArray, {contentId: bookmarkId, ...}
-function tubiBookmarks_removeBookmarkReq(content as Object, bookmarkIdList as Object) as Object
+function tubiBookmarks_removeBookmarkReq(content as Object) as Object
   bookmarkReq = invalid
-
-  if content <> invalid and content.id <> invalid
-    idToCheck = content.id
-    
-    'if episodes was passed in, we need to get the id of the parent series since we don't bookmarks series
-    idToServe = content.bookmarkId
-    if content.parentId <> invalid and content.parentId <> ""
-      idToCheck = content.parentId
-    end if
-
-    if bookmarkIdList <> invalid then
-      idToServe = bookmarkIdList.videos[idToCheck]
-      if idToServe = invalid then
-        idToServe = bookmarkIdList.series[idToCheck]
-      end if
-    end if
-    
-    if idToServe <> invalid
-      bookmarkReq = m.createBookmarksRequest(idToServe, "delete")
-    else
-      tubiLog("idToServe was invalid, not found in bookmarkIdList")
-    end if
+  if content <> invalid and content.id <> invalid and content.bookmarkId <> invalid
+    bookmarkReq = m.createBookmarksRequest(content.bookmarkId, "delete")
+  else
+    tubiLog("bookmark id not found")
   end if
-
   return bookmarkReq
 end function
 
@@ -173,30 +141,11 @@ end function
 
 'returns a request object that can be used to remove a history from the server
 '@content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
-'@historyIdList: assocArray, {contentId: historyId, ...}
-function tubiBookmarks_removeHistoryReq(content as Object, historyIdList as Object) as Object
+function tubiBookmarks_removeHistoryReq(content as Object) as Object
   historyReq = invalid
-
-  if content <> invalid
-    idToCheck = content.id
-
-    idToServe = content.historyId
-
-    'set the episode's parent id as the id to check for the "history server id", since when we remove a history,
-    'we remove the whole series not just the episode
-    if content.parentId <> invalid and content.parentId <> ""
-      idToCheck = content.parentId 
-      
-      if historyIdList <> invalid and historyIdList.series[idToCheck] <> invalid
-        idToServe = historyIdList.series[idToCheck].serverId
-      end if
-    end if
-
-    if idToServe <> invalid then
-      historyReq = m.createHistoryRequest(idToServe, invalid, 0, "delete")
-    end if
+  if content <> invalid and content.historyId <> invalid then
+    historyReq = m.createHistoryRequest(content.historyId, invalid, 0, "delete")
   end if
-
   return historyReq
 end function
 
@@ -379,90 +328,57 @@ end function
 
 
 '@initialBookmarks: string, JSON server response when making the first call to UAPI to get a user's basic bookmark info
-'returns an object with 2 keys, bookmarkIds and bookmarkOrder
-'   bookmarkIds: assocArray, a map of contentIds to server bookmarksIds
-'   bookmarkOrder: an array of contentIds (series have pre-pended 0), that keeps the order of bookmarks as returned from the server
+'returns bookmarkIds ordered node tree with series having episode children
 function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
-  bookmarkOrder = []
-  bookmarkIds = {
-    'each videos and series assocArray should look like:
-    '{contentId: bookmarkServerId, ...}
-    videos: {}
-    series: {}
-  }
-
+  bookmarkIds = CreateObject("roSGNode", "TubiContentNode")
   parsedInitialBookmarks = ParseJson(initialBookmarks)
   if parsedInitialBookmarks <> Invalid
     for each bookmark in parsedInitialBookmarks.items
+      child = bookmarkIds.createChild("TubiContentNode")
+      child.id = bookmark.content_id.toStr() 
+      child.bookmarkId = bookmark.id
       if bookmark.content_type = m.constants.uapiContentTypes.movie
-        bookmarkIds.videos[bookmark.content_id.toStr()] = bookmark.id
-        bookmarkOrder.push(bookmark.content_id.toStr())
+        child.type = m.constants.ui.contentTypes.video
       else if bookmark.content_type = m.constants.uapiContentTypes.series
-        bookmarkIds.series[bookmark.content_id.toStr()] = bookmark.id
-        bookmarkOrder.push("0" + bookmark.content_id.toStr())
+        child.id = "0" + child.id
+        child.type = m.constants.ui.contentTypes.series
       end if
     end for
   end if
-
-  return {
-    bookmarkOrder: bookmarkOrder
-    bookmarkIds: bookmarkIds
-  }
-
+  return bookmarkIds
 end function
 
 
 
 '@initialHistory: string, JSON server response when making the first call to UAPI to get a user's basic bookmark info
-'returns an object with 2 keys, historyIds and historyOrder
-'   historyIds: assocArray, a map of contentIds to server historysIds
-'   historyOrder: an array of contentIds (series have pre-pended 0), that keeps the order of history as returned from the server
+'returns historyIds ordered node tree with series having episode children
 function tubiBookmarks_handleInitialHistory(initialHistory)
-  tubiLog("TubiBookmarks.handleInitialHistory")
-  historyOrder = []
-  historyIds = {
-    'each videos and series assocArray should look like:
-    '{contentId: {
-    '   serverId: historyServerId
-    '   position: 365
-    '  }
-    '}
-    videos: {}
-    series: {}
-  }
-
-  'parse the initial bookmark response and create a list of bookmark server ids that will persist in the content controller
+  historyIds = CreateObject("roSGNode", "TubiContentNode")
   parsedInitialHistory = ParseJson(initialHistory)
   if parsedInitialHistory <> invalid then
     for each history in parsedInitialHistory.items
+      child = historyIds.createChild("TubiContentNode")
+      child.id =         history.content_id.toStr()
       if history.content_type = m.constants.uapiContentTypes.movie
-        historyIds.videos[history.content_id.toStr()] = {
-          serverId: history.id
-          position: history.position
-        }
-        historyOrder.push(history.content_id.toStr())
-
+        child.historyId =  history.id
+        child.nowPos =     history.position
+        child.type =       m.constants.ui.contentTypes.video
       else if history.content_type = m.constants.uapiContentTypes.series
-        historyIds.series[history.content_id.toStr()] = {
-          serverId: history.id
-          currentEpisodeId: history.episodes[history.position].content_id.toStr()
-        }
+        child.id =                 "0" + child.id
+        child.currentEpisodeId =   history.episodes[history.position].content_id.toStr()
+        child.historyId =          history.id
+        child.type =               m.constants.ui.contentTypes.series
         for each episode in history.episodes
-          historyIds.videos[episode.content_id.toStr()] = {
-            serverId: episode.id
-            position: episode.position
-          }
+          grandchild = child.createChild("TubiContentNode")
+          grandchild.id = episode.content_id.toStr()
+          grandchild.historyId = episode.id
+          grandchild.nowPos = episode.position
+          grandchild.type = m.constants.ui.contentTypes.video
         end for
-        historyOrder.push("0" + history.content_id.toStr())
       end if
     end for
   end if
-
-  return {
-    historyOrder: historyOrder
-    historyIds: historyIds
-  }
-
+  return historyIds
 end function
 
 
@@ -474,71 +390,56 @@ end function
 '         parentHistoryId: string (optional), a history id for a series as returned by the UAPI server
 '       }
 '@historyIds: assocArray, historyIds as stored on scenegraphs m.global.historyIds. Also returned from m.handleInitialHistory().historyIds
-function tubiBookmarks_updateNowPos(content, playerInfo, historyIds, historyOrder)
+function tubiBookmarks_updateNowPos(content, playerInfo, historyIds)
 
   if historyIds <> invalid and playerInfo <> invalid and content.id <> invalid
-    
-    newHistoryIds = {
-      videos: {}
-      series: {}
-    }
-    if historyIds.series <> invalid then newHistoryIds.series.append(historyIds.series)
-    if historyIds.videos <> invalid then newHistoryIds.videos.append(historyIds.videos)
-
-    newHistoryOrder = []
-    newHistoryOrder.append(historyOrder)
-
-    if newHistoryIds.videos[content.id] <> invalid 
+    existingEpisode = historyIds.findNode(content.id)    
+    if existingEpisode <> invalid
       tubiLog("Bookmarks.updateNowPos updating historyId for " + content.id)
-      newHistoryIds.videos[content.id].position = playerInfo.nowPos
+      existingEpisode.nowPos = playerInfo.nowPos
 
       ' update the currentEpisodeId if an episode was just played
       if content.parentId <> invalid and content.parentId <> "" then
         tubiLog("Bookmarks.updateNowPos updating currentEpisodeId for " + content.parentId)
-        if newHistoryIds.series[content.parentId] <> invalid
-          newHistoryIds.series[content.parentId].currentEpisodeId = content.id
+        series = historyIds.findNode(content.parentId)
+        if series <> invalid then 
+          series.currentEpisodeId = content.id
+          historyIds.insertChild(series, 0)  ' bump the order to the beginning
         end if
+      else
+        ' movie
+        historyIds.insertChild(existingEpisode, 0)  ' bump to the beginning
       end if
     else
-      tubiLog("Bookmarks.updateNowPos Storing historyId for " + content.id)
+      tubiLog("Bookmarks.updateNowPos storing historyId for " + content.id)
 
       ' store the series if video was an episode
       if content.parentId <> invalid and content.parentId <> "" then
-        tubiLog("Bookmarks.updateNowPos Storing parentHistoryId for " + content.parentId)
-        newHistoryIds.series[content.parentId] = {
-          serverId: playerInfo.parentHistoryId   ' may be invalid for signed-out user
-          currentEpisodeId: content.id
-        }
-        newHistoryIds.videos[content.id] = {
-          serverId: playerInfo.historyId        ' may be invalid for signed-out user
-          position: playerInfo.nowPos
-        }
-        orderId = "0" + content.parentId
+        tubiLog("Bookmarks.updateNowPos storing parentHistoryId for " + content.parentId)
+
+        series = historyIds.findNode(content.parentId)
+        if series = invalid
+          series =                    historyIds.createChild("TubiContentNode")
+          series.id =                 content.parentId
+          series.historyId =          playerInfo.parentHistoryId  ' TODO(Chris): check that this is invalid for all cases and remove
+          series.type =               m.constants.ui.contentTypes.series
+        end if
+        series.currentEpisodeId =   content.id
+        historyIds.insertChild(series, 0)
+        episode =                   series.createChild("TubiContentNode")
+        episode.id =                content.id
+        episode.historyId =         playerInfo.historyId
+        episode.nowPos =            playerInfo.nowPos
+        episode.type =              m.constants.ui.contentTypes.video
       else
-        ' update if the video was a movie
-        newHistoryIds.videos[content.id] = {
-          serverId: playerInfo.historyId        ' may be invalid for signed-out user
-          position: playerInfo.nowPos
-        }
-        orderId = content.id
+        episode =                   historyIds.createChild("TubiContentNode")
+        episode.id =                content.id
+        episode.historyId =         playerInfo.historyId
+        episode.nowPos =            playerInfo.nowPos
+        episode.type =              m.constants.ui.contentTypes.video
+        historyIds.insertChild(episode, 0)
       end if
-
-      ' clear any existing series/movie from history and put the new entry at the top
-      for i=0 to newHistoryOrder.count()-1
-        if newHistoryOrder[i] = orderId then newHistoryOrder.delete(i)
-      end for
-      newHistoryOrder.unshift(orderId)
     end if
-
-    return {
-      historyOrder: newHistoryOrder
-      historyIds: newHistoryIds
-    }
-  else
-    ' one of the arguments was invalid, just return what we were passed in
-    return {
-      historyOrder: historyOrder      
-      historyIds: historyIds
-    }
   end if
+  return historyIds
 end function
