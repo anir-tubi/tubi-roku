@@ -4,6 +4,7 @@ Function init()
   m.ButtonGroup.setFocus(true)
   m.ButtonGroup.observeField("itemSelected", "onButtonSelected")
   m.RegistrationCode = m.top.findNode("RegistrationCode")
+  m.exitedScreen = false
   getRegistrationCode()
 End Function
 
@@ -15,6 +16,7 @@ End Function
 Function onScreenFocusChange()
   tubiLog("RegisterInstructionsScreen.onScreenFocusChange")
   if m.top.hasFocus() then
+    m.exitedScreen = false
     m.ButtonGroup.setFocus(true)
   end if
 End Function
@@ -62,7 +64,7 @@ End Function
 Function onRegTaskStateChange()
   tubiLog("RegisterInstructionsScreen.onRegTaskStateChange; state = " + m.RegCodeTask.state)
   if m.RegCodeTask.state = "stop" then
-    if m.RegCodeTask.response = invalid or m.RegCodeTask.response.status <> "registered" then
+    if (m.RegCodeTask.response = invalid or m.RegCodeTask.response.status <> "registered") and not m.exitedScreen then
       'Just retry the reg code
       getRegistrationCode()
     end if
@@ -90,4 +92,16 @@ Function getRegistrationCode()
   m.RegCodeTask.observeField("response", "onRegistrationResponse")
   m.RegCodeTask.observeField("state", "onRegTaskStateChange")
   m.RegCodeTask.control = "RUN"
+End Function
+
+
+Function onKeyEvent(key As String, press As Boolean)
+  if press
+    if key = "back"
+      'leaving page so stop polling
+      m.RegCodeTask.cancel = true
+      m.exitedScreen = true
+      return false
+    end if
+  end if
 End Function

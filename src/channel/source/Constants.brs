@@ -355,7 +355,8 @@ Function getConstants()
   constants.ui = {}
     'constants needed for sign in flow experimentation
     constants.ui.signIn = {}
-    constants.ui.signIn.skipContinueScreen = false
+      constants.ui.signIn.skipContinueScreen = false
+      constants.ui.signIn.skipSignInRegisterScreen = false
 
     'static - pre defined category names
     constants.ui.categoryNames = {}

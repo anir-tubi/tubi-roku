@@ -7,6 +7,7 @@ Function init()
   m.Background = m.top.findNode("SignInBackground")
   m.Background.color = m.global.constants.ui.colors.backgroundColor
   m.skipContinueScreen = m.global.constants.ui.signIn.skipContinueScreen
+  m.skipSignInRegisterScreen = m.global.constants.ui.signIn.skipSignInRegisterScreen
 
   initScreenStack(m.top.findNode("SignInScreenStack"), invalid, false)
   pushScreen(m.Disambiguation)
@@ -30,10 +31,15 @@ End Function
 ' User chose to sign in, display the sign-in/register screen
 Function onDisambiguationSignIn()
   tubiLog("SignInController.onDisambiguationSignIn")
-  m.SignInRegister = CreateObject("roSGNode", "SignInRegisterScreen")
-  m.SignInRegister.observeField("signInButtonSelected", "onSignIn")
-  m.SignInRegister.observeField("registerButtonSelected", "onRegister")
-  pushScreen(m.SignInRegister)
+  if m.skipSignInRegisterScreen = true
+    'just go straight to the web code registration screen
+    onRegister()
+  else
+    m.SignInRegister = CreateObject("roSGNode", "SignInRegisterScreen")
+    m.SignInRegister.observeField("signInButtonSelected", "onSignIn")
+    m.SignInRegister.observeField("registerButtonSelected", "onRegister")
+    pushScreen(m.SignInRegister)
+  end if
 End Function
 
 

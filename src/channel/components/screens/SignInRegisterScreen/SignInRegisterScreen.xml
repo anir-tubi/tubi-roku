@@ -55,6 +55,10 @@
       itemSpacings="[206]"
       translation="[540,419]"
       layoutDirection="horiz">
+      <Poster
+       uri="pkg:/images/picto-register.png"
+       width="302"
+       height="192"/>
       <LayoutGroup
         layoutDirection="vert">
         <Rectangle
@@ -66,10 +70,6 @@
          width="300"
          height="144"/>
       </LayoutGroup>
-      <Poster
-       uri="pkg:/images/picto-register.png"
-       width="302"
-       height="192"/>
     </LayoutGroup>
        
     <ScrollingList
@@ -82,8 +82,8 @@
       itemComponentName="SignInButton"
       itemSpacings="[26]">
       <ContentNode role="content">
-        <ContentNode id="signin" title="Sign In via Email"/>
         <ContentNode id="register" title="Register Online"/>
+        <ContentNode id="signin" title="Sign In via Email"/>
       </ContentNode>
     </ScrollingList>
     
@@ -93,7 +93,7 @@
       itemSpacings="[26]"
       opacity="0.5">
      <Label
-       text="Use your email and password for your existing account"
+       text="Register at tubitv.com or sign in into an existing account"
        wrap="true"
        width="480">
        <Font
@@ -102,7 +102,7 @@
          size="22"/>
      </Label>
      <Label
-       text="Register at tubitv.com or sign in into an existing account"
+       text="Use your email and password for your existing account"
        wrap="true"
        width="480">
        <Font
