@@ -114,5 +114,6 @@ theme:
   GridScreenOverhangHeightSD: "45"
   OverhangLogoHD: "pkg:/images/oldUI/TubiTV_TallBanner_HD_1280x135.jpg"
   OverhangLogoSD: "pkg:/images/oldUI/TubiTV_TallBanner_SD_720x125.jpg"
-
-
+  RegistrationCodeColor: "#ff9900"
+  ParagraphBodyText: "#FFFFFF"
+  ParagraphHeaderText: "#FFFFFF"
