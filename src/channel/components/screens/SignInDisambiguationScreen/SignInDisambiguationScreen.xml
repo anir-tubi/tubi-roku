@@ -73,7 +73,7 @@
       itemComponentName="SignInButton"
       itemSpacings="[26]">
       <ContentNode role="content">
-        <ContentNode id="signin" title="Sign In Or Register"/>
+        <ContentNode id="signin" title="Sign In or Register Free"/>
         <ContentNode id="guestpass" title="Guest Pass"/>
       </ContentNode>
     </ScrollingList>
