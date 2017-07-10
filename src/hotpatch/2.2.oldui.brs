@@ -1209,3 +1209,291 @@ m.app.player.showSpanOfContentVideoNew = Function(episode As Object)
   end while
 
 end function
+
+
+'Update text on web coder registration screen
+m.app.registerScreen.webRegister = Function()
+  settings = m.utils.getSettings()
+
+  'create new regId to send to server as a unique id that will be stored in Roku's local memory if registration is completed
+  'regId will be saved into into memory as "token"
+  regId = m.utils.generateUuId()
+
+  webRegPort = CreateObject("roMessagePort")
+
+  'set up registation screen
+  webRegScreen = CreateObject("roCodeRegistrationScreen")
+  webRegScreen.SetMessagePort(webRegPort)
+
+  webRegScreen.AddHeaderText("Steps to activate Tubi TV for Roku")
+  webRegScreen.AddParagraph("1) Register or sign in on a computer or mobile device at tubitv.com/activate")
+  webRegScreen.AddParagraph("2) When asked, enter the activation code below.")
+  webRegScreen.AddParagraph(" ")
+  webRegScreen.SetRegistrationCode("Retrieving code...")
+  webRegScreen.AddParagraph(" ")
+  webRegScreen.AddParagraph("3) This screen will automatically update after you enter the code.")
+  webRegScreen.AddButton(2, "Get a new code")
+  webRegScreen.AddButton(1, "Cancel")
+  webRegScreen.Show()
+
+  m.utils.trackEvent({
+    trackType: "pageLoad"
+    value: "/deviceregistration/code"
+    port: webRegPort
+  })
+
+  'close the phone register screen since we will never return to it from this screen
+  ' m.canvas.Close()
+
+  'get code from server and add it to screen
+
+  'start polling server to see if the user has added the code. If after polling begins, the user asks for a new code
+  'stop the current polling async request and start a new async request to get the code.
+  'until there is an error or the server responds that the user has registered, there should always be exactly one async request
+  'waiting for a response (either getting code or polling to see if registration complete)
+
+  webRegUrlGetCode = settings.regUrlBase + "/generate"
+  webRegUrlGetConfirmation = settings.regUrlBase + "/status"
+
+  regCode = invalid
+  regId = invalid
+  token = invalid
+  identifier = invalid
+
+  haveRegistrationCode = false
+
+  pollCounter = 0
+  timeSpan = CreateObject("roTimespan")
+
+  while true
+    if haveRegistrationCode = false 'then we need to attempt to get the response code
+      getCodeBody = {
+        device_id: m.utils.deviceInfo.deviceId
+        platform: "roku"
+      }
+      if identifier <> invalid
+        getCodeBody.identifier = identifier
+      end if
+      
+      getCodeBodyJson = FormatJson(getCodeBody)
+
+      getCodeHeaders = {
+        "Content-Type": "application/json"
+      }
+      webRegAsyncId = m.utils.sendAsyncRequest(webRegUrlGetCode, webRegPort, "webRegistration", "POST", true, getCodeBodyJson, getCodeHeaders)
+    else 'start polling
+      pollBody = {
+        device_id: m.utils.deviceInfo.deviceId
+        platform: "roku"
+        activation_token: token
+      }
+      pollJsonBody = FormatJson(pollBody)
+      pollHeaders = {
+        "Content-Type": "application/json"
+      }
+      webRegAsyncId = m.utils.sendAsyncRequest(webRegUrlGetConfirmation, webRegPort, "webConfirmationPoll", "POST", true, pollJsonBody, pollHeaders)
+      timeSpan.Mark()
+    end if
+
+    if (webRegAsyncId <> 0)
+      codeRetryCount = 0
+    
+      while true
+        'keep running through this loop(listening for events) - if we are polling and 2 seconds have passed since the last poll
+        'jump out of the inner while loop and make another polling call.
+        if timeSpan.TotalMilliseconds() > 2000 and haveRegistrationCode = true
+          exit while
+        end if
+
+        msg = wait(1000, webRegPort) 'listen for messages for 1 sec (either remote control input message or message indicating a response to the previous async call)
+        'make sure the message is from the most recent async request
+        'there can be race conditions, especially when asking for a new registration code
+        if msg <> invalid
+          if type(msg) = "roUrlEvent" and msg.GetFailureReason() <> "Cancelled" 'got response from server for async call
+            if haveRegistrationCode = false 'means the current response is to a get code request
+              getCodeResponse = m.utils.getAsyncResponse(msg, 0)
+              ' if getCodeResponse <> invalid and getCodeResponse.data <> invalid and getCodeResponse.data.len() > 0 and getCodeResponse.responseCode = 200
+              if getCodeResponse <> invalid and getCodeResponse.id = webRegAsyncId
+                if getCodeResponse.data <> invalid and getCodeResponse.data.len() > 0
+                  codeResponse = ParseJson(getCodeResponse.data)
+                  regCode = codeResponse.activation_code 'code for a user to enter at tubitv.com/roku to complete registration
+                  'only store the first regId that is created - any subsquent calls to get activation code will send new regIds - we don't want those
+                  'regIds are known as tokens on the server and web code'                 
+                  if regId = invalid
+                    regId = codeResponse.activation_token 'regId should be a UUID - to be passed back to server as an identifier when polling
+                  end if
+                  webRegScreen.SetRegistrationCode(regCode) 'add code to the screen
+                  token = regId
+                  identifier = regCode
+                  haveRegistrationCode = true
+                  exit while
+                
+                'did not successfully get a code from the server - so retry
+                else
+                  if codeRetryCount <= 3
+                    webRegAsyncId = m.utils.sendAsyncRequest(webRegUrlGetCode, webRegPort, "webRegistration", "POST", true, getCodeBodyJson, getCodeHeaders)
+                    
+                    m.utils.trackEvent({
+                      trackType: "registerFail"
+                      value: "bad-server-response-code"
+                      port: webRegPort
+                    })
+
+                    codeRetryCount = codeRetryCount + 1
+                  else
+                    m.utils.trackEvent({
+                      trackType: "navigate"
+                      value: "/home"
+                      ctx: "/deviceregistration/code"
+                      port: webRegPort
+                    })
+
+                    m.showMessage("We're sorry", "Could not get code from server.")
+                    webRegScreen.Close()
+                    return false
+                  end if
+                end if
+              end if
+            else if haveRegistrationCode = true 'means the current response is to a get confirmation request (polling)
+              registrationResponse = m.utils.getAsyncResponse(msg, 0)
+              ' if registrationResponse <> invalid and registrationResponse.data <> invalid and registrationResponse.data.len() > 0 and registrationResponse.responseCode = 200
+              if registrationResponse <> invalid and registrationResponse.id = webRegAsyncId
+                if registrationResponse.data <> invalid and registrationResponse.data.len() > 0
+                  registrationInfo = ParseJson(registrationResponse.data)
+
+                  if registrationInfo.status = "pending"
+                    'we get a response with no confirmation that user registered - so we're still waiting
+                    pollCounter = pollCounter + 2
+                    'if we've polled for 5 minutes stop polling
+                    if pollCounter > 600
+                      m.showMessage("We're sorry", "After checking for 10 minutes, we did not see you register.")
+                      
+                      m.utils.trackEvent({
+                        trackType: "registerFail"
+                        value: "code-user-timeout"
+                        port: webRegPort
+                      })                    
+                      
+                      m.utils.trackEvent({
+                        trackType: "navigate"
+                        value: "/home"
+                        ctx: "/deviceregistration/code"
+                        port: webRegPort
+                      })
+  
+                      webRegScreen.Close()
+                      return false
+                    end if
+                  else if registrationInfo.status = "registered"
+                    'we get a response confirming the user registered so let the user know and exit the page
+                    'store auth info in registry
+                    authInfo = m.utils.formatAuthInfoFromServer(registrationInfo)
+                    m.utils.saveAuthInfo(authInfo)
+
+                    m.utils.trackEvent({
+                      trackType: "registerSuccess"
+                      value: "/deviceregistration/code"
+                      port: webRegPort
+                    })
+
+                    'create a message box with a button for closing the box
+                    'when user closes box, webRegScreen should close and bring users to the gridScreen
+                    m.showMessage("Thank you", "You are now registered as " + registrationInfo.first_name + " " + registrationInfo.last_name + ".")
+
+                    m.utils.trackEvent({
+                      trackType: "navigate"
+                      value: "/home"
+                      ctx: "/deviceregistration/code"
+                      port: webRegPort
+                    })
+
+                    webRegScreen.Close()
+                    return true
+                  end if
+
+
+                else
+                  'we get an error
+                  print "there was an error while polling for response from web registration"
+                  m.showMessage("We're sorry", "Registration wasn't able to be completed.")
+
+                  m.utils.trackEvent({
+                    trackType: "registerFail"
+                    value: "bad-server-response-poll"
+                    port: webRegPort
+                  })
+
+                  m.utils.trackEvent({
+                    trackType: "navigate"
+                    value: "/home"
+                    ctx: "/deviceregistration/code"
+                    port: webRegPort
+                  })
+
+                  webRegScreen.Close()
+                  return false
+                end if
+
+              else if registrationResponse <> invalid and registrationResponse.id <> webRegAsyncId
+                'we got a response from a user tracking event, so no need to do anything
+                print "registration screen user event response"
+              end if
+
+            else 'something went horribly wrong
+              print "haveRegistrationCode is not an expected type"
+              m.showMessage("We're sorry", "Registration wasn't able to be completed...")
+              m.utils.trackEvent({
+                trackType: "registerFail"
+                value: "unknown-error"
+                port: webRegPort
+              })
+
+              m.utils.trackEvent({
+                trackType: "navigate"
+                value: "/home"
+                ctx: "/deviceregistration/code"
+                port: webRegPort
+              })
+
+              webRegScreen.Close()
+              return false
+            end if
+          else if type(msg) = "roCodeRegistrationScreenEvent"
+            if msg.GetIndex() = 0 or msg.GetIndex() = 1 'back button or cancel button pressed
+              m.utils.cancelAsyncRequest(webRegAsyncId)
+              
+              m.utils.trackEvent({
+                trackType: "registerFail"
+                value: "user-cancel"
+                port: webRegPort
+              })
+
+              m.utils.trackEvent({
+                trackType: "navigate"
+                value: "/home"
+                ctx: "/deviceregistration/code"
+                port: webRegPort
+              })
+              
+              webRegScreen.Close()
+              return false
+            else if msg.GetIndex() = 2 'request for new code
+              'only honor request for new codes if we are not in the process of getting a new code
+              'if we try to get a new code, while waiting for the server to respond, the server gets confused and returns an error
+              if haveRegistrationCode = true
+                print "new web registration code was requested"
+                haveRegistrationCode = false
+                webRegScreen.SetRegistrationCode("Retrieving...")
+                m.utils.cancelAsyncRequest(webRegAsyncId) 'get rid of any pending async get request before making another
+                exit while
+              end if
+            else if msg.isScreenClosed() 'don't think this is necessary
+              ' return false
+            end if
+          end if
+        end if
+      end while
+    end if
+  end while
+
+end Function
