@@ -42,7 +42,7 @@
       translation="[910,126]"/>
     
     <Label
-      text="Register or sign in online at"
+      text="Register for free or sign in online at"
       translation="[0,260]"
       horizAlign="center"
       width="1920">
@@ -53,7 +53,7 @@
     </Label> 
            
     <Label
-      text="www.tubitv.com/activate"
+      text="tubitv.com/activate"
       translation="[0,321]"
       horizAlign="center"
       width="1920"
