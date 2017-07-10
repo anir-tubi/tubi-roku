@@ -2,7 +2,7 @@ print "Hot Patch 2.2.newui dev"
 
 'settings.version must be updated manually in the new ui hotpatch file
 'when a new remote components version is released
-m.global.utils.constants.settings.version = "2_2_17"
+m.global.utils.constants.settings.version = "2_2_20"
 
 
 m.global.utils.constants.settings.allowAfterHours = true

@@ -75,10 +75,15 @@ End Function
 ' At continuation screen, user decided to log in after all
 Function onContinueSignIn()
   tubiLog("SignInController.onContinueSignIn")
-  m.SignInRegister = CreateObject("roSGNode", "SignInRegisterScreen")
-  m.SignInRegister.observeField("signInButtonSelected", "onSignIn")
-  m.SignInRegister.observeField("registerButtonSelected", "onRegister")
-  pushScreen(m.SignInRegister)
+  if m.skipSignInRegisterScreen = true
+    'just go straight to the web code registration screen
+    onRegister()    
+  else
+    m.SignInRegister = CreateObject("roSGNode", "SignInRegisterScreen")
+    m.SignInRegister.observeField("signInButtonSelected", "onSignIn")
+    m.SignInRegister.observeField("registerButtonSelected", "onRegister")
+    pushScreen(m.SignInRegister)
+  end if
 End Function
 
 
