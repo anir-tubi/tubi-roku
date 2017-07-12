@@ -137,6 +137,7 @@ Function startUserExperience()
       showDetailScreen(m.top.deepLinkContent)
 
     else if m.authTask.authInfo = invalid then
+      tubiLog("ContentController ask user to sign in")
       startSignIn()
     else if m.top.onNowContent <> invalid
       startOnNow()
@@ -687,6 +688,7 @@ End Function
 Function onDeepLinkContentReceived()
   tubiLog("onDeepLinkContentReceived")
   m.deepLinkEvaluated = true
+  m.top.unobserveField("deepLinkContent")
   startUserExperience()
 End Function
 

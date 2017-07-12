@@ -22,6 +22,9 @@ end if
 ' incompatible architectural changes.
 m.global.utils.constants.settings.remoteComponentsUrl = "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_" + m.global.utils.constants.settings.version + ".pkg"
 
+
+
+
 ' Patch the deep link to set controller.deepLinkContent field even if there is no deep link
 m.global.channel.deepLink = Function(args, controller, tracking)
 
