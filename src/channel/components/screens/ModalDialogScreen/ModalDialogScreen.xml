@@ -91,7 +91,6 @@
           width="490"
           height="1080"
           layoutDirection="vert"
-          focusBitmapUri="pkg:/images/menu-focus.9.png"
           itemComponentName="InstalledCategorySeasonListItem"
           itemSpacings="[6]">
         </InstalledScrollingList>

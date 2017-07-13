@@ -48,7 +48,6 @@
       itemSpacings="[10]"
       scrollWidth="1760"
       scrollHeight="500"
-      focusBitmapUri="pkg:/images/menu-focus.9.png"
       itemComponentName="SignInPoster"/>
     
     <SignInPosterContentNode

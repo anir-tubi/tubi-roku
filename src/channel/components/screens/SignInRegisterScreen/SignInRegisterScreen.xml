@@ -78,7 +78,6 @@
       translation="[450,720]"
       height="80"
       width="986"
-      focusBitmapUri="pkg:/images/menu-focus.9.png"
       itemComponentName="SignInButton"
       itemSpacings="[26]">
       <ContentNode role="content">

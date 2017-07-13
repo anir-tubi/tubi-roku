@@ -1,7 +1,6 @@
 Function init()
   m.top.observeField("focusedChild", "onFocus")
   m.Disambiguation = CreateObject("roSGNode", "SignInDisambiguationScreen")
-  m.Disambiguation.setFocus(true)
   m.Disambiguation.observeField("signInButtonSelected", "onDisambiguationSignIn")
   m.Disambiguation.observeField("guestPassButtonSelected", "onDisambiguationGuestPass")
   m.Background = m.top.findNode("SignInBackground")
