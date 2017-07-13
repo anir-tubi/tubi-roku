@@ -368,6 +368,12 @@ Function updateLowMemBackground()
       backgroundImage.visible = false
       backgroundGradient.uri = "pkg:/images/home-gradient-25.png"
       backgroundImage.uri = m.top.backgroundUriList[0]
+      backgroundImage.loadWidth="1615"
+      backgroundImage.width="1615"
+      backgroundImage.loadHeight="909"
+      backgroundImage.height="909"
+      backgroundImage.translation="[305,0]"
+      uri="pkg:/images/grid-default-blurred.jpg"
       backgroundImage.visible = true
     else
       backgroundImage.uri = m.top.backgroundUriList[0]
@@ -378,6 +384,11 @@ Function updateLowMemBackground()
       backgroundImage.visible = false
       backgroundGradient.uri = "pkg:/images/detail-gradient-25.png"
       backgroundImage.uri = m.top.backgroundUriList[0]
+      backgroundImage.loadWidth="1920"
+      backgroundImage.width="1920"
+      backgroundImage.loadHeight="1080"
+      backgroundImage.height="1080"
+      backgroundImage.translation="[0,0]"
       backgroundImage.visible = true
     else
       backgroundImage.uri = m.top.backgroundUriList[0]
