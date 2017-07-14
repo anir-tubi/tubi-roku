@@ -9,6 +9,19 @@ Function testExternalConfigInitSuccess(t As Object)
   t.assertFalse(constants.externalConfig.info.livetv)
 End Function
 
+Function testExternalConfigMergedDefaults(t As Object)
+  constants = getConstants()
+  request = TubiRequest()
+  config = TubiExternalConfig(request, constants)
+  config.getConfigs = MockGetConfigs
+  t.assertInvalid(constants.externalConfig.info)
+  config.init()
+  t.assertNotInvalid(constants.externalConfig.info)
+  t.assertFalse(constants.externalConfig.info.livetv)
+  ' check default value explicitly not in the MockGetConfigs values
+  t.assertNotInvalid(constants.externalConfig.info.limited_newui_enabled)
+End Function
+
 Function testExternalConfigInitFailed(t As Object)
   constants = getConstants()
   request = TubiRequest()

@@ -24,26 +24,28 @@
   </interface>
 
   <children>
-    <Video
-      id="VideoBackground"
-      width="1920"
-      height="1080"
-      translation="[0,0]"
-      enableUI="false"
-      loop="true"
-      enableTrickPlay="false"
-      notificationInterval="0"
-      mute="true">
-    </Video>
-    
-    <Poster
-      id="HeroShade"
-      width="1920"
-      height="1080"
-      uri="pkg:/images/sign-in-disambiguation-mask-480x270.png"
-      loadSync="true"
-      translation="[0,0]"/>
-    
+    <Group
+      id="VideoAndShade"
+      visible="false">
+      <Video
+        id="VideoBackground"
+        width="1920"
+        height="1080"
+        translation="[0,0]"
+        enableUI="false"
+        loop="true"
+        enableTrickPlay="false"
+        notificationInterval="0"
+        mute="true">
+      </Video>
+      <Poster
+        id="HeroShade"
+        width="1920"
+        height="1080"
+        uri="pkg:/images/sign-in-disambiguation-mask-480x270.png"
+        loadSync="true"
+        translation="[0,0]"/>
+    </Group>
     <Poster
       id="Logo"
       uri="pkg:/images/logo.png"

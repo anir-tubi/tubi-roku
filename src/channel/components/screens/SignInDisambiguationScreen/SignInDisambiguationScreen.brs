@@ -3,14 +3,21 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.ButtonGroup.observeField("itemSelected", "onButtonSelected")
 
-  content = CreateObject("roSGNode", "ContentNode")
-  content.url = m.global.constants.urls.splashVideoUrl
-  content.streamformat="hls"
-
   m.Video = m.top.findNode("VideoBackground") 
-  m.Video.content = content
-  m.Video.control = "play"
-  m.Video.observeField("state", "onVideoStateChange")
+  m.VideoAndShade = m.top.findNode("VideoAndShade")
+
+  if m.global.constants.deviceInfo.limitedNewUi = false
+    ' show the video intro
+    content = CreateObject("roSGNode", "ContentNode")
+    content.url = m.global.constants.urls.splashVideoUrl
+    content.streamformat="hls"
+    m.Video.content = content
+    m.Video.control = "play"
+    m.Video.observeField("state", "onVideoStateChange")
+    m.VideoAndShade.visible = true
+  else
+    m.VideoAndShade.visible = false
+  end if
 
   m.Slogan = m.top.findNode("Slogan")
   m.Slogan.texts =  [
@@ -40,18 +47,22 @@ End Function
 Function onScreenFocusChange()
   tubiLog("SignInDisambiguationScreen.onScreenFocusChange")
   if m.top.isInFocusChain() then
-    m.Video.visible = true
-    if m.Video.state = "paused" then
-      m.Video.control = "resume"
-    else if m.Video.state <> "playing" then
-      m.Video.control = "play"
-    end if  
+    if m.VideoAndShade.visible
+      m.Video.visible = true
+      if m.Video.state = "paused" then
+        m.Video.control = "resume"
+      else if m.Video.state <> "playing" then
+        m.Video.control = "play"
+      end if
+    end if
     if m.top.hasFocus() then
       m.ButtonGroup.setFocus(true)
     end if
   else
-    m.Video.control = "pause"
-    m.Video.visible = false
+    if m.VideoAndShade.visible
+      m.Video.control = "pause"
+      m.Video.visible = false
+    end if
   end if
 End Function
 

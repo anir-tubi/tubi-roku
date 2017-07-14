@@ -208,8 +208,13 @@ End Function
 '
 Function focusGrid()
   m.EpisodeGrid.setFocus(true)
-  slideTo(m.SeasonRows, [85,m.SeasonRows.translation[1]], 0.5)
-  slideTo(m.Menu, [-375,m.Menu.translation[1]], 0.5)
+  if m.global.constants.deviceInfo.limitedNewUi
+    m.SeasonRows.translation = [85,m.SeasonRows.translation[1]]
+    m.Menu.translation = [-375,m.Menu.translation[1]]
+  else
+    slideTo(m.SeasonRows, [85,m.SeasonRows.translation[1]], 0.5)
+    slideTo(m.Menu, [-375,m.Menu.translation[1]], 0.5)
+  end if
 End Function
 
 
@@ -218,7 +223,12 @@ End Function
 '
 Function focusMenu()
   m.Menu.setFocus(true)
-  slideTo(m.SeasonRows, [525,m.SeasonRows.translation[1]], 0.5)
-  slideTo(m.Menu, [65,m.Menu.translation[1]], 0.5)
+  if m.global.constants.deviceInfo.limitedNewUi
+    m.SeasonRows.translation = [525,m.SeasonRows.translation[1]]
+    m.Menu.translation = [65,m.Menu.translation[1]]
+  else
+    slideTo(m.SeasonRows, [525,m.SeasonRows.translation[1]], 0.5)
+    slideTo(m.Menu, [65,m.Menu.translation[1]], 0.5)
+  end if
 End Function
 

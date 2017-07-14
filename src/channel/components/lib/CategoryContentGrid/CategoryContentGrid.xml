@@ -3,6 +3,7 @@
 <component name="CategoryContentGrid" extends="Group">
   <script type="text/brightscript" uri="pkg:/components/lib/CategoryContentGrid/CategoryContentGrid.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
@@ -98,13 +99,12 @@
     <ContentGrid
       id="ContentGrid"
       numRows="1"
-      width="1835"
-      height="300"
       fillDirection="W"
       visible="true"
       translation="[7,53]"
       itemSpacing="[10,10]"
       scrollBounds="[0,0,210,0]"
+      posterBounds="[0,0,1835,300]"
       itemSize="[210,300]"
       itemComponentName="Poster"/>
     <Label

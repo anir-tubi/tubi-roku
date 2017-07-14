@@ -57,7 +57,7 @@ End Function
 ' onComponentFocusChange
 '
 Function onComponentFocusChange()
-  tubiLog("CategoryGridList.onComponentFocusChange")
+  tubiLog("CategoryGridList.onComponentFocusChange" + focusState(m.top))
   if m.top.hasFocus() and m.ContentGrid <> invalid then
     m.ContentGrid.setFocus(true)
   end if
@@ -88,17 +88,32 @@ Function onDirtyUserCategories()
 
   ' Calling this will kick off any fetches needed if the user categories
   ' are within the cache window
-  onListFocusChange()
+  loadCategories(m.ScrollingList.itemFocused)
 End Function
 
 
 '''''''''''''''''''''
 ' onListFocusChange
 '
-' The ScrollingList has changed to a new category grid
+' The ScrollingList has changed to a new category grid.
+' This is debounced so only called when user stops on a category
 Function onListFocusChange()
   tubiLog("CategoryGridList.onListFocusChange")
+  loadCategories(m.ScrollingList.itemFocused)
   m.top.categoryFocused = m.ScrollingList.itemFocused
+End function
+
+'''''''''''''''''''''''''
+' onPreListFocusChange
+'
+' This is a leading-edge trigger and will happen even when fast scrolling
+Function onPreListFocusChange()
+  tubiLog("CategoryGridList.onPreListFocusChange")
+  focusCategory(m.ScrollingList.preItemFocused)
+  m.top.preCategoryFocused = m.ScrollingList.preItemFocused
+End Function
+
+Function focusCategory(newIndex)
   ' Stop listening to old category grid
   if m.ContentGrid <> invalid then
     m.ContentGrid.unobserveField("itemSelected")
@@ -106,37 +121,40 @@ Function onListFocusChange()
     m.ContentGrid.unobserveField("cursorIndex")
     m.ContentGrid.unobserveField("cursorPosition")
   end if
-  m.ContentGrid = m.ScrollingList.findNode("Items").getChild(m.ScrollingList.itemFocused)
+  m.ContentGrid = m.ScrollingList.findNode("Items").getChild(newIndex)
   if m.ContentGrid <> invalid then 
+    ' Finally, set focus on the grid so user can scroll
+    if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)
+
     m.ContentGrid.observeField("itemSelected", "onItemSelected")
     m.ContentGrid.observeField("itemFocused", "onItemFocused")
     m.ContentGrid.observeField("cursorIndex", "onCursorIndexChange")
     m.ContentGrid.observeField("cursorPosition", "onCursorPositionChange")
     m.top.cursorPosition = m.ContentGrid.cursorPosition
-    if m.ContentGrid.cursorIndex = -1 then
+  end if
+End Function
+
+' Load the current ContentGrid and its adjacent categories
+Function loadCategories(index)
+  contentGrid = m.ScrollingList.findNode("Items").getChild(index)
+  if contentGrid <> invalid then
+    if contentGrid.cursorIndex = -1 then
       ' seed the first items
-      fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, 1)
+      fetch(contentGrid, contentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, 1)
     else
-      fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize + 1)
+      fetch(contentGrid, contentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, contentGrid.cursorIndex \ m.blockSize + 1)
     end if
 
     ' Make sure adjacent categories are warm
-    for i = m.ScrollingList.itemFocused - m.categoryWindowSize to m.ScrollingList.itemFocused + m.categoryWindowSize
+    for i = index - m.categoryWindowSize to index + m.categoryWindowSize
       adjacent = m.ScrollingList.findNode("Items").getChild(i)
       if adjacent <> invalid then
         fetch(adjacent, adjacent.content.id, "metadataFetchTaskResponse", m.blockSize, adjacent.cursorIndex \ m.blockSize + 1)
       end if
     end for
-
-    ' Finally, set focus on the grid so user can scroll
-    if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)
   end if
 End Function
 
-
-Function onPreListFocusChange()
-  m.top.preCategoryFocused = m.ScrollingList.preItemFocused
-End Function
 
 
 ''''''''''''''''
@@ -296,26 +314,9 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
 
   ' special categories can have deprecated ids in them, causing trouble
   ' with pagination. Here we just force it to always grab the whole category
-
-  request = invalid
-  if categoryId = "MyQueue" then
-    request = bookmarksRequest()
+  if categoryId = "MyQueue" or categoryId = "ContinueWatching" then
     offset = 0
     per_page = 0
-  else if categoryId = "ContinueWatching" then
-    request = historyRequest()
-    offset = 0
-    per_page = 0
-  else if categoryId = "SearchSignIn" or categoryId = "SearchSignOut" then
-    ' NO-OP
-  else
-    request = categoryRequest(categoryId)
-  end if
-
-  ' If global bookmark or history ids are unavailable then we will get invalid
-  if request = invalid then
-    tubiLog("Unvailable request for category " + categoryId)
-    return
   end if
 
   requestId = categoryId + "-" + stri(offset).trim()
@@ -324,6 +325,24 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
   if metadataCacheHasEntry(requestId) <> -1 then
     tubiLog("Skipping duplicate request for " + requestId)
   else
+
+    request = invalid
+    if categoryId = "MyQueue" then
+      request = bookmarksRequest()
+    else if categoryId = "ContinueWatching" then
+      request = historyRequest()
+    else if categoryId = "SearchSignIn" or categoryId = "SearchSignOut" then
+      ' NO-OP
+    else
+      request = categoryRequest(categoryId)
+    end if
+
+    ' If global bookmark or history ids are unavailable then we will get invalid
+    if request = invalid then
+      tubiLog("Unvailable request for category " + categoryId)
+      return
+    end if
+
     request.id = requestId
     request.node = m.top
     request.field = field

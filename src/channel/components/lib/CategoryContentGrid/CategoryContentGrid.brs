@@ -18,11 +18,11 @@ Function init()
   m.FocusIndex = m.top.findNode("FocusIndex")
 
   ' initialize CategoryName visibility
-  onFocusPercentChange()
+  m.top.opacity = 0.2
 End Function
 
 Function onComponentFocusChange()
-  tubiLog("CategoryContentGrid.onComponentFocusChange")
+  tubiLog("CategoryContentGrid.onComponentFocusChange" + focusState(m.top))
   if m.top.hasFocus() and m.ContentGrid.visible then
     m.ContentGrid.setFocus(true)
   else if m.top.isInFocusChain() then

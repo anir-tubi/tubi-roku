@@ -3,8 +3,6 @@ Function init()
   m.Disambiguation = CreateObject("roSGNode", "SignInDisambiguationScreen")
   m.Disambiguation.observeField("signInButtonSelected", "onDisambiguationSignIn")
   m.Disambiguation.observeField("guestPassButtonSelected", "onDisambiguationGuestPass")
-  m.Background = m.top.findNode("SignInBackground")
-  m.Background.color = m.global.constants.ui.colors.backgroundColor
   m.skipContinueScreen = m.global.constants.ui.signIn.skipContinueScreen
   m.skipSignInRegisterScreen = m.global.constants.ui.signIn.skipSignInRegisterScreen
 

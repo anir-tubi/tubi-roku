@@ -27,11 +27,16 @@
   </interface>
         
     <children>
-      <Rectangle
-        id="SignInBackground"
+      <Poster
+        id="BackgroundGradient"
+        uri="pkg:/images/sign-in-background.png"
         width="1920"
+        loadWidth="1920"
         height="1080"
-        translation="[0,0]" />
+        loadHeight="1080"
+        loadDisplayMode="scaleToZoom"
+        loadSync="false"
+        translation="[0,0]"/>
 
       <Group
        id="SignInScreenStack"/>

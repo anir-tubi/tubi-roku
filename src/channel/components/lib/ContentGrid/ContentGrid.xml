@@ -71,9 +71,8 @@
     -  3: bottom boundary (value of 0 means full height)
     -->
 
-    <field id="width" type="float" />
-    <field id="height" type="float" />
     <field id="scrollBounds" type="floatarray" value="[0,0,0,0]"/>
+    <field id="posterBounds" alias="ContentsMask.clippingRect"/>
 
     <!-- Focus control -->
     <field id="itemSelected" type="node" alwaysNotify="true"/>

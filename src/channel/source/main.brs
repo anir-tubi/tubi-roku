@@ -19,7 +19,7 @@ Function Main(startupArgs as Dynamic)
   if constants.deviceInfo.limitedNewUi = true
     'default the models that require limited versions of the new ui to receive the old ui
     constants.deviceInfo.newUi = false
-    if constants.externalConfig.info.rokutv_newui = 1
+    if constants.externalConfig.info.limited_newui_enabled = 1
       constants.deviceInfo.newUi = true
     end if
   end if

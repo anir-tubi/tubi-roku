@@ -253,6 +253,7 @@ Function translateBookmarkMetadata(contentToTranslate) As Object
     end if
   end for
   setTotalCount(translated)
+  tubiLog("TranslateMetadata converted " + stri(nodeCount) + " nodes")
   return translated
 End Function
 

@@ -1,0 +1,10 @@
+# These are images that have been added since the last formal Roku published version of the channel.
+# These are the only images that will be included inside the remote components bundle.
+# 
+# Generated with (and manually filtered for new or changed images): 
+#   git diff --stat 2_2_8:src/images HEAD:src/channel/images/
+#
+images
+images/ads-countdown-gradient.png
+images/circle.png
+images/sign-in-background.jpg 

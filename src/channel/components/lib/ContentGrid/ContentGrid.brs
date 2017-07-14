@@ -1,16 +1,8 @@
 Function init()
-  m.top.observeField("width", "onDimensionChange")
-  m.top.observeField("height", "onDimensionChange")
-  m.top.observeField("scrollBounds", "onDimensionChange")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusedChild", "onComponentFocusChange")
-  m.top.observeField("itemSize", "onItemSizeChange")
-  m.top.observeField("numRows", "onContentChange")
-  m.top.observeField("numColumns", "onContentChange")
-  m.top.observeField("fillDirection", "onContentChange")
   m.top.observeField("visible", "onVisibleChange")
   m.top.observeField("animateToItem", "onAnimateToItem")
-  m.top.observeField("itemComponentName", "onItemComponentNameChange")
   m.mask = m.top.findNode("ContentsMask")
   m.scrollAnimation = m.top.findNode("ScrollAnimation")
   m.scrollAnimation.observeField("state", "endChangeFocus")
@@ -21,7 +13,7 @@ Function init()
 
   ' m.items is a FIFO cache of components of the type specified in 
   ' m.top.itemComponents.  The cache size is calculated by the visible
-  ' window, set by (m.top.width*m.top.height), and accounting for an
+  ' window, set by (m.top.posterBounds.width*m.top.posterBounds.height), and accounting for an
   ' overhang set by m.overhang.  Newer entries are added via appendChild()
   ' and older entries are expunged by removeChildIndex(0).
   m.items = m.top.findNode("Items")
@@ -60,14 +52,9 @@ Function init()
   ' Send cursor events during scrolling or only when scrolling stops and item is focused
   m.continuousEvents = constants.performance.contentGrid.continuousEvents
 
-  m.itemPool = createNodePool(m.top.itemComponentName, 0)
+  m.limitedNewUi = constants.deviceInfo.limitedNewUi
 End Function
 
-Function onItemComponentNameChange()
-  m.itemPool = createNodePool(m.top.itemComponentName, 0)
-  ' we have to recalculate all the internal dimensions and recreate all children
-  onContentChange()
-End Function
 
 ' Remove an item from its parent and return it to the free pool
 ' TODO(Chris): Should the NodePool mixin remove from parent?
@@ -95,28 +82,6 @@ Function onVisibleChange()
 End Function
 
 ''''''''''''''''''''''
-' onItemSizeChange
-'
-' the 9-patch focus image is 7 pixels padding on each side, so we set focus image 
-' translation and  width to account for that.
-Function onItemSizeChange() As Void
-  focusPoster = m.focusBox.findNode("FocusBoxPoster")
-  focusPoster.width = m.top.itemSize[0] + 14
-  focusPoster.height = m.top.itemSize[1] + 14
-End Function
-
-
-''''''''''''''''''''''
-' onDimensionsChange
-'
-' Sets our scrolling extremeties. We could scroll current focused item
-' here but I don't think this will change once it is set. 
-Function onDimensionChange() As Void
-  m.mask.clippingRect = [0,0,m.top.width,m.top.height]
-End Function
-
-
-''''''''''''''''''''''
 ' onComponentFocusChange
 '
 ' Called when the ContentGrid itself has gained/lost focus
@@ -125,16 +90,27 @@ Function onComponentFocusChange()
   tubiLog("ContentGrid.onComponentFocusChange " + focusState(m.top))
   if m.top.content <> invalid and m.numItems > 0 and m.top.isInFocusChain() then
     m.focusBox.visible = true
+    focusPoster = m.focusBox.findNode("FocusBoxPoster")
+    focusPoster.width = m.top.itemSize[0] + 14
+    focusPoster.height = m.top.itemSize[1] + 14
 
     if m.focusBox.opacity <> 1.0
-      fade(m.focusBox, "in", 0.3)
+      if m.limitedNewUi
+        m.focusBox.opacity = 1.0
+      else
+        fade(m.focusBox, "in", 0.3)
+      end if
     end if
 
     m.top.itemFocused = getContent(gridIndexToItemIndex(m.internalItemFocused))
     m.top.cursorPosition = [m.internalItemFocused[0], m.internalItemFocused[1]]
     m.top.cursorIndex = gridIndexToItemIndex(m.internalItemFocused)
   else
-    fade(m.focusBox, "out", 0.3)
+    if m.limitedNewUi
+      m.focusBox.opacity = 0.0
+    else
+      fade(m.focusBox, "out", 0.3)
+    end if
     ' If we don't have focus, clear out any keypresses.  This fixes an
     ' issue where we get a press but focus changes before we get the
     ' release, which causes an unfocused grid to continue scrolling.
@@ -165,6 +141,11 @@ Function onContentChange() As Void
     end for
     return
   end if
+
+  if m.itemPool = invalid or m.top.itemComponentName <> m.itemPool.nodeType
+    m.itemPool = createNodePool(m.top.itemComponentName, 0)
+  end if
+
   m.numItems = getContentCount()
 
   ' Resolve the real grid size
@@ -252,7 +233,7 @@ Function loadVisiblePosters(useCache=true As Boolean) As Void
       index = gridIndexToItemIndex([i,j])
       content = getContent(index)
       ' If we're beyond the end of the total items, don't create more components
-      if index < m.numItems and content <> invalid then
+      if index < m.numItems then
 
         item = invalid
         if useCache then
@@ -301,13 +282,20 @@ Function createItemComponent(index As Integer, content As Object, item As Object
   else if item.hasField("uri") then 
     ' Special case here.  If we use Poster node type directly, it has a 'uri' field instead of
     ' an 'itemContent' field.
+    if content <> invalid then
+      uri = content.hdgridposterurl
+    else
+      uri = "pkg:/images/placeholder.jpg"
+    end if
     fields = {
       id: stri(index)  
       width: m.top.itemSize[0]
       height: m.top.itemSize[1]
+      loadWidth: m.top.itemSize[0]
+      loadHeight: m.top.itemSize[1]
       loadDisplayMode: "scaleToZoom"
       loadingBitmapUri: "pkg:/images/placeholder.jpg"
-      uri: content.hdgridposterurl
+      uri: uri
       translation: [itemRect.x,itemRect.y]
     }
     item.setFields(fields)
@@ -339,7 +327,7 @@ Function startChangeFocus(newFocusedIndex As Object) As Void
   ' Vertical scrolling
   topLimit = m.top.scrollBounds[1]
   bottomLimit = m.top.scrollBounds[3]
-  if bottomLimit = 0 then bottomLimit = m.top.height
+  if bottomLimit = 0 then bottomLimit = m.top.posterBounds.height
   if (itemRect.y + itemRect.height + m.items.translation[1]) > bottomLimit then
     newY = bottomLimit - itemRect.y - itemRect.height
   else if (itemRect.y + m.items.translation[1]) < topLimit then
@@ -351,7 +339,7 @@ Function startChangeFocus(newFocusedIndex As Object) As Void
   ' Horizontal scrolling
   rightLimit = m.top.scrollBounds[2]
   leftLimit = m.top.scrollBounds[0]
-  if rightLimit = 0 then rightLimit = m.top.width
+  if rightLimit = 0 then rightLimit = m.top.posterBounds.width
   if (itemRect.x + itemRect.width + m.items.translation[0]) > rightLimit then
     newX = rightLimit - itemRect.x - itemRect.width
   else if (itemRect.x + m.items.translation[0]) < leftLimit then
@@ -389,10 +377,10 @@ Function endChangeFocus()
 
     ' If we're using a reasonably high-powered device, send messages while scrolling,
     ' otherwise send messages only when settled.
+    loadVisiblePosters()
     if m.continuousEvents then
       m.top.cursorPosition = [m.internalItemFocused[0], m.internalItemFocused[1]]
       m.top.cursorIndex = gridIndexToItemIndex(m.internalItemFocused)
-      loadVisiblePosters()
     end if
 
     ' Once things have settled, set itemFocused
@@ -400,7 +388,6 @@ Function endChangeFocus()
       if not m.continuousEvents then
         m.top.cursorPosition = [m.internalItemFocused[0], m.internalItemFocused[1]]
         m.top.cursorIndex = gridIndexToItemIndex(m.internalItemFocused)
-        loadVisiblePosters()
       end if
       m.top.itemFocused = getContent(m.top.cursorIndex)
     end if
@@ -588,8 +575,8 @@ End Function
 Function getVisibleItemWindow()
   x =  -m.items.translation[0] \ (m.top.itemSize[0] + m.top.itemSpacing[0])
   y =  -m.items.translation[1] \ (m.top.itemSize[1] + m.top.itemSpacing[1])
-  width =  m.top.width \ (m.top.itemSize[0] + m.top.itemSpacing[0]) + 1 ' always add one so we show overhang
-  height =  m.top.height \ (m.top.itemSize[1] + m.top.itemSpacing[1]) + 1
+  width =  m.top.posterBounds.width \ (m.top.itemSize[0] + m.top.itemSpacing[0]) + 1 ' always add one so we show overhang
+  height =  m.top.posterBounds.height \ (m.top.itemSize[1] + m.top.itemSpacing[1]) + 1
 
   return {
     x: x

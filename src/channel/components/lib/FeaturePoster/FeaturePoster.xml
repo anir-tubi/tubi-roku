@@ -23,7 +23,9 @@
       id="Background" 
       loadingBitmapUri="pkg:/images/placeholder-featured.jpg"
       width="430"
+      loadWidth="430"
       height="256"
+      loadHeight="256"
       loadDisplayMode="scaleToZoom"
       translation="[0,0]" />
 

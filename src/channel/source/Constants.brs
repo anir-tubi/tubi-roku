@@ -53,13 +53,13 @@ Function getConstants()
       "3100X": true  ' 2 XS
       "3400X": true  ' MHL Stick
       "3420X": true  ' MHL Stick
-      "3500X": true  ' HDMI Stick (2014)
-      "3700X": true  ' Express
-      "3710X": true  ' Express+
     }
 
     'models that can run the new ui, but need some functionality reduced - like backgrounds and animations, etc.
     limitedNewUIModels = {
+      "3500X": true  ' HDMI Stick (2014)
+      "3700X": true  ' Express
+      "3710X": true  ' Express+
       "5000X": true  ' TV (low specs)
     }
 
@@ -410,7 +410,7 @@ Function getConstants()
     constants.ui.colors = {}
       'template colors
       constants.ui.colors.transparent = "0x00000000"
-      constants.ui.colors.backgroundColor = "0x000000FF"
+      constants.ui.colors.backgroundColor = "0x191919FF"
       constants.ui.colors.focused = "0xFF9933FF"
       constants.ui.colors.unfocused = "0xFFFFFFFF"
       constants.ui.colors.primaryText = "0xFFFFFFFF"

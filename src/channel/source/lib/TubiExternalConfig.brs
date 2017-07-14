@@ -6,8 +6,8 @@ Function TubiExternalConfig(request as Object, constants as Object) as Object
     'default values should just be a simple key/value associative array
     defaultValues: {
       roku_new_ui: 0
-      rokutv_newui: 0
       remote_components: 0
+      limited_newui_enabled: 0
     }
 
     ' public methods
@@ -23,11 +23,13 @@ End Function
 Function tubiExternalConfig_init()
   configs = m.getConfigs()
 
+  mergedConfig = {}
+  mergedConfig.append(m.defaultValues)
   if configs <> invalid
-    m.storeConfigs(configs)
-  else
-    m.storeConfigs(m.defaultValues)
+    mergedConfig.append(configs)
   end if
+
+  m.storeConfigs(mergedConfig)
 End Function
 
 

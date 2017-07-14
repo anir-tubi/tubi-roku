@@ -125,8 +125,13 @@ Function showCategoryMenu()
   if not m.CategoryList.isInFocusChain()
     m.CategoryList.setFocus(true)
     m.categoryListIsFocused = true
-    slideTo(m.ContentArea, [525,m.ContentArea.translation[1]], 0.5)
-    slideTo(m.CategoryList, [60,m.CategoryList.translation[1]], 0.5)
+    if m.global.constants.deviceInfo.limitedNewUi
+      m.ContentArea.translation = [525,m.ContentArea.translation[1]]
+      m.CategoryList.translation = [60,m.CategoryList.translation[1]]
+    else
+      slideTo(m.ContentArea, [525,m.ContentArea.translation[1]], 0.5)
+      slideTo(m.CategoryList, [60,m.CategoryList.translation[1]], 0.5)
+    end if
     m.trackingCount = 0
     m.top.categoryMenuVisible = true
   end if
@@ -136,8 +141,13 @@ Function hideCategoryMenu()
   if m.CategoryList.isInFocusChain()
     m.CategoryGridList.setFocus(true)
     m.categoryListIsFocused = false
-    slideTo(m.ContentArea, [85,m.ContentArea.translation[1]], 0.5)
-    slideTo(m.CategoryList, [-380,m.CategoryList.translation[1]], 0.5)
+    if m.global.constants.deviceInfo.limitedNewUi
+      m.ContentArea.translation = [85,m.ContentArea.translation[1]]
+      m.CategoryList.translation = [-380,m.CategoryList.translation[1]]
+    else
+      slideTo(m.ContentArea, [85,m.ContentArea.translation[1]], 0.5)
+      slideTo(m.CategoryList, [-380,m.CategoryList.translation[1]], 0.5)
+    end if
     m.trackingCount = 0
     m.top.categoryMenuVisible = false
   end if

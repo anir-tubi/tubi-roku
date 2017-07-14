@@ -351,7 +351,12 @@ Function addLowMemBackground()
     newBackground.findNode("BackgroundImages").createChild("Group").createChild("DetailsPoster")
   end if
 
-  newBackground.findNode("BackgroundPoster").uri = m.top.backgroundUriList[0]
+  poster = newBackground.findNode("BackgroundPoster")
+  ' Reduce VRAM usage by 25%
+  poster.loadWidth = poster.loadWidth * 0.5
+  poster.loadHeight = poster.loadHeight * 0.5
+  poster.uri = m.top.backgroundUriList[0]
+
   m.top.appendChild(newBackground)
   m.top.getChild(0).findNode("BackgroundGradient").opacity = 1.0
   m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(0).findNode("BackgroundPoster").opacity = 1.0

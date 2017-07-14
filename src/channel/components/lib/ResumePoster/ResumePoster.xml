@@ -16,7 +16,9 @@
     <Poster
      id="Poster"
      width="210"
+     loadWidth="210"
      height="300"
+     loadHeight="300"
      visible="true"
      loadDisplayMode = "scaleToZoom"
      loadingBitmapUri = "pkg:/images/placeholder.jpg"
