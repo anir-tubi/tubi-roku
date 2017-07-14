@@ -1,13 +1,12 @@
 Function init()
   m.top.observeField("focusedChild", "onFocus")
-  m.Disambiguation = CreateObject("roSGNode", "SignInDisambiguationScreen")
-  m.Disambiguation.observeField("signInButtonSelected", "onDisambiguationSignIn")
-  m.Disambiguation.observeField("guestPassButtonSelected", "onDisambiguationGuestPass")
+  m.top.observeField("show", "onShow")
+  m.Background = m.top.findNode("SignInBackground")
+  m.Background.color = m.global.constants.ui.colors.backgroundColor
   m.skipContinueScreen = m.global.constants.ui.signIn.skipContinueScreen
   m.skipSignInRegisterScreen = m.global.constants.ui.signIn.skipSignInRegisterScreen
 
-  initScreenStack(m.top.findNode("SignInScreenStack"), invalid, false)
-  pushScreen(m.Disambiguation)
+  initScreenStack(m.top.findNode("SignInScreenStack"), onScreenStackEmpty)
 End Function
 
 
@@ -18,6 +17,29 @@ End Function
 Function onFocus()
   if m.top.hasFocus() and currentScreen() <> invalid then
     currentScreen().setFocus(true)
+  end if
+End Function
+
+
+Function onScreenStackEmpty()
+  tubiLog("SignInController.onScreenStackEmpty")
+  m.top.backPressed = true
+End Function
+
+
+''''''''''''''''
+' onShow
+'
+' Start the sign-in experience. Do it here instead of init() so
+' that the caller can configure the first screen.
+Function onShow()
+  if m.top.skipDisambiguationScreen = true then
+    onDisambiguationSignIn()
+  else
+    m.Disambiguation = CreateObject("roSGNode", "SignInDisambiguationScreen")
+    m.Disambiguation.observeField("signInButtonSelected", "onDisambiguationSignIn")
+    m.Disambiguation.observeField("guestPassButtonSelected", "onDisambiguationGuestPass")
+    pushScreen(m.Disambiguation)
   end if
 End Function
 

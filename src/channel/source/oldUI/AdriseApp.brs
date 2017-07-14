@@ -305,7 +305,7 @@ Function AdriseApp_handleItemPicked(playlist, listIndex, itemIndex, source)
   settings = m.utils.getSettings()
   episode = m.cp.getEpisodeInPlaylist(playlist, itemIndex)
 
-  if episode.type = "tubiLogin" or episode.type = "bookmarks"
+  if episode.type = "tubiLogin"
     authInfo = m.utils.getAuthInfo()
     if (authInfo.accessToken = invalid)
       'user wants to log in

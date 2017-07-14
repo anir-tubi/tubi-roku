@@ -53,7 +53,6 @@ Function showExitAppModal()
   exitModal.title = "Are you Sure?"
   exitModal.message = "Do you really want to exit Tubi TV?"
   exitModal.buttons = ["Exit", "Cancel"]
-  exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")
 
   m.exitModal_ = exitModal
   m.top.appendChild(m.exitModal_)

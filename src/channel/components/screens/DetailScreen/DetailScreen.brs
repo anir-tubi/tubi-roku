@@ -336,7 +336,7 @@ Function onMenuItemSelected()
         addToQueue()
       else
         m.Dialog = m.top.createChild("ModalDialogScreen")
-        m.Dialog.title = "Whoops!"
+        m.Dialog.title = "Sign in to add to your queue"
         m.Dialog.message = "You must be signed in in order to add a title to your queue."
         m.Dialog.buttons = ["Sign In or Register", "Cancel"]
         m.Dialog.observeField("buttonSelected", "onDialogButton")

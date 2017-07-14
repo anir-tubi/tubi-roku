@@ -2,11 +2,10 @@
 ' initScreenStack
 '
 ' Set the screen stack parent object. This should be an empty Group
-Function initScreenStack(stack As Object, stackEmptyCallback=invalid As Object, showExitModal=true)
+Function initScreenStack(stack As Object, stackEmptyCallback=invalid As Object)
   tubiLog("ScreenStack.initScreenStack")
   m.ScreenStack_ = stack
   m.ScreenStackEmptyCallback_ = stackEmptyCallback
-  m.ScreenStackShowExitModal_ = showExitModal
 End Function
 
 
@@ -24,44 +23,15 @@ Function onKeyEvent(key As String, press As Boolean)
     else if key = "back"
       if m.ScreenStack_.getChildCount() > 1 then
         popScreen()
-        return true
-      else if m.ScreenStackEmptyCallback_ <> invalid and type(m.ScreenStackEmptyCallback_) = "roFunction" and m.enteredFromDeepLink = true then
-        ' only remove the last item if we have a valid callback
-        m.enteredFromDeepLink = false
-        popScreen()
+      else if m.ScreenStackEmptyCallback_ <> invalid and type(m.ScreenStackEmptyCallback_) = "roFunction" then
+        ' Don't remove the last item, let the callback decide what to do
         m.ScreenStackEmptyCallback_()
-        return true
-      else
-        if m.ScreenStackShowExitModal_ then
-          ' only remove the last item if we have a valid callback
-          exitModal = showExitAppModal()
-          exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")
-        end if
-        return true
       end if
+      ' Always consume back button, otherwise it will cause the app to exit
+      return true
     end if
   end if
   return false
-End Function
-
-
-''''''''''''''''''''''
-' onExitAppModalButtonSelected
-'
-' handles the response of a user who has been presented an exit app modal
-Function onExitAppModalButtonSelected()
-  result = getExitAppModalResult()
-
-  if result = 0
-    'exit the app
-    m.top.exitApp = true  'm is the context of the screen stack's parent controller
-  else
-    'return to the last screen
-    focusedScreen = currentScreen()
-    focusedScreen.setFocus(true)
-  end if
-
-  closeExitAppModal()
 End Function
 
 

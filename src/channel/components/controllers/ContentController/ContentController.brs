@@ -42,13 +42,50 @@ Function init()
 
   m.enteredFromDeepLink = false 'used to determine back button behavior in screen stack
   m.ScreenStack = m.top.findNode("ContentScreenStack")
-  initScreenStack(m.ScreenStack, startOnNow)
+  initScreenStack(m.ScreenStack, onScreenStackEmpty)
 
   m.videoPlayer = m.top.findNode("VideoPlayer")
 
   m.autohideTimer = m.top.findNode("AutohideTimer")
   m.autohideTimer.observeField("fire", "onAutohide")
 End Function
+
+Function onScreenStackEmpty()
+  ' if we went straight to detail screen for a deep link, launch the home screen.
+  ' After we have entered the home screen, ignore back button presses
+  if m.enteredFromDeepLink
+    popScreen()  ' remove the last screen, probably detail screen
+    m.enteredFromDeepLink = false
+    startOnNow()
+  else
+    ' only remove the last item if we have a valid callback
+    m.exitModal = showExitAppModal()
+    m.exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")
+  end if
+End Function
+
+
+''''''''''''''''''''''
+' onExitAppModalButtonSelected
+'
+' handles the response of a user who has been presented an exit app modal
+Function onExitAppModalButtonSelected()
+  result = getExitAppModalResult()
+
+  if result = 0
+    'exit the app
+    m.top.exitApp = true  'm is the context of the screen stack's parent controller
+  else
+    'return to the last screen
+    focusedScreen = currentScreen()
+    focusedScreen.setFocus(true)
+  end if
+
+  m.exitModal.unobserveField("buttonSelected")
+  m.exitModal = invalid
+  closeExitAppModal()
+End Function
+
 
 
 Function onAutohide()
@@ -138,7 +175,7 @@ Function startUserExperience()
 
     else if m.authTask.authInfo = invalid then
       tubiLog("ContentController ask user to sign in")
-      startSignIn()
+      startSignIn(false)
     else if m.top.onNowContent <> invalid
       startOnNow()
     end if
@@ -213,13 +250,15 @@ End Function
 ' startSignIn
 '
 ' Defer to the sign-in controller for sign in experience
-Function startSignIn()
+Function startSignIn(skipDisambiguation)
   tubiLog("ContentController.startSignIn")
   m.SignIn = m.top.createChild("SignInController")
+  m.SignIn.skipDisambiguationScreen = skipDisambiguation
   m.SignIn.observeField("guestPass", "onSignInComplete")
   m.SignIn.observeField("signedIn", "onSignInComplete")
   m.SignIn.observeField("registered", "onSignInComplete")
-  m.SignIn.observeField("exitApp", "onSignInExitApp")
+  m.SignIn.observeField("backPressed", "onSignInBackPressed")
+  m.SignIn.show = true
   m.SignIn.setFocus(true)
 End Function
 
@@ -238,6 +277,8 @@ Function onSignInComplete()
     popScreen()
   end while
 
+  m.backgroundGroup.enterFromSignIn = true
+
   if m.SignIn.guestPass then
     ' start the 'On Now' experience right away
     startOnNow()
@@ -247,21 +288,35 @@ Function onSignInComplete()
     m.authTask.control = "RUN"
   end if
 
-  m.SignIn.unobserveField("guestPass")
-  m.SignIn.unobserveField("signedIn")
-  m.SignIn.unobserveField("registered")
-  m.top.removeChild(m.SignIn)
-  m.SignIn = invalid
+  removeSignInController()
 End Function
 
 
 '''''''''''''''''''''''''
-' onSignInExitApp
+' onSignInBackPressed
 '
-' The sign-in controller says the user wants to exit the app so tell the main thread we want to exit
-Function onSignInExitApp()
-  m.top.exitApp = true
+' The sign-in controller captured a back button press at the top of the screen stack
+Function onSignInBackPressed()
+  tubiLog("ContentController.onSignInBackPressed")
+  ' If we loaded the sign-in experience from the tools menu or Add To Queue button, keep
+  ' the context.  We detect this by looking at whether the ContentController's screen stack
+  ' is empty or not.
+  if currentScreen() <> invalid
+    removeSignInController()
+  end if
 End Function
+
+
+Function removeSignInController()
+  m.SignIn.unobserveField("guestPass")
+  m.SignIn.unobserveField("signedIn")
+  m.SignIn.unobserveField("registered")
+  m.SignIn.unobserveField("backPressed")
+  m.top.removeChild(m.SignIn)
+  m.SignIn = invalid
+  if currentScreen() <> invalid then currentScreen().setFocus(true)
+End Function
+
 
 
 '''''''''''''''''''''''
@@ -303,11 +358,7 @@ End Function
 ' Launch the Sign In experience
 Function onSignInSelected()
   tubiLog("ContentController.onSignInSelected")
-  startSignIn()
-
-  'preloads the unblurred background so when we hit the category screen
-  'we can just start the timer for countdown to transition to the blurred background
-  m.backgroundGroup.enterFromSignIn = true
+  startSignIn(true)
 End Function
 
 ''''''''''''''''''''

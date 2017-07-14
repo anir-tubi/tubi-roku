@@ -323,8 +323,8 @@ function GridScreen (utils)
             type: "tubiLogin"
             sdposterurl: "http://cdn.adrise.com/hotpatches/roku/login-portraitSD.jpg"
             hdposterurl: "http://cdn.adrise.com/hotpatches/roku/login-portraitHD.jpg"
-            title: "Sign up"
-            description: "Click here to register with Tubi TV."
+            title: "Log In For Queue and Continue Watching Access"
+            description: "Now you can access all the saved videos in your Queue and your Continue Watching lists from any Tubi TV device."
             }
           m.isLogoutButtonShown = false
         else
@@ -347,14 +347,6 @@ function GridScreen (utils)
           description: "Go to search screen."
         }
 
-        bookmarkItem = {
-          type: "bookmarks"
-          sdposterurl: "http://cdn.adrise.com/hotpatches/roku/queue-portraitSD.jpg"
-          hdposterurl: "http://cdn.adrise.com/hotpatches/roku/queue-portraitHD.jpg"
-          title: "Log In For Queue and View History Access"
-          description: "Now you can access all the videos in your queue and your view history from any Tubi TV device!"
-        }
-
         policyItem = {
           type: "policy"
           sdposterurl: "http://cdn.adrise.com/hotpatches/roku/policy-portraitSD.jpg"
@@ -367,11 +359,6 @@ function GridScreen (utils)
 
         if settings.showSearch = true
           list.push(searchItem)
-        end if
-
-        'add bookmarks "button" to top row if appropriate
-        if (accessToken = invalid)
-          list.push(bookmarkItem)
         end if
 
         list.push(policyItem)
