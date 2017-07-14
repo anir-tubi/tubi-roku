@@ -160,6 +160,10 @@ End Function
 ' Handle category list received
 Function onContentChange() As Void
   tubiLog("CategoryScreen.onContentChange")
+
+  spinner = m.top.findNode("LoadingSpinner")
+  spinner.visible = false
+
   m.CategoryList.content = invalid  ' since alwaysNotify=false on scrollinglist
   ' Force Featured to the top of the list
   for i=0 to m.top.content.getChildCount()-1

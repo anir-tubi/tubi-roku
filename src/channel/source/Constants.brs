@@ -357,6 +357,7 @@ Function getConstants()
     constants.ui.signIn = {}
       constants.ui.signIn.skipContinueScreen = false
       constants.ui.signIn.skipSignInRegisterScreen = false
+      constants.ui.signIn.backExitsSignIn = false
 
     'static - pre defined category names
     constants.ui.categoryNames = {}

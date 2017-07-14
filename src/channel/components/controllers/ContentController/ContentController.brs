@@ -78,7 +78,12 @@ Function onExitAppModalButtonSelected()
   else
     'return to the last screen
     focusedScreen = currentScreen()
-    focusedScreen.setFocus(true)
+    if focusedScreen <> invalid
+      focusedScreen.setFocus(true)
+    ' if screen stack was empty, this was a modal over top of the sign in controller
+    else if m.SignIn <> invalid
+      m.SignIn.setFocus(true)
+    end if
   end if
 
   m.exitModal.unobserveField("buttonSelected")
@@ -303,6 +308,9 @@ Function onSignInBackPressed()
   ' is empty or not.
   if currentScreen() <> invalid
     removeSignInController()
+  else if m.global.constants.ui.signIn.backExitsSignIn = true
+    m.exitModal = showExitAppModal()
+    m.exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")
   end if
 End Function
 

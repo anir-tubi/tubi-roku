@@ -44,7 +44,8 @@
      translation="[0,0]"
      visible="false" 
      loadDisplayMode="scaleToFit"
-     uri="" />
+     loadSync="true"
+     uri="pkg:/images/menu-focus.9.png" />
     <Group 
      id="Items"
      translation="[0,0]"/>
