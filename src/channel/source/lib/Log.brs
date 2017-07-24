@@ -126,7 +126,6 @@ function tubiLog_debug(message="" as String, serverTypeName="" as String, subtyp
 end function
 
 
-'info will only send logging to the server if the device id is in m.idsToLog
 function tubiLog_info(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
   logInfo = m.buildLogInfo(message, m.logConsts.info.serverType[serverTypeName], subtype, m.logConsts.info.name)
   m.sendLogging(logInfo, queue)  
@@ -187,7 +186,7 @@ function tubiLog_sendLogging_(logInfo as Object, queue as Object)
 
       if logInfo["type"] <> invalid and logInfo.level <> "" and logInfo.subtype <> "" and queue <> invalid
         'don't send debug or info statements unless the user id is in m.constants.idsToLog
-        if m.constants.idsToLog.DoesExist(m.constants.deviceInfo.deviceId) or logInfo.level = m.logConsts.warn.name or logInfo.level = m.logConsts.error.name
+        if m.constants.idsToLog.DoesExist(m.constants.deviceInfo.deviceId) or logInfo.level = m.logConsts.warn.name or logInfo.level = m.logConsts.error.name or logInfo.level = m.logConsts.info.name
           loggingRequest = m.getLoggingRequest(logInfo)
           return queue.pushRequest(loggingRequest)
         end if 

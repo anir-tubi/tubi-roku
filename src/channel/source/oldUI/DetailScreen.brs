@@ -443,10 +443,10 @@ function DetailScreen_showCaptionsDialog(episode)
             port: m.detailsPort
           })
 
-          m.utils.log.info(m.detailsPort, "clientInfo", "subtitles-off", "Subtitles disabled")
+          m.utils.log.debug(m.detailsPort, "clientDebug", "subtitles-off", "Subtitles disabled")
         else if buttonIndex = 1
           deviceInfo.setCaptionsMode("Instant replay")
-          m.utils.log.info(m.detailsPort, "clientInfo", "subtitles-off", "Subtitles set to Instant replay")
+          m.utils.log.debug(m.detailsPort, "clientDebug", "subtitles-off", "Subtitles set to Instant replay")
         else
           episode.subtitles.current = episode.subtitles.languages[buttonIndex-2].name
           episode.subtitleUrl = episode.subtitles.languages[buttonIndex-2].url
@@ -459,7 +459,7 @@ function DetailScreen_showCaptionsDialog(episode)
             port: m.detailsPort
           })
 
-          m.utils.log.info(m.detailsPort, "clientInfo", "subtitles-off", "Subtitles set to " + episode.subtitles.current)
+          m.utils.log.debug(m.detailsPort, "clientDebug", "subtitles-off", "Subtitles set to " + episode.subtitles.current)
         end if
         return deviceInfo.GetCaptionsMode()
       end if

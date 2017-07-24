@@ -48,6 +48,8 @@ Function init()
 
   m.autohideTimer = m.top.findNode("AutohideTimer")
   m.autohideTimer.observeField("fire", "onAutohide")
+
+  m.appLoadStopwatch = CreateObject("roTimespan")
 End Function
 
 Function onScreenStackEmpty()
@@ -482,6 +484,7 @@ End Function
 
 Function startOnNow()
   tubiLog("ContentController.startOnNow")
+  m.appLoadStopwatch.mark()
   ' meta-screen, really just to allow screenstack to function.  we interact
   ' with the child groups directly instead of the parent group
   m.homeScreen = CreateObject("roSGNode", "homeScreen")
@@ -500,6 +503,7 @@ Function startOnNow()
 
   m.categoryScreen = m.homeScreen.findNode("CategoryScreen")
   m.categoryScreen.observeField("contentSelected", "onContentSelected")
+  m.categoryScreen.observeField("firstPosterLoaded", "onFirstPosterLoaded")
 
   m.homeScreen.signedIn = (m.authTask.authInfo <> invalid)
 
@@ -930,6 +934,7 @@ Function onSearchBackgroundChange()
   m.backgroundGroup.newBackgroundType = "grid"
 End Function
 
+
 '''''''''''''''''''''''
 ' onDetailItemFailed
 '
@@ -943,4 +948,20 @@ Function onDetailItemFailed()
   if currentScreen() = invalid then
     startOnNow()
   end if
+End Function
+
+
+'''''''''''''''''''''''
+' onFirstPosterLoaded
+'
+' Info that the first poster in the first CategoryContentGrid has bubbled all the way up.
+' Fire off a log to a server so we can track how long it took since the app was started, ie. StartOnNow() was called
+Function onFirstPosterLoaded()
+  tubiLog("ContentController.onFirstPosterLoaded")  'write to console only
+  messageInfo = {
+    loadtime: m.appLoadStopwatch.TotalMilliseconds()
+    model: m.global.constants.deviceInfo.model
+  }
+  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load")   'send info to server
+
 End Function

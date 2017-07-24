@@ -41,6 +41,9 @@
      -      }
     -->
     <field id="error" type="assocarray" alwaysNotify="true" />
+
+    <!-- bubbles up from the first CategoryContentGrid loaded -->
+    <field id="firstPosterLoaded" type="boolean" value="false" />
   </interface>
   
   <children>

@@ -461,7 +461,7 @@ function adriseAds_getAdUnitsListTraditional(episode, playerSettings, traditiona
 
   ' make sure that the xml pulled from the clickThrough RAF XML doc is valid and useable
   if not xml.Parse(traditionalAdXmlString) or xml.GetName() <> "feed" or islist(xml.GetBody()) = false
-    m.utils.log.info(playerSettings.playerPort, "apiBad", "no-ads-in-xml", "error with traditional ad xml - nothing returned")
+    m.utils.log.debug(playerSettings.playerPort, "adDebug", "no-ads-in-xml", "error with traditional ad xml - nothing returned")
     print ""
     return []
   end if
@@ -597,7 +597,7 @@ function adriseAds_getAdUnitFromXml(adXml)
 
     'Determine if there are any type of companion ads running
     if adXml.companion_ad.GetAttributes().type <> invalid
-      m.utils.log.info(m.playerPort, "clientInfo", "companion-ad", "THERE IS A COMPANION AD")
+      m.utils.log.debug(m.playerPort, "debugInfo", "companion-ad", "THERE IS A COMPANION AD")
       companionAttributes = adXml.companion_ad.GetAttributes()
 
       'if the companion ad is Brightline, add Brightline information for companion ads to adUnit object.
@@ -959,7 +959,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails, playerSettings)
                   GetGlobalAA().app.detailScreen.addBookmarkReqIds[bookmarkReqId.toStr()] = true
 
                   houseAdDialog.updateText(bookmarkContent.title + " has been added to your queue.")
-                  m.utils.log.info(adPort, "clientInfo", "house-ad-bookmark-success", "Bookmark added from house ad for content id " + bookmarkContent.id)
+                  m.utils.log.debug(adPort, "debugInfo", "house-ad-bookmark-success", "Bookmark added from house ad for content id " + bookmarkContent.id)
                   
                 else
                   houseAdDialog.updateText("Sorry, we could not update your bookmark")
@@ -973,7 +973,7 @@ function adriseAds_showVideoAd(canvas, adUnit, adDetails, playerSettings)
             
             else
               houseAdDialog.updateText("You must be logged in to add content to your queue.")
-              m.utils.log.info(adPort, "clientInfo", "house-ad-bookmark-fail", "Bookmark not added because user not logged in")
+              m.utils.log.debug(adPort, "debugInfo", "house-ad-bookmark-fail", "Bookmark not added because user not logged in")
 
             end if
             houseAdDialog.show()

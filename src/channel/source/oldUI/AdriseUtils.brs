@@ -660,7 +660,7 @@ function adriseUtils_getTextFile(url as String, name = "" as String, auth = fals
   h = CreateObject("roUrlTransfer")
   h.SetPort(CreateObject("roMessagePort"))
 
-  m.log.info(invalid, "clientInfo", name, url)
+  m.log.debug(invalid, "clientDebug", name, url)
   print ""
 
   if url.Left(5) = "https"
@@ -723,12 +723,12 @@ function adriseUtils_sendAsyncRequest(url as String, port, name = "" as String, 
 
   'if we send logging for logging API requests, we end up in an infinite loop
   if url <> settings.loggingUrl
-    m.log.info(port, "clientInfo", "send-async-request-id", urlXfer.GetIdentity().toStr())
-    m.log.info(port, "clientInfo", "send-async-request-name", name)
-    m.log.info(port, "clientInfo", "send-async-request-type", reqType)
-    m.log.info(port, "clientInfo", "send-async-request-url", url)
-    m.log.info(port, "clientInfo", "send-async-request-body", body)
-    m.log.info(port, "clientInfo", "send-async-request-headers", headers)
+    m.log.debug(port, "clientDebug", "send-async-request-id", urlXfer.GetIdentity().toStr())
+    m.log.debug(port, "clientDebug", "send-async-request-name", name)
+    m.log.debug(port, "clientDebug", "send-async-request-type", reqType)
+    m.log.debug(port, "clientDebug", "send-async-request-url", url)
+    m.log.debug(port, "clientDebug", "send-async-request-body", body)
+    m.log.debug(port, "clientDebug", "send-async-request-headers", headers)
   end if
 
   url = m.buildUrl(url, name, urlXfer)
@@ -791,7 +791,7 @@ function adriseUtils_sendAsyncRequest(url as String, port, name = "" as String, 
     m.asynchRequests[id.ToStr()] = urlXfer
 
     if url <> settings.loggingUrl
-      m.log.info(port, "clientInfo", "stored-async-request-objects", "async request objects stored = " +  m.asynchRequests.count().toStr())
+      m.log.debug(port, "clientDebug", "stored-async-request-objects", "async request objects stored = " +  m.asynchRequests.count().toStr())
       print ""
     end if
   end if
@@ -825,6 +825,7 @@ function adriseUtils_getAsyncResponse (msg as Object, id as Integer) as Object
   end if
   return invalid
 end function
+
 
 ' --------------------------------------------------------
 ' .channelStoreGoToAPP(pluginID)

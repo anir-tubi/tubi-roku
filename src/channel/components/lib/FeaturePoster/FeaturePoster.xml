@@ -16,6 +16,10 @@
     <field id="index" type="integer" />
     <field id="width" type="float" />
     <field id="height" type="float" />
+
+    <!-- used so the FeaturePoster load state can be identified at the same level as a regular poster -->
+    <field id="loadStatus" type="string"  alias="Background.loadStatus"/>
+
   </interface>
 
   <children>

@@ -89,6 +89,10 @@
     <!-- If true, play button presses will be interpreted like "ok" and select the content -->
     <field id="playIsSelect" type="boolean" value="true" />
 
+    <!-- Is used to communicate with parents that the first poster has successfully loaded -->
+    <field id="firstPosterLoaded" type="boolean" value="false" />
+    <field id="isFirstInList" type="boolean" value="false" />
+
   </interface>
   
   <children>

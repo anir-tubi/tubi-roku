@@ -66,6 +66,7 @@
     <field id="categoryMenuVisible" type="boolean"/>
     <field id="onNowHintVisible" alias="OnNowHint.visible"/>
     <field id="searchSignOutHintVisible" alias="SearchSignOutHint.visible"/>
+    <field id="firstPosterLoaded" alias="CategoryGridList.firstPosterLoaded"/>
   </interface>
 
   <children>

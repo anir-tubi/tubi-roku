@@ -35,6 +35,9 @@ Function init()
 
   m.ScrollingList.focusChangeDuration = constants.performance.categoryGridList.categoryAnimationDuration
   m.gridAnimationDuration = constants.performance.categoryGridList.gridAnimationDuration
+
+  ' Used to bubble up that the first poster in the first category content grid has been loaded
+  m.firstCategoryContentGrid = invalid
 End Function
 
 
@@ -78,6 +81,13 @@ Function onContentChange()
     categoryContentGrid = contentGridsParent.getChild(i)    
     categoryContentGrid.focusChangeDuration = m.gridAnimationDuration
   end for
+
+  'listen so we can send load time to server
+  if m.firstCategoryContentGrid = invalid
+    m.firstCategoryContentGrid = contentGridsParent.getChild(0)
+    m.firstCategoryContentGrid.isFirstInList = true
+    m.firstCategoryContentGrid.observeField("firstPosterLoaded", "onFirstPosterLoaded")
+  end if
 End Function
 
 Function onDirtyUserCategories()
@@ -551,6 +561,13 @@ Function metadataCachePush(component As Object, categoryId As String, offset As 
   end if
 End Function
 
+
+
+'This is used as an intermediary to bubble up info that content has loaded on screen so we can let the server know time to load
+Function onFirstPosterLoaded()
+  m.firstCategoryContentGrid.unobserveField("firstPosterLoaded")
+  m.top.firstPosterLoaded = true
+End Function
 
 ''''''''''''''''''''
 ' Debugging Helpers

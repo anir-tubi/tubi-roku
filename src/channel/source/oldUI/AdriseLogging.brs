@@ -64,7 +64,7 @@ end function
 
 'debug is used to track a specific user's device
 'debug will only send logging if the device id is in m.idsToLog
-function adriseLogging_debug(port, logType as string, subtype as string, message as string)
+function adriseLogging_debug(port, logType, subtype, message)
   options = m.buildOptions(subtype, message, m.logConsts.debug.name, m.logConsts.debug.logType[logType], m.logConsts.debug.printed)
   m.sendLogging(port, options)
 end function
@@ -97,6 +97,11 @@ function adriseLogging_buildOptions(subtype, message, level, logType, printed)
   }
   options["type"] = logType
 
+  for each option in options
+    if type(options[option]) <> "String" and type(options[option]) <> "roString"
+      options[option] = FormatJson(options[option])
+    end if
+  end for
   return options
 end function
 
@@ -117,10 +122,10 @@ function adriseLogging_sendLogging(port, options)
   if options <> invalid and options.count() > 0
     'print all log messages to console if we are in dev mode only
     if settings.mode = "dev" and options.message <> invalid and options.subtype <> invalid
-      print "LOG " + options.printed + " (" + options.subtype + ") : " options.message
+      print "LOG " + options.printed + " (" + options.subtype + ") : " + options.message
 
     'don't send debug statements unless the user id is in m.idsToLog
-    else if type(port) = "roMessagePort" and options.level <> invalid and (m.idsToLog.DoesExist(m.utils.deviceInfo.deviceId) or options.level = m.logConsts.warn.name or options.level = m.logConsts.error.name)
+    else if type(port) = "roMessagePort" and options.level <> invalid and (m.idsToLog.DoesExist(m.utils.deviceInfo.deviceId) or options.level = m.logConsts.info.name or options.level = m.logConsts.warn.name or options.level = m.logConsts.error.name)
       loggingInfo = {
         app_id: settings.shortAppName
         platform: "roku"

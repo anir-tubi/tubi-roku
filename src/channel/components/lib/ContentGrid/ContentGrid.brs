@@ -53,6 +53,9 @@ Function init()
   m.continuousEvents = constants.performance.contentGrid.continuousEvents
 
   m.limitedNewUi = constants.deviceInfo.limitedNewUi
+
+  'm.firstItem is the first item loaded into m.items - it will be used to track the load time of the app
+  m.firstItem = invalid
 End Function
 
 
@@ -245,6 +248,14 @@ Function loadVisiblePosters(useCache=true As Boolean) As Void
           item = createItemComponent(index, content, m.itemPool.get())
         end if
         m.items.appendChild(item)  ' push to end of the FIFO
+
+        'track the very first item loaded into m.items
+        if m.top.isFirstInList and m.firstItem = invalid
+          m.firstItem = item
+          if m.firstItem.isSubtype("Poster") or m.firstItem.isSubtype("FeaturePoster")
+            m.firstItem.observeField("loadStatus", "onFirstPosterLoaded")
+          end if
+        end if
       end if
     end for
   end for
@@ -584,4 +595,13 @@ Function getVisibleItemWindow()
     width: width
     height: height
   }
+End Function
+
+
+'Once the frist poster has been loaded, this notification will bubble up until it can be reported to an external API
+Function onFirstPosterLoaded(evt)
+  if m.top.isFirstInList = true and evt.getData() = "ready"
+    m.top.firstPosterLoaded = true
+    m.firstItem.unobserveField("loadStatus")
+  end if
 End Function

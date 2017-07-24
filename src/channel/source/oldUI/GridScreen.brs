@@ -9,8 +9,9 @@ function GridScreen (utils)
 
     'create the roTimespan object to be used for 'on focus' tracking
     'we want to see if the user has focused on something for at least a second
-    timer: CreateObject("roTimespan")
     focusCount: 0
+    appLoadStopwatch: invalid
+
 
     'keeps track of calls to get user playlist info
     httpIds: {}
@@ -25,6 +26,10 @@ function GridScreen (utils)
     showUserPlaylists: GridScreen_showUserPlaylists
 
     show: function (selItem, cp, gridStyle, showLinearTv)
+      if m.isShown = false
+        m.appLoadStopwatch = CreateObject("roTimespan")
+      end if
+
       m.cp = cp
       settings = m.utils.getSettings()
       m.bookmarkRowNum = 2
@@ -144,6 +149,16 @@ function GridScreen (utils)
             'set the focus to the appropriate video in the list
             if rowNum = selItem.listIndex
               m.rokuGridScreen.SetListOffset(selItem.listIndex, selItem.itemIndex)
+            end if
+
+            'send a log message
+            if rowNum = 0 and m.appLoadStopwatch <> invalid
+              appLoadMessage = {
+                loadtime: m.appLoadStopwatch.TotalMilliseconds()
+                model: m.utils.deviceInfo.model
+              }
+              m.utils.log.info(msgPort, "clientInfo", "time-to-load", FormatJson(appLoadMessage))
+              m.appLoadStopwatch = invalid
             end if
           end if
 
@@ -564,7 +579,7 @@ function Gridscreen_loadOnNewFocus(playlists, selItem)
     end for
 
     if playlists[newCurrentRow].isSubsetted <> true
-      m.utils.log.info(invalid, "clientInfo", "1: current-row-not-subsetted-on-new-focus", newCurrentRow)
+      m.utils.log.debug(invalid, "clientDebug", "1: current-row-not-subsetted-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow, playlists[newCurrentRow].episodes, 0, 8)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow, playlists[newCurrentRow].episodes, playlists[newCurrentRow].episodes.count() - 3, 3)
       m.rokuGridScreen.SetListOffset(selItem.listIndex, selItem.itemIndex)
@@ -572,33 +587,33 @@ function Gridscreen_loadOnNewFocus(playlists, selItem)
     end if
 
     if isLast = false and playlists[newCurrentRow + 1].isSubsetted <> true
-      m.utils.log.info(invalid, "clientInfo", "2: next-row-not-subsetted-on-new-focus", newCurrentRow)
+      m.utils.log.debug(invalid, "clientDebug", "2: next-row-not-subsetted-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow + 1, playlists[newCurrentRow + 1].episodes, 0, 8)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow + 1, playlists[newCurrentRow + 1].episodes, playlists[newCurrentRow + 1].episodes.count() - 3, 3)
       playlists[newCurrentRow + 1].isSubsetted = true
     end if
 
     if playlists[newCurrentRow].isComplete <> true 
-      m.utils.log.info(invalid, "clientInfo", "3: current-row-not-complete-on-new-focus", newCurrentRow)
+      m.utils.log.debug(invalid, "clientDebug", "3: current-row-not-complete-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow, playlists[newCurrentRow].episodes, 8, playlists[newCurrentRow].episodes.count() - 11)
       playlists[newCurrentRow].isComplete = true
     end if
 
     if isLast = false and playlists[newCurrentRow + 1].isComplete <> true
-      m.utils.log.info(invalid, "clientInfo", "4: next-row-not-complete-on-new-focus", newCurrentRow)
+      m.utils.log.debug(invalid, "clientDebug", "4: next-row-not-complete-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow + 1, playlists[newCurrentRow + 1].episodes, 8, playlists[newCurrentRow + 1].episodes.count() - 11)
       playlists[newCurrentRow + 1].isComplete = true
     end if
 
     if playlists[newCurrentRow - 1].isSubsetted <> true
-      m.utils.log.info(invalid, "clientInfo", "5: previous-row-not-subsetted-on-new-focus", newCurrentRow)
+      m.utils.log.debug(invalid, "clientDebug", "5: previous-row-not-subsetted-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow - 1, playlists[newCurrentRow - 1].episodes, 0, 8)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow - 1, playlists[newCurrentRow - 1].episodes, playlists[newCurrentRow - 1].episodes.count() - 3, 3)
       playlists[newCurrentRow - 1].isSubsetted = true
     end if
 
     if playlists[newCurrentRow - 1].isComplete <> true
-      m.utils.log.info(invalid, "clientInfo", "6: current-row-not-complete-on-new-focus", newCurrentRow)
+      m.utils.log.debug(invalid, "clientDebug", "6: current-row-not-complete-on-new-focus", newCurrentRow)
       m.rokuGridScreen.SetContentListSubset(newCurrentRow - 1, playlists[newCurrentRow - 1].episodes, 8, playlists[newCurrentRow - 1].episodes.count() - 11)
       playlists[newCurrentRow - 1].isComplete = true
     end if

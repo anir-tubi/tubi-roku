@@ -379,8 +379,6 @@ function tubiAds_getAdUnitsListTraditional(episode, traditionalAdXmlString)
 
   ' make sure that the xml pulled from the clickThrough RAF XML doc is valid and useable
   if not xml.Parse(traditionalAdXmlString) or xml.GetName() <> "feed" or islist(xml.GetBody()) = false
-    ' m.utils.log.info(m.playerRequestQueue, "no-ads-in-xml", "error with traditional ad xml - nothing returned")
-    ' print ""
     return []
   end if
 
@@ -519,7 +517,6 @@ function tubiAds_getAdUnitFromXml(adXml)
 
     'Determine if there are any type of companion ads running
     if adXml.companion_ad.GetAttributes().type <> invalid
-      ' m.utils.log.info(m.playerRequestQueue, "companion-ad", "THERE IS A COMPANION AD")
       companionAttributes = adXml.companion_ad.GetAttributes()
 
       'if the companion ad is Brightline, add Brightline information for companion ads to adUnit object.
@@ -859,69 +856,6 @@ function tubiAds_showVideoAd(canvas, adUnit, adDetails)
             end if
             m.selectableAds.handleAdClick(adUnit)
           end if
-
-          ' if adUnit.isHouseAd = true
-          '   authInfo = m.utils.getAuthInfo()
-          '   if authInfo.accessToken <> invalid
-          '     if adUnit.companionOverlay.bookmarkId <> invalid and adUnit.companionOverlay.bookmarkType <> invalid
-          '       cp = GetGlobalAA().app.cp
-          '       bookmarkContent = cp.getContentFromLocalPlaylists(adUnit.companionOverlay.bookmarkId, adUnit.companionOverlay.bookmarkType)
-
-          '       if bookmarkContent <> invalid and bookmarkContent.id <> invalid
-          '         bookmarkContent.isBookmark = true
-                  
-          '         'if house ad content is already bookmarked, remove it locally so we can add it to the front of the bookmarks list again
-          '         for i=0 to cp.userPlaylists[m.constants.settings.bookmarkRegistry].episodes.count()-1
-          '           checkingBookmark = cp.userPlaylists.bookmarks.episodes[i]
-          '           if checkingBookmark.id <> invalid and checkingBookmark.id = bookmarkContent.id and checkingBookmark["type"] = bookmarkContent["type"]
-          '             cp.userPlaylists.bookmarks.episodes.delete(i)
-          '             exit for
-          '           end if
-          '         end for
-
-
-          '         serverType = "movie"
-          '         userPlaylistStore = "userPlaylistVideos"
-          '         if adUnit.companionOverlay.bookmarkType = "series"
-          '           serverType = "series"
-          '           userPlaylistStore = "userPlaylistSeries"
-          '         end if
-                  
-          '         'add the bookmark to the local store and populate the bookmarks playlist
-          '         cp[userPlaylistStore][bookmarkContent.id] = bookmarkContent
-          '         cp.userPlaylists.bookmarks.episodes.unshift(cp[userPlaylistStore][bookmarkContent.id])
-
-          '         'add the bookmark to the server
-          '         bookmarkReqId = m.utils.updateBookmarks(bookmarkContent.id, "add", serverType, GetGlobalAA().app.detailScreen.detailsPort)
-          '         GetGlobalAA().app.detailScreen.addBookmarkReqIds[bookmarkReqId.toStr()] = true
-
-          '         m.utils.tracking.trackUserEvent({
-          '           trackType: "addBookmark"
-          '           value: bookmarkContent.id
-          '           ctx: "/house/" + bookmarkContent["type"] + "/" + bookmarkContent.id + "/ad/" + adUnit.id
-          '           requestQ: m.playerRequestQueue
-          '         })
-
-          '         houseAdDialog.updateText(bookmarkContent.title + " has been added to your queue.")
-          '         ' m.utils.log.info(adRequestQueue, "house-ad-bookmark-success", "Bookmark added from house ad for content id " + bookmarkContent.id)
-                  
-          '       else
-          '         houseAdDialog.updateText("Sorry, we could not update your bookmark")
-          '         ' m.utils.log.warn(adRequestQueue, "house-ad-bookmark-fail", "Could not ad bookmark from house ad due to not finding content")
-          '       end if
-              
-          '     else
-          '       houseAdDialog.updateText("Sorry, we could not update your bookmark")
-          '       ' m.utils.log.warn(adRequestQueue, "house-ad-bookmark-fail", "Could not ad bookmark from house ad due to incomplete data")
-          '     end if
-            
-          '   else
-          '     houseAdDialog.updateText("You must be logged in to add content to your queue.")
-          '     ' m.utils.log.info(adRequestQueue, "house-ad-bookmark-fail", "Bookmark not added because user not logged in")
-
-          '   end if
-          '   houseAdDialog.show()
-          ' end if
 
         else if (i = 4 or i = 5) ' left or right
           if adUnit.adIsSelectable
