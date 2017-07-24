@@ -146,6 +146,8 @@ function adriseAds_populateUrl(episode, playerSettings)
 
   deviceId = "&deviceid=" + m.utils.deviceInfo.deviceId
   model = "&model=" + m.utils.deviceInfo.model
+  clientVersion = "&roku-v=" + m.utils.deviceInfo.clientVersion
+  language = "&m-language=" + m.utils.deviceInfo.language
 
   ' add Roku Advertiser Id (RIDA) to ad call url  
   urlAdId = ""
@@ -242,7 +244,7 @@ function adriseAds_populateUrl(episode, playerSettings)
   end if
 
   'create the url to be used for ad calls'
-  url = m.baseUrl + "?platform=roku" + appId + adSdk + cid + nowPos + model + deviceId + optOut + urlAdId + urlTubiId + pubId + contentType + isLinear + "&_=" + RND(1000000000000).ToStr()
+  url = m.baseUrl + "?platform=roku" + appId + adSdk + cid + nowPos + model + deviceId + optOut + urlAdId + urlTubiId + pubId + contentType + isLinear + clientVersion + language + "&_=" + RND(1000000000000).ToStr()
 
   return url
 end function

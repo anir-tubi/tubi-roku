@@ -150,6 +150,8 @@ function tubiAds_populateUrl(episode) As String
     "deviceid": m.constants.deviceInfo.deviceId
     "pubid": episode.pubId
     "content-type": "hls"
+    "roku-v": m.constants.deviceInfo.clientVersion
+    "m-language": m.constants.deviceInfo.language
     "_": RND(1000000000000).ToStr()
   }
 

@@ -143,6 +143,7 @@ Function getConstants()
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
     constants.deviceInfo.limitedNewUi  = limitedNewUi
     constants.deviceInfo.clientVersion  = clientVersion
+    constants.deviceInfo.language  = di.GetCurrentLocale().Left(2)
 
 
   'the names of the registry memory sections that will save bookmark and previously viewed info

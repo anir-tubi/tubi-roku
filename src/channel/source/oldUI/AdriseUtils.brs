@@ -1348,5 +1348,6 @@ function adriseUtils_getDeviceInfo()
     countryCode: countryCode ' will be invalid if old version of firmware
     lowMemory: lowMemory
     clientVersion: clientVersion
+    language: di.GetCurrentLocale().Left(2)
   }
 end function
