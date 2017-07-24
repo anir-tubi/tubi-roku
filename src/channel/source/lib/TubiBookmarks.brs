@@ -218,6 +218,7 @@ function tubiBookmarks_getInitialBookmarksReq(localId) as Object
   options = {
     method: m.constants.reqTypes.get
     params: {
+      platform: m.constants.platform
       "page_enabled": false
     }
   }
@@ -247,6 +248,7 @@ function tubiBookmarks_getInitialHistoryReq(localId) as Object
     method: m.constants.reqTypes.get
     params: {
       "page_enabled": false
+      platform: m.constants.platform
     }
   }
 

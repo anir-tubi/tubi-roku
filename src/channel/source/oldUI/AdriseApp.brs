@@ -112,12 +112,12 @@ function AdriseApp_runApp()
     'turn on bookmarks for tubitv only'
     GetGlobalAA().app.settings.showBookmarks = true
     GetGlobalAA().app.settings.bookmarksUrl = GetGlobalAA().app.settings.bookmarksUrlBase + "/queues"
-    GetGlobalAA().app.settings.bookmarksUrlNoPage = GetGlobalAA().app.settings.bookmarksUrl + "?page_enabled=false"
+    GetGlobalAA().app.settings.bookmarksUrlNoPage = GetGlobalAA().app.settings.bookmarksUrl + "?page_enabled=false&platform=" + GetGlobalAA().app.settings.platformName
 
     ' turn on previously viewed for tubitv only
     GetGlobalAA().app.settings.showPreviouslyViewed = true
     GetGlobalAA().app.settings.previouslyViewedUrl = GetGlobalAA().app.settings.bookmarksUrlBase + "/histories"
-    GetGlobalAA().app.settings.previouslyViewedUrlNoPage = GetGlobalAA().app.settings.previouslyViewedUrl + "?page_enabled=false"
+    GetGlobalAA().app.settings.previouslyViewedUrlNoPage = GetGlobalAA().app.settings.previouslyViewedUrl + "?page_enabled=false&platform=" + GetGlobalAA().app.settings.platformName
 
     'refresh token url
     GetGlobalAA().app.settings.getAccessTokenUrl = GetGlobalAA().app.settings.bookmarksUrlBase + "/login/refresh"
