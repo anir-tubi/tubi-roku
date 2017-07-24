@@ -18,6 +18,7 @@ function RegisterScreen(uniqueId, utils)
     utils: utils
     baseUrl: "http://tubitv.com"
     allowSMS: true
+    exitOnBack: false
 
     setupInitialScreen: RegisterScreen_setupInitialScreen
 
@@ -367,7 +368,7 @@ function RegisterScreen(uniqueId, utils)
               if (index = 0) ' back
                 m.canvas.close()
                 m.canvas = invalid
-                return true
+                return not m.exitOnBack
               else if (index = 6) ' ok button on remote
                 if(m.col = 0) 'selected OK button on screen
                   if m.allowSMS <> invalid and m.allowSMS = false
