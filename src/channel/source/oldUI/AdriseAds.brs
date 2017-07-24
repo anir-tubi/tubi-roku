@@ -55,6 +55,7 @@ function AdriseAds (utils, playerPort)
     checkForCommercialBreak: adriseAds_checkForCommercialBreak
     getCuePoints: adriseAds_getCuepoints
     populateUrl: adriseAds_populateUrl
+    addLogIdentifier: adriseAds_addLogIdentifier
     getResumingPlayAds: adriseAds_getResumingPlayAds
 
     ' innovid irolls
@@ -182,15 +183,35 @@ function adriseAds_populateUrl(episode, playerSettings)
   if playerSettings <> invalid
     if type(playerSettings.appId) = "String" or type(playerSettings.appId) = "roString"
       appId = "&appid=" + playerSettings.appId
+    else
+      'send debug log in the case that there is no appId on playerSettings
+      message = "No app id as string in the player settings"
+      message = m.addLogIdentifier(message, episode)
+      m.utils.log.warn(m.playerPort, "clientWarn", "missing-appId", message)
     end if
 
     if type(playerSettings.pubId) = "String" or type(playerSettings.pubId) = "roString"
       pubId = "&pubid=" + playerSettings.pubId
+    else
+      'send debug log in the case that there is no pubId on playerSettings
+      message = "No pub id as string in the player settings"
+      message = m.addLogIdentifier(message, episode)
+      m.utils.log.warn(m.playerPort, "clientWarn", "missing-pubId", message)
     end if
 
     if type(playerSettings.contentType) = "String" or type(playerSettings.contentType) = "roString"
       contentType = "&content-type=" + playerSettings.contentType
+    else
+      'send debug log in the case that there is no contentType on playerSettings
+      message = "No content type as string in the player settings"
+      message = m.addLogIdentifier(message, episode)
+      m.utils.log.warn(m.playerPort, "clientWarn", "missing-contentType", message)
     end if
+  else
+    'send debug log in the case that there is no player settings
+    message = "No player settings in oldUI ads.populateUrl()"
+    message = m.addLogIdentifier(message, episode)
+    m.utils.log.warn(m.playerPort, "clientWarn", "missing-playerSettings", message)
   end if
 
   cid = ""
@@ -198,11 +219,26 @@ function adriseAds_populateUrl(episode, playerSettings)
   if episode <> invalid
     if type(episode.id) = "String" or type(episode.id) = "roString"
       cid = "&cid=" + episode.id
+    else
+      'send debug log in the case that there is no id on episode
+      message = "No id as string on the video"
+      message = m.addLogIdentifier(message, episode)
+      m.utils.log.warn(m.playerPort, "clientWarn", "missing-cid", message)
     end if
 
     if type(episode.nowPos) = "roFloat" or type(episode.nowPos) = "roInteger"
       nowPos = "&nowpos=" + Int(episode.nowPos).ToStr()
+    else
+      'send debug log in the case that the episode wasn't sent to ads
+      message = "No nowPos as float or integer on the video"
+      message = m.addLogIdentifier(message, episode)
+      m.utils.log.warn(m.playerPort, "clientWarn", "missing-nowPos", message)
     end if
+  else
+    'send debug log in the case that the episode wasn't sent to ads
+    message = "No video sent to ads.populateUrl()"
+    message = m.addLogIdentifier(message, episode)
+    m.utils.log.warn(m.playerPort, "clientWarn", "missing-video", message)
   end if
 
   'create the url to be used for ad calls'
@@ -210,6 +246,26 @@ function adriseAds_populateUrl(episode, playerSettings)
 
   return url
 end function
+
+Function adriseAds_addLogIdentifier(message, episode)
+  if episode <> invalid
+    if type(episode.id) = "String" or type(episode.id) = "roString"
+      message = message + " for video with id = " + episode.id
+    else if episode.title <> invalid and episode.title.len() > 0
+      message = message + " for video with title = " + episode.title
+    else if episode.description <> invalid and episode.description.len() > 0
+      message = message + " for video with description = " + episode.description
+    else if episode.url <> invalid
+      message = message + " for video with url = " + episode.url
+    else if episode.hDPosterUrl <> invalid
+      message = message + " for video with poster url = " + episode.hDPosterUrl
+    end if
+  else
+    message = message + " and no video info was sent to ad player."
+  end if
+
+  return message
+End Function
 
 ' ----------------------------------------------
 '  m.getAdsListViaRoku(episode, playerSettings)

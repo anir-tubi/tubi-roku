@@ -7,7 +7,7 @@ settings:
   adLoadingBackgroundColor: "#222223"
   adLoadingFontColor: "#EBEBEB"
   loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
-  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/2.2.newui.brs"
+  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/2.3.newui.brs"
   remoteComponentsUrl: "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_<<VER-TO-REPLACE>>.pkg"
   appName: "Tubi TV"
   isLiveTVOn: true
@@ -35,7 +35,7 @@ settings:
   show_country: false
   proxyUrl: "none"
   proxyFolder: "none"
-  hotPatchUrlOldUI: "http://cdn.adrise.com/hotpatches/roku/2.2.oldui.brs"
+  hotPatchUrlOldUI: "http://cdn.adrise.com/hotpatches/roku/2.3.oldui.brs"
   adrise_loadingurl: "pkg:/images/FREETVMOVIES_Tubi_icon_no-background_336x201"
 
 

@@ -24,7 +24,7 @@ REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
   --include 'source/3rdparty/**' \
   --include 'components' \
   --include 'components/**' \
-  --include-from=new_images_since_2_2_8 \
+  --include-from=new_images_since_2_3_1 \
   --exclude '*'
 DEV_PORT=8085
 DEV_PASSWORD?=1234
@@ -67,7 +67,7 @@ rsync:
 	@find ./$(TARGET_REMOTE_DIR)/components -name '*.xml' | xargs sed -i '' 's|<script type="text/brightscript" uri="pkg:|<script type="text/brightscript" uri="libpkg:|'
 
 	# Swap only whitelisted image references from pkg:/ to libpkg:/
-	@for path in `egrep "(png|jpg)" new_images_since_2_2_8`; do \
+	@for path in `egrep "(png|jpg)" new_images_since_2_3_1`; do \
     echo "Redirecting whitelisted image $$path"; \
     find ./$(TARGET_REMOTE_DIR)/components -type file | xargs sed -E -i '' "s|pkg:/+$$path|libpkg:/$$path|"; \
   done
