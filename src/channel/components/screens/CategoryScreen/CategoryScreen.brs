@@ -79,6 +79,7 @@ End Function
 Function onScreenFocusChange()
   tubiLog("CategoryScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus()
+    m.trackingCount = 0
     if m.categoryListIsFocused = false
     ' defaulted to screen, move to a subcomponent
       m.CategoryGridList.setFocus(true)
@@ -216,7 +217,6 @@ Function onCategoryMenuChange() As Void
   m.top.backgroundUriList = [m.defaultHeroUri]
 
   'update the tracking URI for user tracking purposes
-  m.trackingCount = m.trackingCount + 1
   catPos = (m.CategoryList.itemFocused + 1).toStr()
   catSlug = ""
   if newCategory.slug <> invalid
@@ -293,7 +293,6 @@ Function onGridFocusChange() As Void
   end if
 
   'set the user event tracking info
-  m.trackingCount = m.trackingCount + 1
   row = row.toStr() + "/"
   col = col.toStr()
   m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug + row + col
@@ -403,6 +402,7 @@ End Function
 '
 ' send the navigateInPage (navigate_within_page) tracking event
 Function onTrackingUriChange()
+  m.trackingCount = m.trackingCount + 1
   m.global.trackingLoggingTask.trackEvent = {
     trackType: "navigateInPage"
     value: m.trackingCount

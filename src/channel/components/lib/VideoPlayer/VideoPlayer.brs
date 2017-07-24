@@ -19,18 +19,6 @@
 '      subtitle         when subtitles turned off
 '                       when subtitles turned on
 '
-'      resumeAfterAds   after pre-roll and each mid-roll
-'
-'      playProgress     on start of scrubbing
-'                       at regular intervals set by 'pingFrequency' in constants
-'
-'      seek             at end of scrubbing
-'
-'      pauseToggle      when paused using pause/play button
-'                       when resumed using pause/play button
-'
-'      subtitle         when subtitles turned off
-'                       when subtitles turned on
 '
 '
 '
@@ -196,7 +184,7 @@ Function onVideoPickerFocused()
   if m.VideoPicker.contentFocused <> -1
     m.lastButtonPressPos = m.playerPosition
 
-    'content grid naturally debounces the content selections, so trackEvent and naviatations increment
+    'content grid naturally debounces the content selections, so trackEvent and navigations increment
     'only happen when a user has settled on a content
     m.VideoPicker.navigations = m.VideoPicker.navigations + 1
     
@@ -297,28 +285,10 @@ Function onVideoPositionChange()
 
   ' Analytics
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval then
-    extraCtx = {
-      interval: m.playerPosition - m.lastPingTime
-    }
-
-    if m.top.analyticsMode = "onnow-autoplay"
-      extraCtx.on_now = true
-      extraCtx.livetv = true
-    else if m.top.analyticsMode = "onnow-engaged"
-      extraCtx.on_now = true
-    else if m.top.analyticsMode = "onnow-docked"
-      extraCtx.embedded = true
-      extraCtx.on_now = true
-      extraCtx.livetv = true
-    end if
-
-    trackEvent({
-      trackType: "playProgress"
-      ctx: m.Video.content.id
-      value: m.playerPosition
-      extraCtx: extraCtx
-    })
+    playProgressEvent = getPlayProgressEvent()
     m.lastPingTime = m.playerPosition
+
+    trackEvent(playProgressEvent)
   end if
 
   ' User history
@@ -342,12 +312,21 @@ Function onVideoPositionChange()
       end if
 
       ' Fire up the midroll
-      if m.playerPosition = cuepoint and m.top.adState = "adspending" then
-        ' We must stop the video here, not just pause it, in order to release
-        ' system resources to the RAF video player
-        showAdBreak()
-        ' store latest history
-        historyPosition()
+      if m.playerPosition = cuepoint
+        if m.top.adState = "adspending" then
+          ' We must stop the video here, not just pause it, in order to release
+          ' system resources to the RAF video player
+          showAdBreak()
+          ' store latest history
+          historyPosition()
+        else if m.top.adState = "noads"
+          ' when we reach the cuepoint, we find that the last ad call returned no ads
+          trackEvent({
+            trackType: "resumeAfterAds"
+            value: m.playerPosition
+            ctx: m.top.content.id
+          })
+        end if
       end if
     end for
   end if 
@@ -601,11 +580,8 @@ Function onAdStateChange()
     m.Video.control = "play"
     trackEvent({
       trackType: "resumeAfterAds"
-      value: m.Video.content.nowPos
-      ctx: m.Video.content.id
-      extraCtx: {
-        livetv: m.Video.content.isLiveTV
-      }
+      value: m.playerPosition
+      ctx: m.top.content.id
     })
   else if m.top.adState = "adsclosed"
     ' We want to allow the UI to decide what to do when user hits "Back".  The best
@@ -803,6 +779,11 @@ Function beginScrub()
     animateTransport("in")
   end if
   m.scrubTimespan.mark()
+
+
+  ' playProgress analytics
+  playProgressEvent = getPlayProgressEvent()
+  trackEvent(playProgressEvent)
 End Function
 
 
@@ -821,6 +802,14 @@ Function endScrub()
   m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
   m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
   m.PlayPauseButton.focusState = true
+
+  ' seek analytics
+  trackEvent({
+    trackType: "seek"
+    value: m.playerPosition
+    ctx: m.top.content.id
+  })
+  m.lastPingTime = m.playerPosition
 
   ' resume ad break
   if m.top.enableAds and oldVideoState = "ffw" then
@@ -1015,6 +1004,13 @@ Function jumpToPosition(position)
     position = 0
   end if
 
+  ' seek analytics
+  trackEvent({
+    trackType: "seek"
+    value: position
+    ctx: m.top.content.id
+  })
+
   m.playerPosition = position
   m.Video.seek = position
   m.VideoState = "play"
@@ -1070,4 +1066,29 @@ Function onShowTransport()
   else
     animateTransport("out")
   end if
+End Function
+
+
+Function getPlayProgressEvent()
+  extraCtx = {
+    interval: m.playerPosition - m.lastPingTime
+  }
+
+  if m.top.analyticsMode = "onnow-autoplay"
+    extraCtx.on_now = true
+    extraCtx.livetv = true
+  else if m.top.analyticsMode = "onnow-engaged"
+    extraCtx.on_now = true
+  else if m.top.analyticsMode = "onnow-docked"
+    extraCtx.embedded = true
+    extraCtx.on_now = true
+    extraCtx.livetv = true
+  end if
+
+  return {
+    trackType: "playProgress"
+    ctx: m.Video.content.id
+    value: m.playerPosition
+    extraCtx: extraCtx
+  }
 End Function

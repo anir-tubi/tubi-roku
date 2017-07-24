@@ -25,6 +25,8 @@
     
     <!-- WRITE-ONLY: setting this field to true causes the category screen to be navigated to -->
     <field id="showCategoryScreen" type="boolean" value="false" alwaysNotify="true"/>
+
+    <field id="trackingUri" type="string"  value="/home" alwaysNotify="true"/>
   </interface>
   
   <children>

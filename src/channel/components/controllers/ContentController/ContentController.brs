@@ -120,16 +120,6 @@ Function unAutohide()
   tubiLog("ContentController.unAutohide")
   if m.autohideAnimation <> invalid then m.autohideAnimation.control = "stop"
 
-  'the user is bringing back the on now home UI after returning from the on now player experience
-  if m.autohideTimer.focusVideo = true
-    videoPicker = m.VideoPlayer.findNode("VideoPicker")
-    m.trackingLoggingTask.trackEvent = {
-      trackType: "navigate"
-      value: "/on_now/" + m.VideoPlayer.playlist.slug + "/1/" + videoPicker.contentFocused.toStr()
-      ctx: "/home/1/cat/" + m.VideoPlayer.playlist.slug + "/1/" + videoPicker.contentFocused.toStr()
-    }
-  end if
-
   m.ScreenStack.visible = true
   m.autohideAnimation = fade(m.ScreenStack, "in", 0.5)
   currentScreen().setFocus(true)

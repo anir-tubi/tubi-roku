@@ -12,6 +12,7 @@ Function init()
   m.playlistIndex = 0
   m.autohideSeconds = 3
   m.internalState = "stop"
+  m.isInPlayerMode = false
   m.adSuppressionDuration = 5 * 60  ' seconds until ads start showing
   m.adSuppressionExpire = 0 'Uptime(0) + m.adSuppressionDuration
 End Function
@@ -28,6 +29,18 @@ Function onComponentFocusChange()
     m.adSuppressionExpire = 0
     m.onNowOverlay.setFocus(true)
     autohideWhenPlaying()
+
+    if m.isInPlayerMode = true
+      if m.videoPlayer <> invalid and m.videoPlayer.playlist <> invalid and m.VideoPlayer.playlist.slug <> invalid
+        videoPicker = m.VideoPlayer.findNode("VideoPicker")
+        trackEvent({
+          trackType: "navigate"
+          value: "/on_now/" + m.VideoPlayer.playlist.slug + "/1/" + videoPicker.contentFocused.toStr()
+          ctx: "/home/1/cat/" + m.VideoPlayer.playlist.slug + "/1/" + videoPicker.contentFocused.toStr()
+        })
+      end if
+      m.isInPlayerMode = false
+    end if
   end if
 End Function
 
@@ -36,12 +49,17 @@ Function onControlChange()
   m.adSuppressionExpire = 0
   if m.videoPlayer <> invalid then m.videoPlayer.enableAds = false
   if m.top.control = "play"
-    if m.internalState = "stop" then showOnNow()
-    dockVideo(false)
+    if m.internalState = "stop" then
+      showOnNow()
+    else if m.internalState = "dock" then
+      dockVideo(false)
+    end if
     autohideWhenPlaying()
   else if m.top.control = "stop"
     hideOnNow()
-    dockVideo(false)
+    if m.internalState = "dock"
+      dockVideo(false)
+    end if
     autohideCancel()
   else if m.top.control = "dock"
     if m.internalState = "stop" then showOnNow()
@@ -168,6 +186,8 @@ End Function
 
 'the onNowOverlay has changed which playlist/channel is selected
 Function onOverlayContentSelected()
+  m.isInPlayerMode = true
+
   tubiLog("OnNow.onOverlayContentSelected")
   autohideStart(0, true, 0.5)  ' hide right away
   'analyticsMode = onnow-engaged for the video player is handled in contentController onAutohide which occurs when the autohide concludes

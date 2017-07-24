@@ -46,14 +46,16 @@ End Function
 '           ctx: dynamic, depends on the eventType
 '           extraCtx: dynamic, depends on the eventType
 Function trackSceneGraphEvent(evt)
-  constants = m.constants
-  Request = TubiRequest()
-  Auth = TubiAuth(constants, Request)
-  Tracking = TubiTracking(constants, Request, Auth)
+  if evt <> invalid and evt.trackType <> invalid then
+    tubiLog("TrackingLoggingTask.trackSceneGraphEvent for " + evt.trackType)
+    constants = m.constants
+    Request = TubiRequest()
+    Auth = TubiAuth(constants, Request)
+    Tracking = TubiTracking(constants, Request, Auth)
 
-  evt.requestQ = m.queue
-  Tracking.trackUserEvent(evt)  'creates a request and adds it to the requestQueue
-
+    evt.requestQ = m.queue
+    Tracking.trackUserEvent(evt)  'creates a request and adds it to the requestQueue
+  end if
 End Function
 
 
