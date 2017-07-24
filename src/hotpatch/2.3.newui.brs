@@ -14,6 +14,7 @@ m.global.utils.constants.settings.remoteComponentsUrl = "http://cdn.adrise.com/h
 ' Turn features on/off
 m.global.utils.constants.ui.signIn.skipContinueScreen = true
 m.global.utils.constants.ui.signIn.backExitsSignIn = true
+m.global.utils.constants.ui.onNow.disableOnNow = false
 
 
 

@@ -509,7 +509,7 @@ Function startOnNow()
 
   ' If experiment calls for OnNow, set the content.  Don't ever do OnNow
   ' for low-spec devices
-  if getExperimentValue("UserNamespace", "roku_on_now") = 1 and m.global.constants.deviceInfo.limitedNewUi = false
+  if getExperimentValue("UserNamespace", "roku_on_now") = 1 and m.global.constants.deviceInfo.limitedNewUi = false and  m.global.constants.ui.onNow.disableOnNow = false
 
     m.onNow.content = m.top.onNowContent
     m.onNow.visible = true

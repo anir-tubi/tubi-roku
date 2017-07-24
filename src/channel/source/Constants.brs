@@ -354,6 +354,10 @@ Function getConstants()
 
   'UI properties that should be passed into the scene graph
   constants.ui = {}
+
+    constants.ui.onNow = {}
+      constants.ui.onNow.disableOnNow = false
+
     'constants needed for sign in flow experimentation
     constants.ui.signIn = {}
       constants.ui.signIn.skipContinueScreen = false
