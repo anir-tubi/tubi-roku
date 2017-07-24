@@ -25,10 +25,10 @@
 
   <children>
     <Label
-      translation="[478,188]"
-      text="Sign in or Register on Tubi TV"
+      translation="[0,188]"
+      text="Sign in or Register for Free on Tubi TV"
       horizAlign="center"
-      width="964">
+      width="1920">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
@@ -46,13 +46,13 @@
       <LayoutGroup
         layoutDirection="vert">
         <Rectangle
-         height="33"
-         width="300"
+         width="290"
+         height="4"
          color="0x00000000"/>
         <Poster
          uri="pkg:/images/picto-sign-in.png"
-         width="300"
-         height="144"/>
+         width="290"
+         height="188"/>
       </LayoutGroup>
     </LayoutGroup>
        
@@ -65,7 +65,7 @@
       itemComponentName="SignInButton"
       itemSpacings="[26]">
       <ContentNode role="content">
-        <ContentNode id="register" title="Register Online"/>
+        <ContentNode id="register" title="Register or Link Account"/>
         <ContentNode id="signin" title="Sign In via Email"/>
       </ContentNode>
     </ScrollingList>
@@ -76,7 +76,7 @@
       itemSpacings="[26]"
       opacity="0.5">
      <Label
-       text="Register at tubitv.com or sign in into an existing account"
+       text="Register for free at tubitv.com or sign in to an existing account"
        wrap="true"
        width="480">
        <Font
