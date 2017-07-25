@@ -57,7 +57,7 @@
       id="LowercaseKeyboard"
       width="1920"
       height="80"
-      visible="true"
+      visible="false"
       itemSpacings="[2]"
       itemComponentName="KeyboardItem"
       focusChangeDuration="0.1"
