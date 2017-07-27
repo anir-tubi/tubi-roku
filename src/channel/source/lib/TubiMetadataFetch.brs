@@ -109,9 +109,9 @@ Function TubiMetadataFetch_organizeLiveTvContent(liveTvResponse)
   nodeCount = m.translate.translateRecursive(channels, parent)
   parent.liveTvCursor = channels.liveTvCursor
 
-  ' For now we force short-form channel to be active
+  'find the channel specified in costants
   for i=0 to parent.getChildCount()-1
-    if parent.getChild(i).liveTvChannelType = "short_form"
+    if parent.getChild(i).id = m.constants.ui.onNow.channelId
       parent.liveTvCursor = [i, parent.liveTvCursor[1], parent.liveTvCursor[2]]
       exit for
     end if
