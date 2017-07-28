@@ -43,7 +43,7 @@ End Function
 
 '###########
 'Function onKeyEvent(key As String, press As Boolean) As Boolean
-'  if key = "options" then 
+'  if press and key = "options" then
 '    DumpCacheEntries()
 '    DumpItemStats()
 '    STOP
@@ -133,14 +133,14 @@ Function focusCategory(newIndex)
   end if
   m.ContentGrid = m.ScrollingList.findNode("Items").getChild(newIndex)
   if m.ContentGrid <> invalid then 
-    ' Finally, set focus on the grid so user can scroll
-    if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)
 
     m.ContentGrid.observeField("itemSelected", "onItemSelected")
     m.ContentGrid.observeField("itemFocused", "onItemFocused")
     m.ContentGrid.observeField("cursorIndex", "onCursorIndexChange")
     m.ContentGrid.observeField("cursorPosition", "onCursorPositionChange")
     m.top.cursorPosition = m.ContentGrid.cursorPosition
+    ' Finally, set focus on the grid so user can scroll
+    if m.top.isInFocusChain() then m.ContentGrid.setFocus(true)
   end if
 End Function
 
@@ -282,23 +282,45 @@ Function onMetadataFetchTaskResponse() As Void
   '#####
 
   ' Merge the new content with any existing.
-  'TODO(Chris): Handle the case where there is a gap between the cached content and the new content
   if contentGrid.content <> invalid then
-    if newContent.offset < contentGrid.content.offset then
-      if (newContent.offset + newContent.getChildCount()) >= contentGrid.content.offset then
-        ' prepend new items to existing content
-        overlap = (newContent.offset + newContent.getChildCount()) - contentGrid.content.offset
-        prepend = newContent.getChildren(newContent.getChildCount() - overlap, 0)
-        contentGrid.content.insertChildren(prepend, 0)
-        contentGrid.content.offset = newContent.offset
-      end if
+    if newContent.offset < contentGrid.content.offset and (newContent.offset + newContent.getChildCount()) >= contentGrid.content.offset then
+      ' new content prefixes existing content without gaps
+      overlap = (newContent.offset + newContent.getChildCount()) - contentGrid.content.offset
+      prepend = newContent.getChildren(newContent.getChildCount() - overlap, 0)
+      '#####
+      'print "Prefix: "; contentGrid.content.offset; "-"; (contentGrid.content.offset+contentGrid.content.getChildCount()); " with "; newContent.offset; "-"; newContent.offset+prepend.count()
+      '#####
+      contentGrid.content.insertChildren(prepend, 0)
+      contentGrid.content.offset = newContent.offset
+    else if newContent.offset >= contentGrid.content.offset and newContent.offset <= (contentGrid.content.offset + contentGrid.content.getChildCount()) then
+      ' new content suffixes existing content without gaps
+      overlap = (contentGrid.content.offset + contentGrid.content.getChildCount()) - newContent.offset
+      contentGrid.content.removeChildrenIndex(overlap, contentGrid.content.getChildCount()-overlap)
+      '#####
+      'print "Suffix: "; contentGrid.content.offset; "-"; (contentGrid.content.offset+contentGrid.content.getChildCount()); " with "; newContent.offset-overlap; "-"; newContent.offset + newContent.getChildCount()
+      '#####
+      append = newContent.getChildren(newContent.getChildCount(), 0)
+      contentGrid.content.appendChildren(append)
     else
-      ' append new items to existing content
-      if newContent.offset <= (contentGrid.content.offset + contentGrid.content.getChildCount()) then
-        overlap = (contentGrid.content.offset + contentGrid.content.getChildCount()) - newContent.offset
-        contentGrid.content.removeChildrenIndex(overlap, contentGrid.content.getChildCount()-overlap)
+      ' Corner case: content is not adjacent to existing content"
+      if contentGrid.cursorIndex >= newContent.offset and contentGrid.cursorIndex <= (newContent.offset + newContent.getChildCount() - 1) then
+        ' purge existing items
+        reentry = m.metadataCache[entry]  ' this will get purged so we keep a reference to it
+        m.metadataCache[entry].contentNode = invalid 'so that the purge doesn't mess with our new content
+        '#####
+        'print "Replace A: "; contentGrid.content.offset; "-"; (contentGrid.content.offset+contentGrid.content.getChildCount()); " with "; newContent.offset; "-"; newContent.offset + newContent.getChildCount()
+        '#####
+        while metadataCacheExpireOne(reentry.category): end while
+        metadataCachePush(reentry.componentNode, reentry.category, reentry.offset)
+        entry = metadataCacheHasEntry(reentry.id)
+        m.metadataCache[entry].contentNode = newContent.getChild(0)
+        m.metadataCache[entry].length = newContent.getChildCount()
         append = newContent.getChildren(newContent.getChildCount(), 0)
+        '#####
+        'print "Replace B: "; contentGrid.content.offset; "-"; (contentGrid.content.offset+contentGrid.content.getChildCount()); " with "; newContent.offset; "-"; newContent.offset + newContent.getChildCount()
+        '#####
         contentGrid.content.appendChildren(append)
+        contentGrid.content.offset = newContent.offset
       end if        
     end if
   end if
@@ -321,6 +343,10 @@ End Function
 Function fetch(component As Object, categoryId As String, field="categoryResponse" As String, per_page=0 As Integer, page=1 As Integer) As Void
   tubiLog("CategoryGridList.fetch " + categoryId)
   offset = per_page * (page - 1)
+  if offset < 0 then
+    tubiLog("CategoryGridList.fetch: Skipping request for negative offset")
+    return
+  end if
 
   ' special categories can have deprecated ids in them, causing trouble
   ' with pagination. Here we just force it to always grab the whole category
@@ -333,7 +359,7 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
 
   ' if there is already a request in the cache, just refresh its cache position
   if metadataCacheHasEntry(requestId) <> -1 then
-    tubiLog("Skipping duplicate request for " + requestId)
+    tubiLog("CategoryGridList.fetch: Skipping duplicate request for " + requestId)
   else
 
     request = invalid
@@ -349,7 +375,7 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
 
     ' If global bookmark or history ids are unavailable then we will get invalid
     if request = invalid then
-      tubiLog("Unvailable request for category " + categoryId)
+      tubiLog("CategoryGridList.fetch: Unvailable request for category " + categoryId)
       return
     end if
 
@@ -362,7 +388,7 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
       request.options.params.page = page
     end if
 
-    tubiLog("Asking MetadataFetchTask for " + requestId)
+    tubiLog("CategoryGridList.fetch: Asking MetadataFetchTask for " + requestId)
     m.global.metadataFetchTask.request = request
   end if
   metadataCachePush(component, categoryId, offset)
@@ -515,7 +541,7 @@ Function metadataCacheExpireOne(categoryId="" As String) As Boolean
       else
         if ((parent.offset + parent.getChildCount()) - expired.offset) <= expired.length then
           'print "EXPIRE C " + expired.id
-          parent.removeChildrenIndex(expired.length, expired.offset)
+          parent.removeChildrenIndex(expired.length, expired.offset - parent.offset)
         else
           'print "EXPIRE D " + expired.id
           ' Here if this block is in-between two other blocks.  The proper way would be to delete all 
@@ -548,6 +574,7 @@ Function metadataCachePush(component As Object, categoryId As String, offset As 
     ' put the new entry in first so we can detect expire case D and keep blocks adjacent to the new block
     entry = {
       id: id
+      category: categoryId
       offset: offset
       length: 0    ' will be filled when the response arrives
       contentNode: invalid

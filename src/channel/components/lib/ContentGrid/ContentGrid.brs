@@ -105,9 +105,12 @@ Function onComponentFocusChange()
       end if
     end if
 
-    m.top.itemFocused = getContent(gridIndexToItemIndex(m.internalItemFocused))
-    m.top.cursorPosition = [m.internalItemFocused[0], m.internalItemFocused[1]]
-    m.top.cursorIndex = gridIndexToItemIndex(m.internalItemFocused)
+    ' only raise item focus events if there is content
+    if m.internalItemFocused[0] <> -1 and m.internalItemFocused[1] <> -1 then
+      m.top.itemFocused = getContent(gridIndexToItemIndex(m.internalItemFocused))
+      m.top.cursorPosition = [m.internalItemFocused[0], m.internalItemFocused[1]]
+      m.top.cursorIndex = gridIndexToItemIndex(m.internalItemFocused)
+    end if
   else
     if m.limitedNewUi
       m.focusBox.opacity = 0.0
@@ -133,15 +136,11 @@ Function onContentChange() As Void
 
   content = m.top.content
   if content = invalid or content.getChildCount() = 0 then
-    m.internalItemFocused = [-1, -1]
-    m.top.itemSelected = invalid
-    m.top.itemFocused = invalid
-    m.top.cursorPosition = [-1, -1]
-    m.top.cursorIndex = -1
     ' Remove all existing itemComponents, returning them to the pool
     for i=0 to m.items.getChildCount()-1
       removeAndRelease(m.items.getChild(0))
     end for
+    if content = invalid then m.internalItemFocused = [-1, -1]
     return
   end if
 
