@@ -10,6 +10,11 @@ Function init()
     if m.top.visible then
       m.Animation.control = "start"
     end if
+  else
+    loadingMessage = m.top.findNode("LoadingMessage")
+    loadingMessage.visible = true
+    spinner = m.top.findNode("SpinnerPoster")
+    spinner.visible = false
   end if
 End Function
 
@@ -29,34 +34,45 @@ Function onDimensionsChange()
 
   ' max size 200x200 for box
   spinnerBox = m.top.findNode("SpinnerBox")
-  rect = calculateRect(200)
+  rect = calculateRect(200, 200)
   spinnerBox.translation = [rect.x, rect.y]
   spinnerBox.width = rect.width
   spinnerBox.height = rect.height
 
   ' max size 66x66 for spinner graphic
   spinner = m.top.findNode("SpinnerPoster")
-  rect = calculateRect(66)
-  spinner.translation = [rect.x, rect.y]
-  spinner.width = rect.width
-  spinner.height = rect.height
-  spinner.scaleRotateCenter=[rect.width / 2, rect.height / 2]
+  if spinner.visible
+    rect = calculateRect(66, 66)
+    spinner.width = rect.width
+    spinner.height = rect.height
+    spinner.scaleRotateCenter=[rect.width / 2, rect.height / 2]
+  else
+    rect = calculateRect(180, 66)
+    message = m.top.findNode("LoadingMessage")
+    message.width = rect.width
+    message.height = rect.height
+  end if
+  posterOrMessage = m.top.findNode("PosterOrMessage")
+  posterOrMessage.translation = [rect.x, rect.y]
 End Function
 
 
 ' Get a bounding rect of a centered square with boundary of max size 'max'. If the max is greater
 ' than the total size of this Spinner component, the component size is used
-Function calculateRect(max As Integer)
-  if m.top.width < max
+Function calculateRect(maxWidth, maxHeight)
+  if m.top.width < maxWidth
     x = 0
-    y = 0
     width = m.top.width
+  else
+    x = (m.top.width - maxWidth) / 2
+    width = maxWidth
+  end if
+  if m.top.height < maxHeight
+    y = 0
     height = m.top.height
   else
-    x = (m.top.width - max) / 2
-    y = (m.top.height - max) / 2
-    width = max
-    height = max
+    y = (m.top.height - maxHeight) / 2
+    height = maxHeight
   end if
   return { x: x, y: y, width: width, height: height }
 End Function
