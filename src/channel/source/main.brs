@@ -19,7 +19,11 @@ Function Main(startupArgs as Dynamic)
   if constants.deviceInfo.limitedNewUi = true
     'default the models that require limited versions of the new ui to receive the old ui
     constants.deviceInfo.newUi = false
-    if constants.externalConfig.info.limited_newui_enabled = 1
+    if constants.deviceInfo.model = "3500X"
+      if constants.externalConfig.info["3500_newui_enabled"] = 1 then
+        constants.deviceInfo.newUi = true
+      end if
+    else if constants.externalConfig.info.limited_newui_enabled = 1
       constants.deviceInfo.newUi = true
     end if
   end if
