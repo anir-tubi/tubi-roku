@@ -173,7 +173,7 @@ Function startUserExperience()
 
       else if m.authTask.authInfo = invalid then
         tubiLog("ContentController ask user to sign in")
-        startSignIn()
+        startSignIn(false)
       else if m.global.constants.ui.onnow.on = false or m.top.onNowContent <> invalid
         startOnNow()
       end if
