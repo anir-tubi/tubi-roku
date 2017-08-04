@@ -33,6 +33,10 @@
            type="stringarray" 
            value="[&quot;pkg:/images/grid-default-blurred.jpg&quot;]"
            alwaysNotify="true" />
+
+    <!-- observed by HomeScreen for navigating between screens -->
+    <field id="trackingUri" type="string"/>
+    <field id="trackingCount" type="integer"/>
     
     
   </interface>

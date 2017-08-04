@@ -1,12 +1,24 @@
 Function init()
+  m.constants = m.global.constants
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("showCategoryScreen", "onShowCategoryScreen")
+  m.HomeViews = m.top.findNode("HomeViews")
   m.ToolsMenu = m.top.findNode("ToolsMenu")
   m.OnNow = m.top.findNode("OnNow")
   m.CategoryScreen = m.top.findNode("CategoryScreen")
+  m.TrackingLoggingTask = m.top.findNode("TrackingLoggingTask")
+
   m.CategoryScreen.observeField("backgroundUriList", "onCategoryBackgroundChange")
   m.CategoryScreen.observeField("contentSelected", "onCategoryContentSelected")
+
+  m.ToolsMenu.observeField("trackingCount", "onTrackingCountChange")
+  m.ToolsMenu.observeField("trackingUri", "onTrackingUriChange")
+  m.OnNow.observeField("trackingCount", "onTrackingCountChange")
+  m.OnNow.observeField("trackingUri", "onTrackingUriChange")
+  m.CategoryScreen.observeField("trackingCount", "onTrackingCountChange")
+  m.CategoryScreen.observeField("trackingUri", "onTrackingUriChange")
+
   m.focusTarget = m.OnNow
 End Function
 
@@ -51,16 +63,21 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       end if
     else if key = "up"
       if m.OnNow.isInFocusChain() then
+        m.ToolsMenu.trackingCount = m.top.trackingCount
+        m.OnNow.trackingUri = ""
         showTools(true)
         showOnNow(false, "below", false)
         m.ToolsMenu.findNode("ToolsMenu").setFocus(true)
         return true
       else if m.CategoryScreen.isInFocusChain() then  ' must be category screen focus
         showCategoryScreen(false)
+        m.CategoryScreen.trackingUri = ""
         if m.top.onNowContent <> invalid then
+          m.OnNow.trackingCount = m.top.trackingCount
           showOnNow(true, "above", false)
           m.OnNow.setFocus(true)
         else
+          m.ToolsMenu.trackingCount = m.top.trackingCount
           showTools(true)
           m.ToolsMenu.findNode("ToolsMenu").setFocus(true)
         end if
@@ -68,18 +85,23 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       end if
     else if key = "down"
       if m.ToolsMenu.isInFocusChain() then
-        showTools(false)      
+        showTools(false)
+        m.ToolsMenu.trackingUri = ""
         if m.top.onNowContent <> invalid then
+          m.OnNow.trackingCount = m.top.trackingCount
           showOnNow(true, "below", false)
           m.OnNow.setFocus(true)
         else
+          m.CategoryScreen.trackingCount = m.top.trackingCount
           showCategoryScreen(true)
           m.CategoryScreen.setFocus(true)
         end if
         return true
       else if m.OnNow.isInFocusChain() then
+        m.CategoryScreen.trackingCount = m.top.trackingCount
+        m.OnNow.trackingUri = ""
         showCategoryScreen(true)
-        showOnNow(false, "above", true)  ' TODO: Make sure we dock here
+        showOnNow(false, "above", true)
         m.CategoryScreen.setFocus(true)
         return true
       end if
@@ -118,6 +140,17 @@ Function showOnNow(show, direction, dock)
 End Function
 
 Function showCategoryScreen(show)
+  'set the rowPlaceholder value on the CategoryScreen so that keep the correct uri value for analytics
+  'basically the number of "rows" that are above the category screen, like "On Now" and "Tools"
+  catScreenIndex = getChildIndex(m.HomeViews, m.CategoryScreen)
+  if catScreenIndex >= 0
+    onNowVisible = 0
+    if m.constants.ui.onnow.on = false
+      onNowVisible = 1
+    end if
+    m.CategoryScreen.rowPlaceholder = catScreenIndex - onNowVisible
+  end if
+
   if show and not m.CategoryScreen.isInFocusChain()
     animate(m.CategoryScreen, m.CategoryScreen.translation, [0, 0], 1.0, 1.0, 0.4)
     m.CategoryScreen.infoVisible = true
@@ -152,3 +185,16 @@ Function onCategoryContentSelected()
   end if
 End Function
 
+
+'update the HomeScreen trackingCount based on changes to the focused child screen's trackingCount
+Function onTrackingCountChange(evt)
+  if evt.getData() <> invalid and evt.getRoSGNode().isInFocusChain()
+    m.top.trackingCount = evt.getData()
+  end if
+End Function
+
+Function onTrackingUriChange(evt)
+  if evt.getData() <> invalid and evt.getRoSGNode().isInFocusChain()
+    m.top.trackingUri = evt.getData()
+  end if
+End Function

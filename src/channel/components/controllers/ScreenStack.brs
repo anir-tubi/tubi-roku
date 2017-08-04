@@ -22,7 +22,7 @@ Function onKeyEvent(key As String, press As Boolean)
       return true
     else if key = "back"
       if m.ScreenStack_.getChildCount() > 1 then
-        popScreen()
+        popScreen(true)
       else if m.ScreenStackEmptyCallback_ <> invalid and type(m.ScreenStackEmptyCallback_) = "roFunction" then
         ' Don't remove the last item, let the callback decide what to do
         m.ScreenStackEmptyCallback_()
@@ -39,7 +39,7 @@ End Function
 ' pushScreen
 '
 ' Push a screen on to the stack, allowing the back button to retrace steps
-Function pushScreen(screen As Object)
+Function pushScreen(screen As Object, sendTrackingEvents = true as Boolean)
   tubiLog("ScreenStack.pushScreen")
   top = currentScreen()
   if top <> invalid then
@@ -53,12 +53,14 @@ Function pushScreen(screen As Object)
   screen.opacity = 1.0
   
   'handle user tracking for navigating to screen
-  if top <> invalid
+  if sendTrackingEvents = true and top <> invalid
     screenTrackingNavigate(top, screen)
   end if
   
   'handle user tracking for loading screen
-  screenTrackingLoad(screen)
+  if sendTrackingEvents = true
+    screenTrackingLoad(screen)
+  end if
 
 End Function
 
@@ -85,7 +87,7 @@ End Function
 ' popScreen
 '
 ' Remove the top-most screen of the stack, making the previous screen visible
-Function popScreen()
+Function popScreen(sendTrackingEvents = true as Boolean)
   tubiLog("ScreenStack.popScreen")
   top = m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-1)
   fields = top.getFields()
@@ -103,12 +105,12 @@ Function popScreen()
   end if
 
   'handle user tracking for navigating to screen
-  if top <> invalid and newTop <> invalid
+  if sendTrackingEvents = true and top <> invalid and newTop <> invalid
     screenTrackingNavigate(top, newTop)
   end if
 
   'handle user tracking for loading screen
-  if newTop <> invalid
+  if sendTrackingEvents = true and newTop <> invalid
     screenTrackingLoad(newTop)
   end if
 End Function

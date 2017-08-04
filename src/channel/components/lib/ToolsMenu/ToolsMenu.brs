@@ -6,6 +6,7 @@ Function init()
   content = m.top.findNode("SearchSignInContent")
   m.Menu.content = content
   m.top.observeField("focusedChild", "onComponentFocusChange")
+  m.top.observeField("trackingUri", "onTrackingUriChange")
   m.Description = m.top.findNode("Description")
 
   onSignedInChange()  ' initialize the sign in/out text
@@ -21,10 +22,14 @@ Function onItemFocused()
   tubiLog("ToolsMenu.onItemFocused")
   item = m.Menu.content.getChild(m.Menu.itemFocused)
   m.Description.text = item.description
+  if m.top.isInFocusChain()
+    m.top.trackingUri = "/home/1/cat/Tools/1/" + (m.Menu.itemFocused + 1).toStr()   'assumes Tools is at the top
+  end if
 End Function
 
 Function onItemSelected()
   tubiLog("ToolsMenu.onItemSelected")
+  m.top.trackingCount = 0
   if m.Menu.content <> invalid then
     item = m.Menu.content.getChild(m.Menu.itemSelected)
     if item.id = "SearchMenuItem" then
@@ -52,5 +57,17 @@ Function onSignedInChange()
   else
     content.title = "Sign In"
     content.description = "Sign In to Tubi TV. Access your Queue and View History across your devices"
+  end if
+End Function
+
+Function onTrackingUriChange()
+  tubiLog("ToolsMenu.onTrackingUriChange")
+  if m.top.isInFocusChain() and m.top.trackingUri <> ""
+    m.top.trackingCount = m.top.trackingCount + 1
+    m.global.trackingLoggingTask.trackEvent = {
+      trackType: "navigateInPage"
+      value: m.top.trackingCount
+      ctx: m.top.trackingUri
+    }
   end if
 End Function

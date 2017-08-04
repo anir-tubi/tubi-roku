@@ -1,14 +1,15 @@
-'used to determine if the node passed in as the child is actually a child node of the parent
-Function doesChildExist(parent, child)
+' used to determine the index of the child with respect the parent
+' returns the index or -1 if the passed in child does not belong to the parent
+Function getChildIndex(parent, child)
   if parent.getChildCount() > 0
     for i=0 to parent.getChildCount()-1
       if parent.getChild(i).isSameNode(child)
-        return true
+        return i
       end if
     end for
-    return false
+    return -1
   else
-    return false
+    return -1
   end if
 End Function
 

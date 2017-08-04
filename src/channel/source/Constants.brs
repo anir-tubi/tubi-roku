@@ -141,10 +141,10 @@ Function getConstants()
     constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.newUi = newUi
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
-    constants.deviceInfo.limitedNewUi  = limitedNewUi
-    constants.deviceInfo.clientVersion  = clientVersion
+    constants.deviceInfo.limitedNewUi = limitedNewUi
+    constants.deviceInfo.clientVersion = clientVersion
     constants.deviceInfo.language  = di.GetCurrentLocale().Left(2)
-
+    
 
   'the names of the registry memory sections that will save bookmark and previously viewed info
   constants.reqNames = {}
@@ -358,6 +358,7 @@ Function getConstants()
     'constants needed for on now UI
     constants.ui.onNow = {}
       constants.ui.onNow.disableOnNow = false
+      constants.ui.onnow.on = false
       constants.ui.onNow.channelId = "livetv_clips"
 
     'constants needed for sign in flow experimentation
@@ -453,108 +454,6 @@ Function getConstants()
       constants.ui.colors.seasonContentTitle = constants.ui.colors.primaryText
       constants.ui.colors.episodeBorder = constants.ui.colors.focused
       constants.ui.colors.episodeInnerBorder = constants.ui.colors.backgroundColor
-
-    'x and y coordinates of where to place UI elements
-    constants.ui.positions = {}
-      constants.ui.positions.heroImage = [0, 0]
-      constants.ui.positions.viewTitleArea = [47, 28]
-      constants.ui.positions.titleHeader = [0, 0] 'relative to the viewTitleArea's origin
-      constants.ui.positions.titleFirstContent = [0, 46] 'relative to the viewTitleArea's origin
-      constants.ui.positions.titleSecondContent = [0, 70] 'relative to the viewTitleArea's origin
-      ' constants.ui.positions.titleThirdContent = [0, 105] 'relative to the viewTitleArea's origin
-      constants.ui.positions.categoryList = [47, 240]
-      constants.ui.positions.categoryContent = [243, 240]
-      constants.ui.positions.allCategoriesContent = [0, 0]
-      constants.ui.positions.categoryContentItems = [0, 0]
-      constants.ui.positions.categoryContentBorder = [0, 0]
-      constants.ui.positions.categoryListCursor = [-8, 2]
-      constants.ui.positions.posterLabel = [15, 115]
-      constants.ui.positions.posterLabelGradient = [0, 99]
-      constants.ui.positions.videoOptionsList = [47, 240]
-      constants.ui.positions.videoOptionsMainSelection = [0, 0]
-      constants.ui.positions.videoOptions = [14, 8]
-      constants.ui.positions.videoOptionsHistoryIndicator = [0, 34]
-      constants.ui.positions.videoOptionsNoHero = [1033, 64]
-      constants.ui.positions.episodesGroup = [47, 238]
-      constants.ui.positions.episodesContent = [0, 32]  'this is the row container, the episode poster will be offset vertically and horizontally by the width of border
-      constants.ui.positions.episodesGroupSeasonTitles = [0, 0]
-      constants.ui.positions.episodesBorderStart = [0, 32]
-
-    'width and height sizes for UI elements
-    constants.ui.sizes = {}
-      constants.ui.sizes.logoHeight = constants.deviceInfo.displayHeight
-      constants.ui.sizes.logoWidth = constants.deviceInfo.displayWidth
-      constants.ui.sizes.heroImageHeight = constants.deviceInfo.displayHeight
-      constants.ui.sizes.heroImageWidth = constants.deviceInfo.displayWidth
-      constants.ui.sizes.heroFilterHeight = constants.deviceInfo.displayHeight
-      constants.ui.sizes.heroFilterWidth = constants.deviceInfo.displayWidth
-      constants.ui.sizes.viewTitleAreaHeight = 218
-      constants.ui.sizes.viewTitleAreaWidth = 655
-      constants.ui.sizes.viewTitleAreaHeaderTextHeight = 30 'this is given to the font node and represents a point measurement
-      constants.ui.sizes.viewTitleAreaBodyTextHeight = 18  'this is given to the font node and represents a point measurement
-      constants.ui.sizes.viewTitleAreaTextSpacing = -4 'used as line spacing between description lines
-      constants.ui.sizes.viewTitleAreaSectionSpacing = 27 'used as line spacing between metadata section and description section
-      constants.ui.sizes.titleHeader = constants.ui.sizes.viewTitleAreaWidth
-      constants.ui.sizes.titleMetaDataWidth = constants.ui.sizes.viewTitleAreaWidth
-      constants.ui.sizes.titleDescriptionWidth = constants.ui.sizes.viewTitleAreaWidth
-      constants.ui.sizes.categoryListTextHeight = 18
-      constants.ui.sizes.categoryListLineHeightAdjustor = 7
-      constants.ui.sizes.categoryListCursorHeight = 20
-      constants.ui.sizes.categoryListCursorWidth = 4
-      constants.ui.sizes.categoryListWidth = 196
-      constants.ui.sizes.categoryListHeight = 480
-      constants.ui.sizes.categoryListSpacing = 25
-      constants.ui.sizes.categoryContentItemsHeight = 480
-      constants.ui.sizes.categoryContentItemsWidth = 1037
-      constants.ui.sizes.categoryContentItemsVerticalSpacing = 15
-      constants.ui.sizes.categoryContentItemsHorizontalSpacing = 15
-      constants.ui.sizes.categoryContentItemsVerticalSpacingFeatured = 15
-      constants.ui.sizes.categoryContentItemsHorizontalSpacingFeatured = 15
-      constants.ui.sizes.categoryContentPosterHeight = 217
-      constants.ui.sizes.categoryContentPosterWidth = 151
-      constants.ui.sizes.categoryContentBorderThickness = 4
-      constants.ui.sizes.categoryContentBorderHeight = 225
-      constants.ui.sizes.categoryContentBorderWidth = 159
-      constants.ui.sizes.categoryContentPosterHeightFeatured = 139
-      constants.ui.sizes.categoryContentPosterWidthFeatured = 307
-      constants.ui.sizes.categoryContentBorderHeightFeatured = 147
-      constants.ui.sizes.categoryContentBorderWidthFeatured = 315
-      constants.ui.sizes.categoryContentViewArea = [0.0, 0.0, 1273, 460]
-      constants.ui.sizes.posterLabelWidth = constants.ui.sizes.categoryContentPosterWidthFeatured - constants.ui.positions.posterLabel[0]
-      constants.ui.sizes.posterLabelTextHeight = 16 'this is given to the font node and represents a point measurement
-      constants.ui.sizes.posterLabelGradientHeight = 40
-      constants.ui.sizes.posterLabelGradientWidth = constants.ui.sizes.categoryContentPosterWidthFeatured
-      constants.ui.sizes.videoOptionsMainSelectionHeight = 38
-      constants.ui.sizes.videoOptionsMainSelectionWidth = 215
-      constants.ui.sizes.videoOptionsHistoryIndicatorHeight = 4
-      constants.ui.sizes.videoOptionsHistoryIndicatorWidth = constants.ui.sizes.videoOptionsMainSelectionWidth
-      constants.ui.sizes.videoOptionsTextHeight = 18
-      constants.ui.sizes.videoOptionsLabelWidth = 200
-      constants.ui.sizes.videoOptionsLabelHeight = 38
-      constants.ui.sizes.videoOptionsLabelVerticalSpacing = 38
-      constants.ui.sizes.viewOptionsListCursorHeight = constants.ui.sizes.categoryListCursorHeight
-      constants.ui.sizes.viewOptionsListCursorWidth = constants.ui.sizes.categoryListCursorWidth
-      constants.ui.sizes.viewOptionsListCursorOffsetVertical = 2
-      constants.ui.sizes.viewOptionsListCursorOffsetHorizontal = -10
-      constants.ui.sizes.videoOptionsNoHeroHeight = 287
-      constants.ui.sizes.videoOptionsNoHeroWidth = 200
-      constants.ui.sizes.episodesGroupPosterHeight = constants.ui.sizes.categoryContentPosterHeightFeatured
-      constants.ui.sizes.episodesGroupPosterWidth = constants.ui.sizes.categoryContentPosterWidthFeatured
-      constants.ui.sizes.episodesGroupPosterVerticalSpacing = 0
-      constants.ui.sizes.episodesGroupPosterHorizontalSpacing = 15
-      constants.ui.sizes.seasonTextHeight = 18
-      constants.ui.sizes.episodeTextHeight = 16
-      constants.ui.sizes.seasonContentHeight = 175
-      constants.ui.sizes.seasonContentWidth = 0
-      constants.ui.sizes.seasonContentVerticalSpacing = 18
-      constants.ui.sizes.seasonContentTitleHeight = 18
-      constants.ui.sizes.seasonContentTitleWidth = constants.ui.sizes.seasonContentWidth
-      constants.ui.sizes.episodeContentWidth = 1233
-      constants.ui.sizes.episodeContentHeight = 139
-      constants.ui.sizes.episodesGroupViewArea = [0.0, 0.0, 1273, 460]
-      constants.ui.sizes.episodeBorderHeight = constants.ui.sizes.categoryContentBorderHeightFeatured
-      constants.ui.sizes.episodeBorderWidth = constants.ui.sizes.categoryContentBorderWidthFeatured
-
 
     'amounts that may be used throughout the UI
     constants.ui.amounts = {}

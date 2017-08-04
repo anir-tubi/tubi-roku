@@ -26,27 +26,33 @@
     <!-- WRITE-ONLY: setting this field to true causes the category screen to be navigated to -->
     <field id="showCategoryScreen" type="boolean" value="false" alwaysNotify="true"/>
 
-    <field id="trackingUri" type="string"  value="/home" alwaysNotify="true"/>
+    <!-- Manages trackingCount across child screens that are all counted as 
+         navigate_within_screen events from analytics point of view -->
+    <field id="trackingUri" type="string"  value="/home" />
+    <field id="trackingCount" type="integer"  value="0" />
   </interface>
   
   <children>
-    <ToolsMenu
-      id="ToolsMenu"
-      visible="true"
-      opacity="0.0"
-      translation="[0,0]"/>
-    
-    <OnNow
-      id="OnNow"
-      visible="true"
-      translation="[0,0]"/>
-    
-    <CategoryScreen
-      id="CategoryScreen"
-      translation="[0,392]"
-      infoVisible="false"
-      visible="true"
-      opacity="0.2"/>
+    <Group
+      id="HomeViews">
+      <ToolsMenu
+        id="ToolsMenu"
+        visible="true"
+        opacity="0.0"
+        translation="[0,0]"/>
+      
+      <OnNow
+        id="OnNow"
+        visible="true"
+        translation="[0,0]"/>
+      
+      <CategoryScreen
+        id="CategoryScreen"
+        translation="[0,392]"
+        infoVisible="false"
+        visible="true"
+        opacity="0.2"/>
+    </Group>
     
     <Poster
       id="tubiLogo"
@@ -54,5 +60,8 @@
       width="149"
       uri="pkg:/images/logo.png"
       translation="[85,56]" />
+
+    <TrackingLoggingTask
+      id="TrackingLoggingTask" />
   </children>
 </component>

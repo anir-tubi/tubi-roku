@@ -3,6 +3,7 @@ Function TubiChannel(utils)
     metadataFetch: utils.metadataFetch
     constants: utils.constants
     tracking: utils.tracking
+    experiments: utils.experiments
 
     'public methods
     runChannel: tubiChannel_runChannel
@@ -17,8 +18,16 @@ Function tubiChannel_runChannel(args, adShim, port)
   screen = CreateObject("roSGScreen")
   screen.setMessagePort(port)
 
-  'get live tv content metadata
-  onNowContent = m.metadataFetch.liveTv()
+  ' get live tv content metadata if necessary
+  ' will getExperimentValue() again in ContentController which will send the tracking event
+  onNowContent = invalid
+  if not m.constants.deviceInfo.limitedNewUi
+    experimentInfo = m.experiments.getExperimentValue("UserNamespace", "roku_on_now")
+    if experimentInfo <> invalid and experimentInfo.experimentValue = 1
+      m.constants.ui.onnow.on = true
+      onNowContent = m.metadataFetch.liveTv()
+    end if
+  end if
 
   ' start the scene graph UI
   sgGlobal = screen.getGlobalNode()

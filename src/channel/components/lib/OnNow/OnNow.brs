@@ -5,6 +5,7 @@ Function init()
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("control", "onControlChange")
+  m.top.observeField("trackingUri", "onTrackingUriChanged")
   m.DebounceTimer = m.top.findNode("Debounce")
   m.DebounceTimer.observeField("fire", "onDebounceDone")
   m.Unavailable = m.top.findNode("Unavailable")
@@ -23,6 +24,7 @@ Function autohideWhenPlaying()
   end if
 End Function
 
+
 Function onComponentFocusChange()
   tubiLog("OnNow.onComponentFocusChange " + focusState(m.top))
   if m.top.isInFocusChain() and m.top.hasFocus() then
@@ -35,11 +37,15 @@ Function onComponentFocusChange()
         videoPicker = m.VideoPlayer.findNode("VideoPicker")
         trackEvent({
           trackType: "navigate"
-          value: "/on_now/" + m.VideoPlayer.playlist.slug + "/1/" + videoPicker.contentFocused.toStr()
-          ctx: "/home/1/cat/" + m.VideoPlayer.playlist.slug + "/1/" + videoPicker.contentFocused.toStr()
+          value: "/on_now/" + m.VideoPlayer.playlist.slug + "/1/" + (videoPicker.contentFocused + 1).toStr()
+          ctx: "/home/1/cat/" + m.VideoPlayer.playlist.slug + "/1/" + (videoPicker.contentFocused + 1).toStr()
         })
       end if
       m.isInPlayerMode = false
+      m.top.trackingCount = 0
+    else
+      currentPlaylistState = m.playlistInfo[m.playlistIndex]
+      m.top.trackingUri = "/home/1/cat/" + m.top.content.getChild(m.playlistIndex).slug + "/1/" + (currentPlaylistState.contentIndex + 1).toStr()
     end if
   end if
 End Function
@@ -247,12 +253,20 @@ Function onDebounceDone()
 
   ' debounce the onNowOverlay navigations count so it is consistent with the videoPicker which utilizes a contentGrid component
   ' utilizes a contentGrid component which naturally debounces the navigations count
-  m.onNowOverlay.navigations = m.onNowOverlay.navigations + 1
-  trackEvent({
-    trackType: "navigateInPage"
-    value: m.onNowOverlay.navigations
-    ctx: "/home/1/cat/" + m.top.content.getChild(m.playlistIndex).slug + "/1/" + currentPlaylistState.contentIndex.toStr()
-  })
+  m.top.trackingUri = "/home/1/cat/" + m.top.content.getChild(m.playlistIndex).slug + "/1/" + (currentPlaylistState.contentIndex + 1).toStr()
+End Function
+
+
+Function onTrackingUriChanged()
+  if m.top.isInFocusChain() and m.top.trackingUri <> ""
+    m.top.trackingCount = m.top.trackingCount + 1
+    videoPicker = m.VideoPlayer.findNode("VideoPicker")
+    trackEvent({
+      trackType: "navigateInPage"
+      value: m.top.trackingCount
+      ctx: m.top.trackingUri
+    })
+  end if 
 End Function
 
 

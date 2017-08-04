@@ -12,7 +12,7 @@ Function init()
   m.top.observeField("categoryListResponse", "onCategoriesReceived")
   m.top.observeField("trackingUri", "onTrackingUriChange")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
-  m.trackingCount = 0
+  m.top.trackingCount = 0
   m.CategoryList.observeField("itemFocused","onCategoryMenuChange")
   m.CategoryList.observeField("preItemFocused","onPreCategoryMenuChange")
   m.CategoryList.observeField("itemSelected", "onCategoryMenuSelected")
@@ -79,7 +79,6 @@ End Function
 Function onScreenFocusChange()
   tubiLog("CategoryScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus()
-    m.trackingCount = 0
     if m.categoryListIsFocused = false
     ' defaulted to screen, move to a subcomponent
       m.CategoryGridList.setFocus(true)
@@ -217,7 +216,7 @@ Function onCategoryMenuChange() As Void
   m.top.backgroundUriList = [m.defaultHeroUri]
 
   'update the tracking URI for user tracking purposes
-  catPos = (m.CategoryList.itemFocused + 1).toStr()
+  catPos = (m.CategoryList.itemFocused + m.top.rowPlaceholder + 1).toStr()
   catSlug = ""
   if newCategory.slug <> invalid
     catSlug = newCategory.slug
@@ -283,7 +282,7 @@ Function onGridFocusChange() As Void
       catSlug = m.CategoryList.content.getChild(m.CategoryList.itemFocused).slug + "/"
     end if
   end if
-  catPos = (m.CategoryList.itemFocused + 1).toStr()
+  catPos = (m.CategoryList.itemFocused + m.top.rowPlaceholder + 1).toStr()
   
   row = 0
   col = 0
@@ -301,6 +300,7 @@ End Function
 
 Function onGridItemSelected() As Void
   tubiLog("CategoryScreen.onGridItemSelected")
+  m.top.trackingCount = 0
   selectedItem = m.CategoryGridList.itemSelected
   if selectedItem <> invalid then 
     m.top.contentSelected = selectedItem
@@ -402,12 +402,14 @@ End Function
 '
 ' send the navigateInPage (navigate_within_page) tracking event
 Function onTrackingUriChange()
-  m.trackingCount = m.trackingCount + 1
-  m.global.trackingLoggingTask.trackEvent = {
-    trackType: "navigateInPage"
-    value: m.trackingCount
-    ctx: m.top.trackingUri
-  }
+  if m.top.trackingUri <> ""
+    m.top.trackingCount = m.top.trackingCount + 1
+    m.global.trackingLoggingTask.trackEvent = {
+      trackType: "navigateInPage"
+      value: m.top.trackingCount
+      ctx: m.top.trackingUri
+    }
+  end if
 End Function
 
 

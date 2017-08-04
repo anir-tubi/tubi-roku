@@ -27,7 +27,10 @@
 
     <!-- play, stop, dock -->
     <field id="control" type="string" value=""/> 
-    
+
+    <!-- observed by HomeScreen for navigating between screens -->
+    <field id="trackingUri" type="string" />
+    <field id="trackingCount" type="integer" alias="OnNowOverlay.navigations" />
   </interface>
 
   <children>

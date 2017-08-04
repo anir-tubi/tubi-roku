@@ -160,42 +160,25 @@ End Function
 ' will we launch the UI
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
-  if m.metadataFetchTask.ready and m.authInfoReceived and m.trackingLoggingTask.ready and m.onNowReceived and m.deepLinkEvaluated then
-    if m.top.deepLinkContent <> invalid then
-      tubiLog("ContentController detected deep link request")
-      ' we were asked to deep link into a content item. Go to it
-      ' whether we were logged in or not.
-      testLog("Deep link contentId = " + m.top.deepLinkContent.id)
-      testLog("Deep link type = " + m.top.deepLinkContent.type)
-      m.enteredFromDeepLink = true
-      showDetailScreen(m.top.deepLinkContent)
+  if m.metadataFetchTask.ready and m.authInfoReceived and m.trackingLoggingTask.ready and m.deepLinkEvaluated then
+    if m.global.constants.ui.onnow.on = false or (m.global.constants.ui.onnow.on = true and m.onNowReceived)
+      if m.top.deepLinkContent <> invalid then
+        tubiLog("ContentController detected deep link request")
+        ' we were asked to deep link into a content item. Go to it
+        ' whether we were logged in or not.
+        testLog("Deep link contentId = " + m.top.deepLinkContent.id)
+        testLog("Deep link type = " + m.top.deepLinkContent.type)
+        m.enteredFromDeepLink = true
+        showDetailScreen(m.top.deepLinkContent, true)
 
-    else if m.authTask.authInfo = invalid then
-      tubiLog("ContentController ask user to sign in")
-      startSignIn(false)
-    else if m.top.onNowContent <> invalid
-      startOnNow()
+      else if m.authTask.authInfo = invalid then
+        tubiLog("ContentController ask user to sign in")
+        startSignIn()
+      else if m.global.constants.ui.onnow.on = false or m.top.onNowContent <> invalid
+        startOnNow()
+      end if
     end if
   end if
-End Function
-
-
-'''''''''''''''''''''''
-' startCategoryScreen
-'
-' On either app start (if user is signed in) or after the sign in
-' flow is complete, create and show the category screen.
-Function startCategoryScreen()
-  m.categoryScreen = CreateObject("roSGNode", "CategoryScreen")
-  m.categoryScreen.observeField("contentSelected", "onContentSelected")
-  m.categoryScreen.observeField("searchSelected", "onSearchSelected")
-  m.categoryScreen.observeField("signInSelected", "onSignInSelected")
-  m.categoryScreen.observeField("signOutSelected", "onSignOutSelected")
-  m.categoryScreen.observeField("aboutSelected", "onAboutSelected")
-  m.categoryScreen.observeField("privacySelected", "onPrivacySelected")
-  m.categoryScreen.observeField("backgroundUriList", "onGridBackgroundChange")
-  m.categoryScreen.signedIn = (m.authTask.authInfo <> invalid)
-  pushScreen(m.categoryScreen)
 End Function
 
 
@@ -271,7 +254,7 @@ Function onSignInComplete()
   ' gone through the sign-in.  If they 'back' out of it, the screen
   ' stack will stay intact and this function will not be called
   while currentScreen() <> invalid
-    popScreen()
+    popScreen(true)
   end while
 
   m.backgroundGroup.enterFromSignIn = true
@@ -326,7 +309,7 @@ End Function
 Function onContentSelected(msg As Object)
   tubiLog("ContentController.onContentSelected")
   content = msg.GetData()  
-  showDetailScreen(content)
+  showDetailScreen(content, true)
 End Function
 
 
@@ -348,7 +331,7 @@ Function onSearchSelected()
   m.searchScreen = CreateObject("roSGNode", "SearchScreen")
   m.searchScreen.observeField("contentSelected", "onContentSelected")
   m.searchScreen.observeField("backgroundUriList", "onSearchBackgroundChange")
-  pushScreen(m.searchScreen)
+  pushScreen(m.searchScreen, true)
 End Function
 
 
@@ -371,7 +354,7 @@ Function onSignOutSelected()
   ' gone through the sign-in.  If they 'back' out of it, the screen
   ' stack will stay intact and this function will not be called
   while currentScreen() <> invalid
-    popScreen()
+    popScreen(true)
   end while
   m.categoryScreen = invalid
   m.AuthTask.functionName = "execSignOut"
@@ -402,7 +385,7 @@ End Function
 ' Dismiss a modal dialog
 Function onCloseModal()
   tubiLog("ContentController.onCloseAbout")
-  popScreen()
+  popScreen(true)
   m.aboutScreen = invalid
 End Function
 
@@ -506,10 +489,10 @@ Function startOnNow()
 
   m.homeScreen.signedIn = (m.authTask.authInfo <> invalid)
 
-  ' If experiment calls for OnNow, set the content.  Don't ever do OnNow
+  ' If experiment calls for OnNow, set the content. Don't ever do OnNow
   ' for low-spec devices
-  if getExperimentValue("UserNamespace", "roku_on_now") = 1 and m.global.constants.deviceInfo.limitedNewUi = false and  m.global.constants.ui.onNow.disableOnNow = false
-
+  if not m.global.constants.deviceInfo.limitedNewUi and getExperimentValue("UserNamespace", "roku_on_now") = 1
+    m.global.constants.ui.onnow.on = true
     m.onNow.content = m.top.onNowContent
     m.onNow.visible = true
     m.categoryScreen.onNowHintVisible = true
@@ -521,7 +504,7 @@ Function startOnNow()
     m.categoryScreen.onNowHintVisible = false
     m.categoryScreen.searchSignOutHintVisible = true
   end if
-  pushScreen(m.homeScreen)
+  pushScreen(m.homeScreen, true)
 End Function
 
 Function onNowStopped()
@@ -700,13 +683,13 @@ Function onEpisodeList()
 
   m.episodesScreen.episodeToFocus = m.detailScreen.episodeSelection   'episodeToFocus should be [seasonIndex, episodeIndex]
   
-  pushScreen(m.episodesScreen)
+  pushScreen(m.episodesScreen, true)
 End Function
 
 
 Function onEpisodeSelected()
   m.detailScreen.episodeSelection = m.episodesScreen.episodeSelected
-  popScreen()
+  popScreen(true)
   m.episodesScreen = invalid
 
   ' Autoplay the selected episode
@@ -841,8 +824,8 @@ Function onPlayerInfo() As Void
     ' so we rebuild it new.  This may lose the episode selection, but it might be set by currentEpisode
     ' from the service
     content = m.detailScreen.shortContent 
-    popScreen()
-    showDetailScreen(content)
+    popScreen(false)
+    showDetailScreen(content, false)
   end if
 
   if m.categoryScreen <> invalid then 
@@ -868,8 +851,10 @@ End Function
 '''''''''''''''''''''
 ' showDetailScreen
 '
-'
-Function showDetailScreen(content)
+' @content: roSGNode, a content node for a single pieces of content
+' @sendPushScreenEvents: boolean, will be passed to pushScreen() and dictates if 'navigate'
+'                                 and 'pageLoad' events will be fired when the detail screen is added
+Function showDetailScreen(content, sendPushScreenEvents = true)
   m.detailScreen = CreateObject("roSGNode", "DetailScreen")
   if m.top.deepLinkContent <> invalid
     m.detailScreen.deepLinkHandled = false
@@ -890,7 +875,7 @@ Function showDetailScreen(content)
   m.detailScreen.observeField("backgroundUriList", "onDetailBackgroundChange")
   m.detailScreen.observeField("itemFailed", "onDetailItemFailed")
   m.detailScreen.signedIn = (m.authTask.authInfo <> invalid)
-  pushScreen(m.detailScreen)
+  pushScreen(m.detailScreen, sendPushScreenEvents)
 End Function
 
 
@@ -941,7 +926,7 @@ End Function
 ' to a title becoming unavailable, or a problem with a deep link.
 Function onDetailItemFailed()
   tubiLog("ContentController.onDetailItemFailed")
-  popScreen()
+  popScreen(true)
 
   ' If a deep-link occurred, we skipped category screen creation so create it here
   if currentScreen() = invalid then
