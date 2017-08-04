@@ -25,7 +25,7 @@
       <field id="frequency" type="int" value="2000" alwaysNotify="true" />
       
       <!-- Set the expiration time in seconds after which the task will stop polling status -->
-      <field id="expiration" type="int" value="300" alwaysNotify="false" />
+      <field id="expiration" type="int" value="600" alwaysNotify="false" />
       
       <!-- Set to the response body of the status call. -->
       <field id="response" type="assocarray" alwaysNotify="true" />

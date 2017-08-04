@@ -1017,7 +1017,7 @@ function RegisterScreen(uniqueId, utils)
 
                       if registrationInfo.status = "pending"
                         'we get a response with no confirmation that user registered - so we're still waiting
-                        pollCounter = pollCounter + 2
+                        pollCounter = pollCounter + 1
                         'if we've polled for 5 minutes stop polling
                         if pollCounter > 600
                           m.showMessage("We're sorry", "After checking for 10 minutes, we did not see you register.")
