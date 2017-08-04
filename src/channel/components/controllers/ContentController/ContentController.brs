@@ -386,10 +386,9 @@ Function onAboutSelected()
   tubiLog("ContentController.onAboutSelected")
   m.aboutScreen = CreateObject("roSGNode", "ModalDialogScreen")
   m.aboutScreen.title = "About Tubi TV"
-  message = "v" + m.global.constants.settings.version + Chr(10)
-  message = message + Chr(169) + " 2017 Tubi TV" + Chr(10) ' + Chr(13)
-  message = message + "All rights reserved." + Chr(10) '+ Chr(13)
-  message = message + "Tubi TV related marks are trademarks of Tubi TV, an adRise Company."
+  message = "Version " + m.global.constants.settings.version.Replace("_",".") + Chr(10)
+  message = message + Chr(169) + " 2017 Tubi Inc. all rights reserved." + Chr(10) ' + Chr(13)
+  message = message + "The Tubi wordmark and all related logotypes are trademarks of Tubi, Inc."
   m.aboutScreen.message = message
   m.aboutScreen.buttons = ["Close"]
   m.aboutScreen.observeField("buttonSelected", "onCloseModal")
