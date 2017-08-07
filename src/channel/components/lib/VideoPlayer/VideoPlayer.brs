@@ -156,7 +156,7 @@ Function onContentChange() As Void
     m.ClosedCaptionDisabled.visible = true
   
   'there are subtitles, so check if captions button has been greyed out previously
-  else if getChildIndex(m.TransportButtons, m.ClosedCaption) >= 0
+  else if getChildIndex(m.TransportButtons, m.ClosedCaption) < 0
     m.TransportButtons.appendChild(m.ClosedCaption)
     m.ClosedCaptionDisabled.visible = false
   end if
@@ -174,7 +174,7 @@ Function onContentChange() As Void
     m.TransportButtons.removeChild(m.SkipTrailerButton)
 
   'add the skip trailer button if it's a trailer and it doesn't already exist on the transport
-  else if getChildIndex(m.TransportButtons, m.SkipTrailerButton) >= 0
+  else if getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
     m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
   end if
 End Function
