@@ -1,6 +1,10 @@
 print "Hot Patch 2.2.oldui"
 
 
+'Turn off Live TV
+m.app.linearTV.showLinearTV = false
+m.app.cp.showLinearTV = false
+
 ' Disallow SMS for activation
 m.app.registerScreen.allowSMS = false
 
