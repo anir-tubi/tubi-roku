@@ -2,7 +2,7 @@
 settings:
   mode: "staging"
   # Hotpatches should match <MAJOR>.<MINOR> of the production build.
-  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku-staging/2.3.newui.brs"
-  hotPatchUrlOldUI: "http://cdn.adrise.com/hotpatches/roku-staging/2.3.oldui.brs"
+  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku-staging/2.4.newui.brs"
+  hotPatchUrlOldUI: "http://cdn.adrise.com/hotpatches/roku-staging/2.4.oldui.brs"
   # The remote components version should match the exact build number in production. This value is expected to be overridden by the hotpatch loaded
   remoteComponentsUrl: "http://cdn.adrise.com/hotpatches/roku-staging/components/tubitv_remote_components_<<VER-TO-REPLACE>>.pkg"
