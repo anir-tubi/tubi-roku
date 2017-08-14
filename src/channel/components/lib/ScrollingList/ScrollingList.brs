@@ -96,7 +96,7 @@ Function onContentChange() As Void
     if newItem <> invalid then
       newItem.content = m.top.content.getChild(i)
       ' may be invalid if component doesn't have a 'content' field
-      if newItem.content <> invalid then
+      if (newItem.id = invalid or newItem.id = "") and newItem.content <> invalid then
         newItem.id = newItem.content.id
       end if
 

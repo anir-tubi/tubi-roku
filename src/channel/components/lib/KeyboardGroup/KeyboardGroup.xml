@@ -12,6 +12,7 @@
 <component name="KeyboardGroup" extends="Group">
 
   <script type="text/brightscript" uri="pkg:/components/lib/KeyboardGroup/KeyboardGroup.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
@@ -65,34 +66,34 @@
       layoutDirection="horiz">
       <ContentNode
         role="content">
-        <ContentNode title="a"/>
-        <ContentNode title="b"/>
-        <ContentNode title="c"/>
-        <ContentNode title="d"/>
-        <ContentNode title="e"/>
-        <ContentNode title="f"/>
-        <ContentNode title="g"/>
-        <ContentNode title="h"/>
-        <ContentNode title="i"/>
-        <ContentNode title="j"/>
-        <ContentNode title="k"/>
-        <ContentNode title="l"/>
-        <ContentNode title="m"/>
-        <ContentNode title="n"/>
-        <ContentNode title="o"/>
-        <ContentNode title="p"/>
-        <ContentNode title="q"/>
-        <ContentNode title="r"/>
-        <ContentNode title="s"/>
-        <ContentNode title="t"/>
-        <ContentNode title="u"/>
-        <ContentNode title="v"/>
-        <ContentNode title="w"/>
-        <ContentNode title="x"/>
-        <ContentNode title="y"/>
-        <ContentNode title="z"/>
-        <ContentNode title=" "/>
-        <ContentNode title="&#x7F;"/>
+        <ContentNode title="a" id="LowercaseKeyboard-a"/>
+        <ContentNode title="b" id="LowercaseKeyboard-b"/>
+        <ContentNode title="c" id="LowercaseKeyboard-c"/>
+        <ContentNode title="d" id="LowercaseKeyboard-d"/>
+        <ContentNode title="e" id="LowercaseKeyboard-e"/>
+        <ContentNode title="f" id="LowercaseKeyboard-f"/>
+        <ContentNode title="g" id="LowercaseKeyboard-g"/>
+        <ContentNode title="h" id="LowercaseKeyboard-h"/>
+        <ContentNode title="i" id="LowercaseKeyboard-i"/>
+        <ContentNode title="j" id="LowercaseKeyboard-j"/>
+        <ContentNode title="k" id="LowercaseKeyboard-k"/>
+        <ContentNode title="l" id="LowercaseKeyboard-l"/>
+        <ContentNode title="m" id="LowercaseKeyboard-m"/>
+        <ContentNode title="n" id="LowercaseKeyboard-n"/>
+        <ContentNode title="o" id="LowercaseKeyboard-o"/>
+        <ContentNode title="p" id="LowercaseKeyboard-p"/>
+        <ContentNode title="q" id="LowercaseKeyboard-q"/>
+        <ContentNode title="r" id="LowercaseKeyboard-r"/>
+        <ContentNode title="s" id="LowercaseKeyboard-s"/>
+        <ContentNode title="t" id="LowercaseKeyboard-t"/>
+        <ContentNode title="u" id="LowercaseKeyboard-u"/>
+        <ContentNode title="v" id="LowercaseKeyboard-v"/>
+        <ContentNode title="w" id="LowercaseKeyboard-w"/>
+        <ContentNode title="x" id="LowercaseKeyboard-x"/>
+        <ContentNode title="y" id="LowercaseKeyboard-y"/>
+        <ContentNode title="z" id="LowercaseKeyboard-z"/>
+        <ContentNode title=" " id="LowercaseKeyboard-space"/>
+        <ContentNode title="&#x7F;" id="LowercaseKeyboard-back"/>
       </ContentNode>
     </ScrollingList>
     
@@ -108,34 +109,34 @@
       layoutDirection="horiz">
       <ContentNode
         role="content">
-        <ContentNode title="A"/>
-        <ContentNode title="B"/>
-        <ContentNode title="C"/>
-        <ContentNode title="D"/>
-        <ContentNode title="E"/>
-        <ContentNode title="F"/>
-        <ContentNode title="G"/>
-        <ContentNode title="H"/>
-        <ContentNode title="I"/>
-        <ContentNode title="J"/>
-        <ContentNode title="K"/>
-        <ContentNode title="L"/>
-        <ContentNode title="M"/>
-        <ContentNode title="N"/>
-        <ContentNode title="O"/>
-        <ContentNode title="P"/>
-        <ContentNode title="Q"/>
-        <ContentNode title="R"/>
-        <ContentNode title="S"/>
-        <ContentNode title="T"/>
-        <ContentNode title="U"/>
-        <ContentNode title="V"/>
-        <ContentNode title="W"/>
-        <ContentNode title="X"/>
-        <ContentNode title="Y"/>
-        <ContentNode title="Z"/>
-        <ContentNode title=" "/>
-        <ContentNode title="&#x7F;"/>
+        <ContentNode title="A" id="UppercaseKeyboard-A"/>
+        <ContentNode title="B" id="UppercaseKeyboard-B"/>
+        <ContentNode title="C" id="UppercaseKeyboard-C"/>
+        <ContentNode title="D" id="UppercaseKeyboard-D"/>
+        <ContentNode title="E" id="UppercaseKeyboard-E"/>
+        <ContentNode title="F" id="UppercaseKeyboard-F"/>
+        <ContentNode title="G" id="UppercaseKeyboard-G"/>
+        <ContentNode title="H" id="UppercaseKeyboard-H"/>
+        <ContentNode title="I" id="UppercaseKeyboard-I"/>
+        <ContentNode title="J" id="UppercaseKeyboard-J"/>
+        <ContentNode title="K" id="UppercaseKeyboard-K"/>
+        <ContentNode title="L" id="UppercaseKeyboard-L"/>
+        <ContentNode title="M" id="UppercaseKeyboard-M"/>
+        <ContentNode title="N" id="UppercaseKeyboard-N"/>
+        <ContentNode title="O" id="UppercaseKeyboard-O"/>
+        <ContentNode title="P" id="UppercaseKeyboard-P"/>
+        <ContentNode title="Q" id="UppercaseKeyboard-Q"/>
+        <ContentNode title="R" id="UppercaseKeyboard-R"/>
+        <ContentNode title="S" id="UppercaseKeyboard-S"/>
+        <ContentNode title="T" id="UppercaseKeyboard-T"/>
+        <ContentNode title="U" id="UppercaseKeyboard-U"/>
+        <ContentNode title="V" id="UppercaseKeyboard-V"/>
+        <ContentNode title="W" id="UppercaseKeyboard-W"/>
+        <ContentNode title="X" id="UppercaseKeyboard-X"/>
+        <ContentNode title="Y" id="UppercaseKeyboard-Y"/>
+        <ContentNode title="Z" id="UppercaseKeyboard-Z"/>
+        <ContentNode title=" " id="UppercaseKeyboard-space"/>
+        <ContentNode title="&#x7F;" id="UppercaseKeyboard-back"/>
       </ContentNode>
     </ScrollingList>
     
@@ -151,18 +152,18 @@
       layoutDirection="horiz">
       <ContentNode
         role="content">
-        <ContentNode title="1"/>
-        <ContentNode title="2"/>
-        <ContentNode title="3"/>
-        <ContentNode title="4"/>
-        <ContentNode title="5"/>
-        <ContentNode title="6"/>
-        <ContentNode title="7"/>
-        <ContentNode title="8"/>
-        <ContentNode title="9"/>
-        <ContentNode title="0"/>
-        <ContentNode title=" "/>
-        <ContentNode title="&#x7F;"/>
+        <ContentNode title="1" id="NumericKeyboard-1"/>
+        <ContentNode title="2" id="NumericKeyboard-2"/>
+        <ContentNode title="3" id="NumericKeyboard-3"/>
+        <ContentNode title="4" id="NumericKeyboard-4"/>
+        <ContentNode title="5" id="NumericKeyboard-5"/>
+        <ContentNode title="6" id="NumericKeyboard-6"/>
+        <ContentNode title="7" id="NumericKeyboard-7"/>
+        <ContentNode title="8" id="NumericKeyboard-8"/>
+        <ContentNode title="9" id="NumericKeyboard-9"/>
+        <ContentNode title="0" id="NumericKeyboard-0"/>
+        <ContentNode title=" " id="NumericKeyboard-space"/>
+        <ContentNode title="&#x7F;" id="NumericKeyboard-back"/>
       </ContentNode>
     </ScrollingList>
     
@@ -178,34 +179,34 @@
       layoutDirection="horiz">
       <ContentNode
         role="content">
-        <ContentNode title="@"/>
-        <ContentNode title="#"/>
-        <ContentNode title="!"/>
-        <ContentNode title="?"/>
-        <ContentNode title="&amp;"/>
-        <ContentNode title="*"/>
-        <ContentNode title="^"/>
-        <ContentNode title="("/>
-        <ContentNode title=")"/>
-        <ContentNode title="\"/>
-        <ContentNode title="/"/>
-        <ContentNode title="["/>
-        <ContentNode title="]"/>
-        <ContentNode title="|"/>
-        <ContentNode title="&lt;"/>
-        <ContentNode title="&gt;"/>
-        <ContentNode title="{"/>
-        <ContentNode title="}"/>
-        <ContentNode title="+"/>
-        <ContentNode title="-"/>
-        <ContentNode title="="/>
-        <ContentNode title="_"/>
-        <ContentNode title=","/>
-        <ContentNode title="."/>
-        <ContentNode title=":"/>
-        <ContentNode title=";"/>
-        <ContentNode title=" "/>
-        <ContentNode title="&#x7F;"/>
+        <ContentNode title="@" id="Symbolic1Keyboard-@"/>
+        <ContentNode title="#" id="Symbolic1Keyboard-#"/>
+        <ContentNode title="!" id="Symbolic1Keyboard-!"/>
+        <ContentNode title="?" id="Symbolic1Keyboard-?"/>
+        <ContentNode title="&amp;" id="Symbolic1Keyboard-amp"/>
+        <ContentNode title="*" id="Symbolic1Keyboard-*"/>
+        <ContentNode title="^" id="Symbolic1Keyboard-^"/>
+        <ContentNode title="(" id="Symbolic1Keyboard-("/>
+        <ContentNode title=")" id="Symbolic1Keyboard-)"/>
+        <ContentNode title="\" id="Symbolic1Keyboard-\"/>
+        <ContentNode title="/" id="Symbolic1Keyboard-/"/>
+        <ContentNode title="[" id="Symbolic1Keyboard-["/>
+        <ContentNode title="]" id="Symbolic1Keyboard-]"/>
+        <ContentNode title="|" id="Symbolic1Keyboard-|"/>
+        <ContentNode title="&lt;" id="Symbolic1Keyboard-["/>
+        <ContentNode title="&gt;" id="Symbolic1Keyboard-]"/>
+        <ContentNode title="{" id="Symbolic1Keyboard-{"/>
+        <ContentNode title="}" id="Symbolic1Keyboard-}"/>
+        <ContentNode title="+" id="Symbolic1Keyboard-+"/>
+        <ContentNode title="-" id="Symbolic1Keyboard--"/>
+        <ContentNode title="=" id="Symbolic1Keyboard-+"/>
+        <ContentNode title="_" id="Symbolic1Keyboard-_"/>
+        <ContentNode title="," id="Symbolic1Keyboard-,"/>
+        <ContentNode title="." id="Symbolic1Keyboard-."/>
+        <ContentNode title=":" id="Symbolic1Keyboard-:"/>
+        <ContentNode title=";" id="Symbolic1Keyboard-;"/>
+        <ContentNode title=" " id="Symbolic1Keyboard-space"/>
+        <ContentNode title="&#x7F;" id="Symbolic1Keyboard-back"/>
       </ContentNode>
     </ScrollingList>
     
@@ -221,12 +222,12 @@
       layoutDirection="horiz">
       <ContentNode
         role="content">
-        <ContentNode title="$"/>
-        <ContentNode title="%"/>
-        <ContentNode title="&quot;"/>
-        <ContentNode title="'"/>
-        <ContentNode title="`"/>
-        <ContentNode title="~"/>
+        <ContentNode title="$" id="Symbolic2Keyboard-$"/>
+        <ContentNode title="%" id="Symbolic2Keyboard-%"/>
+        <ContentNode title="&quot;" id="Symbolic2Keyboard-quote"/>
+        <ContentNode title="'" id="Symbolic2Keyboard-'"/>
+        <ContentNode title="`" id="Symbolic2Keyboard-`"/>
+        <ContentNode title="~" id="Symbolic2Keyboard-~"/>
       </ContentNode>
     </ScrollingList>
   </children>

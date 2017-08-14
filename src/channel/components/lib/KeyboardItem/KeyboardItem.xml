@@ -36,6 +36,7 @@
      id="Text"
      height="80"
      width="60"
+     color="0xFFFFFFFF"
      horizAlign="center"
      vertAlign="center">
       <Font

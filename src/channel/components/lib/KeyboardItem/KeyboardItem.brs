@@ -27,6 +27,7 @@ Function onContentChange()
       m.Image.visible = true
     else
       m.Text.visible = true
+      m.Text.id = m.top.content.id + "-text"
       m.Text.text = m.top.content.title
     end if
   else

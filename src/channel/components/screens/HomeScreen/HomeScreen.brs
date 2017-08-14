@@ -152,12 +152,12 @@ Function showCategoryScreen(show)
   end if
 
   if show and not m.CategoryScreen.isInFocusChain()
-    animate(m.CategoryScreen, m.CategoryScreen.translation, [0, 0], 1.0, 1.0, 0.4)
+    animate(m.CategoryScreen, {destination: [0, 0], opacity: 1.0, duration: 0.4})
     m.CategoryScreen.infoVisible = true
     m.top.backgroundUriList = m.CategoryScreen.backgroundUriList
     m.focusTarget = m.CategoryScreen
   else if not show and m.CategoryScreen.isInFocusChain()
-    animate(m.CategoryScreen, m.CategoryScreen.translation, [0, 392], 0.2, 1.0, 0.4)
+    animate(m.CategoryScreen, {destination: [0, 392], opacity: 0.2, duration: 0.4})
     m.CategoryScreen.infoVisible = false
     m.CategoryScreen.categoryMenuVisible = false
   end if
