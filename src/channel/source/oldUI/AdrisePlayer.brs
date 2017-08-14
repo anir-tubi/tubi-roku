@@ -458,8 +458,14 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
       'log any re-buffers that user might encounter
       if msg.isStreamStarted()
         if msg.getInfo().isUnderrun = true
-          warningMsg = "Video with id: " + episode.id + " buffered mid stream. Segment Url: " + msg.getInfo().url + " Stream Bitrate: " + msg.getInfo().streamBitrate.toStr() + " Measured Bitrate: " + msg.getInfo().measuredBitrate.toStr()
-          m.utils.log.warn(m.playerPort, "videoBuffer", "video-rebuffer",  warningMsg)
+          m.rebufferMessage = {
+            timespan: CreateObject("roTimespan")
+            buffer_time_ms: 0
+            video_id: episode.id
+            video_url: msg.getInfo().url
+            stream_bitrate: msg.getInfo().streamBitrate
+            measured_bitrate: msg.getInfo().measuredBitrate
+          }
         end if
       end if
 
@@ -534,12 +540,20 @@ function AdrisePlayer_showSpanOfContentVideoNew(episode As Object)
       end if
 
       'show a loading screen while the video buffers
-      if msg.isStatusMessage() and msg.GetMessage() = "startup progress"
-        playerStates.isPaused = false
-        progressPercent = msg.GetIndex() / 10
-        if playerStates.loadProgress <> progressPercent
-          playerStates.loadProgress = progressPercent
-          m.paintToCanvas(progressPercent, playerStates, episode)
+      if msg.isStatusMessage()
+        if msg.GetMessage() = "start of play" and m.rebufferMessage <> invalid
+          m.rebufferMessage.buffer_time_ms = m.rebufferMessage.timespan.TotalMilliseconds()
+          m.rebufferMessage.Delete("timespan")  ' this shouldn't go out with the message
+          m.utils.log.warn(m.playerPort, "videoBuffer", "REBUFFERING",  FormatJSON(m.rebufferMessage))
+          m.rebufferMessage = invalid
+        end if
+        if msg.GetMessage() = "startup progress"
+          playerStates.isPaused = false
+          progressPercent = msg.GetIndex() / 10
+          if playerStates.loadProgress <> progressPercent
+            playerStates.loadProgress = progressPercent
+            m.paintToCanvas(progressPercent, playerStates, episode)
+          end if
         end if
       end if
 

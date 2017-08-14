@@ -70,6 +70,7 @@ Function init()
   m.lastButtonPressPos = 0
   m.transportAutoHideTime = m.global.constants.player.transportAutoHideTime
   m.ignoreOptionsKey = m.global.constants.deviceInfo.firmwareCaptionMenu
+  m.bufferingInfo = invalid
 
   'buttons
   m.TransportButtons = m.top.findNode("TransportButtons")

@@ -52,6 +52,43 @@ Function onVideoStateChange(msg)
   else
     m.top.state = state
   end if
+
+  ' Track buffering time.  We need to track 2 pieces of data:
+  '   1) previous state "buffering"?: boolean (since we log at end of buffering)
+  '   2) duration of "buffering" state: time
+  ' We use m.bufferingTimespan for both these data by allowing it to be 'invalid' when
+  ' not tracking buffering state.
+  if state = "buffering"
+    m.bufferingInfo = {
+      timespan: CreateObject("roTimespan")
+    }
+  else
+    ' only send buffering time if we reached playing state, otherwise
+    ' the user may have just backed out of it or an error occurred
+    if m.bufferingInfo <> invalid and state = "playing" then
+      messageInfo = {
+        buffer_time_ms: m.bufferingInfo.timespan.TotalMilliseconds()
+        video_id: ""
+        video_url: ""
+      }
+      if m.Video.streamInfo <> invalid then
+        messageInfo.stream_bitrate = m.Video.streamInfo.streamBitrate
+        messageInfo.measured_bitrate = m.Video.streamInfo.measuredBitrate
+        messageInfo.video_url = m.Video.streamInfo.streamUrl
+      end if
+      content = currentPlaylistContent()
+      if content <> invalid then
+        messageInfo.video_id = content.id
+      end if
+
+      ' TODO(Chris): Remove this check once the logging server can handle loads
+      ' for every buffering event.  For now we just log underruns
+      if m.Video.streamInfo <> invalid and m.Video.streamInfo.isUnderrun then
+        tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "REBUFFERING")
+      end if
+    end if
+    m.bufferingInfo = invalid
+  end if
 End Function
 
 Function advancePlaylist() As Boolean
