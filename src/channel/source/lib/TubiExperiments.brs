@@ -15,8 +15,9 @@ Function TubiExperiments(request as Object, constants as Object) as Object
     '   }
     ' }
     defaultValues: {
-      RokuNamespace: {
+      UserNamespace: {
         roku_on_now: 0
+        roku_continue_screen: 1
       }
     }
 
@@ -139,7 +140,6 @@ Function tubiExperiments_getNamespaces_()
   inputs = escapeUrlObj.Escape(inputs)
 
   url = m.constants.urls.datascience.experiment + "?platform=" + m.constants.platform + "&inputs=" + inputs
-
 
   expRequest = m.request.createAsync(url, "getExperiment")
   res = expRequest.runSynchronous()
