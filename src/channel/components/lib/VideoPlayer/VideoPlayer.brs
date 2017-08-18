@@ -585,19 +585,23 @@ Function onAdStateChange()
       ctx: m.top.content.id
     })
   else if m.top.adState = "adsclosed"
-    ' We want to allow the UI to decide what to do when user hits "Back".  The best
-    ' way is to resume the playback so live content is playing.  The controlling node
-    ' should set control = "stop" if they want to exit video playback entirely
-    m.Video.seek = m.playerPosition
-    m.Video.control = "play"
-    trackEvent({
-      trackType: "resumeAfterAds"
-      value: m.Video.content.nowPos
-      ctx: m.Video.content.id
-      extraCtx: {
-        livetv: m.Video.content.isLiveTV
-      }
-    })
+    ' This is not ideal implementation but we want the OnNow experience to continue playing
+    ' even if the user presses back during an ad.  We don't want to resume play under normal 
+    ' VOD playback so we skip restarting the video. Resuming play in the VOD case was
+    ' causing a bug where there was a very long black screen after exiting an ad break 
+    ' via the back button (i assume the render thread was busy caching the video segments).
+    if m.Video.content.isLiveTV
+      m.Video.seek = m.playerPosition
+      m.Video.control = "play"
+      trackEvent({
+        trackType: "resumeAfterAds"
+        value: m.Video.content.nowPos
+        ctx: m.Video.content.id
+        extraCtx: {
+          livetv: m.Video.content.isLiveTV
+        }
+      })
+    end if
 
     backButtonExit()
   end if
