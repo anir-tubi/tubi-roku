@@ -69,7 +69,9 @@ Function tubiChannel_runChannel(args, adShim, port)
     end while
 
     'change the client version so we tracking knows we are using the remote components
-    m.constants.deviceInfo.clientVersion = m.constants.deviceInfo.clientVersion.Replace("local", "remote")
+    if rodash().get(m, "constants.settings.version") <> invalid
+      m.constants.deviceInfo.clientVersion = m.constants.settings.version.Replace("_", ".") + ".newui.remote"
+    end if
     sgGlobal.setField("constants", m.constants)
 
     controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
