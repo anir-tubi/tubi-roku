@@ -280,35 +280,40 @@ Function createItemComponent(index As Integer, content As Object, item As Object
   gridIndex = itemIndexToGridIndex(index)
   itemRect = getGridItemRect(gridIndex)
 
-  if item.hasField("itemContent") then 
-    fields = {
-      id: stri(index)  
-      width: m.top.itemSize[0]
-      height: m.top.itemSize[1]
-      itemContent: content
-      translation: [itemRect.x,itemRect.y]
-    }
-    item.setFields(fields)
-  else if item.hasField("uri") then 
-    ' Special case here.  If we use Poster node type directly, it has a 'uri' field instead of
-    ' an 'itemContent' field.
-    if content <> invalid then
-      uri = content.hdgridposterurl
-    else
-      uri = "pkg:/images/placeholder.jpg"
-    end if
-    fields = {
-      id: stri(index)  
-      width: m.top.itemSize[0]
-      height: m.top.itemSize[1]
+  fields = {
+    id: stri(index)
+    width: m.top.itemSize[0]
+    height: m.top.itemSize[1]
+    translation: [itemRect.x,itemRect.y]
+  }
+
+  ' If low-spec device, save VRAM by scaling.
+  ' NOTE: This saves VRAM but if the UI resolution is 720p and manifest has 'ui_resolutions=fhd'
+  '       then the posters get scaled twice and look quite terrible. Later we should ideally support
+  '       ui_resultion of hd to make up for this.
+
+  ' NOTE2: These need to be set before the uri fields or they'll have no effect
+  if m.limitedNewUi
+    fields.append({
       loadWidth: m.top.itemSize[0]
       loadHeight: m.top.itemSize[1]
       loadDisplayMode: "scaleToZoom"
-      loadingBitmapUri: "pkg:/images/placeholder.jpg"
-      uri: uri
-      translation: [itemRect.x,itemRect.y]
-    }
-    item.setFields(fields)
+    })
+  end if
+
+  ' Set non-content fields first so that they affect the images on load.  This order is required.
+  item.setFields(fields)
+
+  ' Support custom components driven by 'itemComponent' content node or 'uri', such as Poster node type
+  if item.hasField("itemContent") then 
+    item.itemContent = content
+  else if item.hasField("uri") then 
+    item.loadingBitmapUri = "pkg:/images/placeholder.jpg"
+    if content <> invalid then
+      item.uri = content.hdgridposterurl
+    else
+      item.uri = "pkg:/images/placeholder.jpg"
+    end if
   end if
 
   'print "Rendering item " + stri(index) + " at [" + str(itemRect.x) + "," + str(itemRect.y) + "]"

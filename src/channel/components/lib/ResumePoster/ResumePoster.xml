@@ -10,17 +10,17 @@
     <field id="index" type="integer" />
     <field id="width" alias="Poster.width" />
     <field id="height" alias="Poster.height" />
+    <field id="loadWidth" alias="Poster.loadWidth" />
+    <field id="loadHeight" alias="Poster.loadHeight" />
+    <field id="loadDisplayMode" alias="Poster.loadDisplayMode" />
   </interface>
 
   <children>
     <Poster
      id="Poster"
      width="210"
-     loadWidth="210"
      height="300"
-     loadHeight="300"
      visible="true"
-     loadDisplayMode = "scaleToZoom"
      loadingBitmapUri = "pkg:/images/placeholder.jpg"
      translation="[0,0]">
       <Rectangle
