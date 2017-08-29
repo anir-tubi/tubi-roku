@@ -5,18 +5,27 @@
 ' the passed in screen node
 Function createGridOverlay(screen, spacingX=10, spacingY=10)
   if m.global.constants.settings.mode <> "dev"
-    return
+    return false
   end if
 
   boldColor = "0xC3C43FFF"
   graphColor = "0xAAAAAAFF"
   fontsize = 16
+  width = 1920
+  height = 1080
 
-  'get screen dimensions
+
+  'get screen resolutions
   deviceInfo = CreateObject("roDeviceInfo")
   uiResolution = deviceInfo.GetUiResolution()
-  width = uiResolution.width
-  height = uiResolution.height
+
+  if uiResolution.name = "FHD"
+    lineSize = 1
+    boldLineSize = 2
+  else
+    lineSize = 2
+    boldLineSize = 4
+  end if
 
   'create line containers
   allLines = CreateObject("roSGNode", "Group")
@@ -31,15 +40,15 @@ Function createGridOverlay(screen, spacingX=10, spacingY=10)
       line.height = height
       
       if x MOD 100 = 0
-        line.width = 2
+        line.width = boldLineSize
         line.color = boldColor
         label = vertLines.createChild("Label")
-        label.translation = [x-fontsize, 0]
+        label.translation = [x-fontsize, 100-fontsize]
         label.text = x.ToStr()
         label.color = boldColor
         label.font.size = fontsize
       else
-        line.width = 1
+        line.width = lineSize
         line.color = graphColor
       end if
     end if
@@ -53,15 +62,15 @@ Function createGridOverlay(screen, spacingX=10, spacingY=10)
       line.width = width
 
       if y MOD 100 = 0
-        line.height = 2
+        line.height = boldLineSize
         line.color = boldColor
         label = horizLines.createChild("Label")
-        label.translation = [0, y-fontsize]
+        label.translation = [100-fontsize, y-fontsize]
         label.text = y.ToStr()
         label.color = boldColor
         label.font.size = fontsize
       else
-        line.height = 1
+        line.height = lineSize
         line.color = graphColor
       end if
     end if
