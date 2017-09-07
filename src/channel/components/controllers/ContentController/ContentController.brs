@@ -21,6 +21,7 @@ Function init()
   m.background.color = m.global.constants.ui.colors.backgroundColor
 
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
+  m.defaultBackgroundUri = m.global.constants.ui.uris.defaultBackground
 
   m.global.addField("bookmarkIds", "node", false)
   m.global.addField("historyIds", "node", false)
@@ -61,8 +62,7 @@ Function onScreenStackEmpty()
     startOnNow()
   else
     ' only remove the last item if we have a valid callback
-    m.exitModal = showExitAppModal()
-    m.exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")
+    m.exitModal = showExitAppModal("onExitAppModalButtonSelected")
   end if
 End Function
 
@@ -72,7 +72,7 @@ End Function
 '
 ' handles the response of a user who has been presented an exit app modal
 Function onExitAppModalButtonSelected()
-  result = getExitAppModalResult()
+  result = getModalResult(m.exitModal)
 
   if result = 0
     'exit the app
@@ -88,9 +88,7 @@ Function onExitAppModalButtonSelected()
     end if
   end if
 
-  m.exitModal.unobserveField("buttonSelected")
-  m.exitModal = invalid
-  closeExitAppModal()
+  m.exitModal = closeModal(m.exitModal)   'set to invalid
 End Function
 
 
@@ -284,8 +282,7 @@ Function onSignInBackPressed()
   if currentScreen() <> invalid
     removeSignInController()
   else if m.global.constants.ui.signIn.backExitsSignIn = true
-    m.exitModal = showExitAppModal()
-    m.exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")
+    m.exitModal = showExitAppModal("onExitAppModalButtonSelected")
   end if
 End Function
 
@@ -338,7 +335,7 @@ End Function
 ''''''''''''''''''''
 ' onSignInSelected
 '
-' Launch the Sign In experience
+' Launch the sign in experience
 Function onSignInSelected()
   tubiLog("ContentController.onSignInSelected")
   startSignIn(true)
@@ -350,15 +347,36 @@ End Function
 ' Log the user out, update screens
 Function onSignOutSelected()
   tubiLog("ContentController.onSignOutSelected")
-  ' flush the screenstack in any case where the user has successfully
-  ' gone through the sign-in.  If they 'back' out of it, the screen
-  ' stack will stay intact and this function will not be called
-  while currentScreen() <> invalid
-    popScreen(true)
-  end while
-  m.categoryScreen = invalid
-  m.AuthTask.functionName = "execSignOut"
-  m.AuthTask.control = "RUN"
+  m.signOutModal = showSignOutModal("onSignOutModalSelected")
+End Function
+
+
+''''''''''''''''''''
+' onSignOutModalSelected
+'
+' Log the user out, update screens
+Function onSignOutModalSelected()
+  tubiLog("ContentController.onSignOutModalSelected")
+  modalResult = getModalResult(m.signOutModal)
+
+  'do the sign out stuff if confirmed
+  if modalResult = 0
+    ' flush the screenstack in any case where the user has successfully
+    ' gone through the sign-in.  If they 'back' out of it, the screen
+    ' stack will stay intact and this function will not be called
+    while currentScreen() <> invalid
+      popScreen(true)
+    end while
+    m.categoryScreen = invalid
+    m.AuthTask.functionName = "execSignOut"
+    m.AuthTask.control = "RUN"
+  end if
+
+  focusedScreen = currentScreen()
+  if focusedScreen <> invalid
+    focusedScreen.setFocus(true)
+  end if
+  m.signOutModal = closeModal(m.signOutModal)   'set to invalid
 End Function
 
 ''''''''''''''''''''
@@ -370,7 +388,8 @@ Function onAboutSelected()
   m.aboutScreen = CreateObject("roSGNode", "ModalDialogScreen")
   m.aboutScreen.title = "About Tubi TV"
   message = "Version " + m.global.constants.settings.version.Replace("_",".") + Chr(10)
-  message = message + Chr(169) + " 2017 Tubi Inc. all rights reserved." + Chr(10) ' + Chr(13)
+  message = message + Chr(10)
+  message = message + Chr(169) + " 2017 Tubi, Inc. all rights reserved." + Chr(10) ' + Chr(13)
   message = message + "The Tubi wordmark and all related logotypes are trademarks of Tubi, Inc."
   m.aboutScreen.message = message
   m.aboutScreen.buttons = ["Close"]
@@ -470,7 +489,7 @@ Function startOnNow()
   ' meta-screen, really just to allow screenstack to function.  we interact
   ' with the child groups directly instead of the parent group
   m.homeScreen = CreateObject("roSGNode", "homeScreen")
-  m.homeScreen.observeField("backgroundUriList", "onNowStopped")
+  m.homeScreen.observeField("backgroundUriList", "homeScreenBackgroundUpdated")
 
   m.toolsMenu = m.homeScreen.findNode("ToolsMenu")
   m.toolsMenu.observeField("searchSelected", "onSearchSelected")
@@ -478,7 +497,6 @@ Function startOnNow()
   m.toolsMenu.observeField("signOutSelected", "onSignOutSelected")
   m.toolsMenu.observeField("aboutSelected", "onAboutSelected")
   m.toolsMenu.observeField("privacySelected", "onPrivacySelected")
-  m.toolsMenu.observeField("backgroundUriList", "onStopLiveTV")
 
   m.onNow = m.homeScreen.findNode("OnNow")
   m.onNow.control = "play"
@@ -507,10 +525,12 @@ Function startOnNow()
   pushScreen(m.homeScreen, true)
 End Function
 
-Function onNowStopped()
-  tubiLog("ContentController.onNowStopped")
+Function homeScreenBackgroundUpdated()
+  tubiLog("ContentController.homeScreenBackgroundUpdated")
   m.backgroundGroup.backgroundUriList = m.homeScreen.backgroundUriList
-  m.backgroundGroup.newBackgroundType = "grid"
+
+  'change the background type to fullscreen if new background uri list is default
+  m.backgroundGroup.newBackgroundType = getBackgroundtype(m.backgroundGroup.backgroundUriList)
 End Function
 
 
@@ -886,7 +906,10 @@ End Function
 Function onGridBackgroundChange()
   TubiLog("ContentController.onGridBackgroundChange")
   m.backgroundGroup.backgroundUriList = m.categoryScreen.backgroundUriList
-  m.backgroundGroup.newBackgroundType = "grid"
+
+  'change the background type to fullscreen if new background uri list is default
+  m.backgroundGroup.newBackgroundType = getBackgroundtype(m.backgroundGroup.backgroundUriList)
+  print "NEW BACKGROUNDURI LIST "; m.backgroundGroup.backgroundUriList 
 End Function
 
 
@@ -897,7 +920,7 @@ End Function
 Function onDetailBackgroundChange()
   TubiLog("ContentController.onDetailBackgroundChange")
   m.backgroundGroup.backgroundUriList = m.detailScreen.backgroundUriList
-  m.backgroundGroup.newBackgroundType = "details"
+  m.backgroundGroup.newBackgroundType = "fullscreen"
 End Function
 
 
@@ -908,14 +931,18 @@ End Function
 Function onEpisodeBackgroundChange()
   TubiLog("ContentController.onEpisodeBackgroundChange")
   m.backgroundGroup.backgroundUriList = m.episodesScreen.backgroundUriList
-  m.backgroundGroup.newBackgroundType = "grid"
+
+  'change the background type to fullscreen if new background uri list is default 
+  m.backgroundGroup.newBackgroundType = getBackgroundtype(m.backgroundGroup.backgroundUriList)
 End Function
 
 
 Function onSearchBackgroundChange()
   TubiLog("ContentController.onSearchBackgroundChange")
   m.backgroundGroup.backgroundUriList = m.searchScreen.backgroundUriList
-  m.backgroundGroup.newBackgroundType = "grid"
+
+  'change the background type to fullscreen if new background uri list is default 
+  m.backgroundGroup.newBackgroundType = getBackgroundtype(m.backgroundGroup.backgroundUriList)
 End Function
 
 
@@ -947,5 +974,19 @@ Function onFirstPosterLoaded()
     model: m.global.constants.deviceInfo.model
   }
   tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load")   'send info to server
-
 End Function
+
+
+'''''''''''''''''''''''
+' getBackgroundtype
+'
+' Helper function to get the background type depending on if passed in uri list is using the default image
+' @backgroundUriList, array of uris
+Function getBackgroundtype(backgroundUriList)
+  if backgroundUriList[0] = m.defaultBackgroundUri
+    return "fullscreen"
+  else
+    return "topright"
+  end if
+End Function
+

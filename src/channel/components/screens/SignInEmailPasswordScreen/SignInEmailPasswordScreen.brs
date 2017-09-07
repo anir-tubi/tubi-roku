@@ -120,20 +120,18 @@ Function setColors()
   if m.Keyboard.isInFocusChain() and m.FocusedTextBox <> invalid then
     m.FocusedTextBox.color = m.global.constants.ui.colors.selectedEntryBox
     m.FocusedTextBox.textColor = m.global.constants.ui.colors.selectedEntryText
+    m.FocusedTextBox.textOpacity = 1.0
   end if
 
-  'Sign In button
+  'Sign in button
   m.SignInButtonDisabledFocus.visible = false
   m.SignInButtonFocus.visible = false
-  m.SignInButton.findNode("focusedText").color = m.global.constants.ui.colors.unfocused
-  m.SignInButton.opacity = 1.0
-  if m.PasswordTextBox.text <> "" and m.EmailTextBox.text <> "" then
-    if m.SignInButton.isInFocusChain()
+  if m.SignInButton.isInFocusChain()
+    if m.PasswordTextBox.text <> "" and m.EmailTextBox.text <> "" then
       m.SignInButtonFocus.visible = true
-      m.SignInButton.findNode("focusedText").color = m.global.constants.ui.colors.focusedText
+    else
+      m.SignInButtonDisabledFocus.visible = true
     end if
-  else
-    if m.SignInButton.isInFocusChain() then m.SignInButtonDisabledFocus.visible = true
   end if
 End Function
 
@@ -217,8 +215,7 @@ End Function
 '''''''''''''''''''''''''
 ' onSignInResult
 '
-' Handle a sign in response from the task, showing an
-' error or setting 'signInSuccess' field on success.
+' Handle a sign in response from the task
 Function onSignInResult()
   tubiLog("SignInEmailPasswordScreen.onSignInResult")
   m.SignIn.unobserveField("response")
@@ -226,14 +223,9 @@ Function onSignInResult()
   m.SpinnerAnimation.control = "stop"
 
   if m.SignIn.response.code <> invalid and m.SignIn.response.code = 200 then
-    m.top.signInSuccess = true
+    m.top.signInResult = true
   else
-    m.Dialog = m.top.createChild("ModalDialogScreen")
-    m.Dialog.title = "Sign In Failed"
-    m.Dialog.message = "The email and password combination you provided is not valid."
-    m.Dialog.buttons = ["Try again"]
-    m.Dialog.observeField("buttonSelected", "onCloseError")
-    m.Dialog.setFocus(true)
+    m.top.signInResult = false
   end if
   m.SignIn = invalid  ' free the task
 End Function

@@ -36,13 +36,13 @@
     </Label>
     
     <LayoutGroup
-      itemSpacings="[206]"
-      translation="[540,419]"
+      itemSpacings="[275]"
+      translation="[514,416]"
       layoutDirection="horiz">
       <Poster
        uri="pkg:/images/picto-register.png"
-       width="302"
-       height="192"/>
+       width="306"
+       height="198"/>
       <LayoutGroup
         layoutDirection="vert">
         <Rectangle
@@ -51,29 +51,29 @@
          color="0x00000000"/>
         <Poster
          uri="pkg:/images/picto-sign-in.png"
-         width="290"
-         height="188"/>
+         width="306"
+         height="198"/>
       </LayoutGroup>
     </LayoutGroup>
        
     <ScrollingList
       id="SignInOrRegisterButtons"
       layoutDirection="horiz"
-      translation="[450,720]"
+      translation="[432,720]"
       height="80"
-      width="986"
+      width="1046"
       itemComponentName="SignInButton"
-      itemSpacings="[26]">
+      itemSpacings="[86]">
       <ContentNode role="content">
         <ContentNode id="register" title="Register or Link Account"/>
-        <ContentNode id="signin" title="Sign In via Email"/>
+        <ContentNode id="signin" title="Sign in via Email"/>
       </ContentNode>
     </ScrollingList>
     
     <LayoutGroup
-      translation="[450,833]"
+      translation="[432,837]"
       layoutDirection="horiz"
-      itemSpacings="[26]"
+      itemSpacings="[86]"
       opacity="0.5">
      <Label
        text="Register for free at tubitv.com or sign in to an existing account"

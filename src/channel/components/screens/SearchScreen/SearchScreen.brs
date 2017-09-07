@@ -11,6 +11,7 @@ Function init()
   m.Cursor = m.top.findNode("Cursor")
   m.InfoPanel = m.top.findNode("SearchInfoPanel")
   m.UpdatingMessage = m.top.findNode("UpdatingMessage")
+  m.UpdatingMessageText = m.UpdatingMessage.findNode("SearchUpdatingText")
 
   m.TextEntryAnimation = m.top.findNode("TextEntryAnimation")
   m.TranslationInterpolator = m.top.findNode("TextEntryTranslationInterpolator")
@@ -24,8 +25,9 @@ Function init()
 
   ' While we aren't loading a seeded "Trending Searches", set the text to focus color
   m.SearchText.color = m.global.constants.ui.colors.focused ' default is white when no search term is entered
+  m.UpdatingMessageText.color = m.global.constants.ui.searchUpdatingText
 
-  m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
+  m.defaultHeroUri = "pkg:/images/art-blur-background.png"
 
   m.top.backgroundUriList = [m.defaultHeroUri]
 End Function
@@ -135,12 +137,12 @@ End Function
 '
 ' Animate the keyboard off screen, show the info panel, and focus on the content grid
 Function startFocusResultGrid()
-  m.TranslationInterpolator.keyValue = [[85,315],[85,138]]
-  m.SearchText.font.size = 33
+  m.TranslationInterpolator.keyValue = [[85,315],[85,545]]
+  m.SearchText.font.size = 34
   m.Cursor.visible = false
   keyboardRect = m.Keyboard.boundingRect()
   m.InfoPanelOpacityInterpolator.keyValue = [0.0, 1.0]
-  m.SearchHintOpacityInterpolator.keyValue = [0.0, 1.0]
+  m.SearchHintOpacityInterpolator.keyValue = [0.0, 0.5]
   m.KeyboardInterpolator.keyValue = [[0,0], [0, -keyboardRect.height]]
   m.TextEntryAnimation.observeField("state", "endFocusResultGrid")
   m.TextEntryAnimation.control = "start"
@@ -165,11 +167,11 @@ End Function
 '
 ' Hide the info panel and bring back the keyboard
 Function startFocusKeyboard()
-  m.TranslationInterpolator.keyValue = [[85,138],[85,315]]
+  m.TranslationInterpolator.keyValue = [[85,545],[85,315]]
   m.SearchText.font.size = 67
   keyboardRect = m.Keyboard.boundingRect()
   m.InfoPanelOpacityInterpolator.keyValue = [1.0, 0.0]
-  m.SearchHintOpacityInterpolator.keyValue = [1.0, 0.0]
+  m.SearchHintOpacityInterpolator.keyValue = [0.5, 0.0]
   m.KeyboardInterpolator.keyValue = [m.Keyboard.translation, [0, 0]]
   m.TextEntryAnimation.observeField("state", "endFocusKeyboard")
   m.TextEntryAnimation.control = "start"

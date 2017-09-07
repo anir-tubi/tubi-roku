@@ -110,11 +110,11 @@
       </Group>
       <Group
         id="SearchSignOutHint"
+        opacity="0.5"
         visible="false">
         <Poster
           id="LiveUpTriangle"
           uri="pkg:/images/up-arrow.png"
-          visible="true"
           width="47"
           height="47"
           translation="[843,57]" />
@@ -200,17 +200,16 @@
 
       <ScrollingList
         id="CategoryList"
-        translation="[-380, 640]"
+        translation="[-380, 616]"
         width="425"
         height="440"
         scrollHeight="80"
         itemSpacings="[8]"
-        itemComponentName="CategorySeasonListItem"
-        focusBitmapUri="pkg:/images/menu-focus.png"/>
+        itemComponentName="CategorySeasonListItem" />
 
       <Group
         id="ContentArea"
-        translation="[85,553]" >
+        translation="[85,562]" >
         <CategoryGridList
           id="CategoryGridList"/>
       </Group>

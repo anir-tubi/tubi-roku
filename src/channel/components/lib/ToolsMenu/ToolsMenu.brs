@@ -10,6 +10,10 @@ Function init()
   m.Description = m.top.findNode("Description")
 
   onSignedInChange()  ' initialize the sign in/out text
+
+  if m.global.constants.ui.onnow.on = true
+    m.top.findNode("OnNowHint-Tools").visible = true
+  end if
 End Function
 
 Function onComponentFocusChange()
@@ -55,8 +59,8 @@ Function onSignedInChange()
     content.title = "Sign Out"
     content.description = "Sign Out of Tubi TV"
   else
-    content.title = "Sign In"
-    content.description = "Sign In to Tubi TV. Access your Queue and View History across your devices"
+    content.title = "Sign in"
+    content.description = "Sign in to Tubi TV. Access your Queue and View History across your devices"
   end if
 End Function
 

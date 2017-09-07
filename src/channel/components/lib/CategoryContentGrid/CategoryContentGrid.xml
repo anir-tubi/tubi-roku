@@ -43,7 +43,7 @@
       height="40"
       width="1000"
       translation="[0,0]"
-      color="0xFF9933FF"
+      color="0xFF501AFF"
       opacity="0.0">
       <Font
         role="font"
@@ -68,13 +68,14 @@
       id="CategoryCount"
       layoutDirection="horiz"
       horizAlignment="right"
-      translation="[1755,10]">
+      opacity="0.0"
+      translation="[1755,5]">
       <Label
         id="FocusIndex"
         text=""
         height="40"
         horizAlign="right"
-        color="0xFF9933FF" >
+        color="0xFF501AFF" >
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-SemiBold.ttf"
@@ -94,10 +95,10 @@
 
     <Spinner
       id="Spinner"
-      width="1895"
+      width="1750"
       height="300"
       visible="false"
-      translation="[7,63]"/>
+      translation="[0,63]"/>
     <ContentGrid
       id="ContentGrid"
       numRows="1"

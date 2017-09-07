@@ -44,7 +44,7 @@
       itemSpacings="[8]"
       itemComponentName="CategorySeasonListItem"
       visible="false"
-      focusBitmapUri="pkg:/images/menu-focus-short.png" />
+      focusBitmapUri="pkg:/images/menu-focus.9.png" />
 
     <ScrollingList
       id="SeasonRows"
@@ -52,7 +52,7 @@
       height="503"
       scrollHeight="370"
       itemSpacings="[29]"
-      itemComponentName="CategoryContentGrid"
+      itemComponentName="SeasonContentGrid"
       focusBitmapUri=""
       focusChangeDuration="0.6"
       translation="[85,588]" />

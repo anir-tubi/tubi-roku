@@ -4,7 +4,7 @@
  - Background Group
  -
  - A group that handles any background transitions
- - As well as switching between the different background types - grid (category, episode screens), details (detail, search screens)
+ - As well as switching between the different background types - topright (category, episode screens), fullscreen (detail, search screens)
  -
  -->
 <component name="BackgroundGroup" extends="Group">
@@ -12,8 +12,8 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   
   <interface>
-    <!-- newBackgroundType can be "grid", "details" -->
-    <field id="newBackgroundType" type="string" value="grid" alwaysNotify="true" />
+    <!-- newBackgroundType can be "topright", "fullscreen" -->
+    <field id="newBackgroundType" type="string" value="topright" alwaysNotify="true" />
 
     <!-- used to set the uri for the background image -->
     <field id="backgroundUriList" type="stringarray" />

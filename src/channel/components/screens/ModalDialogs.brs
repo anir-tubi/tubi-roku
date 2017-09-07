@@ -39,37 +39,78 @@ End Function
 '
 ' Use like:
 '
-' exitModal = showExitAppModal()
-' exitModal.observeField("buttonSelected", "onExitAppModalButtonSelected")
+' m.exitModal = showExitAppModal("onExitModalSelected")
 ' Function onExitAppModalButtonSelected()
-'   result = getExitAppModalResult()
+'   result = getModalResult(m.exitModal)
 '   doStuff(result) 'context specific actions based on what the user selected
-'   closeExitAppModal()
+'   m.exitModal = closeModal(m.exitModal)   'set to invalid
+'   setFocusToLastFocusedComponent()
 ' End Function
 '
 '
-Function showExitAppModal()
+Function showExitAppModal(callbackName as String)
   exitModal = CreateObject("roSGNode", "ModalDialogScreen")
-  exitModal.title = "Are you Sure?"
-  exitModal.message = "Do you really want to exit Tubi TV?"
+  exitModal.title = "Are You Sure?"
+  exitModal.message = "Do you really want to exit Tubi?"
   exitModal.buttons = ["Exit", "Cancel"]
 
-  m.exitModal_ = exitModal
-  m.top.appendChild(m.exitModal_)
-  m.exitModal_.visible = true
-  m.exitModal_.setFocus(true)
+  m.top.appendChild(exitModal)
+  exitModal.visible = true
+  exitModal.observeField("buttonSelected", callbackName)
+  exitModal.setFocus(true)
 
   return exitModal
 End Function
 
 
-Function getExitAppModalResult()
-  return m.exitModal_.buttonSelected
+' SIGN OUT MODAL-----------------------------------------------
+' A set of functions used to ask a user if they truly intended to sign out
+'
+' Use like:
+'
+' m.signOutModal = showSignOutModal("onSignOutModalSelected")
+' Function onSignOutAppModalButtonSelected()
+'   result = getModalResult(m.signOutModal)
+'   doStuff(result) 'context specific actions based on what the user selected
+'   m.signOutModal = closeModal(m.signOutModal)   'set to invalid
+'   setFocusToLastFocusedComponent()
+' End Function
+'
+'
+Function showSignOutModal(callbackName as String)
+  signOutModal = CreateObject("roSGNode", "ModalDialogScreen")
+  signOutModal.title = "Are You Sure?"
+  signOutModal.message = "You are about to sign out of your Tubi account."
+  signOutModal.buttons = ["Sign Out", "Cancel"]
+
+  m.top.appendChild(signOutModal)
+  signOutModal.visible = true
+  signOutModal.observeField("buttonSelected", callbackName)
+  signOutModal.setFocus(true)
+
+  return signOutModal
 End Function
 
 
-Function closeExitAppModal()
-  m.exitModal_.setFocus(false)
-  m.top.removeChild(m.exitModal_)
-  m.exitModal_ = invalid
+' Used in conjuction with showExitAppModal or showSignOutModal
+'
+' @modalNode: SGNode, a modal node as returned by one of the above function calls
+' returns an integer representing the index of the choice selected
+Function getModalResult(modalNode)
+  return modalNode.buttonSelected
 End Function
+
+
+' Used in conjuction with showExitAppModal or showSignOutModal
+'
+' @modalNode: SGNode, a modal node as returned by one of the above function calls
+' side effects are removing focus from the modal and removing the modal from it's parent
+' returns invalid
+Function closeModal(modalNode)
+  modalNode.setFocus(false)
+  modalNode.unobserveField("buttonSelected")
+  m.top.removeChild(modalNode)
+  return invalid
+End Function
+
+

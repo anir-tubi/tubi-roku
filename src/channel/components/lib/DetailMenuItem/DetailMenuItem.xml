@@ -22,7 +22,7 @@
   <children>
     <Poster
      id="FocusedIcon" 
-     translation="[22,20]"
+     translation="[22,16]"
      loadWidth="40"
      loadHeight="40"
      loadDisplayMode="scaleToZoom" 
@@ -30,26 +30,14 @@
     
     <Poster
      id="UnfocusedIcon" 
-     translation="[22,20]"
+     translation="[22,16]"
      loadWidth="40"
      loadHeight="40"
      loadDisplayMode="scaleToZoom" 
      opacity="1.0"/>
     
     <Label
-     id="FocusedText"
-     translation="[72,0]" 
-     vertAlign="center"
-     horizAlign="left" 
-     height="80"
-     opacity="0.0">
-      <Font
-       role="font"
-       uri="pkg:/fonts/Vaud-SemiBold.ttf"
-       size="33" />
-    </Label>
-    <Label
-     id="UnfocusedText"
+     id="DetailsMenuText"
      translation="[72,0]" 
      vertAlign="center"
      horizAlign="left" 

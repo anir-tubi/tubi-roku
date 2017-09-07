@@ -133,6 +133,12 @@ Function focusCategory(newIndex)
   end if
   m.ContentGrid = m.ScrollingList.findNode("Items").getChild(newIndex)
   if m.ContentGrid <> invalid then 
+    'check if we need to update the spinner placement/width
+    if m.top.isFullWidth = false
+      m.ContentGrid.findNode("Spinner").width = 1310
+    else
+      m.ContentGrid.findNode("Spinner").width = 1750
+    end if
 
     m.ContentGrid.observeField("itemSelected", "onItemSelected")
     m.ContentGrid.observeField("itemFocused", "onItemFocused")

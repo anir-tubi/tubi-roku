@@ -89,6 +89,15 @@ Function onVideoStateChange(msg)
     end if
     m.bufferingInfo = invalid
   end if
+
+  ' Loading page visibility
+  if state = "playing" or state = "paused" then
+    m.Loading.visible = false
+    m.Spinner.visible = false
+  else
+    m.Loading.visible = true
+    m.Spinner.visible = true
+  end if
 End Function
 
 Function advancePlaylist() As Boolean

@@ -31,6 +31,10 @@ Function onButtonSelected()
   button = m.ButtonGroup.content.getChild(m.ButtonGroup.itemSelected)
   if button.id = "refresh" then
     getRegistrationCode()
+  else if button.id = "sign-in" then
+    m.top.signInButtonPressed = true
+    m.RegCodeTask.cancel = true
+    m.exitedScreen = true
   end if
 End Function
 

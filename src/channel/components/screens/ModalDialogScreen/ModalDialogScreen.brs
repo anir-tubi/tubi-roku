@@ -9,6 +9,7 @@ Function init()
   m.Message = m.top.findNode("Message")
   m.ScrollableMessage = m.top.findNode("ScrollableMessage")
   m.ScrollableBackground = m.top.findNode("ScrollableBackground")
+  m.MessageGroup = m.top.findNode("MessageGroup")
 End Function
 
 
@@ -33,24 +34,22 @@ Function formatDialog()
 
   'text area
   if m.top.scrollable then
+    m.MessageGroup.removeChild(m.Message)
+    m.MessageGroup.appendChild(m.ScrollableBackground)  ' for making this idempotent
     m.ScrollableBackground.visible = true
     m.ScrollableBackground.height = 320
     m.ScrollableMessage.visible = true
     m.ScrollableMessage.height = 300
-    m.Message.visible = false
     m.ScrollableMessage.text = m.top.message
   else
-    m.ScrollableBackground.visible = false
-    m.ScrollableBackground.height = 0
-    m.ScrollableMessage.visible = false
-    m.ScrollableMessage.height = 0
+    m.MessageGroup.removeChild(m.ScrollableBackground)
     m.Message.visible = true
     m.Message.text = m.top.message
   end if
 
   ' Position the dialog vertically and horizontally centered on the screen
   contentRect = m.ContentArea.boundingRect()
-  m.DialogBox.height = contentRect.height + 65 + 24
+  m.DialogBox.height = contentRect.height + 65 + 24  ' 65 is from top to title, 24 is from button to bottom of dialog
   newY = (1080 - m.DialogBox.height) / 2.0
   m.DialogBox.translation = [m.DialogBox.translation[0], newY]
 End Function

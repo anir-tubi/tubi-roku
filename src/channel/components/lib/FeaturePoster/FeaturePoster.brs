@@ -10,7 +10,7 @@ End Function
 '
 ' Update the title and background on 'content' being set
 Function onContentChange()
-  print "FeaturePoster.onContentChange"
+  tubiLog("FeaturePoster.onContentChange")
   ' NOTE: This is to account for ContentGrid saving VRAM by setting load* fields. Since we 
   ' hardcode m.Background.width and m.Background.height, we don't want ContentGrid to set
   ' the loadWidth/loadHeight values for us.

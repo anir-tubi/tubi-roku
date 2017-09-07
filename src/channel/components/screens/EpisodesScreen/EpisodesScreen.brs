@@ -17,7 +17,7 @@ Function init()
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
 
 
-  m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
+  m.defaultHeroUri = "pkg:/images/art-blur-background.png"
 End Function
 
 

@@ -10,35 +10,26 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
-    <!-- hide the progress bar when focus changes -->
-    <field id="focusPercent" type="float" value="0.0"/>
-    
     <!-- Content expected for a KeyboardItem:
      -
      - title - The label text
      -
      -->
     <field id="content" type="node" />
+
+    <field id="focusPercent" type="float" value="0.0"/>
     <field id="listHasFocus" type="boolean" value="false" />
   </interface>
 
   <children>
-    <Poster
-     id="Image"
-     visible="false"
-     loadHeight="40"
-     loadWidth="60"
-     height="40"
-     width="60"
-     translation="[0,20]"/>
-    
     <Label
      id="Text"
      height="80"
      width="60"
      color="0xFFFFFFFF"
      horizAlign="center"
-     vertAlign="center">
+     vertAlign="center"
+     translation="[0,0]">
       <Font
        role="font"
        uri="pkg:/fonts/Vaud-SemiBold.ttf"

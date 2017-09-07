@@ -5,7 +5,7 @@ Function init()
   m.top.observeField("enabled", "onFocusUpdate")
 
   m.colors = {
-    focusedText: m.global.constants.ui.colors.focusedText
+    focusedText: m.global.constants.ui.colors.focused
     unfocusedText: m.global.constants.ui.colors.unfocused
   }
 
@@ -16,7 +16,7 @@ End Function
 Function onFocusUpdate()
   TubiLog("TransportButton.onFocusUpdate: " + m.top.id)
   if m.top.focusState = true
-    m.top.uri = m.top.focusedUri
+    m.top.blendColor = m.colors.focusedText
 
     'skip trailer button is a special case where text color also needs to be updated
     if m.top.id = "SkipTrailerButton"
@@ -27,7 +27,7 @@ Function onFocusUpdate()
     end if
 
   else
-    m.top.uri = m.top.unfocusedUri
+    m.top.blendColor = "0xffffffff"
 
     'skip trailer button is a special case where text color also needs to be updated
     if m.top.id = "SkipTrailerButton"

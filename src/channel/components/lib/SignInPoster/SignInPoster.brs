@@ -1,36 +1,26 @@
 Function init()
   tubiLog("SignInPoster.init")
-
   m.top.observeField("content", "onContentChange")
   m.FocusedIcon = m.top.findNode("FocusedIcon")
   m.UnfocusedIcon = m.top.findNode("UnfocusedIcon")
-  m.FocusedText = m.top.findNode("FocusedText")
-  m.UnfocusedText = m.top.findNode("UnfocusedText")
-  m.FocusedText.color = m.global.constants.ui.colors.shade
-  m.UnfocusedText.color = m.global.constants.ui.colors.unfocused
+  m.ToolText = m.top.findNode("ToolText")
   m.top.observeField("focusPercent", "onFocusChange")
   m.top.observeField("listHasFocus", "onFocusChange")
 End Function
 
-Function onFocusChange()
-  if m.top.listHasFocus then
-    m.FocusedText.color = m.global.constants.ui.colors.shade
-  else
-    ' This case only applies to Search & Sign In menu where the menu doesn't have focus, we don't
-    ' call attention to the focused menu item
-    m.FocusedText.color = m.global.constants.ui.colors.unfocused
+Function onFocusChange(evt)
+  if m.FocusedIcon.uri <> m.UnfocusedIcon.uri
+    m.FocusedIcon.opacity = m.top.focusPercent
+    m.UnfocusedIcon.opacity = 1.0 - m.top.focusPercent
   end if
-  m.FocusedText.opacity = m.top.focusPercent
-  m.UnfocusedText.opacity = 1.0 - m.top.focusPercent
-  m.FocusedIcon.opacity = m.top.focusPercent
-  m.UnfocusedIcon.opacity = 1.0 - m.top.focusPercent
+  ' if, in the future, we want to change the color of the text here or maybe in the ToolsMenu.brs,
+  ' we can use the color change animation from the animationMixin
 End Function
 
 Function onContentChange()
   tubiLog("SignInPoster.onContentChange")
   if m.top.content <> invalid then
-    m.FocusedText.text = m.top.content.title
-    m.UnfocusedText.text = m.top.content.title
+    m.ToolText.text = m.top.content.title
     m.FocusedIcon.uri = m.top.content.focusIconUrl
     m.UnfocusedIcon.uri = m.top.content.unfocusIconUrl
   end if

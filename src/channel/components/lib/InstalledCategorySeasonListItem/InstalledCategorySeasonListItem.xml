@@ -25,54 +25,18 @@
       id="ForceDimensions"
       color="0x00000000"/>
     <Label 
-      id="categoryUnfocusedText" 
+      id="categoryText" 
       horizAlign="left"
       vertAlign="center"
       width="322"
       height="79"
-      translation="[19,1]"
-      opacity="0.0"
+      translation="[44,1]"
+      opacity="1.0"
       color="0xFFFFFFFF">
       <Font
       role="font"
       size="33"
       uri="pkg:/fonts/Vaud-SemiBold.ttf" />
     </Label>
-    <Label 
-      id="categoryFocusedText" 
-      horizAlign="left"
-      vertAlign="center"
-      width="322"
-      height="79"
-      translation="[19,1]"
-      color="0x191919FF">
-      <Font
-      role="font"
-      size="33"
-      uri="pkg:/fonts/Vaud-SemiBold.ttf" />
-    </Label>
-    
-    <Group
-      id="categoryCountGroup"
-      opacity="0.0"
-      translation="[361,16]">
-      <Poster
-        id="categoryCountBackground"
-        width="48"
-        height="48"
-        uri="pkg:/images/count-background.png"
-        translation="[0,0]"/>
-      <Label
-        id="categoryCountText"
-        horizAlign="center"
-        width="48"
-        translation="[-2,15]"
-        color="0xFF9933FF">
-        <Font
-        role="font"
-        size="22"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf" />
-      </Label>
-    </Group>
   </children>
 </component>

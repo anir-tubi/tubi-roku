@@ -36,7 +36,7 @@
     <children>
       <Poster
         id="BackgroundGradient"
-        uri="pkg:/images/sign-in-background.png"
+        uri="pkg:/images/art-blur-background.png"
         width="1920"
         loadWidth="1920"
         height="1080"

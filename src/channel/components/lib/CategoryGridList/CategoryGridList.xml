@@ -44,6 +44,12 @@
 
     <!-- bubbles up from the first CategoryContentGrid loaded -->
     <field id="firstPosterLoaded" type="boolean" value="false" />
+
+    <!-- inbound interface so the UI can be updated based on if the category grid lists occupy
+     -   the full width of the category screen (ie. the category menu is not showing).
+     -   Assumes there are only 2 possible widths for the CategoryGridList, full width and not full width.
+     -->
+    <field id="isFullWidth" type="boolean" value="true" />
   </interface>
   
   <children>
@@ -52,7 +58,7 @@
       width="1835"
       height="503"
       scrollHeight="370"
-      itemSpacings="[29]"
+      itemSpacings="[15]"
       itemComponentName="CategoryContentGrid"
       focusBitmapUri=""
       focusChangeDuration="0.6"

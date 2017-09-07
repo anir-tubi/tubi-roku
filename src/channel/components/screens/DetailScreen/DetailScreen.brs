@@ -10,7 +10,7 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("episodeSelection", "onEpisodeSelectionChange")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
-  m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
+  m.defaultHeroUri = "pkg:/images/art-blur-background.png"
 
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
   m.PlayMenuItem = m.top.findNode("PlayMenuItem")
@@ -336,9 +336,9 @@ Function onMenuItemSelected()
         addToQueue()
       else
         m.Dialog = m.top.createChild("ModalDialogScreen")
-        m.Dialog.title = "Sign in to add to your queue"
-        m.Dialog.message = "You must be signed in in order to add a title to your queue."
-        m.Dialog.buttons = ["Sign In or Register", "Cancel"]
+        m.Dialog.title = "Please Sign in."
+        m.Dialog.message = "You must be signed in, in order to add a title to your queue."
+        m.Dialog.buttons = ["Sign in or Register", "Cancel"]
         m.Dialog.observeField("buttonSelected", "onDialogButton")
         m.Dialog.setFocus(true)
       end if

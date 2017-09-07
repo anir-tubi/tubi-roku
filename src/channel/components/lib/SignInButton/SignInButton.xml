@@ -24,25 +24,12 @@
 
   <children>
     <Label
-      id="focusedText"
+      id="Text"
       text=""
       width="480"
       height="80"
       horizAlign="center"
       vertAlign="center">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="33" />
-    </Label>
-    <Label
-      id="unfocusedText"
-      text=""
-      width="480"
-      height="80"
-      horizAlign="center"
-      vertAlign="center"
-      opacity="0.0">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-SemiBold.ttf"

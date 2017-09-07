@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - SignInFaile
+ -
+ -
+ - The first screen of the sign-in flow, it asks whether the user wants to sign in or
+ - use a guest pass to view content.
+ -
+ -->
+<component name="SignInFailed" extends="Group">
+
+  <script type="text/brightscript" uri="pkg:/components/screens/SignInFailed/SignInFailed.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  
+  <interface>
+    <field id="tryAgainButtonSelected" type="boolean" value="false" alwaysNotify="true"/>
+    <!-- keeps the uri used for user tracking -->
+    <field id="trackingUri" type="string"  value="/login-choice" />    
+  </interface>
+
+  <children>
+    <Label
+      translation="[589,409]"
+      text="Sign in Failed"
+      width="763">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="43" />
+    </Label>
+    
+    <Label
+      translation="[589,508]"
+      text="The email and password combination you provided is not valid."
+      wrap="true"
+      width="763">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="27" />
+    </Label>
+    
+    <ScrollingList
+      id="TryAgainButtons"
+      layoutDirection="horiz"
+      translation="[545,624]"
+      height="80"
+      width="480"
+      itemComponentName="InstalledCategorySeasonListItem"
+      itemSpacings="[60]">
+      <ContentNode role="content">
+        <ContentNode id="try-again" title="Try Again"/>
+      </ContentNode>
+    </ScrollingList>
+  </children>
+</component>

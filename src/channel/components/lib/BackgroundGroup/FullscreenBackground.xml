@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+ - Details Background
+ -
+ - Handles animations and layout for backgrounds on the category screen and episode screen
+ -
+ -->
+<component name="FullscreenBackground" extends="Group">
+  <interface />
+
+  <children>
+    <Group
+      id="BackgroundImages" />
+    <Poster
+      id="BackgroundGradient"
+      loadWidth="1920"
+      width="1920"
+      loadHeight="1080"
+      height="1080"
+      uri="pkg:/images/detail-gradient-25.png"
+      loadDisplayMode="scaleToZoom"
+      translation="[0,0]"
+      opacity="1.0"
+      visible="true" />
+    <Animation
+      id="GradientFadeIn"
+      duration="0.9"
+      easeFunction="inOutCubic">
+      <FloatFieldInterpolator
+        id="FadeInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[0, 1]"
+        fieldToInterp="BackgroundGradient.opacity" />
+    </Animation>    
+    <Animation
+      id="GradientFadeOut"
+      duration="0.9"
+      easeFunction="inCubic">
+      <FloatFieldInterpolator
+        id="FadeInterpolator"
+        key="[1.0,0.0]"
+        keyValue="[0, 1]"
+        fieldToInterp="BackgroundGradient.opacity" />
+    </Animation>      
+  </children>
+</component>

@@ -59,7 +59,8 @@
     </Label>
 
     <Group
-     id="SearchSignOutHint">
+     id="SearchSignOutHint"
+     opacity="0.5">
       <Poster
         id="LiveUpTriangle"
         uri="pkg:/images/up-arrow.png"
@@ -84,7 +85,27 @@
       uri="pkg:/images/icon-on-now.png"
       width="115"
       height="55"
-      translation="[243,53]" />
+      translation="[207,53]" />
+
+    <Group
+     opacity="0.5">
+      <Poster
+        uri="pkg:/images/back.png"
+        width="47"
+        height="47"
+        translation="[76,489]"/>
+      <Label
+        text="PRESS BACK TO EXIT"
+        translation="[125,493]"
+        height="47"
+        vertAlign="center">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+    </Group>
 
     <Timer
       id="Debounce"

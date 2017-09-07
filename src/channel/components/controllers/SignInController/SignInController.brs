@@ -112,7 +112,7 @@ End Function
 Function onSignIn()
   tubiLog("SignInController.onSignIn")
   m.EmailPasswordScreen = CreateObject("roSGNode", "SignInEmailPasswordScreen")
-  m.EmailPasswordScreen.observeField("signInSuccess", "onSignInSuccess")
+  m.EmailPasswordScreen.observeField("signInResult", "onSignInResult")
   pushScreen(m.EmailPasswordScreen)
 End Function
 
@@ -125,6 +125,7 @@ Function onRegister()
   tubiLog("SignInController.onRegister")
   m.RegisterInstructions = CreateObject("roSGNode", "RegisterInstructionsScreen")
   m.RegisterInstructions.observeField("registerSuccess", "onRegisterSuccess")
+  m.RegisterInstructions.observeField("signInButtonPressed", "onSignIn")
   pushScreen(m.RegisterInstructions)
 End Function
 
@@ -139,10 +140,26 @@ Function onRegisterSuccess()
 End Function
 
 '''''''''''''''''''''''''''''
-' onSignInSuccess
+' onSignInResult
 '
 ' User has successfully signed in, set a field to redirect to content
-Function onSignInSuccess()
-  tubiLog("SignInController.onSignInSuccess")
-  m.top.signedIn = true
+Function onSignInResult()
+  tubiLog("SignInController.onSignInResult")
+  if m.EmailPasswordScreen.signInResult = true then
+    m.top.signedIn = true
+  else
+    if m.SignInFailed <> invalid then
+      m.SignInFailed.unobserveField("tryAgainButtonSelected")
+      m.SignInFailed = invalid
+    end if
+    m.SignInFailed = CreateObject("roSGNode", "SignInFailed")
+    m.SignInFailed.observeField("tryAgainButtonSelected", "onTryAgain")
+    pushScreen(m.SignInFailed)
+  end if
+End Function
+
+Function onTryAgain()
+  tubiLog("SignInController.onTryAgain")
+  m.SignInFailed.unobserveField("tryAgainButtonSelected")
+  popScreen()
 End Function

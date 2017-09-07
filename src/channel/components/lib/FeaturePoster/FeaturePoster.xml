@@ -8,6 +8,7 @@
 <component name="FeaturePoster" extends="Group">
 
   <script type="text/brightscript" uri="pkg:/components/lib/FeaturePoster/FeaturePoster.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
@@ -34,7 +35,7 @@
     <Label
       id="Title"
       color="0xFFFFFFFF"
-      width="430"
+      width="410"
       height="35"
       vertAlign="top"
       translation="[0,270]">

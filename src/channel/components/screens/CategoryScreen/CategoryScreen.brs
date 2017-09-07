@@ -29,12 +29,11 @@ Function init()
   m.ContinueWatchingCategory = m.SpecialCategories.findNode("ContinueWatching")
   m.MyQueueCategory = m.SpecialCategories.findNode("MyQueue")
 
-  m.defaultHeroUri = "pkg:/images/grid-default-blurred.jpg"
+  m.defaultBackgroundUri = m.global.constants.ui.uris.defaultBackground
 
   onSignedInChange()  ' seed the search & sign in menu - also calls loadUserCategories() if necessary
 
   loadAllCategories()
-
 End Function
 
 
@@ -101,10 +100,10 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("CategoryScreen.onKeyEvent")
   if press then
     if (key = "right" or key = "ok") then
-      hideCategoryMenu()
+      m.top.categoryMenuVisible = false
       return true
     else if key = "left" then
-      showCategoryMenu()
+      m.top.categoryMenuVisible = true
       return true
     end if
   end if
@@ -126,14 +125,14 @@ Function showCategoryMenu()
     m.CategoryList.setFocus(true)
     m.categoryListIsFocused = true
     if m.global.constants.deviceInfo.limitedNewUi
-      m.ContentArea.translation = [525,m.ContentArea.translation[1]]
+      m.ContentArea.translation = [517,m.ContentArea.translation[1]]
       m.CategoryList.translation = [60,m.CategoryList.translation[1]]
     else
-      slideTo(m.ContentArea, [525,m.ContentArea.translation[1]], 0.5)
+      slideTo(m.ContentArea, [517,m.ContentArea.translation[1]], 0.5)
       slideTo(m.CategoryList, [60,m.CategoryList.translation[1]], 0.5)
     end if
     m.trackingCount = 0
-    m.top.categoryMenuVisible = true
+    m.CategoryGridList.isFullWidth = false
   end if
 End Function
 
@@ -149,7 +148,7 @@ Function hideCategoryMenu()
       slideTo(m.CategoryList, [-380,m.CategoryList.translation[1]], 0.5)
     end if
     m.trackingCount = 0
-    m.top.categoryMenuVisible = false
+    m.CategoryGridList.isFullWidth = true
   end if
 End Function
 
@@ -213,7 +212,7 @@ Function onCategoryMenuChange() As Void
   newCategory = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
   m.InfoPanel.content = newCategory
   m.InfoPanel.mode = "category"
-  m.top.backgroundUriList = [m.defaultHeroUri]
+  m.top.backgroundUriList = [m.defaultBackgroundUri]
 
   'update the tracking URI for user tracking purposes
   catPos = (m.CategoryList.itemFocused + m.top.rowPlaceholder + 1).toStr()
@@ -272,7 +271,7 @@ Function onGridFocusChange() As Void
   if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
     m.top.backgroundUriList = focusedContent.backgrounds
   else
-    m.top.backgroundUriList = [m.defaultHeroUri]
+    m.top.backgroundUriList = [m.defaultBackgroundUri]
   end if
 
   'update the tracking URI

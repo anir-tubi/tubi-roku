@@ -9,3 +9,24 @@ images
 
 # Add images below here like:
 #   images/new-image.png
+images/character-delete-focused.png
+images/character-space-focused.png
+images/count-background.png
+images/icon-link.png
+images/icon-on-now.png
+images/logo-white-large.png
+images/menu-focus.9.png
+images/picto-account-synchro.png
+images/picto-history.png
+images/picto-queue.png
+images/picto-register.png
+images/picto-sign-in.png
+images/selector.9.png
+images/splash-fhd.png
+images/transport
+images/transport/sgplayer
+images/transport/sgplayer/cc-rail-on.png
+images/transport/sgplayer/fhd
+images/transport/sgplayer/fhd/progress-foreground.9.png
+images/transport/sgplayer/hd
+images/transport/sgplayer/hd/progress-foreground.9.png

@@ -235,25 +235,11 @@ Function getConstants()
 
     constants.urls.transportButtons = {}
       constants.urls.transportButtons.fastForward = "pkg:/images/transport/sgplayer/icon-ffw.png"
-      constants.urls.transportButtons.fastForwardFocus = [
-        "pkg:/images/transport/sgplayer/icon-ffw-1-focus.png",
-        "pkg:/images/transport/sgplayer/icon-ffw-2-focus.png",
-        "pkg:/images/transport/sgplayer/icon-ffw-3-focus.png"
-      ]
       constants.urls.transportButtons.rewind = "pkg:/images/transport/sgplayer/icon-rew.png"
-      constants.urls.transportButtons.rewindFocus = [
-        "pkg:/images/transport/sgplayer/icon-rew-1-focus.png",
-        "pkg:/images/transport/sgplayer/icon-rew-2-focus.png",
-        "pkg:/images/transport/sgplayer/icon-rew-3-focus.png"
-      ]
       constants.urls.transportButtons.pause = "pkg:/images/transport/sgplayer/icon-pause.png"
-      constants.urls.transportButtons.pauseFocus = "pkg:/images/transport/sgplayer/icon-pause-focus.png"
       constants.urls.transportButtons.play = "pkg:/images/transport/sgplayer/icon-play.png"
-      constants.urls.transportButtons.playFocus = "pkg:/images/transport/sgplayer/icon-play-focus.png"
       constants.urls.transportButtons.toEnd = "pkg:/images/transport/sgplayer/icon-to-end.png"
-      constants.urls.transportButtons.toEndFocus = "pkg:/images/transport/sgplayer/icon-to-end-focus.png"
       constants.urls.transportButtons.toStart = "pkg:/images/transport/sgplayer/icon-to-start.png"
-      constants.urls.transportButtons.toStartFocus = "pkg:/images/transport/sgplayer/icon-to-start-focus.png"
 
   'http request types
   constants.reqTypes = {}
@@ -416,23 +402,26 @@ Function getConstants()
       constants.ui.uris.homeBackgroundGradient = "pkg:/images/home-gradient-25.png"
       constants.ui.uris.detailBackgroundGradient = "pkg:/images/detail-gradient-25.png"
 
+      'default background image uri
+      constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.jpg"
+
     constants.ui.colors = {}
       'template colors
       constants.ui.colors.transparent = "0x00000000"
       constants.ui.colors.backgroundColor = "0x191919FF"
-      constants.ui.colors.focused = "0xFF9933FF"
+      constants.ui.colors.focused = "0xFF501AFF"
       constants.ui.colors.unfocused = "0xFFFFFFFF"
       constants.ui.colors.primaryText = "0xFFFFFFFF"
       constants.ui.colors.secondaryText = "0x777777FF"
-      constants.ui.colors.focusedText = "0x2C2C2CFF"
-      constants.ui.colors.highlightedText = "0xFF9933FF"
+      constants.ui.colors.focusedText = "0xFFFFFFFF"
+      constants.ui.colors.highlightedText = "0xFF501AFF"
       constants.ui.colors.shade = "0x191919FF"
       constants.ui.colors.spinnerBox = "0x2C2C2CFF"
 
       'textbox text colors
       constants.ui.colors.unselectedEntryText = "0x191919FF"
       constants.ui.colors.selectedEntryText = "0x191919FF"
-      constants.ui.colors.selectedEntryBox = "0xF4D8BCFF"
+      constants.ui.colors.selectedEntryBox = "0xF3C4B6FF"
       constants.ui.colors.unselectedEntryBox = "0xFFFFFFFF"
       
       'colors for individual elements - can be made individual or controlled by template colors
@@ -455,6 +444,7 @@ Function getConstants()
       constants.ui.colors.seasonContentTitle = constants.ui.colors.primaryText
       constants.ui.colors.episodeBorder = constants.ui.colors.focused
       constants.ui.colors.episodeInnerBorder = constants.ui.colors.backgroundColor
+      constants.ui.colors.searchUpdatingText = constants.ui.colors.secondaryText
 
     'amounts that may be used throughout the UI
     constants.ui.amounts = {}

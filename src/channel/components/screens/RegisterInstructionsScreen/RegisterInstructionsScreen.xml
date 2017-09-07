@@ -13,21 +13,34 @@
     <!-- Set to true if the user has successfully registered -->
     <field id="registerSuccess" type="boolean" value="false" alwaysNotify="true"/>
 
+    <field id="signInButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
+
     <!-- keeps the uri used for user tracking -->
     <field id="trackingUri" type="string"  value="/login-choice/code" />
   </interface>
 
   <children>
-    <Poster
-      id="Circle1"
-      uri="pkg:/images/1.png"
-      width="100"
-      height="100"
-      translation="[910,126]"/>
+    <Label
+      translation="[0,107]"
+      text="Register or Link Account"
+      horizAlign="center"
+      width="1920">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="67" />
+    </Label>
     
+    <Poster
+      id="Link"
+      width="96"
+      height="96"
+      uri="pkg:/images/icon-link.png"
+      translation="[912,248]"/>
+            
     <Label
       text="Register for free or sign in online at"
-      translation="[0,260]"
+      translation="[0,420]"
       horizAlign="center"
       width="1920">
       <Font
@@ -38,26 +51,19 @@
            
     <Label
       text="tubitv.com/activate"
-      translation="[0,321]"
+      translation="[0,481]"
       horizAlign="center"
       width="1920"
-      color="0xff9933">
+      color="0xff501a">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-Semibold.ttf"
         size="43"/>
     </Label> 
     
-    <Poster
-      id="Circle2"
-      uri="pkg:/images/2.png"
-      width="100"
-      height="100"
-      translation="[910,465]"/>
-    
     <Label
-      text="When asked, enter the activation code below"
-      translation="[0,596]"
+      text="then enter the activation code below"
+      translation="[0,548]"
       width="1920"
       horizAlign="center">
       <Font
@@ -69,40 +75,40 @@
     <Label
       id="RegistrationCode"
       text=""
-      translation="[0,657]"
+      translation="[0,609]"
       width="1920"
       horizAlign="center"
-      color="0xff9933">
+      color="0xff501a">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-Semibold.ttf"
         size="43"/>
     </Label> 
     
-    <ScrollingList
-      id="RefreshButtons"
-      layoutDirection="horiz"
-      translation="[720,816]"
-      height="80"
-      width="986"
-      itemComponentName="SignInButton"
-      itemSpacings="[26]">
-      <ContentNode role="content">
-        <ContentNode id="refresh" title="Refresh Code"/>
-      </ContentNode>
-    </ScrollingList>
-    
     <Label
       text="This screen will automatically refresh once your device is linked"
-      translation="[0,936]"
+      translation="[0,678]"
       width="1920"
-      horizAlign="center"
-      opacity="0.5">
+      horizAlign="center">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="22"/>
-    </Label> 
+        size="24"/>
+    </Label>
+
+    <ScrollingList
+      id="RefreshButtons"
+      layoutDirection="horiz"
+      translation="[432,776]"
+      height="80"
+      width="1046"
+      itemComponentName="SignInButton"
+      itemSpacings="[86]">
+      <ContentNode role="content">
+        <ContentNode id="refresh" title="Refresh Code"/>
+        <ContentNode id="sign-in" title="Sign in via Email"/>
+      </ContentNode>
+    </ScrollingList>
     
   </children>
 </component>

@@ -34,21 +34,11 @@
       opacity="1.0"/>
     
     <Label
-      id="FocusedText"
+      id="ToolText"
+      color="0xFFFFFFFF"
       horizAlign="center"
       translation="[0,288]"
       width="430"
-      opacity="0.0">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="33" />
-    </Label>
-    <Label
-      id="UnfocusedText"
-      horizAlign="center"
-      width="430"
-      translation="[0,288]"
       opacity="1.0">
       <Font
         role="font"

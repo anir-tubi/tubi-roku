@@ -72,37 +72,37 @@
       id="ResumeMenuItem"
       title="Resume" 
       unfocusiconurl="pkg:/images/icon-resume.png"
-      focusiconurl="pkg:/images/icon-resume-on.png"/>
+      focusiconurl="pkg:/images/icon-resume.png"/>
     <DetailMenuItemContentNode
       id="PlayMenuItem"
       title="Play"
       unfocusiconurl="pkg:/images/icon-play.png"
-      focusiconurl="pkg:/images/icon-play-on.png" />
+      focusiconurl="pkg:/images/icon-play.png" />
     <DetailMenuItemContentNode
       id="EpisodesMenuItem"
       title="Episodes list"
       unfocusiconurl="pkg:/images/icon-all-episodes.png"
-      focusiconurl="pkg:/images/icon-all-episodes-on.png" />
+      focusiconurl="pkg:/images/icon-all-episodes.png" />
     <DetailMenuItemContentNode
       id="AddQueueMenuItem"
       title="Add to queue"
       unfocusiconurl="pkg:/images/icon-add-to-queue.png"
-      focusiconurl="pkg:/images/icon-add-to-queue-on.png" />
+      focusiconurl="pkg:/images/icon-add-to-queue.png" />
     <DetailMenuItemContentNode
       id="RemoveQueueMenuItem"
       title="Remove from queue"
       unfocusiconurl="pkg:/images/icon-remove-from-queue.png"
-      focusiconurl="pkg:/images/icon-remove-from-queue-on.png" />
+      focusiconurl="pkg:/images/icon-remove-from-queue.png" />
     <DetailMenuItemContentNode
       id="RemoveHistoryMenuItem"
       title="Remove from history"
       unfocusiconurl="pkg:/images/icon-remove-from-history.png"
-      focusiconurl="pkg:/images/icon-remove-from-history-on.png" />
+      focusiconurl="pkg:/images/icon-remove-from-history.png" />
     <DetailMenuItemContentNode
       id="WatchTrailerMenuItem"
       title="Watch Trailer"
       unfocusiconurl="pkg:/images/icon-trailer.png"
-      focusiconurl="pkg:/images/icon-trailer-on.png" />
+      focusiconurl="pkg:/images/icon-trailer.png" />
   
     <InfoPanel
       id="InfoPanel"
@@ -118,7 +118,7 @@
       height="352"
       itemSpacings="[8]"
       itemComponentName="DetailMenuItem"
-      focusBitmapUri="pkg:/images/menu-focus.png"
+      focusBitmapUri="pkg:/images/menu-focus.9.png"
       visible="false"
       translation="[60, 680]" />
     

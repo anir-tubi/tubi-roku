@@ -33,6 +33,7 @@
 Function init()
   tubiLog("VideoPlayer.init")
   m.Spinner = m.top.findNode("BufferSpinner")
+  m.Loading = m.top.findNode("Loading")
   m.Transport = m.top.findNode("Transport")
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
@@ -91,7 +92,6 @@ Function init()
   setFocusedButton(m.PlayPauseButton)
   m.ClosedCaptionDisabled = m.top.findNode("ClosedCaptionDisabled")
 
-  m.Video.observeField("bufferingStatus", "onBufferStatus")
   m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
   m.top.observeField("adState", "onAdStateChange")
 
@@ -133,14 +133,6 @@ Function onDockedChange()
     ' immediately hide all HUD components
     m.Overlay.opacity = 0.0
     m.HUD.opacity = 0.0
-  end if
-End Function
-
-Function onBufferStatus()
-  if m.Video.bufferingStatus <> invalid
-    m.Spinner.visible = true
-  else
-    m.Spinner.visible = false
   end if
 End Function
 
@@ -529,7 +521,7 @@ Function onKeyEvent(key As String, press As Boolean)
       if m.Overlay.opacity = 0
         showTransport()
       else
-        if m.top.content.isLiveTV then
+        if m.top.content <> invalid and m.top.content.isLiveTV = true then
           if m.top.hasFocus()
             focusVideoPicker(true)
           else
@@ -628,8 +620,7 @@ End Function
 'show transport
 Function showTransport()
   resetTransportButtons()
-  m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
-  m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
+  m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
   m.PickerGroup.opacity = 0.0
   m.PickerGroup.translation = [0,0]
@@ -697,8 +688,7 @@ Function pauseVideo()
     focusVideoPicker(false)
   end if
 
-  m.PlayPauseButton.focusedUri = m.buttonUris.playFocus
-  m.PlayPauseButton.unfocusedUri = m.buttonUris.play
+  m.PlayPauseButton.uri = m.buttonUris.play
   setFocusedButton(m.PlayPauseButton)
   
   updateTransport()
@@ -715,8 +705,7 @@ End Function
 
 'Resume play from a paused state
 Function resumeFromPause()
-  m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
-  m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
+  m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
 
   animateTransport("out")
@@ -736,27 +725,16 @@ End Function
 
 Function resetTransportButtons()
   m.SkipTrailerButton.focusState = false
-
   m.StartButton.focusState = false
-
-  m.RewindButton.focusedUri = m.buttonUris.rewindFocus
-  m.RewindButton.unfocusedUri = m.buttonUris.rewind
+  m.RewindButton.uri = m.buttonUris.rewind
   m.RewindButton.focusState = false
-
   m.HopBackButton.focusState = false
-
-  m.PlayPauseButton.focusedUri = m.buttonUris.playFocus
-  m.PlayPauseButton.unfocusedUri = m.buttonUris.play
+  m.PlayPauseButton.uri = m.buttonUris.play
   m.PlayPauseButton.focusState = false
-
   m.HopForwardButton.focusState = false
-
-  m.FastForwardButton.focusedUri = m.buttonUris.fastForwardFocus
-  m.FastForwardButton.unfocusedUri = m.buttonUris.fastForward
+  m.FastForwardButton.uri = m.buttonUris.fastForward
   m.FastForwardButton.focusState = false
-
   m.EndButton.focusState = false
-
   m.ClosedCaption.focusState = false
 
   'also upate the transport timestamps
@@ -804,8 +782,7 @@ Function endScrub()
   m.lastPingTime = m.playerPosition
 
   resetTransportButtons()
-  m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
-  m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
+  m.PlayPauseButton.uri = m.buttonUris.pause
   m.PlayPauseButton.focusState = true
 
   ' seek analytics
@@ -882,10 +859,8 @@ Function handleFastForward()
   if m.VideoState = "rew"
     m.VideoState = "ffw"
     m.scrubAmt = 0
-    m.RewindButton.focusedUri = m.buttonUris.rewindFocus
-    m.RewindButton.unfocusedUri = m.buttonUris.rewind
-    m.FastForwardButton.focusedUri = m.buttonUris.fastForwardLevelsFocus[0]
-    m.FastForwardButton.unfocusedUri = m.buttonUris.fastForwardLevels[0]
+    m.RewindButton.uri = m.buttonUris.rewind
+    m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[0]
 
   'increase the fast forward speed
   else if m.VideoState = "ffw"
@@ -894,15 +869,13 @@ Function handleFastForward()
     else
       m.scrubAmt = 0
     end if
-    m.FastForwardButton.focusedUri = m.buttonUris.fastForwardLevelsFocus[m.scrubAmt]
-    m.FastForwardButton.unfocusedUri = m.buttonUris.fastForwardLevels[m.scrubAmt]
+    m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[m.scrubAmt]
 
   'start the fast forward
   else
     beginScrub()
     m.VideoState = "ffw"
-    m.FastForwardButton.focusedUri = m.buttonUris.fastForwardLevelsFocus[0]
-    m.FastForwardButton.unfocusedUri = m.buttonUris.fastForwardLevels[0]
+    m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[0]
   end if
 
   setFocusedButton(m.FastForwardButton, true)
@@ -915,10 +888,8 @@ Function handleRewind()
   if m.VideoState = "ffw"
     m.VideoState = "rew"
     m.scrubAmt = 0
-    m.FastForwardButton.focusedUri = m.buttonUris.fastforwardFocus
-    m.FastForwardButton.unfocusedUri = m.buttonUris.fastforward
-    m.RewindButton.focusedUri = m.buttonUris.rewindLevelsFocus[0]
-    m.RewindButton.unfocusedUri = m.buttonUris.rewindLevels[0]
+    m.FastForwardButton.uri = m.buttonUris.fastforward
+    m.RewindButton.uri = m.buttonUris.rewindLevels[0]
 
   'increase the rewind speed
   else if m.VideoState = "rew"
@@ -927,15 +898,13 @@ Function handleRewind()
     else
       m.scrubAmt = 0
     end if
-    m.RewindButton.focusedUri = m.buttonUris.rewindLevelsFocus[m.scrubAmt]
-    m.RewindButton.unfocusedUri = m.buttonUris.rewindLevels[m.scrubAmt]
+    m.RewindButton.uri = m.buttonUris.rewindLevels[m.scrubAmt]
 
   'start the rewind
   else
     beginScrub()
     m.VideoState = "rew"
-    m.RewindButton.focusedUri = m.buttonUris.rewindLevelsFocus[0]
-    m.RewindButton.unfocusedUri = m.buttonUris.rewindLevels[0]
+    m.RewindButton.uri = m.buttonUris.rewindLevels[0]
   end if
 
   setFocusedButton(m.RewindButton, true)
@@ -1020,8 +989,7 @@ Function jumpToPosition(position)
   m.Video.seek = position
   m.VideoState = "play"
 
-  m.PlayPauseButton.focusedUri = m.buttonUris.pauseFocus
-  m.PlayPauseButton.unfocusedUri = m.buttonUris.pause
+  m.PlayPauseButton.uri = m.buttonUris.pause
 End Function
 
 

@@ -7,8 +7,8 @@ Function init()
   m.newBackgroundAnimation = invalid
   m.oldTransitionOut = invalid
   m.currentBackgroundType = invalid
-  m.unblurredDefaultBackground = "pkg:/images/non-blurred-default-background.jpg"
-  m.blurredDefaultBackground = "pkg:/images/grid-default-blurred.jpg"
+  ' m.unblurredDefaultBackground = "pkg:/images/sign-in-background.png"
+  m.blurredDefaultBackground = m.global.constants.ui.uris.defaultBackground
   m.imageIndex = 0
 
   m.timer = CreateObject("roSGNode", "Timer")
@@ -34,9 +34,14 @@ Function updateBackground()
     'we have a roku model that can handle images fading without getting clunky and stuck
     if m.top.newBackgroundType <> m.currentBackgroundType
       'we are creating a new gradient overlay and updating the background image
-      'ie. moving from the category screen to details screen or vice versa
+      'ie. moving from a fullscreen background to a topright background or vice versa
       m.currentBackgroundType = m.top.newBackgroundType
       m.timer.unobserveField("fire")
+
+      'cases
+      '1) category screen topright to category screen fullscreen(no gradient)
+      '2) category screen topright to details screen fullscreen(gradient)
+      '3) details screen fullscreen(gradient) to category screen topright
       
       'remove any background nodes that might be still transitioning when we want to start our new transition
       while m.top.getChildCount() > 1
@@ -46,6 +51,7 @@ Function updateBackground()
         m.top.removeChildIndex(0)
       end while
 
+      'identify the animation node for transitioning out the old background image
       m.oldTransitionOut = invalid
       if m.top.getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages") <> invalid and m.top.getChild(0).findNode("BackgroundImages").getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex) <> invalid
         m.oldTransitionOut = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex).findNode("TransitionOut")
@@ -54,21 +60,24 @@ Function updateBackground()
       addNewBackground()
       posterGroup = invalid
 
+      'start transitioning out the old background image and the old gradient
       if m.oldTransitionOut <> invalid and m.top.getChild(0) <> invalid and m.top.getChild(0).findNode("GradientFadeOut") <> invalid
         m.oldTransitionOut.control = "start"
         m.top.getChild(0).findNode("GradientFadeOut").control = "start"
       end if
 
-
+      'identify the new poster group
       lastAddedPoster = m.top.getChildCount() - 1
       if m.top.getChild(lastAddedPoster) <> invalid and m.top.getChild(lastAddedPoster).findNode("BackgroundImages") <> invalid and m.top.getChild(lastAddedPoster).findNode("BackgroundImages").getChild(0) <> invalid
         posterGroup = m.top.getChild(lastAddedPoster).findNode("BackgroundImages").getChild(0).getChild(0)
       end if
 
+      'start transition in of new poster group (or start listening for the new poster to be loaded)
       if posterGroup <> invalid
         m.newBackgroundPoster = posterGroup.findNode("BackgroundPoster")
         
         if m.newBackgroundPoster.uri = m.blurredDefaultBackground
+          m.top.getChild(lastAddedPoster).findNode("BackgroundGradient").opacity = 0.0
           m.newBackgroundAnimation = posterGroup.findNode("FadeInOnly")
         else
           m.newBackgroundAnimation = posterGroup.findNode("TransitionIn")
@@ -117,6 +126,7 @@ Function updateBackground()
 
       m.oldTransitionOut = invalid
       if m.top.getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages") <> invalid
+        'transition out the old background
         if m.top.getChild(0).findNode("BackgroundImages").getChild(0) <> invalid and m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex) <> invalid
           m.oldTransitionOut = m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(m.imageIndex).findNode("TransitionOut")
 
@@ -125,6 +135,7 @@ Function updateBackground()
           end if
         end if
 
+        'transition in the new background if ready
         if  m.top.getChild(0).findNode("BackgroundImages").getChild(1) <> invalid
           posterGroup = m.top.getChild(0).findNode("BackgroundImages").getChild(1).getChild(0)
 
@@ -164,17 +175,17 @@ Function setUpBackground()
   TubiLog("BackgroundGroup.setUpBackground")
   m.currentBackgroundType = m.top.newBackgroundType
 
-  'pre load the blurred default background in case it doesn't exist
-  'addNewBackground() needs a non empty backgroundUriList to work properly
-  m.top.backgroundUriList = [m.unblurredDefaultBackground]
+  ' 'pre load the blurred default background in case it doesn't exist
+  ' 'addNewBackground() needs a non empty backgroundUriList to work properly
+  ' m.top.backgroundUriList = [m.unblurredDefaultBackground]
 
-  'set the unblurred background and make it visible
-  addNewBackground(true)
+  ' 'set the unblurred background and make it visible
+  ' addNewBackground(true)
 
-  if m.top.getChild(0) <> invalid
-    m.top.getChild(0).findNode("BackgroundGradient").opacity = 1.0
-    m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(0).findNode("BackgroundPoster").opacity = 1.0
-  end if
+  ' if m.top.getChild(0) <> invalid
+  '   m.top.getChild(0).findNode("BackgroundGradient").opacity = 1.0
+  '   m.top.getChild(0).findNode("BackgroundImages").getChild(0).getChild(0).findNode("BackgroundPoster").opacity = 1.0
+  ' end if
 
   m.top.backgroundUriList = [m.blurredDefaultBackground]
 
@@ -185,17 +196,18 @@ End Function
 
 Function addNewBackground(isIntro=false as Boolean)
   'we have a new background type, so we need to switch out the whole background including the gradient
-  if isIntro = true
-    newBackground = CreateObject("roSGNode", "GridBackground")
-    posterType = "DetailsPoster"
+  ' if isIntro = true
+  '   newBackground = CreateObject("roSGNode", "TopRightBackground")
+  '   posterType = "FullscreenPoster"
 
-  else if m.top.newBackgroundType = "grid"
-    newBackground = CreateObject("roSGNode", "GridBackground")
-    posterType = "GridPoster"
+  ' else if m.top.newBackgroundType = "topright"
+  if m.top.newBackgroundType = "topright"
+    newBackground = CreateObject("roSGNode", "TopRightBackground")
+    posterType = "ToprightPoster"
   
-  else if m.top.newBackgroundType = "details"
-    newBackground = CreateObject("roSGNode", "DetailsBackground")
-    posterType = "DetailsPoster"
+  else if m.top.newBackgroundType = "fullscreen"
+    newBackground = CreateObject("roSGNode", "FullScreenBackground")
+    posterType = "FullscreenPoster"
 
   else
     return false
@@ -221,10 +233,10 @@ End Function
 
 
 Function addNewImageList()
-  if m.top.newBackgroundType = "grid"
-    posterType = "GridPoster"
-  else if m.top.newBackgroundType = "details"
-    posterType = "DetailsPoster"
+  if m.top.newBackgroundType = "topright"
+    posterType = "ToprightPoster"
+  else if m.top.newBackgroundType = "fullscreen"
+    posterType = "FullscreenPoster"
   else
     return false
   end if
@@ -320,7 +332,7 @@ Function rotateBackgrounds()
 End Function
 
 
-'runs when a user selects to "Sign In" from the category screen. 
+'runs when a user selects to "Sign in" from the category screen. 
 'Since this will take us to the sign up flow we want to set up a clean start for when we return
 Function setUnblurred()
   TubiLog("BackgroundGroup.setUnblurred")
@@ -343,12 +355,12 @@ End Function
 
 
 Function addLowMemBackground()
-  if m.top.newBackgroundType = "grid"
-    newBackground = CreateObject("roSGNode", "GridBackground")
-    newBackground.findNode("BackgroundImages").createChild("Group").createChild("GridPoster")
-  else if m.top.newBackgroundType = "details"
-    newBackground = CreateObject("roSGNode", "DetailsBackground")
-    newBackground.findNode("BackgroundImages").createChild("Group").createChild("DetailsPoster")
+  if m.top.newBackgroundType = "topright"
+    newBackground = CreateObject("roSGNode", "TopRightBackground")
+    newBackground.findNode("BackgroundImages").createChild("Group").createChild("ToprightPoster")
+  else if m.top.newBackgroundType = "fullscreen"
+    newBackground = CreateObject("roSGNode", "FullScreenBackground")
+    newBackground.findNode("BackgroundImages").createChild("Group").createChild("FullscreenPoster")
   end if
 
   poster = newBackground.findNode("BackgroundPoster")
@@ -368,7 +380,7 @@ Function updateLowMemBackground()
   backgroundImage = m.top.getChild(0).findNode("BackgroundPoster")
   backgroundGradient = m.top.getChild(0).findNode("BackgroundGradient")
 
-  if m.top.newBackgroundType = "grid"
+  if m.top.newBackgroundType = "topright"
     if backgroundGradient.uri <> "pkg:/images/home-gradient-25.png"
       backgroundImage.visible = false
       backgroundGradient.uri = "pkg:/images/home-gradient-25.png"
@@ -378,13 +390,13 @@ Function updateLowMemBackground()
       backgroundImage.loadHeight="909"
       backgroundImage.height="909"
       backgroundImage.translation="[305,0]"
-      uri="pkg:/images/grid-default-blurred.jpg"
+      uri="pkg:/images/art-blur-background.jpg"
       backgroundImage.visible = true
     else
       backgroundImage.uri = m.top.backgroundUriList[0]
     end if
 
-  else if m.top.newBackgroundType = "details"
+  else if m.top.newBackgroundType = "fullscreen"
     if backgroundGradient.uri <> "pkg:/images/detail-gradient-25.png"
       backgroundImage.visible = false
       backgroundGradient.uri = "pkg:/images/detail-gradient-25.png"

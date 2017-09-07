@@ -98,11 +98,46 @@
       notificationInterval="1"
       visible="true" />
 
-    <Spinner
-      id="BufferSpinner"
-      visible="false"
-      width="1920"
-      height="1080"/>
+    <Group
+      id="Loading"
+      visible="false">
+      <Poster
+        id="BackgroundGradient"
+        uri="pkg:/images/art-blur-background.png"
+        width="1920"
+        height="1080"
+        loadSync="true"/>
+      <LayoutGroup
+        layoutDirection="horiz"
+        translation="[88,69]">
+        <Label
+          height="64"
+          vertAlign="center"
+          color="0xff501aff"
+          text="Loading">
+          <Font
+            id="Vaud34px"
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="34"/>
+        </Label>
+        <Label
+          height="64"
+          vertAlign="center"
+          text=" &#xB7; Your title will begin shortly">
+          <Font
+            id="Vaud34px"
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="34"/>
+        </Label>
+      </LayoutGroup>
+      <Spinner
+        id="BufferSpinner"
+        visible="false"
+        width="1920"
+        height="1080"/>
+    </Group>
 
     <Group
       id="AdHeadsUp"
@@ -144,7 +179,7 @@
         <Label
           height="66"
           vertAlign="center"
-          color="0xFF9933FF"
+          color="0xff501aff"
           text="   break">
           <Font
             id="Vaud34px"
@@ -320,7 +355,7 @@
           height="80"
           uri=""
           unfocusedUri=""
-          focusedUri="pkg:/images/transport/sgplayer/skip-trailer-button.png"
+          focusedUri=""
           loadSync="true"
           translation="[85,949]" >
           <Label
@@ -337,8 +372,6 @@
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-to-start.png"
-          unfocusedUri="pkg:/images/transport/sgplayer/icon-to-start.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-to-start-focus.png"
           loadSync="true"
           translation="[540,958]" />
         <TransportButton
@@ -346,8 +379,6 @@
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-rew.png"
-          unfocusedUri="pkg:/images/transport/sgplayer/icon-rew.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-rew-focus.png"
           loadSync="true"
           translation="[670,958]" />
         <TransportButton
@@ -355,8 +386,6 @@
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
-          unfocusedUri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-rew-30s-focus.png"
           loadSync="true"
           translation="[800,958]" />
         <!-- play/pause uri will update based on playing state of video -->
@@ -365,8 +394,6 @@
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-play.png"
-          unfocusedUri="pkg:/images/transport/sgplayer/icon-play.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-play-focus.png"
           loadSync="true"
           translation="[930,958]" />
         <TransportButton
@@ -374,8 +401,6 @@
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
-          unfocusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-fwd-30s-focus.png"
           loadSync="true"
           translation="[1060,958]" />
         <TransportButton
@@ -383,8 +408,6 @@
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-ffw.png"
-          unfocusedUri="pkg:/images/transport/sgplayer/icon-ffw.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-ffw-focus.png"
           loadSync="true"
           translation="[1190,958]" />
         <TransportButton
@@ -392,8 +415,6 @@
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-to-end.png"
-          unfocusedUri="pkg:/images/transport/sgplayer/icon-to-end.png"
-          focusedUri="pkg:/images/transport/sgplayer/icon-to-end-focus.png"
           loadSync="true"
           translation="[1320,958]" />
         <TransportButton
@@ -401,8 +422,6 @@
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/cc-icon.png"
-          unfocusedUri="pkg:/images/transport/sgplayer/cc-icon.png"
-          focusedUri="pkg:/images/transport/sgplayer/cc-icon-focus.png"
           loadSync="true"
           translation="[1697,958]" >
             <Poster

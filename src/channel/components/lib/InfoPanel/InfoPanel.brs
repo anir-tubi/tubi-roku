@@ -190,7 +190,6 @@ Function onModeChange()
   else if m.top.mode = "episode" then
     m.offset.appendChild(m.Title)
     m.offset.appendChild(m.Episode)
-    m.offset.appendChild(m.TwoLineInfo)
     m.offset.appendChild(m.Description)
     m.offset.itemSpacings = [26, 25, 30]
   end if

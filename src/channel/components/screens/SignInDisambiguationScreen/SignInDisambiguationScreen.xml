@@ -42,17 +42,18 @@
         id="HeroShade"
         width="1920"
         height="1080"
-        uri="pkg:/images/sign-in-disambiguation-mask-480x270.png"
+        uri="pkg:/images/art-blur-background.png"
         loadSync="true"
+        opacity="0.9"
         translation="[0,0]"/>
     </Group>
     <Poster
       id="Logo"
-      uri="pkg:/images/logo.png"
-      width="286"
-      height="82"
+      uri="pkg:/images/logo-white-large.png"
+      width="206"
+      height="90"
       loadSync="true"
-      translation="[816,360]"/>
+      translation="[857,351]"/>
     
     <RotatingLabel
       id="Slogan"
@@ -70,11 +71,11 @@
       layoutDirection="horiz"
       translation="[450,720]"
       height="80"
-      width="986"
+      width="1020"
       itemComponentName="SignInButton"
-      itemSpacings="[26]">
+      itemSpacings="[60]">
       <ContentNode role="content">
-        <ContentNode id="signin" title="Sign In or Register Free"/>
+        <ContentNode id="signin" title="Sign in or Register Free"/>
         <ContentNode id="guestpass" title="Guest Pass"/>
       </ContentNode>
     </ScrollingList>

@@ -114,6 +114,7 @@ Function showTools(show)
   if show and not m.ToolsMenu.isInFocusChain()
     ' show
     slideFade(m.ToolsMenu, "above", "in", 0.4)
+    m.top.backgroundType = "fullscreen"
     m.top.backgroundUriList = m.ToolsMenu.backgroundUriList
     m.focusTarget = m.ToolsMenu
   else if not show and m.ToolsMenu.isInFocusChain()
@@ -154,6 +155,7 @@ Function showCategoryScreen(show)
   if show and not m.CategoryScreen.isInFocusChain()
     animate(m.CategoryScreen, {destination: [0, 0], opacity: 1.0, duration: 0.4})
     m.CategoryScreen.infoVisible = true
+    m.top.backgroundType = "topright"
     m.top.backgroundUriList = m.CategoryScreen.backgroundUriList
     m.focusTarget = m.CategoryScreen
   else if not show and m.CategoryScreen.isInFocusChain()
@@ -174,7 +176,10 @@ End Function
 
 Function onCategoryBackgroundChange()
   tubiLog("HomeScreen.onCategoryBackgroundChange")
-  if m.CategoryScreen.isInFocusChain() then m.top.backgroundUriList = m.CategoryScreen.backgroundUriList
+  if m.CategoryScreen.isInFocusChain() then
+    m.top.backgroundType = "topright"
+    m.top.backgroundUriList = m.CategoryScreen.backgroundUriList
+  end if
 End Function
 
 Function onCategoryContentSelected()
