@@ -57,6 +57,7 @@
         width="875"
         wrap="true"
         maxLines="1"
+        color="0xFFFFFFFF"
         vertAlign="bottom">
         <Font
           id="TitleFont"
@@ -159,6 +160,7 @@
         lineSpacing="16"
         maxLines="5"
         wrap="true"
+        color="0xFFFFFFFF"
         font="dictionary:Vaud27px" />
 
       <LayoutGroup
@@ -188,6 +190,7 @@
         <Label
           id="Director"
           font="dictionary:Vaud27px"
+          color="0xFFFFFFFF"
           ellipsizeOnBoundary="true"
           width="710"        
           visible="true" />
@@ -219,6 +222,7 @@
         <Label
           id="Starring"
           font="dictionary:Vaud27px"
+          color="0xFFFFFFFF"
           ellipsizeOnBoundary="true"
           width="710"
           visible="true" />

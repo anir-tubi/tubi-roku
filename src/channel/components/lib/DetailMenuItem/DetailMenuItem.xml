@@ -42,6 +42,7 @@
      vertAlign="center"
      horizAlign="left" 
      height="80"
+     color="0xFFFFFFFF"
      opacity="1.0">
       <Font
        role="font"
