@@ -42,7 +42,7 @@
       loadSync="true"
       width="1920"
       height="1080"
-      uri="pkg:/images/splash-1920.jpg"/>
+      uri="pkg:/images/splash-fhd.png"/>
 
   </children>
 
