@@ -126,6 +126,7 @@ Function onRegister()
   m.RegisterInstructions = CreateObject("roSGNode", "RegisterInstructionsScreen")
   m.RegisterInstructions.observeField("registerSuccess", "onRegisterSuccess")
   m.RegisterInstructions.observeField("signInButtonPressed", "onSignIn")
+  m.RegisterInstructions.observeField("skipButtonPressed", "onContinueGuestPass")
   pushScreen(m.RegisterInstructions)
 End Function
 

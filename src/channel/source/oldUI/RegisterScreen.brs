@@ -986,23 +986,21 @@ function RegisterScreen(uniqueId, utils)
                     else
                       if codeRetryCount <= 3
                         webRegAsyncId = m.utils.sendAsyncRequest(webRegUrlGetCode, webRegPort, "webRegistration", "POST", true, getCodeBodyJson, getCodeHeaders)
+                        codeRetryCount = codeRetryCount + 1
+                      else
+                        m.showMessage("We're sorry", "Could not get code from server.")
                         
                         m.utils.trackEvent({
                           trackType: "registerFail"
                           value: "bad-server-response-code"
                           port: webRegPort
                         })
-
-                        codeRetryCount = codeRetryCount + 1
-                      else
                         m.utils.trackEvent({
                           trackType: "navigate"
                           value: "/home"
                           ctx: "/deviceregistration/code"
                           port: webRegPort
                         })
-
-                        m.showMessage("We're sorry", "Could not get code from server.")
                         webRegScreen.Close()
                         return false
                       end if

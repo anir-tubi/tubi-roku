@@ -166,6 +166,7 @@ function tubiTracking_getTrackData(eventType as String, value=0 as Dynamic, ctx=
     registerFail: {
       value: value
       key: "register_device_fail"
+      ctx: ctx
     }
     registerSuccess: {
       value: "/deviceregistration/code"

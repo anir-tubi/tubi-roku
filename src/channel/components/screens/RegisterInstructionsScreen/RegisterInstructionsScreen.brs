@@ -4,7 +4,6 @@ Function init()
   m.ButtonGroup.setFocus(true)
   m.ButtonGroup.observeField("itemSelected", "onButtonSelected")
   m.RegistrationCode = m.top.findNode("RegistrationCode")
-  m.exitedScreen = false
   getRegistrationCode()
 End Function
 
@@ -16,7 +15,6 @@ End Function
 Function onScreenFocusChange()
   tubiLog("RegisterInstructionsScreen.onScreenFocusChange")
   if m.top.hasFocus() then
-    m.exitedScreen = false
     m.ButtonGroup.setFocus(true)
   end if
 End Function
@@ -34,7 +32,6 @@ Function onButtonSelected()
   else if button.id = "sign-in" then
     m.top.signInButtonPressed = true
     m.RegCodeTask.cancel = true
-    m.exitedScreen = true
   end if
 End Function
 
@@ -59,19 +56,41 @@ Function onRegistrationResponse()
 End Function
 
 
-'''''''''''''''''''''''
-' onRegTaskStateChange
+'''''''''''''''''''''''''
+' onRegTaskError
 '
-' This may be called if 
-'    a) The polling expiration was reached
-'    b) An API error was encountered
-Function onRegTaskStateChange()
-  tubiLog("RegisterInstructionsScreen.onRegTaskStateChange; state = " + m.RegCodeTask.state)
-  if m.RegCodeTask.state = "stop" then
-    if (m.RegCodeTask.response = invalid or m.RegCodeTask.response.status <> "registered") and not m.exitedScreen then
-      'Just retry the reg code
-      getRegistrationCode()
-    end if
+' An error was recorded by the registrationCodeTask so let the user know
+Function onRegTaskError(evt)
+  message = "We're sorry a connection error occurred."
+  if evt.getData() = "poll"
+    message = "We're sorry, we could not connect with the server to see if you registered your device."
+  else if evt.getData() = "code"
+    message = "We're sorry, there was an error while receiving the code from the server."
+  end if
+  m.errorDialog = m.top.createChild("ModalDialogScreen")
+  m.errorDialog.title = "Connection Error During Registration"
+  m.errorDialog.message = message
+  m.errorDialog.buttons = ["Try again", "Skip"]
+  m.errorDialog.observeField("buttonSelected", "onErrorButtonPress")
+  m.errorDialog.setFocus(true)
+End Function
+
+
+'''''''''''''''''''''''''
+' onErrorButtonPress
+'
+' Respond the user selecting a button on the error modal
+Function onErrorButtonPress(evt)
+  buttonSelected = evt.getData()
+  m.top.removeChild(m.errorDialog)
+  m.errorDialog.unobserveField("buttonSelected")
+  if buttonSelected = 0
+    'try again
+    getRegistrationCode()
+  else
+    'leave the screen and go to homepage
+    m.RegCodeTask.cancel = true
+    m.top.skipButtonPressed = true
   end if
 End Function
 
@@ -79,8 +98,6 @@ End Function
 '''''''''''''''''''''''
 ' getRegistrationCode
 '
-' TODO(Chris): Cancel outstanding threads polling when this screen closes.  This will happen
-' when the user presses "back" button and re-enters this screen
 Function getRegistrationCode()
   tubiLog("RegisterInstructionsScreen.getRegistrationCode")
   m.RegistrationCode.text = "------"
@@ -88,13 +105,13 @@ Function getRegistrationCode()
     m.top.removeChild(m.RegCodeTask)
     m.RegCodeTask.unobserveField("code")
     m.RegCodeTask.unobserveField("response")
-    m.RegCodeTask.unobserveField("state")
+    m.RegCodeTask.unobserveField("error")
     m.RegCodeTask.cancel = true  ' tell the thread to exit
   end if
   m.RegCodeTask = m.top.createChild("RegistrationCodeTask")
   m.RegCodeTask.observeField("code", "onCodeChange")
   m.RegCodeTask.observeField("response", "onRegistrationResponse")
-  m.RegCodeTask.observeField("state", "onRegTaskStateChange")
+  m.RegCodeTask.observeField("error", "onRegTaskError")
   m.RegCodeTask.control = "RUN"
 End Function
 
@@ -104,7 +121,11 @@ Function onKeyEvent(key As String, press As Boolean)
     if key = "back"
       'leaving page so stop polling
       m.RegCodeTask.cancel = true
-      m.exitedScreen = true
+
+      m.global.trackingLoggingTask.trackEvent = {
+        trackType: "registerFail"
+        value: "user-cancel"
+      }
       return false
     end if
   end if

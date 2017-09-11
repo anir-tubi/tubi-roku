@@ -19,7 +19,6 @@
 <component name="ErrorController" extends="Scene">
 
   <script type="text/brightscript" uri="pkg:/components/controllers/ErrorController/ErrorController.brs" />
-  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   
   <interface>
     <!--

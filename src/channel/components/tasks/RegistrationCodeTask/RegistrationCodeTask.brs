@@ -6,6 +6,8 @@ Function registrationLoop() As Void
   tubiLog("RegistrationCodeTask.registrationLoop")
   constants = m.global.constants 'single thread-local reference to avoid thread rendevue
   Request = TubiRequest()
+  pollFailureCount = 0
+  maxConsecPollFailures = m.top.maxConsecPollFailures
   
   ' Get Registration code
   url = constants.urls.users.urlBase + "/code/generate"
@@ -40,11 +42,26 @@ Function registrationLoop() As Void
             tubiLog("Received activation code: " + parsed.activation_code)
             exit while
           else
+            'received a valid response but it didn't have any json or the json didn't contain a code
             tubiLog("Bad response generating reg code")
+            m.global.trackingLoggingTask.trackEvent = {
+              trackType: "registerFail"
+              value: "bad-server-response-nocode"
+              ctx: result.response.code
+            }
+            m.top.error = "code"
             return  ' bad response didn't have a reg code
           end if
         else
+          'didn't receive a valid response when requesting a code
           tubiLog("Reg code generation failed " + stri(result.response.code))
+          'this event will only fire once per attempt to get code, not on every retry like the oldui code did
+          m.global.trackingLoggingTask.trackEvent = {
+            trackType: "registerFail"
+            value: "bad-server-response-code"
+            ctx: result.response.code
+          }
+          m.top.error = "code"
           return 
         end if
       else
@@ -92,34 +109,52 @@ Function registrationLoop() As Void
             parsed = ParseJSON(result.response.data)
             if parsed <> invalid and parsed.status <> invalid then
               tubiLog("Poll status = " + parsed.status)
-              if parsed.status = "registered" then 
+              if parsed.status = "registered" then   ' status may be "pending" or "registered"
                 auth = TubiAuth(constants, Request)
                 ' persist the registration information before we notify the scene graph
                 auth.handleRegistration(parsed)
-                m.top.response = parsed  ' status may be "pending" or "registered"
+                m.top.response = parsed
                 m.global.trackingLoggingTask.trackEvent = {
                   trackType: "registerSuccess"
                 }  
                 return  ' end the thread
               else
-                m.top.response = parsed  ' status may be "pending" or "registered"
+                m.top.response = parsed  ' status should be "pending" at this point
+                pollFailureCount = 0
                 exit while  ' pop out to outer while loop
               end if
             else
+              'we got a polling response but either no json attached or no value for the status key
               tubiLog("Bad response polling reg code status")
               m.global.trackingLoggingTask.trackEvent = {
                 trackType: "registerFail"
                 value: "bad-response-status"
               }              
-              return
+              pollFailureCount = pollFailureCount + 1
+              if pollFailureCount >= maxConsecPollFailures
+                m.top.error = "poll"
+                return
+              else
+                'this polling attempt failed but we can continue polling,
+                'so exit to outer while loop and send a new polling request
+                exit while
+              end if
             end if
           else
             tubiLog("Reg code polling failed " + stri(result.response.code))
             m.global.trackingLoggingTask.trackEvent = {
               trackType: "registerFail"
-              value: "polling-response-failure"
-            }            
-            return 
+              value: "bad-server-response-poll"
+            }
+            pollFailureCount = pollFailureCount + 1
+            if pollFailureCount >= maxConsecPollFailures
+              m.top.error = "poll"
+              return
+            else
+              'this polling attempt failed but we can continue polling,
+              'so exit to outer while loop and send a new polling request 
+              exit while
+            end if
           end if
         else
           ' no response available yet, keep waiting
@@ -131,5 +166,11 @@ Function registrationLoop() As Void
       end if
     end while
   end while
+
+  'we haven't exited the while loop by returning out of the function so we must have hit the expiration timeout
+  m.global.trackingLoggingTask.trackEvent = {
+    trackType: "registerFail"
+    value: "code-user-timeout"
+  }
 
 End Function

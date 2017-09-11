@@ -14,6 +14,7 @@
     <field id="registerSuccess" type="boolean" value="false" alwaysNotify="true"/>
 
     <field id="signInButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
+    <field id="skipButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
 
     <!-- keeps the uri used for user tracking -->
     <field id="trackingUri" type="string"  value="/login-choice/code" />
