@@ -537,19 +537,31 @@ end function
 
 'Populate a playlist/row with all the content needed to load that row
 function Gridscreen_populatePlaylistWithEpisodes(playlist)
+  retries = 0
   colNum = 0
   episodes = []
 
   'get all videos/shows for a category/playlist/row
   while true
+    'this will make the call to the server to get the content for the playlist if the playlist doesn't have content yet
+    'typically this only happens when colNum = 0, but if there is an error on the first call, it can happen on subsequent calls as well
     episode = m.cp.getEpisodeInPlaylist(playlist, colNum)
+
     if episode = invalid
       exit while
-    else
+    else if episode.count() > 1
       episodes.push(episode)
+      colNum = colNum + 1
+      retries = 0
+    else
+      'empty episode due to an error getting the contents for the playlist
+      if retries <= 9
+        retries = retries + 1
+      else
+        exit while
+      end if
     end if
 
-    colNum = colNum + 1
   end while
   return episodes
 end function
