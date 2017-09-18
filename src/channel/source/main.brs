@@ -28,7 +28,6 @@ Function Main(startupArgs as Dynamic)
     end if
   end if
 
-  constants.deviceInfo.newUi = true
   if constants.deviceInfo.newUi = true
     MainNewUI(startupArgs, constants)
   else
