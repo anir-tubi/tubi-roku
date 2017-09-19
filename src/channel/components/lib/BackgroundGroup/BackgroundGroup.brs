@@ -395,7 +395,7 @@ Function updateLowMemBackground()
       backgroundImage.loadHeight="909"
       backgroundImage.height="909"
       backgroundImage.translation="[305,0]"
-      uri="pkg:/images/art-blur-background.jpg"
+      uri="pkg:/images/art-blur-background.png"
       backgroundImage.visible = true
     else
       backgroundImage.uri = m.top.backgroundUriList[0]

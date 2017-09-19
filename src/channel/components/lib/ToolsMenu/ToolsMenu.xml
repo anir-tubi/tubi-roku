@@ -31,7 +31,7 @@
     <!-- will be used to change the background images on the content controller -->
     <field id="backgroundUriList" 
            type="stringarray" 
-           value="[&quot;pkg:/images/art-blur-background.jpg&quot;]"
+           value="[&quot;pkg:/images/art-blur-background.png&quot;]"
            alwaysNotify="true" />
 
     <!-- observed by HomeScreen for navigating between screens -->

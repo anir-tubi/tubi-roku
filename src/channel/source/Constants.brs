@@ -403,7 +403,7 @@ Function getConstants()
       constants.ui.uris.detailBackgroundGradient = "pkg:/images/detail-gradient-25.png"
 
       'default background image uri
-      constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.jpg"
+      constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.png"
 
     constants.ui.colors = {}
       'template colors
