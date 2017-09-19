@@ -189,8 +189,12 @@ Function setUpBackground()
 
   m.top.backgroundUriList = [m.blurredDefaultBackground]
 
-  'set the blurred background - opacity is still 0 at this point
-  addNewImageList()
+  if m.global.constants.deviceInfo.limitedNewUi = true
+    addLowMemBackground()
+  else
+    'set the blurred background - opacity is still 0 at this point
+    addNewImageList()
+  end if
 End Function
 
 
@@ -355,6 +359,7 @@ End Function
 
 
 Function addLowMemBackground()
+  TubiLog("BackgroundGroup.addLowMemBackground")
   if m.top.newBackgroundType = "topright"
     newBackground = CreateObject("roSGNode", "TopRightBackground")
     newBackground.findNode("BackgroundImages").createChild("Group").createChild("ToprightPoster")
