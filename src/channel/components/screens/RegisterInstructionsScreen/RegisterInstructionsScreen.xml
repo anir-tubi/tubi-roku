@@ -51,7 +51,7 @@
     </Label> 
            
     <Label
-      text="tubitv.com/activate"
+      text="tubi.tv/activate"
       translation="[0,481]"
       horizAlign="center"
       width="1920"
