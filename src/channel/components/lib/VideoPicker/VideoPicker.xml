@@ -38,7 +38,7 @@
       visible="true"
       translation="[0,0]"
       itemSpacing="[10,10]"
-      posterBounds="[0,0,1920,300]"
+      posterBounds="[0,0,1920,310]"
       scrollBounds="[85,0,515,300]"
       itemSize="[430,256]"
       playIsSelect="false"
