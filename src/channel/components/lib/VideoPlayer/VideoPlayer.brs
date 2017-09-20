@@ -43,7 +43,7 @@ Function init()
   m.top.observeField("playlist", "onPlaylistChange")
   m.top.observeField("seekPlaylist", "onSeekPlaylist")
   m.top.observeField("focusedChild", "onComponentFocusChange")
-  m.top.observeField("docked", "onDockedChange")
+  m.top.observeField("dock", "onDockedChange")
   m.top.observeField("showTransport", "onShowTransport")
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
@@ -129,10 +129,15 @@ Function onComponentFocusChange()
 End Function
 
 Function onDockedChange()
-  if m.top.docked
+  if m.top.dock
     ' immediately hide all HUD components
     m.Overlay.opacity = 0.0
     m.HUD.opacity = 0.0
+    m.Loading.visible = false
+    m.Spinner.visible = false
+    m.top.isDocked = true
+  else
+    m.top.isDocked = false
   end if
 End Function
 

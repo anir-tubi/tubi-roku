@@ -37,6 +37,8 @@
 
     <!-- WRITE-ONLY field which hides overlay and transport.  This is not a persistent state -->
     <field id="dock" type="boolean" value="false" alwaysNotify="true"/>
+    <!-- READ-ONLY field which indicates the current state of the player with respect to being docked -->
+    <field id="isDocked" type="boolean" value="false" />
     
     <field id="width" alias="VideoNode.width"/>
     <field id="height" alias="VideoNode.height"/>
