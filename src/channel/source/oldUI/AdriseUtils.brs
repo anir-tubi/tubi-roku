@@ -1240,20 +1240,29 @@ function adriseUtils_sluggify(preSlug as string)
   'remove any leading/trailing white space
   slug = slug.trim()
 
-  'replace spaces with hyphens
+  'replace spaces with underscore
   while slug.Instr(0, "  ") >= 0
     slug.Replace("  ", " ")
   end while
-  slug = slug.Replace(" ", "-")
-  slug = slug.Replace("&", "-and-")
+  slug = slug.Replace(" ", "_")
 
-  'remove any characters that aren't lower case letters, numbers or hyphens
+  'replace special characters
+  slug = slug.Replace("&", "and")
+  slug = slug.Replace("-", "_")
+  slug = slug.Replace("ñ", "n")
+  slug = slug.Replace("á", "a")
+  slug = slug.Replace("é", "e")
+  slug = slug.Replace("í", "i")
+  slug = slug.Replace("ó", "o")
+  slug = slug.Replace("ú", "u")
+
+  'remove any characters that aren't lower case letters, numbers or underscore
   regX = createObject("roRegex", "", "i")
   slugTokens = regX.split(slug)
   finalSlug = ""
   for i=0 to slugTokens.count()-1 step 1
     char = slugTokens[i]
-    if (Asc(char) >= 48 and Asc(char) <= 57) or (Asc(char) >= 97 and Asc(char) <= 122) or Asc(char) = 45
+    if (Asc(char) >= 48 and Asc(char) <= 57) or (Asc(char) >= 97 and Asc(char) <= 122) or Asc(char) = 95
       finalSlug = finalSlug + char
     end if
   end for

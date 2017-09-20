@@ -302,14 +302,12 @@ function GridScreen (utils)
             selItem.itemIndex = msg.GetData()
             playlist = playlists[selItem.listIndex]
             if playlist <> invalid
-              ' m.utils.trackEvent({
-              '   trackType: "navigateInPage"
-              '   value: m.focusCount
-              '   ctx: "/home/" + (selItem.listIndex + 1).toStr() + "/cat/" + m.utils.sluggify(playlist.name) + "/1/" + (selItem.itemIndex + 1).toStr()
-              '   port: msgPort
-              ' })
-              
-
+              m.utils.trackEvent({
+                trackType: "navigateInPage"
+                value: m.focusCount
+                ctx: "/home/" + (selItem.listIndex + 1).toStr() + "/cat/" + m.utils.sluggify(playlist.name) + "/1/" + (selItem.itemIndex + 1).toStr()
+                port: msgPort
+              })
             end if
 
           end if
