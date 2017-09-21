@@ -18,13 +18,6 @@ Function init()
   else
     m.VideoAndShade.visible = false
   end if
-
-  m.Slogan = m.top.findNode("Slogan")
-  m.Slogan.texts =  [
-    "100% free service"
-    "The largest collection of free movies and TV shows"
-    "Sign in or register free to manage your queue"
-  ]
 End Function
 
 

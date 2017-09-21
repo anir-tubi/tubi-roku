@@ -53,18 +53,33 @@
       width="206"
       height="90"
       loadSync="true"
-      translation="[857,351]"/>
+      translation="[857,311]"/>
     
-    <RotatingLabel
+    <LayoutGroup
       id="Slogan"
-      horizAlign="center"
       width="1920"
-      translation="[0,544]">
-      <Font
+      itemSpacings="[23]"
+      translation="[0,497]">
+      <Label
+        id="Slogan-line1"
+        text="Now playing. No paying."
+        width="1920"
+        horizAlign="center" >
+        <Font
+        id="Vaud43SemiBold"
         role="font"
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="43" />
-    </RotatingLabel>
+      </Label>
+      <Label
+        id="Slogan-line2"
+        text="100% Free."
+        width="1920"
+        horizAlign="center"
+        font="dictionary:Vaud43SemiBold">
+      </Label>
+
+    </LayoutGroup>
     
     <ScrollingList
       id="SignInOrGuestButtons"
