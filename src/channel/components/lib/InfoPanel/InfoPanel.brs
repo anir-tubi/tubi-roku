@@ -80,10 +80,10 @@ Function onContentChange()
     end if
 
     'add closed captions if they are available
-    if content.subtitleUrls = invalid or content.subtitleUrls.count() = 0
-      firstLineGroup.removeChild(m.ClosedCaptions)
-    else if content.subtitleUrls <> invalid and content.subtitleUrls.count() > 0
+    if content.subtitleTracks <> invalid and content.subtitleTracks.count() > 0
       firstLineGroup.insertChild(m.ClosedCaptions, 1)
+    else
+      firstLineGroup.removeChild(m.ClosedCaptions)
     end if
 
     if content.rating <> invalid and content.rating <> "" then

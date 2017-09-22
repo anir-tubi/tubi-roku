@@ -183,22 +183,15 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   'take care of any subtitles if they exist - should only happen on videos
   if contentFromServer.subtitles <> invalid and type(contentFromServer.subtitles) = "roArray" and contentFromServer.subtitles.count() > 0
-    subtitleLanguages = []
-    subtitleUrls = []
-
+    subtitleTracks = []
     for each subtitle in contentFromServer.subtitles
-      subtitleLanguages.push(subtitle.lang)
-      subtitleUrls.push(subtitle.url)
+      ' Firmware 8.0+ scene graph native CC dialog
+      subtitleTracks.push({
+        language: subtitle.lang
+        trackname: subtitle.url
+      })
     end for
-
-    translatedContent.subtitleLanguages = subtitleLanguages
-    translatedContent.subtitleUrls = subtitleUrls
-    
-    'set the default subtitles if there is only one set of subtitles
-    if contentFromServer.subtitles.count() = 1
-      translatedContent.subtitleDefault = contentFromServer.subtitles[0].url
-      translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles.[0].url}
-    end if
+    translatedContent.subtitleTracks = subtitleTracks
   end if
 
   'set the inital subtitle on/off state for the video

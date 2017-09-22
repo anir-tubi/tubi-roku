@@ -149,7 +149,7 @@ Function onContentChange() As Void
   if m.top.content = invalid then return
 
   'there are no subtitles so grey out the captions button
-  if m.top.content.subtitleUrls.count() = 0
+  if m.top.content.subtitleTracks = invalid or m.top.content.subtitleTracks.count() = 0
     m.TransportButtons.removeChild(m.ClosedCaption)
     m.ClosedCaptionDisabled.visible = true
   

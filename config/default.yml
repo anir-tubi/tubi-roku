@@ -47,13 +47,11 @@ manifest:
   bs_libs_required: roku_ads_lib
   ui_resolutions: "fhd"
   uri_resolution_autosub: "$$RES$$,sd,hd,fhd"
-  rsg_version: 1.0
 
 component_library_manifest:
   title: "Tubi TV Component Library"
   subtitle: "Remote loading for scenegraph components"
   sg_component_libs_provided: "TubiRemoteLibrary"
-  rsg_version: 1
   hidden: 1
 
 theme:

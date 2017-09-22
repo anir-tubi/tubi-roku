@@ -70,7 +70,12 @@ Function getConstants()
       "4640X": true    ' Ultra (TBD)
       "5000X": true    ' Roku TV
       "6000X": true    ' 4K Roku TV
+      "7000X": true    ' 4k Roku TV
     }
+    if firmwareVersionMajor >= 8 then
+      ' Firmware 8.0.0 added a system dialog for captions on Roku 4
+      firmwareCaptionMenuModels["4400X"] = true
+    end if
 
     if lowMemoryModels[di.GetModel()] <> invalid
       lowMemory = true
