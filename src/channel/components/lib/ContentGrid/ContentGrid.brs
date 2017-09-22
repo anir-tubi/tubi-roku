@@ -294,11 +294,15 @@ Function createItemComponent(index As Integer, content As Object, item As Object
 
   ' NOTE2: These need to be set before the uri fields or they'll have no effect
   if m.limitedNewUi
-    fields.append({
-      loadWidth: m.top.itemSize[0]
-      loadHeight: m.top.itemSize[1]
-      loadDisplayMode: "scaleToZoom"
-    })
+    if item.hasField("loadWidth") then
+      fields.loadWidth = m.top.itemSize[0]
+    end if
+    if item.hasField("loadHeight") then
+      fields.loadHeight = m.top.itemSize[1]
+    end if
+    if item.hasField("loadDisplayMode") then
+      fields.loadDisplayMode = "scaleToZoom"
+    end if
   end if
 
   ' Set non-content fields first so that they affect the images on load.  This order is required.
