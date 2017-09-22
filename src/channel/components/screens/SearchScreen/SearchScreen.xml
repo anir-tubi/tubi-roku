@@ -91,6 +91,7 @@
       translation="[85,409]"
       visible="false">
       <Spinner
+        id="SearchSpinner"
         width="66"
         height="66"/>
       <Label

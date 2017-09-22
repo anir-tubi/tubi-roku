@@ -12,6 +12,7 @@ Function init()
   m.InfoPanel = m.top.findNode("SearchInfoPanel")
   m.UpdatingMessage = m.top.findNode("UpdatingMessage")
   m.UpdatingMessageText = m.UpdatingMessage.findNode("SearchUpdatingText")
+  m.UpdatingSpinner = m.UpdatingMessage.findNode("SearchSpinner")
 
   m.TextEntryAnimation = m.top.findNode("TextEntryAnimation")
   m.TranslationInterpolator = m.top.findNode("TextEntryTranslationInterpolator")
@@ -220,4 +221,7 @@ Function loadSearchResults()
   m.global.metadataFetchTask.request = request
 
   m.UpdatingMessage.visible = true
+  if m.global.constants.deviceInfo.limitedNewUi = true
+    m.UpdatingSpinner.visible = false
+  end if
 End Function
