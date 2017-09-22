@@ -15,6 +15,7 @@ Function init()
   m.timer.duration = 3
 
   m.updateCount = 0
+  m._ = rodash()
 End Function
 
 
@@ -386,6 +387,7 @@ Function updateLowMemBackground()
   backgroundGradient = m.top.getChild(0).findNode("BackgroundGradient")
 
   if m.top.newBackgroundType = "topright"
+    backgroundGradient.visible = true
     if backgroundGradient.uri <> "pkg:/images/home-gradient-25.png"
       backgroundImage.visible = false
       backgroundGradient.uri = "pkg:/images/home-gradient-25.png"
@@ -395,14 +397,19 @@ Function updateLowMemBackground()
       backgroundImage.loadHeight="909"
       backgroundImage.height="909"
       backgroundImage.translation="[305,0]"
-      uri="pkg:/images/art-blur-background.png"
       backgroundImage.visible = true
-    else
+    else if not m._.empty(m.top.backgroundUriList)
       backgroundImage.uri = m.top.backgroundUriList[0]
     end if
 
   else if m.top.newBackgroundType = "fullscreen"
     if backgroundGradient.uri <> "pkg:/images/detail-gradient-25.png"
+      if m.top.backgroundUriList[0] = m.blurredDefaultBackground
+        backgroundGradient.visible = false
+      else
+        backgroundGradient.visible = true
+      end if
+
       backgroundImage.visible = false
       backgroundGradient.uri = "pkg:/images/detail-gradient-25.png"
       backgroundImage.uri = m.top.backgroundUriList[0]
@@ -412,7 +419,7 @@ Function updateLowMemBackground()
       backgroundImage.height="1080"
       backgroundImage.translation="[0,0]"
       backgroundImage.visible = true
-    else
+    else if not m._.empty(m.top.backgroundUriList)
       backgroundImage.uri = m.top.backgroundUriList[0]
     end if
   end if

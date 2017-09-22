@@ -237,8 +237,8 @@ Function onSignedInChange()
     loadUserCategories()
   else
     'If user logged out, don't track their history or queue
-    m.global.bookmarkIds = CreateObject("TubiContentNode")
-    m.global.historyIds = CreateObject("TubiContentNode")
+    m.global.bookmarkIds = CreateObject("roSGNode", "TubiContentNode")
+    m.global.historyIds = CreateObject("roSGNode", "TubiContentNode")
   end if
 End Function
 

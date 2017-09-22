@@ -57,7 +57,6 @@
     
     <LayoutGroup
       id="Slogan"
-      width="1920"
       itemSpacings="[23]"
       translation="[0,497]">
       <Label
