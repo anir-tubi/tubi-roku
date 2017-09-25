@@ -1193,6 +1193,7 @@ function adriseUtils_getTrackData(eventType, value=0, ctx=invalid, extraCtx=inva
     registerFail:{
       key: "register_device_fail"
       value: value
+      ctx: ctx
     }
     registerSuccess:{
       key: "register_device_success"
