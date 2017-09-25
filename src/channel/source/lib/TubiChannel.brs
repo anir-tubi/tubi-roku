@@ -23,7 +23,7 @@ Function tubiChannel_runChannel(args, adShim, port)
   onNowContent = invalid
   if not m.constants.deviceInfo.limitedNewUi
     experimentInfo = m.experiments.getExperimentValue("UserNamespace", "roku_on_now")
-    if experimentInfo <> invalid and experimentInfo.experimentValue = 1
+    if experimentInfo <> invalid and experimentInfo.experimentValue = 1 and not m.constants.ui.onNow.disableOnNow
       m.constants.ui.onnow.on = true
       onNowContent = m.metadataFetch.liveTv()
     end if
