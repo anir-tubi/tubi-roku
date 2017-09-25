@@ -64,7 +64,6 @@ Function updateBackground()
       'start transitioning out the old background image and the old gradient
       if m.oldTransitionOut <> invalid and m.top.getChild(0) <> invalid and m.top.getChild(0).findNode("GradientFadeOut") <> invalid
         m.oldTransitionOut.control = "start"
-        m.top.getChild(0).findNode("GradientFadeOut").control = "start"
       end if
 
       'identify the new poster group
@@ -230,6 +229,7 @@ End Function
 
 Function removeBackground()
   TubiLog("BackgroundGroup.removeBackground")
+  m.top.getChild(0).findNode("BackgroundGradient").opacity = 0.0
   if m.oldTransitionOut.state = "stopped"
     m.oldTransitionOut.unobserveField("state")
     m.top.removeChildIndex(0)
