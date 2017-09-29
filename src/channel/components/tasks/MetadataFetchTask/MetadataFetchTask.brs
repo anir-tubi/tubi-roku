@@ -14,6 +14,7 @@ Function fetchLoop()
   m.port = CreateObject("roMessagePort")
   m.queue = TubiRequestQueue().create(m.port)
   m.top.observeField("request", m.port)
+  m.top.observeField("batchRequest", m.port)
   m.top.observeField("cancel", m.port)
   while true
     m.constants = m.global.getField("constants")   ' this should grab a thread-local copy
@@ -46,9 +47,11 @@ Function fetchLoop()
   while true
     msg = wait(0, m.port)
     if type(msg) = "roSGNodeEvent" then
+      tubiLog("Received roSGNodeEvent for field " + msg.GetField())
       if msg.GetField() = "request" then
-        tubiLog("Received roSGNodeEvent for field " + msg.GetField())
         beginRequest(msg.GetData())
+      else if msg.GetField() = "batchRequest" then
+        beginBatch(msg.GetData())
       else if msg.GetField() = "cancel" then
         cancelRequests(msg.GetData())
       end if
@@ -59,6 +62,36 @@ Function fetchLoop()
 End Function
 
 
+Function beginBatch(batchRequest) As Void
+  tubiLog("MetadataFetchTask.beginBatch")
+  if type(batchRequest.node) <> "roSGNode" then
+    tubiLog("MetadataFetchTask.beginBatch: invalid 'node' argument")
+    return
+  end if
+
+  if batchRequest.field = invalid or batchRequest.field = "" then
+    tubiLog("MetadataFetchTask.beginBatch: invalid 'field' argument")
+    return
+  end if
+
+  if type(batchRequest.requests) <> "roAssociativeArray" then
+    tubiLog("MetadataFetchTask.beginBatch: invalid requests array")
+    return
+  end if
+
+  batchResponse = {}
+  for each requestId in batchRequest.requests
+    request = batchRequest.requests[requestId]
+    batchResponse[requestId] = invalid  ' seed the response holder
+    request.batchResponse = batchResponse
+    ' duplicate these so that the beginRequest logic can stay the same
+    request.node = batchRequest.node
+    request.field = batchRequest.field
+    beginRequest(request)
+  end for
+End Function
+
+
 '''''''''''''''''''''''''
 ' beginRequest
 '
@@ -66,7 +99,7 @@ End Function
 '
 Function beginRequest(metadataRequest) As Void
   tubiLog("MetadataFetchTask.beginRequest")
-  if metadataRequest.node = invalid or type(metadataRequest.node) <> "roSGNode" then
+  if type(metadataRequest.node) <> "roSGNode" then
     tubiLog("MetadataFetchTask.beginRequest: invalid 'node' argument")
     return
   end if
@@ -90,10 +123,10 @@ Function beginRequest(metadataRequest) As Void
   end if
 
   ' store some context in the request object
-  if metadataRequest.id <> invalid then httpRequest.mftId = metadataRequest.id
-  httpRequest.node = metadataRequest.node
-  httpRequest.field = metadataRequest.field
-  httpRequest.request_start_time = m.timespan.TotalMilliseconds()
+  context = {}
+  context.append(metadataRequest)
+  context.request_start_time = m.timespan.TotalMilliseconds()
+  httpRequest.context = context
 
   m.queue.pushRequest(httpRequest)
 End Function
@@ -106,9 +139,9 @@ End Function
 Function cancelRequests(metadataRequest As Object) As Void
   tubiLog("MetadataFetchTask.cancelRequests")
   for each entry in m.queue.queue
-    if entry.request.node.isSameNode(metadataRequest.node) and entry.request.field = metadataRequest.field then
-      if metadataRequest.id <> invalid and entry.request.mftId <> invalid then
-        if entry.request.mftId = metadataRequest.id then
+    if entry.request.context.node.isSameNode(metadataRequest.node) and entry.request.context.field = metadataRequest.field then
+      if metadataRequest.id <> invalid and entry.request.context.id <> invalid then
+        if entry.request.context.id = metadataRequest.id then
           tubiLog("CANCELLING REQUEST")
           m.queue.cancelRequest(entry.request)
         end if
@@ -134,39 +167,64 @@ Function handleResponse(message)
 
   ' invalid can be returned if request is being retried
   if handledRequest <> invalid then
-    handledRequest.request_end_time = m.timespan.TotalMilliseconds()
+    request_end_time = m.timespan.TotalMilliseconds()
 
     ' double check that we have our context
-    if handledRequest.node <> invalid and handledRequest.field <> invalid and handledRequest.response <> invalid then
+    if handledRequest.context.node <> invalid and handledRequest.context.field <> invalid and handledRequest.response <> invalid then
       ' response should have fields: code, data, failReason
-      tubiLog("MetadataFetchTask response code was " + stri(handledRequest.response.code) + " for " + handledRequest.name)
+      tubiLog("MetadataFetchTask response code was " + stri(handledRequest.response.code) + " for " + handledRequest.context.name)
 
-      tubiLog("MetadataFetchTask.handleResponse setting response field " + handledRequest.field)
-      tubiLog("MetadataFetchTask request duration = " + tostr(handledRequest.request_end_time - handledRequest.request_start_time))
+      tubiLog("MetadataFetchTask.handleResponse setting response field " + handledRequest.context.field)
+      tubiLog("MetadataFetchTask request duration = " + tostr(request_end_time - handledRequest.context.request_start_time))
 
       parsed = ParseJSON(handledRequest.response.data)
       if parsed = invalid then
         tubiLog("MetadataFetchTask failed to parse JSON response")
       else
         'indicates a request from the details screen. this request needs to be handled slightly differently
-        if handledRequest.name = "getSingleContent"
+        if handledRequest.context.name = "getSingleContent"
           handledRequest.convertedMetadata = translateDetailsMetadata(parsed)
 
         'indicates a request for the full data for bookmarks - we need to handle differently because we may need to re-arrange content order
-        else if handledRequest.name = m.constants.reqNames.getFullBookmarks
+        else if handledRequest.context.name = m.constants.reqNames.getFullBookmarks
           handledRequest.convertedMetadata = translateBookmarkMetadata(parsed)
-        else if handledRequest.name = m.constants.reqNames.getFullHistory
+        else if handledRequest.context.name = m.constants.reqNames.getFullHistory
           handledRequest.convertedMetadata = translateBookmarkMetadata(parsed)
         else
           handledRequest.convertedMetadata = translateMetadata(parsed)
         end if
       end if
-      handledRequest.convert_end_time = m.timespan.TotalMilliseconds()
-      handledRequest.id = handledRequest.mftId
-      tubiLog("MetadataFetchTask convert duration = " + tostr(handledRequest.convert_end_time - handledRequest.request_end_time))
-      success = handledRequest.node.setField(handledRequest.field, handledRequest)
+      convert_end_time = m.timespan.TotalMilliseconds()
+      handledRequest.id = handledRequest.context.id
+      tubiLog("MetadataFetchTask convert duration = " + tostr(convert_end_time - request_end_time))
+
+      ' if not a batch, return now, otherwise collect all responses
+      if handledRequest.context.batchResponse = invalid then
+        success = handledRequest.context.node.setField(handledRequest.context.field, handledRequest)
+        tubiLog("MetadataFetchTask rendezvous duration = " + tostr(m.timespan.TotalMilliseconds() - convert_end_time))
+      else
+        batchResponse = handledRequest.context.batchResponse
+        batchResponse[handledRequest.context.id] = handledRequest
+
+        ' see if all responses are complete
+        expected = batchResponse.count()
+        completed = 0
+        for each requestId in batchResponse
+          if batchResponse[requestId] <> invalid then
+            completed = completed + 1
+          end if
+        end for
+        if completed = expected then
+          success = handledRequest.context.node.setField(handledRequest.context.field, batchResponse)
+          tubiLog("MetadataFetchTask rendezvous duration = " + tostr(m.timespan.TotalMilliseconds() - convert_end_time))
+        else
+          tubiLog("MetadataFetchTask completed " + stri(completed) + " of " + stri(expected))
+          success = true
+        end if
+      end if
+
       if not success
-        tubiLog("WARNING: Rendezvous failed to set response field " + handledRequest.field)
+        tubiLog("WARNING: Rendezvous failed to set response field " + handledRequest.context.field)
       end if
     end if
   else

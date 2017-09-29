@@ -1,6 +1,7 @@
 Function init()
   tubiLog("CategoryGridList.init")
   m.top.observeField("metadataFetchTaskResponse", "onMetadataFetchTaskResponse")
+  m.top.observeField("metadataFetchTaskBatch", "onMetadataFetchTaskBatchResponse")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
@@ -38,6 +39,8 @@ Function init()
 
   ' Used to bubble up that the first poster in the first category content grid has been loaded
   m.firstCategoryContentGrid = invalid
+
+  m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 End Function
 
 
@@ -156,18 +159,28 @@ Function loadCategories(index)
   if contentGrid <> invalid then
     if contentGrid.cursorIndex = -1 then
       ' seed the first items
-      fetch(contentGrid, contentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, 1)
+      immediate = fetch(contentGrid, contentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, 1)
     else
-      fetch(contentGrid, contentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, contentGrid.cursorIndex \ m.blockSize + 1)
+      immediate = fetch(contentGrid, contentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, contentGrid.cursorIndex \ m.blockSize + 1)
+    end if
+    if immediate <> invalid then
+      m.global.metadataFetchTask.request = immediate
     end if
 
     ' Make sure adjacent categories are warm
+    requests = []
     for i = index - m.categoryWindowSize to index + m.categoryWindowSize
       adjacent = m.ScrollingList.findNode("Items").getChild(i)
       if adjacent <> invalid then
-        fetch(adjacent, adjacent.content.id, "metadataFetchTaskResponse", m.blockSize, adjacent.cursorIndex \ m.blockSize + 1)
+        request = fetch(adjacent, adjacent.content.id, "", m.blockSize, adjacent.cursorIndex \ m.blockSize + 1)
+        if request <> invalid then
+          requests.push(request)
+        end if
       end if
     end for
+    if requests.count() > 0 then
+      m.global.metadataFetchTask.batchRequest = m.metadataFetchTaskDTO.createBatchRequest(m.top, "metadataFetchTaskBatch", requests)
+    end if
   end if
 End Function
 
@@ -215,26 +228,49 @@ Function onCursorIndexChange() As Void
   '#####
 
   ' Make sure the current block is being fetched and/or at the top of the cache
-  fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize + 1)
+  requests = []
+  currentBlock = fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize + 1)
+  if currentBlock <> invalid then
+    requests.push(currentBlock)
+  end if
 
   ' Fetch any adjacent blocks
   if (m.ContentGrid.cursorIndex MOD m.blockSize) >= (m.blockSize - m.triggerSize) and (m.ContentGrid.content.totalCount > (m.ContentGrid.content.offset + m.ContentGrid.content.getChildCount())) then
     ' next window
-    fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize + 2)
+    request = fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize + 2)
+    if request <> invalid then
+      requests.push(request)
+    end if
   else if m.ContentGrid.content.offset <> invalid and m.ContentGrid.content.offset > 0 and (m.ContentGrid.cursorIndex MOD m.blockSize) < m.triggerSize then
     ' previous window
-    fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize)
+    request = fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize)
+    if request <> invalid then
+      requests.push(request)
+    end if
+  end if
+  if requests.count() > 0 then
+    m.global.metadataFetchTask.batchRequest = m.metadataFetchTaskDTO.createBatchRequest(m.top, "metadataFetchTaskBatch", requests)
   end if
 End Function
 
+Function onMetadataFetchTaskBatchResponse(message) As Void
+  tubiLog("CategoryGridList.onMetadataFetchTaskBatchResponse")
+  responses = message.GetData()
+  for each requestId in responses
+    mergeMetadata(responses[requestId])
+  end for
+End Function
 
-Function onMetadataFetchTaskResponse() As Void
+Function onMetadataFetchTaskResponse(message) As Void
   tubiLog("CategoryGridList.onMetadataFetchTaskResponse")
-  response = m.top.metadataFetchTaskResponse.response
+  mergeMetadata(message.GetData())
+End Function
 
+Function mergeMetadata(fetched) As Void
   ' TODO(Chris): handle this better.  if we set an error it should also be reset hwen the category is next fetched
   newContent = invalid
-  if response.code < 200 or response.code >= 300 then 
+  response = fetched.response
+  if response.code < 200 or response.code >= 300 then
     testLog("Category content returned " + stri(response.code))
     m.top.error = {
       code: response.code
@@ -248,36 +284,36 @@ Function onMetadataFetchTaskResponse() As Void
       return
     end if
   else
-    newContent = m.top.metadataFetchTaskResponse.convertedMetadata
+    newContent = fetched.convertedMetadata
   end if
 
-  entry = metadataCacheHasEntry(m.top.metadataFetchTaskResponse.id)
+  entry = metadataCacheHasEntry(fetched.id)
   if entry = -1 then
     'entry was expired before reponse made it here, ignore it
-    tubiLog("Ignoring response for expired block " + m.top.metadataFetchTaskResponse.id)
+    tubiLog("Ignoring response for expired block " + fetched.id)
     return
   end if
 
   ' we apply order to the bookmarks and history categories here since they come back from
   ' the server in any order
   if newContent <> invalid
-    if Left(m.top.metadataFetchTaskResponse.id, 7) = "MyQueue" and m.global.bookmarkIds <> invalid then
+    if Left(fetched.id, 7) = "MyQueue" and m.global.bookmarkIds <> invalid then
       tubiLog("Sorting queue content")
       sortUserContent(newContent, m.global.bookmarkIds)
-    else if Left(m.top.metadataFetchTaskResponse.id, 16) = "ContinueWatching" and m.global.historyIds <> invalid then
+    else if Left(fetched.id, 16) = "ContinueWatching" and m.global.historyIds <> invalid then
       tubiLog("Sorting history content")
       sortUserContent(newContent, m.global.historyIds)
     end if
   end if
 
-  tubiLog("Received response for request id " + m.top.metadataFetchTaskResponse.id)
+  tubiLog("Received response for request id " + fetched.id)
   m.metadataCache[entry].contentNode = newContent.getChild(0)
   m.metadataCache[entry].length = newContent.getChildCount()
   contentGrid = m.metadataCache[entry].componentNode
 
   ' set the offset of this block
-  if m.top.metadataFetchTaskResponse.params.per_page <> invalid and m.top.metadataFetchTaskResponse.params.page <> invalid
-    newContent.offset = m.top.metadataFetchTaskResponse.params.per_page *  (m.top.metadataFetchTaskResponse.params.page - 1)
+  if fetched.params.per_page <> invalid and fetched.params.page <> invalid
+    newContent.offset = fetched.params.per_page * (fetched.params.page - 1)
   else
     newContent.offset = 0
   end if
@@ -346,12 +382,12 @@ End Function
 '
 ' Load a single category's content
 ' NOTE!: Server-side pages are 1-based, not zero-based
-Function fetch(component As Object, categoryId As String, field="categoryResponse" As String, per_page=0 As Integer, page=1 As Integer) As Void
+Function fetch(component As Object, categoryId As String, field="categoryResponse" As String, per_page=0 As Integer, page=1 As Integer)
   tubiLog("CategoryGridList.fetch " + categoryId)
   offset = per_page * (page - 1)
   if offset < 0 then
     tubiLog("CategoryGridList.fetch: Skipping request for negative offset")
-    return
+    return invalid
   end if
 
   ' special categories can have deprecated ids in them, causing trouble
@@ -364,11 +400,10 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
   requestId = categoryId + "-" + stri(offset).trim()
 
   ' if there is already a request in the cache, just refresh its cache position
+  request = invalid
   if metadataCacheHasEntry(requestId) <> -1 then
     tubiLog("CategoryGridList.fetch: Skipping duplicate request for " + requestId)
   else
-
-    request = invalid
     if categoryId = "MyQueue" then
       request = bookmarksRequest()
     else if categoryId = "ContinueWatching" then
@@ -382,22 +417,18 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
     ' If global bookmark or history ids are unavailable then we will get invalid
     if request = invalid then
       tubiLog("CategoryGridList.fetch: Unvailable request for category " + categoryId)
-      return
+    else
+      if per_page <> 0 then
+        request.options.params.page_enabled = true
+        request.options.params.per_page = per_page
+        request.options.params.page = page
+      end if
+      request = m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, request.name, request.options)
+      tubiLog("CategoryGridList.fetch: Asking MetadataFetchTask for " + requestId)
     end if
-
-    request.id = requestId
-    request.node = m.top
-    request.field = field
-    if per_page <> 0 then
-      request.options.params.page_enabled = true
-      request.options.params.per_page = per_page
-      request.options.params.page = page
-    end if
-
-    tubiLog("CategoryGridList.fetch: Asking MetadataFetchTask for " + requestId)
-    m.global.metadataFetchTask.request = request
   end if
   metadataCachePush(component, categoryId, offset)
+  return request
 End Function
 
 
@@ -516,11 +547,7 @@ Function metadataCacheExpireOne(categoryId="" As String) As Boolean
     'print "CANCELLING IN-FLIGHT REQUEST for " + expired.id
     ' Cancel in-flight requests.  There is a race condition here where response may have already come in.
     ' We need to check for this at the response handler.
-    m.global.metadataFetchTask.cancel = {
-      node: m.top
-      field: "categoryResponse"
-      id: expired.id
-    }
+    m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(expired.id, m.top, "categoryResponse")
   else
     ' remove the entries from the contentnode tree
     parent = expired.contentNode.getParent()

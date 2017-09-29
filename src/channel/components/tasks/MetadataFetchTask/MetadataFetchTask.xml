@@ -21,32 +21,17 @@
 
     <interface>
       <!--
-       -
-       - The request param should have the following form:
-       - {
-       -   id: <unique id assigned by the caller to be used in request cancelations>
-       -   node: <node to receive content>
-       -   field: <field name on which to receive response>
-       -   url: <url to fetch>
-       -   options: <options to pass to createAsyncHTTPRequest>
-       -   name: <name to pass to createAsyncHTTPRequest>
-       - }
-       -
+       - Single request - see MetadataFetchTaskDTO.brs for structure
        -->
       <field id="request" type="assocarray" alwaysNotify="true"/>
       
+      <!--
+       - Batch request - see MetadataFetchTaskDTO.brs for structure
+       -->
+      <field id="batchRequest" type="assocarray" alwaysNotify="true"/>
+
       <!-- 
-       -
-       - Cancel an outstanding request that matches the node and
-       - field passed in.
-       - 
-       - Expected format:
-       - {
-       -   id: <id sent in the request>
-       -   node: <node to receive content>
-       -   field: <field name on which to receive response>
-       - }
-       -        
+       - Cancel an outstanding request - see MetadataFetchTaskDTO.brs for structure
        -->
       <field id="cancel" type="assocarray" alwaysNotify="true"/>
       

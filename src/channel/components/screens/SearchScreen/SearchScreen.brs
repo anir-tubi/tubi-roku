@@ -30,6 +30,8 @@ Function init()
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
 
+  m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
+
   m.top.backgroundUriList = [m.defaultHeroUri]
 End Function
 
@@ -203,22 +205,16 @@ Function loadSearchResults()
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
 
-  request = {
-    url: urlBase + "/search"
-    node: m.top
-    field: "searchResponse"
-    options: {
-      params: {
-        app_id: settings.shortAppName
-        platform: platform
-        search: m.SearchText.text
-      }
+  options = {
+    params: {
+      app_id: settings.shortAppName
+      platform: platform
+      search: m.SearchText.text
     }
-    name: "searchAPI"    
   }
   ' cancel any in-flight requests
-  m.global.metadataFetchTask.cancel = { node: m.top, field: "searchResponse"}
-  m.global.metadataFetchTask.request = request
+  m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, m.top, "searchResponse")
+  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", urlBase + "/search", "searchAPI", options)
 
   m.UpdatingMessage.visible = true
   if m.global.constants.deviceInfo.limitedNewUi = true

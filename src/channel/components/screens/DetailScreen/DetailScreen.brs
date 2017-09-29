@@ -21,6 +21,7 @@ Function init()
   m.WatchTrailerMenuItem = m.top.findNode("WatchTrailerMenuItem")
 
   m.isWaitingForServerResponse = false
+  m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 End Function
 
 Function onScreenFocusChange()
@@ -388,22 +389,16 @@ Function loadContentDetails(content)
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
 
-  request = {
-    url: url
-    node: m.top
-    field: "contentDetailResponse"
-    options: {
-      params: {
-        "app_id": settings.shortAppName
-        platform: platform
-        "content_id": content.id
-        ' "content_ids": contentId
-        ' fields: "*(id,type,title,duration,ratings,description,year,posterarts,subtitles,lang,url,publisher_id,actors,directors,tags,children,credit_cuepoints)"
-      }
+  options = {
+    params: {
+      "app_id": settings.shortAppName
+      platform: platform
+      "content_id": content.id
+      ' "content_ids": contentId
+      ' fields: "*(id,type,title,duration,ratings,description,year,posterarts,subtitles,lang,url,publisher_id,actors,directors,tags,children,credit_cuepoints)"
     }
-    name: "getSingleContent"
   }
-  m.global.metadataFetchTask.request = request
+  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(content.id, m.top, "contentDetailResponse", url, "getSingleContent", options)
 End Function
 
 

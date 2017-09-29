@@ -31,6 +31,8 @@ Function init()
 
   m.defaultBackgroundUri = m.global.constants.ui.uris.defaultBackground
 
+  m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
+
   onSignedInChange()  ' seed the search & sign in menu - also calls loadUserCategories() if necessary
 
   loadAllCategories()
@@ -318,21 +320,15 @@ Function loadAllCategories()
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
   url = m.global.constants.urls.cms.categories
-  request = {
-    url: url
-    node: m.top
-    field: "categoryListResponse"
-    name: "getAllCategories"
-    options: {
-      params: {
-        "app_id": settings.shortAppName
-        platform: platform
-        "device_id": deviceInfo.deviceId
-        page_enabled: false
-      }
+  options = {
+    params: {
+      "app_id": settings.shortAppName
+      platform: platform
+      "device_id": deviceInfo.deviceId
+      page_enabled: false
     }
   }
-  m.global.metadataFetchTask.request = request
+  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("categories", m.top, "categoryListResponse", url, "getAllCategories", options)
 End Function
 
 
