@@ -59,6 +59,7 @@ function ContentProvider(pubId as String, shortAppName as String, imageSize as S
 
     shortAppName: shortAppName
     maxContent: 50    'max contents in each category for 256MB devices
+    miniMaxCountent: 25
 
     imageSize: imageSize
 
@@ -283,7 +284,7 @@ function ContentProvider_getPlaylistFromXmlObj(obj, imageSize, depth, parent, so
     end if
 
     'limits the number of contents per category in the lower memory models (as defined in m.utils.deviceInfo)
-    if m.utils.deviceInfo.lowMemory <> true or count < m.maxContent
+    if m.utils.deviceInfo.lowMemory <> true or (m.playlistCounter > 10 and count < m.miniMaxCountent) or (m.playlistCounter <= 10 and count < m.maxContent)
 
       id = child.id.getText()
 
