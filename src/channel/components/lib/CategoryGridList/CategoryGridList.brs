@@ -13,8 +13,6 @@ Function init()
   '
   '  {
   '    id: "<category>-<offset>"
-  '    offset: <offset into category items>
-  '    length: <length of block>
   '    contentNode: <node reference to first item in the block>
   '    componentNode: <node reference to grid component assigned to this content block>
   '  }
@@ -26,7 +24,6 @@ Function init()
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
   m.blockSize = constants.performance.categoryGridList.blockSize
-  m.triggerSize = constants.performance.categoryGridList.triggerSize
   m.categoryWindowSize = constants.performance.categoryGridList.categoryWindowSize
 
   ' The most cached blocks we can have.  This should balance out with blockSize and expectations on
@@ -131,7 +128,6 @@ Function focusCategory(newIndex)
   if m.ContentGrid <> invalid then
     m.ContentGrid.unobserveField("itemSelected")
     m.ContentGrid.unobserveField("itemFocused")
-    m.ContentGrid.unobserveField("cursorIndex")
     m.ContentGrid.unobserveField("cursorPosition")
   end if
   m.ContentGrid = m.ScrollingList.findNode("Items").getChild(newIndex)
@@ -145,7 +141,6 @@ Function focusCategory(newIndex)
 
     m.ContentGrid.observeField("itemSelected", "onItemSelected")
     m.ContentGrid.observeField("itemFocused", "onItemFocused")
-    m.ContentGrid.observeField("cursorIndex", "onCursorIndexChange")
     m.ContentGrid.observeField("cursorPosition", "onCursorPositionChange")
     m.top.cursorPosition = m.ContentGrid.cursorPosition
     ' Finally, set focus on the grid so user can scroll
@@ -159,9 +154,9 @@ Function loadCategories(index)
   if contentGrid <> invalid then
     if contentGrid.cursorIndex = -1 then
       ' seed the first items
-      immediate = fetch(contentGrid, contentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, 1)
+      immediate = fetch(contentGrid, contentGrid.content.id, "metadataFetchTaskResponse", m.blockSize)
     else
-      immediate = fetch(contentGrid, contentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, contentGrid.cursorIndex \ m.blockSize + 1)
+      immediate = fetch(contentGrid, contentGrid.content.id, "metadataFetchTaskResponse", m.blockSize)
     end if
     if immediate <> invalid then
       m.global.metadataFetchTask.request = immediate
@@ -172,7 +167,7 @@ Function loadCategories(index)
     for i = index - m.categoryWindowSize to index + m.categoryWindowSize
       adjacent = m.ScrollingList.findNode("Items").getChild(i)
       if adjacent <> invalid then
-        request = fetch(adjacent, adjacent.content.id, "", m.blockSize, adjacent.cursorIndex \ m.blockSize + 1)
+        request = fetch(adjacent, adjacent.content.id, "", m.blockSize)
         if request <> invalid then
           requests.push(request)
         end if
@@ -184,18 +179,37 @@ Function loadCategories(index)
   end if
 End Function
 
-
+' Resolve and internal ContentNode that's been abbreviated for the CategoryGridList
+' into a fully parsed TubiContentNode
+Function resolveAbbreviatedContent(abbreviated, index)
+  if abbreviated <> invalid and abbreviated.subType() = "ContentNode" then
+    category = abbreviated.getParent()
+    if category <> invalid and category.json <> invalid then
+      parsed = ParseJson(category.json)
+      if parsed <> invalid then
+        fullContent = parsed.children[index]
+        translated = CreateObject("roSGNode", "TubiContentNode")
+        TubiMetadataTranslate(m.global.constants).translateRecursive(fullContent, translated)
+        return translated
+      end if
+    end if
+    return invalid
+  else
+    return abbreviated
+  end if
+End Function
 
 ''''''''''''''''
 ' Item focus and selection proxies
 Function onItemSelected()
   tubiLog("CategoryGridList.onItemSelected")
-  m.top.itemSelected = m.ContentGrid.itemSelected
+  ' Resolve the abbreviated category content into a full TubiContentNode
+  m.top.itemSelected = resolveAbbreviatedContent(m.ContentGrid.itemSelected, m.ContentGrid.cursorIndex)
 End Function
 
 Function onItemFocused()
   tubiLog("CategoryGridList.onItemFocused")
-  m.top.itemFocused = m.ContentGrid.itemFocused
+  m.top.itemFocused = resolveAbbreviatedContent(m.ContentGrid.itemFocused, m.ContentGrid.cursorIndex)
 End Function
 
 Function onCursorPositionChange()
@@ -211,46 +225,6 @@ Function sortUserContent(unsortedContent, order)
     ' push it to bottom, it will behave like a stack
     if contentItem <> invalid then unsortedContent.appendChild(contentItem)
   end for
-End Function
-
-'''''''''''''''''''''''''
-' onCursorPositionChange
-'
-Function onCursorIndexChange() As Void
-  tubiLog("CategoryGridList.onCursorIndexChange")
-  if m.ContentGrid.cursorIndex < 0 then return
-
-  '#####
-  'print "*** Cursor position is " + stri(m.ContentGrid.cursorIndex)
-  'print "*** Offset is " + stri(m.ContentGrid.content.offset)
-  'print "*** Count is " + stri(m.ContentGrid.content.getChildCount())
-  'print "*** Total is " + stri(m.ContentGrid.content.totalCount)
-  '#####
-
-  ' Make sure the current block is being fetched and/or at the top of the cache
-  requests = []
-  currentBlock = fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize + 1)
-  if currentBlock <> invalid then
-    requests.push(currentBlock)
-  end if
-
-  ' Fetch any adjacent blocks
-  if (m.ContentGrid.cursorIndex MOD m.blockSize) >= (m.blockSize - m.triggerSize) and (m.ContentGrid.content.totalCount > (m.ContentGrid.content.offset + m.ContentGrid.content.getChildCount())) then
-    ' next window
-    request = fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize + 2)
-    if request <> invalid then
-      requests.push(request)
-    end if
-  else if m.ContentGrid.content.offset <> invalid and m.ContentGrid.content.offset > 0 and (m.ContentGrid.cursorIndex MOD m.blockSize) < m.triggerSize then
-    ' previous window
-    request = fetch(m.ContentGrid, m.ContentGrid.content.id, "metadataFetchTaskResponse", m.blockSize, m.ContentGrid.cursorIndex \ m.blockSize)
-    if request <> invalid then
-      requests.push(request)
-    end if
-  end if
-  if requests.count() > 0 then
-    m.global.metadataFetchTask.batchRequest = m.metadataFetchTaskDTO.createBatchRequest(m.top, "metadataFetchTaskBatch", requests)
-  end if
 End Function
 
 Function onMetadataFetchTaskBatchResponse(message) As Void
@@ -308,72 +282,27 @@ Function mergeMetadata(fetched) As Void
 
   tubiLog("Received response for request id " + fetched.id)
   m.metadataCache[entry].contentNode = newContent.getChild(0)
-  m.metadataCache[entry].length = newContent.getChildCount()
   contentGrid = m.metadataCache[entry].componentNode
+  parentCategory = contentGrid.content
 
-  ' set the offset of this block
-  if fetched.params.per_page <> invalid and fetched.params.page <> invalid
-    newContent.offset = fetched.params.per_page * (fetched.params.page - 1)
-  else
-    newContent.offset = 0
-  end if
-
-  '#####
-  'print "Received offset " + stri(newContent.offset)
-  'print "Received count " + stri(newContent.getChildCount())
-  '#####
-
-  ' Merge the new content with any existing.
-  if contentGrid.content <> invalid then
-    if newContent.offset < contentGrid.content.offset and (newContent.offset + newContent.getChildCount()) >= contentGrid.content.offset then
-      ' new content prefixes existing content without gaps
-      overlap = (newContent.offset + newContent.getChildCount()) - contentGrid.content.offset
-      prepend = newContent.getChildren(newContent.getChildCount() - overlap, 0)
-      '#####
-      'print "Prefix: "; contentGrid.content.offset; "-"; (contentGrid.content.offset+contentGrid.content.getChildCount()); " with "; newContent.offset; "-"; newContent.offset+prepend.count()
-      '#####
-      contentGrid.content.insertChildren(prepend, 0)
-      contentGrid.content.offset = newContent.offset
-    else if newContent.offset >= contentGrid.content.offset and newContent.offset <= (contentGrid.content.offset + contentGrid.content.getChildCount()) then
-      ' new content suffixes existing content without gaps
-      overlap = (contentGrid.content.offset + contentGrid.content.getChildCount()) - newContent.offset
-      contentGrid.content.removeChildrenIndex(overlap, contentGrid.content.getChildCount()-overlap)
-      '#####
-      'print "Suffix: "; contentGrid.content.offset; "-"; (contentGrid.content.offset+contentGrid.content.getChildCount()); " with "; newContent.offset-overlap; "-"; newContent.offset + newContent.getChildCount()
-      '#####
-      append = newContent.getChildren(newContent.getChildCount(), 0)
-      contentGrid.content.appendChildren(append)
-    else
-      ' Corner case: content is not adjacent to existing content"
-      if contentGrid.cursorIndex >= newContent.offset and contentGrid.cursorIndex <= (newContent.offset + newContent.getChildCount() - 1) then
-        ' purge existing items
-        reentry = m.metadataCache[entry]  ' this will get purged so we keep a reference to it
-        m.metadataCache[entry].contentNode = invalid 'so that the purge doesn't mess with our new content
-        '#####
-        'print "Replace A: "; contentGrid.content.offset; "-"; (contentGrid.content.offset+contentGrid.content.getChildCount()); " with "; newContent.offset; "-"; newContent.offset + newContent.getChildCount()
-        '#####
-        while metadataCacheExpireOne(reentry.category): end while
-        metadataCachePush(reentry.componentNode, reentry.category, reentry.offset)
-        entry = metadataCacheHasEntry(reentry.id)
-        m.metadataCache[entry].contentNode = newContent.getChild(0)
-        m.metadataCache[entry].length = newContent.getChildCount()
-        append = newContent.getChildren(newContent.getChildCount(), 0)
-        '#####
-        'print "Replace B: "; contentGrid.content.offset; "-"; (contentGrid.content.offset+contentGrid.content.getChildCount()); " with "; newContent.offset; "-"; newContent.offset + newContent.getChildCount()
-        '#####
-        contentGrid.content.appendChildren(append)
-        contentGrid.content.offset = newContent.offset
-      end if        
+  ' Add the new content
+  if parentCategory <> invalid then
+    ' replace any existing content.  This will work for populating empty categories as well as reloading user categories    
+    if parentCategory.getChildCount() = 0 then
+      parentCategory.removeChildrenIndex(parentCategory.getChildCount(), 0)
     end if
+    parentCategory.appendChildren(newContent.getChildren(newContent.getChildCount(), 0))
   end if
 
-  ' Add totalCount which we only get from pagination APIs
-  if newContent.totalCount <> invalid and newContent.totalCount <> -1 then
-    contentGrid.content.totalCount = newContent.totalCount
-  else
-    contentGrid.content.totalCount = contentGrid.content.getChildCount()
+  ' Add json source string
+  if newContent.json <> invalid then
+    parentCategory.json = newContent.json
   end if
-  contentGrid.content = contentGrid.content  ' force redraw
+
+  ' Add totalCount
+  parentCategory.totalCount = contentGrid.content.getChildCount()
+  parentCategory.offset = 0  ' offset is always zero since we load whole categories only
+  contentGrid.content = parentCategory  ' force redraw
 End Function
 
 
@@ -381,23 +310,14 @@ End Function
 ' fetch
 '
 ' Load a single category's content
-' NOTE!: Server-side pages are 1-based, not zero-based
-Function fetch(component As Object, categoryId As String, field="categoryResponse" As String, per_page=0 As Integer, page=1 As Integer)
+Function fetch(component As Object, categoryId As String, field="categoryResponse" As String, per_page=0 As Integer)
   tubiLog("CategoryGridList.fetch " + categoryId)
-  offset = per_page * (page - 1)
-  if offset < 0 then
-    tubiLog("CategoryGridList.fetch: Skipping request for negative offset")
-    return invalid
-  end if
 
-  ' special categories can have deprecated ids in them, causing trouble
-  ' with pagination. Here we just force it to always grab the whole category
   if categoryId = "MyQueue" or categoryId = "ContinueWatching" then
-    offset = 0
     per_page = 0
   end if
 
-  requestId = categoryId + "-" + stri(offset).trim()
+  requestId = categoryId + "-0"
 
   ' if there is already a request in the cache, just refresh its cache position
   request = invalid
@@ -405,29 +325,21 @@ Function fetch(component As Object, categoryId As String, field="categoryRespons
     tubiLog("CategoryGridList.fetch: Skipping duplicate request for " + requestId)
   else
     if categoryId = "MyQueue" then
-      request = bookmarksRequest()
+      request = bookmarksRequest(requestId, field)
     else if categoryId = "ContinueWatching" then
-      request = historyRequest()
-    else if categoryId = "SearchSignIn" or categoryId = "SearchSignOut" then
-      ' NO-OP
+      request = historyRequest(requestId, field)
     else
-      request = categoryRequest(categoryId)
+      request = categoryRequest(requestId, field, categoryId, per_page)
     end if
 
     ' If global bookmark or history ids are unavailable then we will get invalid
     if request = invalid then
       tubiLog("CategoryGridList.fetch: Unvailable request for category " + categoryId)
     else
-      if per_page <> 0 then
-        request.options.params.page_enabled = true
-        request.options.params.per_page = per_page
-        request.options.params.page = page
-      end if
-      request = m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, request.name, request.options)
       tubiLog("CategoryGridList.fetch: Asking MetadataFetchTask for " + requestId)
     end if
   end if
-  metadataCachePush(component, categoryId, offset)
+  metadataCachePush(component, categoryId)
   return request
 End Function
 
@@ -436,28 +348,27 @@ End Function
 ' categoryRequest
 '
 '
-Function categoryRequest(categoryId As String) As Object
-  settings = m.global.constants.settings
-  url = m.global.constants.urls.cms.categories
-  platform = m.global.constants.platform
-  deviceInfo = m.global.constants.deviceInfo
-  constants = m.global.constants
-
-  request = {
-    url: url
-    name: "getCategory"
-    options: {
-        params: {
-          "app_id": settings.shortAppName
-          platform: platform
-          "device_id": deviceInfo.deviceId
-          "cat_id": categoryId
-          all: false
-          page_enabled: false
-        }
-      }
+Function categoryRequest(requestId As String, field As String, categoryId As String, per_page As Integer) As Object
+  constants = m.global.constants  ' only one reference to m.global for performance
+  url = constants.urls.cms.categories
+  options = {
+    params: {
+      "app_id": constants.settings.shortAppName,
+      "platform": constants.platform,
+      "device_id": constants.deviceInfo.deviceId,
+      "cat_id": categoryId,
+      "all": false,
+      "page_enabled": true,
+      "page": 1,
+      "per_page": per_page
     }
-  return request
+  }
+  if categoryId = "featured" then
+    isFeaturedCategory = true
+  else
+    isFeaturedCategory = false
+  end if
+  return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, url, constants.reqNames.getCategory, options, isFeaturedCategory)
 End Function
 
 
@@ -465,7 +376,7 @@ End Function
 ' historyRequest
 '
 ' Load the user's history content for "Continue Watching"
-Function historyRequest()
+Function historyRequest(requestId As String, field As String) As Object
   constants = m.global.constants
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
@@ -476,7 +387,8 @@ Function historyRequest()
     for i=0 to historyIds.getChildCount()-1
       idList.push(historyIds.getChild(i).id)
     end for
-    return Bookmarks.getFullHistoryReq(idList)
+    request = Bookmarks.getFullHistoryReq(idList)
+    return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, constants.reqNames.getFullHistory, request.options)
   end if
   return invalid
 End Function
@@ -485,8 +397,8 @@ End Function
 '''''''''''''''''''''
 ' bookmarksRequest
 '
-' Load the user's history content for "Continue Watching"
-Function bookmarksRequest() As Object
+' Load the user's history content for "My Queue"
+Function bookmarksRequest(requestId As String, field As String) As Object
   constants = m.global.constants
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
@@ -497,7 +409,8 @@ Function bookmarksRequest() As Object
     for i=0 to bookmarkIds.getChildCount()-1
       idList.push(bookmarkIds.getChild(i).id)
     end for
-    return Bookmarks.getFullBookmarksReq(idList)
+    request = Bookmarks.getFullBookmarksReq(idList)
+    return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, constants.reqNames.getFullBookmarks, request.options)
   end if
   return invalid
 End Function
@@ -551,41 +464,9 @@ Function metadataCacheExpireOne(categoryId="" As String) As Boolean
   else
     ' remove the entries from the contentnode tree
     parent = expired.contentNode.getParent()
-
-    ' check if parent is valid, it may be that the nodes were removed when adding a non-contiguous block to the parent
     if parent <> invalid then
-
-      ' possible scenarios
-      ' - expired nodes are all items in the category, remove them all
-      ' - expired nodes are the prefix of items in the category, need to increase the offset number as well as remove nodes
-      ' - expired nodes are the suffix of items in the category, just need to remove nodes
-      ' - expired nodes are in the middle of the items in the category, need to expire another block as well? we have a 
-      '   constraint of only allowing contiguous blocks
-      if parent.offset = expired.offset then
-        if parent.getChildCount() <= expired.length then
-          'print "EXPIRE A " + expired.id
-          parent.removeChildrenIndex(parent.getChildCount(), 0)
-          parent.offset = 0
-        else
-          'print "EXPIRE B " + expired.id
-          parent.removeChildrenIndex(expired.length, 0)
-          parent.offset = parent.offset + expired.length
-        end if
-      else
-        if ((parent.offset + parent.getChildCount()) - expired.offset) <= expired.length then
-          'print "EXPIRE C " + expired.id
-          parent.removeChildrenIndex(expired.length, expired.offset - parent.offset)
-        else
-          'print "EXPIRE D " + expired.id
-          ' Here if this block is in-between two other blocks.  The proper way would be to delete all 
-          ' blocks before or all blocks after, depending on where the user most recently was in the category.
-          ' That's rather tedious so we'll simply refresh the cache position of this block and allow the
-          ' extremeties of the span to trickle up the cache and get expired on their own. Eventually this
-          ' block will not be in the middle.
-          if expired <> invalid then m.metadataCache.Push(expired)
-          return metadataCacheExpireOne(categoryId)  ' this will just expire the subsequent entry
-        end if
-      end if
+      parent.removeChildrenIndex(parent.getChildCount(), 0)
+      parent.offset = 0
       ' kick a refresh of the grid to destroy the item nodes for the expired content
       expired.componentNode.content =  expired.componentNode.content
     end if
@@ -593,8 +474,8 @@ Function metadataCacheExpireOne(categoryId="" As String) As Boolean
   return true
 End Function
 
-Function metadataCachePush(component As Object, categoryId As String, offset As Integer)
-  id = categoryId + "-" + stri(offset).trim()
+Function metadataCachePush(component As Object, categoryId As String)
+  id = categoryId + "-0"
 
   ' check if entry already exists and reset its cache position
   i = metadataCacheHasEntry(id)
@@ -608,8 +489,6 @@ Function metadataCachePush(component As Object, categoryId As String, offset As 
     entry = {
       id: id
       category: categoryId
-      offset: offset
-      length: 0    ' will be filled when the response arrives
       contentNode: invalid
       componentNode: component
     }
@@ -648,16 +527,13 @@ Function DumpItemStats()
     grid = gridList.getChild(i)
     if grid.content = invalid then
       id = ""
-      offset = 0
       numContent = 0
     else
       id = grid.content.id
-      offset = grid.content.offset
-      if offset = invalid then offset = 0
       numContent = grid.content.getChildCount()
     end if
     gridItems = grid.findNode("ContentsMask").findNode("Items")
     numItems = gridItems.getChildCount()
-    print "CATEGORY-GRID-LIST[" + id + "] offset=" + stri(offset) + " numContent=" + stri(numContent) + " numItems=" + stri(numItems)
+    print "CATEGORY-GRID-LIST[" + id + "] numContent=" + stri(numContent) + " numItems=" + stri(numItems)
   end for
 End Function

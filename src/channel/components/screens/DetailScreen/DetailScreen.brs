@@ -384,21 +384,15 @@ End Function
 '
 Function loadContentDetails(content)
   tubiLog("DetailScreen.loadDetails")
-  settings = m.global.constants.settings
-  url = m.global.constants.urls.cms.singleContent
-  platform = m.global.constants.platform
-  deviceInfo = m.global.constants.deviceInfo
-
+  constants = m.global.constants
   options = {
     params: {
-      "app_id": settings.shortAppName
-      platform: platform
+      "app_id": constants.settings.shortAppName
+      "platform": constants.platform
       "content_id": content.id
-      ' "content_ids": contentId
-      ' fields: "*(id,type,title,duration,ratings,description,year,posterarts,subtitles,lang,url,publisher_id,actors,directors,tags,children,credit_cuepoints)"
     }
   }
-  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(content.id, m.top, "contentDetailResponse", url, "getSingleContent", options)
+  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(content.id, m.top, "contentDetailResponse", constants.urls.cms.singleContent, constants.reqNames.getSingleContent, options)
 End Function
 
 

@@ -44,5 +44,8 @@
     <!-- 3-entry array containing [channel, episode, position] -->
     <field id="liveTVCursor" type="intarray" value="[-1,-1,-1]"/>
     <field id="liveTVChannelType" type="string" value=""/>
+
+    <!-- json sources for CategoryGridList -->
+    <field id="json" type="string" />
   </interface>
 </component>

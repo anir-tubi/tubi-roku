@@ -153,8 +153,12 @@ Function getConstants()
 
   'the names of the registry memory sections that will save bookmark and previously viewed info
   constants.reqNames = {}
+    constants.reqNames.searchAPI = "searchAPI"
+    constants.reqNames.getCategory = "getCategory"
+    constants.reqNames.getAllCategories = "getAllCategories"
     constants.reqNames.getFullBookmarks = "getFullBookmarks" 
     constants.reqNames.getFullHistory = "getFullHistory"
+    constants.reqNames.getSingleContent = "getSingleContent"
 
   'Nielsen ID token for integrating with Nielsen DAR
   constants.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
@@ -492,57 +496,27 @@ Function getConstants()
       constants.performance.categoryGridList = {}
       constants.performance.contentGrid = {}
       if limitedNewUi
-        '
-        ' Estimated metadata memory usage:
-        '
-        ' blocks-in-memory = (current category blocks) + (categoryWindowSize * 2)
-        ' blocks-in-memory = (2) + (2 * 2) = 6
-        ' items-in-memory = Max(blocks-in-memory, metadataCacheMaxEntries) * blockSize
-        ' items-in-memory = Max(6,8) * 40 = 480
-        ' memory-usage = average-item-memory * items-in-memory
-        ' memory-usage = 25kb * 480 = 12MB
-        '
-        ' Estimated poster VRAM usage (2-row content grid):
-        '
-        ' posters-in-VRAM = Min(numColumns, (visible width + 2 * overhang)) * Min(numRows, (visible height + 2 * overhang)) * (2 categories visible when animating)
-        ' posters-in-VRAM = Min(n, (7 + 2 * 1)) * Min(2, (2 + 2 * 1)) * 2
-        ' posters-in-VRAM = 9 * 2 * 2 = 36
-        ' poster-memory-usage = posters-in-VRAM * VRAM-per-poster
-        ' poster-memory-usage = 36 * (210*270*4Bpp) = 36 * 226KB ~= 8MB
-        '
         ' Notes:
         ' - lowMemory devices may have 512MB but will have 256MB minimum.
         ' - the player needs about 70MB headroom to function well (calculated as free+cached)
         ' - the OS on a 256MB device only takes about 70MB on startup
         ' - VRAM on 256MB device is limited to 63MB and starts relieving pressure at ~90% full
         ' - Total app memory available = 256MB - 63MB - 70MB - 70MB = 53MB
-        constants.performance.categoryGridList.blockSize = 20  ' 40 is about 2s to convert metadata in the MetadataFetchTask, so don't go any higher
-        constants.performance.categoryGridList.triggerSize = 15  ' make trigger large so horizontal scrolling has plenty of lead time
+        constants.performance.categoryGridList.blockSize = 200
         constants.performance.categoryGridList.categoryWindowSize = 3
-        constants.performance.categoryGridList.metadataCacheMaxEntries = 40  ' this is the biggest impact on number of nodes in memory
+        constants.performance.categoryGridList.metadataCacheMaxEntries = 20  ' this is the biggest impact on number of nodes in memory
         constants.performance.categoryGridList.categoryAnimationDuration = 0.75
         constants.performance.categoryGridList.gridAnimationDuration = 0.4
         constants.performance.contentGrid.overhang = 1
         constants.performance.contentGrid.continuousEvents = false
       else
-        ' single-row-poster-memory-usage = 9 visible posters * 7 = 63 * 226KB = 14MB
-        constants.performance.categoryGridList.blockSize = 30
-        constants.performance.categoryGridList.triggerSize = 10
+        constants.performance.categoryGridList.blockSize = 200
         constants.performance.categoryGridList.categoryWindowSize = 3
-        constants.performance.categoryGridList.metadataCacheMaxEntries = 30
+        constants.performance.categoryGridList.metadataCacheMaxEntries = 20
         constants.performance.categoryGridList.categoryAnimationDuration = 0.5
         constants.performance.categoryGridList.gridAnimationDuration = 0.25
         constants.performance.contentGrid.overhang = 1
         constants.performance.contentGrid.continuousEvents = true
-      ' Roku 4 and better
-        'constants.performance.categoryGridList.blockSize = 30
-        'constants.performance.categoryGridList.triggerSize = 10
-        'constants.performance.categoryGridList.categoryWindowSize = 4
-        'constants.performance.categoryGridList.metadataCacheMaxEntries = 20
-        'constants.performance.categoryGridList.categoryAnimationDuration = 0.75
-        'constants.performance.categoryGridList.gridAnimationDuration = 0.4
-        'constants.performance.contentGrid.overhang = 2
-        'constants.performance.contentGrid.continuousEvents = true
       end if
 
   return constants  

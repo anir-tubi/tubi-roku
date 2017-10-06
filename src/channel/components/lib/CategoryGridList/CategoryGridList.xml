@@ -8,6 +8,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
 
   <interface>
     <!--

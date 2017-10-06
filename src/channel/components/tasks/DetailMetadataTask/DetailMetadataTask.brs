@@ -5,17 +5,18 @@ End Function
 Function execGetDetailMetadata()
   tubiLog("DetailMetadataTask.execGetDetailMetadata")
 
-  appName = m.global.constants.settings.shortAppName
-  url = m.global.constants.urls.cms.singleContent
-  platform = m.global.constants.platform
+  constants = m.global.constants
+  appName = constants.settings.shortAppName
+  url = constants.urls.cms.singleContent
+  platform = constants.platform
   options = {
     params: {
       "app_id": appName
-      platform: platform
+      "platform": platform
       "content_id": m.top.contentFragment.id
     }
   }
-  request = TubiRequest().createAsync(url, "getSingleContent", options)
+  request = TubiRequest().createAsync(url, constants.reqNames.getSingleContent, options)
   port = CreateObject("roMessagePort")
   request.start(port)
 
@@ -29,7 +30,7 @@ Function execGetDetailMetadata()
         tubiLog("MetadataFetchTask failed to parse JSON response")
         m.top.error = result.response
       else
-        translate = TubiMetadataTranslate(m.global.constants)
+        translate = TubiMetadataTranslate(constants)
         detail = CreateObject("roSGNode", "TubiContentNode")
         translate.translateRecursive(parsed, detail)
         m.top.response = detail

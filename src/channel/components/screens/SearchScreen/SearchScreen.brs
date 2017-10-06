@@ -200,24 +200,21 @@ End Function
 '
 Function loadSearchResults()
   tubiLog("SearchScreen.loadSearchResults")
-  settings = m.global.constants.settings
-  urlBase = m.global.constants.urls.cms.urlBase
-  platform = m.global.constants.platform
-  deviceInfo = m.global.constants.deviceInfo
-
+  constants = m.global.constants
+  url = constants.urls.cms.urlBase + "/search"
   options = {
     params: {
-      app_id: settings.shortAppName
-      platform: platform
-      search: m.SearchText.text
+      "app_id": constants.settings.shortAppName
+      "platform": constants.platform
+      "search": m.SearchText.text
     }
   }
   ' cancel any in-flight requests
   m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, m.top, "searchResponse")
-  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", urlBase + "/search", "searchAPI", options)
+  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", url, constants.reqNames.searchAPI, options)
 
   m.UpdatingMessage.visible = true
-  if m.global.constants.deviceInfo.limitedNewUi = true
+  if constants.deviceInfo.limitedNewUi = true
     m.UpdatingSpinner.visible = false
   end if
 End Function

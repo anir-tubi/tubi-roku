@@ -182,7 +182,7 @@ Function handleResponse(message)
         tubiLog("MetadataFetchTask failed to parse JSON response")
       else
         'indicates a request from the details screen. this request needs to be handled slightly differently
-        if handledRequest.context.name = "getSingleContent"
+        if handledRequest.context.name = m.constants.reqNames.getSingleContent
           handledRequest.convertedMetadata = translateDetailsMetadata(parsed)
 
         'indicates a request for the full data for bookmarks - we need to handle differently because we may need to re-arrange content order
@@ -190,6 +190,8 @@ Function handleResponse(message)
           handledRequest.convertedMetadata = translateBookmarkMetadata(parsed)
         else if handledRequest.context.name = m.constants.reqNames.getFullHistory
           handledRequest.convertedMetadata = translateBookmarkMetadata(parsed)
+        else if handledRequest.context.name = m.constants.reqNames.getCategory
+          handledRequest.convertedMetadata = translateCategoryMetadata(parsed, handledRequest.response.data, handledRequest.context.isFeaturedCategory)
         else
           handledRequest.convertedMetadata = translateMetadata(parsed)
         end if
@@ -233,7 +235,53 @@ Function handleResponse(message)
 End Function
 
 
+''''''''''''''''''''
+' translateCategoryMetadata
+'
+' Translate content specifically targeted at CategoryGridList.  This is aimed at PERFORMANCE
+' above ease of use so it only translates the minimal necessary fields.  The performance
+' tricks used here, found through measurement are:
+' 1) Use ContentNode instead of TubiContentNode
+' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
+' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
+Function translateCategoryMetadata(contentToTranslate, json, isFeaturedCategory) As Object
+  translated = CreateObject("roSGNode", "ContentNode")
+  node_count = 0
+  if isFeaturedCategory = invalid then
+    isFeaturedCategory = false
+  end if
+  if contentToTranslate <> invalid and type(contentToTranslate) = "roAssociativeArray" and contentToTranslate.children <> invalid
+    translated.addField("offset", "integer", false)
+    translated.addField("totalCount", "integer", false)
+    translated.addField("json", "string", false)
+    updateMetadata = {
+      id: contentToTranslate.id
+      title: contentToTranslate.title
+      children: CreateObject("roArray", contentToTranslate.children.count(), false)
+      totalCount: contentToTranslate.children.count()
+      json: json
+    }
+    for each child in contentToTranslate.children
+      childAA = {
+        id: child.id
+        title: child.title
+        description: child.description
+      }
+      if isFeaturedCategory and child.hero_images <> invalid then
+        childAA.hdgridposterurl = child.hero_images[0]
+      else if child.posterarts <> invalid then
+        childAA.hdgridposterurl = child.posterarts[0]
+      end if
+      updateMetadata.children.push(childAA)
+    end for
+    translated.update(updateMetadata)
+    node_count = 1 + translated.getChildCount()
+  end if
 
+  setTotalCount(translated)
+  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
+  return translated
+End Function
 
 
 'See example metadata at "https://uapi.adrise.tv/cms/categories?app_id=tubitv&platform=roku&device_id=AABBCCDDEEFF&page_enabled=false"
