@@ -676,7 +676,13 @@ function adriseAds_showCommercialBreakViaRoku(canvas, playerSettings)
           }
 
           isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList, screenCount)
-          m.roadframework.mediator.util.xfers = []
+
+          '#####
+          ' WORKAROUND FOR RAF MEMORY LEAK, still present in RAF 1.9
+          if m.roadframework.mediator <> invalid and m.roadframework.mediator.util <> invalid and m.roadframework.mediator.util.xfers <> invalid then
+            m.roadframework.mediator.util.xfers = []
+          end if
+          '#####
 
           if isCompleted = false
             print "RAF ads not completed"
