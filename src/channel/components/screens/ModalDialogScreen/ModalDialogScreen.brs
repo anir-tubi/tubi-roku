@@ -66,10 +66,10 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       end if 
     end if
 
-    if key = "back"
-      ' eat all the back button presses... force the user to choose a button on the dialog
-      return true
+    if key = "back" or key = "options" then
+      m.top.exitButton = key
     end if
+    return true
   end if
   return false
 End Function

@@ -24,6 +24,9 @@
     
     <field id="scrollable" type="boolean" value="false"/>
 
+    <!-- set to "options" or "back" if either of those keys are pressed -->
+    <field id="exitButton" type="string" alwaysNotify="true"/>
+
   </interface>
 
   <children>

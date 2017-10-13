@@ -187,7 +187,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     for each subtitle in contentFromServer.subtitles
       ' Firmware 8.0+ scene graph native CC dialog
       subtitleTracks.push({
-        language: subtitle.lang
+        description: subtitle.lang
         trackname: subtitle.url
       })
     end for

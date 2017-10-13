@@ -118,6 +118,14 @@ Function init()
 
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
+
+  ' used by CC dialog
+  m.ccSelections = [ 0 ]  ' modeled as an array for adding caption and audio tracks selection
+  m.ccModes = [
+    "Off"
+    "On"
+    "Instant replay"
+  ]
 End Function
 
 
@@ -489,7 +497,7 @@ Function onKeyEvent(key As String, press As Boolean)
 
     else if key = "options"
       if m.ignoreOptionsKey = false then
-        handleClosedCaption()
+        showCCDialog()
       end if
 
     else if key = "left"
@@ -701,15 +709,17 @@ End Function
 
 
 'pause the video player
-Function pauseVideo()
+Function pauseVideo(shouldShowTransport)
   m.Video.control = "pause"
   m.VideoState = "pause"
 
-  if m.HUD.opacity < 1.0
-    showTransport()
-  else
-    ' make sure transport is showing
-    focusVideoPicker(false)
+  if shouldShowTransport
+    if m.HUD.opacity < 1.0
+      showTransport()
+    else
+      ' make sure transport is showing
+      focusVideoPicker(false)
+    end if
   end if
 
   m.PlayPauseButton.uri = m.buttonUris.play
@@ -863,7 +873,7 @@ End Function
 Function handlePlayPause()
   tubiLog("VideoPlayer.handlePlayPause VideoState = " + m.VideoState)
   if m.VideoState = "play" then
-    pauseVideo()
+    pauseVideo(true)
   else if m.VideoState = "pause" then
     resumeFromPause()
   else if m.VideoState = "rew" or m.VideoState = "ffw"
@@ -1008,6 +1018,19 @@ Function cancelReplayCaptions()
   end if
 End Function
 
+' Discover the current cc settings and format button text accordingly
+Function getCCButtons()
+  if m.top.content.subtitleTracks = invalid or m.top.content.subtitleTracks.count() = 0 then
+    return ["Close"]
+  else
+    for i=0 to m.ccModes.count()-1
+      if m.video.globalCaptionMode = m.ccModes[i]
+        m.ccSelections[0] = i
+      end if
+    end for
+    return ["Mode: " + m.video.globalCaptionMode, "Close"]
+  end if
+End Function
 
 'handles ClosedCaption button/toggle selection
 Function handleClosedCaption()
@@ -1026,6 +1049,56 @@ Function handleClosedCaption()
   end if
 End Function
 
+Function showCCDialog()
+  ' show full options dialog
+  if m.VideoState = "play" or m.VideoState = "pause" then
+    m.ccWasPlaying = false
+    if m.VideoState = "play" then
+      m.ccWasPlaying = true
+      pauseVideo(false)
+    end if
+    m.ccDialog = CreateObject("roSGNode", "ModalDialogScreen")
+    m.ccDialog.title = "Closed Caption/Audio Configuration"
+    buttons = getCCButtons()
+    m.ccDialog.buttons = buttons
+    if buttons.count() = 1 then
+      m.ccDialog.message = "No captions are available for this video."
+    end if
+    m.ccDialog.observeField("buttonSelected", "onCCDialogButton")
+    m.ccDialog.observeField("exitButton", "closeCCDialog")
+    m.top.appendChild(m.ccDialog)
+    m.ccDialog.visible = true
+    m.ccDialog.setFocus(true)
+  end if
+End Function
+
+Function closeCCDialog()
+  if m.ccDialog <> invalid then
+    if m.ccWasPlaying then
+      resumeFromPause()
+    end if
+    m.ccDialog.unobserveField("buttonSelected")
+    m.ccDialog.unobserveField("exitButton")
+    m.ccDialog.setFocus(false)
+    m.top.setFocus(true)
+    m.top.removeChild(m.ccDialog)
+    m.ccDialog = invalid
+  end if
+End Function
+
+Function onCCDialogButton()
+  tubiLog("VideoPlayer.onCCDialogButton")
+  index = m.ccDialog.buttonSelected
+  if m.ccDialog.buttons[index] = "Close" then
+    ' Close
+    closeCCDialog()
+  else
+    ' Captions mode
+    m.ccSelections[0] = (m.ccSelections[0] + 1) MOD m.ccModes.count()
+    m.video.globalCaptionMode = m.ccModes[m.ccSelections[0]]
+    m.ccDialog.buttons = getCCButtons()
+  end if
+End Function
 
 'handles replay key press or HopBack button selection
 Function jumpToPosition(position)
@@ -1084,13 +1157,13 @@ End Function
 'exit the video player due to back button while no transport displaying, or during ad break
 Function backButtonExit()
   historyPosition()
-  ' minor detail... set backButtonPressed first so that observers get that event before any video state change
   m.top.backButtonPressed = true
 End Function
 
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads
 Function showAdBreak()
   m.Video.control = "stop"
+  closeCCDialog()  ' if dialog is showing, it's awkward to have it still show after ad break
   m.top.adPosition = m.playerPosition
   m.top.adControl = "play"
 End Function
