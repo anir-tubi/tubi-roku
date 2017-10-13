@@ -32,6 +32,7 @@
 
 Function init()
   tubiLog("VideoPlayer.init")
+  m._ = rodash()
   m.Spinner = m.top.findNode("BufferSpinner")
   m.Loading = m.top.findNode("Loading")
   m.Transport = m.top.findNode("Transport")
@@ -42,7 +43,6 @@ Function init()
   m.top.observeField("content", "onContentChange")
   m.top.observeField("playlist", "onPlaylistChange")
   m.top.observeField("seekPlaylist", "onSeekPlaylist")
-  m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("dock", "onDockedChange")
   m.top.observeField("showTransport", "onShowTransport")
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
@@ -72,6 +72,7 @@ Function init()
   m.transportAutoHideTime = m.global.constants.player.transportAutoHideTime
   m.ignoreOptionsKey = m.global.constants.deviceInfo.firmwareCaptionMenu
   m.bufferingInfo = invalid
+  m.progressBarFocused = false
 
   'buttons
   m.TransportButtons = m.top.findNode("TransportButtons")
@@ -113,20 +114,12 @@ Function init()
     m.CCNipple.translation = m.CCNippleOnTranslation
   end if
 
+  m.focusedColor = m.global.constants.ui.colors.focused
+
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
 End Function
 
-Function onComponentFocusChange()
-  if m.top.isInFocusChain()
-    button = m.TransportButtons.getChild(m.focusedButtonIndex)
-    if m.top.hasFocus()
-      button.focusState = true
-    else  
-      button.focusState = false
-    end if
-  end if
-End Function
 
 Function onDockedChange()
   if m.top.dock
@@ -214,8 +207,15 @@ End Function
 
 ' m.playerPosition is the main source of truth for position.
 ' It can be updated by the video node or by calculations made while scrubbing
-Function updatePlayerPosition()
-  m.playerPosition = m.Video.position
+Function updatePlayerPosition(amt=0)
+  if amt > 0
+    m.playerPosition = m._.min(m.playerPosition + amt, m.Video.duration - 5)
+  else if amt < 0
+    m.playerPosition = m._.max(m.playerPosition + amt, 0)
+  else
+    m.playerPosition = m.Video.position
+  end if
+
   updateTransport()
 End Function
 
@@ -493,8 +493,13 @@ Function onKeyEvent(key As String, press As Boolean)
       end if
 
     else if key = "left"
-      if m.HUD.opacity = 0
-        showTransport()
+      'video is in playback mode and user wants to skip back
+      if m.HUD.opacity = 0 and m.progressBarFocused = false
+        handleSkipVideo(-10, m.progressBarFocused)
+
+      'user is in skip ahead mode (the progress bar is focused) and wants to skip back.
+      else if m.progressBarFocused = true
+        handleSkipVideo(-10, m.progressBarFocused)
 
       else
         'navigate the transport buttons, skipping disabled ones
@@ -508,8 +513,13 @@ Function onKeyEvent(key As String, press As Boolean)
       end if
 
     else if key = "right"
-      if m.HUD.opacity = 0
-        showTransport()
+      'video is in playback mode and user wants to skip ahead
+      if m.HUD.opacity = 0 and m.progressBarFocused = false
+        handleSkipVideo(10, m.progressBarFocused)
+
+      'user is in skip ahead mode (the progress bar is focused) and wants to skip ahead.
+      else if m.progressBarFocused = true
+        handleSkipVideo(10, m.progressBarFocused)
 
       else
         'navigate the transport buttons, skipping disabled ones
@@ -522,16 +532,26 @@ Function onKeyEvent(key As String, press As Boolean)
         end for
       end if
 
-    else if key = "up" or key = "down"
+    else if key = "up"
       if m.Overlay.opacity = 0
         showTransport()
-      else
-        if m.top.content <> invalid and m.top.content.isLiveTV = true then
-          if m.top.hasFocus()
-            focusVideoPicker(true)
-          else
-            focusVideoPicker(false)
-          end if
+      else if m.progressBarFocused = false
+        setFocusedButton(m.ProgressBar)
+      else if m.top.content <> invalid and m.top.content.isLiveTV = true then
+        if m.top.hasFocus()
+          focusVideoPicker(true)
+        end if
+      end if
+
+    else if key = "down"
+      if m.Overlay.opacity = 0
+        showTransport()
+      else if m.progressBarFocused = true
+        button = m.TransportButtons.getChild(m.focusedButtonIndex)
+        setFocusedButton(button)
+      else if m.top.content <> invalid and m.top.content.isLiveTV = true then
+        if not m.top.hasFocus()
+          focusVideoPicker(false)
         end if
       end if
 
@@ -659,16 +679,15 @@ End Function
 
 Function focusVideoPicker(focus)
   tubiLog("VideoPlayerFocusVideoPicker")
-  transportButton = m.TransportButtons.getChild(m.focusedButtonIndex)
   if not focus and m.VideoPicker.isInFocusChain()
     ' I'm not sure why we have to setFocus(false) here, but it doesn't work otherwise
     slideFade(m.PickerGroup, "below", "out", 0.6)
     slideFade(m.Transport, "below", "in", 0.6)
     fade(m.PickerGradient, "out", 0.6)
     fade(m.TransportGradient, "in", 0.6)
-    transportButton.focusState = true
     m.VideoPicker.setFocus(false)
     m.top.setFocus(true)
+    setFocusedButton(m.ProgressBar)
   else if focus and m.top.hasFocus()
     m.VideoPicker.jumpToIndex = m.top.playlistIndex
     slideFade(m.PickerGroup, "below", "in", 0.6)
@@ -676,7 +695,7 @@ Function focusVideoPicker(focus)
     fade(m.PickerGradient, "in", 0.6)
     fade(m.TransportGradient, "out", 0.6)
     m.VideoPicker.setFocus(true)
-    transportButton.focusState = false
+    m.progressBarFocused = false
   end if
 End Function
 
@@ -710,21 +729,27 @@ End Function
 
 'Resume play from a paused state
 Function resumeFromPause()
-  m.PlayPauseButton.uri = m.buttonUris.pause
-  setFocusedButton(m.PlayPauseButton)
 
   animateTransport("out")
-  m.Video.control = "resume"
-  m.VideoState = "play"
 
-  trackEvent({
-    trackType: "pauseToggle"
-    ctx: m.Video.content.id
-    value: "resumed"
-    extraCtx: {
-      livetv: m.Video.content.isLiveTV
-    }
-  })
+  if m.playerPosition <> m.Video.position
+    jumpToPosition(m.playerPosition)
+  else
+    m.Video.control = "resume"
+    m.VideoState = "play"
+
+    trackEvent({
+      trackType: "pauseToggle"
+      ctx: m.Video.content.id
+      value: "resumed"
+      extraCtx: {
+        livetv: m.Video.content.isLiveTV
+      }
+    })
+  end if
+
+  m.PlayPauseButton.uri = m.buttonUris.pause
+  setFocusedButton(m.PlayPauseButton)
 End Function
 
 
@@ -790,22 +815,12 @@ Function endScrub()
   m.PlayPauseButton.uri = m.buttonUris.pause
   m.PlayPauseButton.focusState = true
 
-  ' seek analytics
-  trackEvent({
-    trackType: "seek"
-    value: m.playerPosition
-    ctx: m.top.content.id
-  })
-  m.lastPingTime = m.playerPosition
-
-  ' resume ad break
+  shouldAdBreak = false
   if m.top.enableAds and oldVideoState = "ffw" then
-    m.Video.control = "stop"
-    m.top.adPosition = m.playerPosition
-    m.top.adControl = "seek"
-  else
-    m.Video.seek = m.playerPosition 'will load and play the video at the seeked to point
+    shouldAdBreak = true
   end if
+
+  handleSeek(m.playerPosition, shouldAdBreak)
 End Function
 
 
@@ -946,6 +961,45 @@ Function handleHopBack(remoteReplayButton)
 End Function
 
 
+'helper function to conclude a hop, skip, or end scrub
+'performs the seek tracking and runs an ad break if told to
+Function handleSeek(position as Integer, shouldAdBreak as Boolean)
+  ' seek analytics
+  trackEvent({
+    trackType: "seek"
+    value: position
+    ctx: m.top.content.id
+  })
+
+  if shouldAdBreak
+    m.Video.control = "stop"
+    m.top.adPosition = position
+    m.top.adControl = "seek"
+  else
+    m.Video.seek = position 'will load and play the video at the seeked to point
+    m.VideoState = "play"
+  end if
+End Function
+
+
+'handles the functionality for Roku's requirement to skip the video forward or backward while pausing the video.
+'functionality is: pause video, jump 10s forward or back, show the transport
+Function handleSkipVideo(amt, isProgressBarFocused)
+  if m.VideoState <> "pause"
+    m.Video.control = "pause"
+    m.VideoState = "pause"
+  end if
+
+  if isProgressBarFocused <> true
+    showTransport()
+    m.PlayPauseButton.uri = m.buttonUris.play
+    setFocusedButton(m.ProgressBar)
+  end if
+
+  updatePlayerPosition(amt)
+End Function
+
+
 Function cancelReplayCaptions()
   if m.video.globalCaptionMode = "On" and m.replayCaptionEnd <> 0
     tubilog("Turning off replay captions")
@@ -983,18 +1037,15 @@ Function jumpToPosition(position)
     position = 0
   end if
 
-  ' seek analytics
-  trackEvent({
-    trackType: "seek"
-    value: position
-    ctx: m.top.content.id
-  })
+  shouldAdBreak = false
+  if position > m.playerPosition
+    shouldAdBreak = true
+  end if
 
   m.playerPosition = position
-  m.Video.seek = position
-  m.VideoState = "play"
-
   m.PlayPauseButton.uri = m.buttonUris.pause
+
+  handleSeek(position, shouldAdBreak)
 End Function
 
 
@@ -1010,7 +1061,7 @@ Function setFocusedButton(TransportButton, keyFocus=false)
     button = m.TransportButtons.getChild(i)
     if TransportButton.id = button.id
       m.focusedButtonIndex = i
-      ' if overlay has focus, don't set the icon to yellow
+      ' if overlay has focus, don't set the icon to orange
       if m.top.hasFocus()
         button.focusState = true
       else
@@ -1020,6 +1071,14 @@ Function setFocusedButton(TransportButton, keyFocus=false)
       button.focusState = false
     end if
   end for
+
+  if TransportButton.id = "ProgressBarForeground"
+    m.progressBarFocused = true
+    m.ProgressBar.blendColor = m.focusedColor
+  else
+    m.progressBarFocused = false
+    m.ProgressBar.blendColor = "0xFFFFFFFF"
+  end if
 End Function
 
 'exit the video player due to back button while no transport displaying, or during ad break
