@@ -162,9 +162,9 @@ function adriseAds_populateUrl(episode, playerSettings)
 
   'add TubiTV user/registration id to ad call url
   urlTubiId = ""
-  userData = m.utils.getUserData()
-  if userData <> invalid and userData.token <> invalid
-    urlTubiId = "&tubitvid=" + userData.token
+  authInfo = m.utils.getAuthInfo()
+  if authInfo <> invalid and authInfo.userId <> invalid
+    urlTubiId = "&tubitvid=" + authInfo.userId.toStr()
   end if
 
   'add if Linear/Live TV is on or off to ad call url
