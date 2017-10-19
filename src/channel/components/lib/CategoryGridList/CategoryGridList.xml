@@ -4,6 +4,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/CategoryGridList/CategoryGridList.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
@@ -21,14 +22,13 @@
     -    - offset - the offset into the total categorof the first 
     -
     -->
-    <field id="content" type="node"/>
+    <field id="content" alias="RowList.content" />
     <field id="itemSelected" type="node" alwaysNotify="true"/>
     <field id="itemFocused" type="node" alwaysNotify="true"/>
-    <field id="cursorPosition" type="intarray" value="[-1,-1]"/>
+    <field id="cursorPosition" alias="RowList.rowItemFocused" />
 
     <field id="categoryFocused" type="integer" value="-1"/>
-    <field id="preCategoryFocused" type="integer" value="-1"/>
-    <field id="animateToCategory" alias="ScrollingList.animateToItem"/>
+    <field id="animateToCategory" alias="RowList.animateToItem"/>
     
     <!-- set when we need to purge and reload history and queue -->
     <field id="dirtyUserCategories" type="boolean" value="false" alwaysNotify="true"/>
@@ -45,7 +45,7 @@
     -->
     <field id="error" type="assocarray" alwaysNotify="true" />
 
-    <!-- bubbles up from the first CategoryContentGrid loaded -->
+    <!-- first category is loaded -->
     <field id="firstPosterLoaded" type="boolean" value="false" />
 
     <!-- inbound interface so the UI can be updated based on if the category grid lists occupy
@@ -56,16 +56,32 @@
   </interface>
   
   <children>
-    <ScrollingList
-      id="ScrollingList"
-      width="1835"
-      height="503"
-      scrollHeight="370"
-      itemSpacings="[15]"
-      itemComponentName="CategoryContentGrid"
-      focusBitmapUri=""
-      focusChangeDuration="0.6"
-      translation="[0,0]"/>
+    <RowList
+      id="RowList"
+      itemComponentName="CategoryGridPoster"
+      rowTitleComponentName="CategoryGridRowLabel"
+      itemSize="[1835,364]"
+      itemSpacing="[0,28]"
+      numRows="2"
+      rowSpacings="[28]"
+      rowItemSize="[[430,256],[210,300]]"
+      rowItemSpacing="[[10,0]]"
+      showRowLabel="[true]"
+      showRowCounter="[false]"
+      fadeFocusFeedbackWhenAutoScrolling="true"
+      rowFocusAnimationStyle="floatingFocus"
+      vertFocusAnimationStyle="fixedFocus"
+      focusBitmapUri="pkg:/images/selector.9.png"/>
+
+    <Timer
+      id="RowListItemDebounce"
+      duration="0.5"/>
+    <Timer
+      id="RowListCategoryDebounce"
+      duration="0.5"/>
+    <Timer
+      id="AnimateToCategoryDebounce"
+      duration="0.5"/>
   </children>
 </component>
       

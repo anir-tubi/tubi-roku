@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="CategoryGridRowLabel" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/CategoryGridRowLabel/CategoryGridRowLabel.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- Incoming interface for encapsulation in a ScrollingList -->
+    <field id="content" type="node"/>
+  </interface>
+  
+  <children>
+    <Label
+      id="CategoryName"
+      height="63"
+      width="1000"
+      translation="[0,0]"
+      color="0xFFFFFFFF"
+      opacity="1.0">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="34" />
+    </Label>
+    
+    <LayoutGroup
+      id="CategoryCount"
+      layoutDirection="horiz"
+      horizAlignment="right"
+      translation="[1755,0]">
+      <Label
+        id="FocusIndex"
+        text=""
+        height="63"
+        horizAlign="right"
+        color="0xFF501AFF" >
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="27" />
+      </Label>
+      <Label
+        id="ItemCount"
+        text=""
+        height="63"
+        horizAlign="right">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="27" />
+      </Label>
+    </LayoutGroup>
+
+  </children>
+</component>

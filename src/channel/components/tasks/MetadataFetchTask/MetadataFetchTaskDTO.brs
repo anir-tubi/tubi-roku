@@ -10,7 +10,7 @@ Function MetadataFetchTaskDTO()
 End Function
 
 ' MetadataFetchTask.request
-Function metadataFetchTaskClient_createRequest(id, node, field, url, name, options, isFeaturedCategory=false)
+Function metadataFetchTaskClient_createRequest(id, node, field, url, name, options, isFeaturedCategory=false, sortOrder=invalid)
   if id = invalid or id = "" then
     id = CreateObject("roDeviceInfo").GetRandomUUID()
   end if
@@ -32,6 +32,9 @@ Function metadataFetchTaskClient_createRequest(id, node, field, url, name, optio
   if type(isFeaturedCategory) <> "Boolean" and type(isFeaturedCategory) <> "roBoolean"
     isFeaturedCategory = false
   end if
+  if type(sortOrder) <> "roArray" then
+    sortOrder = []
+  end if
 
   return {
     id: id
@@ -42,6 +45,7 @@ Function metadataFetchTaskClient_createRequest(id, node, field, url, name, optio
     options: options
     batch: false
     isFeaturedCategory: isFeaturedCategory
+    sortOrder: sortOrder
   }
 End Function
 

@@ -2,11 +2,9 @@ Function init()
   m.poster = m.top.findNode("Poster")
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.top.observeField("itemContent", "onContentChange")
-  m.top.observeField("width", "drawProgressBar")
-  m.top.observeField("height", "drawProgressBar")
-  m.resumeProgressBar.color = m.global.constants.ui.colors.focused
   m.resumeMargin = 4  'inset of resume bar
-  drawProgressBar()
+  m.title = m.top.findNode("Title")
+  m.resumeProgressBar.color = m.global.constants.ui.colors.focused
 End Function
 
 
@@ -14,15 +12,24 @@ End Function
 ' onContentChange
 '
 ' Update the title and background on 'content' being set
-Function onContentChange()
-  tubiLog("ResumePoster.onContentChange")
+Function onContentChange(data)
+  tubiLog("CategoryGridPoster.onContentChange " + data.getField())
+
+  ' set some defaults
+  m.title.visible = false
+  m.resumeProgressBar.visible = false
+
   if m.top.itemContent <> invalid then
-    if m.top.itemContent.portrait <> invalid then
-      m.poster.uri = m.top.itemContent.portrait
-    else
-      m.poster.uri = m.top.itemContent.hdgridposterurl
+    m.poster.uri = m.top.itemContent.hdgridposterurl
+    categoryContent = m.top.itemContent.getParent()
+    if categoryContent <> invalid then
+      if categoryContent.title = "Featured" then
+        m.title.visible = true
+        m.title.text = m.top.itemContent.title
+      else if categoryContent.title = "Continue Watching"
+        drawProgressBar()
+      end if
     end if
-    drawProgressBar()
   end if
 End Function
 
@@ -40,7 +47,5 @@ Function drawProgressBar()
     m.resumeProgressBar.width = (m.top.width - (2 * m.resumeMargin)) * percentage
     m.resumeProgressBar.translation = [m.resumeMargin, m.top.height - m.resumeProgressBar.height - m.resumeMargin]
     m.resumeProgressBar.visible = true
-  else
-    m.resumeProgressBar.visible = false
   end if
 End Function

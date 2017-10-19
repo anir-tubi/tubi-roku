@@ -298,18 +298,7 @@ end function
 '
 'returns an object that contains all the content for a metadataTaskThread, except the node and field properties (to be added after this function returns)
 function tubiBookmarks_getFullBookmarkOrHistory_(orderList as Object, reqName as String) as Object
-
-  fullReq = invalid
-
-  ids = ""
-  for each item in orderList
-    if type(item) = "roString" or type(item) = "String"
-      ids = ids + "," + item
-    end if
-  end for
-  
-  ids = Right(ids, ids.len()-1)
-
+  ids = orderList.join(",")
   fullReq = {
     url: m.constants.urls.cms.contents
     name: reqName

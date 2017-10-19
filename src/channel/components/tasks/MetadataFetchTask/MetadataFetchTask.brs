@@ -187,11 +187,13 @@ Function handleResponse(message)
 
         'indicates a request for the full data for bookmarks - we need to handle differently because we may need to re-arrange content order
         else if handledRequest.context.name = m.constants.reqNames.getFullBookmarks
-          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed)
+          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, handledRequest.context.sortOrder)
         else if handledRequest.context.name = m.constants.reqNames.getFullHistory
-          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed)
+          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, handledRequest.context.sortOrder)
         else if handledRequest.context.name = m.constants.reqNames.getCategory
           handledRequest.convertedMetadata = translateCategoryMetadata(parsed, handledRequest.response.data, handledRequest.context.isFeaturedCategory)
+        else if handledRequest.context.name = m.constants.reqNames.getAllCategories
+          handledRequest.convertedMetadata = translateAllCategoriesMetadata(parsed)
         else
           handledRequest.convertedMetadata = translateMetadata(parsed)
         end if
@@ -245,15 +247,12 @@ End Function
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
 Function translateCategoryMetadata(contentToTranslate, json, isFeaturedCategory) As Object
-  translated = CreateObject("roSGNode", "ContentNode")
+  translated = CreateObject("roSGNode", "CategoryContentNode")
   node_count = 0
   if isFeaturedCategory = invalid then
     isFeaturedCategory = false
   end if
   if contentToTranslate <> invalid and type(contentToTranslate) = "roAssociativeArray" and contentToTranslate.children <> invalid
-    translated.addField("offset", "integer", false)
-    translated.addField("totalCount", "integer", false)
-    translated.addField("json", "string", false)
     updateMetadata = {
       id: contentToTranslate.id
       title: contentToTranslate.title
@@ -266,11 +265,17 @@ Function translateCategoryMetadata(contentToTranslate, json, isFeaturedCategory)
         id: child.id
         title: child.title
         description: child.description
+        length: child.duration
+        subtype: "ContentNode"
       }
       if isFeaturedCategory and child.hero_images <> invalid then
         childAA.hdgridposterurl = child.hero_images[0]
       else if child.posterarts <> invalid then
         childAA.hdgridposterurl = child.posterarts[0]
+      end if
+      ' normalize ids for series, should always be zero-prefixed
+      if child.type = "s" or child.type = "a"
+        childAA.id = "0" + child.id
       end if
       updateMetadata.children.push(childAA)
     end for
@@ -345,22 +350,58 @@ Function translateDetailsMetadata(contentToTranslate) As Object
 End Function
 
 
+Function translateAllCategoriesMetadata(contentToTranslate) As Object
+  translated = CreateObject("roSGNode", "CategoryContentNode")
+  wrappedContent = {
+    id: ""
+    title: ""
+    children: CreateObject("roArray", contentToTranslate.count(), false)
+  }
+  for i=0 to contentToTranslate.count()-1
+    content = contentToTranslate[i]
+    if content.title <> "After Hours" or m.allowAfterHours = true
+      childAA = {
+        id: content.id
+        title: content.title
+        description: content.description
+      }
+      wrappedContent.children.push(childAA)
+    end if
+  end for
+  translated.update(wrappedContent)
+  node_count = 1 + translated.getChildCount()
+  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
+  return translated
+End Function
+
 ''''''''''''''''''''''
 ' translateBookmarkMetadata
 '
 ' Translates content from server into format that roku understands, specifically for bookmarks AND history
-Function translateBookmarkMetadata(contentToTranslate) As Object
-  translated = CreateObject("roSGNode", "TubiContentNode")
-  nodeCount = 0
-  for each contentId in contentToTranslate
-    if contentToTranslate[contentId] <> invalid
-      node = translated.createChild("TubiContentNode")
-      nodeCount = nodeCount + m.metadataTranslate.translateRecursive(contentToTranslate[contentId], node)
+' @sortOrder - array of string content ids to use for sorting the items in contentToTranslate
+Function translateBookmarkMetadata(contentToTranslate, sortOrder) As Object
+  wrappedContent = {
+    id: ""
+    title: ""
+    children: CreateObject("roArray", contentToTranslate.count(), false)
+  }
+
+  for i=0 to sortOrder.count()-1
+    contentItem = contentToTranslate[sortOrder[i]]
+    if contentItem <> invalid then
+      wrappedContent.children.push(contentItem)
+      contentToTranslate.Delete(sortOrder[i])
     end if
   end for
-  setTotalCount(translated)
-  tubiLog("TranslateMetadata converted " + stri(nodeCount) + " nodes")
-  return translated
+
+  ' remaining unsorted items will be appended
+  for each contentId in contentToTranslate
+    if contentToTranslate[contentId] <> invalid then
+      wrappedContent.children.push(contentToTranslate[contentId])
+    end if
+  end for
+  json = FormatJSON(wrappedContent)
+  return translateCategoryMetadata(wrappedContent, json, false)
 End Function
 
 

@@ -505,16 +505,12 @@ Function getConstants()
         constants.performance.categoryGridList.blockSize = 200
         constants.performance.categoryGridList.categoryWindowSize = 3
         constants.performance.categoryGridList.metadataCacheMaxEntries = 20  ' this is the biggest impact on number of nodes in memory
-        constants.performance.categoryGridList.categoryAnimationDuration = 0.75
-        constants.performance.categoryGridList.gridAnimationDuration = 0.4
         constants.performance.contentGrid.overhang = 1
         constants.performance.contentGrid.continuousEvents = false
       else
         constants.performance.categoryGridList.blockSize = 200
         constants.performance.categoryGridList.categoryWindowSize = 3
         constants.performance.categoryGridList.metadataCacheMaxEntries = 20
-        constants.performance.categoryGridList.categoryAnimationDuration = 0.5
-        constants.performance.categoryGridList.gridAnimationDuration = 0.25
         constants.performance.contentGrid.overhang = 1
         constants.performance.contentGrid.continuousEvents = true
       end if

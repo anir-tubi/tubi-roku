@@ -171,13 +171,8 @@
     </Group>
 
 
-  <MaskGroup
-    id="CategoryMenuAndGrid"
-    translation="[0,0]"
-    maskUri="pkg:/images/poster-mask-pixel.png"
-    maskSize="[0,1080]"
-    maskOffset="[1840,0]">
-
+    <Group
+      id="CategoryMenuAndGrid">
 
       <!-- Special category menu items. These will be merged with category list -->
       <ContentNode
@@ -208,13 +203,16 @@
         itemSpacings="[8]"
         itemComponentName="CategorySeasonListItem" />
 
-      <Group
+      <MaskGroup
         id="ContentArea"
-        translation="[85,562]" >
+        maskUri="pkg:/images/poster-mask.png"
+        maskSize="[0,0]"
+        maskOffset="[1731,326]"
+        translation="[85,562]">
         <CategoryGridList
           id="CategoryGridList"/>
-      </Group>
-    </MaskGroup>
+      </MaskGroup>
+    </Group>
 
     <AuthTask
       id="CategoryAuthTask" />

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "CategoryContentNode" extends="ContentNode">
+  <interface>
+    <!-- these will come in for paginated responses -->
+    <field id="totalCount" type="int" value="-1"/>
+    <field id="offset" type="int" value="0"/>
+
+    <!-- json sources for CategoryGridList -->
+    <field id="json" type="string" />
+
+    <!-- currently focused item index to communicate to CategoryGridRowLabel -->
+    <field id="focusIndex" type="integer" value="-1"/>
+  </interface>
+</component>

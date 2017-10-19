@@ -965,7 +965,7 @@ End Function
 '''''''''''''''''''''''
 ' onFirstPosterLoaded
 '
-' Info that the first poster in the first CategoryContentGrid has bubbled all the way up.
+' Info that the first poster in the first category has bubbled all the way up.
 ' Fire off a log to a server so we can track how long it took since the app was started, ie. StartOnNow() was called
 Function onFirstPosterLoaded()
   tubiLog("ContentController.onFirstPosterLoaded")  'write to console only

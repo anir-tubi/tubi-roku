@@ -34,3 +34,11 @@ Function clone(source)
   target.setFields(fields)
   return target  
 End Function
+
+Function cloneDeep(source)
+  root = clone(source)
+  for i=0 to source.getChildCount()-1
+    root.appendChild(clone(source.getChild(i)))
+  end for
+  return root
+End Function

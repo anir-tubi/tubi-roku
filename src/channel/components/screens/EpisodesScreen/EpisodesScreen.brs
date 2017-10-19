@@ -52,7 +52,7 @@ Function onSeasonFocused()
     m.EpisodeGrid.unobserveField("itemFocused")
   end if
 
-  m.EpisodeGrid = m.SeasonRows.findNode("Items").getChild(m.top.seasonFocused)  'should be a CategoryContentGrid.xml component
+  m.EpisodeGrid = m.SeasonRows.findNode("Items").getChild(m.top.seasonFocused)  'should be a SeasonContentGrid.xml component
 
   if m.EpisodeGrid <> invalid then 
     m.EpisodeGrid.observeField("itemSelected", "onEpisodeSelected")
@@ -77,7 +77,7 @@ Function onEpisodeToFocus()
   m.SeasonRows.animateToItem = m.top.episodeToFocus[0]
   
   'm.EpisodeGrid hasn't necessarily been updated by onSeasonFocused() running (as a result of setting m.top.seasonFocused)
-  'so we need to find the appropriate episode grid (CategoryContentGrid) component to set itemToFocus on
+  'so we need to find the appropriate episode grid (SeasonContentGrid) component to set itemToFocus on
   episodeGridToFocus = m.SeasonRows.findNode("Items").getChild(m.top.episodeToFocus[0])
 
   if episodeGridToFocus <> invalid

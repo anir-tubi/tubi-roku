@@ -4,6 +4,7 @@ Function init()
   m.CategoryList = m.top.findNode("CategoryList") 'aka category menu
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.SpecialCategories = m.top.findNode("SpecialCategories")
+  m.HintGroup = m.top.findNode("UpHintGroup")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("categoryPreviewResponse", "onCategoryPreviewReceived")
   m.top.observeField("focusedChild", "onScreenFocusChange")
@@ -23,7 +24,7 @@ Function init()
   m.CategoryGridList = m.top.findNode("CategoryGridList")
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
-  m.CategoryGridList.observeField("preCategoryFocused", "onPreGridCategoryChange")
+  m.CategoryGridList.observeField("categoryFocused", "onGridCategoryChange")
 
   'Special categories
   m.ContinueWatchingCategory = m.SpecialCategories.findNode("ContinueWatching")
@@ -124,6 +125,7 @@ End Function
 
 Function showCategoryMenu()
   if not m.CategoryList.isInFocusChain()
+    m.CategoryList.animateToItem = m.CategoryGridList.categoryFocused
     m.CategoryList.setFocus(true)
     m.categoryListIsFocused = true
     if m.global.constants.deviceInfo.limitedNewUi
@@ -198,10 +200,8 @@ Function onPreCategoryMenuChange()
   if m.CategoryList.isInFocusChain() and m.CategoryList.content <> invalid then
     m.CategoryGridList.animateToCategory = m.CategoryList.preItemFocused
   end if
-
-  'removes the "On Now" and arrow if the top most category is not focused
-  removeLiveTvHint(m.CategoryList.preItemFocused)
 End Function
+
 
 '''''''''''''''''''''
 ' onCategoryMenuChange
@@ -245,16 +245,13 @@ Function onSignedInChange()
 End Function
 
 
-Function onPreGridCategoryChange() As Void
-
-  ' Don't sync if CategoryGridList has focus and most likely triggered the grid category change
-  if m.CategoryGridList.isInFocusChain() and m.CategoryGridList.content <> invalid then
-    m.CategoryList.animateToItem = m.CategoryGridList.preCategoryFocused ' CategoryList has one extra item
-  end if
-
+Function onGridCategoryChange() As Void
   'removes the "On Now" and arrow if the top most category is not focused
-  removeLiveTvHint(m.CategoryGridList.preCategoryFocused)
-
+  if m.CategoryGridList.categoryFocused = 0
+    if m.HintGroup.opacity < 1.0 then fade(m.HintGroup, "in", 0.4)
+  else
+    if m.HintGroup.opacity > 0.0 then fade(m.HintGroup, "out", 0.4)
+  end if
 End Function
 
 
@@ -407,13 +404,3 @@ Function onTrackingUriChange()
   end if
 End Function
 
-
-
-Function removeLiveTvHint(categoryIndex as integer)
-  hintGroup = m.top.findNode("UpHintGroup")
-  if categoryIndex = 0
-    if hintGroup.opacity < 1.0 then fade(hintGroup, "in", 0.4)
-  else
-    if hintGroup.opacity > 0.0 then fade(hintGroup, "out", 0.4)
-  end if
-End Function

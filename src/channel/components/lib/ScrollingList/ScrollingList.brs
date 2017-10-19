@@ -73,13 +73,9 @@ Function onContentChange() As Void
 
   ' add or remove children as necessary
   if newNumItems > oldNumItems
-    for i=0 to (newNumItems - oldNumItems)-1
-      m.items.createChild(m.top.itemComponentName)
-    end for
+    m.items.createChildren(newNumItems - oldNumItems, m.top.itemComponentName)
   else if newNumItems < oldNumItems
-    for i=oldNumItems-1 to newNumItems step -1
-      m.items.removeChildIndex(i)
-    end for
+    m.items.removeChildrenIndex(oldNumItems - newNumItems, 0)
   end if
 
   ' early out if there are no items.  This mimics the behavior of internal components, where
@@ -90,7 +86,7 @@ Function onContentChange() As Void
   end if
 
   nextItemPosition = 0
-  for i=0 to m.top.content.getChildCount()-1
+  for i=0 to newNumItems-1
     newItem = m.items.getChild(i)
     ' may be invalid if itemComponentName incorrectly set
     if newItem <> invalid then
@@ -98,11 +94,6 @@ Function onContentChange() As Void
       ' may be invalid if component doesn't have a 'content' field
       if (newItem.id = invalid or newItem.id = "") and newItem.content <> invalid then
         newItem.id = newItem.content.id
-      end if
-
-      ' listHasFocus should default to "false" for itemComponent types
-      if m.top.isInFocusChain() then
-        newItem.listHasFocus = true
       end if
 
       if m.top.itemSpacings.count() = 0 then
@@ -125,6 +116,14 @@ Function onContentChange() As Void
       newItem.translation = [x,y]
     end if
   end for
+
+  ' listHasFocus should default to "false" for itemComponent types
+  if m.top.isInFocusChain() then
+    for i=0 to m.items.getChildCount()-1
+      item = m.items.getChild(i)
+      item.listHasFocus = true
+    end for
+  end if
 
   ' Default focus to first item
   if m.internalItemFocused = -1 then
