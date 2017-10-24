@@ -63,18 +63,32 @@ Function getConstants()
       "5000X": true  ' TV (low specs)
     }
 
-    ' models which are TVs have a built-in caption menu we need to handle specially
-    firmwareCaptionMenuModels = {
-      "4620X": true    ' Premiere
-      "4630X": true    ' Premiere Plus
-      "4640X": true    ' Ultra (TBD)
-      "5000X": true    ' Roku TV
-      "6000X": true    ' 4K Roku TV
-      "7000X": true    ' 4k Roku TV
+    'models that do not run the system CC overlay/dialog during video playback
+    noFirmwareCaptionMenuModels = {
+      "2400X": true  ' LT (2011)
+      "2450X": true  ' LT (2012)
+      "2500X": true  ' HD
+      "2700X": true  ' LT (2013)
+      "2710X": true  ' 1 / SE
+      "2720X": true  ' 2 (2013)
+      "3000X": true  ' 2 HD
+      "3050X": true  ' 2 XD
+      "3100X": true  ' 2 XS
+      "3400X": true  ' MHL Stick
+      "3420X": true  ' MHL Stick
+      "3500X": true  ' HDMI Stick (2014)
+      "3600X": true  ' QuadCore Stick (2016)
+      "3700X": true  ' Express
+      "3710X": true  ' Express+
+      "4200X": true  ' 3 (2013)
+      "4210X": true  ' 2 (2015)
+      "4230X": true  ' 3 (2015)
+      "4400X": true  ' 4
     }
-    if firmwareVersionMajor >= 8 then
-      ' Firmware 8.0.0 added a system dialog for captions on Roku 4
-      firmwareCaptionMenuModels["4400X"] = true
+
+    ' Firmware 8.0.0 added a system dialog for captions on Roku 4
+    if firmwareVersionMajor >= 8
+      noFirmwareCaptionMenuModels.delete("4400X")
     end if
 
     if lowMemoryModels[di.GetModel()] <> invalid
@@ -95,10 +109,10 @@ Function getConstants()
       limitedNewUi = false
     end if
 
-    if firmwareCaptionMenuModels[di.GetModel()] <> invalid
-      firmwareCaptionMenu = true
-    else
+    if noFirmwareCaptionMenuModels[di.GetModel()] <> invalid
       firmwareCaptionMenu = false
+    else
+      firmwareCaptionMenu = true
     end if
 
     'get client version from manifest
