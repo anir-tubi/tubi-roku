@@ -101,54 +101,25 @@ You can set `DEV_PASSWORD` with the developer password set on the roku device if
 - Run unit tests (white box)
 - Run jasmine tests (black box)
 
+##### Setting Up Staging
+- Running `make ROKU_PROFILE=staging install` will do the following:
+  - generate a version of the main app that can be used for staging
+  - upload hotpatch files and remote components build to a s3 bucket on AWS. (**You must set up access on AWS for this to work**).
+- Running `make ROKU_PROFILE=staging stage` will just upload the hotpatch and remote components pkg to s3. This can be used for testing remote components builds with the existing staging private channel.
+
 ### Versioning and Building
 
-- For every submission cycle to Roku:
-  - Bump the minor version number, e.g.
-  - Reset the build number to 1
-  - Update default.yml and staging.yml
-	  - Set the hotpatchUrl to `http://.../<major>.<minor>.newUI.brs`
-	  - Set the hotPatchUrlOldUI to `http://.../<major>.<minor>.oldUI.brs`
-  - Merge contents of n-1 hotpatches to source base
-  - Create new empty hotpatch files
-  - Update staging.yml
-- For every bugfix update, either via internal QA or Roku QA:
-  - Bump the build number in build.yml by running `make release`
-  - make the build with ROKU_PROFILE=production (`make release` does this)
-  - Bump the build number for `remoteComponentsUrl` to `"http://.../tubitv_remote_components_<major>_<minor>_<build>.pkg"`
-
-### Deployment and Internal QA
-
-- Rekey and run `make pkg`
-- For major versions
-    1. Collect build artifacts
-        - tubitv\_remote\_components-\<major\>.\<minor\>.\<build\>.zip (remote components for \<major\>.\<minor\>.\<build\>)
-        - tubitv_roku.zip
-        - \<major\>.\<minor\>.oldui.brs (oldUI hotpatch)
-        - \<major\>.\<minor\>.newui.brs (newUI hotpatch)
-    2. Deploy remote components to CDN
-    3. Deploy hotpatch files to CDN
-- git tag the release
-- Push tags to repo
-- Create github release for the tag
-- Publish staging build to private channel
-
-### Roku Submission
-
-- Send build via Roku portal
-
-### (needs update) Tag the release
-
-Running `make release` will take care of a few steps for prepping a release build.  These include
-
-* Cleaning up any previous builds from the build directory to avoid stale sources
-* Verifying a clean build directory to avoid uncommited changes in the build
-* Incrementing the build number in the manifest and generated Settings.brs file
-* Tagging the source tree
-
-The following is example output of running the release target:
-
-
+##### Building For Roku Submission
+- Verify that the PKG_PASSWORD environment variable is set with the password needed for the production dev id
+- Verify that the ROKU\_DEV_TARGET environement variable is set
+- Run `make release`. `make release` will do the following:
+  - Clean up any previous builds from the build directory to avoid stale sources
+  - Verify a clean build directory to avoid uncommited changes in the build
+  - Increment the build number in the manifest and generated Settings.brs file
+  - Tag the source tree
+  - Build `tubitv_remote_components.pkg`
+  - Build `tubitv_roku.pkg`
+  - The following is example output of running the release target:
 
 ```
 $ make release
@@ -166,6 +137,39 @@ If you are intending this to be a formal release, create a pull request for the 
 Remember to push the new tag to remote with 'git push --tags origin'
 
 ```
+
+- Create "empty" hotpatches for the newui and oldui on the CDN named `x.y.oldui.brs` and `x.y.newui.brs`, where x and y are major and minor version numbers.
+- Make sure to update the version number in the newui hotpatch.
+- Copy the newly created `tubitv_remote_components.pkg` file to the CDN and rename it to `tubitv_remote_components_x_y_z.pkg`
+- Push the tag created during `make release` to GitHub
+- Create a GitHub release for the tag with title "Submission Build" and set as "Pre Release"
+- Upload the build to Roku via the development portal
+- Email Roku Partner Success to let them know the build is in their queue
+
+##### After Submitting to Roku, Before Starting New Development
+  - Bump the minor version number, e.g.
+  - Reset the build number to 1
+  - Update default.yml
+    - Set the hotpatchUrl to `http://.../<major>.<minor>.newUI.brs`
+    - Set the hotPatchUrlOldUI to `http://.../<major>.<minor>.oldUI.brs`
+  - Merge contents of n-1 hotpatches to source base
+  - Create new empty hotpatch files
+
+##### After Roku Deploys our Build
+- Update the GitHub release's title to "Submission Release" and set to "Latest Release"
+- Create a staging build for the latest production version number and 
+  - checkout out the "Submission Release" tag.
+  - run `make ROKU_PROFILE=staging install`
+  - package the `tubitv_roku_x_y_z.zip` file
+  - update the staging private channel with the newly created package via the Roku Developer Portal
+
+##### Building for Remote Components Deployment
+- **Before updating any functionality, checkout the tag for the latest Roku Submission Release so you are building on what is in production**
+- Run `make release`
+- Copy the newly created `tubitv_remote_components.pkg` file to the CDN and rename it to `tubitv_remote_components_x_y_z.pkg` where x, y, and z are the major, minor, and build numbers after the version number was incremented during `make release`
+- Update the version number in the newui hotpatch
+- Push the tag created during `make release` to GitHub
+- Create a GitHub release for the tag with title "Remote Release"
 
 
 

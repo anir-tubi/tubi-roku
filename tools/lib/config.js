@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 const localIp = require('my-local-ip')();
+// const jszip = require('jszip');
+const archiver = require('archiver');
 
 const cwd = path.join(process.cwd(), 'config');
 const defaultProfile = 'default';
@@ -27,7 +29,7 @@ function parse(profile, withReplace) {
     const remoteComponentDir = localIp + ':8090';
     let rendered = raw.replace(/<<URI-TO-REPLACE>>/g, remoteComponentDir);
 
-    const version = getBuildTag();
+    const version = getBuildTag(false, false);
     rendered = rendered.replace(/<<VER-TO-REPLACE>>/g, version);
     return yaml.load(rendered);
   }
@@ -40,9 +42,19 @@ function parse(profile, withReplace) {
  * A simple function that returns the version number as defined in build.yml
  * @returns string (ex. '2_1_3')
  */
-function getBuildTag() {
+function getBuildTag(isMinor=false, isDot=false) {
+  let connector = '.';
+  if (!isDot || isDot === 'false') {
+    connector = '_';
+  }
+  
   var build = parse(buildProfile, false);
-  return `${build.manifest.major_version}_${build.manifest.minor_version}_${build.manifest.build_version}`;
+
+  if (!isMinor || isMinor === 'false') {
+    return `${build.manifest.major_version}${connector}${build.manifest.minor_version}${connector}${build.manifest.build_version}`;
+  } else {
+    return `${build.manifest.major_version}${connector}${build.manifest.minor_version}`;
+  }
 }
 
 
@@ -50,8 +62,8 @@ function getBuildTag() {
  * Prints the version number as defined in build.yml
  * @returns string (ex. '2_1_3')
  */
-function getBuildTagExternal() {
-  console.log(getBuildTag());
+function getBuildTagExternal(isMinor=false, isDot=false) {
+  console.log(getBuildTag(isMinor, isDot));
 }
 
 
@@ -158,6 +170,7 @@ function genManifest(env, filename, manifestName) {
   })
 }
 
+
 function incrementBuildNumber() {
   let build = parse(buildProfile, true);
 
@@ -176,8 +189,55 @@ function incrementBuildNumber() {
 }
 
 
-exports.load = load;
-exports.save = save;
-exports.genManifest = genManifest;
-exports.incrementBuildNumber = incrementBuildNumber;
-exports.getBuildTagExternal = getBuildTagExternal;
+function zipDir(dirPath) {
+  // const zip = new jszip();
+  const version = getBuildTag(false, false);
+
+  const localPath = 'build/local';
+  const remotePath = 'build/remote';
+
+  // set up the source and destination paths of the zip file
+  if (dirPath === localPath) {
+    var zipSource = path.join(process.cwd(), localPath);
+    var zipName = `tubi_${version}.zip`;
+  } else if (dirPath === remotePath) {
+    var zipSource = path.join(process.cwd(), remotePath);
+    var zipName = `tubi_remote_components_${version}.zip`;
+  } else {
+    console.log('The directory to be zipped is not recognized. No zip created!');
+    return;
+  }
+  
+  const zipDest = path.join(process.cwd(), 'build', zipName);
+  const output = fs.createWriteStream(zipDest);
+  const archive = archiver('zip', {
+    zlib: { level: 9 } // Sets the compression level.
+  });
+
+  // listen for all archive data to be written
+  // 'close' event is fired only when a file descriptor is involved
+  output.on('close', function() {
+    console.log(`${zipName} has been successfully created`);
+  });
+
+  archive.pipe(output);
+
+  // good practice to catch this error explicitly  
+  archive.on('error', function(err) {
+    console.log('zip error', dirPath, err);
+  });
+
+  archive.directory(zipSource, false);
+  archive.finalize();
+}
+
+
+module.exports = {
+  parse,
+  load,
+  save,
+  genManifest,
+  incrementBuildNumber,
+  getBuildTagExternal,
+  zipDir,
+};

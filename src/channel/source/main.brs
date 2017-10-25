@@ -155,6 +155,9 @@ Function Hotpatch(hotPatchUrl) As Integer
     transfer = CreateObject("roUrlTransfer")
     transfer.SetMessagePort(port)
     transfer.setUrl(hotPatchUrl)
+    if Left(UCase(hotPatchUrl), 5) = "HTTPS"
+      transfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
+    end if
     transfer.AsyncGetToString()
     msg = wait(10000, transfer.GetMessagePort())
 

@@ -4,17 +4,14 @@ MAKE=make
 TOOL_CLI=node tools/cli.js
 LANG=C
 
-NAME=tubitv_roku
-REMOTE_LOAD_NAME=tubitv_remote_components
+NAME=tubi
+REMOTE_LOAD_NAME=tubi_remote_components
 SRC_DIR=src/channel
 BUILD_DIR=build
-SRC_HOTPATCH_DIR=src/hotpatch
+BUILD_HOTPATCH_DIR=build/hotpatch
 TARGET_DIR=$(BUILD_DIR)/local
 TARGET_REMOTE_DIR=$(BUILD_DIR)/remote
 TARGET_HOTPATCH_DIR=$(BUILD_DIR)/hotpatch
-TARGET=$(NAME).zip
-REMOTE_LOAD_ZIP=$(REMOTE_LOAD_NAME).zip
-REMOTE_LOAD_PKG=$(REMOTE_LOAD_NAME).pkg
 REMOTE_LOAD_PORT=8090
 REMOTE_LOAD_IMAGE_WHITELIST=
 REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
@@ -35,6 +32,8 @@ MANIFEST_FILE=manifest
 ORIGINAL_MANIFEST_NAME=manifest
 REMOTE_LOAD_NAME_MANIFEST_NAME=component_library_manifest
 TESTS=source/tests
+S3_STAGING_ADDR=s3://adrise-bryan-playground/roku-staging
+S3_COMPONENTS_DIR=components
 
 ifeq ($(ROKU_PROFILE), production)
 RSYNC_EXCLUDE=--exclude source/tests --exclude '.keep'
@@ -42,16 +41,12 @@ else
 RSYNC_EXCLUDE=--exclude '.keep'
 endif
 
-build: rsync gen zip
-	@echo "Project $(TARGET) is built with profile $(ROKU_PROFILE)."
+build: clean rsync gen zip
+	@echo "Project $(VERSIONED_TARGET) is built with profile $(ROKU_PROFILE)."
 
 zip:
-	@rm -f ./$(BUILD_DIR)/$(TARGET)
-	@rm -f ./$(BUILD_DIR)/$(REMOTE_LOAD_ZIP)
-
-	@cd $(TARGET_DIR); $(ZIP) ../$(TARGET) .
-	@cd $(TARGET_REMOTE_DIR); $(ZIP) ../$(REMOTE_LOAD_ZIP) .
-
+	@$(TOOL_CLI) zip-files $(TARGET_DIR)
+	@$(TOOL_CLI) zip-files $(TARGET_REMOTE_DIR)
 
 rsync:
 	@mkdir -p ./$(TARGET_DIR)
@@ -61,7 +56,6 @@ rsync:
 	@rm -f ./$(TARGET_DIR)/$(SETTING_FILE)
 	@rsync -arvq $(RSYNC_EXCLUDE) $(SRC_DIR)/* $(TARGET_DIR)
 	@rsync -arvq $(REMOTE_LOAD_RSYNC_INCLUDE) $(SRC_DIR)/* $(TARGET_REMOTE_DIR)
-	@rsync -arvq $(SRC_HOTPATCH_DIR)/* $(TARGET_HOTPATCH_DIR)
 
 	# Swap script references from pkg:/ to libpkg:/
 	@find ./$(TARGET_REMOTE_DIR)/components -name '*.xml' | xargs sed -i '' 's|<script type="text/brightscript" uri="pkg:|<script type="text/brightscript" uri="libpkg:|'
@@ -75,31 +69,49 @@ rsync:
 	# Remove $$RES$$ autosub since it doesn't work for remote components
 	@find ./$(TARGET_REMOTE_DIR)/components -name '*.xml' | xargs sed -i '' 's|\$$\$$RES\$$\$$|fhd|'
 
-
 gen:
 	@$(TOOL_CLI) create-config $(ROKU_PROFILE) $(TARGET_DIR)/$(SETTING_FILE)
 	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_DIR)/$(MANIFEST_FILE) $(ORIGINAL_MANIFEST_NAME)
 	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_REMOTE_DIR)/$(MANIFEST_FILE) $(REMOTE_LOAD_NAME_MANIFEST_NAME)
+	@$(TOOL_CLI) create-hotpatch $(ROKU_PROFILE) 
 	@touch $(TARGET_REMOTE_DIR)/source/main.brs
+
+stage: set-build
+  ifeq ($(ROKU_PROFILE), staging)
+		@echo "Uploading components and hotpatches to s3 staging."
+		@aws s3 cp $(BUILD_DIR)/$(VERSIONED_REMOTE_LOAD_PKG) $(S3_STAGING_ADDR)/$(S3_COMPONENTS_DIR)/$(VERSIONED_REMOTE_LOAD_PKG)
+		@aws s3 cp $(BUILD_HOTPATCH_DIR)/$(VERSIONED_OLDUI_HOTPATCH) $(S3_STAGING_ADDR)/$(VERSIONED_OLDUI_HOTPATCH)
+		@aws s3 cp $(BUILD_HOTPATCH_DIR)/$(VERSIONED_NEWUI_HOTPATCH) $(S3_STAGING_ADDR)/$(VERSIONED_NEWUI_HOTPATCH)
+  endif
+
+set-build:
+BUILD_VERSION?=$$($(TOOL_CLI) get-build-tag false false)
+MINOR_VERSION_DOT?=$$($(TOOL_CLI) get-build-tag true true)
+VERSIONED_REMOTE_LOAD_NAME?=$(REMOTE_LOAD_NAME)_$(BUILD_VERSION)
+VERSIONED_REMOTE_LOAD_ZIP?=$(VERSIONED_REMOTE_LOAD_NAME).zip
+VERSIONED_REMOTE_LOAD_PKG?=$(VERSIONED_REMOTE_LOAD_NAME).pkg
+VERSIONED_TARGET?=$(NAME)_$(BUILD_VERSION).zip
+VERSIONED_NAME?=$(NAME)_$(BUILD_VERSION)
+VERSIONED_OLDUI_HOTPATCH=$(MINOR_VERSION_DOT).oldui.brs
+VERSIONED_NEWUI_HOTPATCH=$(MINOR_VERSION_DOT).newui.brs
 
 host:
 	@$(TOOL_CLI) host-components $(BUILD_DIR) $(REMOTE_LOAD_PORT)
 
-install: env build pkg-components
+install: env build pkg-components stage
 	@echo "Installing $(NAME) to host $(ROKU_DEV_TARGET)...(this might take up to a minute)"
-	@#$(CURL)  -H 'Connection: close' --digest -u "rokudev:1234" -F "mysubmit=Install" -F "archive=@$(TARGET_DIR)/$(TARGET)" http://$(ROKU_DEV_TARGET)/plugin_install | grep "<font color" | sed "s/<font color=\"red\">//"
-	@$(TOOL_CLI) upload $(BUILD_DIR)/$(TARGET) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
+	@$(TOOL_CLI) upload $(BUILD_DIR)/$(VERSIONED_TARGET) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
 	@$(MAKE) -j2 dev host
 
-pkg-components:
-	@echo "Signing $(REMOTE_LOAD_ZIP) on host $(ROKU_DEV_TARGET)"
-	@$(TOOL_CLI) upload $(BUILD_DIR)/$(REMOTE_LOAD_ZIP) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
-	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(REMOTE_LOAD_NAME) $(BUILD_DIR)
+pkg-components: set-build
+	@echo "Signing $(VERSIONED_REMOTE_LOAD_ZIP) on host $(ROKU_DEV_TARGET)"
+	@$(TOOL_CLI) upload $(BUILD_DIR)/$(VERSIONED_REMOTE_LOAD_ZIP) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
+	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(VERSIONED_REMOTE_LOAD_NAME) $(BUILD_DIR)
 
 pkg: pkg-components
-	@echo "Signing $(TARGET) on host $(ROKU_DEV_TARGET)"
-	@$(TOOL_CLI) upload $(BUILD_DIR)/$(TARGET) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
-	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(NAME) $(BUILD_DIR)
+	@echo "Signing $(VERSIONED_TARGET) on host $(ROKU_DEV_TARGET)"
+	@$(TOOL_CLI) upload $(BUILD_DIR)/$(VERSIONED_TARGET) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
+	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(VERSIONED_NAME) $(BUILD_DIR)
 
 dev: env
 	@echo "Telnet to $(ROKU_DEV_TARGET) 8085"
@@ -126,19 +138,17 @@ verifyrepo:
 		exit 1; \
   fi
 
-release: clean verifyrepo
+release: verifyrepo set-build
 	@$(TOOL_CLI) increment-build-number
 	@git commit -m "incrementbuild: Bump build number" config/build.yml
-	@echo "Tagging $$($(TOOL_CLI) get-build-tag)"
-	@$(TOOL_CLI) get-build-tag | xargs git tag
+	@echo "Tagging $$($(TOOL_CLI) get-build-tag false false)"
+	@$(TOOL_CLI) get-build-tag false false | xargs git tag
 	@$(MAKE) ROKU_PROFILE=production build pkg
-	@$(TOOL_CLI) get-build-tag | xargs -I %% mv ./$(BUILD_DIR)/$(TARGET) ./$(BUILD_DIR)/$(NAME)_%%.zip
-	@$(TOOL_CLI) get-build-tag | xargs -I %% mv ./$(BUILD_DIR)/$(REMOTE_LOAD_ZIP) ./$(BUILD_DIR)/$(REMOTE_LOAD_NAME)_%%.zip
 	@echo
 	@echo "If you are intending this to be a formal release, create a pull request for the current branch"
-	@echo "    git branch release_$$($(TOOL_CLI) get-build-tag)"
-	@echo "    git push origin release_$$($(TOOL_CLI) get-build-tag)"
+	@echo "    git branch release_$$($(TOOL_CLI) get-build-tag false false)"
+	@echo "    git push origin release_$$($(TOOL_CLI) get-build-tag false false)"
 	@echo "Remember to push the new tag to remote with 'git push --tags origin'"
 	@echo
 
-.PHONY: build zip rsync install dev gen discover test clean verifyrepo release pkg
+.PHONY: build zip rsync install dev gen discover test clean verifyrepo release pkg pkg-components stage set-build

@@ -1,12 +1,13 @@
-print "Hot Patch 2.4.newui"
+print "Hot Patch 2.4.newui {{profile}}"
 
 '''''''''''''''''''''''''''''''
 'settings.version must be updated manually in the new ui hotpatch file
 'when a new remote components version is released
-m.global.utils.constants.settings.version = "2_4_1"
+m.global.utils.constants.settings.version = "{{versionUnderscored}}"
 ' Set the most current remote components URL.  These should only increment build number.  Minor or major version number differences indicate
 ' incompatible architectural changes.
-m.global.utils.constants.settings.remoteComponentsUrl = "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_" + m.global.utils.constants.settings.version + ".pkg"
+' m.global.utils.constants.settings.remoteComponentsUrl = "http://cdn.adrise.com/hotpatches/roku/components/tubitv_remote_components_" + m.global.utils.constants.settings.version + ".pkg"
+m.global.utils.constants.settings.remoteComponentsUrl = "{{remoteComponentsLocation}}"
 
 
 

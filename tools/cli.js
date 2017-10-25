@@ -2,6 +2,7 @@
 
 const config = require('./lib/config');
 const network = require('./lib/network');
+const templatize = require('./lib/templating');
 const program = require('commander');
 
 program.version('0.1.0');
@@ -22,6 +23,13 @@ program
   .description('create roku manifest file')
   .action((env, filename, manifestname) => {
     config.genManifest(env, filename, manifestname)
+  });
+
+program
+  .command('create-hotpatch <env>')
+  .description('create hotpatch files')
+  .action((env) => {
+    templatize.createHotpatch(env)
   });
 
 program
@@ -68,10 +76,10 @@ program
   });
 
 program
-  .command('get-build-tag')
+  .command('get-build-tag <is_minor> <is_dot>')
   .description('dump a git-friendly version number to use as a tag')
-  .action(() => {
-    config.getBuildTagExternal()
+  .action((isMinor, isDot) => {
+    config.getBuildTagExternal(isMinor, isDot);
   });
 
 program
@@ -79,6 +87,13 @@ program
   .description('set up a temporary service that will return the externally loaded components')
   .action((zippath, port) => {
     network.hostComponents(zippath, port)
+  });
+
+program
+  .command('zip-files <dir_path>')
+  .description('zip the contents of a directory')
+  .action((dir_path) => {
+    config.zipDir(dir_path);
   });
 
 program.parse(process.argv);
