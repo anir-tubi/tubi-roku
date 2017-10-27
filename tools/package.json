@@ -28,7 +28,7 @@
     "request": "^2.67.0",
     "roku-test": "veeta-tv/node-roku-test#5171b3f",
     "rx": "^4.0.7",
-    "my-local-ip": "^1.0.0"
+    "my-local-ip": "^1.0.0",
     "archiver": "^2.1.0",
     "handlebars": "^4.0.11"
   }
