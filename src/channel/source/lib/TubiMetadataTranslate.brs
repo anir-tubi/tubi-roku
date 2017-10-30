@@ -193,7 +193,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     end for
     translatedContent.subtitleTracks = subtitleTracks
     ' This is needed to make subtitles work on Roku 3 (and other models... 3900, 3800, etc.)
-    translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles[0]}
+    translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles[0].url}
   end if
 
   'set the inital subtitle on/off state for the video
