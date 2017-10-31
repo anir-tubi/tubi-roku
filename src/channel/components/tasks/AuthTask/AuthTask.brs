@@ -2,12 +2,49 @@ Function init()
   m.top.functionName = "execGetAuthInfo"
 End Function
 
-Function execGetAuthInfo()
-  tubiLog("AuthTask.execGetAuthInfo")
+'''''''''
+' Synchronously load auth info, followed by loading of user categories (if user is logged in)
+Function execIntializeUserData()
+  tubiLog("AuthTask.execIntializeUserData")
   constants = m.global.constants
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
-  m.top.authInfo = Auth.getAuthInfo()
+  Bookmarks = TubiBookmarks(Request, Auth, constants)
+  authInfo = Auth.getAuthInfo()
+  queuePort = CreateObject("roMessagePort")
+  queue = TubiRequestQueue().create(queuePort)
+  localBookmarkReqId = "bookmark"
+  localHistoryReqId = "history"
+
+  initialBookmarksReq = Bookmarks.getInitialBookmarksReq(localBookmarkReqId)
+  if initialBookmarksReq <> invalid then
+    queue.pushRequest(initialBookmarksReq)
+  else
+    m.top.bookmarks = invalid
+  end if
+
+  initialHistoryReq = Bookmarks.getInitialHistoryReq(localHistoryReqId)
+  if initialHistoryReq <> invalid then
+    queue.pushRequest(initialHistoryReq)
+  else
+    m.top.history = invalid
+  end if
+
+  while queue.count() > 0
+    msg = wait(0, queuePort)
+    handledReq = queue.handleEvent(msg)
+    if handledReq <> invalid
+      print "*** execInitializeUserData: "; handledReq.localId; " returned "; handledReq.response.code
+      if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
+        if handledReq.localId = localBookmarkReqId
+          m.top.bookmarks = Bookmarks.handleInitialBookmarks(handledReq.response.data)
+        else if handledReq.localId = localHistoryReqId
+          m.top.history = Bookmarks.handleInitialHistory(handledReq.response.data)
+        end if
+      end if
+    end if
+  end while
+  m.top.authInfo = authInfo  ' set last so that it can be used as a trigger 
 End Function
 
 Function execSignOut()
@@ -17,56 +54,6 @@ Function execSignOut()
   Auth = TubiAuth(constants, Request)
   Auth.logout()
   m.top.authInfo = invalid
-End Function
-
-Function getInitialUserCategories()
-  tubiLog("AuthTask.getUserCategories")
-  constants = m.global.constants
-  Request = TubiRequest()
-  Auth = TubiAuth(constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, constants)
-
-  queuePort = CreateObject("roMessagePort")
-  Queue = TubiRequestQueue()
-  queue = Queue.create(queuePort)
-
-  localBookmarkReqId = "bookmark"
-  localHistoryReqId = "history"
-
-  initialBookmarksReq = Bookmarks.getInitialBookmarksReq(localBookmarkReqId)
-  if initialBookmarksReq <> invalid then queue.pushRequest(initialBookmarksReq)
-
-  initialHistoryReq = Bookmarks.getInitialHistoryReq(localHistoryReqId)
-  if initialHistoryReq <> invalid then queue.pushRequest(initialHistoryReq)
-
-  if queue.count() > 0 then
-
-    while true
-      msg = wait(0, queuePort)
-      handledReq = queue.handleEvent(msg)
-
-      if handledReq <> invalid
-        if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
-          if handledReq.localId = localBookmarkReqId
-            while m.top.setField("initialBookmarks", handledReq.response.data) = false
-              tubiLog("initialBookmarks not set", "warn")
-            end while
-
-          else if handledReq.localId = localHistoryReqId
-            while m.top.setField("initialHistory", handledReq.response.data) = false
-              tubiLog("initialHistory not set", "warn")
-            end while
-          end if
-        end if
-      end if
-
-      'once we've received all our initial responses, shut down this loop
-      if queue.count() = 0
-        exit while
-      end if
-    end while
-  end if
-
 End Function
 
 Function addToQueue()
@@ -132,7 +119,6 @@ Function removeFromQueue()
   end if
   tubiLog("EXIT AuthTask.removeFromQueue")
 End Function
-
 
 Function removeFromHistory()
   tubiLog("AuthTask.removeFromHistory")

@@ -321,11 +321,11 @@ end function
 '@initialBookmarks: string, JSON server response when making the first call to UAPI to get a user's basic bookmark info
 'returns bookmarkIds ordered node tree with series having episode children
 function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
-  bookmarkIds = CreateObject("roSGNode", "TubiContentNode")
+  bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
   parsedInitialBookmarks = ParseJson(initialBookmarks)
   if parsedInitialBookmarks <> Invalid
     for each bookmark in parsedInitialBookmarks.items
-      child = bookmarkIds.createChild("TubiContentNode")
+      child = bookmarkIds.createChild("BookmarkContentNode")
       child.id = bookmark.content_id.toStr() 
       child.bookmarkId = bookmark.id
       if bookmark.content_type = m.constants.uapiContentTypes.movie
@@ -344,11 +344,11 @@ end function
 '@initialHistory: string, JSON server response when making the first call to UAPI to get a user's basic bookmark info
 'returns historyIds ordered node tree with series having episode children
 function tubiBookmarks_handleInitialHistory(initialHistory)
-  historyIds = CreateObject("roSGNode", "TubiContentNode")
+  historyIds = CreateObject("roSGNode", "HistoryContentNode")
   parsedInitialHistory = ParseJson(initialHistory)
   if parsedInitialHistory <> invalid then
     for each history in parsedInitialHistory.items
-      child = historyIds.createChild("TubiContentNode")
+      child = historyIds.createChild("HistoryContentNode")
       child.id =         history.content_id.toStr()
       if history.content_type = m.constants.uapiContentTypes.movie
         child.historyId =  history.id
@@ -360,7 +360,7 @@ function tubiBookmarks_handleInitialHistory(initialHistory)
         child.historyId =          history.id
         child.type =               m.constants.ui.contentTypes.series
         for each episode in history.episodes
-          grandchild = child.createChild("TubiContentNode")
+          grandchild = child.createChild("HistoryContentNode")
           grandchild.id = episode.content_id.toStr()
           grandchild.historyId = episode.id
           grandchild.nowPos = episode.position
@@ -410,20 +410,20 @@ function tubiBookmarks_updateNowPos(content, playerInfo, historyIds)
 
         series = historyIds.findNode(content.parentId)
         if series = invalid
-          series =                    historyIds.createChild("TubiContentNode")
+          series =                    historyIds.createChild("HistoryContentNode")
           series.id =                 content.parentId
           series.historyId =          playerInfo.parentHistoryId  ' TODO(Chris): check that this is invalid for all cases and remove
           series.type =               m.constants.ui.contentTypes.series
         end if
         series.currentEpisodeId =   content.id
         historyIds.insertChild(series, 0)
-        episode =                   series.createChild("TubiContentNode")
+        episode =                   series.createChild("HistoryContentNode")
         episode.id =                content.id
         episode.historyId =         playerInfo.historyId
         episode.nowPos =            playerInfo.nowPos
         episode.type =              m.constants.ui.contentTypes.video
       else
-        episode =                   historyIds.createChild("TubiContentNode")
+        episode =                   historyIds.createChild("HistoryContentNode")
         episode.id =                content.id
         episode.historyId =         playerInfo.historyId
         episode.nowPos =            playerInfo.nowPos

@@ -344,15 +344,12 @@ Function historyRequest(requestId As String, field As String) As Object
   Auth = TubiAuth(m.constants, Request)
   Bookmarks = TubiBookmarks(Request, Auth, m.constants)
   historyIds = m.global.historyIds
-  if historyIds <> invalid then
-    idList = []
-    for i=0 to historyIds.getChildCount()-1
-      idList.push(historyIds.getChild(i).id)
-    end for
-    request = Bookmarks.getFullHistoryReq(idList)
-    return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, m.constants.reqNames.getFullHistory, request.options, false, idList)
-  end if
-  return invalid
+  idList = []
+  for i=0 to historyIds.getChildCount()-1
+    idList.push(historyIds.getChild(i).id)
+  end for
+  request = Bookmarks.getFullHistoryReq(idList)
+  return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, m.constants.reqNames.getFullHistory, request.options, false, idList)
 End Function
 
 
@@ -365,15 +362,12 @@ Function bookmarksRequest(requestId As String, field As String) As Object
   Auth = TubiAuth(m.constants, Request)
   Bookmarks = TubiBookmarks(Request, Auth, m.constants)
   bookmarkIds = m.global.bookmarkIds
-  if bookmarkIds <> invalid then
-    idList = []
-    for i=0 to bookmarkIds.getChildCount()-1
-      idList.push(bookmarkIds.getChild(i).id)
-    end for
-    request = Bookmarks.getFullBookmarksReq(idList)
-    return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, m.constants.reqNames.getFullBookmarks, request.options, false, idList)
-  end if
-  return invalid
+  idList = []
+  for i=0 to bookmarkIds.getChildCount()-1
+    idList.push(bookmarkIds.getChild(i).id)
+  end for
+  request = Bookmarks.getFullBookmarksReq(idList)
+  return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, m.constants.reqNames.getFullBookmarks, request.options, false, idList)
 End Function
 
 

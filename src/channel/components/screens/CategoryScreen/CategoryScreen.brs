@@ -18,7 +18,6 @@ Function init()
   m.CategoryList.observeField("preItemFocused","onPreCategoryMenuChange")
   m.CategoryList.observeField("itemSelected", "onCategoryMenuSelected")
   m.categoryListIsFocused = false
-  m.authTask = m.top.findNode("CategoryAuthTask")
 
   'Content area
   m.CategoryGridList = m.top.findNode("CategoryGridList")
@@ -34,7 +33,7 @@ Function init()
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 
-  onSignedInChange()  ' seed the search & sign in menu - also calls loadUserCategories() if necessary
+  onSignedInChange()  ' seed the search & sign in menu
 
   loadAllCategories()
 End Function
@@ -234,14 +233,6 @@ Function onSignedInChange()
   if m.top.content <> invalid then
     onContentChange()
   end if
-
-  if m.top.signedIn = true then
-    loadUserCategories()
-  else
-    'If user logged out, don't track their history or queue
-    m.global.bookmarkIds = CreateObject("roSGNode", "TubiContentNode")
-    m.global.historyIds = CreateObject("roSGNode", "TubiContentNode")
-  end if
 End Function
 
 
@@ -326,66 +317,6 @@ Function loadAllCategories()
     }
   }
   m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("categories", m.top, "categoryListResponse", url, "getAllCategories", options)
-End Function
-
-
-'''''''''''''''''''''
-' loadUserCategories
-'
-' Load the Queue and View History user categories
-Function loadUserCategories()
-  tubiLog("CategoryScreen.loadUserCategories")
-  'make the initial calls to the user's queue and view history
-  m.authTask.observeField("initialBookmarks", "handleInitialBookmarks")
-  m.authTask.observeField("initialHistory", "handleInitialHistory")
-
-  m.global.bookmarkIds = invalid
-  m.global.historyIds = invalid
-
-  m.authTask.functionName = "getInitialUserCategories"
-  m.authTask.control = "RUN"
-End Function
-
-
-'''''''''''
-' handleInitialBookmarks
-'
-' Use the metadataFetchTask to populate the content for the user's "My Queue" category
-Function handleInitialBookmarks()
-  tubiLog("CategoryScreen.handleInitialBookmarks")
-  constants = m.global.constants
-  Request = TubiRequest()
-  Auth = TubiAuth(constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, constants)
-
-  if m.authTask.initialBookmarks <> invalid
-    m.global.bookmarkIds = Bookmarks.handleInitialBookmarks(m.authTask.initialBookmarks)
-
-    'it's possible that the call to get the full bookmarks content can occur before the
-    'bookmark id/order are set, so just in case, set user categories as dirty to load them again
-    onDirtyUserCategories()
-  end if
-End Function
-
-
-'''''''''''
-' handleInitialHistory
-'
-' Use the metadataFetchTask to populate the content for the user's "My Queue" category
-Function handleInitialHistory()
-  tubiLog("CategoryScreen.handleInitialHistory")
-  constants = m.global.constants
-  Request = TubiRequest()
-  Auth = TubiAuth(constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, constants)
-
-  if m.authTask.initialHistory <> invalid
-    m.global.historyIds = Bookmarks.handleInitialHistory(m.authTask.initialHistory)
-
-    'it's possible that the call to get the full bookmarks content can occur before the
-    'bookmark id/order are set, so just in case, set user categories as dirty to load them again
-    onDirtyUserCategories()
-  end if
 End Function
 
 

@@ -17,8 +17,8 @@
     <interface>
       <!-- Set to the response body -->
       <field id="authInfo" type="assocarray" alwaysNotify="true" />
-      <field id="initialBookmarks" type="string" alwaysNotify="true" />
-      <field id="initialHistory" type="string" alwaysNotify="true" />
+      <field id="bookmarks" type="node"/>
+      <field id="history" type="node"/>
       
       <!-- addBookmark -->
       <field id="content" type="node" />

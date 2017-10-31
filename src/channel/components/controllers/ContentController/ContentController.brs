@@ -32,7 +32,7 @@ Function init()
   m.authTask = m.top.findNode("AuthTask")
   m.authTask.observeField("authInfo", "onAuthInfoReceived")
   m.authInfoReceived = false
-  m.authTask.functionName = "execGetAuthInfo"
+  m.authTask.functionName = "execIntializeUserData"
   m.authTask.control = "RUN"
 
   m.top.observeField("deepLinkContent", "onDeepLinkContentReceived")
@@ -188,8 +188,19 @@ Function onAuthInfoReceived()
   tubiLog("ContentController.onAuthInfoReceived")
   if m.authTask.authInfo = invalid
     ' user is logged out, so initialize empty bookmarks and history
-    m.global.bookmarkIds = CreateObject("roSGNode", "TubiContentNode")
-    m.global.historyIds = CreateObject("roSGNode", "TubiContentNode")
+    m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
+    m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
+  else
+    if m.authTask.bookmarks = invalid then
+      m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
+    else
+      m.global.bookmarkIds = m.authTask.bookmarks
+    end if
+    if m.authTask.history = invalid then
+      m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
+    else
+      m.global.historyIds = m.authTask.history
+    end if
   end if
   m.authInfoReceived = true
   startUserExperience()
@@ -262,7 +273,7 @@ Function onSignInComplete()
     startOnNow()
   else
     ' retrieve the credentials on the AuthTask before starting the UI. This reduces jank.
-    m.authTask.functionName = "execGetAuthInfo"
+    m.authTask.functionName = "execIntializeUserData"
     m.authTask.control = "RUN"
   end if
 
@@ -472,10 +483,8 @@ Function onResume()
   content = getDetailScreenContent()
   if content <> invalid then
     ' find the position in global history
-    if m.global.historyIds <> invalid then
-      history = m.global.historyIds.findNode(content.id)
-      if history <> invalid then content.nowPos = history.nowPos
-    end if
+    history = m.global.historyIds.findNode(content.id)
+    if history <> invalid then content.nowPos = history.nowPos
     playVideoContent(content)
   else
     tubiLog("ERROR: Resume selected but content is invalid")

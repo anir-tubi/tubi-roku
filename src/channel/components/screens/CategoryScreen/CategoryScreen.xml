@@ -214,9 +214,6 @@
       </MaskGroup>
     </Group>
 
-    <AuthTask
-      id="CategoryAuthTask" />
-
     <!-- At request of backend, deferring these requests gives the backend time to
       - cache the responses
       -->

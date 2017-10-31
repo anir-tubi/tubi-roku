@@ -99,12 +99,10 @@ Function onContentChange() As Void
 
     else
       episodeSelection = [0,0]
-      if m.global.historyIds <> invalid then
-        history = m.global.historyIds.findNode(m.top.content.id)
-        if history <> invalid and history.currentEpisodeId <> invalid and history.currentEpisodeId <> "" then
-          tubiLog("Finding current episode " + history.currentEpisodeId + " in series " + m.top.content.id)
-          episodeSelection = findEpisodeInSeries(history.currentEpisodeId)
-        end if
+      history = m.global.historyIds.findNode(m.top.content.id)
+      if history <> invalid and history.currentEpisodeId <> invalid and history.currentEpisodeId <> "" then
+        tubiLog("Finding current episode " + history.currentEpisodeId + " in series " + m.top.content.id)
+        episodeSelection = findEpisodeInSeries(history.currentEpisodeId)
       end if
       m.top.episodeSelection = episodeSelection
     endif
@@ -207,11 +205,9 @@ Function onShortContentChange()
         ' trim leading "0" off series id
         trackUri = trackUri + Mid(content.id, 2)
 
-        if m.global.historyIds <> invalid then
-          history = m.global.historyIds.findNode(content.id)
-          if history <> invalid and history.currentEpisodeId <> invalid and history.currentEpisodeId.len() > 0
-            trackUri = trackUri + "/" + history.currentEpisodeId
-          end if
+        history = m.global.historyIds.findNode(content.id)
+        if history <> invalid and history.currentEpisodeId <> invalid and history.currentEpisodeId.len() > 0
+          trackUri = trackUri + "/" + history.currentEpisodeId
         end if
       end if
 
@@ -257,14 +253,10 @@ Function setMenuItems() As Void
 
   history = invalid
   bookmark = invalid
-  if m.global.historyids <> invalid then
-    ' history should always deal with videos (movies or episodes)
-    history = m.global.historyIds.findNode(focusedContent.id)
-  end if
-  if m.global.bookmarkIds <> invalid then
-    ' bookmarks always deal with movie or series, not episodes
-    bookmark = m.global.bookmarkIds.findNode(m.top.content.id)
-  end if
+  ' history should always deal with videos (movies or episodes)
+  history = m.global.historyIds.findNode(focusedContent.id)
+  ' bookmarks always deal with movie or series, not episodes
+  bookmark = m.global.bookmarkIds.findNode(m.top.content.id)
 
   if history <> invalid and history.nowPos <> invalid and history.nowPos <> 0 then
     m.ResumeMenuItem.length = focusedContent.length
@@ -433,13 +425,11 @@ Function onBookmarked() As Void
 
   ' if deep linked here, we may not have the bookmarks loaded.  Also, there is the chance
   ' of a race condition where bookmarks are in flight.
-  if m.global.bookmarkIds <> invalid
-    newBookmark = CreateObject("roSGNode", "TubiContentNode")
-    newBookmark.id = m.top.content.id
-    newBookmark.type = m.top.content.type
-    newBookmark.bookmarkId = m.AuthTask.bookmarkId
-    m.global.bookmarkIds.insertChild(newBookmark, 0)
-  end if
+  newBookmark = CreateObject("roSGNode", "BookmarkContentNode")
+  newBookmark.id = m.top.content.id
+  newBookmark.type = m.top.content.type
+  newBookmark.bookmarkId = m.AuthTask.bookmarkId
+  m.global.bookmarkIds.insertChild(newBookmark, 0)
   m.top.shortContent = m.top.shortContent
 
   'user tracking
@@ -469,16 +459,8 @@ Function removeFromQueue()
   if m.isWaitingForServerResponse = false
     m.AuthTask.functionName = "removeFromQueue"
     content = clone(m.top.content)
-'#####
-print "***** Removing content "; content.id; " from queue"
-'#####
-    if m.global.bookmarkIds <> invalid then
-      bookmark = m.global.bookmarkIds.findNode(content.id)
-      content.bookmarkId = bookmark.bookmarkId
-'#####
-print "***** Removing bookmark "; content.bookmarkId; " from queue"
-'#####
-    end if
+    bookmark = m.global.bookmarkIds.findNode(content.id)
+    content.bookmarkId = bookmark.bookmarkId
     m.AuthTask.content = content
     m.AuthTask.observeField("result", "onBookmarkRemoved")
     m.AuthTask.control = "RUN"
@@ -505,10 +487,8 @@ Function onBookmarkRemoved() As Void
     return
   end if
 
-  if m.global.bookmarkIds <> invalid
-    bookmarkNode = m.global.bookmarkIds.findNode(m.top.content.id)
-    if bookmarkNode <> invalid then m.global.bookmarkIds.removeChild(bookmarkNode)
-  end if
+  bookmarkNode = m.global.bookmarkIds.findNode(m.top.content.id)
+  if bookmarkNode <> invalid then m.global.bookmarkIds.removeChild(bookmarkNode)
   'TODO(Chris): remove this and rely on global bookmarkIds for rendering proper menu (rather than needing a fully-realized content rendered by metadatafetchtask)
   m.top.shortContent = m.top.shortContent
 
@@ -530,10 +510,8 @@ Function removeFromHistory()
   if m.isWaitingForServerResponse = false
     m.AuthTask.functionName = "removeFromHistory"
     content = clone(m.top.content)
-    if m.global.historyIds <> invalid then
-      history = m.global.historyIds.findNode(m.top.content.id)
-      content.historyId = history.historyId
-    end if
+    history = m.global.historyIds.findNode(m.top.content.id)
+    content.historyId = history.historyId
     m.AuthTask.content = content
     m.AuthTask.observeField("result", "onHistoryRemoved")
     m.AuthTask.control = "RUN"
@@ -560,11 +538,9 @@ Function onHistoryRemoved() As Void
     return
   end if
 
-  if m.global.historyIds <> invalid
-    historyNode = m.global.historyIds.findNode(m.top.shortContent.id)
-    if historyNode <> invalid
-      m.global.historyIds.removeChild(historyNode)
-    end if
+  historyNode = m.global.historyIds.findNode(m.top.shortContent.id)
+  if historyNode <> invalid
+    m.global.historyIds.removeChild(historyNode)
   end if
   m.top.removeFromHistorySelected = true
 

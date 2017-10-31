@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "BookmarkContentNode" extends="ContentNode">
+  <interface>
+    <field id="type" type="string" />
+    <field id="bookmarkId" type="string" />
+  </interface>
+</component>
