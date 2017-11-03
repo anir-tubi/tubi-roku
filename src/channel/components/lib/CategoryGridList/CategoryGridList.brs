@@ -78,10 +78,12 @@ End Function
 
 Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
-  ' Clone here since we are editing fields within the incoming content
-  m.internalContent = cloneDeep(m.top.content)
-  m.RowList.content = m.internalContent
-  loadCategories(0)
+  m.RowList.content = invalid
+  if m.top.content <> invalid then
+    ' Clone here since we are replacing nodes within the category tree
+    m.internalContent = cloneDeep(m.top.content)
+    loadCategories(0)
+  end if
 End Function
 
 Function onDirtyUserCategories()
@@ -113,7 +115,9 @@ End Function
 ' The RowList has changed to a new category row
 Function onItemFocused()
   tubiLog("CategoryGridList.onItemFocused")
-  m.RowListCategoryDebounce.control = "start"
+  if m.RowList.itemFocused <> -1 then
+    m.RowListCategoryDebounce.control = "start"
+  end if
 End Function
 
 Function onRowListCategoryDebounce()
@@ -130,11 +134,6 @@ Function loadCategories(index) As Void
 
   categoryContent = m.internalContent.getChild(index)
   if categoryContent <> invalid then
-    immediate = fetch(categoryContent, categoryContent.id, index, "metadataFetchTaskResponse", m.blockSize)
-    if immediate <> invalid then
-      m.global.metadataFetchTask.request = immediate
-    end if
-
     ' Make sure adjacent categories are warm
     requests = []
     for i = index - m.categoryWindowSize to index + m.categoryWindowSize
@@ -209,6 +208,11 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
   for each requestId in responses
     mergeMetadata(responses[requestId])
   end for
+
+  ' Delayed setting of Rowlist content until first batch arrives
+  if m.RowList.content = invalid then
+    m.RowList.content = m.internalContent
+  end if
 End Function
 
 Function onMetadataFetchTaskResponse(message) As Void

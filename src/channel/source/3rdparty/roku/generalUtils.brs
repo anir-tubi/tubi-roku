@@ -81,10 +81,11 @@ End Sub
 '******************************************************
 'Convert anything to a string
 '
-'Always returns a string
+'Always returns a string, trying to use native toStr() function
 '******************************************************
 Function tostr(any)
-    ret = AnyToString(any)
+    if FindMemberFunction(any, "toStr") <> invalid then ret = any.toStr()
+    if ret = invalid ret = AnyToString(any)
     if ret = invalid ret = type(any)
     if ret = invalid ret = "unknown" 'failsafe
     return ret

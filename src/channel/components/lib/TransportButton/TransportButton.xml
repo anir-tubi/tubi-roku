@@ -6,11 +6,7 @@
   <interface>
     <field id="enabled" type="boolean" value="true"/>
 
-    <!-- image uri's that will update the official uri upon focus or unfocus state change -->
-    <field id="focusedUri" type="string" />
-    <field id="unfocusedUri" type="string" />
-
     <!-- boolean indicates if the button is focused or not -->
-    <field id="focusState" type="boolean" />
+    <field id="focusState" type="boolean" value="false"/>
   </interface>
 </component>

@@ -303,15 +303,6 @@ End Function
 Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
   if params = invalid or params.Count() = 0 then return url
 
-  ' Safety - backward compatible for firmware < 7.5
-  if FindMemberFunction(url, "EncodeUriComponentXXX") <> invalid then
-    hasEncode = true
-    tempUrlTransfer = invalid
-  else
-    hasEncode = false
-    tempUrlTransfer = CreateObject("roUrlTransfer")
-  end if
-
   ' allow a dangling '?' or '&' in the base url, e.g. "http://something.net/?"
   '         Example                  Case
   '             ...net                2
@@ -331,17 +322,13 @@ Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
   end if
 
   for each p in params
-    key = tostr(p).trim()
+    key = p.toStr().trim()
     if params[p] = invalid then 
       value = ""  ' don't send any string literal "invalid"
     else
-      value = tostr(params[p]).trim()
+      value = (params[p]).toStr().trim()
     end if
-    if hasEncode then
-      url = url + separator + key.EncodeUriComponent() + "=" + value.EncodeUriComponent()
-    else
-      url = url + separator + tempUrlTransfer.Escape(key) + "=" + tempUrlTransfer.Escape(value)
-    end if
+    url = url + separator + key.EncodeUriComponent() + "=" + value.EncodeUriComponent()
     separator = "&"
   end for
 

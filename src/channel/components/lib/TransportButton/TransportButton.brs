@@ -1,16 +1,11 @@
 Function init()
   m.top.observeField("focusState", "onFocusUpdate")
-  m.top.observeField("focusedUri", "onFocusUpdate")
-  m.top.observeField("unfocusedUri", "onFocusUPdate")
   m.top.observeField("enabled", "onFocusUpdate")
 
   m.colors = {
     focusedText: m.global.constants.ui.colors.focused
     unfocusedText: m.global.constants.ui.colors.unfocused
   }
-
-  ' bootstrap the state
-  onFocusUpdate()
 End Function
 
 Function onFocusUpdate()

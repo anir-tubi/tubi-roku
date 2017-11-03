@@ -22,7 +22,7 @@
     -    - offset - the offset into the total categorof the first 
     -
     -->
-    <field id="content" alias="RowList.content" />
+    <field id="content" type="node"/>
     <field id="itemSelected" type="node" alwaysNotify="true"/>
     <field id="itemFocused" type="node" alwaysNotify="true"/>
     <field id="cursorPosition" alias="RowList.rowItemFocused" />
