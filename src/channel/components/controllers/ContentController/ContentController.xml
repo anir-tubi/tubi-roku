@@ -60,6 +60,16 @@
   </interface>
         
     <children>
+      <!--
+        - This hides the loading screen that was in place by the Scene
+        - before remote components have loaded
+        -->
+      <Rectangle
+        id="ContentBackground"
+        width="1920"
+        height="1080"
+        translation="[0,0]"/>
+
       <!--Handles the background images -->
       <BackgroundGroup
         id="BackgroundGroup" />
