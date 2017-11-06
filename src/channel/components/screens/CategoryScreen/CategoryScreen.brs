@@ -5,7 +5,6 @@ Function init()
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.SpecialCategories = m.top.findNode("SpecialCategories")
   m.HintGroup = m.top.findNode("UpHintGroup")
-  m.top.observeField("content", "onContentChange")
   m.top.observeField("categoryPreviewResponse", "onCategoryPreviewReceived")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
@@ -33,6 +32,16 @@ Function init()
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 
+  ' Category list loaded by loadAllCategories
+  ' Content should be structured as:
+  ' <CategoryContentNode>
+  '   <CategoryContentNode title="category1" />
+  '   <CategoryContentNode title="category2" />
+  '   <CategoryContentNode title="category3" />
+  '   ...
+  ' </CategoryContentNode>
+  m.categoryContent = invalid
+
   if m.global.constants.deviceInfo.scaledUi = true then
     frame = m.top.findNode("DockedVideoFrame")
     frameMargin = 4 ' FHD is margin 6
@@ -56,7 +65,16 @@ Function onCategoriesReceived()
   if m.top.categoryListResponse <> invalid then
     response = m.top.categoryListResponse.response
     if response.code >= 200 and response.code < 300 then
-      m.top.content = m.top.categoryListResponse.convertedMetadata
+      m.categoryContent = m.top.categoryListResponse.convertedMetadata
+      adjustCategories()
+      spinner = m.top.findNode("LoadingSpinner")
+      spinner.visible = false
+      m.CategoryList.content = invalid  ' since alwaysNotify=false on scrollinglist
+      ' Prepend special categories, taking care to remove them if they already are there
+      m.InfoPanel.mode = "category"
+      m.CategoryList.content = m.categoryContent
+      m.CategoryGridList.content = m.categoryContent  ' should be the category list
+      if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
     else
       testLog("Category list returned " + stri(response.code))
       ' if we were loading in the background, don't show an error modal
@@ -77,6 +95,7 @@ End Function
 ' if one of the user categories is showing, reload it
 Function onDirtyUserCategories()
   tubiLog("CategoryScreen.onDirtyUserCategories")
+  adjustCategories()
   m.CategoryGridList.dirtyUserCategories = true
 End Function
 
@@ -165,42 +184,36 @@ Function hideCategoryMenu()
 End Function
 
 
-'''''''''''''''''''''
-' onContentChange
-'
-' Handle category list received
-Function onContentChange() As Void
-  tubiLog("CategoryScreen.onContentChange")
+' Change categories based on current app state
+Function adjustCategories() As Void
+  if m.categoryContent = invalid then return
 
-  spinner = m.top.findNode("LoadingSpinner")
-  spinner.visible = false
-
-  m.CategoryList.content = invalid  ' since alwaysNotify=false on scrollinglist
   ' Force Featured to the top of the list
-  for i=0 to m.top.content.getChildCount()-1
-    category = m.top.content.getChild(i)
+  for i=0 to m.categoryContent.getChildCount()-1
+    category = m.categoryContent.getChild(i)
     if category.title = "Featured"
-      m.top.content.removeChild(category)
-      m.top.content.insertChild(category, 0)
+      if i > 0 then
+        m.categoryContent.removeChild(category)
+        m.categoryContent.insertChild(category, 0)
+      end if
       exit for
     end if
   end for
 
-  ' Prepend special categories, taking care to remove them if they already are there
-  m.InfoPanel.mode = "category"
-  if m.top.signedIn then
-    m.top.content.insertChild(m.ContinueWatchingCategory, 1)
-    m.top.content.insertChild(m.MyQueueCategory, 2)
-  else
-    m.top.content.removeChild(m.ContinueWatchingCategory)
-    m.top.content.removeChild(m.MyQueueCategory)
+  ' Add or remove user categories, taking care to only change them when necessary
+  insert = 1
+  if m.top.signedIn and m.global.historyIds.getChildCount() > 0 and not m.categoryContent.isSameNode(m.ContinueWatchingCategory.getParent()) then
+    m.categoryContent.insertChild(m.ContinueWatchingCategory, insert)
+    insert = insert + 1
+  else if m.global.historyIds.getChildCount() = 0 and m.ContinueWatchingCategory.getParent() <> invalid then
+    m.categoryContent.removeChild(m.ContinueWatchingCategory)
   end if
-
-  m.CategoryList.content = m.top.content
-  m.CategoryGridList.content = m.top.content  ' should be the category list
-  if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
+  if m.top.signedIn and m.global.bookmarkIds.getChildCount() > 0 and not m.categoryContent.isSameNode(m.MyQueueCategory.getParent()) then
+    m.categoryContent.insertChild(m.MyQueueCategory, insert)
+  else if m.global.bookmarkIds.getChildCount() = 0 and m.MyQueueCategory.getParent() <> invalid then
+    m.categoryContent.removeChild(m.MyQueueCategory)
+  end if
 End Function
-
 
 ' Use this trigger to synchronize menu and grid
 Function onPreCategoryMenuChange()
@@ -239,9 +252,7 @@ End Function
 '
 Function onSignedInChange()
   tubiLog("CategoryScreen.onSignedInChange")
-  if m.top.content <> invalid then
-    onContentChange()
-  end if
+  adjustCategories()
 End Function
 
 
@@ -343,4 +354,3 @@ Function onTrackingUriChange()
     }
   end if
 End Function
-

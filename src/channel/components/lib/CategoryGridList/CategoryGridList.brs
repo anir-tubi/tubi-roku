@@ -48,9 +48,28 @@ Function init()
     m.RowList.itemComponentName = ""
   end if
 
+  ' The content that actually populates the RowList.  Cloned from m.top so that we have a local tree we can modify
+  ' Content should be structured as:
+  ' <CategoryContentNode>
+  '   <CategoryContentNode title="category1" />
+  '     <ContentNode title="item1" />
+  '     <ContentNode title="item2" />
+  '   <CategoryContentNode title="category2" />
+  '     <ContentNode title="item3" />
+  '     <ContentNode title="item4" />
+  '   <CategoryContentNode title="category3" />
+  '   ...
+  ' </CategoryContentNode>
+  m.internalContent = invalid
+
+  ' A stashed reference to m.top.content.  We call observeField on m.top.content so if it changes, we'll need a
+  ' reference to the old value so we can unobserve it.
+  m.lastContent = invalid
+
   if m.constants.deviceInfo.scaledUi = true then
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
+
 End Function
 
 
@@ -79,14 +98,73 @@ Function onComponentFocusChange()
   end if
 End Function
 
+Function onContentModify(message)
+  change = message.GetData()
+  tubiLog("CategoryGridList.onContentModify operation = " + change.operation)
+  rowItemFocused = m.RowList.rowItemFocused
+  if change.operation = "insert" or change.operation = "add"
+    ' insert - A child node was inserted at change.index1
+    ' add - A child node was added to the end of the children node tree (at change.index1)
+    new = clone(m.top.content.getChild(change.index1))
+    m.internalContent.insertChild(new, change.index1)
+    ' RowList doesn't update the focus row automatically so we do it here to keep cursor at the same spot
+    if rowItemFocused[0] <> -1 and change.index1 <= rowItemFocused[0]
+      rowItemFocused[0] = rowItemFocused[0] + 1
+      m.RowList.jumpToRowItem = rowItemFocused
+    end if
+  else if change.operation = "remove"
+    ' remove - A child node was removed from position change.index1, and if change.index2>change.index1, all the children
+    ' nodes between change.index1 and change.index2 inclusive were removed
+    removed = m.internalContent.getChildren(change.index2-change.index1+1, change.index1)
+    m.internalContent.removeChildrenIndex(change.index2-change.index1+1, change.index1)
+    for i=0 to removed.count()-1
+      metadataCacheExpireOne(removed[i].id)
+    end for
+    if rowItemFocused[0] <> -1 and change.index1 < rowItemFocused[0]
+      rowItemFocused[0] = rowItemFocused[0] - 1
+      m.RowList.jumpToRowItem = rowItemFocused
+    end if
+  else if change.operation = "set"
+    ' The child node at position change.index1 was replaced with a new child node
+    new = clone(m.top.content.getChild(change.index1))
+    replaced = m.internalContent.getChild(new, change.index1)
+    m.internalContent.replaceChild(new, change.index1)
+    metadataCacheExpireOne(replaced.id)
+  else if change.operation = "clear" or change.operation = "setall"
+    ' clear - All the children nodes were removed
+    ' setall - All the children nodes were replaced
+    return onContentChange()  ' reset the entire cache
+  else if change.operation = "move"
+    ' move - The child node at position change.index1 was moved to the new position change.index2
+    m.internalContent.insertChild(m.internalContent.getChild(index1), index2)
+  else if change.operation = "modify"
+    ' modify - A pre-defined content meta-data field of a ContentNode node child at change.index1  was
+    '          changed (only set for ContentNode node children when a pre-defined content meta-data
+    '          field changes)
+    ' NOTE: ignored for CategoryGridList
+  end if
+  loadCategories(rowItemFocused[0])
+End Function
 
 Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
-  m.RowList.content = invalid
-  if m.top.content <> invalid then
-    ' Clone here since we are replacing nodes within the category tree
-    m.internalContent = cloneDeep(m.top.content)
-    loadCategories(0)
+  ' This is a verbose check that makes sure we only refresh the whole RowList content if the root node is different
+  if (m.top.content <> invalid and not m.top.content.isSameNode(m.lastContent)) or (m.lastContent <> invalid and not m.lastContent.isSameNode(m.top.content)) then
+    ' Setting RowList invalid here will empty the grid.  It will be set after the first batch of
+    ' metadata is received.  Setting RowList.content with a few full categories will cause it to prefetch
+    ' posters and do a nice fade-in.
+    m.RowList.content = invalid
+    if m.lastContent <> invalid then
+      m.lastContent.unobserveField("change")
+    end if
+    m.lastContent = m.top.content
+    if m.top.content <> invalid then
+      ' Clone here since we are replacing nodes within the category tree
+      m.metadataCache = []
+      m.internalContent = cloneDeep(m.top.content)
+      loadCategories(0)
+      m.top.content.observeField("change", "onContentModify")
+    end if
   end if
 End Function
 
@@ -256,6 +334,12 @@ Function mergeMetadata(fetched) As Void
   m.metadataCache[entry].contentNode = newContent.getChild(0)
   parentCategory = m.metadataCache[entry].parentContentNode
   index = m.metadataCache[entry].index
+
+  ' Check if a response arrives but the cache has been flushed and categories moved, such as adding or removing user categories
+  if parentCategory <> invalid and not parentCategory.isSameNode(m.internalContent.getChild(index)) then
+    tubiLog("Ignoring response due to changed index " + fetched.id)
+    return
+  end if
 
   ' Add the new content
   if parentCategory <> invalid then

@@ -13,14 +13,13 @@
 
   <interface>
     <!--
-    - 'content' should be a 2-level tree similar to RowList native component.  
-    -
-    - * The root node is ignored
-    -
-    - * The children of the root node are categories with the following relevant metadata fields:
-    -    - totalCount - total number of items in the category
-    -    - offset - the offset into the total categorof the first 
-    -
+    - 'content' should be a category list without content items, structured as:
+    - <CategoryContentNode>
+    -   <CategoryContentNode title="category1" />
+    -   <CategoryContentNode title="category2" />
+    -   <CategoryContentNode title="category3" />
+    -   ...
+    - </CategoryContentNode>
     -->
     <field id="content" type="node"/>
     <field id="itemSelected" type="node" alwaysNotify="true"/>

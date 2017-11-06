@@ -109,7 +109,7 @@
         uri="pkg:/images/art-blur-background.png"
         width="1920"
         height="1080"
-        loadSync="true"/>
+        loadSync="false"/>
       <LayoutGroup
         layoutDirection="horiz"
         translation="[88,69]">
@@ -341,7 +341,7 @@
           width="260"
           height="80"
           uri=""
-          loadSync="true"
+          loadSync="false"
           translation="[85,949]" >
           <Label
             id="SkipTrailerButtonLabel"
@@ -357,21 +357,21 @@
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-to-start.png"
-          loadSync="true"
+          loadSync="false"
           translation="[540,958]" />
         <TransportButton
           id="RewindButton"
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-rew.png"
-          loadSync="true"
+          loadSync="false"
           translation="[670,958]" />
         <TransportButton
           id="HopBackButton"
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
-          loadSync="true"
+          loadSync="false"
           translation="[800,958]" />
         <!-- play/pause uri will update based on playing state of video -->
         <TransportButton
@@ -379,35 +379,35 @@
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-play.png"
-          loadSync="true"
+          loadSync="false"
           translation="[930,958]" />
         <TransportButton
           id="HopForwardButton"
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
-          loadSync="true"
+          loadSync="false"
           translation="[1060,958]" />
         <TransportButton
           id="FastForwardButton"
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-ffw.png"
-          loadSync="true"
+          loadSync="false"
           translation="[1190,958]" />
         <TransportButton
           id="EndButton"
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/icon-to-end.png"
-          loadSync="true"
+          loadSync="false"
           translation="[1320,958]" />
         <TransportButton
           id="ClosedCaption"
           width="60"
           height="60"
           uri="pkg:/images/transport/sgplayer/cc-icon.png"
-          loadSync="true"
+          loadSync="false"
           translation="[1697,958]" >
             <Poster
               id="CCRailOff"
@@ -415,7 +415,7 @@
               height="60"
               opacity="1.0"
               uri="pkg:/images/transport/sgplayer/cc-rail-off.png"
-              loadSync="true"
+              loadSync="false"
               translation="[60,0]" />
             <Poster
               id="CCRailOn"
@@ -423,14 +423,14 @@
               height="60"
               opacity="0.0"
               uri="pkg:/images/transport/sgplayer/cc-rail-on.png"
-              loadSync="true"
+              loadSync="false"
               translation="[60,0]" />
             <Poster
               id="CCNipple"
               width="60"
               height="60"
               uri="pkg:/images/transport/sgplayer/cc-nipple.png"
-              loadSync="true"
+              loadSync="false"
               translation="[58,0]" />
         </TransportButton>
       </Group>
@@ -440,7 +440,7 @@
         width="140"
         height="60"
         uri="pkg:/images/transport/sgplayer/cc-icon-disabled.png"
-        loadSync="true"
+        loadSync="false"
         translation="[1697,958]"
         visible="false" />
 

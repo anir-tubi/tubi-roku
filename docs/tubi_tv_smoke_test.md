@@ -23,6 +23,13 @@
 	- Can add series to my queue, show up on web
 	- can remove items from my queue; takes effect immediately
 	- my queue is the same across channel launches
+  - hiding empty queue:
+    - launch with empty queue, queue doesn't show
+    - remove all items from queue removes category from grid
+    - add item to empty queue ads category to grid
+    - negative: removing item that isn't the last doesn't remove category from grid
+    - going from signed-out to signed-in doesn't show empty queue
+    - going from signed-in to signed-out doesn't show queue
 - "Continue Watching"
 	- selecting a new title to watch adds it to the "Continue Watching" category
 	- can remove titles from "continue watching", takes effect immediately
@@ -30,6 +37,13 @@
 	- last watched episode is automatically chosen on detail page when resuming a series
 	- Resume button starts where left off
 	- Play button overrides the resume position, starts from beginning
+  - hiding history:
+    - launch with empty queue, queue doesn't show
+    - remove all items from queue removes category from grid
+    - negative: removing item that isn't the last doesn't remove category from grid
+    - add item to empty queue ads category to grid
+    - going from signed-out to signed-in doesn't show empty history
+    - going from signed-in to signed-out doesn't show history
 - Search
 	- search results show up
 	- search results are updated on each key entry
