@@ -61,6 +61,9 @@
       -->
     <field id="analyticsMode" type="string" value="true" />
 
+    <!-- The device id of the deeplink source device -->
+    <field id="deeplinkSource" type="string" />
+
     <!--
       -
       - Ad playback interface to main Brightscript thread

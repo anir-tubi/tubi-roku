@@ -4,6 +4,7 @@ Function TubiChannel(utils)
     constants: utils.constants
     tracking: utils.tracking
     experiments: utils.experiments
+    auth: utils.auth
 
     'public methods
     runChannel: tubiChannel_runChannel
@@ -35,6 +36,8 @@ Function tubiChannel_runChannel(args, adShim, port)
   sgGlobal.constants = m.constants 
   tubiScene = screen.CreateScene("TubiScene")
   screen.show()
+
+  deepLinkContent = m.deepLink(args, m.tracking, m.auth)
 
   'flag to enable vs. disable remote components loading
   enableRemoteComponents = m.constants.externalConfig.info.remote_components
@@ -82,7 +85,7 @@ Function tubiChannel_runChannel(args, adShim, port)
   end if
   controller.observeField("exitApp", port)
 
-  m.deepLink(args, controller, m.tracking)
+  controller.deepLinkContent = deepLinkContent
 
   adShim.run(controller)
 End Function
@@ -112,17 +115,17 @@ End Function
 '
 ' NOTE: 'entry' seems undocumented and may have been added special for adRise by Roku
 
-Function tubiChannel_deepLink(args, controller, tracking)
-
+Function tubiChannel_deepLink(args, tracking, auth)
+  _ = rodash()
   'handle/set up any deep linking that may have occurred
-  if (args.contentID <> invalid)
+  if (args.contentId <> invalid)
     tubiLog("Deep Link detected for content id " + args.contentId)
 
     for each key in args
       testLog(key + " = " + tostr(args[key]))
     end for
 
-    content = CreateObject("roSGNode", "TubiContentNode")
+    content = CreateObject("roSGNode", "DeeplinkContentNode")
     content.id = args.contentId
 
     ' default deep link source is search
@@ -134,6 +137,34 @@ Function tubiChannel_deepLink(args, controller, tracking)
     ' contentID=18267&entry=banner
     if args.entry <> invalid
       deepLinkSource = args.entry
+    end if
+
+    ' deeplinks coming from ios or android devices need to be authenticated
+    if args.refreshToken <> invalid and args.userId <> invalid and args.deviceId <> invalid and args.entry <> invalid
+      if args.refreshToken.unescape() <> "" and args.userId.unescape() <> "" and args.deviceId.unescape() <> ""
+        if args.entry = "iphone" or args.entry = "ipad" or args.entry = "ios" or args.entry = "android"
+
+          externalAuthInfo = {
+            platform: args.entry
+            externalDeviceId: args.deviceId.unescape()
+            externalRefreshToken: args.refreshToken.unescape()
+            userId: args.userId.unescape()
+          }
+
+          content.source = args.deviceId.unescape()
+
+          ' only transfer the refresh token and log the external user in
+          ' if there is no one currently logged in on the roku
+          if auth.getAuthInfo() = invalid
+            auth.transferRefreshToken(externalAuthInfo)
+          end if
+        end if
+      end if
+    end if
+
+    ' set up the resume time if we are deeplinking to a specific point in the video
+    if args.resumeTime <> invalid
+      content.nowPos = args.resumeTime.ToInt()
     end if
 
     trackingUri = "/video"
@@ -201,8 +232,8 @@ Function tubiChannel_deepLink(args, controller, tracking)
     if content.deeplinkType = "series" and Left(content.id, 1) <> "0" then
       content.id = "0" + content.id
     end if
-    controller.deepLinkContent = content
+    return content
   else
-    controller.deepLinkContent = invalid
+    return invalid
   end if
 End Function

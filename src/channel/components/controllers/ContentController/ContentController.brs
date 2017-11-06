@@ -48,6 +48,8 @@ Function init()
   m.autohideTimer.observeField("fire", "onAutohide")
 
   m.appLoadStopwatch = CreateObject("roTimespan")
+
+  m._ = rodash()
 End Function
 
 Function onScreenStackEmpty()
@@ -548,6 +550,11 @@ End Function
 Function playVideoContent(content As Object)
   m.videoPlayer.visible = true
   m.videoPlayer.analyticsMode = "normal"
+
+  if not m._.empty(m.detailScreen.shortContent.source)
+    m.videoPlayer.deeplinkSource = m.detailScreen.shortContent.source
+  end if
+
   m.videoPlayer.observeField("state", "onEpisodeFinished")
   m.videoPlayer.observeField("historyPosition", "onEpisodePosition")
   m.videoPlayer.observeField("backButtonPressed", "onEpisodeFinished")
@@ -607,6 +614,7 @@ Function onEpisodeFinished(msg As Object)
     m.videoPlayer.unobserveField("backButtonPressed")
     m.videoPlayer.unobserveField("state")
     m.videoPlayer.unobserveField("historyPosition")
+    m.videoPlayer.deeplinkSource = ""
     m.videoPlayer.visible = false
     m.videoPlayer.control = "stop"
 

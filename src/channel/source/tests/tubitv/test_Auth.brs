@@ -257,6 +257,34 @@ Function testRequestTokenRefresh(t as Object)
 End Function
 
 
+Function testRequestTokenTransfer(t as Object)
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+  auth.constants.urls.users.transferToken = "http://127.0.0.1:65535/"
+
+  server = createMetadataFetchTaskServer(65535)
+  msgPort = CreateObject("roMessagePort")
+  server.SetMessagePort(msgPort)
+
+  externalAuthInfo = {
+    platform: "iphone"
+    externalDeviceId: "Some555Other666String777"
+    externalRefreshToken: "Some111Refresh999String000"
+    userId: "6735"
+  }
+
+  authRequest = auth.requestTokenTransfer(externalAuthInfo, msgPort)
+
+  t.assertNotInvalid(authRequest)
+  t.assertNotInvalid(authRequest.isHttps)
+  t.assertNotInvalid(authRequest.url)
+  t.assertEqual(authRequest.url, auth.constants.urls.users.transferToken)
+  t.assertNotInvalid(authRequest.method)
+  t.assertEqual(authRequest.method, "POST")
+End Function
+
+
 Function testHandleRefreshResponse(t as Object)
   constants = getConstants()
   requestObj = TubiRequest()

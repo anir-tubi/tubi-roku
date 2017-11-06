@@ -13,6 +13,7 @@ Function TubiAuth(constants, request)
     oneTimeLoginMigration: tubiAuth_oneTimeLoginMigration
     logout: tubiAuth_deleteAuthInfo_
     refreshAuthToken: tubiAuth_refreshAuthToken
+    transferRefreshToken: tubiAuth_transferRefreshToken
     getAuthHeaders: tubiAuth_getAuthHeaders
     createAuthRequest: tubiAuth_createAuthRequest
 
@@ -21,6 +22,7 @@ Function TubiAuth(constants, request)
     deleteAuthInfo: tubiAuth_deleteAuthInfo_
     checkIfAuthExpired: tubiAuth_checkIfAuthExpired_
     requestTokenRefresh: tubiAuth_requestTokenRefresh_
+    requestTokenTransfer: tubiAuth_requestTokenTransfer_
     handleRefreshResponse: tubiAuth_handleRefreshResponse_
     updateAuthInfo: tubiAuth_updateAuthInfo_
     formatAuthInfoFromServer: tubiAuth_formatAuthInfoFromServer_
@@ -106,8 +108,7 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
 
       if newAccess <> invalid
         newAuthInfo = m.updateAuthInfo(newAccess, authInfo)
-        newAuthInfo = m.saveAuthInfo(authInfo) 'returns invalid if not saved to the registry
-
+        newAuthInfo = m.saveAuthInfo(newAuthInfo) 'returns invalid if not saved to the registry
         exit while
       end if
 
@@ -120,6 +121,53 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
   end if
 
   return newAuthInfo 'may return invalid
+End Function
+
+
+'takes a refresh token from another device along with additional auth info and uses that info to
+'get a roku refresh token. Then takes the new roku refresh token and get's a new auth token
+'
+'@externalAuthInfo: assocArray, the necessary info needed to do a token transfer from a different platform
+'   platform: string, the originating platform (iphone, ipad, android, etc.)
+'   externalDeviceId: string of integers, the device id for the originating device
+'   externalRefreshToken: string, the refresh token sent by the originating device
+'   userId: string of integers, the user id sent by the originating device
+'@timeout: integer, the max amount of time (in ms) to wait for a response from the server
+'
+Function tubiAuth_transferRefreshToken(externalAuthInfo, timeout=10)
+  newAuthInfo = invalid
+  authPort = CreateObject("roMessagePort")
+
+  'create and send transfer request
+  transferReq = m.requestTokenTransfer(externalAuthInfo, authPort)
+
+  'listen for transfer request response
+  if transferReq <> invalid
+    timer = CreateObject("roTimespan")
+    while true
+      msg = wait(100, authPort)
+      newRefreshToken = m.handleRefreshResponse(msg, transferReq)
+
+      if newRefreshToken <> invalid
+        stubbedAuthInfo = {
+          refreshToken: newRefreshToken.refresh_token
+          userId: externalAuthInfo.userId
+        }
+
+        'get new auth token and save new auth info to registry
+        newAuthInfo = m.refreshAuthToken(stubbedAuthInfo, timeout)
+        exit while
+      end if
+
+      'wait max x secs for a response to refresh the auth token
+      if timer.totalMilliseconds() > (timeout * 1000)
+        exit while
+      end if
+
+    end while
+  end if
+
+  return newAuthInfo
 End Function
 
 
@@ -277,6 +325,41 @@ function tubiAuth_requestTokenRefresh_(authInfo, port)
 
   return invalid
 end function
+
+
+'create/send a request that can be used to obtain a roku refresh token when given a refresh token from a different platfrom (ios, android, etc.)
+'@externalAuthInfo: assocArray, the necessary info needed to do a token transfer from a different platform
+'   platform: string, the originating platform (iphone, ipad, android, etc.)
+'   externalDeviceId: string of integers, the device id for the originating device
+'   externalRefreshToken: string, the refresh token sent by the originating device
+'   userId: string of integers, the user id sent by the originating device
+Function tubiAuth_requestTokenTransfer_(externalAuthInfo, port)
+  body = {
+    user_id: externalAuthInfo.userId
+    device_id: m.constants.deviceInfo.deviceId
+    platform: m.constants.settings.platformName
+    from_device_id: externalAuthInfo.externalDeviceId
+    from_platform: externalAuthInfo.platform
+  }
+  bodyJson = FormatJson(body)
+
+  headers = m.getAuthHeaders(externalAuthInfo.externalRefreshToken)
+  reqOptions = {
+    method: "POST"
+    body: bodyJson
+    headers: headers
+    retries: 0
+  }
+
+  newTokenReq = m.request.createAsync(m.constants.urls.users.transferToken, "getRefreshTokenFromTransfer", reqOptions)
+  reqSent = newTokenReq.start(port)
+
+  if reqSent = true
+    return newTokenReq
+  end if
+
+  return invalid
+End Function
 
 
 '@refreshRequest: assocArray, a reqest object as created by tubiRequest().createAsyncHTTPRequest()

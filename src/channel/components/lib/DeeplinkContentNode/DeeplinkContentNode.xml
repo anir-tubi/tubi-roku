@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "DeeplinkContentNode" extends="ContentNode">
+  <interface>
+    <!-- inherited field id="id" type="string";  content id, as received from deeplink parameter,
+       - series id not yet prefixed with 0
+     -->
+
+    <!-- where the deeplink came from -->
+    <field id="source" type="string" />
+
+    <!-- internal content type -->
+    <field id="type" type="string" />
+
+    <!-- where the deeplink will resume from -->
+    <field id="nowPos" type="int" />
+
+    <!-- movie, episode, series season as dictated by roku's deeplink api-->
+    <field id="deeplinkType" type="string" />
+  </interface>
+</component>

@@ -22,6 +22,7 @@ Function init()
 
   m.isWaitingForServerResponse = false
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
+  m.contentTypes = m.global.constants.ui.contentTypes
 End Function
 
 Function onScreenFocusChange()
@@ -39,13 +40,30 @@ Function onContentReceived()
     fullContent = m.top.contentDetailResponse.convertedMetadata
     deeplinkType = m.top.shortContent.deeplinkType
     
+    if deeplinkType <> invalid and deeplinkType <> "" and fullContent.type = m.contentTypes.video
+      fullContent.nowPos = m.top.shortContent.nowPos
+    end if
+
     'we got the response for an episode, but we need the whole series due to deeplink requirements
     'fullContent.parentId will be empty string for the series response even if  m.top.shortContent.deeplinkType = "season"
-    if (deeplinkType = "season" or deeplinkType = "episode") and fullContent.parentId <> ""
-      seriesContent = CreateObject("roSGNode", "TubiContentNode")
-      seriesContent.id = fullContent.parentId
-      seriesContent.type = "series"
-      loadContentDetails(seriesContent)
+    if (deeplinkType = "season" or deeplinkType = "episode")
+      if fullContent.parentId <> ""
+        'we've received some series content from the deep link parameters, still need to get full content from server
+        seriesContent = CreateObject("roSGNode", "TubiContentNode")
+        seriesContent.id = fullContent.parentId
+        seriesContent.type = m.contentTypes.series
+        loadContentDetails(seriesContent)
+      else
+        'we've received the full series content from the server after a deeplink
+        episodeSelection = findEpisodeInSeries(m.top.shortContent.id, fullContent)
+        season = fullContent.getChild(episodeSelection[0])
+        episode = invalid
+        if season <> invalid
+          episode = season.getChild(episodeSelection[1])
+          episode.nowPos = m.top.shortContent.nowPos
+        end if
+        m.top.content = fullContent
+      end if
 
     else
       m.top.content = fullContent
@@ -78,7 +96,11 @@ Function onContentChange() As Void
   if m.top.content.type = "video"
     'auto start deep link content if it's a video
     if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "movie"
-      m.top.playSelected = true
+      if m.top.content.nowPos > 0
+        m.top.resumeSelected = true
+      else
+        m.top.playSelected = true
+      end if
     end if
     drawSubComponents()
   else if m.top.content.type = "series"
@@ -87,22 +109,29 @@ Function onContentChange() As Void
     ' Deep link gave us the episode id we need to seek to
     if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "season"
       tubiLog("Finding episode " + m.top.shortContent.id + " in series " + m.top.content.id)
-      m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id)
+      m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id, m.top.content)
 
       'tell the controller to open the episode selection page
       m.top.episodeListSelected = true
 
     else if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "episode"
       tubiLog("Finding episode " + m.top.shortContent.id + " in series " + m.top.content.id)
-      m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id)
-      m.top.playSelected = true
+      m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id, m.top.content)
+      season = m.top.content.getChild(m.top.episodeSelection[0])
+      episode = invalid
+      if season <> invalid then episode = season.getChild(m.top.episodeSelection[1])
+      if episode <> invalid and episode.nowPos > 0
+        m.top.resumeSelected = true
+      else
+        m.top.playSelected = true
+      end if
 
     else
       episodeSelection = [0,0]
       history = m.global.historyIds.findNode(m.top.content.id)
       if history <> invalid and history.currentEpisodeId <> invalid and history.currentEpisodeId <> "" then
         tubiLog("Finding current episode " + history.currentEpisodeId + " in series " + m.top.content.id)
-        episodeSelection = findEpisodeInSeries(history.currentEpisodeId)
+        episodeSelection = findEpisodeInSeries(history.currentEpisodeId, m.top.content)
       end if
       m.top.episodeSelection = episodeSelection
     endif
@@ -110,9 +139,10 @@ Function onContentChange() As Void
 End Function
 
 
-Function findEpisodeInSeries(episodeId As String)
-  for i=0 to m.top.content.getChildCount()-1
-    season = m.top.content.getChild(i)
+'@contentNode is a TubiContentNode, usually m.top.content, expected to be used only on series content nodes
+Function findEpisodeInSeries(episodeId As String, contentNode)
+  for i=0 to contentNode.getChildCount()-1
+    season = contentNode.getChild(i)
     for j=0 to season.getChildCount()-1
       episode = season.getChild(j)
       if episode.id = episodeId then

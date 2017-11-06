@@ -29,6 +29,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
   
   <interface>
     <!-- Watched by the main brightscript thread to indicate video playback should start -->
@@ -39,6 +40,9 @@
       - The node should have 2 fields set:
       -    id    - the content requested
       -    type  - the type of content: "series", "video", or "episode"
+      - 2 optional fields should be set if the source is deeplink from another platform (ie. iphone, etc.)
+      -    source  - the device id of the originating device
+      -    nowPos  - the resume time sent along with deeplink
       -->
     <field id="deepLinkContent" type="node" alwaysNotify="true" />
 

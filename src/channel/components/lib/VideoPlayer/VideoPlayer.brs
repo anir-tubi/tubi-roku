@@ -1215,6 +1215,10 @@ Function getPlayProgressEvent()
     extraCtx.livetv = true
   end if
 
+  if m.top.deeplinkSource <> ""
+    extraCtx.casting = m.top.deeplinkSource
+  end if
+
   return {
     trackType: "playProgress"
     ctx: m.Video.content.id
