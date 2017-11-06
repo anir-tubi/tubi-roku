@@ -45,5 +45,8 @@
     <!-- 3-entry array containing [channel, episode, position] -->
     <field id="liveTVCursor" type="intarray" value="[-1,-1,-1]"/>
     <field id="liveTVChannelType" type="string" value=""/>
+
+    <!-- used to deliver focus indices to EpisodeScreen RowList row item counter -->
+    <field id="focusIndex" type="integer" value="-1"/>
   </interface>
 </component>
