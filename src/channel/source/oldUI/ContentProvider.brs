@@ -548,10 +548,15 @@ sub ContentProvider_getAllEpisodesForPlaylistFromServer (playlist, source)
           if videoDetails.starring <> invalid
             playlist.videosPrelim[xmlId].actors = splitter.Split(videoDetails.starring.getText())
           end if
-          if videoDetails.nielsenGenre <> invalid
-            playlist.videosPrelim[xmlId].nielsenGenre = videoDetails.nielsenGenre.getText()
-          end if
-          
+          if videoDetails.tags <> invalid
+            playlist.videosPrelim[xmlId].genres = []
+            tagsList = videoDetails.tags.getChildElements()
+            if tagsList <> invalid
+              for each tag in tagsList
+                playlist.videosPrelim[xmlId].genres.push(tag.getText())
+              end for
+            end if
+          end if          
           if videoDetails.publisherId <> invalid
             playlist.videosPrelim[xmlId].pubId = videoDetails.publisherId.getText()
           end if

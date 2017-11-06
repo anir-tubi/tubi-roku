@@ -57,6 +57,7 @@ function AdriseAds (utils, playerPort)
     populateUrl: adriseAds_populateUrl
     addLogIdentifier: adriseAds_addLogIdentifier
     getResumingPlayAds: adriseAds_getResumingPlayAds
+    getRokuGenreInfo: adriseAds_getRokuGenreInfo
 
     ' innovid irolls
     showInnovidAd : adriseAds_showInnovidAd,
@@ -283,15 +284,20 @@ function adriseAds_getAdsListViaRoku(episode, playerSettings)
   end if
 
   'set the content genre (as stated in RAF documentation for Nielsen functionality)
-  if episode.nielsenGenre <> invalid
-    m.roAdFramework.setNielsenGenre(episode.nielsenGenre)
+  rokuGenreInfo = m.getRokuGenreInfo(episode)
+  if rokuGenreInfo <> invalid and rokuGenreInfo.genres.count() > 0
+    m.roAdFramework.setContentGenre(rokuGenreInfo.genres, rokuGenreInfo.isKids)
+  else
+    m.roAdFramework.setContentGenre("")
   end if
 
   'set the program id/title (as stated in RAF documentation for Nielsen functionality)
-  if episode.isParentSeries = true
-    m.roAdFramework.setNielsenProgramId(episode.parentTitle)
+  if episode.isParentSeries = true and episode.parentTitle <> invalid
+    m.roAdFramework.setContentId(episode.parentTitle)
+  else if episode.title <> invalid
+    m.roAdFramework.setContentId(episode.title)
   else
-    m.roAdFramework.setNielsenProgramId(episode.title)
+    m.roAdFramework.setContentId()
   end if
 
   'get the url for making the ad call
@@ -1239,6 +1245,60 @@ function adriseAds_getResumingPlayAds(episode, playerSettings)
 
   return shouldBreak
 end function
+
+
+Function adriseAds_getRokuGenreInfo(episode)
+  if episode <> invalid and episode.genres <> invalid
+
+    'map that translates tubi genres (keys) to roku genres (values)
+    genreMap = {
+      Action: "Action"
+      Adventure: "Adventure"
+      Animation: "Animated"
+      Anime: "Animated"
+      Comedy: "Comedy"
+      Crime: "Crime drama"
+      Documentary: "Documentary"
+      Drama: "Drama"
+      Fantasy: "Fantasy"
+      "Foreign/International": false
+      Holiday: "Special"
+      Horror: "Horror"
+      Independent: false
+      "Kids & Family": "Children"
+      LGBT: false
+      Lifestyle: "Special"
+      Music: "Music"
+      Musicals: "Musical"
+      Mystery: "Mystery"
+      Reality: "Entertainment"
+      Romance: "Romance"
+      "Science & Nature": "Documentary"
+      "Sci-Fi": " Science fiction"
+      Sport: "Entertainment"
+      Thriller: " Thriller"
+      War: "War"
+      Western: "Western"
+    }
+
+    rokuGenres = []
+    isKids = false
+
+    for each genre in episode.genres
+      rokuGenre = genreMap[genre]
+      if type(rokuGenre) = "roString"
+        rokuGenres.push(rokuGenre)
+        if rokuGenre = "Children" then isKids = true 
+      end if
+    end for
+
+    return {
+      genres: rokuGenres
+      isKids: isKids
+    }
+  end if
+  return invalid
+End Function
 
 
 'get any companion overlay info that might be contained within a companion ad tag in the ad xml response
