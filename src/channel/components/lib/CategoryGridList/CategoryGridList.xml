@@ -53,6 +53,8 @@
      -   Assumes there are only 2 possible widths for the CategoryGridList, full width and not full width.
      -->
     <field id="isFullWidth" type="boolean" value="true" />
+
+    <field id="currFocusRow" alias="RowList.currFocusRow" />
   </interface>
   
   <children>

@@ -133,7 +133,7 @@ End Function
 
 Function showCategoryMenu()
   if not m.CategoryList.isInFocusChain()
-    m.CategoryList.animateToItem = m.CategoryGridList.categoryFocused
+    m.CategoryList.animateToItem = Int(m.CategoryGridList.currFocusRow)
     m.CategoryList.setFocus(true)
     m.categoryListIsFocused = true
     if m.global.constants.deviceInfo.limitedNewUi
