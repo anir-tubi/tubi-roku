@@ -7,6 +7,15 @@ Function init()
   m.top.observeField("jumpToIndex", "onJumpToIndexChange")
   m.top.observeField("focusedChild", "onChildFocused")
   m.navigations = m.top.navigations
+
+  if m.global.constants.deviceInfo.scaledUi = true then
+    focusBox = m.top.findNode("FocusBox")
+    focusBox.uri = "pkg:/images/selector-hd.9.png"
+    focusBoxMargin = 4
+    focusBox.width = 430 + focusBoxMargin * 2
+    focusBox.height = 256 + focusBoxMargin * 2
+    focusBox.translation= [85 - focusBoxMargin,-focusBoxMargin]
+  end if
 End Function
 
 

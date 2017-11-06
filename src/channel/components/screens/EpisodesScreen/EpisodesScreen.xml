@@ -43,8 +43,7 @@
       scrollHeight="80"
       itemSpacings="[8]"
       itemComponentName="CategorySeasonListItem"
-      visible="false"
-      focusBitmapUri="pkg:/images/menu-focus.9.png" />
+      visible="false"/>
 
     <ScrollingList
       id="SeasonRows"

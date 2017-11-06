@@ -17,9 +17,6 @@ Function init()
   m.trackingLoggingTask.observeField("ready", "onTrackingLoggingReady")
   m.global.trackingLoggingTask.control = "RUN"
   
-  m.background = m.top.findNode("ContentBackground")
-  m.background.color = m.global.constants.ui.colors.backgroundColor
-
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
   m.defaultBackgroundUri = m.global.constants.ui.uris.defaultBackground
 
@@ -160,6 +157,7 @@ Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
   if m.metadataFetchTask.ready and m.authInfoReceived and m.trackingLoggingTask.ready and m.deepLinkEvaluated then
     if m.global.constants.ui.onnow.on = false or (m.global.constants.ui.onnow.on = true and m.onNowReceived)
+
       if m.top.deepLinkContent <> invalid then
         tubiLog("ContentController detected deep link request")
         ' we were asked to deep link into a content item. Go to it

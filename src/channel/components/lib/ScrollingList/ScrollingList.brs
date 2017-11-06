@@ -18,6 +18,10 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.internalItemFocused = m.top.itemFocused  ' separate from event emitter
   m.pressAndHold = invalid 'track when a key is being held down without release
+
+  if m.global.constants.deviceInfo.scaledUi = true then
+    m.focusImage.uri ="pkg:/images/menu-focus-hd.9.png"
+  end if
 End Function
 
 ''''''''''''''''''''''

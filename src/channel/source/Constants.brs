@@ -115,6 +115,13 @@ Function getConstants()
       firmwareCaptionMenu = true
     end if
 
+    ' There is a bug with 9-patch handling when FHD is the only ui_resolution entry and display is 720p
+    if di.GetDisplaySize().w <> 1920
+      scaledUi = true
+    else
+      scaledUi = false
+    end if
+
     'get client version from manifest
     clientVersionNums = ["", "", ""]
 
@@ -163,6 +170,7 @@ Function getConstants()
     constants.deviceInfo.limitedNewUi = limitedNewUi
     constants.deviceInfo.clientVersion = clientVersion
     constants.deviceInfo.language  = di.GetCurrentLocale().Left(2)
+    constants.deviceInfo.scaledUi = scaledUi
     
 
   'the names of the registry memory sections that will save bookmark and previously viewed info
@@ -249,9 +257,6 @@ Function getConstants()
     'linear poster art urls'
     constants.urls.linearPosterSDUrl = "http://cdn.adrise.com/hotpatches/roku/LinearTV-beta-SD.jpg"
     constants.urls.linearPosterHDUrl = "http://cdn.adrise.com/hotpatches/roku/LinearTV-beta-HD.jpg"
-
-    ' splash video
-    constants.urls.splashVideoUrl = "http://c11.adrise.tv/v2/sources/content-owners/adrise-no-ads/328128/v20169300123-1280x714-,386,951,1592,1956,2833,k.mp4.m3u8"
 
     'privacy statement text
     constants.urls.privacyUrl = "http://cdn.adrise.tv/legal/TubiTVPrivacyPolicy.txt"

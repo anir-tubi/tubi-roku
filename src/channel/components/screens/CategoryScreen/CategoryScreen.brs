@@ -33,6 +33,15 @@ Function init()
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 
+  if m.global.constants.deviceInfo.scaledUi = true then
+    frame = m.top.findNode("DockedVideoFrame")
+    frameMargin = 4 ' FHD is margin 6
+    frame.uri = "pkg:/images/selector-white-hd.9.png"
+    frame.width = 455 + frameMargin * 2
+    frame.height = 256 + frameMargin * 2
+    frame.translation = [1390 - frameMargin, 151 - frameMargin]
+  end if
+
   onSignedInChange()  ' seed the search & sign in menu
 
   loadAllCategories()

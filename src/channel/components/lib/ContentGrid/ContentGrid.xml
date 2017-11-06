@@ -126,7 +126,7 @@
      visible="false">
       <Poster
        id="FocusBoxPoster"
-       uri="pkg:/images/selector.9.png"
+       uri="pkg:/images/selector-fhd.9.png"
        translation="[-7,-7]" 
        loadDisplayMode="scaleToFit"/>
     </Group>

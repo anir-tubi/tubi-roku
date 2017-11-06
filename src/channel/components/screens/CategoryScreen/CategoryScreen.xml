@@ -143,7 +143,7 @@
         visible="false">
       <Poster
         id="DockedVideoFrame"
-        uri="pkg:/images/selector-white.9.png"
+        uri="pkg:/images/selector-white-fhd.9.png"
         width="467"
         height="268"
         visible="true"

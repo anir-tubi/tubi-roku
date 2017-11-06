@@ -126,6 +126,26 @@ Function init()
     "On"
     "Instant replay"
   ]
+
+  ' Workaround for 9-patch bug
+  '
+  ' ProgressBarBackground and ProgressBarForeground use 9-patch images which have
+  ' special undocumented handling (bugs?).  For manifest with ui_resolution=fhd, we
+  ' need to provide 2 resolutions: fhd and hd, where hd 0.75 the intended resolution.  For instance,
+  ' we expect the FHD height to be 16 pixels so the hd source image height has to be 12 pixels.  Roku
+  ' wrongly applies a 1.5x scaling when ui_resolution=fhd and the screen is 720p.  SD resolutions are
+  ' not needed since 720p ui resolution is used and scaled down properly.
+  '
+  ' NOTE2: 9-patch images can't have width/height set below their native resolution (bitmapWidth/bitmapHeight)
+  '        else the 9-patch logic does not get applied and you will just see stretched images.  Because of
+  '        scaling wackiness, bitmapWidth or bitmapHeight may report half-pixel values.  It's best to not
+  '        set a height explicitly.
+  if m.global.constants.deviceInfo.scaledUi = true then
+    background = m.top.findNode("ProgressBarBackground")
+    background.uri = "pkg:/images/transport/sgplayer/hd/progress-background.9.png"
+    foreground = m.top.findNode("ProgressBarForeground")
+    foreground.uri = "pkg:/images/transport/sgplayer/hd/white-progress-foreground.9.png"
+  end if
 End Function
 
 

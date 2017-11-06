@@ -45,7 +45,7 @@
      visible="false" 
      loadDisplayMode="scaleToFit"
      loadSync="true"
-     uri="pkg:/images/menu-focus.9.png" />
+     uri="pkg:/images/menu-focus-fhd.9.png" />
     <Group 
      id="Items"
      translation="[0,0]"/>

@@ -56,6 +56,15 @@ Function init()
 
   'm.firstItem is the first item loaded into m.items - it will be used to track the load time of the app
   m.firstItem = invalid
+
+  if m.global.constants.deviceInfo.scaledUi = true then
+    focusPoster = m.top.findNode("FocusBoxPoster")
+    focusPoster.uri = "pkg:/images/selector-hd.9.png"
+    focusPoster.translation="[-5,-5]"
+    m.focusBoxMargin = 5
+  else
+    m.focusBoxMargin = 7
+  end if
 End Function
 
 
@@ -94,8 +103,8 @@ Function onComponentFocusChange()
   if m.top.content <> invalid and m.numItems > 0 and m.top.isInFocusChain() then
     m.focusBox.visible = true
     focusPoster = m.focusBox.findNode("FocusBoxPoster")
-    focusPoster.width = m.top.itemSize[0] + 14
-    focusPoster.height = m.top.itemSize[1] + 14
+    focusPoster.width = m.top.itemSize[0] + (m.focusBoxMargin * 2)
+    focusPoster.height = m.top.itemSize[1] + (m.focusBoxMargin * 2)
 
     if m.focusBox.opacity <> 1.0
       if m.limitedNewUi

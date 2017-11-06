@@ -120,7 +120,6 @@
       height="352"
       itemSpacings="[8]"
       itemComponentName="DetailMenuItem"
-      focusBitmapUri="pkg:/images/menu-focus.9.png"
       visible="false"
       translation="[60, 680]" />
     

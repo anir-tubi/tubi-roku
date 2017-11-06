@@ -47,6 +47,10 @@ Function init()
   if m.constants.deviceInfo.limitedNewUi then
     m.RowList.itemComponentName = ""
   end if
+
+  if m.constants.deviceInfo.scaledUi = true then
+    m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
+  end if
 End Function
 
 

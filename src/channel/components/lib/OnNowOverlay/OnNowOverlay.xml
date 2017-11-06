@@ -46,10 +46,10 @@
       rowFocusAnimationStyle="floatingFocus"/>
     <Poster
       id="FocusBox"
-      width="430"
-      height="256"
-      uri="pkg:/images/selector.9.png"
-      translation="[85,0]"/>
+      width="442"
+      height="268"
+      uri="pkg:/images/selector-fhd.9.png"
+      translation="[79,-6]"/>
 
     <InfoPanel
     id="Info"

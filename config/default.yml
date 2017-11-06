@@ -45,6 +45,8 @@ manifest:
   mm_icon_focus_hd: "pkg:/images/channel-icon-hd-540x405.png"
   splash_screen_fhd: "pkg:/images/splash-fhd.png"
   bs_libs_required: roku_ads_lib
+  # We have a workaround for 9-patch handling when ui_resolutions is "fhd" and scaling down for non-4k devices. 
+  # If we ever add "sd" or "hd", the workaround will also need to be removed.
   ui_resolutions: "fhd"
   uri_resolution_autosub: "$$RES$$,sd,hd,fhd"
 

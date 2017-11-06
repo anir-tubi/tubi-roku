@@ -11,6 +11,13 @@ Function init()
   m.Keyboard.observeField("text", "onKeyboardTextChanged")
   m.KeyboardAnimation = m.top.findNode("KeyboardAnimation")
   m.KeyboardInterpolator = m.top.findNode("KeyboardTranslationInterpolator")
+
+  if m.global.constants.deviceInfo.scaledUi = true then
+    m.EmailTextBoxFocus.uri = "pkg:/images/selector-hd.9.png"
+    m.PasswordTextBoxFocus.uri = "pkg:/images/selector-hd.9.png"
+    m.SignInButtonFocus.uri = "pkg:/images/menu-focus-hd.9.png"
+    m.SignInButtonDisabledFocus.uri = "pkg:/images/menu-disabled-focus-hd.9.png"
+  end if
 End Function
 
 ''''''''''''''''''''''
@@ -20,8 +27,15 @@ End Function
 Function onScreenFocusChange()
   tubiLog("SignInEmailPasswordScreen.onScreenFocusChange")
   if m.top.hasFocus() then
-    m.EmailTextBox.setFocus(true)
-    m.EmailTextBoxFocus.visible = true
+    if m.Keyboard.visible = true
+      m.Keyboard.setFocus(true)
+    else
+      m.EmailTextBoxFocus.visible = true
+      m.PasswordTextBoxFocus.visible = false
+      m.FocusedTextBox = m.EmailTextBox
+      m.EmailTextBox.setFocus(false)
+      startShowKeyboard()
+    end if
   end if
   setColors()
 End Function
@@ -141,31 +155,38 @@ End Function
 '
 Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("SignInEmailPasswordScreen.onKeyEvent")
+  result = false
   if press then
     if key = "down" then
       if m.Keyboard.isInFocusChain() then
         startHideKeyboard()
-        return true
+        result = true
       else if m.EmailTextBox.isInFocusChain() then
         m.PasswordTextBox.setFocus(true)
         m.EmailTextBoxFocus.visible = false
         m.PasswordTextBoxFocus.visible = true
-        return true
+        result = true
       else if m.PasswordTextBox.isInFocusChain() then
         m.SignInButton.setFocus(true)
         m.PasswordTextBoxFocus.visible = false
-        return true
+        result = true
       end if
     else if key = "up" 
       if m.SignInButton.isInFocusChain() then
         m.PasswordTextBox.setFocus(true)
         m.PasswordTextBoxFocus.visible = true
-        return true
+        result = true
       else if m.PasswordTextBox.isInFocusChain() then
         m.PasswordTextBoxFocus.visible = false
         m.EmailTextBox.setFocus(true)
         m.EmailTextBoxFocus.visible = true
-        return true
+        result = true
+      else if m.EmailTextBox.isInFocusChain() then
+        m.FocusedTextBox = m.EmailTextBox
+        m.EmailTextBoxFocus.visible = false
+        m.EmailTextBox.setFocus(false)
+        startShowKeyboard()
+        result = true
       end if
     else if key = "OK" then
       if m.EmailTextBox.hasFocus() then
@@ -173,23 +194,29 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
         m.EmailTextBoxFocus.visible = false
         m.EmailTextBox.setFocus(false)
         startShowKeyboard()
-        return true
+        result = true
       else if m.PasswordTextBox.hasFocus() then
         m.FocusedTextBox = m.PasswordTextBox
         m.PasswordTextBoxFocus.visible = false
         m.PasswordTextBox.setFocus(false)
         startShowKeyboard()
-        return true
+        result = true
       else if m.SignInButton.hasFocus() and m.SignInButtonFocus.visible = true then
         if m.SignIn = invalid then
           ' only sign-in if button is enabled and task isn't running
           signIn()
-          return true
+          result = true
         end if
+      end if
+    else if key = "back" then
+      if m.Keyboard.isInFocusChain() then
+        startHideKeyboard()
+        result = true
       end if
     end if
   end if
-  return false
+  setColors()
+  return result
 End Function
 
 
