@@ -383,7 +383,7 @@ end function
 '@historyIds: assocArray, historyIds as stored on scenegraphs m.global.historyIds. Also returned from m.handleInitialHistory().historyIds
 function tubiBookmarks_updateNowPos(content, playerInfo, historyIds)
 
-  if historyIds <> invalid and playerInfo <> invalid and content.id <> invalid
+  if historyIds <> invalid and playerInfo <> invalid and playerInfo.historyId <> invalid and playerInfo.historyId <> "" and content.id <> invalid
     existingEpisode = historyIds.findNode(content.id)    
     if existingEpisode <> invalid
       tubiLog("Bookmarks.updateNowPos updating historyId for " + content.id)
