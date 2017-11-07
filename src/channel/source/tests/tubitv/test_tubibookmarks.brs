@@ -407,12 +407,11 @@ Function testUpdateNowPosSignedOutMovieNew(t As Object)
   playerInfo = {
     nowPos: 145
   }
+  ' NOTE: Current behavior is that we don't maintain an
+  ' offline history.  Content must have a historyId to
+  ' be tracked in history
   result = BM.updateNowPos(content, playerInfo, historyIds)
-  t.assertEqual(result.getChildCount(), 1)
-  t.assertEqual(result.getChild(0).id, "321221")
-  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.video)
-  t.assertEqual(result.getChild(0).historyId, "")
-  t.assertEqual(result.getChild(0).nowPos, 145)
+  t.assertEqual(result.getChildCount(), 0)
 End Function
 
 Function testUpdateNowPosSignedOutEpisodeNew(t As Object)
@@ -429,16 +428,11 @@ Function testUpdateNowPosSignedOutEpisodeNew(t As Object)
   playerInfo = {
     nowPos: 145
   }
+  ' NOTE: Current behavior is that we don't maintain an
+  ' offline history.  Content must have a historyId to
+  ' be tracked in history
   result = BM.updateNowPos(content, playerInfo, historyIds)
-  t.assertEqual(result.getChildCount(), 1)
-  t.assertEqual(result.getChild(0).id, "1079")
-  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.series)
-  t.assertEqual(result.getChild(0).historyId, "")
-  t.assertEqual(result.getChild(0).currentEpisodeId, "302800")
-  t.assertEqual(result.getChild(0).getChildCount(), 1)
-  t.assertEqual(result.getChild(0).getChild(0).id, "302800")
-  t.assertEqual(result.getChild(0).getChild(0).historyId, "")
-  t.assertEqual(result.getChild(0).getChild(0).nowPos, 145)
+  t.assertEqual(result.getChildCount(), 0)
 End Function
 
 Function testUpdateNowPosSignedInMovieExisting(t As Object)
@@ -526,12 +520,15 @@ Function testUpdateNowPosSignedOutMovieExisting(t As Object)
   playerInfo = {
     nowPos: 145
   }
+  ' Expected behavior is that we ignore content which is
+  ' missing a historyId, even if there is already something
+  ' in the history
   result = BM.updateNowPos(content, playerInfo, historyIds)
   t.assertEqual(result.getChildCount(), 1)
   t.assertEqual(result.getChild(0).id, "321221")
   t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.video)
   t.assertEqual(result.getChild(0).historyId, "")
-  t.assertEqual(result.getChild(0).nowPos, 145)
+  t.assertEqual(result.getChild(0).nowPos, 10)
 End Function
 
 Function testUpdateNowPosSignedOutEpisodeExisting(t As Object)
@@ -556,6 +553,9 @@ Function testUpdateNowPosSignedOutEpisodeExisting(t As Object)
   playerInfo = {
     nowPos: 145
   }
+  ' Expected behavior is that we ignore content which is
+  ' missing a historyId, even if there is already something
+  ' in the history
   result = BM.updateNowPos(content, playerInfo, historyIds)
   t.assertEqual(result.getChildCount(), 1)
   t.assertEqual(result.getChild(0).id, "01079")
@@ -565,7 +565,7 @@ Function testUpdateNowPosSignedOutEpisodeExisting(t As Object)
   t.assertEqual(result.getChild(0).getChildCount(), 1)
   t.assertEqual(result.getChild(0).getChild(0).id, "302800")
   t.assertEqual(result.getChild(0).getChild(0).historyId, "")
-  t.assertEqual(result.getChild(0).getChild(0).nowPos, 145)
+  t.assertEqual(result.getChild(0).getChild(0).nowPos, 15)
 End Function
 
 Function xtestUpdateNowPosInvalidHistoryIds(t As Object)

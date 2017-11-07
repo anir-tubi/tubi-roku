@@ -202,17 +202,7 @@ Function testSendLogging(t as Object)
   logInfo7 = log.buildLogInfo(message, infoServerType, subtype, infoLevel)
   logResult7 = log.sendLogging(logInfo7, requestQueue)
 
-  t.assertInvalid(logResult7)
-  t.assertTrue(requestQueue.queue.count() = 0)
-  requestQueue.queue = []  'reset for next tests
-
-
-  'test if log requests are sent for info when the device id is in constants.idsToSend
-  constants.idsToLog.AddReplace(constants.deviceInfo.deviceId, true)
-  logInfo8 = log.buildLogInfo(message, infoServerType, subtype, infoLevel)
-  logResult8 = log.sendLogging(logInfo8, requestQueue)
-
-  t.assertNotInvalid(logResult8)
+  t.assertNotInvalid(logResult7)
   t.assertTrue(requestQueue.queue.count() > 0)
   requestQueue.queue = []  'reset for next tests
   constants.idsToLog = {}  'reset for next tests
@@ -221,10 +211,10 @@ Function testSendLogging(t as Object)
   'test a valid warn log
   warnLevel = "warn"
   warnServerType = "API:SLOW"
-  logInfo9 = log.buildLogInfo(message, warnServerType, subtype, warnLevel)
-  logResult9 = log.sendLogging(logInfo9, requestQueue)
+  logInfo8 = log.buildLogInfo(message, warnServerType, subtype, warnLevel)
+  logResult8 = log.sendLogging(logInfo8, requestQueue)
 
-  t.assertNotInvalid(logResult9)
+  t.assertNotInvalid(logResult8)
   t.assertTrue(requestQueue.queue.count() > 0)
   requestQueue.queue = []  'reset for next tests
 
