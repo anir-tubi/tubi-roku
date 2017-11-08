@@ -37,8 +37,6 @@ Function tubiChannel_runChannel(args, adShim, port)
   tubiScene = screen.CreateScene("TubiScene")
   screen.show()
 
-  deepLinkContent = m.deepLink(args, m.tracking, m.auth)
-
   'flag to enable vs. disable remote components loading
   enableRemoteComponents = m.constants.externalConfig.info.remote_components
 
