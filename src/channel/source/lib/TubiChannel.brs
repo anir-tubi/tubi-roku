@@ -77,9 +77,11 @@ Function tubiChannel_runChannel(args, adShim, port)
     end if
     sgGlobal.setField("constants", m.constants)
 
+    deepLinkContent = m.deepLink(args, m.tracking, m.auth, true)
     controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
     controller.onNowContent = onNowContent
   else
+    deepLinkContent = m.deepLink(args, m.tracking, m.auth, false)
     controller = tubiScene.createChild("ContentController")
     controller.onNowContent = onNowContent
   end if
@@ -89,7 +91,6 @@ Function tubiChannel_runChannel(args, adShim, port)
 
   adShim.run(controller)
 End Function
-
 
 
 '''''''''''''''
@@ -115,8 +116,7 @@ End Function
 '
 ' NOTE: 'entry' seems undocumented and may have been added special for adRise by Roku
 
-Function tubiChannel_deepLink(args, tracking, auth)
-  _ = rodash()
+Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
   'handle/set up any deep linking that may have occurred
   if (args.contentId <> invalid)
     tubiLog("Deep Link detected for content id " + args.contentId)
@@ -125,7 +125,12 @@ Function tubiChannel_deepLink(args, tracking, auth)
       testLog(key + " = " + tostr(args[key]))
     end for
 
-    content = CreateObject("roSGNode", "DeeplinkContentNode")
+    if isRemoteComponents
+      content = CreateObject("roSGNode", "TubiRemoteLibrary:DeeplinkContentNode")
+    else
+      content = CreateObject("roSGNode", "DeeplinkContentNode")
+    end if
+
     content.id = args.contentId
 
     ' default deep link source is search
