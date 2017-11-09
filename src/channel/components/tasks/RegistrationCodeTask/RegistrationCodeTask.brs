@@ -167,6 +167,8 @@ Function registrationLoop() As Void
     end while
   end while
 
+  m.top.error = "expire"
+
   'we haven't exited the while loop by returning out of the function so we must have hit the expiration timeout
   m.global.trackingLoggingTask.trackEvent = {
     trackType: "registerFail"

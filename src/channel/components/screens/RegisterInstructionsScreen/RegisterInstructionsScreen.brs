@@ -4,7 +4,6 @@ Function init()
   m.ButtonGroup.setFocus(true)
   m.ButtonGroup.observeField("itemSelected", "onButtonSelected")
   m.RegistrationCode = m.top.findNode("RegistrationCode")
-  getRegistrationCode()
 End Function
 
 
@@ -16,6 +15,10 @@ Function onScreenFocusChange()
   tubiLog("RegisterInstructionsScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.ButtonGroup.setFocus(true)
+    ' do this here so if a user navigates away from this
+    ' screen but it is reused later, we always have a fresh
+    ' code and full timeout period.
+    getRegistrationCode()
   end if
 End Function
 
@@ -61,14 +64,21 @@ End Function
 '
 ' An error was recorded by the registrationCodeTask so let the user know
 Function onRegTaskError(evt)
-  message = "We're sorry a connection error occurred."
-  if evt.getData() = "poll"
-    message = "We're sorry, we could not connect with the server to see if you registered your device."
+  if evt.getData() = "expire"
+    title = "Activation Code Expired"
+    message = "We're sorry, but the activation code expired before your device was successfully linked."
+  else if evt.getData() = "poll"
+    title = "Connection Error During Activation"
+    message = "We're sorry, but we could not connect with the server to see if you registered your device."
   else if evt.getData() = "code"
-    message = "We're sorry, there was an error while receiving the code from the server."
+    title = "Connection Error During Registration"
+    message = "We're sorry, but there was an error while receiving the code from the server."
+  else
+    title = "Activation Code Error"
+    message = "We're sorry, but an activation code error occurred."
   end if
   m.errorDialog = m.top.createChild("ModalDialogScreen")
-  m.errorDialog.title = "Connection Error During Registration"
+  m.errorDialog.title = title
   m.errorDialog.message = message
   m.errorDialog.buttons = ["Try again", "Skip"]
   m.errorDialog.observeField("buttonSelected", "onErrorButtonPress")
@@ -82,6 +92,7 @@ End Function
 ' Respond the user selecting a button on the error modal
 Function onErrorButtonPress(evt)
   buttonSelected = evt.getData()
+  m.ButtonGroup.setFocus(true)
   m.top.removeChild(m.errorDialog)
   m.errorDialog.unobserveField("buttonSelected")
   if buttonSelected = 0
@@ -102,13 +113,12 @@ Function getRegistrationCode()
   tubiLog("RegisterInstructionsScreen.getRegistrationCode")
   m.RegistrationCode.text = "------"
   if m.RegCodeTask <> invalid then
-    m.top.removeChild(m.RegCodeTask)
     m.RegCodeTask.unobserveField("code")
     m.RegCodeTask.unobserveField("response")
     m.RegCodeTask.unobserveField("error")
     m.RegCodeTask.cancel = true  ' tell the thread to exit
   end if
-  m.RegCodeTask = m.top.createChild("RegistrationCodeTask")
+  m.RegCodeTask = CreateObject("roSGNode", "RegistrationCodeTask")
   m.RegCodeTask.observeField("code", "onCodeChange")
   m.RegCodeTask.observeField("response", "onRegistrationResponse")
   m.RegCodeTask.observeField("error", "onRegTaskError")
