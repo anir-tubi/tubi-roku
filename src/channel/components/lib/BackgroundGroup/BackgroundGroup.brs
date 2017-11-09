@@ -97,8 +97,9 @@ Function updateBackground()
 
 
     else
-      'we are not changing the gradient overlay because the background types are the same
-      'so we are just updating the background image list
+      'normally this is just changing between posters within a category (no need to change the overlay), however, 
+      'there is an edge case where a full screen background poster with no overlay on the category screen can transistion to a
+      'full screen background poster on the details screen with an overlay
       m.timer.unobserveField("fire")
 
       'don't update the background image if it hasn't changed (ie. changing categories)
@@ -147,6 +148,9 @@ Function updateBackground()
                 m.newBackgroundAnimation = posterGroup.findNode("FadeInOnly")
               else
                 m.newBackgroundAnimation = posterGroup.findNode("TransitionIn")
+                if m.top.getChild(0).findNode("BackgroundGradient").opacity = 0.0
+                  m.top.getChild(0).findNode("BackgroundGradient").opacity = 1.0
+                end if
               end if
 
               if m.newBackgroundPoster.loadStatus = "ready"

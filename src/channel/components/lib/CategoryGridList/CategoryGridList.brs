@@ -92,7 +92,7 @@ End Function
 ' onComponentFocusChange
 '
 Function onComponentFocusChange()
-  tubiLog("CategoryGridList.onComponentFocusChange" + focusState(m.top))
+  tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
   if m.top.hasFocus() then
     m.RowList.setFocus(true)
   end if

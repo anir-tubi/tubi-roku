@@ -30,7 +30,13 @@ Function onScreenFocusChange() As Void
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.isInFocusChain()
     if m.top.hasFocus() then
+    'this typically happens if the homescreen is regaining focus after returning from the details screen or a modal (like "About")
       m.focusTarget.setFocus(true)
+
+      'ensure that the category screen has its background image reloaded if it is gaining focus
+      if type(m.focusTarget) = "roSGNode" and m.focusTarget.isSameNode(m.CategoryScreen)
+        m.top.backgroundUriList = m.top.backgroundUriList
+      end if
     end if
   end if
 End Function
