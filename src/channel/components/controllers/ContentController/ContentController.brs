@@ -692,8 +692,9 @@ Function onTrailerFinished(msg As Object)
     m.videoPlayer.unobserveField("backButtonPressed")
     m.videoPlayer.unobserveField("skipTrailer")
     m.videoPlayer.unobserveField("state")
-    m.videoPlayer.observeField("state", "onTrailerStopped")
     m.videoPlayer.control = "stop"
+    content = getDetailScreenContent()
+    playVideoContent(content)
   end if
 
   if endTrailer then
@@ -704,15 +705,6 @@ Function onTrailerFinished(msg As Object)
     m.videoPlayer.control = "stop"
     m.ScreenStack.visible = true
     currentScreen().setFocus(true)
-  end if
-End Function
-
-
-Function onTrailerStopped()
-  if m.videoPlayer.state = "stopped"
-    m.videoPlayer.unobserveField("state")
-    content = getDetailScreenContent()
-    playVideoContent(content)
   end if
 End Function
 

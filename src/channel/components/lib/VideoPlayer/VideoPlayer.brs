@@ -620,9 +620,10 @@ Function onAdStateChange()
     showAdBreak()
   ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
   'TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
-  else if m.top.adState = "noads" and m.VideoState = "play" and m.Video.state <> "playing" then
+  else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause") and m.Video.state <> "playing" then
     ' came back from an ad break
     m.Video.seek = m.playerPosition
+    m.VideoState = "play"
     m.Video.control = "play"
     trackEvent({
       trackType: "resumeAfterAds"
@@ -966,6 +967,9 @@ Function handleHopForward()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub()
     setFocusedButton(m.HopForwardButton)
+  end if
+  if m.HUD.opacity > 0.0
+    animateTransport("out")
   end if
   jumpToPosition(m.playerPosition + 30)
 End Function

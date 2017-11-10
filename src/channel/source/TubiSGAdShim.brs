@@ -63,9 +63,10 @@ Function tubiSGAdShim_run(scene As Object) As boolean
           episode = m.videoPlayerNode.content.getFields()  ' clone the content node into a local AA to avoid messing with it
           position = m.videoPlayerNode.adPosition
           tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position))
+          print "ad state "; m.videoPlayerNode.adState
           m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
         else
-          m.videoPlayer.adState = "noads"  ' if video player content was changed before we got here, return no ads
+          m.videoPlayerNode.adState = "noads"  ' if video player content was changed before we got here, return no ads
         end if
       end if
     end if
