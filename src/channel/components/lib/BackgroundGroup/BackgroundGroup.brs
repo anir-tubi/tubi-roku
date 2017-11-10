@@ -387,7 +387,7 @@ End Function
 
 Function updateLowMemBackground()
   TubiLog("BackgroundGroup.updateLowMemBackground")
-  backgroundImage = m.top.getChild(0).findNode("BackgroundPoster")
+  backgroundImage = m.top.getChild(0).findNode("BackgroundPoster")  'existing background image, prior to update
   backgroundGradient = m.top.getChild(0).findNode("BackgroundGradient")
 
   if m.top.newBackgroundType = "topright"
@@ -424,6 +424,11 @@ Function updateLowMemBackground()
       backgroundImage.translation="[0,0]"
       backgroundImage.visible = true
     else if not m._.empty(m.top.backgroundUriList)
+      if m.top.backgroundUriList[0] = m.blurredDefaultBackground
+        backgroundGradient.visible = false
+      else
+        backgroundGradient.visible = true
+      end if
       backgroundImage.uri = m.top.backgroundUriList[0]
     end if
   end if
