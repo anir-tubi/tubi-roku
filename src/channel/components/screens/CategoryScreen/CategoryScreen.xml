@@ -191,8 +191,8 @@
         id="ContentArea"
         maskUri="pkg:/images/poster-mask.png"
         maskSize="[0,0]"
-        maskOffset="[1731,326]"
-        translation="[85,562]">
+        maskOffset="[1731,317]"
+        translation="[85,553]">
         <CategoryGridList
           id="CategoryGridList"/>
       </MaskGroup>
