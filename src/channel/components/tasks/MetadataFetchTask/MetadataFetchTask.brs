@@ -259,6 +259,7 @@ Function translateCategoryMetadata(contentToTranslate, json, isFeaturedCategory)
       children: CreateObject("roArray", contentToTranslate.children.count(), false)
       totalCount: contentToTranslate.children.count()
       json: json
+      type: m.contentTypes.category
     }
     for each child in contentToTranslate.children
       childAA = {
@@ -364,6 +365,7 @@ Function translateAllCategoriesMetadata(contentToTranslate) As Object
         id: content.id
         title: content.title
         description: content.description
+        type: m.contentTypes.category
       }
       wrappedContent.children.push(childAA)
     end if

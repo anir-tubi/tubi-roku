@@ -51,6 +51,9 @@
     <field id="searchSignOutHintVisible" alias="SearchSignOutHint.visible"/>
     <field id="firstPosterLoaded" alias="CategoryGridList.firstPosterLoaded"/>
 
+    <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
+    <field id="cachedContent" alias="CategoryGridList.cachedContent" />
+
     <!-- When used as a child of container screen (ex. Homescreen),
          accounts for the other visible rows (ex. On Now, Tools) -->
     <field id="rowPlaceholder" type="integer" value="0"/>

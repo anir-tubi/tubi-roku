@@ -54,6 +54,13 @@
     <field id="isFullWidth" type="boolean" value="true" />
 
     <field id="currFocusRow" alias="RowList.currFocusRow" />
+
+    <!-- READ-ONLY: Do not observe this since it will be constantly changing.  It's only used for
+      - contextual information about the focused or selected items.  Expect that all of the
+      - leaf nodes are abbreviated ContentNodes and not fully-translated TubiContentNodes.  Only
+      - expect on id and title to be valid.
+      -->
+    <field id="cachedContent" alias="RowList.content" />
   </interface>
   
   <children>

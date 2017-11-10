@@ -838,11 +838,16 @@ Function onPlayerInfo() As Void
       ' NOTE2: m.top.playContent comes from the detailscreen,
       '        so we map it back to the categoryscreen via 'shortContent'
       tubiLog("Autoplay: Movie")
-      parent = m.detailScreen.shortContent.getParent()
+
+      ' TODO(Chris): this is terribly unpleasant, looking into the categoryscreen's internal data structure
+      parent = invalid
+      if m.categoryScreen.cachedContent <> invalid
+        parent = m.categoryScreen.cachedContent.getChild(m.categoryScreen.cursorPosition[0])
+      end if
       if parent <> invalid and parent.type = m.global.constants.ui.contentTypes.category then
         for i=0 to parent.getChildCount()-1
           child = parent.getChild(i)
-          if child.isSameNode(m.detailScreen.shortContent) then
+          if child.id = m.detailScreen.shortContent.id then
             nextContent = parent.getChild(i+1)
             if nextContent <> invalid then
               ' set the detail screen to focus on the next movie. Note that this will take some 

@@ -3,6 +3,7 @@
 <component name = "CategoryContentNode" extends="ContentNode">
   <interface>
     <!-- inherited field id="id" type="string";  category id as sent from the server -->
+    <field id="type" type="string"/>
 
     <!-- these will come in for paginated responses -->
     <field id="totalCount" type="int" value="-1"/>
