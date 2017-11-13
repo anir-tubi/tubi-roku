@@ -30,3 +30,20 @@ m.global.utils.constants.ui.onNow.disableOnNow = false
 if m.global.utils.constants.externalConfig.info.remote_components = 1
   m.global.utils.constants.deviceInfo.clientVersion = m.global.utils.constants.deviceInfo.clientVersion.Replace("local", "remote")
 end if
+
+
+
+'Fix issue on tracking
+m.global.utils.tracking.getUserTrackingRequest = Function(trackData as Object)
+  trackUrl = m.constants.urls.datascience.event
+
+  options = {
+    method: m.constants.reqTypes.post
+    body: FormatJson(trackData)
+    headers: {"Content-Type": "application/json"}
+  }
+
+  userRequest = m.request.createAsync(trackUrl, "track" + trackData.key, options)
+
+  return userRequest
+End Function
