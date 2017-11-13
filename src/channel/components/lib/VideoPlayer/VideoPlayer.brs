@@ -318,7 +318,10 @@ Function onVideoPositionChange()
   end if
 
   ' User history
-  if m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval
+  ' NOTE: historyPosition should not be set near an ad break due to race condition where RAF being
+  ' invoked will cause the AuthTask thread to get stuck, never completing and staying in a "run"
+  ' state perpetually.
+  if (m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval) and m.top.adState <> "adspending"
     historyPosition()
   end if
 
@@ -343,8 +346,6 @@ Function onVideoPositionChange()
           ' We must stop the video here, not just pause it, in order to release
           ' system resources to the RAF video player
           showAdBreak()
-          ' store latest history
-          historyPosition()
         else if m.top.adState = "noads"
           ' when we reach the cuepoint, we find that the last ad call returned no ads
           trackEvent({
