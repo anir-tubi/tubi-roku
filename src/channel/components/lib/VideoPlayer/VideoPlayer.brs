@@ -623,9 +623,12 @@ Function onAdStateChange()
   'TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
   else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause") and m.Video.state <> "playing" then
     ' came back from an ad break
-    m.Video.seek = m.playerPosition
+    ' set the m.Video.control prior to the m.Video.seek to ensure that the video is not started from the beginning even if m.playerPosition <> 0.
+    ' this is a seeming inconsistency with the firmware and should not neccessarily work this way, but it does.
+    ' normally we would expect to set the seek prior to setting control to "play"
     m.VideoState = "play"
     m.Video.control = "play"
+    m.Video.seek = m.playerPosition
     trackEvent({
       trackType: "resumeAfterAds"
       value: m.playerPosition
