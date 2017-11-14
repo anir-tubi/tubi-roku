@@ -1,4 +1,4 @@
-print "Hot Patch 2.5.oldui"
+print "Hot Patch 2.5.oldui {{profile}}"
 
 ' Disallow SMS for activation
 m.app.registerScreen.allowSMS = false

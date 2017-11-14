@@ -16,7 +16,7 @@ bluebird.promisifyAll(fs);
 /**
  * Parse a yml file, inserting special values. If it does not exist, return {}.
  * @param profile: ['default', 'dev', 'staging', 'production']
- * @param withReplace: boolean, dictates if replacing functionality will be performed
+ * @param withReplace: boolean, dictates if replacing/templating functionality will be performed
  * @returns {*}
  */
 function parse(profile, withReplace) {
@@ -24,13 +24,14 @@ function parse(profile, withReplace) {
   if (!fs.existsSync(filename)) return {};
   const raw = fs.readFileSync(filename, { encoding: 'utf8' });
 
-  if (withReplace){
-    /* URI-TO-REPLACE is the localhost server of dynamic components zip */
-    const remoteComponentDir = localIp + ':8090';
-    let rendered = raw.replace(/<<URI-TO-REPLACE>>/g, remoteComponentDir);
-
-    const version = getBuildTag(false, false);
-    rendered = rendered.replace(/<<VER-TO-REPLACE>>/g, version);
+  if (withReplace) {
+    const { configTemplating } = require('./templating');
+    const templateValues = {
+      hostUri: `${localIp}:8090`,
+      versionUnderscored: getBuildTag(false, false),
+      versionMinorDotted: getBuildTag(true, true),
+    };
+    let rendered = configTemplating(raw, templateValues);
     return yaml.load(rendered);
   }
   

@@ -8,13 +8,9 @@ const {parse} = require('./config');
 bluebird.promisifyAll(fs);
 
 
-function getHotpatchSourcePath(buildProfile, ui, build) {
+function getHotpatchSourcePath(ui, build) {
   let filename = '';
-  if (buildProfile === 'dev'){
-    filename = `dev.${ui}.brs`;
-  } else if (buildProfile === 'staging' || buildProfile === 'production' || buildProfile === 'default' ) {
-    filename = `${build.major_version}.${build.minor_version}.${ui}.brs`;
-  }
+  filename = `${build.major_version}.${build.minor_version}.${ui}.brs`;
 
   const pathToHotpatch = path.join(process.cwd(), 'src', 'hotpatch', filename);
 
@@ -57,7 +53,7 @@ function createHotpatch(buildProfile) {
   const uis = ['oldui', 'newui'];
 
   uis.forEach(ui => {
-    const hotpatchSourcePath = getHotpatchSourcePath(buildProfile, ui, build);
+    const hotpatchSourcePath = getHotpatchSourcePath(ui, build);
     const hotpatchDestinationPath = getHotpatchDestinationPath(ui, build);
     const remoteComponentsLocation = getRemoteComponentsLocation(buildProfile, build);
 
@@ -86,4 +82,15 @@ function createHotpatch(buildProfile) {
   });
 }
 
-module.exports = { createHotpatch };
+
+// @templateSource: string, a string containing handlebar placeholders
+// @values: obj, keys represent the name of the placeholders, values are what will replace the placeholders
+// returns a string with the placeholders replaced
+function configTemplating(templateSource, values) {
+  const template = Handlebars.compile(templateSource, { noEscape: true });
+  const configOutput = template(values);
+  return configOutput;
+}
+
+
+module.exports = { createHotpatch, configTemplating };

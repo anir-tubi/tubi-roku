@@ -1,13 +1,13 @@
 settings:
   mode: "production"
-  version: "<<VER-TO-REPLACE>>"
+  version: "{{versionUnderscored}}"
   contentType: "hls"
   shortAppName: "tubitv"
   platformName: "roku"
   adLoadingBackgroundColor: "#222223"
   adLoadingFontColor: "#EBEBEB"
   loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
-  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/2.5.newui.brs"
+  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/{{versionMinorDotted}}.newui.brs"
   remoteComponentsHost: "http://cdn.adrise.com/hotpatches/roku/components"
   appName: "Tubi TV"
   isLiveTVOn: true
