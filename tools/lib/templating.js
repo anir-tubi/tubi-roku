@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const localIp = require('my-local-ip')();
 const bluebird = require('bluebird');
-const {parse} = require('./config');
+const {load, parse} = require('./config');
 
 bluebird.promisifyAll(fs);
 
@@ -27,7 +27,7 @@ function getHotpatchDestinationPath(ui, build) {
 function getRemoteComponentsLocation(buildProfile, build) {
   const filename = `tubi_remote_components_${build.major_version}_${build.minor_version}_${build.build_version}.pkg`;
 
-  const config = parse(buildProfile, true);
+  const config = load(buildProfile, true);
   const {settings} = config;
   const {remoteComponentsHost} = settings;
   return `${remoteComponentsHost}/${filename}`;
