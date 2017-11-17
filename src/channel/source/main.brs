@@ -169,10 +169,18 @@ Function Hotpatch(hotPatchUrl) As Integer
         ' Eval the downloaded script
         if len(evalString) > 10
           errCode = eval(evalString)
-          if Type(errCode) = "Integer" and errCode=252
-            print "(hp len: " + str(len(evalString)) + ")"
-          else
-            print "evalError "; errCode
+          if Type(errCode) = "Integer"
+            if errCode=252
+              print "(hp len: " + str(len(evalString)) + ")"
+            else
+              print "evalError "; errCode
+              hotpatchResult = -1
+            end if
+          else if type(errCode) = "roList"
+            print "evalError "
+            for each error in errCode
+              print error
+            end for
             hotpatchResult = -1
           end if
         end if
