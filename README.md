@@ -1,82 +1,60 @@
-# adRise Roku platform
+# Tubi Roku Channel
 
-This is the repo for the source code of roku platform.
 
-## Install
+## Setup
 
-After checkout code, please run:
+Get the sources and set up the toolchain:
 
 ```bash
+$ git clone git@github.com:adRise/project-total-recall.git
 $ cd tools
 $ npm install  # this expect you have node > 4.x installed
 ```
+
+Set up the device and signing keys:
+
+```
+export ROKU_DEV_TARGET=<your-roku-ip>
+export DEV_PASSWORD=<dev password set up on Roku device>
+export PKG_PASSWORD=<password from the GENKEY utility used for signing packages>
+```
+
 
 ## Development
 
 ### Run local build
 
-To run a local build, you just need to:
+To run a local build:
 
-```
-export ROKU_DEV_TARGET=<your-roku-ip>
+```bash
 $ make install
 ```
 
-It will automatically build the target from ``src`` to ``build``, including:
-
-* generate manifest file
-* generate Settings.brs from configuration
-* create a zip file for source files
-
-And it will run then run telnet to listen to the roku console output.
-
-```
-$ make install
-Generated the file: build/source/Settings.brs.
-Project adrise_roku.zip is built with profile dev.
-Installing adrise_roku to host 192.168.1.164...(this might take up to a minute)
-pplication Received: 774617 bytes stored.
-Install Success.</font>
-Telnet to 192.168.1.164 8085
-Trying 192.168.1.164...
-Connected to 192.168.1.164.
-Escape character is '^]'.
-
-<here are all the debug output>
-```
-
-If you don't like to assign ``ROKU_DEV_TARGET`` every time, please add
-
-```
-export ROKU_DEV_TARGET=<your-roku-ip>
-```
-
-to your ~/.bash_profile, and run ``source ~/.bashrc`` on current shell. For any new shell it will have this envar defined.
-
-You can also tune the ``ROKU_PROFILE`` with envar. By default it is ``dev``. You can change it to ``production``, ``staging`` and ``test``. Their difference can be found in ``config/*``.
+Once the build is complete, make will telnet to listen to the roku console on port 8085
 
 
-You can set `DEV_PASSWORD` with the developer password set on the roku device if it is something other than the default `1234`
+**Artifacts:**
+
+    build/hotpatch/x.x.newui.brs				# Hotpatch brightscript file for new SceneGraph UI
+    build/hotpatch/x.x.oldui.brs				# Hotpatch brightscript file for old SDK1 UI
+    build/tubi_x_x_x.zip						# Unsigned client package for sideloading
+	build/tubi_remote_components_2_5_1.pkg		# Remove SceneGraph components for dynamic loading
 
 
 ## Test
 
-### Smoke tests
+### Unit tests
 
-[Smoke tests](docs/tubi_tv_smoke_test.md) should be manually run for each release.
 
-### Run unit tests
+Run the unit tests located in `src/source/tests`:
 
-``test`` profile is just for testing purpose. If you run this:
+```bash
+$ make ROKU_PROFILE=test install
+```
+
+Expect output report:
 
 ```
-16:56 $ export ROKU_PROFILE=test
-✔ ~/projects/adrise/roku/adrise_roku [feature/add-readme|✚ 1…1]
-16:56 $ make install
-Generated the file: build/source/Settings.brs.
-Project adrise_roku.zip is built with profile test.
-Installing adrise_roku to host 192.168.1.164...(this might take up to a minute)
-
 ------ Running dev 'tubitv_roku' main ------
 Roku_Ads Framework version 1.5
 Roku_Ads_checkAllowedFeature: Parsing whitelist for ROKU_ADS_NIELSEN_ID
@@ -88,38 +66,48 @@ Ran 103 tests
 OK
 ```
 
-The code will run all the test suites defined in ``src/source/tests`` only. Run this every time before a pull request is suggested. Later on we will integrate this with jenkins build server.
+### Manual tests
 
-You can set `DEV_PASSWORD` with the developer password set on the roku device if it is something other than the default `1234`
+[Smoke tests](docs/tubi_tv_smoke_test.md) should be manually run for each release.
 
 
 ## Release Process
 
 ### Testing
 
-- Smoke tests (manual)
+- Manual tests
 - Run unit tests (white box)
-- Run jasmine tests (black box)
+- ~~Run jasmine tests (black box)~~ `DEFUNCT`
 
-##### Setting Up Staging
-- Running `make ROKU_PROFILE=staging install` will do the following:
-  - generate a version of the main app that can be used for staging
-  - upload hotpatch files and remote components build to a s3 bucket on AWS. (**You must set up access on AWS for this to work**).
-- Running `make ROKU_PROFILE=staging stage` will just upload the hotpatch and remote components pkg to s3. This can be used for testing remote components builds with the existing staging private channel.
+### Deploy to Staging for QA
 
-### Versioning and Building
+```bash
+$ export AWS_ACCESS_KEY_ID=<s3 staging bucket access_key>
+$ export AWS_SECRET_ACCESS_KEY=<s3 staging bucket secret_key>
+$ export AWS_DEFAULT_REGION=<s3 staging bucket region>
+$ make ROKU_PROFILE=staging install
+```
+
+This will:
+
+1. generate a version of the main app that can be used for staging
+1. upload hotpatch files and remote components build to a s3 bucket on AWS
+
+
+### Versioning and Building for Production 
+
 
 ##### Building For Roku Submission
 - Verify that the PKG_PASSWORD environment variable is set with the password needed for the production dev id
-- Verify that the ROKU\_DEV_TARGET environement variable is set
-- Run `make release`. `make release` will do the following:
-  - Clean up any previous builds from the build directory to avoid stale sources
-  - Verify a clean build directory to avoid uncommited changes in the build
-  - Increment the build number in the manifest and generated Settings.brs file
-  - Tag the source tree
-  - Build `tubitv_remote_components.pkg`
-  - Build `tubitv_roku.pkg`
-  - The following is example output of running the release target:
+- Run `make release`. This will:
+    - Clean up any previous builds from the build directory to avoid stale sources
+    - Verify a clean build directory to avoid uncommited changes in the build
+    - Increment the build number in the manifest and generated Settings.brs file
+    - Tag the source tree
+    - Build `tubitv_remote_components.pkg`
+    - Build `tubitv_roku.pkg`
+
+The following is example output of running the release target:
 
 ```
 $ make release
@@ -145,6 +133,7 @@ Remember to push the new tag to remote with 'git push --tags origin'
 - Create a GitHub release for the tag with title "Submission Build" and set as "Pre Release"
 - Upload the build to Roku via the development portal
 - Email Roku Partner Success to let them know the build is in their queue
+
 
 ##### After Submitting to Roku, Before Starting New Development
   - Bump the minor version number, e.g.
@@ -173,28 +162,9 @@ Remember to push the new tag to remote with 'git push --tags origin'
 
 
 
-## Project Layout
+## Architecture
 
-
-| Path | Usage |
-| ---- | ----- |
-| Makefile| Main project Makefile.  This builds and install the channel |
-| /build | build output goes here.  This is not checked in to git. |
-| /config | Run-time environment settings for the channel. |
-| /docs | Supplemental documentation for the channel |
-| /spec | Black box tests for the channel |
-| /src | Sources and assets which will be selectively included in the channe zip file, depending on build configuration. |
-| /src/3rdparty | 3rd party brightscript sources |
-| /src/components | SceneGraph components and accompanying code |
-| /src/components/controllers | "Controller"-type scene graph components which control visibility and flow of the application |
-| /src/components/lib | Custom Scene-Graph components which are not full screen, i.e. keyboard, left-hand menu |
-| /src/components/screens | Custom SceneGraph components which are full screen, usually managed as a stack or workflow from a controller |
-| /src/components/tasks | Components derived from Task node which are related to background threads |
-| /src/images | Packaged channel image assets |
-| /src/source | Non-SceneGraph BrightScript code; Libraries and non-SceneGraph screens |
-| /src/source/tests | Unit tests for non-SceneGraph Brightscript code |
-| /tools | These are build-time tools based on node.  They are launched from the Makefile. |
-
+See [docs/archicture.md](docs/architecture.md) for details architectural information
 
 
 
