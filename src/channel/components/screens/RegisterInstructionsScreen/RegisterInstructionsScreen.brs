@@ -1,11 +1,39 @@
 Function init()
-  m.ButtonGroup = m.top.findNode("RefreshButtons")
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.ButtonGroup.setFocus(true)
-  m.ButtonGroup.observeField("itemSelected", "onButtonSelected")
+  m.top.observeField("skipSignInOption", "setButtonContent")
+  m.Buttons = m.top.findNode("Buttons")
+  m.Buttons.setFocus(true)
+  m.Buttons.observeField("itemSelected", "onButtonSelected")
   m.RegistrationCode = m.top.findNode("RegistrationCode")
+  setButtonContent()
 End Function
 
+
+''''''''''''''''''''''''
+' setButtonContent
+'
+Function setButtonContent()
+  content = CreateObject("roSGNode", "ContentNode")
+  refresh = content.createChild("ContentNode")
+  refresh.id = "refresh"
+  refresh.title = "Refresh Code"
+  if not m.top.skipSignInOption then
+    signIn = content.createChild("ContentNode")
+    signIn.id = "sign-in"
+    signIn.title = "Sign in via Email"
+    ' Layout set for 2 buttons
+    m.Buttons.translation= [437,776]
+    m.Buttons.height = 80
+    m.Buttons.width = 1046
+    m.Buttons.itemSpacings = [86]
+  else
+    m.Buttons.translation= [720,776]
+    m.Buttons.height = 80
+    m.Buttons.width = 480
+    m.Buttons.itemSpacings = []
+  end if
+  m.Buttons.content = content
+End Function
 
 ''''''''''''''''''''''''''
 ' onScreenFocusChange
@@ -14,7 +42,7 @@ End Function
 Function onScreenFocusChange()
   tubiLog("RegisterInstructionsScreen.onScreenFocusChange")
   if m.top.hasFocus() then
-    m.ButtonGroup.setFocus(true)
+    m.Buttons.setFocus(true)
     ' do this here so if a user navigates away from this
     ' screen but it is reused later, we always have a fresh
     ' code and full timeout period.
@@ -29,7 +57,7 @@ End Function
 ' Handle Refresh button selected
 Function onButtonSelected()
   tubiLog("RegisterInstructionsScreen.onButtonSelected")
-  button = m.ButtonGroup.content.getChild(m.ButtonGroup.itemSelected)
+  button = m.Buttons.content.getChild(m.Buttons.itemSelected)
   if button.id = "refresh" then
     getRegistrationCode()
   else if button.id = "sign-in" then
@@ -92,7 +120,7 @@ End Function
 ' Respond the user selecting a button on the error modal
 Function onErrorButtonPress(evt)
   buttonSelected = evt.getData()
-  m.ButtonGroup.setFocus(true)
+  m.Buttons.setFocus(true)
   m.top.removeChild(m.errorDialog)
   m.errorDialog.unobserveField("buttonSelected")
   if buttonSelected = 0

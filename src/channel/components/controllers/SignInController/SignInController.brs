@@ -124,6 +124,7 @@ End Function
 Function onRegister()
   tubiLog("SignInController.onRegister")
   m.RegisterInstructions = CreateObject("roSGNode", "RegisterInstructionsScreen")
+  m.RegisterInstructions.skipSignInOption = m.global.constants.ui.signIn.skipSignInOption
   m.RegisterInstructions.observeField("registerSuccess", "onRegisterSuccess")
   m.RegisterInstructions.observeField("signInButtonPressed", "onSignIn")
   m.RegisterInstructions.observeField("skipButtonPressed", "onContinueGuestPass")

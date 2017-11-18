@@ -381,6 +381,7 @@ Function getConstants()
       constants.ui.signIn.skipContinueScreen = false
       constants.ui.signIn.skipSignInRegisterScreen = false
       constants.ui.signIn.backExitsSignIn = false
+      constants.ui.signIn.skipSignInOption = true    ' if true, suppress the "Sign in via Email" button on reg code screen
 
     'static - pre defined category names
     constants.ui.categoryNames = {}

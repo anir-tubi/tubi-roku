@@ -110,11 +110,11 @@ Function onContentChange() As Void
       if m.top.layoutDirection = "horiz" then
         x = nextItemPosition
         y = 0
-          nextItemPosition = nextItemPosition + itemRect.width + m.top.itemSpacings[i MOD m.top.itemSpacings.count()]
+        nextItemPosition = nextItemPosition + itemRect.width + itemSpacingAfter(i)
       else
         x = 0
         y = nextItemPosition
-        nextItemPosition = nextItemPosition + itemRect.height + m.top.itemSpacings[i MOD m.top.itemSpacings.count()]
+        nextItemPosition = nextItemPosition + itemRect.height + itemSpacingAfter(i)
       end if
 
       newItem.translation = [x,y]
@@ -142,6 +142,18 @@ Function onContentChange() As Void
   m.focusImage.width = itemRect.width
   m.focusImage.height = itemRect.height
   startChangeFocus(focus)
+End Function
+
+'''''''''''''''''''''
+' itemSpacingAfter
+'
+' Calculate the spacing following the item indicated
+Function itemSpacingAfter(index)
+  if m.top.itemSpacings = invalid or m.top.itemSpacings.count() = 0 then
+    return 0
+  else
+    return m.top.itemSpacings[index MOD m.top.itemSpacings.count()]
+  end if
 End Function
 
 ''''''''''''''''''''''
