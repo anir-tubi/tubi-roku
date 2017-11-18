@@ -32,12 +32,12 @@ Function init()
   m.authTask = m.top.findNode("AuthTask")
   m.authTask.observeField("authInfo", "onAuthInfoReceived")
   m.authInfoReceived = false
-  m.authTask.functionName = "execIntializeUserData"
+  m.authTask.functionName = "execInitializeUserData"
+  
   m.authTask.control = "RUN"
 
   m.top.observeField("deepLinkContent", "onDeepLinkContentReceived")
   m.deepLinkEvaluated = false
-  m.top.observeField("playerInfo", "onPlayerInfo")
 
   m.logOutTask = m.top.findNode("LogOutTask")
 
@@ -285,7 +285,7 @@ Function onSignInComplete()
     startOnNow()
   else
     ' retrieve the credentials on the AuthTask before starting the UI. This reduces jank.
-    m.authTask.functionName = "execIntializeUserData"
+    m.authTask.functionName = "execInitializeUserData"
     m.authTask.control = "RUN"
   end if
 
@@ -639,8 +639,7 @@ Function onEpisodeFinished(msg As Object)
     m.ScreenStack.visible = true
     currentScreen().setFocus(true)
 
-    ' trigger onPlayerInfo callback for remainder of logic
-    m.top.playerInfo = playerInfo
+    onPlayerInfo(playerInfo)
   end if
 End Function
 
@@ -772,9 +771,16 @@ End Function
 '''''''''''''''''''''
 ' onPlayerInfo
 '
-' Is called when the nowPos is updated from the player
-Function onPlayerInfo() As Void
-  playerInfo = m.top.playerInfo
+' Called when video playback is done
+' Expect:
+' playerInfo = {
+'   result           - m.global.constants.player.playerResults value
+'   nowPos           - integer seconds where playback stopped
+'   historyId        - history id if stored at the server
+'   parentHistoryId  - history id for series if historyId is valid and content is episodic
+' }
+'
+Function onPlayerInfo(playerInfo) As Void
   tubiLog("onPlayerInfo: nowPos = " + playerInfo.nowPos.toStr())
   if playerInfo.historyId <> invalid and playerInfo.historyId <> "" then
     tubiLog("onPlayerInfo: historyId = " + playerInfo.historyId.toStr())
@@ -834,9 +840,6 @@ Function onPlayerInfo() As Void
       ' last title launched was not related to a category on 
       ' the category screen.  In that case we'll just skip
       ' autoplay.
-      '
-      ' NOTE2: m.top.playContent comes from the detailscreen,
-      '        so we map it back to the categoryscreen via 'shortContent'
       tubiLog("Autoplay: Movie")
 
       ' TODO(Chris): this is terribly unpleasant, looking into the categoryscreen's internal data structure

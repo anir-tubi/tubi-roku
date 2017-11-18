@@ -15,20 +15,72 @@
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
-      <!-- Set to the response body -->
-      <field id="authInfo" type="assocarray" alwaysNotify="true" />
-      <field id="bookmarks" type="node"/>
-      <field id="history" type="node"/>
+      <!-- INPUT -->
+        <!-- Content for queue and history changes with fields:
+        -
+        -    addToQueue:
+        -        content.id
+        -        content.type
+        -
+        -    removeFromQueue:
+        -        content.id
+        -        content.bookmarkId
+        -
+        -    removeFromHistory:
+        -        content.id
+        -        content.historyId
+        -
+        -    updateHistory:
+        -        content.id
+        -        content.type
+        -        content.parentId (only necessary if content is episode in a series)
+        -->
+        <field id="content" type="node" />
+
+        <!-- updateHistory:
+         -       Seconds since start of content to store in history
+         -->
+        <field id="nowPos" type="integer" />
+
+
+      <!-- OUTPUT -->
+        <!-- execInitializeUserData, execSignOut, updateHistory:
+        -        auth info blob from Auth.getAuthInfo(), or invalid if signed out
+        -->
+        <field id="authInfo" type="assocarray" alwaysNotify="true" />
+
+        <!-- execInitializeUserData:
+        -        BookmarkContentNode tree of bookmarks
+        -->
+        <field id="bookmarks" type="node"/>
+
+        <!-- execInitializeUserData:
+        -        HistoryContentNode tree of history
+        -->
+        <field id="history" type="node"/>
+
+        <!-- addToQueue:
+        -        id of bookmark entry
+        -->
+        <field id="bookmarkId" type="string" alwaysNotify="true" />
+
+        <!-- removeFromQueue, removeFromHistory:
+        -        Result of request as:
+        -        {
+        -          code: <integer http response code>
+        -          data: <http response body>
+        -          failReason: <string from roUrlEvent.GetFailureReason()>
+        -        }
+        -->
+        <field id="result" type="assocarray" alwaysNotify="true" />
       
-      <!-- addBookmark -->
-      <field id="content" type="node" />
-      <field id="bookmarkId" type="string" alwaysNotify="true" />
-      
-      <!-- removeFromHistory, removeFromQueue -->
-      <field id="result" type="assocarray" alwaysNotify="true" />
-      
-      <!-- updateHistory -->
-      <field id="nowPos" type="integer" />
-      <field id="historyResult" type="assocarray" alwaysNotify="true" />
+        <!-- updateHistory:
+        -        History response with structure:
+        -        {
+        -          historyId: <id of the history entry>
+        -          parentHistoryId: <id of the series, only set if content episodic>
+        -        }
+        -->
+        <field id="historyResult" type="assocarray" alwaysNotify="true" />
     </interface>
 </component>

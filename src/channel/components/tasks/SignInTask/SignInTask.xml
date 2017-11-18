@@ -14,11 +14,18 @@
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
-      <!-- Inputs -->
-      <field id="email" type="string" />
-      <field id="password" type="string" />
-      
-      <!-- Set to the response body -->
-      <field id="response" type="assocarray" alwaysNotify="true" />
+      <!-- INPUT -->
+        <field id="email" type="string" />
+        <field id="password" type="string" />
+
+      <!-- OUTPUT -->
+        <!-- Set on sucess or failure to:
+        -   {
+        -     code: <integer http response code>
+        -     data: <http response body>
+        -     failReason: <string failure reason from roUrlEvent.GetFailureReason()>
+        -   }
+        -->
+        <field id="response" type="assocarray" alwaysNotify="true" />
     </interface>
 </component>

@@ -12,13 +12,16 @@
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
-      <!-- input -->
-      <field id="uri" type="uri"/>
-      <!-- optional input -->
-      <field id="node" type="node" />
-      <field id="field" type="string" value="" />
-      
-      <!-- Set to the response body -->
-      <field id="response" type="string" />
+      <!-- INPUT -->
+        <!-- URI to request -->
+        <field id="uri" type="uri"/>
+
+        <!-- Optional node and field to set the response on.  If not set, SimpleRequestTask.response will be set -->
+        <field id="node" type="node" />
+        <field id="field" type="string" value="" />
+
+      <!-- OUTPUT -->
+        <!-- Set to the response body if SimpleRequestTask.node and SimpleRequestTask.field were not set -->
+        <field id="response" type="string" />
     </interface>
 </component>

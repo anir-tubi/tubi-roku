@@ -32,30 +32,25 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
   
   <interface>
-    <!-- Watched by the main brightscript thread to indicate video playback should start -->
-    <field id="playContent" type="assocarray" alwaysNotify="true" />
+    <!-- INPUTS -->
+      <!-- Show the detail screen for the item indicated
+        -
+        - The node should have 2 fields set:
+        -    id    - the content requested
+        -    type  - the type of content: "series", "video", or "episode"
+        - 2 optional fields should be set if the source is deeplink from another platform (ie. iphone, etc.)
+        -    source  - the device id of the originating device
+        -    nowPos  - the resume time sent along with deeplink
+        -->
+      <field id="deepLinkContent" type="node" alwaysNotify="true" />
 
-    <!-- Show the detail screen for the item indicated 
-      - 
-      - The node should have 2 fields set:
-      -    id    - the content requested
-      -    type  - the type of content: "series", "video", or "episode"
-      - 2 optional fields should be set if the source is deeplink from another platform (ie. iphone, etc.)
-      -    source  - the device id of the originating device
-      -    nowPos  - the resume time sent along with deeplink
-      -->
-    <field id="deepLinkContent" type="node" alwaysNotify="true" />
-
-    <!-- Used to communicate the new nowPos of a video that has been played in the player -->
-    <field id="playerInfo" type="assocarray" alwaysNotify="true" />
-
-    <!-- Interface for receiving Live TV content from the main Brightscript thread -->
-    <field id="onNowContent" type="node" alwaysNotify="true"/>
+      <!-- Interface for receiving Live TV content from the main Brightscript thread -->
+      <field id="onNowContent" type="node" alwaysNotify="true"/>
     
-    <field id="contentRefreshBeforePlay" type="assocarray"/>
 
-    <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->
-    <field id="exitApp" type="boolean" value="false" />
+    <!-- OUTPUT -->
+      <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->
+      <field id="exitApp" type="boolean" value="false" />
 
   </interface>
         

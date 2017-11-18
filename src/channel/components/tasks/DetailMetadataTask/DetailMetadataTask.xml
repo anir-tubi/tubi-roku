@@ -13,13 +13,24 @@
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
-      <!-- input -->
-      <field id="contentFragment" type="node"/>
+      <!-- INPUT -->
+        <!-- Content node to get a fully parsed TubiContentNode for.
+        - Only contentFragment.id is expected to be populated.  All other fields are ignored.
+        -->
+        <field id="contentFragment" type="node"/>
       
-      <!-- Set to the parsed response -->
-      <field id="response" type="node" />
+
+      <!-- OUTPUT -->
+        <!-- Set to the parsed TubiContentNode on success -->
+        <field id="response" type="node" />
       
-      <!-- Set when an error occurs -->
-      <field id="error" type="assocarray" />
+        <!-- Set when an error occurs to:
+        -   {
+        -     code: <integer http response code>
+        -     data: <http response body>
+        -     failReason: <string failure reason from roUrlEvent.GetFailureReason()>
+        -   }
+        -->
+        <field id="error" type="assocarray" />
     </interface>
 </component>

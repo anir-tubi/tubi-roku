@@ -15,36 +15,39 @@
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
-      <!--
-      -
-      - The trackEvent field should have the following form:
-      - {
-      -   trackType: <node to receive content>
-      -   value: dynamic, depends on the eventType
-      -   ctx: dynamic, depends on the eventType
-      -   extraCtx: dynamic, depends on the eventType
-      - }
-      -
-      - for more info on trackEvent values, please see:
-      - https://tubitv.atlassian.net/wiki/pages/viewpage.action?spaceKey=EC&title=Analytics+Events
-      -->
+      <!-- INPUT -->
+        <!--
+        -
+        - The trackEvent field should have the following form:
+        - {
+        -   trackType: <node to receive content>
+        -   value: dynamic, depends on the eventType
+        -   ctx: dynamic, depends on the eventType
+        -   extraCtx: dynamic, depends on the eventType
+        - }
+        -
+        - for more info on trackEvent values, please see:
+        - https://tubitv.atlassian.net/wiki/pages/viewpage.action?spaceKey=EC&title=Analytics+Events
+        -->
+        <field id="trackEvent" type="assocarray" alwaysNotify="true"/>
 
-      <field id="trackEvent" type="assocarray" alwaysNotify="true"/>
 
-
-      <!--
-      -
-      - The logMsg field should have the following form:
-      - {
-      -   message: string, the message to be logged
-      -   level: string, the type of debug, must be one of "debug", "error", "info", "warn"
-      -   serverType: string, a string specified as one that is in TubiLogger().logConsts
-      -   subtype: string, a small string used to differentiate log messages
-      - }
-      -
-      -->      
-      <field id="logMsg" type="assocarray" alwaysNotify="true"/>
+        <!--
+        -
+        - The logMsg field should have the following form:
+        - {
+        -   message: string, the message to be logged
+        -   level: string, the type of debug, must be one of "debug", "error", "info", "warn"
+        -   serverType: string, a string specified as one that is in TubiLogger().logConsts
+        -   subtype: string, a small string used to differentiate log messages
+        - }
+        -
+        -->      
+        <field id="logMsg" type="assocarray" alwaysNotify="true"/>
       
-      <field id="ready" type="boolean" value="false" />
+
+      <!-- OUTPUT -->
+        <!-- Set to true once the task thread is running and input fields are being observed -->
+        <field id="ready" type="boolean" value="false" />
     </interface>
 </component>

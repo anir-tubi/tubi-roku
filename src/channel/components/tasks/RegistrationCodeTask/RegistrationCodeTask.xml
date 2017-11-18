@@ -18,26 +18,28 @@
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
-      <!-- once the registration code has been generated, it will be stored here -->
-      <field id="code" type="string" value="" alwaysNotify="true" />
-      
-      <!-- Set the poll frequency for registration code status updates -->
-      <field id="frequency" type="int" value="2000" alwaysNotify="true" />
+      <!-- INPUT -->
+        <!-- Set the poll frequency for registration code status updates -->
+        <field id="frequency" type="int" value="2000" alwaysNotify="true" />
 
-      <!-- Set the number of consecutive polling failures before we stop polling -->
-      <field id="maxConsecPollFailures" type="int" value="30" />
+        <!-- Set the number of consecutive polling failures before we stop polling -->
+        <field id="maxConsecPollFailures" type="int" value="30" />
       
-      <!-- Set the expiration time in seconds after which the task will stop polling status -->
-      <field id="expiration" type="int" value="600" alwaysNotify="false" />
+        <!-- Set the expiration time in seconds after which the task will stop polling status -->
+        <field id="expiration" type="int" value="600" alwaysNotify="false" />
       
-      <!-- Set to the response body of the status call. -->
-      <field id="response" type="assocarray" alwaysNotify="true" />
-      
-      <!-- Set to communicate to the screen that an error as occured. Value should indicate what type of error occurred -->
-      <field id="error" type="string" alwaysNotify="true" />
+        <!-- Set this to true in order to cancel the polling loop and exit the thread function -->
+        <field id="cancel" type="boolean" value="false" alwaysNotify="true" />
 
-      <!-- Set this to true in order to cancel the polling loop and exit the thread function -->
-      <field id="cancel" type="boolean" value="false" alwaysNotify="true" />
 
+      <!-- OUTPUT -->
+        <!-- once the registration code has been generated, it will be stored here -->
+        <field id="code" type="string" value="" alwaysNotify="true" />
+      
+        <!-- Set to the response body of the status call. -->
+        <field id="response" type="assocarray" alwaysNotify="true" />
+      
+        <!-- Set to communicate to the screen that an error as occured. Value should indicate what type of error occurred -->
+        <field id="error" type="string" alwaysNotify="true" />
     </interface>
 </component>

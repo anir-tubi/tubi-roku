@@ -1,11 +1,11 @@
 Function init()
-  m.top.functionName = "execGetAuthInfo"
+  m.top.functionName = "execInitializeUserData"
 End Function
 
 '''''''''
 ' Synchronously load auth info, followed by loading of user categories (if user is logged in)
-Function execIntializeUserData()
-  tubiLog("AuthTask.execIntializeUserData")
+Function execInitializeUserData()
+  tubiLog("AuthTask.execInitializeUserData")
   constants = m.global.constants
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
