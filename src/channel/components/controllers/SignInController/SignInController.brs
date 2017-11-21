@@ -65,8 +65,7 @@ End Function
 ' 
 ' User chose a guest pass, prompt them once more with a feature list
 Function onDisambiguationGuestPass()
-  ' if m.skipContinueScreen = true
-  if getExperimentValue("UserNamespace", "roku_continue_screen") = 0
+  if m.skipContinueScreen = true
     m.top.guestPass = true
   else
     m.ContinueAsGuest = CreateObject("roSGNode", "ContinueAsGuestScreen")
