@@ -297,7 +297,7 @@ function adriseAds_getAdsListViaRoku(episode, playerSettings)
   else if episode.title <> invalid
     m.roAdFramework.setContentId(episode.title)
   else
-    m.roAdFramework.setContentId()
+    m.roAdFramework.setContentId("")
   end if
 
   'get the url for making the ad call

@@ -209,7 +209,7 @@ function tubiAds_getAdsListViaRoku(episode)
     end for
     m.roAdFramework.setContentGenre(episode.rokuGenres, isKids)
   else
-    m.roAdFramework.setContentGenre()
+    m.roAdFramework.setContentGenre("")
   end if
 
   'set the program id/title (as stated in RAF documentation for Nielsen functionality)
@@ -218,7 +218,7 @@ function tubiAds_getAdsListViaRoku(episode)
   else if episode.title <> invalid
     m.roAdFramework.setContentId(episode.title)
   else
-    m.roAdFramework.setContentId()
+    m.roAdFramework.setContentId("")
   end if
 
   'get the url for making the ad call
