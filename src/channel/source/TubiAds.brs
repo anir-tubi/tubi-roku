@@ -196,7 +196,7 @@ function tubiAds_getAdsListViaRoku(episode)
 
   'set the content length (as stated in RAF documentation for Nielsen functionality)
   if episode.length <> invalid
-    m.roAdFramework.setContentLength(episode.length)
+    m.roAdFramework.setContentLength(int(episode.length))
   else
     m.roAdFramework.setContentLength()
   end if
