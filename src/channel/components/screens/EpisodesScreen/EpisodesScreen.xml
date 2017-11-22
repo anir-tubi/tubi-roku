@@ -50,7 +50,7 @@
       itemSpacing="[0,28]"
       numRows="2"
       rowSpacings="[28]"
-      rowItemSize="[[430,256]]"
+      rowItemSize="[[430,242]]"
       rowItemSpacing="[[10,0]]"
       showRowLabel="[true]"
       showRowCounter="[false]"

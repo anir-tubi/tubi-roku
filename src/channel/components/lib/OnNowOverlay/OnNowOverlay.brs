@@ -13,7 +13,7 @@ Function init()
     focusBox.uri = "pkg:/images/selector-hd.9.png"
     focusBoxMargin = 4
     focusBox.width = 430 + focusBoxMargin * 2
-    focusBox.height = 256 + focusBoxMargin * 2
+    focusBox.height = 242 + focusBoxMargin * 2
     focusBox.translation= [85 - focusBoxMargin,-focusBoxMargin]
   end if
 End Function

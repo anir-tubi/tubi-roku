@@ -29,7 +29,7 @@
       id="Background" 
       loadingBitmapUri="pkg:/images/placeholder-featured.jpg"
       width="430"
-      height="256"
+      height="242"
       translation="[0,0]" />
 
     <Label
@@ -38,7 +38,7 @@
       width="410"
       height="35"
       vertAlign="top"
-      translation="[0,270]">
+      translation="[0,256]">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-Medium.ttf"

@@ -36,9 +36,9 @@
     <RowList
       id="LeftGrid"
       itemComponentName="VideoPickerPoster"
-      itemSize="[515,256]"
+      itemSize="[515,242]"
       numRows="1"
-      rowItemSize="[[430,256]]"
+      rowItemSize="[[430,242]]"
       rowItemSpacing="[[10,0]]"
       focusXOffset="85"
       focusBitmapUri=""
@@ -47,7 +47,7 @@
     <Poster
       id="FocusBox"
       width="442"
-      height="268"
+      height="254"
       uri="pkg:/images/selector-fhd.9.png"
       translation="[79,-6]"/>
 
@@ -64,9 +64,9 @@
     <RowList
       id="RightGrid"
       itemComponentName="VideoPickerPoster"
-      itemSize="[514,256]"
+      itemSize="[514,242]"
       numRows="1"
-      rowItemSize="[[430,256]]"
+      rowItemSize="[[430,242]]"
       rowItemSpacing="[[10,0]]"
       focusBitmapUri=""
       translation="[1406,0]"
