@@ -76,6 +76,7 @@ function AdriseAds (utils, playerPort)
 
 	  utils: utils
 	  doTest: true
+    _: rodash()
   }
 end function
 
@@ -318,6 +319,12 @@ function adriseAds_getAdsListViaRoku(episode, playerSettings)
   'traditional version of xml is in the clickThrough property/clickThrough VAST tag
   'traditional is used if adId of the first ad object in the first ad pod is set equal to 'default'
   if currentAdUnitsList <> invalid and currentAdUnitsList.count() > 0 and currentAdUnitsList[0] <> invalid and currentAdUnitsList[0].ads <> invalid and currentAdUnitsList[0].ads.count() > 0
+
+    'tell RAF that this is a midroll
+    if episode.nowPos > 0
+      currentAdUnitsList[0].rendersequence = "midroll"
+    end if
+
     adUnitType = "" 'keeps track of what kind adUnitsList/adPod is currently being built by the for loop - can be "adrise" or "roku"
     
     'set up the duration for use by the adRise pre ad splash screen
@@ -400,7 +407,7 @@ function adriseAds_getAdsListViaRoku(episode, playerSettings)
               adUnitsList: [
                 {
                   viewed: currentAdUnitsList[0].viewed
-                  renderSequence: currentAdUnitsList[0].renderSequence
+                  renderSequence: m._.cond(episode.nowPos > 0, "midroll", "preroll")
                   duration: currentAdUnitsList[0].duration
                   renderTime: currentAdUnitsList[0].renderTime
                   ads: []
@@ -681,7 +688,7 @@ function adriseAds_showCommercialBreakViaRoku(canvas, playerSettings)
             total: m.totalAdBreakAds
           }
 
-          isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList, screenCount)
+          isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList[0], screenCount)
 
           '#####
           ' WORKAROUND FOR RAF MEMORY LEAK, still present in RAF 1.9

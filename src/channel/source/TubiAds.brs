@@ -71,7 +71,7 @@ function TubiAds (utils, playerRequestQueue)
     end function
 
     currentAdUnit: {}
-
+    _: rodash()
   }
 end function
 
@@ -231,7 +231,7 @@ function tubiAds_getAdsListViaRoku(episode)
   'adUnits are called adPods in RAF documentation
   currentAdUnitsList = m.roAdFramework.getAds()
 
-  ' print currentAdUnitsList
+  ' ShowVarSimple(currentAdUnitsList, "Ad Unit List")
   ' stop
 
   'check to see if the ad server returns an ad that can be used by RAF or needs to use our ad SDK
@@ -320,7 +320,7 @@ function tubiAds_getAdsListViaRoku(episode)
               adUnitsList: [
                 {
                   viewed: currentAdUnitsList[0].viewed
-                  renderSequence: currentAdUnitsList[0].renderSequence
+                  renderSequence: m._.cond(episode.nowPos > 0, "midroll", "preroll")
                   duration: currentAdUnitsList[0].duration
                   renderTime: currentAdUnitsList[0].renderTime
                   ads: []
@@ -600,8 +600,8 @@ function tubiAds_showCommercialBreakViaRoku(canvas)
             total: m.totalAdBreakAds
           }
 
-          isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList, screenCount)
-          
+          isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList[0], screenCount)
+
           '#####
           ' WORKAROUND FOR RAF MEMORY LEAK, still present in RAF 1.9
           if m.roadframework.mediator <> invalid and m.roadframework.mediator.util <> invalid and m.roadframework.mediator.util.xfers <> invalid then
