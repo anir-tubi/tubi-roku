@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="PosterSceneFHD" extends="Scene" >
+  <script type="text/brightscript" uri="poster.brs"/>
+  <children>
+    <Poster
+      id="Image"
+      translation="[0,0]"/>
+    <Rectangle
+      id="Shade"
+      width="1920"
+      height="1080"
+      color="0x000000FF"
+      opacity="0.5"
+      translation="[0,0]"/>
+    <LayoutGroup
+      translation="[100,60]">
+      <Label id="Experiment"/>
+      <Label id="DisplaySize"/>
+      <Label id="UIResolution"/>
+      <Label id="PosterUri"/>
+      <Label id="PosterSize"/>
+      <Label id="PosterLoadSize"/>
+      <Label id="PosterBitmapSize"/>
+      <Label id="PosterLoadDisplayMode"/>
+      <Label id="PosterLoadStatus"/>
+      <Label id="PosterLoadTime"/>
+    </LayoutGroup>
+  </children>
+
+</component>
