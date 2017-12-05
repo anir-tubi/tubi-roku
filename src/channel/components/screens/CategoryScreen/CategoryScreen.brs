@@ -1,5 +1,6 @@
 Function init()
   tubiLog("CategoryScreen.init")
+  m.constants = m.global.constants
   m.ContentArea = m.top.findNode("ContentArea")
   m.CategoryList = m.top.findNode("CategoryList") 'aka category menu
   m.InfoPanel = m.top.findNode("InfoPanel")
@@ -22,13 +23,13 @@ Function init()
   m.CategoryGridList = m.top.findNode("CategoryGridList")
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
-  m.CategoryGridList.observeField("categoryFocused", "onGridCategoryChange")
+  m.CategoryGridList.observeField("cursorPosition", "onGridCursorChange")
 
   'Special categories
-  m.ContinueWatchingCategory = m.SpecialCategories.findNode("ContinueWatching")
-  m.MyQueueCategory = m.SpecialCategories.findNode("MyQueue")
+  m.ContinueWatchingCategory = m.SpecialCategories.findNode(m.constants.ui.categoryIds.history)
+  m.MyQueueCategory = m.SpecialCategories.findNode(m.constants.ui.categoryIds.queue)
 
-  m.defaultBackgroundUri = m.global.constants.ui.uris.defaultBackground
+  m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 
@@ -42,7 +43,7 @@ Function init()
   ' </CategoryContentNode>
   m.categoryContent = invalid
 
-  if m.global.constants.deviceInfo.scaledUi = true then
+  if m.constants.deviceInfo.scaledUi = true then
     frame = m.top.findNode("DockedVideoFrame")
     frameMargin = 4 ' FHD is margin 6
     frame.uri = "pkg:/images/selector-white-hd.9.png"
@@ -241,7 +242,7 @@ Function onCategoryMenuChange() As Void
   catPos = (m.CategoryList.itemFocused + m.top.rowPlaceholder + 1).toStr()
   catSlug = ""
   if newCategory.slug <> invalid
-    catSlug = newCategory.slug
+    catSlug = newCategory.id
   end if
   m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug
 End Function
@@ -256,9 +257,9 @@ Function onSignedInChange()
 End Function
 
 
-Function onGridCategoryChange() As Void
+Function onGridCursorChange() As Void
   'removes the "On Now" and arrow if the top most category is not focused
-  if m.CategoryGridList.categoryFocused = 0
+  if m.CategoryGridList.cursorPosition[0] = 0
     if m.HintGroup.opacity < 1.0 then fade(m.HintGroup, "in", 0.4)
   else
     if m.HintGroup.opacity > 0.0 then fade(m.HintGroup, "out", 0.4)
@@ -286,23 +287,24 @@ Function onGridFocusChange() As Void
 
   'update the tracking URI
   catSlug = ""
-  if m.CategoryList.content.getChild(m.CategoryList.itemFocused) <> invalid
-    if m.CategoryList.content.getChild(m.CategoryList.itemFocused).slug <> invalid
-      catSlug = m.CategoryList.content.getChild(m.CategoryList.itemFocused).slug + "/"
+  if m.CategoryList.content.getChild(m.CategoryGridList.cursorPosition[0]) <> invalid
+    if m.CategoryList.content.getChild(m.CategoryGridList.cursorPosition[0]).id <> invalid
+      catSlug = m.CategoryList.content.getChild(m.CategoryGridList.cursorPosition[0]).id + "/"
     end if
   end if
-  catPos = (m.CategoryList.itemFocused + m.top.rowPlaceholder + 1).toStr()
   
-  row = 0
-  col = 0
-  if m.CategoryList.itemFocused >= 0
-    col = m.CategoryGridList.cursorPosition[0] + 1
-    row = m.CategoryGridList.cursorPosition[1] + 1
+  row = 1  'row is fixed at 1 for this design, it indicates the row within the category
+  col = 0  'column is the column within the category, expect this to change
+  catPos = 0  'catPos is the order of the category (Featured should be 1)
+  if m.CategoryGridList.cursorPosition[0] >= 0
+    catPos = m.CategoryGridList.cursorPosition[0] + 1
+    col = m.CategoryGridList.cursorPosition[1] + 1
   end if
 
   'set the user event tracking info
   row = row.toStr() + "/"
   col = col.toStr()
+  catPos = catPos.toStr()
   m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug + row + col
 
 End Function

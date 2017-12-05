@@ -929,9 +929,10 @@ function adriseUtils_trackEvent(evt)
     trackData = m.getTrackData(evt.trackType, evt.value, evt.ctx, evt.extraCtx)
 
     trackingDataToSendJSON = FormatJson(trackData)
+    headers = {"Content-Type": "application/json"}
 
     'url as String, port, name = "" as String, reqType = invalid, isHttps = false, body = invalid, headers = invalid
-    asyncId = m.sendAuthAsyncRequest(settings.userEventUrl, evt.port, "track" + evt.trackType, "POST", true, trackingDataToSendJSON, invalid)
+    asyncId = m.sendAuthAsyncRequest(settings.userEventUrl, evt.port, "track" + evt.trackType, "POST", true, trackingDataToSendJSON, headers)
   end if
 
 end function

@@ -391,6 +391,10 @@ Function getConstants()
       constants.ui.categoryNames.history = "Continue Watching"
       constants.ui.categoryNames.queue = "My Queue"
 
+    constants.ui.categoryIds = {}
+      constants.ui.categoryIds.history = "continue_watching"
+      constants.ui.categoryIds.queue = "my_queue"
+
     constants.ui.text = {}
       'a default text to serve as the title of the page until the UI receives category information
       constants.ui.text.titleText = "Welcome to Tubi TV"

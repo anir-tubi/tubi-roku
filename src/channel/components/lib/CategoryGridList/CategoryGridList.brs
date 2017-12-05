@@ -171,8 +171,8 @@ End Function
 Function onDirtyUserCategories()
   tubiLog("CategoryGridList.onDirtyUserCategories")
   ' expire any cache entries. this will also remove them from the content tree
-  while metadataCacheExpireOne("MyQueue"): end while
-  while metadataCacheExpireOne("ContinueWatching"): end while
+  while metadataCacheExpireOne(m.constants.ui.categoryIds.queue): end while
+  while metadataCacheExpireOne(m.constants.ui.categoryIds.history): end while
 
   ' Calling this will kick off any fetches needed if the user categories
   ' are within the cache window
@@ -204,7 +204,6 @@ End Function
 
 Function onRowListCategoryDebounce()
   tubiLog("CategoryGridList.onRowLisCategoryDebounce")
-  m.top.categoryFocused = m.RowList.itemFocused
   loadCategories(m.RowList.itemFocused)
 End function
 
@@ -369,7 +368,7 @@ End Function
 Function fetch(parentContentNode As Object, categoryId As String, index As Integer, field="categoryResponse" As String, per_page=0 As Integer)
   tubiLog("CategoryGridList.fetch " + categoryId)
 
-  if categoryId = "MyQueue" or categoryId = "ContinueWatching" then
+  if categoryId = m.constants.ui.categoryIds.queue or categoryId = m.constants.ui.categoryIds.history then
     per_page = 0
   end if
 
@@ -380,9 +379,9 @@ Function fetch(parentContentNode As Object, categoryId As String, index As Integ
   if metadataCacheHasEntry(requestId) <> -1 then
     tubiLog("CategoryGridList.fetch: Skipping duplicate request for " + requestId)
   else
-    if categoryId = "MyQueue" then
+    if categoryId = m.constants.ui.categoryIds.queue then
       request = bookmarksRequest(requestId, field)
-    else if categoryId = "ContinueWatching" then
+    else if categoryId = m.constants.ui.categoryIds.history then
       request = historyRequest(requestId, field)
     else
       request = categoryRequest(requestId, field, categoryId, per_page)
