@@ -240,9 +240,10 @@ Function onCategoryMenuChange() As Void
 
   'update the tracking URI for user tracking purposes
   catPos = (m.CategoryList.itemFocused + m.top.rowPlaceholder + 1).toStr()
-  catSlug = ""
-  if newCategory.slug <> invalid
+  if newCategory <> invalid
     catSlug = newCategory.id
+  else
+    catSlug = ""
   end if
   m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug
 End Function

@@ -162,20 +162,16 @@
       <ContentNode
         id="SpecialCategories">
         <!-- TubiContentNode here so it can contain the totalcount for the Info Panel -->
-        <TubiContentNode
+        <CategoryContentNode
           id="continue_watching"
           type="category"
           title="Continue Watching"
-          description="The Movies and TV Shows you have started watching can be found here"
-          placeholderText="You haven't watched anything yet. The content you watch will appear here."
-          slug="continue_watching" />
-        <TubiContentNode
+          description="The Movies and TV Shows you have started watching can be found here"/>
+        <CategoryContentNode
           id="my_queue"
           type="category"
           title="My Queue"
-          description="The Movies and TV Shows you have added to your Queue can be found here"
-          placeholderText="You don’t have anything in your Queue yet. Get started by adding Movies and TV Shows that interest you to your Queue."
-          slug="my_queue" />
+          description="The Movies and TV Shows you have added to your Queue can be found here"/>
       </ContentNode>
 
       <ScrollingList
