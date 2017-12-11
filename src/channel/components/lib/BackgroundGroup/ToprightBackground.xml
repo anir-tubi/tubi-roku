@@ -74,7 +74,8 @@
       loadDisplayMode="scaleToZoom"
       translation="[0,0]"
       opacity="1.0"
-      visible="true" />
+      visible="true" 
+      loadSync="true" />
     <Animation
       id="GradientFadeIn"
       duration="0.9"
