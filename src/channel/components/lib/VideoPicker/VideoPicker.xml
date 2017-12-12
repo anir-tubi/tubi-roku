@@ -22,26 +22,25 @@
       -->
     
     <!-- expect content to be a playlist node -->
-    <field id="content" alias="ContentGrid.content"/>
+    <field id="content" type="node"/>
     <!-- sets the overlay to show the playlist/content at the indicated index. -->
     <field id="jumpToIndex" type="int" alwaysNotify="true"/>
 
   </interface>  
 
   <children>
-    <ContentGrid
-      id="ContentGrid"
+    <RowList
+      id="Grid"
+      itemComponentName="VideoPickerPoster"
+      itemSize="[1920,404]"
+      focusXOffset="85"
       numRows="1"
-      width="1920"
-      height="300"
-      fillDirection="W"
-      visible="true"
-      translation="[0,0]"
-      itemSpacing="[10,10]"
-      posterBounds="[0,0,1920,310]"
-      scrollBounds="[85,0,515,300]"
-      itemSize="[430,242]"
-      playIsSelect="false"
-      itemComponentName="VideoPickerPoster"/>
+      rowItemSize="[[430,242]]"
+      rowItemSpacing="[[10,0]]"
+      showRowLabel="[false]"
+      showRowCounter="[false]"
+      rowFocusAnimationStyle="floatingFocus"
+      vertFocusAnimationStyle="fixedFocus"
+      focusBitmapUri="pkg:/images/selector-fhd.9.png"/>
   </children>
 </component>

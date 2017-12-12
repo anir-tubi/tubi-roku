@@ -250,9 +250,6 @@ Function onDebounceDone()
   currentPlaylistState = m.playlistInfo[m.playlistIndex]
   m.videoPlayer.playlist = m.top.content.getChild(m.playlistIndex)
   m.videoPlayer.seekPlaylist = [currentPlaylistState.contentIndex, currentPlaylistState.nowPos]
-
-  ' debounce the onNowOverlay navigations count so it is consistent with the videoPicker which utilizes a contentGrid component
-  ' utilizes a contentGrid component which naturally debounces the navigations count
   m.top.trackingUri = "/home/1/cat/" + m.top.content.getChild(m.playlistIndex).slug + "/1/" + (currentPlaylistState.contentIndex + 1).toStr()
 End Function
 

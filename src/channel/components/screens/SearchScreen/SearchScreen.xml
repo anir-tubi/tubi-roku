@@ -109,18 +109,14 @@
     <Group
       id="ResultArea"
       translation="[85,616]">
-    <ContentGrid
+    <PosterGrid
       id="ResultGrid"
-      numColumns="8"
-      numRows="4"
-      posterBounds="[0,0,1750,464]"
-      scrollBounds="[0,0,0,300]"
-      itemSize="[210,300]"
+      basePosterSize="[210,300]"
       itemSpacing="[10,10]"
-      itemComponentName="Poster"
-      fillDirection="Z"
-      visible="true"
-      translation="[0,0]"/>
+      numColumns="8"
+      numRows="2"
+      vertFocusAnimationStyle="fixedFocus"
+      focusBitmapUri="pkg:/images/selector-fhd.9.png"/>
     <Label
       id="NoResultsMessage"
       text="No Search Results"

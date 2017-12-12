@@ -207,7 +207,7 @@ Function onRowListCategoryDebounce()
   loadCategories(m.RowList.itemFocused)
 End function
 
-' Load the current ContentGrid and its adjacent categories
+' Load the current category and its adjacent categories
 Function loadCategories(index) As Void
   if m.internalContent = invalid or index < 0 then
     return

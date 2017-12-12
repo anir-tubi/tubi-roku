@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
- - FeaturePoster
- -
- - Item in a ContentGrid for the 16:9 aspect ratio
- -
+ - FeaturePosterWithProgress
  -->
 <component name="FeaturePosterWithProgress" extends="Group">
 
@@ -16,7 +13,6 @@
     <field id="width" alias="FeaturePoster.width"/>
     <field id="height" alias="FeaturePoster.height"/>
     <field id="loadStatus" alias="FeaturePoster.loadStatus"/>
-    <field id="loadDisplayMode" alias="FeaturePoster.loadDisplayMode"/>
   </interface>
 
   <children>

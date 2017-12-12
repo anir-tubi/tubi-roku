@@ -5,8 +5,6 @@
 
   <interface>
     <field id="itemContent" type="node" />
-
-    <!-- these are ignored but here for compatibility with ContentGrid -->
     <field id="width" alias="Poster.width" />
     <field id="height" alias="Poster.height" />
   </interface>

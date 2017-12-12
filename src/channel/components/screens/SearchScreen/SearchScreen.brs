@@ -32,6 +32,11 @@ Function init()
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 
+  if m.global.constants.deviceInfo.scaledUi = true then
+    m.ResultGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
+  end if
+
+
   m.top.backgroundUriList = [m.defaultHeroUri]
 End Function
 
@@ -76,9 +81,11 @@ End Function
 ' Handle content grid item selected
 Function onResultSelected()
   tubiLog("SearchScreen.onResultSelected")
-  if m.ResultGrid.itemSelected <> invalid
-    selectedItem = m.ResultGrid.itemSelected
-    m.top.contentSelected = selectedItem
+  if m.ResultGrid.content <> invalid
+    selectedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemSelected)
+    if selectedContent <> invalid
+      m.top.contentSelected = selectedContent
+    end if
   end if
 End Function
 
@@ -104,15 +111,16 @@ End Function
 '
 ' Update the info panel when a result item is focused
 Function onItemFocused()
-  m.InfoPanel.content = m.ResultGrid.itemFocused
-  focusedContent = m.ResultGrid.itemFocused
-
-  if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
-    m.top.backgroundUriList = focusedContent.backgrounds
-  else
-    m.top.backgroundUriList = [m.defaultHeroUri]
+  tubiLog("SearchScreen.onItemFocused")
+  if m.ResultGrid.content <> invalid
+    focusedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
+    m.InfoPanel.content = focusedContent
+    if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
+      m.top.backgroundUriList = focusedContent.backgrounds
+    else
+      m.top.backgroundUriList = [m.defaultHeroUri]
+    end if
   end if
-
 End Function
 
 

@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
  - FeaturePoster
- -
- - Item in a ContentGrid for the 16:9 aspect ratio
- -
  -->
 <component name="FeaturePoster" extends="Group">
 
@@ -13,7 +10,7 @@
   <interface>
     <field id="itemContent" type="node" />
     
-    <!-- these are ignored but here for compatibility with ContentGrid -->
+    <!-- these are ignored but here for compatibility -->
     <field id="index" type="integer" />
     <field id="width" type="float" />
     <field id="height" type="float" />
@@ -21,7 +18,6 @@
     <!-- used so the FeaturePoster load state can be identified at the same level as a regular poster -->
     <field id="loadStatus" type="string"  alias="Background.loadStatus"/>
 
-    <field id="loadDisplayMode" alias="Background.loadDisplayMode" />
   </interface>
 
   <children>

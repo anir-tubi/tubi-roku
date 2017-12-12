@@ -519,7 +519,6 @@ Function getConstants()
     ' Set some performance parementers based on device profile
     constants.performance = {}
       constants.performance.categoryGridList = {}
-      constants.performance.contentGrid = {}
       if limitedNewUi
         ' Notes:
         ' - lowMemory devices may have 512MB but will have 256MB minimum.
@@ -530,15 +529,10 @@ Function getConstants()
         constants.performance.categoryGridList.blockSize = 200
         constants.performance.categoryGridList.categoryWindowSize = 3
         constants.performance.categoryGridList.metadataCacheMaxEntries = 20  ' this is the biggest impact on number of nodes in memory
-        constants.performance.contentGrid.overhang = 1
-        constants.performance.contentGrid.continuousEvents = false
       else
         constants.performance.categoryGridList.blockSize = 200
         constants.performance.categoryGridList.categoryWindowSize = 3
         constants.performance.categoryGridList.metadataCacheMaxEntries = 20
-        constants.performance.contentGrid.overhang = 1
-        constants.performance.contentGrid.continuousEvents = true
       end if
-
   return constants  
 end Function
