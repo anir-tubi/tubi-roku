@@ -1,38 +1,74 @@
 Function init()
   tubiLog("KeyboardGroup.init")
-
-  m.SymbolMenu = m.top.findNode("SymbolMenu")
-  m.SymbolMenu.observeField("itemFocused", "onKeyboardChange")
-  m.SymbolMenu.observeField("preItemFocused", "onKeyboardPreChange")
-
-  m.UppercaseKeyboard = m.top.findNode("UppercaseKeyboard")
-  m.UppercaseKeyboard.observeField("itemSelected", "onKeySelected")
-
-  m.LowercaseKeyboard = m.top.findNode("LowercaseKeyboard")
-  m.LowercaseKeyboard.observeField("itemSelected", "onKeySelected")
-
-  m.NumericKeyboard = m.top.findNode("NumericKeyboard")
-  m.NumericKeyboard.observeField("itemSelected", "onKeySelected")
-
-  m.Symbolic1Keyboard = m.top.findNode("Symbolic1Keyboard")
-  m.Symbolic1Keyboard.observeField("itemSelected", "onKeySelected")
-
+  m.Menu = m.top.findNode("Menu")
+  m.Menu.observeField("itemFocused", "onKeyboardChange")
+  m.Keyboard = m.top.findNode("Keyboard")
+  m.Keyboard.observeField("itemSelected", "onKeySelected")
   m.Symbolic2Keyboard = m.top.findNode("Symbolic2Keyboard")
   m.Symbolic2Keyboard.observeField("itemSelected", "onKeySelected")
-
-  m.CurrentKeyboard = m.UppercaseKeyboard
+  m.Overlay = m.top.findNode("KeyboardOverlay")
   m.top.observeField("focusedChild", "onKeyboardFocusChange")
-
-  m.lastFocusedItem = m.SymbolMenu
-
+  m.lastFocusedItem = m.Menu
   m.BACKSPACE = Chr(&h7F)
 
-  m.lastFocusedKeyboardIndex = 0
-  m.primaryTextColor = m.global.constants.ui.colors.primaryText
-  m.focusedTextColor = m.global.constants.ui.colors.focusedText
-  m.highlightedTextColor = m.global.constants.ui.colors.highlightedText
+  ' grid content hidden behind overlay images
+  m.keyboards = [
+  { ' lowercase
+    columnSpacings: [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,16,21]
+    translation: [66,82]
+    content: m.top.findNode("LowercaseContent")
+  }
+  { ' uppercase
+    columnSpacings: [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,17,21]
+    translation: [66,82]
+    content: m.top.findNode("UppercaseContent")
+  }
+  { ' numeric
+    columnSpacings: [2,2,2,2,2,2,2,2,2,18,21]
+    translation: [588,82]
+    content: m.top.findNode("NumericContent")
+  }
+  { ' symbol1
+    columnSpacings: [0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,17,21]
+    translation: [70,82]
+    content: m.top.findNode("SymbolicContent1")
+  }
+  ]
+  ' Keyboard iamges
+  m.overlays = [
+  { ' lowercase
+    uri: "pkg:/images/keyboard-lowercase.png"
+    width: 1748
+    height: 40
+    translation: [85,99]
+  }
+  { ' uppercase
+    uri: "pkg:/images/keyboard-uppercase.png"
+    width: 1751
+    height: 40
+    translation: [83,99]
+  }
+  { ' numeric
+    uri: "pkg:/images/keyboard-numbers.png"
+    width: 756
+    height: 40
+    translation: [609,99]
+  }
+  { ' symbol1
+    uri: "pkg:/images/keyboard-symbols.png"
+    width: 1750
+    height: 111
+    translation: [84,99]
+  }
+  ]
 
-  m.SymbolMenu.findNode("Items").getChild(0).color = m.focusedTextColor
+  m.Keyboard.setFields(m.keyboards[0])
+  m.Overlay.setFields(m.overlays[0])
+
+  if m.global.constants.deviceInfo.scaledUi = true then
+    m.Symbolic2Keyboard.focusedBitmapUri = "pkg:/images/menu-focus-hd.9.png"
+    m.Keyboard.focusedBitmapUri = "pkg:/images/menu-focus-hd.9.png"
+  end if
 End Function
 
 
@@ -40,9 +76,11 @@ End Function
 ' onKeySelected
 '
 ' A keyboard key has been selected by user pressing 'OK' on the remote
-Function onKeySelected()
+Function onKeySelected(message)
   tubiLog("KeyboardGroup.onKeySelected")
-  key = m.CurrentKeyboard.content.getChild(m.CurrentKeyboard.itemSelected)
+  ' GetNode() will return m.Keyboard or m.Sybolic2Keyboard
+  keyboard = message.getRoSGNode()
+  key = keyboard.content.getChild(keyboard.itemSelected)
   if key.title = m.BACKSPACE 
     if m.top.text.len() > 0 then m.top.text = Left(m.top.text, m.top.text.len()-1)
   else if m.top.text.len() < m.top.maxLength then
@@ -61,31 +99,17 @@ End Function
 
 
 '''''''''''''''''''''''
-' onKeyboardPreChange
-'
-' The highlighted keyboard title is changing
-Function onKeyboardPreChange()
-  m.lastFocusedKeyboardIndex = m.SymbolMenu.preItemFocused
-End Function
-
-
-'''''''''''''''''''''''
 ' onKeyboardChange
 '
 ' Make the appropriate keyboard visible based on symbol menu selection
 Function onKeyboardChange()
-  keyboard = m.SymbolMenu.content.getChild(m.SymbolMenu.itemFocused)
-  if keyboard <> invalid then
-    newKeyboard = m.top.findNode(keyboard.id + "Keyboard")
-    m.CurrentKeyboard.visible = false
-    newKeyboard.visible = true
-    m.CurrentKeyboard = newKeyboard
-    ' special case, there are 2 symbolic keyboards
-    if newKeyboard.id = m.Symbolic1Keyboard.id then
-      m.Symbolic2Keyboard.visible = true
-    else
-      m.Symbolic2Keyboard.visible = false
-    end if
+  m.Keyboard.setFields(m.keyboards[m.Menu.itemFocused])
+  m.Overlay.setFields(m.overlays[m.Menu.itemFocused])
+  ' special case, there are 2 symbolic keyboards
+  if m.Menu.itemFocused = 3 then
+    m.Symbolic2Keyboard.visible = true
+  else
+    m.Symbolic2Keyboard.visible = false
   end if
 End Function
 
@@ -98,50 +122,36 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("KeyboardGroup.onKeyEvent")
   if press then
     if key = "down" then
-      if m.SymbolMenu.hasFocus() then
-        'don't allow changing focus from keyboard selector to keys selector until keyboard selector animation is complete
-        if m.SymbolMenu.preItemFocused = m.SymbolMenu.itemFocused
-          focusedKeyboard = m.SymbolMenu.findNode("Items").getChild(m.SymbolMenu.preItemFocused)
-          finishAnimation(focusedKeyboard)
-          focusedKeyboard.color = m.highlightedTextColor
-
-          m.CurrentKeyboard.setFocus(true)
-          m.lastFocusedItem = m.CurrentKeyboard
+      if m.Menu.hasFocus() then
+        if m.Menu.currFocusColumn = m.Menu.itemFocused
+          m.Keyboard.setFocus(true)
+          m.lastFocusedItem = m.Keyboard
         end if
         return true
-      else if m.CurrentKeyboard.hasFocus() then
-        if m.CurrentKeyboard.id = m.Symbolic1Keyboard.id then
+      else if m.Keyboard.hasFocus() then
+        if m.Symbolic2Keyboard.visible then
           m.Symbolic2Keyboard.setFocus(true)
-          m.CurrentKeyboard = m.Symbolic2Keyboard
-          m.lastFocusedItem = m.CurrentKeyboard
+          m.lastFocusedItem = m.Symbolic2Keyboard
           return true
         end if
       end if
     else if key = "up" then
-      if m.CurrentKeyboard.hasFocus() then
-        if m.Symbolic2Keyboard.hasFocus() then
-          m.Symbolic1Keyboard.setFocus(true)
-          m.CurrentKeyboard = m.Symbolic1Keyboard
-          m.lastFocusedItem = m.CurrentKeyboard
-          return true
-        else
-          focusedKeyboard = m.SymbolMenu.findNode("Items").getChild(m.SymbolMenu.itemFocused)
-          focusedKeyboard.color = m.focusedTextColor
-          m.lastFocusedKeyboardIndex = m.SymbolMenu.itemFocused
-
-          m.SymbolMenu.setFocus(true)
-          m.lastFocusedItem = m.SymbolMenu
-          return true
-        end if
+      if m.Keyboard.hasFocus() then
+        m.Menu.setFocus(true)
+        m.lastFocusedItem = m.Menu
+        return true
+      else if m.Symbolic2Keyboard.hasFocus() then
+        m.Keyboard.setFocus(true)
+        m.lastFocusedItem = m.Keyboard
         return true
       end if
-    else if key = "rewind" or key = "right" then
-      if m.CurrentKeyboard.hasFocus() then
-        m.CurrentKeyboard.animateToItem = 0
+    else if key = "fastforward" or key = "right" then
+      if m.Keyboard.hasFocus() then
+        m.Keyboard.jumpToItem = 0
       end if
-    else if key = "fastforward" or key = "left" then
-      if m.CurrentKeyboard.hasFocus() then
-        m.CurrentKeyboard.animateToItem = m.CurrentKeyboard.content.getChildCount() - 1
+    else if key = "rewind" or key = "left" then
+      if m.Keyboard.hasFocus() then
+        m.Keyboard.jumpToItem = m.Keyboard.content.getChildCount() - 1
       end if
     end if
   end if

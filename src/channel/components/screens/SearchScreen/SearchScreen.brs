@@ -154,7 +154,7 @@ Function startFocusResultGrid()
   keyboardRect = m.Keyboard.boundingRect()
   m.InfoPanelOpacityInterpolator.keyValue = [0.0, 1.0]
   m.SearchHintOpacityInterpolator.keyValue = [0.0, 0.5]
-  m.KeyboardInterpolator.keyValue = [[0,0], [0, -keyboardRect.height]]
+  m.KeyboardInterpolator.keyValue = [m.Keyboard.translation, [0, -keyboardRect.height]]
   m.TextEntryAnimation.observeField("state", "endFocusResultGrid")
   m.TextEntryAnimation.control = "start"
   m.Keyboard.setFocus(false)
@@ -183,7 +183,7 @@ Function startFocusKeyboard()
   keyboardRect = m.Keyboard.boundingRect()
   m.InfoPanelOpacityInterpolator.keyValue = [1.0, 0.0]
   m.SearchHintOpacityInterpolator.keyValue = [0.5, 0.0]
-  m.KeyboardInterpolator.keyValue = [m.Keyboard.translation, [0, 0]]
+  m.KeyboardInterpolator.keyValue = [m.Keyboard.translation, [0, 65]]
   m.TextEntryAnimation.observeField("state", "endFocusKeyboard")
   m.TextEntryAnimation.control = "start"
   m.ResultGrid.setFocus(false)

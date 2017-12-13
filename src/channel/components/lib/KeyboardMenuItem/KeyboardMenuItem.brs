@@ -1,11 +1,21 @@
 Function init()
   tubiLog("KeyboardMenuItem.init")
-  m.top.height = 80
-  m.top.width = 124
+  m.top.observeField("itemContent", "onContentChange")
+  m.focusColor = m.global.constants.ui.colors.primaryText
+  m.highlightColor = m.global.constants.ui.colors.highlightedText
+  m.top.color = m.focusColor
+  m.top.observeField("gridHasFocus", "onFocusChange")
+  m.top.observeField("focusPercent", "onFocusChange")
   m.top.vertAlign = "center"
   m.top.horizAlign = "center"
-  m.top.observeField("content", "onContentChange")
-  m.top.color = m.global.constants.ui.colors.primaryText
+End Function
+
+Function onFocusChange()
+  if m.top.focusPercent = 1 and not m.top.gridHasFocus
+    m.top.color = m.highlightColor
+  else
+    m.top.color = m.focusColor
+  end if
 End Function
 
 ''''''''''''''''''''
@@ -14,9 +24,8 @@ End Function
 ' Set the label text
 Function onContentChange()
   tubiLog("KeyboardMenuItem.onContentChange")
-  if m.top.content <> invalid and m.top.content.title <> invalid then
-    m.top.text = m.top.content.title
-    m.top.id = m.top.content.id + "-text"
+  if m.top.itemContent <> invalid and m.top.itemContent.title <> invalid then
+    m.top.text = m.top.itemContent.title
   else
     m.top.text = ""
   end if

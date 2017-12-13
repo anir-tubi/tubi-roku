@@ -16,56 +16,57 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
-    <!-- 
-      - The text that is manipulated by the keyboard. This can be written to so the
-      - keyboard can be seeded with a value from elsewhere. 
+    <!--
+      - INPUTS
       -->
-    <field id="text" type="string" value="" alwaysNotify="true" />
     
-    <!-- The maximum number of characters before keypresses are ignored -->
-    <field id="maxLength" type="int" value="128" />
+      <!-- The maximum number of characters before keypresses are ignored -->
+      <field id="maxLength" type="int" value="128" />
+    
+    
+    <!--
+      - OUTPUTS
+      -->
+    
+      <!-- 
+        - The text that is manipulated by the keyboard. This can be written to so the
+        - keyboard can be seeded with a value from elsewhere. 
+        -->
+      <field id="text" type="string" value="" alwaysNotify="true" />
+    
   </interface>
   
   <children>
     
-    <ScrollingList
-      id="SymbolMenu"
-      width="502"
-      height="80"
-      visible="true" 
-      itemSpacings="[2]"
-      itemComponentName="KeyboardMenuItem"
-      translation="[709,65]"
-      layoutDirection="horiz">
-      <ContentNode
-        role="content">
-        <ContentNode
-          id="Lowercase"
-          title="abc"/>
-        <ContentNode
-          id="Uppercase"
-          title="ABC"/>
-        <ContentNode
-          id="Numeric"
-          title="123"/>
-        <ContentNode
-          id="Symbolic1"
-          title="@#!"/>
+    <MarkupGrid
+      id="Menu"
+      numColumns="4"
+      numRows="1"
+      itemSize="[124,80]"
+      drawFocusFeedbackOnTop="false"
+      focusBitmapUri="pkg:/images/menu-focus-fhd.9.png"
+      columnSpacings="[2]"
+      translation="[709,0]"
+      itemComponentName="KeyboardMenuItem">
+      <ContentNode role="content">
+        <ContentNode id="MenuLowercase" title="abc"/>
+        <ContentNode id="MenuUppercase" title="ABC"/>
+        <ContentNode id="MenuNumeric" title="123"/>
+        <ContentNode id="MenuSymbolic1" title="@#!"/>
       </ContentNode>
-    </ScrollingList>
-    
-    <ScrollingList
-      id="LowercaseKeyboard"
-      width="1920"
-      height="80"
-      visible="false"
-      itemSpacings="[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,22,22]"
-      itemComponentName="KeyboardItem"
-      focusChangeDuration="0.1"
-      translation="[66,147]"
-      layoutDirection="horiz">
-      <ContentNode
-        role="content">
+    </MarkupGrid>
+
+    <PosterGrid
+      id="Keyboard"
+      visible="true"
+      itemSize="[60,80]"
+      columnSpacings="[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,22,22]"
+      focusBitmapUri="pkg:/images/menu-focus-fhd.9.png"
+      numColumns="28"
+      numRows="1"
+      drawFocusFeedbackOnTop="false"
+      translation="[66,82]">
+      <ContentNode role="content" id="LowercaseContent">
         <ContentNode title="a" id="LowercaseKeyboard-a"/>
         <ContentNode title="b" id="LowercaseKeyboard-b"/>
         <ContentNode title="c" id="LowercaseKeyboard-c"/>
@@ -95,131 +96,18 @@
         <ContentNode title=" " id="LowercaseKeyboard-space"/>
         <ContentNode title="&#x7F;" id="LowercaseKeyboard-back"/>
       </ContentNode>
-    </ScrollingList>
+    </PosterGrid>
     
-    <ScrollingList
-      id="UppercaseKeyboard"
-      width="1920"
-      height="80"
-      visible="false"
-      itemSpacings="[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,22,22]"
-      itemComponentName="KeyboardItem"
-      focusChangeDuration="0.1"
-      translation="[66,147]"
-      layoutDirection="horiz">
-      <ContentNode
-        role="content">
-        <ContentNode title="A" id="UppercaseKeyboard-A"/>
-        <ContentNode title="B" id="UppercaseKeyboard-B"/>
-        <ContentNode title="C" id="UppercaseKeyboard-C"/>
-        <ContentNode title="D" id="UppercaseKeyboard-D"/>
-        <ContentNode title="E" id="UppercaseKeyboard-E"/>
-        <ContentNode title="F" id="UppercaseKeyboard-F"/>
-        <ContentNode title="G" id="UppercaseKeyboard-G"/>
-        <ContentNode title="H" id="UppercaseKeyboard-H"/>
-        <ContentNode title="I" id="UppercaseKeyboard-I"/>
-        <ContentNode title="J" id="UppercaseKeyboard-J"/>
-        <ContentNode title="K" id="UppercaseKeyboard-K"/>
-        <ContentNode title="L" id="UppercaseKeyboard-L"/>
-        <ContentNode title="M" id="UppercaseKeyboard-M"/>
-        <ContentNode title="N" id="UppercaseKeyboard-N"/>
-        <ContentNode title="O" id="UppercaseKeyboard-O"/>
-        <ContentNode title="P" id="UppercaseKeyboard-P"/>
-        <ContentNode title="Q" id="UppercaseKeyboard-Q"/>
-        <ContentNode title="R" id="UppercaseKeyboard-R"/>
-        <ContentNode title="S" id="UppercaseKeyboard-S"/>
-        <ContentNode title="T" id="UppercaseKeyboard-T"/>
-        <ContentNode title="U" id="UppercaseKeyboard-U"/>
-        <ContentNode title="V" id="UppercaseKeyboard-V"/>
-        <ContentNode title="W" id="UppercaseKeyboard-W"/>
-        <ContentNode title="X" id="UppercaseKeyboard-X"/>
-        <ContentNode title="Y" id="UppercaseKeyboard-Y"/>
-        <ContentNode title="Z" id="UppercaseKeyboard-Z"/>
-        <ContentNode title=" " id="UppercaseKeyboard-space"/>
-        <ContentNode title="&#x7F;" id="UppercaseKeyboard-back"/>
-      </ContentNode>
-    </ScrollingList>
-    
-    <ScrollingList
-      id="NumericKeyboard"
-      width="1920"
-      height="80"
-      visible="false"
-      itemSpacings="[2,2,2,2,2,2,2,2,2,22,22]"
-      itemComponentName="KeyboardItem"
-      focusChangeDuration="0.1"
-      translation="[588,147]"
-      layoutDirection="horiz">
-      <ContentNode
-        role="content">
-        <ContentNode title="1" id="NumericKeyboard-1"/>
-        <ContentNode title="2" id="NumericKeyboard-2"/>
-        <ContentNode title="3" id="NumericKeyboard-3"/>
-        <ContentNode title="4" id="NumericKeyboard-4"/>
-        <ContentNode title="5" id="NumericKeyboard-5"/>
-        <ContentNode title="6" id="NumericKeyboard-6"/>
-        <ContentNode title="7" id="NumericKeyboard-7"/>
-        <ContentNode title="8" id="NumericKeyboard-8"/>
-        <ContentNode title="9" id="NumericKeyboard-9"/>
-        <ContentNode title="0" id="NumericKeyboard-0"/>
-        <ContentNode title=" " id="NumericKeyboard-space"/>
-        <ContentNode title="&#x7F;" id="NumericKeyboard-back"/>
-      </ContentNode>
-    </ScrollingList>
-    
-    <ScrollingList
-      id="Symbolic1Keyboard"
-      width="1920"
-      height="80"
-      visible="false"
-      itemSpacings="[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,22,22]"
-      itemComponentName="KeyboardItem"
-      focusChangeDuration="0.1"
-      translation="[66,147]"
-      layoutDirection="horiz">
-      <ContentNode
-        role="content">
-        <ContentNode title="@" id="Symbolic1Keyboard-@"/>
-        <ContentNode title="#" id="Symbolic1Keyboard-#"/>
-        <ContentNode title="!" id="Symbolic1Keyboard-!"/>
-        <ContentNode title="?" id="Symbolic1Keyboard-?"/>
-        <ContentNode title="&amp;" id="Symbolic1Keyboard-amp"/>
-        <ContentNode title="*" id="Symbolic1Keyboard-*"/>
-        <ContentNode title="^" id="Symbolic1Keyboard-^"/>
-        <ContentNode title="(" id="Symbolic1Keyboard-("/>
-        <ContentNode title=")" id="Symbolic1Keyboard-)"/>
-        <ContentNode title="\" id="Symbolic1Keyboard-\"/>
-        <ContentNode title="/" id="Symbolic1Keyboard-/"/>
-        <ContentNode title="[" id="Symbolic1Keyboard-["/>
-        <ContentNode title="]" id="Symbolic1Keyboard-]"/>
-        <ContentNode title="|" id="Symbolic1Keyboard-|"/>
-        <ContentNode title="&lt;" id="Symbolic1Keyboard-["/>
-        <ContentNode title="&gt;" id="Symbolic1Keyboard-]"/>
-        <ContentNode title="{" id="Symbolic1Keyboard-{"/>
-        <ContentNode title="}" id="Symbolic1Keyboard-}"/>
-        <ContentNode title="+" id="Symbolic1Keyboard-+"/>
-        <ContentNode title="-" id="Symbolic1Keyboard--"/>
-        <ContentNode title="=" id="Symbolic1Keyboard-+"/>
-        <ContentNode title="_" id="Symbolic1Keyboard-_"/>
-        <ContentNode title="," id="Symbolic1Keyboard-,"/>
-        <ContentNode title="." id="Symbolic1Keyboard-."/>
-        <ContentNode title=":" id="Symbolic1Keyboard-:"/>
-        <ContentNode title=";" id="Symbolic1Keyboard-;"/>
-        <ContentNode title=" " id="Symbolic1Keyboard-space"/>
-        <ContentNode title="&#x7F;" id="Symbolic1Keyboard-back"/>
-      </ContentNode>
-    </ScrollingList>
-    
-    <ScrollingList
+    <PosterGrid
       id="Symbolic2Keyboard"
-      width="1920"
-      height="80"
+      itemSize="[60,80]"
       visible="false"
-      itemSpacings="[2]"
-      itemComponentName="KeyboardItem"
-      focusChangeDuration="0.1"
-      translation="[747,227]"
-      layoutDirection="horiz">
+      columnSpacings="[2]"
+      focusBitmapUri="pkg:/images/menu-focus-fhd.9.png"
+      numColumns="28"
+      numRows="1"
+      drawFocusFeedbackOnTop="false"
+      translation="[747,162]">
       <ContentNode
         role="content">
         <ContentNode title="$" id="Symbolic2Keyboard-$"/>
@@ -229,6 +117,89 @@
         <ContentNode title="`" id="Symbolic2Keyboard-`"/>
         <ContentNode title="~" id="Symbolic2Keyboard-~"/>
       </ContentNode>
-    </ScrollingList>
+    </PosterGrid>
+    
+    <Poster
+      id="KeyboardOverlay"/>
+    
+    <ContentNode
+      id="UppercaseContent">
+      <ContentNode title="A" id="UppercaseKeyboard-A"/>
+      <ContentNode title="B" id="UppercaseKeyboard-B"/>
+      <ContentNode title="C" id="UppercaseKeyboard-C"/>
+      <ContentNode title="D" id="UppercaseKeyboard-D"/>
+      <ContentNode title="E" id="UppercaseKeyboard-E"/>
+      <ContentNode title="F" id="UppercaseKeyboard-F"/>
+      <ContentNode title="G" id="UppercaseKeyboard-G"/>
+      <ContentNode title="H" id="UppercaseKeyboard-H"/>
+      <ContentNode title="I" id="UppercaseKeyboard-I"/>
+      <ContentNode title="J" id="UppercaseKeyboard-J"/>
+      <ContentNode title="K" id="UppercaseKeyboard-K"/>
+      <ContentNode title="L" id="UppercaseKeyboard-L"/>
+      <ContentNode title="M" id="UppercaseKeyboard-M"/>
+      <ContentNode title="N" id="UppercaseKeyboard-N"/>
+      <ContentNode title="O" id="UppercaseKeyboard-O"/>
+      <ContentNode title="P" id="UppercaseKeyboard-P"/>
+      <ContentNode title="Q" id="UppercaseKeyboard-Q"/>
+      <ContentNode title="R" id="UppercaseKeyboard-R"/>
+      <ContentNode title="S" id="UppercaseKeyboard-S"/>
+      <ContentNode title="T" id="UppercaseKeyboard-T"/>
+      <ContentNode title="U" id="UppercaseKeyboard-U"/>
+      <ContentNode title="V" id="UppercaseKeyboard-V"/>
+      <ContentNode title="W" id="UppercaseKeyboard-W"/>
+      <ContentNode title="X" id="UppercaseKeyboard-X"/>
+      <ContentNode title="Y" id="UppercaseKeyboard-Y"/>
+      <ContentNode title="Z" id="UppercaseKeyboard-Z"/>
+      <ContentNode title=" " id="UppercaseKeyboard-space"/>
+      <ContentNode title="&#x7F;" id="UppercaseKeyboard-back"/>
+    </ContentNode>
+    
+    <ContentNode
+      id="NumericContent">
+      <ContentNode title="1" id="NumericKeyboard-1"/>
+      <ContentNode title="2" id="NumericKeyboard-2"/>
+      <ContentNode title="3" id="NumericKeyboard-3"/>
+      <ContentNode title="4" id="NumericKeyboard-4"/>
+      <ContentNode title="5" id="NumericKeyboard-5"/>
+      <ContentNode title="6" id="NumericKeyboard-6"/>
+      <ContentNode title="7" id="NumericKeyboard-7"/>
+      <ContentNode title="8" id="NumericKeyboard-8"/>
+      <ContentNode title="9" id="NumericKeyboard-9"/>
+      <ContentNode title="0" id="NumericKeyboard-0"/>
+      <ContentNode title=" " id="NumericKeyboard-space"/>
+      <ContentNode title="&#x7F;" id="NumericKeyboard-back"/>
+    </ContentNode>
+    
+    <ContentNode
+      id="SymbolicContent1">
+      <ContentNode title="@" id="Symbolic1Keyboard-@"/>
+      <ContentNode title="#" id="Symbolic1Keyboard-#"/>
+      <ContentNode title="!" id="Symbolic1Keyboard-!"/>
+      <ContentNode title="?" id="Symbolic1Keyboard-?"/>
+      <ContentNode title="&amp;" id="Symbolic1Keyboard-amp"/>
+      <ContentNode title="*" id="Symbolic1Keyboard-*"/>
+      <ContentNode title="^" id="Symbolic1Keyboard-^"/>
+      <ContentNode title="(" id="Symbolic1Keyboard-("/>
+      <ContentNode title=")" id="Symbolic1Keyboard-)"/>
+      <ContentNode title="\" id="Symbolic1Keyboard-\"/>
+      <ContentNode title="/" id="Symbolic1Keyboard-/"/>
+      <ContentNode title="[" id="Symbolic1Keyboard-["/>
+      <ContentNode title="]" id="Symbolic1Keyboard-]"/>
+      <ContentNode title="|" id="Symbolic1Keyboard-|"/>
+      <ContentNode title="&lt;" id="Symbolic1Keyboard-["/>
+      <ContentNode title="&gt;" id="Symbolic1Keyboard-]"/>
+      <ContentNode title="{" id="Symbolic1Keyboard-{"/>
+      <ContentNode title="}" id="Symbolic1Keyboard-}"/>
+      <ContentNode title="+" id="Symbolic1Keyboard-+"/>
+      <ContentNode title="-" id="Symbolic1Keyboard--"/>
+      <ContentNode title="=" id="Symbolic1Keyboard-+"/>
+      <ContentNode title="_" id="Symbolic1Keyboard-_"/>
+      <ContentNode title="," id="Symbolic1Keyboard-,"/>
+      <ContentNode title="." id="Symbolic1Keyboard-."/>
+      <ContentNode title=":" id="Symbolic1Keyboard-:"/>
+      <ContentNode title=";" id="Symbolic1Keyboard-;"/>
+      <ContentNode title=" " id="Symbolic1Keyboard-space"/>
+      <ContentNode title="&#x7F;" id="Symbolic1Keyboard-back"/>
+    </ContentNode>
   </children>
 </component>

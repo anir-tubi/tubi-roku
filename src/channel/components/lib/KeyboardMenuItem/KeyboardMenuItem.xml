@@ -18,15 +18,15 @@
      - title - The label text
      -
      -->
-    <field id="content" type="node" />
-    <field id="listHasFocus" type="boolean" value="false" />
+    <field id="itemContent" type="node" />
+    <field id="gridHasFocus" type="boolean"/>
   </interface>
 
   <children>
     <Font
-     role="font"
-     uri="pkg:/fonts/Vaud-SemiBold.ttf"
-     size="43" />
+      role="font"
+      uri="pkg:/fonts/Vaud-SemiBold.ttf"
+      size="43" />
   </children>
 </component>
     
