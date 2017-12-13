@@ -239,20 +239,11 @@ End Function
 Function resolveAbbreviatedContent(rowItemIndex)
   category = m.internalContent.getChild(rowItemIndex[0])
   if category <> invalid then
-    if category.json <> invalid and category.json <> "" then
-      parsed = ParseJson(category.json)
-      if parsed <> invalid then
-        fullContent = parsed.children[rowItemIndex[1]]
-        translated = CreateObject("roSGNode", "TubiContentNode")
-        m.metadataTranslate.translateRecursive(fullContent, translated)
-        return translated
-      end if
-    end if
-    ' just return the abbreviated content.  This happens for user categories every time
-    return category.getChild(rowItemIndex[1])
+    return m.metadataTranslate.getContentFromCategoryJson(category, rowItemIndex[1])
   end if
   return invalid
 End Function
+
 
 ''''''''''''''''
 ' onRowItemSelected - RowList.rowItemSelected event handler, triggered when user presses "OK"

@@ -93,7 +93,7 @@ Function popScreen(sendTrackingEvents = true as Boolean)
   fields = top.getFields()
   for each f in fields
     ' make sure the controller completely dereferences the screen
-    top.unobserveField(f)
+    top.unobserveFieldScoped(f)
   end for
   m.ScreenStack_.removeChild(top)
   newTop = m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-1)

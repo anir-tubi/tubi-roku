@@ -23,8 +23,10 @@ End Function
 ' take an integer length in seconds and give it an English descriptions like "1 h 36 min"
 'TODO(Chris): Move this to common library
 Function formatLengthAsEnglish(length As Dynamic) As String
-  if type(length) = "roFloat" or type(length) = "Double" then length = Int(length)
-  if type(length) = "Integer" or type(length) = "roInteger"
+  if type(length) = "roFloat" or type(length) = "Float" or type(length) = "Double" then
+    length = Int(length)
+  end if
+  if type(length) = "Integer" or type(length) = "roInt"
     hours = length \ 3600
     minutes = (length mod 3600) \ 60
     seconds = length mod 60
@@ -58,21 +60,6 @@ Function padString(s As String, width As Integer, c as String)
   return result
 End Function
 
-
-'''''''''''''''''''
-' joinStringArray
-'
-' Join strings together, using 'c' as a separator
-' Example: joinStringArray(['a','b','c'],'-') => "a-b-c"
-'TODO(Chris): Move this to common library
-Function joinStringArray(a As Object, c As String)
-  result = ""
-  if a.count() > 0 then result = a[0]
-  for i=1 to a.count() - 1
-    result = result + c + a[i]
-  end for
-  return result
-End Function
 
 
 ''''''''''

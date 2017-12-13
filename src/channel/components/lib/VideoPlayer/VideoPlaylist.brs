@@ -129,24 +129,19 @@ Function refreshContent(nowPos)
 
   if content <> invalid then 
     tubiLog("VideoPlayer current content id = " + content.id)
-    if content.isTrailer
-      m.top.content = content  ' don't need to refresh if this is a trailer
-      playContent()
-    else
-      if m.refreshTask <> invalid
-        m.refreshTask.unobserveField("response")
-        m.refreshTask.unobserveField("error")
-      end if
-      m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
-      fragment = clone(content)
-      fragment.nowPos = nowPos  ' we have to pass this along since it is relevant after the refresh, but may
-                                ' have come from numerous places, e.g. m.top.seekPlaylist or advancePlaylist
-      m.refreshTask.contentFragment = fragment
-      m.refreshTask.observeField("response", "onRefreshResponse")
-      m.refreshTask.observeField("error", "onRefreshError")
-      m.refreshTask.control = "RUN"
-      m.VideoState = "refresh"
+    if m.refreshTask <> invalid
+      m.refreshTask.unobserveField("response")
+      m.refreshTask.unobserveField("error")
     end if
+    m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
+    fragment = clone(content)
+    fragment.nowPos = nowPos  ' we have to pass this along since it is relevant after the refresh, but may
+                              ' have come from numerous places, e.g. m.top.seekPlaylist or advancePlaylist
+    m.refreshTask.contentFragment = fragment
+    m.refreshTask.observeField("response", "onRefreshResponse")
+    m.refreshTask.observeField("error", "onRefreshError")
+    m.refreshTask.control = "RUN"
+    m.VideoState = "refresh"
   end if
 End Function
 
@@ -162,6 +157,15 @@ Function onRefreshResponse(msg)
   for each f in mergedFields
     refreshedContent.setField(f, playlistContent.getField(f))
   end for
+
+  ' In the case that we are attempting to watch a trailer, overwrite the video urls of the refreshed content
+  ' with the trailer urls
+  if playlistContent.isTrailer and not m._.empty(refreshedContent.trailerUrls)
+    refreshedContent.url = refreshedContent.trailerUrls[0]
+    refreshedContent.subtitleTracks = []
+    refreshedContent.subtitleConfig = invalid
+  end if
+
   m.top.content = refreshedContent
   if m.VideoState = "refresh" then
     playContent()

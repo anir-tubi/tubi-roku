@@ -26,6 +26,7 @@
     <field id="historyId" type="string" />
     <field id="currentEpisodeId" type="string" />
     <field id="isTrailer" type="boolean" value="false" />
+    <field id="hasTrailer" type="boolean" value="false" />
     <field id="trailerUrls" type="stringArray" />
     <field id="deeplinkType" type="string" />
 

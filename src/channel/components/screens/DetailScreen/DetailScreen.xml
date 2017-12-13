@@ -5,67 +5,98 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
-  <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
-
 
   <interface>
-    <!-- Full content of the item to show details for -->
-    <field id="content" type="node" />
-    
-    <!-- Setting shortContent triggers a metadata fetch for the full details of the content item 
-      - 
-      - shortContent should have a minumum of:
-      -     contentId - the content id
-      -     type - "video", "series", "season", "category" (video may be an episode)
-      - 
-      -->
-    <field id="shortContent" type="node" alwaysNotify="true"/>
+    <!-- INPUTS -->
+      <!-- The mode used by info panel, one of: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
+      <field id="mode" type="string" alias="DetailInfoPanel.mode" />
 
-    <!-- set to true when the suer selects the 'Play' menu button -->
-    <field id="playSelected" type="boolean" alwaysNotify="true" />
+      <!-- Pass through signal to the info panel that the height/placement should be recalculated -->
+      <field id="calculateInfoHeight" type="boolean" alias="DetailInfoPanel.calculateHeight" />
 
-    <!-- MetadataFetchTask response for single content -->
-    <field id="contentDetailResponse" type="assocarray" alwaysNotify="true"/>
-    
-    <!-- keeps the uri used for user tracking -->
-    <field id="trackingUri" type="string"  value="" />
+      <!-- The title displayed on the info panel -->
+      <field id="title" type="string" alias="DetailInfoPanel.title" />
 
-    <!-- will be used to change the background images on the content controller -->
-    <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />    
+      <!-- The title of the episode displayed on the info panel, just below the series title-->
+      <field id="episodeTitle" type="string" alias="DetailInfoPanel.episodeTitle" />
 
-    <!-- set to true when the suer selects the 'Resume' menu button -->
-    <field id="resumeSelected" type="boolean" alwaysNotify="true" />
-    
-    <!-- set to true when the user selects the 'Episode List' menu button -->
-    <field id="episodeListSelected" type="boolean" alwaysNotify="true" />
-    
-    <!-- set to true if the user is signed in and we want to change the experience based on that -->
-    <field id="signedIn" type="boolean" value="false" />
-    
-    <!-- set to true if the user elected to sign in from the add to queue modal -->
-    <field id="signInSelected" type="boolean" alwaysNotify="true"/>
-    
-    <!-- set to true when the user adds the title to their queue -->
-    <field id="addToQueueSelected" type="boolean" alwaysNotify="true" />
-    
-    <!-- set to true when the user removes the title from their queue -->
-    <field id="removeFromQueueSelected" type="boolean" alwaysNotify="true" />
-    
-    <!-- set to true when the user removes the title from their history -->
-    <field id="removeFromHistorySelected" type="boolean" alwaysNotify="true" />
+      <!-- The year the video was released -->
+      <field id="releaseDate" type="string" alias="DetailInfoPanel.releaseDate" />
 
-    <!-- set to true when the user wants to see the trailer for the content -->
-    <field id="watchTrailerSelected" type="boolean" alwaysNotify="true" />
+      <!-- The length of the video in seconds -->
+      <field id="length" type="string" alias="DetailInfoPanel.length" />
 
-    <!-- Set the to current episode selection, when 'content' field is type 'series' -->
-    <field id="episodeSelection" type="intarray" value="[-1,-1]" alwaysNotify="true"/>
-    
-    <!-- Set to true if the fetch of detailed metadata for the item in shortContent fails -->
-    <field id="itemFailed" type="boolean" value="false" alwaysNotify="true"/>
+      <!-- Indicates if the video has captions -->
+      <field id="hasCC" type="boolean" alias="DetailInfoPanel.hasCC" />
 
-    <!-- Set to false when we receive a deeplink and back to true once we've handled it -->
-    <field id="deeplinkHandled" type="boolean" value="true" />
+      <!-- The rating of the video, can be "G", "NR", "PG-13", "PG", "R", "TV-14", "TV-G", "TV-MA", "TV-PG", "TV-Y", "TV-Y7"  or lowercase -->
+      <field id="rating" type="string" alias="DetailInfoPanel.rating" />
 
+      <!-- Array of strings of genres for the video -->
+      <field id="genres" type="stringarray" alias="DetailInfoPanel.genres" />
+
+      <!-- Description of the video displayed on the info panel -->
+      <field id="description" type="string" alias="DetailInfoPanel.description" />
+
+      <!-- Array of strings of directors -->
+      <field id="directors" type="stringarray" alias="DetailInfoPanel.directors" />
+
+      <!-- Array of strings of actors/actresses -->
+      <field id="starring" type="stringarray" alias="DetailInfoPanel.starring" />
+
+      <!-- Indicates if the video is an episode of a series -->
+      <field id="isSeries" type="boolean" value="false" />
+
+      <!-- Indicates if the video is in the user's bookmarks/queue -->
+      <field id="isBookmark" type="boolean" value="false" />
+
+      <!-- Indicates if the video is in the user's history -->
+      <field id="isHistory" type="boolean" />
+
+      <!-- The most recently watched point in the video for the user, ie. where the user will resume to -->
+      <field id="resumePoint" type="integer" value="0" />
+
+      <!-- Indicates if the content has a trailer -->
+      <field id="hasTrailer" type="boolean" value="false" />
+
+      <!-- keeps the uri used for user tracking -->
+      <field id="trackingUri" type="string"  value="" />
+
+      <!-- keeps the uri used for user tracking -->
+      <field id="animateToListItem" type="integer" alias="Menu.animateToItem" />
+
+      <!-- used to update the text on the addToQueue button -->
+      <field id="addToQueueTitle" type="string" value="Add to queue" alwaysNotify="true" />
+
+      <!-- used to update the text on the removeQueue button -->
+      <field id="removeQueueTitle" type="string" value="Remove from queue" alwaysNotify="true" />
+
+      <!-- informs the details screen if the content controller is waiting for a user category update from the server -->
+      <field id="isWaitingForServerResponse" type="boolean" value="false" />
+
+
+    <!-- OUTPUTS -->
+
+      <!-- set to true when the suer selects the 'Resume' menu button -->
+      <field id="resumeSelected" type="boolean" alwaysNotify="true" />
+
+      <!-- set to true when the suer selects the 'Play' menu button -->
+      <field id="playSelected" type="boolean" alwaysNotify="true" />
+
+      <!-- set to true when the user selects the 'Episode List' menu button -->
+      <field id="episodeListSelected" type="boolean" alwaysNotify="true" />
+
+      <!-- set to true when the user adds the title to their queue -->
+      <field id="addToQueueSelected" type="boolean" alwaysNotify="true" />
+      
+      <!-- set to true when the user removes the title from their queue -->
+      <field id="removeFromQueueSelected" type="boolean" alwaysNotify="true" />
+      
+      <!-- set to true when the user removes the title from their history -->
+      <field id="removeFromHistorySelected" type="boolean" alwaysNotify="true" />
+
+      <!-- set to true when the user wants to see the trailer for the content -->
+      <field id="watchTrailerSelected" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -107,8 +138,8 @@
       focusiconurl="pkg:/images/icon-trailer.png" />
   
     <InfoPanel
-      id="InfoPanel"
-      mode="detail"
+      id="DetailInfoPanel"
+      mode="item"
       translation="[85,123]"
       maxHeight="477"
       maxTitleLines="2"
@@ -120,10 +151,8 @@
       height="352"
       itemSpacings="[8]"
       itemComponentName="DetailMenuItem"
-      visible="false"
+      visible="true"
       translation="[60, 680]" />
     
-    <AuthTask
-      id="AuthTask" />
   </children>
 </component>

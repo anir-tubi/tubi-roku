@@ -6,7 +6,6 @@ Function init()
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.SpecialCategories = m.top.findNode("SpecialCategories")
   m.HintGroup = m.top.findNode("UpHintGroup")
-  m.top.observeField("categoryPreviewResponse", "onCategoryPreviewReceived")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
@@ -234,8 +233,19 @@ Function onCategoryMenuChange() As Void
   if not m.CategoryList.isInFocusChain() or m.CategoryList.content = invalid then return
 
   newCategory = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
-  m.InfoPanel.content = newCategory
-  m.InfoPanel.mode = "category"
+  referenceCategory = m.top.cachedContent.getChild(m.CategoryList.itemFocused)
+  
+  infoMetadata = CreateObject("roSGNode", "CategoryContentNode")
+  if newCategory <> invalid
+    infoMetadata.title = newCategory.title
+    infoMetadata.description = newCategory.description
+  end if
+
+  if referenceCategory <> invalid
+    infoMetadata.totalCount = referenceCategory.getChildCount()
+  end if
+
+  populateInfoPanel("category", infoMetadata)
   m.top.backgroundUriList = [m.defaultBackgroundUri]
 
   'update the tracking URI for user tracking purposes
@@ -277,8 +287,7 @@ Function onGridFocusChange() As Void
 
   if not m.CategoryGridList.isInFocusChain() then return
   focusedContent = m.CategoryGridList.itemFocused
-  m.InfoPanel.content = focusedContent
-  m.InfoPanel.mode = "item"
+  populateInfoPanel("item", focusedContent)
 
   if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
     m.top.backgroundUriList = focusedContent.backgrounds
@@ -356,4 +365,31 @@ Function onTrackingUriChange()
       ctx: m.top.trackingUri
     }
   end if
+End Function
+
+
+'@mode: string, one of the valid info panel modes (see InfoPanel.brs for details)
+'@content: content node
+Function populateInfoPanel(mode, contentNode)
+  if mode = "category"
+    m.InfoPanel.mode = "category"
+    m.InfoPanel.categoryContentCount = contentNode.totalCount
+    m.InfoPanel.title = contentNode.title
+    m.InfoPanel.description = contentNode.description
+  else if mode = "item"
+    m.InfoPanel.mode = "item"
+    m.InfoPanel.title = contentNode.title
+    m.InfoPanel.description = contentNode.description
+    m.InfoPanel.releaseDate = contentNode.releaseDate
+    m.InfoPanel.length = contentNode.length
+    m.InfoPanel.rating = contentNode.rating
+    m.InfoPanel.genres = contentNode.genres
+    if contentNode.subtitleTracks <> invalid
+      m.InfoPanel.hasCC = true
+    else
+      m.InfoPanel.hasCC = false
+    end if
+  end if
+
+  m.InfoPanel.calculateHeight = true
 End Function

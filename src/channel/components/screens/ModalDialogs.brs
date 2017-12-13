@@ -39,7 +39,7 @@ End Function
 '
 ' Use like:
 '
-' m.exitModal = showExitAppModal("onExitModalSelected")
+' m.exitModal = showExitAppModal("onExitAppModalButtonSelected")
 ' Function onExitAppModalButtonSelected()
 '   result = getModalResult(m.exitModal)
 '   doStuff(result) 'context specific actions based on what the user selected
@@ -68,14 +68,13 @@ End Function
 '
 ' Use like:
 '
-' m.signOutModal = showSignOutModal("onSignOutModalSelected")
+' m.signOutModal = showSignOutModal("onSignOutAppModalButtonSelected")
 ' Function onSignOutAppModalButtonSelected()
 '   result = getModalResult(m.signOutModal)
 '   doStuff(result) 'context specific actions based on what the user selected
 '   m.signOutModal = closeModal(m.signOutModal)   'set to invalid
 '   setFocusToLastFocusedComponent()
 ' End Function
-'
 '
 Function showSignOutModal(callbackName as String)
   signOutModal = CreateObject("roSGNode", "ModalDialogScreen")
@@ -89,6 +88,26 @@ Function showSignOutModal(callbackName as String)
   signOutModal.setFocus(true)
 
   return signOutModal
+End Function
+
+
+' SIGN IN MODAL-----------------------------------------------
+' A set of functions used to ask a user if they would like to sign in
+'
+' Use like sign out modal:
+'
+Function showSignInModal(callbackName as String, message as String)
+  signInModal = CreateObject("roSGNode", "ModalDialogScreen")
+  signInModal.title = "Please Sign In"
+  signInModal.message = message
+  signInModal.buttons = ["Sign in or Register", "Cancel"]
+
+  m.top.appendChild(signInModal)
+  signInModal.visible = true
+  signInModal.observeField("buttonSelected", callbackName)
+  signInModal.setFocus(true)
+
+  return signInModal
 End Function
 
 

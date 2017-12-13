@@ -1,17 +1,6 @@
 Function init()
-  m.Info = m.top.findNode("InfoPanel")
-  m.Hero = m.top.findNode("HeroBackground")
+  m.Info = m.top.findNode("DetailInfoPanel")
   m.Menu = m.top.findNode("Menu")
-  m.AuthTask = m.top.findNode("AuthTask")
-  m.top.observeField("content", "onContentChange")
-  m.top.observeField("shortContent", "onShortContentChange")
-  m.top.observeField("signedIn", "onSignedInChange")
-  m.top.observeField("contentDetailResponse", "onContentReceived")
-  m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("episodeSelection", "onEpisodeSelectionChange")
-  m.Menu.observeField("itemSelected", "onMenuItemSelected")
-  m.defaultHeroUri = "pkg:/images/art-blur-background.png"
-
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
   m.PlayMenuItem = m.top.findNode("PlayMenuItem")
   m.EpisodesMenuItem = m.top.findNode("EpisodesMenuItem")
@@ -20,9 +9,19 @@ Function init()
   m.RemoveHistoryMenuItem = m.top.findNode("RemoveHistoryMenuItem")
   m.WatchTrailerMenuItem = m.top.findNode("WatchTrailerMenuItem")
 
-  m.isWaitingForServerResponse = false
-  m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
-  m.contentTypes = m.global.constants.ui.contentTypes
+  m.top.observeField("length", "onLengthChange")
+  m.top.observeField("isSeries", "onIsSeries")
+  m.top.observeField("isBookmark", "onIsBookmark")
+  m.top.observeField("isHistory", "onIsHistory")
+  m.top.observeField("resumePoint", "onResumePointChange")
+  m.top.observeField("hasTrailer", "onHasTrailer")
+  m.top.observeField("focusedChild", "onScreenFocusChange")
+  m.top.observeField("addToQueueTitle", "onAddToQueueTitleChange")
+  m.top.observeField("removeQueueTitle", "onRemoveFromQueueTitleChange")
+  m.Menu.observeField("itemSelected", "onMenuItemSelected")
+
+  m.defaultHeroUri = "pkg:/images/art-blur-background.png"
+  setInitialMenuItems()
 End Function
 
 Function onScreenFocusChange()
@@ -33,305 +32,160 @@ Function onScreenFocusChange()
   end if
 End Function
 
-Function onContentReceived()
-  tubiLog("DetailScreen.onContentReceived")
-  response = m.top.contentDetailResponse.response
-  if response.code >= 200 and response.code < 300 then
-    fullContent = m.top.contentDetailResponse.convertedMetadata
-    deeplinkType = m.top.shortContent.deeplinkType
-    
-    if deeplinkType <> invalid and deeplinkType <> "" and fullContent.type = m.contentTypes.video
-      fullContent.nowPos = m.top.shortContent.nowPos
-    end if
 
-    'we got the response for an episode, but we need the whole series due to deeplink requirements
-    'fullContent.parentId will be empty string for the series response even if  m.top.shortContent.deeplinkType = "season"
-    if (deeplinkType = "season" or deeplinkType = "episode")
-      if fullContent.parentId <> ""
-        'we've received some series content from the deep link parameters, still need to get full content from server
-        seriesContent = CreateObject("roSGNode", "TubiContentNode")
-        seriesContent.id = fullContent.parentId
-        seriesContent.type = m.contentTypes.series
-        loadContentDetails(seriesContent)
-      else
-        'we've received the full series content from the server after a deeplink
-        episodeSelection = findEpisodeInSeries(m.top.shortContent.id, fullContent)
-        season = fullContent.getChild(episodeSelection[0])
-        episode = invalid
-        if season <> invalid
-          episode = season.getChild(episodeSelection[1])
-          episode.nowPos = m.top.shortContent.nowPos
-        end if
-        m.top.content = fullContent
-      end if
-
-    else
-      m.top.content = fullContent
-    end if
-
-  else
-    'TODO(Chris): Show error modal here
-    testLog("Content detail returned " + stri(response.code))
-    showErrorModal(response.code, response.failReason, retryContentDetail, cancelContentDetail)
-  end if
-End Function
-
-' Trigger reload via shortContent field
-Function retryContentDetail()
-  m.top.shortContent = m.top.shortContent
-End Function
-
-' If we can't get content, nothing else to do but exit
-Function cancelContentDetail()
-  m.top.itemFailed = true
+Function onLengthChange()
+  tubiLog("DetailScreen.onLengthChange")
+  m.ResumeMenuItem.length = m.top.length
 End Function
 
 
-'''''''''''''''''''
-' onContentChange
-'
-' Full content description has arrived
-Function onContentChange() As Void
-  tubiLog("DetailScreen.onContentChange")
-  if m.top.content.type = "video"
-    'auto start deep link content if it's a video
-    if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "movie"
-      if m.top.content.nowPos > 0
-        m.top.resumeSelected = true
-      else
-        m.top.playSelected = true
-      end if
-    end if
-    drawSubComponents()
-  else if m.top.content.type = "series"
-     'don't call drawSubComponents() here since it will run when m.top.episodeSelection is set
+Function onResumePointChange()
+  tubiLog("DetailScreen.onResumePointChange")
+  menuItems = cloneDeep(m.Menu.content)
+  resumeIndex = getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
 
-    ' Deep link gave us the episode id we need to seek to
-    if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "season"
-      tubiLog("Finding episode " + m.top.shortContent.id + " in series " + m.top.content.id)
-      m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id, m.top.content)
-
-      'tell the controller to open the episode selection page
-      m.top.episodeListSelected = true
-
-    else if m.top.deepLinkHandled = false and m.top.shortContent.deeplinkType = "episode"
-      tubiLog("Finding episode " + m.top.shortContent.id + " in series " + m.top.content.id)
-      m.top.episodeSelection = findEpisodeInSeries(m.top.shortContent.id, m.top.content)
-      season = m.top.content.getChild(m.top.episodeSelection[0])
-      episode = invalid
-      if season <> invalid then episode = season.getChild(m.top.episodeSelection[1])
-      if episode <> invalid and episode.nowPos > 0
-        m.top.resumeSelected = true
-      else
-        m.top.playSelected = true
-      end if
-
-    else
-      episodeSelection = [0,0]
-      history = m.global.historyIds.findNode(m.top.content.id)
-      if history <> invalid and history.currentEpisodeId <> invalid and history.currentEpisodeId <> "" then
-        tubiLog("Finding current episode " + history.currentEpisodeId + " in series " + m.top.content.id)
-        episodeSelection = findEpisodeInSeries(history.currentEpisodeId, m.top.content)
-      end if
-      m.top.episodeSelection = episodeSelection
-    endif
+  m.ResumeMenuItem.playstart = m.top.resumePoint
+  if resumeIndex = -1 and m.top.resumePoint > 0
+    menuItems.insertChild(m.ResumeMenuItem, 0)
+    m.Menu.content = menuItems
+  else if resumeIndex > -1 and m.top.resumePoint = 0
+    menuItems.removeChildIndex(resumeIndex)
+    m.Menu.content = menuItems
   end if
 End Function
 
 
-'@contentNode is a TubiContentNode, usually m.top.content, expected to be used only on series content nodes
-Function findEpisodeInSeries(episodeId As String, contentNode)
-  for i=0 to contentNode.getChildCount()-1
-    season = contentNode.getChild(i)
-    for j=0 to season.getChildCount()-1
-      episode = season.getChild(j)
-      if episode.id = episodeId then
-        tubiLog("Episode is [" + stri(i) + "," + stri(j) + "]")
-        return [i,j]
-      end if
-    end for
-  end for
-  return [0,0]
-End Function
-
-
-'''''''''''''''''''''''
-' drawSubComponents
-'
-' Decouple from onContentChange since episode selection also needs this
-Function drawSubComponents()
-  tubiLog("DetailScreen.drawSubComponents")
-  if m.top.content.type = "video"
-    m.Info.mode = "movie"
-    m.Info.content = m.top.content
-  else if m.top.content.type = "series"
-    m.Info.mode = "series"
-    ' clone the content object since we want the SERIES title & description, but the EPISODE details
-    episode = getEpisodeContent(m.top.episodeSelection)
-    episode_title = ""
-    if episode = invalid then
-      ' something failed, try to get the first season-episode
-      m.top.episodeSelection = [0,0]
-      episode = getEpisodeContent(m.top.episodeSelection)
-      if episode = invalid then
-        ' Protect against a series with empty season/episode content
-        episode = m.top.content
-      end if
-    end if
-    infoPanelContent = clone(episode)
-    infoPanelContent.episode_title = episode.title
-    infoPanelContent.title = m.top.content.title
-    infoPanelContent.description = m.top.content.description
-    m.Info.content = infoPanelContent
-  end if
-
-  if m.top.content.backgrounds <> invalid and m.top.content.backgrounds.count() > 0 then
-    m.top.backgroundUriList = m.top.content.backgrounds
-  else
-    m.top.backgroundUriList = [m.defaultHeroUri]
-  end if
-
-  setMenuItems()
-End Function
-
-
-
-''''''''''''''''''''''
-' onSignedInChange
-'
-Function onSignedInChange()
-  setMenuItems()
-End Function
-
-''''''''''''''''''''''
-' getEpisodeContent
-'
-Function getEpisodeContent(selection As Object) As Object
-  season = m.top.content.getChild(m.top.episodeSelection[0])
-  if season <> invalid then
-    episode = season.getChild(m.top.episodeSelection[1])
-    if episode <> invalid then return episode
-  end if
-  return invalid
-End Function
-
-
-''''''''''''''''''''''''
-' onShortContentChange
-'
-' Seed for content received, retrieve the full content details
-Function onShortContentChange()
-  tubiLog("DetailScreen.onShortContentChange")  
-  if m.top.shortContent <> invalid
-    loadContentDetails(m.top.shortContent)
-
-    'set the tracking URI
-    trackUri = invalid
-    content = m.top.shortContent
-    if content["type"] = m.global.constants.ui.contentTypes.series
-      trackUri = "/series/"
-
-      if content.id <> invalid
-        ' trim leading "0" off series id
-        trackUri = trackUri + Mid(content.id, 2)
-
-        history = m.global.historyIds.findNode(content.id)
-        if history <> invalid and history.currentEpisodeId <> invalid and history.currentEpisodeId.len() > 0
-          trackUri = trackUri + "/" + history.currentEpisodeId
-        end if
-      end if
-
-    else if content["type"] = m.global.constants.ui.contentTypes.video
-      trackUri = "/video/"
-      
-      if content.id <> invalid
-        trackUri = trackUri + content.id
-      end if
-    end if
-
-    if trackUri <> invalid then m.top.trackingUri = trackUri
-  end if
-End Function
-
-
-''''''''''''''''''''''
-' setMenuItems
-'
-' Add appropriate menu items for the selection
-Function setMenuItems() As Void
-  tubiLog("DetailScreen.setMenuItems")
-
-  ' if content is not set, don't show a menu
-  if m.top.content = invalid then 
-    return
-  end if
-
-  menuItems = CreateObject("roSGNode", "ContentNode")
-
-  if m.top.content.type = "video" then
-    focusedContent = m.top.content
-  else if m.top.content.type = "series" then
-    focusedContent = m.top.content
-    season = m.top.content.getChild(m.top.episodeSelection[0])
-    if season <> invalid then
-      episode = season.getChild(m.top.episodeSelection[1])
-      if episode <> invalid then
-        focusedContent = episode
-      end if
-    end if
-  end if
-
-  history = invalid
-  bookmark = invalid
-  ' history should always deal with videos (movies or episodes)
-  history = m.global.historyIds.findNode(focusedContent.id)
-  ' bookmarks always deal with movie or series, not episodes
-  bookmark = m.global.bookmarkIds.findNode(m.top.content.id)
-
-  if history <> invalid and history.nowPos <> invalid and history.nowPos <> 0 then
-    m.ResumeMenuItem.length = focusedContent.length
-    m.ResumeMenuItem.playstart = history.nowPos
-    menuItems.appendChild(m.ResumeMenuItem)
-  end if
-
-  menuItems.appendChild(m.PlayMenuItem)
-
-  if m.top.content.trailerUrls <> invalid and m.top.content.trailerUrls.count() > 0 then
-    menuItems.appendChild(m.WatchTrailerMenuItem)
-  end if
-
-  if m.top.content.type = "series" then
-    menuItems.appendChild(m.EpisodesMenuItem)
-  end if
-
-  ' bookmarks follow series or movie, so don't use focusedContent here
-  if m.top.signedIn = true and bookmark <> invalid and bookmark.bookmarkId <> "" then
-    menuItems.appendChild(m.RemoveQueueMenuItem)
-    m.RemoveQueueMenuItem.title = "Remove from queue"
-  else 
-    menuItems.appendChild(m.AddQueueMenuItem)
-    m.AddQueueMenuItem.title = "Add to queue"  ' reset this for the next time it shows
-  end if
-
-  ' history will be set on the series if any of the episodes have history, so look at m.top.content
-  if history <> invalid then
-    menuItems.appendChild(m.RemoveHistoryMenuItem)
-    m.RemoveHistoryMenuItem.title = "Remove from history"
-  end if
-
-  m.Menu.content = menuItems
-  m.Menu.visible = true
-  if m.top.hasFocus() then m.Menu.setFocus(true)
-
-  'set the position menu cursor to be stationary if there are more than 4 menu items
-  tempMenuItem = CreateObject("roSGNode", m.Menu.itemComponentName) 'should be a DetailMenuItem.xml component
-  itemsPerMenu = m.Menu.height \ tempMenuItem.height
-
-  if m.Menu.content.getChildCount() > itemsPerMenu
-    m.Menu.scrollHeight = (m.Menu.height \ itemsPerMenu)
-  end if
+Function onIsBookmark()
+  tubiLog("DetailScreen.onIsBookmark")
+  'reset the value in the case that add to queue button was pressed and title is currently "Adding"
+  m.AddQueueMenuItem.title = "Add to queue"
+  m.RemoveQueueMenuItem.title = "Remove from queue"
   
-  m.isWaitingForServerResponse = false
+  menuItems = cloneDeep(m.Menu.content)
+  addQueueIndex = getChildIndexById(m.Menu.content, m.AddQueueMenuItem.id)
+  removeQueueIndex = getChildIndexById(m.Menu.content, m.RemoveQueueMenuItem.id)
+
+  if m.top.isBookmark = false
+    if addQueueIndex = -1
+    'add queue item doesn't exist
+      if removeQueueIndex > -1
+        'remove queue item does exist so replace remove queue item with add queue item
+        menuItems.removeChildIndex(removeQueueIndex)
+        menuItems.insertChild(m.AddQueueMenuItem, removeQueueIndex)
+      else
+        menuItems.appendChild(m.AddQueueMenuItem)
+      end if
+    else if removeQueueIndex > -1
+      'both add to queue and remove from queue items exist... this shouldn't happen
+      menuItems.removeChildIndex(removeQueueIndex)
+    end if
+  else
+    if removeQueueIndex = -1
+      'remove queue item doesn't exist
+      if addQueueIndex > -1
+        'add queue item exists, so replace add queue item with remove queue item
+        menuItems.removeChildIndex(addQueueIndex)
+        menuItems.insertChild(m.RemoveQueueMenuItem, addQueueIndex)
+      else
+        menuItems.appendChild(m.RemoveQueueMenuItem)
+      end if
+    else if addQueueIndex > -1
+      'both add to queue and remove from queue items exist... this shouldn't happen
+      menuItems.removeChildIndex(m.AddQueueMenuItem)
+    end if
+  end if
+  m.Menu.content = menuItems
+End Function
+
+
+Function onIsHistory()
+  tubiLog("DetailScreen.onIsHistory")
+  removeHistoryIndex = getChildIndexById(m.Menu.content, m.RemoveHistoryMenuItem.id)
+  previousItems = [m.AddQueueMenuItem, m.RemoveQueueMenuItem]
+  addRemoveMenuItem(m.top.isHistory, removeHistoryIndex, m.RemoveHistoryMenuItem, previousItems)
+End Function
+
+
+Function onIsSeries()
+  tubiLog("DetailScreen.onIsSeries")
+  episodeIndex = getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
+  addRemoveMenuItem(m.top.isSeries, episodeIndex, m.EpisodesMenuItem, [m.PlayMenuItem])
+End Function
+
+
+Function onHasTrailer()
+  tubiLog("DetailScreen.onHasTrailer")
+  trailerIndex = getChildIndexById(m.Menu.content, m.WatchTrailerMenuItem.id)
+  addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.PlayMenuItem])
+End Function
+
+
+Function onAddToQueueTitleChange()
+  tubiLog("DetailScreen.onAddToQueueTitleChange")
+  m.AddQueueMenuItem.title = m.top.addToQueueTitle
+End Function
+
+
+Function onRemoveFromQueueTitleChange()
+  tubiLog("DetailScreen.onRemoveFromQueueTitleChange")
+  m.RemoveQueueMenuItem.title = m.top.removeQueueTitle
+End Function
+
+
+''''''''''''''''''''''
+' setInitialMenuItems
+'
+' Detail screen always has at least a play button and "add to queue" button
+' Set basic buttons first, additional buttons will be added based on the input fields of the details screen
+Function setInitialMenuItems() As Void
+  tubiLog("DetailScreen.setInitialMenuItems")
+  menuItems = CreateObject("roSGNode", "ContentNode")
+  menuItems.appendChild(m.PlayMenuItem)
+  menuItems.appendChild(m.AddQueueMenuItem)
+  ' m.AddQueueMenuItem.title = "Add to queue"
+  m.Menu.content = menuItems
+End Function
+
+
+''''''''''''''''''''''
+' addRemoveMenuItem
+'
+' add or remove a specific menu item
+' @add: boolean, add an item if true, remove if false
+' @itemIndex: int, index location of the item in the menuItems. -1 indicates the item does not exist in the menuItems.
+' @itemToAdd: one of the DetailMenuItemContentNode children of the DetailScreen (ie m.EpisodesMenuItem). This is optional for remove.
+' @previousItem: array, indicates which existing item the added item will follow. If the array contains multiple items,
+'                       the first item in the array that is found will dictate the placement of the new item, 
+'                       and all other items will be disregarded.
+' Set basic buttons first, additional buttons will be added based on the input fields of the details screen
+Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = []) As Void
+  menuItems = cloneDeep(m.Menu.content)
+
+  if add = false and itemIndex > -1
+    'menu item exists, so we need to remove it
+    menuItems.removeChildIndex(itemIndex)
+    m.Menu.content = menuItems
+  else if add = true and itemIndex = -1
+    'we don't have menu item, and need to add one
+    'find the previous item index, and insert the Watch Trailer item one index after
+    previousItemIndex = -1
+    if itemToAdd <> invalid and previousItems <> invalid and previousItems.count() > 0
+      for i=0 to previousItems.count()-1
+        previousItemIndex = getChildIndexById(menuItems, previousItems[i].id)
+        if previousItemIndex > -1
+          exit for
+        end if
+      end for
+    end if
+
+    if previousItemIndex > -1
+      menuItems.insertChild(itemToAdd, previousItemIndex + 1)
+    else
+      menuItems.appendChild(itemToAdd)
+    end if
+
+    m.Menu.content = menuItems
+  end if
 End Function
 
 
@@ -354,21 +208,11 @@ Function onMenuItemSelected()
     else if selection.id = "EpisodesMenuItem"
       m.top.episodeListSelected = true
     else if selection.id = "AddQueueMenuItem" then
-      if m.top.signedIn = true then
-        'TODO(Chris): bookmark the content and update 'shortContent' which is owned by the controller
-        addToQueue()
-      else
-        m.Dialog = m.top.createChild("ModalDialogScreen")
-        m.Dialog.title = "Please Sign in."
-        m.Dialog.message = "You must be signed in, in order to add a title to your queue."
-        m.Dialog.buttons = ["Sign in or Register", "Cancel"]
-        m.Dialog.observeField("buttonSelected", "onDialogButton")
-        m.Dialog.setFocus(true)
-      end if
+      m.top.addToQueueSelected = true
     else if selection.id = "RemoveQueueMenuItem" then
-      removeFromQueue()
+      m.top.removeFromQueueSelected = true
     else if selection.id = "RemoveHistoryMenuItem" then
-      removeFromHistory()
+      m.top.removeFromHistorySelected = true
     end if
   end if
 End Function
@@ -389,196 +233,6 @@ Function onDialogButton()
 End Function
 
 
-'''''''''''''''''''''
-' onEpisodeSelectionChange
-'
-' Show details for the selected episode
-Function onEpisodeSelectionChange()
-  tubiLog("DetailScreen.onEpisodeSelectionChange")
-  tubiLog("Episode [" + stri(m.top.episodeSelection[0]) + "," + stri(m.top.episodeSelection[1]) + "] selected")
-  drawSubComponents()
-End Function
-
-
-'''''''''''''''''''''''''''
-' loadContentDetails
-'
-'
-Function loadContentDetails(content)
-  tubiLog("DetailScreen.loadDetails")
-  constants = m.global.constants
-  options = {
-    params: {
-      "app_id": constants.settings.shortAppName
-      "platform": constants.platform
-      "content_id": content.id
-    }
-  }
-  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(content.id, m.top, "contentDetailResponse", constants.urls.cms.singleContent, constants.reqNames.getSingleContent, options)
-End Function
-
-
-Function addToQueue()
-  tubiLog("DetailScreen.addToQueue")
-  if m.isWaitingForServerResponse = false
-    m.AuthTask.functionName = "addToQueue"
-    m.AuthTask.content = m.top.content
-    m.AuthTask.observeField("bookmarkId", "onBookmarked")
-    m.AuthTask.control = "RUN"
-    m.isWaitingForServerResponse = true
-    m.AddQueueMenuItem.title = "Adding..."
-  end if
-End Function
-
-
-'''''''''''''''''''
-' onBookmarked
-'
-Function onBookmarked() As Void
-  tubiLog("DetailScreen.onBookmarked")
-  'TODO(Chris): add bookmark id to global tree
-  m.AuthTask.unobserveField("bookmarkId")
-
-  if m.AuthTask.bookmarkId = invalid then
-    code = -1
-    reason = "Unknown"
-    tubiLog("addToQueue returned " + stri(code))
-    m.isWaitingForServerResponse = false
-    showErrorModal(code, reason, addToQueue, cancelHistoryQueueChange)
-    return
-  end if
-
-  tubiLog("Got bookmarkId " + m.AuthTask.bookmarkId + " for content " + m.top.content.id)
-
-  ' TODO(Chris): Move management of this global list off to a library
-  ' or task
-
-  ' if deep linked here, we may not have the bookmarks loaded.  Also, there is the chance
-  ' of a race condition where bookmarks are in flight.
-  newBookmark = CreateObject("roSGNode", "BookmarkContentNode")
-  newBookmark.id = m.top.content.id
-  newBookmark.type = m.top.content.type
-  newBookmark.bookmarkId = m.AuthTask.bookmarkId
-  m.global.bookmarkIds.insertChild(newBookmark, 0)
-  m.top.shortContent = m.top.shortContent
-
-  'user tracking
-  m.global.trackingLoggingTask.trackEvent = {
-    trackType: "addBookmark"
-    value: m.top.content.id
-    ctx: m.top.trackingUri
-  }
-
-  ' Notify the controller so that it can react
-  m.top.addToQueueSelected = true
-End Function
-
-Function cancelHistoryQueueChange()
-  m.isWaitingForServerResponse = false
-  setMenuItems()
-End Function
-
-
-'''''''''''''''''''''
-' removeFromQueue
-'
-' This is not ideal.  We have to remove from 3 places: local content node, 
-' m.global bookmarks, and the server
-Function removeFromQueue()
-  tubiLog("DetailScreen.removeFromQueue")
-  if m.isWaitingForServerResponse = false
-    m.AuthTask.functionName = "removeFromQueue"
-    content = clone(m.top.content)
-    bookmark = m.global.bookmarkIds.findNode(content.id)
-    content.bookmarkId = bookmark.bookmarkId
-    m.AuthTask.content = content
-    m.AuthTask.observeField("result", "onBookmarkRemoved")
-    m.AuthTask.control = "RUN"
-    m.isWaitingForServerResponse = true
-    m.RemoveQueueMenuItem.title = "Removing..."
-  end if
-End Function
-
-Function onBookmarkRemoved() As Void
-  tubiLog("DetailScreen.onBookmarkRemoved")
-  m.AuthTask.unobserveField("result")
-
-  if m.AuthTask.result = invalid or m.AuthTask.result.response.code <> 204 then
-    if m.AuthTask.result <> invalid
-      code = m.AuthTask.result.response.code
-      reason = m.AuthTask.result.response.failReason
-    else
-      code = -1
-      reason = "Unknown"
-    end if
-    tubiLog("removeFromQueue returned " + stri(code))
-    m.isWaitingForServerResponse = false
-    showErrorModal(code, reason, removeFromQueue, cancelHistoryQueueChange)
-    return
-  end if
-
-  bookmarkNode = m.global.bookmarkIds.findNode(m.top.content.id)
-  if bookmarkNode <> invalid then m.global.bookmarkIds.removeChild(bookmarkNode)
-  'TODO(Chris): remove this and rely on global bookmarkIds for rendering proper menu (rather than needing a fully-realized content rendered by metadatafetchtask)
-  m.top.shortContent = m.top.shortContent
-
-  'user tracking
-  m.global.trackingLoggingTask.trackEvent = {
-    trackType: "deleteBookmark"
-    value: m.top.content.id
-  }
-
-  ' Notify the controller so that it can react
-  m.top.removeFromQueueSelected = true
-End Function
-
-'''''''''''''''''''''''
-' removeFromHistory
-'
-Function removeFromHistory()
-  tubiLog("DetailScreen.removeFromHistory")
-  if m.isWaitingForServerResponse = false
-    m.AuthTask.functionName = "removeFromHistory"
-    content = clone(m.top.content)
-    history = m.global.historyIds.findNode(m.top.content.id)
-    content.historyId = history.historyId
-    m.AuthTask.content = content
-    m.AuthTask.observeField("result", "onHistoryRemoved")
-    m.AuthTask.control = "RUN"
-    m.isWaitingForServerResponse = true
-    m.RemoveHistoryMenuItem.title = "Removing..."
-  end if
-End Function
-
-Function onHistoryRemoved() As Void
-  tubiLog("DetailScreen.onHistoryRemoved")
-  m.AuthTask.unobserveField("result")
-
-  if m.AuthTask.result = invalid or m.AuthTask.result.response.code <> 204 then
-    if m.AuthTask.result <> invalid
-      code = m.AuthTask.result.response.code
-      reason = m.AuthTask.result.response.failReason
-    else
-      code = -1
-      reason = "Unknown"
-    end if
-    tubiLog("removeFromHistory returned " + stri(code))
-    m.isWaitingForServerResponse = false
-    showErrorModal(code, reason, removeFromHistory, cancelHistoryQueueChange)
-    return
-  end if
-
-  historyNode = m.global.historyIds.findNode(m.top.shortContent.id)
-  if historyNode <> invalid
-    m.global.historyIds.removeChild(historyNode)
-  end if
-  m.top.removeFromHistorySelected = true
-
-  ' force reload the content, which will clear all the history and nowPos
-  m.top.shortContent = m.top.shortContent
-End Function
-
-
 '''''''''''''''''''''''
 ' onKeyEvent
 '
@@ -588,7 +242,7 @@ Function onKeyEvent(key As String, press As Boolean)
   tubiLog("DetailScreen.onKeyEvent key = " + key)
   if press then
     if key = "back"
-      if m.isWaitingForServerResponse = true
+      if m.top.isWaitingForServerResponse = true
         return true
       end if
     end if

@@ -28,6 +28,7 @@
     <field id="cursorPosition" alias="RowList.rowItemFocused" />
 
     <field id="animateToCategory" alias="RowList.animateToItem"/>
+    <field id="jumpToRowItem" alias="RowList.jumpToRowItem"/>
     
     <!-- set when we need to purge and reload history and queue -->
     <field id="dirtyUserCategories" type="boolean" value="false" alwaysNotify="true"/>

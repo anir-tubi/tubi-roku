@@ -14,10 +14,7 @@
   <interface>
     <!-- MetadataFetchTask response for single category content -->
     <field id="categoryResponse" type="assocarray" alwaysNotify="true"/>
-    
-    <!-- MetadataFetchTask response for single category content -->
-    <field id="categoryPreviewResponse" type="assocarray" alwaysNotify="true"/>
-    
+       
     <!-- MetadataFetchTask response for category list -->
     <field id="categoryListResponse" type="assocarray" alwaysNotify="true"/>
     
@@ -53,6 +50,9 @@
 
     <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
     <field id="cachedContent" alias="CategoryGridList.cachedContent" />
+    
+    <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
+    <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
 
     <!-- When used as a child of container screen (ex. Homescreen),
          accounts for the other visible rows (ex. On Now, Tools) -->

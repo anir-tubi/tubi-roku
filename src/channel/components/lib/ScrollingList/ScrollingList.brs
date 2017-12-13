@@ -75,6 +75,8 @@ Function onContentChange() As Void
     newNumItems = m.top.content.getChildCount()
   end if
 
+
+
   ' add or remove children as necessary
   if newNumItems > oldNumItems
     m.items.createChildren(newNumItems - oldNumItems, m.top.itemComponentName)
@@ -96,9 +98,7 @@ Function onContentChange() As Void
     if newItem <> invalid then
       newItem.content = m.top.content.getChild(i)
       ' may be invalid if component doesn't have a 'content' field
-      if (newItem.id = invalid or newItem.id = "") and newItem.content <> invalid then
-        newItem.id = newItem.content.id
-      end if
+      newItem.id = newItem.content.id
 
       if m.top.itemSpacings.count() = 0 then
         spacing = 0
@@ -303,6 +303,7 @@ Function startChangeFocus(newFocusedIndex As Integer) As Void
   unfocusedItem = m.items.getChild(m.internalItemFocused)
 
   focusedItem = m.items.getChild(newFocusedIndex)
+
   if focusedItem = invalid then return
   m.internalItemFocused = newFocusedIndex
 
@@ -352,7 +353,7 @@ End Function
 ' Animation is done.  If we aren't repeating keys or
 ' press-and-hold, the send the itemFocused update.
 Function endChangeFocus()
-  tubiLog("ScrollingList.endChangeFocus")
+  tubiLog("ScrollingList.endChangeFocus " + m.scrollAnimation.state)
   if m.scrollAnimation.state = "stopped" then
     focusedItem = m.items.getChild(m.internalItemFocused)
     if focusedItem <> invalid then

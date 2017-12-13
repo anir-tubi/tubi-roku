@@ -37,10 +37,10 @@ Function onEpisodeFocused()
     episode = getEpisodeContent(m.RowList.rowItemFocused)
     if episode <> invalid then
       m.Info.mode = "episode"
-      infoPanelContent = clone(episode)
-      infoPanelContent.episode_title = episode.title
-      infoPanelContent.title = m.top.content.title
-      m.Info.content = infoPanelContent
+      m.Info.title = m.top.content.title
+      m.Info.episodeTitle = episode.title
+      m.Info.description = episode.description
+      m.Info.calculateHeight = true
     end if
     season = m.top.content.getChild(m.RowList.rowItemFocused[0])
     if season <> invalid then
@@ -77,11 +77,11 @@ End Function
 Function setSeasonInfo(season As Integer)
   ' Display the series description when the season is being selected
   seasonContent = m.top.content.getChild(season)   ' season
-  infoContent = clone(seasonContent)
-  infoContent.description = m.top.content.description ' series description
-  infoContent.totalCount = seasonContent.getChildCount()
+  m.Info.title = seasonContent.title
+  m.Info.seasonEpisodeCount = seasonContent.getChildCount()
+  m.Info.description = m.top.content.description ' series description
   m.Info.mode = "season"
-  m.Info.content = infoContent
+  m.Info.calculateHeight = true
 End Function
 
 
@@ -90,7 +90,7 @@ Function onContentChange()
 
   m.RowList.content = m.top.content
   m.Menu.content = m.top.content
-  
+
   'set backgrounds
   if m.top.content.backgrounds <> invalid and m.top.content.backgrounds.count() > 0 then 
     m.top.backgroundUriList = m.top.content.backgrounds

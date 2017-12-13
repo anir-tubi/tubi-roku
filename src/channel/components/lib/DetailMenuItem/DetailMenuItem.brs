@@ -14,6 +14,7 @@ Function init()
 End Function
 
 Function onFocusChange()
+  tubiLog("DetailMenuItem.onFocusChange " + m.top.id + str(m.top.focusPercent))
   if m.FocusedIcon.uri <> m.UnfocusedIcon.uri
     m.FocusedIcon.opacity = m.top.focusPercent
     m.UnfocusedIcon.opacity = 1.0 - m.top.focusPercent
@@ -23,7 +24,7 @@ Function onFocusChange()
 End Function
 
 Function onContentChange()
-  tubiLog("DetailMenuItem.onContenChange")
+  tubiLog("DetailMenuItem.onContentChange")
   if m.top.content <> invalid then
     m.DetailsMenuText.text = m.top.content.title
     m.FocusedIcon.uri = m.top.content.focusIconUrl

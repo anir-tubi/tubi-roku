@@ -30,19 +30,31 @@
 
 
   <interface>
-    <field id="content" type="node" />
-      
+    <!-- INPUTS -->
+    <field id="title" alias="Title.text" />
+    <field id="episodeTitle" alias="Episode.text" />
+    <field id="releaseDate" type="string" />
+    <field id="length" type="integer" />
+    <field id="hasCC" type="boolean" />
+    <field id="rating" type="string" />
+    <field id="genres" type="stringarray" />
+    <field id="description" type="string" />
+    <field id="directors" type="stringarray" />
+    <field id="starring" type="stringarray" />
+    <field id="seasonEpisodeCount" type="integer" />
+    <field id="categoryContentCount" type="integer" />
+    <field id="calculateHeight" type="boolean" alwaysNotify="true" />
+
+
     <!-- mode is either: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
     <field id="mode" type="string" value="category" />
+
     <!-- maxHeight is the area in which the content should be centered -->
     <field id="maxHeight" type="int" value="0" />
-
     <field id="maxTitleLines" alias="Title.maxLines"/>
     <field id="numTitleLines" alias="Title.numLines"/>
     <field id="titleFontSize" alias="TitleFont.size"/>
-
     <field id="width" type="float" value="875" />
-
     <field id="ratingVisible" alias="Rating.visible"/>
   </interface>
 

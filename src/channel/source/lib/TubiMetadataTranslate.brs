@@ -2,6 +2,7 @@ Function TubiMetadataTranslate(constants As Object)
   return {
     ' public
     translateRecursive: tubiMetadataTranslate_translateRecursive
+    getContentFromCategoryJson: tubiMetadataTranslate_getContentFromCategoryJson
     
     ' private
     constants: constants
@@ -211,6 +212,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     trailer = contentFromServer.trailers[0]
     if trailer.url <> invalid and (type(trailer.url) = "roString" or type(trailer.url) = "String") then translatedContent.trailerUrls = [trailer.url]
   end if
+  if contentFromServer.has_trailer = true then translatedContent.hasTrailer = true
 
   'if this content is actually just a paginated response, set pagination data
   if contentFromServer.total_count <> invalid then translatedContent.totalCount = contentFromServer.total_count
@@ -235,3 +237,22 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   return count  
 end Function
 
+
+' returns the full metadata of a single piece of content as stored within the category json returned from UAPI cms/categories endpoint
+' may return limited metadata for the single piece of content if json does not exist or cannot be parsed
+'
+' @category: a category tubiContentNode with full category content stored in json format on the .json field
+' @index: the index at which the desired content resides within the category
+Function tubiMetadataTranslate_getContentFromCategoryJson(category, index)
+  if category <> invalid and category.json <> invalid and category.json <> "" then
+    parsed = ParseJson(category.json)
+    if parsed <> invalid then
+      fullContent = parsed.children[index]
+      translated = CreateObject("roSGNode", "TubiContentNode")
+      m.translateRecursive(fullContent, translated)
+      return translated
+    end if
+  end if
+  ' just return the abbreviated content.  This happens for user categories every time
+  return category.getChild(index)
+End Function

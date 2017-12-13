@@ -1,9 +1,25 @@
-' used to determine the index of the child with respect the parent
+' used to determine the index of the child with respect to the parent
 ' returns the index or -1 if the passed in child does not belong to the parent
 Function getChildIndex(parent, child)
   if parent.getChildCount() > 0
     for i=0 to parent.getChildCount()-1
       if parent.getChild(i).isSameNode(child)
+        return i
+      end if
+    end for
+    return -1
+  else
+    return -1
+  end if
+End Function
+
+' used to determine the index of the child having childId with respect to the parent
+' can be used if the parent along with children have been cloned and getChildIndex won't work
+' returns the index or -1 if the passed in child does not belong to the parent
+Function getChildIndexById(parent, childId)
+  if parent.getChildCount() > 0
+    for i=0 to parent.getChildCount()-1
+      if parent.getChild(i).id <> invalid and parent.getChild(i).id = childId
         return i
       end if
     end for
