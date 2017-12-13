@@ -114,7 +114,8 @@ Function onItemFocused()
   tubiLog("SearchScreen.onItemFocused")
   if m.ResultGrid.content <> invalid
     focusedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
-    m.InfoPanel.content = focusedContent
+    populateInfoPanel(focusedContent)
+
     if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
       m.top.backgroundUriList = focusedContent.backgrounds
     else
@@ -224,5 +225,28 @@ Function loadSearchResults()
   m.UpdatingMessage.visible = true
   if constants.deviceInfo.limitedNewUi = true
     m.UpdatingSpinner.visible = false
+  end if
+End Function
+
+
+'''''''''''''''''''''
+' populateInfoPanel
+'
+Function populateInfoPanel(focusedContent)
+  if focusedContent <> invalid
+    m.InfoPanel.title = focusedContent.title
+    m.InfoPanel.releaseDate = focusedContent.releaseDate
+    m.InfoPanel.genres = focusedContent.genres
+    m.InfoPanel.length = focusedContent.length
+    m.InfoPanel.rating = focusedContent.rating
+    m.InfoPanel.description = focusedContent.description
+
+    if focusedContent.showSubtitles
+      m.InfoPanel.hasCC = true
+    else
+      m.InfoPanel.hasCC = false
+    end if
+
+    m.InfoPanel.calculateHeight = true
   end if
 End Function
