@@ -36,7 +36,7 @@
   <children>
     <Poster
       id="OnNowGradient"
-      uri="pkg:/images/browse-picker-gradient.png"
+      uri="pkg:/images/browse-picker-gradient-fhd.9.png"
       width="1920"
       height="1080"
       translation="[0,0]"/>

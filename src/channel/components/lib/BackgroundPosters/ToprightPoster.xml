@@ -4,12 +4,9 @@
   <children>
     <Poster
       id="BackgroundPoster"
-      loadWidth="1615"
       width="1615"
-      loadHeight="909"
       height="909"
       uri="pkg:/images/art-blur-background.png"
-      loadDisplayMode="scaleToZoom"
       translation="[305,0]"
       opacity="0.0"
       visible="true" />

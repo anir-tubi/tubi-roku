@@ -151,12 +151,10 @@
       opacity="1.0">
       <Poster
         id="AdHeadsUpGradient"
-        loadWidth="1920"
         width="1920"
-        loadHidth="317"
         height="317"
         translation="[0,0]"
-        uri="pkg:/images/ads-countdown-gradient.png"/>
+        uri="pkg:/images/ads-countdown-gradient.9.png"/>
       <Poster
         id="AdHeadsUpCircle"
         loadWidth="66"
@@ -217,14 +215,14 @@
         height="1080"
         translation="[0,0]"
         opacity="0.0"
-        uri="pkg:/images/playback-gradient.png"/>
+        uri="pkg:/images/playback-gradient-fhd.9.png"/>
       <Poster
         id="PickerGradient"
         width="1920"
         height="1080"
         translation="[0,0]"
         opacity="0.0"
-        uri="pkg:/images/browse-picker-gradient.png"/>
+        uri="pkg:/images/browse-picker-gradient-fhd.9.png"/>
       <Poster
         uri="pkg:/images/back.png"
         width="47"

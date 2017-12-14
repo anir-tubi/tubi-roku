@@ -145,6 +145,8 @@ Function init()
     background.uri = "pkg:/images/transport/sgplayer/hd/progress-background.9.png"
     foreground = m.top.findNode("ProgressBarForeground")
     foreground.uri = "pkg:/images/transport/sgplayer/hd/white-progress-foreground.9.png"
+    m.TransportGradient.uri = "pkg:/images/playback-gradient-hd.9.png"
+    m.PickerGradient.uri = "pkg:/images/browse-picker-gradient-hd.9.png"
   end if
 End Function
 

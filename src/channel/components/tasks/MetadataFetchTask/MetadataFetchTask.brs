@@ -207,8 +207,10 @@ Function handleResponse(message)
         success = handledRequest.context.node.setField(handledRequest.context.field, handledRequest)
         tubiLog("MetadataFetchTask rendezvous duration = " + tostr(m.timespan.TotalMilliseconds() - convert_end_time))
       else
-        batchResponse = handledRequest.context.batchResponse
-        batchResponse[handledRequest.context.id] = handledRequest
+        context = handledRequest.context
+        handledRequest.context = invalid  ' to avoid circular reference
+        batchResponse = context.batchResponse
+        batchResponse[handledRequest.id] = handledRequest
 
         ' see if all responses are complete
         expected = batchResponse.count()
@@ -219,7 +221,7 @@ Function handleResponse(message)
           end if
         end for
         if completed = expected then
-          success = handledRequest.context.node.setField(handledRequest.context.field, batchResponse)
+          success = context.node.setField(context.field, batchResponse)
           tubiLog("MetadataFetchTask rendezvous duration = " + tostr(m.timespan.TotalMilliseconds() - convert_end_time))
         else
           tubiLog("MetadataFetchTask completed " + stri(completed) + " of " + stri(expected))
@@ -228,8 +230,9 @@ Function handleResponse(message)
       end if
 
       if not success
-        tubiLog("WARNING: Rendezvous failed to set response field " + handledRequest.context.field)
+        tubiLog("WARNING: Rendezvous failed to set response field")
       end if
+
     end if
   else
     tubiLog("Request handled but response was empty or node/field was invalid")

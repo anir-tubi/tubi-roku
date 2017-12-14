@@ -287,7 +287,9 @@ Function onGridFocusChange() As Void
 
   if not m.CategoryGridList.isInFocusChain() then return
   focusedContent = m.CategoryGridList.itemFocused
-  populateInfoPanel("item", focusedContent)
+  if focusedContent <> invalid
+    populateInfoPanel("item", focusedContent)
+  end if
 
   if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
     m.top.backgroundUriList = focusedContent.backgrounds
@@ -371,25 +373,23 @@ End Function
 '@mode: string, one of the valid info panel modes (see InfoPanel.brs for details)
 '@content: content node
 Function populateInfoPanel(mode, contentNode)
-  if mode = "category"
-    m.InfoPanel.mode = "category"
-    m.InfoPanel.categoryContentCount = contentNode.totalCount
-    m.InfoPanel.title = contentNode.title
-    m.InfoPanel.description = contentNode.description
-  else if mode = "item"
-    m.InfoPanel.mode = "item"
-    m.InfoPanel.title = contentNode.title
-    m.InfoPanel.description = contentNode.description
-    m.InfoPanel.releaseDate = contentNode.releaseDate
-    m.InfoPanel.length = contentNode.length
-    m.InfoPanel.rating = contentNode.rating
-    m.InfoPanel.genres = contentNode.genres
-    if contentNode.subtitleTracks <> invalid
-      m.InfoPanel.hasCC = true
-    else
-      m.InfoPanel.hasCC = false
+  if contentNode <> invalid
+    if mode = "category"
+      m.InfoPanel.mode = "category"
+      m.InfoPanel.categoryContentCount = contentNode.totalCount
+      m.InfoPanel.title = contentNode.title
+      m.InfoPanel.description = contentNode.description
+    else if mode = "item"
+      m.InfoPanel.mode = "item"
+      m.InfoPanel.title = contentNode.title
+      m.InfoPanel.description = contentNode.description
+      m.InfoPanel.releaseDate = contentNode.releaseDate
+      m.InfoPanel.length = contentNode.length
+      m.InfoPanel.rating = contentNode.rating
+      m.InfoPanel.genres = contentNode.genres
+      contentNode.subtitleTracks = (m.InfoPanel.hasCC <> invalid)
     end if
-  end if
 
-  m.InfoPanel.calculateHeight = true
+    m.InfoPanel.calculateHeight = true
+  end if
 End Function

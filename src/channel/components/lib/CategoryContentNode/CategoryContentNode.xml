@@ -14,5 +14,8 @@
 
     <!-- currently focused item index to communicate to CategoryGridRowLabel -->
     <field id="focusIndex" type="integer" value="-1"/>
+
+    <!-- State of category children none, loading, loaded -->
+    <field id="state" type="string" value="none"/>
   </interface>
 </component>

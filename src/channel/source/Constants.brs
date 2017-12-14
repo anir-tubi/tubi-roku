@@ -57,6 +57,16 @@ Function getConstants()
 
     'models that can run the new ui, but need some functionality reduced - like backgrounds and animations, etc.
     limitedNewUIModels = {
+      "2400X": true  ' LT (2011)
+      "2450X": true  ' LT (2012)
+      "2700X": true  ' LT (2013)
+      "2710X": true  ' 1 / SE
+      "2720X": true  ' 2 (2013)
+      "3000X": true  ' 2 HD
+      "3050X": true  ' 2 XD
+      "3100X": true  ' 2 XS
+      "3400X": true  ' MHL Stick
+      "3420X": true  ' MHL Stick
       "3500X": true  ' HDMI Stick (2014)
       "3700X": true  ' Express
       "3710X": true  ' Express+
@@ -526,13 +536,25 @@ Function getConstants()
         ' - the OS on a 256MB device only takes about 70MB on startup
         ' - VRAM on 256MB device is limited to 63MB and starts relieving pressure at ~90% full
         ' - Total app memory available = 256MB - 63MB - 70MB - 70MB = 53MB
-        constants.performance.categoryGridList.blockSize = 200
-        constants.performance.categoryGridList.categoryWindowSize = 3
-        constants.performance.categoryGridList.metadataCacheMaxEntries = 20  ' this is the biggest impact on number of nodes in memory
+
+        ' Tuning reference: Time to convert 200 metadata items (one category)
+        '    2450X:   600 ms   (150 ms for 50 items)
+        '    2710X:   500 ms
+        '    3500X:   500 ms
+        '    3600X:   120 ms
+        '    4200X:   100 ms
+        if lowMemory
+          constants.performance.categoryGridList.blockSize = 50
+          constants.performance.categoryGridList.categoryWindowSize = 5
+        else
+          constants.performance.categoryGridList.blockSize = 200
+          constants.performance.categoryGridList.categoryWindowSize = 5
+        end if
+        constants.performance.categoryGridList.eagerLoad = false
       else
         constants.performance.categoryGridList.blockSize = 200
-        constants.performance.categoryGridList.categoryWindowSize = 3
-        constants.performance.categoryGridList.metadataCacheMaxEntries = 20
+        constants.performance.categoryGridList.categoryWindowSize = 10
+        constants.performance.categoryGridList.eagerLoad = true
       end if
   return constants  
 end Function

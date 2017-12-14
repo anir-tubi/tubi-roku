@@ -66,12 +66,9 @@
       id="BackgroundImages" />
     <Poster
       id="BackgroundGradient"
-      loadWidth="1920"
       width="1920"
-      loadHeight="1080"
       height="1080"
       uri="pkg:/images/home-gradient-25.png"
-      loadDisplayMode="scaleToZoom"
       translation="[0,0]"
       opacity="1.0"
       visible="true" 

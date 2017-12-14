@@ -34,7 +34,6 @@
     <field id="dirtyUserCategories" type="boolean" value="false" alwaysNotify="true"/>
     
     <!-- incoming metadata from MetadataFetchTask -->
-    <field id="metadataFetchTaskResponse" type="assocarray" />
     <field id="metadataFetchTaskBatch" type="assocarray" />
     
     <!-- if a fetch error occurred, error is set with the following information
@@ -84,9 +83,6 @@
 
     <Timer
       id="RowListItemDebounce"
-      duration="0.5"/>
-    <Timer
-      id="RowListCategoryDebounce"
       duration="0.5"/>
     <Timer
       id="AnimateToCategoryDebounce"

@@ -1,6 +1,5 @@
 Function init()
   tubiLog("CategoryGridList.init")
-  m.top.observeField("metadataFetchTaskResponse", "onMetadataFetchTaskResponse")
   m.top.observeField("metadataFetchTaskBatch", "onMetadataFetchTaskBatchResponse")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("content", "onContentChange")
@@ -13,20 +12,8 @@ Function init()
 
   m.RowListItemDebounce = m.top.findNode("RowListitemDebounce")
   m.RowListItemDebounce.observeField("fire", "onRowListItemDebounce")
-  m.RowListCategoryDebounce = m.top.findNode("RowListCategoryDebounce")
-  m.RowListCategoryDebounce.observeField("fire", "onRowListCategoryDebounce")
   m.AnimateToCategoryDebounce = m.top.findNode("AnimateToCategoryDebounce")
   m.AnimateToCategoryDebounce.observeField("fire", "onAnimateToCategoryDebounce")
-  ' The metadata block cache.  Each entry has the following structure
-  '
-  '  {
-  '    id: "<category>-<offset>"
-  '    contentNode: <node reference to grid component assigned to this content block>
-  '    parentContentNode: <node reference to category parent of the content block>
-  '    index: <index of category content node in m.internalContent>
-  '  }
-  '
-  m.metadataCache = []
 
   m.constants = m.global.constants
 
@@ -34,11 +21,7 @@ Function init()
   ' is what focus thresholds trigger a fetch.
   m.blockSize = m.constants.performance.categoryGridList.blockSize
   m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
-
-  ' The most cached blocks we can have.  This should balance out with blockSize and expectations on
-  ' network performance and metadata decode speed.
-  ' Max total posters at any time is (m.blockSize * (2 * m.categoryWindowsSize + 2))
-  m.metadataCacheMaxEntries = m.constants.performance.categoryGridList.metadataCacheMaxEntries
+  m.eagerLoad = m.constants.performance.categoryGridList.eagerLoad
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
@@ -73,21 +56,6 @@ Function init()
 End Function
 
 
-'###########
-'Function onKeyEvent(key As String, press As Boolean) As Boolean
-'  if press and key = "options" then
-'    DumpCacheEntries()
-'    DumpItemStats()
-'    STOP
-'    return true
-'  end if
-'  return false
-'End Function
-'###########
-
-
-
-
 '''''''''''''''''''''''''
 ' onComponentFocusChange
 '
@@ -117,9 +85,6 @@ Function onContentModify(message)
     ' nodes between change.index1 and change.index2 inclusive were removed
     removed = m.internalContent.getChildren(change.index2-change.index1+1, change.index1)
     m.internalContent.removeChildrenIndex(change.index2-change.index1+1, change.index1)
-    for i=0 to removed.count()-1
-      metadataCacheExpireOne(removed[i].id)
-    end for
     if rowItemFocused[0] <> -1 and change.index1 < rowItemFocused[0]
       rowItemFocused[0] = rowItemFocused[0] - 1
       m.RowList.jumpToRowItem = rowItemFocused
@@ -129,7 +94,6 @@ Function onContentModify(message)
     new = clone(m.top.content.getChild(change.index1))
     replaced = m.internalContent.getChild(new, change.index1)
     m.internalContent.replaceChild(new, change.index1)
-    metadataCacheExpireOne(replaced.id)
   else if change.operation = "clear" or change.operation = "setall"
     ' clear - All the children nodes were removed
     ' setall - All the children nodes were replaced
@@ -148,8 +112,12 @@ End Function
 
 Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
+  if m.top.content = invalid
+    m.RowList.content = invalid
+    m.lastContent = invalid
+    m.internalContent = invalid
   ' This is a verbose check that makes sure we only refresh the whole RowList content if the root node is different
-  if (m.top.content <> invalid and not m.top.content.isSameNode(m.lastContent)) or (m.lastContent <> invalid and not m.lastContent.isSameNode(m.top.content)) then
+  else if not m.top.content.isSameNode(m.lastContent) or (m.lastContent <> invalid and not m.lastContent.isSameNode(m.top.content)) then
     ' Setting RowList invalid here will empty the grid.  It will be set after the first batch of
     ' metadata is received.  Setting RowList.content with a few full categories will cause it to prefetch
     ' posters and do a nice fade-in.
@@ -160,7 +128,6 @@ Function onContentChange()
     m.lastContent = m.top.content
     if m.top.content <> invalid then
       ' Clone here since we are replacing nodes within the category tree
-      m.metadataCache = []
       m.internalContent = cloneDeep(m.top.content)
       loadCategories(0)
       m.top.content.observeField("change", "onContentModify")
@@ -170,9 +137,18 @@ End Function
 
 Function onDirtyUserCategories()
   tubiLog("CategoryGridList.onDirtyUserCategories")
-  ' expire any cache entries. this will also remove them from the content tree
-  while metadataCacheExpireOne(m.constants.ui.categoryIds.queue): end while
-  while metadataCacheExpireOne(m.constants.ui.categoryIds.history): end while
+  if m.internalContent <> invalid
+    myQueue = m.internalContent.findNode(m.constants.ui.categoryIds.queue)
+    if myQueue <> invalid
+      myQueue.removeChildrenIndex(myQueue.getChildCount(), 0)
+      myQueue.state = "none"
+    end if
+    continueWatching = m.internalContent.findNode(m.constants.ui.categoryIds.history)
+    if continueWatching <> invalid
+      continueWatching.removeChildrenIndex(continueWatching.getChildCount(), 0)
+      continueWatching.state = "none"
+    end if
+  end if
 
   ' Calling this will kick off any fetches needed if the user categories
   ' are within the cache window
@@ -197,15 +173,8 @@ End Function
 ' The RowList has changed to a new category row
 Function onItemFocused()
   tubiLog("CategoryGridList.onItemFocused")
-  if m.RowList.itemFocused <> -1 then
-    m.RowListCategoryDebounce.control = "start"
-  end if
-End Function
-
-Function onRowListCategoryDebounce()
-  tubiLog("CategoryGridList.onRowLisCategoryDebounce")
   loadCategories(m.RowList.itemFocused)
-End function
+End Function
 
 ' Load the current category and its adjacent categories
 Function loadCategories(index) As Void
@@ -213,22 +182,20 @@ Function loadCategories(index) As Void
     return
   end if
 
-  categoryContent = m.internalContent.getChild(index)
-  if categoryContent <> invalid then
-    ' Make sure adjacent categories are warm
-    requests = []
-    for i = index - m.categoryWindowSize to index + m.categoryWindowSize
-      adjacent = m.internalContent.getChild(i)
-      if adjacent <> invalid then
-        request = fetch(adjacent, adjacent.id, i, "", m.blockSize)
-        if request <> invalid then
-          requests.push(request)
-        end if
+  requests = []
+  windowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
+  for i = windowStart to (windowStart + m.categoryWindowSize)-1
+    category = m.internalContent.getChild(i)
+    ' If category.json is not empty, category is already loaded
+    if category <> invalid and category.state = "none" then
+      request = getRequest(category.id, i, "", m.blockSize)
+      if request <> invalid then
+        requests.push(request)
       end if
-    end for
-    if requests.count() > 0 then
-      m.global.metadataFetchTask.batchRequest = m.metadataFetchTaskDTO.createBatchRequest(m.top, "metadataFetchTaskBatch", requests)
     end if
+  end for
+  if requests.count() > 0 then
+    m.global.metadataFetchTask.batchRequest = m.metadataFetchTaskDTO.createBatchRequest(m.top, "metadataFetchTaskBatch", requests)
   end if
 End Function
 
@@ -277,22 +244,30 @@ End Function
 Function onMetadataFetchTaskBatchResponse(message) As Void
   tubiLog("CategoryGridList.onMetadataFetchTaskBatchResponse")
   responses = message.GetData()
-  for each requestId in responses
-    mergeMetadata(responses[requestId])
-  end for
+  if responses <> invalid
+    batchMaxIndex = 0
+    for each requestId in responses
+      index = mergeMetadata(responses[requestId])
+      if index > batchMaxIndex
+        batchMaxIndex = index
+      end if
+    end for
 
-  ' Delayed setting of Rowlist content until first batch arrives
-  if m.RowList.content = invalid then
-    m.RowList.content = m.internalContent
+    if m.eagerLoad then
+      loadCategories(batchMaxIndex+1)
+    end if
+
+    ' Delayed setting of Rowlist content until first batch arrives
+    if m.RowList.content = invalid then
+      m.RowList.content = m.internalContent
+    end if
+
+    ' free references to the batch so that it can be garbage collected
+    m.top.metadataFetchTaskBatch = invalid
   end if
 End Function
 
-Function onMetadataFetchTaskResponse(message) As Void
-  tubiLog("CategoryGridList.onMetadataFetchTaskResponse")
-  mergeMetadata(message.GetData())
-End Function
-
-Function mergeMetadata(fetched) As Void
+Function mergeMetadata(fetched)
   ' TODO(Chris): handle this better.  if we set an error it should also be reset hwen the category is next fetched
   newContent = invalid
   response = fetched.response
@@ -307,40 +282,34 @@ Function mergeMetadata(fetched) As Void
     if response.code = 400 then
       newContent = CreateObject("roSGNode", "TubiContentNode")
     else
-      return
+      return -1
     end if
   else
     newContent = fetched.convertedMetadata
   end if
 
-  entry = metadataCacheHasEntry(fetched.id)
-  if entry = -1 then
-    'entry was expired before reponse made it here, ignore it
-    tubiLog("Ignoring response for expired block " + fetched.id)
-    return
-  end if
-
   tubiLog("Received response for request id " + fetched.id)
-  m.metadataCache[entry].contentNode = newContent.getChild(0)
-  parentCategory = m.metadataCache[entry].parentContentNode
-  index = m.metadataCache[entry].index
+  index = -1
+  categories = m.internalContent.getChildren(m.internalContent.getChildCount(), 0)
+  for i=0 to categories.count()-1
+    if categories[i].id = fetched.id then
+      index = i
+      exit for
+    end if
+  end for
+  parentCategory = m.internalContent.getChild(index)
 
   ' Check if a response arrives but the cache has been flushed and categories moved, such as adding or removing user categories
-  if parentCategory <> invalid and not parentCategory.isSameNode(m.internalContent.getChild(index)) then
+  if parentCategory = invalid then
     tubiLog("Ignoring response due to changed index " + fetched.id)
-    return
+    return -1
   end if
 
-  ' Add the new content
-  if parentCategory <> invalid then
-    ' These fields don't come down with the category metadata parent
-    newContent.id = parentCategory.id
-    newContent.title = parentCategory.title
-    newContent.addField("focusIndex", "integer", false)
-    m.internalContent.replaceChild(newContent, index)
-    m.metadataCache[entry].parentContentNode = newContent
-    parentCategory = newContent
-  end if
+  ' These fields don't come down with the category metadata parent
+  newContent.id = parentCategory.id
+  newContent.title = parentCategory.title
+  newContent.state = "loaded"
+  m.internalContent.replaceChild(newContent, index)
 
   ' If RowList gets content for a focused row, it doesn't automatically emit rowItemFocused so we manually handle that here
   if index = m.RowList.rowItemFocused[0] and m.RowList.rowItemFocused[1] = -1 then
@@ -349,43 +318,37 @@ Function mergeMetadata(fetched) As Void
   if m.top.firstPosterLoaded = false then
     m.top.firstPosterLoaded = true
   end if
+  return index
 End Function
 
 
 '''''''''''''''''''''
-' fetch
+' getRequest
 '
 ' Load a single category's content
-Function fetch(parentContentNode As Object, categoryId As String, index As Integer, field="categoryResponse" As String, per_page=0 As Integer)
+Function getRequest(categoryId As String, index As Integer, field="categoryResponse" As String, per_page=0 As Integer)
   tubiLog("CategoryGridList.fetch " + categoryId)
 
   if categoryId = m.constants.ui.categoryIds.queue or categoryId = m.constants.ui.categoryIds.history then
     per_page = 0
   end if
 
-  requestId = categoryId + "-0"
-
   ' if there is already a request in the cache, just refresh its cache position
   request = invalid
-  if metadataCacheHasEntry(requestId) <> -1 then
-    tubiLog("CategoryGridList.fetch: Skipping duplicate request for " + requestId)
+  if categoryId = m.constants.ui.categoryIds.queue then
+    request = bookmarksRequest(categoryId, field)
+  else if categoryId = m.constants.ui.categoryIds.history then
+    request = historyRequest(categoryId, field)
   else
-    if categoryId = m.constants.ui.categoryIds.queue then
-      request = bookmarksRequest(requestId, field)
-    else if categoryId = m.constants.ui.categoryIds.history then
-      request = historyRequest(requestId, field)
-    else
-      request = categoryRequest(requestId, field, categoryId, per_page)
-    end if
-
-    ' If global bookmark or history ids are unavailable then we will get invalid
-    if request = invalid then
-      tubiLog("CategoryGridList.fetch: Unvailable request for category " + categoryId)
-    else
-      tubiLog("CategoryGridList.fetch: Asking MetadataFetchTask for " + requestId)
-    end if
+    request = categoryRequest(categoryId, field, categoryId, per_page)
   end if
-  metadataCachePush(parentContentNode, categoryId, index)
+
+  ' If global bookmark or history ids are unavailable then we will get invalid
+  if request = invalid then
+    tubiLog("CategoryGridList.fetch: Unvailable request for category " + categoryId)
+  else
+    tubiLog("CategoryGridList.fetch: Asking MetadataFetchTask for " + categoryId)
+  end if
   return request
 End Function
 
@@ -450,119 +413,4 @@ Function bookmarksRequest(requestId As String, field As String) As Object
   end for
   request = Bookmarks.getFullBookmarksReq(idList)
   return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, m.constants.reqNames.getFullBookmarks, request.options, false, idList)
-End Function
-
-
-''''''''''''''''''''
-' Metadata Cache management
-'
-Function metadataCacheHasEntry(id As String) As Integer
-  for i=0 to m.metadataCache.count()-1
-    if m.metadataCache[i].id = id then return i
-  end for
-  return -1
-End Function
-
-
-'''''''''''''''''''''''''''
-' metadataCacheExpireOne
-'
-' Expire one entry, optionally giving a categoryId to only expire items for that
-' category
-'
-' returns true if entry was expired, or false if a categoryId was given and no entries matched
-Function metadataCacheExpireOne(categoryId="" As String) As Boolean
-  expired = invalid
-  ' expire one entry
-  if categoryId="" then
-    expired = m.metadataCache.Shift()
-  else
-    ' find an entry whose category matches
-    for i=0 to m.metadataCache.count()-1
-      if Left(m.metadataCache[i].id, Len(categoryId)) = categoryId then
-        expired = m.metadataCache[i]
-        m.metadataCache.Delete(i)
-        exit for
-      end if
-    end for
-  end if
-
-  ' cache was empty or categoryId was given and no matches found
-  if expired = invalid then
-    return false
-  end if
-
-  'tubiLog("Expiring cache entry for " + expired.id)
-  if expired.contentNode = invalid then
-    'print "CANCELLING IN-FLIGHT REQUEST for " + expired.id
-    ' Cancel in-flight requests.  There is a race condition here where response may have already come in.
-    ' We need to check for this at the response handler.
-    m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(expired.id, m.top, "categoryResponse")
-  else
-    ' remove the entries from the contentnode tree
-    parent = expired.parentContentNode
-    if parent <> invalid then
-      parent.removeChildrenIndex(parent.getChildCount(), 0)
-      parent.offset = 0
-    end if
-  end if
-  return true
-End Function
-
-Function metadataCachePush(parentContentNode As Object, categoryId As String, index As Integer)
-  id = categoryId + "-0"
-
-  ' check if entry already exists and reset its cache position
-  i = metadataCacheHasEntry(id)
-  if i <> -1 then
-    'print "FOUND CACHE ENTRY AT INDEX " + stri(i) + ". RESETTING ITS POSITION " + id
-    entry = m.metadataCache[i]
-    m.metadataCache.Delete(i)
-    m.metadataCache.Push(entry)
-  else
-    ' put the new entry in first so we can detect expire case D and keep blocks adjacent to the new block
-    entry = {
-      id: id
-      category: categoryId
-      contentNode: invalid
-      parentContentNode: parentContentNode
-      index: index
-    }
-    m.metadataCache.Push(entry)
-
-    if m.metadataCache.count() >= m.metadataCacheMaxEntries then
-      metadataCacheExpireOne()
-    end if      
-  end if
-End Function
-
-
-''''''''''''''''''''
-' Debugging Helpers
-''''''''''''''''''''
-
-
-Function DumpCacheEntries()
-  for i=0 to m.metadataCache.count()-1
-    entry = m.metadataCache[i]
-    hasData = (entry.contentNode <> invalid)
-    print "METADATA-CACHE[" + stri(i) + "]: " + entry.id + " hasData = " + hasData.toStr()
-  end for
-End Function
-
-Function DumpItemStats()
-  gridList = m.ScrollingList.findNode("Items")
-  for i=0 to gridList.getChildCount()-1
-    grid = gridList.getChild(i)
-    if grid.content = invalid then
-      id = ""
-      numContent = 0
-    else
-      id = grid.content.id
-      numContent = grid.content.getChildCount()
-    end if
-    gridItems = grid.findNode("ContentsMask").findNode("Items")
-    numItems = gridItems.getChildCount()
-    print "CATEGORY-GRID-LIST[" + id + "] numContent=" + stri(numContent) + " numItems=" + stri(numItems)
-  end for
 End Function

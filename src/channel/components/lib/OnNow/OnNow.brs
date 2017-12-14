@@ -16,6 +16,11 @@ Function init()
   m.isInPlayerMode = false
   m.adSuppressionDuration = 5 * 60  ' seconds until ads start showing
   m.adSuppressionExpire = 0 'Uptime(0) + m.adSuppressionDuration
+
+  if m.global.constants.deviceInfo.scaledUi = true then
+    onNowGradient = m.top.findNode("OnNowGradient")
+    onNowGradient.uri = "pkg:/images/browse-picker-gradient-hd.9.png"
+  end if
 End Function
 
 Function autohideWhenPlaying()
