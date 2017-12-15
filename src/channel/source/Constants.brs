@@ -59,6 +59,7 @@ Function getConstants()
     limitedNewUIModels = {
       "2400X": true  ' LT (2011)
       "2450X": true  ' LT (2012)
+      "2500X": true  ' HD
       "2700X": true  ' LT (2013)
       "2710X": true  ' 1 / SE
       "2720X": true  ' 2 (2013)
