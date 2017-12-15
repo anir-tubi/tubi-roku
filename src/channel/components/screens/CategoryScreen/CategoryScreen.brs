@@ -291,10 +291,14 @@ Function onGridFocusChange() As Void
     populateInfoPanel("item", focusedContent)
   end if
 
-  if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
-    m.top.backgroundUriList = focusedContent.backgrounds
-  else
-    m.top.backgroundUriList = [m.defaultBackgroundUri]
+  ' If focus is on an empty category, leave the background as is.  This helps avoid
+  ' background jank and keeps CPU usage down while categories are being fetched.
+  if focusedContent <> invalid
+    if focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
+      m.top.backgroundUriList = focusedContent.backgrounds
+    else
+      m.top.backgroundUriList = [m.defaultBackgroundUri]
+    end if
   end if
 
   'update the tracking URI

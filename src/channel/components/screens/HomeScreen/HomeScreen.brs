@@ -32,11 +32,6 @@ Function onScreenFocusChange() As Void
     if m.top.hasFocus() then
     'this typically happens if the homescreen is regaining focus after returning from the details screen or a modal (like "About")
       m.focusTarget.setFocus(true)
-
-      'ensure that the category screen has its background image reloaded if it is gaining focus
-      if type(m.focusTarget) = "roSGNode" and m.focusTarget.isSameNode(m.CategoryScreen)
-        m.top.backgroundUriList = m.top.backgroundUriList
-      end if
     end if
   end if
 End Function
@@ -162,7 +157,6 @@ Function showCategoryScreen(show)
     animate(m.CategoryScreen, {destination: [0, 0], opacity: 1.0, duration: 0.4})
     m.CategoryScreen.infoVisible = true
     m.top.backgroundType = "topright"
-    m.top.backgroundUriList = m.CategoryScreen.backgroundUriList
     m.focusTarget = m.CategoryScreen
   else if not show and m.CategoryScreen.isInFocusChain()
     animate(m.CategoryScreen, {destination: [0, 392], opacity: 0.2, duration: 0.4})

@@ -53,6 +53,8 @@ Function init()
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
 
+  ' suppress debounce if we have just gained focus
+  m.justGainedFocus = false
 End Function
 
 
@@ -63,6 +65,7 @@ Function onComponentFocusChange()
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
   if m.top.hasFocus() then
     m.RowList.setFocus(true)
+    m.justGainedFocus = true
   end if
 End Function
 
@@ -204,9 +207,11 @@ End Function
 '
 ' @rowItemIndex is 2D array of [rowindex, itemindex] from RowList.rowItemSelected or m.RowList.rowItemFocused
 Function resolveAbbreviatedContent(rowItemIndex)
-  category = m.internalContent.getChild(rowItemIndex[0])
-  if category <> invalid then
-    return m.metadataTranslate.getContentFromCategoryJson(category, rowItemIndex[1])
+  if m.internalContent <> invalid
+    category = m.internalContent.getChild(rowItemIndex[0])
+    if category <> invalid then
+      return m.metadataTranslate.getContentFromCategoryJson(category, rowItemIndex[1])
+    end if
   end if
   return invalid
 End Function
@@ -225,11 +230,16 @@ End Function
 Function onRowItemFocused()
   tubiLog("CategoryGridList.onRowItemFocused")
 
-  m.RowListItemDebounce.control = "start"
-  ' immediately update the position counter
-  category = m.internalContent.getChild(m.RowList.rowItemFocused[0])
-  if category <> invalid then
-    category.focusIndex = m.RowList.rowItemFocused[1]
+  if m.justGainedFocus
+    onRowListItemDebounce()
+    m.justGainedFocus = false
+  else
+    m.RowListItemDebounce.control = "start"
+    ' immediately update the position counter
+    category = m.internalContent.getChild(m.RowList.rowItemFocused[0])
+    if category <> invalid then
+      category.focusIndex = m.RowList.rowItemFocused[1]
+    end if
   end if
 End Function
 
