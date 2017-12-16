@@ -9,76 +9,13 @@ Function Main(startupArgs as Dynamic)
   auth = TubiAuth(constants, request)
   tracking = TubiTracking(constants, request, auth)
 
-  if constants.deviceInfo.newUi = true
-    'run remote config for devices in the newUI - anything not in the oldUI models list
-    externalConfig = TubiExternalConfig(request, constants)
-    externalConfig.init() 'sets external config values on constants
-  end if
-
-  'check external config values to see if limitedNewUi (ie. Roku TVs - 5000X) get the new ui or old ui
-  if constants.deviceInfo.limitedNewUi = true
-    'default the models that require limited versions of the new ui to receive the old ui
-    constants.deviceInfo.newUi = false
-    if constants.deviceInfo.model = "3500X"
-      if constants.externalConfig.info["limited_newui_3500_enabled"] = 1 then
-        constants.deviceInfo.newUi = true
-      end if
-    else if constants.externalConfig.info.limited_newui_enabled = 1
-      constants.deviceInfo.newUi = true
-    end if
-  end if
-
-  if constants.deviceInfo.newUi = true
-    MainNewUI(startupArgs, constants)
-  else
-    MainOldUI(startupArgs)
-  end if
-
-End Function
-
-
-
-
-
-
-Sub MainOldUI(params as Dynamic)
-  placeholderCanvas = CreateObject( "roImageCanvas" )
-  placeholderCanvas.SetMessagePort(CreateObject("roMessagePort"))
-  placeholderCanvas.Show()
-
-  app = AdriseApp(params)
-  m.app = app
-
-  ' This will only run for the test mode
-  if app.settings.mode = "test"
-    print "Starting all the tests..."
-    BrsTestMain()
-    return
-  end if
-
-  ' apply hotpatch to main brightscript thread
-  ' this also verifies startup network connectivity
-  if Hotpatch(app.settings.hotPatchUrlOldUI) <> 0 then
-    showErrorDialog()
-    return ' exit the app on error.  scene graph exits anyway once
-              ' we destroy a Scene and try to create it again.
-  end if
-
-  app.runApp()
-  placeholderCanvas.close()
-
-end Sub
-
-
-
-''''''''''''''''''''
-' Simple main to launch the unit tests if mode is "test".
-' Otherwise, exit immediately.
-'
-Function MainNewUI(args As Dynamic, constants As Object)
+  'run remote config
+  externalConfig = TubiExternalConfig(request, constants)
+  externalConfig.init() 'sets external config values on constants
 
   settings = getSettings()
 
+  ' launch the unit tests if mode is "test". Otherwise, exit immediately.
   if settings.mode = "test" then
     BrsTestMain()
     END
@@ -135,8 +72,8 @@ Function MainNewUI(args As Dynamic, constants As Object)
               ' we destroy a Scene and try to create it again.
   end if
 
-  m.global.channel.runChannel(args, m.global.adShim, port)
-end Function
+  m.global.channel.runChannel(startupArgs, m.global.adShim, port)
+End Function
 
 
 
@@ -252,6 +189,4 @@ Function showErrorDialog()
   end while
 
   screen.close()
-
 End Function
-

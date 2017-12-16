@@ -40,21 +40,6 @@ Function getConstants()
       "3420X": true  ' MHL Stick      
     }
 
-    'all models that are not in this list will run the new UI
-    oldUIModels = {
-      "2400X": true  ' LT (2011)
-      "2450X": true  ' LT (2012)
-      "2500X": true  ' HD
-      "2700X": true  ' LT (2013)
-      "2710X": true  ' 1 / SE
-      "2720X": true  ' 2 (2013)
-      "3000X": true  ' 2 HD
-      "3050X": true  ' 2 XD
-      "3100X": true  ' 2 XS
-      "3400X": true  ' MHL Stick
-      "3420X": true  ' MHL Stick
-    }
-
     'models that can run the new ui, but need some functionality reduced - like backgrounds and animations, etc.
     limitedNewUIModels = {
       "2400X": true  ' LT (2011)
@@ -106,12 +91,6 @@ Function getConstants()
       lowMemory = true
     else
       lowMemory = false
-    end if
-
-    if oldUIModels[di.GetModel()] <> invalid
-      newUi = false
-    else
-      newUi = true
     end if
 
     if limitedNewUIModels[di.GetModel()] <> invalid
@@ -176,7 +155,6 @@ Function getConstants()
     constants.deviceInfo.captionsMode = di.GetCaptionsMode()
     constants.deviceInfo.countryCode = countryCode ' will be invalid if old version of firmware
     constants.deviceInfo.lowMemory = lowMemory
-    constants.deviceInfo.newUi = newUi
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
     constants.deviceInfo.limitedNewUi = limitedNewUi
     constants.deviceInfo.clientVersion = clientVersion
@@ -406,36 +384,12 @@ Function getConstants()
       constants.ui.categoryIds.history = "continue_watching"
       constants.ui.categoryIds.queue = "my_queue"
 
-    constants.ui.text = {}
-      'a default text to serve as the title of the page until the UI receives category information
-      constants.ui.text.titleText = "Welcome to Tubi TV"
-
-      constants.ui.text.defaultCategoryDescription = "You are now tuned in to Tubi TV. Your home for all the best content. If you love it, we got it."
-      constants.ui.text.resumePlayButton = "Resume "
-      constants.ui.text.playButton = "Play"
-      constants.ui.text.playFromStartButton = "Play From Start"
-      constants.ui.text.episodeListButton = "Episodes List"
-      constants.ui.text.subtitlesButton = "Subtitles"
-      constants.ui.text.addToQueueButton = "Add To Queue"
-      constants.ui.text.removeFromQueueButton = "Remove From Queue"
-      constants.ui.text.removeFromHistoryButton = "Remove From History"
-
     constants.ui.contentTypes = {}
       constants.ui.contentTypes.series = "series"
       constants.ui.contentTypes.video = "video"
       constants.ui.contentTypes.episode = "episode"
       constants.ui.contentTypes.season = "season"
       constants.ui.contentTypes.category = "category"
-
-    'used as label ids in the videos options list
-    constants.ui.options = {}
-      constants.ui.options.resume = "resume"
-      constants.ui.options.playOption = "playOption"
-      constants.ui.options.episodes = "episodes"
-      constants.ui.options.subtitles = "subtitles"
-      constants.ui.options.removeQueue = "removeQueue"
-      constants.ui.options.addQueue = "addQueue"
-      constants.ui.options.removeHistory = "removeHistory"
 
     'screen ids in the UI
     constants.ui.screenIds = {}
@@ -491,19 +445,6 @@ Function getConstants()
       constants.ui.colors.episodeInnerBorder = constants.ui.colors.backgroundColor
       constants.ui.colors.searchUpdatingText = constants.ui.colors.secondaryText
 
-    'amounts that may be used throughout the UI
-    constants.ui.amounts = {}
-      constants.ui.amounts.loadedPosters = 42 'used to determine how many posters to initialize in a category
-      constants.ui.amounts.posterBuffer = 14
-      constants.ui.amounts.maxPosters = 42 'used to determine the max amount of posters in a category allowed at one time
-      constants.ui.amounts.categoryReplaceWait = 0.5 'number of seconds to wait before updating category contents
-      constants.ui.amounts.viewTitleAreaDescriptionMaxLines = 4
-      constants.ui.amounts.categoryContentItemsNumRows = 2
-      constants.ui.amounts.categoryContentItemsNumRowsFeatured = 3
-      constants.ui.amounts.seasonContentNumRows = 1
-      constants.ui.amounts.numVisibleEpisodes = 3
-      constants.ui.amounts.numVisibleSeasons = 2
-
     'fonts for UI elmements
     constants.ui.fonts = {}
       constants.ui.fonts.openSans = {}
@@ -520,12 +461,6 @@ Function getConstants()
       constants.ui.fonts.videoOptionsFontType = constants.ui.fonts.openSans.regular
       constants.ui.fonts.seasonFontType = constants.ui.fonts.openSans.regular
       constants.ui.fonts.episodeFontType = constants.ui.fonts.openSans.regular
-
-    'boolean settings for UI elements
-    constants.ui.booleans = {}
-      constants.ui.booleans.isPosterLabelVisible = false
-      constants.ui.booleans.isPosterLabelVisibleFeatured = true
-      constants.ui.booleans.isEpisodeLabelVisible = true
 
     ' Set some performance parementers based on device profile
     constants.performance = {}

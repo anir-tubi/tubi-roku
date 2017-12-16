@@ -10,34 +10,8 @@ settings:
   hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/{{versionMinorDotted}}.newui.brs"
   remoteComponentsHost: "http://cdn.adrise.com/hotpatches/roku/components"
   appName: "Tubi TV"
-  isLiveTVOn: true
-  isRokuAdFrameworkOn: false
   migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"
   allowAfterHours: true
-
-  #the settings below are exclusively used for the old UI version of the app that runs on low powered devices
-  pubid: "00000000_DEFAULT_PUB_ID_00000000"
-  zoneid: "tubitv_roku"
-  imageSize: "214x306"
-  GridStyle: "Flat-Movie"
-  SetPosterStyle: "rounded-rect-16x9-generic"
-  adrise_bg: "#222223"
-  adrise_fontcolor: "#EBEBEB"
-  show_details_screen: true
-  subscription: false
-  vezoSubscription: false
-  newThumbnailStrategy: false
-  allowVezoSubscription: false
-  registerWithTubi: true
-  vezoServer: "http://vezo.tv"
-  allowRentals: false
-  show_language: false
-  show_country: false
-  proxyUrl: "none"
-  proxyFolder: "none"
-  hotPatchUrlOldUI: "http://cdn.adrise.com/hotpatches/roku/2.4.oldui.brs"
-  adrise_loadingurl: "pkg:/images/FREETVMOVIES_Tubi_icon_no-background_336x201"
-
 
 manifest:
   title: "Tubi TV"
@@ -55,61 +29,3 @@ component_library_manifest:
   subtitle: "Remote loading for scenegraph components"
   sg_component_libs_provided: "TubiRemoteLibrary"
   hidden: 1
-
-theme:
-  ThemeType: "flat-movie"
-  BackgroundColor: "#222223"
-  GridScreenBackgroundColor: "#222223"
-  BannerBackgroundColor: "none"
-  GridScreenMessageColor: "#FFFFFF"
-  GridScreenDescriptionTitleColor: "#ff9900"
-  GridScreenDescriptionDateColor: "#666666"
-  GridScreenDescriptionRuntimeColor: "#666666"
-  GridScreenDescriptionSynopsisColor: "#929292"
-  GridScreenRetrievingColor: "#cccccc"
-  GridScreenListNameColor: "#cccccc"
-  CounterTextLeft: "#FFFFFF"
-  CounterSeparator: "#FFFFFF"
-  ButtonMenuNormalText: "#888888"
-  ButtonMenuHighlightText: "#ff8800"
-  CounterTextRight: "#FFFFFF"
-  SpringboardTitleText: "#AAAAAA"
-  SpringboardSynopsisColor: "#AAAAAA"
-  SpringboardDirectorColor: "#666666"
-  SpringboardDirectorLabelColor: "#888888"
-  SpringboardActorColor: "#666666"
-  SpringboardGenreColor: "#666666"
-  SpringboardRuntimeColor: "#888888"
-  BreadcrumbTextLeft: "#cccccc"
-  PosterScreenLine1Text: "#888888"
-  PosterScreenLine2Text: "#CCCCCC"
-  BreadcrumbTextRight: "#cccccc"
-  GridScreenLogoOffsetHD_X: "0"
-  GridScreenLogoOffsetHD_Y: "0"
-  GridScreenLogoOffsetSD_X: "0"
-  GridScreenLogoOffsetSD_Y: "0"
-  GridScreenBorderOffsetHD: "(-10,-11)"
-  GridScreenBorderOffsetSD: "(-23,-20)"
-  GridScreenDescriptionOffsetHD: "(200,258)"
-  GridScreenDescriptionOffsetSD: "(102,145)"
-  OverhangOffsetSD_X: "0"
-  OverhangOffsetSD_Y: "0"
-  OverhangOffsetHD_X: "0"
-  OverhangOffsetHD_Y: "0"
-  OverhangPrimaryLogoOffsetHD_X: "0"
-  OverhangPrimaryLogoOffsetHD_Y: "0"
-  GridScreenLogoHD: "pkg:/images/oldUI/TubiTV_GridscreenLogo_HD_1280x65.jpg"
-  GridScreenLogoSD: "pkg:/images/oldUI/TubiTV_GridscreenLogo_SD_720x45.jpg"
-  TallBannerHD: "pkg:/images/oldUI/TubiTV_TallBanner_HD_1280x135.jpg"
-  TallBannerSD: "pkg:/images/oldUI/TubiTV_TallBanner_SD_720x125.jpg"
-  GridScreenFocusBorderHD: "pkg:/images/oldUI/frame-glow-hd3.png"
-  GridScreenFocusBorderSD: "pkg:/images/oldUI/frame-glow-sd3.png"
-  GridScreenDescriptionImageHD: "pkg:/images/oldUI/bubble-hd.png"
-  GridScreenDescriptionImageSD: "pkg:/images/oldUI/bubble-sd.png"
-  GridScreenOverhangHeightHD: "65"
-  GridScreenOverhangHeightSD: "45"
-  OverhangLogoHD: "pkg:/images/oldUI/TubiTV_TallBanner_HD_1280x135.jpg"
-  OverhangLogoSD: "pkg:/images/oldUI/TubiTV_TallBanner_SD_720x125.jpg"
-  RegistrationCodeColor: "#ff9900"
-  ParagraphBodyText: "#FFFFFF"
-  ParagraphHeaderText: "#FFFFFF"
