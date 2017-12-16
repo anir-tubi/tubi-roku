@@ -29,9 +29,10 @@ sub init()
     [0,0]
     [1920,1080]
     [1280,720]
+    [646,364]
   ]
   m.numExperiments = m.imageUris.count() * m.loadDisplayModes.count() * m.loadSizes.count()
-  m.testIndex = 16
+  m.testIndex = 0
   setExperiment(m.testIndex)
   m.top.setFocus(true)
 end sub

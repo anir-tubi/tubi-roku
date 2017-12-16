@@ -4,6 +4,8 @@
   <children>
     <Poster
       id="Image"
+      width="1920"
+      height="1080"
       translation="[0,0]"/>
     <Rectangle
       id="Shade"
