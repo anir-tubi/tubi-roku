@@ -148,10 +148,12 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     else if key = "fastforward" or key = "right" then
       if m.Keyboard.hasFocus() then
         m.Keyboard.jumpToItem = 0
+        return true
       end if
     else if key = "rewind" or key = "left" then
       if m.Keyboard.hasFocus() then
         m.Keyboard.jumpToItem = m.Keyboard.content.getChildCount() - 1
+        return true
       end if
     end if
   end if
