@@ -7,7 +7,7 @@ settings:
   adLoadingBackgroundColor: "#222223"
   adLoadingFontColor: "#EBEBEB"
   loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
-  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/{{versionMinorDotted}}.newui.brs"
+  hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/{{versionMinorDotted}}.brs"
   remoteComponentsHost: "http://cdn.adrise.com/hotpatches/roku/components"
   appName: "Tubi TV"
   migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"

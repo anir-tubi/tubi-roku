@@ -8,18 +8,13 @@ const {load, parse} = require('./config');
 bluebird.promisifyAll(fs);
 
 
-function getHotpatchSourcePath(ui, build) {
-  let filename = '';
-  filename = `${build.major_version}.${build.minor_version}.${ui}.brs`;
-
-  const pathToHotpatch = path.join(process.cwd(), 'src', 'hotpatch', filename);
-
-  return pathToHotpatch;
+function getHotpatchSourcePath(build) {
+  const filename = `${build.major_version}.${build.minor_version}.brs`;
+  return path.join(process.cwd(), 'src', 'hotpatch', filename);
 }
 
-
-function getHotpatchDestinationPath(ui, build) {
-  const filename = `${build.major_version}.${build.minor_version}.${ui}.brs`;
+function getHotpatchDestinationPath(build) {
+  const filename = `${build.major_version}.${build.minor_version}.brs`;
   return path.join(process.cwd(), 'build', 'hotpatch', filename);
 }
 
@@ -50,36 +45,32 @@ function createHotpatch(buildProfile) {
   const build = parse('build', true).manifest;
   const versionUnderscored = `${build.major_version}_${build.minor_version}_${build.build_version}`;
 
-  const uis = ['oldui', 'newui'];
+  const hotpatchSourcePath = getHotpatchSourcePath(build);
+  const hotpatchDestinationPath = getHotpatchDestinationPath(build);
+  const remoteComponentsLocation = getRemoteComponentsLocation(buildProfile, build);
 
-  uis.forEach(ui => {
-    const hotpatchSourcePath = getHotpatchSourcePath(ui, build);
-    const hotpatchDestinationPath = getHotpatchDestinationPath(ui, build);
-    const remoteComponentsLocation = getRemoteComponentsLocation(buildProfile, build);
+  //this sets up the template values that will be placed in the template
+  const handlebarData = {
+    profile: buildProfile,
+    versionUnderscored,
+    remoteComponentsLocation,
+  };
 
-    //this sets up the template values that will be placed in the template
-    const handlebarData = {
-      profile: buildProfile,
-      versionUnderscored,
-      remoteComponentsLocation,
-    };
-
-    //read the hotpatch source file, fill the template, and write to output directory
-    if (hotpatchSourcePath !== '') {
-      fs.readFileAsync(hotpatchSourcePath, 'utf8')
-      .then((data) => {
-        const template = Handlebars.compile(data, { noEscape: true });
-        const hotpatchOutput = template(handlebarData);
-        return fs.writeFileAsync(hotpatchDestinationPath, hotpatchOutput);
-      })
-      .then(() => {
-        console.log(`Hotpatch for ${ui} built.`);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-    }
-  });
+  //read the hotpatch source file, fill the template, and write to output directory
+  if (hotpatchSourcePath !== '') {
+    fs.readFileAsync(hotpatchSourcePath, 'utf8')
+    .then((data) => {
+      const template = Handlebars.compile(data, { noEscape: true });
+      const hotpatchOutput = template(handlebarData);
+      return fs.writeFileAsync(hotpatchDestinationPath, hotpatchOutput);
+    })
+    .then(() => {
+      console.log(`Hotpatch built.`);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+  }
 }
 
 
