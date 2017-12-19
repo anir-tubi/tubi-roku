@@ -59,6 +59,13 @@ Function getConstants()
       "5000X": true  ' TV (low specs)
     }
 
+    ' these are non-OpenGL but CPU significantly faster than the "old" devices
+    limitedNewUIWithFastCPU = {
+      "3700X": true
+      "3710X": true
+      "5000X": true
+    }
+
     'models that do not run the system CC overlay/dialog during video playback
     noFirmwareCaptionMenuModels = {
       "2400X": true  ' LT (2011)
@@ -95,8 +102,14 @@ Function getConstants()
 
     if limitedNewUIModels[di.GetModel()] <> invalid
       limitedNewUi = true
+      if limitedNewUIWithFastCPU[di.GetModel()] <> invalid
+        fastCpu = true
+      else
+        fastCpu = false
+      end if
     else
       limitedNewUi = false
+      fastCpu = true
     end if
 
     if noFirmwareCaptionMenuModels[di.GetModel()] <> invalid
@@ -155,6 +168,7 @@ Function getConstants()
     constants.deviceInfo.captionsMode = di.GetCaptionsMode()
     constants.deviceInfo.countryCode = countryCode ' will be invalid if old version of firmware
     constants.deviceInfo.lowMemory = lowMemory
+    constants.deviceInfo.fastCpu = fastCpu
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
     constants.deviceInfo.limitedNewUi = limitedNewUi
     constants.deviceInfo.clientVersion = clientVersion
@@ -479,14 +493,19 @@ Function getConstants()
         '    3500X:   500 ms
         '    3600X:   120 ms
         '    4200X:   100 ms
+        '    3710X:   150 ms
+        '    5000X:   160 ms
         if lowMemory
           constants.performance.categoryGridList.blockSize = 50
-          constants.performance.categoryGridList.categoryWindowSize = 5
         else
           constants.performance.categoryGridList.blockSize = 200
+        end if
+        if fastCpu
+          constants.performance.categoryGridList.categoryWindowSize = 10
+        else
           constants.performance.categoryGridList.categoryWindowSize = 5
         end if
-        constants.performance.categoryGridList.eagerLoad = false
+        constants.performance.categoryGridList.eagerLoad = true
       else
         constants.performance.categoryGridList.blockSize = 200
         constants.performance.categoryGridList.categoryWindowSize = 10

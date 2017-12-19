@@ -6,7 +6,6 @@ Function init()
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
   m.RowList = m.top.findNode("RowList")
-  m.RowList.observeField("itemFocused", "onItemFocused")
   m.RowList.observeField("rowItemFocused", "onRowItemFocused")
   m.RowList.observeField("rowItemSelected", "onRowItemSelected")
 
@@ -22,6 +21,11 @@ Function init()
   m.blockSize = m.constants.performance.categoryGridList.blockSize
   m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
   m.eagerLoad = m.constants.performance.categoryGridList.eagerLoad
+
+  ' If eager loading, we don't need to listen for row changes
+  if not m.eagerLoad
+    m.RowList.observeField("itemFocused", "onItemFocused")
+  end if
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
@@ -151,11 +155,16 @@ Function onDirtyUserCategories()
       continueWatching.removeChildrenIndex(continueWatching.getChildCount(), 0)
       continueWatching.state = "none"
     end if
+
+    ' reload the categories
+    ' this is done separately in case they are not contiguous or overlap
+    ' a fetch window
+    myQueueIndex = getChildIndex(m.internalContent, myQueue)
+    loadCategories(myQueueIndex)
+    continueWatchingIndex = getChildIndex(m.internalContent, continueWatching)
+    loadCategories(continueWatchingIndex)
   end if
 
-  ' Calling this will kick off any fetches needed if the user categories
-  ' are within the cache window
-  loadCategories(m.RowList.itemFocused)
 End Function
 
 ' animateToCategory doesn't cause rowItemFocused or itemFocused to be triggered unless
@@ -195,6 +204,7 @@ Function loadCategories(index) As Void
       if request <> invalid then
         requests.push(request)
       end if
+      category.state = "loading"
     end if
   end for
   if requests.count() > 0 then

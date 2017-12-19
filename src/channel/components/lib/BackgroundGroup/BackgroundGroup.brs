@@ -374,9 +374,14 @@ Function addLowMemBackground()
   end if
 
   poster = newBackground.findNode("BackgroundPoster")
-  ' Reduce VRAM usage by 25%
-  poster.loadWidth = poster.loadWidth * 0.5
-  poster.loadHeight = poster.loadHeight * 0.5
+
+  ' Expecting background images to be 1920x1080, setting loadWidth/loadHeight causes:
+  '  - VRAM usage 9% of unscaled (450K from 8MB)
+  '  - load time comparable to unscaled image (no improvement but no worse, ~800ms on 3500X)
+  '  - resampling of scaled image so it still looks acceptable
+  poster.loadWidth = "640"
+  poster.loadHeight = "360"
+  poster.loadDisplayMode = "scaleToZoom"
   poster.uri = m.top.backgroundUriList[0]
 
   m.top.appendChild(newBackground)
@@ -395,10 +400,10 @@ Function updateLowMemBackground()
     if backgroundGradient.uri <> "pkg:/images/home-gradient-25.png"
       backgroundImage.visible = false
       backgroundGradient.uri = "pkg:/images/home-gradient-25.png"
-      backgroundImage.uri = m.top.backgroundUriList[0]
       backgroundImage.width="1615"
       backgroundImage.height="909"
       backgroundImage.translation="[305,0]"
+      backgroundImage.uri = m.top.backgroundUriList[0]
       backgroundImage.visible = true
     else if not m._.empty(m.top.backgroundUriList)
       backgroundImage.uri = m.top.backgroundUriList[0]
@@ -411,13 +416,12 @@ Function updateLowMemBackground()
       else
         backgroundGradient.visible = true
       end if
-
       backgroundImage.visible = false
       backgroundGradient.uri = "pkg:/images/detail-gradient-25.png"
-      backgroundImage.uri = m.top.backgroundUriList[0]
       backgroundImage.width="1920"
       backgroundImage.height="1080"
       backgroundImage.translation="[0,0]"
+      backgroundImage.uri = m.top.backgroundUriList[0]
       backgroundImage.visible = true
     else if not m._.empty(m.top.backgroundUriList)
       if m.top.backgroundUriList[0] = m.blurredDefaultBackground
