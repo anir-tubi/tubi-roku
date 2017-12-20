@@ -448,6 +448,12 @@
       </Group>  <!-- Transport -->
     </Group>  <!-- HUD -->
     
+    <!-- RAF needs a parent group with no other elements, otherwise it will use
+      - the Group dimensions set by the other children and not scale appropriately.
+      -->
+    <Group
+      id="RAFAdContainer"/>
+
   <Timer
     id="ScrubTimer"
     duration="0.25"

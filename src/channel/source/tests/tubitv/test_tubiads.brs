@@ -63,12 +63,10 @@ Function testGetAdsListViaRoku(t As Object)
 End Function
 
 
-
 ' helper to initialize TubiAds module and stub the request so get ads always returns nothing
 Function createTubiAds()
   constants = getConstants()
   request = TubiRequest()
-  requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
   translate = TubiMetadataTranslate(constants)
   metadataFetch = TubiMetadataFetch(constants, request, translate)
@@ -80,7 +78,6 @@ Function createTubiAds()
   utils = {
     constants: constants
     request: request
-    requestQueue: requestQueue
     tracking: tracking
     auth: auth
     metadataFetch: metadataFetch
@@ -88,8 +85,7 @@ Function createTubiAds()
   }
 
   port = CreateObject("roMessagePort")
-  requestQueue = utils.requestQueue.create(port)
-  ads = TubiAds(utils, requestQueue)
+  ads = TubiAds(utils)
   ads.populateUrl = Function(episode)
     ' deliberately fake so it fails and RAF.getAds() returns invalid
     return "http://127.0.0.1/"

@@ -5,7 +5,6 @@ Function TubiTracking (constants, request, auth)
     auth: auth
     trackUserEvent: tubiTracking_trackUserEvent
     trackAdEvent: tubiTracking_trackAdEvent
-    getTrackingTags: tubiTracking_getTrackingTags
     getTrackData: tubiTracking_getTrackData
     getUserTrackingRequest: tubiTracking_getUserTrackingRequest
   }
@@ -47,7 +46,7 @@ end function
 
 
 '@evt: assocArray: has the following fields
-'           trackType: string, corresponds to one of the eventTypes found in getTrackingTags
+'           trackType: string, corresponds to one of the eventTypes found in getTrackData
 '           value: dynamic, depends on the eventType
 '           ctx: dynamic, depends on the eventType
 '           extraCtx: dynamic, depends on the eventType
@@ -67,21 +66,6 @@ function tubiTracking_trackUserEvent(evt as Object)
     end if
   end if
 
-end function
-
-
-
-' --------------------------------------------------------
-' .getTrackingTags (xml_tags)
-' --------------------------------------------------------
-function tubiTracking_getTrackingTags(xml_tags)
-  ret = []
-  count = 0
-  For Each item in xml_tags
-      ret[count] = item.GetText()
-      count = count + 1
-  next
-  return ret
 end function
 
 

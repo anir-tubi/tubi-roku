@@ -3,14 +3,12 @@
 '
 '''''''
 Function TubiSGAdShim(utils, port)
-  requestQueue = utils.requestQueue.create(port)
   return {
     utils: utils
     constants: utils.constants
     run: tubiSGAdShim_run
-    ads: TubiAds(utils, requestQueue)
+    ads: TubiAds(utils)
     port: port
-    requestQueue: requestQueue
     videoAdsList: invalid
     resumePlayAdsList: invalid
     handleControlMessage: tubiSGAdShim_handleControlMessage
@@ -190,14 +188,9 @@ Function tubiSGAdShim_preroll(episode As Object, cuepoint As Integer)
 
   'otherwise if the user is starting from beginning or resuming on a cue point, show ads
   'attempt to get list of ads and play them for preroll
-  if m.ads.isRokuAdFrameworkOn = true
-    m.ads.getAdsListViaRoku(episode)
-    hasAds = m.ads.allAdUnitsList.count() > 0
-  else
-    m.videoAdsList = m.ads.getAdsList(episode)
-    hasAds = m.videoAdsList <> invalid
-  end if
-  
+  m.ads.getAdsListViaRoku(episode)
+  hasAds = m.ads.allAdUnitsList.count() > 0
+
   if hasAds
     m.videoPlayerNode.adState = "adspending"
   else
@@ -216,22 +209,8 @@ End Function
 Function tubiSGAdShim_playAds(episode As Object, cuepoint As Integer)
   m.videoPlayerNode.adState = "adsplaying"
 
-  ' set up a video ad
-  canvas = CreateObject("roImageCanvas")
-  canvas.SetMessagePort(m.playerPort)
-  canvas.SetLayer(1, {color: "#000000"})
-  canvas.Show()
-
-  'otherwise if the user is starting from beginning or resuming on a cue point, show ads
-  'attempt to get list of ads and play them for preroll
-  if m.ads.isRokuAdFrameworkOn = true
-    status = m.ads.showCommercialBreakViaRoku(canvas)
-  else
-    status = m.ads.showCommercialBreak(canvas, m.videoAdsList) 'videoAdsList can be invalid
-  end if
-
-  canvas.close()
-
+  adContainer = m.videoPlayerNode.findNode("RAFAdContainer")
+  status = m.ads.showCommercialBreakViaRoku(adContainer)
   if status = m.constants.player.playerResults.closed
     m.videoPlayerNode.adState = "adsclosed"
   else

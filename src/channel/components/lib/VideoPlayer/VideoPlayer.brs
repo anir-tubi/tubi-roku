@@ -628,6 +628,7 @@ Function onAdStateChange()
     ' set the m.Video.control prior to the m.Video.seek to ensure that the video is not started from the beginning even if m.playerPosition <> 0.
     ' this is a seeming inconsistency with the firmware and should not neccessarily work this way, but it does.
     ' normally we would expect to set the seek prior to setting control to "play"
+    m.top.setFocus(true)
     m.VideoState = "play"
     m.Video.control = "play"
     m.Video.seek = m.playerPosition
@@ -642,6 +643,7 @@ Function onAdStateChange()
     ' VOD playback so we skip restarting the video. Resuming play in the VOD case was
     ' causing a bug where there was a very long black screen after exiting an ad break 
     ' via the back button (i assume the render thread was busy caching the video segments).
+    m.top.setFocus(true)
     if m.Video.content.isLiveTV
       m.Video.seek = m.playerPosition
       m.Video.control = "play"

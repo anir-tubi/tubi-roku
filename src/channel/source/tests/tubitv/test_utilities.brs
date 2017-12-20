@@ -1,8 +1,3 @@
-Sub testAdd(t as object)
-  t.assertEqual( (1+2), 3)
-  t.assertEqual( 0+1, 1)
-End Sub
-
 Sub testEnv(t as object)
   settings = getSettings()
   env = settings.mode
@@ -14,9 +9,4 @@ Sub testManifest(t as object)
   title = manifest.title
   t.assertNotInvalid(title)
   t.assertNotEqual(title, "")
-End Sub
-
-Sub testTheme(t as object)
-  theme = getTheme()
-  t.assertNotInvalid(theme)
 End Sub
