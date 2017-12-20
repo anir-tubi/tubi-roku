@@ -95,7 +95,6 @@
         <Label
           id="CategoryLine1">
           <Font
-            id="Vaud27px"
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"
             size="27" />
@@ -114,8 +113,12 @@
         opacity="0.5"
         visible="true">
         <Label
-          id="SeasonLine1"
-          font="dictionary:Vaud27px" />
+          id="SeasonLine1">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27" />
+        </Label>
       </LayoutGroup>
       
       <LayoutGroup
@@ -129,8 +132,12 @@
           vertAlignment="center" >
           <Label
             id="Line1"
-            opacity="0.5"
-            font="dictionary:Vaud27px" />
+            opacity="0.5">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
           <Rectangle
             id="ClosedCaptionRectangle"
             height="36"
@@ -162,8 +169,12 @@
           id="Line2"
           opacity="0.5"
           width="875"
-          ellipsizeOnBoundary="true"
-          font="dictionary:Vaud27px"/>
+          ellipsizeOnBoundary="true">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27" />
+        </Label>
       </LayoutGroup>
       
       <Label
@@ -172,8 +183,12 @@
         lineSpacing="16"
         maxLines="5"
         wrap="true"
-        color="0xFFFFFFFF"
-        font="dictionary:Vaud27px" />
+        color="0xFFFFFFFF">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27" />
+      </Label>
 
       <LayoutGroup
         id="DirectorGroup"
@@ -183,9 +198,13 @@
         <Label
           id="DirectorTag"
           text="Directed by"
-          font="dictionary:Vaud27px"
           visible="true" 
-          opacity="0.5"/>
+          opacity="0.5">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27" />
+        </Label>
         <!-- this layout group pushes the separator rectangle up 2 pixels -->
         <LayoutGroup
           layoutDirection="vert">
@@ -201,11 +220,15 @@
         </LayoutGroup>
         <Label
           id="Director"
-          font="dictionary:Vaud27px"
           color="0xFFFFFFFF"
           ellipsizeOnBoundary="true"
           width="710"        
-          visible="true" />
+          visible="true">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27" />
+        </Label>
       </LayoutGroup>
 
       <LayoutGroup
@@ -216,9 +239,13 @@
         <Label
           id="StarringTag"
           text="Starring"
-          font="dictionary:Vaud27px"
           visible="true" 
-          opacity="0.5"/>
+          opacity="0.5">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27" />
+        </Label>
         <LayoutGroup
           layoutDirection="vert">
           <Rectangle 
@@ -233,11 +260,15 @@
         </LayoutGroup>
         <Label
           id="Starring"
-          font="dictionary:Vaud27px"
           color="0xFFFFFFFF"
           ellipsizeOnBoundary="true"
           width="710"
-          visible="true" />
+          visible="true" >
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27" />
+        </Label>
       </LayoutGroup>
     </LayoutGroup>
   </children>
