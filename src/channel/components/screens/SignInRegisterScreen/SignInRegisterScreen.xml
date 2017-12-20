@@ -26,7 +26,7 @@
   <children>
     <Label
       translation="[0,188]"
-      text="Sign in or Register for Free on Tubi TV"
+      text="Sign in or Register for Free on Tubi"
       horizAlign="center"
       width="1920">
       <Font
@@ -76,7 +76,7 @@
       itemSpacings="[86]"
       opacity="0.5">
      <Label
-       text="Register for free at tubitv.com or sign in to an existing account"
+       text="Register for free at tubi.tv or sign in to an existing account"
        wrap="true"
        width="480">
        <Font

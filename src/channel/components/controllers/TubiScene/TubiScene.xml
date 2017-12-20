@@ -4,7 +4,7 @@
  -
  - This the main scene that remotely loads the ContentController which in turn builds the CategoryScreen and the DetailsScreen, etc.
  - In order for remote loading of the scenegraph app to work, we have to sign the package, that is downloaded via the url in the
- - ComponentLibrary tag, with the same developer id as is used to create the Tubi TV app.
+ - ComponentLibrary tag, with the same developer id as is used to create the Tubi app.
  -
  - Please see https://sdkdocs.roku.com/display/sdkdoc/ComponentLibrary for more info on remotely loading scenegraph components 
  -

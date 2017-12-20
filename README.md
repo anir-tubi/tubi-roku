@@ -103,8 +103,8 @@ This will:
     - Verify a clean build directory to avoid uncommited changes in the build
     - Increment the build number in the manifest and generated Settings.brs file
     - Tag the source tree
-    - Build `tubitv_remote_components.pkg`
-    - Build `tubitv_roku.pkg`
+    - Build `tubi_remote_components.pkg`
+    - Build `tubi_roku.pkg`
 
 The following is example output of running the release target:
 
@@ -116,7 +116,7 @@ Incremented the build number to 2.1.33
 Tagging 2_1_33
 Generated the file: build/source/Settings.brs.
 Generated the file build/manifest.
-Project tubitv_roku.zip is built with profile production.
+Project tubi_roku.zip is built with profile production.
 
 If you are intending this to be a formal release, create a pull request for the current branch
     git branch release_2_1_33
@@ -127,7 +127,7 @@ Remember to push the new tag to remote with 'git push --tags origin'
 
 - Create "empty" hotpatch on the CDN named `x.y.brs`, where x and y are major and minor version numbers.
 - Make sure to update the version number in the hotpatch.
-- Copy the newly created `tubitv_remote_components.pkg` file to the CDN and rename it to `tubitv_remote_components_x_y_z.pkg`
+- Copy the newly created `tubi_remote_components.pkg` file to the CDN and rename it to `tubi_remote_components_x_y_z.pkg`
 - Push the tag created during `make release` to GitHub
 - Create a GitHub release for the tag with title "Submission Build" and set as "Pre Release"
 - Upload the build to Roku via the development portal
@@ -147,13 +147,13 @@ Remember to push the new tag to remote with 'git push --tags origin'
 - Create a staging build for the latest production version number and 
   - checkout out the "Submission Release" tag.
   - run `make ROKU_PROFILE=staging install`
-  - package the `tubitv_roku_x_y_z.zip` file
+  - package the `tubi_roku_x_y_z.zip` file
   - update the staging private channel with the newly created package via the Roku Developer Portal
 
 ##### Building for Remote Components Deployment
 - **Before updating any functionality, checkout the tag for the latest Roku Submission Release so you are building on what is in production**
 - Run `make release`
-- Copy the newly created `tubitv_remote_components.pkg` file to the CDN and rename it to `tubitv_remote_components_x_y_z.pkg` where x, y, and z are the major, minor, and build numbers after the version number was incremented during `make release`
+- Copy the newly created `tubi_remote_components.pkg` file to the CDN and rename it to `tubi_remote_components_x_y_z.pkg` where x, y, and z are the major, minor, and build numbers after the version number was incremented during `make release`
 - Update the version number in the hotpatch
 - Push the tag created during `make release` to GitHub
 - Create a GitHub release for the tag with title "Remote Release"

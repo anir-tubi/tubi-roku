@@ -9,12 +9,11 @@ settings:
   loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
   hotPatchUrl: "http://cdn.adrise.com/hotpatches/roku/{{versionMinorDotted}}.brs"
   remoteComponentsHost: "http://cdn.adrise.com/hotpatches/roku/components"
-  appName: "Tubi TV"
   migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"
   allowAfterHours: true
 
 manifest:
-  title: "Tubi TV"
+  title: "Tubi"
   subtitle: "What TV was meant to be"
   mm_icon_focus_hd: "pkg:/images/channel-icon-hd-540x405.png"
   splash_screen_fhd: "pkg:/images/splash-fhd.png"
@@ -25,7 +24,7 @@ manifest:
   uri_resolution_autosub: "$$RES$$,sd,hd,fhd"
 
 component_library_manifest:
-  title: "Tubi TV Component Library"
+  title: "Tubi Component Library"
   subtitle: "Remote loading for scenegraph components"
   sg_component_libs_provided: "TubiRemoteLibrary"
   hidden: 1

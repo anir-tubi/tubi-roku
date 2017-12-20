@@ -415,7 +415,7 @@ End Function
 Function onAboutSelected()
   tubiLog("ContentController.onAboutSelected")
   m.aboutScreen = CreateObject("roSGNode", "ModalDialogScreen")
-  m.aboutScreen.title = "About Tubi TV"
+  m.aboutScreen.title = "About Tubi"
   message = "Version " + m.constants.settings.version.Replace("_",".") + Chr(10)
   message = message + Chr(10)
   message = message + Chr(169) + " 2017 Tubi, Inc. all rights reserved." + Chr(10) ' + Chr(13)
@@ -441,7 +441,7 @@ End Function
 Function onPrivacySelected()
   tubiLog("ContentController.onPrivacySelecte")
   m.privacyText = CreateObject("roSGNode", "ModalDialogScreen")
-  m.privacyText.title = "Tubi TV Privacy Policy"
+  m.privacyText.title = "Tubi Privacy Policy"
   m.privacyText.scrollable = true
   'm.privacyText.message = legal
   m.privacyText.buttons = ["Close"]
