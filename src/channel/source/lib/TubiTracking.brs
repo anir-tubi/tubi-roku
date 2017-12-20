@@ -4,45 +4,10 @@ Function TubiTracking (constants, request, auth)
     request: request
     auth: auth
     trackUserEvent: tubiTracking_trackUserEvent
-    trackAdEvent: tubiTracking_trackAdEvent
     getTrackData: tubiTracking_getTrackData
     getUserTrackingRequest: tubiTracking_getUserTrackingRequest
   }
 End Function
-
-
-' --------------------------------------------------------
-' .trackAdEvent(evt)
-' --------------------------------------------------------
-function tubiTracking_trackAdEvent(evt)
-
-  ' ------------AdUnit Events------------------
-  if evt.trackType = "click" then
-    For Each trackUrl in evt.adUnit.clickTrack
-      trackUrl = strReplace(trackUrl, "[", "")
-      trackUrl = strReplace(trackUrl, "]", "")
-      clickRequest = m.request.createAsync(trackUrl, "trackClick")
-      evt.requestQ.pushRequest(clickRequest)
-    end for
-
-  else if evt.trackType = "imp" then
-    For Each trackUrl in evt.adUnit.impTrack
-      trackUrl = strReplace(trackUrl, "[", "")
-      trackUrl = strReplace(trackUrl, "]", "")
-      impRequest = m.request.createAsync(trackUrl, "trackImp")
-      evt.requestQ.pushRequest(impRequest)
-    end for
-
-  else if evt.trackType = "viewthru" then
-    For Each trackUrl in evt.adUnit.viewthru[evt.adPercentage]
-      trackUrl = strReplace(trackUrl, "[", "")
-      trackUrl = strReplace(trackUrl, "]", "")
-      evt.adUnit.viewthru[evt.adPercentage] = "" ' making sure it doesn't get fired again
-      viewThruRequest = m.request.createAsync(trackUrl, "trackViewThru")
-      evt.requestQ.pushRequest(viewThruRequest)      
-    end for
-  end if
-end function
 
 
 '@evt: assocArray: has the following fields

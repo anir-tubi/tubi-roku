@@ -324,8 +324,11 @@ end function
 
 ' ----------------------------------------------
 ' showCommercialBreakViaRoku
+'
+' containerNode is any empty Group node under which RAF will create a child video node of its own, and
+' remove it on completion of showAds()
 ' ----------------------------------------------
-function tubiAds_showCommercialBreakViaRoku(node)
+function tubiAds_showCommercialBreakViaRoku(containerNode)
   ' ShowVariable(m.allAdUnitsList, "ALL AD UNITS LIST", 4)
   if m.allAdUnitsList.count() > 0
     currentAdPosition = 1
@@ -339,7 +342,7 @@ function tubiAds_showCommercialBreakViaRoku(node)
             total: m.totalAdBreakAds
           }
 
-          isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList[0], screenCount, node)
+          isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList[0], screenCount, containerNode)
 
           '#####
           ' WORKAROUND FOR RAF MEMORY LEAK, still present in RAF 1.9
@@ -407,10 +410,6 @@ end function
 ' (expect that the player object will be the main video player for the channel)
 ' ----------------------------------------------
 function tubiAds_getResumingPlayAds(episode, player)
-  shouldBreak = false
   m.getAdsListViaRoku(episode)
-  if m.allAdUnitsList.count() > 0
-    shouldBreak = true
-  end if
-  return shouldBreak
+  return (m.allAdUnitsList.count() > 0)
 end function
