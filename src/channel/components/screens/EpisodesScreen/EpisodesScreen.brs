@@ -136,7 +136,7 @@ End Function
 '
 Function focusGrid()
   m.RowList.setFocus(true)
-  if m.global.constants.deviceInfo.limitedNewUi
+  if m.global.constants.deviceInfo.limitedUi
     m.RowList.translation = [85,m.RowList.translation[1]]
     m.Menu.translation = [-425,m.Menu.translation[1]]
   else
@@ -152,7 +152,7 @@ End Function
 Function focusMenu()
   m.Menu.animateToItem = m.RowList.currFocusRow
   m.Menu.setFocus(true)
-  if m.global.constants.deviceInfo.limitedNewUi
+  if m.global.constants.deviceInfo.limitedUi
     m.RowList.translation = [525,m.RowList.translation[1]]
     m.Menu.translation = [65,m.Menu.translation[1]]
   else

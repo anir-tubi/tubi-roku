@@ -155,7 +155,7 @@ Function showCategoryMenu()
     m.CategoryList.animateToItem = Int(m.CategoryGridList.currFocusRow)
     m.CategoryList.setFocus(true)
     m.categoryListIsFocused = true
-    if m.global.constants.deviceInfo.limitedNewUi
+    if m.global.constants.deviceInfo.limitedUi
       m.ContentArea.translation = [517,m.ContentArea.translation[1]]
       m.CategoryList.translation = [60,m.CategoryList.translation[1]]
     else
@@ -171,7 +171,7 @@ Function hideCategoryMenu()
   if m.CategoryList.isInFocusChain()
     m.CategoryGridList.setFocus(true)
     m.categoryListIsFocused = false
-    if m.global.constants.deviceInfo.limitedNewUi
+    if m.global.constants.deviceInfo.limitedUi
       m.ContentArea.translation = [85,m.ContentArea.translation[1]]
       m.CategoryList.translation = [-380,m.CategoryList.translation[1]]
     else

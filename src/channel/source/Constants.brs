@@ -40,8 +40,8 @@ Function getConstants()
       "3420X": true  ' MHL Stick      
     }
 
-    'models that can run the new ui, but need some functionality reduced - like backgrounds and animations, etc.
-    limitedNewUIModels = {
+    'models that need some functionality reduced - like backgrounds and animations, etc.
+    limitedUIModels = {
       "2400X": true  ' LT (2011)
       "2450X": true  ' LT (2012)
       "2500X": true  ' HD
@@ -60,7 +60,7 @@ Function getConstants()
     }
 
     ' these are non-OpenGL but CPU significantly faster than the "old" devices
-    limitedNewUIWithFastCPU = {
+    limitedUIWithFastCPU = {
       "3700X": true
       "3710X": true
       "5000X": true
@@ -100,15 +100,15 @@ Function getConstants()
       lowMemory = false
     end if
 
-    if limitedNewUIModels[di.GetModel()] <> invalid
-      limitedNewUi = true
-      if limitedNewUIWithFastCPU[di.GetModel()] <> invalid
+    if limitedUIModels[di.GetModel()] <> invalid
+      limitedUi = true
+      if limitedUIWithFastCPU[di.GetModel()] <> invalid
         fastCpu = true
       else
         fastCpu = false
       end if
     else
-      limitedNewUi = false
+      limitedUi = false
       fastCpu = true
     end if
 
@@ -147,7 +147,7 @@ Function getConstants()
     for i=0 to clientVersionNums.count()-1
       clientVersion = clientVersion + clientVersionNums[i] + "."
     end for
-    clientVersion = clientVersion + "newui.local"
+    clientVersion = clientVersion + "local"
 
     constants.deviceInfo.deviceId = di.GetDeviceUniqueId()
     constants.deviceInfo.deviceAdId = di.GetAdvertisingId()
@@ -170,7 +170,7 @@ Function getConstants()
     constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.fastCpu = fastCpu
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
-    constants.deviceInfo.limitedNewUi = limitedNewUi
+    constants.deviceInfo.limitedUi = limitedUi
     constants.deviceInfo.clientVersion = clientVersion
     constants.deviceInfo.language  = di.GetCurrentLocale().Left(2)
     constants.deviceInfo.scaledUi = scaledUi
@@ -479,7 +479,7 @@ Function getConstants()
     ' Set some performance parementers based on device profile
     constants.performance = {}
       constants.performance.categoryGridList = {}
-      if limitedNewUi
+      if limitedUi
         ' Notes:
         ' - lowMemory devices may have 512MB but will have 256MB minimum.
         ' - the player needs about 70MB headroom to function well (calculated as free+cached)

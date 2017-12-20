@@ -223,7 +223,7 @@ Function loadSearchResults()
   m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", url, constants.reqNames.searchAPI, options)
 
   m.UpdatingMessage.visible = true
-  if constants.deviceInfo.limitedNewUi = true
+  if constants.deviceInfo.limitedUi = true
     m.UpdatingSpinner.visible = false
   end if
 End Function

@@ -1,7 +1,7 @@
-print "Hot Patch 2.5.newui {{profile}}"
+print "Hot Patch 2.5 {{profile}}"
 
 '''''''''''''''''''''''''''''''
-'settings.version must be updated manually in the new ui hotpatch file
+'settings.version must be updated manually in the hotpatch file
 'when a new remote components version is released
 m.global.utils.constants.settings.version = "{{versionUnderscored}}"
 ' Set the most current remote components URL.  These should only increment build number.  Minor or major version number differences indicate

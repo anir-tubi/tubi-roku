@@ -23,7 +23,7 @@ Function updateBackground()
   TubiLog("BackgroundGroup.updateBackground")
   m.updateCount = m.updateCount + 1
 
-  if m.global.constants.deviceInfo.limitedNewUi = true
+  if m.global.constants.deviceInfo.limitedUi = true
     ' we have a low spec device that won't handle transitions so make it basic
     if m.top.getChildCount() = 0
       addLowMemBackground()
@@ -193,7 +193,7 @@ Function setUpBackground()
 
   m.top.backgroundUriList = [m.blurredDefaultBackground]
 
-  if m.global.constants.deviceInfo.limitedNewUi = true
+  if m.global.constants.deviceInfo.limitedUi = true
     addLowMemBackground()
   else
     'set the blurred background - opacity is still 0 at this point

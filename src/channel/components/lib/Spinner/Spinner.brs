@@ -4,7 +4,7 @@ Function init()
   m.top.observeField("height", "onDimensionsChange")
 
   ' Non-OpenGL slow devices look really poor with clunky spinner
-  if m.global.constants.deviceInfo.limitedNewUi = false
+  if m.global.constants.deviceInfo.limitedUi = false
     m.Animation = m.top.findNode("SpinnerAnimation")
     m.top.observeField("visible", "onVisibilityChange")
     if m.top.visible then

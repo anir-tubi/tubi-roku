@@ -9,15 +9,14 @@
 	- Signed Out state
 		- Signed Out state doesn't show user categories
 		- Signed Out state lands on feature grid by default on start
-		- newUI: Add to Queue is shown on details screen but leads to a modal
-		- oldUI: Add to Queue and Remove From History do not appear on details screens
+		- Add to Queue is shown on details screen but leads to a modal
 		- signed out state persists across channel launches, lands on Sign-In disambiguation screen
 	- Transitions
 		- After successful sign in, feature grid is shown
 		- After successful sign in, user categories are shown
 		- After successful sign out, feature grid is shown
 		- Sign in succeeds when launched from category screen
-		- newUI: Sign in succeeds when launched from detail screen adding to queue
+		- Sign in succeeds when launched from detail screen adding to queue
 - "My Queue"
 	- Can add videos to my queue, show up on web
 	- Can add series to my queue, show up on web
@@ -53,15 +52,13 @@
 	- videos play with pre-roll, mid-roll ads
 	- video is full-screen, even on Roku 4
 	- transport works: pause/play/ff/rew
-	- oldUI: left/right works as 10s scrub
 	- subtitles menu pops up on "*", both when paused and during playback
-	- oldUI: live tv playback works
 - Ads
 	- play full screen
 	- can be paused
 	- cannot be ff or rew
 	- back goes to detail screen
-- Trailers (new ui only)
+- Trailers
 	- trailers show on detail screen menu for movies which have them
 	- trailers return to detail screen after finished playing
 - Network error handling
@@ -79,26 +76,23 @@
 	    - on
 	    - off
 	    - instant replay
-	- oldUI: subtitles selection on detail page changes global caption setting
-	- oldUI/software (Roku LT):
+	- software subtitle selection (Roku 3)
 		- on
 		- off
 		- instant replay
-	- oldUI/firmware (Roku TV):
+	- firmware subtitle selection (Roku TV):
 		- on
 		- off
 		- instant replay
 - Autoplay
 	- movies
 	- series
-- Old UI specific
-	- Low-spec devices show old ui by default
-	- playback shows pre-roll and mid-roll ads
-	- categories are limited to 80 items
-	- no crashes after 2 ad breaks
+- Old devices specifically:
+	- categories are limited to 50 items
+	- no crashes after 2 ad breaks, 5 titles
 
 ## Screens - verify visually
-- New UI
+- Full UI
     - Grid Screen
     - Detail Screen
 	    - Play
@@ -110,16 +104,18 @@
     - Privacy
     - Sign in Disambiguation
     - Sign in
-- Old UI
-  - Grid Screen
-  - Detail Screen
-  - Series/Episode Screen
-  - Search Screen
-  - Search Results Screen
-  - Privacy Policy
-  - Sign in disambiguation
-  - Sign in smart phone
-  - Sign in reg code
+- Limited UI
+    - Grid Screen
+    - Detail Screen
+	    - Play
+	    - Resume
+    - Episode Selection Screen
+    - Sign in username/password
+    - Sign in reg code
+    - About
+    - Privacy
+    - Sign in Disambiguation
+    - Sign in
 
 ## Negative testing
 - Fast navigation; fast button pressing

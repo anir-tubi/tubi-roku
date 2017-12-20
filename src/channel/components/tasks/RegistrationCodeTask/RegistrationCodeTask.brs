@@ -55,7 +55,7 @@ Function registrationLoop() As Void
         else
           'didn't receive a valid response when requesting a code
           tubiLog("Reg code generation failed " + stri(result.response.code))
-          'this event will only fire once per attempt to get code, not on every retry like the oldui code did
+          'this event will only fire once per attempt to get code, not on every retry
           m.global.trackingLoggingTask.trackEvent = {
             trackType: "registerFail"
             value: "bad-server-response-code"

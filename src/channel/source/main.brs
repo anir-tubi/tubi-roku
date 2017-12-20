@@ -151,7 +151,7 @@ Function showErrorDialog()
   sgGlobal.addField("constants", "assocarray", false)
 
 
-  ' make sure there are constants on the global utils (ie. we are using the old UI),
+  ' make sure there are constants on the global utils
   ' as they are needed for the error message
   if m.global <> invalid
     if m.global.utils <> invalid

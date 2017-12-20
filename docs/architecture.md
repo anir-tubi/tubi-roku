@@ -81,5 +81,4 @@
 | /src/hotpatch | Hotpatch template files |
 | /src/channel | Channel sources and assets which will be included in the channel package and remote components |
 | /src/channel/source/tests | Unit tests |
-| /src/channel/source/oldUI | Old SDK1 channel sources
 | /tools | These are build-time tools based on node.  They are launched from the Makefile. |

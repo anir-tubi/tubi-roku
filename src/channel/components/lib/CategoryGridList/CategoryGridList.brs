@@ -31,7 +31,7 @@ Function init()
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
 
    ' if low-spec device, use the native poster nodes rather than custom components
-  if m.constants.deviceInfo.limitedNewUi then
+  if m.constants.deviceInfo.limitedUi then
     m.RowList.itemComponentName = ""
   end if
 

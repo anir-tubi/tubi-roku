@@ -22,7 +22,7 @@ Function tubiChannel_runChannel(args, adShim, port)
   ' get live tv content metadata if necessary
   ' will getExperimentValue() again in ContentController which will send the tracking event
   onNowContent = invalid
-  if not m.constants.deviceInfo.limitedNewUi
+  if not m.constants.deviceInfo.limitedUi
     experimentInfo = m.experiments.getExperimentValue("UserNamespace", "roku_on_now")
     if experimentInfo <> invalid and experimentInfo.experimentValue = 1 and not m.constants.ui.onNow.disableOnNow
       m.constants.ui.onnow.on = true
@@ -71,7 +71,7 @@ Function tubiChannel_runChannel(args, adShim, port)
 
     'change the client version so we tracking knows we are using the remote components
     if rodash().get(m, "constants.settings.version") <> invalid
-      m.constants.deviceInfo.clientVersion = m.constants.settings.version.Replace("_", ".") + ".newui.remote"
+      m.constants.deviceInfo.clientVersion = m.constants.settings.version.Replace("_", ".") + ".remote"
     end if
     sgGlobal.setField("constants", m.constants)
 

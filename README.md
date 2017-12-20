@@ -35,8 +35,7 @@ Once the build is complete, make will telnet to listen to the roku console on po
 
 **Artifacts:**
 
-    build/hotpatch/x.x.newui.brs				# Hotpatch brightscript file for new SceneGraph UI
-    build/hotpatch/x.x.oldui.brs				# Hotpatch brightscript file for old SDK1 UI
+    build/hotpatch/x.x.brs				# Hotpatch brightscript file
     build/tubi_x_x_x.zip						# Unsigned client package for sideloading
 	build/tubi_remote_components_2_5_1.pkg		# Remove SceneGraph components for dynamic loading
 
@@ -126,8 +125,8 @@ Remember to push the new tag to remote with 'git push --tags origin'
 
 ```
 
-- Create "empty" hotpatches for the newui and oldui on the CDN named `x.y.oldui.brs` and `x.y.newui.brs`, where x and y are major and minor version numbers.
-- Make sure to update the version number in the newui hotpatch.
+- Create "empty" hotpatch on the CDN named `x.y.brs`, where x and y are major and minor version numbers.
+- Make sure to update the version number in the hotpatch.
 - Copy the newly created `tubitv_remote_components.pkg` file to the CDN and rename it to `tubitv_remote_components_x_y_z.pkg`
 - Push the tag created during `make release` to GitHub
 - Create a GitHub release for the tag with title "Submission Build" and set as "Pre Release"
@@ -139,10 +138,9 @@ Remember to push the new tag to remote with 'git push --tags origin'
   - Bump the minor version number, e.g.
   - Reset the build number to 1
   - Update default.yml
-    - Set the hotpatchUrl to `http://.../<major>.<minor>.newUI.brs`
-    - Set the hotPatchUrlOldUI to `http://.../<major>.<minor>.oldUI.brs`
+    - Set the hotpatchUrl to `http://.../<major>.<minor>.brs`
   - Merge contents of n-1 hotpatches to source base
-  - Create new empty hotpatch files
+  - Create new empty hotpatch file
 
 ##### After Roku Deploys our Build
 - Update the GitHub release's title to "Submission Release" and set to "Latest Release"
@@ -156,7 +154,7 @@ Remember to push the new tag to remote with 'git push --tags origin'
 - **Before updating any functionality, checkout the tag for the latest Roku Submission Release so you are building on what is in production**
 - Run `make release`
 - Copy the newly created `tubitv_remote_components.pkg` file to the CDN and rename it to `tubitv_remote_components_x_y_z.pkg` where x, y, and z are the major, minor, and build numbers after the version number was incremented during `make release`
-- Update the version number in the newui hotpatch
+- Update the version number in the hotpatch
 - Push the tag created during `make release` to GitHub
 - Create a GitHub release for the tag with title "Remote Release"
 
