@@ -70,20 +70,20 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   '       if the primary thread is stuck.
   '
   parent = translatedContent.getParent()
-  if parent <> invalid then
+  parentWhiteList = {}
+  parentWhiteList[m.constants.ui.contentTypes.series] = true
+  parentWhiteList[m.constants.ui.contentTypes.season] = true
+
+  if parent <> invalid and parent.type <> invalid and parentWhiteList[parent.type] then
     if parent.parentId <> invalid and parent.parentId <> "" then
       translatedContent.parentId = parent.parentId
     else
       translatedContent.parentId = parent.id
     end if
-    ' No parent if the parent.id is the task node
-    if translatedContent.parentId = "MetadataFetchTask" then 
-      translatedContent.parentId = invalid
-
-      'this happens on deep link with mediaType = episode
-      if contentFromServer.series_id <> invalid
-        translatedContent.parentId = "0" + contentFromServer.series_id
-      end if
+    
+    'this happens on deep link with mediaType = episode
+    if contentFromServer.series_id <> invalid
+      translatedContent.parentId = "0" + contentFromServer.series_id
     end if
 
     if parent.parentType <> invalid and parent.parentType <> "" then

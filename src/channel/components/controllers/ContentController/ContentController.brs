@@ -775,6 +775,11 @@ Function onPlayerInfo(playerInfo) As Void
   'update the nowPos in the global historyIds store
   m.global.historyIds = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds)
 
+  'update the detailScreen UI with the resume point
+  if m.DetailScreen <> invalid
+    m.DetailScreen.resumePoint = playerInfo.nowPos
+  end if
+
   if playerInfo.result = m.constants.player.playerResults.failed then
     showPlayerError(playerInfo.result)
     return

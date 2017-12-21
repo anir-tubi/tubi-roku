@@ -100,6 +100,12 @@ End Function
 
 Function onIsHistory()
   tubiLog("DetailScreen.onIsHistory")
+  'if removing from history, remove the resume button
+  resumeIndex = getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
+  if not m.top.isHistory
+    addRemoveMenuItem(m.top.isHistory, resumeIndex)
+  end if
+
   removeHistoryIndex = getChildIndexById(m.Menu.content, m.RemoveHistoryMenuItem.id)
   previousItems = [m.AddQueueMenuItem, m.RemoveQueueMenuItem]
   addRemoveMenuItem(m.top.isHistory, removeHistoryIndex, m.RemoveHistoryMenuItem, previousItems)

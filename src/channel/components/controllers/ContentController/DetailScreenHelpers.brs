@@ -280,11 +280,14 @@ Function onRemoveFromHistorySelected()
     m.AuthTask.functionName = "removeFromHistory"
     content = clone(m.detailScreenContent)
     history = m.global.historyIds.findNode(m.detailScreenContent.id)
-    content.historyId = history.historyId
-    m.AuthTask.content = content
-    m.AuthTask.observeField("result", "onHistoryRemoved")
-    m.AuthTask.control = "RUN"
-    m.detailScreen.isWaitingForServerResponse = true
+
+    if history <> invalid
+      content.historyId = history.historyId
+      m.AuthTask.content = content
+      m.AuthTask.observeField("result", "onHistoryRemoved")
+      m.AuthTask.control = "RUN"
+      m.detailScreen.isWaitingForServerResponse = true
+    end if
   end if
 End Function
 
