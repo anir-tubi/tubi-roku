@@ -74,7 +74,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   parentWhiteList[m.constants.ui.contentTypes.series] = true
   parentWhiteList[m.constants.ui.contentTypes.season] = true
 
-  if parent <> invalid and parent.type <> invalid and parentWhiteList[parent.type] then
+  if parent <> invalid and parent.type <> invalid and parentWhiteList.DoesExist(parent.type) then
     if parent.parentId <> invalid and parent.parentId <> "" then
       translatedContent.parentId = parent.parentId
     else
