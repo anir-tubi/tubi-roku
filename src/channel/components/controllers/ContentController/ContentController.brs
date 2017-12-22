@@ -633,6 +633,7 @@ Function onEpisodeFinished(msg As Object)
     endEpisode = true
   end if
   if endEpisode then
+    onEpisodePosition()
     m.videoPlayer.unobserveFieldScoped("backButtonPressed")
     m.videoPlayer.unobserveFieldScoped("state")
     m.videoPlayer.unobserveFieldScoped("historyPosition")
@@ -813,12 +814,11 @@ Function onPlayerInfo(playerInfo) As Void
       if nextEpisode2dIndex <> invalid
         m.detailScreen2dIndex = nextEpisode2dIndex  'must be set for onPlay() to grab the next episode
 
+        'update the current episode to be the next episode for the series history
         nextEpisode = getEpisodeContent(nextEpisode2dIndex, lastContent)
-        history = m.global.historyIds.findNode(lastContent.id)
-        history.currentEpisodeId = nextEpisode.id
-        'TODO Bryan: make sure the resume button is set with the correct nowPos
-        populateDetailScreen(lastContent)
+        m.global.historyIds = Bookmarks.updateNowPos(nextEpisode, {}, m.global.historyIds)
 
+        populateDetailScreen(lastContent)
         onPlay()
         return
       end if

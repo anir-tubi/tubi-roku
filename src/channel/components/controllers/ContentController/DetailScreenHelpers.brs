@@ -281,7 +281,7 @@ Function onRemoveFromHistorySelected()
     content = clone(m.detailScreenContent)
     history = m.global.historyIds.findNode(m.detailScreenContent.id)
 
-    if history <> invalid
+    if history <> invalid and history.historyId <> invalid
       content.historyId = history.historyId
       m.AuthTask.content = content
       m.AuthTask.observeField("result", "onHistoryRemoved")

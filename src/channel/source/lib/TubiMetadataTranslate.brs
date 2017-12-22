@@ -100,7 +100,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
     if parent.parentHistoryId <> invalid and parent.parentHistoryId <> "" then
       translatedContent.parentHistoryId = parent.parentHistoryId
-    else
+    else if parent.historyId <> invalid and parent.historyId <> ""
       translatedContent.parentHistoryId = parent.historyId
     end if
 

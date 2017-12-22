@@ -846,8 +846,7 @@ Function endScrub()
   m.ScrubTimer.unobserveField("fire")
   oldVideoState = m.VideoState
   m.VideoState = "play"
-  ' Resent periodic event trackers
-  m.lastSavedPosition = m.playerPosition
+  ' Reset periodic event trackers
   m.lastPingTime = m.playerPosition
 
   resetTransportButtons()
