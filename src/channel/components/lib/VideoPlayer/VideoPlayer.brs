@@ -122,9 +122,10 @@ Function init()
   ' used by CC dialog
   m.ccSelections = [ 0 ]  ' modeled as an array for adding caption and audio tracks selection
   m.ccModes = [
-    "Off"
-    "On"
-    "Instant replay"
+    ' globalCaptionMode text,       Button text on software caption dialog
+    ["Off",                          "Off"]
+    ["On",                           "On always"]
+    ["Instant replay",               "On replay"]
   ]
 
   ' Workaround for 9-patch bug
@@ -1055,11 +1056,11 @@ Function getCCButtons()
     return ["Close"]
   else
     for i=0 to m.ccModes.count()-1
-      if m.video.globalCaptionMode = m.ccModes[i]
+      if m.video.globalCaptionMode = m.ccModes[i][0]
         m.ccSelections[0] = i
       end if
     end for
-    return ["Mode: " + m.video.globalCaptionMode, "Close"]
+    return ["Mode: " + m.ccModes[m.ccSelections[0]][1], "Close"]
   end if
 End Function
 
@@ -1126,7 +1127,7 @@ Function onCCDialogButton()
   else
     ' Captions mode
     m.ccSelections[0] = (m.ccSelections[0] + 1) MOD m.ccModes.count()
-    m.video.globalCaptionMode = m.ccModes[m.ccSelections[0]]
+    m.video.globalCaptionMode = m.ccModes[m.ccSelections[0]][0]
     m.ccDialog.buttons = getCCButtons()
   end if
 End Function
