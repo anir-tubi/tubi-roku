@@ -32,30 +32,20 @@
       loadSync="true"
       translation="[857,311]"/>
     
-    <LayoutGroup
+    <RotatingLabel
       id="Slogan"
-      itemSpacings="[23]"
-      translation="[0,497]">
-      <Label
-        id="Slogan-line1"
-        text="Now playing. No paying."
-        width="1920"
-        horizAlign="center" >
-        <Font
-        id="Vaud43SemiBold"
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="43" />
-      </Label>
-      <Label
-        id="Slogan-line2"
-        text="100% Free."
-        width="1920"
-        horizAlign="center"
-        font="dictionary:Vaud43SemiBold">
-      </Label>
-
-    </LayoutGroup>
+      translation="[0,544]"
+      texts="[&quot;The largest library of free TV shows and movies&quot;,&quot;Watch for free on any device&quot;,&quot;100% free. No credit card required!&quot;]"
+      crossfadeDuration="1"
+      displayDuration="5"
+      width="1920"
+      horizAlign="center" >
+      <Font
+      id="Vaud43SemiBold"
+      role="font"
+      uri="pkg:/fonts/Vaud-SemiBold.ttf"
+      size="43" />
+    </RotatingLabel>
     
     <ScrollingList
       id="SignInOrGuestButtons"

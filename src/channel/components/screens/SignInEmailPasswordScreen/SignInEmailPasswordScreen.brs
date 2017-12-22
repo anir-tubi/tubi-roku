@@ -49,7 +49,7 @@ Function startShowKeyboard()
   tubiLog("SignInEmailPasswordScreen.startShowKeyboard")
   m.Keyboard.text = m.FocusedTextBox.text  ' seed the keyboard with the existing textbox text
   m.Keyboard.visible = true
-  m.KeyboardInterpolator.keyValue = [m.Keyboard.translation, [0, 0]]
+  m.KeyboardInterpolator.keyValue = [m.Keyboard.translation, [0, 65]]
   m.KeyboardAnimation.observeField("state", "endShowKeyboard")
   m.KeyboardAnimation.control = "start"
 End Function
@@ -75,7 +75,7 @@ End Function
 Function startHideKeyboard()
   tubiLog("SignInEmailPasswordScreen.startHideKeyboard")
   keyboardRect = m.Keyboard.boundingRect()
-  m.KeyboardInterpolator.keyValue = [[0,0], [0, -keyboardRect.height]]
+  m.KeyboardInterpolator.keyValue = [m.Keyboard.translation, [0, -keyboardRect.height]]
   m.KeyboardAnimation.observeField("state", "endHideKeyboard")
   m.KeyboardAnimation.control = "start"
   m.Keyboard.setFocus(false)
