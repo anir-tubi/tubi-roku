@@ -4,31 +4,37 @@
 - Sign In/Out
 	- Signed In
 		- Signed In state shows user categories
+		- Signed In state shows 'Sign Out' in tools menu
 		- Signed In state lands on feature grid by default on start
 		- signed In state persists across channel launches, lands on category grid screen
 	- Signed Out state
+		- Signed Out state shows sign in prompt on launch
 		- Signed Out state doesn't show user categories
-		- Signed Out state lands on feature grid by default on start
+		- Signed Out state shows 'Sign In' in tools menu
+		- Signed Out state lands on feature category after choosing "Guest Pass"
 		- Add to Queue is shown on details screen but leads to a modal
 		- signed out state persists across channel launches, lands on Sign-In disambiguation screen
 	- Transitions
-		- After successful sign in, feature grid is shown
+		- After successful sign in, feature grid is focused
 		- After successful sign in, user categories are shown
-		- After successful sign out, feature grid is shown
-		- Sign in succeeds when launched from category screen
-		- Sign in succeeds when launched from detail screen adding to queue
+		- After successful sign out, sign in choice screen is shown
+		- After successful sign out, choose "Guest Pass", feature category is focused
+		- After successful sign out, choose "Guest Pass", user categories are not shown
+		- Sign in succeeds when launched from tools menu		- Sign in succeeds when launched from detail screen adding to queue
 - "My Queue"
+	- Can add videos to my queue, shows up in user categories
 	- Can add videos to my queue, show up on web
+	- Can add series to my queue, shows up in user categories
 	- Can add series to my queue, show up on web
 	- can remove items from my queue; takes effect immediately
 	- my queue is the same across channel launches
-  - hiding empty queue:
-    - launch with empty queue, queue doesn't show
-    - remove all items from queue removes category from grid
-    - add item to empty queue ads category to grid
-    - negative: removing item that isn't the last doesn't remove category from grid
-    - going from signed-out to signed-in doesn't show empty queue
-    - going from signed-in to signed-out doesn't show queue
+- Hiding empty queue:
+	- remove all items from queue removes category from grid
+	- launch with empty queue, queue doesn't show
+	- add item to empty queue ads category to grid
+	- negative: removing item that isn't the last doesn't remove category from grid
+	- going from signed-out to signed-in doesn't show empty queue
+	- going from signed-in to signed-out doesn't show queue
 - "Continue Watching"
 	- selecting a new title to watch adds it to the "Continue Watching" category
 	- can remove titles from "continue watching", takes effect immediately
@@ -36,13 +42,13 @@
 	- last watched episode is automatically chosen on detail page when resuming a series
 	- Resume button starts where left off
 	- Play button overrides the resume position, starts from beginning
-  - hiding history:
-    - launch with empty queue, queue doesn't show
-    - remove all items from queue removes category from grid
-    - negative: removing item that isn't the last doesn't remove category from grid
-    - add item to empty queue ads category to grid
-    - going from signed-out to signed-in doesn't show empty history
-    - going from signed-in to signed-out doesn't show history
+- Hiding history:
+	- launch with empty history, history doesn't show
+	- remove all items from history removes category from grid
+	- negative: removing item that isn't the last doesn't remove category from grid
+	- add item to empty history ads category to grid
+	- going from signed-out to signed-in doesn't show empty history
+	- going from signed-in to signed-out doesn't show history
 - Search
 	- search results show up
 	- search results are updated on each key entry
@@ -50,7 +56,7 @@
 	- returning from play of search result item goes back to search result screen
 - Video playback
 	- videos play with pre-roll, mid-roll ads
-	- video is full-screen, even on Roku 4
+	- video is full-screen
 	- transport works: pause/play/ff/rew
 	- subtitles menu pops up on "*", both when paused and during playback
 - Ads
@@ -58,17 +64,12 @@
 	- can be paused
 	- cannot be ff or rew
 	- back goes to detail screen
+	- midrolls have countdown overlay
+	- seek midrolls trigger
 - Trailers
 	- trailers show on detail screen menu for movies which have them
 	- trailers return to detail screen after finished playing
-- Network error handling
-- Deep Linking
-	- Season shows episode picker: http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=111770&mediaType=season
-	- Movie automatically plays: http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=348932&mediaType=movie
-	- Episode automatically plays: http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=111770&mediaType=episode
-	- Backward-compatibility
-		- Series shows Detail screen http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=11&MediaType=series
-	- shows main grid on content not found
+	- skip trailer button launches feature
 - Closed Captions
 	- subtitles work (all dogs go to heaven has working subtitles)
 	- instant replay subtitles work
@@ -84,38 +85,74 @@
 		- on
 		- off
 		- instant replay
+	- firmware caption language/track selection
+		- shows default (i don't know any titles that have multiple language tracks)
+	- software caption language/track selection
+		- omitted from the dialog when only one choice is available
+- Audio Track Selection
+	- firmware track selection (Roku TV)
+		- shows default (i don't know any titles that have multiple language tracks)
+	- software (Roku 3)
+		- language selection shows correctly the language that is available, or no selection choice if only one exists
+choice if only one exists
 - Autoplay
 	- movies
 	- series
-- Old devices specifically:
+- Network error handling
+- Deep Linking
+	- Season shows episode picker: http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=111770&mediaType=season
+	- Movie automatically plays: http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=313883&mediaType=movie
+	- Episode automatically plays: http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=111770&mediaType=episode
+	- Backward-compatibility
+		- Series shows Detail screen http://${ROKU_DEV_TARGET}:8060/launch/dev?contentID=11&MediaType=series
+	- shows main grid on content not found
+- Low memory devices:
 	- categories are limited to 50 items
 	- no crashes after 2 ad breaks, 5 titles
 
 ## Screens - verify visually
-- Full UI
+- 1080/FHD UI (Roku 4, Premiere, Ultra)
     - Grid Screen
     - Detail Screen
 	    - Play
 	    - Resume
     - Episode Selection Screen
+    - Search Screen
     - Sign in username/password
     - Sign in reg code
     - About
     - Privacy
     - Sign in Disambiguation
     - Sign in
-- Limited UI
+    - Video Player / Transport
+- 720/HD Full UI (Roku 3)
     - Grid Screen
     - Detail Screen
 	    - Play
 	    - Resume
     - Episode Selection Screen
+    - Search Screen
     - Sign in username/password
     - Sign in reg code
     - About
     - Privacy
     - Sign in Disambiguation
     - Sign in
+    - Video Player / Transport
+- 720/HD Limited UI (Roku 1)
+    - Grid Screen
+    - Detail Screen
+	    - Play
+	    - Resume
+    - Episode Selection Screen
+    - Search Screen
+    - Sign in username/password
+    - Sign in reg code
+    - About
+    - Privacy
+    - Sign in Disambiguation
+    - Sign in
+    - Video Player / Transport
 
 ## Negative testing
 - Fast navigation; fast button pressing
