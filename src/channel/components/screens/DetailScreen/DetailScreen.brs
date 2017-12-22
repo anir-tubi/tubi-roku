@@ -18,6 +18,7 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("addToQueueTitle", "onAddToQueueTitleChange")
   m.top.observeField("removeQueueTitle", "onRemoveFromQueueTitleChange")
+  m.top.observeField("isLoading", "onIsLoading")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
@@ -135,6 +136,13 @@ End Function
 Function onRemoveFromQueueTitleChange()
   tubiLog("DetailScreen.onRemoveFromQueueTitleChange")
   m.RemoveQueueMenuItem.title = m.top.removeQueueTitle
+End Function
+
+
+Function onIsLoading()
+  tubiLog("DetailScreen.onIsLoading")
+  m.Info.visible = not m.top.isLoading
+  m.Menu.visible = not m.top.isLoading
 End Function
 
 

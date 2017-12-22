@@ -184,7 +184,7 @@ Function startUserExperience()
         testLog("Deep link contentId = " + m.top.deepLinkContent.id)
         testLog("Deep link type = " + m.top.deepLinkContent.type)
         m.enteredFromDeepLink = true
-        prepareDetailScreen(m.top.deepLinkContent)
+        showDetailScreen(m.top.deepLinkContent)
 
       else if m.authTask.authInfo = invalid then
         tubiLog("ContentController ask user to sign in")
@@ -334,7 +334,7 @@ End Function
 Function onContentSelected(msg As Object)
   tubiLog("ContentController.onContentSelected")
   content = msg.GetData()  
-  prepareDetailScreen(content)
+  showDetailScreen(content)
 End Function
 
 
@@ -864,22 +864,6 @@ Function onPlayerInfo(playerInfo) As Void
 End Function
 
 
-
-'''''''''''''''''''''
-' prepareDetailScreen
-'
-' Does an additionl metadata fetch in the case that content is a series or deeplink
-' @content: roSGNode, a content node for a single pieces of content
-Function prepareDetailScreen(content)
-  m.detailScreenContent = content
-  if m.enteredFromDeeplink or content.type = m.constants.ui.contentTypes.series
-    getSingleContentFromServer()
-  else
-    showDetailScreen(content)
-  end if
-End Function
-
-
 '''''''''''''''''''''
 ' showDetailScreen
 '
@@ -899,10 +883,17 @@ Function showDetailScreen(content)
   m.detailScreen.observeFieldScoped("removeFromHistorySelected", "onRemoveFromHistorySelected")
   m.detailScreen.observeFieldScoped("itemFailed", "onDetailItemFailed")
 
-  populateDetailScreen(content)
-
+  m.detailScreenContent = content
   pushScreen(m.detailScreen, true)
+
+  if m.enteredFromDeeplink or content.type = m.constants.ui.contentTypes.series
+    m.detailScreen.isLoading = true
+    getSingleContentFromServer()
+  else
+    populateDetailScreen(content)
+  end if
 End Function
+
 
 '''''''''''''''''''''
 ' populateDetailScreen
@@ -910,6 +901,9 @@ End Function
 'Populates the detail screen's state from a content node
 '@content: tubiContentNode
 Function populateDetailScreen(content)
+  'hide the spinner
+  m.detailScreen.isLoading = false
+
   'update detail screen state via the input interface
   m.detailScreen.title = content.title
   m.detailScreen.releaseDate = content.releaseDate

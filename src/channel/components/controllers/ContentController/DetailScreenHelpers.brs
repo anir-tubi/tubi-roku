@@ -60,7 +60,7 @@ Function onSingleContentResponse(msg) As Void
 
   if m.enteredFromDeepLink = true and m.top.deepLinkContent <> invalid
     if m.top.deepLinkContent.deeplinkType = "series"
-      showDetailScreen(m.detailScreenContent)
+      populateDetailScreen(m.detailScreenContent)
       return
     else if (m.top.deepLinkContent.deeplinkType = "season" or m.top.deepLinkContent.deeplinkType = "episode") and m.detailScreenContent.type = m.constants.ui.contentTypes.video
       ' deeplink sent us an episode id, so here, we have full info for an episode, but we need full info for a series
@@ -71,12 +71,12 @@ Function onSingleContentResponse(msg) As Void
       return
     else if m.top.deepLinkContent.deeplinkType = "season" and m.detailScreenContent.type = m.constants.ui.contentTypes.series
       ' we've now received the full series info, so we can build the relevant screens
-      showDetailScreen(m.detailScreenContent)
+      populateDetailScreen(m.detailScreenContent)
       onEpisodeList()
       return
     else if (m.top.deepLinkContent.deeplinkType = "episode" and m.detailScreenContent.type = m.constants.ui.contentTypes.series) or m.top.deepLinkContent.deeplinkType = "movie"
       ' we now have the full series info for episode deeplinks, or have the full movie info by default
-      showDetailScreen(m.detailScreenContent)
+      populateDetailScreen(m.detailScreenContent)
       onPlay()
       return
     else
@@ -87,7 +87,7 @@ Function onSingleContentResponse(msg) As Void
     end if
   end if
 
-  showDetailScreen(m.detailScreenContent)
+  populateDetailScreen(m.detailScreenContent)
 End Function
 
 

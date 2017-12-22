@@ -183,7 +183,8 @@
         lineSpacing="16"
         maxLines="5"
         wrap="true"
-        color="0xFFFFFFFF">
+        color="0xFFFFFFFF"
+        visble="false">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"
@@ -194,11 +195,11 @@
         id="DirectorGroup"
         layoutDirection="horiz"
         vertAlignment="bottom"
-        itemSpacings="[5,5]">
+        itemSpacings="[5,5]"
+        visible="false">
         <Label
           id="DirectorTag"
           text="Directed by"
-          visible="true" 
           opacity="0.5">
           <Font
             role="font"
@@ -222,8 +223,7 @@
           id="Director"
           color="0xFFFFFFFF"
           ellipsizeOnBoundary="true"
-          width="710"        
-          visible="true">
+          width="710">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"
@@ -235,11 +235,11 @@
         id="StarringGroup"
         layoutDirection="horiz"
         vertAlignment="bottom"
-        itemSpacings="[5,5]">
+        itemSpacings="[5,5]"
+        visible="false" >
         <Label
           id="StarringTag"
           text="Starring"
-          visible="true" 
           opacity="0.5">
           <Font
             role="font"
@@ -262,8 +262,7 @@
           id="Starring"
           color="0xFFFFFFFF"
           ellipsizeOnBoundary="true"
-          width="710"
-          visible="true" >
+          width="710">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"

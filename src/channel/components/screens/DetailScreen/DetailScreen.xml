@@ -74,6 +74,10 @@
       <!-- informs the details screen if the content controller is waiting for a user category update from the server -->
       <field id="isWaitingForServerResponse" type="boolean" value="false" />
 
+      <!-- hides or shows the loading spinner -->
+      <field id="isLoading" type="boolean" alias="DetailSpinner.visible" />
+
+
 
     <!-- OUTPUTS -->
 
@@ -153,6 +157,12 @@
       itemComponentName="DetailMenuItem"
       visible="true"
       translation="[60, 680]" />
+
+    <Spinner
+      id="DetailSpinner"
+      visible="false"
+      width="1920"
+      height="1080"/>
     
   </children>
 </component>
