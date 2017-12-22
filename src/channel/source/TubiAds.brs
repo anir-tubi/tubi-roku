@@ -342,7 +342,8 @@ function tubiAds_showCommercialBreakViaRoku(containerNode)
             total: m.totalAdBreakAds
           }
 
-          isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList[0], screenCount, containerNode)
+          ' NOTE: Don't pass in containerNode, which currently has an intermittent crash on 2450X (Dec 2017, RAF 2.0314)
+          isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList[0], screenCount)
 
           '#####
           ' WORKAROUND FOR RAF MEMORY LEAK, still present in RAF 1.9
