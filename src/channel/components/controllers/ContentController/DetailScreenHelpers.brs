@@ -12,7 +12,7 @@ Function populateDetailTrackingUri(content as Object, episode) As String
       trackUri = trackUri + Mid(content.id, 2)
 
       'get the episode id
-      if episode <> invalid and episode.id <> invalid and episode.id = "roString"
+      if episode <> invalid and episode.id <> invalid and type(episode.id) = "roString"
         trackUri = trackUri + "/" + episode.id
       end if
     end if
@@ -139,6 +139,22 @@ Function getEpisodeContent(episode2dIndex As Object, contentNode As Object) As O
     if episode <> invalid then return episode
   end if
   return invalid
+End Function
+
+
+' given a content node, return invalid for movie, or the metadata for the episode to be displayed on the details screen
+' @content: tubiContentNode - video or series
+Function getCurrentEpisode(content)
+  episode = invalid
+  if content.type = m.constants.ui.contentTypes.series
+    history = m.global.historyIds.findNode(content.id)
+    detailScreen2dIndex = [0,0]
+    if history <> invalid
+      detailScreen2dIndex = findEpisode2dIndex(history.currentEpisodeId, content)
+    end if
+    episode = getEpisodeContent(detailScreen2dIndex, content)
+  end if
+  return episode
 End Function
 
 

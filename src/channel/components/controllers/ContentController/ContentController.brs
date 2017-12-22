@@ -884,6 +884,11 @@ Function showDetailScreen(content)
   m.detailScreen.observeFieldScoped("itemFailed", "onDetailItemFailed")
 
   m.detailScreenContent = content
+
+  'set the detail screen tracking uri
+  'this must happen before pushScreen so that pushScreen can send the analytics request with the proper URI
+  episode = getCurrentEpisode(content)
+  m.detailScreen.trackingUri = populateDetailTrackingUri(content, episode)
   pushScreen(m.detailScreen, true)
 
   if m.enteredFromDeeplink or content.type = m.constants.ui.contentTypes.series
@@ -913,7 +918,7 @@ Function populateDetailScreen(content)
   bookmark = m.global.bookmarkIds.findNode(content.id)
   history = m.global.historyIds.findNode(content.id)
 
-  episode = invalid
+  episode = getCurrentEpisode(content)
   episodeHistory = invalid
   if content.type = m.constants.ui.contentTypes.series
     m.detailScreen2dIndex = [0, 0]
@@ -921,7 +926,6 @@ Function populateDetailScreen(content)
       m.detailScreen2dIndex = findEpisode2dIndex(history.currentEpisodeId, content)
     end if
     
-    episode = getEpisodeContent(m.detailScreen2dIndex, content)
     if episode <> invalid
       episodeHistory = m.global.historyIds.findNode(episode.id)
       m.detailScreen.episodeTitle = episode.title
@@ -964,9 +968,6 @@ Function populateDetailScreen(content)
   else
     m.detailScreen.resumePoint = 0
   end if
-
-  'set the detail screen tracking uri
-  m.detailScreen.trackingUri = populateDetailTrackingUri(content, episode)
 
   'tell the detail screen/info panel to vertically center the info panel
   m.detailScreen.calculateInfoHeight = true
