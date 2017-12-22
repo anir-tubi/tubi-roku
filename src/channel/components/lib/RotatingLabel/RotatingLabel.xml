@@ -5,7 +5,7 @@
  - This is a "Label"-like component that will crossfade different texts
  -
  -->
-<component name="RotatingLabel" extends="Label" >
+<component name="RotatingLabel" extends="Group" >
   <script type="text/brightscript" uri="pkg:/components/lib/RotatingLabel/RotatingLabel.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
@@ -13,6 +13,22 @@
     <field id="texts" type="stringarray" />
     <field id="crossfadeDuration" alias="RotatingLabelCrossfade.duration" value="1.0"/>
     <field id="displayDuration" alias="DisplayTimer.duration" value="5.0"/>
+
+    <!-- forwarded to children -->
+    <field id="color" alias="NewLabel.color"/>
+    <field id="width" alias="NewLabel.width"/>
+    <field id="font" alias="NewLabel.font"/>
+    <field id="horizAlign" alias="NewLabel.horizAlign"/>
+    <field id="vertAlign" alias="NewLabel.vertAlign"/>
+    <field id="numLines" alias="NewLabel.numLines"/>
+    <field id="maxLines" alias="NewLabel.maxLines"/>
+    <field id="wrap" alias="NewLabel.wrap"/>
+    <field id="lineSpacing" alias="NewLabel.lineSpacing"/>
+    <field id="displayPartialLines" alias="NewLabel.displayPartialLines"/>
+    <field id="ellipsizeOnBoundary" alias="NewLabel.ellipsizeOnBoundary"/>
+    <field id="truncateOnDelimiter" alias="NewLabel.truncateOnDelimiter"/>
+    <field id="wordBreakChars" alias="NewLabel.wordBreakChars"/>
+    <field id="ellipsisText" alias="NewLabel.ellipsisText"/>
   </interface>
 
   <children>

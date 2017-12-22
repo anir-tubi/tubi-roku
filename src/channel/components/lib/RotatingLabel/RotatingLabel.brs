@@ -5,6 +5,8 @@ Function init()
   m.CrossfadeAnimation = m.top.findNode("RotatingLabelCrossfade")
   m.DisplayTimer = m.top.findNode("DisplayTimer")
   m.textsIndex = -1
+  m.oldLabel = m.top.findNode("OldLabel")
+  m.newLabel = m.top.findNode("NewLabel")
 End Function
 
 Function onTextsChange()
@@ -19,9 +21,8 @@ End Function
 
 Function startCrossfade()
   tubiLog("RotatingLabel.startCrossfade")
-  oldLabel = m.top.findNode("OldLabel")
-  newLabel = m.top.findNode("NewLabel")
   ' attributes to set on the oldLabel as it fades out
+
   whitelist = [
     "color"
     "width"
@@ -39,12 +40,12 @@ Function startCrossfade()
     "ellipsisText"
   ]
   for each attribute in whitelist
-    oldLabel[attribute] = m.top[attribute]
-    newLabel[attribute] = m.top[attribute]
+    m.oldLabel[attribute] = m.newLabel[attribute]
   end for
-
-  oldLabel.text = newLabel.text
-  newLabel.text = m.top.texts[m.textsIndex]
+  m.oldLabel.opacity = 1.0
+  m.oldLabel.text = m.newLabel.text
+  m.newLabel.opacity = 0.0
+  m.newLabel.text = m.top.texts[m.textsIndex]
   m.CrossfadeAnimation.observeField("state", "onCrossfadeStateChange")
   m.CrossfadeAnimation.control = "start"
 End Function
