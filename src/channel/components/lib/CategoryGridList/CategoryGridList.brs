@@ -81,7 +81,14 @@ Function onContentModify(message)
     ' insert - A child node was inserted at change.index1
     ' add - A child node was added to the end of the children node tree (at change.index1)
     new = clone(m.top.content.getChild(change.index1))
+
+    ' NOTE!: There is a bug internal to RowList caused by inserting a child content node,
+    ' causing it to create a whole bunch of new components and crash low-end devices.  Here we avoid this
+    ' by removing the content first before manipulating it.  In the end the RowList doesn't destroy
+    ' the rowItemComponent items when content is set to invalid, so this has almost no overhead.
+    m.RowList.content = invalid  ' temporarily
     m.internalContent.insertChild(new, change.index1)
+    m.RowList.content = m.internalContent
     ' RowList doesn't update the focus row automatically so we do it here to keep cursor at the same spot
     if rowItemFocused[0] <> -1 and change.index1 <= rowItemFocused[0]
       rowItemFocused[0] = rowItemFocused[0] + 1
