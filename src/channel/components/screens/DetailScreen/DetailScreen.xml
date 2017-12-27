@@ -71,6 +71,9 @@
       <!-- used to update the text on the removeQueue button -->
       <field id="removeQueueTitle" type="string" value="Remove from queue" alwaysNotify="true" />
 
+      <!-- used to update the text on the removeQueue button -->
+      <field id="removeHistoryTitle" type="string" value="Remove from history" alwaysNotify="true" />
+
       <!-- informs the details screen if the content controller is waiting for a user category update from the server -->
       <field id="isWaitingForServerResponse" type="boolean" value="false" />
 

@@ -18,6 +18,7 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("addToQueueTitle", "onAddToQueueTitleChange")
   m.top.observeField("removeQueueTitle", "onRemoveFromQueueTitleChange")
+  m.top.observeField("removeHistoryTitle", "onRemoveFromHistoryTitleChange")
   m.top.observeField("isLoading", "onIsLoading")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
 
@@ -101,6 +102,9 @@ End Function
 
 Function onIsHistory()
   tubiLog("DetailScreen.onIsHistory")
+  'reset the value in the case that remove from history button was pressed and title is currently "Removing..."
+  m.RemoveHistoryMenuItem.title = "Remove from history"
+
   'if removing from history, remove the resume button
   resumeIndex = getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
   if not m.top.isHistory
@@ -129,13 +133,22 @@ End Function
 
 Function onAddToQueueTitleChange()
   tubiLog("DetailScreen.onAddToQueueTitleChange")
-  m.AddQueueMenuItem.title = m.top.addToQueueTitle
+  addQueueIndex = getChildIndexById(m.Menu.content, m.AddQueueMenuItem.id)
+  updateMenuItemTitle(addQueueIndex, m.top.addToQueueTitle)
 End Function
 
 
 Function onRemoveFromQueueTitleChange()
   tubiLog("DetailScreen.onRemoveFromQueueTitleChange")
-  m.RemoveQueueMenuItem.title = m.top.removeQueueTitle
+  removeQueueIndex = getChildIndexById(m.Menu.content, m.RemoveQueueMenuItem.id)
+  updateMenuItemTitle(removeQueueIndex, m.top.removeQueueTitle)
+End Function
+
+
+Function onRemoveFromHistoryTitleChange()
+  tubiLog("DetailScreen.onRemoveFromHistoryTitleChange")
+  removeHistoryIndex = getChildIndexById(m.Menu.content, m.RemoveHistoryMenuItem.id)
+  updateMenuItemTitle(removeHistoryIndex, m.top.removeHistoryTitle)
 End Function
 
 
@@ -200,6 +213,21 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
 
     m.Menu.content = menuItems
   end if
+End Function
+
+
+''''''''''''''''''''''''
+' updateMenuItemTitle
+'
+' directly update the title of one of the menu items.
+' Updating a DetailMenuItemContentNode doesn't necessarilly pass through title to the actual menu item
+'
+' @index: int, the index of the menu itemt to change
+' @title: string, the new title
+Function updateMenuItemTitle(index, title)
+  menuItemButton = m.Menu.findNode("Items").getChild(index)
+  buttonLabel = menuItemButton.findNode("DetailsMenuText")
+  buttonLabel.text = title
 End Function
 
 
