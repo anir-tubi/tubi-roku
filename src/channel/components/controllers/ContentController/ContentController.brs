@@ -777,8 +777,13 @@ Function onPlayerInfo(playerInfo) As Void
   m.global.historyIds = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds)
 
   'update the detailScreen UI with the resume point
-  if m.DetailScreen <> invalid
-    m.DetailScreen.resumePoint = playerInfo.nowPos
+  if m.detailScreen <> invalid
+    m.detailScreen.resumePoint = playerInfo.nowPos
+  end if
+
+  'make sure the remove from history button is present on the details screen if necessary
+  if m.authTask.authInfo <> invalid and m.global.historyIds.findNode(content.id) <> invalid
+    m.detailScreen.isHistory = true
   end if
 
   if playerInfo.result = m.constants.player.playerResults.failed then
@@ -959,7 +964,7 @@ Function populateDetailScreen(content)
   end if
 
   m.detailScreen.isBookmark = (bookmark <> invalid)
-  m.detailScreen.isHistory = (history <> invalid)
+  m.detailScreen.isHistory = (history <> invalid and m.authTask.authInfo <> invalid)
 
   if content.type = m.constants.ui.contentTypes.series and episodeHistory <> invalid and episodeHistory.nowPos > 0
     m.detailScreen.resumePoint = episodeHistory.nowPos
