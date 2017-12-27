@@ -505,7 +505,7 @@ Function getConstants()
         else
           constants.performance.categoryGridList.categoryWindowSize = 5
         end if
-        constants.performance.categoryGridList.eagerLoad = true
+        constants.performance.categoryGridList.eagerLoad = false
       else
         constants.performance.categoryGridList.blockSize = 200
         constants.performance.categoryGridList.categoryWindowSize = 10
