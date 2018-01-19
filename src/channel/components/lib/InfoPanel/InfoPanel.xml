@@ -184,7 +184,7 @@
         maxLines="5"
         wrap="true"
         color="0xFFFFFFFF"
-        visble="false">
+        visible="false">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"
