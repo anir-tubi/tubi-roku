@@ -97,18 +97,17 @@ Function onSingleContentError(msg)
   m.refreshTask.unobserveField("response")
   m.refreshTask.unobserveField("error")
   m.refreshTask = invalid
-
-  'modal message, could not get series data from the server, try again? close?
   message = "Could not retrieve content information from server."
-  cacelCallback = invalid
+  showErrorModal(error.code, message, getSingleContentFromServer, cancelGetSingleContent)
+End Function
 
-  'in the case there is an error while attempting to get metadata for a deeplink content
+Function cancelGetSingleContent()
+  'if there is an error while attempting to get metadata for a deeplink content,
+  ' launch the category screen
   if m.enteredFromDeepLink
-    cacelCallback = startOnNow
     m.enteredFromDeepLink = false
+    startOnNow()
   end if
-
-  showErrorModal(error.code, message, getSingleContentFromServer, cacelCallback)
 End Function
 
 
