@@ -128,7 +128,8 @@ End Function
 '
 Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("CategoryScreen.onKeyEvent")
-  if press then
+  ' ignore keypresses until the screen content has shown up
+  if press and m.top.categoryListResponse <> invalid then
     if (key = "right" or key = "ok") then
       m.top.categoryMenuVisible = false
       return true
@@ -232,17 +233,19 @@ Function onCategoryMenuChange() As Void
   tubiLog("CategoryScreen.onCategoryMenuChange")
   if not m.CategoryList.isInFocusChain() or m.CategoryList.content = invalid then return
 
-  newCategory = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
-  referenceCategory = m.top.cachedContent.getChild(m.CategoryList.itemFocused)
-  
   infoMetadata = CreateObject("roSGNode", "CategoryContentNode")
+
+  newCategory = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
   if newCategory <> invalid
     infoMetadata.title = newCategory.title
     infoMetadata.description = newCategory.description
   end if
 
-  if referenceCategory <> invalid
-    infoMetadata.totalCount = referenceCategory.getChildCount()
+  if m.top.cachedContent <> invalid
+    referenceCategory = m.top.cachedContent.getChild(m.CategoryList.itemFocused)
+    if referenceCategory <> invalid
+      infoMetadata.totalCount = referenceCategory.getChildCount()
+    end if
   end if
 
   populateInfoPanel("category", infoMetadata)
