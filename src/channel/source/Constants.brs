@@ -375,14 +375,14 @@ Function getConstants()
 
     'constants needed for on now UI
     constants.ui.onNow = {}
-      constants.ui.onNow.disableOnNow = false
+      constants.ui.onNow.disableOnNow = true
       constants.ui.onnow.on = false
       constants.ui.onNow.channelId = "livetv_clips"
 
     'constants needed for sign in flow experimentation
     constants.ui.signIn = {}
-      constants.ui.signIn.skipContinueScreen = false
-      constants.ui.signIn.skipSignInRegisterScreen = false
+      constants.ui.signIn.skipContinueScreen = true
+      constants.ui.signIn.skipSignInRegisterScreen = true
       constants.ui.signIn.backExitsSignIn = false
       constants.ui.signIn.skipSignInOption = true    ' if true, suppress the "Sign in via Email" button on reg code screen
 
