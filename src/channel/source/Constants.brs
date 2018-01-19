@@ -54,15 +54,23 @@ Function getConstants()
       "3400X": true  ' MHL Stick
       "3420X": true  ' MHL Stick
       "3500X": true  ' HDMI Stick (2014)
+      "3600X": true  ' QuadCore Stick (2016)
       "3700X": true  ' Express
       "3710X": true  ' Express+
+      "3800X": true  ' Stick (2017)
+      "3900X": true  ' Express (2017)
+      "3910X": true  ' Express+ (2017)
       "5000X": true  ' TV (low specs)
     }
 
-    ' these are non-OpenGL but CPU significantly faster than the "old" devices
+    ' these are non-OpenGL or low VRAM but CPU significantly faster than the "old" devices
     limitedUIWithFastCPU = {
+      "3600X": true
       "3700X": true
       "3710X": true
+      "3800X": true
+      "3900X": true
+      "3910X": true
       "5000X": true
     }
 

@@ -16,12 +16,16 @@ Function init()
 
   m.updateCount = 0
   m._ = rodash()
+
+  m.maxBackgroundImages = 1
 End Function
 
 
 Function updateBackground()
   TubiLog("BackgroundGroup.updateBackground")
   m.updateCount = m.updateCount + 1
+
+  clampImageList()
 
   if m.global.constants.deviceInfo.limitedUi = true
     ' we have a low spec device that won't handle transitions so make it basic
@@ -345,6 +349,9 @@ End Function
 'Since this will take us to the sign up flow we want to set up a clean start for when we return
 Function setUnblurred()
   TubiLog("BackgroundGroup.setUnblurred")
+
+  clampImageList()
+
   if m.top.enterFromSignIn = true
 
     m.updateCount = 0
@@ -433,4 +440,19 @@ Function updateLowMemBackground()
     end if
   end if
 
+End Function
+
+' NOTE!!! Workaround for multiple large-size backgrounds filling up VRAM on
+' VRAM-challenged devices such as 3900X.  Ideally, if we want to rotate
+' backgrounds we should only ever have 2 loaded at any time, the one currently
+' visible and the next one to be shown.  This is a temporary fix just to pass
+' Roku certification.
+Function clampImageList()
+  if m.top.backgroundUriList <> invalid and m.top.backgroundUriList.count() > m.maxBackgroundImages
+    newList = []
+    for i=0 to m.maxBackgroundImages-1
+      newList.push(m.top.backgroundUriList[i])
+    end for
+    m.top.backgroundUriList = newList
+  end if
 End Function
