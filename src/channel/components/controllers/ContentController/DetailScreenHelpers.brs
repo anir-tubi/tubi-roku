@@ -58,10 +58,10 @@ Function onSingleContentResponse(msg) As Void
   m.refreshTask.unobserveField("error")
   m.refreshTask = invalid
 
+  afterFn = invalid  ' the function to execute once we've sorted the detail screen out
   if m.enteredFromDeepLink = true and m.top.deepLinkContent <> invalid
     if m.top.deepLinkContent.deeplinkType = "series"
-      populateDetailScreen(m.detailScreenContent)
-      return
+      m.detailScreen2dIndex = [0,0]
     else if (m.top.deepLinkContent.deeplinkType = "season" or m.top.deepLinkContent.deeplinkType = "episode") and m.detailScreenContent.type = m.constants.ui.contentTypes.video
       ' deeplink sent us an episode id, so here, we have full info for an episode, but we need full info for a series
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
@@ -71,23 +71,43 @@ Function onSingleContentResponse(msg) As Void
       return
     else if m.top.deepLinkContent.deeplinkType = "season" and m.detailScreenContent.type = m.constants.ui.contentTypes.series
       ' we've now received the full series info, so we can build the relevant screens
-      populateDetailScreen(m.detailScreenContent)
-      onEpisodeList()
-      return
-    else if (m.top.deepLinkContent.deeplinkType = "episode" and m.detailScreenContent.type = m.constants.ui.contentTypes.series) or m.top.deepLinkContent.deeplinkType = "movie"
-      ' we now have the full series info for episode deeplinks, or have the full movie info by default
-      populateDetailScreen(m.detailScreenContent)
-      onPlay()
-      return
+      m.detailScreen2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, m.detailScreenContent)  ' this will find the episode if deep link was episode id, or [0,0] if it was series id
+      afterFn = onEpisodeList
+    else if m.top.deepLinkContent.deeplinkType = "episode" and m.detailScreenContent.type = m.constants.ui.contentTypes.series
+      ' we now have the full series info for episode deeplinks
+      m.detailScreen2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, m.detailScreenContent)  ' this will find the episode if deep link was episode id, or [0,0] if it was series id
+      afterFn = onPlay
+    else if m.top.deepLinkContent.deeplinkType = "movie"
+      afterFn = onPlay
     else
       'start the channel normally in case of issues
       m.enteredFromDeepLink = false
       startOnNow()
       return
     end if
+  else
+    ' Find a default episode to land on, in case no specific episode requested from deep link
+    if m.detailScreenContent.type = m.constants.ui.contentTypes.series and m.detailScreen2dIndex[0] = -1
+      history = m.global.historyIds.findNode(m.detailScreenContent.id)
+      if history <> invalid
+        m.detailScreen2dIndex = findEpisode2dIndex(history.currentEpisodeId, m.detailScreenContent)
+      else
+        m.detailScreen2dIndex = [0,0]
+      end if
+    end if
   end if
 
+  ' showDetailScreen defers navigation tracking for refreshed content or deep links, so do it here
+  m.detailScreen.trackingUri = populateDetailTrackingUri(m.detailScreenContent, getEpisodeContent(m.detailScreen2dIndex, m.detailScreenContent))
+  if previousScreen() <> invalid
+    screenTrackingNavigate(previousScreen(), m.detailScreen)
+  end if
+  screenTrackingLoad(m.detailScreen)
+
   populateDetailScreen(m.detailScreenContent)
+  if afterFn <> invalid
+    afterFn()
+  end if
 End Function
 
 
@@ -145,7 +165,7 @@ End Function
 ' @content: tubiContentNode - video or series
 Function getCurrentEpisode(content)
   episode = invalid
-  if content.type = m.constants.ui.contentTypes.series
+  if content <> invalid and content.type = m.constants.ui.contentTypes.series
     history = m.global.historyIds.findNode(content.id)
     detailScreen2dIndex = [0,0]
     if history <> invalid

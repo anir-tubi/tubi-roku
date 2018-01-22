@@ -394,47 +394,6 @@ Function testUpdateNowPosSignedInEpisodeNew(t As Object)
   t.assertEqual(result.getChild(0).getChild(0).nowPos, 145)
 End Function
 
-Function testUpdateNowPosSignedOutMovieNew(t As Object)
-  constants = getConstants()
-  REQUEST = TubiRequest()
-  AUTH = mockAuth_Unauthorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = CreateObject("roSGNode", "TubiContentNode")
-  content = CreateObject("roSGNode", "TubiContentNode")
-  content.type = "video"
-  content.id = "321221"
-  content.title = "We Are Young"
-  playerInfo = {
-    nowPos: 145
-  }
-  ' NOTE: Current behavior is that we don't maintain an
-  ' offline history.  Content must have a historyId to
-  ' be tracked in history
-  result = BM.updateNowPos(content, playerInfo, historyIds)
-  t.assertEqual(result.getChildCount(), 0)
-End Function
-
-Function testUpdateNowPosSignedOutEpisodeNew(t As Object)
-  constants = getConstants()
-  REQUEST = TubiRequest()
-  AUTH = mockAuth_Unauthorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = CreateObject("roSGNode", "TubiContentNode")
-  content = CreateObject("roSGNode", "TubiContentNode")
-  content.type = "video"
-  content.id = "302800"
-  content.title = "S02:E05 - You, I'll Be Following"
-  content.parentId = "1079"
-  playerInfo = {
-    nowPos: 145
-  }
-  ' NOTE: Current behavior is that we don't maintain an
-  ' offline history.  Content must have a historyId to
-  ' be tracked in history
-  result = BM.updateNowPos(content, playerInfo, historyIds)
-  t.assertEqual(result.getChildCount(), 0)
-End Function
-
 Function testUpdateNowPosSignedInMovieExisting(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
@@ -501,71 +460,6 @@ Function testUpdateNowPosSignedInEpisodeExisting(t As Object)
   t.assertEqual(result.getChild(0).getChild(0).type, constants.ui.contentTypes.video)
   t.assertEqual(result.getChild(0).getChild(0).historyId, "AABBCCDDEEFFGG")
   t.assertEqual(result.getChild(0).getChild(0).nowPos, 145)
-End Function
-
-Function testUpdateNowPosSignedOutMovieExisting(t As Object)
-  constants = getConstants()
-  REQUEST = TubiRequest()
-  AUTH = mockAuth_Unauthorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = CreateObject("roSGNode", "TubiContentNode")
-  movie = historyIds.createChild("TubiContentNode")
-  movie.id = "321221"
-  movie.type = "video"
-  movie.nowPos = 10
-  content = CreateObject("roSGNode", "TubiContentNode")
-  content.type = "video"
-  content.id = "321221"
-  content.title = "We Are Young"
-  playerInfo = {
-    nowPos: 145
-  }
-  ' Expected behavior is that we ignore content which is
-  ' missing a historyId, even if there is already something
-  ' in the history
-  result = BM.updateNowPos(content, playerInfo, historyIds)
-  t.assertEqual(result.getChildCount(), 1)
-  t.assertEqual(result.getChild(0).id, "321221")
-  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.video)
-  t.assertEqual(result.getChild(0).historyId, "")
-  t.assertEqual(result.getChild(0).nowPos, 10)
-End Function
-
-Function testUpdateNowPosSignedOutEpisodeExisting(t As Object)
-  constants = getConstants()
-  REQUEST = TubiRequest()
-  AUTH = mockAuth_Unauthorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = CreateObject("roSGNode", "TubiContentNode")
-  series = historyIds.createChild("TubiContentNode")
-  series.id = "01079"
-  series.type = "series"
-  series.currentEpisodeId = "302800"
-  episode = series.createChild("TubiContentNode")
-  episode.id = "302800"
-  episode.type = "video"
-  episode.nowPos = 15
-  content = CreateObject("roSGNode", "TubiContentNode")
-  content.type = "video"
-  content.id = "302800"
-  content.title = "S02:E05 - You, I'll Be Following"
-  content.parentId = "1079"
-  playerInfo = {
-    nowPos: 145
-  }
-  ' Expected behavior is that we ignore content which is
-  ' missing a historyId, even if there is already something
-  ' in the history
-  result = BM.updateNowPos(content, playerInfo, historyIds)
-  t.assertEqual(result.getChildCount(), 1)
-  t.assertEqual(result.getChild(0).id, "01079")
-  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.series)
-  t.assertEqual(result.getChild(0).historyId, "")
-  t.assertEqual(result.getChild(0).currentEpisodeId, "302800")
-  t.assertEqual(result.getChild(0).getChildCount(), 1)
-  t.assertEqual(result.getChild(0).getChild(0).id, "302800")
-  t.assertEqual(result.getChild(0).getChild(0).historyId, "")
-  t.assertEqual(result.getChild(0).getChild(0).nowPos, 15)
 End Function
 
 Function xtestUpdateNowPosInvalidHistoryIds(t As Object)

@@ -55,8 +55,13 @@ Function init()
 
   m.appLoadStopwatch = CreateObject("roTimespan")
 
-  m.detailScreenContent = invalid
+  ' detailScreen2dIndex may be set by:
+  '   (a) history currentEpisodeId if user is signed in and series is in history
+  '   (b) selection chosen from episode screen
+  '   (c) autoplay advancement
+  '   (d) default [0,0] when no history or not signed in
   m.detailScreen2dIndex = [0, 0] 'stores the [season, episode] position
+  m.detailScreenContent = invalid
 
   m._ = rodash()
 End Function
@@ -397,8 +402,20 @@ Function onSignOutModalSelected()
       popScreen(true)
     end while
     m.categoryScreen = invalid
+    ' clear out some stateful information we keep on the AuthTask
+    ' TODO(Chris): Don't keep state on child tasks, keep them locally
+    m.AuthTask.bookmarks = invalid
+    m.AuthTask.history = invalid
+    m.AuthTask.bookmarkId = ""
+    m.AuthTask.result = invalid
+    m.AuthTask.historyResult = invalid
+    ' triggers observer for m.AuthTask.authInfo
     m.AuthTask.functionName = "execSignOut"
     m.AuthTask.control = "RUN"
+
+    ' clear history and bookmarks
+    m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
+    m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
   end if
 
   focusedScreen = currentScreen()
@@ -594,6 +611,7 @@ Function playVideoContent(content As Object)
   m.ScreenStack.visible = false
 
   ' For position history tracking
+  m.authtask.historyResult = invalid
   m.authTask.content = localContent
 End Function
 
@@ -633,7 +651,6 @@ Function onEpisodeFinished(msg As Object)
     endEpisode = true
   end if
   if endEpisode then
-    onEpisodePosition()
     m.videoPlayer.unobserveFieldScoped("backButtonPressed")
     m.videoPlayer.unobserveFieldScoped("state")
     m.videoPlayer.unobserveFieldScoped("historyPosition")
@@ -726,7 +743,7 @@ End Function
 
 
 Function onEpisodeSelected()
-  m.detailScreen.episodeSelection = m.episodesScreen.episodeSelected
+  m.detailScreen2dIndex = m.episodesScreen.episodeSelected
   popScreen(true)
   m.episodesScreen = invalid
 
@@ -774,16 +791,13 @@ Function onPlayerInfo(playerInfo) As Void
   Bookmarks = TubiBookmarks(Request, Auth, m.constants)
 
   'update the nowPos in the global historyIds store
-  m.global.historyIds = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds)
+  if m.authTask.authInfo <> invalid and playerInfo.historyId <> invalid
+    m.global.historyIds = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds)
+  end if
 
   'update the detailScreen UI with the resume point
   if m.detailScreen <> invalid
-    m.detailScreen.resumePoint = playerInfo.nowPos
-  end if
-
-  'make sure the remove from history button is present on the details screen if necessary
-  if m.authTask.authInfo <> invalid and m.global.historyIds.findNode(content.id) <> invalid
-    m.detailScreen.isHistory = true
+    populateDetailScreen(m.detailScreenContent)
   end if
 
   if playerInfo.result = m.constants.player.playerResults.failed then
@@ -818,10 +832,6 @@ Function onPlayerInfo(playerInfo) As Void
 
       if nextEpisode2dIndex <> invalid
         m.detailScreen2dIndex = nextEpisode2dIndex  'must be set for onPlay() to grab the next episode
-
-        'update the current episode to be the next episode for the series history
-        nextEpisode = getEpisodeContent(nextEpisode2dIndex, lastContent)
-        m.global.historyIds = Bookmarks.updateNowPos(nextEpisode, {}, m.global.historyIds)
 
         populateDetailScreen(lastContent)
         onPlay()
@@ -887,19 +897,16 @@ Function showDetailScreen(content)
   m.detailScreen.observeFieldScoped("removeFromQueueSelected", "onRemoveFromQueueSelected")
   m.detailScreen.observeFieldScoped("removeFromHistorySelected", "onRemoveFromHistorySelected")
   m.detailScreen.observeFieldScoped("itemFailed", "onDetailItemFailed")
-
   m.detailScreenContent = content
-
-  'set the detail screen tracking uri
-  'this must happen before pushScreen so that pushScreen can send the analytics request with the proper URI
-  episode = getCurrentEpisode(content)
-  m.detailScreen.trackingUri = populateDetailTrackingUri(content, episode)
-  pushScreen(m.detailScreen, true)
+  m.detailScreen2dIndex = [-1,-1]   'default, indicating that there was no specific episode requested
 
   if m.enteredFromDeeplink or content.type = m.constants.ui.contentTypes.series
     m.detailScreen.isLoading = true
+    pushScreen(m.detailScreen, false)  ' don't send tracking until we resolve series episode
     getSingleContentFromServer()
   else
+    m.detailScreen.trackingUri = populateDetailTrackingUri(m.detailScreenContent, invalid)
+    pushScreen(m.detailScreen, true)
     populateDetailScreen(content)
   end if
 End Function
@@ -923,14 +930,9 @@ Function populateDetailScreen(content)
   bookmark = m.global.bookmarkIds.findNode(content.id)
   history = m.global.historyIds.findNode(content.id)
 
-  episode = getCurrentEpisode(content)
+  episode = getEpisodeContent(m.detailScreen2dIndex, content)
   episodeHistory = invalid
   if content.type = m.constants.ui.contentTypes.series
-    m.detailScreen2dIndex = [0, 0]
-    if history <> invalid
-      m.detailScreen2dIndex = findEpisode2dIndex(history.currentEpisodeId, content)
-    end if
-    
     if episode <> invalid
       episodeHistory = m.global.historyIds.findNode(episode.id)
       m.detailScreen.episodeTitle = episode.title
@@ -964,7 +966,7 @@ Function populateDetailScreen(content)
   end if
 
   m.detailScreen.isBookmark = (bookmark <> invalid)
-  m.detailScreen.isHistory = (history <> invalid and m.authTask.authInfo <> invalid)
+  m.detailScreen.isHistory = (history <> invalid)
 
   if content.type = m.constants.ui.contentTypes.series and episodeHistory <> invalid and episodeHistory.nowPos > 0
     m.detailScreen.resumePoint = episodeHistory.nowPos

@@ -70,6 +70,19 @@
 	- trailers show on detail screen menu for movies which have them
 	- trailers return to detail screen after finished playing
 	- skip trailer button launches feature
+- Episode selection
+    - Episode screen shows all episodes/seasons
+    - Episode screen lands on episode shown on detail screen
+    - Selecting episode goes to playback of that particular episode
+    - Back to exit video before any history saved focuses on the episode that was playing
+    - Signed-out users land on first episode in first season on Detail Screen
+    - Signed-in users land on first episode in first season on Detail Screen when not in history
+    - Signed-in users land on to 'currentEpisodeId' episode on Detail Screen when in history
+    - Deep-link
+        - lands on first episode of selected season when deep link type is "season" and id is type episode
+        - lands on first episode of first season when deep link type is "season" and id is type series
+        - lands on first episode of first season when deep link type is "series" and id is type series
+        - back from deep link type "episode" (video should auto play) lands on selected episode in series
 - Closed Captions
 	- subtitles work (all dogs go to heaven has working subtitles)
 	- instant replay subtitles work

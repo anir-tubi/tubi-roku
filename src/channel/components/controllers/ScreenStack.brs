@@ -126,6 +126,15 @@ End Function
 
 
 ''''''''''''''''''''
+' previousScreen
+'
+' Get the screen under the current one in the stack
+Function previousScreen()
+  return m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-2)
+End Function
+
+
+''''''''''''''''''''
 ' screenTrackingNavigate
 '
 ' 'tracking for navigating to a screen

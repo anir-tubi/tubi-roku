@@ -43,17 +43,17 @@ End Function
 
 Function onResumePointChange()
   tubiLog("DetailScreen.onResumePointChange")
-  menuItems = cloneDeep(m.Menu.content)
-  resumeIndex = getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
+  menuItems = m.Menu.content
+  resumeIndex = getChildIndexById(menuItems, m.ResumeMenuItem.id)
+  m.Menu.content = invalid
 
   m.ResumeMenuItem.playstart = m.top.resumePoint
   if resumeIndex = -1 and m.top.resumePoint > 0
     menuItems.insertChild(m.ResumeMenuItem, 0)
-    m.Menu.content = menuItems
   else if resumeIndex > -1 and m.top.resumePoint = 0
     menuItems.removeChildIndex(resumeIndex)
-    m.Menu.content = menuItems
   end if
+  m.Menu.content = menuItems
 End Function
 
 
@@ -63,9 +63,10 @@ Function onIsBookmark()
   m.AddQueueMenuItem.title = "Add to queue"
   m.RemoveQueueMenuItem.title = "Remove from queue"
   
-  menuItems = cloneDeep(m.Menu.content)
-  addQueueIndex = getChildIndexById(m.Menu.content, m.AddQueueMenuItem.id)
-  removeQueueIndex = getChildIndexById(m.Menu.content, m.RemoveQueueMenuItem.id)
+  menuItems = m.Menu.content
+  addQueueIndex = getChildIndexById(menuItems, m.AddQueueMenuItem.id)
+  removeQueueIndex = getChildIndexById(menuItems, m.RemoveQueueMenuItem.id)
+  m.Menu.content = invalid
 
   if m.top.isBookmark = false
     if addQueueIndex = -1
@@ -133,22 +134,19 @@ End Function
 
 Function onAddToQueueTitleChange()
   tubiLog("DetailScreen.onAddToQueueTitleChange")
-  addQueueIndex = getChildIndexById(m.Menu.content, m.AddQueueMenuItem.id)
-  updateMenuItemTitle(addQueueIndex, m.top.addToQueueTitle)
+  m.AddQueueMenuItem.title = m.top.addToQueueTitle
 End Function
 
 
 Function onRemoveFromQueueTitleChange()
   tubiLog("DetailScreen.onRemoveFromQueueTitleChange")
-  removeQueueIndex = getChildIndexById(m.Menu.content, m.RemoveQueueMenuItem.id)
-  updateMenuItemTitle(removeQueueIndex, m.top.removeQueueTitle)
+  m.RemoveQueueMenuItem.title = m.top.removeQueueTitle
 End Function
 
 
 Function onRemoveFromHistoryTitleChange()
   tubiLog("DetailScreen.onRemoveFromHistoryTitleChange")
-  removeHistoryIndex = getChildIndexById(m.Menu.content, m.RemoveHistoryMenuItem.id)
-  updateMenuItemTitle(removeHistoryIndex, m.top.removeHistoryTitle)
+  m.RemoveHistoryMenuItem.title = m.top.removeHistoryTitle
 End Function
 
 
@@ -186,12 +184,12 @@ End Function
 '                       and all other items will be disregarded.
 ' Set basic buttons first, additional buttons will be added based on the input fields of the details screen
 Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = []) As Void
-  menuItems = cloneDeep(m.Menu.content)
+  menuItems = m.Menu.content
+  m.Menu.content = invalid
 
   if add = false and itemIndex > -1
     'menu item exists, so we need to remove it
     menuItems.removeChildIndex(itemIndex)
-    m.Menu.content = menuItems
   else if add = true and itemIndex = -1
     'we don't have menu item, and need to add one
     'find the previous item index, and insert the Watch Trailer item one index after
@@ -211,23 +209,8 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
       menuItems.appendChild(itemToAdd)
     end if
 
-    m.Menu.content = menuItems
   end if
-End Function
-
-
-''''''''''''''''''''''''
-' updateMenuItemTitle
-'
-' directly update the title of one of the menu items.
-' Updating a DetailMenuItemContentNode doesn't necessarilly pass through title to the actual menu item
-'
-' @index: int, the index of the menu itemt to change
-' @title: string, the new title
-Function updateMenuItemTitle(index, title)
-  menuItemButton = m.Menu.findNode("Items").getChild(index)
-  buttonLabel = menuItemButton.findNode("DetailsMenuText")
-  buttonLabel.text = title
+  m.Menu.content = menuItems
 End Function
 
 
