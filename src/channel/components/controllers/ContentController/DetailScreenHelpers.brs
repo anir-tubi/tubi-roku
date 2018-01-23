@@ -76,9 +76,23 @@ Function onSingleContentResponse(msg) As Void
     else if m.top.deepLinkContent.deeplinkType = "episode" and m.detailScreenContent.type = m.constants.ui.contentTypes.series
       ' we now have the full series info for episode deeplinks
       m.detailScreen2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, m.detailScreenContent)  ' this will find the episode if deep link was episode id, or [0,0] if it was series id
-      afterFn = onPlay
+
+      'determine if we need to resume or play from start the deeplinked episode
+      if m.top.deepLinkContent.nowPos <> invalid and m.top.deepLinkContent.nowPos > 0
+        episode = getEpisodeContent(m.detailScreen2dIndex, m.detailScreenContent)
+        episode.nowPos = m.top.deepLinkContent.nowPos
+        afterFn = onResume
+      else
+        afterFn = onPlay
+      end if
     else if m.top.deepLinkContent.deeplinkType = "movie"
-      afterFn = onPlay
+      'determine if we need to resume or play from start the deeplinked movie
+      if m.top.deepLinkContent.nowPos <> invalid and m.top.deepLinkContent.nowPos > 0
+        m.detailScreenContent.nowPos = m.top.deepLinkContent.nowPos
+        afterFn = onResume
+      else
+        afterFn = onPlay
+      end if
     else
       'start the channel normally in case of issues
       m.enteredFromDeepLink = false
