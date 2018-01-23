@@ -13,6 +13,7 @@
     <field id="genres" type="stringarray" />
     <field id="rokuGenres" type="stringarray" />
     <field id="showsubtitles" type="boolean" />
+    <field id="hasSubtitles" type="boolean" />
     <field id="language" type="string" />
     <field id="pubid" type="string" />
     <field id="country" type="string" />

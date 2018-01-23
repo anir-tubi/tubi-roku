@@ -184,6 +184,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   'take care of any subtitles if they exist - should only happen on videos
+  if contentFromServer.has_subtitle <> invalid then translatedContent.hasSubtitles = contentFromServer.has_subtitle
   if contentFromServer.subtitles <> invalid and type(contentFromServer.subtitles) = "roArray" and contentFromServer.subtitles.count() > 0
     subtitleTracks = []
     for each subtitle in contentFromServer.subtitles

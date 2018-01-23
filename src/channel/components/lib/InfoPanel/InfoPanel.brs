@@ -30,6 +30,10 @@ Function init()
 
   onModeChange()  ' kickstart the mode
   onWidthChange()
+
+  'set the default CC state to be no CC
+  firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
+  firstLineGroup.removeChild(m.ClosedCaptions)
 End Function
 
 

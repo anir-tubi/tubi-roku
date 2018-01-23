@@ -957,9 +957,9 @@ Function populateDetailScreen(content)
   m.detailScreen.directors = stateSource.directors
   m.detailScreen.starring = stateSource.actors
 
-  if episode <> invalid and episode.subtitleTracks <> invalid
+  if episode <> invalid and (episode.hasSubtitles = true or not m._.empty(episode.subtitleTracks))
     m.detailScreen.hasCC = true
-  else if content.type = m.constants.ui.contentTypes.video and content <> invalid and content.subtitleTracks <> invalid
+  else if content <> invalid and content.type = m.constants.ui.contentTypes.video and (content.hasSubtitles = true or not m._.empty(content.subtitleTracks))
     m.detailScreen.hasCC = true
   else
     m.detailScreen.hasCC = false

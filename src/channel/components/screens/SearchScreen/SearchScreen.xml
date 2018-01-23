@@ -4,6 +4,7 @@
   <script type="text/brightscript" uri="pkg:/components/screens/SearchScreen/SearchScreen.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
     <!-- set to the tubi content id of the item which was clicked on -->

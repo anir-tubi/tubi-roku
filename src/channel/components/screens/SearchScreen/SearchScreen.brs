@@ -1,5 +1,6 @@
 Function init()
   tubiLog("SearchScreen.init")
+  m._ = rodash()
 
   m.Keyboard = m.top.findNode("Keyboard")
   m.Keyboard.observeField("text", "onKeyboardTextChanged")
@@ -35,7 +36,6 @@ Function init()
   if m.global.constants.deviceInfo.scaledUi = true then
     m.ResultGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
-
 
   m.top.backgroundUriList = [m.defaultHeroUri]
 End Function
@@ -149,6 +149,7 @@ End Function
 '
 ' Animate the keyboard off screen, show the info panel, and focus on the content grid
 Function startFocusResultGrid()
+  tubiLog("SearchScreen.startFocusResultGrid")
   m.TranslationInterpolator.keyValue = [[85,315],[85,545]]
   m.SearchText.font.size = 34
   m.Cursor.visible = false
@@ -167,6 +168,7 @@ End Function
 '
 ' Finalize focus and visibility after the animation
 Function endFocusResultGrid()
+  tubiLog("SearchScreen.endFocusResultGrid")
   if m.TextEntryAnimation.state = "stopped" then
     m.TextEntryAnimation.unobserveField("state")
     m.ResultGrid.setFocus(true)
@@ -241,7 +243,7 @@ Function populateInfoPanel(focusedContent)
     m.InfoPanel.rating = focusedContent.rating
     m.InfoPanel.description = focusedContent.description
 
-    if focusedContent.showSubtitles
+    if (focusedContent.hasSubtitles or not m._.empty(focusedContent.subtitleTracks))
       m.InfoPanel.hasCC = true
     else
       m.InfoPanel.hasCC = false

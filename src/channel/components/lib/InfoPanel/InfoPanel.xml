@@ -35,7 +35,7 @@
     <field id="episodeTitle" alias="Episode.text" />
     <field id="releaseDate" type="string" />
     <field id="length" type="integer" />
-    <field id="hasCC" type="boolean" />
+    <field id="hasCC" type="boolean"  value="false"/>
     <field id="rating" type="string" />
     <field id="genres" type="stringarray" />
     <field id="description" type="string" />

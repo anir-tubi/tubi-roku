@@ -1,5 +1,6 @@
 Function init()
   tubiLog("CategoryScreen.init")
+  m._ = rodash()
   m.constants = m.global.constants
   m.ContentArea = m.top.findNode("ContentArea")
   m.CategoryList = m.top.findNode("CategoryList") 'aka category menu
@@ -394,7 +395,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.length = contentNode.length
       m.InfoPanel.rating = contentNode.rating
       m.InfoPanel.genres = contentNode.genres
-      contentNode.subtitleTracks = (m.InfoPanel.hasCC <> invalid)
+      m.InfoPanel.hasCC = (contentNode.hasSubtitles or not m._.empty(contentNode.subtitleTracks))
     end if
 
     m.InfoPanel.calculateHeight = true
