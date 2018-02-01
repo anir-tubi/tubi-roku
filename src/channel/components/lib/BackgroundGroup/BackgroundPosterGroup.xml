@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="BackgroundPosterGroup" extends="Group">
+  <interface>
+    <!-- Store the last animation that was triggered in case we need to stop it later-->
+    <field id="lastAnimationName" type="string" />
+
+    <!-- Inputs -->
+    <field id="width" alias="BackgroundPoster.width" />
+    <field id="height" alias="BackgroundPoster.height" />
+    <field id="loadWidth" alias="BackgroundPoster.loadWidth" />
+    <field id="loadHeight" alias="BackgroundPoster.loadHeight" />
+    <field id="loadDisplayMode" alias="BackgroundPoster.loadDisplayMode" />
+    <field id="uri" alias="BackgroundPoster.uri" />
+    <field id="posterTranslation" alias="BackgroundPoster.translation" />
+    <field id="posterOpacity" alias="BackgroundPoster.opacity" />
+    <field id="topRightTransitionInControl" alias="TopRightTransitionIn.control" />
+    <field id="fullScreenTransitionInControl" alias="FullScreenTransitionIn.control" />
+    <field id="fadeInControl" alias="FadeIn.control" />
+    <field id="fadeOutControl" alias="FadeOut.control" />
+
+    <!-- Outputs -->
+    <field id="loadStatus" alias="BackgroundPoster.loadStatus" />
+  </interface>
+
+  <children>
+    <Poster
+      id="BackgroundPoster"
+      width="1920"
+      height="1080"
+      uri="pkg:/images/art-blur-background.png"
+      translation="[0,0]"
+      opacity="0.0" />
+    <Animation
+      id="TopRightTransitionIn"
+      duration="0.9"
+      easeFunction="inOutCubic">
+      <Vector2DFieldInterpolator
+        id="TranslationInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[[143, -91],[305,0]]"
+        fieldToInterp="BackgroundPoster.translation" />
+      <FloatFieldInterpolator
+        id="ShrinkWidthInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[1938, 1615]"
+        fieldToInterp="BackgroundPoster.width" />
+      <FloatFieldInterpolator
+        id="ShrinkHeightInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[1091, 909]"
+        fieldToInterp="BackgroundPoster.height" />
+      <FloatFieldInterpolator
+        id="FadeInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[0, 1]"
+        fieldToInterp="BackgroundPoster.opacity" />
+    </Animation>
+    <Animation
+      id="FullScreenTransitionIn"
+      duration="0.9"
+      easeFunction="inOutCubic">
+      <Vector2DFieldInterpolator
+        id="TranslationInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[[-192, -108],[0,0]]"
+        fieldToInterp="BackgroundPoster.translation" />
+      <FloatFieldInterpolator
+        id="ShrinkWidthInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[2304, 1920]"
+        fieldToInterp="BackgroundPoster.width" />
+      <FloatFieldInterpolator
+        id="ShrinkHeightInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[1296, 1080]"
+        fieldToInterp="BackgroundPoster.height" />        
+      <FloatFieldInterpolator
+        id="FadeInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[0, 1]"
+        fieldToInterp="BackgroundPoster.opacity" />
+    </Animation>
+    <Animation
+      id="FadeIn"
+      duration="0.9"
+      easeFunction="inOutCubic">
+      <FloatFieldInterpolator
+        id="FadeInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[0, 1]"
+        fieldToInterp="BackgroundPoster.opacity" />
+    </Animation>    
+    <Animation
+      id="FadeOut"
+      duration="0.9"
+      easeFunction="outCubic">
+      <FloatFieldInterpolator
+        id="FadeInterpolator"
+        key="[1.0,0.0]"
+        keyValue="[0, 1]"
+        fieldToInterp="BackgroundPoster.opacity" />
+    </Animation>
+  </children>
+</component>

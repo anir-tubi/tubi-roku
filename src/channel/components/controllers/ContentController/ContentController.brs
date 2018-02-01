@@ -288,8 +288,6 @@ Function onSignInComplete()
     popScreen(true)
   end while
 
-  m.backgroundGroup.enterFromSignIn = true
-
   if m.SignIn.guestPass then
     ' start the 'On Now' experience right away
     startOnNow()
@@ -571,10 +569,10 @@ End Function
 
 Function homeScreenBackgroundUpdated()
   tubiLog("ContentController.homeScreenBackgroundUpdated")
-  m.backgroundGroup.backgroundUriList = m.homeScreen.backgroundUriList
-
-  'change the background type to fullscreen if new background uri list is default
-  m.backgroundGroup.newBackgroundType = getBackgroundtype(m.backgroundGroup.backgroundUriList)
+  m.backgroundGroup.backgroundInfo = {
+    type: getBackgroundtype(m.homeScreen.backgroundUriList)
+    uriList: m.homeScreen.backgroundUriList
+  }
 End Function
 
 
@@ -932,11 +930,14 @@ Function populateDetailScreen(content)
 
   'update the background images for the detail screen
   if content.backgrounds <> invalid and content.backgrounds.count() > 0
-    m.backgroundGroup.backgroundUriList = content.backgrounds
+    backgroundUriList = content.backgrounds
   else
-    m.backgroundGroup.backgroundUriList = [m.defaultBackgroundUri]
+    backgroundUriList = [m.defaultBackgroundUri]
   end if
-  m.backgroundGroup.newBackgroundType = "fullscreen"
+  m.backgroundGroup.backgroundInfo = {
+    type: m.constants.ui.backgroundTypes.fullScreen
+    uriList: backgroundUriList
+  }
 End Function
 
 
@@ -946,11 +947,10 @@ End Function
 '
 Function onGridBackgroundChange()
   TubiLog("ContentController.onGridBackgroundChange")
-  m.backgroundGroup.backgroundUriList = m.categoryScreen.backgroundUriList
-
-  'change the background type to fullscreen if new background uri list is default
-  m.backgroundGroup.newBackgroundType = getBackgroundtype(m.backgroundGroup.backgroundUriList)
-  print "NEW BACKGROUNDURI LIST "; m.backgroundGroup.backgroundUriList 
+  m.backgroundGroup.backgroundInfo = {
+    type: getBackgroundtype(m.categoryScreen.backgroundUriList)
+    uriList: m.categoryScreen.backgroundUriList
+  }
 End Function
 
 
@@ -960,19 +960,19 @@ End Function
 '
 Function onEpisodeBackgroundChange()
   TubiLog("ContentController.onEpisodeBackgroundChange")
-  m.backgroundGroup.backgroundUriList = m.episodesScreen.backgroundUriList
-
-  'change the background type to fullscreen if new background uri list is default 
-  m.backgroundGroup.newBackgroundType = getBackgroundtype(m.backgroundGroup.backgroundUriList)
+  m.backgroundGroup.backgroundInfo = {
+    type: getBackgroundtype(m.episodesScreen.backgroundUriList)
+    uriList: m.episodesScreen.backgroundUriList
+  }
 End Function
 
 
 Function onSearchBackgroundChange()
   TubiLog("ContentController.onSearchBackgroundChange")
-  m.backgroundGroup.backgroundUriList = m.searchScreen.backgroundUriList
-
-  'change the background type to fullscreen if new background uri list is default 
-  m.backgroundGroup.newBackgroundType = getBackgroundtype(m.backgroundGroup.backgroundUriList)
+  m.backgroundGroup.backgroundInfo = {
+    type: getBackgroundtype(m.searchScreen.backgroundUriList)
+    uriList: m.searchScreen.backgroundUriList
+  }
 End Function
 
 
@@ -1014,9 +1014,9 @@ End Function
 ' @backgroundUriList, array of uris
 Function getBackgroundtype(backgroundUriList)
   if backgroundUriList[0] = m.defaultBackgroundUri
-    return "fullscreen"
+    return m.constants.ui.backgroundTypes.fullScreen
   else
-    return "topright"
+    return m.constants.ui.backgroundTypes.topRight
   end if
 End Function
 

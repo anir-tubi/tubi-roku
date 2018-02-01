@@ -54,24 +54,26 @@ Function getConstants()
       "3400X": true  ' MHL Stick
       "3420X": true  ' MHL Stick
       "3500X": true  ' HDMI Stick (2014)
-      "3600X": true  ' QuadCore Stick (2016)
       "3700X": true  ' Express
       "3710X": true  ' Express+
-      "3800X": true  ' Stick (2017)
-      "3900X": true  ' Express (2017)
-      "3910X": true  ' Express+ (2017)
       "5000X": true  ' TV (low specs)
     }
 
-    ' these are non-OpenGL or low VRAM but CPU significantly faster than the "old" devices
+    ' these are non-OpenGL but CPU significantly faster than the "old" devices
     limitedUIWithFastCPU = {
-      "3600X": true
       "3700X": true
       "3710X": true
-      "3800X": true
-      "3900X": true
-      "3910X": true
       "5000X": true
+    }
+
+    lowVram = {
+      "3600X": true  ' QuadCore Stick (2016)
+      "3800X": true  ' Stick (2017)
+      "3900X": true  ' Express (2017)
+      "3910X": true  ' Express+ (2017)
+      "4200X": true  ' 3 (2013)
+      "4210X": true  ' 2 (2015)
+      "4230X": true  ' 3 (2015)
     }
 
     'models that do not run the system CC overlay/dialog during video playback
@@ -119,6 +121,13 @@ Function getConstants()
       limitedUi = false
       fastCpu = true
     end if
+
+    if lowVram[di.GetModel()] <> invalid
+      lowVram = true
+    else
+      lowVram = false
+    end if
+
 
     if noFirmwareCaptionMenuModels[di.GetModel()] <> invalid
       firmwareCaptionMenu = false
@@ -177,6 +186,7 @@ Function getConstants()
     constants.deviceInfo.countryCode = countryCode ' will be invalid if old version of firmware
     constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.fastCpu = fastCpu
+    constants.deviceInfo.lowVram = lowVram
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
     constants.deviceInfo.limitedUi = limitedUi
     constants.deviceInfo.clientVersion = clientVersion
@@ -225,6 +235,7 @@ Function getConstants()
 
     'contents url
     constants.urls.cms = {}
+      ' constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
       constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
       constants.urls.cms.contents = constants.urls.cms.urlBase + "/contents"
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
@@ -248,7 +259,7 @@ Function getConstants()
 
     'user event tracking url
     constants.urls.dataScience = {}
-      ' constants.urls.dataScience.urlBase = "https://staging-uapi.adrise.tv/datascience"
+      ' constants.urls.dataScience.urlBase = "https://uapi.staging-public.tubi.io/datascience"
       constants.urls.dataScience.urlBase = "https://uapi.adrise.tv/datascience"
       constants.urls.datascience.event = constants.urls.dataScience.urlBase + "/event"
       constants.urls.datascience.experiment = constants.urls.dataScience.urlBase + "/evaluate/namespaces"
@@ -420,6 +431,10 @@ Function getConstants()
       constants.ui.contentTypes.episode = "episode"
       constants.ui.contentTypes.season = "season"
       constants.ui.contentTypes.category = "category"
+
+    constants.ui.backgroundTypes = {}
+      constants.ui.backgroundTypes.fullScreen = "fullscreen"
+      constants.ui.backgroundTypes.topRight = "topright"
 
     'screen ids in the UI
     constants.ui.screenIds = {}

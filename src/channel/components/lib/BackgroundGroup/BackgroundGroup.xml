@@ -13,16 +13,28 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
   
   <interface>
-    <!-- newBackgroundType can be "topright", "fullscreen" -->
-    <field id="newBackgroundType" type="string" value="topright" alwaysNotify="true" />
-
-    <!-- used to set the uri for the background image -->
-    <field id="backgroundUriList" type="stringarray" />
-    
-    <!-- flag to notify if the user is opening the category screen from the sign in screens -->
-    <field id="enterFromSignIn" type="boolean" value="false" alwaysNotify="true" />
-
+    <!-- backgrondInfo has the keys "type (string)" and "uriList (array)".
+         type can be "topright", "fullscreen"
+         uriList is an array of background image uris
+    -->
+    <field id="backgroundInfo" type="assocarray" />
   </interface>
 
-  <children />
+  <children>
+    <BackgroundPosterGroup
+      id="Poster1"
+      posterOpacity="0.0" />
+    <BackgroundPosterGroup
+      id="Poster2"
+      posterOpacity="1.0"
+      uri="pkg:/images/art-blur-background.png" />
+    <BackgroundGradientGroup
+      id="FullScreenGradient"
+      uri="pkg:/images/detail-gradient-25.png"
+      gradientOpacity="1.0"/>
+    <BackgroundGradientGroup
+      id="TopRightGradient"
+      uri="pkg:/images/home-gradient-25.png"
+      gradientOpacity="0.0"/>
+  </children>
 </component>
