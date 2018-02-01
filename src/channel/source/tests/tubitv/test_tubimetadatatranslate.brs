@@ -64,3 +64,100 @@ Function testParentTypes(t As Object)
     end if
   end for
 End Function
+
+Function testCreditsCuepoints(t As Object)
+  constants = getConstants()
+  translate = TubiMetadataTranslate(constants)
+
+  ' normal cuepoint
+  source = {
+    id: "12345"
+    type: "v"
+    duration: 600
+    credit_cuepoints: {
+      prologue: 0
+      postlude: 550
+    }
+  }
+  dest = CreateObject("roSGNode", "TubiContentNode")
+  translate.translateRecursive(source, dest)
+  t.assertTrue(dest.length = 600)
+  t.assertTrue(dest.creditsCuepoint = 550)
+
+  ' default cuepoint
+  source = {
+    id: "12345"
+    type: "v"
+    duration: 600
+    credit_cuepoints: {
+      prologue: 0
+      postlude: 0
+    }
+  }
+  dest = CreateObject("roSGNode", "TubiContentNode")
+  translate.translateRecursive(source, dest)
+  t.assertTrue(dest.length = 600)
+  t.assertTrue(dest.creditsCuepoint = 570)
+
+  ' missing cuepoints
+  source = {
+    id: "12345"
+    type: "v"
+    duration: 600
+  }
+  dest = CreateObject("roSGNode", "TubiContentNode")
+  translate.translateRecursive(source, dest)
+  t.assertTrue(dest.length = 600)
+  t.assertTrue(dest.creditsCuepoint = 570)
+
+  ' cuepoint too close to the end
+  source = {
+    id: "12345"
+    type: "v"
+    duration: 600
+    credit_cuepoints: {
+      prologue: 0
+      postlude: 595
+    }
+  }
+  dest = CreateObject("roSGNode", "TubiContentNode")
+  translate.translateRecursive(source, dest)
+  t.assertTrue(dest.length = 600)
+  t.assertTrue(dest.creditsCuepoint = 570)
+
+  ' no cuepoint or length given
+  source = {
+    id: "12345"
+    type: "v"
+  }
+  dest = CreateObject("roSGNode", "TubiContentNode")
+  translate.translateRecursive(source, dest)
+  t.assertTrue(dest.length = 0)
+  t.assertTrue(dest.creditsCuepoint = 0)
+
+  ' title isn't long enough for default cuepoint placement (no cuepoints)
+  source = {
+    id: "12345"
+    type: "v"
+    duration: 10
+  }
+  dest = CreateObject("roSGNode", "TubiContentNode")
+  translate.translateRecursive(source, dest)
+  t.assertTrue(dest.length = 10)
+  t.assertTrue(dest.creditsCuepoint = 0)
+
+  ' title isn't long enough for default cuepoint placement (no cuepoints)
+  source = {
+    id: "12345"
+    type: "v"
+    duration: 10
+    credit_cuepoints: {
+      prologue: 0
+      postlude: 8
+    }
+  }
+  dest = CreateObject("roSGNode", "TubiContentNode")
+  translate.translateRecursive(source, dest)
+  t.assertTrue(dest.length = 10)
+  t.assertTrue(dest.creditsCuepoint = 0)
+End Function

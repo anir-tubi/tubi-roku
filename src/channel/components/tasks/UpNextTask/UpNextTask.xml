@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - UpNextTask
+ -
+ - This is a task to get releated content or recommended alternatives to show at the end of a title
+ -
+ --> 
+<component name="UpNextTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/tasks/UpNextTask/UpNextTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+
+    <interface>
+      <!-- INPUT -->
+        <!-- Content node to get a fully parsed TubiContentNode for.
+        - Only contentFragment.id is expected to be populated.  All other fields are ignored.
+        -->
+        <field id="content" type="node"/>
+      
+
+      <!-- OUTPUT -->
+        <!-- Set to the parsed TubiContentNode on success -->
+        <field id="response" type="node" />
+      
+        <!-- Set when an error occurs to:
+        -   {
+        -     code: <integer http response code>
+        -     data: <http response body>
+        -     failReason: <string failure reason from roUrlEvent.GetFailureReason()>
+        -   }
+        -->
+        <field id="error" type="assocarray" />
+    </interface>
+</component>

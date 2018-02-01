@@ -192,6 +192,7 @@ Function getConstants()
     constants.reqNames.getFullBookmarks = "getFullBookmarks" 
     constants.reqNames.getFullHistory = "getFullHistory"
     constants.reqNames.getSingleContent = "getSingleContent"
+    constants.reqNames.getUpNextContent = "getUpNextContent"
 
   'Nielsen ID token for integrating with Nielsen DAR
   constants.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
@@ -228,6 +229,7 @@ Function getConstants()
       constants.urls.cms.contents = constants.urls.cms.urlBase + "/contents"
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
       constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
+      constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
 
     'users url
     constants.urls.users = {}
@@ -309,7 +311,13 @@ Function getConstants()
   'constants needed for the video player
   constants.player = {}
 
-    constants.player.creditsDuration = 180
+    ' number of seconds that the "up next" screen will show
+    constants.player.upNextCountdown = 20
+
+    ' default if cuepoint is missing from metadata.  Should be just
+    ' enough time to show the upNext countdown, with a slight buffer to avoid
+    ' race conditions with videos ending
+    constants.player.creditsDuration = 30
 
     'how often the video player sends play progress events
     constants.player.pingFrequency = 10

@@ -31,7 +31,7 @@ End Function
 
 '@content: roSGNode, a TubiContentNode
 Function getSingleContentFromServer(content=invalid)
-  tubiLog("DetailScreenHelpers.getSeriesContent")
+  tubiLog("DetailScreenHelpers.getSingleContentFromServer")
   if content = invalid then content = m.detailScreenContent
 
   if content <> invalid then 
@@ -49,9 +49,10 @@ End Function
 
 
 Function onSingleContentResponse(msg) As Void
-  tubiLog("DetailScreenHelpers.onSeriesContentResponse")
+  tubiLog("DetailScreenHelpers.onSingleContentResponse")
   'refreshedContent should hold all the series info that is needed for the detail screen to function
   refreshedContent = msg.GetData()
+  oldContent = m.detailScreenContent  ' in a few cases we need this for the original content id
   m.detailScreenContent = refreshedContent
 
   m.refreshTask.unobserveField("response")
@@ -61,8 +62,18 @@ Function onSingleContentResponse(msg) As Void
   afterFn = invalid  ' the function to execute once we've sorted the detail screen out
   if m.enteredFromDeepLink = true and m.top.deepLinkContent <> invalid
     if m.top.deepLinkContent.deeplinkType = "series"
+      '  m.detailScreenContent.id:       series id
+      '  m.detailScreenContent.seriesId: invalid
+      '  m.detailScreenContent.type:     series
+      '  m.deepLinkContent.deepLinkType: series
       m.detailScreen2dIndex = [0,0]
+
     else if (m.top.deepLinkContent.deeplinkType = "season" or m.top.deepLinkContent.deeplinkType = "episode") and m.detailScreenContent.type = m.constants.ui.contentTypes.video
+      '  m.detailScreenContent.id =       episode id
+      '  m.detailScreenContent.seriesId = series id
+      '  m.detailScreenContent.type =     video
+      '  m.deepLinkContent.deepLinkType = seaason | episode
+
       ' deeplink sent us an episode id, so here, we have full info for an episode, but we need full info for a series
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
       emptySeriesNode.type = m.constants.ui.contentTypes.series
@@ -70,12 +81,22 @@ Function onSingleContentResponse(msg) As Void
       getSingleContentFromServer(emptySeriesNode)
       return
     else if m.top.deepLinkContent.deeplinkType = "season" and m.detailScreenContent.type = m.constants.ui.contentTypes.series
+      '  m.detailScreenContent.id =       series id
+      '  m.detailScreenContent.seriesId = invalid
+      '  m.detailScreenContent.type =     series
+      '  m.deepLinkContent.deepLinkType = season
+
       ' we've now received the full series info, so we can build the relevant screens
-      m.detailScreen2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, m.detailScreenContent)  ' this will find the episode if deep link was episode id, or [0,0] if it was series id
+      m.detailScreen2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, m.detailScreenContent)
       afterFn = onEpisodeList
     else if m.top.deepLinkContent.deeplinkType = "episode" and m.detailScreenContent.type = m.constants.ui.contentTypes.series
+      '  m.detailScreenContent.id =       series id
+      '  m.detailScreenContent.seriesId = invalid
+      '  m.detailScreenContent.type =     series
+      '  m.deepLinkContent.deepLinkType = episode
+
       ' we now have the full series info for episode deeplinks
-      m.detailScreen2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, m.detailScreenContent)  ' this will find the episode if deep link was episode id, or [0,0] if it was series id
+      m.detailScreen2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, m.detailScreenContent)
 
       'determine if we need to resume or play from start the deeplinked episode
       if m.top.deepLinkContent.nowPos <> invalid and m.top.deepLinkContent.nowPos > 0
@@ -102,12 +123,25 @@ Function onSingleContentResponse(msg) As Void
   else
     ' Find a default episode to land on, in case no specific episode requested from deep link
     if m.detailScreenContent.type = m.constants.ui.contentTypes.series and m.detailScreen2dIndex[0] = -1
-      history = m.global.historyIds.findNode(m.detailScreenContent.id)
-      if history <> invalid
-        m.detailScreen2dIndex = findEpisode2dIndex(history.currentEpisodeId, m.detailScreenContent)
+      if oldContent <> invalid and oldContent.type = m.constants.ui.contentTypes.video 
+        ' a specific episode was requested by id
+        m.detailScreen2dIndex = findEpisode2dIndex(oldContent.id, m.detailScreenContent)
       else
-        m.detailScreen2dIndex = [0,0]
+        ' first see if there was a specific episode id we wanted
+        history = m.global.historyIds.findNode(m.detailScreenContent.id)
+        if history <> invalid
+          m.detailScreen2dIndex = findEpisode2dIndex(history.currentEpisodeId, m.detailScreenContent)
+        else
+          m.detailScreen2dIndex = [0,0]
+        end if
       end if
+    else if m.detailScreenContent.type = m.constants.ui.contentTypes.video and m.detailScreenContent.seriesId <> invalid and m.detailScreenContent.seriesId <> ""
+      ' Case here of having an episode outside of a series (probably from autoplay)
+      emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
+      emptySeriesNode.type = m.constants.ui.contentTypes.series
+      emptySeriesNode.id = m.detailScreenContent.seriesId
+      getSingleContentFromServer(emptySeriesNode)
+      return
     end if
   end if
 

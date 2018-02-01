@@ -150,9 +150,23 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     end if
   end if
 
-  'add fake credit cuepoints for episodes - we can remove this once we get actual credits cue points for content
-  if translatedContent.parentId <> invalid and translatedContent[typeVar] = m.contentTypes.video and translatedContent.length <> invalid
-    translatedContent.creditsCuepoint = translatedContent.length - m.creditsDuration
+  'add default credit cuepoints if missing, or skip it if content is very short
+  if translatedContent.creditsCuepoint = 0 and translatedContent.length > m.creditsDuration
+    cuepoint = translatedContent.length - m.creditsDuration
+    if cuepoint >= 0
+      translatedContent.creditsCuepoint = cuepoint
+    end if
+  end if
+
+  ' if credits duration is less than m.creditsDuration, force it to be at least that long
+  if translatedContent.creditsCuepoint > 0 and (translatedContent.length - translatedContent.creditsCuePoint) < m.creditsDuration
+    cuepoint = translatedContent.length - m.creditsDuration
+    if cuePoint >= 0
+      translatedContent.creditsCuepoint = cuepoint
+    else
+      ' if the cuepoint was adjusted, but it ended up being negative
+      translatedContent.creditsCuepoint = 0
+    end if
   end if
 
   if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0

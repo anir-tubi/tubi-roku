@@ -583,36 +583,36 @@ End Function
 '
 ' Helper function for onResume and onPlay to launch content
 Function playVideoContent(content As Object)
-  m.videoPlayer.visible = true
-  if content.isTrailer
-    m.videoPlayer.analyticsMode = "trailer"
-    m.videoPlayer.observeFieldScoped("state", "onTrailerFinished")
-    m.videoPlayer.observeFieldScoped("backButtonPressed", "onTrailerFinished")
-    m.videoPlayer.observeFieldScoped("skipTrailer", "onTrailerFinished")
-    m.videoPlayer.enableAds = false
-  else
-    m.videoPlayer.analyticsMode = "normal"
-    m.videoPlayer.observeFieldScoped("state", "onEpisodeFinished")
-    m.videoPlayer.observeFieldScoped("historyPosition", "onEpisodePosition")
-    m.videoPlayer.observeFieldScoped("backButtonPressed", "onEpisodeFinished")
-    m.videoPlayer.enableAds = true
-  end if
-
-  m.videoPlayer.setFocus(true)
+  if content <> invalid
+    if content.isTrailer
+      m.videoPlayer.analyticsMode = "trailer"
+      m.videoPlayer.observeFieldScoped("skipTrailer", "onSkipTrailer")
+      m.videoPlayer.enableAds = false
+    else
+      m.videoPlayer.analyticsMode = "normal"
+      m.videoPlayer.observeFieldScoped("historyPosition", "onEpisodePosition")
+      m.videoPlayer.observeFieldScoped("creditsPosition", "onEpisodeCredits")
+      m.videoPlayer.enableAds = true
+    end if
+    m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
+    m.videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
+    m.videoPlayer.visible = true
+    m.videoPlayer.setFocus(true)
   
-  ' Clone the content so we don't have listeners affecting it
-  parent = CreateObject("roSGNode", "TubiContentNode")
-  localContent = clone(content)
-  parent.appendChild(localContent)
+    ' Clone the content so we don't have listeners affecting it
+    parent = CreateObject("roSGNode", "TubiContentNode")
+    localContent = clone(content)
+    parent.appendChild(localContent)
 
-  m.videoPlayer.playlist = parent
-  m.videoPlayer.loopPlaylist = false
-  m.videoPlayer.seekPlaylist = [0, localContent.nowPos]
-  m.ScreenStack.visible = false
+    m.videoPlayer.playlist = parent
+    m.videoPlayer.loopPlaylist = false
+    m.videoPlayer.seekPlaylist = [0, localContent.nowPos]
+    m.ScreenStack.visible = false
 
-  ' For position history tracking
-  m.authtask.historyResult = invalid
-  m.authTask.content = localContent
+    ' For position history tracking
+    m.authtask.historyResult = invalid
+    m.authTask.content = localContent
+  end if
 End Function
 
 
@@ -631,43 +631,134 @@ Function onEpisodePosition()
   end if
 End Function
 
-
-'''''''''''''''''''''''
-' onEpisodeFinished
-'
-' A series episode or feature film has finished playing
-Function onEpisodeFinished(msg As Object)
-  tubiLog("ContentController.onEpisodeFinished")
-  endEpisode = false
-  playerInfo = {}
-  if msg.getField() = "state" and (msg.getData() = "error" or msg.getData() = "finished") then
-    print "Episode finished"
-    if msg.getData() = "error" then playerInfo.result = m.constants.player.playerResults.failed 
-    if msg.getData() = "finished" then playerInfo.result = m.constants.player.playerResults.completed
-    endEpisode = true
-  else if msg.getField() = "backButtonPressed" then
-    print "Back button pressed"
-    playerInfo.result = m.constants.player.playerResults.closed
-    endEpisode = true
-  end if
-  if endEpisode then
-    m.videoPlayer.unobserveFieldScoped("backButtonPressed")
-    m.videoPlayer.unobserveFieldScoped("state")
-    m.videoPlayer.unobserveFieldScoped("historyPosition")
-    m.videoPlayer.deeplinkSource = ""
-    m.videoPlayer.visible = false
-    m.videoPlayer.control = "stop"
-
-    playerInfo.nowPos = m.videoPlayer.historyPosition
-    if m.authtask.historyResult <> invalid
-      playerInfo.historyId = m.authtask.historyResult.historyId
-      playerInfo.parentHistoryId = m.authtask.historyResult.parentHistoryId
+Function onEpisodeCredits()
+  ' launch the task only if its not already running
+  if m.upNextTask = invalid or m.upNextTask.state <> "RUN"
+    if m.upNextTask <> invalid
+      m.upNextTask.unobserveField("error")
+      m.upNextTask.unobserveField("response")
     end if
+    m.upNextTask = CreateObject("roSGNode", "UpNextTask")
+    m.upNextTask.observeField("response", "onUpNextResponse")
+    m.upNextTask.observeField("error", "onUpNextError")
+    m.upNextTask.content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
+    m.upNextTask.control = "RUN"
+  end if
+End Function
 
+Function onUpNextResponse()
+  tubiLog("ContentController.onUpNextResponse")
+  if m.upNextScreen <> invalid
+    m.upNextScreen.unobserveField("contentSelected", "onUpNextContentSelected")
+    m.upNextScreen.unobserveField("backPressed", "onUpNextBackPressed")
+    m.upNextScreen = invalid
+  end if
+  m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
+  m.upNextScreen.observeField("contentSelected", "onUpNextContentSelected")
+  m.upNextScreen.observeField("backPressed", "onUpNextBackPressed")
+  m.upNextScreen.content = m.upNextTask.response
+  pushScreen(m.upNextScreen, true)
+  m.ScreenStack.visible = true
+End Function
+
+Function onUpNextError()
+  tubiLog("ContentController.onUpNextError")
+  ' On error, just skip showing the up next screen
+  m.upNextScreen = invalid
+End Function
+
+' Triggered by either a button press or by timer expiration
+Function onUpNextContentSelected()
+  tubiLog("ContentController.onUpNextContentSelected")
+  content = m.upNextScreen.contentSelected
+  m.upNextScreen.unobserveField("contentSelected")
+  m.upNextScreen.unobserveField("backPressed")
+  m.upNextScreen = invalid
+  popScreen()
+  stopVideoContent(m.constants.player.playerResults.completed, false)
+  playVideoContent(content)
+End Function
+
+Function onUpNextBackPressed()
+  tubiLog("ContentController.onUpNextBackPressed")
+  ' remove the screen and put focus back on the video player transport
+  m.upNextScreen.unobserveField("contentSelected")
+  m.upNextScreen.unobserveField("backPressed")
+  m.upNextScreen = invalid
+  popScreen()
+  m.ScreenStack.visible = false
+  m.videoPlayer.setFocus(true)
+End Function
+
+Function onVideoPlayerState(msg)
+  tubiLog("ContentController.onVideoPlayerState state = " + msg.GetData())
+  state = msg.GetData()
+  if state = "error"
+    stopVideoContent(m.constants.player.playerResults.failed, true)
+    showPlayerError(m.constants.player.playerResults.failed)
+  else if state = "finished"
+    returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+  end if
+End Function
+
+Function onVideoPlayerBackPressed()
+  tubiLog("ContentController.onVideoPlayerBackPressed")
+  returnToDetailScreenFromVideo(m.constants.player.playerResults.closed)
+End Function
+
+' Stop the video player and refresh detail screen with the relevant content
+Function returnToDetailScreenFromVideo(result)
+  stopVideoContent(result, true)
+  content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
+  if content.isTrailer
+    content = getDetailScreenContent()
+  end if
+  showDetailScreen(content)
+End Function
+
+' Stop the video player and optionally return to the screen stack
+Function stopVideoContent(playerResult, showScreenStack)
+  m.videoPlayer.unobserveFieldScoped("backButtonPressed")
+  m.videoPlayer.unobserveFieldScoped("state")
+  m.videoPlayer.unobserveFieldScoped("skipTrailer")
+  m.videoPlayer.unobserveFieldScoped("historyPosition")
+  m.videoPlayer.unobserveFieldScoped("creditsPosition")
+  m.videoPlayer.deeplinkSource = ""
+  m.videoPlayer.control = "stop"
+  playerInfo = {}
+  playerInfo.nowPos = m.videoPlayer.historyPosition
+  playerInfo.result = playerResult
+  if m.authtask.historyResult <> invalid
+    playerInfo.historyId = m.authtask.historyResult.historyId
+    playerInfo.parentHistoryId = m.authtask.historyResult.parentHistoryId
+  end if
+  tubiLog("stopVideoContent: nowPos = " + playerInfo.nowPos.toStr())
+  if playerInfo.historyId <> invalid and playerInfo.historyId <> "" then
+    tubiLog("stopVideoContent: historyId = " + playerInfo.historyId.toStr())
+  end if
+  if playerInfo.parentHistoryId <> invalid and playerInfo.parentHistoryId <> "" then
+    tubiLog("stopVideoContent: parentHistoryId = " + playerInfo.parentHistoryId.toStr())
+  end if
+  content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
+
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  Bookmarks = TubiBookmarks(Request, Auth, m.constants)
+
+  'update the nowPos in the global historyIds store
+  if m.authTask.authInfo <> invalid and playerInfo.historyId <> invalid
+    m.global.historyIds = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds)
+  end if
+
+  if m.categoryScreen <> invalid then 
+    m.categoryScreen.dirtyUserCategories = true
+  end if
+
+  ' should only do this if not autoplaying another video
+  if showScreenStack
+    m.videoPlayer.visible = false
     m.ScreenStack.visible = true
     currentScreen().setFocus(true)
-
-    onPlayerInfo(playerInfo)
   end if
 End Function
 
@@ -688,41 +779,11 @@ Function onWatchTrailer()
   end if
 End Function
 
-
-Function onTrailerFinished(msg As Object)
-  tubiLog("ContentController.onTrailerFinished")
-  endTrailer = false
-  if msg.getField() = "state"
-    if msg.getData() = "error" or msg.getData() = "finished" then
-      print "Trailer finished"
-      endTrailer = true
-    end if
-
-  else if msg.getField() = "backButtonPressed" then
-    print "Back button pressed"
-    endTrailer = true
-
-  else if msg.getField() = "skipTrailer"
-    print "Trailer skipped"  'now we need to play the main video
-    m.videoPlayer.unobserveFieldScoped("backButtonPressed")
-    m.videoPlayer.unobserveFieldScoped("skipTrailer")
-    m.videoPlayer.unobserveFieldScoped("state")
-    m.videoPlayer.control = "stop"
-    content = getDetailScreenContent()
-    playVideoContent(content)
-  end if
-
-  if endTrailer then
-    m.videoPlayer.unobserveFieldScoped("backButtonPressed")
-    m.videoPlayer.unobserveFieldScoped("skipTrailer")
-    m.videoPlayer.unobserveFieldScoped("state")
-    m.videoPlayer.visible = false
-    m.videoPlayer.control = "stop"
-    m.ScreenStack.visible = true
-    currentScreen().setFocus(true)
-  end if
+Function onSkipTrailer()
+  tubiLog("ContentController.onSkipTrailer")
+  stopVideoContent(m.constants.player.playerResults.completed, false)
+  playVideoContent(getDetailScreenContent())
 End Function
-
 
 Function onEpisodeList()
   tubiLog("ContentController.onEpisodeList")
@@ -765,121 +826,6 @@ End Function
 
 
 '''''''''''''''''''''
-' onPlayerInfo
-'
-' Called when video playback is done
-' Expect:
-' playerInfo = {
-'   result           - m.constants.player.playerResults value
-'   nowPos           - integer seconds where playback stopped
-'   historyId        - history id if stored at the server
-'   parentHistoryId  - history id for series if historyId is valid and content is episodic
-' }
-'
-Function onPlayerInfo(playerInfo) As Void
-  tubiLog("onPlayerInfo: nowPos = " + playerInfo.nowPos.toStr())
-  if playerInfo.historyId <> invalid and playerInfo.historyId <> "" then
-    tubiLog("onPlayerInfo: historyId = " + playerInfo.historyId.toStr())
-  end if
-  if playerInfo.parentHistoryId <> invalid and playerInfo.parentHistoryId <> "" then
-    tubiLog("onPlayerInfo: parentHistoryId = " + playerInfo.parentHistoryId.toStr())
-  end if
-  content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
-
-  Request = TubiRequest()
-  Auth = TubiAuth(m.constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, m.constants)
-
-  'update the nowPos in the global historyIds store
-  if m.authTask.authInfo <> invalid and playerInfo.historyId <> invalid
-    m.global.historyIds = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds)
-  end if
-
-  'update the detailScreen UI with the resume point
-  if m.detailScreen <> invalid
-    populateDetailScreen(m.detailScreenContent)
-  end if
-
-  if playerInfo.result = m.constants.player.playerResults.failed then
-    showPlayerError(playerInfo.result)
-    return
-  end if
-
-  if playerInfo.result = m.constants.player.playerResults.completed
-
-    ' autoplay feature
-    lastContent = m.detailScreenContent
-
-    ' find the next episode in a series
-    if lastContent <> invalid and lastContent.type = m.constants.ui.contentTypes.series then
-      tubiLog("Autoplay: Series")
-
-      nextEpisode2dIndex = invalid
-      selection = m.detailScreen2dIndex  '2d array
-      season = m.detailScreenContent.getChild(selection[0])
-
-      if season <> invalid
-        if season.getChild(selection[1] + 1) <> invalid
-          nextEpisode2dIndex = [selection[0], selection[1] + 1]
-
-        else
-          nextSeason = m.detailScreenContent.getChild(selection[0] + 1)
-          if nextSeason <> invalid and nextSeason.getChild(0) <> invalid
-            nextEpisode2dIndex = [selection[0] + 1, 0]
-          end if
-        end if
-      end if      
-
-      if nextEpisode2dIndex <> invalid
-        m.detailScreen2dIndex = nextEpisode2dIndex  'must be set for onPlay() to grab the next episode
-
-        populateDetailScreen(lastContent)
-        onPlay()
-        return
-      end if
-
-    ' find the next movie in a category
-    else if lastContent <> invalid and lastContent.type = m.constants.ui.contentTypes.video then
-      ' NOTE: be careful here in case of deep links, where the
-      ' last title launched was not related to a category on 
-      ' the category screen.  In that case we'll just skip
-      ' autoplay.
-      tubiLog("Autoplay: Movie")
-
-      ' TODO(Chris): this is terribly unpleasant, looking into the categoryscreen's internal data structure
-      parent = invalid
-      if m.categoryScreen.cachedContent <> invalid
-        parent = m.categoryScreen.cachedContent.getChild(m.categoryScreen.cursorPosition[0])
-      end if
-      if parent <> invalid and parent.type = m.constants.ui.contentTypes.category then
-        for i=0 to parent.getChildCount()-1
-          child = parent.getChild(i)
-          if child.id = m.detailScreenContent.id then
-            if parent.getChild(i+1) <> invalid
-              nextContent = m.metadataTranslate.getContentFromCategoryJson(parent, i+1)
-              if nextContent <> invalid then
-                ' set the detail screen to focus on the next movie.
-                m.detailScreenContent = nextContent
-                populateDetailScreen(nextContent)
-                m.categoryScreen.jumpToRowItem = [m.categoryScreen.cursorPosition[0], m.categoryScreen.cursorPosition[1]+1]
-                onPlay()
-                return
-              end if
-            end if
-          end if
-        end for
-      end if
-    end if
-  end if
-
-  if m.categoryScreen <> invalid then 
-    m.categoryScreen.dirtyUserCategories = true
-  end if
-
-End Function
-
-
-'''''''''''''''''''''
 ' showDetailScreen
 '
 ' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
@@ -888,7 +834,10 @@ Function showDetailScreen(content)
     m.detailScreen = CreateObject("roSGNode", "DetailScreen")
   end if
 
-  'observe detail screen output interface
+  ' ensure we have no observers before adding then below.
+  ' TODO(CT): ScreenStack and observers set here are at odds with each other over
+  '           managing observers.  Needs cleaning up.
+  unobserveAllScoped(m.detailScreen)
   m.detailScreen.observeFieldScoped("playSelected", "onPlay")
   m.detailScreen.observeFieldScoped("resumeSelected", "onResume")
   m.detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
@@ -900,7 +849,7 @@ Function showDetailScreen(content)
   m.detailScreenContent = content
   m.detailScreen2dIndex = [-1,-1]   'default, indicating that there was no specific episode requested
 
-  if m.enteredFromDeeplink or content.type = m.constants.ui.contentTypes.series
+  if m.enteredFromDeeplink or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
     m.detailScreen.isLoading = true
     pushScreen(m.detailScreen, false)  ' don't send tracking until we resolve series episode
     getSingleContentFromServer()

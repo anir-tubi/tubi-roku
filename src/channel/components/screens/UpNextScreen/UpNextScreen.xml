@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="UpNextScreen" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/screens/UpNextScreen/UpNextScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!--
+      - OUTPUTS
+      -->
+    <field id="contentFocused" type="node"/>
+    <field id="contentSelected" type="node" alwaysNotify="true"/>
+    <field id="backPressed" type="boolean" alwaysNotify="true"/>
+    
+    <!--
+      - INPUTS
+      -->
+    <field id="content" type="node" alwaysNotify="true"/>
+  </interface>  
+
+  <children>
+    <Timer
+      id="CountdownTimer"
+      duration="1.0"
+      repeat="true"/>
+    <Poster
+      id="Gradient"
+      width="1920"
+      height="1080"
+      translation="[0,0]"
+      uri="pkg:/images/up-next-gradient-fhd.9.png"/>
+    <Group
+      id="BackGroup"
+      opacity="0.5">
+      <Poster
+        uri="pkg:/images/back.png"
+        width="47"
+        height="47"
+        translation="[72,601]"/>
+      <Label
+        text="BACK TO DISMISS"
+        translation="[123,605]"
+        height="47"
+        vertAlign="center">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+    </Group>
+    <!-- Movies shows a navigable grid with a few suggestions -->
+    <Group
+      id="MovieGroup"
+      visible="false">
+      <TargetList
+        id="GridMovie"
+        itemComponentName="UpNextPoster"
+        showTargetRects="false"
+        advanceKey="right"
+        reverseKey="left"
+        translation="[0,688]"/>
+      <Poster
+        id="FocusBox"
+        uri="pkg:/images/selector-fhd.9.png"/>
+      <Label
+        id="CountdownLabelMovie"
+        translation="[354,638]"
+        height="46">
+        <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-SemiBold.ttf"
+         size="34" />
+      </Label>
+      <InfoPanel
+        id="InfoMovie"
+        mode="item"
+        width="992"
+        maxHeight="313"
+        maxTitleLines="3"
+        titleFontSize="67"
+        translation="[354,691]"/>
+    </Group>
+    <!-- Series shows a single poster for the next episode in the same series -->
+    <Group
+      id="SeriesGroup"
+      visible="false">
+      <MarkupGrid
+        id="GridSeries"
+        itemComponentName="UpNextPoster"
+        itemSize="[430,242]"
+        focusBitmapUri="pkg:/images/selector-fhd.9.png"
+        numColumns="1"
+        numRows="1"
+        translation="[85,688]" />
+      <Label
+        id="CountdownLabelSeries"
+        translation="[573,598]"
+        height="46">
+        <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-SemiBold.ttf"
+         size="34" />
+      </Label>
+      <InfoPanel
+        id="InfoSeries"
+        mode="item"
+        width="875"
+        maxHeight="397"
+        maxTitleLines="3"
+        titleFontSize="67"
+        translation="[574,650]"/>
+    </Group>
+  </children>
+</component>

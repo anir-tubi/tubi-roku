@@ -33,6 +33,8 @@
     <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
     <field id="historyPosition" type="integer" value="0" />
 
+    <field id="creditsPosition" type="integer" alwaysNotify="true"/>
+
     <!-- interval in seconds for sending position data to the tracking server -->
     <field id="analyticsInterval" type="integer" value="0"/>
 

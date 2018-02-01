@@ -90,11 +90,7 @@ End Function
 Function popScreen(sendTrackingEvents = true as Boolean)
   tubiLog("ScreenStack.popScreen")
   top = m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-1)
-  fields = top.getFields()
-  for each f in fields
-    ' make sure the controller completely dereferences the screen
-    top.unobserveFieldScoped(f)
-  end for
+  unobserveAllScoped(top)
   m.ScreenStack_.removeChild(top)
   newTop = m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-1)
   if newTop <> invalid then

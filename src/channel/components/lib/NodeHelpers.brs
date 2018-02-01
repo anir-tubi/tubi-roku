@@ -56,3 +56,13 @@ Function cloneDeep(source)
   end for
   return root
 End Function
+
+' Remove all observers.  This adds safety for when we want to ensure
+' observer state so we don't do double observation
+Function unobserveAllScoped(node)
+  if type(node) = "roSGNode"
+    for each f in node.getFields()
+      node.unobserveFieldScoped(f)
+    end for
+  end if
+End Function

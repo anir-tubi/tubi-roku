@@ -328,6 +328,10 @@ Function onVideoPositionChange()
     historyPosition()
   end if
 
+  if (m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0 and m.playerPosition = m.top.content.creditsCuePoint)
+    m.top.creditsPosition = m.playerPosition
+  end if
+
   'Advertisements
   if m.top.enableAds and m.top.midrolls <> invalid and m.top.midrolls.count() > 0 then
     m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown

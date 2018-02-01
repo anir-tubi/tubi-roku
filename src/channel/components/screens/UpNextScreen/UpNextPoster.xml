@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="UpNextPoster" extends="Group" >
+  <script type="text/brightscript" uri="./UpNextPoster.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <!-- These fields follow the TargetList's itemComponent interface -->
+      <field id="currTarget" type="float"/>
+      <field id="currRect"    type="rect2d" />
+      <field id="groupHasFocus" type="boolean"/>
+
+      <!-- These fields follow the MarkupGrid's itemComponent interface -->
+      <field id="width" alias="Poster.width"/>
+      <field id="height" alias="Poster.height"/>
+      <field id="gridHasFocus" type="boolean"/>
+
+      <!-- Fields common to both TargetList and MarkupGrid -->
+      <field id="index" type="integer"/>
+      <field id="itemContent" type="node" />
+      <field id="focusPercent" type="float"/>
+      <field id="itemHasfocus" type="boolean"/>
+  </interface>
+
+  <children>
+    <Poster
+      id="Poster"/>
+  </children>
+</component>
