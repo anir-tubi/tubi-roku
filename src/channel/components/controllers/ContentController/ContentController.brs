@@ -517,7 +517,11 @@ Function onResume()
   if content <> invalid then
     ' find the position in global history
     history = m.global.historyIds.findNode(content.id)
-    if history <> invalid then content.nowPos = history.nowPos
+    if m.top.deepLinkContent = invalid or m.top.deepLinkContent.deepLinkType = "season" or m.top.deepLinkContent.deepLinkType = "series"
+      if history <> invalid then
+        content.nowPos = history.nowPos
+      end if
+    end if
     playVideoContent(content)
   else
     tubiLog("ERROR: Resume selected but content is invalid")
@@ -591,6 +595,9 @@ Function playVideoContent(content As Object)
       m.videoPlayer.observeFieldScoped("historyPosition", "onEpisodePosition")
       m.videoPlayer.observeFieldScoped("creditsPosition", "onEpisodeCredits")
       m.videoPlayer.enableAds = true
+      if m.top.deepLinkContent <> invalid
+        m.videoPlayer.deeplinkSource = m.top.deepLinkContent.source
+      end if
     end if
     m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
     m.videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
@@ -708,6 +715,7 @@ End Function
 Function returnToDetailScreenFromVideo(result)
   stopVideoContent(result, true)
   content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
+  m.top.deepLinkContent = invalid
   if content.isTrailer
     content = getDetailScreenContent()
   end if
@@ -847,7 +855,7 @@ Function showDetailScreen(content)
   m.detailScreenContent = content
   m.detailScreen2dIndex = [-1,-1]   'default, indicating that there was no specific episode requested
 
-  if m.enteredFromDeeplink or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
+  if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
     m.detailScreen.isLoading = true
     pushScreen(m.detailScreen, false)  ' don't send tracking until we resolve series episode
     getSingleContentFromServer()

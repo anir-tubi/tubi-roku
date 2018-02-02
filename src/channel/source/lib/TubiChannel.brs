@@ -154,7 +154,6 @@ Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
             userId: args.userId.unescape()
           }
 
-          content.source = args.deviceId.unescape()
 
           ' only transfer the refresh token and log the external user in
           ' if there is no one currently logged in on the roku
@@ -163,6 +162,10 @@ Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
           end if
         end if
       end if
+    end if
+
+    if args.deviceId <> invalid and args.deviceId.unescape() <> ""
+      content.source = args.deviceId.unescape()
     end if
 
     ' set up the resume time if we are deeplinking to a specific point in the video
