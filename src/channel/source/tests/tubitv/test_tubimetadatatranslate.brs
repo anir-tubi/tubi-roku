@@ -97,7 +97,7 @@ Function testCreditsCuepoints(t As Object)
   dest = CreateObject("roSGNode", "TubiContentNode")
   translate.translateRecursive(source, dest)
   t.assertTrue(dest.length = 600)
-  t.assertTrue(dest.creditsCuepoint = 570)
+  t.assertTrue(dest.creditsCuepoint = 560)
 
   ' missing cuepoints
   source = {
@@ -108,7 +108,7 @@ Function testCreditsCuepoints(t As Object)
   dest = CreateObject("roSGNode", "TubiContentNode")
   translate.translateRecursive(source, dest)
   t.assertTrue(dest.length = 600)
-  t.assertTrue(dest.creditsCuepoint = 570)
+  t.assertTrue(dest.creditsCuepoint = 560)
 
   ' cuepoint too close to the end
   source = {
@@ -123,7 +123,7 @@ Function testCreditsCuepoints(t As Object)
   dest = CreateObject("roSGNode", "TubiContentNode")
   translate.translateRecursive(source, dest)
   t.assertTrue(dest.length = 600)
-  t.assertTrue(dest.creditsCuepoint = 570)
+  t.assertTrue(dest.creditsCuepoint = 560)
 
   ' no cuepoint or length given
   source = {
