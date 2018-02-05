@@ -1049,6 +1049,7 @@ Function handleSkipVideo(amt, isProgressBarFocused)
   if m.VideoState <> "pause"
     m.Video.control = "pause"
     m.VideoState = "pause"
+    m.PlayPauseButton.uri = m.buttonUris.play
   end if
 
   if isProgressBarFocused <> true
