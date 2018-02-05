@@ -33,6 +33,7 @@
 Function init()
   tubiLog("VideoPlayer.init")
   m._ = rodash()
+  m.constants = m.global.constants
   m.Spinner = m.top.findNode("BufferSpinner")
   m.Loading = m.top.findNode("Loading")
   m.Transport = m.top.findNode("Transport")
@@ -65,12 +66,12 @@ Function init()
   m.VideoState = "stop"
   m.scrubAmt = -1
   m.playerPosition = 0
-  m.maxScrub = m.global.constants.player.maxScrub
-  m.scrubMultipliers = m.global.constants.player.scrubMultipliers
+  m.maxScrub = m.constants.player.maxScrub
+  m.scrubMultipliers = m.constants.player.scrubMultipliers
   m.scrubTimespan = CreateObject("roTimespan")
   m.lastButtonPressPos = 0
-  m.transportAutoHideTime = m.global.constants.player.transportAutoHideTime
-  m.ignoreOptionsKey = m.global.constants.deviceInfo.firmwareCaptionMenu
+  m.transportAutoHideTime = m.constants.player.transportAutoHideTime
+  m.ignoreOptionsKey = m.constants.deviceInfo.firmwareCaptionMenu
   m.bufferingInfo = invalid
   m.progressBarFocused = false
 
@@ -88,7 +89,7 @@ Function init()
   m.CCRailOn = m.TransportButtons.findNode("CCRailOn")
   m.CCRailOff = m.TransportButtons.findNode("CCRailOff")
   m.CCNipple = m.TransportButtons.findNode("CCNipple")
-  m.buttonUris = m.global.constants.player.transportButtons
+  m.buttonUris = m.constants.player.transportButtons
   m.focusedButtonIndex = 0
   setFocusedButton(m.PlayPauseButton)
   m.ClosedCaptionDisabled = m.top.findNode("ClosedCaptionDisabled")
@@ -101,8 +102,8 @@ Function init()
   m.adPrefetchTime = 15
   m.adHeadsUpTime = 10
 
-  m.analyticsInterval = m.global.constants.player.pingFrequency
-  m.historyInterval = m.global.constants.player.historyFrequency
+  m.analyticsInterval = m.constants.player.pingFrequency
+  m.historyInterval = m.constants.player.historyFrequency
 
   'if global captions are turned on, slide the closed caption toggle to on position
   m.CCNippleOnTranslation = [89,0]
@@ -114,7 +115,7 @@ Function init()
     m.CCNipple.translation = m.CCNippleOnTranslation
   end if
 
-  m.focusedColor = m.global.constants.ui.colors.focused
+  m.focusedColor = m.constants.ui.colors.focused
 
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
@@ -141,7 +142,7 @@ Function init()
   '        else the 9-patch logic does not get applied and you will just see stretched images.  Because of
   '        scaling wackiness, bitmapWidth or bitmapHeight may report half-pixel values.  It's best to not
   '        set a height explicitly.
-  if m.global.constants.deviceInfo.scaledUi = true then
+  if m.constants.deviceInfo.scaledUi = true then
     background = m.top.findNode("ProgressBarBackground")
     background.uri = "pkg:/images/transport/sgplayer/hd/progress-background.9.png"
     foreground = m.top.findNode("ProgressBarForeground")
@@ -171,6 +172,17 @@ Function onContentChange() As Void
   cancelReplayCaptions()
   m.AdHeadsUp.visible = false
   if m.top.content = invalid then return
+
+  'add the title and episode title to the overlay
+  title = m.Overlay.findNode("VideoOverlayTitle")
+  episodeTitle = m.Overlay.findNode("VideoOverlayEpisodeTitle")
+  if m.top.content.parentType = "series"
+    title.text = m.top.content.parentTitle
+    episodeTitle.text = m.top.content.title
+  else
+    title.text = m.top.content.title
+    episodeTitle.text = ""
+  end if
 
   'there are no subtitles so grey out the captions button
   if m.top.content.subtitleTracks = invalid or m.top.content.subtitleTracks.count() = 0
@@ -342,9 +354,12 @@ Function onVideoPositionChange()
         m.top.adControl = "midroll"
       end if
 
-      if m.playerPosition >= (cuepoint - m.adHeadsUpTime)and m.playerPosition < cuepoint and m.top.adState = "adspending"
-        m.AdHeadsUp.visible = true
-        m.AdHeadsUpText.text = " " + Chr(&hb7) + " Starts in " + stri(cuepoint - m.playerPosition).trim() + " s"
+      if m.playerPosition >= (cuepoint - m.adHeadsUpTime) and m.playerPosition < cuepoint and m.top.adState = "adspending"
+        if m.Overlay.opacity = 0
+          ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
+          m.AdHeadsUp.visible = true
+          m.AdHeadsUpText.text = " " + Chr(&hb7) + " Starts in " + stri(cuepoint - m.playerPosition).trim() + " s"
+        end if
       end if
 
       ' Fire up the midroll

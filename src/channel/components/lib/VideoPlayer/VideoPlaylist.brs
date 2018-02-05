@@ -153,7 +153,7 @@ Function onRefreshResponse(msg)
   ' While the refresh content may not hold all the information we need (e.g. isLiveTV), it's
   ' only used for the stream urls and subtitle urls really and should be ok here without merging
   ' fields from the original content.
-  mergedFields = ["isLiveTV", "isTrailer", "nowPos"]
+  mergedFields = ["isLiveTV", "isTrailer", "nowPos", "parentType", "parentTitle"]
   for each f in mergedFields
     refreshedContent.setField(f, playlistContent.getField(f))
   end for

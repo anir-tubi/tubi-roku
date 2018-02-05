@@ -241,6 +241,32 @@
           uri="pkg:/fonts/Vaud-SemiBold.ttf"
           size="22" />
       </Label>
+      <Label
+        id="VideoOverlayTitle"
+        translation="[84,147]"
+        width="1311"
+        ellipsizeOnBoundary="true"
+        height="73"
+        vertAlign="center">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="67" />
+      </Label>
+      <Label
+        id="VideoOverlayEpisodeTitle"
+        translation="[84,238]"
+        width="1311"
+        ellipsizeOnBoundary="true"
+        height="46"
+        vertAlign="center">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="36" />
+      </Label>
     </Group>
     
     <Group
