@@ -676,12 +676,12 @@ End Function
 Function onUpNextContentSelected()
   tubiLog("ContentController.onUpNextContentSelected")
   content = m.upNextScreen.contentSelected
+  stopVideoContent(m.constants.player.playerResults.completed, false)
+  playVideoContent(content)
+  popScreen()
   m.upNextScreen.unobserveField("contentSelected")
   m.upNextScreen.unobserveField("backPressed")
   m.upNextScreen = invalid
-  popScreen()
-  stopVideoContent(m.constants.player.playerResults.completed, false)
-  playVideoContent(content)
 End Function
 
 Function onUpNextBackPressed()
