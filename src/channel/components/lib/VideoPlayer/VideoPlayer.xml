@@ -57,11 +57,12 @@
       -  Allowed modes are:
       -  'normal'
       -  'trailer'
+      -  'autoplay'
       -  'onnow-autoplay'
       -  'onnow-engaged'
       -  'onnow-docked'
       -->
-    <field id="analyticsMode" type="string" value="true" />
+    <field id="analyticsMode" type="string" value="normal" />
 
     <!-- The device id of the deeplink source device -->
     <field id="deeplinkSource" type="string" />

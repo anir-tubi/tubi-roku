@@ -431,7 +431,9 @@ Function playContent()
   else
     extraCtx = {subtitles: m.Video.content.showSubtitles}
 
-    if m.top.analyticsMode = "onnow-autoplay" 
+    if m.top.analyticsMode = "autoplay"
+      extraCtx.autoplay = true
+    else if m.top.analyticsMode = "onnow-autoplay" 
       'onnow-autoplay signifies the onnow video started without input from the user (ie. when the on now screen loads)
       extraCtx.on_now = true
       extraCtx.livetv = true  'server uses this flag to determine if viewing should be part of CVT
@@ -1236,7 +1238,9 @@ Function getPlayProgressEvent()
     interval: m.playerPosition - m.lastPingTime
   }
 
-  if m.top.analyticsMode = "onnow-autoplay"
+  if m.top.analyticsMode = "autoplay"
+    extraCtx.autoplay = true
+  else if m.top.analyticsMode = "onnow-autoplay"
     extraCtx.on_now = true
     extraCtx.livetv = true
   else if m.top.analyticsMode = "onnow-engaged"

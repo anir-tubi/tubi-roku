@@ -500,7 +500,7 @@ Function onPlay()
   content = getDetailScreenContent()
   if content <> invalid then
     content.nowPos = 0 'reset the start position
-    playVideoContent(content)
+    playVideoContent(content, false)
   else
     tubiLog("ERROR: Play selected but content is invalid")
   end if
@@ -522,7 +522,7 @@ Function onResume()
         content.nowPos = history.nowPos
       end if
     end if
-    playVideoContent(content)
+    playVideoContent(content, false)
   else
     tubiLog("ERROR: Resume selected but content is invalid")
   end if
@@ -584,7 +584,7 @@ End Function
 ' playVideoContent
 '
 ' Helper function for onResume and onPlay to launch content
-Function playVideoContent(content As Object)
+Function playVideoContent(content As Object, isAutoplay As Boolean)
   if content <> invalid
     if content.isTrailer
       m.videoPlayer.analyticsMode = "trailer"
@@ -592,6 +592,9 @@ Function playVideoContent(content As Object)
       m.videoPlayer.enableAds = false
     else
       m.videoPlayer.analyticsMode = "normal"
+      if isAutoplay = true
+        m.videoPlayer.analyticsMode = "autoplay"
+      end if
       m.videoPlayer.observeFieldScoped("historyPosition", "onEpisodePosition")
       m.videoPlayer.observeFieldScoped("creditsPosition", "onEpisodeCredits")
       m.videoPlayer.enableAds = true
@@ -677,7 +680,7 @@ Function onUpNextContentSelected()
   tubiLog("ContentController.onUpNextContentSelected")
   content = m.upNextScreen.contentSelected
   stopVideoContent(m.constants.player.playerResults.completed, false)
-  playVideoContent(content)
+  playVideoContent(content, true)
   popScreen()
   m.upNextScreen.unobserveField("contentSelected")
   m.upNextScreen.unobserveField("backPressed")
@@ -781,14 +784,14 @@ Function onWatchTrailer()
     trailerContent.nowPos = 0
     trailerContent.isTrailer = true
 
-    playVideoContent(trailerContent)
+    playVideoContent(trailerContent, false)
   end if
 End Function
 
 Function onSkipTrailer()
   tubiLog("ContentController.onSkipTrailer")
   stopVideoContent(m.constants.player.playerResults.completed, false)
-  playVideoContent(getDetailScreenContent())
+  playVideoContent(getDetailScreenContent(), false)
 End Function
 
 Function onEpisodeList()
