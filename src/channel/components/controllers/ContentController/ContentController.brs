@@ -667,6 +667,15 @@ End Function
 Function onUpNextContentSelected()
   tubiLog("ContentController.onUpNextContentSelected")
   content = m.upNextScreen.contentSelected
+  oldContent = m.videoPlayer.content
+
+  if content.parentId <> invalid and oldContent.parentId <> invalid
+    if oldContent.parentId <> "" and content.parentId = oldContent.parentId
+      content.parentType = "series"
+      content.parentTitle = oldContent.parentTitle
+    end if
+  end if
+
   stopVideoContent(m.constants.player.playerResults.completed, false)
   playVideoContent(content, true)
   popScreen()
