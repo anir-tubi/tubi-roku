@@ -601,6 +601,11 @@ Function playVideoContent(content As Object, isAutoplay As Boolean)
       if m.top.deepLinkContent <> invalid
         m.videoPlayer.deeplinkSource = m.top.deepLinkContent.source
       end if
+      ' preload autoplay content;  We don't observe 'error' or 'response' fields
+      ' since they will be evaluated at the creditsCuepoint callback
+      m.upNextTask = CreateObject("roSGNode", "UpNextTask")
+      m.upNextTask.content = content
+      m.upNextTask.control = "RUN"
     end if
     m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
     m.videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
@@ -640,39 +645,22 @@ Function onEpisodePosition()
 End Function
 
 Function onEpisodeCredits()
-  ' launch the task only if its not already running
-  if m.upNextTask = invalid or m.upNextTask.state <> "RUN"
-    if m.upNextTask <> invalid
-      m.upNextTask.unobserveField("error")
-      m.upNextTask.unobserveField("response")
+  tubiLog("ContentController.onEpisodeCredits")
+  ' Verify that the UpNextTask has a response and it matches the currently playing content
+  currentContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
+  if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.content <> invalid and currentContent <> invalid and m.upNextTask.content.id = currentContent.id
+    if m.upNextScreen <> invalid
+      m.upNextScreen.unobserveField("contentSelected", "onUpNextContentSelected")
+      m.upNextScreen.unobserveField("backPressed", "onUpNextBackPressed")
+      m.upNextScreen = invalid
     end if
-    m.upNextTask = CreateObject("roSGNode", "UpNextTask")
-    m.upNextTask.observeField("response", "onUpNextResponse")
-    m.upNextTask.observeField("error", "onUpNextError")
-    m.upNextTask.content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
-    m.upNextTask.control = "RUN"
+    m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
+    m.upNextScreen.observeField("contentSelected", "onUpNextContentSelected")
+    m.upNextScreen.observeField("backPressed", "onUpNextBackPressed")
+    m.upNextScreen.content = m.upNextTask.response
+    pushScreen(m.upNextScreen, true)
+    m.ScreenStack.visible = true
   end if
-End Function
-
-Function onUpNextResponse()
-  tubiLog("ContentController.onUpNextResponse")
-  if m.upNextScreen <> invalid
-    m.upNextScreen.unobserveField("contentSelected", "onUpNextContentSelected")
-    m.upNextScreen.unobserveField("backPressed", "onUpNextBackPressed")
-    m.upNextScreen = invalid
-  end if
-  m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
-  m.upNextScreen.observeField("contentSelected", "onUpNextContentSelected")
-  m.upNextScreen.observeField("backPressed", "onUpNextBackPressed")
-  m.upNextScreen.content = m.upNextTask.response
-  pushScreen(m.upNextScreen, true)
-  m.ScreenStack.visible = true
-End Function
-
-Function onUpNextError()
-  tubiLog("ContentController.onUpNextError")
-  ' On error, just skip showing the up next screen
-  m.upNextScreen = invalid
 End Function
 
 ' Triggered by either a button press or by timer expiration
@@ -694,8 +682,13 @@ Function onUpNextBackPressed()
   m.upNextScreen.unobserveField("backPressed")
   m.upNextScreen = invalid
   popScreen()
-  m.ScreenStack.visible = false
-  m.videoPlayer.setFocus(true)
+  if m.videoPlayer.state = "finished"
+    ' up next was dismissed but playback had already finished
+    returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+  else
+    m.ScreenStack.visible = false
+    m.videoPlayer.setFocus(true)
+  end if
 End Function
 
 Function onVideoPlayerState(msg)
@@ -705,7 +698,15 @@ Function onVideoPlayerState(msg)
     stopVideoContent(m.constants.player.playerResults.failed, true)
     showPlayerError(m.constants.player.playerResults.failed)
   else if state = "finished"
-    returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+    if m.upNextScreen <> invalid and currentScreen().isSameNode(m.upNextScreen)
+      tubiLog("Ignoring video state 'finished' while UpNextScreen is visible")
+    else if m.upNextTask.response <> invalid and m.upNextTask.response.getChild(0) <> invalid
+      nextContent = m.upNextTask.response.getChild(0)
+      stopVideoContent(m.constants.player.playerResults.completed, false)
+      playVideoContent(nextContent, true)
+    else
+      returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+    end if
   end if
 End Function
 

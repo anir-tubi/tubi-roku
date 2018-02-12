@@ -415,9 +415,11 @@ Function playContent()
     m.playerPosition = m.Video.content.nowPos
     m.lastSavedPosition = m.Video.content.nowPos
     m.lastPingTime = m.Video.content.nowPos
+    m.lastButtonPressPos = m.Video.content.nowPos
   else
     m.lastPingTime = 0
     m.lastSavedPosition = 0
+    m.lastButtonPressPos = 0
   end if
   m.top.midrolls = []  ' Always reset midrolls when we first start playback.  Preroll will populate these
     

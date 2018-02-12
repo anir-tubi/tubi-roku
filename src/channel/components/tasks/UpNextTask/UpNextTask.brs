@@ -45,6 +45,7 @@ Function execGetUpNextContent() As Void
           node = parent.createChild("TubiContentNode")
           translate.translateRecursive(content, node)
         end for
+        tubiLog("UpNextTask Received " + parent.getChildCount().toStr() + " autoplay items for " + m.top.content.id)
         m.top.response = parent
       end if
       exit while

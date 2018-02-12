@@ -131,6 +131,8 @@ Function onItemFocused()
     if content <> invalid
       updateInfoPanel(m.InfoMovie, content)
       m.top.contentFocused = content
+      ' reset countdown while user is interacting
+      m.timeRemaining = m.global.constants.player.upNextCountdown
     end if
   end if
 End Function
