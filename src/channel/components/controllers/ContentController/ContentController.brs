@@ -669,13 +669,7 @@ Function onUpNextContentSelected()
   content = m.upNextScreen.contentSelected
   oldContent = m.videoPlayer.content
 
-  if content.parentId <> invalid and oldContent.parentId <> invalid
-    if oldContent.parentId <> "" and content.parentId = oldContent.parentId
-      content.parentType = "series"
-      content.parentTitle = oldContent.parentTitle
-    end if
-  end if
-
+  content = addSeriesTitle(content, oldContent)
   stopVideoContent(m.constants.player.playerResults.completed, false)
   playVideoContent(content, true)
   popScreen()
@@ -710,7 +704,11 @@ Function onVideoPlayerState(msg)
     if m.upNextScreen <> invalid and currentScreen().isSameNode(m.upNextScreen)
       tubiLog("Ignoring video state 'finished' while UpNextScreen is visible")
     else if m.upNextTask.response <> invalid and m.upNextTask.response.getChild(0) <> invalid
+      'this happens if the "next video" button has been pressed on the player transport
       nextContent = m.upNextTask.response.getChild(0)
+      oldContent = m.videoPlayer.content
+
+      nextContent = addSeriesTitle(nextContent, oldContent)
       stopVideoContent(m.constants.player.playerResults.completed, false)
       playVideoContent(nextContent, true)
     else
@@ -1041,3 +1039,17 @@ Function getBackgroundtype(backgroundUriList)
   end if
 End Function
 
+
+' helper function for adding series title metadata to content returned from the up next API.
+' @content: episode content node with metadata from the up next api
+' @oldContent: episode content with full metadata, including parentType (usually from the player)
+Function addSeriesTitle(content, oldContent)
+  if content.parentId <> invalid and oldContent.parentId <> invalid
+    if oldContent.parentId <> "" and content.parentId = oldContent.parentId
+      content.parentType = "series"
+      content.parentTitle = oldContent.parentTitle
+    end if
+  end if
+
+  return content
+End Function
