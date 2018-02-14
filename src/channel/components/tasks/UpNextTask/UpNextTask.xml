@@ -14,12 +14,17 @@
 
     <interface>
       <!-- INPUT -->
-        <!-- Content node to get a fully parsed TubiContentNode for.
-        - Only contentFragment.id is expected to be populated.  All other fields are ignored.
+        <!--
+        - Expect the request to contain:
+        -   {
+        -     contentId:
+        -     categoryId:
+        -     userId:
+        -   }
+        -
         -->
-        <field id="content" type="node"/>
+        <field id="request" type="assocarray"/>
       
-
       <!-- OUTPUT -->
         <!-- Set to the parsed TubiContentNode on success -->
         <field id="response" type="node" />

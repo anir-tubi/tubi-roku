@@ -63,6 +63,10 @@ Function init()
   m.detailScreen2dIndex = [0, 0] 'stores the [season, episode] position
   m.detailScreenContent = invalid
 
+  ' Set to the category id when content is launched from category screen,
+  ' or set to invalid elsewhere
+  m.autoplayContext = invalid
+
   m._ = rodash()
 End Function
 
@@ -334,9 +338,16 @@ End Function
 ' onContentSelected
 '
 ' Show the detail screen for the selected content
-Function onContentSelected(msg As Object)
+Function onContentSelected()
   tubiLog("ContentController.onContentSelected")
-  content = msg.GetData()  
+  content = m.categoryScreen.contentSelected
+  m.autoplayContext = invalid
+  if m.categoryScreen.cachedContent <> invalid and m.categoryScreen.cursorPosition <> invalid
+    category = m.categoryScreen.cachedContent.getChild(m.categoryScreen.cursorPosition[0])
+    if category <> invalid
+      m.autoplayContext = category.id
+    end if
+  end if
   showDetailScreen(content)
 End Function
 
@@ -358,9 +369,15 @@ End Function
 Function onSearchSelected()
   tubiLog("ContentController.onSearchSelected")
   m.searchScreen = CreateObject("roSGNode", "SearchScreen")
-  m.searchScreen.observeFieldScoped("contentSelected", "onContentSelected")
+  m.searchScreen.observeFieldScoped("contentSelected", "onSearchContentSelected")
   m.searchScreen.observeFieldScoped("backgroundUriList", "onSearchBackgroundChange")
   pushScreen(m.searchScreen, true)
+End Function
+
+Function onSearchContentSelected()
+  tubiLog("ContentController.onSearchContentSelected")
+  m.autoplayContext = invalid
+  showDetailScreen(m.searchScreen.contentSelected)
 End Function
 
 
@@ -604,7 +621,15 @@ Function playVideoContent(content As Object, isAutoplay As Boolean)
       ' preload autoplay content;  We don't observe 'error' or 'response' fields
       ' since they will be evaluated at the creditsCuepoint callback
       m.upNextTask = CreateObject("roSGNode", "UpNextTask")
-      m.upNextTask.content = content
+      request = {}
+      request.contentId = content.id
+      if m.authtask.authInfo <> invalid
+        request.userId = m.authtask.authInfo.userId
+      end if
+      if m.autoplayContext <> invalid
+        request.categoryId = m.autoplayContext
+      end if
+      m.upNextTask.request = request
       m.upNextTask.control = "RUN"
     end if
     m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
@@ -648,7 +673,7 @@ Function onEpisodeCredits()
   tubiLog("ContentController.onEpisodeCredits")
   ' Verify that the UpNextTask has a response and it matches the currently playing content
   currentContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
-  if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.content <> invalid and currentContent <> invalid and m.upNextTask.content.id = currentContent.id
+  if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
     if m.upNextScreen <> invalid
       m.upNextScreen.unobserveField("contentSelected", "onUpNextContentSelected")
       m.upNextScreen.unobserveField("backPressed", "onUpNextBackPressed")

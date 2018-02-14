@@ -5,7 +5,7 @@ End Function
 Function execGetUpNextContent() As Void
   tubiLog("UpNextTask.execGetUpNextContent")
   
-  if type(m.top.content) <> "roSGNode"
+  if type(m.top.request) <> "roAssociativeArray" or m.top.request.contentId = invalid
     m.top.error = {
       code: -1
       data: ""
@@ -16,7 +16,7 @@ Function execGetUpNextContent() As Void
 
   constants = m.global.constants
   appName = constants.settings.shortAppName
-  url = constants.urls.cms.upNextContent + "/" + m.top.content.id + "/next"
+  url = constants.urls.cms.upNextContent + "/" + m.top.request.contentId + "/next"
   platform = constants.platform
   options = {
     params: {
@@ -25,6 +25,12 @@ Function execGetUpNextContent() As Void
       "device_id": constants.deviceInfo.deviceId
     }
   }
+  if m.top.request.userId <> invalid and m.top.request.userId <> ""
+    options.params.user_id = m.top.request.userId
+  end if
+  if m.top.request.categoryId <> invalid and m.top.request.categoryId <> ""
+    options.params.container_id = m.top.request.categoryId
+  end if
   request = TubiRequest().createAsync(url, constants.reqNames.getUpNextContent, options)
   port = CreateObject("roMessagePort")
   request.start(port)
@@ -45,7 +51,7 @@ Function execGetUpNextContent() As Void
           node = parent.createChild("TubiContentNode")
           translate.translateRecursive(content, node)
         end for
-        tubiLog("UpNextTask Received " + parent.getChildCount().toStr() + " autoplay items for " + m.top.content.id)
+        tubiLog("UpNextTask Received " + parent.getChildCount().toStr() + " autoplay items for " + m.top.request.contentId)
         m.top.response = parent
       end if
       exit while
