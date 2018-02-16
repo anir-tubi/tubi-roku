@@ -423,7 +423,7 @@ Function getConstants()
 
     constants.ui.categoryIds = {}
       constants.ui.categoryIds.history = "continue_watching"
-      constants.ui.categoryIds.queue = "my_queue"
+      constants.ui.categoryIds.queue = "queue"
 
     constants.ui.contentTypes = {}
       constants.ui.contentTypes.series = "series"

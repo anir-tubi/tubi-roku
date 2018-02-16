@@ -170,7 +170,7 @@
           title="Continue Watching"
           description="The Movies and TV Shows you have started watching can be found here"/>
         <CategoryContentNode
-          id="my_queue"
+          id="queue"
           type="category"
           title="My Queue"
           description="The Movies and TV Shows you have added to your Queue can be found here"/>

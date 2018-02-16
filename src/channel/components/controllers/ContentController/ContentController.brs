@@ -674,17 +674,19 @@ Function onEpisodeCredits()
   ' Verify that the UpNextTask has a response and it matches the currently playing content
   currentContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
   if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
-    if m.upNextScreen <> invalid
-      m.upNextScreen.unobserveField("contentSelected", "onUpNextContentSelected")
-      m.upNextScreen.unobserveField("backPressed", "onUpNextBackPressed")
-      m.upNextScreen = invalid
+    if m.upNextTask.response.getChildCount() > 0
+      if m.upNextScreen <> invalid
+        m.upNextScreen.unobserveField("contentSelected", "onUpNextContentSelected")
+        m.upNextScreen.unobserveField("backPressed", "onUpNextBackPressed")
+        m.upNextScreen = invalid
+      end if
+      m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
+      m.upNextScreen.observeField("contentSelected", "onUpNextContentSelected")
+      m.upNextScreen.observeField("backPressed", "onUpNextBackPressed")
+      m.upNextScreen.content = m.upNextTask.response
+      pushScreen(m.upNextScreen, true)
+      m.ScreenStack.visible = true
     end if
-    m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
-    m.upNextScreen.observeField("contentSelected", "onUpNextContentSelected")
-    m.upNextScreen.observeField("backPressed", "onUpNextBackPressed")
-    m.upNextScreen.content = m.upNextTask.response
-    pushScreen(m.upNextScreen, true)
-    m.ScreenStack.visible = true
   end if
 End Function
 

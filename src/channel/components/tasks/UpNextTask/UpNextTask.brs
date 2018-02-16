@@ -15,6 +15,8 @@ Function execGetUpNextContent() As Void
   end if
 
   constants = m.global.constants
+  requestLib = TubiRequest()
+  auth = TubiAuth(constants, requestLib)
   appName = constants.settings.shortAppName
   url = constants.urls.cms.upNextContent + "/" + m.top.request.contentId + "/next"
   platform = constants.platform
@@ -31,14 +33,17 @@ Function execGetUpNextContent() As Void
   if m.top.request.categoryId <> invalid and m.top.request.categoryId <> ""
     options.params.container_id = m.top.request.categoryId
   end if
-  request = TubiRequest().createAsync(url, constants.reqNames.getUpNextContent, options)
+
+  request = auth.createAuthRequest(url, constants.reqNames.getUpNextContent, options)
+  if request = invalid
+    request = requestLib.createAsync(url, constants.reqNames.getUpNextContent, options)
+  end if
   port = CreateObject("roMessagePort")
   request.start(port)
 
   while true
     msg = wait(0, port)
     result = request.handleEvent(msg)
-
     if result <> invalid and result.response <> invalid and result.response.code >= 200 and result.response.code < 400
       parsed = ParseJSON(result.response.data)
       if parsed = invalid then
