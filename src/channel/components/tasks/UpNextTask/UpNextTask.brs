@@ -31,7 +31,12 @@ Function execGetUpNextContent() As Void
     options.params.user_id = m.top.request.userId
   end if
   if m.top.request.categoryId <> invalid and m.top.request.categoryId <> ""
-    options.params.container_id = m.top.request.categoryId
+    categoryId = m.top.request.categoryId
+    ' for categories that were originally nested categories in the matrix api, their category id can look like:
+    ' parent_id/sub/nested_id or as a specific example foreign_favories/sub/international_films
+    ' for the moment, the API can only handle the parent_id
+    categoryId = categoryId.split("/sub/")[0]
+    options.params.container_id = categoryId
   end if
 
   request = auth.createAuthRequest(url, constants.reqNames.getUpNextContent, options)
