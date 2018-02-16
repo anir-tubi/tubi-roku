@@ -68,7 +68,7 @@ Function onCategoriesReceived()
     if response.code >= 200 and response.code < 300 then
       m.categoryContent = m.top.categoryListResponse.convertedMetadata
       adjustCategories()
-      spinner = m.top.findNode("LoadingSpinner")
+      spinner = m.top.findNode("CategorySpinner")
       spinner.visible = false
       m.CategoryList.content = invalid  ' since alwaysNotify=false on scrollinglist
       ' Prepend special categories, taking care to remove them if they already are there

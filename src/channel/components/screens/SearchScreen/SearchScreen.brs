@@ -45,7 +45,6 @@ Function onSearchResultsReceived()
   tubiLog("SearchScreen.onSearchResultsReceived")
   response = m.top.searchResponse.response
   if response.code >= 200 and response.code < 300 then 
-    m.UpdatingMessage.visible = false
     m.top.content = m.top.searchResponse.convertedMetadata
     if m.top.searchResponse.convertedMetadata <> invalid and m.top.searchResponse.convertedMetadata.getChildCount() > 0 then
       m.ResultGrid.visible = true
@@ -224,7 +223,6 @@ Function loadSearchResults()
   m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, m.top, "searchResponse")
   m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", url, constants.reqNames.searchAPI, options)
 
-  m.UpdatingMessage.visible = true
   if constants.deviceInfo.limitedUi = true
     m.UpdatingSpinner.visible = false
   end if

@@ -3,8 +3,18 @@ Function init()
   m.top.observeField("width", "onDimensionsChange")
   m.top.observeField("height", "onDimensionsChange")
 
+  m.top.observeField("isDisabled", "onIsDisabled")
+End Function
+
+
+'Previously in init()
+Function onIsDisabled()
   ' Non-OpenGL slow devices look really poor with clunky spinner
-  if m.global.constants.deviceInfo.limitedUi = false
+
+  ' While we are using the SKD1 version of RAF, the search screen does not repopulate poster images if
+  ' the following spinners are in effect. This should be temporary and full spinner usage should be ok 
+  ' once we move to the SG version of RAF.
+  if m.global.constants.deviceInfo.limitedUi = false and m.top.isDisabled <> true
     m.Animation = m.top.findNode("SpinnerAnimation")
     m.top.observeField("visible", "onVisibilityChange")
     if m.top.visible then
@@ -23,7 +33,7 @@ Function onVisibilityChange()
     m.Animation.control = "start"
   else if m.top.visible = false then
     m.Animation.control = "stop"
-  endif
+  end if
 End Function
 
 Function onDimensionsChange()

@@ -64,8 +64,9 @@
 
     <!-- Show a loading spinner only if it takes more than 3 seconds to load -->
     <Spinner
-      id="LoadingSpinner"
+      id="CategorySpinner"
       visible="true"
+      isDisabled="false"
       width="1920"
       height="1080"/>
 

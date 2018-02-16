@@ -144,6 +144,7 @@
       <Spinner
         id="BufferSpinner"
         visible="false"
+        isDisabled="true"
         width="1920"
         height="1080"/>
     </Group>

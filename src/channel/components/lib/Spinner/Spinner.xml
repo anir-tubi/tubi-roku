@@ -14,6 +14,13 @@
     <field id="showShade" alias="Shade.visible" value="false"/>
     <field id="width" alias="Shade.width"/>
     <field id="height" alias="Shade.height"/>
+
+    <!-- This is a temporary field that must be set when creating a Spinner node in the XML.
+         If "isDisabled" is not set, the spinner will not work as expected in most cases.
+         This field should not be updated at any time after being set in the XML declaration.
+         This field should be removed when we move to SG RAF.
+     -->
+    <field id="isDisabled" type="boolean" alwaysNotify="true"/>
   </interface>
 
   <children>

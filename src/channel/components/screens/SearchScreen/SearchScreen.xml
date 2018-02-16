@@ -94,6 +94,7 @@
       visible="false">
       <Spinner
         id="SearchSpinner"
+        isDisabled="true"
         width="66"
         height="66"/>
       <Label
