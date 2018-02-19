@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ -  Group with no default focus set
+ - 
+ -->
+<component name="GroupNoFocus" extends="Group" >
+  <children>
+    <Button
+      id="Button"
+      text="GroupNoFocus"
+      textColor="0xFFFFFF"
+      focusedTextColor="0x999999"
+      translation="[0,0]"/>
+  </children>
+</component>

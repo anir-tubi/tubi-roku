@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - Test scenarios
+ -
+ - 1) initial focus for child instantiated before the parent
+ - 2) initial focus for child instantiated after the parent
+ - 3) focus for child when setFocus() called from parent
+ - 4) focus for child when child is removed and readded to parent (reused)
+ - 
+ -->
+<component name="InitialFocusScene" extends="Scene" >
+  <script type="text/brightscript">
+    <![CDATA[
+      Function init()
+        m.top.setFocus(true)
+        printFocusTree(m.top)
+      End Function
+
+      Function onKeyEvent(key, press)
+        print "InitialFocusScene.onKeyEvent key = "; key
+        if press
+          ' Testing initialFocus with/without initialFocus and with/without setFocus calls
+          if key = "up" 
+            print "Replacing children with 'GroupFocus' and setting focus"
+            replaceChild("GroupFocus", true)
+            return true
+          else if key = "left"
+            print "Replacing children with 'GroupFocus' without setting focus"
+            replaceChild("GroupFocus", false)
+            return true
+          else if key = "down"
+            print "Replacing children with 'GroupNoFocus' and setting focus"
+            replaceChild("GroupNoFocus", true)
+            return true
+          else if key = "right"
+            print "Replacing children with 'GroupNoFocus' without setting focus"
+            replaceChild("GroupNoFocus", false)
+            return true
+
+          ' For testing moving focus up/down a parent/child chain
+          else if key = "fastforward"
+            ' testing moving
+            child = m.top.getChild(0)
+            child.setFocus(true)
+          else if key = "rewind"
+            m.top.setFocus(true)
+
+          ' Testing reused nodes and how initialFocus affects focus
+          else if key = "back"
+            ' Remove and append the current child to see how initialFocus is affected
+            print "Removing and replacing current child"
+            child = m.top.getChild(0)
+            m.top.removeChild(child)
+            m.top.appendChild(child)
+            child.setFocus(true)
+            return true
+          end if
+        end if
+        printFocusTree(m.top)
+        return false
+      End Function
+
+      Function replaceChild(subType, focus)
+        m.top.removeChildrenIndex(m.top.getChildCount(), 0)
+        child = m.top.createChild(subType)
+        if focus
+          child.setFocus(true)
+        end if
+      End Function
+
+      ' Recursively print the focus tree
+      Function printFocusTree(node, level=0)
+        indent = ""
+        for i=0 to level
+          indent = indent + "  "
+        end for
+        ' self
+        print indent + "<"; node.subtype(); " id="""; node.id; """ isInFocusChain="; node.isInFocusChain(); " hasFocus="; node.hasFocus(); ">"
+        for i=0 to node.getChildCount()-1
+          printFocusTree(node.getChild(i), level+1)
+        end for
+      End Function
+    ]]>
+  </script>
+</component>

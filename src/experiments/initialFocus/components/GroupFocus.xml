@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="GroupFocus" extends="Group" initialFocus="Button">
+  <children>
+    <Button
+      id="Button"
+      text="GroupFocus"
+      textColor="0xFFFFFF"
+      focusedTextColor="0x999999"
+      translation="[0,0]"/>
+  </children>
+</component>
