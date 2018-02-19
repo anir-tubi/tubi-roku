@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="Observer" extends="Group" >
+  <script type="text/brightscript">
+    <![CDATA[
+      Function init()
+        m.top.observeField("observe", "setupCallback")
+        m.top.observeField("unobserve", "setupCallback")
+        m.top.observeField("observeScoped", "setupCallback")
+        m.top.observeField("unobserveScoped", "setupCallback")
+      End Function
+
+      Function setupCallback(msg)
+        field = msg.GetField()
+        print m.top.id; ".setupCallback field = "; field
+        if type(m.top.targetNode) = "roSGNode" and m.top.targetField <> ""
+          if field = "observe"
+            m.top.targetNode.observeField(m.top.targetField, "eventCallback")
+          else if field = "unobserve"
+            m.top.targetNode.unobserveField(m.top.targetField)
+          else if field = "observeScoped"
+            m.top.targetNode.observeFieldScoped(m.top.targetField, "eventCallback")
+          else if field = "unobserveScoped"
+            m.top.targetNode.unobserveFieldScoped(m.top.targetField)
+          end if
+        end if
+      End Function
+
+      Function eventCallback()
+        print m.top.id; ".eventCallback"
+      End Function
+
+    ]]>
+  </script>
+  <interface>
+    <!-- Set up the node+field that will be observed -->
+    <field id="targetNode" type="node"/>
+    <field id="targetField" type="string"/>
+    
+    <!-- actions to take on targetNode+targetField -->
+    <field id="observe" type="boolean" alwaysNotify="true"/>
+    <field id="unobserve" type="boolean" alwaysNotify="true"/>
+    <field id="observeScoped" type="boolean" alwaysNotify="true"/>
+    <field id="unobserveScoped" type="boolean" alwaysNotify="true"/>
+  </interface>
+</component>

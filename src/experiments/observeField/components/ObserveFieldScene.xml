@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ -->
+<component name="ObserveFieldScene" extends="Scene" >
+  <script type="text/brightscript">
+    <![CDATA[
+      Function init()
+        m.ButtonGroup1 = m.top.findNode("ButtonGroup1")
+        m.ButtonGroup1.observeField("buttonSelected", "onButtonSelected")
+        m.ButtonGroup2 = m.top.findNode("ButtonGroup2")
+        m.ButtonGroup2.observeField("buttonSelected", "onButtonSelected")
+        m.Target = m.top.findNode("ObserveTarget")
+        m.Observer1 = m.top.findNode("Observer1")
+        m.Observer1.targetNode = m.Target
+        m.Observer1.targetField = "buttonSelected"
+        m.Observer2 = m.top.findNode("Observer2")
+        m.Observer2.targetNode = m.Target
+        m.Observer2.targetField = "buttonSelected"
+        m.ButtonGroup1.setFocus(true)
+      End Function
+
+      Function onButtonSelected(msg)
+        node = msg.getRoSGNode()
+        observer = invalid
+        if node.id = "ButtonGroup1"
+          observer = m.Observer1
+        else if node.id = "ButtonGroup2"
+          observer = m.Observer2
+        end if
+        button = node.buttons[node.buttonSelected]
+        if button = "observe"
+          observer.observe = true
+        else if button = "unobserve"
+          observer.unobserve = true
+        else if button = "observeScoped"
+          observer.observeScoped = true
+        else if button = "unobserveScoped"
+          observer.unobserveScoped = true
+        end if
+      End Function
+
+      Function onKeyEvent(key, press)
+        'print "ObserveFieldScene.onKeyEvent key="; key; " press="; press
+        if press 
+          if key = "right" and m.ButtonGroup1.isInFocusChain()
+            print "Setting ButtonGroup2 focus"
+            m.ButtonGroup2.setFocus(true)
+            return true
+          else if key = "left" and m.ButtonGroup2.isInFocusChain()
+            print "Setting ButtonGroup1 focus"
+            m.ButtonGroup1.setFocus(true)
+            return true
+          else if key = "up" and not m.Target.hasFocus()
+            print "Setting Target focus"
+            m.Target.setFocus(true)
+            return true
+          else if key = "down" and m.Target.hasFocus()
+            print "Setting ButtonGroup1 focus"
+            m.ButtonGroup1.setFocus(true)
+            return true
+          end if
+        end if
+        return false
+      End Function
+
+    ]]>
+  </script>
+  <children>
+    <Observer id="Observer1"/>
+    <Observer id="Observer2"/>
+    
+    <LayoutGroup>
+      <Button
+        id="ObserveTarget"
+        text="ObserveTarget"/>
+      <LayoutGroup
+        layoutDirection="horiz">
+        <LayoutGroup
+          layoutDirection="vert">
+          <Label
+            text="Observer 1"/>
+          <ButtonGroup
+            id="ButtonGroup1"
+            buttons="[&quot;observe&quot;,&quot;unobserve&quot;,&quot;observeScoped&quot;,&quot;unobserveScoped&quot;]"/>
+        </LayoutGroup>
+        <LayoutGroup
+          layoutDirection="vert">
+          <Label
+            text="Observer 2"/>
+          <ButtonGroup
+            id="ButtonGroup2"
+            buttons="[&quot;observe&quot;,&quot;unobserve&quot;,&quot;observeScoped&quot;,&quot;unobserveScoped&quot;]"/>
+        </LayoutGroup>
+      </LayoutGroup>
+    </LayoutGroup>
+  </children>
+</component>
