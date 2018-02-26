@@ -8,6 +8,11 @@ Function init()
   m.RemoveQueueMenuItem = m.top.findNode("RemoveQueueMenuItem")
   m.RemoveHistoryMenuItem = m.top.findNode("RemoveHistoryMenuItem")
   m.WatchTrailerMenuItem = m.top.findNode("WatchTrailerMenuItem")
+  m.RelatedContentGroup = m.top.findNode("RelatedContentGroup")
+  m.RelatedGrid = m.top.findNode("RelatedGrid")
+  m.RelatedTitle = m.top.findNode("RelatedTitle")
+  m.RelatedRowLabel = m.top.findNode("RelatedRowLabel")
+  m.AnimationGroup = m.top.findNode("AnimationGroup")
 
   m.top.observeField("length", "onLengthChange")
   m.top.observeField("isSeries", "onIsSeries")
@@ -21,19 +26,27 @@ Function init()
   m.top.observeField("removeHistoryTitle", "onRemoveFromHistoryTitleChange")
   m.top.observeField("isLoading", "onIsLoading")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
+  m.top.observeField("relatedContent", "onRelatedContentChange")
+  m.RelatedGrid.observeField("itemFocused", "onRelatedItemFocused")
+  m.top.observeField("animateToListItem", "onAnimateToListItem")
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
   setInitialMenuItems()
+  m.focusTarget = m.Menu
+
+  m.focusAnimationDuration = 0.4
+End Function
+
+Function onAnimateToListItem()
+  focusMenu(true)
 End Function
 
 Function onScreenFocusChange()
   tubiLog("DetailScreen.onScreenFocusChange")
   if m.top.hasFocus() then
-    ' defaulted to screen, move to a subcomponent
-    m.Menu.setFocus(true)
+    m.focusTarget.setFocus(true)
   end if
 End Function
-
 
 Function onLengthChange()
   tubiLog("DetailScreen.onLengthChange")
@@ -154,6 +167,7 @@ Function onIsLoading()
   tubiLog("DetailScreen.onIsLoading")
   m.Info.visible = not m.top.isLoading
   m.Menu.visible = not m.top.isLoading
+  m.RelatedContentGroup.visible = not m.top.isLoading
 End Function
 
 
@@ -251,12 +265,37 @@ Function onDialogButton()
   m.top.removeChild(m.Dialog)
   m.Dialog.unobserveField("buttonSelected")
   m.Dialog = invalid
-  m.Menu.setFocus(true)
+  m.focusTarget.setFocus(true)
   if buttonSelected = 0 then
     m.top.signInSelected = true
   end if
 End Function
 
+
+Function onRelatedContentChange()
+  tubiLog("DetailScreen.onRelatedContentChange")
+  if m.top.relatedContent <> invalid and m.top.relatedContent.getChildCount() > 0
+    m.RelatedContentGroup.visible = true
+    ' To force a single row in postergrid, set the columns
+    m.RelatedGrid.numColumns = m.top.relatedContent.getChildCount()
+  else
+    m.RelatedContentGroup.visible = false
+    if m.RelatedContentGroup.isInFocusChain()
+      focusMenu()
+    end if
+  end if
+End Function
+
+
+Function onRelatedItemFocused()
+  tubiLog("DetailScreen.onRelatedItemFocused")
+  if m.RelatedGrid.content <> invalid
+    focusedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
+    if focusedContent <> invalid
+      m.RelatedTitle.text = focusedContent.title
+    end if
+  end if
+End Function
 
 '''''''''''''''''''''''
 ' onKeyEvent
@@ -267,9 +306,19 @@ Function onKeyEvent(key As String, press As Boolean)
   tubiLog("DetailScreen.onKeyEvent key = " + key)
   if press then
     if key = "back"
-      if m.top.isWaitingForServerResponse = true
-        return true
+      if not m.top.isWaitingForServerResponse
+        m.top.backButtonPressed = true
       end if
+      return true
+    end if
+    ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
+    if key = "down" and m.Menu.isInFocusChain() and m.RelatedContentGroup.visible then
+      focusRelated()
+      return true
+    end if
+    if key = "up" and m.RelatedGrid.isInFocusChain()
+      focusMenu()
+      return true
     end if
   end if
 
@@ -277,3 +326,28 @@ Function onKeyEvent(key As String, press As Boolean)
 End Function
 
 
+Function focusMenu(immediately=false)
+  m.focusTarget = m.Menu
+  if immediately
+    m.AnimationGroup.translation = [0,0]
+    m.RelatedContentGroup.opacity = 0.2
+    m.Info.opacity = 1.0
+  else
+    slideTo(m.AnimationGroup, [0,0], m.focusAnimationDuration)
+    animate(m.RelatedContentGroup, { opacity: 0.2, duration: m.focusAnimationDuration})
+    animate(m.Info, { opacity: 1.0, duration: m.focusAnimationDuration})
+  end if
+  if m.top.isInFocusChain()
+    m.Menu.setFocus(true)
+  end if
+End Function
+
+Function focusRelated()
+  m.focusTarget = m.RelatedGrid
+  if m.top.isInFocusChain()
+    m.RelatedGrid.setFocus(true)
+  end if
+  slideTo(m.AnimationGroup, [0,-392], m.focusAnimationDuration)
+  animate(m.RelatedContentGroup, { opacity: 1.0, duration: m.focusAnimationDuration })
+  animate(m.Info, { opacity: 0.2, duration: m.focusAnimationDuration })
+End Function

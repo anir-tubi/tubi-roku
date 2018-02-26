@@ -55,13 +55,20 @@ Function init()
 
   m.appLoadStopwatch = CreateObject("roTimespan")
 
-  ' detailScreen2dIndex may be set by:
+  ' Array of detail screen content for it to behave as a virtual stack.
+  ' Each entry is:
+  ' {
+  '   content: <content which populates the detail screen fields>
+  '   series2dIndex: <season:episode pair as a 2d integer array, only applicable for series content>
+  '   sourceTrackingUri: <tracking URI for each screen>
+  ' }
+  '
+  ' screen2dIndex may be set by:
   '   (a) history currentEpisodeId if user is signed in and series is in history
   '   (b) selection chosen from episode screen
   '   (c) autoplay advancement
   '   (d) default [0,0] when no history or not signed in
-  m.detailScreen2dIndex = [0, 0] 'stores the [season, episode] position
-  m.detailScreenContent = invalid
+  m.detailScreenContent = []
 
   ' Set to the category id when content is launched from category screen,
   ' or set to invalid elsewhere
@@ -193,7 +200,7 @@ Function startUserExperience()
         testLog("Deep link contentId = " + m.top.deepLinkContent.id)
         testLog("Deep link type = " + m.top.deepLinkContent.type)
         m.enteredFromDeepLink = true
-        showDetailScreen(m.top.deepLinkContent)
+        showDetailScreen(m.top.deepLinkContent, invalid)
 
       else if m.authTask.authInfo = invalid then
         tubiLog("ContentController ask user to sign in")
@@ -348,7 +355,7 @@ Function onContentSelected()
       m.autoplayContext = category.id
     end if
   end if
-  showDetailScreen(content)
+  showDetailScreen(content, m.categoryScreen.trackingUri)
 End Function
 
 
@@ -377,7 +384,7 @@ End Function
 Function onSearchContentSelected()
   tubiLog("ContentController.onSearchContentSelected")
   m.autoplayContext = invalid
-  showDetailScreen(m.searchScreen.contentSelected)
+  showDetailScreen(m.searchScreen.contentSelected, m.searchScreen.trackingUri)
 End Function
 
 
@@ -757,7 +764,11 @@ Function returnToDetailScreenFromVideo(result)
   if content.isTrailer
     content = getDetailScreenContent()
   end if
-  showDetailScreen(content)
+  ' Replace the entire detail screen content stack after video playback
+  if currentScreen() <> invalid and currentScreen().isSameNode(m.detailScreen)
+    m.detailScreenContent = []
+  end if
+  showDetailScreen(content, invalid)
 End Function
 
 ' Stop the video player and optionally return to the screen stack
@@ -802,7 +813,9 @@ Function stopVideoContent(playerResult, showScreenStack)
   if showScreenStack
     m.videoPlayer.visible = false
     m.ScreenStack.visible = true
-    currentScreen().setFocus(true)
+    if currentScreen() <> invalid
+      currentScreen().setFocus(true)
+    end if
   end if
 End Function
 
@@ -831,29 +844,35 @@ End Function
 
 Function onEpisodeList()
   tubiLog("ContentController.onEpisodeList")
-  m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
-  m.episodesScreen.content = m.detailScreenContent
-  m.episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")
-  m.episodesScreen.observeFieldScoped("backgroundUriList", "onEpisodeBackgroundChange")
+  contentAndIndex = m.detailScreenContent.peek()
+  if contentAndIndex <> invalid and contentAndIndex.content <> invalid
+    m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
+    m.episodesScreen.content = contentAndIndex.content
+    m.episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")
+    m.episodesScreen.observeFieldScoped("backgroundUriList", "onEpisodeBackgroundChange")
 
-  if m.episodesScreen.content <> invalid and m.episodesScreen.content.id <> invalid
-    contentId = Mid(m.episodesScreen.content.id, 2)  ' trim leading "0" off series id
-    m.episodesScreen.trackingUri = m.episodesScreen.trackingUri + contentId
-  end if
+    if m.episodesScreen.content <> invalid and m.episodesScreen.content.id <> invalid
+      contentId = Mid(m.episodesScreen.content.id, 2)  ' trim leading "0" off series id
+      m.episodesScreen.trackingUri = m.episodesScreen.trackingUri + contentId
+    end if
 
-  m.episodesScreen.episodeToFocus = m.detailScreen2dIndex   'episodeToFocus should be [seasonIndex, episodeIndex]
+    m.episodesScreen.episodeToFocus = contentAndIndex.series2dIndex   'episodeToFocus should be [seasonIndex, episodeIndex]
   
-  pushScreen(m.episodesScreen, true)
+    pushScreen(m.episodesScreen, true)
+  end if
 End Function
 
 
 Function onEpisodeSelected()
-  m.detailScreen2dIndex = m.episodesScreen.episodeSelected
-  popScreen(true)
-  m.episodesScreen = invalid
+  contentAndIndex = m.detailScreenContent.peek()
+  if contentAndIndex <> invalid and contentAndIndex.content <> invalid
+    contentAndIndex.series2dIndex = m.episodesScreen.episodeSelected
+    popScreen(true)
+    m.episodesScreen = invalid
 
-  ' Autoplay the selected episode
-  onResume()
+    ' Autoplay the selected episode
+    onResume()
+  end if
 End Function
 
 
@@ -873,7 +892,7 @@ End Function
 ' showDetailScreen
 '
 ' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
-Function showDetailScreen(content)
+Function showDetailScreen(content, sourceTrackingUri)
   if m.detailScreen = invalid
     m.detailScreen = CreateObject("roSGNode", "DetailScreen")
   end if
@@ -890,18 +909,25 @@ Function showDetailScreen(content)
   m.detailScreen.observeFieldScoped("removeFromQueueSelected", "onRemoveFromQueueSelected")
   m.detailScreen.observeFieldScoped("removeFromHistorySelected", "onRemoveFromHistorySelected")
   m.detailScreen.observeFieldScoped("itemFailed", "onDetailItemFailed")
-  m.detailScreenContent = content
-  m.detailScreen2dIndex = [-1,-1]   'default, indicating that there was no specific episode requested
-
+  m.detailScreen.observeFieldScoped("backButtonPressed", "onDetailBackPressed")
+  m.detailScreen.observeFieldScoped("relatedContentSelected", "onRelatedContentSelected")
+  contentAndIndex = {
+    content: content
+    series2dIndex: [-1,-1]   'default, indicating that there was no specific episode requested
+    sourceTrackingUri: sourceTrackingUri
+  }
+  m.detailScreenContent.push(contentAndIndex)
   if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
     m.detailScreen.isLoading = true
-    pushScreen(m.detailScreen, false)  ' don't send tracking until we resolve series episode
-    getSingleContentFromServer()
   else
-    m.detailScreen.trackingUri = populateDetailTrackingUri(m.detailScreenContent, invalid)
-    pushScreen(m.detailScreen, true)
-    populateDetailScreen(content)
+    m.detailScreen.trackingUri = populateDetailTrackingUri(content, invalid)
+    populateDetailScreen(contentAndIndex)
   end if
+  ' always fetch detail content so we get related items as well
+  if currentScreen() = invalid or not currentScreen().isSameNode(m.detailScreen)
+    pushScreen(m.detailScreen, false)  ' don't send tracking until we resolve series episode
+  end if
+  getSingleContentFromServer()
 End Function
 
 
@@ -910,7 +936,8 @@ End Function
 '
 'Populates the detail screen's state from a content node
 '@content: tubiContentNode
-Function populateDetailScreen(content)
+Function populateDetailScreen(contentAndIndex)
+  content = contentAndIndex.content
   'hide the spinner
   m.detailScreen.isLoading = false
 
@@ -923,7 +950,7 @@ Function populateDetailScreen(content)
   bookmark = m.global.bookmarkIds.findNode(content.id)
   history = m.global.historyIds.findNode(content.id)
 
-  episode = getEpisodeContent(m.detailScreen2dIndex, content)
+  episode = getEpisodeContent(contentAndIndex.series2dIndex, content)
   episodeHistory = invalid
   if content.type = m.constants.ui.contentTypes.series
     if episode <> invalid
@@ -971,6 +998,12 @@ Function populateDetailScreen(content)
 
   'tell the detail screen/info panel to vertically center the info panel
   m.detailScreen.calculateInfoHeight = true
+
+  if (m.constants.ui.detailScreen.enableRelatedContent = invalid and getExperimentValue("UserNamespace", "related_content") = 1) or m.constants.ui.detailScreen.enableRelatedContent = true
+    m.detailScreen.relatedContent = content.relatedContent
+  else
+    m.detailScreen.relatedContent = invalid
+  end if
 
   m.detailScreen.animateToListItem = 0
 

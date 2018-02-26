@@ -54,12 +54,12 @@ Function pushScreen(screen As Object, sendTrackingEvents = true as Boolean)
   
   'handle user tracking for navigating to screen
   if sendTrackingEvents = true and top <> invalid
-    screenTrackingNavigate(top, screen)
+    screenTrackingNavigate(top.trackingUri, screen.trackingUri)
   end if
   
   'handle user tracking for loading screen
   if sendTrackingEvents = true
-    screenTrackingLoad(screen)
+    screenTrackingLoad(screen.trackingUri)
   end if
 
 End Function
@@ -102,12 +102,12 @@ Function popScreen(sendTrackingEvents = true as Boolean)
 
   'handle user tracking for navigating to screen
   if sendTrackingEvents = true and top <> invalid and newTop <> invalid
-    screenTrackingNavigate(top, newTop)
+    screenTrackingNavigate(top.trackingUri, newTop.trackingUri)
   end if
 
   'handle user tracking for loading screen
   if sendTrackingEvents = true and newTop <> invalid
-    screenTrackingLoad(newTop)
+    screenTrackingLoad(newTop.trackingUri)
   end if
 End Function
 
@@ -134,15 +134,15 @@ End Function
 ' screenTrackingNavigate
 '
 ' 'tracking for navigating to a screen
-Function screenTrackingNavigate(oldScreen, newScreen)
+Function screenTrackingNavigate(oldTrackingUri, newTrackingUri)
   sourceUri = ""
-  if oldScreen.trackingUri <> invalid
-    sourceUri = oldScreen.trackingUri
+  if oldTrackingUri <> invalid
+    sourceUri = oldTrackingUri
   end if
 
   destinationUri = invalid
-  if newScreen.trackingUri <> invalid
-    destinationUri = newScreen.trackingUri
+  if newTrackingUri <> invalid
+    destinationUri = newTrackingUri
   end if
 
   if destinationUri <> invalid 
@@ -159,10 +159,10 @@ End Function
 ' screenTrackingLoad
 '
 ' tracking for loading a new screen
-Function screenTrackingLoad(newScreen)
+Function screenTrackingLoad(newTrackingUri)
   destinationUri = invalid
-  if newScreen.trackingUri <> invalid
-    destinationUri = newScreen.trackingUri
+  if newtrackingUri <> invalid
+    destinationUri = newTrackingUri
   end if
 
   'tracking for loading screen

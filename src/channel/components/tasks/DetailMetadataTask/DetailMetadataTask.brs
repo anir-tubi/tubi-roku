@@ -2,47 +2,80 @@ Function init()
   m.top.functionName = "execGetDetailMetadata"
 End Function
 
-Function execGetDetailMetadata()
+'
+' Simultaneously request content detail and related items.
+'
+' Note that we raise errors if content detail fails, but ignore
+' them if related items fails
+'
+Function execGetDetailMetadata() As Void
   tubiLog("DetailMetadataTask.execGetDetailMetadata")
-
-  constants = m.global.constants
-  appName = constants.settings.shortAppName
-  url = constants.urls.cms.singleContent
-  platform = constants.platform
-  options = {
-    params: {
-      "app_id": appName
-      "platform": platform
-      "content_id": m.top.contentFragment.id
+  if type(m.top.request) <> "roAssociativeArray" or m.top.request.contentId = invalid
+    m.top.error = {
+      code: -1
+      data: ""
+      failReason: "Content was invalid"
     }
-  }
-  request = TubiRequest().createAsync(url, constants.reqNames.getSingleContent, options)
-  port = CreateObject("roMessagePort")
-  request.start(port)
+    return
+  end if
 
+  tubiLog("DetailMetadataTask getting content for " + m.top.request.contentId)
+  ' request setup
+  constants = m.global.constants
+  cms = CmsApi(constants, TubiRequest())
+  translate = TubiMetadataTranslate(constants)
+  contentReq = cms.singleContentReq(m.top.request.contentId)
+  relatedReq = cms.relatedContentReq(m.top.request.contentId, m.top.request.userId)
+  port = CreateObject("roMessagePort")
+  contentReq.start(port)
+  relatedReq.start(port)
+
+  ' Wait for all responses
+  contentResult = invalid
+  relatedResult = invalid
   while true
     msg = wait(0, port)
-    result = request.handleEvent(msg)
-
-    if result <> invalid and result.response <> invalid and result.response.code >= 200 and result.response.code < 400
-      parsed = ParseJSON(result.response.data)
-      if parsed = invalid then
-        tubiLog("MetadataFetchTask failed to parse JSON response")
-        m.top.error = result.response
-      else
-        translate = TubiMetadataTranslate(constants)
-        detail = CreateObject("roSGNode", "TubiContentNode")
-        translate.translateRecursive(parsed, detail)
-        m.top.response = detail
-      end if
-      exit while
-    else
-      m.top.error = {
-        code: msg.GetResponseCode()
-        data: ""
-        failReason: "Result is invalid"
-      }
+    if contentResult = invalid
+      contentResult = contentReq.handleEvent(msg)
+    end if
+    if relatedResult = invalid
+      relatedResult = relatedReq.handleEvent(msg)
+    end if
+    if contentResult <> invalid and relatedResult <> invalid
       exit while
     end if
   end while
+
+  ' Parse results
+  if contentResult <> invalid and contentResult.response <> invalid and success(contentResult.response.code)
+    parsed = ParseJSON(contentResult.response.data)
+    if parsed = invalid then
+      tubiLog("MetadataFetchTask failed to parse JSON response")
+      m.top.error = contentResult.response
+    else
+      detail = CreateObject("roSGNode", "TubiContentNode")
+      translate.translateRecursive(parsed, detail)
+
+      if relatedResult <> invalid and relatedResult.response <> invalid and success(relatedResult.response.code)
+        parsed = ParseJSON(relatedResult.response.data)
+        if parsed = invalid then
+          tubiLog("MetadataFetchTask failed to parse JSON response")
+        else
+          detail.relatedContent = translate.translateRelatedContent(parsed)
+        end if
+      end if
+      m.top.response = detail
+    end if
+  else
+    m.top.error = {
+      code: contentResult.response.code
+      data: ""
+      failReason: "Result is invalid"
+    }
+  end if
+End Function
+
+' Helper for checking HTTP request success
+Function success(code)
+  return code >= 200 and code < 400
 End Function

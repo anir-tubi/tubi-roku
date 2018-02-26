@@ -203,6 +203,7 @@ Function getConstants()
     constants.reqNames.getFullHistory = "getFullHistory"
     constants.reqNames.getSingleContent = "getSingleContent"
     constants.reqNames.getUpNextContent = "getUpNextContent"
+    constants.reqNames.getRelatedContent = "getRelatedContent"
 
   'Nielsen ID token for integrating with Nielsen DAR
   constants.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
@@ -241,6 +242,7 @@ Function getConstants()
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
       constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
       constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
+      constants.urls.cms.relatedContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/related"
 
     'users url
     constants.urls.users = {}
@@ -399,6 +401,9 @@ Function getConstants()
 
   'UI properties that should be passed into the scene graph
   constants.ui = {}
+
+    constants.ui.detailScreen = {}
+      constants.ui.detailScreen.enableRelatedContent = invalid  ' true or false overrides experiment values; invalid defers to experiment
 
     'constants needed for on now UI
     constants.ui.onNow = {}

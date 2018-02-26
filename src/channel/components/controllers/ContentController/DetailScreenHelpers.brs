@@ -32,7 +32,10 @@ End Function
 '@content: roSGNode, a TubiContentNode
 Function getSingleContentFromServer(content=invalid)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
-  if content = invalid then content = m.detailScreenContent
+  if content = invalid then
+    contentAndIndex = m.detailScreenContent.peek()
+    content = contentAndIndex.content
+  end if
 
   if content <> invalid then 
     if m.refreshTask <> invalid
@@ -40,7 +43,10 @@ Function getSingleContentFromServer(content=invalid)
       m.refreshTask.unobserveField("error")
     end if
     m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
-    m.refreshTask.contentFragment = content
+    m.refreshTask.request = {
+      contentId: content.id
+      ' TODO(Chris): Add a user id here or full auth info
+    }
     m.refreshTask.observeField("response", "onSingleContentResponse")
     m.refreshTask.observeField("error", "onSingleContentError")
     m.refreshTask.control = "RUN"
@@ -50,10 +56,16 @@ End Function
 
 Function onSingleContentResponse(msg) As Void
   tubiLog("DetailScreenHelpers.onSingleContentResponse")
-  'refreshedContent should hold all the series info that is needed for the detail screen to function
+
+  ' Replace the top of the detail screen content stack with the refreshed content
   refreshedContent = msg.GetData()
-  oldContent = m.detailScreenContent  ' in a few cases we need this for the original content id
-  m.detailScreenContent = refreshedContent
+  oldContentAndIndex = m.detailScreenContent.pop()
+  oldContent = oldContentAndIndex.content
+  contentAndIndex = {
+    content: refreshedContent
+    series2dIndex: oldContentAndIndex.series2dIndex
+  }
+  m.detailScreenContent.push(contentAndIndex)
 
   m.refreshTask.unobserveField("response")
   m.refreshTask.unobserveField("error")
@@ -62,45 +74,44 @@ Function onSingleContentResponse(msg) As Void
   afterFn = invalid  ' the function to execute once we've sorted the detail screen out
   if m.enteredFromDeepLink = true and m.top.deepLinkContent <> invalid
     if m.top.deepLinkContent.deeplinkType = "series"
-      '  m.detailScreenContent.id:       series id
-      '  m.detailScreenContent.seriesId: invalid
-      '  m.detailScreenContent.type:     series
+      '  refreshedContent.id:       series id
+      '  refreshedContent.seriesId: invalid
+      '  refreshedContent.type:     series
       '  m.deepLinkContent.deepLinkType: series
-      m.detailScreen2dIndex = [0,0]
+      contentAndIndex.series2dIndex = [0,0]
 
-    else if (m.top.deepLinkContent.deeplinkType = "season" or m.top.deepLinkContent.deeplinkType = "episode") and m.detailScreenContent.type = m.constants.ui.contentTypes.video
-      '  m.detailScreenContent.id =       episode id
-      '  m.detailScreenContent.seriesId = series id
-      '  m.detailScreenContent.type =     video
+    else if (m.top.deepLinkContent.deeplinkType = "season" or m.top.deepLinkContent.deeplinkType = "episode") and refreshedContent.type = m.constants.ui.contentTypes.video
+      '  refreshedContent.id =       episode id
+      '  refreshedContent.seriesId = series id
+      '  refreshedContent.type =     video
       '  m.deepLinkContent.deepLinkType = seaason | episode
 
       ' deeplink sent us an episode id, so here, we have full info for an episode, but we need full info for a series
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
       emptySeriesNode.type = m.constants.ui.contentTypes.series
-      emptySeriesNode.id = m.detailScreenContent.seriesId
+      emptySeriesNode.id = refreshedContent.seriesId
       getSingleContentFromServer(emptySeriesNode)
       return
-    else if m.top.deepLinkContent.deeplinkType = "season" and m.detailScreenContent.type = m.constants.ui.contentTypes.series
-      '  m.detailScreenContent.id =       series id
-      '  m.detailScreenContent.seriesId = invalid
-      '  m.detailScreenContent.type =     series
+    else if m.top.deepLinkContent.deeplinkType = "season" and refreshedContent.type = m.constants.ui.contentTypes.series
+      '  refreshedContent.id =       series id
+      '  refreshedContent.seriesId = invalid
+      '  refreshedContent.type =     series
       '  m.deepLinkContent.deepLinkType = season
 
       ' we've now received the full series info, so we can build the relevant screens
-      m.detailScreen2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, m.detailScreenContent)
+      contentAndIndex.series2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, refreshedContent)
       afterFn = onEpisodeList
-    else if m.top.deepLinkContent.deeplinkType = "episode" and m.detailScreenContent.type = m.constants.ui.contentTypes.series
-      '  m.detailScreenContent.id =       series id
-      '  m.detailScreenContent.seriesId = invalid
-      '  m.detailScreenContent.type =     series
+    else if m.top.deepLinkContent.deeplinkType = "episode" and refreshedContent.type = m.constants.ui.contentTypes.series
+      '  refreshedContent.id =       series id
+      '  refreshedContent.seriesId = invalid
+      '  refreshedContent.type =     series
       '  m.deepLinkContent.deepLinkType = episode
 
       ' we now have the full series info for episode deeplinks
-      m.detailScreen2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, m.detailScreenContent)
-
+      contentAndIndex.series2dIndex = findEpisode2dIndex(m.top.deepLinkContent.id, refreshedContent)
       'determine if we need to resume or play from start the deeplinked episode
       if m.top.deepLinkContent.nowPos <> invalid and m.top.deepLinkContent.nowPos > 0
-        episode = getEpisodeContent(m.detailScreen2dIndex, m.detailScreenContent)
+        episode = getEpisodeContent(contentAndIndex.series2dIndex, refreshedContent)
         episode.nowPos = m.top.deepLinkContent.nowPos
         afterFn = onResume
       else
@@ -109,7 +120,7 @@ Function onSingleContentResponse(msg) As Void
     else if m.top.deepLinkContent.deeplinkType = "movie"
       'determine if we need to resume or play from start the deeplinked movie
       if m.top.deepLinkContent.nowPos <> invalid and m.top.deepLinkContent.nowPos > 0
-        m.detailScreenContent.nowPos = m.top.deepLinkContent.nowPos
+        refreshedContent.nowPos = m.top.deepLinkContent.nowPos
         afterFn = onResume
       else
         afterFn = onPlay
@@ -122,37 +133,37 @@ Function onSingleContentResponse(msg) As Void
     end if
   else
     ' Find a default episode to land on, in case no specific episode requested from deep link
-    if m.detailScreenContent.type = m.constants.ui.contentTypes.series and m.detailScreen2dIndex[0] = -1
+    if refreshedContent.type = m.constants.ui.contentTypes.series and contentAndIndex.series2dIndex[0] = -1
       if oldContent <> invalid and oldContent.type = m.constants.ui.contentTypes.video 
         ' a specific episode was requested by id
-        m.detailScreen2dIndex = findEpisode2dIndex(oldContent.id, m.detailScreenContent)
+        contentAndIndex.series2dIndex = findEpisode2dIndex(oldContent.id, refreshedContent)
       else
         ' first see if there was a specific episode id we wanted
-        history = m.global.historyIds.findNode(m.detailScreenContent.id)
+        history = m.global.historyIds.findNode(refreshedContent.id)
         if history <> invalid
-          m.detailScreen2dIndex = findEpisode2dIndex(history.currentEpisodeId, m.detailScreenContent)
+          contentAndIndex.series2dIndex = findEpisode2dIndex(history.currentEpisodeId, refreshedContent)
         else
-          m.detailScreen2dIndex = [0,0]
+          contentAndIndex.series2dIndex = [0,0]
         end if
       end if
-    else if m.detailScreenContent.type = m.constants.ui.contentTypes.video and m.detailScreenContent.seriesId <> invalid and m.detailScreenContent.seriesId <> ""
+    else if refreshedContent.type = m.constants.ui.contentTypes.video and refreshedContent.seriesId <> invalid and refreshedContent.seriesId <> ""
       ' Case here of having an episode outside of a series (probably from autoplay)
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
       emptySeriesNode.type = m.constants.ui.contentTypes.series
-      emptySeriesNode.id = m.detailScreenContent.seriesId
+      emptySeriesNode.id = refreshedContent.seriesId
       getSingleContentFromServer(emptySeriesNode)
       return
     end if
   end if
 
   ' showDetailScreen defers navigation tracking for refreshed content or deep links, so do it here
-  m.detailScreen.trackingUri = populateDetailTrackingUri(m.detailScreenContent, getEpisodeContent(m.detailScreen2dIndex, m.detailScreenContent))
-  if previousScreen() <> invalid
-    screenTrackingNavigate(previousScreen(), m.detailScreen)
+  m.detailScreen.trackingUri = populateDetailTrackingUri(refreshedContent, getEpisodeContent(contentAndIndex.series2dIndex, refreshedContent))
+  if contentAndIndex.sourceTrackingUri <> invalid
+    screenTrackingNavigate(contentAndIndex.sourceTrackingUri, m.detailScreen.trackingUri)
   end if
-  screenTrackingLoad(m.detailScreen)
+  screenTrackingLoad(m.detailScreen.trackingUri)
 
-  populateDetailScreen(m.detailScreenContent)
+  populateDetailScreen(contentAndIndex)
   if afterFn <> invalid
     afterFn()
   end if
@@ -228,11 +239,12 @@ End Function
 ' Helper to deduce the content, video or episode, to play or resume
 Function getDetailScreenContent()
   videoToPlay = invalid
-  if m.detailScreenContent <> invalid then
-    if m.detailScreenContent.type = m.constants.ui.contentTypes.video then
-      videoToPlay = m.detailScreenContent
+  contentAndIndex = m.detailScreenContent.peek()
+  if contentAndIndex <> invalid and contentAndIndex.content <> invalid then
+    if contentAndIndex.content.type = m.constants.ui.contentTypes.video then
+      videoToPlay = contentAndIndex.content
     else
-      videoToPlay = getEpisodeContent(m.detailScreen2dIndex, m.detailScreenContent)
+      videoToPlay = getEpisodeContent(contentAndIndex.series2dIndex, contentAndIndex.content)
     end if
   end if
   return videoToPlay
@@ -245,12 +257,15 @@ Function onAddToQueueSelected()
     signInMessage = "You must be signed in, in order to add a title to your queue."
     m.signInModal = showSignInModal("onSignInModalButtonSelected", signInMessage)
   else if m.detailScreen.isWaitingForServerResponse <> true
-    m.detailScreen.addToQueueTitle = "Adding..."
-    m.AuthTask.functionName = "addToQueue"
-    m.AuthTask.content = m.detailScreenContent
-    m.AuthTask.observeField("bookmarkId", "onBookmarked")
-    m.AuthTask.control = "RUN"
-    m.detailScreen.isWaitingForServerResponse = true
+    contentAndIndex = m.detailScreenContent.peek()
+    if contentAndIndex <> invalid and contentAndIndex.content <> invalid
+      m.detailScreen.addToQueueTitle = "Adding..."
+      m.AuthTask.functionName = "addToQueue"
+      m.AuthTask.content = contentAndIndex.content
+      m.AuthTask.observeField("bookmarkId", "onBookmarked")
+      m.AuthTask.control = "RUN"
+      m.detailScreen.isWaitingForServerResponse = true
+    end if
   end if
 End Function
 
@@ -284,25 +299,27 @@ Function onBookmarked() As Void
     return
   end if
 
-  tubiLog("Got bookmarkId " + m.AuthTask.bookmarkId + " for content " + m.detailScreenContent.id)
+  contentAndIndex = m.detailScreenContent.peek()
+  if contentAndIndex <> invalid and contentAndIndex.content <> invalid
+    tubiLog("Got bookmarkId " + m.AuthTask.bookmarkId + " for content " + contentAndIndex.content.id)
 
-  ' TODO(Chris): Move management of this global list off to a library
-  ' or task
-  newBookmark = CreateObject("roSGNode", "BookmarkContentNode")
-  newBookmark.id = m.detailScreenContent.id
-  newBookmark.type = m.detailScreenContent.type
-  newBookmark.bookmarkId = m.AuthTask.bookmarkId
-  m.global.bookmarkIds.insertChild(newBookmark, 0)
-  m.detailScreen.isBookmark = true
-  m.detailScreen.isWaitingForServerResponse = false
+    ' TODO(Chris): Move management of this global list off to a library
+    ' or task
+    newBookmark = CreateObject("roSGNode", "BookmarkContentNode")
+    newBookmark.id = contentAndIndex.content.id
+    newBookmark.type = contentAndIndex.content.type
+    newBookmark.bookmarkId = m.AuthTask.bookmarkId
+    m.global.bookmarkIds.insertChild(newBookmark, 0)
+    m.detailScreen.isBookmark = true
+    m.detailScreen.isWaitingForServerResponse = false
 
-  'user tracking
-  m.global.trackingLoggingTask.trackEvent = {
-    trackType: "addBookmark"
-    value: m.detailScreenContent.id
-    ctx: m.top.trackingUri
-  }
-
+    'user tracking
+    m.global.trackingLoggingTask.trackEvent = {
+      trackType: "addBookmark"
+      value: contentAndIndex.content.id
+      ctx: m.top.trackingUri
+    }
+  end if
   onHistoryQueueChange()
 End Function
 
@@ -310,15 +327,18 @@ End Function
 Function onRemoveFromQueueSelected()
   tubiLog("DetailScreenHelpers.onRemoveFromQueueSelected")
   if m.detailScreen.isWaitingForServerResponse <> true
-    m.detailScreen.removeQueueTitle = "Removing..."
-    m.AuthTask.functionName = "removeFromQueue"
-    content = clone(m.detailScreenContent)
-    bookmark = m.global.bookmarkIds.findNode(content.id)
-    content.bookmarkId = bookmark.bookmarkId
-    m.AuthTask.content = content
-    m.AuthTask.observeField("result", "onBookmarkRemoved")
-    m.AuthTask.control = "RUN"
-    m.detailScreen.isWaitingForServerResponse = true
+    contentAndIndex = m.detailScreenContent.peek()
+    if contentAndIndex <> invalid and contentAndIndex.content <> invalid
+      m.detailScreen.removeQueueTitle = "Removing..."
+      m.AuthTask.functionName = "removeFromQueue"
+      content = clone(contentAndIndex.content)
+      bookmark = m.global.bookmarkIds.findNode(content.id)
+      content.bookmarkId = bookmark.bookmarkId
+      m.AuthTask.content = content
+      m.AuthTask.observeField("result", "onBookmarkRemoved")
+      m.AuthTask.control = "RUN"
+      m.detailScreen.isWaitingForServerResponse = true
+    end if
   end if
 End Function
 
@@ -342,16 +362,19 @@ Function onBookmarkRemoved() As Void
   end if
 
   m.detailScreen.isWaitingForServerResponse = false
-  bookmarkNode = m.global.bookmarkIds.findNode(m.detailScreenContent.id)
-  if bookmarkNode <> invalid then m.global.bookmarkIds.removeChild(bookmarkNode)
-  m.detailScreen.isBookmark = false
+  contentAndIndex = m.detailScreenContent.peek()
+  if contentAndIndex <> invalid and contentAndIndex.content <> invalid
+    content = contentAndIndex.content
+    bookmarkNode = m.global.bookmarkIds.findNode(content.id)
+    if bookmarkNode <> invalid then m.global.bookmarkIds.removeChild(bookmarkNode)
+    m.detailScreen.isBookmark = false
 
-  'user tracking
-  m.global.trackingLoggingTask.trackEvent = {
-    trackType: "deleteBookmark"
-    value: m.detailScreenContent.id
-  }
-
+    'user tracking
+    m.global.trackingLoggingTask.trackEvent = {
+      trackType: "deleteBookmark"
+      value: content.id
+    }
+  end if
   onHistoryQueueChange()
 End Function
 
@@ -359,17 +382,19 @@ End Function
 Function onRemoveFromHistorySelected()
   tubiLog("DetailScreenHelpers.onRemoveFromHistorySelected")
   if m.detailScreen.isWaitingForServerResponse <> true
-    m.detailScreen.removeHistoryTitle = "Removing..."
-    m.AuthTask.functionName = "removeFromHistory"
-    content = clone(m.detailScreenContent)
-    history = m.global.historyIds.findNode(m.detailScreenContent.id)
-
-    if history <> invalid and history.historyId <> invalid
-      content.historyId = history.historyId
-      m.AuthTask.content = content
-      m.AuthTask.observeField("result", "onHistoryRemoved")
-      m.AuthTask.control = "RUN"
-      m.detailScreen.isWaitingForServerResponse = true
+    contentAndIndex = m.detailScreenContent.peek()
+    if contentAndIndex <> invalid and contentAndIndex.content <> invalid
+      history = m.global.historyIds.findNode(content.id)
+      if history <> invalid and history.historyId <> invalid
+        content = clone(contentAndIndex.content)
+        m.detailScreen.removeHistoryTitle = "Removing..."
+        content.historyId = history.historyId
+        m.AuthTask.functionName = "removeFromHistory"
+        m.AuthTask.content = content
+        m.AuthTask.observeField("result", "onHistoryRemoved")
+        m.AuthTask.control = "RUN"
+        m.detailScreen.isWaitingForServerResponse = true
+      end if
     end if
   end if
 End Function
@@ -393,14 +418,53 @@ Function onHistoryRemoved() As Void
   end if
 
   m.detailScreen.isWaitingForServerResponse = false
-  historyNode = m.global.historyIds.findNode(m.detailScreenContent.id)
-  if historyNode <> invalid then m.global.historyIds.removeChild(historyNode)
-  m.detailScreen.isHistory = false
-
+  contentAndIndex = m.detailScreenContent.peek()
+  if contentAndIndex <> invalid and contentAndIndex.content <> invalid
+    historyNode = m.global.historyIds.findNode(contentAndIndex.content.id)
+    if historyNode <> invalid then m.global.historyIds.removeChild(historyNode)
+    m.detailScreen.isHistory = false
+  end if
   onHistoryQueueChange()
 End Function
 
 
 Function cancelHistoryQueueChange()
   m.detailScreen.isWaitingForServerResponse = false
+End Function
+
+
+Function onRelatedContentSelected()
+  contentAndIndex = m.detailScreenContent.peek()
+  if contentAndIndex <> invalid and contentAndIndex.content <> invalid
+    content = contentAndIndex.content.relatedContent.getChild(m.detailScreen.relatedContentSelected)
+    if content <> invalid
+      sourceTrackingUri = m.detailScreen.trackingUri + "/related/" + m.detailScreen.relatedContentSelected.toStr()
+      showDetailScreen(content, sourceTrackingUri)
+    end if
+  end if
+End Function
+
+
+Function onDetailBackPressed()
+  m.detailScreenContent.pop()
+  ' cancel outstanding metadata fetches
+  if m.refreshTask <> invalid
+    m.refreshTask.unobserveField("response")
+    m.refreshTask.unobserveField("error")
+    m.refreshTask = invalid
+  end if
+  if m.detailScreenContent.count() > 0
+    contentAndIndex = m.detailScreenContent.peek()
+    if contentAndIndex <> invalid and contentAndIndex.content <> invalid
+      oldTrackingUri = m.detailScreen.trackingUri
+      m.detailScreen.trackingUri = populateDetailTrackingUri(contentAndIndex.content, getEpisodeContent(contentAndIndex.series2dIndex, contentAndIndex.content))
+      screenTrackingNavigate(oldTrackingUri, m.detailScreen.trackingUri)
+      screenTrackingLoad(m.detailScreen.trackingUri)
+      populateDetailScreen(contentAndIndex)
+    end if
+  else
+    ' TODO(Chris): This is in terrible need of refactor. We shouldn't be calling this directly
+    ' but we have to invoke the "empty stack" logic at this point.
+    onKeyEvent("back", true)
+  end if
 End Function

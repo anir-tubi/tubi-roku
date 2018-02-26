@@ -50,5 +50,8 @@
 
     <!-- used to deliver focus indices to EpisodeScreen RowList row item counter -->
     <field id="focusIndex" type="integer" value="-1"/>
+    
+    <!-- for related content items displayed on the detail screen -->
+    <field id="relatedContent" type="node" />
   </interface>
 </component>

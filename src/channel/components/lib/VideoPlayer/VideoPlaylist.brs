@@ -134,10 +134,11 @@ Function refreshContent(nowPos)
       m.refreshTask.unobserveField("error")
     end if
     m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
-    fragment = clone(content)
-    fragment.nowPos = nowPos  ' we have to pass this along since it is relevant after the refresh, but may
-                              ' have come from numerous places, e.g. m.top.seekPlaylist or advancePlaylist
-    m.refreshTask.contentFragment = fragment
+    request = {
+      contentId: content.id
+      ' TODO(Chris): Add userid here
+    }
+    m.refreshTask.request = request
     m.refreshTask.observeField("response", "onRefreshResponse")
     m.refreshTask.observeField("error", "onRefreshError")
     m.refreshTask.control = "RUN"
@@ -149,26 +150,28 @@ Function onRefreshResponse(msg)
   tubiLog("VideoPlayer.onRefreshResponse")
   refreshedContent = msg.GetData()
   refreshTask = msg.getRoSGNode()
-  playlistContent = refreshTask.contentFragment
-  ' While the refresh content may not hold all the information we need (e.g. isLiveTV), it's
-  ' only used for the stream urls and subtitle urls really and should be ok here without merging
-  ' fields from the original content.
-  mergedFields = ["isLiveTV", "isTrailer", "nowPos", "parentType", "parentTitle"]
-  for each f in mergedFields
-    refreshedContent.setField(f, playlistContent.getField(f))
-  end for
+  playlistContent = currentPlaylistContent()
+  if refreshedContent.id = playlistContent.id
+    ' While the refresh content may not hold all the information we need (e.g. isLiveTV), it's
+    ' only used for the stream urls and subtitle urls really and should be ok here without merging
+    ' fields from the original content.
+    mergedFields = ["isLiveTV", "isTrailer", "nowPos", "parentType", "parentTitle"]
+    for each f in mergedFields
+      refreshedContent.setField(f, playlistContent.getField(f))
+    end for
 
-  ' In the case that we are attempting to watch a trailer, overwrite the video urls of the refreshed content
-  ' with the trailer urls
-  if playlistContent.isTrailer and not m._.empty(refreshedContent.trailerUrls)
-    refreshedContent.url = refreshedContent.trailerUrls[0]
-    refreshedContent.subtitleTracks = []
-    refreshedContent.subtitleConfig = invalid
-  end if
+    ' In the case that we are attempting to watch a trailer, overwrite the video urls of the refreshed content
+    ' with the trailer urls
+    if playlistContent.isTrailer and not m._.empty(refreshedContent.trailerUrls)
+      refreshedContent.url = refreshedContent.trailerUrls[0]
+      refreshedContent.subtitleTracks = []
+      refreshedContent.subtitleConfig = invalid
+    end if
 
-  m.top.content = refreshedContent
-  if m.VideoState = "refresh" then
-    playContent()
+    m.top.content = refreshedContent
+    if m.VideoState = "refresh" then
+      playContent()
+    end if
   end if
 End Function
 

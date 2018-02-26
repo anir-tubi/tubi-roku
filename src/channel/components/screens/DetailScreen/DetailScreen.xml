@@ -5,6 +5,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -80,7 +81,8 @@
       <!-- hides or shows the loading spinner -->
       <field id="isLoading" type="boolean" alias="DetailSpinner.visible" />
 
-
+      <!-- content to populated the RelatedGrid -->
+      <field id="relatedContent" alias="RelatedGrid.content" />
 
     <!-- OUTPUTS -->
 
@@ -104,6 +106,10 @@
 
       <!-- set to true when the user wants to see the trailer for the content -->
       <field id="watchTrailerSelected" type="boolean" alwaysNotify="true" />
+
+      <field id="relatedContentSelected" alias="RelatedGrid.itemSelected" />
+
+      <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -144,29 +150,69 @@
       unfocusiconurl="pkg:/images/icon-trailer.png"
       focusiconurl="pkg:/images/icon-trailer.png" />
   
-    <InfoPanel
-      id="DetailInfoPanel"
-      mode="item"
-      translation="[85,123]"
-      maxHeight="477"
-      maxTitleLines="2"
-      visible="true" />
-  
-    <ScrollingList
-      id="Menu"
-      width="465"
-      height="352"
-      itemSpacings="[8]"
-      itemComponentName="DetailMenuItem"
-      visible="true"
-      translation="[60, 680]" />
-
     <Spinner
       id="DetailSpinner"
       visible="false"
       isDisabled="false"
       width="1920"
-      height="1080"/>
+      height="1080"
+      translation="[0,0]"/>
     
+    <Group
+      id="AnimationGroup"
+      translation="[0,0]">
+      <InfoPanel
+        id="DetailInfoPanel"
+        mode="item"
+        translation="[85,123]"
+        maxHeight="498"
+        maxTitleLines="2"
+        visible="true" />
+
+      <ScrollingList
+        id="Menu"
+        width="465"
+        height="256"
+        itemSpacings="[8]"
+        itemComponentName="DetailMenuItem"
+        visible="true"
+        translation="[60, 656]" />
+
+      <Group
+        id="RelatedContentGroup"
+        translation="[85,945]"
+        visible="false"
+        opacity="0.2">
+        <CategoryGridRowLabel
+          id="RelatedRowLabel"
+          translation="[0,0]">
+          <TubiContentNode
+            role="content"
+            title="You Might Also Like"/>
+        </CategoryGridRowLabel>
+        <PosterGrid
+          id="RelatedGrid"
+          itemSize="[1920,300]"
+          numRows="1"
+          basePosterSize="[210,300]"
+          itemSpacing="[10,0]"
+          fadeFocusFeedbackWhenAutoScrolling="true"
+          horizFocusAnimationStyle="fixedFocus"
+          focusBitmapUri="pkg:/images/selector-fhd.9.png"
+          translation="[0,63]"/>
+        <Label
+          id="RelatedTitle"
+          width="875"
+          wrap="false"
+          maxLines="1"
+          color="0xFFFFFFFF"
+          translation="[0,386]">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27" />
+        </Label>
+      </Group>
+    </Group>
   </children>
 </component>

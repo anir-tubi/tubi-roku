@@ -3,6 +3,7 @@ Function TubiMetadataTranslate(constants As Object)
     ' public
     translateRecursive: tubiMetadataTranslate_translateRecursive
     getContentFromCategoryJson: tubiMetadataTranslate_getContentFromCategoryJson
+    translateRelatedContent: tubiMetadataTranslate_translateRelatedContent
     
     ' private
     constants: constants
@@ -270,4 +271,18 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, index)
   end if
   ' just return the abbreviated content.  This happens for user categories every time
   return category.getChild(index)
+End Function
+
+
+
+' Expect content from the /related API, structured as an array of assocarrays
+Function tubiMetadataTranslate_translateRelatedContent(contentFromServer)
+  translated = CreateObject("roSGNode", "TubiContentNode")
+  if type(contentFromServer) = "roArray"
+    for each content in contentFromServer
+      node = translated.createChild("TubiContentNode")
+      m.translateRecursive(content, node)
+    end for
+  end if
+  return translated
 End Function

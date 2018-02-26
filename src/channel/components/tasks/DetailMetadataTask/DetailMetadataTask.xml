@@ -9,19 +9,23 @@
     <script type="text/brightscript" uri="pkg:/components/tasks/DetailMetadataTask/DetailMetadataTask.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
       <!-- INPUT -->
-        <!-- Content node to get a fully parsed TubiContentNode for.
-        - Only contentFragment.id is expected to be populated.  All other fields are ignored.
-        -->
-        <field id="contentFragment" type="node"/>
+        <!-- Set to
+         - {
+         -   contentId: <id of the content to fetch (0-prefixed for series)>
+         -   userId: <options user id if user is signed in>
+         - }
+         -->
+        <field id="request" type="assocarray"/>
       
 
       <!-- OUTPUT -->
-        <!-- Set to the parsed TubiContentNode on success -->
+        <!-- Set to the content response -->
         <field id="response" type="node" />
       
         <!-- Set when an error occurs to:

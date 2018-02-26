@@ -18,6 +18,7 @@ Function TubiExperiments(request as Object, constants as Object) as Object
       UserNamespace: {
         roku_on_now: 0
         roku_continue_screen: 1
+        related_content: 0
       }
     }
 
