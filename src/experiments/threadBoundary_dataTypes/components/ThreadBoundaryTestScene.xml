@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ -->
+<component name="ThreadBoundaryTestScene" extends="Scene" >
+  <script type="text/brightscript" uri="pkg:/components/ThreadBoundaryTestScene.brs" />
+  <script type="text/brightscript" uri="pkg:/components/buildNodes.brs" />
+  <interface>
+    <field id="json" type="string" alias="ContentTask.json" />
+    <field id="aa" type="assocarray" alias="ContentTask.aa" />
+    <field id="nodeTree" type="node" alias="ContentTask.nodeTree" />
+    <field id="exit" type="boolean" alias="ContentTask.exit" />
+  </interface>
+  <children>
+    <ContentTask
+      id="ContentTask" />
+  </children>
+</component>
