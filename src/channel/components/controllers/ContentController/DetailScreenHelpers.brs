@@ -384,7 +384,7 @@ Function onRemoveFromHistorySelected()
   if m.detailScreen.isWaitingForServerResponse <> true
     contentAndIndex = m.detailScreenContent.peek()
     if contentAndIndex <> invalid and contentAndIndex.content <> invalid
-      history = m.global.historyIds.findNode(content.id)
+      history = m.global.historyIds.findNode(contentAndIndex.content.id)
       if history <> invalid and history.historyId <> invalid
         content = clone(contentAndIndex.content)
         m.detailScreen.removeHistoryTitle = "Removing..."
