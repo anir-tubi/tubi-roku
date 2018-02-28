@@ -6,7 +6,6 @@ Function init()
 End Function
 
 Function onRectChange()
-  tubiLog("UpNextPoster.onRectChange")
   m.Poster.width = m.top.currRect.width
   m.Poster.height = m.top.currRect.height
 End Function

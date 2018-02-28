@@ -614,6 +614,7 @@ Function playVideoContent(content As Object, isAutoplay As Boolean)
       m.videoPlayer.analyticsMode = "trailer"
       m.videoPlayer.observeFieldScoped("skipTrailer", "onSkipTrailer")
       m.videoPlayer.enableAds = false
+      m.upNextTask = invalid
     else
       m.videoPlayer.analyticsMode = "normal"
       if isAutoplay = true
@@ -735,18 +736,35 @@ Function onVideoPlayerState(msg)
     stopVideoContent(m.constants.player.playerResults.failed, true)
     showPlayerError(m.constants.player.playerResults.failed)
   else if state = "finished"
-    if m.upNextScreen <> invalid and currentScreen().isSameNode(m.upNextScreen)
-      tubiLog("Ignoring video state 'finished' while UpNextScreen is visible")
-    else if m.upNextTask.response <> invalid and m.upNextTask.response.getChild(0) <> invalid
-      'this happens if the "next video" button has been pressed on the player transport
-      nextContent = m.upNextTask.response.getChild(0)
-      oldContent = m.videoPlayer.content
+    ' If trailer, play the feature
+    finishedContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
+    if finishedContent.isTrailer
+      content = getDetailScreenContent()
+      if content <> invalid then
+        content = clone(content)
+        content.nowPos = 0 'reset the start position
+        stopVideoContent(m.constants.player.playerResults.completed, false)
+        playVideoContent(content, false)
+      else
+        ' just show the current screen on the screen stack
+        stopVideoContent(m.constants.player.playerResults.completed, true)
+      end if
 
-      nextContent = addSeriesTitle(nextContent, oldContent)
-      stopVideoContent(m.constants.player.playerResults.completed, false)
-      playVideoContent(nextContent, true)
+    ' If not a trailer, look for UpNext content to play
     else
-      returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+      if m.upNextScreen <> invalid and currentScreen().isSameNode(m.upNextScreen)
+        tubiLog("Ignoring video state 'finished' while UpNextScreen is visible")
+      else if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.response.getChild(0) <> invalid
+        'this happens if the "next video" button has been pressed on the player transport
+        nextContent = m.upNextTask.response.getChild(0)
+        oldContent = m.videoPlayer.content
+
+        nextContent = addSeriesTitle(nextContent, oldContent)
+        stopVideoContent(m.constants.player.playerResults.completed, false)
+        playVideoContent(nextContent, true)
+      else
+        returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+      end if
     end if
   end if
 End Function
