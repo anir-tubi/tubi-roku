@@ -939,7 +939,7 @@ Function showDetailScreen(content, sourceTrackingUri)
     m.detailScreen.isLoading = true
   else
     m.detailScreen.trackingUri = populateDetailTrackingUri(content, invalid)
-    populateDetailScreen(contentAndIndex)
+    populateDetailScreen(contentAndIndex, true)
   end if
   ' always fetch detail content so we get related items as well
   if currentScreen() = invalid or not currentScreen().isSameNode(m.detailScreen)
@@ -954,9 +954,10 @@ End Function
 '
 'Populates the detail screen's state from a content node
 '@content: tubiContentNode
-Function populateDetailScreen(contentAndIndex)
+Function populateDetailScreen(contentAndIndex, resetButtonIndex=false)
   content = contentAndIndex.content
   'hide the spinner
+  wasLoading = m.detailScreen.isLoading
   m.detailScreen.isLoading = false
 
   'update detail screen state via the input interface
@@ -1023,7 +1024,9 @@ Function populateDetailScreen(contentAndIndex)
     m.detailScreen.relatedContent = invalid
   end if
 
-  m.detailScreen.animateToListItem = 0
+  if wasLoading or resetButtonIndex
+    m.detailScreen.animateToListItem = 0
+  end if
 
   'update the background images for the detail screen
   if content.backgrounds <> invalid and content.backgrounds.count() > 0
