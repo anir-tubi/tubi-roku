@@ -696,7 +696,7 @@ End Function
 
 ' Helper function to prevent historyPosition being sent during  trailers
 Function historyPosition()
-  if m.top.analyticsMode = "normal" then
+  if m.top.analyticsMode = "normal" or m.top.analyticsMode = "autoplay" then
     m.top.historyPosition = m.playerPosition
     m.lastSavedPosition = m.playerPosition
   end if
