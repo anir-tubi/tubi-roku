@@ -190,10 +190,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   if contentFromServer.url <> invalid
-    translatedContent.url = contentFromServer.url
-    if contentFromServer.url.instr(1,".m3u8") > 0
+    if Lcase(contentFromServer.url).instr(1,".m3u8") > 0
+      translatedContent.url = contentFromServer.url
       translatedContent.streamformat = "hls"
-    else if contentFromServer.url.instr(1,".mp4") > 0
+    else if Lcase(contentFromServer.url).instr(1,".mp4") > 0
+      translatedContent.url = contentFromServer.url
       translatedContent.streamformat = "mp4"
     end if
   end if

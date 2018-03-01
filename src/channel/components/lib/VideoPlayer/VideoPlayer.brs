@@ -410,6 +410,7 @@ End Function
 
 
 Function playContent()
+  tubilog("VideoPlayer.playContent")
   if m.Video.content.nowPos <> invalid then
     m.Video.seek = m.Video.content.nowPos
     m.playerPosition = m.Video.content.nowPos
@@ -648,19 +649,26 @@ Function onAdStateChange()
   ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
   'TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
   else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause") and m.Video.state <> "playing" then
-    ' came back from an ad break
-    ' set the m.Video.control prior to the m.Video.seek to ensure that the video is not started from the beginning even if m.playerPosition <> 0.
-    ' this is a seeming inconsistency with the firmware and should not neccessarily work this way, but it does.
-    ' normally we would expect to set the seek prior to setting control to "play"
-    m.top.setFocus(true)
-    m.VideoState = "play"
-    m.Video.control = "play"
-    m.Video.seek = m.playerPosition
-    trackEvent({
-      trackType: "resumeAfterAds"
-      value: m.playerPosition
-      ctx: m.top.content.id
-    })
+    ' Came back from an ad break
+    ' Set the m.Video.control prior to the m.Video.seek to ensure that the video is not started from the beginning even if m.playerPosition <> 0.
+    ' This is a seeming inconsistency with the firmware and should not neccessarily work this way, but it does.
+    ' Normally we would expect to set the seek prior to setting control to "play"
+    ' Unfortunately, this order of play before seek causes a device crash if the content url is not a valid video url.
+    if m.Video.content.url <> invalid and m.Video.content.url <> ""
+      m.top.setFocus(true)
+      m.VideoState = "play"
+      m.Video.control = "play"
+      m.Video.seek = m.playerPosition
+      trackEvent({
+        trackType: "resumeAfterAds"
+        value: m.playerPosition
+        ctx: m.top.content.id
+      })
+    else
+      m.top.errorMsg = "Video URL is not valid. Please contact: support@tubi.tv"
+      m.top.state = "error"
+      tubiLog("Invalid video url", "error", "videoPlayback", "video-url")
+    end if
   else if m.top.adState = "adsclosed"
     ' This is not ideal implementation but we want the OnNow experience to continue playing
     ' even if the user presses back during an ad.  We don't want to resume play under normal 

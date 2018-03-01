@@ -503,11 +503,16 @@ Function showPlayerError(errorMessage As String)
 End Function
 
 Function onRetryPlayerError()
+  ' reset the video player state in case trying to resume causes an error again
+  m.videoPlayer.state = ""
   ' try to resume the video from the last checkpoint
   onResume()
 End Function
 
 Function onCancelPlayerError()
+  ' reset the video player state in case an error occurs during the next attempt at playing a video
+  m.videoPlayer.state = ""
+
   top = currentScreen()
   if top <> invalid then
     top.setFocus(true)
@@ -734,7 +739,12 @@ Function onVideoPlayerState(msg)
   state = msg.GetData()
   if state = "error"
     stopVideoContent(m.constants.player.playerResults.failed, true)
-    showPlayerError(m.constants.player.playerResults.failed)
+    errorMessage = m.constants.player.playerResults.failed
+    if m.videoPlayer.errorMsg <> ""
+      errorMessage = m.videoPlayer.errorMsg
+    end if
+    m.videoPlayer.errorMessage = ""
+    showPlayerError(errorMessage)
   else if state = "finished"
     ' If trailer, play the feature
     finishedContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)

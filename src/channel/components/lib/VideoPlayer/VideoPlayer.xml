@@ -24,8 +24,9 @@
     
     <!-- Alias fields for the video node -->
     <field id="content" alias="VideoNode.content"/>
-    <field id="state" type="string" />
     <field id="position" alias="VideoNode.position"/>
+    <field id="state" type="string" />
+    <field id="errorMsg" type="string" />
 
     <!-- Only support play and stop for simple external interface -->
     <field id="control" type="string" value="none" alwaysNotify="true"/>

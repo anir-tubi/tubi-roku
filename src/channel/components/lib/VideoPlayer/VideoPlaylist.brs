@@ -43,12 +43,22 @@ Function currentPlaylistContent()
   end if
 End Function
 
+'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
   tubiLog("VideoPlayer.onVideoStateChange")
   state = msg.GetData()
   if (state = "finished" or state = "error") and m.VideoState = "play"
+    if state = "error"
+      tubiLog("Video playback error", "error", "videoPlayback", "video-playback")
+    end if
+
     ' hide "finished" and "error" states if we are advancing the playlist
-    if not advancePlaylist() then m.top.state = state
+    if not advancePlaylist()
+      if state = "error"
+        m.top.errorMsg = "There was an issue with video playback."
+      end if
+      m.top.state = state
+    end if
   else
     m.top.state = state
   end if
