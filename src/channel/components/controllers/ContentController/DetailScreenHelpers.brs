@@ -64,6 +64,7 @@ Function onSingleContentResponse(msg) As Void
   contentAndIndex = {
     content: refreshedContent
     series2dIndex: oldContentAndIndex.series2dIndex
+    sourceTrackingUri: oldContentAndIndex.sourceTrackingUri
   }
   m.detailScreenContent.push(contentAndIndex)
 
