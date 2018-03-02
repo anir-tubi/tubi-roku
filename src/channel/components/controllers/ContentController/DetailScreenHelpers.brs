@@ -42,11 +42,16 @@ Function getSingleContentFromServer(content=invalid)
       m.refreshTask.unobserveField("response")
       m.refreshTask.unobserveField("error")
     end if
-    m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
-    m.refreshTask.request = {
+
+    request = {
       contentId: content.id
-      ' TODO(Chris): Add a user id here or full auth info
     }
+    if (m.constants.ui.detailScreen.enableRelatedContent = invalid and getExperimentValue("UserNamespace", "related_content") = 1) or m.constants.ui.detailScreen.enableRelatedContent = true
+      request.getRelated = true
+    end if
+    m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
+    m.refreshTask.request = request
+
     m.refreshTask.observeField("response", "onSingleContentResponse")
     m.refreshTask.observeField("error", "onSingleContentError")
     m.refreshTask.control = "RUN"

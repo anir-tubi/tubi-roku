@@ -1028,11 +1028,7 @@ Function populateDetailScreen(contentAndIndex, resetButtonIndex=false)
   'tell the detail screen/info panel to vertically center the info panel
   m.detailScreen.calculateInfoHeight = true
 
-  if (m.constants.ui.detailScreen.enableRelatedContent = invalid and getExperimentValue("UserNamespace", "related_content") = 1) or m.constants.ui.detailScreen.enableRelatedContent = true
-    m.detailScreen.relatedContent = content.relatedContent
-  else
-    m.detailScreen.relatedContent = invalid
-  end if
+  m.detailScreen.relatedContent = content.relatedContent
 
   if wasLoading or resetButtonIndex
     m.detailScreen.animateToListItem = 0

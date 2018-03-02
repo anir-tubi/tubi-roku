@@ -22,13 +22,20 @@ Function execGetDetailMetadata() As Void
   tubiLog("DetailMetadataTask getting content for " + m.top.request.contentId)
   ' request setup
   constants = m.global.constants
-  cms = CmsApi(constants, TubiRequest())
+  RequestModule = TubiRequest()
+  AuthModule = TubiAuth(constants, RequestModule)
+  cms = CmsApi(constants, RequestModule, AuthModule)
   translate = TubiMetadataTranslate(constants)
-  contentReq = cms.singleContentReq(m.top.request.contentId)
-  relatedReq = cms.relatedContentReq(m.top.request.contentId, m.top.request.userId)
   port = CreateObject("roMessagePort")
+
+  contentReq = cms.singleContentReq(m.top.request.contentId)
   contentReq.start(port)
-  relatedReq.start(port)
+
+  relatedReq = invalid
+  if m.top.request.getRelated = true
+    relatedReq = cms.relatedContentReq(m.top.request.contentId, m.top.request.userId)
+    relatedReq.start(port)
+  end if
 
   ' Wait for all responses
   contentResult = invalid
@@ -38,10 +45,10 @@ Function execGetDetailMetadata() As Void
     if contentResult = invalid
       contentResult = contentReq.handleEvent(msg)
     end if
-    if relatedResult = invalid
+    if relatedReq <> invalid and relatedResult = invalid
       relatedResult = relatedReq.handleEvent(msg)
     end if
-    if contentResult <> invalid and relatedResult <> invalid
+    if (contentResult <> invalid and relatedReq = invalid) or (contentResult <> invalid and relatedResult <> invalid)
       exit while
     end if
   end while

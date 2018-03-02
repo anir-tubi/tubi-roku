@@ -1,10 +1,11 @@
 ' Thin wrapper for CMS API requests.  Collected here to facilitate easy
 ' integration tests
-Function CmsApi(constants, request)
+Function CmsApi(constants, request, auth)
   return {
     ' private
     constants_: constants
     request_: request
+    auth_: auth
     commonOptions_: cmsApi_commonOptions_
     
     ' public
@@ -34,7 +35,12 @@ Function cmsApi_getRelatedContentRequest(contentId, userId=invalid)
   if userId <> invalid and userId <> ""
     options.params.user_id = userId
   end if
-  return m.request_.createAsync(url, m.constants_.reqNames.getRelatedContent, options)
+  'create an auth request if user is logged in, otherwise use a normal request
+  request = m.auth_.createAuthRequest(url, m.constants_.reqNames.getRelatedContent, options)
+  if request = invalid
+    request = m.request_.createAsync(url, m.constants_.reqNames.getRelatedContent, options)
+  end if
+  return request
 End Function
 
 
@@ -50,7 +56,12 @@ Function cmsApi_getUpNextContentRequest(contentId, categoryId=invalid, userId=in
   if categoryId <> invalid and categoryId <> ""
     options.params.container_id = categoryId
   end if
-  return m.request_.createAsync(url, m.constants_.reqNames.getUpNextContent, options)
+  'create an auth request if user is logged in, otherwise use a normal request
+  request = m.auth_.createAuthRequest(url, m.constants_.reqNames.getUpNextContent, options)
+  if request = invalid
+    request = m.request_.createAsync(url, m.constants_.reqNames.getUpNextContent, options)
+  end if
+  return request
 End Function
 
 
