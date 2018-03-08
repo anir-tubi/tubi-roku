@@ -213,6 +213,14 @@ function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
       end if
     end if
 
+    'add user id if not already added
+    if options.params = invalid
+      options.params = {}
+    end if
+    if options.params["user_id"] = invalid
+      options.params["user_id"] = authInfo.userId
+    end if
+
     authReq = m.request.createAsync(url, name, options)
     authReq.getAuthHeaders = m.getAuthHeaders
     authReq.refreshAuthToken = m.refreshAuthToken
