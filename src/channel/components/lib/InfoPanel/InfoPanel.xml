@@ -56,12 +56,19 @@
     <field id="titleFontSize" alias="TitleFont.size"/>
     <field id="width" type="float" value="875" />
     <field id="ratingVisible" alias="Rating.visible"/>
+
+    <!-- OUTPUTS -->
+    <field id="descriptionSelected" type="boolean" alwaysNotify="true" />
+
+    <!-- Parent can use this to determine whether it makes sense to give InfoPanel focus -->
+    <field id="isDescriptionEllipsized" alias="Description.isTextEllipsized" />
   </interface>
 
   <children>
     <LayoutGroup
       id="Offset"
       layoutDirection="vert"
+      horizAlignment="custom"
       translation="[0,0]">
 
       <Label
@@ -177,47 +184,64 @@
         </Label>
       </LayoutGroup>
       
-      <Label
-        id="Description"
-        width="875"
-        lineSpacing="16"
-        maxLines="5"
-        wrap="true"
-        color="0xFFFFFFFF"
-        visible="false">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-      </Label>
-
-      <LayoutGroup
-        id="DirectorGroup"
-        layoutDirection="horiz"
-        vertAlignment="bottom"
-        itemSpacings="[5,5]"
-        visible="false">
+      <Group
+        id="DescriptionGroup"
+        translation="[-25,0]">
+        <Poster
+          id="DescriptionFocusButton"
+          uri="pkg:/images/menu-focus-fhd.9.png"
+          width="875"
+          height="300"
+          visible="false"/>
         <Label
-          id="DirectorTag"
-          text="Directed by"
-          opacity="0.5">
+          id="Description"
+          width="875"
+          lineSpacing="16"
+          maxLines="5"
+          wrap="true"
+          color="0xFFFFFFFF"
+          translation="[25,15]"
+          visible="false">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"
             size="27" />
         </Label>
-        <!-- this layout group pushes the separator rectangle up 2 pixels -->
+      </Group>
+        
+      <LayoutGroup
+        id="DirectorGroup"
+        layoutDirection="horiz"
+        vertAlignment="bottom"
+        itemSpacings="[5]"
+        visible="false">
         <LayoutGroup
-          layoutDirection="vert">
-          <Rectangle 
-            id="DirectorRect"
-            opacity="0.2"
-            width="43"
-            height="2"/>
-          <Rectangle 
-            opacity="0.0"
-            width="43"
-            height="5"/>
+          id="DirectorPrefix"
+          layoutDirection="horiz"
+          itemSpacings="[5]"
+          vertAlignment="bottom">
+          <Label
+            id="DirectorTag"
+            text="Directed by"
+            opacity="0.5">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+          <!-- this layout group pushes the separator rectangle up 2 pixels -->
+          <LayoutGroup
+            layoutDirection="vert">
+            <Rectangle 
+              id="DirectorRect"
+              opacity="0.2"
+              width="43"
+              height="2"/>
+            <Rectangle 
+              opacity="0.0"
+              width="43"
+              height="5"/>
+          </LayoutGroup>
         </LayoutGroup>
         <Label
           id="Director"
@@ -235,28 +259,34 @@
         id="StarringGroup"
         layoutDirection="horiz"
         vertAlignment="bottom"
-        itemSpacings="[5,5]"
+        itemSpacings="[5]"
         visible="false" >
-        <Label
-          id="StarringTag"
-          text="Starring"
-          opacity="0.5">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
         <LayoutGroup
-          layoutDirection="vert">
-          <Rectangle 
-            id="StarringRect"
-            opacity="0.2"
-            width="84"
-            height="2"/>
-          <Rectangle 
-            opacity="0.0"
-            width="77"
-            height="5"/>
+          id="StarringPrefix"
+          layoutDirection="horiz"
+          itemSpacings="[5]"
+          vertAlignment="bottom">
+          <Label
+            id="StarringTag"
+            text="Starring"
+            opacity="0.5">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+          <LayoutGroup
+            layoutDirection="vert">
+            <Rectangle 
+              id="StarringRect"
+              opacity="0.2"
+              width="84"
+              height="2"/>
+            <Rectangle 
+              opacity="0.0"
+              width="77"
+              height="5"/>
+          </LayoutGroup>
         </LayoutGroup>
         <Label
           id="Starring"

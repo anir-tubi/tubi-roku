@@ -500,7 +500,7 @@ Function getConstants()
       constants.ui.fonts.openSans = {}
         constants.ui.fonts.openSans.regular = "pkg:/fonts/OpenSans-Regular.ttf"
         constants.ui.fonts.openSans.bold = "pkg:/fonts/OpenSans-Bold.ttf"
-        constants.ui.fonts.openSans.semiBold = "pkg:/fonts/OpenSans-Semibold.ttf"
+        constants.ui.fonts.openSans.semiBold = "pkg:/fonts/OpenSans-SemiBold.ttf"
         constants.ui.fonts.openSans.italics = "pkg:/fonts/OpenSans-Italic.ttf"
         constants.ui.fonts.openSans.light = "pkg:/fonts/OpenSans-Light.ttf"
 

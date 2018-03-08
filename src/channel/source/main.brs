@@ -21,6 +21,10 @@ Function Main(startupArgs as Dynamic)
     END
   endif
 
+  if startupArgs.ComponentTest <> invalid and startupArgs.ComponentTest <> ""
+    ' This will block indefinitely
+    ComponentTest(startupArgs.ComponentTest)
+  end if
 
   ' Set up the global settings.  SceneGraph will receive a clone object, not a reference.
   ' Sources used in both BRS & SG threads will use:

@@ -65,7 +65,7 @@
       color="0xff501a">
       <Font
         role="font"
-        uri="pkg:/fonts/Vaud-Semibold.ttf"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="43"/>
     </Label> 
     
@@ -89,7 +89,7 @@
       color="0xff501a">
       <Font
         role="font"
-        uri="pkg:/fonts/Vaud-Semibold.ttf"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="43"/>
     </Label> 
     

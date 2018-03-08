@@ -7,6 +7,8 @@ Function init()
   m.ClosedCaptions = m.top.findNode("ClosedCaptionRectangle")
   m.Rating = m.top.findNode("Rating")
   m.Description = m.top.findNode("Description")
+  m.DescriptionGroup = m.top.findNode("DescriptionGroup")
+  m.DescriptionFocusButton = m.top.findNode("DescriptionFocusButton")
   m.Director = m.top.findNode("Director")
   m.DirectorGroup = m.top.findNode("DirectorGroup")
   m.StarringGroup = m.top.findNode("StarringGroup")
@@ -27,8 +29,8 @@ Function init()
   m.top.observeField("seasonEpisodeCount", "onSeasonEpisodeCountChange")
   m.top.observeField("categoryContentCount", "onCategoryContentCountChange")
   m.top.observeField("calculateHeight", "onCalculateHeight")
+  m.top.observeField("focusedChild", "onComponentFocus")
 
-  onModeChange()  ' kickstart the mode
   onWidthChange()
 
   'set the default CC state to be no CC
@@ -36,13 +38,39 @@ Function init()
   firstLineGroup.removeChild(m.ClosedCaptions)
 End Function
 
+Function onComponentFocus()
+  tubiLog("InfoPanel.onComponentFocus")
+  if m.top.isInFocusChain() and  m.top.description <> invalid and m.top.description <> ""
+    m.DescriptionFocusButton.visible = true
+  else
+    m.DescriptionFocusButton.visible = false
+  end if
+End Function
 
+
+' Apply width to all components. Since the outer LayoutGroup has
+' horizAlignment set to "custom", each child will have its translation
+' field set to adjust it's x offset. We account for the x offset in
+' setting each width here so that the children don't go beyond the right edge.
 Function onWidthChange()
   tubiLog("InfoPanel.onWidthChange")
-  m.Title.width = m.top.width
-  m.Description.width = m.top.width
-  m.Starring.width = m.top.width - 165
-  m.Director.width = m.top.width - 165
+  m.Title.width = m.top.width - m.Title.translation[0]
+  m.Episode.width = m.top.width - m.Episode.translation[0]
+  categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
+  categoryLine1.width = m.top.width - m.CategoryDetails.translation[0]
+  seasonLine1 = m.SeasonDetails.findNode("SeasonLine1")
+  seasonLine1.width = m.top.width - m.SeasonDetails.translation[0]
+  line2 = m.TwoLineInfo.findNode("Line2")
+  line2.width = m.top.width - m.TwoLineInfo.translation[0]
+
+  ' The description text needs a right margin which matches its left margin
+  m.Description.width = m.top.width - 2 * m.Description.translation[0]
+  ' Reduce the director width based on "Direct by..." prefix
+  directorPrefixBoundingRect = m.top.findNode("DirectorPrefix").boundingRect()
+  m.Director.width = m.top.width - directorPrefixBoundingRect.width + m.DirectorGroup.itemSpacings[0] - m.DirectorGroup.translation[0]
+  starringPrefixBoundingRect = m.top.findNode("StarringPrefix").boundingRect()
+  m.Starring.width = m.top.width - starringPrefixBoundingRect.width + m.StarringGroup.itemSpacings[0] - m.StarringGroup.translation[0]
+  m.DescriptionFocusButton.width = m.top.width + -m.DescriptionGroup.translation[0]
 End Function
 
 
@@ -170,12 +198,18 @@ End Function
 
 
 Function onCalculateHeight()
+  tubiLog("InfoPanel.onCalculateHeight")
+  topMargin = 15
+  bottomMargin = 8
+  m.DescriptionFocusButton.height = m.Description.boundingRect().height + topMargin + bottomMargin
   ' try to shorten description to fit max height
   if m.top.maxHeight <> 0 and m.top.maxHeight < m.Offset.BoundingRect().height then
     m.Description.height = m.Description.boundingRect().height - (m.offset.BoundingRect().height - m.top.maxHeight)
-    if m.Description.height <= 0 then m.Description.text = ""
+    if m.Description.height <= 0 then
+      m.Description.text = ""
+    end if
+    m.DescriptionFocusButton.height = m.Description.boundingRect().height + topMargin + bottomMargin
   end if
-  
   'vertically center the info panel
   offsetY = (m.top.maxHeight - m.Offset.BoundingRect().height) \ 2
   if offsetY > 0
@@ -200,37 +234,46 @@ Function onModeChange()
   if m.top.mode= "category" then
     m.Offset.appendChild(m.Title)
     m.Offset.appendChild(m.CategoryDetails)
-    m.Offset.appendChild(m.Description)
-    m.Offset.itemSpacings = [52, 31]
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.Offset.itemSpacings = [52, 15]
   else if m.top.mode = "item" then
     m.Offset.appendChild(m.Title)
     m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.Description)
-    m.Offset.itemSpacings = [42, 30]
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.Offset.itemSpacings = [42, 15]
   else if m.top.mode = "movie" then
     m.Offset.appendChild(m.Title)
     m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.Description)
+    m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.appendChild(m.DirectorGroup)
     m.Offset.appendChild(m.StarringGroup)
-    m.Offset.itemSpacings = [42, 30, 34, 11]
+    m.Offset.itemSpacings = [42, 15, 17, 11]
   else if m.top.mode = "series" then
     m.Offset.appendChild(m.Title)
     m.Offset.appendChild(m.Episode)
     m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.Description)
+    m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.appendChild(m.DirectorGroup)
     m.Offset.appendChild(m.StarringGroup)
-    m.Offset.itemSpacings = [26, 25, 30, 34, 11]
+    m.Offset.itemSpacings = [26, 25, 15, 17, 11]
   else if m.top.mode = "season" then
     m.Offset.appendChild(m.Title)
     m.Offset.appendChild(m.SeasonDetails)
-    m.Offset.appendChild(m.Description)
-    m.Offset.itemSpacings = [52, 31]
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.Offset.itemSpacings = [52, 15]
   else if m.top.mode = "episode" then
     m.Offset.appendChild(m.Title)
     m.Offset.appendChild(m.Episode)
-    m.Offset.appendChild(m.Description)
-    m.Offset.itemSpacings = [26, 25, 30]
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.Offset.itemSpacings = [26, 25, 15]
   end if
+End Function
+
+
+Function onKeyEvent(key, press)
+  if press and key = "OK"
+    m.top.descriptionSelected = true
+    return true
+  end if
+  return false
 End Function

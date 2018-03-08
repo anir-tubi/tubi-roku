@@ -29,13 +29,38 @@ Function init()
   m.top.observeField("relatedContent", "onRelatedContentChange")
   m.RelatedGrid.observeField("itemFocused", "onRelatedItemFocused")
   m.top.observeField("animateToListItem", "onAnimateToListItem")
+  m.Info.observeField("descriptionSelected", "onDescriptionSelected")
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
   setInitialMenuItems()
   m.focusTarget = m.Menu
 
   m.focusAnimationDuration = 0.4
+
+  ' modal popup to show full, scrollable description
+  m.descriptionModal = invalid
 End Function
+
+Function onDescriptionSelected()
+  tubiLog("DetailScreen.onDescriptionSelected")
+  m.descriptionModal = CreateObject("roSGNode", "ModalDialogScreen")
+  m.descriptionModal.title = "Full Synopsis"
+  m.descriptionModal.scrollable = true
+  m.descriptionModal.message = m.top.description
+  m.descriptionModal.buttons = ["Close"]
+  m.descriptionModal.observeFieldScoped("buttonSelected", "onCloseDescriptionModal")
+  m.descriptionModal.observeFieldScoped("exitButton", "onCloseDescriptionModal")
+  m.top.appendChild(m.descriptionModal)
+  m.descriptionModal.setFocus(true)
+End Function
+
+Function onCloseDescriptionModal()
+  tubiLog("DetailScreen.onCloseDescriptionModal")
+  m.top.removeChild(m.descriptionModal)
+  m.descriptionModal = invalid
+  m.top.setFocus(true)
+End Function
+
 
 Function onAnimateToListItem()
   focusMenu(true)
@@ -257,21 +282,6 @@ Function onMenuItemSelected()
 End Function
 
 
-''''''''''''''''''''
-' onDialogButton
-'
-Function onDialogButton()
-  buttonSelected = m.Dialog.buttonSelected
-  m.top.removeChild(m.Dialog)
-  m.Dialog.unobserveField("buttonSelected")
-  m.Dialog = invalid
-  m.focusTarget.setFocus(true)
-  if buttonSelected = 0 then
-    m.top.signInSelected = true
-  end if
-End Function
-
-
 Function onRelatedContentChange()
   tubiLog("DetailScreen.onRelatedContentChange")
   if m.top.relatedContent <> invalid and m.top.relatedContent.getChildCount() > 0
@@ -312,13 +322,23 @@ Function onKeyEvent(key As String, press As Boolean)
       return true
     end if
     ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
-    if key = "down" and m.Menu.isInFocusChain() and m.RelatedContentGroup.visible then
-      focusRelated()
-      return true
+    if key = "down"
+      if m.Menu.isInFocusChain() and m.RelatedContentGroup.visible then
+        focusRelated()
+        return true
+      else if m.Info.isInFocusChain()
+        focusMenu()
+        return true
+      end if
     end if
-    if key = "up" and m.RelatedGrid.isInFocusChain()
-      focusMenu()
-      return true
+    if key = "up"
+      if m.RelatedGrid.isInFocusChain()
+        focusMenu()
+        return true
+      else if m.Menu.isInFocusChain() and m.Info.isDescriptionEllipsized
+        focusInfo()
+        return true
+      end if
     end if
   end if
 
@@ -350,4 +370,11 @@ Function focusRelated()
   slideTo(m.AnimationGroup, [0,-392], m.focusAnimationDuration)
   animate(m.RelatedContentGroup, { opacity: 1.0, duration: m.focusAnimationDuration })
   animate(m.Info, { opacity: 0.2, duration: m.focusAnimationDuration })
+End Function
+
+Function focusInfo()
+  m.focusTarget = m.Info
+  if m.top.isInFocusChain()
+    m.Info.setFocus(true)
+  end if
 End Function
