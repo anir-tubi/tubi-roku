@@ -49,12 +49,12 @@
         -->
         <field id="authInfo" type="assocarray" alwaysNotify="true" />
 
-        <!-- execInitializeUserData:
+        <!-- execInitializeUserData, execSignOut:
         -        BookmarkContentNode tree of bookmarks
         -->
         <field id="bookmarks" type="node"/>
 
-        <!-- execInitializeUserData:
+        <!-- execInitializeUserData, execSignOut:
         -        HistoryContentNode tree of history
         -->
         <field id="history" type="node"/>

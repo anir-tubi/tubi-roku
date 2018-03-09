@@ -81,14 +81,21 @@
       <TrackingLoggingTask
         id="TrackingLoggingTask" />
       
-      <AuthTask
-        id="AuthTask" />
-      
       <Group
        id="ContentScreenStack"/>
       
       <Timer
        id="AutohideTimer"/>
+
+      <!-- Spinner primarily for sign-in/sign-out transitions -->
+      <Spinner
+        id="ContentControllerSpinner"
+        visible="false"
+        modal="true"
+        isDisabled="false"
+        width="1920"
+        height="1080"/>
+
     </children>
 
 </component>

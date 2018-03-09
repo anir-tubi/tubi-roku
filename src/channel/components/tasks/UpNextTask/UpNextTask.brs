@@ -52,7 +52,7 @@ Function execGetUpNextContent() As Void
     if result <> invalid and result.response <> invalid and result.response.code >= 200 and result.response.code < 400
       parsed = ParseJSON(result.response.data)
       if parsed = invalid then
-        tubiLog("MetadataFetchTask failed to parse JSON response")
+        tubiLog("UpNextTask failed to parse JSON response")
         m.top.error = result.response
       else
         translate = TubiMetadataTranslate(constants)

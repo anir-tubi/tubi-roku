@@ -66,7 +66,7 @@ End Function
 ' User chose a guest pass, prompt them once more with a feature list
 Function onDisambiguationGuestPass()
   if m.skipContinueScreen = true
-    m.top.guestPass = true
+    m.top.state = "guest"
   else
     m.ContinueAsGuest = CreateObject("roSGNode", "ContinueAsGuestScreen")
     m.ContinueAsGuest.observeField("signInButtonSelected", "onContinueSignIn")
@@ -137,7 +137,7 @@ End Function
 ' User has successfully registered, set a field to redirect to content
 Function onRegisterSuccess()
   tubiLog("SignInController.onRegisterSuccess")
-  m.top.registered = true
+  m.top.state = "registered"
 End Function
 
 '''''''''''''''''''''''''''''
@@ -147,7 +147,7 @@ End Function
 Function onSignInResult()
   tubiLog("SignInController.onSignInResult")
   if m.EmailPasswordScreen.signInResult = true then
-    m.top.signedIn = true
+    m.top.state = "signedin"
   else
     if m.SignInFailed <> invalid then
       m.SignInFailed.unobserveField("tryAgainButtonSelected")

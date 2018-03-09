@@ -259,17 +259,21 @@ End Function
 
 Function onAddToQueueSelected()
   tubiLog("DetailScreenHelpers.addToQueue")
-  if m.authTask.authInfo = invalid
+  if m.global.authInfo = invalid
     signInMessage = "You must be signed in, in order to add a title to your queue."
     m.signInModal = showSignInModal("onSignInModalButtonSelected", signInMessage)
   else if m.detailScreen.isWaitingForServerResponse <> true
     contentAndIndex = m.detailScreenContent.peek()
     if contentAndIndex <> invalid and contentAndIndex.content <> invalid
       m.detailScreen.addToQueueTitle = "Adding..."
-      m.AuthTask.functionName = "addToQueue"
-      m.AuthTask.content = contentAndIndex.content
-      m.AuthTask.observeField("bookmarkId", "onBookmarked")
-      m.AuthTask.control = "RUN"
+      if m.userTask <> invalid
+        unobserveAllScoped(m.userTask)
+      end if
+      m.userTask = CreateObject("roSGNode", "AuthTask")
+      m.userTask.functionName = "addToQueue"
+      m.userTask.content = contentAndIndex.content
+      m.userTask.observeField("bookmarkId", "onBookmarked")
+      m.userTask.control = "RUN"
       m.detailScreen.isWaitingForServerResponse = true
     end if
   end if
@@ -294,9 +298,11 @@ End Function
 
 Function onBookmarked() As Void
   tubiLog("DetailScreenHelpers.onBookmarked")
-  m.AuthTask.unobserveField("bookmarkId")
+  bookmarkId = m.userTask.bookmarkId
+  m.userTask.unobserveFieldScoped("bookmarkId")
+  m.userTask = invalid
 
-  if m.AuthTask.bookmarkId = invalid then
+  if bookmarkId = invalid then
     code = -1
     reason = "Unknown"
     tubiLog("addToQueue returned " + stri(code))
@@ -307,14 +313,14 @@ Function onBookmarked() As Void
 
   contentAndIndex = m.detailScreenContent.peek()
   if contentAndIndex <> invalid and contentAndIndex.content <> invalid
-    tubiLog("Got bookmarkId " + m.AuthTask.bookmarkId + " for content " + contentAndIndex.content.id)
+    tubiLog("Got bookmarkId " + bookmarkId + " for content " + contentAndIndex.content.id)
 
     ' TODO(Chris): Move management of this global list off to a library
     ' or task
     newBookmark = CreateObject("roSGNode", "BookmarkContentNode")
     newBookmark.id = contentAndIndex.content.id
     newBookmark.type = contentAndIndex.content.type
-    newBookmark.bookmarkId = m.AuthTask.bookmarkId
+    newBookmark.bookmarkId = bookmarkId
     m.global.bookmarkIds.insertChild(newBookmark, 0)
     m.detailScreen.isBookmark = true
     m.detailScreen.isWaitingForServerResponse = false
@@ -336,13 +342,17 @@ Function onRemoveFromQueueSelected()
     contentAndIndex = m.detailScreenContent.peek()
     if contentAndIndex <> invalid and contentAndIndex.content <> invalid
       m.detailScreen.removeQueueTitle = "Removing..."
-      m.AuthTask.functionName = "removeFromQueue"
+      if m.userTask <> invalid
+        unobserveAllScoped(m.userTask)
+      end if
+      m.userTask = CreateObject("roSGNode", "AuthTask")
+      m.userTask.functionName = "removeFromQueue"
       content = clone(contentAndIndex.content)
       bookmark = m.global.bookmarkIds.findNode(content.id)
       content.bookmarkId = bookmark.bookmarkId
-      m.AuthTask.content = content
-      m.AuthTask.observeField("result", "onBookmarkRemoved")
-      m.AuthTask.control = "RUN"
+      m.userTask.content = content
+      m.userTask.observeFieldScoped("result", "onBookmarkRemoved")
+      m.userTask.control = "RUN"
       m.detailScreen.isWaitingForServerResponse = true
     end if
   end if
@@ -351,12 +361,14 @@ End Function
 
 Function onBookmarkRemoved() As Void
   tubiLog("DetailScreenHelpers.onBookmarkRemoved")
-  m.AuthTask.unobserveField("result")
+  result = m.userTask.result
+  m.userTask.unobserveField("result")
+  m.userTask = invalid
 
-  if m.AuthTask.result = invalid or m.AuthTask.result.response.code <> 204 then
-    if m.AuthTask.result <> invalid
-      code = m.AuthTask.result.response.code
-      reason = m.AuthTask.result.response.failReason
+  if result = invalid or result.response.code <> 204 then
+    if result <> invalid
+      code = result.response.code
+      reason = result.response.failReason
     else
       code = -1
       reason = "Unknown"
@@ -395,10 +407,14 @@ Function onRemoveFromHistorySelected()
         content = clone(contentAndIndex.content)
         m.detailScreen.removeHistoryTitle = "Removing..."
         content.historyId = history.historyId
-        m.AuthTask.functionName = "removeFromHistory"
-        m.AuthTask.content = content
-        m.AuthTask.observeField("result", "onHistoryRemoved")
-        m.AuthTask.control = "RUN"
+        if m.userTask <> invalid
+          unobserveAllScoped(m.userTask)
+        end if
+        m.userTask = CreateObject("roSGNode", "AuthTask")
+        m.userTask.functionName = "removeFromHistory"
+        m.userTask.content = content
+        m.userTask.observeField("result", "onHistoryRemoved")
+        m.userTask.control = "RUN"
         m.detailScreen.isWaitingForServerResponse = true
       end if
     end if
@@ -408,12 +424,14 @@ End Function
 
 Function onHistoryRemoved() As Void
   tubiLog("DetailScreenHelpers.onHistoryRemoved")
-  m.AuthTask.unobserveField("result")
+  result = m.userTask.result
+  m.userTask.unobserveField("result")
+  m.userTask = invalid
 
-  if m.AuthTask.result = invalid or m.AuthTask.result.response.code <> 204 then
-    if m.AuthTask.result <> invalid
-      code = m.AuthTask.result.response.code
-      reason = m.AuthTask.result.response.failReason
+  if result = invalid or result.response.code <> 204 then
+    if result <> invalid
+      code = result.response.code
+      reason = result.response.failReason
     else
       code = -1
       reason = "Unknown"

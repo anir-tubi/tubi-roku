@@ -86,3 +86,8 @@ Function calculateRect(maxWidth, maxHeight)
   end if
   return { x: x, y: y, width: width, height: height }
 End Function
+
+
+Function onKeyEvent(key, press)
+  return m.top.modal
+End Function

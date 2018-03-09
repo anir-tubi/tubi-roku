@@ -44,6 +44,13 @@ Function execInitializeUserData()
       end if
     end if
   end while
+  ' return empty containers if user is not authenticated
+  if m.top.bookmarks = invalid
+    m.top.bookmarks = CreateObject("roSGNode", "BookmarkContentNode")
+  end if
+  if m.top.history = invalid
+    m.top.history = CreateObject("roSGNode", "HistoryContentNode")
+  end if
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger 
 End Function
 
@@ -53,6 +60,8 @@ Function execSignOut()
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
   Auth.logout()
+  m.top.bookmarks = CreateObject("roSGNode", "BookmarkContentNode")
+  m.top.history = CreateObject("roSGNode", "HistoryContentNode")
   m.top.authInfo = invalid
 End Function
 
@@ -158,26 +167,28 @@ Function updateHistory()
   Bookmarks = TubiBookmarks(Request, Auth, m.global.constants)
 
   'only do the following if the user is logged in
-  if m.top.content <> invalid and m.top.authInfo <> invalid and m.top.authInfo.accessToken <> invalid
+  if m.top.content <> invalid
     tubiLog("Adding content " + m.top.content.id + " from history at position " + stri(m.top.nowPos))
     newHistoryReq = Bookmarks.addHistoryReq(m.top.content, m.top.nowPos)
-    result = newHistoryReq.runSynchronous()  ' timeout default is 5 seconds
-    historyResult = {}
+    if newHistoryReq <> invalid
+      result = newHistoryReq.runSynchronous()  ' timeout default is 5 seconds
+      historyResult = {}
 
-    if result <> invalid then
-      parsedResp = parseJson(result)
+      if result <> invalid then
+        parsedResp = parseJson(result)
 
-      'check if we have the response for a history API call
-      if parsedResp <> invalid and parsedResp.id <> invalid
-        if parsedResp.episodes <> invalid and type(parsedResp.episodes) = "roArray" and parsedResp.episodes.count() > 0
-          historyResult.historyId = parsedResp.episodes[0].id
-          historyResult.parentHistoryId = parsedResp.id
-        else
-          historyResult.historyId = parsedResp.id
+        'check if we have the response for a history API call
+        if parsedResp <> invalid and parsedResp.id <> invalid
+          if parsedResp.episodes <> invalid and type(parsedResp.episodes) = "roArray" and parsedResp.episodes.count() > 0
+            historyResult.historyId = parsedResp.episodes[0].id
+            historyResult.parentHistoryId = parsedResp.id
+          else
+            historyResult.historyId = parsedResp.id
+          end if
         end if
       end if
+      m.top.historyResult = historyResult  ' with result
     end if
-    m.top.historyResult = historyResult  ' with result
     tubiLog("EXIT AuthTask.updateHistory")
   end if
 End Function

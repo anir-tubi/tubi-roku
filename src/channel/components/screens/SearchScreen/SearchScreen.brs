@@ -24,6 +24,7 @@ Function init()
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("searchResponse", "onSearchResultsReceived")
+  m.top.observeField("signedIn", "onSignedInChange")
 
   ' While we aren't loading a seeded "Trending Searches", set the text to focus color
   m.SearchText.color = m.global.constants.ui.colors.focused ' default is white when no search term is entered
@@ -40,6 +41,14 @@ Function init()
   m.top.backgroundUriList = [m.defaultHeroUri]
 End Function
 
+
+' This may filter results based on parental controls so send it again on auth change
+Function onSignedInChange()
+  tubiLog("SearchScreen.onSignedInChange")
+  if m.Keyboard.text <> invalid and m.Keyboard.text.len() > 0 then
+    loadSearchResults()
+  end if
+End Function
 
 Function onSearchResultsReceived()
   tubiLog("SearchScreen.onSearchResultsReceived")

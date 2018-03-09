@@ -161,7 +161,7 @@ end function
 '@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
 function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, position as Dynamic, action as String, contentType = "" as String) as Object
   authInfo = m.auth.getAuthInfo()  'from memory
-  if authInfo.accessToken = invalid
+  if authInfo = invalid or authInfo.accessToken = invalid
     return invalid
   end if
   

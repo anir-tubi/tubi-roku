@@ -57,7 +57,7 @@ Function execGetDetailMetadata() As Void
   if contentResult <> invalid and contentResult.response <> invalid and success(contentResult.response.code)
     parsed = ParseJSON(contentResult.response.data)
     if parsed = invalid then
-      tubiLog("MetadataFetchTask failed to parse JSON response")
+      tubiLog("DetailMetadataTask failed to parse JSON response")
       m.top.error = contentResult.response
     else
       detail = CreateObject("roSGNode", "TubiContentNode")
@@ -66,7 +66,7 @@ Function execGetDetailMetadata() As Void
       if relatedResult <> invalid and relatedResult.response <> invalid and success(relatedResult.response.code)
         parsed = ParseJSON(relatedResult.response.data)
         if parsed = invalid then
-          tubiLog("MetadataFetchTask failed to parse JSON response")
+          tubiLog("DetailMetadataTask failed to parse JSON response")
         else
           detail.relatedContent = translate.translateRelatedContent(parsed)
         end if

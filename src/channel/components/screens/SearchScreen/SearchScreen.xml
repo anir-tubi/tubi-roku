@@ -7,6 +7,8 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
+    <field id="signedIn" type="boolean" alwaysNotify="true"/>
+
     <!-- set to the tubi content id of the item which was clicked on -->
     <field id="contentSelected" type="node" alwaysNotify="true"/>
 

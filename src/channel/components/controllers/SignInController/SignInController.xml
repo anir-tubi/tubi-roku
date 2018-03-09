@@ -17,21 +17,18 @@
   <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
 
   <interface>
-    <field id="skipDisambiguationScreen" type="boolean" value="false"/>
+    <!-- INPUT -->
+      <field id="skipDisambiguationScreen" type="boolean" value="false"/>
 
-    <!-- Set to 'true' when a user has chosen to use a guest pass -->
-    <field id="guestPass" type="boolean" value="false" alwaysNotify="true"/>
+      <!-- Set to true to reset sign-in screen flow -->
+      <field id="show" type="boolean" value="false"/>
     
-    <!-- Set to 'true' when an existing user has signed with credentials successfully -->
-    <field id="signedIn" type="boolean" value="false" alwaysNotify="true"/>
-    
-    <!-- Set to 'true' when a user has newly registered from the site -->
-    <field id="registered" type="boolean" value="false" alwaysNotify="true"/>
+    <!-- OUTPUT -->
+      <!-- Set to the final state of the sign-in process: 'guest', 'registered', 'signedin' -->
+      <field id="state" type="string" />
 
-    <!-- Back button pressed at the top of the sign in screen stack -->
-    <field id="backPressed" type="boolean" value="false" alwaysNotify="true"/>
-
-    <field id="show" type="boolean" value="false"/>
+      <!-- Back button pressed at the top of the sign in screen stack -->
+      <field id="backPressed" type="boolean" value="false" alwaysNotify="true"/>
   </interface>
         
     <children>

@@ -26,18 +26,31 @@ Function init()
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
+  ' Global state
   m.global.addField("bookmarkIds", "node", false)
+  m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
   m.global.addField("historyIds", "node", false)
+  m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
+  ' NOTE: global authInfo is mostly a formality since TubiAuth currently reads values from the registry, so
+  '       places that need authInfo don't need to reference m.global.
+  m.global.addField("authInfo", "assocarray", false)
+  m.global.authInfo = invalid  ' indicates not logged in
 
   m.metadataFetchTask.observeFieldScoped("ready", "onMetadataTaskReady")
   m.global.metadataFetchTask.control = "RUN"
 
-  m.authTask = m.top.findNode("AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
   m.authInfoReceived = false
+  m.authTask = CreateObject("roSGNode", "AuthTask")
+  m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
   m.authTask.functionName = "execInitializeUserData"
-  
   m.authTask.control = "RUN"
+
+  ' history updates during video playback
+  m.updateHistoryTask = CreateObject("roSGNode", "AuthTask")
+  m.updateHistoryTask.functionName = "updateHistory"
+
+  ' For queue and history management from detail screen
+  m.userTask = CreateObject("roSGNode", "AuthTask")
 
   m.top.observeFieldScoped("deepLinkContent", "onDeepLinkContentReceived")
   m.deepLinkEvaluated = false  'indicates if the contentController has recognized that we entered from a deeplink or not
@@ -52,6 +65,7 @@ Function init()
 
   m.autohideTimer = m.top.findNode("AutohideTimer")
   m.autohideTimer.observeFieldScoped("fire", "onAutohide")
+  m.spinner = m.top.findNode("ContentControllerSpinner")
 
   m.appLoadStopwatch = CreateObject("roTimespan")
 
@@ -202,7 +216,7 @@ Function startUserExperience()
         m.enteredFromDeepLink = true
         showDetailScreen(m.top.deepLinkContent, invalid)
 
-      else if m.authTask.authInfo = invalid then
+      else if m.global.authInfo = invalid then
         tubiLog("ContentController ask user to sign in")
         startSignIn(false)
       else if m.constants.ui.onnow.on = false or m.top.onNowContent <> invalid
@@ -210,33 +224,6 @@ Function startUserExperience()
       end if
     end if
   end if
-End Function
-
-
-'''''''''''''''''''''''
-' onAuthInfoReceived
-'
-'
-Function onAuthInfoReceived()
-  tubiLog("ContentController.onAuthInfoReceived")
-  if m.authTask.authInfo = invalid
-    ' user is logged out, so initialize empty bookmarks and history
-    m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
-    m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
-  else
-    if m.authTask.bookmarks = invalid then
-      m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
-    else
-      m.global.bookmarkIds = m.authTask.bookmarks
-    end if
-    if m.authTask.history = invalid then
-      m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
-    else
-      m.global.historyIds = m.authTask.history
-    end if
-  end if
-  m.authInfoReceived = true
-  startUserExperience()
 End Function
 
 
@@ -276,9 +263,7 @@ Function startSignIn(skipDisambiguation)
   tubiLog("ContentController.startSignIn")
   m.SignIn = m.top.createChild("SignInController")
   m.SignIn.skipDisambiguationScreen = skipDisambiguation
-  m.SignIn.observeFieldScoped("guestPass", "onSignInComplete")
-  m.SignIn.observeFieldScoped("signedIn", "onSignInComplete")
-  m.SignIn.observeFieldScoped("registered", "onSignInComplete")
+  m.SignIn.observeFieldScoped("state", "onSignInComplete")
   m.SignIn.observeFieldScoped("backPressed", "onSignInBackPressed")
   m.SignIn.show = true
   m.SignIn.setFocus(true)
@@ -292,23 +277,76 @@ End Function
 Function onSignInComplete()
   tubiLog("ContentController.onSignInComplete")
 
-  ' flush the screenstack in any case where the user has successfully
-  ' gone through the sign-in.  If they 'back' out of it, the screen
-  ' stack will stay intact and this function will not be called
-  while currentScreen() <> invalid
-    popScreen(true)
-  end while
-
-  if m.SignIn.guestPass then
-    ' start the 'On Now' experience right away
+  if m.SignIn.state = "guest" then
+    ' If user signed out, always start at home screen
+    while currentScreen() <> invalid
+      popScreen(true)
+    end while
     startOnNow()
   else
     ' retrieve the credentials on the AuthTask before starting the UI. This reduces jank.
+    m.authInfoReceived = false
+    if m.authTask <> invalid
+      m.authTask.unobserveFieldScoped("authInfo")
+    end if
+    m.authTask = CreateObject("roSGNode", "AuthTask")
+    m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
     m.authTask.functionName = "execInitializeUserData"
     m.authTask.control = "RUN"
+    m.spinner.visible = true
+    m.spinner.setFocus(true)
   end if
 
   removeSignInController()
+End Function
+
+' Auth Info refreshed AFTER app is already running
+Function onAuthInfoReceived()
+  tubiLog("ContentController.onAuthInfoReceived")
+  ' AuthInfo may be invalid if authTask failed to log the user in
+  m.global.authInfo = m.authTask.authInfo
+  ' These will be empty parent nodes (no children) if user is not authenticated
+  m.global.bookmarkIds = m.authTask.bookmarks
+  m.global.historyIds = m.authTask.history
+  m.authInfoReceived = true
+  m.authTask.unobserveFieldScoped("authInfo")
+  m.authTask = invalid
+
+  ' Here we notify screens that may exist, though we try to keep context
+  '
+  ' Transitions:
+  '   signed in -> guest:
+  '   guest -> signed in
+  '
+  '  Auth listeners:
+  '    HomeScreen/CategoryScreen - load categories which are filtered by user auth
+  '    SearchScreen - results (may be) filtered by user auth
+  '
+  '  Bookmark/Queue listeners
+  '    HomeScreen/CategoryScreen - user categories will be dirty
+  '    DetailScreen - just history/bookmarks
+  '    EpisodeScreen - history
+
+  if m.homeScreen <> invalid
+    m.homeScreen.signedIn = (m.global.authInfo <> invalid)
+  end if
+  if m.categoryScreen <> invalid
+    m.categoryScreen.dirtyUserCategories = true
+  end if
+  if m.searchScreen <> invalid
+    m.searchScreen.signedIn = (m.global.authInfo <> invalid)
+  end if
+  if m.detailScreen <> invalid and m.detailScreenContent.peek() <> invalid
+    contentAndIndex = m.detailScreenContent.peek()
+    populateDetailScreen(contentAndIndex, true)
+  end if
+
+  m.spinner.visible = false
+  if currentScreen() = invalid
+    startUserExperience()
+  else
+    currentScreen().setFocus(true)
+  end if
 End Function
 
 
@@ -330,9 +368,7 @@ End Function
 
 
 Function removeSignInController()
-  m.SignIn.unobserveFieldScoped("guestPass")
-  m.SignIn.unobserveFieldScoped("signedIn")
-  m.SignIn.unobserveFieldScoped("registered")
+  m.SignIn.unobserveFieldScoped("state")
   m.SignIn.unobserveFieldScoped("backPressed")
   m.top.removeChild(m.SignIn)
   m.SignIn = invalid
@@ -423,21 +459,19 @@ Function onSignOutModalSelected()
     while currentScreen() <> invalid
       popScreen(true)
     end while
-    m.categoryScreen = invalid
-    ' clear out some stateful information we keep on the AuthTask
-    ' TODO(Chris): Don't keep state on child tasks, keep them locally
-    m.AuthTask.bookmarks = invalid
-    m.AuthTask.history = invalid
-    m.AuthTask.bookmarkId = ""
-    m.AuthTask.result = invalid
-    m.AuthTask.historyResult = invalid
-    ' triggers observer for m.AuthTask.authInfo
-    m.AuthTask.functionName = "execSignOut"
-    m.AuthTask.control = "RUN"
 
-    ' clear history and bookmarks
-    m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
-    m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
+    m.authInfoReceived = false
+    if m.authTask <> invalid
+      m.authTask.unobserveFieldScoped("onAuthInfoReceived")
+    end if
+    m.authTask = CreateObject("roSGNode", "AuthTask")
+    m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
+    m.authTask.functionName = "execSignOut"
+    m.authTask.control = "RUN"
+
+    m.categoryScreen = invalid
+    m.spinner.visible = true
+    m.spinner.setFocus(true)
   end if
 
   focusedScreen = currentScreen()
@@ -580,7 +614,7 @@ Function startOnNow()
   m.categoryScreen.observeFieldScoped("contentSelected", "onContentSelected")
   m.categoryScreen.observeFieldScoped("firstPosterLoaded", "onFirstPosterLoaded")
 
-  m.homeScreen.signedIn = (m.authTask.authInfo <> invalid)
+  m.homeScreen.signedIn = (m.global.authInfo <> invalid)
 
   ' If experiment calls for OnNow, set the content. Don't ever do OnNow
   ' for low-spec devices
@@ -636,8 +670,8 @@ Function playVideoContent(content As Object, isAutoplay As Boolean)
       m.upNextTask = CreateObject("roSGNode", "UpNextTask")
       request = {}
       request.contentId = content.id
-      if m.authtask.authInfo <> invalid
-        request.userId = m.authtask.authInfo.userId
+      if m.global.authInfo <> invalid
+        request.userId = m.global.authInfo.userId
       end if
       if m.autoplayContext <> invalid
         request.categoryId = m.autoplayContext
@@ -661,8 +695,8 @@ Function playVideoContent(content As Object, isAutoplay As Boolean)
     m.ScreenStack.visible = false
 
     ' For position history tracking
-    m.authtask.historyResult = invalid
-    m.authTask.content = localContent
+    m.updateHistoryTask.historyResult = invalid
+    m.updateHistoryTask.content = localContent
   end if
 End Function
 
@@ -675,10 +709,9 @@ Function onEpisodePosition()
   tubiLog("ContentController.onEpisodePosition")
   ' Only run a new task if the previous task is done.  Priority of resume states is
   ' pretty low and we don't mind losing a few.
-  if m.authTask.state <> "RUN" then
-    m.authTask.nowPos = m.videoPlayer.historyPosition
-    m.authTask.functionName = "updateHistory"
-    m.authTask.control = "RUN"
+  if m.updateHistoryTask.state <> "RUN" then
+    m.updateHistoryTask.nowPos = m.videoPlayer.historyPosition
+    m.updateHistoryTask.control = "RUN"
   end if
 End Function
 
@@ -811,9 +844,9 @@ Function stopVideoContent(playerResult, showScreenStack)
   playerInfo = {}
   playerInfo.nowPos = m.videoPlayer.historyPosition
   playerInfo.result = playerResult
-  if m.authtask.historyResult <> invalid
-    playerInfo.historyId = m.authtask.historyResult.historyId
-    playerInfo.parentHistoryId = m.authtask.historyResult.parentHistoryId
+  if m.updateHistoryTask.historyResult <> invalid
+    playerInfo.historyId = m.updateHistoryTask.historyResult.historyId
+    playerInfo.parentHistoryId = m.updateHistoryTask.historyResult.parentHistoryId
   end if
   tubiLog("stopVideoContent: nowPos = " + playerInfo.nowPos.toStr())
   if playerInfo.historyId <> invalid and playerInfo.historyId <> "" then
@@ -829,7 +862,7 @@ Function stopVideoContent(playerResult, showScreenStack)
   Bookmarks = TubiBookmarks(Request, Auth, m.constants)
 
   'update the nowPos in the global historyIds store
-  if m.authTask.authInfo <> invalid and playerInfo.historyId <> invalid
+  if m.global.authInfo <> invalid and playerInfo.historyId <> invalid
     m.global.historyIds = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds)
   end if
 
