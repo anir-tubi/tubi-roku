@@ -515,6 +515,7 @@ Function getConstants()
     ' Set some performance parementers based on device profile
     constants.performance = {}
       constants.performance.categoryGridList = {}
+
       if limitedUi
         ' Notes:
         ' - lowMemory devices may have 512MB but will have 256MB minimum.
