@@ -206,20 +206,22 @@ Function loadCategories(index) As Void
   'Determine the window start and window size for lazy loading
   windowInfo = getWindowInfo(index)
 
-  'Create requests for each category in the window
-  for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
-    category = m.internalContent.getChild(i)
-    ' If category.json is not empty, category is already loaded
-    if category <> invalid and category.state = "none" then
-      request = getRequest(category.id, i, "", m.blockSize)
-      if request <> invalid then
-        requests.push(request)
+  if windowInfo <> invalid
+    'Create requests for each category in the window
+    for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
+      category = m.internalContent.getChild(i)
+      ' If category.json is not empty, category is already loaded
+      if category <> invalid and category.state = "none" then
+        request = getRequest(category.id, i, "", m.blockSize)
+        if request <> invalid then
+          requests.push(request)
+        end if
+        category.state = "loading"
       end if
-      category.state = "loading"
+    end for
+    if requests.count() > 0 then
+      m.global.metadataFetchTask.batchRequest = m.metadataFetchTaskDTO.createBatchRequest(m.top, "metadataFetchTaskBatch", requests)
     end if
-  end for
-  if requests.count() > 0 then
-    m.global.metadataFetchTask.batchRequest = m.metadataFetchTaskDTO.createBatchRequest(m.top, "metadataFetchTaskBatch", requests)
   end if
 End Function
 
@@ -229,25 +231,28 @@ End Function
 '@index: integer, the index of the category within the category grid
 Function getWindowInfo(index)
   currentCategory = m.internalContent.getChild(index)
-  currentWindowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
-  windowSize = m.categoryWindowSize
-  if currentCategory.state = "none"
-    windowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
-    if (index + 1) MOD m.categoryWindowSize = 0
-      ' if the user lands on an empty category that is also the last category in its window,
-      ' add some more categories to the batch in order to fill the "next" category
-      windowSize = m.categoryWindowSize + (m.categoryWindowSize \ 2)
+  if currentCategory <> invalid
+    currentWindowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
+    windowSize = m.categoryWindowSize
+    if currentCategory.state = "none"
+      windowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
+      if (index + 1) MOD m.categoryWindowSize = 0
+        ' if the user lands on an empty category that is also the last category in its window,
+        ' add some more categories to the batch in order to fill the "next" category
+        windowSize = m.categoryWindowSize + (m.categoryWindowSize \ 2)
+      end if
+    else
+      ' attempt to load the current window, or next window depending on the index of the current category
+      nextBatchIndex = (m.categoryWindowSize \ 2)
+      windowStart = ((index + m.categoryWindowSize - (nextBatchIndex)) \ (m.categoryWindowSize)) * m.categoryWindowSize
     end if
-  else
-    ' attempt to load the current window, or next window depending on the index of the current category
-    nextBatchIndex = (m.categoryWindowSize \ 2)
-    windowStart = ((index + m.categoryWindowSize - (nextBatchIndex)) \ (m.categoryWindowSize)) * m.categoryWindowSize
-  end if
 
-  return {
-    start: windowStart
-    size: windowSize
-  }
+    return {
+      start: windowStart
+      size: windowSize
+    }
+  end if
+  return invalid
 End Function
 
 ' Resolve and internal ContentNode that's been abbreviated for the CategoryGridList
