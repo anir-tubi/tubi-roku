@@ -29,12 +29,9 @@ End Function
 '''''''''''''''''''''''
 ' relatedContentReq()
 '
-Function cmsApi_getRelatedContentRequest(contentId, userId=invalid)
+Function cmsApi_getRelatedContentRequest(contentId)
   url = m.constants_.urls.cms.upNextContent + "/" + contentId + "/related"
   options = m.commonOptions_()
-  if userId <> invalid and userId <> ""
-    options.params.user_id = userId
-  end if
   'create an auth request if user is logged in, otherwise use a normal request
   request = m.auth_.createAuthRequest(url, m.constants_.reqNames.getRelatedContent, options)
   if request = invalid
@@ -47,12 +44,9 @@ End Function
 '''''''''''''''''''''''
 ' upNextContentReq()
 '
-Function cmsApi_getUpNextContentRequest(contentId, categoryId=invalid, userId=invalid)
+Function cmsApi_getUpNextContentRequest(contentId, categoryId=invalid)
   url = m.constants_.urls.cms.upNextContent + "/" + contentId + "/next"
   options = m.commonOptions_()
-  if userId <> invalid and userId <> ""
-    options.params.user_id = userId
-  end if
   if categoryId <> invalid and categoryId <> ""
     options.params.container_id = categoryId
   end if

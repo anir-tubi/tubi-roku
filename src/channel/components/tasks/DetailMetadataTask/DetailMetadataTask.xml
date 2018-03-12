@@ -19,7 +19,7 @@
         <!-- Set to
          - {
          -   contentId: <id of the content to fetch (0-prefixed for series)>
-         -   userId: <options user id if user is signed in>
+         -   getRelated: <boolean, should we also get the related content at this time>
          - }
          -->
         <field id="request" type="assocarray"/>

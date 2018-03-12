@@ -670,9 +670,6 @@ Function playVideoContent(content As Object, isAutoplay As Boolean)
       m.upNextTask = CreateObject("roSGNode", "UpNextTask")
       request = {}
       request.contentId = content.id
-      if m.global.authInfo <> invalid
-        request.userId = m.global.authInfo.userId
-      end if
       if m.autoplayContext <> invalid
         request.categoryId = m.autoplayContext
       end if

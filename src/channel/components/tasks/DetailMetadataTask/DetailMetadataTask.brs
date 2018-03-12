@@ -33,7 +33,7 @@ Function execGetDetailMetadata() As Void
 
   relatedReq = invalid
   if m.top.request.getRelated = true
-    relatedReq = cms.relatedContentReq(m.top.request.contentId, m.top.request.userId)
+    relatedReq = cms.relatedContentReq(m.top.request.contentId)
     relatedReq.start(port)
   end if
 
