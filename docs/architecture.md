@@ -60,14 +60,17 @@
 
 ![](tubitv_roku_screen_flow.png)
 
-### Threading Model
-
-![](tubitv_roku_threading_model.png)
 
 ### Data Model
 
+![](tubi_data_flow.png)
+
 ![](tubitv_roku_logical_entities.png)
 
+
+### Threading Model
+
+![](tubitv_roku_threading_model.png)
 
 ## Source Layout
 
