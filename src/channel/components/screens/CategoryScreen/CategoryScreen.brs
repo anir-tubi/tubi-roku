@@ -19,6 +19,11 @@ Function init()
   m.CategoryList.observeField("itemSelected", "onCategoryMenuSelected")
   m.categoryListIsFocused = false
 
+  m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
+  m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
+  m.CategoryRefreshTimer.observeField("fire", "onCategoryRefreshTimer")
+  m.CategoryRefreshTimer.control = "start"
+
   'Content area
   m.CategoryGridList = m.top.findNode("CategoryGridList")
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
@@ -400,4 +405,10 @@ Function populateInfoPanel(mode, contentNode)
 
     m.InfoPanel.calculateHeight = true
   end if
+End Function
+
+
+Function onCategoryRefreshTimer()
+  tubiLog("CategoryScreen.onCategoryRefreshTimer")
+  loadAllCategories()
 End Function

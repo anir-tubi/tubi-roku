@@ -321,6 +321,9 @@ Function getConstants()
   constants.timers = {}
     constants.timers.remoteComponentTimeout = 30000
 
+    ' Time in seconds after which we force a refresh of the categoryscreen
+    constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
+
   'constants needed for the video player
   constants.player = {}
 

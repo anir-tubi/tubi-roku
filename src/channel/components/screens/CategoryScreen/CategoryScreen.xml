@@ -196,12 +196,9 @@
       </MaskGroup>
     </Group>
 
-    <!-- At request of backend, deferring these requests gives the backend time to
-      - cache the responses
-      -->
+    <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
     <Timer
-      id="CategoryPreloadTimer"
-      duration="2.0"/>
-    
+      id="CategoryRefreshTimer"
+      repeat="true"/>
   </children>
 </component>
