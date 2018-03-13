@@ -58,9 +58,11 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   if press 
     if m.top.scrollable then
       if key = "up" and m.ButtonList.hasFocus() then
+        m.ScrollableMessage.scrollbarThumbBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
         m.ScrollableMessage.setFocus(true)
         return true
       else if (key = "down" or key = "left" or key = "right") and m.ScrollableMessage.hasFocus() then
+        m.ScrollableMessage.scrollbarThumbBitmapUri = "pkg:/images/menu-disabled-focus-fhd.9.png"
         m.ButtonList.setFocus(true)
         return true
       end if 
