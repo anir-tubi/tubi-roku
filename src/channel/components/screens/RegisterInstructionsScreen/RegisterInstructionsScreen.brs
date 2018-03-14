@@ -1,13 +1,44 @@
 Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("skipSignInOption", "setButtonContent")
+  m.top.observeField("simpleRegisterScreen", "onSimpleRegister")
   m.Buttons = m.top.findNode("Buttons")
   m.Buttons.setFocus(true)
   m.Buttons.observeField("itemSelected", "onButtonSelected")
   m.RegistrationCode = m.top.findNode("RegistrationCode")
+  m.RegistrationCode1 = m.top.findNode("RegistrationCode1")
+  m.RegistrationCode2 = m.top.findNode("RegistrationCode2")
+  m.RegistrationCode3 = m.top.findNode("RegistrationCode3")
+  m.RegistrationCode4 = m.top.findNode("RegistrationCode4")
+  m.RegistrationCode5 = m.top.findNode("RegistrationCode5")
+  m.RegistrationCode6 = m.top.findNode("RegistrationCode6")
   setButtonContent()
+  onSimpleRegister()
+
+
+  if m.global.constants.deviceInfo.scaledUi = true then
+    m.top.findNode("RegistrationPoster1").uri = "pkg:/images/hd/menu-button.9.png"
+    m.top.findNode("RegistrationPoster2").uri = "pkg:/images/hd/menu-button.9.png"
+    m.top.findNode("RegistrationPoster3").uri = "pkg:/images/hd/menu-button.9.png"
+    m.top.findNode("RegistrationPoster4").uri = "pkg:/images/hd/menu-button.9.png"
+    m.top.findNode("RegistrationPoster5").uri = "pkg:/images/hd/menu-button.9.png"
+    m.top.findNode("RegistrationPoster6").uri = "pkg:/images/hd/menu-button.9.png"
+  end if
+
 End Function
 
+
+Function onSimpleRegister()
+  if m.top.simpleRegisterScreen
+    m.top.findNode("SimpleRegistrationGroup").visible = true
+    m.top.findNode("VerboseRegistrationGroup").visible = false
+    m.Buttons.translation = [m.Buttons.translation[0], 746]
+  else
+    m.top.findNode("SimpleRegistrationGroup").visible = false
+    m.top.findNode("VerboseRegistrationGroup").visible = true
+    m.Buttons.translation = [m.Buttons.translation[0], 776]
+  end if
+End Function
 
 ''''''''''''''''''''''''
 ' setButtonContent
@@ -22,12 +53,12 @@ Function setButtonContent()
     signIn.id = "sign-in"
     signIn.title = "Sign in via Email"
     ' Layout set for 2 buttons
-    m.Buttons.translation= [437,776]
+    m.Buttons.translation = [437, m.Buttons.translation[1]]
     m.Buttons.height = 80
     m.Buttons.width = 1046
     m.Buttons.itemSpacings = [86]
   else
-    m.Buttons.translation= [720,776]
+    m.Buttons.translation= [720, m.Buttons.translation[1]]
     m.Buttons.height = 80
     m.Buttons.width = 480
     m.Buttons.itemSpacings = []
@@ -73,6 +104,12 @@ End Function
 ' Display the new registration code
 Function onCodeChange()
   m.RegistrationCode.text = m.RegCodeTask.code
+  m.RegistrationCode1.text = m.RegCodeTask.code.Mid(0,1)
+  m.RegistrationCode2.text = m.RegCodeTask.code.Mid(1,1)
+  m.RegistrationCode3.text = m.RegCodeTask.code.Mid(2,1)
+  m.RegistrationCode4.text = m.RegCodeTask.code.Mid(3,1)
+  m.RegistrationCode5.text = m.RegCodeTask.code.Mid(4,1)
+  m.RegistrationCode6.text = m.RegCodeTask.code.Mid(5,1)
 End Function
 
 
@@ -140,6 +177,12 @@ End Function
 Function getRegistrationCode()
   tubiLog("RegisterInstructionsScreen.getRegistrationCode")
   m.RegistrationCode.text = "------"
+  m.RegistrationCode1.text = "-"
+  m.RegistrationCode2.text = "-"
+  m.RegistrationCode3.text = "-"
+  m.RegistrationCode4.text = "-"
+  m.RegistrationCode5.text = "-"
+  m.RegistrationCode6.text = "-"
   if m.RegCodeTask <> invalid then
     m.RegCodeTask.unobserveField("code")
     m.RegCodeTask.unobserveField("response")
