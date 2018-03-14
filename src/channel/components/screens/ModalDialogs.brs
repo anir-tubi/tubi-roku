@@ -34,102 +34,61 @@ End Function
 
 
 
-' EXIT APP MODAL-----------------------------------------------
-' A set of functions used to ask a user if they truly intended to exit the app 
-'
-' Use like:
-'
-' m.exitModal = showExitAppModal("onExitAppModalButtonSelected")
-' Function onExitAppModalButtonSelected()
-'   result = getModalResult(m.exitModal)
-'   doStuff(result) 'context specific actions based on what the user selected
-'   m.exitModal = closeModal(m.exitModal)   'set to invalid
-'   setFocusToLastFocusedComponent()
-' End Function
-'
+'''''''''''''''''''''''
+' showExitAppModal
 '
 Function showExitAppModal(callbackName as String)
-  exitModal = CreateObject("roSGNode", "ModalDialogScreen")
-  exitModal.title = "Are You Sure?"
-  exitModal.message = "Do you really want to exit Tubi?"
-  exitModal.buttons = ["Exit", "Cancel"]
-
-  m.top.appendChild(exitModal)
-  exitModal.visible = true
-  exitModal.observeField("buttonSelected", callbackName)
-  exitModal.setFocus(true)
-
-  return exitModal
+  title = "Are You Sure?"
+  message = "Do you really want to exit Tubi?"
+  buttons = ["Exit", "Cancel"]
+  showModal(title, message, buttons, callbackName)
 End Function
 
 
-' SIGN OUT MODAL-----------------------------------------------
-' A set of functions used to ask a user if they truly intended to sign out
-'
-' Use like:
-'
-' m.signOutModal = showSignOutModal("onSignOutAppModalButtonSelected")
-' Function onSignOutAppModalButtonSelected()
-'   result = getModalResult(m.signOutModal)
-'   doStuff(result) 'context specific actions based on what the user selected
-'   m.signOutModal = closeModal(m.signOutModal)   'set to invalid
-'   setFocusToLastFocusedComponent()
-' End Function
+'''''''''''''''''''''''
+' showSignOutModal
 '
 Function showSignOutModal(callbackName as String)
-  signOutModal = CreateObject("roSGNode", "ModalDialogScreen")
-  signOutModal.title = "Are You Sure?"
-  signOutModal.message = "You are about to sign out of your Tubi account."
-  signOutModal.buttons = ["Sign Out", "Cancel"]
-
-  m.top.appendChild(signOutModal)
-  signOutModal.visible = true
-  signOutModal.observeField("buttonSelected", callbackName)
-  signOutModal.setFocus(true)
-
-  return signOutModal
+  title = "Are You Sure?"
+  message = "You are about to sign out of your Tubi account."
+  buttons = ["Sign Out", "Cancel"]
+  showModal(title, message, buttons, callbackName)
 End Function
 
 
-' SIGN IN MODAL-----------------------------------------------
-' A set of functions used to ask a user if they would like to sign in
+'''''''''''''''''''''''
+' showModal
 '
-' Use like sign out modal:
-'
-Function showSignInModal(callbackName as String, message as String)
-  signInModal = CreateObject("roSGNode", "ModalDialogScreen")
-  signInModal.title = "Please Sign In"
-  signInModal.message = message
-  signInModal.buttons = ["Sign in or Register", "Cancel"]
-
-  m.top.appendChild(signInModal)
-  signInModal.visible = true
-  signInModal.observeField("buttonSelected", callbackName)
-  signInModal.setFocus(true)
-
-  return signInModal
+Function showModal(title, message, buttons, callbackName)
+  modal = CreateObject("roSGNode", "ModalDialogScreen")
+  modal.title = title
+  modal.message = message
+  modal.buttons = buttons
+  m.top.appendChild(modal)
+  ' NOTE! the closeModal callback must be observed AFTER the "callbackName"
+  modal.observeField("buttonSelected", callbackName)
+  modal.observeField("buttonSelected", "closeModal")
+  modal.observeField("exitButton", "closeModal")
+  modal.setFocus(true)
 End Function
-
-
-' Used in conjuction with showExitAppModal or showSignOutModal
-'
-' @modalNode: SGNode, a modal node as returned by one of the above function calls
-' returns an integer representing the index of the choice selected
-Function getModalResult(modalNode)
-  return modalNode.buttonSelected
-End Function
-
 
 ' Used in conjuction with showExitAppModal or showSignOutModal
 '
 ' @modalNode: SGNode, a modal node as returned by one of the above function calls
 ' side effects are removing focus from the modal and removing the modal from it's parent
 ' returns invalid
-Function closeModal(modalNode)
-  modalNode.setFocus(false)
+Function closeModal(msg)
+  modalNode = msg.getRoSGNode()
+  focus = false
+  if modalNode.isInFocusChain()
+    modalNode.setFocus(false)
+    focus = true
+  end if
   modalNode.unobserveField("buttonSelected")
+  modalNode.unobserveField("exitButton")
   m.top.removeChild(modalNode)
+  if focus
+    m.top.setFocus(true)
+  end if
   return invalid
 End Function
-
-

@@ -260,8 +260,10 @@ End Function
 Function onAddToQueueSelected()
   tubiLog("DetailScreenHelpers.addToQueue")
   if m.global.authInfo = invalid
-    signInMessage = "You must be signed in, in order to add a title to your queue."
-    m.signInModal = showSignInModal("onSignInModalButtonSelected", signInMessage)
+    title = "Please Sign In"
+    message = "You must be signed in, in order to add a title to your queue."
+    buttons = ["Sign in or Register", "Cancel"]
+    showModal(title, message, buttons, "onSignInModalButtonSelected")
   else if m.detailScreen.isWaitingForServerResponse <> true
     contentAndIndex = m.detailScreenContent.peek()
     if contentAndIndex <> invalid and contentAndIndex.content <> invalid
@@ -281,14 +283,9 @@ End Function
 
 
 ' handles the response of a user who has been presented a sign in modal on the details screen
-Function onSignInModalButtonSelected()
-  buttonSelected = getModalResult(m.signInModal)
-
-  m.signInModal = closeModal(m.signInModal)   'set to invalid
-  if buttonSelected = 0 then
+Function onSignInModalButtonSelected(msg)
+  if msg.getData() = 0
     onSignInSelected()
-  else
-    m.detailScreen.setFocus(true)
   end if
 End Function
 

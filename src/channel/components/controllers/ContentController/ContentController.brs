@@ -3,6 +3,7 @@ Function init()
   tubiLog("Init Scenegraph----------------")
   'first things first, observe the live tv content field which comes from the main thread
   m.top.observeFieldScoped("onNowContent", "onOnNowContent")
+  m.top.observeField("focusedChild", "onComponentFocus")
   m.onNowReceived = false
 
   m.constants = m.global.constants
@@ -88,6 +89,9 @@ Function init()
   ' or set to invalid elsewhere
   m.autoplayContext = invalid
 
+  ' We only show this message once per session for signed-out users
+  m.promptSignInOnGuestPlayShown = false
+
   m._ = rodash()
 End Function
 
@@ -99,20 +103,26 @@ Function onScreenStackEmpty()
     m.enteredFromDeepLink = false
     startOnNow()
   else
-    ' only remove the last item if we have a valid callback
-    m.exitModal = showExitAppModal("onExitAppModalButtonSelected")
+    showExitAppModal("onExitAppModalButtonSelected")
   end if
 End Function
 
+Function onComponentFocus()
+  if m.top.isInFocusChain() and m.top.hasFocus()
+    if m.videoPlayer.visible = true
+      m.videoPlayer.setFocus(true)
+    else if currentScreen() <> invalid
+      currentScreen().setFocus(true)
+    end if
+  end if
+End Function
 
 ''''''''''''''''''''''
 ' onExitAppModalButtonSelected
 '
 ' handles the response of a user who has been presented an exit app modal
-Function onExitAppModalButtonSelected()
-  result = getModalResult(m.exitModal)
-
-  if result = 0
+Function onExitAppModalButtonSelected(msg)
+  if msg.getData() = 0
     'exit the app
     m.top.exitApp = true  'm is the context of the screen stack's parent controller
   else
@@ -125,8 +135,6 @@ Function onExitAppModalButtonSelected()
       m.SignIn.setFocus(true)
     end if
   end if
-
-  m.exitModal = closeModal(m.exitModal)   'set to invalid
 End Function
 
 
@@ -216,7 +224,7 @@ Function startUserExperience()
         m.enteredFromDeepLink = true
         showDetailScreen(m.top.deepLinkContent, invalid)
 
-      else if m.global.authInfo = invalid then
+      else if m.global.authInfo = invalid and not m.constants.ui.signIn.skipSignInOnLaunch
         tubiLog("ContentController ask user to sign in")
         startSignIn(false)
       else if m.constants.ui.onnow.on = false or m.top.onNowContent <> invalid
@@ -439,7 +447,7 @@ End Function
 ' Log the user out, update screens
 Function onSignOutSelected()
   tubiLog("ContentController.onSignOutSelected")
-  m.signOutModal = showSignOutModal("onSignOutModalSelected")
+  showSignOutModal("onSignOutModalSelected")
 End Function
 
 
@@ -447,12 +455,11 @@ End Function
 ' onSignOutModalSelected
 '
 ' Log the user out, update screens
-Function onSignOutModalSelected()
+Function onSignOutModalSelected(msg)
   tubiLog("ContentController.onSignOutModalSelected")
-  modalResult = getModalResult(m.signOutModal)
 
   'do the sign out stuff if confirmed
-  if modalResult = 0
+  if msg.getData() = 0
     ' flush the screenstack in any case where the user has successfully
     ' gone through the sign-in.  If they 'back' out of it, the screen
     ' stack will stay intact and this function will not be called
@@ -473,12 +480,6 @@ Function onSignOutModalSelected()
     m.spinner.visible = true
     m.spinner.setFocus(true)
   end if
-
-  focusedScreen = currentScreen()
-  if focusedScreen <> invalid
-    focusedScreen.setFocus(true)
-  end if
-  m.signOutModal = closeModal(m.signOutModal)   'set to invalid
 End Function
 
 ''''''''''''''''''''
@@ -562,10 +563,26 @@ Function onPlay()
   tubiLog("ContentController.onPlay")
   content = getDetailScreenContent()
   if content <> invalid then
-    content.nowPos = 0 'reset the start position
-    playVideoContent(content, false)
+    if m.global.authInfo = invalid and m.constants.ui.signIn.promptSignInOnGuestPlay and not m.promptSignInOnGuestPlayShown
+      title = "Sign in for a better experience"
+      message = "Sign in for free to save to your queue and sync with other devices"
+      buttons = ["Sign in or Register", "Play Anyways"]
+      showModal(title, message, buttons, "onPlaySignInModalButtonSelected")
+      m.promptSignInOnGuestPlayShown = true
+    else
+      playVideoContent(content, false, 0)
+    end if
   else
     tubiLog("ERROR: Play selected but content is invalid")
+  end if
+End Function
+
+Function onPlaySignInModalButtonSelected(msg)
+  if msg.getData() = 0
+    onSignInSelected()
+  else
+    content = getDetailScreenContent()
+    playVideoContent(content, false, 0)
   end if
 End Function
 
@@ -578,14 +595,15 @@ Function onResume()
   tubiLog("ContentController.onResume")
   content = getDetailScreenContent()
   if content <> invalid then
+    nowPos = invalid
     ' find the position in global history
     history = m.global.historyIds.findNode(content.id)
     if m.top.deepLinkContent = invalid or m.top.deepLinkContent.deepLinkType = "season" or m.top.deepLinkContent.deepLinkType = "series"
       if history <> invalid then
-        content.nowPos = history.nowPos
+        nowPos = history.nowPos
       end if
     end if
-    playVideoContent(content, false)
+    playVideoContent(content, false, nowPos)
   else
     tubiLog("ERROR: Resume selected but content is invalid")
   end if
@@ -647,7 +665,7 @@ End Function
 ' playVideoContent
 '
 ' Helper function for onResume and onPlay to launch content
-Function playVideoContent(content As Object, isAutoplay As Boolean)
+Function playVideoContent(content As Object, isAutoplay As Boolean, position=invalid As Dynamic)
   if content <> invalid
     if content.isTrailer
       m.videoPlayer.analyticsMode = "trailer"
@@ -684,6 +702,9 @@ Function playVideoContent(content As Object, isAutoplay As Boolean)
     ' Clone the content so we don't have listeners affecting it
     parent = CreateObject("roSGNode", "TubiContentNode")
     localContent = clone(content)
+    if position <> invalid
+      localContent.nowPos = position
+    end if
     parent.appendChild(localContent)
 
     m.videoPlayer.playlist = parent
@@ -781,10 +802,8 @@ Function onVideoPlayerState(msg)
     if finishedContent.isTrailer
       content = getDetailScreenContent()
       if content <> invalid then
-        content = clone(content)
-        content.nowPos = 0 'reset the start position
         stopVideoContent(m.constants.player.playerResults.completed, false)
-        playVideoContent(content, false)
+        playVideoContent(content, false, 0)  ' always start at zero here
       else
         ' just show the current screen on the screen stack
         stopVideoContent(m.constants.player.playerResults.completed, true)

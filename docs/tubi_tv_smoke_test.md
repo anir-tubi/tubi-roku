@@ -13,7 +13,8 @@
 		- Signed Out state shows 'Sign In' in tools menu
 		- Signed Out state lands on feature category after choosing "Guest Pass"
 		- Add to Queue is shown on details screen but leads to a modal
-		- signed out state persists across channel launches, lands on Sign-In disambiguation screen
+		- Signed out state persists across channel launches, lands on Sign-In disambiguation screen
+
 	- Transitions
 		- After successful sign in, feature grid is focused
 		- After successful sign in, user categories are shown
@@ -49,6 +50,9 @@
 	- add item to empty history ads category to grid
 	- going from signed-out to signed-in doesn't show empty history
 	- going from signed-in to signed-out doesn't show history
+- Detail Screen:
+	- Signed-out user gets prompt to sign in when "Add to Queue" button selected
+	- Signed-out user gets prompt to sign in when "Play" is selected, once per session
 - Search
 	- search results show up
 	- search results are updated on each key entry
