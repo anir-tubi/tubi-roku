@@ -3,6 +3,12 @@ Function init()
   m.top.observeField("show", "onShow")
   m.skipContinueScreen = m.global.constants.ui.signIn.skipContinueScreen
   m.skipSignInRegisterScreen = m.global.constants.ui.signIn.skipSignInRegisterScreen
+  m.simpleRegisterScreen = false
+  if m.global.constants.ui.signIn.simpleRegisterScreen <> invalid
+    m.simpleRegisterScreen = m.global.constants.ui.signIn.simpleRegisterScreen
+  else
+    m.simpleRegisterScreen = (getExperimentValue("UserNamespace", "roku_simple_register_screen") = 1)
+  end if
 
   initScreenStack(m.top.findNode("SignInScreenStack"), onScreenStackEmpty)
 End Function
@@ -124,7 +130,7 @@ Function onRegister()
   tubiLog("SignInController.onRegister")
   m.RegisterInstructions = CreateObject("roSGNode", "RegisterInstructionsScreen")
   m.RegisterInstructions.skipSignInOption = m.global.constants.ui.signIn.skipSignInOption
-  m.RegisterInstructions.simpleRegisterScreen = m.global.constants.ui.signIn.simpleRegisterScreen
+  m.RegisterInstructions.simpleRegisterScreen = m.simpleRegisterScreen
   m.RegisterInstructions.observeField("registerSuccess", "onRegisterSuccess")
   m.RegisterInstructions.observeField("signInButtonPressed", "onSignIn")
   m.RegisterInstructions.observeField("skipButtonPressed", "onContinueGuestPass")

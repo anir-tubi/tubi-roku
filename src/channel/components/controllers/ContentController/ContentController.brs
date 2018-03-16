@@ -90,8 +90,25 @@ Function init()
   m.autoplayContext = invalid
 
   ' We only show this message once per session for signed-out users
-  m.promptSignInOnGuestPlayShown = false
+  m.promptSignInOnGuestPlay = false
+  if m.constants.ui.signIn.promptSignInOnGuestPlay <> invalid
+    m.promptSignInOnGuestPlay = m.constants.ui.signIn.promptSignInOnGuestPlay
+  else
+    value = getExperimentValue("UserNamespace", "roku_sign_in")
+    if value = 2 or value = 3
+      m.promptSignInOnGuestPlay = true
+    end if
+  end if
 
+  m.skipSignInOnLaunch = false
+  if m.constants.ui.signIn.skipSignInOnLaunch <> invalid
+    m.skipSignInOnLaunch = m.constants.ui.signIn.skipSignInOnLaunch
+  else
+    value = getExperimentValue("UserNamespace", "roku_sign_in")
+    if value = 0 or value = 2
+      m.skipSignInOnLaunch = true
+    end if
+  end if
   m._ = rodash()
 End Function
 
@@ -223,8 +240,7 @@ Function startUserExperience()
         testLog("Deep link type = " + m.top.deepLinkContent.type)
         m.enteredFromDeepLink = true
         showDetailScreen(m.top.deepLinkContent, invalid)
-
-      else if m.global.authInfo = invalid and not m.constants.ui.signIn.skipSignInOnLaunch
+      else if m.global.authInfo = invalid and not m.skipSignInOnLaunch
         tubiLog("ContentController ask user to sign in")
         startSignIn(false)
       else if m.constants.ui.onnow.on = false or m.top.onNowContent <> invalid
@@ -563,12 +579,12 @@ Function onPlay()
   tubiLog("ContentController.onPlay")
   content = getDetailScreenContent()
   if content <> invalid then
-    if m.global.authInfo = invalid and m.constants.ui.signIn.promptSignInOnGuestPlay and not m.promptSignInOnGuestPlayShown
+    if m.global.authInfo = invalid and m.promptSignInOnGuestPlay
       title = "Sign in for a better experience"
       message = "Sign in for free to save to your queue and sync with other devices"
       buttons = ["Sign in or Register", "Play Anyways"]
       showModal(title, message, buttons, "onPlaySignInModalButtonSelected")
-      m.promptSignInOnGuestPlayShown = true
+      m.promptSignInOnGuestPlay = false  ' only show this once per session
     else
       playVideoContent(content, false, 0)
     end if
