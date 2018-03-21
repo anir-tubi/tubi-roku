@@ -1,8 +1,8 @@
 Function init()
   m.top.observeField("signedIn", "onSignedInChange")
   m.Menu = m.top.findNode("Menu")
-  m.Menu.observeField("itemSelected", "onItemSelected")
-  m.Menu.observeField("itemFocused", "onItemFocused")
+  m.Menu.observeField("rowItemSelected", "onItemSelected")
+  m.Menu.observeField("rowItemFocused", "onItemFocused")
   content = m.top.findNode("SearchSignInContent")
   m.Menu.content = content
   m.top.observeField("focusedChild", "onComponentFocusChange")
@@ -11,8 +11,13 @@ Function init()
 
   onSignedInChange()  ' initialize the sign in/out text
 
-  if m.global.constants.ui.onnow.on = true
+  m.constants = m.global.constants
+  if m.constants.ui.onnow.on = true
     m.top.findNode("OnNowHint-Tools").visible = true
+  end if
+
+  if m.constants.deviceInfo.scaledUi = true
+    m.Menu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
   end if
 End Function
 
@@ -24,10 +29,11 @@ End Function
 
 Function onItemFocused()
   tubiLog("ToolsMenu.onItemFocused")
-  item = m.Menu.content.getChild(m.Menu.itemFocused)
+  rowItemFocused = m.Menu.rowItemFocused
+  item = m.Menu.content.getChild(rowItemFocused[0]).getChild(rowItemFocused[1])
   m.Description.text = item.description
   if m.top.isInFocusChain()
-    m.top.trackingUri = "/home/1/cat/Tools/1/" + (m.Menu.itemFocused + 1).toStr()   'assumes Tools is at the top
+    m.top.trackingUri = "/home/1/cat/Tools/1/" + (rowItemFocused[1] + 1).toStr()   'assumes Tools is at the top
   end if
 End Function
 
@@ -35,7 +41,8 @@ Function onItemSelected()
   tubiLog("ToolsMenu.onItemSelected")
   m.top.trackingCount = 0
   if m.Menu.content <> invalid then
-    item = m.Menu.content.getChild(m.Menu.itemSelected)
+    rowItemSelected = m.Menu.rowItemSelected
+    item = m.Menu.content.getChild(rowItemSelected[0]).getChild(rowItemSelected[1])
     if item.id = "SearchMenuItem" then
       m.top.searchSelected = true
     else if item.id = "SignInOutMenuItem" then

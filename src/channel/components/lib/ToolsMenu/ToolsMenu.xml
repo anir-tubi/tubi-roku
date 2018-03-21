@@ -42,45 +42,48 @@
   </interface>
 
   <children>
-    <ScrollingList
+    <RowList
       id="Menu"
-      layoutDirection="horiz"
-      width="1760"
-      height="500"
       visible="true"
+      itemComponentName="SignInPoster"
       translation="[85,257]"
-      itemSpacings="[10]"
-      scrollWidth="1760"
-      scrollHeight="500"
-      itemComponentName="SignInPoster"/>
-    
-    <SignInPosterContentNode
+      itemSize="[1760,400]"
+      itemSpacing="[0,28]"
+      numRows="1"
+      rowSpacings="[0]"
+      rowItemSize="[[430,400]]"
+      rowItemSpacing="[[10,0]]"
+      showRowLabel="[false]"
+      showRowCounter="[false]"
+      focusBitmapUri="pkg:/images/menu-focus-fhd.9.png"
+      drawFocusFeedbackOnTop="false" />
+
+    <ContentNode
       id="SearchSignInContent">
-      <SignInPosterContentNode
-        id="SearchMenuItem"
-        title="Search" 
-        description="Find movies and TV shows by title, search for cast members, genres and more."
-        focusIconUrl="pkg:/images/icon-search-large.png"
-        unfocusIconUrl="pkg:/images/icon-search-large.png"/>
-      <SignInPosterContentNode
-        id="SignInOutMenuItem"
-        title="Sign in"
-        description="Sign in to Tubi. Access your Queue and Continue Watching lists across your devices."
-        focusIconUrl="pkg:/images/icon-sign-in-large.png"
-        unfocusIconUrl="pkg:/images/icon-sign-in-large.png"/>
-      <SignInPosterContentNode
-        id="AboutMenuItem"
-        title="About"
-        description="View general information about Tubi including the version number of this app."
-        focusIconUrl="pkg:/images/icon-about-large.png"
-        unfocusIconUrl="pkg:/images/icon-about-large.png"/>
-      <SignInPosterContentNode
-        id="PrivacyMenuItem"
-        title="Privacy"
-        description="Review Tubi's privacy policy."
-        focusIconUrl="pkg:/images/icon-privacy-large.png"
-        unfocusIconUrl="pkg:/images/icon-privacy-large.png"/>
-    </SignInPosterContentNode>
+      <ContentNode
+        id="SearchSignInContentRow">
+        <ContentNode
+          id="SearchMenuItem"
+          title="Search"
+          description="Find movies and TV shows by title, search for cast members, genres and more."
+          HDGRIDPOSTERURL="pkg:/images/icon-search-large.png"/>
+        <ContentNode
+          id="SignInOutMenuItem"
+          title="Sign in"
+          description="Sign in to Tubi. Access your Queue and Continue Watching lists across your devices."
+          HDGRIDPOSTERURL="pkg:/images/icon-sign-in-large.png"/>
+        <ContentNode
+          id="AboutMenuItem"
+          title="About"
+          description="View general information about Tubi including the version number of this app."
+          HDGRIDPOSTERURL="pkg:/images/icon-about-large.png"/>
+        <ContentNode
+          id="PrivacyMenuItem"
+          title="Privacy"
+          description="Review Tubi's privacy policy."
+          HDGRIDPOSTERURL="pkg:/images/icon-privacy-large.png"/>
+      </ContentNode>
+    </ContentNode>
     
     <Label
       id="Description"

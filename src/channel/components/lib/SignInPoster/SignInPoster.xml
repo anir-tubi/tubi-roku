@@ -5,41 +5,23 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   
   <interface>
-    <field id="content" type="node" />
-    
-    <!-- hide the progress bar when focus changes -->
-    <field id="focusPercent" type="float" value="0.0"/>
-    <field id="listHasFocus" type="boolean" value="false" />
+    <field id="itemContent" type="node" />
   </interface>
   
   <children>
-    <Rectangle
-      id="Background"
-      width="430"
-      height="400"
-      color="0x00000000"/>
-    
     <Poster
-      id="FocusedIcon"
+      id="Icon"
+      translation="[98,46]"
       width="234"
       height="234"
-      translation="[98,46]"
-      opacity="0.0"/>
-    
-    <Poster
-      id="UnfocusedIcon"
-      width="234"
-      height="234"
-      translation="[98,46]"
-      opacity="1.0"/>
+      loadSync="true"/>
     
     <Label
       id="ToolText"
       color="0xFFFFFFFF"
       horizAlign="center"
       translation="[0,288]"
-      width="430"
-      opacity="1.0">
+      width="430">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
