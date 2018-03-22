@@ -96,14 +96,15 @@
           </Rectangle>
         </Group>
         
-        <InstalledScrollingList
+        <FilledButtonMarkupGrid
           id="ButtonList"
-          width="490"
-          height="1080"
-          layoutDirection="vert"
-          itemComponentName="InstalledCategorySeasonListItem"
-          itemSpacings="[6]">
-        </InstalledScrollingList>
+          translation="[0,0]"
+          itemSize="[406,80]"
+          itemComponentName="ModalListItem"
+          itemSpacing="[0,6]"
+          numRows="3"
+          numColumns="1"
+          vertFocusAnimationStyle="floatingFocus"/>
       </LayoutGroup>
     </Rectangle>
 

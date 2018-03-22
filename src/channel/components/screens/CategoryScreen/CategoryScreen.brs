@@ -15,7 +15,7 @@ Function init()
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.top.trackingCount = 0
   m.CategoryList.observeField("itemFocused","onCategoryMenuChange")
-  m.CategoryList.observeField("preItemFocused","onPreCategoryMenuChange")
+  m.CategoryList.observeField("rowScrollFocused","onCategoryListScrollFocused")
   m.CategoryList.observeField("itemSelected", "onCategoryMenuSelected")
   m.categoryListIsFocused = false
 
@@ -157,9 +157,10 @@ Function onCategoryMenuVisible()
   end if
 End Function
 
+
 Function showCategoryMenu()
   if not m.CategoryList.isInFocusChain()
-    m.CategoryList.animateToItem = Int(m.CategoryGridList.currFocusRow)
+    m.CategoryList.jumpToItem = Int(m.CategoryGridList.currFocusRow)
     m.CategoryList.setFocus(true)
     m.categoryListIsFocused = true
     if m.global.constants.deviceInfo.limitedUi
@@ -223,10 +224,10 @@ Function adjustCategories() As Void
 End Function
 
 ' Use this trigger to synchronize menu and grid
-Function onPreCategoryMenuChange()
+Function onCategoryListScrollFocused()
   ' Don't sync if CategoryList has focus and most likely triggered the grid category change
   if m.CategoryList.isInFocusChain() and m.CategoryList.content <> invalid then
-    m.CategoryGridList.animateToCategory = m.CategoryList.preItemFocused
+    m.CategoryGridList.animateToCategory = m.CategoryList.rowScrollFocused
   end if
 End Function
 

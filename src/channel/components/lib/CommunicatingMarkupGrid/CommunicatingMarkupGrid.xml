@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - CommunicatingMarkupGrid
+ -
+ - An extension of FilledButtonMarkupGrid that communicates which row is in focus as the row is being scrolled.
+ -
+ -->
+<component name="CommunicatingMarkupGrid" extends="FilledButtonMarkupGrid">
+
+  <script type="text/brightscript" uri="pkg:/components/lib/CommunicatingMarkupGrid/CommunicatingMarkupGrid.brs" />
+
+  <interface>
+    <!-- OUTPUT -->
+    <field id="rowScrollFocused" type="int" />
+  </interface>
+</component>

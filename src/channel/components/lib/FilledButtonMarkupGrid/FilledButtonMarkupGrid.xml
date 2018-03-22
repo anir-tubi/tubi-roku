@@ -4,7 +4,6 @@
  -
  - An extension of MarkupGrid that hard codes the focusBitmapUri so that the effect is filled buttons.
  -
- -
  -->
 <component name="FilledButtonMarkupGrid" extends="MarkupGrid">
 

@@ -176,13 +176,15 @@
           description="The Movies and TV Shows you have added to your Queue can be found here"/>
       </ContentNode>
 
-      <ScrollingList
+      <CommunicatingMarkupGrid
         id="CategoryList"
         translation="[-380, 616]"
-        width="425"
-        height="440"
-        scrollHeight="80"
-        itemSpacings="[8]"
+        itemSize="[425,80]"
+        itemSpacing="[0,8]"
+        numRows="5"
+        numColumns="1"
+        drawFocusFeedbackOnTop="false"
+        vertFocusAnimationStyle="fixedFocus"
         itemComponentName="CategorySeasonListItem" />
 
       <MaskGroup

@@ -9,23 +9,18 @@
  - the scrollinglist has focus.
  -
  -->
-<component name="InstalledCategorySeasonListItem" extends="Rectangle" >
-  <script type="text/brightscript" uri="pkg:/components/lib/InstalledCategorySeasonListItem/InstalledCategorySeasonListItem.brs" />
+<component name="ModalListItem" extends="Group" >
+  <script type="text/brightscript" uri="pkg:/components/lib/ModalListItem/ModalListItem.brs" />
 
   <interface>
-    <field id="focusPercent" type="float" value="0.0"/>
-    <field id="content" type="node" />
-    <field id="listHasFocus" type="boolean" value="false" />
-    <field id="width" alias="ForceDimensions.width" value="425.0" />
-    <field id="height" alias="ForceDimensions.height" value="80.0" />
+    <field id="itemContent" type="node" />
+    <field id="width" type="float" value="406.0" />
+    <field id="height" type="float" value="80.0" />
   </interface>
   
   <children>
-    <Rectangle
-      id="ForceDimensions"
-      color="0x00000000"/>
     <Label 
-      id="categoryText" 
+      id="buttonText" 
       horizAlign="left"
       vertAlign="center"
       width="322"
