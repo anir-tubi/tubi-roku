@@ -268,15 +268,14 @@
       </Label>
     </Group>
 
-    <ScrollingList
+    <FilledButtonMarkupGrid
       id="Buttons"
-      layoutDirection="horiz"
       translation="[437,776]"
-      height="80"
-      width="1046"
       itemComponentName="SignInButton"
-      itemSpacings="[86]">
-    </ScrollingList>
-    
+      itemSize="[480,80]"
+      itemSpacing="[0,0]"
+      numRows="1"
+      numColumns="1" />
+          
   </children>
 </component>

@@ -13,6 +13,7 @@
     <field id="texts" type="stringarray" />
     <field id="crossfadeDuration" alias="RotatingLabelCrossfade.duration" value="1.0"/>
     <field id="displayDuration" alias="DisplayTimer.duration" value="5.0"/>
+    <field id="runCrossfade" type="boolean" value="false" />
 
     <!-- forwarded to children -->
     <field id="color" alias="NewLabel.color"/>

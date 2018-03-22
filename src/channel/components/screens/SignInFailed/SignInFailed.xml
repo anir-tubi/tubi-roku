@@ -40,17 +40,17 @@
         size="27" />
     </Label>
     
-    <ScrollingList
+    <FilledButtonMarkupGrid
       id="TryAgainButtons"
-      layoutDirection="horiz"
       translation="[545,624]"
-      height="80"
-      width="480"
-      itemComponentName="InstalledCategorySeasonListItem"
-      itemSpacings="[60]">
+      itemComponentName="SignInButton"
+      itemSize="[480,80]"
+      itemSpacing="[0,0]"
+      numRows="1"
+      numColumns="1">
       <ContentNode role="content">
         <ContentNode id="try-again" title="Try Again"/>
       </ContentNode>
-    </ScrollingList>
+    </FilledButtonMarkupGrid>
   </children>
 </component>

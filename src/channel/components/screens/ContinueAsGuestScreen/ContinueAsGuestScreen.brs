@@ -6,14 +6,14 @@ Function init()
 End Function
 
 Function onScreenFocusChange()
-  tubiLog("SignInDisambiguationScreen.onScreenFocusChange")
+  tubiLog("ContinueAsGuestScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.ButtonGroup.setFocus(true)
   end if
 End Function
 
 Function onButtonSelected()
-  tubiLog("SignInDisambiguationScreen.onButtonSelected")
+  tubiLog("ContinueAsGuestScreen.onButtonSelected")
   button = m.ButtonGroup.content.getChild(m.ButtonGroup.itemSelected)
   if button.id = "signin" then
     m.top.signInButtonSelected = true

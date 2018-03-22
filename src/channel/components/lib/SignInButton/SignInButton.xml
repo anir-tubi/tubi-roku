@@ -5,21 +5,20 @@
  - This component is used for all 480x80 buttons within the sign-in flow.
  -
  -->
-<component name="SignInButton" extends="Rectangle" >
+<component name="SignInButton" extends="Group" >
   <script type="text/brightscript" uri="pkg:/components/lib/SignInButton/SignInButton.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
-    <!-- hide the progress bar when focus changes -->
-    <field id="focusPercent" type="float" value="0.0"/>
-    
     <!-- Content expected for a KeyboardMenuItem:
      -
      - title - The label text
      -
      -->
+    <field id="itemContent" type="node" />
     <field id="content" type="node" />
-    <field id="listHasFocus" type="boolean" value="false" />
+    <field id="width" alias="Text.width" />
+    <field id="height" alias="Text.height" />
   </interface>
 
   <children>

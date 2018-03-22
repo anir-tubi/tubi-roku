@@ -1,5 +1,6 @@
 Function init()
   m.ButtonGroup = m.top.findNode("SignInOrGuestButtons")
+  m.Slogan = m.top.findNode("Slogan")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.ButtonGroup.observeField("itemSelected", "onButtonSelected")
 End Function
@@ -16,6 +17,9 @@ Function onScreenFocusChange()
   tubiLog("SignInDisambiguationScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.ButtonGroup.setFocus(true)
+    m.Slogan.runCrossfade = true
+  else if not m.top.isInFocusChain()
+    m.Slogan.runCrossfade = false
   end if
 End Function
 
@@ -33,5 +37,3 @@ Function onButtonSelected()
     m.top.guestPassButtonSelected = true
   end if
 End Function
-
-

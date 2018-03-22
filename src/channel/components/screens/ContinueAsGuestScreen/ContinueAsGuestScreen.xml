@@ -88,19 +88,18 @@
      </Label>
     </LayoutGroup>  
   
-  
-    <ScrollingList
+    <FilledButtonMarkupGrid
       id="SignInOrGuestButtons"
-      layoutDirection="horiz"
-      translation="[450,776]"
-      height="80"
-      width="1020"
+      translation="[450,720]"
       itemComponentName="SignInButton"
-      itemSpacings="[60]">
+      itemSize="[480,80]"
+      itemSpacing="[60,0]"
+      numRows="1"
+      numColumns="2">
       <ContentNode role="content">
         <ContentNode id="signin" title="Sign in or Register"/>
         <ContentNode id="guestpass" title="Continue as a Guest"/>
       </ContentNode>
-    </ScrollingList>
+    </FilledButtonMarkupGrid>
   </children>
 </component>

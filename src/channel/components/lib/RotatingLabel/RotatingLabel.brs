@@ -1,6 +1,7 @@
 Function init()
   tubiLog("RotatingLabel.init")
   m.top.observeField("texts", "onTextsChange")
+  m.top.observeField("runCrossfade", "onRunCrossfade")
   m.LabelGroup = m.top.findNode("RotatingLabelGroup")
   m.CrossfadeAnimation = m.top.findNode("RotatingLabelCrossfade")
   m.DisplayTimer = m.top.findNode("DisplayTimer")
@@ -13,9 +14,18 @@ Function onTextsChange()
   tubiLog("RotatingLabel.onTextsChange")
   if m.top.texts <> invalid and m.top.texts.count() > 0 then
     m.textsIndex = 0
-    startCrossfade()
   else
     m.textsIndex = -1
+  end if
+End Function
+
+Function onRunCrossfade()
+  if m.top.runCrossfade = true
+    startCrossfade()
+  else if m.top.runCrossfade = false
+    m.DisplayTimer.control = "stop"
+    m.oldLabel.text = ""
+    m.newLabel.text = ""
   end if
 End Function
 

@@ -11,7 +11,7 @@ End Function
 '
 ' Set the right child element focus when screen focus changes
 Function onScreenFocusChange()
-  tubiLog("SignInDisambiguationScreen.onScreenFocusChange")
+  tubiLog("SignInRegisterScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.ButtonGroup.setFocus(true)
   end if
@@ -23,7 +23,7 @@ End Function
 '
 ' Handle button selections
 Function onButtonSelected()
-  tubiLog("SignInDisambiguationScreen.onButtonSelected")
+  tubiLog("SignInRegisterScreen.onButtonSelected")
   button = m.ButtonGroup.content.getChild(m.ButtonGroup.itemSelected)
   if button.id = "signin" then
     m.top.signInButtonSelected = true

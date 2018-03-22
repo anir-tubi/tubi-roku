@@ -54,14 +54,11 @@ Function setButtonContent()
     signIn.title = "Sign in via Email"
     ' Layout set for 2 buttons
     m.Buttons.translation = [437, m.Buttons.translation[1]]
-    m.Buttons.height = 80
-    m.Buttons.width = 1046
-    m.Buttons.itemSpacings = [86]
+    m.Buttons.itemSpacing = [86, 0]
+    m.Buttons.numColumns = 2
   else
     m.Buttons.translation= [720, m.Buttons.translation[1]]
-    m.Buttons.height = 80
-    m.Buttons.width = 480
-    m.Buttons.itemSpacings = []
+    m.Buttons.itemSpacings = [0,0]
   end if
   m.Buttons.content = content
 End Function

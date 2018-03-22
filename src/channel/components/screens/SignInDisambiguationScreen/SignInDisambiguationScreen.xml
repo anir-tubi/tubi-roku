@@ -7,7 +7,7 @@
  - use a guest pass to view content.
  -
  -->
-<component name="SignInDisambiguationScreen" extends="Group">
+<component name="SignInDisambiguationScreen" extends="Group" >
 
   <script type="text/brightscript" uri="pkg:/components/screens/SignInDisambiguationScreen/SignInDisambiguationScreen.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
@@ -39,7 +39,7 @@
       crossfadeDuration="1"
       displayDuration="5"
       width="1920"
-      horizAlign="center" >
+      horizAlign="center">
       <Font
       id="Vaud43SemiBold"
       role="font"
@@ -47,18 +47,18 @@
       size="43" />
     </RotatingLabel>
     
-    <ScrollingList
+    <FilledButtonMarkupGrid
       id="SignInOrGuestButtons"
-      layoutDirection="horiz"
       translation="[450,720]"
-      height="80"
-      width="1020"
       itemComponentName="SignInButton"
-      itemSpacings="[60]">
+      itemSize="[480,80]"
+      itemSpacing="[60,0]"
+      numRows="1"
+      numColumns="2">
       <ContentNode role="content">
         <ContentNode id="signin" title="Sign in or Register Free"/>
         <ContentNode id="guestpass" title="Guest Pass"/>
       </ContentNode>
-    </ScrollingList>
+    </FilledButtonMarkupGrid>
   </children>
 </component>

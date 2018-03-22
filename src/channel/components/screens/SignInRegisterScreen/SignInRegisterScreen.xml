@@ -56,19 +56,19 @@
       </LayoutGroup>
     </LayoutGroup>
        
-    <ScrollingList
+    <FilledButtonMarkupGrid
       id="SignInOrRegisterButtons"
-      layoutDirection="horiz"
       translation="[432,720]"
-      height="80"
-      width="1046"
-      itemComponentName="SignInButton"
-      itemSpacings="[86]">
+      itemSize="[480,80]"
+      itemSpacing="[96,0]"
+      numRows="1"
+      numColumns="2"
+      itemComponentName="SignInButton">
       <ContentNode role="content">
         <ContentNode id="register" title="Register or Link Account"/>
         <ContentNode id="signin" title="Sign in via Email"/>
       </ContentNode>
-    </ScrollingList>
+    </FilledButtonMarkupGrid>
     
     <LayoutGroup
       translation="[432,837]"

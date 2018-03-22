@@ -88,7 +88,7 @@ End Function
 ' User really wants a guest pass, set a field so the parent can show content
 Function onContinueGuestPass()
   tubiLog("SignInController.onContinueGuestPass")
-  m.top.guestPass = true
+    m.top.state = "guest"
 End Function
 
 
