@@ -8,7 +8,7 @@ Function init()
   m.RowList.observeField("rowItemFocused", "onEpisodeFocused")
   m.Menu = m.top.findNode("EpisodeMenu")
   m.Menu.observeField("itemFocused", "onSeasonChangeMenu")
-  m.Menu.observeField("preItemFocused", "onPreMenuChange")
+  m.Menu.observeField("rowScrollFocused", "onMenuScrollFocused")
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
 
   if m.global.constants.deviceInfo.scaledUi = true then
@@ -46,7 +46,7 @@ Function onEpisodeFocused()
     if season <> invalid then
       season.focusIndex = m.RowList.rowItemFocused[1]
     end if
-    m.Menu.animateToItem = m.RowList.rowItemFocused[0]
+    m.Menu.jumpToItem = m.RowList.rowItemFocused[0]
   end if
 End Function
 
@@ -66,10 +66,10 @@ End Function
 
 
 'When menu updates season, we need to sync the season rows grid
-Function onPreMenuChange() As Void
-  if m.RowList.preItemFocused <> m.Menu.preItemFocused
-    tubiLog("onPreMenuChange")
-    m.RowList.animateToItem = m.Menu.preItemFocused
+Function onMenuScrollFocused() As Void
+  if m.RowList.preItemFocused <> m.Menu.rowScrollFocused
+    tubiLog("EpisodeScreen.onMenuScrollFocused")
+    m.RowList.animateToItem = m.Menu.rowScrollFocused
   end if
 End Function
 

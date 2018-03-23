@@ -183,7 +183,6 @@
         itemSpacing="[0,8]"
         numRows="5"
         numColumns="1"
-        drawFocusFeedbackOnTop="false"
         vertFocusAnimationStyle="fixedFocus"
         itemComponentName="CategorySeasonListItem" />
 

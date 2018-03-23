@@ -32,18 +32,19 @@
       mode="detail"
       visible="true" />
     
-    <ScrollingList
+    <CommunicatingMarkupGrid
       id="EpisodeMenu"
-      translation="[-425, 640]"
-      width="425"
-      height="440"
-      scrollHeight="80"
-      itemSpacings="[8]"
-      itemComponentName="CategorySeasonListItem"/>
+      translation="[-425, 616]"
+      itemSize="[425,80]"
+      itemSpacing="[0,8]"
+      numRows="5"
+      numColumns="1"
+      vertFocusAnimationStyle="fixedFocus"
+      itemComponentName="CategorySeasonListItem" />
 
     <RowList
       id="RowList"
-      translation="[85,588]"
+      translation="[85,552]"
       itemComponentName="FeaturePosterWithProgress"
       rowTitleComponentName="CategoryGridRowLabel"
       itemSize="[1835,364]"
