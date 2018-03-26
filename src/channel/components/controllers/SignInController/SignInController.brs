@@ -7,7 +7,7 @@ Function init()
   if m.global.constants.ui.signIn.simpleRegisterScreen <> invalid
     m.simpleRegisterScreen = m.global.constants.ui.signIn.simpleRegisterScreen
   else
-    m.simpleRegisterScreen = (getExperimentValue("UserNamespace", "roku_simple_register_screen") = 1)
+    m.simpleRegisterScreen = (getExperimentValue("RokuNamespace", "roku_simple_register_screen") = 1)
   end if
 
   initScreenStack(m.top.findNode("SignInScreenStack"), onScreenStackEmpty)
