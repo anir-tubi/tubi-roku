@@ -21,6 +21,23 @@
 ' This is intended for simple components to be verified visually, including
 ' keypress handling.
 Function ComponentTest(componentTestName)
+
+  ' Set up the host scene
+  port = CreateObject("roMessagePort")
+  screen = CreateObject("roSGScreen")
+  scene = screen.CreateScene("TestScene")
+  scene.id = "ComponentTestScene"
+  screen.SetMessagePort(port)
+  screen.show()
+  scene.observeField("keypress", port)
+  scene.backgroundUri = ""  ' get rid of the grey default poster
+  ' Set a very visible red background for the component under test
+  boundaries = scene.createChild("Rectangle")
+  boundaries.id = "ComponentTestBoundaries"
+  boundaries.color = "0xFF0000FF"
+  boundaries.translation = [0,0]
+  m.componentTestScreen = screen  ' pass through to componentTest_testComponent
+
   testFunctionName = "componentTest_" + componentTestName
   print "*** Running component test "; testFunctionName
   testFunctionNameType = "nothing"
@@ -28,14 +45,14 @@ Function ComponentTest(componentTestName)
   if testFunctionNameType <> "Function"
     print "Component test function not found: "; testFunctionName
   else
-    result = Eval(testFunctionName + "(componentTest_testComponent)")
+    result = Eval(testFunctionName + "(screen, componentTest_testComponent)")
     if type(result) = "roList"
       print "Errors ";
       for i=0 to result.count()-1
         print "  ["; i; "] "; result[i]
       end for
     ' &hFC==ERR_NORMAL_END
-    ' &hE2==ERR_VALUE_RETURN 
+    ' &hE2==ERR_VALUE_RETURN
     else if result <> &hFC and result <> &hE2
       print "Eval error "; result
       compileErrors = GetLastRunCompileError()
@@ -62,17 +79,11 @@ End Function
 ' - Scene captures "back" and "ok" events to remove and restore target component focus
 '
 Function componentTest_testComponent(componentName, dataFields={}, observeFields=[])
-  port = CreateObject("roMessagePort")
-  screen = CreateObject("roSGScreen")
-  scene = screen.CreateScene("TestScene")
-  scene.id = "ComponentTestScene"
-  screen.SetMessagePort(port)
-  screen.show()
-  scene.observeField("keypress", port)
-  scene.backgroundUri = ""  ' get rid of the grey default poster
-  ' Set a very visible red background for the component under test
-  boundaries = scene.createChild("Rectangle")
-  boundaries.color = "0x990000FF"
+  screen = m.componentTestScreen
+  port = screen.GetMessagePort()
+  scene = screen.GetScene()
+  boundaries = scene.findNode("ComponentTestBoundaries")
+
   ' focused component
   target = scene.createChild(componentName)
   for each field in observeFields
@@ -91,14 +102,17 @@ Function componentTest_testComponent(componentName, dataFields={}, observeFields
     print "Unexpected type '"; type(dataFields); "' for data fields"
   end if
   target.setFocus(true)
+
   while true
     msg = wait(100, port)
     if type(msg) = "Invalid"
-      ' Constantly resize, in case any internal processing or user input changes the dimensions
-      rect = target.sceneBoundingRect()
-      boundaries.translation = [rect.x, rect.y]
-      boundaries.width = rect.width
-      boundaries.height = rect.height
+      ' Allow boundaries to be invalid, incase the componentTest function removed this background
+      if boundaries <> invalid
+        ' Constantly resize, in case any internal processing or user input changes the dimensions
+        rect = target.boundingRect()
+        boundaries.width = rect.width
+        boundaries.height = rect.height
+      end if
     else
       print "Got " + type(msg) + " message"
       if type(msg) = "roSGScreenEvent" and msg.isScreenClosed() then

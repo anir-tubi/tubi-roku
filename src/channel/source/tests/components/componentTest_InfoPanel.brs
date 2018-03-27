@@ -1,4 +1,4 @@
-Function componentTest_InfoPanel_movieMode(runTests)
+Function componentTest_InfoPanel_movieMode(screen, runTests)
   ' Info Panel children for 'movie' mode
   '   m.Title
   '   m.TwoLineInfo
@@ -28,7 +28,7 @@ Function componentTest_InfoPanel_movieMode(runTests)
 End Function
 
 
-Function componentTest_InfoPanel_seriesMode(runTests)
+Function componentTest_InfoPanel_seriesMode(screen, runTests)
   ' Info Panel children for 'series' mode
   '   m.Title
   '   m.Episode
@@ -60,7 +60,7 @@ Function componentTest_InfoPanel_seriesMode(runTests)
 End Function
 
 
-Function componentTest_InfoPanel_categoryMode(runTests)
+Function componentTest_InfoPanel_categoryMode(screen, runTests)
   ' Info Panel children for 'category' mode
   '   m.Title
   '   m.CategoryDetails
@@ -84,7 +84,7 @@ Function componentTest_InfoPanel_categoryMode(runTests)
 End Function
 
 
-Function componentTest_InfoPanel_categoryScreen_itemMode(runTests)
+Function componentTest_InfoPanel_categoryScreen_itemMode(screen, runTests)
   ' Force fields to be set in the exact order as CategoryScreen
   data = [
   {
