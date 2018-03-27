@@ -2,9 +2,7 @@
 <!--
  - CategoryListItem
  -
- - Items used in a ScrollingList for showing categories.  These
- - are labels which can wrap text and also display a cursor when
- - the scrollinglist has focus.
+ - Items used in a MarkupGrid (like FilledButtonMarkupGrid) or RowList for showing category names.
  -
  -->
 <component name="CategorySeasonListItem" extends="Group" >

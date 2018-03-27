@@ -75,8 +75,6 @@ Function onCategoriesReceived()
       adjustCategories()
       spinner = m.top.findNode("CategorySpinner")
       spinner.visible = false
-      m.CategoryList.content = invalid  ' since alwaysNotify=false on scrollinglist
-      ' Prepend special categories, taking care to remove them if they already are there
       m.InfoPanel.mode = "category"
       m.CategoryList.content = m.categoryContent
       m.CategoryGridList.content = m.categoryContent  ' should be the category list
@@ -124,10 +122,11 @@ Function onScreenFocusChange()
   end if
 End Function
 
-' We do this here becase the ScrollingList component swallows the 'ok' keypress
+
 Function onCategoryMenuSelected()
-  onKeyEvent("ok", true)
+  m.top.categoryMenuVisible = false
 End Function
+
 
 ''''''''''''''''''''
 ' onKeyEvent
