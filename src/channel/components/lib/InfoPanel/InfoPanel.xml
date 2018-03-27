@@ -47,7 +47,7 @@
 
 
     <!-- mode is either: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
-    <field id="mode" type="string" value="category" />
+    <field id="mode" type="string"/>
 
     <!-- maxHeight is the area in which the content should be centered -->
     <field id="maxHeight" type="int" value="0" />

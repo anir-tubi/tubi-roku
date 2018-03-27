@@ -67,13 +67,15 @@ Function componentTest_InfoPanel_categoryMode(runTests)
   '   m.Description
   data = [
   {
-    "mode": "category"
-    "title": "Test Title"
-    "categoryContentCount": 75
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Satis est ad hoc responsum. Hoc tu nunc in illo probas. Occultum facinus esse potuerit, gaudebit; Tamen a proposito, inquam, aberramus. Quae quo sunt excelsiores, eo dant clariora indicia naturae. Quis est tam dissimile homini. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Satis est ad hoc responsum. Hoc tu nunc in illo probas. Occultum facinus esse potuerit, gaudebit; Tamen a proposito, inquam, aberramus. Quae quo sunt excelsiores, eo dant clariora indicia naturae. Quis est tam dissimile homini."
-    "translation": [100,0]
-    "width": 875
+    "id":            "InfoPanel"
+    "maxHeight":     325
+    "maxTitleLines": 2
+    "visible":       true
   }
+  { "mode": "category" }
+  { "categoryContentCount": 75 }
+  { "title": "Test Title" }
+  { "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Satis est ad hoc responsum. Hoc tu nunc in illo probas. Occultum facinus esse potuerit, gaudebit; Tamen a proposito, inquam, aberramus. Quae quo sunt excelsiores, eo dant clariora indicia naturae. Quis est tam dissimile homini. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Satis est ad hoc responsum. Hoc tu nunc in illo probas. Occultum facinus esse potuerit, gaudebit; Tamen a proposito, inquam, aberramus. Quae quo sunt excelsiores, eo dant clariora indicia naturae. Quis est tam dissimile homini." }
   {
     "calculateHeight": true
   }
