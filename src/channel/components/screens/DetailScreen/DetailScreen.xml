@@ -64,7 +64,7 @@
       <field id="trackingUri" type="string"  value="" />
 
       <!-- keeps the uri used for user tracking -->
-      <field id="animateToListItem" type="integer" alias="Menu.animateToItem" />
+      <field id="jumpToItem" type="integer" alias="Menu.jumpToItem" />
 
       <!-- used to update the text on the addToQueue button -->
       <field id="addToQueueTitle" type="string" value="Add to queue" alwaysNotify="true" />
@@ -117,38 +117,31 @@
     <DetailMenuItemContentNode
       id="ResumeMenuItem"
       title="Resume" 
-      unfocusiconurl="pkg:/images/icon-resume.png"
-      focusiconurl="pkg:/images/icon-resume.png"/>
+      iconUrl="pkg:/images/icon-resume.png"/>
     <DetailMenuItemContentNode
       id="PlayMenuItem"
       title="Play"
-      unfocusiconurl="pkg:/images/icon-play.png"
-      focusiconurl="pkg:/images/icon-play.png" />
+      iconUrl="pkg:/images/icon-play.png" />
     <DetailMenuItemContentNode
       id="EpisodesMenuItem"
       title="Episodes list"
-      unfocusiconurl="pkg:/images/icon-all-episodes.png"
-      focusiconurl="pkg:/images/icon-all-episodes.png" />
+      iconUrl="pkg:/images/icon-all-episodes.png" />
     <DetailMenuItemContentNode
       id="AddQueueMenuItem"
       title="Add to queue"
-      unfocusiconurl="pkg:/images/icon-add-to-queue.png"
-      focusiconurl="pkg:/images/icon-add-to-queue.png" />
+      iconUrl="pkg:/images/icon-add-to-queue.png" />
     <DetailMenuItemContentNode
       id="RemoveQueueMenuItem"
       title="Remove from queue"
-      unfocusiconurl="pkg:/images/icon-remove-from-queue.png"
-      focusiconurl="pkg:/images/icon-remove-from-queue.png" />
+      iconUrl="pkg:/images/icon-remove-from-queue.png" />
     <DetailMenuItemContentNode
       id="RemoveHistoryMenuItem"
       title="Remove from history"
-      unfocusiconurl="pkg:/images/icon-remove-from-history.png"
-      focusiconurl="pkg:/images/icon-remove-from-history.png" />
+      iconUrl="pkg:/images/icon-remove-from-history.png" />
     <DetailMenuItemContentNode
       id="WatchTrailerMenuItem"
       title="Watch Trailer"
-      unfocusiconurl="pkg:/images/icon-trailer.png"
-      focusiconurl="pkg:/images/icon-trailer.png" />
+      iconUrl="pkg:/images/icon-trailer.png" />
   
     <Spinner
       id="DetailSpinner"
@@ -169,14 +162,15 @@
         maxTitleLines="2"
         visible="true" />
 
-      <ScrollingList
-        id="Menu"
-        width="465"
-        height="256"
-        itemSpacings="[8]"
-        itemComponentName="DetailMenuItem"
-        visible="true"
-        translation="[60, 656]" />
+    <FilledButtonMarkupGrid
+      id="Menu"
+      translation="[60,656]"
+      itemSize="[465,80]"
+      itemComponentName="DetailMenuItem"
+      itemSpacing="[0,8]"
+      numRows="3"
+      numColumns="1"
+      vertFocusAnimationStyle="floatingFocus"/>
 
       <Group
         id="RelatedContentGroup"

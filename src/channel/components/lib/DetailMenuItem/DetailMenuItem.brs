@@ -1,36 +1,22 @@
 Function init()
-  m.top.observeField("content", "onContentChange")
-  m.FocusedIcon = m.top.findNode("FocusedIcon")
-  m.UnfocusedIcon = m.top.findNode("UnfocusedIcon")
+  m.top.observeField("itemContent", "onItemContentChange")
+  m.Icon = m.top.findNode("Icon")
   m.DetailsMenuText = m.top.findNode("DetailsMenuText")
   m.Progress = m.top.findNode("ResumeProgressBar")
   ' Force a static size, which ScrollingList will pick up since it internal uses LayoutGroup for spacing
-  m.top.width = 440
+  m.top.width = 465
   m.top.height = 80
   m.top.color = m.global.constants.ui.colors.transparent
   m.Progress.color = m.global.constants.ui.colors.focusedText
-  m.top.observeField("focusPercent", "onFocusChange")
-  m.top.observeField("listHasFocus", "onFocusChange")
 End Function
 
-Function onFocusChange()
-  tubiLog("DetailMenuItem.onFocusChange " + m.top.id + str(m.top.focusPercent))
-  if m.FocusedIcon.uri <> m.UnfocusedIcon.uri
-    m.FocusedIcon.opacity = m.top.focusPercent
-    m.UnfocusedIcon.opacity = 1.0 - m.top.focusPercent
-  end if
-  'we can change the color of the menu item text if we want by using colorChange() from the animationMixin
-  'on DetailsMenuText, but perhaps best to do it from DetailScreen.brs
-End Function
-
-Function onContentChange()
-  tubiLog("DetailMenuItem.onContentChange")
-  if m.top.content <> invalid then
-    m.DetailsMenuText.text = m.top.content.title
-    m.FocusedIcon.uri = m.top.content.focusIconUrl
-    m.UnfocusedIcon.uri = m.top.content.unfocusIconUrl
-    if m.top.content.playstart <> invalid and m.top.content.playstart <> 0.0 and m.top.content.length <> invalid and m.top.content.length <> 0.0 then
-      showProgressBar(m.top.content.playstart / m.top.content.length)
+Function onItemContentChange()
+  tubiLog("DetailMenuItem.onItemContentChange")
+  if m.top.itemContent <> invalid then
+    m.DetailsMenuText.text = m.top.itemContent.title
+    m.Icon.uri = m.top.itemContent.iconUrl
+    if m.top.itemContent.playstart <> invalid and m.top.itemContent.playstart <> 0.0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0.0 then
+      showProgressBar(m.top.itemContent.playstart / m.top.itemContent.length)
     else
       m.Progress.visible = false
     end if

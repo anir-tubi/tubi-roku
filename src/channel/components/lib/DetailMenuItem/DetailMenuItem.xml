@@ -10,32 +10,22 @@
     <!-- Content expected for a DetailMenuItem:
      -
      - title - The label text
-     - url - The icon uri
+     - iconUrl - The icon uri
      - playstart/length - both of these need to be present and the
      -                    progress bar will be displayed
      -
      -->
-    <field id="content" type="node" />
-    <field id="listHasFocus" type="boolean" value="false" />
+    <field id="itemContent" type="node" />
   </interface>
   
   <children>
     <Poster
-     id="FocusedIcon" 
+     id="Icon"
      translation="[22,16]"
-     loadWidth="40"
-     loadHeight="40"
-     loadDisplayMode="scaleToZoom" 
-     opacity="0.0"/>
-    
-    <Poster
-     id="UnfocusedIcon" 
-     translation="[22,16]"
-     loadWidth="40"
-     loadHeight="40"
-     loadDisplayMode="scaleToZoom" 
-     opacity="1.0"/>
-    
+     width="40"
+     height="40"
+     loadSync="true"/>
+
     <Label
      id="DetailsMenuText"
      translation="[72,0]" 

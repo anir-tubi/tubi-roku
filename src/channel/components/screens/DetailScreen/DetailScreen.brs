@@ -28,7 +28,7 @@ Function init()
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
   m.top.observeField("relatedContent", "onRelatedContentChange")
   m.RelatedGrid.observeField("itemFocused", "onRelatedItemFocused")
-  m.top.observeField("animateToListItem", "onAnimateToListItem")
+  m.top.observeField("jumpToItem", "onJumpToItem")
   m.Info.observeField("descriptionSelected", "onDescriptionSelected")
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
@@ -62,7 +62,7 @@ Function onCloseDescriptionModal()
 End Function
 
 
-Function onAnimateToListItem()
+Function onJumpToItem()
   focusMenu(true)
 End Function
 
@@ -83,7 +83,6 @@ Function onResumePointChange()
   tubiLog("DetailScreen.onResumePointChange")
   menuItems = m.Menu.content
   resumeIndex = getChildIndexById(menuItems, m.ResumeMenuItem.id)
-  m.Menu.content = invalid
 
   m.ResumeMenuItem.playstart = m.top.resumePoint
   if resumeIndex = -1 and m.top.resumePoint > 0
@@ -104,7 +103,6 @@ Function onIsBookmark()
   menuItems = m.Menu.content
   addQueueIndex = getChildIndexById(menuItems, m.AddQueueMenuItem.id)
   removeQueueIndex = getChildIndexById(menuItems, m.RemoveQueueMenuItem.id)
-  m.Menu.content = invalid
 
   if m.top.isBookmark = false
     if addQueueIndex = -1
@@ -224,7 +222,6 @@ End Function
 ' Set basic buttons first, additional buttons will be added based on the input fields of the details screen
 Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = []) As Void
   menuItems = m.Menu.content
-  m.Menu.content = invalid
 
   if add = false and itemIndex > -1
     'menu item exists, so we need to remove it

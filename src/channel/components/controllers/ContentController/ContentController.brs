@@ -1096,7 +1096,7 @@ Function populateDetailScreen(contentAndIndex, resetButtonIndex=false)
   m.detailScreen.relatedContent = content.relatedContent
 
   if wasLoading or resetButtonIndex
-    m.detailScreen.animateToListItem = 0
+    m.detailScreen.jumpToItem = 0
   end if
 
   'update the background images for the detail screen
