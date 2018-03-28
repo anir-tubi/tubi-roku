@@ -344,7 +344,7 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
 End Function
 
 Function mergeMetadata(fetched)
-  ' TODO(Chris): handle this better.  if we set an error it should also be reset hwen the category is next fetched
+  ' TODO(Chris): handle this better.  if we set an error it should also be reset when the category is next fetched
   newContent = invalid
   response = fetched.response
   if response.code < 200 or response.code >= 300 then
@@ -388,8 +388,14 @@ Function mergeMetadata(fetched)
   m.internalContent.replaceChild(newContent, index)
 
   ' If RowList gets content for a focused row, it doesn't automatically emit rowItemFocused so we manually handle that here
-  if index = m.RowList.rowItemFocused[0] and m.RowList.rowItemFocused[1] = -1 then
-    m.RowList.jumpToRowItem = [index,0]
+  if index = m.RowList.rowItemFocused[0] then
+    'in the case of deleting a content from a user cateogry, we want to refocus on the next item in the category
+    item = m.RowList.rowItemFocused[1]
+    'in the case that the focused row was previously empty, make sure we focus on the first item
+    if m.RowList.rowItemFocused[1] = -1
+      item = 0
+    end if
+    m.RowList.jumpToRowItem = [index, item]
   end if
   if m.top.firstPosterLoaded = false then
     m.top.firstPosterLoaded = true
