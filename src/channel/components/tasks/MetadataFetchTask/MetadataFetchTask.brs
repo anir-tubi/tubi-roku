@@ -272,7 +272,7 @@ Function translateCategoryMetadata(contentToTranslate, json, isFeaturedCategory)
         length: child.duration
         subtype: "ContentNode"
       }
-      if isFeaturedCategory and child.hero_images <> invalid then
+      if isFeaturedCategory = true and child.hero_images <> invalid then
         childAA.hdgridposterurl = child.hero_images[0]
       else if child.posterarts <> invalid then
         childAA.hdgridposterurl = child.posterarts[0]
@@ -285,6 +285,17 @@ Function translateCategoryMetadata(contentToTranslate, json, isFeaturedCategory)
     end for
     translated.update(updateMetadata)
     node_count = 1 + translated.getChildCount()
+    ' Set a flag only on featured row content.  We do it here manually
+    ' to avoid having to define a custom content node which have
+    ' proven to be much slower to instantiate.  Could use some testing,
+    ' though.
+    if isFeaturedCategory = true
+      for i = 0 to translated.getChildCount()-1
+        child = translated.getChild(i)
+        child.addField("isFeaturedCategory", "boolean", false)
+        child.isFeaturedCategory = true
+      end for
+    end if
   end if
 
   setTotalCount(translated)

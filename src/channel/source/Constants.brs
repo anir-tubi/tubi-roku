@@ -424,6 +424,9 @@ Function getConstants()
       constants.ui.signIn.skipSignInOnLaunch = false
       constants.ui.signIn.promptSignInOnGuestPlay = false
 
+    constants.ui.categoryScreen = {}
+      constants.ui.categoryScreen.singleFeaturePoster = false
+
     'static - pre defined category names
     constants.ui.categoryNames = {}
       constants.ui.categoryNames.topCategory = "Featured"
@@ -446,6 +449,7 @@ Function getConstants()
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
       constants.ui.backgroundTypes.topRight = "topright"
+      constants.ui.backgroundTypes.feature = "feature"
 
     'screen ids in the UI
     constants.ui.screenIds = {}

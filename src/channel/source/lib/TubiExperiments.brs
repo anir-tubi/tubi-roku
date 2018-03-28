@@ -20,6 +20,7 @@ Function TubiExperiments(request as Object, constants as Object) as Object
         roku_continue_screen: 1
         related_content: 0
         roku_sign_in: 1  ' 0 don't show any sign in, 1 show sign in at start, 2 show sign in on play, 3 show sign in on both occasions
+        roku_single_feature_poster: 0
       }
       RokuNamespace: {
         roku_simple_register_screen: 0

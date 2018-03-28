@@ -10,6 +10,8 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+
 
   <interface>
     <!--
@@ -72,9 +74,9 @@
       itemSpacing="[0,28]"
       numRows="2"
       rowSpacings="[28]"
-      rowItemSize="[[430,242],[210,300]]"
-      rowItemSpacing="[[10,0]]"
-      showRowLabel="[true]"
+      rowItemSize="[[210,300]]"
+      rowItemSpacing="[[1920,0],[10,0]]"
+      showRowLabel="[false, true]"
       showRowCounter="[false]"
       fadeFocusFeedbackWhenAutoScrolling="true"
       rowFocusAnimationStyle="floatingFocus"

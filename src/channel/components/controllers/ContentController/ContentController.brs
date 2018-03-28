@@ -109,6 +109,14 @@ Function init()
       m.skipSignInOnLaunch = true
     end if
   end if
+
+  m.singleFeaturePoster = false
+  if m.constants.ui.categoryScreen.singleFeaturePoster <> invalid
+     m.singleFeaturePoster = m.constants.ui.categoryScreen.singleFeaturePoster
+  else
+    m.singleFeaturePoster = (getExperimentValue("UserNamespace", "roku_single_feature_poster") = 1)
+  end if
+
   m._ = rodash()
 End Function
 
@@ -240,7 +248,7 @@ Function startUserExperience()
         testLog("Deep link type = " + m.top.deepLinkContent.type)
         m.enteredFromDeepLink = true
         showDetailScreen(m.top.deepLinkContent, invalid)
-      else if m.global.authInfo = invalid and not m.skipSignInOnLaunch
+      else if m.global.authInfo = invalid and m.skipSignInOnLaunch <> true
         tubiLog("ContentController ask user to sign in")
         startSignIn(false)
       else if m.constants.ui.onnow.on = false or m.top.onNowContent <> invalid
@@ -579,7 +587,7 @@ Function onPlay()
   tubiLog("ContentController.onPlay")
   content = getDetailScreenContent()
   if content <> invalid then
-    if m.global.authInfo = invalid and m.promptSignInOnGuestPlay
+    if m.global.authInfo = invalid and m.promptSignInOnGuestPlay = true
       title = "Sign in for a better experience"
       message = "Sign in for free to save to your queue and sync with other devices"
       buttons = ["Sign in or Register", "Play Anyways"]
@@ -1184,11 +1192,15 @@ End Function
 ' Helper function to get the background type depending on if passed in uri list is using the default image
 ' @backgroundUriList, array of uris
 Function getBackgroundtype(backgroundUriList)
+  backgroundType = m.constants.ui.backgroundTypes.topRight
   if backgroundUriList[0] = m.defaultBackgroundUri
-    return m.constants.ui.backgroundTypes.fullScreen
+    backgroundType = m.constants.ui.backgroundTypes.fullScreen
   else
-    return m.constants.ui.backgroundTypes.topRight
+    if m.categoryScreen <> invalid and m.categoryScreen.isInFocusChain() and m.categoryScreen.cursorPosition[0] = 0 and m.singleFeaturePoster = true
+      backgroundType = m.constants.ui.backgroundTypes.feature
+    end if
   end if
+  return backgroundType
 End Function
 
 

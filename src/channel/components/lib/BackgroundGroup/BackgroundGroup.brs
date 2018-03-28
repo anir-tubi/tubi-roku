@@ -12,6 +12,7 @@ Function init()
 
   m.fullScreenGradient = m.top.findNode("FullScreenGradient")
   m.topRightGradient = m.top.findNode("TopRightGradient")
+  m.featureGradient = m.top.findNode("FeatureGradient")
   m.oldPoster = m.top.findNode("Poster1")  'the poster that is hidden (or transitioning to be hidden)
   m.newPoster = m.top.findNode("Poster2")  'the poster that is visible (or transitioning to be visible)
   m.oldBackgroundType = m.constants.ui.backgroundTypes.fullscreen  'set the default background type
@@ -91,7 +92,7 @@ End Function
 '@posterType: string, can be one of the background poster types as defined in constants ("fullscreen" or "topright")
 '@posterUri: string, image uri to use for the background poster
 Function setPosterValues(posterUri)
-  if m.top.backgroundInfo.type = m.constants.ui.backgroundTypes.fullScreen
+  if m.top.backgroundInfo.type = m.constants.ui.backgroundTypes.fullScreen or m.top.backgroundInfo.type = m.constants.ui.backgroundTypes.feature
     m.oldPoster.width = 1920
     m.oldPoster.height = 1080
     m.oldPoster.posterTranslation = [0,0]
@@ -170,29 +171,57 @@ Function transitionGradients()
     if m.newPoster.uri = m.blurredDefaultBackground
       m.fullScreenGradient.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 0.0
+      m.featureGradient.gradientOpacity = 0.0
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen
       m.fullScreenGradient.gradientOpacity = 1.0
       m.topRightGradient.gradientOpacity = 0.0
+      m.featureGradient.gradientOpacity = 0.0
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.topRight
       m.fullScreenGradient.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 1.0
+      m.featureGradient.gradientOpacity = 0.0
+    else if m.newBackgroundType = m.constants.ui.backgroundTypes.feature
+      m.fullScreenGradient.gradientOpacity = 0.0
+      m.topRightGradient.gradientOpacity = 0.0
+      m.featureGradient.gradientOpacity = 1.0
     end if
   else
     if m.newPoster.uri = m.blurredDefaultBackground
-      if m.fullScreenGradient.gradientOpacity = 1.0
+      if m.fullScreenGradient.gradientOpacity > 0.0
         m.fullScreenGradient.fadeOutControl = "start"
         m.fullScreenGradient.lastAnimationName = "GradientFadeOut"
       end if
-      if m.topRightGradient.gradientOpacity = 1.0
+      if m.topRightGradient.gradientOpacity > 0.0
         m.topRightGradient.fadeOutControl = "start"
         m.topRightGradient.lastAnimationName = "GradientFadeOut"
       end if
+      if m.featureGradient.gradientOpacity > 0.0
+        m.featureGradient.fadeOutControl = "start"
+        m.featureGradient.lastAnimationName = "GradientFadeOut"
+      end if
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen
-      if m.fullScreenGradient.gradientOpacity = 0.0
+      if m.fullScreenGradient.gradientOpacity < 1.0
         m.fullScreenGradient.fadeInControl = "start"
         m.fullScreenGradient.lastAnimationName = "GradientFadeIn"
       end if
-      if m.topRightGradient.gradientOpacity = 1.0
+      if m.topRightGradient.gradientOpacity > 0.0
+        m.topRightGradient.fadeOutControl = "start"
+        m.topRightGradient.lastAnimationName = "GradientFadeOut"
+      end if
+      if m.featureGradient.gradientOpacity > 0.0
+        m.featureGradient.fadeOutControl = "start"
+        m.featureGradient.lastAnimationName = "GradientFadeOut"
+      end if
+    else if m.newBackgroundType = m.constants.ui.backgroundTypes.feature
+      if m.featureGradient.gradientOpacity < 1.0
+        m.featureGradient.fadeInControl = "start"
+        m.featureGradient.lastAnimationName = "GradientFadeIn"
+      end if
+      if m.fullScreenGradient.gradientOpacity > 0.0
+        m.fullScreenGradient.fadeOutControl = "start"
+        m.fullScreenGradient.lastAnimationName = "GradientFadeOut"
+      end if
+      if m.topRightGradient.gradientOpacity > 0.0
         m.topRightGradient.fadeOutControl = "start"
         m.topRightGradient.lastAnimationName = "GradientFadeOut"
       end if
@@ -204,9 +233,13 @@ Function transitionGradients()
       '2) when returning to the category screen from the details screen, the animation is clunky. Setting
       '   the value without animating it is an attempt to reduce the processing needed to run the animations.
       m.topRightGradient.gradientOpacity = 1.0
-      if m.fullScreenGradient.gradientOpacity = 1.0
+      if m.fullScreenGradient.gradientOpacity > 0.0
         m.fullScreenGradient.fadeOutControl = "start"
         m.fullScreenGradient.lastAnimationName = "GradientFadeOut"
+      end if
+      if m.featureGradient.gradientOpacity > 0.0
+        m.featureGradient.fadeOutControl = "start"
+        m.featureGradient.lastAnimationName = "GradientFadeOut"
       end if
     end if
   end if
@@ -273,5 +306,8 @@ Function startTransitionIn()
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
+  else if m.newBackgroundType = m.constants.ui.backgroundTypes.feature
+    m.newPoster.fadeInControl = "start"
+    m.newPoster.lastAnimationName = "FadeIn"
   end if
 End Function
