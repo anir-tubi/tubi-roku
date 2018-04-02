@@ -12,10 +12,16 @@
     <!-- json sources for CategoryGridList -->
     <field id="json" type="string" />
 
+    <!-- if the category is nested under a "complex" category in the matrix API -->
+    <field id="parentId" type="string" />
+
     <!-- currently focused item index to communicate to CategoryGridRowLabel -->
     <field id="focusIndex" type="integer" value="-1"/>
 
-    <!-- State of category children none, loading, loaded -->
+    <!-- State of category children: none, loading, partial, loaded -->
     <field id="state" type="string" value="none"/>
+
+    <!-- Should this category use landscape images -->
+    <field id="isLandscape" type="boolean" value="false"/>
   </interface>
 </component>

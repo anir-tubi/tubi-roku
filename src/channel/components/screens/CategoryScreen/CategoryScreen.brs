@@ -12,11 +12,12 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
-  m.top.observeField("categoryListResponse", "onCategoriesReceived")
+  m.top.observeField("homescreenResponse", "onHomescreenResponse")
   m.top.observeField("trackingUri", "onTrackingUriChange")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.top.trackingCount = 0
-  m.CategoryList.observeField("itemFocused","onCategoryMenuChange")
+  
+  m.CategoryList.observeField("itemFocused","onCategoryMenuItemFocused")
   m.CategoryList.observeField("rowScrollFocused","onCategoryListScrollFocused")
   m.CategoryList.observeField("itemSelected", "onCategoryMenuSelected")
   m.categoryListIsFocused = false
@@ -31,11 +32,12 @@ Function init()
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
   m.CategoryGridList.observeField("cursorPosition", "onGridCursorChange")
+  m.CategoryGridList.observeField("categoryTotalCounts", "onTotalCountsChange")
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRow")
 
-  'Special categories
-  m.ContinueWatchingCategory = m.SpecialCategories.findNode(m.constants.ui.categoryIds.history)
-  m.MyQueueCategory = m.SpecialCategories.findNode(m.constants.ui.categoryIds.queue)
+  'Special categories - used to update the user categories as necessary
+  m.ContinueWatchingCategory = invalid
+  m.MyQueueCategory = invalid
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
@@ -43,11 +45,17 @@ Function init()
 
   ' Category list loaded by loadAllCategories
   ' Content should be structured as:
-  ' <CategoryContentNode>
-  '   <CategoryContentNode title="category1" />
-  '   <CategoryContentNode title="category2" />
-  '   <CategoryContentNode title="category3" />
-  '   ...
+  ' <CategoryContentNode json={...all contents info...}>
+  '   <CategoryContentNode id="featured">
+  '     <ContentNode id="37108" />
+  '     <ContentNode id="337825" />
+  '      ...
+  '   </CategoryContentNode>
+  '   <CategoryContentNode id="most_popular" />
+  '     <ContentNode id="346629" />
+  '     <ContentNode id="407698" />
+  '      ...
+  '   </CategoryContentNode>
   ' </CategoryContentNode>
   m.categoryContent = invalid
 
@@ -81,20 +89,49 @@ End Function
 
 
 ''''''''''''''''''''''''''''''
-' onCategoriesReceived
+' onHomescreenResponse
 '
-Function onCategoriesReceived()
-  tubiLog("CategoryScreen.onCategoriesReceived")
-  if m.top.categoryListResponse <> invalid then
-    response = m.top.categoryListResponse.response
+Function onHomescreenResponse()
+  tubiLog("CategoryScreen.onHomescreenResponse")
+  if m.top.homescreenResponse.response <> invalid then
+    response = m.top.homescreenResponse.response
     if response.code >= 200 and response.code < 300 then
-      m.categoryContent = m.top.categoryListResponse.convertedMetadata
-      adjustCategories()
+      m.categoryContent = m.top.homescreenResponse.convertedMetadata
       spinner = m.top.findNode("CategorySpinner")
       spinner.visible = false
+
+      'create a list of just the categories for the CategoryList menu component
+      categoryListContent = CreateObject("roSGNode", "CategoryContentNode")
+      categoryAA = {
+        title: ""
+        id: ""
+        children: []
+      }
+      for i=0 to m.categoryContent.getChildCount()-1
+        category = m.categoryContent.getChild(i)
+
+        'since we're already looping through the content, take advantage to set the user categories (queue, history)
+        if category.id = m.constants.ui.categoryIds.history
+          m.ContinueWatchingCategory = category
+        else if category.id = m.constants.ui.categoryIds.queue
+          m.MyQueueCategory = category
+        end if
+
+        if category <> invalid
+          categoryTitleAA = {
+            id: category.id
+            title: category.title
+            description: category.description
+            totalCount: category.totalCount   'we will need to update this later when we get the remaining content
+          }
+        end if
+        categoryAA.children.push(categoryTitleAA)
+      end for
+      categoryListContent.update(categoryAA)
+
       m.InfoPanel.mode = "category"
-      m.CategoryList.content = m.categoryContent
-      m.CategoryGridList.content = m.categoryContent  ' should be the category list
+      m.CategoryList.content = categoryListContent    ' should be all cateogories but with no content in them
+      m.CategoryGridList.content = m.categoryContent  ' should be all categories with initial amounts of content in them
       if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
     else
       testLog("Category list returned " + stri(response.code))
@@ -151,7 +188,7 @@ End Function
 Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("CategoryScreen.onKeyEvent")
   ' ignore keypresses until the screen content has shown up
-  if press and m.top.categoryListResponse <> invalid then
+  if press and m.top.homescreenResponse <> invalid then
     if (key = "right" or key = "ok") then
       m.top.categoryMenuVisible = false
       return true
@@ -189,8 +226,10 @@ Function showCategoryMenu()
     end if
     m.trackingCount = 0
     m.CategoryGridList.isFullWidth = false
+    m.top.backgroundUriList = [m.defaultBackgroundUri]
   end if
 End Function
+
 
 Function hideCategoryMenu()
   if m.CategoryList.isInFocusChain()
@@ -216,27 +255,15 @@ End Function
 Function adjustCategories() As Void
   if m.categoryContent = invalid then return
 
-  ' Force Featured to the top of the list
-  for i=0 to m.categoryContent.getChildCount()-1
-    category = m.categoryContent.getChild(i)
-    if category.title = "Featured"
-      if i > 0 then
-        m.categoryContent.removeChild(category)
-        m.categoryContent.insertChild(category, 0)
-      end if
-      exit for
-    end if
-  end for
-
   ' Add or remove user categories, taking care to only change them when necessary
   insert = 1
-  if m.top.signedIn and m.global.historyIds.getChildCount() > 0 and not m.categoryContent.isSameNode(m.ContinueWatchingCategory.getParent()) then
+  if m.top.signedIn and m.global.historyIds.getChildCount() > 0 and m.ContinueWatchingCategory <> invalid and not m.categoryContent.isSameNode(m.ContinueWatchingCategory.getParent()) then
     m.categoryContent.insertChild(m.ContinueWatchingCategory, insert)
     insert = insert + 1
   else if m.global.historyIds.getChildCount() = 0 and m.ContinueWatchingCategory.getParent() <> invalid then
     m.categoryContent.removeChild(m.ContinueWatchingCategory)
   end if
-  if m.top.signedIn and m.global.bookmarkIds.getChildCount() > 0 and not m.categoryContent.isSameNode(m.MyQueueCategory.getParent()) then
+  if m.top.signedIn and m.global.bookmarkIds.getChildCount() > 0 and m.MyQueueCategory <> invalid and not m.categoryContent.isSameNode(m.MyQueueCategory.getParent()) then
     m.categoryContent.insertChild(m.MyQueueCategory, insert)
   else if m.global.bookmarkIds.getChildCount() = 0 and m.MyQueueCategory.getParent() <> invalid then
     m.categoryContent.removeChild(m.MyQueueCategory)
@@ -253,11 +280,11 @@ End Function
 
 
 '''''''''''''''''''''
-' onCategoryMenuChange
+' onCategoryMenuItemFocused
 '
-' On category focus change, update the info panel
-Function onCategoryMenuChange() As Void
-  tubiLog("CategoryScreen.onCategoryMenuChange")
+' On category menu, item focus change, update the info panel
+Function onCategoryMenuItemFocused() As Void
+  tubiLog("CategoryScreen.onCategoryMenuItemFocused")
   if not m.CategoryList.isInFocusChain() or m.CategoryList.content = invalid then return
 
   infoMetadata = CreateObject("roSGNode", "CategoryContentNode")
@@ -266,17 +293,10 @@ Function onCategoryMenuChange() As Void
   if newCategory <> invalid
     infoMetadata.title = newCategory.title
     infoMetadata.description = newCategory.description
-  end if
-
-  if m.top.cachedContent <> invalid
-    referenceCategory = m.top.cachedContent.getChild(m.CategoryList.itemFocused)
-    if referenceCategory <> invalid
-      infoMetadata.totalCount = referenceCategory.getChildCount()
-    end if
+    infoMetadata.totalCount = newCategory.totalCount
   end if
 
   populateInfoPanel(m.InfoPanel, "category", infoMetadata)
-  m.top.backgroundUriList = [m.defaultBackgroundUri]
 
   'update the tracking URI for user tracking purposes
   catPos = (m.CategoryList.itemFocused + m.top.rowPlaceholder + 1).toStr()
@@ -336,10 +356,10 @@ Function onGridFocusChange() As Void
 
       ' Show the position dots
       totalCount = 0
-      if m.top.cachedContent <> invalid
-        referenceCategory = m.top.cachedContent.getChild(m.CategoryList.currFocusRow)
+      if m.categoryContent <> invalid
+        referenceCategory = m.categoryContent.findNode(m.constants.ui.categoryIds.featured)
         if referenceCategory <> invalid
-          totalCount = referenceCategory.getChildCount()
+          totalCount = referenceCategory.totalCount
         end if
       end if
       m.FeatureDots.removeChildrenIndex(m.FeatureDots.getChildCount(), 0)
@@ -390,7 +410,6 @@ Function onGridFocusChange() As Void
   col = col.toStr()
   catPos = catPos.toStr()
   m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug + row + col
-
 End Function
 
 Function onGridItemSelected() As Void
@@ -402,10 +421,30 @@ Function onGridItemSelected() As Void
   end if
 End Function
 
+
+Function onTotalCountsChange(msg)
+  tubiLog("CategoryScreen.onTotalCountsChange")
+  totalCountInfo = msg.getData()
+
+  for i=0 to totalCountInfo.count()-1
+    categoryInList = m.categoryContent.getChild(i)
+    categoryInList.totalCount = totalCountInfo[i]
+  end for
+
+  itemFocused = m.CategoryList.itemFocused
+  m.CategoryList.content = m.categoryContent
+  ' NOTE: Setting the content for the CategoryList forces a refresh of the
+  ' CategorySeasonListItems but the side effect is the MarkupGrid focuses
+  ' to the first item.  We counteract that here by explicitly setting
+  ' the focus.
+  m.CategoryList.jumpToItem = itemFocused
+End Function
+
+
 '''''''''''''''''''''
 ' loadAllCategories
 '
-' Load category list plus one populated category
+' Load all category content, including . Series do not have season or episode information though.
 Function loadAllCategories()
   tubiLog("CategoryScreen.loadAllCategories")
 
@@ -413,16 +452,19 @@ Function loadAllCategories()
   settings = m.global.constants.settings
   platform = m.global.constants.platform
   deviceInfo = m.global.constants.deviceInfo
-  url = m.global.constants.urls.cms.categories
+  url = m.global.constants.urls.matrix.homescreen
   options = {
     params: {
       "app_id": settings.shortAppName
       platform: platform
       "device_id": deviceInfo.deviceId
-      page_enabled: false
+      expand: 2
+      includeEmpty: true
+      limit: m.constants.performance.categoryGridList.initialBlockSize
     }
   }
-  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("categories", m.top, "categoryListResponse", url, "getAllCategories", options)
+  reqName = m.constants.reqNames.getHomescreen
+  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", url, reqName, options)
 End Function
 
 

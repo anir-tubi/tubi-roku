@@ -17,18 +17,12 @@
     <!-- MetadataFetchTask response for single category content -->
     <field id="categoryResponse" type="assocarray" alwaysNotify="true"/>
        
-    <!-- MetadataFetchTask response for category list -->
-    <field id="categoryListResponse" type="assocarray" alwaysNotify="true"/>
+    <!-- MetadataFetchTask response for matrix homescreen (all categories and content) -->
+    <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
     
     <!-- keeps the uri used for user tracking -->
     <field id="trackingUri" type="string"  value="/home" alwaysNotify="false"/>
     <field id="trackingCount" type="integer" />
-
-    <!-- will be populated with the full (unparsed) bookmark response -->
-    <field id="bookmarks" type="string" />
-    
-    <!-- will be populated with the full (unparsed) history response -->
-    <field id="history" type="string" />
 
     <!-- will be used to change the background images on the content controller -->
     <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
@@ -51,7 +45,6 @@
     <field id="firstPosterLoaded" alias="CategoryGridList.firstPosterLoaded"/>
 
     <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
-    <field id="cachedContent" alias="CategoryGridList.cachedContent" />
     
     <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
     <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
@@ -161,22 +154,6 @@
 
     <Group
       id="CategoryMenuAndGrid">
-
-      <!-- Special category menu items. These will be merged with category list -->
-      <ContentNode
-        id="SpecialCategories">
-        <!-- TubiContentNode here so it can contain the totalcount for the Info Panel -->
-        <CategoryContentNode
-          id="continue_watching"
-          type="category"
-          title="Continue Watching"
-          description="The Movies and TV Shows you have started watching can be found here"/>
-        <CategoryContentNode
-          id="queue"
-          type="category"
-          title="My Queue"
-          description="The Movies and TV Shows you have added to your Queue can be found here"/>
-      </ContentNode>
 
       <CommunicatingMarkupGrid
         id="CategoryList"

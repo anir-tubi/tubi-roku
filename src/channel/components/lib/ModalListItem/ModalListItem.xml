@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <!--
- - InstalledCategorySeasonListItem
- - This is a copy of the CategorySeasonListItem, only it is added to the installed pkg
- - and will not be able to be modified as part of the external component library.
+ - ModalListItem
  -
- - Items used in a MarkupGrid (like FilledButtonMarkupGrid) or RowList for showing categories.
+ - Items used in a MarkupGrid (like FilledButtonMarkupGrid) or RowList for showing modal buttons.
  -
  -->
 <component name="ModalListItem" extends="Group" >

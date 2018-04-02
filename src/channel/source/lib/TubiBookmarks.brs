@@ -14,8 +14,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object) a
     removeHistoryReq: tubiBookmarks_removeHistoryReq
     getInitialBookmarksReq: tubiBookmarks_getInitialBookmarksReq
     getInitialHistoryReq: tubiBookmarks_getInitialHistoryReq
-    getFullBookmarksReq: tubiBookmarks_getFullBookmarksReq
-    getFullHistoryReq: tubiBookmarks_getFullHistoryReq
     handleInitialBookmarks: tubiBookmarks_handleInitialBookmarks
     handleInitialHistory: tubiBookmarks_handleInitialHistory
     updateNowPos: tubiBookmarks_updateNowPos
@@ -23,7 +21,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object) a
     'private methods
     createBookmarksRequest: tubiBookmarks_createBookmarksRequest_
     createHistoryRequest: tubiBookmarks_createHistoryRequest_
-    getFullBookmarkOrHistory: tubiBookmarks_getFullBookmarkOrHistory_
   }
 End Function
 
@@ -261,63 +258,6 @@ function tubiBookmarks_getInitialHistoryReq(localId) as Object
 end function
 
 
-'returns a request to use to get the full data for all bookmarked content
-'@orderList: array, an array (typically stored on content controller) that has the order of all content in the user's bookmarks
-'                each item in the array looks like:
-'                           {
-'                             cid: contentId
-'                             type: contentType ("series" or "movie")
-'                           }
-function tubiBookmarks_getFullBookmarksReq(orderList as Object) as Object
-  fullBookmarksReq = m.getFullBookmarkOrHistory(orderList, m.constants.reqNames.getFullBookmarks)
-
-  return fullBookmarksReq
-end function
-
-
-
-'returns a request to use to get the full data for all content stored in a user's history
-'@orderList: array, an array (typically stored on content controller) that has the order of all content in the user's history
-'                each item in the array looks like:
-'                           {
-'                             cid: contentId
-'                             type: contentType ("series" or "movie")
-'                           }
-function tubiBookmarks_getFullHistoryReq(orderList as Object) as Object
-  tubiLog("TubiBookmarks.getFullHistoryReq")
-  fullHistoryReq = m.getFullBookmarkOrHistory(orderList, m.constants.reqNames.getFullHistory)
-  
-  return fullHistoryReq
-end function
-
-
-
-'@orderList: array of assocArrays, an array that contains basic information returned from the initial call to get bookmarks or history and 
-'                 retains the order of the contents
-'@reqName: string, the name that will be used by the request, also used to match the request in the metadataFetchTask
-'
-'returns an object that contains all the content for a metadataTaskThread, except the node and field properties (to be added after this function returns)
-function tubiBookmarks_getFullBookmarkOrHistory_(orderList as Object, reqName as String) as Object
-  ids = orderList.join(",")
-  fullReq = {
-    url: m.constants.urls.cms.contents
-    name: reqName
-    options: {
-      method: m.constants.reqTypes.get
-      headers: m.constants.headers.json
-      params: {
-        platform: m.constants.platform
-        "content_ids": ids
-        "page_enabled": false
-        fields: "*(id,type,title,duration,ratings,description,year,posterarts,subtitles,lang,url,publisher_id,actors,directors,tags,credit_cuepoints,backgrounds,has_trailer)"
-      }
-    }
-  }
-
-  return fullReq
-end function
-
-
 '@initialBookmarks: string, JSON server response when making the first call to UAPI to get a user's basic bookmark info
 'returns bookmarkIds ordered node tree with series having episode children
 function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
@@ -371,7 +311,6 @@ function tubiBookmarks_handleInitialHistory(initialHistory)
   end if
   return historyIds
 end function
-
 
 '@content: content, the video content (movie or episode)
 '@playerInfo: assocArray, contains the new nowPos as an integer and potentially a historyId as a string

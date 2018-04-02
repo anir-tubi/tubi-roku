@@ -13,8 +13,11 @@
     <field id="focusPercent" type="float" value="0.0"/>
     <field id="itemContent" type="node" />
     <field id="listHasFocus" type="boolean" value="false" />
+    <field id="gridHasFocus" type="boolean" value="false" />
+    <field id="rowListHasFocus" type="boolean" value="false" />
     <field id="width" type="float" value="425.0" />
     <field id="height" type="float" value="80.0" />
+    <field id="totalCount" alias="categoryCountText.text" />
   </interface>
   
   <children>
@@ -35,6 +38,7 @@
     <Group
       id="categoryCountGroup"
       opacity="0.0"
+      visible="false"
       translation="[361,16]">
       <Poster
         id="categoryCountBackground"

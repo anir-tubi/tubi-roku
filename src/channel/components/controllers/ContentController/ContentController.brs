@@ -639,7 +639,7 @@ Function startOnNow()
   m.appLoadStopwatch.mark()
   ' meta-screen, really just to allow screenstack to function.  we interact
   ' with the child groups directly instead of the parent group
-  m.homeScreen = CreateObject("roSGNode", "homeScreen")
+  m.homeScreen = CreateObject("roSGNode", "HomeScreen")
   m.homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
 
   m.toolsMenu = m.homeScreen.findNode("ToolsMenu")

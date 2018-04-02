@@ -18,6 +18,7 @@
     <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
 
     <interface>
       <!-- INPUT -->

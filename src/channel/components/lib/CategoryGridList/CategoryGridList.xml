@@ -14,6 +14,7 @@
 
 
   <interface>
+    <!-- INPUT -->
     <!--
     - 'content' should be a category list without content items, structured as:
     - <CategoryContentNode>
@@ -24,10 +25,6 @@
     - </CategoryContentNode>
     -->
     <field id="content" type="node"/>
-    <field id="itemSelected" type="node" alwaysNotify="true"/>
-    <field id="itemFocused" type="node" alwaysNotify="true"/>
-    <!-- array with the [x, y], where x is the category index and y is the content index -->
-    <field id="cursorPosition" alias="RowList.rowItemFocused" />
 
     <field id="animateToCategory" alias="RowList.animateToItem"/>
     <field id="jumpToRowItem" alias="RowList.jumpToRowItem"/>
@@ -37,6 +34,10 @@
     
     <!-- incoming metadata from MetadataFetchTask -->
     <field id="metadataFetchTaskBatch" type="assocarray" />
+
+    <!-- incoming metadata from MetadataFetchTask for single categories (non batched). These are currently not used. -->
+    <field id="remainingInCategoryResponse" type="assocarray" />
+    <field id="wholeCategoryResponse" type="assocarray" />
     
     <!-- if a fetch error occurred, error is set with the following information
      -      {
@@ -46,23 +47,30 @@
     -->
     <field id="error" type="assocarray" alwaysNotify="true" />
 
-    <!-- first category is loaded -->
-    <field id="firstPosterLoaded" type="boolean" value="false" />
-
     <!-- inbound interface so the UI can be updated based on if the category grid lists occupy
      -   the full width of the category screen (ie. the category menu is not showing).
      -   Assumes there are only 2 possible widths for the CategoryGridList, full width and not full width.
      -->
     <field id="isFullWidth" type="boolean" value="true" />
 
+
+    <!-- OUTPUT -->
+    <field id="itemSelected" type="node" alwaysNotify="true"/>
+    <field id="itemFocused" type="node" alwaysNotify="true"/>
+    <!-- array with the [x, y], where x is the category index and y is the content index -->
+    <field id="cursorPosition" alias="RowList.rowItemFocused" />
+
+    <!-- first category is loaded -->
+    <field id="firstPosterLoaded" type="boolean" value="false" />
+
+
     <field id="currFocusRow" alias="RowList.currFocusRow" />
 
-    <!-- READ-ONLY: Do not observe this since it will be constantly changing.  It's only used for
-      - contextual information about the focused or selected items.  Expect that all of the
-      - leaf nodes are abbreviated ContentNodes and not fully-translated TubiContentNodes.  Only
-      - expect on id and title to be valid.
-      -->
-    <field id="cachedContent" alias="RowList.content" />
+    <!-- holds an array of integers the indexes represent the category order, and the vaule represents the totalCount of the category.
+         When it is updated, category screen will update the total counts in the category menu
+     -->
+    <field id="categoryTotalCounts" type="intarray"/>
+
   </interface>
   
   <children>

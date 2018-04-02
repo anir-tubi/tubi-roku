@@ -197,10 +197,8 @@ Function getConstants()
   'the names of the registry memory sections that will save bookmark and previously viewed info
   constants.reqNames = {}
     constants.reqNames.searchAPI = "searchAPI"
+    constants.reqNames.getHomescreen = "getHomescreen"
     constants.reqNames.getCategory = "getCategory"
-    constants.reqNames.getAllCategories = "getAllCategories"
-    constants.reqNames.getFullBookmarks = "getFullBookmarks" 
-    constants.reqNames.getFullHistory = "getFullHistory"
     constants.reqNames.getSingleContent = "getSingleContent"
     constants.reqNames.getUpNextContent = "getUpNextContent"
     constants.reqNames.getRelatedContent = "getRelatedContent"
@@ -244,6 +242,13 @@ Function getConstants()
       constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
       constants.urls.cms.relatedContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/related"
 
+    'matrix url
+    constants.urls.matrix = {}
+      constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
+      constants.urls.matrix.homescreen = constants.urls.matrix.urlBase + "/homescreen"
+      constants.urls.matrix.container = constants.urls.matrix.urlBase + "/containers"
+
+
     'users url
     constants.urls.users = {}
       constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
@@ -267,9 +272,6 @@ Function getConstants()
       constants.urls.datascience.experiment = constants.urls.dataScience.urlBase + "/evaluate/namespaces"
       constants.urls.datascience.logging = constants.urls.dataScience.urlBase + "/logging"
 
-    'matrix API urls
-    constants.urls.matrix = {}
-      constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
 
     'live tv urls
     constants.urls.liveTv = {}
@@ -436,8 +438,10 @@ Function getConstants()
       constants.ui.categoryNames.queue = "My Queue"
 
     constants.ui.categoryIds = {}
+      'these map to matrix api container ids
       constants.ui.categoryIds.history = "continue_watching"
       constants.ui.categoryIds.queue = "queue"
+      constants.ui.categoryIds.featured = "featured"
 
     constants.ui.contentTypes = {}
       constants.ui.contentTypes.series = "series"
@@ -525,6 +529,7 @@ Function getConstants()
     ' Set some performance parementers based on device profile
     constants.performance = {}
       constants.performance.categoryGridList = {}
+      constants.performance.categoryGridList.initialBlockSize = 12
 
       if limitedUi
         ' Notes:
@@ -543,18 +548,19 @@ Function getConstants()
         '    3710X:   150 ms
         '    5000X:   160 ms
         if lowMemory
-          constants.performance.categoryGridList.blockSize = 50
+          constants.performance.categoryGridList.finalBlockSize = 50
         else
-          constants.performance.categoryGridList.blockSize = 200
+          constants.performance.categoryGridList.finalBlockSize = 200
         end if
         if fastCpu
           constants.performance.categoryGridList.categoryWindowSize = 10
         else
           constants.performance.categoryGridList.categoryWindowSize = 5
         end if
+        constants.performance.categoryGridList.initialBlockSize = 0
         constants.performance.categoryGridList.eagerLoad = false
       else
-        constants.performance.categoryGridList.blockSize = 200
+        constants.performance.categoryGridList.finalBlockSize = 200
         constants.performance.categoryGridList.categoryWindowSize = 10
         constants.performance.categoryGridList.eagerLoad = true
       end if

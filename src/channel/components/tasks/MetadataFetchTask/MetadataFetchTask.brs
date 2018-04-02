@@ -23,16 +23,26 @@ Function fetchLoop()
     end if
     tubiLog("WARNING: Rendezvous failed for constants")
   end while
+
+  ' get single feature poster value
+  m.singleFeaturePoster = false
+  if m.constants.ui.categoryScreen.singleFeaturePoster <> invalid
+     m.singleFeaturePoster = m.constants.ui.categoryScreen.singleFeaturePoster
+  else
+    m.singleFeaturePoster = (getExperimentValue("UserNamespace", "roku_single_feature_poster") = 1)
+  end if
+
   m.timespan = CreateObject("roTimeSpan")
   m.timespan.mark()
   m.epoch = m.timespan.TotalMilliseconds()
+  m.totalConversionTime = 0
 
   ' Ready the translator
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
 
   ' Prepare the auth module
   m.Request = TubiRequest()
-  m.Auth = TubiAuth(m.constants, m.Request)  
+  m.Auth = TubiAuth(m.constants, m.Request)
 
   ' Cache a few values we don't want to look up from m.global each call to translateRecursive.
   ' Timings here were reduced from 33ms to 2ms per content item by not referencing m.global in
@@ -64,6 +74,7 @@ End Function
 
 Function beginBatch(batchRequest) As Void
   tubiLog("MetadataFetchTask.beginBatch")
+  m.totalConversionTime = 0
   if type(batchRequest.node) <> "roSGNode" then
     tubiLog("MetadataFetchTask.beginBatch: invalid 'node' argument")
     return
@@ -184,21 +195,16 @@ Function handleResponse(message)
         'indicates a request from the details screen. this request needs to be handled slightly differently
         if handledRequest.context.name = m.constants.reqNames.getSingleContent
           handledRequest.convertedMetadata = translateDetailsMetadata(parsed)
-
-        'indicates a request for the full data for bookmarks - we need to handle differently because we may need to re-arrange content order
-        else if handledRequest.context.name = m.constants.reqNames.getFullBookmarks
-          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, handledRequest.context.sortOrder)
-        else if handledRequest.context.name = m.constants.reqNames.getFullHistory
-          handledRequest.convertedMetadata = translateBookmarkMetadata(parsed, handledRequest.context.sortOrder)
         else if handledRequest.context.name = m.constants.reqNames.getCategory
-          handledRequest.convertedMetadata = translateCategoryMetadata(parsed, handledRequest.response.data, handledRequest.context.isFeaturedCategory)
-        else if handledRequest.context.name = m.constants.reqNames.getAllCategories
-          handledRequest.convertedMetadata = translateAllCategoriesMetadata(parsed)
+          handledRequest.convertedMetadata = translateCategoryMetadata(parsed, handledRequest.response.data)
+        else if handledRequest.context.name = m.constants.reqNames.getHomescreen
+          handledRequest.convertedMetadata = translateHomescreenMetadata(parsed)
         else
           handledRequest.convertedMetadata = translateMetadata(parsed)
         end if
       end if
       convert_end_time = m.timespan.TotalMilliseconds()
+      m.totalConversionTime = m.totalConversionTime + (convert_end_time - request_end_time)
       handledRequest.id = handledRequest.context.id
       tubiLog("MetadataFetchTask convert duration = " + tostr(convert_end_time - request_end_time))
 
@@ -222,6 +228,8 @@ Function handleResponse(message)
         end for
         if completed = expected then
           success = context.node.setField(context.field, batchResponse)
+
+          tubiLog("MetadataFetchTask total conversion time = " + tostr(m.totalConversionTime))
           tubiLog("MetadataFetchTask rendezvous duration = " + tostr(m.timespan.TotalMilliseconds() - convert_end_time))
         else
           tubiLog("MetadataFetchTask completed " + stri(completed) + " of " + stri(expected))
@@ -249,56 +257,33 @@ End Function
 ' 1) Use ContentNode instead of TubiContentNode
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
-Function translateCategoryMetadata(contentToTranslate, json, isFeaturedCategory) As Object
+Function translateCategoryMetadata(contentToTranslate, fullJson) As Object
   translated = CreateObject("roSGNode", "CategoryContentNode")
+  container = contentToTranslate.container
+  contents = contentToTranslate.contents
+
+  contentsJson = getContentsJson(contents, fullJson)
+
   node_count = 0
-  if isFeaturedCategory = invalid then
-    isFeaturedCategory = false
-  end if
-  if contentToTranslate <> invalid and type(contentToTranslate) = "roAssociativeArray" and contentToTranslate.children <> invalid
-    updateMetadata = {
-      id: contentToTranslate.id
-      title: contentToTranslate.title
-      children: CreateObject("roArray", contentToTranslate.children.count(), false)
-      totalCount: contentToTranslate.children.count()
-      json: json
-      type: m.contentTypes.category
-    }
-    for each child in contentToTranslate.children
-      childAA = {
-        id: child.id
-        title: child.title
-        description: child.description
-        length: child.duration
-        subtype: "ContentNode"
-      }
-      if isFeaturedCategory = true and child.hero_images <> invalid then
-        childAA.hdgridposterurl = child.hero_images[0]
-      else if child.posterarts <> invalid then
-        childAA.hdgridposterurl = child.posterarts[0]
-      end if
-      ' normalize ids for series, should always be zero-prefixed
-      if child.type = "s" or child.type = "a"
-        childAA.id = "0" + child.id
-      end if
-      updateMetadata.children.push(childAA)
-    end for
-    translated.update(updateMetadata)
+  categoryMetadata = buildCategoryAA(container, contents, contentsJson)
+
+  if type(categoryMetadata) = "roAssociativeArray"
+    translated.update(categoryMetadata)
     node_count = 1 + translated.getChildCount()
-    ' Set a flag only on featured row content.  We do it here manually
-    ' to avoid having to define a custom content node which have
-    ' proven to be much slower to instantiate.  Could use some testing,
-    ' though.
-    if isFeaturedCategory = true
-      for i = 0 to translated.getChildCount()-1
-        child = translated.getChild(i)
-        child.addField("isFeaturedCategory", "boolean", false)
-        child.isFeaturedCategory = true
-      end for
-    end if
   end if
 
-  setTotalCount(translated)
+  ' Set a flag only on content with landscape posters.  We do it here manually
+  ' to avoid having to define a custom content node which have
+  ' proven to be much slower to instantiate.  Could use some testing,
+  ' though.
+  if container.id = m.constants.ui.categoryIds.featured and m.singleFeaturePoster <> true
+    for i = 0 to translated.getChildCount()-1
+      child = translated.getChild(i)
+      child.addField("isLandscape", "boolean", false)
+      child.isLandscape = true
+    end for
+  end if
+
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
 End Function
@@ -365,59 +350,149 @@ Function translateDetailsMetadata(contentToTranslate) As Object
 End Function
 
 
-Function translateAllCategoriesMetadata(contentToTranslate) As Object
+''''''''''''''''''''''
+' translateHomescreenMetadata
+' Translate the initial homescreen call to matrix api
+'
+' @contentToTranslate: roAssocArray, should have a form like:
+'                     {
+'                        containers: [
+'                           {
+'                             id: "featured"
+'                             children: ["37108", "337825", "304771"]
+'                             ...
+'                           }
+'                           {
+'                             id: "most_popular"
+'                             children: ["346629", "407698", "300175"]
+'                             ...
+'                           }
+'                        ],
+'                        contents: {
+'                           "37108": {
+'                               id: "37108"
+'                               title: ...
+'                           },
+'                           "337825": {
+'                               id: "337825"
+'                               title: ...
+'                           },
+'                           ...
+'                        }
+'                     }
+'
+' Returns a set of content meta data in the form below.
+' The ContentNodes will have a limited set of meta data, just enough to propagate the category grid.
+' The outer most CategoryContentNode's json field will be filled with the contents json
+' <CategoryContentNode json={...all contents info...}>
+'   <CategoryContentNode id="featured">
+'     <ContentNode id="37108" />
+'     <ContentNode id="337825" />
+'      ...
+'   </CategoryContentNode>
+'   <CategoryContentNode id="most_popular" />
+'     <ContentNode id="346629" />
+'     <ContentNode id="407698" />
+'      ...
+'   </CategoryContentNode>
+' </CategoryContentNode>
+'
+Function translateHomescreenMetadata(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "CategoryContentNode")
-  wrappedContent = {
+  homescreenAA = {
     id: ""
     title: ""
-    children: CreateObject("roArray", contentToTranslate.count(), false)
+    children: []    'categories
   }
-  for i=0 to contentToTranslate.count()-1
-    content = contentToTranslate[i]
-    if content.title <> "After Hours" or m.allowAfterHours = true
-      childAA = {
-        id: content.id
-        title: content.title
-        description: content.description
-        type: m.contentTypes.category
-      }
-      wrappedContent.children.push(childAA)
+
+  containers = contentToTranslate.containers
+  contents = contentToTranslate.contents
+
+  'set up AAs for all categories including any nested categories
+  for i=0 to containers.count()-1
+    container = containers[i]
+    if container.type <> "complex"
+      categoryAA = buildCategoryAA(container, contents)
+      homescreenAA.children.push(categoryAA)
+    else
+      for j=0 to container.children.count()-1
+        nestedContainer = container.children[j]
+        categoryAA = buildCategoryAA(nestedContainer, contents)
+        categoryAA.parentId = container.id
+        homescreenAA.children.push(categoryAA)
+      end for
     end if
   end for
-  translated.update(wrappedContent)
+
+  translated.update(homescreenAA)
   node_count = 1 + translated.getChildCount()
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
 End Function
 
+
 ''''''''''''''''''''''
-' translateBookmarkMetadata
+' buildCategoryAA
 '
-' Translates content from server into format that roku understands, specifically for bookmarks AND history
-' @sortOrder - array of string content ids to use for sorting the items in contentToTranslate
-Function translateBookmarkMetadata(contentToTranslate, sortOrder) As Object
-  wrappedContent = {
-    id: ""
-    title: ""
-    children: CreateObject("roArray", contentToTranslate.count(), false)
-  }
+' @container: assocArray, a single container as found in the matrix API
+' @contents: assocArray, a set of content meta data as found in the matrix API
+' @contentsJson: string, the JSON string of just the contents portion of the matrix API
+'
+' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
+Function buildCategoryAA(container, contents, contentsJson=invalid)
+  updateMetadata = {}
+  if type(container) = "roAssociativeArray" and type(contents) = "roAssociativeArray"
+    updateMetadata = {
+      id: container.id
+      title: container.title
+      description: container.description
+      children: CreateObject("roArray", container.children.count(), false)
+      totalCount: 0
+      offset: m.constants.performance.categoryGridList.initialBlockSize
+      type: m.contentTypes.category
+      json: ""
+      state: "partial"
+    }
 
-  for i=0 to sortOrder.count()-1
-    contentItem = contentToTranslate[sortOrder[i]]
-    if contentItem <> invalid then
-      wrappedContent.children.push(contentItem)
-      contentToTranslate.Delete(sortOrder[i])
-    end if
-  end for
+    jsonAA = {}
+    validCount = 0
+    for each child in container.children
+      ' contents[child].valid is "true" or "false" for user categories and is invalid for all other categories.
+      ' For all other categories, assume all contents are valid.
+      if contents[child] <> invalid and contents[child].valid <> false
+        fullChild = contents[child]
+        childAA = {
+          id: fullChild.id
+          title: fullChild.title
+          description: fullChild.description
+          length: fullChild.duration
+          subtype: "ContentNode"
+        }
+        if container.id = m.constants.ui.categoryIds.featured and m.singleFeaturePoster <> true and fullChild.hero_images <> invalid then
+          childAA.hdgridposterurl = fullChild.hero_images[0]
+        else if fullChild.posterarts <> invalid then
+          childAA.hdgridposterurl = fullChild.posterarts[0]
+        end if
 
-  ' remaining unsorted items will be appended
-  for each contentId in contentToTranslate
-    if contentToTranslate[contentId] <> invalid then
-      wrappedContent.children.push(contentToTranslate[contentId])
+        ' normalize ids for series, should always be zero-prefixed
+        if fullChild.type = "s" or fullChild.type = "a"
+          childAA.id = "0" + fullChild.id
+        end if
+        jsonAA[childAA.id] = fullChild
+        validCount += 1
+        updateMetadata.children.push(childAA)
+      end if
+    end for
+
+    updateMetadata.totalCount = validCount
+    if contentsJson <> invalid
+      updateMetadata.json = contentsJson
+    else
+      updateMetadata.json = FormatJSON(jsonAA)
     end if
-  end for
-  json = FormatJSON(wrappedContent)
-  return translateCategoryMetadata(wrappedContent, json, false)
+  end if
+
+  return updateMetadata
 End Function
 
 
@@ -433,4 +508,24 @@ Function setTotalCount(metadata As Object)
   if metadata.totalCount = -1 and metadata.getChildCount() <> 0 then
     metadata.totalCount = metadata.getChildCount()
   end if
+End Function
+
+
+'helper function to encapsulate getting the contents JSON from a matrix single container response
+Function getContentsJson(contents, fullJson)
+  contentsJson = invalid
+
+  'Doing string operations to isolate the contents portion of the JSON matrix response is considerably faster than re-formatting the JSON
+  contentsIdentifier =  Chr(34) + "contents" + Chr(34) + ":{"
+  contentsPos = Instr(0, fullJson, contentsIdentifier)
+  if contentsPos > 0
+    contentsJsonLength = fullJson.len() - contentsPos - contentsIdentifier.len() + 1
+    contentsJson = Mid(fullJson, contentsPos + contentsIdentifier.len()-1, contentsJsonLength)
+  else
+    'Do a Format JSON since we can't find the contents with our string search
+    tubiLog("Formatted JSON for category metadata", "warn", "clientWarn", "category-metadata-format-json")
+    contentsJson = FormatJSON(contents)
+  end if
+
+  return contentsJson
 End Function

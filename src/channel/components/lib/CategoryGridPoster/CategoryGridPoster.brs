@@ -23,7 +23,7 @@ Function onContentChange(data)
     m.poster.uri = m.top.itemContent.hdgridposterurl
     categoryContent = m.top.itemContent.getParent()
     if categoryContent <> invalid then
-      if m.top.itemContent.isFeaturedCategory <> invalid and m.top.itemContent.isFeaturedCategory
+      if m.top.itemContent.isLandscape = true
         m.title.visible = true
         m.title.text = m.top.itemContent.title
       else if categoryContent.title = "Continue Watching"

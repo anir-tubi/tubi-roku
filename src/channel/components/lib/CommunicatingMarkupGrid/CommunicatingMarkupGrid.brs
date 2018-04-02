@@ -19,7 +19,6 @@ Function onCurrFocusRowChange(msg)
       if newFocus < focusPos
         newFocus += 1
       end if
-      print newFocus
     end if
 
     m.top.rowScrollFocused = newFocus

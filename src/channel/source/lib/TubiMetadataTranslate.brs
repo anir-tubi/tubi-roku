@@ -255,23 +255,22 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 end Function
 
 
-' returns the full metadata of a single piece of content as stored within the category json returned from UAPI cms/categories endpoint
-' may return limited metadata for the single piece of content if json does not exist or cannot be parsed
+' returns the full metadata of a single piece of content as stored within the json for all contents as returned from matrix APIs.
+' may invalid if json does not exist or cannot be parsed
 '
 ' @category: a category tubiContentNode with full category content stored in json format on the .json field
-' @index: the index at which the desired content resides within the category
-Function tubiMetadataTranslate_getContentFromCategoryJson(category, index)
-  if category <> invalid and category.json <> invalid and category.json <> "" then
+' @contentId: string, an id for a piece of content (movie or series)
+Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
+  if category <> invalid and category.json <> invalid and category.json <> ""
     parsed = ParseJson(category.json)
-    if parsed <> invalid then
-      fullContent = parsed.children[index]
+    if parsed <> invalid
+      fullContent = parsed[contentId]
       translated = CreateObject("roSGNode", "TubiContentNode")
       m.translateRecursive(fullContent, translated)
       return translated
     end if
   end if
-  ' just return the abbreviated content.  This happens for user categories every time
-  return category.getChild(index)
+  return invalid
 End Function
 
 

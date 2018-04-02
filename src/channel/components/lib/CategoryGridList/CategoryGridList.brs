@@ -18,7 +18,8 @@ Function init()
 
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
-  m.blockSize = m.constants.performance.categoryGridList.blockSize
+  m.initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
+  m.finalBlockSize = m.constants.performance.categoryGridList.finalBlockSize
   m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
   m.eagerLoad = m.constants.performance.categoryGridList.eagerLoad
 
@@ -156,8 +157,15 @@ Function onContentChange()
     if m.top.content <> invalid then
       ' Clone here since we are replacing nodes within the category tree
       m.internalContent = cloneDeep(m.top.content)
+      m.RowList.content = m.internalContent
+      'At this point, there is a limited set (as defined in constants) of content in each category.
+      'loadCategories will get the rest of the content for each category.
       loadCategories(0)
       m.top.content.observeField("change", "onContentModify")
+
+      if m.top.firstPosterLoaded = false then
+        m.top.firstPosterLoaded = true
+      end if
     end if
   end if
 End Function
@@ -215,23 +223,23 @@ Function loadCategories(index) As Void
   end if
 
   requests = []
-
-  'Determine the window start and window size for lazy loading
+    'Determine the window start and window size for lazy loading
   windowInfo = getWindowInfo(index)
-
   if windowInfo <> invalid
     'Create requests for each category in the window
     for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
       category = m.internalContent.getChild(i)
-      ' If category.json is not empty, category is already loaded
-      if category <> invalid and category.state = "none" then
-        request = getRequest(category.id, i, "", m.blockSize)
+      if category <> invalid
+        request = invalid
+        if category.state = "partial" or category.state = "none"
+          request = getWholeCategoryRequest(category, "")
+        end if
         if request <> invalid then
           requests.push(request)
         end if
-        category.state = "loading"
       end if
     end for
+
     if requests.count() > 0 then
       m.global.metadataFetchTask.batchRequest = m.metadataFetchTaskDTO.createBatchRequest(m.top, "metadataFetchTaskBatch", requests)
     end if
@@ -247,7 +255,7 @@ Function getWindowInfo(index)
   if currentCategory <> invalid
     currentWindowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
     windowSize = m.categoryWindowSize
-    if currentCategory.state = "none"
+    if currentCategory.state = "partial" or currentCategory.state = "none"
       windowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
       if (index + 1) MOD m.categoryWindowSize = 0
         ' if the user lands on an empty category that is also the last category in its window,
@@ -273,10 +281,18 @@ End Function
 '
 ' @rowItemIndex is 2D array of [rowindex, itemindex] from RowList.rowItemSelected or m.RowList.rowItemFocused
 Function resolveAbbreviatedContent(rowItemIndex)
+  tubiLog("CategoryGridList.resolveAbbreviatedContent")
   if m.internalContent <> invalid
+    contentId = invalid
     category = m.internalContent.getChild(rowItemIndex[0])
-    if category <> invalid then
-      return m.metadataTranslate.getContentFromCategoryJson(category, rowItemIndex[1])
+    if category <> invalid
+      content = category.getChild(rowItemIndex[1])
+      if content <> invalid
+        contentId = content.id
+      end if
+    end if
+    if contentId <> invalid and contentId <> ""
+      return m.metadataTranslate.getContentFromCategoryJson(category, contentId) ' can return invalid
     end if
   end if
   return invalid
@@ -341,7 +357,19 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
     ' free references to the batch so that it can be garbage collected
     m.top.metadataFetchTaskBatch = invalid
   end if
+
+  counts = []
+  children = m.internalContent.getChildren(m.internalContent.getChildCount(), 0)
+  for each child in children
+    if child.totalCount <> invalid
+      counts.push(child.totalCount)
+    else
+      counts.push(0)
+    end if
+  end for
+  m.top.categoryTotalCounts = counts
 End Function
+
 
 Function mergeMetadata(fetched)
   ' TODO(Chris): handle this better.  if we set an error it should also be reset when the category is next fetched
@@ -360,140 +388,112 @@ Function mergeMetadata(fetched)
     else
       return -1
     end if
+  else if fetched.convertedMetadata <> invalid
+    newContent = fetched.convertedMetadata  'this is a category node filled with content children
   else
-    newContent = fetched.convertedMetadata
+    return -1
   end if
 
   tubiLog("Received response for request id " + fetched.id)
   index = -1
   categories = m.internalContent.getChildren(m.internalContent.getChildCount(), 0)
-  for i=0 to categories.count()-1
-    if categories[i].id = fetched.id then
-      index = i
-      exit for
-    end if
-  end for
-  parentCategory = m.internalContent.getChild(index)
+  if newContent.id <> invalid
+    for i=0 to categories.count()-1
+      if categories[i].id = newContent.id then
+        index = i
+        exit for
+      end if
+    end for
+    parentCategory = m.internalContent.getChild(index)
 
-  ' Check if a response arrives but the cache has been flushed and categories moved, such as adding or removing user categories
-  if parentCategory = invalid then
-    tubiLog("Ignoring response due to changed index " + fetched.id)
+    ' Check if a response arrives but the cache has been flushed and categories moved, such as adding or removing user categories
+    if parentCategory = invalid then
+      tubiLog("Ignoring response due to changed index " + fetched.id)
+      return -1
+    end if
+
+    newContent.state = "loaded"
+
+    'Add the existing preliminarily loaded contents to the newly received contents
+    m.internalContent.replaceChild(newContent, index)
+
+    ' If RowList gets content for a focused row, it doesn't automatically emit rowItemFocused so we manually handle that here
+    if index = m.RowList.rowItemFocused[0] then
+      'in the case of deleting a content from a user cateogry, we want to refocus on the next item in the category
+      item = m.RowList.rowItemFocused[1]
+      'in the case that the focused row was previously empty, make sure we focus on the first item
+      if m.RowList.rowItemFocused[1] = -1
+        item = 0
+      end if
+      m.RowList.jumpToRowItem = [index, item]
+    end if
+
+    return index
+  else
     return -1
   end if
+End Function
 
-  ' These fields don't come down with the category metadata parent
-  newContent.id = parentCategory.id
-  newContent.title = parentCategory.title
-  newContent.state = "loaded"
-  m.internalContent.replaceChild(newContent, index)
 
-  ' If RowList gets content for a focused row, it doesn't automatically emit rowItemFocused so we manually handle that here
-  if index = m.RowList.rowItemFocused[0] then
-    'in the case of deleting a content from a user cateogry, we want to refocus on the next item in the category
-    item = m.RowList.rowItemFocused[1]
-    'in the case that the focused row was previously empty, make sure we focus on the first item
-    if m.RowList.rowItemFocused[1] = -1
-      item = 0
+'''''''''''''''''''''
+' getWholeCategoryRequest
+'
+' Returns a request to get all the content for a category - used to refresh categories in their entirety
+Function getWholeCategoryRequest(category As Object, field="wholeCategoryResponse" As String)
+  if category <> invalid and type(category.id) = "roString"
+    categoryId = category.id
+    tubiLog("CategoryGridList.fetch whole" + categoryId)
+
+    categoryId = getFullCategoryId(category)
+    if categoryId <> invalid
+      limit = m.constants.performance.categoryGridList.finalBlockSize
+      url = m.constants.urls.matrix.container + "/" + categoryId
+      options = {
+        params: {
+          "app_id": m.constants.settings.shortAppName,
+          "platform": m.constants.platform,
+          "device_id": m.constants.deviceInfo.deviceId,
+          "expand": 1,
+          "cursor": 0,
+          "limit": limit
+        }
+      }
+
+      'this will be an auth request if the user is logged in
+      'auth request creation happens in metadataFetchTask
+      'auth request will add the userId param
+      request = m.metadataFetchTaskDTO.createRequest(category.id, m.top, field, url, m.constants.reqNames.getCategory, options)
+
+      if request = invalid then
+        tubiLog("CategoryGridList.fetch whole: Unvailable request for category " + categoryId)
+      else
+        tubiLog("CategoryGridList.fetch whole: Asking MetadataFetchTask for " + categoryId)
+      end if
+      return request
     end if
-    m.RowList.jumpToRowItem = [index, item]
   end if
-  if m.top.firstPosterLoaded = false then
-    m.top.firstPosterLoaded = true
-  end if
-  return index
+
+  return invalid
 End Function
 
 
 '''''''''''''''''''''
-' getRequest
+' getFullCategoryId
 '
-' Load a single category's content
-Function getRequest(categoryId As String, index As Integer, field="categoryResponse" As String, per_page=0 As Integer)
-  tubiLog("CategoryGridList.fetch " + categoryId)
-
-  if categoryId = m.constants.ui.categoryIds.queue or categoryId = m.constants.ui.categoryIds.history then
-    per_page = 0
+'
+' Helper function to build category ids for nested categories that matrix API can recognize
+' @category: sgNode, a CateogorContentNode
+' if a nested category returns an id in the form of 'parentCat/sub/childCat'
+' if not a nested category, returns the categoryId
+' if there is no categoryId, returns invalid
+Function getFullCategoryId(category)
+  categoryId = invalid
+  if type(category) = "roSGNode" and category.id <> ""
+    categoryId = category.id
+    if category.parentId <> invalid and category.parentId <> ""
+      categoryId = category.parentId + "/sub/" + category.id
+      ' categoryId = categoryId.encodeUriComponent()
+    end if
   end if
-
-  ' if there is already a request in the cache, just refresh its cache position
-  request = invalid
-  if categoryId = m.constants.ui.categoryIds.queue then
-    request = bookmarksRequest(categoryId, field)
-  else if categoryId = m.constants.ui.categoryIds.history then
-    request = historyRequest(categoryId, field)
-  else
-    request = categoryRequest(categoryId, field, categoryId, per_page)
-  end if
-
-  ' If global bookmark or history ids are unavailable then we will get invalid
-  if request = invalid then
-    tubiLog("CategoryGridList.fetch: Unvailable request for category " + categoryId)
-  else
-    tubiLog("CategoryGridList.fetch: Asking MetadataFetchTask for " + categoryId)
-  end if
-  return request
-End Function
-
-
-'''''''''''''''''''''
-' categoryRequest
-'
-'
-Function categoryRequest(requestId As String, field As String, categoryId As String, per_page As Integer) As Object
-  url = m.constants.urls.cms.categories
-  options = {
-    params: {
-      "app_id": m.constants.settings.shortAppName,
-      "platform": m.constants.platform,
-      "device_id": m.constants.deviceInfo.deviceId,
-      "cat_id": categoryId,
-      "all": false,
-      "page_enabled": true,
-      "page": 1,
-      "per_page": per_page
-    }
-  }
-  ' the isFeaturedCategory flag has the effect is that MFT returns landscape posters
-  if categoryId = "featured" and m.singleFeaturePoster <> true
-    isFeaturedCategory = true
-  else
-    isFeaturedCategory = false
-  end if
-  return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, url, m.constants.reqNames.getCategory, options, isFeaturedCategory)
-End Function
-
-
-'''''''''''''''''''''
-' historyRequest
-'
-' Load the user's history content for "Continue Watching"
-Function historyRequest(requestId As String, field As String) As Object
-  Request = TubiRequest()
-  Auth = TubiAuth(m.constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, m.constants)
-  historyIds = m.global.historyIds
-  idList = []
-  for i=0 to historyIds.getChildCount()-1
-    idList.push(historyIds.getChild(i).id)
-  end for
-  request = Bookmarks.getFullHistoryReq(idList)
-  return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, m.constants.reqNames.getFullHistory, request.options, false, idList)
-End Function
-
-
-'''''''''''''''''''''
-' bookmarksRequest
-'
-' Load the user's history content for "My Queue"
-Function bookmarksRequest(requestId As String, field As String) As Object
-  Request = TubiRequest()
-  Auth = TubiAuth(m.constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, m.constants)
-  bookmarkIds = m.global.bookmarkIds
-  idList = []
-  for i=0 to bookmarkIds.getChildCount()-1
-    idList.push(bookmarkIds.getChild(i).id)
-  end for
-  request = Bookmarks.getFullBookmarksReq(idList)
-  return m.metadataFetchTaskDTO.createRequest(requestId, m.top, field, request.url, m.constants.reqNames.getFullBookmarks, request.options, false, idList)
+  return categoryId
 End Function
