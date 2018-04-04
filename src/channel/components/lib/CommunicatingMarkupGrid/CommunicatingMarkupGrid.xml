@@ -11,6 +11,6 @@
 
   <interface>
     <!-- OUTPUT -->
-    <field id="rowScrollFocused" type="int" />
+    <field id="rowScrollFocused" type="int" value="-1" />
   </interface>
 </component>
