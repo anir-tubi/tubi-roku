@@ -146,7 +146,6 @@ Function refreshContent(nowPos)
     m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
     request = {
       contentId: content.id
-      ' TODO(Chris): Add userid here
     }
     m.refreshTask.request = request
     m.refreshTask.observeField("response", "onRefreshResponse")

@@ -104,7 +104,7 @@ Function onContentModify(message)
     m.internalContent.insertChild(new, change.index1)
     m.RowList.content = m.internalContent
     ' RowList doesn't update the focus row automatically so we do it here to keep cursor at the same spot
-    if rowItemFocused[0] <> -1 and change.index1 <= rowItemFocused[0]
+    if rowItemFocused[0] <> invalid and rowItemFocused[0] <> -1 and change.index1 <= rowItemFocused[0]
       rowItemFocused[0] = rowItemFocused[0] + 1
       m.RowList.jumpToRowItem = rowItemFocused
     end if
@@ -113,7 +113,7 @@ Function onContentModify(message)
     ' nodes between change.index1 and change.index2 inclusive were removed
     removed = m.internalContent.getChildren(change.index2-change.index1+1, change.index1)
     m.internalContent.removeChildrenIndex(change.index2-change.index1+1, change.index1)
-    if rowItemFocused[0] <> -1 and change.index1 < rowItemFocused[0]
+    if rowItemFocused[0] <> invalid and rowItemFocused[0] <> -1 and change.index1 < rowItemFocused[0]
       rowItemFocused[0] = rowItemFocused[0] - 1
       m.RowList.jumpToRowItem = rowItemFocused
     end if
@@ -135,7 +135,10 @@ Function onContentModify(message)
     '          field changes)
     ' NOTE: ignored for CategoryGridList
   end if
-  loadCategories(rowItemFocused[0])
+
+  if rowItemFocused[0] <> invalid
+    loadCategories(rowItemFocused[0])
+  end if
 End Function
 
 Function onContentChange()

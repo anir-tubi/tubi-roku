@@ -496,140 +496,143 @@ Function onKeyEvent(key As String, press As Boolean)
   if press
     m.lastButtonPressPos = m.playerPosition
 
-    if key = "OK"
-      if m.HUD.opacity = 0
-        showTransport()
-      else
-        'do action based on the current focused button
-        focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
-        if focusButtonId = m.SkipTrailerButton.id
-          handleSkipTrailer()
-        else if focusButtonId = m.StartButton.id
-          goToStart()
-        else if focusButtonId = m.RewindButton.id
-          handleRewind()
-        else if focusButtonId = m.HopBackButton.id
-          handleHopBack(false)
-        else if focusButtonId = m.PlayPauseButton.id
-          handlePlayPause()
-        else if focusButtonId = m.HopForwardButton.id
-          handleHopForward()
-        else if focusButtonId = m.FastForwardButton.id
-          handleFastForward()
-        else if focusButtonId = m.EndButton.id
-          goToEnd()
-        else if focusButtonId = m.ClosedCaption.id
-          handleClosedCaption()
-        end if
-      end if
-
-    else if key = "play" then
-      if m.PlayPauseButton.enabled then
-        handlePlayPause()
-      end if
-
-    else if key = "fastforward"
-      if m.FastForwardButton.enabled then
-        handleFastForward()
-      end if
-
-    else if key = "rewind"
-      if m.RewindButton.enabled then
-        handleRewind()
-      end if
-
-    else if key = "replay"
-      if m.HopBackButton.enabled then
-        handleHopBack(true)
-      end if
-
-    else if key = "options"
-      if m.ignoreOptionsKey = false then
-        showCCDialog()
-      end if
-
-    else if key = "left"
-      'video is in playback mode and user wants to skip back
-      if m.HUD.opacity = 0 and m.progressBarFocused = false
-        handleSkipVideo(-10, m.progressBarFocused)
-
-      'user is in skip ahead mode (the progress bar is focused) and wants to skip back.
-      else if m.progressBarFocused = true
-        handleSkipVideo(-10, m.progressBarFocused)
-
-      else
-        'navigate the transport buttons, skipping disabled ones
-        for i=m.focusedButtonIndex-1 to 0 step -1
-          button = m.TransportButtons.getChild(i)
-          if button.enabled then
-            setFocusedButton(button)
-            exit for
-          end if
-        end for
-      end if
-
-    else if key = "right"
-      'video is in playback mode and user wants to skip ahead
-      if m.HUD.opacity = 0 and m.progressBarFocused = false
-        handleSkipVideo(10, m.progressBarFocused)
-
-      'user is in skip ahead mode (the progress bar is focused) and wants to skip ahead.
-      else if m.progressBarFocused = true
-        handleSkipVideo(10, m.progressBarFocused)
-
-      else
-        'navigate the transport buttons, skipping disabled ones
-        for i=m.focusedButtonIndex+1 to m.TransportButtons.getChildCount()-1
-          button = m.TransportButtons.getChild(i)
-          if button.enabled then
-            setFocusedButton(button)
-            exit for
-          end if
-        end for
-      end if
-
-    else if key = "up"
-      if m.Overlay.opacity = 0
-        showTransport()
-      else if m.progressBarFocused = false
-        setFocusedButton(m.ProgressBar)
-      else if m.top.content <> invalid and m.top.content.isLiveTV = true then
-        if m.top.hasFocus()
-          focusVideoPicker(true)
-        end if
-      end if
-
-    else if key = "down"
-      if m.Overlay.opacity = 0
-        showTransport()
-      else if m.progressBarFocused = true
-        button = m.TransportButtons.getChild(m.focusedButtonIndex)
-        setFocusedButton(button)
-      else if m.top.content <> invalid and m.top.content.isLiveTV = true then
-        if not m.top.hasFocus()
-          focusVideoPicker(false)
-        end if
-      end if
-
-    else if key = "back" then
-      if m.VideoState = "play"
+    if isButtonPressAllowed(key)
+      if key = "OK"
         if m.HUD.opacity = 0
-          backButtonExit()
+          showTransport()
+        else
+          'do action based on the current focused button
+          focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
+          if focusButtonId = m.SkipTrailerButton.id
+            handleSkipTrailer()
+          else if focusButtonId = m.StartButton.id
+            goToStart()
+          else if focusButtonId = m.RewindButton.id
+            handleRewind()
+          else if focusButtonId = m.HopBackButton.id
+            handleHopBack(false)
+          else if focusButtonId = m.PlayPauseButton.id
+            handlePlayPause()
+          else if focusButtonId = m.HopForwardButton.id
+            handleHopForward()
+          else if focusButtonId = m.FastForwardButton.id
+            handleFastForward()
+          else if focusButtonId = m.EndButton.id
+            goToEnd()
+          else if focusButtonId = m.ClosedCaption.id
+            handleClosedCaption()
+          end if
+        end if
+
+      else if key = "play" then
+        if m.PlayPauseButton.enabled then
+          handlePlayPause()
+        end if
+
+      else if key = "fastforward"
+        if m.FastForwardButton.enabled then
+          handleFastForward()
+        end if
+
+      else if key = "rewind"
+        if m.RewindButton.enabled then
+          handleRewind()
+        end if
+
+      else if key = "replay"
+        if m.HopBackButton.enabled then
+          handleHopBack(true)
+        end if
+
+      else if key = "options"
+        if m.ignoreOptionsKey = false then
+          showCCDialog()
+        end if
+
+      else if key = "left"
+        'video is in playback mode and user wants to skip back
+        if m.HUD.opacity = 0 and m.progressBarFocused = false and isActiveVideoState()
+          handleSkipVideo(-10, m.progressBarFocused)
+
+        'user is in skip ahead mode (the progress bar is focused) and wants to skip back.
+        else if m.progressBarFocused = true and isActiveVideoState()
+          handleSkipVideo(-10, m.progressBarFocused)
 
         else
-          'close the transport
-          animateTransport("out")
-          resetTransportButtons()
+          'navigate the transport buttons, skipping disabled ones
+          for i=m.focusedButtonIndex-1 to 0 step -1
+            button = m.TransportButtons.getChild(i)
+            if button.enabled then
+              setFocusedButton(button)
+              exit for
+            end if
+          end for
         end if
 
-      else if m.VideoState = "pause"
-        resumeFromPause()
+      else if key = "right"
+        'video is in playback mode and user wants to skip ahead
+        if m.HUD.opacity = 0 and m.progressBarFocused = false and isActiveVideoState()
+          handleSkipVideo(10, m.progressBarFocused)
 
-      else if m.VideoState = "rew" or m.VideoState = "ffw"
-        setFocusedButton(m.PlayPauseButton)
-        endScrub()
+        'user is in skip ahead mode (the progress bar is focused) and wants to skip ahead.
+        else if m.progressBarFocused = true and isActiveVideoState()
+          handleSkipVideo(10, m.progressBarFocused)
+
+        else
+          'navigate the transport buttons, skipping disabled ones
+          for i=m.focusedButtonIndex+1 to m.TransportButtons.getChildCount()-1
+            button = m.TransportButtons.getChild(i)
+            if button.enabled then
+              setFocusedButton(button)
+              exit for
+            end if
+          end for
+        end if
+
+      else if key = "up"
+        if m.Overlay.opacity = 0
+          showTransport()
+        else if m.progressBarFocused = false
+          setFocusedButton(m.ProgressBar)
+        else if m.top.content <> invalid and m.top.content.isLiveTV = true then
+          if m.top.hasFocus()
+            focusVideoPicker(true)
+          end if
+        end if
+
+      else if key = "down"
+        if m.Overlay.opacity = 0
+          showTransport()
+        else if m.progressBarFocused = true
+          button = m.TransportButtons.getChild(m.focusedButtonIndex)
+          setFocusedButton(button)
+        else if m.top.content <> invalid and m.top.content.isLiveTV = true then
+          if not m.top.hasFocus()
+            focusVideoPicker(false)
+          end if
+        end if
+
+      else if key = "back" then
+        if m.VideoState = "play"
+          if m.HUD.opacity = 0
+            backButtonExit()
+
+          else
+            'close the transport
+            animateTransport("out")
+            resetTransportButtons()
+          end if
+
+        else if m.VideoState = "pause"
+          resumeFromPause()
+
+        else if m.VideoState = "rew" or m.VideoState = "ffw"
+          setFocusedButton(m.PlayPauseButton)
+          endScrub()
+        end if
       end if
     end if
+
   end if
   ' Consume all key presses
   return true
@@ -1271,4 +1274,41 @@ Function getPlayProgressEvent()
     value: m.playerPosition
     extraCtx: extraCtx
   }
+End Function
+
+
+' Helper function to determine if we should ignore or handle a button press
+' We don't want to handle button presses that affect video playback when the video is not loaded
+' Moving focus around the transport is ok though
+Function isButtonPressAllowed(key)
+  disabledKeys = {
+    OK: true
+    rewind: true
+    fastforward: true
+    play: true
+    replay: true
+    options: true
+  }
+
+  if not isActiveVideoState() and disabledKeys[key] = true
+    return false
+  else
+    return true
+  end if
+End Function
+
+
+' Helper function to determine if the video state is such that we should handle button presses
+' Currently we don't want to handle most button presses when m.VideoState is in the "refresh" or "stop" states
+Function isActiveVideoState()
+  disactiveStates = {
+    refresh: true
+    stop: true
+  }
+
+  if disactiveStates[m.VideoState] = true
+    return false
+  else
+    return true
+  end if
 End Function

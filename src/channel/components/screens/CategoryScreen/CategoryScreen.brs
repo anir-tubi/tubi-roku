@@ -260,12 +260,12 @@ Function adjustCategories() As Void
   if m.top.signedIn and m.global.historyIds.getChildCount() > 0 and m.ContinueWatchingCategory <> invalid and not m.categoryContent.isSameNode(m.ContinueWatchingCategory.getParent()) then
     m.categoryContent.insertChild(m.ContinueWatchingCategory, insert)
     insert = insert + 1
-  else if m.global.historyIds.getChildCount() = 0 and m.ContinueWatchingCategory.getParent() <> invalid then
+  else if m.global.historyIds.getChildCount() = 0 and m.ContinueWatchingCategory <> invalid and m.ContinueWatchingCategory.getParent() <> invalid then
     m.categoryContent.removeChild(m.ContinueWatchingCategory)
   end if
   if m.top.signedIn and m.global.bookmarkIds.getChildCount() > 0 and m.MyQueueCategory <> invalid and not m.categoryContent.isSameNode(m.MyQueueCategory.getParent()) then
     m.categoryContent.insertChild(m.MyQueueCategory, insert)
-  else if m.global.bookmarkIds.getChildCount() = 0 and m.MyQueueCategory.getParent() <> invalid then
+  else if m.global.bookmarkIds.getChildCount() = 0 and m.MyQueueCategory <> invalid and m.MyQueueCategory.getParent() <> invalid then
     m.categoryContent.removeChild(m.MyQueueCategory)
   end if
 End Function
