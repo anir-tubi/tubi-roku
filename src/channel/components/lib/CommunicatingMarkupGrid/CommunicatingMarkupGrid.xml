@@ -11,6 +11,6 @@
 
   <interface>
     <!-- OUTPUT -->
-    <field id="rowScrollFocused" type="int" value="-1" />
+    <field id="rowScrollFocused" type="int" alwaysNotify="true"/>
   </interface>
 </component>
