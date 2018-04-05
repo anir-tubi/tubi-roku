@@ -196,5 +196,25 @@
     <Timer
       id="CategoryRefreshTimer"
       repeat="true"/>
+
+    <Animation
+      id="Fades">
+      <!-- keyValues here are in relation to CategorGridList.currFocusRow when less than 1.0 -->
+      <FloatFieldInterpolator
+        id="HintGroupFade"
+        fieldToInterp="UpHintGroup.opacity"
+        key="[0.0,1.0]"
+        keyValue="[1.0,0.0]"/>
+      <FloatFieldInterpolator
+        id="InfoPanelFade"
+        fieldToInterp="InfoPanel.opacity"
+        key="[0.0,1.0]"
+        keyValue="[0.0,1.0]"/>
+      <FloatFieldInterpolator
+        id="FeatureInfoFade"
+        fieldToInterp="FeatureInfo.opacity"
+        key="[0.0,1.0]"
+        keyValue="[1.0,0.0]"/>
+    </Animation>
   </children>
 </component>

@@ -9,6 +9,10 @@ Function init()
   m.SpecialCategories = m.top.findNode("SpecialCategories")
   m.HintGroup = m.top.findNode("UpHintGroup")
   m.FeatureDots = m.top.findNode("FeatureDots")
+  fades = m.top.findNode("Fades")
+  m.InfoPanelFade = fades.findNode("InfoPanelFade")
+  m.FeatureInfoFade = fades.findNode("FeatureInfoFade")
+  m.HintGroupFade = fades.findNode("HintGroupFade")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
@@ -80,7 +84,6 @@ Function init()
     m.FeatureInfo.opacity = 0.0
     m.InfoPanel.opacity = 1.0
   end if
-
 
   onSignedInChange()  ' seed the search & sign in menu
 
@@ -317,26 +320,20 @@ Function onSignedInChange()
   adjustCategories()
 End Function
 
-
 Function onCurrFocusRow()
-  ' Note the effect when swapping info panels.  The old
-  ' one is immediately hidden while the new one fades in.
-  ' This has the cleanest visual effect.
-  if m.CategoryGridList.currFocusRow < 1.0 and m.HintGroup.opacity = 0
-    fade(m.HintGroup, "in", 0.4)
-    if m.singleFeaturePoster = true
-      fade(m.FeatureInfo, "in", 0.4)
-      if m.CategoryGridList.isInFocusChain()
-        ' If category menu is focused, info panel shows category description so don't hide it
-        m.InfoPanel.opacity = 0.0
-      end if
+  if m.CategoryGridList.currFocusRow >= 1
+    animationFraction = 1.0
+  else
+    animationFraction = m.CategoryGridList.currFocusRow
+  end if
+
+  m.HintGroupFade.fraction = animationFraction
+  if m.singleFeaturePoster = true
+    if m.CategoryGridList.isInFocusChain()
+      ' If category menu is focused, info panel shows category description so don't hide it
+      m.InfoPanelFade.fraction = animationFraction
     end if
-  else if m.CategoryGridList.currFocusRow > 0.0 and m.HintGroup.opacity = 1
-    fade(m.HintGroup, "out", 0.4)
-    if m.singleFeaturePoster = true
-      fade(m.InfoPanel, "in", 0.4)
-      m.FeatureInfo.opacity = 0.0
-    end if
+    m.FeatureInfoFade.fraction = animationFraction
   end if
 End Function
 
