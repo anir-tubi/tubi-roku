@@ -747,13 +747,18 @@ End Function
 ' onEpisodePosition
 '
 ' Update the resume position
+' This function triggers when the video stops as well as when m.videoPlayer.historyPosition is updated
 Function onEpisodePosition()
   tubiLog("ContentController.onEpisodePosition")
-  ' Only run a new task if the previous task is done.  Priority of resume states is
-  ' pretty low and we don't mind losing a few.
-  if m.updateHistoryTask.state <> "RUN" then
-    m.updateHistoryTask.nowPos = m.videoPlayer.historyPosition
-    m.updateHistoryTask.control = "RUN"
+  ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
+  history = m.global.historyIds.findNode(m.updateHistoryTask.content.id)
+  if history <> invalid or m.videoPlayer.historyPosition > m.constants.player.historyFrequency
+    ' Only run a new task if the previous task is done.  Priority of resume states is
+    ' pretty low and we don't mind losing a few.
+    if m.updateHistoryTask.state <> "RUN" then
+      m.updateHistoryTask.nowPos = m.videoPlayer.historyPosition
+      m.updateHistoryTask.control = "RUN"
+    end if
   end if
 End Function
 
