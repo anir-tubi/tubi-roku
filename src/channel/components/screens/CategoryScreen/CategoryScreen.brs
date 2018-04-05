@@ -317,7 +317,7 @@ End Function
 '
 Function onSignedInChange()
   tubiLog("CategoryScreen.onSignedInChange")
-  adjustCategories()
+  loadAllCategories()
 End Function
 
 Function onCurrFocusRow()
