@@ -445,7 +445,7 @@ End Function
 Function getWholeCategoryRequest(category As Object, field="wholeCategoryResponse" As String)
   if category <> invalid and type(category.id) = "roString"
     categoryId = category.id
-    tubiLog("CategoryGridList.fetch whole" + categoryId)
+    tubiLog("CategoryGridList.fetch whole " + categoryId)
 
     categoryId = getFullCategoryId(category)
     if categoryId <> invalid

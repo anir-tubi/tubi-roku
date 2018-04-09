@@ -6,7 +6,6 @@ Function init()
   m.CategoryList = m.top.findNode("CategoryList") 'aka category menu
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.FeatureInfo = m.top.findNode("FeatureInfo")
-  m.SpecialCategories = m.top.findNode("SpecialCategories")
   m.HintGroup = m.top.findNode("UpHintGroup")
   m.FeatureDots = m.top.findNode("FeatureDots")
   fades = m.top.findNode("Fades")
@@ -103,13 +102,6 @@ Function onHomescreenResponse()
       spinner = m.top.findNode("CategorySpinner")
       spinner.visible = false
 
-      'create a list of just the categories for the CategoryList menu component
-      categoryListContent = CreateObject("roSGNode", "CategoryContentNode")
-      categoryAA = {
-        title: ""
-        id: ""
-        children: []
-      }
       for i=0 to m.categoryContent.getChildCount()-1
         category = m.categoryContent.getChild(i)
 
@@ -120,20 +112,13 @@ Function onHomescreenResponse()
           m.MyQueueCategory = category
         end if
 
-        if category <> invalid
-          categoryTitleAA = {
-            id: category.id
-            title: category.title
-            description: category.description
-            totalCount: category.totalCount   'we will need to update this later when we get the remaining content
-          }
+        if m.ContinueWatchingCategory <> invalid and m.MyQueueCategory <> invalid
+          exit for
         end if
-        categoryAA.children.push(categoryTitleAA)
       end for
-      categoryListContent.update(categoryAA)
 
       m.InfoPanel.mode = "category"
-      m.CategoryList.content = categoryListContent    ' should be all cateogories but with no content in them
+      m.CategoryList.content = m.categoryContent    ' should be all cateogories but with no content in them
       m.CategoryGridList.content = m.categoryContent  ' should be all categories with initial amounts of content in them
       if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
     else
@@ -258,20 +243,41 @@ End Function
 Function adjustCategories() As Void
   if m.categoryContent = invalid then return
 
-  ' Add or remove user categories, taking care to only change them when necessary
   insert = 1
-  if m.top.signedIn and m.global.historyIds.getChildCount() > 0 and m.ContinueWatchingCategory <> invalid and not m.categoryContent.isSameNode(m.ContinueWatchingCategory.getParent()) then
-    m.categoryContent.insertChild(m.ContinueWatchingCategory, insert)
-    insert = insert + 1
-  else if m.global.historyIds.getChildCount() = 0 and m.ContinueWatchingCategory <> invalid and m.ContinueWatchingCategory.getParent() <> invalid then
-    m.categoryContent.removeChild(m.ContinueWatchingCategory)
+  ' Add or remove user categories, taking care to only change them when necessary
+  if m.top.signedIn and m.global.historyIds.getChildCount() > 0
+    if m.ContinueWatchingCategory = invalid
+      m.ContinueWatchingCategory = CreateObject("roSGNode", "CategoryContentNode")
+      m.ContinueWatchingCategory.id = m.constants.ui.categoryIds.history
+      m.ContinueWatchingCategory.title = m.constants.ui.categoryNames.history
+      m.ContinueWatchingCategory.state = "none"
+      m.categoryContent.insertChild(m.ContinueWatchingCategory, insert)
+    end if
+  else if m.global.historyIds.getChildCount() = 0 and m.ContinueWatchingCategory <> invalid
+    historyIndex = getChildIndexById(m.categoryContent, m.constants.ui.categoryIds.history)
+    m.categoryContent.removeChildIndex(historyIndex)
+    m.ContinueWatchingCategory = invalid
   end if
-  if m.top.signedIn and m.global.bookmarkIds.getChildCount() > 0 and m.MyQueueCategory <> invalid and not m.categoryContent.isSameNode(m.MyQueueCategory.getParent()) then
-    m.categoryContent.insertChild(m.MyQueueCategory, insert)
-  else if m.global.bookmarkIds.getChildCount() = 0 and m.MyQueueCategory <> invalid and m.MyQueueCategory.getParent() <> invalid then
-    m.categoryContent.removeChild(m.MyQueueCategory)
+
+  if m.top.signedIn and m.global.bookmarkIds.getChildCount() > 0
+    if m.MyQueueCategory = invalid
+      m.MyQueueCategory = CreateObject("roSGNode", "CategoryContentNode")
+      m.MyQueueCategory.id = m.constants.ui.categoryIds.queue
+      m.MyQueueCategory.title = m.constants.ui.categoryNames.queue
+      m.MyQueueCategory.state = "none"
+      historyIndex = getChildIndexById(m.categoryContent, m.constants.ui.categoryIds.history)
+      if historyIndex >= 0
+        insert = historyIndex + 1
+      end if
+      m.categoryContent.insertChild(m.MyQueueCategory, insert)
+    end if
+  else if m.global.bookmarkIds.getChildCount() = 0 and m.MyQueueCategory <> invalid
+    queueIndex = getChildIndexById(m.categoryContent, m.constants.ui.categoryIds.queue)
+    m.categoryContent.removeChildIndex(queueIndex)
+    m.MyQueueCategory = invalid
   end if
 End Function
+
 
 ' Use this trigger to synchronize menu and grid
 Function onCategoryListScrollFocused()

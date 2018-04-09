@@ -435,7 +435,7 @@ Function getConstants()
       constants.ui.categoryNames.signedOutTools = "Search & Sign In"
       constants.ui.categoryNames.signedInTools = "Search & Sign Out"
       constants.ui.categoryNames.history = "Continue Watching"
-      constants.ui.categoryNames.queue = "My Queue"
+      constants.ui.categoryNames.queue = "Queue"
 
     constants.ui.categoryIds = {}
       'these map to matrix api container ids
