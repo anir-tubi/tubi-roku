@@ -236,9 +236,11 @@ Function loadCategories(index) As Void
         request = invalid
         if category.state = "partial" or category.state = "none"
           request = getWholeCategoryRequest(category, "")
+          category.state = "loading"
         end if
         if request <> invalid then
           requests.push(request)
+          category.state = "loading"
         end if
       end if
     end for

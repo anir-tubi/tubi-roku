@@ -84,8 +84,6 @@ Function init()
     m.InfoPanel.opacity = 1.0
   end if
 
-  onSignedInChange()  ' seed the search & sign in menu
-
   loadAllCategories()
 End Function
 
@@ -323,7 +321,7 @@ End Function
 '
 Function onSignedInChange()
   tubiLog("CategoryScreen.onSignedInChange")
-  loadAllCategories()
+  onDirtyUserCategories()
 End Function
 
 Function onCurrFocusRow()
