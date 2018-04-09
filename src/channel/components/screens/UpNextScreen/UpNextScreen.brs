@@ -13,9 +13,10 @@ Function init()
   m.MovieGroup = m.top.findNode("MovieGroup")
   m.SeriesGroup = m.top.findNode("SeriesGroup")
   m.GridMovie = m.top.findNode("GridMovie")
-  m.GridMovie.observeField("itemFocused", "onItemFocused")
+  m.GridMovie.observeField("itemFocused", "onMovieItemFocused")
   m.GridMovie.observeField("itemSelected", "onMovieItemSelected")
   m.GridSeries = m.top.findNode("GridSeries")
+  m.GridSeries.observeField("itemFocused", "onSeriesItemFocused")
   m.GridSeries.observeField("itemSelected", "onSeriesItemSelected")
 
   focusBox = m.top.findNode("FocusBox")
@@ -71,7 +72,7 @@ Function init()
   m.GridMovie.targetSet = targetSet
 
   ' The seconds remaining
-  m.timeRemaining = m.global.constants.player.upNextCountdown 
+  m.timeRemaining = m.global.constants.player.upNextCountdown
 End Function
 
 Function onComponentFocus()
@@ -124,12 +125,21 @@ Function onKeyEvent(key, press)
   return false
 End Function
 
-Function onItemFocused()
-  tubiLog("UpNextScreen.onItemFocused")
-  if m.GridMovie.content <> invalid
-    content = m.GridMovie.content.getChild(m.GridMovie.itemFocused)
+Function onMovieItemFocused()
+  tubiLog("UpNextScreen.onMovieItemFocused")
+  itemFocusedHelper(m.GridMovie, m.InfoMovie)
+End Function
+
+Function onMovieItemSelected()
+  tubiLog("UpNextScreen.onMovieItemSelected")
+  m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemSelected)
+End Function
+
+Function itemFocusedHelper(grid, info)
+  if grid.content <> invalid
+    content = grid.content.getChild(grid.itemFocused)
     if content <> invalid
-      updateInfoPanel(m.InfoMovie, content)
+      updateInfoPanel(info, content)
       m.top.contentFocused = content
       ' reset countdown while user is interacting
       m.timeRemaining = m.global.constants.player.upNextCountdown
@@ -137,9 +147,9 @@ Function onItemFocused()
   end if
 End Function
 
-Function onMovieItemSelected()
-  tubiLog("UpNextScreen.onMovieItemSelected")
-  m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemSelected)
+Function onSeriesItemFocused()
+  tubiLog("UpNextScreen.onSeriesItemFocused")
+  itemFocusedHelper(m.GridSeries, m.InfoSeries)
 End Function
 
 Function onSeriesItemSelected()
@@ -148,9 +158,10 @@ Function onSeriesItemSelected()
 End Function
 
 Function onCountdownTimer()
-  tubiLog("UpNextScreen.onCountdownTimer")  
+  tubiLog("UpNextScreen.onCountdownTimer")
   m.timeRemaining = m.timeRemaining - 1
   if m.timeRemaining = 0
+    m.top.timeout = true
     if m.MovieGroup.visible
       m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemFocused)
     else

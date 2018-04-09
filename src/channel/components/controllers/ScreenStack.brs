@@ -15,6 +15,9 @@ End Function
 ' Back pressed on detail screen should close it
 Function onKeyEvent(key As String, press As Boolean)
   tubiLog("ScreenStack.onKeyEvent key = " + key)
+  if m.lastUserActivity <> invalid
+    m.lastUserActivity = Uptime(0)
+  end if
   if press then
     ' for autohide support, bring the UI back on any keypress
     if m.ScreenStack_.opacity < 1.0 and type(unAutohide) = "Function"

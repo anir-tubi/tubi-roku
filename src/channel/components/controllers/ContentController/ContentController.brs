@@ -68,6 +68,10 @@ Function init()
   m.autohideTimer.observeFieldScoped("fire", "onAutohide")
   m.spinner = m.top.findNode("ContentControllerSpinner")
 
+  m.inactivityTimer = m.top.findNode("InactivityTimer")
+  m.inactivityTimer.observeFieldScoped("fire", "onInactivityTimer")
+  m.inactivityTimer.control = "start"
+
   m.appLoadStopwatch = CreateObject("roTimespan")
 
   ' Array of detail screen content for it to behave as a virtual stack.
@@ -88,6 +92,9 @@ Function init()
   ' Set to the category id when content is launched from category screen,
   ' or set to invalid elsewhere
   m.autoplayContext = invalid
+
+
+  m.lastUserActivity = Uptime(0)  ' arbitrary marker when user last pressed a remote key
 
   ' We only show this message once per session for signed-out users
   m.promptSignInOnGuestPlay = false
@@ -140,6 +147,74 @@ Function onComponentFocus()
       currentScreen().setFocus(true)
     end if
   end if
+End Function
+
+Function onInactivityTimer()
+  tubiLog("ContentController.onInactivityTimer")
+  now = Uptime(0)
+  if (now - m.lastUserActivity > m.constants.timers.stillWatchingTimeout) and m.videoPlayer.visible = true
+    if m.inactivityModal = invalid
+      ' Don't invoke this during an ad break or while upNext is visible.  Also if it's just been paused leave it.
+      if m.videoPlayer.adState <> "adsplaying" and m.videoPlayer.state = "playing" and m.upNextScreen = invalid
+        m.videoPlayer.control = "pause"
+        m.inactivityModal = showModal("Are you still watching?", "", ["Yes", "No"], "onInactivityButton", false)
+        m.inactivityModal.observeField("exitButton", "onInactivityClose")
+
+        m.trackingLoggingTask.trackEvent = {
+          trackType: "generic"
+          value: "still_watching"
+          ctx: "still_watching_shown"
+        }
+      end if
+    else if (now - m.lastUserActivity - m.constants.timers.stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
+      closeInactivityModal()
+      m.videoPlayer.control = "resume"
+      m.trackingLoggingTask.trackEvent = {
+        trackType: "generic"
+        value: "still_watching"
+        ctx: "still_watching_timeout"
+      }
+    end if
+  end if
+End Function
+
+Function onInactivityClose()
+  tubiLog("ContentController.onInactivityButton")
+  closeInactivityModal()
+  m.videoPlayer.control = "resume"
+  m.trackingLoggingTask.trackEvent = {
+    trackType: "generic"
+    value: "still_watching"
+    ' Interpret a "back" button press as a 'yes'
+    ctx: "still_watching_yes"
+  }
+End Function
+
+Function onInactivityButton()
+  tubiLog("ContentController.onInactivityButton")
+  button = m.inactivityModal.buttonSelected
+  closeInactivityModal()
+  if button = 0
+    m.videoPlayer.control = "resume"
+    ctx = "still_watching_yes"
+  else
+    returnToDetailScreenFromVideo(m.constants.player.playerResults.closed)
+    ctx = "still_watching_no"
+  end if
+  m.trackingLoggingTask.trackEvent = {
+    trackType: "generic"
+    value: "still_watching"
+    ctx: ctx
+  }
+End Function
+
+Function closeInactivityModal()
+  tubiLog("ContentController.closeInactivityModal")
+  closeModal(m.inactivityModal)
+  m.inactivityModal = invalid
+  ' Just reset it here for now.  Requirements are to dismiss the modal, not
+  ' to take any action like stop playback
+  m.lastUserActivity = Uptime(0)
 End Function
 
 ''''''''''''''''''''''
@@ -769,13 +844,15 @@ Function onEpisodeCredits()
   if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
     if m.upNextTask.response.getChildCount() > 0
       if m.upNextScreen <> invalid
-        m.upNextScreen.unobserveField("contentSelected", "onUpNextContentSelected")
-        m.upNextScreen.unobserveField("backPressed", "onUpNextBackPressed")
+        m.upNextScreen.unobserveField("contentSelected")
+        m.upNextScreen.unobserveField("timeout")
+        m.upNextScreen.unobserveField("backPressed")
         m.upNextScreen = invalid
       end if
       m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
       m.upNextScreen.observeField("contentSelected", "onUpNextContentSelected")
       m.upNextScreen.observeField("backPressed", "onUpNextBackPressed")
+      m.upNextScreen.observeField("timeout", "onUpNextTimeout")
       m.upNextScreen.content = m.upNextTask.response
       pushScreen(m.upNextScreen, true)
       m.ScreenStack.visible = true
@@ -783,19 +860,28 @@ Function onEpisodeCredits()
   end if
 End Function
 
-' Triggered by either a button press or by timer expiration
-Function onUpNextContentSelected()
-  tubiLog("ContentController.onUpNextContentSelected")
-  content = m.upNextScreen.contentSelected
+Function playUpNextContent(nextContent)
   oldContent = m.videoPlayer.content
-
-  content = addSeriesTitle(content, oldContent)
+  content = addSeriesTitle(nextContent, oldContent)
   stopVideoContent(m.constants.player.playerResults.completed, false)
   playVideoContent(content, true)
   popScreen()
   m.upNextScreen.unobserveField("contentSelected")
+  m.upNextScreen.unobserveField("timeout")
   m.upNextScreen.unobserveField("backPressed")
   m.upNextScreen = invalid
+End Function
+
+Function onUpNextTimeout()
+  tubiLog("ContentController.onUpNextTimeout")
+  playUpNextContent(m.upNextScreen.contentFocused)
+End Function
+
+' Triggered by either a button press or by timer expiration
+Function onUpNextContentSelected()
+  tubiLog("ContentController.onUpNextContentSelected")
+  playUpNextContent(m.upNextScreen.contentSelected)
+  m.lastUserActivity = Uptime(0)
 End Function
 
 Function onUpNextBackPressed()
@@ -812,6 +898,7 @@ Function onUpNextBackPressed()
     m.ScreenStack.visible = false
     m.videoPlayer.setFocus(true)
   end if
+  m.lastUserActivity = Uptime(0)
 End Function
 
 Function onVideoPlayerState(msg)

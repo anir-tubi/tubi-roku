@@ -486,8 +486,9 @@ Function onControlChange()
       m.top.adControl = "stop"
     end if
   else if m.top.control = "pause" then
-    m.Video.control = "pause"
-    m.VideoState = "pause"
+    pauseVideo(false)
+  else if m.top.control = "resume" and m.Video.state = "paused" then
+    resumeFromPause()
   end if
 End Function
 
@@ -632,10 +633,12 @@ Function onKeyEvent(key As String, press As Boolean)
         end if
       end if
     end if
-
+    ' Consume all key presses
+    return true
   end if
-  ' Consume all key presses
-  return true
+  ' Allow unconsumed keypress to trickle up to ContentController, which is using
+  ' keypresses to reset an inactivity timer
+  return false
 End Function
 
 

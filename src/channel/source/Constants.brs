@@ -326,6 +326,10 @@ Function getConstants()
     ' Time in seconds after which we force a refresh of the categoryscreen
     constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
 
+    ' Time in seconds after which we pop up the modal to ask the user if they are still watching
+    constants.timers.stillWatchingTimeout = 5 * 60 * 60
+    constants.timers.stillWatchingDismissTimeout = 10 * 60
+
   'constants needed for the video player
   constants.player = {}
 

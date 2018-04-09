@@ -9,6 +9,8 @@
       -->
     <field id="contentFocused" type="node"/>
     <field id="contentSelected" type="node" alwaysNotify="true"/>
+    <!-- The countdown timer expired -->
+    <field id="timeout" type="boolean" alwaysNotify="true"/>
     <field id="backPressed" type="boolean" alwaysNotify="true"/>
     
     <!--

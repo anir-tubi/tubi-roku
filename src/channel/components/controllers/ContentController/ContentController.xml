@@ -87,6 +87,11 @@
       <Timer
        id="AutohideTimer"/>
 
+      <Timer
+       id="InactivityTimer"
+       duration="10"
+       repeat="true"/>
+
       <!-- Spinner primarily for sign-in/sign-out transitions -->
       <Spinner
         id="ContentControllerSpinner"

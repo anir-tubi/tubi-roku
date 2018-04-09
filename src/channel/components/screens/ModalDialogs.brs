@@ -59,7 +59,8 @@ End Function
 '''''''''''''''''''''''
 ' showModal
 '
-Function showModal(title, message, buttons, callbackName)
+' Returns the newly created modal, in case the caller needs to forcefully close it
+Function showModal(title, message, buttons, callbackName, backToExit=true)
   modal = CreateObject("roSGNode", "ModalDialogScreen")
   modal.title = title
   modal.message = message
@@ -68,27 +69,41 @@ Function showModal(title, message, buttons, callbackName)
   ' NOTE! the closeModal callback must be observed AFTER the "callbackName"
   modal.observeField("buttonSelected", callbackName)
   modal.observeField("buttonSelected", "closeModal")
-  modal.observeField("exitButton", "closeModal")
+  if backToExit = true
+    modal.observeField("exitButton", "closeModal")
+  end if
   modal.setFocus(true)
+  return modal
 End Function
 
+
+'''''''''''''''''''''''
+' closeModal
+'
 ' Used in conjuction with showExitAppModal or showSignOutModal
 '
-' @modalNode: SGNode, a modal node as returned by one of the above function calls
+' @msg: a modal node reference, or a roSGNodeEvent if triggered as a callback
 ' side effects are removing focus from the modal and removing the modal from it's parent
 ' returns invalid
 Function closeModal(msg)
-  modalNode = msg.getRoSGNode()
-  focus = false
-  if modalNode.isInFocusChain()
-    modalNode.setFocus(false)
-    focus = true
+  if type(msg) = "roSGNode"
+    modalNode = msg  '
+  else if type(msg) = "roSGNodeEvent"
+    modalNode = msg.getRoSGNode()
   end if
-  modalNode.unobserveField("buttonSelected")
-  modalNode.unobserveField("exitButton")
-  m.top.removeChild(modalNode)
-  if focus
-    m.top.setFocus(true)
+
+  if modalNode <> invalid
+    focus = false
+    if modalNode.isInFocusChain()
+      modalNode.setFocus(false)
+      focus = true
+    end if
+    modalNode.unobserveField("buttonSelected")
+    modalNode.unobserveField("exitButton")
+    m.top.removeChild(modalNode)
+    if focus
+      m.top.setFocus(true)
+    end if
   end if
   return invalid
 End Function
