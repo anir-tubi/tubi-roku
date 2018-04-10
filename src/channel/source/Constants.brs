@@ -166,9 +166,34 @@ Function getConstants()
     end for
     clientVersion = clientVersion + "local"
 
-    constants.deviceInfo.deviceId = di.GetDeviceUniqueId()
-    constants.deviceInfo.deviceAdId = di.GetAdvertisingId()
-    constants.deviceInfo.isAdIdTrackingDisabled = di.IsAdIdTrackingDisabled()
+    'Use newer APIs over deprecated APIs when appropriate
+    deviceInfoRegSection = "deviceinfo"
+    if FindMemberFunction(di, "GetDeviceUniqueId") <> invalid
+      constants.deviceInfo.deviceId = di.GetDeviceUniqueId()
+      RegWrite("deviceId", constants.deviceInfo.deviceId, deviceInfoRegSection)
+    else if FindMemberFunction(di, "GetChannelClientId") <> invalid
+      storedDeviceId = RegRead("deviceId", deviceInfoRegSection)
+      if storedDeviceId <> invalid
+        constants.deviceInfo.deviceId = storedDeviceId
+      else
+        constants.deviceInfo.deviceId = di.GetChannelClientId()
+      end if
+    else
+      constants.deviceInfo.deviceId = "noid"
+    end if
+
+    if FindMemberFunction(di, "GetRIDA") <> invalid
+      constants.deviceInfo.deviceAdId = di.GetRIDA()
+    else
+      constants.deviceInfo.deviceAdId = di.GetAdvertisingId()
+    end if
+
+    if FindMemberFunction(di, "IsRIDADisabled") <> invalid
+      constants.deviceInfo.isAdIdTrackingDisabled = di.IsRIDADisabled()
+    else
+      constants.deviceInfo.isAdIdTrackingDisabled = di.IsAdIdTrackingDisabled()
+    end if
+
     constants.deviceInfo.ipAddresses = di.GetIPAddrs() 'array of network interface ip addresses (normally will only contain 1 element)
     constants.deviceInfo.firmwareVersion = firmwareVersion
     constants.deviceInfo.firmwareBuild = firmwareBuild
