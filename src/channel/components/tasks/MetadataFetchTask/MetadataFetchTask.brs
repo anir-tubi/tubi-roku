@@ -16,6 +16,8 @@ Function fetchLoop()
   m.top.observeField("request", m.port)
   m.top.observeField("batchRequest", m.port)
   m.top.observeField("cancel", m.port)
+  m.top.observeField("historyIds", m.port)
+  m.top.observeField("bookmarkIds", m.port)
   while true
     m.constants = m.global.getField("constants")   ' this should grab a thread-local copy
     if m.constants <> invalid then
@@ -64,6 +66,10 @@ Function fetchLoop()
         beginBatch(msg.GetData())
       else if msg.GetField() = "cancel" then
         cancelRequests(msg.GetData())
+      else if msg.GetField() = "historyIds"
+        m.historyIds = msg.GetData()
+      else if msg.GetField() = "bookmarkIds"
+        m.bookmarkIds = msg.GetData()
       end if
     else if type(msg) = "roUrlEvent" then
       handleResponse(msg)
@@ -461,26 +467,43 @@ Function buildCategoryAA(container, contents, contentsJson=invalid)
       ' For all other categories, assume all contents are valid.
       if contents[child] <> invalid and contents[child].valid <> false
         fullChild = contents[child]
-        childAA = {
-          id: fullChild.id
-          title: fullChild.title
-          description: fullChild.description
-          length: fullChild.duration
-          subtype: "ContentNode"
-        }
-        if container.id = m.constants.ui.categoryIds.featured and m.singleFeaturePoster <> true and fullChild.hero_images <> invalid then
-          childAA.hdgridposterurl = fullChild.hero_images[0]
-        else if fullChild.posterarts <> invalid then
-          childAA.hdgridposterurl = fullChild.posterarts[0]
+
+        ' Skip any queue or history contents that we don't have a queue or history id for
+        ' This ensures that our channel is internally consistent, and we don't end up adding content to history or queue
+        ' to which we don't add the remove from history/queue buttons (history/queue id is used to determine to add those buttons)
+        skip = false
+        if container.id = m.constants.ui.categoryIds.queue
+          if m.bookmarkIds[fullChild.id] <> true and m.bookmarkIds["0" + fullChild.id] <> true
+            skip = true
+          end if
+        else if container.id = m.constants.ui.categoryIds.history
+          if m.historyIds[fullChild.id] <> true and m.historyIds["0" + fullChild.id] <> true
+            skip = true
+          end if
         end if
 
-        ' normalize ids for series, should always be zero-prefixed
-        if fullChild.type = "s" or fullChild.type = "a"
-          childAA.id = "0" + fullChild.id
+        if skip = false
+          childAA = {
+            id: fullChild.id
+            title: fullChild.title
+            description: fullChild.description
+            length: fullChild.duration
+            subtype: "ContentNode"
+          }
+          if container.id = m.constants.ui.categoryIds.featured and m.singleFeaturePoster <> true and fullChild.hero_images <> invalid then
+            childAA.hdgridposterurl = fullChild.hero_images[0]
+          else if fullChild.posterarts <> invalid then
+            childAA.hdgridposterurl = fullChild.posterarts[0]
+          end if
+
+          ' normalize ids for series, should always be zero-prefixed
+          if fullChild.type = "s" or fullChild.type = "a"
+            childAA.id = "0" + fullChild.id
+          end if
+          jsonAA[childAA.id] = fullChild
+          validCount += 1
+          updateMetadata.children.push(childAA)
         end if
-        jsonAA[childAA.id] = fullChild
-        validCount += 1
-        updateMetadata.children.push(childAA)
       end if
     end for
 

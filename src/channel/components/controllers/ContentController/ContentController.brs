@@ -32,6 +32,9 @@ Function init()
   m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
   m.global.addField("historyIds", "node", false)
   m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
+  m.global.observeField("bookmarkIds", "onBookmarkIdsUpdate")
+  m.global.observeField("historyIds", "onHistoryIdsUpdate")
+
   ' NOTE: global authInfo is mostly a formality since TubiAuth currently reads values from the registry, so
   '       places that need authInfo don't need to reference m.global.
   m.global.addField("authInfo", "assocarray", false)
@@ -415,6 +418,7 @@ Function onAuthInfoReceived()
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
+
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
@@ -1308,4 +1312,19 @@ Function addSeriesTitle(content, oldContent)
   end if
 
   return content
+End Function
+
+
+'pass the boomarkIds as an AA to the metadatafetch task
+Function onBookmarkIdsUpdate()
+  tubiLog("ContentController.onBookmarkIdsUpdate")
+  bookmarkIdsAA = convertNodesToIdsAA(m.global.bookmarkIds)
+  m.metadataFetchTask.bookmarkIds = bookmarkIdsAA
+End Function
+
+'pass the historyIds as an AA to the metadatafetch task
+Function onHistoryIdsUpdate()
+  tubiLog("ContentController.onHistoryIdsUpdate")
+  historyIdsAA = convertNodesToIdsAA(m.global.historyIds)
+  m.metadataFetchTask.historyIds = historyIdsAA
 End Function

@@ -66,3 +66,52 @@ Function unobserveAllScoped(node)
     end for
   end if
 End Function
+
+
+'Given a parent node, return an AA of consisting of ids of the 1st level children nodes:
+' {
+'   childId1: true
+'   childId2: true
+'   ...
+' }
+'
+Function convertNodesToIdsAA(parent)
+  ids = {}
+  convertNodesTimer = CreateObject("roTimeSpan")
+
+  children = parent.getChildren(parent.getChildCount(), 0)
+  for each child in children
+    ids[child.id] = true
+  end for
+
+  return ids
+End Function
+
+
+' Clones the parent node and inserts the child node at the given index.
+' Returns an updated copy of the original parent node or the unchanged parent node if the insert didn't work
+Function immutableInsertChild(parent as object, child as object, index as Integer)
+  clonedParent = cloneDeep(parent)
+  inserted = clonedParent.insertChild(child, index)
+  if inserted <> true then return parent
+  return clonedParent
+End Function
+
+
+' Clones the parent node and removes the child node at the given index.
+' Returns an updated copy of the original parent node or the unchanged parent node if the removal didn't work
+Function immutableRemoveChildIndex(parent as object, index as Integer)
+  clonedParent = cloneDeep(parent)
+  removed = clonedParent.removeChildIndex(index)
+  if removed <> true then return parent
+  return clonedParent
+End Function
+
+
+' Clones the parent node and removes the child node
+' Returns an updated copy of the original parent node or the unchanged parent node if the removal didn't work
+Function immutableRemoveChild(parent as object, child as object)
+  childIndex = getChildIndex(parent, child)
+  clonedParent = immutableRemoveChildIndex(parent, childIndex)
+  return clonedParent
+End Function

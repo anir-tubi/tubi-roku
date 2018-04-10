@@ -318,7 +318,7 @@ Function onBookmarked() As Void
     newBookmark.id = contentAndIndex.content.id
     newBookmark.type = contentAndIndex.content.type
     newBookmark.bookmarkId = bookmarkId
-    m.global.bookmarkIds.insertChild(newBookmark, 0)
+    m.global.bookmarkIds = immutableInsertChild(m.global.bookmarkIds, newBookmark, 0)
     m.detailScreen.isBookmark = true
     m.detailScreen.isWaitingForServerResponse = false
 
@@ -381,7 +381,9 @@ Function onBookmarkRemoved() As Void
   if contentAndIndex <> invalid and contentAndIndex.content <> invalid
     content = contentAndIndex.content
     bookmarkNode = m.global.bookmarkIds.findNode(content.id)
-    if bookmarkNode <> invalid then m.global.bookmarkIds.removeChild(bookmarkNode)
+    if bookmarkNode <> invalid then
+      m.global.bookmarkIds = immutableRemoveChild(m.global.bookmarkIds, bookmarkNode)
+    end if
     m.detailScreen.isBookmark = false
 
     'user tracking
@@ -442,7 +444,9 @@ Function onHistoryRemoved() As Void
   contentAndIndex = m.detailScreenContent.peek()
   if contentAndIndex <> invalid and contentAndIndex.content <> invalid
     historyNode = m.global.historyIds.findNode(contentAndIndex.content.id)
-    if historyNode <> invalid then m.global.historyIds.removeChild(historyNode)
+    if historyNode <> invalid
+      m.global.historyIds = immutableRemoveChild(m.global.historyIds, historyNode)
+    end if
     m.detailScreen.isHistory = false
   end if
   onHistoryQueueChange()

@@ -333,11 +333,11 @@ function tubiBookmarks_updateNowPos(content, playerInfo, historyIds)
         series = historyIds.findNode(content.parentId)
         if series <> invalid then 
           series.currentEpisodeId = content.id
-          historyIds.insertChild(series, 0)  ' bump the order to the beginning
+          historyIds = immutableInsertChild(historyIds, series, 0)  ' bump the order to the beginning
         end if
       else
         ' movie
-        historyIds.insertChild(existingEpisode, 0)  ' bump to the beginning
+        historyIds = immutableInsertChild(historyIds, existingEpisode, 0)  ' bump the order to the beginning
       end if
     else
       tubiLog("Bookmarks.updateNowPos storing historyId for " + content.id)
@@ -354,7 +354,7 @@ function tubiBookmarks_updateNowPos(content, playerInfo, historyIds)
           series.type =               m.constants.ui.contentTypes.series
         end if
         series.currentEpisodeId =   content.id
-        historyIds.insertChild(series, 0)
+        historyIds =                immutableInsertChild(historyIds, series, 0)
         episode =                   series.createChild("HistoryContentNode")
         episode.id =                content.id
         episode.historyId =         playerInfo.historyId
@@ -366,7 +366,7 @@ function tubiBookmarks_updateNowPos(content, playerInfo, historyIds)
         episode.historyId =         playerInfo.historyId
         episode.nowPos =            playerInfo.nowPos
         episode.type =              m.constants.ui.contentTypes.video
-        historyIds.insertChild(episode, 0)
+        historyIds =                immutableInsertChild(historyIds, episode, 0)
       end if
     end if
   end if
