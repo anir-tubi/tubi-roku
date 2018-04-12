@@ -218,6 +218,7 @@ Function closeInactivityModal()
   ' Just reset it here for now.  Requirements are to dismiss the modal, not
   ' to take any action like stop playback
   m.lastUserActivity = Uptime(0)
+  m.inactivityTimer.control = "stop"  ' enforces just showing the inactivity modal once
 End Function
 
 ''''''''''''''''''''''
