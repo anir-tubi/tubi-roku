@@ -120,7 +120,7 @@ Function onContentModify(message)
   else if change.operation = "set"
     ' The child node at position change.index1 was replaced with a new child node
     new = clone(m.top.content.getChild(change.index1))
-    replaced = m.internalContent.getChild(new, change.index1)
+    replaced = m.internalContent.getChild(change.index1)
     m.internalContent.replaceChild(new, change.index1)
   else if change.operation = "clear" or change.operation = "setall"
     ' clear - All the children nodes were removed
