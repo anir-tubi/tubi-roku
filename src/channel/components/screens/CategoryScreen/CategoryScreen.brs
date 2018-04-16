@@ -18,6 +18,7 @@ Function init()
   m.top.observeField("homescreenResponse", "onHomescreenResponse")
   m.top.observeField("trackingUri", "onTrackingUriChange")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
+  m.top.observeField("loadAllCategories", "loadAllCategories")
   m.top.trackingCount = 0
   
   m.CategoryList.observeField("itemFocused","onCategoryMenuItemFocused")
@@ -83,8 +84,6 @@ Function init()
     m.FeatureInfo.opacity = 0.0
     m.InfoPanel.opacity = 1.0
   end if
-
-  loadAllCategories()
 End Function
 
 
@@ -319,9 +318,12 @@ End Function
 '''''''''''''''''''''''''''
 ' onSignedInChange
 '
+' When signed in/out changes, we need to reload all categories to 
+' reflect changes in parental controls between guest and signed-in
+' users
 Function onSignedInChange()
   tubiLog("CategoryScreen.onSignedInChange")
-  onDirtyUserCategories()
+  loadAllCategories()
 End Function
 
 Function onCurrFocusRow()
@@ -449,23 +451,28 @@ End Function
 Function loadAllCategories()
   tubiLog("CategoryScreen.loadAllCategories")
 
-  ' TODO(Chris): This should move to a shim layer which hides specifics of the Tubi v4 API
-  settings = m.global.constants.settings
-  platform = m.global.constants.platform
-  deviceInfo = m.global.constants.deviceInfo
-  url = m.global.constants.urls.matrix.homescreen
-  options = {
-    params: {
-      "app_id": settings.shortAppName
-      platform: platform
-      "device_id": deviceInfo.deviceId
-      expand: 2
-      includeEmpty: true
-      limit: m.constants.performance.categoryGridList.initialBlockSize
+  ' This check causes all category fetches to be skipped prior to the field
+  ' being set to true.  Then, once true it will reload any time loadCategories() is
+  ' called, such as when signedIn field changes.
+  if m.top.loadAllCategories = true
+    ' TODO(Chris): This should move to a shim layer which hides specifics of the Tubi v4 API
+    settings = m.global.constants.settings
+    platform = m.global.constants.platform
+    deviceInfo = m.global.constants.deviceInfo
+    url = m.global.constants.urls.matrix.homescreen
+    options = {
+      params: {
+        "app_id": settings.shortAppName
+        platform: platform
+        "device_id": deviceInfo.deviceId
+        expand: 2
+        includeEmpty: true
+        limit: m.constants.performance.categoryGridList.initialBlockSize
+      }
     }
-  }
-  reqName = m.constants.reqNames.getHomescreen
-  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", url, reqName, options)
+    reqName = m.constants.reqNames.getHomescreen
+    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", url, reqName, options)
+  end if
 End Function
 
 

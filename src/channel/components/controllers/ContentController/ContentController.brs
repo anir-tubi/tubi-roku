@@ -737,6 +737,7 @@ Function startOnNow()
   m.categoryScreen.observeFieldScoped("firstPosterLoaded", "onFirstPosterLoaded")
 
   m.homeScreen.signedIn = (m.global.authInfo <> invalid)
+  m.categoryScreen.loadAllCategories = true
 
   ' If experiment calls for OnNow, set the content. Don't ever do OnNow
   ' for low-spec devices

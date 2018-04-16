@@ -15,44 +15,57 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
-    <!-- MetadataFetchTask response for single category content -->
-    <field id="categoryResponse" type="assocarray" alwaysNotify="true"/>
-       
-    <!-- MetadataFetchTask response for matrix homescreen (all categories and content) -->
-    <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
+    <!-- INPUTS -->
+      <!-- MetadataFetchTask response for matrix homescreen (all categories and content) -->
+      <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
     
-    <!-- keeps the uri used for user tracking -->
-    <field id="trackingUri" type="string"  value="/home" alwaysNotify="false"/>
-    <field id="trackingCount" type="integer" />
+      <!-- set to true if the user is signed in and we want to change the experience based on that -->
+      <field id="signedIn" type="boolean" value="false" />
 
-    <!-- will be used to change the background images on the content controller -->
-    <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
-    
-    <!-- set to the tubi content id of the item which was clicked on -->
-    <field id="contentSelected" type="node" alwaysNotify="true"/>
+      <field id="dirtyUserCategories" type="boolean" value="false" alwaysNotify="true"/>
 
-    <!-- set to true if the user is signed in and we want to change the experience based on that -->
-    <field id="signedIn" type="boolean" value="false" />
+      <!-- show/hide the InfoPanel -->
+      <field id="infoVisible" alias="StuffThatsInvisibleDuringLiveTV.visible"/>
 
-    <field id="dirtyUserCategories" type="boolean" value="false" alwaysNotify="true"/>
+      <!-- show/hide the docked video frame -->
+      <field id="dockedVideoFrameVisible" alias="DockOverlay.visible"/>
 
-    <field id="infoVisible" alias="StuffThatsInvisibleDuringLiveTV.visible"/>
+      <!-- show/hide the category menu -->
+      <field id="categoryMenuVisible" type="boolean"/>
 
-    <field id="dockedVideoFrameVisible" alias="DockOverlay.visible"/>
+      <!-- show/hide the onNow hint -->
+      <field id="onNowHintVisible" alias="OnNowHint.visible"/>
 
-    <field id="categoryMenuVisible" type="boolean"/>
-    <field id="onNowHintVisible" alias="OnNowHint.visible"/>
-    <field id="searchSignOutHintVisible" alias="SearchSignOutHint.visible"/>
-    <field id="firstPosterLoaded" alias="CategoryGridList.firstPosterLoaded"/>
+      <!-- show/hide the tools menu hint -->
+      <field id="searchSignOutHintVisible" alias="SearchSignOutHint.visible"/>
 
-    <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
-    
-    <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
-    <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
+      <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
+      <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
 
-    <!-- When used as a child of container screen (ex. Homescreen),
-         accounts for the other visible rows (ex. On Now, Tools) -->
-    <field id="rowPlaceholder" type="integer" value="0"/>
+      <!-- When used as a child of container screen (ex. Homescreen),
+           accounts for the other visible rows (ex. On Now, Tools) -->
+      <field id="rowPlaceholder" type="integer" value="0"/>
+
+      <!-- Trigger the content to be loaded.  This field is used to delay
+           the initial category content loading until after the stateful
+           fields have been set (e.g. signedIn) -->
+      <field id="loadAllCategories" type="boolean" value="false"/>
+
+    <!-- OUTPUTS -->
+      <!-- keeps the uri used for user tracking -->
+      <field id="trackingUri" type="string"  value="/home" alwaysNotify="false"/>
+      <field id="trackingCount" type="integer" />
+
+      <!-- will be used to change the background images on the content controller -->
+      <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
+
+      <!-- set to the tubi content id of the item which was clicked on -->
+      <field id="contentSelected" type="node" alwaysNotify="true"/>
+
+      <!-- triggered once the first CategoryGridList content is loaded -->
+      <field id="firstPosterLoaded" alias="CategoryGridList.firstPosterLoaded"/>
+
+      <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
   </interface>
 
   <children>
