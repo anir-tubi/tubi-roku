@@ -99,33 +99,12 @@ Function init()
 
   m.lastUserActivity = Uptime(0)  ' arbitrary marker when user last pressed a remote key
 
-  ' We only show this message once per session for signed-out users
+  ' These values will be set from experiments in the trackingLoggingReady callback
+  ' since the trackingLoggingTask is not yet ready and is needed to send exposure events
+  ' We only show the sign in prompt message once per session for signed-out users
   m.promptSignInOnGuestPlay = false
-  if m.constants.ui.signIn.promptSignInOnGuestPlay <> invalid
-    m.promptSignInOnGuestPlay = m.constants.ui.signIn.promptSignInOnGuestPlay
-  else
-    value = getExperimentValue("UserNamespace", "roku_sign_in")
-    if value = 2 or value = 3
-      m.promptSignInOnGuestPlay = true
-    end if
-  end if
-
   m.skipSignInOnLaunch = false
-  if m.constants.ui.signIn.skipSignInOnLaunch <> invalid
-    m.skipSignInOnLaunch = m.constants.ui.signIn.skipSignInOnLaunch
-  else
-    value = getExperimentValue("UserNamespace", "roku_sign_in")
-    if value = 0 or value = 2
-      m.skipSignInOnLaunch = true
-    end if
-  end if
-
   m.singleFeaturePoster = false
-  if m.constants.ui.categoryScreen.singleFeaturePoster <> invalid
-     m.singleFeaturePoster = m.constants.ui.categoryScreen.singleFeaturePoster
-  else
-    m.singleFeaturePoster = (getExperimentValue("UserNamespace", "roku_single_feature_poster") = 1)
-  end if
 
   m._ = rodash()
 End Function
@@ -294,6 +273,24 @@ Function onTrackingLoggingReady()
     m.trackingLoggingTask.trackEvent = {
       trackType: "startApp"
     }
+
+    if m.constants.ui.signIn.promptSignInOnGuestPlay <> invalid
+      m.promptSignInOnGuestPlay = m.constants.ui.signIn.promptSignInOnGuestPlay
+    else
+      value = getExperimentValue("UserNamespace", "roku_sign_in")
+      if value = 2 or value = 3
+        m.promptSignInOnGuestPlay = true
+      end if
+    end if
+
+    if m.constants.ui.signIn.skipSignInOnLaunch <> invalid
+      m.skipSignInOnLaunch = m.constants.ui.signIn.skipSignInOnLaunch
+    else
+      value = getExperimentValue("UserNamespace", "roku_sign_in")
+      if value = 0 or value = 2
+        m.skipSignInOnLaunch = true
+      end if
+    end if
 
     startUserExperience()
   end if
@@ -1290,6 +1287,15 @@ End Function
 ' Helper function to get the background type depending on if passed in uri list is using the default image
 ' @backgroundUriList, array of uris
 Function getBackgroundtype(backgroundUriList)
+  'get the singleFeaturePoster experiment value - but only one time
+  if m.singleFeaturePoster = invalid
+    if m.constants.ui.categoryScreen.singleFeaturePoster <> invalid
+       m.singleFeaturePoster = m.constants.ui.categoryScreen.singleFeaturePoster
+    else
+      m.singleFeaturePoster = (getExperimentValue("UserNamespace", "roku_single_feature_poster") = 1)
+    end if
+  end if
+
   backgroundType = m.constants.ui.backgroundTypes.topRight
   if backgroundUriList[0] = m.defaultBackgroundUri
     backgroundType = m.constants.ui.backgroundTypes.fullScreen
