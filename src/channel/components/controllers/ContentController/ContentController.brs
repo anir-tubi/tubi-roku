@@ -493,13 +493,7 @@ End Function
 Function onContentSelected()
   tubiLog("ContentController.onContentSelected")
   content = m.categoryScreen.contentSelected
-  m.autoplayContext = invalid
-  if m.categoryScreen.cachedContent <> invalid and m.categoryScreen.cursorPosition <> invalid
-    category = m.categoryScreen.cachedContent.getChild(m.categoryScreen.cursorPosition[0])
-    if category <> invalid
-      m.autoplayContext = category.id
-    end if
-  end if
+  m.autoplayContext = m.categoryScreen.currCategoryId
   showDetailScreen(content, m.categoryScreen.trackingUri)
 End Function
 

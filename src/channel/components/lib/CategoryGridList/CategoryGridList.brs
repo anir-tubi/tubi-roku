@@ -308,6 +308,10 @@ End Function
 ' onRowItemSelected - RowList.rowItemSelected event handler, triggered when user presses "OK"
 Function onRowItemSelected()
   tubiLog("CategoryGridList.onRowItemSelected")
+  category = m.internalContent.getChild(m.RowList.rowItemSelected[0])
+  if category <> invalid
+    m.top.currCategoryId = category.id
+  end if
   m.top.itemSelected = resolveAbbreviatedContent(m.RowList.rowItemSelected)
 End Function
 
@@ -326,6 +330,7 @@ Function onRowItemFocused()
     category = m.internalContent.getChild(m.RowList.rowItemFocused[0])
     if category <> invalid then
       category.focusIndex = m.RowList.rowItemFocused[1]
+      m.top.currCategoryId = category.id
     end if
   end if
 End Function
@@ -334,6 +339,10 @@ End Function
 ' onRowListItemDebounce - RowList.rowItemFocus debounce handler
 Function onRowListItemDebounce()
   tubiLog("CategoryGridList.onRowListItemDebounce")
+  category = m.internalContent.getChild(m.RowList.rowItemFocused[0])
+  if category <> invalid
+    m.top.currCategoryId = category.id
+  end if
   m.top.itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
 End Function
 

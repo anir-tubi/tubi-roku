@@ -65,6 +65,7 @@
 
 
     <field id="currFocusRow" alias="RowList.currFocusRow" />
+    <field id="currCategoryId" type="string" />
 
     <!-- holds an array of integers the indexes represent the category order, and the vaule represents the totalCount of the category.
          When it is updated, category screen will update the total counts in the category menu

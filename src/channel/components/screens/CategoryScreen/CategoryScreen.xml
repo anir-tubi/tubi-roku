@@ -66,6 +66,8 @@
       <field id="firstPosterLoaded" alias="CategoryGridList.firstPosterLoaded"/>
 
       <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
+
+      <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
   </interface>
 
   <children>
