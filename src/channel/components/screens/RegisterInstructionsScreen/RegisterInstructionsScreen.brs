@@ -107,6 +107,16 @@ Function onCodeChange()
   m.RegistrationCode4.text = m.RegCodeTask.code.Mid(3,1)
   m.RegistrationCode5.text = m.RegCodeTask.code.Mid(4,1)
   m.RegistrationCode6.text = m.RegCodeTask.code.Mid(5,1)
+
+  ' Set the audio guide fields
+  if m.Buttons.content <> invalid
+    regCodeButton = m.Buttons.content.getChild(0)
+    if regCodeButton <> invalid
+      regCodeButton.AUDIO_GUIDE_TEXT = "Activation Code: " + m.RegCodeTask.code.split("").join(". ") + ". Refresh Code"
+      ' Automatically appended to the text above is "... button. Press OK to select."
+      m.Buttons.jumpToItem = m.Buttons.itemFocused
+    end if
+  end if
 End Function
 
 
