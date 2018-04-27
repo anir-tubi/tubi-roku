@@ -393,32 +393,16 @@ Function onGridFocusChange() As Void
   end if
 
   'update the tracking URI
-  catSlug = ""
-  if m.CategoryList.content.getChild(m.CategoryGridList.cursorPosition[0]) <> invalid
-    if m.CategoryList.content.getChild(m.CategoryGridList.cursorPosition[0]).id <> invalid
-      catSlug = m.CategoryList.content.getChild(m.CategoryGridList.cursorPosition[0]).id + "/"
-    end if
-  end if
-  
-  row = 1  'row is fixed at 1 for this design, it indicates the row within the category
-  col = 0  'column is the column within the category, expect this to change
-  catPos = 0  'catPos is the order of the category (Featured should be 1)
-  if m.CategoryGridList.cursorPosition[0] >= 0
-    catPos = m.CategoryGridList.cursorPosition[0] + 1
-    col = m.CategoryGridList.cursorPosition[1] + 1
-  end if
-
-  'set the user event tracking info
-  row = row.toStr() + "/"
-  col = col.toStr()
-  catPos = catPos.toStr()
-  m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug + row + col
+  m.top.trackingUri = updateTrackingUri(m.CategoryGridList.cursorPosition)
 End Function
 
 Function onGridItemSelected() As Void
   tubiLog("CategoryScreen.onGridItemSelected")
   m.top.trackingCount = 0
   selectedItem = m.CategoryGridList.itemSelected
+
+  m.top.trackingUri = updateTrackingUri(m.CategoryGridList.selectedPosition)
+
   if selectedItem <> invalid then 
     m.top.contentSelected = selectedItem
   end if
@@ -515,6 +499,29 @@ Function populateInfoPanel(target, mode, contentNode)
 
     target.calculateHeight = true
   end if
+End Function
+
+
+' returns a tracking uri that can be added to CategoryScreen.trackingUri for navigation and page load tracking
+' @position, 2d array, where index 0 is the category row index and index 1 is the column or position with the category
+Function updateTrackingUri(position)
+  catSlug = m.CategoryGridList.currCategoryId + "/"
+
+  row = 1  'row is fixed at 1 for this design, it indicates the row within the category
+  col = 0  'column is the column within the category, expect this to change
+  catPos = 0  'catPos is the order of the category (Featured should be 1)
+  if position[0] >= 0
+    catPos = position[0] + 1
+    col = position[1] + 1
+  end if
+
+  'set the user event tracking info
+  row = row.toStr() + "/"
+  col = col.toStr()
+  catPos = catPos.toStr()
+  trackingUri = "/home/" + catPos + "/cat/" + catSlug + row + col
+
+  return trackingUri
 End Function
 
 

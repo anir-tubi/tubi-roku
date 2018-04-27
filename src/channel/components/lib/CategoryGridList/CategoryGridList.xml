@@ -59,6 +59,7 @@
     <field id="itemFocused" type="node" alwaysNotify="true"/>
     <!-- array with the [x, y], where x is the category index and y is the content index -->
     <field id="cursorPosition" alias="RowList.rowItemFocused" />
+    <field id="selectedPosition" alias="RowList.rowItemSelected" />
 
     <!-- first category is loaded -->
     <field id="firstPosterLoaded" type="boolean" value="false" />
