@@ -81,10 +81,14 @@ Function onKeySelected(message)
   ' GetNode() will return m.Keyboard or m.Sybolic2Keyboard
   keyboard = message.getRoSGNode()
   key = keyboard.content.getChild(keyboard.itemSelected)
-  if key.title = m.BACKSPACE 
+  processKey(key.title)
+End Function
+
+Function processKey(keyTitle)
+  if keyTitle = m.BACKSPACE
     if m.top.text.len() > 0 then m.top.text = Left(m.top.text, m.top.text.len()-1)
   else if m.top.text.len() < m.top.maxLength then
-    m.top.text = m.top.text + key.title
+    m.top.text = m.top.text + keyTitle
   end if
 End Function
 
@@ -155,6 +159,15 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
         m.Keyboard.jumpToItem = m.Keyboard.content.getChildCount() - 1
         return true
       end if
+    else if key.left(4) = "Lit_"
+      processKey(key.mid(4, 1))
+      return true
+    else if key = "backspace"
+      processKey(m.BACKSPACE)
+      return true
+    else if key = "stop"
+      m.top.text = "" ' clear all text
+      return true
     end if
   end if
   return false
