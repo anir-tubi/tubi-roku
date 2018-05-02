@@ -131,6 +131,36 @@ Function onComponentFocus()
   end if
 End Function
 
+
+Function inStillWatchingExperimentWindow()
+  time = CreateObject("roDateTime")
+  seconds = time.AsSeconds()
+  experimentStartTime = m.constants.timers.stillWatchingExperimentStart
+  experimentEndTime   = m.constants.timers.stillWatchingExperimentEnd
+  if seconds > experimentStartTime and seconds < experimentEndTime
+    return true
+  else
+    return false
+  end if
+End Function
+
+Function shouldStopOnStillWatchingTimeout()
+  if m.constants.player.stillWatchingStopOnTimeout = invalid
+    return inStillWatchingExperimentWindow()
+  else
+    return (m.constants.player.stillWatchingStopOnTimeout = true)
+  end if
+End Function
+
+Function stillWatchingExperimentAnalyticsValue()
+  if m.constants.player.stillWatchingStopOnTimeout = invalid
+    if inStillWatchingExperimentWindow() = true
+      return "still_watching_24"
+    end if
+  end if
+  return "still_watching"
+End Function
+
 Function onInactivityTimer()
   tubiLog("ContentController.onInactivityTimer")
   now = Uptime(0)
@@ -144,16 +174,20 @@ Function onInactivityTimer()
 
         m.trackingLoggingTask.trackEvent = {
           trackType: "generic"
-          value: "still_watching"
+          value: stillWatchingExperimentAnalyticsValue()
           ctx: "still_watching_shown"
         }
       end if
     else if (now - m.lastUserActivity - m.constants.timers.stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
       closeInactivityModal()
-      m.videoPlayer.control = "resume"
+      if shouldStopOnStillWatchingTimeout() = true
+        returnToDetailScreenFromVideo(m.constants.player.playerResults.closed)
+      else
+        m.videoPlayer.control = "resume"
+      end if
       m.trackingLoggingTask.trackEvent = {
         trackType: "generic"
-        value: "still_watching"
+        value: stillWatchingExperimentAnalyticsValue()
         ctx: "still_watching_timeout"
       }
     end if
@@ -166,7 +200,7 @@ Function onInactivityClose()
   m.videoPlayer.control = "resume"
   m.trackingLoggingTask.trackEvent = {
     trackType: "generic"
-    value: "still_watching"
+    value: stillWatchingExperimentAnalyticsValue()
     ' Interpret a "back" button press as a 'yes'
     ctx: "still_watching_yes"
   }
@@ -185,7 +219,7 @@ Function onInactivityButton()
   end if
   m.trackingLoggingTask.trackEvent = {
     trackType: "generic"
-    value: "still_watching"
+    value: stillWatchingExperimentAnalyticsValue()
     ctx: ctx
   }
 End Function
