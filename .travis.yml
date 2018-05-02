@@ -1,0 +1,14 @@
+# Bash skips all the default ruby setup
+language: bash
+
+# We don't really need osx except for comptibility of arguments to commands like sed.
+os: osx
+
+# We use a subshell here since 'cd' persists to subsequent commands otherwise.
+# See https://docs.travis-ci.com/user/common-build-problems/#SSH-is-not-working-as-expected
+install:
+- bash -c 'cd tools && npm install'
+- brew install jfrog-cli-go
+
+script:
+- make build
