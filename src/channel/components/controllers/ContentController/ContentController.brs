@@ -345,7 +345,7 @@ Function startUserExperience()
     if m.constants.ui.onnow.on = false or (m.constants.ui.onnow.on = true and m.onNowReceived)
 
       ' Since we're ready to start the channel, make sure the loading spinner is hidden
-      root = m.NodeHelpers.rootNode()
+      root = m.top.getScene()
       if root <> invalid
         spinner = root.findNode("LoadingSpinner")
         if spinner <> invalid then

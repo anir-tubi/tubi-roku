@@ -2,7 +2,6 @@ Function TubiNodeHelpers()
   return {
     getChildIndex: tubiNodeHelpers_getChildIndex
     getChildIndexById: tubiNodeHelpers_getChildIndexById
-    rootNode: tubiNodeHelpers_rootNode
     unobserveAllScoped: tubiNodeHelpers_unobserveAllScoped
     convertNodesToIdsAA: tubiNodeHelpers_convertNodesToIdsAA
     immutableInsertChild: tubiNodeHelpers_immutableInsertChild
@@ -41,19 +40,6 @@ Function tubiNodeHelpers_getChildIndexById(parent, childId)
   else
     return -1
   end if
-End Function
-
-
-Function tubiNodeHelpers_rootNode()
-  if m.top <> invalid then
-    parent = m.top
-    while true
-      nextParent = parent.getParent()
-      if nextParent = invalid then return parent
-      parent = nextParent
-    end while
-  end if
-  return invalid
 End Function
 
 

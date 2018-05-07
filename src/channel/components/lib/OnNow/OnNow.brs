@@ -111,7 +111,7 @@ Function onContentChange()
     m.onNowOverlay.content = m.top.content.getChild(m.playlistIndex)
     m.onNowOverlay.jumpToIndex = m.playlistInfo[m.playlistIndex].contentindex
     if m.videoPlayer = invalid
-      m.videoPlayer = m.NodeHelpers.rootNode().findNode("VideoPlayer")
+      m.videoPlayer = m.top.getScene().findNode("VideoPlayer")
     end if
 
     ' This will cause the last control to be applied appropriately
