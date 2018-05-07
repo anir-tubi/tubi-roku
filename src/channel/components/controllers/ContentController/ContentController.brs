@@ -1,14 +1,19 @@
 Function init()
   tubiLog(" ")
   tubiLog("Init Scenegraph----------------")
+  m._ = rodash()
+  m.constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.NodeHelpers = TubiNodeHelpers()
+  m.Bookmarks = TubiBookmarks(Request, Auth, m.constants, m.NodeHelpers)
+
   'first things first, observe the live tv content field which comes from the main thread
   m.top.observeFieldScoped("onNowContent", "onOnNowContent")
   m.top.observeField("focusedChild", "onComponentFocus")
   m.onNowReceived = false
 
-  m.constants = m.global.constants
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
-
 
   ' save a global reference to the fetch task for nodes to access
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
@@ -32,8 +37,6 @@ Function init()
   m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
   m.global.addField("historyIds", "node", false)
   m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
-  m.global.observeField("bookmarkIds", "onBookmarkIdsUpdate")
-  m.global.observeField("historyIds", "onHistoryIdsUpdate")
 
   ' NOTE: global authInfo is mostly a formality since TubiAuth currently reads values from the registry, so
   '       places that need authInfo don't need to reference m.global.
@@ -342,7 +345,7 @@ Function startUserExperience()
     if m.constants.ui.onnow.on = false or (m.constants.ui.onnow.on = true and m.onNowReceived)
 
       ' Since we're ready to start the channel, make sure the loading spinner is hidden
-      root = rootNode()
+      root = m.NodeHelpers.rootNode()
       if root <> invalid
         spinner = root.findNode("LoadingSpinner")
         if spinner <> invalid then
@@ -474,7 +477,8 @@ Function onAuthInfoReceived()
     m.homeScreen.signedIn = (m.global.authInfo <> invalid)
   end if
   if m.categoryScreen <> invalid
-    m.categoryScreen.dirtyUserCategories = true
+    m.categoryScreen.dirtyUserCategories = m.constants.ui.categoryIds.queue
+    m.categoryScreen.dirtyUserCategories = m.constants.ui.categoryIds.history
   end if
   if m.searchScreen <> invalid
     m.searchScreen.signedIn = (m.global.authInfo <> invalid)
@@ -535,10 +539,31 @@ End Function
 ''''''''''''''''''''
 ' onHistoryQueueChange
 '
-'
-Function onHistoryQueueChange()
+' @categoryId: string, the categoryId/containerId of the category we will refresh
+Function onHistoryQueueChange(categoryId)
   tubiLog("ContentController.onHistoryQueueChange")
-  if m.categoryScreen <> invalid then m.categoryScreen.dirtyUserCategories = true
+  if m.global.authInfo <> invalid
+    if m.authTask <> invalid
+      m.authTask.unobserveFieldScoped("authInfo")
+    end if
+    ' TODO Bryan: only get the history/queue ids of the categoryIds instead of both every time
+    m.authTask = CreateObject("roSGNode", "AuthTask")
+    m.authTask.observeFieldScoped("authInfo", "onHistoryQueueRefresh")
+    m.authTask.functionName = "execInitializeUserData"
+    m.authTask.control = "RUN"
+  end if
+  if m.categoryScreen <> invalid then m.categoryScreen.dirtyUserCategories = categoryId
+End Function
+
+Function onHistoryQueueRefresh()
+  m.authTask.unobserveFieldScoped("authInfo")
+  ' These will be empty parent nodes (no children) if user is not authenticated
+  m.global.bookmarkIds = m.authTask.bookmarks
+  m.global.historyIds = m.authTask.history
+  if m.detailScreen <> invalid and m.detailScreenContent.peek() <> invalid
+    contentAndIndex = m.detailScreenContent.peek()
+    populateDetailScreen(contentAndIndex, true)
+  end if
 End Function
 
 
@@ -831,7 +856,7 @@ Function playVideoContent(content As Object, isAutoplay As Boolean, position=inv
   
     ' Clone the content so we don't have listeners affecting it
     parent = CreateObject("roSGNode", "TubiContentNode")
-    localContent = clone(content)
+    localContent = content.clone(false)
     if position <> invalid
       localContent.nowPos = position
     end if
@@ -1020,18 +1045,8 @@ Function stopVideoContent(playerResult, showScreenStack)
   end if
   content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
 
-  Request = TubiRequest()
-  Auth = TubiAuth(m.constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, m.constants)
-
-  'update the nowPos in the global historyIds store
-  if m.global.authInfo <> invalid and playerInfo.historyId <> invalid
-    m.global.historyIds = Bookmarks.updateNowPos(content, playerInfo, m.global.historyIds)
-  end if
-
-  if m.categoryScreen <> invalid then 
-    m.categoryScreen.dirtyUserCategories = true
-  end if
+  ' reload history
+  onHistoryQueueChange(m.constants.ui.categoryIds.history)
 
   ' should only do this if not autoplaying another video
   if showScreenStack
@@ -1124,7 +1139,7 @@ Function showDetailScreen(content, sourceTrackingUri)
   ' ensure we have no observers before adding then below.
   ' TODO(CT): ScreenStack and observers set here are at odds with each other over
   '           managing observers.  Needs cleaning up.
-  unobserveAllScoped(m.detailScreen)
+  m.NodeHelpers.unobserveAllScoped(m.detailScreen)
   m.detailScreen.observeFieldScoped("playSelected", "onPlay")
   m.detailScreen.observeFieldScoped("resumeSelected", "onResume")
   m.detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
@@ -1348,19 +1363,4 @@ Function addSeriesTitle(content, oldContent)
   end if
 
   return content
-End Function
-
-
-'pass the boomarkIds as an AA to the metadatafetch task
-Function onBookmarkIdsUpdate()
-  tubiLog("ContentController.onBookmarkIdsUpdate")
-  bookmarkIdsAA = convertNodesToIdsAA(m.global.bookmarkIds)
-  m.metadataFetchTask.bookmarkIds = bookmarkIdsAA
-End Function
-
-'pass the historyIds as an AA to the metadatafetch task
-Function onHistoryIdsUpdate()
-  tubiLog("ContentController.onHistoryIdsUpdate")
-  historyIdsAA = convertNodesToIdsAA(m.global.historyIds)
-  m.metadataFetchTask.historyIds = historyIdsAA
 End Function

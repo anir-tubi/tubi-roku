@@ -16,8 +16,6 @@ Function fetchLoop()
   m.top.observeField("request", m.port)
   m.top.observeField("batchRequest", m.port)
   m.top.observeField("cancel", m.port)
-  m.top.observeField("historyIds", m.port)
-  m.top.observeField("bookmarkIds", m.port)
   while true
     m.constants = m.global.getField("constants")   ' this should grab a thread-local copy
     if m.constants <> invalid then
@@ -45,6 +43,8 @@ Function fetchLoop()
   ' Prepare the auth module
   m.Request = TubiRequest()
   m.Auth = TubiAuth(m.constants, m.Request)
+  m.NodeHelpers = TubiNodeHelpers()
+  m.Bookmarks = TubiBookmarks(m.Request, m.Auth, m.constants, m.NodeHelpers)
 
   ' Cache a few values we don't want to look up from m.global each call to translateRecursive.
   ' Timings here were reduced from 33ms to 2ms per content item by not referencing m.global in
@@ -66,10 +66,6 @@ Function fetchLoop()
         beginBatch(msg.GetData())
       else if msg.GetField() = "cancel" then
         cancelRequests(msg.GetData())
-      else if msg.GetField() = "historyIds"
-        m.historyIds = msg.GetData()
-      else if msg.GetField() = "bookmarkIds"
-        m.bookmarkIds = msg.GetData()
       end if
     else if type(msg) = "roUrlEvent" then
       handleResponse(msg)
@@ -272,8 +268,14 @@ Function translateCategoryMetadata(contentToTranslate, fullJson) As Object
 
   node_count = 0
   categoryMetadata = buildCategoryAA(container, contents, contentsJson)
+  if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
+    return invalid
+  end if
 
   if type(categoryMetadata) = "roAssociativeArray"
+    ' buildCategoryAA always returns AA.state = "partial", 
+    ' but any single category request should be considered fully loaded
+    categoryMetadata.state = "loaded"
     translated.update(categoryMetadata)
     node_count = 1 + translated.getChildCount()
   end if
@@ -419,13 +421,17 @@ Function translateHomescreenMetadata(contentToTranslate) As Object
     container = containers[i]
     if container.type <> "complex"
       categoryAA = buildCategoryAA(container, contents)
-      homescreenAA.children.push(categoryAA)
+      if categoryAA <> invalid
+        homescreenAA.children.push(categoryAA)
+      end if
     else
       for j=0 to container.children.count()-1
         nestedContainer = container.children[j]
         categoryAA = buildCategoryAA(nestedContainer, contents)
-        categoryAA.parentId = container.id
-        homescreenAA.children.push(categoryAA)
+        if categoryAA <> invalid
+          categoryAA.parentId = container.id
+          homescreenAA.children.push(categoryAA)
+        end if
       end for
     end if
   end for
@@ -468,44 +474,37 @@ Function buildCategoryAA(container, contents, contentsJson=invalid)
       if contents[child] <> invalid and contents[child].valid <> false
         fullChild = contents[child]
 
-        ' Skip any queue or history contents that we don't have a queue or history id for
-        ' This ensures that our channel is internally consistent, and we don't end up adding content to history or queue
-        ' to which we don't add the remove from history/queue buttons (history/queue id is used to determine to add those buttons)
-        skip = false
-        if container.id = m.constants.ui.categoryIds.queue
-          if m.bookmarkIds[fullChild.id] <> true and m.bookmarkIds["0" + fullChild.id] <> true
-            skip = true
-          end if
-        else if container.id = m.constants.ui.categoryIds.history
-          if m.historyIds[fullChild.id] <> true and m.historyIds["0" + fullChild.id] <> true
-            skip = true
-          end if
+        childAA = {
+          id: fullChild.id
+          title: fullChild.title
+          description: fullChild.description
+          length: fullChild.duration
+          subtype: "ContentNode"
+        }
+        if container.id = m.constants.ui.categoryIds.featured and m.singleFeaturePoster <> true and fullChild.hero_images <> invalid then
+          childAA.hdgridposterurl = fullChild.hero_images[0]
+        else if fullChild.posterarts <> invalid then
+          childAA.hdgridposterurl = fullChild.posterarts[0]
         end if
 
-        if skip = false
-          childAA = {
-            id: fullChild.id
-            title: fullChild.title
-            description: fullChild.description
-            length: fullChild.duration
-            subtype: "ContentNode"
-          }
-          if container.id = m.constants.ui.categoryIds.featured and m.singleFeaturePoster <> true and fullChild.hero_images <> invalid then
-            childAA.hdgridposterurl = fullChild.hero_images[0]
-          else if fullChild.posterarts <> invalid then
-            childAA.hdgridposterurl = fullChild.posterarts[0]
-          end if
-
-          ' normalize ids for series, should always be zero-prefixed
-          if fullChild.type = "s" or fullChild.type = "a"
-            childAA.id = "0" + fullChild.id
-          end if
-          jsonAA[childAA.id] = fullChild
-          validCount += 1
-          updateMetadata.children.push(childAA)
+        ' normalize ids for series, should always be zero-prefixed
+        if fullChild.type = "s" or fullChild.type = "a"
+          childAA.id = "0" + fullChild.id
         end if
+        jsonAA[childAA.id] = fullChild
+        validCount += 1
+        updateMetadata.children.push(childAA)
       end if
     end for
+
+    ' if all the content is out of window, do not return category metadata aa
+    ' container.cursor = 0 for limitedUI matrix/homescreen calls
+    ' container.cursor = invalid for matrix/containers/{id} calls
+    ' if we are getting category from matrix/containers/{id} and it returns no valid content,
+    ' we want to remove that category from the category screen
+    if container.cursor = invalid and validCount = 0
+      return invalid
+    end if
 
     updateMetadata.totalCount = validCount
     if contentsJson <> invalid

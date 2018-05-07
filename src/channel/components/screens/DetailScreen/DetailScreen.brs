@@ -1,4 +1,5 @@
 Function init()
+  m.NodeHelpers = TubiNodeHelpers()
   m.Info = m.top.findNode("DetailInfoPanel")
   m.Menu = m.top.findNode("Menu")
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
@@ -82,7 +83,7 @@ End Function
 Function onResumePointChange()
   tubiLog("DetailScreen.onResumePointChange")
   menuItems = m.Menu.content
-  resumeIndex = getChildIndexById(menuItems, m.ResumeMenuItem.id)
+  resumeIndex = m.NodeHelpers.getChildIndexById(menuItems, m.ResumeMenuItem.id)
 
   m.ResumeMenuItem.playstart = m.top.resumePoint
   if resumeIndex = -1 and m.top.resumePoint > 0
@@ -101,8 +102,8 @@ Function onIsBookmark()
   m.RemoveQueueMenuItem.title = "Remove from queue"
   
   menuItems = m.Menu.content
-  addQueueIndex = getChildIndexById(menuItems, m.AddQueueMenuItem.id)
-  removeQueueIndex = getChildIndexById(menuItems, m.RemoveQueueMenuItem.id)
+  addQueueIndex = m.NodeHelpers.getChildIndexById(menuItems, m.AddQueueMenuItem.id)
+  removeQueueIndex = m.NodeHelpers.getChildIndexById(menuItems, m.RemoveQueueMenuItem.id)
 
   if m.top.isBookmark = false
     if addQueueIndex = -1
@@ -143,12 +144,12 @@ Function onIsHistory()
   m.RemoveHistoryMenuItem.title = "Remove from history"
 
   'if removing from history, remove the resume button
-  resumeIndex = getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
+  resumeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
   if not m.top.isHistory
     addRemoveMenuItem(m.top.isHistory, resumeIndex)
   end if
 
-  removeHistoryIndex = getChildIndexById(m.Menu.content, m.RemoveHistoryMenuItem.id)
+  removeHistoryIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.RemoveHistoryMenuItem.id)
   previousItems = [m.AddQueueMenuItem, m.RemoveQueueMenuItem]
   addRemoveMenuItem(m.top.isHistory, removeHistoryIndex, m.RemoveHistoryMenuItem, previousItems)
 End Function
@@ -156,14 +157,14 @@ End Function
 
 Function onIsSeries()
   tubiLog("DetailScreen.onIsSeries")
-  episodeIndex = getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
+  episodeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
   addRemoveMenuItem(m.top.isSeries, episodeIndex, m.EpisodesMenuItem, [m.PlayMenuItem])
 End Function
 
 
 Function onHasTrailer()
   tubiLog("DetailScreen.onHasTrailer")
-  trailerIndex = getChildIndexById(m.Menu.content, m.WatchTrailerMenuItem.id)
+  trailerIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.WatchTrailerMenuItem.id)
   addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.PlayMenuItem])
 End Function
 
@@ -232,7 +233,7 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
     previousItemIndex = -1
     if itemToAdd <> invalid and previousItems <> invalid and previousItems.count() > 0
       for i=0 to previousItems.count()-1
-        previousItemIndex = getChildIndexById(menuItems, previousItems[i].id)
+        previousItemIndex = m.NodeHelpers.getChildIndexById(menuItems, previousItems[i].id)
         if previousItemIndex > -1
           exit for
         end if

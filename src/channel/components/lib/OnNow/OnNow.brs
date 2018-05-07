@@ -1,4 +1,5 @@
 Function init()
+  m.NodeHelpers = TubiNodeHelpers()
   m.onNowOverlay = m.top.findNode("onNowOverlay")
   m.onNowOverlay.observeField("contentSelected", "onOverlayContentSelected")
   m.onNowOverlay.observeField("contentFocused", "onOverlayContentFocused")
@@ -110,7 +111,7 @@ Function onContentChange()
     m.onNowOverlay.content = m.top.content.getChild(m.playlistIndex)
     m.onNowOverlay.jumpToIndex = m.playlistInfo[m.playlistIndex].contentindex
     if m.videoPlayer = invalid
-      m.videoPlayer = rootNode().findNode("VideoPlayer")
+      m.videoPlayer = m.NodeHelpers.rootNode().findNode("VideoPlayer")
     end if
 
     ' This will cause the last control to be applied appropriately

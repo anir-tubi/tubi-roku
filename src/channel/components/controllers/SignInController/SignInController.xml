@@ -9,12 +9,11 @@
 
   <script type="text/brightscript" uri="pkg:/components/controllers/SignInController/SignInController.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ScreenStack.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
 
   <interface>
     <!-- INPUT -->

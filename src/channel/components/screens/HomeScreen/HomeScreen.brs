@@ -1,4 +1,5 @@
 Function init()
+  m.NodeHelpers = TubiNodeHelpers()
   m.constants = m.global.constants
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
@@ -144,7 +145,7 @@ End Function
 Function showCategoryScreen(show)
   'set the rowPlaceholder value on the CategoryScreen so that keep the correct uri value for analytics
   'basically the number of "rows" that are above the category screen, like "On Now" and "Tools"
-  catScreenIndex = getChildIndex(m.HomeViews, m.CategoryScreen)
+  catScreenIndex = m.NodeHelpers.getChildIndex(m.HomeViews, m.CategoryScreen)
   if catScreenIndex >= 0
     onNowVisible = 0
     if m.constants.ui.onnow.on = false

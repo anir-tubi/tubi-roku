@@ -93,7 +93,7 @@ End Function
 Function popScreen(sendTrackingEvents = true as Boolean)
   tubiLog("ScreenStack.popScreen")
   top = m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-1)
-  unobserveAllScoped(top)
+  m.NodeHelpers.unobserveAllScoped(top)
   m.ScreenStack_.removeChild(top)
   newTop = m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-1)
   if newTop <> invalid then

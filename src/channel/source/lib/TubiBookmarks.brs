@@ -1,11 +1,11 @@
 'a set of hepler functions that facilitate sending and receiving "Continue Watching"/history and "My Queue"/bookmarks
 'info to the server (UAPI at the time of writing this comment)
-Function TubiBookmarks(request as Object, auth as Object, constants as Object) as Object
-
+Function TubiBookmarks(request as Object, auth as Object, constants as Object, nodeHelpers as Object) as Object
   return {
     request: request
     auth: auth
     constants: constants
+    nodeHelpers: nodeHelpers
 
     'public methods
     addBookmarkReq: tubiBookmarks_addBookmarkReq
@@ -16,7 +16,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object) a
     getInitialHistoryReq: tubiBookmarks_getInitialHistoryReq
     handleInitialBookmarks: tubiBookmarks_handleInitialBookmarks
     handleInitialHistory: tubiBookmarks_handleInitialHistory
-    updateNowPos: tubiBookmarks_updateNowPos
 
     'private methods
     createBookmarksRequest: tubiBookmarks_createBookmarksRequest_
@@ -308,67 +307,6 @@ function tubiBookmarks_handleInitialHistory(initialHistory)
         end for
       end if
     end for
-  end if
-  return historyIds
-end function
-
-'@content: content, the video content (movie or episode)
-'@playerInfo: assocArray, contains the new nowPos as an integer and potentially a historyId as a string
-'       {
-'         nowPos: int, the position that the content was watched to in the player
-'         historyId: string (optional), a history id as returned by the UAPI server
-'         parentHistoryId: string (optional), a history id for a series as returned by the UAPI server
-'       }
-'@historyIds: roSGNode, historyIds as stored on scenegraphs m.global.historyIds. Also returned from m.handleInitialHistory().historyIds
-function tubiBookmarks_updateNowPos(content, playerInfo, historyIds)
-  if historyIds <> invalid and playerInfo <> invalid and content.id <> invalid
-    existingEpisode = historyIds.findNode(content.id)    
-    if existingEpisode <> invalid
-      tubiLog("Bookmarks.updateNowPos updating historyId for " + content.id)
-      existingEpisode.nowPos = playerInfo.nowPos
-
-      ' update the currentEpisodeId if an episode was just played
-      if content.parentId <> invalid and content.parentId <> "" then
-        tubiLog("Bookmarks.updateNowPos updating currentEpisodeId for " + content.parentId)
-        series = historyIds.findNode(content.parentId)
-        if series <> invalid then 
-          series.currentEpisodeId = content.id
-          historyIds = immutableInsertChild(historyIds, series, 0)  ' bump the order to the beginning
-        end if
-      else
-        ' movie
-        historyIds = immutableInsertChild(historyIds, existingEpisode, 0)  ' bump the order to the beginning
-      end if
-    else
-      tubiLog("Bookmarks.updateNowPos storing historyId for " + content.id)
-
-      ' store the series if video was an episode
-      if content.parentId <> invalid and content.parentId <> "" then
-        tubiLog("Bookmarks.updateNowPos storing parentHistoryId for " + content.parentId)
-
-        series = historyIds.findNode(content.parentId)
-        if series = invalid
-          series =                    historyIds.createChild("HistoryContentNode")
-          series.id =                 content.parentId
-          series.historyId =          playerInfo.parentHistoryId  ' TODO(Chris): check that this is invalid for all cases and remove
-          series.type =               m.constants.ui.contentTypes.series
-        end if
-        series.currentEpisodeId =   content.id
-        historyIds =                immutableInsertChild(historyIds, series, 0)
-        episode =                   series.createChild("HistoryContentNode")
-        episode.id =                content.id
-        episode.historyId =         playerInfo.historyId
-        episode.nowPos =            playerInfo.nowPos
-        episode.type =              m.constants.ui.contentTypes.video
-      else
-        episode =                   historyIds.createChild("HistoryContentNode")
-        episode.id =                content.id
-        episode.historyId =         playerInfo.historyId
-        episode.nowPos =            playerInfo.nowPos
-        episode.type =              m.constants.ui.contentTypes.video
-        historyIds =                immutableInsertChild(historyIds, episode, 0)
-      end if
-    end if
   end if
   return historyIds
 end function

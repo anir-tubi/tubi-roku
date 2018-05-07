@@ -9,25 +9,25 @@ Function execInitializeUserData()
   constants = m.global.constants
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, constants)
+  NodeHelpers = TubiNodeHelpers()
+  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()
   queuePort = CreateObject("roMessagePort")
   queue = TubiRequestQueue().create(queuePort)
   localBookmarkReqId = "bookmark"
   localHistoryReqId = "history"
+  ' return empty containers if user is not authenticated or requests fail
+  newBookmarks = CreateObject("roSGNode", "BookmarkContentNode")
+  newHistory = CreateObject("roSGNode", "HistoryContentNode")
 
   initialBookmarksReq = Bookmarks.getInitialBookmarksReq(localBookmarkReqId)
   if initialBookmarksReq <> invalid then
     queue.pushRequest(initialBookmarksReq)
-  else
-    m.top.bookmarks = invalid
   end if
 
   initialHistoryReq = Bookmarks.getInitialHistoryReq(localHistoryReqId)
   if initialHistoryReq <> invalid then
     queue.pushRequest(initialHistoryReq)
-  else
-    m.top.history = invalid
   end if
 
   while queue.count() > 0
@@ -37,20 +37,16 @@ Function execInitializeUserData()
       print "*** execInitializeUserData: "; handledReq.localId; " returned "; handledReq.response.code
       if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
         if handledReq.localId = localBookmarkReqId
-          m.top.bookmarks = Bookmarks.handleInitialBookmarks(handledReq.response.data)
+          newBookmarks = Bookmarks.handleInitialBookmarks(handledReq.response.data)
         else if handledReq.localId = localHistoryReqId
-          m.top.history = Bookmarks.handleInitialHistory(handledReq.response.data)
+          newHistory = Bookmarks.handleInitialHistory(handledReq.response.data)
         end if
       end if
     end if
   end while
-  ' return empty containers if user is not authenticated
-  if m.top.bookmarks = invalid
-    m.top.bookmarks = CreateObject("roSGNode", "BookmarkContentNode")
-  end if
-  if m.top.history = invalid
-    m.top.history = CreateObject("roSGNode", "HistoryContentNode")
-  end if
+
+  m.top.bookmarks = newBookmarks
+  m.top.history = newHistory
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger 
 End Function
 
@@ -69,7 +65,8 @@ Function addToQueue()
   tubiLog("AuthTask.addToQueue")
   Request = TubiRequest()
   Auth = TubiAuth(m.global.constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants)
+  NodeHelpers = TubiNodeHelpers()
+  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
   request = Bookmarks.addBookmarkReq(m.top.content)
   port = CreateObject("roMessagePort")
   if request <> invalid then
@@ -102,7 +99,8 @@ Function removeFromQueue()
   tubiLog("AuthTask.removeFromQueue")
   Request = TubiRequest()
   Auth = TubiAuth(m.global.constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants)
+  NodeHelpers = TubiNodeHelpers()
+  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
 
   tubiLog("Removing bookmark id " + m.top.content.bookmarkId + " for content " + m.top.content.id)
   request = Bookmarks.removeBookmarkReq(m.top.content)
@@ -133,7 +131,8 @@ Function removeFromHistory()
   tubiLog("AuthTask.removeFromHistory")
   Request = TubiRequest()
   Auth = TubiAuth(m.global.constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants)
+  NodeHelpers = TubiNodeHelpers()
+  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
 
   tubiLog("Removing content " + m.top.content.id + " from history")
   request = Bookmarks.removeHistoryReq(m.top.content)
@@ -164,7 +163,8 @@ Function updateHistory()
   tubiLog("AuthTask.updateHistory")
   Request = TubiRequest()
   Auth = TubiAuth(m.global.constants, Request)
-  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants)
+  NodeHelpers = TubiNodeHelpers()
+  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
 
   'only do the following if the user is logged in
   if m.top.content <> invalid

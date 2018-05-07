@@ -269,7 +269,7 @@ Function onAddToQueueSelected()
     if contentAndIndex <> invalid and contentAndIndex.content <> invalid
       m.detailScreen.addToQueueTitle = "Adding..."
       if m.userTask <> invalid
-        unobserveAllScoped(m.userTask)
+        m.NodeHelpers.unobserveAllScoped(m.userTask)
       end if
       m.userTask = CreateObject("roSGNode", "AuthTask")
       m.userTask.functionName = "addToQueue"
@@ -298,7 +298,6 @@ Function onBookmarked() As Void
   bookmarkId = m.userTask.bookmarkId
   m.userTask.unobserveFieldScoped("bookmarkId")
   m.userTask = invalid
-
   if bookmarkId = invalid then
     code = -1
     reason = "Unknown"
@@ -312,13 +311,6 @@ Function onBookmarked() As Void
   if contentAndIndex <> invalid and contentAndIndex.content <> invalid
     tubiLog("Got bookmarkId " + bookmarkId + " for content " + contentAndIndex.content.id)
 
-    ' TODO(Chris): Move management of this global list off to a library
-    ' or task
-    newBookmark = CreateObject("roSGNode", "BookmarkContentNode")
-    newBookmark.id = contentAndIndex.content.id
-    newBookmark.type = contentAndIndex.content.type
-    newBookmark.bookmarkId = bookmarkId
-    m.global.bookmarkIds = immutableInsertChild(m.global.bookmarkIds, newBookmark, 0)
     m.detailScreen.isBookmark = true
     m.detailScreen.isWaitingForServerResponse = false
 
@@ -329,7 +321,7 @@ Function onBookmarked() As Void
       ctx: m.top.trackingUri
     }
   end if
-  onHistoryQueueChange()
+  onHistoryQueueChange(m.constants.ui.categoryIds.queue)
 End Function
 
 
@@ -340,11 +332,11 @@ Function onRemoveFromQueueSelected()
     if contentAndIndex <> invalid and contentAndIndex.content <> invalid
       m.detailScreen.removeQueueTitle = "Removing..."
       if m.userTask <> invalid
-        unobserveAllScoped(m.userTask)
+        m.NodeHelpers.unobserveAllScoped(m.userTask)
       end if
       m.userTask = CreateObject("roSGNode", "AuthTask")
       m.userTask.functionName = "removeFromQueue"
-      content = clone(contentAndIndex.content)
+      content = contentAndIndex.content.clone(false)
       bookmark = m.global.bookmarkIds.findNode(content.id)
       content.bookmarkId = bookmark.bookmarkId
       m.userTask.content = content
@@ -379,20 +371,13 @@ Function onBookmarkRemoved() As Void
   m.detailScreen.isWaitingForServerResponse = false
   contentAndIndex = m.detailScreenContent.peek()
   if contentAndIndex <> invalid and contentAndIndex.content <> invalid
-    content = contentAndIndex.content
-    bookmarkNode = m.global.bookmarkIds.findNode(content.id)
-    if bookmarkNode <> invalid then
-      m.global.bookmarkIds = immutableRemoveChild(m.global.bookmarkIds, bookmarkNode)
-    end if
-    m.detailScreen.isBookmark = false
-
     'user tracking
     m.global.trackingLoggingTask.trackEvent = {
       trackType: "deleteBookmark"
-      value: content.id
+      value: contentAndIndex.content.id
     }
   end if
-  onHistoryQueueChange()
+  onHistoryQueueChange(m.constants.ui.categoryIds.queue)
 End Function
 
 
@@ -403,11 +388,11 @@ Function onRemoveFromHistorySelected()
     if contentAndIndex <> invalid and contentAndIndex.content <> invalid
       history = m.global.historyIds.findNode(contentAndIndex.content.id)
       if history <> invalid and history.historyId <> invalid
-        content = clone(contentAndIndex.content)
+        content = contentAndIndex.content.clone(false)
         m.detailScreen.removeHistoryTitle = "Removing..."
         content.historyId = history.historyId
         if m.userTask <> invalid
-          unobserveAllScoped(m.userTask)
+          m.NodeHelpers.unobserveAllScoped(m.userTask)
         end if
         m.userTask = CreateObject("roSGNode", "AuthTask")
         m.userTask.functionName = "removeFromHistory"
@@ -443,13 +428,9 @@ Function onHistoryRemoved() As Void
   m.detailScreen.isWaitingForServerResponse = false
   contentAndIndex = m.detailScreenContent.peek()
   if contentAndIndex <> invalid and contentAndIndex.content <> invalid
-    historyNode = m.global.historyIds.findNode(contentAndIndex.content.id)
-    if historyNode <> invalid
-      m.global.historyIds = immutableRemoveChild(m.global.historyIds, historyNode)
-    end if
     m.detailScreen.isHistory = false
   end if
-  onHistoryQueueChange()
+  onHistoryQueueChange(m.constants.ui.categoryIds.history)
 End Function
 
 

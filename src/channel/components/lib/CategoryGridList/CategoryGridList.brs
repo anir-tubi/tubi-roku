@@ -1,5 +1,8 @@
 Function init()
   tubiLog("CategoryGridList.init")
+  m.constants = m.global.constants
+  m.NodeHelpers = TubiNodeHelpers()
+
   m.top.observeField("metadataFetchTaskBatch", "onMetadataFetchTaskBatchResponse")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("content", "onContentChange")
@@ -13,8 +16,6 @@ Function init()
   m.RowListItemDebounce.observeField("fire", "onRowListItemDebounce")
   m.AnimateToCategoryDebounce = m.top.findNode("AnimateToCategoryDebounce")
   m.AnimateToCategoryDebounce.observeField("fire", "onAnimateToCategoryDebounce")
-
-  m.constants = m.global.constants
 
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
@@ -94,8 +95,7 @@ Function onContentModify(message)
   if change.operation = "insert" or change.operation = "add"
     ' insert - A child node was inserted at change.index1
     ' add - A child node was added to the end of the children node tree (at change.index1)
-    new = clone(m.top.content.getChild(change.index1))
-
+    new = m.top.content.getChild(change.index1).clone(true)
     ' NOTE!: There is a bug internal to RowList caused by inserting a child content node,
     ' causing it to create a whole bunch of new components and crash low-end devices.  Here we avoid this
     ' by removing the content first before manipulating it.  In the end the RowList doesn't destroy
@@ -119,9 +119,12 @@ Function onContentModify(message)
     end if
   else if change.operation = "set"
     ' The child node at position change.index1 was replaced with a new child node
-    new = clone(m.top.content.getChild(change.index1))
+    new = m.top.content.getChild(change.index1).clone(true)
     replaced = m.internalContent.getChild(change.index1)
     m.internalContent.replaceChild(new, change.index1)
+    m.Rowlist.content = invalid
+    m.Rowlist.content = m.internalContent
+    m.RowList.jumpToRowItem = rowItemFocused
   else if change.operation = "clear" or change.operation = "setall"
     ' clear - All the children nodes were removed
     ' setall - All the children nodes were replaced
@@ -159,7 +162,7 @@ Function onContentChange()
     m.lastContent = m.top.content
     if m.top.content <> invalid then
       ' Clone here since we are replacing nodes within the category tree
-      m.internalContent = cloneDeep(m.top.content)
+      m.internalContent = m.top.content.clone(true)
       m.RowList.content = m.internalContent
       'At this point, there is a limited set (as defined in constants) of content in each category.
       'loadCategories will get the rest of the content for each category.
@@ -173,30 +176,6 @@ Function onContentChange()
   end if
 End Function
 
-Function onDirtyUserCategories()
-  tubiLog("CategoryGridList.onDirtyUserCategories")
-  if m.internalContent <> invalid
-    myQueue = m.internalContent.findNode(m.constants.ui.categoryIds.queue)
-    if myQueue <> invalid
-      myQueue.removeChildrenIndex(myQueue.getChildCount(), 0)
-      myQueue.state = "none"
-    end if
-    continueWatching = m.internalContent.findNode(m.constants.ui.categoryIds.history)
-    if continueWatching <> invalid
-      continueWatching.removeChildrenIndex(continueWatching.getChildCount(), 0)
-      continueWatching.state = "none"
-    end if
-
-    ' reload the categories
-    ' this is done separately in case they are not contiguous or overlap
-    ' a fetch window
-    myQueueIndex = getChildIndex(m.internalContent, myQueue)
-    loadCategories(myQueueIndex)
-    continueWatchingIndex = getChildIndex(m.internalContent, continueWatching)
-    loadCategories(continueWatchingIndex)
-  end if
-
-End Function
 
 ' animateToCategory doesn't cause rowItemFocused or itemFocused to be triggered unless
 ' the RowList has focus.  We capture this in order to load categories even when the
@@ -350,10 +329,17 @@ End Function
 Function onMetadataFetchTaskBatchResponse(message) As Void
   tubiLog("CategoryGridList.onMetadataFetchTaskBatchResponse")
   responses = message.GetData()
+  removableCategories = {}
   if responses <> invalid
     batchMaxIndex = 0
     for each requestId in responses
       index = mergeMetadata(responses[requestId])
+      if index = -1
+        'we rely on the request id to be the same as the category id here
+        'it works but is not best practice
+        'categories with index = -1 means they have no content and should be removed
+        removableCategories[requestId] = true
+      end if
       if index > batchMaxIndex
         batchMaxIndex = index
       end if
@@ -375,7 +361,9 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
   counts = []
   children = m.internalContent.getChildren(m.internalContent.getChildCount(), 0)
   for each child in children
-    if child.totalCount <> invalid
+    if removableCategories[child.id] = true
+      counts.push(-1)
+    else if child.totalCount <> invalid
       counts.push(child.totalCount)
     else
       counts.push(0)

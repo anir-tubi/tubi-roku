@@ -16,6 +16,8 @@
     <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
@@ -36,10 +38,6 @@
          - Cancel an outstanding request - see MetadataFetchTaskDTO.brs for structure
          -->
         <field id="cancel" type="assocarray" alwaysNotify="true"/>
-
-        <field id="bookmarkIds" type="assocarray"/>
-        <field id="historyIds" type="assocarray"/>
-
 
       <!-- OUTPUT -->
         <!-- Set to true once the thread loop is up and listening for requests -->

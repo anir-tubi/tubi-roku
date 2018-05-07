@@ -12,6 +12,7 @@
     <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>

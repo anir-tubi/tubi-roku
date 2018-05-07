@@ -10,19 +10,20 @@
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/NodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
     <!-- INPUTS -->
       <!-- MetadataFetchTask response for matrix homescreen (all categories and content) -->
       <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
     
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
       <field id="signedIn" type="boolean" value="false" />
 
-      <field id="dirtyUserCategories" type="boolean" value="false" alwaysNotify="true"/>
+      <field id="dirtyUserCategories" type="string" alwaysNotify="true"/>
 
       <!-- show/hide the InfoPanel -->
       <field id="infoVisible" alias="StuffThatsInvisibleDuringLiveTV.visible"/>

@@ -1,6 +1,7 @@
 Function init()
   tubiLog("CategoryScreen.init")
   m._ = rodash()
+  m.NodeHelpers = TubiNodeHelpers()
   m.constants = m.global.constants
   m.ContentArea = m.top.findNode("ContentArea")
   m.CategoryList = m.top.findNode("CategoryList") 'aka category menu
@@ -12,10 +13,12 @@ Function init()
   m.InfoPanelFade = fades.findNode("InfoPanelFade")
   m.FeatureInfoFade = fades.findNode("FeatureInfoFade")
   m.HintGroupFade = fades.findNode("HintGroupFade")
+  m.Spinner = m.top.findNode("CategorySpinner")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
   m.top.observeField("homescreenResponse", "onHomescreenResponse")
+  m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
   m.top.observeField("trackingUri", "onTrackingUriChange")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.top.observeField("loadAllCategories", "loadAllCategories")
@@ -38,10 +41,6 @@ Function init()
   m.CategoryGridList.observeField("cursorPosition", "onGridCursorChange")
   m.CategoryGridList.observeField("categoryTotalCounts", "onTotalCountsChange")
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRow")
-
-  'Special categories - used to update the user categories as necessary
-  m.ContinueWatchingCategory = invalid
-  m.MyQueueCategory = invalid
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
@@ -96,24 +95,7 @@ Function onHomescreenResponse()
     response = m.top.homescreenResponse.response
     if response.code >= 200 and response.code < 300 then
       m.categoryContent = m.top.homescreenResponse.convertedMetadata
-      spinner = m.top.findNode("CategorySpinner")
-      spinner.visible = false
-
-      for i=0 to m.categoryContent.getChildCount()-1
-        category = m.categoryContent.getChild(i)
-
-        'since we're already looping through the content, take advantage to set the user categories (queue, history)
-        if category.id = m.constants.ui.categoryIds.history
-          m.ContinueWatchingCategory = category
-        else if category.id = m.constants.ui.categoryIds.queue
-          m.MyQueueCategory = category
-        end if
-
-        if m.ContinueWatchingCategory <> invalid and m.MyQueueCategory <> invalid
-          exit for
-        end if
-      end for
-
+      m.Spinner.visible = false
       m.InfoPanel.mode = "category"
       m.CategoryList.content = m.categoryContent    ' should be all cateogories but with no content in them
       m.CategoryGridList.content = m.categoryContent  ' should be all categories with initial amounts of content in them
@@ -126,6 +108,86 @@ Function onHomescreenResponse()
   end if
 End Function
 
+Function onReloadUserCategoriesResponse(msg)
+  handledRequest = msg.getData()
+  tubiLog("CategoryScreen.onReloadUserCategoriesResponse")
+  if handledRequest.response <> invalid then
+    response = handledRequest.response
+    if response.code >= 200 and response.code < 300 then
+      newCategory = handledRequest.convertedMetadata
+      m.Spinner.visible = false
+
+      if m.categoryContent <> invalid
+        oldCategory = invalid
+        if newCategory <> invalid and newCategory.id <> invalid
+          oldCategory = m.categoryContent.findNode(newCategory.id)
+        else if handledRequest.context.id <> invalid
+          oldCategory = m.categoryContent.findNode(handledRequest.context.id)
+        end if
+
+        ' there are 4 options here
+        ' 1) new category and old category both have content in them - replace the old with the new
+        ' 2) new category has content, old category doesn't exist - add the new category
+        ' 3) new category doesn't have content (will be invalid), old category does have content - remove old category
+        ' 4) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
+        if newCategory <> invalid and oldCategory <> invalid
+          'replace old category with new category
+          m.categoryContent.replaceChild(newCategory, m.NodeHelpers.getChildIndex(m.categoryContent, oldCategory))
+        else if newCategory <> invalid and oldCategory = invalid
+          'add new category
+          'if new category is history, put it one before queue, or if queue doens't exist put it in 2nd position
+          'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
+          if newCategory.id = m.constants.ui.categoryIds.history
+            queueIndex = m.NodeHelpers.getChildIndexById(m.categoryContent, m.constants.ui.categoryIds.queue)
+            insertPos = 1
+            if queueIndex > -1
+              insertPos = queueIndex
+            end if
+            m.categoryContent.insertChild(newCategory, insertPos)
+          else if newCategory.id = m.constants.ui.categoryIds.queue
+            historyIndex = m.NodeHelpers.getChildIndexById(m.categoryContent, m.constants.ui.categoryIds.history)
+            insertPos = 1
+            if historyIndex > -1
+              insertPos = historyIndex + 1
+            end if
+            m.categoryContent.insertChild(newCategory, insertPos)
+          end if
+        else if newCategory = invalid and oldCategory <> invalid
+          'remove old category
+          m.categoryContent.removeChild(oldCategory)
+        else if newCategory = invalid and oldCategory = invalid
+          'do nothing
+        end if
+
+        'reset the categoryGridList content so the changes display in the RowList
+        categoryContent = m.categoryContent
+        m.CategoryGridList.content = categoryContent
+      end if
+
+
+
+
+      ' if m.CategoryGridList.content <> invalid
+      '   ' Make sure any user categories which didn't get newly added are reloaded
+      '   for each userCategory in [m.constants.ui.categoryIds.history, m.constants.ui.categoryIds.queue]
+      '     childNode = m.CategoryGridList.content.findNode(userCategory)
+      '     if childNode <> invalid
+      '       m.CategoryGridList.content.replaceChild(childNode.clone(false), m.NodeHelpers.getChildIndex(m.CategoryGridList.content, childNode))
+      '     end if
+      '   end for
+      ' else
+      '   m.CategoryGridList.content = m.categoryContent  ' should be all categories with initial amounts of content in them
+      ' end if
+      ' if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
+    else
+      testLog("Category list returned " + stri(response.code))
+      ' if we were loading in the background, don't show an error modal
+      if m.top.isInFocusChain() then showErrorModal(response.code, response.failReason, retryCategoryList, retryCategoryList)
+    end if
+  end if
+End Function
+
+
 ' We retry in the cancel or retry cases, since there is nowhere else to go
 Function retryCategoryList()
   loadAllCategories()
@@ -136,10 +198,31 @@ End Function
 ' onDirtyUserCategories
 '
 ' if one of the user categories is showing, reload it
-Function onDirtyUserCategories()
+Function onDirtyUserCategories(msg)
   tubiLog("CategoryScreen.onDirtyUserCategories")
-  adjustCategories()
-  m.CategoryGridList.dirtyUserCategories = true
+  categoryId = msg.getData()
+
+  if categoryId <> invalid
+    url = m.constants.urls.matrix.container + "/" + categoryId
+    options = {
+      params: {
+        "app_id": m.constants.settings.shortAppName,
+        platform: m.constants.platform,
+        "device_id": m.constants.deviceInfo.deviceId,
+        limit: m.constants.performance.categoryGridList.finalBlockSize
+        expand: 1,
+        cursor: 0,
+        includeEmpty: true
+      }
+    }
+
+    'this will be an auth request if the user is logged in
+    'auth request creation happens in metadataFetchTask
+    'auth request will add the userId param
+    reqName = m.constants.reqNames.getCategory
+    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", url, reqName, options)
+    m.Spinner.visible = true
+  end if
 End Function
 
 ''''''''''''''''''''
@@ -234,47 +317,6 @@ Function hideCategoryMenu()
     m.CategoryGridList.isFullWidth = true
   end if
 End Function
-
-
-' Change categories based on current app state
-Function adjustCategories() As Void
-  if m.categoryContent = invalid then return
-
-  insert = 1
-  ' Add or remove user categories, taking care to only change them when necessary
-  if m.top.signedIn and m.global.historyIds.getChildCount() > 0
-    if m.ContinueWatchingCategory = invalid
-      m.ContinueWatchingCategory = CreateObject("roSGNode", "CategoryContentNode")
-      m.ContinueWatchingCategory.id = m.constants.ui.categoryIds.history
-      m.ContinueWatchingCategory.title = m.constants.ui.categoryNames.history
-      m.ContinueWatchingCategory.state = "none"
-      m.categoryContent.insertChild(m.ContinueWatchingCategory, insert)
-    end if
-  else if m.global.historyIds.getChildCount() = 0 and m.ContinueWatchingCategory <> invalid
-    historyIndex = getChildIndexById(m.categoryContent, m.constants.ui.categoryIds.history)
-    m.categoryContent.removeChildIndex(historyIndex)
-    m.ContinueWatchingCategory = invalid
-  end if
-
-  if m.top.signedIn and m.global.bookmarkIds.getChildCount() > 0
-    if m.MyQueueCategory = invalid
-      m.MyQueueCategory = CreateObject("roSGNode", "CategoryContentNode")
-      m.MyQueueCategory.id = m.constants.ui.categoryIds.queue
-      m.MyQueueCategory.title = m.constants.ui.categoryNames.queue
-      m.MyQueueCategory.state = "none"
-      historyIndex = getChildIndexById(m.categoryContent, m.constants.ui.categoryIds.history)
-      if historyIndex >= 0
-        insert = historyIndex + 1
-      end if
-      m.categoryContent.insertChild(m.MyQueueCategory, insert)
-    end if
-  else if m.global.bookmarkIds.getChildCount() = 0 and m.MyQueueCategory <> invalid
-    queueIndex = getChildIndexById(m.categoryContent, m.constants.ui.categoryIds.queue)
-    m.categoryContent.removeChildIndex(queueIndex)
-    m.MyQueueCategory = invalid
-  end if
-End Function
-
 
 ' Use this trigger to synchronize menu and grid
 Function onCategoryListScrollFocused()
@@ -413,13 +455,19 @@ Function onTotalCountsChange(msg)
   tubiLog("CategoryScreen.onTotalCountsChange")
   totalCountInfo = msg.getData()
 
-  for i=0 to totalCountInfo.count()-1
+  for i=totalCountInfo.count()-1 to 0 Step -1
     categoryInList = m.categoryContent.getChild(i)
     categoryInList.totalCount = totalCountInfo[i]
+
+    'category has no content, so we delete it here
+    if categoryInList.totalCount = -1
+      m.categoryContent.removeChildIndex(i)
+    end if
   end for
 
   itemFocused = m.CategoryList.itemFocused
   m.CategoryList.content = m.categoryContent
+  m.CategoryGridList.content = m.categoryContent
   ' NOTE: Setting the content for the CategoryList forces a refresh of the
   ' CategorySeasonListItems but the side effect is the MarkupGrid focuses
   ' to the first item.  We counteract that here by explicitly setting
@@ -456,6 +504,7 @@ Function loadAllCategories()
     }
     reqName = m.constants.reqNames.getHomescreen
     m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", url, reqName, options)
+    m.Spinner.visible = true
   end if
 End Function
 

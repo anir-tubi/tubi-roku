@@ -39,7 +39,8 @@ Function testAddBookmarkReqUnauthorized(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Unauthorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   content = CreateObject("roSGNode", "TubiContentNode")
 
   ' Type: Movie
@@ -54,7 +55,8 @@ Function testAddBookmarkReqMovie(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "321221"
@@ -67,7 +69,8 @@ Function testAddBookmarkReqSeries(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "series"
   content.id = "01079"
@@ -80,7 +83,8 @@ Function testAddBookmarkReqEpisodeWithParent(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "302800"
@@ -98,7 +102,8 @@ Function testRemoveBookmarkReq(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "series"
   content.id = "01079"
@@ -117,7 +122,8 @@ Function xtestAddHistoryReqVideo(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "321221"
@@ -130,7 +136,8 @@ Function xtestAddHistoryReqEpisodeWithParent(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "302800"
@@ -145,7 +152,8 @@ Function testAddHistoryReqEpisodeWithoutParent(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "video"
   content.id = "302800"
@@ -159,7 +167,8 @@ Function testAddHistoryReqSeries(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   content = CreateObject("roSGNode", "TubiContentNode")
   content.type = "series"
   content.id = "1079"
@@ -180,7 +189,8 @@ Function testGetInitialBookmarksReqSignedOut(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Unauthorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   req = BM.getInitialBookmarksReq("1234")
   t.assertInvalid(req)
 End Function
@@ -189,7 +199,8 @@ Function testGetInitialBookmarksReqSignedIn(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   req = BM.getInitialBookmarksReq("1234")
   t.assertNotInvalid(req)
 End Function
@@ -198,7 +209,8 @@ Function testGetInitialHistoryReqSignedOut(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Unauthorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   req = BM.getInitialHistoryReq("1234")
   t.assertInvalid(req)
 End Function
@@ -207,7 +219,8 @@ Function testGetInitialHistoryReqSignedIn(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   req = BM.getInitialHistoryReq("1234")
   t.assertNotInvalid(req)
 End Function
@@ -239,7 +252,8 @@ Function testHandleInitialBookmarks(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   bookmarks = BM.handleInitialBookmarks(serverJson)
   t.assertNotInvalid(bookmarks)
   t.assertEqual(bookmarks.getChildCount(), 2)
@@ -316,7 +330,8 @@ Function testHandleInitialHistory(t As Object)
   constants = getConstants()
   REQUEST = TubiRequest()
   AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   history = BM.handleInitialHistory(serverJson)
   t.assertNotInvalid(history)
   t.assertEqual(history.getChildCount(), 2)
@@ -333,140 +348,4 @@ Function testHandleInitialHistory(t As Object)
   t.assertEqual(history.getChild(1).getChild(0).historyId, "58236b43da0d8f51916fd020")
   t.assertEqual(history.getChild(1).getChild(0).nowPos, 2720)
   t.assertEqual(history.getChild(1).getChild(0).type, "video")
-End Function
-
-''''''''''''''
-' updateNowPos
-'
-' Permutations:
-'   signed in vs. signed out - playerInfo.historyId will be empty or invalid for signed out
-'   movie vs. episode () - episode will have playerInfo.parentHistoryId
-'   new vs. existing - historyIds{}/historyOrder[] will already contain a matching entry for existing
-''''''''''''''
-
-Function testUpdateNowPosSignedInMovieNew(t As Object)
-  constants = getConstants()
-  REQUEST = TubiRequest()
-  AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = CreateObject("roSGNode", "TubiContentNode")
-  content = CreateObject("roSGNode", "TubiContentNode")
-  content.type = "video"
-  content.id = "321221"
-  content.title = "We Are Young"
-  playerInfo = {
-    nowPos: 145
-    historyId: "AABBCCDDEEFFGG"
-  }
-  result = BM.updateNowPos(content, playerInfo, historyIds)
-  t.assertEqual(result.getChildCount(), 1)
-  t.assertEqual(result.getChild(0).id, "321221")
-  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.video)
-  t.assertEqual(result.getChild(0).historyId, "AABBCCDDEEFFGG")
-  t.assertEqual(result.getChild(0).nowPos, 145)
-End Function
-
-Function testUpdateNowPosSignedInEpisodeNew(t As Object)
-  constants = getConstants()
-  REQUEST = TubiRequest()
-  AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = CreateObject("roSGNode", "TubiContentNode")
-  content = CreateObject("roSGNode", "TubiContentNode")
-  content.type = "video"
-  content.id = "302800"
-  content.title = "S02:E05 - You, I'll Be Following"
-  content.parentId = "1079"
-  playerInfo = {
-    nowPos: 145
-    historyId: "AABBCCDDEEFFGG"
-    parentHistoryId: "TTUUVVWWXXYYZZ"
-  }
-  result = BM.updateNowPos(content, playerInfo, historyIds)
-  t.assertEqual(result.getChildCount(), 1)
-  t.assertEqual(result.getChild(0).id, "1079")
-  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.series)
-  t.assertEqual(result.getChild(0).historyId, "TTUUVVWWXXYYZZ")
-  t.assertEqual(result.getChild(0).currentEpisodeId, "302800")
-  t.assertEqual(result.getChild(0).getChildCount(), 1)
-  t.assertEqual(result.getChild(0).getChild(0).id, "302800")
-  t.assertEqual(result.getChild(0).getChild(0).historyId, "AABBCCDDEEFFGG")
-  t.assertEqual(result.getChild(0).getChild(0).nowPos, 145)
-End Function
-
-Function testUpdateNowPosSignedInMovieExisting(t As Object)
-  constants = getConstants()
-  REQUEST = TubiRequest()
-  AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = CreateObject("roSGNode", "TubiContentNode")
-  video = historyIds.createChild("TubiContentNode")
-  video.id = "321221"
-  video.type = "video"
-  video.historyId = "AABBCCDDEEFFGG"
-  video.nowPos = 10
-  content = CreateObject("roSGNode", "TubiContentNode")
-  content.type = "video"
-  content.id = "321221"
-  content.title = "We Are Young"
-  playerInfo = {
-    nowPos: 145
-    historyId: "AABBCCDDEEFFGG"
-  }
-  result = BM.updateNowPos(content, playerInfo, historyIds)
-  t.assertEqual(result.getChildCount(), 1)
-  t.assertEqual(result.getChild(0).id, "321221")
-  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.video)
-  t.assertEqual(result.getChild(0).historyId, "AABBCCDDEEFFGG")
-  t.assertEqual(result.getChild(0).nowPos, 145)
-End Function
-
-Function testUpdateNowPosSignedInEpisodeExisting(t As Object)
-  constants = getConstants()
-  REQUEST = TubiRequest()
-  AUTH = mockAuth_Authorized(constants, REQUEST)
-  BM = TubiBookmarks(REQUEST, AUTH, constants)
-  historyIds = CreateObject("roSGNode", "TubiContentNode")
-  series = historyIds.createChild("TubiContentNode")
-  series.id = "01079"
-  series.type = "series"
-  series.historyId = "TTUUVVWWXXYYZZ"
-  series.currentEpisodeId = "302800"
-  episode = series.createChild("TubiContentNode")
-  episode.id = "302800"
-  episode.type = "video"
-  episode.historyId = "AABBCCDDEEFFGG"
-  episode.nowPos = 15
-  content = CreateObject("roSGNode", "TubiContentNode")
-  content.type = "video"
-  content.id = "302800"
-  content.title = "S02:E05 - You, I'll Be Following"
-  content.parentId = "1079"
-  playerInfo = {
-    nowPos: 145
-    historyId: "AABBCCDDEEFFGG"
-    parentHistoryId: "TTUUVVWWXXYYZZ"
-  }
-
-
-  result = BM.updateNowPos(content, playerInfo, historyIds)
-  t.assertEqual(result.getChildCount(), 1)
-  t.assertEqual(result.getChild(0).id, "01079")
-  t.assertEqual(result.getChild(0).type, constants.ui.contentTypes.series)
-  t.assertEqual(result.getChild(0).historyId, "TTUUVVWWXXYYZZ")
-  t.assertEqual(result.getChild(0).currentEpisodeId, "302800")
-  t.assertEqual(result.getChild(0).getChildCount(), 1)
-  t.assertEqual(result.getChild(0).getChild(0).id, "302800")
-  t.assertEqual(result.getChild(0).getChild(0).type, constants.ui.contentTypes.video)
-  t.assertEqual(result.getChild(0).getChild(0).historyId, "AABBCCDDEEFFGG")
-  t.assertEqual(result.getChild(0).getChild(0).nowPos, 145)
-End Function
-
-Function xtestUpdateNowPosInvalidHistoryIds(t As Object)
-End Function
-
-Function xtestUpdateNowPosInvalidHistoryOrder(t As Object)
-End Function
-
-Function xtestUpdateNowPosInvalidPlayerInfo(t As Object)
 End Function
