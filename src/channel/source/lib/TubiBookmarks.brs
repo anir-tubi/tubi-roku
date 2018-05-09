@@ -156,16 +156,11 @@ end function
 '@contentType: string (should be "series" or "movie") - not necessary for deletes
 '@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
 function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, position as Dynamic, action as String, contentType = "" as String) as Object
-  authInfo = m.auth.getAuthInfo()  'from memory
-  if authInfo = invalid or authInfo.accessToken = invalid
-    return invalid
-  end if
-  
   body = {
-    user_id: authInfo.userId
     content_id: id
     content_type: contentType
     position: position
+    device_id: m.constants.deviceInfo.deviceId
   }
 
   if parentId <> invalid
@@ -194,6 +189,13 @@ function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, 
   end if
 
   historyReq = m.auth.createAuthRequest(url, action+"History", options)
+  if historyReq = invalid
+    'for logged out users
+    options.headers = {
+      "Content-type": "application/json"
+    }
+    historyReq = m.Request.createAsync(url, action+"History", options)
+  end if
 
   return historyReq
 end function
@@ -230,14 +232,6 @@ end function
 
 '@localId: string, a string used to identify req when a response is received
 function tubiBookmarks_getInitialHistoryReq(localId) as Object
-  authInfo = m.auth.getAuthInfo()  'from registry
-
-  'if the user is not logged in (aka doesn't have an accessToken in local memory),
-  'then don't get any history items
-  if authInfo = invalid or authInfo.accessToken = invalid
-    return invalid
-  end if
-
   url = m.constants.urls.users.history
 
   options = {
@@ -245,10 +239,19 @@ function tubiBookmarks_getInitialHistoryReq(localId) as Object
     params: {
       "page_enabled": false
       platform: m.constants.platform
+      "deviceId": m.constants.deviceInfo.deviceId
     }
   }
 
   initialHistoryReq = m.auth.createAuthRequest(url, "getInitialHistory", options)
+  'auth.createAuthRequest() returns invalid if user is not logged in
+  if initialHistoryReq = invalid
+    options.headers = {
+      "Content-type": "application/json"
+    }
+    initialHistoryReq = m.request.createAsync(url, "getInitialHistory", options)
+  end if
+
   if initialHistoryReq <> invalid then
     initialHistoryReq.localId = localId
   end if
