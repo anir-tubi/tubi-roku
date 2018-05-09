@@ -186,7 +186,6 @@ function tubiTracking_getUserTrackingRequest(trackData as Object) as Object
     options = {
       method: m.constants.reqTypes.post
       body: FormatJson(trackData)
-      headers: {"Content-Type": "application/json"}
     }
 
     userRequest = m.request.createAsync(trackUrl, "track" + trackData.key, options)

@@ -190,10 +190,6 @@ function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, 
 
   historyReq = m.auth.createAuthRequest(url, action+"History", options)
   if historyReq = invalid
-    'for logged out users
-    options.headers = {
-      "Content-type": "application/json"
-    }
     historyReq = m.Request.createAsync(url, action+"History", options)
   end if
 
@@ -246,9 +242,6 @@ function tubiBookmarks_getInitialHistoryReq(localId) as Object
   initialHistoryReq = m.auth.createAuthRequest(url, "getInitialHistory", options)
   'auth.createAuthRequest() returns invalid if user is not logged in
   if initialHistoryReq = invalid
-    options.headers = {
-      "Content-type": "application/json"
-    }
     initialHistoryReq = m.request.createAsync(url, "getInitialHistory", options)
   end if
 

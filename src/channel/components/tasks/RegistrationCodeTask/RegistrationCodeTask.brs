@@ -19,9 +19,6 @@ Function registrationLoop() As Void
   reqOptions = {
     method: "POST"
     body: body
-    headers: {
-      "Content-type": "application/json"
-    }
   }
   regCodeRequest = Request.createAsync(url, "webRegistration", reqOptions)
   
@@ -93,9 +90,6 @@ Function registrationLoop() As Void
     reqOptions = {
       method: "POST"
       body: body
-      headers: {
-        "Content-type": "application/json"
-      }
     }
     regCodeStatus = Request.createAsync(url, "webConfirmationPoll", reqOptions)
     regCodeStatus.start(port)

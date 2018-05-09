@@ -24,9 +24,6 @@ Function execSignIn() As Void
   reqOptions = {
     method: "POST"
     body: body
-    headers: {
-      "Content-type": "application/json"
-    }
   }
   request = Request.createAsync(url, "webLogin", reqOptions)
   

@@ -44,12 +44,20 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     headers: {}
     retries: 3
   }
+
   for each o in mergedOptions
     if options[o] <> invalid then mergedOptions[o] = options[o]
     if o = "method" then
       mergedOptions.method = UCase(mergedOptions.method)
       if validRequestTypes.DoesExist(mergedOptions.method) = false then
-        method = "GET"
+        mergedOptions.method = "GET"
+      end if
+    end if
+    if o = "headers" and mergedOptions[o].DoesExist("Content-Type") = false
+      if options.method <> invalid
+        if UCase(options.method) = "POST" or UCase(options.method) = "PUT" or UCase(options.method) = "PATCH"
+          mergedOptions[o].Append({"Content-Type": "application/json"})
+        end if
       end if
     end if
   end for
