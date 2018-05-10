@@ -303,6 +303,12 @@
           visible="true"/>
       </Group>
 
+      <SpritePoster
+        id="Thumbnail"
+        width="342"
+        height="192"
+        spriteDirection="horiz"
+        translation="[238,633]"/>
       
       <Group
         id="Transport"

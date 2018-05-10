@@ -20,6 +20,7 @@
          - {
          -   contentId: <id of the content to fetch (0-prefixed for series)>
          -   getRelated: <boolean, should we also get the related content at this time>
+         -   getThumbnails: <boolean, indicates whether we should get the seeking thumbnails>
          - }
          -->
         <field id="request" type="assocarray"/>

@@ -1,0 +1,115 @@
+' Useful for comparing behavior of ButtonGroup with
+' the Menu component
+Function componentTest_SpritePoster(screen, runComponentTest)
+  apiResponse = {
+    "count_per_sprite": 20
+    "duration": 8538.123
+    "frame_width": 220
+    "height": 92
+    "id": "301333"
+    "sprites": [
+      "http://images.adrise.tv/mHqxdM3p0GZhXrkz3ICH49arh5g=/img.adrise.tv/301333/5x-0.jpg"
+      "http://images.adrise.tv/WCn7sR7BqUnzXvQTzHSXffYX8T0=/img.adrise.tv/301333/5x-1.jpg"
+      "http://images.adrise.tv/F-W42HaCs4eX8IUY7Vz_gHGukmo=/img.adrise.tv/301333/5x-2.jpg"
+      "http://images.adrise.tv/9xhbJ1hL_EuqnxoKlUmWUeN3EWQ=/img.adrise.tv/301333/5x-3.jpg"
+      "http://images.adrise.tv/fVh2rqVR4AqFZdr7QbwcylfcY4c=/img.adrise.tv/301333/5x-4.jpg"
+      "http://images.adrise.tv/K1-3NjYfXrIZSwkI9TezG_qdWOM=/img.adrise.tv/301333/5x-5.jpg"
+      "http://images.adrise.tv/oqQ2MYQhaeIe4o4029I_Zjos2CY=/img.adrise.tv/301333/5x-6.jpg"
+      "http://images.adrise.tv/IYr4PlapC5s_XmVtOUqF6UBxXxY=/img.adrise.tv/301333/5x-7.jpg"
+      "http://images.adrise.tv/bc-yY2my7uIwat03368P4nP72iQ=/img.adrise.tv/301333/5x-8.jpg"
+      "http://images.adrise.tv/geJtsCDttw4XMPBhhIeCkQ_5krA=/img.adrise.tv/301333/5x-9.jpg"
+      "http://images.adrise.tv/IzPiYbMQ9hnLAVedbPCZ2pozkjU=/img.adrise.tv/301333/5x-10.jpg"
+      "http://images.adrise.tv/1NlSgQdj2hPUiA9YXinkIHZHdEc=/img.adrise.tv/301333/5x-11.jpg"
+      "http://images.adrise.tv/0x6FUFB17Xf3bFkQP0sgMgzt7fE=/img.adrise.tv/301333/5x-12.jpg"
+      "http://images.adrise.tv/jPnF1wnZCEjSZiqWVwpwG2NX6vw=/img.adrise.tv/301333/5x-13.jpg"
+      "http://images.adrise.tv/x6VoVJsnR8lR6xUrgTsqZcthkh8=/img.adrise.tv/301333/5x-14.jpg"
+      "http://images.adrise.tv/bWiLPAZbFGdL1656CQOIRZnPRFs=/img.adrise.tv/301333/5x-15.jpg"
+      "http://images.adrise.tv/XDUgZbUP2iEllk4AjZIQpSs8o8A=/img.adrise.tv/301333/5x-16.jpg"
+      "http://images.adrise.tv/IHktSpl3Ds1avYni_mmjr6GJOTI=/img.adrise.tv/301333/5x-17.jpg"
+      "http://images.adrise.tv/BRjVa2viwf-I3TdueExEUgBV-_8=/img.adrise.tv/301333/5x-18.jpg"
+      "http://images.adrise.tv/WNpmpzmx06wng0pDE8VUFQtkYnw=/img.adrise.tv/301333/5x-19.jpg"
+      "http://images.adrise.tv/cTq0xi24UgF9b2_a8BPqslu1iFs=/img.adrise.tv/301333/5x-20.jpg"
+      "http://images.adrise.tv/N6NBro54Btl4Qni_OrBz-sPTzx0=/img.adrise.tv/301333/5x-21.jpg"
+      "http://images.adrise.tv/dj_a_W5pPrG7pgiiUnS_QPu9uGk=/img.adrise.tv/301333/5x-22.jpg"
+      "http://images.adrise.tv/jemSGNEowwq74fmTG76dO3YyaCg=/img.adrise.tv/301333/5x-23.jpg"
+      "http://images.adrise.tv/w2dO7syt7-P6I-IOS_ORQDvAKY4=/img.adrise.tv/301333/5x-24.jpg"
+      "http://images.adrise.tv/pbD0Pj43-dzhtcvONnszajxOY_Y=/img.adrise.tv/301333/5x-25.jpg"
+      "http://images.adrise.tv/IQPEXVBeA-VkrWxc0QmImEyO_ZA=/img.adrise.tv/301333/5x-26.jpg"
+      "http://images.adrise.tv/AnA8xywgawEP7fMH9jguak5ligc=/img.adrise.tv/301333/5x-27.jpg"
+      "http://images.adrise.tv/9oREZVTMJ4_rDUWJIxWs8QivbRU=/img.adrise.tv/301333/5x-28.jpg"
+      "http://images.adrise.tv/2K2mq7kGiqEKmdzrtkw8q7A2bj4=/img.adrise.tv/301333/5x-29.jpg"
+      "http://images.adrise.tv/SwBi-C8Z1x6GG1gSnA73cDX8XA8=/img.adrise.tv/301333/5x-30.jpg"
+      "http://images.adrise.tv/jyuQkd6GmReNJEJH1t-24HOUKeU=/img.adrise.tv/301333/5x-31.jpg"
+      "http://images.adrise.tv/NaVTLvNUrUQ9UTUMyYz6CwX25KE=/img.adrise.tv/301333/5x-32.jpg"
+      "http://images.adrise.tv/UGbNzhtxhYom4WCkRNR82yAPJXc=/img.adrise.tv/301333/5x-33.jpg"
+      "http://images.adrise.tv/ggzzDcS21gCQIPAWl0TzIIqoRqQ=/img.adrise.tv/301333/5x-34.jpg"
+      "http://images.adrise.tv/1gJrA_W3kVMbPN1qFiLnH60EO14=/img.adrise.tv/301333/5x-35.jpg"
+      "http://images.adrise.tv/X7hZIQa9_0YU89GIMEu9ibhFYy4=/img.adrise.tv/301333/5x-36.jpg"
+      "http://images.adrise.tv/DNOXvKw5pS9tfgNWwiSB4m0O-jg=/img.adrise.tv/301333/5x-37.jpg"
+      "http://images.adrise.tv/RRaLEuiVdLW_B25tqhAd7np-SBc=/img.adrise.tv/301333/5x-38.jpg"
+      "http://images.adrise.tv/nQt9wlcZrLuN05xAsaMcOBEsJww=/img.adrise.tv/301333/5x-39.jpg"
+      "http://images.adrise.tv/GxOwIjL92EuYysWnlweiTdnP59c=/img.adrise.tv/301333/5x-40.jpg"
+      "http://images.adrise.tv/vu-chtKNnFmpFNHkRD_oM-XLQI8=/img.adrise.tv/301333/5x-41.jpg"
+      "http://images.adrise.tv/XL4yiLnI8l4W5cQvK6s8tnmndxQ=/img.adrise.tv/301333/5x-42.jpg"
+      "http://images.adrise.tv/Eo_q2-GvxSyt6KMzVXrQt0JZfLU=/img.adrise.tv/301333/5x-43.jpg"
+      "http://images.adrise.tv/pAvzmAcN70m7lgNHIJU284RGgZo=/img.adrise.tv/301333/5x-44.jpg"
+      "http://images.adrise.tv/isHw5WynWakBzMaxHSu_B-ZmdCU=/img.adrise.tv/301333/5x-45.jpg"
+      "http://images.adrise.tv/q98DRojl3GqsPlEbnX4gXutEWec=/img.adrise.tv/301333/5x-46.jpg"
+      "http://images.adrise.tv/U536-IbMErA3fBDMBr-OPI5i75o=/img.adrise.tv/301333/5x-47.jpg"
+      "http://images.adrise.tv/bOuAKD7mHZr2oEC7pYkXrBd9DiI=/img.adrise.tv/301333/5x-48.jpg"
+      "http://images.adrise.tv/H3RQARvgXMGMgnTjkfDFphYUprk=/img.adrise.tv/301333/5x-49.jpg"
+      "http://images.adrise.tv/gjDFBod7Ev285JQ1SojYTpKxQ70=/img.adrise.tv/301333/5x-50.jpg"
+      "http://images.adrise.tv/yMXvjj6T6Un4ZgqrEcgL6kMfghk=/img.adrise.tv/301333/5x-51.jpg"
+      "http://images.adrise.tv/iZL3AO4E44qiEGuyrXaywA--YdM=/img.adrise.tv/301333/5x-52.jpg"
+      "http://images.adrise.tv/rPPg9_yLayf5ikHU8Kj3v-Q8sH8=/img.adrise.tv/301333/5x-53.jpg"
+      "http://images.adrise.tv/XVVEtsrGAkAyZ6hL-AgQFsKumNY=/img.adrise.tv/301333/5x-54.jpg"
+      "http://images.adrise.tv/LRrlVBKjn3K2di2Pl2XE6g7josY=/img.adrise.tv/301333/5x-55.jpg"
+      "http://images.adrise.tv/zf4ng2lm92CqQJAZ8z4ChaugmzM=/img.adrise.tv/301333/5x-56.jpg"
+      "http://images.adrise.tv/wXEDGwpL0xa4OK24B6m6Fvv6Oow=/img.adrise.tv/301333/5x-57.jpg"
+      "http://images.adrise.tv/4bkjhjxmC8833hpm5ncILDyGA0U=/img.adrise.tv/301333/5x-58.jpg"
+      "http://images.adrise.tv/cXQbhNosig6wTAJPLt2bKZVAkzY=/img.adrise.tv/301333/5x-59.jpg"
+      "http://images.adrise.tv/M9J8SaMjuHfp2e7SmQSR4tAG4-0=/img.adrise.tv/301333/5x-60.jpg"
+      "http://images.adrise.tv/IIenOOYKfKuWlBtbMg7LCTTpcSE=/img.adrise.tv/301333/5x-61.jpg"
+      "http://images.adrise.tv/Wpl6AXcAP3OyU4AIkd1Zey6bJ2Y=/img.adrise.tv/301333/5x-62.jpg"
+      "http://images.adrise.tv/4fw5blzinGDBBO3vUOMbdlj87fY=/img.adrise.tv/301333/5x-63.jpg"
+      "http://images.adrise.tv/fwN4BvNGXjezPs8xXapeOEduWqU=/img.adrise.tv/301333/5x-64.jpg"
+      "http://images.adrise.tv/T9ZYFGPVRNf3VA-_PH63GYJfB44=/img.adrise.tv/301333/5x-65.jpg"
+      "http://images.adrise.tv/Uo2P2Zit0BH2qIWssqGTwAwFlho=/img.adrise.tv/301333/5x-66.jpg"
+      "http://images.adrise.tv/1HKisjyJVPvsLb814QaZ_wlg18g=/img.adrise.tv/301333/5x-67.jpg"
+      "http://images.adrise.tv/2G3bbNHPSSbsnf87nW7Xgr8I54s=/img.adrise.tv/301333/5x-68.jpg"
+      "http://images.adrise.tv/E-BH-HHRSD2K8Ud7oXl6qyjRA9k=/img.adrise.tv/301333/5x-69.jpg"
+      "http://images.adrise.tv/OGOqxax3c2x1bfpv_PIoURkHESA=/img.adrise.tv/301333/5x-70.jpg"
+      "http://images.adrise.tv/lZY4Z_BxQKibpMCxeXQxJ0d_GIo=/img.adrise.tv/301333/5x-71.jpg"
+      "http://images.adrise.tv/rJq35PmRPPdFAqEDQyFelwAlULs=/img.adrise.tv/301333/5x-72.jpg"
+      "http://images.adrise.tv/P4rN2kfSUIrP4cPOiNWPpXPy_R8=/img.adrise.tv/301333/5x-73.jpg"
+      "http://images.adrise.tv/eSz0DF6ZsOUxylL7_CWC68qG9_Y=/img.adrise.tv/301333/5x-74.jpg"
+      "http://images.adrise.tv/-x7ADJQZExWPPJ7lqB7V59c4oy0=/img.adrise.tv/301333/5x-75.jpg"
+      "http://images.adrise.tv/SlS6-yRoAEKbfa5ezH2bysH8hZs=/img.adrise.tv/301333/5x-76.jpg"
+      "http://images.adrise.tv/41jZjAWkSnGOVxsNsFDPNfGv0Fs=/img.adrise.tv/301333/5x-77.jpg"
+      "http://images.adrise.tv/tQD3_1g7RfS_32LD2SZdo8XxutQ=/img.adrise.tv/301333/5x-78.jpg"
+      "http://images.adrise.tv/neiyFmqq-OwGedwaljyptQL2lds=/img.adrise.tv/301333/5x-79.jpg"
+      "http://images.adrise.tv/xO0uf3bXLK3rEoFduxbRd5NLRoE=/img.adrise.tv/301333/5x-80.jpg"
+      "http://images.adrise.tv/ZJSoOZQDO2U9QBZ9E33D0tCmqNU=/img.adrise.tv/301333/5x-81.jpg"
+      "http://images.adrise.tv/DBBsS0k3KHa9w-6X7cw0qQlpNJE=/img.adrise.tv/301333/5x-82.jpg"
+      "http://images.adrise.tv/NKCF36b5vC02g25WPwTbLZUeeEA=/img.adrise.tv/301333/5x-83.jpg"
+      "http://images.adrise.tv/9Gpdpyn5f8GlYZhSy_E8gqS99hQ=/img.adrise.tv/301333/5x-84.jpg"
+      "http://images.adrise.tv/gPB7DGj6twK2nuV0Gd9qejgNugQ=/img.adrise.tv/301333/5x-85.jpg"
+    ]
+  }
+  loadScaleFactor = 0.75
+  data = [
+    {
+      "numSprites": apiResponse.count_per_sprite
+      "spriteWidth": 440
+      "spriteHeight": 184
+      "spriteSheetWidth": apiResponse.frame_width * apiResponse.count_per_sprite * loadScaleFactor
+      "spriteSheetHeight": apiResponse.height * loadScaleFactor
+    }
+    {
+      "spriteUrls": apiResponse.sprites
+    }
+  ]
+  return runComponentTest("SpritePosterTest", data)
+End Function
+
+

@@ -78,7 +78,7 @@ End Function
 ' - observe roSGNodeEvents from 'observeFields'
 ' - Scene captures "back" and "ok" events to remove and restore target component focus
 '
-Function componentTest_testComponent(componentName, dataFields={}, observeFields=[])
+Function componentTest_testComponent(componentName, dataFields={}, observeFields=[], runAfterInstantiate=invalid)
   screen = m.componentTestScreen
   port = screen.GetMessagePort()
   scene = screen.GetScene()
@@ -102,7 +102,6 @@ Function componentTest_testComponent(componentName, dataFields={}, observeFields
     print "Unexpected type '"; type(dataFields); "' for data fields"
   end if
   target.setFocus(true)
-
   while true
     msg = wait(100, port)
     if type(msg) = "Invalid"
@@ -112,6 +111,13 @@ Function componentTest_testComponent(componentName, dataFields={}, observeFields
         rect = target.boundingRect()
         boundaries.width = rect.width
         boundaries.height = rect.height
+      end if
+
+      if type(runAfterInstantiate) = "Function" or type(runAfterInstantiate) = "roFunction"
+        result = runAfterInstantiate(target)
+        if result = false
+          runAfterInstantiate = invalid
+        end if
       end if
     else
       print "Got " + type(msg) + " message"

@@ -53,5 +53,9 @@
     
     <!-- for related content items displayed on the detail screen -->
     <field id="relatedContent" type="node" />
+
+    <field id="thumbnailUrls" type="stringarray" />
+    <field id="thumbnailSpan" type="integer" />
+    <field id="thumbnailSize" type="intarray"/>
   </interface>
 </component>

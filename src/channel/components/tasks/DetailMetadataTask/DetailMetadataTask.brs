@@ -37,9 +37,16 @@ Function execGetDetailMetadata() As Void
     relatedReq.start(port)
   end if
 
+  thumbnailsReq = invalid
+  if m.top.request.getThumbnails = true
+    thumbnailsReq = cms.thumbnailsReq(m.top.request.contentId)
+    thumbnailsReq.start(port)
+  end if
+
   ' Wait for all responses
   contentResult = invalid
   relatedResult = invalid
+  thumbnailsResult = invalid
   while true
     msg = wait(0, port)
     if contentResult = invalid
@@ -48,7 +55,10 @@ Function execGetDetailMetadata() As Void
     if relatedReq <> invalid and relatedResult = invalid
       relatedResult = relatedReq.handleEvent(msg)
     end if
-    if (contentResult <> invalid and relatedReq = invalid) or (contentResult <> invalid and relatedResult <> invalid)
+    if thumbnailsReq <> invalid and thumbnailsResult = invalid
+      thumbnailsResult = thumbnailsReq.handleEvent(msg)
+    end if
+    if contentResult <> invalid and (relatedReq = invalid or relatedResult <> invalid) and (thumbnailsReq = invalid or thumbnailsResult <> invalid)
       exit while
     end if
   end while
@@ -69,6 +79,17 @@ Function execGetDetailMetadata() As Void
           tubiLog("DetailMetadataTask failed to parse JSON response")
         else
           detail.relatedContent = translate.translateRelatedContent(parsed)
+        end if
+      end if
+
+      if thumbnailsResult <> invalid and thumbnailsResult.response <> invalid and success(thumbnailsResult.response.code)
+        parsed = ParseJSON(thumbnailsResult.response.data)
+        if parsed = invalid then
+          tubiLog("DetailMetadataTask failed to parse JSON response")
+        else
+          detail.thumbnailUrls = parsed.sprites
+          detail.thumbnailSpan = parsed.count_per_sprite
+          detail.thumbnailSize = [parsed.frame_width, parsed.height]
         end if
       end if
       m.top.response = detail

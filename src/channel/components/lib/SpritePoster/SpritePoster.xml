@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="SpritePoster" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/SpritePoster/SpritePoster.brs" />
+  
+  <interface>
+    <!-- INPUTS -->
+      <field id="spriteUrls" type="stringarray"/>
+      <!-- number of sprites per sprite page -->
+      <field id="numSprites" type="integer"/>
+      <field id="spriteSheetWidth" type="float" value="0.0"/>
+      <field id="spriteSheetHeight" type="float" value="0.0"/>
+
+      <!-- Sprite dimensions to be applied to incoming file -->
+      <field id="width" type="float" />
+      <field id="height" type="float" />
+
+      <!-- Sprite sheet direction: "horiz" or "vert" -->
+      <field id="spriteDirection" type="string"/>
+
+      <!-- Jump to the specified zero-index sprite -->
+      <field id="jumpToSprite" type="integer" value="0"/>
+  </interface>
+  <children>
+    <Poster
+      id="Poster"/>
+    <!-- Based on testing, this will preload the image even if visible=false. This
+         reduces the possibility of a thumbnail blank while the sprite sheet is
+         loading -->
+    <Poster
+      id="Preload"
+      visible="false"/>
+    <Poster
+      id="Preload2"
+      visible="false"/>
+  </children>
+</component>

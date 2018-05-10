@@ -146,6 +146,7 @@ Function refreshContent(nowPos)
     m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
     request = {
       contentId: content.id
+      getThumbnails: true
     }
     m.refreshTask.request = request
     m.refreshTask.observeField("response", "onRefreshResponse")

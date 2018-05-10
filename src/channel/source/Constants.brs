@@ -227,6 +227,7 @@ Function getConstants()
     constants.reqNames.getSingleContent = "getSingleContent"
     constants.reqNames.getUpNextContent = "getUpNextContent"
     constants.reqNames.getRelatedContent = "getRelatedContent"
+    constants.reqNames.getThumbnails = "getThumbnails"
 
   'Nielsen ID token for integrating with Nielsen DAR
   constants.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
@@ -266,6 +267,7 @@ Function getConstants()
       constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
       constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
       constants.urls.cms.relatedContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/related"
+      constants.urls.cms.thumbnails = constants.urls.cms.urlBase + "/content" ' + content_id + "/thumbnail_sprites"
 
     'matrix url
     constants.urls.matrix = {}
@@ -383,6 +385,8 @@ Function getConstants()
     constants.player.transportAutoHideTime = 5
 
     constants.player.stillWatchingStopOnTimeout = invalid
+
+    constants.player.thumbnailFrequency = 5
 
     'video player returns one of the following
     constants.player.playerResults = {}

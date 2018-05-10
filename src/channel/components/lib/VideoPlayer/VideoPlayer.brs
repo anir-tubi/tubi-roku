@@ -61,6 +61,7 @@ Function init()
   m.VideoPicker.observeField("contentSelected", "onVideoPickerSelected")
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
+  m.Thumbnail = m.top.findNode("Thumbnail")
 
   'm.VideoState is source of truth for the state of the video player for the UI
   'possible values are "play", "pause", "rew", "ffw", "stop", "refresh"
@@ -129,6 +130,10 @@ Function init()
     ["On",                           "On always"]
     ["Instant replay",               "On replay"]
   ]
+
+  m.thumbnailMinXOffset = 238 ' based on zeplin designs
+  m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
+  m.thumbnailMaxYOffset = 889
 
   ' Workaround for 9-patch bug
   '
@@ -211,6 +216,24 @@ Function onContentChange() As Void
   'add the skip trailer button if it's a trailer and it doesn't already exist on the transport
   else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
     m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
+  end if
+
+  m.Thumbnail.visible = false   ' always start with thumbnail invisible, then show it when scrubbin
+  if m.top.content.thumbnailUrls <> invalid and m.top.content.thumbnailUrls.count() > 0 and m.constants.deviceInfo.limitedUi = false
+    m.Thumbnail.numSprites = m.top.content.thumbnailSpan
+    ' This should bring the 4400px image width down below the 4kx4k texture size limit
+    ' which would otherwise cause the images to fail to load.
+    scaleFactor = 0.75
+    m.Thumbnail.spriteSheetWidth = m.top.content.thumbnailSize[0] * m.top.content.thumbnailSpan * scaleFactor
+    m.Thumbnail.spriteSheetHeight = m.top.content.thumbnailSize[1] * scaleFactor
+    m.Thumbnail.spriteUrls = m.top.content.thumbnailUrls
+    m.Thumbnail.jumpToSprite = 0
+    ' Always keep height of thumbnail the same, varying the width if necessary
+    thumbnailAspect = m.top.content.thumbnailSize[0] / m.top.content.thumbnailSize[1]
+    m.Thumbnail.width = m.Thumbnail.height * thumbnailAspect
+    m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
+    m.Thumbnail.translation = [m.thumbnailMinXOffset, m.thumbnailMaxYOffset - m.Thumbnail.height]
+  else
   end if
 End Function
 
@@ -300,7 +323,21 @@ Function updateTransport()
   if m.Video.duration > 0
     maxWidth = m.top.findNode("ProgressBarBackground").width
     minWidth = m.ProgressBar.bitmapWidth
-    m.ProgressBar.width = minWidth + (m.playerPosition / m.Video.duration) * (maxWidth - minWidth)
+    percentComplete = (m.playerPosition / m.Video.duration)
+    m.ProgressBar.width = minWidth + percentComplete * (maxWidth - minWidth)
+
+    progressBarRight = m.ProgressBar.translation[0] + m.ProgressBar.width
+
+    thumbnailXOffset = progressBarRight - m.Thumbnail.width / 2
+    if thumbnailXOffset > m.thumbnailMaxXOffset
+      thumbnailXOffset = m.thumbnailMaxXOffset
+    end if
+    if thumbnailXOffset < m.thumbnailMinXOffset
+      thumbnailXOffset = m.thumbnailMinXOffset
+    end if
+
+    m.Thumbnail.translation = [thumbnailXOffset, m.Thumbnail.translation[1]]
+    m.Thumbnail.jumpToSprite = m.playerPosition \ m.constants.player.thumbnailFrequency
   end if
 End Function
 
@@ -857,6 +894,13 @@ Function updateTransportTimes()
   end if
 End Function
 
+Function showThumbnail()
+  if m.top.content.thumbnailUrls <> invalid and m.top.content.thumbnailUrls.count() > 0 and m.constants.deviceInfo.limitedUi = false
+    m.Thumbnail.visible = true
+  else
+    m.Thumbnail.visible = false
+  end if
+end Function
 
 'Perform at start of FF or RW
 Function beginScrub()
@@ -868,9 +912,9 @@ Function beginScrub()
 
   if m.HUD.opacity < 1.0
     animateTransport("in")
+    showThumbnail()
   end if
   m.scrubTimespan.mark()
-
 
   ' playProgress analytics
   playProgressEvent = getPlayProgressEvent()
@@ -1044,6 +1088,7 @@ End Function
 'helper function to conclude a hop, skip, or end scrub
 'performs the seek tracking and runs an ad break if told to
 Function handleSeek(position as Integer, shouldAdBreak as Boolean)
+  m.Thumbnail.visible = false
   ' seek analytics
   trackEvent({
     trackType: "seek"
@@ -1076,6 +1121,7 @@ Function handleSkipVideo(amt, isProgressBarFocused)
     m.PlayPauseButton.uri = m.buttonUris.play
     setFocusedButton(m.ProgressBar)
   end if
+  showThumbnail()
 
   updatePlayerPosition(amt)
 End Function
