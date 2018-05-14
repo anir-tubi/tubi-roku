@@ -10,6 +10,7 @@ Function init()
     m.simpleRegisterScreen = (getExperimentValue("RokuNamespace", "roku_simple_register_screen") = 1)
   end if
 
+  m.NodeHelpers = TubiNodeHelpers()
   initScreenStack(m.top.findNode("SignInScreenStack"), onScreenStackEmpty)
 End Function
 
