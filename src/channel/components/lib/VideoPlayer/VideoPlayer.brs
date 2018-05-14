@@ -912,8 +912,8 @@ Function beginScrub()
 
   if m.HUD.opacity < 1.0
     animateTransport("in")
-    showThumbnail()
   end if
+  showThumbnail()
   m.scrubTimespan.mark()
 
   ' playProgress analytics
