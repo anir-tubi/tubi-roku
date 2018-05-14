@@ -542,7 +542,7 @@ End Function
 ' @categoryId: string, the categoryId/containerId of the category we will refresh
 Function onHistoryQueueChange(categoryId)
   tubiLog("ContentController.onHistoryQueueChange")
-  if m.constants.ui.users.guestHistory <> true
+  if m.constants.ui.users.guestHistory = true
     if m.authTask <> invalid
       m.authTask.unobserveFieldScoped("authInfo")
     end if
