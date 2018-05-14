@@ -542,15 +542,17 @@ End Function
 ' @categoryId: string, the categoryId/containerId of the category we will refresh
 Function onHistoryQueueChange(categoryId)
   tubiLog("ContentController.onHistoryQueueChange")
-  if m.authTask <> invalid
-    m.authTask.unobserveFieldScoped("authInfo")
+  if m.constants.ui.users.guestHistory <> true
+    if m.authTask <> invalid
+      m.authTask.unobserveFieldScoped("authInfo")
+    end if
+    ' TODO Bryan: only get the history/queue ids of the categoryIds instead of both every time
+    m.authTask = CreateObject("roSGNode", "AuthTask")
+    m.authTask.observeFieldScoped("authInfo", "onHistoryQueueRefresh")
+    m.authTask.functionName = "execInitializeUserData"
+    m.authTask.control = "RUN"
+    if m.categoryScreen <> invalid then m.categoryScreen.dirtyUserCategories = categoryId
   end if
-  ' TODO Bryan: only get the history/queue ids of the categoryIds instead of both every time
-  m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onHistoryQueueRefresh")
-  m.authTask.functionName = "execInitializeUserData"
-  m.authTask.control = "RUN"
-  if m.categoryScreen <> invalid then m.categoryScreen.dirtyUserCategories = categoryId
 End Function
 
 Function onHistoryQueueRefresh()

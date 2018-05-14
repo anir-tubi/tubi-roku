@@ -452,6 +452,10 @@ Function getConstants()
       constants.ui.onnow.on = false
       constants.ui.onNow.channelId = "livetv_clips"
 
+    'constants for user specific functionality
+    constants.ui.users = {}
+      constants.ui.users.guestHistory = false
+
     'constants needed for sign in flow experimentation
     constants.ui.signIn = {}
       constants.ui.signIn.skipContinueScreen = true

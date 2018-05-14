@@ -156,6 +156,10 @@ end function
 '@contentType: string (should be "series" or "movie") - not necessary for deletes
 '@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
 function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, position as Dynamic, action as String, contentType = "" as String) as Object
+  if m.constants.ui.users.guestHistory <> true
+    return invalid
+  end if
+
   body = {
     content_id: id
     content_type: contentType
@@ -228,6 +232,10 @@ end function
 
 '@localId: string, a string used to identify req when a response is received
 function tubiBookmarks_getInitialHistoryReq(localId) as Object
+  if m.constants.ui.users.guestHistory <> true
+    return invalid
+  end if
+
   url = m.constants.urls.users.history
 
   options = {
