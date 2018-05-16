@@ -156,7 +156,8 @@ end function
 '@contentType: string (should be "series" or "movie") - not necessary for deletes
 '@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
 function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, position as Dynamic, action as String, contentType = "" as String) as Object
-  if m.constants.ui.users.guestHistory <> true
+  authInfo = m.auth.getAuthInfo()
+  if authInfo = invalid and m.constants.ui.users.guestHistory <> true
     return invalid
   end if
 
@@ -166,7 +167,9 @@ function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, 
     position: position
     device_id: m.constants.deviceInfo.deviceId
   }
-
+  if authInfo <> invalid
+    body.user_id = Val(authInfo.userId)
+  end if
   if parentId <> invalid
     body.parent_id = parentId
   end if
@@ -232,7 +235,11 @@ end function
 
 '@localId: string, a string used to identify req when a response is received
 function tubiBookmarks_getInitialHistoryReq(localId) as Object
-  if m.constants.ui.users.guestHistory <> true
+  authInfo = m.auth.getAuthInfo()  'from registry
+
+  'if the user is not logged in (aka doesn't have an accessToken in local memory),
+  'then don't get any bookmarks
+  if authInfo = invalid and m.constants.ui.users.guestHistory <> true
     return invalid
   end if
 
