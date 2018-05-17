@@ -165,7 +165,6 @@ Function stillWatchingExperimentAnalyticsValue()
 End Function
 
 Function onInactivityTimer()
-  tubiLog("ContentController.onInactivityTimer")
   now = Uptime(0)
   if (now - m.lastUserActivity > m.constants.timers.stillWatchingTimeout) and m.videoPlayer.visible = true
     if m.inactivityModal = invalid

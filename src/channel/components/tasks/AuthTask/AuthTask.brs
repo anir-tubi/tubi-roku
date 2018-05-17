@@ -12,41 +12,11 @@ Function execInitializeUserData()
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()
-  queuePort = CreateObject("roMessagePort")
-  queue = TubiRequestQueue().create(queuePort)
-  localBookmarkReqId = "bookmark"
-  localHistoryReqId = "history"
-  ' return empty containers if user is not authenticated or requests fail
-  newBookmarks = CreateObject("roSGNode", "BookmarkContentNode")
-  newHistory = CreateObject("roSGNode", "HistoryContentNode")
 
-  initialBookmarksReq = Bookmarks.getInitialBookmarksReq(localBookmarkReqId)
-  if initialBookmarksReq <> invalid then
-    queue.pushRequest(initialBookmarksReq)
-  end if
+  userCats = getInitalUserCategories(Bookmarks, true, true)
 
-  initialHistoryReq = Bookmarks.getInitialHistoryReq(localHistoryReqId)
-  if initialHistoryReq <> invalid then
-    queue.pushRequest(initialHistoryReq)
-  end if
-
-  while queue.count() > 0
-    msg = wait(0, queuePort)
-    handledReq = queue.handleEvent(msg)
-    if handledReq <> invalid
-      print "*** execInitializeUserData: "; handledReq.localId; " returned "; handledReq.response.code
-      if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
-        if handledReq.localId = localBookmarkReqId
-          newBookmarks = Bookmarks.handleInitialBookmarks(handledReq.response.data)
-        else if handledReq.localId = localHistoryReqId
-          newHistory = Bookmarks.handleInitialHistory(handledReq.response.data)
-        end if
-      end if
-    end if
-  end while
-
-  m.top.bookmarks = newBookmarks
-  m.top.history = newHistory
+  m.top.bookmarks = userCats.newBookmarks
+  m.top.history = userCats.newHistory
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger 
 End Function
 
@@ -55,9 +25,17 @@ Function execSignOut()
   constants = m.global.constants 'single thread-local reference to avoid thread rendevue
   Request = TubiRequest()
   Auth = TubiAuth(constants, Request)
+  NodeHelpers = TubiNodeHelpers()
+
   Auth.logout()
-  m.top.bookmarks = CreateObject("roSGNode", "BookmarkContentNode")
-  m.top.history = CreateObject("roSGNode", "HistoryContentNode")
+
+  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
+  authInfo = Auth.getAuthInfo()
+
+  userCats = getInitalUserCategories(Bookmarks, true, false)
+
+  m.top.bookmarks = userCats.newBookmarks
+  m.top.history = userCats.newHistory
   m.top.authInfo = invalid
 End Function
 
@@ -191,4 +169,50 @@ Function updateHistory()
     end if
     tubiLog("EXIT AuthTask.updateHistory")
   end if
+End Function
+
+
+Function getInitalUserCategories(Bookmarks, getHistory=true, getBookmarks=false)
+  queuePort = CreateObject("roMessagePort")
+  queue = TubiRequestQueue().create(queuePort)
+  localBookmarkReqId = "bookmark"
+  localHistoryReqId = "history"
+  ' return empty containers if user is not authenticated or requests fail
+  newBookmarks = CreateObject("roSGNode", "BookmarkContentNode")
+  newHistory = CreateObject("roSGNode", "HistoryContentNode")
+  userCategories = {
+    newBookmarks: newBookmarks
+    newHistory: newHistory
+  }
+
+  if getBookmarks = true
+    initialBookmarksReq = Bookmarks.getInitialBookmarksReq(localBookmarkReqId)
+    if initialBookmarksReq <> invalid then
+      queue.pushRequest(initialBookmarksReq)
+    end if
+  end if
+
+  if getHistory = true
+    initialHistoryReq = Bookmarks.getInitialHistoryReq(localHistoryReqId)
+    if initialHistoryReq <> invalid then
+      queue.pushRequest(initialHistoryReq)
+    end if
+  end if
+
+  while queue.count() > 0
+    msg = wait(0, queuePort)
+    handledReq = queue.handleEvent(msg)
+    if handledReq <> invalid
+      print "*** execInitializeUserData: "; handledReq.localId; " returned "; handledReq.response.code
+      if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
+        if handledReq.localId = localBookmarkReqId
+          userCategories.newBookmarks = Bookmarks.handleInitialBookmarks(handledReq.response.data)
+        else if handledReq.localId = localHistoryReqId
+          userCategories.newHistory = Bookmarks.handleInitialHistory(handledReq.response.data)
+        end if
+      end if
+    end if
+  end while
+
+  return userCategories
 End Function
