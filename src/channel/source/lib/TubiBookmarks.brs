@@ -168,7 +168,7 @@ function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, 
     device_id: m.constants.deviceInfo.deviceId
   }
   if authInfo <> invalid
-    body.user_id = Val(authInfo.userId)
+    body.user_id = authInfo.userId
   end if
   if parentId <> invalid
     body.parent_id = parentId
