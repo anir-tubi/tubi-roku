@@ -41,6 +41,7 @@ Function init()
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
+  m.Video.observeField("downloadedSegment", "onDownloadedSegment")
   m.top.observeField("control", "onControlChange")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("playlist", "onPlaylistChange")

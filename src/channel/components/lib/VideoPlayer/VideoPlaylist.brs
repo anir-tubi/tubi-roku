@@ -49,7 +49,9 @@ Function onVideoStateChange(msg)
   state = msg.GetData()
   if (state = "finished" or state = "error") and m.VideoState = "play"
     if state = "error"
-      tubiLog("Video playback error", "error", "videoPlayback", "video-playback")
+      content = currentPlaylistContent()
+      errorInfo = getPlaybackErrorInfo(m.Video, content)
+      tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-playback")
     end if
 
     ' hide "finished" and "error" states if we are advancing the playlist
@@ -76,24 +78,12 @@ Function onVideoStateChange(msg)
     ' only send buffering time if we reached playing state, otherwise
     ' the user may have just backed out of it or an error occurred
     if m.bufferingInfo <> invalid and state = "playing" then
-      messageInfo = {
-        buffer_time_ms: m.bufferingInfo.timespan.TotalMilliseconds()
-        video_id: ""
-        video_url: ""
-      }
-      if m.Video.streamInfo <> invalid then
-        messageInfo.stream_bitrate = m.Video.streamInfo.streamBitrate
-        messageInfo.measured_bitrate = m.Video.streamInfo.measuredBitrate
-        messageInfo.video_url = m.Video.streamInfo.streamUrl
-      end if
-      content = currentPlaylistContent()
-      if content <> invalid then
-        messageInfo.video_id = content.id
-      end if
-
       ' TODO(Chris): Remove this check once the logging server can handle loads
       ' for every buffering event.  For now we just log underruns
-      if m.Video.streamInfo <> invalid and m.Video.streamInfo.isUnderrun then
+      if m.Video <> invalid and m.Video.streamInfo.isUnderrun then
+        bufferingTime = m.bufferingInfo.timespan.TotalMilliseconds()
+        content = currentPlaylistContent()
+        messageInfo = getBufferMessageInfo(bufferingTime, m.Video, content)
         tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "REBUFFERING")
       end if
     end if
@@ -107,6 +97,16 @@ Function onVideoStateChange(msg)
   else
     m.Loading.visible = true
     m.Spinner.visible = true
+  end if
+End Function
+
+Function onDownloadedSegment(msg)
+  tubiLog("VideoPlaylist.onDownloadedSegment")
+  dlsegment = msg.getData()
+  if dlsegment <> invalid and dlsegment.status <> 0
+    content = currentPlaylistContent()
+    errorInfo = getDownloadErrorInfo(dlsegment, m.Video, content)
+    tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-download")
   end if
 End Function
 
@@ -193,3 +193,83 @@ Function onRefreshError(msg)
   end if
 End Function
 
+
+' Helper functions to create the error info to be sent as the message of error logs
+Function getDownloadErrorInfo(downloadedSegment, videoNode, content)
+  errorInfo = {
+    video_id: ""
+    video_url: ""
+  }
+
+  if downloadedSegment <> invalid
+    errorInfo.error_code = downloadedSegment.status
+    errorInfo.segment_sequence = downloadedSegment.SegSequence
+    errorInfo.segment_url = downloadedSegment.SegUrl
+    errorInfo.segment_download_duration = downloadedSegment.DownloadDuration
+    errorInfo.segment_bitrate = downloadedSegment.BitrateBps
+    errorInfo.segment_size = downloadedSegment.SegSize
+  end if
+
+  if content <> invalid then errorInfo.video_id = content.id
+  if videoNode <> invalid and videoNode.streamInfo <> invalid
+    errorInfo.video_url = videoNode.streamInfo.streamUrl
+  end if
+
+  return errorInfo
+End Function
+
+
+Function getBufferMessageInfo(ms, videoNode, content)
+  messageInfo = {
+    buffer_time_ms: ms
+    video_id: ""
+    video_url: ""
+  }
+  if videoNode <> invalid and videoNode.streamInfo <> invalid then
+    messageInfo.stream_bitrate = videoNode.streamInfo.streamBitrate
+    messageInfo.measured_bitrate = videoNode.streamInfo.measuredBitrate
+    messageInfo.video_url = videoNode.streamInfo.streamUrl
+  end if
+  if content <> invalid then
+    messageInfo.video_id = content.id
+  end if
+  return messageInfo
+End Function
+
+
+Function getPlaybackErrorInfo(videoNode, content)
+  errorInfo = {
+    video_id: ""
+    video_url: ""
+  }
+  if videoNode <> invalid
+    if videoNode.errorCode <> 0
+      if videoNode.errorCode = -3
+        errorInfo.error_message = "Server did not respond with hls segment. Potential 504 or 404. Following segment likely has issue."
+        if videoNode.downloadedSegment <> invalid
+          ' in the case of errorCode = -3, it likely means there was a 504 or 404 response from the server which ultimately was the source of the error.
+          ' we get the last downloaded segment which is the last good segment instead of the current streaming segment, which may be several segments ahead of the bad segment.
+          ' in this case, the segment causing the error is the segment AFTER the logged segment.
+          errorInfo.segment_sequence = videoNode.downloadedSegment.Sequence
+          errorInfo.segment_url = videoNode.downloadedSegment.SegUrl
+          errorInfo.segment_bitrate = videoNode.downloadedSegment.BitrateBps
+        end if
+      else if videoNode.errorMsg <> invalid
+        errorInfo.error_message = videoNode.errorMsg
+        if videoNode.streamingSegment <> invalid
+          ' videoNode.streamingSegment can be invalid when the server returns a 504, 404, etc.
+          errorInfo.segment_url = videoNode.streamingSegment.segUrl
+          errorInfo.segment_start_time = videoNode.streamingSegment.segStartTime
+          errorInfo.segment_sequence = videoNode.streamingSegment.segSequence
+          errorInfo.segment_bitrate = videoNode.streamingSegment.segBitrateBps
+        end if
+      end if
+      errorInfo.error_code = videoNode.errorCode
+    end if
+
+    if content <> invalid then errorInfo.video_id = content.id
+
+    if videoNode.streamInfo <> invalid then errorInfo.video_url = videoNode.streamInfo.streamUrl
+  end if
+  return errorInfo
+End Function
