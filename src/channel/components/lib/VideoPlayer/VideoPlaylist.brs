@@ -71,10 +71,12 @@ Function onVideoStateChange(msg)
   ' We use m.bufferingTimespan for both these data by allowing it to be 'invalid' when
   ' not tracking buffering state.
   if state = "buffering"
-    content = currentPlaylistContent()
-    messageInfo = getBufferMessageInfo(0, m.Video, content)
-    tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "rebuffer-start")
-    m.bufferingTimespan = CreateObject("roTimespan")
+    if m.Video.streamInfo <> invalid and m.Video.streamInfo.isUnderrun = true
+      content = currentPlaylistContent()
+      messageInfo = getBufferMessageInfo(0, m.Video, content)
+      tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "rebuffer-start")
+      m.bufferingTimespan = CreateObject("roTimespan")
+    end if
   else
     ' only send buffering time if we reached playing state, otherwise
     ' the user may have just backed out of it or an error occurred
