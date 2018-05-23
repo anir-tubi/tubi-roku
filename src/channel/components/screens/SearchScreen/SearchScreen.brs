@@ -232,6 +232,10 @@ Function loadSearchResults()
   m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, m.top, "searchResponse")
   m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", url, constants.reqNames.searchAPI, options)
 
+  m.global.trackingLoggingTask.trackEvent = {
+    trackType: "search"
+    value: m.SearchText.text
+  }
   if constants.deviceInfo.limitedUi = true
     m.UpdatingSpinner.visible = false
   end if
