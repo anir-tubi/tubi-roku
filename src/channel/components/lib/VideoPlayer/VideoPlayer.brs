@@ -517,7 +517,11 @@ Function onControlChange()
 
   else if m.top.control = "stop" then
     cancelReplayCaptions()
-    m.Video.control = "stop"
+    if m.Video.state <> "error" or m.Video.position > 0
+      ' There is a bug in roku firmware 8.0 that causes an execution timeout if
+      ' a video node's control is set to "stop" when the state is "error" and position = 0
+      m.Video.control = "stop"
+    end if
     m.VideoState = "stop"
 
     'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed
@@ -530,6 +534,7 @@ Function onControlChange()
     resumeFromPause()
   end if
 End Function
+
 
 Function onKeyEvent(key As String, press As Boolean)
   tubiLog("VideoPlayer.onKeyEvent key = " + key)
@@ -712,7 +717,11 @@ Function onAdStateChange()
     else
       m.top.errorMsg = "Video URL is not valid. Please contact: support@tubi.tv"
       m.top.state = "error"
-      tubiLog("Invalid video url", "error", "videoPlayback", "video-url")
+      errorInfo = {
+        video_id: m.top.content.id
+        video_url: m.top.content.url
+      }
+      tubiLog(FormatJson(errorInfo), "error", "videoPlayback", "video-url")
     end if
   else if m.top.adState = "adsclosed"
     ' This is not ideal implementation but we want the OnNow experience to continue playing

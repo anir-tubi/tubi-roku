@@ -71,23 +71,23 @@ Function onVideoStateChange(msg)
   ' We use m.bufferingTimespan for both these data by allowing it to be 'invalid' when
   ' not tracking buffering state.
   if state = "buffering"
-    m.bufferingInfo = {
-      timespan: CreateObject("roTimespan")
-    }
+    content = currentPlaylistContent()
+    messageInfo = getBufferMessageInfo(0, m.Video, content)
+    tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "rebuffer-start")
+    m.bufferingTimespan = CreateObject("roTimespan")
   else
     ' only send buffering time if we reached playing state, otherwise
     ' the user may have just backed out of it or an error occurred
-    if m.bufferingInfo <> invalid and state = "playing" then
+    if m.bufferingTimespan <> invalid and state = "playing" then
       ' TODO(Chris): Remove this check once the logging server can handle loads
       ' for every buffering event.  For now we just log underruns
       if m.Video <> invalid and m.Video.streamInfo.isUnderrun then
-        bufferingTime = m.bufferingInfo.timespan.TotalMilliseconds()
         content = currentPlaylistContent()
-        messageInfo = getBufferMessageInfo(bufferingTime, m.Video, content)
-        tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "REBUFFERING")
+        messageInfo = getBufferMessageInfo(m.bufferingTimespan.TotalMilliseconds(), m.Video, content)
+        tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "REBUFFERING")  'REBUFFERING is a legacy message style. It should be treated as rebuffer-end
       end if
     end if
-    m.bufferingInfo = invalid
+    m.bufferingTimespan = invalid
   end if
 
   ' Loading page visibility
@@ -221,10 +221,15 @@ End Function
 
 Function getBufferMessageInfo(ms, videoNode, content)
   messageInfo = {
-    buffer_time_ms: ms
     video_id: ""
     video_url: ""
   }
+
+  ' timespan is invalid if we are sending a buffer start event
+  if ms > 0
+    messageInfo.buffer_time_ms = ms
+  end if
+
   if videoNode <> invalid and videoNode.streamInfo <> invalid then
     messageInfo.stream_bitrate = videoNode.streamInfo.streamBitrate
     messageInfo.measured_bitrate = videoNode.streamInfo.measuredBitrate
