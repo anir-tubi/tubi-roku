@@ -24,6 +24,7 @@ End Function
 Function onComponentFocusChange()
   if m.top.isInFocusChain() and not m.Menu.hasFocus() then
     m.Menu.setFocus(true)
+    m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   end if
 End Function
 

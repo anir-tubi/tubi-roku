@@ -15,6 +15,8 @@ Function init()
 
   m.ToolsMenu.observeField("trackingCount", "onTrackingCountChange")
   m.ToolsMenu.observeField("trackingUri", "onTrackingUriChange")
+  m.ToolsMenu.observeField("backgroundUriList", "onToolsBackgroundChange")
+
   m.OnNow.observeField("trackingCount", "onTrackingCountChange")
   m.OnNow.observeField("trackingUri", "onTrackingUriChange")
   m.CategoryScreen.observeField("trackingCount", "onTrackingCountChange")
@@ -116,8 +118,6 @@ Function showTools(show)
   if show and not m.ToolsMenu.isInFocusChain()
     ' show
     slideFade(m.ToolsMenu, "above", "in", 0.4)
-    m.top.backgroundType = "fullscreen"
-    m.top.backgroundUriList = m.ToolsMenu.backgroundUriList
     m.focusTarget = m.ToolsMenu
   else if not show and m.ToolsMenu.isInFocusChain()
     ' hide
@@ -157,7 +157,6 @@ Function showCategoryScreen(show)
   if show and not m.CategoryScreen.isInFocusChain()
     animate(m.CategoryScreen, {destination: [0, 0], opacity: 1.0, duration: 0.4})
     m.CategoryScreen.infoVisible = true
-    m.top.backgroundType = "topright"
     m.focusTarget = m.CategoryScreen
   else if not show and m.CategoryScreen.isInFocusChain()
     animate(m.CategoryScreen, {destination: [0, 392], opacity: 0.2, duration: 0.4})
@@ -178,7 +177,6 @@ End Function
 Function onCategoryBackgroundChange()
   tubiLog("HomeScreen.onCategoryBackgroundChange")
   if m.CategoryScreen.isInFocusChain() then
-    m.top.backgroundType = "topright"
     m.top.backgroundUriList = m.CategoryScreen.backgroundUriList
   end if
 End Function
@@ -188,6 +186,13 @@ Function onCategoryContentSelected()
   if m.top.onNowContent <> invalid
     m.OnNow.control = "stop"  ' make sure we always stop the video before detail screen shows
     m.CategoryScreen.dockedVideoFrameVisible = false
+  end if
+End Function
+
+Function onToolsBackgroundChange()
+  tubiLog("HomeScreen.onToolsBackgroundChange")
+  if m.ToolsMenu.isInFocusChain() then
+    m.top.backgroundUriList = m.ToolsMenu.backgroundUriList
   end if
 End Function
 

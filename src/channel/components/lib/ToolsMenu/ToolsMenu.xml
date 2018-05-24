@@ -29,10 +29,7 @@
     <field id="privacySelected" type="boolean" alwaysNotify="true"/>
     
     <!-- will be used to change the background images on the content controller -->
-    <field id="backgroundUriList" 
-           type="stringarray" 
-           value="[&quot;pkg:/images/art-blur-background.png&quot;]"
-           alwaysNotify="true" />
+    <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
 
     <!-- observed by HomeScreen for navigating between screens -->
     <field id="trackingUri" type="string"/>
