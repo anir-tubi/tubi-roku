@@ -1,7 +1,21 @@
 ZIP=zip --quiet -x Makefile -9 -r
 CURL=curl
 MAKE=make
-TOOL_CLI=node tools/cli.js
+
+# Account for Linux builds
+OS=$(shell uname)
+ifeq ($(OS), Darwin)
+SED=sed -i '' -E
+else
+SED=sed -i.bk -r
+ifneq (, $(shell which nodejs))
+NODE=nodejs
+else
+NODE=node
+endif
+endif
+
+TOOL_CLI=$(NODE) tools/cli.js
 LANG=C
 
 NAME=tubi
@@ -58,22 +72,22 @@ rsync:
 	@rsync -arvq $(REMOTE_LOAD_RSYNC_INCLUDE) $(SRC_DIR)/* $(TARGET_REMOTE_DIR)
 
 	# Swap script references from pkg:/ to libpkg:/
-	@find ./$(TARGET_REMOTE_DIR)/components -name '*.xml' | xargs sed -i '' 's|<script type="text/brightscript" uri="pkg:|<script type="text/brightscript" uri="libpkg:|'
+	find ./$(TARGET_REMOTE_DIR)/components -name '*.xml' | xargs $(SED) 's|<script type="text/brightscript" uri="pkg:|<script type="text/brightscript" uri="libpkg:|'
 
 	# Swap only whitelisted image references from pkg:/ to libpkg:/
-	@for path in `egrep "(png|jpg)" new_images_since_2_5`; do \
+	for path in `egrep "(png|jpg)" new_images_since_2_5`; do \
     echo "Redirecting whitelisted image $$path"; \
-    find ./$(TARGET_REMOTE_DIR)/components -type file | xargs sed -E -i '' "s|pkg:/+$$path|libpkg:/$$path|"; \
+    find ./$(TARGET_REMOTE_DIR)/components -type f | xargs $(SED) "s|pkg:/+$$path|libpkg:/$$path|"; \
   done
 
 	# Remove $$RES$$ autosub since it doesn't work for remote components
-	@find ./$(TARGET_REMOTE_DIR)/components -name '*.xml' | xargs sed -i '' 's|\$$\$$RES\$$\$$|fhd|'
+	@find ./$(TARGET_REMOTE_DIR)/components -name '*.xml' | xargs $(SED) 's|\$$\$$RES\$$\$$|fhd|'
 
 gen:
-	@$(TOOL_CLI) create-config $(ROKU_PROFILE) $(TARGET_DIR)/$(SETTING_FILE)
+	@$(TOOL_CLI) create-settings $(ROKU_PROFILE) $(TARGET_DIR)/$(SETTING_FILE)
 	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_DIR)/$(MANIFEST_FILE) $(ORIGINAL_MANIFEST_NAME)
 	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_REMOTE_DIR)/$(MANIFEST_FILE) $(REMOTE_LOAD_NAME_MANIFEST_NAME)
-	@$(TOOL_CLI) create-hotpatch $(ROKU_PROFILE) 
+	@$(TOOL_CLI) create-hotpatch $(ROKU_PROFILE)
 	@touch $(TARGET_REMOTE_DIR)/source/main.brs
 
 stage: set-build

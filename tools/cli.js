@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
+'use strict';
+const build = require('./lib/build');
 const config = require('./lib/config');
 const network = require('./lib/network');
-const templatize = require('./lib/templating');
 const program = require('commander');
 
 program.version('0.1.0');
@@ -12,24 +13,24 @@ program.version('0.1.0');
  * should read configuration from database.
  */
 program
-  .command('create-config <env> <filename>')
+  .command('create-settings <env> <filename>')
   .description('create roku configuration files')
   .action((env, filename) => {
-    config.save(env, filename);
+    build.createSettings(env, filename);
   });
 
 program
   .command('create-manifest <env> <filename> <manifestname>')
   .description('create roku manifest file')
   .action((env, filename, manifestname) => {
-    config.genManifest(env, filename, manifestname)
+    build.createManifest(env, filename, manifestname)
   });
 
 program
   .command('create-hotpatch <env>')
   .description('create hotpatch files')
   .action((env) => {
-    templatize.createHotpatch(env)
+    build.createHotpatch(env)
   });
 
 program
@@ -79,7 +80,7 @@ program
   .command('get-build-tag <is_minor> <is_dot>')
   .description('dump a git-friendly version number to use as a tag')
   .action((isMinor, isDot) => {
-    config.getBuildTagExternal(isMinor, isDot);
+    console.log(config.getBuildTag(isMinor, isDot));
   });
 
 program
@@ -93,7 +94,7 @@ program
   .command('zip-files <dir_path>')
   .description('zip the contents of a directory')
   .action((dir_path) => {
-    config.zipDir(dir_path);
+    build.zipDir(dir_path);
   });
 
 program.parse(process.argv);

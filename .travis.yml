@@ -1,14 +1,23 @@
 # Bash skips all the default ruby setup
 language: bash
 
-# We don't really need osx except for comptibility of arguments to commands like sed.
-os: osx
+dist: trusty
+sudo: false
+
+before_install:
+- node --version
+#- curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+#- sudo apt-get update
+#- sudo apt-get install -y nodejs
+#- sudo apt-get install -y make
+#- sudo apt-get install -y rsync
+#- sudo apt-get install -y sudo
+#- sudo apt-get install -y curl
 
 # We use a subshell here since 'cd' persists to subsequent commands otherwise.
 # See https://docs.travis-ci.com/user/common-build-problems/#SSH-is-not-working-as-expected
 install:
 - bash -c 'cd tools && npm install'
-- brew install jfrog-cli-go
 
 script:
 - make build

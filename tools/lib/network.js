@@ -1,3 +1,4 @@
+'use strict';
 const path = require('path');
 const http = require('http');
 const fs = require('fs');
@@ -128,7 +129,7 @@ exports.hostComponents = function(serverPath, port){
   const server = http.createServer((req, res) => {
     const nodePath = path.dirname(require.main.filename);
     const requestPath = require('url').parse(req.url).pathname;
-    const fullPath = nodePath + '/../' + serverPath + requestPath;
+    const fullPath = `${nodePath}/../${serverPath}${requestPath}`;
     const stream = fs.createReadStream(fullPath);
 
     stream
