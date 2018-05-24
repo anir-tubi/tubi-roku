@@ -1,11 +1,9 @@
 Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("skipSignInOption", "setButtonContent")
-  m.top.observeField("simpleRegisterScreen", "onSimpleRegister")
   m.Buttons = m.top.findNode("Buttons")
   m.Buttons.setFocus(true)
   m.Buttons.observeField("itemSelected", "onButtonSelected")
-  m.RegistrationCode = m.top.findNode("RegistrationCode")
   m.RegistrationCode1 = m.top.findNode("RegistrationCode1")
   m.RegistrationCode2 = m.top.findNode("RegistrationCode2")
   m.RegistrationCode3 = m.top.findNode("RegistrationCode3")
@@ -13,8 +11,6 @@ Function init()
   m.RegistrationCode5 = m.top.findNode("RegistrationCode5")
   m.RegistrationCode6 = m.top.findNode("RegistrationCode6")
   setButtonContent()
-  onSimpleRegister()
-
 
   if m.global.constants.deviceInfo.scaledUi = true then
     m.top.findNode("RegistrationPoster1").uri = "pkg:/images/hd/menu-button.9.png"
@@ -24,21 +20,8 @@ Function init()
     m.top.findNode("RegistrationPoster5").uri = "pkg:/images/hd/menu-button.9.png"
     m.top.findNode("RegistrationPoster6").uri = "pkg:/images/hd/menu-button.9.png"
   end if
-
 End Function
 
-
-Function onSimpleRegister()
-  if m.top.simpleRegisterScreen
-    m.top.findNode("SimpleRegistrationGroup").visible = true
-    m.top.findNode("VerboseRegistrationGroup").visible = false
-    m.Buttons.translation = [m.Buttons.translation[0], 746]
-  else
-    m.top.findNode("SimpleRegistrationGroup").visible = false
-    m.top.findNode("VerboseRegistrationGroup").visible = true
-    m.Buttons.translation = [m.Buttons.translation[0], 776]
-  end if
-End Function
 
 ''''''''''''''''''''''''
 ' setButtonContent
@@ -100,7 +83,6 @@ End Function
 '
 ' Display the new registration code
 Function onCodeChange()
-  m.RegistrationCode.text = m.RegCodeTask.code
   m.RegistrationCode1.text = m.RegCodeTask.code.Mid(0,1)
   m.RegistrationCode2.text = m.RegCodeTask.code.Mid(1,1)
   m.RegistrationCode3.text = m.RegCodeTask.code.Mid(2,1)
@@ -183,7 +165,6 @@ End Function
 '
 Function getRegistrationCode()
   tubiLog("RegisterInstructionsScreen.getRegistrationCode")
-  m.RegistrationCode.text = "------"
   m.RegistrationCode1.text = "-"
   m.RegistrationCode2.text = "-"
   m.RegistrationCode3.text = "-"

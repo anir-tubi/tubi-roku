@@ -314,7 +314,7 @@ Function onTrackingLoggingReady()
       m.promptSignInOnGuestPlay = m.constants.ui.signIn.promptSignInOnGuestPlay
     else
       value = getExperimentValue("UserNamespace", "roku_sign_in")
-      if value = 2 or value = 3
+      if value = 2
         m.promptSignInOnGuestPlay = true
       end if
     end if
@@ -323,7 +323,7 @@ Function onTrackingLoggingReady()
       m.skipSignInOnLaunch = m.constants.ui.signIn.skipSignInOnLaunch
     else
       value = getExperimentValue("UserNamespace", "roku_sign_in")
-      if value = 0 or value = 2
+      if value <> 1
         m.skipSignInOnLaunch = true
       end if
     end if

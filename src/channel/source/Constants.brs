@@ -460,7 +460,6 @@ Function getConstants()
     constants.ui.signIn = {}
       constants.ui.signIn.skipContinueScreen = true
       constants.ui.signIn.skipSignInRegisterScreen = true
-      constants.ui.signIn.simpleRegisterScreen = false
       constants.ui.signIn.backExitsSignIn = false
       constants.ui.signIn.skipSignInOption = true    ' if true, suppress the "Sign in via Email" button on reg code screen
       constants.ui.signIn.skipSignInOnLaunch = false

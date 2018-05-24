@@ -13,8 +13,6 @@
     <!-- INPUT -->
       <field id="skipSignInOption" type="boolean" value="false"/>
 
-      <field id="simpleRegisterScreen" type="boolean" value="false"/>
-
     <!-- OUTPUT -->
       <!-- Set to true if the user has successfully registered -->
       <field id="registerSuccess" type="boolean" value="false" alwaysNotify="true"/>
@@ -187,90 +185,9 @@
         </Label>
       </Poster>
     </Group>
-
-    <Group
-      id="VerboseRegistrationGroup"
-      visible="false">
-      <Label
-        translation="[0,107]"
-        text="Register or Link Account"
-        horizAlign="center"
-        width="1920">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="67" />
-      </Label>
-    
-      <Poster
-        id="Link"
-        width="96"
-        height="96"
-        uri="pkg:/images/icon-link.png"
-        translation="[912,248]"/>
-            
-      <Label
-        text="Register for free or sign in online at"
-        translation="[0,420]"
-        horizAlign="center"
-        width="1920">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="27"/>
-      </Label>
-           
-      <Label
-        text="tubi.tv/activate"
-        translation="[0,481]"
-        horizAlign="center"
-        width="1920"
-        color="0xff501a">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="43"/>
-      </Label>
-    
-      <Label
-        text="then enter the activation code below"
-        translation="[0,548]"
-        width="1920"
-        horizAlign="center">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="27"/>
-      </Label>
-           
-      <Label
-        id="RegistrationCode"
-        text=""
-        translation="[0,609]"
-        width="1920"
-        horizAlign="center"
-        color="0xff501a">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="43"/>
-      </Label>
-    
-      <Label
-        text="This screen will automatically refresh once your device is linked"
-        translation="[0,678]"
-        width="1920"
-        horizAlign="center">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="24"/>
-      </Label>
-    </Group>
-
     <FilledButtonMarkupGrid
       id="Buttons"
-      translation="[437,776]"
+      translation="[437,746]"
       itemComponentName="SignInButton"
       itemSize="[480,80]"
       itemSpacing="[0,0]"
