@@ -12,3 +12,4 @@ settings:
   mode: "dev"
   hotPatchUrl: "http://{{hostUri}}/hotpatch/{{versionMinorDotted}}.brs"
   remoteComponentsHost: "http://{{hostUri}}"
+  remoteComponentsExtension: "zip"

@@ -116,9 +116,11 @@ install: env build pkg-components stage
 	@$(MAKE) -j2 dev host
 
 pkg-components: set-build
+ifneq ($(ROKU_PROFILE), dev)
 	@echo "Signing $(VERSIONED_REMOTE_LOAD_ZIP) on host $(ROKU_DEV_TARGET)"
 	@$(TOOL_CLI) upload $(BUILD_DIR)/$(VERSIONED_REMOTE_LOAD_ZIP) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
 	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(VERSIONED_REMOTE_LOAD_NAME) $(BUILD_DIR)
+endif
 
 pkg: pkg-components
 	@echo "Signing $(VERSIONED_TARGET) on host $(ROKU_DEV_TARGET)"

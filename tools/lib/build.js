@@ -77,10 +77,10 @@ function createManifest(env, filename, manifestName) {
 }
 
 function getRemoteComponentsLocation(buildProfile, build) {
-  const filename = `tubi_remote_components_${getBuildTag(false, false)}.pkg`
   const configuration = load(buildProfile, true);
   const { settings } = configuration;
-  const { remoteComponentsHost } = settings;
+  const { remoteComponentsHost, remoteComponentsExtension } = settings;
+  const filename = `tubi_remote_components_${getBuildTag(false, false)}.${remoteComponentsExtension}`
   return `${remoteComponentsHost}/${filename}`;
 }
 
