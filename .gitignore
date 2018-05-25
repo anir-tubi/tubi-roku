@@ -2,3 +2,4 @@ build/*
 tools/node_modules/*
 .DS_Store
 config/dev.yml
+tools/package-lock.json
