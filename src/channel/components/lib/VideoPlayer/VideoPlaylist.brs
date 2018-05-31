@@ -50,7 +50,7 @@ Function onVideoStateChange(msg)
   if (state = "finished" or state = "error") and m.VideoState = "play"
     if state = "error"
       content = currentPlaylistContent()
-      errorInfo = getPlaybackErrorInfo(m.Video, content)
+      errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorMsg, content)
       tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-playback")
     end if
 
@@ -73,7 +73,7 @@ Function onVideoStateChange(msg)
   if state = "buffering"
     if m.Video.streamInfo <> invalid and m.Video.streamInfo.isUnderrun = true
       content = currentPlaylistContent()
-      messageInfo = getBufferMessageInfo(0, m.Video, content)
+      messageInfo = getBufferMessageInfo(0, m.Video.streamInfo, content)
       tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "rebuffer-start")
       m.bufferingTimespan = CreateObject("roTimespan")
     end if
@@ -85,7 +85,7 @@ Function onVideoStateChange(msg)
       ' for every buffering event.  For now we just log underruns
       if m.Video <> invalid and m.Video.streamInfo.isUnderrun then
         content = currentPlaylistContent()
-        messageInfo = getBufferMessageInfo(m.bufferingTimespan.TotalMilliseconds(), m.Video, content)
+        messageInfo = getBufferMessageInfo(m.bufferingTimespan.TotalMilliseconds(), m.Video.streamInfo, content)
         tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "REBUFFERING")  'REBUFFERING is a legacy message style. It should be treated as rebuffer-end
       end if
     end if
@@ -107,7 +107,7 @@ Function onDownloadedSegment(msg)
   dlsegment = msg.getData()
   if dlsegment <> invalid and dlsegment.status <> 0
     content = currentPlaylistContent()
-    errorInfo = getDownloadErrorInfo(dlsegment, m.Video, content)
+    errorInfo = getDownloadErrorInfo(dlsegment, m.Video.streamInfo, content)
     tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-download")
   end if
 End Function
@@ -197,7 +197,7 @@ End Function
 
 
 ' Helper functions to create the error info to be sent as the message of error logs
-Function getDownloadErrorInfo(downloadedSegment, videoNode, content)
+Function getDownloadErrorInfo(downloadedSegment, streamInfo, content)
   errorInfo = {
     video_id: ""
     video_url: ""
@@ -206,22 +206,22 @@ Function getDownloadErrorInfo(downloadedSegment, videoNode, content)
   if downloadedSegment <> invalid
     errorInfo.error_code = downloadedSegment.status
     errorInfo.segment_sequence = downloadedSegment.SegSequence
-    errorInfo.segment_url = downloadedSegment.SegUrl
+    errorInfo.segment_url = removeExcessUrl(downloadedSegment.SegUrl)
     errorInfo.segment_download_duration = downloadedSegment.DownloadDuration
     errorInfo.segment_bitrate = downloadedSegment.BitrateBps
     errorInfo.segment_size = downloadedSegment.SegSize
   end if
 
   if content <> invalid then errorInfo.video_id = content.id
-  if videoNode <> invalid and videoNode.streamInfo <> invalid
-    errorInfo.video_url = videoNode.streamInfo.streamUrl
+  if streamInfo <> invalid
+    errorInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
   end if
 
   return errorInfo
 End Function
 
 
-Function getBufferMessageInfo(ms, videoNode, content)
+Function getBufferMessageInfo(ms, streamInfo, content)
   messageInfo = {
     video_id: ""
     video_url: ""
@@ -232,10 +232,10 @@ Function getBufferMessageInfo(ms, videoNode, content)
     messageInfo.buffer_time_ms = ms
   end if
 
-  if videoNode <> invalid and videoNode.streamInfo <> invalid then
-    messageInfo.stream_bitrate = videoNode.streamInfo.streamBitrate
-    messageInfo.measured_bitrate = videoNode.streamInfo.measuredBitrate
-    messageInfo.video_url = videoNode.streamInfo.streamUrl
+  if streamInfo <> invalid then
+    messageInfo.stream_bitrate = streamInfo.streamBitrate
+    messageInfo.measured_bitrate = streamInfo.measuredBitrate
+    messageInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
   end if
   if content <> invalid then
     messageInfo.video_id = content.id
@@ -244,39 +244,57 @@ Function getBufferMessageInfo(ms, videoNode, content)
 End Function
 
 
-Function getPlaybackErrorInfo(videoNode, content)
+Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, streamInfo, errorCode, errorMsg, content)
   errorInfo = {
     video_id: ""
     video_url: ""
   }
-  if videoNode <> invalid
-    if videoNode.errorCode <> 0
-      if videoNode.errorCode = -3
-        errorInfo.error_message = "Server did not respond with hls segment. Potential 504 or 404. Following segment likely has issue."
-        if videoNode.downloadedSegment <> invalid
-          ' in the case of errorCode = -3, it likely means there was a 504 or 404 response from the server which ultimately was the source of the error.
-          ' we get the last downloaded segment which is the last good segment instead of the current streaming segment, which may be several segments ahead of the bad segment.
-          ' in this case, the segment causing the error is the segment AFTER the logged segment.
-          errorInfo.segment_sequence = videoNode.downloadedSegment.Sequence
-          errorInfo.segment_url = videoNode.downloadedSegment.SegUrl
-          errorInfo.segment_bitrate = videoNode.downloadedSegment.BitrateBps
-        end if
-      else if videoNode.errorMsg <> invalid
-        errorInfo.error_message = videoNode.errorMsg
-        if videoNode.streamingSegment <> invalid
-          ' videoNode.streamingSegment can be invalid when the server returns a 504, 404, etc.
-          errorInfo.segment_url = videoNode.streamingSegment.segUrl
-          errorInfo.segment_start_time = videoNode.streamingSegment.segStartTime
-          errorInfo.segment_sequence = videoNode.streamingSegment.segSequence
-          errorInfo.segment_bitrate = videoNode.streamingSegment.segBitrateBps
-        end if
-      end if
-      errorInfo.error_code = videoNode.errorCode
+  if errorCode = -3
+    errorInfo.error_message = "Server did not respond with hls segment. Potential 504 or 404. Following segment likely has issue."
+    ' Check for position to be > 0 in order to prevent segments from previous videos to populate
+    ' the error messaging for the current video.
+    if position > 0 and downloadedSegment <> invalid
+      ' in the case of errorCode = -3, it likely means there was a 504 or 404 response from the server which ultimately was the source of the error.
+      ' we get the last downloaded segment which is the last good segment instead of the current streaming segment, which may be several segments ahead of the bad segment.
+      ' in this case, the segment causing the error is the segment AFTER the logged segment.
+      errorInfo.segment_sequence = downloadedSegment.segSequence
+      errorInfo.segment_url = removeExcessUrl(downloadedSegment.SegUrl)
+      errorInfo.segment_bitrate = downloadedSegment.BitrateBps
     end if
-
-    if content <> invalid then errorInfo.video_id = content.id
-
-    if videoNode.streamInfo <> invalid then errorInfo.video_url = videoNode.streamInfo.streamUrl
+  else if errorMsg <> invalid
+    errorInfo.error_message = errorMsg
+    if position > 0 and streamingSegment <> invalid
+      ' streamingSegment can be invalid when the server returns a 504, 404, etc.
+      errorInfo.segment_url = removeExcessUrl(streamingSegment.segUrl)
+      errorInfo.segment_start_time = streamingSegment.segStartTime
+      errorInfo.segment_sequence = streamingSegment.segSequence
+      errorInfo.segment_bitrate = streamingSegment.segBitrateBps
+    end if
   end if
+  errorInfo.error_code = errorCode
+
+  if content <> invalid then errorInfo.video_id = content.id
+
+  if position > 0 and streamInfo <> invalid
+    errorInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
+  else if content <> invalid
+    errorInfo.video_url = removeExcessUrl(content.url)
+  end if
+
   return errorInfo
+End Function
+
+
+'Helper function that removes all characters after the ? in the url
+Function removeExcessUrl(url)
+  cutUrl = ""
+  if type(url) = "roString" or type(url) = "String"
+    position = url.Instr(Chr(63)) 'checks for the position of the "?" in the url string
+    if position > -1
+      cutUrl = url.Left(position)
+    else
+      cutUrl = url
+    end if
+  end if
+  return cutUrl
 End Function

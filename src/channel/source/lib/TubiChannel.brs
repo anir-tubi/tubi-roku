@@ -37,6 +37,14 @@ Function tubiChannel_runChannel(args, adShim, port)
   tubiScene = screen.CreateScene("TubiScene")
   screen.show()
 
+  'run SceneGraph tests if in test mode
+  if m.constants.settings.mode = "test"
+    Runner = TestRunner()
+    Runner.logger.SetVerbosity(2)
+    Runner.RUN()
+    return 0
+  end if
+
   'flag to enable vs. disable remote components loading
   enableRemoteComponents = m.constants.externalConfig.info.remote_components
 

@@ -18,7 +18,6 @@ Function Main(startupArgs as Dynamic)
   ' launch the unit tests if mode is "test". Otherwise, exit immediately.
   if settings.mode = "test" then
     BrsTestMain()
-    END
   endif
 
   if startupArgs.ComponentTest <> invalid and startupArgs.ComponentTest <> ""
