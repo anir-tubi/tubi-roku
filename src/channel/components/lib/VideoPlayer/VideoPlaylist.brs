@@ -262,7 +262,13 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
       errorInfo.segment_bitrate = downloadedSegment.BitrateBps
     end if
   else if errorMsg <> invalid
-    errorInfo.error_message = errorMsg
+    if errorCode = 0
+      ' orignal network error message is to long:
+      ' "Network error.  This could be caused by any of the following problems: (1) The server is down or unresponsive. (2) The server is unreachable. (3) There is a network setup issue on the client."
+      errorInfo.error_message = "Network error"
+    else
+      errorInfo.error_message = errorMsg
+    end if
     if position > 0 and streamingSegment <> invalid
       ' streamingSegment can be invalid when the server returns a 504, 404, etc.
       errorInfo.segment_url = removeExcessUrl(streamingSegment.segUrl)
