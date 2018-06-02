@@ -40,10 +40,29 @@ exports.uploadPkg = function(pkgfile, address, password) {
       archive: fs.createReadStream(pkgfile)
     };
     request.post({url: url, auth: auth, formData: data}, (err, response, body) => {
+      const success = body.match(/<font color="red">Install Success.<\/font>/);
       if (err) {
         rej(err);
       }
-      res(body);
+      else if (response.statusCode !== 200) {
+        rej(`HTTP Status code ${response.statusCode}`);
+      }
+      else if (success === null) {
+        let errorMessages = body.match(/<font color="red">([^<]*)/);
+        if (errorMessages !== null) {
+          errorMessages.shift()
+          errorMessages.forEach((message) => {
+            console.log(`Device install error: ${message}`);
+          });
+        }
+        else {
+          console.log('Unknown install error');
+        }
+        rej('Device install failed');
+      }
+      else {
+        res(body);
+      }
     });
   });
 };
@@ -71,16 +90,16 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
       pkg_time: '',
     };
     request.post({url: url, auth: auth, formData: data}, (err, response, body) => {
-      if (err) {
+      var packages = body.match(/pkgs\/\/([^\"]*)/)
+      if (err)
         rej(err);
+      else if (response.statusCode !== 200)
+        rej(`HTTP Status code ${response.statusCode}`);
+      else if (packages === null) {
+        rej('No downloadable packages found!');
       }
       else {
         console.log("Got " + body.length + " bytes response");
-        var packages = body.match(/pkgs\/\/([^\"]*)/)
-        if (packages === null) {
-          console.log("No downloadable packages found!");
-          return;
-        }       
         const url = `http://${address}/pkgs/${packages[1]}`;
         const auth = {
           user: 'rokudev',

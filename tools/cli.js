@@ -43,6 +43,7 @@ program
         console.log('Upload %s to %s successfully.', pkgfile, address);
       }).catch(err => {
         console.log(err);
+        process.exit(1);
       });
     });
   });
@@ -55,6 +56,7 @@ program
       console.log("Signed package at %s.", path);
     }).catch(err => {
       console.log(err);
+      process.exit(1);
     });
   });
 
