@@ -241,11 +241,6 @@ Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
     trackData = tracking.getTrackData("deeplink", invalid, trackingUri, extraCtx)
     trackReq = tracking.getUserTrackingRequest(trackData)
     trackReq.runSynchronous(1)
-
-    ' Normalize the content id since our internal data model expects "0" prefix for series
-    if content.deeplinkType = "series" and Left(content.id, 1) <> "0" then
-      content.id = "0" + content.id
-    end if
     return content
   else
     return invalid

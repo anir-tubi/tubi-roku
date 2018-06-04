@@ -78,19 +78,40 @@ Function onSingleContentResponse(msg) As Void
   m.refreshTask = invalid
 
   afterFn = invalid  ' the function to execute once we've sorted the detail screen out
+
   if m.enteredFromDeepLink = true and m.top.deepLinkContent <> invalid
-    if m.top.deepLinkContent.deeplinkType = "series"
+    if m.top.deepLinkContent.deeplinkType = "series" and refreshedContent.type = m.constants.ui.contentTypes.series
       '  refreshedContent.id:       series id
       '  refreshedContent.seriesId: invalid
       '  refreshedContent.type:     series
       '  m.deepLinkContent.deepLinkType: series
-      contentAndIndex.series2dIndex = [0,0]
 
-    else if (m.top.deepLinkContent.deeplinkType = "season" or m.top.deepLinkContent.deeplinkType = "episode") and refreshedContent.type = m.constants.ui.contentTypes.video
+      ' As of spring 2018 (firmware 8.1), "series" media types are valid and
+      ' will have a content id of an episode, not the series.  Roku states that
+      ' the episode id is NOT what should be played, rather we are allowed
+      ' to choose the most appropriate episode and automatically start playback.
+      ' Here we use the history to choose an episode or just default to the first one.
+
+      afterFn = onPlay
+      history = m.global.historyIds.findNode(refreshedContent.id)
+      if history <> invalid
+        contentAndIndex.series2dIndex = findEpisode2dIndex(history.currentEpisodeId, refreshedContent)
+        episode = getEpisodeContent(contentAndIndex.series2dIndex, refreshedContent)
+        episodeHistory = invalid
+        if episode <> invalid
+          episodeHistory = m.global.historyIds.findNode(episode.id)
+        end if
+        if episodeHistory <> invalid and episodeHistory.nowPos > 0
+          afterFn = onResume
+        end if
+      else
+        contentAndIndex.series2dIndex = [0,0]
+      end if
+    else if (m.top.deepLinkContent.deeplinkType = "season" or m.top.deepLinkContent.deeplinkType = "episode" or m.top.deepLinkContent.deeplinkType = "series") and refreshedContent.type = m.constants.ui.contentTypes.video
       '  refreshedContent.id =       episode id
       '  refreshedContent.seriesId = series id
       '  refreshedContent.type =     video
-      '  m.deepLinkContent.deepLinkType = seaason | episode
+      '  m.deepLinkContent.deepLinkType = season | episode | series
 
       ' deeplink sent us an episode id, so here, we have full info for an episode, but we need full info for a series
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
@@ -182,16 +203,15 @@ Function onSingleContentError(msg)
   m.refreshTask.unobserveField("response")
   m.refreshTask.unobserveField("error")
   m.refreshTask = invalid
-  message = "Could not retrieve content information from server."
-  showErrorModal(error.code, message, getSingleContentFromServer, cancelGetSingleContent)
-End Function
-
-Function cancelGetSingleContent()
-  'if there is an error while attempting to get metadata for a deeplink content,
-  ' launch the category screen
-  if m.enteredFromDeepLink
+  ' Roku requires that errors are not shown for invalid content ids when deep linking
+  if m.enteredFromDeepLink = true
     m.enteredFromDeepLink = false
+    m.detailScreenContent.pop()
+    popScreen()
     startOnNow()
+  else
+    message = "Could not retrieve content information from server."
+    showErrorModal(error.code, message, getSingleContentFromServer)
   end if
 End Function
 
