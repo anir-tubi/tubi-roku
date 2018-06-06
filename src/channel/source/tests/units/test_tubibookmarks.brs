@@ -279,7 +279,7 @@ Function testHandleInitialHistory(t As Object)
         "updated_at": "2017-10-24T20:45:15.185Z"
         "created_at": "2017-01-10T20:09:58.780Z"
         "id": "58753f96da0d8f5191001f1b"
-      },
+      }
       {
         "content_id": 1737
         "content_type": "series"
@@ -295,7 +295,7 @@ Function testHandleInitialHistory(t As Object)
             "state": "opened"
             "content_length": -1
             "id": "58236b43da0d8f51916fd020"
-          },
+          }
           {
             "content_id": 325943
             "user_id": 3684839
@@ -303,7 +303,7 @@ Function testHandleInitialHistory(t As Object)
             "state": "opened"
             "content_length": -1
             "id": "58236bacda0d8f51916fd0d9"
-          },
+          }
           {
             "content_id": 325944
             "user_id": 3684839
@@ -311,7 +311,7 @@ Function testHandleInitialHistory(t As Object)
             "state": "opened"
             "content_length": -1
             "id": "58236bf7da0d8f51916fd14f"
-          },
+          }
           {
             "content_id": 325949
             "user_id": 3684839
@@ -320,10 +320,10 @@ Function testHandleInitialHistory(t As Object)
             "content_length": -1
             "id": "58236d46da0d8f51916fd35f"
           }
-        ],
-        "created_at": "2016-11-09T18:32:12.645Z",
+        ]
+        "created_at": "2016-11-09T18:32:12.645Z"
         "id": "58236bacda0d8f51916fd0da"
-      },
+      }
     ]
   }
   serverJson = FormatJson(serverHistory)

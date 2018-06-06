@@ -56,17 +56,17 @@ Function testAddParamsToUrl(t As Object)
     [ "http://bbb/",          { "a": "1" },    "http://bbb/?a=1" ]
     [ "http://bbb/",          { "a": invalid },"http://bbb/?a=" ]
     [ "http://bbb/",          { invalid: 0 },  "http://bbb/?invalid=0" ]  ' this is funny... invalid is changed into a string by the compiler
-    [ "http://eee/",          { y: 1, z: 2 },  "http://eee/?y=1&z=2" ],
+    [ "http://eee/",          { y: 1, z: 2 },  "http://eee/?y=1&z=2" ]
 
     ' Test handling of query string existence in base url
-    [ "http://adrise.tv",        { a: 1 },     "http://adrise.tv?a=1" ],
-    [ "http://adrise.tv/",       { b: 1 },     "http://adrise.tv/?b=1" ],
-    [ "http://adrise.tv/?x",     { c: 1 },     "http://adrise.tv/?x&c=1" ],
-    [ "http://adrise.tv/?x&",    { d: 1 },     "http://adrise.tv/?x&d=1" ],
-    [ "http://adrise.tv/?x=",    { e: 1 },     "http://adrise.tv/?x=&e=1" ],
-    [ "http://adrise.tv/?x=&",   { f: 1 },     "http://adrise.tv/?x=&f=1" ],
-    [ "http://adrise.tv/?x=1",   { g: 1 },     "http://adrise.tv/?x=1&g=1" ],
-    [ "http://adrise.tv/?x=1&",  { h: 1 },     "http://adrise.tv/?x=1&h=1" ],
+    [ "http://adrise.tv",        { a: 1 },     "http://adrise.tv?a=1" ]
+    [ "http://adrise.tv/",       { b: 1 },     "http://adrise.tv/?b=1" ]
+    [ "http://adrise.tv/?x",     { c: 1 },     "http://adrise.tv/?x&c=1" ]
+    [ "http://adrise.tv/?x&",    { d: 1 },     "http://adrise.tv/?x&d=1" ]
+    [ "http://adrise.tv/?x=",    { e: 1 },     "http://adrise.tv/?x=&e=1" ]
+    [ "http://adrise.tv/?x=&",   { f: 1 },     "http://adrise.tv/?x=&f=1" ]
+    [ "http://adrise.tv/?x=1",   { g: 1 },     "http://adrise.tv/?x=1&g=1" ]
+    [ "http://adrise.tv/?x=1&",  { h: 1 },     "http://adrise.tv/?x=1&h=1" ]
   ]
 
   for each test in testCases
@@ -87,7 +87,8 @@ Function testMethods(t As Object)
   server.SetMessagePort(port)
 
   ' Go through each method, verifying from the server side that the method in the request is correct
-  for each method in [ "GET", "PUT", "POST", "PATCH", "DELETE" ]
+  validMethods = [ "GET", "PUT", "POST", "PATCH", "DELETE" ]
+  for each method in validMethods
     request = TubiRequest().createAsync("http://127.0.0.1:65534/", "", { method: method })
     request.start(port)
     while true

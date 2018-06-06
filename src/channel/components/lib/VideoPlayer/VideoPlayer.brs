@@ -33,7 +33,7 @@
 Function init()
   tubiLog("VideoPlayer.init")
   m._ = rodash()
-  m.NodeHelpers. = TubiNodeHelpers()
+  m.NodeHelpers = TubiNodeHelpers()
   m.constants = m.global.constants
   m.Spinner = m.top.findNode("BufferSpinner")
   m.Loading = m.top.findNode("Loading")

@@ -55,6 +55,12 @@ else
 RSYNC_EXCLUDE=--exclude '.keep'
 endif
 
+# The following paths exclude primarily because they break the linter.  Linter should get fixed
+LINT_FIND_OPTIONS= \
+  -name '*.brs' \
+  ! -path 'src/channel/source/3rdparty/*'
+
+
 build: clean rsync gen zip
 	@echo "Project $(VERSIONED_TARGET) is built with profile $(ROKU_PROFILE)."
 
@@ -109,6 +115,10 @@ VERSIONED_HOTPATCH=$(MINOR_VERSION_DOT).brs
 
 host:
 	@$(TOOL_CLI) host-components $(BUILD_DIR) $(REMOTE_LOAD_PORT)
+
+lint:
+	@echo "Linting all sources using wist.  This can take a very long time..."
+	NODE_PATH=${PWD}/tools/node_modules find src/channel ${LINT_FIND_OPTIONS} -print0 | xargs -0L1 -n 1 -P 8 ./tools/node_modules/\@willowtreeapps/wist/bin/wist.js
 
 install: env build pkg-components stage
 	@echo "Installing $(NAME) to host $(ROKU_DEV_TARGET)...(this might take up to a minute)"
