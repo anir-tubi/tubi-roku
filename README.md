@@ -170,4 +170,4 @@ See [docs/archicture.md](docs/architecture.md) for details architectural informa
 ## Tubi TV Brightscript Style Guide
 Please reference the following style guide for best practices:
 
-[Tubi TV Brightscript Style Guide] (https://gist.github.com/brybott-adrise/ba0233b203a8f5c3ff75d7a59a7ee6e5)
+[Tubi TV Brightscript Style Guide] (https://gist.github.com/brybott-tubi/ba0233b203a8f5c3ff75d7a59a7ee6e5)
