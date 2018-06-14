@@ -21,5 +21,8 @@ End Function
     <field id="keypress" type="string" alwaysNotify="true"/>
   </interface>
   <children>
+    <!-- Add support for Roku Advanced Layout Editor -->
+    <TrackerTask
+      id="TrackerTask"/>
   </children>
 </component>

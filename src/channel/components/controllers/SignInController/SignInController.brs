@@ -3,8 +3,14 @@ Function init()
   m.top.observeField("show", "onShow")
   m.skipContinueScreen = m.global.constants.ui.signIn.skipContinueScreen
   m.skipSignInRegisterScreen = m.global.constants.ui.signIn.skipSignInRegisterScreen
+  m.ScreenStack = m.top.findNode("SignInScreenStack")
+  if m.global.constants.deviceInfo.limitedUi = false
+    m.ScreenStack.transition = "cascade"
+  else
+    m.ScreenStack.transition = "visible"
+  end if
   m.NodeHelpers = TubiNodeHelpers()
-  initScreenStack(m.top.findNode("SignInScreenStack"), onScreenStackEmpty)
+  initScreenStack(m.ScreenStack, onScreenStackEmpty)
 End Function
 
 

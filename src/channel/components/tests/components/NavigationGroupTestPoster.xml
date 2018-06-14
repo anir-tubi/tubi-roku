@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - TestScene
+ -
+ - Wrapper for testing components in an isolated scene
+ -->
+<component name="NavigationGroupTestPoster" extends="Group">
+  <interface>
+    <field id="focusPercent" alias="Poster.opacity"/>
+    <field id="uri"          alias="Poster.uri"/>
+  </interface>
+  <children>
+    <Poster id="Poster"/>
+  </children>
+</component>

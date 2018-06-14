@@ -2,7 +2,6 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("skipSignInOption", "setButtonContent")
   m.Buttons = m.top.findNode("Buttons")
-  m.Buttons.setFocus(true)
   m.Buttons.observeField("itemSelected", "onButtonSelected")
   m.RegistrationCode1 = m.top.findNode("RegistrationCode1")
   m.RegistrationCode2 = m.top.findNode("RegistrationCode2")
@@ -188,8 +187,10 @@ End Function
 Function onKeyEvent(key As String, press As Boolean)
   if press
     if key = "back"
-      'leaving page so stop polling
-      m.RegCodeTask.cancel = true
+      if m.RegCodeTask <> invalid
+        'leaving page so stop polling
+        m.RegCodeTask.cancel = true
+      end if
 
       m.global.trackingLoggingTask.trackEvent = {
         trackType: "registerFail"

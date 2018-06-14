@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - NavigationGroup
+ -
+ -
+ - A parent group of many child groups, controlling visibility and transitions between
+ - child groups.
+ -
+ - Requirements/Behavior:
+ -    - Supports XML-declared child groups
+ -    - Supports dynamically appended child groups (in BRS)
+ -    - Resolves overlapping 'show' events, always landing on the most recent 'show' but not necessarily transitioning through immediates
+ -    - immediate and animated transitions
+ -    - child-defined transitions (via focusPercent)
+ -->
+
+<component name="NavigationGroup" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/NavigationGroup/NavigationGroup.brs"/>
+  
+  <interface>
+    <!-- INPUT -->
+      <!-- TAB NAVIGATION
+      -
+      - For tab-style navigation, use show to display an arbitrary child view
+      -
+      -   'show'       - transition to the view specified by the id given
+      -   'addView'    - add a child view without transitioning to it
+      -   'removeView' - remove a child view, transitioning away if necessary
+      -->
+      <field id="show" type="string" />
+      <field id="addView" type="node" />
+      <field id="removeView" type="string" alwaysNotify="true"/>
+    
+      <!-- STACK NAVIGATION:
+      -
+      - For stack-style navigation, use push and pop to add and remove child views
+      -
+      -   'pushView'  - add a view, then immediately transition to it
+      -   'popView'   - transition away from the current view, then remove it
+      -->
+      <field id="pushView" type="node" />
+      <field id="popView" type="boolean" alwaysNotify="true"/>
+
+      <!-- Transition behavior -->
+
+      <!-- Possible values are: 
+      -     visible       - immediate change to visibility field
+      -     fade          - do a crossfade with the animation here
+      -     cascade       - do a complete fade out of old view, followed by fade in of new
+      -     focusPercent  - animate the focusPercent field of the child views
+      -->
+      <field id="transition" type="string" value="visible"/>
+      <field id="transitionDuration" type="float" value="1.0"/>
+
+      <!-- true to consume back keypresses and pop screens -->
+      <field id="backToPop" type="boolean" value="false"/>
+
+    <!-- OUTPUT -->
+      <!--
+      - 
+      -
+      -
+      -
+      -->
+      <field id="currentViewId" type="string"/>
+  </interface>
+</component>

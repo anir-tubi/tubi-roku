@@ -67,22 +67,37 @@
         height="1080"
         translation="[0,0]"/>
 
-      <!--Handles the background images -->
-      <BackgroundGroup
-        id="BackgroundGroup"/>
+      <!-- Top-level NavigationGroup deals with just 2 experiences:
+            1) the ContentGroup which contains HomeScreen, CategoryScreen, DetailScreen, etc.
+            2) the SignInController
+      -->
+      <NavigationGroup
+        id="RootTabGroup"
+        transitionDuration="1.0">
 
-      <VideoPlayer
-        id="VideoPlayer"
-        visible="false"/>
+        <!-- All the children of this group share a background instance -->
+        <Group
+          id="ContentGroup"
+          visible="false">
+          <!--Handles the background images -->
+          <BackgroundGroup
+            id="BackgroundGroup"/>
+          <VideoPlayer
+            id="VideoPlayer"
+            visible="false"/>
+          <NavigationGroup
+            id="ContentScreenStack"
+            transitionDuration="1.0"/>
+        </Group>
+
+      </NavigationGroup>
       
-      <MetadataFetchTask 
+      <!-- Services -->
+      <MetadataFetchTask
         id="MetadataFetchTask" />
 
       <TrackingLoggingTask
         id="TrackingLoggingTask" />
-      
-      <Group
-       id="ContentScreenStack"/>
       
       <Timer
        id="AutohideTimer"/>

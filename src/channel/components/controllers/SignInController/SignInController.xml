@@ -43,8 +43,9 @@
         loadSync="false"
         translation="[0,0]"/>
 
-      <Group
-       id="SignInScreenStack"/>
+      <NavigationGroup
+       id="SignInScreenStack"
+       transitionDuration="1.0"/>
     </children>
 
 </component>

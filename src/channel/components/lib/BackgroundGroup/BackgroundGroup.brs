@@ -24,6 +24,9 @@ Function init()
   m.timer = CreateObject("roSGNode", "Timer")
   m.timer.duration = 3
 
+  ' Prevent artifacts when a parent node is faded in, which might cause
+  ' the masked image to show through the gradient
+  m.top.inheritParentOpacity = false
 End Function
 
 

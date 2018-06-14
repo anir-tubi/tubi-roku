@@ -29,6 +29,10 @@ Function init()
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.constants.ui.colors.backgroundColor
 
+  m.rootTabGroup = m.top.findNode("RootTabGroup")
+  m.rootTabGroup.observeField("currentViewId", "onRootTabTransitioned")
+  m.contentGroup = m.top.findNode("ContentGroup")
+
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
@@ -109,10 +113,19 @@ Function init()
   m.skipSignInOnLaunch = false
   m.singleFeaturePoster = false
 
+  if m.constants.deviceInfo.limitedUi = false
+    m.rootTabGroup.transition = "cascade"
+    m.ScreenStack.transition = "cascade"
+  else
+    m.rootTabGroup.transition = "visible"
+    m.ScreenStack.transition = "visible"
+  end if
+
   m._ = rodash()
 End Function
 
 Function onScreenStackEmpty()
+  tubiLog("ContentController.onScreenStackEmpty")
   ' if we went straight to detail screen for a deep link, launch the home screen.
   ' After we have entered the home screen, ignore back button presses
   if m.enteredFromDeepLink
@@ -351,7 +364,6 @@ Function startUserExperience()
           spinner.visible = false
         end if
       end if
-
       if m.top.deepLinkContent <> invalid then
         tubiLog("ContentController detected deep link request")
         ' we were asked to deep link into a content item. Go to it
@@ -359,11 +371,13 @@ Function startUserExperience()
         testLog("Deep link contentId = " + m.top.deepLinkContent.id)
         testLog("Deep link type = " + m.top.deepLinkContent.type)
         m.enteredFromDeepLink = true
+        m.rootTabGroup.show = m.contentGroup.id
         showDetailScreen(m.top.deepLinkContent, invalid)
       else if m.global.authInfo = invalid and m.skipSignInOnLaunch <> true
         tubiLog("ContentController ask user to sign in")
         startSignIn(false)
       else if m.constants.ui.onnow.on = false or m.top.onNowContent <> invalid
+        m.rootTabGroup.show = m.contentGroup.id
         startOnNow()
       end if
     end if
@@ -405,10 +419,14 @@ End Function
 ' Defer to the sign-in controller for sign in experience
 Function startSignIn(skipDisambiguation)
   tubiLog("ContentController.startSignIn")
-  m.SignIn = m.top.createChild("SignInController")
+  m.SignIn = CreateObject("roSGNode", "SignInController")
+  m.SignIn.id = "SignInController"  ' needs to be valid for navigation group
   m.SignIn.skipDisambiguationScreen = skipDisambiguation
+  m.SignIn.visible = false
   m.SignIn.observeFieldScoped("state", "onSignInComplete")
   m.SignIn.observeFieldScoped("backPressed", "onSignInBackPressed")
+  m.rootTabGroup.addView = m.SignIn
+  m.rootTabGroup.show = m.SignIn.id
   m.SignIn.show = true
   m.SignIn.setFocus(true)
 End Function
@@ -441,7 +459,7 @@ Function onSignInComplete()
     m.spinner.setFocus(true)
   end if
 
-  removeSignInController()
+  m.rootTabGroup.show = m.contentGroup.id
 End Function
 
 ' Auth Info refreshed AFTER app is already running
@@ -506,21 +524,11 @@ Function onSignInBackPressed()
   ' the context.  We detect this by looking at whether the ContentController's screen stack
   ' is empty or not.
   if currentScreen() <> invalid
-    removeSignInController()
+    m.rootTabGroup.show = m.contentGroup.id
   else if m.constants.ui.signIn.backExitsSignIn = true
     m.exitModal = showExitAppModal("onExitAppModalButtonSelected")
   end if
 End Function
-
-
-Function removeSignInController()
-  m.SignIn.unobserveFieldScoped("state")
-  m.SignIn.unobserveFieldScoped("backPressed")
-  m.top.removeChild(m.SignIn)
-  m.SignIn = invalid
-  if currentScreen() <> invalid then currentScreen().setFocus(true)
-End Function
-
 
 
 '''''''''''''''''''''''
@@ -770,7 +778,6 @@ Function startOnNow()
   ' with the child groups directly instead of the parent group
   m.homeScreen = CreateObject("roSGNode", "HomeScreen")
   m.homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
-
   m.toolsMenu = m.homeScreen.findNode("ToolsMenu")
   m.toolsMenu.observeFieldScoped("searchSelected", "onSearchSelected")
   m.toolsMenu.observeFieldScoped("signInSelected", "onSignInSelected")
@@ -803,6 +810,7 @@ Function startOnNow()
     m.categoryScreen.onNowHintVisible = false
     m.categoryScreen.searchSignOutHintVisible = true
   end if
+  m.rootTabGroup.show = m.contentGroup.id
   pushScreen(m.homeScreen, true)
 End Function
 
@@ -814,6 +822,20 @@ Function homeScreenBackgroundUpdated()
   }
 End Function
 
+
+Function onRootTabTransitioned()
+  tubiLog("ContentController.onRootTabTransitioned")
+  ' We're here if the SignIn controller was navigated away from
+  if m.SignIn <> invalid and m.rootTabGroup.currentViewId <> m.SignIn.id
+    m.SignIn.unobserveFieldScoped("state")
+    m.SignIn.unobserveFieldScoped("backPressed")
+    m.rootTabGroup.removeView = m.SignIn.id
+    m.SignIn = invalid
+  end if
+  if m.rootTabGroup.currentViewId = m.contentGroup.id
+    if currentScreen() <> invalid then currentScreen().setFocus(true)
+  end if
+End Function
 
 '''''''''''''''''''''
 ' playVideoContent

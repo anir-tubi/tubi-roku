@@ -6,8 +6,23 @@ Function initScreenStack(stack As Object, stackEmptyCallback=invalid As Object)
   tubiLog("ScreenStack.initScreenStack")
   m.ScreenStack_ = stack
   m.ScreenStackEmptyCallback_ = stackEmptyCallback
+  m.ScreenStackOldTop_ = invalid
+  stack.observeField("currentViewId", "onScreenStackChange")
 End Function
 
+
+Function onScreenStackChange()
+  tubiLog("ScreenStack.onScreenStackChange")
+  current = currentScreen()
+  if current <> invalid
+    current.setFocus(true)
+    if m.ScreenStackOldTop_ <> invalid
+      screenTrackingNavigate(m.ScreenStackOldTop_.trackingUri, current.trackingUri)
+      screenTrackingLoad(current.trackingUri)
+      m.ScreenStackOldTop_ = invalid
+    end if
+  end if
+End Function
 
 '''''''''''''''''''''''
 ' onKeyEvent
@@ -44,20 +59,12 @@ End Function
 ' Push a screen on to the stack, allowing the back button to retrace steps
 Function pushScreen(screen As Object, sendTrackingEvents = true as Boolean)
   tubiLog("ScreenStack.pushScreen")
-  top = currentScreen()
-  if top <> invalid then
-    top.visible = false
-    top.opacity = 0.0
-    top.setFocus(false)
-  end if
-  m.ScreenStack_.appendChild(screen) 
-  screen.setFocus(true)
-  screen.visible = true
-  screen.opacity = 1.0
+  current = currentScreen()
+  m.ScreenStack_.pushView = screen
   
   'handle user tracking for navigating to screen
-  if sendTrackingEvents = true and top <> invalid
-    screenTrackingNavigate(top.trackingUri, screen.trackingUri)
+  if sendTrackingEvents = true and current <> invalid
+    screenTrackingNavigate(current.trackingUri, screen.trackingUri)
   end if
   
   'handle user tracking for loading screen
@@ -75,14 +82,7 @@ End Function
 ' pushScreen is that we leave the existing currentScreen visible.
 Function pushModal(dialog As Object)
   tubiLog("ScreenStack.pushModal")
-  top = currentScreen()
-  if top <> invalid then
-    top.setFocus(false)
-  end if
-  m.ScreenStack_.appendChild(dialog) 
-  dialog.setFocus(true)
-  dialog.visible = true
-  dialog.opacity = 1.0
+  m.ScreenStack_.pushView = dialog
 End Function
 
 
@@ -92,25 +92,15 @@ End Function
 ' Remove the top-most screen of the stack, making the previous screen visible
 Function popScreen(sendTrackingEvents = true as Boolean)
   tubiLog("ScreenStack.popScreen")
-  top = m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-1)
-  m.NodeHelpers.unobserveAllScoped(top)
-  m.ScreenStack_.removeChild(top)
-  newTop = m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-1)
-  if newTop <> invalid then
-    ' just in case empty the whole stack
-    newTop.visible = true
-    newTop.opacity = 1.0
-    newTop.setFocus(true)
-  end if
+  current = currentScreen()
+  m.NodeHelpers.unobserveAllScoped(current)
+  m.ScreenStack_.popView = true
 
   'handle user tracking for navigating to screen
-  if sendTrackingEvents = true and top <> invalid and newTop <> invalid
-    screenTrackingNavigate(top.trackingUri, newTop.trackingUri)
-  end if
-
-  'handle user tracking for loading screen
-  if sendTrackingEvents = true and newTop <> invalid
-    screenTrackingLoad(newTop.trackingUri)
+  if sendTrackingEvents = true and current <> invalid
+    m.ScreenStackOldTop_ = current
+  else
+    m.ScreenStackOldTop_ = invalid
   end if
 End Function
 
@@ -120,16 +110,7 @@ End Function
 '
 ' Get the current top of the screen stack 
 Function currentScreen()
-  return m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-1)
-End Function
-
-
-''''''''''''''''''''
-' previousScreen
-'
-' Get the screen under the current one in the stack
-Function previousScreen()
-  return m.ScreenStack_.getChild(m.ScreenStack_.getChildCount()-2)
+  return m.ScreenStack_.findNode(m.ScreenStack_.currentViewId)
 End Function
 
 
