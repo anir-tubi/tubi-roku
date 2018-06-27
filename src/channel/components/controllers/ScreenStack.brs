@@ -157,3 +157,21 @@ Function screenTrackingLoad(newTrackingUri)
     }
   end if
 End Function
+
+
+Function clearScreenStack(sendTrackingEvents = true as Boolean)
+  tubiLog("ScreenStack.popScreen")
+  for i=m.ScreenStack_.getChildCount()-1 to 0 step -1
+    screen = m.ScreenStack_.getChild(i)
+    m.NodeHelpers.unobserveAllScoped(screen)
+    m.ScreenStack_.removeChild(screen)
+    'handle user tracking for navigating to screen
+    if sendTrackingEvents = true and i > 0
+      newScreen = m.ScreenStack_.getChild(i-1)
+      if newScreen <> invalid
+        screenTrackingNavigate(screen.trackingUri, newScreen.trackingUri)
+        screenTrackingLoad(newScreen.trackingUri)
+      end if
+    end if
+  end for
+End Function

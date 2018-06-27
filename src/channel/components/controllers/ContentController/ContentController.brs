@@ -441,9 +441,7 @@ Function onSignInComplete()
 
   if m.SignIn.state = "guest" then
     ' If user signed out, always start at home screen
-    while currentScreen() <> invalid
-      popScreen(true)
-    end while
+    clearScreenStack(true)
     startOnNow()
   else
     ' retrieve the credentials on the AuthTask before starting the UI. This reduces jank.
@@ -624,9 +622,7 @@ Function onSignOutModalSelected(msg)
     ' flush the screenstack in any case where the user has successfully
     ' gone through the sign-in.  If they 'back' out of it, the screen
     ' stack will stay intact and this function will not be called
-    while currentScreen() <> invalid
-      popScreen(true)
-    end while
+    clearScreenStack(true)
 
     m.authInfoReceived = false
     if m.authTask <> invalid
