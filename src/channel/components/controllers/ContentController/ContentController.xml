@@ -72,8 +72,7 @@
             2) the SignInController
       -->
       <NavigationGroup
-        id="RootTabGroup"
-        transitionDuration="1.0">
+        id="RootTabGroup">
 
         <!-- All the children of this group share a background instance -->
         <Group
@@ -86,8 +85,7 @@
             id="VideoPlayer"
             visible="false"/>
           <NavigationGroup
-            id="ContentScreenStack"
-            transitionDuration="1.0"/>
+            id="ContentScreenStack"/>
         </Group>
 
       </NavigationGroup>

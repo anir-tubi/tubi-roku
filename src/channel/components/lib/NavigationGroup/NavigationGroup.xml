@@ -41,17 +41,6 @@
       <field id="pushView" type="node" />
       <field id="popView" type="boolean" alwaysNotify="true"/>
 
-      <!-- Transition behavior -->
-
-      <!-- Possible values are: 
-      -     visible       - immediate change to visibility field
-      -     fade          - do a crossfade with the animation here
-      -     cascade       - do a complete fade out of old view, followed by fade in of new
-      -     focusPercent  - animate the focusPercent field of the child views
-      -->
-      <field id="transition" type="string" value="visible"/>
-      <field id="transitionDuration" type="float" value="1.0"/>
-
       <!-- true to consume back keypresses and pop screens -->
       <field id="backToPop" type="boolean" value="false"/>
 

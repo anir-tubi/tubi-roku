@@ -113,14 +113,6 @@ Function init()
   m.skipSignInOnLaunch = false
   m.singleFeaturePoster = false
 
-  if m.constants.deviceInfo.limitedUi = false
-    m.rootTabGroup.transition = "cascade"
-    m.ScreenStack.transition = "cascade"
-  else
-    m.rootTabGroup.transition = "visible"
-    m.ScreenStack.transition = "visible"
-  end if
-
   m._ = rodash()
 End Function
 

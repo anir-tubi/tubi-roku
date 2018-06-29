@@ -5,26 +5,12 @@ Function init()
   m.top.observeField("pushView", "onPush")
   m.top.observeField("popView", "onPop")
 
-  ' Create this dynamically so it doesn't show up as a child node in getChildCount()
-  ' this allows for static declaration of NavigationGroup children in XML files
-  m.animation = CreateObject("roSGNode", "Animation")
-  m.animation.duration = 1.0
-  m.animation.easeFunction = "linear"
-  m.animation.observeField("state", "onAnimationState")
-  m.animateIn = m.animation.createChild("FloatFieldInterpolator")
-  m.animateIn.key = [0, 0.5, 1.0]
-  m.animateIn.keyValue = [0, 0.5, 1.0]
-  m.animateOut = m.animation.createChild("FloatFieldInterpolator")
-  m.animateOut.key = [0, 0.5, 1.0]
-  m.animateOut.keyValue = [1.0, 0.5, 0]
   m.views = m.top
   m.deviceInfo = CreateObject("roDeviceInfo")
 
   ' State
   m.currentView = invalid
   m.previousView = invalid
-  m.transitioning = false
-  m.removeAfterTransition = false ' for remove events where a transition needs to complete first
   m.queuedEvents = [] ' queuing events guarantees that we don't have visual artifacts
                       ' when events come in during an active transition.
 End Function
@@ -97,16 +83,6 @@ Function onPop(msg)
   end if
 End Function
 
-'''''''''''''''''''
-' onAnimationState
-Function onAnimationState()
-  ' Check if there is a queued animation to start
-  if m.animation.state = "stopped"
-    transitionComplete()
-    processQueuedEvents()
-  end if
-End Function
-
 '''''''''''''''''
 ' onKeyEvent
 Function onKeyEvent(key, press)
@@ -127,7 +103,7 @@ End Function
 
 Function processQueuedEvents()
   ' do this in a while loop since some events are immediate, like "add"
-  while m.transitioning = false and m.queuedEvents.count() > 0
+  while m.queuedEvents.count() > 0
     event = m.queuedEvents.shift()
     if event <> invalid
       if event.event = "pop"
@@ -142,11 +118,11 @@ Function processQueuedEvents()
       else if event.event = "show"
         ' TODO(Chris): add a special case here where we can collapse adjacent 
         ' 'show' events to go immediately to the final show
-        transition(event.value, m.top.transition, m.top.transitionDuration)
+        transition(event.value, false)
 
       else if event.event = "push"
         addViewHelper(event.value)
-        transition(event.value.id, m.top.transition, m.top.transitionDuration)
+        transition(event.value.id, false)
 
       else if event.event = "add"
         addViewHelper(event.value)
@@ -197,7 +173,7 @@ Function removeViewHelper(removeView)
         exit for
       end if
     end for
-    transition(nextViewId, m.top.transition, m.top.transitionDuration, true)
+    transition(nextViewId, true)
   else
     m.views.removeChild(removeView)
   end if
@@ -210,111 +186,28 @@ End Function
 '
 '''''''''''''''
 
-Function transition(newId, method, duration, removeAfter=false)
+Function transition(newId, removeAfter)
   nextView = invalid
   if newId <> invalid
     nextView = m.views.findNode(newId)
   end if
-  currentId = ""
-  if m.currentView <> invalid
-    currentId = m.currentView.id
-  end if
-  m.transitioning = true
+
+  ' swap internal references
   m.previousView = m.currentView
   m.currentView = nextView
-  m.removeAfterTransition = removeAfter
-  if method = "focusPercent"
-    transitionFocusPercent(m.previousView, m.currentView, duration)
-  else if method = "fade"
-    transitionFade(m.previousView, m.currentView, duration)
-  else if method = "cascade"
-    transitionCascade(m.previousView, m.currentView, duration)
-  else
-    transitionVisible(m.previousView, m.currentView)
-    transitionComplete()
-  end if
-End Function
 
-' Use 'visible' to transition from one view to another immediately
-Function transitionVisible(old, new)
-  if old <> invalid
-    old.visible = false
-  end if
-  if new <> invalid
-    new.visible = true
-  end if
-End Function
-
-' Use 'opacity' to transition from one view to another
-Function transitionFade(old, new, duration)
-  if old <> invalid
-    m.animateOut.fieldToInterp = old.id + ".opacity"
-    m.animateOut.keyValue = [old.opacity, old.opacity/2, 0]
-  else
-    m.animateOut.fieldToInterp = ""
-  end if
-  if new <> invalid
-    new.opacity = 0
-    new.visible = true
-    m.animateIn.fieldToInterp = new.id + ".opacity"
-    m.animateIn.keyValue = [0, 0.5, 1]
-  else
-    m.animateIn.fieldToInterp = ""
-  end if
-  m.animation.duration = duration
-  m.animation.control = "start"
-End Function
-
-Function transitionCascade(old, new, duration)
-  if old <> invalid
-    m.animateOut.fieldToInterp = old.id + ".opacity"
-    m.animateOut.keyValue = [old.opacity, 0, 0]
-  else
-    m.animateOut.fieldToInterp = ""
-  end if
-  if new <> invalid
-    new.opacity = 0
-    new.visible = true
-    m.animateIn.fieldToInterp = new.id + ".opacity"
-    m.animateIn.keyValue = [0, 0, 1]
-  else
-    m.animateIn.fieldToInterp = ""
-  end if
-  m.animation.duration = duration
-  m.animation.control = "start"
-End Function
-
-' Use 'focusPercent' to transition from one view to another
-Function transitionFocusPercent(old, new, duration)
-  ' make sure that there isn't already an animation happening
-  ' TODO: Find the right way to verify that focusPercent is a float field
-  if old <> invalid and old.focusPercent <> invalid
-    m.animateOut.fieldToInterp = old.id + ".focusPercent"
-    m.animateOut.keyValue = [old.focusPercent, 0]
-  end if
-  if new <> invalid and new.focusPercent <> invalid
-    new.focusPercent = 0
-    new.visible = true
-    m.animateIn.fieldToInterp = new.id + ".focusPercent"
-    m.animateIn.keyValue = [0, 1]
-  else
-    m.animateIn.fieldToInterp = ""
-  end if
-  m.animation.duration = duration
-  m.animation.control = "start"
-End Function
-
-Function transitionComplete()
+  ' Set visibility
   if m.previousView <> invalid
     m.previousView.visible = false
-    if m.removeAfterTransition = true
-      m.views.removeChild(m.previousView)
-    end if
-    m.previousView = invalid
   end if
   if m.currentView <> invalid
+    m.currentView.visible = true
     m.top.currentViewId = m.currentView.id
   end if
-  m.removeAfterTransition = false
-  m.transitioning = false
+
+  ' remove old view for pop/remove actions
+  if m.previousView <> invalid and removeAfter = true
+    m.views.removeChild(m.previousView)
+    m.previousView = invalid
+  end if
 End Function
