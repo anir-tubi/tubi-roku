@@ -37,10 +37,34 @@
     
     
     
+    
 
  
 <script type = "text/brightscript" >
 <![CDATA[
+
+' RALE_Config - RALE config singleton class
+' @return {object} - RALE config properties
+Function RALE_Config() as Object
+    if m.appConfig = Invalid then m.appConfig = RALE_InitConfig()
+    return m.appConfig
+End Function
+
+' RALE_InitConfig - RALE config init function. Defines all config properties
+' @return {object} - RALE config properties
+Function RALE_InitConfig() as Object
+    this = {
+        bufferSize: 1024,
+        minSocketPort: 49152,
+        maxSocketPort: 65535
+    }
+
+    return this
+End Function
+
+
+' CreateSelectorView - Selector (live) view class constructor
+' @return {object} - selector (live) view
 Function CreateSelectorView() as Object
     view = CreateObject("roSGNode", "Group")
 
@@ -83,6 +107,10 @@ Function CreateSelectorView() as Object
     return view
 End Function
 
+' NodeUtils_AddInterfaceToNode - Adds interface to node
+' @param {object} node - node
+' @param {object} interface - interface
+' @return {boolean} - is interface was added
 Function NodeUtils_AddInterfaceToNode(node, interface as Object) as Boolean
     if node = invalid OR interface = invalid then return false
     for each field in interface
@@ -91,6 +119,10 @@ Function NodeUtils_AddInterfaceToNode(node, interface as Object) as Boolean
     return true
 End Function
 
+' NodeUtils_AddNodeInterfaceField - Adds interface field to node
+' @param {object} node - node
+' @param {object} fieldConfig - field config
+' @return {boolean} - is interface was added
 Function NodeUtils_AddNodeInterfaceField(node, fieldConfig as Object) as Boolean
     if node = invalid OR fieldConfig = invalid then return false
     if fieldConfig.id = invalid then return false
@@ -115,6 +147,10 @@ Function NodeUtils_AddNodeInterfaceField(node, fieldConfig as Object) as Boolean
     return true
 End Function
 
+' NodeUtils_AddChildrenToNode - Adds children to node
+' @param {object} node - node
+' @param {object} childrenConfig - children config
+' @return {object} - view object
 Function NodeUtils_AddChildrenToNode(node, childrenConfig as Object) as Object
     if node = invalid then return invalid
     viewObject = {node : node, children : []}
@@ -128,6 +164,10 @@ Function NodeUtils_AddChildrenToNode(node, childrenConfig as Object) as Object
     return viewObject
 End Function
 
+' NodeUtils_AddChildToNode - Adds child to node
+' @param {object} node - node
+' @param {object} childConfig - child config
+' @return {object} - view object
 Function NodeUtils_AddChildToNode(node, childConfig) as Object
     if node = invalid or childConfig = invalid then return invalid
     if childConfig.subtype = invalid then return invalid
@@ -137,6 +177,8 @@ Function NodeUtils_AddChildToNode(node, childConfig) as Object
     return NodeUtils_AddChildrenToNode(view, childConfig.children)
 End Function
 
+' SelectorView_UpdateView - width, height and border change event handler. Updates Selector (live) view
+' @param {object} event - event data
 Sub SelectorView_UpdateView(event)
     node = event.getRoSGNode()
     border = node.border
@@ -178,6 +220,8 @@ Sub SelectorView_UpdateView(event)
     fill.height = height
 End Sub
 
+' SelectorView_UpdateColors - color change event handler. Updates Selector (live) view color
+' @param {object} event - event data
 Sub SelectorView_UpdateColors(event)
     node = event.getRoSGNode()
     for each view in node.getchildren(-1,0)
@@ -185,6 +229,9 @@ Sub SelectorView_UpdateColors(event)
     end for
 End Sub
 
+' SelectorView_UpdateViewFromBRect - boundingRect change event handler.
+'                             Updates Selector (live) view translation, width and height
+' @param {object} event - event data
 Sub SelectorView_UpdateViewFromBRect(event)
     node = event.getRoSGNode()
     boundingRect = node.boundingRect
@@ -197,6 +244,10 @@ Sub SelectorView_UpdateViewFromBRect(event)
     end if
 End Sub
 
+' isBoundingRectChanged - checks is bounding rect was changed
+' @param {object} br - node bounding rect
+' @param {object} node - node
+' @return {boolean} - true if node bounding rect was changed
 Sub isBoundingRectChanged(br, node) as Boolean
     o = node.oldBoundingRect
     if o = Invalid then
@@ -211,6 +262,8 @@ Sub isBoundingRectChanged(br, node) as Boolean
     end if
 End Sub
 
+' SelectorView_UpdateViewPosition - interval event handler. Updates selector (live) view position
+' @param {object} event - node bounding rect
 Sub SelectorView_UpdateViewPosition(event)
     timer = event.getRoSGNode()
     node = timer.getparent()
@@ -226,6 +279,9 @@ Sub SelectorView_UpdateViewPosition(event)
     end if
 End Sub
 
+
+' getCommandMap - Defines map that contains all RALE commands handlers
+' @return {object} - handlers map
 Sub getCommandMap() as Object
     return {
         "init" : "UIThread_init",
@@ -261,10 +317,17 @@ Sub getCommandMap() as Object
     }
 End Sub
 
+' callCommand - Call RALE command functuin from UI thread
+' @param {string} command - command name
+' @param {object} args - command arguments
+' @return {object} - response of RALE command
 Sub callCommand(command, args) as Object
     return m.top.callFunc(command, args)
 End Sub
 
+' UIThread_init - RALE "init" command
+' @param {object} args - command arguments
+' @return {object} - response of command. Contains RALE version
 Sub UIThread_init(args) as Object
     root = m.top.GetScene()
 
@@ -284,10 +347,16 @@ End Sub
 '=======================
 ' Config commands
 '=======================
+
+' UIThread_showSelectorView - RALE "showSelectorView" command handler. Shows Selector (Live) View
+' @param {object} args - command arguments
 Sub UIThread_showSelectorView(args) as Object
     m.showSelectorView = true
     setSelectorView(m.currentNode, type(m.currentNode), m.currentPath)
 End Sub
+
+' UIThread_hideSelectorView - RALE "hideSelectorView" command handler. Hides Selector (Live) View
+' @param {object} args - command arguments
 Sub UIThread_hideSelectorView(args) as Object
     m.showSelectorView = false
     setSelectorView(m.currentNode, type(m.currentNode), m.currentPath)
@@ -296,6 +365,10 @@ End Sub
 '=======================
 ' Node commands
 '=======================
+
+' UIThread_selectNode - RALE "selectNode" command handler. Selects node by path
+' @param {object} args - command arguments
+' @return {object} - response of command. Contains node path and node data (id, type, fields, layout etc.)
 Sub UIThread_selectNode(args) as Object
     path = args["path"]
 
@@ -326,6 +399,9 @@ Sub UIThread_selectNode(args) as Object
     }
 End Sub
 
+' UIThread_updateNode - RALE "updateNode" command handler. Updates selected node
+' @param {object} args - command arguments
+' @return {object} - response of command. Contains node path and data (id, type, fields, layout etc.)
 Sub UIThread_updateNode(args) as Object
     return {
         path: m.currentPath,
@@ -333,6 +409,9 @@ Sub UIThread_updateNode(args) as Object
     }
 End Sub
 
+' UIThread_getNodeData - RALE "getNodeData" command handler. Returns selected node data
+' @param {object} args - command arguments
+' @return {object} - response of command. Node data (id, type, fields, layout etc.)
 Sub UIThread_getNodeData(args) as Object
     return getNodeData(m.currentNode, m.currentPath, Invalid)
 End Sub
@@ -340,6 +419,10 @@ End Sub
 '=======================
 ' Tree View commands
 '=======================
+
+' UIThread_getItemList - RALE "getItemList" command handler. Returns node children and fields, by node path
+' @param {object} args - command arguments
+' @return {object} - response of command. List of node children and fields
 Sub UIThread_getItemList(args) as Object
     path = args["path"]
 
@@ -350,6 +433,9 @@ Sub UIThread_getItemList(args) as Object
     return getItemList(node, path)
 End Sub
 
+' UIThread_getNodeTree - RALE "getNodeTree" command handler. Returns children hierarchy by node path
+' @param {object} args - command arguments
+' @return {object} - response of command. Node children hierarchy
 Sub UIThread_getNodeTree(args) as Object
     path = args["path"]
 
@@ -364,6 +450,10 @@ End Sub
 '=======================
 ' Children commands
 '=======================
+
+' UIThread_addChild - RALE "addChild" command handler. Adds new child to node by path (if no path adds to selected node)
+' @param {object} args - command arguments
+' @return {object} - response of command. Contains node children hierarchy and index
 Sub UIThread_addChild(args) as Object
     childType = args["type"]
     path = args["path"]
@@ -394,6 +484,9 @@ Sub UIThread_addChild(args) as Object
     end if
 End Sub
 
+' UIThread_removeChild - RALE "removeChild" command handler. Removes child from node by path (if no path removes from selected node)
+' @param {object} args - command arguments
+' @return {object} - response of command
 Sub UIThread_removeChild(args) as Object
     index = FW_AsInteger(args["index"])
     path = args["path"]
@@ -412,6 +505,9 @@ Sub UIThread_removeChild(args) as Object
     return removeChild(node, index)
 End Sub
 
+' UIThread_moveChild - RALE "moveChild" command handler. Moves selected node child
+' @param {object} args - command arguments
+' @return {object} - response of command
 Sub UIThread_moveChild(args) as Object
     fromIndex = FW_AsString(args["fromIndex"])
     fromIndexInt = FW_AsInteger(fromIndex)
@@ -427,6 +523,10 @@ End Sub
 '=======================
 ' Fields commands
 '=======================
+
+' UIThread_setField - RALE "setField" command handler. Sets new value into node field (if the field doesn't exist creates it)
+' @param {object} args - command arguments
+' @return {array} - response of command. Node field list
 Sub UIThread_setField(args) as Object
     field = FW_AsString(args["field"])
     fieldType = args["type"]
@@ -447,6 +547,9 @@ Sub UIThread_setField(args) as Object
     return getFieldList(m.currentNode)
 End Sub
 
+' UIThread_removeField - RALE "removeField" command handler. Remove field from node by id
+' @param {object} args - command arguments
+' @return {array} - response of command. Node field list
 Sub UIThread_removeField(args) as Object
     field = args["field"]
     if field = Invalid then return getError("Field ID is required")
@@ -476,6 +579,10 @@ End Sub
 '=======================
 ' Focus commands
 '=======================
+
+' UIThread_setFocus - RALE "setFocus" command handler. Sets focus in node by path
+' @param {object} args - command arguments
+' @return {object} - response of command. Status
 Sub UIThread_setFocus(args) as Object
     path = args["path"]
 
@@ -487,6 +594,9 @@ Sub UIThread_setFocus(args) as Object
     return { success: true }
 End Sub
 
+' UIThread_selectFocusedNode - RALE "selectFocusedNode" command handler. Select focused node
+' @param {object} args - command arguments
+' @return {object} - response of command. Contains node path and data (id, type, fields, layout etc.)
 Sub UIThread_selectFocusedNode(args) as Object
     root = m.top.getScene()
     node = getFocusedNodeObj(root)
@@ -510,6 +620,10 @@ End Sub
 '=======================
 ' Bounding Rect commands
 '=======================
+
+' UIThread_setBoundingRect - RALE "setBoundingRect" command handler. Sets properties into selected node layout
+' @param {object} args - command arguments
+' @return {object} - response of command. Node sceneBoundingRect
 Sub UIThread_setBoundingRect(args) as Object
     boundingRect = args["boundingrect"]
     if boundingRect = Invalid then return getError("boundingrect is required")
@@ -564,6 +678,11 @@ End Sub
 '=======================
 ' Helpers functions
 '=======================
+
+' getLayout - Returns node layout fields (boundingRect, resolution, isMovable, isHeightResizable, isWidthResizable)
+' @param {object} node - node
+' @param {object} root - root of nodes (main scene)
+' @return {object} - node layout
 Sub getLayout(node, root) as Object
     if not FW_IsSGNode(node) then return getError("Invalid Node Type")
 
@@ -588,6 +707,10 @@ Sub getLayout(node, root) as Object
     }
 End Sub
 
+' getItemObj - Returns node object
+' @param {object} item - node or filed
+' @param {string} index - field id or child index
+' @return {object} - node data object
 Sub getItemObj(item, index) as Dynamic
     itemType = type(item)
 
@@ -616,6 +739,9 @@ Sub getItemObj(item, index) as Dynamic
     end if
 End Sub
 
+' getFieldList - Returns node field list
+' @param {object} node - node
+' @return {array} - list of fields
 Sub getFieldList(node) as Object
     nodeType = type(node)
 
@@ -647,6 +773,9 @@ Sub getFieldList(node) as Object
     return fieldList
 End Sub
 
+' getChildList - Returns node children list
+' @param {object} node - node
+' @return {array} - list of children
 Sub getChildList(node) as Object
     nodeType = type(node)
 
@@ -668,6 +797,10 @@ Sub getChildList(node) as Object
     end if
 End Sub
 
+' getItemList - Returns node children list and node data
+' @param {object} node - node
+' @param {object} index - node index
+' @return {object} - node data object and list of node children
 Sub getItemList(node, index) as Object
     item = { item: getItemObj(node, index) }
     nodeType = type(node)
@@ -679,6 +812,10 @@ Sub getItemList(node, index) as Object
     return item
 End Sub
 
+' getNodeTree - Goes through node children and returns node children hierarchy
+' @param {object} node - node or filed
+' @param {string} id - node index or filed id
+' @return {array} - node children hierarchy
 Sub getNodeTree(node, id) as Object
     item = {}
     nodeType = type(node)
@@ -738,6 +875,11 @@ Sub getNodeTree(node, id) as Object
     return item
 End Sub
 
+' getNodeData - Returns node children hierarchy
+' @param {object} node - node or filed
+' @param {array} path - path to node
+' @param {object} root - root of nodes (main scene)
+' @return {object} - node data (item, fieldlist, layout)
 Sub getNodeData(node, path, root) as Object
     index = RALE_getNodeIndexByPath(path)
     if index = Invalid then return getError("Invalid Path")
@@ -752,6 +894,11 @@ Sub getNodeData(node, path, root) as Object
     return result
 End Sub
 
+' addChild - Adds child to node by type and index
+' @param {object} node - parent node
+' @param {string} childType - path to node
+' @param {string} index - child index
+' @return {object} - status
 Sub addChild(node, childType, index) as Object
     if not FW_IsSGNode(node) then return getError("Cannot Add Child. Invalid Node Type")
 
@@ -774,6 +921,10 @@ Sub addChild(node, childType, index) as Object
     end if
 End Sub
 
+' removeChild - Removes child from node by index
+' @param {object} node - parent node
+' @param {string} index - child index
+' @return {object} - status
 Sub removeChild(node, index as Integer) as Object
     if not FW_IsSGNode(node) then return getError("Invalid Node Type")
     count = node.getChildCount()
@@ -786,6 +937,11 @@ Sub removeChild(node, index as Integer) as Object
     end if
 End Sub
 
+' moveChild - Moves node child by index to another position
+' @param {object} node - parent node
+' @param {string} fromIndex - current child index
+' @param {string} toIndex - index where you want to move
+' @return {object} - status
 Sub moveChild(node, fromIndex, toIndex) as Object
     if not FW_IsSGNode(node) then return getError("Invalid Node Type")
 
@@ -804,6 +960,11 @@ Sub moveChild(node, fromIndex, toIndex) as Object
     end if
 End Sub
 
+' setSelectorView - Shows selector (live) view for node
+' @param {object} node - node
+' @param {string} nodeType - type of node
+' @param {array} nodePath - path to node
+' @return {object} - status
 Function setSelectorView(node, nodeType, nodePath) as Object
     if m.selectorView <> Invalid then
         if m.showSelectorView and nodeType = "roSGNode" and nodePath.count() > 0 then
@@ -814,6 +975,11 @@ Function setSelectorView(node, nodeType, nodePath) as Object
     end if
 End Function
 
+' setNodeField - Sets field into node
+' @param {object} node - node
+' @param {string} field - field id
+' @param {dynamic} value - field value
+' @param {string} fieldType - field type
 Sub setNodeField(node, field, value, fieldType) as Object
     fields = {}
     if fieldType = Invalid then
@@ -836,6 +1002,12 @@ Sub setNodeField(node, field, value, fieldType) as Object
     end if
 End Sub
 
+' setObjField - Sets field into AssociativeArray
+' @param {array} parentPath - node
+' @param {string} field - field id
+' @param {dynamic} value - field value
+' @param {string} fieldType - field type
+' @return {object} - status
 Sub setObjField(parentPath, field, value, fieldType) as Object
     if fieldType <> Invalid then
         value = RALE_convertToType(value, fieldType)
@@ -843,6 +1015,11 @@ Sub setObjField(parentPath, field, value, fieldType) as Object
     return setInParentNode(parentPath, field, value)
 End Sub
 
+' setInParentNode - Sets field into parent node
+' @param {array} path - path to field
+' @param {string} field - field id
+' @param {dynamic} value - field value
+' @return {object} - parent node
 Function setInParentNode(path, field, value)
     root = m.top.getScene()
     parentPath = []
@@ -879,11 +1056,17 @@ Function setInParentNode(path, field, value)
     return RALE_getNodeByPath(root, path)
 End Function
 
+' setFocus - Focus node
+' @param {object} node - node
 Sub setFocus(node) as Object
     if not FW_IsSGNode(node) then return getError("Invalid Node Type")
     node.setFocus(true)
 End Sub
 
+' getFocusedNodeObj - Returns focused node
+' @param {object} root - root
+' @param {object} maxDeep - search depth
+' @return {object} - focused node
 Function getFocusedNodeObj(root, maxDeep = 25) as Object
     node = root
     focusedChild = node.focusedChild
@@ -895,6 +1078,10 @@ Function getFocusedNodeObj(root, maxDeep = 25) as Object
     return node
 End Function
 
+' getNodeIndex - Returns node index
+' @param {object} node - node
+' @param {object} parent - node parent
+' @return {integer} - node index
 Function getNodeIndex(node, parent) as Integer
     for i = 0 to parent.getchildCount() - 1
         if parent.getChild(i).isSameNode(node) then return i
@@ -902,6 +1089,10 @@ Function getNodeIndex(node, parent) as Integer
     return -1
 End Function
 
+' getNodePath - Returns node path
+' @param {object} node - node
+' @param {object} root - root
+' @return {array} - node path
 Function getNodePath(node, root) as Object
     path = []
 
@@ -922,46 +1113,92 @@ Function getNodePath(node, root) as Object
     return path
 End Function
 
+' getNodePath - Returns error object
+' @param {string} message - error message
 Function getError(message as String) as Object
     return { error: { message: message } }
 End Function
 
+
+' @desc TrackerTask init function
 Sub init()
     m.top.functionName = "tracker"
     m.top.control = "RUN"
 
+    m.config = RALE_Config()
     m.sceneBG = m.top.GetScene().getChild(0)
-    m.raleVersion = "1.3.8"
+    m.raleVersion = "1.4.13"
 End Sub
 
+' tracker - TrackerTask run function
 Sub tracker()
     appInfo = CreateObject("roAppInfo")
     if not appInfo.IsDev() then return
 
     ?"tracker Run"
     handlersMap = getCommandMap()
-
-    messagePort = CreateObject("roMessagePort")
-    connections = {}
     buffer = CreateObject("roByteArray")
-    buffer[1024] = 0
+    buffer[m.config.bufferSize] = 0
+    messagePort = CreateObject("roMessagePort")
+    addr = CreateObject("roSocketAddress")
+
+    inputPort = CreateObject("roMessagePort")
+    inputObj  = CreateObject("roInput")
+    inputObj.SetMessagePort(inputPort)
+
+    while True
+        port = 0
+        msg = wait(0, inputPort)
+        if type(msg) = "roInputEvent"
+            if msg.IsInput()
+                info = msg.GetInfo()
+                if type(info) = "roAssociativeArray" and info.rale <> Invalid then
+                    port = FW_AsInteger(info.port)
+                end if
+            end if
+        end if
+        if port > m.config.minSocketPort and port < m.config.maxSocketPort then
+            socketConnection(addr, messagePort, port, buffer, handlersMap)
+        end if
+    end while
+
+End Sub
+
+' socketConnection - Starts socket connection. Keep alive while connection won't be closed
+' @param {object} addr - roSocketAddress
+' @param {object} messagePort - roMessagePort
+' @param {number} port - socket connection port
+' @param {array} buffer - buffer for socket packets
+' @param {object} handlersMap - map that contains all RALE commands handlers
+' @return {string} - connection status
+Sub socketConnection(addr, messagePort, port, buffer, handlersMap) as String
+    connections = {}
+
+    addr.setPort(port)
+
     tcpListen = CreateObject("roStreamSocket")
     tcpListen.setMessagePort(messagePort)
-    addr = CreateObject("roSocketAddress")
-    addr.setPort(54321)
     tcpListen.setAddress(addr)
     tcpListen.notifyReadable(true)
     tcpListen.listen(4)
 
-    if not tcpListen.eOK()
-        print "Error creating listen socket"
-        stop
-    end if
+    wasConnected = false
 
     while True
-        event = wait(0, messagePort)
+
+        if not wasConnected then
+            event = wait(3000, messagePort)
+            if event = Invalid then
+                tcpListen.close()
+                return "connection timeout"
+            end if
+        else
+            event = wait(0, messagePort)
+        end if
+
         ' ? type(event)
         if type(event) = "roSocketEvent"
+            wasConnected = true
             changedID = event.getSocketID()
             if changedID = tcpListen.getID() and tcpListen.isReadable()
                 ' New
@@ -1020,6 +1257,7 @@ Sub tracker()
                 if closed or not connection.eOK()
                     connection.close()
                     connections.delete(Stri(changedID))
+                    exit while
                 end if
             end if
         end if
@@ -1029,6 +1267,8 @@ Sub tracker()
     for each id in connections
         connections[id].close()
     end for
+
+    return "connection closed"
 End Sub
 
 'IMPORTS=
@@ -1406,6 +1646,9 @@ function FW_GetSubElement(element as Dynamic, subElementTree as Dynamic, delim =
     return result
 end function
 
+' RALE_parseType - Parse type name to brs type
+' @param {string} _type - type
+' @return {string} - brs type
 Function RALE_parseType(_type as String) as String
     _type =  LCase(_type)
     convertMap = {
@@ -1438,6 +1681,10 @@ Function RALE_parseType(_type as String) as String
     return _type
 End function
 
+' RALE_convertToType - Convert variable to type
+' @param {dynamic} value - variable value
+' @param {string} _type - type to which you want to convert
+' @return {dynamic} - new variable value
 Function RALE_convertToType(value as Dynamic, _type as String) as Dynamic
     _type = RALE_parseType(_type)
 
@@ -1465,6 +1712,10 @@ Function RALE_convertToType(value as Dynamic, _type as String) as Dynamic
     return value
 End function
 
+' RALE_getNodeByItem - Returns node field or child by item data
+' @param {dynamic} item - item data
+' @param {dynamic} node - type to which you want to convert
+' @return {dynamic} - node field or child
 Function RALE_getNodeByItem(item as Dynamic, node as Dynamic) as Dynamic
     itemType = type(item)
     if itemType <> "roAssociativeArray" then return Invalid
@@ -1501,6 +1752,10 @@ Function RALE_getNodeByItem(item as Dynamic, node as Dynamic) as Dynamic
     end if
 End function
 
+' RALE_getNodeByPath - Returns node by path
+' @param {object} root - root of nodes (main scene)
+' @param {array} path - path to node (for example [{ child: 1 }, { field: "fieldId" }])
+' @return {dynamic} - node or Invalid (if no node by this path)
 Function RALE_getNodeByPath(root as Dynamic, path as Object) as Dynamic
     node = root
 
@@ -1514,6 +1769,10 @@ Function RALE_getNodeByPath(root as Dynamic, path as Object) as Dynamic
     return node
 End function
 
+' RALE_getNodeListByPath - Returns node by path
+' @param {object} root - root of nodes (main scene)
+' @param {array} path - path to node (for example [{ child: 1 }, { field: "fieldId" }])
+' @return {dynamic} - list of nodes (parent nodes and selected one) or Invalid (if no node by this path)
 Function RALE_getNodeListByPath(root as Dynamic, path as Object) as Dynamic
     node = root
     nodeList = [node]
@@ -1529,6 +1788,9 @@ Function RALE_getNodeListByPath(root as Dynamic, path as Object) as Dynamic
     return nodeList
 End function
 
+' RALE_getNodeIndexByPath - Returns node index or id by path
+' @param {array} path - path to node (for example [{ child: 1 }, { field: "fieldId" }])
+' @return {dynamic} - node index or id or Invalid (if no node by this path)
 Function RALE_getNodeIndexByPath(path) as Dynamic
     if type(path) <> "roArray" then return Invalid
 
@@ -1550,6 +1812,10 @@ Function RALE_getNodeIndexByPath(path) as Dynamic
     return index
 End function
 
+' RALE_splitStringByLength - Splits string on parts and store in array
+' @param {string} str - string which will be splitted
+' @param {integer} length - max part langth
+' @return {array} - splitted string
 Function RALE_splitStringByLength(str, length) as Dynamic
     list = []
     strLength = str.len()
