@@ -49,7 +49,7 @@ Function onVideoStateChange(msg)
   state = msg.GetData()
   if (state = "finished" or state = "error") and m.VideoState = "play"
     if state = "error"
-      content = currentPlaylistContent()
+      content = m.Video.content
       errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorMsg, content)
       tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-playback")
     end if
@@ -72,7 +72,7 @@ Function onVideoStateChange(msg)
   ' not tracking buffering state.
   if state = "buffering"
     if m.Video.streamInfo <> invalid and m.Video.streamInfo.isUnderrun = true
-      content = currentPlaylistContent()
+      content = m.Video.content
       messageInfo = getBufferMessageInfo(0, m.Video.streamInfo, content)
       tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "rebuffer-start")
       m.bufferingTimespan = CreateObject("roTimespan")
@@ -84,7 +84,7 @@ Function onVideoStateChange(msg)
       ' TODO(Chris): Remove this check once the logging server can handle loads
       ' for every buffering event.  For now we just log underruns
       if m.Video <> invalid and m.Video.streamInfo.isUnderrun then
-        content = currentPlaylistContent()
+        content = m.Video.content
         messageInfo = getBufferMessageInfo(m.bufferingTimespan.TotalMilliseconds(), m.Video.streamInfo, content)
         tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "REBUFFERING")  'REBUFFERING is a legacy message style. It should be treated as rebuffer-end
       end if
@@ -106,7 +106,7 @@ Function onDownloadedSegment(msg)
   tubiLog("VideoPlaylist.onDownloadedSegment")
   dlsegment = msg.getData()
   if dlsegment <> invalid and dlsegment.status <> 0
-    content = currentPlaylistContent()
+    content = m.Video.content
     errorInfo = getDownloadErrorInfo(dlsegment, m.Video.streamInfo, content)
     tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-download")
   end if
