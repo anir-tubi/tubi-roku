@@ -1,0 +1,15 @@
+<?rokuml version="1.0" encoding="utf-8" ?> 
+
+<!-- a Task handling the playback loop of both content abd ad -->
+<component name="PlayerTask" extends="Task">
+
+<script type="text/brightscript" uri="pkg:/components/PlayerTask.brs" />
+
+<interface>
+    <field id="video" type="node" />
+
+    <!-- RELAY.  This is an INPUT field -->
+    <field id="position" type="float" />
+</interface>
+
+</component>
