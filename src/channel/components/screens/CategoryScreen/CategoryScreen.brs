@@ -75,7 +75,7 @@ Function init()
   if m.constants.ui.categoryScreen.singleFeaturePoster <> invalid
      m.singleFeaturePoster = m.constants.ui.categoryScreen.singleFeaturePoster
   else
-    m.singleFeaturePoster = (getExperimentValue("UserNamespace", "roku_single_feature_poster") = 1)
+    m.singleFeaturePoster = (getExperimentValue("UserNamespace", "roku_single_feature_poster") = "single")
   end if
 
   ' Corrections for the XML values in case of not showing single feature poster
