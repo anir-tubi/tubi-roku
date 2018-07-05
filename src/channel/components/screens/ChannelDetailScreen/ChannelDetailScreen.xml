@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - Channel Detail Screen
+ -
+ - This is a screen that displays information for a single content "channel".
+ -
+ -->
+<component name="ChannelDetailScreen" extends="Group">
+
+  <script type="text/brightscript" uri="pkg:/components/screens/ChannelDetailScreen/ChannelDetailScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <!-- content should be a container content node with a single channel content node filled with multiple item content nodes -->
+      <field id="content" alias="ChannelsRowList.content" />
+
+      <!-- hides or shows the loading spinner -->
+      <field id="isLoading" type="boolean" alias="ChannelDetailSpinner.visible" />
+
+    <!-- OUTPUT -->
+      <!-- the content node representing the item which was clicked on -->
+      <field id="contentSelected" type="node" alwaysNotify="true"/>
+
+      <!-- will be used to change the background images on the content controller -->
+      <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
+
+      <!-- keeps the uri used for user tracking -->
+      <field id="trackingUri" type="string"  value="/home" alwaysNotify="false"/>
+      <field id="trackingCount" type="integer" value="0"/>
+
+  </interface>
+
+  <children>
+    <Poster
+      id="tubiLogo"
+      height="45"
+      width="103"
+      opacity="0.5"
+      uri="pkg:/images/logo-white-large.png"
+      translation="[85,55]" />
+    <InfoPanel
+      id="ChannelsInfoPanel"
+      mode="category"
+      translation="[85,163]"
+      maxHeight="325"
+      maxTitleLines="2"
+      visible="true" />
+    <FilledButtonMarkupGrid
+      id="ChannelsButtonList"
+      translation="[60, 616]"
+      itemSize="[425,80]"
+      itemSpacing="[0,8]"
+      numRows="1"
+      numColumns="1"
+      vertFocusAnimationStyle="fixedFocus"
+      itemComponentName="CategorySeasonListItem" />
+    <RowList
+      id="ChannelsRowList"
+      translation="[517,616]"
+      itemComponentName="CategoryGridPoster"
+      rowTitleComponentName="CategoryGridRowLabel"
+      itemSize="[1835,364]"
+      itemSpacing="[0,28]"
+      numRows="1"
+      rowItemSize="[[210,300]]"
+      rowItemSpacing="[[10,0]]"
+      fadeFocusFeedbackWhenAutoScrolling="true"
+      rowFocusAnimationStyle="floatingFocus"
+      vertFocusAnimationStyle="fixedFocus"
+      focusBitmapUri="pkg:/images/selector-fhd.9.png"/>
+
+    <Spinner
+      id="ChannelDetailSpinner"
+      visible="false"
+      isDisabled="false"
+      width="1920"
+      height="1080"
+      translation="[0,0]"/>
+
+  </children>
+</component>

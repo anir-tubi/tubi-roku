@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - ChannelMetadataTask
+ -
+ - This is a task to get detail metadata 
+ -
+ --> 
+<component name="ChannelMetadataTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/tasks/ChannelMetadataTask/ChannelMetadataTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+
+    <interface>
+      <!-- INPUT -->
+        <!-- id of the channel to fetch -->
+        <field id="channelId" type="string"/>
+
+      <!-- OUTPUT -->
+        <!-- Set to the content response -->
+        <field id="response" type="node" />
+      
+        <!-- Set when an error occurs to:
+        -   {
+        -     code: <integer http response code>
+        -     data: <http response body>
+        -     failReason: <string failure reason from roUrlEvent.GetFailureReason()>
+        -   }
+        -->
+        <field id="error" type="assocarray" />
+    </interface>
+</component>

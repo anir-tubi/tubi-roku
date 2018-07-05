@@ -13,8 +13,6 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocus")
   m.onNowReceived = false
 
-  m.metadataTranslate = TubiMetadataTranslate(m.constants)
-
   ' save a global reference to the fetch task for nodes to access
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
   m.global.addField("metadataFetchTask", "node", false)
@@ -83,21 +81,6 @@ Function init()
   m.inactivityTimer.control = "start"
 
   m.appLoadStopwatch = CreateObject("roTimespan")
-
-  ' Array of detail screen content for it to behave as a virtual stack.
-  ' Each entry is:
-  ' {
-  '   content: <content which populates the detail screen fields>
-  '   series2dIndex: <season:episode pair as a 2d integer array, only applicable for series content>
-  '   sourceTrackingUri: <tracking URI for each screen>
-  ' }
-  '
-  ' screen2dIndex may be set by:
-  '   (a) history currentEpisodeId if user is signed in and series is in history
-  '   (b) selection chosen from episode screen
-  '   (c) autoplay advancement
-  '   (d) default [0,0] when no history or not signed in
-  m.detailScreenContent = []
 
   ' Set to the category id when content is launched from category screen,
   ' or set to invalid elsewhere
@@ -356,6 +339,8 @@ Function startUserExperience()
           spinner.visible = false
         end if
       end if
+      ' In any of the auth transitions, this spinner might be visible
+      m.spinner.visible = false
       if m.top.deepLinkContent <> invalid then
         tubiLog("ContentController detected deep link request")
         ' we were asked to deep link into a content item. Go to it
@@ -490,11 +475,7 @@ Function onAuthInfoReceived()
   if m.searchScreen <> invalid
     m.searchScreen.signedIn = (m.global.authInfo <> invalid)
   end if
-  if m.detailScreen <> invalid and m.detailScreenContent.peek() <> invalid
-    contentAndIndex = m.detailScreenContent.peek()
-    populateDetailScreen(contentAndIndex, true)
-  end if
-
+  refreshAllDetailScreens()
   m.spinner.visible = false
   if currentScreen() = invalid
     startUserExperience()
@@ -529,7 +510,12 @@ Function onContentSelected()
   tubiLog("ContentController.onContentSelected")
   content = m.categoryScreen.contentSelected
   m.autoplayContext = m.categoryScreen.currCategoryId
-  showDetailScreen(content, m.categoryScreen.trackingUri)
+
+  if content.type = "channel"
+    showChannelScreen(content, m.categoryScreen.trackingUri)
+  else
+    showDetailScreen(content, m.categoryScreen.trackingUri)
+  end if
 End Function
 
 
@@ -553,14 +539,22 @@ Function onHistoryQueueChange(categoryId)
 End Function
 
 Function onHistoryQueueRefresh()
+  tubiLog("ContentController.onHistoryQueueRefresh")
   m.authTask.unobserveFieldScoped("authInfo")
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
-  if m.detailScreen <> invalid and m.detailScreenContent.peek() <> invalid
-    contentAndIndex = m.detailScreenContent.peek()
-    populateDetailScreen(contentAndIndex, true)
-  end if
+  refreshAllDetailScreens()
+End Function
+
+Function refreshAllDetailScreens()
+  ' Refresh all detail screens so they have proper history that's been loaded or unloaded
+  for i=0 to m.ScreenStack_.getChildCount()-1
+    screen = m.ScreenStack_.getChild(i)
+    if screen.subType() = "DetailScreen"
+      populateDetailScreen(screen, screen.content, true)
+    end if
+  end for
 End Function
 
 
@@ -625,7 +619,6 @@ Function onSignOutModalSelected(msg)
     m.authTask.functionName = "execSignOut"
     m.authTask.control = "RUN"
 
-    m.categoryScreen = invalid
     m.spinner.visible = true
     m.spinner.setFocus(true)
   end if
@@ -683,14 +676,17 @@ End Function
 '
 Function showPlayerError(errorMessage As String)
   tubiLog("ContentController.showPlayerError")
-  showErrorModal(0, errorMessage, onRetryPlayerError, onCancelPlayerError)
+  showErrorModal(0, errorMessage, onRetryPlayerError, [], onCancelPlayerError, [])
 End Function
 
 Function onRetryPlayerError()
   ' reset the video player state in case trying to resume causes an error again
   m.videoPlayer.state = ""
   ' try to resume the video from the last checkpoint
-  onResume()
+  screen = currentScreen()
+  if screen.isSubtype("DetailScreen") = true
+    resumeHelper(screen)
+  end if
 End Function
 
 Function onCancelPlayerError()
@@ -702,62 +698,6 @@ Function onCancelPlayerError()
     top.setFocus(true)
   end if
 End Function
-
-
-'''''''''''
-' onPlay
-'
-' Notify the main Brightscript thread to invoke the video player
-Function onPlay()
-  tubiLog("ContentController.onPlay")
-  content = getDetailScreenContent()
-  if content <> invalid then
-    if m.global.authInfo = invalid and m.promptSignInOnGuestPlay = true
-      title = "Sign in for a better experience"
-      message = "Sign in for free to save to your queue and sync with other devices"
-      buttons = ["Sign in or Register", "Play Anyways"]
-      showModal(title, message, buttons, "onPlaySignInModalButtonSelected")
-      m.promptSignInOnGuestPlay = false  ' only show this once per session
-    else
-      playVideoContent(content, false, 0)
-    end if
-  else
-    tubiLog("ERROR: Play selected but content is invalid")
-  end if
-End Function
-
-Function onPlaySignInModalButtonSelected(msg)
-  if msg.getData() = 0
-    onSignInSelected()
-  else
-    content = getDetailScreenContent()
-    playVideoContent(content, false, 0)
-  end if
-End Function
-
-
-'''''''''''
-' onResume
-'
-' Notify the main Brightscript thread to invoke the video player, resuming at the indicated location
-Function onResume()
-  tubiLog("ContentController.onResume")
-  content = getDetailScreenContent()
-  if content <> invalid then
-    nowPos = invalid
-    ' find the position in global history
-    history = m.global.historyIds.findNode(content.id)
-    if m.top.deepLinkContent = invalid or m.top.deepLinkContent.deepLinkType = "season" or m.top.deepLinkContent.deepLinkType = "series"
-      if history <> invalid then
-        nowPos = history.nowPos
-      end if
-    end if
-    playVideoContent(content, false, nowPos)
-  else
-    tubiLog("ERROR: Resume selected but content is invalid")
-  end if
-End Function
-
 
 Function startOnNow()
   tubiLog("ContentController.startOnNow")
@@ -1023,10 +963,11 @@ Function returnToDetailScreenFromVideo(result)
     content = getDetailScreenContent()
   end if
   ' Replace the entire detail screen content stack after video playback
-  if currentScreen() <> invalid and currentScreen().isSameNode(m.detailScreen)
-    m.detailScreenContent = []
+  if currentScreen() <> invalid and currentScreen().subType() = "DetailScreen"
+    showDetailScreen(content, invalid, currentScreen())
+  else
+    showDetailScreen(content, invalid)
   end if
-  showDetailScreen(content, invalid)
 End Function
 
 ' Stop the video player and optionally return to the screen stack
@@ -1090,39 +1031,6 @@ Function onSkipTrailer()
   playVideoContent(getDetailScreenContent(), false)
 End Function
 
-Function onEpisodeList()
-  tubiLog("ContentController.onEpisodeList")
-  contentAndIndex = m.detailScreenContent.peek()
-  if contentAndIndex <> invalid and contentAndIndex.content <> invalid
-    m.episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
-    m.episodesScreen.content = contentAndIndex.content
-    m.episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")
-    m.episodesScreen.observeFieldScoped("backgroundUriList", "onEpisodeBackgroundChange")
-
-    if m.episodesScreen.content <> invalid and m.episodesScreen.content.id <> invalid
-      contentId = Mid(m.episodesScreen.content.id, 2)  ' trim leading "0" off series id
-      m.episodesScreen.trackingUri = m.episodesScreen.trackingUri + contentId
-    end if
-
-    m.episodesScreen.episodeToFocus = contentAndIndex.series2dIndex   'episodeToFocus should be [seasonIndex, episodeIndex]
-  
-    pushScreen(m.episodesScreen, true)
-  end if
-End Function
-
-
-Function onEpisodeSelected()
-  contentAndIndex = m.detailScreenContent.peek()
-  if contentAndIndex <> invalid and contentAndIndex.content <> invalid
-    contentAndIndex.series2dIndex = m.episodesScreen.episodeSelected
-    popScreen(true)
-    m.episodesScreen = invalid
-
-    ' Autoplay the selected episode
-    onResume()
-  end if
-End Function
-
 
 '''''''''''''''''''''
 ' onDeepLinkContentReceived
@@ -1133,137 +1041,6 @@ Function onDeepLinkContentReceived()
   m.deepLinkEvaluated = true
   m.top.unobserveFieldScoped("deepLinkContent")
   startUserExperience()
-End Function
-
-
-'''''''''''''''''''''
-' showDetailScreen
-'
-' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
-Function showDetailScreen(content, sourceTrackingUri)
-  if m.detailScreen = invalid
-    m.detailScreen = CreateObject("roSGNode", "DetailScreen")
-  end if
-
-  ' ensure we have no observers before adding then below.
-  ' TODO(CT): ScreenStack and observers set here are at odds with each other over
-  '           managing observers.  Needs cleaning up.
-  m.NodeHelpers.unobserveAllScoped(m.detailScreen)
-  m.detailScreen.observeFieldScoped("playSelected", "onPlay")
-  m.detailScreen.observeFieldScoped("resumeSelected", "onResume")
-  m.detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
-  m.detailScreen.observeFieldScoped("episodeListSelected", "onEpisodeList")
-  m.detailScreen.observeFieldScoped("addToQueueSelected", "onAddToQueueSelected")
-  m.detailScreen.observeFieldScoped("removeFromQueueSelected", "onRemoveFromQueueSelected")
-  m.detailScreen.observeFieldScoped("removeFromHistorySelected", "onRemoveFromHistorySelected")
-  m.detailScreen.observeFieldScoped("itemFailed", "onDetailItemFailed")
-  m.detailScreen.observeFieldScoped("backButtonPressed", "onDetailBackPressed")
-  m.detailScreen.observeFieldScoped("relatedContentSelected", "onRelatedContentSelected")
-  contentAndIndex = {
-    content: content
-    series2dIndex: [-1,-1]   'default, indicating that there was no specific episode requested
-    sourceTrackingUri: sourceTrackingUri
-  }
-  m.detailScreenContent.push(contentAndIndex)
-  if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
-    m.detailScreen.isLoading = true
-  else
-    m.detailScreen.trackingUri = populateDetailTrackingUri(content, invalid)
-    populateDetailScreen(contentAndIndex, true)
-  end if
-  ' always fetch detail content so we get related items as well
-  if currentScreen() = invalid or not currentScreen().isSameNode(m.detailScreen)
-    pushScreen(m.detailScreen, false)  ' don't send tracking until we resolve series episode
-  end if
-  getSingleContentFromServer()
-End Function
-
-
-'''''''''''''''''''''
-' populateDetailScreen
-'
-'Populates the detail screen's state from a content node
-'@content: tubiContentNode
-Function populateDetailScreen(contentAndIndex, resetButtonIndex=false)
-  content = contentAndIndex.content
-  'hide the spinner
-  wasLoading = m.detailScreen.isLoading
-  m.detailScreen.isLoading = false
-
-  'update detail screen state via the input interface
-  m.detailScreen.title = content.title
-  m.detailScreen.releaseDate = content.releaseDate
-  m.detailScreen.genres = content.genres
-  m.detailScreen.hasTrailer = content.hasTrailer
-
-  bookmark = m.global.bookmarkIds.findNode(content.id)
-  history = m.global.historyIds.findNode(content.id)
-
-  episode = getEpisodeContent(contentAndIndex.series2dIndex, content)
-  episodeHistory = invalid
-  if content.type = m.constants.ui.contentTypes.series
-    if episode <> invalid
-      episodeHistory = m.global.historyIds.findNode(episode.id)
-      m.detailScreen.episodeTitle = episode.title
-    end if
-
-    m.detailScreen.isSeries = true
-    m.detailScreen.mode = "series"
-  else
-    m.detailScreen.isSeries = false
-    m.detailScreen.mode = "movie"
-  end if
-
-  if episode <> invalid
-    stateSource = episode
-  else
-    stateSource = content
-  end if
-
-  m.detailScreen.length = stateSource.length
-  m.detailScreen.rating = stateSource.rating
-  m.detailScreen.description = stateSource.description
-  m.detailScreen.directors = stateSource.directors
-  m.detailScreen.starring = stateSource.actors
-
-  if episode <> invalid and (episode.hasSubtitles = true or not m._.empty(episode.subtitleTracks))
-    m.detailScreen.hasCC = true
-  else if content <> invalid and content.type = m.constants.ui.contentTypes.video and (content.hasSubtitles = true or not m._.empty(content.subtitleTracks))
-    m.detailScreen.hasCC = true
-  else
-    m.detailScreen.hasCC = false
-  end if
-
-  m.detailScreen.isBookmark = (bookmark <> invalid)
-  m.detailScreen.isHistory = (history <> invalid)
-
-  if content.type = m.constants.ui.contentTypes.series and episodeHistory <> invalid and episodeHistory.nowPos > 0
-    m.detailScreen.resumePoint = episodeHistory.nowPos
-  else if content.type = m.constants.ui.contentTypes.video and history <> invalid and history.nowPos > 0
-    m.detailScreen.resumePoint = history.nowPos
-  else
-    m.detailScreen.resumePoint = 0
-  end if
-
-  'tell the detail screen/info panel to vertically center the info panel
-  m.detailScreen.calculateInfoHeight = true
-
-  m.detailScreen.relatedContent = content.relatedContent
-
-  if wasLoading or resetButtonIndex
-    m.detailScreen.jumpToItem = 0
-  end if
-
-  'update the background images for the detail screen
-  if content.backgrounds <> invalid and content.backgrounds.count() > 0
-    backgroundUriList = content.backgrounds
-  else
-    backgroundUriList = [m.defaultBackgroundUri]
-  end if
-  m.backgroundGroup.backgroundInfo = {
-    type: m.constants.ui.backgroundTypes.fullScreen
-    uriList: backgroundUriList
-  }
 End Function
 
 
@@ -1284,11 +1061,12 @@ End Function
 ' onEpisodeBackgroundChange
 '
 '
-Function onEpisodeBackgroundChange()
+Function onEpisodeBackgroundChange(msg)
   TubiLog("ContentController.onEpisodeBackgroundChange")
+  screen = msg.getRoSGNode()
   m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype(m.episodesScreen.backgroundUriList)
-    uriList: m.episodesScreen.backgroundUriList
+    type: getBackgroundtype(screen.backgroundUriList)
+    uriList: screen.backgroundUriList
   }
 End Function
 
@@ -1298,6 +1076,15 @@ Function onSearchBackgroundChange()
   m.backgroundGroup.backgroundInfo = {
     type: getBackgroundtype(m.searchScreen.backgroundUriList)
     uriList: m.searchScreen.backgroundUriList
+  }
+End Function
+
+Function onChannelBackgroundChange(msg)
+  TubiLog("ContentController.onChannelBackgroundChange")
+  channelScreen = msg.getRoSGNode()
+  m.backgroundGroup.backgroundInfo = {
+    type: getBackgroundtype(channelScreen.backgroundUriList)
+    uriList: channelScreen.backgroundUriList
   }
 End Function
 

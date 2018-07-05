@@ -19,14 +19,15 @@
 <component name="ContentController" extends="Group">
 
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ContentController.brs" />
+  <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ChannelScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/DetailScreenHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/EpisodeScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ScreenStack.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />  
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />

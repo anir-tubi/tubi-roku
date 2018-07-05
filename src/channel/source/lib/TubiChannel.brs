@@ -40,8 +40,9 @@ Function tubiChannel_runChannel(args, adShim, port)
   'run SceneGraph tests if in test mode
   if m.constants.settings.mode = "test"
     Runner = TestRunner()
+    Runner.SetTestsDirectory("pkg:/source/tests")
     Runner.logger.SetVerbosity(2)
-    Runner.RUN()
+    Runner.Run()
     return 0
   end if
 

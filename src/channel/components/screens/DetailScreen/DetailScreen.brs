@@ -8,6 +8,7 @@ Function init()
   m.AddQueueMenuItem = m.top.findNode("AddQueueMenuItem")
   m.RemoveQueueMenuItem = m.top.findNode("RemoveQueueMenuItem")
   m.RemoveHistoryMenuItem = m.top.findNode("RemoveHistoryMenuItem")
+  m.ChannelMenuItem = m.top.findNode("ChannelMenuItem")
   m.WatchTrailerMenuItem = m.top.findNode("WatchTrailerMenuItem")
   m.RelatedContentGroup = m.top.findNode("RelatedContentGroup")
   m.RelatedGrid = m.top.findNode("RelatedGrid")
@@ -19,12 +20,15 @@ Function init()
   m.top.observeField("isSeries", "onIsSeries")
   m.top.observeField("isBookmark", "onIsBookmark")
   m.top.observeField("isHistory", "onIsHistory")
+  m.top.observeField("isChannelItem", "onIsChannel")
   m.top.observeField("resumePoint", "onResumePointChange")
   m.top.observeField("hasTrailer", "onHasTrailer")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("addToQueueTitle", "onAddToQueueTitleChange")
   m.top.observeField("removeQueueTitle", "onRemoveFromQueueTitleChange")
   m.top.observeField("removeHistoryTitle", "onRemoveFromHistoryTitleChange")
+  m.top.observeField("channelTitle", "onChannelTitleChange")
+  m.top.observeField("channelImage", "onChannelImageChange")
   m.top.observeField("isLoading", "onIsLoading")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
   m.top.observeField("relatedContent", "onRelatedContentChange")
@@ -71,6 +75,8 @@ Function onScreenFocusChange()
   tubiLog("DetailScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.focusTarget.setFocus(true)
+    ' force a background update
+    m.top.backgroundUriList = m.top.backgroundUriList
   end if
 End Function
 
@@ -155,6 +161,19 @@ Function onIsHistory()
 End Function
 
 
+Function onIsChannel()
+  tubiLog("DetailScreen.onIsChannel")
+  channelIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ChannelMenuItem.id)
+  print "channelIndex "; channelIndex
+  previousItems = [
+    m.RemoveHistoryMenuItem
+    m.RemoveQueueMenuItem
+    m.AddQueueMenuItem
+  ]
+  addRemoveMenuItem(m.top.isChannelItem, channelIndex, m.ChannelMenuItem, previousItems)
+End Function
+
+
 Function onIsSeries()
   tubiLog("DetailScreen.onIsSeries")
   episodeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
@@ -184,6 +203,12 @@ End Function
 Function onRemoveFromHistoryTitleChange()
   tubiLog("DetailScreen.onRemoveFromHistoryTitleChange")
   m.RemoveHistoryMenuItem.title = m.top.removeHistoryTitle
+End Function
+
+
+Function onChannelTitleChange()
+  tubiLog("DetailScreen.onChannelTitleChange")
+  m.ChannelMenuItem.title = "Go to " + m.top.channelTitle
 End Function
 
 
@@ -261,20 +286,22 @@ Function onMenuItemSelected()
   if selection <> invalid then
     print "Menu item selected: " + selection.title
 
-    if selection.id = "ResumeMenuItem" then
+    if selection.id = "ResumeMenuItem"
       m.top.resumeSelected = true
-    else if selection.id = "PlayMenuItem" then
+    else if selection.id = "PlayMenuItem"
       m.top.playSelected = true
-    else if selection.id = "WatchTrailerMenuItem" then
+    else if selection.id = "WatchTrailerMenuItem"
       m.top.watchTrailerSelected = true
     else if selection.id = "EpisodesMenuItem"
       m.top.episodeListSelected = true
-    else if selection.id = "AddQueueMenuItem" then
+    else if selection.id = "AddQueueMenuItem"
       m.top.addToQueueSelected = true
-    else if selection.id = "RemoveQueueMenuItem" then
+    else if selection.id = "RemoveQueueMenuItem"
       m.top.removeFromQueueSelected = true
-    else if selection.id = "RemoveHistoryMenuItem" then
+    else if selection.id = "RemoveHistoryMenuItem"
       m.top.removeFromHistorySelected = true
+    else if selection.id = "ChannelMenuItem"
+      m.top.channelSelected = true
     end if
   end if
 End Function

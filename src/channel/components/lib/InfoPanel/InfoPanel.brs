@@ -1,10 +1,13 @@
 Function init()
+  m.nodeHelpers = TubiNodeHelpers()
+  m.TitleGroup = m.top.findNode("TitleGroup")
   m.Title = m.top.findNode("Title")
+  m.TitleLogo = m.top.findNode("TitleLogo")
   m.Episode = m.top.findNode("Episode")
   m.CategoryDetails = m.top.findNode("CategoryDetails")
   m.SeasonDetails = m.top.findNode("SeasonDetails")
   m.TwoLineInfo = m.top.findNode("TwoLineInfo")
-  m.ClosedCaptions = m.top.findNode("ClosedCaptionRectangle")
+  m.ClosedCaptions = m.top.findNode("ClosedCaptionPoster")
   m.Rating = m.top.findNode("Rating")
   m.Description = m.top.findNode("Description")
   m.DescriptionGroup = m.top.findNode("DescriptionGroup")
@@ -14,14 +17,16 @@ Function init()
   m.StarringGroup = m.top.findNode("StarringGroup")
   m.Starring = m.top.findNode("Starring")
   m.Offset = m.top.findNode("Offset")
+  m.PartnerLogo = m.top.findNode("PartnerLogo")
 
   m.top.observeField("mode", "onModeChange")
   m.top.observeField("width", "onWidthChange")
 
+  m.top.observeField("titleLogoUri", "onTitleLogoUriChange")
   m.top.observeField("releaseDate", "onLine1Change")
   m.top.observeField("length", "onLine1Change")
-  m.top.observeField("hasCC", "onHasCC")
-  m.top.observeField("rating", "onRatingChange")
+  m.top.observeField("hasCC", "onLine1Change")
+  m.top.observeField("rating", "onLine1Change")
   m.top.observeField("genres", "onGenresChange")
   m.top.observeField("description", "onDescriptionChange")
   m.top.observeField("directors", "onDirectorsChange")
@@ -30,12 +35,27 @@ Function init()
   m.top.observeField("categoryContentCount", "onCategoryContentCountChange")
   m.top.observeField("calculateHeight", "onCalculateHeight")
   m.top.observeField("focusedChild", "onComponentFocus")
+  m.top.observeField("partnerLogoUri", "onLine1Change")
+  m.PartnerLogo.observeField("loadStatus", "onPosterLoadStatus")
+  m.Rating.observeField("loadStatus", "onPosterLoadStatus")
+  m.ClosedCaptions.observeField("loadStatus", "onPosterLoadStatus")
 
   onWidthChange()
 
   'set the default CC state to be no CC
-  firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
-  firstLineGroup.removeChild(m.ClosedCaptions)
+'  firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
+'  firstLineGroup.removeChild(m.ClosedCaptions)
+
+  'set the default title logo state to be no title logo
+  m.TitleGroup.removeChild(m.TitleLogo)
+End Function
+
+Function onPosterLoadStatus(msg)
+  poster = msg.getRoSGNode()
+  if poster.loadStatus = "ready"
+    ' set width based on aspect ratio
+    poster.width = (poster.bitmapWidth / poster.bitmapHeight) * poster.height
+  end if
 End Function
 
 Function onComponentFocus()
@@ -54,7 +74,11 @@ End Function
 ' setting each width here so that the children don't go beyond the right edge.
 Function onWidthChange()
   tubiLog("InfoPanel.onWidthChange")
-  m.Title.width = m.top.width - m.Title.translation[0]
+  if m.TitleLogo.visible = true
+    m.Title.width = m.top.width - m.Title.translation[0] - m.TitleGroup.itemSpacings[0] - m.TitleLogo.width - m.TitleLogo.translation[0]
+  else
+    m.Title.width = m.top.width - m.Title.translation[0]
+  end if
   m.Episode.width = m.top.width - m.Episode.translation[0]
   categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
   categoryLine1.width = m.top.width - m.CategoryDetails.translation[0]
@@ -71,6 +95,19 @@ Function onWidthChange()
   starringPrefixBoundingRect = m.top.findNode("StarringPrefix").boundingRect()
   m.Starring.width = m.top.width - starringPrefixBoundingRect.width + m.StarringGroup.itemSpacings[0] - m.StarringGroup.translation[0]
   m.DescriptionFocusButton.width = m.top.width + -m.DescriptionGroup.translation[0]
+End Function
+
+
+Function onTitleLogoUriChange()
+  tubiLog("InfoPanel.onTitleLogoUriChange")
+  if m.top.titleLogoUri <> ""
+    m.TitleLogo.uri = m.top.titleLogoUri
+    m.TitleGroup.insertChild(m.TitleLogo, 0)
+    m.TitleLogo.visible = true
+  else
+    m.TitleGroup.removeChild(m.TitleLogo)
+    m.TitleLogo.visible = false
+  end if
 End Function
 
 
@@ -91,30 +128,25 @@ Function onLine1Change()
     text = text + formatLengthAsEnglish(m.top.length) + " "
   end if
   line1Label.text = text
-End Function
 
-
-Function onHasCC()
-  tubiLog("InfoPanel.onHasCC")
-  'add closed captions if they are available
-  firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
+  ' start at index 1 to skip label
+  index = 1
+  firstLineGroup.removeChildrenIndex(firstLineGroup.getChildCount()-1, index)
   if m.top.hasCC = true
-    firstLineGroup.insertChild(m.ClosedCaptions, 1)
-  else
-    firstLineGroup.removeChild(m.ClosedCaptions)
+    firstLineGroup.insertChild(m.ClosedCaptions, index)
+    m.ClosedCaptions.uri = "pkg:/images/icon-closed-caption.png"
+    index += 1
   end if
-End Function
-
-
-Function onRatingChange()
-  tubiLog("InfoPanel.onRatingChange")
   if m.top.rating <> invalid and m.top.rating <> "" then
+    firstLineGroup.insertChild(m.Rating, index)
     m.Rating.uri = "pkg:/images/rating-" + Ucase(m.top.rating) + ".png"
-  else
-    m.Rating.uri = ""
+    index += 1
+  end if
+  if m.top.partnerLogoUri <> invalid and m.top.partnerLogoUri <> ""
+    firstLineGroup.appendChild(m.PartnerLogo)
+    m.PartnerLogo.uri = m.top.partnerLogoUri
   end if
 End Function
-
 
 Function onGenresChange()
   tubiLog("InfoPanel.onGenresChange")
@@ -232,24 +264,24 @@ Function onModeChange()
   end while
 
   if m.top.mode= "category" then
-    m.Offset.appendChild(m.Title)
+    m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.CategoryDetails)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [52, 15]
   else if m.top.mode = "item" then
-    m.Offset.appendChild(m.Title)
+    m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [42, 15]
   else if m.top.mode = "movie" then
-    m.Offset.appendChild(m.Title)
+    m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.appendChild(m.DirectorGroup)
     m.Offset.appendChild(m.StarringGroup)
     m.Offset.itemSpacings = [42, 15, 17, 11]
   else if m.top.mode = "series" then
-    m.Offset.appendChild(m.Title)
+    m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
@@ -257,12 +289,12 @@ Function onModeChange()
     m.Offset.appendChild(m.StarringGroup)
     m.Offset.itemSpacings = [26, 25, 15, 17, 11]
   else if m.top.mode = "season" then
-    m.Offset.appendChild(m.Title)
+    m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.SeasonDetails)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [52, 15]
   else if m.top.mode = "episode" then
-    m.Offset.appendChild(m.Title)
+    m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [26, 25, 15]

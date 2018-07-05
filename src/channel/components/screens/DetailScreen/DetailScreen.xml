@@ -54,6 +54,9 @@
       <!-- Indicates if the video is in the user's history -->
       <field id="isHistory" type="boolean" />
 
+      <!-- Indicates if the video is in a channel -->
+      <field id="isChannelItem" type="boolean" value="false" />
+
       <!-- The most recently watched point in the video for the user, ie. where the user will resume to -->
       <field id="resumePoint" type="integer" value="0" />
 
@@ -72,8 +75,14 @@
       <!-- used to update the text on the removeQueue button -->
       <field id="removeQueueTitle" type="string" value="Remove from queue" alwaysNotify="true" />
 
-      <!-- used to update the text on the removeQueue button -->
+      <!-- used to update the text on the removeHistory button -->
       <field id="removeHistoryTitle" type="string" value="Remove from history" alwaysNotify="true" />
+
+      <!-- used to update the text on the channel button -->
+      <field id="channelTitle" type="string" alwaysNotify="true" />
+
+      <!-- For the Presented By info panel field -->
+      <field id="channelImg" type="string" alias="DetailInfoPanel.partnerLogoUri" />
 
       <!-- informs the details screen if the content controller is waiting for a user category update from the server -->
       <field id="isWaitingForServerResponse" type="boolean" value="false" />
@@ -83,6 +92,10 @@
 
       <!-- content to populated the RelatedGrid -->
       <field id="relatedContent" alias="RelatedGrid.content" />
+
+      <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
+
+      <field id="content" type="node" />
 
     <!-- OUTPUTS -->
 
@@ -106,6 +119,9 @@
 
       <!-- set to true when the user wants to see the trailer for the content -->
       <field id="watchTrailerSelected" type="boolean" alwaysNotify="true" />
+
+      <!-- set to true when the user wants to navigate to the channel details screen -->
+      <field id="channelSelected" type="boolean" alwaysNotify="true" />
 
       <field id="relatedContentSelected" alias="RelatedGrid.itemSelected" />
 
@@ -138,6 +154,10 @@
       id="RemoveHistoryMenuItem"
       title="Remove from history"
       iconUrl="pkg:/images/icon-remove-from-history.png" />
+    <DetailMenuItemContentNode
+      id="ChannelMenuItem"
+      title=""
+      iconUrl="pkg:/images/icon-channel.png" />
     <DetailMenuItemContentNode
       id="WatchTrailerMenuItem"
       title="Watch Trailer"

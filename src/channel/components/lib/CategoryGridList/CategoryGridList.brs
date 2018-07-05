@@ -448,30 +448,8 @@ Function getWholeCategoryRequest(category As Object, field="wholeCategoryRespons
 
     categoryId = getFullCategoryId(category)
     if categoryId <> invalid
-      limit = m.constants.performance.categoryGridList.finalBlockSize
-      url = m.constants.urls.matrix.container + "/" + categoryId
-      options = {
-        params: {
-          "app_id": m.constants.settings.shortAppName,
-          "platform": m.constants.platform,
-          "device_id": m.constants.deviceInfo.deviceId,
-          "expand": 1,
-          "cursor": 0,
-          "limit": limit
-        }
-      }
-
-      'this will be an auth request if the user is logged in
-      'auth request creation happens in metadataFetchTask
-      'auth request will add the userId param
-      request = m.metadataFetchTaskDTO.createRequest(category.id, m.top, field, url, m.constants.reqNames.getCategory, options)
-
-      if request = invalid then
-        tubiLog("CategoryGridList.fetch whole: Unvailable request for category " + categoryId)
-      else
-        tubiLog("CategoryGridList.fetch whole: Asking MetadataFetchTask for " + categoryId)
-      end if
-      return request
+      tubiLog("CategoryGridList.fetch whole: Asking MetadataFetchTask for " + categoryId)
+      return m.metadataFetchTaskDTO.createRequest(categoryId, m.top, field, m.constants.reqNames.getCategory)
     end if
   end if
 

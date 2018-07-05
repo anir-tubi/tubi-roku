@@ -2,14 +2,17 @@
 ' on a generic error modal.  Screens should include this file directly
 ' in a <script> tag.
 
-Function showErrorModal(errorCode As Integer, errorMessage As String, tryAgainCallback=invalid As Dynamic, cancelCallback=invalid As Dynamic) As Void
+Function showErrorModal(errorCode As Integer, errorMessage As String, tryAgainCallback=invalid As Dynamic, tryAgainParams=[] As Object, cancelCallback=invalid As Dynamic, cancelParams=[] As Object) As Void
+  tubiLog("ModalDialog.showErrorModal")
   modal = CreateObject("roSGNode", "ModalDialogScreen")
   modal.title = "Something went wrong"
   modal.message = "Error " + stri(errorCode) + Chr(10) + errorMessage
   modal.buttons = ["Try Again", "Close"]
   modal.observeField("buttonSelected", "onErrorModalButtonSelected")
   m.errorModalTryAgainCallback_ = tryAgainCallback
+  m.errorModalTryAgainParams_ = tryAgainParams
   m.errorModalCancelCallback_ = cancelCallback
+  m.errorModalCancelParams_ = cancelParams
   m.errorModal_ = modal
   m.top.appendChild(m.errorModal_)
   m.errorModal_.visible = true
@@ -17,18 +20,33 @@ Function showErrorModal(errorCode As Integer, errorMessage As String, tryAgainCa
 End Function
 
 Function onErrorModalButtonSelected()
+  tubiLog("ModalDialog.onErrorModalButtonSelected")
   m.errorModal_.setFocus(false)
   m.top.removeChild(m.errorModal_)
   m.top.setFocus(true)
   if m.errorModal_.buttonSelected = 0 then
     ' try again
-    if m.errorModalTryAgainCallback_ <> invalid then m.errorModalTryAgainCallback_()
+    if m.errorModalTryAgainCallback_ <> invalid
+      if m.errorModalTryAgainParams_.count() > 0
+        m.errorModalTryAgainCallback_(m.errorModalTryAgainParams_)
+      else
+        m.errorModalTryAgainCallback_()
+      end if
+    end if
   else
     ' cancel
-    if m.errorModalCancelCallback_ <> invalid then m.errorModalCancelCallback_()
+    if m.errorModalCancelCallback_ <> invalid
+      if m.errorModalCancelParams_.count() > 0
+        m.errorModalCancelCallback_(m.errorModalCancelParams_)
+      else
+        m.errorModalCancelCallback_()
+      end if
+    end if
   end if
   m.errorModalTryAgainCallback_ = invalid
+  m.errorModalTryAgainParams_ = invalid
   m.errorModalCancelCallback_ = invalid
+  m.errorModalCancelParams_ = invalid
   m.errorModal_ = invalid
 End Function
 
@@ -61,6 +79,7 @@ End Function
 '
 ' Returns the newly created modal, in case the caller needs to forcefully close it
 Function showModal(title, message, buttons, callbackName, backToExit=true)
+  tubiLog("ModalDialog.showModal")
   modal = CreateObject("roSGNode", "ModalDialogScreen")
   modal.title = title
   modal.message = message

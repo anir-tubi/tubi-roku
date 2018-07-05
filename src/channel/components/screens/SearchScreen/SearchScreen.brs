@@ -220,17 +220,9 @@ End Function
 Function loadSearchResults()
   tubiLog("SearchScreen.loadSearchResults")
   constants = m.global.constants
-  url = constants.urls.cms.urlBase + "/search"
-  options = {
-    params: {
-      "app_id": constants.settings.shortAppName
-      "platform": constants.platform
-      "search": m.SearchText.text
-    }
-  }
   ' cancel any in-flight requests
   m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, m.top, "searchResponse")
-  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", url, constants.reqNames.searchAPI, options)
+  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", constants.reqNames.searchAPI, m.SearchText.text)
 
   m.global.trackingLoggingTask.trackEvent = {
     trackType: "search"

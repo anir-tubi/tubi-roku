@@ -28,7 +28,7 @@ Function execGetDetailMetadata() As Void
   translate = TubiMetadataTranslate(constants)
   port = CreateObject("roMessagePort")
 
-  contentReq = cms.singleContentReq(m.top.request.contentId)
+  contentReq = cms.singleContentReq(m.top.request.contentId, true)
   contentReq.start(port)
 
   relatedReq = invalid
@@ -95,8 +95,12 @@ Function execGetDetailMetadata() As Void
       m.top.response = detail
     end if
   else
+    code = -1
+    if contentResult <> invalid and contentResult.response <> invalid
+      code = contentResult.response.code
+    end if
     m.top.error = {
-      code: contentResult.response.code
+      code: code
       data: ""
       failReason: "Result is invalid"
     }

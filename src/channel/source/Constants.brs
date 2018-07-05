@@ -228,6 +228,8 @@ Function getConstants()
     constants.reqNames.getUpNextContent = "getUpNextContent"
     constants.reqNames.getRelatedContent = "getRelatedContent"
     constants.reqNames.getThumbnails = "getThumbnails"
+    constants.reqNames.getChannel = "getChannel"
+
 
   'Nielsen ID token for integrating with Nielsen DAR
   constants.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
@@ -268,13 +270,14 @@ Function getConstants()
       constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
       constants.urls.cms.relatedContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/related"
       constants.urls.cms.thumbnails = constants.urls.cms.urlBase + "/content" ' + content_id + "/thumbnail_sprites"
+      constants.urls.cms.search = constants.urls.cms.urlBase + "/search"
 
     'matrix url
     constants.urls.matrix = {}
       constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
       constants.urls.matrix.homescreen = constants.urls.matrix.urlBase + "/homescreen"
       constants.urls.matrix.container = constants.urls.matrix.urlBase + "/containers"
-
+      constants.urls.matrix.channel = constants.urls.matrix.urlBase + "/containers" ' + "/:container_id"
 
     'users url
     constants.urls.users = {}
@@ -286,10 +289,6 @@ Function getConstants()
       constants.urls.users.queues = constants.urls.users.urlBase + "/queues"
       constants.urls.users.history = constants.urls.users.urlBase + "/histories"
       constants.urls.users.config = constants.urls.users.urlBase + "/config/" + constants.platform
-
-
-    'search url
-    constants.urls.searchBaseUrl = "http://cms.adrise.com/"
 
     'user event tracking url
     constants.urls.dataScience = {}
@@ -488,6 +487,7 @@ Function getConstants()
       constants.ui.contentTypes.episode = "episode"
       constants.ui.contentTypes.season = "season"
       constants.ui.contentTypes.category = "category"
+      constants.ui.contentTypes.channel = "channel"
 
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"

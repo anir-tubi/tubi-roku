@@ -57,5 +57,10 @@
     <field id="thumbnailUrls" type="stringarray" />
     <field id="thumbnailSpan" type="integer" />
     <field id="thumbnailSize" type="intarray"/>
+
+    <!-- channels feature -->
+    <field id="channelImg" type="string" />
+    <field id="channelId" type="string" />
+    <field id="channelTitle" type="string" value="Channel"/>
   </interface>
 </component>

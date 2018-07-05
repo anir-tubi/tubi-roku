@@ -4,6 +4,10 @@ Function TubiMetadataTranslate(constants As Object)
     translateRecursive: tubiMetadataTranslate_translateRecursive
     getContentFromCategoryJson: tubiMetadataTranslate_getContentFromCategoryJson
     translateRelatedContent: tubiMetadataTranslate_translateRelatedContent
+    translate: tubiMetadataTranslate_translate
+    translateContainer: tubiMetadataTranslate_translateContainer
+    translateChannel: tubiMetadataTranslate_translateChannel
+    translateHomescreen: tubiMetadataTranslate_translateHomescreen
     
     ' private
     constants: constants
@@ -12,8 +16,11 @@ Function TubiMetadataTranslate(constants As Object)
     creditsDuration: constants.player.creditsDuration
     allowAfterHours: constants.settings.allowAfterHours
     
-    dedupeBackgrounds: tubiMetadataTranslate_dedupeBackgrounds
-    setTotalCount: tubiMetadataTranslate_setTotalCount
+    dedupeBackgrounds_: tubiMetadataTranslate_dedupeBackgrounds
+    setTotalCount_: tubiMetadataTranslate_setTotalCount
+    getContentsJson_: tubiMetadataTranslate_getContentsJson
+    buildCategoryAA_: tubiMetadataTranslate_buildCategoryAA
+    generateChannelPosterUrl: tubiMetadataTranslate_generateChannelPosterUrl
   }
 End Function
 
@@ -60,6 +67,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       translatedContent[typeVar] = m.contentTypes.season
       ' prefix "0" to series
       if translatedContent.id <> "" then translatedContent.id = "0" + translatedContent.id
+    else if contentFromServer[typeVar] = "channel"
+      translatedContent[typeVar] = m.contentTypes.channel
     end if
   end if
 
@@ -182,7 +191,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   if contentFromServer.backgrounds <> invalid and type(contentFromServer.backgrounds) = "roArray" and contentFromServer.backgrounds.count() > 0
-    translatedContent.backgrounds = m.dedupeBackgrounds(contentFromServer.backgrounds)
+    translatedContent.backgrounds = m.dedupeBackgrounds_(contentFromServer.backgrounds)
   end if
 
   if contentFromServer.ratings <> invalid and contentFromServer.ratings[0] <> invalid and contentFromServer.ratings[0].value <> invalid
@@ -236,6 +245,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if contentFromServer.more <> invalid then translatedContent.more = contentFromServer.more
 
+  ' Channels
+  if contentFromServer.channel_id <> invalid then translatedContent.channelId = contentFromServer.channel_id
+  if contentFromServer.channel_logo <> invalid then translatedContent.channelImg = contentFromServer.channel_logo
+  if contentFromServer.channel_title <> invalid then translatedContent.channelTitle = contentFromServer.channel_title
+
   'take care of any children the content might have
   if contentFromServer.children <> invalid and contentFromServer.children.count() > 0
 
@@ -255,6 +269,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 end Function
 
 
+''''''''''''''
+' getContentFromCategoryJson
+'
 ' returns the full metadata of a single piece of content as stored within the json for all contents as returned from matrix APIs.
 ' may invalid if json does not exist or cannot be parsed
 '
@@ -275,6 +292,9 @@ End Function
 
 
 
+''''''''''''''''''''''
+' translateRelatedContent
+'
 ' Expect content from the /related API, structured as an array of assocarrays
 Function tubiMetadataTranslate_translateRelatedContent(contentFromServer)
   translated = CreateObject("roSGNode", "TubiContentNode")
@@ -285,4 +305,336 @@ Function tubiMetadataTranslate_translateRelatedContent(contentFromServer)
     end for
   end if
   return translated
+End Function
+
+
+''''''''''''''''''''''
+' translateHomescreen
+' Translate the initial homescreen call to matrix api
+'
+' @contentToTranslate: roAssocArray, should have a form like:
+'                     {
+'                        containers: [
+'                           {
+'                             id: "featured"
+'                             children: ["37108", "337825", "304771"]
+'                             ...
+'                           }
+'                           {
+'                             id: "most_popular"
+'                             children: ["346629", "407698", "300175"]
+'                             ...
+'                           }
+'                        ],
+'                        contents: {
+'                           "37108": {
+'                               id: "37108"
+'                               title: ...
+'                           },
+'                           "337825": {
+'                               id: "337825"
+'                               title: ...
+'                           },
+'                           ...
+'                        }
+'                     }
+'
+' Returns a set of content meta data in the form below.
+' The ContentNodes will have a limited set of meta data, just enough to propagate the category grid.
+' The outer most CategoryContentNode's json field will be filled with the contents json
+' <CategoryContentNode json={...all contents info...}>
+'   <CategoryContentNode id="featured">
+'     <ContentNode id="37108" />
+'     <ContentNode id="337825" />
+'      ...
+'   </CategoryContentNode>
+'   <CategoryContentNode id="most_popular" />
+'     <ContentNode id="346629" />
+'     <ContentNode id="407698" />
+'      ...
+'   </CategoryContentNode>
+' </CategoryContentNode>
+'
+Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
+  translated = CreateObject("roSGNode", "CategoryContentNode")
+  homescreenAA = {
+    id: ""
+    title: ""
+    children: []    'categories
+  }
+
+  containers = contentToTranslate.containers
+  contents = contentToTranslate.contents
+
+  'set up AAs for all categories including any nested categories
+  for i=0 to containers.count()-1
+    container = containers[i]
+    if container.type <> "complex"
+      categoryAA = m.buildCategoryAA_(container, contents, invalid)
+      if categoryAA <> invalid
+        homescreenAA.children.push(categoryAA)
+      end if
+    else
+      for j=0 to container.children.count()-1
+        nestedContainer = container.children[j]
+        categoryAA = m.buildCategoryAA_(nestedContainer, contents, invalid)
+        if categoryAA <> invalid
+          categoryAA.parentId = container.id
+          homescreenAA.children.push(categoryAA)
+        end if
+      end for
+    end if
+  end for
+
+  translated.update(homescreenAA)
+  node_count = 1 + translated.getChildCount()
+  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
+  return translated
+End Function
+
+
+''''''''''''''''''''
+' translateContainer
+'
+' Translate content specifically targeted at CategoryGridList.  This is aimed at PERFORMANCE
+' above ease of use so it only translates the minimal necessary fields.  The performance
+' tricks used here, found through measurement are:
+' 1) Use ContentNode instead of TubiContentNode
+' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
+' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
+Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson) As Object
+  translated = CreateObject("roSGNode", "CategoryContentNode")
+  container = contentToTranslate.container
+  contents = contentToTranslate.contents
+
+  contentsJson = m.getContentsJson_(contents, fullJson)
+
+  node_count = 0
+  categoryMetadata = m.buildCategoryAA_(container, contents, contentsJson)
+  if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
+    return invalid
+  end if
+
+  if type(categoryMetadata) = "roAssociativeArray"
+    ' buildCategoryAA always returns AA.state = "partial", 
+    ' but any single category request should be considered fully loaded
+    categoryMetadata.state = "loaded"
+    translated.update(categoryMetadata)
+    node_count = 1 + translated.getChildCount()
+  end if
+
+  ' Set a flag only on content with landscape posters.  We do it here manually
+  ' to avoid having to define a custom content node which have
+  ' proven to be much slower to instantiate.  Could use some testing,
+  ' though.
+  if container.id = m.constants.ui.categoryIds.featured and m.singleFeaturePoster <> true
+    for i = 0 to translated.getChildCount()-1
+      child = translated.getChild(i)
+      child.addField("isLandscape", "boolean", false)
+      child.isLandscape = true
+    end for
+  end if
+
+  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
+  return translated
+End Function
+
+
+''''''''''''''''''''''
+' buildCategoryAA
+'
+' @container: assocArray, a single container as found in the matrix API
+' @contents: assocArray, a set of content meta data as found in the matrix API
+' @contentsJson: string, the JSON string of just the contents portion of the matrix API
+'
+' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson=invalid)
+  updateMetadata = {}
+  if type(container) = "roAssociativeArray" and type(contents) = "roAssociativeArray"
+    updateMetadata = {
+      id: container.id
+      title: container.title
+      description: container.description
+      totalCount: 0
+      offset: m.constants.performance.categoryGridList.initialBlockSize
+      json: ""
+      state: "partial"
+    }
+
+    if container.type = "channel" and container.children.count() > 0
+      withPrepend = true
+      updateMetadata.type = m.contentTypes.channel
+    else
+      withPrepend = false
+      updateMetadata.type = m.contentTypes.category
+    end if
+    jsonAA = {}
+    validCount = 0
+    children = []
+    if withPrepend = true
+      children.push(container.id)
+      ' new content item
+      prependContent = {}
+      prependContent.append(container)
+      prependContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
+      prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
+      ' new category content group
+      prependedContents = {}
+      prependedContents[container.id] = prependContent
+      prependedContents.append(contents)
+      contents = prependedContents
+      contentsJson = invalid  ' force it to be regenerated
+    end if
+    children.append(container.children)
+    updateMetadata.children = CreateObject("roArray", children.count(), false)
+    for each child in children 
+      ' contents[child].valid is "true" or "false" for user categories and is invalid for all other categories.
+      ' For all other categories, assume all contents are valid.
+      if contents[child] <> invalid and contents[child].valid <> false
+        fullChild = contents[child]
+
+        childAA = {
+          id: fullChild.id
+          title: fullChild.title
+          description: fullChild.description
+          length: fullChild.duration
+          subtype: "ContentNode"
+        }
+        if container.id = m.constants.ui.categoryIds.featured and m.singleFeaturePoster <> true and fullChild.hero_images <> invalid then
+          childAA.hdgridposterurl = fullChild.hero_images[0]
+        else if fullChild.posterarts <> invalid then
+          childAA.hdgridposterurl = fullChild.posterarts[0]
+        end if
+
+        ' normalize ids for series, should always be zero-prefixed
+        if fullChild.type = "s" or fullChild.type = "a"
+          childAA.id = "0" + fullChild.id
+        end if
+        jsonAA[childAA.id] = fullChild
+        validCount += 1
+        updateMetadata.children.push(childAA)
+      end if
+    end for
+
+    ' if all the content is out of window, do not return category metadata aa
+    ' container.cursor = 0 for limitedUI matrix/homescreen calls
+    ' container.cursor = invalid for matrix/containers/{id} calls
+    ' if we are getting category from matrix/containers/{id} and it returns no valid content,
+    ' we want to remove that category from the category screen
+    if container.cursor = invalid and validCount = 0
+      return invalid
+    end if
+
+    updateMetadata.totalCount = validCount
+    if contentsJson <> invalid
+      updateMetadata.json = contentsJson
+    else
+      updateMetadata.json = FormatJSON(jsonAA)
+    end if
+  end if
+
+  return updateMetadata
+End Function
+
+
+''''''''''''''''''''''
+' getContentsJson
+'
+'helper function to encapsulate getting the contents JSON from a matrix single container response
+Function tubiMetadataTranslate_getContentsJson(contents, fullJson)
+  contentsJson = invalid
+
+  'Doing string operations to isolate the contents portion of the JSON matrix response is considerably faster than re-formatting the JSON
+  contentsIdentifier =  Chr(34) + "contents" + Chr(34) + ":{"
+  contentsPos = Instr(0, fullJson, contentsIdentifier)
+  if contentsPos > 0
+    contentsJsonLength = fullJson.len() - contentsPos - contentsIdentifier.len() + 1
+    contentsJson = Mid(fullJson, contentsPos + contentsIdentifier.len()-1, contentsJsonLength)
+  else
+    'Do a Format JSON since we can't find the contents with our string search
+    tubiLog("Formatted JSON for category metadata", "warn", "clientWarn", "category-metadata-format-json")
+    contentsJson = FormatJSON(contents)
+  end if
+
+  return contentsJson
+End Function
+
+
+'See example metadata at "https://uapi.adrise.tv/cms/categories?app_id=tubitv&platform=roku&device_id=AABBCCDDEEFF&page_enabled=false"
+
+''''''''''''''''''''''
+' translate
+'
+' Translates content from server into format that roku understands
+' contentToTranslate should be parsed from JSON before it hits this function
+Function tubiMetadataTranslate_translate(contentToTranslate) As Object
+  translated = CreateObject("roSGNode", "TubiContentNode")
+
+  node_count = 0
+
+  if contentToTranslate <> invalid
+    'expect a list of categories with one category filled with content or a list of contents
+    if type(contentToTranslate) = "roArray"
+      for each content in contentToTranslate
+        if content.title <> "After Hours" or m.allowAfterHours = true
+          node = translated.createChild("TubiContentNode")
+          node_count = node_count + m.translateRecursive(content, node)
+        end if
+      end for
+
+    'expect a single piece of content, or several (as an associative array)
+    else if type(contentToTranslate) = "roAssociativeArray"
+
+      'expect this to happen just for the search API
+      if contentToTranslate.children <> invalid
+        node_count = m.translateRecursive(contentToTranslate, translated)
+      
+      'expect this to happen for history/queue content
+      else
+        for each content in contentToTranslate
+          if contentToTranslate[content] <> invalid
+            node = translated.createChild("TubiContentNode")
+            node_count = node_count + m.translateRecursive(contentToTranslate[content], node)
+          end if
+        end for
+      end if
+    end if
+  end if
+
+  m.setTotalCount_(translated)
+  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
+  return translated
+end Function
+
+
+Function tubiMetadataTranslate_translateChannel(contentToTranslate)
+  translated = CreateObject("roSGNode", "CategoryContentNode")
+  node_count = 0
+  container = contentToTranslate.container
+  if container <> invalid
+    translated.id = container.id
+    translated.title = container.title
+    translated.description = container.description
+    translated.offset = 0
+    translated.json = ""
+    translated.state = "loaded"
+    translated.logoUri = container.logo
+    translated.type = m.contentTypes.channel
+    translated.slug = container.slug
+
+    for i=0 to container.children.count()-1
+      child = contentToTranslate.contents[contentToTranslate.container.children[i]]
+      node = translated.createChild("TubiContentNode")
+      node_count += m.translateRecursive(child, node)
+    end for
+  end if
+  m.setTotalCount_(translated)
+  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
+  return translated
+End Function
+
+
+Function tubiMetadataTranslate_generateChannelPosterUrl(channelId)
+  'TODO(Chris): Use the channelId to generate a url to the channel-specific asset
+  return "http://cdn.adrise.tv/tubitv-assets/img/channelTile.png"
 End Function

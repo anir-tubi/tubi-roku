@@ -159,6 +159,13 @@ Function screenTrackingLoad(newTrackingUri)
 End Function
 
 
+Function printScreenStack()
+  for i=0 to m.ScreenStack_.getChildCount()-1
+    screen = m.ScreenStack_.getChild(i)
+    print "stack["; i; "]: "; screen.subtype(); " id = "; screen.id
+  end for
+End Function
+
 Function clearScreenStack(sendTrackingEvents = true as Boolean)
   tubiLog("ScreenStack.popScreen")
   for i=m.ScreenStack_.getChildCount()-1 to 0 step -1

@@ -113,6 +113,7 @@ Function onDownloadedSegment(msg)
 End Function
 
 Function advancePlaylist() As Boolean
+  tubiLog("VideoPlaylist.advancePlaylist")
   ' advance the playlist
   if m.top.playlist <> invalid
     newIndex = m.top.playlistIndex + 1
@@ -191,7 +192,10 @@ Function onRefreshError(msg)
   tubiLog("VideoPlayer.onRefreshError")
   ' TODO: When do we shown an error vs. skip content and continue on?
   if m.VideoState = "refresh" or m.VideoState = "pause"
-    advancePlaylist()
+    if advancePlaylist() <> true
+      m.top.errorMsg = "Could not refresh the content or play next content."
+      m.top.state = "error"
+    end if
   end if
 End Function
 

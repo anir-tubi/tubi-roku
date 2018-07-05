@@ -103,7 +103,7 @@ Function onHomescreenResponse()
     else
       testLog("Category list returned " + stri(response.code))
       ' if we were loading in the background, don't show an error modal
-      if m.top.isInFocusChain() then showErrorModal(response.code, response.failReason, retryCategoryList, retryCategoryList)
+      if m.top.isInFocusChain() then showErrorModal(response.code, response.failReason, retryCategoryList, [], retryCategoryList, [])
     end if
   end if
 End Function
@@ -182,7 +182,7 @@ Function onReloadUserCategoriesResponse(msg)
     else
       testLog("Category list returned " + stri(response.code))
       ' if we were loading in the background, don't show an error modal
-      if m.top.isInFocusChain() then showErrorModal(response.code, response.failReason, retryCategoryList, retryCategoryList)
+      if m.top.isInFocusChain() then showErrorModal(response.code, response.failReason, retryCategoryList, [], retryCategoryList, [])
     end if
   end if
 End Function
@@ -220,7 +220,7 @@ Function onDirtyUserCategories(msg)
     'auth request creation happens in metadataFetchTask
     'auth request will add the userId param
     reqName = m.constants.reqNames.getCategory
-    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", url, reqName, options)
+    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", reqName)
     m.Spinner.visible = true
   end if
 End Function
@@ -487,23 +487,8 @@ Function loadAllCategories()
   ' being set to true.  Then, once true it will reload any time loadCategories() is
   ' called, such as when signedIn field changes.
   if m.top.loadAllCategories = true
-    ' TODO(Chris): This should move to a shim layer which hides specifics of the Tubi v4 API
-    settings = m.global.constants.settings
-    platform = m.global.constants.platform
-    deviceInfo = m.global.constants.deviceInfo
-    url = m.global.constants.urls.matrix.homescreen
-    options = {
-      params: {
-        "app_id": settings.shortAppName
-        platform: platform
-        "device_id": deviceInfo.deviceId
-        expand: 2
-        includeEmpty: true
-        limit: m.constants.performance.categoryGridList.initialBlockSize
-      }
-    }
     reqName = m.constants.reqNames.getHomescreen
-    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", url, reqName, options)
+    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", reqName)
     m.Spinner.visible = true
   end if
 End Function

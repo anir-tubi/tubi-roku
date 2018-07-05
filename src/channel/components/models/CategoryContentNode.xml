@@ -23,5 +23,10 @@
 
     <!-- Should this category use landscape images -->
     <field id="isLandscape" type="boolean" value="false"/>
+
+    <!-- A logo that will be displayed for channels -->
+    <field id="logoUri" type="string" />
+
+    <field id="slug" type="string" />
   </interface>
 </component>

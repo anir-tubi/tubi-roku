@@ -25,18 +25,21 @@
 <component name="InfoPanel" extends="Group">
 
   <script type="text/brightscript" uri="pkg:/components/lib/InfoPanel/InfoPanel.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />  
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
 
   <interface>
     <!-- INPUTS -->
     <field id="title" alias="Title.text" />
+    <field id="titleLogoUri" type="string" />
     <field id="episodeTitle" alias="Episode.text" />
     <field id="releaseDate" type="string" />
     <field id="length" type="integer" />
-    <field id="hasCC" type="boolean"  value="false"/>
+    <field id="hasCC" type="boolean"  value="false" />
     <field id="rating" type="string" />
+    <field id="partnerLogoUri" type="string" />
     <field id="genres" type="stringarray" />
     <field id="description" type="string" />
     <field id="directors" type="stringarray" />
@@ -71,19 +74,34 @@
       horizAlignment="custom"
       translation="[0,0]">
 
-      <Label
-        id="Title"
-        width="875"
-        wrap="true"
-        maxLines="1"
-        color="0xFFFFFFFF"
-        vertAlign="bottom">
-        <Font
-          id="TitleFont"
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="67" />
-      </Label>
+      <LayoutGroup
+        id="TitleGroup"
+        layoutDirection="horiz"
+        vertAlignment="center"
+        itemSpacings="[20]"
+        addItemSpacingAfterChild="true">
+        <Poster
+          id="TitleLogo"
+          visible="false"
+          height="80"
+          width="80"
+          loadDisplayMode="scaleToFit" />
+        <Label
+          id="Title"
+          width="875"
+          height="80"
+          wrap="true"
+          maxLines="1"
+          color="0xFFFFFFFF"
+          vertAlign="bottom">
+          <Font
+            id="TitleFont"
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="67" />
+        </Label>
+      </LayoutGroup>
+
 
       <Label
         id="Episode">
@@ -136,7 +154,9 @@
         <LayoutGroup
           id="FirstLineGroup"
           layoutDirection="horiz"
-          vertAlignment="center" >
+          vertAlignment="center"
+          itemSpacings="[10]"
+          addItemSpacingAfterChild="true">
           <Label
             id="Line1"
             opacity="0.5">
@@ -145,32 +165,22 @@
               uri="pkg:/fonts/Vaud-Medium.ttf"
               size="27" />
           </Label>
-          <Rectangle
-            id="ClosedCaptionRectangle"
+          <Poster
+            id="ClosedCaptionPoster"
             height="36"
-            width="72"
-            color="0x00000000">
-            <Poster
-              id="ClosedCaptionPoster"
-              height="36"
-              loadHeight="36"
-              loadDisplayMode="scaleToFit"
-              translation="[3,0]"
-              loadSync="true"
-              uri="pkg://images/icon-closed-caption.png" />
-          </Rectangle>
-          <Rectangle
-            height="40"
-            width="72"
-            color="0x00000000">
-            <Poster
-              id="Rating"
-              height="36"
-              loadHeight="36"
-              loadDisplayMode="scaleToFit"
-              loadSync="true"
-              translation="[0,0]" />
-          </Rectangle>
+            width="56"
+            loadSync="true"
+            loadDisplayMode="scaleToFit"/>
+          <Poster
+            id="Rating"
+            height="36"
+            loadDisplayMode="scaleToFit"
+            loadSync="true"/>
+          <Poster
+            id="PartnerLogo"
+            height="36"
+            loadHeight="36"
+            loadDisplayMode="scaleToFit"/>
         </LayoutGroup>
         <Label
           id="Line2"

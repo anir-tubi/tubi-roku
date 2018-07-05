@@ -10,7 +10,8 @@ Function MetadataFetchTaskDTO()
 End Function
 
 ' MetadataFetchTask.request
-Function metadataFetchTaskClient_createRequest(id, node, field, url, name, options, sortOrder=invalid)
+
+Function metadataFetchTaskClient_createRequest(id, node, field, name, searchText=invalid)
   if id = invalid or id = "" then
     id = CreateObject("roDeviceInfo").GetRandomUUID()
   end if
@@ -20,28 +21,20 @@ Function metadataFetchTaskClient_createRequest(id, node, field, url, name, optio
   if type(field) <> "String" and type(field) <> "roString"
     field = ""
   end if
-  if type(url) <> "String" and type(url) <> "roString"
-    url = ""
-  end if
   if type(name) <> "String" and type(name) <> "roString"
     name = ""
   end if
   if type(options) <> "roAssociativeArray" then
     options = {}
   end if
-  if type(sortOrder) <> "roArray" then
-    sortOrder = []
-  end if
 
   return {
     id: id
     node: node
     field: field
-    url: url
     name: name
-    options: options
     batch: false
-    sortOrder: sortOrder
+    searchText: searchText
   }
 End Function
 
