@@ -94,7 +94,7 @@ Function init()
   ' We only show the sign in prompt message once per session for signed-out users
   m.promptSignInOnGuestPlay = false
   m.skipSignInOnLaunch = false
-  m.singleFeaturePoster = false
+  m.singleFeaturePoster = invalid
 
   m._ = rodash()
 End Function
