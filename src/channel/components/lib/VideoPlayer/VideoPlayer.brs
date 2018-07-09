@@ -65,13 +65,19 @@ Function init()
   m.Thumbnail = m.top.findNode("Thumbnail")
 
   'm.VideoState is source of truth for the state of the video player for the UI
-  'possible values are "play", "pause", "rew", "ffw", "stop", "refresh"
+  'possible values are "play", "pause", "rew", "ffw", "stop", "refresh", "skip"
   m.VideoState = "stop"
+
+  'm.scrubAmt is the 0-based level of scrub speed - current design allows for 0, 1, 2
   m.scrubAmt = -1
-  m.playerPosition = 0
   m.maxScrub = m.constants.player.maxScrub
   m.scrubMultipliers = m.constants.player.scrubMultipliers
   m.scrubTimespan = CreateObject("roTimespan")
+  ' m.positionAtJumpStart holds the state during FF/REW/Skips/Hops so we can tell if at the end of all user actions
+  ' the user ended up moving forward or backwards from their original position.
+  m.positionAtJumpStart = -1
+  m.playerPosition = 0
+
   m.lastButtonPressPos = 0
   m.transportAutoHideTime = m.constants.player.transportAutoHideTime
   m.ignoreOptionsKey = m.constants.deviceInfo.firmwareCaptionMenu
@@ -402,7 +408,7 @@ Function onVideoPositionChange()
       end if
 
       ' Fire up the midroll
-      if m.playerPosition = cuepoint
+      if m.playerPosition = cuepoint and cuepoint > 0
         if m.top.adState = "adspending" then
           ' We must stop the video here, not just pause it, in order to release
           ' system resources to the RAF video player
@@ -698,7 +704,7 @@ Function onAdStateChange()
     showAdBreak()
   ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
   'TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
-  else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause") and m.Video.state <> "playing" then
+  else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "skip") and m.Video.state <> "playing" then
     ' Came back from an ad break
     ' Set the m.Video.control prior to the m.Video.seek to ensure that the video is not started from the beginning even if m.playerPosition <> 0.
     ' This is a seeming inconsistency with the firmware and should not neccessarily work this way, but it does.
@@ -854,7 +860,6 @@ End Function
 
 'Resume play from a paused state
 Function resumeFromPause()
-
   animateTransport("out")
 
   if m.playerPosition <> m.Video.position
@@ -873,6 +878,17 @@ Function resumeFromPause()
     })
   end if
 
+  m.PlayPauseButton.uri = m.buttonUris.pause
+  setFocusedButton(m.PlayPauseButton)
+End Function
+
+
+Function resumeFromSkip()
+  tubiLog("VideoPlayer.resumeFromSkip")
+  animateTransport("out")
+  if m.playerPosition <> m.Video.position
+    jumpToPosition(m.playerPosition)
+  end if
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
 End Function
@@ -942,16 +958,10 @@ Function endScrub()
   ' Reset periodic event trackers
   m.lastPingTime = m.playerPosition
 
-  resetTransportButtons()
   m.PlayPauseButton.uri = m.buttonUris.pause
-  m.PlayPauseButton.focusState = true
+  setFocusedButton(m.PlayPauseButton)
 
-  shouldAdBreak = false
-  if m.top.enableAds and oldVideoState = "ffw" then
-    shouldAdBreak = true
-  end if
-
-  handleSeek(m.playerPosition, shouldAdBreak)
+  jumpToPosition(m.playerPosition)
 End Function
 
 
@@ -966,21 +976,24 @@ End Function
 'handles StartButton selection
 'moves the player to the 0:00:00 position
 Function goToStart()
+  m.positionAtJumpStart = m.playerPosition
+  m.playerPosition = 0
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub()
     setFocusedButton(m.StartButton)
   end if
-  jumpToPosition(0)
+  jumpToPosition(m.playerPosition)
 End Function
 
 
 'handles EndButton selection
-'moves the player to 5 seconds before the end of the video
 Function goToEnd()
+  'reset before endScrub because we don't want an ad call made when moving to the next video, let prerolls hit instead
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub()
     setFocusedButton(m.EndButton)
   end if
+  
   if not advancePlaylist() then
     'the end of the video playback
     m.VideoState = "stop"
@@ -999,6 +1012,8 @@ Function handlePlayPause()
     resumeFromPause()
   else if m.VideoState = "rew" or m.VideoState = "ffw"
     endScrub()
+  else if m.VideoState = "skip"
+    resumeFromSkip()
   end if
   setFocusedButton(m.PlayPauseButton, true)
 End Function
@@ -1024,6 +1039,7 @@ Function handleFastForward()
 
   'start the fast forward
   else
+    m.positionAtJumpStart = m.playerPosition
     beginScrub()
     m.VideoState = "ffw"
     m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[0]
@@ -1053,6 +1069,7 @@ Function handleRewind()
 
   'start the rewind
   else
+    m.positionAtJumpStart = m.playerPosition
     beginScrub()
     m.VideoState = "rew"
     m.RewindButton.uri = m.buttonUris.rewindLevels[0]
@@ -1120,9 +1137,11 @@ End Function
 'handles the functionality for Roku's requirement to skip the video forward or backward while pausing the video.
 'functionality is: pause video, jump 10s forward or back, show the transport
 Function handleSkipVideo(amt, isProgressBarFocused)
-  if m.VideoState <> "pause"
+  'handle the first skip press
+  if m.VideoState <> "skip"
     m.Video.control = "pause"
-    m.VideoState = "pause"
+    m.VideoState = "skip"
+    m.positionAtJumpStart = m.playerPosition
     m.PlayPauseButton.uri = m.buttonUris.play
   end if
 
@@ -1228,7 +1247,11 @@ Function onCCDialogButton()
 End Function
 
 'handles replay key press or HopBack button selection
+'@position: integer, should be m.playerPosition in most cases
+'
+'function calling jumpToPosition should reset m.positionAtJumpStart to -1 after calling jumpToPosition
 Function jumpToPosition(position)
+  tubiLog("VideoPlayer.jumpToPosition")
   cancelReplayCaptions() ' on any jump we cancel any temporary caption modifications
 
   if position > (m.Video.duration - 5)
@@ -1236,15 +1259,14 @@ Function jumpToPosition(position)
   else if position < 0
     position = 0
   end if
+  m.playerPosition = position 'in case position is updated by the above block
 
   shouldAdBreak = false
-  if m.top.enableAds and position > m.playerPosition
+  if m.top.enableAds and m.positionAtJumpStart > -1 and position > m.positionAtJumpStart
     shouldAdBreak = true
   end if
 
-  m.playerPosition = position
   m.PlayPauseButton.uri = m.buttonUris.pause
-
   handleSeek(position, shouldAdBreak)
 End Function
 
