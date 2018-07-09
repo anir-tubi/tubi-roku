@@ -634,7 +634,7 @@ Function onAboutSelected()
   m.aboutScreen.title = "About Tubi"
   message = "Version " + m.constants.settings.version.Replace("_",".") + Chr(10)
   message = message + Chr(10)
-  message = message + Chr(169) + " 2017 Tubi, Inc. all rights reserved." + Chr(10) ' + Chr(13)
+  message = message + Chr(169) + " 2018 Tubi, Inc. all rights reserved." + Chr(10) ' + Chr(13)
   message = message + "The Tubi wordmark and all related logotypes are trademarks of Tubi, Inc."
   m.aboutScreen.message = message
   m.aboutScreen.buttons = ["Close"]
