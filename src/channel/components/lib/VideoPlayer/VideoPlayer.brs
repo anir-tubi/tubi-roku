@@ -1238,7 +1238,7 @@ Function jumpToPosition(position)
   end if
 
   shouldAdBreak = false
-  if position > m.playerPosition
+  if m.top.enableAds and position > m.playerPosition
     shouldAdBreak = true
   end if
 
