@@ -90,6 +90,9 @@ function tubiBookmarks_createBookmarksRequest_(id as String, action as String, c
 
   options = {
     method: verb
+    params: {
+      platform: m.constants.platform
+    }
   }
 
   if bodyJson <> invalid
@@ -189,6 +192,9 @@ function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, 
 
   options = {
     method: verb
+    params: {
+      platform: m.constants.platform
+    }
   }
 
   if bodyJson <> invalid
