@@ -324,6 +324,11 @@ Function getConstants()
       constants.urls.transportButtons.toEnd = "pkg:/images/transport/sgplayer/icon-to-end.png"
       constants.urls.transportButtons.toStart = "pkg:/images/transport/sgplayer/icon-to-start.png"
 
+    constants.urls.channelPosterUnbranded = "http://cdn.adrise.tv/image/roku_support_images/channel-poster-generic.png"
+    constants.urls.channelPosterBrandedPrefix = "http://cdn.adrise.tv/image/roku_support_images/channel-poster-"
+    constants.urls.channelPosterBrandedSuffix = ".png"
+
+
   'http request types
   constants.reqTypes = {}
     constants.reqTypes.get = "GET"

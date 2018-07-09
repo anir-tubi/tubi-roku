@@ -11,6 +11,8 @@ Function TestSuite_TubiMetadataTranslate() as Object
   this.addTest("translateChannel", testCase_tubiMetadataTranslate_translateChannel)
   this.addTest("translateHomescreen", testCase_tubiMetadataTranslate_translateHomescreen)
   this.addTest("translate", testCase_tubiMetadataTranslate_translate)
+  this.addTest("generateChannelPosterUrl", testCase_tubiMetadataTranslate_generateChannelPosterUrl)
+  this.addTest("generateChannelPosterUrl_unbranded", testCase_tubiMetadataTranslate_generateChannelPosterUrl_unbranded)
   return this
 End Function
 
@@ -276,5 +278,20 @@ print "translated.slug = "; translated.slug
 print "translated.totalCount = "; translated.totalCount
   result = result + m.assertTrue(translated.totalCount = 95)
   result = result + m.assertTrue(translated.getChildCount() = 95)
+  return result
+End Function
+
+Function testCase_tubiMetadataTranslate_generateChannelPosterUrl()
+  channel = ParseJson(ReadAsciiFile("pkg:/source/tests/units/channel.json"))
+  posterUrl = m.translate.generateChannelPosterUrl(channel.container.id)
+  return m.assertEqual(posterUrl, "http://cdn.adrise.tv/image/roku_support_images/channel-poster-cbs.png")
+End Function
+
+Function testCase_tubiMetadataTranslate_generateChannelPosterUrl_unbranded()
+  channel = ParseJson(ReadAsciiFile("pkg:/source/tests/units/channel.json"))
+  posterUrl = m.translate.generateChannelPosterUrl("")
+  result = m.assertEqual(posterUrl, m.constants.urls.channelPosterUnbranded)
+  posterUrl = m.translate.generateChannelPosterUrl(invalid)
+  result += m.assertEqual(posterUrl, m.constants.urls.channelPosterUnbranded)
   return result
 End Function

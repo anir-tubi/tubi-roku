@@ -635,6 +635,9 @@ End Function
 
 
 Function tubiMetadataTranslate_generateChannelPosterUrl(channelId)
-  'TODO(Chris): Use the channelId to generate a url to the channel-specific asset
-  return "http://cdn.adrise.tv/tubitv-assets/img/channelTile.png"
+  if (type(channelId) = "String" or type(channelId) = "roString") and channelId <> ""
+    return m.constants.urls.channelPosterBrandedPrefix + channelId + m.constants.urls.channelPosterBrandedSuffix
+  else
+    return m.constants.urls.channelPosterUnbranded
+  end if
 End Function
