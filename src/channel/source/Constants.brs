@@ -316,14 +316,7 @@ Function getConstants()
     'privacy statement text
     constants.urls.privacyUrl = "http://cdn.adrise.tv/legal/TubiTVPrivacyPolicy.txt"
 
-    constants.urls.transportButtons = {}
-      constants.urls.transportButtons.fastForward = "pkg:/images/transport/sgplayer/icon-ffw.png"
-      constants.urls.transportButtons.rewind = "pkg:/images/transport/sgplayer/icon-rew.png"
-      constants.urls.transportButtons.pause = "pkg:/images/transport/sgplayer/icon-pause.png"
-      constants.urls.transportButtons.play = "pkg:/images/transport/sgplayer/icon-play.png"
-      constants.urls.transportButtons.toEnd = "pkg:/images/transport/sgplayer/icon-to-end.png"
-      constants.urls.transportButtons.toStart = "pkg:/images/transport/sgplayer/icon-to-start.png"
-
+    'channels poster image urls
     constants.urls.channelPosterUnbranded = "http://cdn.adrise.tv/image/roku_support_images/channel-poster-generic.png"
     constants.urls.channelPosterBrandedPrefix = "http://cdn.adrise.tv/image/roku_support_images/channel-poster-"
     constants.urls.channelPosterBrandedSuffix = ".png"

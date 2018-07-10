@@ -958,6 +958,7 @@ Function endScrub()
   ' Reset periodic event trackers
   m.lastPingTime = m.playerPosition
 
+  resetTransportButtons()
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
 
