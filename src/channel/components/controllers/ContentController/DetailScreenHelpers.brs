@@ -118,7 +118,7 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false)
 
   detailScreen.isBookmark = (bookmark <> invalid)
   detailScreen.isHistory = (history <> invalid)
-  detailScreen.isChannelItem = (content.channelId <> invalid)
+  detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "")
 
   detailScreen.channelImg = content.channelImg
   detailScreen.channelTitle = content.channelTitle
