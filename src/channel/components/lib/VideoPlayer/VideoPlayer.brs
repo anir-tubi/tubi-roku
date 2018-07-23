@@ -1280,6 +1280,8 @@ Function jumpToPosition(position)
   end if
 
   m.PlayPauseButton.uri = m.buttonUris.pause
+  m.lastButtonPressPos = position
+
   handleSeek(position, shouldAdBreak)
 End Function
 
