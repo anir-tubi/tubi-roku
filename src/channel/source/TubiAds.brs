@@ -16,10 +16,13 @@ function TubiAds (utils)
   'turn on debug output for RAF
   roAdFramework.setDebugOutput(false)
 
+  'a port used for sending logging requests
+  adLoggingPort = CreateObject("roMessagePort")
 
   return {
     utils: utils
     constants: utils.constants
+    requestQueue: utils.requestQueue.create(adLoggingPort)
     roAdFramework: roAdFramework
 
     allAdUnitsList:[]
@@ -213,10 +216,19 @@ function tubiAds_getAdsListViaRoku(episode)
 
   'get the array of ad units back from the Roku Advertising Framework(RAF)
   'adUnits are called adPods in RAF documentation
+  adFetchTimer = CreateObject("roTimeSpan")
   currentAdUnitsList = m.roAdFramework.getAds()
+  timeToFetch = adFetchTimer.totalMilliseconds()
 
-  ' ShowVarSimple(currentAdUnitsList, "Ad Unit List")
-  ' stop
+  'log ad fetch errors
+  if currentAdUnitsList = invalid
+    timeToFetchMessage = {
+      message: "RAF got no response"
+      call_duration: timeToFetch
+      raf_version: m.roAdFramework.getLibVersion()
+    }
+    m.utils.log.error(FormatJSON(timeToFetchMessage), "adError", "no-ad-response", m.requestQueue)
+  end if
 
   'check to see if the ad server returns an ad that can be used by RAF or needs to use our ad SDK
   'traditional version of xml is in the clickThrough property/clickThrough VAST tag
