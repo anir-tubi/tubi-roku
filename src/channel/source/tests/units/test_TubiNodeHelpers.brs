@@ -3,7 +3,6 @@ Function TestSuite_TubiNodeHelpers()
   this.name = "TubiNodeHelpersTestSuite"
   this.addTest("getChildIndex", testCase_tubiNodeHelpers_getChildIndex)
   this.addTest("getChildIndexById", testCase_tubiNodeHelpers_getChildIndexById)
-  this.addTest("unobserveAllScoped", testCase_tubiNodeHelpers_unobserveAllScoped)
   this.addTest("convertNodesToIdsAA", testCase_tubiNodeHelpers_convertNodesToIdsAA)
   this.addTest("immutableInsertChild", testCase_tubiNodeHelpers_immutableInsertChild)
   this.addTest("immutableInsertChild_exists", testCase_tubiNodeHelpers_immutableInsertChildAlreadyExists)

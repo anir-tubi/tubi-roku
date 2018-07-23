@@ -105,7 +105,7 @@
       translation="[0,0]"
       enableUI="false"
       enableTrickPlay="false"
-      notificationInterval="1"
+      notificationInterval="0.5"
       visible="true" />
 
     <Group

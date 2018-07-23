@@ -110,6 +110,12 @@ Function init()
   m.lastSavedPosition = 0
   m.adPrefetchTime = 15
   m.adHeadsUpTime = 10
+  m.adBreakAdvance = 0.5
+
+  ' checking m.recentCuepointFetch and m.recentCuepoint prevents multiple ad calls and multiple tracking events
+  ' for a single cuepoint if the position callback happens at 10.2 and 10.7 for instance
+  m.recentCuepointFetch = 0
+  m.recentCuepoint = 0
 
   m.analyticsInterval = m.constants.player.pingFrequency
   m.historyInterval = m.constants.player.historyFrequency
@@ -355,7 +361,7 @@ End Function
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
 Function onVideoPositionChange()
-  tubiLog("VideoPlayer.onVideoPositionChange position =" + stri(m.Video.position))
+  tubiLog("VideoPlayer.onVideoPositionChange position = " + m.playerPosition.toStr())
 
   updatePlayerPosition()
 
@@ -373,7 +379,6 @@ Function onVideoPositionChange()
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval then
     playProgressEvent = getPlayProgressEvent()
     m.lastPingTime = m.playerPosition
-
     trackEvent(playProgressEvent)
   end if
 
@@ -394,12 +399,15 @@ Function onVideoPositionChange()
     m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
     for each cuepoint in m.top.midrolls
 
-      if m.playerPosition = (cuepoint - m.adPrefetchTime)
-        m.top.adPosition = m.playerPosition
-        m.top.adControl = "midroll"
+      if isAtPosition(m.playerPosition, cuepoint - m.adPrefetchTime)
+        if cuepoint - m.adPrefetchTime <> m.recentCuepointFetch
+          m.recentCuepointFetch = cuepoint - m.adPrefetchTime
+          m.top.adPosition = cuepoint
+          m.top.adControl = "midroll"
+        end if
       end if
 
-      if m.playerPosition >= (cuepoint - m.adHeadsUpTime) and m.playerPosition < cuepoint and m.top.adState = "adspending"
+      if isInWindow(m.playerPosition, cuepoint, m.adHeadsUpTime) and m.top.adState = "adspending"
         if m.Overlay.opacity = 0
           ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
           m.AdHeadsUp.visible = true
@@ -408,18 +416,22 @@ Function onVideoPositionChange()
       end if
 
       ' Fire up the midroll
-      if m.playerPosition = cuepoint and cuepoint > 0
-        if m.top.adState = "adspending" then
-          ' We must stop the video here, not just pause it, in order to release
-          ' system resources to the RAF video player
-          showAdBreak()
-        else if m.top.adState = "noads"
-          ' when we reach the cuepoint, we find that the last ad call returned no ads
-          trackEvent({
-            trackType: "resumeAfterAds"
-            value: m.playerPosition
-            ctx: m.top.content.id
-          })
+      if cuepoint > 0 and isAtPosition(m.playerPosition, cuepoint - m.adBreakAdvance)
+        if cuepoint <> m.recentCuepoint
+          m.AdHeadsUp.visible = false
+          m.recentCuepoint = cuepoint
+          if m.top.adState = "adspending" then
+            ' We must stop the video here, not just pause it, in order to release
+            ' system resources to the RAF video player
+            showAdBreak()
+          else if m.top.adState = "noads"
+            ' when we reach the cuepoint, we find that the last ad call returned no ads
+            trackEvent({
+              trackType: "resumeAfterAds"
+              value: m.playerPosition
+              ctx: m.top.content.id
+            })
+          end if
         end if
       end if
     end for
@@ -1394,4 +1406,14 @@ Function isActiveVideoState()
   else
     return true
   end if
+End Function
+
+
+' Compare video position to target, allowing 1s beyond
+Function isAtPosition(position, target)
+  return (position >= target and position <= target + 1)
+End Function
+
+Function isInWindow(position, target, window)
+  return (position >= (target - window) and position < target)
 End Function
