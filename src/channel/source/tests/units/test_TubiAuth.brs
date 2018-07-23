@@ -1,4 +1,19 @@
-Function testFormatAuth(t As Object)
+Function TestSuite_TubiAuth()
+  this = BaseTestSuite()
+  this.Name = "TubiAuthTestSuite"
+  this.addTest("formatAuthInfoFromServer", testCase_tubiAuth_formatAuthInfoFromServer)
+  this.addTest("checkIfAuthExpired", testCase_tubiAuth_checkIfAuthExpired)
+  this.addTest("updateAuthInfo", testCase_tubiAuth_updateAuthInfo)
+  this.addTest("getAuthHeaders", testCase_tubiAuth_getAuthHeaders)
+  this.addTest("saveAuthInfo", testCase_tubiAuth_saveAuthInfo)
+  this.addTest("deleteAuthInfo", testCase_tubiAuth_deleteAuthInfo)
+  this.addTest("requestTokenRefresh", testCase_tubiAuth_requestTokenRefresh)
+  this.addTest("testRequestTokenTransfer", testCase_tubiAuth_requestTokenTransfer)
+  this.addTest("handleRefreshResponse", testCase_tubiAuth_handleRefreshResponse)
+  return this
+End Function
+
+Function testCase_tubiAuth_formatAuthInfoFromServer()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
@@ -21,41 +36,34 @@ Function testFormatAuth(t As Object)
   dateTime = CreateObject("roDateTime")
   timeToNow = dateTime.AsSeconds()
   expireCheck = (serverAuthInfo.expires_in + timeToNow).toStr()
-
   authInfo = auth.formatAuthInfoFromServer(serverAuthInfo)
-  t.assertNotInvalid(authInfo.userId)
-  t.assertEqual(authInfo.userId, serverAuthInfo.user_id.toStr())
-
-  t.assertNotInvalid(authInfo.name)
-  t.assertEqual(authInfo.name, serverAuthInfo.name)
-
-  t.assertNotInvalid(authInfo.fn)
-  t.assertEqual(authInfo.fn, serverAuthInfo.first_name)
-
-  t.assertNotInvalid(authInfo.ln)
-  t.assertEqual(authInfo.ln, serverAuthInfo.last_name)
-
-  t.assertNotInvalid(authInfo.accessToken)
-  t.assertEqual(authInfo.accessToken, serverAuthInfo.access_token)
-
-  t.assertNotInvalid(authInfo.refreshToken)
-  t.assertEqual(authInfo.refreshToken, serverAuthInfo.refresh_token)
-
-  t.assertNotInvalid(authInfo.expireTime)
-  t.assertEqual(authInfo.expireTime, expireCheck)
+  result = ""
+  result += m.assertNotInvalid(authInfo.userId)
+  result += m.assertEqual(authInfo.userId, serverAuthInfo.user_id.toStr())
+  result += m.assertNotInvalid(authInfo.name)
+  result += m.assertEqual(authInfo.name, serverAuthInfo.name)
+  result += m.assertNotInvalid(authInfo.fn)
+  result += m.assertEqual(authInfo.fn, serverAuthInfo.first_name)
+  result += m.assertNotInvalid(authInfo.ln)
+  result += m.assertEqual(authInfo.ln, serverAuthInfo.last_name)
+  result += m.assertNotInvalid(authInfo.accessToken)
+  result += m.assertEqual(authInfo.accessToken, serverAuthInfo.access_token)
+  result += m.assertNotInvalid(authInfo.refreshToken)
+  result += m.assertEqual(authInfo.refreshToken, serverAuthInfo.refresh_token)
+  result += m.assertNotInvalid(authInfo.expireTime)
+  result += m.assertEqual(authInfo.expireTime, expireCheck)
+  return result
 End Function
 
-
-Function testCheckIfAuthExpired(t As Object)
+Function testCase_tubiAuth_checkIfAuthExpired()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
-
   clock = CreateObject("roDateTime")
   present = clock.AsSeconds()
   past = present - 30000
   future = present + 30000
-
+  result = ""
 
   'stub expired authInfo
   expiredAuthInfo = {
@@ -64,10 +72,8 @@ Function testCheckIfAuthExpired(t As Object)
     expireTime: past
     userId: "12345"
   }
-
   isPastExpired = auth.checkIfAuthExpired(expiredAuthInfo)
-  t.assertTrue(isPastExpired)
-
+  result += m.assertTrue(isPastExpired)
 
   'stub non expired authInfo
   validAuthInfo = {
@@ -76,27 +82,23 @@ Function testCheckIfAuthExpired(t As Object)
     expireTime: future
     userId: "12345"
   }
-
   isFutureExpired = auth.checkIfAuthExpired(validAuthInfo)
-  t.assertFalse(isFutureExpired)
+  result += m.assertFalse(isFutureExpired)
+  return result
 End Function
 
-
-Function testUpdateAuthInfo(t as Object)
+Function testCase_tubiAuth_updateAuthInfo()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
-  
   dateTime = CreateObject("roDateTime")
   timeToNow = dateTime.AsSeconds()
   future = (timeToNow + 86400).toStr()
-
   refreshInfo = {
     user_id: "6735"
     expires_in: 86400
     access_token: "Some222Crazy333String444"
   }
-
   authInfo = {
     expireTime: 123456
     accessToken: "Some555Other666String777"
@@ -105,72 +107,68 @@ Function testUpdateAuthInfo(t as Object)
   }
 
   updatedAuthInfo = auth.updateAuthInfo(refreshInfo, authInfo)
-  ' t.assertEqual(updatedAuthInfo.refreshToken, authInfo.refreshToken)
-  ' t.assertEqual(updatedAuthInfo.userId, authInfo.userId)
-  ''' t.assertNotEqual(updatedAuthInfo.expireTime, authInfo.expireTime)
-  ' t.assertNotEqual(updatedAuthInfo.accessToken, authInfo.accessToken)
-  t.assertEqual(updatedAuthInfo.expireTime, future)
-  ' t.assertEqual(updatedAuthInfo.accessToken, refreshInfo.access_token)
+  result = ""
+  ' m.assertEqual(updatedAuthInfo.refreshToken, authInfo.refreshToken)
+  ' m.assertEqual(updatedAuthInfo.userId, authInfo.userId)
+  ''' m.assertNotEqual(updatedAuthInfo.expireTime, authInfo.expireTime)
+  ' m.assertNotEqual(updatedAuthInfo.accessToken, authInfo.accessToken)
+  result += m.assertEqual(updatedAuthInfo.expireTime, future)
+  ' m.assertEqual(updatedAuthInfo.accessToken, refreshInfo.access_token)
+  return result
 End Function
 
-
-Function testGetAuthHeaders(t as Object)
+Function testCase_tubiAuth_getAuthHeaders()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
   token = "Some555Other666String777"
-  
+  result = ""
   authHeaders = auth.getAuthHeaders(token)
-  t.assertNotInvalid(authHeaders["Content-Type"])
-  t.assertEqual(authHeaders["Content-Type"], "application/json")
-  t.assertNotInvalid(authHeaders["Authorization"])
-  t.assertEqual(authHeaders["Authorization"], "Bearer " + token)
+  result += m.assertNotInvalid(authHeaders["Content-Type"])
+  result += m.assertEqual(authHeaders["Content-Type"], "application/json")
+  result += m.assertNotInvalid(authHeaders["Authorization"])
+  result += m.assertEqual(authHeaders["Authorization"], "Bearer " + token)
+  return result
 End Function
 
-
-Function testSaveAuthInfo(t as Object)
+Function testCase_tubiAuth_saveAuthInfo()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
   auth.authRegKey = "testauth"
-
   authInfo1 = {
     expireTime: "123456"
     accessToken: "Some555Other666String777"
     refreshToken: "Some111Refresh999String000"
     userId: "6735"
   }
-
   authInfo2 = {
     expireTime: "234567"
     refreshToken: "Some111Refresh999String000x"
     userId: "6736"
   }
-  
   authInfo3 = {
     accessToken: "Some555Other666String777a"
     refreshToken: "Some111Refresh999String000y"
     userId: "6737"
   }
-
   authInfo4 = {
     expireTime: "123456"
     accessToken: "Some555Other666String777b"
     userId: "6738"
   }
-
   authInfo5 = {
     expireTime: "123456"
     accessToken: "Some555Other666String777c"
     refreshToken: "Some111Refresh999String000z"
   }
-
   authInfo6 = {
     expireTime: 123456
     accessToken: "Some555Other666String777d"
     refreshToken: "Some111Refresh999String000w"
     userId: "6739"
   }
+  result = ""
 
   authInfo1 = auth.saveAuthInfo(authInfo1) 
   authInfo2 = auth.saveAuthInfo(authInfo2) 'invalid?
@@ -178,134 +176,121 @@ Function testSaveAuthInfo(t as Object)
   authInfo4 = auth.saveAuthInfo(authInfo4) 'invalid?
   authInfo5 = auth.saveAuthInfo(authInfo5) 'invalid?
   authInfo6 = auth.saveAuthInfo(authInfo6) 'invalid?
-  
   savedAuthInfo = RegReadAll(auth.authRegKey)
-
-  t.assertNotInvalid(authInfo1)
-  t.assertInvalid(authInfo2)
-  t.assertInvalid(authInfo3)
-  t.assertInvalid(authInfo4)
-  t.assertInvalid(authInfo5)
-  t.assertInvalid(authInfo6)
-
-  t.assertEqual(savedAuthInfo.expireTime, authInfo1.expireTime)
-  t.assertEqual(savedAuthInfo.accessToken, authInfo1.accessToken)
-  t.assertEqual(savedAuthInfo.refreshToken, authInfo1.refreshToken)
-  t.assertEqual(savedAuthInfo.userId, authInfo1.userId)
-
+  result += m.assertNotInvalid(authInfo1)
+  result += m.assertInvalid(authInfo2)
+  result += m.assertInvalid(authInfo3)
+  result += m.assertInvalid(authInfo4)
+  result += m.assertInvalid(authInfo5)
+  result += m.assertInvalid(authInfo6)
+  result += m.assertEqual(savedAuthInfo.expireTime, authInfo1.expireTime)
+  result += m.assertEqual(savedAuthInfo.accessToken, authInfo1.accessToken)
+  result += m.assertEqual(savedAuthInfo.refreshToken, authInfo1.refreshToken)
+  result += m.assertEqual(savedAuthInfo.userId, authInfo1.userId)
   authSection = CreateObject("roRegistry")
   authSection.delete(auth.authRegKey)
   authSection.flush()
+  return result
 End Function
 
-
-Function testDeleteAuthInfo(t as Object)
+Function testCase_tubiAuth_deleteAuthInfo()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
   auth.authRegKey = "testauth"
-
   authInfo = {
     expireTime: "123456"
     accessToken: "Some555Other666String777"
     refreshToken: "Some111Refresh999String000"
     userId: "6735"
   }
+  result = ""
 
   for each a in authInfo
     RegWrite(a, authInfo[a], auth.authRegKey)
   end for
-
   auth.deleteAuthInfo()
-
   deletedAuthInfo = RegReadAll(auth.authRegKey)
-
   authInfoStillExists = false
   if deletedAuthInfo.count() > 0 
     authInfoStillExists = true
   end if
-
-  t.assertFalse(authInfoStillExists)
+  result += m.assertFalse(authInfoStillExists)
+  return result
 End Function
 
 
-Function testRequestTokenRefresh(t as Object)
+Function testCase_tubiAuth_requestTokenRefresh()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
   auth.constants.urls.users.refreshToken = "http://127.0.0.1:65535/"
-
-  server = createMetadataFetchTaskServer(65535)
-  msgPort = CreateObject("roMessagePort")
-  server.SetMessagePort(msgPort)
-
   savedAuthInfo = {
     expireTime: 123456
     accessToken: "Some555Other666String777"
     refreshToken: "Some111Refresh999String000"
     userId: "6735"
   }
+  result = ""
 
+  server = testHelper_tubiAuth_createMetadataFetchTaskServer(65535)
+  msgPort = CreateObject("roMessagePort")
+  server.SetMessagePort(msgPort)
   authRequest = auth.requestTokenRefresh(savedAuthInfo, msgPort)
-
-  t.assertNotInvalid(authRequest)
-  t.assertNotInvalid(authRequest.isHttps)
-  t.assertNotInvalid(authRequest.url)
-  t.assertEqual(authRequest.url, auth.constants.urls.users.refreshToken)
-  t.assertNotInvalid(authRequest.method)
-  t.assertEqual(authRequest.method, "POST")
+  result += m.assertNotInvalid(authRequest)
+  result += m.assertNotInvalid(authRequest.isHttps)
+  result += m.assertNotInvalid(authRequest.url)
+  result += m.assertEqual(authRequest.url, auth.constants.urls.users.refreshToken)
+  result += m.assertNotInvalid(authRequest.method)
+  result += m.assertEqual(authRequest.method, "POST")
+  return result
 End Function
 
-
-Function testRequestTokenTransfer(t as Object)
+Function testCase_tubiAuth_requestTokenTransfer()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
   auth.constants.urls.users.transferToken = "http://127.0.0.1:65535/"
-
-  server = createMetadataFetchTaskServer(65535)
-  msgPort = CreateObject("roMessagePort")
-  server.SetMessagePort(msgPort)
-
   externalAuthInfo = {
     platform: "iphone"
     externalDeviceId: "Some555Other666String777"
     externalRefreshToken: "Some111Refresh999String000"
     userId: "6735"
   }
+  result = ""
 
+  server = testHelper_tubiAuth_createMetadataFetchTaskServer(65535)
+  msgPort = CreateObject("roMessagePort")
+  server.SetMessagePort(msgPort)
   authRequest = auth.requestTokenTransfer(externalAuthInfo, msgPort)
-
-  t.assertNotInvalid(authRequest)
-  t.assertNotInvalid(authRequest.isHttps)
-  t.assertNotInvalid(authRequest.url)
-  t.assertEqual(authRequest.url, auth.constants.urls.users.transferToken)
-  t.assertNotInvalid(authRequest.method)
-  t.assertEqual(authRequest.method, "POST")
+  result += m.assertNotInvalid(authRequest)
+  result += m.assertNotInvalid(authRequest.isHttps)
+  result += m.assertNotInvalid(authRequest.url)
+  result += m.assertEqual(authRequest.url, auth.constants.urls.users.transferToken)
+  result += m.assertNotInvalid(authRequest.method)
+  result += m.assertEqual(authRequest.method, "POST")
+  return result
 End Function
 
 
-Function testHandleRefreshResponse(t as Object)
+Function testCase_tubiAuth_handleRefreshResponse()
   constants = getConstants()
   requestObj = TubiRequest()
   auth = TubiAuth(constants, requestObj)
   url = "http://127.0.0.1:65535/"
-
-  server = createMetadataFetchTaskServer(65535)
+  server = testHelper_tubiAuth_createMetadataFetchTaskServer(65535)
   msgPort = CreateObject("roMessagePort")
   server.SetMessagePort(msgPort)
-
   request = requestObj.createAsync(url, "fakeRequest", {})
   isReqStarted = request.start(msgPort)
-
   newAccess = invalid
-
   mockServerInfo = {
     user_id: 12345
     access_token: "some333acess666Token901234565"
     expires_in: 1209600
   }
   json = FormatJSON(mockServerInfo)
+  result = ""
 
   if isReqStarted = true
     while true
@@ -332,25 +317,22 @@ Function testHandleRefreshResponse(t as Object)
 
     end while
   end if
-
-  t.assertNotInvalid(newAccess)
-  t.assertNotInvalid(newAccess.user_id)
-  t.assertEqual(newAccess.user_id, mockServerInfo.user_id)
-  t.assertNotInvalid(newAccess.access_token)
-  t.assertEqual(newAccess.access_token, mockServerInfo.access_token)
-  t.assertNotInvalid(newAccess.expires_in)
-  t.assertEqual(newAccess.expires_in, mockServerInfo.expires_in)
+  result += m.assertNotInvalid(newAccess)
+  result += m.assertNotInvalid(newAccess.user_id)
+  result += m.assertEqual(newAccess.user_id, mockServerInfo.user_id)
+  result += m.assertNotInvalid(newAccess.access_token)
+  result += m.assertEqual(newAccess.access_token, mockServerInfo.access_token)
+  result += m.assertNotInvalid(newAccess.expires_in)
+  result += m.assertEqual(newAccess.expires_in, mockServerInfo.expires_in)
+  return result
 End Function
 
 
-Function testCreateAuthRequest(t as Object)
+Function testCase_tubiAuth_createAuthRequest()
   constants = getConstants()
   requestObj = TubiRequest()
   auth = TubiAuth(constants, requestObj)
-
   url = "https://somefakeurl.com"
-
-
   'a good set of authInfo... should create a valid auth request
   auth.getAuthInfo = function()
     return {
@@ -360,18 +342,18 @@ Function testCreateAuthRequest(t as Object)
       userId: "6739"
     }
   end function
-
+  result = ""
 
   authRequest = auth.createAuthRequest(url, "goodAuthRequest")
-  t.assertNotInvalid(authRequest)
-  t.assertNotInvalid(authRequest.getAuthHeaders)
-  t.assertNotInvalid(authRequest.refreshAuthToken)
-  t.assertNotInvalid(authRequest.updateAuthInfo)
-  t.assertNotInvalid(authRequest.saveAuthInfo)
-  t.assertNotInvalid(authRequest.handleRefreshResponse)
-  t.assertNotInvalid(authRequest.constants)
-  t.assertNotInvalid(authRequest.request)
-  t.assertNotInvalid(authRequest.authInfo)
+  result += m.assertNotInvalid(authRequest)
+  result += m.assertNotInvalid(authRequest.getAuthHeaders)
+  result += m.assertNotInvalid(authRequest.refreshAuthToken)
+  result += m.assertNotInvalid(authRequest.updateAuthInfo)
+  result += m.assertNotInvalid(authRequest.saveAuthInfo)
+  result += m.assertNotInvalid(authRequest.handleRefreshResponse)
+  result += m.assertNotInvalid(authRequest.constants)
+  result += m.assertNotInvalid(authRequest.request)
+  result += m.assertNotInvalid(authRequest.authInfo)
 
   'a bad set of authInfo... should create an invalid auth request
   auth.getAuthInfo = function()
@@ -383,7 +365,16 @@ Function testCreateAuthRequest(t as Object)
   end function
 
   authRequest = auth.createAuthRequest(url, "badAuthRequest")
-  t.assertInvalid(authRequest)
+  result += m.assertInvalid(authRequest)
+  return result
+End Function
 
-
+Function testHelper_tubiAuth_createMetadataFetchTaskServer(tcpPort As Integer)
+  server = CreateObject("roStreamSocket")
+  address = CreateObject("roSocketAddress")
+  address.setPort(tcpPort)
+  server.setAddress(address)
+  server.notifyReadable(true)
+  server.listen(4)
+  return server
 End Function

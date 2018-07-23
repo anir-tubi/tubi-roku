@@ -125,11 +125,13 @@ Function testCase_cmsApi_channelReq()
   channel = request.runSynchronous()
   result = ""
   result = result + m.AssertNotInvalid(channel)
-  parsed = ParseJson(channel)
-  result = result + m.AssertNotInvalid(parsed)
-  result = result + m.AssertNotInvalid(parsed.container)
-  result = result + m.AssertEqual(parsed.container.type, "channel")
-  result = result + m.AssertEqual(parsed.container.id, "cbs")
+  if channel <> invalid
+    parsed = ParseJson(channel)
+    result = result + m.AssertNotInvalid(parsed)
+    result = result + m.AssertNotInvalid(parsed.container)
+    result = result + m.AssertEqual(parsed.container.type, "channel")
+    result = result + m.AssertEqual(parsed.container.id, "cbs")
+  end if
   return result
 End Function
 

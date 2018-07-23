@@ -15,12 +15,6 @@ Function Main(startupArgs as Dynamic)
 
   settings = getSettings()
 
-  ' launch the unit tests if mode is "test". Otherwise, exit immediately.
-  if settings.mode = "test" then
-    ' Isolate to unit tests while we're migrating from BrsTest to Roku unit-test-framework
-    BrsTestMain("Test", "test", "pkg:/source/tests/units/brstest")
-  endif
-
   if startupArgs.ComponentTest <> invalid and startupArgs.ComponentTest <> ""
     ' This will block indefinitely
     ComponentTest(startupArgs.ComponentTest)

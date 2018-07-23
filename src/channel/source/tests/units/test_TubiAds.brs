@@ -1,8 +1,15 @@
+Function TestSuite_TubiAds()
+  this = BaseTestSuite()
+  this.name = "TubiAdsTestSuite"
+  this.addTest("getAdsListViaRoku", testCase_tubiAds_getAdsListViaRoku)
+  return this
+End Function
+
 '''''''''''''''''''''''''
 ' TESTED WITH RAF 2.0314 on firmware 8.0.0-4128-04
 '''''''''''''''''''''''''
-Function testGetAdsListViaRoku(t As Object)
-  ads = createTubiAds()
+Function testCase_tubiAds_getAdsListViaRoku()
+  ads = testHelper_tubiAds_createTubiAds()
   episodeTemplate = {
     "title": "Fake Episode"
     "length": 1000
@@ -60,11 +67,12 @@ Function testGetAdsListViaRoku(t As Object)
   episodeIds.delete("parentTitle")
   episodeIds.delete("title")
   ads.getAdsListViaRoku(episodeIds)
+  return ""
 End Function
 
 
 ' helper to initialize TubiAds module and stub the request so get ads always returns nothing
-Function createTubiAds()
+Function testHelper_tubiAds_createTubiAds()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)

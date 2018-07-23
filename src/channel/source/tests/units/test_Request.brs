@@ -1,48 +1,64 @@
-Function testCreateAsyncHTTPReqeust(t As Object)
-  request = TubiRequest().createAsync("http://localhost/")
-  t.assertNotInvalid(request)
+Function TestSuite_Request()
+  this = BaseTestSuite()
+  this.Name = "RequestTestSuite"
+  this.addTest("createAsync", testCase_request_createAsync)
+  this.addTest("start_withPort", testCase_request_startWithPort)
+  this.addTest("start_withUrlTransfer", testCase_request_startWithUrlTransfer)
+  this.addTest("cancel", testCase_request_cancel)
+  this.addTest("handleEvent", testCase_request_handleEvent)
+  this.addTest("addParamsToUrl", testCase_request_addParamsToUrl)
+  this.addTest("addParamsToUrl_asModuleFunction", testCase_request_addParamsToUrlAsModuleFunction)
+  this.addTest("isHttps", testCase_request_isHttps)
+  this.addTest("methods", testCase_request_methods)
+  return this
 End Function
 
-Function testStartWithPort(t As Object)
+Function testCase_request_createAsync()
+  request = TubiRequest().createAsync("http://localhost/")
+  return m.assertNotInvalid(request)
+End Function
+
+Function testCase_request_startWithPort()
   request = TubiRequest().createAsync("http://localhost/")
   port = CreateObject("roMessagePort")
-  t.assertTrue(request.start(port))
+  return m.assertTrue(request.start(port))
 End Function
 
-Function testStartWithUrlTransfer(t As Object)
+Function testCase_request_startWithUrlTransfer()
   request = TubiRequest().createAsync("http://localhost/")
   urltransfer = CreateObject("roUrlTransfer")
-  t.assertTrue(request.start(urltransfer))
+  return m.assertTrue(request.start(urltransfer))
 End Function
 
-Function testCancel(t As Object)
+Function testCase_request_cancel()
   request = TubiRequest().createAsync("http://localhost/")
   urltransfer = CreateObject("roUrlTransfer")
-  t.assertTrue(request.start(urltransfer))
+  result = m.assertTrue(request.start(urltransfer))
   request.cancel()
   ' sets urltransfer to invalid after cancelling it
-  t.assertInvalid(request.urltransfer)
+  result += m.assertInvalid(request.urltransfer)
+  return result
 End Function
 
-Function testHandleEvent(t As Object)
+Function testCase_request_handleEvent()
   request = TubiRequest().createAsync("http://127.0.0.1:65535/", "", { retries: 0 })
   port = CreateObject("roMessagePort")
-  t.assertTrue(request.start(port))
+  result = m.assertTrue(request.start(port))
   msg = wait(1000, port)
-  t.assertNotInvalid(msg)
+  result += m.assertNotInvalid(msg)
   response = request.handleEvent(msg)
-  t.assertNotInvalid(response)
+  result += m.assertNotInvalid(response)
+  return result
 End Function
 
-Function testAddParamsToUrlAsModuleFunction(t As Object)
+Function testCase_request_addParamsToUrlAsModuleFunction()
   ' Verify that we don't need to use the createAsync factory method in order to use this function
   module = TubiRequest()
-  t.assertEqual( module.addParamsToUrl("http://adrise.tv/", { uid: 0}), "http://adrise.tv/?uid=0")
+  return m.assertEqual( module.addParamsToUrl("http://adrise.tv/", { uid: 0}), "http://adrise.tv/?uid=0")
 End Function
 
-Function testAddParamsToUrl(t As Object)
+Function testCase_request_addParamsToUrl()
   request = TubiRequest().createAsync("http://localhost/")
-
   testCases = [
     ' URL                     Params        Expected Result
     
@@ -69,25 +85,29 @@ Function testAddParamsToUrl(t As Object)
     [ "http://adrise.tv/?x=1&",  { h: 1 },     "http://adrise.tv/?x=1&h=1" ]
   ]
 
+  result = ""
   for each test in testCases
-    t.assertEqual( request.addParamsToUrl_(test[0], test[1]), test[2])
+    result += m.assertEqual( request.addParamsToUrl_(test[0], test[1]), test[2])
   end for
+  return result
 End Function
 
-Function testIsHttps(t As Object)
+Function testCase_request_isHttps()
   request = TubiRequest().createAsync("http://localhost/")
-  t.assertFalse(request.isHttps)
+  result = m.assertFalse(request.isHttps)
   request = TubiRequest().createAsync("https://localhost/")
-  t.assertTrue(request.isHttps)
+  result += m.assertTrue(request.isHttps)
+  return result
 End Function
 
-Function testMethods(t As Object)
-  port = CreateObject("roMessagePort")
-  server = createTestServer(65534)
-  server.SetMessagePort(port)
+Function testCase_request_methods()
+  result = ""
+  validMethods = [ "GET", "PUT", "POST", "PATCH", "DELETE" ]
 
   ' Go through each method, verifying from the server side that the method in the request is correct
-  validMethods = [ "GET", "PUT", "POST", "PATCH", "DELETE" ]
+  port = CreateObject("roMessagePort")
+  server = testHelper_request_createTestServer(65534)
+  server.SetMessagePort(port)
   for each method in validMethods
     request = TubiRequest().createAsync("http://127.0.0.1:65534/", "", { method: method })
     request.start(port)
@@ -96,17 +116,17 @@ Function testMethods(t As Object)
       if type(msg) = "roSocketEvent" then
         connection = server.accept()
         buffer = connection.receiveStr(512)
-        t.assertEqual(Left(buffer, method.Len()), method)
+        result += m.assertEqual(Left(buffer, method.Len()), method)
         exit while
       else if type(msg) = invalid
-        t.fail()
+        result += m.fail("Timed out waiting for network request")
       end if
     end while
   end for
-  
+  return result
 End Function
 
-Function createTestServer(tcpPort As Integer)
+Function testHelper_request_createTestServer(tcpPort As Integer)
   server = CreateObject("roStreamSocket")
   address = CreateObject("roSocketAddress")
   address.setPort(tcpPort)
