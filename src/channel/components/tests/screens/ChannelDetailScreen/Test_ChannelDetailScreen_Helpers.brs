@@ -47,7 +47,7 @@ Function TestCase_populateInfoPanelItem()
     rating: "R"
     genres: ["Action", "Adventure", "Oscar"]
     hasSubtitles: true
-    channelImg: "http://images.adrise.tv/LeN4r8F_Jru-2mE_pq3IkGjpHxg=/180x60/img.adrise.tv/57d9cd58-db8c-4d0a-95d4-b18f52877ac5.png"
+    inlineLogoUri: "http://images.adrise.tv/LeN4r8F_Jru-2mE_pq3IkGjpHxg=/180x60/img.adrise.tv/57d9cd58-db8c-4d0a-95d4-b18f52877ac5.png"
   }
   content.update(contentData)
 
@@ -57,7 +57,7 @@ Function TestCase_populateInfoPanelItem()
   controlInfoPanel.length = content.length
   controlInfoPanel.hasCC = content.hasSubtitles
   controlInfoPanel.rating = content.rating
-  controlInfoPanel.partnerLogoUri = content.channelImg
+  controlInfoPanel.partnerLogoUri = content.inlineLogoUri
   controlInfoPanel.genres = content.genres
   controlInfoPanel.description = content.description
   controlInfoPanel.mode = "item"

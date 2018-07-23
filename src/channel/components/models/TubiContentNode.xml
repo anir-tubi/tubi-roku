@@ -59,8 +59,9 @@
     <field id="thumbnailSize" type="intarray"/>
 
     <!-- channels feature -->
-    <field id="channelImg" type="string" />
+    <field id="inlineLogoUri" type="string" />
+    <field id="titleLogoUri" type="string" />
     <field id="channelId" type="string" />
-    <field id="channelTitle" type="string" value="Channel"/>
+    <field id="channelTitle" type="string" />
   </interface>
 </component>

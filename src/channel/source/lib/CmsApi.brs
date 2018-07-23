@@ -89,6 +89,7 @@ Function cmsApi_getChannelRequest(channelId, limit)
   options.params.expand = 1
   options.params.cursor = 0
   options.params.limit = limit
+  options.params["includeChannels"] = true
   return m.createAuthRequest_(url, m.constants_.reqNames.getChannel, options)
 End Function
 
@@ -116,6 +117,7 @@ Function cmsApi_getCategoryRequest(categoryId, limit)
   options.params.expand = 1
   options.params.cursor = 0
   options.params.limit = limit
+  options.params["includeChannels"] = true
   return m.createAuthRequest_(url, m.constants_.reqNames.getCategory, options)
 End Function
 

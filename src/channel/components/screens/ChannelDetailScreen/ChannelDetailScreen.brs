@@ -176,17 +176,10 @@ End Function
 '@infoPanel: roSGNode, an InfoPanel component
 '@content: roSGNode, a content node
 Function populateInfoPanel(infoPanel, content, mode)
-  infoPanel.mode = mode
   if content.title <> invalid
     infoPanel.title = content.title
   else
     infoPanel.title = ""
-  end if
-
-  if content.channelImg <> invalid
-    infoPanel.titleLogoUri = content.channelImg
-  else
-    infoPanel.titleLogoUri = ""
   end if
 
   if content.description <> invalid
@@ -225,8 +218,8 @@ Function populateInfoPanel(infoPanel, content, mode)
     infoPanel.hasCC = false
   end if
 
-  if content.channelImg <> invalid
-    infoPanel.partnerLogoUri = content.channelImg
+  if content.inlineLogoUri <> invalid
+    infoPanel.partnerLogoUri = content.inlineLogoUri
   else
     infoPanel.partnerLogoUri = ""
   end if
@@ -243,6 +236,7 @@ Function populateInfoPanel(infoPanel, content, mode)
     infoPanel.titleLogoUri = ""
   end if
   
+  infoPanel.mode = mode
   infoPanel.calculateHeight = true
 
   return infoPanel

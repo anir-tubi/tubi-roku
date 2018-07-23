@@ -338,6 +338,8 @@ Function getConstants()
     constants.uapiContentTypes.movie = "movie"
     constants.uapiContentTypes.series = "series"
     constants.uapiContentTypes.episode = "episode"
+    constants.uapiContentTypes.container = "container"
+    constants.uapiContentTypes.channel = "channel"
 
   'uapi actions - add or delete from user categories
   constants.uapiActions = {}

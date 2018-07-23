@@ -82,7 +82,7 @@
       <field id="channelTitle" type="string" alwaysNotify="true" />
 
       <!-- For the Presented By info panel field -->
-      <field id="channelImg" type="string" alias="DetailInfoPanel.partnerLogoUri" />
+      <field id="inlineLogoUri" type="string" alias="DetailInfoPanel.partnerLogoUri" />
 
       <!-- informs the details screen if the content controller is waiting for a user category update from the server -->
       <field id="isWaitingForServerResponse" type="boolean" value="false" />

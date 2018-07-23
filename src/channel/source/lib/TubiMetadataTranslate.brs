@@ -247,7 +247,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   ' Channels
   if contentFromServer.channel_id <> invalid then translatedContent.channelId = contentFromServer.channel_id
-  if contentFromServer.channel_logo <> invalid then translatedContent.channelImg = contentFromServer.channel_logo
+  if contentFromServer.channel_logo <> invalid then translatedContent.inlineLogoUri = contentFromServer.channel_logo
+  if contentFromServer.logo <> invalid then translatedContent.titleLogoUri = contentFromServer.logo
   if contentFromServer.channel_title <> invalid then translatedContent.channelTitle = contentFromServer.channel_title
 
   'take care of any children the content might have
@@ -464,6 +465,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
     if container.type = "channel" and container.children.count() > 0
       withPrepend = true
       updateMetadata.type = m.contentTypes.channel
+      updateMetadata.logoUri = container.logo
     else
       withPrepend = false
       updateMetadata.type = m.contentTypes.category

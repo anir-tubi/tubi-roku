@@ -20,7 +20,7 @@ Function componentTest_ChannelDetailScreen(screen, runTests)
             rating: "R"
             genres: ["Action", "Adventure", "Oscar"]
             hasSubtitles: true
-            channelImg: "http://images.adrise.tv/LeN4r8F_Jru-2mE_pq3IkGjpHxg=/180x60/img.adrise.tv/57d9cd58-db8c-4d0a-95d4-b18f52877ac5.png"
+            inlineLogoUri: "http://images.adrise.tv/LeN4r8F_Jru-2mE_pq3IkGjpHxg=/180x60/img.adrise.tv/57d9cd58-db8c-4d0a-95d4-b18f52877ac5.png"
             subtype: "TubiContentNode"
           }
           {
@@ -34,7 +34,7 @@ Function componentTest_ChannelDetailScreen(screen, runTests)
             genres: ["Western"]
             rating: "R"
             hasSubtitles: false
-            channelImg: "http://images.adrise.tv/LeN4r8F_Jru-2mE_pq3IkGjpHxg=/180x60/img.adrise.tv/57d9cd58-db8c-4d0a-95d4-b18f52877ac5.png"
+            inlineLogoUri: "http://images.adrise.tv/LeN4r8F_Jru-2mE_pq3IkGjpHxg=/180x60/img.adrise.tv/57d9cd58-db8c-4d0a-95d4-b18f52877ac5.png"
             subtype: "TubiContentNode"
           }
           {
@@ -47,7 +47,7 @@ Function componentTest_ChannelDetailScreen(screen, runTests)
             length: 107 * 60
             genres: ["Sci Fi", "Action"]
             hasSubtitles: true
-            channelImg: "http://images.adrise.tv/LeN4r8F_Jru-2mE_pq3IkGjpHxg=/180x60/img.adrise.tv/57d9cd58-db8c-4d0a-95d4-b18f52877ac5.png"
+            inlineLogoUri: "http://images.adrise.tv/LeN4r8F_Jru-2mE_pq3IkGjpHxg=/180x60/img.adrise.tv/57d9cd58-db8c-4d0a-95d4-b18f52877ac5.png"
             subtype: "TubiContentNode"
           }
         ]

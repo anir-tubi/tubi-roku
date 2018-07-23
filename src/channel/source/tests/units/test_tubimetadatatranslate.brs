@@ -200,7 +200,7 @@ Function testCase_tubiMetadataTranslate_translateRecursive_channel()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   result = ""
-  result = result + m.assertNotInvalid(dest.channelImg)
+  result = result + m.assertNotInvalid(dest.inlineLogoUri)
   result = result + m.assertTrue(dest.channelId = "cbs")
   return result
 End Function

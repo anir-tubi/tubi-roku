@@ -342,6 +342,7 @@ Function onCategoryMenuItemFocused() As Void
     infoMetadata.title = newCategory.title
     infoMetadata.description = newCategory.description
     infoMetadata.totalCount = newCategory.totalCount
+    infoMetadata.logoUri = newCategory.logoUri
   end if
 
   populateInfoPanel(m.InfoPanel, "category", infoMetadata)
@@ -520,6 +521,7 @@ Function populateInfoPanel(target, mode, contentNode)
       target.categoryContentCount = contentNode.totalCount
       target.title = contentNode.title
       target.description = contentNode.description
+      target.titleLogoUri = contentNode.logoUri
     else if mode = "item"
       target.mode = "item"
       target.title = contentNode.title
@@ -529,6 +531,8 @@ Function populateInfoPanel(target, mode, contentNode)
       target.rating = contentNode.rating
       target.genres = contentNode.genres
       target.hasCC = (contentNode.hasSubtitles or not m._.empty(contentNode.subtitleTracks))
+      target.titleLogoUri = contentNode.titleLogoUri
+      target.partnerLogoUri = contentNode.inlineLogoUri
     end if
 
     target.calculateHeight = true
