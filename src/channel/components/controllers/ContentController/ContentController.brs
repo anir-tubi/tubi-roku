@@ -92,8 +92,6 @@ Function init()
   ' These values will be set from experiments in the trackingLoggingReady callback
   ' since the trackingLoggingTask is not yet ready and is needed to send exposure events
   ' We only show the sign in prompt message once per session for signed-out users
-  m.promptSignInOnGuestPlay = false
-  m.skipSignInOnLaunch = false
   m.singleFeaturePoster = invalid
 
   m._ = rodash()
@@ -298,24 +296,6 @@ Function onTrackingLoggingReady()
       trackType: "startApp"
     }
 
-    if m.constants.ui.signIn.promptSignInOnGuestPlay <> invalid
-      m.promptSignInOnGuestPlay = m.constants.ui.signIn.promptSignInOnGuestPlay
-    else
-      value = getExperimentValue("UserNamespace", "roku_sign_in")
-      if value = 2
-        m.promptSignInOnGuestPlay = true
-      end if
-    end if
-
-    if m.constants.ui.signIn.skipSignInOnLaunch <> invalid
-      m.skipSignInOnLaunch = m.constants.ui.signIn.skipSignInOnLaunch
-    else
-      value = getExperimentValue("UserNamespace", "roku_sign_in")
-      if value <> 1
-        m.skipSignInOnLaunch = true
-      end if
-    end if
-
     startUserExperience()
   end if
 End Function
@@ -350,9 +330,6 @@ Function startUserExperience()
         m.enteredFromDeepLink = true
         m.rootTabGroup.show = m.contentGroup.id
         showDetailScreen(m.top.deepLinkContent, invalid)
-      else if m.global.authInfo = invalid and m.skipSignInOnLaunch <> true
-        tubiLog("ContentController ask user to sign in")
-        startSignIn(false)
       else if m.constants.ui.onnow.on = false or m.top.onNowContent <> invalid
         m.rootTabGroup.show = m.contentGroup.id
         startOnNow()

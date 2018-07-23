@@ -663,15 +663,7 @@ End Function
 Function playHelper(screen)
   episode = getEpisodeContent(screen.content)
   if episode <> invalid then
-    if m.global.authInfo = invalid and m.promptSignInOnGuestPlay = true
-      title = "Sign in for a better experience"
-      message = "Sign in for free to save to your queue and sync with other devices"
-      buttons = ["Sign in or Register", "Play Anyways"]
-      showModal(title, message, buttons, "onPlaySignInModalButtonSelected")
-      m.promptSignInOnGuestPlay = false  ' only show this once per session
-    else
       playVideoContent(episode, false, 0)
-    end if
   else
     tubiLog("ERROR: Play selected but content is invalid")
   end if
