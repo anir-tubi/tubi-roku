@@ -390,7 +390,7 @@ Function onVideoPositionChange()
     historyPosition()
   end if
 
-  if (m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0 and m.playerPosition = m.top.content.creditsCuePoint)
+  if (m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0 and isAtPosition(m.playerPosition, m.top.content.creditsCuePoint))
     m.top.creditsPosition = m.playerPosition
   end if
 
@@ -777,7 +777,7 @@ End Function
 ' Helper function to prevent historyPosition being sent during  trailers
 Function historyPosition()
   if m.top.analyticsMode = "normal" or m.top.analyticsMode = "autoplay" then
-    m.top.historyPosition = m.playerPosition
+    m.top.historyPosition = Int(m.playerPosition)
     m.lastSavedPosition = m.playerPosition
   end if
 End Function
@@ -1345,7 +1345,7 @@ End Function
 
 Function getPlayProgressEvent()
   extraCtx = {
-    interval: m.playerPosition - m.lastPingTime
+    interval: Int(m.playerPosition - m.lastPingTime)
   }
 
   if m.top.analyticsMode = "autoplay"
@@ -1368,7 +1368,7 @@ Function getPlayProgressEvent()
   return {
     trackType: "playProgress"
     ctx: m.Video.content.id
-    value: m.playerPosition
+    value: Int(m.playerPosition)
     extraCtx: extraCtx
   }
 End Function
@@ -1411,11 +1411,12 @@ Function isActiveVideoState()
 End Function
 
 
-' Compare video position to target, allowing 1s beyond
+' Returns true if the position is between the target and the target + 1
 Function isAtPosition(position, target)
   return (position >= target and position <= target + 1)
 End Function
 
+' Returns true if the position is between (target - window) and the target
 Function isInWindow(position, target, window)
   return (position >= (target - window) and position < target)
 End Function
