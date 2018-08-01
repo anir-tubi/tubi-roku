@@ -6,4 +6,5 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/UnitTestFramework.brs"/>
   <script type="text/brightscript" uri="pkg:/components/tests/lib/VideoPlayer/Test_VideoPlayer_VideoErrorHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/tests/lib/VideoPlayer/Test_VideoPlayer_Cuepoints.brs" />
+  <script type="text/brightscript" uri="pkg:/components/tests/lib/VideoPlayer/Test_VideoPlayer_VideoPlayerHelpers.brs" />
 </component>

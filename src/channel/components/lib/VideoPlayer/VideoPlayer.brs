@@ -559,7 +559,7 @@ Function onKeyEvent(key As String, press As Boolean)
   if press
     m.lastButtonPressPos = m.playerPosition
 
-    if isButtonPressAllowed(key)
+    if isButtonPressAllowed(key,  m.VideoState, m.Video)
       if key = "OK"
         if m.HUD.opacity = 0
           showTransport()
@@ -614,11 +614,11 @@ Function onKeyEvent(key As String, press As Boolean)
 
       else if key = "left"
         'video is in playback mode and user wants to skip back
-        if m.HUD.opacity = 0 and m.progressBarFocused = false and isActiveVideoState()
+        if m.HUD.opacity = 0 and m.progressBarFocused = false and isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(-10, m.progressBarFocused)
 
         'user is in skip ahead mode (the progress bar is focused) and wants to skip back.
-        else if m.progressBarFocused = true and isActiveVideoState()
+        else if m.progressBarFocused = true and isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(-10, m.progressBarFocused)
 
         else
@@ -634,11 +634,11 @@ Function onKeyEvent(key As String, press As Boolean)
 
       else if key = "right"
         'video is in playback mode and user wants to skip ahead
-        if m.HUD.opacity = 0 and m.progressBarFocused = false and isActiveVideoState()
+        if m.HUD.opacity = 0 and m.progressBarFocused = false and isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(10, m.progressBarFocused)
 
         'user is in skip ahead mode (the progress bar is focused) and wants to skip ahead.
-        else if m.progressBarFocused = true and isActiveVideoState()
+        else if m.progressBarFocused = true and isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(10, m.progressBarFocused)
 
         else
@@ -750,6 +750,7 @@ Function onAdStateChange()
     m.top.setFocus(true)
     if m.Video.content.isLiveTV
       m.Video.seek = m.playerPosition
+      m.VideoState = "play"
       m.Video.control = "play"
       trackEvent({
         trackType: "resumeAfterAds"
@@ -949,7 +950,7 @@ Function beginScrub()
   m.ScrubTimer.control = "start"
 
   if m.HUD.opacity < 1.0
-    animateTransport("in")
+    showTransport()
   end if
   showThumbnail()
   m.scrubTimespan.mark()
@@ -970,6 +971,7 @@ Function endScrub()
   ' Reset periodic event trackers
   m.lastPingTime = m.playerPosition
 
+  animateTransport("out")
   resetTransportButtons()
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
@@ -1377,7 +1379,7 @@ End Function
 ' Helper function to determine if we should ignore or handle a button press
 ' We don't want to handle button presses that affect video playback when the video is not loaded
 ' Moving focus around the transport is ok though
-Function isButtonPressAllowed(key)
+Function isButtonPressAllowed(key, videoState, videoNode)
   disabledKeys = {
     OK: true
     rewind: true
@@ -1387,27 +1389,34 @@ Function isButtonPressAllowed(key)
     options: true
   }
 
-  if not isActiveVideoState() and disabledKeys[key] = true
-    return false
-  else
-    return true
+  isAllowed  = true
+  'in non active video states, we don't allow the disabled keys, non disable keys are always allowed
+  if not isActiveVideoState(videoState, videoNode) and disabledKeys[key] = true
+    isAllowed = false
   end if
+
+  return isAllowed
 End Function
 
 
-' Helper function to determine if the video state is such that we should handle button presses
+' Helper function to determine if the video state (m.VideoState) is such that we should handle button presses
 ' Currently we don't want to handle most button presses when m.VideoState is in the "refresh" or "stop" states
-Function isActiveVideoState()
+Function isActiveVideoState(videoState, videoNode)
   disactiveStates = {
     refresh: true
     stop: true
   }
 
-  if disactiveStates[m.VideoState] = true
-    return false
-  else
-    return true
+  isActive = true
+  if disactiveStates[videoState] = true
+    isActive = false
   end if
+
+  if videoNode.state = "buffering" or videoNode.state = "stopped"
+    isActive = false
+  end if
+
+  return isActive
 End Function
 
 
