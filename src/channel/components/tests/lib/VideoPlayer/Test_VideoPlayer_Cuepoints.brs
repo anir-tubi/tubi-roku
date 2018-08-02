@@ -23,7 +23,9 @@ End Function
 Function testCase_isAtPosition()
   ' way outside
   result = m.assertFalse(isAtPosition(1.72, 90))
-  result += m.assertTrue(isAtPosition(90.72, 90))
+  ' borderline
+  result += m.assertFalse(isAtPosition(90.72, 90))
+  result += m.assertTrue(isAtPosition(90.22, 90))
   ' only hits if >=
   result += m.assertFalse(isAtPosition(89.72, 90))
   return result

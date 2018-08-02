@@ -1420,9 +1420,9 @@ Function isActiveVideoState(videoState, videoNode)
 End Function
 
 
-' Returns true if the position is between the target and the target + 1
+' Returns true if the position is between the target and target+notificationInterval
 Function isAtPosition(position, target)
-  return (position >= target and position <= target + 1)
+  return (position >= target and position <= target + m.Video.notificationInterval)
 End Function
 
 ' Returns true if the position is between (target - window) and the target
