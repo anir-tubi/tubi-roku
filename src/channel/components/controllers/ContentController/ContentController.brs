@@ -766,7 +766,13 @@ Function playVideoContent(content As Object, isAutoplay As Boolean, position=inv
       end if
       ' preload autoplay content;  We don't observe 'error' or 'response' fields
       ' since they will be evaluated at the creditsCuepoint callback
-      m.upNextTask = CreateObject("roSGNode", "UpNextTask")
+      if m.upNextTask = invalid
+        ' m.upNextTask can't just be overwritten, or else it creates two UpNextTasks.
+        ' When m.upNextTask.control = "RUN" happens if it was overwritten, the task's functionName
+        ' actually runs for each of the tasks that had been ever been assigned to m.upNextTask.
+        ' This becomes an issue if a user selects play multiple times.
+        m.upNextTask = CreateObject("roSGNode", "UpNextTask")
+      end if
       request = {}
       request.contentId = content.id
       if m.autoplayContext <> invalid

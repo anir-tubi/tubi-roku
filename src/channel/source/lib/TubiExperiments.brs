@@ -17,9 +17,6 @@ Function TubiExperiments(request as Object, constants as Object) as Object
     defaultValues: {
       UserNamespace: {
         roku_on_now: 0
-        roku_continue_screen: 1
-        related_content: 0
-        roku_sign_in: 0  ' 0 don't show any sign in, 1 show sign in at start, 2 show sign in on play, 3 don't show any sign in
         roku_single_feature_poster: "control"
       }
       RokuNamespace: {

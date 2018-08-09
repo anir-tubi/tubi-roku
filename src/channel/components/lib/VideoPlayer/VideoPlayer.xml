@@ -495,9 +495,6 @@
     id="ScrubTimer"
     duration="0.25"
     repeat="true" />
-
-  <AuthTask
-    id="VideoPlayerAuthTask" />
   
   </children>
 </component>

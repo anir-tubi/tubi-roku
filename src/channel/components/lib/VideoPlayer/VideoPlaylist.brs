@@ -145,8 +145,14 @@ Function refreshContent(nowPos)
     if m.refreshTask <> invalid
       m.refreshTask.unobserveField("response")
       m.refreshTask.unobserveField("error")
+    else
+      ' refreshTask can't just be overwritten, or else it creates two DetailMetaDataTasks.
+      ' When refreshTask.control = "RUN" happens if it was overwritten, the task's functionName
+      ' actually runs for each of the tasks that had been ever been assigned to m.refreshTask.
+      ' This becomes an issue if a user selects play multiple times.
+      m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
     end if
-    m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
+
     request = {
       contentId: content.id
       getThumbnails: true

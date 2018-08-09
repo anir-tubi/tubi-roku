@@ -442,9 +442,6 @@ Function getConstants()
   'UI properties that should be passed into the scene graph
   constants.ui = {}
 
-    constants.ui.detailScreen = {}
-      constants.ui.detailScreen.enableRelatedContent = invalid  ' true or false overrides experiment values; invalid defers to experiment
-
     'constants needed for on now UI
     constants.ui.onNow = {}
       constants.ui.onNow.disableOnNow = true
