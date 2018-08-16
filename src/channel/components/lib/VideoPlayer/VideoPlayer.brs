@@ -1058,6 +1058,7 @@ Function handleFastForward()
     beginScrub()
     m.VideoState = "ffw"
     m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[0]
+    m.PlayPauseButton.uri = m.buttonUris.play
   end if
 
   setFocusedButton(m.FastForwardButton, true)
@@ -1088,6 +1089,7 @@ Function handleRewind()
     beginScrub()
     m.VideoState = "rew"
     m.RewindButton.uri = m.buttonUris.rewindLevels[0]
+    m.PlayPauseButton.uri = m.buttonUris.play
   end if
 
   setFocusedButton(m.RewindButton, true)
