@@ -28,5 +28,9 @@
     <field id="logoUri" type="string" />
 
     <field id="slug" type="string" />
+
+    <!-- time fetched from the service -->
+    <field id="fetchedAt" type="integer"/>
+
   </interface>
 </component>

@@ -21,6 +21,7 @@ Function TubiMetadataTranslate(constants As Object)
     getContentsJson_: tubiMetadataTranslate_getContentsJson
     buildCategoryAA_: tubiMetadataTranslate_buildCategoryAA
     generateChannelPosterUrl: tubiMetadataTranslate_generateChannelPosterUrl
+    fetchedAtTimestamp_: tubiMetadataTranslate_fetchedAtTimestamp
   }
 End Function
 
@@ -46,7 +47,7 @@ End Function
 '
 ' This is a recursive function that does the heavy lifting for translateContentFromServer
 'this is a recursive function that does the heavy lifting for translateContentFromServer
-Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object) As Integer
+Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object, fetchedAt=invalid) As Integer
   if contentFromServer = invalid then return 0
 
   count = 1
@@ -251,6 +252,14 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.logo <> invalid then translatedContent.titleLogoUri = contentFromServer.logo
   if contentFromServer.channel_title <> invalid then translatedContent.channelTitle = contentFromServer.channel_title
 
+  ' Allow this to be passed in, so for cases where we lazily translate it can contain
+  ' the right time
+  if fetchedAt <> invalid then
+    translatedContent.fetchedAt = fetchedAt
+  else
+    translatedContent.fetchedAt = m.fetchedAtTimestamp_()
+  end if
+
   'take care of any children the content might have
   if contentFromServer.children <> invalid and contentFromServer.children.count() > 0
 
@@ -260,7 +269,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
     for each childContent in contentFromServer.children
       node = translatedContent.createChild("TubiContentNode")
-      count = count + m.translateRecursive(childContent, node)
+      ' pass the resolved fetchedAt time so that it doesn't have to be generated again for every child
+      count = count + m.translateRecursive(childContent, node, translatedContent.fetchedAt)
     end for
 
   end if
@@ -284,7 +294,7 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
     if parsed <> invalid
       fullContent = parsed[contentId]
       translated = CreateObject("roSGNode", "TubiContentNode")
-      m.translateRecursive(fullContent, translated)
+      m.translateRecursive(fullContent, translated, category.fetchedAt)
       return translated
     end if
   end if
@@ -358,9 +368,11 @@ End Function
 '
 Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "CategoryContentNode")
+  fetchedAt = m.fetchedAtTimestamp_()
   homescreenAA = {
     id: ""
     title: ""
+    fetchedAt: fetchedAt
     children: []    'categories
   }
 
@@ -371,14 +383,14 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   for i=0 to containers.count()-1
     container = containers[i]
     if container.type <> "complex"
-      categoryAA = m.buildCategoryAA_(container, contents, invalid)
+      categoryAA = m.buildCategoryAA_(container, contents, invalid, fetchedAt)
       if categoryAA <> invalid
         homescreenAA.children.push(categoryAA)
       end if
     else
       for j=0 to container.children.count()-1
         nestedContainer = container.children[j]
-        categoryAA = m.buildCategoryAA_(nestedContainer, contents, invalid)
+        categoryAA = m.buildCategoryAA_(nestedContainer, contents, invalid, fetchedAt)
         if categoryAA <> invalid
           categoryAA.parentId = container.id
           homescreenAA.children.push(categoryAA)
@@ -407,11 +419,11 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson) 
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
   contents = contentToTranslate.contents
-
+  fetchedAt = m.fetchedAtTimestamp_()
   contentsJson = m.getContentsJson_(contents, fullJson)
 
   node_count = 0
-  categoryMetadata = m.buildCategoryAA_(container, contents, contentsJson)
+  categoryMetadata = m.buildCategoryAA_(container, contents, contentsJson, fetchedAt)
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
     return invalid
   end if
@@ -449,7 +461,7 @@ End Function
 ' @contentsJson: string, the JSON string of just the contents portion of the matrix API
 '
 ' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson=invalid)
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson=invalid, fetchedAt=invalid)
   updateMetadata = {}
   if type(container) = "roAssociativeArray" and type(contents) = "roAssociativeArray"
     updateMetadata = {
@@ -458,6 +470,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       description: container.description
       totalCount: 0
       offset: m.constants.performance.categoryGridList.initialBlockSize
+      fetchedAt: fetchedAt
       json: ""
       state: "partial"
     }
@@ -571,7 +584,9 @@ End Function
 ' contentToTranslate should be parsed from JSON before it hits this function
 Function tubiMetadataTranslate_translate(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
-
+  fetchedAt = m.fetchedAtTimestamp_()
+  translated.fetchedAt = fetchedAt  ' This is probably just an ignored object, but we
+                                    ' should mark it's fetch time for consistency
   node_count = 0
 
   if contentToTranslate <> invalid
@@ -580,7 +595,7 @@ Function tubiMetadataTranslate_translate(contentToTranslate) As Object
       for each content in contentToTranslate
         if content.title <> "After Hours" or m.allowAfterHours = true
           node = translated.createChild("TubiContentNode")
-          node_count = node_count + m.translateRecursive(content, node)
+          node_count = node_count + m.translateRecursive(content, node, fetchedAt)
         end if
       end for
 
@@ -589,14 +604,14 @@ Function tubiMetadataTranslate_translate(contentToTranslate) As Object
 
       'expect this to happen just for the search API
       if contentToTranslate.children <> invalid
-        node_count = m.translateRecursive(contentToTranslate, translated)
+        node_count = m.translateRecursive(contentToTranslate, translated, fetchedAt)
       
       'expect this to happen for history/queue content
       else
         for each content in contentToTranslate
           if contentToTranslate[content] <> invalid
             node = translated.createChild("TubiContentNode")
-            node_count = node_count + m.translateRecursive(contentToTranslate[content], node)
+            node_count = node_count + m.translateRecursive(contentToTranslate[content], node, fetchedAt)
           end if
         end for
       end if
@@ -611,6 +626,7 @@ end Function
 
 Function tubiMetadataTranslate_translateChannel(contentToTranslate)
   translated = CreateObject("roSGNode", "CategoryContentNode")
+  fetchedAt = m.fetchedAtTimestamp_()
   node_count = 0
   container = contentToTranslate.container
   if container <> invalid
@@ -623,11 +639,12 @@ Function tubiMetadataTranslate_translateChannel(contentToTranslate)
     translated.logoUri = container.logo
     translated.type = m.contentTypes.channel
     translated.slug = container.slug
+    translated.fetchedAt = fetchedAt
 
     for i=0 to container.children.count()-1
       child = contentToTranslate.contents[contentToTranslate.container.children[i]]
       node = translated.createChild("TubiContentNode")
-      node_count += m.translateRecursive(child, node)
+      node_count += m.translateRecursive(child, node, fetchedAt)
     end for
   end if
   m.setTotalCount_(translated)
@@ -642,4 +659,10 @@ Function tubiMetadataTranslate_generateChannelPosterUrl(channelId)
   else
     return m.constants.urls.channelPosterUnbranded
   end if
+End Function
+
+' The fetchedAt field in various content nodes should be seconds since epoch and
+' only be used locally (not intended to be synchronized with any server-side timestamps)
+Function tubiMetadataTranslate_fetchedAtTimestamp()
+  return CreateObject("roDateTime").AsSeconds()
 End Function

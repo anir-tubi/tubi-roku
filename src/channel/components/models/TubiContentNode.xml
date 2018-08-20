@@ -63,5 +63,8 @@
     <field id="titleLogoUri" type="string" />
     <field id="channelId" type="string" />
     <field id="channelTitle" type="string" />
+
+    <!-- time fetched from the service -->
+    <field id="fetchedAt" type="integer"/>
   </interface>
 </component>

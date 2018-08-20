@@ -184,12 +184,24 @@ Function tubiSGAdShim_preroll(episode As Object, cuepoint As Integer)
   m.ads.reset()
 
   'make a synchrynous call to get cuepoints, if any
-  m.ads.getCuepoints(episode)
+  port = CreateObject("roMessagePort")
+  timer = CreateObject("roTimespan")
+  cuepointsReq = m.ads.getCuepointsReq(episode)
+  cuepointsReq.start(port)
 
   'otherwise if the user is starting from beginning or resuming on a cue point, show ads
   'attempt to get list of ads and play them for preroll
   m.ads.getAdsListViaRoku(episode)
   hasAds = m.ads.allAdUnitsList.count() > 0
+
+  ' wait ONLY 5 seconds for cuepoints to come back
+  while timer.TotalMilliseconds() < 5000
+    msg = wait(5000 - timer.TotalMilliseconds(), port)
+    if type(msg) = "roUrlEvent" and cuepointsReq.handleEvent(msg) <> invalid
+      m.ads.parseCuepoints(cuepointsReq)
+      exit while
+    end if
+  end while
 
   if hasAds
     m.videoPlayerNode.adState = "adspending"

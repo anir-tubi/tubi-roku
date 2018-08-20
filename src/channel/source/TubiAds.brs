@@ -33,7 +33,8 @@ function TubiAds (utils)
 
     ' methods
     reset: tubiAds_reset
-    getCuePoints: tubiAds_getCuepoints
+    getCuePointsReq: tubiAds_getCuepointsReq
+    parseCuePoints: tubiAds_parseCuepoints
     getAdsListViaRoku: tubiAds_getAdsListViaRoku
     hasAds: tubiAds_hasAds
     showCommercialBreakViaRoku: tubiAds_showCommercialBreakViaRoku
@@ -379,11 +380,11 @@ end function
 
 
 ' ----------------------------------------------
-' getCuePoints
+' getCuepointsReq
 '
 ' gets the cuepoints for the passed in episode and attach them to ads object
 ' ----------------------------------------------
-function tubiAds_getCuepoints(episode)
+function tubiAds_getCuepointsReq(episode)
   'get the cuepoints synchronously
   options = {
     params: {
@@ -393,20 +394,23 @@ function tubiAds_getCuepoints(episode)
       cid: episode.id
     }
   }
-  cuepointsReq = m.utils.request.createAsync(m.constants.urls.cuepointsBaseUrl, "getCuePoints", options)
-  cuepointsJson = cuepointsReq.runSynchronous(5)
+  return m.utils.request.createAsync(m.constants.urls.cuepointsBaseUrl, "getCuePoints", options)
+end function
 
-  'parse the returned JSON to a Brightscript object - should return an array
-  if cuepointsJson <> invalid
-    cuepoints = ParseJson(cuepointsJson)
+
+
+' ----------------------------------------------
+' parseCuepoints
+'
+' parse a cuepoints response
+function tubiAds_parseCuepoints(cuepointsReq)
+  if cuepointsReq <> invalid and cuepointsReq.response <> invalid and cuepointsReq.response.data <> invalid
+    cuepoints = ParseJson(cuepointsReq.response.data)
+    if type(cuepoints) = "roArray" and cuepoints.count() > 0
+      m.midrolls = cuepoints
+      return cuepoints
+    end if
   end if
-
-  if type(cuepoints) = "roArray" and cuepoints.count() > 0
-    m.midrolls = cuepoints
-    return cuepoints
-  end if
-
-  'return invalid by default
   return invalid
 end function
 

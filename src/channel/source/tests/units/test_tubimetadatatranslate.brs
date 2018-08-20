@@ -6,11 +6,13 @@ Function TestSuite_TubiMetadataTranslate() as Object
   this.addTest("translateRecursive_testParentTypes", testCase_tubiMetadataTranslate_translateRecursive_testParentTypes)
   this.addTest("translateRecursive_testCreditsCuepoints", testCase_tubiMetadataTranslate_translateRecursive_testCreditsCuepoints)
   this.addTest("translateRecursive_channel", testCase_tubiMetadataTranslate_translateRecursive_channel)
+  this.addTest("translateRecursive_series", testCase_tubiMetadataTranslate_translateRecursive_series)
   this.addTest("translateContainer_category", testCase_tubiMetadataTranslate_translateContainer_category)
   this.addTest("translateContainer_channel", testCase_tubiMetadataTranslate_translateContainer_channel)
   this.addTest("translateChannel", testCase_tubiMetadataTranslate_translateChannel)
   this.addTest("translateHomescreen", testCase_tubiMetadataTranslate_translateHomescreen)
   this.addTest("translate", testCase_tubiMetadataTranslate_translate)
+  this.addTest("getContentFromCategoryJson", testCase_tubiMetadataTranslate_getContentfromCategoryJson)
   this.addTest("generateChannelPosterUrl", testCase_tubiMetadataTranslate_generateChannelPosterUrl)
   this.addTest("generateChannelPosterUrl_unbranded", testCase_tubiMetadataTranslate_generateChannelPosterUrl_unbranded)
   return this
@@ -205,16 +207,36 @@ Function testCase_tubiMetadataTranslate_translateRecursive_channel()
   return result
 End Function
 
+Function testCase_tubiMetadataTranslate_translateRecursive_series()
+  seriesJson = ReadAsciiFile("pkg:/source/tests/units/series.json")
+  result = ""
+  fetchTime = CreateObject("roDateTime").AsSeconds()
+  dest = CreateObject("roSGNode", "TubiContentNode")
+  m.translate.translateRecursive(ParseJson(seriesJson), dest)
+  result += m.assertNotInvalid(dest)
+  result += m.assertTrue(dest.fetchedAt = fetchTime)
+  result += m.assertTrue(dest.getChildCount() = 2)
+  season = dest.getChild(0)
+  result += m.assertTrue(season.getChildCount() = 52)
+  result += m.assertTrue(season.fetchedAt = fetchTime)
+  episode = season.getChild(0)
+  result += m.assertTrue(episode.fetchedAt = fetchTime)
+  return result
+End Function
+
+
 '''''''''''''''''''
 ' translateContainer
 
 Function testCase_tubiMetadataTranslate_translateContainer_category()
   categoryJson = ReadAsciiFile("pkg:/source/tests/units/category.json")
   result = ""
+  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateContainer(ParseJson(categoryJson), categoryJson)
   result = result + m.assertNotInvalid(translated)
   result = result + m.assertEqual(translated.id, "featured")
   result = result + m.assertTrue(translated.totalCount = 8)
+  result = result + m.assertTrue(translated.fetchedAt >= fetchTime)
   result = result + m.assertTrue(translated.getChildCount() = 8)
   return result
 End Function
@@ -222,10 +244,12 @@ End Function
 Function testCase_tubiMetadataTranslate_translateContainer_channel()
   channelJson = ReadAsciiFile("pkg:/source/tests/units/channel.json")
   result = ""
+  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateContainer(ParseJson(channelJson), channelJson)
   result = result + m.assertNotInvalid(translated)
   result = result + m.assertEqual(translated.id, "cbs")
   result = result + m.assertTrue(translated.totalCount = 96)
+  result = result + m.assertTrue(translated.fetchedAt >= fetchTime)
   result = result + m.assertTrue(translated.getChildCount() = 96)
   result = result + m.assertEqual(translated.getChild(0).id, "cbs")
   result = result + m.assertNotInvalid(translated.json)
@@ -243,8 +267,10 @@ End Function
 Function testCase_tubiMetadataTranslate_translateHomescreen()
   homeJson = ReadAsciiFile("pkg:/source/tests/units/homescreen.json")
   result = ""
+  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateHomescreen(ParseJson(homeJson))
   result = result + m.assertNotInvalid(translated)
+  result = result + m.assertTrue(translated.fetchedAt >= fetchTime)
   result = result + m.assertTrue(translated.getChildCount() = 48)
   result = result + m.assertTrue(translated.getChild(0).id = "featured")
   result = result + m.assertTrue(translated.getChild(0).getChildCount() = 1)
@@ -258,8 +284,10 @@ End Function
 Function testCase_tubiMetadataTranslate_translate()
   matches = ReadAsciiFile("pkg:/source/tests/units/search.json")
   result = ""
+  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translate(ParseJson(matches))
   result = result + m.assertNotInvalid(translated)
+  result = result + m.assertTrue(translated.fetchedAt >= fetchTime)
   return result
 End Function
 
@@ -269,17 +297,35 @@ End Function
 Function testCase_tubiMetadataTranslate_translateChannel()
   channelJson = ReadAsciiFile("pkg:/source/tests/units/channel.json")
   result = ""
+  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateChannel(ParseJson(channelJson))
   result = result + m.assertNotInvalid(translated)
-print "translated.id = "; translated.id
   result = result + m.assertEqual(translated.id, "cbs")
-print "translated.slug = "; translated.slug
   result = result + m.assertEqual(translated.slug, "cbs")
-print "translated.totalCount = "; translated.totalCount
+  result = result + m.assertTrue(translated.fetchedAt >= fetchTime)
   result = result + m.assertTrue(translated.totalCount = 95)
   result = result + m.assertTrue(translated.getChildCount() = 95)
   return result
 End Function
+
+
+
+'''''''''''''''''''''''''''''
+' getContentFromCategoryJson
+Function testCase_tubiMetadataTranslate_getContentFromCategoryJson()
+  categoryJson = ReadAsciiFile("pkg:/source/tests/units/category.json")
+  result = ""
+  fetchTime = CreateObject("roDateTime").AsSeconds()
+  translated = m.translate.translateContainer(ParseJson(categoryJson), categoryJson)
+  result = result + m.assertNotInvalid(translated)
+  translated.fetchedAt = 12345  ' fake this to verify it passes through to children
+  child = m.translate.getContentFromCategoryJson(translated, translated.getChild(0).id)
+  result = result + m.assertNotInvalid(child)
+  result = result + m.assertTrue(translated.fetchedAt = 12345)
+print "fetchedAt = "; child.fetchedAt
+  return result
+End Function
+
 
 Function testCase_tubiMetadataTranslate_generateChannelPosterUrl()
   channel = ParseJson(ReadAsciiFile("pkg:/source/tests/units/channel.json"))

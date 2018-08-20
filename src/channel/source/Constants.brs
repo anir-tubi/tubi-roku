@@ -387,6 +387,8 @@ Function getConstants()
 
     constants.player.thumbnailFrequency = 5
 
+    constants.player.maxAgeStreamUrl = 2 * 60 * 60 ' Time in seconds after which we consider a stream url stale
+
     'video player returns one of the following
     constants.player.playerResults = {}
       constants.player.playerResults.completed = "COMPLETED"
