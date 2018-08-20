@@ -20,7 +20,7 @@ Function componentTest_DetailScreen_AddQueue_History_Channel(screen, runTests)
     hasTrailer: false
     trackingUri: ""
     jumpToItem: 4
-    channelTitle: "A&E"
+    channelName: "A&E"
   }
 
   constants = {}

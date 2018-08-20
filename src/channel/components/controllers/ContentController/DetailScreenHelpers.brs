@@ -125,7 +125,7 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false)
   detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "")
 
   detailScreen.inlineLogoUri = content.inlineLogoUri
-  detailScreen.channelTitle = content.channelTitle
+  detailScreen.channelName = content.channelName
 
   if content.type = m.constants.ui.contentTypes.series and episodeHistory <> invalid and episodeHistory.nowPos > 0
     detailScreen.resumePoint = episodeHistory.nowPos

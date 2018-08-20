@@ -79,7 +79,7 @@
       <field id="removeHistoryTitle" type="string" value="Remove from history" alwaysNotify="true" />
 
       <!-- used to update the text on the channel button -->
-      <field id="channelTitle" type="string" alwaysNotify="true" />
+      <field id="channelName" type="string" alwaysNotify="true" />
 
       <!-- For the Presented By info panel field -->
       <field id="inlineLogoUri" type="string" alias="DetailInfoPanel.partnerLogoUri" />

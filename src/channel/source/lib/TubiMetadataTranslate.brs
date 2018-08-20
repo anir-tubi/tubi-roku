@@ -250,7 +250,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.channel_id <> invalid then translatedContent.channelId = contentFromServer.channel_id
   if contentFromServer.channel_logo <> invalid then translatedContent.inlineLogoUri = contentFromServer.channel_logo
   if contentFromServer.logo <> invalid then translatedContent.titleLogoUri = contentFromServer.logo
-  if contentFromServer.channel_title <> invalid then translatedContent.channelTitle = contentFromServer.channel_title
+  if contentFromServer.channel_name <> invalid then translatedContent.channelName = contentFromServer.channel_name
 
   ' Allow this to be passed in, so for cases where we lazily translate it can contain
   ' the right time

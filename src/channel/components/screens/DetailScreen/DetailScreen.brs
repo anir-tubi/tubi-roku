@@ -27,7 +27,7 @@ Function init()
   m.top.observeField("addToQueueTitle", "onAddToQueueTitleChange")
   m.top.observeField("removeQueueTitle", "onRemoveFromQueueTitleChange")
   m.top.observeField("removeHistoryTitle", "onRemoveFromHistoryTitleChange")
-  m.top.observeField("channelTitle", "onChannelTitleChange")
+  m.top.observeField("channelName", "onChannelNameChange")
   m.top.observeField("channelImage", "onChannelImageChange")
   m.top.observeField("isLoading", "onIsLoading")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
@@ -206,9 +206,9 @@ Function onRemoveFromHistoryTitleChange()
 End Function
 
 
-Function onChannelTitleChange()
-  tubiLog("DetailScreen.onChannelTitleChange")
-  m.ChannelMenuItem.title = "Go to " + m.top.channelTitle
+Function onChannelNameChange()
+  tubiLog("DetailScreen.onChannelNameChange")
+  m.ChannelMenuItem.title = "Go to " + m.top.channelName
 End Function
 
 
