@@ -7,6 +7,7 @@
 ' @detailScreen: in case we are reloading and existing screen rather than creating a new one
 Function showDetailScreen(content, sourceTrackingUri, detailScreen=invalid)
   tubiLog("DetailScreenHelpers.showDetailScreen")
+  needFetch = false
 
   if detailScreen = invalid
     localDetailScreen = CreateObject("roSGNode", "DetailScreen")
@@ -22,6 +23,7 @@ Function showDetailScreen(content, sourceTrackingUri, detailScreen=invalid)
     localDetailScreen.observeFieldScoped("relatedContentSelected", "onRelatedContentSelected")
     localDetailScreen.observeFieldScoped("backgroundUriList", "onDetailBackgroundChange")
     localDetailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
+    needFetch = true
   else
     localDetailScreen = detailScreen
   end if 
@@ -29,8 +31,10 @@ Function showDetailScreen(content, sourceTrackingUri, detailScreen=invalid)
   ' Set the currentEpisodeId to an uninitialized state.  it will be resolved later
   content.currentEpisodeId = ""
   localDetailScreen.content = content
+
   if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
     localDetailScreen.isLoading = true
+    needFetch = true
   else
     localDetailScreen.trackingUri = populateDetailTrackingUri(content, invalid)
     populateDetailScreen(localDetailScreen, content, true)
@@ -40,6 +44,8 @@ Function showDetailScreen(content, sourceTrackingUri, detailScreen=invalid)
   ' an existing details screen should already have the detail/related content, so no need to request again
   if detailScreen = invalid
     pushScreen(localDetailScreen, false)  ' don't send tracking until we resolve series episode
+  end if
+  if needFetch = true
     getSingleContentFromServer(localDetailScreen, content, sourceTrackingUri)
   end if
 End Function
