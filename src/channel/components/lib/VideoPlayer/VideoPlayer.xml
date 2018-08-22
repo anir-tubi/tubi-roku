@@ -234,7 +234,7 @@
         height="47"
         translation="[822,58]"/>
       <Label
-        text="PRESS BACK TO EXIT"
+        text="PRESS BACK TO HIDE"
         translation="[870,61]"
         height="47"
         vertAlign="center">

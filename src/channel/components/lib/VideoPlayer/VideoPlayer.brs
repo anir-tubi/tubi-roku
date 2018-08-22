@@ -679,19 +679,18 @@ Function onKeyEvent(key As String, press As Boolean)
         if m.VideoState = "play"
           if m.HUD.opacity = 0
             backButtonExit()
-
           else
             'close the transport
             animateTransport("out")
             resetTransportButtons()
           end if
-
         else if m.VideoState = "pause"
           resumeFromPause()
-
         else if m.VideoState = "rew" or m.VideoState = "ffw"
           setFocusedButton(m.PlayPauseButton)
           endScrub()
+        else if m.VideoState = "skip"
+          resumeFromSkip()
         end if
       end if
     end if
