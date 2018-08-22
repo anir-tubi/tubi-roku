@@ -256,7 +256,9 @@ Function onBackgroundPosterReady()
     startTransitionIn()
 
     'once the transition is complete we will want to start the timer for rotating background images
-    m.newPoster.findNode(m.newPoster.lastAnimationName).observeField("state", "onTransitionComplete")
+    if m.newPoster.findNode(m.newPoster.lastAnimationName) <> invalid
+      m.newPoster.findNode(m.newPoster.lastAnimationName).observeField("state", "onTransitionComplete")
+    end if
   end if
 End Function
 
