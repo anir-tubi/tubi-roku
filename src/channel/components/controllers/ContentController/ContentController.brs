@@ -940,14 +940,18 @@ End Function
 ' Stop the video player and refresh detail screen with the relevant content
 Function returnToDetailScreenFromVideo(result)
   stopVideoContent(result, true)
-  content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
+  content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex) 'this always returns a video - sometimes an episode
   m.top.deepLinkContent = invalid
   if content.isTrailer
     content = getDetailScreenContent()
+  else if content.parentType = m.constants.ui.contentTypes.series
+    currentEpisodeId = content.id
+    content = getDetailScreenContent()
+    content.currentEpisodeId = currentEpisodeId
   end if
   ' Replace the entire detail screen content stack after video playback
   if currentScreen() <> invalid and currentScreen().subType() = "DetailScreen"
-    showDetailScreen(content, invalid, currentScreen())
+    populateDetailScreen(currentScreen(), content, true)
   else
     showDetailScreen(content, invalid)
   end if

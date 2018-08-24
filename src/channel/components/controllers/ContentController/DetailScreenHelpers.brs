@@ -5,49 +5,32 @@
 ' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
 ' @sourceTrackingUri: the uri of the previous screen for tracking
 ' @detailScreen: in case we are reloading and existing screen rather than creating a new one
-Function showDetailScreen(content, sourceTrackingUri, detailScreen=invalid)
+Function showDetailScreen(content, sourceTrackingUri)
   tubiLog("DetailScreenHelpers.showDetailScreen")
-  needFetch = false
 
-  if detailScreen = invalid
-    localDetailScreen = CreateObject("roSGNode", "DetailScreen")
-    localDetailScreen.observeFieldScoped("playSelected", "onPlay")
-    localDetailScreen.observeFieldScoped("resumeSelected", "onResume")
-    localDetailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
-    localDetailScreen.observeFieldScoped("episodeListSelected", "onEpisodeList")
-    localDetailScreen.observeFieldScoped("addToQueueSelected", "onAddToQueueSelected")
-    localDetailScreen.observeFieldScoped("removeFromQueueSelected", "onRemoveFromQueueSelected")
-    localDetailScreen.observeFieldScoped("removeFromHistorySelected", "onRemoveFromHistorySelected")
-    localDetailScreen.observeFieldScoped("itemFailed", "onDetailItemFailed")
-    localDetailScreen.observeFieldScoped("backButtonPressed", "onDetailBackPressed")
-    localDetailScreen.observeFieldScoped("relatedContentSelected", "onRelatedContentSelected")
-    localDetailScreen.observeFieldScoped("backgroundUriList", "onDetailBackgroundChange")
-    localDetailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
-    needFetch = true
-  else
-    localDetailScreen = detailScreen
-  end if 
-
-  ' Set the currentEpisodeId to an uninitialized state.  it will be resolved later
-  content.currentEpisodeId = ""
-  localDetailScreen.content = content
+  detailScreen = CreateObject("roSGNode", "DetailScreen")
+  detailScreen.observeFieldScoped("playSelected", "onPlay")
+  detailScreen.observeFieldScoped("resumeSelected", "onResume")
+  detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
+  detailScreen.observeFieldScoped("episodeListSelected", "onEpisodeList")
+  detailScreen.observeFieldScoped("addToQueueSelected", "onAddToQueueSelected")
+  detailScreen.observeFieldScoped("removeFromQueueSelected", "onRemoveFromQueueSelected")
+  detailScreen.observeFieldScoped("removeFromHistorySelected", "onRemoveFromHistorySelected")
+  detailScreen.observeFieldScoped("itemFailed", "onDetailItemFailed")
+  detailScreen.observeFieldScoped("backButtonPressed", "onDetailBackPressed")
+  detailScreen.observeFieldScoped("relatedContentSelected", "onRelatedContentSelected")
+  detailScreen.observeFieldScoped("backgroundUriList", "onDetailBackgroundChange")
+  detailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
 
   if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
-    localDetailScreen.isLoading = true
-    needFetch = true
+    detailScreen.isLoading = true
   else
-    localDetailScreen.trackingUri = populateDetailTrackingUri(content, invalid)
-    populateDetailScreen(localDetailScreen, content, true)
+    detailScreen.trackingUri = populateDetailTrackingUri(content, invalid)
+    populateDetailScreen(detailScreen, content, true)
   end if
 
-  ' only push the screen on the stack if it's new, and...
-  ' an existing details screen should already have the detail/related content, so no need to request again
-  if detailScreen = invalid
-    pushScreen(localDetailScreen, false)  ' don't send tracking until we resolve series episode
-  end if
-  if needFetch = true
-    getSingleContentFromServer(localDetailScreen, content, sourceTrackingUri)
-  end if
+  pushScreen(detailScreen, false)  ' don't send tracking until we resolve series episode
+  getSingleContentFromServer(detailScreen, content, sourceTrackingUri)
 End Function
 
 
