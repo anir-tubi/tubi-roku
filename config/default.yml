@@ -28,4 +28,5 @@ component_library_manifest:
   title: "Tubi Component Library"
   subtitle: "Remote loading for scenegraph components"
   sg_component_libs_provided: "TubiRemoteLibrary"
+  bs_libs_required: roku_ads_lib
   hidden: 1

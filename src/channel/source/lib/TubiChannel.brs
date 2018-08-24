@@ -14,8 +14,9 @@ End Function
 
 
 'runs the scene graph portion of the channel
-Function tubiChannel_runChannel(args, adShim, port)
+Function tubiChannel_runChannel(args) As Void
   ' Load scene graph
+  port = CreateObject("roMessagePort")
   screen = CreateObject("roSGScreen")
   screen.setMessagePort(port)
 
@@ -43,7 +44,7 @@ Function tubiChannel_runChannel(args, adShim, port)
     Runner.SetTestsDirectory("pkg:/source/tests")
     Runner.logger.SetVerbosity(2)
     Runner.Run()
-    return 0
+    return
   end if
 
   'flag to enable vs. disable remote components loading
@@ -63,7 +64,7 @@ Function tubiChannel_runChannel(args, adShim, port)
     'Listen for when the remote loading has completed
     while remoteLibrary.loadStatus <> "ready"
       msg = wait(1000, port)
-      if type(msgType) = "roSGScreenEvent" and msg.isScreenClosed() then return 0
+      if type(msgType) = "roSGScreenEvent" and msg.isScreenClosed() then return
 
       loadStatus = remoteLibrary.loadStatus
       print "TubiRemoteLibrary status is " + loadStatus
@@ -74,7 +75,7 @@ Function tubiChannel_runChannel(args, adShim, port)
 
       if loadStatus = "failed"
         showErrorDialog()
-        return 0
+        return
       end if
     end while
 
@@ -96,7 +97,24 @@ Function tubiChannel_runChannel(args, adShim, port)
 
   controller.deepLinkContent = deepLinkContent
 
-  adShim.run(controller)
+  while(true)
+    msg = wait(0, port)
+    msgType = type(msg)
+
+    if msgType = "roSGScreenEvent"
+      if msg.isScreenClosed()
+        return
+      end if
+
+    else if msgType = "roSGNodeEvent"
+      tubiLog("TubiChannel got roSGNodeEvent for " + msg.GetField())
+      if msg.GetField() = "exitApp"
+        if msg.GetData() = true
+          return
+        end if
+      end if
+    end if
+  end while
 End Function
 
 

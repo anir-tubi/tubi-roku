@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - AdsTask
+ -
+ -->
+<component name="AdsTask" extends="Task">
+    <script type="text/brightscript" uri="pkg:/components/tasks/AdsTask/AdsTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiAds.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiSGAdShim.brs" />
+
+    <interface>
+      <!-- INPUT -->
+        <field id="videoPlayerNode" type="node" />
+    </interface>
+</component>

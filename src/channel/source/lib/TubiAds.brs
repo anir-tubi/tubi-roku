@@ -1,4 +1,4 @@
-function TubiAds (utils)
+function TubiAds (constants, log, request, requestQueue, auth)
 
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
@@ -20,18 +20,23 @@ function TubiAds (utils)
   adLoggingPort = CreateObject("roMessagePort")
 
   return {
-    utils: utils
-    constants: utils.constants
-    requestQueue: utils.requestQueue.create(adLoggingPort)
-    roAdFramework: roAdFramework
+    ' dependencies
+    constants: constants
+    auth: auth
+    request: request
+    log: log
 
+    ' private
+    requestQueue: requestQueue.create(adLoggingPort)
+    roAdFramework: roAdFramework
     allAdUnitsList:[]
     totalAdBreakAds: 0
     midrolls : []
     commercialDuration : 0
     lastAdFailed: false
+    _: rodash()
 
-    ' methods
+    ' public
     reset: tubiAds_reset
     getCuePointsReq: tubiAds_getCuepointsReq
     parseCuePoints: tubiAds_parseCuepoints
@@ -43,7 +48,6 @@ function TubiAds (utils)
     getResumingPlayAds: tubiAds_getResumingPlayAds
     getCommaDelimitedMidrolls: tubiAds_getCommaDelimitedMidrolls
     populateUrl: tubiAds_populateUrl
-    _: rodash()
   }
 end function
 
@@ -160,7 +164,7 @@ function tubiAds_populateUrl(episode) As String
   end if
 
   'add TubiTV user/registration id to ad call url
-  authInfo = m.utils.auth.getAuthInfo()
+  authInfo = m.auth.getAuthInfo()
   if authInfo <> invalid and authInfo.userId <> invalid
     params["tubitvid"] = authInfo.userId
   end if
@@ -173,7 +177,7 @@ function tubiAds_populateUrl(episode) As String
 
   params["sdk"] = "raf_vast"
 
-  return m.utils.request.addParamsToUrl(m.constants.urls.adsBaseUrl, params)
+  return m.request.addParamsToUrl(m.constants.urls.adsBaseUrl, params)
 end function
 
 ' ----------------------------------------------
@@ -228,7 +232,7 @@ function tubiAds_getAdsListViaRoku(episode)
       call_duration: timeToFetch
       raf_version: m.roAdFramework.getLibVersion()
     }
-    m.utils.log.error(FormatJSON(timeToFetchMessage), "adError", "no-ad-response", m.requestQueue)
+    m.log.error(FormatJSON(timeToFetchMessage), "adError", "no-ad-response", m.requestQueue)
   end if
 
   'check to see if the ad server returns an ad that can be used by RAF or needs to use our ad SDK
@@ -394,7 +398,7 @@ function tubiAds_getCuepointsReq(episode)
       cid: episode.id
     }
   }
-  return m.utils.request.createAsync(m.constants.urls.cuepointsBaseUrl, "getCuePoints", options)
+  return m.request.createAsync(m.constants.urls.cuepointsBaseUrl, "getCuePoints", options)
 end function
 
 

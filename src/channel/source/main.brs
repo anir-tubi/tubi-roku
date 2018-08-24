@@ -1,7 +1,3 @@
-'Add Library for Roku Ad Framework
-Library "Roku_Ads.brs"
-
-
 'The Main function serves to run any remote config and experiment API calls and then choose the appropriate UI
 Function Main(startupArgs as Dynamic)
   constants = getConstants()
@@ -59,11 +55,6 @@ Function Main(startupArgs as Dynamic)
 
   m.global.channel = TubiChannel(m.global.utils)
 
-  port = CreateObject("roMessagePort")
-
-  ' also populates m.global.sgAdShim.ads
-  m.global.adShim = TubiSGAdShim(m.global.utils, port)
-
   ' apply hotpatch to main brightscript thread
   ' this also verifies startup network connectivity
   if Hotpatch(settings.hotPatchUrl) <> 0 then
@@ -72,7 +63,7 @@ Function Main(startupArgs as Dynamic)
               ' we destroy a Scene and try to create it again.
   end if
 
-  m.global.channel.runChannel(startupArgs, m.global.adShim, port)
+  m.global.channel.runChannel(startupArgs)
 End Function
 
 

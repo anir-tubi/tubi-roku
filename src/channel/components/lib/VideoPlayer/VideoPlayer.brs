@@ -63,6 +63,9 @@ Function init()
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
+  m.AdsTask = m.top.findNode("AdsTask")
+  m.AdsTask.videoPlayerNode = m.top
+  m.AdsTask.control = "RUN"
 
   'm.VideoState is source of truth for the state of the video player for the UI
   'possible values are "play", "pause", "rew", "ffw", "stop", "refresh", "skip"

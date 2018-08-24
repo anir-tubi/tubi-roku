@@ -491,10 +491,13 @@
     <Group
       id="RAFAdContainer"/>
 
-  <Timer
-    id="ScrubTimer"
-    duration="0.25"
-    repeat="true" />
+    <AdsTask
+      id="AdsTask" />
+
+    <Timer
+      id="ScrubTimer"
+      duration="0.25"
+      repeat="true" />
   
   </children>
 </component>
