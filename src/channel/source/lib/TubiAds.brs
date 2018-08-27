@@ -48,6 +48,8 @@ function TubiAds (constants, log, request, requestQueue, auth)
     getResumingPlayAds: tubiAds_getResumingPlayAds
     getCommaDelimitedMidrolls: tubiAds_getCommaDelimitedMidrolls
     populateUrl: tubiAds_populateUrl
+    adBufferingCallback: tubiAds_adBufferingCallback
+    adTrackingCallback: tubiAds_adTrackingCallback
   }
 end function
 
@@ -70,6 +72,7 @@ function tubiAds_reset()
   m.midrolls = []
   m.commercialDuration = 0
   m.lastAdFailed = false
+  m.containerNode = invalid
 end function
 
 
@@ -345,7 +348,7 @@ end function
 ' containerNode is any empty Group node under which RAF will create a child video node of its own, and
 ' remove it on completion of showAds()
 ' ----------------------------------------------
-function tubiAds_showCommercialBreakViaRoku(containerNode)
+function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   ' ShowVariable(m.allAdUnitsList, "ALL AD UNITS LIST", 4)
   if m.allAdUnitsList.count() > 0
     currentAdPosition = 1
@@ -359,7 +362,34 @@ function tubiAds_showCommercialBreakViaRoku(containerNode)
             total: m.totalAdBreakAds
           }
 
+          m.containerNode = containerNode
+          m.containerNode.visible = false
+          ' controlnode has progress bar
+          m.controlnode = controlNode
+
+          ' This should happen before any buffering.  We set this here because
+          ' interactive ads don't have buffering callbacks and we don't want the
+          ' loading bar to sit empty and look like nothing is happening.  It will
+          ' also trigger the ads messaging to appear.
+          m.controlNode.adProgress = 1
+          m.controlNode.loadingMessage = "Your program will begin after these messages…"
+
+          ' Setting this is REQUIRED in order for setAdBufferRenderCallback to
+          ' trigger callbacks.  The empty second argument just suppresses
+          ' any ad buffering visual.
+          m.roAdFramework.setAdBufferScreenLayer(2, [{}])
+          ' Simple shim to make a global-scope callback into a module-scoped method call
+          m.roAdFramework.setAdBufferRenderCallback(function(m,e,c): m.adBufferingCallback(e,c): end function, m, 0)
+          m.roAdFramework.setTrackingCallback(function(m,e,c): m.adTrackingCallback(e,c): end function, m)
           isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList[0], screenCount, containerNode)
+
+          ' This will hide the buffering messaging and reset the progress bar
+          ' before the video loading takes over status
+          m.controlNode.adProgress = 0
+          m.controlNode.loadingMessage = ""
+          m.containerNode.visible = false
+          m.containerNode = invalid
+          m.controlNode = invalid
 
           '#####
           ' WORKAROUND FOR RAF MEMORY LEAK, still present in RAF 1.9
@@ -368,6 +398,7 @@ function tubiAds_showCommercialBreakViaRoku(containerNode)
             m.roadframework.mediator.util.xfers = []
           end if
           '#####
+
 
           if isCompleted = false
             print "RAF ads not completed"
@@ -432,4 +463,41 @@ end function
 function tubiAds_getResumingPlayAds(episode, player)
   m.getAdsListViaRoku(episode)
   return (m.allAdUnitsList.count() > 0)
+end function
+
+' ----------------------------------------------
+' adBufferingCallback
+'
+' callback during RAF buffering
+function tubiAds_adBufferingCallback(eventType, ctx)
+  
+  print "*** adBufferingCallback: eventType = "; eventType; " ctx = "; ctx
+  if ctx.progress <> invalid 
+    if ctx.progress = 100
+      m.containerNode.visible = true
+    else
+      m.controlNode.adProgress = ctx.progress
+    end if
+  else
+    m.containerNode.visible = false
+  end if
+end function
+
+
+' ------------------------------------
+' adTrackingCallback
+'
+' callback during RAF ad display
+function tubiAds_adTrackingCallback(eventType, ctx)
+  print "*** adTrackingCallback: eventType = "; eventType; " ctx = "; ctx
+  if eventType <> invalid 
+    if eventType = "Impression"
+      m.containerNode.visible = true
+      ' this will reset the progress bar to avoid seeing a full bar once the 
+      ' ad ends.  The reason we set it to 1 instead of zero is that the 1
+      ' will keep the ads-specific messaging on screen rather than clearing
+      ' it out.
+      m.controlNode.adProgress = 1  
+    end if
+  end if
 end function

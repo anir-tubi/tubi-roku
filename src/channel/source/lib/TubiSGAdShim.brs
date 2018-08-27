@@ -220,7 +220,7 @@ Function tubiSGAdShim_playAds(episode As Object, cuepoint As Integer)
   m.videoPlayerNode.adState = "adsplaying"
 
   adContainer = m.videoPlayerNode.findNode("RAFAdContainer")
-  status = m.ads_.showCommercialBreakViaRoku(adContainer)
+  status = m.ads_.showCommercialBreakViaRoku(adContainer, m.videoPlayerNode)
   if status = m.constants_.player.playerResults.closed
     m.videoPlayerNode.adState = "adsclosed"
   else

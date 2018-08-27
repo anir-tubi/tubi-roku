@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - TubiProgressBar
+ -
+ - Prefixed with "Tubi-" to avoid name collision with built-in ProgressBar
+ - component
+ -
+ - Progress bar that manages 9-patch artifacts
+ -
+ -->
+<component name="TubiProgressBar" extends="Group" >
+  <script type="text/brightscript" uri="./TubiProgressBar.brs" />
+  <interface>
+    <!-- INPUT -->
+
+      <!-- The width of the progress bar -->
+      <field id="width"         type="float" />
+
+      <!-- The percentage to fill the loading bar -->
+      <field id="progress"      type="float" value="0.0" />
+      <field id="trackColor"    alias="ProgressBarBackground.blendColor" />
+      <field id="focusColor"    type="color" value="0xFFFFFFFF" />
+      <field id="unfocusColor"  type="color" value="0xFFFFFFFF" />
+
+      <field id="scaledUI"      type="boolean" value="false" />
+  </interface>
+
+  <children>
+    <Poster
+      id="ProgressBarBackground"
+      uri="pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png"
+      loadSync="true"/>
+
+    <!-- ProgressBarForeground width will be set based on current position -->
+    <Poster
+      id="ProgressBarForeground"
+      uri="pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png"
+      loadSync="true"
+      visible="false"/>
+  </children>
+</component>

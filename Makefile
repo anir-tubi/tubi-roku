@@ -149,7 +149,7 @@ endif
 discover:
 	@$(TOOL_CLI) discover
 
-test:
+test: install
 	NODE_PATH=${PWD}/tools/node_modules jasmine
 
 clean:

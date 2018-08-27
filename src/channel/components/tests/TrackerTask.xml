@@ -903,7 +903,7 @@ Sub addChild(node, childType, index) as Object
     if not FW_IsSGNode(node) then return getError("Cannot Add Child. Invalid Node Type")
 
     child = CreateObject("roSGNode", childType)
-    if not FW_IsSGNode(child) then return getError("Cannot Add Child. Invalid Subtype")
+    if not FW_IsSGNode(child) then return getError("Cannot Add Child. Invalid Component Type")
 
     childCount = node.getChildCount()
     if FW_IsInteger(index) and index < childCount then
@@ -1127,7 +1127,7 @@ Sub init()
 
     m.config = RALE_Config()
     m.sceneBG = m.top.GetScene().getChild(0)
-    m.raleVersion = "1.4.13"
+    m.raleVersion = "1.5.12"
 End Sub
 
 ' tracker - TrackerTask run function

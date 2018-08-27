@@ -35,13 +35,15 @@ Function init()
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
   m.constants = m.global.constants
-  m.Spinner = m.top.findNode("BufferSpinner")
   m.Loading = m.top.findNode("Loading")
+  m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
+  m.LoadingMessage = m.top.findNode("LoadingMessage")
   m.Transport = m.top.findNode("Transport")
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("downloadedSegment", "onDownloadedSegment")
+  m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.top.observeField("control", "onControlChange")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("playlist", "onPlaylistChange")
@@ -50,7 +52,7 @@ Function init()
   m.top.observeField("showTransport", "onShowTransport")
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
-  m.ProgressBar = m.top.findNode("ProgressBarForeground")
+  m.ProgressBar = m.top.findNode("ProgressBar")
   m.Overlay = m.top.findNode("VideoOverlay")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
   m.PickerGroup = m.top.findNode("Picker")
@@ -108,6 +110,7 @@ Function init()
 
   m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
   m.top.observeField("adState", "onAdStateChange")
+  m.top.observeField("adProgress", "onAdProgressChange")
 
   m.lastPingTime = 0
   m.lastSavedPosition = 0
@@ -134,6 +137,9 @@ Function init()
   end if
 
   m.focusedColor = m.constants.ui.colors.focused
+  m.ProgressBar.focusColor = m.focusedColor
+  m.LoadingProgressBar.focusColor = m.focusedColor
+  m.LoadingProgressBar.unfocusColor = m.focusedColor
 
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
@@ -151,24 +157,9 @@ Function init()
   m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
   m.thumbnailMaxYOffset = 889
 
-  ' Workaround for 9-patch bug
-  '
-  ' ProgressBarBackground and ProgressBarForeground use 9-patch images which have
-  ' special undocumented handling (bugs?).  For manifest with ui_resolution=fhd, we
-  ' need to provide 2 resolutions: fhd and hd, where hd 0.75 the intended resolution.  For instance,
-  ' we expect the FHD height to be 16 pixels so the hd source image height has to be 12 pixels.  Roku
-  ' wrongly applies a 1.5x scaling when ui_resolution=fhd and the screen is 720p.  SD resolutions are
-  ' not needed since 720p ui resolution is used and scaled down properly.
-  '
-  ' NOTE2: 9-patch images can't have width/height set below their native resolution (bitmapWidth/bitmapHeight)
-  '        else the 9-patch logic does not get applied and you will just see stretched images.  Because of
-  '        scaling wackiness, bitmapWidth or bitmapHeight may report half-pixel values.  It's best to not
-  '        set a height explicitly.
   if m.constants.deviceInfo.scaledUi = true then
-    background = m.top.findNode("ProgressBarBackground")
-    background.uri = "pkg:/images/transport/sgplayer/hd/progress-background.9.png"
-    foreground = m.top.findNode("ProgressBarForeground")
-    foreground.uri = "pkg:/images/transport/sgplayer/hd/white-progress-foreground.9.png"
+    m.ProgressBar.scaledUI = m.constants.deviceInfo.scaledUi
+    m.LoadingProgressBar.scaledUI = m.constants.deviceInfo.scaledUi
     m.TransportGradient.uri = "pkg:/images/playback-gradient-hd.9.png"
     m.PickerGradient.uri = "pkg:/images/browse-picker-gradient-hd.9.png"
   end if
@@ -180,13 +171,25 @@ Function init()
 End Function
 
 
+Function onAdProgressChange(msg)
+  progress = msg.GetData()
+  m.LoadingProgressBar.progress = progress
+End Function
+
+Function onBufferingStatus(msg)
+  status = msg.GetData()
+  m.LoadingMessage.text = ""
+  if status <> invalid and status.percentage <> invalid
+    m.LoadingProgressBar.progress = status.percentage
+  end if
+End Function
+
 Function onDockedChange()
   if m.top.dock
     ' immediately hide all HUD components
     m.Overlay.opacity = 0.0
     m.HUD.opacity = 0.0
     m.Loading.visible = false
-    m.Spinner.visible = false
     m.top.isDocked = true
   else
     m.top.isDocked = false
@@ -196,6 +199,10 @@ End Function
 
 Function onContentChange() As Void
   tubiLog("VideoPlayer.onContentChange")
+  ' Reset some state
+
+  m.LoadingProgressBar.progress = 0
+  m.LoadingMessage.text = ""
   cancelReplayCaptions()
   m.AdHeadsUp.visible = false
   if m.top.content = invalid then return
@@ -342,12 +349,10 @@ Function updateTransport()
 
   'update the position bar width
   if m.Video.duration > 0
-    maxWidth = m.top.findNode("ProgressBarBackground").width
-    minWidth = m.ProgressBar.bitmapWidth
     percentComplete = (m.playerPosition / m.Video.duration)
-    m.ProgressBar.width = minWidth + percentComplete * (maxWidth - minWidth)
+    m.ProgressBar.progress = percentComplete * 100
 
-    progressBarRight = m.ProgressBar.translation[0] + m.ProgressBar.width
+    progressBarRight = m.ProgressBar.translation[0] + (m.ProgressBar.width * percentComplete)
 
     thumbnailXOffset = progressBarRight - m.Thumbnail.width / 2
     if thumbnailXOffset > m.thumbnailMaxXOffset
@@ -1336,12 +1341,13 @@ Function setFocusedButton(TransportButton, keyFocus=false)
     end if
   end for
 
-  if TransportButton.id = "ProgressBarForeground"
+  if TransportButton.id = "ProgressBar"
     m.progressBarFocused = true
-    m.ProgressBar.blendColor = m.focusedColor
+    m.ProgressBar.setFocus(true)
   else
+    m.ProgressBar.setFocus(false)
     m.progressBarFocused = false
-    m.ProgressBar.blendColor = "0xFFFFFFFF"
+    m.top.setFocus(true)
   end if
 End Function
 

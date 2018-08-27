@@ -88,6 +88,10 @@
     <!-- field for communicating playback position to the ad shim -->
     <field id="adPosition" type="int" />
 
+    <field id="adProgress" type="integer" value="0" />
+
+    <field id="loadingMessage" alias="LoadingMessage.text" />
+
     <!--
       - List of midrolls as time in seconds.  This will be written to by main brightscript thread.
       -->
@@ -111,43 +115,35 @@
     <Group
       id="Loading"
       visible="false">
-      <Poster
-        id="BackgroundGradient"
-        uri="pkg:/images/art-blur-background.png"
-        width="1920"
-        height="1080"
-        loadSync="false"/>
-      <LayoutGroup
-        layoutDirection="horiz"
-        translation="[88,69]">
-        <Label
-          height="64"
-          vertAlign="center"
-          color="0xff501aff"
-          text="Loading">
-          <Font
-            id="Vaud34px"
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="34"/>
-        </Label>
-        <Label
-          height="64"
-          vertAlign="center"
-          text=" &#xB7; Your title will begin shortly">
-          <Font
-            id="Vaud34px"
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="34"/>
-        </Label>
-      </LayoutGroup>
-      <Spinner
-        id="BufferSpinner"
-        visible="false"
-        isDisabled="true"
+      <Rectangle
+        id="LoadingBackground"
+        color="0x000000FF"
         width="1920"
         height="1080"/>
+      <Poster
+        width="309"
+        height="135"
+        uri="pkg:/images/logo-white-xlarge.png"
+        loadSync="true"
+        translation="[810,382]"/>
+      <Label
+        id="LoadingMessage"
+        height="64"
+        width="1920"
+        horizAlign="center"
+        vertAlign="center"
+        translation="[0,606]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="32"/>
+      </Label>
+      <TubiProgressBar
+        id="LoadingProgressBar"
+        width="750"
+        progress="50"
+        trackColor="0xFFFFFF14"
+        translation="[584,696]"/>
     </Group>
 
     <Group
@@ -341,15 +337,10 @@
           </Label>
         </Group>
       
-      <Poster
-        id="ProgressBarBackground"
-        uri="pkg:/images/transport/sgplayer/fhd/progress-background.9.png"
+      <TubiProgressBar
+        id="ProgressBar"
         width="1752"
-        translation="[85,896]"/>
-      <!-- ProgressBarForeground width will be set based on current position -->
-      <Poster
-        id="ProgressBarForeground"
-        uri="pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png"
+        trackColor="0xFFFFFF14"
         translation="[85,896]"/>
 
       <!-- Time -->
