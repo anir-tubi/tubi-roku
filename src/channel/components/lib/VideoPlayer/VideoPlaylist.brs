@@ -58,6 +58,7 @@ Function onVideoStateChange(msg)
     if not advancePlaylist()
       if state = "error"
         m.top.errorMsg = "There was an issue with video playback."
+        m.monitoringTask.endPlayback = m.Video.errorMsg
       end if
       m.top.state = state
     end if
@@ -103,7 +104,6 @@ Function onVideoStateChange(msg)
 End Function
 
 Function onDownloadedSegment(msg)
-  tubiLog("VideoPlaylist.onDownloadedSegment")
   dlsegment = msg.getData()
   if dlsegment <> invalid and dlsegment.status <> 0
     content = m.Video.content

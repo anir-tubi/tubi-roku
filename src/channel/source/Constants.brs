@@ -234,6 +234,10 @@ Function getConstants()
   'Nielsen ID token for integrating with Nielsen DAR
   constants.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
 
+  constants.thirdParty = {}
+    constants.thirdParty.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
+    constants.thirdParty.convivaIsLive = invalid
+
   'platform is used when communitcating with CMS API
   constants.platform = "roku"
 

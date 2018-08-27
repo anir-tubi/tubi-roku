@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="ConvivaTask" extends="Task" >
+  <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/ConvivaTask/ConvivaTask.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/conviva/Conviva_Roku_2.146.0.36444.brs" />
+  <interface>
+    <!-- INPUTS -->
+      <field id="videoNode" type="node" />
+
+      <!-- beginPlayback can be "withAds" or "withoutAds" -->
+      <field id="beginPlayback" type="string" alwaysNotify="true" />
+
+      <!-- endPlayback should be either an errorMsg as given by Video.errorMsg or "noerror" -->
+      <field id="endPlayback" type="string" alwaysNotify="true" />
+      
+      <field id="beginSeek" type="integer" alwaysNotify="true" />
+      
+      <!--  beginAds can be "preroll" or "midroll" -->
+      <field id="beginAds" type="string" alwaysNotify="true" />
+      
+      <field id="endAds" type="boolean" alwaysNotify="true" />
+  </interface>
+</component>

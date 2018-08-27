@@ -172,6 +172,11 @@ Function init()
     m.TransportGradient.uri = "pkg:/images/playback-gradient-hd.9.png"
     m.PickerGradient.uri = "pkg:/images/browse-picker-gradient-hd.9.png"
   end if
+
+  'Video Monitoring
+  m.monitoringTask = m.top.findNode("ConvivaTask")
+  m.monitoringTask.videoNode = m.Video
+  m.monitoringTask.control = "RUN"
 End Function
 
 
@@ -426,6 +431,7 @@ Function onVideoPositionChange()
           if m.top.adState = "adspending" then
             ' We must stop the video here, not just pause it, in order to release
             ' system resources to the RAF video player
+            m.monitoringTask.beginAds = "midroll"
             showAdBreak()
           else if m.top.adState = "noads"
             ' when we reach the cuepoint, we find that the last ad call returned no ads
@@ -524,8 +530,11 @@ Function playContent()
   if m.top.enableAds then
     ' Start pre-roll fetch
     m.top.adControl = "preroll"
+    m.monitoringTask.beginPlayback = "withAds"
+    m.monitoringTask.beginAds = "preroll"
   else
     m.Video.control = "play"
+    m.monitoringTask.beginPlayback = "withoutAds"
   end if
 End Function
 
@@ -691,7 +700,7 @@ Function onKeyEvent(key As String, press As Boolean)
           resumeFromPause()
         else if m.VideoState = "rew" or m.VideoState = "ffw"
           setFocusedButton(m.PlayPauseButton)
-          endScrub()
+          endScrub(true)
         else if m.VideoState = "skip"
           resumeFromSkip()
         end if
@@ -718,14 +727,18 @@ Function onAdStateChange()
     showAdBreak()
   ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
   'TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
-  else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "skip") and m.Video.state <> "playing" then
+  else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip") and m.Video.state <> "playing" then
     ' Came back from an ad break
+    m.monitoringTask.endAds = true
     ' Set the m.Video.control prior to the m.Video.seek to ensure that the video is not started from the beginning even if m.playerPosition <> 0.
     ' This is a seeming inconsistency with the firmware and should not neccessarily work this way, but it does.
     ' Normally we would expect to set the seek prior to setting control to "play"
     ' Unfortunately, this order of play before seek causes a device crash if the content url is not a valid video url.
     if m.Video.content.url <> invalid and m.Video.content.url <> ""
       m.top.setFocus(true)
+      if m.VideoState = "ffw" or m.VideoState = "rew"
+        m.monitoringTask.beginSeek = m.playerPosition
+      end if
       m.VideoState = "play"
       m.Video.control = "play"
       m.Video.seek = m.playerPosition
@@ -742,6 +755,7 @@ Function onAdStateChange()
         video_url: m.top.content.url
       }
       tubiLog(FormatJson(errorInfo), "error", "videoPlayback", "video-url")
+      m.monitoringTask.endPlayback = "noerror"
     end if
   else if m.top.adState = "adsclosed"
     ' This is not ideal implementation but we want the OnNow experience to continue playing
@@ -750,6 +764,7 @@ Function onAdStateChange()
     ' causing a bug where there was a very long black screen after exiting an ad break 
     ' via the back button (i assume the render thread was busy caching the video segments).
     m.top.setFocus(true)
+    m.monitoringTask.endAds = true
     if m.Video.content.isLiveTV
       m.Video.seek = m.playerPosition
       m.VideoState = "play"
@@ -762,6 +777,8 @@ Function onAdStateChange()
           livetv: m.Video.content.isLiveTV
         }
       })
+    else
+      m.monitoringTask.endPlayback = "noerror"
     end if
 
     backButtonExit()
@@ -964,12 +981,11 @@ End Function
 
 
 'Perform at end of FF or RW
-Function endScrub()
+' @shouldJump: boolean, indicates if we should use jumpToPosition - don't use if will use later on in the calling function
+Function endScrub(shouldJump = false)
   m.scrubAmt = -1 'reset just in case it somehow got to less than -1
   m.ScrubTimer.control = "stop"
   m.ScrubTimer.unobserveField("fire")
-  oldVideoState = m.VideoState
-  m.VideoState = "play"
   ' Reset periodic event trackers
   m.lastPingTime = m.playerPosition
 
@@ -978,7 +994,9 @@ Function endScrub()
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
 
-  jumpToPosition(m.playerPosition)
+  if shouldJump = true
+    jumpToPosition(m.playerPosition)
+  end if
 End Function
 
 
@@ -996,7 +1014,7 @@ Function goToStart()
   m.positionAtJumpStart = m.playerPosition
   m.playerPosition = 0
   if m.VideoState = "ffw" or m.VideoState = "rew"
-    endScrub()
+    endScrub(false)
     setFocusedButton(m.StartButton)
   end if
   jumpToPosition(m.playerPosition)
@@ -1007,14 +1025,16 @@ End Function
 Function goToEnd()
   'reset before endScrub because we don't want an ad call made when moving to the next video, let prerolls hit instead
   if m.VideoState = "ffw" or m.VideoState = "rew"
-    endScrub()
+    endScrub(true)
     setFocusedButton(m.EndButton)
   end if
   
+  m.monitoringTask.endPlayback = "noerror"
+ 
   if not advancePlaylist() then
     'the end of the video playback
     m.VideoState = "stop"
-    m.video.control = "stop"
+    m.Video.control = "stop"
     m.top.state = "finished"
   end if
 End Function
@@ -1028,7 +1048,7 @@ Function handlePlayPause()
   else if m.VideoState = "pause" then
     resumeFromPause()
   else if m.VideoState = "rew" or m.VideoState = "ffw"
-    endScrub()
+    endScrub(true)
   else if m.VideoState = "skip"
     resumeFromSkip()
   end if
@@ -1101,7 +1121,7 @@ End Function
 'handles HopForward button selection
 Function handleHopForward()
   if m.VideoState = "ffw" or m.VideoState = "rew"
-    endScrub()
+    endScrub(false)
     setFocusedButton(m.HopForwardButton)
   end if
   if m.HUD.opacity > 0.0
@@ -1115,7 +1135,7 @@ End Function
 Function handleHopBack(remoteReplayButton)
   setFocusedButton(m.HopBackButton)  'necessary because there is a dedicated hop back button on certain roku remotes
   if m.VideoState = "ffw" or m.VideoState = "rew"
-    endScrub()
+    endScrub(false)
   end if
   setFocusedButton(m.HopBackButton, true)
   if m.HUD.opacity > 0.0
@@ -1147,6 +1167,7 @@ Function handleSeek(position as Integer, shouldAdBreak as Boolean)
     m.top.adPosition = position
     m.top.adControl = "seek"
   else
+    m.monitoringTask.beginSeek = position
     m.Video.seek = position 'will load and play the video at the seeked to point
     m.VideoState = "play"
   end if
@@ -1328,6 +1349,7 @@ End Function
 Function backButtonExit()
   historyPosition()
   m.top.backButtonPressed = true
+  m.monitoringTask.endPlayback = "noerror"
 End Function
 
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads
