@@ -63,7 +63,8 @@ Function Main(startupArgs as Dynamic)
               ' we destroy a Scene and try to create it again.
   end if
 
-  m.global.channel.runChannel(startupArgs)
+  ' TODO: On submission, remove the last 2 "invalid" parameters which are only for backwards compatibility
+  m.global.channel.runChannel(startupArgs, invalid, invalid)
 End Function
 
 
