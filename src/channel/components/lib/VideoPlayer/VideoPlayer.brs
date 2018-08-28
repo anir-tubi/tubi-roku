@@ -741,7 +741,7 @@ Function onAdStateChange()
     ' Unfortunately, this order of play before seek causes a device crash if the content url is not a valid video url.
     if m.Video.content.url <> invalid and m.Video.content.url <> ""
       m.top.setFocus(true)
-      if m.VideoState = "ffw" or m.VideoState = "rew"
+      if m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip"
         m.monitoringTask.beginSeek = m.playerPosition
       end if
       m.VideoState = "play"
