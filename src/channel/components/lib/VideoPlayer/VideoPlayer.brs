@@ -1326,6 +1326,16 @@ Function setFocusedButton(TransportButton, keyFocus=false)
   if keyfocus
     focusVideoPicker(false)
   end if
+
+  if TransportButton.id = "ProgressBar"
+    m.progressBarFocused = true
+    m.ProgressBar.setFocus(true)
+  else
+    m.ProgressBar.setFocus(false)
+    m.progressBarFocused = false
+    m.top.setFocus(true)
+  end if
+
   for i=0 to m.TransportButtons.getChildCount()-1
     button = m.TransportButtons.getChild(i)
     if TransportButton.id = button.id
@@ -1341,14 +1351,6 @@ Function setFocusedButton(TransportButton, keyFocus=false)
     end if
   end for
 
-  if TransportButton.id = "ProgressBar"
-    m.progressBarFocused = true
-    m.ProgressBar.setFocus(true)
-  else
-    m.ProgressBar.setFocus(false)
-    m.progressBarFocused = false
-    m.top.setFocus(true)
-  end if
 End Function
 
 'exit the video player due to back button while no transport displaying, or during ad break
