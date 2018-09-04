@@ -1,3 +1,5 @@
+Library "Roku_Ads.brs"
+
 Function TestSuite_TubiAds()
   this = BaseTestSuite()
   this.name = "TubiAdsTestSuite"
@@ -92,20 +94,8 @@ Function testHelper_tubiAds_createTubiAds()
   tracking = TubiTracking(constants, request, auth)
   log = TubiLogger(constants, request, auth)
 
-  ' copied from main.brs
-  utils = {
-    constants: constants
-    request: request
-    requestQueue: TubiRequestQueue()
-    tracking: tracking
-    auth: auth
-    metadataFetch: metadataFetch
-    requestQueue: requestQueue
-    log: log
-  }
-
   port = CreateObject("roMessagePort")
-  ads = TubiAds(utils)
+  ads = TubiAds(constants, log, request, requestQueue, auth)
   ads.populateUrl = Function(episode)
     ' deliberately fake so it fails and RAF.getAds() returns invalid
     return "http://127.0.0.1/"

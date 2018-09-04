@@ -45,7 +45,7 @@ End Function
 
 
 Function testCase_cmsApi_singleContentReq_withChannels()
-  request = m.api.singleContentReq("01627", true)
+  request = m.api.singleContentReq("02076", true)
   content = request.runSynchronous()
   result = ""
   result = result + m.AssertNotInvalid(content)
@@ -53,7 +53,7 @@ Function testCase_cmsApi_singleContentReq_withChannels()
   result = result + m.AssertNotInvalid(parsed.id)
   result = result + m.AssertNotInvalid(parsed.channel_id)
   result = result + m.AssertNotInvalid(parsed.channel_logo)
-  result = result + m.AssertEqual(parsed.id, "1627")
+  result = result + m.AssertEqual(parsed.id, "2076")
   return result
 End Function
 
@@ -121,7 +121,7 @@ End Function
 ' channelReq
 '
 Function testCase_cmsApi_channelReq()
-  request = m.api.channelReq("cbs", 200)
+  request = m.api.channelReq("aetv", 200)
   channel = request.runSynchronous()
   result = ""
   result = result + m.AssertNotInvalid(channel)
@@ -130,7 +130,7 @@ Function testCase_cmsApi_channelReq()
     result = result + m.AssertNotInvalid(parsed)
     result = result + m.AssertNotInvalid(parsed.container)
     result = result + m.AssertEqual(parsed.container.type, "channel")
-    result = result + m.AssertEqual(parsed.container.id, "cbs")
+    result = result + m.AssertEqual(parsed.container.id, "aetv")
   end if
   return result
 End Function
