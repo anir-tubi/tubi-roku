@@ -470,9 +470,7 @@ end function
 '
 ' callback during RAF buffering
 function tubiAds_adBufferingCallback(eventType, ctx)
-  
-  print "*** adBufferingCallback: eventType = "; eventType; " ctx = "; ctx
-  if ctx.progress <> invalid 
+  if ctx.progress <> invalid
     if ctx.progress = 100
       m.containerNode.visible = true
     else
@@ -489,7 +487,6 @@ end function
 '
 ' callback during RAF ad display
 function tubiAds_adTrackingCallback(eventType, ctx)
-  print "*** adTrackingCallback: eventType = "; eventType; " ctx = "; ctx
   if eventType <> invalid 
     if eventType = "Impression"
       m.containerNode.visible = true
