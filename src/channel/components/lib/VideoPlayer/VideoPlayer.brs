@@ -45,7 +45,6 @@ Function init()
   m.Video.observeField("downloadedSegment", "onDownloadedSegment")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.top.observeField("control", "onControlChange")
-  m.top.observeField("content", "onContentChange")
   m.top.observeField("playlist", "onPlaylistChange")
   m.top.observeField("seekPlaylist", "onSeekPlaylist")
   m.top.observeField("dock", "onDockedChange")
@@ -196,74 +195,6 @@ Function onDockedChange()
   end if
 End Function
 
-
-Function onContentChange() As Void
-  tubiLog("VideoPlayer.onContentChange")
-  ' Reset some state
-
-  m.LoadingProgressBar.progress = 0
-  m.LoadingMessage.text = ""
-  cancelReplayCaptions()
-  m.AdHeadsUp.visible = false
-  if m.top.content = invalid then return
-
-  'add the title and episode title to the overlay
-  title = m.Overlay.findNode("VideoOverlayTitle")
-  episodeTitle = m.Overlay.findNode("VideoOverlayEpisodeTitle")
-  if m.top.content.parentType = "series"
-    title.text = m.top.content.parentTitle
-    episodeTitle.text = m.top.content.title
-  else
-    title.text = m.top.content.title
-    episodeTitle.text = ""
-  end if
-
-  'there are no subtitles so grey out the captions button
-  if m.top.content.subtitleTracks = invalid or m.top.content.subtitleTracks.count() = 0
-    m.TransportButtons.removeChild(m.ClosedCaption)
-    m.ClosedCaptionDisabled.visible = true
-  
-  'there are subtitles, so check if captions button has been greyed out previously
-  else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.ClosedCaption) < 0
-    m.TransportButtons.appendChild(m.ClosedCaption)
-    m.ClosedCaptionDisabled.visible = false
-  end if
-
-  liveTVGroup = m.top.findNode("LiveTVGroup")
-
-  if m.top.content.isLiveTV then
-    liveTVGroup.visible = true
-  else
-    liveTVGroup.visible = false
-  end if
-
-  'if it's not a trailer, remove the skip trailer button
-  if m.top.content.isTrailer = false
-    m.TransportButtons.removeChild(m.SkipTrailerButton)
-
-  'add the skip trailer button if it's a trailer and it doesn't already exist on the transport
-  else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
-    m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
-  end if
-
-  m.Thumbnail.visible = false   ' always start with thumbnail invisible, then show it when scrubbin
-  if m.top.content.thumbnailUrls <> invalid and m.top.content.thumbnailUrls.count() > 0 and m.constants.deviceInfo.limitedUi = false
-    m.Thumbnail.numSprites = m.top.content.thumbnailSpan
-    ' This should bring the 4400px image width down below the 4kx4k texture size limit
-    ' which would otherwise cause the images to fail to load.
-    scaleFactor = 0.75
-    m.Thumbnail.spriteSheetWidth = m.top.content.thumbnailSize[0] * m.top.content.thumbnailSpan * scaleFactor
-    m.Thumbnail.spriteSheetHeight = m.top.content.thumbnailSize[1] * scaleFactor
-    m.Thumbnail.spriteUrls = m.top.content.thumbnailUrls
-    m.Thumbnail.jumpToSprite = 0
-    ' Always keep height of thumbnail the same, varying the width if necessary
-    thumbnailAspect = m.top.content.thumbnailSize[0] / m.top.content.thumbnailSize[1]
-    m.Thumbnail.width = m.Thumbnail.height * thumbnailAspect
-    m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
-    m.Thumbnail.translation = [m.thumbnailMinXOffset, m.thumbnailMaxYOffset - m.Thumbnail.height]
-  else
-  end if
-End Function
 
 Function onVideoPickerFocused()
   tubiLog("VideoPlayer.onVideoPickerFocused = " + stri(m.VideoPicker.contentFocused))
@@ -958,7 +889,7 @@ Function updateTransportTimes()
 End Function
 
 Function showThumbnail()
-  if m.top.content.thumbnailUrls <> invalid and m.top.content.thumbnailUrls.count() > 0 and m.constants.deviceInfo.limitedUi = false
+  if m.Thumbnail.spriteUrls <> invalid and m.Thumbnail.spriteUrls.count() > 0 and m.constants.deviceInfo.limitedUi = false
     m.Thumbnail.visible = true
   else
     m.Thumbnail.visible = false

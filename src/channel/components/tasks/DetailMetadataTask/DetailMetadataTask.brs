@@ -19,7 +19,6 @@ Function execGetDetailMetadata() As Void
     return
   end if
 
-  tubiLog("DetailMetadataTask getting content for " + m.top.request.contentId)
   ' request setup
   constants = m.global.constants
   RequestModule = TubiRequest()
@@ -28,17 +27,23 @@ Function execGetDetailMetadata() As Void
   translate = TubiMetadataTranslate(constants)
   port = CreateObject("roMessagePort")
 
-  contentReq = cms.singleContentReq(m.top.request.contentId, true)
-  contentReq.start(port)
+  contentReq = invalid
+  if m.top.request.getContent = true
+    tubiLog("DetailMetadataTask getting content for " + m.top.request.contentId)
+    contentReq = cms.singleContentReq(m.top.request.contentId, true)
+    contentReq.start(port)
+  end if
 
   relatedReq = invalid
   if m.top.request.getRelated = true
+    tubiLog("DetailMetadataTask getting related (you may also like) for " + m.top.request.contentId)
     relatedReq = cms.relatedContentReq(m.top.request.contentId)
     relatedReq.start(port)
   end if
 
   thumbnailsReq = invalid
   if m.top.request.getThumbnails = true
+    tubiLog("DetailMetadataTask getting sprites for " + m.top.request.contentId)
     thumbnailsReq = cms.thumbnailsReq(m.top.request.contentId)
     thumbnailsReq.start(port)
   end if
@@ -49,7 +54,7 @@ Function execGetDetailMetadata() As Void
   thumbnailsResult = invalid
   while true
     msg = wait(0, port)
-    if contentResult = invalid
+    if contentReq <> invalid and contentResult = invalid
       contentResult = contentReq.handleEvent(msg)
     end if
     if relatedReq <> invalid and relatedResult = invalid
@@ -58,52 +63,74 @@ Function execGetDetailMetadata() As Void
     if thumbnailsReq <> invalid and thumbnailsResult = invalid
       thumbnailsResult = thumbnailsReq.handleEvent(msg)
     end if
-    if contentResult <> invalid and (relatedReq = invalid or relatedResult <> invalid) and (thumbnailsReq = invalid or thumbnailsResult <> invalid)
+    if (contentReq = invalid or contentResult <> invalid) and (relatedReq = invalid or relatedResult <> invalid) and (thumbnailsReq = invalid or thumbnailsResult <> invalid)
       exit while
     end if
   end while
 
+  updatedContent = invalid
+
   ' Parse results
-  if contentResult <> invalid and contentResult.response <> invalid and success(contentResult.response.code)
-    parsed = ParseJSON(contentResult.response.data)
-    if parsed = invalid then
-      tubiLog("DetailMetadataTask failed to parse JSON response")
-      m.top.error = contentResult.response
+  if contentReq <> invalid
+    if contentResult <> invalid and contentResult.response <> invalid and success(contentResult.response.code)
+      parsed = ParseJSON(contentResult.response.data)
+      if parsed = invalid then
+        tubiLog("DetailMetadataTask failed to parse JSON response")
+        m.top.error = contentResult.response
+      else
+        updatedContent = CreateObject("roSGNode", "TubiContentNode")
+        translate.translateRecursive(parsed, updatedContent)
+      end if
     else
-      detail = CreateObject("roSGNode", "TubiContentNode")
-      translate.translateRecursive(parsed, detail)
-
-      if relatedResult <> invalid and relatedResult.response <> invalid and success(relatedResult.response.code)
-        parsed = ParseJSON(relatedResult.response.data)
-        if parsed = invalid then
-          tubiLog("DetailMetadataTask failed to parse JSON response")
-        else
-          detail.relatedContent = translate.translateRelatedContent(parsed)
-        end if
+      code = -1
+      if contentResult <> invalid and contentResult.response <> invalid
+        code = contentResult.response.code
       end if
+      m.top.error = {
+        code: code
+        data: ""
+        failReason: "Result is invalid"
+      }
+    end if
+  end if
 
-      if thumbnailsResult <> invalid and thumbnailsResult.response <> invalid and success(thumbnailsResult.response.code)
-        parsed = ParseJSON(thumbnailsResult.response.data)
-        if parsed = invalid then
-          tubiLog("DetailMetadataTask failed to parse JSON response")
-        else
-          detail.thumbnailUrls = parsed.sprites
-          detail.thumbnailSpan = parsed.count_per_sprite
-          detail.thumbnailSize = [parsed.frame_width, parsed.height]
+  if relatedReq <> invalid
+    if relatedResult <> invalid and relatedResult.response <> invalid and success(relatedResult.response.code)
+      parsed = ParseJSON(relatedResult.response.data)
+      if parsed = invalid then
+        tubiLog("DetailMetadataTask failed to parse JSON response")
+      else
+        if updatedContent = invalid
+          updatedContent = CreateObject("roSGNode", "TubiContentNode")
+          updatedContent.id = m.top.request.contentId
         end if
+        updatedContent.relatedContent = translate.translateRelatedContent(parsed)
       end if
-      m.top.response = detail
+    else
+      tubiLog("DetailMetadataTask did not get valid response for related content.")
     end if
-  else
-    code = -1
-    if contentResult <> invalid and contentResult.response <> invalid
-      code = contentResult.response.code
+  end if
+
+  if thumbnailsReq <> invalid
+    if thumbnailsResult <> invalid and thumbnailsResult.response <> invalid and success(thumbnailsResult.response.code)
+      parsed = ParseJSON(thumbnailsResult.response.data)
+      if parsed = invalid then
+        tubiLog("DetailMetadataTask failed to parse JSON response")
+      else
+        spritesContentNode = CreateObject("roSGNode", "TubiContentNode")
+        spritesContentNode.id = m.top.request.contentId
+        spritesContentNode.thumbnailUrls = parsed.sprites
+        spritesContentNode.thumbnailSpan = parsed.count_per_sprite
+        spritesContentNode.thumbnailSize = [parsed.frame_width, parsed.height]
+      end if
+    else
+      tubiLog("DetailMetadataTask did not get a valid response for thumbnails/sprites")
     end if
-    m.top.error = {
-      code: code
-      data: ""
-      failReason: "Result is invalid"
-    }
+    m.top.thumbnailsResponse = spritesContentNode
+  end if
+
+  if updatedContent <> invalid
+    m.top.response = updatedContent
   end if
 End Function
 

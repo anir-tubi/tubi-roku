@@ -164,7 +164,6 @@ End Function
 Function onIsChannel()
   tubiLog("DetailScreen.onIsChannel")
   channelIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ChannelMenuItem.id)
-  print "channelIndex "; channelIndex
   previousItems = [
     m.RemoveHistoryMenuItem
     m.RemoveQueueMenuItem

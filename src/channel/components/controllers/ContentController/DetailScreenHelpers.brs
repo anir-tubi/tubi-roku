@@ -189,6 +189,7 @@ Function getSingleContentFromServer(screen, content, sourceTrackingUri)
     request = {
       contentId: content.id
       getRelated: true
+      getContent: true
     }
     refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
     refreshTask.request = request

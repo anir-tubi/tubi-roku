@@ -141,34 +141,68 @@ Function refreshContent(nowPos)
 
   if content <> invalid then 
     tubiLog("VideoPlayer current content id = " + content.id)
+
+    'reset thumbnail state
+    m.Thumbnail.visible = false
+    m.Thumbnail.numSprites = 0
+    m.Thumbnail.spriteUrls = []
+
     threshold = CreateObject("roDateTime").AsSeconds() - m.constants.player.maxAgeStreamUrl
     if content.url <> invalid and content.url <> "" and content.fetchedAt <> invalid and content.fetchedAt > threshold
-      m.top.content = content
+      ' we already have a valid url, so only need to get thumbnail/sprites
+      resetVideoPlayerState(content)
+      m.top.content = content   'sends content to video node and makes current content available to contentController
       playContent()
-    else
-      if m.refreshTask <> invalid
-        m.refreshTask.unobserveField("response")
-        m.refreshTask.unobserveField("error")
-      else
-        ' refreshTask can't just be overwritten, or else it creates two DetailMetaDataTasks.
-        ' When refreshTask.control = "RUN" happens if it was overwritten, the task's functionName
-        ' actually runs for each of the tasks that had been ever been assigned to m.refreshTask.
-        ' This becomes an issue if a user selects play multiple times.
-        m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
-      end if
-
-      request = {
+      requestDetails = {
         contentId: content.id
         getThumbnails: true
       }
-      m.refreshTask.request = request
-      m.refreshTask.observeField("response", "onRefreshResponse")
-      m.refreshTask.observeField("error", "onRefreshError")
-      m.refreshTask.control = "RUN"
-      m.VideoState = "refresh"
+      runRefreshTask(requestDetails)
+    else
+      requestDetails = {
+        contentId: content.id
+        getThumbnails: true
+        getContent: true
+      }
+      runRefreshTask(requestDetails)
     end if
   end if
 End Function
+
+
+' @requestDetails: assocArray, lets the refresh (DetailMetadataTask) task know what requests to make.
+'                  Consists of the following key/values:
+'                  {
+'                     contentId: string
+'                     getContent: bool     'get updated content metadata including latest video uri
+'                     getThumbnails: bool  'get thumbnail "sprites" used during ffw/rew
+'                     getRelated: bool     'get "You May Also Like" content
+'                     refresh: bool        'this dictates if m.VideoState is set to "refresh"
+'                  }
+Function runRefreshTask(requestDetails)
+  tubiLog("VideoPlayer.runRefreshTask")
+  if m.refreshTask <> invalid
+    m.refreshTask.unobserveField("response")
+    m.refreshTask.unobserveField("error")
+    m.refreshTask.unobserveField("thumbnailsResponse")
+  else
+    ' refreshTask can't just be overwritten, or else it creates two DetailMetaDataTasks.
+    ' When refreshTask.control = "RUN" happens if it was overwritten, the task's functionName
+    ' actually runs for each of the tasks that had been ever been assigned to m.refreshTask.
+    ' This becomes an issue if a user selects play multiple times.
+    m.refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
+  end if
+
+  m.refreshTask.request = requestDetails
+  m.refreshTask.observeField("response", "onRefreshResponse")
+  m.refreshTask.observeField("error", "onRefreshError")
+  m.refreshTask.observeField("thumbnailsResponse", "onThumbnailsResponse")
+  m.refreshTask.control = "RUN"
+  if requestDetails.refresh = true
+    m.VideoState = "refresh"
+  end if
+End Function
+
 
 Function onRefreshResponse(msg)
   tubiLog("VideoPlayer.onRefreshResponse")
@@ -192,12 +226,12 @@ Function onRefreshResponse(msg)
       refreshedContent.subtitleConfig = invalid
     end if
 
-    m.top.content = refreshedContent
-    if m.VideoState = "refresh" then
-      playContent()
-    end if
+    resetVideoPlayerState(refreshedContent)
+    m.top.content = refreshedContent  'sends content to video node and makes current content available to contentController
+    playContent()
   end if
 End Function
+
 
 Function onRefreshError(msg)
   tubiLog("VideoPlayer.onRefreshError")
@@ -207,6 +241,90 @@ Function onRefreshError(msg)
       m.top.errorMsg = "Could not refresh the content or play next content."
       m.top.state = "error"
     end if
+  end if
+End Function
+
+
+Function onThumbnailsResponse(msg)
+  tubiLog("VideoPlayer.onThumbnailsResponse")
+  thumbnailsInfo = msg.getData()  'expect a TubiContentNode with thumbnail fields populated
+  m.Thumbnail.visible = false   ' always start with thumbnail invisible, then show it when scrubbing
+
+  if thumbnailsInfo <> invalid
+    if thumbnailsInfo.thumbnailUrls <> invalid and thumbnailsInfo.thumbnailUrls.count() > 0 and m.constants.deviceInfo.limitedUi = false
+      m.Thumbnail.numSprites = thumbnailsInfo.thumbnailSpan
+      ' This should bring the 4400px image width down below the 4kx4k texture size limit
+      ' which would otherwise cause the images to fail to load.
+      scaleFactor = 0.75
+      m.Thumbnail.spriteSheetWidth = thumbnailsInfo.thumbnailSize[0] * thumbnailsInfo.thumbnailSpan * scaleFactor
+      m.Thumbnail.spriteSheetHeight = thumbnailsInfo.thumbnailSize[1] * scaleFactor
+      m.Thumbnail.spriteUrls = thumbnailsInfo.thumbnailUrls
+      m.Thumbnail.jumpToSprite = 0
+      ' Always keep height of thumbnail the same, varying the width if necessary
+      thumbnailAspect = thumbnailsInfo.thumbnailSize[0] / thumbnailsInfo.thumbnailSize[1]
+      m.Thumbnail.width = m.Thumbnail.height * thumbnailAspect
+      m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
+      m.Thumbnail.translation = [m.thumbnailMinXOffset, m.thumbnailMaxYOffset - m.Thumbnail.height]
+    end if
+  end if
+End Function
+
+
+' Reset video player state to a basic state
+' @content: TubiContentNode
+Function resetVideoPlayerState(content = invalid)
+  m.LoadingProgressBar.progress = 0
+  m.LoadingMessage.text = ""
+  cancelReplayCaptions()
+  m.AdHeadsUp.visible = false
+  if content <> invalid
+    updateVideoPlayerState(content)
+  end if
+End Function
+
+
+' Set video player state based on passed in content
+' @content: TubiContentNode
+Function updateVideoPlayerState(content) as Void
+  if type(content) <> "roSGNode" then return
+
+  ' add the title and episode title to the overlay
+  title = m.Overlay.findNode("VideoOverlayTitle")
+  episodeTitle = m.Overlay.findNode("VideoOverlayEpisodeTitle")
+  if content.parentType = "series"
+    title.text = content.parentTitle
+    episodeTitle.text = content.title
+  else
+    title.text = content.title
+    episodeTitle.text = ""
+  end if
+
+  'there are no subtitles so grey out the captions button
+  if content.subtitleTracks = invalid or content.subtitleTracks.count() = 0
+    m.TransportButtons.removeChild(m.ClosedCaption)
+    m.ClosedCaptionDisabled.visible = true
+
+  'there are subtitles, so check if captions button has been greyed out previously
+  else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.ClosedCaption) < 0
+    m.TransportButtons.appendChild(m.ClosedCaption)
+    m.ClosedCaptionDisabled.visible = false
+  end if
+
+  liveTVGroup = m.top.findNode("LiveTVGroup")
+
+  if content.isLiveTV then
+    liveTVGroup.visible = true
+  else
+    liveTVGroup.visible = false
+  end if
+
+  'if it's not a trailer, remove the skip trailer button
+  if content.isTrailer = false
+    m.TransportButtons.removeChild(m.SkipTrailerButton)
+
+  'add the skip trailer button if it's a trailer and it doesn't already exist on the transport
+  else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
+    m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
   end if
 End Function
 
