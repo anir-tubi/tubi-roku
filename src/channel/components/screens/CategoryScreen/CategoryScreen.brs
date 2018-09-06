@@ -466,7 +466,7 @@ Function onTotalCountsChange(msg)
     end if
   end for
 
-  itemFocused = m.CategoryList.itemFocused
+  itemFocused = m.CategoryList.rowScrollFocused
   m.CategoryList.content = m.categoryContent
   m.CategoryGridList.content = m.categoryContent
   ' NOTE: Setting the content for the CategoryList forces a refresh of the
