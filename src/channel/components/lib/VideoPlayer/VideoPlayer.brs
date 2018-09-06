@@ -962,7 +962,6 @@ Function goToEnd()
   'reset before endScrub because we don't want an ad call made when moving to the next video, let prerolls hit instead
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(true)
-    setFocusedButton(m.EndButton)
   end if
   
   m.monitoringTask.endPlayback = "noerror"
@@ -973,6 +972,8 @@ Function goToEnd()
     m.Video.control = "stop"
     m.top.state = "finished"
   end if
+  animateTransport("out")
+  resetTransportButtons()
 End Function
 
 
