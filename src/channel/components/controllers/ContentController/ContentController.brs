@@ -938,21 +938,48 @@ Function onVideoPlayerBackPressed()
 End Function
 
 ' Stop the video player and refresh detail screen with the relevant content
+'
+' Use cases:                                                Actions:
+'   - Exit video player movie                              : 1 - redraw detail screen with existing detail content to preserve related items
+'   - Exit video player movie after autoplay               : 2 - replace detail screen and fetch full content with related items
+'   - Exit video player series                             : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
+'   - Exit video player series after autoplay              : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
+'   - Exit video player trailer                            : 5 - redraw detail screen with existing detail content to preserve related items
+'   - Deep link: exit video player movie                   : 1 - redraw detail screen with existing detail content to preserve related items
+'   - Deep link: exit video player movie after autoplay    : 2 - replace detail screen and fetch full content with related items
+'   - Deep link: Exit video player series                  : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
+'   - Deep link: Exit video player series after autoplay   : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
 Function returnToDetailScreenFromVideo(result)
   stopVideoContent(result, true)
+
+  ' get updated content, to be used to reload or re-populate details screen
   content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex) 'this always returns a video - sometimes an episode
   m.top.deepLinkContent = invalid
   if content.isTrailer
+    ' Action 5
     content = getDetailScreenContent()
   else if content.parentType = m.constants.ui.contentTypes.series
+    ' Action 3
     currentEpisodeId = content.id
     content = getDetailScreenContent()
     content.currentEpisodeId = currentEpisodeId
+  else if content.id <> invalid and getDetailScreenContent().id <> invalid and content.id = getDetailScreenContent().id  ' no autoplay - same content as already on detail screen
+    ' Action 1
+    content = getDetailScreenContent()
   end if
-  ' Replace the entire detail screen content stack after video playback
+
+  'reload or re-populate the screen as necessary
   if currentScreen() <> invalid and currentScreen().subType() = "DetailScreen"
-    populateDetailScreen(currentScreen(), content, true)
+    if currentScreen().content <> invalid and currentScreen().content.id = content.id
+      ' Action 1, 3, 5 - same content so just re-populate screen with any updates
+      populateDetailScreen(currentScreen(), content, true)
+    else
+      ' Action 2 - new content so tear down the screen and rebuild it
+      popScreen()
+      showDetailScreen(content, invalid)
+    end if
   else
+    ' This is a safety, but no code paths actually lead here currently 2.5.111
     showDetailScreen(content, invalid)
   end if
 End Function
