@@ -330,7 +330,7 @@ End Function
 Function testCase_tubiMetadataTranslate_generateChannelPosterUrl()
   channel = ParseJson(ReadAsciiFile("pkg:/source/tests/units/channel.json"))
   posterUrl = m.translate.generateChannelPosterUrl(channel.container.id)
-  return m.assertEqual(posterUrl, "http://cdn.adrise.tv/image/roku_support_images/channel-poster-cbs.png")
+  return m.assertEqual(posterUrl, "https://cdn.adrise.tv/image/roku_support_images/channel-poster-cbs.png")
 End Function
 
 Function testCase_tubiMetadataTranslate_generateChannelPosterUrl_unbranded()

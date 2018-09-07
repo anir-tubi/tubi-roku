@@ -308,21 +308,14 @@ Function getConstants()
       constants.urls.liveTv.getAll = constants.urls.matrix.urlBase + "/livetv"
 
     'cuepoints url
-    constants.urls.cuepointsBaseUrl = "http://ads.adrise.tv/cue-points/"
-
-    'linear schedule url
-    constants.urls.linearUrl = "http://cms.adrise.com/v3/livetv?cid=roku&platform=roku&id=tubitv"
-
-    'linear poster art urls'
-    constants.urls.linearPosterSDUrl = "http://cdn.adrise.com/hotpatches/roku/LinearTV-beta-SD.jpg"
-    constants.urls.linearPosterHDUrl = "http://cdn.adrise.com/hotpatches/roku/LinearTV-beta-HD.jpg"
+    constants.urls.cuepointsBaseUrl = "https://ads.adrise.tv/cue-points/"
 
     'privacy statement text
-    constants.urls.privacyUrl = "http://cdn.adrise.tv/legal/TubiTVPrivacyPolicy.txt"
+    constants.urls.privacyUrl = "https://cdn.adrise.tv/legal/TubiTVPrivacyPolicy.txt"
 
     'channels poster image urls
-    constants.urls.channelPosterUnbranded = "http://cdn.adrise.tv/image/roku_support_images/channel-poster-generic.png"
-    constants.urls.channelPosterBrandedPrefix = "http://cdn.adrise.tv/image/roku_support_images/channel-poster-"
+    constants.urls.channelPosterUnbranded = "https://cdn.adrise.tv/image/roku_support_images/channel-poster-generic.png"
+    constants.urls.channelPosterBrandedPrefix = "https://cdn.adrise.tv/image/roku_support_images/channel-poster-"
     constants.urls.channelPosterBrandedSuffix = ".png"
 
 
