@@ -61,6 +61,7 @@ End Function
 'Populates the detail screen's state from a content node
 '@content: tubiContentNode
 Function populateDetailScreen(detailScreen, content, resetButtonIndex=false)
+  tubiLog("DetailScreenHelpers.populateDetailScreen")
   'hide the spinner
   wasLoading = detailScreen.isLoading
   detailScreen.isLoading = false

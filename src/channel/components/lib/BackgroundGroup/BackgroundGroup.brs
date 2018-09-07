@@ -8,6 +8,9 @@ Function init()
     type: m.constants.ui.backgroundTypes.fullScreen
     uriList: [m.blurredDefaultBackground]
   }
+  'this is a store that we can check against in order to prevent updateBackground logic from running when
+  'm.top.lastBackgroundInfo is updated with the same info as before. "alwaysNotify" doesn't seem to work on assocArray fields
+  m.lastBackgroundInfo = m.top.backgroundInfo
   m.top.observeField("backgroundInfo", "newBackgroundSet")
 
   m.fullScreenGradient = m.top.findNode("FullScreenGradient")
@@ -33,9 +36,29 @@ End Function
 'Runs when the backgroundType has been set.
 Function newBackgroundSet()
   TubiLog("BackgroundGroup.newBackgroundSet")
-  m.timer.control = "stop"
-  m.isRotation = false
-  updateBackground(0)
+
+  'can't rely on alwaysNotify for m.top.uriList, so run our own logic to determine if the field value has actually changed
+  isSame = true
+  if type(m.lastBackgroundInfo.type) <> type(m.top.backgroundInfo.type) or m.lastBackgroundInfo.type <> m.top.backgroundInfo.type
+    isSame = false
+  else if m.lastBackgroundInfo.uriList.count() <> m.top.backgroundInfo.uriList.count()
+    isSame = false
+  else
+    'types are the same and uriList counts are the same, so check if all elements in uriList are the same
+    for i=0 to m.lastBackgroundInfo.count()-1
+      if type(m.lastBackgroundInfo.uriList[i]) <> type(m.top.backgroundInfo.uriList[i]) or m.lastBackgroundInfo.uriList[i] <> m.top.backgroundInfo.uriList[i]
+        isSame = false
+        exit for
+      end if
+    end for
+  end if
+
+  if isSame = false
+    m.timer.control = "stop"
+    m.isRotation = false
+    updateBackground(0)
+    m.lastBackgroundInfo = m.top.backgroundInfo
+  end if
 End Function
 
 
