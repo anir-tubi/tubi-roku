@@ -20,10 +20,11 @@ function createHotpatch(buildProfile) {
     staging: true,
     production: true,
     default: true,
+    test: true,
   };
 
   if (!validBuildProfiles[buildProfile]) {
-    console.log('Hotpatch not built because of non valid build profile. Must be one of dev, staging, production, default.');
+    console.log('Hotpatch not built because of non valid build profile. Must be one of dev, staging, production, default, test.');
     return;
   }
 
