@@ -1,8 +1,6 @@
 Function init()
   m.top.observeField("focusedChild", "onFocus")
   m.top.observeField("show", "onShow")
-  m.skipContinueScreen = m.global.constants.ui.signIn.skipContinueScreen
-  m.skipSignInRegisterScreen = m.global.constants.ui.signIn.skipSignInRegisterScreen
   m.ScreenStack = m.top.findNode("SignInScreenStack")
   if m.global.constants.deviceInfo.limitedUi = false
     m.ScreenStack.transition = "cascade"
@@ -41,7 +39,7 @@ Function onShow()
     onDisambiguationSignIn()
   else
     m.Disambiguation = CreateObject("roSGNode", "SignInDisambiguationScreen")
-    m.Disambiguation.observeField("signInButtonSelected", "onDisambiguationSignIn")
+    m.Disambiguation.observeField("signInButtonSelected", "onRegister")
     m.Disambiguation.observeField("guestPassButtonSelected", "onDisambiguationGuestPass")
     pushScreen(m.Disambiguation)
   end if
@@ -49,36 +47,11 @@ End Function
 
 
 '''''''''''''''''''''''''''''
-' onDisambiguationSignIn
-'
-' User chose to sign in, display the sign-in/register screen
-Function onDisambiguationSignIn()
-  tubiLog("SignInController.onDisambiguationSignIn")
-  if m.skipSignInRegisterScreen = true
-    'just go straight to the web code registration screen
-    onRegister()
-  else
-    m.SignInRegister = CreateObject("roSGNode", "SignInRegisterScreen")
-    m.SignInRegister.observeField("signInButtonSelected", "onSignIn")
-    m.SignInRegister.observeField("registerButtonSelected", "onRegister")
-    pushScreen(m.SignInRegister)
-  end if
-End Function
-
-
-'''''''''''''''''''''''''''''
 ' onDisambiguationGuestPass
 ' 
-' User chose a guest pass, prompt them once more with a feature list
+' User chose a guest pass
 Function onDisambiguationGuestPass()
-  if m.skipContinueScreen = true
-    m.top.state = "guest"
-  else
-    m.ContinueAsGuest = CreateObject("roSGNode", "ContinueAsGuestScreen")
-    m.ContinueAsGuest.observeField("signInButtonSelected", "onContinueSignIn")
-    m.ContinueAsGuest.observeField("guestPassButtonSelected", "onContinueGuestPass")
-    pushScreen(m.ContinueAsGuest)
-  end if
+  m.top.state = "guest"
 End Function
 
 
@@ -93,45 +66,13 @@ End Function
 
 
 '''''''''''''''''''''''''''''
-' onContinueSignIn
-'
-' At continuation screen, user decided to log in after all
-Function onContinueSignIn()
-  tubiLog("SignInController.onContinueSignIn")
-  if m.skipSignInRegisterScreen = true
-    'just go straight to the web code registration screen
-    onRegister()    
-  else
-    m.SignInRegister = CreateObject("roSGNode", "SignInRegisterScreen")
-    m.SignInRegister.observeField("signInButtonSelected", "onSignIn")
-    m.SignInRegister.observeField("registerButtonSelected", "onRegister")
-    pushScreen(m.SignInRegister)
-  end if
-End Function
-
-
-'''''''''''''''''''''''''''''
-' onSignIn
-'
-' User wants to enter credentials to sign in
-Function onSignIn()
-  tubiLog("SignInController.onSignIn")
-  m.EmailPasswordScreen = CreateObject("roSGNode", "SignInEmailPasswordScreen")
-  m.EmailPasswordScreen.observeField("signInResult", "onSignInResult")
-  pushScreen(m.EmailPasswordScreen)
-End Function
-
-
-'''''''''''''''''''''''''''''
 ' onRegister
 '
 ' User wants to register (or sign-in) via the web site
 Function onRegister()
   tubiLog("SignInController.onRegister")
   m.RegisterInstructions = CreateObject("roSGNode", "RegisterInstructionsScreen")
-  m.RegisterInstructions.skipSignInOption = m.global.constants.ui.signIn.skipSignInOption
   m.RegisterInstructions.observeField("registerSuccess", "onRegisterSuccess")
-  m.RegisterInstructions.observeField("signInButtonPressed", "onSignIn")
   m.RegisterInstructions.observeField("skipButtonPressed", "onContinueGuestPass")
   pushScreen(m.RegisterInstructions)
 End Function
@@ -144,29 +85,4 @@ End Function
 Function onRegisterSuccess()
   tubiLog("SignInController.onRegisterSuccess")
   m.top.state = "registered"
-End Function
-
-'''''''''''''''''''''''''''''
-' onSignInResult
-'
-' User has successfully signed in, set a field to redirect to content
-Function onSignInResult()
-  tubiLog("SignInController.onSignInResult")
-  if m.EmailPasswordScreen.signInResult = true then
-    m.top.state = "signedin"
-  else
-    if m.SignInFailed <> invalid then
-      m.SignInFailed.unobserveField("tryAgainButtonSelected")
-      m.SignInFailed = invalid
-    end if
-    m.SignInFailed = CreateObject("roSGNode", "SignInFailed")
-    m.SignInFailed.observeField("tryAgainButtonSelected", "onTryAgain")
-    pushScreen(m.SignInFailed)
-  end if
-End Function
-
-Function onTryAgain()
-  tubiLog("SignInController.onTryAgain")
-  m.SignInFailed.unobserveField("tryAgainButtonSelected")
-  popScreen()
 End Function

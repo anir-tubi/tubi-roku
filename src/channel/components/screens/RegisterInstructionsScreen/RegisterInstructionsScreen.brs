@@ -1,6 +1,5 @@
 Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("skipSignInOption", "setButtonContent")
   m.Buttons = m.top.findNode("Buttons")
   m.Buttons.observeField("itemSelected", "onButtonSelected")
   m.RegistrationCode1 = m.top.findNode("RegistrationCode1")
@@ -30,18 +29,8 @@ Function setButtonContent()
   refresh = content.createChild("ContentNode")
   refresh.id = "refresh"
   refresh.title = "Refresh Code"
-  if not m.top.skipSignInOption then
-    signIn = content.createChild("ContentNode")
-    signIn.id = "sign-in"
-    signIn.title = "Sign in via Email"
-    ' Layout set for 2 buttons
-    m.Buttons.translation = [437, m.Buttons.translation[1]]
-    m.Buttons.itemSpacing = [86, 0]
-    m.Buttons.numColumns = 2
-  else
-    m.Buttons.translation= [720, m.Buttons.translation[1]]
-    m.Buttons.itemSpacings = [0,0]
-  end if
+  m.Buttons.translation= [720, m.Buttons.translation[1]]
+  m.Buttons.itemSpacings = [0,0]
   m.Buttons.content = content
 End Function
 
@@ -70,9 +59,6 @@ Function onButtonSelected()
   button = m.Buttons.content.getChild(m.Buttons.itemSelected)
   if button.id = "refresh" then
     getRegistrationCode()
-  else if button.id = "sign-in" then
-    m.top.signInButtonPressed = true
-    m.RegCodeTask.cancel = true
   end if
 End Function
 

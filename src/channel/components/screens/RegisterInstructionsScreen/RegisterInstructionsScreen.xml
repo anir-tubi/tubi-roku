@@ -11,14 +11,10 @@
   
   <interface>
     <!-- INPUT -->
-      <field id="skipSignInOption" type="boolean" value="false"/>
 
     <!-- OUTPUT -->
       <!-- Set to true if the user has successfully registered -->
       <field id="registerSuccess" type="boolean" value="false" alwaysNotify="true"/>
-
-      <!-- Set to true when the "Sign in via Email" button is selected -->
-      <field id="signInButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
 
       <!-- Set to true when the "Skip" button on the error modal is selected -->
       <field id="skipButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
