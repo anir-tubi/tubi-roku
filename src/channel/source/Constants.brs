@@ -449,7 +449,7 @@ Function getConstants()
 
     'constants for user specific functionality
     constants.ui.users = {}
-      constants.ui.users.guestHistory = false
+      constants.ui.users.guestHistory = true
 
     'constants needed for sign in flow experimentation
     constants.ui.signIn = {}
