@@ -40,7 +40,7 @@ exports.uploadPkg = function(pkgfile, address, password) {
       archive: fs.createReadStream(pkgfile)
     };
     request.post({url: url, auth: auth, formData: data}, (err, response, body) => {
-      const success = body.match(/<font color="red">Install Success.<\/font>/);
+      const success = !!body ? body.match(/<font color="red">Install Success.<\/font>/) : null
       if (err) {
         rej(err);
       }
