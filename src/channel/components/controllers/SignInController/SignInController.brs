@@ -36,7 +36,7 @@ End Function
 ' that the caller can configure the first screen.
 Function onShow()
   if m.top.skipDisambiguationScreen = true then
-    onDisambiguationSignIn()
+    onRegister()
   else
     m.Disambiguation = CreateObject("roSGNode", "SignInDisambiguationScreen")
     m.Disambiguation.observeField("signInButtonSelected", "onRegister")
