@@ -50,9 +50,9 @@ S3_STAGING_ADDR=s3://adrise-bryan-playground/roku-staging
 S3_COMPONENTS_DIR=components
 
 ifeq ($(ROKU_PROFILE), production)
-RSYNC_EXCLUDE=--exclude source/tests --exclude '.keep'
+RSYNC_EXCLUDE=--exclude source/tests --exclude '.keep' --exclude '.DS_Store' --exclude '*.md'
 else
-RSYNC_EXCLUDE=--exclude '.keep'
+RSYNC_EXCLUDE=--exclude '.keep' --exclude '.DS_Store' --exclude '*.md'
 endif
 
 # The following paths exclude primarily because they break the linter.  Linter should get fixed
