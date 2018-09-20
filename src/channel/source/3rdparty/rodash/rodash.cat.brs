@@ -1,4 +1,4 @@
-' VERSION: rodash 0.1.0
+' VERSION: rodash 0.2.1
 ' LICENSE: Permission is hereby granted, free of charge, to any person obtaining
 ' LICENSE: a copy of this software and associated documentation files (the
 ' LICENSE: "Software"), to deal in the Software without restriction, including
@@ -17,12 +17,6 @@
 ' LICENSE: LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 ' LICENSE: OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 ' LICENSE: WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-Function rodash_andx_(args)
-for each a in args
-if not a then return false
-end for
-return true
-End Function
 Function rodash_cloneNode_(source)
 blacklistedFields = ["change", "focusedChild"]  ' read-only fields
 destination = CreateObject("roSGNode", source.subtype())
@@ -239,12 +233,6 @@ audioOutputChannel: di.GetAudioOutputChannel()
 audioDecodeInfo: di.GetAudioDecodeInfo()
 }
 }
-ic = CreateObject("roImageCanvas")
-if ic <> invalid
-profile.imageCanvas = {
-canvasRect: ic.GetCanvasRect()
-}
-end if
 return profile
 End Function
 Function rodash_difference_(first, second)
@@ -358,12 +346,6 @@ Function rodash_min_(a,b)
 min = invalid
 result = eval("if a <= b then: min = a: else: min = b: end if")
 return min
-End Function
-Function rodash_orx_(args)
-for each a in args
-if a then return true
-end for
-return false
 End Function
 Function rodash_pathAsArray_(path)
 pathRE = CreateObject("roRegex", "\[([0-9]+)\]", "i")
@@ -480,8 +462,6 @@ uriParse: rodash_uri_parse_
 empty: rodash_empty_
 clone: rodash_clone_
 cloneDeep: rodash_cloneDeep_
-andx: rodash_andx_
-orx: rodash_orx_
 cond: rodash_cond_
 map: rodash_map_
 indexOf: rodash_indexOf_

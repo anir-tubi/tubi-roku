@@ -15,7 +15,6 @@ settings:
 
 manifest:
   title: "Tubi"
-  subtitle: "What TV was meant to be"
   mm_icon_focus_hd: "pkg:/images/channel-icon-hd-336x210.png"
   mm_icon_focus_sd: "pkg:/images/channel-icon-sd-246x140.png"
   splash_screen_fhd: "pkg:/images/splash-fhd.png"
