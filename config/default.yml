@@ -25,10 +25,14 @@ manifest:
   # If we ever add "sd" or "hd", the workaround will also need to be removed.
   ui_resolutions: "fhd"
   uri_resolution_autosub: "$$RES$$,sd,hd,fhd"
+  requires_widevine_drm: 1
+  requires_widevine_version: 1.0
 
 component_library_manifest:
   title: "Tubi Component Library"
   subtitle: "Remote loading for scenegraph components"
   sg_component_libs_provided: "TubiRemoteLibrary"
   bs_libs_required: roku_ads_lib
+  requires_widevine_drm: 1
+  requires_widevine_version: 1.0
   hidden: 1
