@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name="EntryScene" extends="Scene">
+
+<script type="text/brightscript" uri="pkg:/components/EntryScene.brs" />
+
+<children>
+    <LayoutGroup>
+      <LabelList id="list" itemSize="[800, 50]" translation="[100,50]" />
+    </LayoutGroup>
+</children>
+
+</component>
