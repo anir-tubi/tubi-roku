@@ -74,8 +74,8 @@ End Function
 ' By default prints to console
 ' @message: string, the message to be logged
 ' @level: string, (optional), the type of debug, must be one of "debug", "error", "info", "warn"
-' @subtype: string, (optional), a small string used to differentiate log messages (required by logging API)
 ' @serverTypeName: string, (semi optional - required for sending log to server), a string that must exist in one of the server types in logConsts, (required by logging API)
+' @subtype: string, (optional), a small string used to differentiate log messages (required by logging API)
 Function tubiLog(message="" as String, level="debug" as String, serverTypeName="" as String, subtype="" as String) as Void
   if level <> "error" and level <> "info" and level <> "warn"
     level = "debug"

@@ -57,7 +57,13 @@ Function Main(startupArgs as Dynamic)
 
   ' apply hotpatch to main brightscript thread
   ' this also verifies startup network connectivity
-  if Hotpatch(settings.hotPatchUrl) <> 0 then
+  hotpatchResult = HotpatchWithRetries(settings.hotPatchUrl)
+  if hotpatchResult.valid <> true then
+    hotpatchResult.delete("valid")
+    errorMessage = FormatJSON(hotpatchResult)
+    hotpatchErrorPort = CreateObject("roMessagePort")
+    errorQ = requestQueue.create(hotpatchErrorPort)
+    log.error(errorMessage, "apiBadResponse", "hotpatch-error", errorQ)
     showErrorDialog()
     return -1 ' exit the app on error.  scene graph exits anyway once
               ' we destroy a Scene and try to create it again.
@@ -69,6 +75,23 @@ End Function
 
 
 
+Function HotpatchWithRetries(hotPatchUrl)
+  maxRetries = 5
+  backoffFactor = 1.5
+  initialBackoff = 1000 'ms
+  pause = initialBackoff
+  retries = 0
+  hotpatchResult = Hotpatch(hotPatchUrl)
+  while hotpatchResult.valid <> true and retries < maxRetries
+    retries += 1
+    pause = pause * backoffFactor
+    sleep(pause)
+    print "Retrying Hotpatch: attempt="; retries+1; " pause="; pause
+    hotpatchResult = Hotpatch(hotPatchUrl)
+  end while
+  return hotpatchResult
+End Function
+
 ''''''''''''''
 ' Hotpatch
 '
@@ -78,7 +101,7 @@ End Function
 '  0 patch applied, or no patch available
 ' -1 network error downloading patch file (not 404)
 '
-Function Hotpatch(hotPatchUrl) As Integer
+Function Hotpatch(hotPatchUrl) As Object
   if len(hotPatchUrl) > 5
     port = CreateObject("roMessagePort")
     transfer = CreateObject("roUrlTransfer")
@@ -90,7 +113,9 @@ Function Hotpatch(hotPatchUrl) As Integer
     transfer.AsyncGetToString()
     msg = wait(10000, transfer.GetMessagePort())
 
-    hotpatchResult = 0
+    hotpatchResult = {
+      valid: true
+    }
     if type(msg) = "roUrlEvent"
       if msg.GetResponseCode() = 200 'all good, server responded back with a hotpatch file
         evalString = msg.GetString()
@@ -103,31 +128,40 @@ Function Hotpatch(hotPatchUrl) As Integer
               print "(hp len: " + str(len(evalString)) + ")"
             else
               print "evalError "; errCode
-              hotpatchResult = -1
+              hotpatchResult.valid = false
+              hotpatchResult.evalErr = errCode
             end if
           else if type(errCode) = "roList"
             print "evalError "
             for each error in errCode
               print error
             end for
-            hotpatchResult = -1
+            hotpatchResult.valid = false
+            if errCode[0] <> invalid and errCode[0].errNo <> invalid
+              hotpatchResult.evalErr = errCode[0].errNo
+            else
+              hotpatchResult.evalErr = -1
+            end if
           end if
         end if
 
       else if msg.GetResponseCode() > 0 'server responded with 403 error or similar - couldn't find the file but server up
         print "No file at hotpatch location"
-        hotpatchResult = -1
+        hotpatchResult.valid = false
+        hotpatchResult.resErr = msg.GetResponseCode()
       
       else
         ' some network failure
         print "Network error downloading hotpatch file"
         print msg.getFailureReason()
-        hotpatchResult = -1
+        hotpatchResult.valid = false
+        hotpatchResult.networkErr = msg.getFailureReason()
       end if
     else if msg = invalid
       'no response back from hotpatch server - either server completely down or more likely user's internet is not connected
       print "Timeout downloading hotpatch file"
-      hotpatchResult = -1
+      hotpatchResult.valid = false
+      hotpatchResult.networkErr = "no response"
     end if
   end if
 
@@ -167,10 +201,15 @@ Function showErrorDialog()
   sgGlobal.constants = m.global.utils.constants
   controller = screen.CreateScene("ErrorController")
   screen.show()
+  message = "There may be an issue with your network connection, or with Tubi's server. "
+  message += "Please check your network connection and try again."
+  message += chr(10)
+  message += chr(10)
+  message += "If you continue to have issues, please contact support@tubi.tv"
   controller.observeField("buttonSelected", port)
   controller.error = {
-    title: "Network Error"
-    message: "Please check your network connection and try again"
+    title: "Connection Error"
+    message: message
     buttonText: "Exit"
   }
 

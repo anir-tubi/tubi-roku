@@ -5,10 +5,13 @@ Function TubiChannel(utils)
     tracking: utils.tracking
     experiments: utils.experiments
     auth: utils.auth
+    log: utils.log
+    requestQueue: utils.requestQueue
 
     'public methods
     runChannel: tubiChannel_runChannel
     deepLink: tubiChannel_deepLink
+    loadRemoteComponents: tubiChannel_loadRemoteComponents
   }
 End Function
 
@@ -53,33 +56,34 @@ Function tubiChannel_runChannel(args, adShim, port) As Void
   enableRemoteComponents = m.constants.externalConfig.info.remote_components
 
   if enableRemoteComponents = 1 then
-    ' Dynamic Component Library loading
-    remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
 
-    print "TubiRemoteLibrary loading from " + m.constants.settings.remoteComponentsUrl
-    ' NOTE: Dynamically setting uri here only works for HTTPS or signed packages.  HTTP will give loadStatus 'none'
-    remoteLibrary.uri = m.constants.settings.remoteComponentsUrl
-    print "TubiRemoteLibrary status is " + remoteLibrary.loadStatus
-
-
-    componentTimer = CreateObject("roTimespan")
-    'Listen for when the remote loading has completed
-    while remoteLibrary.loadStatus <> "ready"
-      msg = wait(1000, port)
-      if type(msgType) = "roSGScreenEvent" and msg.isScreenClosed() then return
-
-      loadStatus = remoteLibrary.loadStatus
-      print "TubiRemoteLibrary status is " + loadStatus
-
-      if componentTimer.totalMilliseconds() > m.constants.timers.remoteComponentTimeout then
-        loadStatus = "failed"
-      end if
-
-      if loadStatus = "failed"
-        showErrorDialog()
-        return
-      end if
+    maxRetries = 5
+    backoffFactor = 1.5
+    initialBackoff = 1000 'ms
+    pause = initialBackoff
+    retries = 0
+    loadStatus = m.loadRemoteComponents(screen)
+    while loadStatus <> "ready" and retries < maxRetries
+      retries += 1
+      pause = pause * backoffFactor
+      sleep(pause)
+      ' To reset state, use a new ComponentLibrary instance
+      remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
+      tubiScene.removeChild(remoteLibrary)
+      newRemoteLibrary = tubiScene.appendChild("ComponentLibrary")
+      print "Retrying loadRemoteComponents: attempt="; retries+1; " pause="; pause
+      loadStatus = m.loadRemoteComponents(screen)
     end while
+
+    if loadStatus <> "ready"
+      error = { loadStatus: loadStatus }
+      errorMessage = FormatJSON(error)
+      errorPort = CreateObject("roMessagePort")
+      errorQ = m.requestQueue.create(errorPort)
+      m.log.error(errorMessage, "apiBadResponse", "remote-components-error", errorQ)
+      showErrorDialog()
+      return
+    end if
 
     'change the client version so we tracking knows we are using the remote components
     if rodash().get(m, "constants.settings.version") <> invalid
@@ -117,6 +121,38 @@ Function tubiChannel_runChannel(args, adShim, port) As Void
       end if
     end if
   end while
+End Function
+
+
+Function tubiChannel_loadRemoteComponents(screen)
+  tubiScene = screen.getScene()
+  port = screen.GetMessagePort()
+
+  ' Dynamic Component Library loading
+  remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
+
+  print "TubiRemoteLibrary loading from " + m.constants.settings.remoteComponentsUrl
+  ' NOTE: Dynamically setting uri here only works for HTTPS or signed packages.  HTTP will give loadStatus 'none'
+  remoteLibrary.uri = m.constants.settings.remoteComponentsUrl
+  print "TubiRemoteLibrary status is " + remoteLibrary.loadStatus
+
+
+  componentTimer = CreateObject("roTimespan")
+  'Listen for when the remote loading has completed
+  while remoteLibrary.loadStatus <> "ready"
+    msg = wait(1000, port)
+    if type(msgType) = "roSGScreenEvent" and msg.isScreenClosed() then
+      return "closed"
+    end if
+
+    loadStatus = remoteLibrary.loadStatus
+    print "TubiRemoteLibrary status is " + loadStatus
+
+    if componentTimer.totalMilliseconds() > m.constants.timers.remoteComponentTimeout then
+      return "timeout"
+    end if
+  end while
+  return remoteLibrary.loadStatus
 End Function
 
 
