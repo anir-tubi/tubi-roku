@@ -65,7 +65,7 @@ Function cmsApi_getSingleContentRequest(contentId, includeChannels=false)
   options = m.commonOptions_()
   options.params.content_id = contentId
   options.params["includeChannels"] = includeChannels
-  return m.request_.createAsync(url, m.constants_.reqNames.getSingleContent, options)
+  return m.createAuthRequest_(url, m.constants_.reqNames.getSingleContent, options)
 End Function
 
 
