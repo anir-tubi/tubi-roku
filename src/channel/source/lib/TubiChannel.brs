@@ -52,11 +52,7 @@ Function tubiChannel_runChannel(args, adShim, port) As Void
     return
   end if
 
-  'flag to enable vs. disable remote components loading
-  enableRemoteComponents = m.constants.externalConfig.info.remote_components
-
-  if enableRemoteComponents = 1 then
-
+  if m.constants.remoteComponents <> false
     maxRetries = 5
     backoffFactor = 1.5
     initialBackoff = 1000 'ms

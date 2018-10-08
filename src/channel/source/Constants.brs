@@ -252,6 +252,10 @@ Function getConstants()
   constants.externalConfig = {}
     constants.externalConfig.info = invalid   'will be replaced in main.brs
 
+  'dictates if the channel should use the remote components (or if false, the installed components)
+  'only change to false in case of emergencies, as installed components will likely break after many remote releases
+  constants.remoteComponents = true
+
   'a list of device ids that will send debug and info logs to the logging API - this will be populated by hotpatch
   'idsToLog is expected to look like {
   '  13GSC41289Y: true
