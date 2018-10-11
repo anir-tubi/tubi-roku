@@ -963,7 +963,7 @@ Function returnToDetailScreenFromVideo(result)
     currentEpisodeId = content.id
     content = getDetailScreenContent()
     content.currentEpisodeId = currentEpisodeId
-  else if content.id <> invalid and getDetailScreenContent().id <> invalid and content.id = getDetailScreenContent().id  ' no autoplay - same content as already on detail screen
+  else if content <> invalid and content.id <> invalid and getDetailScreenContent() <> invalid and getDetailScreenContent().id <> invalid and content.id = getDetailScreenContent().id  ' no autoplay - same content as already on detail screen
     ' Action 1
     content = getDetailScreenContent()
   end if

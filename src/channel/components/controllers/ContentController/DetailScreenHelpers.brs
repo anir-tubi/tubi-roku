@@ -62,90 +62,92 @@ End Function
 '@content: tubiContentNode
 Function populateDetailScreen(detailScreen, content, resetButtonIndex=false)
   tubiLog("DetailScreenHelpers.populateDetailScreen")
-  'hide the spinner
-  wasLoading = detailScreen.isLoading
-  detailScreen.isLoading = false
+  if type(detailScreen) = "roSGNode" and detailScreen.isSubType("DetailScreen") and type(content) = "roSGNode"
+    'hide the spinner
+    wasLoading = detailScreen.isLoading
+    detailScreen.isLoading = false
 
-  'update detail screen state via the input interface
-  detailScreen.title = content.title
-  detailScreen.releaseDate = content.releaseDate
-  detailScreen.genres = content.genres
-  detailScreen.hasTrailer = content.hasTrailer
+    'update detail screen state via the input interface
+    detailScreen.title = content.title
+    detailScreen.releaseDate = content.releaseDate
+    detailScreen.genres = content.genres
+    detailScreen.hasTrailer = content.hasTrailer
 
-  bookmark = m.global.bookmarkIds.findNode(content.id)
-  history = m.global.historyIds.findNode(content.id)
+    bookmark = m.global.bookmarkIds.findNode(content.id)
+    history = m.global.historyIds.findNode(content.id)
 
-  episode = getEpisodeContent(content)
-  episodeHistory = invalid
-  if content.type = m.constants.ui.contentTypes.series
-    if episode <> invalid
-      episodeHistory = m.global.historyIds.findNode(episode.id)
-      detailScreen.episodeTitle = episode.title
+    episode = getEpisodeContent(content)
+    episodeHistory = invalid
+    if content.type = m.constants.ui.contentTypes.series
+      if episode <> invalid
+        episodeHistory = m.global.historyIds.findNode(episode.id)
+        detailScreen.episodeTitle = episode.title
+      end if
+
+      detailScreen.isSeries = true
+      detailScreen.mode = "series"
+    else
+      detailScreen.isSeries = false
+      detailScreen.mode = "movie"
     end if
 
-    detailScreen.isSeries = true
-    detailScreen.mode = "series"
-  else
-    detailScreen.isSeries = false
-    detailScreen.mode = "movie"
+    if episode <> invalid
+      stateSource = episode
+    else
+      stateSource = content
+    end if
+
+    detailScreen.length = stateSource.length
+    detailScreen.rating = stateSource.rating
+    detailScreen.description = stateSource.description
+    detailScreen.directors = stateSource.directors
+    detailScreen.starring = stateSource.actors
+
+    if episode <> invalid and (episode.hasSubtitles = true or not m._.empty(episode.subtitleTracks))
+      detailScreen.hasCC = true
+    else if content <> invalid and content.type = m.constants.ui.contentTypes.video and (content.hasSubtitles = true or not m._.empty(content.subtitleTracks))
+      detailScreen.hasCC = true
+    else
+      detailScreen.hasCC = false
+    end if
+
+    detailScreen.isBookmark = (bookmark <> invalid)
+    detailScreen.isHistory = (history <> invalid)
+    detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "")
+
+    detailScreen.inlineLogoUri = content.inlineLogoUri
+    detailScreen.channelName = content.channelName
+
+    if content.type = m.constants.ui.contentTypes.series and episodeHistory <> invalid and episodeHistory.nowPos > 0
+      detailScreen.resumePoint = episodeHistory.nowPos
+    else if content.type = m.constants.ui.contentTypes.video and history <> invalid and history.nowPos > 0
+      detailScreen.resumePoint = history.nowPos
+    else
+      detailScreen.resumePoint = 0
+    end if
+
+    'tell the detail screen/info panel to vertically center the info panel
+    detailScreen.calculateInfoHeight = true
+
+    detailScreen.relatedContent = content.relatedContent
+
+    if wasLoading or resetButtonIndex
+      detailScreen.jumpToItem = 0
+    end if
+
+    'update the background images for the detail screen
+    if content.backgrounds <> invalid and content.backgrounds.count() > 0
+      backgroundUriList = content.backgrounds
+    else
+      backgroundUriList = [m.defaultBackgroundUri]
+    end if
+    detailScreen.backgroundUriList = backgroundUriList
+    m.backgroundGroup.backgroundInfo = {
+      type: m.constants.ui.backgroundTypes.fullScreen
+      uriList: backgroundUriList
+    }
+    detailScreen.content = content
   end if
-
-  if episode <> invalid
-    stateSource = episode
-  else
-    stateSource = content
-  end if
-
-  detailScreen.length = stateSource.length
-  detailScreen.rating = stateSource.rating
-  detailScreen.description = stateSource.description
-  detailScreen.directors = stateSource.directors
-  detailScreen.starring = stateSource.actors
-
-  if episode <> invalid and (episode.hasSubtitles = true or not m._.empty(episode.subtitleTracks))
-    detailScreen.hasCC = true
-  else if content <> invalid and content.type = m.constants.ui.contentTypes.video and (content.hasSubtitles = true or not m._.empty(content.subtitleTracks))
-    detailScreen.hasCC = true
-  else
-    detailScreen.hasCC = false
-  end if
-
-  detailScreen.isBookmark = (bookmark <> invalid)
-  detailScreen.isHistory = (history <> invalid)
-  detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "")
-
-  detailScreen.inlineLogoUri = content.inlineLogoUri
-  detailScreen.channelName = content.channelName
-
-  if content.type = m.constants.ui.contentTypes.series and episodeHistory <> invalid and episodeHistory.nowPos > 0
-    detailScreen.resumePoint = episodeHistory.nowPos
-  else if content.type = m.constants.ui.contentTypes.video and history <> invalid and history.nowPos > 0
-    detailScreen.resumePoint = history.nowPos
-  else
-    detailScreen.resumePoint = 0
-  end if
-
-  'tell the detail screen/info panel to vertically center the info panel
-  detailScreen.calculateInfoHeight = true
-
-  detailScreen.relatedContent = content.relatedContent
-
-  if wasLoading or resetButtonIndex
-    detailScreen.jumpToItem = 0
-  end if
-
-  'update the background images for the detail screen
-  if content.backgrounds <> invalid and content.backgrounds.count() > 0
-    backgroundUriList = content.backgrounds
-  else
-    backgroundUriList = [m.defaultBackgroundUri]
-  end if
-  detailScreen.backgroundUriList = backgroundUriList
-  m.backgroundGroup.backgroundInfo = {
-    type: m.constants.ui.backgroundTypes.fullScreen
-    uriList: backgroundUriList
-  }
-  detailScreen.content = content
 End Function
 
 

@@ -206,12 +206,12 @@ Function onDirtyUserCategories(msg)
     url = m.constants.urls.matrix.container + "/" + categoryId
     options = {
       params: {
-        "app_id": m.constants.settings.shortAppName,
-        platform: m.constants.platform,
-        "device_id": m.constants.deviceInfo.deviceId,
+        "app_id": m.constants.settings.shortAppName
+        platform: m.constants.platform
+        "device_id": m.constants.deviceInfo.deviceId
         limit: m.constants.performance.categoryGridList.finalBlockSize
-        expand: 1,
-        cursor: 0,
+        expand: 1
+        cursor: 0
         includeEmpty: true
       }
     }

@@ -114,6 +114,7 @@ Function execGetDetailMetadata() As Void
   if thumbnailsReq <> invalid
     if thumbnailsResult <> invalid and thumbnailsResult.response <> invalid and success(thumbnailsResult.response.code)
       parsed = ParseJSON(thumbnailsResult.response.data)
+      spritesContentNode = invalid
       if parsed = invalid then
         tubiLog("DetailMetadataTask failed to parse JSON response")
       else

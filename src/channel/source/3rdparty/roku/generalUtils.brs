@@ -85,9 +85,9 @@ End Sub
 '******************************************************
 Function tostr(any)
     if FindMemberFunction(any, "toStr") <> invalid then ret = any.toStr()
-    if ret = invalid ret = AnyToString(any)
-    if ret = invalid ret = type(any)
-    if ret = invalid ret = "unknown" 'failsafe
+    if ret = invalid then ret = AnyToString(any)
+    if ret = invalid then ret = type(any)
+    if ret = invalid then ret = "unknown" 'failsafe
     return ret
 End Function
 
