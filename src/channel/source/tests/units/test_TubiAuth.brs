@@ -10,7 +10,105 @@ Function TestSuite_TubiAuth()
   this.addTest("requestTokenRefresh", testCase_tubiAuth_requestTokenRefresh)
   this.addTest("testRequestTokenTransfer", testCase_tubiAuth_requestTokenTransfer)
   this.addTest("handleRefreshResponse", testCase_tubiAuth_handleRefreshResponse)
+  this.addTest("handleRefreshResponse_403", testCase_tubiAuth_handleRefreshResponse_403)
+  this.addTest("refreshAuthtoken", testCase_tubiAuth_refreshAuthToken)
+  this.addTest("refreshAuthtoken_failed", testCase_tubiAuth_refreshAuthToken_failed)
+  this.addTest("refreshAuthtoken_403", testCase_tubiAuth_refreshAuthToken_403)
+  this.addTest("transferRefreshToken", testCase_tubiAuth_transferRefreshToken)
+  this.addTest("transferRefreshToken_failed", testCase_tubiAuth_transferRefreshToken_failed)
+  this.addTest("transferRefreshToken_403", testCase_tubiAuth_transferRefreshToken_403)
   return this
+End Function
+
+Function testCase_tubiAuth_refreshAuthToken()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+  oldAuthInfo = {
+    expireTime: 123456
+    accessToken: "Some555Other666String777"
+    refreshToken: "Some111Refresh999String000"
+    userId: "6735"
+  }
+  result = ""
+  ' mocks
+  auth.requestTokenRefresh = Function(authInfo, authPort)
+    return {} ' passes through to handleRefreshResponse so it can be anything but invalid
+  End Function
+
+  auth.handleRefreshResponse = Function(msg, refreshReq)
+    return {
+      access_token: "AABBCCDD"
+      refresh_token: "AABBCCDD"
+      expires_in: 86400
+      user_id: "6735"
+    }
+  End Function
+
+  newAuthInfo = auth.refreshAuthToken(oldAuthInfo, 1)
+  result += m.AssertNotInvalid(newAuthInfo.accessToken)
+  result += m.AssertNotInvalid(newAuthInfo.refreshtoken)
+  return result
+End Function
+
+
+Function testCase_tubiAuth_refreshAuthToken_failed()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+  oldAuthInfo = {
+    expireTime: 123456
+    accessToken: "Some555Other666String777"
+    refreshToken: "Some111Refresh999String000"
+    userId: "6735"
+  }
+  result = ""
+  ' mocks
+  auth.requestTokenRefresh = Function(authInfo, authPort)
+    return {} ' passes through to handleRefreshResponse so it can be anything but invalid
+  End Function
+
+  auth.handleRefreshResponse = Function(msg, refreshReq)
+    return invalid
+  End Function
+
+  newAuthInfo = auth.refreshAuthToken(oldAuthInfo, 1)
+  return m.AssertInvalid(newAuthInfo)
+End Function
+
+Function testCase_tubiAuth_refreshAuthToken_403()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+  oldAuthInfo = {
+    expireTime: 123456
+    accessToken: "Some555Other666String777"
+    refreshToken: "Some111Refresh999String000"
+    userId: "6735"
+  }
+  auth.saveAuthInfo(oldAuthInfo)  ' save it to the registry to verify clearing
+  result = ""
+  ' mocks
+  auth.requestTokenRefresh = Function(authInfo, authPort)
+    return {} ' passes through to handleRefreshResponse so it can be anything but invalid
+  End Function
+
+  auth.handleRefreshResponse = Function(msg, refreshReq)
+    return {} ' indicative of the old tokens being invalid and shoule not be stored
+  End Function
+
+  savedAuthInfo = RegReadAll(auth.authRegKey)
+  result += m.AssertNotInvalid(savedAuthInfo)
+  result += m.AssertNotInvalid(savedAuthInfo.accessToken)
+  result += m.AssertNotInvalid(savedAuthInfo.refreshToken)
+  newAuthInfo = auth.refreshAuthToken(oldAuthInfo, 1)
+  result += m.AssertInvalid(newAuthInfo)
+  result += m.AssertInvalid(newAuthInfo)
+  savedAuthInfo = RegReadAll(auth.authRegKey)
+  result += m.AssertNotInvalid(savedAuthInfo)
+  result += m.AssertInvalid(savedAuthInfo.accessToken)
+  result += m.AssertInvalid(savedAuthInfo.refreshToken)
+  return result
 End Function
 
 Function testCase_tubiAuth_formatAuthInfoFromServer()
@@ -327,6 +425,49 @@ Function testCase_tubiAuth_handleRefreshResponse()
   return result
 End Function
 
+Function testCase_tubiAuth_handleRefreshResponse_403()
+  constants = getConstants()
+  requestObj = TubiRequest()
+  auth = TubiAuth(constants, requestObj)
+  url = "http://127.0.0.1:65535/"
+  server = testHelper_tubiAuth_createMetadataFetchTaskServer(65535)
+  msgPort = CreateObject("roMessagePort")
+  server.SetMessagePort(msgPort)
+  request = requestObj.createAsync(url, "fakeRequest", {})
+  isReqStarted = request.start(msgPort)
+  newAccess = invalid
+  result = ""
+
+  if isReqStarted = true
+    while true
+      msg = wait(0, msgPort)
+
+      if type(msg) = "roSocketEvent"
+
+        connection = server.accept()
+        buffer = connection.receiveStr(1024)
+
+        response =            "HTTP/1.1 403 Forbidden" + Chr(13) + Chr(10)
+        response = response + "Content-length: 0" + Chr(13) + Chr(10)
+        response = response + "Connection: close" + Chr(13) + Chr(10)
+        response = response + Chr(13) + Chr(10)
+        connection.sendstr(response)
+        connection.close()
+      
+      else if type(msg) = "roUrlEvent"
+        newAccess = auth.handleRefreshResponse(msg, request)
+        exit while
+      end if
+
+    end while
+  end if
+  result += m.assertNotInvalid(newAccess)
+  result += m.assertInvalid(newAccess.user_id)
+  result += m.assertInvalid(newAccess.access_token)
+  result += m.assertInvalid(newAccess.refresh_token)
+  result += m.assertInvalid(newAccess.expires_in)
+  return result
+End Function
 
 Function testCase_tubiAuth_createAuthRequest()
   constants = getConstants()
@@ -369,6 +510,114 @@ Function testCase_tubiAuth_createAuthRequest()
   return result
 End Function
 
+
+'**********************
+' transferRefreshToken
+'**********************
+
+Function testCase_tubiAuth_transferRefreshToken()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+  externalAuthInfo = {
+    platform: "ios"
+    externalDeviceId: "AABBCCDD"
+    externalRefreshToken: "Some111Refresh999String000"
+    userId: "6735"
+  }
+  result = ""
+  ' mocks
+  auth.requestTokenRefresh = Function(authInfo, authPort)
+    return {} ' passes through to handleRefreshResponse so it can be anything but invalid
+  End Function
+
+  auth.handleRefreshResponse = Function(msg, refreshReq)
+    return {
+      access_token: "AABBCCDD"
+      refresh_token: "AABBCCDD"
+      expires_in: 86400
+      user_id: "6735"
+    }
+  End Function
+
+  auth.requestTokenTransfer = Function(externalAuthInfo, authPort)
+    return {}
+  End Function
+
+  auth.refreshAuthToken = Function(stubbedAuthInfo, timeout)
+    return {
+      accessToken: "AABBCCDD"
+      refreshToken: "AABBCCDD"
+      expiresTime: 86400
+      userId: "6735"
+    }
+  End Function
+
+  newAuthInfo = auth.transferRefreshToken(externalAuthInfo, 1)
+  result += m.AssertNotInvalid(newAuthInfo)
+  result += m.AssertNotInvalid(newAuthInfo.accessToken)
+  result += m.AssertNotInvalid(newAuthInfo.refreshtoken)
+  return result
+End Function
+
+Function testCase_tubiAuth_transferRefreshToken_failed()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+  externalAuthInfo = {
+    platform: "ios"
+    externalDeviceId: "AABBCCDD"
+    externalRefreshToken: "Some111Refresh999String000"
+    userId: "6735"
+  }
+  result = ""
+  ' mocks
+  auth.requestTokenRefresh = Function(authInfo, authPort)
+    return {} ' passes through to handleRefreshResponse so it can be anything but invalid
+  End Function
+
+  auth.handleRefreshResponse = Function(msg, refreshReq)
+    return invalid
+  End Function
+
+  auth.requestTokenTransfer = Function(externalAuthInfo, authPort)
+    return {}
+  End Function
+
+  newAuthInfo = auth.transferRefreshToken(externalAuthInfo, 1)
+  result += m.AssertInvalid(newAuthInfo)
+  return result
+End Function
+
+Function testCase_tubiAuth_transferRefreshToken_403()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+  externalAuthInfo = {
+    platform: "ios"
+    externalDeviceId: "AABBCCDD"
+    externalRefreshToken: "Some111Refresh999String000"
+    userId: "6735"
+  }
+  result = ""
+  ' mocks
+  auth.requestTokenRefresh = Function(authInfo, authPort)
+    return {} ' passes through to handleRefreshResponse so it can be anything but invalid
+  End Function
+
+  auth.handleRefreshResponse = Function(msg, refreshReq)
+    return {} ' indicates 403
+  End Function
+
+  auth.requestTokenTransfer = Function(externalAuthInfo, authPort)
+    return {}
+  End Function
+
+  newAuthInfo = auth.transferRefreshToken(externalAuthInfo, 1)
+  result += m.AssertInvalid(newAuthInfo)
+  return result
+End Function
+
 Function testHelper_tubiAuth_createMetadataFetchTaskServer(tcpPort As Integer)
   server = CreateObject("roStreamSocket")
   address = CreateObject("roSocketAddress")
@@ -378,3 +627,4 @@ Function testHelper_tubiAuth_createMetadataFetchTaskServer(tcpPort As Integer)
   server.listen(4)
   return server
 End Function
+

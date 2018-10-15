@@ -107,8 +107,14 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
       newAccess = m.handleRefreshResponse(msg, refreshReq)
 
       if newAccess <> invalid
-        newAuthInfo = m.updateAuthInfo(newAccess, authInfo)
-        newAuthInfo = m.saveAuthInfo(newAuthInfo) 'returns invalid if not saved to the registry
+        if newAccess.access_token <> invalid
+          newAuthInfo = m.updateAuthInfo(newAccess, authInfo)
+          newAuthInfo = m.saveAuthInfo(newAuthInfo) 'returns invalid if not saved to the registry
+        else
+          ' Be careful to only do this if the service rejected suth refresh.  We don't
+          ' want to sign users out for transient errors like network down.
+          m.deleteAuthInfo()
+        end if
         exit while
       end if
 
@@ -149,13 +155,15 @@ Function tubiAuth_transferRefreshToken(externalAuthInfo, timeout=10)
       newRefreshToken = m.handleRefreshResponse(msg, transferReq)
 
       if newRefreshToken <> invalid
-        stubbedAuthInfo = {
-          refreshToken: newRefreshToken.refresh_token
-          userId: externalAuthInfo.userId
-        }
+        if newRefreshToken.refresh_token <> invalid
+          stubbedAuthInfo = {
+            refreshToken: newRefreshToken.refresh_token
+            userId: externalAuthInfo.userId
+          }
 
-        'get new auth token and save new auth info to registry
-        newAuthInfo = m.refreshAuthToken(stubbedAuthInfo, timeout)
+          'get new auth token and save new auth info to registry
+          newAuthInfo = m.refreshAuthToken(stubbedAuthInfo, timeout)
+        end if
         exit while
       end if
 
@@ -377,7 +385,10 @@ function tubiAuth_handleRefreshResponse_(msg, refreshRequest)
   responseInfo = refreshRequest.handleEvent(msg)
 
   if responseInfo <> invalid and responseInfo.response <> invalid and responseInfo.response.data <> invalid
-    if responseInfo.response.data.len() > 0
+    if responseInfo.response.code = 403
+      ' refresh token was expired
+      newAccess = {}
+    else if responseInfo.response.data.len() > 0
       newAccess = ParseJson(responseInfo.response.data)
     end if
   end if
