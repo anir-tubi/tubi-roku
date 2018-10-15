@@ -35,7 +35,7 @@ REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
   --include 'source/3rdparty/**' \
   --include 'components' \
   --include 'components/**' \
-  --include-from=new_images_since_2_5 \
+  --include-from=new_images_since_2_6 \
   --exclude '*'
 DEV_PORT=8085
 DEV_PASSWORD?=1234
