@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="ParentalControlsPanel" extends="Panel" >
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="./ParentalControlsPanel.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+      <!-- make a particular setting "checked" and focused -->
+      <field id="selectItem" type="integer" alwaysNotify="true"/>
+      <field id="offset" alias="Offset.translation"/>
+      <field id="isLoading" type="boolean"/>
+
+    <!-- OUTPUTS -->
+      <field id="itemSelected" alias="ParentalControlsMenu.itemSelected" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+    <Group
+      id="Offset">
+
+    <Group
+      id="ContentGroup">
+      <Label 
+        id="Title"
+        height="73"
+        vertAlign="bottom"
+        translation="[25,0]"
+        text="Parental Controls">
+        <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-SemiBold.ttf"
+         size="43" />
+      </Label>
+
+      <Label 
+        id="Instructions"
+        width="1090"
+        wrap="true"
+        vertAlign="bottom"
+        translation="[25,130]">
+        <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-SemiBold.ttf"
+         size="27" />
+      </Label>
+
+      <MarkupList
+        id="ParentalControlsMenu"
+        numRows="12"
+        itemSize="[560,80]"
+        itemSpacing="[0,8]"
+        itemComponentName="CheckButton"
+        vertFocusAnimationStyle="floatingFocus"
+        translation="[0,338]">
+        <ContentNode
+          id="SettingsMenuContent"
+          role="content">
+          <CheckButtonContentNode
+            title="Little Kids (G, TV-Y, TV-G)"/>
+          <CheckButtonContentNode
+            title="Older Kids (PG, TV-PG, TV-Y7)"/>
+          <CheckButtonContentNode
+            title="Teens (PG-13, TV-14)"/>
+            <CheckButtonContentNode
+            title="Adults (R, TV-MA, NC-17)"/>
+        </ContentNode>
+      </MarkupList>
+    </Group>
+
+    <Spinner
+      id="Spinner"
+      visible="false"
+      isDisabled="false"
+      height="717"
+      width="1034"
+      translation="[0,0]"/>
+    </Group>
+  </children>
+</component>

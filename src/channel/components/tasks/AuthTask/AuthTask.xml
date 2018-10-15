@@ -43,12 +43,18 @@
          -->
         <field id="nowPos" type="integer" />
 
+        <!-- updateParentalSetting -->
+        <field id="password" type="string"/>
+        <field id="parentalSetting" type="integer"/>
 
       <!-- OUTPUT -->
         <!-- execInitializeUserData, execSignOut, updateHistory:
         -        auth info blob from Auth.getAuthInfo(), or invalid if signed out
         -->
         <field id="authInfo" type="assocarray" alwaysNotify="true" />
+
+
+        <field id="userInfo" type="assocarray" alwaysNotify="true"/>
 
         <!-- execInitializeUserData, execSignOut:
         -        BookmarkContentNode tree of bookmarks

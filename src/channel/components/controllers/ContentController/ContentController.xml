@@ -22,6 +22,8 @@
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ChannelScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/DetailScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/EpisodeScreenHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ToolsMenuHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/SettingsScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ScreenStack.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />

@@ -3,10 +3,6 @@ Function init()
   m.Icon = m.top.findNode("Icon")
   m.DetailsMenuText = m.top.findNode("DetailsMenuText")
   m.Progress = m.top.findNode("ResumeProgressBar")
-
-' Width needed to compute progress bar width.
-  m.top.width = 440
-
   m.top.color = m.global.constants.ui.colors.transparent
   m.Progress.color = m.global.constants.ui.colors.focusedText
 End Function

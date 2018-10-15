@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="SignOutPanel" extends="Panel" >
+  <script type="text/brightscript" uri="./SignOutPanel.brs" />
+
+  <interface>
+    <field id="name"   type="string"/>
+    <field id="email"  type="string"/>
+    <field id="offset" alias="Offset.translation"/>
+  </interface>
+
+  <children>
+    <Group
+      id="Offset">
+      <Label 
+        id="Title"
+        height="73"
+        vertAlign="bottom"
+        text="Sign Out">
+        <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-SemiBold.ttf"
+         size="43" />
+      </Label>
+
+      <LayoutGroup
+        itemSpacings="[28]"
+        translation="[0,130]">
+        <Label 
+          id="Name"
+          height="38"
+          vertAlign="bottom">
+          <Font
+           role="font"
+           uri="pkg:/fonts/Vaud-SemiBold.ttf"
+           size="38" />
+        </Label>
+
+        <Label 
+          id="Email"
+          height="27"
+          vertAlign="bottom">
+          <Font
+           role="font"
+           uri="pkg:/fonts/Vaud-SemiBold.ttf"
+           size="27" />
+        </Label>
+      </LayoutGroup>
+    </Group>
+  </children>
+</component>

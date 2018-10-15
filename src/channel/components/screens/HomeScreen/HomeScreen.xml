@@ -11,37 +11,33 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   
   <interface>
-    <field id="signedIn" type="boolean" value="false" />
+    <!-- INPUTS -->
+      <field id="signedIn" type="boolean" value="false" />
         
-    <!-- will be used to change the background images on the content controller -->
-    <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
-    <field id="backgroundType" type="string" />
+      <!-- TODO: Plumb this to OnNowOverlay when the play button is selected -->
+      <field id="hideUI" type="boolean"/>
     
-    <field id="focusTarget" type="node"/>
+      <field id="onNowContent" alias="OnNow.content"/>
     
-    <!-- TODO: Plumb this to OnNowOverlay when the play button is selected -->
-    <field id="hideUI" type="boolean"/>
-    
-    <field id="onNowContent" alias="OnNow.content"/>
-    
-    <!-- WRITE-ONLY: setting this field to true causes the category screen to be navigated to -->
-    <field id="showCategoryScreen" type="boolean" value="false" alwaysNotify="true"/>
+      <!-- setting this field to true causes the category screen to be navigated to -->
+      <field id="showCategoryScreen" type="boolean" value="false" alwaysNotify="true"/>
 
-    <!-- Manages trackingCount across child screens that are all counted as 
+    <!-- OUTPUT -->
+      <field id="toolsMenuSelected" type="boolean" alwaysNotify="true"/>
+
+      <!-- will be used to change the background images on the content controller -->
+      <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
+      <field id="backgroundType" type="string" />
+
+      <!-- Manages trackingCount across child screens that are all counted as
          navigate_within_screen events from analytics point of view -->
-    <field id="trackingUri" type="string"  value="/home" />
-    <field id="trackingCount" type="integer"  value="0" />
+      <field id="trackingUri" type="string"  value="/home" />
+      <field id="trackingCount" type="integer"  value="0" />
   </interface>
   
   <children>
     <Group
       id="HomeViews">
-      <ToolsMenu
-        id="ToolsMenu"
-        visible="true"
-        opacity="0.0"
-        translation="[0,0]"/>
-      
       <OnNow
         id="OnNow"
         visible="true"
@@ -63,7 +59,5 @@
       uri="pkg:/images/logo-white-large.png"
       translation="[85,55]" />
 
-    <TrackingLoggingTask
-      id="TrackingLoggingTask" />
   </children>
 </component>

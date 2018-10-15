@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="ScrollingTextPanel" extends="Panel" >
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="./ScrollingTextPanel.brs" />
+
+  <interface>
+    <field id="title" alias="Title.text"/>
+    <field id="text"  alias="Text.text"/>
+    <field id="offset" alias="Offset.translation"/>
+    <field id="isLoading" type="boolean"/>
+  </interface>
+
+  <children>
+    <Group
+      id="Offset">
+      <Group
+        id="ContentGroup">
+        <Label 
+          id="Title"
+          height="73"
+          vertAlign="bottom">
+          <Font
+           role="font"
+           uri="pkg:/fonts/Vaud-SemiBold.ttf"
+           size="43" />
+        </Label>
+
+        <ScrollableText
+          id="Text"
+          height="717"
+          width="1034"
+          translation="[0,130]"
+          scrollbarThumbBitmapUri="pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png">
+          <Font
+           role="font"
+           uri="pkg:/fonts/Vaud-Medium.ttf"
+           size="27" />
+        </ScrollableText>
+      </Group>
+
+      <Spinner
+        id="Spinner"
+        visible="false"
+        isDisabled="false"
+        height="717"
+        width="1034"
+        translation="[0,0]"/>
+    </Group>
+  </children>
+</component>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="SettingsScreen" extends="Group" >
+  <script type="text/brightscript" uri="pkg:/components/screens/SettingsScreen/SettingsScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+      <!-- show or hide the Sign Out panel -->
+      <field id="signedIn" type="boolean" value="false" />
+
+      <!-- populate the sign out panel with these values -->
+      <field id="name"            type="string"/>
+      <field id="email"           type="string"/>
+
+    <!-- OUTPUTS -->
+      <!-- triggers for upstream controller -->
+      <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
+      <field id="trackingUri" type="string"/>
+      <field id="trackingCount" type="integer"/>
+
+      <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
+      <field id="signInSelected" type="boolean" alwaysNotify="true"/>
+      <field id="parentalSettingSelected" type="integer" alwaysNotify="true"/>
+      <field id="remoteParentalSetting" type="integer" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+    <Poster
+      id="TubiLogo"
+      height="45"
+      width="103"
+      opacity="0.5"
+      uri="pkg:/images/logo-white-large.png"
+      translation="[85,55]" />
+
+    <Label 
+      id="Title"
+      text="Settings"
+      height="73"
+      translation="[85,227]">
+      <Font
+       role="font"
+       uri="pkg:/fonts/Vaud-SemiBold.ttf"
+       size="67" />
+    </Label>
+
+    <LayoutGroup
+      id="ToolbarHint"
+      layoutDirection="horiz"
+      vertAlignment="custom"
+      opacity="0.5"
+      translation="[837,58]">
+      <Label
+        text="PRESS"
+        vertAlign="center"
+        height="47"
+        translation="[0,2]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+      <Poster
+        uri="pkg:/images/back.png"
+        width="47"
+        height="47"/>
+      <Label
+        text="FOR TOOLBAR"
+        vertAlign="center"
+        height="47"
+        translation="[0,2]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+    </LayoutGroup>
+
+    <PanelSet
+      id="PanelSet"
+      width="1920"
+      height="550"
+      translation="[60,477]"/>
+  </children>
+</component>

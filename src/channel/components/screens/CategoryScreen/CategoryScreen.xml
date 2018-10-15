@@ -51,7 +51,7 @@
       <!-- Trigger the content to be loaded.  This field is used to delay
            the initial category content loading until after the stateful
            fields have been set (e.g. signedIn) -->
-      <field id="loadAllCategories" type="boolean" value="false"/>
+      <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
 
     <!-- OUTPUTS -->
       <!-- keeps the uri used for user tracking -->
@@ -107,28 +107,39 @@
           translation="[929,55]"
           opacity="0.5"/>
       </Group>
-      <Group
+
+      <LayoutGroup
         id="SearchSignOutHint"
+        layoutDirection="horiz"
+        vertAlignment="custom"
         opacity="0.5"
-        visible="false">
-        <Poster
-          id="LiveUpTriangle"
-          uri="pkg:/images/up-arrow.png"
-          width="47"
-          height="47"
-          translation="[843,57]" />
+        translation="[837,58]">
         <Label
-          id="AllChannels"
-          text="SEARCH &amp; MORE"
+          text="PRESS"
           vertAlign="center"
           height="47"
-          translation="[892,61]">
+          translation="[0,2]">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-SemiBold.ttf"
             size="22" />
         </Label>
-      </Group>
+        <Poster
+          uri="pkg:/images/back.png"
+          width="47"
+          height="47"/>
+        <Label
+          text="FOR SEARCH &amp; MORE"
+          vertAlign="center"
+          height="47"
+          translation="[0,2]">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+      </LayoutGroup>
+
       </Group>
       <InfoPanel
         id="InfoPanel"

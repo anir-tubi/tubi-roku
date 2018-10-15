@@ -16,6 +16,9 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     getInitialHistoryReq: tubiBookmarks_getInitialHistoryReq
     handleInitialBookmarks: tubiBookmarks_handleInitialBookmarks
     handleInitialHistory: tubiBookmarks_handleInitialHistory
+    getUserInfoReq: tubiBookmarks_getUserInfoReq
+    handleUserInfo: tubiBookmarks_handleUserInfo
+    updateParentalRatingReq: tubiBookmarks_updateParentalRatingReq
 
     'private methods
     createBookmarksRequest: tubiBookmarks_createBookmarksRequest_
@@ -326,4 +329,62 @@ function tubiBookmarks_handleInitialHistory(initialHistory)
     end for
   end if
   return historyIds
+end function
+
+function tubiBookmarks_getUserInfoReq()
+  authInfo = m.auth.getAuthInfo()
+  if authInfo = invalid or authInfo.accessToken = invalid
+    return invalid
+  end if
+
+  url = m.constants.urls.users.settings + "/" + authInfo.userId.toStr() + "/settings"
+  options = {
+    params: {
+      platform: m.constants.platform
+    }
+  }
+  return m.auth.createAuthRequest(url, "getUserInfo", options)
+end function
+
+function tubiBookmarks_handleUserInfo(userInfo)
+  result = {}
+  parsed = ParseJson(userInfo)
+  if parsed <> invalid
+    if parsed.user_id <> invalid then         result.userId = parsed.user_id
+    if parsed.email <> invalid then           result.email = parsed.email
+    if parsed.facebook_id <> invalid then     result.facebookId = parsed.facebook_id
+    if parsed.name <> invalid then            result.name = parsed.name
+    if parsed.first_name <> invalid then      result.firstName = parsed.first_name
+    if parsed.last_name <> invalid then       result.lastName = parsed.last_name
+    if parsed.profile_pic <> invalid then     result.profilePic = parsed.profile_pic
+    if parsed.gender <> invalid then          result.gender = parsed.gender
+    if parsed.birthday <> invalid then        result.birthday = parsed.birthday
+    if parsed.phone_number <> invalid then    result.phoneNumber = parsed.phone_number
+    if parsed.is_confirmed <> invalid then    result.isConfirmed = parsed.is_confirmed
+    if parsed.enabled <> invalid then         result.enabled = parsed.enabled
+    if parsed.has_password <> invalid then    result.hasPassword = parsed.has_password
+    if parsed.parental_rating <> invalid then result.parentalRating = parsed.parental_rating
+  end if
+  return result
+end function
+
+function tubiBookmarks_updateParentalRatingReq(newRating, password)
+  authInfo = m.auth.getAuthInfo()
+  if authInfo = invalid or authInfo.accessToken = invalid
+    return invalid
+  end if
+
+  url = m.constants.urls.users.settings + "/" + authInfo.userId.toStr() + "/settings/parental_rating"
+  body = {
+    parental_rating: newRating
+    password: password
+  }
+  options = {
+    method: m.constants.reqTypes.put
+    params: {
+      platform: m.constants.platform
+    }
+    body: FormatJson(body)
+  }
+  return m.auth.createAuthRequest(url, "updateParentalRating", options)
 end function

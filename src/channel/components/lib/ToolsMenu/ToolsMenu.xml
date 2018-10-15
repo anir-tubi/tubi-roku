@@ -4,84 +4,80 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
-    <!-- read/write field -->
-    <field id="signedIn" type="boolean" value="false" />
+    <!-- INPUTS -->
+      <field id="signedIn" type="boolean" value="false" />
     
-    <!-- read fields -->
-    <field id="itemSelected" alias="Menu.itemSelected" />
-    <field id="content" alias="Menu.content" />
-    
-    <field id="downButtonPressed" type="boolean" alwaysNotify="true" />
-    
-    <!-- set to true when the user has selected the "Search" button -->
-    <field id="searchSelected" type="boolean" alwaysNotify="true"/>
+    <!-- OUTPUTS -->
+      <field id="searchSelected" type="boolean" alwaysNotify="true"/>
+      <field id="signInSelected" type="boolean" alwaysNotify="true"/>
+      <field id="settingsSelected" type="boolean" alwaysNotify="true"/>
+      <field id="exitSelected" type="boolean" alwaysNotify="true"/>
+      <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
 
-    <!-- set to true when the user has selected the "Sign in" button -->
-    <field id="signInSelected" type="boolean" alwaysNotify="true"/>
+      <!-- will be used to change the background images on the content controller -->
+      <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
 
-    <!-- set to true when the user has selected the "Sign Out" button -->
-    <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
-
-    <!-- set to true when the user has selected the "About" button -->
-    <field id="aboutSelected" type="boolean" alwaysNotify="true"/>
-    
-    <!-- set to true when the user has selected the "Privacy" button -->
-    <field id="privacySelected" type="boolean" alwaysNotify="true"/>
-    
-    <!-- will be used to change the background images on the content controller -->
-    <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
-
-    <!-- observed by HomeScreen for navigating between screens -->
-    <field id="trackingUri" type="string"/>
-    <field id="trackingCount" type="integer"/>
-    
+      <!-- observed by HomeScreen for navigating between screens -->
+      <field id="trackingUri" type="string" value="home/ott-toolbar"/>
+      <field id="trackingCount" type="integer"/>
     
   </interface>
 
   <children>
-    <RowList
-      id="Menu"
-      visible="true"
-      itemComponentName="SignInPoster"
-      translation="[85,257]"
-      itemSize="[1760,400]"
-      itemSpacing="[0,28]"
-      numRows="1"
-      rowSpacings="[0]"
-      rowItemSize="[[430,400]]"
-      rowItemSpacing="[[10,0]]"
-      showRowLabel="[false]"
-      showRowCounter="[false]"
-      focusBitmapUri="pkg:/images/menu-focus-fhd.9.png"
-      drawFocusFeedbackOnTop="false" />
+    <Poster
+      id="tubiLogo"
+      height="45"
+      width="103"
+      opacity="0.5"
+      uri="pkg:/images/logo-white-large.png"
+      translation="[85,55]" />
 
-    <ContentNode
-      id="SearchSignInContent">
-      <ContentNode
-        id="SearchSignInContentRow">
+    <LayoutGroup
+      horizAlignment="center"
+      translation="[960,257]">
+      <RowList
+        id="Menu"
+        visible="true"
+        itemComponentName="SignInPoster"
+        itemSize="[1760,400]"
+        itemSpacing="[0,28]"
+        numRows="1"
+        rowSpacings="[0]"
+        rowItemSize="[[430,400]]"
+        rowItemSpacing="[[10,0]]"
+        showRowLabel="[false]"
+        showRowCounter="[false]"
+        focusBitmapUri="pkg:/images/menu-focus-fhd.9.png"
+        drawFocusFeedbackOnTop="false" >
         <ContentNode
-          id="SearchMenuItem"
-          title="Search"
-          description="Find movies and TV shows by title, search for cast members, genres and more."
-          HDGRIDPOSTERURL="pkg:/images/icon-search-large.png"/>
-        <ContentNode
-          id="SignInOutMenuItem"
-          title="Sign in"
-          description="Sign in to Tubi. Access your Queue and Continue Watching lists across your devices."
-          HDGRIDPOSTERURL="pkg:/images/icon-sign-in-large.png"/>
-        <ContentNode
-          id="AboutMenuItem"
-          title="About"
-          description="View general information about Tubi including the version number of this app."
-          HDGRIDPOSTERURL="pkg:/images/icon-about-large.png"/>
-        <ContentNode
-          id="PrivacyMenuItem"
-          title="Privacy"
-          description="Review Tubi's privacy policy."
-          HDGRIDPOSTERURL="pkg:/images/icon-privacy-large.png"/>
-      </ContentNode>
-    </ContentNode>
-    
+          id="SearchSignInContent"
+          role="content">
+          <ContentNode
+            id="SearchSignInContentRow">
+            <ContentNode
+              id="SearchMenuItem"
+              title="Search"
+              description="Find movies and TV shows by title, search for cast members, genres and more."
+              HDGRIDPOSTERURL="pkg:/images/icon-search-large.png"/>
+            <ContentNode
+              id="SettingsMenuItem"
+              title="Settings"
+              description="Modify Parental Controls, Customize Closed Captions, View Privacy Policy and Learn About Tubi"
+              HDGRIDPOSTERURL="pkg:/images/icon-settings-large.png"/>
+            <ContentNode
+              id="SignInMenuItem"
+              title="Sign In"
+              description="Sign in to Tubi. Access your Queue and Continue Watching lists across your devices."
+              HDGRIDPOSTERURL="pkg:/images/icon-sign-in-large.png"/>
+            <ContentNode
+              id="ExitMenuItem"
+              title="Exit Tubi"
+              description="Exit Tubi"
+              HDGRIDPOSTERURL="pkg:/images/icon-exit-large.png"/>
+          </ContentNode>
+        </ContentNode>
+      </RowList>
+    </LayoutGroup>
     <Label
       id="Description"
       text=""
@@ -96,25 +92,5 @@
         uri="pkg:/fonts/Vaud-Medium.ttf"
         size="30"/>
     </Label>
-    <Group
-      id="OnNowHint-Tools"
-      visible="false">
-      <Poster
-        id="DownArrow-Tools"
-        uri="pkg:/images/down-arrow.png"
-        visible="true"
-        width="47"
-        height="47"
-        translation="[880,913]"
-        opacity="0.5"/>
-      <Poster
-        id="onNowIcon-Tools"
-        uri="pkg:/images/icon-on-now.png"
-        visible="true"
-        width="115"
-        height="55"
-        translation="[935,908]"
-        opacity="0.5"/>
-    </Group>
   </children>
 </component>

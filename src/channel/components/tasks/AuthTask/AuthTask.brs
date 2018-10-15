@@ -13,7 +13,11 @@ Function execInitializeUserData()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()
 
-  userCats = getInitalUserCategories(Bookmarks, true, true)
+  userCats = getInitalUserCategories(Bookmarks, true, true, true)
+  ' enhance the auth tokens with the user profile information
+  if authInfo <> invalid and userCats.userInfo <> invalid
+    authInfo.append(userCats.userInfo)
+  end if
 
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
@@ -32,7 +36,7 @@ Function execSignOut()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()
 
-  userCats = getInitalUserCategories(Bookmarks, true, false)
+  userCats = getInitalUserCategories(Bookmarks, true, false, false)
 
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
@@ -172,7 +176,7 @@ Function updateHistory()
 End Function
 
 
-Function getInitalUserCategories(Bookmarks, getHistory=true, getBookmarks=false)
+Function getInitalUserCategories(Bookmarks, getHistory=true, getBookmarks=false, getUserInfo=false)
   queuePort = CreateObject("roMessagePort")
   queue = TubiRequestQueue().create(queuePort)
   localBookmarkReqId = "bookmark"
@@ -184,6 +188,14 @@ Function getInitalUserCategories(Bookmarks, getHistory=true, getBookmarks=false)
     newBookmarks: newBookmarks
     newHistory: newHistory
   }
+
+  if getUserInfo = true
+    userInfoReq = Bookmarks.getUserInfoReq()
+    if userInfoReq <> invalid
+      userInfoReq.localId = "userInfo"
+      queue.pushRequest(userInfoReq)
+    end if
+  end if
 
   if getBookmarks = true
     initialBookmarksReq = Bookmarks.getInitialBookmarksReq(localBookmarkReqId)
@@ -209,10 +221,58 @@ Function getInitalUserCategories(Bookmarks, getHistory=true, getBookmarks=false)
           userCategories.newBookmarks = Bookmarks.handleInitialBookmarks(handledReq.response.data)
         else if handledReq.localId = localHistoryReqId
           userCategories.newHistory = Bookmarks.handleInitialHistory(handledReq.response.data)
+        else if handledReq.localId = "userInfo"
+          userCategories.userInfo = Bookmarks.handleUserInfo(handledReq.response.data)
         end if
       end if
     end if
   end while
 
   return userCategories
+End Function
+
+
+Function updateParentalSetting()
+  tubiLog("AuthTask.updateParentalSetting")
+  Request = TubiRequest()
+  Auth = TubiAuth(m.global.constants, Request)
+  NodeHelpers = TubiNodeHelpers()
+  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
+  authInfo = Auth.getAuthInfo()
+
+  'only do the following if the user is logged in
+  updateParentalReq = Bookmarks.updateParentalRatingReq(m.top.parentalSetting, m.top.password)
+
+  if updateParentalReq <> invalid
+    result = updateParentalReq.runSynchronous()
+    if result <> invalid
+      ' Force a refresh since the user token contains the parental control setting
+      m.top.authInfo = Auth.refreshAuthToken(authInfo, 5)
+      m.top.result = updateParentalReq.response
+    else
+      m.top.result = invalid
+    end if
+  else
+    m.top.result = invalid
+  end if
+  tubiLog("EXIT AuthTask.updateParentalSetting")
+End Function
+
+Function execGetUserInfo()
+  tubiLog("AuthTask.getUserInfo")
+  constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(constants, Request)
+  NodeHelpers = TubiNodeHelpers()
+  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
+  authInfo = Auth.getAuthInfo()
+
+  result = getInitalUserCategories(Bookmarks, false, false, true)
+  if result <> invalid and result.userInfo <> invalid
+    ' Just in case settings have changed, refresh the auth token
+    Auth.refreshAuthToken(authInfo, 5)
+    m.top.userInfo = result.userInfo
+  else
+    m.top.userInfo = invalid
+  end if
 End Function

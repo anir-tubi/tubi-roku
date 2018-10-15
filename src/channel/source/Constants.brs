@@ -297,6 +297,7 @@ Function getConstants()
       constants.urls.users.queues = constants.urls.users.urlBase + "/queues"
       constants.urls.users.history = constants.urls.users.urlBase + "/histories"
       constants.urls.users.config = constants.urls.users.urlBase + "/config/" + constants.platform
+      constants.urls.users.settings = constants.urls.users.urlBase + "/users" ' + "/:id/settings"
 
     'user event tracking url
     constants.urls.dataScience = {}
@@ -316,6 +317,7 @@ Function getConstants()
 
     'privacy statement text
     constants.urls.privacyUrl = "https://cdn.adrise.tv/legal/TubiTVPrivacyPolicy.txt"
+    constants.urls.termsOfUseUrl = "https://cdn.adrise.tv/legal/TubiTVTermsOfUse.txt"
 
     'channels poster image urls
     constants.urls.channelPosterUnbranded = "https://cdn.adrise.tv/image/roku_support_images/channel-poster-generic.png"

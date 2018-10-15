@@ -111,6 +111,7 @@ Function onScreenStackEmpty()
 End Function
 
 Function onComponentFocus()
+  tubiLog("ContentController.onComponentFocus")
   if m.top.isInFocusChain() and m.top.hasFocus()
     if m.videoPlayer.visible = true
       m.videoPlayer.setFocus(true)
@@ -442,15 +443,16 @@ Function onAuthInfoReceived()
   '    DetailScreen - just history/bookmarks
   '    EpisodeScreen - history
 
-  if m.homeScreen <> invalid
-    m.homeScreen.signedIn = (m.global.authInfo <> invalid)
-  end if
+  for i=0 to m.ScreenStack.getChildCount()-1
+    screen = m.ScreenStack.getChild(i)
+    if screen.hasField("signedIn")
+      screen.signedIn = (m.global.authInfo <> invalid)
+    end if
+  end for
+
   if m.categoryScreen <> invalid
     m.categoryScreen.dirtyUserCategories = m.constants.ui.categoryIds.queue
     m.categoryScreen.dirtyUserCategories = m.constants.ui.categoryIds.history
-  end if
-  if m.searchScreen <> invalid
-    m.searchScreen.signedIn = (m.global.authInfo <> invalid)
   end if
   refreshAllDetailScreens()
   m.spinner.visible = false
@@ -535,33 +537,12 @@ Function refreshAllDetailScreens()
 End Function
 
 
-''''''''''''''''''''
-' onSearchSelected
-'
-' Show the search screen
-Function onSearchSelected()
-  tubiLog("ContentController.onSearchSelected")
-  m.searchScreen = CreateObject("roSGNode", "SearchScreen")
-  m.searchScreen.observeFieldScoped("contentSelected", "onSearchContentSelected")
-  m.searchScreen.observeFieldScoped("backgroundUriList", "onSearchBackgroundChange")
-  pushScreen(m.searchScreen, true)
-End Function
-
 Function onSearchContentSelected()
   tubiLog("ContentController.onSearchContentSelected")
   m.autoplayContext = invalid
   showDetailScreen(m.searchScreen.contentSelected, m.searchScreen.trackingUri)
 End Function
 
-
-''''''''''''''''''''
-' onSignInSelected
-'
-' Launch the sign in experience
-Function onSignInSelected()
-  tubiLog("ContentController.onSignInSelected")
-  startSignIn(true)
-End Function
 
 ''''''''''''''''''''
 ' onSignOutSelected
@@ -631,23 +612,6 @@ Function onCloseModal()
 End Function
 
 
-Function onPrivacySelected()
-  tubiLog("ContentController.onPrivacySelecte")
-  m.privacyText = CreateObject("roSGNode", "ModalDialogScreen")
-  m.privacyText.title = "Tubi Privacy Policy"
-  m.privacyText.scrollable = true
-  'm.privacyText.message = legal
-  m.privacyText.buttons = ["Close"]
-  m.privacyText.observeFieldScoped("buttonSelected", "onCloseModal")
-  pushModal(m.privacyText)
-  m.privacyRequestTask = CreateObject("roSGNOde", "SimpleRequestTask")
-  m.privacyRequestTask.uri = m.constants.urls.privacyUrl 
-  m.privacyRequestTask.node = m.privacyText
-  m.privacyRequestTask.field = "message"
-  m.privacyRequestTask.control = "RUN"
-End Function
-
-
 '''''''''''''''''''
 ' onPlayerError
 '
@@ -683,13 +647,7 @@ Function startOnNow()
   ' with the child groups directly instead of the parent group
   m.homeScreen = CreateObject("roSGNode", "HomeScreen")
   m.homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
-  m.toolsMenu = m.homeScreen.findNode("ToolsMenu")
-  m.toolsMenu.observeFieldScoped("searchSelected", "onSearchSelected")
-  m.toolsMenu.observeFieldScoped("signInSelected", "onSignInSelected")
-  m.toolsMenu.observeFieldScoped("signOutSelected", "onSignOutSelected")
-  m.toolsMenu.observeFieldScoped("aboutSelected", "onAboutSelected")
-  m.toolsMenu.observeFieldScoped("privacySelected", "onPrivacySelected")
-
+  m.homeScreen.observeFieldScoped("toolsMenuSelected", "onHomeScreenToolsMenuSelected")
   m.onNow = m.homeScreen.findNode("OnNow")
   m.onNow.control = "play"
 
@@ -727,6 +685,10 @@ Function homeScreenBackgroundUpdated()
   }
 End Function
 
+Function onHomeScreenToolsMenuSelected()
+  tubiLog("ContentController.onHomeScreenToolsMenuSelected")
+  showToolsMenu()
+End Function
 
 Function onRootTabTransitioned()
   tubiLog("ContentController.onRootTabTransitioned")

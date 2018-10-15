@@ -370,19 +370,23 @@ Function onSignedInChange()
 End Function
 
 Function onCurrFocusRow()
-  if m.CategoryGridList.currFocusRow >= 1
-    animationFraction = 1.0
-  else
-    animationFraction = m.CategoryGridList.currFocusRow
-  end if
-
-  m.HintGroupFade.fraction = animationFraction
-  if m.singleFeaturePoster = true
-    if m.CategoryGridList.isInFocusChain()
-      ' If category menu is focused, info panel shows category description so don't hide it
-      m.InfoPanelFade.fraction = animationFraction
+  ' Toolbar is available at any grid row so we only fade out this
+  ' up hint for OnNow content
+  if m.top.onNowHintVisible = true
+    if m.CategoryGridList.currFocusRow >= 1
+      animationFraction = 1.0
+    else
+      animationFraction = m.CategoryGridList.currFocusRow
     end if
-    m.FeatureInfoFade.fraction = animationFraction
+
+    m.HintGroupFade.fraction = animationFraction
+    if m.singleFeaturePoster = true
+      if m.CategoryGridList.isInFocusChain()
+        ' If category menu is focused, info panel shows category description so don't hide it
+        m.InfoPanelFade.fraction = animationFraction
+      end if
+      m.FeatureInfoFade.fraction = animationFraction
+    end if
   end if
 End Function
 

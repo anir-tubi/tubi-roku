@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="SettingsMenuPanel" extends="ListPanel" >
+  <script type="text/brightscript" uri="./SettingsMenuPanel.brs"/>
+
+  <interface>
+    <!-- INPUTS -->
+      <field id="signedIn" type="boolean" />
+
+    <!-- OUTPUTS -->
+      <field id="content" alias="SettingsMenu.content"/>
+      <field id="itemSelected" alias="SettingsMenu.itemSelected"/>
+  </interface>
+
+  <children>
+    <MarkupList
+      id="SettingsMenu"
+      numRows="12"
+      itemSize="[420,80]"
+      itemSpacing="[0,8]"
+      itemComponentName="DetailMenuItem"
+      vertFocusAnimationStyle="floatingFocus">
+      <ContentNode
+        id="SettingsMenuContent"
+        role="content">
+        <DetailMenuItemContentNode
+          id="ParentalControls"
+          title="Parental Controls"
+          iconUrl="pkg:/images/icon-parental.png" />
+        <DetailMenuItemContentNode
+          id="AboutButton"
+          title="About"
+          iconUrl="pkg:/images/icon-about.png" />
+        <DetailMenuItemContentNode
+          id="PrivacyPolicyButton"
+          title="Privacy Policy"
+          iconUrl="pkg:/images/icon-privacy.png" />
+        <DetailMenuItemContentNode
+          id="TermsOfServiceButton"
+          title="Terms of Service"
+          iconUrl="pkg:/images/icon-terms.png" />
+        <DetailMenuItemContentNode
+          id="SignInOutButton"
+          title="Sign Out"
+          iconUrl="pkg:/images/icon-sign-in.png" />
+      </ContentNode>
+    </MarkupList>
+  </children>
+</component>
