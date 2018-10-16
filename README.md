@@ -6,7 +6,7 @@
 
 ## Production Channel
 
-![Staging Channel Logo](channel-store/channel-store-img-fhd-540x405.png)
+![Staging Channel Logo](channel-store/channel-store-poster-540x405.png)
 
 Roku Channel Store: [channelstore.roku.com/details/41468/tubi](https://channelstore.roku.com/details/41468/tubi)
 
@@ -14,9 +14,9 @@ Direct Install: [my.roku.com/add/tubitv](https://my.roku.com/add/tubitv)
 
 ## Staging Channel
 
-![Staging Channel Logo](channel-store/channel-store-img-staging-fhd-540x405.png)
+![Staging Channel Logo](channel-store/channel-store-poster-staging-540x405.png)
 
-Direct Install: [my.roku.com/add/T6XMK9X](https://my.roku.com/add/T6XMK9X)
+Direct Install: [my.roku.com/add/NDDHPHK](https://my.roku.com/add/NDDHPHK)
 
 
 
