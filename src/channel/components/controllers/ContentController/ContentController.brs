@@ -95,6 +95,21 @@ Function init()
   m.singleFeaturePoster = invalid
 
   m._ = rodash()
+
+  ' mux in "components_reset" mode, meaning video node instance is long-lived
+  m.muxEnabled = false
+  if m.constants.thirdParty.mux.enabled = invalid
+    m.muxEnabled = (m.constants.externalConfig.info.mux_enabled = 1)
+  else
+    m.muxEnabled = m.constants.thirdParty.mux.enabled
+  end if
+  if m.muxEnabled = true
+    m.muxTask = m.top.createChild("MuxTask")
+    m.muxTask.id = "MuxTask"  ' so that video player can find it
+    m.muxTask.video = m.videoPlayer.findNode("VideoNode")
+    m.muxTask.config = m.constants.thirdParty.mux.config
+    m.muxTask.control = "RUN"
+  end if
 End Function
 
 Function onScreenStackEmpty()
@@ -742,6 +757,11 @@ Function playVideoContent(content As Object, isAutoplay As Boolean, position=inv
       end if
       m.upNextTask.request = request
       m.upNextTask.control = "RUN"
+
+      '  Mux events
+      if m.muxEnabled = true
+        m.muxTask.view = "start"
+      end if
     end if
     m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
     m.videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
@@ -948,6 +968,10 @@ End Function
 
 ' Stop the video player and optionally return to the screen stack
 Function stopVideoContent(playerResult, showScreenStack)
+  '  Mux events
+  if m.muxEnabled = true
+    m.muxTask.view = "end"
+  end if
   m.videoPlayer.unobserveFieldScoped("backButtonPressed")
   m.videoPlayer.unobserveFieldScoped("state")
   m.videoPlayer.unobserveFieldScoped("skipTrailer")

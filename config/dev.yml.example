@@ -13,3 +13,13 @@ settings:
   hotPatchUrl: "http://{{hostUri}}/hotpatch/{{versionMinorDotted}}.brs"
   remoteComponentsHost: "http://{{hostUri}}"
   remoteComponentsExtension: "zip"
+
+manifest:
+  mux_dry_run: false
+  mux_debug_events: "full"
+  mux_debug_beacons: "full"
+
+component_library_manifest:
+  mux_dry_run: false
+  mux_debug_events: "full"
+  mux_debug_beacons: "full"

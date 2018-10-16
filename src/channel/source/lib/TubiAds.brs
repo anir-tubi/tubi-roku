@@ -350,6 +350,9 @@ end function
 ' ----------------------------------------------
 function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   ' ShowVariable(m.allAdUnitsList, "ALL AD UNITS LIST", 4)
+  scene = containerNode.getScene()
+  m.muxNode = scene.findNode("MuxTask")
+
   if m.allAdUnitsList.count() > 0
     currentAdPosition = 1
     for each adUnitsListContainer in m.allAdUnitsList
@@ -496,5 +499,9 @@ function tubiAds_adTrackingCallback(eventType, ctx)
       ' it out.
       m.controlNode.adProgress = 1  
     end if
+  end if
+
+  if m.muxNode <> invalid
+    m.muxNode.rafEvent = {obj:m, eventType:eventType, ctx:ctx}
   end if
 end function

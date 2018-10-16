@@ -99,7 +99,7 @@
 
       <TrackingLoggingTask
         id="TrackingLoggingTask" />
-      
+
       <Timer
        id="AutohideTimer"/>
 
