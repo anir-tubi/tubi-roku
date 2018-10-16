@@ -61,7 +61,7 @@ Function onPasswordConfirm(msg)
   parentalSettingUpdateTask.observeField("result", "onParentalSettingComplete")
   parentalSettingUpdateTask.control = "RUN"
   m.confirmPasswordScreen.addFields({task: parentalSettingUpdateTask})
-  node.isLoading = true
+  confirmPasswordScreen.isLoading = true
 End Function
 
 ' This is triggered once the remote setting has been received
