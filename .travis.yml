@@ -4,9 +4,14 @@ language: bash
 dist: trusty
 sudo: false
 
+# See https://github.com/dwyl/learn-travis/blob/master/encrypted-ssh-keys-deployment.md to explain
+# the openssl stuff here
 before_install:
 - node --version
-- openssl aes-256-cbc -K $encrypted_b03b8763723f_key -iv $encrypted_b03b8763723f_iv -in id_rsa.travis_roku.enc -out ~\/id_rsa.travis_roku -d
+- openssl aes-256-cbc -K $encrypted_b03b8763723f_key -iv $encrypted_b03b8763723f_iv -in id_rsa.travis_roku.enc -out ./id_rsa.travis_roku -d
+- chmod 0600 ./id_rsa.travis_roku
+- ssh-add ./id_rsa.travis_roku
+- pip install --user awscli
 
 # We use a subshell here since 'cd' persists to subsequent commands otherwise.
 # See https://docs.travis-ci.com/user/common-build-problems/#SSH-is-not-working-as-expected
@@ -15,4 +20,8 @@ install:
 
 script:
 - make build
-- make lint
+- cd travis/client && bash travis.sh 
+- cd ../..
+
+after_success:
+  - aws s3 sync ${TRAVIS_BUILD_DIR}/build s3://roku-build-artifacts/${TRAVIS_BRANCH} --exclude="*" --include="*.zip" --include="*.pkg"
