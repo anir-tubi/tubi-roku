@@ -7,7 +7,11 @@ Function showErrorModal(errorCode As Integer, errorMessage As String, tryAgainCa
   modal = CreateObject("roSGNode", "ModalDialogScreen")
   modal.title = "Something went wrong"
   modal.message = "Error " + stri(errorCode) + Chr(10) + errorMessage
-  modal.buttons = ["Try Again", "Close"]
+  if tryAgainCallback <> invalid
+    modal.buttons = ["Try Again", "Close"]
+  else
+    modal.buttons = ["Close"]
+  end if
   modal.observeField("buttonSelected", "onErrorModalButtonSelected")
   m.errorModalTryAgainCallback_ = tryAgainCallback
   m.errorModalTryAgainParams_ = tryAgainParams
@@ -24,7 +28,7 @@ Function onErrorModalButtonSelected()
   m.errorModal_.setFocus(false)
   m.top.removeChild(m.errorModal_)
   m.top.setFocus(true)
-  if m.errorModal_.buttonSelected = 0 then
+  if m.errorModal_.buttonSelected = 0 and m.errorModal_.buttons.count() > 1
     ' try again
     if m.errorModalTryAgainCallback_ <> invalid
       if m.errorModalTryAgainParams_.count() > 0
@@ -34,7 +38,7 @@ Function onErrorModalButtonSelected()
       end if
     end if
   else
-    ' cancel
+    ' cancel/close
     if m.errorModalCancelCallback_ <> invalid
       if m.errorModalCancelParams_.count() > 0
         m.errorModalCancelCallback_(m.errorModalCancelParams_)

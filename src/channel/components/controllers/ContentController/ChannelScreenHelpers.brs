@@ -45,9 +45,14 @@ End Function
 
 Function onChannelContentError(msg)
   tubiLog("ChannelScreenHelpers.onChannelContentError")
-  ' TODO(Chris): show some error
+  errorInfo = msg.getData()
   task = msg.getRoSGNode()
-  screen = task.target
+  ' Screen is created/pushed in showChannelScreen, since there is no content, remove it.
+  ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
+  ' sent in the case of an error.
+  popScreen(false)
+  message = "Could not retrieve channel content."
+  showErrorModal(errorInfo.code, message)
   task.unobserveField("response")
   task.unobserveField("error")
 End Function

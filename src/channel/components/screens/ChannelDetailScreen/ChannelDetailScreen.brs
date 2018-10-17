@@ -248,7 +248,6 @@ End Function
 '
 'returns a string with a tracking uri that is ready to be sent to the tracking api
 Function generateTrackingUri(rowItem, channel)
-  'TODO BRYAN: verify that the following URI format is appropriate -> "/channel/slug/row/col"
   slug = ""
   row = ""
   col = ""
