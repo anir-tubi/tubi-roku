@@ -94,14 +94,17 @@ Function popScreen(sendTrackingEvents = true as Boolean)
   tubiLog("ScreenStack.popScreen")
   current = currentScreen()
   m.NodeHelpers.unobserveAllScoped(current)
-  m.ScreenStack_.popView = true
 
-  'handle user tracking for navigating to screen
+  ' m.ScreenStackOldTop_ is used in onScreenStackChange() to fire navigation and page load events.
+  ' It must be set before m.ScreenStack_.popView as m.ScreenStack_.popView will trigger a chain of events
+  ' that will eventually lead to onScreenStackChange() being called.
   if sendTrackingEvents = true and current <> invalid
     m.ScreenStackOldTop_ = current
   else
     m.ScreenStackOldTop_ = invalid
   end if
+
+  m.ScreenStack_.popView = true
 End Function
 
 

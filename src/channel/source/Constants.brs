@@ -291,6 +291,7 @@ Function getConstants()
 
     'matrix url
     constants.urls.matrix = {}
+      ' constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
       constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
       constants.urls.matrix.homescreen = constants.urls.matrix.urlBase + "/homescreen"
       constants.urls.matrix.container = constants.urls.matrix.urlBase + "/containers"
