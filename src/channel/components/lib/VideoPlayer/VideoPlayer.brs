@@ -323,7 +323,9 @@ Function onVideoPositionChange()
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval then
     playProgressEvent = getPlayProgressEvent()
     m.lastPingTime = m.playerPosition
-    trackEvent(playProgressEvent)
+    if playProgressEvent <> invalid
+      trackEvent(playProgressEvent)
+    end if
   end if
 
   ' User history
@@ -911,8 +913,12 @@ Function beginScrub()
   m.scrubTimespan.mark()
 
   ' playProgress analytics
-  playProgressEvent = getPlayProgressEvent()
-  trackEvent(playProgressEvent)
+  if m.VideoState <> "skip"
+    playProgressEvent = getPlayProgressEvent()
+    if playProgressEvent <> invalid
+      trackEvent(playProgressEvent)
+    end if
+  end if
 End Function
 
 
@@ -1120,6 +1126,13 @@ Function handleSkipVideo(amt, isProgressBarFocused)
     m.VideoState = "skip"
     m.positionAtJumpStart = m.playerPosition
     m.PlayPauseButton.uri = m.buttonUris.play
+
+    if m.VideoState <> "rew" or m.VideoState <> "ffw"
+      playProgressEvent = getPlayProgressEvent()
+      if playProgressEvent <> invalid
+        trackEvent(playProgressEvent)
+      end if
+    end if
   end if
 
   if isProgressBarFocused <> true
@@ -1312,33 +1325,37 @@ End Function
 
 
 Function getPlayProgressEvent()
-  extraCtx = {
-    interval: Int(m.playerPosition - m.lastPingTime)
-  }
+  if (m.playerPosition - m.lastPingTime) > 0
+    extraCtx = {
+      interval: Int(m.playerPosition - m.lastPingTime)
+    }
 
-  if m.top.analyticsMode = "autoplay"
-    extraCtx.autoplay = true
-  else if m.top.analyticsMode = "onnow-autoplay"
-    extraCtx.on_now = true
-    extraCtx.livetv = true
-  else if m.top.analyticsMode = "onnow-engaged"
-    extraCtx.on_now = true
-  else if m.top.analyticsMode = "onnow-docked"
-    extraCtx.embedded = true
-    extraCtx.on_now = true
-    extraCtx.livetv = true
+    if m.top.analyticsMode = "autoplay"
+      extraCtx.autoplay = true
+    else if m.top.analyticsMode = "onnow-autoplay"
+      extraCtx.on_now = true
+      extraCtx.livetv = true
+    else if m.top.analyticsMode = "onnow-engaged"
+      extraCtx.on_now = true
+    else if m.top.analyticsMode = "onnow-docked"
+      extraCtx.embedded = true
+      extraCtx.on_now = true
+      extraCtx.livetv = true
+    end if
+
+    if m.top.deeplinkSource <> ""
+      extraCtx.casting = m.top.deeplinkSource
+    end if
+
+    return {
+      trackType: "playProgress"
+      ctx: m.Video.content.id
+      value: Int(m.playerPosition)
+      extraCtx: extraCtx
+    }
+  else
+    return invalid
   end if
-
-  if m.top.deeplinkSource <> ""
-    extraCtx.casting = m.top.deeplinkSource
-  end if
-
-  return {
-    trackType: "playProgress"
-    ctx: m.Video.content.id
-    value: Int(m.playerPosition)
-    extraCtx: extraCtx
-  }
 End Function
 
 
