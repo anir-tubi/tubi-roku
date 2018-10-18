@@ -9,6 +9,7 @@
     <!-- OUTPUTS -->
       <field id="content" alias="SettingsMenu.content"/>
       <field id="itemSelected" alias="SettingsMenu.itemSelected"/>
+      <field id="itemFocused" alias="SettingsMenu.itemFocused"/>
   </interface>
 
   <children>

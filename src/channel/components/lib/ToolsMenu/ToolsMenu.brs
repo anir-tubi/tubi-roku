@@ -69,7 +69,7 @@ Function onSignedInChange()
 End Function
 
 Function onKeyEvent(key, press)
-  if press = true and key = "back"
+  if press = true and (key = "back" or key = "down")
     ' We want to suppress page navigation events specifically for tools menu
     ' to be consistent with old behavior. capture this event so screenstack 
     ' doesn't receive it

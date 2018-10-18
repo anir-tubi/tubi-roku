@@ -33,6 +33,39 @@
       translation="[85,55]" />
 
     <LayoutGroup
+      id="ToolbarHint"
+      layoutDirection="horiz"
+      vertAlignment="custom"
+      opacity="0.5"
+      translation="[837,58]">
+      <Label
+        text="PRESS"
+        vertAlign="center"
+        height="47"
+        translation="[0,2]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+      <Poster
+        uri="pkg:/images/back.png"
+        width="47"
+        height="47"/>
+      <Label
+        text="FOR HOME"
+        vertAlign="center"
+        height="47"
+        translation="[0,2]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+    </LayoutGroup>
+
+
+    <LayoutGroup
       horizAlignment="center"
       translation="[960,257]">
       <RowList

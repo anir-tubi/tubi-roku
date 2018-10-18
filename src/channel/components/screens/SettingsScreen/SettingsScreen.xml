@@ -37,7 +37,7 @@
       id="Title"
       text="Settings"
       height="73"
-      translation="[85,227]">
+      translation="[85,230]">
       <Font
        role="font"
        uri="pkg:/fonts/Vaud-SemiBold.ttf"
@@ -80,6 +80,6 @@
       id="PanelSet"
       width="1920"
       height="550"
-      translation="[60,477]"/>
+      translation="[60,414]"/>
   </children>
 </component>

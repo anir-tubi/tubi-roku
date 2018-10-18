@@ -66,6 +66,8 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
         showOnNow(true, "above", false)
         m.OnNow.setFocus(true)
         return true
+      else
+        m.top.toolsMenuSelected = true
       end if
     else if key = "down"
       if m.OnNow.isInFocusChain() then

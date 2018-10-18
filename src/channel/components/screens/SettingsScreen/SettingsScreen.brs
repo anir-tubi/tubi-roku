@@ -1,14 +1,16 @@
 Function init()
   m.leftPanelWidth = 420
   m.rightPanelWidth = 1034
-  m.rightPaneloffset = [220,-250]
+  m.rightPaneloffset = [220,-197]
 
   m.PanelSet = m.top.findNode("PanelSet")
+  m.Title = m.top.findNode("Title")
 
   ' Create the menu
   m.SettingsMenuPanel = CreateSettingsMenuPanel()
   m.SettingsMenuPanel.observeField("createNextPanelIndex", "onCreateNextPanelIndex")
   m.SettingsMenuPanel.observeField("itemSelected", "onMenuItemSelected")
+  m.SettingsMenuPanel.observeField("itemFocused", "onMenuItemFocused")
 
   ' This must happen after the pane is all set up so that the createNextPanelIndex
   ' event fires for the default menu selection
@@ -30,10 +32,26 @@ Function onSignedInChange()
   end for
 End Function
 
+' NOTE: The focus chain of PanelSet is very difficult to use to determine
+'       which particular panel is focused, otherwise we could just set focus
+'       in onComponentFocusChange.  Instead, this method, along with
+'       onComponentFocusChange, are the only way I have been able to
+'       acheive the desired opacity as focus moves left/right across panels
+'       and in/out of the screen, such as when a sign in dialog shows.
+Function onMenuItemFocused()
+   m.Title.opacity = 1.0
+End Function
+
 Function onComponentFocusChange()
   tubiLog("SettingsScreen.onComponentFocusChange")
-  if m.top.isInFocusChain() and m.top.hasFocus()
-    m.SettingsMenuPanel.setFocus(true)
+
+  menu = m.SettingsMenuPanel.findNode("SettingsMenu")
+  if m.top.isInFocusChain()
+    if m.top.hasFocus()
+      m.SettingsMenuPanel.setFocus(true)
+    else
+      m.Title.opacity = 0.3
+    end if
   end if
 End Function
 

@@ -37,7 +37,7 @@
         width="1090"
         wrap="true"
         vertAlign="bottom"
-        translation="[25,130]">
+        translation="[25,143]">
         <Font
          role="font"
          uri="pkg:/fonts/Vaud-SemiBold.ttf"
@@ -51,7 +51,7 @@
         itemSpacing="[0,8]"
         itemComponentName="CheckButton"
         vertFocusAnimationStyle="floatingFocus"
-        translation="[0,338]">
+        translation="[0,347]">
         <ContentNode
           id="SettingsMenuContent"
           role="content">
