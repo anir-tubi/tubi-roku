@@ -236,7 +236,6 @@ Function getConstants()
 
   constants.thirdParty = {}
     constants.thirdParty.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
-    constants.thirdParty.convivaIsLive = invalid
     constants.thirdParty.mux = {}
       constants.thirdParty.mux.enabled = false    ' off by default
       ' Mux config fields: https://docs.mux.com/docs/metadata

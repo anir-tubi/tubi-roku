@@ -489,9 +489,5 @@
       id="ScrubTimer"
       duration="0.25"
       repeat="true" />
-
-    <ConvivaTask
-      id="ConvivaTask" />
-  
   </children>
 </component>

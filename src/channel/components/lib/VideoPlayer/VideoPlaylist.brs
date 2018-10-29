@@ -58,7 +58,6 @@ Function onVideoStateChange(msg)
     if not advancePlaylist()
       if state = "error"
         m.top.errorMsg = "There was an issue with video playback."
-        m.monitoringTask.endPlayback = m.Video.errorMsg
       end if
       m.top.state = state
     end if

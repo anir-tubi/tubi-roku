@@ -162,11 +162,6 @@ Function init()
     m.TransportGradient.uri = "pkg:/images/playback-gradient-hd.9.png"
     m.PickerGradient.uri = "pkg:/images/browse-picker-gradient-hd.9.png"
   end if
-
-  'Video Monitoring
-  m.monitoringTask = m.top.findNode("ConvivaTask")
-  m.monitoringTask.videoNode = m.Video
-  m.monitoringTask.control = "RUN"
 End Function
 
 
@@ -369,7 +364,6 @@ Function onVideoPositionChange()
           if m.top.adState = "adspending" then
             ' We must stop the video here, not just pause it, in order to release
             ' system resources to the RAF video player
-            m.monitoringTask.beginAds = "midroll"
             showAdBreak()
           else if m.top.adState = "noads"
             ' when we reach the cuepoint, we find that the last ad call returned no ads
@@ -468,11 +462,8 @@ Function playContent()
   if m.top.enableAds then
     ' Start pre-roll fetch
     m.top.adControl = "preroll"
-    m.monitoringTask.beginPlayback = "withAds"
-    m.monitoringTask.beginAds = "preroll"
   else
     m.Video.control = "play"
-    m.monitoringTask.beginPlayback = "withoutAds"
   end if
 End Function
 
@@ -667,16 +658,12 @@ Function onAdStateChange()
   'TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
   else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip") and m.Video.state <> "playing" then
     ' Came back from an ad break
-    m.monitoringTask.endAds = true
     ' Set the m.Video.control prior to the m.Video.seek to ensure that the video is not started from the beginning even if m.playerPosition <> 0.
     ' This is a seeming inconsistency with the firmware and should not neccessarily work this way, but it does.
     ' Normally we would expect to set the seek prior to setting control to "play"
     ' Unfortunately, this order of play before seek causes a device crash if the content url is not a valid video url.
     if m.Video.content.url <> invalid and m.Video.content.url <> ""
       m.top.setFocus(true)
-      if m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip"
-        m.monitoringTask.beginSeek = m.playerPosition
-      end if
       m.VideoState = "play"
       m.Video.control = "play"
       m.Video.seek = m.playerPosition
@@ -693,7 +680,6 @@ Function onAdStateChange()
         video_url: m.top.content.url
       }
       tubiLog(FormatJson(errorInfo), "error", "videoPlayback", "video-url")
-      m.monitoringTask.endPlayback = "noerror"
     end if
   else if m.top.adState = "adsclosed"
     ' This is not ideal implementation but we want the OnNow experience to continue playing
@@ -702,7 +688,6 @@ Function onAdStateChange()
     ' causing a bug where there was a very long black screen after exiting an ad break 
     ' via the back button (i assume the render thread was busy caching the video segments).
     m.top.setFocus(true)
-    m.monitoringTask.endAds = true
     if m.Video.content.isLiveTV
       m.Video.seek = m.playerPosition
       m.VideoState = "play"
@@ -715,8 +700,6 @@ Function onAdStateChange()
           livetv: m.Video.content.isLiveTV
         }
       })
-    else
-      m.monitoringTask.endPlayback = "noerror"
     end if
 
     backButtonExit()
@@ -969,9 +952,7 @@ Function goToEnd()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(true)
   end if
-  
-  m.monitoringTask.endPlayback = "noerror"
- 
+
   if not advancePlaylist() then
     'the end of the video playback
     m.VideoState = "stop"
@@ -1110,7 +1091,6 @@ Function handleSeek(position as Integer, shouldAdBreak as Boolean)
     m.top.adPosition = position
     m.top.adControl = "seek"
   else
-    m.monitoringTask.beginSeek = position
     m.Video.seek = position 'will load and play the video at the seeked to point
     m.VideoState = "play"
   end if
@@ -1302,7 +1282,6 @@ End Function
 Function backButtonExit()
   historyPosition()
   m.top.backButtonPressed = true
-  m.monitoringTask.endPlayback = "noerror"
 End Function
 
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads

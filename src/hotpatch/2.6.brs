@@ -27,11 +27,3 @@ m.global.utils.constants.ui.signIn.backExitsSignIn = true
 if m.global.utils.constants.externalConfig.info.remote_components = 1
   m.global.utils.constants.deviceInfo.clientVersion = m.global.utils.constants.deviceInfo.clientVersion.Replace("local", "remote")
 end if
-
-'turn Conviva on/off - remote config takes precedence over hotpatch value (conviaIsLive variable)
-convivaIsLive = true 'set to true if live, false if test, and invalid to turn off
-if m.global.utils.constants.externalConfig.info.convivaIsLive <> invalid
-  m.global.utils.constants.thirdParty.convivaIsLive = m.global.utils.constants.externalConfig.info.convivaIsLive
-else
-  m.global.utils.constants.thirdParty.convivaIsLive = convivaIsLive
-end if
