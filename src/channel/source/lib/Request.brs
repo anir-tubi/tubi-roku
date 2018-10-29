@@ -331,13 +331,23 @@ Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
 
   for each p in params
     key = p.toStr().trim()
-    if params[p] = invalid then 
-      value = ""  ' don't send any string literal "invalid"
+
+    ' Normalize all params to an array for simpler handling
+    if type(params[p]) = "roArray"
+      key = key + "[]"
+      values = params[p]
     else
-      value = (params[p]).toStr().trim()
+      values = [params[p]]
     end if
-    url = url + separator + key.EncodeUriComponent() + "=" + value.EncodeUriComponent()
-    separator = "&"
+
+    for each value in values
+      if value = invalid then 
+        value = ""  ' don't send any string literal "invalid"
+      end if
+      value = value.toStr().trim()
+      url = url + separator + key.EncodeUriComponent() + "=" + value.EncodeUriComponent()
+      separator = "&"
+    end for
   end for
 
   return url

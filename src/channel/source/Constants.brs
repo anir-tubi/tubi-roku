@@ -454,6 +454,19 @@ Function getConstants()
       constants.player.transportButtons.closedCaptionFocus = "pkg:/images/transport/sgplayer/cc-icon-focus.png"
       constants.player.transportButtons.closedCaptionDisabled = "pkg:/images/transport/sgplayer/cc-icon-disabled.png"
 
+      ' Drm types/schemes, as named and supported by UAPI
+      constants.player.drmTypes = {}
+      constants.player.drmTypes.dashWidevine = "dash_widevine"
+      constants.player.drmTypes.dashPlayready = "dash_playready"
+      constants.player.drmTypes.hlsv3 = "hlsv3"
+
+      ' Supported schemes, in order of preference
+      constants.player.drmOrder = [
+        constants.player.drmTypes.dashWidevine
+        constants.player.drmTypes.dashPlayready
+        constants.player.drmTypes.hlsv3
+      ]
+
   'UI properties that should be passed into the scene graph
   constants.ui = {}
 

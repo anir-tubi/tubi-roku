@@ -209,6 +209,47 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     end if
   end if
 
+  ' DRM encoded streams
+  if type(contentFromServer.video_resources) = "roArray" and contentFromServer.video_resources.count() > 0
+    ' Create a "stub" ContentNode with just the DRM-oriented fields populated. This
+    ' will make it easy to merge metadata plus drm info into one actionable
+    ' contentnode for the video player
+    video = contentFromServer.video_resources[0]
+
+    if video.manifest <> invalid then translatedContent.url = video.manifest.url
+    if video.duration <> invalid then translatedContent.length = video.duration
+
+    if video.type = m.constants.player.drmTypes.dashWidevine
+      translatedContent.streamFormat = "dash"
+      if video.license_server <> invalid
+        translatedContent.drmParams = {
+          keySystem: "Widevine"
+          licenseServerURL: video.license_server.url
+        }
+        if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
+          translatedContent.httpHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+        end if
+      end if
+
+    else if video.type = m.constants.player.drmTypes.dashPlayReady
+      translatedContent.streamFormat = "dash"
+      if video.license_server <> invalid
+        translatedContent.encodingType = "PlayReadyLicenseAcquisitionUrl"
+        translatedContent.encodingKey = video.license_server.url
+        if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
+          translatedContent.httpHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+        end if
+      end if
+
+    else if video.type = m.constants.player.drmTypes.hlsv3
+      translatedContent.streamFormat = "hls"
+
+    else
+      ' Don't add unsupported/unknown video resource types
+    end if
+  end if
+
+
   'take care of any subtitles if they exist - should only happen on videos
   if contentFromServer.has_subtitle <> invalid then translatedContent.hasSubtitles = contentFromServer.has_subtitle
   if contentFromServer.subtitles <> invalid and type(contentFromServer.subtitles) = "roArray" and contentFromServer.subtitles.count() > 0

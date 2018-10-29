@@ -28,9 +28,7 @@ Function testCase_tubiExternalConfig_initDefaults()
   result = m.assertInvalid(constants.externalConfig.info)
   config.init()
   result += m.assertNotInvalid(constants.externalConfig.info)
-  result += m.assertFalse(constants.externalConfig.info.livetv)
-  ' check default value explicitly not in the MockGetConfigs values
-  result += m.assertNotInvalid(constants.externalConfig.info.limited_newui_enabled)
+  result += m.assertNotInvalid(constants.externalConfig.info.mux_enabled)
   return result
 End Function
 

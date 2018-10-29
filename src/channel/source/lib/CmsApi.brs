@@ -65,6 +65,7 @@ Function cmsApi_getSingleContentRequest(contentId, includeChannels=false)
   options = m.commonOptions_()
   options.params.content_id = contentId
   options.params["includeChannels"] = includeChannels
+  options.params["video_resources"] = m.constants_.player.drmOrder
   return m.createAuthRequest_(url, m.constants_.reqNames.getSingleContent, options)
 End Function
 

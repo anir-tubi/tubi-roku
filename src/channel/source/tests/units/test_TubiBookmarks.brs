@@ -11,6 +11,7 @@ Function TestSuite_TubiBookmarks()
   this.addTest("addHistoryReq_episodeWithoutParent", testCase_tubiBookmarks_addHistoryReqEpisodeWithoutParent)
   this.addTest("addHistoryReq_series", testCase_tubiBookmarks_addHistoryReqSeries)
   this.addTest("getInitialBookmarksReq_signedOut", testCase_tubiBookmarks_getInitialBookmarksReqSignedOut)
+  this.addTest("getInitialBookmarksReq_signedOut_guestHistoryEnabled", testCase_tubiBookmarks_getInitialHistoryReqSignedOutGuestHistoryEnabled)
   this.addTest("getInitialBookmarksReq_signedIn", testCase_tubiBookmarks_getInitialBookmarksReqSignedIn)
   this.addTest("getInitialHistoryReq_signedOut", testCase_tubiBookmarks_getInitialHistoryReqSignedOut)
   this.addTest("getInitialHistoryReq_signedIn", testCase_tubiBookmarks_getInitialHistoryReqSignedIn)
@@ -219,12 +220,24 @@ End Function
 
 Function testCase_tubiBookmarks_getInitialHistoryReqSignedOut()
   constants = getConstants()
+  constants.ui.users.guestHistory = false
   REQUEST = TubiRequest()
   AUTH = testHelper_tubiBookmarks_mockAuth_Unauthorized(constants, REQUEST)
   NODEHELPERS = TubiNodeHelpers()
   BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
   req = BM.getInitialHistoryReq("1234")
   return m.assertInvalid(req)
+End Function
+
+Function testCase_tubiBookmarks_getInitialHistoryReqSignedOutGuestHistoryEnabled()
+  constants = getConstants()
+  constants.ui.users.guestHistory = true
+  REQUEST = TubiRequest()
+  AUTH = testHelper_tubiBookmarks_mockAuth_Unauthorized(constants, REQUEST)
+  NODEHELPERS = TubiNodeHelpers()
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
+  req = BM.getInitialHistoryReq("1234")
+  return m.assertNotInvalid(req)
 End Function
 
 Function testCase_tubiBookmarks_getInitialHistoryReqSignedIn()

@@ -66,5 +66,9 @@
 
     <!-- time fetched from the service -->
     <field id="fetchedAt" type="integer"/>
+
+    <!-- individual stream resources -->
+    <field id="videoResources" type="array"/>
+
   </interface>
 </component>

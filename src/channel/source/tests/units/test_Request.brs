@@ -73,6 +73,8 @@ Function testCase_request_addParamsToUrl()
     [ "http://bbb/",          { "a": invalid },"http://bbb/?a=" ]
     [ "http://bbb/",          { invalid: 0 },  "http://bbb/?invalid=0" ]  ' this is funny... invalid is changed into a string by the compiler
     [ "http://eee/",          { y: 1, z: 2 },  "http://eee/?y=1&z=2" ]
+    ' EncodeUriComponent() escapes the square brackets, which isn't necessary but is accepted at the service
+    [ "http://eee/",          { "a": [1, 2, 3], "b": 4 }, "http://eee/?a%5B%5D=1&a%5B%5D=2&a%5B%5D=3&b=4" ]
 
     ' Test handling of query string existence in base url
     [ "http://adrise.tv",        { a: 1 },     "http://adrise.tv?a=1" ]

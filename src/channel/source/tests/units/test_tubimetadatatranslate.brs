@@ -7,6 +7,7 @@ Function TestSuite_TubiMetadataTranslate() as Object
   this.addTest("translateRecursive_testCreditsCuepoints", testCase_tubiMetadataTranslate_translateRecursive_testCreditsCuepoints)
   this.addTest("translateRecursive_channel", testCase_tubiMetadataTranslate_translateRecursive_channel)
   this.addTest("translateRecursive_series", testCase_tubiMetadataTranslate_translateRecursive_series)
+  this.addTest("translateRecursive_videoResources", testCase_tubiMetadataTranslate_translateRecursive_videoResources)
   this.addTest("translateContainer_category", testCase_tubiMetadataTranslate_translateContainer_category)
   this.addTest("translateContainer_channel", testCase_tubiMetadataTranslate_translateContainer_channel)
   this.addTest("translateChannel", testCase_tubiMetadataTranslate_translateChannel)
@@ -214,13 +215,40 @@ Function testCase_tubiMetadataTranslate_translateRecursive_series()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(ParseJson(seriesJson), dest)
   result += m.assertNotInvalid(dest)
-  result += m.assertTrue(dest.fetchedAt = fetchTime)
+  result += m.assertTrue(dest.fetchedAt - fetchTime < 2)
   result += m.assertTrue(dest.getChildCount() = 2)
   season = dest.getChild(0)
   result += m.assertTrue(season.getChildCount() = 52)
-  result += m.assertTrue(season.fetchedAt = fetchTime)
+  result += m.assertTrue(season.fetchedAt - fetchTime < 2)
   episode = season.getChild(0)
-  result += m.assertTrue(episode.fetchedAt = fetchTime)
+  result += m.assertTrue(episode.fetchedAt - fetchTime < 2)
+  return result
+End Function
+
+Function testCase_tubiMetadataTranslate_translateRecursive_videoResources()
+  content = ReadAsciiFile("pkg:/source/tests/units/video_resources.json")
+  result = ""
+  dest = CreateObject("roSGNode", "TubiContentNode")
+  m.translate.translateRecursive(ParseJson(content), dest)
+  result += m.assertNotInvalid(dest.videoResources)
+  result += m.assertTrue(dest.videoResources.count() = 3)
+
+  ' Make sure drm streams have necessary data
+  for i=0 to 1
+    result += m.assertNotInvalid(dest.videoResources[i].url)
+    result += m.assertNotInvalid(dest.videoResources[i].drmParams)
+    result += m.assertNotInvalid(dest.videoResources[i].drmHeaders)
+    result += m.assertEqual(dest.videoResources[0].streamformat, "dash")
+  end for
+' HLS shouldn't have any drm fields
+  result += m.assertNotInvalid(dest.videoResources[2].url)
+  result += m.assertInvalid(dest.videoResources[2].drmParams)
+  result += m.assertInvalid(dest.videoResources[2].drmHeaders)
+  result += m.assertEqual(dest.videoResources[2].streamformat, "hls")
+
+  ' Make sure order is correct
+  result += m.assertEqual(dest.videoResources[0].drmParams.KeySystem, "widevine")
+  result += m.assertEqual(dest.videoResources[1].drmParams.KeySystem, "playready")
   return result
 End Function
 
@@ -236,7 +264,7 @@ Function testCase_tubiMetadataTranslate_translateContainer_category()
   result = result + m.assertNotInvalid(translated)
   result = result + m.assertEqual(translated.id, "featured")
   result = result + m.assertTrue(translated.totalCount = 8)
-  result = result + m.assertTrue(translated.fetchedAt >= fetchTime)
+  result = result + m.assertTrue(translated.fetchedAt - fetchTime < 2)
   result = result + m.assertTrue(translated.getChildCount() = 8)
   return result
 End Function
@@ -249,7 +277,7 @@ Function testCase_tubiMetadataTranslate_translateContainer_channel()
   result = result + m.assertNotInvalid(translated)
   result = result + m.assertEqual(translated.id, "cbs")
   result = result + m.assertTrue(translated.totalCount = 96)
-  result = result + m.assertTrue(translated.fetchedAt >= fetchTime)
+  result = result + m.assertTrue(translated.fetchedAt - fetchTime < 2)
   result = result + m.assertTrue(translated.getChildCount() = 96)
   result = result + m.assertEqual(translated.getChild(0).id, "cbs")
   result = result + m.assertNotInvalid(translated.json)
@@ -270,7 +298,7 @@ Function testCase_tubiMetadataTranslate_translateHomescreen()
   fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateHomescreen(ParseJson(homeJson))
   result = result + m.assertNotInvalid(translated)
-  result = result + m.assertTrue(translated.fetchedAt >= fetchTime)
+  result = result + m.assertTrue(translated.fetchedAt - fetchTime < 2)
   result = result + m.assertTrue(translated.getChildCount() = 48)
   result = result + m.assertTrue(translated.getChild(0).id = "featured")
   result = result + m.assertTrue(translated.getChild(0).getChildCount() = 1)
@@ -287,7 +315,7 @@ Function testCase_tubiMetadataTranslate_translate()
   fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translate(ParseJson(matches))
   result = result + m.assertNotInvalid(translated)
-  result = result + m.assertTrue(translated.fetchedAt >= fetchTime)
+  result = result + m.assertTrue(translated.fetchedAt - fetchTime < 2)
   return result
 End Function
 
@@ -302,7 +330,7 @@ Function testCase_tubiMetadataTranslate_translateChannel()
   result = result + m.assertNotInvalid(translated)
   result = result + m.assertEqual(translated.id, "cbs")
   result = result + m.assertEqual(translated.slug, "cbs")
-  result = result + m.assertTrue(translated.fetchedAt >= fetchTime)
+  result = result + m.assertTrue(translated.fetchedAt - fetchTime < 2)
   result = result + m.assertTrue(translated.totalCount = 95)
   result = result + m.assertTrue(translated.getChildCount() = 95)
   return result
@@ -322,7 +350,6 @@ Function testCase_tubiMetadataTranslate_getContentFromCategoryJson()
   child = m.translate.getContentFromCategoryJson(translated, translated.getChild(0).id)
   result = result + m.assertNotInvalid(child)
   result = result + m.assertTrue(translated.fetchedAt = 12345)
-print "fetchedAt = "; child.fetchedAt
   return result
 End Function
 
