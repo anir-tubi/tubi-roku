@@ -1,5 +1,14 @@
 Function init()
   m.top.functionName = "fetchLoop"
+  ' Observe pattern which ensures that we don't lose events before the thread
+  ' is running. This works because m.top is copied from the render thread to the task
+  ' thread at the point at which m.top.control = "RUN" is run. Any events that m.port
+  ' has heard before fetchLoop runs remain on the port until they are handled by the while loop within fetchLoop.
+  m.port = CreateObject("roMessagePort")
+  m.top.observeField("request", m.port)
+  m.top.observeField("batchRequest", m.port)
+  m.top.observeField("cancel", m.port)
+  m.top.control = "RUN"
 End Function
 
 
@@ -11,11 +20,7 @@ End Function
 '
 Function fetchLoop()
   tubiLog("MetadataFetchTask.fetchLoop started")
-  m.port = CreateObject("roMessagePort")
   m.queue = TubiRequestQueue().create(m.port)
-  m.top.observeField("request", m.port)
-  m.top.observeField("batchRequest", m.port)
-  m.top.observeField("cancel", m.port)
   while true
     m.constants = m.global.getField("constants")   ' this should grab a thread-local copy
     if m.constants <> invalid then
@@ -51,9 +56,6 @@ Function fetchLoop()
   ' Timings here were reduced from 33ms to 2ms per content item by not referencing m.global in
   ' the recursive function below.
   setTranslateGlobalsToLocal()  ' do this once up front
-
-  ' Signal that we're ready for requests
-  m.top.ready = true
 
   'when the request field for the metadata task field is updated, the event is heard in this loop
   'and beginRequest() is called

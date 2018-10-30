@@ -40,9 +40,5 @@
          - Cancel an outstanding request - see MetadataFetchTaskDTO.brs for structure
          -->
         <field id="cancel" type="assocarray" alwaysNotify="true"/>
-
-      <!-- OUTPUT -->
-        <!-- Set to true once the thread loop is up and listening for requests -->
-        <field id="ready" type="boolean" value="false" />
     </interface>
 </component>

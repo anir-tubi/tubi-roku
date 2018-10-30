@@ -1,5 +1,11 @@
 Function init()
   m.top.functionName = "watchLoop"
+  ' Observe pattern which ensures that we don't lose events before the thread
+  ' is running
+  m.port = CreateObject("roMessagePort")
+  m.top.observeField("trackEvent", m.port)
+  m.top.observeField("logMsg", m.port)
+  m.top.control = "RUN"
 End Function
 
 
@@ -11,14 +17,8 @@ End Function
 '
 Function watchLoop()
   tubiLog("TrackingLoggingTask.watchLoop started")
-  m.port = CreateObject("roMessagePort")
   m.queue = TubiRequestQueue().create(m.port)
-  m.top.observeField("trackEvent", m.port)
-  m.top.observeField("logMsg", m.port)
   m.constants = m.global.constants   ' this should grab a thread-local copy
-
-  ' Signal that we're ready for requests
-  m.top.ready = true
 
   'when the trackEvent field for the metadata task field is updated, the event is heard in this loop
   'and beginRequest() is called

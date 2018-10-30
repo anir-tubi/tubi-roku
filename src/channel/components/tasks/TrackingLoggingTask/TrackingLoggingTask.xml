@@ -45,9 +45,5 @@
         -->      
         <field id="logMsg" type="assocarray" alwaysNotify="true"/>
       
-
-      <!-- OUTPUT -->
-        <!-- Set to true once the task thread is running and input fields are being observed -->
-        <field id="ready" type="boolean" value="false" />
     </interface>
 </component>

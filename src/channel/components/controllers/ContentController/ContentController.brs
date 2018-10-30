@@ -13,7 +13,7 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocus")
   m.onNowReceived = false
 
-  ' save a global reference to the fetch task for nodes to access
+  ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
   m.global.addField("metadataFetchTask", "node", false)
   m.global.metadataFetchTask = m.metadataFetchTask
@@ -21,8 +21,6 @@ Function init()
   m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
   m.global.addField("trackingLoggingTask", "node", false)
   m.global.trackingLoggingTask = m.trackingLoggingTask
-  m.trackingLoggingTask.observeFieldScoped("ready", "onTrackingLoggingReady")
-  m.global.trackingLoggingTask.control = "RUN"
   
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.constants.ui.colors.backgroundColor
@@ -44,9 +42,6 @@ Function init()
   '       places that need authInfo don't need to reference m.global.
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid  ' indicates not logged in
-
-  m.metadataFetchTask.observeFieldScoped("ready", "onMetadataTaskReady")
-  m.global.metadataFetchTask.control = "RUN"
 
   m.authInfoReceived = false
   m.authTask = CreateObject("roSGNode", "AuthTask")
@@ -110,6 +105,10 @@ Function init()
     m.muxTask.config = m.constants.thirdParty.mux.config
     m.muxTask.control = "RUN"
   end if
+
+  m.trackingLoggingTask.trackEvent = {
+    trackType: "startApp"
+  }
 End Function
 
 Function onScreenStackEmpty()
@@ -299,32 +298,13 @@ Function showUI(key)
 End Function
 
 '''''''''''''''''''''''''
-' onTrackingLoggingReady
-'
-' Only once we have a metadata task ready AND the user's login status
-' will we launch the UI
-Function onTrackingLoggingReady()
-  tubiLog("ContentController.onTrackingLoggingReady")
-  if m.trackingLoggingTask.ready = true
-    m.trackingLoggingTask.unobserveFieldScoped("ready")
-    
-    m.trackingLoggingTask.trackEvent = {
-      trackType: "startApp"
-    }
-
-    startUserExperience()
-  end if
-End Function
-
-
-'''''''''''''''''''''''''
 ' startUserExperience
 '
 ' Only once we have a metadata task ready AND the user's login status
 ' will we launch the UI
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
-  if m.metadataFetchTask.ready and m.authInfoReceived and m.trackingLoggingTask.ready and m.deepLinkEvaluated then
+  if m.authInfoReceived and m.deepLinkEvaluated then
     if m.constants.ui.onnow.on = false or (m.constants.ui.onnow.on = true and m.onNowReceived)
 
       ' Since we're ready to start the channel, make sure the loading spinner is hidden
@@ -363,23 +343,6 @@ Function onOnNowContent()
   m.top.unobserveFieldScoped("onNowContent")
   m.onNowReceived = true
   startUserExperience()
-End Function
-
-
-'''''''''''''''''''''''
-' onMetadataTaskReady
-'
-' Load the categories once the metadata task thread is ready.  This
-' may be much after the task state is change to "RUN".  The task itself
-' takes a moment to initialize and get its observer ready to handle
-' incoming metadata requests.
-Function onMetadataTaskReady()
-  tubiLog("ContentController.onMetadataTaskReady")
-
-  if m.metadataFetchTask.ready = true then
-    m.metadataFetchTask.unobserveFieldScoped("ready")
-    startUserExperience()
-  end if
 End Function
 
 
