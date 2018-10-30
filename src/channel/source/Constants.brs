@@ -164,7 +164,7 @@ Function getConstants()
     for i=0 to clientVersionNums.count()-1
       clientVersion = clientVersion + clientVersionNums[i] + "."
     end for
-    clientVersion = clientVersion + "local"
+    clientVersion = clientVersion + "remote"
 
     'Use newer APIs over deprecated APIs when appropriate
     deviceInfoRegSection = "deviceinfo"
