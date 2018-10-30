@@ -12,6 +12,7 @@ Function TubiChannel(utils)
     runChannel: tubiChannel_runChannel
     deepLink: tubiChannel_deepLink
     loadRemoteComponents: tubiChannel_loadRemoteComponents
+    logCrashes: tubiChannel_logCrashes
   }
 End Function
 
@@ -24,6 +25,8 @@ Function tubiChannel_runChannel(args, adShim, port) As Void
   port = CreateObject("roMessagePort")
   screen = CreateObject("roSGScreen")
   screen.setMessagePort(port)
+
+  m.logCrashes(args)
 
   ' get live tv content metadata if necessary
   ' will getExperimentValue() again in ContentController which will send the tracking event
@@ -299,3 +302,24 @@ Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
     return invalid
   end if
 End Function
+
+Function tubiChannel_logCrashes(args)
+
+  ' These are reasons we don't care about
+  reasonBlacklist = {
+    "EXIT_UNKNOWN":         "EXIT_UNKNOWN"        ' default exit reason
+    "EXIT_POWER_MODE":      "EXIT_POWER_MODE"
+    "EXIT_DIAL_DELETE":     "EXIT_DIAL_DELETE"
+    "EXIT_IDLE_AUTO_EXIT":  "EXIT_IDLE_AUTO_EXIT"
+  }
+
+  reason = args.lastExitOrTerminationReason
+  if reason <> invalid and reasonBlacklist[reason] = invalid
+    messageInfo = {
+      reason: reason
+      model: m.constants.deviceInfo.model
+    }
+    m.log.warn(FormatJSON(messageInfo), "clientWarn", "exit-failure", m.requestQueue)
+  end if
+End Function
+
