@@ -319,7 +319,9 @@ Function tubiChannel_logCrashes(args)
       reason: reason
       model: m.constants.deviceInfo.model
     }
-    m.log.warn(FormatJSON(messageInfo), "clientWarn", "exit-failure", m.requestQueue)
+    errorPort = CreateObject("roMessagePort")
+    errorQ = m.requestQueue.create(errorPort)
+    m.log.warn(FormatJSON(messageInfo), "clientWarn", "exit-failure", errorQ)
   end if
 End Function
 
