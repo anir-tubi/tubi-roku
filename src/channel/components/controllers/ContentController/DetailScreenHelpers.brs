@@ -69,7 +69,6 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false)
 
     'update detail screen state via the input interface
     detailScreen.title = content.title
-    detailScreen.releaseDate = content.releaseDate
     detailScreen.genres = content.genres
     detailScreen.hasTrailer = content.hasTrailer
 
@@ -97,25 +96,28 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false)
       stateSource = content
     end if
 
-    detailScreen.length = stateSource.length
-    detailScreen.rating = stateSource.rating
+    lineOneData = {}
+    lineOneData.length = stateSource.length
+    lineOneData.rating = stateSource.rating
+    lineOneData.releaseDate = content.releaseDate
+    lineOneData.partnerLogoUri = content.inlineLogoUri
+    if episode <> invalid and (episode.hasSubtitles = true or not m._.empty(episode.subtitleTracks))
+      lineOneData.hasCC = true
+    else if content <> invalid and content.type = m.constants.ui.contentTypes.video and (content.hasSubtitles = true or not m._.empty(content.subtitleTracks))
+      lineOneData.hasCC = true
+    else
+      lineOneData.hasCC = false
+    end if
+    detailScreen.lineOneData = lineOneData
+
     detailScreen.description = stateSource.description
     detailScreen.directors = stateSource.directors
     detailScreen.starring = stateSource.actors
-
-    if episode <> invalid and (episode.hasSubtitles = true or not m._.empty(episode.subtitleTracks))
-      detailScreen.hasCC = true
-    else if content <> invalid and content.type = m.constants.ui.contentTypes.video and (content.hasSubtitles = true or not m._.empty(content.subtitleTracks))
-      detailScreen.hasCC = true
-    else
-      detailScreen.hasCC = false
-    end if
 
     detailScreen.isBookmark = (bookmark <> invalid)
     detailScreen.isHistory = (history <> invalid)
     detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "")
 
-    detailScreen.inlineLogoUri = content.inlineLogoUri
     detailScreen.channelName = content.channelName
 
     if content.type = m.constants.ui.contentTypes.series and episodeHistory <> invalid and episodeHistory.nowPos > 0

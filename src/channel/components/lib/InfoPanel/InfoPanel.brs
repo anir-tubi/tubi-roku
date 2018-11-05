@@ -23,10 +23,7 @@ Function init()
   m.top.observeField("width", "onWidthChange")
 
   m.top.observeField("titleLogoUri", "onTitleLogoUriChange")
-  m.top.observeField("releaseDate", "onLine1Change")
-  m.top.observeField("length", "onLine1Change")
-  m.top.observeField("hasCC", "onLine1Change")
-  m.top.observeField("rating", "onLine1Change")
+  m.top.observeField("lineOneData", "onLineOneDataChange")
   m.top.observeField("genres", "onGenresChange")
   m.top.observeField("description", "onDescriptionChange")
   m.top.observeField("directors", "onDirectorsChange")
@@ -35,7 +32,6 @@ Function init()
   m.top.observeField("categoryContentCount", "onCategoryContentCountChange")
   m.top.observeField("calculateHeight", "onCalculateHeight")
   m.top.observeField("focusedChild", "onComponentFocus")
-  m.top.observeField("partnerLogoUri", "onLine1Change")
   m.PartnerLogo.observeField("loadStatus", "onPosterLoadStatus")
   m.Rating.observeField("loadStatus", "onPosterLoadStatus")
   m.ClosedCaptions.observeField("loadStatus", "onPosterLoadStatus")
@@ -111,42 +107,62 @@ Function onTitleLogoUriChange()
 End Function
 
 
-Function onLine1Change()
-  tubiLog("InfoPanel.onLine1Change")
+Function onLineOneDataChange(msg)
+  tubiLog("InfoPanel.onLineOneDataChange")
+  data = msg.getData()
   firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
   line1Label = m.TwoLineInfo.findNode("Line1")
   text = ""
   
-  if m.top.releasedate <> invalid and m.top.releasedate <> "" then
-    text = m.top.releasedate + " "
+  if data.releasedate <> invalid and data.releasedate <> "" then
+    text = data.releasedate + " "
   end if
-  if m.top.length <> invalid and m.top.length <> 0 then
+  if data.length <> invalid and data.length <> 0 then
     ' add 'dot' spacer only if we had a release date
     if text.len() > 0 then 
       text = text + Chr(&hb7) + " "
     end if
-    text = text + formatLengthAsEnglish(m.top.length) + " "
+    text = text + formatLengthAsEnglish(data.length) + " "
   end if
   line1Label.text = text
 
-  ' start at index 1 to skip label
-  index = 1
-  firstLineGroup.removeChildrenIndex(firstLineGroup.getChildCount()-1, index)
-  if m.top.hasCC = true
-    firstLineGroup.insertChild(m.ClosedCaptions, index)
-    m.ClosedCaptions.uri = "pkg:/images/icon-closed-caption.png"
-    index += 1
+  insertIndex = 1
+
+  if data.hasCC = true
+    if m.ClosedCaptions.getParent() = invalid
+      firstLineGroup.insertChild(m.ClosedCaptions, insertIndex)
+      insertIndex ++
+    end if
+  else
+    if m.ClosedCaptions.getParent() <> invalid
+      firstLineGroup.removeChild(m.ClosedCaptions)
+    end if
   end if
-  if m.top.rating <> invalid and m.top.rating <> "" then
-    firstLineGroup.insertChild(m.Rating, index)
-    m.Rating.uri = "pkg:/images/rating-" + Ucase(m.top.rating) + ".png"
-    index += 1
+
+  if data.rating <> invalid and data.rating <> ""
+    if m.Rating.getParent() = invalid
+      firstLineGroup.insertChild(m.Rating, insertIndex)
+      insertIndex ++
+    end if
+    m.Rating.uri = "pkg:/images/rating-" + Ucase(data.rating) + ".png"
+  else
+    if m.Rating.getParent() <> invalid
+      firstLineGroup.removeChild(m.Rating)
+    end if
   end if
-  if m.top.partnerLogoUri <> invalid and m.top.partnerLogoUri <> ""
-    firstLineGroup.appendChild(m.PartnerLogo)
-    m.PartnerLogo.uri = m.top.partnerLogoUri
+
+  if data.partnerLogoUri <> invalid and data.partnerLogoUri <> ""
+    if m.PartnerLogo.getParent() = invalid
+      firstLineGroup.appendChild(m.PartnerLogo)
+    end if
+    m.PartnerLogo.uri = data.partnerLogoUri
+  else
+    if m.PartnerLogo.getParent() <> invalid
+      firstLineGroup.removeChild(m.PartnerLogo)
+    end if
   end if
 End Function
+
 
 Function onGenresChange()
   tubiLog("InfoPanel.onGenresChange")

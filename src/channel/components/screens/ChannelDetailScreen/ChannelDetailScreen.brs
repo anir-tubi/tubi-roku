@@ -176,6 +176,8 @@ End Function
 '@infoPanel: roSGNode, an InfoPanel component
 '@content: roSGNode, a content node
 Function populateInfoPanel(infoPanel, content, mode)
+  infoPanel.mode = mode
+  
   if content.title <> invalid
     infoPanel.title = content.title
   else
@@ -188,40 +190,42 @@ Function populateInfoPanel(infoPanel, content, mode)
     infoPanel.description = ""
   end if
 
+  line1Data = {}
   if content.releaseDate <> invalid
-    infoPanel.releaseDate = content.releaseDate
+    line1Data.releaseDate = content.releaseDate
   else
-    infoPanel.releaseDate = ""
+    line1Data.releaseDate = ""
   end if
 
   if content.length <> invalid
-    infoPanel.length = content.length
+    line1Data.length = content.length
   else
-    infoPanel.length = 0
+    line1Data.length = 0
+  end if
+
+  if (content.hasSubtitles = true or not m._.empty(content.subtitleTracks)) = true
+    line1Data.hasCC = true
+  else
+    line1Data.hasCC = false
   end if
 
   if content.rating <> invalid
-    infoPanel.rating = content.rating
+    line1Data.rating = content.rating
   else
-    infoPanel.rating = 0
+    line1Data.rating = 0
   end if
+
+  if content.inlineLogoUri <> invalid
+    line1Data.partnerLogoUri = content.inlineLogoUri
+  else
+    line1Data.partnerLogoUri = ""
+  end if
+  infoPanel.lineOneData = line1Data
 
   if content.genres <> invalid
     infoPanel.genres = content.genres
   else
     infoPanel.genres = []
-  end if
-
-  if (content.hasSubtitles = true or not m._.empty(content.subtitleTracks)) = true
-    infoPanel.hasCC = true
-  else
-    infoPanel.hasCC = false
-  end if
-
-  if content.inlineLogoUri <> invalid
-    infoPanel.partnerLogoUri = content.inlineLogoUri
-  else
-    infoPanel.partnerLogoUri = ""
   end if
 
   if content.totalCount <> invalid and content.totalCount >= 0
@@ -235,8 +239,7 @@ Function populateInfoPanel(infoPanel, content, mode)
   else
     infoPanel.titleLogoUri = ""
   end if
-  
-  infoPanel.mode = mode
+
   infoPanel.calculateHeight = true
 
   return infoPanel

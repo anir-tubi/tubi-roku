@@ -21,17 +21,8 @@
       <!-- The title of the episode displayed on the info panel, just below the series title-->
       <field id="episodeTitle" type="string" alias="DetailInfoPanel.episodeTitle" />
 
-      <!-- The year the video was released -->
-      <field id="releaseDate" type="string" alias="DetailInfoPanel.releaseDate" />
-
-      <!-- The length of the video in seconds -->
-      <field id="length" type="string" alias="DetailInfoPanel.length" />
-
-      <!-- Indicates if the video has captions -->
-      <field id="hasCC" type="boolean" alias="DetailInfoPanel.hasCC" />
-
-      <!-- The rating of the video, can be "G", "NR", "PG-13", "PG", "R", "TV-14", "TV-G", "TV-MA", "TV-PG", "TV-Y", "TV-Y7"  or lowercase -->
-      <field id="rating" type="string" alias="DetailInfoPanel.rating" />
+      <!-- An assoc array of key/values that populate the items in FirstLineGroup in the DetailInfoPanel -->
+      <field id="lineOneData" type="assocarray" alias="DetailInfoPanel.lineOneData" />
 
       <!-- Array of strings of genres for the video -->
       <field id="genres" type="stringarray" alias="DetailInfoPanel.genres" />
@@ -80,9 +71,6 @@
 
       <!-- used to update the text on the channel button -->
       <field id="channelName" type="string" alwaysNotify="true" />
-
-      <!-- For the Presented By info panel field -->
-      <field id="inlineLogoUri" type="string" alias="DetailInfoPanel.partnerLogoUri" />
 
       <!-- informs the details screen if the content controller is waiting for a user category update from the server -->
       <field id="isWaitingForServerResponse" type="boolean" value="false" />

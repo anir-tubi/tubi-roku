@@ -530,13 +530,17 @@ Function populateInfoPanel(target, mode, contentNode)
       target.mode = "item"
       target.title = contentNode.title
       target.description = contentNode.description
-      target.releaseDate = contentNode.releaseDate
-      target.length = contentNode.length
-      target.rating = contentNode.rating
-      target.genres = contentNode.genres
-      target.hasCC = (contentNode.hasSubtitles or not m._.empty(contentNode.subtitleTracks))
+
+      lineOneData = {}
+      lineOneData.releaseDate = contentNode.releaseDate
+      lineOneData.length = contentNode.length
+      lineOneData.hasCC = (contentNode.hasSubtitles or not m._.empty(contentNode.subtitleTracks))
+      lineOneData.rating = contentNode.rating
+      lineOneData.partnerLogoUri = contentNode.inlineLogoUri
+
+      target.lineOneData = lineOneData
       target.titleLogoUri = contentNode.titleLogoUri
-      target.partnerLogoUri = contentNode.inlineLogoUri
+      target.genres = contentNode.genres
     end if
 
     target.calculateHeight = true

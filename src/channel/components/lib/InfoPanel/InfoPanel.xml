@@ -35,11 +35,6 @@
     <field id="title" alias="Title.text" />
     <field id="titleLogoUri" type="string" />
     <field id="episodeTitle" alias="Episode.text" />
-    <field id="releaseDate" type="string" />
-    <field id="length" type="integer" />
-    <field id="hasCC" type="boolean"  value="false" />
-    <field id="rating" type="string" />
-    <field id="partnerLogoUri" type="string" />
     <field id="genres" type="stringarray" />
     <field id="description" type="string" />
     <field id="directors" type="stringarray" />
@@ -48,6 +43,18 @@
     <field id="categoryContentCount" type="integer" />
     <field id="calculateHeight" type="boolean" alwaysNotify="true" />
 
+    <!-- handles changes to FirstLineGroup, has a structure like
+      {
+        releaseDate: "1924"   'The year the video was released
+        length: 0             'The length of the video in seconds
+        hasCC: true           'Indicates if the video has captions
+        rating: "R"           'The rating of the video, can be "G", "NR", "PG-13", "PG", "R", "TV-14", "TV-G",
+                               "TV-MA", "TV-PG", "TV-Y", "TV-Y7"  or lowercase
+        partnerLogoUri: ""    'The URI used to display the partner/channel logo
+      }
+      Handling these at once is more efficient than handling them all individually
+     -->
+    <field id="lineOneData" type="assocarray" />
 
     <!-- mode is either: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
     <field id="mode" type="string"/>
@@ -169,8 +176,9 @@
             id="ClosedCaptionPoster"
             height="36"
             width="56"
-            loadSync="true"
-            loadDisplayMode="scaleToFit"/>
+            loadDisplayMode="scaleToFit"
+            uri="pkg:/images/icon-closed-caption.png"
+            loadSync="true"/>
           <Poster
             id="Rating"
             height="36"
