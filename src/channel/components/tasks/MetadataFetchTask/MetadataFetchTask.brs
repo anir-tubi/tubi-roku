@@ -198,7 +198,7 @@ Function handleResponse(message)
       tubiLog("MetadataFetchTask response code was " + stri(handledRequest.response.code) + " for " + handledRequest.context.name)
 
       tubiLog("MetadataFetchTask.handleResponse setting response field " + handledRequest.context.field)
-      tubiLog("MetadataFetchTask request duration = " + tostr(request_end_time - handledRequest.context.request_start_time))
+      tubiLog("MetadataFetchTask request duration = " + (request_end_time - handledRequest.context.request_start_time).toStr())
 
       parsed = ParseJSON(handledRequest.response.data)
       if parsed = invalid then
@@ -217,12 +217,12 @@ Function handleResponse(message)
       convert_end_time = m.timespan.TotalMilliseconds()
       m.totalConversionTime = m.totalConversionTime + (convert_end_time - request_end_time)
       handledRequest.id = handledRequest.context.id
-      tubiLog("MetadataFetchTask convert duration = " + tostr(convert_end_time - request_end_time))
+      tubiLog("MetadataFetchTask convert duration = " + (convert_end_time - request_end_time).toStr())
 
       ' if not a batch, return now, otherwise collect all responses
       if handledRequest.context.batchResponse = invalid then
         success = handledRequest.context.node.setField(handledRequest.context.field, handledRequest)
-        tubiLog("MetadataFetchTask rendezvous duration = " + tostr(m.timespan.TotalMilliseconds() - convert_end_time))
+        tubiLog("MetadataFetchTask rendezvous duration = " + (m.timespan.TotalMilliseconds() - convert_end_time).toStr())
       else
         context = handledRequest.context
         handledRequest.context = invalid  ' to avoid circular reference
@@ -240,8 +240,8 @@ Function handleResponse(message)
         if completed = expected then
           success = context.node.setField(context.field, batchResponse)
 
-          tubiLog("MetadataFetchTask total conversion time = " + tostr(m.totalConversionTime))
-          tubiLog("MetadataFetchTask rendezvous duration = " + tostr(m.timespan.TotalMilliseconds() - convert_end_time))
+          tubiLog("MetadataFetchTask total conversion time = " + m.totalConversionTime.toStr())
+          tubiLog("MetadataFetchTask rendezvous duration = " + (m.timespan.TotalMilliseconds() - convert_end_time).toStr())
         else
           tubiLog("MetadataFetchTask completed " + stri(completed) + " of " + stri(expected))
           success = true

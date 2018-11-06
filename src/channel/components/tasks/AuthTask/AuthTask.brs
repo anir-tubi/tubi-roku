@@ -58,11 +58,11 @@ Function addToQueue()
       msg = wait(0, port)
       result = request.handleEvent(msg)
       if result <> invalid then
-        tubiLog("addBookmarkReq returned " + tostr(result.response.code))
+        tubiLog("addBookmarkReq returned " + result.response.code.toStr())
         parsed = ParseJSON(result.response.data)
         if parsed <> invalid then
           m.top.bookmarkId = parsed.id
-          tubiLog("addBookmark received bookmarkId " + tostr(parsed.id))
+          tubiLog("addBookmark received bookmarkId " + parsed.id.toStr())
         else
           tubiLog("addBookmark failed to parse response")
           m.top.bookmarkId = invalid
@@ -94,7 +94,7 @@ Function removeFromQueue()
       result = request.handleEvent(msg)
       if result <> invalid then
         if result.response.code >= 200 and result.response.code < 300
-          tubiLog("removeBookmarkReq received " + tostr(result.response.code))
+          tubiLog("removeBookmarkReq received " + result.response.code.toStr())
         else
           tubiLog("removeBookmark failed")
         end if
@@ -126,7 +126,7 @@ Function removeFromHistory()
       result = request.handleEvent(msg)
       if result <> invalid then
         if result.response.code >= 200 and result.response.code < 300
-          tubiLog("removeHistoryReq received " + tostr(result.response.code))
+          tubiLog("removeHistoryReq received " + result.response.code.toStr())
         else
           tubiLog("removeBookmark failed")
         end if

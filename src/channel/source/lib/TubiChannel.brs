@@ -183,10 +183,6 @@ Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
   if (args.contentId <> invalid)
     tubiLog("Deep Link detected for content id " + args.contentId)
 
-    for each key in args
-      testLog(key + " = " + tostr(args[key]))
-    end for
-
     if isRemoteComponents
       content = CreateObject("roSGNode", "TubiRemoteLibrary:DeeplinkContentNode")
     else

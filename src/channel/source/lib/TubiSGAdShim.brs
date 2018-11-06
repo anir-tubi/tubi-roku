@@ -83,15 +83,15 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       preroll: "preroll"
       midroll: "preroll"
       seek: "preroll"
-      play: invalid
-      stop: invalid
+      play: ""
+      stop: ""
     }
     fetching: {
       cuepoints: "cuepoints"
       preroll: "preroll"
-      midroll: invalid
+      midroll: ""
       seek: "midroll"
-      play: invalid
+      play: ""
       stop: "reset"
     }
     noads: {
@@ -99,7 +99,7 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       preroll: "preroll"
       midroll: "midroll"
       seek: "resume"
-      play: invalid
+      play: ""
       stop: "reset"
     }
     adspending: {
@@ -113,17 +113,17 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
     adsplaying: {
       cuepoints: "cuepoints"
       preroll: "preroll"
-      midroll: invalid
-      seek: invalid
-      play: invalid
+      midroll: ""
+      seek: ""
+      play: ""
       stop: "reset"
     }
     adsclosed: {
       cuepoints: "cuepoints"
       preroll: "preroll"
-      midroll: invalid
-      seek: invalid
-      play: invalid
+      midroll: ""
+      seek: ""
+      play: ""
       stop: "reset"
     }
   }
@@ -144,14 +144,14 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
   end if
 
   functionName = stateMachine[state][control]
-  tubiLog("TubiSGAdShim: state=" + state + " control=" + control + " function=" + tostr(functionName))
-  if functionName <> invalid then 
+  tubiLog("TubiSGAdShim: state=" + state + " control=" + control + " function=" + functionName)
+  if functionName <> "" then
     newState = m[functionName](episode, normalizedPosition)
     'always update midroll list since TubiAds can
     'make modifications to it throughout playback
     m.videoPlayerNode.midrolls = m.ads_.midrolls
     for each time in m.ads_.midrolls
-      print "MIDROLL: " + stri(time)
+      print "MIDROLL: " + time.toStr()
     end for
   end if
 End Function
