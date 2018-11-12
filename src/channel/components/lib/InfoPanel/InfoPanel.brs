@@ -133,6 +133,9 @@ Function onLineOneDataChange(msg)
       firstLineGroup.insertChild(m.ClosedCaptions, insertIndex)
       insertIndex ++
     end if
+    ' Although this uri does not change, if it is set in the component XML, the icon will appear
+    ' during the initial channel load, so set it dynamically when it should appear
+    m.ClosedCaptions.uri = "pkg:/images/icon-closed-caption.png"
   else
     if m.ClosedCaptions.getParent() <> invalid
       firstLineGroup.removeChild(m.ClosedCaptions)
