@@ -162,6 +162,10 @@ Function init()
     m.TransportGradient.uri = "pkg:/images/playback-gradient-hd.9.png"
     m.PickerGradient.uri = "pkg:/images/browse-picker-gradient-hd.9.png"
   end if
+
+  ' m.didAdvanceDrm holds current state regarding if playback failed, and the player is going to try the
+  ' the next video stream available
+  m.didAdvanceDrm = false
 End Function
 
 
@@ -1275,7 +1279,6 @@ Function setFocusedButton(TransportButton, keyFocus=false)
       button.focusState = false
     end if
   end for
-
 End Function
 
 'exit the video player due to back button while no transport displaying, or during ad break

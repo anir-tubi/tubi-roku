@@ -214,39 +214,49 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     ' Create a "stub" ContentNode with just the DRM-oriented fields populated. This
     ' will make it easy to merge metadata plus drm info into one actionable
     ' contentnode for the video player
-    video = contentFromServer.video_resources[0]
-
-    if video.manifest <> invalid then translatedContent.url = video.manifest.url
-    if video.duration <> invalid then translatedContent.length = video.duration
-
-    if video.type = m.constants.player.drmTypes.dashWidevine
-      translatedContent.streamFormat = "dash"
-      if video.license_server <> invalid
-        translatedContent.drmParams = {
-          keySystem: "Widevine"
-          licenseServerURL: video.license_server.url
-        }
-        if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
-          translatedContent.httpHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
-        end if
+    videoResources = []
+    for each video in contentFromServer.video_resources
+      resource = {}
+      if video.manifest <> invalid
+        if video.manifest.url <> invalid then resource.url = video.manifest.url
+        if video.manifest.duration <> invalid then resource.length = video.manifest.duration
       end if
 
-    else if video.type = m.constants.player.drmTypes.dashPlayReady
-      translatedContent.streamFormat = "dash"
-      if video.license_server <> invalid
-        translatedContent.encodingType = "PlayReadyLicenseAcquisitionUrl"
-        translatedContent.encodingKey = video.license_server.url
-        if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
-          translatedContent.httpHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+      if video.type = m.constants.player.drmTypes.dashWidevine
+        resource.type = m.constants.player.drmTypes.dashWidevine
+        resource.streamFormat = "dash"
+        if video.license_server <> invalid
+          resource.drmParams = {
+            keySystem: "Widevine"
+            licenseServerURL: video.license_server.url
+          }
+          if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
+            resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+          end if
         end if
+      else if video.type = m.constants.player.drmTypes.dashPlayReady
+        resource.type = m.constants.player.drmTypes.dashPlayReady
+        resource.streamFormat = "dash"
+        if video.license_server <> invalid
+          resource.encodingType = "PlayReadyLicenseAcquisitionUrl"
+          resource.encodingKey = video.license_server.url
+          if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
+            resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+          end if
+        end if
+      else if video.type = m.constants.player.drmTypes.hlsv3
+        resource.type = m.constants.player.drmTypes.hlsv3
+        resource.streamFormat = "hls"
+      else
+        ' Don't add unsupported/unknown video resource types
+        resource = invalid
       end if
 
-    else if video.type = m.constants.player.drmTypes.hlsv3
-      translatedContent.streamFormat = "hls"
-
-    else
-      ' Don't add unsupported/unknown video resource types
-    end if
+      if resource <> invalid
+        videoResources.push(resource)
+      end if
+    end for
+    translatedContent.videoResources = videoResources
   end if
 
 

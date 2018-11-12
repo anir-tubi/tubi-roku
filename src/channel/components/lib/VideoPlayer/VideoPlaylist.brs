@@ -47,22 +47,30 @@ End Function
 Function onVideoStateChange(msg)
   tubiLog("VideoPlayer.onVideoStateChange " + msg.GetData())
   state = msg.GetData()
-  if (state = "finished" or state = "error") and m.VideoState = "play"
-    if state = "error"
-      content = m.Video.content
-      errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorMsg, content)
-      tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-playback")
-    end if
 
-    ' hide "finished" and "error" states if we are advancing the playlist
-    if not advancePlaylist()
-      if state = "error"
-        m.top.errorMsg = "There was an issue with video playback."
-      end if
+  if state = "finished" and m.VideoState = "play"
+    if m.didAdvanceDrm = true
+      ' video player always changes state to "finished" after reaching a state of "error"
+      ' so we wait until the "finished" state is reached to play the next available stream for the video
+      ' in order to prevent race conditions due to video player state changing.
+      m.didAdvanceDrm = false
+      playContent()
+    else if advancePlaylist() <> true
       m.top.state = state
     end if
-  else
-    m.top.state = state
+  else if state = "error"
+    content = m.Video.content
+    errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorMsg, content)
+    tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-playback")
+    m.monitoringTask.endPlayback = m.Video.errorMsg
+
+    ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
+    ' right after error state occurs.
+    m.didAdvanceDrm = advanceDrmOnContent(content)
+    if m.didAdvanceDrm <> true and advancePlaylist() <> true
+      m.top.errorMsg = "There was an issue with video playback."  'is used in error modal
+      m.top.state = state   'triggers error modal in ContentController
+    end if
   end if
 
   ' Track buffering time.  We need to track 2 pieces of data:
@@ -150,6 +158,7 @@ Function refreshContent(nowPos)
     if content.url <> invalid and content.url <> "" and content.fetchedAt <> invalid and content.fetchedAt > threshold
       ' we already have a valid url, so only need to get thumbnail/sprites
       resetVideoPlayerState(content)
+      setDrmOnContent(content, 0)
       m.top.content = content   'sends content to video node and makes current content available to contentController
       playContent()
       requestDetails = {
@@ -226,6 +235,7 @@ Function onRefreshResponse(msg)
     end if
 
     resetVideoPlayerState(refreshedContent)
+    setDrmOnContent(refreshedContent, 0)
     m.top.content = refreshedContent  'sends content to video node and makes current content available to contentController
     playContent()
   end if
@@ -325,6 +335,56 @@ Function updateVideoPlayerState(content) as Void
   else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
     m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
   end if
+End Function
+
+
+Function advanceDrmOnContent(contentNode)
+  tubiLog("VideoPlaylist.advanceDrmOnContent")
+  nextIndex = 0
+  if contentNode.drmType <> ""
+    for i=0 to contentNode.videoResources.count()-1
+      resource = contentNode.videoResources[i]
+      if contentNode.drmType = resource.type
+        nextIndex = i + 1
+        exit for
+      end if
+    end for
+  end if
+  return setDrmOnContent(contentNode, nextIndex)
+End Function
+
+
+' Updates the content node's url and httpHeaders fields with the videoResource info indicated by the index value
+'
+' @contentNode: roSGNode, a TubiContentNode
+' @index: int, the index of the video resource we want to use for DRM
+Function setDrmOnContent(contentNode, index)
+  tubiLog("VideoPlaylist.setDrmOnContent")
+  if contentNode.videoResources <> invalid and contentNode.videoResources.count() > 0 and contentNode.videoResources[index] <> invalid
+    ' reset DRM fields
+    contentNode.drmParams = {}
+    contentNode.encodingType = ""
+    contentNode.encodingKey = ""
+
+    resource = contentNode.videoResources[index]
+
+    ' set general fields related to DRM
+    contentNode.httpHeaders = resource.drmHeaders
+    contentNode.url = resource.url
+    contentNode.length = resource.length
+    contentNode.streamFormat = resource.streamFormat
+    contentNode.drmType = resource.type
+
+    ' set DRM scheme specific fields
+    if resource.type = m.constants.player.drmTypes.dashWidevine
+      contentNode.drmParams = resource.drmParams
+    else if resource.type = m.constants.player.drmTypes.dashPlayready
+      contentNode.encodingType = resource.encodingType
+      contentNode.encodingKey = resource.encodingKey
+    end if
+    return true
+  end if
+  return false
 End Function
 
 

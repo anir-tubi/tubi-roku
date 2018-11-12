@@ -69,6 +69,7 @@
 
     <!-- individual stream resources -->
     <field id="videoResources" type="array"/>
-
+    <!-- the current drm type -->
+    <field id="drmType" type="string"/>
   </interface>
 </component>
