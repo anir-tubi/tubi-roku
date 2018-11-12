@@ -311,7 +311,8 @@ Function onSingleContentResponse(msg) As Void
     end if
   else
     ' Find a default episode to land on, in case no specific episode requested from deep link
-    if refreshedContent.type = m.constants.ui.contentTypes.series and refreshedContent.currentEpisodeId = ""
+    ' NOTE: If the series is a daily, recurring series then we always want to go to the most recent
+    if refreshedContent.type = m.constants.ui.contentTypes.series and refreshedContent.currentEpisodeId = "" and refreshedContent.isRecurring = false
       if oldContent <> invalid and oldContent.type = m.constants.ui.contentTypes.video 
         ' a specific episode was requested by id
         refreshedContent.currentEpisodeId = oldContent.id

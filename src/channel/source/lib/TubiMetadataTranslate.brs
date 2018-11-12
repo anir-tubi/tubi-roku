@@ -303,6 +303,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.logo <> invalid then translatedContent.titleLogoUri = contentFromServer.logo
   if contentFromServer.channel_name <> invalid then translatedContent.channelName = contentFromServer.channel_name
 
+  if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
+
   ' Allow this to be passed in, so for cases where we lazily translate it can contain
   ' the right time
   if fetchedAt <> invalid then

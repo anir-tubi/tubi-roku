@@ -69,6 +69,9 @@
 
     <!-- individual stream resources -->
     <field id="videoResources" type="array"/>
+
+    <field id="isRecurring" type="boolean"/>
+
     <!-- the current drm type -->
     <field id="drmType" type="string"/>
   </interface>
