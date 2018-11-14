@@ -91,21 +91,7 @@ Function init()
 
   m._ = rodash()
 
-  ' mux in "components_reset" mode, meaning video node instance is long-lived
-  m.muxEnabled = false
-  if m.constants.thirdParty.mux.enabled = invalid
-    m.muxEnabled = (m.constants.externalConfig.info.mux_enabled = 1)
-  else
-    m.muxEnabled = m.constants.thirdParty.mux.enabled
-  end if
-  if m.muxEnabled = true
-    m.muxTask = m.top.createChild("MuxTask")
-    m.muxTask.id = "MuxTask"  ' so that video player can find it
-    m.muxTask.video = m.videoPlayer.findNode("VideoNode")
-    m.muxTask.config = m.constants.thirdParty.mux.config
-    m.muxTask.control = "RUN"
-  end if
-
+  initVideoTracking()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
@@ -721,10 +707,7 @@ Function playVideoContent(content As Object, isAutoplay As Boolean, position=inv
       m.upNextTask.request = request
       m.upNextTask.control = "RUN"
 
-      '  Mux events
-      if m.muxEnabled = true
-        m.muxTask.view = "start"
-      end if
+      videoTrackingStart()
     end if
     m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
     m.videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
@@ -931,10 +914,7 @@ End Function
 
 ' Stop the video player and optionally return to the screen stack
 Function stopVideoContent(playerResult, showScreenStack)
-  '  Mux events
-  if m.muxEnabled = true
-    m.muxTask.view = "end"
-  end if
+  videoTrackingStop()
   m.videoPlayer.unobserveFieldScoped("backButtonPressed")
   m.videoPlayer.unobserveFieldScoped("state")
   m.videoPlayer.unobserveFieldScoped("skipTrailer")
@@ -1122,4 +1102,47 @@ Function addSeriesTitle(content, oldContent)
   end if
 
   return content
+End Function
+
+
+Function initVideoTracking()
+  ' mux in "components_reset" mode, meaning video node instance is long-lived
+  if m.constants.thirdParty.mux.enabled = true
+    m.muxTask = m.top.createChild("MuxTask")
+    m.muxTask.id = "MuxTask"  ' so that video player can find it
+    m.muxTask.video = m.videoPlayer.findNode("VideoNode")
+    m.muxTask.config = m.constants.thirdParty.mux.config
+    m.muxTask.control = "RUN"
+  end if
+
+  if m.constants.thirdParty.youbora.enabled = true
+    m.youboraTask = m.top.createChild("YBPluginRokuVideo")
+    m.youboraTask.id = "Youbora"
+    m.youboraTask.options = m.constants.thirdParty.youbora.config
+    m.youboraTask.videoplayer = m.videoPlayer.findNode("VideoNode")
+    m.global.addFields({YouboraLogActive: m.constants.thirdParty.youbora.debug})
+    m.youboraTask.control = "RUN"
+  end if
+End Function
+
+Function videoTrackingStart()
+  '  Mux events
+  if m.constants.thirdParty.mux.enabled = true
+    m.muxTask.view = "start"
+  end if
+
+  if m.constants.thirdParty.youbora.enabled = true
+    m.youboraTask.event = {handler:"play"}
+  end if
+End Function
+
+Function videoTrackingStop()
+  '  Mux events
+  if m.constants.thirdParty.mux.enabled = true
+    m.muxTask.view = "end"
+  end if
+  if m.constants.thirdParty.youbora.enabled = true
+    m.youboraTask.event = {handler:"stop"}
+    m.youboraTask.taskState = "stop"
+  end if
 End Function

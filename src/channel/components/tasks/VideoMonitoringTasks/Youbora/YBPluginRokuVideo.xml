@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2016 Roku Corp.  All Rights Reserved. -->
+
+<component name="YBPluginRokuVideo" extends="YBPluginGeneric">
+    <interface>
+		<field id = "taskState" type = "string" />
+		<field id = "autoJoinTime" type = "bool" />
+		<field id = "reportErrors" type = "bool" />
+    </interface>
+
+    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/YBPluginRokuVideo.brs"/>
+</component>

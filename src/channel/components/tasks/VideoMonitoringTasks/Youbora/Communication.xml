@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2016 Roku Corp.  All Rights Reserved. -->
+
+<component name="Communication" extends="Task">
+  <interface>
+
+	<!-- fields -->
+	<field id = "httpSecure" type = "boolean" />
+	<field id = "code" type = "string" />
+	<field id = "prefix" type = "string" />
+	<field id = "view" type = "integer" value = "-1" />
+	<field id = "pingTime" type = "integer" />
+	<field id = "balancerEnabled" type = "string" />
+	<field id = "requestHost" type = "string" />
+
+	<!-- commands -->
+    <field id = "request" type = "assocarray" />
+    <field id = "addPreloader" type = "string" />
+    <field id = "removePreloader" type = "string" />
+    <field id = "nextView" type = "assocarray" />
+
+  </interface>
+
+  <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Utils.brs"/> 
+  <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Communication.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Request.brs"/>
+
+</component>

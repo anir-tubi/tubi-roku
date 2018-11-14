@@ -246,6 +246,17 @@ Function getConstants()
         ' DEVELOPMENT
         constants.thirdParty.mux.config.property_key = "o9i11mt559ko07190jhlh0g45"
 
+    constants.thirdParty.youbora = {}
+      constants.thirdParty.youbora.enabled = false
+      constants.thirdParty.youbora.debug = false
+      constants.thirdParty.youbora.config = {}
+        ' DEVELOPMENT
+        constants.thirdParty.youbora.config.accountCode = "tubitvdev" 'This is the only mandatory param
+        ' PRODUCTION
+        'constants.thirdParty.youbora.config.accountCode = "tubitv" 'This is the only mandatory param
+
+        constants.thirdParty.youbora.config.expectAds = true
+
   'platform is used when communitcating with CMS API
   constants.platform = "roku"
 

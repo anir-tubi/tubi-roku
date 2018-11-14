@@ -5,7 +5,8 @@ Function TubiExternalConfig(request as Object, constants as Object) as Object
 
     'default values should just be a simple key/value associative array
     defaultValues: {
-      mux_enabled: false
+      mux_enabled: 0
+      youbora_enabled: 0
     }
 
     ' public methods

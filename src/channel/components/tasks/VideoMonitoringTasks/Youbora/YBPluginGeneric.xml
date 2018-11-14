@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2016 Roku Corp.  All Rights Reserved. -->
+
+<component name="YBPluginGeneric" extends="Task">
+
+    <interface>
+
+        <!-- Video object from where to listen for events -->
+        <field id = "videoplayer" type = "node" value = "" />
+
+        <!-- Field to emit a youbora event -->
+        <field id = "event" type = "assocarray" />
+
+        <!-- Youbora options containing all media related info -->
+        <field id = "options" type = "assocarray" />
+
+        <!-- Logging flag. Set to true to view Youbora logs -->
+        <field id = "logging" type = "boolean" value = "false" />
+        
+        <!-- Field to emit a youbora adevent -->
+        <field id = "adevent" type = "assocarray" />
+
+    </interface>
+
+    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Utils.brs"/>  
+    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/YBPluginGeneric.brs"/>
+    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Chrono.brs"/>  
+    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/ViewManager.brs"/>
+    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Request.brs"/>
+    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/InfoManager.brs"/>
+
+</component>
