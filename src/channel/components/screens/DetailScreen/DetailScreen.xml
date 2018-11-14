@@ -36,6 +36,9 @@
       <!-- Array of strings of actors/actresses -->
       <field id="starring" type="stringarray" alias="DetailInfoPanel.starring" />
 
+      <!-- Length of the video (duration) -->
+      <field id="length" type="integer" />
+
       <!-- Indicates if the video is an episode of a series -->
       <field id="isSeries" type="boolean" value="false" />
 

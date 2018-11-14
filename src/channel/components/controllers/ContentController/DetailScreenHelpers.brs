@@ -117,8 +117,8 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false)
     detailScreen.isBookmark = (bookmark <> invalid)
     detailScreen.isHistory = (history <> invalid)
     detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "")
-
     detailScreen.channelName = content.channelName
+    detailScreen.length = stateSource.length  'needed to compute the resume bar on the resume button
 
     if content.type = m.constants.ui.contentTypes.series and episodeHistory <> invalid and episodeHistory.nowPos > 0
       detailScreen.resumePoint = episodeHistory.nowPos
