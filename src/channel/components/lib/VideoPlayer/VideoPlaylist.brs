@@ -103,6 +103,7 @@ Function onVideoStateChange(msg)
   ' Loading page visibility
   if state = "playing" or state = "paused" or m.top.isDocked then
     m.Loading.visible = false
+    m.top.state = state
   else
     m.LoadingProgressBar.progress = 0
     m.Loading.visible = true
