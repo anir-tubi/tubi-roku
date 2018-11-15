@@ -8,7 +8,6 @@ function ViewManager(_infoManager as Object, plugin) As Object
 	this.sendRequest = ViewManager_sendRequest
 
     'Fields
-    this.isInitSent = false
     this.isStartSent = false
 	this.isJoinSent = false
 	this.isPaused = false
@@ -31,6 +30,7 @@ function ViewManager(_infoManager as Object, plugin) As Object
 	this.chronoGenericAd = Chrono()
 	this.chronoAdJoin = Chrono()
 	this.chronoAdPause = Chrono()
+	this.chronoTotalAds = Chrono()
 
 
     if _infoManager <> Invalid
@@ -71,43 +71,21 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 		endif
   endif
 
-  if req = "init" 
-
-  	if m.isInitSent = false
-  			params = m.infoManager.getRequestParams("start", params)
-
-  			m.isInitSent = true
-
-  			m.infoManager.plugin._startPingTimer()
-			m.chronoPing.start()
-	        m.chronoJoinTime.start() 'Start timing join time
-
-			m.com.nextView = {live:false} 'Live = true
-			m.com.request = {service: "/init", args:params}
-			YouboraLog("Request: NQS /init " + params["mediaResource"])
-  	end if
-
-  	
-  end if
-
-
 	if req = "start"
+
 		if m.isStartSent = false
 			params = m.infoManager.getRequestParams("start", params)
 
 			m.isStartSent = true
-			if m.isInitSent = false
+
 			'Start chronos
 			m.infoManager.plugin._startPingTimer()
 			m.chronoPing.start()
 	        m.chronoJoinTime.start() 'Start timing join time
 
 			m.com.nextView = {live:false} 'Live = true
-			end if
 			m.com.request = {service: "/start", args:params}
 			YouboraLog("Request: NQS /start " + params["mediaResource"])
-			
-			
 		endif
 
 	else if req = "join"
@@ -118,8 +96,8 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			params = m.infoManager.getRequestParams("join", params)
 
 			'Add jointime from chrono
-			if m.chronoGenericAd.startTime <> Invalid
-			     m.chronoJoinTime.setStartTime(m.chronoJoinTime.getStartTime() + m.chronoGenericAd.getDeltaTime())
+			if m.chronoTotalAds.startTime <> Invalid
+			     m.chronoJoinTime.setStartTime(m.chronoJoinTime.getStartTime() + m.chronoTotalAds.getDeltaTime())
 			end if
 			if params.DoesExist("joinDuration") = false then params["joinDuration"] = m.chronoJoinTime.getDeltaTime()
 
@@ -144,7 +122,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 	else if req = "stop"
 
-	if m.isStartSent OR m.isInitSent
+	if m.isStartSent
 
 		pauseDuration = -1
 
@@ -153,7 +131,6 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 		end if
 
 		m.isStartSent = false
-		m.isInitSent = false
 		m.isPaused = false
 		m.isJoinSent = false
 		m.isSeeking = false
@@ -305,8 +282,11 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 		YouboraLog("Request: NQS /error " + params.msg)
 
 	else if req = "adStart"
-        if (m.isStartSent = true OR m.isInitSent = true) and m.isShowingAds = false
+        if m.isStartSent = true and m.isShowingAds = false
             m.isShowingAds = true
+            if m.chronoTotalAds.getDeltaTime() = -1
+            	m.chronoTotalAds.start()
+            end if
             m.chronoGenericAd.start()
             m.chronoAdJoin.start()
             params = m.infoManager.getRequestParams("adStart", params)
@@ -317,7 +297,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
          end if
 
      else if req = "adJoin"
-        if (m.isStartSent = true OR m.isInitSent = true) and m.isShowingAds = true and m.isAdJoinSent = false
+        if m.isStartSent = true and m.isShowingAds = true and m.isAdJoinSent = false
             m.isAdJoinSent = true
             m.chronoAdJoin.stop()
             if params.DoesExist("adJoinDuration") = false then params["adJoinDuration"] = m.chronoAdJoin.getDeltaTime()
@@ -330,7 +310,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
          end if
 
      else if req = "adPause"
-        if (m.isStartSent = true OR m.isInitSent = true) and m.isShowingAds = true and m.isAdPaused = false
+        if m.isStartSent = true and m.isShowingAds = true and m.isAdPaused = false
             m.isAdPaused = true
             params = m.infoManager.getRequestParams("adPause", params)
 
@@ -340,7 +320,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
          end if
 
      else if req = "adResume"
-        if (m.isStartSent = true OR m.isInitSent = true) and m.isShowingAds = true and m.isAdPaused = true
+        if m.isStartSent = true and m.isShowingAds = true and m.isAdPaused = true
             m.isAdPaused = false
             params = m.infoManager.getRequestParams("adResume", params)
 
@@ -350,7 +330,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
          end if
 
      else if req = "adStop"
-        if (m.isStartSent = true OR m.isInitSent = true) and m.isShowingAds = true
+        if m.isStartSent = true and m.isShowingAds = true
             m.chronoGenericAd.stop()
 
             if m.isShowingAds = true
@@ -368,6 +348,11 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
          end if
 
+     else if req = "adError"
+     	params = m.infoManager.getRequestParams("adError", params)
+
+        m.com.request = {service: "/adError", args:params}
+        YouboraLog("Request: NQS /adError")
     endif
 end sub
 

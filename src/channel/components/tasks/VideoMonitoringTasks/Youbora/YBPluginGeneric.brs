@@ -51,7 +51,7 @@ sub _run()
     YouboraLog("YBPluginGeneric.brs - run")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.1.0-" + m.pluginName
+    m.pluginVersion = "6.0.4-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)
@@ -198,9 +198,8 @@ sub stoptMonitoring()
 end sub
 
 sub eventHandler(event as String, params = Invalid)
-    if event = "init"
-        m.viewManager.sendRequest("init", params)
-    else if event = "play"
+
+    if event = "play"
         m.viewManager.sendRequest("start", params)
     else if event = "join"
         m.viewManager.sendRequest("join", params)
@@ -242,6 +241,9 @@ sub eventHandler(event as String, params = Invalid)
         m.viewManager.sendRequest("adStop", params)
     else if event = "adError"
         m.viewManager.sendRequest("adError", params)
+        if m.viewManager.isShowingAds = true
+            m.viewManager.sendRequest("adStop", params)
+        endif
     else if event = "adPause"
         m.viewManager.sendRequest("adPause", params)
     else if event = "adResume"
@@ -278,7 +280,7 @@ sub invokeAdHandler(data as Object)
          adParams["adDuration"] = data.duration
     end if
 
-    if m.viewManager.isInitSent = true  AND m.viewManager.isJoinSent = false
+    if m.viewManager.isStartSent = true AND m.viewManager.isJoinSent = false
         adParams["adPosition"] = "pre"
     else if m.viewManager.isJoinSent = true
         if m.viewManager.isFinished = true
@@ -290,8 +292,8 @@ sub invokeAdHandler(data as Object)
 
     if type(data) = "roAssociativeArray"
         if data.type = "PodStart"
-            if m.viewManager.isInitSent = false
-                invokeHandler({handler: "init"})
+            if m.viewManager.isStartSent = false
+                invokeHandler({handler: "play"})
             end if
         else if data.type = "PodComplete"
             if m.viewManager.isFinished = true
@@ -301,7 +303,7 @@ sub invokeAdHandler(data as Object)
             m.lastAdPlayhead = 0
             eventHandler("seeked")
             eventHandler("buffered")
-            adParams["adnalyzerVersion"] = "6.1.0 Roku Adnalyzer"
+            adParams["adnalyzerVersion"] = "6.0.3 Roku Adnalyzer"
             invokeHandler({handler: "adPlayJoin", params: adParams})
         else if data.type = "Complete"
             invokeHandler({handler: "adStop", params: adParams})

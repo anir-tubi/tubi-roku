@@ -4,8 +4,6 @@
 <component name="YBPluginRokuVideo" extends="YBPluginGeneric">
     <interface>
 		<field id = "taskState" type = "string" />
-		<field id = "autoJoinTime" type = "bool" />
-		<field id = "reportErrors" type = "bool" />
     </interface>
 
     <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/YBPluginRokuVideo.brs"/>

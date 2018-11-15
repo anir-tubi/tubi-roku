@@ -9,10 +9,7 @@ end sub
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.1.1-" + m.pluginName
-
-    m.top.autoJoinTime = true
-    m.top.reportErrors = true
+    m.pluginVersion = "6.0.4-" + m.pluginName
 
     m.top.videoplayer.ObserveField("state", m.port)
     m.top.videoplayer.ObserveField("bufferingStatus", m.port)
@@ -49,15 +46,14 @@ sub processPlayerState(newState as String)
     YouboraLog("Player state: " + newState)
 
     if newState = "buffering"
-        if m.viewManager.isInitSent = false
-            eventHandler("init")
+        if m.viewManager.isStartSent = false
+            eventHandler("play")
         else
             eventHandler("seeking")
         endif
     else if newState = "playing"
-        if m.viewManager.isInitSent = true
-            if m.viewManager.isJoinSent = false AND m.top.autoJoinTime = true
-                eventHandler("play")
+        if m.viewManager.isStartSent = true
+            if m.viewManager.isJoinSent = false
                 eventHandler("join")
             else if m.viewManager.isPaused = true
                 eventHandler("resume")
@@ -81,7 +77,7 @@ sub processPlayerState(newState as String)
         else
             YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
         endif
-    else if newState = "error" AND m.top.reportErrors = true
+    else if newState = "error"
         eventHandler("error", {"msg":m.top.videoplayer.errorMsg, "errorCode":m.top.videoplayer.errorCode.ToStr()})
     else if newState = "paused"
         eventHandler("pause")

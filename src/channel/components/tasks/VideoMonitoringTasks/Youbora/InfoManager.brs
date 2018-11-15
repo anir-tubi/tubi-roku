@@ -261,10 +261,6 @@ function InfoManager_getRequestParams(requestName = "" as String, params = Inval
         'Network
         if outParams.DoesExist("isp") = false then outParams["isp"] = m.options["network.isp"]
         if outParams.DoesExist("ip") = false then outParams["ip"] = m.options["network.ip"]
-        'SmartSwitch
-        if outParams.DoesExist("smartswitchConfigCode") = false then outParams["smartswitchConfigCode"] = m.options["smartswitch.configcode"]
-        if outParams.DoesExist("smartswitchGroupCode") = false then outParams["smartswitchGroupCode"] = m.options["smartswitch.groupcode"]
-        if outParams.DoesExist("smartswitchContractCode") = false then outParams["smartswitchContractCode"] = m.options["smartswitch.contractcode"]
         'Extra params
         nextraparams = 20
         index = 1
@@ -333,6 +329,16 @@ function InfoManager_getRequestParams(requestName = "" as String, params = Inval
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
         if outParams.DoesExist("adPosition") = false then outParams["adPosition"] = m.getAdPosition()
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
+    else if requestName = "adError"
+        if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
+        if outParams.DoesExist("adPosition") = false then outParams["adPosition"] = m.getAdPosition()
+        if outParams.DoesExist("adResource") = false then outParams["adResource"] = m.options["ad.resource"]
+        if outParams.DoesExist("adCampaign") = false then outParams["adCampaign"] = m.options["ad.campaign"]
+        if outParams.DoesExist("adTitle") = false then outParams["adTitle"] = m.options["ad.title"]
+        if outParams.DoesExist("adProperties") = false then outParams["adProperties"] = m.options["ad.metadata"]
+        if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
+        if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
+        if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
     endif
 
     return outParams
