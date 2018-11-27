@@ -26,7 +26,19 @@
     <field id="content" alias="VideoNode.content"/>
     <field id="position" alias="VideoNode.position"/>
     <field id="state" type="string" />
+    <!-- Error message to be displayed to the user -->
     <field id="errorMsg" type="string" />
+    <!-- Error message as told by the video node  -->
+    <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />   
+    <!-- Error code as told by the video node  -->
+    <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
+
+    <!-- We observe the VideoNode state change and when the state = "error", the call back chain of events
+         eventually sets VideoNode.control = "stop". Due to an idiosyncracy in Roku behavior, this prevents
+         the Youbora plugin from observing the error state on the video node, and so, we must manually trigger
+         the Youbora plugin with the error info. The content controller observes this field and sends error info to Youbora.
+    -->
+    <field id="sendYouboraError" type="boolean" alwaysNotify="true" />
 
     <!-- Only support play and stop for simple external interface -->
     <field id="control" type="string" value="none" alwaysNotify="true"/>

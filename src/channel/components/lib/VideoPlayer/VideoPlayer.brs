@@ -480,11 +480,7 @@ Function onControlChange()
 
   else if m.top.control = "stop" then
     cancelReplayCaptions()
-    if m.Video.state <> "error" or m.Video.position > 0
-      ' There is a bug in roku firmware 8.0 that causes an execution timeout if
-      ' a video node's control is set to "stop" when the state is "error" and position = 0
-      m.Video.control = "stop"
-    end if
+    m.Video.control = "stop"
     m.VideoState = "stop"
 
     'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed

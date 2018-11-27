@@ -707,7 +707,7 @@ Function playVideoContent(content As Object, isAutoplay As Boolean, position=inv
       m.upNextTask.request = request
       m.upNextTask.control = "RUN"
 
-      videoTrackingStart()
+      videoTrackingStart(content)
     end if
     m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
     m.videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
@@ -1116,6 +1116,7 @@ Function initVideoTracking()
   end if
 
   if m.constants.thirdParty.youbora.enabled = true
+    m.videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
     m.youboraTask = m.top.createChild("YBPluginRokuVideo")
     m.youboraTask.id = "Youbora"
     m.youboraTask.options = m.constants.thirdParty.youbora.config
@@ -1125,13 +1126,29 @@ Function initVideoTracking()
   end if
 End Function
 
-Function videoTrackingStart()
+Function videoTrackingStart(content)
   '  Mux events
   if m.constants.thirdParty.mux.enabled = true
     m.muxTask.view = "start"
   end if
 
+  ' Youbora events
   if m.constants.thirdParty.youbora.enabled = true
+    youboraConfig = m.constants.thirdParty.youbora.config
+
+    if content <> invalid
+      youboraConfig["content.metadata"] = {
+        video_id: content.id
+      }
+    end if
+
+    if m.global.authInfo <> invalid
+      youboraConfig.username = m.global.authInfo.userId
+    end if
+
+    youboraConfig["device.code"] = m.constants.deviceInfo.deviceId
+
+    m.youboraTask.options = youboraConfig
     m.youboraTask.event = {handler:"play"}
   end if
 End Function
@@ -1143,6 +1160,20 @@ Function videoTrackingStop()
   end if
   if m.constants.thirdParty.youbora.enabled = true
     m.youboraTask.event = {handler:"stop"}
-    m.youboraTask.taskState = "stop"
   end if
+End Function
+
+
+' We observe the VideoNode state change and when the state = "error", the call back chain of events
+' eventually sets VideoNode.control = "stop". Due to an idiosyncracy in Roku behavior, this prevents
+' the Youbora plugin from observing the error state on the video node, and so, we must manually trigger
+' the Youbora plugin with the error info.
+Function onSendYouboraError()
+  m.youboraTask.event = {
+    handler: "error"
+    params: {
+      "msg": m.videoplayer.videoErrorMsg,
+      "errorCode": m.videoplayer.videoErrorCode.ToStr()
+    }
+  }
 End Function

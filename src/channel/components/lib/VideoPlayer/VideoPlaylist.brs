@@ -62,6 +62,7 @@ Function onVideoStateChange(msg)
     content = m.Video.content
     errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorMsg, content)
     tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-playback")
+    m.top.sendYouboraError = true
 
     ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
     ' right after error state occurs.
