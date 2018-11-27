@@ -21,6 +21,10 @@ Function onScreenFocusChange()
   tubiLog("EpisodesScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.RowList.setFocus(true)
+
+    'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error
+    m.RowList.setFocus(false)
+    m.RowList.setFocus(true)
   end if
 End Function
 
