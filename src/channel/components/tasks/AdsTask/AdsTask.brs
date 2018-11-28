@@ -10,7 +10,7 @@ Function execAdsTask()
   requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
   log = TubiLogger(constants, request, auth)
-  ads = TubiAds(constants, log, request, requestQueue, auth)
+  ads = TubiAds(constants, log, request, requestQueue, auth, m.top.adContentType)
   adShim = TubiSGAdShim(constants, ads)
   adShim.run(m.top.videoPlayerNode)
 End Function

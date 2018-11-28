@@ -1,0 +1,105 @@
+{
+  "id": "438042",
+  "type": "v",
+  "detailed_type": "movie",
+  "title": "Goon",
+  "description": "A bouncer looking for a purpose takes his fighting skills to the hockey rink. His epic brawls could make him a star, if he can learn how to skate.",
+  "tags": [
+    "Comedy",
+    "Sport"
+  ],
+  "year": 2011,
+  "publisher_id": "cf5f5fa2ef132bbc45e011ac328cf688",
+  "import_id": "magnolia",
+  "partner_id": "10457MAG",
+  "posterarts": [
+    "http://image-server.staging-public.tubi.io/rfXiSxsrEzKc-_rK7Zq2kocpKY0=/210x300/smart/img.adrise.tv/5a5e8b97-8c8f-4089-8be7-33bb106f0614.jpg",
+    "http://image-server.staging-public.tubi.io/ggLSTTD6ypZt4bhzIbRtR_GNmi8=/210x270/smart/img.adrise.tv/5a5e8b97-8c8f-4089-8be7-33bb106f0614.jpg"
+  ],
+  "thumbnails": [
+    "http://image-server.staging-public.tubi.io/flNnr4dAOJAIU5ufOWZBiwcH7i4=/250x141/smart/img.adrise.tv/0bfb789f-6870-4fe6-970b-2b3ad31c5ddb.jpg"
+  ],
+  "hero_images": [
+    "http://image-server.staging-public.tubi.io/FZO6OAxyL_OXqszGDnMim6ZnNFU=/430x242/smart/img.adrise.tv/0bfb789f-6870-4fe6-970b-2b3ad31c5ddb.jpg"
+  ],
+  "landscape_images": [],
+  "backgrounds": [
+    "http://image-server.staging-public.tubi.io/bttTDsWR_WtX2Jvm4OdR3VBbHrY=/1920x1080/smart/img.adrise.tv/99924e15-e306-4f88-89f3-dfba36ca92f9.jpg",
+    "http://image-server.staging-public.tubi.io/bttTDsWR_WtX2Jvm4OdR3VBbHrY=/1920x1080/smart/img.adrise.tv/99924e15-e306-4f88-89f3-dfba36ca92f9.jpg",
+    "http://image-server.staging-public.tubi.io/bttTDsWR_WtX2Jvm4OdR3VBbHrY=/1920x1080/smart/img.adrise.tv/99924e15-e306-4f88-89f3-dfba36ca92f9.jpg",
+    "http://image-server.staging-public.tubi.io/bttTDsWR_WtX2Jvm4OdR3VBbHrY=/1920x1080/smart/img.adrise.tv/99924e15-e306-4f88-89f3-dfba36ca92f9.jpg"
+  ],
+  "preview_sprite": {
+    "url": "http://image-server.staging-public.tubi.io/Xo25a_t0q3oHZAOcSBKY-aXMjM8=/img.adrise.tv/438042/10p.jpg",
+    "count": 10,
+    "height": 124,
+    "frame_width": 220
+  },
+  "subtitles": [
+    {
+      "lang": "English",
+      "url": "http://s.adrise.tv/928091c5-f5c5-4658-8415-592a1c07f146.srt"
+    }
+  ],
+  "has_subtitle": true,
+  "updated_at": "2018-08-10T22:23:25.102Z",
+  "lang": "English",
+  "country": "Canada",
+  "ratings": [
+    {
+      "system": "mpaa",
+      "value": "R"
+    }
+  ],
+  "actors": [
+    "Seann William Scott",
+    "Jay Baruchel",
+    "Alison Pill",
+    "Liev Schreiber",
+    "Eugene Levy"
+  ],
+  "directors": [
+    "Michael Dowse"
+  ],
+  "needs_login": true,
+  "url": "https://frqj.adrise.tv/eda181f7-80ca-4a3c-9e45-6af38804ba79/h7q8sdxw8y.m3u8?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDA1NzAwNzZ9.3zpQiMAUgy6rKXl2_gKefWhG0_ePd6gV1B-RPPvJ8Dw",
+  "trailers": [],
+  "has_trailer": false,
+  "duration": 1327,
+  "credit_cuepoints": {
+    "postlude": 1307,
+    "prelogue": 0
+  },
+  "availability_starts": "2012-01-01T00:00:00.000Z",
+  "availability_ends": "2023-12-31T00:00:00.000Z",
+  "video_resources": [
+    {
+      "type": "dash_widevine",
+      "manifest": {
+        "url": "https://s3-us-west-2.amazonaws.com/haofei-playground-public/drm/440105_cenc/index.mpd?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDAzMzQ5NDR9.FxmRmcDKTcl947oIMMgHR9Vue6FICGwu0yq-9iVE_VM"
+      },
+      "license_server": {
+        "url": "https://wv-keyos.licensekeyserver.com/",
+        "auth_header_key": "customdata",
+        "auth_header_value": "PEtleU9TQXV0aGVudGljYXRpb25YTUw+PERhdGE+PEdlbmVyYXRpb25UaW1lPjIwMTgtMTAtMDQgMDA6Mjg6MjUuMTU0PC9HZW5lcmF0aW9uVGltZT48RXhwaXJhdGlvblRpbWU+MjAxOC0xMS0wMyAwMDoyODoyNS4xNTQ8L0V4cGlyYXRpb25UaW1lPjxVbmlxdWVJZD5jYzVkMzFkZS0yY2Y5LTQ1NGItYmMxOS1mNzJkNDYwMjNjNGM8L1VuaXF1ZUlkPjxDb250ZW50SUQ+MzBhMjZmZTgtNjBiYS00NjAwLWEyMmEtYWViZTU2MGVhZTc3PC9Db250ZW50SUQ+PEV4dGVybmFsSUQ+MWU2NjE3YTYtNzQyYi00YjU0LTgzNzYtYTg4NzI5NjcxMGY3PC9FeHRlcm5hbElEPjxSU0FQdWJLZXlJZD45YzZiZjE3M2M4OTM3MmEzOGRkZWUwMWQxMjVjZThhNTwvUlNBUHViS2V5SWQ+PFdpZGV2aW5lUG9saWN5IGZsX0NhblBlcnNpc3Q9InRydWUiIGZsX0NhblBsYXk9InRydWUiIC8+PFdpZGV2aW5lQ29udGVudEtleVNwZWMgVHJhY2tUeXBlPSJIRCI+PFNlY3VyaXR5TGV2ZWw+MTwvU2VjdXJpdHlMZXZlbD48L1dpZGV2aW5lQ29udGVudEtleVNwZWM+PC9EYXRhPjxTaWduYXR1cmU+QlVWWGwzalUzeFhOTGV1YkF2dDA1RXNOWmV6eGNMQUo2QU1UT3lxeEVIemNpL2JRNVdLTG5KTEFNNXBWcjJxNU9tcDJralUvRFVRZE9RNXM2bHpTVE41YkRhL0F6Zko0U21Rd3FXQTlMNGN1Q2ZneEd1TTBaOWs1eTdkc1EwZU9iUVQ4aFp0RHN6bkw1cmw2dEFjclgwd3RMd0lQdlYxdURBUzZ1REZjUEduR0VnMGVlekt3K0ErQ0ora3Nyalg1K2gxa0ttdmVUNkdVNnYrL2xRTlJEOXlUS2J4d0JLM3F3RTU4RnJQNWU2bDMybEVzOXBvbHlEdnh4YUplOVdvcFIvbit2TW9qR0xuODVoelY3aGh3ZzdqZW8zdlg5aU0zS0kyUlNrdnY5bFF1NUxQUWErOFdsV3V3NGRCSE55T1gyamtpUzJ2NVRmeHN1NWExeC9oQklBPT08L1NpZ25hdHVyZT48L0tleU9TQXV0aGVudGljYXRpb25YTUw+"
+      }
+    },
+    {
+      "type": "dash_playready",
+      "manifest": {
+        "url": "https://s3-us-west-2.amazonaws.com/haofei-playground-public/drm/440105_cenc/index.mpd?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDA1NzAwNzZ9.3zpQiMAUgy6rKXl2_gKefWhG0_ePd6gV1B-RPPvJ8Dw"
+      },
+      "license_server": {
+        "url": "https://pr-keyos.licensekeyserver.com/core/rightsmanager.asmx",
+        "auth_header_key": "customdata",
+        "auth_header_value": "PEtleU9TQXV0aGVudGljYXRpb25YTUw+PERhdGE+PEdlbmVyYXRpb25UaW1lPjIwMTgtMTAtMDQgMDA6Mjg6MjUuMTU0PC9HZW5lcmF0aW9uVGltZT48RXhwaXJhdGlvblRpbWU+MjAxOC0xMS0wMyAwMDoyODoyNS4xNTQ8L0V4cGlyYXRpb25UaW1lPjxVbmlxdWVJZD5jYzVkMzFkZS0yY2Y5LTQ1NGItYmMxOS1mNzJkNDYwMjNjNGM8L1VuaXF1ZUlkPjxDb250ZW50SUQ+MzBhMjZmZTgtNjBiYS00NjAwLWEyMmEtYWViZTU2MGVhZTc3PC9Db250ZW50SUQ+PEV4dGVybmFsSUQ+MWU2NjE3YTYtNzQyYi00YjU0LTgzNzYtYTg4NzI5NjcxMGY3PC9FeHRlcm5hbElEPjxSU0FQdWJLZXlJZD45YzZiZjE3M2M4OTM3MmEzOGRkZWUwMWQxMjVjZThhNTwvUlNBUHViS2V5SWQ+PFdpZGV2aW5lUG9saWN5IGZsX0NhblBlcnNpc3Q9InRydWUiIGZsX0NhblBsYXk9InRydWUiIC8+PFdpZGV2aW5lQ29udGVudEtleVNwZWMgVHJhY2tUeXBlPSJIRCI+PFNlY3VyaXR5TGV2ZWw+MTwvU2VjdXJpdHlMZXZlbD48L1dpZGV2aW5lQ29udGVudEtleVNwZWM+PC9EYXRhPjxTaWduYXR1cmU+QlVWWGwzalUzeFhOTGV1YkF2dDA1RXNOWmV6eGNMQUo2QU1UT3lxeEVIemNpL2JRNVdLTG5KTEFNNXBWcjJxNU9tcDJralUvRFVRZE9RNXM2bHpTVE41YkRhL0F6Zko0U21Rd3FXQTlMNGN1Q2ZneEd1TTBaOWs1eTdkc1EwZU9iUVQ4aFp0RHN6bkw1cmw2dEFjclgwd3RMd0lQdlYxdURBUzZ1REZjUEduR0VnMGVlekt3K0ErQ0ora3Nyalg1K2gxa0ttdmVUNkdVNnYrL2xRTlJEOXlUS2J4d0JLM3F3RTU4RnJQNWU2bDMybEVzOXBvbHlEdnh4YUplOVdvcFIvbit2TW9qR0xuODVoelY3aGh3ZzdqZW8zdlg5aU0zS0kyUlNrdnY5bFF1NUxQUWErOFdsV3V3NGRCSE55T1gyamtpUzJ2NVRmeHN1NWExeC9oQklBPT08L1NpZ25hdHVyZT48L0tleU9TQXV0aGVudGljYXRpb25YTUw+"
+      }
+    },
+    {
+      "type": "hlsv3",
+      "manifest": {
+        "url": "https://frqj.adrise.tv/c5fab94b-8e9a-4dd9-917a-32326c77c18d/goe0bvrp4a.m3u8?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDA1NzAwNzZ9.3zpQiMAUgy6rKXl2_gKefWhG0_ePd6gV1B-RPPvJ8Dw"
+      }
+    }
+  ]
+}

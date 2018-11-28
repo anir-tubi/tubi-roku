@@ -95,7 +95,7 @@ Function testHelper_tubiAds_createTubiAds()
   log = TubiLogger(constants, request, auth)
 
   port = CreateObject("roMessagePort")
-  ads = TubiAds(constants, log, request, requestQueue, auth)
+  ads = TubiAds(constants, log, request, requestQueue, auth, "hls")
   ads.populateUrl = Function(episode)
     ' deliberately fake so it fails and RAF.getAds() returns invalid
     return "http://127.0.0.1/"

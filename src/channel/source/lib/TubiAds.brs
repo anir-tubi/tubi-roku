@@ -1,4 +1,4 @@
-function TubiAds (constants, log, request, requestQueue, auth)
+function TubiAds (constants, log, request, requestQueue, auth, adContentType)
 
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
@@ -19,6 +19,10 @@ function TubiAds (constants, log, request, requestQueue, auth)
   'a port used for sending logging requests
   adLoggingPort = CreateObject("roMessagePort")
 
+  if adContentType <> "hls" and adContentType <> "mp4"
+    adContenType = "hls"  ' safety fallback
+  end if
+
   return {
     ' dependencies
     constants: constants
@@ -35,6 +39,7 @@ function TubiAds (constants, log, request, requestQueue, auth)
     commercialDuration : 0
     lastAdFailed: false
     _: rodash()
+    adContentType: adContentType  ' "hls" or "mp4"
 
     ' public
     reset: tubiAds_reset
@@ -149,7 +154,7 @@ function tubiAds_populateUrl(episode) As String
     "model": m.constants.deviceInfo.model
     "deviceid": m.constants.deviceInfo.deviceId
     "pubid": episode.pubId
-    "content-type": "hls"
+    "content-type": m.adContentType
     "roku-v": m.constants.deviceInfo.clientVersion
     "m-language": m.constants.deviceInfo.language
     "_": RND(1000000000000).ToStr()
