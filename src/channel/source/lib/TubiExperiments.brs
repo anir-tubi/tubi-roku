@@ -14,6 +14,10 @@ Function TubiExperiments(request as Object, constants as Object) as Object
     '       background_color: "00FF12"
     '   }
     ' }
+    '
+    ' Default values are always used in case of a "control" value or
+    ' in the case that the experiment API doesn't return a response with our experiment.
+    ' All experiments are required by the backend to have one of the experiment values to be "control"
     defaultValues: {
       UserNamespace: {
         roku_on_now: 0
@@ -195,6 +199,9 @@ Function tubiExperiments_getExperimentValue(namespaceName as string, parameterNa
   if namespace <> invalid
     if namespace.evaluated_params <> invalid
       experimentValue = namespace.evaluated_params[parameterName]
+      if experimentValue = "control"
+        experimentValue = m.getDefault(namespaceName, parameterName)
+      end if
     end if
 
     if namespace.evaluated_experiment_name <> invalid
