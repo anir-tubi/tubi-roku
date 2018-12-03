@@ -162,7 +162,7 @@ End Function
 
 
 
-'takes the assocArray as given by the UAPI server and updates it as necessary to be easier to work with... including removing underscores from assocArray keys
+'Updates the namespace's experiment_definitions field to be an AA so as to be easier to work with later.
 '@namespaces: assocArray, an experiments namespace as returned by UAPI and whose json has been parsed to a Brightscript array of assocArrays
 Function tubiExperiments_parseNamespace_(namespace as Object) as Object
 

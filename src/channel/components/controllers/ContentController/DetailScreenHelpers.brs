@@ -398,16 +398,18 @@ Function findEpisode2dIndex(episodeId As String, contentNode As Object)
 End Function
 
 
-' @contentNode series content node
+' Given a content node that may be a series or a video, return the appropriate video to play.
+' This may just be returning the video that is passed in (in the case of a movie).
+' @contentNode content node
 Function getEpisodeContent(content)
   if content <> invalid 
     if content.currentEpisodeId <> invalid and content.currentEpisodeId <> ""
       return content.findNode(content.currentEpisodeId)
     else
-      series = content.getChild(0)
-      if series <> invalid
+      season = content.getChild(0)
+      if season <> invalid
         ' return a default if no match
-        return series.getChild(0)
+        return season.getChild(0)
       end if
     end if
   end if
