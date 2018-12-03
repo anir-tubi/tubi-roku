@@ -8,29 +8,38 @@
 Function showDetailScreen(content, sourceTrackingUri)
   tubiLog("DetailScreenHelpers.showDetailScreen")
 
-  detailScreen = CreateObject("roSGNode", "DetailScreen")
-  detailScreen.observeFieldScoped("playSelected", "onPlay")
-  detailScreen.observeFieldScoped("resumeSelected", "onResume")
-  detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
-  detailScreen.observeFieldScoped("episodeListSelected", "onEpisodeList")
-  detailScreen.observeFieldScoped("addToQueueSelected", "onAddToQueueSelected")
-  detailScreen.observeFieldScoped("removeFromQueueSelected", "onRemoveFromQueueSelected")
-  detailScreen.observeFieldScoped("removeFromHistorySelected", "onRemoveFromHistorySelected")
-  detailScreen.observeFieldScoped("itemFailed", "onDetailItemFailed")
-  detailScreen.observeFieldScoped("backButtonPressed", "onDetailBackPressed")
-  detailScreen.observeFieldScoped("relatedContentSelected", "onRelatedContentSelected")
-  detailScreen.observeFieldScoped("backgroundUriList", "onDetailBackgroundChange")
-  detailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
+  if content <> invalid
+    detailScreen = CreateObject("roSGNode", "DetailScreen")
+    detailScreen.observeFieldScoped("playSelected", "onPlay")
+    detailScreen.observeFieldScoped("resumeSelected", "onResume")
+    detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
+    detailScreen.observeFieldScoped("episodeListSelected", "onEpisodeList")
+    detailScreen.observeFieldScoped("addToQueueSelected", "onAddToQueueSelected")
+    detailScreen.observeFieldScoped("removeFromQueueSelected", "onRemoveFromQueueSelected")
+    detailScreen.observeFieldScoped("removeFromHistorySelected", "onRemoveFromHistorySelected")
+    detailScreen.observeFieldScoped("itemFailed", "onDetailItemFailed")
+    detailScreen.observeFieldScoped("backButtonPressed", "onDetailBackPressed")
+    detailScreen.observeFieldScoped("relatedContentSelected", "onRelatedContentSelected")
+    detailScreen.observeFieldScoped("backgroundUriList", "onDetailBackgroundChange")
+    detailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
 
-  if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
-    detailScreen.isLoading = true
+    if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
+      detailScreen.isLoading = true
+    else
+      detailScreen.trackingUri = populateDetailTrackingUri(content, invalid)
+      populateDetailScreen(detailScreen, content, true)
+    end if
+
+    pushScreen(detailScreen, false)  ' don't send tracking until we resolve series episode
+    getSingleContentFromServer(detailScreen, content, sourceTrackingUri)
   else
-    detailScreen.trackingUri = populateDetailTrackingUri(content, invalid)
-    populateDetailScreen(detailScreen, content, true)
+    ' TODO: Refer to logs to determine if it's necessary to show a modal in this instance informing the user to press the back
+    ' back button. We shouldn't end up with an invalid content, but as of 11/25/18 there are crash logs
+    ' that indicate it might be possible that getDetailScreenContent() as called by ContentController.returnToDetailScreenFromVideo()
+    ' may return invalid, which may get passed to this function as the content argument.
+    message = "DetailScreenHelpers.showDetailScreen, content is invalid"
+    tubiLog(message, "warn", "clientWarn", "showdetailscreen-invalid-content")
   end if
-
-  pushScreen(detailScreen, false)  ' don't send tracking until we resolve series episode
-  getSingleContentFromServer(detailScreen, content, sourceTrackingUri)
 End Function
 
 

@@ -883,17 +883,21 @@ Function returnToDetailScreenFromVideo(result)
   ' get updated content, to be used to reload or re-populate details screen
   content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex) 'this always returns a video - sometimes an episode
   m.top.deepLinkContent = invalid
-  if content.isTrailer
-    ' Action 5
-    content = getDetailScreenContent()
-  else if content.parentType = m.constants.ui.contentTypes.series
-    ' Action 3
-    currentEpisodeId = content.id
-    content = getDetailScreenContent()
-    content.currentEpisodeId = currentEpisodeId
-  else if content <> invalid and content.id <> invalid and getDetailScreenContent() <> invalid and getDetailScreenContent().id <> invalid and content.id = getDetailScreenContent().id  ' no autoplay - same content as already on detail screen
-    ' Action 1
-    content = getDetailScreenContent()
+  if content <> invalid
+    if content.isTrailer
+      ' Action 5
+      content = getDetailScreenContent()
+    else if content.parentType = m.constants.ui.contentTypes.series
+      ' Action 3
+      currentEpisodeId = content.id
+      content = getDetailScreenContent()
+      if content <> invalid
+        content.currentEpisodeId = currentEpisodeId
+      end if
+    else if content.id <> invalid and getDetailScreenContent() <> invalid and getDetailScreenContent().id <> invalid and content.id = getDetailScreenContent().id  ' no autoplay - same content as already on detail screen
+      ' Action 1
+      content = getDetailScreenContent()
+    end if
   end if
 
   'reload or re-populate the screen as necessary
