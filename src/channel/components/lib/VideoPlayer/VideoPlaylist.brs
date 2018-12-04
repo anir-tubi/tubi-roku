@@ -158,9 +158,7 @@ Function refreshContent(nowPos)
     threshold = CreateObject("roDateTime").AsSeconds() - m.constants.player.maxAgeStreamUrl
     if content.url <> invalid and content.url <> "" and content.fetchedAt <> invalid and content.fetchedAt > threshold
       ' we already have a valid url, so only need to get thumbnail/sprites
-      resetVideoPlayerState(content)
-      setDrmOnContent(content, 0)
-      m.top.content = content   'sends content to video node and makes current content available to contentController
+      prepareToStartVideo(content, 0)
       playContent()
       requestDetails = {
         contentId: content.id
@@ -235,9 +233,7 @@ Function onRefreshResponse(msg)
       refreshedContent.subtitleConfig = invalid
     end if
 
-    resetVideoPlayerState(refreshedContent)
-    setDrmOnContent(refreshedContent, 0)
-    m.top.content = refreshedContent  'sends content to video node and makes current content available to contentController
+    prepareToStartVideo(refreshedContent, 0)
     playContent()
   end if
 End Function
@@ -277,6 +273,15 @@ Function onThumbnailsResponse(msg)
       m.Thumbnail.translation = [m.thumbnailMinXOffset, m.thumbnailMaxYOffset - m.Thumbnail.height]
     end if
   end if
+End Function
+
+
+' Helper function that aggregates any tasks that need to be done before playing a new video
+Function prepareToStartVideo(content, drmIndex)
+  resetVideoPlayerState(content)
+  setDrmOnContent(content, drmIndex)
+  m.top.content = content  'sends content to video node and makes current content available to contentController
+  m.top.sendVideoTrackingStart = true
 End Function
 
 

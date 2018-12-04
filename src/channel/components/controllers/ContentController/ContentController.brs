@@ -686,6 +686,7 @@ Function playVideoContent(content As Object, isAutoplay As Boolean, position=inv
       end if
       m.videoPlayer.observeFieldScoped("historyPosition", "onEpisodePosition")
       m.videoPlayer.observeFieldScoped("creditsPosition", "onEpisodeCredits")
+      m.videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
       m.videoPlayer.enableAds = true
       if m.top.deepLinkContent <> invalid
         m.videoPlayer.deeplinkSource = m.top.deepLinkContent.source
@@ -706,9 +707,8 @@ Function playVideoContent(content As Object, isAutoplay As Boolean, position=inv
       end if
       m.upNextTask.request = request
       m.upNextTask.control = "RUN"
-
-      videoTrackingStart(content)
     end if
+
     m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
     m.videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
     m.videoPlayer.visible = true
@@ -924,6 +924,7 @@ Function stopVideoContent(playerResult, showScreenStack)
   m.videoPlayer.unobserveFieldScoped("skipTrailer")
   m.videoPlayer.unobserveFieldScoped("historyPosition")
   m.videoPlayer.unobserveFieldScoped("creditsPosition")
+  m.videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
   m.videoPlayer.deeplinkSource = ""
   m.videoPlayer.control = "stop"
   playerInfo = {}
@@ -1130,7 +1131,7 @@ Function initVideoTracking()
   end if
 End Function
 
-Function videoTrackingStart(content)
+Function onVideoTrackingStart()
   '  Mux events
   if m.constants.thirdParty.mux.enabled = true
     m.muxTask.view = "start"
@@ -1140,9 +1141,9 @@ Function videoTrackingStart(content)
   if m.constants.thirdParty.youbora.enabled = true
     youboraConfig = m.constants.thirdParty.youbora.config
 
-    if content <> invalid
+    if m.videoPlayer.content <> invalid
       youboraConfig["content.metadata"] = {
-        video_id: content.id
+        video_id: m.videoPlayer.content.id
       }
     end if
 

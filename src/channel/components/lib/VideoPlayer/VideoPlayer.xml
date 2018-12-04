@@ -42,6 +42,7 @@
          the Youbora plugin with the error info. The content controller observes this field and sends error info to Youbora.
     -->
     <field id="sendYouboraError" type="boolean" alwaysNotify="true" />
+    <field id="sendVideoTrackingStart" type="boolean" alwaysNotify="true" />
 
     <!-- Only support play and stop for simple external interface -->
     <field id="control" type="string" value="none" alwaysNotify="true"/>
