@@ -1142,9 +1142,7 @@ Function onVideoTrackingStart()
     youboraConfig = m.constants.thirdParty.youbora.config
 
     if m.videoPlayer.content <> invalid
-      youboraConfig["content.metadata"] = {
-        video_id: m.videoPlayer.content.id
-      }
+      youboraConfig["extraparam.1"] = m.videoPlayer.content.id
     end if
 
     if m.global.authInfo <> invalid
