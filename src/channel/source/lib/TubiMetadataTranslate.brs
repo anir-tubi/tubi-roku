@@ -493,7 +493,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson) 
   ' to avoid having to define a custom content node which have
   ' proven to be much slower to instantiate.  Could use some testing,
   ' though.
-  if container.id = m.constants.ui.categoryIds.featured and m.singleFeaturePoster <> true
+  if container.id = m.constants.ui.categoryIds.featured
     for i = 0 to translated.getChildCount()-1
       child = translated.getChild(i)
       child.addField("isLandscape", "boolean", false)
@@ -568,7 +568,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           length: fullChild.duration
           subtype: "ContentNode"
         }
-        if container.id = m.constants.ui.categoryIds.featured and m.singleFeaturePoster <> true and fullChild.hero_images <> invalid then
+        if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid then
           childAA.hdgridposterurl = fullChild.hero_images[0]
         else if fullChild.posterarts <> invalid then
           childAA.hdgridposterurl = fullChild.posterarts[0]

@@ -6,12 +6,8 @@ Function init()
   m.ContentArea = m.top.findNode("ContentArea")
   m.CategoryList = m.top.findNode("CategoryList") 'aka category menu
   m.InfoPanel = m.top.findNode("InfoPanel")
-  m.FeatureInfo = m.top.findNode("FeatureInfo")
   m.HintGroup = m.top.findNode("UpHintGroup")
-  m.FeatureDots = m.top.findNode("FeatureDots")
   fades = m.top.findNode("Fades")
-  m.InfoPanelFade = fades.findNode("InfoPanelFade")
-  m.FeatureInfoFade = fades.findNode("FeatureInfoFade")
   m.HintGroupFade = fades.findNode("HintGroupFade")
   m.Spinner = m.top.findNode("CategorySpinner")
   m.top.observeField("focusedChild", "onScreenFocusChange")
@@ -69,19 +65,6 @@ Function init()
     frame.width = 455 + frameMargin * 2
     frame.height = 256 + frameMargin * 2
     frame.translation = [1390 - frameMargin, 151 - frameMargin]
-  end if
-
-  m.singleFeaturePoster = false
-  if m.constants.ui.categoryScreen.singleFeaturePoster <> invalid
-     m.singleFeaturePoster = m.constants.ui.categoryScreen.singleFeaturePoster
-  else
-    m.singleFeaturePoster = (getExperimentValue("UserNamespace", "roku_single_feature_poster") = "single")
-  end if
-
-  ' Corrections for the XML values in case of not showing single feature poster
-  if not m.singleFeaturePoster
-    m.FeatureInfo.opacity = 0.0
-    m.InfoPanel.opacity = 1.0
   end if
 End Function
 
@@ -281,7 +264,6 @@ End Function
 
 Function showCategoryMenu()
   if not m.CategoryList.isInFocusChain()
-    fade(m.InfoPanel, "in", 0.4)  ' if feature row is focused on the grid, the info panel would be hidden
     m.CategoryList.jumpToItem = Int(m.CategoryGridList.currFocusRow)
     m.CategoryList.setFocus(true)
     m.categoryListIsFocused = true
@@ -303,9 +285,6 @@ Function hideCategoryMenu()
   if m.CategoryList.isInFocusChain()
     m.CategoryGridList.setFocus(true)
     m.categoryListIsFocused = false
-    if m.CategoryGridList.currFocusRow = 0 and m.singleFeaturePoster = true
-      m.InfoPanel.opacity = 0.0   ' hide info panel if category grid will show the feature row
-    end if
     if m.global.constants.deviceInfo.limitedUi
       m.ContentArea.translation = [85,m.ContentArea.translation[1]]
       m.CategoryList.translation = [-380,m.CategoryList.translation[1]]
@@ -345,7 +324,7 @@ Function onCategoryMenuItemFocused() As Void
     infoMetadata.logoUri = newCategory.logoUri
   end if
 
-  populateInfoPanel(m.InfoPanel, "category", infoMetadata)
+  populateInfoPanel("category", infoMetadata)
 
   'update the tracking URI for user tracking purposes
   catPos = (m.CategoryList.itemFocused + m.top.rowPlaceholder + 1).toStr()
@@ -380,13 +359,6 @@ Function onCurrFocusRow()
     end if
 
     m.HintGroupFade.fraction = animationFraction
-    if m.singleFeaturePoster = true
-      if m.CategoryGridList.isInFocusChain()
-        ' If category menu is focused, info panel shows category description so don't hide it
-        m.InfoPanelFade.fraction = animationFraction
-      end if
-      m.FeatureInfoFade.fraction = animationFraction
-    end if
   end if
 End Function
 
@@ -401,32 +373,7 @@ Function onGridFocusChange() As Void
   if not m.CategoryGridList.isInFocusChain() then return
   focusedContent = m.CategoryGridList.itemFocused
   if focusedContent <> invalid
-    if m.CategoryGridList.currFocusRow = 0 and m.singleFeaturePoster = true
-      populateInfoPanel(m.FeatureInfo, "item", focusedContent)
-
-      ' Show the position dots
-      totalCount = 0
-      if m.categoryContent <> invalid
-        referenceCategory = m.categoryContent.findNode(m.constants.ui.categoryIds.featured)
-        if referenceCategory <> invalid
-          totalCount = referenceCategory.totalCount
-        end if
-      end if
-      m.FeatureDots.removeChildrenIndex(m.FeatureDots.getChildCount(), 0)
-      dots = m.FeatureDots.createChildren(totalCount, "Poster")
-      for i=0 to dots.count()-1
-        dots[i].width = 8
-        dots[i].height = 8
-        dots[i].uri = "pkg:/images/dot.png"
-        dots[i].blendColor = "0xffffff50"
-        if m.CategoryGridList.cursorPosition[1] = i
-          dots[i].blendColor = "0xff501a"
-        end if
-      end for
-
-    else
-      populateInfoPanel(m.InfoPanel, "item", focusedContent)
-    end if
+    populateInfoPanel("item", focusedContent)
   end if
 
   ' If focus is on an empty category, leave the background as is.  This helps avoid
@@ -515,21 +462,20 @@ Function onTrackingUriChange()
 End Function
 
 
-'@target: either the m.InfoPanel or m.FeatureInfo, depending on which panel is showing
 '@mode: string, one of the valid info panel modes (see InfoPanel.brs for details)
 '@contentNode: content node
-Function populateInfoPanel(target, mode, contentNode)
-  if contentNode <> invalid and target <> invalid
+Function populateInfoPanel(mode, contentNode)
+  if contentNode <> invalid
     if mode = "category"
-      target.mode = "category"
-      target.categoryContentCount = contentNode.totalCount
-      target.title = contentNode.title
-      target.description = contentNode.description
-      target.titleLogoUri = contentNode.logoUri
+      m.InfoPanel.mode = "category"
+      m.InfoPanel.categoryContentCount = contentNode.totalCount
+      m.InfoPanel.title = contentNode.title
+      m.InfoPanel.description = contentNode.description
+      m.InfoPanel.titleLogoUri = contentNode.logoUri
     else if mode = "item"
-      target.mode = "item"
-      target.title = contentNode.title
-      target.description = contentNode.description
+      m.InfoPanel.mode = "item"
+      m.InfoPanel.title = contentNode.title
+      m.InfoPanel.description = contentNode.description
 
       lineOneData = {}
       lineOneData.releaseDate = contentNode.releaseDate
@@ -538,12 +484,12 @@ Function populateInfoPanel(target, mode, contentNode)
       lineOneData.rating = contentNode.rating
       lineOneData.partnerLogoUri = contentNode.inlineLogoUri
 
-      target.lineOneData = lineOneData
-      target.titleLogoUri = contentNode.titleLogoUri
-      target.genres = contentNode.genres
+      m.InfoPanel.lineOneData = lineOneData
+      m.InfoPanel.titleLogoUri = contentNode.titleLogoUri
+      m.InfoPanel.genres = contentNode.genres
     end if
 
-    target.calculateHeight = true
+    m.InfoPanel.calculateHeight = true
   end if
 End Function
 

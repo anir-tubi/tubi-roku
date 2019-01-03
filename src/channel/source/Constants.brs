@@ -494,9 +494,6 @@ Function getConstants()
     constants.ui.signIn = {}
       constants.ui.signIn.backExitsSignIn = false
 
-    constants.ui.categoryScreen = {}
-      constants.ui.categoryScreen.singleFeaturePoster = false
-
     'static - pre defined category names
     constants.ui.categoryNames = {}
       constants.ui.categoryNames.topCategory = "Featured"

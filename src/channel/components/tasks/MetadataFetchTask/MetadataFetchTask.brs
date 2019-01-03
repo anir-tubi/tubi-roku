@@ -29,14 +29,6 @@ Function fetchLoop()
     tubiLog("WARNING: Rendezvous failed for constants")
   end while
 
-  ' get single feature poster value
-  m.singleFeaturePoster = false
-  if m.constants.ui.categoryScreen.singleFeaturePoster <> invalid
-     m.singleFeaturePoster = m.constants.ui.categoryScreen.singleFeaturePoster
-  else
-    m.singleFeaturePoster = (getExperimentValue("UserNamespace", "roku_single_feature_poster") = "single")
-  end if
-
   m.timespan = CreateObject("roTimeSpan")
   m.timespan.mark()
   m.epoch = m.timespan.TotalMilliseconds()

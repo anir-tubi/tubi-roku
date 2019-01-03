@@ -84,11 +84,6 @@ Function init()
 
   m.lastUserActivity = Uptime(0)  ' arbitrary marker when user last pressed a remote key
 
-  ' These values will be set from experiments in the trackingLoggingReady callback
-  ' since the trackingLoggingTask is not yet ready and is needed to send exposure events
-  ' We only show the sign in prompt message once per session for signed-out users
-  m.singleFeaturePoster = invalid
-
   m._ = rodash()
 
   initVideoTracking()
@@ -1074,22 +1069,10 @@ End Function
 ' Helper function to get the background type depending on if passed in uri list is using the default image
 ' @backgroundUriList, array of uris
 Function getBackgroundtype(backgroundUriList)
-  'get the singleFeaturePoster experiment value - but only one time
-  if m.singleFeaturePoster = invalid
-    if m.constants.ui.categoryScreen.singleFeaturePoster <> invalid
-       m.singleFeaturePoster = m.constants.ui.categoryScreen.singleFeaturePoster
-    else
-      m.singleFeaturePoster = (getExperimentValue("UserNamespace", "roku_single_feature_poster") = "single")
-    end if
-  end if
-
-  backgroundType = m.constants.ui.backgroundTypes.topRight
   if backgroundUriList[0] = m.defaultBackgroundUri
     backgroundType = m.constants.ui.backgroundTypes.fullScreen
   else
-    if m.categoryScreen <> invalid and m.categoryScreen.isInFocusChain() and m.categoryScreen.cursorPosition[0] = 0 and m.singleFeaturePoster = true
-      backgroundType = m.constants.ui.backgroundTypes.feature
-    end if
+    backgroundType = m.constants.ui.backgroundTypes.topRight
   end if
   return backgroundType
 End Function

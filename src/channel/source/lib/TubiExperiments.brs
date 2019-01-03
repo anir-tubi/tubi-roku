@@ -21,7 +21,6 @@ Function TubiExperiments(request as Object, constants as Object) as Object
     defaultValues: {
       UserNamespace: {
         roku_on_now: 0
-        roku_single_feature_poster: "control"
       }
       RokuNamespace: {
         roku_simple_register_screen: 0

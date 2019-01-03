@@ -37,7 +37,6 @@ Function componentTest_CategoryGridList(screen, runTests)
   constants.ui.colors.focused = "0xffffff"
   constants.ui.contentTypes = {}
   constants.ui.categoryScreen = {}
-  constants.ui.categoryScreen.singleFeaturePoster = false
   constants.ui.categoryIds = {}
   constants.ui.categoryIds.queue = "Queue"
   constants.ui.categoryIds.history = "History"

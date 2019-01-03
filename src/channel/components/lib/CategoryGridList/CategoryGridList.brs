@@ -59,19 +59,6 @@ Function init()
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
 
-  m.singleFeaturePoster = false
-  if m.constants.ui.categoryScreen.singleFeaturePoster <> invalid
-     m.singleFeaturePoster = m.constants.ui.categoryScreen.singleFeaturePoster
-  else
-    m.singleFeaturePoster = (getExperimentValue("UserNamespace", "roku_single_feature_poster") = "single")
-  end if
-
-  if m.singleFeaturePoster <> true
-    m.RowList.rowItemSize = [[430, 242], [210, 300]]
-    m.RowList.rowItemSpacing = [[10, 0]]
-    m.RowList.showRowLabel = [true]
-  end if
-
   ' suppress debounce if we have just gained focus
   m.justGainedFocus = false
 End Function

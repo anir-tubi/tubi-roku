@@ -146,8 +146,7 @@
         translation="[85,163]"
         maxHeight="325"
         maxTitleLines="2"
-        visible="true"
-        opacity="0.0"/>
+        visible="true"/>
       <Group
         id="DockOverlay"
         visible="false">
@@ -202,22 +201,6 @@
         translation="[85,553]">
         <CategoryGridList
           id="CategoryGridList"/>
-        <InfoPanel
-          id="FeatureInfo"
-          mode="item"
-          width="992"
-          maxHeight="313"
-          maxTitleLines="3"
-          titleFontSize="67"
-          translation="[260,0]">
-          <LayoutGroup
-            id="FeatureDots"
-            layoutDirection="horiz"
-            horizAlignment="right"
-            itemSpacings="[10]"
-            translation="[1485,291]">
-          </LayoutGroup>
-        </InfoPanel>
       </MaskGroup>
     </Group>
 
@@ -239,11 +222,6 @@
         fieldToInterp="InfoPanel.opacity"
         key="[0.0,1.0]"
         keyValue="[0.0,1.0]"/>
-      <FloatFieldInterpolator
-        id="FeatureInfoFade"
-        fieldToInterp="FeatureInfo.opacity"
-        key="[0.0,1.0]"
-        keyValue="[1.0,0.0]"/>
     </Animation>
   </children>
 </component>

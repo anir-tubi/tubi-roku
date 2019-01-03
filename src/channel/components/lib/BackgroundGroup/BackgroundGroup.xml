@@ -14,7 +14,7 @@
   
   <interface>
     <!-- backgrondInfo has the keys "type (string)" and "uriList (array)".
-         type can be "topright", "fullscreen", "feature"
+         type can be "topright", "fullscreen"
          uriList is an array of background image uris
     -->
     <field id="backgroundInfo" type="assocarray" />
@@ -35,10 +35,6 @@
     <BackgroundGradientGroup
       id="TopRightGradient"
       uri="pkg:/images/home-gradient-25.png"
-      gradientOpacity="0.0"/>
-    <BackgroundGradientGroup
-      id="FeatureGradient"
-      uri="pkg:/images/feature-row-gradient.9.png"
       gradientOpacity="0.0"/>
   </children>
 </component>
