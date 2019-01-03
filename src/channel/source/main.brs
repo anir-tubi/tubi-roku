@@ -2,8 +2,14 @@
 Function Main(startupArgs as Dynamic)
   constants = getConstants()
   request = TubiRequest()
+  requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
+  translate = TubiMetadataTranslate(constants)
+  metadataFetch = TubiMetadataFetch(constants, request, translate)
   tracking = TubiTracking(constants, request, auth)
+  nodeHelpers = TubiNodeHelpers()
+  bookmarks = TubiBookmarks(request, auth, constants, nodeHelpers)
+  log = TubiLogger(constants, request, auth)
 
   'run remote config
   externalConfig = TubiExternalConfig(request, constants)
@@ -25,17 +31,6 @@ Function Main(startupArgs as Dynamic)
   m.global = {} ' important syntactically to keep the settings at m.global.settings, whether
                 ' used from the main Brightscript thread or the SceneGraph thread
   
-  request = TubiRequest()
-  requestQueue = TubiRequestQueue()
-  auth = TubiAuth(constants, request)
-  translate = TubiMetadataTranslate(constants)
-  metadataFetch = TubiMetadataFetch(constants, request, translate)
-  tracking = TubiTracking(constants, request, auth)
-  nodeHelpers = TubiNodeHelpers()
-  bookmarks = TubiBookmarks(request, auth, constants, nodeHelpers)
-  log = TubiLogger(constants, request, auth)
-
-
   'set up all experiments
   experiments = TubiExperiments(request, constants)
   experiments.init() 'sets experiment values on constants
