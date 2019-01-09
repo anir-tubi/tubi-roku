@@ -6,7 +6,10 @@ Function showErrorModal(errorCode As Integer, errorMessage As String, tryAgainCa
   tubiLog("ModalDialog.showErrorModal")
   modal = CreateObject("roSGNode", "ModalDialogScreen")
   modal.title = "Something went wrong"
-  modal.message = "Error " + stri(errorCode) + Chr(10) + errorMessage
+  message = "Error " + stri(errorCode) + Chr(10)
+  message += errorMessage + Chr(10)
+  message += "Please contact: support@tubi.tv"
+  modal.message = message
   if tryAgainCallback <> invalid
     modal.buttons = ["Try Again", "Close"]
   else

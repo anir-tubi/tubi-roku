@@ -680,7 +680,7 @@ Function onAdStateChange()
         ctx: m.top.content.id
       })
     else
-      m.top.errorMsg = "Video URL is not valid. Please contact: support@tubi.tv"
+      m.top.errorMsg = "Video URL is not valid."
       m.top.state = "error"
       errorInfo = {
         video_id: m.top.content.id
