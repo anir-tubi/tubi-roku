@@ -28,15 +28,6 @@ TARGET_REMOTE_DIR=$(BUILD_DIR)/remote
 TARGET_HOTPATCH_DIR=$(BUILD_DIR)/hotpatch
 REMOTE_LOAD_PORT=8090
 REMOTE_LOAD_IMAGE_WHITELIST=
-REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
-  --include 'source/lib' \
-  --include 'source/lib/**' \
-  --include 'source/3rdparty' \
-  --include 'source/3rdparty/**' \
-  --include 'components' \
-  --include 'components/**' \
-  --include-from=new_images_since_2_6 \
-  --exclude '*'
 DEV_PORT=8085
 DEV_PASSWORD?=1234
 PKG_PASSWORD?=ABCD
@@ -50,9 +41,53 @@ S3_STAGING_ADDR=s3://adrise-bryan-playground/roku-staging
 S3_COMPONENTS_DIR=components
 
 ifeq ($(ROKU_PROFILE), production)
-RSYNC_EXCLUDE=--exclude source/tests --exclude '.keep' --exclude '.DS_Store' --exclude '*.md'
+# More specific excludes to omit overhead of compiling test support files
+RSYNC_EXCLUDE= \
+  --exclude source/tests \
+  --exclude components/tests \
+  --exclude '.keep' \
+  --exclude '.DS_Store' \
+  --exclude '*.md' \
+  --exclude 'ComponentTestFramework.brs' \
+  --exclude 'UnitTestFramework.brs' \
+  --exclude 'Test_*.xml'
+REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
+  --include 'source/lib' \
+  --include 'source/lib/**' \
+  --include 'source/3rdparty' \
+  --include 'source/3rdparty/mux' \
+  --include 'source/3rdparty/mux/**' \
+  --include 'source/3rdparty/rodash' \
+  --include 'source/3rdparty/rodash/**' \
+  --include 'source/3rdparty/roku' \
+  --include 'source/3rdparty/roku/generalUtils.brs' \
+  --include 'components' \
+  --include 'components/controllers' \
+  --include 'components/controllers/**' \
+  --include 'components/lib' \
+  --include 'components/lib/**' \
+  --include 'components/models' \
+  --include 'components/models/**' \
+  --include 'components/screens' \
+  --include 'components/screens/**' \
+  --include 'components/tasks' \
+  --include 'components/tasks/**' \
+  --include-from=new_images_since_2_6 \
+  --exclude '*'
 else
-RSYNC_EXCLUDE=--exclude '.keep' --exclude '.DS_Store' --exclude '*.md'
+RSYNC_EXCLUDE= \
+  --exclude '.keep' \
+  --exclude '.DS_Store' \
+  --exclude '*.md'
+REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
+  --include 'source/lib' \
+  --include 'source/lib/**' \
+  --include 'source/3rdparty' \
+  --include 'source/3rdparty/**' \
+  --include 'components' \
+  --include 'components/**' \
+  --include-from=new_images_since_2_6 \
+  --exclude '*'
 endif
 
 # The following paths exclude primarily because they break the linter.  Linter should get fixed
