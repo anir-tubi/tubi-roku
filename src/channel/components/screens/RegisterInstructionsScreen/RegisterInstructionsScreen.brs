@@ -116,6 +116,8 @@ Function onRegTaskError(evt)
     title = "Activation Code Error"
     message = "We're sorry, but an activation code error occurred."
   end if
+  message += Chr(10)
+  message += "If this problem persists, pleace contact: support@tubi.tv"
   m.errorDialog = m.top.createChild("ModalDialogScreen")
   m.errorDialog.title = title
   m.errorDialog.message = message
