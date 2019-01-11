@@ -51,6 +51,7 @@
         rating: "R"           'The rating of the video, can be "G", "NR", "PG-13", "PG", "R", "TV-14", "TV-G",
                                "TV-MA", "TV-PG", "TV-Y", "TV-Y7"  or lowercase
         partnerLogoUri: ""    'The URI used to display the partner/channel logo
+        availabilityEnds: "2019-03-31T00:00:00Z"
       }
       Handling these at once is more efficient than handling them all individually
      -->
@@ -183,6 +184,13 @@
             height="36"
             loadDisplayMode="scaleToFit"
             loadSync="true"/>
+          <Label
+            id="ExpireWarning">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
           <Poster
             id="PartnerLogo"
             height="36"

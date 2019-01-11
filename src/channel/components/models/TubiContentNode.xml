@@ -74,5 +74,8 @@
 
     <!-- the current drm type -->
     <field id="drmType" type="string"/>
+
+    <!-- availability_ends: "2019-03-31T00:00:00Z" -->
+    <field id="availabilityEnds" type="string"/>
   </interface>
 </component>

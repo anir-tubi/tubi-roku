@@ -574,6 +574,7 @@ Function getConstants()
       constants.ui.colors.episodeBorder = constants.ui.colors.focused
       constants.ui.colors.episodeInnerBorder = constants.ui.colors.backgroundColor
       constants.ui.colors.searchUpdatingText = constants.ui.colors.secondaryText
+      constants.ui.colors.expirationWarning = "0xFF9933FF"
 
     'fonts for UI elmements
     constants.ui.fonts = {}

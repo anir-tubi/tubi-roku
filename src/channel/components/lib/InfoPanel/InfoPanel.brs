@@ -18,6 +18,8 @@ Function init()
   m.Starring = m.top.findNode("Starring")
   m.Offset = m.top.findNode("Offset")
   m.PartnerLogo = m.top.findNode("PartnerLogo")
+  m.ExpireWarning = m.top.findNode("ExpireWarning")
+  m.ExpireWarning.color = m.global.constants.ui.colors.expirationWarning
 
   m.top.observeField("mode", "onModeChange")
   m.top.observeField("width", "onWidthChange")
@@ -131,8 +133,8 @@ Function onLineOneDataChange(msg)
   if data.hasCC = true
     if m.ClosedCaptions.getParent() = invalid
       firstLineGroup.insertChild(m.ClosedCaptions, insertIndex)
-      insertIndex ++
     end if
+    insertIndex++
     ' Although this uri does not change, if it is set in the component XML, the icon will appear
     ' during the initial channel load, so set it dynamically when it should appear
     m.ClosedCaptions.uri = "pkg:/images/icon-closed-caption.png"
@@ -145,8 +147,8 @@ Function onLineOneDataChange(msg)
   if data.rating <> invalid and data.rating <> ""
     if m.Rating.getParent() = invalid
       firstLineGroup.insertChild(m.Rating, insertIndex)
-      insertIndex ++
     end if
+    insertIndex++
     m.Rating.uri = "pkg:/images/rating-" + Ucase(data.rating) + ".png"
   else
     if m.Rating.getParent() <> invalid
@@ -154,10 +156,32 @@ Function onLineOneDataChange(msg)
     end if
   end if
 
+  if data.availabilityEnds <> invalid and data.availabilityEnds <> ""
+    datetime = CreateObject("roDateTime")
+    datetime.FromISO8601String(data.availabilityEnds)
+    endSeconds = datetime.AsSeconds()
+    nowSeconds = CreateObject("roDateTime").AsSeconds()
+    daysRemaining = ((endSeconds - nowSeconds) \ 86400) + 1
+    if daysRemaining > 0 and daysRemaining <= 30
+      m.ExpireWarning.text = "Expires in " +  daysRemaining.toStr() + " days"
+      if m.ExpireWarning.getParent() = invalid
+        firstLineGroup.insertChild(m.ExpireWarning, insertIndex)
+      end if
+      insertIndex++
+    else
+      if m.ExpireWarning.getParent() <> invalid
+        firstLineGroup.removeChild(m.ExpireWarning)
+      end if
+    end if
+  else
+    firstLineGroup.removeChild(m.ExpireWarning)
+  end if
+
   if data.partnerLogoUri <> invalid and data.partnerLogoUri <> ""
     if m.PartnerLogo.getParent() = invalid
-      firstLineGroup.appendChild(m.PartnerLogo)
+      firstLineGroup.insertChild(m.PartnerLogo, insertIndex)
     end if
+    insertIndex++
     m.PartnerLogo.uri = data.partnerLogoUri
   else
     if m.PartnerLogo.getParent() <> invalid

@@ -305,6 +305,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
 
+  if contentFromServer.availability_ends <> invalid then translatedContent.availabilityEnds = contentFromServer.availability_ends
+
+
   ' Allow this to be passed in, so for cases where we lazily translate it can contain
   ' the right time
   if fetchedAt <> invalid then

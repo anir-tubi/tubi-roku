@@ -117,6 +117,9 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false)
     else
       lineOneData.hasCC = false
     end if
+    if content.availabilityEnds <> invalid
+      lineOneData.availabilityEnds = content.availabilityEnds
+    end if
     detailScreen.lineOneData = lineOneData
 
     detailScreen.description = stateSource.description
