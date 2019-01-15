@@ -33,13 +33,13 @@ End Function
 ' singleContentReq
 '
 Function testCase_cmsApi_singleContentReq()
-  request = m.api.singleContentReq("312412")
+  request = m.api.singleContentReq("111770")
   content = request.runSynchronous()
   result = ""
   result = result + m.AssertNotInvalid(content)
   parsed = ParseJson(content)
   result = result + m.AssertNotInvalid(parsed.id)
-  result = result + m.AssertEqual(parsed.id, "312412")
+  result = result + m.AssertEqual(parsed.id, "111770")
   return result
 End Function
 

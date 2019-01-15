@@ -14,7 +14,6 @@ Function TestSuite_ChannelDetailScreen_Helpers() as Object
   ' Test cases should return the assert value
   this.addTest("TestCase_populateInfoPanelItem", TestCase_populateInfoPanelItem)
   this.addTest("TestCase_populateInfoPanelChannel", TestCase_populateInfoPanelChannel)
-  this.addTest("TestCase_generateTrackingUri", TestCase_generateTrackingUri)
   
   return this
 End Function
@@ -62,6 +61,13 @@ Function TestCase_populateInfoPanelItem()
   controlInfoPanel.description = content.description
   controlInfoPanel.mode = "item"
   controlInfoPanel.calculateHeight = true
+  controlInfoPanel.lineOneData = {
+    hasCC: content.hasSubtitles
+    length: content.length
+    partnerLogoUri: content.inlineLogoUri
+    rating: content.rating
+    releaseDate: content.releaseDate
+  }
 
   emptyInfoPanel = CreateObject("roSGNode", "InfoPanel")
   populatedInfoPanel = populateInfoPanel(emptyInfoPanel, content, "item")
@@ -81,21 +87,17 @@ Function TestCase_populateInfoPanelChannel()
   controlInfoPanel.categoryContentCount = content.totalCount
   controlInfoPanel.mode = "category"
   controlInfoPanel.calculateHeight = true
+  controlInfoPanel.lineOneData = {
+    hasCC: content.hasSubtitles
+    length: content.length
+    partnerLogoUri: content.inlineLogoUri
+    rating: content.rating
+    releaseDate: content.releaseDate
+  }
 
   emptyInfoPanel = CreateObject("roSGNode", "InfoPanel")
   populatedInfoPanel = populateInfoPanel(emptyInfoPanel, content, "category")
 
   ' can't test equality of nodes, so test if they have the same fields
   return m.assertEqual(populatedInfoPanel.getFields(), controlInfoPanel.getFields())
-End Function
-
-
-Function TestCase_generateTrackingUri()
-  rowItem = [7, 0]
-  channel = ChannelDetailScreenTestSetup_GetChannel()
-
-  controlUri = "/category/channel_x/1/8"
-  generatedUri = generateTrackingUri(rowItem, channel)
-
-  return m.assertEqual(generatedUri, controlUri)
 End Function

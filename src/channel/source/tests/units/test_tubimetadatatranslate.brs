@@ -233,22 +233,26 @@ Function testCase_tubiMetadataTranslate_translateRecursive_videoResources()
   result += m.assertNotInvalid(dest.videoResources)
   result += m.assertTrue(dest.videoResources.count() = 3)
 
-  ' Make sure drm streams have necessary data
   for i=0 to 1
     result += m.assertNotInvalid(dest.videoResources[i].url)
-    result += m.assertNotInvalid(dest.videoResources[i].drmParams)
     result += m.assertNotInvalid(dest.videoResources[i].drmHeaders)
     result += m.assertEqual(dest.videoResources[0].streamformat, "dash")
   end for
-' HLS shouldn't have any drm fields
+
+  'Widevine has drmParams
+  result += m.assertEqual(dest.videoResources[0].type, "dash_widevine")
+  result += m.assertNotInvalid(dest.videoResources[0].drmParams)
+
+  'Playready doesn't have drmParams
+  result += m.assertEqual(dest.videoResources[1].type, "dash_playready")
+  result += m.assertInvalid(dest.videoResources[1].drmParams)
+
+  'HLS shouldn't have any drm fields
   result += m.assertNotInvalid(dest.videoResources[2].url)
   result += m.assertInvalid(dest.videoResources[2].drmParams)
   result += m.assertInvalid(dest.videoResources[2].drmHeaders)
   result += m.assertEqual(dest.videoResources[2].streamformat, "hls")
 
-  ' Make sure order is correct
-  result += m.assertEqual(dest.videoResources[0].drmParams.KeySystem, "widevine")
-  result += m.assertEqual(dest.videoResources[1].drmParams.KeySystem, "playready")
   return result
 End Function
 
