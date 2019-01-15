@@ -198,7 +198,7 @@ Function tubiExperiments_getExperimentValue(namespaceName as string, parameterNa
   if namespace <> invalid
     if namespace.evaluated_params <> invalid
       experimentValue = namespace.evaluated_params[parameterName]
-      if experimentValue = "control"
+      if (type(experimentValue) = "roString" or type(experimentValue) = "String") and experimentValue = "control"
         experimentValue = m.getDefault(namespaceName, parameterName)
       end if
     end if
