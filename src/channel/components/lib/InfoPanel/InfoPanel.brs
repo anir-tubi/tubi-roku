@@ -162,7 +162,8 @@ Function onLineOneDataChange(msg)
     endSeconds = datetime.AsSeconds()
     nowSeconds = CreateObject("roDateTime").AsSeconds()
     daysRemaining = ((endSeconds - nowSeconds) \ 86400) + 1
-    if daysRemaining > 0 and daysRemaining <= 30
+    ' BIZ REQ: only titles expiring in the next 2 weeks should display message
+    if daysRemaining > 0 and daysRemaining <= 14
       m.ExpireWarning.text = "Expires in " +  daysRemaining.toStr() + " days"
       if m.ExpireWarning.getParent() = invalid
         firstLineGroup.insertChild(m.ExpireWarning, insertIndex)
