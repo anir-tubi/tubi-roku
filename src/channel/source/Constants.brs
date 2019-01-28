@@ -386,10 +386,10 @@ Function getConstants()
     ' number of seconds that the "up next" screen will show
     constants.player.upNextCountdown = 30
 
-    ' default if cuepoint is missing from metadata.  Should be just
-    ' enough time to show the upNext countdown, with a slight buffer to avoid
-    ' race conditions with videos ending
-    constants.player.creditsDuration = 40
+    ' default if cuepoint is missing from metadata, or minimum cuepoint
+    ' duration for titles whose cuepoint is right at the end.  This will
+    ' allow time for UpNext to display before the stream ends.
+    constants.player.creditsDuration = 5
 
     'how often the video player sends play progress events
     constants.player.pingFrequency = 10
