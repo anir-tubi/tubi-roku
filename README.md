@@ -132,3 +132,5 @@ $ git push --tags
 # Contributing
 
 See [CONTRUBUTING.md](CONTRIBUTING.md)
+
+Last updated by: Jack Hand
