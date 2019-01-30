@@ -364,6 +364,10 @@ Function onKeyEvent(key As String, press As Boolean)
         return true
       end if
     end if
+    if key = "OK"
+      '//ensure this keypress is captured so the default Roku positive audio sound is played.
+      return true
+    end if
   end if
 
   return false
