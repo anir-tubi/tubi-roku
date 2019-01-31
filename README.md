@@ -115,12 +115,26 @@ $ git push --tags
 
 6\. Submit build to Roku (only for submission builds)
 
-- Upload the .pkg file to Roku via the [developer.roku.com/developer](developer.roku.com/developer)
-- Email Roku Partner Success to let them know the build is in their queue
+- Create a new `new_images_since_x_y` file where x and y are the major and minor build numbers
+- Update the Makefile with the new `new_images_since_x_y` path (2 variables should be updated)
+- Create a new hotpatch for the new version (ie. 2.7.brs)
+- Move any necessary logic from the previous version's hotpatch to the new version's hotpathc
 - Update version numbers in `config/build.yml`
   - Increment `minor_version`
   - set `build_version` to `1`
-- Upload the .pkg file to Roku staging private channel
+- Update the staging channel store poster located in `./channel-store/channel-store-poster-staging-540x405.png`
+- Update the hotpatch url in `./config/staging.yml` to reflect the new build version
+- Commit the above changes to master
+- --
+
+- Run `make ROKU_PROFILE=staging install`
+- Use the "Application Packager" web interface on the Roku device to package the build
+- Create a new private channel with the created .pkg file via [developer.roku.com/developer](developer.roku.com/developer)
+- --
+
+- Run `make release`
+- Upload the .pkg file to Roku via [developer.roku.com/developer](developer.roku.com/developer)
+- Email Roku Partner Success to let them know the build is in their queue
 
 7\. Create release in github
 
