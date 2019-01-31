@@ -2,6 +2,6 @@
 settings:
   mode: "staging"
   # Hotpatches should match <MAJOR>.<MINOR> of the production build.
-  hotPatchUrl: "https://s3-us-west-1.amazonaws.com/adrise-bryan-playground/roku-staging/2.6.brs"
+  hotPatchUrl: "https://s3-us-west-1.amazonaws.com/adrise-bryan-playground/roku-staging/2.7.brs"
   # The remote components version should match the exact build number in production. This value is expected to be overridden by the hotpatch loaded
   remoteComponentsHost: "https://s3-us-west-1.amazonaws.com/adrise-bryan-playground/roku-staging/components"

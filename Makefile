@@ -72,7 +72,7 @@ REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
   --include 'components/screens/**' \
   --include 'components/tasks' \
   --include 'components/tasks/**' \
-  --include-from=new_images_since_2_6 \
+  --include-from=new_images_since_2_7 \
   --exclude '*'
 else
 RSYNC_EXCLUDE= \
@@ -86,7 +86,7 @@ REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
   --include 'source/3rdparty/**' \
   --include 'components' \
   --include 'components/**' \
-  --include-from=new_images_since_2_6 \
+  --include-from=new_images_since_2_7 \
   --exclude '*'
 endif
 
