@@ -339,10 +339,14 @@ Function onVideoPositionChange()
   ' invoked will cause the AuthTask thread to get stuck, never completing and staying in a "run"
   ' state perpetually.
   if (m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval) and m.top.adState <> "adspending"
-    historyPosition()
+    historyPosition(m.playerPosition)
   end if
 
   if (m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0 and isAtPosition(m.playerPosition, m.top.content.creditsCuePoint))
+    ' Always fire history here to fix a race condition where the user has
+    ' watched beyond the cuepoint but the title doesn't get removed due
+    ' to no history events triggering after the cuepoint
+    historyPosition(m.playerPosition + 5)
     m.top.creditsPosition = m.playerPosition
   end if
 
@@ -723,10 +727,10 @@ End Function
 
 
 ' Helper function to prevent historyPosition being sent during  trailers
-Function historyPosition()
+Function historyPosition(position)
   if m.top.analyticsMode = "normal" or m.top.analyticsMode = "autoplay" then
-    m.top.historyPosition = Int(m.playerPosition)
-    m.lastSavedPosition = m.playerPosition
+    m.top.historyPosition = Int(position)
+    m.lastSavedPosition = position
   end if
 End Function
 
@@ -1286,7 +1290,7 @@ End Function
 
 'exit the video player due to back button while no transport displaying, or during ad break
 Function backButtonExit()
-  historyPosition()
+  historyPosition(m.playerPosition)
   m.top.backButtonPressed = true
 End Function
 
