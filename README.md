@@ -46,7 +46,12 @@ $ npm install  # this expect you have node > 4.x installed
 
 ![](docs/dev-mode.png)
 
-3\. Set the build environment
+4\. Set the developer id on your Roku device
+
+* Navigate to the Roku device's IP in your broswer; select Utilities
+* Upload the pkg file and enter the password (get from other roku developers on the team), select `Rekey`
+
+5\. Set the build environment
 
 ```
 $ export ROKU_DEV_TARGET=<your-roku-ip>
@@ -54,7 +59,7 @@ $ export DEV_PASSWORD=<dev password set up on Roku device>
 $ export PKG_PASSWORD=<password from the GENKEY utility used for signing packages>
 ```
 
-4\. Make a development build, sideload to the device, and attach to the developer console
+6\. Make a development build, sideload to the device, and attach to the developer console
 
 ```
 $ make install
@@ -87,10 +92,28 @@ $ make ROKU_PROFILE=test install
 
 2\. Deploy to staging
 
+* Before deploying to staging, install the AWS CLI tool.
+[https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+
+* Navigate to your `.aws` directory.
+
+* In the `config` file set the `AWS_DEFAULT_REGION `.
+
+	```
+	[default]
+	region = us-west-1
+	```
+* In the `credentials` file, set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+
+	```
+	[default]
+	aws_access_key_id = <<aws_access_key_id>>
+	aws_secret_access_key = <<aws_secret_access_key>>
+	```
+
+Then run:
+
 ```
-$ export AWS_ACCESS_KEY_ID=<s3 staging bucket access_key>
-$ export AWS_SECRET_ACCESS_KEY=<s3 staging bucket secret_key>
-$ export AWS_DEFAULT_REGION=<s3 staging bucket region>
 $ make ROKU_PROFILE=staging install
 ```
 
