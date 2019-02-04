@@ -142,29 +142,11 @@ Function getConstants()
       scaledUi = false
     end if
 
-    'get client version from manifest
-    clientVersionNums = ["", "", ""]
-
-    manifest = ReadASCIIFile("pkg:/manifest")
-    lines = manifest.Tokenize(Chr(10))
-    for each line in lines
-      props = line.Tokenize("=")
-      if props[0] = "major_version"
-        clientVersionNums[0] = props[1]
-
-      else if props[0] = "minor_version"
-        clientVersionNums[1] = props[1]
-
-      else if props[0] = "build_version"
-        clientVersionNums[2] = props[1]
-      end if
-    end for
-
-    clientVersion = ""
-    for i=0 to clientVersionNums.count()-1
-      clientVersion = clientVersion + clientVersionNums[i] + "."
-    end for
-    clientVersion = clientVersion + "remote"
+    appInfo = CreateObject("roAppInfo")
+    clientVersion = appInfo.GetVersion()
+    majorVersion = appInfo.GetValue("major_version")
+    minorVersion = appInfo.GetValue("minor_version")
+    buildVersion = appInfo.GetValue("build_version")
 
     'Use newer APIs over deprecated APIs when appropriate
     deviceInfoRegSection = "deviceinfo"
@@ -207,14 +189,16 @@ Function getConstants()
     constants.deviceInfo.displaySize = di.GetDisplaySize()
     constants.deviceInfo.displayWidth = di.GetDisplaySize().w
     constants.deviceInfo.displayHeight = di.GetDisplaySize().h
-    constants.deviceInfo.captionsMode = di.GetCaptionsMode()
     constants.deviceInfo.countryCode = countryCode ' will be invalid if old version of firmware
     constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.fastCpu = fastCpu
     constants.deviceInfo.lowVram = lowVram
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
     constants.deviceInfo.limitedUi = limitedUi
-    constants.deviceInfo.clientVersion = clientVersion
+    constants.deviceInfo.clientVersion = clientVersion  'will be overwritten in TubiChannel.brs if using remote components
+    constants.deviceInfo.majorVersion = majorVersion    'will be overwritten in TubiChannel.brs if using remote components
+    constants.deviceInfo.minorVersion = minorVersion    'will be overwritten in TubiChannel.brs if using remote components
+    constants.deviceInfo.buildVersion = buildVersion    'will be overwritten in TubiChannel.brs if using remote components
     constants.deviceInfo.language  = di.GetCurrentLocale().Left(2)
     constants.deviceInfo.scaledUi = scaledUi
     
@@ -259,6 +243,9 @@ Function getConstants()
 
   'platform is used when communitcating with CMS API
   constants.platform = "roku"
+
+  'analyticsPlatform is used when sending analytics events
+  constants.analyticsPlatform = "ROKU"
 
   'previously found in settings as "shortAppName"
   constants.appName = "tubitv"
@@ -321,11 +308,14 @@ Function getConstants()
 
     'user event tracking url
     constants.urls.dataScience = {}
-      ' constants.urls.dataScience.urlBase = "https://uapi.staging-public.tubi.io/datascience"
       constants.urls.dataScience.urlBase = "https://uapi.adrise.tv/datascience"
-      constants.urls.datascience.event = constants.urls.dataScience.urlBase + "/event"
       constants.urls.datascience.experiment = constants.urls.dataScience.urlBase + "/evaluate/namespaces"
       constants.urls.datascience.logging = constants.urls.dataScience.urlBase + "/logging"
+
+    constants.urls.analytics = {}
+      ' constants.urls.analytics.urlBase = "https://analytics-ingestion.staging-public.tubi.io/analytics-ingestion"
+      constants.urls.analytics.urlBase = "https://analytics-ingestion.production-public.tubi.io/analytics-ingestion"
+      constants.urls.analytics.event = constants.urls.analytics.urlBase + "/v2/event"
 
 
     'live tv urls

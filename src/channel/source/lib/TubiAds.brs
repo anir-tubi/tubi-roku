@@ -1,5 +1,4 @@
-function TubiAds (constants, log, request, requestQueue, auth, adContentType)
-
+function TubiAds (constants, log, request, requestQueue, auth, tracking, adContentType)
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
   
@@ -29,6 +28,7 @@ function TubiAds (constants, log, request, requestQueue, auth, adContentType)
     auth: auth
     request: request
     log: log
+    tracking: tracking
 
     ' private
     requestQueue: requestQueue.create(adLoggingPort)
@@ -503,7 +503,35 @@ function tubiAds_adTrackingCallback(eventType, ctx)
       ' ad ends.  The reason we set it to 1 instead of zero is that the 1
       ' will keep the ads-specific messaging on screen rather than clearing
       ' it out.
-      m.controlNode.adProgress = 1  
+      m.controlNode.adProgress = 1
+
+      startAdEvent = {
+        ad_started: m.tracking.getAnalyticsAd(ctx)
+        video_id: m.controlNode.content.id.toInt()
+        start_position: 0
+        is_fullscreen: true
+      }
+      m.tracking.trackUserEvent("start_ad_break", startAdEvent, m.requestQueue)
+    else if eventType = "Complete" or eventType = "Close"
+      if eventType = "Complete"
+        endPosition = ctx.duration
+      else if eventType = "Close"
+        endPosition = m.adPlaybackPos
+      end if
+      m.adPlaybackPos = 0
+
+      finishAdEvent = {
+        ad_finished: m.tracking.getAnalyticsAd(ctx)
+        video_id: m.controlNode.content.id.toInt()
+        end_position: endPosition * 1000
+        reason: "DETECTED"
+      }
+      m.tracking.trackUserEvent("finish_ad", finishAdEvent, m.requestQueue)
+    end if
+  else
+    ' eventType is invalid when an event fires signalling that one second of ad playback has ocurred
+    if ctx.time <> invalid
+      m.adPlaybackPos = ctx.time
     end if
   end if
 

@@ -1,6 +1,10 @@
 Function init()
   tubiLog("SearchScreen.init")
   m._ = rodash()
+  m.constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
 
   m.Keyboard = m.top.findNode("Keyboard")
   m.Keyboard.observeField("text", "onKeyboardTextChanged")
@@ -34,11 +38,21 @@ Function init()
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 
-  if m.global.constants.deviceInfo.scaledUi = true then
+  if m.constants.deviceInfo.scaledUi = true then
     m.ResultGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
 
   m.top.backgroundUriList = [m.defaultHeroUri]
+
+  'set initial tracking values
+  m.top.trackingPageInfo = {
+    pageType: "search_page"
+    pageValues: {}
+  }
+
+  ' Used to determine if navigate_within_page events should be sent. Only send when the content grid already
+  ' has focus, not when it gains focus.
+  m.gridHasFocus = false
 End Function
 
 
@@ -54,7 +68,7 @@ Function onSearchResultsReceived()
   tubiLog("SearchScreen.onSearchResultsReceived")
   response = m.top.searchResponse.response
   if response.code >= 200 and response.code < 300 then 
-    m.top.content = m.top.searchResponse.convertedMetadata
+    m.ResultGrid.content = m.top.searchResponse.convertedMetadata
     if m.top.searchResponse.convertedMetadata <> invalid and m.top.searchResponse.convertedMetadata.getChildCount() > 0 then
       m.ResultGrid.visible = true
       m.NoResultsMessage.visible = false
@@ -91,8 +105,17 @@ Function onResultSelected()
   tubiLog("SearchScreen.onResultSelected")
   if m.ResultGrid.content <> invalid
     selectedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemSelected)
+    m.top.trackingComponentInfo = getTrackingComponentInfo(m.ResultGrid.itemSelected, m.ResultGrid.numColumns, selectedContent, m.Tracking)
+
     if selectedContent <> invalid
+      m.top.trackingPageInfo = {
+        pageType: "search_page"
+        pageValues: {
+          query: Left(m.Keyboard.text, 256)
+        }
+      }
       m.top.contentSelected = selectedContent
+      m.gridHasFocus = false
     end if
   end if
 End Function
@@ -109,7 +132,7 @@ Function onKeyboardTextChanged()
     loadSearchResults()
   else
     ' if the text was empty, clear out any existing results
-    m.top.content = invalid
+    m.ResultGrid.content = invalid
   end if
 End Function
 
@@ -129,6 +152,35 @@ Function onItemFocused()
     else
       m.top.backgroundUriList = [m.defaultHeroUri]
     end if
+
+    ' Set up the info that the ContentController uses to send navigate_within_page events.
+    ' Don't change m.top.navigateWithinPageInfo if the focused content hasn't changed
+    ' (protects against re-setting when the focus is set upon returning to search page from details page)
+    if m.gridHasFocus = true and m.ResultGrid.itemFocused <> invalid
+
+      searchComponent = invalid
+      if m.ResultGrid.numColumns <> invalid
+        searchComponent = getTrackingComponentInfo(m.ResultGrid.itemFocused, m.ResultGrid.numColumns, focusedContent, m.Tracking)
+      end if
+
+      if searchComponent <> invalid
+        navigateWithinPageInfo = {
+          pageOneof: m.Tracking.getAnalyticsPage("search_page", {query: Left(m.Keyboard.text, 256)})
+          componentOneof: m.Tracking.getAnalyticsComponent(searchComponent.componentType, searchComponent.componentValues)
+          means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+          vertical_location_mode: "COORDINATE"  'LocationMode enum
+          horizontal_location_mode: "COORDINATE"  'LocationMode enum
+        }
+
+        if searchComponent.componentValues <> invalid and searchComponent.componentValues.content_tile <> invalid
+          navigateWithinPageInfo.vertical_location = searchComponent.componentValues.content_tile.row
+          navigateWithinPageInfo.horizontal_location = searchComponent.componentValues.content_tile.col
+        end if
+
+        m.top.navigateWithinPageInfo = navigateWithinPageInfo
+      end if
+    end if
+    m.gridHasFocus = true
   end if
 End Function
 
@@ -140,7 +192,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("SearchScreen.onKeyEvent")
   if press then
     ' Only focus on content grid if animation is not in process, and if there is actually content there
-    if key = "down" and m.Keyboard.isInFocusChain() and m.TextEntryAnimation.state = "stopped" and m.top.content <> invalid and m.top.content.getChildCount() > 0 then
+    if key = "down" and m.Keyboard.isInFocusChain() and m.TextEntryAnimation.state = "stopped" and m.ResultGrid.content <> invalid and m.ResultGrid.content.getChildCount() > 0 then
       startFocusResultGrid()
       return true
     else if key = "up" and m.ResultGrid.isInFocusChain() and m.TextEntryAnimation.state = "stopped" then
@@ -217,18 +269,23 @@ End Function
 '''''''''''''''''''''
 ' loadSearchResults
 '
+' Create a request object for the search and hand the request to the metaDataFetchTask which will actually make the request
 Function loadSearchResults()
   tubiLog("SearchScreen.loadSearchResults")
-  constants = m.global.constants
+  searchText = m.Keyboard.text
   ' cancel any in-flight requests
   m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, m.top, "searchResponse")
-  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", constants.reqNames.searchAPI, m.SearchText.text)
+  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", m.constants.reqNames.searchAPI, searchText)
 
   m.global.trackingLoggingTask.trackEvent = {
-    trackType: "search"
-    value: m.SearchText.text
+    type: "search"
+    values: {
+      query: Left(searchText, 256)
+      search_type: "PAGE" 'SearchType enum
+    }
   }
-  if constants.deviceInfo.limitedUi = true
+
+  if m.constants.deviceInfo.limitedUi = true
     m.UpdatingSpinner.visible = false
   end if
 End Function
@@ -254,4 +311,20 @@ Function populateInfoPanel(focusedContent)
 
     m.InfoPanel.calculateHeight = true
   end if
+End Function
+
+
+Function getTrackingComponentInfo(itemIndex, numColumns, contentNode, trackingLib)
+  if trackingLib <> invalid
+    column = (1 + itemIndex) MOD numColumns
+    row = 1 + (itemIndex \ numColumns)
+    return {
+      componentType: "search_result_component"
+      componentValues: {
+        content_tile: trackingLib.getAnalyticsTile(contentNode, column, row)
+      }
+    }
+  end if
+
+  return invalid
 End Function

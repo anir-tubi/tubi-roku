@@ -6,8 +6,14 @@
        - series id not yet prefixed with 0
      -->
 
-    <!-- where the deeplink came from -->
+    <!-- where the deeplink came from, ie. "iphone", "android", etc.-->
     <field id="source" type="string" />
+
+    <!-- use to associate deeplinks with marketing campaigns - filled by the "entry" deeplink parameter -->
+    <field id="campaign" type="string" />
+
+    <!-- type of campaign -->
+    <field id="medium" type="string" />
 
     <!-- internal content type -->
     <field id="type" type="string" />

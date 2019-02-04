@@ -1,26 +1,34 @@
-Function showChannelScreen(content, sourceTrackingUri)
+Function showChannelScreen(content)
   channelScreen = CreateObject("roSGNode", "ChannelDetailScreen")
+  channelScreen.trackingLoadStartTime = UpTime(0)
   channelScreen.observeFieldScoped("contentSelected", "onChannelContentSelected")
   channelScreen.observeFieldScoped("backgroundUriList", "onChannelBackgroundChange")
+  channelScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   channelScreen.isLoading = true
-  pushScreen(channelScreen, false)  ' don't send tracking until we resolve series episode
-  getChannelFromServer(channelScreen, content, sourceTrackingUri)
+
+  channelScreen.trackingPageInfo = {
+    pageType: "category_page"
+    pageValues: {
+      category_slug: content.id
+    }
+  }
+
+  pushScreen(channelScreen, true, false)  ' don't send page load tracking until we resolve channel content
+  getChannelFromServer(channelScreen, content)
 End Function
 
 Function onChannelContentSelected(msg)
   tubiLog("ChannelScreenHelpers.onChannelContentSelected")
   channelScreen = msg.getRoSGNode()
-  showDetailScreen(channelScreen.contentSelected, channelScreen.trackingUri)
+  showDetailScreen(channelScreen.contentSelected)
 End Function
 
-Function getChannelFromServer(screen, content, sourceTrackingUri)
-  tubiLog("ChannelScreenHelpers.getSingleContentFromServer")
+Function getChannelFromServer(screen, content)
+  tubiLog("ChannelScreenHelpers.getChannelFromServer")
   channelTask = CreateObject("roSGNode", "ChannelMetadataTask")
   channelTask.channelId = content.id
   screen.addField("task", "node", false)
   screen.task = channelTask
-  screen.addField("sourceTrackingUri", "string", false)
-  screen.sourceTrackingUri = sourceTrackingUri
   channelTask.addField("target", "node", false)
   channelTask.target = screen
   channelTask.observeField("response", "onChannelContentResponse")
@@ -37,10 +45,8 @@ Function onChannelContentResponse(msg)
   task.unobserveField("response")
   task.unobserveField("error")
 
-  if screen.sourceTrackingUri <> invalid
-    screenTrackingNavigate(screen.sourceTrackingUri, screen.trackingUri)
-  end if
-  screenTrackingLoad(screen.trackingUri)
+  loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
+  screenTrackingLoad(screen.trackingPageInfo, loadTime)
 End Function
 
 Function onChannelContentError(msg)

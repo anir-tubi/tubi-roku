@@ -27,6 +27,11 @@ Function TubiAuth(constants, request)
     updateAuthInfo: tubiAuth_updateAuthInfo_
     formatAuthInfoFromServer: tubiAuth_formatAuthInfoFromServer_
     
+    regRead: tubiAuth_regRead_
+    regReadAll: tubiAuth_regReadAll_
+    regWrite: tubiAuth_regWrite_
+    regDelete: tubiAuth_regDelete_
+
     'used for old logins, should not be used except in oneTimeLoginMigration
     getUserData: tubiAuth_getUserData_
     deleteUserData: tubiAuth_deleteUserData_
@@ -43,7 +48,7 @@ End Function
 '   userId: userId(Integer as String)
 '}
 function tubiAuth_getAuthInfo()
-  authInfo = RegReadAll(m.authRegKey) 'returns empty assocArray if nothing in the auth registry
+  authInfo = m.regReadAll(m.authRegKey) 'returns empty assocArray if nothing in the auth registry
   newAuthInfo = invalid
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
     authInfo.expireTime = authInfo.expireTime.toInt()
@@ -254,7 +259,7 @@ end function
 function tubiAuth_saveAuthInfo_(authInfo)
   if authInfo <> invalid and authInfo.refreshToken <> invalid and authInfo.accessToken <> invalid and authInfo.expireTime <> invalid  and (type(authInfo.expireTime) = "String" or type(authInfo.expireTime) = "roString") and authInfo.userId <> invalid
     for each key in authInfo
-      RegWrite(key, authInfo[key], m.authRegKey)
+      m.regWrite(key, authInfo[key], m.authRegKey)
     end for
   else
     authInfo = invalid
@@ -477,7 +482,7 @@ end function
 
 'gets the old user data - only necessary for doing one time login registration syncs
 Function tubiAuth_getUserData_()
-  str = RegRead("userdata")
+  str = m.regRead("userdata")
   if(str <> invalid)
     return m.userDataFromString(str)
   end if
@@ -487,7 +492,7 @@ End Function
 
 'deletes the old user data - only necessary for doing one time login registration syncs
 Function tubiAuth_deleteUserData_()
-    RegDelete("userdata")
+    m.regDelete("userdata")
 End Function
 
 
@@ -500,4 +505,47 @@ Function tubiAuth_userDataFromString_(str)
     return {token: a[0], fn: a[1], ln: a[2]}
   end if
   return invalid
+End Function
+
+
+' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency for any logic that wants to call
+' auth.getAuthInfo
+Function tubiAuth_regReadAll_(section="")
+  if section = "" then section = "Default"
+  sec = CreateObject("roRegistrySection", section)
+  keys = sec.GetKeyList()
+  allInfo = {}
+  for each key in keys
+      value = m.regRead(key, section)
+      allInfo[key] = value
+  end for
+  return allInfo
+End Function
+
+
+' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency for any logic that wants to call
+' auth.getAuthInfo
+Function tubiAuth_regRead_(key, section=invalid)
+  if section = invalid then section = "Default"
+  sec = CreateObject("roRegistrySection", section)
+  if sec.Exists(key) then return sec.Read(key)
+  return invalid
+End Function
+
+
+' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency
+Function tubiAuth_regWrite_(key, val, section=invalid)
+  if section = invalid then section = "Default"
+  sec = CreateObject("roRegistrySection", section)
+  sec.Write(key, val)
+  sec.Flush() ' commit it
+End Function
+
+
+' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency
+Function tubiAuth_regDelete_(key, section=invalid)
+  if section = invalid then section = "Default"
+  sec = CreateObject("roRegistrySection", section)
+  sec.Delete(key)
+  sec.Flush()
 End Function

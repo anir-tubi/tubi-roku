@@ -1,17 +1,21 @@
 Function init()
+  m.constants = m.global.constants
   m.top.observeField("signedIn", "onSignedInChange")
-  m.Menu = m.top.findNode("Menu")
-  m.Menu.observeField("rowItemSelected", "onItemSelected")
-  m.Menu.observeField("rowItemFocused", "onItemFocused")
+  m.top.observeField("itemSelected", "onItemSelected")
+  m.top.observeField("itemFocused", "onItemFocused")
   content = m.top.findNode("SearchSignInContent")
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.Menu = m.top.findNode("Menu")
   m.Menu.content = content
+  m.Menu.observeField("rowItemFocused", "onMenuItemFocused")
   m.SignInContent = content.findNode("SignInMenuItem")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.Description = m.top.findNode("Description")
 
   onSignedInChange()  ' initialize the sign in/out text
 
-  m.constants = m.global.constants
   if m.constants.ui.onnow.on = true
     m.top.findNode("OnNowHint-Tools").visible = true
   end if
@@ -28,11 +32,34 @@ Function onComponentFocusChange()
   end if
 End Function
 
+
+'We don't use a straight alias of the m.Menu.rowItemFocused because that field is treated like alwaysNotify=true
+'by the RowList component, so we inject our own field that we can treat like alwaysNotify=false
+Function onMenuItemFocused(msg)
+  itemFocused = msg.getData()
+  m.top.itemFocused = itemFocused
+End Function
+
+
 Function onItemFocused()
   tubiLog("ToolsMenu.onItemFocused")
   rowItemFocused = m.Menu.rowItemFocused
   item = m.Menu.content.getChild(rowItemFocused[0]).getChild(rowItemFocused[1])
   m.Description.text = item.description
+
+  'Set the navigateWithinPageInfo value which will pass through to HomeScreen.brs and eventually trigger ContentController
+  'to fire a navigate_within_page analytics event.
+  if m.Menu.hasFocus()  'THIS DOESN'T WORK
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage("tools_page", {})  'there is no "tools_page" in protos, so this is a place holder for now
+      componentOneof: m.Tracking.getAnalyticsComponent("tools_component", {}) 'there is no "tools_component" in protos, so this is a place holder for now
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      vertical_location: 1
+      vertical_location_mode: "INDEX"  'LocationMode enum
+      horizontal_location: rowItemFocused[1] + 1 '1 based index
+      horizontal_location_mode: "COORDINATE"  'LocationMode enum
+    }
+  end if
 End Function
 
 Function onItemSelected()
@@ -40,6 +67,11 @@ Function onItemSelected()
   if m.Menu.content <> invalid then
     rowItemSelected = m.Menu.rowItemSelected
     item = m.Menu.content.getChild(rowItemSelected[0]).getChild(rowItemSelected[1])
+    m.top.trackingComponentInfo = {
+      componentType: "tools_menu_component"    'doesn't actually exist in protos currently
+      componentValues: {}
+    }
+
     if item.id = "SearchMenuItem" then
       m.top.searchSelected = true
     else if item.id = "SignInMenuItem" then
@@ -51,6 +83,7 @@ Function onItemSelected()
     end if
   end if
 End Function
+
 
 Function onSignedInChange()
   tubiLog("ToolsMenu.onSignedInChanged")
@@ -67,6 +100,7 @@ Function onSignedInChange()
   menuWidth = (posterWidth + posterSpacing) * numberButtons
   m.Menu.itemSize = [menuWidth, 400]
 End Function
+
 
 Function onKeyEvent(key, press)
   if press = true and (key = "back" or key = "down")

@@ -208,21 +208,27 @@ Function tubiExperiments_getExperimentValue(namespaceName as string, parameterNa
     end if
 
     if namespace.experiment_definitions <> invalid and experimentName <> invalid
+      'namespace,experiment_definitions has been updated in parseNamespace so it an AA now, not an Array as returned by the API
       experimentDef = namespace.experiment_definitions[experimentName]
     end if
   end if
 
   if experimentValue <> invalid
     if experimentDef <> invalid and experimentDef.auto_log_exposure = true
-
-      'trackInfo can be sent into TubiTracking().getTrackData() in order to make a tracking API call
+      'trackInfo keys can be sent as params to TubiTracking().trackUserEvent(), in order to make a tracking API call
+      'trackInfo can be set as an AA on the trackEvent field in the trackingLoggingTask, in order to make a tracking API call
       trackInfo = {
-        trackType: "experiment"
-        value: experimentName
-        ctx: namespace.evaluated_experiment_salt
-        extraCtx: namespace.evaluated_params
+        type: "exposure"
+        values: {
+          experiment: {
+            namespace: namespaceName
+            name: experimentName
+            salt: namespace.evaluated_experiment_salt
+            parameter_name: parameterName
+            parameter_value: experimentValue
+          }
+        }
       }
-
     end if
   else
     experimentValue = m.getDefault(namespaceName, parameterName)
@@ -232,7 +238,6 @@ Function tubiExperiments_getExperimentValue(namespaceName as string, parameterNa
     experimentValue: experimentValue
     trackInfo: trackInfo
   }
-
 End Function
 
 

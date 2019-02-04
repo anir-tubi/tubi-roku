@@ -12,7 +12,6 @@ Function TubiMetadataTranslate(constants As Object)
     ' private
     constants: constants
     contentTypes: constants.ui.contentTypes
-    captionsMode: constants.deviceInfo.captionsMode
     creditsDuration: constants.player.creditsDuration
     allowAfterHours: constants.settings.allowAfterHours
     
@@ -274,15 +273,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.subtitleTracks = subtitleTracks
     ' This is needed to make subtitles work on Roku 3 (and other models... 3900, 3800, etc.)
     translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles[0].url}
-  end if
-
-  'set the inital subtitle on/off state for the video
-  if translatedContent["type"] = "video"
-    if m.captionsMode = "On"
-      translatedContent.showSubtitles = true
-    else
-      translatedContent.showSubtitles = false
-    end if
   end if
 
   ' trailers

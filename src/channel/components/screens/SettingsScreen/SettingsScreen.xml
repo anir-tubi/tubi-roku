@@ -2,6 +2,9 @@
 <component name="SettingsScreen" extends="Group" >
   <script type="text/brightscript" uri="pkg:/components/screens/SettingsScreen/SettingsScreen.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -15,13 +18,25 @@
     <!-- OUTPUTS -->
       <!-- triggers for upstream controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
-      <field id="trackingUri" type="string"/>
-      <field id="trackingCount" type="integer"/>
 
       <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
       <field id="signInSelected" type="boolean" alwaysNotify="true"/>
       <field id="parentalSettingSelected" type="integer" alwaysNotify="true"/>
       <field id="remoteParentalSetting" type="integer" alwaysNotify="true"/>
+
+      <!-- Keeps the information used for user tracking - structure looks like:
+        {
+          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
+          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
+        }
+      -->
+      <field id="trackingPageInfo" type="assocarray" />
+
+      <!-- Holds the information needed to populate a navigate_witin_page event. be passed to the contentController
+           which will be responsible for sending navigate_within_page events.
+           See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA
+      -->
+      <field id="navigateWithinPageInfo" type="assocarray" />
   </interface>
 
   <children>

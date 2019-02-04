@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="UpNextScreen" extends="Group">
   <script type="text/brightscript" uri="pkg:/components/screens/UpNextScreen/UpNextScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
@@ -12,6 +15,12 @@
     <!-- The countdown timer expired -->
     <field id="timeout" type="boolean" alwaysNotify="true"/>
     <field id="backPressed" type="boolean" alwaysNotify="true"/>
+
+    <!-- Holds the information needed to populate a navigate_witin_page event. This will
+         be observed by the contentController via videoHelpers
+         which will be responsible for sending navigate_within_page events.
+    -->
+    <field id="navigateWithinPageInfo" type="assocarray" />
     
     <!--
       - INPUTS

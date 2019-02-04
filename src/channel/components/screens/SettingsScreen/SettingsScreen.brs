@@ -1,4 +1,10 @@
 Function init()
+  m.constants = m.global.constants
+
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
+
   m.leftPanelWidth = 420
   m.rightPanelWidth = 1034
   m.rightPaneloffset = [220,-197]
@@ -15,8 +21,13 @@ Function init()
   ' This must happen after the pane is all set up so that the createNextPanelIndex
   ' event fires for the default menu selection
   m.PanelSet.appendChild(m.SettingsMenuPanel)
+  m.PanelSet.observeField("isGoingBack", "onReturnToMenu")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
+
+  ' used to compare if a newly focused item gained focus from a different item while scrolling,
+  ' or gained focus from a different component/screen
+  m.menuIsFocused = false
 End Function
 
 Function onSignedInChange()
@@ -39,7 +50,23 @@ End Function
 '       acheive the desired opacity as focus moves left/right across panels
 '       and in/out of the screen, such as when a sign in dialog shows.
 Function onMenuItemFocused()
-   m.Title.opacity = 1.0
+  tubiLog("SettingsScreen.onMenuItemFocused")
+  m.Title.opacity = 1.0
+
+  if m.menuIsFocused = true
+    row = m.SettingsMenuPanel.itemFocused + 1
+    col = 1
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("settings_menu_component", {}) 'settings_menu_component doesn't exist in protos
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      vertical_location: row
+      vertical_location_mode: "COORDINATE"  'LocationMode enum
+      horizontal_location: col
+      horizontal_location_mode: "INDEX"  'LocationMode enum
+    }
+  end if
+  m.menuIsFocused = true
 End Function
 
 Function onComponentFocusChange()
@@ -47,11 +74,17 @@ Function onComponentFocusChange()
 
   menu = m.SettingsMenuPanel.findNode("SettingsMenu")
   if m.top.isInFocusChain()
-    if m.top.hasFocus()
-      m.SettingsMenuPanel.setFocus(true)
-    else
+    if m.top.hasFocus() = false
       m.Title.opacity = 0.3
     end if
+  end if
+End Function
+
+
+Function onReturnToMenu(msg)
+  isReturning = msg.getData()
+  if isReturning = true
+    m.menuIsFocused = false
   end if
 End Function
 

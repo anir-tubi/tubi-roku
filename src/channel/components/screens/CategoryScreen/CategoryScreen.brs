@@ -3,6 +3,10 @@ Function init()
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
   m.constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.trackingLoggingTask = m.global.trackingLoggingTask
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.ContentArea = m.top.findNode("ContentArea")
   m.CategoryList = m.top.findNode("CategoryList") 'aka category menu
   m.InfoPanel = m.top.findNode("InfoPanel")
@@ -15,10 +19,8 @@ Function init()
   m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
   m.top.observeField("homescreenResponse", "onHomescreenResponse")
   m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
-  m.top.observeField("trackingUri", "onTrackingUriChange")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.top.observeField("loadAllCategories", "loadAllCategories")
-  m.top.trackingCount = 0
   
   m.CategoryList.observeField("itemFocused","onCategoryMenuItemFocused")
   m.CategoryList.observeField("rowScrollFocused","onCategoryListScrollFocused")
@@ -32,9 +34,8 @@ Function init()
 
   'Content area
   m.CategoryGridList = m.top.findNode("CategoryGridList")
-  m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
-  m.CategoryGridList.observeField("cursorPosition", "onGridCursorChange")
+  m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("categoryTotalCounts", "onTotalCountsChange")
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRow")
 
@@ -66,6 +67,9 @@ Function init()
     frame.height = 256 + frameMargin * 2
     frame.translation = [1390 - frameMargin, 151 - frameMargin]
   end if
+
+  m.gridHasFocus = false
+  m.listHasFocus = false
 End Function
 
 
@@ -86,10 +90,14 @@ Function onHomescreenResponse()
     else
       testLog("Category list returned " + stri(response.code))
       ' if we were loading in the background, don't show an error modal
-      if m.top.isInFocusChain() then showErrorModal(response.code, response.failReason, retryCategoryList, [], retryCategoryList, [])
+      if m.top.isInFocusChain()
+        showErrorModal(response.code, response.failReason, retryCategoryList, [], retryCategoryList, [])
+        sendDialogAnalyticsEvent("WARNING", m.Tracking, m.trackingLoggingTask)
+      end if
     end if
   end if
 End Function
+
 
 Function onReloadUserCategoriesResponse(msg)
   handledRequest = msg.getData()
@@ -147,9 +155,6 @@ Function onReloadUserCategoriesResponse(msg)
         m.CategoryGridList.content = categoryContent
       end if
 
-
-
-
       ' if m.CategoryGridList.content <> invalid
       '   ' Make sure any user categories which didn't get newly added are reloaded
       '   for each userCategory in [m.constants.ui.categoryIds.history, m.constants.ui.categoryIds.queue]
@@ -165,7 +170,10 @@ Function onReloadUserCategoriesResponse(msg)
     else
       testLog("Category list returned " + stri(response.code))
       ' if we were loading in the background, don't show an error modal
-      if m.top.isInFocusChain() then showErrorModal(response.code, response.failReason, retryCategoryList, [], retryCategoryList, [])
+      if m.top.isInFocusChain()
+        showErrorModal(response.code, response.failReason, retryCategoryList, [], retryCategoryList, [])
+        sendDialogAnalyticsEvent("WARNING", m.Tracking, m.trackingLoggingTask)
+      end if
     end if
   end if
 End Function
@@ -176,6 +184,7 @@ Function retryCategoryList()
   loadAllCategories()
   m.top.setFocus(true)
 End Function
+
 
 ''''''''''''''''''''''''''''
 ' onDirtyUserCategories
@@ -208,6 +217,7 @@ Function onDirtyUserCategories(msg)
   end if
 End Function
 
+
 ''''''''''''''''''''
 ' onScreenFocusChange
 '
@@ -218,12 +228,15 @@ Function onScreenFocusChange()
   tubiLog("CategoryScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus()
     if m.categoryListIsFocused = false
-    ' defaulted to screen, move to a subcomponent
       m.CategoryGridList.setFocus(true)
+      m.top.backgroundUriList = determineBackgroundImage(m.CategoryGridList.itemFocused)
     else
       m.CategoryList.setFocus(true)
       m.categoryListIsFocused = true
     end if
+  else if m.top.isInFocusChain() = false
+    m.gridHasFocus = false
+    m.listHasFocus = false
   end if
 End Function
 
@@ -274,7 +287,6 @@ Function showCategoryMenu()
       slideTo(m.ContentArea, [517,m.ContentArea.translation[1]], 0.5)
       slideTo(m.CategoryList, [60,m.CategoryList.translation[1]], 0.5)
     end if
-    m.trackingCount = 0
     m.CategoryGridList.isFullWidth = false
     m.top.backgroundUriList = [m.defaultBackgroundUri]
   end if
@@ -292,7 +304,6 @@ Function hideCategoryMenu()
       slideTo(m.ContentArea, [85,m.ContentArea.translation[1]], 0.5)
       slideTo(m.CategoryList, [-380,m.CategoryList.translation[1]], 0.5)
     end if
-    m.trackingCount = 0
     m.CategoryGridList.isFullWidth = true
   end if
 End Function
@@ -326,14 +337,20 @@ Function onCategoryMenuItemFocused() As Void
 
   populateInfoPanel("category", infoMetadata)
 
-  'update the tracking URI for user tracking purposes
-  catPos = (m.CategoryList.itemFocused + m.top.rowPlaceholder + 1).toStr()
-  if newCategory <> invalid
-    catSlug = newCategory.id
-  else
-    catSlug = ""
+  'Set up the navigateWithinPageInfo to send to ContentController via Homescreen
+  if m.listHasFocus = true
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+      componentOneof: m.Tracking.getAnalyticsComponent("category_list_component", {}) 'category_list_component doesn't exist in protos
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      vertical_location: m.CategoryList.itemFocused + 1 '1 based index
+      vertical_location_mode: "COORDINATE"  'LocationMode enum
+      horizontal_location: 1
+      horizontal_location_mode: "INDEX"  'LocationMode enum
+    }
   end if
-  m.top.trackingUri = "/home/" + catPos + "/cat/" + catSlug
+  m.listHasFocus = true
+  m.gridHasFocus = false
 End Function
 
 
@@ -369,7 +386,6 @@ End Function
 ' On grid focus change, update the info panel
 Function onGridFocusChange() As Void
   tubiLog("CategoryScreen.onGridFocusChange")
-
   if not m.CategoryGridList.isInFocusChain() then return
   focusedContent = m.CategoryGridList.itemFocused
   if focusedContent <> invalid
@@ -379,26 +395,52 @@ Function onGridFocusChange() As Void
   ' If focus is on an empty category, leave the background as is.  This helps avoid
   ' background jank and keeps CPU usage down while categories are being fetched.
   if focusedContent <> invalid
-    if focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
-      m.top.backgroundUriList = focusedContent.backgrounds
-    else
-      m.top.backgroundUriList = [m.defaultBackgroundUri]
-    end if
+    m.top.backgroundUriList = determineBackgroundImage(focusedContent)
   end if
 
-  'update the tracking URI
-  m.top.trackingUri = updateTrackingUri(m.CategoryGridList.cursorPosition)
+  'Set up the navigateWithinPageInfo to send to ContentController via Homescreen
+  analyticsRow = m.CategoryGridList.cursorPosition[0] + 1
+  analyticsCol = m.CategoryGridList.cursorPosition[1] + 1
+  categoryComponentInfo = {
+    category_slug: m.top.currCategoryId
+    category_row: analyticsRow
+    content_tile: m.Tracking.getAnalyticsTile(focusedContent, analyticsCol, analyticsRow)
+  }
+
+  if m.gridHasFocus = true
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+      componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      vertical_location: analyticsRow
+      vertical_location_mode: "COORDINATE"  'LocationMode enum
+      horizontal_location: analyticsCol
+      horizontal_location_mode: "COORDINATE"  'LocationMode enum
+    }
+  end if
+  m.gridHasFocus = true
+  m.listHasFocus = false
 End Function
 
 Function onGridItemSelected() As Void
   tubiLog("CategoryScreen.onGridItemSelected")
-  m.top.trackingCount = 0
   selectedItem = m.CategoryGridList.itemSelected
 
-  m.top.trackingUri = updateTrackingUri(m.CategoryGridList.selectedPosition)
+  ' Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
+  m.top.trackingComponentInfo = {
+    componentType: "category_component"
+    componentValues: {
+      category_slug: m.top.currCategoryId
+      category_row: m.top.selectedPosition[0] + 1  'all analytics are 1 based
+      content_tile: m.Tracking.getAnalyticsTile(selectedItem, m.top.selectedPosition[1] + 1)
+    }
+  }
 
+  ' Content controller observes contentSelected to populate/push the detail screen
   if selectedItem <> invalid then 
     m.top.contentSelected = selectedItem
+    m.gridHasFocus = false
+    m.listHasFocus = false
   end if
 End Function
 
@@ -446,22 +488,6 @@ Function loadAllCategories()
 End Function
 
 
-'''''''''''
-' onTrackingUriChange
-'
-' send the navigateInPage (navigate_within_page) tracking event
-Function onTrackingUriChange()
-  if m.top.trackingUri <> ""
-    m.top.trackingCount = m.top.trackingCount + 1
-    m.global.trackingLoggingTask.trackEvent = {
-      trackType: "navigateInPage"
-      value: m.top.trackingCount
-      ctx: m.top.trackingUri
-    }
-  end if
-End Function
-
-
 '@mode: string, one of the valid info panel modes (see InfoPanel.brs for details)
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
@@ -494,30 +520,27 @@ Function populateInfoPanel(mode, contentNode)
 End Function
 
 
-' returns a tracking uri that can be added to CategoryScreen.trackingUri for navigation and page load tracking
-' @position, 2d array, where index 0 is the category row index and index 1 is the column or position with the category
-Function updateTrackingUri(position)
-  catSlug = m.CategoryGridList.currCategoryId + "/"
-
-  row = 1  'row is fixed at 1 for this design, it indicates the row within the category
-  col = 0  'column is the column within the category, expect this to change
-  catPos = 0  'catPos is the order of the category (Featured should be 1)
-  if position[0] >= 0
-    catPos = position[0] + 1
-    col = position[1] + 1
-  end if
-
-  'set the user event tracking info
-  row = row.toStr() + "/"
-  col = col.toStr()
-  catPos = catPos.toStr()
-  trackingUri = "/home/" + catPos + "/cat/" + catSlug + row + col
-
-  return trackingUri
+Function sendDialogAnalyticsEvent(dialogType, trackingLib, trackingTask)
+  trackingTask.trackEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: dialogType   'DialogType enum
+      pageOneof: trackingLib.getAnalyticsPage("home_page", {})
+    }
+  }
 End Function
 
 
 Function onCategoryRefreshTimer()
   tubiLog("CategoryScreen.onCategoryRefreshTimer")
   loadAllCategories()
+End Function
+
+
+Function determineBackgroundImage(focusedContent)
+  if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0
+   return focusedContent.backgrounds
+  else
+    return [m.defaultBackgroundUri]
+  end if
 End Function

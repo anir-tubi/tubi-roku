@@ -86,14 +86,27 @@ Function tubiChannel_runChannel(args, adShim, port) As Void
 
     'change the client version so we tracking knows we are using the remote components
     if rodash().get(m, "constants.settings.version") <> invalid
-      m.constants.deviceInfo.clientVersion = m.constants.settings.version.Replace("_", ".") + ".remote"
+      m.constants.deviceInfo.clientVersion = m.constants.settings.version.Replace("_", ".")
+      versions = m.constants.settings.version.split("_")
+      m.constants.deviceInfo.majorVersion = versions[0]
+      m.constants.deviceInfo.minorVersion = versions[1]
+      m.constants.deviceInfo.buildVersion = versions[2]
     end if
     sgGlobal.setField("constants", m.constants)
+
+    ' Send the active event - this should be the first analytics event sent per session
+    ' have to do it after versions are overwritten in constants from remote components
+    requestQ = m.requestQueue.create(port)
+    m.tracking.trackUserEvent("active", {}, requestQ)
 
     deepLinkContent = m.deepLink(args, m.tracking, m.auth, true)
     controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
     controller.onNowContent = onNowContent
   else
+    'Send the active event - this should be the first analytics event sent per session
+    requestQ = m.requestQueue.create(port)
+    m.tracking.trackUserEvent("active", {}, requestQ)
+
     deepLinkContent = m.deepLink(args, m.tracking, m.auth, false)
     controller = tubiScene.createChild("ContentController")
     controller.onNowContent = onNowContent
@@ -192,14 +205,14 @@ Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
     content.id = args.contentId
 
     ' default deep link source is search
-    deepLinkSource = "search"
+    content.source = "search"
 
     ' if there is a parameter called entry with a value, that is the source of the deep link
     ' typically entry = banner from the Roku banner ads ('entry' is a custom parameter)
     ' deep link urls with entry source should look like:
     ' contentID=18267&entry=banner
     if args.entry <> invalid
-      deepLinkSource = args.entry
+      content.source = args.entry
     end if
 
     ' deeplinks coming from ios or android devices need to be authenticated
@@ -225,7 +238,7 @@ Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
     end if
 
     if args.deviceId <> invalid and args.deviceId.unescape() <> ""
-      content.source = args.deviceId.unescape()
+      content.content = args.deviceId.unescape()
     end if
 
     ' set up the resume time if we are deeplinking to a specific point in the video
@@ -257,7 +270,7 @@ Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
 
 
     ' remove any 0s that might be prepended to the content id
-    if deepLinkSource = "search"
+    if content.source = "search"
       prepend = "0"
       while prepend = "0"
         prepend = content.id
@@ -273,26 +286,17 @@ Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
     end if
 
     'see tubitv.atlassian.net/wiki/display/EC/Referrals
-    deeplinkMedium = "partnership"
+    content.medium = "partnership"
     if args.medium <> invalid
-      deeplinkMedium = args.medium
+      content.medium = args.medium
     end if
 
     'see tubitv.atlassian.net/wiki/display/EC/Referrals
-    deeplinkCampaign = "default-campaign"
+    content.campaign = "default-campaign"
     if args.campaign <> invalid
-      deeplinkCampaign = args.campaign
+      content.campaign = args.campaign
     end if
 
-    extraCtx = {
-      source: deepLinkSource
-      campaign: deeplinkCampaign
-      medium: deeplinkMedium
-    }
-
-    trackData = tracking.getTrackData("deeplink", invalid, trackingUri, extraCtx)
-    trackReq = tracking.getUserTrackingRequest(trackData)
-    trackReq.runSynchronous(1)
     return content
   else
     return invalid

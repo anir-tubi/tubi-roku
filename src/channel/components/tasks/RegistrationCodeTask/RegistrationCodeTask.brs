@@ -41,11 +41,7 @@ Function registrationLoop() As Void
           else
             'received a valid response but it didn't have any json or the json didn't contain a code
             tubiLog("Bad response generating reg code")
-            m.global.trackingLoggingTask.trackEvent = {
-              trackType: "registerFail"
-              value: "bad-server-response-nocode"
-              ctx: result.response.code
-            }
+            trackRegistrationFailure("bad-server-response-nocode")
             m.top.error = "code"
             return  ' bad response didn't have a reg code
           end if
@@ -53,11 +49,8 @@ Function registrationLoop() As Void
           'didn't receive a valid response when requesting a code
           tubiLog("Reg code generation failed " + stri(result.response.code))
           'this event will only fire once per attempt to get code, not on every retry
-          m.global.trackingLoggingTask.trackEvent = {
-            trackType: "registerFail"
-            value: "bad-server-response-code"
-            ctx: result.response.code
-          }
+          message = "bad-server-response-code-" + result.response.code.toStr()
+          trackRegistrationFailure(message)
           m.top.error = "code"
           return 
         end if
@@ -109,8 +102,15 @@ Function registrationLoop() As Void
                 auth.handleRegistration(parsed)
                 m.top.response = parsed
                 m.global.trackingLoggingTask.trackEvent = {
-                  trackType: "registerSuccess"
-                }  
+                  type: "account"
+                  values: {
+                    manip: "REGISTER_DEVICE"
+                    current: "UNKNOWN"
+                    user_type: "UNKNOWN_USER_TYPE"
+                    status: "SUCCESS"
+                    linked: ""
+                  }
+                }
                 return  ' end the thread
               else
                 m.top.response = parsed  ' status should be "pending" at this point
@@ -120,10 +120,7 @@ Function registrationLoop() As Void
             else
               'we got a polling response but either no json attached or no value for the status key
               tubiLog("Bad response polling reg code status")
-              m.global.trackingLoggingTask.trackEvent = {
-                trackType: "registerFail"
-                value: "bad-response-status"
-              }              
+              trackRegistrationFailure(bad-response-status)
               pollFailureCount = pollFailureCount + 1
               if pollFailureCount >= maxConsecPollFailures
                 m.top.error = "poll"
@@ -136,12 +133,9 @@ Function registrationLoop() As Void
             end if
           else
             tubiLog("Reg code polling failed " + stri(result.response.code))
-            m.global.trackingLoggingTask.trackEvent = {
-              trackType: "registerFail"
-              value: "bad-server-response-poll"
-            }
             pollFailureCount = pollFailureCount + 1
             if pollFailureCount >= maxConsecPollFailures
+              trackRegistrationFailure("bad-server-response-poll")
               m.top.error = "poll"
               return
             else
@@ -164,9 +158,21 @@ Function registrationLoop() As Void
   m.top.error = "expire"
 
   'we haven't exited the while loop by returning out of the function so we must have hit the expiration timeout
-  m.global.trackingLoggingTask.trackEvent = {
-    trackType: "registerFail"
-    value: "code-user-timeout"
-  }
+  trackRegistrationFailure("code-user-timeout")
 
+End Function
+
+
+Function trackRegistrationFailure(message)
+  m.global.trackingLoggingTask.trackEvent = {
+    type: "account"
+    values: {
+      manip: "REGISTER_DEVICE"
+      current: "UNKNOWN"
+      user_type: "UNKNOWN_USER_TYPE"
+      status: "FAIL"
+      linked: ""
+      message: message
+    }
+  }
 End Function

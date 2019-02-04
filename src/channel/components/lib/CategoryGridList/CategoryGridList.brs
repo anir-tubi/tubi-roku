@@ -274,7 +274,11 @@ Function onRowItemSelected()
   if category <> invalid
     m.top.currCategoryId = category.id
   end if
-  m.top.itemSelected = resolveAbbreviatedContent(m.RowList.rowItemSelected)
+
+  itemSelected = resolveAbbreviatedContent(m.RowList.rowItemSelected)
+  if itemSelected <> invalid
+    m.top.itemSelected = itemSelected
+  end if
 End Function
 
 
@@ -305,7 +309,12 @@ Function onRowListItemDebounce()
   if category <> invalid
     m.top.currCategoryId = category.id
   end if
-  m.top.itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
+
+  itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
+  if itemFocused <> invalid
+    m.top.itemFocused = itemFocused
+    m.top.cursorPosition = m.RowList.rowItemFocused
+  end if
 End Function
 
 

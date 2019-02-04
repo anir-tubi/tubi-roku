@@ -8,6 +8,9 @@
 
   <script type="text/brightscript" uri="pkg:/components/screens/RegisterInstructionsScreen/RegisterInstructionsScreen.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   
   <interface>
     <!-- INPUT -->
@@ -19,8 +22,13 @@
       <!-- Set to true when the "Skip" button on the error modal is selected -->
       <field id="skipButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
 
-      <!-- keeps the uri used for user tracking -->
-      <field id="trackingUri" type="string"  value="/login-choice/code" />
+      <!-- Keeps the information used for user tracking - structure looks like:
+        {
+          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
+          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
+        }
+      -->
+      <field id="trackingPageInfo" type="assocarray" />
   </interface>
 
   <children>

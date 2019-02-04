@@ -7,13 +7,8 @@ Function init()
   m.OnNow = m.top.findNode("OnNow")
   m.CategoryScreen = m.top.findNode("CategoryScreen")
 
-  m.CategoryScreen.observeField("backgroundUriList", "onCategoryBackgroundChange")
   m.CategoryScreen.observeField("contentSelected", "onCategoryContentSelected")
-
-  m.OnNow.observeField("trackingCount", "onTrackingCountChange")
-  m.OnNow.observeField("trackingUri", "onTrackingUriChange")
-  m.CategoryScreen.observeField("trackingCount", "onTrackingCountChange")
-  m.CategoryScreen.observeField("trackingUri", "onTrackingUriChange")
+  m.CategoryScreen.observeField("backgroundUriList", "onCategoryBackgroundChange")
 
   m.onNowEnabled = false
   if m.global.constants.ui.onnow.on = true
@@ -65,23 +60,23 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
         m.OnNow.trackingCount = m.top.trackingCount
         showOnNow(true, "above", false)
         m.OnNow.setFocus(true)
+        m.top.navigateBetweenHomescreens = true
         return true
       else
         m.top.toolsMenuSelected = true
       end if
     else if key = "down"
       if m.OnNow.isInFocusChain() then
-        m.CategoryScreen.trackingCount = m.top.trackingCount
-        m.OnNow.trackingUri = ""
         showCategoryScreen(true)
         showOnNow(false, "above", true)
         m.CategoryScreen.setFocus(true)
+        m.top.navigateBetweenHomescreens = true
         return true
       end if
     end if
   end if
-
 End Function
+
 
 Function showOnNow(show, direction, dock)
   if show and not m.OnNow.isInFocusChain()
@@ -100,6 +95,7 @@ Function showOnNow(show, direction, dock)
   end if
 End Function
 
+
 Function showCategoryScreen(show)
   'set the rowPlaceholder value on the CategoryScreen so that keep the correct uri value for analytics
   'basically the number of "rows" that are above the category screen, like "On Now"
@@ -112,11 +108,24 @@ Function showCategoryScreen(show)
     m.CategoryScreen.rowPlaceholder = catScreenIndex - onNowVisible
   end if
 
-  if show and not m.CategoryScreen.isInFocusChain()
-    animate(m.CategoryScreen, {destination: [0, 0], opacity: 1.0, duration: 0.4})
-    m.CategoryScreen.infoVisible = true
-    m.focusTarget = m.CategoryScreen
-  else if not show and m.CategoryScreen.isInFocusChain()
+  if show = true
+    ' oldTrackingPageInfo will be used in navigate_to_page event
+    m.top.oldTrackingPageInfo = m.top.trackingPageInfo
+
+    ' there are no analytics components that are selected to navigate to the category page, so don't set m.top.trackingComponentInfo
+    ' set the tracking page info for the category page
+    m.top.trackingPageInfo = {
+      pageType: "home_page"
+      pageValues: {}
+    }
+
+    if m.CategoryScreen.isInFocusChain() = false
+      ' show the category screen
+      animate(m.CategoryScreen, {destination: [0, 0], opacity: 1.0, duration: 0.4})
+      m.CategoryScreen.infoVisible = true
+      m.focusTarget = m.CategoryScreen
+    end if
+  else if show = false and m.CategoryScreen.isInFocusChain() = true
     animate(m.CategoryScreen, {destination: [0, 392], opacity: 0.2, duration: 0.4})
     m.CategoryScreen.infoVisible = false
     m.CategoryScreen.categoryMenuVisible = false
@@ -143,19 +152,5 @@ Function onCategoryContentSelected()
   if m.onNowEnabled = true
     m.OnNow.control = "stop"  ' make sure we always stop the video before detail screen shows
     m.CategoryScreen.dockedVideoFrameVisible = false
-  end if
-End Function
-
-
-'update the HomeScreen trackingCount based on changes to the focused child screen's trackingCount
-Function onTrackingCountChange(evt)
-  if evt.getData() <> invalid and evt.getRoSGNode().isInFocusChain()
-    m.top.trackingCount = evt.getData()
-  end if
-End Function
-
-Function onTrackingUriChange(evt)
-  if evt.getData() <> invalid and evt.getRoSGNode().isInFocusChain()
-    m.top.trackingUri = evt.getData()
   end if
 End Function

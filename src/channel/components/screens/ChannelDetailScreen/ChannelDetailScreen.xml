@@ -10,6 +10,9 @@
   <script type="text/brightscript" uri="pkg:/components/screens/ChannelDetailScreen/ChannelDetailScreen.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
@@ -27,10 +30,35 @@
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
 
-      <!-- keeps the uri used for user tracking -->
-      <field id="trackingUri" type="string"  value="/category" alwaysNotify="false"/>
-      <field id="trackingCount" type="integer" value="0"/>
+      <!-- Keeps the information used for user tracking - structure looks like:
+        {
+          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
+          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
+        }
+      -->
+      <field id="trackingPageInfo" type="assocarray" />
 
+      <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
+        {
+          componentType: "category_component"    ' Corresponds to one of the page types in tubiTracking_getAnalyticsComponent() 
+                                                 ' which mirrors the protos repo.
+          componentValues: {}                    ' An assoc array with key/values that match the componentType as found in
+                                                 ' tubiTracking_getAnalyticsComponent().
+        }
+      -->
+      <field id="trackingComponentInfo" type="assocarray" />
+
+      <!-- Holds the information needed to populate a navigate_witin_page event. This will
+           be observed by the Homescreen, which will subsequently pass it to the contentController
+           which will be responsible for sending navigate_within_page events.
+           See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA
+      -->
+      <field id="navigateWithinPageInfo" type="assocarray" />
+
+      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
+           Used when showing a series/episode page
+      -->
+      <field id="trackingLoadStartTime" type="integer" />
   </interface>
 
   <children>

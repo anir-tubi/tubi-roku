@@ -1,4 +1,9 @@
 Function init()
+  m.trackingLoggingTask = m.global.trackingLoggingTask
+  m.constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.NodeHelpers = TubiNodeHelpers()
   m.Info = m.top.findNode("DetailInfoPanel")
   m.Menu = m.top.findNode("Menu")
@@ -32,6 +37,7 @@ Function init()
   m.top.observeField("isLoading", "onIsLoading")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
   m.top.observeField("relatedContent", "onRelatedContentChange")
+  m.RelatedGrid.observeField("itemSelected", "onRelatedContentSelected")
   m.RelatedGrid.observeField("itemFocused", "onRelatedItemFocused")
   m.top.observeField("jumpToItem", "onJumpToItem")
   m.Info.observeField("descriptionSelected", "onDescriptionSelected")
@@ -44,6 +50,18 @@ Function init()
 
   ' modal popup to show full, scrollable description
   m.descriptionModal = invalid
+
+  'set initial tracking values
+  m.top.trackingPageInfo = {
+    pageType: "video_page"
+    pageValues: {
+      video_id: 0
+    }
+  }
+
+  ' Used to determine if navigate_within_page events should be sent. Only send when the related content already
+  ' has focus, not when it gains focus.
+  m.relatedHasFocus = false
 End Function
 
 Function onDescriptionSelected()
@@ -57,6 +75,14 @@ Function onDescriptionSelected()
   m.descriptionModal.observeFieldScoped("exitButton", "onCloseDescriptionModal")
   m.top.appendChild(m.descriptionModal)
   m.descriptionModal.setFocus(true)
+
+  m.trackingLoggingTask.trackEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION"
+      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: m.top.content.id.toInt()}) 
+    }
+  }
 End Function
 
 Function onCloseDescriptionModal()
@@ -321,6 +347,22 @@ Function onRelatedContentChange()
 End Function
 
 
+Function onRelatedContentSelected()
+  m.relatedHasFocus = false
+
+  'set the component info so it can be used in navigate_to_page event
+  selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemSelected)
+  col = m.RelatedGrid.itemSelected + 1
+  row = 1
+  m.top.trackingComponentInfo = {
+    componentType: "related_component"
+    componentValues: m.Tracking.getAnalyticsTile(selectedContent, col, row)
+  }
+
+  m.top.relatedContentSelected = m.RelatedGrid.itemSelected
+End Function
+
+
 Function onRelatedItemFocused()
   tubiLog("DetailScreen.onRelatedItemFocused")
   if m.RelatedGrid.content <> invalid
@@ -328,8 +370,30 @@ Function onRelatedItemFocused()
     if focusedContent <> invalid
       m.RelatedTitle.text = focusedContent.title
     end if
+
+    ' trigger navigate_within_page events in ContentController
+    if m.relatedHasFocus = true
+      col = m.RelatedGrid.itemFocused + 1
+      row = 1
+      ymalComponent = {
+        content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
+      }
+      videoId = m.top.content.id.toInt()
+
+      m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId} )
+        componentOneof: m.Tracking.getAnalyticsComponent("related_component", ymalComponent) 'category_list_component doesn't exist in protos
+        means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+        vertical_location: row '1 based index
+        vertical_location_mode: "INDEX"  'LocationMode enum
+        horizontal_location: col
+        horizontal_location_mode: "COORDINATE"  'LocationMode enum
+      }
+    end if
+    m.relatedHasFocus = true
   end if
 End Function
+
 
 '''''''''''''''''''''''
 ' onKeyEvent
@@ -387,6 +451,7 @@ Function focusMenu(immediately=false)
   end if
   if m.top.isInFocusChain()
     m.Menu.setFocus(true)
+    m.relatedHasFocus = false
   end if
 End Function
 

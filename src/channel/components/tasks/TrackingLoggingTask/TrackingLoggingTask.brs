@@ -26,7 +26,6 @@ Function watchLoop()
     msg = wait(0, m.port)
     if type(msg) = "roSGNodeEvent" then
       if msg.GetField() = "trackEvent" then
-        tubiLog("Received roSGNodeEvent for field " + msg.GetField())
         trackSceneGraphEvent(msg.GetData())
 
       else if msg.GetField() = "logMsg" then
@@ -45,16 +44,15 @@ End Function
 '           value: dynamic, depends on the eventType
 '           ctx: dynamic, depends on the eventType
 '           extraCtx: dynamic, depends on the eventType
-Function trackSceneGraphEvent(evt)
-  if evt <> invalid and evt.trackType <> invalid then
-    tubiLog("TrackingLoggingTask.trackSceneGraphEvent for " + evt.trackType)
+Function trackSceneGraphEvent(evtData)
+  if evtData <> invalid and type(evtData.type) = "roString"
+    tubiLog("TrackingLoggingTask.trackSceneGraphEvent for " + evtData.type)
     constants = m.constants
     Request = TubiRequest()
     Auth = TubiAuth(constants, Request)
     Tracking = TubiTracking(constants, Request, Auth)
 
-    evt.requestQ = m.queue
-    Tracking.trackUserEvent(evt)  'creates a request and adds it to the requestQueue
+    Tracking.trackUserEvent(evtData.type, evtData.values, m.queue)  'creates a request and adds it to the requestQueue
   end if
 End Function
 

@@ -1,4 +1,9 @@
 Function init()
+  m.trackingLoggingTask = m.global.trackingLoggingTask
+  m.constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.Buttons = m.top.findNode("Buttons")
   m.Buttons.observeField("itemSelected", "onButtonSelected")
@@ -18,6 +23,14 @@ Function init()
     m.top.findNode("RegistrationPoster5").uri = "pkg:/images/hd/menu-button.9.png"
     m.top.findNode("RegistrationPoster6").uri = "pkg:/images/hd/menu-button.9.png"
   end if
+
+  'set initial tracking values
+  m.top.trackingPageInfo = {
+    pageType: "auth_page"
+    pageValues: {
+      auth_action: "ACTIVATION"
+    }
+  }
 End Function
 
 
@@ -124,6 +137,17 @@ Function onRegTaskError(evt)
   m.errorDialog.buttons = ["Try again", "Skip"]
   m.errorDialog.observeField("buttonSelected", "onErrorButtonPress")
   m.errorDialog.setFocus(true)
+
+  authPageValues = {
+    auth_action:  "ACTIVATION"  'Action enum
+  }
+  m.trackingLoggingTask.trackEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "WARNING"
+      pageOneof: m.Tracking.getAnalyticsPage("auth_page", authPageValues) 
+    }
+  }
 End Function
 
 
@@ -180,9 +204,16 @@ Function onKeyEvent(key As String, press As Boolean)
         m.RegCodeTask.cancel = true
       end if
 
-      m.global.trackingLoggingTask.trackEvent = {
-        trackType: "registerFail"
-        value: "user-cancel"
+      m.trackingLoggingTask.trackEvent = {
+        type: "account"
+        values: {
+          manip: "REGISTER_DEVICE"
+          current: "UNKNOWN"
+          user_type: "UNKNOWN_USER_TYPE"
+          status: "FAIL"
+          message: "user-cancel"
+          linked: ""
+        }
       }
       return false
     end if

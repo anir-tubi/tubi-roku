@@ -1,13 +1,19 @@
 Function init()
+  m.constants = m.global.constants
+  m.NodeHelpers = TubiNodeHelpers()
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
+
   m.top.observeField("focusedChild", "onFocus")
   m.top.observeField("show", "onShow")
   m.ScreenStack = m.top.findNode("SignInScreenStack")
-  if m.global.constants.deviceInfo.limitedUi = false
+  if m.constants.deviceInfo.limitedUi = false
     m.ScreenStack.transition = "cascade"
   else
     m.ScreenStack.transition = "visible"
   end if
-  m.NodeHelpers = TubiNodeHelpers()
+
   initScreenStack(m.ScreenStack, onScreenStackEmpty)
 End Function
 
@@ -41,7 +47,7 @@ Function onShow()
     m.Disambiguation = CreateObject("roSGNode", "SignInDisambiguationScreen")
     m.Disambiguation.observeField("signInButtonSelected", "onRegister")
     m.Disambiguation.observeField("guestPassButtonSelected", "onDisambiguationGuestPass")
-    pushScreen(m.Disambiguation)
+    pushScreen(m.Disambiguation, true, true)
   end if
 End Function
 
@@ -74,7 +80,16 @@ Function onRegister()
   m.RegisterInstructions = CreateObject("roSGNode", "RegisterInstructionsScreen")
   m.RegisterInstructions.observeField("registerSuccess", "onRegisterSuccess")
   m.RegisterInstructions.observeField("skipButtonPressed", "onContinueGuestPass")
-  pushScreen(m.RegisterInstructions)
+
+  shouldTrackNavigate = true
+  if currentScreen() = invalid and m.top.sourceScreen <> invalid
+    'do the navigate_to_page here instead of from within push screen, because the screen stack does not have the previous screens info
+    'as it belongs to the contentController's screen stack
+    shouldTrackNavigate = false
+    screenTrackingNavigate(m.top.sourceScreen.trackingPageInfo, m.RegisterInstructions.trackingPageInfo, m.top.sourceScreen.trackingComponentInfo)
+  end if
+
+  pushScreen(m.RegisterInstructions, shouldTrackNavigate, true)
 End Function
 
 

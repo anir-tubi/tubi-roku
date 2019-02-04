@@ -35,6 +35,7 @@ Function onSeekPlaylist(msg) As Void
   refreshContent(newIndex[1])
 End Function
 
+
 Function currentPlaylistContent()
   if m.top.playlist <> invalid
     return m.top.playlist.getChild(m.top.playlistIndex)
@@ -42,6 +43,7 @@ Function currentPlaylistContent()
     return invalid
   end if
 End Function
+
 
 'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
@@ -110,6 +112,7 @@ Function onVideoStateChange(msg)
   end if
 End Function
 
+
 Function onDownloadedSegment(msg)
   dlsegment = msg.getData()
   if dlsegment <> invalid and dlsegment.status <> 0
@@ -118,6 +121,7 @@ Function onDownloadedSegment(msg)
     tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-download")
   end if
 End Function
+
 
 Function advancePlaylist() As Boolean
   tubiLog("VideoPlaylist.advancePlaylist")
@@ -139,10 +143,10 @@ Function advancePlaylist() As Boolean
   end if
 End Function
 
+
 ''''''''''''''''''''''
 ' METADATA REFRESH
 ''''''''''''''''''''''
-
 Function refreshContent(nowPos)
   tubiLog("VideoPlayer.refreshContent")
   content = currentPlaylistContent()

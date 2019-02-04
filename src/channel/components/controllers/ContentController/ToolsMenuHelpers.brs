@@ -6,10 +6,11 @@ Function showToolsMenu()
   m.toolsMenu.observeFieldScoped("exitSelected", "onExitSelected")
   m.toolsMenu.observeFieldScoped("backgroundUriList", "onToolsBackgroundChange")
   m.toolsMenu.observeFieldScoped("backButtonPressed", "onToolsBackButton")
+  m.toolsMenu.observeField("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   m.toolsMenu.signedIn = (m.global.authInfo <> invalid)
-  pushScreen(m.toolsMenu, false)  ' Don't send page navagation since tools are
-                                  ' categorized as "navigate_in_page"
+  pushScreen(m.toolsMenu, true, true)
 End Function
+
 
 ''''''''''''''''''''
 ' onSearchSelected
@@ -20,7 +21,8 @@ Function onSearchSelected()
   m.searchScreen = CreateObject("roSGNode", "SearchScreen")
   m.searchScreen.observeFieldScoped("contentSelected", "onSearchContentSelected")
   m.searchScreen.observeFieldScoped("backgroundUriList", "onSearchBackgroundChange")
-  pushScreen(m.searchScreen, true)
+  m.searchScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+  pushScreen(m.searchScreen, true, true)
 End Function
 
 
@@ -58,5 +60,5 @@ End Function
 
 Function onToolsBackButton()
   tubiLog("ToolsMenuHelper.onToolsBackButton")
-  popScreen(false)
+  popScreen(true)
 End Function

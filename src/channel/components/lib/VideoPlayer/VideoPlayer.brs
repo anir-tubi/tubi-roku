@@ -4,20 +4,20 @@
 '
 '      EVENT            TRIGGERS
 '      ===============================
-'      videoPlay        only on start of episode playback, or autoplay invoked playback
+'      start_video        only on start of episode playback, or autoplay invoked playback
 '
-'      resumeAfterAds   after pre-roll and each mid-roll
+'      resume_after_ads   after pre-roll and each mid-roll
 '
-'      playProgress     on start of scrubbing
-'                       at regular intervals set by 'pingFrequency' in constants
+'      play_progress      on start of scrubbing
+'                         at regular intervals set by 'pingFrequency' in constants
 '
-'      seek             at end of scrubbing
+'      seek               at end of scrubbing
 '
-'      pauseToggle      when paused using pause/play button
-'                       when resumed using pause/play button
+'      pause_toggle       when paused using pause/play button
+'                         when resumed using pause/play button
 '
-'      subtitle         when subtitles turned off
-'                       when subtitles turned on
+'      subtitles_toggle   when subtitles turned off
+'                         when subtitles turned on
 '
 '
 '
@@ -35,6 +35,9 @@ Function init()
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
   m.constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.Loading = m.top.findNode("Loading")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
@@ -85,7 +88,7 @@ Function init()
   m.scrubMultipliers = m.constants.player.scrubMultipliers
   m.scrubTimespan = CreateObject("roTimespan")
   ' m.positionAtJumpStart holds the state during FF/REW/Skips/Hops so we can tell if at the end of all user actions
-  ' the user ended up moving forward or backwards from their original position.
+  ' the user ended up moving forward or backwards from their original position. Also used for "seek" event tracking.
   m.positionAtJumpStart = -1
   m.playerPosition = 0
 
@@ -206,18 +209,9 @@ Function onVideoPickerFocused()
   tubiLog("VideoPlayer.onVideoPickerFocused = " + stri(m.VideoPicker.contentFocused))
   if m.VideoPicker.contentFocused <> -1
     m.lastButtonPressPos = m.playerPosition
-
-    'content grid naturally debounces the content selections, so trackEvent and navigations increment
-    'only happen when a user has settled on a content
-    m.VideoPicker.navigations = m.VideoPicker.navigations + 1
-    
-    trackEvent({
-      trackType: "navigateInPage"
-      value: m.VideoPicker.navigations
-      ctx: "/on_now/" + m.top.content.slug + "/1/" + m.VideoPicker.contentFocused.toStr()
-    })
   end if
 End Function
+
 
 Function onVideoPickerSelected()
   tubiLog("VideoPlayer.onVideoPickerSelected " + stri(m.VideoPicker.contentSelected))
@@ -234,7 +228,6 @@ Function onVideoPickerSelected()
     end if
   end if
 End Function
-
 
 
 ' m.playerPosition is the main source of truth for position.
@@ -328,8 +321,8 @@ Function onVideoPositionChange()
   ' Analytics
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval then
     playProgressEvent = getPlayProgressEvent()
-    m.lastPingTime = m.playerPosition
     if playProgressEvent <> invalid
+      m.lastPingTime = m.playerPosition
       trackEvent(playProgressEvent)
     end if
   end if
@@ -377,15 +370,24 @@ Function onVideoPositionChange()
           m.AdHeadsUp.visible = false
           m.recentCuepoint = cuepoint
           if m.top.adState = "adspending" then
+            ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
+            playProgressEvent = getPlayProgressEvent()
+            if playProgressEvent <> invalid
+              m.lastPingTime = m.playerPosition
+              trackEvent(playProgressEvent)
+            end if
+
             ' We must stop the video here, not just pause it, in order to release
             ' system resources to the RAF video player
             showAdBreak()
           else if m.top.adState = "noads"
             ' when we reach the cuepoint, we find that the last ad call returned no ads
             trackEvent({
-              trackType: "resumeAfterAds"
-              value: m.playerPosition
-              ctx: m.top.content.id
+              type: "resume_after_break"
+              values: {
+                video_id: m.Video.content.id.toInt()
+                position: Int(m.playerPosition * 1000)  'without Int(), can return scientific notation, causing API error
+              }
             })
           end if
         end if
@@ -397,25 +399,48 @@ End Function
 
 Function onCaptionModeChange()
   tubiLog("VideoPlayer.onCaptionModeChange")
+  language = ""
   if m.Video.globalCaptionMode = "On"
     fade(m.CCRailOn, "in", 0.5)
     fade(m.CCRailOff, "out", 0.5)
     slideTo(m.CCNipple, m.CCNippleOnTranslation, 0.5)
-    value = "on"
+    toggleState = "ON"
+
+    subtitleUrl = m.Video.subtitleTrack
+    for i=0 to m.Video.availableSubtitleTracks.count()-1
+      trackInfo = m.Video.availableSubtitleTracks[i]
+      if m.Video.subtitleTrack = trackInfo.TrackName
+        if trackInfo.language = "eng"
+          language = "EN"
+        else if trackInfo.language = "spa"
+          language = "ES"
+        else if trackInfo.language = "fre"
+          language = "FR"
+        else if trackInfo.language = "fra"
+          language = "FR"
+        else if trackInfo.language = "kor"
+          language = "KO"
+        else if trackInfo.language = "cho"
+          language = "ZH"
+        else if trackInfo.language = "zhi"
+          language = "ZH"
+        end if
+      end if
+    end for
   else  'handles "Off", "Instant replay", and "When mute"
     fade(m.CCRailOn, "out", 0.5)
     fade(m.CCRailOff, "in", 0.5)
     slideTo(m.CCNipple, m.CCNippleOffTranslation, 0.5)
-    value = "off"
+    toggleState = "OFF"
   end if
-  
+
   if m.Video.content <> invalid then
     trackEvent({
-      trackType: "subtitles"
-      ctx: m.Video.content.id
-      value: value
-      extraCtx: {
-        livetv: m.Video.content.isLiveTV
+      type: "subtitles_toggle"
+      values: {
+        video_id: m.Video.content.id.toInt()
+        toggle_state: toggleState  'ToggleState enum
+        language: language  'Language enum
       }
     })
   end if
@@ -437,37 +462,61 @@ Function playContent()
   end if
   m.top.midrolls = []  ' Always reset midrolls when we first start playback.  Preroll will populate these
     
-
   'start_video user event analytics
   if m.top.analyticsMode = "trailer"
+    'set up tracking for trailer
     trackEvent({
-      trackType: "startTrailer"
-      value: m.Video.content.id
+      type: "start_trailer"
+      values: {
+        video_id: m.Video.content.id.toInt()
+        is_fullscreen: true
+      }
     })
   else
-    extraCtx = {subtitles: m.Video.content.showSubtitles}
-
-    if m.top.analyticsMode = "autoplay"
-      extraCtx.autoplay = true
+    'set up tracking for normal playback
+    autoPlayAutomatic = false
+    autoPlayDeliberate = false
+    isLiveTv = false
+    isOnNow = false
+    isFullScreen = true
+    isEmbedded = false
+    if m.top.analyticsMode = "autoplay-automatic"
+      autoPlayAutomatic = true
+    else if m.top.analyticsMode = "autoplay-deliberate"
+      autoPlayDeliberate = true
     else if m.top.analyticsMode = "onnow-autoplay" 
       'onnow-autoplay signifies the onnow video started without input from the user (ie. when the on now screen loads)
-      extraCtx.on_now = true
-      extraCtx.livetv = true  'server uses this flag to determine if viewing should be part of CVT
+      isOnNow = true
+      isLiveTv = true  'server uses this flag to determine if viewing should be part of CVT
     else if m.top.analyticsMode = "onnow-engaged"
       'onnow-engaged signifies the on now video started while the user has been "engaged" (ie. they selected an on now video, or an on now video autoplayed)
-      extraCtx.on_now = true
+      isOnNow = true
     else if m.top.analyticsMode = "onnow-docked"
       'onnow-docked signifies the on now video started while while in docked mode
-      extraCtx.on_now = true
-      extraCtx.livetv = true
-      extraCtx.embedded = true
+      isOnNow = true
+      isLiveTv = true
+      isFullScreen = false
+      isEmbedded = true
+    end if
+
+    hasSubtitles = false
+    if m.Video.globalCaptionMode = "On" and m.Video.content.hasSubtitles = true
+      hasSubtitles = true
     end if
 
     trackEvent({
-      trackType: "videoPlay"
-      value: m.Video.content.id
-      ctx: m.Video.content.nowPos
-      extraCtx: extraCtx
+      type: "start_video"
+      values: {
+        video_id: m.Video.content.id.toInt()
+        start_position: m.playerPosition * 1000
+        current_cdn: ""   'not possible for Roku client
+        has_subtitles: hasSubtitles  'the video player will show subtititles at start
+        is_livetv: isLiveTv
+        is_embedded: isEmbedded
+        is_fullscreen: isFullScreen
+        from_autoplay_deliberate: autoPlayDeliberate
+        from_autoplay_automatic: autoPlayAutomatic
+      }
     })
   end if
 
@@ -533,7 +582,7 @@ Function onKeyEvent(key As String, press As Boolean)
           else if focusButtonId = m.FastForwardButton.id
             handleFastForward()
           else if focusButtonId = m.EndButton.id
-            goToEnd()
+            goToNext()
           else if focusButtonId = m.ClosedCaption.id
             handleClosedCaption()
           end if
@@ -679,15 +728,17 @@ Function onAdStateChange()
       m.Video.control = "play"
       m.Video.seek = m.playerPosition
       trackEvent({
-        trackType: "resumeAfterAds"
-        value: m.playerPosition
-        ctx: m.top.content.id
+        type: "resume_after_break"
+        values: {
+          video_id: m.Video.content.id.toInt()
+          position: Int(m.playerPosition * 1000)    'without Int(), can return scientific notation, causing API error
+        }
       })
     else
       m.top.errorMsg = "Video URL is not valid."
       m.top.state = "error"
       errorInfo = {
-        video_id: m.top.content.id
+        video_id: m.top.content.id.toInt()
         video_url: m.top.content.url
       }
       tubiLog(FormatJson(errorInfo), "error", "videoPlayback", "video-url")
@@ -704,11 +755,10 @@ Function onAdStateChange()
       m.VideoState = "play"
       m.Video.control = "play"
       trackEvent({
-        trackType: "resumeAfterAds"
-        value: m.Video.content.nowPos
-        ctx: m.Video.content.id
-        extraCtx: {
-          livetv: m.Video.content.isLiveTV
+        type: "resume_after_break"
+        values: {
+          video_id: m.Video.content.id.toInt()
+          position: Int(m.playerPosition * 1000)    'without Int(), can return scientific notation, causing API error
         }
       })
     end if
@@ -720,7 +770,7 @@ End Function
 
 ' Helper function to prevent tracking events being sent for trailers
 Function trackEvent(event As Object)
-  if m.top.analyticsMode <> "trailer" or event.trackType = "startTrailer" then
+  if m.top.analyticsMode <> "trailer" or event.type = "start_trailer" then
     m.global.trackingLoggingTask.trackEvent = event
   end if
 End Function
@@ -771,7 +821,7 @@ Function animateTransport(direction)
 End Function
 
 Function focusVideoPicker(focus)
-  tubiLog("VideoPlayerFocusVideoPicker")
+  tubiLog("VideoPlayer.focusVideoPicker")
   if not focus and m.VideoPicker.isInFocusChain()
     ' I'm not sure why we have to setFocus(false) here, but it doesn't work otherwise
     slideFade(m.PickerGroup, "below", "out", 0.6)
@@ -812,11 +862,10 @@ Function pauseVideo(shouldShowTransport)
   
   updateTransport()
   trackEvent({
-    trackType: "pauseToggle"
-    ctx: m.Video.content.id
-    value: "paused"
-    extraCtx: {
-      livetv: m.Video.content.isLiveTV
+    type: "pause_toggle"
+    values: {
+      video_id: m.Video.content.id.toInt()
+      pause_state: "PAUSED"
     }
   })
 End Function
@@ -832,14 +881,13 @@ Function resumeFromPause()
     m.Video.control = "resume"
     m.VideoState = "play"
 
-    trackEvent({
-      trackType: "pauseToggle"
-      ctx: m.Video.content.id
-      value: "resumed"
-      extraCtx: {
-        livetv: m.Video.content.isLiveTV
-      }
-    })
+  trackEvent({
+    type: "pause_toggle"
+    values: {
+      video_id: m.Video.content.id.toInt()
+      pause_state: "RESUMED"
+    }
+  })
   end if
 
   m.PlayPauseButton.uri = m.buttonUris.pause
@@ -853,6 +901,7 @@ Function resumeFromSkip()
   if m.playerPosition <> m.Video.position
     jumpToPosition(m.playerPosition)
   end if
+  m.lastPingTime = m.playerPosition
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
 End Function
@@ -958,7 +1007,7 @@ End Function
 
 
 'handles EndButton selection
-Function goToEnd()
+Function goToNext()
   'reset before endScrub because we don't want an ad call made when moving to the next video, let prerolls hit instead
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(true)
@@ -968,7 +1017,7 @@ Function goToEnd()
     'the end of the video playback
     m.VideoState = "stop"
     m.Video.control = "stop"
-    m.top.state = "finished"
+    m.top.goToNext = true
   end if
   animateTransport("out")
   resetTransportButtons()
@@ -1058,11 +1107,21 @@ Function handleHopForward()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
     setFocusedButton(m.HopForwardButton)
+  else if m.VideoState <> "skip"
+    playProgressEvent = getPlayProgressEvent()
+    if playProgressEvent <> invalid
+      trackEvent(playProgressEvent)
+    end if
+
+    'only update m.positionAtJumpStart if we are not concluding another seek interaction
+    m.positionAtJumpStart = m.playerPosition  'used for seek event analytics
   end if
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
-  jumpToPosition(m.playerPosition + 30)
+  hopPosition = m.playerPosition + 30
+  jumpToPosition(hopPosition)
+  m.lastPingTime = hopPosition        'used for accurate play_progress accounting
 End Function
 
 
@@ -1071,16 +1130,26 @@ Function handleHopBack(remoteReplayButton)
   setFocusedButton(m.HopBackButton)  'necessary because there is a dedicated hop back button on certain roku remotes
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
+  else if m.VideoState <> "skip"
+    playProgressEvent = getPlayProgressEvent()
+    if playProgressEvent <> invalid
+      trackEvent(playProgressEvent)
+    end if
+
+    'only update m.positionAtJumpStart if we are not concluding another seek interaction
+    m.positionAtJumpStart = m.playerPosition   'used for seek event analytics
   end if
+
   setFocusedButton(m.HopBackButton, true)
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
-  oldPosition = m.playerPosition
-  jumpToPosition(m.playerPosition - 30)
+  hopPosition = m.playerPosition - 30
+  jumpToPosition(hopPosition)
+  m.lastPingTime = hopPosition    'used for accurate play_progress accounting
   if remoteReplayButton and m.Video.globalCaptionMode = "Instant replay"
     tubilog("Turning on replay captions")
-    m.replayCaptionEnd = oldPosition
+    m.replayCaptionEnd = m.positionAtJumpStart
     m.video.globalCaptionMode = "On"
   end if
 End Function
@@ -1088,13 +1157,16 @@ End Function
 
 'helper function to conclude a hop, skip, or end scrub
 'performs the seek tracking and runs an ad break if told to
-Function handleSeek(position as Integer, shouldAdBreak as Boolean)
+Function handleSeek(position as Float, positionAtJumpStart as Float, shouldAdBreak as Boolean)
   m.Thumbnail.visible = false
   ' seek analytics
   trackEvent({
-    trackType: "seek"
-    value: position
-    ctx: m.top.content.id
+    type: "seek"
+    values: {
+      video_id: m.Video.content.id.toInt()
+      from_position: positionAtJumpStart * 1000
+      to_position: position * 1000
+    }
   })
 
   if shouldAdBreak
@@ -1112,18 +1184,22 @@ End Function
 'functionality is: pause video, jump 10s forward or back, show the transport
 Function handleSkipVideo(amt, isProgressBarFocused)
   'handle the first skip press
+  print "m.VideoState "; m.VideoState
   if m.VideoState <> "skip"
     m.Video.control = "pause"
-    m.VideoState = "skip"
-    m.positionAtJumpStart = m.playerPosition
     m.PlayPauseButton.uri = m.buttonUris.play
 
-    if m.VideoState <> "rew" or m.VideoState <> "ffw"
+    if m.VideoState <> "rew" and m.VideoState <> "ffw"
       playProgressEvent = getPlayProgressEvent()
       if playProgressEvent <> invalid
         trackEvent(playProgressEvent)
       end if
+
+      'only update m.positionAtJumpStart if we are not concluding another seek interaction
+      m.positionAtJumpStart = m.playerPosition
     end if
+
+    m.VideoState = "skip"
   end if
 
   if isProgressBarFocused <> true
@@ -1196,6 +1272,13 @@ Function showCCDialog()
     m.top.appendChild(m.ccDialog)
     m.ccDialog.visible = true
     m.ccDialog.setFocus(true)
+    trackEvent({
+      type: "dialog"
+      values: {
+        dialog_type: "INFORMATION" 'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage("", {})
+      }
+    })
   end if
 End Function
 
@@ -1235,6 +1318,7 @@ Function jumpToPosition(position)
   tubiLog("VideoPlayer.jumpToPosition")
   cancelReplayCaptions() ' on any jump we cancel any temporary caption modifications
 
+  'Don't let position be out of bounds of the duration of the video
   if position > (m.Video.duration - 5)
     position = m.Video.duration - 5
   else if position < 0
@@ -1250,7 +1334,7 @@ Function jumpToPosition(position)
   m.PlayPauseButton.uri = m.buttonUris.pause
   m.lastButtonPressPos = position
 
-  handleSeek(position, shouldAdBreak)
+  handleSeek(position, m.positionAtJumpStart, shouldAdBreak)
 End Function
 
 
@@ -1294,6 +1378,7 @@ Function backButtonExit()
   m.top.backButtonPressed = true
 End Function
 
+
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads
 Function showAdBreak()
   m.Video.control = "stop"
@@ -1319,38 +1404,34 @@ Function onShowTransport()
 End Function
 
 
+' Play progress events should occur (and m.lastPingTime should be set!) at the following instances
+' a user watches for 10s (pauses should not set m.lastPingTime)
+' an ad break starts
+' a user begins a "seek" functionality (skip 10s, hop 30s, ff/rew)
+' a user selects to "jump to next video"
 Function getPlayProgressEvent()
-  if (m.playerPosition - m.lastPingTime) > 0
-    extraCtx = {
-      interval: Int(m.playerPosition - m.lastPingTime)
+  playProgressEvent = invalid
+  if m.playerPosition <> m.lastPingTime
+    playProgressEvent = {
+      type: "play_progress"
+      values: {
+        video_id: m.Video.content.id.toInt()
+        position: Int(m.playerPosition * 1000)   'ms - without Int(), can return scientific notation, causing API error
+        view_time: Int((m.playerPosition - m.lastPingTime) * 1000)   'ms
+      }
     }
 
-    if m.top.analyticsMode = "autoplay"
-      extraCtx.autoplay = true
-    else if m.top.analyticsMode = "onnow-autoplay"
-      extraCtx.on_now = true
-      extraCtx.livetv = true
-    else if m.top.analyticsMode = "onnow-engaged"
-      extraCtx.on_now = true
-    else if m.top.analyticsMode = "onnow-docked"
-      extraCtx.embedded = true
-      extraCtx.on_now = true
-      extraCtx.livetv = true
+    if m.Video.streamInfo <> invalid and m.Video.streamInfo.measuredBitrate <> invalid
+      'measuredBitrate appears to be reported in bits despite the documentation that it is kibibits
+      playProgressEvent.values.nominal_speed = Int(m.Video.streamInfo.measuredBitrate / (10^6))
     end if
 
-    if m.top.deeplinkSource <> ""
-      extraCtx.casting = m.top.deeplinkSource
+    if m.Video.content.isTrailer = true
+      playProgressEvent.type = "trailer_play_progress"
     end if
-
-    return {
-      trackType: "playProgress"
-      ctx: m.Video.content.id
-      value: Int(m.playerPosition)
-      extraCtx: extraCtx
-    }
-  else
-    return invalid
   end if
+
+  return playProgressEvent
 End Function
 
 

@@ -7,6 +7,7 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.NodeHelpers = TubiNodeHelpers()
   m.Bookmarks = TubiBookmarks(Request, Auth, m.constants, m.NodeHelpers)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
 
   'first things first, observe the live tv content field which comes from the main thread
   m.top.observeFieldScoped("onNowContent", "onOnNowContent")
@@ -102,6 +103,13 @@ Function onScreenStackEmpty()
     startOnNow()
   else
     showExitAppModal("onExitAppModalButtonSelected")
+    m.trackingLoggingTask.trackEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "INFORMATION"   'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+      }
+    }
   end if
 End Function
 
@@ -137,6 +145,7 @@ Function shouldStopOnStillWatchingTimeout()
   end if
 End Function
 
+
 Function stillWatchingExperimentAnalyticsValue()
   if m.constants.player.stillWatchingStopOnTimeout = invalid
     if inStillWatchingExperimentWindow() = true
@@ -145,6 +154,7 @@ Function stillWatchingExperimentAnalyticsValue()
   end if
   return "still_watching"
 End Function
+
 
 Function onInactivityTimer()
   now = Uptime(0)
@@ -156,10 +166,20 @@ Function onInactivityTimer()
         m.inactivityModal = showModal("Are you still watching?", "", ["Yes", "No"], "onInactivityButton", false)
         m.inactivityModal.observeField("exitButton", "onInactivityClose")
 
+        'should indicate the still watching dialog was shown
         m.trackingLoggingTask.trackEvent = {
-          trackType: "generic"
-          value: stillWatchingExperimentAnalyticsValue()
-          ctx: "still_watching_shown"
+          type: "auto_play"
+          values: {
+            video_id: m.videoPlayer.content.id.toInt()  'DialogType enum
+            auto_play_action: "STILL_WATCHING"
+          }
+        }
+        m.trackingLoggingTask.trackEvent = {
+          type: "dialog"
+          values: {
+            dialog_type: "INFORMATION"   'DialogType enum
+            pageOneof: m.Tracking.getAnalyticsPage("video_player_page", {})  'there is no page representation for the video player in protos currently
+          }
         }
       end if
     else if (now - m.lastUserActivity - m.constants.timers.stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
@@ -169,14 +189,19 @@ Function onInactivityTimer()
       else
         m.videoPlayer.control = "resume"
       end if
+
+      ' should indicate the still watching dialog timed out without any user interaction
       m.trackingLoggingTask.trackEvent = {
-        trackType: "generic"
-        value: stillWatchingExperimentAnalyticsValue()
-        ctx: "still_watching_timeout"
+        type: "auto_play"
+        values: {
+          video_id: m.videoPlayer.content.id.toInt()  'DialogType enum
+          auto_play_action: "STILL_WATCHING"
+        }
       }
     end if
   end if
 End Function
+
 
 Function onInactivityClose()
   tubiLog("ContentController.onInactivityButton")
@@ -189,6 +214,7 @@ Function onInactivityClose()
     ctx: "still_watching_yes"
   }
 End Function
+
 
 Function onInactivityButton()
   tubiLog("ContentController.onInactivityButton")
@@ -208,6 +234,7 @@ Function onInactivityButton()
   }
 End Function
 
+
 Function closeInactivityModal()
   tubiLog("ContentController.closeInactivityModal")
   closeModal(m.inactivityModal)
@@ -217,6 +244,7 @@ Function closeInactivityModal()
   m.lastUserActivity = Uptime(0)
   m.inactivityTimer.control = "stop"  ' enforces just showing the inactivity modal once
 End Function
+
 
 ''''''''''''''''''''''
 ' onExitAppModalButtonSelected
@@ -278,6 +306,7 @@ Function showUI(key)
   if key = "back" then m.homeScreen.showCategoryScreen = true
 End Function
 
+
 '''''''''''''''''''''''''
 ' startUserExperience
 '
@@ -306,7 +335,7 @@ Function startUserExperience()
         testLog("Deep link type = " + m.top.deepLinkContent.type)
         m.enteredFromDeepLink = true
         m.rootTabGroup.show = m.contentGroup.id
-        showDetailScreen(m.top.deepLinkContent, invalid)
+        showDetailScreen(m.top.deepLinkContent)
       else if m.constants.ui.onnow.on = false or m.top.onNowContent <> invalid
         m.rootTabGroup.show = m.contentGroup.id
         startOnNow()
@@ -341,6 +370,11 @@ Function startSignIn(skipDisambiguation)
   m.SignIn.observeFieldScoped("backPressed", "onSignInBackPressed")
   m.rootTabGroup.addView = m.SignIn
   m.rootTabGroup.show = m.SignIn.id
+
+  if currentScreen() <> invalid
+    m.SignIn.sourceScreen = currentScreen()
+  end if
+
   m.SignIn.show = true
   m.SignIn.setFocus(true)
 End Function
@@ -436,6 +470,13 @@ Function onSignInBackPressed()
     m.rootTabGroup.show = m.contentGroup.id
   else if m.constants.ui.signIn.backExitsSignIn = true
     m.exitModal = showExitAppModal("onExitAppModalButtonSelected")
+    m.trackingLoggingTask.trackEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "INFORMATION"   'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage("auth_page", {auth_action: "ACTIVATION"})
+      }
+    }
   end if
 End Function
 
@@ -450,9 +491,9 @@ Function onContentSelected()
   m.autoplayContext = m.categoryScreen.currCategoryId
 
   if content.type = "channel"
-    showChannelScreen(content, m.categoryScreen.trackingUri)
+    showChannelScreen(content)
   else
-    showDetailScreen(content, m.categoryScreen.trackingUri)
+    showDetailScreen(content)
   end if
 End Function
 
@@ -499,64 +540,7 @@ End Function
 Function onSearchContentSelected()
   tubiLog("ContentController.onSearchContentSelected")
   m.autoplayContext = invalid
-  showDetailScreen(m.searchScreen.contentSelected, m.searchScreen.trackingUri)
-End Function
-
-
-''''''''''''''''''''
-' onSignOutSelected
-'
-' Log the user out, update screens
-Function onSignOutSelected()
-  tubiLog("ContentController.onSignOutSelected")
-  showSignOutModal("onSignOutModalSelected")
-End Function
-
-
-''''''''''''''''''''
-' onSignOutModalSelected
-'
-' Log the user out, update screens
-Function onSignOutModalSelected(msg)
-  tubiLog("ContentController.onSignOutModalSelected")
-
-  'do the sign out stuff if confirmed
-  if msg.getData() = 0
-    ' flush the screenstack in any case where the user has successfully
-    ' gone through the sign-in.  If they 'back' out of it, the screen
-    ' stack will stay intact and this function will not be called
-    clearScreenStack(true)
-
-    m.authInfoReceived = false
-    if m.authTask <> invalid
-      m.authTask.unobserveFieldScoped("onAuthInfoReceived")
-    end if
-    m.authTask = CreateObject("roSGNode", "AuthTask")
-    m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
-    m.authTask.functionName = "execSignOut"
-    m.authTask.control = "RUN"
-
-    m.spinner.visible = true
-    m.spinner.setFocus(true)
-  end if
-End Function
-
-''''''''''''''''''''
-' onAboutSelected
-'
-' Show the about screen
-Function onAboutSelected()
-  tubiLog("ContentController.onAboutSelected")
-  m.aboutScreen = CreateObject("roSGNode", "ModalDialogScreen")
-  m.aboutScreen.title = "About Tubi"
-  message = "Version " + m.constants.settings.version.Replace("_",".") + Chr(10)
-  message = message + Chr(10)
-  message = message + Chr(169) + " 2018 Tubi, Inc. all rights reserved." + Chr(10) ' + Chr(13)
-  message = message + "The Tubi wordmark and all related logotypes are trademarks of Tubi, Inc."
-  m.aboutScreen.message = message
-  m.aboutScreen.buttons = ["Close"]
-  m.aboutScreen.observeFieldScoped("buttonSelected", "onCloseModal")
-  pushModal(m.aboutScreen)
+  showDetailScreen(m.searchScreen.contentSelected)
 End Function
 
 
@@ -571,34 +555,6 @@ Function onCloseModal()
 End Function
 
 
-'''''''''''''''''''
-' onPlayerError
-'
-Function showPlayerError(errorMessage As String)
-  tubiLog("ContentController.showPlayerError")
-  showErrorModal(0, errorMessage, onRetryPlayerError, [], onCancelPlayerError, [])
-End Function
-
-Function onRetryPlayerError()
-  ' reset the video player state in case trying to resume causes an error again
-  m.videoPlayer.state = ""
-  ' try to resume the video from the last checkpoint
-  screen = currentScreen()
-  if screen.isSubtype("DetailScreen") = true
-    resumeHelper(screen)
-  end if
-End Function
-
-Function onCancelPlayerError()
-  ' reset the video player state in case an error occurs during the next attempt at playing a video
-  m.videoPlayer.state = ""
-
-  top = currentScreen()
-  if top <> invalid then
-    top.setFocus(true)
-  end if
-End Function
-
 Function startOnNow()
   tubiLog("ContentController.startOnNow")
   m.appLoadStopwatch.mark()
@@ -606,7 +562,10 @@ Function startOnNow()
   ' with the child groups directly instead of the parent group
   m.homeScreen = CreateObject("roSGNode", "HomeScreen")
   m.homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
+  m.homeScreen.observeFieldScoped("navigateBetweenHomescreens", "onNavigateBetweeenHomescreens")
+  m.homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   m.homeScreen.observeFieldScoped("toolsMenuSelected", "onHomeScreenToolsMenuSelected")
+
   m.onNow = m.homeScreen.findNode("OnNow")
   m.onNow.control = "play"
 
@@ -633,8 +592,11 @@ Function startOnNow()
     m.categoryScreen.searchSignOutHintVisible = true
   end if
   m.rootTabGroup.show = m.contentGroup.id
-  pushScreen(m.homeScreen, true)
+  'this is the first screen so no need for navigate_to_page tracking.
+  'page_load tracking will happen when content is received.
+  pushScreen(m.homeScreen, false, false)
 End Function
+
 
 Function homeScreenBackgroundUpdated()
   tubiLog("ContentController.homeScreenBackgroundUpdated")
@@ -649,6 +611,13 @@ Function onHomeScreenToolsMenuSelected()
   showToolsMenu()
 End Function
 
+' navigate_to_page and page_load for transitions between the tools page and the category page (and any other pages on Homescreen)
+Function onNavigateBetweeenHomescreens()
+  screenTrackingNavigate(m.HomeScreen.oldTrackingPageInfo, m.HomeScreen.trackingPageInfo, invalid)
+  screenTrackingLoad(m.Homescreen.trackingPageInfo, 0)
+End Function
+
+
 Function onRootTabTransitioned()
   tubiLog("ContentController.onRootTabTransitioned")
   ' We're here if the SignIn controller was navigated away from
@@ -661,317 +630,6 @@ Function onRootTabTransitioned()
   if m.rootTabGroup.currentViewId = m.contentGroup.id
     if currentScreen() <> invalid then currentScreen().setFocus(true)
   end if
-End Function
-
-'''''''''''''''''''''
-' playVideoContent
-'
-' Helper function for onResume and onPlay to launch content
-Function playVideoContent(content As Object, isAutoplay As Boolean, position=invalid As Dynamic)
-  if content <> invalid
-    if content.isTrailer
-      m.videoPlayer.analyticsMode = "trailer"
-      m.videoPlayer.observeFieldScoped("skipTrailer", "onSkipTrailer")
-      m.videoPlayer.enableAds = false
-      m.upNextTask = invalid
-    else
-      m.videoPlayer.analyticsMode = "normal"
-      if isAutoplay = true
-        m.videoPlayer.analyticsMode = "autoplay"
-      end if
-      m.videoPlayer.observeFieldScoped("historyPosition", "onEpisodePosition")
-      m.videoPlayer.observeFieldScoped("creditsPosition", "onEpisodeCredits")
-      m.videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
-      m.videoPlayer.enableAds = true
-      if m.top.deepLinkContent <> invalid
-        m.videoPlayer.deeplinkSource = m.top.deepLinkContent.source
-      end if
-      ' preload autoplay content;  We don't observe 'error' or 'response' fields
-      ' since they will be evaluated at the creditsCuepoint callback
-      if m.upNextTask = invalid
-        ' m.upNextTask can't just be overwritten, or else it creates two UpNextTasks.
-        ' When m.upNextTask.control = "RUN" happens if it was overwritten, the task's functionName
-        ' actually runs for each of the tasks that had been ever been assigned to m.upNextTask.
-        ' This becomes an issue if a user selects play multiple times.
-        m.upNextTask = CreateObject("roSGNode", "UpNextTask")
-      end if
-      request = {}
-      request.contentId = content.id
-      if m.autoplayContext <> invalid
-        request.categoryId = m.autoplayContext
-      end if
-      m.upNextTask.request = request
-      m.upNextTask.control = "RUN"
-    end if
-
-    m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
-    m.videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
-    m.videoPlayer.visible = true
-    m.videoPlayer.setFocus(true)
-  
-    ' Clone the content so we don't have listeners affecting it
-    parent = CreateObject("roSGNode", "TubiContentNode")
-    localContent = content.clone(false)
-    if position <> invalid
-      localContent.nowPos = position
-    end if
-    parent.appendChild(localContent)
-
-    m.videoPlayer.playlist = parent
-    m.videoPlayer.loopPlaylist = false
-    m.videoPlayer.seekPlaylist = [0, localContent.nowPos]
-    m.ScreenStack.visible = false
-
-    ' For position history tracking
-    m.updateHistoryTask.historyResult = invalid
-    m.updateHistoryTask.content = localContent
-  end if
-End Function
-
-
-''''''''''''''''''''''
-' onEpisodePosition
-'
-' Update the resume position
-' This function triggers when the video stops as well as when m.videoPlayer.historyPosition is updated
-Function onEpisodePosition()
-  tubiLog("ContentController.onEpisodePosition")
-  ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
-  history = m.global.historyIds.findNode(m.updateHistoryTask.content.id)
-  if history <> invalid or m.videoPlayer.historyPosition > m.constants.player.historyFrequency
-    ' Only run a new task if the previous task is done.  Priority of resume states is
-    ' pretty low and we don't mind losing a few.
-    if m.updateHistoryTask.state <> "RUN" then
-      m.updateHistoryTask.nowPos = m.videoPlayer.historyPosition
-      m.updateHistoryTask.control = "RUN"
-    end if
-  end if
-End Function
-
-Function onEpisodeCredits()
-  tubiLog("ContentController.onEpisodeCredits")
-  ' Verify that the UpNextTask has a response and it matches the currently playing content
-  currentContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
-  if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
-    if m.upNextTask.response.getChildCount() > 0
-      if m.upNextScreen <> invalid
-        m.upNextScreen.unobserveField("contentSelected")
-        m.upNextScreen.unobserveField("timeout")
-        m.upNextScreen.unobserveField("backPressed")
-        m.upNextScreen = invalid
-      end if
-      m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
-      m.upNextScreen.observeField("contentSelected", "onUpNextContentSelected")
-      m.upNextScreen.observeField("backPressed", "onUpNextBackPressed")
-      m.upNextScreen.observeField("timeout", "onUpNextTimeout")
-      m.upNextScreen.content = m.upNextTask.response
-      pushScreen(m.upNextScreen, true)
-      m.ScreenStack.visible = true
-    end if
-  end if
-End Function
-
-Function playUpNextContent(nextContent)
-  oldContent = m.videoPlayer.content
-  content = addSeriesTitle(nextContent, oldContent)
-  stopVideoContent(m.constants.player.playerResults.completed, false)
-  playVideoContent(content, true)
-  popScreen()
-  m.upNextScreen.unobserveField("contentSelected")
-  m.upNextScreen.unobserveField("timeout")
-  m.upNextScreen.unobserveField("backPressed")
-  m.upNextScreen = invalid
-End Function
-
-Function onUpNextTimeout()
-  tubiLog("ContentController.onUpNextTimeout")
-  playUpNextContent(m.upNextScreen.contentFocused)
-End Function
-
-' Triggered by either a button press or by timer expiration
-Function onUpNextContentSelected()
-  tubiLog("ContentController.onUpNextContentSelected")
-  playUpNextContent(m.upNextScreen.contentSelected)
-  m.lastUserActivity = Uptime(0)
-End Function
-
-Function onUpNextBackPressed()
-  tubiLog("ContentController.onUpNextBackPressed")
-  ' remove the screen and put focus back on the video player transport
-  m.upNextScreen.unobserveField("contentSelected")
-  m.upNextScreen.unobserveField("backPressed")
-  m.upNextScreen = invalid
-  popScreen()
-  if m.videoPlayer.state = "finished"
-    ' up next was dismissed but playback had already finished
-    returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
-  else
-    m.ScreenStack.visible = false
-    m.videoPlayer.setFocus(true)
-  end if
-  m.lastUserActivity = Uptime(0)
-End Function
-
-Function onVideoPlayerState(msg)
-  tubiLog("ContentController.onVideoPlayerState state = " + msg.GetData())
-  state = msg.GetData()
-  if state = "error"
-    stopVideoContent(m.constants.player.playerResults.failed, true)
-    errorMessage = m.constants.player.playerResults.failed
-    if m.videoPlayer.errorMsg <> ""
-      errorMessage = m.videoPlayer.errorMsg
-    end if
-    m.videoPlayer.errorMessage = ""
-    showPlayerError(errorMessage)
-  else if state = "finished"
-    ' If trailer, play the feature
-    finishedContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
-    if finishedContent.isTrailer
-      content = getDetailScreenContent()
-      if content <> invalid then
-        stopVideoContent(m.constants.player.playerResults.completed, false)
-        playVideoContent(content, false, 0)  ' always start at zero here
-      else
-        ' just show the current screen on the screen stack
-        stopVideoContent(m.constants.player.playerResults.completed, true)
-      end if
-
-    ' If not a trailer, look for UpNext content to play
-    else
-      if m.upNextScreen <> invalid and currentScreen().isSameNode(m.upNextScreen)
-        tubiLog("Ignoring video state 'finished' while UpNextScreen is visible")
-      else if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.response.getChild(0) <> invalid
-        'this happens if the "next video" button has been pressed on the player transport
-        nextContent = m.upNextTask.response.getChild(0)
-        oldContent = m.videoPlayer.content
-
-        nextContent = addSeriesTitle(nextContent, oldContent)
-        stopVideoContent(m.constants.player.playerResults.completed, false)
-        playVideoContent(nextContent, true)
-      else
-        returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
-      end if
-    end if
-  end if
-End Function
-
-Function onVideoPlayerBackPressed()
-  tubiLog("ContentController.onVideoPlayerBackPressed")
-  returnToDetailScreenFromVideo(m.constants.player.playerResults.closed)
-End Function
-
-' Stop the video player and refresh detail screen with the relevant content
-'
-' Use cases:                                                Actions:
-'   - Exit video player movie                              : 1 - redraw detail screen with existing detail content to preserve related items
-'   - Exit video player movie after autoplay               : 2 - replace detail screen and fetch full content with related items
-'   - Exit video player series                             : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
-'   - Exit video player series after autoplay              : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
-'   - Exit video player trailer                            : 5 - redraw detail screen with existing detail content to preserve related items
-'   - Deep link: exit video player movie                   : 1 - redraw detail screen with existing detail content to preserve related items
-'   - Deep link: exit video player movie after autoplay    : 2 - replace detail screen and fetch full content with related items
-'   - Deep link: Exit video player series                  : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
-'   - Deep link: Exit video player series after autoplay   : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
-Function returnToDetailScreenFromVideo(result)
-  stopVideoContent(result, true)
-
-  ' get updated content, to be used to reload or re-populate details screen
-  content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex) 'this always returns a video - sometimes an episode
-  m.top.deepLinkContent = invalid
-  if content <> invalid
-    if content.isTrailer
-      ' Action 5
-      content = getDetailScreenContent()
-    else if content.parentType = m.constants.ui.contentTypes.series
-      ' Action 3
-      currentEpisodeId = content.id
-      content = getDetailScreenContent()
-      if content <> invalid
-        content.currentEpisodeId = currentEpisodeId
-      end if
-    else if content.id <> invalid and getDetailScreenContent() <> invalid and getDetailScreenContent().id <> invalid and content.id = getDetailScreenContent().id  ' no autoplay - same content as already on detail screen
-      ' Action 1
-      content = getDetailScreenContent()
-    end if
-  end if
-
-  'reload or re-populate the screen as necessary
-  if currentScreen() <> invalid and currentScreen().subType() = "DetailScreen"
-    if currentScreen().content <> invalid and currentScreen().content.id = content.id
-      ' Action 1, 3, 5 - same content so just re-populate screen with any updates
-      populateDetailScreen(currentScreen(), content, true)
-    else
-      ' Action 2 - new content so tear down the screen and rebuild it
-      popScreen()
-      showDetailScreen(content, invalid)
-    end if
-  else
-    ' This is a safety, but no code paths actually lead here currently 2.5.111
-    showDetailScreen(content, invalid)
-  end if
-End Function
-
-' Stop the video player and optionally return to the screen stack
-Function stopVideoContent(playerResult, showScreenStack)
-  videoTrackingStop()
-  m.videoPlayer.unobserveFieldScoped("backButtonPressed")
-  m.videoPlayer.unobserveFieldScoped("state")
-  m.videoPlayer.unobserveFieldScoped("skipTrailer")
-  m.videoPlayer.unobserveFieldScoped("historyPosition")
-  m.videoPlayer.unobserveFieldScoped("creditsPosition")
-  m.videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
-  m.videoPlayer.deeplinkSource = ""
-  m.videoPlayer.control = "stop"
-  playerInfo = {}
-  playerInfo.nowPos = m.videoPlayer.historyPosition
-  playerInfo.result = playerResult
-  if m.updateHistoryTask.historyResult <> invalid
-    playerInfo.historyId = m.updateHistoryTask.historyResult.historyId
-    playerInfo.parentHistoryId = m.updateHistoryTask.historyResult.parentHistoryId
-  end if
-  tubiLog("stopVideoContent: nowPos = " + playerInfo.nowPos.toStr())
-  if playerInfo.historyId <> invalid and playerInfo.historyId <> "" then
-    tubiLog("stopVideoContent: historyId = " + playerInfo.historyId.toStr())
-  end if
-  if playerInfo.parentHistoryId <> invalid and playerInfo.parentHistoryId <> "" then
-    tubiLog("stopVideoContent: parentHistoryId = " + playerInfo.parentHistoryId.toStr())
-  end if
-  content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
-
-  ' reload history
-  onHistoryQueueChange(m.constants.ui.categoryIds.history)
-
-  ' should only do this if not autoplaying another video
-  if showScreenStack
-    m.videoPlayer.visible = false
-    m.ScreenStack.visible = true
-    if currentScreen() <> invalid
-      currentScreen().setFocus(true)
-    end if
-  end if
-End Function
-
-
-Function onWatchTrailer()
-  tubiLog("ContentController.onWatchTrailer")
-  content = getDetailScreenContent()
-  if content <> invalid then
-    trailerContent = CreateObject("roSGNode", "TubiContentNode")
-    if content.id <> invalid
-      trailerContent.id = content.id
-    end if
-    trailerContent.streamformat="hls"
-    trailerContent.nowPos = 0
-    trailerContent.isTrailer = true
-
-    playVideoContent(trailerContent, false)
-  end if
-End Function
-
-Function onSkipTrailer()
-  tubiLog("ContentController.onSkipTrailer")
-  stopVideoContent(m.constants.player.playerResults.completed, false)
-  playVideoContent(getDetailScreenContent(), false)
 End Function
 
 
@@ -1054,9 +712,21 @@ End Function
 ' Info that the first poster in the first category has bubbled all the way up.
 ' Fire off a log to a server so we can track how long it took since the app was started, ie. StartOnNow() was called
 Function onFirstPosterLoaded()
+  loadTime = m.appLoadStopwatch.TotalMilliseconds()
+
+  'send tracking event for initial home page load
+  m.global.trackingLoggingTask.trackEvent = {
+    type: "page_load"
+    values: {
+      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})  'a valid page type (see PageLoadEvent in events.protos)
+      load_time: loadTime
+      status: "UNKNOWN_ACTION_STATUS"  'ActionStatus enum
+    }
+  }
+
   tubiLog("ContentController.onFirstPosterLoaded")  'write to console only
   messageInfo = {
-    loadtime: m.appLoadStopwatch.TotalMilliseconds()
+    loadtime: loadTime
     model: m.constants.deviceInfo.model
   }
   tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load")   'send info to server
@@ -1078,18 +748,17 @@ Function getBackgroundtype(backgroundUriList)
 End Function
 
 
-' helper function for adding series title metadata to content returned from the up next API.
-' @content: episode content node with metadata from the up next api
-' @oldContent: episode content with full metadata, including parentType (usually from the player)
-Function addSeriesTitle(content, oldContent)
-  if content.parentId <> invalid and oldContent.parentId <> invalid
-    if oldContent.parentId <> "" and content.parentId = oldContent.parentId
-      content.parentType = "series"
-      content.parentTitle = oldContent.parentTitle
-    end if
-  end if
 
-  return content
+'''''''''''''''''''''''
+' onNavigateWithinPageInfoChange
+'
+' Callback for when a navigateWithinPageInfo has been updated - sends the navigate_within_page event
+Function onNavigateWithinPageInfoChange(msg)
+  navigateWithinPageInfo = msg.getData()
+  m.trackingLoggingTask.trackEvent = {
+    type: "navigate_within_page"
+    values: navigateWithinPageInfo
+  }
 End Function
 
 

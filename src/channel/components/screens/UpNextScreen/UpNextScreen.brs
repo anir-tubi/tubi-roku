@@ -1,4 +1,9 @@
 Function init()
+  m.constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
+
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusedChild", "onComponentFocus")
 
@@ -72,7 +77,11 @@ Function init()
   m.GridMovie.targetSet = targetSet
 
   ' The seconds remaining
-  m.timeRemaining = m.global.constants.player.upNextCountdown
+  m.timeRemaining = m.constants.player.upNextCountdown
+
+  ' Used to determine if navigate_within_page events should be sent. Only send when the Up Next content row already
+  ' has focus, not when it gains focus.
+  m.isUpNextFocused = false
 End Function
 
 Function onComponentFocus()
@@ -98,7 +107,6 @@ Function onContentChange()
       m.GridSeries.content = singleContent
       drawCountdown(m.CountdownSeries, m.timeRemaining)
       updateInfoPanel(m.InfoSeries, m.GridSeries.content.getChild(0))
-      m.GridSeries.setFocus(true)
     else
       ' show the movie experience
       m.MovieGroup.visible = true
@@ -106,7 +114,6 @@ Function onContentChange()
       m.GridMovie.content = m.top.content
       drawCountdown(m.CountdownMovie, m.timeRemaining)
       updateInfoPanel(m.InfoMovie, m.GridMovie.content.getChild(0))
-      m.GridMovie.setFocus(true)
     end if
     m.Timer.control = "start"
   else
@@ -121,18 +128,36 @@ Function onKeyEvent(key, press)
   if press and key = "back"
     m.Timer.control = "stop"
     m.top.backPressed = true
+    m.isUpNextFocused = false
   end if
   return false
 End Function
 
 Function onMovieItemFocused()
   tubiLog("UpNextScreen.onMovieItemFocused")
-  itemFocusedHelper(m.GridMovie, m.InfoMovie)
+  itemFocusedHelper(m.GridMovie, m.InfoMovie)  'updates m.top.contentFocused
+
+  'Set the navigateWithinPageInfo value which will pass through to ContentController via videoHelpers.brs
+  'to fire a navigate_within_page analytics event.
+  if m.isUpNextFocused = true
+    contentTile = m.Tracking.getAnalyticsTile(m.top.contentFocused, m.GridMovie.itemFocused + 1, 1)
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage("video_player_page", {})  'there is no "video_player_page" in protos
+      componentOneof: m.Tracking.getAnalyticsComponent("auto_play_component", {content_tile: contentTile})
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      vertical_location: 1
+      vertical_location_mode: "INDEX"  'LocationMode enum
+      horizontal_location: m.GridMovie.itemFocused + 1 '1 based index
+      horizontal_location_mode: "COORDINATE"  'LocationMode enum
+    }
+  end if
+  m.isUpNextFocused = true
 End Function
 
 Function onMovieItemSelected()
   tubiLog("UpNextScreen.onMovieItemSelected")
   m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemSelected)
+  m.isUpNextFocused = false
 End Function
 
 Function itemFocusedHelper(grid, info)
@@ -155,6 +180,7 @@ End Function
 Function onSeriesItemSelected()
   tubiLog("UpNextScreen.onSeriesItemSelected")
   m.top.contentSelected = m.GridSeries.content.getChild(m.GridSeries.itemSelected)
+  m.isUpNextFocused = false
 End Function
 
 Function onCountdownTimer()
@@ -167,6 +193,7 @@ Function onCountdownTimer()
     else
       m.top.contentSelected = m.GridSeries.content.getChild(0)
     end if
+    m.isUpNextFocused = false
     m.Timer.control = "stop"
   else
     if m.MovieGroup.visible

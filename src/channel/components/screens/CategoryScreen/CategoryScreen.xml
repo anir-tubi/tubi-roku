@@ -3,9 +3,10 @@
 
   <script type="text/brightscript" uri="pkg:/components/screens/CategoryScreen/CategoryScreen.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
@@ -54,10 +55,6 @@
       <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
 
     <!-- OUTPUTS -->
-      <!-- keeps the uri used for user tracking -->
-      <field id="trackingUri" type="string"  value="/home" alwaysNotify="false"/>
-      <field id="trackingCount" type="integer" />
-
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
 
@@ -70,6 +67,24 @@
       <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
 
       <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
+
+      <field id="selectedPosition" alias="CategoryGridList.selectedPosition" />
+
+      <!-- Holds the information needed to populate a navigate_witin_page event. This will
+           be observed by the Homescreen, which will subsequently pass it to the contentController
+           which will be responsible for sending navigate_within_page events.
+      -->
+      <field id="navigateWithinPageInfo" type="assocarray" />
+
+      <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
+        {
+          componentType: "category_component"    ' Corresponds to one of the page types in tubiTracking_getAnalyticsComponent() 
+                                                 ' which mirrors the protos repo.
+          componentValues: {}                    ' An assoc array with key/values that match the componentType as found in
+                                                 ' tubiTracking_getAnalyticsComponent().
+        }
+      -->
+      <field id="trackingComponentInfo" type="assocarray" />
   </interface>
 
   <children>

@@ -11,9 +11,11 @@
   <script type="text/brightscript" uri="pkg:/components/controllers/ScreenStack.brs" />
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
 
   <interface>
@@ -22,6 +24,11 @@
 
       <!-- Set to true to reset sign-in screen flow -->
       <field id="show" type="boolean" value="false"/>
+
+      <!-- The node from which the sign in option was selected (ie. homeScreen or detailScreen
+           Used to send navigate_to_page tracking info when the sign in screen stack is initiated.
+      -->
+      <field id="sourceScreen" type="node" />
     
     <!-- OUTPUT -->
       <!-- Set to the final state of the sign-in process: 'guest', 'registered', 'signedin' -->
@@ -44,8 +51,7 @@
         translation="[0,0]"/>
 
       <NavigationGroup
-       id="SignInScreenStack"
-       transitionDuration="1.0"/>
+       id="SignInScreenStack" />
     </children>
 
 </component>

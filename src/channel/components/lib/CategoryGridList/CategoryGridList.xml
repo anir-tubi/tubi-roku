@@ -57,9 +57,9 @@
 
     <!-- OUTPUT -->
     <field id="itemSelected" type="node" alwaysNotify="true"/>
-    <field id="itemFocused" type="node" alwaysNotify="true"/>
+    <field id="itemFocused" type="node" />
     <!-- array with the [x, y], where x is the category index and y is the content index -->
-    <field id="cursorPosition" alias="RowList.rowItemFocused" />
+    <field id="cursorPosition" type="vector2d" value="[-1,-1]"/>
     <field id="selectedPosition" alias="RowList.rowItemSelected" />
 
     <!-- first category is loaded -->

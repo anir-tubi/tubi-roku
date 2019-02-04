@@ -3,6 +3,10 @@ Function init()
   m.constants = m.global.constants
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
+
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.ButtonList = m.top.findNode("ChannelsButtonList")
   m.RowList = m.top.findNode("ChannelsRowList")
@@ -21,14 +25,19 @@ Function init()
 
   ' track the last focused item
   m.focusTarget = m.ButtonList
+
+  ' set initial tracking values
+  m.top.trackingPageInfo = setTrackingPageInfo(invalid)
+
+  ' used to compare if a newly focused item gained focus from a different item while scrolling,
+  ' or gained focus from a different component/screen
+  m.contentIsFocused = false
 End Function
 
 
 Function onScreenFocusChange()
   if m.top.hasFocus() = true
     m.focusTarget.setFocus(true)
-  else if m.top.isInFocusChain() = false
-    m.top.trackingCount = 0
   end if
 End Function
 
@@ -70,6 +79,8 @@ Function showButtonList(buttonList, rowList)
     slideTo(rowList, [517, rowList.translation[1]], 0.5)
   end if
 
+  m.contentIsFocused = false
+
   'set focus on buttonList
   buttonList.setFocus(true)
   m.focusTarget = buttonlist
@@ -106,12 +117,11 @@ End Function
 
 Function onContentChange()
   if m.top.content <> invalid
-    m.top.trackingCount = 0
     category = m.top.content.getChild(0)
     if category <> invalid
       showButtonList(m.ButtonList, m.RowList)
       populateInfoPanel(m.InfoPanel, category, "category")
-      m.top.trackingUri = generateTrackingUri(invalid, category)
+      m.top.trackingPageInfo = setTrackingPageInfo(category)
     end if
   end if
 End Function
@@ -132,24 +142,36 @@ End Function
 Function onRowItemFocused()
   tubiLog("ChannelDetailScreen.onRowItemFocused")
   rowItem = m.RowList.rowItemFocused
-  category = m.top.content.getChild(rowItem[0])
-  content = category.getChild(rowItem[1])
+  category = m.top.content.getChild(rowItem[0]) 'contentNode
+  content = category.getChild(rowItem[1]) 'contentNode
 
   ' Update the info panel
   populateInfoPanel(m.InfoPanel, content, "item")
 
-  ' Update the tracking URI.  Only send events if they have not been fired already,
-  ' in case focus changes cause rowIteFocused to trigger
-  trackingUri = generateTrackingUri(rowItem, category)
-  if trackingUri <> m.top.trackingUri
-    m.top.trackingCount = m.top.trackingCount + 1
-    m.top.trackingUri = trackingUri
-    m.global.trackingLoggingTask.trackEvent = {
-      trackType: "navigateInPage"
-      value: m.top.trackingCount
-      ctx: m.top.trackingUri
+  ' Update the tracking info.
+  trackingPageInfo = setTrackingPageInfo(category)
+  m.top.trackingPageInfo = trackingPageInfo
+
+  ' trigger navigate_within_page events in ContentController
+  if m.contentIsFocused = true
+    col = rowItem[1] + 1
+    row = 1
+    categoryComponent = {
+      category_slug: category.slug
+      category_row: 1   ' 1 based index
+      content_tile: m.Tracking.getAnalyticsTile(content, col, row)
+    }
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponent)
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      vertical_location: row '1 based index
+      vertical_location_mode: "INDEX"  'LocationMode enum
+      horizontal_location: col
+      horizontal_location_mode: "COORDINATE"  'LocationMode enum
     }
   end if
+  m.contentIsFocused = true
 
   ' Update the background image
   if type(content.backgrounds) = "roArray" and content.backgrounds.count() > 0
@@ -165,8 +187,24 @@ Function onRowItemSelected()
   category = m.top.content.getChild(rowItem[0])
   content = category.getChild(rowItem[1])
 
-  ' Update the tracking URI so that it is ready once the ContentController creates the details page
-  m.top.trackingUri = generateTrackingUri(rowItem, category)
+  ' Update the tracking info so that it is ready once the ContentController creates the details page
+  m.top.trackingPageInfo = setTrackingPageInfo(category)
+
+  categorySlug = ""
+  if category <> invalid
+    categorySlug = category.slug
+  end if
+
+  ' Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
+  m.top.trackingComponentInfo = {
+    componentType: "category_component"
+    componentValues: {
+      category_slug: categorySlug
+      category_row: 1
+      content_tile: m.Tracking.getAnalyticsTile(content, rowItem[1] + 1)
+    }
+  }
+  m.contentIsFocused = false
 
   ' Pass info to ContentController
   m.top.contentSelected = content
@@ -246,20 +284,21 @@ Function populateInfoPanel(infoPanel, content, mode)
 End Function
 
 
-'@rowItem: 2DArray, [x, y] where x is the position in the channel row. Expect y = 0.
 '@channel: roSGNode, a content node for a single channel
 '
-'returns a string with a tracking uri that is ready to be sent to the tracking api
-Function generateTrackingUri(rowItem, channel)
+'returns an AA with tracking info formatted for use by ScreenStack.screenTrackingLoad()
+Function setTrackingPageInfo(channel)
   slug = ""
-  row = ""
-  col = ""
-
-  if channel.slug <> invalid then slug = channel.slug
-  
-  if rowItem <> invalid
-    if rowItem[1] <> invalid then row = "/" + (rowItem[1] + 1).toStr()
-    if rowItem[0] <> invalid then col = "/" + (rowItem[0] + 1).toStr()
+  if channel <> invalid
+    slug = channel.slug
   end if
-  return "/category/" + slug + row + col
+
+  trackingInfo = {
+    pageType: "category_page"
+    pageValues: {
+      category_slug: slug
+    }
+  }
+
+  return trackingInfo
 End Function

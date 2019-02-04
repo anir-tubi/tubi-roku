@@ -1,5 +1,9 @@
 Function init()
   tubiLog("EpisodesScreen.init")
+  m.constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.Info = m.top.findNode("InfoPanel")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
@@ -14,6 +18,20 @@ Function init()
   if m.global.constants.deviceInfo.scaledUi = true then
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
+
+  'set initial tracking values
+  m.top.trackingPageInfo = {
+    pageType: "series_detail_page"
+    pageValues: {
+      series_id: 0
+    }
+  }
+
+  ' When the screen comes in to focus, onEpisodeFocused() triggers. At this point in time, m.RowList.hasFocus() is true.
+  ' m.gridIsFocused can be used to differentiate between onEpisodeFocused() occurring due to the focus changing between
+  ' items on the RowList, or due to the RowList gaining focus when focus is given to the EpisodesScreen.
+  m.gridIsFocused = false
+  m.listIsFocused = false
 End Function
 
 
@@ -21,6 +39,9 @@ Function onScreenFocusChange()
   tubiLog("EpisodesScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.RowList.setFocus(true)
+  else if m.top.isInFocusChain() = false
+    m.gridIsFocused = false
+    m.listIsFocused = false
 
     'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error
     m.RowList.setFocus(false)
@@ -28,12 +49,30 @@ Function onScreenFocusChange()
   end if
 End Function
 
+
 Function onSeasonChangeMenu()
   tubiLog("EpisodesScreen.onSeasonChangeMenu")
-  if m.Menu.isInFocusChain() then
+  if m.Menu.isInFocusChain() and m.Menu.itemFocused <> invalid then
     setSeasonInfo(m.Menu.itemFocused)
+
+    if m.listIsFocused = true
+      seriesDetailPage = getSeriesDetailPage(m.top.content)
+
+      m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage(seriesDetailPage.type, seriesDetailPage.values)
+        componentOneof: m.Tracking.getAnalyticsComponent("seasons_component", {}) 'seasons_component doesn't exist in protos
+        means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+        vertical_location: m.Menu.itemFocused + 1  '1 based index
+        vertical_location_mode: "COORDINATE"  'LocationMode enum
+        horizontal_location: 1
+        horizontal_location_mode: "INDEX"  'LocationMode enum
+      }
+    end if
   end if
+  m.gridIsFocused = false
+  m.listIsFocused = true
 End Function
+
 
 Function onEpisodeFocused()
   tubiLog("EpisodesScreen.onEpisodeFocused")
@@ -50,9 +89,51 @@ Function onEpisodeFocused()
     if season <> invalid then
       season.focusIndex = m.RowList.rowItemFocused[1]
     end if
+
+    ' trigger navigate_within_page events in ContentController
+    rowItem = m.RowList.rowItemFocused
+    if m.gridIsFocused = true
+      row = m.RowList.rowItemFocused[0] + 1
+      col = m.RowList.rowItemFocused[1] + 1
+      episodeListComponent = {
+        content_tile: m.Tracking.getAnalyticsTile(episode, col, row)
+      }
+
+      seriesDetailPage = getSeriesDetailPage(m.top.content)
+
+      m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage(seriesDetailPage.type, seriesDetailPage.values)
+        componentOneof: m.Tracking.getAnalyticsComponent("episode_video_list_component", episodeListComponent)
+        means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+        vertical_location: row  '1 based index
+        vertical_location_mode: "COORDINATE"  'LocationMode enum
+        horizontal_location: col
+        horizontal_location_mode: "COORDINATE"  'LocationMode enum
+      }
+    end if
+
     m.Menu.jumpToItem = m.RowList.rowItemFocused[0]
+    m.gridIsFocused = true
+    m.listIsFocused = false
   end if
 End Function
+
+
+Function onEpisodeSelected()
+  'set the component info so it can be used in navigate_to_page event
+  episode = getEpisodeContent(m.RowList.rowItemFocused)
+  row = m.RowList.rowItemFocused[0] + 1
+  col = m.RowList.rowItemFocused[1] + 1
+  m.top.trackingComponentInfo = {
+    componentType: "episode_video_list_component"
+    componentValues: {
+      content_tile: m.Tracking.getAnalyticsTile(episode, col, row)
+    }
+  }
+
+  m.top.episodeSelected = m.RowList.rowItemSelected
+End Function
+
 
 ''''''''''''''''''''''
 ' getEpisodeContent
@@ -165,3 +246,26 @@ Function focusMenu()
   end if
 End Function
 
+
+''''''''''''''''''''
+' getSeriesDetailPage
+'
+' @episode: roSGNode, series content node (m.top.content)
+Function getSeriesDetailPage(series)
+  values = {
+    series_id: 0
+  }
+
+  if series.id <> invalid and series.id <> ""
+    seriesId = series.id
+    if Left(series.id, 1) = "0"
+      seriesId = Mid(series.id, 2).toInt()
+    end if
+    values.series_id = seriesId
+  end if
+
+  return {
+    type: "series_detail_page"
+    values: values
+  }
+End Function

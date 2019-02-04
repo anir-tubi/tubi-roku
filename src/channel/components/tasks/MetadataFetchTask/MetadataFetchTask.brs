@@ -254,7 +254,6 @@ End Function
 
 Function setTranslateGlobalsToLocal()
   m.contentTypes = m.global.constants.ui.contentTypes
-  m.captionsMode = m.global.constants.deviceInfo.captionsMode
   m.creditsDuration = m.global.constants.player.creditsDuration
   m.allowAfterHours = m.global.constants.settings.allowAfterHours
 end Function

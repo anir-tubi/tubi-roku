@@ -4,8 +4,11 @@
  -
  -->
 <component name="ErrorController" extends="Scene">
-
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ErrorController/ErrorController.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
   
   <interface>
     <!--
@@ -29,6 +32,9 @@
       width="1920"
       height="1080"
       uri="pkg:/images/splash-fhd.png"/>
+
+    <TrackingLoggingTask
+      id="TrackingLoggingTask" />
 
   </children>
 

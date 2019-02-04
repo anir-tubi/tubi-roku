@@ -3,12 +3,21 @@ Function showEpisodeScreen(content)
   episodesScreen.content = content
   episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")
   episodesScreen.observeFieldScoped("backgroundUriList", "onEpisodeBackgroundChange")
+  episodesScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   if episodesScreen.content <> invalid and episodesScreen.content.id <> invalid
     contentId = Mid(episodesScreen.content.id, 2)  ' trim leading "0" off series id
-    episodesScreen.trackingUri = episodesScreen.trackingUri + contentId
+
+    'update tracking info - have to set the whole AA, can't update only a portion on the AA field
+    episodesScreen.trackingPageInfo = {
+      pageType: "series_detail_page"
+      pageValues: {
+        series_id: contentId
+      }
+    }
   end if
+
   episodesScreen.episodeToFocus = findEpisode2dIndex(content.currentEpisodeId, content)
-  pushScreen(episodesScreen, true)
+  pushScreen(episodesScreen, true, true)
 End Function
 
 
@@ -26,8 +35,17 @@ Function onEpisodeSelected(msg)
         if history <> invalid then
           content.nowPos = history.nowPos
         end if
-        popScreen(true)
-        playVideoContent(content, false, nowPos)
+
+        'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
+        episodesScreen.trackingComponentInfo = {
+          componentType: "episode_video_list_component"
+          componentValues: {
+            content_tile: m.Tracking.getAnalyticsTile(episode, episodesScreen.episodeSelected[1])
+          }
+        }
+
+        popScreen(false)
+        playVideoContent(content, "none", nowPos)
       end if
     end if
   end if

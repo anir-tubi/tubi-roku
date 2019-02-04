@@ -15,17 +15,59 @@ Function showSettingsScreen()
     m.settingsScreen.signedIn = false
     m.settingsScreen.parentalSetting = 3  ' Default to most permissive
   end if
-  m.settingsScreen.observeField("signOutSelected", "onSettingsSignOutSelected")
-  m.settingsScreen.observeField("signInSelected", "onSettingsSignInSelected")
-  m.settingsScreen.observeField("parentalSettingSelected", "onParentalSettingSelected")
-  m.settingsScreen.observeField("remoteParentalSetting", "onRemoteParentalSetting")
-  pushScreen(m.settingsScreen)
+  m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
+  m.settingsScreen.observeFieldScoped("signInSelected", "onSettingsSignInSelected")
+  m.settingsScreen.observeFieldScoped("parentalSettingSelected", "onParentalSettingSelected")
+  m.settingsScreen.observeFieldScoped("remoteParentalSetting", "onRemoteParentalSetting")
+  m.settingsScreen.observeFieldScoped("remoteParentalSetting", "onRemoteParentalSetting")
+  m.settingsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+
+  m.settingsScreen.trackingPageInfo = {
+    pageType: "settings_page"   ' placeholder, does not currently exist in protos
+    pageValues: {}
+  }
+  pushScreen(m.settingsScreen, true, true)
 End Function
+
 
 Function onSettingsSignOutSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignOutSelected")
   showSignOutModal("onSignOutModalSelected")
+  m.trackingLoggingTask.trackEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION" 'DialogType enum
+      pageOneof: m.Tracking.getAnalyticsPage("settings_page", {})  'settings_page doesn't exist in protos
+    }
+  }
 End Function
+
+
+' Log the user out, update screens
+Function onSignOutModalSelected(msg)
+  tubiLog("ContentController.onSignOutModalSelected")
+
+  'do the sign out stuff if confirmed
+  if msg.getData() = 0
+    ' flush the screenstack in any case where the user has successfully
+    ' gone through the sign-in.  If they 'back' out of it, the screen
+    ' stack will stay intact and this function will not be called
+    clearScreenStack(false)
+
+    m.authInfoReceived = false
+    if m.authTask <> invalid
+      m.authTask.unobserveFieldScoped("onAuthInfoReceived")
+    end if
+    m.authTask = CreateObject("roSGNode", "AuthTask")
+    m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
+    m.authTask.functionName = "execSignOut"
+    m.authTask.control = "RUN"
+
+    m.spinner.visible = true
+    m.spinner.setFocus(true)
+  end if
+End Function
+
 
 Function onSettingsSignInSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignInSelected")

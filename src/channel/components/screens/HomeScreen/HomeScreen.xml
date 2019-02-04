@@ -29,10 +29,36 @@
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
       <field id="backgroundType" type="string" />
 
-      <!-- Manages trackingCount across child screens that are all counted as
-         navigate_within_screen events from analytics point of view -->
-      <field id="trackingUri" type="string"  value="/home" />
-      <field id="trackingCount" type="integer"  value="0" />
+      <!-- Keeps the information used for user tracking - structure looks like:
+        {
+          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
+          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
+        }
+      -->
+      <field id="trackingPageInfo" type="assocarray" />
+
+      <!-- Same format as trackingPageInfo -->
+      <field id="oldTrackingPageInfo" type="assocarray" />
+
+      <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
+        {
+          componentType: "category_component"    ' Corresponds to one of the page types in tubiTracking_getAnalyticsComponent() 
+                                                 ' which mirrors the protos repo.
+          componentValues: {}                    ' An assoc array with key/values that match the componentType as found in
+                                                 ' tubiTracking_getAnalyticsComponent().
+        }
+      -->
+      <field id="trackingComponentInfo" alias="CategoryScreen.trackingComponentInfo" />
+
+      <!-- Holds the information needed to populate a navigate_witin_page event. This will
+           be updated when CategoryScreen update their navigateWithinPageInfo fields,
+           and will be subsequently passed to the contentController
+           which will be responsible for sending navigate_within_page events.
+      -->
+      <field id="navigateWithinPageInfo" alias="CategoryScreen.navigateWithinPageInfo" />
+
+      <!-- A trigger that informs the ContentController that the user is navigating within screens in the Homescreen -->
+      <field id="navigateBetweenHomescreens" type="boolean" alwaysNotify="true" />
   </interface>
   
   <children>
@@ -58,6 +84,5 @@
       opacity="0.5"
       uri="pkg:/images/logo-white-large.png"
       translation="[85,55]" />
-
   </children>
 </component>

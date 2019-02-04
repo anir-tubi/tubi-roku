@@ -19,8 +19,6 @@ End Function
 Function onChildFocused()
   if m.top.isInFocusChain() and m.top.hasFocus()
     m.grid.setFocus(true)
-  else
-    m.top.navigations = 0
   end if
 End Function
 

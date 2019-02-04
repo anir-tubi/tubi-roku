@@ -6,6 +6,9 @@
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -57,10 +60,37 @@
       <!-- Indicates if the content has a trailer -->
       <field id="hasTrailer" type="boolean" value="false" />
 
-      <!-- keeps the uri used for user tracking -->
-      <field id="trackingUri" type="string"  value="" />
+      <!-- Keeps the information used for user tracking - structure looks like:
+        {
+          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
+          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
+        }
+      -->
+      <field id="trackingPageInfo" type="assocarray" />
 
-      <!-- keeps the uri used for user tracking -->
+      <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
+        {
+          componentType: "category_component"    ' Corresponds to one of the page types in tubiTracking_getAnalyticsComponent() 
+                                                 ' which mirrors the protos repo.
+          componentValues: {}                    ' An assoc array with key/values that match the componentType as found in
+                                                 ' tubiTracking_getAnalyticsComponent().
+        }
+      -->
+      <field id="trackingComponentInfo" type="assocarray" />
+
+      <!-- Holds the information needed to populate a navigate_witin_page event. This will
+           be observed by the Homescreen, which will subsequently pass it to the contentController
+           which will be responsible for sending navigate_within_page events.
+           See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA
+      -->
+      <field id="navigateWithinPageInfo" type="assocarray" />
+
+      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
+           Used when showing a series/episode page
+      -->
+      <field id="trackingLoadStartTime" type="integer" />
+
+      <!-- interface for moving the focus on the details screen menu to a specific item-->
       <field id="jumpToItem" type="integer" alias="Menu.jumpToItem" />
 
       <!-- used to update the text on the addToQueue button -->
@@ -114,7 +144,8 @@
       <!-- set to true when the user wants to navigate to the channel details screen -->
       <field id="channelSelected" type="boolean" alwaysNotify="true" />
 
-      <field id="relatedContentSelected" alias="RelatedGrid.itemSelected" />
+      <!-- mirrors RelatedGrid.itemSelected, but DetailScreen interjects before sending it to the ContentController -->
+      <field id="relatedContentSelected" type="integer" alwaysNotify="true" />
 
       <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
   </interface>
@@ -173,15 +204,15 @@
         maxTitleLines="2"
         visible="true" />
 
-    <FilledButtonMarkupGrid
-      id="Menu"
-      translation="[60,656]"
-      itemSize="[465,80]"
-      itemComponentName="DetailMenuItem"
-      itemSpacing="[0,8]"
-      numRows="3"
-      numColumns="1"
-      vertFocusAnimationStyle="floatingFocus"/>
+      <FilledButtonMarkupGrid
+        id="Menu"
+        translation="[60,656]"
+        itemSize="[465,80]"
+        itemComponentName="DetailMenuItem"
+        itemSpacing="[0,8]"
+        numRows="3"
+        numColumns="1"
+        vertFocusAnimationStyle="floatingFocus"/>
 
       <Group
         id="RelatedContentGroup"
