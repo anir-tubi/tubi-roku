@@ -1128,6 +1128,7 @@ End Function
 'handles HopBack button selection
 Function handleHopBack(remoteReplayButton)
   setFocusedButton(m.HopBackButton)  'necessary because there is a dedicated hop back button on certain roku remotes
+
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
   else if m.VideoState <> "skip"
@@ -1141,17 +1142,23 @@ Function handleHopBack(remoteReplayButton)
   end if
 
   setFocusedButton(m.HopBackButton, true)
+
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
+
   hopPosition = m.playerPosition - 30
+  if remoteReplayButton = true
+    hopPosition = m.playerPosition - 20
+    if m.Video.globalCaptionMode = "Instant replay"
+      tubilog("Turning on replay captions")
+      m.replayCaptionEnd = m.positionAtJumpStart
+      m.video.globalCaptionMode = "On"
+    end if
+  end if
+
   jumpToPosition(hopPosition)
   m.lastPingTime = hopPosition    'used for accurate play_progress accounting
-  if remoteReplayButton and m.Video.globalCaptionMode = "Instant replay"
-    tubilog("Turning on replay captions")
-    m.replayCaptionEnd = m.positionAtJumpStart
-    m.video.globalCaptionMode = "On"
-  end if
 End Function
 
 
