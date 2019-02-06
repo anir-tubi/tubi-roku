@@ -18,9 +18,7 @@ End Function
 
 
 'runs the scene graph portion of the channel
-' TODO: On Submission, remove the adShim and port parameters which are not used in the function and only exist for
-'       backwards compatibility
-Function tubiChannel_runChannel(args, adShim, port) As Void
+Function tubiChannel_runChannel(args) As Void
   ' Load scene graph
   port = CreateObject("roMessagePort")
   screen = CreateObject("roSGScreen")
