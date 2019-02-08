@@ -32,11 +32,12 @@ Direct Install: [my.roku.com/add/NDDHPHK](https://my.roku.com/add/NDDHPHK)
 $ git clone git@github.com:adRise/project-total-recall.git
 ```
 
-2\. Install build tools
+2\. Navigate to the github repo in terminal and then install build tools
 
 ```
 $ cd tools
 $ npm install  # this expect you have node > 4.x installed
+$ cd ..
 ```
 
 3\. Enable developer mode on the Roku device remote control:
@@ -45,6 +46,8 @@ $ npm install  # this expect you have node > 4.x installed
 ![](docs/remote.png)
 
 ![](docs/dev-mode.png)
+
+When asked to set up a dev password, use "1234" so it's easier for any developer to easily know the password for any device.
 
 4\. Set the developer id on your Roku device
 

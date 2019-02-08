@@ -21,7 +21,7 @@ bluebird.promisifyAll(fs);
 function parse(profile, templateValues={}) {
   const filename = path.join(cwd, `${profile}.yml`);
   if (!fs.existsSync(filename)) return {};
-  let template = fs.readFileSync(filename, 'utf8')
+  let template = fs.readFileSync(filename, 'utf8');
   let rendered = templating.renderTemplate(template, templateValues);
   return yaml.load(rendered);
 }
