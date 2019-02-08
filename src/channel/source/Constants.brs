@@ -262,6 +262,10 @@ Function getConstants()
   'only change to false in case of emergencies, as installed components will likely break after many remote releases
   constants.remoteComponents = true
 
+  ' Should the user be shown the upgrade alert to help them upgrade to the latest version.
+  '   Used within the hotpatch after a point release to nudge users to use the latest and
+    constants.showUpgradeAlert = false
+
   'a list of device ids that will send debug and info logs to the logging API - this will be populated by hotpatch
   'idsToLog is expected to look like {
   '  13GSC41289Y: true

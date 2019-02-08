@@ -13,6 +13,7 @@ Function TubiChannel(utils)
     deepLink: tubiChannel_deepLink
     loadRemoteComponents: tubiChannel_loadRemoteComponents
     logCrashes: tubiChannel_logCrashes
+    closeUpgradeWindow: tubiChannel_closeUpgradeWindow
   }
 End Function
 
@@ -111,13 +112,42 @@ Function tubiChannel_runChannel(args) As Void
   end if
   controller.observeField("exitApp", port)
 
-  controller.deepLinkContent = deepLinkContent
+  modalUpdate = invalid
+  '//If the Upgrade constant has not been triggered, then continue startup normally.
+  if m.constants.showUpgradeAlert = false
+    controller.deepLinkContent = deepLinkContent
+  else
+    '//Create upgrade window to inform user that they should upgrade the app
+    modalUpdate = CreateObject("roSGNode", "ModalDialogScreen")
+    modalUpdate = tubiScene.createChild("ModalDialogScreen")
+    modalUpdate.title  = "Please update this app"
+    modalUpdate.message  = "This version of Tubi is no longer supported. "
+    modalUpdate.message  += "To update, please exit the Tubi app and go to:"
+    modalUpdate.message  += chr(10)
+    modalUpdate.message  += chr(10)
+    modalUpdate.message  += "Settings> System> System update> Check now"
+    modalUpdate.buttons = ["Close"]
+    modalUpdate.setFocus(true)
+    modalUpdate.observeField("exitButton", port)
+    modalUpdate.observeField("buttonSelected", port)
+  end if
 
   while(true)
     msg = wait(0, port)
     msgType = type(msg)
 
-    if msgType = "roSGScreenEvent"
+    modalNode = invalid
+    if msgType = "roSGNode"
+      modalNode = msg  '
+    else if msgType = "roSGNodeEvent"
+      modalNode = msg.getRoSGNode()
+    end if
+
+    if modalNode <> invalid and modalUpdate <> invalid and modalNode.title <> invalid and LEN(modalNode.title) > 0 and modalNode.title = modalUpdate.title and modalUpdate.getParent() <> invalid
+      '//this is the upgrade window, so continue the app startup process and call the window's event handler
+      controller.deepLinkContent = deepLinkContent
+      m.closeUpgradeWindow(modalNode)
+    else if msgType = "roSGScreenEvent"
       if msg.isScreenClosed()
         return
       end if
@@ -132,6 +162,27 @@ Function tubiChannel_runChannel(args) As Void
     end if
   end while
 End Function
+
+'//This function is called when the upgrade window should be closed
+Function tubiChannel_closeUpgradeWindow(modalNode)
+  if modalNode <> invalid
+    tubiLog("closeUpgradeWindow(), The user has shown the Upgrade window")
+    focus = false
+    if modalNode.isInFocusChain()
+      focus = true
+    end if
+    modalNode.unobserveField("buttonSelected")
+    modalNode.unobserveField("exitButton")
+    parent = modalNode.getParent()
+    parent.removeChild(modalNode)
+
+    if focus = true
+      parent.setFocus(true)
+    end if
+
+  end if
+  return invalid
+end Function
 
 
 Function tubiChannel_loadRemoteComponents(screen)
