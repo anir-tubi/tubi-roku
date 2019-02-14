@@ -309,7 +309,7 @@ Function onVideoPositionChange()
   updatePlayerPosition()
 
   ' Auto hide transport
-  if m.VideoState = "play" and m.HUD.opacity > 0 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
+  if m.VideoState = "play" and m.HUD.opacity = 1 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
     animateTransport("out")
   end if
 
@@ -803,7 +803,7 @@ End Function
 'aggregates all the animation for showing/hiding the transport
 '@direction: string, value may be "out" or "in"
 Function animateTransport(direction)
-  tubiLog("VideoPlayer.AnimateTransport")
+  tubiLog("VideoPlayer.AnimateTransport, direction = " + direction)
   slideFade(m.HUD, "below", direction, 0.6)
   fade(m.Overlay, direction, 0.6)
   
