@@ -65,7 +65,7 @@
       visible="false">
       <TargetList
         id="GridMovie"
-        itemComponentName="TubiRemoteLibrary:UpNextPoster"
+        itemComponentName="UpNextPoster"
         showTargetRects="false"
         advanceKey="right"
         reverseKey="left"
@@ -97,7 +97,7 @@
       visible="false">
       <MarkupGrid
         id="GridSeries"
-        itemComponentName="TubiRemoteLibrary:UpNextPoster"
+        itemComponentName="UpNextPoster"
         itemSize="[430,242]"
         focusBitmapUri="pkg:/images/selector-fhd.9.png"
         numColumns="1"
