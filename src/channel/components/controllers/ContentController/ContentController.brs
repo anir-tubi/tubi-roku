@@ -640,7 +640,6 @@ End Function
 Function onDeepLinkContentReceived()
   tubiLog("onDeepLinkContentReceived")
   m.deepLinkEvaluated = true
-  m.top.unobserveFieldScoped("deepLinkContent")
   startUserExperience()
 End Function
 

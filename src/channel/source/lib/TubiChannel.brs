@@ -22,8 +22,10 @@ End Function
 Function tubiChannel_runChannel(args) As Void
   ' Load scene graph
   port = CreateObject("roMessagePort")
+  input = CreateObject("roInput")
+  input.SetMessagePort(port)
   screen = CreateObject("roSGScreen")
-  screen.setMessagePort(port)
+  screen.SetMessagePort(port)
 
   m.logCrashes(args)
 
@@ -132,7 +134,7 @@ Function tubiChannel_runChannel(args) As Void
     modalUpdate.observeField("buttonSelected", port)
   end if
 
-  while(true)
+  while true
     msg = wait(0, port)
     msgType = type(msg)
 
@@ -147,6 +149,12 @@ Function tubiChannel_runChannel(args) As Void
       '//this is the upgrade window, so continue the app startup process and call the window's event handler
       controller.deepLinkContent = deepLinkContent
       m.closeUpgradeWindow(modalNode)
+    else if msgType = "roInputEvent"
+        if msg.GetInfo().MediaType <> invalid and msg.GetInfo().ContentID <> invalid
+          '//a deeplink event has occured while the app was running
+          deepLinkContent = m.deepLink(msg.GetInfo(), m.tracking, m.auth, false)
+          controller.deepLinkContent = deepLinkContent
+        end if
     else if msgType = "roSGScreenEvent"
       if msg.isScreenClosed()
         return
