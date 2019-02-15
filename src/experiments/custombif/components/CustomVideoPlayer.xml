@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="CustomVideoPlayer" extends="Group">
+
+  <script type="text/brightscript" uri="CustomVideoPlayer.brs"/>
+
+  <interface>
+    <field id="width" alias="InternalVideo.width" value="1920"/>
+    <field id="height" alias="InternalVideo.height" value="1080"/>
+    <field id="control" alias="InternalVideo.control" />
+    <field id="content" alias="InternalVideo.content" />
+  </interface>
+
+  <children>
+    <Video
+      id="InternalVideo"
+      translation="[0,0]"
+      visible="true"/>
+
+    <LayoutGroup>
+      <Label id="SeekPosition" />
+      <Label id="PlaybackPosition" />
+    </LayoutGroup>
+
+    <LayoutGroup
+      horizAlignment="center"
+      vertAlignment="center"
+      translation="[960,540]">
+      <Poster
+        id="Thumbnail"
+        width="440"
+        height="184"
+        visible="false"/>
+    </LayoutGroup>
+  </children>
+
+</component>
