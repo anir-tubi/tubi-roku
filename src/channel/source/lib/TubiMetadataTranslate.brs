@@ -466,7 +466,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson) 
   container = contentToTranslate.container
   contents = contentToTranslate.contents
   fetchedAt = m.fetchedAtTimestamp_()
-  contentsJson = m.getContentsJson_(contents, fullJson)
+  contentsJson = m.getContentsJson_(contentToTranslate, fullJson)
 
   node_count = 0
   categoryMetadata = m.buildCategoryAA_(container, contents, contentsJson, fetchedAt)
@@ -602,19 +602,46 @@ End Function
 ' getContentsJson
 '
 'helper function to encapsulate getting the contents JSON from a matrix single container response
-Function tubiMetadataTranslate_getContentsJson(contents, fullJson)
+'@parsedJson: assocArray, the container response that has already been run through ParseJSON()
+'@fullJson: string, the full json formatted response
+Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
   contentsJson = invalid
 
-  'Doing string operations to isolate the contents portion of the JSON matrix response is considerably faster than re-formatting the JSON
+  'Doing string operations to isolate the contents portion of the JSON matrix response is ~4x faster than re-formatting the JSON
   contentsIdentifier =  Chr(34) + "contents" + Chr(34) + ":{"
-  contentsPos = Instr(0, fullJson, contentsIdentifier)
-  if contentsPos > 0
-    contentsJsonLength = fullJson.len() - contentsPos - contentsIdentifier.len() + 1
-    contentsJson = Mid(fullJson, contentsPos + contentsIdentifier.len()-1, contentsJsonLength)
-  else
-    'Do a Format JSON since we can't find the contents with our string search
+  safetyEject = false
+  contentsIdentifierPos = Instr(1, fullJson, contentsIdentifier)
+
+  'make sure the content key exists exactly once in the JSON string
+  if contentsIdentifierPos > 0 and Instr(contentsIdentifierPos + 1, fullJson, contentsIdentifier) < 1
+    contentsStartPos = contentsIdentifierPos + contentsIdentifier.len() - 1
+    contentsEndPos = fullJson.len()  'set default assuming contents is the last key in the AA json
+
+    for each key in parsedJson
+      if key <> "contents"
+        keyIdentifier = Chr(34) + key + Chr(34) + ":"   ' ex: "container":  'can't guarantee AA so don't include bracket
+        keyPos = Instr(1, fullJson, keyIdentifier)
+        'make sure the key exists exactly once in the JSON string
+        if keyPos > 0 and Instr(keyPos + 1, fullJson, keyIdentifier) < 1
+          if keyPos > contentsStartPos and keyPos < contentsEndPos
+            contentsEndPos = keyPos - 1
+          end if
+        else
+          safetyEject = true  ' key not found, or found multiple times in string, can't be trusted
+          exit for
+        end if
+      end if
+    end for
+  end if
+
+  if safetyEject = false
+    contentsJson = Mid(fullJson, contentsStartPos, contentsEndPos - contentsStartPos)
+  end if
+
+  'the optimization didn't update contentsJson, so do the slower but more faithful way (FormatJSON)
+  if contentsJson = invalid and parsedJson.contents <> invalid
     tubiLog("Formatted JSON for category metadata", "warn", "clientWarn", "category-metadata-format-json")
-    contentsJson = FormatJSON(contents)
+    contentsJson = FormatJSON(parsedJson.contents)
   end if
 
   return contentsJson
