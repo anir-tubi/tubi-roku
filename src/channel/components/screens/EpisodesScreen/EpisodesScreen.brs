@@ -32,20 +32,20 @@ Function init()
   ' items on the RowList, or due to the RowList gaining focus when focus is given to the EpisodesScreen.
   m.gridIsFocused = false
   m.listIsFocused = false
+
 End Function
 
 
 Function onScreenFocusChange()
   tubiLog("EpisodesScreen.onScreenFocusChange")
   if m.top.hasFocus() then
+    'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error
+    m.RowList.setFocus(true)
+    m.RowList.setFocus(false) 
     m.RowList.setFocus(true)
   else if m.top.isInFocusChain() = false
-    m.gridIsFocused = false
+    m.gridIsFocused = false 
     m.listIsFocused = false
-
-    'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error
-    m.RowList.setFocus(false)
-    m.RowList.setFocus(true)
   end if
 End Function
 

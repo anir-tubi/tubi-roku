@@ -103,6 +103,9 @@ Function hideButtonList(buttonList, rowList)
 
   'set focus on rowList
   rowList.setFocus(true)
+  '//an extra call to setFocus() is needed to set the proper focus due to a bug in the roku Rowlist component that offsets the cursor in error
+  m.RowList.setFocus(false)
+  m.RowList.setFocus(true)
   m.focusTarget = rowList
 
   'show the background image of the focused content
