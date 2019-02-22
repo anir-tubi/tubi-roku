@@ -53,7 +53,6 @@ Function playVideoContent(content As Object, autoplayType As String, position=in
       localContent.nowPos = position
     end if
     parent.appendChild(localContent)
-
     m.videoPlayer.playlist = parent
     m.videoPlayer.loopPlaylist = false
     m.videoPlayer.seekPlaylist = [0, localContent.nowPos]
@@ -315,7 +314,7 @@ Function stopVideoContent(playerResult, showScreenStack)
   end if
 
   stoppedContent = m.videoPlayer.content
-  if stoppedContent.isTrailer = true
+  if stoppedContent <> invalid and stoppedContent.isTrailer = true
     m.trackingLoggingTask.trackEvent({
       type: "finish_trailer"
       values: {
@@ -356,12 +355,11 @@ End Function
 Function showPlayerError(errorMessage As String)
   tubiLog("ContentController.showPlayerError")
   showErrorModal(0, errorMessage, onRetryPlayerError, [], onCancelPlayerError, [])
-
   m.trackingLoggingTask.trackEvent = {
     type: "dialog"
     values: {
       dialog_type: "WARNING" 'DialogType enum
-      pageOneof: trackingLib.getAnalyticsPage("video_player_page", analyticsContent)  ' There currently is no video_player_page in protos
+      pageOneof: m.Tracking.getAnalyticsPage("video_player_page", analyticsContent)  ' There currently is no video_player_page in protos
     }
   }
 End Function
