@@ -162,13 +162,12 @@ Function refreshContent(nowPos)
     if content.url <> invalid and content.url <> "" and content.fetchedAt <> invalid and content.fetchedAt > threshold
       ' we already have a valid url, so only need to get thumbnail/sprites
       prepareToStartVideo(content, 0)
-      playContent()
       requestDetails = {
         contentId: content.id
         getThumbnails: true
-        refresh: true
       }
       runRefreshTask(requestDetails)
+      playContent()
     else
       requestDetails = {
         contentId: content.id
@@ -221,6 +220,7 @@ Function onRefreshResponse(msg)
   refreshedContent = msg.GetData()
   refreshTask = msg.getRoSGNode()
   playlistContent = currentPlaylistContent()
+  m.VideoState = "stop"
   if refreshedContent.id = playlistContent.id
     ' While the refresh content may not hold all the information we need (e.g. isLiveTV), it's
     ' only used for the stream urls and subtitle urls really and should be ok here without merging
@@ -248,6 +248,7 @@ Function onRefreshError(msg)
   tubiLog("VideoPlayer.onRefreshError")
   ' TODO: When do we shown an error vs. skip content and continue on?
   if m.VideoState = "refresh" or m.VideoState = "pause"
+    m.VideoState = "stop"
     if advancePlaylist() <> true
       m.top.errorMsg = "Could not refresh the content or play next content."
       m.top.state = "error"
