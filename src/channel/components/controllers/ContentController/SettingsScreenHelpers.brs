@@ -79,12 +79,14 @@ Function onParentalSettingSelected(msg)
   tubiLog("SettingsScreenHelpers.onParentalSettingSelected")
   parentalSetting = msg.GetData()
   if m.settingsScreen.signedIn = true
-    m.confirmPasswordScreen = CreateObject("roSGNode", "ConfirmPasswordScreen")
-    m.confirmPasswordScreen.message = "Enter your password to" + Chr(10) + "change parental rating"
-    m.confirmPasswordScreen.buttonText = "Submit"
-    m.confirmPasswordScreen.isLoading = false
-    m.confirmPasswordScreen.observeField("submitSelected", "onPasswordConfirm")
-    pushScreen(m.confirmPasswordScreen)
+    if m.global.authInfo <> invalid and parentalSetting <> m.global.authInfo.parentalrating
+      m.confirmPasswordScreen = CreateObject("roSGNode", "ConfirmPasswordScreen")
+      m.confirmPasswordScreen.message = "Enter your password to" + Chr(10) + "change parental rating"
+      m.confirmPasswordScreen.buttonText = "Submit"
+      m.confirmPasswordScreen.isLoading = false
+      m.confirmPasswordScreen.observeField("submitSelected", "onPasswordConfirm")
+      pushScreen(m.confirmPasswordScreen)
+    end if
   else
     title = "Please Sign In"
     message = "You must be signed in to adjust parental controls"
