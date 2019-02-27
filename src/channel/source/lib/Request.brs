@@ -215,7 +215,6 @@ Function tubihttp_handleEvent(message As Object) As Object
         'server said our auth token was not valid
         if m.authInfo <> invalid and code = 403 and m.retries > 0
           newAuthInfo = m.refreshAuthToken(m.authInfo, 100)
-
           if newAuthInfo <> invalid
             'replace any necessary new auth info in the headers and try again
             authHeaders = m.getAuthHeaders(newAuthInfo.accessToken)

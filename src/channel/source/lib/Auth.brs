@@ -244,6 +244,8 @@ function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
     authReq.constants = m.constants
     authReq.request = m.request
     authReq.authInfo = authInfo
+    authReq.regWrite = m.regWrite
+    authReq.authRegKey = m.authRegKey
   end if
 
   return authReq
