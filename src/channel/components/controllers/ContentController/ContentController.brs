@@ -57,7 +57,7 @@ Function init()
   ' For queue and history management from detail screen
   m.userTask = CreateObject("roSGNode", "AuthTask")
 
-  m.top.observeFieldScoped("deepLinkContent", "onDeepLinkContentReceived")
+  m.top.observeFieldScoped("deepLinkTrigger", "onDeepLinkContentReceived")
   m.deepLinkEvaluated = false  'indicates if the contentController has recognized that we entered from a deeplink or not
 
   m.logOutTask = m.top.findNode("LogOutTask")

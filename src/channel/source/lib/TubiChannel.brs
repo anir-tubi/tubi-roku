@@ -118,6 +118,7 @@ Function tubiChannel_runChannel(args) As Void
   '//If the Upgrade constant has not been triggered, then continue startup normally.
   if m.constants.showUpgradeAlert = false
     controller.deepLinkContent = deepLinkContent
+    controller.deepLinkTrigger = true
   else
     '//Create upgrade window to inform user that they should upgrade the app
     modalUpdate = CreateObject("roSGNode", "ModalDialogScreen")
@@ -148,12 +149,14 @@ Function tubiChannel_runChannel(args) As Void
     if modalNode <> invalid and modalUpdate <> invalid and modalNode.title <> invalid and LEN(modalNode.title) > 0 and modalNode.title = modalUpdate.title and modalUpdate.getParent() <> invalid
       '//this is the upgrade window, so continue the app startup process and call the window's event handler
       controller.deepLinkContent = deepLinkContent
+      controller.deepLinkTrigger = true
       m.closeUpgradeWindow(modalNode)
     else if msgType = "roInputEvent"
         if msg.GetInfo().MediaType <> invalid and msg.GetInfo().ContentID <> invalid
           '//a deeplink event has occured while the app was running
           deepLinkContent = m.deepLink(msg.GetInfo(), m.tracking, m.auth, false)
           controller.deepLinkContent = deepLinkContent
+          controller.deepLinkTrigger = true
         end if
     else if msgType = "roSGScreenEvent"
       if msg.isScreenClosed()

@@ -49,10 +49,11 @@
         -    source  - the device id of the originating device
         -    nowPos  - the resume time sent along with deeplink
         -->
-      <field id="deepLinkContent" type="node" alwaysNotify="true" />
+      <field id="deepLinkContent" type="node" />
+      <field id="deepLinkTrigger" type="boolean" alwaysNotify="true" />
 
       <!-- Interface for receiving Live TV content from the main Brightscript thread -->
-      <field id="onNowContent" type="node" alwaysNotify="true"/>
+      <field id="onNowContent" type="node" alwaysNotify="true" />
     
 
     <!-- OUTPUT -->
