@@ -4,21 +4,15 @@ Function showSettingsScreen()
   if m.global.authInfo <> invalid
     authInfo = m.global.authInfo
     m.settingsScreen.signedIn = true
-    if authInfo.firstName <> invalid and authInfo.lastName <> invalid
-      m.settingsScreen.name = authInfo.firstName + " " + authInfo.lastName
-    else
-      m.settingsScreen.name = authInfo.name
-    end if
-    m.settingsScreen.email = authInfo.email
-    m.settingsScreen.parentalSetting = authInfo.parentalrating
+    setUserInfo()
   else
     m.settingsScreen.signedIn = false
     m.settingsScreen.parentalSetting = 3  ' Default to most permissive
   end if
+  m.settingsScreen.observeFieldScoped("signedIn", "OnSignedIn")
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
   m.settingsScreen.observeFieldScoped("signInSelected", "onSettingsSignInSelected")
   m.settingsScreen.observeFieldScoped("parentalSettingSelected", "onParentalSettingSelected")
-  m.settingsScreen.observeFieldScoped("remoteParentalSetting", "onRemoteParentalSetting")
   m.settingsScreen.observeFieldScoped("remoteParentalSetting", "onRemoteParentalSetting")
   m.settingsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
 
@@ -29,6 +23,22 @@ Function showSettingsScreen()
   pushScreen(m.settingsScreen, true, true)
 End Function
 
+Function OnSignedIn()
+  setUserInfo()
+End Function
+
+Function setUserInfo()
+  if m.global.authInfo <> invalid
+    authInfo = m.global.authInfo
+    if authInfo.firstName <> invalid and authInfo.lastName <> invalid
+      m.settingsScreen.name = authInfo.firstName + " " + authInfo.lastName
+    else
+      m.settingsScreen.name = authInfo.name
+    end if
+    m.settingsScreen.email = authInfo.email
+    m.settingsScreen.parentalSetting = authInfo.parentalrating
+  end if
+End Function
 
 Function onSettingsSignOutSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignOutSelected")

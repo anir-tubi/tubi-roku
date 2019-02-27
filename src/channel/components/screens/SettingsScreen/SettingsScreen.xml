@@ -12,8 +12,8 @@
       <field id="signedIn" type="boolean" value="false" />
 
       <!-- populate the sign out panel with these values -->
-      <field id="name"            type="string"/>
-      <field id="email"           type="string"/>
+      <field id="name" type="string"/>
+      <field id="email" type="string"/>
 
     <!-- OUTPUTS -->
       <!-- triggers for upstream controller -->

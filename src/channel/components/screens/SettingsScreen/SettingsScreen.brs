@@ -74,7 +74,9 @@ Function onComponentFocusChange()
 
   menu = m.SettingsMenuPanel.findNode("SettingsMenu")
   if m.top.isInFocusChain()
-    if m.top.hasFocus() = false
+    if m.top.hasFocus() = true
+      m.SettingsMenuPanel.setFocus(true)
+    else
       m.Title.opacity = 0.3
     end if
   end if
