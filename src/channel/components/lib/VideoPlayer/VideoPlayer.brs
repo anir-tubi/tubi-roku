@@ -900,6 +900,9 @@ Function resumeFromSkip()
   animateTransport("out")
   if m.playerPosition <> m.Video.position
     jumpToPosition(m.playerPosition)
+  else
+    m.Video.control = "resume"
+    m.VideoState = "play"
   end if
   m.lastPingTime = m.playerPosition
   m.PlayPauseButton.uri = m.buttonUris.pause
