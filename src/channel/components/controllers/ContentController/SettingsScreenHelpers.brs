@@ -84,6 +84,16 @@ Function onSettingsSignInSelected()
   startSignIn(true)
 End Function
 
+'//When exiting the ConfirmPasswordScreen, make sure some event handlers are no longer listened to 
+Function onConfirmPasswordScreenVisible(msg)
+  tubiLog("SettingsScreenHelper.onConfirmPasswordScreenVisible")
+  confirmPasswordScreen = msg.getRoSGNode()
+  '//if we don't stop listening to this "result" field, then it may cause an error window to appear if/when 
+  '//   the request returns a negative response.
+  if confirmPasswordScreen <> invalid and confirmPasswordScreen.visible = false and m.parentalSettingUpdateTask <> invalid 
+    m.parentalSettingUpdateTask.unobserveField("result")
+  end if
+End Function
 
 Function onParentalSettingSelected(msg)
   tubiLog("SettingsScreenHelpers.onParentalSettingSelected")
@@ -94,6 +104,7 @@ Function onParentalSettingSelected(msg)
       m.confirmPasswordScreen.message = "Enter your password to" + Chr(10) + "change parental rating"
       m.confirmPasswordScreen.buttonText = "Submit"
       m.confirmPasswordScreen.isLoading = false
+      m.confirmPasswordScreen.observeField("visible", "onConfirmPasswordScreenVisible")
       m.confirmPasswordScreen.observeField("submitSelected", "onPasswordConfirm")
       pushScreen(m.confirmPasswordScreen)
     end if
@@ -108,13 +119,13 @@ End Function
 Function onPasswordConfirm(msg)
   tubiLog("SettingsScreenHelper.onPasswordConfirm")
   confirmPasswordScreen = msg.getRoSGNode()
-  parentalSettingUpdateTask = CreateObject("roSGNode", "AuthTask")
-  parentalSettingUpdateTask.functionName = "updateParentalSetting"
-  parentalSettingUpdateTask.password = confirmPasswordScreen.passwordText
-  parentalSettingUpdateTask.parentalSetting = m.settingsScreen.parentalSettingSelected
-  parentalSettingUpdateTask.observeField("result", "onParentalSettingComplete")
-  parentalSettingUpdateTask.control = "RUN"
-  m.confirmPasswordScreen.addFields({task: parentalSettingUpdateTask})
+  m.parentalSettingUpdateTask = CreateObject("roSGNode", "AuthTask")
+  m.parentalSettingUpdateTask.functionName = "updateParentalSetting"
+  m.parentalSettingUpdateTask.password = confirmPasswordScreen.passwordText
+  m.parentalSettingUpdateTask.parentalSetting = m.settingsScreen.parentalSettingSelected
+  m.parentalSettingUpdateTask.observeField("result", "onParentalSettingComplete")
+  m.parentalSettingUpdateTask.control = "RUN"
+  m.confirmPasswordScreen.addFields({task: m.parentalSettingUpdateTask})
   confirmPasswordScreen.isLoading = true
 End Function
 
