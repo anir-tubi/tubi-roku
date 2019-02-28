@@ -57,7 +57,7 @@ End Function
 ' pushScreen
 '
 ' Push a screen on to the stack, allowing the back button to retrace steps
-Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEvents = true as Boolean)
+Function pushScreen(screen As Object, sendNavigateEvents = true as Boolean, sendLoadingEvents = true as Boolean)
   tubiLog("ScreenStack.pushScreen")
   current = currentScreen()
   m.ScreenStack_.pushView = screen

@@ -52,7 +52,7 @@ End Function
 '
 ' Set the focus on the button group
 Function onScreenFocusChange()
-  tubiLog("RegisterInstructionsScreen.onScreenFocusChange")
+  tubiLog("ActivationCodeScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.Buttons.setFocus(true)
     ' do this here so if a user navigates away from this
@@ -68,7 +68,7 @@ End Function
 '
 ' Handle Refresh button selected
 Function onButtonSelected()
-  tubiLog("RegisterInstructionsScreen.onButtonSelected")
+  tubiLog("ActivationCodeScreen.onButtonSelected")
   button = m.Buttons.content.getChild(m.Buttons.itemSelected)
   if button.id = "refresh" then
     getRegistrationCode()
@@ -106,7 +106,7 @@ End Function
 ' Registration polling received a response, watch for it to be successful
 Function onRegistrationResponse()
   if m.RegCodeTask.response <> invalid and m.RegCodeTask.response.status = "registered" then
-    m.top.registerSuccess = true
+    m.top.activationSuccess = true
   end if
 End Function
 
@@ -175,7 +175,7 @@ End Function
 ' getRegistrationCode
 '
 Function getRegistrationCode()
-  tubiLog("RegisterInstructionsScreen.getRegistrationCode")
+  tubiLog("ActivationCodeScreen.getRegistrationCode")
   m.RegistrationCode1.text = "-"
   m.RegistrationCode2.text = "-"
   m.RegistrationCode3.text = "-"

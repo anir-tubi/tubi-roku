@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
- - RegisterInstructionsScreen
+ - ActivationCodeScreen
  - 
  - Present the user with a registration code to register on tubi.tv
  -->
-<component name="RegisterInstructionsScreen" extends="Group">
+<component name="ActivationCodeScreen" extends="Group">
 
-  <script type="text/brightscript" uri="pkg:/components/screens/RegisterInstructionsScreen/RegisterInstructionsScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ActivationCodeScreen/ActivationCodeScreen.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
@@ -17,7 +17,7 @@
 
     <!-- OUTPUT -->
       <!-- Set to true if the user has successfully registered -->
-      <field id="registerSuccess" type="boolean" value="false" alwaysNotify="true"/>
+      <field id="activationSuccess" type="boolean" value="false" alwaysNotify="true"/>
 
       <!-- Set to true when the "Skip" button on the error modal is selected -->
       <field id="skipButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
