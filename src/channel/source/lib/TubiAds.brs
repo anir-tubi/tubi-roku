@@ -1,7 +1,7 @@
 function TubiAds (constants, log, request, requestQueue, auth, tracking, adContentType)
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
-  
+
   'set the preferences for the Roku Advertising Framework so we never use their ad server if our server returns no ads
   'set to 0 retries - 1 max request, even if there are no ads returned from our server
   roAdFramework.setAdPrefs(false, 1)
@@ -519,7 +519,10 @@ function tubiAds_adTrackingCallback(eventType, ctx)
         endPosition = m.adPlaybackPos
       end if
       m.adPlaybackPos = 0
-
+      if endPosition = invalid 
+        '//ensure a valid value is used. This may not happen during a close event.
+        endPosition = 0
+      end if
       finishAdEvent = {
         ad_finished: m.tracking.getAnalyticsAd(ctx)
         video_id: m.controlNode.content.id.toInt()
