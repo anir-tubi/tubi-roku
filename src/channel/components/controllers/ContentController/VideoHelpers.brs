@@ -77,7 +77,7 @@ Function onEpisodePosition()
   if history <> invalid or m.videoPlayer.historyPosition > m.constants.player.historyFrequency
     ' Only run a new task if the previous task is done.  Priority of resume states is
     ' pretty low and we don't mind losing a few.
-    if m.updateHistoryTask.state <> "RUN" then
+    if m.updateHistoryTask.state <> "RUN"   
       m.updateHistoryTask.nowPos = m.videoPlayer.historyPosition
       m.updateHistoryTask.control = "RUN"
     end if
@@ -248,7 +248,6 @@ End Function
 '   - Deep link: Exit video player series after autoplay   : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
 Function returnToDetailScreenFromVideo(result)
   stopVideoContent(result, true)
-
   ' get updated content, to be used to reload or re-populate details screen
   content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex) 'this always returns a video - sometimes an episode
   m.top.deepLinkContent = invalid
@@ -272,8 +271,10 @@ Function returnToDetailScreenFromVideo(result)
   'reload or re-populate the screen as necessary
   if currentScreen() <> invalid and currentScreen().subType() = "DetailScreen"
     if currentScreen().content <> invalid and currentScreen().content.id = content.id
+      '//So the detailed page does not have a refresh issue, pass the local resume number before the backend communicates.
+      nResumePoint = m.videoPlayer.historyPosition '//The problem with this is that if the backend comes back with a different number than the local number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video. The local number is 2 seconds and displays the resume button, but the backend determines that 2 seconds is not enough to warrant a resume button and returns 0 as the resume point.
       ' Action 1, 3, 5 - same content so just re-populate screen with any updates
-      populateDetailScreen(currentScreen(), content, true)
+      populateDetailScreen(currentScreen(), content, true, nResumePoint)
     else
       ' Action 2 - new content so tear down the screen and rebuild it
       popScreen()
@@ -326,7 +327,7 @@ Function stopVideoContent(playerResult, showScreenStack)
   end if
 
   ' reload history
-  onHistoryQueueChange(m.constants.ui.categoryIds.history)
+  onHistoryQueueChange(m.constants.ui.categoryIds.history) 
 
   ' should only do this if not autoplaying another video
   if showScreenStack

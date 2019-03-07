@@ -76,7 +76,7 @@ End Function
 '
 'Populates the detail screen's state from a content node
 '@content: tubiContentNode
-Function populateDetailScreen(detailScreen, content, resetButtonIndex=false)
+Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSavedPosition = -1)
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   if type(detailScreen) = "roSGNode" and detailScreen.isSubType("DetailScreen") and type(content) = "roSGNode"
     'hide the spinner
@@ -139,13 +139,19 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false)
     detailScreen.channelName = content.channelName
     detailScreen.length = stateSource.length  'needed to compute the resume bar on the resume button
 
+    nResumePoint = 0
     if content.type = m.constants.ui.contentTypes.series and episodeHistory <> invalid and episodeHistory.nowPos > 0
-      detailScreen.resumePoint = episodeHistory.nowPos
+      nResumePoint = episodeHistory.nowPos
     else if content.type = m.constants.ui.contentTypes.video and history <> invalid and history.nowPos > 0
-      detailScreen.resumePoint = history.nowPos
-    else
-      detailScreen.resumePoint = 0
+      nResumePoint = history.nowPos
     end if
+    if nSavedPosition > 0
+      '//If the saved position is passed as greater than 0 than use that number instead. 
+      '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct 
+      nResumePoint = nSavedPosition
+      detailScreen.isHistory = true
+    end if
+    detailScreen.resumePoint = nResumePoint
 
     'tell the detail screen/info panel to vertically center the info panel
     detailScreen.calculateInfoHeight = true

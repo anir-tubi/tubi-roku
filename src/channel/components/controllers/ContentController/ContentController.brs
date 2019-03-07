@@ -406,7 +406,9 @@ Function refreshAllDetailScreens()
   for i=0 to m.ScreenStack_.getChildCount()-1
     screen = m.ScreenStack_.getChild(i)
     if screen.subType() = "DetailScreen"
-      populateDetailScreen(screen, screen.content, true)
+      if screen.visible <> true and screen.isInFocusChain() <> true
+        populateDetailScreen(screen, screen.content, true)
+      end if
     end if
   end for
 End Function
