@@ -24,6 +24,7 @@ Function init()
   m.PanelSet.observeField("isGoingBack", "onReturnToMenu")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
+  m.top.observeField("parentalSettingUpdated", "onSignedInChange")
 
   ' used to compare if a newly focused item gained focus from a different item while scrolling,
   ' or gained focus from a different component/screen
@@ -31,6 +32,7 @@ Function init()
 End Function
 
 Function onSignedInChange()
+
   tubiLog("SettingsScreen.onSignedInChange")
   m.SettingsMenuPanel.signedIn = m.top.signedIn
 
