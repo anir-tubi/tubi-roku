@@ -107,7 +107,7 @@
       <field id="historyPosition" type="integer" value="0" />
 
       <!-- Is set when the credits cuepoint position is reached -->
-      <field id="creditsPosition" type="integer" alwaysNotify="true"/>
+      <field id="creditsPosition" type="integer" alwaysNotify="false"/>
 
       <!-- READ-ONLY field which indicates the current state of the player with respect to being docked -->
       <field id="isDocked" type="boolean" value="false" />

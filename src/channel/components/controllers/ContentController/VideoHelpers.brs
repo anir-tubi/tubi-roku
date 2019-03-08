@@ -86,34 +86,36 @@ End Function
 
 
 Function onEpisodeCredits()
-  tubiLog("ContentController.onEpisodeCredits")
-  ' Verify that the UpNextTask has a response and it matches the currently playing content
-  currentContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
-  if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
-    if m.upNextTask.response.getChildCount() > 0
-      if m.upNextScreen <> invalid
-        m.upNextScreen.unobserveFieldScoped("contentSelected")
-        m.upNextScreen.unobserveFieldScoped("backPressed")
-        m.upNextScreen.unobserveFieldScoped("timeout")
-        m.upNextScreen.unobserveFieldScoped("navigateWithinPageInfo")
-        m.upNextScreen = invalid
-      end if
-      m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
-      m.upNextScreen.observeFieldScoped("contentSelected", "onUpNextContentSelected")
-      m.upNextScreen.observeFieldScoped("backPressed", "onUpNextBackPressed")
-      m.upNextScreen.observeFieldScoped("timeout", "onUpNextTimeout")
-      m.upNextScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-      m.upNextScreen.content = m.upNextTask.response
-      pushScreen(m.upNextScreen, false, false)
-      m.ScreenStack.visible = true
+  tubiLog("ContentController.onEpisodeCredits") 
+  if m.videoPlayer.creditsPosition > 0
+    ' Verify that the UpNextTask has a response and it matches the currently playing content
+    currentContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
+    if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
+      if m.upNextTask.response.getChildCount() > 0
+        if m.upNextScreen <> invalid
+          m.upNextScreen.unobserveFieldScoped("contentSelected")
+          m.upNextScreen.unobserveFieldScoped("backPressed")
+          m.upNextScreen.unobserveFieldScoped("timeout")
+          m.upNextScreen.unobserveFieldScoped("navigateWithinPageInfo")
+          m.upNextScreen = invalid
+        end if
+        m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
+        m.upNextScreen.observeFieldScoped("contentSelected", "onUpNextContentSelected")
+        m.upNextScreen.observeFieldScoped("backPressed", "onUpNextBackPressed")
+        m.upNextScreen.observeFieldScoped("timeout", "onUpNextTimeout")
+        m.upNextScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+        m.upNextScreen.content = m.upNextTask.response
+        pushScreen(m.upNextScreen, false, false)
+        m.ScreenStack.visible = true
 
-      m.trackingLoggingTask.trackEvent = {
-        type: "autoplay"
-        values: {
-          video_id: m.videoPlayer.content.id.toInt()
-          auto_play_action: "SHOW" 'AutoPlayAction enum
+        m.trackingLoggingTask.trackEvent = {
+          type: "autoplay"
+          values: {
+            video_id: m.videoPlayer.content.id.toInt()
+            auto_play_action: "SHOW" 'AutoPlayAction enum
+          }
         }
-      }
+      end if
     end if
   end if
 End Function
@@ -273,6 +275,11 @@ Function returnToDetailScreenFromVideo(result)
     if currentScreen().content <> invalid and currentScreen().content.id = content.id
       '//So the detailed page does not have a refresh issue, pass the local resume number before the backend communicates.
       nResumePoint = m.videoPlayer.historyPosition '//The problem with this is that if the backend comes back with a different number than the local number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video. The local number is 2 seconds and displays the resume button, but the backend determines that 2 seconds is not enough to warrant a resume button and returns 0 as the resume point.
+
+      if nResumePoint < m.constants.player.historyFrequency or (m.videoPlayer.creditsPosition > 0 and nResumePoint > m.videoPlayer.creditsPosition)
+        '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0
+        nResumePoint = 0
+      end if
       ' Action 1, 3, 5 - same content so just re-populate screen with any updates
       populateDetailScreen(currentScreen(), content, true, nResumePoint)
     else

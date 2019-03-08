@@ -145,7 +145,7 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     else if content.type = m.constants.ui.contentTypes.video and history <> invalid and history.nowPos > 0
       nResumePoint = history.nowPos
     end if
-    if nSavedPosition > 0
+    if nSavedPosition >= 0
       '//If the saved position is passed as greater than 0 than use that number instead. 
       '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct 
       nResumePoint = nSavedPosition

@@ -335,12 +335,17 @@ Function onVideoPositionChange()
     historyPosition(m.playerPosition)
   end if
 
-  if (m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0 and isAtPosition(m.playerPosition, m.top.content.creditsCuePoint))
-    ' Always fire history here to fix a race condition where the user has
-    ' watched beyond the cuepoint but the title doesn't get removed due
-    ' to no history events triggering after the cuepoint
-    historyPosition(m.playerPosition + 5)
-    m.top.creditsPosition = m.playerPosition
+  if (m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0)
+    if m.top.creditsPosition > 0 and m.playerPosition < m.top.content.creditsCuePoint
+      '//reset the creditsPosition if the current position is prior to the end credits: i.e. after watching the end credits, the user decided to rewind  before the credits
+      m.top.creditsPosition = 0
+    else if (m.top.creditsPosition <= 0 and m.playerPosition >= m.top.content.creditsCuePoint)
+      ' Always fire history here to fix a race condition where the user has
+      ' watched beyond the cuepoint but the title doesn't get removed due
+      ' to no history events triggering after the cuepoint
+      historyPosition(m.playerPosition + 5)
+      m.top.creditsPosition = m.playerPosition
+    end if
   end if
 
   'Advertisements
