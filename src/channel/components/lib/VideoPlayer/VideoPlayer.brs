@@ -714,15 +714,19 @@ End Function
 ' adState values are: init, fetching, adspending, noads, adsplaying, adsclosed, noads
 Function onAdStateChange()
   tubiLog("VideoPlayer.onAdStateChange adState = " + m.top.adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
-  ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
-  ' video playback stopped and should play right away when we get adspending.
-  if m.top.adState = "adspending" and (m.top.adControl = "preroll" or m.top.adControl = "seek") and m.top.enableAds then
+  if m.top.adState = "init" and m.top.adControl <> ""
+    ' There is a race condition that can occur during deeplinks such that m.top.adControl can be set before the adShim is listening
+    ' which results in a ad/video loading screen that never loads. Reset the ad control once the ad state is in init if this is the case
+    ' to fix the issue.
+    m.top.adControl = m.top.adControl
+  else if m.top.adState = "adspending" and (m.top.adControl = "preroll" or m.top.adControl = "seek") and m.top.enableAds then
+    ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
+    ' video playback stopped and should play right away when we get adspending.
     ' pre-roll or resume-roll. Play ads right away
     showAdBreak()
-  ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
-  'TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
   else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip") and m.Video.state <> "playing" then
-    ' Came back from an ad break
+    ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
+    ' TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
     ' Set the m.Video.control prior to the m.Video.seek to ensure that the video is not started from the beginning even if m.playerPosition <> 0.
     ' This is a seeming inconsistency with the firmware and should not neccessarily work this way, but it does.
     ' Normally we would expect to set the seek prior to setting control to "play"
