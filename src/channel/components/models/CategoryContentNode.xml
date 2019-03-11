@@ -29,8 +29,8 @@
 
     <field id="slug" type="string" />
 
-    <!-- time fetched from the service -->
-    <field id="fetchedAt" type="integer"/>
+    <!-- if UpTime(0) > validUntil, then refetch metadata for this container/category -->
+    <field id="validUntil" type="integer"/>
 
   </interface>
 </component>

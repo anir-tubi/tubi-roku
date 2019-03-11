@@ -3,8 +3,6 @@
 ' showDetailScreen
 '
 ' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
-' @sourceTrackingUri: the uri of the previous screen for tracking
-' @detailScreen: in case we are reloading and existing screen rather than creating a new one
 Function showDetailScreen(content)
   tubiLog("DetailScreenHelpers.showDetailScreen")
   if content <> invalid
@@ -23,6 +21,7 @@ Function showDetailScreen(content)
     detailScreen.observeFieldScoped("backgroundUriList", "onDetailBackgroundChange")
     detailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
     detailScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+    detailScreen.observeFieldScoped("refreshContent", "onRefreshContentSignal")
 
     if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
       detailScreen.isLoading = true
@@ -70,6 +69,15 @@ Function onDetailScreenChannelSelected(msg)
     showChannelScreen(channelNode)
   end if
 End Function
+
+
+'detail screen has told us that the content or related content is out of cache window, so refresh
+Function onRefreshContentSignal(msg)
+  detailScreen = msg.getRoSGNode()
+  m.refreshingDetailCache = true
+  getSingleContentFromServer(detailScreen, detailScreen.content)
+End Function
+
 
 '''''''''''''''''''''
 ' populateDetailScreen
@@ -193,6 +201,7 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
 End Function
 
 
+'@screen: roSGNode, a detail screen node
 '@content: roSGNode, a TubiContentNode
 Function getSingleContentFromServer(screen, content)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
@@ -208,7 +217,6 @@ Function getSingleContentFromServer(screen, content)
     refreshTask.target = screen
     screen.addField("task", "node", false)
     screen.task = refreshTask
-    screen.addField("sourceTrackingUri", "string", false)
     refreshTask.observeField("response", "onSingleContentResponse")
     refreshTask.observeField("error", "onSingleContentError")
     refreshTask.control = "RUN"
@@ -356,12 +364,16 @@ Function onSingleContentResponse(msg) As Void
     loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000)  'in ms
   end if
 
-  if m.enteredFromDeepLink = false
+  if m.enteredFromDeepLink = false and m.refreshingDetailCache = false
     oldScreen = getHiddenScreen(1)  'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
     if oldScreen <> invalid
       screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
     end if
     screenTrackingLoad(detailScreen.trackingPageInfo, loadTime)
+  end if
+
+  if m.refreshingDetailCache = true
+    m.refreshingDetailCache = false
   end if
 
   if afterFn <> invalid
@@ -384,6 +396,8 @@ Function onSingleContentError(msg)
     popScreen()
     sendDeeplinkAnalytics(m.top.deepLinkContent, "home", m.Tracking, m.trackingLoggingTask)
     startOnNow()
+  else if m.refreshingDetailCache = true
+    m.refreshingDetailCache = false
   else
     message = "Could not retrieve content information from server."
     getSingleContentParams = [detailScreen, detailScreen.content, detailScreen.trackingUri]

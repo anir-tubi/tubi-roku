@@ -46,7 +46,7 @@ End Function
 '
 ' This is a recursive function that does the heavy lifting for translateContentFromServer
 'this is a recursive function that does the heavy lifting for translateContentFromServer
-Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object, fetchedAt=invalid) As Integer
+Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object) As Integer
   if contentFromServer = invalid then return 0
 
   count = 1
@@ -294,16 +294,13 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.channel_name <> invalid then translatedContent.channelName = contentFromServer.channel_name
 
   if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
-
   if contentFromServer.availability_ends <> invalid then translatedContent.availabilityEnds = contentFromServer.availability_ends
 
-
-  ' Allow this to be passed in, so for cases where we lazily translate it can contain
-  ' the right time
-  if fetchedAt <> invalid then
-    translatedContent.fetchedAt = fetchedAt
+  'set the time past which the content metadata should be refreshed from the server
+  if contentFromServer.valid_duration <> invalid
+    translatedContent.validUntil = UpTime(0) + contentFromServer.valid_duration
   else
-    translatedContent.fetchedAt = m.fetchedAtTimestamp_()
+    translatedContent.validUntil = UpTime(0) + m.constants.cacheTimes.content
   end if
 
   'take care of any children the content might have
@@ -316,7 +313,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     for each childContent in contentFromServer.children
       node = translatedContent.createChild("TubiContentNode")
       ' pass the resolved fetchedAt time so that it doesn't have to be generated again for every child
-      count = count + m.translateRecursive(childContent, node, translatedContent.fetchedAt)
+      count = count + m.translateRecursive(childContent, node)
     end for
 
   end if
@@ -340,7 +337,7 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
     if parsed <> invalid
       fullContent = parsed[contentId]
       translated = CreateObject("roSGNode", "TubiContentNode")
-      m.translateRecursive(fullContent, translated, category.fetchedAt)
+      m.translateRecursive(fullContent, translated)
       return translated
     end if
   end if
@@ -354,13 +351,29 @@ End Function
 '
 ' Expect content from the /related API, structured as an array of assocarrays
 Function tubiMetadataTranslate_translateRelatedContent(contentFromServer)
-  translated = CreateObject("roSGNode", "TubiContentNode")
+  translated = CreateObject("roSGNode", "CategoryContentNode")
   if type(contentFromServer) = "roArray"
+    shortestValidDuration = invalid
     for each content in contentFromServer
       node = translated.createChild("TubiContentNode")
       m.translateRecursive(content, node)
+
+      if shortestValidDuration = invalid
+        shortestValidDuration = content.valid_duration
+      else if content.valid_duration <> invalid
+        if content.valid_duration < shortestValidDuration
+          shortestValidDuration = content.valid_duration
+        end if
+      end if
     end for
+
+    if shortestValidDuration <> invalid
+      translated.validUntil = UpTime(0) + shortestValidDuration
+    else
+      translated.validUntil = m.constants.cacheTimes.category
+    end if
   end if
+
   return translated
 End Function
 
@@ -414,13 +427,18 @@ End Function
 '
 Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "CategoryContentNode")
-  fetchedAt = m.fetchedAtTimestamp_()
   homescreenAA = {
     id: ""
     title: ""
-    fetchedAt: fetchedAt
+    validUntil: 0
     children: []    'categories
   }
+
+  if contentToTranslate.valid_duration <> invalid
+    homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
+  else
+    homescreenAA.validUntil = m.constants.cacheTimes.homescreen
+  end if
 
   containers = contentToTranslate.containers
   contents = contentToTranslate.contents
@@ -429,14 +447,14 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   for i=0 to containers.count()-1
     container = containers[i]
     if container.type <> "complex"
-      categoryAA = m.buildCategoryAA_(container, contents, invalid, fetchedAt)
+      categoryAA = m.buildCategoryAA_(container, contents, invalid)
       if categoryAA <> invalid
         homescreenAA.children.push(categoryAA)
       end if
     else
       for j=0 to container.children.count()-1
         nestedContainer = container.children[j]
-        categoryAA = m.buildCategoryAA_(nestedContainer, contents, invalid, fetchedAt)
+        categoryAA = m.buildCategoryAA_(nestedContainer, contents, invalid)
         if categoryAA <> invalid
           categoryAA.parentId = container.id
           homescreenAA.children.push(categoryAA)
@@ -465,11 +483,10 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson) 
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
   contents = contentToTranslate.contents
-  fetchedAt = m.fetchedAtTimestamp_()
   contentsJson = m.getContentsJson_(contentToTranslate, fullJson)
 
   node_count = 0
-  categoryMetadata = m.buildCategoryAA_(container, contents, contentsJson, fetchedAt)
+  categoryMetadata = m.buildCategoryAA_(container, contents, contentsJson)
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
     return invalid
   end if
@@ -516,7 +533,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       description: container.description
       totalCount: 0
       offset: m.constants.performance.categoryGridList.initialBlockSize
-      fetchedAt: fetchedAt
+      validUntil: 0
       json: ""
       state: "partial"
     }
@@ -529,6 +546,13 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       withPrepend = false
       updateMetadata.type = m.contentTypes.category
     end if
+
+    if container.valid_duration <> invalid
+      updateMetadata.validUntil = container.valid_duration
+    else
+      updateMetadata.validUntil = m.constants.cacheTimes.category
+    end if
+
     jsonAA = {}
     validCount = 0
     children = []
@@ -668,7 +692,7 @@ Function tubiMetadataTranslate_translate(contentToTranslate) As Object
       for each content in contentToTranslate
         if content.title <> "After Hours" or m.allowAfterHours = true
           node = translated.createChild("TubiContentNode")
-          node_count = node_count + m.translateRecursive(content, node, fetchedAt)
+          node_count = node_count + m.translateRecursive(content, node)
         end if
       end for
 
@@ -677,14 +701,14 @@ Function tubiMetadataTranslate_translate(contentToTranslate) As Object
 
       'expect this to happen just for the search API
       if contentToTranslate.children <> invalid
-        node_count = m.translateRecursive(contentToTranslate, translated, fetchedAt)
+        node_count = m.translateRecursive(contentToTranslate, translated)
       
       'expect this to happen for history/queue content
       else
         for each content in contentToTranslate
           if contentToTranslate[content] <> invalid
             node = translated.createChild("TubiContentNode")
-            node_count = node_count + m.translateRecursive(contentToTranslate[content], node, fetchedAt)
+            node_count = node_count + m.translateRecursive(contentToTranslate[content], node)
           end if
         end for
       end if
@@ -712,12 +736,17 @@ Function tubiMetadataTranslate_translateChannel(contentToTranslate)
     translated.logoUri = container.logo
     translated.type = m.contentTypes.channel
     translated.slug = container.slug
-    translated.fetchedAt = fetchedAt
+
+    if container.valid_duration <> invalid
+      translated.validUntil = Uptime(0) + container.valid_duration
+    else
+      translated.validUntil = m.constants.cacheTimes.category
+    end if
 
     for i=0 to container.children.count()-1
       child = contentToTranslate.contents[contentToTranslate.container.children[i]]
       node = translated.createChild("TubiContentNode")
-      node_count += m.translateRecursive(child, node, fetchedAt)
+      node_count += m.translateRecursive(child, node)
     end for
   end if
   m.setTotalCount_(translated)

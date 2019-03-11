@@ -103,6 +103,11 @@ Function onScreenFocusChange()
     m.focusTarget.setFocus(true)
     ' force a background update
     m.top.backgroundUriList = m.top.backgroundUriList
+
+    'determine if the content should be refreshed
+    if shouldRefresh(m.top.content) = true or shouldRefresh(m.top.relatedContent) = true
+      m.top.refreshContent = true
+    end if
   end if
 End Function
 
@@ -455,6 +460,7 @@ Function focusMenu(immediately=false)
   end if
 End Function
 
+
 Function focusRelated()
   m.focusTarget = m.RelatedGrid
   if m.top.isInFocusChain()
@@ -464,6 +470,7 @@ Function focusRelated()
   animate(m.RelatedContentGroup, { opacity: 1.0, duration: m.focusAnimationDuration })
   animate(m.Info, { opacity: 0.2, duration: m.focusAnimationDuration })
 End Function
+
 
 Function focusInfo()
   m.focusTarget = m.Info

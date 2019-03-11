@@ -63,9 +63,6 @@
     <field id="channelId" type="string" />
     <field id="channelName" type="string" />
 
-    <!-- time fetched from the service -->
-    <field id="fetchedAt" type="integer"/>
-
     <!-- individual stream resources -->
     <field id="videoResources" type="array"/>
 
@@ -76,5 +73,8 @@
 
     <!-- availability_ends: "2019-03-31T00:00:00Z" -->
     <field id="availabilityEnds" type="string"/>
+
+    <!-- if UpTime(0) > validUntil, then refetch metadata for this content -->
+    <field id="validUntil" type="integer"/>
   </interface>
 </component>

@@ -374,6 +374,7 @@ Function getConstants()
     constants.timers.stillWatchingDismissTimeout = 10 * 60
     constants.timers.stillWatchingExperimentStart = 1525712400  ' May 7, 10am PDT
     constants.timers.stillWatchingExperimentEnd = 1525798800  ' May 8, 10am PDT
+
   'constants needed for the video player
   constants.player = {}
 
@@ -403,8 +404,6 @@ Function getConstants()
     constants.player.stillWatchingStopOnTimeout = invalid
 
     constants.player.thumbnailFrequency = 5
-
-    constants.player.maxAgeStreamUrl = 2 * 60 * 60 ' Time in seconds after which we consider a stream url stale
 
     'video player returns one of the following
     constants.player.playerResults = {}
@@ -470,6 +469,13 @@ Function getConstants()
         constants.player.drmTypes.dashPlayready
         constants.player.drmTypes.hlsv3
       ]
+
+  'Default times for which the caches for different content types are valid.
+  'These will normally come from the server, these times stored in constants are backup values.
+  constants.cacheTimes = {}
+    constants.cacheTimes.content = 2 * 60 * 60 ' Time in seconds after which an individual piece of content' cache is not valid
+    constants.cacheTimes.category = 4 * 60 * 60 ' Time in seconds after which a category's cache is not valid
+    constants.cacheTimes.homescreen = 6 * 60 * 60 ' Time in seconds after which the category screen's cache is not valid
 
   'UI properties that should be passed into the scene graph
   constants.ui = {}

@@ -38,6 +38,12 @@ End Function
 Function onScreenFocusChange()
   if m.top.hasFocus() = true
     m.focusTarget.setFocus(true)
+
+    if m.top.content <> invalid
+      if shouldRefresh(m.top.content) = true  'cacheValidationMixin
+        m.top.refreshChannel = true
+      end if
+    end if
   end if
 End Function
 
@@ -129,6 +135,7 @@ Function onContentChange()
   end if
 End Function
 
+
 Function onIsLoading()
   tubiLog("ChannelDetailScreen.onIsLoading")
   if m.top.isLoading = true
@@ -141,6 +148,7 @@ Function onIsLoading()
     m.RowList.visible = true
   end if
 End Function
+
 
 Function onRowItemFocused()
   tubiLog("ChannelDetailScreen.onRowItemFocused")

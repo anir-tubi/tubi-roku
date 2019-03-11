@@ -158,8 +158,8 @@ Function refreshContent(nowPos)
     m.Thumbnail.visible = false
     m.Thumbnail.numSprites = 0
     m.Thumbnail.spriteUrls = []
-    threshold = CreateObject("roDateTime").AsSeconds() - m.constants.player.maxAgeStreamUrl
-    if content.url <> invalid and content.url <> "" and content.fetchedAt <> invalid and content.fetchedAt > threshold
+
+    if content.url <> invalid and content.url <> "" and content.validUntil <> invalid and content.validUntil >= UpTime(0)
       ' we already have a valid url, so only need to get thumbnail/sprites
       prepareToStartVideo(content, 0)
       requestDetails = {

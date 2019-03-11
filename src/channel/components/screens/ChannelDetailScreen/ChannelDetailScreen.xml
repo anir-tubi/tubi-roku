@@ -13,6 +13,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
@@ -29,6 +30,10 @@
 
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
+
+      <!-- tells ContentController/ChannelScreenHelpers that the category metadata
+           for the channel content is out of the cache window and should be updated -->
+      <field id="refreshChannel" type="boolean" alwaysNotify="true" />
 
       <!-- Keeps the information used for user tracking - structure looks like:
         {

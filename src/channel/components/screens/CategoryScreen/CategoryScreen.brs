@@ -234,6 +234,10 @@ Function onScreenFocusChange()
       m.CategoryList.setFocus(true)
       m.categoryListIsFocused = true
     end if
+
+    if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
+      loadAllCategories()
+    end if
   else if m.top.isInFocusChain() = false
     m.gridHasFocus = false
     m.listHasFocus = false
