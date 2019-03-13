@@ -310,18 +310,19 @@ End Function
 Function populateInfoPanel(focusedContent)
   if focusedContent <> invalid
     m.InfoPanel.title = focusedContent.title
-    m.InfoPanel.releaseDate = focusedContent.releaseDate
     m.InfoPanel.genres = focusedContent.genres
-    m.InfoPanel.length = focusedContent.length
-    m.InfoPanel.rating = focusedContent.rating
     m.InfoPanel.description = focusedContent.description
-
-    if (focusedContent.hasSubtitles = true or not m._.empty(focusedContent.subtitleTracks))
-      m.InfoPanel.hasCC = true
+    info = {}
+    info.releaseDate = focusedContent.releaseDate
+    info.length = focusedContent.length
+    info.rating = focusedContent.rating
+    if (focusedContent.hasSubtitles or not m._.empty(focusedContent.subtitleTracks))
+      info.hasCC = true
     else
-      m.InfoPanel.hasCC = false
+      info.hasCC = false
     end if
 
+    m.InfoPanel.lineOneData = info
     m.InfoPanel.calculateHeight = true
   end if
 End Function
