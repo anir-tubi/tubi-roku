@@ -251,6 +251,7 @@ End Function
 '
 ' Hide the info panel and bring back the keyboard
 Function startFocusKeyboard()
+  resetMetaData()
   m.TranslationInterpolator.keyValue = [[85,545],[85,315]]
   m.SearchText.font.size = 67
   keyboardRect = m.Keyboard.boundingRect()
@@ -303,6 +304,13 @@ Function loadSearchResults(bDefaultResults = false)
   end if
 End Function
 
+'''''''''''''''''''''
+' resetMetaData
+'
+Function resetMetaData()
+  m.top.backgroundUriList = [m.defaultHeroUri]
+  populateInfoPanel(invalid)
+End Function
 
 '''''''''''''''''''''
 ' populateInfoPanel
@@ -324,6 +332,11 @@ Function populateInfoPanel(focusedContent)
 
     m.InfoPanel.lineOneData = info
     m.InfoPanel.calculateHeight = true
+  else 
+    m.InfoPanel.title = ""
+    m.InfoPanel.genres = []
+    m.InfoPanel.description = ""
+    m.InfoPanel.lineOneData = {}
   end if
 End Function
 
