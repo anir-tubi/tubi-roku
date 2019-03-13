@@ -207,6 +207,7 @@ Function getConstants()
   constants.reqNames = {}
     constants.reqNames.searchAPI = "searchAPI"
     constants.reqNames.getHomescreen = "getHomescreen"
+    constants.reqNames.getSearchDefault = "getSearchDefault"
     constants.reqNames.getCategory = "getCategory"
     constants.reqNames.getSingleContent = "getSingleContent"
     constants.reqNames.getUpNextContent = "getUpNextContent"
@@ -214,6 +215,11 @@ Function getConstants()
     constants.reqNames.getThumbnails = "getThumbnails"
     constants.reqNames.getChannel = "getChannel"
 
+
+  'the different thumbnail orientations 
+  constants.orientations = {}
+    constants.orientations.landscape = "landscape"
+    constants.orientations.portrait = "portrait"
 
   'Nielsen ID token for integrating with Nielsen DAR
   constants.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"

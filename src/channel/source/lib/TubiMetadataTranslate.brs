@@ -479,14 +479,14 @@ End Function
 ' 1) Use ContentNode instead of TubiContentNode
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
-Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson) As Object
+Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = invalid, bFullData = false) As Object
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
   contents = contentToTranslate.contents
   contentsJson = m.getContentsJson_(contentToTranslate, fullJson)
 
   node_count = 0
-  categoryMetadata = m.buildCategoryAA_(container, contents, contentsJson)
+  categoryMetadata = m.buildCategoryAA_(container, contents, contentsJson, fetchedAt, sOrientation, bFullData)
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
     return invalid
   end if
@@ -503,7 +503,19 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson) 
   ' to avoid having to define a custom content node which have
   ' proven to be much slower to instantiate.  Could use some testing,
   ' though.
+  sLandscape = false
   if container.id = m.constants.ui.categoryIds.featured
+    sLandscape = true
+  end if
+
+  if sOrientation <> invalid 
+    if sOrientation = m.constants.orientations.landscape 
+      sLandscape = true
+    else if sOrientation = m.constants.orientations.portrait
+      sLandscape = false
+    end if
+  end if 
+  if sLandscape = true
     for i = 0 to translated.getChildCount()-1
       child = translated.getChild(i)
       child.addField("isLandscape", "boolean", false)
@@ -522,10 +534,12 @@ End Function
 ' @container: assocArray, a single container as found in the matrix API
 ' @contents: assocArray, a set of content meta data as found in the matrix API
 ' @contentsJson: string, the JSON string of just the contents portion of the matrix API
+' @sOrientation: string, should the thumbnail be a portrait or landscape
+' @bFullData: boolean, Should the full data be parsed and passed to the video children?
 '
 ' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson=invalid, fetchedAt=invalid)
-  updateMetadata = {}
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson=invalid, fetchedAt=invalid, sOrientation = invalid, bFullData = false)
+  updateMetadata = {} 
   if type(container) = "roAssociativeArray" and type(contents) = "roAssociativeArray"
     updateMetadata = {
       id: container.id
@@ -577,15 +591,37 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       ' For all other categories, assume all contents are valid.
       if contents[child] <> invalid and contents[child].valid <> false
         fullChild = contents[child]
+        sType = "ContentNode"
+        if bFullData = true
+          '//if true then set children to TubiContentNode type so more data is passed to the children
+          sType = "TubiContentNode"
+        end if
 
         childAA = {
           id: fullChild.id
           title: fullChild.title
           description: fullChild.description
           length: fullChild.duration
-          subtype: "ContentNode"
+          subtype: sType
         }
-        if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid then
+        bLandscape = false
+        if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid
+          bLandscape = true
+        end if
+        
+        if sOrientation <> invalid
+          if sOrientation = m.constants.orientations.landscape and fullChild.hero_images <> invalid
+            bLandscape = true
+          else sOrientation = m.constants.orientations.portrait 
+            bLandscape = false
+          end if 
+        end if 
+
+        if fullChild.backgrounds <> invalid and type(fullChild.backgrounds) = "roArray" and fullChild.backgrounds.count() > 0
+          childAA.backgrounds = m.dedupeBackgrounds_(fullChild.backgrounds)
+        end if
+
+        if bLandscape = true then
           childAA.hdgridposterurl = fullChild.hero_images[0]
         else if fullChild.posterarts <> invalid then
           childAA.hdgridposterurl = fullChild.posterarts[0]

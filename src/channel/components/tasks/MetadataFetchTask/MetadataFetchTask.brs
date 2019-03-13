@@ -123,10 +123,11 @@ Function beginRequest(metadataRequest) As Void
   httpRequest = invalid
   if metadataRequest.name = m.constants.reqNames.getHomescreen
     httpRequest = m.CmsApi.homeScreenReq(m.constants.performance.categoryGridList.initialBlockSize)
-  else if metadataRequest.name = m.constants.reqNames.getCategory
+  else if metadataRequest.name = m.constants.reqNames.getCategory or metadataRequest.name = m.constants.reqNames.getSearchDefault
     categoryId = metadataRequest.id
     limit = m.constants.performance.categoryGridList.finalBlockSize
-    httpRequest = m.CmsApi.categoryReq(categoryId, limit)
+    name = metadataRequest.name
+    httpRequest = m.CmsApi.categoryReq(categoryId, limit, name)
   else if metadataRequest.name = m.constants.reqNames.searchAPI
     limit = m.constants.performance.categoryGridList.finalBlockSize
     httpRequest = m.CmsApi.searchReq(metadataRequest.searchText, limit)
@@ -197,8 +198,15 @@ Function handleResponse(message)
         tubiLog("MetadataFetchTask failed to parse JSON response")
       else
         'indicates a request from the details screen. this request needs to be handled slightly differently
-        if handledRequest.context.name = m.constants.reqNames.getCategory
-          handledRequest.convertedMetadata = m.metadataTranslate.translateContainer(parsed, handledRequest.response.data)
+        if handledRequest.context.name = m.constants.reqNames.getCategory or handledRequest.context.name = m.constants.reqNames.getSearchDefault
+          '//tell translate function to only include specific orientation thumbnails: featured search result 
+          orientation = invalid
+          bFullData = false
+          if handledRequest.context.name = m.constants.reqNames.getSearchDefault
+            orientation = m.constants.orientations.portrait
+            bFullData = true
+          end if
+          handledRequest.convertedMetadata = m.metadataTranslate.translateContainer(parsed, handledRequest.response.data, orientation, bFullData)
         else if handledRequest.context.name = m.constants.reqNames.getHomescreen
           handledRequest.convertedMetadata = m.metadataTranslate.translateHomescreen(parsed)
         else
@@ -206,6 +214,7 @@ Function handleResponse(message)
           handledRequest.convertedMetadata = m.metadataTranslate.translate(parsed)
         end if
       end if
+
       convert_end_time = m.timespan.TotalMilliseconds()
       m.totalConversionTime = m.totalConversionTime + (convert_end_time - request_end_time)
       handledRequest.id = handledRequest.context.id

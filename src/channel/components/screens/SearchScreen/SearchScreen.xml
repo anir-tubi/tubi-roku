@@ -103,6 +103,7 @@
       </Label>
       <Rectangle
         id="Cursor"
+        visible="false"
         height="70"
         width="2"/>
     </LayoutGroup>

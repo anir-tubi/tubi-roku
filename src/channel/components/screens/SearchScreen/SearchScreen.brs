@@ -53,6 +53,8 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the content grid already
   ' has focus, not when it gains focus.
   m.gridHasFocus = false
+
+  loadSearchResults(true)'//load the default search results
 End Function
 
 
@@ -70,6 +72,13 @@ Function onSearchResultsReceived()
   if response.code >= 200 and response.code < 300 then 
     m.ResultGrid.content = m.top.searchResponse.convertedMetadata
     if m.top.searchResponse.convertedMetadata <> invalid and m.top.searchResponse.convertedMetadata.getChildCount() > 0 then
+      if response.name = m.constants.reqNames.getSearchDefault
+        '//display special text when the default search is displaying 
+        m.SearchText.text = "Trending Searches"
+        m.SearchText.color = m.global.constants.ui.colors.titleHeader
+        m.Cursor.visible = false
+        '//::TODO:: set Number of results textfield to = "Popular titles this week"
+      end if
       m.ResultGrid.visible = true
       m.NoResultsMessage.visible = false
     else
@@ -127,12 +136,14 @@ End Function
 ' Launch a search when the keyboard text has changed
 Function onKeyboardTextChanged()
   tubiLog("SearchScreen.onSearchTextChanged " + m.Keyboard.text)
-  m.SearchText.text = m.Keyboard.text  
+  m.SearchText.text = m.Keyboard.text
+  m.SearchText.color = m.global.constants.ui.colors.focused  
   if m.Keyboard.text <> invalid and m.Keyboard.text.len() > 0 then
+    m.Cursor.visible = true
     loadSearchResults()
   else
-    ' if the text was empty, clear out any existing results
-    m.ResultGrid.content = invalid
+    '//if the search text was empty, clear out any existing results and display the default search results
+    loadSearchResults(true)
   end if
 End Function
 
@@ -152,7 +163,6 @@ Function onItemFocused()
     else
       m.top.backgroundUriList = [m.defaultHeroUri]
     end if
-
     ' Set up the info that the ContentController uses to send navigate_within_page events.
     ' Don't change m.top.navigateWithinPageInfo if the focused content hasn't changed
     ' (protects against re-setting when the focus is set upon returning to search page from details page)
@@ -260,7 +270,6 @@ End Function
 Function endFocusKeyboard()
   if m.TextEntryAnimation.state = "stopped" then
     m.TextEntryAnimation.unobserveField("state")
-    m.Cursor.visible = true
     m.Keyboard.setFocus(true)
   end if
 End Function
@@ -270,20 +279,24 @@ End Function
 ' loadSearchResults
 '
 ' Create a request object for the search and hand the request to the metaDataFetchTask which will actually make the request
-Function loadSearchResults()
+Function loadSearchResults(bDefaultResults = false)
   tubiLog("SearchScreen.loadSearchResults")
   searchText = m.Keyboard.text
   ' cancel any in-flight requests
   m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, m.top, "searchResponse")
-  m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", m.constants.reqNames.searchAPI, searchText)
 
-  m.global.trackingLoggingTask.trackEvent = {
-    type: "search"
-    values: {
-      query: Left(searchText, 256)
-      search_type: "PAGE" 'SearchType enum
+  if bDefaultResults = false
+    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", m.constants.reqNames.searchAPI, searchText)
+    m.global.trackingLoggingTask.trackEvent = {
+      type: "search"
+      values: {
+        query: Left(searchText, 256)
+        search_type: "PAGE" 'SearchType enum
+      }
     }
-  }
+  else 
+    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("featured", m.top, "searchResponse", m.constants.reqNames.getSearchDefault)
+  end if
 
   if m.constants.deviceInfo.limitedUi = true
     m.UpdatingSpinner.visible = false
@@ -303,7 +316,7 @@ Function populateInfoPanel(focusedContent)
     m.InfoPanel.rating = focusedContent.rating
     m.InfoPanel.description = focusedContent.description
 
-    if (focusedContent.hasSubtitles or not m._.empty(focusedContent.subtitleTracks))
+    if (focusedContent.hasSubtitles = true or not m._.empty(focusedContent.subtitleTracks))
       m.InfoPanel.hasCC = true
     else
       m.InfoPanel.hasCC = false

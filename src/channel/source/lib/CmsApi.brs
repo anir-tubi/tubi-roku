@@ -112,14 +112,17 @@ End Function
 '''''''''''''''''''''
 ' categoryReq()
 '
-Function cmsApi_getCategoryRequest(categoryId, limit)
+Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid)
   url = m.constants_.urls.matrix.container + "/" + categoryId
+  if name = invalid
+    name = m.constants_.reqNames.getCategory
+  end if
   options = m.commonOptions_()
   options.params.expand = 1
   options.params.cursor = 0
   options.params.limit = limit
   options.params["includeChannels"] = true
-  return m.createAuthRequest_(url, m.constants_.reqNames.getCategory, options)
+  return m.createAuthRequest_(url, name, options)
 End Function
 
 
