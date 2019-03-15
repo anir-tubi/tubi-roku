@@ -174,11 +174,16 @@ Function onInactivityTimer()
             auto_play_action: "STILL_WATCHING"
           }
         }
+
+        contentId = 0
+        if m.videoPlayer.content <> invalid and m.videoPlayer.content.id <> invalid and m.videoPlayer.content.id <> ""
+          contentId = m.videoPlayer.content.id.toInt()
+        end if
         m.trackingLoggingTask.trackEvent = {
           type: "dialog"
           values: {
             dialog_type: "INFORMATION"   'DialogType enum
-            pageOneof: m.Tracking.getAnalyticsPage("video_player_page", {})  'there is no page representation for the video player in protos currently
+            pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: contentId})
           }
         }
       end if
@@ -594,7 +599,7 @@ Function onFirstPosterLoaded()
     values: {
       pageOneof: m.Tracking.getAnalyticsPage("home_page", {})  'a valid page type (see PageLoadEvent in events.protos)
       load_time: loadTime
-      status: "UNKNOWN_ACTION_STATUS"  'ActionStatus enum
+      status: "SUCCESS"  'ActionStatus enum
     }
   }
 

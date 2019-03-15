@@ -142,13 +142,13 @@ Function onMovieItemFocused()
   if m.isUpNextFocused = true
     contentTile = m.Tracking.getAnalyticsTile(m.top.contentFocused, m.GridMovie.itemFocused + 1, 1)
     m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage("video_player_page", {})  'there is no "video_player_page" in protos
+      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: m.top.videoId.toInt()})
       componentOneof: m.Tracking.getAnalyticsComponent("auto_play_component", {content_tile: contentTile})
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
       vertical_location: 1
       vertical_location_mode: "INDEX"  'LocationMode enum
       horizontal_location: m.GridMovie.itemFocused + 1 '1 based index
-      horizontal_location_mode: "COORDINATE"  'LocationMode enum
+      horizontal_location_mode: "INDEX"  'LocationMode enum
     }
   end if
   m.isUpNextFocused = true

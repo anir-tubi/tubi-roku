@@ -25,7 +25,6 @@ Function init()
   m.CategoryList.observeField("itemFocused","onCategoryMenuItemFocused")
   m.CategoryList.observeField("rowScrollFocused","onCategoryListScrollFocused")
   m.CategoryList.observeField("itemSelected", "onCategoryMenuSelected")
-  m.categoryListIsFocused = false
 
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -70,6 +69,9 @@ Function init()
 
   m.gridHasFocus = false
   m.listHasFocus = false
+
+  ' Can be "grid" or "list" for current UI (2/19)
+  m.lastFocused = "grid"
 End Function
 
 
@@ -86,7 +88,6 @@ Function onHomescreenResponse()
       m.InfoPanel.mode = "category"
       m.CategoryList.content = m.categoryContent    ' should be all cateogories but with no content in them
       m.CategoryGridList.content = m.categoryContent  ' should be all categories with initial amounts of content in them
-      if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
     else
       testLog("Category list returned " + stri(response.code))
       ' if we were loading in the background, don't show an error modal
@@ -227,18 +228,26 @@ End Function
 Function onScreenFocusChange()
   tubiLog("CategoryScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus()
-    if m.categoryListIsFocused = false
+    if m.lastFocused = "list"
+      m.CategoryList.setFocus(true)
+      m.listHasFocus = true
+      m.gridHasFocus = false
+    else
       m.CategoryGridList.setFocus(true)
       m.top.backgroundUriList = determineBackgroundImage(m.CategoryGridList.itemFocused)
-    else
-      m.CategoryList.setFocus(true)
-      m.categoryListIsFocused = true
+      m.listHasFocus = false
+      m.gridHasFocus = true
     end if
 
     if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
       loadAllCategories()
     end if
   else if m.top.isInFocusChain() = false
+    if m.listHasFocus = true
+      m.lastFocused = "list"
+    else
+      m.lastFocused = "grid"
+    end if
     m.gridHasFocus = false
     m.listHasFocus = false
   end if
@@ -283,7 +292,7 @@ Function showCategoryMenu()
   if not m.CategoryList.isInFocusChain()
     m.CategoryList.jumpToItem = Int(m.CategoryGridList.currFocusRow)
     m.CategoryList.setFocus(true)
-    m.categoryListIsFocused = true
+    m.listHasFocus = true
     if m.global.constants.deviceInfo.limitedUi
       m.ContentArea.translation = [517,m.ContentArea.translation[1]]
       m.CategoryList.translation = [60,m.CategoryList.translation[1]]
@@ -300,7 +309,7 @@ End Function
 Function hideCategoryMenu()
   if m.CategoryList.isInFocusChain()
     m.CategoryGridList.setFocus(true)
-    m.categoryListIsFocused = false
+    m.listHasFocus = false
     if m.global.constants.deviceInfo.limitedUi
       m.ContentArea.translation = [85,m.ContentArea.translation[1]]
       m.CategoryList.translation = [-380,m.CategoryList.translation[1]]
@@ -346,9 +355,9 @@ Function onCategoryMenuItemFocused() As Void
     m.top.navigateWithinPageInfo = {
       pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
       componentOneof: m.Tracking.getAnalyticsComponent("category_list_component", {}) 'category_list_component doesn't exist in protos
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
       vertical_location: m.CategoryList.itemFocused + 1 '1 based index
-      vertical_location_mode: "COORDINATE"  'LocationMode enum
+      vertical_location_mode: "INDEX"  'LocationMode enum
       horizontal_location: 1
       horizontal_location_mode: "INDEX"  'LocationMode enum
     }
@@ -403,24 +412,29 @@ Function onGridFocusChange() As Void
   end if
 
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen
-  analyticsRow = m.CategoryGridList.cursorPosition[0] + 1
-  analyticsCol = m.CategoryGridList.cursorPosition[1] + 1
-  categoryComponentInfo = {
-    category_slug: m.top.currCategoryId
-    category_row: analyticsRow
-    content_tile: m.Tracking.getAnalyticsTile(focusedContent, analyticsCol, analyticsRow)
-  }
+  oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + 1
+  oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
+  newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 1
+  newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
 
-  if m.gridHasFocus = true
-    m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
-      componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
-      vertical_location: analyticsRow
-      vertical_location_mode: "COORDINATE"  'LocationMode enum
-      horizontal_location: analyticsCol
-      horizontal_location_mode: "COORDINATE"  'LocationMode enum
-    }
+  if m.gridHasFocus = true and oldAnalyticsRow > 0 and oldAnalyticsCol > 0
+    if oldAnalyticsRow <> newAnalyticsRow or oldAnalyticsCol <> newAnalyticsCol
+      categoryComponentInfo = {
+        category_slug: m.top.currCategoryId
+        category_row: oldAnalyticsRow
+        content_tile: m.Tracking.getAnalyticsTile(focusedContent, oldAnalyticsCol, oldAnalyticsRow)
+      }
+
+      m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+        componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
+        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+        vertical_location: newAnalyticsRow
+        vertical_location_mode: "INDEX"  'LocationMode enum
+        horizontal_location: newAnalyticsCol
+        horizontal_location_mode: "INDEX"  'LocationMode enum
+      }
+    end if
   end if
   m.gridHasFocus = true
   m.listHasFocus = false

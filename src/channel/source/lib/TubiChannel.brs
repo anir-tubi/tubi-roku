@@ -85,7 +85,7 @@ Function tubiChannel_runChannel(args) As Void
       return
     end if
 
-    'change the client version so we tracking knows we are using the remote components
+    'change the client version so tracking knows we are using the remote components
     if rodash().get(m, "constants.settings.version") <> invalid
       m.constants.deviceInfo.clientVersion = m.constants.settings.version.Replace("_", ".")
       versions = m.constants.settings.version.split("_")

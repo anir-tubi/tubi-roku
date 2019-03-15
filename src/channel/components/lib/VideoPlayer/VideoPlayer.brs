@@ -404,14 +404,20 @@ End Function
 
 Function onCaptionModeChange()
   tubiLog("VideoPlayer.onCaptionModeChange")
-  language = ""
   if m.Video.globalCaptionMode = "On"
     fade(m.CCRailOn, "in", 0.5)
     fade(m.CCRailOff, "out", 0.5)
     slideTo(m.CCNipple, m.CCNippleOnTranslation, 0.5)
     toggleState = "ON"
+  else  'handles "Off", "Instant replay", and "When mute"
+    fade(m.CCRailOn, "out", 0.5)
+    fade(m.CCRailOff, "in", 0.5)
+    slideTo(m.CCNipple, m.CCNippleOffTranslation, 0.5)
+    toggleState = "OFF"
+  end if
 
-    subtitleUrl = m.Video.subtitleTrack
+  if m.Video.content <> invalid then
+    language = ""
     for i=0 to m.Video.availableSubtitleTracks.count()-1
       trackInfo = m.Video.availableSubtitleTracks[i]
       if m.Video.subtitleTrack = trackInfo.TrackName
@@ -432,14 +438,7 @@ Function onCaptionModeChange()
         end if
       end if
     end for
-  else  'handles "Off", "Instant replay", and "When mute"
-    fade(m.CCRailOn, "out", 0.5)
-    fade(m.CCRailOff, "in", 0.5)
-    slideTo(m.CCNipple, m.CCNippleOffTranslation, 0.5)
-    toggleState = "OFF"
-  end if
 
-  if m.Video.content <> invalid then
     trackEvent({
       type: "subtitles_toggle"
       values: {

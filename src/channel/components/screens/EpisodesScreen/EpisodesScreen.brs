@@ -41,7 +41,8 @@ Function onScreenFocusChange()
   if m.top.hasFocus() then
     'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error
     m.RowList.setFocus(true)
-    m.RowList.setFocus(false) 
+    m.RowList.setFocus(false)
+    m.gridIsFocused = false
     m.RowList.setFocus(true)
   else if m.top.isInFocusChain() = false
     m.gridIsFocused = false 
@@ -61,9 +62,9 @@ Function onSeasonChangeMenu()
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(seriesDetailPage.type, seriesDetailPage.values)
         componentOneof: m.Tracking.getAnalyticsComponent("seasons_component", {}) 'seasons_component doesn't exist in protos
-        means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
         vertical_location: m.Menu.itemFocused + 1  '1 based index
-        vertical_location_mode: "COORDINATE"  'LocationMode enum
+        vertical_location_mode: "INDEX"  'LocationMode enum
         horizontal_location: 1
         horizontal_location_mode: "INDEX"  'LocationMode enum
       }
@@ -104,11 +105,11 @@ Function onEpisodeFocused()
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(seriesDetailPage.type, seriesDetailPage.values)
         componentOneof: m.Tracking.getAnalyticsComponent("episode_video_list_component", episodeListComponent)
-        means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
         vertical_location: row  '1 based index
-        vertical_location_mode: "COORDINATE"  'LocationMode enum
+        vertical_location_mode: "INDEX"  'LocationMode enum
         horizontal_location: col
-        horizontal_location_mode: "COORDINATE"  'LocationMode enum
+        horizontal_location_mode: "INDEX"  'LocationMode enum
       }
     end if
 

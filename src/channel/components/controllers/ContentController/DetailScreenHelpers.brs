@@ -403,6 +403,10 @@ Function onSingleContentError(msg)
     getSingleContentParams = [detailScreen, detailScreen.content, detailScreen.trackingUri]
     showErrorModal(error.code, message, getSingleContentFromServerRetry, getSingleContentParams)
 
+    ' Typically we would want to make a call to screenTrackingLoad() with success=false here to indicate to analytics that the page did not load;
+    ' however, movie details screens do load, and episode details screens don't load, but we don't know the content id of the episode's video
+    ' which means that our page information cannot be built properly and the call is squashed by back end validation. So we just don't send for now.
+
     content = getDetailScreenContent()
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
   end if
@@ -790,8 +794,7 @@ Function sendDeeplinkAnalytics(deepLinkContent, entryPoint, trackingLib, trackin
     end if
     referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("series_detail_page", {series_id: seriesId.toInt()})
   else if entryPoint = "video"
-    ' "video_player_page" does not currently exist in protos, so this is left as a place holder
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("video_player_page", {video_id: deepLinkContent.id.toInt()})
+    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("video_page", {video_id: deepLinkContent.id.toInt()})
   end if
 
   trackingTask.trackEvent = {
@@ -851,7 +854,7 @@ Function sendDialogAnalytics(content, dialogType, trackingLib, trackingTask)
   }
 
   if type(content) = "roSGNode" and content.isSubtype("ContentNode") = true
-    dialogAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("video_page", content.id)
+    dialogAnalyticsEvent.values.pageOneof = trackingLib.getAnalyticsPage("video_page", {video_id: content.id.toInt()})
   end if
 
   trackingTask.trackEvent = dialogAnalyticsEvent

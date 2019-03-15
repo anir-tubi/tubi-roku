@@ -108,7 +108,7 @@ Function tubiTracking_getAnalyticsUser()
   authInfo = m.auth.getAuthInfo()
   if authInfo <> invalid and (type(authInfo.userId) = "roString" or type(authInfo.userId) = "String")
     userId = authInfo.userId.toInt()
-    authType = "UNKNOWN"
+    authType = "CODE"
   else
     userId = 0
     authType = "NOT_AUTHED"
@@ -148,10 +148,14 @@ End Function
 ' See protos.analytics.events.protos -> ClientEvent
 ' See protos.analytics.client.protos -> App
 Function tubiTracking_getAnalyticsApp()
+  majorVersion = m.constants.deviceInfo.majorVersion
+  minorVersion = m.constants.deviceInfo.minorVersion
+  buildVersion = m.constants.deviceInfo.buildVersion
+
   app = {
     platform: m.constants.analyticsPlatform
     app_version: m.constants.deviceInfo.clientVersion
-    app_version_numeric: m.constants.deviceInfo.buildVersion.toInt()
+    app_version_numeric: (majorVersion.toInt() * 1000000) + (minorVersion.toInt() * 1000) + buildVersion.toInt()
     app_height: m.constants.deviceInfo.displayHeight
     app_width: m.constants.deviceInfo.displayWidth
   }
@@ -301,7 +305,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       toggle_state: "" 'ToggleState enum
     }
 
-    autoplay: {   'This event is fired when a user interacts with the autoplay/Up Next UI, not when an autoplay occurs
+    auto_play: {   'This event is fired when a user interacts with the autoplay/Up Next UI, not when an autoplay occurs
       video_id: -1
       auto_play_action: "" 'AutoPlayAction enum
     }
@@ -328,7 +332,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       reason: ""  'Reason enum
     }
 
-    start_ad_break: {
+    start_ad: {
       ad_started: {}  'Ad
       video_id: -1
       start_position: -1
@@ -625,6 +629,10 @@ Function tubiTracking_getOneOfs()
     account_page_type: ""   'PageType enum
   }
 
+  generic_page = {
+    generic_page_type: ""   'GenericPageType enum
+  }
+
   ' onboarding_page = {}   'not currently used
   ' landing_page = {}    'not currently used
   ' splash_page = {}   'not currently used
@@ -645,6 +653,7 @@ Function tubiTracking_getOneOfs()
     login_page: login_page
     register_page: register_page
     account_page: account_page
+    generic_page: generic_page
     ' onboarding_page: onboarding_page
     ' landing_page: landing_page
     ' splash_page: splash_page
@@ -665,6 +674,7 @@ Function tubiTracking_getOneOfs()
     dest_login_page: login_page
     dest_register_page: register_page
     dest_account_page: account_page
+    dest_generic_page: generic_page
     ' dest_onboarding_page: onboarding_page
     ' dest_landing_page: landing_page
     ' dest_splash_page: splash_page

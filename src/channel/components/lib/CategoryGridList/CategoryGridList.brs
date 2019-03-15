@@ -70,8 +70,8 @@ End Function
 Function onComponentFocusChange()
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
   if m.top.hasFocus() then
-    m.RowList.setFocus(true)
     m.justGainedFocus = true
+    m.RowList.setFocus(true)
   end if
 End Function
 
@@ -312,8 +312,9 @@ Function onRowListItemDebounce()
 
   itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
   if itemFocused <> invalid
-    m.top.itemFocused = itemFocused
+    m.top.oldCursorPosition = m.top.cursorPosition
     m.top.cursorPosition = m.RowList.rowItemFocused
+    m.top.itemFocused = itemFocused
   end if
 End Function
 

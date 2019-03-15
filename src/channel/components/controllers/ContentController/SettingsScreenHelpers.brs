@@ -15,10 +15,6 @@ Function showSettingsScreen()
   m.settingsScreen.observeFieldScoped("remoteParentalSetting", "onRemoteParentalSetting")
   m.settingsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
 
-  m.settingsScreen.trackingPageInfo = {
-    pageType: "settings_page"   ' placeholder, does not currently exist in protos
-    pageValues: {}
-  }
   pushScreen(m.settingsScreen, true, true)
 End Function
 
@@ -62,7 +58,7 @@ Function onSettingsSignOutSelected()
     type: "dialog"
     values: {
       dialog_type: "INFORMATION" 'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage("settings_page", {})  'settings_page doesn't exist in protos
+      pageOneof: m.Tracking.getAnalyticsPage("account_page", {account_page_type: "PARENTAL"})  'settings_page doesn't exist in protos
     }
   }
 End Function

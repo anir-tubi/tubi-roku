@@ -105,7 +105,7 @@ Function registrationLoop() As Void
                   type: "account"
                   values: {
                     manip: "REGISTER_DEVICE"
-                    current: "UNKNOWN"
+                    current: "CODE"
                     user_type: "UNKNOWN_USER_TYPE"
                     status: "SUCCESS"
                     linked: ""

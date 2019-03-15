@@ -23,6 +23,13 @@ Function init()
   if m.constants.deviceInfo.scaledUi = true
     m.Menu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
   end if
+
+  m.top.trackingPageInfo = {
+    pageType: "generic_page"
+    pageValues: {
+      generic_page_type: "OTT_MENU"
+    }
+  }
 End Function
 
 Function onComponentFocusChange()
@@ -49,15 +56,15 @@ Function onItemFocused()
 
   'Set the navigateWithinPageInfo value which will pass through to HomeScreen.brs and eventually trigger ContentController
   'to fire a navigate_within_page analytics event.
-  if m.Menu.hasFocus()  'THIS DOESN'T WORK
+  if m.Menu.hasFocus()
     m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage("tools_page", {})  'there is no "tools_page" in protos, so this is a place holder for now
+      pageOneof: m.Tracking.getAnalyticsPage("generic_page", {generic_page_type: "OTT_MENU"})
       componentOneof: m.Tracking.getAnalyticsComponent("tools_component", {}) 'there is no "tools_component" in protos, so this is a place holder for now
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
       vertical_location: 1
       vertical_location_mode: "INDEX"  'LocationMode enum
       horizontal_location: rowItemFocused[1] + 1 '1 based index
-      horizontal_location_mode: "COORDINATE"  'LocationMode enum
+      horizontal_location_mode: "INDEX"  'LocationMode enum
     }
   end if
 End Function

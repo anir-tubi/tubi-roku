@@ -71,7 +71,7 @@ End Function
 ' Update the resume position
 ' This function triggers when the video stops as well as when m.videoPlayer.historyPosition is updated
 Function onEpisodePosition()
-  tubiLog("ContentController.onEpisodePosition")
+  tubiLog("VideoHelpers.onEpisodePosition")
   ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
   history = m.global.historyIds.findNode(m.updateHistoryTask.content.id)
   if history <> invalid or m.videoPlayer.historyPosition > m.constants.player.historyFrequency
@@ -86,36 +86,35 @@ End Function
 
 
 Function onEpisodeCredits()
-  tubiLog("ContentController.onEpisodeCredits") 
-  if m.videoPlayer.creditsPosition > 0
-    ' Verify that the UpNextTask has a response and it matches the currently playing content
-    currentContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
-    if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
-      if m.upNextTask.response.getChildCount() > 0
-        if m.upNextScreen <> invalid
-          m.upNextScreen.unobserveFieldScoped("contentSelected")
-          m.upNextScreen.unobserveFieldScoped("backPressed")
-          m.upNextScreen.unobserveFieldScoped("timeout")
-          m.upNextScreen.unobserveFieldScoped("navigateWithinPageInfo")
-          m.upNextScreen = invalid
-        end if
-        m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
-        m.upNextScreen.observeFieldScoped("contentSelected", "onUpNextContentSelected")
-        m.upNextScreen.observeFieldScoped("backPressed", "onUpNextBackPressed")
-        m.upNextScreen.observeFieldScoped("timeout", "onUpNextTimeout")
-        m.upNextScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-        m.upNextScreen.content = m.upNextTask.response
-        pushScreen(m.upNextScreen, false, false)
-        m.ScreenStack.visible = true
-
-        m.trackingLoggingTask.trackEvent = {
-          type: "autoplay"
-          values: {
-            video_id: m.videoPlayer.content.id.toInt()
-            auto_play_action: "SHOW" 'AutoPlayAction enum
-          }
-        }
+  tubiLog("VideoHelpers.onEpisodeCredits")
+  ' Verify that the UpNextTask has a response and it matches the currently playing content
+  currentContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
+  if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
+    if m.upNextTask.response.getChildCount() > 0
+      if m.upNextScreen <> invalid
+        m.upNextScreen.unobserveFieldScoped("contentSelected")
+        m.upNextScreen.unobserveFieldScoped("backPressed")
+        m.upNextScreen.unobserveFieldScoped("timeout")
+        m.upNextScreen.unobserveFieldScoped("navigateWithinPageInfo")
+        m.upNextScreen = invalid
       end if
+      m.upNextScreen = CreateObject("roSGNode", "UpNextScreen")
+      m.upNextScreen.observeFieldScoped("contentSelected", "onUpNextContentSelected")
+      m.upNextScreen.observeFieldScoped("backPressed", "onUpNextBackPressed")
+      m.upNextScreen.observeFieldScoped("timeout", "onUpNextTimeout")
+      m.upNextScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+      m.upNextScreen.videoId = m.videoPlayer.content.id
+      m.upNextScreen.content = m.upNextTask.response
+      pushScreen(m.upNextScreen, false, false)
+      m.ScreenStack.visible = true
+
+      m.trackingLoggingTask.trackEvent = {
+        type: "auto_play"
+        values: {
+          video_id: m.videoPlayer.content.id.toInt()
+          auto_play_action: "SHOW" 'AutoPlayAction enum
+        }
+      }
     end if
   end if
 End Function
@@ -139,35 +138,35 @@ Function playUpNextContent(nextContent, autoplayType)
   content = addSeriesTitle(nextContent, oldContent)
   stopVideoContent(m.constants.player.playerResults.completed, false)
   playVideoContent(content, autoplayType)
-  popScreen()
-  m.upNextScreen.unobserveField("contentSelected")
-  m.upNextScreen.unobserveField("timeout")
-  m.upNextScreen.unobserveField("backPressed")
+  popScreen(false) ' pop the up next screen off the screen stack
+  m.upNextScreen.unobserveFieldScoped("contentSelected")
+  m.upNextScreen.unobserveFieldScoped("timeout")
+  m.upNextScreen.unobserveFieldScoped("backPressed")
   m.upNextScreen = invalid
 End Function
 
 
 Function onUpNextTimeout()
-  tubiLog("ContentController.onUpNextTimeout")
+  tubiLog("VideoHelpers.onUpNextTimeout")
   playUpNextContent(m.upNextScreen.contentFocused, "automatic")
 End Function
 
 
 ' Triggered by either a button press or by timer expiration
 Function onUpNextContentSelected()
-  tubiLog("ContentController.onUpNextContentSelected")
+  tubiLog("VideoHelpers.onUpNextContentSelected")
   playUpNextContent(m.upNextScreen.contentSelected, "deliberate")
   m.lastUserActivity = Uptime(0)
 End Function
 
 
 Function onUpNextBackPressed()
-  tubiLog("ContentController.onUpNextBackPressed")
+  tubiLog("VideoHelpers.onUpNextBackPressed")
   ' remove the screen and put focus back on the video player transport
-  m.upNextScreen.unobserveField("contentSelected")
-  m.upNextScreen.unobserveField("backPressed")
+  m.upNextScreen.unobserveFieldScoped("contentSelected")
+  m.upNextScreen.unobserveFieldScoped("backPressed")
   m.upNextScreen = invalid
-  popScreen()
+  popScreen(false) 'pop the up next screen off the screen stack
   if m.videoPlayer.state = "finished"
     ' up next was dismissed but playback had already finished
     returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
@@ -177,7 +176,7 @@ Function onUpNextBackPressed()
   end if
   m.lastUserActivity = Uptime(0)
     m.trackingLoggingTask.trackEvent = {
-    type: "autoplay"
+    type: "auto_play"
     values: {
       video_id: m.videoPlayer.content.id.toInt()
       auto_play_action: "DISMISS" 'AutoPlayAction enum
@@ -187,7 +186,7 @@ End Function
 
 
 Function onVideoPlayerState(msg)
-  tubiLog("ContentController.onVideoPlayerState state = " + msg.GetData())
+  tubiLog("VideoHelpers.onVideoPlayerState state = " + msg.GetData())
   state = msg.GetData()
   if state = "error"
     stopVideoContent(m.constants.player.playerResults.failed, true)
@@ -231,7 +230,7 @@ End Function
 
 
 Function onVideoPlayerBackPressed()
-  tubiLog("ContentController.onVideoPlayerBackPressed")
+  tubiLog("VideoHelpers.onVideoPlayerBackPressed")
   returnToDetailScreenFromVideo(m.constants.player.playerResults.closed)
 End Function
 
@@ -284,7 +283,7 @@ Function returnToDetailScreenFromVideo(result)
       populateDetailScreen(currentScreen(), content, true, nResumePoint)
     else
       ' Action 2 - new content so tear down the screen and rebuild it
-      popScreen()
+      popScreen(false)
       showDetailScreen(content)
     end if
   else
@@ -296,6 +295,7 @@ End Function
 
 ' Stop the video player and optionally return to the screen stack
 Function stopVideoContent(playerResult, showScreenStack)
+  tubiLog("VideoHelpers.stopVideoContent")
   videoTrackingStop()
   m.videoPlayer.unobserveFieldScoped("backButtonPressed")
   m.videoPlayer.unobserveFieldScoped("state")
@@ -344,14 +344,13 @@ Function stopVideoContent(playerResult, showScreenStack)
     current = currentScreen()
     if current <> invalid
       current.setFocus(true)
-      screenTrackingLoad(current.trackingPageInfo)
     end if
   end if
 End Function
 
 
 Function onSkipTrailer()
-  tubiLog("ContentController.onSkipTrailer")
+  tubiLog("VideoHelpers.onSkipTrailer")
   stopVideoContent(m.constants.player.playerResults.completed, false)
   playVideoContent(getDetailScreenContent(), "none")
 End Function
@@ -361,13 +360,17 @@ End Function
 ' onPlayerError
 '
 Function showPlayerError(errorMessage As String)
-  tubiLog("ContentController.showPlayerError")
+  tubiLog("VideoHelpers.showPlayerError")
   showErrorModal(0, errorMessage, onRetryPlayerError, [], onCancelPlayerError, [])
+  videoId = 0
+  if m.videoPlayer <> invalid and m.videoPlayer.content <> invalid and m.videoPlayer.content.id <> invalid
+    videoId = m.videoPlayer.content.id.toInt()
+  end if
   m.trackingLoggingTask.trackEvent = {
     type: "dialog"
     values: {
       dialog_type: "WARNING" 'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage("video_player_page", analyticsContent)  ' There currently is no video_player_page in protos
+      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId})
     }
   }
 End Function

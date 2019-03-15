@@ -10,6 +10,7 @@
       <field id="content" alias="SettingsMenu.content"/>
       <field id="itemSelected" alias="SettingsMenu.itemSelected"/>
       <field id="itemFocused" alias="SettingsMenu.itemFocused"/>
+      <field id="itemUnfocused" alias="SettingsMenu.itemUnfocused"/>
   </interface>
 
   <children>

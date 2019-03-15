@@ -26,6 +26,14 @@ Function init()
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("parentalSettingUpdated", "onSignedInChange")
 
+  'set initial tracking values
+  m.top.trackingPageInfo = {
+    pageType: "account_page"
+    pageValues: {
+      account_page_type: "PARENTAL"
+    }
+  }
+
   ' used to compare if a newly focused item gained focus from a different item while scrolling,
   ' or gained focus from a different component/screen
   m.menuIsFocused = false
@@ -55,15 +63,16 @@ Function onMenuItemFocused()
   tubiLog("SettingsScreen.onMenuItemFocused")
   m.Title.opacity = 1.0
 
-  if m.menuIsFocused = true
+  ' send navigate_within_page events for settings screen
+  if m.menuIsFocused = true and m.SettingsMenuPanel.itemUnfocused > -1
     row = m.SettingsMenuPanel.itemFocused + 1
     col = 1
     m.top.navigateWithinPageInfo = {
       pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("settings_menu_component", {}) 'settings_menu_component doesn't exist in protos
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      componentOneof: m.Tracking.getAnalyticsComponent("account_menu_component", {}) 'account_menu_component doesn't exist in protos
+      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
       vertical_location: row
-      vertical_location_mode: "COORDINATE"  'LocationMode enum
+      vertical_location_mode: "INDEX"  'LocationMode enum
       horizontal_location: col
       horizontal_location_mode: "INDEX"  'LocationMode enum
     }
@@ -81,6 +90,8 @@ Function onComponentFocusChange()
     else
       m.Title.opacity = 0.3
     end if
+  else
+    m.menuIsFocused = false
   end if
 End Function
 

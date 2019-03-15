@@ -20,12 +20,15 @@
          be observed by the contentController via videoHelpers
          which will be responsible for sending navigate_within_page events.
     -->
-    <field id="navigateWithinPageInfo" type="assocarray" />
+    <field id="navigateWithinPageInfo" type="assocarray"/>
     
     <!--
       - INPUTS
       -->
     <field id="content" type="node" alwaysNotify="true"/>
+
+    <!-- The video id of the content that is playing when the Up Next UI begins -->
+    <field id="videoId" type="string"/>
   </interface>  
 
   <children>

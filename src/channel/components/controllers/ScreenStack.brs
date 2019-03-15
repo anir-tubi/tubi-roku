@@ -170,12 +170,18 @@ End Function
 ' screenTrackingLoad
 '
 ' tracking for loading a new screen
-Function screenTrackingLoad(trackingPageInfo, loadTime=0)
+Function screenTrackingLoad(trackingPageInfo, loadTime=0, success=true)
   pageType = ""
   pageValues = {}
   if trackingPageInfo <> invalid
     pageType = trackingPageInfo.pageType
     pageValues = trackingPageInfo.pageValues
+  end if
+
+  if success = true
+    status = "SUCCESS"
+  else
+    status = "FAIL"
   end if
 
   'tracking for loading screen
@@ -184,7 +190,7 @@ Function screenTrackingLoad(trackingPageInfo, loadTime=0)
     values: {
       pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)  'a valid page type (see PageLoadEvent in events.protos)
       load_time: loadTime
-      status: "UNKNOWN_ACTION_STATUS"  'ActionStatus enum
+      status: status  'ActionStatus enum
     }
   }
 End Function

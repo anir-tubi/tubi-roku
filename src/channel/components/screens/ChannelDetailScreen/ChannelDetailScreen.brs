@@ -111,6 +111,7 @@ Function hideButtonList(buttonList, rowList)
   rowList.setFocus(true)
   '//an extra call to setFocus() is needed to set the proper focus due to a bug in the roku Rowlist component that offsets the cursor in error
   m.RowList.setFocus(false)
+  m.contentIsFocused = false
   m.RowList.setFocus(true)
   m.focusTarget = rowList
 
@@ -175,11 +176,11 @@ Function onRowItemFocused()
     m.top.navigateWithinPageInfo = {
       pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
       componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponent)
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
       vertical_location: row '1 based index
       vertical_location_mode: "INDEX"  'LocationMode enum
       horizontal_location: col
-      horizontal_location_mode: "COORDINATE"  'LocationMode enum
+      horizontal_location_mode: "INDEX"  'LocationMode enum
     }
   end if
   m.contentIsFocused = true

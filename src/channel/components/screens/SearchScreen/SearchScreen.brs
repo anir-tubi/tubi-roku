@@ -177,9 +177,9 @@ Function onItemFocused()
         navigateWithinPageInfo = {
           pageOneof: m.Tracking.getAnalyticsPage("search_page", {query: Left(m.Keyboard.text, 256)})
           componentOneof: m.Tracking.getAnalyticsComponent(searchComponent.componentType, searchComponent.componentValues)
-          means_of_navigation: "SCROLL"  'MeansOfNavigation enum
-          vertical_location_mode: "COORDINATE"  'LocationMode enum
-          horizontal_location_mode: "COORDINATE"  'LocationMode enum
+          means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+          vertical_location_mode: "INDEX"  'LocationMode enum
+          horizontal_location_mode: "INDEX"  'LocationMode enum
         }
 
         if searchComponent.componentValues <> invalid and searchComponent.componentValues.content_tile <> invalid

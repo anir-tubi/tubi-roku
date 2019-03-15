@@ -388,11 +388,11 @@ Function onRelatedItemFocused()
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId} )
         componentOneof: m.Tracking.getAnalyticsComponent("related_component", ymalComponent) 'category_list_component doesn't exist in protos
-        means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
         vertical_location: row '1 based index
         vertical_location_mode: "INDEX"  'LocationMode enum
         horizontal_location: col
-        horizontal_location_mode: "COORDINATE"  'LocationMode enum
+        horizontal_location_mode: "INDEX"  'LocationMode enum
       }
     end if
     m.relatedHasFocus = true

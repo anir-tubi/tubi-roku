@@ -511,7 +511,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
         start_position: 0
         is_fullscreen: true
       }
-      m.tracking.trackUserEvent("start_ad_break", startAdEvent, m.requestQueue)
+      m.tracking.trackUserEvent("start_ad", startAdEvent, m.requestQueue)
     else if eventType = "Complete" or eventType = "Close"
       if eventType = "Complete"
         endPosition = ctx.duration
