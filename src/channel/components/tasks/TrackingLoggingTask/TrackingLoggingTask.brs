@@ -5,6 +5,7 @@ Function init()
   m.port = CreateObject("roMessagePort")
   m.top.observeField("trackEvent", m.port)
   m.top.observeField("logMsg", m.port)
+  m.top.observeField("logException", m.port)
   m.top.control = "RUN"
 End Function
 
@@ -19,6 +20,10 @@ Function watchLoop()
   tubiLog("TrackingLoggingTask.watchLoop started")
   m.queue = TubiRequestQueue().create(m.port)
   m.constants = m.global.constants   ' this should grab a thread-local copy
+  m.request = TubiRequest()
+  m.auth = TubiAuth(m.constants, m.request)
+  m.logger = TubiLogger(m.constants, m.request, m.auth)
+  m.tracking = TubiTracking(m.constants, m.request, m.auth)
 
   'when the trackEvent field for the metadata task field is updated, the event is heard in this loop
   'and beginRequest() is called
@@ -30,6 +35,9 @@ Function watchLoop()
 
       else if msg.GetField() = "logMsg" then
         sendSceneGraphLog(msg.GetData())
+
+      else if msg.GetField() = "logException" then
+        sendSceneGraphException(msg.GetData())
 
       end if
     else if type(msg) = "roUrlEvent" then
@@ -47,22 +55,19 @@ End Function
 Function trackSceneGraphEvent(evtData)
   if evtData <> invalid and type(evtData.type) = "roString"
     tubiLog("TrackingLoggingTask.trackSceneGraphEvent for " + evtData.type)
-    constants = m.constants
-    Request = TubiRequest()
-    Auth = TubiAuth(constants, Request)
-    Tracking = TubiTracking(constants, Request, Auth)
-
-    Tracking.trackUserEvent(evtData.type, evtData.values, m.queue)  'creates a request and adds it to the requestQueue
+    m.tracking.trackUserEvent(evtData.type, evtData.values, m.queue)  'creates a request and adds it to the requestQueue
   end if
 End Function
 
 
 Function sendSceneGraphLog(logInfo)
-  constants = m.global.constants
-  request = TubiRequest()
-  auth = TubiAuth(constants, request)
-  logger = TubiLogger(constants, request, auth)
-
   'runs the appropriate method (debug, error, etc.) from the logger object and add the log request to the tracking/logging queue
-  logger[logInfo.level](logInfo.message, logInfo.serverTypeName, logInfo.subtype, m.queue)
+  m.logger[logInfo.level](logInfo.message, logInfo.serverTypeName, logInfo.subtype, m.queue)
 End Function
+
+
+Function sendSceneGraphException(logInfo)
+  'runs the appropriate method (debug, error, etc.) from the logger object and add the log request to the tracking/logging queue
+  m.logger.exception(logInfo.level, logInfo.message)
+End Function
+

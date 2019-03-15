@@ -89,7 +89,6 @@ Function onHomescreenResponse()
       m.CategoryList.content = m.categoryContent    ' should be all cateogories but with no content in them
       m.CategoryGridList.content = m.categoryContent  ' should be all categories with initial amounts of content in them
     else
-      testLog("Category list returned " + stri(response.code))
       ' if we were loading in the background, don't show an error modal
       if m.top.isInFocusChain()
         showErrorModal(response.code, response.failReason, retryCategoryList, [], retryCategoryList, [])
@@ -169,7 +168,6 @@ Function onReloadUserCategoriesResponse(msg)
       ' end if
       ' if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
     else
-      testLog("Category list returned " + stri(response.code))
       ' if we were loading in the background, don't show an error modal
       if m.top.isInFocusChain()
         showErrorModal(response.code, response.failReason, retryCategoryList, [], retryCategoryList, [])

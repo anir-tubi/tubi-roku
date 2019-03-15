@@ -8,6 +8,7 @@
 <component name="TrackingLoggingTask" extends="Task">
     <script type="text/brightscript" uri="pkg:/components/tasks/TrackingLoggingTask/TrackingLoggingTask.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Sentry.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
@@ -44,6 +45,17 @@
         -
         -->      
         <field id="logMsg" type="assocarray" alwaysNotify="true"/>
-      
+
+        <!--
+        -
+        - The logException field should have the following form
+        - {
+        -   message: string, the message to be logged
+        -   level: string, the type of debug, must be one of "debug", "error", "info", "warn"
+        - }
+        -
+        -->
+        <field id="logException" type="assocarray" alwaysNotify="true"/>
+
     </interface>
 </component>

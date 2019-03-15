@@ -17,11 +17,6 @@ Function TestSuite_VideoPlayer_VideoErrorHelpers() as Object
   this.addTest("TestCase_getPlaybackErrorInfo_Error3", TestCase_getPlaybackErrorInfo_Error3)
   this.addTest("TestCase_getPlaybackErrorInfo_Error3_Position0", TestCase_getPlaybackErrorInfo_Error3_Position0)
   
-  this.addTest("TestCase_getDownloadErrorInfo", TestCase_getDownloadErrorInfo)
-  
-  this.addTest("TestCase_getStartBufferMessageInfo", TestCase_getStartBufferMessageInfo)
-  this.addTest("TestCase_getEndBufferMessageInfo", TestCase_getEndBufferMessageInfo)
-  
   this.addTest("TestCase_removeExcessUrl", TestCase_removeExcessUrl)
   
   return this
@@ -145,50 +140,6 @@ Function TestCase_getPlaybackErrorInfo_Error3_Position0()
   }
   errorInfo = getPlaybackErrorInfo(0, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode3, mi.errorMsg3, mi.content)
   return m.assertEqual(errorInfo, correctErrorInfo)
-End Function
-
-
-Function TestCase_getDownloadErrorInfo()
-  mi = VideoErrorHelpers_SetUp()
-  correctErrorInfo = {
-    video_id: mi.content.id
-    video_url: removeExcessUrl(mi.streamInfo.streamUrl)
-    segment_url: removeExcessUrl(mi.downloadedSegment.segUrl)
-    segment_sequence: mi.downloadedSegment.segSequence
-    segment_bitrate: mi.downloadedSegment.bitrateBps
-    segment_download_duration: mi.downloadedSegment.downloadDuration
-    segment_size: mi.downloadedSegment.segSize
-    error_code: mi.downloadedSegment.status
-  }
-  errorInfo = getDownloadErrorInfo(mi.downloadedSegment, mi.streamInfo, mi.content)
-  return m.assertEqual(errorInfo, correctErrorInfo)
-End Function
-
-
-Function TestCase_getStartBufferMessageInfo()
-  mi = VideoErrorHelpers_SetUp()
-  correctBufferInfo = {
-    video_id: mi.content.id
-    video_url: removeExcessUrl(mi.streamInfo.streamUrl)
-    stream_bitrate: mi.streamInfo.streamBitrate
-    measured_bitrate: mi.streamInfo.measuredBitrate
-  }
-  bufferInfo = getBufferMessageInfo(0, mi.streamInfo, mi.content)
-  return m.assertEqual(bufferInfo, correctBufferInfo)
-End Function
-
-
-Function TestCase_getEndBufferMessageInfo()
-  mi = VideoErrorHelpers_SetUp()
-  correctBufferInfo = {
-    video_id: mi.content.id
-    video_url: removeExcessUrl(mi.streamInfo.streamUrl)
-    buffer_time_ms: mi.bufferMs
-    stream_bitrate: mi.streamInfo.streamBitrate
-    measured_bitrate: mi.streamInfo.measuredBitrate
-  }
-  bufferInfo = getBufferMessageInfo(mi.bufferMs, mi.streamInfo, mi.content)
-  return m.assertEqual(bufferInfo, correctBufferInfo)
 End Function
 
 

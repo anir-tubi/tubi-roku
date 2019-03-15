@@ -76,11 +76,13 @@ Function tubiChannel_runChannel(args) As Void
     end while
 
     if loadStatus <> "ready"
-      error = { loadStatus: loadStatus }
-      errorMessage = FormatJSON(error)
+      error = {
+        message: "Remote components failed to load"
+        loadStatus: loadStatus
+        url: m.constants.settings.remoteComponentsUrl
+      }
       errorPort = CreateObject("roMessagePort")
-      errorQ = m.requestQueue.create(errorPort)
-      m.log.error(errorMessage, "apiBadResponse", "remote-components-error", errorQ)
+      m.log.exception("error", error)
       showErrorDialog()
       return
     end if
@@ -211,7 +213,7 @@ Function tubiChannel_loadRemoteComponents(screen)
 
   componentTimer = CreateObject("roTimespan")
   'Listen for when the remote loading has completed
-  while remoteLibrary.loadStatus <> "ready"
+  while remoteLibrary.loadStatus <> "ready" and remoteLibrary.loadStatus <> "failed"
     msg = wait(1000, port)
     if type(msgType) = "roSGScreenEvent" and msg.isScreenClosed() then
       return "closed"
@@ -376,12 +378,12 @@ Function tubiChannel_logCrashes(args)
   reason = args.lastExitOrTerminationReason
   if reason <> invalid and reasonBlacklist[reason] = invalid
     messageInfo = {
+      message: "Crash detected on previous run"
       reason: reason
       model: m.constants.deviceInfo.model
     }
     errorPort = CreateObject("roMessagePort")
-    errorQ = m.requestQueue.create(errorPort)
-    m.log.warn(FormatJSON(messageInfo), "clientWarn", "exit-failure", errorQ)
+    m.log.exception("warn", messageInfo)
   end if
 End Function
 

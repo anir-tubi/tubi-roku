@@ -75,33 +75,6 @@ Function onVideoStateChange(msg)
     end if
   end if
 
-  ' Track buffering time.  We need to track 2 pieces of data:
-  '   1) previous state "buffering"?: boolean (since we log at end of buffering)
-  '   2) duration of "buffering" state: time
-  ' We use m.bufferingTimespan for both these data by allowing it to be 'invalid' when
-  ' not tracking buffering state.
-  if state = "buffering"
-    if m.Video.streamInfo <> invalid and m.Video.streamInfo.isUnderrun = true
-      content = m.Video.content
-      messageInfo = getBufferMessageInfo(0, m.Video.streamInfo, content)
-      tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "rebuffer-start")
-      m.bufferingTimespan = CreateObject("roTimespan")
-    end if
-  else
-    ' only send buffering time if we reached playing state, otherwise
-    ' the user may have just backed out of it or an error occurred
-    if m.bufferingTimespan <> invalid and state = "playing" then
-      ' TODO(Chris): Remove this check once the logging server can handle loads
-      ' for every buffering event.  For now we just log underruns
-      if m.Video <> invalid and m.Video.streamInfo.isUnderrun then
-        content = m.Video.content
-        messageInfo = getBufferMessageInfo(m.bufferingTimespan.TotalMilliseconds(), m.Video.streamInfo, content)
-        tubiLog(FormatJSON(messageInfo), "warn", "videoBuffer", "REBUFFERING")  'REBUFFERING is a legacy message style. It should be treated as rebuffer-end
-      end if
-    end if
-    m.bufferingTimespan = invalid
-  end if
-
   ' Loading page visibility
   if state = "playing" or state = "paused" or m.top.isDocked then
     m.Loading.visible = false
@@ -111,17 +84,6 @@ Function onVideoStateChange(msg)
     m.Loading.visible = true
   end if
 End Function
-
-
-Function onDownloadedSegment(msg)
-  dlsegment = msg.getData()
-  if dlsegment <> invalid and dlsegment.status <> 0
-    content = m.Video.content
-    errorInfo = getDownloadErrorInfo(dlsegment, m.Video.streamInfo, content)
-    tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-download")
-  end if
-End Function
-
 
 Function advancePlaylist() As Boolean
   tubiLog("VideoPlaylist.advancePlaylist")
@@ -398,55 +360,6 @@ Function setDrmOnContent(contentNode, index)
   end if
   return false
 End Function
-
-
-' Helper functions to create the error info to be sent as the message of error logs
-Function getDownloadErrorInfo(downloadedSegment, streamInfo, content)
-  errorInfo = {
-    video_id: ""
-    video_url: ""
-  }
-
-  if downloadedSegment <> invalid
-    errorInfo.error_code = downloadedSegment.status
-    errorInfo.segment_sequence = downloadedSegment.SegSequence
-    errorInfo.segment_url = removeExcessUrl(downloadedSegment.SegUrl)
-    errorInfo.segment_download_duration = downloadedSegment.DownloadDuration
-    errorInfo.segment_bitrate = downloadedSegment.BitrateBps
-    errorInfo.segment_size = downloadedSegment.SegSize
-  end if
-
-  if content <> invalid then errorInfo.video_id = content.id
-  if streamInfo <> invalid
-    errorInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
-  end if
-
-  return errorInfo
-End Function
-
-
-Function getBufferMessageInfo(ms, streamInfo, content)
-  messageInfo = {
-    video_id: ""
-    video_url: ""
-  }
-
-  ' timespan is invalid if we are sending a buffer start event
-  if ms > 0
-    messageInfo.buffer_time_ms = ms
-  end if
-
-  if streamInfo <> invalid then
-    messageInfo.stream_bitrate = streamInfo.streamBitrate
-    messageInfo.measured_bitrate = streamInfo.measuredBitrate
-    messageInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
-  end if
-  if content <> invalid then
-    messageInfo.video_id = content.id
-  end if
-  return messageInfo
-End Function
-
 
 Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, streamInfo, errorCode, errorMsg, content)
   errorInfo = {

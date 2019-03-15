@@ -376,7 +376,6 @@ Function mergeMetadata(fetched)
   newContent = invalid
   response = fetched.response
   if response.code < 200 or response.code >= 300 then
-    testLog("Category content returned " + stri(response.code))
     m.top.error = {
       code: response.code
       failReason: response.failReason

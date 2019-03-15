@@ -5,6 +5,7 @@
  -->
 <component name="AdsTask" extends="Task">
     <script type="text/brightscript" uri="pkg:/components/tasks/AdsTask/AdsTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Sentry.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />

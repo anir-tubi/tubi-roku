@@ -336,8 +336,6 @@ Function startUserExperience()
         tubiLog("ContentController detected deep link request")
         ' we were asked to deep link into a content item. Go to it
         ' whether we were logged in or not.
-        testLog("Deep link contentId = " + m.top.deepLinkContent.id)
-        testLog("Deep link type = " + m.top.deepLinkContent.type)
         m.enteredFromDeepLink = true
         m.rootTabGroup.show = m.contentGroup.id
         showDetailScreen(m.top.deepLinkContent)

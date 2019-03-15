@@ -45,7 +45,6 @@ Function init()
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
-  m.Video.observeField("downloadedSegment", "onDownloadedSegment")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.top.observeField("control", "onControlChange")
   m.top.observeField("playlist", "onPlaylistChange")
@@ -743,13 +742,15 @@ Function onAdStateChange()
         }
       })
     else
-      m.top.errorMsg = "Video URL is not valid."
+      errorMsg = "Video URL is not valid."
+      m.top.errorMsg = errorMsg
       m.top.state = "error"
       errorInfo = {
+        message: errorMsg
         video_id: m.top.content.id.toInt()
         video_url: m.top.content.url
       }
-      tubiLog(FormatJson(errorInfo), "error", "videoPlayback", "video-url")
+      tubiException(errorInfo, "error")
     end if
   else if m.top.adState = "adsclosed"
     ' This is not ideal implementation but we want the OnNow experience to continue playing

@@ -55,10 +55,14 @@ Function Main(startupArgs as Dynamic)
   hotpatchResult = HotpatchWithRetries(settings.hotPatchUrl)
   if hotpatchResult.valid <> true then
     hotpatchResult.delete("valid")
-    errorMessage = FormatJSON(hotpatchResult)
+    errorMessage = {
+      message: "Hotpatch failed to load"
+      url: settings.hotPatchUrl
+    }
+    errorMessage.append(hotpatchResult)
     hotpatchErrorPort = CreateObject("roMessagePort")
     errorQ = requestQueue.create(hotpatchErrorPort)
-    log.error(errorMessage, "apiBadResponse", "hotpatch-error", errorQ)
+    log.exception("error", errorMessage)
     showErrorDialog()
     return -1 ' exit the app on error.  scene graph exits anyway once
               ' we destroy a Scene and try to create it again.

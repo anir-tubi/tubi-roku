@@ -56,60 +56,41 @@ Function TubiLogger(constants, request, auth)
     error: tubiLog_error
     info: tubiLog_info
     warn: tubiLog_warn
+    exception: tubiLog_exception
 
     'private methods
     buildLogInfo: tubiLog_buildLogInfo_
     sendLogging: tubiLog_sendLogging_
     getLoggingRequest: tubiLog_getLoggingRequest_
     getLogPrintout: tubiLog_getLogPrintout_
-
+    getSentryInstance: tubiLog_getSentryInstance_
   }
 End Function
 
 
 ''''''''''''''''''''
-' tubiLog
+' getSentryInstance
 '
-' Wrapper for logging.  Only used by scenegraph, and only sends to server if the trackingLoggingTask is ready
-' By default prints to console
-' @message: string, the message to be logged
-' @level: string, (optional), the type of debug, must be one of "debug", "error", "info", "warn"
-' @serverTypeName: string, (semi optional - required for sending log to server), a string that must exist in one of the server types in logConsts, (required by logging API)
-' @subtype: string, (optional), a small string used to differentiate log messages (required by logging API)
-Function tubiLog(message="" as String, level="debug" as String, serverTypeName="" as String, subtype="" as String) as Void
-  if level <> "error" and level <> "info" and level <> "warn"
-    level = "debug"
+' Because this resolves the current user id, it probably should not
+' be cached in the Log instance
+Function tubiLog_getSentryInstance_()
+  ' sentry for remote error logging
+  sentryAttributes = {
+    "release": m.constants.deviceInfo.clientVersion
+  }
+  sentryContext = {
+    "app": {
+      "app_name": m.constants.appName
+      "device_app_hash": m.constants.deviceInfo.deviceId
+      "app_version": m.constants.deviceInfo.clientVersion
+    }
+  }
+  if m.auth.getAuthInfo() <> invalid and m.auth.getAuthInfo().userId <> invalid
+    sentryContext["user"] = {}
+    sentryContext["user"]["id"] = m.auth.getAuthInfo().userId.toStr()
   end if
 
-  if message <> ""
-    if serverTypeName = ""
-      'if we can't send this to the server anyways, no need to involve the trackingLogging task, so just print to the console
-      print tubiLog_getLogPrintout_(level, subtype, message)
-
-    else if m.global <> invalid and  m.global.trackingLoggingTask <> invalid
-      m.global.trackingLoggingTask.logMsg = {
-        message: message
-        serverTypeName: serverTypeName
-        subtype: subtype
-        level: level
-      }
-    
-    else
-      'if the trackingLoggingTask is not ready, just print to the console
-      print tubiLog_getLogPrintout_(level, subtype, message)
-    end if
-  end if
-End Function
-
-
-''''''''''''''''''''
-' testLog
-'
-' Logging specifically targeted at automated tests.  These log
-' statements should not be reformatted without also changing
-' the black box tests which rely upon them.
-Function testLog(what as String) as Void
-  print "TEST: " + what
+  return Sentry(m.constants.thirdParty.sentry.dsn, sentryAttributes, sentryContext)
 End Function
 
 
@@ -141,6 +122,20 @@ end function
 function tubiLog_warn(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
   logInfo = m.buildLogInfo(message, m.logConsts.warn.serverType[serverTypeName], subtype, m.logConsts.warn.name)
   m.sendLogging(logInfo, queue)  
+end function
+
+function tubiLog_exception(level as string, message as Object) as Void
+  if type(message) <> "roAssociativeArray"
+    return
+  end if
+
+  print m.getLogPrintout(level, "", message.message)
+  tubiToSentry = {}
+  tubiToSentry[m.logConsts.error.name] = "error"
+  tubiToSentry[m.logConsts.warn.name] = "warning"
+  tubiToSentry[m.logConsts.info.name] = "info"
+  ' NOTE: This is a synchronous, blocking call
+  m.getSentryInstance().captureMessage(message, tubiToSentry[level])
 end function
 
 '--------------------------------------------------------------------------------
@@ -257,3 +252,61 @@ Function tubiLog_getLogPrintout_(level="" as String, subtype="" as String, messa
 End Function
 
 
+
+'*******************************************************************************
+'
+' Public functions (not TubiLogger member functions) meant to run in SceneGraph
+' main thread which has access to the global logging node.
+'
+'*******************************************************************************
+
+
+
+''''''''''''''''''''
+' tubiLog
+'
+' Wrapper for logging.  Only used by scenegraph, and only sends to server if the trackingLoggingTask is ready
+' By default prints to console
+' @logType: "exception" or "log"
+' @message: string, the message to be logged
+' @level: string, (optional), the type of debug, must be one of "debug", "error", "info", "warn"
+' @serverTypeName: string, (semi optional - required for sending log to server), a string that must exist in one of the server types in logConsts, (required by logging API)
+' @subtype: string, (optional), a small string used to differentiate log messages (required by logging API)
+Function tubiLog_helper(logType, message="" as Dynamic, level="debug" as String, serverTypeName="" as String, subtype="" as String) as Void
+  if level <> "error" and level <> "info" and level <> "warn"
+    level = "debug"
+  end if
+
+  if logType = "exception"
+    field = "logException"
+  else
+    field = "logMsg"
+  end if
+
+  if message <> invalid
+    if serverTypeName = ""
+      'if we can't send this to the server anyways, no need to involve the trackingLogging task, so just print to the console
+      print tubiLog_getLogPrintout_(level, subtype, message)
+
+    else if m.global <> invalid and  m.global.trackingLoggingTask <> invalid
+      m.global.trackingLoggingTask[field] = {
+        message: message
+        serverTypeName: serverTypeName
+        subtype: subtype
+        level: level
+      }
+    
+    else
+      'if the trackingLoggingTask is not ready, just print to the console
+      print tubiLog_getLogPrintout_(level, subtype, message)
+    end if
+  end if
+End Function
+
+Function tubiException(message="" as Dynamic, level="debug" as String) as Void
+  tubiLog_helper("exception", message, level, serverTypeName, subtype)
+End Function
+
+Function tubiLog(message="" as Dynamic, level="debug" as String, serverTypeName="" as String, subtype="" as String) as Void
+  tubiLog_helper("log", message, level, serverTypeName, subtype)
+End Function

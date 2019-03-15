@@ -87,7 +87,6 @@ Function onSearchResultsReceived()
     end if
   else
     'TODO(Chris): Show error modal here
-      testLog("Search results returned " + stri(response.code))
   end if
 End Function
 
