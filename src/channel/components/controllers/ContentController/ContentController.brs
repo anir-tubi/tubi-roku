@@ -678,7 +678,7 @@ Function onVideoTrackingStart()
       youboraConfig.username = m.global.authInfo.userId
     end if
 
-    youboraConfig["device.code"] = m.constants.deviceInfo.deviceId
+    youboraConfig["content.transactionCode"] = m.constants.deviceInfo.deviceId
 
     m.youboraTask.options = youboraConfig
     m.youboraTask.event = {handler:"play"}
