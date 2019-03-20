@@ -89,7 +89,7 @@ Function onEpisodeCredits()
   tubiLog("VideoHelpers.onEpisodeCredits")
   ' Verify that the UpNextTask has a response and it matches the currently playing content
   currentContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
-  if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
+  if m.videoPlayer.creditsPosition > 0 and m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
     if m.upNextTask.response.getChildCount() > 0
       if m.upNextScreen <> invalid
         m.upNextScreen.unobserveFieldScoped("contentSelected")
