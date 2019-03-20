@@ -31,7 +31,7 @@ Function setUserInfo()
       m.settingsScreen.name = authInfo.name
     end if
     m.settingsScreen.email = authInfo.email
-    m.settingsScreen.parentalSetting = authInfo.parentalrating
+    m.settingsScreen.parentalSettingUpdated = authInfo.parentalrating
   end if
 End Function
 

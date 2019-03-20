@@ -37,10 +37,12 @@ Function init()
   ' used to compare if a newly focused item gained focus from a different item while scrolling,
   ' or gained focus from a different component/screen
   m.menuIsFocused = false
+
+  m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
 End Function
 
-Function onSignedInChange()
 
+Function onSignedInChange()
   tubiLog("SettingsScreen.onSignedInChange")
   m.SettingsMenuPanel.signedIn = m.top.signedIn
 
@@ -52,6 +54,7 @@ Function onSignedInChange()
     end if
   end for
 End Function
+
 
 ' NOTE: The focus chain of PanelSet is very difficult to use to determine
 '       which particular panel is focused, otherwise we could just set focus
@@ -82,8 +85,6 @@ End Function
 
 Function onComponentFocusChange()
   tubiLog("SettingsScreen.onComponentFocusChange")
-
-  menu = m.SettingsMenuPanel.findNode("SettingsMenu")
   if m.top.isInFocusChain()
     if m.top.hasFocus() = true
       m.SettingsMenuPanel.setFocus(true)

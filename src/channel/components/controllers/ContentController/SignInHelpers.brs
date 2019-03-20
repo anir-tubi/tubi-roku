@@ -4,27 +4,6 @@
 ' Defer to the sign-in controller for sign in experience
 Function startSignIn(skipDisambiguation)
   tubiLog("SignInHelpers.startSignIn")
-
-  ' tubiLog("ContentController.startSignIn")
-  ' m.SignIn = CreateObject("roSGNode", "SignInController")
-  ' m.SignIn.id = "SignInController"  ' needs to be valid for navigation group
-  ' m.SignIn.skipDisambiguationScreen = skipDisambiguation
-  ' m.SignIn.visible = false
-  ' m.SignIn.observeFieldScoped("state", "onSignInComplete")
-  ' m.SignIn.observeFieldScoped("backPressed", "onSignInBackPressed")
-  ' m.rootTabGroup.addView = m.SignIn
-  ' m.rootTabGroup.show = m.SignIn.id
-
-  ' if currentScreen() <> invalid
-  '   m.SignIn.sourceScreen = currentScreen()
-  ' end if
-
-  ' m.SignIn.show = true
-  ' m.SignIn.setFocus(true)
-
-
-
-
   activationCodeScreen = CreateObject("roSGNode", "ActivationCodeScreen")
   activationCodeScreen.observeFieldScoped("activationSuccess", "onActivationSuccess")
   pushScreen(activationCodeScreen, true, true)
@@ -54,16 +33,7 @@ Function onActivationSuccess()
   m.spinner.visible = true
   m.spinner.setFocus(true)
 
-  'remove the activation code screen since it is no longer necessary
-  if currentScreen().getSubtype() =  "ActivationCodeScreen"
-    popScreen(true)
-
-    screen = currentScreen()
-    m.backgroundGroup.backgroundInfo = {
-      type: getBackgroundtype(screen.backgroundUriList)
-      uriList: screen.backgroundUriList
-    }
-  end if
+  'we remove the activation screen after auth info has been received
 End Function
 
 
@@ -101,6 +71,17 @@ Function onAuthInfoReceived()
       screen.signedIn = (m.global.authInfo <> invalid)
     end if
   end for
+
+  'remove the activation code screen since it is no longer necessary
+  if currentScreen() <> invalid and currentScreen().getSubtype() =  "ActivationCodeScreen"
+    popScreen(true)
+
+    screen = currentScreen()
+    m.backgroundGroup.backgroundInfo = {
+      type: getBackgroundtype(screen.backgroundUriList)
+      uriList: screen.backgroundUriList
+    }
+  end if
 
   '//The m.rootTabGroup.show needs to be set AFTER the user has been set as signed in so the sign in page can properly be set as sign out
   m.rootTabGroup.show = m.contentGroup.id
