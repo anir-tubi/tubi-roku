@@ -157,7 +157,9 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
       '//If the saved position is passed as greater than 0 than use that number instead. 
       '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct 
       nResumePoint = nSavedPosition
-      detailScreen.isHistory = true
+      if nSavedPosition > 0
+        detailScreen.isHistory = true
+      end if
     end if
     detailScreen.resumePoint = nResumePoint
 
