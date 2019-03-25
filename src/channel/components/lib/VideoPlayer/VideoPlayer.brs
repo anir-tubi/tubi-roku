@@ -1437,6 +1437,8 @@ Function getPlayProgressEvent()
         video_id: m.Video.content.id.toInt()
         position: Int(m.playerPosition * 1000)   'ms - without Int(), can return scientific notation, causing API error
         view_time: Int((m.playerPosition - m.lastPingTime) * 1000)   'ms
+        from_autoplay_deliberate: m.top.analyticsMode = "autoplay-deliberate"
+        from_autoplay_automatic: m.top.analyticsMode = "autoplay-automatic"
       }
     }
 

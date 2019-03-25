@@ -281,6 +281,8 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_id: -1
       position: -1   'ms
       view_time: -1  'ms
+      from_autoplay_deliberate: false
+      from_autoplay_automatic: false
     }
 
     seek: {
