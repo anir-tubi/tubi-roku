@@ -1,8 +1,8 @@
 Function init()
+  m.limitedUi = m.global.constants.deviceInfo.limitedUi
   m.top.opacity = "0.8"
   m.top.observeField("width", "onDimensionsChange")
   m.top.observeField("height", "onDimensionsChange")
-
   m.top.observeField("isDisabled", "onIsDisabled")
 End Function
 
@@ -14,7 +14,7 @@ Function onIsDisabled()
   ' While we are using the SKD1 version of RAF, the search screen does not repopulate poster images if
   ' the following spinners are in effect. This should be temporary and full spinner usage should be ok 
   ' once we move to the SG version of RAF.
-  if m.global.constants.deviceInfo.limitedUi = false and m.top.isDisabled <> true
+  if m.limitedUi <> true and m.top.isDisabled <> true
     m.Animation = m.top.findNode("SpinnerAnimation")
     m.top.observeField("visible", "onVisibilityChange")
     if m.top.visible then

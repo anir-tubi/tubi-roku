@@ -16,6 +16,9 @@ Function onContentChange(data)
 
   ' set some defaults
   m.title.visible = false
+
+  ' next line shouldn't be necessary but is added in order to try and quell crashes as reported by roku crash logs
+  if m.resumeProgressBar = invalid then m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.resumeProgressBar.visible = false
 
   if m.top.itemContent <> invalid then
@@ -36,7 +39,10 @@ End Function
 Function drawProgressBar()
   history = invalid
   if m.top.itemContent <> invalid then
-    history = m.global.historyIds.findNode(m.top.itemContent.id)
+    historyIds = m.global.historyIds
+    if historyIds <> invalid
+      history = m.global.historyIds.findNode(m.top.itemContent.id)
+    end if
   end if
 
   if m.top.itemContent <> invalid and history <> invalid and history.nowPos <> invalid and history.nowPos <> 0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0 then

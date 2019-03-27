@@ -1,8 +1,9 @@
 Function init()
   tubiLog("KeyboardMenuItem.init")
   m.top.observeField("itemContent", "onContentChange")
-  m.focusColor = m.global.constants.ui.colors.primaryText
-  m.highlightColor = m.global.constants.ui.colors.highlightedText
+  constants = m.global.constants
+  m.focusColor = constants.ui.colors.primaryText
+  m.highlightColor = constants.ui.colors.highlightedText
   m.top.color = m.focusColor
   m.top.observeField("gridHasFocus", "onFocusChange")
   m.top.observeField("focusPercent", "onFocusChange")

@@ -3,7 +3,7 @@ Function init()
   m.top.drawFocusFeedbackOnTop = false
   m.top.focusBitmapUri = "pkg://images/menu-focus-fhd.9.png"
 
-  if m.constants.deviceInfo.scaledUi = true
+  if m.constants <> invalid and m.constants.deviceInfo.scaledUi = true
     m.top.focusBitmapUri = "pkg://images/menu-focus-hd.9.png"
   end if
 End Function

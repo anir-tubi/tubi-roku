@@ -336,7 +336,7 @@ Function onVideoPositionChange()
     historyPosition(m.playerPosition)
   end if
 
-  if (m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0)
+  if m.top.content <> invalid and m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0
     if m.top.creditsPosition > 0 and m.playerPosition < m.top.content.creditsCuePoint
       '//reset the creditsPosition if the current position is prior to the end credits: i.e. after watching the end credits, the user decided to rewind  before the credits
       m.top.creditsPosition = 0

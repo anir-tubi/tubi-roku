@@ -2,10 +2,14 @@ Function init()
   m.top.observeField("focusState", "onFocusUpdate")
   m.top.observeField("enabled", "onFocusUpdate")
 
-  m.colors = {
-    focusedText: m.global.constants.ui.colors.focused
-    unfocusedText: m.global.constants.ui.colors.unfocused
-  }
+  constants = m.global.constants
+
+  if constants <> invalid
+    m.colors = {
+      focusedText: constants.ui.colors.focused
+      unfocusedText: constants.ui.colors.unfocused
+    }
+  end if
 End Function
 
 Function onFocusUpdate()

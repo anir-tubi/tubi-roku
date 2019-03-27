@@ -402,7 +402,7 @@ Function onSingleContentError(msg)
     m.refreshingDetailCache = false
   else
     message = "Could not retrieve content information from server."
-    getSingleContentParams = [detailScreen, detailScreen.content, detailScreen.trackingUri]
+    getSingleContentParams = [detailScreen, detailScreen.content]
     showErrorModal(error.code, message, getSingleContentFromServerRetry, getSingleContentParams)
 
     ' Typically we would want to make a call to screenTrackingLoad() with success=false here to indicate to analytics that the page did not load;
@@ -479,9 +479,12 @@ Function getDetailScreenContent()
 End Function
 
 
-Function onAddToQueueSelected(msg)
+Function onAddToQueueSelected(msg=invalid, detailScreen=invalid)
   tubiLog("DetailScreenHelpers.addToQueue")
-  detailScreen = msg.getRoSGNode()
+  if msg <> invalid
+    detailScreen = msg.getRoSGNode()
+  end if
+
   if m.global.authInfo = invalid
     title = "Please Sign In"
     message = "You must be signed in, in order to add a title to your queue."
@@ -489,8 +492,7 @@ Function onAddToQueueSelected(msg)
     showModal(title, message, buttons, "onSignInModalButtonSelected")
     content = getDetailScreenContent()
     sendDialogAnalytics(content, "INFORMATION", m.Tracking, m.trackingLoggingTask)
-
-  else if detailScreen.isWaitingForServerResponse <> true
+  else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
     detailScreen.addToQueueTitle = "Adding..."
     userTask = CreateObject("roSGNode", "AuthTask")
     userTask.functionName = "addToQueue"
@@ -502,6 +504,13 @@ Function onAddToQueueSelected(msg)
     userTask.observeField("bookmarkId", "onBookmarked")
     userTask.control = "RUN"
     detailScreen.isWaitingForServerResponse = true
+  end if
+End Function
+
+'Wraps onAddToQueueSelected in the case of an error modal and a user attempting to retry adding the content to their queue
+Function onAddToQueueSelectedRetry(params)
+  if type(params) = "roArray" and params.count() = 2
+    onAddToQueueSelected(params[0], params[1])
   end if
 End Function
 
@@ -529,7 +538,7 @@ Function onBookmarked(msg) As Void
     reason = "Unknown"
     tubiLog("addToQueue returned " + stri(code))
     detailScreen.isWaitingForServerResponse = false
-    showErrorModal(code, reason, onAddToQueueSelected, [], cancelHistoryQueueChange, [])
+    showErrorModal(code, reason, onAddToQueueSelectedRetry, [invalid, detailScreen], cancelHistoryQueueChange, [])
 
     content = getDetailScreenContent()
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
@@ -545,10 +554,12 @@ Function onBookmarked(msg) As Void
 End Function
 
 
-Function onRemoveFromQueueSelected(msg)
+Function onRemoveFromQueueSelected(msg=invalid, detailScreen=invalid)
   tubiLog("DetailScreenHelpers.onRemoveFromQueueSelected")
-  detailScreen = msg.getRoSGNode()
-  if detailScreen.isWaitingForServerResponse <> true
+  if msg <> invalid
+    detailScreen = msg.getRoSGNode()
+  end if
+  if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
     detailScreen.removeQueueTitle = "Removing..."
     userTask = CreateObject("roSGNode", "AuthTask")
     userTask.functionName = "removeFromQueue"
@@ -563,6 +574,13 @@ Function onRemoveFromQueueSelected(msg)
     userTask.observeFieldScoped("result", "onBookmarkRemoved")
     userTask.control = "RUN"
     detailScreen.isWaitingForServerResponse = true
+  end if
+End Function
+
+'Wraps onAddToQueueSelected in the case of an error modal and a user attempting to retry removing the content from their queue
+Function onRemoveFromQueueSelectedRetry(params)
+  if type(params) = "roArray" and params.count() = 2
+    onRemoveFromQueueSelected(params[0], params[1])
   end if
 End Function
 
@@ -584,7 +602,7 @@ Function onBookmarkRemoved(msg) As Void
     end if
     tubiLog("removeFromQueue returned " + stri(code))
     detailScreen.isWaitingForServerResponse = false
-    showErrorModal(code, reason, onRemoveFromQueueSelected, [], cancelHistoryQueueChange, [])
+    showErrorModal(code, reason, onRemoveFromQueueSelectedRetry, [invalid, detailScreen], cancelHistoryQueueChange, [])
 
     content = getDetailScreenContent()
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
@@ -597,10 +615,13 @@ Function onBookmarkRemoved(msg) As Void
 End Function
 
 
-Function onRemoveFromHistorySelected(msg)
+Function onRemoveFromHistorySelected(msg=invalid, detailScreen=invalid)
   tubiLog("DetailScreenHelpers.onRemoveFromHistorySelected")
-  detailScreen = msg.getRoSGNode()
-  if detailScreen.isWaitingForServerResponse <> true
+  if msg <> invalid
+    detailScreen = msg.getRoSGNode()
+  end if
+
+  if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
     history = m.global.historyIds.findNode(detailScreen.content.id)
     if history <> invalid and history.historyId <> invalid
       content = detailScreen.content.clone(false)
@@ -624,6 +645,14 @@ Function onRemoveFromHistorySelected(msg)
 End Function
 
 
+'Wraps onRemoveFromHistorySelected in the case of an error modal and a user attempting to retry removing the content from their history
+Function onRemoveFromHistorySelectedRetry(params)
+  if type(params) = "roArray" and params.count() = 2
+    onRemoveFromQueueSelected(params[0], params[1])
+  end if
+End Function
+
+
 Function onHistoryRemoved(msg) As Void
   tubiLog("DetailScreenHelpers.onHistoryRemoved")
   task = msg.getRoSGNode()
@@ -641,7 +670,7 @@ Function onHistoryRemoved(msg) As Void
       reason = "Unknown"
     end if
     tubiLog("removeFromHistory returned " + stri(code))
-    showErrorModal(code, reason, onRemoveFromHistorySelected, [], cancelHistoryQueueChange, [])
+    showErrorModal(code, reason, onRemoveFromHistorySelectedRetry, [invalid, detailScreen], cancelHistoryQueueChange, [])
 
     content = getDetailScreenContent()
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
