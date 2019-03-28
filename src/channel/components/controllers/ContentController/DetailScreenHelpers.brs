@@ -28,19 +28,18 @@ Function showDetailScreen(content)
     else
       populateDetailScreen(detailScreen, content, true)
     end if
-
+  
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
     getSingleContentFromServer(detailScreen, content)
   else
     ' TODO: Refer to logs to determine if it's necessary to show a modal in this instance informing the user to press the back
     ' back button. We shouldn't end up with an invalid content, but as of 11/25/18 there are crash logs
     ' that indicate it might be possible that getDetailScreenContent() as called by ContentController.returnToDetailScreenFromVideo()
-    ' may return invalid, which may get passed to this function as the content argument.
+    ' may return invalid, which may get passed to this function as the content argument.  
     message = "DetailScreenHelpers.showDetailScreen, content is invalid"
     tubiLog(message, "warn", "clientWarn", "showdetailscreen-invalid-content")
   end if
 End Function
-
 
 Function onDetailBackgroundChange(msg)
   tubiLog("DetailScreenHelpers.onDetailBackgroundChange")

@@ -41,6 +41,12 @@ Function playVideoContent(content As Object, autoplayType As String, position=in
       m.upNextTask.request = request
       m.upNextTask.control = "RUN"
     end if
+    
+    '//Stop the background artwork from transitioning 
+    m.backgroundGroup.backgroundInfo = {
+      type: m.constants.ui.backgroundTypes.fullScreen
+      uriList: []
+    }
     m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
     m.videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
     m.videoPlayer.visible = true
