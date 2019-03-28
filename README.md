@@ -142,9 +142,9 @@ $ git push --tags
 6\. Submit build to Roku (only for submission builds)
 
 - Create a new `new_images_since_x_y` file where x and y are the major and minor build numbers
-- Update the Makefile with the new `new_images_since_x_y` path (2 variables should be updated)
+- Update the Makefile with the new `new_images_since_x_y` path (3 instances should be updated)
 - Create a new hotpatch for the new version (ie. 2.7.brs)
-- Move any necessary logic from the previous version's hotpatch to the new version's hotpathc
+- Move any necessary logic from the previous version's hotpatch to the new version's hotpatch
 - Update version numbers in `config/build.yml`
   - Increment `minor_version`
   - set `build_version` to `1`
