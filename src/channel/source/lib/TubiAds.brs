@@ -358,7 +358,6 @@ end function
 function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   ' ShowVariable(m.allAdUnitsList, "ALL AD UNITS LIST", 4)
   scene = containerNode.getScene()
-  m.muxNode = scene.findNode("MuxTask")
   m.youboraNode = scene.findNode("Youbora")
 
   if m.allAdUnitsList.count() > 0
@@ -538,11 +537,6 @@ function tubiAds_adTrackingCallback(eventType, ctx)
     if ctx.time <> invalid
       m.adPlaybackPos = ctx.time
     end if
-  end if
-
-  ' Mux video plaback monitoring
-  if m.muxNode <> invalid
-    m.muxNode.rafEvent = {obj:m, eventType:eventType, ctx:ctx}
   end if
 
   ' NPAW Youbora video plaback monitoring

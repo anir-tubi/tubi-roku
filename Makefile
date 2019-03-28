@@ -55,8 +55,6 @@ REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
   --include 'source/lib' \
   --include 'source/lib/**' \
   --include 'source/3rdparty' \
-  --include 'source/3rdparty/mux' \
-  --include 'source/3rdparty/mux/**' \
   --include 'source/3rdparty/rodash' \
   --include 'source/3rdparty/rodash/**' \
   --include 'source/3rdparty/roku' \

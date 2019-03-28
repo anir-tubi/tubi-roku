@@ -640,14 +640,6 @@ End Function
 
 
 Function initVideoTracking()
-  ' mux in "components_reset" mode, meaning video node instance is long-lived
-  if m.constants.thirdParty.mux.enabled = true
-    m.muxTask = m.top.createChild("MuxTask")
-    m.muxTask.id = "MuxTask"  ' so that video player can find it
-    m.muxTask.video = m.videoPlayer.findNode("VideoNode")
-    m.muxTask.config = m.constants.thirdParty.mux.config
-    m.muxTask.control = "RUN"
-  end if
 
   if m.constants.thirdParty.youbora.enabled = true
     m.videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
@@ -661,10 +653,6 @@ Function initVideoTracking()
 End Function
 
 Function onVideoTrackingStart()
-  '  Mux events
-  if m.constants.thirdParty.mux.enabled = true
-    m.muxTask.view = "start"
-  end if
 
   ' Youbora events
   if m.constants.thirdParty.youbora.enabled = true
@@ -686,10 +674,6 @@ Function onVideoTrackingStart()
 End Function
 
 Function videoTrackingStop()
-  '  Mux events
-  if m.constants.thirdParty.mux.enabled = true
-    m.muxTask.view = "end"
-  end if
   if m.constants.thirdParty.youbora.enabled = true
     m.youboraTask.event = {handler:"stop"}
   end if

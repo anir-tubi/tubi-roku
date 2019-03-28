@@ -226,16 +226,6 @@ Function getConstants()
 
   constants.thirdParty = {}
     constants.thirdParty.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
-    constants.thirdParty.mux = {}
-      constants.thirdParty.mux.enabled = false    ' off by default
-      ' Mux config fields: https://docs.mux.com/docs/metadata
-      constants.thirdParty.mux.config = {}
-        ' "property_key" was renamed to "env_key" in docs, but roku sdk is not updated
-        ' PRODUCTION
-        'constants.thirdParty.mux.config.property_key = "3gubs8dgj0g5eumq84d7gtka5"
-        ' DEVELOPMENT
-        constants.thirdParty.mux.config.property_key = "o9i11mt559ko07190jhlh0g45"
-
     constants.thirdParty.youbora = {}
       constants.thirdParty.youbora.enabled = false
       constants.thirdParty.youbora.debug = false
