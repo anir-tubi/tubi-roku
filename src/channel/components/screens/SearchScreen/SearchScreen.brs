@@ -162,6 +162,7 @@ Function onItemFocused()
     else
       m.top.backgroundUriList = [m.defaultHeroUri]
     end if
+
     ' Set up the info that the ContentController uses to send navigate_within_page events.
     ' Don't change m.top.navigateWithinPageInfo if the focused content hasn't changed
     ' (protects against re-setting when the focus is set upon returning to search page from details page)
@@ -175,7 +176,7 @@ Function onItemFocused()
       if searchComponent <> invalid
         navigateWithinPageInfo = {
           pageOneof: m.Tracking.getAnalyticsPage("search_page", {query: Left(m.Keyboard.text, 256)})
-          componentOneof: m.Tracking.getAnalyticsComponent(searchComponent.componentType, searchComponent.componentValues)
+          componentOneof: m.Tracking.getAnalyticsComponent(m.oldSearchComponent.componentType, m.oldSearchComponent.componentValues)
           means_of_navigation: "BUTTON"  'MeansOfNavigation enum
           vertical_location_mode: "INDEX"  'LocationMode enum
           horizontal_location_mode: "INDEX"  'LocationMode enum
@@ -187,7 +188,12 @@ Function onItemFocused()
         end if
 
         m.top.navigateWithinPageInfo = navigateWithinPageInfo
+        m.oldSearchComponent = searchComponent
       end if
+    else if m.gridHasFocus = false and m.ResultGrid.itemFocused <> invalid
+      'the search grid is gaining focus, so we don't send navigate_within_page events at this time. Instead we just cache information
+      'for the next time we send a navigate_within_page event (when the user navigates the search grid)
+      m.oldSearchComponent = getTrackingComponentInfo(m.ResultGrid.itemFocused, m.ResultGrid.numColumns, focusedContent, m.Tracking)
     end if
     m.gridHasFocus = true
   end if
@@ -260,6 +266,7 @@ Function startFocusKeyboard()
   m.TextEntryAnimation.observeField("state", "endFocusKeyboard")
   m.TextEntryAnimation.control = "start"
   m.ResultGrid.setFocus(false)
+  m.gridHasFocus = false
 End Function
 
 
