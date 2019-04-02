@@ -22,6 +22,7 @@ Function showDetailScreen(content)
     detailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
     detailScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     detailScreen.observeFieldScoped("refreshContent", "onRefreshContentSignal")
+    m.refreshingDetailCache = false
 
     if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
       detailScreen.isLoading = true

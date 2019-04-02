@@ -398,6 +398,8 @@ End Function
 Function onGridFocusChange() As Void
   tubiLog("CategoryScreen.onGridFocusChange")
   if not m.CategoryGridList.isInFocusChain() then return
+
+  oldFocusedContent = m.CategoryGridList.oldItemFocused
   focusedContent = m.CategoryGridList.itemFocused
   if focusedContent <> invalid
     populateInfoPanel("item", focusedContent)
@@ -418,9 +420,9 @@ Function onGridFocusChange() As Void
   if m.gridHasFocus = true and oldAnalyticsRow > 0 and oldAnalyticsCol > 0
     if oldAnalyticsRow <> newAnalyticsRow or oldAnalyticsCol <> newAnalyticsCol
       categoryComponentInfo = {
-        category_slug: m.top.currCategoryId
+        category_slug: m.CategoryGridList.oldCategoryId
         category_row: oldAnalyticsRow
-        content_tile: m.Tracking.getAnalyticsTile(focusedContent, oldAnalyticsCol, oldAnalyticsRow)
+        content_tile: m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, oldAnalyticsRow)
       }
 
       m.top.navigateWithinPageInfo = {

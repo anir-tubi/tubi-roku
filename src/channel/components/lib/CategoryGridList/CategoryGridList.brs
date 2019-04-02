@@ -272,6 +272,7 @@ Function onRowItemSelected()
   tubiLog("CategoryGridList.onRowItemSelected")
   category = m.internalContent.getChild(m.RowList.rowItemSelected[0])
   if category <> invalid
+    m.top.oldCategoryId = m.top.currCategoryId
     m.top.currCategoryId = category.id
   end if
 
@@ -296,7 +297,6 @@ Function onRowItemFocused()
     category = m.internalContent.getChild(m.RowList.rowItemFocused[0])
     if category <> invalid then
       category.focusIndex = m.RowList.rowItemFocused[1]
-      m.top.currCategoryId = category.id
     end if
   end if
 End Function
@@ -307,6 +307,7 @@ Function onRowListItemDebounce()
   tubiLog("CategoryGridList.onRowListItemDebounce")
   category = m.internalContent.getChild(m.RowList.rowItemFocused[0])
   if category <> invalid
+    m.top.oldCategoryId = m.top.currCategoryId
     m.top.currCategoryId = category.id
   end if
 
@@ -314,6 +315,7 @@ Function onRowListItemDebounce()
   if itemFocused <> invalid
     m.top.oldCursorPosition = m.top.cursorPosition
     m.top.cursorPosition = m.RowList.rowItemFocused
+    m.top.oldItemFocused = m.top.itemFocused
     m.top.itemFocused = itemFocused
   end if
 End Function

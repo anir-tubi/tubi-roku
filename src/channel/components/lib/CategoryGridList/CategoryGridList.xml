@@ -58,6 +58,7 @@
     <!-- OUTPUT -->
     <field id="itemSelected" type="node" alwaysNotify="true"/>
     <field id="itemFocused" type="node" />
+    <field id="oldItemFocused" type="node" />
     <!-- array with the [x, y], where x is the category index and y is the content index -->
     <field id="cursorPosition" type="vector2d" value="[-1,-1]"/>
     <field id="oldCursorPosition" type="vector2d" value="[-1,-1]"/>
@@ -66,9 +67,9 @@
     <!-- first category is loaded -->
     <field id="firstPosterLoaded" type="boolean" value="false" />
 
-
     <field id="currFocusRow" alias="RowList.currFocusRow" />
     <field id="currCategoryId" type="string" />
+    <field id="oldCategoryId" type="string" />
 
     <!-- holds an array of integers the indexes represent the category order, and the vaule represents the totalCount of the category.
          When it is updated, category screen will update the total counts in the category menu

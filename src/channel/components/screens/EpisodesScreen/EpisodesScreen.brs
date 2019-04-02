@@ -96,9 +96,16 @@ Function onEpisodeFocused()
     if m.gridIsFocused = true
       row = m.RowList.rowItemFocused[0] + 1
       col = m.RowList.rowItemFocused[1] + 1
-      episodeListComponent = {
-        content_tile: m.Tracking.getAnalyticsTile(episode, col, row)
-      }
+
+      episodeListComponent = {}
+      if m.oldRowItemFocused <> invalid
+        oldRow = m.oldRowItemFocused[0] + 1
+        oldCol = m.oldRowItemFocused[1] + 1
+        oldEpisode = getEpisodeContent(m.oldRowItemFocused)
+        episodeListComponent = {
+          content_tile: m.Tracking.getAnalyticsTile(oldEpisode, oldCol, oldRow)
+        }
+      end if
 
       seriesDetailPage = getSeriesDetailPage(m.top.content)
 
@@ -113,6 +120,7 @@ Function onEpisodeFocused()
       }
     end if
 
+    m.oldRowItemFocused = rowItem
     m.Menu.jumpToItem = m.RowList.rowItemFocused[0]
     m.gridIsFocused = true
     m.listIsFocused = false
