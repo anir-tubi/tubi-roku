@@ -281,7 +281,6 @@ Function getConstants()
     constants.urls.cms = {}
       ' constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
       constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
-      constants.urls.cms.contents = constants.urls.cms.urlBase + "/contents"
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
       constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
       constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
