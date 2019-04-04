@@ -116,28 +116,29 @@ End Function
 '
 ' An error was recorded by the registrationCodeTask so let the user know
 Function onRegTaskError(evt)
-  if evt.getData() = "expire"
+
+  sSubtypeCode = m.constants.errors.subtypes.fetchError
+
+  sEventName = evt.getData()
+  if sEventName = "expire"
     title = "Activation Code Expired"
     message = "We're sorry, but the activation code expired before your device was successfully linked."
-  else if evt.getData() = "poll"
+    sSubtypeCode = m.constants.errors.subtypes.expireError
+  else if sEventName = "poll"
     title = "Connection Error During Activation"
     message = "We're sorry, but we could not connect with the server to see if you registered your device."
-  else if evt.getData() = "code"
+    sSubtypeCode = m.constants.errors.subtypes.networkError
+  else if sEventName = "code"
     title = "Connection Error During Registration"
     message = "We're sorry, but there was an error while receiving the code from the server."
   else
     title = "Activation Code Error"
     message = "We're sorry, but an activation code error occurred."
   end if
-  message += Chr(10)
-  message += "If this problem persists, pleace contact: support@tubi.tv"
-  m.errorDialog = m.top.createChild("ModalDialogScreen")
-  m.errorDialog.title = title
-  m.errorDialog.message = message
-  m.errorDialog.buttons = ["Try again", "Skip"]
-  m.errorDialog.observeField("buttonSelected", "onErrorButtonPress")
-  m.errorDialog.setFocus(true)
-
+  
+  errorObj = createErrorObject(m.global.constants.errors.context.activateScreen, sSubtypeCode, message, "", title)
+  showErrorModal(errorObj, onErrorButtonTryAgainPress, [], onErrorButtonCancelPress, [], ["Try again", "Skip"])
+  
   authPageValues = {
     auth_action:  "ACTIVATION"  'Action enum
   }
@@ -150,26 +151,25 @@ Function onRegTaskError(evt)
   }
 End Function
 
-
 '''''''''''''''''''''''''
-' onErrorButtonPress
+' onErrorButtonTryAgainPress
 '
-' Respond the user selecting a button on the error modal
-Function onErrorButtonPress(evt)
-  buttonSelected = evt.getData()
+' Respond the user selecting the try again button on the error modal
+Function onErrorButtonTryAgainPress()
   m.Buttons.setFocus(true)
-  m.top.removeChild(m.errorDialog)
-  m.errorDialog.unobserveField("buttonSelected")
-  if buttonSelected = 0
-    'try again
-    getRegistrationCode()
-  else
-    'leave the screen and go to homepage
-    m.RegCodeTask.cancel = true
-    m.top.skipButtonPressed = true
-  end if
+  getRegistrationCode()
 End Function
 
+'''''''''''''''''''''''''
+' onErrorButtonCancelPress
+'
+' Respond the user selecting the cancel button on the error modal
+Function onErrorButtonCancelPress()
+  m.Buttons.setFocus(true)
+  'leave the screen and go to homepage
+  m.RegCodeTask.cancel = true
+  m.top.skipButtonPressed = true
+End Function
 
 '''''''''''''''''''''''
 ' getRegistrationCode

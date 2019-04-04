@@ -599,11 +599,20 @@ Function AnyToString(any As Dynamic) As dynamic
         if any = true return "true"
         return "false"
     endif
-    if isfloat(any) return Str(any)
+    if isfloat(any) return any.toStr()
     if type(any) = "roTimespan" return itostr(any.TotalMilliseconds()) + "ms"
     return invalid
 End Function
 
+
+
+'******************************************************
+'Same as AnyToString() but return empty string if any = invalid
+'******************************************************
+Function AnyToStringButNotInvalid(any As Dynamic) As dynamic
+    if any = invalid return ""
+    return AnyToString(any)
+End Function
 
 '******************************************************
 'Walk an XML tree and print it

@@ -60,7 +60,7 @@ Function onDetailScreenChannelSelected(msg)
     channelNode.id = detailScreen.content.channelId
     channelNode.type = m.constants.ui.contentTypes.channel
 
-  ' Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
+    ' Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
     detailScreen.trackingComponentInfo = {
       componentType: "detail_menu_component"    'doesn't actually exist in protos currently
       componentValues: {}
@@ -154,8 +154,8 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
       nResumePoint = history.nowPos
     end if
     if nSavedPosition >= 0
-      '//If the saved position is passed as greater than 0 than use that number instead. 
-      '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct 
+      '//If the saved position is passed as greater than 0 than use that number instead.
+      '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct
       nResumePoint = nSavedPosition
       if nSavedPosition > 0
         detailScreen.isHistory = true
@@ -207,12 +207,14 @@ End Function
 '@content: roSGNode, a TubiContentNode
 Function getSingleContentFromServer(screen, content)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
-  if content <> invalid then 
+  if content <> invalid then
     request = {
       contentId: content.id
       getRelated: true
       getContent: true
+      content: content
     }
+
     refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
     refreshTask.request = request
     refreshTask.addField("target", "node", false)
@@ -229,6 +231,7 @@ End Function
 '@params: 2 index array containing params that should be passed to getSingleContentFromServer()
 Function getSingleContentFromServerRetry(params)
   if type(params) = "roArray" and params.count() = 2
+    m.refreshingDetailCache = false
     getSingleContentFromServer(params[0], params[1])
   end if
 End Function
@@ -238,13 +241,14 @@ Function onSingleContentResponse(msg) As Void
   tubiLog("DetailScreenHelpers.onSingleContentResponse")
   task = msg.getRoSGNode()
   detailScreen = task.target
+
   task.unobserveField("response")
   task.unobserveField("error")
 
   ' Replace the top of the detail screen content stack with the refreshed content
   refreshedContent = msg.GetData()
   oldContent = detailScreen.content
-  afterFn = invalid  ' the function to execute once we've sorted the detail screen out
+  afterFn = invalid  ' the Function to execute once we've sorted the detail screen out
   if m.enteredFromDeepLink = true and m.top.deepLinkContent <> invalid
     if m.top.deepLinkContent.deeplinkType = "series" and refreshedContent.type = m.constants.ui.contentTypes.series
       '  refreshedContent.id:       series id
@@ -337,7 +341,7 @@ Function onSingleContentResponse(msg) As Void
     ' Find a default episode to land on, in case no specific episode requested from deep link
     ' NOTE: If the series is a daily, recurring series then we always want to go to the most recent
     if refreshedContent.type = m.constants.ui.contentTypes.series and refreshedContent.currentEpisodeId = "" and refreshedContent.isRecurring = false
-      if oldContent <> invalid and oldContent.type = m.constants.ui.contentTypes.video 
+      if oldContent <> invalid and oldContent.type = m.constants.ui.contentTypes.video
         ' a specific episode was requested by id
         refreshedContent.currentEpisodeId = oldContent.id
       else
@@ -388,6 +392,11 @@ Function onSingleContentError(msg)
   error = msg.GetData()
   task = msg.getRoSGNode()
   tubiLog("DetailScreenHelpers.onSingleContentError")
+
+  content = invalid
+  if task.request <> invalid 
+    content = task.request.content
+  end if
   task.unobserveField("response")
   task.unobserveField("error")
   task = invalid
@@ -402,8 +411,13 @@ Function onSingleContentError(msg)
     m.refreshingDetailCache = false
   else
     message = "Could not retrieve content information from server."
-    getSingleContentParams = [detailScreen, detailScreen.content]
-    showErrorModal(error.code, message, getSingleContentFromServerRetry, getSingleContentParams)
+    if content = invalid 
+      content = detailScreen.content
+    end if
+    getSingleContentParams = [detailScreen, content]
+  
+    errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, message, error.code)
+    showErrorModal(errorObj, getSingleContentFromServerRetry, getSingleContentParams, onCloseErrorModal)
 
     ' Typically we would want to make a call to screenTrackingLoad() with success=false here to indicate to analytics that the page did not load;
     ' however, movie details screens do load, and episode details screens don't load, but we don't know the content id of the episode's video
@@ -437,7 +451,7 @@ End Function
 ' This may just be returning the video that is passed in (in the case of a movie).
 ' @contentNode content node
 Function getEpisodeContent(content)
-  if content <> invalid 
+  if content <> invalid
     if content.currentEpisodeId <> invalid and content.currentEpisodeId <> ""
       return content.findNode(content.currentEpisodeId)
     else
@@ -490,7 +504,7 @@ Function onAddToQueue(detailScreen)
   tubiLog("DetailScreenHelpers.onAddToQueue")
   if m.global.authInfo = invalid
     title = "Please Sign In"
-    message = "You must be signed in, in order to add a title to your queue."
+    message = "You must be signed in to add a title to your queue."
     buttons = ["Sign in or Register", "Cancel"]
     showModal(title, message, buttons, "onSignInModalButtonSelected")
     content = getDetailScreenContent()
@@ -500,7 +514,7 @@ Function onAddToQueue(detailScreen)
     userTask = CreateObject("roSGNode", "AuthTask")
     userTask.functionName = "addToQueue"
     userTask.content = detailScreen.content
-    userTask.addField("target", "node", false) 
+    userTask.addField("target", "node", false)
     userTask.target = detailScreen
     detailScreen.addField("task", "node", false)
     detailScreen.task = userTask
@@ -538,11 +552,11 @@ Function onBookmarked(msg) As Void
   task.unobserveFieldScoped("bookmarkId")
   detailScreen.task = invalid
   if bookmarkId = invalid or bookmarkId = ""
-    code = -1
     reason = "Unknown"
-    tubiLog("addToQueue returned " + stri(code))
     detailScreen.isWaitingForServerResponse = false
-    showErrorModal(code, reason, onAddToQueueRetry, [detailScreen], cancelHistoryQueueChange, [detailScreen, "addToQueueTitle", "Add to queue"])
+    
+    errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, reason)
+    showErrorModal(errorObj, onAddToQueueSelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "addToQueueTitle", "Add to queue"])
 
     content = getDetailScreenContent()
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
@@ -602,16 +616,17 @@ Function onBookmarkRemoved(msg) As Void
   task.unobserveField("result")
   detailScreen.task = invalid
   if result = invalid or result.response.code <> 204 then
+    code = ""
+    reason = "Unknown"
     if result <> invalid
       code = result.response.code
       reason = result.response.failReason
-    else
-      code = -1
-      reason = "Unknown"
     end if
-    tubiLog("removeFromQueue returned " + stri(code))
+    tubiLog("removeFromQueue returned ")
     detailScreen.isWaitingForServerResponse = false
-    showErrorModal(code, reason, onRemoveFromQueueRetry, [detailScreen], cancelHistoryQueueChange, [detailScreen, "removeQueueTitle", "Remove from queue"])
+
+    errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, reason, code)
+    showErrorModal(errorObj, onRemoveFromQueueSelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "removeQueueTitle", "Remove from queue"])
 
     content = getDetailScreenContent()
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
@@ -672,15 +687,16 @@ Function onHistoryRemoved(msg) As Void
   detailScreen.task = invalid
 
   if result = invalid or result.response.code <> 204 then
+    code = ""
+    reason = "Unknown"
     if result <> invalid
       code = result.response.code
       reason = result.response.failReason
-    else
-      code = -1
-      reason = "Unknown"
     end if
     tubiLog("removeFromHistory returned " + stri(code))
-    showErrorModal(code, reason, onRemoveFromHistoryRetry, [detailScreen], cancelHistoryQueueChange, [detailScreen, "removeHistoryTitle", "Remove from history"])
+    
+    errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, reason, code)
+    showErrorModal(errorObj, onRemoveFromHistorySelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "removeHistoryTitle", "Remove from history"])
 
     content = getDetailScreenContent()
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
@@ -720,10 +736,16 @@ Function onRelatedContentSelected(msg)
   end if
 End Function
 
+Function onCloseErrorModal()
+  '//exit the detail screen entirely since the content could not be gathered.
+  onDetailBackPressed()
+End Function
 
 Function onDetailBackPressed()
   ' TODO(Chris): This is in terrible need of refactor. We shouldn't be calling this directly
   ' but we have to invoke the "empty stack" logic at this point.
+
+  m.refreshingDetailCache = false
   onKeyEvent("back", true)
 End Function
 
@@ -781,7 +803,7 @@ End Function
 Function playHelper(screen)
   episode = getEpisodeContent(screen.content)
   if episode <> invalid then
-      playVideoContent(episode, "none", 0)
+    playVideoContent(episode, "none", 0)
   else
     tubiLog("ERROR: Play selected but content is invalid")
   end if

@@ -49,7 +49,7 @@
         layoutDirection="vert"
         horizAlignment="custom"
         translation="[20,65]"
-        itemSpacings="[60,36]">
+        itemSpacings="[50,36]">
         <Label
           id="Title"
           color="0xFFFFFFFF"

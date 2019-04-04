@@ -77,11 +77,12 @@ Function onChannelContentError(msg)
   ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
   ' sent in the case of an error.
   popScreen(false)
+  
+  errorObj = createErrorObject(m.global.constants.errors.context.channelScreen, m.global.constants.errors.subtypes.fetchError, "Could not retrieve channel content.", errorInfo.code)
+  showErrorModal(errorObj)
   screen = task.target
   loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
   screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
-  message = "Could not retrieve channel content."
-  showErrorModal(errorInfo.code, message)
 
   m.trackingLoggingTask.trackEvent = {
     type: "dialog"

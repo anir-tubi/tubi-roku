@@ -11,6 +11,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   
   <interface>
     <!-- INPUT -->

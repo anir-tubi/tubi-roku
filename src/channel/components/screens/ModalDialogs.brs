@@ -1,19 +1,36 @@
 ' This is a set of functions for displaying and handling button presses
 ' on a generic error modal.  Screens should include this file directly
 ' in a <script> tag.
+' @param errorObj: The Associative array that contains all the info for the error message
+' @param tryAgainCallback: (optional) Function to call when the try again button is clicked
+' @param tryAgainParams: (optional) The parameters to pass to the tryAgainCallback() function when it is called
+' @param cancelCallback: (optional)  Function to call when the cancel button is clicked
+' @param cancelParams: (optional)  The parameters to pass to the cancelCallback() function when it is called
+' @param buttons: (optional) An array of strings for the names of the buttons. Should onluy be 1 or 2 button names. Default buttons will be used if this is not passed
 
-Function showErrorModal(errorCode As Integer, errorMessage As String, tryAgainCallback=invalid As Dynamic, tryAgainParams=[] As Object, cancelCallback=invalid As Dynamic, cancelParams=[] As Object) As Void
+Function showErrorModal(errorObj As Object, tryAgainCallback=invalid As Dynamic, tryAgainParams=[] As Object, cancelCallback=invalid As Dynamic, cancelParams=[] As Object, buttons=[] as Object) As Void
   tubiLog("ModalDialog.showErrorModal")
   modal = CreateObject("roSGNode", "ModalDialogScreen")
-  modal.title = "Something went wrong"
-  message = "Error " + stri(errorCode) + Chr(10)
+  modal.title = errorObj.title
+  errorCode = errorObj.code
+  errorMessage = errorObj.message
+
+  message = "Error: " + errorCode + Chr(10)
   message += errorMessage + Chr(10)
   message += "Please contact: support@tubi.tv"
   modal.message = message
   if tryAgainCallback <> invalid
-    modal.buttons = ["Try Again", "Close"]
+    if buttons.count() = 2
+      modal.buttons = [buttons[0], buttons[1]]
+    else 
+      modal.buttons = ["Try Again", "Close"]
+    end if
   else
-    modal.buttons = ["Close"]
+    if buttons.count() = 1
+      modal.buttons = [buttons[0]]
+    else 
+      modal.buttons = ["Close"]
+    end if
   end if
   modal.observeField("buttonSelected", "onErrorModalButtonSelected")
   m.errorModalTryAgainCallback_ = tryAgainCallback
@@ -24,6 +41,52 @@ Function showErrorModal(errorCode As Integer, errorMessage As String, tryAgainCa
   m.top.appendChild(m.errorModal_)
   m.errorModal_.visible = true
   m.errorModal_.setFocus(true)
+End Function
+
+
+'''''''''''''''''''''''
+' createErrorObject
+'   This create an associatiove array to be used to display error messages.
+'   Some of the contents of this object are dictated by the error codes specified on the following URL: 
+'   https://tubitv.atlassian.net/wiki/spaces/EC/pages/798359880/User+Facing+Error+Codes
+'
+' @param contextCode: The context code ID
+' @param subtypeCode: The subtype code ID
+' @param message: The message to be displayed when displaying this error
+' @param externalCode: The ID that comes from an outside source: i.e. server may provide a 404 error
+' @param title: The title of the error window to be displayed when displaying this error
+' Returns an associative array that is used to create the error object param for the showErrorModal() function
+Function createErrorObject(contextCode as String, subtypeCode as String, message = "" as String, externalCode = "", title = "" as String) as Object
+  oError = {}
+
+  oError.contextCode = contextCode
+  oError.subtypeCode = subtypeCode
+  '//The external code is optional, so if there is no external code, then do not include it in the returned code
+  sExternalCode = ""
+  if externalCode <> invalid 
+    if isstr(externalCode) = true
+      sExternalCode = externalCode
+    else if isint(externalCode) = true
+      sExternalCode = externalCode.toStr()
+    end if
+    if Len(sExternalCode) > 0
+      sExternalCode = "-" + sExternalCode
+    end if
+  end if
+  oError.externalCode = externalCode
+  oError.message = message
+  if Len(title) <= 0
+    title = "Something went wrong"
+  end if
+  oError.title = title
+
+  '//Format error codes according to the following specs
+  '//   https://tubitv.atlassian.net/wiki/spaces/EC/pages/798359880/User+Facing+Error+Codes
+  sPrefix = "RO"  '//RO = "Roku"
+  
+  oError.code = sPrefix + "-" + oError.contextCode  + "-" + oError.subtypeCode + sExternalCode
+
+  return oError
 End Function
 
 Function onErrorModalButtonSelected()
@@ -57,7 +120,26 @@ Function onErrorModalButtonSelected()
   m.errorModal_ = invalid
 End Function
 
+'isstr
+' ::TODO:: this is copied from generalUtils.brs. If/when we make generalUtils available to the general code, then we should link to generalUtils
+'Determine if the given object supports the ifString interface
+'******************************************************
+Function isstr(obj as dynamic) As Boolean
+    if obj = invalid return false
+    if GetInterface(obj, "ifString") = invalid return false
+    return true
+End Function
 
+'******************************************************
+'isint
+' ::TODO:: this is copied from generalUtils.brs. If/when we make generalUtils available to the general code, then we should link to generalUtils
+'Determine if the given object supports the ifInt interface
+'******************************************************
+Function isint(obj as dynamic) As Boolean
+    if obj = invalid return false
+    if GetInterface(obj, "ifInt") = invalid return false
+    return true
+End Function
 
 '''''''''''''''''''''''
 ' showExitAppModal

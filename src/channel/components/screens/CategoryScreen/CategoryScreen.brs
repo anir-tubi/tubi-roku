@@ -91,7 +91,8 @@ Function onHomescreenResponse()
     else
       ' if we were loading in the background, don't show an error modal
       if m.top.isInFocusChain()
-        showErrorModal(response.code, response.failReason, retryCategoryList, [], retryCategoryList, [])
+        errorObj = createErrorObject(m.global.constants.errors.context.homeScreen, m.global.constants.errors.subtypes.fetchError, response.failReason, response.code)
+        showErrorModal(errorObj, retryCategoryList, [], retryCategoryList, [])
         sendDialogAnalyticsEvent("WARNING", m.Tracking, m.trackingLoggingTask)
       end if
     end if
@@ -170,7 +171,9 @@ Function onReloadUserCategoriesResponse(msg)
     else
       ' if we were loading in the background, don't show an error modal
       if m.top.isInFocusChain()
-        showErrorModal(response.code, response.failReason, retryCategoryList, [], retryCategoryList, [])
+
+        errorObj = createErrorObject(m.global.constants.errors.context.homeScreen, m.global.constants.errors.subtypes.fetchError, response.failReason, response.code)
+        showErrorModal(errorObj, retryCategoryList, [], retryCategoryList, [])
         sendDialogAnalyticsEvent("WARNING", m.Tracking, m.trackingLoggingTask)
       end if
     end if
@@ -494,12 +497,12 @@ End Function
 ' Load all category content, including . Series do not have season or episode information though.
 Function loadAllCategories()
   tubiLog("CategoryScreen.loadAllCategories")
-
   ' This check causes all category fetches to be skipped prior to the field
   ' being set to true.  Then, once true it will reload any time loadCategories() is
   ' called, such as when signedIn field changes.
   if m.top.loadAllCategories = true
     reqName = m.constants.reqNames.getHomescreen
+    '//::TODO:: JHAND - test error here!
     m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", reqName)
     m.Spinner.visible = true
   end if

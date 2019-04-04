@@ -195,19 +195,24 @@ Function showErrorDialog()
     }
   end if
 
-
   sgGlobal.constants = m.global.utils.constants
+
+  errorObj = {}
+  errorObj.contextCode = sgGlobal.constants.errors.context.homeScreen 
+  errorObj.subtypeCode = sgGlobal.constants.errors.subtypes.networkError
+
+  errorObj.title = "Connection Error"
+
   controller = screen.CreateScene("ErrorController")
   screen.show()
   message = "There may be an issue with your network connection, or with Tubi's server. "
   message += "Please check your network connection and try again."
   message += chr(10)
-  message += chr(10)
-  message += "If you continue to have issues, please contact support@tubi.tv"
+  errorObj.message = message
+  
   controller.observeField("buttonSelected", port)
   controller.error = {
-    title: "Connection Error"
-    message: message
+    info: errorObj
     buttonText: "Exit"
   }
 

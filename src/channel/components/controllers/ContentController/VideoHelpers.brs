@@ -366,8 +366,11 @@ End Function
 ' onPlayerError
 '
 Function showPlayerError(errorMessage As String)
-  tubiLog("VideoHelpers.showPlayerError")
-  showErrorModal(0, errorMessage, onRetryPlayerError, [], onCancelPlayerError, [])
+  tubiLog("ContentController.showPlayerError")
+
+  errorObj = createErrorObject(m.global.constants.errors.context.playerScreen, m.global.constants.errors.subtypes.playerSetupErrorError, errorMessage)
+  showErrorModal(errorObj, onRetryPlayerError, [], onCancelPlayerError, [])
+  
   videoId = 0
   if m.videoPlayer <> invalid and m.videoPlayer.content <> invalid and m.videoPlayer.content.id <> invalid
     videoId = m.videoPlayer.content.id.toInt()

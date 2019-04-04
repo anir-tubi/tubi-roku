@@ -475,6 +475,31 @@ Function getConstants()
     constants.cacheTimes.category = 4 * 60 * 60 ' Time in seconds after which a category's cache is not valid
     constants.cacheTimes.homescreen = 6 * 60 * 60 ' Time in seconds after which the category screen's cache is not valid
 
+
+  'This will store the error codes that are needed to be displayed to the user. 
+  constants.errors = {}
+
+  '//Where does the error happen?
+  constants.errors.context = {}
+  constants.errors.context.homeScreen = "1"
+  constants.errors.context.videoDetailScreen = "2"
+  constants.errors.context.playerScreen = "3"
+  constants.errors.context.seriesDetailScreen = "4"
+  constants.errors.context.episodeScreen = "5"
+  constants.errors.context.channelScreen = "6"
+  constants.errors.context.searchScreen = "7"
+  constants.errors.context.activateScreen = "8"
+
+  '//What is the actual error?
+  constants.errors.subtypes = {}
+  '//Failed to fetch data from backend
+  constants.errors.subtypes.fetchError = "100"
+  constants.errors.subtypes.expireError = "101"
+  'Could not setup player
+  constants.errors.subtypes.playerSetupError = "200"
+  constants.errors.subtypes.networkError = "300"
+
+
   'UI properties that should be passed into the scene graph
   constants.ui = {}
 
