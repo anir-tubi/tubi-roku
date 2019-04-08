@@ -105,10 +105,10 @@ Function registrationLoop() As Void
                   type: "account"
                   values: {
                     manip: "REGISTER_DEVICE"
-                    current: "CODE"
+                    current: ""  'not needed for the REGISTER_DEVICE event
                     user_type: "UNKNOWN_USER_TYPE"
                     status: "SUCCESS"
-                    linked: ""
+                    linked: ""  'not needed for the REGISTER_DEVICE event
                   }
                 }
                 return  ' end the thread

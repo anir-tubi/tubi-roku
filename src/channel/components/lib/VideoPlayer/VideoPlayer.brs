@@ -1011,11 +1011,17 @@ End Function
 'moves the player to the 0:00:00 position
 Function goToStart()
   m.positionAtJumpStart = m.playerPosition
-  m.playerPosition = 0
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
     setFocusedButton(m.StartButton)
+  else
+    playProgressEvent = getPlayProgressEvent()
+    if playProgressEvent <> invalid
+      trackEvent(playProgressEvent)
+    end if
   end if
+  m.playerPosition = 0
+  m.lastPingTime = m.playerPosition
   jumpToPosition(m.playerPosition)
 End Function
 
