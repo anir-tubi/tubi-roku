@@ -155,7 +155,7 @@ Function getConstants()
       RegWrite("deviceId", constants.deviceInfo.deviceId, deviceInfoRegSection)
     else if FindMemberFunction(di, "GetChannelClientId") <> invalid
       storedDeviceId = RegRead("deviceId", deviceInfoRegSection)
-      if storedDeviceId <> invalid
+      if storedDeviceId <> invalid and storedDeviceId <> "000000000000"
         constants.deviceInfo.deviceId = storedDeviceId
       else
         constants.deviceInfo.deviceId = di.GetChannelClientId()
