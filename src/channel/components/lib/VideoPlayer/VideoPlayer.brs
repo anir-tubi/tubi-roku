@@ -1438,7 +1438,7 @@ End Function
 ' a user selects to "jump to next video"
 Function getPlayProgressEvent()
   playProgressEvent = invalid
-  if m.playerPosition <> m.lastPingTime
+  if m.playerPosition > m.lastPingTime
     playProgressEvent = {
       type: "play_progress"
       values: {

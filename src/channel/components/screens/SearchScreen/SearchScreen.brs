@@ -349,8 +349,9 @@ End Function
 
 Function getTrackingComponentInfo(itemIndex, numColumns, contentNode, trackingLib)
   if trackingLib <> invalid
-    column = (1 + itemIndex) MOD numColumns
+    column = 1 + (itemIndex MOD numColumns)
     row = 1 + (itemIndex \ numColumns)
+
     return {
       componentType: "search_result_component"
       componentValues: {
