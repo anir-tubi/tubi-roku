@@ -32,6 +32,14 @@ Function init()
   }
 End Function
 
+Function updateFocusedMenuItemDescription()
+  rowItemFocused = m.Menu.rowItemFocused
+  if rowItemFocused <> invalid and rowItemFocused.Count() > 0 and m.Menu.content <> invalid
+    item = m.Menu.content.getChild(rowItemFocused[0]).getChild(rowItemFocused[1])
+    m.Description.text = item.description
+  end if
+End Function
+
 Function onComponentFocusChange()
   if m.top.isInFocusChain() and not m.Menu.hasFocus() then
     m.Menu.setFocus(true)
@@ -47,25 +55,25 @@ Function onMenuItemFocused(msg)
   m.top.itemFocused = itemFocused
 End Function
 
-
-Function onItemFocused()
+Function onItemFocused() 
   tubiLog("ToolsMenu.onItemFocused")
   rowItemFocused = m.Menu.rowItemFocused
-  item = m.Menu.content.getChild(rowItemFocused[0]).getChild(rowItemFocused[1])
-  m.Description.text = item.description
+  if rowItemFocused<> invalid and rowItemFocused.Count() > 0
+    updateFocusedMenuItemDescription()
 
-  'Set the navigateWithinPageInfo value which will pass through to HomeScreen.brs and eventually trigger ContentController
-  'to fire a navigate_within_page analytics event.
-  if m.Menu.hasFocus()
-    m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage("generic_page", {generic_page_type: "OTT_MENU"})
-      componentOneof: m.Tracking.getAnalyticsComponent("tools_component", {}) 'there is no "tools_component" in protos, so this is a place holder for now
-      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-      vertical_location: 1
-      vertical_location_mode: "INDEX"  'LocationMode enum
-      horizontal_location: rowItemFocused[1] + 1 '1 based index
-      horizontal_location_mode: "INDEX"  'LocationMode enum
-    }
+    'Set the navigateWithinPageInfo value which will pass through to HomeScreen.brs and eventually trigger ContentController
+    'to fire a navigate_within_page analytics event.
+    if m.Menu.hasFocus()
+      m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage("generic_page", {generic_page_type: "OTT_MENU"})
+        componentOneof: m.Tracking.getAnalyticsComponent("tools_component", {}) 'there is no "tools_component" in protos, so this is a place holder for now
+        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+        vertical_location: 1
+        vertical_location_mode: "INDEX"  'LocationMode enum
+        horizontal_location: rowItemFocused[1] + 1 '1 based index
+        horizontal_location_mode: "INDEX"  'LocationMode enum
+      }
+    end if
   end if
 End Function
 
@@ -106,6 +114,9 @@ Function onSignedInChange()
   numberButtons = m.Menu.content.getChild(0).getChildCount()
   menuWidth = (posterWidth + posterSpacing) * numberButtons
   m.Menu.itemSize = [menuWidth, 400]
+  
+  '//When the signed in state changes, ensure the selected menu item has the proper description showing
+  updateFocusedMenuItemDescription()
 End Function
 
 
