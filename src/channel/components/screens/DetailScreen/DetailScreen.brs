@@ -361,7 +361,9 @@ Function onRelatedContentSelected()
   row = 1
   m.top.trackingComponentInfo = {
     componentType: "related_component"
-    componentValues: m.Tracking.getAnalyticsTile(selectedContent, col, row)
+      componentValues: {
+        content_tile: m.Tracking.getAnalyticsTile(selectedContent, col, row)
+      }
   }
 
   m.top.relatedContentSelected = m.RelatedGrid.itemSelected

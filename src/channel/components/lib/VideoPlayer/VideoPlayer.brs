@@ -418,7 +418,7 @@ Function onCaptionModeChange()
   end if
 
   if m.Video.content <> invalid then
-    language = ""
+    language = "UNKNOWN"
     for i=0 to m.Video.availableSubtitleTracks.count()-1
       trackInfo = m.Video.availableSubtitleTracks[i]
       if m.Video.subtitleTrack = trackInfo.TrackName
@@ -513,7 +513,7 @@ Function playContent()
       type: "start_video"
       values: {
         video_id: m.Video.content.id.toInt()
-        start_position: m.playerPosition * 1000
+        start_position: Int(m.playerPosition * 1000)
         current_cdn: ""   'not possible for Roku client
         has_subtitles: hasSubtitles  'the video player will show subtititles at start
         is_livetv: isLiveTv
@@ -1191,8 +1191,8 @@ Function handleSeek(position as Float, positionAtJumpStart as Float, shouldAdBre
     type: "seek"
     values: {
       video_id: m.Video.content.id.toInt()
-      from_position: positionAtJumpStart * 1000
-      to_position: position * 1000
+      from_position: Int(positionAtJumpStart * 1000)
+      to_position: Int(position * 1000)
     }
   })
 

@@ -136,6 +136,7 @@ Function tubiTracking_getAnalyticsDevice()
     is_mobile: false
     device_height: m.constants.deviceInfo.displayHeight
     device_width: m.constants.deviceInfo.displayWidth
+    advertiser_id: "00000000-0000-0000-0000-000000000000"
   }
   if m.constants.deviceInfo.isAdIdTrackingDisabled <> true
     device.advertiser_id = m.constants.deviceInfo.deviceAdId

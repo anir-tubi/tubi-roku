@@ -726,12 +726,6 @@ Function onRelatedContentSelected(msg)
   detailScreen = msg.getRoSGNode()
   content = detailScreen.content.relatedContent.getChild(detailScreen.relatedContentSelected)
   if content <> invalid
-    detailScreen.trackingComponentInfo = {
-      componentType: "related_component"
-      componentValues: {
-        content_tile: m.Tracking.getAnalyticsTile(content, detailScreen.relatedContentSelected)
-      }
-    }
     showDetailScreen(content)
   end if
 End Function

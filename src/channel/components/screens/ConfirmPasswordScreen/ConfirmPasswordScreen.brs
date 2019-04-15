@@ -18,6 +18,14 @@ Function init()
     m.SubmitButtonFocus.uri = "pkg:/images/menu-focus-hd.9.png"
     m.SubmitButtonDisabledFocus.uri = "pkg:/images/menu-disabled-focus-hd.9.png"
   end if
+
+  'set initial tracking values
+  m.top.trackingPageInfo = {
+    pageType: "auth_page"
+    pageValues: {
+      auth_action: "PASSWORD_CONFIRMATION"
+    }
+  }
 End Function
 
 ''''''''''''''''''''''
