@@ -249,7 +249,14 @@ Function onSingleContentResponse(msg) As Void
   refreshedContent = msg.GetData()
   oldContent = detailScreen.content
   afterFn = invalid  ' the Function to execute once we've sorted the detail screen out
+  history = m.global.historyIds.findNode(refreshedContent.id)
+
   if m.enteredFromDeepLink = true and m.top.deepLinkContent <> invalid
+    if history <> invalid and history.nowPos > 0
+     '//Use the history deeplink to resume a deeplinked video 
+      m.top.deepLinkContent.nowPos = history.nowPos
+    end if
+
     if m.top.deepLinkContent.deeplinkType = "series" and refreshedContent.type = m.constants.ui.contentTypes.series
       '  refreshedContent.id:       series id
       '  refreshedContent.seriesId: invalid
@@ -263,7 +270,6 @@ Function onSingleContentResponse(msg) As Void
       ' Here we use the history to choose an episode or just default to the first one.
 
       afterFn = playHelper
-      history = m.global.historyIds.findNode(refreshedContent.id)
       if history <> invalid
         refreshedContent.currentEpisodeId = history.currentEpisodeId
         episode = getEpisodeContent(refreshedContent)
@@ -346,7 +352,6 @@ Function onSingleContentResponse(msg) As Void
         refreshedContent.currentEpisodeId = oldContent.id
       else
         ' first see if there was a specific episode id we wanted
-        history = m.global.historyIds.findNode(refreshedContent.id)
         if history <> invalid
           refreshedContent.currentEpisodeId = history.currentEpisodeId
         else
