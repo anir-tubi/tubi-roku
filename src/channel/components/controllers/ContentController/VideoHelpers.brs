@@ -136,7 +136,6 @@ Function onGoToNext()
   playVideoContent(nextContent, "none") 'TODO: FIND OUT IF THIS COUNTS AS AUTOPLAY?
 End Function
 
-
 ' @nextContent: roSGNode, the content node representing the content that will be played next
 ' @ autoplayType: string, "deliberate" or "automatic", refers to if the up next content was selected or is auto playing
 Function playUpNextContent(nextContent, autoplayType)
@@ -145,9 +144,11 @@ Function playUpNextContent(nextContent, autoplayType)
   stopVideoContent(m.constants.player.playerResults.completed, false)
   playVideoContent(content, autoplayType)
   popScreen(false) ' pop the up next screen off the screen stack
-  m.upNextScreen.unobserveFieldScoped("contentSelected")
-  m.upNextScreen.unobserveFieldScoped("timeout")
-  m.upNextScreen.unobserveFieldScoped("backPressed")
+  if m.upNextScreen <> invalid
+    m.upNextScreen.unobserveFieldScoped("contentSelected")
+    m.upNextScreen.unobserveFieldScoped("timeout")
+    m.upNextScreen.unobserveFieldScoped("backPressed")
+  end if
   m.upNextScreen = invalid
 End Function
 
@@ -171,11 +172,20 @@ Function onUpNextBackPressed()
   ' remove the screen and put focus back on the video player transport
   m.upNextScreen.unobserveFieldScoped("contentSelected")
   m.upNextScreen.unobserveFieldScoped("backPressed")
+  focusedVideo = invalid
+  if m.upNextScreen <> invalid 
+    focusedVideo = m.upNextScreen.contentFocused
+  end if
   m.upNextScreen = invalid
   popScreen(false) 'pop the up next screen off the screen stack
   if m.videoPlayer.state = "finished"
     ' up next was dismissed but playback had already finished
-    returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+    if focusedVideo <> invalid
+      '//go to next upNext video that was last focused
+      playUpNextContent(focusedVideo, "automatic")
+    else
+      returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+    end if
   else
     m.ScreenStack.visible = false
     m.videoPlayer.setFocus(true)
