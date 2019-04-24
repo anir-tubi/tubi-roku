@@ -513,10 +513,6 @@ Function getConstants()
     constants.ui.users = {}
       constants.ui.users.guestHistory = true
 
-    'constants needed for sign in flow experimentation
-    constants.ui.signIn = {}
-      constants.ui.signIn.backExitsSignIn = false
-
     'static - pre defined category names
     constants.ui.categoryNames = {}
       constants.ui.categoryNames.topCategory = "Featured"

@@ -98,27 +98,3 @@ Function onAuthInfoReceived()
     currentScreen().setFocus(true)
   end if
 End Function
-
-
-'''''''''''''''''''''''''
-' onSignInBackPressed
-'
-' The sign-in controller captured a back button press at the top of the screen stack
-Function onSignInBackPressed()
-  tubiLog("SignInHelpers.onSignInBackPressed")
-  ' If we loaded the sign-in experience from the tools menu or Add To Queue button, keep
-  ' the context.  We detect this by looking at whether the ContentController's screen stack
-  ' is empty or not.
-  if currentScreen() <> invalid
-    m.rootTabGroup.show = m.contentGroup.id
-  else if m.constants.ui.signIn.backExitsSignIn = true
-    m.exitModal = showExitAppModal("onExitAppModalButtonSelected")
-    m.trackingLoggingTask.trackEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "INFORMATION"   'DialogType enum
-        pageOneof: m.Tracking.getAnalyticsPage("auth_page", {auth_action: "ACTIVATION"})
-      }
-    }
-  end if
-End Function

@@ -12,8 +12,6 @@ m.global.utils.constants.settings.remoteComponentsUrl = "{{remoteComponentsLocat
 '''''''''''''''''''''''''''''''
 ' Turn features on/off
 
-' Turn on the back exits sign-in for Roku approval
-m.global.utils.constants.ui.signIn.backExitsSignIn = true
 
 
 '''''''''''''''''''''''''''''''
