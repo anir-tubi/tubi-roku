@@ -70,7 +70,7 @@ REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
   --include 'components/screens/**' \
   --include 'components/tasks' \
   --include 'components/tasks/**' \
-  --include-from=new_images_since_2_8 \
+  --include-from=new_images_since_2_9 \
   --exclude '*'
 else
 RSYNC_EXCLUDE= \
@@ -84,7 +84,7 @@ REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
   --include 'source/3rdparty/**' \
   --include 'components' \
   --include 'components/**' \
-  --include-from=new_images_since_2_8 \
+  --include-from=new_images_since_2_9 \
   --exclude '*'
 endif
 
@@ -114,7 +114,7 @@ rsync:
 	find ./$(TARGET_REMOTE_DIR)/components -name '*.xml' | xargs $(SED) 's|<script type="text/brightscript" uri="pkg:|<script type="text/brightscript" uri="libpkg:|'
 
 	# Swap only whitelisted image references from pkg:/ to libpkg:/
-	for path in `egrep "(png|jpg)" new_images_since_2_8`; do \
+	for path in `egrep "(png|jpg)" new_images_since_2_9`; do \
     echo "Redirecting whitelisted image $$path"; \
     find ./$(TARGET_REMOTE_DIR)/components -type f | xargs $(SED) "s|pkg:/+$$path|libpkg:/$$path|"; \
   done
