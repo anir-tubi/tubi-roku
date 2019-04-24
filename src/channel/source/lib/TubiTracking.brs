@@ -67,7 +67,7 @@ End Function
 '@eventType: string, the type of event we are sending, will be used as part of the request identifier
 '@trackData: assocArray, object returned from m.getTrackData()
 Function tubiTracking_getUserTrackingRequest(eventType, trackData) as Object
-  trackUrl = m.constants.urls.analytics.event
+  trackUrl = m.constants.urls.analytics.singleEvent
 
     options = {
       method: m.constants.reqTypes.post

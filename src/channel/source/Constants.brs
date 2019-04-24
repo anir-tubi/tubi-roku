@@ -318,6 +318,7 @@ Function getConstants()
       ' constants.urls.analytics.urlBase = "https://analytics-ingestion.staging-public.tubi.io/analytics-ingestion"
       constants.urls.analytics.urlBase = "https://analytics-ingestion.production-public.tubi.io/analytics-ingestion"
       constants.urls.analytics.event = constants.urls.analytics.urlBase + "/v2/event"
+      constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
 
 
     'live tv urls
