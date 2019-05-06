@@ -1,35 +1,38 @@
 Function init()
-  tubiLog("SearchScreen.init")
+  tubiLog("SearchScreenOld.init")
   m._ = rodash()
   m.constants = m.global.constants
   Request = TubiRequest()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
-  
-  m.spinner = m.top.findNode("spinner")
-  m.Keyboard = m.top.findNode("Keyboard")
-  m.Keyboard.textEditBox.maxTextLength = 100
-  '//::TODO:: there looks like there is a bug when setting a custom focus color background. The focius color is not the right size. 
-  '//   When this is fixed in a firmware, we should use a custom focus background color
-  '//m.keyboard.focusedKeyColor = m.global.constants.ui.colors.keyboardFocusedText
-  m.keyboard.focusedKeyColor = "0x000000FF" '//Set the focus color to black when using the default key background color because there is a bug when the backspace key is not visible
-  '//m.keyboard.focusBitmapUri = "pkg:/images/keyboard_search_focused_key.9.png"
-  m.keyboard.observeField("text", "onKeyboardTextChanged")
 
+  m.Keyboard = m.top.findNode("Keyboard")
+  m.Keyboard.observeField("text", "onKeyboardTextChanged")
   m.SearchText = m.top.findNode("SearchText")
   m.ResultGrid = m.top.findNode("ResultGrid")
   m.ResultGrid.observeField("itemSelected", "onResultSelected")
   m.ResultGrid.observeField("itemFocused", "onItemFocused")
-  
   m.NoResultsMessage = m.top.findNode("NoResultsMessage")
-  m.NoResultsMessage.color = m.constants.ui.colors.primaryText
+  m.Cursor = m.top.findNode("Cursor")
+  m.InfoPanel = m.top.findNode("SearchInfoPanel")
+  m.UpdatingMessage = m.top.findNode("UpdatingMessage")
+  m.UpdatingMessageText = m.UpdatingMessage.findNode("SearchUpdatingText")
+  m.UpdatingSpinner = m.UpdatingMessage.findNode("SearchSpinner")
+
+  m.TextEntryAnimation = m.top.findNode("TextEntryAnimation")
+  m.TranslationInterpolator = m.top.findNode("TextEntryTranslationInterpolator")
+  m.ScaleInterpolator = m.top.findNode("TextEntryScaleInterpolator")
+  m.KeyboardInterpolator = m.top.findNode("KeyboardTranslationInterpolator")
+  m.InfoPanelOpacityInterpolator = m.top.findNode("InfoPanelOpacityInterpolator")
+  m.SearchHintOpacityInterpolator = m.top.findNode("SearchHintOpacityInterpolator")
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("searchResponse", "onSearchResultsReceived")
   m.top.observeField("signedIn", "onSignedInChange")
-  m.top.observeField("visible", "onVisible")
 
-  m.SearchText.color = m.global.constants.ui.colors.titleHeader
+  ' While we aren't loading a seeded "Trending Searches", set the text to focus color
+  m.SearchText.color = m.global.constants.ui.colors.focused ' default is white when no search term is entered
+  m.UpdatingMessageText.color = m.global.constants.ui.searchUpdatingText
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
 
@@ -50,73 +53,54 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the content grid already
   ' has focus, not when it gains focus.
   m.gridHasFocus = false
-  ' Used to know if the grid was in focus when user returns from the detailed screen
-  m.bViewedSearchSubPage = false
 
   loadSearchResults(true)'//load the default search results
 End Function
 
 
-'''''''''''''''''''''''''
-' displayLoading
-'
-' Display the loading spinner or not
-Function displayLoading(b = true)
-  m.spinner.visible = b
-End Function
-
-Function onVisible()
-  if m.top.visible = true
-    m.top.backgroundUriList = [m.defaultHeroUri]
-  end if
-End Function
-
-'''''''''''''''''''''''''
-' onScreenFocusChange
-'
-' On focus set to screen, push focus on keyboard or grid.
-' This is used when the search screen regains focus after coming back from the details page.
-Function onScreenFocusChange()
-  if m.top.hasFocus() then
-    if m.bViewedSearchSubPage = true
-      m.bViewedSearchSubPage = false
-      m.ResultGrid.setFocus(true)
-    end if
-  end if
-End Function
-
 ' This may filter results based on parental controls so send it again on auth change
 Function onSignedInChange()
-  tubiLog("SearchScreen.onSignedInChange")
+  tubiLog("SearchScreenOld.onSignedInChange")
   if m.Keyboard.text <> invalid and m.Keyboard.text.len() > 0 then
     loadSearchResults()
   end if
 End Function
 
 Function onSearchResultsReceived()
-  tubiLog("SearchScreen.onSearchResultsReceived")
-  displayLoading(false)
+  tubiLog("SearchScreenOld.onSearchResultsReceived")
   response = m.top.searchResponse.response
   if response.code >= 200 and response.code < 300 then 
     m.ResultGrid.content = m.top.searchResponse.convertedMetadata
     if m.top.searchResponse.convertedMetadata <> invalid and m.top.searchResponse.convertedMetadata.getChildCount() > 0 then
       if response.name = m.constants.reqNames.getSearchDefault
         '//display special text when the default search is displaying 
-        m.SearchText.text = "Search for movies, TV shows, and people"
+        m.SearchText.text = "Trending Searches"
+        m.SearchText.color = m.global.constants.ui.colors.titleHeader
+        m.Cursor.visible = false
+        '//::TODO:: set Number of results textfield to = "Popular titles this week"
       end if
       m.ResultGrid.visible = true
       m.NoResultsMessage.visible = false
     else
       m.ResultGrid.visible = false
       m.NoResultsMessage.visible = true
-      message = "We couldn't find results for "
-      message +=  "'" + m.SearchText.text + "'" 
-      message += chr(10) 
-      message += "Please try again"
-      m.NoResultsMessage.text = message
     end if
   else
     'TODO(Chris): Show error modal here
+  end if
+End Function
+
+'''''''''''''''''''''''''
+' onScreenFocusChange
+'
+' On focus set to screen, push focus on keyboard or grid
+Function onScreenFocusChange()
+  if m.top.hasFocus() then
+    if m.InfoPanel.opacity = 0.0 then
+      m.Keyboard.setFocus(true)
+    else
+      m.ResultGrid.setFocus(true)
+    end if
   end if
 End Function
 
@@ -126,7 +110,7 @@ End Function
 '
 ' Handle content grid item selected
 Function onResultSelected()
-  tubiLog("SearchScreen.onResultSelected")
+  tubiLog("SearchScreenOld.onResultSelected")
   if m.ResultGrid.content <> invalid
     selectedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemSelected)
     m.top.trackingComponentInfo = getTrackingComponentInfo(m.ResultGrid.itemSelected, m.ResultGrid.numColumns, selectedContent, m.Tracking)
@@ -140,7 +124,6 @@ Function onResultSelected()
       }
       m.top.contentSelected = selectedContent
       m.gridHasFocus = false
-      m.bViewedSearchSubPage = true
     end if
   end if
 End Function
@@ -151,17 +134,12 @@ End Function
 '
 ' Launch a search when the keyboard text has changed
 Function onKeyboardTextChanged()
-  tubiLog("SearchScreen.onSearchTextChanged " + m.Keyboard.text)
-
-  '//display spinner
-  displayLoading()
-  '//hide previous content
-  m.ResultGrid.visible = false
-  m.NoResultsMessage.visible = false
-
-  m.SearchText.text = LCase(m.Keyboard.text)
+  tubiLog("SearchScreenOld.onSearchTextChanged " + m.Keyboard.text)
+  m.SearchText.text = m.Keyboard.text
+  m.SearchText.color = m.global.constants.ui.colors.focused  
   if m.Keyboard.text <> invalid and m.Keyboard.text.len() > 0 then
-    loadSearchResults() 
+    m.Cursor.visible = true
+    loadSearchResults()
   else
     '//if the search text was empty, clear out any existing results and display the default search results
     loadSearchResults(true)
@@ -174,9 +152,16 @@ End Function
 '
 ' Update the info panel when a result item is focused
 Function onItemFocused()
-  tubiLog("SearchScreen.onItemFocused")
+  tubiLog("SearchScreenOld.onItemFocused")
   if m.ResultGrid.content <> invalid
     focusedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
+    populateInfoPanel(focusedContent)
+
+    if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0 then
+      m.top.backgroundUriList = focusedContent.backgrounds
+    else
+      m.top.backgroundUriList = [m.defaultHeroUri]
+    end if
 
     ' Set up the info that the ContentController uses to send navigate_within_page events.
     ' Don't change m.top.navigateWithinPageInfo if the focused content hasn't changed
@@ -215,13 +200,94 @@ Function onItemFocused()
 End Function
 
 
+'''''''''''''''''''''''
+' onKeyEvent
+'
+Function onKeyEvent(key As String, press As Boolean) As Boolean
+  tubiLog("SearchScreenOld.onKeyEvent")
+  if press then
+    ' Only focus on content grid if animation is not in process, and if there is actually content there
+    if key = "down" and m.Keyboard.isInFocusChain() and m.TextEntryAnimation.state = "stopped" and m.ResultGrid.content <> invalid and m.ResultGrid.content.getChildCount() > 0 then
+      startFocusResultGrid()
+      return true
+    else if key = "up" and m.ResultGrid.isInFocusChain() and m.TextEntryAnimation.state = "stopped" then
+      startFocusKeyboard()
+      return true
+    end if
+  end if
+  return false
+End Function
+
+
+''''''''''''''''''''''
+' startFocusResultGrid
+'
+' Animate the keyboard off screen, show the info panel, and focus on the content grid
+Function startFocusResultGrid()
+  tubiLog("SearchScreenOld.startFocusResultGrid")
+  m.TranslationInterpolator.keyValue = [[85,315],[85,545]]
+  m.SearchText.font.size = 34
+  m.Cursor.visible = false
+  keyboardRect = m.Keyboard.boundingRect()
+  m.InfoPanelOpacityInterpolator.keyValue = [0.0, 1.0]
+  m.SearchHintOpacityInterpolator.keyValue = [0.0, 0.5]
+  m.KeyboardInterpolator.keyValue = [m.Keyboard.translation, [0, -keyboardRect.height]]
+  m.TextEntryAnimation.observeField("state", "endFocusResultGrid")
+  m.TextEntryAnimation.control = "start"
+  m.Keyboard.setFocus(false)
+End Function
+
+
+'''''''''''''''''''''
+' endFocusResultGrid
+'
+' Finalize focus and visibility after the animation
+Function endFocusResultGrid()
+  tubiLog("SearchScreenOld.endFocusResultGrid")
+  if m.TextEntryAnimation.state = "stopped" then
+    m.TextEntryAnimation.unobserveField("state")
+    m.ResultGrid.setFocus(true)
+  end if
+End Function
+
+
+''''''''''''''''''''''''''
+' startFocusKeyboard
+'
+' Hide the info panel and bring back the keyboard
+Function startFocusKeyboard()
+  resetMetaData()
+  m.TranslationInterpolator.keyValue = [[85,545],[85,315]]
+  m.SearchText.font.size = 67
+  keyboardRect = m.Keyboard.boundingRect()
+  m.InfoPanelOpacityInterpolator.keyValue = [1.0, 0.0]
+  m.SearchHintOpacityInterpolator.keyValue = [0.5, 0.0]
+  m.KeyboardInterpolator.keyValue = [m.Keyboard.translation, [0, 65]]
+  m.TextEntryAnimation.observeField("state", "endFocusKeyboard")
+  m.TextEntryAnimation.control = "start"
+  m.ResultGrid.setFocus(false)
+  m.gridHasFocus = false
+End Function
+
+
+''''''''''''''''''''''''''
+' endFocusKeyboard
+'
+' Finalize focus and visibility after the animation
+Function endFocusKeyboard()
+  if m.TextEntryAnimation.state = "stopped" then
+    m.TextEntryAnimation.unobserveField("state")
+    m.Keyboard.setFocus(true)
+  end if
+End Function
+
 
 '''''''''''''''''''''
 ' loadSearchResults
 '
 ' Create a request object for the search and hand the request to the metaDataFetchTask which will actually make the request
 Function loadSearchResults(bDefaultResults = false)
-  tubiLog("SearchScreen.loadSearchResults")
+  tubiLog("SearchScreenOld.loadSearchResults")
   searchText = m.Keyboard.text
   ' cancel any in-flight requests
   m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, m.top, "searchResponse")
@@ -239,6 +305,45 @@ Function loadSearchResults(bDefaultResults = false)
     m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("featured", m.top, "searchResponse", m.constants.reqNames.getSearchDefault)
   end if
 
+  if m.constants.deviceInfo.limitedUi = true
+    m.UpdatingSpinner.visible = false
+  end if
+End Function
+
+'''''''''''''''''''''
+' resetMetaData
+'
+Function resetMetaData()
+  m.top.backgroundUriList = [m.defaultHeroUri]
+  populateInfoPanel(invalid)
+End Function
+
+'''''''''''''''''''''
+' populateInfoPanel
+'
+Function populateInfoPanel(focusedContent)
+  if focusedContent <> invalid
+    m.InfoPanel.title = focusedContent.title
+    m.InfoPanel.genres = focusedContent.genres
+    m.InfoPanel.description = focusedContent.description
+    info = {}
+    info.releaseDate = focusedContent.releaseDate
+    info.length = focusedContent.length
+    info.rating = focusedContent.rating
+    if (focusedContent.hasSubtitles or not m._.empty(focusedContent.subtitleTracks))
+      info.hasCC = true
+    else
+      info.hasCC = false
+    end if
+
+    m.InfoPanel.lineOneData = info
+    m.InfoPanel.calculateHeight = true
+  else 
+    m.InfoPanel.title = ""
+    m.InfoPanel.genres = []
+    m.InfoPanel.description = ""
+    m.InfoPanel.lineOneData = {}
+  end if
 End Function
 
 
@@ -256,35 +361,4 @@ Function getTrackingComponentInfo(itemIndex, numColumns, contentNode, trackingLi
   end if
 
   return invalid
-End Function
-
-'''''''''''''''''''''''
-' onKeyEvent
-'
-Function onKeyEvent(key As String, press As Boolean) As Boolean
-  tubiLog("SearchScreen.onKeyEvent")
-  if press then
-    ' Only focus on content grid if animation is not in process, and if there is actually content there
-    if key = "right" and m.Keyboard.isInFocusChain() and m.ResultGrid.content <> invalid and m.ResultGrid.content.getChildCount() > 0 then
-      m.ResultGrid.setFocus(true)
-      m.gridHasFocus = true 
-      return true
-    else if key = "left" and m.ResultGrid.isInFocusChain() then
-      m.Keyboard.setFocus(true)
-      m.gridHasFocus = false
-      return true
-    else if key = "back" and m.ResultGrid.isInFocusChain() then
-      '//when the user hits BACK, then set the keyboard to focus
-      '//jump to left most visible thumbnail in the grid
-      nFocused = m.ResultGrid.itemFocused
-      nColumns = m.ResultGrid.numColumns
-      nJumpTo = Int(nFocused/nColumns) * nColumns
-
-      m.ResultGrid.jumpToItem = nJumpTo
-      m.Keyboard.setFocus(true)
-      m.gridHasFocus = false
-      return true
-    end if
-  end if
-  return false
 End Function

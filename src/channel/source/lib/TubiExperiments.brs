@@ -23,6 +23,7 @@ Function TubiExperiments(request as Object, constants as Object) as Object
         roku_on_now: 0
       }
       RokuNamespace: {
+        roku_search_page_new: false
         roku_simple_register_screen: 0
         roku_ad_content_type: "hls"
       }

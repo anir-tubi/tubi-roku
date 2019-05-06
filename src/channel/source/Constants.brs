@@ -563,6 +563,10 @@ Function getConstants()
       constants.ui.colors.primaryText = "0xFFFFFFFF"
       constants.ui.colors.secondaryText = "0x777777FF"
       constants.ui.colors.focusedText = "0xFFFFFFFF"
+      '//::NOTE::HARDCODED:: there is a BUG in the built in roku keyboard component'
+      '// If the color is white, then it will make the focus color to a nearly-black gray.
+      '// To combat this limitation, the color is set to white with a very slight, hardly-noticeable opacity.
+      constants.ui.colors.keyboardFocusedText = "0xFFFFFFFE"
       constants.ui.colors.highlightedText = "0xFF501AFF"
       constants.ui.colors.shade = "0x191919FF"
       constants.ui.colors.spinnerBox = "0x2C2C2CFF"

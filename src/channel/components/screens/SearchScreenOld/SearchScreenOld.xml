@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<component name="SearchScreen" extends="Group" initialFocus="Keyboard">
+<component name="SearchScreenOld" extends="Group" initialFocus="Keyboard">
 
-  <script type="text/brightscript" uri="pkg:/components/screens/SearchScreen/SearchScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/SearchScreenOld/SearchScreenOld.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
@@ -50,124 +50,145 @@
   </interface>
   
   <children>
+    <!-- The keyboard: upper, lower, numbers, symbols -->
+    <KeyboardGroup
+      id="Keyboard"
+      translation="[0,65]"/>
 
-    <Group id="nav"
-      translation="[85,55]">
+    <!-- The search label and icon that appear when the keyboard goes off-screen -->
+    <Rectangle
+      id="SearchHint"
+      translation="[850,38]"
+      opacity="0.0"
+      visible="true">
       <Poster
-        id="TubiLogo"
-        height="45"
-        width="103"
-        opacity="0.5"
-        uri="pkg:/images/logo-white-large.png"/>
-      <LayoutGroup
-        id="ToolbarHint"
-        layoutDirection="horiz"
-        vertAlignment="custom"
-        opacity="0.5"
-        translation="[752,3]">
-        <Label
-          text="PRESS"
-          vertAlign="center"
-          height="47"
-          translation="[0,2]">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="22" />
-        </Label>
-        <Poster
-          uri="pkg:/images/back.png"
-          width="47"
-          height="47"/>
-        <Label
-          text="FOR TOOLBAR"
-          vertAlign="center"
-          height="47"
-          translation="[0,2]">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="22" />
-        </Label>
-      </LayoutGroup>
-    </Group>
+       id="SearchHintIcon" 
+       uri="pkg:/images/up-arrow.png"
+       translation="[0,13]"
+       height="47"
+       width="47"
+       loadDisplayMode="scaleToZoom" />
+    
+      <Label
+       id="SearchHintText"
+       translation="[51,0]" 
+       vertAlign="center"
+       horizAlign="left" 
+       height="80"
+       text="SEARCH AGAIN">
+        <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-SemiBold.ttf"
+         size="22" />
+       
+      </Label>
+    </Rectangle>
+    
+    <!-- Live text entry box with a non-blinking "cursor" -->
     <LayoutGroup
-        id="content"
-        translation="[65,160]"
-        layoutDirection="horiz"
-        vertAlignment="top"
-        horizAlignment="left"
-        itemSpacings="[95]">
-      <LayoutGroup
-          id="leftSide"
-          layoutDirection="vert"
-          itemSpacings="[0,14]"
-          horizAlignment="left"
-          vertAlignment="top">
-        <!--topLeftSideSpacer used to position the keyboard so it is aligns vertically with the resulkts grid on the right side-->
-        <Rectangle 
-          id="topLeftSideSpacer"
-          visible="false"
-          width="10"
-          height="64"></Rectangle>
-        <MiniKeyboard
-          id="Keyboard"
-          showTextEditBox="false">
-        </MiniKeyboard>
-      </LayoutGroup>
-      <!-- Live text entry box with a non-blinking "cursor" -->
+      id="TextEntryGroup"
+      layoutDirection="horiz"
+      translation="[85,315]"
+      itemSpacings="[2]">
       <Label
         id="SearchText"
+        text=""
         vertAlign="center"
-        width="1114"
-        height="64">
+        height="74">
         <Font
         id="SearchTextFont"
         role="font"
         uri="pkg:/fonts/Vaud-SemiBold.ttf"     
-        size="43"/>
+        size="67"/>
       </Label>
-    </LayoutGroup>
-  
-    <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus, 
-    the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
-    <Group
-      translation="[745,248]"
-      id="ResultArea">
-      <PosterGrid
-        id="ResultGrid"
-        basePosterSize="[210,300]"
-        itemSpacing="[10,10]"
-        numColumns="5"
-        numRows="3"
-        vertFocusAnimationStyle="fixedFocus"
-        focusBitmapUri="pkg:/images/selector-fhd.9.png"/>
-      <Spinner
-        id="spinner"
+      <Rectangle
+        id="Cursor"
         visible="false"
-        modal="true"
-        isDisabled="false"
-        text="Updating your results..."
-        displayText="true"
-        width="1094"
-        height="575"/>
+        height="70"
+        width="2"/>
+    </LayoutGroup>
+
+    <!-- Infopanel visible once the results grid is focused -->
+    <InfoPanel
+      id="SearchInfoPanel"
+      mode="item"
+      translation="[85,160]"
+      visible="true"
+      opacity="0.0"
+      maxHeight="370"/>
+    
+    <Group
+      id="UpdatingMessage"
+      translation="[85,409]"
+      visible="false">
+      <Spinner
+        id="SearchSpinner"
+        isDisabled="true"
+        width="66"
+        height="66"/>
       <Label
-        id="NoResultsMessage"
-        text="No Search Results"
-        vertAlign="center"
-        horizAlign="center"
-        width="1094"
-        height="575"
-        lineSpacing="5"
-        numLines="2"
-        wrap="true"
-        opacity=".5"
-        visible="false">
+        id="SearchUpdatingText"
+        text="Updating your results..."
+        translation="[76,22]">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="27" />
       </Label>
     </Group>
+    
+    <Group
+      id="ResultArea"
+      translation="[85,616]">
+      <PosterGrid
+        id="ResultGrid"
+        basePosterSize="[210,300]"
+        itemSpacing="[10,10]"
+        numColumns="8"
+        numRows="2"
+        vertFocusAnimationStyle="fixedFocus"
+        focusBitmapUri="pkg:/images/selector-fhd.9.png"/>
+      <Label
+        id="NoResultsMessage"
+        text="No Search Results"
+        vertAlign="center"
+        width="1750"
+        height="390"
+        visible="false">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="34" />
+      </Label>
+    </Group>
+
+    <Animation
+      id="TextEntryAnimation"
+      duration="0.25">
+      <FloatFieldInterpolator
+        id="TextEntryScaleInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[1.0, 0.5]"
+        fieldToInterp=""/>
+      <FloatFieldInterpolator
+        id="InfoPanelOpacityInterpolator"
+        key="[0.0, 1.0]"
+        fieldToInterp="SearchInfoPanel.opacity"/>
+      <FloatFieldInterpolator
+        id="SearchHintOpacityInterpolator"
+        key="[0.0, 1.0]"
+        fieldToInterp="SearchHint.opacity"/>
+      <Vector2DFieldInterpolator
+        id="TextEntryTranslationInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[[85,315],[85,570]]"
+        fieldToInterp="TextEntryGroup.translation"/>
+      <Vector2DFieldInterpolator
+        id="KeyboardTranslationInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[[0,0],[0,0]]"
+        fieldToInterp="Keyboard.translation"/>
+    </Animation>
+
   </children>
 </component>

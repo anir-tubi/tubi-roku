@@ -4,13 +4,14 @@ Function init()
   m.top.observeField("width", "onDimensionsChange")
   m.top.observeField("height", "onDimensionsChange")
   m.top.observeField("isDisabled", "onIsDisabled")
+  m.top.observeField("displayText", "onIsDisabled")
 End Function
 
 
 'Previously in init()
 Function onIsDisabled()
   ' Non-OpenGL slow devices look really poor with clunky spinner
-
+  loadingMessage = m.top.findNode("LoadingMessage")
   ' While we are using the SKD1 version of RAF, the search screen does not repopulate poster images if
   ' the following spinners are in effect. This should be temporary and full spinner usage should be ok 
   ' once we move to the SG version of RAF.
@@ -20,12 +21,15 @@ Function onIsDisabled()
     if m.top.visible then
       m.Animation.control = "start"
     end if
+    if m.top.displayText = true
+      loadingMessage.visible = true
+    end if
   else
-    loadingMessage = m.top.findNode("LoadingMessage")
     loadingMessage.visible = true
     spinner = m.top.findNode("SpinnerPoster")
     spinner.visible = false
   end if
+  onDimensionsChange() '//update the placement of spinners
 End Function
 
 Function onVisibilityChange()
@@ -51,19 +55,30 @@ Function onDimensionsChange()
 
   ' max size 66x66 for spinner graphic
   spinner = m.top.findNode("SpinnerPoster")
+  message = m.top.findNode("LoadingMessage")
+  
+  rectMessage = calculateRect(m.top.width * .6, 66)
+  message.width = rectMessage.width
+  nMessageX = (m.top.width - rectMessage.width) / 2 '//ensure the message is center - assuming the text of the message is centered aligned
+  message.height = rectMessage.height
   if spinner.visible
     rect = calculateRect(66, 66)
     spinner.width = rect.width
     spinner.height = rect.height
     spinner.scaleRotateCenter=[rect.width / 2, rect.height / 2]
+    if m.top.displayText = true
+      '//vertically center both sprinner and message
+      nMessageSpacing = 37
+      nAdditionalMessageHeight = message.height + nMessageSpacing
+      nSpinnerY = rect.y - nAdditionalMessageHeight / 2
+      spinner.translation = [rect.x, nSpinnerY]
+      message.translation = [nMessageX, nSpinnerY + nMessageSpacing + spinner.height]
+    else 
+      spinner.translation = [rect.x, rect.y]
+    end if
   else
-    rect = calculateRect(180, 66)
-    message = m.top.findNode("LoadingMessage")
-    message.width = rect.width
-    message.height = rect.height
+    message.translation = [nMessageX, rectMessage.y]
   end if
-  posterOrMessage = m.top.findNode("PosterOrMessage")
-  posterOrMessage.translation = [rect.x, rect.y]
 End Function
 
 
