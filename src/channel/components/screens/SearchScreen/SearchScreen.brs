@@ -108,17 +108,21 @@ Function onSearchResultsReceived()
       m.ResultGrid.visible = true
       m.NoResultsMessage.visible = false
     else
-      m.ResultGrid.visible = false
-      m.NoResultsMessage.visible = true
-      message = "We couldn't find results for "
-      message +=  "'" + m.SearchText.text + "'" 
-      message += chr(10) 
-      message += "Please try again"
-      m.NoResultsMessage.text = message
+      displayNoResults()
     end if
   else
-    'TODO(Chris): Show error modal here
+    displayNoResults()
   end if
+End Function
+
+Function displayNoResults()
+  m.ResultGrid.visible = false
+  m.NoResultsMessage.visible = true
+  message = "We couldn't find results for "
+  message +=  "'" + m.SearchText.text + "'" 
+  message += chr(10) 
+  message += "Please try again"
+  m.NoResultsMessage.text = message
 End Function
 
 
@@ -160,8 +164,9 @@ Function onKeyboardTextChanged()
   m.ResultGrid.visible = false
   m.NoResultsMessage.visible = false
 
-  m.SearchText.text = LCase(m.Keyboard.text)
-  if m.Keyboard.text <> invalid and m.Keyboard.text.len() > 0 then
+  sKeyboardText = m.Keyboard.text
+  m.SearchText.text = LCase(sKeyboardText)
+  if sKeyboardText <> invalid and sKeyboardText.trim().len() > 0 then
     loadSearchResults() 
   else
     '//if the search text was empty, clear out any existing results and display the default search results
