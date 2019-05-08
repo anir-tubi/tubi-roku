@@ -98,6 +98,7 @@ Function onSearchResultsReceived()
   displayLoading(false)
   response = m.top.searchResponse.response
   if response.code >= 200 and response.code < 300 then 
+    m.ResultGrid.content = invalid '//reset content everytime so in case the new results = previous results, then the contemt can refresh. Without refr4eshing content, then the content may appear blank
     m.ResultGrid.content = m.top.searchResponse.convertedMetadata
     if m.top.searchResponse.convertedMetadata <> invalid and m.top.searchResponse.convertedMetadata.getChildCount() > 0 then
       if response.name = m.constants.reqNames.getSearchDefault
