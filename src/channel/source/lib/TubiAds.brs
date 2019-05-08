@@ -481,11 +481,7 @@ end function
 ' callback during RAF buffering
 function tubiAds_adBufferingCallback(eventType, ctx)
   if ctx.progress <> invalid
-    if ctx.progress = 100
-      m.containerNode.visible = true
-    else
-      m.controlNode.adProgress = ctx.progress
-    end if
+    m.controlNode.adProgress = ctx.progress
   else
     m.containerNode.visible = false
   end if
@@ -499,13 +495,6 @@ end function
 function tubiAds_adTrackingCallback(eventType, ctx)
   if eventType <> invalid 
     if eventType = "Impression"
-      m.containerNode.visible = true
-      ' this will reset the progress bar to avoid seeing a full bar once the 
-      ' ad ends.  The reason we set it to 1 instead of zero is that the 1
-      ' will keep the ads-specific messaging on screen rather than clearing
-      ' it out.
-      m.controlNode.adProgress = 1
-
       startAdEvent = {
         ad_started: m.tracking.getAnalyticsAd(ctx)
         video_id: m.controlNode.content.id.toInt()
@@ -531,6 +520,8 @@ function tubiAds_adTrackingCallback(eventType, ctx)
         reason: "DETECTED"
       }
       m.tracking.trackUserEvent("finish_ad", finishAdEvent, m.requestQueue)
+    else if eventType = "Start"
+      m.containerNode.visible = true
     end if
   else
     ' eventType is invalid when an event fires signalling that one second of ad playback has ocurred
