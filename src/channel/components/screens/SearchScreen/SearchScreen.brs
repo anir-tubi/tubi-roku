@@ -50,8 +50,8 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the content grid already
   ' has focus, not when it gains focus.
   m.gridHasFocus = false
-  ' Used to know if the grid was in focus when user returns from the detailed screen
-  m.bViewedSearchSubPage = false
+  ' Used to know if the grid was in focus especially when user returns from the detailed screen and we know to set the focus back to the results
+  m.bResultsInFocus = false
 
   loadSearchResults(true)'//load the default search results
 End Function
@@ -77,9 +77,8 @@ End Function
 ' On focus set to screen, push focus on keyboard or grid.
 ' This is used when the search screen regains focus after coming back from the details page.
 Function onScreenFocusChange()
-  if m.top.hasFocus() then
-    if m.bViewedSearchSubPage = true
-      m.bViewedSearchSubPage = false
+  if m.top.hasFocus() and m.top.visible = true then
+    if m.bResultsInFocus = true
       m.ResultGrid.setFocus(true)
     end if
   end if
@@ -145,7 +144,6 @@ Function onResultSelected()
       }
       m.top.contentSelected = selectedContent
       m.gridHasFocus = false
-      m.bViewedSearchSubPage = true
     end if
   end if
 End Function
@@ -274,10 +272,12 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     if key = "right" and m.Keyboard.isInFocusChain() and m.ResultGrid.content <> invalid and m.ResultGrid.content.getChildCount() > 0 then
       m.ResultGrid.setFocus(true)
       m.gridHasFocus = true 
+      m.bResultsInFocus = true
       return true
     else if key = "left" and m.ResultGrid.isInFocusChain() then
       m.Keyboard.setFocus(true)
       m.gridHasFocus = false
+      m.bResultsInFocus = false
       return true
     else if key = "back" and m.ResultGrid.isInFocusChain() then
       '//when the user hits BACK, then set the keyboard to focus
@@ -289,6 +289,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       m.ResultGrid.jumpToItem = nJumpTo
       m.Keyboard.setFocus(true)
       m.gridHasFocus = false
+      m.bResultsInFocus = false
       return true
     end if
   end if
