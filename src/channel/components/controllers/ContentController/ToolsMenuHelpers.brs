@@ -18,7 +18,7 @@ End Function
 ' Show the search screen
 Function onSearchSelected()
   tubiLog("ContentController.onSearchSelected")
-  if getExperimentValue("UserNamespace", "roku_search_page_new") <> true
+  if getExperimentValue("RokuNamespace", "roku_search_page_new") <> "new"
     '//use old searchScreen - this is the (default) control group part of the experiment
     tubiLog("ContentController.onSearchSelected() the old search screen is used")
     m.searchScreen = CreateObject("roSGNode", "SearchScreenOld") 
