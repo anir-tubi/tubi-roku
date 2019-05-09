@@ -52,20 +52,23 @@ Function Main(startupArgs as Dynamic)
 
   ' apply hotpatch to main brightscript thread
   ' this also verifies startup network connectivity
-  hotpatchResult = HotpatchWithRetries(settings.hotPatchUrl)
-  if hotpatchResult.valid <> true then
-    hotpatchResult.delete("valid")
-    errorMessage = {
-      message: "Hotpatch failed to load"
-      url: settings.hotPatchUrl
-    }
-    errorMessage.append(hotpatchResult)
-    hotpatchErrorPort = CreateObject("roMessagePort")
-    errorQ = requestQueue.create(hotpatchErrorPort)
-    log.exception("error", errorMessage)
-    showErrorDialog()
-    return -1 ' exit the app on error.  scene graph exits anyway once
-              ' we destroy a Scene and try to create it again.
+
+  if constants.useHotpatch <> false
+    hotpatchResult = HotpatchWithRetries(settings.hotPatchUrl)
+    if hotpatchResult.valid <> true then
+      hotpatchResult.delete("valid")
+      errorMessage = {
+        message: "Hotpatch failed to load"
+        url: settings.hotPatchUrl
+      }
+      errorMessage.append(hotpatchResult)
+      hotpatchErrorPort = CreateObject("roMessagePort")
+      errorQ = requestQueue.create(hotpatchErrorPort)
+      log.exception("error", errorMessage)
+      showErrorDialog()
+      return -1 ' exit the app on error.  scene graph exits anyway once
+                ' we destroy a Scene and try to create it again.
+    end if
   end if
 
   m.global.channel.runChannel(startupArgs)

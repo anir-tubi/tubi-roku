@@ -261,6 +261,10 @@ Function getConstants()
   'only change to false in case of emergencies, as installed components will likely break after many remote releases
   constants.remoteComponents = true
 
+  'toggle for using hotpatch or not. Should only be set to false in testing situations.
+  'production should always use hotpatch!
+  constants.useHotpatch = true
+
   ' Should the user be shown the upgrade alert to help them upgrade to the latest version.
   '   Used within the hotpatch after a point release to nudge users to use the latest and
     constants.showUpgradeAlert = false
