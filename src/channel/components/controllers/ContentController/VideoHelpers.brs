@@ -339,14 +339,14 @@ Function stopVideoContent(playerResult, showScreenStack)
 
   stoppedContent = m.videoPlayer.content
   if stoppedContent <> invalid and stoppedContent.isTrailer = true
-    m.trackingLoggingTask.trackEvent({
+    m.trackingLoggingTask.trackEvent = {
       type: "finish_trailer"
       values: {
         video_id: stoppedContent.id.toInt()
         end_position: playerInfo.nowPos
         reason: "DETECTED"  'Reason enum
       }
-    })
+    }
   end if
 
   ' reload history
