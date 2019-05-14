@@ -7,6 +7,7 @@ Function playVideoContent(content As Object, autoplayType As String, position=in
     if content.isTrailer
       m.videoPlayer.analyticsMode = "trailer"
       m.videoPlayer.observeFieldScoped("skipTrailer", "onSkipTrailer")
+      m.videoPlayer.observeFieldScoped("goToNext", "onSkipTrailer")
       m.videoPlayer.enableAds = false
       m.upNextTask = invalid
     else

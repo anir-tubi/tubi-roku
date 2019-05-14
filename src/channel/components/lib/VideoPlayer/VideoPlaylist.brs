@@ -334,7 +334,7 @@ End Function
 ' @index: int, the index of the video resource we want to use for DRM
 Function setDrmOnContent(contentNode, index)
   tubiLog("VideoPlaylist.setDrmOnContent")
-  if contentNode.videoResources <> invalid and contentNode.videoResources.count() > 0 and contentNode.videoResources[index] <> invalid
+  if contentNode.videoResources <> invalid and contentNode.videoResources.count() > 0 and contentNode.videoResources[index] <> invalid and contentNode.isTrailer <> true
     ' reset DRM fields
     contentNode.drmParams = {}
     contentNode.encodingType = ""
