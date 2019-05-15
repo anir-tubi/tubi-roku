@@ -1003,6 +1003,8 @@ End Function
 'triggers callback on ContentController to play the full video
 Function handleSkipTrailer()
   m.top.skipTrailer = true
+  animateTransport("out")
+  resetTransportButtons()  
   setFocusedButton(m.PlayPauseButton)
 End Function
 
