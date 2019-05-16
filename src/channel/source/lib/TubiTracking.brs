@@ -342,10 +342,11 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       is_fullscreen: true
     }
 
-    ad_click: {   'Not used by Roku client
+    ad_click: {
       ad_clicked: {} 'Ad
       video_id: -1
       position: -1 'ms
+      ad_interaction: "" 'AdInteraction enum
     }
 
     finish_ad: {
@@ -472,9 +473,9 @@ Function tubiTracking_getAnalyticsAd(ctx)
             if idPos >= 0
               impressionId = impressionUrl.Mid(idPos + 3)   'expect impressionId to be of the form "20181011234631-glJvr-0-0"
               impressionIdSplits = impressionId.split("-")
-              podId = impressionIdSplits[1]                 'expect podId to be of the form "glJvr"
+              parentId = impressionIdSplits[0] + "-" + impressionIdSplits[1]                 'expect parentId to be of the form "20181011234631-glJvr"
               adEvent.impression_id = impressionId
-              ' adEvent.pod_id = podId  'protos requires this to be an int, but it should be a string. Returns 500, until fixed in protos, if included.
+              adEvent.parent_id = parentId  'protos requires this to be an int, but it should be a string. Returns 500, until fixed in protos, if included.
             end if
             exit for
           end if

@@ -38,6 +38,8 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     midrolls : []
     commercialDuration : 0
     lastAdFailed: false
+    adPlaybackPos: 0
+    isInteracting: false
     _: rodash()
     adContentType: adContentType  ' "hls" or "mp4"
 
@@ -78,6 +80,8 @@ function tubiAds_reset()
   m.commercialDuration = 0
   m.lastAdFailed = false
   m.containerNode = invalid
+  m.adPlaybackPos = 0
+  m.isInteracting = false
 end function
 
 
@@ -493,8 +497,9 @@ end function
 '
 ' callback during RAF ad display
 function tubiAds_adTrackingCallback(eventType, ctx)
-  if eventType <> invalid 
-    if eventType = "Impression"
+  if eventType <> invalid
+    if eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0
+      'Impression events fire when ads start, but also when a user begins interacting with an interactive ad
       startAdEvent = {
         ad_started: m.tracking.getAnalyticsAd(ctx)
         video_id: m.controlNode.content.id.toInt()
@@ -503,25 +508,46 @@ function tubiAds_adTrackingCallback(eventType, ctx)
       }
       m.tracking.trackUserEvent("start_ad", startAdEvent, m.requestQueue)
     else if eventType = "Complete" or eventType = "Close"
-      if eventType = "Complete"
-        endPosition = ctx.duration
-      else if eventType = "Close"
-        endPosition = m.adPlaybackPos
+      'Close events fire when a user backs out of an ad, or when a user backs out of the interactive portion of an ad
+      if eventType = "Close" and m.isInteracting = true
+        clickAdEvent = {
+          ad_clicked: m.tracking.getAnalyticsAd(ctx)
+          video_id: m.controlNode.content.id.toInt()
+          position: m.adPlaybackPos
+          ad_interaction: "CLOSE"
+        }
+        m.tracking.trackUserEvent("ad_click", clickAdEvent, m.requestQueue)
+      else
+        if eventType = "Complete"
+          endPosition = ctx.duration
+        else if eventType = "Close"
+          endPosition = m.adPlaybackPos
+        end if
+        m.adPlaybackPos = 0
+        if endPosition = invalid
+          '//ensure a valid value is used. This may not happen during a close event.
+          endPosition = 0
+        end if
+        finishAdEvent = {
+          ad_finished: m.tracking.getAnalyticsAd(ctx)
+          video_id: m.controlNode.content.id.toInt()
+          end_position: endPosition * 1000
+          reason: "DETECTED"
+        }
+        m.tracking.trackUserEvent("finish_ad", finishAdEvent, m.requestQueue)
       end if
-      m.adPlaybackPos = 0
-      if endPosition = invalid 
-        '//ensure a valid value is used. This may not happen during a close event.
-        endPosition = 0
-      end if
-      finishAdEvent = {
-        ad_finished: m.tracking.getAnalyticsAd(ctx)
-        video_id: m.controlNode.content.id.toInt()
-        end_position: endPosition * 1000
-        reason: "DETECTED"
-      }
-      m.tracking.trackUserEvent("finish_ad", finishAdEvent, m.requestQueue)
+      m.isInteracting = false
     else if eventType = "Start"
       m.containerNode.visible = true
+    else if eventType = "AcceptInvitation"
+      clickAdEvent = {
+        ad_clicked: m.tracking.getAnalyticsAd(ctx)
+        video_id: m.controlNode.content.id.toInt()
+        position: m.adPlaybackPos
+        ad_interaction: "OPEN"
+      }
+      m.tracking.trackUserEvent("ad_click", clickAdEvent, m.requestQueue)
+      m.isInteracting = true
     end if
   else
     ' eventType is invalid when an event fires signalling that one second of ad playback has ocurred
