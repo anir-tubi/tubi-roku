@@ -425,7 +425,9 @@ Function onGridFocusChange() As Void
       categoryComponentInfo = {
         category_slug: m.CategoryGridList.oldCategoryId
         category_row: oldAnalyticsRow
-        content_tile: m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, oldAnalyticsRow)
+        'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
+        'and the current design only has one row per category
+        content_tile: m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
       }
 
       m.top.navigateWithinPageInfo = {
