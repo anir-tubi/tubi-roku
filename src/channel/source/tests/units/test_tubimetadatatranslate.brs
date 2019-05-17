@@ -127,7 +127,7 @@ Function testCase_tubiMetadataTranslate_translateRecursive_testCreditsCuepoints(
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   result = result + m.assertTrue(dest.length = 600)
-  result = result + m.assertTrue(dest.creditsCuepoint = 560)
+  result = result + m.assertTrue(dest.creditsCuepoint = 595) 'defined by constants.player.creditsDuration
 
   ' missing cuepoints
   source = {
@@ -138,7 +138,7 @@ Function testCase_tubiMetadataTranslate_translateRecursive_testCreditsCuepoints(
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   result = result + m.assertTrue(dest.length = 600)
-  result = result + m.assertTrue(dest.creditsCuepoint = 560)
+  result = result + m.assertTrue(dest.creditsCuepoint = 595) 'defined by constants.player.creditsDuration
 
   ' cuepoint too close to the end
   source = {
@@ -147,13 +147,13 @@ Function testCase_tubiMetadataTranslate_translateRecursive_testCreditsCuepoints(
     duration: 600
     credit_cuepoints: {
       prologue: 0
-      postlude: 595
+      postlude: 598
     }
   }
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   result = result + m.assertTrue(dest.length = 600)
-  result = result + m.assertTrue(dest.creditsCuepoint = 560)
+  result = result + m.assertTrue(dest.creditsCuepoint = 595)
 
   ' no cuepoint or length given
   source = {
@@ -169,26 +169,11 @@ Function testCase_tubiMetadataTranslate_translateRecursive_testCreditsCuepoints(
   source = {
     id: "12345"
     type: "v"
-    duration: 10
+    duration: 3
   }
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
-  result = result + m.assertTrue(dest.length = 10)
-  result = result + m.assertTrue(dest.creditsCuepoint = 0)
-
-  ' title isn't long enough for default cuepoint placement (no cuepoints)
-  source = {
-    id: "12345"
-    type: "v"
-    duration: 10
-    credit_cuepoints: {
-      prologue: 0
-      postlude: 8
-    }
-  }
-  dest = CreateObject("roSGNode", "TubiContentNode")
-  m.translate.translateRecursive(source, dest)
-  result = result + m.assertTrue(dest.length = 10)
+  result = result + m.assertTrue(dest.length = 3)
   result = result + m.assertTrue(dest.creditsCuepoint = 0)
   return result
 End Function
@@ -215,13 +200,10 @@ Function testCase_tubiMetadataTranslate_translateRecursive_series()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(ParseJson(seriesJson), dest)
   result += m.assertNotInvalid(dest)
-  result += m.assertTrue(dest.fetchedAt - fetchTime < 2)
   result += m.assertTrue(dest.getChildCount() = 2)
   season = dest.getChild(0)
   result += m.assertTrue(season.getChildCount() = 52)
-  result += m.assertTrue(season.fetchedAt - fetchTime < 2)
   episode = season.getChild(0)
-  result += m.assertTrue(episode.fetchedAt - fetchTime < 2)
   return result
 End Function
 
@@ -268,7 +250,6 @@ Function testCase_tubiMetadataTranslate_translateContainer_category()
   result = result + m.assertNotInvalid(translated)
   result = result + m.assertEqual(translated.id, "featured")
   result = result + m.assertTrue(translated.totalCount = 8)
-  result = result + m.assertTrue(translated.fetchedAt - fetchTime < 2)
   result = result + m.assertTrue(translated.getChildCount() = 8)
   return result
 End Function
@@ -281,7 +262,6 @@ Function testCase_tubiMetadataTranslate_translateContainer_channel()
   result = result + m.assertNotInvalid(translated)
   result = result + m.assertEqual(translated.id, "cbs")
   result = result + m.assertTrue(translated.totalCount = 96)
-  result = result + m.assertTrue(translated.fetchedAt - fetchTime < 2)
   result = result + m.assertTrue(translated.getChildCount() = 96)
   result = result + m.assertEqual(translated.getChild(0).id, "cbs")
   result = result + m.assertNotInvalid(translated.json)
@@ -302,7 +282,6 @@ Function testCase_tubiMetadataTranslate_translateHomescreen()
   fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateHomescreen(ParseJson(homeJson))
   result = result + m.assertNotInvalid(translated)
-  result = result + m.assertTrue(translated.fetchedAt - fetchTime < 2)
   result = result + m.assertTrue(translated.getChildCount() = 48)
   result = result + m.assertTrue(translated.getChild(0).id = "featured")
   result = result + m.assertTrue(translated.getChild(0).getChildCount() = 1)
@@ -319,7 +298,6 @@ Function testCase_tubiMetadataTranslate_translate()
   fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translate(ParseJson(matches))
   result = result + m.assertNotInvalid(translated)
-  result = result + m.assertTrue(translated.fetchedAt - fetchTime < 2)
   return result
 End Function
 
@@ -334,7 +312,6 @@ Function testCase_tubiMetadataTranslate_translateChannel()
   result = result + m.assertNotInvalid(translated)
   result = result + m.assertEqual(translated.id, "cbs")
   result = result + m.assertEqual(translated.slug, "cbs")
-  result = result + m.assertTrue(translated.fetchedAt - fetchTime < 2)
   result = result + m.assertTrue(translated.totalCount = 95)
   result = result + m.assertTrue(translated.getChildCount() = 95)
   return result
@@ -350,10 +327,8 @@ Function testCase_tubiMetadataTranslate_getContentFromCategoryJson()
   fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateContainer(ParseJson(categoryJson), categoryJson)
   result = result + m.assertNotInvalid(translated)
-  translated.fetchedAt = 12345  ' fake this to verify it passes through to children
   child = m.translate.getContentFromCategoryJson(translated, translated.getChild(0).id)
   result = result + m.assertNotInvalid(child)
-  result = result + m.assertTrue(translated.fetchedAt = 12345)
   return result
 End Function
 

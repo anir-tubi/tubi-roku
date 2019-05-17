@@ -62,7 +62,7 @@ Function testCase_tubiTracking_getAnalyticsUser()
   Tracking = testHelper_tubiTracking_createTubiTracking()
   user = Tracking.getAnalyticsUser()
 
-  result = m.assertNotInvalid(user.device_id)
+  result = ""
   result += m.assertNotInvalid(user.user_id)
   result += m.assertNotInvalid(user.auth_type)
   result += m.assertTrue(user.auth_type = "UNKNOWN" or user.auth_type = "NOT_AUTHED")
