@@ -54,17 +54,20 @@
         <field id="authInfo" type="assocarray" alwaysNotify="true" />
 
 
-        <field id="userInfo" type="assocarray" alwaysNotify="true"/>
+        <field id="userInfo" type="assocarray" alwaysNotify="true" />
+
+        <!-- number of days since the unix epoch when the device first opened Tubi -->
+        <field id="firstVisit" type="integer" />
 
         <!-- execInitializeUserData, execSignOut:
         -        BookmarkContentNode tree of bookmarks
         -->
-        <field id="bookmarks" type="node"/>
+        <field id="bookmarks" type="node" />
 
         <!-- execInitializeUserData, execSignOut:
         -        HistoryContentNode tree of history
         -->
-        <field id="history" type="node"/>
+        <field id="history" type="node" />
 
         <!-- addToQueue:
         -        id of bookmark entry

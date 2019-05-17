@@ -17,6 +17,8 @@ Function TestSuite_TubiAuth()
   this.addTest("transferRefreshToken", testCase_tubiAuth_transferRefreshToken)
   this.addTest("transferRefreshToken_failed", testCase_tubiAuth_transferRefreshToken_failed)
   this.addTest("transferRefreshToken_403", testCase_tubiAuth_transferRefreshToken_403)
+  this.addTest("getFirstVisit", testCase_tubiAuth_getFirstVisit)
+  this.addTest("setFirstVisit", testCase_tubiAuth_setFirstVisit)
   return this
 End Function
 
@@ -97,14 +99,14 @@ Function testCase_tubiAuth_refreshAuthToken_403()
     return {} ' indicative of the old tokens being invalid and shoule not be stored
   End Function
 
-  savedAuthInfo = RegReadAll(auth.authRegKey)
+  savedAuthInfo = RegReadAll(auth.authRegSection)
   result += m.AssertNotInvalid(savedAuthInfo)
   result += m.AssertNotInvalid(savedAuthInfo.accessToken)
   result += m.AssertNotInvalid(savedAuthInfo.refreshToken)
   newAuthInfo = auth.refreshAuthToken(oldAuthInfo, 1)
   result += m.AssertInvalid(newAuthInfo)
   result += m.AssertInvalid(newAuthInfo)
-  savedAuthInfo = RegReadAll(auth.authRegKey)
+  savedAuthInfo = RegReadAll(auth.authRegSection)
   result += m.AssertNotInvalid(savedAuthInfo)
   result += m.AssertInvalid(savedAuthInfo.accessToken)
   result += m.AssertInvalid(savedAuthInfo.refreshToken)
@@ -233,7 +235,7 @@ Function testCase_tubiAuth_saveAuthInfo()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
-  auth.authRegKey = "testauth"
+  auth.authRegSection = "testauth"
   authInfo1 = {
     expireTime: "123456"
     accessToken: "Some555Other666String777"
@@ -274,7 +276,7 @@ Function testCase_tubiAuth_saveAuthInfo()
   authInfo4 = auth.saveAuthInfo(authInfo4) 'invalid?
   authInfo5 = auth.saveAuthInfo(authInfo5) 'invalid?
   authInfo6 = auth.saveAuthInfo(authInfo6) 'invalid?
-  savedAuthInfo = RegReadAll(auth.authRegKey)
+  savedAuthInfo = RegReadAll(auth.authRegSection)
   result += m.assertNotInvalid(authInfo1)
   result += m.assertInvalid(authInfo2)
   result += m.assertInvalid(authInfo3)
@@ -286,7 +288,7 @@ Function testCase_tubiAuth_saveAuthInfo()
   result += m.assertEqual(savedAuthInfo.refreshToken, authInfo1.refreshToken)
   result += m.assertEqual(savedAuthInfo.userId, authInfo1.userId)
   authSection = CreateObject("roRegistry")
-  authSection.delete(auth.authRegKey)
+  authSection.delete(auth.authRegSection)
   authSection.flush()
   return result
 End Function
@@ -295,7 +297,7 @@ Function testCase_tubiAuth_deleteAuthInfo()
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
-  auth.authRegKey = "testauth"
+  auth.authRegSection = "testauth"
   authInfo = {
     expireTime: "123456"
     accessToken: "Some555Other666String777"
@@ -305,10 +307,10 @@ Function testCase_tubiAuth_deleteAuthInfo()
   result = ""
 
   for each a in authInfo
-    RegWrite(a, authInfo[a], auth.authRegKey)
+    RegWrite(a, authInfo[a], auth.authRegSection)
   end for
   auth.deleteAuthInfo()
-  deletedAuthInfo = RegReadAll(auth.authRegKey)
+  deletedAuthInfo = RegReadAll(auth.authRegSection)
   authInfoStillExists = false
   if deletedAuthInfo.count() > 0 
     authInfoStillExists = true
@@ -628,3 +630,42 @@ Function testHelper_tubiAuth_createMetadataFetchTaskServer(tcpPort As Integer)
   return server
 End Function
 
+Function testCase_tubiAuth_getFirstVisit()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+
+  'use a fake section so not to disturb actual first visit info
+  auth.firstVisitRegSection = "testVisit"
+
+  'clear out any leftover info in the "testVisit" section
+  auth.regDelete("firstVisit", auth.firstVisitRegSection)
+  'set up a fake value that we will attempt to get
+  auth.regWrite("firstVisit", "56789", auth.firstVisitRegSection)
+
+  firstVisit = auth.getFirstVisit()
+  result = m.AssertEqual(firstVisit, 56789)
+  return result
+End Function
+
+Function testCase_tubiAuth_setFirstVisit()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+
+  'use a fake section so not to disturb actual first visit info
+  auth.firstVisitRegSection = "testVisit"
+
+  'clear out any leftover info in the "testVisit" section
+  auth.regDelete("firstVisit", auth.firstVisitRegSection)
+
+  dateTime = CreateObject("roDateTime")
+  days = Int(dateTime.AsSeconds() / 24 / 60 / 60)
+  firstVisit = auth.setFirstVisit() 'should be integer
+  result = m.assertEqual(firstVisit, days)
+
+  registryFirstVisit = auth.regRead("firstVisit", auth.firstVisitRegSection)
+  result += m.assertNotInvalid(registryFirstVisit)
+  result += m.assertEqual(firstVisit, registryFirstVisit.toInt())
+  return result
+End Function

@@ -2,13 +2,16 @@
 '@request: assocArray, the object returned from TubiRequest()
 Function TubiAuth(constants, request)
   return {
-    authRegKey: "auth"
+    authRegSection: "auth"
+    firstVisitRegSection: "visit"
     
     constants: constants
     request: request
 
     'public methods
     getAuthInfo: tubiAuth_getAuthInfo
+    getFirstVisit: tubiAuth_getFirstVisit
+    setFirstVisit: tubiAuth_setFirstVisit
     handleRegistration: tubiAuth_handleRegistration
     oneTimeLoginMigration: tubiAuth_oneTimeLoginMigration
     logout: tubiAuth_deleteAuthInfo_
@@ -48,7 +51,7 @@ End Function
 '   userId: userId(Integer as String)
 '}
 function tubiAuth_getAuthInfo()
-  authInfo = m.regReadAll(m.authRegKey) 'returns empty assocArray if nothing in the auth registry
+  authInfo = m.regReadAll(m.authRegSection) 'returns empty assocArray if nothing in the auth registry
   newAuthInfo = invalid
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
     authInfo.expireTime = authInfo.expireTime.toInt()
@@ -63,6 +66,30 @@ function tubiAuth_getAuthInfo()
 
   return newAuthInfo  'can return invalid
 end function
+
+
+'checks device registry for first visit value, if none exists, set today's value as the first visit value.
+'returns stored first visit value (number of days since Unix epoch) or today's value
+Function tubiAuth_getFirstVisit()
+  firstVisit = m.regRead("firstVisit", m.firstVisitRegSection)
+  if firstVisit <> invalid
+    firstVisit = firstVisit.toInt()
+  else
+    firstVisit = m.setFirstVisit()
+  end if
+  return firstVisit
+End Function
+
+
+'sets the first visit value (number of days since Unix epoch) in the device registry
+'returns the number of days since Unix epoch
+Function tubiAuth_setFirstVisit()
+  dateTime = CreateObject("roDateTime")
+  secondsFromEpoch = dateTime.AsSeconds()
+  daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
+  m.regWrite("firstVisit", daysFromEpoch.toStr(), m.firstVisitRegSection)
+  return daysFromEpoch
+End Function
 
 
 'parses auth info from the server and saves it into the registry for further access
@@ -99,14 +126,11 @@ End Function
 'side effects... overwrites the old authInfo in the registry with the new authInfo
 Function tubiAuth_refreshAuthToken(authInfo, timeout)
   authPort = CreateObject("roMessagePort")
-
   refreshReq = m.requestTokenRefresh(authInfo, authPort)
-
   newAuthInfo = invalid
+
   if refreshReq <> invalid
-
     timer = CreateObject("roTimespan")
-
     while true
       msg = wait(100, authPort)
       newAccess = m.handleRefreshResponse(msg, refreshReq)
@@ -127,7 +151,6 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
       if timer.totalMilliseconds() > (timeout * 1000)
         exit while
       end if
-      
     end while
   end if
 
@@ -176,7 +199,6 @@ Function tubiAuth_transferRefreshToken(externalAuthInfo, timeout=10)
       if timer.totalMilliseconds() > (timeout * 1000)
         exit while
       end if
-
     end while
   end if
 
@@ -245,7 +267,7 @@ function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
     authReq.request = m.request
     authReq.authInfo = authInfo
     authReq.regWrite = m.regWrite
-    authReq.authRegKey = m.authRegKey
+    authReq.authRegSection = m.authRegSection
   end if
 
   return authReq
@@ -261,7 +283,7 @@ end function
 function tubiAuth_saveAuthInfo_(authInfo)
   if authInfo <> invalid and authInfo.refreshToken <> invalid and authInfo.accessToken <> invalid and authInfo.expireTime <> invalid  and (type(authInfo.expireTime) = "String" or type(authInfo.expireTime) = "roString") and authInfo.userId <> invalid
     for each key in authInfo
-      m.regWrite(key, authInfo[key], m.authRegKey)
+      m.regWrite(key, authInfo[key], m.authRegSection)
     end for
   else
     authInfo = invalid
@@ -272,7 +294,7 @@ end function
 
 function tubiAuth_deleteAuthInfo_()
   authSection = CreateObject("roRegistry")
-  authSection.delete(m.authRegKey)
+  authSection.delete(m.authRegSection)
   authSection.flush()
 end function
 
