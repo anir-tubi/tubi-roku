@@ -20,7 +20,6 @@ Function init()
   m.RelatedTitle = m.top.findNode("RelatedTitle")
   m.RelatedRowLabel = m.top.findNode("RelatedRowLabel")
   m.AnimationGroup = m.top.findNode("AnimationGroup")
-
   m.top.observeField("length", "onLengthChange")
   m.top.observeField("isSeries", "onIsSeries")
   m.top.observeField("isBookmark", "onIsBookmark")

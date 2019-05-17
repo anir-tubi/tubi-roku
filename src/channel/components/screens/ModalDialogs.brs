@@ -69,7 +69,10 @@ Function createErrorObject(contextCode as String, subtypeCode as String, message
     else if isint(externalCode) = true
       sExternalCode = externalCode.toStr()
     end if
-    if Len(sExternalCode) > 0
+    if sExternalCode = "-1"
+      '//no external code should be set to -1 as that is a value set by the client code as a default error code
+      sExternalCode = ""
+    else if Len(sExternalCode) > 0
       sExternalCode = "-" + sExternalCode
     end if
   end if

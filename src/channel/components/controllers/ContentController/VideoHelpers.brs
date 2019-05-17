@@ -379,7 +379,7 @@ End Function
 Function showPlayerError(errorMessage As String)
   tubiLog("ContentController.showPlayerError")
 
-  errorObj = createErrorObject(m.global.constants.errors.context.playerScreen, m.global.constants.errors.subtypes.playerSetupErrorError, errorMessage)
+  errorObj = createErrorObject(m.global.constants.errors.context.playerScreen, m.global.constants.errors.subtypes.playerSetupError, errorMessage)
   showErrorModal(errorObj, onRetryPlayerError, [], onCancelPlayerError, [])
   
   videoId = 0

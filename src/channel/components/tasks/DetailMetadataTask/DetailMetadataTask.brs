@@ -27,21 +27,33 @@ Function execGetDetailMetadata() As Void
   translate = TubiMetadataTranslate(constants)
   port = CreateObject("roMessagePort")
 
+  ' instatiate variables
+  contentResult = invalid
+  relatedResult = invalid
+  thumbnailsResult = invalid
+  updatedContent = invalid
   contentReq = invalid
+  relatedReq = invalid
+  thumbnailsReq = invalid
+  '//Keep track of when we started to talk to the server so we can create a timeout
+  timerStartServerTalk = CreateObject("roTimespan")
+  timerStartServerTalk.Mark()
+  
+  '// The maximum number of miliseconds it should take to receive a response from the server
+  nTimeOutMax = 5000
+
   if m.top.request.getContent = true
     tubiLog("DetailMetadataTask getting content for " + m.top.request.contentId)
     contentReq = cms.singleContentReq(m.top.request.contentId, true)
     contentReq.start(port)
   end if
 
-  relatedReq = invalid
   if m.top.request.getRelated = true
     tubiLog("DetailMetadataTask getting related (you may also like) for " + m.top.request.contentId)
     relatedReq = cms.relatedContentReq(m.top.request.contentId)
     relatedReq.start(port)
   end if
 
-  thumbnailsReq = invalid
   if m.top.request.getThumbnails = true
     tubiLog("DetailMetadataTask getting sprites for " + m.top.request.contentId)
     thumbnailsReq = cms.thumbnailsReq(m.top.request.contentId)
@@ -49,11 +61,9 @@ Function execGetDetailMetadata() As Void
   end if
 
   ' Wait for all responses
-  contentResult = invalid
-  relatedResult = invalid
-  thumbnailsResult = invalid
   while true
-    msg = wait(0, port)
+    msg = wait(100, port)
+
     if contentReq <> invalid and contentResult = invalid
       contentResult = contentReq.handleEvent(msg)
     end if
@@ -66,13 +76,19 @@ Function execGetDetailMetadata() As Void
     if (contentReq = invalid or contentResult <> invalid) and (relatedReq = invalid or relatedResult <> invalid) and (thumbnailsReq = invalid or thumbnailsResult <> invalid)
       exit while
     end if
+
+    nResponseTime = timerStartServerTalk.TotalMilliseconds()
+    if nResponseTime >= nTimeOutMax
+      ' in case the request(s) times out, then allow the code to exit the while loop
+      exit while
+    end if
   end while
 
-  updatedContent = invalid
 
   ' Parse results
   if contentReq <> invalid
     if contentResult <> invalid and contentResult.response <> invalid and success(contentResult.response.code)
+
       parsed = ParseJSON(contentResult.response.data)
       if parsed = invalid then
         tubiLog("DetailMetadataTask failed to parse JSON response")
@@ -83,13 +99,19 @@ Function execGetDetailMetadata() As Void
       end if
     else
       code = -1
-      if contentResult <> invalid and contentResult.response <> invalid
-        code = contentResult.response.code
+      failReason = "Result is invalid"
+      if contentResult <> invalid 
+        if contentResult.response <> invalid
+          code = contentResult.response.code
+        end if
+      else 
+        failReason = "Call to server timed out"
       end if
+
       m.top.error = {
         code: code
         data: ""
-        failReason: "Result is invalid"
+        failReason: failReason
       }
     end if
   end if
