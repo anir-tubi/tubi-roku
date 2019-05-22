@@ -248,8 +248,12 @@ Function tubihttp_handleEvent(message As Object) As Object
             data: message.GetString()
             failReason: message.GetFailureReason()
             name: m.name
-
           }
+
+          ' if Left(m.name, 5) = "track"
+          '   print "received "; code; " for "; m.name
+          '   print m.response.data
+          ' end if
 
           m.urltransfer = invalid ' release reference in case this will be reused
           return m

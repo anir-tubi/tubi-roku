@@ -781,7 +781,12 @@ End Function
 
 ' Helper function to prevent tracking events being sent for trailers
 Function trackEvent(event As Object)
-  if m.top.analyticsMode <> "trailer" or event.type = "start_trailer" then
+  allowedTrailerEvents = {
+    "start_trailer": true
+    "trailer_play_progress": true
+  }
+
+  if m.top.analyticsMode <> "trailer" or allowedTrailerEvents[event.type] = true
     m.global.trackingLoggingTask.trackEvent = event
   end if
 End Function
@@ -1447,18 +1452,21 @@ Function getPlayProgressEvent()
         video_id: m.Video.content.id.toInt()
         position: Int(m.playerPosition * 1000)   'ms - without Int(), can return scientific notation, causing API error
         view_time: Int((m.playerPosition - m.lastPingTime) * 1000)   'ms
-        from_autoplay_deliberate: m.top.analyticsMode = "autoplay-deliberate"
-        from_autoplay_automatic: m.top.analyticsMode = "autoplay-automatic"
       }
     }
 
+    if m.top.analyticsMode = "trailer"
+      playProgressEvent.type = "trailer_play_progress"
+    else
+      playProgressEvent.values.from_autoplay_deliberate = m.top.analyticsMode = "autoplay-deliberate"
+      playProgressEvent.values.from_autoplay_automatic = m.top.analyticsMode = "autoplay-automatic"
+    end if
+
+    'nominal_speed will be added to the Connection message, rather than the PlayProgressEvent message,
+    'but is still sent via this interface
     if m.Video.streamInfo <> invalid and m.Video.streamInfo.measuredBitrate <> invalid
       'measuredBitrate appears to be reported in bits despite the documentation that it is kibibits
       playProgressEvent.values.nominal_speed = Int(m.Video.streamInfo.measuredBitrate / (10^6))
-    end if
-
-    if m.Video.content.isTrailer = true
-      playProgressEvent.type = "trailer_play_progress"
     end if
   end if
 

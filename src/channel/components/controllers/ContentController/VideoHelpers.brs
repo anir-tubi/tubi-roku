@@ -339,7 +339,7 @@ Function stopVideoContent(playerResult, showScreenStack)
   end if
 
   stoppedContent = m.videoPlayer.content
-  if stoppedContent <> invalid and stoppedContent.isTrailer = true
+  if stoppedContent <> invalid and m.videoPlayer.analyticsMode = "trailer"
     m.trackingLoggingTask.trackEvent = {
       type: "finish_trailer"
       values: {
