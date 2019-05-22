@@ -47,11 +47,9 @@ Function watchLoop()
 End Function
 
 
-'@evt: assocArray: has the following fields
-'           trackType: string, corresponds to one of the eventTypes found in getTrackingTags
-'           value: dynamic, depends on the eventType
-'           ctx: dynamic, depends on the eventType
-'           extraCtx: dynamic, depends on the eventType
+'@evtData: assocArray, has the following fields
+'           type: string, corresponds to one of the eventTypes found in m.tracking.getAnalyticsEvent()
+'           values: assocArray, fields that correspond to the fields specified for the eventType in m.tracking.getAnalyticsEvent()
 Function trackSceneGraphEvent(evtData)
   if evtData <> invalid and type(evtData.type) = "roString"
     tubiLog("TrackingLoggingTask.trackSceneGraphEvent for " + evtData.type)

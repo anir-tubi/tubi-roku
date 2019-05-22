@@ -213,11 +213,6 @@ Function onInactivityClose()
   closeInactivityModal()
   m.videoPlayer.control = "resume"
   m.trackingLoggingTask.trackEvent = {
-    trackType: "generic"
-    value: stillWatchingExperimentAnalyticsValue()
-    ' Interpret a "back" button press as a 'yes'
-    ctx: "still_watching_yes"
-  }
 End Function
 
 
@@ -227,16 +222,9 @@ Function onInactivityButton()
   closeInactivityModal()
   if button = 0
     m.videoPlayer.control = "resume"
-    ctx = "still_watching_yes"
   else
     returnToDetailScreenFromVideo(m.constants.player.playerResults.closed)
-    ctx = "still_watching_no"
   end if
-  m.trackingLoggingTask.trackEvent = {
-    trackType: "generic"
-    value: stillWatchingExperimentAnalyticsValue()
-    ctx: ctx
-  }
 End Function
 
 

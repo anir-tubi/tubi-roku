@@ -21,10 +21,8 @@
         -
         - The trackEvent field should have the following form:
         - {
-        -   trackType: <node to receive content>
-        -   value: dynamic, depends on the eventType
-        -   ctx: dynamic, depends on the eventType
-        -   extraCtx: dynamic, depends on the eventType
+        -   type: string that corresponds to one of the eventTypes found in m.tracking.getAnalyticsEvent()
+        -   values: assocArray with fields that correspond to the fields specified for the eventType in TubiTracking.getAnalyticsEvent()
         - }
         -
         - for more info on trackEvent values, please see:
