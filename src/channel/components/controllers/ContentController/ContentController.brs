@@ -212,7 +212,6 @@ Function onInactivityClose()
   tubiLog("ContentController.onInactivityButton")
   closeInactivityModal()
   m.videoPlayer.control = "resume"
-  m.trackingLoggingTask.trackEvent = {
 End Function
 
 
