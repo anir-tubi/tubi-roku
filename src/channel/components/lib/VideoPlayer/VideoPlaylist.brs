@@ -133,10 +133,15 @@ Function refreshContent(nowPos)
     else
       requestDetails = {
         contentId: content.id
-        getThumbnails: true
         getContent: true
         refresh: true
       }
+
+      ' trailers don't have thumbnails
+      if content.isTrailer <> true
+        requestDetails.getThumbnails = true
+      end if
+
       runRefreshTask(requestDetails)
     end if
   end if
