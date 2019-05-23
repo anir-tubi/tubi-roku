@@ -408,7 +408,7 @@
           translation="[85,949]" >
           <Label
             id="SkipTrailerButtonLabel"
-            text="Skip Trailer"
+            text="Watch Movie"
             font="dictionary:Vaud34px"
             width="260"
             height="86"

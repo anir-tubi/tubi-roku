@@ -769,6 +769,11 @@ Function onWatchTrailer()
     if content.id <> invalid
       trailerContent.id = content.id
     end if
+
+    if content.title <> invalid
+      trailerContent.title = "Trailer (" + content.title + ")"
+    end if
+
     trailerContent.streamformat="hls"
     trailerContent.nowPos = 0
     trailerContent.isTrailer = true
