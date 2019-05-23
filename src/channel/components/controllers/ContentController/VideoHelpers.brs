@@ -133,7 +133,7 @@ Function onGoToNext()
   oldContent = m.videoPlayer.content
 
   nextContent = addSeriesTitle(nextContent, oldContent)
-  stopVideoContent(m.constants.player.playerResults.completed, false)
+  stopVideoContent(false)
   playVideoContent(nextContent, "none") 'TODO: FIND OUT IF THIS COUNTS AS AUTOPLAY?
 End Function
 
@@ -142,7 +142,7 @@ End Function
 Function playUpNextContent(nextContent, autoplayType)
   oldContent = m.videoPlayer.content
   content = addSeriesTitle(nextContent, oldContent)
-  stopVideoContent(m.constants.player.playerResults.completed, false)
+  stopVideoContent(false)
   playVideoContent(content, autoplayType)
   popScreen(false) ' pop the up next screen off the screen stack
   if m.upNextScreen <> invalid
@@ -206,7 +206,7 @@ Function onVideoPlayerState(msg)
   tubiLog("VideoHelpers.onVideoPlayerState state = " + msg.GetData())
   state = msg.GetData()
   if state = "error"
-    stopVideoContent(m.constants.player.playerResults.failed, true)
+    stopVideoContent(true)
     errorMessage = m.constants.player.playerResults.failed
     if m.videoPlayer.errorMsg <> ""
       errorMessage = m.videoPlayer.errorMsg
@@ -217,14 +217,7 @@ Function onVideoPlayerState(msg)
     ' If trailer, play the feature
     finishedContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
     if finishedContent.isTrailer
-      content = getDetailScreenContent()
-      if content <> invalid then
-        stopVideoContent(m.constants.player.playerResults.completed, false)
-        playVideoContent(content, "none", 0)  ' always start at zero here
-      else
-        ' just show the current screen on the screen stack
-        stopVideoContent(m.constants.player.playerResults.completed, true)
-      end if
+      returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
 
     ' If not a trailer, look for UpNext content to play
     else
@@ -236,7 +229,7 @@ Function onVideoPlayerState(msg)
         oldContent = m.videoPlayer.content
 
         nextContent = addSeriesTitle(nextContent, oldContent)
-        stopVideoContent(m.constants.player.playerResults.completed, false)
+        stopVideoContent(false)
         playVideoContent(nextContent, "automatic")
       else
         returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
@@ -265,7 +258,7 @@ End Function
 '   - Deep link: Exit video player series                  : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
 '   - Deep link: Exit video player series after autoplay   : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
 Function returnToDetailScreenFromVideo(result)
-  stopVideoContent(result, true)
+  stopVideoContent(true)
   ' get updated content, to be used to reload or re-populate details screen
   content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex) 'this always returns a video - sometimes an episode
   m.top.deepLinkContent = invalid
@@ -311,7 +304,7 @@ End Function
 
 
 ' Stop the video player and optionally return to the screen stack
-Function stopVideoContent(playerResult, showScreenStack)
+Function stopVideoContent(showScreenStack)
   tubiLog("VideoHelpers.stopVideoContent")
   videoTrackingStop()
   m.videoPlayer.unobserveFieldScoped("backButtonPressed")
@@ -323,19 +316,22 @@ Function stopVideoContent(playerResult, showScreenStack)
   m.videoPlayer.unobserveFieldScoped("goToNext")
   m.videoPlayer.deeplinkSource = ""
   m.videoPlayer.control = "stop"
-  playerInfo = {}
-  playerInfo.nowPos = m.videoPlayer.historyPosition
-  playerInfo.result = playerResult
+  nowPos = m.videoPlayer.historyPosition
+
+  historyId = invalid
+  parentHistoryId = invalid
   if m.updateHistoryTask.historyResult <> invalid
-    playerInfo.historyId = m.updateHistoryTask.historyResult.historyId
-    playerInfo.parentHistoryId = m.updateHistoryTask.historyResult.parentHistoryId
+    historyId = m.updateHistoryTask.historyResult.historyId
+    parentHistoryId = m.updateHistoryTask.historyResult.parentHistoryId
   end if
-  tubiLog("stopVideoContent: nowPos = " + playerInfo.nowPos.toStr())
-  if playerInfo.historyId <> invalid and playerInfo.historyId <> "" then
-    tubiLog("stopVideoContent: historyId = " + playerInfo.historyId.toStr())
+
+  tubiLog("stopVideoContent: nowPos = " + nowPos.toStr())
+  if historyId <> invalid and historyId <> "" then
+    tubiLog("stopVideoContent: historyId = " + historyId.toStr())
   end if
-  if playerInfo.parentHistoryId <> invalid and playerInfo.parentHistoryId <> "" then
-    tubiLog("stopVideoContent: parentHistoryId = " + playerInfo.parentHistoryId.toStr())
+  
+  if parentHistoryId <> invalid and parentHistoryId <> "" then
+    tubiLog("stopVideoContent: parentHistoryId = " + parentHistoryId.toStr())
   end if
 
   stoppedContent = m.videoPlayer.content
@@ -344,7 +340,7 @@ Function stopVideoContent(playerResult, showScreenStack)
       type: "finish_trailer"
       values: {
         video_id: stoppedContent.id.toInt()
-        end_position: playerInfo.nowPos
+        end_position: nowPos
         reason: "DETECTED"  'Reason enum
       }
     }
@@ -368,7 +364,7 @@ End Function
 
 Function onSkipTrailer()
   tubiLog("VideoHelpers.onSkipTrailer")
-  stopVideoContent(m.constants.player.playerResults.completed, false)
+  stopVideoContent(false)
   playVideoContent(getDetailScreenContent(), "none")
 End Function
 
