@@ -171,7 +171,6 @@ Function tubiq_advanceQueue_()
       entry.request.start(entry.urltransfer)
     end if
   end for
-    
 End Function
 
 ' Find a request in the queue by its urltransfer id. This is a helper for handleRequest().

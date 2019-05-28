@@ -120,7 +120,7 @@ End Function
 '   expireTime: numberOfSecondsUntilExpires(Integer or Integer as String)
 '   userId: userId(Integer as String)
 '}
-'@timeout: integer, the max amount of time to wait for a response from the server
+'@timeout: integer, the max amount of time to wait for a response from the server in seconds
 '
 'returns the new authInfo if updated or invalid if there was a problem receiving or updating the new authInfo
 'side effects... overwrites the old authInfo in the registry with the new authInfo
@@ -263,6 +263,7 @@ function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
     authReq.updateAuthInfo = m.updateAuthInfo
     authReq.saveAuthInfo = m.saveAuthInfo
     authReq.handleRefreshResponse = m.handleRefreshResponse
+    authReq.deleteAuthInfo = m.deleteAuthInfo
     authReq.constants = m.constants
     authReq.request = m.request
     authReq.authInfo = authInfo
