@@ -1,5 +1,6 @@
-Function showChannelScreen(content)
+Function showChannelScreen(content, sPageSource = "")
   channelScreen = CreateObject("roSGNode", "ChannelDetailScreen")
+  channelScreen.callingPage = sPageSource
   channelScreen.trackingLoadStartTime = UpTime(0)
   channelScreen.observeFieldScoped("contentSelected", "onChannelContentSelected")
   channelScreen.observeFieldScoped("backgroundUriList", "onChannelBackgroundChange")
@@ -57,6 +58,7 @@ Function onChannelContentResponse(msg)
   screen.isLoading = false
 
   screen.content = task.response
+  screen.shouldLoadContent = true
   task.unobserveField("response")
   task.unobserveField("error")
 

@@ -356,7 +356,7 @@ Function onContentSelected()
   m.autoplayContext = m.categoryScreen.currCategoryId
 
   if content.type = "channel"
-    showChannelScreen(content)
+    showChannelScreen(content, "HOME")
   else
     showDetailScreen(content)
   end if

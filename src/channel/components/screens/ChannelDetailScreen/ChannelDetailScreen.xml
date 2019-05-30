@@ -19,7 +19,10 @@
   <interface>
     <!-- INPUT -->
       <!-- content should be a container content node with a single channel content node filled with multiple item content nodes -->
-      <field id="content" alias="ChannelsRowList.content" />
+      <field id="content" type="node"/>
+
+      <!-- Should the screen load the content. This is set immediately after the content changes indicating that it is safe to load the content.  -->
+      <field id="shouldLoadContent" type="boolean" alwaysNotify="true"/>
 
       <!-- hides or shows the loading spinner -->
       <field id="isLoading" type="boolean" alias="ChannelDetailSpinner.visible" />
@@ -64,44 +67,78 @@
            Used when showing a series/episode page
       -->
       <field id="trackingLoadStartTime" type="integer" />
+
+      <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
+      -->
+      <field id="callingPage" type="string" />
   </interface>
 
   <children>
-    <Poster
+    <Group id="nav">
+      <LayoutGroup
+        id="ScreenNavigationHint"
+        layoutDirection="horiz"
+        vertAlignment="custom"
+        opacity="0.5"
+        translation="[85,85]">
+        <Label
+          text="PRESS"
+          vertAlign="center"
+          height="47"
+          translation="[0,2]">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+        <Poster
+          uri="pkg:/images/back.png"
+          width="47"
+          height="47"/>
+        <Label
+          id="callToAction"
+          vertAlign="center"
+          height="47"
+          translation="[0,2]">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+      </LayoutGroup>
+      <Poster
       id="tubiLogo"
       height="45"
       width="103"
       opacity="0.5"
       uri="pkg:/images/logo-white-large.png"
-      translation="[85,55]" />
+      translation="[1732,60]" />
+    </Group>
     <InfoPanel
       id="ChannelsInfoPanel"
       mode="category"
-      translation="[85,163]"
+      translation="[85,167]"
       maxHeight="325"
       maxTitleLines="2"
       visible="true" />
-    <FilledButtonMarkupGrid
-      id="ChannelsButtonList"
-      translation="[60, 616]"
-      itemSize="[425,80]"
-      itemSpacing="[0,8]"
-      numRows="1"
-      numColumns="1"
-      vertFocusAnimationStyle="fixedFocus"
-      itemComponentName="CategorySeasonListItem" />
-    <RowList
-      id="ChannelsRowList"
-      translation="[517,616]"
+
+    <Label
+      translation="[85,520]"
+      id="pageTitle">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="34" />
+    </Label>
+    <MarkupGrid
+      id="ChannelsVideoGrid"
+      translation="[85,584]"
       itemComponentName="CategoryGridPoster"
-      rowTitleComponentName="CategoryGridRowLabel"
-      itemSize="[1835,364]"
-      itemSpacing="[0,28]"
-      numRows="1"
-      rowItemSize="[[210,300]]"
-      rowItemSpacing="[[10,0]]"
+      itemSize="[210,300]" 
+      itemSpacing="[10,28]"
+      numRows="2"   
+      numColumns="8"
       fadeFocusFeedbackWhenAutoScrolling="true"
-      rowFocusAnimationStyle="floatingFocus"
       vertFocusAnimationStyle="fixedFocus"
       focusBitmapUri="pkg:/images/selector-fhd.9.png"/>
 
