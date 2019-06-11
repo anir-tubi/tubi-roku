@@ -84,7 +84,12 @@ $ make ROKU_PROFILE=test install
 
 [Smoke tests](docs/tubi_tv_smoke_test.md) should be manually run for each release.
 
+3\. If you want to provide someone (i.e. QA) a zip file of the app to [sideload](https://tubitv.atlassian.net/wiki/spaces/EC/pages/879460427/Side+Load+Roku+.zip), you first need to modify temporarily 2 values within the Constants.brs file so it is not trying to load the hotpatch/remote components from the local server:
 
+```
+constants.remoteComponents = false
+constants.useHotpatch = false
+```
 # Release
 
 1\. Run unit tests locally
