@@ -1,5 +1,5 @@
 <?rokuml version="1.0" encoding="utf-8" ?>
-<!--********** Copyright 2018 Roku Corp.  All Rights Reserved. **********-->
+<!--********** Copyright 2019 Roku Corp. All Rights Reserved. **********-->
 
 <component name="TrackerTask" extends="Task">
 
@@ -17,6 +17,8 @@
 
       <function name="UIThread_getItemList"/>
       <function name="UIThread_getNodeTree"/>
+      <function name="UIThread_getNodeById"/>
+      <function name="UIThread_getNodeByName"/>
 
       <function name="UIThread_addChild"/>
       <function name="UIThread_removeChild"/>
@@ -30,8 +32,20 @@
 
       <function name="UIThread_setBoundingRect"/>
 
+      <function name="UIThread_getRegistrySections"/>
+      <function name="UIThread_clearRegistry"/>
+      <function name="UIThread_addRegistrySection"/>
+      <function name="UIThread_removeRegistrySection"/>
+      <function name="UIThread_addRegistryField"/>
+      <function name="UIThread_removeRegistryField"/>
+      <function name="UIThread_editRegistryField"/>
+
+      <function name="UIThread_log"/>
+      <function name="UIThread_setLogVerbosity"/>
+      <function name="UIThread_setLogFormat"/>
   </interface>
 
+    
     
     
     
@@ -56,17 +70,208 @@ Function RALE_InitConfig() as Object
     this = {
         bufferSize: 1024,
         minSocketPort: 49152,
-        maxSocketPort: 65535
+        maxSocketPort: 65535,
+        screensaverResetTimeout: 30000,
+        commandTimeout: 10000,
+        defaultLogLevel: 3,
+        logFormat: "[RALE][%level%] - %message%"
     }
 
     return this
 End Function
 
 
+' RALE_Logger - Constructor of Logger class
+' @param {integer} level - log verbosity level (0-4)
+' @param {string} format - log message format ("[MY_CUSTOM_PREFIX]%message%")
+' @return {object} - logger instance
+function RALE_Logger(level = -1 as Integer, format = "%message%" as String) as Object
+    this = {}
+
+    this.verbosityList = ["OFF", "ERROR", "WARN", "INFO", "DEBUG"]
+    this.verbosityMap = {
+        off     : 0
+        error   : 1
+        warning : 2
+        info    : 3
+        debug   : 4
+    }
+    this.formatMethods = {
+        date:    "getDate",
+        time:    "getTime",
+        level:   "getLevel",
+        message: "getMessage"
+    }
+
+    this.dt = createObject("roDateTime")
+
+    this.setVerbosity = RALE_Logger__SetVerbosityLevel
+    this.setFormat    = RALE_Logger__SetFormat
+
+    this.getDate    = RALE_Logger__GetDate
+    this.getTime    = RALE_Logger__GetTime
+    this.getLevel   = RALE_Logger__GetLevel
+    this.getMessage = RALE_Logger__GetMessage
+
+    this.debug      = RALE_Logger__DebugLog
+    this.info       = RALE_Logger__InfoLog
+    this.warning    = RALE_Logger__WarningLog
+    this.error      = RALE_Logger__ErrorLog
+    this.logMessage = RALE_Logger__LogMessage
+
+    this.setVerbosity(level)
+    this.setFormat(format)
+
+    return this
+end function
+
+' RALE_Logger__SetVerbosityLevel - change logger verbosity level
+' @param {integer} level - log verbosity level (0-4)
+sub RALE_Logger__SetVerbosityLevel(level = 4 as Integer)
+    if level > m.verbosityMap.debug then
+        m.verbosityLevel = m.verbosityMap.debug
+    else if level < m.verbosityMap.off then
+        m.verbosityLevel = m.verbosityMap.off
+    else
+        m.verbosityLevel = level
+    end if
+end sub
+
+' RALE_Logger__SetFormat - Change logger message format
+' @param {string} format - log message format ("[MY_CUSTOM_PREFIX]%message%")
+' Available format variables:
+' %message% - message with which the log function is called (at the end by default)
+' %date% - current date in format "[year]-[month]-[day]"
+' %time% -  current time in format "[hours]:[minutes]:[seconds].[miliseconds]"
+' %level% - verbosity level ("ERROR", "WARN", "INFO" or "DEBUG")
+sub RALE_Logger__SetFormat(format = "%message%" as String)
+    if Instr(1, format, "%message%") = 0 then
+        format = format + "%message%"
+    end if
+    m.formatList = format.split("%")
+end sub
+
+'==========================================
+' Wrappers over various levels of logging
+'==========================================
+
+' RALE_Logger__DebugLog - Log message into console with DEBUG verbosity level
+' @param {string} message - log message
+sub RALE_Logger__DebugLog(message = "")
+    m.logMessage(message, m.verbosityMap.debug)
+end sub
+
+' RALE_Logger__InfoLog - Log message into console with INFO verbosity level
+' @param {string} message - log message
+sub RALE_Logger__InfoLog(message = "")
+    m.logMessage(message, m.verbosityMap.info)
+end sub
+
+' RALE_Logger__WarningLog - Log message into console with WARNING verbosity level
+' @param {string} message - log message
+sub RALE_Logger__WarningLog(message = "")
+    m.logMessage(message, m.verbosityMap.warning)
+end sub
+
+' RALE_Logger__ErrorLog - Log message into console with ERROR verbosity level
+' @param {string} message - log message
+sub RALE_Logger__ErrorLog(message)
+    m.logMessage(message, m.verbosityMap.error)
+end sub
+
+'==========================================
+' Main log function
+'==========================================
+
+' RALE_Logger__LogMessage - Log message into console by message format if logLevel is more than current verbosityLevel
+' @param {string} message - log message
+' @param {integer} logLevel - log verbosity level (0-4)
+sub RALE_Logger__LogMessage(message as String, logLevel as Integer)
+    if  logLevel > 0 and m.verbosityLevel >= logLevel then
+        logMessage = ""
+
+        for each item in m.formatList
+            formatMethod = m.formatMethods[item]
+
+            if formatMethod = Invalid then
+                logMessage = logMessage + item
+            else
+                logMessage = logMessage + m[formatMethod](message, logLevel)
+            end If
+        end for
+
+        print logMessage
+    end if
+end sub
+
+'==========================================
+' Utitlity functions
+'==========================================
+
+' RALE_Logger__GetTime - Returns current time
+' @param {string} message - log message
+' @return {string} - current time in format: "[hours]:[minutes]:[seconds].[miliseconds]"
+function RALE_Logger__GetTime(message as String, level as Integer)
+    m.dt.Mark()
+
+    h = RALE_Logger__getZeroNumber(m.dt.getHours())
+    n = RALE_Logger__getZeroNumber(m.dt.getMinutes())
+    s = RALE_Logger__getZeroNumber(m.dt.getSeconds())
+    ms = str(m.dt.getMilliseconds()).trim()
+    if len(ms) = 1
+      ms = ms + "0"
+    else
+      ms = left(ms, 2)
+    end if
+    return h + ":" + n + ":" + s + "." + ms
+end function
+
+' RALE_Logger__GetDate - Returns current date
+' @param {string} message - log message
+' @return {string} - current date in format: "[year]-[month]-[day]"
+function RALE_Logger__GetDate(message as String, level as Integer)
+    m.dt.Mark()
+    y = str(m.dt.getYear()).trim()
+    mm = RALE_Logger__getZeroNumber(m.dt.getMonth())
+    d = RALE_Logger__getZeroNumber(m.dt.getDayOfMonth())
+    return y + "-" + mm + "-" + d
+end function
+
+' RALE_Logger__GetLevel - Returns current verbosity level
+' @param {string} message - log message
+' @return {integer} - verbosity level
+function RALE_Logger__GetLevel(message as String,  level as Integer)
+    return m.verbosityList[level]
+end function
+
+' RALE_Logger__GetMessage - Returns log message (needed for formating log message)
+' @param {string} message - log message
+' @return {string} - log message
+function RALE_Logger__GetMessage(message as String, level as Integer)
+    return message
+end function
+
+' RALE_Logger__getZeroNumber - Convert number to format "0[number]" if it has less then 2 digits
+' @param {number} n - number for converting
+' @param {number} to_length -  the nessesary count of digits
+' @return {string} - converted numer format
+function RALE_Logger__getZeroNumber(n, to_length=2)
+    n = str(n).trim()
+    if len(n) < to_length
+        n = String(to_length - 1, "0") + n
+    end if
+    return n
+end function
+
+
 ' CreateSelectorView - Selector (live) view class constructor
 ' @return {object} - selector (live) view
 Function CreateSelectorView() as Object
     view = CreateObject("roSGNode", "Group")
+
+    m.resolution = m.top.getScene().getField("currentDesignResolution")
+    m.resWidth = m.resolution.width
+    m.resHeight = m.resolution.height
 
     children = [
         {subtype : "Rectangle", fields : {id : "l"}}
@@ -76,6 +281,18 @@ Function CreateSelectorView() as Object
 
         {subtype : "Rectangle", fields : {id : "horiz"}}
         {subtype : "Rectangle", fields : {id : "vert"}}
+
+
+        {subtype : "Rectangle", fields : {id : "leftLine"}}
+        {subtype : "Rectangle", fields : {id : "topLine"}}
+        {subtype : "Rectangle", fields : {id : "rightLine"}}
+        {subtype : "Rectangle", fields : {id : "bottomLine"}}
+
+        {subtype : "Label", fields : {id : "leftCords"}}
+        {subtype : "Label", fields : {id : "topCords"}}
+        {subtype : "Label", fields : {id : "rightCords"}}
+        {subtype : "Label", fields : {id : "bottomCords"}}
+
         {subtype : "Rectangle", fields : {id : "fill", color :  "#ffffff44"}}
         {subtype : "Timer",     fields : {id : "timer", duration : 1 / 60, repeat : true}}
     ]
@@ -177,6 +394,21 @@ Function NodeUtils_AddChildToNode(node, childConfig) as Object
     return NodeUtils_AddChildrenToNode(view, childConfig.children)
 End Function
 
+' NumberToFixed - formats a number using fixed-point notation
+' @param {float, double} number - formated number
+' @param {integer} digits - the number of digits to appear after the decimal point
+' @return {string} - a string representing the given number using fixed-point notation
+Function NumberToFixed(number, digits) as String
+    str = number.toStr()
+    arr = str.split(".")
+
+    if arr.count() > 1 and digits > 0 then
+        return arr[0] + "." + Left(arr[1], digits)
+    end if
+
+    return arr[0]
+End Function
+
 ' SelectorView_UpdateView - width, height and border change event handler. Updates Selector (live) view
 ' @param {object} event - event data
 Sub SelectorView_UpdateView(event)
@@ -184,6 +416,10 @@ Sub SelectorView_UpdateView(event)
     border = node.border
     width  = node.width
     height = node.height
+    x = node.boundingRect.x
+    y = node.boundingRect.y
+    rightPos = x + width + border*2
+    bottomPos = y + height + border*2
 
     l = node.childrenMap.l
     l.width = border
@@ -214,6 +450,50 @@ Sub SelectorView_UpdateView(event)
     vert.width = border
     vert.height = height
     vert.translation = [(width - border) / 2, 0]
+
+    leftLine = node.childrenMap.leftLine
+    leftLine.width = x
+    leftLine.height = border
+    leftLine.translation = [-x, (height - border) / 2]
+
+    topLine = node.childrenMap.topLine
+    topLine.width = border
+    topLine.height = y
+    topLine.translation = [(width - border) / 2, -y]
+
+    rightLine = node.childrenMap.rightLine
+    rightLine.width = m.resWidth - x + 10
+    rightLine.height = border
+    rightLine.translation = [width + border, (height - border) / 2]
+
+    bottomLine = node.childrenMap.bottomLine
+    bottomLine.width = border
+    bottomLine.height = m.resHeight - y + 10
+    bottomLine.translation = [(width - border) / 2, height + border]
+
+    leftCords = node.childrenMap.leftCords
+    leftCords.font.size = 20
+    leftCords.color = "#FF0000"
+    leftCords.text = NumberToFixed(x, 0)
+    leftCords.translation = [-x/2 - 10, (height - border) / 2 - 20]
+
+    topCords = node.childrenMap.topCords
+    topCords.font.size = 20
+    topCords.color = "#FF0000"
+    topCords.text = NumberToFixed(y, 0)
+    topCords.translation = [(width - border) / 2 + 10, -y/2 - 10]
+
+    rightCords = node.childrenMap.rightCords
+    rightCords.font.size = 20
+    rightCords.color = "#FF0000"
+    rightCords.text = NumberToFixed(m.resWidth - x - width, 0)
+    rightCords.translation = [width + (m.resWidth - rightPos)/2 - 5, (height - border) / 2 - 20]
+
+    bottomCords = node.childrenMap.bottomCords
+    bottomCords.font.size = 20
+    bottomCords.color = "#FF0000"
+    bottomCords.text = NumberToFixed(m.resHeight - y - height, 0)
+    bottomCords.translation = [(width - border) / 2 + 10, height + (m.resHeight - bottomPos)/2 - 5]
 
     fill = node.childrenMap.fill
     fill.width = width
@@ -271,7 +551,7 @@ Sub SelectorView_UpdateViewPosition(event)
     if node.attachedView <> Invalid then
         boundingRect = node.attachedView.sceneboundingRect()
     else
-        boundingRect = {x: 0, y: 0, width: 0, height: 0}
+        boundingRect = {x: -100, y: -100, width: 0, height: 0}
     end if
 
     if isBoundingRectChanged(boundingRect, node) then
@@ -296,8 +576,10 @@ Sub getCommandMap() as Object
         "getNodeData" : "UIThread_getNodeData",
 
         ' Tree View commands
-        "getItemList" : "UIThread_getItemList"
-        "getNodeTree" : "UIThread_getNodeTree"
+        "getItemList" : "UIThread_getItemList",
+        "getNodeTree" : "UIThread_getNodeTree",
+        "getNodeById" : "UIThread_getNodeById",
+        "getNodeByName" : "UIThread_getNodeByName",
 
         ' Children commands
         "addChild" : "UIThread_addChild",
@@ -313,7 +595,21 @@ Sub getCommandMap() as Object
         "selectFocusedNode" : "UIThread_selectFocusedNode",
 
         ' Bounding Rect commands
-        "setBoundingRect" : "UIThread_setBoundingRect"
+        "setBoundingRect" : "UIThread_setBoundingRect",
+
+        ' Registry commands
+        "getRegistrySections"   : "UIThread_getRegistrySections",
+        "clearRegistry"         : "UIThread_clearRegistry",
+        "addRegistrySection"    : "UIThread_addRegistrySection",
+        "removeRegistrySection" : "UIThread_removeRegistrySection",
+        "addRegistryField"      : "UIThread_addRegistryField",
+        "removeRegistryField"   : "UIThread_removeRegistryField",
+        "editRegistryField"     : "UIThread_editRegistryField",
+
+        ' Logger commands
+        "setLogVerbosity" : "UIThread_setLogVerbosity",
+        "setLogFormat"    : "UIThread_setLogFormat",
+        "log"             : "UIThread_log"
     }
 End Sub
 
@@ -341,6 +637,16 @@ Sub UIThread_init(args) as Object
         m.showSelectorView = true
         root.appendChild(m.selectorView)
     end if
+
+    if args.logVerbosity >= 0 then
+        UIThread_setLogVerbosity({ level: args.logVerbosity })
+    end if
+
+    if FW_IsString(args.logFormat) then
+        UIThread_setLogFormat({ format: args.logFormat })
+    end if
+
+    m.logger.info("RALE Initialized")
     return { raleVersion: m.raleVersion }
 End Sub
 
@@ -353,6 +659,7 @@ End Sub
 Sub UIThread_showSelectorView(args) as Object
     m.showSelectorView = true
     setSelectorView(m.currentNode, type(m.currentNode), m.currentPath)
+    m.logger.debug("Selector View was disabled")
 End Sub
 
 ' UIThread_hideSelectorView - RALE "hideSelectorView" command handler. Hides Selector (Live) View
@@ -360,6 +667,7 @@ End Sub
 Sub UIThread_hideSelectorView(args) as Object
     m.showSelectorView = false
     setSelectorView(m.currentNode, type(m.currentNode), m.currentPath)
+    m.logger.debug("Selector View was enabled")
 End Sub
 
 '=======================
@@ -393,6 +701,7 @@ Sub UIThread_selectNode(args) as Object
 
     setSelectorView(node, nodeType, path)
 
+    m.logger.debug("Node selected: " + FW_AsString(m.currentNode))
     return {
         path: m.currentPath,
         node: getNodeData(m.currentNode, m.currentPath, root)
@@ -438,13 +747,52 @@ End Sub
 ' @return {object} - response of command. Node children hierarchy
 Sub UIThread_getNodeTree(args) as Object
     path = args["path"]
+    maxLevel = args["maxLevel"]
 
     root = m.top.getScene()
     node = RALE_getNodeByPath(root, path)
     index = RALE_getNodeIndexByPath(path)
     if node = Invalid then return getError("Invalid Path")
 
-    return getNodeTree(node, index)
+    return getNodeTree(node, index, maxLevel)
+End Sub
+
+' UIThread_getNodeById - RALE "getNodeById" command handler. Returns node with requested id
+' @param {object} args - command arguments
+' @return {object} - response of command. Found node data
+Sub UIThread_getNodeById(args) as Object
+    path = args["path"]
+    id = args["id"]
+
+    if id = Invalid then return getError("id is required")
+
+    root = m.top.getScene()
+    rootNode = RALE_getNodeByPath(root, path)
+    if rootNode = Invalid then return getError("Invalid Path")
+
+    foundNode = getNodeById(rootNode, id)
+    foundPath = RALE_getNodePath(foundNode, root)
+
+    return getNodeData(foundNode, foundPath, root)
+End Sub
+
+' UIThread_getNodeByName - RALE "getNodeByName" command handler. Returns node with requested name
+' @param {object} args - command arguments
+' @return {object} - response of command. Found node path
+Sub UIThread_getNodeByName(args) as Object
+    path = args["path"]
+    name = args["name"]
+
+    if name = Invalid then return getError("name is required")
+
+    root = m.top.getScene()
+    rootNode = RALE_getNodeByPath(root, path)
+    if rootNode = Invalid then return getError("Invalid Path")
+
+    foundNode = getNodeByName(rootNode, name)
+    foundPath = RALE_getNodePath(foundNode, root)
+
+    return getNodeData(foundNode, foundPath, root)
 End Sub
 
 '=======================
@@ -476,7 +824,7 @@ Sub UIThread_addChild(args) as Object
     if result.success = true then
         index = RALE_getNodeIndexByPath(path)
         return {
-            tree: getNodeTree(result.child, index),
+            tree: getNodeTree(result.child, index, 50),
             childindex: result.index
         }
     else
@@ -533,7 +881,7 @@ Sub UIThread_setField(args) as Object
     fieldValue = args["value"]
 
     if field = "" then return getError("Field ID is required")
-    if RALE_convertToType(fieldValue, FW_AsString(fieldType)) = Invalid then return getError("Invalid Field Arguments")
+    if RALE_convertToType(fieldValue, FW_AsString(fieldType)) = Invalid then return getError("Invalid Field Type or Value")
 
     path = m.currentPath
     nodeType = type(m.currentNode)
@@ -544,6 +892,7 @@ Sub UIThread_setField(args) as Object
         m.currentNode = setObjField(path, field, fieldValue, fieldType)
     end if
 
+    m.logger.debug("Field '" + field + "' of selected node was set to " + FW_AsString(fieldValue))
     return getFieldList(m.currentNode)
 End Sub
 
@@ -573,6 +922,7 @@ Sub UIThread_removeField(args) as Object
         owner = setInParentNode(ownerPath, inOwnerField, node)
     end if
 
+    m.logger.debug("Field '" + field + "' of selected node was removed")
     return getFieldList(node)
 End Sub
 
@@ -590,6 +940,7 @@ Sub UIThread_setFocus(args) as Object
     node = RALE_getNodeByPath(node, path)
     if node = Invalid then return getError("Invalid Path")
 
+    m.logger.debug(FW_AsString(node) + " was focused")
     node.setFocus(true)
     return { success: true }
 End Sub
@@ -606,10 +957,11 @@ Sub UIThread_selectFocusedNode(args) as Object
             node: getNodeData(node, m.currentPath, root)
         }
     else
-        path = getNodePath(node, root)
+        path = RALE_getNodePath(node, root)
         m.currentNode = node
         m.currentPath = path
         setSelectorView(node, type(node), path)
+        m.logger.debug("Node selected: " + FW_AsString(node))
         return {
             path: path,
             node: getNodeData(node, path, root)
@@ -652,6 +1004,7 @@ Sub UIThread_setBoundingRect(args) as Object
 
         if node.hasField("translation") AND (deltaY <> 0 or deltaX <> 0) then
             fields.translation = [node.translation[0] - deltaX, node.translation[1] - deltaY]
+            m.logger.debug("Selected node translation was set to " + FW_AsString(fields.translation))
         end if
 
         if node.hasField("width") AND deltaWidth <> 0 then
@@ -660,6 +1013,7 @@ Sub UIThread_setBoundingRect(args) as Object
             else
                 fields.width = node.width - deltaWidth
             end if
+            m.logger.debug("Selected node width was set to " + FW_AsString(fields.width))
         end if
 
         if node.hasField("height") AND deltaHeight <> 0 then
@@ -668,11 +1022,109 @@ Sub UIThread_setBoundingRect(args) as Object
             else
                 fields.height = node.height - deltaHeight
             end if
+            m.logger.debug("Selected node height was set to " + FW_AsString(fields.height))
         end if
 
         node.setFields(fields)
     end if
     return node.sceneBoundingRect()
+End Sub
+
+'=======================
+' Registry commands
+'=======================
+
+' UIThread_getRegistrySections - TBD
+Sub UIThread_getRegistrySections(args) as Object
+    return getRegistrySections()
+End Sub
+
+' UIThread_addRegistrySection - TBD
+Sub UIThread_clearRegistry(args) as Object
+    return clearRegistry()
+End Sub
+
+' UIThread_addRegistrySection - TBD
+Sub UIThread_addRegistrySection(args) as Object
+    name = args.name
+    section = args.section
+
+    if not FW_IsString(name) or name = "" then return getError("Invalid name")
+    if not FW_IsAssociativeArray(section) then return getError("Invalid section. Expected an object")
+
+    return addRegistrySection(name, section)
+End Sub
+
+' UIThread_removeRegistrySection - TBD
+Sub UIThread_removeRegistrySection(args) as Object
+    name = args.name
+
+    if not FW_IsString(name) or name = "" then return getError("Invalid name")
+
+    return removeRegistrySection(name)
+End Sub
+
+' UIThread_addRegistryField - TBD
+Sub UIThread_addRegistryField(args) as Object
+    sectionName = args.sectionName
+    key = args.key
+    value = args.value
+
+    if not FW_IsString(sectionName) or sectionName = "" then return getError("Invalid section name")
+    if not FW_IsString(key) or key = "" then return getError("Invalid key")
+    if not FW_IsString(value) then return getError("Invalid value")
+
+    return addRegistryField(sectionName, key, value)
+End Sub
+
+' UIThread_removeRegistryField - TBD
+Sub UIThread_removeRegistryField(args) as Object
+    sectionName = args.sectionName
+    key = args.key
+
+    if not FW_IsString(sectionName) or sectionName = "" then return getError("Invalid section name")
+    if not FW_IsString(key) or key = "" then return getError("Invalid key")
+
+    return removeRegistryField(sectionName, key)
+End Sub
+
+' UIThread_editRegistryField - TBD
+Sub UIThread_editRegistryField(args) as Object
+    sectionName = args.sectionName
+    key = args.key
+    newKey = args.newKey
+    newValue = args.newValue
+
+    if not FW_IsString(sectionName) or sectionName = "" then return getError("Invalid section name")
+    if not FW_IsString(key) or key = "" then return getError("Invalid key")
+    if not FW_IsString(newKey) or newKey = "" then return getError("Invalid newKey")
+
+    return editRegistryField(sectionName, key, newKey, newValue)
+End Sub
+
+' UIThread_log - TBD
+Sub UIThread_log(args) as Object
+    m.logger.logMessage(args.message, m.logger.verbosityMap[args.status])
+End Sub
+
+' UIThread_setLogVerbosity - TBD
+Sub UIThread_setLogVerbosity(args) as Object
+    level = args.level
+
+    if not FW_IsInteger(level) then return getError("Invalid level")
+
+    m.logger.setVerbosity(args.level)
+    return { success: true }
+End Sub
+
+' UIThread_setLogFormat - TBD
+Sub UIThread_setLogFormat(args) as Object
+    format = args.format
+
+    if not FW_IsString(format) then return getError("Invalid format")
+
+    m.logger.setFormat(args.format)
+    return { success: true }
 End Sub
 
 '=======================
@@ -816,63 +1268,107 @@ End Sub
 ' @param {object} node - node or filed
 ' @param {string} id - node index or filed id
 ' @return {array} - node children hierarchy
-Sub getNodeTree(node, id) as Object
-    item = {}
-    nodeType = type(node)
-    if nodeType = "roSGNode" then
-        item = {
-            item: getItemObj(node, id)
-            childList: []
-        }
+Sub getNodeTree(node, id, maxLevel) as Object
+    item = {
+        item: getItemObj(node, id),
+        childList: []
+    }
 
-        stateStack = []
-        stateObj = {
-            index : 0
-            item : item
-            node : node
-        }
-        processedNodesCount = 1
-        hasMoreChildren = node.getchildcount() > 0
-        while true
-            if hasMoreChildren then
-                childIndex = stateObj.index
-                childNode = node.getchild(childIndex)
+    result = RALE_forEachChild(node, { maxLevel: maxLevel }, getNodeTreeCallback, { item: item })
 
-                stateObj.index++
-                hasMoreChildren = stateObj.item.item.childrencount > stateObj.index
-
-                if childNode <> invalid then
-                    processedNodesCount++
-
-                    childItemObj = {
-                        item : getItemObj(childNode, childIndex)
-                        childList : []
-                    }
-                    stateObj.item.childlist[childIndex] = childItemObj
-                    if childItemObj.item.childrencount > 0 then
-                        stateStack.push(stateObj)
-
-                        stateObj = {
-                            index : 0
-                            item : childItemObj
-                            node : childNode
-                        }
-                        node = childNode
-                        hasMoreChildren = stateObj.item.item.childrencount > stateObj.index
-                    end if
-                end if
-            else if stateStack.count() > 0 then
-                stateObj = stateStack.pop()
-                node = stateObj.node
-                hasMoreChildren = stateObj.item.item.childrencount > stateObj.index
-            else
-                exit while
-            end if
-        end while
-    else
+    if not result then
         return getError("Invalid Node Type")
     end if
+
     return item
+End Sub
+
+Sub getNodeTreeCallback(node, index, parentObj, childObj, storage) as Boolean
+
+    if parentObj.item = Invalid then
+        parentObj.item = storage.item
+    end if
+
+    childItem = {
+        item : getItemObj(node, index),
+        childList : []
+    }
+
+    parentObj.item.childlist[index] = childItem
+
+    if childObj <> Invalid then
+        childObj.item = childItem
+    end if
+
+    return true
+End Sub
+
+' getNodeById - Search for node by id
+' @param {object} node - root node
+' @param {string} id - node id
+' @return {object} - found node
+Sub getNodeById(rootNode, id) as Object
+
+    if rootNode.id = id then
+        return rootNode
+    end if
+
+    storage = {
+        node: Invalid,
+        id: id
+    }
+
+    result = RALE_forEachChild(rootNode, {}, getNodeByIdCallback, storage)
+
+    if not result then
+        return getError("Invalid Node Type")
+    end if
+
+    return storage.node
+End Sub
+
+Sub getNodeByIdCallback(node, index, parentObj, childObj, storage) as Boolean
+
+    if node.id = storage.id then
+        storage.node = node
+        return false
+    end if
+
+    return true
+End Sub
+
+' getNodeByName - Search for node by name (subtype)
+' @param {object} node - root node
+' @param {string} name - node name (subtype)
+' @return {object} - found node
+Sub getNodeByName(rootNode, name) as Object
+
+    if rootNode.subtype() = name then
+        return rootNode
+    end if
+
+    storage = {
+        node: Invalid,
+        name: name
+    }
+
+    result = RALE_forEachChild(rootNode, {}, getNodeByNameCallback, storage)
+
+    if not result then
+        return getError("Invalid Node Type")
+    end if
+
+    return storage.node
+End Sub
+
+Sub getNodeByNameCallback(node, index, parentObj, childObj, storage) as Boolean
+
+    if node.subtype() = storage.name then
+        storage.node = node
+        return false
+    end if
+
+    return true
 End Sub
 
 ' getNodeData - Returns node children hierarchy
@@ -915,6 +1411,7 @@ Sub addChild(node, childType, index) as Object
 
     addedChild = node.getChild(index)
     if type(addedChild) = "roSGNode" and addedChild.isSameNode(child) then
+        m.logger.debug("Child " + childType + " was added to " + FW_AsString(node) + " by index " + FW_AsString(index))
         return { success: true, child: addedChild, index: index }
     else
         return getError("Cannot Add Child")
@@ -930,7 +1427,10 @@ Sub removeChild(node, index as Integer) as Object
     count = node.getChildCount()
     if FW_IsSGNode(node.getChild(index)) then
         node.removeChildIndex(index)
-        if node.getChildCount() < count then return { success: true }
+        if node.getChildCount() < count then
+            m.logger.debug("Child with index " + FW_AsString(index) + " was removed from " + FW_AsString(node))
+            return { success: true }
+        end if
         return getError("Node cannot be removed")
     else
         return getError("No child with this index")
@@ -951,6 +1451,8 @@ Sub moveChild(node, fromIndex, toIndex) as Object
             node.removeChildIndex(fromIndex)
             if toIndex > fromIndex then toIndex--
             node.insertChild(child, toIndex)
+
+            m.logger.debug("Child of " + FW_AsString(node) + " was moved from index " + FW_AsString(fromIndex) + " to index " + FW_AsString(toIndex))
             return { success: true }
         else
             return getError("No child with this index")
@@ -1078,44 +1580,107 @@ Function getFocusedNodeObj(root, maxDeep = 25) as Object
     return node
 End Function
 
-' getNodeIndex - Returns node index
-' @param {object} node - node
-' @param {object} parent - node parent
-' @return {integer} - node index
-Function getNodeIndex(node, parent) as Integer
-    for i = 0 to parent.getchildCount() - 1
-        if parent.getChild(i).isSameNode(node) then return i
+' getRegistrySections - Returns map of roRegistry
+' @return {object} - sections
+Function getRegistrySections() as Object
+    sections = {}
+
+    RALE_forEachRegistryField(getRegistrySectionsCallback, sections)
+
+    return sections
+End Function
+
+Sub getRegistrySectionsCallback(value, key, section, sections) as Boolean
+    if not FW_IsAssociativeArray(sections[section]) then
+        sections[section] = {}
+    end If
+
+    sections[section][key] = value
+
+    return true
+End Sub
+
+' clearRegistry - Clear roRegistry
+Function clearRegistry() as Object
+    RALE_forEachRegistrySection(clearRegistryCallback, {})
+
+    return { success: true }
+End Function
+
+Sub clearRegistryCallback(section, sectionName, storage) as Object
+    return removeRegistrySection(sectionName)
+End Sub
+
+' addRegistrySection - TBD
+' @return {object} - sections
+Function addRegistrySection(sectionName, section) as Object
+    RegistrySection = CreateObject("roRegistrySection", sectionName)
+    keys = section.keys()
+
+    for each key in keys
+        RegistrySection.write(key, section[key])
     end for
-    return -1
+
+    RegistrySection.flush()
+    m.logger.debug("Registry section " + sectionName + " was added to roRegistry")
+
+    return  { success: true }
 End Function
 
-' getNodePath - Returns node path
-' @param {object} node - node
-' @param {object} root - root
-' @return {array} - node path
-Function getNodePath(node, root) as Object
-    path = []
+' removeRegistrySection - TBD
+' @return {object} - sections
+Function removeRegistrySection(sectionName) as Object
+    Registry = CreateObject("roRegistry")
 
-    if node <> Invalid and root <> Invalid then
-        parent = node.getParent()
-        while parent <> Invalid
-            index = getNodeIndex(node, parent)
-            if index = -1 then exit while
+    success = Registry.delete(sectionName)
 
-            node = parent
-            parent = node.getParent()
+    Registry.flush()
 
-            path.unshift({ child: index })
+    m.logger.debug("Registry section " + sectionName + " was removed from roRegistry")
 
-            if root.isSameNode(node) then exit while
-        end while
+    return { success: success }
+End Function
+
+' addRegistryField - TBD
+' @return {object} - sections
+Function addRegistryField(sectionName, key, value) as Object
+    RegistrySection = CreateObject("roRegistrySection", sectionName)
+
+    success = RegistrySection.write(key, value)
+
+     m.logger.debug("Field " + key + " with value " + value + " was added to " + sectionName + " registry section")
+
+    return { success: success }
+End Function
+
+' removeRegistryField - TBD
+' @return {object} - sections
+Function removeRegistryField(sectionName, key) as Object
+    RegistrySection = CreateObject("roRegistrySection", sectionName)
+
+    success = RegistrySection.delete(key)
+
+     m.logger.debug("Field " + key + " was removed from " + sectionName + " registry section")
+
+    return { success: success }
+End Function
+
+' getRegistrySections - TBD
+' @return {object} - sections
+Function editRegistryField(sectionName, key, newKey, newValue) as Object
+    result = removeRegistryField(sectionName, key)
+
+    if result.success then
+        result = addRegistryField(sectionName, newKey, newValue)
     end if
-    return path
+
+    return result
 End Function
 
-' getNodePath - Returns error object
+' getError - Returns error object
 ' @param {string} message - error message
 Function getError(message as String) as Object
+    m.logger.error(message)
     return { error: { message: message } }
 End Function
 
@@ -1126,17 +1691,21 @@ Sub init()
     m.top.control = "RUN"
 
     m.config = RALE_Config()
+    m.logger = RALE_Logger(m.config.defaultLogLevel, m.config.logFormat)
     m.sceneBG = m.top.GetScene().getChild(0)
-    m.raleVersion = "1.5.12"
+    m.raleVersion = "1.8.2"
+
+    m.logger.info("Roku Advanced Layout Editor v." + m.raleVersion)
 End Sub
 
 ' tracker - TrackerTask run function
 Sub tracker()
     appInfo = CreateObject("roAppInfo")
+    handlersMap = getCommandMap()
     if not appInfo.IsDev() then return
 
-    ?"tracker Run"
-    handlersMap = getCommandMap()
+    RALE_InfoLog("TrackerTask run")
+
     buffer = CreateObject("roByteArray")
     buffer[m.config.bufferSize] = 0
     messagePort = CreateObject("roMessagePort")
@@ -1148,7 +1717,9 @@ Sub tracker()
 
     while True
         port = 0
+        RALE_InfoLog("Waiting on ECP input request")
         msg = wait(0, inputPort)
+
         if type(msg) = "roInputEvent"
             if msg.IsInput()
                 info = msg.GetInfo()
@@ -1158,7 +1729,7 @@ Sub tracker()
             end if
         end if
         if port > m.config.minSocketPort and port < m.config.maxSocketPort then
-            socketConnection(addr, messagePort, port, buffer, handlersMap)
+            socketConnection(addr, messagePort, port, buffer, handlersMap, m.config)
         end if
     end while
 
@@ -1170,9 +1741,13 @@ End Sub
 ' @param {number} port - socket connection port
 ' @param {array} buffer - buffer for socket packets
 ' @param {object} handlersMap - map that contains all RALE commands handlers
+' @param {object} config - configuration constants
 ' @return {string} - connection status
-Sub socketConnection(addr, messagePort, port, buffer, handlersMap) as String
+Sub socketConnection(addr, messagePort, port, buffer, handlersMap, config) as String
     connections = {}
+    appManager = createObject("roAppManager")
+    screensaverTimer = CreateObject("roTimespan")
+    screensaverTimer.Mark()
 
     addr.setPort(port)
 
@@ -1184,16 +1759,25 @@ Sub socketConnection(addr, messagePort, port, buffer, handlersMap) as String
 
     wasConnected = false
 
+    RALE_InfoLog("Start socket server on port " + FW_AsString(port))
+
     while True
 
         if not wasConnected then
             event = wait(3000, messagePort)
             if event = Invalid then
                 tcpListen.close()
+                RALE_WarningLog("No 'init' command received. Socket connection closed")
                 return "connection timeout"
             end if
         else
-            event = wait(0, messagePort)
+            event = wait(config.commandTimeout, messagePort)
+        end if
+
+        ' Resets the screensaver timer
+        if screensaverTimer.TotalMilliseconds() > config.screensaverResetTimeout then
+            screensaverTimer.Mark()
+            appManager.UpdateLastKeyPressTime()
         end if
 
         ' ? type(event)
@@ -1204,9 +1788,10 @@ Sub socketConnection(addr, messagePort, port, buffer, handlersMap) as String
                 ' New
                 newConnection = tcpListen.accept()
                 if newConnection = Invalid
-                    print "accept failed"
+                    RALE_WarningLog("Connection accept failed")
                 else
-                    print "accepted new connection " newConnection.getID()
+                    RALE_InfoLog("Accepted new connection " + FW_AsString(newConnection.getID()))
+
                     newConnection.notifyReadable(true)
                     newConnection.setMessagePort(messagePort)
                     connections[Stri(newConnection.getID())] = newConnection
@@ -1228,11 +1813,16 @@ Sub socketConnection(addr, messagePort, port, buffer, handlersMap) as String
                         if request <> Invalid then
                             response = {}
                             if request["command"] <> Invalid then
-                                ? "handling : " request["command"]
+
                                 handler = handlersMap[request["command"]]
                                 if handler <> Invalid then
+                                    RALE_DebugLog("Handling command: " + request["command"])
+                                    RALE_DebugLog("Received arguments: " + FW_AsString(request["args"]))
+
                                     response = callCommand(handler, request["args"])
                                 else
+                                    RALE_ErrorLog("No such command: " + request["command"])
+
                                     response = getError("No such command")
                                 end if
                             end if
@@ -1247,8 +1837,7 @@ Sub socketConnection(addr, messagePort, port, buffer, handlersMap) as String
                                 connection.SendStr(resList[i])
                                 sleep(20)
                             end for
-
-                            ? "command handled in : " timer.TotalMilliseconds()
+                            RALE_DebugLog("Command handled in: " + FW_AsString(timer.TotalMilliseconds()) + "ms")
                         end if
                     else if received=0 ' client closed
                         closed = True
@@ -1268,6 +1857,8 @@ Sub socketConnection(addr, messagePort, port, buffer, handlersMap) as String
         connections[id].close()
     end for
 
+    RALE_InfoLog("Socket connection closed")
+
     return "connection closed"
 End Sub
 
@@ -1276,169 +1867,169 @@ End Sub
 ' Types
 '=====================
 
-'************************************************* 
+'*************************************************
 ' FW_IsXmlElement - check if value contains XMLElement interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains XMLElement interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsXmlElement(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifXMLElement") <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsFunction - check if value contains Function interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains Function interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsFunction(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifFunction") <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsBoolean - check if value contains Boolean interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains Boolean interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsBoolean(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifBoolean") <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsInteger - check if value type equals Integer
 ' @param value As Dynamic
 ' @return As Boolean - true if value type equals Integer, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsInteger(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifInt") <> invalid And (Type(value) = "roInt" Or Type(value) = "roInteger" Or Type(value) = "Integer")
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsFloat - check if value contains Float interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains Float interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsFloat(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifFloat") <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsDouble - check if value contains Double interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains Double interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsDouble(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifDouble") <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsLongInteger - check if value contains LongInteger interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains LongInteger interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsLongInteger(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifLongInt") <> invalid
 End Function
 
 
-'************************************************* 
+'*************************************************
 ' FW_IsNumber - check if value contains LongInteger or Integer or Double or Float interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value is number, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsNumber(value As Dynamic) As Boolean
     Return FW_IsLongInteger(value) or FW_IsDouble(value) or FW_IsInteger(value) or FW_IsFloat(value)
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsList - check if value contains List interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains List interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsList(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifList") <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsArray - check if value contains Array interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains Array interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsArray(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifArray") <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsAssociativeArray - check if value contains AssociativeArray interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains AssociativeArray interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsAssociativeArray(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifAssociativeArray") <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsSGNode - check if value contains SGNodeChildren interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains SGNodeChildren interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsSGNode(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifSGNodeChildren") <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsString - check if value contains String interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains String interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsString(value As Dynamic) As Boolean
     Return FW_IsValid(value) And GetInterface(value, "ifString") <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsNotEmptyString - check if value contains String interface and length more 0
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains String interface and length more 0, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsNotEmptyString(value As Dynamic) As Boolean
     Return FW_IsString(value) and len(value) > 0
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsDateTime - check if value contains DateTime interface
 ' @param value As Dynamic
 ' @return As Boolean - true if value contains DateTime interface, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsDateTime(value As Dynamic) As Boolean
     Return FW_IsValid(value) And (GetInterface(value, "ifDateTime") <> invalid Or Type(value) = "roDateTime")
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_IsValid - check if value initialized and not equal invalid
 ' @param value As Dynamic
 ' @return As Boolean - true if value initialized and not equal invalid, else return false
-'************************************************* 
+'*************************************************
 Function FW_IsValid(value As Dynamic) As Boolean
     Return Type(value) <> "<uninitialized>" And value <> invalid
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_ValidStr - return value if his contains String interface else return empty string
 ' @param value As Object
 ' @return As String - value if his contains String interface else return empty string
-'************************************************* 
+'*************************************************
 Function FW_ValidStr(obj As Object) As String
     if obj <> invalid and GetInterface(obj, "ifString") <> invalid
         return obj
     else
         return ""
     endif
-End Function 
+End Function
 
-'************************************************* 
+'*************************************************
 ' FW_AsString - convert input to String if this possible, else return empty string
 ' @param input As Dynamic
 ' @return As String - return converted string
-'************************************************* 
+'*************************************************
 Function FW_AsString(input As Dynamic) As String
     If FW_IsValid(input) = False Then
         Return ""
@@ -1448,16 +2039,34 @@ Function FW_AsString(input As Dynamic) As String
         Return input.ToStr()
     Else If FW_IsFloat(input) or FW_IsDouble(input) Then
         Return Str(input).Trim()
-    Else
-        Return ""
+    Else If FW_IsBoolean(input) Then
+        If input Then
+            Return "true"
+        Else
+            Return "false"
+        End If
+    Else If FW_IsSGNode(input) Then
+        return input.subtype()
+    Else If FW_IsArray(input) Then
+        result = ""
+        For each item in input
+            result = result + FW_AsString(item) + ", "
+        End For
+        Return "[" + Left(result, Len(result) - 2) + "]"
+    Else If FW_IsAssociativeArray(input) Then
+        result = ""
+        For each key in input
+            result = result + key + " : " + FW_AsString(input[key]) + ", "
+        End For
+        Return "{ " + Left(result, Len(result) - 2) + " }"
     End If
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_AsInteger - convert input to Integer if this possible, else return 0
 ' @param input As Dynamic
 ' @return As Integer - return converted Integer
-'************************************************* 
+'*************************************************
 Function FW_AsInteger(input As Dynamic) As Integer
     If FW_IsValid(input) = False Then
         Return 0
@@ -1472,11 +2081,11 @@ Function FW_AsInteger(input As Dynamic) As Integer
     End If
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_AsLongInteger - convert input to LongInteger if this possible, else return 0
 ' @param input As Dynamic
 ' @return As Integer - return converted LongInteger
-'************************************************* 
+'*************************************************
 Function FW_AsLongInteger(input As Dynamic) As LongInteger
     If FW_IsValid(input) = False Then
         Return 0
@@ -1489,11 +2098,11 @@ Function FW_AsLongInteger(input As Dynamic) As LongInteger
     End If
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_AsFloat - convert input to Float if this possible, else return 0.0
 ' @param input As Dynamic
 ' @return As Float - return converted Float
-'************************************************* 
+'*************************************************
 Function FW_AsFloat(input As Dynamic) As Float
     If FW_IsValid(input) = False Then
         Return 0.0
@@ -1508,11 +2117,11 @@ Function FW_AsFloat(input As Dynamic) As Float
     End If
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_AsDouble - convert input to Double if this possible, else return 0.0
 ' @param input As Dynamic
 ' @return As Float - return converted Double
-'************************************************* 
+'*************************************************
 Function FW_AsDouble(input As Dynamic) As Double
     If FW_IsValid(input) = False Then
         Return 0.0
@@ -1525,11 +2134,11 @@ Function FW_AsDouble(input As Dynamic) As Double
     End If
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_AsBoolean - convert input to Boolean if this possible, else return False
 ' @param input As Dynamic
 ' @return As Boolean
-'************************************************* 
+'*************************************************
 Function FW_AsBoolean(input As Dynamic) As Boolean
     If FW_IsValid(input) = False Then
         Return False
@@ -1544,11 +2153,11 @@ Function FW_AsBoolean(input As Dynamic) As Boolean
     End If
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_AsArray - if type of value equals array return value, else return array with one element [value]
 ' @param value As Object
 ' @return As Object - roArray
-'************************************************* 
+'*************************************************
 Function FW_AsArray(value As Object) As Object
     If FW_IsValid(value)
         If Not FW_IsArray(value) Then
@@ -1560,19 +2169,19 @@ Function FW_AsArray(value As Object) As Object
     Return []
 End Function
 
-'************************************************* 
+'*************************************************
 ' FW_ValidAA - check if obj contains all keys
 ' @param obj As Object   - roAssociativeArray
 ' @param keys as Object  - roArray of keys(string) to check
 ' @param delim as String - key delimiter (default = ".")
 ' @return As Boolean - return true if type of obj equals AssociativeArray and obj contains all keys, else return false
-'************************************************* 
+'*************************************************
 Function FW_ValidAA(obj As Object, keys as Object, delim = "." as String) as Boolean
     'All keys on level 0
     if not FW_IsAssociativeArray(obj) or not FW_IsNotEmptyString(delim) or not FW_isArray(keys) then
         return false
     end if
-    for each key in Keys     
+    for each key in Keys
         subKeys = FW_Split(key, delim)
         aa_check = obj
         'go down the hierarchy key.subkey.subsubkey...
@@ -1584,21 +2193,21 @@ Function FW_ValidAA(obj As Object, keys as Object, delim = "." as String) as Boo
                 print "subkey::"; subkey
                 printAA(obj)
                 return false
-                
+
             end if
         end for
-        
+
     end for
     return true
 end Function
 
-'************************************************* 
+'*************************************************
 ' FW_GetSubElement - check if obj contains subElementTree element and return him
 ' @param element as Dynamic - roAssociativeArray
 ' @param subElementTree as Dynamic - String keys tree
 ' @param delim as String - key delimiter (default = ".")
 ' @return As Dynamic - if exist obj[subElementTree] value else invalid
-'************************************************* 
+'*************************************************
 function FW_GetSubElement(element as Dynamic, subElementTree as Dynamic, delim = "." as String) as Dynamic
     if FW_IsValid(element) = false or FW_IsValid(subElementTree) = false then
         return invalid
@@ -1606,7 +2215,7 @@ function FW_GetSubElement(element as Dynamic, subElementTree as Dynamic, delim =
 
     subElementTreeArray = []
     result = element
-    
+
     if FW_IsNotEmptyString(subElementTree) and FW_IsNotEmptyString(delim) then
        subElementTreeArray = FW_Split(subElementTree, delim)
     else if FW_IsArray(subElementTree) then
@@ -1614,7 +2223,7 @@ function FW_GetSubElement(element as Dynamic, subElementTree as Dynamic, delim =
     else
         result = invalid
     end if
-    
+
     for each field in subElementTreeArray
         if FW_IsSGNode(result) then
             key = FW_AsString(field)
@@ -1642,9 +2251,10 @@ function FW_GetSubElement(element as Dynamic, subElementTree as Dynamic, delim =
             exit for
         end if
     end for
-    
+
     return result
 end function
+
 
 ' RALE_parseType - Parse type name to brs type
 ' @param {string} _type - type
@@ -1769,6 +2379,41 @@ Function RALE_getNodeByPath(root as Dynamic, path as Object) as Dynamic
     return node
 End function
 
+' RALE_getNodeIndex - Returns node index
+' @param {object} node - node
+' @param {object} parent - node parent
+' @return {integer} - node index
+Function RALE_getNodeIndex(node, parent) as Integer
+    for i = 0 to parent.getchildCount() - 1
+        if parent.getChild(i).isSameNode(node) then return i
+    end for
+    return -1
+End Function
+
+' RALE_getNodePath - Returns node path
+' @param {object} node - node
+' @param {object} root - root
+' @return {array} - node path
+Function RALE_getNodePath(node, root) as Object
+    path = []
+
+    if node <> Invalid and root <> Invalid then
+        parent = node.getParent()
+        while parent <> Invalid
+            index = RALE_getNodeIndex(node, parent)
+            if index = -1 then exit while
+
+            node = parent
+            parent = node.getParent()
+
+            path.unshift({ child: index })
+
+            if root.isSameNode(node) then exit while
+        end while
+    end if
+    return path
+End Function
+
 ' RALE_getNodeListByPath - Returns node by path
 ' @param {object} root - root of nodes (main scene)
 ' @param {array} path - path to node (for example [{ child: 1 }, { field: "fieldId" }])
@@ -1828,6 +2473,128 @@ Function RALE_splitStringByLength(str, length) as Dynamic
 
     return list
 End function
+
+' RALE_forEachNode - Goes through all the children and call the callback function
+' @param {object} node - root node
+' @param {object} options - options
+' @param {function} callback - callback function that will be called for each node
+Function RALE_forEachChild(node, options, callback, storage) as Dynamic
+    nodeType = type(node)
+    maxLevel = 50
+
+    if FW_IsInteger(options.maxLevel) then
+        maxLevel = options.maxLevel
+    end if
+
+    if nodeType = "roSGNode" then
+        level = 0
+        stateStack = []
+        stateObj = {
+            index : 0
+            node : node
+        }
+
+        childCount = node.getchildcount()
+        while true
+
+            if childCount > stateObj.index then
+                childIndex = stateObj.index
+                childNode = node.getchild(childIndex)
+
+                stateObj.index++
+
+                if childNode <> invalid then
+                    childCountTmp = childNode.getchildcount()
+
+                    parentObj = stateObj
+                    childObj = Invalid
+
+                    if childCountTmp > 0 and level < maxLevel then
+                        childCount = childCountTmp
+                        stateStack.push(stateObj)
+                        level++
+
+                        stateObj = {
+                            index : 0
+                            node : childNode
+                        }
+                        childObj = stateObj
+
+                        node = childNode
+                    end if
+
+                    result = callback(childNode, childIndex, parentObj, childObj, storage)
+
+                    if not result then
+                        exit while
+                    end if
+                end if
+            else if level > 0 then
+                stateObj = stateStack.pop()
+                level--
+                node = stateObj.node
+                childCount = stateObj.node.getchildcount()
+            else
+                exit while
+            end if
+        end while
+    else
+        return false
+    end if
+
+    return true
+End function
+
+' RALE_forEachRegistryField - Goes through all the roRegistry and call the callback function for each field
+' @param {function} callback - callback function that will be called for each field
+Function RALE_forEachRegistryField(callback, storage) as Dynamic
+    Registry = CreateObject("roRegistry")
+
+    for each section in Registry.GetSectionList()
+        RegistrySection = CreateObject("roRegistrySection", section)
+        for each key in RegistrySection.GetKeyList()
+            callback(RegistrySection.Read(key), key, section, storage)
+        end for
+    end for
+End function
+
+' RALE_forEachRegistrySection - Goes through all the roRegistry and call the callback function for each section
+' @param {function} callback - callback function that will be called for each section
+Function RALE_forEachRegistrySection(callback, storage) as Dynamic
+    Registry = CreateObject("roRegistry")
+
+    for each section in Registry.GetSectionList()
+        callback(CreateObject("roRegistrySection", section), section, storage)
+    end for
+End function
+
+Function RALE_DebugLog(message as String)
+    callCommand("UIThread_log", {
+        message: message,
+        status: "debug"
+    })
+End Function
+
+Function RALE_InfoLog(message as String)
+    callCommand("UIThread_log", {
+        message: message,
+        status: "info"
+    })
+End Function
+
+Function RALE_WarningLog(message as String)
+    callCommand("UIThread_log", {
+        message: message,
+        status: "warning"
+    })
+End Function
+
+Function RALE_ErrorLog(message as String)
+    callCommand("UIThread_log", {
+        message: message,
+        status: "error"
+    })
+End Function
 
 ]]>
 </script>

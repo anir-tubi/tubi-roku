@@ -5,6 +5,7 @@ Function init()
 
   ' wait for any children to be added to the scene
   m.top.observeField("change", "onChildrenChange")
+  ' m.top.createChild("TrackerTask")
 End Function
 
 Function onLoadingTimer()
