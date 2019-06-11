@@ -86,6 +86,10 @@ End Function
 '@content: tubiContentNode
 Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSavedPosition = -1)
   tubiLog("DetailScreenHelpers.populateDetailScreen")
+  'initialize default background - will be overwritten later in most cases
+  backgroundUriList = [m.defaultBackgroundUri]
+
+
   if type(detailScreen) = "roSGNode" and detailScreen.isSubType("DetailScreen") and type(content) = "roSGNode"
     'hide the spinner
     wasLoading = detailScreen.isLoading
@@ -175,14 +179,8 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     'update the background images for the detail screen
     if content.backgrounds <> invalid and content.backgrounds.count() > 0
       backgroundUriList = content.backgrounds
-    else
-      backgroundUriList = [m.defaultBackgroundUri]
     end if
-    detailScreen.backgroundUriList = backgroundUriList
-    m.backgroundGroup.backgroundInfo = {
-      type: m.constants.ui.backgroundTypes.fullScreen
-      uriList: backgroundUriList
-    }
+
     detailScreen.content = content
   end if
 
