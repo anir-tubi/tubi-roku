@@ -2,7 +2,7 @@
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
 '
 Function getExperimentValue(namespaceName as string, parameterName as string)
-  ' set up a list of experiment parameters that we've already send exposure events for
+  ' set up a list of experiment parameters that we've already sent exposure events for
   ' this will prevent multiple exposure events per session for the same experiment
   if m.global.exposedExperimentParameters = invalid
     m.global.addField("exposedExperimentParameters", "assocarray", false)
