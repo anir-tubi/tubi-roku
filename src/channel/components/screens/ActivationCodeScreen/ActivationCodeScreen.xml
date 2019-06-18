@@ -30,6 +30,16 @@
         }
       -->
       <field id="trackingPageInfo" type="assocarray" />
+
+      <!-- Holds the "level" of the screen relative to other screens.
+           Screens with smaller screenLevel values cannot be stacked on top of screens with higher screenLevel values.
+           Attempting to do this action will result in screens being removed from the stack before the screen with the lower
+           vaule is pushed to the stack.
+       -->
+      <field id="screenLevel" type="integer" />
+
+      <!-- If set to true, allows screens of the same type and same screenLevel to stack on top of each other  -->
+      <field id="isStackable" type="boolean" value="false" />
   </interface>
 
   <children>

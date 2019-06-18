@@ -61,6 +61,8 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the related content already
   ' has focus, not when it gains focus.
   m.relatedHasFocus = false
+
+  m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
 End Function
 
 Function onDescriptionSelected()

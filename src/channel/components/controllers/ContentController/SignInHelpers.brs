@@ -83,12 +83,9 @@ Function onAuthInfoReceived()
     }
   end if
 
-  '//The m.rootTabGroup.show needs to be set AFTER the user has been set as signed in so the sign in page can properly be set as sign out
-  m.rootTabGroup.show = m.contentGroup.id
-
-  if m.categoryScreen <> invalid
-    m.categoryScreen.dirtyUserCategories = m.constants.ui.categoryIds.queue
-    m.categoryScreen.dirtyUserCategories = m.constants.ui.categoryIds.history
+  if m.homeScreen <> invalid
+    m.homeScreen.dirtyUserCategories = m.constants.ui.categoryIds.queue
+    m.homeScreen.dirtyUserCategories = m.constants.ui.categoryIds.history
   end if
   refreshAllDetailScreens()
   m.spinner.visible = false

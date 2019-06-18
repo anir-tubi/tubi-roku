@@ -10,22 +10,34 @@
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogScreen/ModalDialogScreen.brs" />
   
   <interface>
-    <!-- The text of buttons.  The button list will grow to the size of this array -->
-    <field id="buttons" type="stringarray" value="[]" alwaysNotify="true"/>
-    
-    <!-- Set to the index into the 'buttons' array of a button which was selected -->
-    <field id="buttonSelected" alias="ButtonList.itemSelected"/>
-    
-    <!-- Bold header text, single line -->
-    <field id="title" alias="Title.text"/>
-           
-    <!-- Secondary message, multiple lines -->
-    <field id="message" type="string" value=""/>
-    
-    <field id="scrollable" type="boolean" value="false"/>
+    <!-- INPUT -->
+      <!-- The text of buttons.  The button list will grow to the size of this array -->
+      <field id="buttons" type="stringarray" value="[]" alwaysNotify="true"/>
 
-    <!-- set to "options" or "back" if either of those keys are pressed -->
-    <field id="exitButton" type="string" alwaysNotify="true"/>
+      <!-- Bold header text, single line -->
+      <field id="title" alias="Title.text"/>
+
+      <!-- Secondary message, multiple lines -->
+      <field id="message" type="string" value=""/>
+
+      <field id="scrollable" type="boolean" value="false"/>
+
+      <!-- set to "options" or "back" if either of those keys are pressed -->
+      <field id="exitButton" type="string" alwaysNotify="true"/>
+
+    <!-- OUTPUT -->
+      <!-- Set to the index into the 'buttons' array of a button which was selected -->
+      <field id="buttonSelected" alias="ButtonList.itemSelected"/>
+
+      <!-- Holds the "level" of the screen relative to other screens.
+           Screens with smaller screenLevel values cannot be stacked on top of screens with higher screenLevel values.
+           Attempting to do this action will result in screens being removed from the stack before the screen with the lower
+           vaule is pushed to the stack.
+       -->
+      <field id="screenLevel" type="integer" />
+
+      <!-- If set to true, allows screens of the same type and same screenLevel to stack on top of each other  -->
+      <field id="isStackable" type="boolean" value="false" />
 
   </interface>
 

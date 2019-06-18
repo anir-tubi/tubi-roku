@@ -4,7 +4,6 @@ Function componentTest_VideoPlayer(screen, runComponentTest)
   content = {
     "id": "301333"
     "description": "Set during the 1937 Japanese invasion of Nanking, an American taking refuge in a church attempts to save a group of women from marauding soldiers."
-    "isLiveTV": false
     "isTrailer": false
     "language": "English"
     "length": 8538

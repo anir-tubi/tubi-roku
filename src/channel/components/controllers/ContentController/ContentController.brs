@@ -9,10 +9,7 @@ Function init()
   m.Bookmarks = TubiBookmarks(Request, Auth, m.constants, m.NodeHelpers)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
-  'first things first, observe the live tv content field which comes from the main thread
-  m.top.observeFieldScoped("onNowContent", "onOnNowContent")
-  m.top.observeField("focusedChild", "onComponentFocus")
-  m.onNowReceived = false
+  m.top.observeFieldScoped("focusedChild", "onComponentFocus")
 
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
@@ -26,8 +23,6 @@ Function init()
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.constants.ui.colors.backgroundColor
 
-  m.rootTabGroup = m.top.findNode("RootTabGroup")
-  m.rootTabGroup.observeField("currentViewId", "onRootTabTransitioned")
   m.contentGroup = m.top.findNode("ContentGroup")
 
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
@@ -63,8 +58,9 @@ Function init()
   m.logOutTask = m.top.findNode("LogOutTask")
 
   m.enteredFromDeepLink = false 'used to determine back button behavior in screen stack
-  m.ScreenStack = m.top.findNode("ContentScreenStack")
-  initScreenStack(m.ScreenStack, onScreenStackEmpty)
+
+  m.screenStack = m.top.findNode("ScreenStack")
+  m.screenStack.observeFieldScoped("isEmpty", "onScreenStackEmpty")
 
   m.videoPlayer = m.top.findNode("VideoPlayer")
 
@@ -93,25 +89,30 @@ Function init()
   }
 End Function
 
-Function onScreenStackEmpty()
-  tubiLog("ContentController.onScreenStackEmpty")
-  ' if we went straight to detail screen for a deep link, launch the home screen.
-  ' After we have entered the home screen, ignore back button presses
-  if m.enteredFromDeepLink
-    popScreen()  ' remove the last screen, probably detail screen
-    m.enteredFromDeepLink = false
-    startOnNow()
-  else
-    showExitAppModal("onExitAppModalButtonSelected")
-    m.trackingLoggingTask.trackEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "INFORMATION"   'DialogType enum
-        pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
-      }
-    }
+
+'''''''''''''''''''''''
+' onKeyEvent
+'
+' Back pressed on detail screen should close it
+Function onKeyEvent(key As String, press As Boolean)
+  tubiLog("ContentController.onKeyEvent key = " + key)
+  if m.lastUserActivity <> invalid
+    m.lastUserActivity = Uptime(0)
   end if
+  if press then
+    ' for autohide support, bring the UI back on any keypress
+    if m.screenStack.opacity < 1.0 and type(unAutohide) = "Function"
+      unAutohide()
+      return true
+    else if key = "back"
+      popScreen(true)
+      ' Always consume back button, otherwise it will cause the app to exit
+      return true
+    end if
+  end if
+  return false
 End Function
+
 
 Function onComponentFocus()
   tubiLog("ContentController.onComponentFocus")
@@ -262,22 +263,18 @@ End Function
 Function onAutohide()
   tubiLog("ContentController.onAutohide")
   fadeTime = 3.0  ' default
-  if m.autohideTimer.fadeTime <> invalid then fadeTime = m.autohideTimer.fadeTime
-  m.autohideAnimation = fade(m.ScreenStack, "out", fadeTime)
+  if m.autohideTimer.fadeTime <> invalid
+    fadeTime = m.autohideTimer.fadeTime
+  end if
+
+  m.autohideAnimation = fade(m.screenStack, "out", fadeTime)
 
   if m.autohideTimer.focusVideo = invalid or m.autohideTimer.focusVideo = true
-    'the user has gone into the onnow player experience
+    'the user has entered the video player auto initialize experience
     m.videoPlayer.setFocus(true)
     m.videoPlayer.observeFieldScoped("backButtonPressed", "unAutohide")
     m.videoPlayer.showTransport = true
   else
-    currentScreen().setFocus(false)
-
-    'if autohiding the on now overlay after autoplay - we want the player to treat the user as engaged for analytics purposes
-    if m.videoPlayer.analyticsMode = "onnow-autoplay"
-      m.videoPlayer.analyticsMode = "onnow-engaged"
-    end if
-
     m.top.setFocus(true)  'key presses go to the screen stack
   end if
 End Function
@@ -286,16 +283,11 @@ Function unAutohide()
   tubiLog("ContentController.unAutohide")
   if m.autohideAnimation <> invalid then m.autohideAnimation.control = "stop"
 
-  m.ScreenStack.visible = true
-  m.autohideAnimation = fade(m.ScreenStack, "in", 0.5)
+  m.screenStack.visible = true
+  m.autohideAnimation = fade(m.screenStack, "in", 0.5)
   currentScreen().setFocus(true)
   m.videoPlayer.enableAds = false
   m.videoPlayer.showTransport = false
-End Function
-
-Function showUI(key)
-  unAutohide()
-  if key = "back" then m.homeScreen.showCategoryScreen = true
 End Function
 
 
@@ -307,42 +299,28 @@ End Function
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
   if m.authInfoReceived and m.deepLinkEvaluated then
-    if m.constants.ui.onnow.on = false or (m.constants.ui.onnow.on = true and m.onNowReceived)
-
-      ' Since we're ready to start the channel, make sure the loading spinner is hidden
-      root = m.top.getScene()
-      if root <> invalid
-        spinner = root.findNode("LoadingSpinner")
-        if spinner <> invalid then
-          spinner.visible = false
-        end if
-      end if
-      ' In any of the auth transitions, this spinner might be visible
-      m.spinner.visible = false
-      if m.top.deepLinkContent <> invalid then
-        tubiLog("ContentController detected deep link request")
-        ' we were asked to deep link into a content item. Go to it
-        ' whether we were logged in or not.
-        m.enteredFromDeepLink = true
-        m.rootTabGroup.show = m.contentGroup.id
-        showDetailScreen(m.top.deepLinkContent)
-      else if m.constants.ui.onnow.on = false or m.top.onNowContent <> invalid
-        m.rootTabGroup.show = m.contentGroup.id
-        startOnNow()
+    ' Since we're ready to start the channel, make sure the loading spinner is hidden
+    root = m.top.getScene()
+    if root <> invalid
+      spinner = root.findNode("LoadingSpinner")
+      if spinner <> invalid then
+        spinner.visible = false
       end if
     end if
+    ' In any of the auth transitions, this spinner might be visible
+    m.spinner.visible = false
+    if m.top.deepLinkContent <> invalid then
+      tubiLog("ContentController detected deep link request")
+      ' we were asked to deep link into a content item. Go to it
+      ' whether we were logged in or not.
+      m.enteredFromDeepLink = true
+      m.contentGroup.visible = true
+      showDetailScreen(m.top.deepLinkContent)
+    else
+      m.contentGroup.visible = true
+      startChannel()
+    end if
   end if
-End Function
-
-
-'''''''''''''''''''''''
-' onOnNowContent
-'
-Function onOnNowContent()
-  tubiLog("ContentController.onOnNowContent")
-  m.top.unobserveFieldScoped("onNowContent")
-  m.onNowReceived = true
-  startUserExperience()
 End Function
 
 
@@ -352,8 +330,8 @@ End Function
 ' Show the detail screen for the selected content
 Function onContentSelected()
   tubiLog("ContentController.onContentSelected")
-  content = m.categoryScreen.contentSelected
-  m.autoplayContext = m.categoryScreen.currCategoryId
+  content = m.homeScreen.contentSelected
+  m.autoplayContext = m.homeScreen.currCategoryId
 
   if content.type = "channel"
     showChannelScreen(content, "HOME")
@@ -378,9 +356,10 @@ Function onHistoryQueueChange(categoryId)
     m.authTask.observeFieldScoped("authInfo", "onHistoryQueueRefresh")
     m.authTask.functionName = "execInitializeUserData"
     m.authTask.control = "RUN"
-    if m.categoryScreen <> invalid then m.categoryScreen.dirtyUserCategories = categoryId
+    if m.homeScreen <> invalid then m.homeScreen.dirtyUserCategories = categoryId
   end if
 End Function
+
 
 Function onHistoryQueueRefresh()
   tubiLog("ContentController.onHistoryQueueRefresh")
@@ -391,10 +370,11 @@ Function onHistoryQueueRefresh()
   refreshAllDetailScreens()
 End Function
 
+
 Function refreshAllDetailScreens()
   ' Refresh all detail screens so they have proper history that's been loaded or unloaded
-  for i=0 to m.ScreenStack_.getChildCount()-1
-    screen = m.ScreenStack_.getChild(i)
+  for i=0 to m.screenStack.getChildCount()-1
+    screen = m.screenStack.getChild(i)
     if screen.subType() = "DetailScreen"
       populateDetailScreen(screen, screen.content, true)
     end if
@@ -420,43 +400,22 @@ Function onCloseModal()
 End Function
 
 
-Function startOnNow()
-  tubiLog("ContentController.startOnNow")
+Function startChannel()
+  tubiLog("ContentController.startChannel")
   m.appLoadStopwatch.mark()
-  ' meta-screen, really just to allow screenstack to function.  we interact
-  ' with the child groups directly instead of the parent group
+
   m.homeScreen = CreateObject("roSGNode", "HomeScreen")
   m.homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
-  m.homeScreen.observeFieldScoped("navigateBetweenHomescreens", "onNavigateBetweeenHomescreens")
   m.homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-  m.homeScreen.observeFieldScoped("toolsMenuSelected", "onHomeScreenToolsMenuSelected")
+  m.homeScreen.observeFieldScoped("toolsMenuSelected", "onToolsMenuSelected")
 
-  m.onNow = m.homeScreen.findNode("OnNow")
-  m.onNow.control = "play"
-
-  m.categoryScreen = m.homeScreen.findNode("CategoryScreen")
-  m.categoryScreen.observeFieldScoped("contentSelected", "onContentSelected")
-  m.categoryScreen.observeFieldScoped("firstPosterLoaded", "onFirstPosterLoaded")
+  m.homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
+  m.homeScreen.observeFieldScoped("firstPosterLoaded", "onFirstPosterLoaded")
 
   m.homeScreen.signedIn = (m.global.authInfo <> invalid)
-  m.categoryScreen.loadAllCategories = true
+  m.homeScreen.loadAllCategories = true
 
-  ' If experiment calls for OnNow, set the content. Don't ever do OnNow
-  ' for low-spec devices
-  if not m.constants.deviceInfo.limitedUi and getExperimentValue("UserNamespace", "roku_on_now") = 1 and not m.constants.ui.onNow.disableOnNow
-    m.constants.ui.onnow.on = true
-    m.onNow.content = m.top.onNowContent
-    m.onNow.visible = true
-    m.categoryScreen.onNowHintVisible = true
-    m.categoryScreen.searchSignOutHintVisible = false
-  else
-    m.onNow.content = invalid
-    m.onNow.visible = false
-    m.homeScreen.showCategoryScreen = true
-    m.categoryScreen.onNowHintVisible = false
-    m.categoryScreen.searchSignOutHintVisible = true
-  end if
-  m.rootTabGroup.show = m.contentGroup.id
+  m.contentGroup.visible = true
   'this is the first screen so no need for navigate_to_page tracking.
   'page_load tracking will happen when content is received.
   pushScreen(m.homeScreen, false, false)
@@ -471,30 +430,10 @@ Function homeScreenBackgroundUpdated()
   }
 End Function
 
-Function onHomeScreenToolsMenuSelected()
-  tubiLog("ContentController.onHomeScreenToolsMenuSelected")
+
+Function onToolsMenuSelected()
+  tubiLog("ContentController.onToolsMenuSelected")
   showToolsMenu()
-End Function
-
-' navigate_to_page and page_load for transitions between the tools page and the category page (and any other pages on Homescreen)
-Function onNavigateBetweeenHomescreens()
-  screenTrackingNavigate(m.HomeScreen.oldTrackingPageInfo, m.HomeScreen.trackingPageInfo, invalid)
-  screenTrackingLoad(m.Homescreen.trackingPageInfo, 0)
-End Function
-
-
-Function onRootTabTransitioned()
-  tubiLog("ContentController.onRootTabTransitioned")
-  ' We're here if the SignIn controller was navigated away from
-  if m.SignIn <> invalid and m.rootTabGroup.currentViewId <> m.SignIn.id
-    m.SignIn.unobserveFieldScoped("state")
-    m.SignIn.unobserveFieldScoped("backPressed")
-    m.rootTabGroup.removeView = m.SignIn.id
-    m.SignIn = invalid
-  end if
-  if m.rootTabGroup.currentViewId = m.contentGroup.id
-    if currentScreen() <> invalid then currentScreen().setFocus(true)
-  end if
 End Function
 
 
@@ -506,19 +445,6 @@ Function onDeepLinkContentReceived()
   tubiLog("onDeepLinkContentReceived")
   m.deepLinkEvaluated = true
   startUserExperience()
-End Function
-
-
-'''''''''''''''''''''
-' onGridBackgroundChange
-'
-'
-Function onGridBackgroundChange()
-  TubiLog("ContentController.onGridBackgroundChange")
-  m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype(m.categoryScreen.backgroundUriList)
-    uriList: m.categoryScreen.backgroundUriList
-  }
 End Function
 
 
@@ -544,6 +470,7 @@ Function onSearchBackgroundChange()
   }
 End Function
 
+
 Function onChannelBackgroundChange(msg)
   TubiLog("ContentController.onChannelBackgroundChange")
   channelScreen = msg.getRoSGNode()
@@ -565,7 +492,7 @@ Function onDetailItemFailed()
 
   ' If a deep-link occurred, we skipped category screen creation so create it here
   if currentScreen() = invalid then
-    startOnNow()
+    startChannel()
   end if
 End Function
 
@@ -574,7 +501,7 @@ End Function
 ' onFirstPosterLoaded
 '
 ' Info that the first poster in the first category has bubbled all the way up.
-' Fire off a log to a server so we can track how long it took since the app was started, ie. StartOnNow() was called
+' Fire off a log to a server so we can track how long it took since the app was started, ie. startChannel() was called
 Function onFirstPosterLoaded()
   loadTime = m.appLoadStopwatch.TotalMilliseconds()
 
@@ -659,6 +586,7 @@ Function onVideoTrackingStart()
     m.youboraTask.event = {handler:"play"}
   end if
 End Function
+
 
 Function videoTrackingStop()
   if m.constants.thirdParty.youbora.enabled = true

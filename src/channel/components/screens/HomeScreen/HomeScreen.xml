@@ -1,44 +1,69 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- This 'screen' is used as a vertical view scroller, encompassing 3 views: 
--    The tools menu, the OnNow screen and the CategoryScreen 
--->
-
 <component name="HomeScreen" extends="Group">
+
   <script type="text/brightscript" uri="pkg:/components/screens/HomeScreen/HomeScreen.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+
   <interface>
     <!-- INPUTS -->
+      <!-- MetadataFetchTask response for matrix homescreen (all categories and content) -->
+      <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
+    
+      <!-- set to true if the user is signed in and we want to change the experience based on that -->
       <field id="signedIn" type="boolean" value="false" />
-        
-      <!-- TODO: Plumb this to OnNowOverlay when the play button is selected -->
-      <field id="hideUI" type="boolean"/>
-    
-      <field id="onNowContent" alias="OnNow.content"/>
-    
-      <!-- setting this field to true causes the category screen to be navigated to -->
-      <field id="showCategoryScreen" type="boolean" value="false" alwaysNotify="true"/>
 
-    <!-- OUTPUT -->
-      <field id="toolsMenuSelected" type="boolean" alwaysNotify="true"/>
+      <field id="dirtyUserCategories" type="string" alwaysNotify="true"/>
 
+      <!-- show/hide the category menu -->
+      <field id="categoryMenuVisible" type="boolean"/>
+
+      <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
+      <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
+
+      <!-- When used as a child of container screen (ex. Homescreen),
+           accounts for the other visible rows (ex. On Now, Tools) -->
+      <field id="rowPlaceholder" type="integer" value="0"/>
+
+      <!-- Trigger the content to be loaded.  This field is used to delay
+           the initial category content loading until after the stateful
+           fields have been set (e.g. signedIn) -->
+      <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
+
+    <!-- OUTPUTS -->
       <!-- will be used to change the background images on the content controller -->
-      <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
-      <field id="backgroundType" type="string" />
+      <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
 
-      <!-- Keeps the information used for user tracking - structure looks like:
-        {
-          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
-          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
-        }
+      <!-- set to the tubi content id of the item which was clicked on -->
+      <field id="contentSelected" type="node" alwaysNotify="true"/>
+
+      <!-- triggered once the first CategoryGridList content is loaded -->
+      <field id="firstPosterLoaded" alias="CategoryGridList.firstPosterLoaded"/>
+
+      <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
+
+      <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
+
+      <field id="selectedPosition" alias="CategoryGridList.selectedPosition" />
+
+      <!-- Holds the information needed to populate a navigate_witin_page event. This will
+           be observed by the Homescreen, which will subsequently pass it to the contentController
+           which will be responsible for sending navigate_within_page events.
       -->
-      <field id="trackingPageInfo" type="assocarray" />
-
-      <!-- Same format as trackingPageInfo -->
-      <field id="oldTrackingPageInfo" type="assocarray" />
+      <field id="navigateWithinPageInfo" type="assocarray" />
 
       <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
         {
@@ -48,35 +73,31 @@
                                                  ' tubiTracking_getAnalyticsComponent().
         }
       -->
-      <field id="trackingComponentInfo" alias="CategoryScreen.trackingComponentInfo" />
+      <field id="trackingComponentInfo" type="assocarray" />
 
-      <!-- Holds the information needed to populate a navigate_witin_page event. This will
-           be updated when CategoryScreen update their navigateWithinPageInfo fields,
-           and will be subsequently passed to the contentController
-           which will be responsible for sending navigate_within_page events.
-      -->
-      <field id="navigateWithinPageInfo" alias="CategoryScreen.navigateWithinPageInfo" />
+      <field id="toolsMenuSelected" type="boolean" alwaysNotify="true"/>
 
-      <!-- A trigger that informs the ContentController that the user is navigating within screens in the Homescreen -->
-      <field id="navigateBetweenHomescreens" type="boolean" alwaysNotify="true" />
+      <!-- Holds the "level" of the screen relative to other screens.
+           Screens with smaller screenLevel values cannot be stacked on top of screens with higher screenLevel values.
+           Attempting to do this action will result in screens being removed from the stack before the screen with the lower
+           vaule is pushed to the stack.
+       -->
+      <field id="screenLevel" type="integer"/>
+
+      <!-- If set to true, allows screens of the same type and same screenLevel to stack on top of each other  -->
+      <field id="isStackable" type="boolean" value="false" />
   </interface>
-  
+
   <children>
-    <Group
-      id="HomeViews">
-      <OnNow
-        id="OnNow"
-        visible="true"
-        translation="[0,0]"/>
-      
-      <CategoryScreen
-        id="CategoryScreen"
-        translation="[0,392]"
-        infoVisible="false"
-        visible="true"
-        opacity="0.2"/>
-    </Group>
-    
+
+    <!-- Show a loading spinner only if it takes more than 3 seconds to load -->
+    <Spinner
+      id="CategorySpinner"
+      visible="true"
+      isDisabled="false"
+      width="1920"
+      height="1080"/>
+
     <Poster
       id="tubiLogo"
       height="45"
@@ -84,5 +105,87 @@
       opacity="0.5"
       uri="pkg:/images/logo-white-large.png"
       translation="[85,55]" />
+
+    <LayoutGroup
+      id="SearchSignOutHint"
+      layoutDirection="horiz"
+      vertAlignment="custom"
+      opacity="0.5"
+      translation="[837,58]">
+      <Label
+        text="PRESS"
+        vertAlign="center"
+        height="47"
+        translation="[0,2]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+      <Poster
+        uri="pkg:/images/back.png"
+        width="47"
+        height="47"/>
+      <Label
+        text="FOR SEARCH &amp; MORE"
+        vertAlign="center"
+        height="47"
+        translation="[0,2]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+    </LayoutGroup>
+
+    <InfoPanel
+      id="InfoPanel"
+      translation="[85,163]"
+      maxHeight="325"
+      maxTitleLines="2"
+      visible="true"/>
+
+    <Group
+      id="CategoryMenuAndGrid">
+      <CommunicatingMarkupGrid
+        id="CategoryList"
+        translation="[-380, 616]"
+        itemSize="[425,80]"
+        itemSpacing="[0,8]"
+        numRows="5"
+        numColumns="1"
+        vertFocusAnimationStyle="fixedFocus"
+        itemComponentName="CategorySeasonListItem" />
+
+      <MaskGroup
+        id="ContentArea"
+        maskUri="pkg:/images/poster-mask.png"
+        maskSize="[0,0]"
+        maskOffset="[1731,317]"
+        translation="[85,553]">
+        <CategoryGridList
+          id="CategoryGridList"/>
+      </MaskGroup>
+    </Group>
+
+    <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
+    <Timer
+      id="CategoryRefreshTimer"
+      repeat="true"/>
+
+    <Animation
+      id="Fades">
+      <!-- keyValues here are in relation to CategorGridList.currFocusRow when less than 1.0 -->
+      <FloatFieldInterpolator
+        id="HintGroupFade"
+        fieldToInterp="UpHintGroup.opacity"
+        key="[0.0,1.0]"
+        keyValue="[1.0,0.0]"/>
+      <FloatFieldInterpolator
+        id="InfoPanelFade"
+        fieldToInterp="InfoPanel.opacity"
+        key="[0.0,1.0]"
+        keyValue="[0.0,1.0]"/>
+    </Animation>
   </children>
 </component>

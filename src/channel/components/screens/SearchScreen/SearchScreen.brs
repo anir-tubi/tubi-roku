@@ -53,6 +53,8 @@ Function init()
   ' Used to know if the grid was in focus especially when user returns from the detailed screen and we know to set the focus back to the results
   m.bResultsInFocus = false
 
+  m.top.screenLevel = m.constants.ui.screenLevels.searchScreen
+
   loadSearchResults(true)'//load the default search results
 End Function
 
@@ -77,7 +79,7 @@ End Function
 ' On focus set to screen, push focus on keyboard or grid.
 ' This is used when the search screen regains focus after coming back from the details page.
 Function onScreenFocusChange()
-  if m.top.hasFocus() and m.top.visible = true then
+  if m.top.hasFocus() then
     if m.bResultsInFocus = true
       m.ResultGrid.setFocus(true)
     end if

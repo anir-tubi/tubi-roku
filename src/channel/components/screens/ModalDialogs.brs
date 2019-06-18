@@ -197,6 +197,7 @@ End Function
 ' side effects are removing focus from the modal and removing the modal from it's parent
 ' returns invalid
 Function closeModal(msg)
+  tubiLog("ModalDialog.closeModal")
   if type(msg) = "roSGNode"
     modalNode = msg  '
   else if type(msg) = "roSGNodeEvent"
@@ -204,15 +205,14 @@ Function closeModal(msg)
   end if
 
   if modalNode <> invalid
-    focus = false
+    modalHasFocus = false
     if modalNode.isInFocusChain()
-      modalNode.setFocus(false)
-      focus = true
+      modalHasFocus = true
     end if
     modalNode.unobserveField("buttonSelected")
     modalNode.unobserveField("exitButton")
     m.top.removeChild(modalNode)
-    if focus
+    if modalHasFocus
       m.top.setFocus(true)
     end if
   end if

@@ -20,7 +20,6 @@ Function TubiExperiments(request as Object, constants as Object) as Object
     ' All experiments are required by the backend to have one of the experiment values to be "control"
     defaultValues: {
       UserNamespace: {
-        roku_on_now: 0
       }
       RokuNamespace: {
         roku_simple_register_screen: 0

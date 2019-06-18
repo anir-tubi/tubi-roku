@@ -1,6 +1,5 @@
 Function TubiChannel(utils)
   return {
-    metadataFetch: utils.metadataFetch
     constants: utils.constants
     tracking: utils.tracking
     experiments: utils.experiments
@@ -28,17 +27,6 @@ Function tubiChannel_runChannel(args) As Void
   screen.SetMessagePort(port)
 
   m.logCrashes(args)
-
-  ' get live tv content metadata if necessary
-  ' will getExperimentValue() again in ContentController which will send the tracking event
-  onNowContent = invalid
-  if not m.constants.deviceInfo.limitedUi
-    experimentInfo = m.experiments.getExperimentValue("UserNamespace", "roku_on_now")
-    if experimentInfo <> invalid and experimentInfo.experimentValue = 1 and not m.constants.ui.onNow.disableOnNow
-      m.constants.ui.onnow.on = true
-      onNowContent = m.metadataFetch.liveTv()
-    end if
-  end if
 
   ' start the scene graph UI
   sgGlobal = screen.getGlobalNode()
@@ -104,7 +92,7 @@ Function tubiChannel_runChannel(args) As Void
 
     deepLinkContent = m.deepLink(args, m.tracking, m.auth, true)
     controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
-    controller.onNowContent = onNowContent
+    controller.id = "ContentController"
   else
     'Send the active event - this should be the first analytics event sent per session
     requestQ = m.requestQueue.create(port)
@@ -112,7 +100,7 @@ Function tubiChannel_runChannel(args) As Void
 
     deepLinkContent = m.deepLink(args, m.tracking, m.auth, false)
     controller = tubiScene.createChild("ContentController")
-    controller.onNowContent = onNowContent
+    controller.id = "ContentController"
   end if
   controller.observeField("exitApp", port)
 

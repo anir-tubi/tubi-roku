@@ -23,6 +23,7 @@ Function init()
   ' set initial tracking values
   m.top.trackingPageInfo = setTrackingPageInfo(invalid)
 
+  m.top.screenLevel = m.constants.ui.screenLevels.channelDetailScreen
 End Function
 
 Function onSetCallOfAction()
@@ -35,6 +36,7 @@ Function onSetCallOfAction()
 
   callToAction = m.top.findNode("callToAction")
   callToAction.text = sPreviousPage
+
 End Function
 
 

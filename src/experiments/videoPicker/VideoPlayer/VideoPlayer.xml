@@ -249,6 +249,13 @@
         opacity="0.0"
         uri="pkg:/images/playback-gradient-fhd.9.png"/>
       <Poster
+        id="PickerGradient"
+        width="1920"
+        height="1080"
+        translation="[0,0]"
+        opacity="0.0"
+        uri="pkg:/images/browse-picker-gradient-fhd.9.png"/>
+      <Poster
         uri="pkg:/images/back.png"
         width="47"
         height="47"
@@ -297,6 +304,32 @@
       visible="true"
       opacity="0.0" >
       
+      <Group
+        id="Picker"
+        visible="true"
+        opacity="0.0">
+        <Poster
+          uri="pkg:/images/down-arrow.png"
+          width="47"
+          height="47"
+          translation="[76,521]"/>
+        <Label
+          text="PRESS DOWN TO HIDE"
+          vertAlign="center"
+          height="47"
+          translation="[125,521]">
+          <Font
+             id="Vaud22px"
+             role="font"
+             uri="pkg:/fonts/Vaud-SemiBold.ttf"
+             size="22" />
+        </Label>
+        <VideoPicker
+          id="VideoPicker"
+          translation="[0,616]"
+          visible="true"/>
+      </Group>
+
       <SpritePoster
         id="Thumbnail"
         width="342"
@@ -307,6 +340,33 @@
       <Group
         id="Transport"
         opacity="1.0">
+        <Group
+         id="LiveTVGroup"
+         visible="false">
+          <Poster
+            id="OnNowBug"
+            uri="pkg:/images/icon-on-now.png"
+            width="115"
+            height="55"
+            translation="[85,961]"/>
+
+          <Poster
+            uri="pkg:/images/up-arrow.png"
+            width="47"
+            height="47"
+            translation="[76,769]"/>
+          <Label
+            text="PRESS UP FOR MORE"
+            vertAlign="center"
+            height="47"
+            translation="[125,769]">
+            <Font
+              id="Vaud22px"
+              role="font"
+              uri="pkg:/fonts/Vaud-SemiBold.ttf"
+              size="22" />
+          </Label>
+        </Group>
       
       <TubiProgressBar
         id="ProgressBar"

@@ -56,8 +56,13 @@ Function init()
   m.ProgressBar = m.top.findNode("ProgressBar")
   m.Overlay = m.top.findNode("VideoOverlay")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
+  m.PickerGroup = m.top.findNode("Picker")
   m.HUD = m.top.findNode("HUD")
   m.TransportGradient = m.top.findNode("TransportGradient")
+  m.PickerGradient = m.top.findNode("PickerGradient")
+  m.VideoPicker = m.top.findNode("VideoPicker")
+  m.VideoPicker.observeField("contentFocused", "onVideoPickerFocused")
+  m.VideoPicker.observeField("contentSelected", "onVideoPickerSelected")
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
@@ -164,6 +169,7 @@ Function init()
     m.ProgressBar.scaledUI = m.constants.deviceInfo.scaledUi
     m.LoadingProgressBar.scaledUI = m.constants.deviceInfo.scaledUi
     m.TransportGradient.uri = "pkg:/images/playback-gradient-hd.9.png"
+    m.PickerGradient.uri = "pkg:/images/browse-picker-gradient-hd.9.png"
   end if
 
   ' m.didAdvanceDrm holds current state regarding if playback failed, and the player is going to try the
@@ -194,6 +200,23 @@ Function onDockedChange()
     m.top.isDocked = true
   else
     m.top.isDocked = false
+  end if
+End Function
+
+
+Function onVideoPickerSelected()
+  tubiLog("VideoPlayer.onVideoPickerSelected " + stri(m.VideoPicker.contentSelected))
+  if m.VideoPicker.contentFocused <> -1
+    animateTransport("out")
+    m.lastButtonPressPos = m.playerPosition
+
+    if m.VideoPicker.contentSelected <> m.top.playlistIndex
+      m.top.seekPlaylist = [m.VideoPicker.contentSelected, 0]
+    else
+      if m.Video.state = "paused"
+        resumeFromPause()
+      end if
+    end if
   end if
 End Function
 
@@ -735,8 +758,11 @@ Function showTransport()
   resetTransportButtons()
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
+  m.PickerGroup.opacity = 0.0
+  m.PickerGroup.translation = [0,0]
   m.Transport.opacity = 1.0
   m.Transport.translation = [0,0]
+  m.PickerGradient.opacity = 0.0
   m.TransportGradient.opacity = 1.0
   animateTransport("in")
 End Function
@@ -748,7 +774,42 @@ Function animateTransport(direction)
   tubiLog("VideoPlayer.AnimateTransport, direction = " + direction)
   slideFade(m.HUD, "below", direction, 0.6)
   fade(m.Overlay, direction, 0.6)
+  
+  ' always set focus back to here when hiding transport, that way left/right won't navigate VideoPicker overlay
+  if m.top.isInFocusChain()
+    if direction = "out" and m.PickerGroup.opacity > 0
+      m.VideoPicker.setFocus(false)
+      m.top.setFocus(true)
+    end if
+    if direction = "in" and m.Transport.opacity = 0
+      m.VideoPicker.setFocus(true)
+      m.VideoPicker.jumpToIndex = m.top.playlistIndex
+    end if
+  end if
 End Function
+
+Function focusVideoPicker(focus)
+  tubiLog("VideoPlayer.focusVideoPicker")
+  if not focus and m.VideoPicker.isInFocusChain()
+    ' I'm not sure why we have to setFocus(false) here, but it doesn't work otherwise
+    slideFade(m.PickerGroup, "below", "out", 0.6)
+    slideFade(m.Transport, "below", "in", 0.6)
+    fade(m.PickerGradient, "out", 0.6)
+    fade(m.TransportGradient, "in", 0.6)
+    m.VideoPicker.setFocus(false)
+    m.top.setFocus(true)
+    setFocusedButton(m.ProgressBar)
+  else if focus and m.top.hasFocus()
+    m.VideoPicker.jumpToIndex = m.top.playlistIndex
+    slideFade(m.PickerGroup, "below", "in", 0.6)
+    slideFade(m.Transport, "below", "out", 0.6)
+    fade(m.PickerGradient, "in", 0.6)
+    fade(m.TransportGradient, "out", 0.6)
+    m.VideoPicker.setFocus(true)
+    m.progressBarFocused = false
+  end if
+End Function
+
 
 'pause the video player
 Function pauseVideo(shouldShowTransport)
@@ -758,6 +819,9 @@ Function pauseVideo(shouldShowTransport)
   if shouldShowTransport
     if m.HUD.opacity < 1.0
       showTransport()
+    else
+      ' make sure transport is showing
+      focusVideoPicker(false)
     end if
   end if
 
@@ -951,7 +1015,7 @@ Function handlePlayPause()
   else if m.VideoState = "skip"
     resumeFromSkip()
   end if
-  setFocusedButton(m.PlayPauseButton)
+  setFocusedButton(m.PlayPauseButton, true)
 End Function
 
 
@@ -982,7 +1046,7 @@ Function handleFastForward()
     m.PlayPauseButton.uri = m.buttonUris.play
   end if
 
-  setFocusedButton(m.FastForwardButton)
+  setFocusedButton(m.FastForwardButton, true)
 End Function
 
 
@@ -1013,7 +1077,7 @@ Function handleRewind()
     m.PlayPauseButton.uri = m.buttonUris.play
   end if
 
-  setFocusedButton(m.RewindButton)
+  setFocusedButton(m.RewindButton, true)
 End Function
 
 
@@ -1056,7 +1120,7 @@ Function handleHopBack(remoteReplayButton)
     m.positionAtJumpStart = m.playerPosition   'used for seek event analytics
   end if
 
-  setFocusedButton(m.HopBackButton)
+  setFocusedButton(m.HopBackButton, true)
 
   if m.HUD.opacity > 0.0
     animateTransport("out")
@@ -1164,7 +1228,7 @@ Function handleClosedCaption()
     animateTransport("in")
   end if
 
-  setFocusedButton(m.ClosedCaption)
+  setFocusedButton(m.ClosedCaption, true)
 
   'setting the globalCaptionMode will trigger a callback that updates the images and does user tracking
   if m.Video.globalCaptionMode = "On"
@@ -1262,7 +1326,13 @@ End Function
 
 'Finds the 'index' of the passed in transport button node and sets it on m.focusedButtonIndex
 'Additionally updates the image of the button to the focused version and all other buttons to the unfocused version
-Function setFocusedButton(TransportButton)
+'
+' If keyFocus is true it will forcefully set focus to the transport
+Function setFocusedButton(TransportButton, keyFocus=false)
+  if keyfocus
+    focusVideoPicker(false)
+  end if
+
   if TransportButton.id = "ProgressBar"
     m.progressBarFocused = true
     m.ProgressBar.setFocus(true)

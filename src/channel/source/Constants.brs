@@ -508,12 +508,6 @@ Function getConstants()
   'UI properties that should be passed into the scene graph
   constants.ui = {}
 
-    'constants needed for on now UI
-    constants.ui.onNow = {}
-      constants.ui.onNow.disableOnNow = true
-      constants.ui.onnow.on = false
-      constants.ui.onNow.channelId = "livetv_clips"
-
     'constants for user specific functionality
     constants.ui.users = {}
       constants.ui.users.guestHistory = true
@@ -545,10 +539,23 @@ Function getConstants()
       constants.ui.backgroundTypes.topRight = "topright"
       constants.ui.backgroundTypes.feature = "feature"
 
-    'screen ids in the UI
-    constants.ui.screenIds = {}
-      constants.ui.screenIds.details = "detailScreen"
-      constants.ui.screenIds.category = "categoryScreen"
+    'Screen levels dictate the hierarchy of the app and prevent scenarios where users can get into infinite screen loops.
+    'Screens cannot be pushed on top of a screen whose screenLevel is greater than theirs.
+    'For example, if the home screen is screenLevel = 10, and the search screen is screenLevel = 20,
+    'the search screen can be pushed on top of the home screen,
+    'but the home screen can not be pushed on top of the search screen.
+    constants.ui.screenLevels = {}
+      constants.ui.screenLevels.homeScreen = 10
+      constants.ui.screenLevels.toolsMenu = 20
+      constants.ui.screenLevels.searchScreen = 30
+      constants.ui.screenLevels.settingsScreen = 30
+      constants.ui.screenLevels.comfirmPasswordScreen = 30
+      constants.ui.screenLevels.channelDetailScreen = 40
+      constants.ui.screenLevels.detailScreen = 50
+      constants.ui.screenLevels.episodeScreen = 50
+      constants.ui.screenLevels.activationCodeScreen = 100
+      constants.ui.screenLevels.upNextScreen = 100
+      constants.ui.screenLevels.modalDialogScreen = 1000
 
     constants.ui.uris = {}
       'background gradient urls

@@ -73,7 +73,7 @@ Function onSignOutModalSelected(msg)
     ' flush the screenstack in any case where the user has successfully
     ' gone through the sign-in.  If they 'back' out of it, the screen
     ' stack will stay intact and this function will not be called
-    clearScreenStack(false)
+    clearScreenStack()
 
     m.authInfoReceived = false
     if m.authTask <> invalid
@@ -172,8 +172,8 @@ Function onRemoteParentalSetting(msg)
   parentalSetting = msg.GetData()
   if m.global.authInfo <> invalid and parentalSetting <> m.global.authInfo.parentalrating
     ' if remote value doesn't match the local one, refresh the category screen
-    if m.categoryScreen <> invalid
-      m.categoryScreen.loadAllCategories = true
+    if m.homeScreen <> invalid
+      m.homeScreen.loadAllCategories = true
     end if
   end if
 End Function
@@ -196,8 +196,8 @@ Function onParentalSettingComplete(msg)
        m.settingsScreen.parentalSettingUpdated = true
     end if
 '    m.global.authInfo = m.authTask.authInfo ' This new token contains the parental controls setting
-    if m.categoryScreen <> invalid
-      m.categoryScreen.loadAllCategories = true
+    if m.homeScreen <> invalid
+      m.homeScreen.loadAllCategories = true
     end if
   else
     if isConfirmPasswordScreen() = true 

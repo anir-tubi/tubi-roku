@@ -16,10 +16,6 @@ Function init()
 
   onSignedInChange()  ' initialize the sign in/out text
 
-  if m.constants.ui.onnow.on = true
-    m.top.findNode("OnNowHint-Tools").visible = true
-  end if
-
   if m.constants.deviceInfo.scaledUi = true
     m.Menu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
   end if
@@ -30,6 +26,8 @@ Function init()
       generic_page_type: "OTT_MENU"
     }
   }
+
+  m.top.screenLevel = m.constants.ui.screenLevels.toolsMenu
 End Function
 
 Function updateFocusedMenuItemDescription()

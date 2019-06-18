@@ -39,6 +39,8 @@ Function init()
   m.menuIsFocused = false
 
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
+
+  m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
 End Function
 
 

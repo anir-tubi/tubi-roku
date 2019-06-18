@@ -33,6 +33,7 @@ Function init()
   m.gridIsFocused = false
   m.listIsFocused = false
 
+  m.top.screenLevel = m.constants.ui.screenLevels.episodeScreen
 End Function
 
 

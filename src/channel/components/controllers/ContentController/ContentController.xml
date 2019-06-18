@@ -26,7 +26,7 @@
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ToolsMenuHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/SettingsScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/SignInHelpers.brs" />
-  <script type="text/brightscript" uri="pkg:/components/controllers/ScreenStack.brs" />
+  <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ScreenStackHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
@@ -53,10 +53,6 @@
       <field id="deepLinkContent" type="node" />
       <field id="deepLinkTrigger" type="boolean" alwaysNotify="true" />
 
-      <!-- Interface for receiving Live TV content from the main Brightscript thread -->
-      <field id="onNowContent" type="node" alwaysNotify="true" />
-    
-
     <!-- OUTPUT -->
       <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->
       <field id="exitApp" type="boolean" value="false" />
@@ -74,35 +70,26 @@
         height="1080"
         translation="[0,0]"/>
 
-      <!-- Top-level NavigationGroup deals with just 2 experiences:
-            1) the ContentGroup which contains HomeScreen, CategoryScreen, DetailScreen, etc.
-            2) the SignInController
-      -->
-      <NavigationGroup
-        id="RootTabGroup">
+      <!-- All the children of this group exist only in a single instance -->
+      <Group
+        id="ContentGroup"
+        visible="false">
+        <!--Handles the background images -->
+        <BackgroundGroup
+          id="BackgroundGroup"/>
+        <VideoPlayer
+          id="VideoPlayer"
+          visible="false"/>
+        <ScreenStack
+          id="ScreenStack"/>
+      </Group>
 
-        <!-- All the children of this group share a background instance -->
-        <Group
-          id="ContentGroup"
-          visible="false">
-          <!--Handles the background images -->
-          <BackgroundGroup
-            id="BackgroundGroup"/>
-          <VideoPlayer
-            id="VideoPlayer"
-            visible="false"/>
-          <NavigationGroup
-            id="ContentScreenStack"/>
-        </Group>
-
-      </NavigationGroup>
-      
       <!-- Services -->
       <MetadataFetchTask
-        id="MetadataFetchTask" />
+        id="MetadataFetchTask"/>
 
       <TrackingLoggingTask
-        id="TrackingLoggingTask" />
+        id="TrackingLoggingTask"/>
 
       <Timer
        id="AutohideTimer"/>

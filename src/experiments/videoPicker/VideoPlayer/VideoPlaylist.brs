@@ -9,6 +9,7 @@ Function onPlaylistChange(msg) As Void
   m.top.playlistIndex = 0
   m.Video.control = "stop"
   m.VideoState = "stop"
+  m.VideoPicker.content = m.top.playlist
 End Function
 
 
@@ -295,6 +296,14 @@ Function updateVideoPlayerState(content) as Void
   else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.ClosedCaption) < 0
     m.TransportButtons.appendChild(m.ClosedCaption)
     m.ClosedCaptionDisabled.visible = false
+  end if
+
+  liveTVGroup = m.top.findNode("LiveTVGroup")
+
+  if content.isLiveTV then
+    liveTVGroup.visible = true
+  else
+    liveTVGroup.visible = false
   end if
 
   'if it's not a trailer, remove the skip trailer button

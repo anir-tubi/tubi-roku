@@ -31,6 +31,8 @@ Function init()
       auth_action: "ACTIVATION"
     }
   }
+
+  m.top.screenLevel = m.constants.ui.screenLevels.activationCodeScreen
 End Function
 
 

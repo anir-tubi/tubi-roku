@@ -89,8 +89,6 @@ Function testHelper_tubiAds_createTubiAds()
   requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
   translate = TubiMetadataTranslate(constants)
-  metadataFetch = TubiMetadataFetch(constants, request, translate)
-  metadataFetch = TubiMetadataFetch(constants, request, translate)
   tracking = TubiTracking(constants, request, auth)
   log = TubiLogger(constants, request, auth)
 

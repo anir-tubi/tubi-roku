@@ -1,4 +1,5 @@
 Function init()
+  m.constants = m.global.constants
   m.PasswordTextBox = m.top.findNode("PasswordTextBox")
   m.PasswordTextBoxFocus = m.top.findNode("PasswordTextBoxFocus")
   m.top.observeField("focusedChild", "onScreenFocusChange")
@@ -10,7 +11,7 @@ Function init()
   m.KeyboardAnimation = m.top.findNode("KeyboardAnimation")
   m.KeyboardInterpolator = m.top.findNode("KeyboardTranslationInterpolator")
 
-  m.colors = m.global.constants.ui.colors
+  m.colors = m.constants.ui.colors
 
   if m.global.constants.deviceInfo.scaledUi = true then
     m.PasswordTextBoxFocus.uri = "pkg:/images/selector-hd.9.png"
@@ -26,6 +27,8 @@ Function init()
       auth_action: "PASSWORD_CONFIRMATION"
     }
   }
+
+  m.top.screenLevel = m.constants.ui.screenLevels.comfirmPasswordScreen
 End Function
 
 ''''''''''''''''''''''

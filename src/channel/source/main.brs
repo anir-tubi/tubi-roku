@@ -5,7 +5,6 @@ Function Main(startupArgs as Dynamic)
   requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
   translate = TubiMetadataTranslate(constants)
-  metadataFetch = TubiMetadataFetch(constants, request, translate)
   tracking = TubiTracking(constants, request, auth)
   nodeHelpers = TubiNodeHelpers()
   bookmarks = TubiBookmarks(request, auth, constants, nodeHelpers)
@@ -44,7 +43,6 @@ Function Main(startupArgs as Dynamic)
     bookmarks: bookmarks
     nodeHelpers: nodeHelpers
     experiments: experiments
-    metadataFetch: metadataFetch
     log: log
   }
 
