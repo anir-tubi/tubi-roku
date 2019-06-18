@@ -84,7 +84,6 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
   }
   o.Append(mergedOptions)
   return o
-
 End Function
 
 
@@ -251,8 +250,8 @@ Function tubihttp_handleEvent(message As Object) As Object
           }
 
           ' if Left(m.name, 5) = "track"
-          '   print "received "; code; " for "; m.name
-          '   print m.response.data
+            ' print "received "; code; " for "; m.name
+            ' print m.response.data
           ' end if
 
           m.urltransfer = invalid ' release reference in case this will be reused

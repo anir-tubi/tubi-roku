@@ -11,7 +11,6 @@ Function TubiSGAdShim(constants, ads)
     ' private
     videoAdsList: invalid
     resumePlayAdsList: invalid
-    cuepoints: tubiSGAdShim_cuepoints
     preroll: tubiSGAdShim_preroll
     playAds: tubiSGAdShim_playAds
     reset: tubiSGAdShim_reset
@@ -66,9 +65,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
         end if
       end if
     end if
-
   end while
-  
 End Function
 
 
@@ -79,7 +76,6 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
 
   stateMachine = {
     init: {
-      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: "preroll"
       seek: "preroll"
@@ -87,7 +83,6 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       stop: ""
     }
     fetching: {
-      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: ""
       seek: "midroll"
@@ -95,7 +90,6 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       stop: "reset"
     }
     noads: {
-      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: "midroll"
       seek: "resume"
@@ -103,7 +97,6 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       stop: "reset"
     }
     adspending: {
-      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: "midroll"
       seek: "resume"
@@ -111,7 +104,6 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       stop: "reset"
     }
     adsplaying: {
-      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: ""
       seek: ""
@@ -119,7 +111,6 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
       stop: "reset"
     }
     adsclosed: {
-      cuepoints: "cuepoints"
       preroll: "preroll"
       midroll: ""
       seek: ""
@@ -158,22 +149,6 @@ End Function
 
 
 ''''''''''''''''''
-' cuepoints
-'
-' Similar to preroll, this is used primarily at the start of playback and
-' intended to reset the state of ads.
-Function tubiSGAdShim_cuepoints(episode As Object, cuepoint As Integer)
-  m.videoplayernode.adstate = "fetching"
-  m.ads_.reset()
-
-  'make a synchrynous call to get cuepoints, if any
-  m.ads_.getCuepoints(episode)
-
-  m.videoPlayerNode.adState = "noads"
-End Function
-
-
-''''''''''''''''''
 ' preroll
 '
 '
@@ -190,18 +165,17 @@ Function tubiSGAdShim_preroll(episode As Object, cuepoint As Integer)
   'otherwise if the user is starting from beginning or resuming on a cue point, show ads
   'attempt to get list of ads and play them for preroll
   m.ads_.getAdsListViaRoku(episode)
-  hasAds = m.ads_.allAdUnitsList.count() > 0
 
   ' wait ONLY 5 seconds for cuepoints to come back
   while timer.TotalMilliseconds() < 5000
     msg = wait(5000 - timer.TotalMilliseconds(), port)
     if type(msg) = "roUrlEvent" and cuepointsReq.handleEvent(msg) <> invalid
-      m.ads_.parseCuepoints(cuepointsReq)
+      m.ads_.parseCuepoints(cuepointsReq)  'sets midrolls times on m.ads_.midrolls
       exit while
     end if
   end while
 
-  if hasAds
+  if m.ads_.hasAds(m.ads_.allAdUnitsList) = true
     m.videoPlayerNode.adState = "adspending"
   else
     m.videoPlayerNode.adState = "noads"

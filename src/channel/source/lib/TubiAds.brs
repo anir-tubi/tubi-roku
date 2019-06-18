@@ -31,6 +31,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     tracking: tracking
 
     ' private
+    enhanceCtx: tubiAds_enhanceCtx
     requestQueue: requestQueue.create(adLoggingPort)
     roAdFramework: roAdFramework
     allAdUnitsList:[]
@@ -54,7 +55,8 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     getCachedAdsList: tubiAds_getCachedAdsList
     getResumingPlayAds: tubiAds_getResumingPlayAds
     getCommaDelimitedMidrolls: tubiAds_getCommaDelimitedMidrolls
-    populateUrl: tubiAds_populateUrl
+    populateUrlAdrise: tubiAds_populateUrlAdrise
+    populateUrlRainmaker: tubiAds_populateUrlRainmaker
     adBufferingCallback: tubiAds_adBufferingCallback
     adTrackingCallback: tubiAds_adTrackingCallback
   }
@@ -63,9 +65,37 @@ end function
 ' ----------------------------------------------
 '  m.hasAds()
 ' Call to see if an ad preload found some ads to play
+'
+' @allAdUnitsList: array, an array of adUnitListContainer AAs with the form
+'                  [
+'                     {
+'                        type: ""
+'                        adUnitsList: [
+'                          {
+'                             viewed: currentAdUnitsList[0].viewed
+'                             renderSequence: m._.cond(episode.nowPos > 0, "midroll", "preroll")
+'                             duration: currentAdUnitsList[0].duration
+'                             renderTime: currentAdUnitsList[0].renderTime
+'                             ads: []
+'                          }
+'                        ]
+'                     }
+'                   ]
+'
 ' ----------------------------------------------
-function tubiAds_hasAds()
-  return (m.allAdUnitsList.count() > 0)
+function tubiAds_hasAds(allAdUnitsList)
+  hasAds = false
+  if allAdUnitsList <> invalid and allAdUnitsList.count() > 0
+    firstAdUnitsListContainer = m.allAdUnitsList[0]
+    if firstAdUnitsListContainer.adUnitsList <> invalid and firstAdUnitsListContainer.adUnitsList.count() > 0
+      adUnitsList = firstAdUnitsListContainer.adUnitsList[0]
+      if adUnitsList.ads <> invalid and adUnitsList.ads.count() > 0
+        hasAds = true
+      end if
+    end if
+  end if
+
+  return hasAds
 end function
 
 ' ----------------------------------------------
@@ -115,9 +145,10 @@ function tubiAds_cacheAdsList(episode, breakPos)
     episode.nowPos = breakPos
 
     m.getAdsListViaRoku(episode)
-    res = m.allAdUnitsList
-    if res <> invalid and res.count() = 0
-      res = invalid
+
+    list = invalid
+    if m.hasAds(m.allAdUnitsList) = true
+      list = m.allAdUnitsList
     end if
 
     episode.nowPos = tmp
@@ -125,7 +156,7 @@ function tubiAds_cacheAdsList(episode, breakPos)
     m.lastAdsList = {
       cid: episode.id
       breakPos: breakPos
-      list: res
+      list: list
     }
   end if
 end function
@@ -143,11 +174,11 @@ end function
 
 
 ' ----------------------------------------------
-' populateUrl
+' populateUrlAdrise
 '
 ' create the url needed to make ad calls
 ' ----------------------------------------------
-function tubiAds_populateUrl(episode) As String
+function tubiAds_populateUrlAdrise(episode) As String
 
   'create the url to be used for ad calls'
   params = {
@@ -188,9 +219,55 @@ function tubiAds_populateUrl(episode) As String
   ' end if
 
   params["sdk"] = "raf_vast"
-
   return m.request.addParamsToUrl(m.constants.urls.adsBaseUrl, params)
 end function
+
+
+' ----------------------------------------------
+' populateUrlRainmaker
+'
+' create the url needed to make ad calls using the rainmaker API
+' For API details, please see https://tubitv.atlassian.net/wiki/spaces/EC/pages/863273074/Rainmaker+-+Request+Parameters
+' ----------------------------------------------
+function tubiAds_populateUrlRainmaker(episode) As String
+  'create the url to be used for ad calls'
+  params = {
+    video_id: episode.id
+    pub_id: episode.pubId
+    now_pos: episode.nowpos.ToStr()
+    content_type: m.adContentType
+    device_id: m.constants.deviceInfo.deviceId
+    model: m.constants.deviceInfo.model
+    app_id: m.constants.settings.shortAppName
+    language: m.constants.deviceInfo.language
+
+    ' the dubug parameter must be set to 1 in order to use the following "limit" parameters for testing
+    ' limit_to_campaign_id: 0   'only allow ads with that particular campaign id through the pre-qual filters
+    ' limit_to_lineitem_id: 0   'only allow ads with that particular line item id through the pre-qual filters
+    ' limit_to_creative_id: 0   'only allow ads with that particular campaign id through the pre-qual filters
+    ' debug: 0    'set to 1 in order to use the "limit" parameters above
+  }
+
+  ' add Roku Advertiser Id (RIDA) to ad call url
+  if m.constants.deviceInfo.deviceAdId <> invalid
+    params["adv_id"] = m.constants.deviceInfo.deviceAdId
+  end if
+
+  if m.constants.deviceInfo.isAdIdTrackingDisabled = true
+    params["opt_out"] = "1"
+  else
+    params["opt_out"] = "0"
+  end if
+
+  'add TubiTV user/registration id to ad call url
+  authInfo = m.auth.getAuthInfo()
+  if authInfo <> invalid and authInfo.userId <> invalid
+    params["user_id"] = authInfo.userId
+  end if
+
+  return m.request.addParamsToUrl(m.constants.urls.adsBaseUrlRainmaker, params)
+end function
+
 
 ' ----------------------------------------------
 '  m.getAdsListViaRoku(episode)
@@ -226,7 +303,12 @@ function tubiAds_getAdsListViaRoku(episode)
   end if
 
   'get the url for making the ad call
-  url = m.populateUrl(episode)
+  url = ""
+  if m.constants.externalConfig.info.rainmaker = true
+    url = m.populateUrlRainmaker(episode)
+  else
+    url = m.populateUrlAdrise(episode)
+  end if
 
   'set the url for the Roku Advertising Framework
   m.roAdFramework.setAdUrl(url)
@@ -270,14 +352,22 @@ function tubiAds_getAdsListViaRoku(episode)
 
     for each adUnit in currentAdUnitsList[0].ads
       if adUnit.adId <> invalid
-        print "AD ID "; adUnit.adId
+        print "AD ID "; adUnit.adId; " "; adUnit.creativeAdId
         
         'the ad server had no ads to return so sends us just the midroll times'
         if adUnit.adId = "empty"
           if m.midrolls.count() = 0 or (m.midrolls.count() = 1 and m.lastAdFailed = true)
             m.midrolls = [] 'reset the midrolls array in case there was a previous default midroll
             if adUnit.clickThrough <> invalid
-              m.midrolls = m.getCommaDelimitedMidrolls(adUnit.clickThrough)
+              ' Rainmaker response returns JSON in the ClickThrough tag, adRise response is a comma delimitted string of cuepoints
+              adInfo = ParseJson(adUnit.clickThrough)
+              if adInfo <> invalid and type(adInfo.breaks) = "roArray" and adInfo.breaks.count() > 0
+                ' using the Rainmaker response since we were able to parse JSON in the clickThrough field
+                m.midrolls = adInfo.breaks
+              else
+                ' using the adRise ad server still - this "else" block can be removed when moving to Rainmaker is complete
+                m.midrolls = m.getCommaDelimitedMidrolls(adUnit.clickThrough)
+              end if
             end if
           end if
         
@@ -325,7 +415,15 @@ function tubiAds_getAdsListViaRoku(episode)
           if m.midrolls.count() = 0 or (m.midrolls.count() = 1 and m.lastAdFailed = true)
             m.midrolls = [] 'reset the midrolls array in case there was a previous default midroll
             if adUnit.clickThrough <> invalid
-              m.midrolls = m.getCommaDelimitedMidrolls(adUnit.clickThrough)
+              ' Rainmaker response returns JSON in the ClickThrough tag, adRise response is a comma delimitted string of cuepoints
+              adInfo = ParseJson(adUnit.clickThrough)
+              if adInfo <> invalid and type(adInfo.breaks) = "roArray" and adInfo.breaks.count() > 0
+                ' using the Rainmaker response since we were able to parse JSON in the clickThrough field
+                m.midrolls = adInfo.breaks
+              else
+                ' using the adRise ad server still - this "else" block can be removed when moving to Rainmaker is complete
+                m.midrolls = m.getCommaDelimitedMidrolls(adUnit.clickThrough)
+              end if
             end if
           end if
         end if
@@ -364,7 +462,7 @@ function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   scene = containerNode.getScene()
   m.youboraNode = scene.findNode("Youbora")
 
-  if m.allAdUnitsList.count() > 0
+  if m.hasAds(m.allAdUnitsList) = true
     currentAdPosition = 1
     for each adUnitsListContainer in m.allAdUnitsList
       if adUnitsListContainer.adUnitsList <> invalid and adUnitsListContainer.adUnitsList.count() > 0
@@ -452,6 +550,7 @@ end function
 ' parseCuepoints
 '
 ' parse a cuepoints response
+' side effect of setting cuepoints on m.midrolls
 function tubiAds_parseCuepoints(cuepointsReq)
   if cuepointsReq <> invalid and cuepointsReq.response <> invalid and cuepointsReq.response.data <> invalid
     cuepoints = ParseJson(cuepointsReq.response.data)
@@ -476,7 +575,7 @@ end function
 ' ----------------------------------------------
 function tubiAds_getResumingPlayAds(episode, player)
   m.getAdsListViaRoku(episode)
-  return (m.allAdUnitsList.count() > 0)
+  return m.hasAds(m.allAdUnitsList)
 end function
 
 ' ----------------------------------------------
@@ -500,6 +599,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
   if eventType <> invalid
     if eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0
       'Impression events fire when ads start, but also when a user begins interacting with an interactive ad
+      ctx = m.enhanceCtx(ctx)
       startAdEvent = {
         ad_started: m.tracking.getAnalyticsAd(ctx)
         video_id: m.controlNode.content.id.toInt()
@@ -510,6 +610,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
     else if eventType = "Complete" or eventType = "Close"
       'Close events fire when a user backs out of an ad, or when a user backs out of the interactive portion of an ad
       if eventType = "Close" and m.isInteracting = true
+        ctx = m.enhanceCtx(ctx)
         clickAdEvent = {
           ad_clicked: m.tracking.getAnalyticsAd(ctx)
           video_id: m.controlNode.content.id.toInt()
@@ -523,11 +624,14 @@ function tubiAds_adTrackingCallback(eventType, ctx)
         else if eventType = "Close"
           endPosition = m.adPlaybackPos
         end if
+
         m.adPlaybackPos = 0
         if endPosition = invalid
           '//ensure a valid value is used. This may not happen during a close event.
           endPosition = 0
         end if
+
+        ctx = m.enhanceCtx(ctx)
         finishAdEvent = {
           ad_finished: m.tracking.getAnalyticsAd(ctx)
           video_id: m.controlNode.content.id.toInt()
@@ -540,6 +644,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
     else if eventType = "Start"
       m.containerNode.visible = true
     else if eventType = "AcceptInvitation"
+      ctx = m.enhanceCtx(ctx)
       clickAdEvent = {
         ad_clicked: m.tracking.getAnalyticsAd(ctx)
         video_id: m.controlNode.content.id.toInt()
@@ -561,3 +666,16 @@ function tubiAds_adTrackingCallback(eventType, ctx)
     m.youboraNode.adevent = ParseJson(FormatJson(ctx))
   end if
 end function
+
+
+Function tubiAds_enhanceCtx(ctx)
+  if ctx.ad <> invalid and ctx.ad.clickThrough <> invalid
+    adInfo = ParseJson(ctx.ad.clickThrough)
+    if adInfo <> invalid
+      ctx.ad.parentId = adInfo.request_id
+      ctx.ad.impressionId = adInfo.impression_id
+      ctx.ad.adVideoId = adInfo.ad_video_id
+    end if
+  end if
+  return ctx
+End Function

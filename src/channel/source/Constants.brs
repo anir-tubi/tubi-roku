@@ -280,6 +280,8 @@ Function getConstants()
     'ad server url
     ' constants.urls.adsBaseUrl = "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
     constants.urls.adsBaseUrl = "http://ads.adrise.tv/"
+    ' constants.urls.adsBaseUrlRainmaker = "http://rainmaker.staging-public.tubi.io/rev/ROKU"
+    constants.urls.adsBaseUrlRainmaker = "http://rainmaker.production-public.tubi.io/rev/ROKU"
 
     'contents url
     constants.urls.cms = {}

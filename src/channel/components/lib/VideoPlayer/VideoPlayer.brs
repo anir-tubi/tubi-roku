@@ -434,7 +434,11 @@ Function playContent()
     m.lastSavedPosition = 0
     m.lastButtonPressPos = 0
   end if
-  m.top.midrolls = []  ' Always reset midrolls when we first start playback.  Preroll will populate these
+
+  ' Always reset ad state when we first start playback.  Preroll fetch will populate midrolls list
+  m.top.midrolls = []
+  m.recentCuepointFetch = 0
+  m.recentCuepoint = 0
     
   'start_video user event analytics
   if m.top.analyticsMode = "trailer"

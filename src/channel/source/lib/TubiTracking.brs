@@ -18,10 +18,13 @@ Function TubiTracking (constants, request, auth)
     getAnalyticsComponent: tubiTracking_getAnalyticsComponent
     getAnalyticsTile: tubiTracking_getAnalyticsTile
     getAnalyticsAd: tubiTracking_getAnalyticsAd
+    getAnalyticsAdAdrise: tubiTracking_getAnalyticsAdAdrise
+    getAnalyticsAdRainmaker: tubiTracking_getAnalyticsAdAdriseRainmaker
 
     populateMessage: tubiTracking_populateMessage
     isEmptyValue: tubiTracking_isEmptyValue
     isNumeric: tubiTracking_isNumeric
+    isString: tubiTracking_isString
 
     ' an AA structure of the valid "Oneofs" that are needed in various protos messages
     allOneofs: tubiTracking_getOneOfs()
@@ -106,7 +109,7 @@ End Function
 ' See protos.analytics.client.protos -> User
 Function tubiTracking_getAnalyticsUser()
   authInfo = m.auth.getAuthInfo()
-  if authInfo <> invalid and (type(authInfo.userId) = "roString" or type(authInfo.userId) = "String")
+  if authInfo <> invalid and m.isString(authInfo.userId) = true
     userId = authInfo.userId.toInt()
     authType = "CODE"
   else
@@ -431,8 +434,18 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
 End Function
 
 
-' Build the structure for an ad message
+' Wrapper for choosing the correct ad message constructor while rolling out the new rainmaker ad server
 Function tubiTracking_getAnalyticsAd(ctx)
+  if m.constants.externalConfig.info.rainmaker = true
+    return m.getAnalyticsAdRainmaker(ctx)
+  else
+    return m.getAnalyticsAdAdrise(ctx)
+  end if
+End Function
+
+
+' Build the structure for an ad message when using the old adrise ad server
+Function tubiTracking_getAnalyticsAdAdrise(ctx)
   adEvent = {
     ad_type: "UNKNOWN"    'adType enum
     ' advertiser_id: ""   'not currently available
@@ -450,7 +463,7 @@ Function tubiTracking_getAnalyticsAd(ctx)
 
     if type(ad.streams) = "roArray" and ad.streams[0] <> invalid
       adVideoUrl = ad.streams[0].url
-      if type(adVideoUrl) = "roString" or type(adVideoUrl) = "String"
+      if m.isString(adVideoUrl) = true
         adEvent.creative_url = adVideoUrl         'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
 
         if isInteractive = false
@@ -466,7 +479,7 @@ Function tubiTracking_getAnalyticsAd(ctx)
     ' extract the impression_id and pod_id from the adrise impression url
     if type(ad.tracking) = "roArray"
       for i=0 to ad.tracking.count()-1
-        if ad.tracking[i].event = "Impression" and (type(ad.tracking[i].url) = "roString" or type(ad.tracking[i].url) = "String")
+        if ad.tracking[i].event = "Impression" and m.isString(ad.tracking[i].url) = true
           impressionUrl = ad.tracking[i].url
           if impressionUrl.Left(20) = "http://ads.adrise.tv"
             idPos = impressionUrl.Instr("id=")
@@ -491,6 +504,49 @@ Function tubiTracking_getAnalyticsAd(ctx)
       end if
     end if
 
+    if ctx.adIndex <> invalid then adEvent.index = ctx.adIndex
+    if ctx.adCount <> invalid then adEvent.pod_size = ctx.adCount
+  end if
+  return adEvent
+End Function
+
+
+' Build the structure for an ad message using the new rainmaker ad server
+Function tubiTracking_getAnalyticsAdAdriseRainmaker(ctx)
+  adEvent = {
+    ad_type: "UNKNOWN"    'adType enum
+    ' advertiser_id: ""   'not currently available
+    ' vendor_id: ""       'not currently available
+    ' creative_duration: 0  'not currently available
+  }
+  if ctx <> invalid and ctx.ad <> invalid
+    ad = ctx.ad
+    isInteractive = false
+    if type(ad.companionads) = "roArray" and ad.companionads.count() > 0
+      isInteractive = true
+    end if
+
+    if ad.creativeAdId <> invalid
+      adEvent.ad_id = ad.creativeAdId
+      adEvent.creative_id = ad.creativeAdId
+    end if
+
+    if type(ad.streams) = "roArray" and m.isString(ad.streams[0]) = true
+        adEvent.creative_url = ad.streams[0]   'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
+    end if
+
+    if isInteractive = true and ad.companionads[0] <> invalid
+      if ad.companionads[0].provider = "innovid_RSG"
+        adEvent.ad_type = "INNOVID"
+      else if ad.companionads[0].provider = "brightline_RSG"
+        adEvent.ad_type = "BRIGHTLINE"
+      end if
+    end if
+
+    if ad.adVideoId <> invalid then adEvent.ad_video_id = ad.adVideoId
+    if ad.impressionId <> invalid then ad.impression_id = ad.impressionId
+    if ad.parentId <> invalid then ad.parent_id = ad.parentId
+    if ad.duration <> invalid then adEvent.reported_duration = ad.duration * 1000  'ms
     if ctx.adIndex <> invalid then adEvent.index = ctx.adIndex
     if ctx.adCount <> invalid then adEvent.pod_size = ctx.adCount
   end if
@@ -562,7 +618,7 @@ End Function
 
 Function tubiTracking_isEmptyValue(value)
   if value <> invalid
-    if (type(value) = "String" or type(value) = "roString") and value = ""
+    if m.isString(value) = true and value = ""
       return true
     else if (type(value) = "roArray" or type(value) = "roAssociativeArray") and value.isEmpty()
       return true
@@ -752,4 +808,10 @@ Function tubiTracking_isNumeric(value)
   end if
 
   return false
+End Function
+
+
+' Helper functtion to determine if the value is a string
+Function tubiTracking_isString(value)
+  return type(value) = "String" or type(value) = "roString"
 End Function
