@@ -276,8 +276,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   ' trailers
   if contentFromServer.trailers <> invalid and type(contentFromServer.trailers) = "roArray" and contentFromServer.trailers.count() > 0
-    trailer = contentFromServer.trailers[0]
-    if trailer.url <> invalid and (type(trailer.url) = "roString" or type(trailer.url) = "String") then translatedContent.trailerUrls = [trailer.url]
+    if contentFromServer.trailers[0] <> invalid and contentFromServer.trailers[0].url <> invalid and contentFromServer.trailers[0].url <> ""
+      translatedContent.trailerInfo = contentFromServer.trailers[0]
+    end if
   end if
   if contentFromServer.has_trailer = true then translatedContent.hasTrailer = true
 

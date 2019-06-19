@@ -198,10 +198,12 @@ Function onRefreshResponse(msg)
 
     ' In the case that we are attempting to watch a trailer, overwrite the video urls of the refreshed content
     ' with the trailer urls
-    if playlistContent.isTrailer and not m._.empty(refreshedContent.trailerUrls)
-      refreshedContent.url = refreshedContent.trailerUrls[0]
+    if playlistContent.isTrailer and refreshedContent.trailerInfo <> invalid and refreshedContent.trailerInfo.url <> invalid
+      refreshedContent.url = refreshedContent.trailerInfo.url
+      refreshedContent.id = refreshedContent.trailerInfo.id
       refreshedContent.subtitleTracks = []
       refreshedContent.subtitleConfig = invalid
+      refreshedContent.id = refreshedContent
     end if
 
     prepareToStartVideo(refreshedContent, 0)

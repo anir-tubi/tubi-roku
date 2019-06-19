@@ -19,7 +19,6 @@ Function playVideoContent(content As Object, autoplayType As String, position=in
       end if
       m.videoPlayer.observeFieldScoped("historyPosition", "onEpisodePosition")
       m.videoPlayer.observeFieldScoped("creditsPosition", "onEpisodeCredits")
-      m.videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
       m.videoPlayer.observeFieldScoped("goToNext", "onGoToNext")
       m.videoPlayer.enableAds = true
       if m.top.deepLinkContent <> invalid
@@ -42,7 +41,7 @@ Function playVideoContent(content As Object, autoplayType As String, position=in
       m.upNextTask.request = request
       m.upNextTask.control = "RUN"
     end if
-    
+
     '//Stop the background artwork from transitioning 
     m.backgroundGroup.backgroundInfo = {
       type: m.constants.ui.backgroundTypes.fullScreen
@@ -50,6 +49,7 @@ Function playVideoContent(content As Object, autoplayType As String, position=in
     }
     m.videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
     m.videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
+    m.videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
     m.videoPlayer.visible = true
     m.videoPlayer.setFocus(true)
   
