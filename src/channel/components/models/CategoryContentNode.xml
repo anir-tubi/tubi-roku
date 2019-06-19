@@ -27,6 +27,12 @@
     <!-- A logo that will be displayed for channels -->
     <field id="logoUri" type="string" />
 
+    <!-- A thumbnail that will be displayed as the background of channel and catrgory containers -->
+    <field id="thumbnail" type="string" />
+
+    <!-- The alpha level that the thumbnails should be set to.  -->
+    <field id="thumbnailAlpha" value="1" type="float" />
+
     <field id="slug" type="string" />
 
     <!-- if UpTime(0) > validUntil, then refetch metadata for this container/category -->

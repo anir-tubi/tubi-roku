@@ -244,7 +244,6 @@ Function loadSearchResults(bDefaultResults = false)
   else 
     m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("featured", m.top, "searchResponse", m.constants.reqNames.getSearchDefault)
   end if
-
 End Function
 
 

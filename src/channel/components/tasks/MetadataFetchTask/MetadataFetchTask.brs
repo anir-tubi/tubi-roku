@@ -200,7 +200,7 @@ Function handleResponse(message)
         'indicates a request from the details screen. this request needs to be handled slightly differently
         if handledRequest.context.name = m.constants.reqNames.getCategory or handledRequest.context.name = m.constants.reqNames.getSearchDefault
           '//tell translate function to only include specific orientation thumbnails: featured search result 
-          orientation = invalid
+          orientation = ""
           bFullData = false
           if handledRequest.context.name = m.constants.reqNames.getSearchDefault
             orientation = m.constants.orientations.portrait

@@ -21,7 +21,7 @@ Function init()
   m.VideoGrid.observeField("itemSelected", "onItemSelected")
 
   ' set initial tracking values
-  m.top.trackingPageInfo = setTrackingPageInfo(invalid)
+  m.top.trackingPageInfo = createTrackingPageInfo(invalid)
 
   m.top.screenLevel = m.constants.ui.screenLevels.channelDetailScreen
 End Function
@@ -69,7 +69,7 @@ Function onLoadContent()
     m.contentLoadedAndFocused = false
     m.VideoGrid.content = category
     if category <> invalid
-      m.top.trackingPageInfo = setTrackingPageInfo(category)
+      m.top.trackingPageInfo = createTrackingPageInfo(category)
     end if
   end if
 End Function
@@ -107,7 +107,7 @@ Function onItemFocused()
     if m.contentLoadedAndFocused = true
       '//Do not send out tracking when the grid is initially loaded. When an item 1st gain focus, this indocates that the grid was just loaded.
       ' Update the tracking info.
-      trackingPageInfo = setTrackingPageInfo(category)
+      trackingPageInfo = createTrackingPageInfo(category)
       m.top.trackingPageInfo = trackingPageInfo
 
       ' trigger navigate_within_page events in ContentController
@@ -142,7 +142,7 @@ Function onItemSelected()
   content = category.getChild(item)
 
   ' Update the tracking info so that it is ready once the ContentController creates the details page
-  m.top.trackingPageInfo = setTrackingPageInfo(category)
+  m.top.trackingPageInfo = createTrackingPageInfo(category)
 
   categorySlug = ""
   if category <> invalid
@@ -243,7 +243,7 @@ End Function
 '@channel: roSGNode, a content node for a single channel
 '
 'returns an AA with tracking info formatted for use by ScreenStack.screenTrackingLoad()
-Function setTrackingPageInfo(channel)
+Function createTrackingPageInfo(channel)
   slug = ""
   if channel <> invalid
     slug = channel.slug

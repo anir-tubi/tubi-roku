@@ -18,6 +18,7 @@ Function CmsApi(constants, request, auth)
     thumbnailsReq: cmsApi_getThumbnailsRequest
     channelReq: cmsApi_getChannelRequest
     homeScreenReq: cmsApi_getHomeScreenRequest
+    channelsCategoriesScreenReq: cmsApi_getChannelsCategoriesScreenRequest
     categoryReq: cmsApi_getCategoryRequest
     searchReq: cmsApi_getSearchRequest
   }
@@ -96,18 +97,24 @@ End Function
 
 
 '''''''''''''''''''''
+' channelsCategoriesScreenReq()
+'
+Function cmsApi_getChannelsCategoriesScreenRequest()
+  return m.homeScreenReq(0, 1)
+End Function
+
+'''''''''''''''''''''
 ' homeScreenReq()
 '
 ' @limit: number of items in each category
-Function cmsApi_getHomeScreenRequest(limit)
+Function cmsApi_getHomeScreenRequest(limit, expand = 2)
   url = m.constants_.urls.matrix.homescreen
   options = m.commonOptions_()
-  options.params.expand = 2
+  options.params.expand = expand
   options.params.includeEmpty = true
   options.params.limit = limit
   return m.createAuthRequest_(url, m.constants_.reqNames.getHomescreen, options)
 End Function
-
 
 '''''''''''''''''''''
 ' categoryReq()

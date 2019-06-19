@@ -207,6 +207,7 @@ Function getConstants()
   constants.reqNames = {}
     constants.reqNames.searchAPI = "searchAPI"
     constants.reqNames.getHomescreen = "getHomescreen"
+    constants.reqNames.getChannelsCategories = "getChannelsCategories"
     constants.reqNames.getSearchDefault = "getSearchDefault"
     constants.reqNames.getCategory = "getCategory"
     constants.reqNames.getSingleContent = "getSingleContent"
@@ -342,6 +343,9 @@ Function getConstants()
     constants.urls.channelPosterUnbranded = "https://cdn.adrise.tv/image/roku_support_images/channel-poster-generic.png"
     constants.urls.channelPosterBrandedPrefix = "https://cdn.adrise.tv/image/roku_support_images/channel-poster-"
     constants.urls.channelPosterBrandedSuffix = ".png"
+    'channels logo image urls
+    constants.urls.channelLogoBrandedPrefix = "https://cdn.adrise.tv/image/channels/"
+    constants.urls.channelLogoBrandedSuffix = "/logo_center.png"
 
 
   'http request types
@@ -496,6 +500,8 @@ Function getConstants()
   constants.errors.context.channelScreen = "6"
   constants.errors.context.searchScreen = "7"
   constants.errors.context.activateScreen = "8"
+  constants.errors.context.channelsScreen = "9"
+  constants.errors.context.categoriesScreen = "10"
 
   '//What is the actual error?
   constants.errors.subtypes = {}
@@ -514,6 +520,12 @@ Function getConstants()
     constants.ui.users = {}
       constants.ui.users.guestHistory = true
 
+
+    'static - pre defined text used in the app
+    constants.ui.terms = {}
+      constants.ui.terms.categories = "Categories"
+      constants.ui.terms.channels = "Channels"
+
     'static - pre defined category names
     constants.ui.categoryNames = {}
       constants.ui.categoryNames.topCategory = "Featured"
@@ -527,6 +539,14 @@ Function getConstants()
       constants.ui.categoryIds.history = "continue_watching"
       constants.ui.categoryIds.queue = "queue"
       constants.ui.categoryIds.featured = "featured"
+      constants.ui.categoryIds.recommendedForYou = "recommended_for_you"
+
+    constants.ui.categoryTypes = {}
+      'these map to matrix api container types
+      constants.ui.categoryTypes.history = "continue_watching"
+      constants.ui.categoryTypes.queue = "queue"
+      constants.ui.categoryTypes.regular = "regular"
+      constants.ui.categoryTypes.channel = "channel"
 
     constants.ui.contentTypes = {}
       constants.ui.contentTypes.series = "series"
@@ -563,6 +583,12 @@ Function getConstants()
       'background gradient urls
       constants.ui.uris.homeBackgroundGradient = "pkg:/images/home-gradient-25.png"
       constants.ui.uris.detailBackgroundGradient = "pkg:/images/detail-gradient-25.png"
+
+      'category background thumbnails
+      constants.ui.uris.categoryBackground_recommended = "pkg:/images/category-bg-recommended430x242.png"
+      constants.ui.uris.categoryBackground_continueWatching = "pkg:/images/category-bg-continue-watching430x242.png"
+      constants.ui.uris.categoryBackground_queue = "pkg:/images/category-bg-queue430x242.png"
+
 
       'default background image uri
       constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.png"

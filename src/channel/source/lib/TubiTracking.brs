@@ -688,7 +688,6 @@ Function tubiTracking_getOneOfs()
   account_page = {
     account_page_type: ""   'PageType enum
   }
-
   generic_page = {
     generic_page_type: ""   'GenericPageType enum
   }
@@ -752,6 +751,10 @@ Function tubiTracking_getOneOfs()
     '   category_slug: ""
     '   category_row: 1   '1 based index
     ' }
+
+    generic_component: {   ' Used for components that are not yet defined in protos
+      generic_component_type: ""  ' GenericComponentType enum
+    }
 
     category_component: {   ' Used for category screen and channel details screen
       category_slug: ""

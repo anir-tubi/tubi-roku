@@ -8,13 +8,14 @@ Function TubiMetadataTranslate(constants As Object)
     translateContainer: tubiMetadataTranslate_translateContainer
     translateChannel: tubiMetadataTranslate_translateChannel
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
-    
+    translateChannelsCategories: tubiMetadataTranslate_translateChannelsCategories
+
     ' private
     constants: constants
     contentTypes: constants.ui.contentTypes
     creditsDuration: constants.player.creditsDuration
     allowAfterHours: constants.settings.allowAfterHours
-    
+
     dedupeBackgrounds_: tubiMetadataTranslate_dedupeBackgrounds
     setTotalCount_: tubiMetadataTranslate_setTotalCount
     getContentsJson_: tubiMetadataTranslate_getContentsJson
@@ -24,7 +25,7 @@ Function TubiMetadataTranslate(constants As Object)
   }
 End Function
 
-Function tubiMetadataTranslate_dedupeBackgrounds(backgroundsFromServer) as Object
+Function tubiMetadataTranslate_dedupeBackgrounds(backgroundsFromServer) As Object
   deduped = {}
 
   for each background in backgroundsFromServer
@@ -44,9 +45,9 @@ End Function
 '''''''''''''''''''''
 ' translateRecursive
 '
-' This is a recursive function that does the heavy lifting for translateContentFromServer
-'this is a recursive function that does the heavy lifting for translateContentFromServer
-Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object) As Integer
+' This is a recursive Function that does the heavy lifting for translateContentFromServer
+'this is a recursive Function that does the heavy lifting for translateContentFromServer
+Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object) as integer
   if contentFromServer = invalid then return 0
 
   count = 1
@@ -90,7 +91,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     else
       translatedContent.parentId = parent.id
     end if
-    
+
     'this happens on deep link with mediaType = episode
     if contentFromServer.series_id <> invalid
       translatedContent.parentId = "0" + contentFromServer.series_id
@@ -120,17 +121,17 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   else
     translatedContent.parentId = invalid
   end if
-  
+
   'translate all the stuff from the server
   if contentFromServer.title <> invalid then translatedContent.title = contentFromServer.title
   if contentFromServer.duration <> invalid then translatedContent.length = contentFromServer.duration
   if contentFromServer.actors <> invalid then translatedContent.actors = contentFromServer.actors 'array of actors
   if contentFromServer.roku_genres <> invalid then translatedContent.rokuGenres = contentFromServer.roku_genres 'array of roku genres
-  if contentFromServer.tags <> invalid then 
+  if contentFromServer.tags <> invalid then
     translatedContent.genres = contentFromServer.tags 'array of genres
     translatedContent.categories = contentFromServer.tags 'array of genres
   end if
-  
+
   if contentFromServer.slug <> invalid then translatedContent.slug = contentFromServer.slug
   if contentFromServer.lang <> invalid then translatedContent.language = contentFromServer.lang
   if contentFromServer.publisher_id <> invalid then translatedContent.pubId = contentFromServer.publisher_id
@@ -140,12 +141,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
   if contentFromServer.series_id <> invalid then translatedContent.seriesId = "0" + contentFromServer.series_id
   if contentFromServer.liveTvChannelType <> invalid then translatedContent.liveTvChannelType = contentFromServer.liveTvChannelType
-  
+
   if contentFromServer.description <> invalid
     translatedContent.description = contentFromServer.description
     translatedContent.longDescription = contentFromServer.description
   end if
-  
+
   if contentFromServer.directors <> invalid and contentFromServer.directors.count() > 0
     translatedContent.directors = contentFromServer.directors
   end if
@@ -319,8 +320,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   ' return the total number of children converted
-  return count  
-end Function
+  return count
+End Function
 
 
 ''''''''''''''
@@ -433,7 +434,6 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
     validUntil: 0
     children: []    'categories
   }
-
   if contentToTranslate.valid_duration <> invalid
     homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
   else
@@ -443,18 +443,19 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   containers = contentToTranslate.containers
   contents = contentToTranslate.contents
 
+
   'set up AAs for all categories including any nested categories
   for i=0 to containers.count()-1
     container = containers[i]
     if container.type <> "complex"
-      categoryAA = m.buildCategoryAA_(container, contents, invalid)
+      categoryAA = m.buildCategoryAA_(container, contents, invalid, "", false)
       if categoryAA <> invalid
         homescreenAA.children.push(categoryAA)
       end if
     else
       for j=0 to container.children.count()-1
         nestedContainer = container.children[j]
-        categoryAA = m.buildCategoryAA_(nestedContainer, contents, invalid)
+        categoryAA = m.buildCategoryAA_(nestedContainer, contents, invalid, "", false)
         if categoryAA <> invalid
           categoryAA.parentId = container.id
           homescreenAA.children.push(categoryAA)
@@ -469,6 +470,100 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   return translated
 End Function
 
+''''''''''''''''''''
+' translateChannelsCategories
+'
+' For now translating the channels and categories feed is identical to the homescreen
+'
+Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, bDisplayChannels = true) As Object
+  sID_queue = m.constants.ui.categoryIds.queue 
+  sID_continue_watching = m.constants.ui.categoryIds.history
+
+  oLimitTypes = {}
+  if bDisplayChannels = true
+    oLimitTypes[m.constants.ui.categoryTypes.channel] = true
+  else
+    oLimitTypes[m.constants.ui.categoryTypes.regular] = true
+    oLimitTypes[m.constants.ui.categoryTypes.history] = true
+    oLimitTypes[m.constants.ui.categoryTypes.queue] = true
+  end if
+
+  catRecommend = invalid
+  catContinueWatching = invalid
+  catQueue = invalid
+
+  '//The following is a modifed version of the tubiMetadataTranslate_translateHomescreen() method
+  translated = CreateObject("roSGNode", "CategoryContentNode")
+  homescreenAA = {
+    id: ""
+    title: ""
+    validUntil: 0
+    children: []    'categories
+  }
+  if contentToTranslate.valid_duration <> invalid
+    homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
+  else
+    homescreenAA.validUntil = m.constants.cacheTimes.homescreen
+  end if
+
+  containers = contentToTranslate.containers
+  contents = contentToTranslate.contents
+
+  '//The following code adds a transparency to the thumbnails and for categories, it shifts a few categories to the top of the list
+  '//::HARDCODED:: If this is categories, then place few catrgories in the front and get rid of featured
+  '//::TODO:: have the backend filter and sort categories when they have more bandwidth
+  'set up AAs for all categories including any nested categories
+  for i=0 to containers.count()-1
+    container = containers[i]
+
+    if oLimitTypes[container.type] = true
+      categoryAA = m.buildCategoryAA_(container, contents, invalid, "", false)
+      if bDisplayChannels = true
+        categoryAA.type = m.contentTypes.channel
+      else 
+        categoryAA.type = m.contentTypes.category
+      end if
+
+      if categoryAA <> invalid
+        sID = LCase(categoryAA.id)
+      end if
+      if sID <> m.constants.ui.categoryIds.featured 
+        if sID = m.constants.ui.categoryIds.recommendedForYou
+          catRecommend = categoryAA
+          catRecommend.thumbnail = m.constants.ui.uris.categoryBackground_recommended
+        else if sID = sID_continue_watching
+          catContinueWatching = categoryAA
+          catContinueWatching.thumbnail = m.constants.ui.uris.categoryBackground_continueWatching
+        else if sID = sID_queue
+          catQueue = categoryAA
+          catQueue.thumbnail = m.constants.ui.uris.categoryBackground_queue
+        else
+          categoryAA.thumbnailAlpha = .3
+          homescreenAA.children.push(categoryAA)
+        end if
+      end if
+    end if
+  end for
+  
+  homescreenAA.children.SortBy("title")
+
+  '//Move the following items to the front of the list if they exist
+  if catQueue <> invalid
+    homescreenAA.children.Unshift(catQueue)
+  end if
+  if catContinueWatching <> invalid
+    homescreenAA.children.Unshift(catContinueWatching)
+  end if
+  if catRecommend <> invalid
+    homescreenAA.children.Unshift(catRecommend)
+  end if
+
+  translated.update(homescreenAA)
+  node_count = 1 + translated.getChildCount()
+  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
+
+  return translated
+End Function
 
 ''''''''''''''''''''
 ' translateContainer
@@ -479,20 +574,20 @@ End Function
 ' 1) Use ContentNode instead of TubiContentNode
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
-Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = invalid, bFullData = false) As Object
+Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false) As Object
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
   contents = contentToTranslate.contents
   contentsJson = m.getContentsJson_(contentToTranslate, fullJson)
 
   node_count = 0
-  categoryMetadata = m.buildCategoryAA_(container, contents, contentsJson, fetchedAt, sOrientation, bFullData)
+  categoryMetadata = m.buildCategoryAA_(container, contents, contentsJson, sOrientation, bFullData)
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
     return invalid
   end if
 
   if type(categoryMetadata) = "roAssociativeArray"
-    ' buildCategoryAA always returns AA.state = "partial", 
+    ' buildCategoryAA always returns AA.state = "partial",
     ' but any single category request should be considered fully loaded
     categoryMetadata.state = "loaded"
     translated.update(categoryMetadata)
@@ -508,13 +603,12 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     sLandscape = true
   end if
 
-  if sOrientation <> invalid 
-    if sOrientation = m.constants.orientations.landscape 
-      sLandscape = true
-    else if sOrientation = m.constants.orientations.portrait
-      sLandscape = false
-    end if
-  end if 
+  if sOrientation = m.constants.orientations.landscape
+    sLandscape = true
+  else if sOrientation = m.constants.orientations.portrait
+    sLandscape = false
+  end if
+
   if sLandscape = true
     for i = 0 to translated.getChildCount()-1
       child = translated.getChild(i)
@@ -534,12 +628,12 @@ End Function
 ' @container: assocArray, a single container as found in the matrix API
 ' @contents: assocArray, a set of content meta data as found in the matrix API
 ' @contentsJson: string, the JSON string of just the contents portion of the matrix API
-' @sOrientation: string, should the thumbnail be a portrait or landscape
+' @sOrientation: string, should the thumbnail be a "portrait" or "landscape" (match against m.constants.orientations values)
 ' @bFullData: boolean, Should the full data be parsed and passed to the video children?
 '
 ' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson=invalid, fetchedAt=invalid, sOrientation = invalid, bFullData = false)
-  updateMetadata = {} 
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson=invalid, sOrientation = "", bFullData = false)
+  updateMetadata = {}
   if type(container) = "roAssociativeArray" and type(contents) = "roAssociativeArray"
     updateMetadata = {
       id: container.id
@@ -551,15 +645,21 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       json: ""
       state: "partial"
     }
-
-    if container.type = "channel" and container.children.count() > 0
-      withPrepend = true
-      updateMetadata.type = m.contentTypes.channel
-      updateMetadata.logoUri = container.logo
-    else
-      withPrepend = false
-      updateMetadata.type = m.contentTypes.category
+    if container.thumbnail <> invalid
+      updateMetadata.thumbnail = container.thumbnail
     end if
+
+    withPrepend = false
+    updateMetadata.type = m.contentTypes.category
+
+    if container.type = m.contentTypes.channel
+      updateMetadata.type = m.contentTypes.channel
+      if container.children <> invalid and container.children.count() > 0
+        withPrepend = true
+      end if
+    end if
+
+    updateMetadata.logoUri = container.logo
 
     if container.valid_duration <> invalid
       updateMetadata.validUntil = container.valid_duration
@@ -586,7 +686,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
     end if
     children.append(container.children)
     updateMetadata.children = CreateObject("roArray", children.count(), false)
-    for each child in children 
+    for each child in children
       ' contents[child].valid is "true" or "false" for user categories and is invalid for all other categories.
       ' For all other categories, assume all contents are valid.
       if contents[child] <> invalid and contents[child].valid <> false
@@ -604,18 +704,15 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           length: fullChild.duration
           subtype: sType
         }
+
         bLandscape = false
-        if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid
+        if sOrientation = m.constants.orientations.portrait
+          bLandscape = false
+        else if sOrientation = m.constants.orientations.landscape and fullChild.hero_images <> invalid
+          bLandscape = true
+        else if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid
           bLandscape = true
         end if
-        
-        if sOrientation <> invalid
-          if sOrientation = m.constants.orientations.landscape and fullChild.hero_images <> invalid
-            bLandscape = true
-          else sOrientation = m.constants.orientations.portrait 
-            bLandscape = false
-          end if 
-        end if 
 
         if fullChild.backgrounds <> invalid and type(fullChild.backgrounds) = "roArray" and fullChild.backgrounds.count() > 0
           childAA.backgrounds = m.dedupeBackgrounds_(fullChild.backgrounds)
@@ -661,7 +758,7 @@ End Function
 ''''''''''''''''''''''
 ' getContentsJson
 '
-'helper function to encapsulate getting the contents JSON from a matrix single container response
+'helper Function to encapsulate getting the contents JSON from a matrix single container response
 '@parsedJson: assocArray, the container response that has already been run through ParseJSON()
 '@fullJson: string, the full json formatted response
 Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
@@ -714,12 +811,12 @@ End Function
 ' translate
 '
 ' Translates content from server into format that roku understands
-' contentToTranslate should be parsed from JSON before it hits this function
+' contentToTranslate should be parsed from JSON before it hits this Function
 Function tubiMetadataTranslate_translate(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
   fetchedAt = m.fetchedAtTimestamp_()
   translated.fetchedAt = fetchedAt  ' This is probably just an ignored object, but we
-                                    ' should mark it's fetch time for consistency
+  ' should mark it's fetch time for consistency
   node_count = 0
 
   if contentToTranslate <> invalid
@@ -732,14 +829,14 @@ Function tubiMetadataTranslate_translate(contentToTranslate) As Object
         end if
       end for
 
-    'expect a single piece of content, or several (as an associative array)
+      'expect a single piece of content, or several (as an associative array)
     else if type(contentToTranslate) = "roAssociativeArray"
 
       'expect this to happen just for the search API
       if contentToTranslate.children <> invalid
         node_count = m.translateRecursive(contentToTranslate, translated)
-      
-      'expect this to happen for history/queue content
+
+        'expect this to happen for history/queue content
       else
         for each content in contentToTranslate
           if contentToTranslate[content] <> invalid
@@ -754,7 +851,7 @@ Function tubiMetadataTranslate_translate(contentToTranslate) As Object
   m.setTotalCount_(translated)
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
-end Function
+End Function
 
 
 Function tubiMetadataTranslate_translateChannel(contentToTranslate)

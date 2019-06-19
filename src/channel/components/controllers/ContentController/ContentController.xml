@@ -20,6 +20,7 @@
 
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ContentController.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ChannelScreenHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ChannelGridScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/DetailScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/EpisodeScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/VideoHelpers.brs" />

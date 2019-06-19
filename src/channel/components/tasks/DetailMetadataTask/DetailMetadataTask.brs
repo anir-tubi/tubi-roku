@@ -37,7 +37,6 @@ Function execGetDetailMetadata() As Void
   thumbnailsReq = invalid
   '//Keep track of when we started to talk to the server so we can create a timeout
   timerStartServerTalk = CreateObject("roTimespan")
-  timerStartServerTalk.Mark()
   
   '// The maximum number of miliseconds it should take to receive a response from the server
   nTimeOutMax = 5000
