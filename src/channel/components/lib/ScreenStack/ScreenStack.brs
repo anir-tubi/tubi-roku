@@ -2,14 +2,22 @@ Function init()
   m.nodeHelpers = TubiNodeHelpers()
   m.top.observeField("pop", "onPop")
   m.top.observeField("push", "onPush")
+  m.top.observeField("focusCurrent", "onSetCurrentFocusCommand")
   m.top.observeField("clearStack", "onClearStack")
+End Function
+
+
+' Indicates that the the current screen should gain focus
+Function onSetCurrentFocusCommand()
+  screen = m.top.current
+  screen.setFocus(true)
+  screen.visible = true
 End Function
 
 
 Function onPop()
   tubiLog("ScreenStack.onPop")
   removeStackTop(m.top, m.nodeHelpers)
-  
   newCurrent = getCurrent()
   if newCurrent <> invalid
     m.top.current = newCurrent
@@ -42,7 +50,9 @@ Function onPush(msg)
     stackTop = getCurrent()
     if stackTop <> invalid
       while true
-        if stackTop.screenLevel <> invalid and newChild.screenLevel <> invalid
+        if stackTop = invalid
+          exit while
+        else if stackTop.screenLevel <> invalid and newChild.screenLevel <> invalid
           if newChild.screenLevel > stackTop.screenLevel
             exit while
           else if newChild.screenLevel = stackTop.screenLevel and stackTop.isStackable = true
@@ -61,7 +71,7 @@ Function onPush(msg)
     newChild.setFocus(true)
     newChild.visible = true
 
-    if oldCurrent <> invalid
+    if oldCurrent <> invalid and oldCurrent.isSameNode(newChild) = false
       oldCurrent.visible = false
     end if
   end if
@@ -74,19 +84,6 @@ Function getCurrent()
 End Function
 
 
-' Helper for adding a scren to the stack
-Function addScreen(stack, screen)
-  if stack <> invalid and screen <> invalid
-    stack.appendChild(screen)
-    stack.current = screen
-    screen.setFocus(true)
-    screen.visible = true
-  end if
-
-  return stack
-End Function
-
-
 Function onClearStack()
   tubiLog("ScreenStack.onClearStack")
   while m.top.getChildCount() > 0
@@ -95,6 +92,7 @@ Function onClearStack()
 
   m.top.current = invalid
 End Function
+
 
 ' Helper for removing the top most screen in the stack
 Function removeStackTop(stack, nodeHelpers)

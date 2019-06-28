@@ -9,6 +9,7 @@ Function init()
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.ContentArea = m.top.findNode("ContentArea")
   m.CategoryList = m.top.findNode("CategoryList") 'aka category menu
+  m.NavSection = m.top.findNode("nav")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.HintGroup = m.top.findNode("UpHintGroup")
   fades = m.top.findNode("Fades")
@@ -21,7 +22,12 @@ Function init()
   m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.top.observeField("loadAllCategories", "loadAllCategories")
+  m.top.observeField("enabled", "onEnableChange")
   
+
+  if getExperimentValue("RokuNamespace", "roku_side_nav") = "on"
+    m.CategoryList.visible = false
+  end if
   m.CategoryList.observeField("itemFocused","onCategoryMenuItemFocused")
   m.CategoryList.observeField("rowScrollFocused","onCategoryListScrollFocused")
   m.CategoryList.observeField("itemSelected", "onCategoryMenuSelected")
@@ -72,6 +78,12 @@ Function init()
   ' Can be "grid" or "list" for current UI (2/19)
   m.lastFocused = "grid"
 
+  'set initial tracking values
+  m.top.trackingPageInfo = {
+    pageType: "home_page"
+    pageValues: {}
+  }
+
   m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
 End Function
 
@@ -100,6 +112,13 @@ Function onHomescreenResponse()
   end if
 End Function
 
+Function onEnableChange()
+  if m.top.enabled = true
+    fade(m.NavSection, "in", 0.3)
+  else
+    fade(m.NavSection, "out", 0.3)
+  end if
+End Function
 
 Function onReloadUserCategoriesResponse(msg)
   handledRequest = msg.getData()
@@ -268,21 +287,23 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("CategoryScreen.onKeyEvent")
   ' ignore keypresses until the screen content has shown up
   if press and m.top.homescreenResponse <> invalid then
-    if key = "back"
-      m.top.toolsMenuSelected = true
-      return true
-    else if key = "up"
-      ' show tools if the first row is focused
-      if m.top.cursorPosition[0] = 0 
+    if getExperimentValue("RokuNamespace", "roku_side_nav") = "off"
+      if key = "back"
         m.top.toolsMenuSelected = true
         return true
+      else if key = "up"
+        ' show tools if the first row is focused
+        if m.top.cursorPosition[0] = 0 
+          m.top.toolsMenuSelected = true
+          return true
+        end if
+      else if (key = "right" or key = "ok")
+        m.top.categoryMenuVisible = false
+        return true
+      else if key = "left"
+        m.top.categoryMenuVisible = true
+        return true
       end if
-    else if (key = "right" or key = "ok")
-      m.top.categoryMenuVisible = false
-      return true
-    else if key = "left"
-      m.top.categoryMenuVisible = true
-      return true
     end if
   end if
   return false

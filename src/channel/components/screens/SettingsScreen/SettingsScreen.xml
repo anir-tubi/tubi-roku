@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="SettingsScreen" extends="Group" >
   <script type="text/brightscript" uri="pkg:/components/screens/SettingsScreen/SettingsScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
@@ -14,6 +15,9 @@
       <!-- populate the sign out panel with these values -->
       <field id="name" type="string"/>
       <field id="email" type="string"/>
+
+      <!-- If the screen is not enabled, then user should not be able to select anything -->
+      <field id="enabled" type="boolean"  alwaysNotify="true"/>
 
     <!-- OUTPUTS -->
       <!-- triggers for upstream controller -->
@@ -51,13 +55,6 @@
   </interface>
 
   <children>
-    <Poster
-      id="TubiLogo"
-      height="45"
-      width="103"
-      opacity="0.5"
-      uri="pkg:/images/logo-white-large.png"
-      translation="[85,55]" />
 
     <Label 
       id="Title"
@@ -70,37 +67,41 @@
        size="67" />
     </Label>
 
-    <LayoutGroup
-      id="ToolbarHint"
-      layoutDirection="horiz"
-      vertAlignment="custom"
-      opacity="0.5"
-      translation="[837,58]">
-      <Label
-        text="PRESS"
-        vertAlign="center"
-        height="47"
-        translation="[0,2]">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="22" />
-      </Label>
-      <Poster
-        uri="pkg:/images/back.png"
-        width="47"
-        height="47"/>
-      <Label
-        text="FOR TOOLBAR"
-        vertAlign="center"
-        height="47"
-        translation="[0,2]">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="22" />
-      </Label>
-    </LayoutGroup>
+
+    <Group id="nav">
+      <LayoutGroup
+        id="ScreenNavigationHint"
+        layoutDirection="horiz"
+        vertAlignment="custom"
+        opacity="0.5"
+        translation="[85,85]">
+        <Label
+          text="PRESS"
+          vertAlign="center"
+          height="47"
+          translation="[0,2]">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+        <Poster
+          uri="pkg:/images/back.png"
+          width="47"
+          height="47"/>
+        <Label
+          text="FOR MENU"
+          id="callToAction"
+          vertAlign="center"
+          height="47"
+          translation="[0,2]">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+      </LayoutGroup>
+    </Group>
 
     <PanelSet
       id="PanelSet"

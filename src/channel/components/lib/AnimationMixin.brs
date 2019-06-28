@@ -142,6 +142,13 @@ Function animate(target As Object, options as Object) As Object
     tubiLog("animate target = " + target.id)
     animationId = "GeneralAnimation-" + target.id
 
+    bAnimate = true
+    ' if low-spec device, then instantly change to target option rather than using animation
+    if m.global.constants.deviceInfo.limitedUi = true then
+      tubiLog("Do not animate due to being a low-spec device, " + target.id)
+      bAnimate = false
+    end if
+
     ' Reuse an existing animation if available
     animation = m.top.findNode(animationId)
     if animation = invalid then
@@ -200,6 +207,10 @@ Function animate(target As Object, options as Object) As Object
     if fadeinterpolator <> invalid
       fadeinterpolator.key = [0.0, delayTime, 1.0]
       fadeinterpolator.keyValue = [target.opacity, target.opacity, options.opacity]
+
+      if bAnimate = false
+        target.opacity = options.opacity
+      end if
     end if
 
     if slideinterpolator <> invalid
@@ -208,23 +219,39 @@ Function animate(target As Object, options as Object) As Object
       '      about a type mismatch.  Hence the verbose line below that which seems overly pedantic.
       '      slideinterpolator.keyValue = [origin, origin, destination]
       slideinterpolator.keyValue = [[options.origin[0], options.origin[1]], [options.origin[0], options.origin[1]], [options.destination[0], options.destination[1]]]
+
+      if bAnimate = false
+        target.translation = [options.destination[0], options.destination[1]]
+      end if
     end if
 
     if scaleinterpolator <> invalid
       scaleinterpolator.key = [0.0, delayTime, 1.0]
       'see above comment about slideinterpolator keyValue format
       scaleinterpolator.keyValue = [[target.scale[0], target.scale[1]], [target.scale[0], target.scale[1]], [options.scale, options.scale]]
+
+      if bAnimate = false
+        target.scale = [options.scale, options.scale]
+      end if
     end if
 
     if colorinterpolator <> invalid
       colorinterpolator.key = [0.0, delayTime, 1.0]
       colorinterpolator.keyValue = [target.color, target.color, options.color]
+
+      if bAnimate = false
+        target.color = options.color
+      end if
     end if
 
-    animation.duration = totalTime
-    animation.easeFunction = options.easeFunction
-    animation.control = "start"
-    return animation
+    if bAnimate = true
+      animation.duration = totalTime
+      animation.easeFunction = options.easeFunction
+      animation.control = "start"
+      return animation
+    else
+      return invalid
+    end if
   else
     return invalid
   end if

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+ - SideNav Group
+ -
+ - This is the main side navigation of the app
+ -->
+<component name="SideNav" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/lib/SideNav/SideNav.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  
+  <interface>
+    <!-- INPUTS -->
+      <field id="width" type="float"/>
+      <field id="opened" value="false" type="boolean"/>
+      <field id="userName" type="string" value="" alwaysNotify="true"/>
+
+      <!--Similar to itemSelected except the the outside requests an item to be selected and if it is available, then itemSelected will be updated. -->
+      <field id="itemRequested" type="string" alwaysNotify="true"/>
+
+    <!-- OUTPUT -->
+      <field id="itemSelected" type="string" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+    <LayoutGroup
+        id="content"
+        layoutDirection="vert"
+        translation="[0,60]"
+        itemSpacings="[220,137]">
+
+      <MarkupList
+        numRows="1"
+        id="topItems"
+        itemSize="[360, 70]"
+        itemSpacing="[0,0]"
+        vertFocusAnimationStyle="floatingFocus"
+        focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+        focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+        itemComponentName="SideNavIconComponent">  
+        <ContentNode id="TopContent" role="content" >
+          <SideNavContentNode
+            id="profile"
+            iconUrl="pkg:/images/sideNavProfile.png"/>
+        </ContentNode>
+      </MarkupList>
+
+
+      <MarkupList
+        numRows="4"
+        id="mainItems"
+        itemSize="[360, 70]"
+        itemSpacing="[0,20]"
+        vertFocusAnimationStyle="floatingFocus"
+        focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+        focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+        itemComponentName="SideNavIconComponent">  
+        <ContentNode id="MainContent" role="content" >
+          <SideNavContentNode
+            id="search"
+            title="Search"
+            iconUrl="pkg:/images/sideNavSearch.png"/>
+          <SideNavContentNode
+            id="home"
+            title="Home"
+            iconUrl="pkg:/images/sideNavHome.png"/>
+          <SideNavContentNode
+            id="categories"
+            title="Categories"
+            iconUrl="pkg:/images/sideNavCategories.png"/>
+          <SideNavContentNode
+            id="channels"
+            title="Channels"
+            iconUrl="pkg:/images/sideNavChannels.png"/>
+        </ContentNode>
+      </MarkupList>
+
+      <MarkupList
+        numRows="2"
+        id="bottomItems"
+        itemSize="[360, 70]"  
+        itemSpacing="[0,17]"
+        vertFocusAnimationStyle="floatingFocus"
+        focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+        focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+        itemComponentName="SideNavIconComponent">  
+        <ContentNode id="BottomContent" role="content" >
+          <SideNavContentNode
+            id="settings"
+            fontSize="27"
+            bold="false"
+            title="Settings"/>
+          <SideNavContentNode
+            id="exit"
+            fontSize="27"
+            bold="false"
+            title="Exit"/>
+        </ContentNode>
+      </MarkupList>
+
+    </LayoutGroup>
+  </children>
+</component>

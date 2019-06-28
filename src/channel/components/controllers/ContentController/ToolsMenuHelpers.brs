@@ -24,6 +24,9 @@ Function onSearchSelected()
   m.searchScreen.observeFieldScoped("backgroundUriList", "onSearchBackgroundChange")
   m.searchScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   pushScreen(m.searchScreen, true, true)
+
+  m.searchScreen.backgroundUriList = [m.constants.ui.uris.defaultBackground]
+
 End Function
 
 

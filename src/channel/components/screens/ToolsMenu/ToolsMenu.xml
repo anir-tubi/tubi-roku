@@ -61,13 +61,6 @@
   </interface>
 
   <children>
-    <Poster
-      id="tubiLogo"
-      height="45"
-      width="103"
-      opacity="0.5"
-      uri="pkg:/images/logo-white-large.png"
-      translation="[85,55]" />
 
     <LayoutGroup
       id="ToolbarHint"

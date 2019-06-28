@@ -43,6 +43,9 @@
            fields have been set (e.g. signedIn) -->
       <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
 
+      <!-- If the screen is not enabled, then user should not be able to select anything -->
+      <field id="enabled" type="boolean"  alwaysNotify="true"/>
+
     <!-- OUTPUTS -->
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
@@ -58,6 +61,14 @@
       <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
 
       <field id="selectedPosition" alias="CategoryGridList.selectedPosition" />
+
+      <!-- Keeps the information used for user tracking - structure looks like:
+        {
+          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
+          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
+        }
+      -->
+      <field id="trackingPageInfo" type="assocarray" />
 
       <!-- Holds the information needed to populate a navigate_witin_page event. This will
            be observed by the Homescreen, which will subsequently pass it to the contentController
@@ -98,45 +109,41 @@
       width="1920"
       height="1080"/>
 
-    <Poster
-      id="tubiLogo"
-      height="45"
-      width="103"
-      opacity="0.5"
-      uri="pkg:/images/logo-white-large.png"
-      translation="[85,55]" />
 
-    <LayoutGroup
-      id="SearchSignOutHint"
-      layoutDirection="horiz"
-      vertAlignment="custom"
-      opacity="0.5"
-      translation="[837,58]">
-      <Label
-        text="PRESS"
-        vertAlign="center"
-        height="47"
-        translation="[0,2]">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="22" />
-      </Label>
-      <Poster
-        uri="pkg:/images/back.png"
-        width="47"
-        height="47"/>
-      <Label
-        text="FOR SEARCH &amp; MORE"
-        vertAlign="center"
-        height="47"
-        translation="[0,2]">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="22" />
-      </Label>
-    </LayoutGroup>
+    <Group id="nav">
+      <LayoutGroup
+        id="ScreenNavigationHint"
+        layoutDirection="horiz"
+        vertAlignment="custom"
+        opacity="0.5"
+        translation="[85,85]">
+        <Label
+          text="PRESS"
+          vertAlign="center"
+          height="47"
+          translation="[0,2]">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+        <Poster
+          uri="pkg:/images/back.png"
+          width="47"
+          height="47"/>
+        <Label
+          text="FOR MENU"
+          id="callToAction"
+          vertAlign="center"
+          height="47"
+          translation="[0,2]">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+      </LayoutGroup>
+    </Group>
 
     <InfoPanel
       id="InfoPanel"

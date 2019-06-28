@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "SideNavContentNode" extends="ContentNode">
+  <interface>
+    <field id="iconUrl" type="string" value=""/>
+    <field id="fontSize" type="integer" value="32"/>
+    <field id="bold" type="boolean" value="true"/>
+    <field id="active" type="boolean" value="false"/>
+    <field id="selected" type="boolean" value="false"/>
+  </interface>
+</component>
