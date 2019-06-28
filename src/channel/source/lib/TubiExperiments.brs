@@ -226,7 +226,7 @@ Function tubiExperiments_getExperimentValue(namespaceName as string, parameterNa
             name: experimentName
             salt: namespace.evaluated_experiment_salt
             parameter_name: parameterName
-            parameter_value: experimentValue
+            parameter_value: namespace.evaluated_params[parameterName]
           }
         }
       }
