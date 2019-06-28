@@ -7,7 +7,6 @@ Function init()
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   
   m.spinner = m.top.findNode("spinner")
-  m.NavSection = m.top.findNode("nav")
   m.Keyboard = m.top.findNode("Keyboard")
   m.Keyboard.textEditBox.maxTextLength = 100
   '//::TODO:: there looks like there is a bug when setting a custom focus color background. The focius color is not the right size. 
@@ -29,7 +28,6 @@ Function init()
   m.top.observeField("searchResponse", "onSearchResultsReceived")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("visible", "onVisible")
-  m.top.observeField("enabled", "onEnableChange")
 
   m.SearchText.color = m.global.constants.ui.colors.titleHeader
 
@@ -84,20 +82,9 @@ Function onScreenFocusChange()
   if m.top.hasFocus() then
     if m.bResultsInFocus = true
       m.ResultGrid.setFocus(true)
-    else
-      m.Keyboard.setFocus(true)
     end if
   end if
 End Function
-
-Function onEnableChange()
-  if m.top.enabled = true
-    fade(m.NavSection, "in", 0.3)
-  else
-    fade(m.NavSection, "out", 0.3)
-  end if
-End Function
-
 
 ' This may filter results based on parental controls so send it again on auth change
 Function onSignedInChange()
@@ -179,20 +166,12 @@ Function onKeyboardTextChanged()
 
   sKeyboardText = m.Keyboard.text
   m.SearchText.text = LCase(sKeyboardText)
-
   if sKeyboardText <> invalid and sKeyboardText.trim().len() > 0 then
     loadSearchResults() 
   else
     '//if the search text was empty, clear out any existing results and display the default search results
     loadSearchResults(true)
   end if
-
-  m.top.trackingPageInfo = {
-    pageType: "search_page"
-    pageValues: {
-      query: Left(m.Keyboard.text, 256)
-    }
-  }
 End Function
 
 

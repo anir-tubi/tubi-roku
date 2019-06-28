@@ -371,7 +371,7 @@ Function tubiMetadataTranslate_translateRelatedContent(contentFromServer)
     if shortestValidDuration <> invalid
       translated.validUntil = UpTime(0) + shortestValidDuration
     else
-      translated.validUntil = Uptime(0) + m.constants.cacheTimes.category
+      translated.validUntil = m.constants.cacheTimes.category
     end if
   end if
 
@@ -437,7 +437,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   if contentToTranslate.valid_duration <> invalid
     homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
   else
-    homescreenAA.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
+    homescreenAA.validUntil = m.constants.cacheTimes.homescreen
   end if
 
   containers = contentToTranslate.containers
@@ -503,7 +503,7 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
   if contentToTranslate.valid_duration <> invalid
     homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
   else
-    homescreenAA.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
+    homescreenAA.validUntil = m.constants.cacheTimes.homescreen
   end if
 
   containers = contentToTranslate.containers
@@ -637,7 +637,6 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
   if type(container) = "roAssociativeArray" and type(contents) = "roAssociativeArray"
     updateMetadata = {
       id: container.id
-      slug: container.slug
       title: container.title
       description: container.description
       totalCount: 0
@@ -663,9 +662,9 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
     updateMetadata.logoUri = container.logo
 
     if container.valid_duration <> invalid
-      updateMetadata.validUntil = Uptime(0) + container.valid_duration
+      updateMetadata.validUntil = container.valid_duration
     else
-      updateMetadata.validUntil = Uptime(0) + m.constants.cacheTimes.category
+      updateMetadata.validUntil = m.constants.cacheTimes.category
     end if
 
     jsonAA = {}
@@ -874,7 +873,7 @@ Function tubiMetadataTranslate_translateChannel(contentToTranslate)
     if container.valid_duration <> invalid
       translated.validUntil = Uptime(0) + container.valid_duration
     else
-      translated.validUntil = Uptime(0) + m.constants.cacheTimes.category
+      translated.validUntil = m.constants.cacheTimes.category
     end if
 
     for i=0 to container.children.count()-1

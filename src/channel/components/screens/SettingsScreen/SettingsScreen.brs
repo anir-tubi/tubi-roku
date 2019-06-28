@@ -11,7 +11,6 @@ Function init()
 
   m.PanelSet = m.top.findNode("PanelSet")
   m.Title = m.top.findNode("Title")
-  m.NavSection = m.top.findNode("nav")
 
   ' Create the menu
   m.SettingsMenuPanel = CreateSettingsMenuPanel()
@@ -26,7 +25,6 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("parentalSettingUpdated", "onSignedInChange")
-  m.top.observeField("enabled", "onEnableChange")
 
   'set initial tracking values
   m.top.trackingPageInfo = {
@@ -70,7 +68,6 @@ Function onMenuItemFocused()
   tubiLog("SettingsScreen.onMenuItemFocused")
   m.Title.opacity = 1.0
 
-  m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   ' send navigate_within_page events for settings screen
   if m.menuIsFocused = true and m.SettingsMenuPanel.itemUnfocused > -1
     row = m.SettingsMenuPanel.itemFocused + 1
@@ -101,13 +98,6 @@ Function onComponentFocusChange()
   end if
 End Function
 
-Function onEnableChange()
-  if m.top.enabled = true
-    fade(m.NavSection, "in", 0.3)
-  else
-    fade(m.NavSection, "out", 0.3)
-  end if
-End Function
 
 Function onReturnToMenu(msg)
   isReturning = msg.getData()

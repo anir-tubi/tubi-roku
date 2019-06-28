@@ -26,7 +26,6 @@ Function init()
   m.contentGroup = m.top.findNode("ContentGroup")
 
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
-  m.logo = m.top.findNode("tubiLogo")
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
   ' Global state
@@ -62,21 +61,9 @@ Function init()
 
   m.screenStack = m.top.findNode("ScreenStack")
   m.screenStack.observeFieldScoped("isEmpty", "onScreenStackEmpty")
-  m.screenStack.observeFieldScoped("current", "onScreenChange")
-
-  ' the screen cache holds the top level screens in memory so they are not recreated and reloaded unecessarily
-  m.screenCache = {}
-
-  m.SideNav = m.top.findNode("SideNav")
-  if getExperimentValue("RokuNamespace", "roku_side_nav") = "on"
-    initSideNav()
-  else
-    m.SideNav.visible = false
-  end if
 
   m.videoPlayer = m.top.findNode("VideoPlayer")
-  m.videoPlayer.observeFieldScoped("visible", "onVideoPlayerVisibleChange")
-  
+
   m.autohideTimer = m.top.findNode("AutohideTimer")
   m.autohideTimer.observeFieldScoped("fire", "onAutohide")
   m.spinner = m.top.findNode("ContentControllerSpinner")
@@ -91,6 +78,7 @@ Function init()
   ' or set to invalid elsewhere
   m.autoplayContext = invalid
 
+
   m.lastUserActivity = Uptime(0)  ' arbitrary marker when user last pressed a remote key
 
   m._ = rodash()
@@ -98,18 +86,6 @@ Function init()
   initVideoTracking()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
-  }
-End Function
-
-
-Function displayExitModule()
-  showExitAppModal("onExitAppModalButtonSelected")
-  m.trackingLoggingTask.trackEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "INFORMATION"   'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
-    }
   }
 End Function
 
@@ -129,87 +105,24 @@ Function onKeyEvent(key As String, press As Boolean)
       unAutohide()
       return true
     else if key = "back"
-      if m.enteredFromDeepLink = true
-        if m.screenStack.getChildCount() > 1
-          popScreen(true)
-        else
-          ' remove the last screen, probably detail screen,
-          ' this should trigger a restart of the app via onScreenStackEmpty()
-          popScreen(false)
-          m.enteredFromDeepLink = false
-        end if
-      else if m.SideNav.opened = false
-        if m.SideNav.visible = true
-          displayNavMenu(true)
-        else if m.screenStack.getChildCount() > 1
-          popScreen()
-          topScreen = currentScreen()
-          sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
-          if sideNavId <> invalid
-            focusSideNavOption(sideNavId)
-          end if
-        end if
-      else if m.SideNav.opened = true
-        if m.screenStack.getChildCount() > 1
-          '//Most likely this condition only happens when user is on the homescreen
-          '//::TODO::SIDENAV - add the condition when the count() = 1 but the screen is not the homescreen. 
-          '//     Show display homescreen. This happens for root activation screen.
-          popScreen()
-          topScreen = currentScreen()
-          sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
-          if sideNavId <> invalid
-            focusSideNavOption(sideNavId)
-            m.SideNav.setFocus(true)
-          else 
-            hideNavMenu(false)
-          end if
-        else
-          displayExitModule()
-        end if
-      end if
+      popScreen(true)
       ' Always consume back button, otherwise it will cause the app to exit
       return true
-    else 
-      '//react to the left/right/up/down keys
-      bReacted = false
-      if key = "left" and m.screenStack.isInFocusChain() = true
-        if m.sideNav.visible = true
-          '//The LEFT Key has been pressed, now display menu and focus on menu
-          displayNavMenu(true)
-          bReacted = true
-        end if
-      else if key = "right" and isSideNavActive() = true
-        '//The RIGHT Key has been pressed, now hide the menu
-        hideNavMenu(true)
-        bReacted = true
-      end if
-      return bReacted
     end if
   end if
   return false
 End Function
+
 
 Function onComponentFocus()
   tubiLog("ContentController.onComponentFocus")
   if m.top.isInFocusChain() and m.top.hasFocus()
     if m.videoPlayer.visible = true
       m.videoPlayer.setFocus(true)
-    else if m.SideNav.opened = true and getExperimentValue("RokuNamespace", "roku_side_nav") = "on"
-      displayNavMenu()
     else if currentScreen() <> invalid
       currentScreen().setFocus(true)
     end if
   end if
-End Function
-
-Function onVideoPlayerVisibleChange()
-  if m.videoPlayer.visible = true
-    m.SideNav.visible = false
-    m.logo.visible = false
-  else
-    m.SideNav.visible = true
-    m.logo.visible = true
-  end if 
 End Function
 
 
@@ -224,7 +137,6 @@ Function inStillWatchingExperimentWindow()
     return false
   end if
 End Function
-
 
 Function shouldStopOnStillWatchingTimeout()
   if m.constants.player.stillWatchingStopOnTimeout = invalid
@@ -338,9 +250,7 @@ Function onExitAppModalButtonSelected(msg)
   else
     'return to the last screen
     focusedScreen = currentScreen()
-    if m.SideNav.opened = true
-      m.SideNav.setFocus(true)
-    else if focusedScreen <> invalid
+    if focusedScreen <> invalid
       focusedScreen.setFocus(true)
     ' if screen stack was empty, this was a modal over top of the sign in controller
     else if m.SignIn <> invalid
@@ -368,7 +278,6 @@ Function onAutohide()
     m.top.setFocus(true)  'key presses go to the screen stack
   end if
 End Function
-
 
 Function unAutohide()
   tubiLog("ContentController.unAutohide")
@@ -408,8 +317,26 @@ Function startUserExperience()
       m.contentGroup.visible = true
       showDetailScreen(m.top.deepLinkContent)
     else
+      m.contentGroup.visible = true
       startChannel()
     end if
+  end if
+End Function
+
+
+'''''''''''''''''''''''
+' onContentSelected
+'
+' Show the detail screen for the selected content
+Function onContentSelected()
+  tubiLog("ContentController.onContentSelected")
+  content = m.homeScreen.contentSelected
+  m.autoplayContext = m.homeScreen.currCategoryId
+
+  if content.type = "channel"
+    showChannelScreen(content, "HOME")
+  else
+    showDetailScreen(content)
   end if
 End Function
 
@@ -429,10 +356,7 @@ Function onHistoryQueueChange(categoryId)
     m.authTask.observeFieldScoped("authInfo", "onHistoryQueueRefresh")
     m.authTask.functionName = "execInitializeUserData"
     m.authTask.control = "RUN"
-    homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-    if homeScreen <> invalid
-      homeScreen.dirtyUserCategories = categoryId
-    end if
+    if m.homeScreen <> invalid then m.homeScreen.dirtyUserCategories = categoryId
   end if
 End Function
 
@@ -458,6 +382,13 @@ Function refreshAllDetailScreens()
 End Function
 
 
+Function onSearchContentSelected()
+  tubiLog("ContentController.onSearchContentSelected")
+  m.autoplayContext = invalid
+  showDetailScreen(m.searchScreen.contentSelected)
+End Function
+
+
 '''''''''''''''''''
 ' onCloseModal
 '
@@ -471,103 +402,38 @@ End Function
 
 Function startChannel()
   tubiLog("ContentController.startChannel")
-  m.contentGroup.visible = true
   m.appLoadStopwatch.mark()
-  showHomeScreen(m.constants, m.global.authInfo)
-  focusSideNavOption(m.constants.ui.sideNavIds.home)
+
+  m.homeScreen = CreateObject("roSGNode", "HomeScreen")
+  m.homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
+  m.homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+  m.homeScreen.observeFieldScoped("toolsMenuSelected", "onToolsMenuSelected")
+
+  m.homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
+  m.homeScreen.observeFieldScoped("firstPosterLoaded", "onFirstPosterLoaded")
+
+  m.homeScreen.signedIn = (m.global.authInfo <> invalid)
+  m.homeScreen.loadAllCategories = true
+
+  m.contentGroup.visible = true
+  'this is the first screen so no need for navigate_to_page tracking.
+  'page_load tracking will happen when content is received.
+  pushScreen(m.homeScreen, false, false)
 End Function
 
 
-' a setter for the screen cache - can overwrite screens in the cache if the passed in screen has
-' the same id as a screen already existing in the screen cache
-'
-' @screen: roSGNode, a screen node
-' returns true or false depending if the screen was successfully set
-Function setInScreenCache(screen)
-  if screen <> invalid and screen.id <> invalid and m.constants.ui.cacheableScreenIds[screen.id] = true
-    m.screenCache[screen.id] = screen
-    return true
-  end if
-  return false
-End Function
-
-
-' a getter for the screen cache - getting does not remove the screen from the cache
-'
-' @screenId: string, the id of the screen that is to be retrieved
-' returns the screen node or invalid if no screens were found with the passed in id
-Function getFromScreenCache(screenId)
-  if type(screenId) = "String" or type(screenId) = "roString"
-    return m.screenCache[screenId] 
-  end if
-  return invalid
-End Function
-
-
-Function displayNavMenu(shouldTrackComponentInteraction = true)
-  bSideNavOpened = m.SideNav.opened
-  m.SideNav.setFocus(true)
-  if bSideNavOpened = false
-    m.SideNav.opened = true
-    if m.nOriginalSideNavX = invalid
-      m.nOriginalSideNavX = m.SideNav.translation[0] 
-    end if 
-    if m.nOriginalScreenStackX = invalid
-      m.nOriginalScreenStackX = m.ScreenStack.translation[0] 
-    end if
-
-    slideTo(m.SideNav, [0, m.SideNav.translation[1]], .2)
-    slideTo(m.ScreenStack, [m.nOriginalScreenStackX + m.SideNav.width, m.ScreenStack.translation[1]], .2)
-
-    topScreen = currentScreen()
-    if topScreen <> invalid
-      topScreen.enabled = false
-
-      if shouldTrackComponentInteraction = true
-        interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "on")
-        m.trackingLoggingTask.trackEvent = interactionEvent
-      end if
-    end if
-  end if
-End Function
-
-
-Function hideNavMenu(shouldTrackComponentInteraction = true)
-  if m.SideNav.opened = true
-    m.SideNav.opened = false
-    focusCurrentScreen() '//This will set the current focus back to the screenstack items
-
-    slideTo(m.SideNav, [m.nOriginalSideNavX, m.SideNav.translation[1]], .3)
-    slideTo(m.ScreenStack, [m.nOriginalScreenStackX, m.ScreenStack.translation[1]], .3)
-
-    topScreen = currentScreen()
-    if topScreen <> invalid
-      topScreen.enabled = true
-
-      'set up analytics for unfocusing side nav component
-      pageType = ""
-      pageValues = {}
-      if topScreen.trackingPageInfo <> invalid
-        pageType = topScreen.trackingPageInfo.pageType
-        pageValues = topScreen.trackingPageInfo.pageValues
-      end if
-
-      if shouldTrackComponentInteraction = true
-        interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")
-        m.trackingLoggingTask.trackEvent = interactionEvent
-      end if
-    end if
-  end if
-End Function
-
-
-' Callback for when a navigateWithinPageInfo has been updated - sends the navigate_within_page event
-Function onNavigateWithinPageInfoChange(msg)
-  navigateWithinPageInfo = msg.getData()
-  m.trackingLoggingTask.trackEvent = {
-    type: "navigate_within_page"
-    values: navigateWithinPageInfo
+Function homeScreenBackgroundUpdated()
+  tubiLog("ContentController.homeScreenBackgroundUpdated")
+  m.backgroundGroup.backgroundInfo = {
+    type: getBackgroundtype(m.homeScreen.backgroundUriList)
+    uriList: m.homeScreen.backgroundUriList
   }
+End Function
+
+
+Function onToolsMenuSelected()
+  tubiLog("ContentController.onToolsMenuSelected")
+  showToolsMenu()
 End Function
 
 
@@ -582,34 +448,25 @@ Function onDeepLinkContentReceived()
 End Function
 
 
-Function homeScreenBackgroundUpdated(msg)
-  tubiLog("ContentController.homeScreenBackgroundUpdated")
-  homeScreen = msg.getRoSGNode()
-  if homeScreen <> invalid
-    m.backgroundGroup.backgroundInfo = {
-      type: getBackgroundtype(homeScreen.backgroundUriList)
-      uriList: homeScreen.backgroundUriList
-    }
-  end if
-End Function
-
-
+'''''''''''''''''''''
+' onEpisodeBackgroundChange
+'
+'
 Function onEpisodeBackgroundChange(msg)
   TubiLog("ContentController.onEpisodeBackgroundChange")
-  episodeScreen = msg.getRoSGNode()
+  screen = msg.getRoSGNode()
   m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype(episodeScreen.backgroundUriList)
-    uriList: episodeScreen.backgroundUriList
+    type: getBackgroundtype(screen.backgroundUriList)
+    uriList: screen.backgroundUriList
   }
 End Function
 
 
-Function onSearchBackgroundChange(msg)
+Function onSearchBackgroundChange()
   TubiLog("ContentController.onSearchBackgroundChange")
-  searchScreen = msg.getRoSGNode()
   m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype(searchScreen.backgroundUriList)
-    uriList: searchScreen.backgroundUriList
+    type: getBackgroundtype(m.searchScreen.backgroundUriList)
+    uriList: m.searchScreen.backgroundUriList
   }
 End Function
 
@@ -641,23 +498,63 @@ End Function
 
 
 '''''''''''''''''''''''
+' onFirstPosterLoaded
+'
+' Info that the first poster in the first category has bubbled all the way up.
+' Fire off a log to a server so we can track how long it took since the app was started, ie. startChannel() was called
+Function onFirstPosterLoaded()
+  loadTime = m.appLoadStopwatch.TotalMilliseconds()
+
+  'send tracking event for initial home page load
+  m.global.trackingLoggingTask.trackEvent = {
+    type: "page_load"
+    values: {
+      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})  'a valid page type (see PageLoadEvent in events.protos)
+      load_time: loadTime
+      status: "SUCCESS"  'ActionStatus enum
+    }
+  }
+
+  tubiLog("ContentController.onFirstPosterLoaded")  'write to console only
+  messageInfo = {
+    loadtime: loadTime
+    model: m.constants.deviceInfo.model
+  }
+  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load")   'send info to server
+End Function
+
+
+'''''''''''''''''''''''
 ' getBackgroundtype
 '
 ' Helper function to get the background type depending on if passed in uri list is using the default image
 ' @backgroundUriList, array of uris
 Function getBackgroundtype(backgroundUriList)
-  if backgroundUriList <> invalid
-    if backgroundUriList[0] = m.defaultBackgroundUri
-      backgroundType = m.constants.ui.backgroundTypes.fullScreen
-    else
-      backgroundType = m.constants.ui.backgroundTypes.topRight
-    end if
+  if backgroundUriList[0] = m.defaultBackgroundUri
+    backgroundType = m.constants.ui.backgroundTypes.fullScreen
+  else
+    backgroundType = m.constants.ui.backgroundTypes.topRight
   end if
   return backgroundType
 End Function
 
 
+
+'''''''''''''''''''''''
+' onNavigateWithinPageInfoChange
+'
+' Callback for when a navigateWithinPageInfo has been updated - sends the navigate_within_page event
+Function onNavigateWithinPageInfoChange(msg)
+  navigateWithinPageInfo = msg.getData()
+  m.trackingLoggingTask.trackEvent = {
+    type: "navigate_within_page"
+    values: navigateWithinPageInfo
+  }
+End Function
+
+
 Function initVideoTracking()
+
   if m.constants.thirdParty.youbora.enabled = true
     m.videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
     m.youboraTask = m.top.createChild("YBPluginRokuVideo")
@@ -669,8 +566,8 @@ Function initVideoTracking()
   end if
 End Function
 
-
 Function onVideoTrackingStart()
+
   ' Youbora events
   if m.constants.thirdParty.youbora.enabled = true
     youboraConfig = m.constants.thirdParty.youbora.config

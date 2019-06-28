@@ -21,9 +21,6 @@
       <!-- content should be a container content node with a single channel content node filled with multiple item content nodes -->
       <field id="content" type="node"/>
 
-      <!-- If the screen is not enabled, then user should not be able to select anything -->
-      <field id="enabled" type="boolean"  alwaysNotify="true"/>
-
       <!-- Should the screen load the content. This is set immediately after the content changes indicating that it is safe to load the content.  -->
       <field id="shouldLoadContent" type="boolean" alwaysNotify="true"/>
 
@@ -32,7 +29,7 @@
 
       <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
       -->
-      <field id="callingPage" type="string"  alwaysNotify="true"/>
+      <field id="callingPage" type="string" />
 
     <!-- OUTPUT -->
       <!-- the content node representing the item which was clicked on -->
@@ -119,6 +116,13 @@
             size="22" />
         </Label>
       </LayoutGroup>
+      <Poster
+      id="tubiLogo"
+      height="45"
+      width="103"
+      opacity="0.5"
+      uri="pkg:/images/logo-white-large.png"
+      translation="[1732,60]" />
     </Group>
     <InfoPanel
       id="ChannelsInfoPanel"

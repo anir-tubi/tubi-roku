@@ -12,19 +12,16 @@ Function init()
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitle = m.top.findNode("pageTitle")
   m.VideoGrid = m.top.findNode("ChannelsVideoGrid")
-  m.NavSection = m.top.findNode("nav")
 
   m.top.observeField("callingPage", "onSetCallOfAction")
   m.top.observeField("shouldLoadContent", "onLoadContent")
   m.top.observeField("isLoading", "onIsLoading")
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("enabled", "onEnableChange")
   m.VideoGrid.observeField("itemFocused", "onItemFocused")
   m.VideoGrid.observeField("itemSelected", "onItemSelected")
 
   ' set initial tracking values
   m.top.trackingPageInfo = createTrackingPageInfo(invalid)
-  m.oldCategoryComponent = invalid
 
   m.top.screenLevel = m.constants.ui.screenLevels.channelDetailScreen
 End Function
@@ -39,29 +36,31 @@ Function onSetCallOfAction()
 
   callToAction = m.top.findNode("callToAction")
   callToAction.text = sPreviousPage
-End Function
 
-
-Function onEnableChange()
-  if m.top.enabled = true
-    fade(m.NavSection, "in", 0.3)
-  else
-    fade(m.NavSection, "out", 0.3)
-  end if
 End Function
 
 
 Function onScreenFocusChange()
   if m.top.hasFocus() = true
+
     m.VideoGrid.setFocus(true)
     if m.top.content <> invalid
-      if shouldRefresh(m.top.content.getChild(0)) = true  'cacheValidationMixin
+      if shouldRefresh(m.top.content) = true  'cacheValidationMixin
         m.top.refreshChannel = true
       end if
     end if
   end if
 End Function
 
+
+Function onKeyEvent(key, press)
+  if press = true
+    if key = "back"
+      return false
+    end if
+  end if
+  return true
+End Function
 
 Function onLoadContent()
   if m.top.content <> invalid
@@ -94,7 +93,6 @@ Function onItemFocused()
     item = m.VideoGrid.itemFocused
     category = m.top.content.getChild(0) 'contentNode
     content = category.getChild(item) 'contentNode
-    numColumns = m.VideoGrid.numColumns
 
     ' Update the info panel
     populateInfoPanel(m.InfoPanel, content, "item")
@@ -113,23 +111,26 @@ Function onItemFocused()
       m.top.trackingPageInfo = trackingPageInfo
 
       ' trigger navigate_within_page events in ContentController
+      numColumns = m.VideoGrid.numColumns
       col = 1 + (item MOD numColumns)
       row = 1 + (item \ numColumns)
 
+      categoryComponent = {
+        category_slug: category.slug
+        category_row: 1   ' 1 based index
+        content_tile: m.Tracking.getAnalyticsTile(content, col, row)
+      }
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
-        componentOneof: m.Tracking.getAnalyticsComponent("category_component", m.oldCategoryComponent)
+        componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponent)
         means_of_navigation: "BUTTON"  'MeansOfNavigation enum
         vertical_location: row '1 based index
         vertical_location_mode: "INDEX"  'LocationMode enum
         horizontal_location: col
         horizontal_location_mode: "INDEX"  'LocationMode enum
       }
-      
-      m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
     else
       m.contentLoadedAndFocused = true
-      m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
     end if
   end if
 End Function
@@ -256,22 +257,4 @@ Function createTrackingPageInfo(channel)
   }
 
   return trackingInfo
-End Function
-
-
-Function getTrackingComponentInfo(itemIndex, numColumns, category, trackingLib)
-  if trackingLib <> invalid and category <> invalid
-    column = 1 + (itemIndex MOD numColumns)
-    row = 1 + (itemIndex \ numColumns)
-    content = category.getChild(itemIndex)
-
-    return {
-      category_slug: category.slug
-      category_row: row
-      category_col: column
-      content_tile: m.Tracking.getAnalyticsTile(content, column, row)
-    }
-  end if
-
-  return invalid
 End Function

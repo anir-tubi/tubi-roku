@@ -37,7 +37,6 @@ Function onRefreshChannelSignal(msg)
   getChannelFromServer(channelScreen, channelRow)
 End Function
 
-
 Function getChannelFromServer(screen, content)
   tubiLog("ChannelScreenHelpers.getChannelFromServer")
   channelTask = CreateObject("roSGNode", "ChannelMetadataTask")

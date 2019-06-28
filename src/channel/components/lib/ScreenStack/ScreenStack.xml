@@ -27,7 +27,6 @@
       <field id="pop" type="boolean" alwaysNotify="true" />
       <field id="push" type="node" />
       <field id="clearStack" type="boolean" alwaysNotify="true" />
-      <field id="focusCurrent" type="boolean" alwaysNotify="true" />
 
     <!-- OUTPUT -->
       <field id="isEmpty" type="boolean" alwaysNotify="true" />

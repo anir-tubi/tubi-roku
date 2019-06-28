@@ -1,67 +1,24 @@
-' gets the ChannelListScreen from the screen cache if it exists, otherwise wraps showChannelGridScreen()
-' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
-' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page
-'                       to let the user know what page they will go to when they click the back button
-Function showChannelListScreen(constants, sPageSource)
-  channelListScreen = getFromScreenCache(m.constants.ui.screenIds.channelListScreen)
-  if channelListScreen <> invalid
-    pushScreen(channelListScreen, true, true)
-  else
-    showChannelGridScreen(constants, sPageSource, true, m.constants.ui.screenLevels.channelCategoryGridScreen)
-  end if
-End Function
-
-
-' gets the CategoryListScreen from the screen cache if it exists, otherwise wraps showChannelGridScreen()
-' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
-' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page
-'                       to let the user know what page they will go to when they click the back button
-Function showCategoryListScreen(constants, sPageSource)
-  categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
-  if categoryListScreen <> invalid
-    pushScreen(categoryListScreen, true, true)
-  else
-    showChannelGridScreen(constants, sPageSource, false, m.constants.ui.screenLevels.channelCategoryGridScreen)
-  end if
-End Function
-
-
 '''''''''''''''''''''
 ' showChannelGridScreen
 '
-' @onstants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 ' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page to let the user know what page they will go to when they click the back button
 ' @bChannel: boolean, Is this a grid page displaying channels? If not, it will be a grid page displaying categories
-' @screenLevel: integer, Should this screen have a different screenlevel other than its default one?
-Function showChannelGridScreen(constants, sPageSource, bChannel = true, screenLevel = -1)
+Function showChannelGridScreen(sPageSource, bChannel = true)
   gridScreen = CreateObject("roSGNode", "ChannelGridScreen")
-
-  gridScreenId = constants.ui.screenIds.channelListScreen
-  pageType = "channel_list_page"
-  if bChannel = false
-    gridScreenId = constants.ui.screenIds.categoryListScreen
-    pageType = "category_list_page"
-  end if
-
-  if screenLevel > 0
-    gridScreen.screenLevel = screenLevel
-  end if
-  gridScreen.id = gridScreenId
   gridScreen.callingPage = sPageSource
   gridScreen.displayChannels = bChannel
   gridScreen.trackingLoadStartTime = UpTime(0)
   gridScreen.observeFieldScoped("contentSelected", "onGridContentSelected")
   gridScreen.observeFieldScoped("backgroundUriList", "onChannelBackgroundChange")
   gridScreen.observeFieldScoped("refreshChannel", "onRefreshGridSignal")
-  gridScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   gridScreen.isLoading = true
 
   gridScreen.trackingPageInfo = {
-    pageType: pageType
-    pageValues: {}
+    pageType: "category_list_page"
+    pageValues: {
+    }
   }
 
-  setInScreenCache(gridScreen)
   pushScreen(gridScreen, true, false)  ' don't send page load tracking until we resolve channel content
   getGridDataFromServer(gridScreen)
 End Function

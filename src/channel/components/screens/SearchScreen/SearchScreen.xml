@@ -2,7 +2,6 @@
 <component name="SearchScreen" extends="Group" initialFocus="Keyboard">
 
   <script type="text/brightscript" uri="pkg:/components/screens/SearchScreen/SearchScreen.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
@@ -16,10 +15,6 @@
 
       <!-- metadataFetchTask pusts results on this field -->
       <field id="searchResponse" type="assocarray" alwaysNotify="true"/>
-
-      <!-- If the screen is not enabled, then user should not be able to select anything -->
-      <field id="enabled" type="boolean"  alwaysNotify="true"/>
-
 
     <!-- OUTPUT -->
       <!-- set to the tubi content id of the item which was clicked on -->
@@ -65,13 +60,21 @@
   </interface>
   
   <children>
-    <Group id="nav">
+
+    <Group id="nav"
+      translation="[85,55]">
+      <Poster
+        id="TubiLogo"
+        height="45"
+        width="103"
+        opacity="0.5"
+        uri="pkg:/images/logo-white-large.png"/>
       <LayoutGroup
-        id="ScreenNavigationHint"
+        id="ToolbarHint"
         layoutDirection="horiz"
         vertAlignment="custom"
         opacity="0.5"
-        translation="[85,85]">
+        translation="[752,3]">
         <Label
           text="PRESS"
           vertAlign="center"
@@ -87,8 +90,7 @@
           width="47"
           height="47"/>
         <Label
-          text="FOR MENU"
-          id="callToAction"
+          text="FOR TOOLBAR"
           vertAlign="center"
           height="47"
           translation="[0,2]">
