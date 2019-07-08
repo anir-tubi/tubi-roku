@@ -57,15 +57,7 @@ Function init()
   ' </CategoryContentNode>
   m.categoryContent = invalid
 
-  if m.constants.deviceInfo.scaledUi = true then
-    frame = m.top.findNode("DockedVideoFrame")
-    frameMargin = 4 ' FHD is margin 6
-    frame.uri = "pkg:/images/selector-white-hd.9.png"
-    frame.width = 455 + frameMargin * 2
-    frame.height = 256 + frameMargin * 2
-    frame.translation = [1390 - frameMargin, 151 - frameMargin]
-  end if
-
+  'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasFocus = false
   m.listHasFocus = false
 
