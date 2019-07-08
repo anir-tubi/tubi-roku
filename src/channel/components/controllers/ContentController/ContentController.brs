@@ -481,23 +481,7 @@ Function onChannelBackgroundChange(msg)
 End Function
 
 
-'''''''''''''''''''''''
-' onDetailItemFailed
-'
-' Handle a detail screen failure to fetch detailed metadata.  This could be due
-' to a title becoming unavailable, or a problem with a deep link.
-Function onDetailItemFailed()
-  tubiLog("ContentController.onDetailItemFailed")
-  popScreen(true)
 
-  ' If a deep-link occurred, we skipped category screen creation so create it here
-  if currentScreen() = invalid then
-    startChannel()
-  end if
-End Function
-
-
-'''''''''''''''''''''''
 ' onFirstPosterLoaded
 '
 ' Info that the first poster in the first category has bubbled all the way up.
