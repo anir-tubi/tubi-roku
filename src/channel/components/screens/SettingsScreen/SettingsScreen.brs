@@ -11,6 +11,7 @@ Function init()
 
   m.PanelSet = m.top.findNode("PanelSet")
   m.Title = m.top.findNode("Title")
+  m.NavSection = m.top.findNode("nav")
 
   ' Create the menu
   m.SettingsMenuPanel = CreateSettingsMenuPanel()
@@ -25,6 +26,8 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("parentalSettingUpdated", "onSignedInChange")
+  m.top.observeField("enabled", "onEnableChange")
+  m.top.observeFieldScoped("itemRequested", "onItemRequested")
 
   'set initial tracking values
   m.top.trackingPageInfo = {
@@ -68,6 +71,7 @@ Function onMenuItemFocused()
   tubiLog("SettingsScreen.onMenuItemFocused")
   m.Title.opacity = 1.0
 
+  m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   ' send navigate_within_page events for settings screen
   if m.menuIsFocused = true and m.SettingsMenuPanel.itemUnfocused > -1
     row = m.SettingsMenuPanel.itemFocused + 1
@@ -98,6 +102,13 @@ Function onComponentFocusChange()
   end if
 End Function
 
+Function onEnableChange()
+  if m.top.enabled = true
+    fade(m.NavSection, "in", 0.3)
+  else
+    fade(m.NavSection, "out", 0.3)
+  end if
+End Function
 
 Function onReturnToMenu(msg)
   isReturning = msg.getData()
@@ -258,6 +269,23 @@ Function CreateSignOutPanel()
   return panel
 End Function
 
+Function focusItemInList(list, sID)
+  index = -1
+  content = list.content
+    index = -1
+    for i = 0 to content.getChildCount() - 1
+      item = content.getChild(i)
+      if item.id = sID 
+        index = i
+        exit for
+      end if
+    end for
+    if index >= 0
+      list.jumpToItem = index
+    end if
+  return index
+End Function
+
 Function onMenuItemSelected()
   buttonContent = m.SettingsMenuPanel.content.getChild(m.SettingsMenuPanel.itemSelected)
   if buttonContent.id = "SignInOutButton"
@@ -272,4 +300,19 @@ End Function
 Function onParentalControlsItemSelected(msg)
   tubiLog("SettingsScreen.onParentalControlsItemSelected")
   m.top.parentalSettingSelected = msg.GetData()
+End Function
+
+
+Function onItemRequested()
+  sButtonID = ""
+  list = m.SettingsMenuPanel.list
+  if list <> invalid
+    if list.itemFocused <> invalid
+      buttonContent = list.content.getChild(list.itemFocused)
+      sButtonID = buttonContent.id 
+    end if
+    if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and m.top.itemRequested <> buttonContent.id 
+      focusItemInList(list, m.top.itemRequested)
+    end if
+  end if
 End Function

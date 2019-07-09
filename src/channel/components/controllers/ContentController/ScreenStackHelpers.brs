@@ -17,6 +17,10 @@ Function pushScreen(screen As Object, sendNavigateEvents = true as Boolean, send
   m.screenStack.push = screen
 End Function
 
+' Tells the screen stack to focus onto the current screen
+Function focusCurrentScreen()
+  m.screenStack.focusCurrent = true
+End Function
 
 ' Wrapper around the m.screenStack push interface to handle analytics events
 ' Remove the top-most screen of the stack, making the previous screen visible
@@ -134,24 +138,15 @@ Function clearScreenStack()
   m.screenStack.clearStack = true
 End Function
 
-
-' Callback to fire when m.screenStack is empty
+' Callback to fire when m.screenStack is empty - should only happen in the case of deeplinks
 Function onScreenStackEmpty()
   tubiLog("ScreenStackHelpers.onScreenStackEmpty")
-  ' if we went straight to detail screen for a deep link, launch the home screen.
-  ' After we have entered the home screen, ignore back button presses
-  if m.enteredFromDeepLink
-    popScreen()  ' remove the last screen, probably detail screen
-    m.enteredFromDeepLink = false
-    startChannel()
-  else
-    showExitAppModal("onExitAppModalButtonSelected")
-    m.trackingLoggingTask.trackEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "INFORMATION"   'DialogType enum
-        pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
-      }
-    }
+  startChannel()
+End Function
+
+Function onScreenChange()
+  if currentScreen() <> invalid and currentScreen().id <> invalid
+    bSideNavVisible = (m.constants.ui.sideNavOpenIds[currentScreen().id] = true)
+    m.sideNav.visible = bSideNavVisible   
   end if
 End Function

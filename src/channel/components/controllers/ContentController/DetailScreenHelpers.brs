@@ -547,7 +547,7 @@ End Function
 ' handles the response of a user who has been presented a sign in modal on the details screen
 Function onSignInModalButtonSelected(msg)
   if msg.getData() = 0
-    onSignInSelected()
+    startSignIn(true)
   end if
 End Function
 
@@ -840,7 +840,7 @@ End Function
 
 Function onPlaySignInModalButtonSelected(msg)
   if msg.getData() = 0
-    onSignInSelected()
+    startSignIn(true)
   else
     episode = getEpisodeContent(getDetailScreenContent())
     playVideoContent(episode, "none", 0)

@@ -529,8 +529,6 @@ Function getConstants()
     'static - pre defined category names
     constants.ui.categoryNames = {}
       constants.ui.categoryNames.topCategory = "Featured"
-      constants.ui.categoryNames.signedOutTools = "Search & Sign In"
-      constants.ui.categoryNames.signedInTools = "Search & Sign Out"
       constants.ui.categoryNames.history = "Continue Watching"
       constants.ui.categoryNames.queue = "Queue"
 
@@ -568,16 +566,64 @@ Function getConstants()
     'but the home screen can not be pushed on top of the search screen.
     constants.ui.screenLevels = {}
       constants.ui.screenLevels.homeScreen = 10
-      constants.ui.screenLevels.toolsMenu = 20
-      constants.ui.screenLevels.searchScreen = 30
-      constants.ui.screenLevels.settingsScreen = 30
-      constants.ui.screenLevels.comfirmPasswordScreen = 30
+      constants.ui.screenLevels.channelCategoryGridScreen = 20
+      constants.ui.screenLevels.searchScreen = 20
+      constants.ui.screenLevels.settingsScreen = 20
+      constants.ui.screenLevels.comfirmPasswordScreen = 40
       constants.ui.screenLevels.channelDetailScreen = 40
       constants.ui.screenLevels.detailScreen = 50
       constants.ui.screenLevels.episodeScreen = 50
       constants.ui.screenLevels.activationCodeScreen = 100
       constants.ui.screenLevels.upNextScreen = 100
       constants.ui.screenLevels.modalDialogScreen = 1000
+
+    constants.ui.screenIds = {}
+      constants.ui.screenIds.homeScreen = "homeScreen"
+      constants.ui.screenIds.searchScreen = "searchScreen"
+      constants.ui.screenIds.settingsScreen = "settingsScreen"
+      constants.ui.screenIds.comfirmPasswordScreen = "comfirmPasswordScreen"
+      constants.ui.screenIds.channelDetailScreen = "channelDetailScreen"
+      constants.ui.screenIds.channelListScreen = "channelListScreen"
+      constants.ui.screenIds.categoryListScreen = "categoryListScreen"
+      constants.ui.screenIds.detailScreen = "detailScreen"
+      constants.ui.screenIds.episodeScreen = "episodeScreen"
+      constants.ui.screenIds.activationCodeScreen = "activationCodeScreen"
+      constants.ui.screenIds.upNextScreen = "upNextScreen"
+      constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"
+
+    constants.ui.cacheableScreenIds = {}
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.channelListScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
+
+    constants.ui.sideNavOpenIds = {}
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.channelListScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
+
+    constants.ui.sideNavIds = {}
+      constants.ui.sideNavIds.home = "home"
+      constants.ui.sideNavIds.search = "search"
+      constants.ui.sideNavIds.channels = "channels"
+      constants.ui.sideNavIds.categories = "categories"
+      constants.ui.sideNavIds.settings = "settings"
+      constants.ui.sideNavIds.exit = "exit"
+      constants.ui.sideNavIds.profile = "profile"
+
+    constants.ui.cacheableScreenIds = {}
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.channelListScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
+
+    'a map of screenIds to corresponding sideNavIds
+    constants.ui.screenIdToSideNavId = {}
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.homeScreen] = constants.ui.sideNavIds.home
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.searchScreen] = constants.ui.sideNavIds.search
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.channelListScreen] = constants.ui.sideNavIds.channels
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings
 
     constants.ui.uris = {}
       'background gradient urls

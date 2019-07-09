@@ -77,21 +77,44 @@ Function onAuthInfoReceived()
     popScreen(true)
 
     screen = currentScreen()
-    m.backgroundGroup.backgroundInfo = {
-      type: getBackgroundtype(screen.backgroundUriList)
-      uriList: screen.backgroundUriList
-    }
+    if screen <> invalid
+      m.backgroundGroup.backgroundInfo = {
+        type: getBackgroundtype(screen.backgroundUriList)
+        uriList: screen.backgroundUriList
+      }
+    end if
   end if
 
-  if m.homeScreen <> invalid
-    m.homeScreen.dirtyUserCategories = m.constants.ui.categoryIds.queue
-    m.homeScreen.dirtyUserCategories = m.constants.ui.categoryIds.history
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    homeScreen.dirtyUserCategories = m.constants.ui.categoryIds.queue
+    homeScreen.dirtyUserCategories = m.constants.ui.categoryIds.history
   end if
+  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   refreshAllDetailScreens()
   m.spinner.visible = false
+
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if currentScreen() = invalid
+    ' this happens on app start up or when a user signs out
+    if homeScreen <> invalid
+      'expect homeScreen to not be invalid only when a user signs out
+      homeScreen.loadAllCategories = true
+    end if
     startUserExperience()
-  else
+  else if currentScreen() <> invalid and currentScreen().getSubtype() = "DetailScreen"
+    ' this happens if a user logs in after attempting to add to queue
+    if homeScreen <> invalid
+      homeScreen.loadAllCategories = true
+    end if
     currentScreen().setFocus(true)
+  else
+    ' this happens when a user signs in from the side nav or settings page
+    if homeScreen <> invalid
+      homeScreen.loadAllCategories = true
+    end if
+    showHomeScreen(m.constants, m.global.authInfo) 'loads home screen from cache
+    focusSideNavOption(m.constants.ui.sideNavIds.home)
   end if
 End Function

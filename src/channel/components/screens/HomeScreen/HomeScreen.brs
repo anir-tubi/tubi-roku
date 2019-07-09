@@ -8,7 +8,7 @@ Function init()
   m.trackingLoggingTask = m.global.trackingLoggingTask
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.ContentArea = m.top.findNode("ContentArea")
-  m.CategoryList = m.top.findNode("CategoryList") 'aka category menu
+  m.NavSection = m.top.findNode("nav")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.HintGroup = m.top.findNode("UpHintGroup")
   fades = m.top.findNode("Fades")
@@ -21,10 +21,7 @@ Function init()
   m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.top.observeField("loadAllCategories", "loadAllCategories")
-  
-  m.CategoryList.observeField("itemFocused","onCategoryMenuItemFocused")
-  m.CategoryList.observeField("rowScrollFocused","onCategoryListScrollFocused")
-  m.CategoryList.observeField("itemSelected", "onCategoryMenuSelected")
+  m.top.observeField("enabled", "onEnableChange")
 
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -59,10 +56,12 @@ Function init()
 
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasFocus = false
-  m.listHasFocus = false
 
-  ' Can be "grid" or "list" for current UI (2/19)
-  m.lastFocused = "grid"
+  'set initial tracking values
+  m.top.trackingPageInfo = {
+    pageType: "home_page"
+    pageValues: {}
+  }
 
   m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
 End Function
@@ -79,7 +78,9 @@ Function onHomescreenResponse()
       m.categoryContent = m.top.homescreenResponse.convertedMetadata
       m.Spinner.visible = false
       m.InfoPanel.mode = "category"
-      m.CategoryList.content = m.categoryContent    ' should be all cateogories but with no content in them
+      if m.categoryContent <> invalid
+        populateInfoWithFirstItem(m.categoryContent)
+      end if
       m.CategoryGridList.content = m.categoryContent  ' should be all categories with initial amounts of content in them
     else
       ' if we were loading in the background, don't show an error modal
@@ -89,6 +90,41 @@ Function onHomescreenResponse()
         sendDialogAnalyticsEvent("WARNING", m.Tracking, m.trackingLoggingTask)
       end if
     end if
+  end if
+End Function
+
+
+''''''''''''''''''''''''''''
+' populateInfoWithFirstItem
+'
+' When the content first loads, this is called to ensure the 1st item populates the info panel. 
+' If this function were not called and the homescreen lost focus (i.e. side menu gained focus) then the info panel would be vacant.
+Function populateInfoWithFirstItem(categoryContent)
+  if categoryContent <> invalid
+    category = categoryContent.getChild(0)
+    if category <> invalid
+      content = category.getChild(0)
+      if content <> invalid
+        contentId = content.id
+      end if
+    end if
+    if contentId <> invalid and contentId <> ""
+      metadataTranslate = TubiMetadataTranslate(m.constants)
+      item = metadataTranslate.getContentFromCategoryJson(category, contentId)
+      populateInfoPanel("item", item)
+      if item <> invalid
+        m.top.backgroundUriList = determineBackgroundImage(item)
+      end if
+    end if
+  end if
+
+End Function
+
+Function onEnableChange()
+  if m.top.enabled = true
+    fade(m.NavSection, "in", 0.3)
+  else
+    fade(m.NavSection, "out", 0.3)
   end if
 End Function
 
@@ -222,151 +258,16 @@ End Function
 Function onScreenFocusChange()
   tubiLog("CategoryScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus()
-    if m.lastFocused = "list"
-      m.CategoryList.setFocus(true)
-      m.listHasFocus = true
-      m.gridHasFocus = false
-    else
-      m.CategoryGridList.setFocus(true)
-      m.top.backgroundUriList = determineBackgroundImage(m.CategoryGridList.itemFocused)
-      m.listHasFocus = false
-      m.gridHasFocus = true
-    end if
+    m.CategoryGridList.setFocus(true)
+    m.top.backgroundUriList = determineBackgroundImage(m.CategoryGridList.itemFocused)
+    m.gridHasFocus = true
 
     if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
       loadAllCategories()
     end if
   else if m.top.isInFocusChain() = false
-    if m.listHasFocus = true
-      m.lastFocused = "list"
-    else
-      m.lastFocused = "grid"
-    end if
     m.gridHasFocus = false
-    m.listHasFocus = false
   end if
-End Function
-
-
-Function onCategoryMenuSelected()
-  m.top.categoryMenuVisible = false
-End Function
-
-
-''''''''''''''''''''
-' onKeyEvent
-'
-Function onKeyEvent(key As String, press As Boolean) As Boolean
-  tubiLog("CategoryScreen.onKeyEvent")
-  ' ignore keypresses until the screen content has shown up
-  if press and m.top.homescreenResponse <> invalid then
-    if key = "back"
-      m.top.toolsMenuSelected = true
-      return true
-    else if key = "up"
-      ' show tools if the first row is focused
-      if m.top.cursorPosition[0] = 0 
-        m.top.toolsMenuSelected = true
-        return true
-      end if
-    else if (key = "right" or key = "ok")
-      m.top.categoryMenuVisible = false
-      return true
-    else if key = "left"
-      m.top.categoryMenuVisible = true
-      return true
-    end if
-  end if
-  return false
-End Function
-
-
-' onCategoryMenuVisible
-Function onCategoryMenuVisible()
-  if m.top.categoryMenuVisible
-    showCategoryMenu()
-  else
-    hideCategoryMenu()
-  end if
-End Function
-
-
-Function showCategoryMenu()
-  if not m.CategoryList.isInFocusChain()
-    m.CategoryList.jumpToItem = Int(m.CategoryGridList.currFocusRow)
-    m.CategoryList.setFocus(true)
-    m.listHasFocus = true
-    if m.global.constants.deviceInfo.limitedUi
-      m.ContentArea.translation = [517,m.ContentArea.translation[1]]
-      m.CategoryList.translation = [60,m.CategoryList.translation[1]]
-    else
-      slideTo(m.ContentArea, [517,m.ContentArea.translation[1]], 0.5)
-      slideTo(m.CategoryList, [60,m.CategoryList.translation[1]], 0.5)
-    end if
-    m.CategoryGridList.isFullWidth = false
-    m.top.backgroundUriList = [m.defaultBackgroundUri]
-  end if
-End Function
-
-
-Function hideCategoryMenu()
-  if m.CategoryList.isInFocusChain()
-    m.CategoryGridList.setFocus(true)
-    m.listHasFocus = false
-    if m.global.constants.deviceInfo.limitedUi
-      m.ContentArea.translation = [85,m.ContentArea.translation[1]]
-      m.CategoryList.translation = [-380,m.CategoryList.translation[1]]
-    else
-      slideTo(m.ContentArea, [85,m.ContentArea.translation[1]], 0.5)
-      slideTo(m.CategoryList, [-380,m.CategoryList.translation[1]], 0.5)
-    end if
-    m.CategoryGridList.isFullWidth = true
-  end if
-End Function
-
-' Use this trigger to synchronize menu and grid
-Function onCategoryListScrollFocused()
-  ' Don't sync if CategoryList has focus and most likely triggered the grid category change
-  if m.CategoryList.isInFocusChain() and m.CategoryList.content <> invalid then
-    m.CategoryGridList.animateToCategory = m.CategoryList.rowScrollFocused
-  end if
-End Function
-
-
-'''''''''''''''''''''
-' onCategoryMenuItemFocused
-'
-' On category menu, item focus change, update the info panel
-Function onCategoryMenuItemFocused() As Void
-  tubiLog("CategoryScreen.onCategoryMenuItemFocused")
-  if not m.CategoryList.isInFocusChain() or m.CategoryList.content = invalid then return
-
-  infoMetadata = CreateObject("roSGNode", "CategoryContentNode")
-
-  newCategory = m.CategoryList.content.getChild(m.CategoryList.itemFocused)
-  if newCategory <> invalid
-    infoMetadata.title = newCategory.title
-    infoMetadata.description = newCategory.description
-    infoMetadata.totalCount = newCategory.totalCount
-    infoMetadata.logoUri = newCategory.logoUri
-  end if
-
-  populateInfoPanel("category", infoMetadata)
-
-  'Set up the navigateWithinPageInfo to send to ContentController via Homescreen
-  if m.listHasFocus = true
-    m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
-      componentOneof: m.Tracking.getAnalyticsComponent("category_list_component", {}) 'category_list_component doesn't exist in protos
-      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-      vertical_location: m.CategoryList.itemFocused + 1 '1 based index
-      vertical_location_mode: "INDEX"  'LocationMode enum
-      horizontal_location: 1
-      horizontal_location_mode: "INDEX"  'LocationMode enum
-    }
-  end if
-  m.listHasFocus = true
-  m.gridHasFocus = false
 End Function
 
 
@@ -430,7 +331,6 @@ Function onGridFocusChange() As Void
     end if
   end if
   m.gridHasFocus = true
-  m.listHasFocus = false
 End Function
 
 Function onGridItemSelected() As Void
@@ -470,14 +370,7 @@ Function onTotalCountsChange(msg)
     end if
   end for
 
-  itemFocused = m.CategoryList.rowScrollFocused
-  m.CategoryList.content = m.categoryContent
   m.CategoryGridList.content = m.categoryContent
-  ' NOTE: Setting the content for the CategoryList forces a refresh of the
-  ' CategorySeasonListItems but the side effect is the MarkupGrid focuses
-  ' to the first item.  We counteract that here by explicitly setting
-  ' the focus.
-  m.CategoryList.jumpToItem = itemFocused
 End Function
 
 

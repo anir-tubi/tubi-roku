@@ -28,6 +28,9 @@ Function TubiTracking (constants, request, auth)
 
     ' an AA structure of the valid "Oneofs" that are needed in various protos messages
     allOneofs: tubiTracking_getOneOfs()
+
+    'an AA map of page ids to their corresponding enum values for the LeftSideNavComponent Section
+    sideNavPageMap: tubiTracking_getSideNavPageMap(constants)
   }
 End Function
 
@@ -364,6 +367,12 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       pageOneof: {}  'a valid page type (see DialogEvent in events.protos)
     }
 
+    component_interaction: {
+      pageOneof: {}  'a valid page type (see ComponentInteractionEvent in events.protos)
+      componentOneof: {}  'a valid component type (see ComponentInteractionEvent in events.protos)
+      user_interaction: ""  'Interaction enum
+    }
+
     account: {
       manip: "" 'Manipulation enum - we only use "REGISTER_DEVICE" currently
       current: "" 'User.AuthType enum
@@ -660,6 +669,8 @@ Function tubiTracking_getOneOfs()
 
   category_list_page = {}
 
+  channel_list_page = {}
+
   video_page = {  'This corresponds to our details page
     video_id: -1
   }
@@ -688,6 +699,7 @@ Function tubiTracking_getOneOfs()
   account_page = {
     account_page_type: ""   'PageType enum
   }
+
   generic_page = {
     generic_page_type: ""   'GenericPageType enum
   }
@@ -705,6 +717,7 @@ Function tubiTracking_getOneOfs()
     category_page: category_page
     sub_category_page: sub_category_page
     category_list_page: category_list_page
+    channel_list_page: channel_list_page
     video_page: video_page
     series_detail_page: series_detail_page
     search_page: search_page
@@ -724,8 +737,10 @@ Function tubiTracking_getOneOfs()
     dest_static_page: static_page
     dest_home_page: home_page
     dest_category_page: category_page
+    dest_category_page: category_page
     dest_sub_category_page: sub_category_page
     dest_category_list_page: category_list_page
+    dest_channel_list_page: channel_list_page
     dest_video_page: video_page
     dest_series_detail_page: series_detail_page
     dest_search_page: search_page
@@ -756,20 +771,21 @@ Function tubiTracking_getOneOfs()
       generic_component_type: ""  ' GenericComponentType enum
     }
 
-    category_component: {   ' Used for category screen and channel details screen
+    left_side_nav_component: {
+      left_nav_section: ""  ' Section enum
+    }
+
+    category_component: {   ' Used for category screen, channel details screen, channel/category grid screen
       category_slug: ""
       category_row: -1   ' 1 based index
-      content_tile: {}  ' ContentTile message
+      category_col: -1   ' 1 based index
+      content_tile: {}  ' ContentTile message - optional
     }
 
     ' sub_category_component: {   'Does not currently exist in roku UI
     '   category_slug: ""
     '   sub_category_slug: ""
     '   category_row: 1   ' 1 based index
-    '   content_tile: {}  ' ContentTile message
-    ' }
-
-    ' content_tile_component: {   ' category_component or search_component should be used instead as it provides more info
     '   content_tile: {}  ' ContentTile message
     ' }
 
@@ -801,6 +817,17 @@ Function tubiTracking_getOneOfs()
     componentOneof: componentOneof
     contentOneof: contentOneof
   }
+End Function
+
+
+Function tubiTracking_getSideNavPageMap(constants)
+  map = {}
+  map[constants.ui.screenIds.homeScreen] = "HOME"
+  map[constants.ui.screenIds.channelListScreen] = "CHANNEL"
+  map[constants.ui.screenIds.categoryListScreen] = "GENRE"
+  map[constants.ui.screenIds.settingsScreen] = "SETTINGS"
+  map[constants.ui.screenIds.searchScreen] = "SEARCH"
+  return map
 End Function
 
 
