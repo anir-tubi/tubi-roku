@@ -631,9 +631,9 @@ Function getConstants()
       constants.ui.uris.detailBackgroundGradient = "pkg:/images/detail-gradient-25.png"
 
       'category background thumbnails
-      constants.ui.uris.categoryBackground_recommended = "pkg:/images/category-bg-recommended430x242.png"
-      constants.ui.uris.categoryBackground_continueWatching = "pkg:/images/category-bg-continue-watching430x242.png"
-      constants.ui.uris.categoryBackground_queue = "pkg:/images/category-bg-queue430x242.png"
+      constants.ui.uris.categoryBackground_recommended = "https://cdn.adrise.tv/image/roku_support_images/category_recommended_thumbnail_1x242.png"
+      constants.ui.uris.categoryBackground_continueWatching = "https://cdn.adrise.tv/image/roku_support_images/category_continuewatching_thumbnail_1x242.png"
+      constants.ui.uris.categoryBackground_queue = "https://cdn.adrise.tv/image/roku_support_images/category_queue_thumbnail_1x242.png"
 
 
       'default background image uri

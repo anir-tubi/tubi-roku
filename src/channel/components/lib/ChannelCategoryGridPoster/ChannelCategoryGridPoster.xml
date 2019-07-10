@@ -12,8 +12,6 @@
   <children>
     <Poster
      id="Poster"
-     loadingBitmapOpacity = "1"
-     failedBitmapOpacity = "1"
      failedBitmapUri = "pkg:/images/placeholder-featured.jpg"
      loadingBitmapUri = "pkg:/images/placeholder-featured.jpg">
     </Poster>
