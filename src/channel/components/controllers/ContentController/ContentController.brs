@@ -68,11 +68,7 @@ Function init()
   m.screenCache = {}
 
   m.SideNav = m.top.findNode("SideNav")
-  if getExperimentValue("RokuNamespace", "roku_side_nav") = "on"
-    initSideNav()
-  else
-    m.SideNav.visible = false
-  end if
+  initSideNav()
 
   m.videoPlayer = m.top.findNode("VideoPlayer")
   m.videoPlayer.observeFieldScoped("visible", "onVideoPlayerVisibleChange")
@@ -194,7 +190,7 @@ Function onComponentFocus()
   if m.top.isInFocusChain() and m.top.hasFocus()
     if m.videoPlayer.visible = true
       m.videoPlayer.setFocus(true)
-    else if m.SideNav.opened = true and getExperimentValue("RokuNamespace", "roku_side_nav") = "on"
+    else if m.SideNav.opened = true
       displayNavMenu()
     else if currentScreen() <> invalid
       currentScreen().setFocus(true)

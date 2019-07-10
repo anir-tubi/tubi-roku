@@ -21,6 +21,7 @@ Function init()
   m.ChannelCategoryGrid.observeField("itemFocused", "onItemFocused")
   m.ChannelCategoryGrid.observeField("itemSelected", "onItemSelected")
 
+  m.contentLoadedAndFocused = false
   m.top.screenLevel = m.constants.ui.screenLevels.channelCategoryGridScreen
 End Function
 
@@ -45,6 +46,7 @@ Function onEnableChange()
 End Function
 
 Function onScreenFocusChange()
+  tubiLog("ChannelGridScreen.onScreenFocusChange")
   if m.top.hasFocus() = true
     m.ChannelCategoryGrid.setFocus(true)
     if m.top.content <> invalid and m.top.content.getChildCount() > 0
@@ -52,6 +54,8 @@ Function onScreenFocusChange()
         m.top.refreshChannel = true
       end if
     end if
+  else if m.top.isInFocusChain() = false
+    m.contentLoadedAndFocused = false
   end if
 End Function
 

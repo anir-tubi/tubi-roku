@@ -10,7 +10,9 @@ End Function
 ' Indicates that the the current screen should gain focus
 Function onSetCurrentFocusCommand()
   screen = m.top.current
-  screen.setFocus(true)
+  if screen.isInFocusChain() <> true
+    screen.setFocus(true)
+  end if
   screen.visible = true
 End Function
 
