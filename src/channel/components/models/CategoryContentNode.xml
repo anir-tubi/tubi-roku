@@ -30,8 +30,8 @@
     <!-- A thumbnail that will be displayed as the background of channel and catrgory containers -->
     <field id="thumbnail" type="string" />
 
-    <!-- The alpha level that the thumbnails should be set to.  -->
-    <field id="thumbnailAlpha" value="1" type="float" />
+    <!-- special categories are "Recommended", "Continue Watching", and "Queue" -->
+    <field id="isSpecial" type="boolean" />
 
     <field id="slug" type="string" />
 

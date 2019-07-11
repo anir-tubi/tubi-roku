@@ -13,13 +13,11 @@
     <Poster
      id="Poster"
      failedBitmapUri = "pkg:/images/placeholder-featured.jpg"
-     loadingBitmapUri = "pkg:/images/placeholder-featured.jpg">
-    </Poster>
+     loadingBitmapUri = "pkg:/images/placeholder-featured.jpg" />
     <Poster
      id="Logo"
      width="200"
-     height="80">
-    </Poster>
+     height="80" />
     <Label
       id="Title"
       numLines="2"

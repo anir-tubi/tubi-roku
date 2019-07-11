@@ -19,8 +19,22 @@ Function onContentChange(data)
   m.title.visible = false
 
   if m.top.itemContent <> invalid then
+    if m.top.itemContent.isSpecial <> true
+      ' Thumbnail images from the matrix/homescreen API are currently 640 x 360.
+      ' These textures are too large when displayed in large amounts (over about 12) as occurs on the category list page,
+      ' resulting in screen flashes as the background and category posters re-render themselves.
+      ' Resampling the images to the size as they are meant to be displayed (430 x 242) uses less texture memory and prevents
+      ' flashing of images up to at least 48 category posters.
+      if m.constants.deviceInfo.limitedUi = true or m.constants.deviceInfo.lowVram = true
+        m.poster.loadWidth = 430
+        m.poster.loadHeight = 242
+        m.poster.loadDisplayMode = "scaleToZoom"
+      end if
+      m.poster.opacity = 0.3
+    end if
+
     m.poster.uri = m.top.itemContent.thumbnail
-    m.poster.opacity = m.top.itemContent.thumbnailAlpha
+
     categoryContent = m.top.itemContent.getParent()
     if categoryContent <> invalid then
         if m.top.itemContent.logouri <> invalid and m.top.itemContent.logouri <> ""

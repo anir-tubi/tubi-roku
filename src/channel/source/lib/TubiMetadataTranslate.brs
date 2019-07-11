@@ -530,15 +530,17 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
       if sID <> m.constants.ui.categoryIds.featured 
         if sID = m.constants.ui.categoryIds.recommendedForYou
           catRecommend = categoryAA
+          catRecommend.isSpecial = true
           catRecommend.thumbnail = m.constants.ui.uris.categoryBackground_recommended
         else if sID = sID_continue_watching
           catContinueWatching = categoryAA
+          catContinueWatching.isSpecial = true
           catContinueWatching.thumbnail = m.constants.ui.uris.categoryBackground_continueWatching
         else if sID = sID_queue
           catQueue = categoryAA
+          catQueue.isSpecial = true
           catQueue.thumbnail = m.constants.ui.uris.categoryBackground_queue
         else
-          categoryAA.thumbnailAlpha = .3
           homescreenAA.children.push(categoryAA)
         end if
       end if
