@@ -100,6 +100,7 @@ End Function
 ' When the content first loads, this is called to ensure the 1st item populates the info panel. 
 ' If this function were not called and the homescreen lost focus (i.e. side menu gained focus) then the info panel would be vacant.
 Function populateInfoWithFirstItem(categoryContent)
+  contentId = invalid
   if categoryContent <> invalid
     category = categoryContent.getChild(0)
     if category <> invalid
@@ -117,7 +118,6 @@ Function populateInfoWithFirstItem(categoryContent)
       end if
     end if
   end if
-
 End Function
 
 Function onEnableChange()
