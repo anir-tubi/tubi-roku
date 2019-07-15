@@ -679,6 +679,10 @@ Function tubiTracking_getOneOfs()
     series_id: -1
   }
 
+  episode_video_list_page = {
+    series_id: -1
+  }
+
   search_page = {
     query: ""   'There is no query associated with the search page
   }
@@ -718,6 +722,7 @@ Function tubiTracking_getOneOfs()
     channel_list_page: channel_list_page
     video_page: video_page
     series_detail_page: series_detail_page
+    episode_video_list_page: episode_video_list_page
     search_page: search_page
     auth_page: auth_page
     login_page: login_page
@@ -741,6 +746,7 @@ Function tubiTracking_getOneOfs()
     dest_channel_list_page: channel_list_page
     dest_video_page: video_page
     dest_series_detail_page: series_detail_page
+    dest_episode_video_list_page: episode_video_list_page
     dest_search_page: search_page
     dest_auth_page: auth_page
     dest_login_page: login_page

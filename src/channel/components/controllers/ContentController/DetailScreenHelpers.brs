@@ -879,11 +879,10 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
   else if entryPoint = "home"
     referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {})
   else if entryPoint = "episodeList"
-    seriesId = deeplinkContent.id
-    if Left(deepLinkContent.id, 1) = "0"
-      seriesId = Mid(deepLinkContent.id, 2)
+    if deepLinkContent <> invalid and type(deepLinkContent.id) = "roString"
+      seriesId = deeplinkContent.id.toInt()
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", {series_id: seriesId})
     end if
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("series_detail_page", {series_id: seriesId.toInt()})
   else if entryPoint = "video"
     referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
   end if

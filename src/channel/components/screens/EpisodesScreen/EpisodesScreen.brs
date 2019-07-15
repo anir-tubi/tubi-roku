@@ -21,7 +21,7 @@ Function init()
 
   'set initial tracking values
   m.top.trackingPageInfo = {
-    pageType: "series_detail_page"
+    pageType: "episode_video_list_page"
     pageValues: {
       series_id: 0
     }
@@ -58,7 +58,7 @@ Function onSeasonChangeMenu()
     setSeasonInfo(m.Menu.itemFocused)
 
     if m.listIsFocused = true
-      seriesDetailPage = getSeriesDetailPage(m.top.content)
+      seriesDetailPage = getEpisodeVideoListPage(m.top.content)
 
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(seriesDetailPage.type, seriesDetailPage.values)
@@ -108,7 +108,7 @@ Function onEpisodeFocused()
         }
       end if
 
-      seriesDetailPage = getSeriesDetailPage(m.top.content)
+      seriesDetailPage = getEpisodeVideoListPage(m.top.content)
 
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(seriesDetailPage.type, seriesDetailPage.values)
@@ -258,10 +258,10 @@ End Function
 
 
 ''''''''''''''''''''
-' getSeriesDetailPage
+' getEpisodeVideoListPage
 '
 ' @episode: roSGNode, series content node (m.top.content)
-Function getSeriesDetailPage(series)
+Function getEpisodeVideoListPage(series)
   values = {
     series_id: 0
   }
@@ -275,7 +275,7 @@ Function getSeriesDetailPage(series)
   end if
 
   return {
-    type: "series_detail_page"
+    type: "episode_video_list_page"
     values: values
   }
 End Function

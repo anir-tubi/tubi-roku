@@ -20,7 +20,7 @@ Function showEpisodeScreen(content, shouldSendNavigationAnalytics)
 
     'update tracking info - have to set the whole AA, can't update only a portion on the AA field
     episodesScreen.trackingPageInfo = {
-      pageType: "series_detail_page"
+      pageType: "episode_video_list_page"
       pageValues: {
         series_id: contentId
       }
