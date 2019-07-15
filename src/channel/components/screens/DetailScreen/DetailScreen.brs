@@ -379,23 +379,27 @@ Function onRelatedItemFocused()
       m.RelatedTitle.text = focusedContent.title
     end if
 
+    col = m.RelatedGrid.itemFocused + 1
+    row = 1
+    videoId = m.top.content.id.toInt()
+
     ' trigger navigate_within_page events in ContentController
     if m.relatedHasFocus = true
-      col = m.RelatedGrid.itemFocused + 1
-      row = 1
-      ymalComponent = {
-        content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-      }
-      videoId = m.top.content.id.toInt()
-
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId} )
-        componentOneof: m.Tracking.getAnalyticsComponent("related_component", ymalComponent) 'category_list_component doesn't exist in protos
+        componentOneof: m.Tracking.getAnalyticsComponent("related_component", m.oldYmalComponent) 'category_list_component doesn't exist in protos
         means_of_navigation: "BUTTON"  'MeansOfNavigation enum
         vertical_location: row '1 based index
         vertical_location_mode: "INDEX"  'LocationMode enum
         horizontal_location: col
         horizontal_location_mode: "INDEX"  'LocationMode enum
+      }
+      m.oldYmalComponent = {
+        content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
+      }
+    else
+      m.oldYmalComponent = {
+        content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
       }
     end if
     m.relatedHasFocus = true

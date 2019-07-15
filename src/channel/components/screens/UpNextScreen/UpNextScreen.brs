@@ -138,20 +138,27 @@ End Function
 Function onMovieItemFocused()
   tubiLog("UpNextScreen.onMovieItemFocused")
   itemFocusedHelper(m.GridMovie, m.InfoMovie)  'updates m.top.contentFocused
+  col = m.GridMovie.itemFocused + 1  '1 based index
+  row = 1
 
   'Set the navigateWithinPageInfo value which will pass through to ContentController via videoHelpers.brs
   'to fire a navigate_within_page analytics event.
   if m.isUpNextFocused = true
-    contentTile = m.Tracking.getAnalyticsTile(m.top.contentFocused, m.GridMovie.itemFocused + 1, 1)
     m.top.navigateWithinPageInfo = {
       pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: m.top.videoId.toInt()})
-      componentOneof: m.Tracking.getAnalyticsComponent("auto_play_component", {content_tile: contentTile})
+      componentOneof: m.Tracking.getAnalyticsComponent("auto_play_component", m.oldAutoPlayComponent)
       means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-      vertical_location: 1
+      vertical_location: row
       vertical_location_mode: "INDEX"  'LocationMode enum
-      horizontal_location: m.GridMovie.itemFocused + 1 '1 based index
+      horizontal_location: col
       horizontal_location_mode: "INDEX"  'LocationMode enum
     }
+
+    contentTile = m.Tracking.getAnalyticsTile(m.top.contentFocused, col, row)
+    m.oldAutoPlayComponent = {content_tile: contentTile}
+  else
+    contentTile = m.Tracking.getAnalyticsTile(m.top.contentFocused, col, row)
+    m.oldAutoPlayComponent = {content_tile: contentTile}
   end if
   m.isUpNextFocused = true
 End Function
