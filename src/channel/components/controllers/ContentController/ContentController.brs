@@ -542,7 +542,7 @@ End Function
 
 Function hideNavMenu(shouldTrackComponentInteraction = true)
   if m.SideNav.opened = true
-    m.SideNav.opened = false
+    m.SideNav.opened = false 
     focusCurrentScreen() '//This will set the current focus back to the screenstack items
 
     slideTo(m.SideNav, [m.nOriginalSideNavX, m.SideNav.translation[1]], .3)

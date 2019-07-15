@@ -46,7 +46,6 @@ Function onSideNavItemSelected()
     bSuccess = false
 
 '//::TODO::SIDENAV - (SHOW DESIGNERS as this might be a good bug) only root pages should display the menu. Listen to the stack and hide menu when when more than one screen is in stack. Also ensure the left button does not animate the sidenav for subPages
-'//::TODO::SIDENAV - add tracking logic
     if itemSelected = m.constants.ui.sideNavIds.profile
       if authInfo = invalid
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
@@ -71,6 +70,11 @@ Function onSideNavItemSelected()
       showCategoryListScreen(m.constants, "MENU")
       bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.settings
+      homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+      if homeScreen <> invalid
+        '//ensure the homescreen is enabled again since when the user backs out of the settings page, he will be returned to the home screen
+        homeScreen.enabled = true
+      end if
       showSettingsScreen()
       bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.exit
