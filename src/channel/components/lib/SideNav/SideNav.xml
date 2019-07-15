@@ -46,35 +46,58 @@
         </ContentNode>
       </MarkupList>
 
-
-      <MarkupList
-        numRows="4"
-        id="mainItems"
-        itemSize="[360, 70]"
-        itemSpacing="[0,20]"
-        vertFocusAnimationStyle="floatingFocus"
-        focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
-        focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
-        itemComponentName="SideNavIconComponent">  
-        <ContentNode id="MainContent" role="content" >
-          <SideNavContentNode
-            id="search"
-            title="Search"
-            iconUrl="pkg:/images/sideNavSearch.png"/>
-          <SideNavContentNode
-            id="home"
-            title="Home"
-            iconUrl="pkg:/images/sideNavHome.png"/>
-          <SideNavContentNode
-            id="categories"
-            title="Categories"
-            iconUrl="pkg:/images/sideNavCategories.png"/>
-          <SideNavContentNode
-            id="channels"
-            title="Channels"
-            iconUrl="pkg:/images/sideNavChannels.png"/>
-        </ContentNode>
-      </MarkupList>
+      <Group>
+        <MarkupList
+          numRows="4"
+          id="mainItemsSelected"
+          itemSize="[360, 70]"
+          itemSpacing="[0,20]"
+          vertFocusAnimationStyle="floatingFocus"
+          focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+          focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+          drawFocusFeedbackOnTop="false"
+          itemComponentName="SideNavIconComponent">  
+          <ContentNode id="MainContent-select" role="content" >
+            <SideNavContentNode
+              id="search-select"/>
+            <SideNavContentNode
+              id="home-select"/>
+            <SideNavContentNode
+              id="categories-select"/>
+            <SideNavContentNode
+              id="channels-select"/>
+          </ContentNode>
+        </MarkupList>
+        <MarkupList
+          numRows="4"
+          id="mainItems"
+          itemSize="[360, 70]"
+          itemSpacing="[0,20]"
+          vertFocusAnimationStyle="floatingFocus"
+          focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+          focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+          drawFocusFeedbackOnTop="false"
+          itemComponentName="SideNavIconComponent">  
+          <ContentNode id="MainContent" role="content" >
+            <SideNavContentNode
+              id="search"
+              title="Search"
+              iconUrl="pkg:/images/sideNavSearch.png"/>
+            <SideNavContentNode
+              id="home"
+              title="Home"
+              iconUrl="pkg:/images/sideNavHome.png"/>
+            <SideNavContentNode
+              id="categories"
+              title="Categories"
+              iconUrl="pkg:/images/sideNavCategories.png"/>
+            <SideNavContentNode
+              id="channels"
+              title="Channels"
+              iconUrl="pkg:/images/sideNavChannels.png"/>
+          </ContentNode>
+        </MarkupList>
+      </Group>
 
       <MarkupList
         numRows="2"

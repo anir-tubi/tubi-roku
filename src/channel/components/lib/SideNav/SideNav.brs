@@ -1,4 +1,5 @@
 Function init()
+  m.constants = m.global.constants
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("userName", "onSignedIn")
   m.top.observeFieldScoped("opened", "onOpenedChange")
@@ -16,6 +17,9 @@ Function init()
 
   m.mainItems = m.top.findNode("mainItems")
   initList(m.mainItems)
+  m.mainItemsSelected = m.top.findNode("mainItemsSelected")
+  m.mainItemsSelected.focusBitmapBlendColor = m.constants.ui.colors.selectedListItem
+  m.mainItemsSelected.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
 
   '//Inititate the default view
   onSignedIn()
@@ -30,6 +34,7 @@ End Function
 Function initList(list)
   list.observeFieldScoped("itemSelected", "onItemSelect")
   list.observeFieldScoped("focusedChild", "onListFocusChange")
+  list.focusBitmapBlendColor = m.constants.ui.colors.focused
   setDrawFocusFeedback(list)
 End Function
 
@@ -114,12 +119,14 @@ Function onOpenedChange()
     setContentActive(m.TopContent)
     setContentActive(m.MainContent)
     setContentActive(m.BottomContent)
+    m.mainItemsSelected.visible = true
   else
     fade(m.topItems, "out", 0.2)
     fade(m.bottomItems, "out", 0.2)
     setContentActive(m.TopContent, false)
     setContentActive(m.MainContent, false)
     setContentActive(m.BottomContent, false)
+    m.mainItemsSelected.visible = false
   end if
 End Function
 
@@ -143,10 +150,13 @@ End Function
 Function onItemRequested()
   if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and m.top.itemRequested <> m.itemSelectedRemembered 
     '//Go thru the lists and select the option that matxches the itemRequested
-    if focusItemInList(m.mainItems, m.top.itemRequested) < 0
+    nIndexMain = focusItemInList(m.mainItems, m.top.itemRequested)
+    if nIndexMain < 0
       if focusItemInList(m.bottomItems, m.top.itemRequested) < 0
         focusItemInList(m.topItems, m.top.itemRequested)
       end if
+    else 
+      m.mainItemsSelected.jumpToItem = nIndexMain
     end if
   end if
 End Function
@@ -187,6 +197,9 @@ Function onItemSelect(msg)
     list: list.id
     index: index
   }
+  if list.id = m.mainItems.id
+    m.mainItemsSelected.jumpToItem = index
+  end if
   m.itemSelectedRemembered = item.id
   m.top.itemSelected = item.id
 End Function

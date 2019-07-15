@@ -645,6 +645,7 @@ Function getConstants()
       constants.ui.colors.backgroundColor = "0x191919FF"
       constants.ui.colors.focused = "0xFF501AFF"
       constants.ui.colors.unfocused = "0xFFFFFFFF"
+      constants.ui.colors.selectedListItem = "0xFFFFFF33"
       constants.ui.colors.primaryText = "0xFFFFFFFF"
       constants.ui.colors.secondaryText = "0x777777FF"
       constants.ui.colors.focusedText = "0xFFFFFFFF"
