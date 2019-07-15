@@ -275,7 +275,7 @@ Function onInactivityTimer()
     else if (now - m.lastUserActivity - m.constants.timers.stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
       closeInactivityModal()
       if shouldStopOnStillWatchingTimeout() = true
-        returnToDetailScreenFromVideo(m.constants.player.playerResults.closed)
+        returnToDetailScreenFromVideo()
       else
         m.videoPlayer.control = "resume"
       end if
@@ -307,7 +307,7 @@ Function onInactivityButton()
   if button = 0
     m.videoPlayer.control = "resume"
   else
-    returnToDetailScreenFromVideo(m.constants.player.playerResults.closed)
+    returnToDetailScreenFromVideo()
   end if
 End Function
 

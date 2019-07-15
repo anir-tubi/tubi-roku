@@ -93,6 +93,8 @@ Function onComponentFocus()
     else if m.SeriesGroup.visible
       m.GridSeries.setFocus(true)
     end if
+  else if m.top.isInFocusChain() <> true
+    m.isUpNextFocused = false
   end if
 End Function
 
@@ -130,7 +132,6 @@ Function onKeyEvent(key, press)
   if press and key = "back"
     m.Timer.control = "stop"
     m.top.backPressed = true
-    m.isUpNextFocused = false
   end if
   return false
 End Function
@@ -166,7 +167,6 @@ End Function
 Function onMovieItemSelected()
   tubiLog("UpNextScreen.onMovieItemSelected")
   m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemSelected)
-  m.isUpNextFocused = false
 End Function
 
 Function itemFocusedHelper(grid, info)
@@ -189,7 +189,6 @@ End Function
 Function onSeriesItemSelected()
   tubiLog("UpNextScreen.onSeriesItemSelected")
   m.top.contentSelected = m.GridSeries.content.getChild(m.GridSeries.itemSelected)
-  m.isUpNextFocused = false
 End Function
 
 Function onCountdownTimer()
@@ -202,7 +201,6 @@ Function onCountdownTimer()
     else
       m.top.contentSelected = m.GridSeries.content.getChild(0)
     end if
-    m.isUpNextFocused = false
     m.Timer.control = "stop"
   else
     if m.MovieGroup.visible

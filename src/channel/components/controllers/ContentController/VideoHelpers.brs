@@ -185,7 +185,7 @@ Function onUpNextBackPressed()
       '//go to next upNext video that was last focused
       playUpNextContent(focusedVideo, "automatic")
     else
-      returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+      returnToDetailScreenFromVideo()
     end if
   else
     m.ScreenStack.visible = false
@@ -217,7 +217,7 @@ Function onVideoPlayerState(msg)
     ' If trailer, play the feature
     finishedContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
     if finishedContent.isTrailer
-      returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+      returnToDetailScreenFromVideo()
 
     ' If not a trailer, look for UpNext content to play
     else
@@ -232,7 +232,7 @@ Function onVideoPlayerState(msg)
         stopVideoContent(false)
         playVideoContent(nextContent, "automatic")
       else
-        returnToDetailScreenFromVideo(m.constants.player.playerResults.completed)
+        returnToDetailScreenFromVideo()
       end if
     end if
   end if
@@ -241,7 +241,7 @@ End Function
 
 Function onVideoPlayerBackPressed()
   tubiLog("VideoHelpers.onVideoPlayerBackPressed")
-  returnToDetailScreenFromVideo(m.constants.player.playerResults.closed)
+  returnToDetailScreenFromVideo()
 End Function
 
 
@@ -257,7 +257,7 @@ End Function
 '   - Deep link: exit video player movie after autoplay    : 2 - replace detail screen and fetch full content with related items
 '   - Deep link: Exit video player series                  : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
 '   - Deep link: Exit video player series after autoplay   : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
-Function returnToDetailScreenFromVideo(result)
+Function returnToDetailScreenFromVideo()
   stopVideoContent(true)
   ' get updated content, to be used to reload or re-populate details screen
   content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex) 'this always returns a video - sometimes an episode
@@ -280,25 +280,29 @@ Function returnToDetailScreenFromVideo(result)
   end if
 
   'reload or re-populate the screen as necessary
-  if currentScreen() <> invalid and currentScreen().subType() = "DetailScreen"
-    if currentScreen().content <> invalid and currentScreen().content.id = content.id
-      '//So the detailed page does not have a refresh issue, pass the local resume number before the backend communicates.
-      nResumePoint = m.videoPlayer.historyPosition '//The problem with this is that if the backend comes back with a different number than the local number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video. The local number is 2 seconds and displays the resume button, but the backend determines that 2 seconds is not enough to warrant a resume button and returns 0 as the resume point.
+  curScreen = currentScreen()
+  if curScreen <> invalid
+    if curScreen.subType() = "DetailScreen"
+      if curScreen.content <> invalid and curScreen.content.id = content.id
+        '//So the detailed page does not have a refresh issue, pass the local resume number before the backend communicates.
+        nResumePoint = m.videoPlayer.historyPosition '//The problem with this is that if the backend comes back with a different number than the local number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video. The local number is 2 seconds and displays the resume button, but the backend determines that 2 seconds is not enough to warrant a resume button and returns 0 as the resume point.
 
-      if nResumePoint < m.constants.player.historyFrequency or (m.videoPlayer.creditsPosition > 0 and nResumePoint > m.videoPlayer.creditsPosition)
-        '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0
-        nResumePoint = 0
+        if nResumePoint < m.constants.player.historyFrequency or (m.videoPlayer.creditsPosition > 0 and nResumePoint > m.videoPlayer.creditsPosition)
+          '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0
+          nResumePoint = 0
+        end if
+        ' Action 1, 3, 5 - same content so just re-populate screen with any updates
+        populateDetailScreen(curScreen, content, true, nResumePoint)
+      else
+        ' Action 2 - new content so tear down the details screen and rebuild it
+        popScreen(false)
+        showDetailScreen(content)
       end if
-      ' Action 1, 3, 5 - same content so just re-populate screen with any updates
-      populateDetailScreen(currentScreen(), content, true, nResumePoint)
     else
-      ' Action 2 - new content so tear down the screen and rebuild it
-      popScreen(false)
-      showDetailScreen(content)
+      'this can happen in the edge case of where ad playback happens after the autoplay UI has started and a user backs out of the ad
+      'leading to the UpNextScreen being at the top of the screen stack when the VideoPlayer.backButtonPressed field is triggered.
+      curScreen.setFocus(true)
     end if
-  else
-    ' This is a safety, but no code paths actually lead here currently 2.5.111
-    showDetailScreen(content)
   end if
 End Function
 
