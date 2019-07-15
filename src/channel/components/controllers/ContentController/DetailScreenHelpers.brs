@@ -402,6 +402,7 @@ End Function
 Function onSingleContentError(msg)
   error = msg.GetData()
   task = msg.getRoSGNode()
+  detailScreen = task.target
   tubiLog("DetailScreenHelpers.onSingleContentError")
 
   content = invalid
@@ -411,7 +412,6 @@ Function onSingleContentError(msg)
   task.unobserveField("response")
   task.unobserveField("error")
   task = invalid
-  detailScreen = currentScreen()
   ' Roku requires that errors are not shown for invalid content ids when deep linking
   if m.enteredFromDeepLink = true
     m.enteredFromDeepLink = false
@@ -434,7 +434,7 @@ Function onSingleContentError(msg)
     ' however, movie details screens do load, and episode details screens don't load, but we don't know the content id of the episode's video
     ' which means that our page information cannot be built properly and the call is squashed by back end validation. So we just don't send for now.
 
-    content = getDetailScreenContent()
+    content = getDetailScreenContent(detailScreen)
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
   end if
 End Function
@@ -494,9 +494,12 @@ End Function
 
 
 ' Helper to deduce the content, video or episode, to play or resume
-Function getDetailScreenContent()
-  screen = currentScreen()
-  if screen <> invalid and screen.content <> invalid
+Function getDetailScreenContent(screen = invalid)
+  if screen = invalid
+    screen = currentScreen()
+  end if
+
+  if screen <> invalid and screen.subType() = "DetailScreen" and screen.content <> invalid
     return screen.content
   else
     return invalid
@@ -518,7 +521,7 @@ Function onAddToQueue(detailScreen)
     message = "You must be signed in to add a title to your queue."
     buttons = ["Sign in or Register", "Cancel"]
     showModal(title, message, buttons, "onSignInModalButtonSelected")
-    content = getDetailScreenContent()
+    content = getDetailScreenContent(detailScreen)
     sendDialogAnalytics(content, "INFORMATION", m.Tracking, m.trackingLoggingTask)
   else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
     detailScreen.addToQueueTitle = "Adding..."
@@ -569,7 +572,7 @@ Function onBookmarked(msg) As Void
     errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, reason)
     showErrorModal(errorObj, onAddToQueueSelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "addToQueueTitle", "Add to queue"])
 
-    content = getDetailScreenContent()
+    content = getDetailScreenContent(detailScreen)
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
     return
   end if
@@ -639,7 +642,7 @@ Function onBookmarkRemoved(msg) As Void
     errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, reason, code)
     showErrorModal(errorObj, onRemoveFromQueueSelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "removeQueueTitle", "Remove from queue"])
 
-    content = getDetailScreenContent()
+    content = getDetailScreenContent(detailScreen)
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
     return
   end if
@@ -709,7 +712,7 @@ Function onHistoryRemoved(msg) As Void
     errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, reason, code)
     showErrorModal(errorObj, onRemoveFromHistorySelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "removeHistoryTitle", "Remove from history"])
 
-    content = getDetailScreenContent()
+    content = getDetailScreenContent(detailScreen)
     sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
     return
   end if
@@ -767,9 +770,10 @@ Function episodesHelper(screen)
 End Function
 
 
-Function onWatchTrailer()
+Function onWatchTrailer(msg)
   tubiLog("ContentController.onWatchTrailer")
-  content = getDetailScreenContent()
+  detailScreen = msg.getRoSGNode()
+  content = getDetailScreenContent(detailScreen)
   if content <> invalid then
     trailerContent = CreateObject("roSGNode", "TubiContentNode")
     if content.id <> invalid
@@ -834,16 +838,6 @@ Function resumeHelper(detailScreen)
     playVideoContent(episode, "none", nowPos)
   else
     tubiLog("ERROR: Resume selected but content is invalid")
-  end if
-End Function
-
-
-Function onPlaySignInModalButtonSelected(msg)
-  if msg.getData() = 0
-    startSignIn(true)
-  else
-    episode = getEpisodeContent(getDetailScreenContent())
-    playVideoContent(episode, "none", 0)
   end if
 End Function
 
