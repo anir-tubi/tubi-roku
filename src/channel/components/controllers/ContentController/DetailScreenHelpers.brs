@@ -23,6 +23,14 @@ Function showDetailScreen(content)
     detailScreen.observeFieldScoped("refreshContent", "onRefreshContentSignal")
     m.refreshingDetailCache = false
 
+    ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
+    detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
+
+    ' Setting the content on the detail screen here prior to getting a response back from server with full info,
+    ' so that it may be used for analytics in the case of failing to fetch the full info from the server.
+    ' We expect to overwrite this in populateDetailScreen() which occurs after the full info has been fetched from the /content API
+    detailScreen.content = content
+
     if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
       detailScreen.isLoading = true
     else
@@ -188,8 +196,6 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     if content.backgrounds <> invalid and content.backgrounds.count() > 0
       backgroundUriList = content.backgrounds
     end if
-
-    detailScreen.content = content
   end if
 
   detailScreen.backgroundUriList = backgroundUriList
@@ -198,13 +204,11 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     uriList: backgroundUriList
   }
 
-  'update tracking info - have to set the whole AA, can't update only a portion on the AA field
-  detailScreen.trackingPageInfo = {
-    pageType: "video_page"
-    pageValues: {
-      video_id: stateSource.id.toInt()
-    }
-  }
+  'update tracking info - have to set the whole AA, can't update only a portion on the AA field.
+  'it is necessary to update trackingPageInfo here so that the correct pageInfo is stored in the case where a deeplink has an
+  'episode content id, but the detail screen content will ultimately be a series content node. Updating here occurs when the
+  'full content has been returned from the /contents API.
+  detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
   detailScreen.content = content
 End Function
 
@@ -247,6 +251,7 @@ Function onSingleContentResponse(msg) As Void
   tubiLog("DetailScreenHelpers.onSingleContentResponse")
   task = msg.getRoSGNode()
   detailScreen = task.target
+  detailScreen.contentFetchError = false
 
   task.unobserveField("response")
   task.unobserveField("error")
@@ -289,7 +294,7 @@ Function onSingleContentResponse(msg) As Void
       else
         refreshedContent.currentEpisodeId = ""
       end if
-      sendDeeplinkAnalytics(m.top.deepLinkContent, "video", m.Tracking, m.trackingLoggingTask)
+      sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
     else if (m.top.deepLinkContent.deeplinkType = "season" or m.top.deepLinkContent.deeplinkType = "episode" or m.top.deepLinkContent.deeplinkType = "series") and refreshedContent.type = m.constants.ui.contentTypes.video
       '  refreshedContent.id =       episode id
       '  refreshedContent.seriesId = series id
@@ -314,7 +319,7 @@ Function onSingleContentResponse(msg) As Void
       ' when deeplinkType = "season", deeplinkContent.id should be an episode id. We want to send tracking with the series id.
       m.top.deepLinkContent.id = refreshedContent.id
       afterFn = episodesHelper
-      sendDeeplinkAnalytics(m.top.deepLinkContent, "episodeList", m.Tracking, m.trackingLoggingTask)
+      sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "episodeList", m.Tracking, m.trackingLoggingTask, m.constants)
     else if m.top.deepLinkContent.deeplinkType = "episode" and refreshedContent.type = m.constants.ui.contentTypes.series
       '  refreshedContent.id =       series id
       '  refreshedContent.seriesId = invalid
@@ -331,7 +336,7 @@ Function onSingleContentResponse(msg) As Void
       else
         afterFn = playHelper
       end if
-      sendDeeplinkAnalytics(m.top.deepLinkContent, "video", m.Tracking, m.trackingLoggingTask)
+      sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
     else if m.top.deepLinkContent.deeplinkType = "movie"
       'determine if we need to resume or play from start the deeplinked movie
       if m.top.deepLinkContent.nowPos <> invalid and m.top.deepLinkContent.nowPos > 0
@@ -340,12 +345,12 @@ Function onSingleContentResponse(msg) As Void
       else
         afterFn = playHelper
       end if
-      sendDeeplinkAnalytics(m.top.deepLinkContent, "video", m.Tracking, m.trackingLoggingTask)
+      sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
     else
       'start the channel normally in case of issues
       'handle deeplinking tracking when landing on category/home screen
       m.enteredFromDeepLink = false
-      sendDeeplinkAnalytics(m.top.deepLinkContent, "home", m.Tracking, m.trackingLoggingTask)
+      sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "home", m.Tracking, m.trackingLoggingTask, m.constants)
       starChannel()
       return
     end if
@@ -416,26 +421,34 @@ Function onSingleContentError(msg)
   if m.enteredFromDeepLink = true
     m.enteredFromDeepLink = false
     popScreen(false)
-    sendDeeplinkAnalytics(m.top.deepLinkContent, "home", m.Tracking, m.trackingLoggingTask)
-    starChannel()
+    content = getDetailScreenContent(detailScreen)
+    sendDeeplinkAnalytics(m.top.deepLinkContent, content, "home", m.Tracking, m.trackingLoggingTask, m.constants)
+    startChannel()
   else if m.refreshingDetailCache = true
     m.refreshingDetailCache = false
   else
     message = "Could not retrieve content information from server."
-    if content = invalid 
-      content = detailScreen.content
-    end if
+    content = getDetailScreenContent(detailScreen)
     getSingleContentParams = [detailScreen, content]
   
     errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, message, error.code)
     showErrorModal(errorObj, getSingleContentFromServerRetry, getSingleContentParams, onCloseErrorModal)
 
-    ' Typically we would want to make a call to screenTrackingLoad() with success=false here to indicate to analytics that the page did not load;
-    ' however, movie details screens do load, and episode details screens don't load, but we don't know the content id of the episode's video
-    ' which means that our page information cannot be built properly and the call is squashed by back end validation. So we just don't send for now.
+    ' Handle navigate_to_page and page_load tracking for detail screen for error cases
+    if detailScreen <> invalid and detailScreen.contentFetchError = false
+      oldScreen = getHiddenScreen(1)  'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
+      if oldScreen <> invalid
+        screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
+      end if
+      loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000)  'in ms
+      screenTrackingLoad(detailScreen.trackingPageInfo, loadTime, false)
+    end if
 
-    content = getDetailScreenContent(detailScreen)
-    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
+    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask, m.constants)
+  end if
+
+  if detailScreen <> invalid
+    detailScreen.contentFetchError = true
   end if
 End Function
 
@@ -460,7 +473,7 @@ End Function
 
 ' Given a content node that may be a series or a video, return the appropriate video to play.
 ' This may just be returning the video that is passed in (in the case of a movie).
-' @contentNode content node
+' @content: roSGNode, a movie or series content node
 Function getEpisodeContent(content)
   if content <> invalid
     if content.currentEpisodeId <> invalid and content.currentEpisodeId <> ""
@@ -522,7 +535,7 @@ Function onAddToQueue(detailScreen)
     buttons = ["Sign in or Register", "Cancel"]
     showModal(title, message, buttons, "onSignInModalButtonSelected")
     content = getDetailScreenContent(detailScreen)
-    sendDialogAnalytics(content, "INFORMATION", m.Tracking, m.trackingLoggingTask)
+    sendDialogAnalytics(content, "INFORMATION", m.Tracking, m.trackingLoggingTask, m.constants)
   else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
     detailScreen.addToQueueTitle = "Adding..."
     userTask = CreateObject("roSGNode", "AuthTask")
@@ -573,7 +586,7 @@ Function onBookmarked(msg) As Void
     showErrorModal(errorObj, onAddToQueueSelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "addToQueueTitle", "Add to queue"])
 
     content = getDetailScreenContent(detailScreen)
-    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
+    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask, m.constants)
     return
   end if
 
@@ -581,7 +594,7 @@ Function onBookmarked(msg) As Void
   detailScreen.isBookmark = true
   detailScreen.isWaitingForServerResponse = false
 
-  sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask)
+  sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
   onHistoryQueueChange(m.constants.ui.categoryIds.queue)
 End Function
 
@@ -643,12 +656,12 @@ Function onBookmarkRemoved(msg) As Void
     showErrorModal(errorObj, onRemoveFromQueueSelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "removeQueueTitle", "Remove from queue"])
 
     content = getDetailScreenContent(detailScreen)
-    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
+    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask, m.constants)
     return
   end if
 
   detailScreen.isWaitingForServerResponse = false
-  sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_QUEUE", m.Tracking, m.trackingLoggingTask)
+  sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
   onHistoryQueueChange(m.constants.ui.categoryIds.queue)
 End Function
 
@@ -713,13 +726,13 @@ Function onHistoryRemoved(msg) As Void
     showErrorModal(errorObj, onRemoveFromHistorySelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "removeHistoryTitle", "Remove from history"])
 
     content = getDetailScreenContent(detailScreen)
-    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask)
+    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask, m.constants)
     return
   end if
 
   detailScreen.isWaitingForServerResponse = false
   detailScreen.isHistory = false
-  sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask)
+  sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask, m.constants)
   onHistoryQueueChange(m.constants.ui.categoryIds.history)
 End Function
 
@@ -761,12 +774,12 @@ End Function
 Function onEpisodeList(msg)
   tubiLog("ContentController.onEpisodeList")
   detailScreen = msg.getRoSGNode()
-  episodesHelper(detailScreen)
+  showEpisodeScreenWithNavigationTracking(detailScreen.content)
 End Function
 
 
 Function episodesHelper(screen)
-  showEpisodeScreen(screen.content)
+  showEpisodeScreenWithoutNavigationTracking(screen.content)
 End Function
 
 
@@ -846,18 +859,23 @@ End Function
 ' actually send the event.
 '
 ' @deepLinkContent: roSGNode, a content node created by deeplink logic and passed to the content controller via m.top.deeplinkContent
+' @refreshedContent: roSGNode, a content node containing full information from the /content API
 ' @entryPoint: string, indicates where the user will land after the deeplink, can be one of: "detail", "home", "episodeList", "video"
 ' @trackingLib: associativeArray, an instance of TubiTracking()
 ' @trackingTask: roSGNode, an instance of the TrackingLoggingTask
-Function sendDeeplinkAnalytics(deepLinkContent, entryPoint, trackingLib, trackingTask)
+' @constants: associativeArray, m.constants
+Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, trackingLib, trackingTask, constants)
   referredAnalyticsEvent = {
     referred_type: "DEEP_LINK"
     campaign: deepLinkContent.campaign
     source: deepLinkContent.source
     medium: deepLinkContent.medium
   }
+
+  pageInfo = getDetailScreenAnalyticsPageInfo(refreshedContent, constants)
+
   if entryPoint = "detail"
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("video_page", {video_id: deepLinkContent.id.toInt()})
+    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
   else if entryPoint = "home"
     referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {})
   else if entryPoint = "episodeList"
@@ -867,7 +885,7 @@ Function sendDeeplinkAnalytics(deepLinkContent, entryPoint, trackingLib, trackin
     end if
     referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("series_detail_page", {series_id: seriesId.toInt()})
   else if entryPoint = "video"
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("video_page", {video_id: deepLinkContent.id.toInt()})
+    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
   end if
 
   trackingTask.trackEvent = {
@@ -880,18 +898,19 @@ End Function
 ' Organizes the information needed to create a "bookmark" tracking event and sends the information to the trackingTask which will
 ' actually send the event.
 '
-' @content: roSGNode, the content that is residing on the details page
+' @content: roSGNode, the content that is residing on the details page, can be a movie or series
 ' @operation: string, one of the valid operations as defined in events.protos -> Bookmarks -> enum Operation
 ' @trackingLib: associativeArray, an instance of TubiTracking()
 ' @trackingTask: roSGNode, an instance of the TrackingLoggingTask
-Function sendBookmarkAnalytics(content, operation, trackingLib, trackingTask)
+Function sendBookmarkAnalytics(content, operation, trackingLib, trackingTask, constants)
   bookmarkAnalyticsEvent = {
     contentOneof: {}
     op: operation
     component: {} 'menu component not currently included in protos definition
   }
   if type(content) = "roSGNode" and content.isSubtype("ContentNode") = true
-    bookmarkAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("video_page", {video_id: content.id.toInt()})
+    pageInfo = getDetailScreenAnalyticsPageInfo(content, constants)
+    bookmarkAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
   end if
 
   if content.type = m.constants.ui.contentTypes.series
@@ -914,11 +933,11 @@ End Function
 ' Organizes the information needed to create a "dialog" tracking event and sends the information to the trackingTask which will
 ' actually send the event.
 '
-' @content: roSGNode, the content that is residing on the details page
+' @content: roSGNode, the content that is residing on the details page content field, can be a movie or series
 ' @dialogType: string, one of the valid operations as defined in events.protos -> DialogEvent -> enum DialogType
 ' @trackingLib: associativeArray, an instance of TubiTracking()
 ' @trackingTask: roSGNode, an instance of the TrackingLoggingTask
-Function sendDialogAnalytics(content, dialogType, trackingLib, trackingTask)
+Function sendDialogAnalytics(content, dialogType, trackingLib, trackingTask, constants)
   dialogAnalyticsEvent = {
     type: "dialog"
     values: {
@@ -927,8 +946,38 @@ Function sendDialogAnalytics(content, dialogType, trackingLib, trackingTask)
   }
 
   if type(content) = "roSGNode" and content.isSubtype("ContentNode") = true
-    dialogAnalyticsEvent.values.pageOneof = trackingLib.getAnalyticsPage("video_page", {video_id: content.id.toInt()})
+    pageInfo = getDetailScreenAnalyticsPageInfo(content, constants)
+    dialogAnalyticsEvent.values.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
   end if
 
   trackingTask.trackEvent = dialogAnalyticsEvent
+End Function
+
+
+' From an analytics point of view, the details screen can be a video_page or a series_detail_page depending if the content it
+' it is displaying is a movie or an episode. This function returns an AA with pageType and pageValue keys that can be passed into
+' m.Tracking.getAnalyticsPage(pageType, pageValues) to create the appropriate analytics page message, based on the content type.
+' May also return invalid if the content parameter is not a ContentNode with values on appropriate fields.
+'
+' @content: roSGNode, the content that is residing on the details page content field, can be a movie or series
+Function getDetailScreenAnalyticsPageInfo(content, constants)
+  pageInfo = invalid
+  if content <> invalid and type(content.id) = "roString"
+    if content.type = constants.ui.contentTypes.series
+      pageInfo = {
+        pageType: "series_detail_page"
+        pageValues: {
+          series_id: content.id.toInt()
+        }
+      }
+    else if content.type = constants.ui.contentTypes.video
+      pageInfo = {
+        pageType: "video_page"
+        pageValues: {
+          video_id: content.id.toInt()
+        }
+      }
+    end if
+  end if
+  return pageInfo
 End Function

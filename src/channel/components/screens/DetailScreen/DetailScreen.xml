@@ -82,6 +82,11 @@
       <!-- hides or shows the loading spinner -->
       <field id="isLoading" type="boolean" alias="DetailSpinner.visible" />
 
+      <!-- holds state info about if there was an error in retrieving the content for this page.
+           Is used to prevent multiple navigate_to_page and page_load events if a user retries to load content from the error modal.
+       -->
+      <field id="contentFetchError" type="boolean" value="false" />
+
       <!-- content to populated the RelatedGrid -->
       <field id="relatedContent" alias="RelatedGrid.content" />
 

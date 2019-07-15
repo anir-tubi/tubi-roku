@@ -1,4 +1,15 @@
-Function showEpisodeScreen(content)
+Function showEpisodeScreenWithNavigationTracking(content)
+  showEpisodeScreen(content, true)
+End Function
+
+Function showEpisodeScreenWithoutNavigationTracking(content)
+  showEpisodeScreen(content, false)
+End Function
+
+
+'@content: roSGNode, a series content node with seasons and episodes as children and grandchildren, respectively
+'@shouldSendAnalytics: boolean, dictates if navigate_to_page and page_load analytics are sent for the episode screen
+Function showEpisodeScreen(content, shouldSendNavigationAnalytics)
   episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
   episodesScreen.content = content
   episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")
@@ -17,7 +28,7 @@ Function showEpisodeScreen(content)
   end if
 
   episodesScreen.episodeToFocus = findEpisode2dIndex(content.currentEpisodeId, content)
-  pushScreen(episodesScreen, true, true)
+  pushScreen(episodesScreen, shouldSendNavigationAnalytics, true)
 End Function
 
 
