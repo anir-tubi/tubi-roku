@@ -415,7 +415,7 @@ Function onSingleContentError(msg)
   ' Roku requires that errors are not shown for invalid content ids when deep linking
   if m.enteredFromDeepLink = true
     m.enteredFromDeepLink = false
-    popScreen()
+    popScreen(false)
     sendDeeplinkAnalytics(m.top.deepLinkContent, "home", m.Tracking, m.trackingLoggingTask)
     starChannel()
   else if m.refreshingDetailCache = true
