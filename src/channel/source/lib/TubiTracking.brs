@@ -700,9 +700,7 @@ Function tubiTracking_getOneOfs()
     account_page_type: ""   'PageType enum
   }
 
-  generic_page = {
-    generic_page_type: ""   'GenericPageType enum
-  }
+  access_menu_page = {}
 
   ' onboarding_page = {}   'not currently used
   ' landing_page = {}    'not currently used
@@ -725,7 +723,7 @@ Function tubiTracking_getOneOfs()
     login_page: login_page
     register_page: register_page
     account_page: account_page
-    generic_page: generic_page
+    access_menu_page: access_menu_page
     ' onboarding_page: onboarding_page
     ' landing_page: landing_page
     ' splash_page: splash_page
@@ -748,7 +746,7 @@ Function tubiTracking_getOneOfs()
     dest_login_page: login_page
     dest_register_page: register_page
     dest_account_page: account_page
-    dest_generic_page: generic_page
+    dest_access_menu_page: access_menu_page
     ' dest_onboarding_page: onboarding_page
     ' dest_landing_page: landing_page
     ' dest_splash_page: splash_page
