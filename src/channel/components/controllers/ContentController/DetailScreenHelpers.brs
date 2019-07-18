@@ -351,7 +351,7 @@ Function onSingleContentResponse(msg) As Void
       'handle deeplinking tracking when landing on category/home screen
       m.enteredFromDeepLink = false
       sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "home", m.Tracking, m.trackingLoggingTask, m.constants)
-      starChannel()
+      startChannel()
       return
     end if
   else
