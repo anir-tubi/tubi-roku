@@ -57,6 +57,9 @@ Function init()
       video_id: 0
     }
   }
+  if m.constants.deviceInfo.scaledUi = true then
+    m.RelatedGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
+  end if
 
   ' Used to determine if navigate_within_page events should be sent. Only send when the related content already
   ' has focus, not when it gains focus.

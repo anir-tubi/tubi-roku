@@ -26,6 +26,10 @@ Function init()
   m.top.trackingPageInfo = createTrackingPageInfo(invalid)
   m.oldCategoryComponent = invalid
 
+  if m.constants.deviceInfo.scaledUi = true then
+    m.VideoGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
+  end if
+
   m.top.screenLevel = m.constants.ui.screenLevels.channelDetailScreen
 End Function
 

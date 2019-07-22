@@ -23,6 +23,11 @@ Function init()
 
   m.contentLoadedAndFocused = false
   m.top.screenLevel = m.constants.ui.screenLevels.channelCategoryGridScreen
+
+
+  if m.constants.deviceInfo.scaledUi = true then
+    m.ChannelCategoryGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
+  end if
 End Function
 
 Function onSetCallOfAction()
