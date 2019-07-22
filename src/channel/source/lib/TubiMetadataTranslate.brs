@@ -531,15 +531,15 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
         if sID = m.constants.ui.categoryIds.recommendedForYou
           catRecommend = categoryAA
           catRecommend.isSpecial = true
-          catRecommend.thumbnail = m.constants.ui.uris.categoryBackground_recommended
+          catRecommend.thumbnail = m.constants.ui.uris.categoryBackgrounds.recommended
         else if sID = sID_continue_watching
           catContinueWatching = categoryAA
           catContinueWatching.isSpecial = true
-          catContinueWatching.thumbnail = m.constants.ui.uris.categoryBackground_continueWatching
+          catContinueWatching.thumbnail = m.constants.ui.uris.categoryBackgrounds.continueWatching
         else if sID = sID_queue
           catQueue = categoryAA
           catQueue.isSpecial = true
-          catQueue.thumbnail = m.constants.ui.uris.categoryBackground_queue
+          catQueue.thumbnail = m.constants.ui.uris.categoryBackgrounds.queue
         else
           homescreenAA.children.push(categoryAA)
         end if
@@ -559,6 +559,15 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
   if catRecommend <> invalid
     homescreenAA.children.Unshift(catRecommend)
   end if
+
+  ' use gradient images that reside on the CDN for category/channel poster images
+  for i=0 to homescreenAA.children.count()-1
+    categoryAA = homescreenAA.children[i]
+    if categoryAA.isSpecial <> true
+      thumbnailNumber = (i MOD 11) + 1
+      categoryAA.thumbnail = m.constants.ui.uris.categoryBackgrounds.urlBase + thumbnailNumber.toStr() + m.constants.ui.uris.categoryBackgrounds.urlEnding 
+    end if
+  end for
 
   translated.update(homescreenAA)
   node_count = 1 + translated.getChildCount()

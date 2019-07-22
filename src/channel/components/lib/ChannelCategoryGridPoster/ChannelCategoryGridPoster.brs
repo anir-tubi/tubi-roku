@@ -30,7 +30,6 @@ Function onContentChange(data)
         m.poster.loadHeight = 242
         m.poster.loadDisplayMode = "scaleToZoom"
       end if
-      m.poster.opacity = 0.3
     end if
 
     m.poster.uri = m.top.itemContent.thumbnail
