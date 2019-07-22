@@ -26,9 +26,12 @@ Function onContentChange(data)
       ' Resampling the images to the size as they are meant to be displayed (430 x 242) uses less texture memory and prevents
       ' flashing of images up to at least 48 category posters.
       if m.constants.deviceInfo.limitedUi = true or m.constants.deviceInfo.lowVram = true
-        m.poster.loadWidth = 430
-        m.poster.loadHeight = 242
-        m.poster.loadDisplayMode = "scaleToZoom"
+        urlBaseLength = Len(m.constants.ui.uris.categoryBackgrounds.urlBase)
+        if type(m.top.itemContent.thumbnail) = "roString" and Left(m.top.itemContent.thumbnail, urlBaseLength) <> m.constants.ui.uris.categoryBackgrounds.urlBase
+          m.poster.loadWidth = 430
+          m.poster.loadHeight = 242
+          m.poster.loadDisplayMode = "scaleToZoom"
+        end if
       end if
     end if
 
