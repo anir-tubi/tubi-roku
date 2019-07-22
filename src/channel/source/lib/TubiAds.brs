@@ -361,7 +361,7 @@ function tubiAds_getAdsListViaRoku(episode)
             if adUnit.clickThrough <> invalid
               ' Rainmaker response returns JSON in the ClickThrough tag, adRise response is a comma delimitted string of cuepoints
               adInfo = ParseJson(adUnit.clickThrough)
-              if adInfo <> invalid and type(adInfo.breaks) = "roArray" and adInfo.breaks.count() > 0
+              if type(adInf) = "roAssociativeArray" and type(adInfo.breaks) = "roArray" and adInfo.breaks.count() > 0
                 ' using the Rainmaker response since we were able to parse JSON in the clickThrough field
                 m.midrolls = adInfo.breaks
               else
@@ -417,7 +417,7 @@ function tubiAds_getAdsListViaRoku(episode)
             if adUnit.clickThrough <> invalid
               ' Rainmaker response returns JSON in the ClickThrough tag, adRise response is a comma delimitted string of cuepoints
               adInfo = ParseJson(adUnit.clickThrough)
-              if adInfo <> invalid and type(adInfo.breaks) = "roArray" and adInfo.breaks.count() > 0
+              if type(adInfo) = "roAssociativeArray" and type(adInfo.breaks) = "roArray" and adInfo.breaks.count() > 0
                 ' using the Rainmaker response since we were able to parse JSON in the clickThrough field
                 m.midrolls = adInfo.breaks
               else
@@ -671,7 +671,7 @@ end function
 Function tubiAds_enhanceCtx(ctx)
   if ctx.ad <> invalid and ctx.ad.clickThrough <> invalid
     adInfo = ParseJson(ctx.ad.clickThrough)
-    if adInfo <> invalid
+    if type(adInfo) = "roAssociativeArray"
       ctx.ad.parentId = adInfo.request_id
       ctx.ad.impressionId = adInfo.impression_id
       ctx.ad.adVideoId = adInfo.ad_video_id
