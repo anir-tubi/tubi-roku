@@ -19,7 +19,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   adLoggingPort = CreateObject("roMessagePort")
 
   if adContentType <> "hls" and adContentType <> "mp4"
-    adContenType = "hls"  ' safety fallback
+    adContenType = "mp4"  ' safety fallback
   end if
 
   return {

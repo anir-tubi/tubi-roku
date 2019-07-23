@@ -19,6 +19,6 @@
     <interface>
       <!-- INPUT -->
         <field id="videoPlayerNode" type="node" />
-        <field id="adContentType" type="string" value="hls" />
+        <field id="adContentType" type="string" value="mp4" />
     </interface>
 </component>

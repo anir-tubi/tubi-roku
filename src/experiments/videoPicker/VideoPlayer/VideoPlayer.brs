@@ -67,14 +67,8 @@ Function init()
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
 
-  ' Configure the ads task for the experiment's ad media type but don't
-  ' trigger tracking until later
-  request = TubiRequest()
-  experiments = TubiExperiments(request, m.constants)
-  experimentInfoAndTracking = experiments.getExperimentValue("RokuNamespace", "roku_ad_content_type")
   m.AdsTask = m.top.findNode("AdsTask")
   m.AdsTask.videoPlayerNode = m.top
-  m.AdsTask.adContentType = experimentInfoAndTracking.experimentValue
   m.AdsTask.control = "RUN"
 
   'm.VideoState is source of truth for the state of the video player for the UI
@@ -1369,11 +1363,6 @@ End Function
 Function showAdBreak()
   m.Video.control = "stop"
   closeCCDialog()  ' if dialog is showing, it's awkward to have it still show after ad break
-
-  ' Evaluate and track the experiment here when we actually are about
-  ' to display an ad.  The value was already consumed in init() so
-  ' we ignore it here
-  getExperimentValue("RokuNamespace", "roku_ad_content_type")
 
   m.top.adPosition = m.playerPosition
   m.top.adControl = "play"
