@@ -137,7 +137,8 @@ function onParentalSettingSelected(msg)
         onPasswordConfirm()
       else
         m.confirmPasswordScreen = CreateObject("roSGNode", "ConfirmPasswordScreen")
-        m.confirmPasswordScreen.message = "Enter your password to" + Chr(10) + "change parental rating"
+        m.confirmPasswordScreen.message = "Enter your password"
+        m.confirmPasswordScreen.subMessage = "to update parental controls"
         m.confirmPasswordScreen.buttonText = "Submit"
         m.confirmPasswordScreen.isLoading = false
         m.confirmPasswordScreen.observeField("visible", "onConfirmPasswordScreenVisible")
