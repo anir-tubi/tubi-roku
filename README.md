@@ -236,7 +236,17 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
 9\. Run `make release` in order to increment the version number once more (the QA build should not be the same version number as the production build).
 
-10\. Update the hotpatch and remote component files to the CDN
+10\. Get the release reviewed.
+
+- Rename the `qa_x_y_z` branch to `release_x_y_z`.
+
+- Push the `release_x_y_z` branch to Github.
+
+- Make a PR to the `x_y_branch`.
+
+- __DO NOT RELEASE UNTIL THE PR IS APPROVED__
+
+11\. Update the hotpatch and remote component files to the CDN
 - Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/)
 
 - Copy two files to the CDN repo:
@@ -247,9 +257,9 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
 - Submit a PR to the CDN repo.
 
-11\. Use an infra script to move the updates to the CDN repo to the actual CDN servers. (Please see the [CDN README](github.com/adRise/adrise_cdn/) for more info).
+12\. Use an infra script to move the updates to the CDN repo to the actual CDN servers. (Please see the [CDN README](github.com/adRise/adrise_cdn/) for more info).
 
-12\. Verify the release
+13\. Verify the release
 - Run a smoke test on production checking at minimum:
     - The production channel loads
 		- Video plays
@@ -257,9 +267,9 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 - Monitor various metrics for signs of any issues:
 	- [Ad impressions per second](https://app.datadoghq.com/dashboard/ckr-vrw-xh4/ad-server-business-metrics?from_ts=1563412592034&to_ts=1564017392034&live=true&tile_size=m&fullscreen_widget=80673160&fullscreen_section=overview)
 
-13\. Push the tag corresponding to the build that was just pushed to Github `git push origin x_y_z`
+14\. Push the tag corresponding to the build that was just pushed to Github `git push origin x_y_z`
 
-14\. Create a release on Github
+15\. Create a release on Github
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
 
