@@ -456,7 +456,7 @@ End Function
 ' Build the structure for an ad message when using the old adrise ad server
 Function tubiTracking_getAnalyticsAdAdrise(ctx)
   adEvent = {
-    ad_type: "UNKNOWN"    'adType enum
+    ad_type: "VAST"    'adType enum
     ' advertiser_id: ""   'not currently available
     ' vendor_id: ""       'not currently available
     ' creative_duration: 0  'not currently available
@@ -523,7 +523,7 @@ End Function
 ' Build the structure for an ad message using the new rainmaker ad server
 Function tubiTracking_getAnalyticsAdAdriseRainmaker(ctx)
   adEvent = {
-    ad_type: "UNKNOWN"    'adType enum
+    ad_type: "VAST"    'adType enum
     ' advertiser_id: ""   'not currently available
     ' vendor_id: ""       'not currently available
     ' creative_duration: 0  'not currently available
