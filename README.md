@@ -92,7 +92,8 @@ $ make ROKU_PROFILE=test install
 constants.remoteComponents = false
 constants.useHotpatch = false
 ```
-# Release
+# Submission Release
+Submission releases are releases that are sent to Roku.
 
 1\. Run unit tests locally
 
@@ -100,28 +101,57 @@ constants.useHotpatch = false
 $ make ROKU_PROFILE=test install
 ```
 
-2\. Prepare for releases 
-- Create a new branch (based off of master), commit changes, and create a Pull Request
-- Once the PR has been approved, create a new branch based off of master and call it “[MAJOR_RELEASE]_[MINOR_RELEASE]_branch”: i.e. 2_9_branch. The release number should be 2 builds greater than the current release.  (We increment 2 versions because 1 version is for QA and if nothing goes wrong, then the other time is for a production release.)
-- Create a new `new_images_since_x_y` file where x and y are the major and minor build numbers
+2\. Prepare for submission release.
+- Create a new branch based off of master and call it “[MAJOR_RELEASE]_[MINOR_RELEASE]_branch”: i.e. `2_9_branch`.
+
+- Create a new `new_images_since_x_y` file where x and y are the major and minor build numbers: i.e. `new_images_since_2_9`
+
 - Update the Makefile with the new `new_images_since_x_y` path (3 instances should be updated)
-- Create a new hotpatch for the new version (ie. 2.9.brs)
+- Create a new hotpatch for the new version: ie. `2.9.brs`
+
 - Move any necessary logic from the previous version's hotpatch to the new version's hotpatch
-  - Ensure you have 3 comment sections in the hotpatch file
+
+  - Ensure you have 2 comment sections in the hotpatch file
     - "always present"
-    - "experiments that will be deleted if no longer needed"
-    - "temporary changes that can be assumed (unless noted) can be deleted"
+
+    - "temporary changes that can be can be deleted unless noted otherwise"
+
 - Update version numbers in `config/build.yml`
+
   - Increment `minor_version`
+
   - set `build_version` to `1`
 
-3\. Deploy to staging
+- Update the value of hotPatchUrl in `./config/staging.yml` to reflect the new build version.
 
-* Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now, 
+- Make a new PR of the `x_y_branch` against master. Once the PR has been merged _DO NOT_ delete the `x_y_branch`, as this will remain the source of truth for what is in production.
+
+3\. Create a staging channel for the minor build
+- Run `make ROKU_PROFILE=staging install`
+
+- Navigate to the `/build` directory, and note the `tubi_x_y_z.pkg file`, you will be creating a private Roku channel with this file.
+
+- Create a new image to serve as the staging channel launch icon.
+	- Using GIMP or Photoshop or other image editor, modify the `channel-store/channel-store-poster-540x405.png` with some text to identify it as the x_y staging channel.
+
+	- Save the modified image as `channel-store/channel-store-poster-staging-540x405.png`, overwriting the old staging channel launch icon.
+
+- In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to create a new private channel.
+
+	- Upload the `build/tubi_x_y_z.pkg` file.
+
+	- Name the channel `Staging x_y`.
+
+	- Upload `channel-store/channel-store-poster-staging-540x405.png` as the "Channel Poster".
+
+
+4\. Deploy to staging
+
+* Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now,
 [https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 
 
-* Navigate to your `.aws` directory.
+* Navigate to your `.aws` directory (typically found at `~/.aws`)
 
 * In the `config` file set the `AWS_DEFAULT_REGION `.
 
@@ -137,56 +167,109 @@ $ make ROKU_PROFILE=test install
 	aws_secret_access_key = <<aws_secret_access_key>>
 	```
 
-- Update the staging channel store to include the new version number. The poster is located in `./channel-store/channel-store-poster-staging-540x405.png`
-- Update the value of hotPatchUrl in `./config/staging.yml` to reflect the new build version
-- Commit the above changes, and create a new PR. 
-
-
-To upload the app onto the staging AWS servewr, run:
+* Upload the hotpatch and remote components onto the staging AWS server, run:
 
 ```
 $ make ROKU_PROFILE=staging install
 ```
-- Use the "Application Packager" web interface on the Roku device to package the build
-- Update or create a new private channel with the created .pkg file via [developer.roku.com/developer](developer.roku.com/developer)
 
-4\. Run functional tests against staging
+5\. Run functional tests against staging
 
 ```
 TBD
 ```
 
-5\. Deploy Remote components to production
-This step can be used to JUST submit the remote components without submitting a new build to Roku.  
-- Run the following command:
+6\. Submit build to Roku
+- Run the following command to increment the build version number, create a new tag for the build,  and output .pkg files that can be submitted to Roku.
 ```
 $ make release
 ```
-- Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/) 
+- In a browser, visit [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to update the "Tubi - Free Movies & TV" channel with the `/build/roku_x_y_z.pkg` file.
+
+7\. Update the hotpatch and remote component files to the CDN
+- Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/)
+
 - Copy two files to the CDN repo:
-  - copy the remote components file (i.e. `build/tubi_remote_components_x_y_z.pkg`) into the folder: hotpatches/roku/componewnts/
-  - copy the hot patches file (i.e. `build/hotpatch/x.y.brs`) into folder: hotpatches/roku/
-- Submit a Pull Request and if you wish to submit a new build to Roku, then wait for the PR to be approved and the files to be uploaded to the CDN before proceeding to the next step.
 
-6\. Create production build (Submit build to Roku)
+  - copy the remote components file (i.e. `build/tubi_remote_components_x_y_z.pkg`) into the folder: hotpatches/roku/components/
 
-- Run the following commands if you diod not run the commands in the previous step:
-```
-$ make release
-$ git push --tags 
-```
-Note: The above 'make' command will automatically increase the build number in build.yml AND it will also create a new tag for that build.
-- Open the hotpatch file in projectTotalRecall/build/hotpatch/ and double check that the version and remoteComponentsUrl match
-- Upload the .pkg file to Roku via [developer.roku.com/developer](developer.roku.com/developer)
-- Email Roku Partner Success to let them know the build is in their queue
+  - copy the hotpatch file (i.e. `build/hotpatch/x.y.brs`) into folder: hotpatches/roku/
 
+- Submit a PR to the CDN repo.
 
-7\. Create release in github
-- From the link below, find the tag that corresponds to the release number that was just pushed to production, and click on the link for that tag.
+8\. Email Roku Partner Success to let them know the build is in their queue.
+
+9\. Push the tag corresponding to the build that was just pushed to Github `git push origin x_y_z`
+
+10\. Create a release on Github
+- From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
+
+
 - Select "Edit Release"
+
 - Update the "Release Title" to be either Submission Release or Remote Release depending on the type of release.
+
 - Add the changes that were included in the release to the "Describe this release" description text box, with each change ending in a period, and on it's own line.
+
+- Select "Update Release"
+
+
+# Remote Release
+Remote releases are releases that are not sent to Roku, and updates are made when a device loads the Tubi channel, by downloading the hotpatch and remote component files, which are used to build the channel UI.
+
+1\. Checkout the most recent `x_y_branch` branch, and pull any potential updates from origin. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`.
+
+2\. Cherry pick any commits from `master` that are to be included in the next release onto the `x_y_branch`.
+
+3\. Check each of the cherry picked commits for updates to `Constants.brs` or `TubiChannel.brs`. If any updates have been made to either of these files, copy the changes into `x.y.brs` hotpatch file in the "temporary changes that can be can be deleted unless noted otherwise" section.
+
+4\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since_x_y` file with the image locations of any new or updated images.
+
+5\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates.
+
+6\. Run `make release` in order to increment the version number.
+
+7\. Deploy to staging by running `make ROKU_PROFILE=staging install`. (See instructions for setting up AWS CLI in Submission Release section 4 if you have not yet up AWS CLI).
+
+8\. Create a CH ticket with any changes that have been made and give to the QA team for manual testing. Once the QA team has signed off on the build...
+
+9\. Run `make release` in order to increment the version number once more (the QA build should not be the same version number as the production build).
+
+10\. Update the hotpatch and remote component files to the CDN
+- Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/)
+
+- Copy two files to the CDN repo:
+
+  - copy the remote components file (i.e. `build/tubi_remote_components_x_y_z.pkg`) into the folder: hotpatches/roku/components/
+
+  - copy the hotpatch file (i.e. `build/hotpatch/x.y.brs`) into folder: hotpatches/roku/
+
+- Submit a PR to the CDN repo.
+
+11\. Use an infra script to move the updates to the CDN repo to the actual CDN servers. (Please see the [CDN README](github.com/adRise/adrise_cdn/) for more info).
+
+12\. Verify the release
+- Run a smoke test on production checking at minimum:
+    - The production channel loads
+		- Video plays
+		- Ads play
+- Monitor various metrics for signs of any issues:
+	- [Ad impressions per second](https://app.datadoghq.com/dashboard/ckr-vrw-xh4/ad-server-business-metrics?from_ts=1563412592034&to_ts=1564017392034&live=true&tile_size=m&fullscreen_widget=80673160&fullscreen_section=overview)
+
+13\. Push the tag corresponding to the build that was just pushed to Github `git push origin x_y_z`
+
+14\. Create a release on Github
+- From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
+	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
+
+
+- Select "Edit Release"
+
+- Update the "Release Title" to be either Submission Release or Remote Release depending on the type of release.
+
+- Add the changes that were included in the release to the "Describe this release" description text box, with each change ending in a period, and on it's own line.
+
 - Select "Update Release"
 
 
