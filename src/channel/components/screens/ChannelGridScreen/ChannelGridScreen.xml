@@ -37,6 +37,8 @@
       -->
       <field id="callingPage" type="string" />
       
+      <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
+      
     <!-- OUTPUT -->
       <!-- the content node representing the item which was clicked on -->
       <field id="contentSelected" type="node" alwaysNotify="true"/>

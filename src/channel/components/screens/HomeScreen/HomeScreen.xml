@@ -27,7 +27,8 @@
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
       <field id="signedIn" type="boolean" value="false" />
 
-      <field id="dirtyUserCategories" type="string" alwaysNotify="true"/>
+      <!-- The oiutside will tell the screen if it is reloading the content-->
+      <field id="reloadingContent" type="boolean" value="false" />
 
       <!-- show/hide the category menu -->
       <field id="categoryMenuVisible" type="boolean"/>

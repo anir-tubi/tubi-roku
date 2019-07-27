@@ -30,6 +30,7 @@
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/SettingsScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/SignInHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ScreenStackHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
@@ -55,6 +56,7 @@
         -->
       <field id="deepLinkContent" type="node" />
       <field id="deepLinkTrigger" type="boolean" alwaysNotify="true" />
+      <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
       <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->

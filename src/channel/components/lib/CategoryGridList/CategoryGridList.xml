@@ -30,9 +30,6 @@
     <field id="animateToCategory" alias="RowList.animateToItem"/>
     <field id="jumpToRowItem" alias="RowList.jumpToRowItem"/>
     
-    <!-- set when we need to purge and reload history and queue -->
-    <field id="dirtyUserCategories" type="boolean" value="false" alwaysNotify="true"/>
-    
     <!-- incoming metadata from MetadataFetchTask -->
     <field id="metadataFetchTaskBatch" type="assocarray" />
 

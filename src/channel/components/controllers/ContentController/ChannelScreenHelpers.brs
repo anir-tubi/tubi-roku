@@ -57,8 +57,19 @@ Function onChannelContentResponse(msg)
   task = msg.getRoSGNode()
   screen = task.target
   screen.isLoading = false
+  bError = false
 
-  screen.content = task.response
+  loadedContent = task.response
+  if loadedContent <> invalid and loadedContent.getChildCount() > 0
+    '//get the root channnel content
+    channel = loadedContent.getChild(0) '//Channel or category 
+    if channel.getChildCount() <= 0
+      bError = true
+    end if
+  else
+    bError = true
+  end if
+  screen.content = loadedContent
   screen.shouldLoadContent = true
   task.unobserveField("response")
   task.unobserveField("error")
@@ -69,11 +80,22 @@ Function onChannelContentResponse(msg)
   else
     m.refreshingChannelCache = false
   end if
+
+  if bError = true
+    '//if no content, then display error
+    onChannelContentError(msg, true)
+  end if
 End Function
 
 
-Function onChannelContentError(msg)
+Function onChannelContentError(msg, bContentEmptyError = false)
   tubiLog("ChannelScreenHelpers.onChannelContentError")
+  sErrorTitle = ""
+  sErrorMessage = "Could not retrieve channel content."
+  if bContentEmptyError = true
+    sErrorTitle = "Oops!"
+    sErrorMessage = "This page currently does not have any content."
+  end if 
   errorInfo = msg.getData()
   task = msg.getRoSGNode()
   ' Screen is created/pushed in showChannelScreen, since there is no content, remove it.
@@ -81,7 +103,7 @@ Function onChannelContentError(msg)
   ' sent in the case of an error.
   popScreen(false)
   
-  errorObj = createErrorObject(m.global.constants.errors.context.channelScreen, m.global.constants.errors.subtypes.fetchError, "Could not retrieve channel content.", errorInfo.code)
+  errorObj = createErrorObject(m.global.constants.errors.context.channelScreen, m.global.constants.errors.subtypes.fetchError, sErrorMessage, errorInfo.code, sErrorTitle)
   showErrorModal(errorObj)
   screen = task.target
   loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms

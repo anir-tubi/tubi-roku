@@ -130,6 +130,8 @@
 
     <Label
       translation="[85,520]"
+      width="1835"
+      numLines="2"
       id="pageTitle">
       <Font
         role="font"

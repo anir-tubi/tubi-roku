@@ -12,6 +12,7 @@ Function init()
   m.ChannelCategoryGrid = m.top.findNode("ChannelCategoryGrid")
   m.NavSection = m.top.findNode("nav")
 
+  m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
   m.top.observeField("callingPage", "onSetCallOfAction")
   m.top.observeField("shouldLoadContent", "onLoadContent")
   m.top.observeField("isLoading", "onIsLoading")
@@ -29,6 +30,65 @@ Function init()
     m.ChannelCategoryGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
 End Function
+
+Function onReloadUserCategoriesResponse()
+  handledRequest = m.top.reloadUserCategoriesResponse
+  tubiLog("ChannelGridScreen.onReloadUserCategoriesResponse")
+  if handledRequest.response <> invalid then
+    bEmpty = true
+    response = handledRequest.response
+    if response.code >= 200 and response.code < 300 then
+      '//this is a successful response
+      newCategory = handledRequest.convertedMetadata
+      if newCategory <> invalid and newCategory.getChildCount() > 0
+        '//this category has content
+        bEmpty = false
+      end if 
+    end if
+
+    '//The ID of the category that was reported to have recently changed
+    sChangedCategoryID = handledRequest.id
+    checkForContentAndRefresh(bEmpty, sChangedCategoryID)
+  end if
+End Function
+
+' checkForContentAndRefresh()
+' @param bContentEmpty - Does the passed category have NO content?
+' @param sCategoryID - The ID of the channel/category that is changing,
+' 
+' When the content of a channel/category is known to have changed outside of this file, then this function should be called
+' to see if the content should be refreshed. If it should, then validUntil will be set to 0 so the next time this screen 
+' is on screen, then the content will be reloaded.
+Function checkForContentAndRefresh(bContentEmpty, sCategoryID)
+  '//Go thru the content and see if category associated with sCategoryID should be hidden or not
+  if m.top.content <> invalid
+    bRefresh = true
+    bCategoryDisplayingOnScreen = false
+    for i = 0 to m.top.content.getChildCount() - 1
+      category = m.top.content.getChild(i)
+      sID = category.id
+
+      if sID = sCategoryID
+        bCategoryDisplayingOnScreen = true
+        exit for
+      end if
+    end for
+
+    if bCategoryDisplayingOnScreen = true and bContentEmpty = false
+      '//no need to refresh the screen if the category is already displaying AND the category isn't empty
+      bRefresh = false
+    else if bCategoryDisplayingOnScreen = false and bContentEmpty = true 
+      '//no need to refresh the screen if the empty category is already not displaying
+      bRefresh = false
+    end if
+
+    if bRefresh = true
+      m.top.content.validUntil = 0
+    end if
+  end if 
+  
+End Function
+
 
 Function onSetCallOfAction()
   sPreviousPage = m.top.callingPage

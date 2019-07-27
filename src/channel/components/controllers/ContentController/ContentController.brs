@@ -8,8 +8,10 @@ Function init()
   m.NodeHelpers = TubiNodeHelpers()
   m.Bookmarks = TubiBookmarks(Request, Auth, m.constants, m.NodeHelpers)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
+  m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
 
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
@@ -425,13 +427,47 @@ Function onHistoryQueueChange(categoryId)
     m.authTask.observeFieldScoped("authInfo", "onHistoryQueueRefresh")
     m.authTask.functionName = "execInitializeUserData"
     m.authTask.control = "RUN"
-    homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-    if homeScreen <> invalid
-      homeScreen.dirtyUserCategories = categoryId
-    end if
+      
+    setDirtyUserCategories(categoryId)
   end if
 End Function
 
+
+''''''''''''''''''''''''''''
+' setDirtyUserCategories
+'
+' if one of the user categories is showing, reload it
+Function setDirtyUserCategories(categoryId)
+  tubiLog("ContentController.setDirtyUserCategories")
+
+  if categoryId <> invalid
+    homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+    if homeScreen <> invalid
+      '// this will get the homescreen to display a spinner
+      homeScreen.reloadingContent = true  
+    end if
+
+    'this will be an auth request if the user is logged in
+    'auth request creation happens in metadataFetchTask
+    'auth request will add the userId param
+    reqName = m.constants.reqNames.getCategory
+    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", reqName)
+
+  end if
+End Function
+
+Function onReloadUserCategoriesResponse(msg)
+  handledRequest = msg.getData()
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+      homeScreen.reloadUserCategoriesResponse = handledRequest  
+  end if
+  categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
+  if categoryListScreen <> invalid
+      categoryListScreen.reloadUserCategoriesResponse = handledRequest  
+  end if
+  refreshStackedUserScreen(handledRequest.id)
+End Function
 
 Function onHistoryQueueRefresh()
   tubiLog("ContentController.onHistoryQueueRefresh")
@@ -453,6 +489,15 @@ Function refreshAllDetailScreens()
   end for
 End Function
 
+Function refreshStackedUserScreen(sScreenID)
+  ' Tell the screen associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0 
+  for i=0 to m.screenStack.getChildCount()-1
+    screen = m.screenStack.getChild(i)
+    if screen.content <> invalid and screen.content.getChildCount() > 0 and screen.content.getChild(0).id  = sScreenID
+      screen.content.getChild(0).validUntil = 0
+    end if
+  end for
+End Function
 
 '''''''''''''''''''
 ' onCloseModal

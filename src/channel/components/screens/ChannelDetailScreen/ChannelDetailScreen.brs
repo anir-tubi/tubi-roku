@@ -66,13 +66,18 @@ Function onScreenFocusChange()
   end if
 End Function
 
-
 Function onLoadContent()
   if m.top.content <> invalid
     category = m.top.content.getChild(0)
-    m.PageTitle.text = category.title
     m.contentLoadedAndFocused = false
-    m.VideoGrid.content = category
+    if category.getChildCount() > 0
+      m.PageTitle.text = category.title
+      m.PageTitle.horizAlign = "left"
+      m.PageTitle.wrap = false
+      m.VideoGrid.content = category
+      m.VideoGrid.visible = true
+    end if
+    
     if category <> invalid
       m.top.trackingPageInfo = createTrackingPageInfo(category)
     end if

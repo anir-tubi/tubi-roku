@@ -16,12 +16,12 @@ Function init()
   m.Spinner = m.top.findNode("CategorySpinner")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
-  m.top.observeField("dirtyUserCategories", "onDirtyUserCategories")
   m.top.observeField("homescreenResponse", "onHomescreenResponse")
   m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.top.observeField("loadAllCategories", "loadAllCategories")
   m.top.observeField("enabled", "onEnableChange")
+  m.top.observeField("reloadingContent", "onReloadingContent")
 
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -66,6 +66,14 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
 End Function
 
+
+''''''''''''''''''''''''''''''
+' onReloadingContent
+'   if the outside is reloading the content of this page, then display the screen so it appears to be loading content.
+'
+Function onReloadingContent()
+  m.Spinner.visible = true
+End Function
 
 ''''''''''''''''''''''''''''''
 ' onHomescreenResponse
@@ -129,9 +137,9 @@ Function onEnableChange()
 End Function
 
 
-Function onReloadUserCategoriesResponse(msg)
-  handledRequest = msg.getData()
-  tubiLog("CategoryScreen.onReloadUserCategoriesResponse")
+Function onReloadUserCategoriesResponse()
+  handledRequest = m.top.reloadUserCategoriesResponse
+  tubiLog("HomeScreen.onReloadUserCategoriesResponse")
   if handledRequest.response <> invalid then
     response = handledRequest.response
     if response.code >= 200 and response.code < 300 then
@@ -214,38 +222,6 @@ End Function
 Function retryCategoryList()
   loadAllCategories()
   m.top.setFocus(true)
-End Function
-
-
-''''''''''''''''''''''''''''
-' onDirtyUserCategories
-'
-' if one of the user categories is showing, reload it
-Function onDirtyUserCategories(msg)
-  tubiLog("CategoryScreen.onDirtyUserCategories")
-  categoryId = msg.getData()
-
-  if categoryId <> invalid
-    url = m.constants.urls.matrix.container + "/" + categoryId
-    options = {
-      params: {
-        "app_id": m.constants.settings.shortAppName
-        platform: m.constants.platform
-        "device_id": m.constants.deviceInfo.deviceId
-        limit: m.constants.performance.categoryGridList.finalBlockSize
-        expand: 1
-        cursor: 0
-        includeEmpty: true
-      }
-    }
-
-    'this will be an auth request if the user is logged in
-    'auth request creation happens in metadataFetchTask
-    'auth request will add the userId param
-    reqName = m.constants.reqNames.getCategory
-    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", reqName)
-    m.Spinner.visible = true
-  end if
 End Function
 
 

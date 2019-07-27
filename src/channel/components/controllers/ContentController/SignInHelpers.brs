@@ -85,11 +85,8 @@ Function onAuthInfoReceived()
     end if
   end if
 
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid
-    homeScreen.dirtyUserCategories = m.constants.ui.categoryIds.queue
-    homeScreen.dirtyUserCategories = m.constants.ui.categoryIds.history
-  end if
+  setDirtyUserCategories(m.constants.ui.categoryIds.queue)
+  setDirtyUserCategories(m.constants.ui.categoryIds.history)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   refreshAllDetailScreens()
