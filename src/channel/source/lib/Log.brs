@@ -304,7 +304,7 @@ Function tubiLog_helper(logType, message="" as Dynamic, level="debug" as String,
 End Function
 
 Function tubiException(message="" as Dynamic, level="debug" as String) as Void
-  tubiLog_helper("exception", message, level, serverTypeName, subtype)
+  tubiLog_helper("exception", message, level)
 End Function
 
 Function tubiLog(message="" as Dynamic, level="debug" as String, serverTypeName="" as String, subtype="" as String) as Void

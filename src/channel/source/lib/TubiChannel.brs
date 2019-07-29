@@ -354,7 +354,6 @@ Function tubiChannel_deepLink(args, tracking, auth, isRemoteComponents)
 End Function
 
 Function tubiChannel_logCrashes(args)
-
   ' These are reasons we don't care about
   reasonBlacklist = {
     "EXIT_UNKNOWN":         "EXIT_UNKNOWN"        ' default exit reason

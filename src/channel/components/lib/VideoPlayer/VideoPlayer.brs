@@ -697,7 +697,8 @@ Function onAdStateChange()
         video_id: m.top.content.id.toInt()
         video_url: m.top.content.url
       }
-      tubiException(errorInfo, "error")
+      jsonErrorInfo = FormatJSON(errorInfo)
+      tubiException(jsonErrorInfo, "error")
     end if
   else if m.top.adState = "adsclosed"
     m.top.setFocus(true)

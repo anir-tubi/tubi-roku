@@ -24,7 +24,7 @@ Function onSideNavSignedIn()
     sGreeting = "Hi "
     if authInfo.firstName <> invalid
       sName = sGreeting + authInfo.firstName
-    else
+    else if authInfo.name <> invalid
       sName = sGreeting + authInfo.name
     end if
   end if
