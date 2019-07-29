@@ -328,7 +328,6 @@ function tubiAds_getAdsListViaRoku(episode)
       ad_url: url
     }
     m.log.error(FormatJSON(timeToFetchMessage), "adError", "no-ad-response", m.requestQueue)
-    m.log.exception("error", timeToFetchMessage)
   end if
 
   'check to see if the ad server returns an ad that can be used by RAF or needs to use our ad SDK
