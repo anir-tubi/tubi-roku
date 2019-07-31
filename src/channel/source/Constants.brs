@@ -590,16 +590,17 @@ Function getConstants()
       constants.ui.screenIds.activationCodeScreen = "activationCodeScreen"
       constants.ui.screenIds.upNextScreen = "upNextScreen"
       constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"
-      constants.ui.screenIds.movieScreen = "movie_night"
-      constants.ui.screenIds.tvScreen = "series_spotlight"
+
+    constants.ui.cacheableScreenIds = {}
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.channelListScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
 
     constants.ui.sideNavOpenIds = {}
       constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.channelListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
 
     constants.ui.sideNavIds = {}
       constants.ui.sideNavIds.home = "home"
@@ -612,10 +613,9 @@ Function getConstants()
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.channelListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
 
     'a map of screenIds to corresponding sideNavIds
     constants.ui.screenIdToSideNavId = {}

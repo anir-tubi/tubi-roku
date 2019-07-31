@@ -89,11 +89,11 @@
               iconUrl="pkg:/images/sideNavHome.png"/>
             <SideNavContentNode
               id="categories"
-              title="Movies"
+              title="Categories"
               iconUrl="pkg:/images/sideNavCategories.png"/>
             <SideNavContentNode
               id="channels"
-              title="TV"
+              title="Channels"
               iconUrl="pkg:/images/sideNavChannels.png"/>
           </ContentNode>
         </MarkupList>

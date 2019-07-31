@@ -80,6 +80,7 @@ Function onGridContentSelected(msg)
   showChannelScreen(gridScreen.contentSelected, sType)
 End Function
 
+
 Function onRefreshGridSignal(msg)
   gridScreen = msg.getRoSGNode()
   m.refreshingChannelGridCache = true
