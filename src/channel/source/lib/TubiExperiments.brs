@@ -25,6 +25,7 @@ Function TubiExperiments(request as Object, constants as Object) as Object
         roku_simple_register_screen: 0
         roku_trailers: "off"
         roku_side_nav: "off"
+        roku_side_nav_movies: "off"
       }
     }
 
