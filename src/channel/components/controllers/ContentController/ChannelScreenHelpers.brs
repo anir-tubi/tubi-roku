@@ -14,9 +14,36 @@ Function showChannelScreen(content, sPageSource = "")
       category_slug: content.id
     }
   }
+  channelScreen.id = content.id
 
   pushScreen(channelScreen, true, false)  ' don't send page load tracking until we resolve channel content
   getChannelFromServer(channelScreen, content)
+End Function
+
+
+Function showMovies()
+  showCacheableChannelScreen(m.constants.ui.screenIds.movieScreen)
+End Function
+
+
+Function showTV()
+  showCacheableChannelScreen(m.constants.ui.screenIds.tvScreen)
+End Function
+
+Function showCacheableChannelScreen(sContentID)
+  content = {
+    id: sContentID
+  }  
+  categoryScreen = getFromScreenCache(content.id)
+  if categoryScreen <> invalid
+    pushScreen(categoryScreen, true, true)
+  else
+    showChannelScreen(content, "Menu")
+    channelScreen = currentScreen()
+    if channelScreen <> invalid and channelScreen.id = content.id
+      setInScreenCache(channelScreen)
+    end if
+  end if
 End Function
 
 

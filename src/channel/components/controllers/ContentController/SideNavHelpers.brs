@@ -64,10 +64,12 @@ Function onSideNavItemSelected()
       showHomeScreen(m.constants, authInfo)
       bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.channels
-      showChannelListScreen(m.constants, "MENU")
+      showTV()
+      ' showChannelListScreen(m.constants, "MENU")
       bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.categories
-      showCategoryListScreen(m.constants, "MENU")
+      showMovies()
+      ' showCategoryListScreen(m.constants, "MENU")
       bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.settings
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
