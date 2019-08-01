@@ -673,7 +673,9 @@ Function tubiAds_enhanceCtx(ctx)
     if type(adInfo) = "roAssociativeArray"
       ctx.ad.parentId = adInfo.request_id
       ctx.ad.impressionId = adInfo.impression_id
-      ctx.ad.adVideoId = adInfo.ad_video_id
+      if adInfo.ad_video_id <> invalid
+        ctx.ad.adVideoId = adInfo.ad_video_id.toStr()
+      end if
     end if
   end if
   return ctx

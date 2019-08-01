@@ -476,9 +476,9 @@ Function tubiTracking_getAnalyticsAdAdrise(ctx)
         adEvent.creative_url = adVideoUrl         'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
 
         if isInteractive = false
-          'interactive ads use external urls that don't contain our creative_id. creative_id maps to ad_video_id in the ad redshift db.
+          'interactive ads use external urls that don't contain our ad_video_id.
           adVideoUrlSplits = adVideoUrl.split("/")
-          adEvent.creative_id = adVideoUrlSplits[4].toInt() ' expect creative_id to be of the form 3256277
+          adEvent.ad_video_id = adVideoUrlSplits[4] ' expect ad_video_id to be of the form 3256277
         end if
       end if
     end if
