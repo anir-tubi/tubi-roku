@@ -79,7 +79,7 @@
       <!-- informs the details screen if the content controller is waiting for a user category update from the server -->
       <field id="isWaitingForServerResponse" type="boolean" value="false" />
 
-      <!-- hides or shows the loading spinner -->
+      <!-- hides or shows the loading spinner. Play/Resume button presses are not honored when isLoading = true -->
       <field id="isLoading" type="boolean" alias="DetailSpinner.visible" />
 
       <!-- holds state info about if there was an error in retrieving the content for this page.

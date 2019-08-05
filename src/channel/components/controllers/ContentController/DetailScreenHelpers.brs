@@ -829,7 +829,7 @@ End Function
 
 Function playHelper(screen)
   episode = getEpisodeContent(screen.content)
-  if episode <> invalid then
+  if episode <> invalid and screen.isLoading <> true then
     playVideoContent(episode, "none", 0)
   else
     tubiLog("ERROR: Play selected but content is invalid")
