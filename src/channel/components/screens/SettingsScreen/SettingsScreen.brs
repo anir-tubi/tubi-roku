@@ -1,10 +1,6 @@
 Function init()
   m.constants = m.global.constants
 
-  Request = TubiRequest()
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
-
   m.leftPanelWidth = 420
   m.rightPanelWidth = 1034
   m.rightPaneloffset = [220,-197]
@@ -22,7 +18,6 @@ Function init()
   ' This must happen after the pane is all set up so that the createNextPanelIndex
   ' event fires for the default menu selection
   m.PanelSet.appendChild(m.SettingsMenuPanel)
-  m.PanelSet.observeField("isGoingBack", "onReturnToMenu")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("parentalSettingUpdated", "onSignedInChange")
@@ -37,12 +32,7 @@ Function init()
     }
   }
 
-  ' used to compare if a newly focused item gained focus from a different item while scrolling,
-  ' or gained focus from a different component/screen
-  m.menuIsFocused = false
-
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
-
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
 End Function
 
@@ -70,23 +60,7 @@ End Function
 Function onMenuItemFocused()
   tubiLog("SettingsScreen.onMenuItemFocused")
   m.Title.opacity = 1.0
-
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
-  ' send navigate_within_page events for settings screen
-  if m.menuIsFocused = true and m.SettingsMenuPanel.itemUnfocused > -1
-    row = m.SettingsMenuPanel.itemFocused + 1
-    col = 1
-    m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("account_menu_component", {}) 'account_menu_component doesn't exist in protos
-      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-      vertical_location: row
-      vertical_location_mode: "INDEX"  'LocationMode enum
-      horizontal_location: col
-      horizontal_location_mode: "INDEX"  'LocationMode enum
-    }
-  end if
-  m.menuIsFocused = true
 End Function
 
 Function onComponentFocusChange()
@@ -97,10 +71,9 @@ Function onComponentFocusChange()
     else
       m.Title.opacity = 0.3
     end if
-  else
-    m.menuIsFocused = false
   end if
 End Function
+
 
 Function onEnableChange()
   if m.top.enabled = true
@@ -110,12 +83,6 @@ Function onEnableChange()
   end if
 End Function
 
-Function onReturnToMenu(msg)
-  isReturning = msg.getData()
-  if isReturning = true
-    m.menuIsFocused = false
-  end if
-End Function
 
 Function onCreateNextPanelIndex()
   nextIndex = m.SettingsMenuPanel.createNextPanelIndex
@@ -145,6 +112,7 @@ Function onCreateNextPanelIndex()
   end if
 End Function
 
+
 Function CreateParentalControlsPanel(existingPanel=invalid)
   if existingPanel = invalid
     pcPanel = CreateObject("roSGNode", "ParentalControlsPanel")
@@ -171,6 +139,7 @@ Function CreateParentalControlsPanel(existingPanel=invalid)
   end if
   return pcPanel
 End Function
+
 
 Function onParentalSettingsReceived(msg)
   task = msg.getRoSGNode()
@@ -200,6 +169,7 @@ Function CreateAboutPanel()
   return aboutPanel
 End Function
 
+
 Function CreateSettingsMenuPanel()
   settingsMenuPanel = CreateObject("roSGNode", "SettingsMenuPanel")
   settingsMenuPanel.width = m.leftPanelWidth
@@ -211,6 +181,7 @@ Function CreateSettingsMenuPanel()
   settingsMenuPanel.signedIn = m.top.signedIn
   return settingsMenuPanel
 End Function
+
 
 Function CreateLegalPanel(title, uri)
   textPanel = CreateObject("roSGNode", "ScrollingTextPanel")
@@ -233,6 +204,7 @@ Function CreateLegalPanel(title, uri)
   return textPanel
 End Function
 
+
 Function onLegalState(msg)
   tubiLog("onLegalState state = " + msg.GetData())
   if msg.GetData() = "stop" or msg.GetData() = "done"
@@ -246,6 +218,7 @@ Function onLegalState(msg)
   end if
 End Function
 
+
 Function CreateSignInPanel()
   panel = CreateObject("roSGNode", "ScrollingTextPanel")
   panel.title = "Sign In"
@@ -254,6 +227,7 @@ Function CreateSignInPanel()
   panel.offset = m.rightPanelOffset
   return panel
 End Function
+
 
 Function CreateSignOutPanel()
   panel = CreateObject("roSGNode", "SignOutPanel")
@@ -268,6 +242,7 @@ Function CreateSignOutPanel()
   panel.offset = m.rightPanelOffset
   return panel
 End Function
+
 
 Function focusItemInList(list, sID)
   index = -1
@@ -286,6 +261,7 @@ Function focusItemInList(list, sID)
   return index
 End Function
 
+
 Function onMenuItemSelected()
   buttonContent = m.SettingsMenuPanel.content.getChild(m.SettingsMenuPanel.itemSelected)
   if buttonContent.id = "SignInOutButton"
@@ -296,6 +272,7 @@ Function onMenuItemSelected()
     end if
   end if
 End Function
+
 
 Function onParentalControlsItemSelected(msg)
   tubiLog("SettingsScreen.onParentalControlsItemSelected")
