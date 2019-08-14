@@ -3,7 +3,7 @@ Function init()
 
   m.leftPanelWidth = 420
   m.rightPanelWidth = 1034
-  m.rightPaneloffset = [220,-197]
+  m.rightPaneloffset = [220,-199]
 
   m.PanelSet = m.top.findNode("PanelSet")
   m.Title = m.top.findNode("Title")
@@ -62,6 +62,7 @@ Function onMenuItemFocused()
   m.Title.opacity = 1.0
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
 End Function
+
 
 Function onComponentFocusChange()
   tubiLog("SettingsScreen.onComponentFocusChange")
@@ -156,14 +157,26 @@ End Function
 
 
 Function CreateAboutPanel()
-  aboutPanel = CreateObject("roSGNode", "ScrollingTextPanel")
-  aboutPanel.title = "About Tubi"
-  text = "Version " + m.global.constants.settings.version.Replace("_",".") + Chr(10)
-  text += Chr(10)
+  aboutPanel = CreateObject("roSGNode", "AboutPanel")
+  aboutPanel.titleOne = "About Tubi"
+  textOne = "Tubi is the leading free, premium, video streaming app. We have the largest library of content with over 15,000 movies and television shows with far fewer ads than cable TV."
+  textOne += Chr(10)
+  aboutPanel.textOne = textOne
+
+  aboutPanel.titleTwo = "Need Help?"
+  textTwo = "Visit http://help.tubitv.com" + Chr(10)
+  textTwo += Chr(10)
+  textTwo += "Email our Support team at support@tubi.tv" + Chr(10)
+  textTwo += Chr(10)
+  textTwo += "Reach us on Facebook, Instagram, Twitter, and on our website at:" + Chr(10)
+  textTwo += "https://tubitv.com/support" + Chr(10)
+  textTwo += Chr(10)
+  textTwo += "Device ID: " + Right(m.constants.deviceInfo.deviceId, 7) + Chr(10)
+  textOne += "Version " + m.global.constants.settings.version.Replace("_",".") + Chr(10)
+  textOne += Chr(10)
   year = CreateObject("roDateTime").GetYear().toStr()
-  text += "© " + year + " Tubi, Inc. all rights reserved." + Chr(10)
-  text += "The Tubi wordmark and all related logotypes are trademarks of Tubi, Inc."
-  aboutPanel.text = text
+  textTwo += "© " + year + " Tubi, Inc. all rights reserved." + Chr(10)
+  aboutPanel.textTwo = textTwo
   aboutPanel.focusable = false
   aboutPanel.offset = m.rightPanelOffset
   return aboutPanel

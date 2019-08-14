@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="AboutPanel" extends="Panel" >
+
+  <interface>
+    <field id="titleOne" alias="TitleOne.text"/>
+    <field id="textOne"  alias="TextOne.text"/>
+    <field id="titleTwo" alias="TitleTwo.text"/>
+    <field id="textTwo"  alias="TextTwo.text"/>
+    <field id="offset" alias="Offset.translation"/>
+  </interface>
+
+  <children>
+    <Group
+      id="Offset">
+      <Group
+        id="ContentGroup">
+        <Label 
+          id="TitleOne"
+          height="73"
+          vertAlign="bottom">
+          <Font
+           role="font"
+           uri="pkg:/fonts/Vaud-SemiBold.ttf"
+           size="43" />
+        </Label>
+        <Label
+          id="TextOne"
+          height="353"
+          width="1034"
+          wrap="true"
+          translation="[0,135]">
+          <Font
+           role="font"
+           uri="pkg:/fonts/Vaud-Medium.ttf"
+           size="27" />
+        </Label>
+        <Label 
+          id="TitleTwo"
+          height="73"
+          vertAlign="bottom"
+          translation="[0,259]">
+          <Font
+           role="font"
+           uri="pkg:/fonts/Vaud-SemiBold.ttf"
+           size="43" />
+        </Label>
+        <Label
+          id="TextTwo"
+          height="353"
+          width="1034"
+          wrap="true"
+          translation="[0,389]">
+          <Font
+           role="font"
+           uri="pkg:/fonts/Vaud-Medium.ttf"
+           size="27" />
+        </Label>
+      </Group>
+    </Group>
+  </children>
+</component>
