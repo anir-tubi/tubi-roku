@@ -5,7 +5,10 @@
     <field id="iconUrl" type="string" value=""/>
     <field id="fontSize" type="integer" value="32"/>
     <field id="bold" type="boolean" value="true"/>
+    <!-- Is the button currently available to the user to be focused upon? If not, then the label will not be visible and the icon may be set to semi-transparent-->
     <field id="active" type="boolean" value="false"/>
+    <!-- Even if the item is active or enabled, if turnedOn = false, then the button will appear disabled; it will be grayed off no matter what if turnedOn = false -->
+    <field id="turnedOn" type="boolean" value="true"/>
     <field id="selected" type="boolean" value="false"/>
   </interface>
 </component>

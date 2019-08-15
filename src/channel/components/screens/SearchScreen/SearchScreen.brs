@@ -9,7 +9,9 @@ Function init()
   m.spinner = m.top.findNode("spinner")
   m.NavSection = m.top.findNode("nav")
   m.Keyboard = m.top.findNode("Keyboard")
+  m.KidsModeMessage = m.top.findNode("KidsModeMessage")
   m.Keyboard.textEditBox.maxTextLength = 100
+
   '//::TODO:: there looks like there is a bug when setting a custom focus color background. The focius color is not the right size. 
   '//   When this is fixed in a firmware, we should use a custom focus background color
   '//m.keyboard.focusedKeyColor = m.global.constants.ui.colors.keyboardFocusedText
@@ -30,6 +32,7 @@ Function init()
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("visible", "onVisible")
   m.top.observeField("enabled", "onEnableChange")
+  m.top.observeField("kidsModeEnabled", "onKidsModeEnableChange")
 
   m.SearchText.color = m.global.constants.ui.colors.titleHeader
 
@@ -98,12 +101,22 @@ Function onEnableChange()
   end if
 End Function
 
+Function onKidsModeEnableChange()
+  if m.top.kidsModeEnabled = true
+    m.KidsModeMessage.visible = false
+  else
+    m.KidsModeMessage.visible = true
+  end if
+End Function
+
 
 ' This may filter results based on parental controls so send it again on auth change
 Function onSignedInChange()
   tubiLog("SearchScreen.onSignedInChange")
   if m.Keyboard.text <> invalid and m.Keyboard.text.len() > 0 then
     loadSearchResults()
+  else
+    loadSearchResults(true)
   end if
 End Function
 

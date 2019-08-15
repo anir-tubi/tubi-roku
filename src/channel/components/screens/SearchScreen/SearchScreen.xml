@@ -19,6 +19,9 @@
 
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean"  alwaysNotify="true"/>
+      
+      <!-- Change the UI based on the value of this field. -->
+      <field id="kidsModeEnabled" value="false" type="boolean" />
 
 
     <!-- OUTPUT -->
@@ -109,15 +112,33 @@
       <LayoutGroup
           id="leftSide"
           layoutDirection="vert"
-          itemSpacings="[0,14]"
+          itemSpacings="[16]"
           horizAlignment="left"
           vertAlignment="top">
-        <!--topLeftSideSpacer used to position the keyboard so it is aligns vertically with the resulkts grid on the right side-->
-        <Rectangle 
-          id="topLeftSideSpacer"
-          visible="false"
-          width="10"
-          height="64"></Rectangle>
+        
+
+        <LayoutGroup
+          id="kidsModeGroup"
+          layoutDirection="horiz">
+          <!--KidsModeMessageSpacer used to position the kids-mode text so it left aligns with the keyboard-->
+          <Rectangle 
+            id="KidsModeMessageSpacer"
+            visible="false"
+            width="20"
+            height="1"/>  
+          <Label
+            id="KidsModeMessage"
+            text="Switch to Kids for kids safe search results"
+            vertAlign="bottom"
+            visible="false"
+            height="50">
+              <Font
+                role="font"
+                uri="pkg:/fonts/Vaud-SemiBold.ttf"     
+                size="27"/>
+          </Label>
+        </LayoutGroup>
+
         <MiniKeyboard
           id="Keyboard"
           showTextEditBox="false">

@@ -51,6 +51,10 @@ Function init()
   m.top.observeField("seekPlaylist", "onSeekPlaylist")
   m.top.observeField("dock", "onDockedChange")
   m.top.observeField("showTransport", "onShowTransport")
+  m.top.observeField("kidsMode", "onKidsModeChange")
+  m.logo = m.top.findNode("tubiLogo")
+  m.logoKids = m.top.findNode("tubiKidsLogo")
+
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.ProgressBar = m.top.findNode("ProgressBar")
@@ -1303,6 +1307,15 @@ Function showAdBreak()
   m.top.adControl = "play"
 End Function
 
+Function onKidsModeChange()
+  if m.top.kidsMode = false
+    m.logo.visible = true
+    m.logoKids.visible = false
+  else 
+    m.logo.visible = false
+    m.logoKids.visible = true
+  end if
+End Function
 
 Function onShowTransport()
   if m.top.showTransport then

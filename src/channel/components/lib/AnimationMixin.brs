@@ -93,18 +93,26 @@ Function colorChange(target As Object, color As String, duration As Float, delay
 End Function
 
 
-Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 As Float)
+Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 As Float, opacity = -1)
   animationOptions = {
     duration: duration
     delay: delay
   }
-  if outOrIn = "out"
-    animationOptions.opacity = 0.0
-    return animate(target, animationOptions)
-  else if outOrIn = "in"
-    animationOptions.opacity = 1.0
-    return animate(target, animationOptions)
+  if opacity < 0 
+    if outOrIn = "out"
+      animationOptions.opacity = 0.0
+    else if outOrIn = "in"
+      animationOptions.opacity = 1.0
+    end if
+  else 
+    '// If the opacity is passed then overwrite the outOrIn string
+    if opacity > 1
+      opacity = 1
+    end if
+    animationOptions.opacity = opacity
   end if
+
+  return animate(target, animationOptions)
 End Function
 
 

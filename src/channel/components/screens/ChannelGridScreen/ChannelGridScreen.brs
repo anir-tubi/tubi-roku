@@ -31,6 +31,7 @@ Function init()
   end if
 End Function
 
+
 Function onReloadUserCategoriesResponse()
   handledRequest = m.top.reloadUserCategoriesResponse
   tubiLog("ChannelGridScreen.onReloadUserCategoriesResponse")

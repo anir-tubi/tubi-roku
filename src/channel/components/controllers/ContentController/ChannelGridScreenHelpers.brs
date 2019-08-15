@@ -80,12 +80,15 @@ Function onGridContentSelected(msg)
   showChannelScreen(gridScreen.contentSelected, sType)
 End Function
 
-
-Function onRefreshGridSignal(msg)
-  gridScreen = msg.getRoSGNode()
+Function refreshGridScreen(gridScreen)
   m.refreshingChannelGridCache = true
   gridScreen.isLoading = true
   getGridDataFromServer(gridScreen)
+End Function
+
+Function onRefreshGridSignal(msg)
+  gridScreen = msg.getRoSGNode()
+  refreshGridScreen(gridScreen)
 End Function
 
 Function getGridDataFromServer(screen)

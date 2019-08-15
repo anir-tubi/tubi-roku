@@ -9,6 +9,9 @@ Function init()
   m.Bookmarks = TubiBookmarks(Request, Auth, m.constants, m.NodeHelpers)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
+  ' Boolean to indicate if the device is in kids moode
+  m.kidsModeOn = invalid
+  m.kidsModeOn = isKidsModeEnabled()
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
@@ -28,7 +31,9 @@ Function init()
   m.contentGroup = m.top.findNode("ContentGroup")
 
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
-  m.logo = m.top.findNode("tubiLogo")
+  m.logoGroup = m.top.findNode("logoGroup")
+  m.logo = m.logoGroup.findNode("tubiLogo")
+  m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
   ' Global state
@@ -90,6 +95,11 @@ Function init()
   m.autoplayContext = invalid
 
   m.lastUserActivity = Uptime(0)  ' arbitrary marker when user last pressed a remote key
+  if m.kidsModeOn = true
+    '//The UI is set by default to non-kids mode. Now change it to kidsMode.
+    enableKidsMode(true)
+  end if
+
 
   m._ = rodash()
 
@@ -203,10 +213,10 @@ End Function
 Function onVideoPlayerVisibleChange()
   if m.videoPlayer.visible = true
     m.SideNav.visible = false
-    m.logo.visible = false
+    m.logoGroup.visible = false
   else
     m.SideNav.visible = true
-    m.logo.visible = true
+    m.logoGroup.visible = true
   end if 
 End Function
 
@@ -478,6 +488,47 @@ Function onHistoryQueueRefresh()
   refreshAllDetailScreens()
 End Function
 
+' When the parental control settings have changed, then enable or disable kids mode.
+Function reactToParentalControlsChange()
+  authInfo = m.global.authInfo
+  if authInfo <> invalid
+    if authInfo.parentalrating < 2
+      '//turn on kids mode
+      enableKidsMode(true)
+    else if isKidsModeEnabled() = true
+      '//turn off kids mode (if it is on) when switching to teens and greater
+      enableKidsMode(false)
+    end if
+  end if
+
+  refreshScreenAfterParentalChanges()
+End Function
+
+Function enableKidsMode(bTurnOn = true)
+  '//::TODO::KIDS-MODE save the kids mode state in local memory
+  m.kidsModeOn = bTurnOn
+  setKidsModeInSideNav()
+  m.videoPlayer.kidsMode = bTurnOn
+  
+  '//display proper logo
+  if bTurnOn = true
+    m.logoKids.visible = true
+    m.logo.visible = false
+  else 
+    m.logoKids.visible = false
+    m.logo.visible = true
+  end if
+End Function
+
+
+Function isKidsModeEnabled() as Boolean
+'// This IF statement is temporary until we get the kids mode from the device memory
+  if m.kidsModeOn = invalid
+    '//::TODO::KIDS-MODE - find out if kids mode is on or off. Set up the kids mode state in a separate PR
+    m.kidsModeOn = true
+  end if 
+  return m.kidsModeOn 
+End Function
 
 Function refreshAllDetailScreens()
   ' Refresh all detail screens so they have proper history that's been loaded or unloaded

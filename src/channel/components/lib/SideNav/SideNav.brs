@@ -2,12 +2,16 @@ Function init()
   m.constants = m.global.constants
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("userName", "onSignedIn")
+  m.top.observeFieldScoped("kidsModeValues", "onKidsModeValuesChanged")
   m.top.observeFieldScoped("opened", "onOpenedChange")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
   m.BottomContent = m.top.findNode("BottomContent")
   m.MainContent = m.top.findNode("MainContent")
   m.TopContent = m.top.findNode("TopContent")
-  m.profileContent = m.top.findNode("profile")
+  m.profileContent = m.TopContent.findNode("profile")
+  m.kidsModeContent = m.TopContent.findNode("kidsMode")
+  '// This is the item to focus on when the sidenav opens. This implies that this was the last item (that has an associated screen) selected 
+  m.itemSelectedRemembered = invalid
 
   m.topItems = m.top.findNode("topItems")
   initList(m.topItems)
@@ -45,8 +49,8 @@ Function onFocusChange()
       '//set the focus on the last selected item
       if m.listItemSelected <> invalid
         list = m.top.findNode(m.listItemSelected.list)
-        list.setFocus(true)
         list.jumpToItem = m.listItemSelected.index
+        list.setFocus(true)
       end if
     end if
   end if
@@ -61,6 +65,23 @@ Function onSignedIn()
 
     m.profileContent.title = sName
     m.topItems.content = m.TopContent
+End Function
+
+' The kids mode has changed, so alter the look of the icon
+Function onKidsModeValuesChanged()
+  sIconTitle = m.top.kidsModeValues.title
+  bEnabled = (m.top.kidsModeValues.grayedOut = false)
+
+  if sIconTitle <> ""
+    m.kidsModeContent.title = sIconTitle
+    m.kidsModeContent.turnedOn = bEnabled
+    nPreviouslyFocusedIndex = m.topItems.itemFocused
+    m.topItems.content = m.TopContent
+    if m.topItems.hasFocus() = true
+      '// If in focus, then set the focus back to the current item after the content has been reset
+      m.topItems.jumpToItem = nPreviouslyFocusedIndex
+    end if
+  end if
 End Function
 
 
@@ -86,6 +107,7 @@ Function onKeyEvent(key, press)
   if press = true
     if key = "up"
       if m.mainItems.isInFocusChain() = true
+        m.topItems.jumpToItem = m.topItems.content.getChildCount() - 1
         m.topItems.setFocus(true)
       else if m.bottomItems.isInFocusChain() = true
         m.mainItems.jumpToItem = m.mainItems.content.getChildCount() - 1
@@ -114,19 +136,26 @@ End Function
 Function onOpenedChange()
   if m.top.opened = true
     '//display hidden items, profile, settings, exit. Set all buttons to full opacity
-    fade(m.topItems, "in", 0.2)
+    
+    if m.itemSelectedRemembered <> invalid
+      list = m.top.findNode(m.itemSelectedRemembered.list)
+      index = getIndexByID(list, m.itemSelectedRemembered.id)
+      list.jumpToItem = index
+      list.setFocus(true)
+    end if
+
     fade(m.bottomItems, "in", 0.2)
     setContentActive(m.TopContent)
     setContentActive(m.MainContent)
     setContentActive(m.BottomContent)
     m.mainItemsSelected.visible = true
   else
-    fade(m.topItems, "out", 0.2)
     fade(m.bottomItems, "out", 0.2)
     setContentActive(m.TopContent, false)
     setContentActive(m.MainContent, false)
     setContentActive(m.BottomContent, false)
     m.mainItemsSelected.visible = false
+    m.listItemSelected = invalid
   end if
 End Function
 
@@ -138,53 +167,65 @@ Function setContentActive(content, bActive = true)
   for i = 0 to content.getChildCount()-1
     item = content.getChild(i)
     item.active = bActive
-    if m.itemSelectedRemembered = item.id
+    
+    if(m.itemSelectedRemembered <> invalid and m.itemSelectedRemembered.id = item.id)
       item.selected = true
     else 
       item.selected = false
-    end if
+    end if 
   end for
 End Function
 
 
 Function onItemRequested()
-  if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and m.top.itemRequested <> m.itemSelectedRemembered 
-    '//Go thru the lists and select the option that matxches the itemRequested
+  if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and (m.itemSelectedRemembered = invalid or m.top.itemRequested <> m.itemSelectedRemembered.id)
+    '//Go thru the lists and select the option that matches the itemRequested
     nIndexMain = focusItemInList(m.mainItems, m.top.itemRequested)
     if nIndexMain < 0
       if focusItemInList(m.bottomItems, m.top.itemRequested) < 0
         focusItemInList(m.topItems, m.top.itemRequested)
       end if
-    else 
-      m.mainItemsSelected.jumpToItem = nIndexMain
     end if
   end if
 End Function
 
+Function getIndexByID(list, sID)
+  content = list.content
+  index = -1
+  for i = 0 to content.getChildCount() - 1
+    item = content.getChild(i)
+    if item.id = sID 
+      index = i
+      exit for
+    end if
+  end for
+  return index
+End Function
 
 Function focusItemInList(list, sID)
-  index = -1
-  content = list.content
-    index = -1
-    for i = 0 to content.getChildCount() - 1
-      item = content.getChild(i)
-      if item.id = sID 
-        index = i
-        exit for
-      end if
-    end for
-    if index >= 0
-      list.jumpToItem = index
-      m.listItemSelected = {
+  index = getIndexByID(list, sID)
+  if index >= 0
+    list.jumpToItem = index
+    if list.id = m.mainItems.id
+      m.mainItemsSelected.jumpToItem = index
+    end if
+    m.listItemSelected = {
+      list: list.id
+      index: index
+    }
+
+    if m.mainItems.id = list.id
+      item = list.content.getChild(index)
+      m.itemSelectedRemembered = {
+        id: item.id,
         list: list.id
-        index: index
       }
-      m.itemSelectedRemembered = item.id
     end if
-    if index >= 0
-      refresh()
-    end if
-  return index
+  end if
+  if index >= 0
+    refresh()
+  end if
+return index
 End Function
 
 
@@ -200,6 +241,12 @@ Function onItemSelect(msg)
   if list.id = m.mainItems.id
     m.mainItemsSelected.jumpToItem = index
   end if
-  m.itemSelectedRemembered = item.id
+  if m.mainItems.id = list.id
+    '//Only allow the middle list items to be remembered as they are the only ones with associated screens while the side nav is still visible 
+    m.itemSelectedRemembered = {
+      list: list.id
+      id: item.id
+    } 
+  end if
   m.top.itemSelected = item.id
 End Function

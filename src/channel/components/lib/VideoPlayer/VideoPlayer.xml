@@ -35,6 +35,9 @@
       <!-- WRITE-ONLY field which hides overlay and transport.  This is not a persistent state -->
       <field id="dock" type="boolean" value="false" alwaysNotify="true"/>
 
+      <!-- WRITE-ONLY field tells if the video player should change its appearance to be kid friendly or not-->
+      <field id="kidsMode" type="boolean" value="false" />
+
       <field id="width" alias="VideoNode.width"/>
       <field id="height" alias="VideoNode.height"/>
 
@@ -151,12 +154,24 @@
         color="0x000000FF"
         width="1920"
         height="1080"/>
-      <Poster
-        width="309"
-        height="135"
-        uri="pkg:/images/logo-white-xlarge.png"
-        loadSync="true"
-        translation="[810,382]"/>
+      <Group
+        id="logoGroup">
+        <Poster
+          id="tubiLogo"
+          width="309"
+          height="135"
+          uri="pkg:/images/logo-white-xlarge.png"
+          loadSync="true"
+          translation="[810,382]"/>
+        <Poster
+          id="tubiKidsLogo"
+          width="632"
+          height="135"
+          uri="pkg:/images/logo-kids-white-xlarge.png"
+          loadSync="true"
+          visible="false"
+          translation="[648,382]"/>
+        </Group>
       <Label
         id="LoadingMessage"
         height="64"

@@ -502,6 +502,7 @@ Function getConstants()
   constants.errors.context.activateScreen = "8"
   constants.errors.context.channelsScreen = "9"
   constants.errors.context.categoriesScreen = "10"
+  constants.errors.context.kidsMode = "11"
 
   '//What is the actual error?
   constants.errors.subtypes = {}
@@ -520,11 +521,16 @@ Function getConstants()
     constants.ui.users = {}
       constants.ui.users.guestHistory = true
 
-
     'static - pre defined text used in the app
     constants.ui.terms = {}
       constants.ui.terms.categories = "Categories"
       constants.ui.terms.channels = "Channels"
+
+      'static - pre defined text used in the side nav
+      constants.ui.terms.sideNav = {}
+        constants.ui.terms.sideNav.kidsModeEnabled = "Exit Kids"
+        constants.ui.terms.sideNav.kidsModeDisabled = "Kids"
+
 
     'static - pre defined category names
     constants.ui.categoryNames = {}
@@ -610,6 +616,7 @@ Function getConstants()
       constants.ui.sideNavIds.settings = "settings"
       constants.ui.sideNavIds.exit = "exit"
       constants.ui.sideNavIds.profile = "profile"
+      constants.ui.sideNavIds.kidsMode = "kidsMode"
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true

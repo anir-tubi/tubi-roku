@@ -91,13 +91,23 @@
           id="SideNav"
           translation="[-66,0]"
           width="438"/>
-        <Poster
-          id="tubiLogo"
-          height="45"
-          width="103"
-          opacity="0.5"
-          uri="pkg:/images/logo-white-large.png"
-          translation="[1732,60]" />
+        <Group 
+          id="logoGroup"
+          opacity="0.5">
+          <Poster
+            id="tubiLogo"
+            height="45"
+            width="103"
+            uri="pkg:/images/logo-white-large.png" 
+            translation="[1732,60]"/>
+          <Poster
+            id="tubiKidsLogo"
+            height="45"
+            width="209"
+            visible="false"
+            translation="[1626,60]"
+            uri="pkg:/images/logo-kids-white-large.png"/>
+        </Group>
       </Group>
 
       <!-- Services -->
