@@ -16,9 +16,6 @@
       <field id="opened" value="false" type="boolean"/>
       <field id="userName" type="string" value="" alwaysNotify="true"/>
 
-      <!-- this is an asscoiative array that contains a boolean param "grayedOut" to indicate if the kids mode button should be grayed out, and "title" to indocate the label title of the kids mode button. -->
-      <field id="kidsModeValues" type="assocarray" value="" alwaysNotify="true"/>
-
       <!--Similar to itemSelected except the the outside requests an item to be selected and if it is available, then itemSelected will be updated. -->
       <field id="itemRequested" type="string" alwaysNotify="true"/>
 
@@ -31,10 +28,10 @@
         id="content"
         layoutDirection="vert"
         translation="[0,60]"
-        itemSpacings="[128,168]">
+        itemSpacings="[220,137]">
 
       <MarkupList
-        numRows="2"
+        numRows="1"
         id="topItems"
         itemSize="[360, 70]"
         itemSpacing="[0,0]"
@@ -46,10 +43,6 @@
           <SideNavContentNode
             id="profile"
             iconUrl="pkg:/images/sideNavProfile.png"/>
-          <SideNavContentNode
-            id="kidsMode"
-            title="Kids"
-            iconUrl="pkg:/images/sideNavKids.png"/>
         </ContentNode>
       </MarkupList>
 

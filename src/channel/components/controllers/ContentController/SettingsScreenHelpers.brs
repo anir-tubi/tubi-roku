@@ -198,16 +198,8 @@ Function refreshScreenAfterParentalChanges()
   if homeScreen <> invalid
     homeScreen.loadAllCategories = true
   end if
-  setContentToRefresh(m.constants.ui.screenIds.channelListScreen) 
+  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
-
-  screen = currentScreen()
-  if screen.id = m.constants.ui.screenIds.searchScreen
-    screen.kidsModeEnabled = isKidsModeEnabled()
-    screen.signedIn = true
-  else if screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen
-    refreshGridScreen(screen)
-  end if
 End Function
 
 function onParentalSettingComplete(msg)
@@ -227,7 +219,8 @@ function onParentalSettingComplete(msg)
       '//Update menu so it appears updated. This is only needed if the password has been saved locally and was not entered immediately from the password screeen
       m.settingsScreen.parentalSettingUpdated = true
     end if
-    reactToParentalControlsChange()
+    
+    refreshScreenAfterParentalChanges()
   else
     if isConfirmPasswordScreen() = true
       setAuthInfoValue("secondsOfSavedPassword", 0)

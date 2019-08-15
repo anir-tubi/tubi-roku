@@ -5,9 +5,8 @@ Function showSearchScreen(constants)
   searchScreen.observeFieldScoped("contentSelected", "onSearchContentSelected")
   searchScreen.observeFieldScoped("backgroundUriList", "onSearchBackgroundChange")
   searchScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-
-  searchScreen.id = m.constants.ui.screenIds.searchScreen
-  searchScreen.kidsModeEnabled = isKidsModeEnabled()
+  
+  searchScreen.id = constants.ui.screenIds.searchScreen
   searchScreen.backgroundUriList = [constants.ui.uris.defaultBackground]
 
   pushScreen(searchScreen, true, true)

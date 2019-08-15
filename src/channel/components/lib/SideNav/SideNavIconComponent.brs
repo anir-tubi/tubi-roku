@@ -31,14 +31,8 @@ End Function
 
 Function onActiveChange()
   if m.top.itemContent.active = true
-    if m.top.itemContent.turnedOn <> false
-      m.Icon.opacity = 1
-      fade(m.Label, "in", .1)
-    else 
-      '// if the item is not enabled, then still don't bring up the opacity 
-      m.Icon.opacity = .15
-      fade(m.Label, "in", .1, 0, .15)
-    end if
+    fade(m.Label, "in", .1)
+    m.Icon.opacity = 1
   else
     fade(m.Label, "out", .1)
 
@@ -46,7 +40,7 @@ Function onActiveChange()
     if m.top.itemContent.selected = true
       m.Icon.opacity = 1
     else
-      m.Icon.opacity = .15
+      m.Icon.opacity = .5
     end if
   end if
 End Function

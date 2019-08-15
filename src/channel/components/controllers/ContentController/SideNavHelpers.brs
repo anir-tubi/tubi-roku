@@ -16,7 +16,7 @@ Function isSideNavActive() as Boolean
   return (m.SideNav.isInFocusChain() = true and m.SideNav.opened = true)
 End Function 
 
-' Change the appearance of some side nav elements when the user data has changed
+
 Function onSideNavSignedIn()
   sName = ""
   authInfo = m.global.authInfo
@@ -29,42 +29,6 @@ Function onSideNavSignedIn()
     end if
   end if
   m.SideNav.userName = sName
-
-End Function
-
-Function inFullKidsMode() as Boolean
-  bFull = true
-  authInfo = m.global.authInfo
-  if authInfo <> invalid
-    if authInfo.parentalrating < 2
-      '//parental controls is set to kids state so Kids Mode is limited
-      bFull = false
-    end if
-  end if
-  return bFull
-End Function
-
-Function setKidsModeInSideNav()
-
-  bKidsModeOn = isKidsModeEnabled()
-  bLimited = false
-  if bKidsModeOn = true
-    sIconTitle = m.constants.ui.terms.sideNav.kidsModeEnabled 
-  else
-    sIconTitle = m.constants.ui.terms.sideNav.kidsModeDisabled 
-  end if
-  authInfo = m.global.authInfo
-  if authInfo <> invalid
-    if inFullKidsMode() = false
-      bLimited = true
-      sIconTitle = m.constants.ui.terms.sideNav.kidsModeEnabled 
-    end if
-  end if
-  
-  m.SideNav.kidsModeValues = {
-    grayedOut: bLimited, 
-    title: sIconTitle
-  }
 End Function
 
 
@@ -78,65 +42,33 @@ Function onSideNavItemSelected()
     if (m.sSideNavCurrentScreen.subtype() = currentScreenNow.subtype()) then bSameScreen = true
   end if
 
-  if m.sSideNavItemSelected <> itemSelected or bSameScreen = false
-    '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
-    bNewScreenCalledSuccess = false 
+  if m.sSideNavItemSelected <> itemSelected or bSameScreen = false or itemSelected = "exit"
+    bSuccess = false
+
+'//::TODO::SIDENAV - (SHOW DESIGNERS as this might be a good bug) only root pages should display the menu. Listen to the stack and hide menu when when more than one screen is in stack. Also ensure the left button does not animate the sidenav for subPages
     if itemSelected = m.constants.ui.sideNavIds.profile
       if authInfo = invalid
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
         startSignIn(true)
-        bNewScreenCalledSuccess = true
+        bSuccess = true
       else
         '//Bring user to the settings page and select the signout option
         showSettingsScreen("SignInOutButton")
-        bNewScreenCalledSuccess = true
-      end if
-    else if itemSelected = m.constants.ui.sideNavIds.kidsMode
-      bModeOn = isKidsModeEnabled()
-      sTitle = ""
-      sDescription = ""
-      if inFullKidsMode() = true
-        '//If we are in full kids mode: aka parental control settings are not set to kids
-        
-        if bModeOn = true
-          bNewScreenCalledSuccess = false
-          sTitle = "Exit Kids"
-          sDescription = "Exit Kids to see titles rated PG-13 and above."
-          errorObj = createErrorObject(m.constants.errors.context.kidsMode, "", sDescription, "", sTitle, false)
-          showErrorModal(errorObj, onKidsModeErrorExit, [], invalid, [], ["Exit Kids", "Cancel"])
-        else 
-          bNewScreenCalledSuccess = false 
-          enableKidsModeFromSideNav()
-          hideNavMenu(false)
-        end if
-      else 
-        '//User is set as a kid, so they are not allowed to change the kids mode, so instead show them an error modal
-        
-        if bModeOn = true
-          bNewScreenCalledSuccess = false
-          sTitle = "Exit Kids"
-          sDescription = "To exit Kids, please update your parental controls in account settings."
-          errorObj = createErrorObject(m.constants.errors.context.kidsMode, "", sDescription, "", sTitle, false)
-          showErrorModal(errorObj, onKidsModeErrorSettingsCall, [], invalid, [], ["Go To Settings", "Cancel"])
-        else 
-          '//This use case should never happen. If the user has parental controls set to kids, then that instantly turns on kids mode,
-          '//   so there will never be an enter kids mode mode when parental controls is turned to kids.
-        end if
-
+        bSuccess = true
       end if
     else if itemSelected = m.constants.ui.sideNavIds.search
       '//display the search
       showSearchScreen(m.constants)
-      bNewScreenCalledSuccess = true
+      bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.home
       showHomeScreen(m.constants, authInfo)
-      bNewScreenCalledSuccess = true
+      bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.channels
       showChannelListScreen(m.constants, "MENU")
-      bNewScreenCalledSuccess = true
+      bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.categories
       showCategoryListScreen(m.constants, "MENU")
-      bNewScreenCalledSuccess = true
+      bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.settings
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
@@ -144,14 +76,16 @@ Function onSideNavItemSelected()
         homeScreen.enabled = true
       end if
       showSettingsScreen()
-      bNewScreenCalledSuccess = true
+      bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.exit
       displayExitModule()
-      bNewScreenCalledSuccess = false
+      bSuccess = true
     end if
 
-    if bNewScreenCalledSuccess = true
-      hideNavMenu(false)
+    if bSuccess = true
+      if itemSelected <> m.constants.ui.sideNavIds.exit
+        hideNavMenu(false)
+      end if
       m.sSideNavItemSelected = itemSelected
       m.sSideNavCurrentScreen  = currentScreen()
     end if
@@ -160,22 +94,6 @@ Function onSideNavItemSelected()
     '//same item was selected, do nothing other than closing the menu
     hideNavMenu(false)
   end if
-End Function
-
-Function enableKidsModeFromSideNav(bEnable = true)
-  enableKidsMode(bEnable)
-  '//refresh all cached screens once the kids mode has changed. 
-    refreshScreenAfterParentalChanges()
-End Function
-
-' The user selected to view the setttings screen from the kids mode limited error screen.
-Function onKidsModeErrorSettingsCall()
-  hideNavMenu(false)
-  showSettingsScreen()
-End Function
-
-Function onKidsModeErrorExit()
-  enableKidsModeFromSideNav(false)
 End Function
 
 

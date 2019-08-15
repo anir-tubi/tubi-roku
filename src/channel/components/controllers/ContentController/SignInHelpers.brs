@@ -84,7 +84,7 @@ Function onAuthInfoReceived()
       }
     end if
   end if
-  
+
   setDirtyUserCategories(m.constants.ui.categoryIds.queue)
   setDirtyUserCategories(m.constants.ui.categoryIds.history)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)

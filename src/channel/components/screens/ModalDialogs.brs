@@ -14,15 +14,10 @@ Function showErrorModal(errorObj As Object, tryAgainCallback=invalid As Dynamic,
   modal.title = errorObj.title
   errorCode = errorObj.code
   errorMessage = errorObj.message
-  
-  if errorObj.shouldDisplayErrorInfo = true
-    message = "Error: " + errorCode + Chr(10)
-    message += errorMessage + Chr(10)
-    message += "Please contact: support@tubi.tv"
-  else 
-    message = errorMessage
-  end if
 
+  message = "Error: " + errorCode + Chr(10)
+  message += errorMessage + Chr(10)
+  message += "Please contact: support@tubi.tv"
   modal.message = message
   if tryAgainCallback <> invalid
     if buttons.count() = 2
@@ -60,9 +55,8 @@ End Function
 ' @param message: The message to be displayed when displaying this error
 ' @param externalCode: The ID that comes from an outside source: i.e. server may provide a 404 error
 ' @param title: The title of the error window to be displayed when displaying this error
-' @param bDisplayErrorInfo: Should the error message diasplay error info (error ID, default contact info, etc)?
 ' Returns an associative array that is used to create the error object param for the showErrorModal() function
-Function createErrorObject(contextCode as String, subtypeCode as String, message = "" as String, externalCode = "", title = "" as String, bDisplayErrorInfo = true) as Object
+Function createErrorObject(contextCode as String, subtypeCode as String, message = "" as String, externalCode = "", title = "" as String) as Object
   oError = {}
 
   oError.contextCode = contextCode
@@ -88,7 +82,6 @@ Function createErrorObject(contextCode as String, subtypeCode as String, message
     title = "Something went wrong"
   end if
   oError.title = title
-  oError.shouldDisplayErrorInfo = bDisplayErrorInfo
 
   '//Format error codes according to the following specs
   '//   https://tubitv.atlassian.net/wiki/spaces/EC/pages/798359880/User+Facing+Error+Codes
