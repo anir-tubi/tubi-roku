@@ -28,7 +28,7 @@
           height="353"
           width="1034"
           wrap="true"
-          translation="[0,135]">
+          translation="[0,120]">
           <Font
            role="font"
            uri="pkg:/fonts/Vaud-Medium.ttf"
@@ -38,7 +38,7 @@
           id="TitleTwo"
           height="73"
           vertAlign="bottom"
-          translation="[0,259]">
+          translation="[0,239]">
           <Font
            role="font"
            uri="pkg:/fonts/Vaud-SemiBold.ttf"
@@ -46,10 +46,10 @@
         </Label>
         <Label
           id="TextTwo"
-          height="353"
+          height="500"
           width="1034"
           wrap="true"
-          translation="[0,389]">
+          translation="[0,354]">
           <Font
            role="font"
            uri="pkg:/fonts/Vaud-Medium.ttf"
