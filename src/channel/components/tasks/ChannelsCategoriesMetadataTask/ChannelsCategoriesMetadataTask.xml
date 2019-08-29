@@ -12,6 +12,8 @@
     <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
 
     <interface>

@@ -470,11 +470,11 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   return translated
 End Function
 
+
 ''''''''''''''''''''
 ' translateChannelsCategories
 '
-' For now translating the channels and categories feed is identical to the homescreen
-'
+' Translate a response from matrix/categories or matrix/channels for use in ChannelGridScreen
 Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, bDisplayChannels = true) As Object
   sID_queue = m.constants.ui.categoryIds.queue 
   sID_continue_watching = m.constants.ui.categoryIds.history
@@ -513,6 +513,13 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
   '//::HARDCODED:: If this is categories, then place few catrgories in the front and get rid of featured
   '//::TODO:: have the backend filter and sort categories when they have more bandwidth
   'set up AAs for all categories including any nested categories
+
+  ' set up the channel/category thumbnail values for an experiment
+  inCategoryGridExperiment = false
+  if type(getExperimentValue) = "Function" and getExperimentValue("RokuNamespace", "roku_category_grid") = "on"
+    inCategoryGridExperiment = true
+  end if
+
   for i=0 to containers.count()-1
     container = containers[i]
 
@@ -563,7 +570,10 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
   ' use gradient images that reside on the CDN for category/channel poster images
   for i=0 to homescreenAA.children.count()-1
     categoryAA = homescreenAA.children[i]
-    if categoryAA.isSpecial <> true
+    if inCategoryGridExperiment = true
+      thumbnailNumber = (i MOD 12) + 1
+      categoryAA.thumbnail = m.constants.ui.uris.categoryBackgrounds.urlBase + thumbnailNumber.toStr() + m.constants.ui.uris.categoryBackgrounds.urlEndingExp
+    else if categoryAA.isSpecial <> true
       thumbnailNumber = (i MOD 11) + 1
       categoryAA.thumbnail = m.constants.ui.uris.categoryBackgrounds.urlBase + thumbnailNumber.toStr() + m.constants.ui.uris.categoryBackgrounds.urlEnding 
     end if

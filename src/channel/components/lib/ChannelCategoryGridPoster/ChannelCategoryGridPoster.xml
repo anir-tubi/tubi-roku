@@ -2,16 +2,27 @@
 <component name="ChannelCategoryGridPoster" extends="Group" >
   <script type="text/brightscript" uri="pkg:/components/lib/ChannelCategoryGridPoster/ChannelCategoryGridPoster.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+
+  <!-- only needed for roku_category_grid experiment, can be deleted when experiment concludes -->
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
     <field id="width" alias="Poster.width" />
     <field id="height" alias="Poster.height" />
+    <field id="focusPercent" type="float" />
+    <field id="gridHasFocus" type="boolean" />
+    <field id="itemHasFocus" type="boolean" />
   </interface>
 
   <children>
     <Poster
      id="Poster"
+     opacity="0.5"
      failedBitmapUri = "pkg:/images/placeholder-featured.jpg"
      loadingBitmapUri = "pkg:/images/placeholder-featured.jpg" />
     <Poster

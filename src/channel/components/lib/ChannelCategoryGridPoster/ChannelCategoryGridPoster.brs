@@ -1,10 +1,22 @@
 Function init()
   m.constants = m.global.constants
+  m._ = rodash()
   m.poster = m.top.findNode("Poster")
   m.logo = m.top.findNode("Logo")
   m.title = m.top.findNode("Title")
   m.top.observeField("itemContent", "onContentChange")
+  m.top.observeField("focusPercent", "onFocusPercentChange")
+  m.top.observeField("gridHasFocus", "onGridFocusChange")
   m.logo.observeField("loadStatus", "onLogoLoad")
+
+  ' used to keep track of if the grid has focus or not, onGridFocusChange fires every time any focus changes including
+  ' scrolling between tiles.
+  m.gridIsFocused = false
+
+  m.categoryGridExperiment = false
+  if getExperimentValue("RokuNamespace", "roku_category_grid") = "on"
+    m.categoryGridExperiment = true
+  end if
 End Function
 
 
@@ -49,6 +61,7 @@ Function onContentChange(data)
   end if
 End Function
 
+
 Function setTranslations()
   nXLogo = (m.top.width - m.logo.width)/2
   nYLogo = (m.top.height - m.logo.height)/2
@@ -59,8 +72,8 @@ Function setTranslations()
   nYTitle = (m.top.height - m.title.boundingRect().height)/2
   m.title.width = nTitleWidth
   m.title.translation = [nXTitle, nYTitle]
-
 End Function
+
 
 Function onLogoLoad()
   if m.logo.loadStatus = "failed"
@@ -69,7 +82,31 @@ Function onLogoLoad()
   end if
 End Function
 
+
 Function displayTitle()
   m.title.visible = true
   m.title.text = m.top.itemContent.title
+End Function
+
+
+Function onFocusPercentChange(msg)
+  if m.categoryGridExperiment = true
+    focusPercent = msg.getData()
+    m.poster.opacity = m._.max(focusPercent, 0.5)
+  end if
+End Function
+
+
+Function onGridFocusChange()
+  if m.categoryGridExperiment = true
+    if m.top.gridHasFocus = false and m.gridIsFocused = true 'grid is losing focus
+      fade(m.poster, "out", 0.4, 0, 0.5)
+      m.gridIsFocused = false
+    else if m.top.gridHasFocus = true
+      if m.gridIsFocused = false and m.top.itemHasFocus = true 'grid is regaining focus
+        fade(m.poster, "in", 0.4, 0)
+      end if
+      m.gridIsFocused = true
+    end if
+  end if
 End Function

@@ -25,11 +25,11 @@ Function init()
   m.contentLoadedAndFocused = false
   m.top.screenLevel = m.constants.ui.screenLevels.channelCategoryGridScreen
 
-
   if m.constants.deviceInfo.scaledUi = true then
     m.ChannelCategoryGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
 End Function
+
 
 Function onReloadUserCategoriesResponse()
   handledRequest = m.top.reloadUserCategoriesResponse
@@ -51,6 +51,7 @@ Function onReloadUserCategoriesResponse()
     checkForContentAndRefresh(bEmpty, sChangedCategoryID)
   end if
 End Function
+
 
 ' checkForContentAndRefresh()
 ' @param bContentEmpty - Does the passed category have NO content?
@@ -86,7 +87,6 @@ Function checkForContentAndRefresh(bContentEmpty, sCategoryID)
       m.top.content.validUntil = 0
     end if
   end if 
-  
 End Function
 
 
@@ -102,6 +102,7 @@ Function onSetCallOfAction()
   callToAction.text = sPreviousPage
 End Function
 
+
 Function onEnableChange()
   if m.top.enabled = true
     fade(m.NavSection, "in", 0.3)
@@ -109,6 +110,7 @@ Function onEnableChange()
     fade(m.NavSection, "out", 0.3)
   end if
 End Function
+
 
 Function onScreenFocusChange()
   tubiLog("ChannelGridScreen.onScreenFocusChange")
@@ -123,6 +125,7 @@ Function onScreenFocusChange()
     m.contentLoadedAndFocused = false
   end if
 End Function
+
 
 Function onLoadContent()
   if m.top.content <> invalid
