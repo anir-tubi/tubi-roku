@@ -10,7 +10,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   roAdFramework.enableNielsenDAR(true)
 
   'set the Nielsen application id for Tubi TV
-  roAdFramework.setNielsenAppId("PC60BD376-8551-4688-BEF4-E8B45A39D4C7")
+  roAdFramework.setNielsenAppId("PB8C78BDD-9B1B-4020-B4DD-AE7917C0F396")
 
   'turn on debug output for RAF
   roAdFramework.setDebugOutput(false)
