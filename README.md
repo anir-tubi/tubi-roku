@@ -102,9 +102,9 @@ $ make ROKU_PROFILE=test install
 ```
 
 2\. Prepare for submission release.
-- Create a new branch based off of master and call it “[MAJOR_RELEASE]_[MINOR_RELEASE]_branch”: i.e. `2_9_branch`.
+- Create a new branch based off of master and call it "x_y_branch", where x is the Major Release number and where y is the Minor Release number: i.e. `2_9_branch`.
 
-- Create a new `new_images_since_x_y` file where x and y are the major and minor build numbers: i.e. `new_images_since_2_9`
+- Create a new `new_images_since_x_y` file: i.e. `new_images_since_2_9`
 
 - Update the Makefile with the new `new_images_since_x_y` path (3 instances should be updated)
 - Create a new hotpatch for the new version: ie. `2.9.brs`
@@ -124,21 +124,28 @@ $ make ROKU_PROFILE=test install
 
 - Update the value of hotPatchUrl in `./config/staging.yml` to reflect the new build version.
 
-- Make a new PR of the `x_y_branch` against master. Once the PR has been merged _DO NOT_ delete the `x_y_branch`, as this will remain the source of truth for what is in production.
-
-3\. Create a staging channel for the minor build
-- Run `make ROKU_PROFILE=staging install`
-
-- Navigate to the `/build` directory, and note the `tubi_x_y_z.pkg file`, you will be creating a private Roku channel with this file.
-
 - Create a new image to serve as the staging channel launch icon.
 	- Using GIMP or Photoshop or other image editor, modify the `channel-store/channel-store-poster-540x405.png` with some text to identify it as the x_y staging channel.
 
 	- Save the modified image as `channel-store/channel-store-poster-staging-540x405.png`, overwriting the old staging channel launch icon.
 
+- Make a new PR of the `x_y_branch` against master. Once the PR has been merged _DO NOT_ delete the `x_y_branch`, as this will remain the source of truth for what is in production.
+
+3\. Create a staging channel for the minor build
+- Run `make ROKU_PROFILE=staging install`
+
+- Navigate to the `/build` directory, and note the `tubi_x_y_z.zip file`, you will be creating a private Roku channel with this file.
+
+- Create a .pkg file from the `tubi_x_y_z.zip` file found in the `/build` directory.
+  - Navigate to your Roku's IP in a browser, and choose the "Packager" tab.
+
+  - Enter App Name/Version as Tubi Staging x.y and enter the password associated with the Tubi dev key (you may need to get this from a teammate).
+
+  - Select the "Package" button, and download the .pkg file from the link that is created.
+
 - In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to create a new private channel.
 
-	- Upload the `build/tubi_x_y_z.pkg` file.
+	- Upload the .pkg file that you downloaded from the browser during the packaging process.
 
 	- Name the channel `Staging x_y`.
 
@@ -187,7 +194,7 @@ $ make release
 - In a browser, visit [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to update the "Tubi - Free Movies & TV" channel with the `/build/roku_x_y_z.pkg` file.
 
 7\. Update the hotpatch and remote component files to the CDN
-- Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/)
+- Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/). Although it does not matter, traditionally we name the branch "Roku_x_y_z", where "z" is the patch number.
 
 - Copy two files to the CDN repo:
 
@@ -205,7 +212,6 @@ $ make release
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
 
-
 - Select "Edit Release"
 
 - Update the "Release Title" to be either Submission Release or Remote Release depending on the type of release.
@@ -218,9 +224,12 @@ $ make release
 # Remote Release
 Remote releases are releases that are not sent to Roku, and updates are made when a device loads the Tubi channel, by downloading the hotpatch and remote component files, which are used to build the channel UI.
 
-1\. Checkout the most recent `x_y_branch` branch, and pull any potential updates from origin. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`.
+1\. Checkout the most recent `x_y_branch` branch, and pull any potential updates from origin. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number.
 
 2\. Cherry pick any commits from `master` that are to be included in the next release onto the `x_y_branch`.
+(See [this page](https://www.previousnext.com.au/blog/intro-cherry-picking-git) for more info info on the cherry pick git command.)
+
+Ensure the cherry pick commit names include the name of PR number. This usually is done automaticlly but be aware that we need to have the PR numbers to make it easier later on so we know which PRs have been pushed and which ones have not.
 
 3\. Check each of the cherry picked commits for updates to `Constants.brs` or `TubiChannel.brs`. If any updates have been made to either of these files, copy the changes into `x.y.brs` hotpatch file in the "temporary changes that can be can be deleted unless noted otherwise" section.
 
@@ -230,13 +239,39 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
 6\. Run `make release` in order to increment the version number.
 
-7\. Deploy to staging by running `make ROKU_PROFILE=staging install`. (See instructions for setting up AWS CLI in Submission Release section 4 if you have not yet up AWS CLI).
+7\. Deploy to staging
+
+* Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now,
+[https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+
+
+* Navigate to your `.aws` directory (typically found at `~/.aws`)
+
+* In the `config` file set the `AWS_DEFAULT_REGION `.
+
+	```
+	[default]
+	region = us-west-1
+	```
+* In the `credentials` file, set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+
+	```
+	[default]
+	aws_access_key_id = <<aws_access_key_id>>
+	aws_secret_access_key = <<aws_secret_access_key>>
+	```
+
+* Upload the hotpatch and remote components onto the staging AWS server, run:
+
+```
+$ make ROKU_PROFILE=staging install
+```
 
 8\. Create a CH ticket with any changes that have been made and give to the QA team for manual testing. Once the QA team has signed off on the build...
 
 9\. Run `make release` in order to increment the version number once more (the QA build should not be the same version number as the production build).
 
-10\. Get the release reviewed.
+10\. Ready the release branch for review
 
 - Rename the `qa_x_y_z` branch to `release_x_y_z`.
 
@@ -244,10 +279,10 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
 - Make a PR to the `x_y_branch`.
 
-- __DO NOT RELEASE UNTIL THE PR IS APPROVED__
+- __DO NOT PROCEED TO THE INFRA SCRIPT STEP UNTIL THIS PR IS APPROVED__
 
 11\. Update the hotpatch and remote component files to the CDN
-- Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/)
+- Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/). Although it does not matter, traditionally we name the branch "Roku_x_y_z".
 
 - Copy two files to the CDN repo:
 
@@ -255,9 +290,16 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
   - copy the hotpatch file (i.e. `build/hotpatch/x.y.brs`) into folder: hotpatches/roku/
 
-- Submit a PR to the CDN repo.
+- Submit a PR to the CDN repo. Wait for the approval and merging of the PR before procreeding to the next step
 
-12\. Use an infra script to move the updates to the CDN repo to the actual CDN servers. (Please see the [CDN README](github.com/adRise/adrise_cdn/) for more info).
+12\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
+- Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
+- You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirmements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
+	```
+	pyenv
+	```
+- In terminal, navigate to your adrise_infrastructure repo and run the installation iunstructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure)
+- Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/).
 
 13\. Verify the release
 - Run a smoke test on production checking at minimum:
