@@ -1,5 +1,5 @@
-function InfoManager(plugin, options = Invalid)
-	YouboraLog("Created InfoManager")
+function InfoManager(plugin, options = invalid)
+    YouboraLog("Created InfoManager")
     this = CreateObject("roAssociativeArray")
 
     'Methods
@@ -10,11 +10,11 @@ function InfoManager(plugin, options = Invalid)
 
         if resource = invalid
             resource = m.plugin.getResource()
-        endif
+        end if
 
         if resource = invalid
             resource = "Unknown"
-        endif
+        end if
 
         return resource
     end function
@@ -24,7 +24,7 @@ function InfoManager(plugin, options = Invalid)
 
         if playhead = invalid
             playhead = 0.0
-        endif
+        end if
 
         return playhead
     end function
@@ -34,11 +34,11 @@ function InfoManager(plugin, options = Invalid)
 
         if duration = invalid
             duration = m.plugin.getMediaDuration()
-        endif
+        end if
 
         if duration = invalid
             duration = 0
-        endif
+        end if
 
         return duration
     end function
@@ -48,7 +48,7 @@ function InfoManager(plugin, options = Invalid)
 
         if title = invalid
             title = m.plugin.getTitle()
-        endif
+        end if
 
         return title
     end function
@@ -58,11 +58,11 @@ function InfoManager(plugin, options = Invalid)
 
         if islive = invalid
             islive = m.plugin.getIsLive()
-        endif
+        end if
 
         if islive = invalid
             islive = false
-        endif
+        end if
 
         return islive
     end function
@@ -72,7 +72,7 @@ function InfoManager(plugin, options = Invalid)
 
         if rendition = invalid
             rendition = m.plugin.getRendition()
-        endif
+        end if
 
         return rendition
     end function
@@ -82,7 +82,7 @@ function InfoManager(plugin, options = Invalid)
 
         if bitrate = invalid
             bitrate = -1.0
-        endif
+        end if
 
         return bitrate
     end function
@@ -92,7 +92,7 @@ function InfoManager(plugin, options = Invalid)
 
         if throughput = invalid
             throughput = -1.0
-        endif
+        end if
 
         return throughput
     end function
@@ -165,9 +165,130 @@ function InfoManager(plugin, options = Invalid)
         if models.DoesExist(hardwareModel)
             return models[hardwareModel]
         else
-            return Invalid
-        endif
+            return invalid
+        end if
 
+    end function
+
+    this.getDeviceInfo = function()
+        deviceInfo = {}
+        if m.options["device.model"] = invalid
+            hardwareModel = CreateObject("roDeviceInfo").GetModel()
+
+            'Mapping
+            models = {
+                'Roku LT
+                "2400X" : "Roku LT",
+                "2450X" : "Roku LT",
+                "2700X" : "Roku LT",
+                'Roku 1
+                "2710X" : "Roku 1",
+                'Roku 2
+                "2720X" : "Roku 2",
+                "3000X" : "Roku 2",
+                "3050X" : "Roku 2",
+                "3100X" : "Roku 2",
+                "4210X" : "Roku 2",
+                'Roku Stick
+                "3600X" : "Roku Stick",
+                "3800X" : "Roku Stick",
+                "3810X" : "Roku Stick",
+                "3400X" : "Roku Stick",
+                "3420X" : "Roku Stick",
+                "3500X" : "Roku Stick",
+                'Roku 3
+                "4200X" : "Roku 3",
+                "4230X" : "Roku 3",
+                'Roku 4
+                "4400X" : "Roku 4",
+                'Roku TV
+                "5000X" : "Roku TV",
+                "6000X" : "Roku TV",
+                "7000X" : "Roku TV",
+                "8000X" : "Roku TV",
+                'Roku Express
+                "3700X" : "Roku Express",
+                "3710X" : "Roku Express",
+                "3900X" : "Roku Express",
+                "3910X" : "Roku Express",
+                'Roku Premiere
+                "4620X" : "Roku Premiere",
+                "4630X" : "Roku Premiere",
+                'Roku Ultra
+                "4640X" : "Roku Ultra",
+                "4660X" : "Roku Ultra",
+                'Roku SD
+                "N1050" : "Roku SD",
+                'Roku HD Classic (Roku HD)
+                "N1000" : "Roku HD Classic (Roku HD)",
+                "N1100" : "Roku HD Classic (Roku HD)",
+                'Roku XD
+                "2050X" : "Roku XD",
+                "2050N" : "Roku XD",
+                "N1101" : "Roku XD",
+                "2100X" : "Roku XD",
+                "2100N" : "Roku XD",
+                'Roku HD
+                "2000C" : "Roku HD",
+                "2500X" : "Roku HD"
+            }
+
+            if models.DoesExist(hardwareModel)
+                deviceInfo["model"] = models[hardwareModel]
+            end if
+        else
+            deviceInfo["model"] = m.options["device.model"]
+        end if
+
+        if m.options["device.osVersion"] = invalid
+            deviceInfo["osVersion"] = CreateObject("roDeviceInfo").GetVersion()
+        else
+            deviceInfo["osVersion"] = m.options["device.osVersion"]
+        end if
+
+        if m.options["device.brand"] = invalid
+            deviceInfo["brand"] = "Roku"
+        else
+            deviceInfo["brand"] = m.options["device.brand"]
+        end if
+
+        if m.options["device.deviceType"] <> invalid
+            deviceInfo["deviceType"] = m.options["device.deviceType"]
+        end if
+
+        if m.options["device.deviceCode"] <> invalid
+            deviceInfo["deviceCode"] = m.options["device.deviceCode"]
+        end if
+
+        if m.options["device.osName"] <> invalid
+            deviceInfo["osName"] = m.options["device.osName"]
+        end if
+
+        if m.options["device.browserName"] = invalid
+            deviceInfo["browserName"] = ""
+        else
+            deviceInfo["browserName"] = m.options["device.browserName"]
+        end if
+
+        if m.options["device.browserVersion"] = invalid
+            deviceInfo["browserVersion"] = ""
+        else
+            deviceInfo["browserVersion"] = m.options["device.browserVersion"]
+        end if
+
+        if m.options["device.deviceBrowserType"] = invalid
+            deviceInfo["deviceBrowserType"] = ""
+        else
+            deviceInfo["deviceBrowserType"] = m.options["device.deviceBrowserType"]
+        end if
+
+        if m.options["device.browserEngine"] = invalid
+            deviceInfo["browserEngine"] = ""
+        else
+            deviceInfo["browserEngine"] = m.options["device.model"]
+        end if
+
+        return deviceInfo
     end function
 
     this.getAdPosition = function()
@@ -205,48 +326,75 @@ function InfoManager(plugin, options = Invalid)
         return duration
     end function
 
+    this.getAdTitle = function()
+        return m.options["ad.title"]
+    end function
+
+    this.getAdResource = function()
+        return m.options["ad.resource"]
+    end function
+
     'Fields
     this.plugin = plugin
 
-    if options = Invalid
+    if options = invalid
         this.options = {}
     else
         this.options = options
-    endif
+    end if
 
     return this
 
 
 
-end Function
+end function
 
-function InfoManager_getRequestParams(requestName = "" as String, params = Invalid)
+function InfoManager_getRequestParams(requestName = "" as string, params = invalid)
 
-    if params = Invalid
+    if params = invalid
         outParams = {}
     else
         outParams = params
     end if
 
+    'Now is mandatory for EVERY request
+    if outParams.DoesExist("accountCode") = false then outParams["accountCode"] = m.options["accountCode"]
+
     if requestName = "data"
         if outParams.DoesExist("system") = false then outParams["system"] = m.options["accountCode"]
         if outParams.DoesExist("pluginName") = false then outParams["pluginName"] = m.plugin.getPluginName()
         if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
-        if outParams.DoesExist("username") = false then outParams["username"] = m.options["username"]
+        if outParams.DoesExist("fingerprint") = false then outParams["fingerprint"] = CreateObject("roDeviceInfo").GetChannelClientId()
     else if requestName = "start" or requestName = "error"
         'Start and Error share most of the params, but error also has error code and error message
         ' Params
         if outParams.DoesExist("system") = false then outParams["system"] = m.options["accountCode"]
         if outParams.DoesExist("player") = false then outParams["player"] = m.plugin.getPluginName()
-        if outParams.DoesExist("username") = false then outParams["username"] = m.options["username"]
-        if outParams.DoesExist("anonymousUser") = false then outParams["anonymousUser"] = m.options["anonymousUser"]
+        if outParams.DoesExist("username") = false
+            if m.options["user.name"] = invalid
+                outParams["username"] = m.options["username"]
+            else
+                outParams["username"] = m.options["user.name"]
+            end if
+        end if
+        if outParams.DoesExist("email") = false then outParams["email"] = m.options["user.email"]
+        if outParams.DoesExist("obfuscateIp") = false then outParams["obfuscateIp"] = m.options["user.obfuscateIp"]
+        if outParams.DoesExist("userType") = false then outParams["user.type"] = m.options["user.email"]
+        if outParams.DoesExist("anonymousUser") = false
+            if m.options["user.anonymousId"] = invalid
+                outParams["anonymousUser"] = m.options["anonymousUser"]
+            else
+                outParams["anonymousUser"] = m.options["user.anonymousId"]
+            end if
+        end if
         if outParams.DoesExist("transactionCode") = false then outParams["transactionCode"] = m.options["content.transactionCode"]
         if outParams.DoesExist("deviceId") = false then outParams["deviceId"] = m.options["device.code"]
         'If no forced deviceId, get it from the device itself
-        if outParams["deviceId"] = Invalid
+        if outParams["deviceId"] = invalid
             outParams["deviceId"] = m.getDeviceIdFromHardware()
-        endif
-        if outParams.DoesExist("deviceInfo") = false then outParams["deviceInfo"] = {"model":m.getDeviceModel()}
+        end if
+        if outParams.DoesExist("deviceInfo") = false then outParams["deviceInfo"] = m.getDeviceInfo()
+        'if outParams.DoesExist("deviceInfo") = false then outParams["deviceInfo"] = {"model":m.getDeviceModel()}
         'Plugin versioning
         if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
         if outParams.DoesExist("playerVersion") = false then outParams["playerVersion"] = m.plugin.getPlayerVersion()
@@ -258,28 +406,57 @@ function InfoManager_getRequestParams(requestName = "" as String, params = Inval
         if outParams.DoesExist("title") = false then outParams["title"] = m.getTitle()
         if outParams.DoesExist("properties") = false then outParams["properties"] = m.options["content.metadata"]
         if outParams.DoesExist("cdn") = false then outParams["cdn"] = m.options["content.cdn"]
+        if outParams.DoesExist("program") = false then outParams["program"] = m.options["content.program"]
+
+        if outParams.DoesExist("package") = false then outParams["package"] = m.options["content.package"]
+        if outParams.DoesExist("saga") = false then outParams["saga"] = m.options["content.saga"]
+        if outParams.DoesExist("tvshow") = false then outParams["tvshow"] = m.options["content.tvShow"]
+        if outParams.DoesExist("season") = false then outParams["season"] = m.options["content.season"]
+        if outParams.DoesExist("titleEpisode") = false then outParams["titleEpisode"] = m.options["content.episodeTitle"]
+        if outParams.DoesExist("channel") = false then outParams["channel"] = m.options["content.Channel"]
+        if outParams.DoesExist("contentId") = false then outParams["contentId"] = m.options["content.id"]
+        if outParams.DoesExist("imdbID") = false then outParams["imdbID"] = m.options["content.imdbId"]
+        if outParams.DoesExist("gracenoteID") = false then outParams["gracenoteID"] = m.options["content.gracenoteId"]
+        if outParams.DoesExist("contentType") = false then outParams["contentType"] = m.options["content.type"]
+        if outParams.DoesExist("genre") = false then outParams["genre"] = m.options["content.genre"]
+        if outParams.DoesExist("contentLanguage") = false then outParams["contentLanguage"] = m.options["content.language"]
+        if outParams.DoesExist("subtitles") = false then outParams["subtitles"] = m.options["content.subtitles"]
+        if outParams.DoesExist("contractedResolution") = false then outParams["contractedResolution"] = m.options["content.contractedResolution"]
+        if outParams.DoesExist("cost") = false then outParams["cost"] = m.options["content.cost"]
+        if outParams.DoesExist("price") = false then outParams["price"] = m.options["content.price"]
+        if outParams.DoesExist("playbackType") = false then outParams["playbackType"] = m.options["content.playbackType"]
+        if outParams.DoesExist("drm") = false then outParams["drm"] = m.options["content.drm"]
+        if outParams.DoesExist("videoCodec") = false then outParams["videoCodec"] = m.options["content.encoding.videoCodec"]
+        if outParams.DoesExist("audioCodec") = false then outParams["audioCodec"] = m.options["content.encoding.audioCodec"]
+        if outParams.DoesExist("codecSettings") = false then outParams["codecSettings"] = m.options["content.encoding.codecSettings"]
+        if outParams.DoesExist("codecProfile") = false then outParams["codecProfile"] = m.options["content.encoding.codecProfile"]
+        if outParams.DoesExist("containerFormat") = false then outParams["containerFormat"] = m.options["content.encoding.containerFormat"]
         'Network
         if outParams.DoesExist("isp") = false then outParams["isp"] = m.options["network.isp"]
         if outParams.DoesExist("ip") = false then outParams["ip"] = m.options["network.ip"]
+        'App
+        if outParams.DoesExist("appName") = false then outParams["appName"] = m.options["app.name"]
+        if outParams.DoesExist("appReleaseVersion") = false then outParams["appReleaseVersion"] = m.options["app.releaseVersion"]
         'Extra params
         nextraparams = 20
         index = 1
         while (index <= nextraparams)
             optionKey = "extraparam." + index.ToStr()
             paramKey = "param"+index.ToStr()
+            optionCustomDimensionKey = "content.customDimension." + index.ToStr()
             paramValue = m.options[optionKey]
-            if paramValue <> Invalid
+            if m.options[optionKey] = invalid then paramValue = m.options[optionCustomDimensionKey]
+            if paramValue <> invalid
                 if outParams.DoesExist(paramKey) = false then outParams[paramKey] = paramValue
-            endif
+            end if
             index = index + 1
         end while
-
 
         'Error-specific params
         if requestName = "error"
             if outParams.DoesExist("msg") = false then outParams["msg"] = "Unknown error"
             if outParams.DoesExist("errorCode") = false then outParams["errorCode"] = 9000
-        endif
+        end if
 
     else if requestName = "join"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
@@ -289,7 +466,7 @@ function InfoManager_getRequestParams(requestName = "" as String, params = Inval
     else if requestName = "resume"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
     else if requestName = "stop"
-        'no params
+        if outParams.DoesExist("playhead") = false then outParams["playhead"] = "-1"
     else if requestName = "ping"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         if outParams.DoesExist("bitrate") = false then outParams["bitrate"] = m.getBitrate()
@@ -300,10 +477,10 @@ function InfoManager_getRequestParams(requestName = "" as String, params = Inval
         'Avoid sending a playhead of 0
         if outParams["playhead"] = 0
             outParams["playhead"] = 1
-        endif
+        end if
     else if requestName = "seekEnd"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
-    else if requestName = "adStart"
+    else if requestName = "adStart" or requestName = "adInit"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         if outParams.DoesExist("adPosition") = false then outParams["adPosition"] = m.getAdPosition()
         if outParams.DoesExist("adResource") = false then outParams["adResource"] = m.options["ad.resource"]
@@ -313,6 +490,21 @@ function InfoManager_getRequestParams(requestName = "" as String, params = Inval
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.3.4 Roku Adnalyzer"
+        'Extra params
+        nextraparams = 10
+        index = 1
+        while (index <= nextraparams)
+            optionKey = "ad.extraparam." + index.ToStr()
+            paramKey = "extraparam"+index.ToStr()
+            optionCustomDimensionKey = "ad.customDimension." + index.ToStr()
+            paramValue = m.options[optionKey]
+            if m.options[optionKey] = invalid then paramValue = m.options[optionCustomDimensionKey]
+            if paramValue <> invalid
+                if outParams.DoesExist(paramKey) = false then outParams[paramKey] = paramValue
+            end if
+            index = index + 1
+        end while
     else if requestName = "adJoin"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
@@ -339,20 +531,20 @@ function InfoManager_getRequestParams(requestName = "" as String, params = Inval
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
-    endif
+    end if
 
     return outParams
 
 end function
 
-function InfoManager_getFromInnerAsocArray(dict as Object, dictName as string, key as string)
-    if dict <> Invalid and dict.DoesExist(dictName) = true
+function InfoManager_getFromInnerAsocArray(dict as object, dictName as string, key as string)
+    if dict <> invalid and dict.DoesExist(dictName) = true
         innerDict = dict[dictName]
-        if innerDict <> Invalid and type(innerDict) = "roAssociativeArray" and innerDict.DoesExist(key) = true
+        if innerDict <> invalid and type(innerDict) = "roAssociativeArray" and innerDict.DoesExist(key) = true
             value = innerDict[key]
             return value
-        endif
-    endif
+        end if
+    end if
 
     return invalid
 end function

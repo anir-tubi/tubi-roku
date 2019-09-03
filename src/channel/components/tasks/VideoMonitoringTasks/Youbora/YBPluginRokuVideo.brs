@@ -9,10 +9,19 @@ end sub
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.0.4-" + m.pluginName
+    m.pluginVersion = "6.3.4-" + m.pluginName
 
-    m.top.videoplayer.ObserveField("state", m.port)
-    m.top.videoplayer.ObserveField("bufferingStatus", m.port)
+    ' Object copy to improve performance
+    m.videoplayer = m.top.videoplayer
+
+    ' Let's cache the segment used on the bitrate to access less to it
+    m.bitrateSegment = invalid
+    ' Cache the streamInfo too, to use with throughtput and resource
+    m.streamInfo = invalid
+
+    m.videoplayer.ObserveField("state", m.port)
+    m.videoplayer.ObserveField("bufferingStatus", m.port)
+    'm.top.ObserveField("taskState", m.port)
     m.top.ObserveField("taskState", "_taskListener")
 end sub
 
@@ -52,7 +61,7 @@ sub processPlayerState(newState as String)
             eventHandler("seeking")
         endif
     else if newState = "playing"
-        if m.viewManager.isStartSent = true
+        'if m.viewManager.isStartSent = true
             if m.viewManager.isJoinSent = false
                 eventHandler("join")
             else if m.viewManager.isPaused = true
@@ -64,7 +73,7 @@ sub processPlayerState(newState as String)
             else if m.viewManager.isSeeking = true
                 eventHandler("seeked")
             endif
-        endif
+        'endif
     else if newState = "stopped"
         'Sometimes when playing an HLS Live stream, the Video player
         'enters the "stopped" state while buffering.
@@ -72,18 +81,18 @@ sub processPlayerState(newState as String)
         'Here we check for the control property of the video player
         'and close the view only if it is stop. This avoids sending
         'false stop events.
-        if m.top.videoplayer.control = "stop" AND m.viewManager.isShowingAds = false
-            'eventHandler("stop")
-        else
-            YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
-        endif
+        ' if m.videoplayer.control = "stop" AND m.viewManager.isShowingAds = false
+        '     'eventHandler("stop")
+        ' else
+        '     YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
+        ' endif
     else if newState = "error"
-        eventHandler("error", {"msg":m.top.videoplayer.errorMsg, "errorCode":m.top.videoplayer.errorCode.ToStr()})
+        eventHandler("error", {"msg":m.videoplayer.errorMsg, "errorCode":m.videoplayer.errorCode.ToStr()})
     else if newState = "paused"
         eventHandler("pause")
     else if newState = "finished"
         m.viewManager.isFinished = true
-        if m.top.videoplayer.control = "stop"
+        if m.videoplayer.control = "stop"
             eventHandler("stop")
         else
             YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
@@ -114,30 +123,23 @@ function getResource()
     'stop
     resource = "unknown"
 
-    'This is only for segmented video transports (dash, hls)
-    ssegment = m.top.videoplayer.streamingSegment
-    if ssegment <> invalid
-        resource = ssegment.segUrl
-    else
-        'This is only for roku >= 7.2
-        info = m.top.videoplayer.streamInfo
-        if info <> invalid
-            resource = info.streamUrl
-        else
+    if m.contentUrl = invalid
             'Get it from the informed url by the client
-            content = m.top.videoplayer.content
+            content = m.videoplayer.content
             if content <> invalid
                 resource = content.URL
+                m.contentUrl = resource
             endif
-        endif
-    endif
+    else
+        resource = m.contentUrl
+    end if
 
     return resource
 
 end function
 
 function getMediaDuration()
-    duration = m.top.videoplayer.duration
+    duration = m.videoplayer.duration
 
     if duration = invalid
         duration = 0
@@ -148,15 +150,14 @@ end function
 
 function getPlayhead()
     if m.viewManager.isJoinSent = true
-        return m.top.videoplayer.position
+        return m.videoplayer.position
     else
        return 0
     end if
 end function
 
 function getTitle()
-
-    content = m.top.videoplayer.content
+    content = m.videoplayer.content
 
     if content <> invalid
         title = content.TITLE
@@ -169,23 +170,23 @@ function getTitle()
 end function
 
 function getIsLive()
-    'This always returns false
-    content = m.top.videoplayer.content
+    'This always returns false, so get rid of one call to a node
+    return false
+    ' content = m.videoplayer.content
 
-    if content <> invalid
-        live = content.Live
-    else
-        live = false
-    endif
+    ' if content <> invalid
+    '     live = content.Live
+    ' else
+    '     live = false
+    ' endif
 
-    return live
+    ' return live
 end function
 
 function getThroughput()
     'This is only for roku >= 7.2
-    info = m.top.videoplayer.streamInfo
-    if info <> invalid
-        throughput = info.measuredBitrate
+    if m.streamInfo <> invalid
+        throughput = m.streamInfo.measuredBitrate
     else
         throughput = invalid
     endif
@@ -194,9 +195,9 @@ end function
 
 function getBitrate()
     'This is only for HLS and DASH
-    ssegment = m.top.videoplayer.streamingSegment
-    if ssegment <> invalid
-        br = ssegment.segBitrateBps
+    m.bitrateSegment = m.videoplayer.streamingSegment
+    if m.bitrateSegment <> invalid
+        br = m.bitrateSegment.segBitrateBps
     else
         br = -1
     endif
@@ -205,9 +206,8 @@ end function
 
 function getRendition()
     'This is only for HLS and DASH
-    ssegment = m.top.videoplayer.streamingSegment
-    if ssegment <> invalid
-        rendition = ssegment.segBitrateBps
+    if m.bitrateSegment <> invalid
+        rendition = m.bitrateSegment.segBitrateBps
         if rendition < 1000
             rendition = rendition.ToStr() + "bps"
         else if rendition < 1000000
@@ -231,5 +231,6 @@ sub _taskListener()
     if m.top.taskState = "stop"
         m.top.videoplayer.unobserveFieldScoped("state")
         m.top.videoplayer.unobserveFieldScoped("bufferingStatus")
+        m.contentUrl = invalid
     end if
 end sub

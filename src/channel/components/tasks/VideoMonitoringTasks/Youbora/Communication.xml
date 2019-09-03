@@ -5,13 +5,14 @@
   <interface>
 
 	<!-- fields -->
-	<field id = "httpSecure" type = "boolean" />
+	<field id = "httpSecure" type = "boolean" value = "false" />
 	<field id = "code" type = "string" />
 	<field id = "prefix" type = "string" />
-	<field id = "view" type = "integer" value = "-1" />
+	<!-- <field id = "view" type = "integer" value = "-1" /> -->
 	<field id = "pingTime" type = "integer" />
 	<field id = "balancerEnabled" type = "string" />
-	<field id = "requestHost" type = "string" />
+	<field id = "requestHost" type = "string" value = "a-fds.youborafds01.com" />
+  <field id = "youboraId" type = "string"/>
 
 	<!-- commands -->
     <field id = "request" type = "assocarray" />
@@ -21,8 +22,8 @@
 
   </interface>
 
-  <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Utils.brs"/> 
-  <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Communication.brs"/>
-  <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Request.brs"/>
+  <script type="text/brightscript" uri="./Utils.brs"/> 
+  <script type="text/brightscript" uri="./Communication.brs"/>
+  <script type="text/brightscript" uri="./Request.brs"/>
 
 </component>

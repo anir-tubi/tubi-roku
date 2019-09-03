@@ -27,6 +27,8 @@ sub init()
     m.getPluginName = getPluginName
     m.getPluginVersion = getPluginVersion
     m.getPlayerVersion = getPlayerVersion
+    m.getIsStarted = getIsStarted
+    m.isExtraMetadataReady = isExtraMetadataReady
 
     'Ads
     m.getAdPosition = getAdPosition
@@ -35,6 +37,9 @@ sub init()
     m.getAdDuration = getAdDuration
 
     m.lastAdPlayhead = 0
+
+    m.isStarted = false
+    m.isAdStarted = false
 
     m.adNumber = 0
     m.adPosition = "unknown"
@@ -51,7 +56,7 @@ sub _run()
     YouboraLog("YBPluginGeneric.brs - run")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.0.4-" + m.pluginName
+    m.pluginVersion = "6.3.4-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)
@@ -62,9 +67,14 @@ sub _run()
 
     'Create timer for pings
     m.pingTimer = CreateObject("roSGNode", "Timer")
-    m.pingTimer.duration = 5
-    m.pingTimer.repeat = true
+    pingTimerFields = {}
+    pingTimerFields["duration"] = 5
+    pingTimerFields["repeat"] = true
+    m.pingTimer.setFields(pingTimerFields)
     m.pingTimer.ObserveField("fire", m.port)
+
+    m.isStarted = false
+    m.isAdStarted = false
 
     'Endless loop to listen for events
     while true
@@ -197,17 +207,36 @@ sub stoptMonitoring()
     eventHandler("stop")
 end sub
 
-sub eventHandler(event as String, params = Invalid)
+function getIsStarted()
+    return m.isStarted
+end function
 
-    if event = "play"
-        m.viewManager.sendRequest("start", params)
+sub eventHandler(event as String, params = Invalid)
+    if event = "init"
+        m.viewManager.sendRequest("init", params)
+    else if event = "play"
+        'Remove when finished with delayed start
+        if m.isStarted = false and m.viewManager.isInitiated = false then ?"Play event// TITLE: "; m.infoManager.getTitle(); " RESOURCE: "; m.infoManager.getResource(); " GETISLIVE: "; m.infoManager.getIsLive(); " DURATION: "; m.infoManager.getMediaDuration()
+        if (m.infoManager.getTitle() <> Invalid AND m.infoManager.getTitle() <> "") AND (m.infoManager.getResource() <> Invalid AND m.infoManager.getResource() <> "Unknown") AND (m.infoManager.getIsLive() = true OR m.infoManager.getMediaDuration() <> 0) AND m.isStarted = false AND m.isExtraMetadataReady() = true OR (m.isExtraMetadataReady() = true AND m.viewManager.isJoinSent = true)
+            m.viewManager.sendRequest("start", params)
+            m.isStarted = true
+        else if m.viewManager.isInitiated = false AND m.isStarted = false
+            m.viewManager.sendRequest("init", params)
+            m.viewManager.isInitiated = true
+        end if
     else if event = "join"
+        if m.viewManager.isInitiated = true AND m.isStarted = false AND m.isExtraMetadataReady()
+            m.viewManager.sendRequest("start", params) ' No need to check if it has been sent or not, ViewManager will take care of that
+            m.isStarted = true
+        end if
         m.viewManager.sendRequest("join", params)
     else if event = "pause"
         m.viewManager.sendRequest("pause", params)
     else if event = "resume"
         m.viewManager.sendRequest("resume", params)
     else if event = "stop"
+        m.isStarted = false
+        m.isAdStarted = false
         m.viewManager.sendRequest("stop", params)
     else if event = "error"
         'Brightscript transforms the keys of params to lowercase
@@ -231,14 +260,41 @@ sub eventHandler(event as String, params = Invalid)
     else if event = "seeked"
         m.viewManager.sendRequest("seekEnd", params)
     else if event = "adPlay"
-        m.viewManager.sendRequest("adStart", params)
+        if m.viewManager.isInitiated = false AND m.isStarted = false
+            m.viewManager.sendRequest("init", params)
+        end if
+
+        if (m.infoManager.getAdDuration() <> 0 OR params["adDuration"] <> 0) AND (m.infoManager.getAdTitle() <> invalid OR params["adTitle"] <> invalid) AND (m.infoManager.getAdResource() <> invalid OR params["adResource"] <> invalid) AND m.viewManager.isAdInitiated = false 
+            m.viewManager.sendRequest("adStart", params)
+            m.isAdStarted = true
+        else if m.viewManager.isAdInitiated = false
+            m.viewManager.sendRequest("adInit", params)
+            m.viewManager.isAdInitiated = true
+        end if
     else if event = "adJoin"
-        m.viewManager.sendRequest("adJoin", params)
+        if m.viewManager.isAdInitiated = true OR m.isAdStarted = true
+            if m.isAdStarted = false
+                m.viewManager.sendRequest("adStart", params)
+            end if
+            m.viewManager.sendRequest("adJoin", params)
+        end if
     else if event = "adPlayJoin"
-        m.viewManager.sendRequest("adStart", params)
-        m.viewManager.sendRequest("adJoin", params)
+        if m.viewManager.isInitiated = false AND m.isStarted = false
+            m.viewManager.sendRequest("init", params)
+        end if
+
+        if m.infoManager.getAdDuration() <> 0 AND m.viewManager.isAdInitiated = false 
+            m.viewManager.sendRequest("adStart", params)
+            m.isAdStarted = true
+            m.viewManager.sendRequest("adJoin", params)
+        else if m.viewManager.isAdInitiated = false
+            m.viewManager.sendRequest("adInit", params)
+            m.viewManager.isAdInitiated = true
+        end if
     else if event = "adStop"
         m.viewManager.sendRequest("adStop", params)
+        m.isAdStarted = false
+        m.isAdInitiated = false
     else if event = "adError"
         m.viewManager.sendRequest("adError", params)
         if m.viewManager.isShowingAds = true
@@ -280,7 +336,7 @@ sub invokeAdHandler(data as Object)
          adParams["adDuration"] = data.duration
     end if
 
-    if m.viewManager.isStartSent = true AND m.viewManager.isJoinSent = false
+    if (m.viewManager.isStartSent = true OR m.viewManager.isInitiated = true) AND m.viewManager.isJoinSent = false
         adParams["adPosition"] = "pre"
     else if m.viewManager.isJoinSent = true
         if m.viewManager.isFinished = true
@@ -303,8 +359,9 @@ sub invokeAdHandler(data as Object)
             m.lastAdPlayhead = 0
             eventHandler("seeked")
             eventHandler("buffered")
-            adParams["adnalyzerVersion"] = "6.0.3 Roku Adnalyzer"
-            invokeHandler({handler: "adPlayJoin", params: adParams})
+            invokeHandler({handler: "adPlay", params: adParams})
+        else if data.type = "Start"
+            invokeHandler({handler: "adJoin", params: adParams})
         else if data.type = "Complete"
             invokeHandler({handler: "adStop", params: adParams})
         else if data.type = "Skip"
@@ -352,7 +409,7 @@ sub requestData(args = Invalid)
         protocol = "http://"
     endif
 
-    m.dataRequest.host = protocol + "nqs.nice264.com"
+    m.dataRequest.host = protocol + "a-fds.youborafds01.com"
     m.dataRequest.service = "/data"
     m.dataRequest.args = args
 
@@ -372,11 +429,12 @@ sub receiveData(response as string)
 
     if outerJson.q <> invalid
         innerJson = outerJson.q
-
+        
         host = ""
         code = ""
         pt = ""
         balancer = ""
+        yid = ""
 
         if innerJson.h <> invalid
             host = innerJson.h
@@ -390,6 +448,9 @@ sub receiveData(response as string)
         if innerJson.b <> invalid
             balancer = innerJson.b
         endif
+        if innerJson.f <> invalid
+            yid = innerJson.f.yid
+        endif
 
 
         if Len(host) > 0 and Len(code) > 0 and Len(pt) > 0 and Len(balancer) > 0
@@ -398,16 +459,21 @@ sub receiveData(response as string)
             pingTime = pt
             balancerEnabled = balancer
 
-            m.viewManager.com.prefix = prefix
-            m.viewManager.com.code = firstCode
-            m.viewManager.com.requestHost = host
-            m.viewManager.com.pingTime = pingTime
-            m.viewManager.com.balancerEnabled = balancerEnabled
+            updateFields = { }
+            updateFields["prefix"] = prefix
+            updateFields["code"] = firstCode
+            updateFields["requestHost"] = host
+            updateFields["pingTime"] = pingTime
+            updateFields["balancerEnabled"] = balancerEnabled
+            updateFields["youboraId"] = yid
+
+            m.viewManager.com.setFields(updateFields)
             'update ping time
             m.pingTimer.duration = pt
-
+            'update the copy we have with the ping timer
+            m.viewManager.pingTime = pt
             YouboraLog("FastData " + code + " is ready.")
-
+        
             m.viewManager.com.removePreloader = "FastData"
         endif
 
@@ -422,3 +488,17 @@ sub setOptions(options = Invalid)
         m.infoManager.options = options
     endif
 end sub
+
+function isExtraMetadataReady()
+    options = m.infoManager.options
+    
+    if options["pendingMetadata"] <> invalid and options["waitForMetadata"] = "true" then
+        pendingParams = options["pendingMetadata"]
+        for i=0 to pendingParams.count() - 1
+            if options[pendingParams[i]] = invalid then
+                return false
+            end if
+        end for
+    end if
+    return true
+end function

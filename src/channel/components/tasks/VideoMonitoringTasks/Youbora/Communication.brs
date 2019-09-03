@@ -7,10 +7,10 @@ sub init()
     m.preloaders.AddTail("FastData")
 	m.requests = {} 
 
-	m.startedRequests = CreateObject("roList")
+	m.requestHost = "a-fds.youborafds01.com"
+	m.view = -1
 
-    m.top.requestHost = "nqs.nice264.com"
-    m.top.httpSecure = false
+	m.startedRequests = CreateObject("roList")
 
     m.top.observeField("request", m.port)
     m.top.observeField("addPreloader", m.port)
@@ -26,7 +26,7 @@ end sub
 
 
 sub _run()
-
+	m.httpSecure = m.top.httpSecure
 	'Endless loop to listen for events
     while true
 
@@ -46,7 +46,9 @@ sub _run()
                 preloader = msg.getData()
                 removePreloader(preloader)
             else if msg.getField() = "requestHost"
-            	setHost(m.top.requestHost)
+				' This will get executed before removing the preloader, so we make sure of saving the host just in case
+				m.requestHost = m.top.requestHost
+            	setHost(m.requestHost)
             else if msg.getField() = "nextView"
             	dict = msg.getData()
             	_nextView(dict.live)
@@ -85,7 +87,7 @@ end sub
 
 
 function getHost() as String
-	return addProtocol(m.host, m.top.httpSecure)
+	return addProtocol(m.host, m.httpSecure)
 end function
 
 sub addPreloader(preloader as String)
@@ -110,6 +112,16 @@ sub removePreloader(preloader as String)
 	if preloader = "FastData"
 		'Move requests from 'nocode' to the proper queue
 		nocodeRequests = m.requests["nocode"]
+		'Save the updated data
+
+		topFields = m.top.getFields()
+
+		m.code = topFields["code"]
+		m.prefix = topFields["prefix"]
+		m.requestHost = topFields["requestHost"]
+		m.pingTime = topFields["pingTime"]
+		m.balancerEnabled = topFields["balancerEnabled"]
+		m.youboraId = topFields["youboraId"]
 
 		if nocodeRequests <> Invalid and nocodeRequests.Count() > 0
 		    m.requests[getViewCode()] = nocodeRequests
@@ -131,7 +143,7 @@ sub sendRequest(service, args = Invalid)
     print "Service: " + service
 	'Remove code
 	args.delete("code")
-
+	
 	req = Request(m.port)
 	req.service = service
 	req.args = args
@@ -168,6 +180,10 @@ sub processRequests()
 					req.host = getHost()
 				endif
 
+				if req.service = "/start"
+					req.args["youboraId"] = m.youboraId
+				endif
+
 				req.send()
 
 				m.startedRequests.Push(req.request)
@@ -191,8 +207,8 @@ function _nextView(liveOrPrefix) as String
 		prefix = liveOrPrefix
 	endif
 
-	m.top.view = m.top.view + 1
-	m.top.prefix = prefix
+	m.view = m.view + 1
+	m.prefix = prefix
 
 	vcode = getViewCode()
 	return vcode
@@ -200,10 +216,10 @@ function _nextView(liveOrPrefix) as String
 end function
 
 function getViewCode() as String
-	if m.top.code = Invalid or m.top.code = ""
+	if m.code = Invalid or m.code = ""
 		return "nocode"
 	else
-		return m.top.prefix + m.top.code + "_" + m.top.view.ToStr()
+		return m.prefix + m.code + "_" + m.view.ToStr()
 	endif
 end function
 

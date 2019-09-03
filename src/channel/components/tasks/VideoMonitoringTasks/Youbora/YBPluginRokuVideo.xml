@@ -6,5 +6,5 @@
 		<field id = "taskState" type = "string" />
     </interface>
 
-    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/YBPluginRokuVideo.brs"/>
+    <script type="text/brightscript" uri="./YBPluginRokuVideo.brs"/>
 </component>

@@ -741,6 +741,9 @@ Function onVideoTrackingStart()
 
     if m.videoPlayer.content <> invalid
       youboraConfig["extraparam.1"] = m.videoPlayer.content.id
+      youboraConfig["content.id"] = m.videoplayer.content.id
+      youboraConfig.drm = m.videoplayer.content.drmType
+      youboraConfig.tvShow = Mid(m.videoplayer.content.parentId, 2)
     end if
 
     if m.global.authInfo <> invalid
@@ -748,6 +751,8 @@ Function onVideoTrackingStart()
     end if
 
     youboraConfig["content.transactionCode"] = m.constants.deviceInfo.deviceId
+    youboraConfig["device.model"] = m.constants.deviceInfo.model
+    youboraConfig["app.releaseVersion"] = m.constants.settings.version
 
     m.youboraTask.options = youboraConfig
     m.youboraTask.event = {handler:"play"}

@@ -459,7 +459,7 @@ end function
 function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   ' ShowVariable(m.allAdUnitsList, "ALL AD UNITS LIST", 4)
   scene = containerNode.getScene()
-  m.youboraNode = scene.findNode("Youbora")
+  m.youboraTask = scene.findNode("Youbora")  'created in ContentController.initVideoTracking
 
   if m.hasAds(m.allAdUnitsList) = true
     currentAdPosition = 1
@@ -595,6 +595,8 @@ end function
 '
 ' callback during RAF ad display
 function tubiAds_adTrackingCallback(eventType, ctx)
+  impressionCount = invalid
+  
   if eventType <> invalid
     if eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0
       'Impression events fire when ads start, but also when a user begins interacting with an interactive ad
@@ -618,6 +620,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
         }
         m.tracking.trackUserEvent("ad_click", clickAdEvent, m.requestQueue)
       else
+        endPosition = invalid
         if eventType = "Complete"
           endPosition = ctx.duration
         else if eventType = "Close"
@@ -642,6 +645,16 @@ function tubiAds_adTrackingCallback(eventType, ctx)
       m.isInteracting = false
     else if eventType = "Start"
       m.containerNode.visible = true
+
+      ' count the number of impression pixels for sending to youbora
+      ' As of v6.3.4 Youbora uses the RAF "Start" event to fire the adStart and the adJoin events
+      ' which will contain the impressionCount as ad.extraparam.3
+      impressionCount = 0
+      for i=0 to ctx.ad.tracking.count()-1
+        if ctx.ad.tracking[i].event = "Impression"
+          impressionCount += 1
+        end if
+      end for
     else if eventType = "AcceptInvitation"
       ctx = m.enhanceCtx(ctx)
       clickAdEvent = {
@@ -654,20 +667,44 @@ function tubiAds_adTrackingCallback(eventType, ctx)
       m.isInteracting = true
     end if
   else
-    ' eventType is invalid when an event fires signalling that one second of ad playback has ocurred
+    ' eventType is invalid when an event fires signaling that one second of ad playback has ocurred
     if ctx.time <> invalid
       m.adPlaybackPos = ctx.time
     end if
   end if
 
   ' NPAW Youbora video plaback monitoring
-  if m.youboraNode <> invalid
-    m.youboraNode.adevent = ParseJson(FormatJson(ctx))
+  if m.youboraTask <> invalid
+    youboraOptions = m.youboraTask.options
+
+    if ctx.ad <> invalid
+      if ctx.ad.creativeAdId <> invalid and ctx.ad.creativeAdId <> ""
+        'rainmaker
+        youboraOptions["ad.extraparam.1"] = ctx.ad.creativeAdId
+      else if ctx.ad.adId <> invalid
+        'adrise
+        youboraOptions["ad.extraparam.1"] = ctx.ad.adId  
+      end if
+
+      if ctx.ad.adVideoId <> invalid
+        youboraOptions["ad.extraparam.2"] = ctx.ad.adVideoId
+      end if
+
+      if impressionCount <> invalid
+        youboraOptions["ad.extraparam.3"] = impressionCount
+      else
+        youboraOptions.delete("ad.extraparam.3")
+      end if
+    end if
+
+    m.youboraTask.options = youboraOptions
+    m.youboraTask.adevent = ctx
   end if
 end function
 
 
 Function tubiAds_enhanceCtx(ctx)
+  ' enhance for analytics
   if ctx.ad <> invalid and ctx.ad.clickThrough <> invalid
     adInfo = ParseJson(ctx.ad.clickThrough)
     if type(adInfo) = "roAssociativeArray"
@@ -678,5 +715,6 @@ Function tubiAds_enhanceCtx(ctx)
       end if
     end if
   end if
+
   return ctx
 End Function

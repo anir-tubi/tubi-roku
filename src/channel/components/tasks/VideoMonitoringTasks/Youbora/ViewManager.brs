@@ -8,6 +8,7 @@ function ViewManager(_infoManager as Object, plugin) As Object
 	this.sendRequest = ViewManager_sendRequest
 
     'Fields
+	this.isInitiated = false
     this.isStartSent = false
 	this.isJoinSent = false
 	this.isPaused = false
@@ -17,6 +18,7 @@ function ViewManager(_infoManager as Object, plugin) As Object
 	this.isErrorSent = false
 	this.isAdPaused = false
 	this.isAdJoinSent = false
+	this.isAdInitiated = false
 
 	this.isFinished = false
 
@@ -32,13 +34,16 @@ function ViewManager(_infoManager as Object, plugin) As Object
 	this.chronoAdPause = Chrono()
 	this.chronoTotalAds = Chrono()
 
+	'Ping time, even though we could get it from the communication class for performance sake we save a copy here
+	this.pingTime = 5
+
 
     if _infoManager <> Invalid
 
     	this.infoManager = _infoManager
 
     	this.com = CreateObject("roSGNode", "Communication")
-    	this.com.requestHost = "nqs.nice264.com"
+    	'this.com.requestHost = "nqs.nice264.com"
 		if (_infoManager.options["httpSecure"] = true)
 			this.com.httpSecure = true
 		else
@@ -56,6 +61,8 @@ end Function
 sub ViewManager_pingCallback()
 	m.sendRequest("ping")
 	m.chronoPing.start()
+	'We "use" the ping time to check if any metadata was missing too
+	if m.infoManager.options["waitForMetadata"] = "true" then m.infoManager.plugin.eventHandler("play")
 end sub
 
 
@@ -71,7 +78,22 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 		endif
   endif
 
-	if req = "start"
+	if req = "init"
+		if m.isInitiated = false
+			params = m.infoManager.getRequestParams("start", params)
+
+			m.isInitiated = true
+
+			'Start chronos
+			m.infoManager.plugin._startPingTimer()
+			m.chronoPing.start()
+	        m.chronoJoinTime.start() 'Start timing join time
+
+			m.com.nextView = {live:false} 'Live = true
+			m.com.request = {service: "/init", args:params}
+			YouboraLog("Request: NQS /init " + params["mediaResource"])
+		end if
+	else if req = "start"
 
 		if m.isStartSent = false
 			params = m.infoManager.getRequestParams("start", params)
@@ -81,16 +103,18 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			'Start chronos
 			m.infoManager.plugin._startPingTimer()
 			m.chronoPing.start()
-	        m.chronoJoinTime.start() 'Start timing join time
+			if m.isInitiated = false
+				m.chronoJoinTime.start() 'Start timing join time
+				m.com.nextView = {live:false} 'Live = true
+			end if 
 
-			m.com.nextView = {live:false} 'Live = true
 			m.com.request = {service: "/start", args:params}
 			YouboraLog("Request: NQS /start " + params["mediaResource"])
 		endif
 
 	else if req = "join"
 
-		if m.isStartSent = true and m.isJoinSent = false
+		if (m.isStartSent = true OR m.isInitiated) and m.isJoinSent = false
 			m.isJoinSent = true
 
 			params = m.infoManager.getRequestParams("join", params)
@@ -122,7 +146,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 	else if req = "stop"
 
-	if m.isStartSent
+	if m.isStartSent OR m.isInitiated
 
 		pauseDuration = -1
 
@@ -130,6 +154,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			pauseDuration = m.chronoPause.getDeltaTime(false)
 		end if
 
+		m.isInitiated = false
 		m.isStartSent = false
 		m.isPaused = false
 		m.isJoinSent = false
@@ -170,7 +195,6 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 		if m.isJoinSent = true and m.isPaused = true
 			m.isPaused = false
-			'm.chronoPause.getDeltaTime()
 
 			params = m.infoManager.getRequestParams("resume", params)
 
@@ -194,7 +218,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			changedEntities["rendition"] = m.lastRendition
 		endif
 
-		if params.DoesExist("pingTime") = false then params["pingTime"] = m.com.pingTime
+		if params.DoesExist("pingTime") = false then params["pingTime"] = m.pingTime
 
 		if m.isBuffering
 			if params.DoesExist("bufferDuration") = false then params["bufferDuration"] = m.chronoBuffer.getDeltaTime(false)
@@ -219,6 +243,11 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 		if m.isShowingAds = true
 		  params["adPlayhead"] = m.infoManager.getAdPlayhead()
+
+			if m.isAdPaused = true
+				params["adPauseDuration"] = m.chronoAdPause.getDeltaTime(false)
+			end if
+
 		end if
 
 		m.com.request = {service: "/ping", args:params}
@@ -281,23 +310,39 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 		YouboraLog("Request: NQS /error " + params.msg)
 
-	else if req = "adStart"
-        if m.isStartSent = true and m.isShowingAds = false
-            m.isShowingAds = true
-            if m.chronoTotalAds.getDeltaTime() = -1
+	else if req = "adInit"
+
+		if (m.isAdInitiated = false)
+			if m.chronoTotalAds.getDeltaTime() = -1
             	m.chronoTotalAds.start()
             end if
-            m.chronoGenericAd.start()
+			m.chronoGenericAd.start()
             m.chronoAdJoin.start()
+
+			params = m.infoManager.getRequestParams("adInit", params)
+			m.isAdInitiated = true
+            m.com.request = {service: "/adInit", args:params}
+            YouboraLog("Request: NQS /adInit")
+		end if
+
+	else if req = "adStart"
+        if (m.isStartSent = true OR m.isInitiated) and m.isShowingAds = false
+            m.isShowingAds = true
+			if (m.isAdInitiated = false)
+				if m.chronoTotalAds.getDeltaTime() = -1
+            		m.chronoTotalAds.start()
+            	end if
+				m.chronoGenericAd.start()
+				m.chronoAdJoin.start()
+			end if
             params = m.infoManager.getRequestParams("adStart", params)
 
             m.com.request = {service: "/adStart", args:params}
             YouboraLog("Request: NQS /adStart")
 
          end if
-
      else if req = "adJoin"
-        if m.isStartSent = true and m.isShowingAds = true and m.isAdJoinSent = false
+        if (m.isStartSent = true OR m.isInitiated) and m.isShowingAds = true and m.isAdJoinSent = false
             m.isAdJoinSent = true
             m.chronoAdJoin.stop()
             if params.DoesExist("adJoinDuration") = false then params["adJoinDuration"] = m.chronoAdJoin.getDeltaTime()
@@ -305,13 +350,14 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
             params = m.infoManager.getRequestParams("adJoin", params)
 
             m.com.request = {service: "/adJoin", args:params}
-            YouboraLog("Request: NQS /adJoin " + params.playhead.toStr() + " ms")
+            YouboraLog("Request: NQS /adJoin " + Str(params["adJoinDuration"]) + " ms")
 
          end if
 
      else if req = "adPause"
-        if m.isStartSent = true and m.isShowingAds = true and m.isAdPaused = false
+        if (m.isStartSent = true OR m.isInitiated) and m.isShowingAds = true and m.isAdPaused = false
             m.isAdPaused = true
+			m.chronoAdPause.start()
             params = m.infoManager.getRequestParams("adPause", params)
 
             m.com.request = {service: "/adPause", args:params}
@@ -320,9 +366,11 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
          end if
 
      else if req = "adResume"
-        if m.isStartSent = true and m.isShowingAds = true and m.isAdPaused = true
+        if (m.isStartSent = true OR m.isInitiated) and m.isShowingAds = true and m.isAdPaused = true
             m.isAdPaused = false
             params = m.infoManager.getRequestParams("adResume", params)
+
+			if params.DoesExist("adPauseDuration") = false then params["adPauseDuration"] = m.chronoAdPause.getDeltaTime()
 
             m.com.request = {service: "/adResume", args:params}
             YouboraLog("Request: NQS /adResume")
@@ -330,15 +378,15 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
          end if
 
      else if req = "adStop"
-        if m.isStartSent = true and m.isShowingAds = true
+        if (m.isStartSent = true OR m.isInitiated) and m.isShowingAds = true
             m.chronoGenericAd.stop()
 
             if m.isShowingAds = true
                 m.isAdPaused = false
                 m.isAdJoinSent = false
-            m.isShowingAds = false
+            	m.isShowingAds = false
             end if
-
+			m.isAdInitiated = false
             params["adTotalDuration"] = m.chronoGenericAd.getDeltaTime()
 
             params = m.infoManager.getRequestParams("adStop", params)

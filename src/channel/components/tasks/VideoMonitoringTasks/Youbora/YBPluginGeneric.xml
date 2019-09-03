@@ -22,11 +22,11 @@
 
     </interface>
 
-    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Utils.brs"/>  
-    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/YBPluginGeneric.brs"/>
-    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Chrono.brs"/>  
-    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/ViewManager.brs"/>
-    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Request.brs"/>
-    <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/InfoManager.brs"/>
+    <script type="text/brightscript" uri="./Utils.brs"/>  
+    <script type="text/brightscript" uri="./YBPluginGeneric.brs"/>
+    <script type="text/brightscript" uri="./Chrono.brs"/>  
+    <script type="text/brightscript" uri="./ViewManager.brs"/>
+    <script type="text/brightscript" uri="./Request.brs"/>
+    <script type="text/brightscript" uri="./InfoManager.brs"/>
 
 </component>

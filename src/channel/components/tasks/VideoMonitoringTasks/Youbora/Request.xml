@@ -13,5 +13,5 @@
 
   </interface>
 
-  <script type="text/brightscript" uri="pkg:/components/tasks/VideoMonitoringTasks/youbora/Request.brs"/>
+  <script type="text/brightscript" uri="./Request.brs"/>
 </component>
