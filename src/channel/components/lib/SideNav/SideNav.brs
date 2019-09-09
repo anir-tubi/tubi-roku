@@ -6,20 +6,27 @@ Function init()
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
   m.BottomContent = m.top.findNode("BottomContent")
   m.MainContent = m.top.findNode("MainContent")
+  m.MainContentSelect = m.top.findNode("MainContent-select")
   m.TopContent = m.top.findNode("TopContent")
   m.profileContent = m.top.findNode("profile")
-
   m.topItems = m.top.findNode("topItems")
-  initList(m.topItems)
-
   m.bottomItems = m.top.findNode("bottomItems")
-  initList(m.bottomItems)
-
   m.mainItems = m.top.findNode("mainItems")
-  initList(m.mainItems)
   m.mainItemsSelected = m.top.findNode("mainItemsSelected")
   m.mainItemsSelected.focusBitmapBlendColor = m.constants.ui.colors.selectedListItem
   m.mainItemsSelected.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
+
+  'remove the channels item if not in the US
+  if m.constants.deviceInfo.countryCode <> "US"
+    mainContentChannels = m.MainContent.findNode("channels")
+    m.MainContent.removeChild(mainContentChannels)
+    mainContentChannelsSelect = m.MainContentSelect.findNode("channels-select")
+    m.MainContentSelect.removeChild(mainContentChannelsSelect)
+  end if
+
+  initList(m.topItems)
+  initList(m.bottomItems)
+  initList(m.mainItems)
 
   '//Inititate the default view
   onSignedIn()

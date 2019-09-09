@@ -15,12 +15,6 @@ Function getConstants()
     firmwareVersionMinor = Val(Mid(firmware, 5, 2))  '8'  integer
     firmwareBuild = Mid(firmware, 9, 4) '01185'  string
 
-    if firmwareVersion >= 4.3
-      countryCode = di.GetCountryCode()
-    else
-      countryCode = invalid
-    end if
-
     if di.GetDisplayType() = "HDTV"
       definition = "hd"
     else
@@ -189,7 +183,8 @@ Function getConstants()
     constants.deviceInfo.displaySize = di.GetDisplaySize()
     constants.deviceInfo.displayWidth = di.GetDisplaySize().w
     constants.deviceInfo.displayHeight = di.GetDisplaySize().h
-    constants.deviceInfo.countryCode = countryCode ' will be invalid if old version of firmware
+    constants.deviceInfo.countryCode = di.GetUserCountryCode()
+    constants.deviceInfo.channelStore = di.GetCountryCode()  'some channel store strings look like country codes
     constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.fastCpu = fastCpu
     constants.deviceInfo.lowVram = lowVram
