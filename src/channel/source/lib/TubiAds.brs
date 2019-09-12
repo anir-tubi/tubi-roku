@@ -32,6 +32,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
 
     ' private
     enhanceCtx: tubiAds_enhanceCtx
+    updateYouboraOptions: tubiAds_updateYouboraOptions
     requestQueue: requestQueue.create(adLoggingPort)
     roAdFramework: roAdFramework
     allAdUnitsList:[]
@@ -596,6 +597,7 @@ end function
 ' callback during RAF ad display
 function tubiAds_adTrackingCallback(eventType, ctx)
   impressionCount = invalid
+  youboraOptions = invalid
   
   if eventType <> invalid
     if eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0
@@ -608,6 +610,14 @@ function tubiAds_adTrackingCallback(eventType, ctx)
         is_fullscreen: true
       }
       m.tracking.trackUserEvent("start_ad", startAdEvent, m.requestQueue)
+
+      impressionCount = 0
+      for i=0 to ctx.ad.tracking.count()-1
+        if ctx.ad.tracking[i].event = "Impression"
+          impressionCount += 1
+        end if
+      end for
+      youboraOptions = m.updateYouboraOptions(m.youboraTask, ctx, impressionCount)
     else if eventType = "Complete" or eventType = "Close"
       'Close events fire when a user backs out of an ad, or when a user backs out of the interactive portion of an ad
       if eventType = "Close" and m.isInteracting = true
@@ -641,20 +651,11 @@ function tubiAds_adTrackingCallback(eventType, ctx)
           reason: "DETECTED"
         }
         m.tracking.trackUserEvent("finish_ad", finishAdEvent, m.requestQueue)
+        youboraOptions = m.updateYouboraOptions(m.youboraTask, ctx, impressionCount)
       end if
       m.isInteracting = false
     else if eventType = "Start"
       m.containerNode.visible = true
-
-      ' count the number of impression pixels for sending to youbora
-      ' As of v6.3.4 Youbora uses the RAF "Start" event to fire the adStart and the adJoin events
-      ' which will contain the impressionCount as ad.extraparam.3
-      impressionCount = 0
-      for i=0 to ctx.ad.tracking.count()-1
-        if ctx.ad.tracking[i].event = "Impression"
-          impressionCount += 1
-        end if
-      end for
     else if eventType = "AcceptInvitation"
       ctx = m.enhanceCtx(ctx)
       clickAdEvent = {
@@ -673,31 +674,10 @@ function tubiAds_adTrackingCallback(eventType, ctx)
     end if
   end if
 
-  ' NPAW Youbora video plaback monitoring
   if m.youboraTask <> invalid
-    youboraOptions = m.youboraTask.options
-
-    if ctx.ad <> invalid
-      if ctx.ad.creativeAdId <> invalid and ctx.ad.creativeAdId <> ""
-        'rainmaker
-        youboraOptions["ad.extraparam.1"] = ctx.ad.creativeAdId
-      else if ctx.ad.adId <> invalid
-        'adrise
-        youboraOptions["ad.extraparam.1"] = ctx.ad.adId  
-      end if
-
-      if ctx.ad.adVideoId <> invalid
-        youboraOptions["ad.extraparam.2"] = ctx.ad.adVideoId
-      end if
-
-      if impressionCount <> invalid
-        youboraOptions["ad.extraparam.3"] = impressionCount
-      else
-        youboraOptions.delete("ad.extraparam.3")
-      end if
+    if youboraOptions <> invalid
+      m.youboraTask.options = youboraOptions
     end if
-
-    m.youboraTask.options = youboraOptions
     m.youboraTask.adevent = ctx
   end if
 end function
@@ -717,4 +697,39 @@ Function tubiAds_enhanceCtx(ctx)
   end if
 
   return ctx
+End Function
+
+
+Function tubiAds_updateYouboraOptions(youboraTask, ctx, impressionCount)
+  youboraOptions = invalid
+
+  if youboraTask <> invalid
+    youboraOptions = youboraTask.options
+
+    if ctx.ad <> invalid
+      if ctx.ad.creativeAdId <> invalid and ctx.ad.creativeAdId <> ""
+        'rainmaker
+        youboraOptions["ad.extraparam.1"] = ctx.ad.creativeAdId
+      else if ctx.ad.adId <> invalid
+        'adrise
+        youboraOptions["ad.extraparam.1"] = ctx.ad.adId
+      end if
+
+      if ctx.ad.adVideoId <> invalid
+        youboraOptions["ad.extraparam.2"] = ctx.ad.adVideoId
+      end if
+
+      if youboraOptions["ad.extraparam.1"] <> invalid and youboraOptions["ad.extraparam.2"] <> invalid
+        youboraOptions["ad.extraparam.3"] = youboraOptions["ad.extraparam.1"] + "-" + youboraOptions["ad.extraparam.2"]
+      end if
+
+      if impressionCount <> invalid
+        youboraOptions["ad.extraparam.4"] = impressionCount
+      else
+        youboraOptions.delete("ad.extraparam.4")
+      end if
+    end if
+  end if
+
+  return youboraOptions
 End Function
