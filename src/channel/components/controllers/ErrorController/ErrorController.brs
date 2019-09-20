@@ -8,28 +8,49 @@ Function init()
   m.top.observeField("error","showModalDialog")
 End Function
 
+
 Function showModalDialog()
   tubiLog("ErrorController.showModalDialog")
   error = m.top.error
   rawErrorObj = error.info
 
-  errorObj = createErrorObject(rawErrorObj.contextCode, rawErrorObj.subtypeCode, rawErrorObj.message, rawErrorObj.externalCode, rawErrorObj.title)
-  showErrorModal(errorObj, invalid, [], onCloseError, [], [error.buttonText])
+  errorCode = getUserFacingErrorCode(rawErrorObj.contextCode, rawErrorObj.subtypeCode, rawErrorObj.externalCode)
 
-  m.trackingLoggingTask.trackEvent = {
+  dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "WARNING" 'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage("", {})  'a valid page type (see DialogEvent in events.protos)
+      dialog_type: "NETWORK_ERROR" 'DialogType enum
+      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})  'a valid page type (see DialogEvent in events.protos)
+      dialog_action: "SHOW"
+      dialog_sub_type: errorCode
     }
   }
+
+  modalInfo = {
+    title: rawErrorObj.title
+    message: getErrorMessage(rawErrorObj.message, errorCode)
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+    backButtonCallback: onCloseError
+  }
+
+  buttonInfo = [
+      {
+        text: error.buttonText
+        type: "accept"
+        callback: onCloseError
+        callbackParams: invalid
+      }
+    ]
+
+  showModal(modalInfo, buttonInfo)
 End Function
+
 
 '''''''''''''''''''''''''
 ' onCloseError
 '
 ' Close the error dialog
 Function onCloseError()
-  m.top.removeChild(m.Dialog)
   m.top.buttonSelected = true
 End Function

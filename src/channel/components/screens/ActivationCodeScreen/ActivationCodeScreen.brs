@@ -33,6 +33,10 @@ Function init()
   }
 
   m.top.screenLevel = m.constants.ui.screenLevels.activationCodeScreen
+
+  ' in the current design, navigating away from the activation page destroys the page
+  ' so it is ok to only get the registration code when the page is created.
+  getRegistrationCode()
 End Function
 
 
@@ -57,10 +61,6 @@ Function onScreenFocusChange()
   tubiLog("ActivationCodeScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.Buttons.setFocus(true)
-    ' do this here so if a user navigates away from this
-    ' screen but it is reused later, we always have a fresh
-    ' code and full timeout period.
-    getRegistrationCode()
   end if
 End Function
 
@@ -119,7 +119,7 @@ End Function
 ' An error was recorded by the registrationCodeTask so let the user know
 Function onRegTaskError(evt)
 
-  sSubtypeCode = m.constants.errors.subtypes.fetchError
+  sSubtypeCode = ""
 
   sEventName = evt.getData()
   if sEventName = "expire"
@@ -131,47 +131,59 @@ Function onRegTaskError(evt)
     message = "We're sorry, but we could not connect with the server to see if you registered your device."
     sSubtypeCode = m.constants.errors.subtypes.networkError
   else if sEventName = "code"
-    title = "Connection Error During Registration"
+    title = "Connection Error During Code Fetch"
     message = "We're sorry, but there was an error while receiving the code from the server."
+    sSubtypeCode = m.constants.errors.subtypes.fetchError
   else
     title = "Activation Code Error"
     message = "We're sorry, but an activation code error occurred."
   end if
   
-  errorObj = createErrorObject(m.global.constants.errors.context.activateScreen, sSubtypeCode, message, "", title)
-  showErrorModal(errorObj, onErrorButtonTryAgainPress, [], onErrorButtonCancelPress, [], ["Try again", "Skip"])
+  userErrorCode = getUserFacingErrorCode(m.constants.errors.context.activateScreen, sSubtypeCode)
   
   authPageValues = {
     auth_action:  "ACTIVATION"  'Action enum
   }
-  m.trackingLoggingTask.trackEvent = {
+  dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "WARNING"
-      pageOneof: m.Tracking.getAnalyticsPage("auth_page", authPageValues) 
+      dialog_type: "REGISTRATION"
+      pageOneof: m.Tracking.getAnalyticsPage("auth_page", authPageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: userErrorCode
     }
   }
+
+  modalInfo = {
+    title: title
+    message: getErrorMessage(message, userErrorCode)
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+
+  showErrorModal(modalInfo, onErrorButtonTryAgainPress, invalid, onErrorButtonCancelPress, invalid, ["Try again", "Skip"])
 End Function
+
 
 '''''''''''''''''''''''''
 ' onErrorButtonTryAgainPress
 '
 ' Respond the user selecting the try again button on the error modal
 Function onErrorButtonTryAgainPress()
-  m.Buttons.setFocus(true)
   getRegistrationCode()
 End Function
+
 
 '''''''''''''''''''''''''
 ' onErrorButtonCancelPress
 '
 ' Respond the user selecting the cancel button on the error modal
 Function onErrorButtonCancelPress()
-  m.Buttons.setFocus(true)
   'leave the screen and go to homepage
   m.RegCodeTask.cancel = true
   m.top.skipButtonPressed = true
 End Function
+
 
 '''''''''''''''''''''''
 ' getRegistrationCode

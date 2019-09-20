@@ -28,7 +28,11 @@ Function execGetChannelMetadata() As Void
     parsed = ParseJSON(channel)
     if parsed = invalid then
       tubiLog("ChannelMetadataTask failed to parse JSON response")
-      m.top.error = channelReq.response
+      m.top.error = {
+        code: -1
+        data: ""
+        failReason: "Could not parse json"
+      }
     else
       channelNode = translate.translateChannel(parsed)
       container = CreateObject("roSGNode", "ContentNode")

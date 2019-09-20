@@ -365,6 +365,8 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     dialog: {
       dialog_type: "" 'DialogType enum
       pageOneof: {}  'a valid page type (see DialogEvent in events.protos)
+      dialog_action: ""  'Action enum
+      dialog_sub_type: ""  'max 20 character string
     }
 
     component_interaction: {

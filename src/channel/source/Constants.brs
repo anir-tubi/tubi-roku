@@ -503,8 +503,12 @@ Function getConstants()
   '//Failed to fetch data from backend
   constants.errors.subtypes.fetchError = "100"
   constants.errors.subtypes.expireError = "101"
+  constants.errors.subtypes.addBookmarkError = "102"
+  constants.errors.subtypes.removeBookmarkError = "103"
+  constants.errors.subtypes.removeHistoryError = "104"
   'Could not setup player
   constants.errors.subtypes.playerSetupError = "200"
+  constants.errors.subtypes.playerPlaybackError = "201"
   constants.errors.subtypes.networkError = "300"
 
 

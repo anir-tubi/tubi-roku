@@ -429,10 +429,23 @@ Function onSingleContentError(msg)
   else
     message = "Could not retrieve content information from server."
     content = getDetailScreenContent(detailScreen)
-    getSingleContentParams = [detailScreen, content]
   
-    errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, message, error.code)
-    showErrorModal(errorObj, getSingleContentFromServerRetry, getSingleContentParams, onCloseErrorModal)
+    ' set up the error modal dialog
+    errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.fetchError, error.code)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "NETWORK_ERROR", errorCode, m.Tracking, m.constants)
+
+    modalInfo = {
+      message: getErrorMessage(message, errorCode)
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
+
+    getSingleContentParams = [
+      detailScreen
+      content
+    ]
+
+    showErrorModal(modalInfo, getSingleContentFromServerRetry, getSingleContentParams)
 
     ' Handle navigate_to_page and page_load tracking for detail screen for error cases
     if detailScreen <> invalid and detailScreen.contentFetchError = false
@@ -443,8 +456,6 @@ Function onSingleContentError(msg)
       loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000)  'in ms
       screenTrackingLoad(detailScreen.trackingPageInfo, loadTime, false)
     end if
-
-    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask, m.constants)
   end if
 
   if detailScreen <> invalid
@@ -530,12 +541,13 @@ End Function
 Function onAddToQueue(detailScreen)
   tubiLog("DetailScreenHelpers.onAddToQueue")
   if m.global.authInfo = invalid
+    content = getDetailScreenContent(detailScreen)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "sign-in-bookmark", m.Tracking, m.constants)
+
     title = "Please Sign In"
     message = "You must be signed in to add a title to your queue."
     buttons = ["Sign in or Register", "Cancel"]
-    showModal(title, message, buttons, "onSignInModalButtonSelected")
-    content = getDetailScreenContent(detailScreen)
-    sendDialogAnalytics(content, "INFORMATION", m.Tracking, m.trackingLoggingTask, m.constants)
+    showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
   else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
     detailScreen.addToQueueTitle = "Adding..."
     userTask = CreateObject("roSGNode", "AuthTask")
@@ -545,7 +557,7 @@ Function onAddToQueue(detailScreen)
     userTask.target = detailScreen
     detailScreen.addField("task", "node", false)
     detailScreen.task = userTask
-    userTask.observeField("bookmarkId", "onBookmarked")
+    userTask.observeField("addBookmarkResult", "onBookmarked")
     userTask.control = "RUN"
     detailScreen.isWaitingForServerResponse = true
   end if
@@ -561,10 +573,8 @@ End Function
 
 
 ' handles the response of a user who has been presented a sign in modal on the details screen
-Function onSignInModalButtonSelected(msg)
-  if msg.getData() = 0
-    startSignIn(true)
-  end if
+Function onSignInModalButtonSelected()
+  startSignIn(true)
 End Function
 
 
@@ -575,24 +585,47 @@ Function onBookmarked(msg) As Void
   tubiLog("DetailScreenHelpers.onBookmarked")
   task = msg.getRoSGNode()
   detailScreen = task.target
-  bookmarkId = task.bookmarkId
-  task.unobserveFieldScoped("bookmarkId")
-  detailScreen.task = invalid
-  if bookmarkId = invalid or bookmarkId = ""
-    reason = "Unknown"
-    detailScreen.isWaitingForServerResponse = false
-    
-    errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, reason)
-    showErrorModal(errorObj, onAddToQueueSelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "addToQueueTitle", "Add to queue"])
+  addBookmarkResult = task.addBookmarkResult
 
+  bookmarkId = ""
+  if addBookmarkResult <> invalid
+    bookmarkId = addBookmarkResult.bookmarkId
+  end if
+
+  task.unobserveFieldScoped("addBookmarkResult")
+  detailScreen.task = invalid
+  detailScreen.isWaitingForServerResponse = false
+
+  if bookmarkId = invalid or bookmarkId = ""
+    detailScreen.addToQueueTitle = "Add to queue"
     content = getDetailScreenContent(detailScreen)
-    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask, m.constants)
+    
+    responseCode = -1
+    if addBookmarkResult <> invalid
+      responseCode = addBookmarkResult.code
+    end if
+
+    ' set up the error modal dialog
+    errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.addBookmarkError, responseCode)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", errorCode, m.Tracking, m.constants)
+    message = "Something went wrong while trying to add the content to your queue."
+
+    modalInfo = {
+      message: getErrorMessage(message, errorCode)
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
+
+    addToQueueRetryParams = [
+      detailScreen
+    ]
+
+    showErrorModal(modalInfo, onAddToQueueRetry, addToQueueRetryParams)
     return
   end if
 
   tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
   detailScreen.isBookmark = true
-  detailScreen.isWaitingForServerResponse = false
 
   sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
   onHistoryQueueChange(m.constants.ui.categoryIds.queue)
@@ -642,25 +675,31 @@ Function onBookmarkRemoved(msg) As Void
   result = task.result
   task.unobserveField("result")
   detailScreen.task = invalid
+  detailScreen.isWaitingForServerResponse = false
+
   if result = invalid or result.response.code <> 204 then
     code = ""
-    reason = "Unknown"
+    message = "Something went wrong while removing the content from your queue."
     if result <> invalid
       code = result.response.code
-      reason = result.response.failReason
     end if
-    tubiLog("removeFromQueue returned ")
-    detailScreen.isWaitingForServerResponse = false
-
-    errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, reason, code)
-    showErrorModal(errorObj, onRemoveFromQueueSelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "removeQueueTitle", "Remove from queue"])
-
+    detailScreen.removeQueueTitle = "Remove from queue"
     content = getDetailScreenContent(detailScreen)
-    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask, m.constants)
+
+    ' set up the error modal dialog
+    errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeBookmarkError, code)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_QUEUE", errorCode, m.Tracking, m.constants)
+
+    modalInfo = {
+      message: getErrorMessage(message, errorCode)
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
+
+    showErrorModal(modalInfo, onRemoveFromQueueRetry, [detailScreen])
     return
   end if
 
-  detailScreen.isWaitingForServerResponse = false
   sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
   onHistoryQueueChange(m.constants.ui.categoryIds.queue)
 End Function
@@ -697,6 +736,7 @@ Function onRemoveFromHistory(detailScreen)
   end if
 End Function
 
+
 'Wraps onRemoveFromHistorySelected in the case of an error modal and a user attempting to retry removing the content from their history
 Function onRemoveFromHistoryRetry(params)
   if type(params) = "roArray" and params.count() = 1
@@ -712,40 +752,34 @@ Function onHistoryRemoved(msg) As Void
   result = task.result
   task.unobserveField("result")
   detailScreen.task = invalid
+  detailScreen.isWaitingForServerResponse = false
 
   if result = invalid or result.response.code <> 204 then
     code = ""
-    reason = "Unknown"
+    message = "Something went wrong while removing the content from your history."
     if result <> invalid
       code = result.response.code
-      reason = result.response.failReason
     end if
-    tubiLog("removeFromHistory returned " + stri(code))
-    
-    errorObj = createErrorObject(m.global.constants.errors.context.videoDetailScreen, m.global.constants.errors.subtypes.fetchError, reason, code)
-    showErrorModal(errorObj, onRemoveFromHistorySelected, [detailScreen], cancelHistoryQueueChange, [detailScreen, "removeHistoryTitle", "Remove from history"])
-
     content = getDetailScreenContent(detailScreen)
-    sendDialogAnalytics(content, "WARNING", m.Tracking, m.trackingLoggingTask, m.constants)
+    detailScreen.removeHistoryTitle = "Remove from history"
+
+    ' set up the error modal dialog
+    errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeHistoryError, code)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_HISTORY", errorCode, m.Tracking, m.constants)
+
+    modalInfo = {
+      message: getErrorMessage(message, errorCode)
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
+
+    showErrorModal(modalInfo, onRemoveFromHistoryRetry, [detailScreen])
     return
   end if
 
-  detailScreen.isWaitingForServerResponse = false
   detailScreen.isHistory = false
   sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask, m.constants)
   onHistoryQueueChange(m.constants.ui.categoryIds.history)
-End Function
-
-'@params: roArray, contains a screen, a field, and a value to update a field on the screen.
-'                  expect something like [detailScreen, "removeQueueTitle", "Remove From queue"]
-Function cancelHistoryQueueChange(params)
-  tubiLog("DetailScreenHelpers.cancelHistoryQueueChange")
-  if type(params) = "roArray" and params.count() = 3
-    detailScreen = params[0]
-    detailScreen.isWaitingForServerResponse = false
-
-    'update the details screen with the appropriate "Remove from queue", "Add to queue", etc. button
-  end if
 End Function
 
 
@@ -929,18 +963,20 @@ Function sendBookmarkAnalytics(content, operation, trackingLib, trackingTask, co
 End Function
 
 
-' Organizes the information needed to create a "dialog" tracking event and sends the information to the trackingTask which will
-' actually send the event.
+' Organizes the information needed to create a "dialog" tracking event and returns the created event AA
 '
 ' @content: roSGNode, the content that is residing on the details page content field, can be a movie or series
 ' @dialogType: string, one of the valid operations as defined in events.protos -> DialogEvent -> enum DialogType
+' @dialogSubtype: string, a string limited to 20 characters, used to distinguish different dialogs from each other
 ' @trackingLib: associativeArray, an instance of TubiTracking()
-' @trackingTask: roSGNode, an instance of the TrackingLoggingTask
-Function sendDialogAnalytics(content, dialogType, trackingLib, trackingTask, constants)
+' @constants: assocArray, an instance of m.constants
+Function getDetailScreenDialogAnalyticEvent(content, dialogType, dialogSubtype, trackingLib, constants)
   dialogAnalyticsEvent = {
     type: "dialog"
     values: {
       dialog_type: dialogType 'DialogType enum
+      dialog_action: "SHOW"
+      dialog_sub_type: dialogSubtype
     }
   }
 
@@ -949,7 +985,7 @@ Function sendDialogAnalytics(content, dialogType, trackingLib, trackingTask, con
     dialogAnalyticsEvent.values.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
   end if
 
-  trackingTask.trackEvent = dialogAnalyticsEvent
+  return dialogAnalyticsEvent
 End Function
 
 

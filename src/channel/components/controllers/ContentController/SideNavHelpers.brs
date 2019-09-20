@@ -78,7 +78,8 @@ Function onSideNavItemSelected()
       showSettingsScreen()
       bSuccess = true
     else if itemSelected = m.constants.ui.sideNavIds.exit
-      displayExitModule()
+      topScreen = currentScreen()
+      displayExitModal(topScreen.trackingPageInfo)
       bSuccess = true
     end if
 

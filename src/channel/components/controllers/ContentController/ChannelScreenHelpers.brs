@@ -83,12 +83,17 @@ Function onChannelContentResponse(msg)
 
   if bError = true
     '//if no content, then display error
-    onChannelContentError(msg, true)
+    showChannelContentError(msg, true)
   end if
 End Function
 
 
-Function onChannelContentError(msg, bContentEmptyError = false)
+Function onChannelContentError(msg)
+  showChannelContentError(msg, false)
+End Function
+
+
+Function showChannelContentError(msg, bContentEmptyError = false)
   tubiLog("ChannelScreenHelpers.onChannelContentError")
   sErrorTitle = ""
   sErrorMessage = "Could not retrieve channel content."
@@ -98,24 +103,34 @@ Function onChannelContentError(msg, bContentEmptyError = false)
   end if 
   errorInfo = msg.getData()
   task = msg.getRoSGNode()
+  screen = task.target
   ' Screen is created/pushed in showChannelScreen, since there is no content, remove it.
   ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
   ' sent in the case of an error.
   popScreen(false)
   
-  errorObj = createErrorObject(m.global.constants.errors.context.channelScreen, m.global.constants.errors.subtypes.fetchError, sErrorMessage, errorInfo.code, sErrorTitle)
-  showErrorModal(errorObj)
-  screen = task.target
-  loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
-  screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
+  errorCode = getUserFacingErrorCode(m.global.constants.errors.context.channelScreen, m.constants.errors.subtypes.fetchError, errorInfo.code)
 
-  m.trackingLoggingTask.trackEvent = {
+  dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "WARNING" 'DialogType enum
+      dialog_type: "NETWORK_ERROR" 'DialogType enum
       pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: errorCode
     }
   }
+
+  modalInfo = {
+    title: sErrorTitle
+    message: getErrorMessage(sErrorMessage, errorCode)
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+
+  showErrorModal(modalInfo)
+  loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
+  screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
 
   task.unobserveField("response")
   task.unobserveField("error")

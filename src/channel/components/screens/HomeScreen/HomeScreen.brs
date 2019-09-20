@@ -1,5 +1,5 @@
 Function init()
-  tubiLog("CategoryScreen.init")
+  tubiLog("HomeScreen.init")
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
   m.constants = m.global.constants
@@ -79,7 +79,7 @@ End Function
 ' onHomescreenResponse
 '
 Function onHomescreenResponse()
-  tubiLog("CategoryScreen.onHomescreenResponse")
+  tubiLog("HomeScreen.onHomescreenResponse")
   if m.top.homescreenResponse.response <> invalid then
     response = m.top.homescreenResponse.response
     if response.code >= 200 and response.code < 300 then
@@ -93,9 +93,17 @@ Function onHomescreenResponse()
     else
       ' if we were loading in the background, don't show an error modal
       if m.top.isInFocusChain()
-        errorObj = createErrorObject(m.global.constants.errors.context.homeScreen, m.global.constants.errors.subtypes.fetchError, response.failReason, response.code)
-        showErrorModal(errorObj, retryCategoryList, [], retryCategoryList, [])
-        sendDialogAnalyticsEvent("WARNING", m.Tracking, m.trackingLoggingTask)
+        errorMessage = "Unable to load Tubi home screen."
+        errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
+        dialogEvent = getHomescreenDialogAnalyticsEvent("NETWORK_ERROR", errorCode, m.Tracking)
+        
+        modalInfo = {
+          message: getErrorMessage(errorMessage, errorCode)
+          openTrackEvent: dialogEvent
+          trackingTask: m.trackingLoggingTask
+        }
+
+        showErrorModal(modalInfo, loadAllCategories, invalid, loadAllCategories, invalid)
       end if
     end if
   end if
@@ -127,6 +135,7 @@ Function populateInfoWithFirstItem(categoryContent)
     end if
   end if
 End Function
+
 
 Function onEnableChange()
   if m.top.enabled = true
@@ -208,20 +217,27 @@ Function onReloadUserCategoriesResponse()
     else
       ' if we were loading in the background, don't show an error modal
       if m.top.isInFocusChain()
+        errorMessage = "Unable to load some categories."
+        errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
+        dialogEvent = getHomescreenDialogAnalyticsEvent("NETWORK_ERROR", errorCode, m.Tracking)
+        
+        modalInfo = {
+          message: getErrorMessage(errorMessage, errorCode)
+          openTrackEvent: dialogEvent
+          trackingTask: m.trackingLoggingTask
+        }
 
-        errorObj = createErrorObject(m.global.constants.errors.context.homeScreen, m.global.constants.errors.subtypes.fetchError, response.failReason, response.code)
-        showErrorModal(errorObj, retryCategoryList, [], retryCategoryList, [])
-        sendDialogAnalyticsEvent("WARNING", m.Tracking, m.trackingLoggingTask)
+        showErrorModal(modalInfo, onUserCategoriesFailed, invalid, invalid, invalid, ["Continue"])
       end if
     end if
   end if
 End Function
 
 
-' We retry in the cancel or retry cases, since there is nowhere else to go
-Function retryCategoryList()
-  loadAllCategories()
-  m.top.setFocus(true)
+Function onUserCategoriesFailed()
+  if m.top.content = invalid
+    loadAllCategories()
+  end if
 End Function
 
 
@@ -232,7 +248,7 @@ End Function
 ' screen has lost focus, usually due to another screen or dialog
 ' being shown.
 Function onScreenFocusChange()
-  tubiLog("CategoryScreen.onScreenFocusChange " + focusState(m.top))
+  tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus()
     m.CategoryGridList.setFocus(true)
     m.top.backgroundUriList = determineBackgroundImage(m.CategoryGridList.itemFocused)
@@ -254,7 +270,7 @@ End Function
 ' reflect changes in parental controls between guest and signed-in
 ' users
 Function onSignedInChange()
-  tubiLog("CategoryScreen.onSignedInChange")
+  tubiLog("HomeScreen.onSignedInChange")
   loadAllCategories()
 End Function
 
@@ -264,7 +280,7 @@ End Function
 '
 ' On grid focus change, update the info panel
 Function onGridFocusChange() As Void
-  tubiLog("CategoryScreen.onGridFocusChange")
+  tubiLog("HomeScreen.onGridFocusChange")
   if not m.CategoryGridList.isInFocusChain() then return
 
   oldFocusedContent = m.CategoryGridList.oldItemFocused
@@ -310,7 +326,7 @@ Function onGridFocusChange() As Void
 End Function
 
 Function onGridItemSelected() As Void
-  tubiLog("CategoryScreen.onGridItemSelected")
+  tubiLog("HomeScreen.onGridItemSelected")
   selectedItem = m.CategoryGridList.itemSelected
 
   ' Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
@@ -333,7 +349,7 @@ End Function
 
 
 Function onTotalCountsChange(msg)
-  tubiLog("CategoryScreen.onTotalCountsChange")
+  tubiLog("HomeScreen.onTotalCountsChange")
   totalCountInfo = msg.getData()
 
   for i=totalCountInfo.count()-1 to 0 Step -1
@@ -355,7 +371,7 @@ End Function
 '
 ' Load all category content, including . Series do not have season or episode information though.
 Function loadAllCategories()
-  tubiLog("CategoryScreen.loadAllCategories")
+  tubiLog("HomeScreen.loadAllCategories")
   ' This check causes all category fetches to be skipped prior to the field
   ' being set to true.  Then, once true it will reload any time loadCategories() is
   ' called, such as when signedIn field changes.
@@ -400,19 +416,21 @@ Function populateInfoPanel(mode, contentNode)
 End Function
 
 
-Function sendDialogAnalyticsEvent(dialogType, trackingLib, trackingTask)
-  trackingTask.trackEvent = {
+Function getHomescreenDialogAnalyticsEvent(dialogType, dialogSubtype, trackingLib)
+  return {
     type: "dialog"
     values: {
-      dialog_type: dialogType   'DialogType enum
+      dialog_type: dialogType 'DialogType enum - TODO: Update this when a "PLAYER_ERROR" value becomes available in protos
       pageOneof: trackingLib.getAnalyticsPage("home_page", {})
+      dialog_action: "SHOW"
+      dialog_sub_type: dialogSubtype
     }
   }
 End Function
 
 
 Function onCategoryRefreshTimer()
-  tubiLog("CategoryScreen.onCategoryRefreshTimer")
+  tubiLog("HomeScreen.onCategoryRefreshTimer")
   loadAllCategories()
 End Function
 

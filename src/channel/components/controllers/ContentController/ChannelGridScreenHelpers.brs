@@ -138,26 +138,40 @@ Function onGridContentError(msg)
   popScreen(false)
   screen = tearDownChannelGridTask(task)
   
-  sErrorType = m.constants.errors.context.categoriesScreen
-  sErrorContent = LCase(m.global.constants.ui.terms.categories)
-  if screen.displayChannels = true
-    sErrorType = m.constants.errors.context.channelsScreen
-    sErrorContent = LCase(m.global.constants.ui.terms.channels)
-  end if
+  if screen <> invalid
+    'delete the screen from the screen cache so that the next time the user attempts to load the page, the page will be loaded
+    'from scratch again. Otherwise an empty page will load and content will never be fetched.
+    deleteFromScreenCache(screen.id)
 
+    sErrorType = m.constants.errors.context.categoriesScreen
+    sErrorContent = LCase(m.global.constants.ui.terms.categories)
+    if screen.displayChannels = true
+      sErrorType = m.constants.errors.context.channelsScreen
+      sErrorContent = LCase(m.global.constants.ui.terms.channels)
+    end if
 
-  errorObj = createErrorObject(sErrorType, m.constants.errors.subtypes.fetchError, "Could not retrieve " + sErrorContent + " content.", errorInfo.code)
-  showErrorModal(errorObj)
-  loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
-  screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
+    errorCode = getUserFacingErrorCode(sErrorType, m.constants.errors.subtypes.fetchError, errorInfo.code)
+    prelimMessage = "Could not retrieve " + sErrorContent + " content."
 
-  m.trackingLoggingTask.trackEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "WARNING" 'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "NETWORK_ERROR" 'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: errorCode
+      }
     }
-  }
+
+    modalInfo = {
+      message: getErrorMessage(prelimMessage, errorCode)
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
+    showErrorModal(modalInfo)
+    loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
+    screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
+  end if
 End Function
 
 

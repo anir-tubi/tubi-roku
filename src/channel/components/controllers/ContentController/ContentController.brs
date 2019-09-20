@@ -100,15 +100,17 @@ Function init()
 End Function
 
 
-Function displayExitModule()
-  showExitAppModal("onExitAppModalButtonSelected")
-  m.trackingLoggingTask.trackEvent = {
+Function displayExitModal(trackingPageInfo)
+  dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "INFORMATION"   'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+      dialog_type: "EXIT"   'DialogType enum
+      pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: ""
     }
   }
+  showExitAppModal(dialogEvent, m.trackingLoggingTask, onExitAppModalButtonSelected)
 End Function
 
 
@@ -162,7 +164,8 @@ Function onKeyEvent(key As String, press As Boolean)
             hideNavMenu(false)
           end if
         else
-          displayExitModule()
+          topScreen = currentScreen()
+          displayExitModal(topScreen.trackingPageInfo)
         end if
       end if
       ' Always consume back button, otherwise it will cause the app to exit
@@ -250,74 +253,74 @@ Function onInactivityTimer()
       ' Don't invoke this during an ad break or while upNext is visible.  Also if it's just been paused leave it.
       if m.videoPlayer.adState <> "adsplaying" and m.videoPlayer.state = "playing" and m.upNextScreen = invalid
         m.videoPlayer.control = "pause"
-        m.inactivityModal = showModal("Are you still watching?", "", ["Yes", "No"], "onInactivityButton", false)
-        m.inactivityModal.observeField("exitButton", "onInactivityClose")
-
-        'should indicate the still watching dialog was shown
-        m.trackingLoggingTask.trackEvent = {
-          type: "auto_play"
-          values: {
-            video_id: m.videoPlayer.content.id.toInt()  'DialogType enum
-            auto_play_action: "STILL_WATCHING"
-          }
-        }
 
         contentId = 0
         if m.videoPlayer.content <> invalid and m.videoPlayer.content.id <> invalid and m.videoPlayer.content.id <> ""
           contentId = m.videoPlayer.content.id.toInt()
         end if
-        m.trackingLoggingTask.trackEvent = {
+
+        dialogEvent = {
           type: "dialog"
           values: {
-            dialog_type: "INFORMATION"   'DialogType enum
-            pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: contentId})
+            dialog_type: "STILL_WATCHING"   'DialogType enum
+            pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: contentId}) 'TODO: should be video_player_page eventually
+            dialog_action: "SHOW"  'Action enum
+            dialog_sub_type: (m.constants.timers.stillWatchingTimeout / 60).toStr() + "-minutes"
           }
         }
+
+        modalInfo = {
+          title: "Are you still watching?"
+          message: ""
+          openTrackEvent: dialogEvent
+          trackingTask: m.trackingLoggingTask
+          backButtonCallback: onInactivityButton
+        }
+
+        modalButtonInfo = [
+          {
+            text: "Yes"
+            type: "accept"
+            callback: onInactivityButton
+          }
+          {
+            text: "No"
+            type: "dismiss"
+            callback: onInactivityClose
+          }
+        ]
+
+        m.inactivityModal = showModal(modalInfo, modalButtonInfo)
       end if
     else if (now - m.lastUserActivity - m.constants.timers.stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
-      closeInactivityModal()
+      closeModal(m.inactivityModal)
+      stopInactivityTimer()
       if shouldStopOnStillWatchingTimeout() = true
         returnToDetailScreenFromVideo()
       else
         m.videoPlayer.control = "resume"
       end if
-
-      ' should indicate the still watching dialog timed out without any user interaction
-      m.trackingLoggingTask.trackEvent = {
-        type: "auto_play"
-        values: {
-          video_id: m.videoPlayer.content.id.toInt()  'DialogType enum
-          auto_play_action: "STILL_WATCHING"
-        }
-      }
     end if
   end if
 End Function
 
 
 Function onInactivityClose()
-  tubiLog("ContentController.onInactivityButton")
-  closeInactivityModal()
-  m.videoPlayer.control = "resume"
+  tubiLog("ContentController.onInactivityClose")
+  returnToDetailScreenFromVideo()
+  stopInactivityTimer()
 End Function
 
 
 Function onInactivityButton()
   tubiLog("ContentController.onInactivityButton")
-  button = m.inactivityModal.buttonSelected
-  closeInactivityModal()
-  if button = 0
-    m.videoPlayer.control = "resume"
-  else
-    returnToDetailScreenFromVideo()
-  end if
+  m.videoPlayer.control = "resume"
+  stopInactivityTimer()
 End Function
 
 
-Function closeInactivityModal()
-  tubiLog("ContentController.closeInactivityModal")
-  closeModal(m.inactivityModal)
-  m.inactivityModal = invalid
+Function stopInactivityTimer()
+  tubiLog("ContentController.stopInactivityTimer")
   ' Just reset it here for now.  Requirements are to dismiss the modal, not
   ' to take any action like stop playback
   m.lastUserActivity = Uptime(0)
@@ -329,22 +332,8 @@ End Function
 ' onExitAppModalButtonSelected
 '
 ' handles the response of a user who has been presented an exit app modal
-Function onExitAppModalButtonSelected(msg)
-  if msg.getData() = 0
-    'exit the app
-    m.top.exitApp = true  'm is the context of the screen stack's parent controller
-  else
-    'return to the last screen
-    focusedScreen = currentScreen()
-    if m.SideNav.opened = true
-      m.SideNav.setFocus(true)
-    else if focusedScreen <> invalid
-      focusedScreen.setFocus(true)
-    ' if screen stack was empty, this was a modal over top of the sign in controller
-    else if m.SignIn <> invalid
-      m.SignIn.setFocus(true)
-    end if
-  end if
+Function onExitAppModalButtonSelected()
+  m.top.exitApp = true
 End Function
 
 
@@ -544,6 +533,19 @@ Function getFromScreenCache(screenId)
   return invalid
 End Function
 
+
+' a deleter for the screen cache - we may need to remove screens from the cache in the case of content loading errors
+' returns true if the screen was successfully deleted, otherwise returns false
+'
+' @screenId: string, the id of the screen that is to be removed
+Function deleteFromScreenCache(screenId)
+  if type(screenId) = "String" or type(screenId) = "roString"
+    return m.screenCache.delete(screenId)
+  end if
+  return false
+End Function
+
+
 ' This will tell the screen to update its content the next time the screen is displayed 
 ' @sID: string, the ID of the screen whose content should be marked to be refreshed
 Function setContentToRefresh(sID)
@@ -556,6 +558,7 @@ Function setContentToRefresh(sID)
   end if
   return false
 End Function 
+
 
 Function displayNavMenu(shouldTrackComponentInteraction = true)
   bSideNavOpened = m.SideNav.opened

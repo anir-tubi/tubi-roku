@@ -144,10 +144,10 @@ Function init()
   ' used by CC dialog
   m.ccSelections = [ 0 ]  ' modeled as an array for adding caption and audio tracks selection
   m.ccModes = [
-    ' globalCaptionMode text,       Button text on software caption dialog
-    ["Off",                          "Off"]
-    ["On",                           "On always"]
-    ["Instant replay",               "On replay"]
+    ' globalCaptionMode text,       Button text on software caption dialog      Dialog Subtype for analytics
+    ["Off",                          "Off",                                      "off"]
+    ["On",                           "On always",                                "on-always"]
+    ["Instant replay",               "On replay",                                "on-replay"]
   ]
 
   m.thumbnailMinXOffset = 238 ' based on zeplin designs
@@ -362,7 +362,7 @@ Function onVideoPositionChange()
         end if
       end if
     end for
-  end if 
+  end if
 End Function
 
 
@@ -506,9 +506,9 @@ Function onControlChange()
       m.top.adControl = "stop"
     end if
   else if m.top.control = "pause" then
-    pauseVideo(false)
+    pauseVideo(false, false)
   else if m.top.control = "resume" and m.Video.state = "paused" then
-    resumeFromPause()
+    resumeFromPause(false)
   end if
 End Function
 
@@ -636,7 +636,7 @@ Function onKeyEvent(key As String, press As Boolean)
             resetTransportButtons()
           end if
         else if m.VideoState = "pause"
-          resumeFromPause()
+          resumeFromPause(true)
         else if m.VideoState = "rew" or m.VideoState = "ffw"
           setFocusedButton(m.PlayPauseButton)
           endScrub(true)
@@ -750,7 +750,7 @@ Function animateTransport(direction)
 End Function
 
 'pause the video player
-Function pauseVideo(shouldShowTransport)
+Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
   m.Video.control = "pause"
   m.VideoState = "pause"
 
@@ -764,18 +764,21 @@ Function pauseVideo(shouldShowTransport)
   setFocusedButton(m.PlayPauseButton)
   
   updateTransport()
-  trackEvent({
-    type: "pause_toggle"
-    values: {
-      video_id: m.Video.content.id.toInt()
-      pause_state: "PAUSED"
-    }
-  })
+
+  if shouldSendAnalytics = true
+    trackEvent({
+      type: "pause_toggle"
+      values: {
+        video_id: m.Video.content.id.toInt()
+        pause_state: "PAUSED"
+      }
+    })
+  end if
 End Function
 
 
 'Resume play from a paused state
-Function resumeFromPause()
+Function resumeFromPause(shouldSendAnalytics)
   animateTransport("out")
 
   if m.playerPosition <> m.Video.position
@@ -784,13 +787,15 @@ Function resumeFromPause()
     m.Video.control = "resume"
     m.VideoState = "play"
 
-  trackEvent({
-    type: "pause_toggle"
-    values: {
-      video_id: m.Video.content.id.toInt()
-      pause_state: "RESUMED"
-    }
-  })
+    if shouldSendAnalytics = true
+      trackEvent({
+        type: "pause_toggle"
+        values: {
+          video_id: m.Video.content.id.toInt()
+          pause_state: "RESUMED"
+        }
+      })
+    end if
   end if
 
   m.PlayPauseButton.uri = m.buttonUris.pause
@@ -942,9 +947,9 @@ End Function
 Function handlePlayPause()
   tubiLog("VideoPlayer.handlePlayPause VideoState = " + m.VideoState)
   if m.VideoState = "play" then
-    pauseVideo(true)
+    pauseVideo(true, true)
   else if m.VideoState = "pause" then
-    resumeFromPause()
+    resumeFromPause(true)
   else if m.VideoState = "rew" or m.VideoState = "ffw"
     endScrub(true)
   else if m.VideoState = "skip"
@@ -1173,13 +1178,14 @@ Function handleClosedCaption()
   end if
 End Function
 
+
 Function showCCDialog()
   ' show full options dialog
   if m.VideoState = "play" or m.VideoState = "pause" then
     m.ccWasPlaying = false
     if m.VideoState = "play" then
       m.ccWasPlaying = true
-      pauseVideo(false)
+      pauseVideo(false, false)
     end if
     m.ccDialog = CreateObject("roSGNode", "ModalDialogScreen")
     m.ccDialog.title = "Closed Caption/Audio Configuration"
@@ -1196,17 +1202,20 @@ Function showCCDialog()
     trackEvent({
       type: "dialog"
       values: {
-        dialog_type: "INFORMATION" 'DialogType enum
-        pageOneof: m.Tracking.getAnalyticsPage("", {})
+        dialog_type: "CLOSED_CAPTIONS" 'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage("", {})  'TODO: Add the video player page
+        dialog_action: "SHOW"  'Action enum
+        dialog_sub_type: m.ccModes[m.ccSelections[0]][2]  '"off", "on-always", "on-replay"
       }
     })
   end if
 End Function
 
+
 Function closeCCDialog()
   if m.ccDialog <> invalid then
     if m.ccWasPlaying then
-      resumeFromPause()
+      resumeFromPause(false)
     end if
     m.ccDialog.unobserveField("buttonSelected")
     m.ccDialog.unobserveField("exitButton")
@@ -1214,8 +1223,19 @@ Function closeCCDialog()
     m.top.setFocus(true)
     m.top.removeChild(m.ccDialog)
     m.ccDialog = invalid
+
+    trackEvent({
+      type: "dialog"
+      values: {
+        dialog_type: "CLOSED_CAPTIONS" 'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage("", {})  'TODO: Add the video player page
+        dialog_action: "ACCEPT_DELIBERATE"  'Action enum
+        dialog_sub_type: m.ccModes[m.ccSelections[0]][2]  '"off", "on-always", "on-replay"
+      }
+    })
   end if
 End Function
+
 
 Function onCCDialogButton()
   tubiLog("VideoPlayer.onCCDialogButton")
@@ -1230,6 +1250,7 @@ Function onCCDialogButton()
     m.ccDialog.buttons = getCCButtons()
   end if
 End Function
+
 
 'handles replay key press or HopBack button selection
 '@position: integer, should be m.playerPosition in most cases
@@ -1286,6 +1307,7 @@ Function setFocusedButton(TransportButton)
     end if
   end for
 End Function
+
 
 'exit the video player due to back button while no transport displaying, or during ad break
 Function backButtonExit()
@@ -1398,6 +1420,7 @@ End Function
 Function isAtPosition(position, target)
   return (position >= target and position <= target + m.Video.notificationInterval)
 End Function
+
 
 ' Returns true if the position is between (target - window) and the target
 Function isInWindow(position, target, window)

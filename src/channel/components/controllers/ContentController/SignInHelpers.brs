@@ -6,6 +6,7 @@ Function startSignIn(skipDisambiguation)
   tubiLog("SignInHelpers.startSignIn")
   activationCodeScreen = CreateObject("roSGNode", "ActivationCodeScreen")
   activationCodeScreen.observeFieldScoped("activationSuccess", "onActivationSuccess")
+  activationCodeScreen.observeFieldScoped("skipButtonPressed", "onActivationSkipped")
   pushScreen(activationCodeScreen, true, true)
 
   m.backgroundGroup.backgroundInfo = {
@@ -114,4 +115,9 @@ Function onAuthInfoReceived()
     showHomeScreen(m.constants, m.global.authInfo) 'loads home screen from cache
     focusSideNavOption(m.constants.ui.sideNavIds.home)
   end if
+End Function
+
+
+Function onActivationSkipped()
+  popScreen(true)
 End Function

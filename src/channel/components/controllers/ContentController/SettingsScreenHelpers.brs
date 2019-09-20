@@ -25,9 +25,11 @@ function showSettingsScreen(sFocusID = "")
   end if
 end function
 
+
 function OnSignedIn()
   setUserInfo()
 end function
+
 
 function setUserInfo()
   if m.global.authInfo <> invalid
@@ -41,6 +43,7 @@ function setUserInfo()
     m.settingsScreen.parentalSettingUpdated = authInfo.parentalrating
   end if
 end function
+
 
 function setAuthInfoValue(attribute, value) as boolean
   bSuccess = false
@@ -58,16 +61,19 @@ function getNowSeconds() as integer
   return nowDate.AsSeconds()
 end function
 
+
 function onSettingsSignOutSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignOutSelected")
-  showSignOutModal("onSignOutModalSelected")
-  m.trackingLoggingTask.trackEvent = {
+  dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "INFORMATION" 'DialogType enum
+      dialog_type: "INFORMATION" 'DialogType enum - TODO use a "SIGN_OUT" type when it becomes available in protos
       pageOneof: m.Tracking.getAnalyticsPage("account_page", {account_page_type: "PARENTAL"})  'settings_page doesn't exist in protos
+      dialog_action: "SHOW"
+      dialog_sub_type: "sign-out-settings"
     }
   }
+  showSignOutModal(dialogEvent, m.trackingLoggingTask, onSignOutModalSelected)
 end function
 
 
@@ -79,29 +85,26 @@ Function onSettingsBackgroundChange()
   }
 End Function
 
+
 ' Log the user out, update screens
-function onSignOutModalSelected(msg)
+function onSignOutModalSelected()
   tubiLog("ContentController.onSignOutModalSelected")
+  ' flush the screenstack in any case where the user has successfully
+  ' gone through the sign-in.  If they 'back' out of it, the screen
+  ' stack will stay intact and this function will not be called
+  clearScreenStack()
 
-  'do the sign out stuff if confirmed
-  if msg.getData() = 0
-    ' flush the screenstack in any case where the user has successfully
-    ' gone through the sign-in.  If they 'back' out of it, the screen
-    ' stack will stay intact and this function will not be called
-    clearScreenStack()
-
-    m.authInfoReceived = false
-    if m.authTask <> invalid
-      m.authTask.unobserveFieldScoped("onAuthInfoReceived")
-    end if
-    m.authTask = CreateObject("roSGNode", "AuthTask")
-    m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
-    m.authTask.functionName = "execSignOut"
-    m.authTask.control = "RUN"
-
-    m.spinner.visible = true
-    m.spinner.setFocus(true)
+  m.authInfoReceived = false
+  if m.authTask <> invalid
+    m.authTask.unobserveFieldScoped("onAuthInfoReceived")
   end if
+  m.authTask = CreateObject("roSGNode", "AuthTask")
+  m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
+  m.authTask.functionName = "execSignOut"
+  m.authTask.control = "RUN"
+
+  m.spinner.visible = true
+  m.spinner.setFocus(true)
 end function
 
 
@@ -109,6 +112,7 @@ function onSettingsSignInSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignInSelected")
   startSignIn(true)
 end function
+
 
 '//When exiting the ConfirmPasswordScreen, make sure some event handlers are no longer listened to
 function onConfirmPasswordScreenVisible(msg)
@@ -120,6 +124,7 @@ function onConfirmPasswordScreenVisible(msg)
     m.parentalSettingUpdateTask.unobserveField("result")
   end if
 end function
+
 
 function onParentalSettingSelected(msg)
   tubiLog("SettingsScreenHelpers.onParentalSettingSelected")
@@ -147,12 +152,24 @@ function onParentalSettingSelected(msg)
       end if
     end if
   else
+    pageInfo = m.settingsScreen.trackingPageInfo
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "INFORMATION" 'DialogType enum  TODO: Change this to a PARENTAL_CONTROLS dialogType once it exists in protos
+        pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "sign-in-parental"
+      }
+    }
+
     title = "Please Sign In"
     message = "You must be signed in to adjust parental controls"
     buttons = ["Sign in", "Cancel"]
-    showModal(title, message, buttons, "onSignInModalButtonSelected")
+    showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
   end if
 end function
+
 
 function isConfirmPasswordScreen() as boolean
   '//Is the current screen the confirmPasswordScreen?
@@ -160,6 +177,7 @@ function isConfirmPasswordScreen() as boolean
   b = (m.confirmPasswordScreen <> invalid and m.confirmPasswordScreen.subType() = screen.subType())
   return b
 end function
+
 
 function onPasswordConfirm(msg = invalid)
   tubiLog("SettingsScreenHelper.onPasswordConfirm")
@@ -183,6 +201,7 @@ function onPasswordConfirm(msg = invalid)
   m.parentalSettingUpdateTask.control = "RUN"
 end function
 
+
 ' This is triggered once the remote setting has been received
 function onRemoteParentalSetting(msg)
   parentalSetting = msg.GetData()
@@ -191,6 +210,7 @@ function onRemoteParentalSetting(msg)
     refreshScreenAfterParentalChanges()
   end if
 end function
+
 
 ' After the parental settings have changes then the content of certain screens should be refreshed
 Function refreshScreenAfterParentalChanges()
@@ -201,6 +221,7 @@ Function refreshScreenAfterParentalChanges()
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
 End Function
+
 
 function onParentalSettingComplete(msg)
   tubiLog("SettingsScreenHelper.onParentalSettingComplete")
@@ -224,10 +245,23 @@ function onParentalSettingComplete(msg)
   else
     if isConfirmPasswordScreen() = true
       setAuthInfoValue("secondsOfSavedPassword", 0)
+
+      pageInfo = m.settingsScreen.trackingPageInfo
+      dialogEvent = {
+        type: "dialog"
+        values: {
+          dialog_type: "INFORMATION" 'DialogType enum  TODO: Change this to a PARENTAL_CONTROLS dialogType once it exists in protos
+          pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+          dialog_action: "SHOW"
+          dialog_sub_type: "parental-controls-failure"
+        }
+      }
+
       title = "Update Failed"
       message = "Failed to update parental control settings.  Please try re-entering your password."
       buttons = ["OK"]
-      showModal(title, message, buttons, "")
+
+      showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
     else if m.global.authInfo.secondsOfSavedPassword <> invalid and m.global.authInfo.secondsOfSavedPassword > 0
       '//if not showing ConfirmPasswordScreen and showing parentalControls panel AND this came from a saved password,
       '//   then display the ConfirmPasswordScreen instead of error message

@@ -147,10 +147,12 @@ Function onParentalSettingsReceived(msg)
   if task <> invalid
     panel = task.getParent()
     if panel <> invalid and panel.isLoading <> invalid
-      userInfo = msg.GetData()
       panel.isLoading = false
-      panel.selectItem = userInfo.parentalrating
-      m.top.remoteParentalSetting = userInfo.parentalrating
+      userInfo = msg.GetData()
+      if userInfo <> invalid
+        panel.selectItem = userInfo.parentalrating
+        m.top.remoteParentalSetting = userInfo.parentalrating
+      end if
     end if
   end if
 End Function

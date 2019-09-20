@@ -211,8 +211,8 @@ Function onVideoPlayerState(msg)
     if m.videoPlayer.errorMsg <> ""
       errorMessage = m.videoPlayer.errorMsg
     end if
-    m.videoPlayer.errorMessage = ""
-    showPlayerError(errorMessage)
+    m.videoPlayer.errorMsg = ""
+    showPlayerError(errorMessage, m.videoPlayer.videoErrorCode)
   else if state = "finished"
     ' If trailer, play the feature
     finishedContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
@@ -376,44 +376,49 @@ End Function
 '''''''''''''''''''
 ' onPlayerError
 '
-Function showPlayerError(errorMessage As String)
+' @errorMessage: string, an error message that will be displayed to the user
+' @errorCode: integer, the video player error code (usually a negative number)
+Function showPlayerError(errorMessage, errorCode)
   tubiLog("ContentController.showPlayerError")
 
-  errorObj = createErrorObject(m.global.constants.errors.context.playerScreen, m.global.constants.errors.subtypes.playerSetupError, errorMessage)
-  showErrorModal(errorObj, onRetryPlayerError, [], onCancelPlayerError, [])
-  
+  ' reset the video player state in case an error occurs during the next attempt at playing a video
+  m.videoPlayer.state = ""
+
+  if errorCode = invalid
+    errorCode = ""
+  end if
+  userErrorCode = getUserFacingErrorCode(m.constants.errors.context.playerScreen, m.constants.errors.subtypes.playerPlaybackError, errorCode.toStr())
+
   videoId = 0
   if m.videoPlayer <> invalid and m.videoPlayer.content <> invalid and m.videoPlayer.content.id <> invalid
     videoId = m.videoPlayer.content.id.toInt()
   end if
-  m.trackingLoggingTask.trackEvent = {
+
+  dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "WARNING" 'DialogType enum
+      dialog_type: "WARNING" 'DialogType enum - TODO: Update this when a "PLAYER_ERROR" value becomes available in protos
       pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId})
+      dialog_action: "SHOW"
+      dialog_sub_type: userErrorCode
     }
   }
+
+  modalInfo = {
+    message: getErrorMessage(errorMessage, userErrorCode)
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+
+  showErrorModal(modalInfo, onRetryPlayerError, invalid)
 End Function
 
 
 Function onRetryPlayerError()
-  ' reset the video player state in case trying to resume causes an error again
-  m.videoPlayer.state = ""
   ' try to resume the video from the last checkpoint
   screen = currentScreen()
   if screen.isSubtype("DetailScreen") = true
     resumeHelper(screen)
-  end if
-End Function
-
-
-Function onCancelPlayerError()
-  ' reset the video player state in case an error occurs during the next attempt at playing a video
-  m.videoPlayer.state = ""
-
-  top = currentScreen()
-  if top <> invalid then
-    top.setFocus(true)
   end if
 End Function
 

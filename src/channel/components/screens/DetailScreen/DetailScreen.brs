@@ -68,38 +68,26 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
 End Function
 
+
 Function onDescriptionSelected()
   tubiLog("DetailScreen.onDescriptionSelected")
-  m.descriptionModal = CreateObject("roSGNode", "ModalDialogScreen")
-  m.descriptionModal.title = "Full Synopsis"
-  m.descriptionModal.scrollable = true
-  m.descriptionModal.message = m.top.description
-  m.descriptionModal.buttons = ["Close"]
-  m.descriptionModal.observeFieldScoped("buttonSelected", "onCloseDescriptionModal")
-  m.descriptionModal.observeFieldScoped("exitButton", "onCloseDescriptionModal")
-  m.top.appendChild(m.descriptionModal)
-  m.descriptionModal.setFocus(true)
-
-  m.trackingLoggingTask.trackEvent = {
+  dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "INFORMATION"
-      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: m.top.content.id.toInt()}) 
+      dialog_type: "INFORMATION"  'TODO: Use the "VIDEO_DESCRIPTION" option when it is added to protos
+      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: m.top.content.id.toInt()})
+      dialog_action: "SHOW"  'Action enum
+      dialog_sub_type: "video-description"  'max 20 character string
     }
   }
-End Function
-
-Function onCloseDescriptionModal()
-  tubiLog("DetailScreen.onCloseDescriptionModal")
-  m.top.removeChild(m.descriptionModal)
-  m.descriptionModal = invalid
-  m.top.setFocus(true)
+  showDescriptionModal(m.top.description, dialogEvent, m.trackingLoggingTask)
 End Function
 
 
 Function onJumpToItem()
   focusMenu(true)
 End Function
+
 
 Function onScreenFocusChange()
   tubiLog("DetailScreen.onScreenFocusChange")

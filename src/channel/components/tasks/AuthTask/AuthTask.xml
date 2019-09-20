@@ -69,17 +69,21 @@
         -->
         <field id="history" type="node" />
 
-        <!-- addToQueue:
-        -        id of bookmark entry
+        <!-- addBookmarkResult:
+        -        Result of request as:
+        -        {
+        -          code: <integer http response code>
+        -          bookmarkId: <bookmark id>
+        -          failReason: <string from roUrlEvent.GetFailureReason()>
+        -        }
         -->
-        <field id="bookmarkId" type="string" alwaysNotify="true" />
+        <field id="addBookmarkResult" type="assocarray" alwaysNotify="true" />
 
         <!-- removeFromQueue, removeFromHistory:
         -        Result of request as:
         -        {
         -          code: <integer http response code>
         -          data: <http response body>
-        -          failReason: <string from roUrlEvent.GetFailureReason()>
         -        }
         -->
         <field id="result" type="assocarray" alwaysNotify="true" />

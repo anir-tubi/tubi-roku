@@ -58,22 +58,31 @@ Function addToQueue()
     while true
       msg = wait(0, port)
       result = request.handleEvent(msg)
-      if result <> invalid then
-        tubiLog("addBookmarkReq returned " + result.response.code.toStr())
+      if result <> invalid and result.response <> invalid
         parsed = ParseJSON(result.response.data)
         if parsed <> invalid then
-          m.top.bookmarkId = parsed.id
+          m.top.addBookmarkResult = {
+            bookmarkId: parsed.id
+            code: result.response.code
+          }
           tubiLog("addBookmark received bookmarkId " + parsed.id.toStr())
         else
           tubiLog("addBookmark failed to parse response")
-          m.top.bookmarkId = invalid
+          m.top.addBookmarkResult = {
+            bookmarkId: ""
+            code: result.response.code
+          }
         end if
         exit while
       end if
     end while
   else
     tubiLog("addBookmarkReq returned invalid")
-    m.top.bookmarkId = ""
+    ' this should never happen
+    m.top.addBookmarkResult = {
+      bookmarkId: ""
+      code: -1
+    }
   end if
   tubiLog("EXIT AuthTask.addToQueue")
 End Function
@@ -258,6 +267,7 @@ Function updateParentalSetting()
   end if
   tubiLog("EXIT AuthTask.updateParentalSetting")
 End Function
+
 
 Function execGetUserInfo()
   tubiLog("AuthTask.getUserInfo")
