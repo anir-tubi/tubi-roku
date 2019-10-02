@@ -27,6 +27,9 @@
     -->
     <field id="content" type="node"/>
 
+    <!-- Indicates if that when the server is contacted, it should indcate that the app is in kidsMode. -->
+    <field id="shouldKidsModeBeSentToServer" type="boolean"/>
+
     <field id="animateToCategory" alias="RowList.animateToItem"/>
     <field id="jumpToRowItem" alias="RowList.jumpToRowItem"/>
     

@@ -25,6 +25,7 @@ Function showDetailScreen(content)
 
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
+    detailScreen.kidsModeEnabled = m.kidsModeEnabled
 
     ' Setting the content on the detail screen here prior to getting a response back from server with full info,
     ' so that it may be used for analytics in the case of failing to fetch the full info from the server.
@@ -163,7 +164,8 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
 
     detailScreen.isBookmark = (bookmark <> invalid)
     detailScreen.isHistory = (history <> invalid)
-    detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "")
+    '//::TODO:: HARDCODE:: right now in kids mode, there are no channels showing up, so hardcode it so the channel's button doesn't show
+    detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "" and m.kidsModeEnabled = false)
     detailScreen.channelName = content.channelName
     detailScreen.length = stateSource.length  'needed to compute the resume bar on the resume button
 
@@ -221,6 +223,7 @@ Function getSingleContentFromServer(screen, content)
     request = {
       contentId: content.id
       getRelated: true
+      kidsMode: shouldKidsModeBeSentToServer()
       getContent: true
       content: content
     }
@@ -553,6 +556,7 @@ Function onAddToQueue(detailScreen)
     userTask = CreateObject("roSGNode", "AuthTask")
     userTask.functionName = "addToQueue"
     userTask.content = detailScreen.content
+    userTask.isKidsMode = shouldKidsModeBeSentToServer()
     userTask.addField("target", "node", false)
     userTask.target = detailScreen
     detailScreen.addField("task", "node", false)
@@ -649,6 +653,7 @@ Function onRemoveFromQueue(detailScreen)
     bookmark = m.global.bookmarkIds.findNode(content.id)
     content.bookmarkId = bookmark.bookmarkId
     userTask.content = content
+    userTask.isKidsMode = shouldKidsModeBeSentToServer()
     userTask.addField("target", "node", false)
     userTask.target = detailScreen
     detailScreen.addField("task", "node", false)
@@ -725,6 +730,7 @@ Function onRemoveFromHistory(detailScreen)
       userTask = CreateObject("roSGNode", "AuthTask")
       userTask.functionName = "removeFromHistory"
       userTask.content = content
+      userTask.isKidsMode = shouldKidsModeBeSentToServer()
       userTask.addField("target", "node", false)
       userTask.target = detailScreen
       detailScreen.addField("task", "node", false)

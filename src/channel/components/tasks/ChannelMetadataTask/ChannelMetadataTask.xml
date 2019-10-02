@@ -18,6 +18,8 @@
       <!-- INPUT -->
         <!-- id of the channel to fetch -->
         <field id="channelId" type="string"/>
+        <!-- Should we send kidsMode variable to api -->
+        <field id="kidsMode" type="boolean"/>
 
       <!-- OUTPUT -->
         <!-- Set to the content response -->

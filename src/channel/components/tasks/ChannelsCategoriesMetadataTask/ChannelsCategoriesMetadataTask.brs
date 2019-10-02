@@ -10,7 +10,7 @@ Function execGetChannelMetadata() As Void
   AuthModule = TubiAuth(constants, RequestModule)
   cms = CmsApi(constants, RequestModule, AuthModule)
   translate = TubiMetadataTranslate(constants)
-  request = cms.channelsCategoriesScreenReq()
+  request = cms.channelsCategoriesScreenReq(m.top.kidsMode)
   port = CreateObject("roMessagePort")
   m.top.observeField("cancelRequest", port)
   m.top.observeField("canceled", port)

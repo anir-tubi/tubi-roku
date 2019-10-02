@@ -32,6 +32,9 @@ Function tubiChannel_runChannel(args) As Void
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
   sgGlobal.constants = m.constants 
+  sgGlobal.addField("theme", "assocarray", false)
+  sgGlobal.theme = m.constants.ui.themes.default
+
   tubiScene = screen.CreateScene("TubiScene")
   screen.show()
 
@@ -111,7 +114,6 @@ Function tubiChannel_runChannel(args) As Void
     controller.deepLinkTrigger = true
   else
     '//Create upgrade window to inform user that they should upgrade the app
-    modalUpdate = CreateObject("roSGNode", "ModalDialogScreen")
     modalUpdate = tubiScene.createChild("ModalDialogScreen")
     modalUpdate.title  = "Please update this app"
     modalUpdate.message  = "This version of Tubi is no longer supported. "

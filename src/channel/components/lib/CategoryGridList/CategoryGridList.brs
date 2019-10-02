@@ -57,9 +57,16 @@ Function init()
   if m.constants.deviceInfo.scaledUi = true then
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
+  m.RowList.focusBitmapBlendColor = m.global.theme.focused
+  m.global.observeField("theme", "onThemeChange")
 
   ' suppress debounce if we have just gained focus
   m.justGainedFocus = false
+End Function
+
+
+Function onThemeChange()
+  m.RowList.focusBitmapBlendColor = m.global.theme.focused
 End Function
 
 
@@ -74,6 +81,7 @@ Function onComponentFocusChange()
   end if
 End Function
 
+
 Function onContentModify(message)
   change = message.GetData()
   tubiLog("CategoryGridList.onContentModify operation = " + change.operation)
@@ -81,36 +89,41 @@ Function onContentModify(message)
   if change.operation = "insert" or change.operation = "add"
     ' insert - A child node was inserted at change.index1
     ' add - A child node was added to the end of the children node tree (at change.index1)
-    new = m.top.content.getChild(change.index1).clone(true)
-    ' NOTE!: There is a bug internal to RowList caused by inserting a child content node,
-    ' causing it to create a whole bunch of new components and crash low-end devices.  Here we avoid this
-    ' by removing the content first before manipulating it.  In the end the RowList doesn't destroy
-    ' the rowItemComponent items when content is set to invalid, so this has almost no overhead.
-    m.RowList.content = invalid  ' temporarily
-    m.internalContent.insertChild(new, change.index1)
-    m.RowList.content = m.internalContent
-    ' RowList doesn't update the focus row automatically so we do it here to keep cursor at the same spot
-    if rowItemFocused[0] <> invalid and rowItemFocused[0] <> -1 and change.index1 <= rowItemFocused[0]
-      rowItemFocused[0] = rowItemFocused[0] + 1
-      m.RowList.jumpToRowItem = rowItemFocused
+    if m.top.content <> invalid
+      new = m.top.content.getChild(change.index1).clone(true)
+      ' NOTE!: There is a bug internal to RowList caused by inserting a child content node,
+      ' causing it to create a whole bunch of new components and crash low-end devices.  Here we avoid this
+      ' by removing the content first before manipulating it.  In the end the RowList doesn't destroy
+      ' the rowItemComponent items when content is set to invalid, so this has almost no overhead.
+      m.RowList.content = invalid  ' temporarily
+      m.internalContent.insertChild(new, change.index1)
+      m.RowList.content = m.internalContent
+      ' RowList doesn't update the focus row automatically so we do it here to keep cursor at the same spot
+      if rowItemFocused[0] <> invalid and rowItemFocused[0] <> -1 and change.index1 <= rowItemFocused[0]
+        rowItemFocused[0] = rowItemFocused[0] + 1
+        m.RowList.jumpToRowItem = rowItemFocused
+      end if
     end if
   else if change.operation = "remove"
     ' remove - A child node was removed from position change.index1, and if change.index2>change.index1, all the children
     ' nodes between change.index1 and change.index2 inclusive were removed
-    removed = m.internalContent.getChildren(change.index2-change.index1+1, change.index1)
-    m.internalContent.removeChildrenIndex(change.index2-change.index1+1, change.index1)
-    if rowItemFocused[0] <> invalid and rowItemFocused[0] <> -1 and change.index1 < rowItemFocused[0]
-      rowItemFocused[0] = rowItemFocused[0] - 1
-      m.RowList.jumpToRowItem = rowItemFocused
+    if m.internalContent <> invalid
+      removed = m.internalContent.getChildren(change.index2-change.index1+1, change.index1)
+      m.internalContent.removeChildrenIndex(change.index2-change.index1+1, change.index1)
+      if rowItemFocused[0] <> invalid and rowItemFocused[0] <> -1 and change.index1 < rowItemFocused[0]
+        rowItemFocused[0] = rowItemFocused[0] - 1
+        m.RowList.jumpToRowItem = rowItemFocused
+      end if
     end if
   else if change.operation = "set"
-    ' The child node at position change.index1 was replaced with a new child node
-    new = m.top.content.getChild(change.index1).clone(true)
-    replaced = m.internalContent.getChild(change.index1)
-    m.internalContent.replaceChild(new, change.index1)
-    m.Rowlist.content = invalid
-    m.Rowlist.content = m.internalContent
-    m.RowList.jumpToRowItem = rowItemFocused
+    if m.top.content <> invalid
+      ' The child node at position change.index1 was replaced with a new child node
+      new = m.top.content.getChild(change.index1).clone(true)
+      m.internalContent.replaceChild(new, change.index1)
+      m.Rowlist.content = invalid
+      m.Rowlist.content = m.internalContent
+      m.RowList.jumpToRowItem = rowItemFocused
+    end if
   else if change.operation = "clear" or change.operation = "setall"
     ' clear - All the children nodes were removed
     ' setall - All the children nodes were replaced
@@ -129,6 +142,7 @@ Function onContentModify(message)
     loadCategories(rowItemFocused[0])
   end if
 End Function
+
 
 Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
@@ -167,9 +181,12 @@ Function onAnimateToCategory()
   m.AnimateToCategoryDebounce.control = "start"
 End Function
 
+
 Function onAnimateToCategoryDebounce()
+  tubiLog("CategoryGridList.onAnimateToCategoryDebounce")
   loadCategories(m.top.animateToCategory)
 End Function
+
 
 '''''''''''''''''''''
 ' onItemFocused
@@ -180,8 +197,10 @@ Function onItemFocused()
   loadCategories(m.RowList.itemFocused)
 End Function
 
+
 ' Load the current category and its adjacent categories
 Function loadCategories(index) As Void
+  tubiLog("CategoryGridList.loadCategories")
   if m.internalContent = invalid or index < 0 then
     return
   end if
@@ -358,16 +377,18 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
   end if
 
   counts = []
-  children = m.internalContent.getChildren(m.internalContent.getChildCount(), 0)
-  for each child in children
-    if removableCategories[child.id] = true
-      counts.push(-1)
-    else if child.totalCount <> invalid
-      counts.push(child.totalCount)
-    else
-      counts.push(0)
-    end if
-  end for
+  if m.internalContent <> invalid
+    children = m.internalContent.getChildren(m.internalContent.getChildCount(), 0)
+    for each child in children
+      if removableCategories[child.id] = true
+        counts.push(-1)
+      else if child.totalCount <> invalid
+        counts.push(child.totalCount)
+      else
+        counts.push(0)
+      end if
+    end for
+  end if
   m.top.categoryTotalCounts = counts
 End Function
 
@@ -396,8 +417,11 @@ Function mergeMetadata(fetched)
 
   tubiLog("Received response for request id " + fetched.id)
   index = -1
-  categories = m.internalContent.getChildren(m.internalContent.getChildCount(), 0)
-  if newContent.id <> invalid
+  categories = invalid
+  if m.internalContent <> invalid
+    categories = m.internalContent.getChildren(m.internalContent.getChildCount(), 0)
+  end if
+  if categories <> invalid and newContent.id <> invalid
     for i=0 to categories.count()-1
       if categories[i].id = newContent.id then
         index = i
@@ -447,7 +471,7 @@ Function getWholeCategoryRequest(category As Object, field="wholeCategoryRespons
     categoryId = getFullCategoryId(category)
     if categoryId <> invalid
       tubiLog("CategoryGridList.fetch whole: Asking MetadataFetchTask for " + categoryId)
-      return m.metadataFetchTaskDTO.createRequest(categoryId, m.top, field, m.constants.reqNames.getCategory)
+      return m.metadataFetchTaskDTO.createRequest(categoryId, m.top, field, m.constants.reqNames.getCategory, invalid, m.top.shouldKidsModeBeSentToServer)
     end if
   end if
 

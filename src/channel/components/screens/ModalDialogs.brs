@@ -302,7 +302,8 @@ End Function
 ' 
 ' @title: string, the title of the dialog, displayed in larger font
 ' @message: string, the main message of the dialog to be displayed to the user
-' @buttons: array of strings (max 2 indexes), a button will be created for each index with the label of the button equal to the index's string
+' @buttons: array of strings (max 2 indexes), a button will be created for each index with the label of the button equal to the index's string.
+'           An empty array will create a single "Ok" button by default.
 ' @dialogEvent: assocArray, contains the info necessary to send a dialog open analytics event, has keys: "type" and "values"
 ' @trackingTask: roSGNode, an instance of the trackingLoggingTask - used to send close dialog events when the dialog is closed.
 ' @callback: roFunction, a function that will be triggered when the first button is selected

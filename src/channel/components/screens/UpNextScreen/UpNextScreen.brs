@@ -11,9 +11,9 @@ Function init()
   m.InfoSeries = m.top.findNode("InfoSeries")
   m.Timer = m.top.findNode("CountdownTimer")
   m.CountdownMovie = m.top.findNode("CountdownLabelMovie")
-  m.CountdownMovie.color =  m.global.constants.ui.colors.highlightedText
+  m.CountdownMovie.color =  m.global.theme.highlightedText
   m.CountdownSeries = m.top.findNode("CountdownLabelSeries")
-  m.CountdownSeries.color =  m.global.constants.ui.colors.highlightedText
+  m.CountdownSeries.color =  m.global.theme.highlightedText
   m.Timer.observeField("fire", "onCountdownTimer")
   m.MovieGroup = m.top.findNode("MovieGroup")
   m.SeriesGroup = m.top.findNode("SeriesGroup")
@@ -34,6 +34,9 @@ Function init()
   else
     focusBoxMargin = 6
   end if
+  focusBox.blendColor = m.global.theme.focused
+  m.GridSeries.focusBitmapBlendColor = m.global.theme.focused
+
   focusBox.width = 210 + focusBoxMargin * 2
   focusBox.height = 300 + focusBoxMargin * 2
   focusBox.translation= [85 - focusBoxMargin, 688 - focusBoxMargin]

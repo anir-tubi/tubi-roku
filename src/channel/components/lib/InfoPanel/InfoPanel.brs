@@ -12,6 +12,7 @@ Function init()
   m.Description = m.top.findNode("Description")
   m.DescriptionGroup = m.top.findNode("DescriptionGroup")
   m.DescriptionFocusButton = m.top.findNode("DescriptionFocusButton")
+  m.DescriptionFocusButton.blendColor = m.global.theme.focused
   m.Director = m.top.findNode("Director")
   m.DirectorGroup = m.top.findNode("DirectorGroup")
   m.StarringGroup = m.top.findNode("StarringGroup")

@@ -61,7 +61,7 @@
             title="Older Kids (PG, TV-PG, TV-Y7)"/>
           <CheckButtonContentNode
             title="Teens (PG-13, TV-14)"/>
-            <CheckButtonContentNode
+          <CheckButtonContentNode
             title="Adults (R, TV-MA, NC-17)"/>
         </ContentNode>
       </MarkupList>

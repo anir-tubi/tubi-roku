@@ -16,12 +16,11 @@ Function init()
   m.Spinner = m.top.findNode("CategorySpinner")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
-  m.top.observeField("homescreenResponse", "onHomescreenResponse")
   m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
-  m.top.observeField("loadAllCategories", "loadAllCategories")
   m.top.observeField("enabled", "onEnableChange")
-  m.top.observeField("reloadingContent", "onReloadingContent")
+  m.top.observeField("isLoading", "onLoadingChange")
+  m.top.observeField("contentUpdated", "onCategoryContentUpdated")
 
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -38,22 +37,6 @@ Function init()
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 
-  ' Category list loaded by loadAllCategories
-  ' Content should be structured as:
-  ' <CategoryContentNode json={...all contents info...}>
-  '   <CategoryContentNode id="featured">
-  '     <ContentNode id="37108" />
-  '     <ContentNode id="337825" />
-  '      ...
-  '   </CategoryContentNode>
-  '   <CategoryContentNode id="most_popular" />
-  '     <ContentNode id="346629" />
-  '     <ContentNode id="407698" />
-  '      ...
-  '   </CategoryContentNode>
-  ' </CategoryContentNode>
-  m.categoryContent = invalid
-
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasFocus = false
 
@@ -66,47 +49,24 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
 End Function
 
-
-''''''''''''''''''''''''''''''
-' onReloadingContent
-'   if the outside is reloading the content of this page, then display the screen so it appears to be loading content.
-'
-Function onReloadingContent()
-  m.Spinner.visible = true
+Function onLoadingChange()
+  m.Spinner.visible = m.top.isLoading
+  bLoaded = (m.top.isLoading = false)
+  m.CategoryGridList.visible = bLoaded
+  if m.top.isLoading = true
+    m.CategoryGridList.content = invalid
+  end if
+  m.InfoPanel.visible = bLoaded
 End Function
 
-''''''''''''''''''''''''''''''
-' onHomescreenResponse
-'
-Function onHomescreenResponse()
-  tubiLog("HomeScreen.onHomescreenResponse")
-  if m.top.homescreenResponse.response <> invalid then
-    response = m.top.homescreenResponse.response
-    if response.code >= 200 and response.code < 300 then
-      m.categoryContent = m.top.homescreenResponse.convertedMetadata
-      m.Spinner.visible = false
-      m.InfoPanel.mode = "category"
-      if m.categoryContent <> invalid
-        populateInfoWithFirstItem(m.categoryContent)
-      end if
-      m.CategoryGridList.content = m.categoryContent  ' should be all categories with initial amounts of content in them
-    else
-      ' if we were loading in the background, don't show an error modal
-      if m.top.isInFocusChain()
-        errorMessage = "Unable to load Tubi home screen."
-        errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
-        dialogEvent = getHomescreenDialogAnalyticsEvent("NETWORK_ERROR", errorCode, m.Tracking)
-        
-        modalInfo = {
-          message: getErrorMessage(errorMessage, errorCode)
-          openTrackEvent: dialogEvent
-          trackingTask: m.trackingLoggingTask
-        }
 
-        showErrorModal(modalInfo, loadAllCategories, invalid, loadAllCategories, invalid)
-      end if
-    end if
+Function onCategoryContentUpdated()
+  m.InfoPanel.mode = "category"
+  if m.top.content <> invalid
+    populateInfoWithFirstItem(m.top.content)
   end if
+  m.CategoryGridList.content = m.top.content  ' should be all categories with initial amounts of content in them
+  m.top.isLoading = false
 End Function
 
 
@@ -153,14 +113,13 @@ Function onReloadUserCategoriesResponse()
     response = handledRequest.response
     if response.code >= 200 and response.code < 300 then
       newCategory = handledRequest.convertedMetadata
-      m.Spinner.visible = false
 
-      if m.categoryContent <> invalid
+      if m.top.content <> invalid
         oldCategory = invalid
         if newCategory <> invalid and newCategory.id <> invalid
-          oldCategory = m.categoryContent.findNode(newCategory.id)
+          oldCategory = m.top.content.findNode(newCategory.id)
         else if handledRequest.context.id <> invalid
-          oldCategory = m.categoryContent.findNode(handledRequest.context.id)
+          oldCategory = m.top.content.findNode(handledRequest.context.id)
         end if
 
         ' there are 4 options here
@@ -170,37 +129,39 @@ Function onReloadUserCategoriesResponse()
         ' 4) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
         if newCategory <> invalid and oldCategory <> invalid
           'replace old category with new category
-          m.categoryContent.replaceChild(newCategory, m.NodeHelpers.getChildIndex(m.categoryContent, oldCategory))
+          m.top.content.replaceChild(newCategory, m.NodeHelpers.getChildIndex(m.top.content, oldCategory))
         else if newCategory <> invalid and oldCategory = invalid
           'add new category
           'if new category is history, put it one before queue, or if queue doens't exist put it in 2nd position
           'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
           if newCategory.id = m.constants.ui.categoryIds.history
-            queueIndex = m.NodeHelpers.getChildIndexById(m.categoryContent, m.constants.ui.categoryIds.queue)
+            queueIndex = m.NodeHelpers.getChildIndexById(m.top.content, m.constants.ui.categoryIds.queue)
             insertPos = 1
             if queueIndex > -1
               insertPos = queueIndex
             end if
-            m.categoryContent.insertChild(newCategory, insertPos)
+            m.top.content.insertChild(newCategory, insertPos)
           else if newCategory.id = m.constants.ui.categoryIds.queue
-            historyIndex = m.NodeHelpers.getChildIndexById(m.categoryContent, m.constants.ui.categoryIds.history)
+            historyIndex = m.NodeHelpers.getChildIndexById(m.top.content, m.constants.ui.categoryIds.history)
             insertPos = 1
             if historyIndex > -1
               insertPos = historyIndex + 1
             end if
-            m.categoryContent.insertChild(newCategory, insertPos)
+            m.top.content.insertChild(newCategory, insertPos)
           end if
         else if newCategory = invalid and oldCategory <> invalid
           'remove old category
-          m.categoryContent.removeChild(oldCategory)
+          m.top.content.removeChild(oldCategory)
         else if newCategory = invalid and oldCategory = invalid
           'do nothing
         end if
 
         'reset the categoryGridList content so the changes display in the RowList
-        categoryContent = m.categoryContent
+        categoryContent = m.top.content
         m.CategoryGridList.content = categoryContent
       end if
+
+      m.top.isLoading = false
 
       ' if m.CategoryGridList.content <> invalid
       '   ' Make sure any user categories which didn't get newly added are reloaded
@@ -211,7 +172,7 @@ Function onReloadUserCategoriesResponse()
       '     end if
       '   end for
       ' else
-      '   m.CategoryGridList.content = m.categoryContent  ' should be all categories with initial amounts of content in them
+      '   m.CategoryGridList.content = m.top.content  ' should be all categories with initial amounts of content in them
       ' end if
       ' if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
     else
@@ -235,8 +196,9 @@ End Function
 
 
 Function onUserCategoriesFailed()
+  tubiLog("Homescreen.onUserCategoriesFailed")
   if m.top.content = invalid
-    loadAllCategories()
+    m.top.loadAllCategories = true
   end if
 End Function
 
@@ -251,11 +213,9 @@ Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus()
     m.CategoryGridList.setFocus(true)
-    m.top.backgroundUriList = determineBackgroundImage(m.CategoryGridList.itemFocused)
     m.gridHasFocus = true
-
     if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
-      loadAllCategories()
+      m.top.loadAllCategories = true
     end if
   else if m.top.isInFocusChain() = false
     m.gridHasFocus = false
@@ -271,7 +231,7 @@ End Function
 ' users
 Function onSignedInChange()
   tubiLog("HomeScreen.onSignedInChange")
-  loadAllCategories()
+  m.top.loadAllCategories = true
 End Function
 
 
@@ -281,7 +241,7 @@ End Function
 ' On grid focus change, update the info panel
 Function onGridFocusChange() As Void
   tubiLog("HomeScreen.onGridFocusChange")
-  if not m.CategoryGridList.isInFocusChain() then return
+  if not m.CategoryGridList.isInFocusChain() or m.top.isLoading = true then return
 
   oldFocusedContent = m.CategoryGridList.oldItemFocused
   focusedContent = m.CategoryGridList.itemFocused
@@ -327,23 +287,25 @@ End Function
 
 Function onGridItemSelected() As Void
   tubiLog("HomeScreen.onGridItemSelected")
-  selectedItem = m.CategoryGridList.itemSelected
+  if m.top.isLoading <> true
+    selectedItem = m.CategoryGridList.itemSelected
 
-  ' Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
-  m.top.trackingComponentInfo = {
-    componentType: "category_component"
-    componentValues: {
-      category_slug: m.top.currCategoryId
-      category_row: m.top.selectedPosition[0] + 1  'all analytics are 1 based
-      content_tile: m.Tracking.getAnalyticsTile(selectedItem, m.top.selectedPosition[1] + 1)
+    ' Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
+    m.top.trackingComponentInfo = {
+      componentType: "category_component"
+      componentValues: {
+        category_slug: m.top.currCategoryId
+        category_row: m.top.selectedPosition[0] + 1  'all analytics are 1 based
+        content_tile: m.Tracking.getAnalyticsTile(selectedItem, m.top.selectedPosition[1] + 1)
+      }
     }
-  }
 
-  ' Content controller observes contentSelected to populate/push the detail screen
-  if selectedItem <> invalid then 
-    m.top.contentSelected = selectedItem
-    m.gridHasFocus = false
-    m.listHasFocus = false
+    ' Content controller observes contentSelected to populate/push the detail screen
+    if selectedItem <> invalid then 
+      m.top.contentSelected = selectedItem
+      m.gridHasFocus = false
+      m.listHasFocus = false
+    end if
   end if
 End Function
 
@@ -353,34 +315,16 @@ Function onTotalCountsChange(msg)
   totalCountInfo = msg.getData()
 
   for i=totalCountInfo.count()-1 to 0 Step -1
-    categoryInList = m.categoryContent.getChild(i)
+    categoryInList = m.top.content.getChild(i)
     categoryInList.totalCount = totalCountInfo[i]
 
     'category has no content, so we delete it here
     if categoryInList.totalCount = -1
-      m.categoryContent.removeChildIndex(i)
+      m.top.content.removeChildIndex(i)
     end if
   end for
 
-  m.CategoryGridList.content = m.categoryContent
-End Function
-
-
-'''''''''''''''''''''
-' loadAllCategories
-'
-' Load all category content, including . Series do not have season or episode information though.
-Function loadAllCategories()
-  tubiLog("HomeScreen.loadAllCategories")
-  ' This check causes all category fetches to be skipped prior to the field
-  ' being set to true.  Then, once true it will reload any time loadCategories() is
-  ' called, such as when signedIn field changes.
-  if m.top.loadAllCategories = true
-    reqName = m.constants.reqNames.getHomescreen
-    '//::TODO:: JHAND - test error here!
-    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", reqName)
-    m.Spinner.visible = true
-  end if
+  m.CategoryGridList.content = m.top.content
 End Function
 
 
@@ -431,7 +375,7 @@ End Function
 
 Function onCategoryRefreshTimer()
   tubiLog("HomeScreen.onCategoryRefreshTimer")
-  loadAllCategories()
+  m.top.loadAllCategories = true
 End Function
 
 

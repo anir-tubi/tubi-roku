@@ -28,6 +28,14 @@ Function init()
   if m.constants.deviceInfo.scaledUi = true then
     m.ChannelCategoryGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
+  m.global.observeField("theme", "onThemeChange")
+
+  m.ChannelCategoryGrid.focusBitmapBlendColor = m.global.theme.focused
+End Function
+
+
+Function onThemeChange()
+  m.ChannelCategoryGrid.focusBitmapBlendColor = m.global.theme.focused
 End Function
 
 

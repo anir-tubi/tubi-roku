@@ -18,9 +18,14 @@
          uriList is an array of background image uris
     -->
     <field id="backgroundInfo" type="assocarray" />
+    <field id="kidsMode" type="boolean" />
   </interface>
 
   <children>
+    <Poster
+      id="background"
+      width="1920"
+      height="1080"/>
     <BackgroundPosterGroup
       id="Poster1"
       posterOpacity="0.0" />

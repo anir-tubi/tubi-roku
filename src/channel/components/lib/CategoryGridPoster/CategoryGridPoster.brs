@@ -51,7 +51,7 @@ Function drawProgressBar()
     if percentage < 0.0 then percentage = 0.0
     m.resumeProgressBar.width = (m.top.width - (2 * m.resumeMargin)) * percentage
     m.resumeProgressBar.translation = [m.resumeMargin, m.top.height - m.resumeProgressBar.height - m.resumeMargin]
-    m.resumeProgressBar.color = m.global.constants.ui.colors.focused
+    m.resumeProgressBar.color = m.global.theme.focused
     m.resumeProgressBar.visible = true
   end if
 End Function

@@ -1,13 +1,28 @@
 Function initSideNav()
-  m.SideNav.observeFieldScoped("itemSelected", "onSideNavItemSelected")
+  m.SideNav.unobserveFieldScoped("itemSelectedId")
+  m.SideNav.observeFieldScoped("itemSelectedId", "onSideNavItemSelected")
+  m.global.unobserveFieldScoped("authInfo")
   m.global.observeFieldScoped("authInfo", "onSideNavSignedIn")
-  m.sSideNavItemSelected = invalid
+  m.sSideNavItemSelectedId = invalid
   m.sSideNavCurrentScreen  = invalid
   onSideNavSignedIn()
+  if m.kidsModeFeatureOn = false
+    m.SideNav.kidsModeValues = {
+      on: false, 
+      featureOn: m.kidsModeFeatureOn
+    }
+  end if
 End Function
+
 
 Function focusSideNavOption(sID)
   m.SideNav.itemRequested = sID
+End Function
+
+
+'tell the side nav to move the selected option (denoted by a stationary gray menu selector)
+Function updateSideNavSelected(sideNavButtonId)
+  m.SideNav.selectedItemRequested = sideNavButtonId
 End Function
 
 
@@ -16,8 +31,9 @@ Function isSideNavActive() as Boolean
   return (m.SideNav.isInFocusChain() = true and m.SideNav.opened = true)
 End Function 
 
-
+' Change the appearance of some side nav elements when the user data has changed
 Function onSideNavSignedIn()
+  tubiLog("onSideNavSignedIn")
   sName = ""
   authInfo = m.global.authInfo
   if authInfo <> invalid
@@ -32,62 +48,186 @@ Function onSideNavSignedIn()
 End Function
 
 
+Function setKidsModeInSideNav(isEnabled = true)
+  bLimited = false
+  if isEnabled = true
+    sIconTitle = m.constants.ui.terms.sideNav.kidsModeEnabled 
+  else
+    sIconTitle = m.constants.ui.terms.sideNav.kidsModeDisabled 
+  end if
+
+  if isKidsModeEnabledByParentalControls() = true
+    '// the user is set with kids permissions, so instruct the side nav to not allow the kids mode button to do everything it can
+    bLimited = true
+    sIconTitle = m.constants.ui.terms.sideNav.kidsModeEnabled 
+  end if
+  
+  m.SideNav.kidsModeValues = {
+    featureOn: m.kidsModeFeatureOn,
+    on: isEnabled
+    grayedOut: bLimited, 
+    title: sIconTitle
+  }
+End Function
+
+
 Function onSideNavItemSelected()
+  itemSelectedId = m.SideNav.itemSelectedId
   itemSelected = m.SideNav.itemSelected
   authInfo = m.global.authInfo
   bSameScreen = false
   currentScreenNow = currentScreen()
   if m.sSideNavCurrentScreen  <> invalid and currentScreenNow <> invalid
-    '//check if we are viewing the same screen. If not but sSideNavItemSelected is still the same as the input, then user navigated away from root page     
+    '//check if we are viewing the same screen. If not but sSideNavItemSelectedId is still the same as the input, then user navigated away from root page
     if (m.sSideNavCurrentScreen.subtype() = currentScreenNow.subtype()) then bSameScreen = true
   end if
 
-  if m.sSideNavItemSelected <> itemSelected or bSameScreen = false or itemSelected = "exit"
-    bSuccess = false
-
-'//::TODO::SIDENAV - (SHOW DESIGNERS as this might be a good bug) only root pages should display the menu. Listen to the stack and hide menu when when more than one screen is in stack. Also ensure the left button does not animate the sidenav for subPages
-    if itemSelected = m.constants.ui.sideNavIds.profile
+  if m.sSideNavItemSelectedId <> itemSelectedId or bSameScreen = false
+    '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
+    bNewScreenCalledSuccess = false 
+    if itemSelectedId = m.constants.ui.sideNavIds.profile
       if authInfo = invalid
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
         startSignIn(true)
-        bSuccess = true
+        bNewScreenCalledSuccess = true
       else
         '//Bring user to the settings page and select the signout option
         showSettingsScreen("SignInOutButton")
-        bSuccess = true
+        bNewScreenCalledSuccess = true
       end if
-    else if itemSelected = m.constants.ui.sideNavIds.search
+    else if itemSelectedId = m.constants.ui.sideNavIds.kidsMode
+      sTitle = ""
+      sDescription = ""
+      if itemSelected.turnedOn = true
+        '//If the parental control settings are not set to kids, then this action is not limited
+        bNewScreenCalledSuccess = false
+        
+        if m.kidsModeEnabled = true
+          dialogEvent = {
+            type: "dialog"
+            values: {
+              dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "KIDS_MODE" when it is available in protos
+              pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
+              dialog_action: "SHOW"
+              dialog_sub_type: "exit-kids-mode"
+            }
+          }
+
+          sTitle = "Exit Kids"
+          sDescription = "Do you have permission from your parents to leave Tubi Kids? If you exit you will see titles rated PG-13 and above."
+          showSimpleModal(sTitle, sDescription, ["Exit Kids", "Cancel"], dialogEvent, m.trackingLoggingTask, onKidsModeExit)
+        else
+          dialogEvent = {
+            type: "dialog"
+            values: {
+              dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "KIDS_MODE" when it is available in protos
+              pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
+              dialog_action: "SHOW"
+              dialog_sub_type: "enter-kids-mode"
+            }
+          }
+
+          sTitle = "Kids"
+          sDescription = "You will only see content rated PG and under until you turn off this setting. For password protected controls please update your parental control preferences in settings."
+          showSimpleModal(sTitle, sDescription, ["Switch to Kids", "Cancel"], dialogEvent, m.trackingLoggingTask, enableKidsModeFromSideNav)
+        end if
+      else 
+        if m.kidsModeEnabled = true
+          bNewScreenCalledSuccess = false
+
+          dialogEvent = {
+            type: "dialog"
+            values: {
+              dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "EXIT_KIDS_MODE" when it is available in protos
+              pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
+              dialog_action: "SHOW"
+              dialog_sub_type: "exit-kids-parental"
+            }
+          }
+
+          sTitle = "Exit Kids"
+          sDescription = "To exit Kids, please update your parental controls in account settings."
+          showSimpleModal(sTitle, sDescription, ["Go To Settings", "Cancel"], dialogEvent, m.trackingLoggingTask, onKidsModeSettingsCall)
+        else 
+          '//This use case should never happen. If the user has parental controls set to kids, then that instantly turns on kids mode,
+          '//   so there will never be an enter kids mode mode when parental controls is turned to kids.
+        end if
+
+      end if
+    else if itemSelectedId = m.constants.ui.sideNavIds.search
       '//display the search
-      showSearchScreen(m.constants)
-      bSuccess = true
-    else if itemSelected = m.constants.ui.sideNavIds.home
+      if m.kidsModeEnabled = true
+        bNewScreenCalledSuccess = false
+
+        dialogEvent = {
+          type: "dialog"
+          values: {
+            dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "EXIT_KIDS_MODE" when it is available in protos
+            pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
+            dialog_action: "SHOW"
+            dialog_sub_type: "kids-mode-search"
+          }
+        }
+
+        sTitle = "Search Disabled"
+        sDescription = "Please exit Tubi Kids to use this feature."
+        showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
+
+        ' reset the selected item indicator in the side nav to the current screen, since selecting search will set it to search
+        sideNavId = m.constants.ui.screenIdToSideNavId[currentScreenNow.id]
+        updateSideNavSelected(sideNavId)
+      else 
+        showSearchScreen(m.constants)
+        bNewScreenCalledSuccess = true
+      end if
+    else if itemSelectedId = m.constants.ui.sideNavIds.home
       showHomeScreen(m.constants, authInfo)
-      bSuccess = true
-    else if itemSelected = m.constants.ui.sideNavIds.channels
-      showChannelListScreen(m.constants, "MENU")
-      bSuccess = true
-    else if itemSelected = m.constants.ui.sideNavIds.categories
+      bNewScreenCalledSuccess = true
+    else if itemSelectedId = m.constants.ui.sideNavIds.channels
+      if m.kidsModeEnabled = true
+        bNewScreenCalledSuccess = false
+
+        dialogEvent = {
+          type: "dialog"
+          values: {
+            dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "EXIT_KIDS_MODE" when it is available in protos
+            pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
+            dialog_action: "SHOW"
+            dialog_sub_type: "kids-mode-channels"
+          }
+        }
+
+        sTitle = "Channels Disabled"
+        sDescription = "Please exit Tubi Kids to use this feature."
+        showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
+
+        ' reset the selected item indicator in the side nav to the current screen, since selecting search will set it to search
+        sideNavId = m.constants.ui.screenIdToSideNavId[currentScreenNow.id]
+        updateSideNavSelected(sideNavId)
+      else
+        showChannelListScreen(m.constants, "MENU")
+        bNewScreenCalledSuccess = true
+      end if
+    else if itemSelectedId = m.constants.ui.sideNavIds.categories
       showCategoryListScreen(m.constants, "MENU")
-      bSuccess = true
-    else if itemSelected = m.constants.ui.sideNavIds.settings
+      bNewScreenCalledSuccess = true
+    else if itemSelectedId = m.constants.ui.sideNavIds.settings
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
         '//ensure the homescreen is enabled again since when the user backs out of the settings page, he will be returned to the home screen
         homeScreen.enabled = true
       end if
       showSettingsScreen()
-      bSuccess = true
-    else if itemSelected = m.constants.ui.sideNavIds.exit
+      bNewScreenCalledSuccess = true
+    else if itemSelectedId = m.constants.ui.sideNavIds.exit
       topScreen = currentScreen()
       displayExitModal(topScreen.trackingPageInfo)
-      bSuccess = true
+      bNewScreenCalledSuccess = false
     end if
 
-    if bSuccess = true
-      if itemSelected <> m.constants.ui.sideNavIds.exit
-        hideNavMenu(false)
-      end if
-      m.sSideNavItemSelected = itemSelected
+    if bNewScreenCalledSuccess = true
+      hideNavMenu(false)
+      m.sSideNavItemSelectedId = itemSelectedId
       m.sSideNavCurrentScreen  = currentScreen()
     end if
   else
@@ -95,6 +235,36 @@ Function onSideNavItemSelected()
     '//same item was selected, do nothing other than closing the menu
     hideNavMenu(false)
   end if
+End Function
+
+
+Function enableKidsModeFromSideNav(bEnable = true)
+  saveKidsModeToMemory(bEnable)
+  enableKidsModeUI(bEnable)
+  refreshScreenAfterParentalChanges()
+  screen = currentScreen()
+  
+  if bEnable = true
+    if screen <> invalid and (screen.id = m.constants.ui.screenIds.searchScreen or screen.id = m.constants.ui.screenIds.channelListScreen)
+      '//If the current screen is one of the pages that should be disabled during kids mode, then take user to homescreen    
+      showHomeScreen(m.constants, m.authInfo)
+
+      homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
+      focusSideNavOption(homeSideNavID)
+    end if
+  end if
+End Function
+
+
+' The user selected to view the settings screen from the exit kids mode with parental controls on modal.
+Function onKidsModeSettingsCall()
+  hideNavMenu(false)
+  showSettingsScreen()
+End Function
+
+
+Function onKidsModeExit()
+  enableKidsModeFromSideNav(false)
 End Function
 
 

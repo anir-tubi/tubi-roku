@@ -43,13 +43,13 @@ Function execGetDetailMetadata() As Void
 
   if m.top.request.getContent = true
     tubiLog("DetailMetadataTask getting content for " + m.top.request.contentId)
-    contentReq = cms.singleContentReq(m.top.request.contentId, true)
+    contentReq = cms.singleContentReq(m.top.request.contentId, true, m.top.request.kidsMode)
     contentReq.start(port)
   end if
 
   if m.top.request.getRelated = true
     tubiLog("DetailMetadataTask getting related (you may also like) for " + m.top.request.contentId)
-    relatedReq = cms.relatedContentReq(m.top.request.contentId)
+    relatedReq = cms.relatedContentReq(m.top.request.contentId, m.top.request.kidsMode)
     relatedReq.start(port)
   end if
 

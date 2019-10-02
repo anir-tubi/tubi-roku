@@ -22,8 +22,21 @@ Function execInitializeUserData()
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
   m.top.firstVisit = Auth.getfirstVisit()
+  m.top.kidsMode = Auth.getKidsMode()
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger 
 End Function
+
+Function saveKidsModeToMemory()
+  tubiLog("AuthTask.saveKidsModeToMemory")
+    kidsModeObject = {
+      enabled: m.top.isKidsMode
+    }
+    constants = m.global.constants 'single thread-local reference to avoid thread rendevue
+    Request = TubiRequest()
+    Auth = TubiAuth(constants, Request)
+    Auth.setKidsMode(kidsModeObject)
+End Function
+
 
 Function execSignOut()
   tubiLog("AuthTask.execSignOut")
@@ -50,7 +63,7 @@ Function addToQueue()
   Auth = TubiAuth(m.global.constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
-  request = Bookmarks.addBookmarkReq(m.top.content)
+  request = Bookmarks.addBookmarkReq(m.top.content, m.top.isKidsMode)
   port = CreateObject("roMessagePort")
   if request <> invalid then
     request.start(port)
@@ -95,7 +108,7 @@ Function removeFromQueue()
   Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
 
   tubiLog("Removing bookmark id " + m.top.content.bookmarkId + " for content " + m.top.content.id)
-  request = Bookmarks.removeBookmarkReq(m.top.content)
+  request = Bookmarks.removeBookmarkReq(m.top.content, m.top.isKidsMode)
   port = CreateObject("roMessagePort")
   if request <> invalid then
     request.start(port)
@@ -127,7 +140,7 @@ Function removeFromHistory()
   Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
 
   tubiLog("Removing content " + m.top.content.id + " from history")
-  request = Bookmarks.removeHistoryReq(m.top.content)
+  request = Bookmarks.removeHistoryReq(m.top.content, m.top.isKidsMode)
   port = CreateObject("roMessagePort")
   if request <> invalid then
     request.start(port)
@@ -161,7 +174,7 @@ Function updateHistory()
   'only do the following if the user is logged in
   if m.top.content <> invalid
     tubiLog("Adding content " + m.top.content.id + " from history at position " + stri(m.top.nowPos))
-    newHistoryReq = Bookmarks.addHistoryReq(m.top.content, m.top.nowPos)
+    newHistoryReq = Bookmarks.addHistoryReq(m.top.content, m.top.nowPos, m.top.isKidsMode)
     if newHistoryReq <> invalid
       result = newHistoryReq.runSynchronous()  ' timeout default is 5 seconds
       historyResult = {}

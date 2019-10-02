@@ -1,7 +1,9 @@
 Function init()
  m.SettingsMenu = m.top.findNode("SettingsMenu")
  m.top.list = m.SettingsMenu
+
  m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
+ m.SettingsMenu.focusBitmapBlendColor = m.global.theme.focused
  m.SettingsMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-fhd.9.png"
  if m.global.constants.deviceInfo.scaledUi = true
    m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"

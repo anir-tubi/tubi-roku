@@ -55,5 +55,7 @@
         -->
         <field id="logException" type="assocarray" alwaysNotify="true"/>
 
+        <!-- indicates the mode of the app and will be passed to all analytics events, ie. KIDS_MODE -->
+        <field id="analyticsAppMode" type="string" value="DEFAULT_MODE"/>
     </interface>
 </component>

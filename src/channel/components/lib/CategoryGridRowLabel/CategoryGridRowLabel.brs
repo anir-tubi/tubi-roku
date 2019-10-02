@@ -4,6 +4,12 @@ Function init()
   m.FocusIndex = m.top.findNode("FocusIndex")
   m.CategoryName = m.top.findNode("CategoryName")
   m.top.observeField("content", "onContentChange")
+  m.FocusIndex.color = m.global.theme.focused
+  m.global.observeField("theme", "onThemeChange")
+End Function
+
+Function onThemeChange()
+  m.FocusIndex.color = m.global.theme.focused
 End Function
 
 Function onContentChange()

@@ -21,25 +21,28 @@
   <interface>
     <!-- INPUTS -->
       <!-- MetadataFetchTask response for matrix homescreen (all categories and content) -->
-      <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
       <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
-    
+      
+      <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
+      <field id="content" type="node"/>
+
+      <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
+      <field id="contentUpdated" type="boolean"  alwaysNotify="true"/>
+      
+      <!-- hides or shows the loading spinner and removes any existing content on the CategoryGridList! -->
+      <field id="isLoading" type="boolean" />
+
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
       <field id="signedIn" type="boolean" value="false" />
-
-      <!-- The oiutside will tell the screen if it is reloading the content-->
-      <field id="reloadingContent" type="boolean" value="false" />
 
       <!-- show/hide the category menu -->
       <field id="categoryMenuVisible" type="boolean"/>
 
+      <!-- Indicates if that when the server is contacted, it should indcate that the app is in kidsMode. -->
+      <field id="shouldKidsModeBeSentToServer" type="boolean" alias="CategoryGridList.shouldKidsModeBeSentToServer"/>
+
       <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
       <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
-
-      <!-- Trigger the content to be loaded.  This field is used to delay
-           the initial category content loading until after the stateful
-           fields have been set (e.g. signedIn) -->
-      <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
 
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean"  alwaysNotify="true"/>
@@ -47,6 +50,11 @@
     <!-- OUTPUTS -->
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
+
+      <!-- Trigger the content to be loaded.  This field is used to delay
+           the initial category content loading until after the stateful
+           fields have been set (e.g. signedIn) -->
+      <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
 
       <!-- set to the tubi content id of the item which was clicked on -->
       <field id="contentSelected" type="node" alwaysNotify="true"/>

@@ -3,24 +3,33 @@ Function init()
   m._ = rodash()
   m.constants = m.global.constants
 
+  m.blurredDefaultBackground = m.constants.ui.uris.defaultBackground
+  m.blurredDefaultBackground_kidsMode = m.constants.ui.uris.kidsModeBackground
+  '// The blurred background that we are currently using
+  m.blurredDefaultBackground_current = m.blurredDefaultBackground 
+
   'set background info defaults
   m.top.backgroundInfo = {
     type: m.constants.ui.backgroundTypes.fullScreen
     uriList: [m.blurredDefaultBackground]
   }
+  '//This is a store that we can use to change the current backgrounds. Like m.lastBackgroundInfo, we can update
+  '// this variable and prevent the updateBackground() observer from being triggered. 
+  m.aCurrentBackgroundInfo = m.top.backgroundInfo
   'this is a store that we can check against in order to prevent updateBackground logic from running when
   'm.top.lastBackgroundInfo is updated with the same info as before. "alwaysNotify" doesn't seem to work on assocArray fields
   m.lastBackgroundInfo = m.top.backgroundInfo
   m.top.observeField("backgroundInfo", "newBackgroundSet")
+  m.top.observeField("kidsMode", "onKidsModeChange")
 
   m.fullScreenGradient = m.top.findNode("FullScreenGradient")
   m.topRightGradient = m.top.findNode("TopRightGradient")
+  m.background = m.top.findNode("background") 
   m.oldPoster = m.top.findNode("Poster1")  'the poster that is hidden (or transitioning to be hidden)
   m.newPoster = m.top.findNode("Poster2")  'the poster that is visible (or transitioning to be visible)
   m.oldBackgroundType = m.constants.ui.backgroundTypes.fullscreen  'set the default background type
   m.newBackgroundType = m.top.backgroundInfo.type
 
-  m.blurredDefaultBackground = m.constants.ui.uris.defaultBackground
   m.isRotation = false
 
   m.timer = CreateObject("roSGNode", "Timer")
@@ -31,32 +40,56 @@ Function init()
   m.top.inheritParentOpacity = false
 End Function
 
+Function onKidsModeChange()
+  if m.top.kidsMode = true
+    m.fullScreenGradient.uri = m.constants.ui.uris.backgroundFullScreenGradient_kidsMode
+    m.topRightGradient.uri = m.constants.ui.uris.backgroundTopRightGradient_kidsMode
+    m.background.uri = m.blurredDefaultBackground_kidsMode
+    m.blurredDefaultBackground_current  = m.blurredDefaultBackground_kidsMode
+  else
+    m.fullScreenGradient.uri = m.constants.ui.uris.backgroundFullScreenGradient
+    m.topRightGradient.uri = m.constants.ui.uris.backgroundTopRightGradient
+    m.background.uri = m.blurredDefaultBackground
+    m.blurredDefaultBackground_current  = m.blurredDefaultBackground
+  end if
+  '//call newBackgroundSet() in case the kids mode change cause the default background is being used and we need to change to appropriate default backround for the current mode.
+  newBackgroundSet()
+End Function
 
 'Runs when the backgroundType has been set.
 Function newBackgroundSet()
   TubiLog("BackgroundGroup.newBackgroundSet")
+  m.aCurrentBackgroundInfo = m.top.backgroundInfo
+
+  for i=0 to m.aCurrentBackgroundInfo.uriList.count()-1
+    '//Modify the default background so the correct default background is used depending on the kids mode state
+    if m.top.kidsMode = true and m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground 
+      m.aCurrentBackgroundInfo.uriList[i]  = m.blurredDefaultBackground_kidsMode 
+    else if m.top.kidsMode = false and m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground_kidsMode 
+      m.aCurrentBackgroundInfo.uriList[i]  = m.blurredDefaultBackground 
+    end if 
+  end for
 
   'can't rely on alwaysNotify for m.top.uriList, so run our own logic to determine if the field value has actually changed
   isSame = true
-  if type(m.lastBackgroundInfo.type) <> type(m.top.backgroundInfo.type) or m.lastBackgroundInfo.type <> m.top.backgroundInfo.type
+  if type(m.lastBackgroundInfo.type) <> type(m.aCurrentBackgroundInfo.type) or m.lastBackgroundInfo.type <> m.aCurrentBackgroundInfo.type
     isSame = false
-  else if m.lastBackgroundInfo.uriList.count() <> m.top.backgroundInfo.uriList.count()
+  else if m.lastBackgroundInfo.uriList.count() <> m.aCurrentBackgroundInfo.uriList.count()
     isSame = false
   else
     'types are the same and uriList counts are the same, so check if all elements in uriList are the same
-    for i=0 to m.lastBackgroundInfo.count()-1
-      if type(m.lastBackgroundInfo.uriList[i]) <> type(m.top.backgroundInfo.uriList[i]) or m.lastBackgroundInfo.uriList[i] <> m.top.backgroundInfo.uriList[i]
+    for i=0 to m.lastBackgroundInfo.uriList.count()-1
+      if type(m.lastBackgroundInfo.uriList[i]) <> type(m.aCurrentBackgroundInfo.uriList[i]) or m.lastBackgroundInfo.uriList[i] <> m.aCurrentBackgroundInfo.uriList[i]
         isSame = false
         exit for
       end if
     end for
   end if
-
   if isSame = false
     m.timer.control = "stop"
     m.isRotation = false
     updateBackground(0)
-    m.lastBackgroundInfo = m.top.backgroundInfo
+    m.lastBackgroundInfo = m.aCurrentBackgroundInfo
   end if
 End Function
 
@@ -73,7 +106,7 @@ Function updateBackground(uriIndex)
   completePosterAnimations()
 
   'set the "old" or "hidden" poster with the new poster uri and size (if necessary)
-  setPosterValues(m.top.backgroundInfo.uriList[uriIndex])
+  setPosterValues(m.aCurrentBackgroundInfo.uriList[uriIndex])
 
   'move newPoster to oldPoster, and switch oldPoster to be the newPoster now that it has the newest values
   tempPoster = m.newPoster
@@ -82,7 +115,7 @@ Function updateBackground(uriIndex)
 
   'update the old and new background types
   m.oldBackgroundType = m.newBackgroundType
-  m.newBackgroundType = m.top.backgroundInfo.type
+  m.newBackgroundType = m.aCurrentBackgroundInfo.type
 
   'transition the gradients if necessary
   transitionGradients()
@@ -117,7 +150,7 @@ End Function
 '@posterType: string, can be one of the background poster types as defined in constants ("fullscreen" or "topright")
 '@posterUri: string, image uri to use for the background poster
 Function setPosterValues(posterUri)
-  if m.top.backgroundInfo.type = m.constants.ui.backgroundTypes.fullScreen
+  if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.fullScreen
     m.oldPoster.width = 1920
     m.oldPoster.height = 1080
     m.oldPoster.posterTranslation = [0,0]
@@ -134,7 +167,7 @@ Function setPosterValues(posterUri)
       m.oldPoster.loadHeight = "720"
       m.oldPoster.loadDisplayMode = "scaleToZoom"
     end if
-  else if m.top.backgroundInfo.type = m.constants.ui.backgroundTypes.topRight
+  else if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.topRight
     m.oldPoster.width = 1615
     m.oldPoster.height = 909
     m.oldPoster.posterTranslation = [305,0]
@@ -193,7 +226,7 @@ End Function
 'Transition the background gradients if necessary so the background gradient fits the new background type
 Function transitionGradients()
   if m.constants.deviceInfo.limitedUi = true
-    if m.newPoster.uri = m.blurredDefaultBackground
+    if m.newPoster.uri = m.blurredDefaultBackground_current
       m.fullScreenGradient.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 0.0
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen
@@ -204,7 +237,7 @@ Function transitionGradients()
       m.topRightGradient.gradientOpacity = 1.0
     end if
   else
-    if m.newPoster.uri = m.blurredDefaultBackground
+    if m.newPoster.uri = m.blurredDefaultBackground_current
       if m.fullScreenGradient.gradientOpacity > 0.0
         m.fullScreenGradient.fadeOutControl = "start"
         m.fullScreenGradient.lastAnimationName = "GradientFadeOut"
@@ -257,7 +290,7 @@ End Function
 Function onTransitionComplete()
   m.newPoster.findNode(m.newPoster.lastAnimationName).unobserveField("state")
 
-  if m.top.backgroundInfo.uriList.count() > 1
+  if m.aCurrentBackgroundInfo.uriList.count() > 1
     m.timer.observeField("fire", "rotateBackgrounds")
     m.timer.control = "start"
   end if
@@ -269,10 +302,10 @@ Function rotateBackgrounds()
   m.timer.unobserveField("fire")
 
   currentIndex = 0
-  currentIndex = m._.indexOf(m.top.backgroundInfo.uriList, m.newPoster.uri)
+  currentIndex = m._.indexOf(m.aCurrentBackgroundInfo.uriList, m.newPoster.uri)
 
   nextIndex = 0
-  if currentIndex + 1 < m.top.backgroundInfo.uriList.count()
+  if currentIndex + 1 < m.aCurrentBackgroundInfo.uriList.count()
     nextIndex = currentIndex + 1
   end if
   m.isRotation = true
@@ -282,11 +315,11 @@ End Function
 
 'Choose the correct transition based on the background type and/or presence of the default background uri
 Function startTransitionIn()
-  if m.newPoster.uri = m.blurredDefaultBackground
+  if m.newPoster.uri = m.blurredDefaultBackground_current
     m.newPoster.fadeInControl = "start"
     m.newPoster.lastAnimationName = "FadeIn"
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.topRight
-    if m.oldBackgroundType = m.constants.ui.backgroundTypes.fullScreen and m.oldPoster.uri <> m.blurredDefaultBackground
+    if m.oldBackgroundType = m.constants.ui.backgroundTypes.fullScreen and m.oldPoster.uri <> m.blurredDefaultBackground_current
       'moving from detail screen to category screen is clunky, so try to reduce the amount of animations
       m.newPoster.posterOpacity = 1.0
     else if m.isRotation = true

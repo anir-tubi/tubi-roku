@@ -4,6 +4,7 @@ Function TubiAuth(constants, request)
   return {
     authRegSection: "auth"
     firstVisitRegSection: "visit"
+    kidsModeRegSection: "kids-mode"
     
     constants: constants
     request: request
@@ -12,6 +13,8 @@ Function TubiAuth(constants, request)
     getAuthInfo: tubiAuth_getAuthInfo
     getFirstVisit: tubiAuth_getFirstVisit
     setFirstVisit: tubiAuth_setFirstVisit
+    getKidsMode: tubiAuth_getKidsMode
+    setKidsMode: tubiAuth_setKidsMode
     handleRegistration: tubiAuth_handleRegistration
     oneTimeLoginMigration: tubiAuth_oneTimeLoginMigration
     logout: tubiAuth_deleteAuthInfo_
@@ -89,6 +92,26 @@ Function tubiAuth_setFirstVisit()
   daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
   m.regWrite("firstVisit", daysFromEpoch.toStr(), m.firstVisitRegSection)
   return daysFromEpoch
+End Function
+
+
+'checks device registry for kids mode value, if none exists, set value to default associative array
+'returns stored kids mode value or the default value
+Function tubiAuth_getKidsMode()
+  kidsMode = m.regRead("kidsMode", m.kidsModeRegSection)
+  if kidsMode <> invalid
+    returnKidsMode = ParseJson(kidsMode)
+  else 
+    '//To future proof the kidsMode variable, we're placing the boolean into an associative array instead of passing it directly - just in case we want to start saving nore info with the on state
+    returnKidsMode = {enabled: false}
+  end if
+  return returnKidsMode
+End Function
+
+'save the passed value to device memory as the kids mode object
+Function tubiAuth_setKidsMode(kidsModeObject)
+    sJson = FormatJson(kidsModeObject)
+    m.regWrite("kidsMode", sJson, m.kidsModeRegSection)
 End Function
 
 

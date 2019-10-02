@@ -2,6 +2,7 @@ Function init()
   tubiLog("SearchScreen.init")
   m._ = rodash()
   m.constants = m.global.constants
+  m.theme = m.global.theme
   Request = TubiRequest()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -9,12 +10,11 @@ Function init()
   m.spinner = m.top.findNode("spinner")
   m.NavSection = m.top.findNode("nav")
   m.Keyboard = m.top.findNode("Keyboard")
+  m.KidsModeMessage = m.top.findNode("KidsModeMessage")
   m.Keyboard.textEditBox.maxTextLength = 100
-  '//::TODO:: there looks like there is a bug when setting a custom focus color background. The focius color is not the right size. 
-  '//   When this is fixed in a firmware, we should use a custom focus background color
-  '//m.keyboard.focusedKeyColor = m.global.constants.ui.colors.keyboardFocusedText
-  m.keyboard.focusedKeyColor = "0x000000FF" '//Set the focus color to black when using the default key background color because there is a bug when the backspace key is not visible
-  '//m.keyboard.focusBitmapUri = "pkg:/images/keyboard_search_focused_key.9.png"
+
+  m.keyboard.focusedKeyColor = m.global.constants.ui.colors.keyboardFocusedText
+  m.keyboard.focusBitmapUri = m.theme.keyboard_focused_key
   m.keyboard.observeField("text", "onKeyboardTextChanged")
 
   m.SearchText = m.top.findNode("SearchText")
@@ -26,10 +26,11 @@ Function init()
   m.NoResultsMessage.color = m.constants.ui.colors.primaryText
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("searchResponse", "onSearchResultsReceived")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("visible", "onVisible")
   m.top.observeField("enabled", "onEnableChange")
+  m.top.observeField("kidsModeEnabled", "onKidsModeEnableChange")
+  m.top.observeField("contentUpdated", "onSearchContentChange")
 
   m.SearchText.color = m.global.constants.ui.colors.titleHeader
 
@@ -40,6 +41,7 @@ Function init()
   if m.constants.deviceInfo.scaledUi = true then
     m.ResultGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
+  m.ResultGrid.focusBitmapBlendColor = m.theme.focused
 
   m.top.backgroundUriList = [m.defaultHeroUri]
 
@@ -98,36 +100,25 @@ Function onEnableChange()
   end if
 End Function
 
+Function onKidsModeEnableChange()
+  if m.top.kidsModeEnabled = true
+    m.KidsModeMessage.visible = false
+  else
+    m.KidsModeMessage.visible = true
+  end if
+End Function
+
 
 ' This may filter results based on parental controls so send it again on auth change
 Function onSignedInChange()
   tubiLog("SearchScreen.onSignedInChange")
   if m.Keyboard.text <> invalid and m.Keyboard.text.len() > 0 then
     loadSearchResults()
+  else
+    loadSearchResults(true)
   end if
 End Function
 
-Function onSearchResultsReceived()
-  tubiLog("SearchScreen.onSearchResultsReceived")
-  displayLoading(false)
-  response = m.top.searchResponse.response
-  if response.code >= 200 and response.code < 300 then 
-    m.ResultGrid.content = invalid '//reset content everytime so in case the new results = previous results, then the contemt can refresh. Without refr4eshing content, then the content may appear blank
-    m.ResultGrid.content = m.top.searchResponse.convertedMetadata
-    if m.top.searchResponse.convertedMetadata <> invalid and m.top.searchResponse.convertedMetadata.getChildCount() > 0 then
-      if response.name = m.constants.reqNames.getSearchDefault
-        '//display special text when the default search is displaying 
-        m.SearchText.text = "Search for movies, TV shows, and people"
-      end if
-      m.ResultGrid.visible = true
-      m.NoResultsMessage.visible = false
-    else
-      displayNoResults()
-    end if
-  else
-    displayNoResults()
-  end if
-End Function
 
 Function displayNoResults()
   m.ResultGrid.visible = false
@@ -163,6 +154,25 @@ Function onResultSelected()
   end if
 End Function
 
+'''''''''''''''''''''''
+' onSearchContentChange
+'
+' When the server returns with search content, this function will be called.
+Function onSearchContentChange()
+  displayLoading(false)
+  m.ResultGrid.content = invalid '//reset content everytime so in case the new results = previous results, then the contemt can refresh. Without refr4eshing content, then the content may appear blank
+  m.ResultGrid.content = m.top.content
+  if m.top.content <> invalid and m.top.content.getChildCount() > 0 then
+    if m.top.content.isDefaultSearchResults = true
+      '//display special text when the default search is displaying 
+      m.SearchText.text = "Search for movies, TV shows, and people"
+    end if
+    m.ResultGrid.visible = true
+    m.NoResultsMessage.visible = false
+  else
+    displayNoResults()
+  end if
+End Function
 
 ''''''''''''''''''''''''''
 ' onKeyboardTextChanged
@@ -246,24 +256,13 @@ End Function
 '''''''''''''''''''''
 ' loadSearchResults
 '
-' Create a request object for the search and hand the request to the metaDataFetchTask which will actually make the request
+' change the m.top.searchText string so the helper will call the search api and load the search results
 Function loadSearchResults(bDefaultResults = false)
   tubiLog("SearchScreen.loadSearchResults")
-  searchText = m.Keyboard.text
-  ' cancel any in-flight requests
-  m.global.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, m.top, "searchResponse")
-
   if bDefaultResults = false
-    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", m.constants.reqNames.searchAPI, searchText)
-    m.global.trackingLoggingTask.trackEvent = {
-      type: "search"
-      values: {
-        query: Left(searchText, 256)
-        search_type: "PAGE" 'SearchType enum
-      }
-    }
+    m.top.searchText = m.Keyboard.text
   else 
-    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("featured", m.top, "searchResponse", m.constants.reqNames.getSearchDefault)
+    m.top.searchText = ""
   end if
 End Function
 

@@ -9,10 +9,7 @@ Function startSignIn(skipDisambiguation)
   activationCodeScreen.observeFieldScoped("skipButtonPressed", "onActivationSkipped")
   pushScreen(activationCodeScreen, true, true)
 
-  m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype([m.defaultBackgroundUri])
-    uriList: [m.defaultBackgroundUri]
-  }
+  displayDefaultBackground()
 End Function
 
 
@@ -38,7 +35,7 @@ Function onActivationSuccess()
 End Function
 
 
-' Auth Info refreshed AFTER app is already running
+' Auth Info refreshed. Occurs at app start up and occurs when a user signs in or out.
 Function onAuthInfoReceived()
   tubiLog("SignInHelpers.onAuthInfoReceived")
   ' AuthInfo may be invalid if authTask failed to log the user in
@@ -47,9 +44,15 @@ Function onAuthInfoReceived()
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
 
+  registryKidsMode = false
+  if m.authTask.kidsMode <> invalid
+    registryKidsMode = m.authTask.kidsMode.enabled
+  end if
+
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
+
 
   ' Here we notify screens that may exist, though we try to keep context
   '
@@ -85,7 +88,7 @@ Function onAuthInfoReceived()
       }
     end if
   end if
-
+  
   setDirtyUserCategories(m.constants.ui.categoryIds.queue)
   setDirtyUserCategories(m.constants.ui.categoryIds.history)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
@@ -100,7 +103,7 @@ Function onAuthInfoReceived()
       'expect homeScreen to not be invalid only when a user signs out
       homeScreen.loadAllCategories = true
     end if
-    startUserExperience()
+    startUserExperience(registryKidsMode)
   else if currentScreen() <> invalid and currentScreen().getSubtype() = "DetailScreen"
     ' this happens if a user logs in after attempting to add to queue
     if homeScreen <> invalid
@@ -112,8 +115,7 @@ Function onAuthInfoReceived()
     if homeScreen <> invalid
       homeScreen.loadAllCategories = true
     end if
-    showHomeScreen(m.constants, m.global.authInfo) 'loads home screen from cache
-    focusSideNavOption(m.constants.ui.sideNavIds.home)
+    startUserExperience(registryKidsMode)
   end if
 End Function
 

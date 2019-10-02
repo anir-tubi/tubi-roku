@@ -6,6 +6,7 @@ Function showChannelScreen(content, sPageSource = "")
   channelScreen.observeFieldScoped("backgroundUriList", "onChannelBackgroundChange")
   channelScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   channelScreen.observeFieldScoped("refreshChannel", "onRefreshChannelSignal")
+  channelScreen.id = m.constants.ui.screenIds.channelDetailScreen
   channelScreen.isLoading = true
 
   channelScreen.trackingPageInfo = {
@@ -15,6 +16,7 @@ Function showChannelScreen(content, sPageSource = "")
     }
   }
 
+  displayDefaultBackground()
   pushScreen(channelScreen, true, false)  ' don't send page load tracking until we resolve channel content
   getChannelFromServer(channelScreen, content)
 End Function
@@ -41,6 +43,7 @@ End Function
 Function getChannelFromServer(screen, content)
   tubiLog("ChannelScreenHelpers.getChannelFromServer")
   channelTask = CreateObject("roSGNode", "ChannelMetadataTask")
+  channelTask.kidsMode = shouldKidsModeBeSentToServer()
   channelTask.channelId = content.id
   screen.addField("task", "node", false)
   screen.task = channelTask
@@ -104,22 +107,36 @@ Function showChannelContentError(msg, bContentEmptyError = false)
   errorInfo = msg.getData()
   task = msg.getRoSGNode()
   screen = task.target
-  ' Screen is created/pushed in showChannelScreen, since there is no content, remove it.
-  ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
-  ' sent in the case of an error.
-  popScreen(false)
-  
-  errorCode = getUserFacingErrorCode(m.global.constants.errors.context.channelScreen, m.constants.errors.subtypes.fetchError, errorInfo.code)
+  topScreen = currentScreen()
+  if screen <> invalid and topScreen.id = m.constants.ui.screenIds.channelDetailScreen
+    ' Screen is created/pushed in showChannelScreen, since there is no content, remove it.
+    ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
+    ' sent in the case of an error.
+    popScreen(false)
+    errorCode = getUserFacingErrorCode(m.global.constants.errors.context.channelScreen, m.constants.errors.subtypes.fetchError, errorInfo.code)
 
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "NETWORK_ERROR" 'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: errorCode
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "NETWORK_ERROR" 'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: errorCode
+      }
     }
-  }
+
+    modalInfo = {
+      title: sErrorTitle
+      message: getErrorMessage(sErrorMessage, errorCode)
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
+
+    showErrorModal(modalInfo)
+  end if
+
+  loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
+  screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
 
   modalInfo = {
     title: sErrorTitle

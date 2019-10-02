@@ -3,7 +3,7 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("width", "drawProgressBar")
   m.top.observeField("height", "drawProgressBar")
-  m.progressBar.color = m.global.constants.ui.colors.focused
+  m.progressBar.color = m.global.theme.focused
   m.resumeMargin = 6  'inset of resume bar
   drawProgressBar()
 End Function

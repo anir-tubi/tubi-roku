@@ -13,7 +13,6 @@ function showSettingsScreen(sFocusID = "")
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
   m.settingsScreen.observeFieldScoped("signInSelected", "onSettingsSignInSelected")
   m.settingsScreen.observeFieldScoped("parentalSettingSelected", "onParentalSettingSelected")
-  m.settingsScreen.observeFieldScoped("remoteParentalSetting", "onRemoteParentalSetting")
   m.settingsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   m.settingsScreen.observeFieldScoped("backgroundUriList", "onSettingsBackgroundChange")
 
@@ -55,6 +54,7 @@ function setAuthInfoValue(attribute, value) as boolean
   end if
   return bSuccess
 end function
+
 
 function getNowSeconds() as integer
   nowDate = CreateObject("roDateTime")
@@ -136,9 +136,9 @@ function onParentalSettingSelected(msg)
       if m.global.authInfo.secondsOfSavedPassword <> invalid
         nSavedSeconds = m.global.authInfo.secondsOfSavedPassword
       end if
-      if m.global.authInfo.passwordText <> invalid and (nNowDate - nSavedSeconds) < 900
+      if m.global.authInfo.passwordText <> invalid and (nNowDate - nSavedSeconds) < 300
         tubiLog("SettingsScreenHelpers.onParentalSettingSelected(), use saved password")
-        '//if there is a saved password, was it submitted within the last 15 minutes (900 seconds), if so, then use that password
+        '//if there is a saved password, was it submitted within the last 5 minutes (300 seconds), if so, then use that password
         onPasswordConfirm()
       else
         m.confirmPasswordScreen = CreateObject("roSGNode", "ConfirmPasswordScreen")
@@ -202,28 +202,33 @@ function onPasswordConfirm(msg = invalid)
 end function
 
 
-' This is triggered once the remote setting has been received
-function onRemoteParentalSetting(msg)
-  parentalSetting = msg.GetData()
-  if m.global.authInfo <> invalid and parentalSetting <> m.global.authInfo.parentalrating
-    ' if remote value doesn't match the local one, refresh the category screen
-    refreshScreenAfterParentalChanges()
-  end if
-end function
-
-
 ' After the parental settings have changes then the content of certain screens should be refreshed
 Function refreshScreenAfterParentalChanges()
+  tubiLog("SettingsScreenHelpers.refreshScreenAfterParentalChanges")
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
     homeScreen.loadAllCategories = true
   end if
-  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.channelListScreen) 
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+
+  screen = currentScreen()
+  if screen <> invalid
+    if screen.id = m.constants.ui.screenIds.searchScreen
+      screen.kidsModeEnabled = m.kidsModeEnabled
+      screen.signedIn = true
+    else if screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen
+      refreshGridScreen(screen)
+    end if
+  end if
 End Function
 
 
+<<<<<<< HEAD
+Function onParentalSettingComplete(msg)
+=======
 function onParentalSettingComplete(msg)
+>>>>>>> master
   tubiLog("SettingsScreenHelper.onParentalSettingComplete")
   task = msg.GetRoSGNode()
   result = msg.GetData()
@@ -240,8 +245,41 @@ function onParentalSettingComplete(msg)
       '//Update menu so it appears updated. This is only needed if the password has been saved locally and was not entered immediately from the password screeen
       m.settingsScreen.parentalSettingUpdated = true
     end if
-    
+
+    if m.settingsScreen.parentalSettingSelected < 2
+      enableKidsModeUI(true)
+    else
+      '//turn off kids mode (if it is on) when switching to teens and greater
+      '// Also, disable the manual version of kids mode if the user had previously enabled kids mode manually
+      if m.kidsModeFeatureOn = true
+        saveKidsModeToMemory(false)
+        enableKidsModeUI(false)
+      end if
+    end if
+
     refreshScreenAfterParentalChanges()
+
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "PARENTAL_CONTROLS" when it is available in protos
+        pageOneof: m.Tracking.getAnalyticsPage(m.settingsScreen.trackingPageInfo.pageType, m.settingsScreen.trackingPageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "parental-updated-" + m.settingsScreen.parentalSettingSelected.toStr()
+      }
+    }
+
+    parentalSetting = m.settingsScreen.parentalSettingSelected
+    parentalDescription = ""
+    if type(parentalSetting) = "roInt" and m.constants.ui.parentalControls.descriptions[parentalSetting] <> invalid
+      parentalChoice = m.constants.ui.parentalControls.descriptions[parentalSetting]
+      parentalDescription += " to "
+      parentalDescription += parentalChoice
+    end if
+
+    title = "Parental Controls Settings Change"
+    message = "Parental controls setting is changed" + parentalDescription + ". Parental controls will be password protected after 5 minutes."
+    showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
   else
     if isConfirmPasswordScreen() = true
       setAuthInfoValue("secondsOfSavedPassword", 0)
@@ -270,4 +308,4 @@ function onParentalSettingComplete(msg)
       onParentalSettingSelected(msgParentalControls)
     end if
   end if
-end function
+End Function

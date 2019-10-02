@@ -47,6 +47,8 @@
         <field id="password" type="string"/>
         <field id="parentalSetting" type="integer"/>
 
+        <field id="isKidsMode" type="boolean" />
+
       <!-- OUTPUT -->
         <!-- execInitializeUserData, execSignOut, updateHistory:
         -        auth info blob from Auth.getAuthInfo(), or invalid if signed out
@@ -58,6 +60,9 @@
 
         <!-- number of days since the unix epoch when the device first opened Tubi -->
         <field id="firstVisit" type="integer" />
+
+        <!-- An Associative array related to user preferences to kids mode -->
+        <field id="kidsMode" type="assocarray" />
 
         <!-- execInitializeUserData, execSignOut:
         -        BookmarkContentNode tree of bookmarks

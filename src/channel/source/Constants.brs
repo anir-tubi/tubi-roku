@@ -122,7 +122,6 @@ Function getConstants()
       lowVram = false
     end if
 
-
     if noFirmwareCaptionMenuModels[di.GetModel()] <> invalid
       firmwareCaptionMenu = false
     else
@@ -210,7 +209,6 @@ Function getConstants()
     constants.reqNames.getRelatedContent = "getRelatedContent"
     constants.reqNames.getThumbnails = "getThumbnails"
     constants.reqNames.getChannel = "getChannel"
-
 
   'the different thumbnail orientations 
   constants.orientations = {}
@@ -300,6 +298,7 @@ Function getConstants()
 
     'users url
     constants.urls.users = {}
+      ' constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
       constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
       constants.urls.users.login = constants.urls.users.urlBase + "/login"
       constants.urls.users.refreshToken = constants.urls.users.urlBase + "/login/refresh"
@@ -322,7 +321,6 @@ Function getConstants()
       constants.urls.analytics.event = constants.urls.analytics.urlBase + "/v2/event"
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
 
-
     'live tv urls
     constants.urls.liveTv = {}
       constants.urls.liveTv.getAll = constants.urls.matrix.urlBase + "/livetv"
@@ -341,7 +339,6 @@ Function getConstants()
     'channels logo image urls
     constants.urls.channelLogoBrandedPrefix = "https://cdn.adrise.tv/image/channels/"
     constants.urls.channelLogoBrandedSuffix = "/logo_center.png"
-
 
   'http request types
   constants.reqTypes = {}
@@ -481,7 +478,6 @@ Function getConstants()
     constants.cacheTimes.category = 4 * 60 * 60 ' Time in seconds after which a category's cache is not valid
     constants.cacheTimes.homescreen = 6 * 60 * 60 ' Time in seconds after which the category screen's cache is not valid
 
-
   'This will store the error codes that are needed to be displayed to the user. 
   constants.errors = {}
 
@@ -497,6 +493,7 @@ Function getConstants()
   constants.errors.context.activateScreen = "8"
   constants.errors.context.channelsScreen = "9"
   constants.errors.context.categoriesScreen = "10"
+  constants.errors.context.kidsMode = "11"
 
   '//What is the actual error?
   constants.errors.subtypes = {}
@@ -511,7 +508,6 @@ Function getConstants()
   constants.errors.subtypes.playerPlaybackError = "201"
   constants.errors.subtypes.networkError = "300"
 
-
   'UI properties that should be passed into the scene graph
   constants.ui = {}
 
@@ -519,11 +515,15 @@ Function getConstants()
     constants.ui.users = {}
       constants.ui.users.guestHistory = true
 
-
     'static - pre defined text used in the app
     constants.ui.terms = {}
       constants.ui.terms.categories = "Categories"
       constants.ui.terms.channels = "Channels"
+
+      'static - pre defined text used in the side nav
+      constants.ui.terms.sideNav = {}
+        constants.ui.terms.sideNav.kidsModeEnabled = "Exit Kids"
+        constants.ui.terms.sideNav.kidsModeDisabled = "Kids"
 
     'static - pre defined category names
     constants.ui.categoryNames = {}
@@ -609,6 +609,7 @@ Function getConstants()
       constants.ui.sideNavIds.settings = "settings"
       constants.ui.sideNavIds.exit = "exit"
       constants.ui.sideNavIds.profile = "profile"
+      constants.ui.sideNavIds.kidsMode = "kidsMode"
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
@@ -640,6 +641,13 @@ Function getConstants()
 
       'default background image uri
       constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.png"
+      'kidsMode background image uri
+      constants.ui.uris.kidsModeBackground = "pkg:/images/art-blur-background_kids.png"
+      constants.ui.uris.backgroundFullScreenGradient = "pkg:/images/detail-gradient-25.png"
+      constants.ui.uris.backgroundTopRightGradient = "pkg:/images/home-gradient-25.png"
+      constants.ui.uris.backgroundFullScreenGradient_kidsMode = "pkg:/images/detail-gradient_kids.png"
+      constants.ui.uris.backgroundTopRightGradient_kidsMode = "pkg:/images/home-gradient_kids.png"
+      constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_kidsmode.png"
 
     constants.ui.colors = {}
       'template colors
@@ -666,27 +674,25 @@ Function getConstants()
       constants.ui.colors.unselectedEntryBox = "0xFFFFFFFF"
       
       'colors for individual elements - can be made individual or controlled by template colors
-      constants.ui.colors.heroFilter = constants.ui.colors.backgroundColor
       constants.ui.colors.titleHeader = constants.ui.colors.primaryText
-      constants.ui.colors.titleMetaData = constants.ui.colors.secondaryText
-      constants.ui.colors.titleDescription = constants.ui.colors.primaryText
-      constants.ui.colors.focusedCategoryList = constants.ui.colors.focused
-      constants.ui.colors.unfocusedCategoryList = constants.ui.colors.unfocused
-      constants.ui.colors.categoryContentBorder = constants.ui.colors.focused
-      constants.ui.colors.categoryContentInnerBorder = constants.ui.colors.backgroundColor
-      constants.ui.colors.categoryListCursor = constants.ui.colors.focused
-      constants.ui.colors.posterLabel = constants.ui.colors.primaryText
-      constants.ui.colors.videoOptionsMainSelection = constants.ui.colors.focused
-      constants.ui.colors.videoOptionsHistoryIndicator = constants.ui.colors.unfocused
-      constants.ui.colors.videoOptionsMainSelectionText = constants.ui.colors.unfocused
-      constants.ui.colors.focusedVideoOptions = constants.ui.colors.focused
-      constants.ui.colors.unfocusedVideoOptions = constants.ui.colors.unfocused
-      constants.ui.colors.videoOptionsCursor = constants.ui.colors.focused
-      constants.ui.colors.seasonContentTitle = constants.ui.colors.primaryText
-      constants.ui.colors.episodeBorder = constants.ui.colors.focused
-      constants.ui.colors.episodeInnerBorder = constants.ui.colors.backgroundColor
-      constants.ui.colors.searchUpdatingText = constants.ui.colors.secondaryText
       constants.ui.colors.expirationWarning = "0xFF9933FF"
+
+    'available themes that can be used for the app 
+    constants.ui.themes = {}
+      constants.ui.themes.default = {
+        focused: constants.ui.colors.focused
+        highlightedText: constants.ui.colors.highlightcolor
+        keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
+        scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
+        scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
+      }
+      constants.ui.themes.kidsMode = {
+        focused: "0xFEA534FF"
+        highlightedText: "0xFEA534FF"
+        keyboard_focused_key: "pkg:/images/keyboard_search_focused_key_kidsMode.9.png"
+        scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground_kidsMode.9.png"
+        scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground_kidsMode.9.png"
+      }
 
     'fonts for UI elmements
     constants.ui.fonts = {}
@@ -704,6 +710,14 @@ Function getConstants()
       constants.ui.fonts.videoOptionsFontType = constants.ui.fonts.openSans.regular
       constants.ui.fonts.seasonFontType = constants.ui.fonts.openSans.regular
       constants.ui.fonts.episodeFontType = constants.ui.fonts.openSans.regular
+
+    constants.ui.parentalControls = {}
+      constants.ui.parentalControls.descriptions = [
+        "Little Kids (G, TV-Y, TV-G)"
+        "Older Kids (PG, TV-PG, TV-Y7)"
+        "Teens (PG-13, TV-14)"
+        "Adults (R, TV-MA, NC-17)"
+      ]
 
     ' Set some performance parementers based on device profile
     constants.performance = {}
@@ -745,3 +759,5 @@ Function getConstants()
       end if
   return constants  
 end Function
+
+

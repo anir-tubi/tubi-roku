@@ -3,7 +3,7 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
   constants = m.global.constants
   m.focusColor = constants.ui.colors.primaryText
-  m.highlightColor = constants.ui.colors.highlightedText
+  m.highlightColor = m.global.theme.highlightedText
   m.top.color = m.focusColor
   m.top.observeField("gridHasFocus", "onFocusChange")
   m.top.observeField("focusPercent", "onFocusChange")

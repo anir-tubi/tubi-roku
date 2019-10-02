@@ -30,8 +30,16 @@ Function init()
     m.VideoGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
 
+  m.VideoGrid.focusBitmapBlendColor = m.global.theme.focused
+  m.global.observeField("theme", "onThemeChange")
+
   m.top.screenLevel = m.constants.ui.screenLevels.channelDetailScreen
 End Function
+
+Function onThemeChange()
+  m.VideoGrid.focusBitmapBlendColor = m.global.theme.focused
+End Function
+
 
 Function onSetCallOfAction()
   sPreviousPage = m.top.callingPage

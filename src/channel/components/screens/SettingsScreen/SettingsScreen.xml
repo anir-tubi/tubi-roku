@@ -28,7 +28,6 @@
       <field id="signInSelected" type="boolean" alwaysNotify="true"/>
       <field id="parentalSettingSelected" type="integer" alwaysNotify="true"/>
       <field id="parentalSettingUpdated" type="boolean" alwaysNotify="true"/>
-      <field id="remoteParentalSetting" type="integer" alwaysNotify="true"/>
 
       <!-- Keeps the information used for user tracking - structure looks like:
         {

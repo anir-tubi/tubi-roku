@@ -16,25 +16,41 @@
       <field id="opened" value="false" type="boolean"/>
       <field id="userName" type="string" value="" alwaysNotify="true"/>
 
-      <!--Similar to itemSelected except the the outside requests an item to be selected and if it is available, then itemSelected will be updated. -->
+      <!-- this is an asscoiative array that contains a boolean param "grayedOut" to indicate if the kids mode button should be grayed out, and "title" to indocate the label title of the kids mode button. -->
+      <field id="kidsModeValues" type="assocarray" value="" alwaysNotify="true"/>
+
+      <!--The id of one of the menu items. If the menu item exists and is selectable, then itemSelected will be updated. -->
       <field id="itemRequested" type="string" alwaysNotify="true"/>
 
+      <field id="selectedItemRequested" type="string" alwaysNotify="true"/>
+
+
     <!-- OUTPUT -->
-      <field id="itemSelected" type="string" alwaysNotify="true"/>
+      <!-- The sideNavContentNode for the side nav menu item that was selected. This field should not be observed, as 
+      the contents of the node can change frequently, even if the node itself remains the same. It can be checked for the
+      current state of the node. -->
+      <field id="itemSelected" type="node"/>
+
+      <!-- The id of the menu item that was selected -->
+      <field id="itemSelectedId" type="string" alwaysNotify="true"/>
   </interface>
 
   <children>
+    <Poster 
+    id="sideNavBackground"
+    width="405"
+    height="1080"/>
     <LayoutGroup
         id="content"
         layoutDirection="vert"
         translation="[0,60]"
-        itemSpacings="[220,137]">
+        itemSpacings="[108,148]">
 
       <MarkupList
-        numRows="1"
+        numRows="2"
         id="topItems"
-        itemSize="[360, 70]"
-        itemSpacing="[0,0]"
+        itemSize="[397, 70]"
+        itemSpacing="[0,17]"
         vertFocusAnimationStyle="floatingFocus"
         focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
         focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
@@ -43,6 +59,10 @@
           <SideNavContentNode
             id="profile"
             iconUrl="pkg:/images/sideNavProfile.png"/>
+          <SideNavContentNode
+            id="kidsMode"
+            title="Kids"
+            iconUrl="pkg:/images/sideNavKids.png"/>
         </ContentNode>
       </MarkupList>
 
@@ -50,8 +70,8 @@
         <MarkupList
           numRows="4"
           id="mainItemsSelected"
-          itemSize="[360, 70]"
-          itemSpacing="[0,20]"
+          itemSize="[397, 70]"
+          itemSpacing="[0,17]"
           vertFocusAnimationStyle="floatingFocus"
           focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
           focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
@@ -71,8 +91,8 @@
         <MarkupList
           numRows="4"
           id="mainItems"
-          itemSize="[360, 70]"
-          itemSpacing="[0,20]"
+          itemSize="[397, 70]"
+          itemSpacing="[0,17]"
           vertFocusAnimationStyle="floatingFocus"
           focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
           focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
@@ -102,7 +122,7 @@
       <MarkupList
         numRows="2"
         id="bottomItems"
-        itemSize="[360, 70]"  
+        itemSize="[397, 70]"  
         itemSpacing="[0,17]"
         vertFocusAnimationStyle="floatingFocus"
         focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"

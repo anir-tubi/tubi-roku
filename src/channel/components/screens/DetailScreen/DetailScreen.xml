@@ -19,6 +19,8 @@
       <!-- Pass through signal to the info panel that the height/placement should be recalculated -->
       <field id="calculateInfoHeight" type="boolean" alias="DetailInfoPanel.calculateHeight" />
 
+      <field id="kidsModeEnabled" type="boolean"  />
+
       <!-- The title displayed on the info panel -->
       <field id="title" type="string" alias="DetailInfoPanel.title" />
 
@@ -235,39 +237,42 @@
         vertFocusAnimationStyle="floatingFocus"/>
 
       <Group
-        id="RelatedContentGroup"
-        translation="[85,945]"
-        visible="false"
-        opacity="0.2">
-        <CategoryGridRowLabel
-          id="RelatedRowLabel"
-          translation="[0,0]">
-          <TubiContentNode
-            role="content"
-            title="You Might Also Like"/>
-        </CategoryGridRowLabel>
-        <PosterGrid
-          id="RelatedGrid"
-          itemSize="[1920,300]"
-          numRows="1"
-          basePosterSize="[210,300]"
-          itemSpacing="[10,0]"
-          fadeFocusFeedbackWhenAutoScrolling="true"
-          horizFocusAnimationStyle="fixedFocus"
-          focusBitmapUri="pkg:/images/selector-fhd.9.png"
-          translation="[0,63]"/>
-        <Label
-          id="RelatedTitle"
-          width="875"
-          wrap="false"
-          maxLines="1"
-          color="0xFFFFFFFF"
-          translation="[0,386]">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
+        id="RelatedContentParentGroup">
+        <Group
+          id="RelatedContentGroup"
+          translation="[85,945]"
+          visible="false"
+          opacity="0.2">
+          <CategoryGridRowLabel
+            id="RelatedRowLabel"
+            translation="[0,0]">
+            <TubiContentNode
+              role="content"
+              title="You Might Also Like"/>
+          </CategoryGridRowLabel>
+          <PosterGrid
+            id="RelatedGrid"
+            itemSize="[1920,300]"
+            numRows="1"
+            basePosterSize="[210,300]"
+            itemSpacing="[10,0]"
+            fadeFocusFeedbackWhenAutoScrolling="true"
+            horizFocusAnimationStyle="fixedFocus"
+            focusBitmapUri="pkg:/images/selector-fhd.9.png"
+            translation="[0,63]"/>
+          <Label
+            id="RelatedTitle"
+            width="875"
+            wrap="false"
+            maxLines="1"
+            color="0xFFFFFFFF"
+            translation="[0,386]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+        </Group>
       </Group>
     </Group>
   </children>

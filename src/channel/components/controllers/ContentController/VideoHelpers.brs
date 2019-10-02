@@ -38,6 +38,7 @@ Function playVideoContent(content As Object, autoplayType As String, position=in
       if m.autoplayContext <> invalid
         request.categoryId = m.autoplayContext
       end if
+      request.kidsMode = shouldKidsModeBeSentToServer()
       m.upNextTask.request = request
       m.upNextTask.control = "RUN"
     end if
@@ -140,11 +141,12 @@ End Function
 ' @nextContent: roSGNode, the content node representing the content that will be played next
 ' @ autoplayType: string, "deliberate" or "automatic", refers to if the up next content was selected or is auto playing
 Function playUpNextContent(nextContent, autoplayType)
+  tubiLog("VideoHelpers.playUpNextContent")
   oldContent = m.videoPlayer.content
   content = addSeriesTitle(nextContent, oldContent)
   stopVideoContent(false)
-  playVideoContent(content, autoplayType)
   popScreen(false) ' pop the up next screen off the screen stack
+  playVideoContent(content, autoplayType)
   if m.upNextScreen <> invalid
     m.upNextScreen.unobserveFieldScoped("contentSelected")
     m.upNextScreen.unobserveFieldScoped("timeout")

@@ -33,7 +33,7 @@ Function Main(startupArgs as Dynamic)
   'set up all experiments
   experiments = TubiExperiments(request, constants)
   experiments.init() 'sets experiment values on constants
-  
+
   m.global.utils = {
     constants: constants
     request: request
@@ -174,6 +174,7 @@ Function showErrorDialog()
   screen.setMessagePort(port)
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
+  sgGlobal.addField("theme", "assocarray", false)
 
 
   ' make sure there are constants on the global utils
@@ -197,6 +198,7 @@ Function showErrorDialog()
   end if
 
   sgGlobal.constants = m.global.utils.constants
+  sgGlobal.theme = sgGlobal.constants.ui.themes.default
 
   errorObj = {}
   errorObj.contextCode = sgGlobal.constants.errors.context.homeScreen 

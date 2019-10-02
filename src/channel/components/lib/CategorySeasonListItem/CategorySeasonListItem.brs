@@ -7,6 +7,7 @@ Function init()
   m.top.observeField("listHasFocus", "onContainerHasFocus")
   m.top.observeField("gridHasFocus", "onContainerHasFocus")
   m.top.observeField("rowListHasFocus", "onContainerHasFocus")
+  m.categoryCountText.color = m.global.theme.focused
 End Function
 
 

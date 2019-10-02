@@ -30,14 +30,15 @@ End Function
 'returns a request object that can be used to add a bookmark to the server
 '@content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
 '     send either the video or the episode as the content, not the parent series
-function tubiBookmarks_addBookmarkReq(content as Object) as Object
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
+function tubiBookmarks_addBookmarkReq(content as Object, bKidsMode as Boolean) as Object
   bookmarkReq = invalid
   if content <> invalid
     'translate internal content type to UAPI content type
     if content["type"] = m.constants.ui.contentTypes.video
-      bookmarkReq = m.createBookmarksRequest(content.id, "add", m.constants.uapiContentTypes.movie)
+      bookmarkReq = m.createBookmarksRequest(content.id, "add", m.constants.uapiContentTypes.movie, bKidsMode)
     else if content["type"] = m.constants.ui.contentTypes.series
-      bookmarkReq = m.createBookmarksRequest(content.id, "add", m.constants.uapiContentTypes.series)
+      bookmarkReq = m.createBookmarksRequest(content.id, "add", m.constants.uapiContentTypes.series, bKidsMode)
     else
       tubiLog("ERROR: Can't bookmark content that isn't a video or series")
     end if
@@ -48,10 +49,11 @@ end function
 
 'returns a request object that can be used to remove a bookmark from the server
 '@content: can be a content node from scene graph or a content object from the main thread - expect videos/movies or episodes, no series
-function tubiBookmarks_removeBookmarkReq(content as Object) as Object
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
+function tubiBookmarks_removeBookmarkReq(content as Object, bKidsMode as Boolean) as Object
   bookmarkReq = invalid
   if content <> invalid and content.id <> invalid and content.bookmarkId <> invalid
-    bookmarkReq = m.createBookmarksRequest(content.bookmarkId, "delete")
+    bookmarkReq = m.createBookmarksRequest(content.bookmarkId, "delete", "", bKidsMode)
   else
     tubiLog("bookmark id not found")
   end if
@@ -65,8 +67,9 @@ end function
   'if delete @id should be the 'bookmark server id'
 '@action: string (should be "add" or "delete")
 '@contentType: string (should be "series" or "movie") - not necessary for deletes
+'@bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 '@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
-function tubiBookmarks_createBookmarksRequest_(id as String, action as String, contentType = "" as String) as Object
+function tubiBookmarks_createBookmarksRequest_(id as String, action as String, contentType = "" as String, bKidsMode = false as Boolean) as Object
   authInfo = m.auth.getAuthInfo()  'from registry
   if authInfo = invalid or authInfo.accessToken = invalid
     return invalid
@@ -97,6 +100,7 @@ function tubiBookmarks_createBookmarksRequest_(id as String, action as String, c
       platform: m.constants.platform
     }
   }
+  options.params["isKidsMode"] = bKidsMode
 
   if bodyJson <> invalid
     options.body = bodyJson
@@ -108,8 +112,10 @@ function tubiBookmarks_createBookmarksRequest_(id as String, action as String, c
 end function
 
 'returns a request object that can be used to add a history to the server
-'@content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
-function tubiBookmarks_addHistoryReq(content as Object, position as Integer) as Object
+' @content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
+' @position: position where user left off of video
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
+function tubiBookmarks_addHistoryReq(content as Object, position as Integer, bKidsMode as Boolean) as Object
   historyReq = invalid
 
   if content <> invalid
@@ -134,7 +140,7 @@ function tubiBookmarks_addHistoryReq(content as Object, position as Integer) as 
       return invalid
     end if
 
-    historyReq = m.createHistoryRequest(idToServe, parentId, position, "add", contentType)
+    historyReq = m.createHistoryRequest(idToServe, parentId, position, "add", contentType, bKidsMode)
   end if
 
   return historyReq
@@ -142,11 +148,12 @@ end function
 
 
 'returns a request object that can be used to remove a history from the server
-'@content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
-function tubiBookmarks_removeHistoryReq(content as Object) as Object
+' @content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
+function tubiBookmarks_removeHistoryReq(content as Object, bKidsMode as Boolean) as Object
   historyReq = invalid
   if content <> invalid and content.historyId <> invalid then
-    historyReq = m.createHistoryRequest(content.historyId, invalid, 0, "delete")
+    historyReq = m.createHistoryRequest(content.historyId, invalid, 0, "delete", "", bKidsMode)
   end if
   return historyReq
 end function
@@ -160,8 +167,9 @@ end function
 '@position: int(player positino or nowPos in seconds) - should be invalid for deletes
 '@action: string (should be "add" or "delete")
 '@contentType: string (should be "series" or "movie") - not necessary for deletes
+'@bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 '@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
-function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, position as Dynamic, action as String, contentType = "" as String) as Object
+function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, position as Dynamic, action as String, contentType = "" as String, bKidsMode = false as Boolean) as Object
   authInfo = m.auth.getAuthInfo()
   if authInfo = invalid and m.constants.ui.users.guestHistory <> true
     return invalid
@@ -199,6 +207,8 @@ function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, 
       platform: m.constants.platform
     }
   }
+
+  options.params["isKidsMode"] = bKidsMode
 
   if bodyJson <> invalid
     options.body = bodyJson

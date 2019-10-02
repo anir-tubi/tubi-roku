@@ -38,9 +38,10 @@ End Function
 '''''''''''''''''''''''
 ' relatedContentReq()
 '
-Function cmsApi_getRelatedContentRequest(contentId)
-  url = m.constants_.urls.cms.upNextContent + "/" + contentId + "/related"
+Function cmsApi_getRelatedContentRequest(contentId, bKidsMode)
+  url = m.constants_.urls.cms.relatedContent + "/" + contentId + "/related"
   options = m.commonOptions_()
+  options.params["isKidsMode"] = bKidsMode
   return m.createAuthRequest_(url, m.constants_.reqNames.getRelatedContent, options)
 End Function
 
@@ -61,10 +62,11 @@ End Function
 '''''''''''''''''''''''
 ' singleContentReq()
 '
-Function cmsApi_getSingleContentRequest(contentId, includeChannels=false)
+Function cmsApi_getSingleContentRequest(contentId, includeChannels=false, bKidsMode = false)
   url = m.constants_.urls.cms.singleContent
   options = m.commonOptions_()
   options.params.content_id = contentId
+  options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
   options.params["video_resources"] = m.constants_.player.drmOrder
   return m.createAuthRequest_(url, m.constants_.reqNames.getSingleContent, options)
@@ -85,12 +87,13 @@ End Function
 '''''''''''''''''''''''
 ' channelReq()
 '
-Function cmsApi_getChannelRequest(channelId, limit)
+Function cmsApi_getChannelRequest(channelId, limit, bKidsMode = false)
   url = m.constants_.urls.matrix.channel + "/" + channelId
   options = m.commonOptions_()
   options.params.expand = 1
   options.params.cursor = 0
   options.params.limit = limit
+  options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = true
   return m.createAuthRequest_(url, m.constants_.reqNames.getChannel, options)
 End Function
@@ -98,28 +101,32 @@ End Function
 
 '''''''''''''''''''''
 ' channelsCategoriesScreenReq()
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 '
-Function cmsApi_getChannelsCategoriesScreenRequest()
-  return m.homeScreenReq(0, 1)
+Function cmsApi_getChannelsCategoriesScreenRequest(bKidsMode = false)
+  return m.homeScreenReq(0, bKidsMode, 1)
 End Function
 
 '''''''''''''''''''''
 ' homeScreenReq()
 '
 ' @limit: number of items in each category
-Function cmsApi_getHomeScreenRequest(limit, expand = 2)
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
+Function cmsApi_getHomeScreenRequest(limit, bKidsMode, expand = 2)
   url = m.constants_.urls.matrix.homescreen
   options = m.commonOptions_()
   options.params.expand = expand
   options.params.includeEmpty = true
   options.params.limit = limit
+  options.params["isKidsMode"] = bKidsMode
+
   return m.createAuthRequest_(url, m.constants_.reqNames.getHomescreen, options)
 End Function
 
 '''''''''''''''''''''
 ' categoryReq()
 '
-Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid)
+Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode = false)
   url = m.constants_.urls.matrix.container + "/" + categoryId
   if name = invalid
     name = m.constants_.reqNames.getCategory
@@ -128,6 +135,7 @@ Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid)
   options.params.expand = 1
   options.params.cursor = 0
   options.params.limit = limit
+  options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = true
   return m.createAuthRequest_(url, name, options)
 End Function
@@ -136,10 +144,11 @@ End Function
 ''''''''''''''''''''''
 ' searchreq()
 '
-Function cmsApi_getSearchRequest(searchText, limit)
+Function cmsApi_getSearchRequest(searchText, limit, bKidsMode)
   url = m.constants_.urls.cms.search
   options = m.commonOptions_()
   options.params.search = searchText
+  options.params["isKidsMode"] = bKidsMode
   return m.createAuthRequest_(url, m.constants_.reqNames.searchAPI, options)
 End Function
 

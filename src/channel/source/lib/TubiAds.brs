@@ -60,6 +60,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     populateUrlRainmaker: tubiAds_populateUrlRainmaker
     adBufferingCallback: tubiAds_adBufferingCallback
     adTrackingCallback: tubiAds_adTrackingCallback
+    isCoppaEnabled: false
   }
 end function
 
@@ -241,6 +242,7 @@ function tubiAds_populateUrlRainmaker(episode) As String
     model: m.constants.deviceInfo.model
     app_id: m.constants.settings.shortAppName
     language: m.constants.deviceInfo.language
+    coppa_enabled: m.isCoppaEnabled
 
     ' the dubug parameter must be set to 1 in order to use the following "limit" parameters for testing
     ' limit_to_campaign_id: 0   'only allow ads with that particular campaign id through the pre-qual filters
@@ -305,7 +307,7 @@ function tubiAds_getAdsListViaRoku(episode)
 
   'get the url for making the ad call
   url = ""
-  if m.constants.externalConfig.info.rainmaker = true
+  if m.constants.externalConfig.info.rainmaker = true or m.isCoppaEnabled = true
     url = m.populateUrlRainmaker(episode)
   else
     url = m.populateUrlAdrise(episode)

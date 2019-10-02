@@ -14,7 +14,9 @@ Function init()
   if m.global.constants.deviceInfo.scaledUi = true then
     m.grid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
+  m.grid.focusBitmapBlendColor = m.global.theme.focused
 End Function
+
 
 Function onChildFocused()
   if m.top.isInFocusChain() and m.top.hasFocus()

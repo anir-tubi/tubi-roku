@@ -3,14 +3,21 @@ Function init()
   m.top.observeField("enabled", "onFocusUpdate")
 
   constants = m.global.constants
+  theme = m.global.theme
+  m.global.observeField("theme", "onThemeChange")
 
   if constants <> invalid
     m.colors = {
-      focusedText: constants.ui.colors.focused
+      focusedText: theme.focused
       unfocusedText: constants.ui.colors.unfocused
     }
   end if
 End Function
+
+Function onThemeChange()
+  m.colors.focusedText = m.global.theme.focused 
+End Function
+
 
 Function onFocusUpdate()
   TubiLog("TransportButton.onFocusUpdate: " + m.top.id)

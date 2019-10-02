@@ -30,6 +30,12 @@ Function execGetUpNextContent() As Void
   if m.top.request.userId <> invalid and m.top.request.userId <> ""
     options.params.user_id = m.top.request.userId
   end if
+
+  if m.top.request.kidsMode <> invalid and m.top.request.kidsMode = true
+    '//::TODO::KIDS-MODE only send kids mode if kidsMode=true. This may need to be changed\ so it is being passed no matter what.
+    options.params["isKidsMode"] = true
+  end if
+
   if m.top.request.categoryId <> invalid and m.top.request.categoryId <> ""
     categoryId = m.top.request.categoryId
     ' for categories that were originally nested categories in the matrix api, their category id can look like:

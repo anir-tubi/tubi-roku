@@ -9,16 +9,17 @@ Function init()
   m.PasswordButtonDisabledFocus = m.top.findNode("PasswordButtonDisabledFocus")
   m.PasswordButtonLabel = m.top.findNode("PasswordButtonLabel")
   m.Keyboard = m.top.findNode("Keyboard")
-  m.Keyboard.focusBitmapUri = "pkg:/images/keyboard_search_focused_key.9.png"
-  '//::TODO:: change this to the constant that was made in the search screen PR
-  m.Keyboard.focusedKeyColor = "0xFFFFFFEE"
   m.Keyboard.textEditBox.secureMode = true
   setPasswordButtonLabel()
   m.Keyboard.observeField("text", "onKeyboardTextChanged")
   m.KeyboardAnimation = m.top.findNode("KeyboardAnimation")
   m.KeyboardInterpolator = m.top.findNode("KeyboardTranslationInterpolator")
 
-  m.colors = m.constants.ui.colors
+  m.theme = m.global.theme
+  m.SubmitButtonFocus.blendColor = m.theme.focused
+  m.PasswordButtonFocus.blendColor = m.theme.focused
+  m.Keyboard.focusedKeyColor = m.constants.ui.colors.keyboardFocusedText
+  m.Keyboard.focusBitmapUri = m.theme.keyboard_focused_key
 
   if m.global.constants.deviceInfo.scaledUi = true then
     m.SubmitButtonFocus.uri = "pkg:/images/menu-focus-hd.9.png"

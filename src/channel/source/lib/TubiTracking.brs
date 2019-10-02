@@ -60,8 +60,8 @@ Function tubiTracking_getClientEvent(eventType, eventValues) as Object
     request: m.getAnalyticsRequestIdempotency()
     sent_timestamp: m.getAnalyticsTimestamp()
     user: m.getAnalyticsUser()
-    device: m.getAnalyticsDevice()
-    app: m.getAnalyticsApp()
+    device: m.getAnalyticsDevice(eventValues)
+    app: m.getAnalyticsApp(eventValues)
     connection: m.getAnalyticsConnection(eventValues)
     event: m.getAnalyticsEvent(eventType, eventValues)
     ' location: {} 'roku unable to provide location
@@ -131,7 +131,7 @@ End Function
 ' Returns a Device message that fulfills the requirement of the "device" field on the ClientEvent message
 ' See protos.analytics.events.protos -> ClientEvent
 ' See protos.analytics.client.protos -> Device
-Function tubiTracking_getAnalyticsDevice()
+Function tubiTracking_getAnalyticsDevice(eventValues)
   device = {
     device_id: m.constants.deviceInfo.deviceId
     manufacturer: "Roku"
@@ -144,7 +144,7 @@ Function tubiTracking_getAnalyticsDevice()
     device_width: m.constants.deviceInfo.displayWidth
     advertiser_id: "00000000-0000-0000-0000-000000000000"
   }
-  if m.constants.deviceInfo.isAdIdTrackingDisabled <> true
+  if m.constants.deviceInfo.isAdIdTrackingDisabled <> true and eventValues.appMode <> "KIDS_MODE"
     device.advertiser_id = m.constants.deviceInfo.deviceAdId
   end if
   return device
@@ -154,7 +154,7 @@ End Function
 ' Returns an App message that fulfills the requirement of the "app" field on the ClientEvent message
 ' See protos.analytics.events.protos -> ClientEvent
 ' See protos.analytics.client.protos -> App
-Function tubiTracking_getAnalyticsApp()
+Function tubiTracking_getAnalyticsApp(eventValues)
   majorVersion = m.constants.deviceInfo.majorVersion
   minorVersion = m.constants.deviceInfo.minorVersion
   buildVersion = m.constants.deviceInfo.buildVersion
@@ -165,6 +165,7 @@ Function tubiTracking_getAnalyticsApp()
     app_version_numeric: (majorVersion.toInt() * 1000000) + (minorVersion.toInt() * 1000) + buildVersion.toInt()
     app_height: m.constants.deviceInfo.displayHeight
     app_width: m.constants.deviceInfo.displayWidth
+    app_mode: eventValues.appMode
   }
   return app
 End Function

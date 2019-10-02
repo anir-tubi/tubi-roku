@@ -6,7 +6,7 @@ Function TubiSGAdShim(constants, ads)
   return {
     ' dependencies
     constants_: constants
-    ads_: ads
+    ads: ads
 
     ' private
     videoAdsList: invalid
@@ -39,6 +39,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
   end if
   port = CreateObject("roMessagePort")
   m.videoPlayerNode.observeField("adControl", port)
+  m.videoplayernode.observeField("isCoppaEnabled", port)
 
   ' Let SceneGraph know that ad shim is ready
   m.videoPlayerNode.adState = "init"
@@ -50,8 +51,9 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
     if msgType = "roSGNodeEvent"
       tubiLog("TubiSGAdShim got roSGNodeEvent for " + msg.GetField())
       if msg.GetField() = "exitApp"
-        if msg.GetData() = true then return true
-
+        if msg.GetData() = true
+          return true
+        end if
       else if msg.GetField() = "adControl"
         value = msg.GetData()        
         if m.videoPlayerNode.content <> invalid
@@ -63,6 +65,8 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
         else
           m.videoPlayerNode.adState = "noads"  ' if video player content was changed before we got here, return no ads
         end if
+      else if msg.GetField() = "isCoppaEnabled"
+        m.ads.isCoppaEnabled = msg.GetData()
       end if
     end if
   end while
@@ -123,8 +127,8 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
   ' the midroll times exactly and there is a possibility of the video node 'position'
   ' field to be slightly off due to delays in thread synchronization.
   normalizedPosition = position
-  if m.ads_.midrolls <> invalid and type(m.ads_.midrolls) = "roArray" then
-    for each cuepoint in m.ads_.midrolls
+  if m.ads.midrolls <> invalid and type(m.ads.midrolls) = "roArray" then
+    for each cuepoint in m.ads.midrolls
       ' We'll give an allowance of 15 seconds here.  I don't expect any cuepoints to be
       ' within 15 seconds of each other so this should be safe
       if Abs(position - cuepoint) < 20 then
@@ -140,8 +144,8 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
     newState = m[functionName](episode, normalizedPosition)
     'always update midroll list since TubiAds can
     'make modifications to it throughout playback
-    m.videoPlayerNode.midrolls = m.ads_.midrolls
-    for each time in m.ads_.midrolls
+    m.videoPlayerNode.midrolls = m.ads.midrolls
+    for each time in m.ads.midrolls
       print "MIDROLL: " + time.toStr()
     end for
   end if
@@ -154,28 +158,28 @@ End Function
 '
 Function tubiSGAdShim_preroll(episode As Object, cuepoint As Integer)
   m.videoplayernode.adstate = "fetching"
-  m.ads_.reset()
+  m.ads.reset()
 
   'make a synchrynous call to get cuepoints, if any
   port = CreateObject("roMessagePort")
   timer = CreateObject("roTimespan")
-  cuepointsReq = m.ads_.getCuepointsReq(episode)
+  cuepointsReq = m.ads.getCuepointsReq(episode)
   cuepointsReq.start(port)
 
   'otherwise if the user is starting from beginning or resuming on a cue point, show ads
   'attempt to get list of ads and play them for preroll
-  m.ads_.getAdsListViaRoku(episode)
+  m.ads.getAdsListViaRoku(episode)
 
   ' wait ONLY 5 seconds for cuepoints to come back
   while timer.TotalMilliseconds() < 5000
     msg = wait(5000 - timer.TotalMilliseconds(), port)
     if type(msg) = "roUrlEvent" and cuepointsReq.handleEvent(msg) <> invalid
-      m.ads_.parseCuepoints(cuepointsReq)  'sets midrolls times on m.ads_.midrolls
+      m.ads.parseCuepoints(cuepointsReq)  'sets midrolls times on m.ads.midrolls
       exit while
     end if
   end while
 
-  if m.ads_.hasAds(m.ads_.allAdUnitsList) = true
+  if m.ads.hasAds(m.ads.allAdUnitsList) = true
     m.videoPlayerNode.adState = "adspending"
   else
     m.videoPlayerNode.adState = "noads"
@@ -194,7 +198,7 @@ Function tubiSGAdShim_playAds(episode As Object, cuepoint As Integer)
   m.videoPlayerNode.adState = "adsplaying"
 
   adContainer = m.videoPlayerNode.findNode("RAFAdContainer")
-  status = m.ads_.showCommercialBreakViaRoku(adContainer, m.videoPlayerNode)
+  status = m.ads.showCommercialBreakViaRoku(adContainer, m.videoPlayerNode)
   if status = m.constants_.player.playerResults.closed
     m.videoPlayerNode.adState = "adsclosed"
   else
@@ -208,7 +212,7 @@ End Function
 ''''''''''''''''''
 ' reset
 Function tubiSGAdShim_reset(episode As Object, cuepoint As Integer)
-  m.ads_.reset()
+  m.ads.reset()
   m.videoPlayerNode.adState = "init"
 End Function
 
@@ -217,8 +221,8 @@ End Function
 ' midroll
 Function tubiSGAdShim_midroll(episode As Object, cuepoint As Integer)
   m.videoplayernode.adstate = "fetching"
-  m.ads_.cacheAdsList(episode, cuepoint)
-  if m.ads_.getCachedAdsList(episode, cuepoint) <> invalid then
+  m.ads.cacheAdsList(episode, cuepoint)
+  if m.ads.getCachedAdsList(episode, cuepoint) <> invalid then
     m.videoPlayerNode.adState = "adspending"
   else
     m.videoPlayerNode.adState = "noads"
@@ -231,7 +235,7 @@ End Function
 Function tubiSGAdShim_resume(episode As Object, cuepoint As Integer)
   m.videoplayernode.adstate = "fetching"
   'NOTE: TubiAds sets resumePlayAdsList on 'm' here
-  if m.ads_.getResumingPlayAds(episode, m) then
+  if m.ads.getResumingPlayAds(episode, m) then
     tubiLog("Setting adState to adspending")
     m.videoPlayerNode.adState = "adspending"
   else
@@ -246,10 +250,10 @@ End Function
 '
 ' Mark a midroll as seen using logic from TubiAds.checkForCommercialBreak
 Function tubiSGAdShim_removeMidroll(cuepoint As Integer)
-  if m.ads_.midrolls <> invalid and type(m.ads_.midrolls) = "roArray" then
-    for i=0 to m.ads_.midrolls.Count() - 1
-      if cuepoint = m.ads_.midrolls[i] then
-        m.ads_.midrolls[i] = -1000
+  if m.ads.midrolls <> invalid and type(m.ads.midrolls) = "roArray" then
+    for i=0 to m.ads.midrolls.Count() - 1
+      if cuepoint = m.ads.midrolls[i] then
+        m.ads.midrolls[i] = -1000
       end if
     end for
   end if

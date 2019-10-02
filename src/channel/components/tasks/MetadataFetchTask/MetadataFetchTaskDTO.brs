@@ -11,7 +11,7 @@ End Function
 
 ' MetadataFetchTask.request
 
-Function metadataFetchTaskClient_createRequest(id, node, field, name, searchText=invalid)
+Function metadataFetchTaskClient_createRequest(id, node, field, name, searchText=invalid, bKidsMode = false)
   if id = invalid or id = "" then
     id = CreateObject("roDeviceInfo").GetRandomUUID()
   end if
@@ -35,6 +35,7 @@ Function metadataFetchTaskClient_createRequest(id, node, field, name, searchText
     name: name
     batch: false
     searchText: searchText
+    kidsMode: bKidsMode
   }
 End Function
 

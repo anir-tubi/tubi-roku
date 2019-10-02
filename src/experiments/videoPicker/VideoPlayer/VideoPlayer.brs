@@ -138,10 +138,9 @@ Function init()
     m.CCNipple.translation = m.CCNippleOnTranslation
   end if
 
-  m.focusedColor = m.constants.ui.colors.focused
-  m.ProgressBar.focusColor = m.focusedColor
-  m.LoadingProgressBar.focusColor = m.focusedColor
-  m.LoadingProgressBar.unfocusColor = m.focusedColor
+  m.global.observeField("theme", "onThemeChange")
+  '//Set the theme colors of the video player
+  onThemeChange()
 
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
@@ -169,6 +168,14 @@ Function init()
   ' m.didAdvanceDrm holds current state regarding if playback failed, and the player is going to try the
   ' the next video stream available
   m.didAdvanceDrm = false
+End Function
+
+
+Function onThemeChange()
+  m.focusedColor = m.global.theme.focused 
+  m.ProgressBar.focusColor = m.focusedColor
+  m.LoadingProgressBar.focusColor = m.focusedColor
+  m.LoadingProgressBar.unfocusColor = m.focusedColor
 End Function
 
 

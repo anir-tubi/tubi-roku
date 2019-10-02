@@ -6,6 +6,7 @@ Function init()
   m.top.observeField("trackEvent", m.port)
   m.top.observeField("logMsg", m.port)
   m.top.observeField("logException", m.port)
+  m.top.observeField("analyticsAppMode", m.port)
   m.top.control = "RUN"
 End Function
 
@@ -24,6 +25,7 @@ Function watchLoop()
   m.auth = TubiAuth(m.constants, m.request)
   m.logger = TubiLogger(m.constants, m.request, m.auth)
   m.tracking = TubiTracking(m.constants, m.request, m.auth)
+  m.analyticsAppMode = "DEFAULT_MODE"
 
   'when the trackEvent field for the metadata task field is updated, the event is heard in this loop
   'and beginRequest() is called
@@ -31,14 +33,13 @@ Function watchLoop()
     msg = wait(0, m.port)
     if type(msg) = "roSGNodeEvent" then
       if msg.GetField() = "trackEvent" then
-        trackSceneGraphEvent(msg.GetData())
-
+        trackSceneGraphEvent(msg.GetData(), m.analyticsAppMode)
       else if msg.GetField() = "logMsg" then
         sendSceneGraphLog(msg.GetData())
-
       else if msg.GetField() = "logException" then
         sendSceneGraphException(msg.GetData())
-
+      else if msg.GetField() = "analyticsAppMode"
+        m.analyticsAppMode = msg.GetData()
       end if
     else if type(msg) = "roUrlEvent" then
       handledRequest = m.queue.handleEvent(msg)
@@ -50,9 +51,11 @@ End Function
 '@evtData: assocArray, has the following fields
 '           type: string, corresponds to one of the eventTypes found in m.tracking.getAnalyticsEvent()
 '           values: assocArray, fields that correspond to the fields specified for the eventType in m.tracking.getAnalyticsEvent()
-Function trackSceneGraphEvent(evtData)
+'@analyticsAppMode: string: corresponds to one of the App message Mode enum as in found in protos
+Function trackSceneGraphEvent(evtData, analyticsAppMode)
   if evtData <> invalid and type(evtData.type) = "roString"
     tubiLog("TrackingLoggingTask.trackSceneGraphEvent for " + evtData.type)
+    evtData.values.appMode = analyticsAppMode
     m.tracking.trackUserEvent(evtData.type, evtData.values, m.queue)  'creates a request and adds it to the requestQueue
   end if
 End Function

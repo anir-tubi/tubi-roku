@@ -15,7 +15,8 @@ Function init()
   m.RemoveHistoryMenuItem = m.top.findNode("RemoveHistoryMenuItem")
   m.ChannelMenuItem = m.top.findNode("ChannelMenuItem")
   m.WatchTrailerMenuItem = m.top.findNode("WatchTrailerMenuItem")
-  m.RelatedContentGroup = m.top.findNode("RelatedContentGroup")
+  m.RelatedContentParentGroup = m.top.findNode("RelatedContentParentGroup")
+  m.RelatedContentGroup = m.RelatedContentParentGroup.findNode("RelatedContentGroup")
   m.RelatedGrid = m.top.findNode("RelatedGrid")
   m.RelatedTitle = m.top.findNode("RelatedTitle")
   m.RelatedRowLabel = m.top.findNode("RelatedRowLabel")
@@ -34,6 +35,7 @@ Function init()
   m.top.observeField("channelName", "onChannelNameChange")
   m.top.observeField("channelImage", "onChannelImageChange")
   m.top.observeField("isLoading", "onIsLoading")
+  m.top.observeField("kidsModeEnabled", "onKidsModeEnableChange")
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
   m.top.observeField("relatedContent", "onRelatedContentChange")
   m.RelatedGrid.observeField("itemSelected", "onRelatedContentSelected")
@@ -61,11 +63,22 @@ Function init()
     m.RelatedGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
 
+  m.RelatedGrid.focusBitmapBlendColor = m.global.theme.focused
+
   ' Used to determine if navigate_within_page events should be sent. Only send when the related content already
   ' has focus, not when it gains focus.
   m.relatedHasFocus = false
 
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
+End Function
+
+
+Function onKidsModeEnableChange()
+  if m.top.kidsModeEnabled = true
+    m.RelatedContentParentGroup.visible = false
+  else
+    m.RelatedContentParentGroup.visible = true
+  end if
 End Function
 
 
@@ -414,7 +427,7 @@ Function onKeyEvent(key As String, press As Boolean)
     end if
     ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
     if key = "down"
-      if m.Menu.isInFocusChain() and m.RelatedContentGroup.visible then
+      if m.Menu.isInFocusChain() = true and m.RelatedContentParentGroup.visible = true and m.RelatedContentGroup.visible = true then
         focusRelated()
         return true
       else if m.Info.isInFocusChain()

@@ -35,6 +35,7 @@ Function init()
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
   m.constants = m.global.constants
+  m.theme = m.global.theme
   Request = TubiRequest()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -51,6 +52,10 @@ Function init()
   m.top.observeField("seekPlaylist", "onSeekPlaylist")
   m.top.observeField("dock", "onDockedChange")
   m.top.observeField("showTransport", "onShowTransport")
+  m.top.observeField("kidsMode", "onKidsModeChange")
+  m.logo = m.top.findNode("tubiLogo")
+  m.logoKids = m.top.findNode("tubiKidsLogo")
+
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.ProgressBar = m.top.findNode("ProgressBar")
@@ -133,10 +138,7 @@ Function init()
     m.CCNipple.translation = m.CCNippleOnTranslation
   end if
 
-  m.focusedColor = m.constants.ui.colors.focused
-  m.ProgressBar.focusColor = m.focusedColor
-  m.LoadingProgressBar.focusColor = m.focusedColor
-  m.LoadingProgressBar.unfocusColor = m.focusedColor
+  updateColors()
 
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
@@ -165,6 +167,13 @@ Function init()
   m.didAdvanceDrm = false
 End Function
 
+Function updateColors()
+  m.focusedColor = m.theme.focused
+  m.ProgressBar.focusColor = m.focusedColor
+  m.LoadingProgressBar.focusColor = m.focusedColor
+  m.LoadingProgressBar.unfocusColor = m.focusedColor
+  m.CCRailOn.blendColor = m.focusedColor
+End Function
 
 Function onAdProgressChange(msg)
   progress = msg.GetData()
@@ -1323,6 +1332,21 @@ Function showAdBreak()
 
   m.top.adPosition = m.playerPosition
   m.top.adControl = "play"
+End Function
+
+
+Function onKidsModeChange()
+  m.theme = m.global.theme
+  updateColors()
+  if m.top.kidsMode = false
+    m.logo.visible = true
+    m.logoKids.visible = false
+  else
+    m.logo.visible = false
+    m.logoKids.visible = true
+  end if
+
+  m.top.isCoppaEnabled = m.top.kidsMode
 End Function
 
 

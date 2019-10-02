@@ -10,6 +10,13 @@ Function init()
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
 
+  ' initialize states needed for various parts of kids mode
+  m.kidsModeEnabled = false  'is the kids mode UI visible
+  m.kidsModeFeatureOn = false   'Should the kids Mode feature be visible to the use?
+  if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
+    m.kidsModeFeatureOn = true
+  end if
+
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
 
@@ -28,9 +35,11 @@ Function init()
   m.contentGroup = m.top.findNode("ContentGroup")
 
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
-  m.logo = m.top.findNode("tubiLogo")
+  m.logoGroup = m.top.findNode("logoGroup")
+  m.logo = m.logoGroup.findNode("tubiLogo")
+  m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
-
+  
   ' Global state
   m.global.addField("bookmarkIds", "node", false)
   m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
@@ -41,6 +50,8 @@ Function init()
   '       places that need authInfo don't need to reference m.global.
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid  ' indicates not logged in
+  m.global.observeFieldScoped("authInfo", "onAuthInfoChanged")
+  m.authInfo = m.global.authInfo '//Local version of m.global.authInfo. This way we are sure we always have access to authInfo
 
   m.authInfoReceived = false
   m.authTask = CreateObject("roSGNode", "AuthTask")
@@ -97,6 +108,13 @@ Function init()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
+End Function
+
+
+' Get a local version of m.global.authInfo since using a local variable has been found to be more reliable 
+Function onAuthInfoChanged(msg)
+  tubiLog("ContentController.onAuthInfoChanged")
+  m.authInfo = msg.getData()  'should be m.global.authInfo
 End Function
 
 
@@ -190,6 +208,7 @@ Function onKeyEvent(key As String, press As Boolean)
   return false
 End Function
 
+
 Function onComponentFocus()
   tubiLog("ContentController.onComponentFocus")
   if m.top.isInFocusChain() and m.top.hasFocus()
@@ -203,13 +222,14 @@ Function onComponentFocus()
   end if
 End Function
 
+
 Function onVideoPlayerVisibleChange()
   if m.videoPlayer.visible = true
     m.SideNav.visible = false
-    m.logo.visible = false
+    m.logoGroup.visible = false
   else
     m.SideNav.visible = true
-    m.logo.visible = true
+    m.logoGroup.visible = true
   end if 
 End Function
 
@@ -374,7 +394,9 @@ End Function
 '
 ' Only once we have a metadata task ready AND the user's login status
 ' will we launch the UI
-Function startUserExperience()
+'
+' @registryKidsMode: boolean, the persisted value for kids mode set in the registry
+Function startUserExperience(registryKidsMode = false)
   tubiLog("ContentController.startUserExperience")
   if m.authInfoReceived and m.deepLinkEvaluated then
     ' Since we're ready to start the channel, make sure the loading spinner is hidden
@@ -393,9 +415,10 @@ Function startUserExperience()
       ' whether we were logged in or not.
       m.enteredFromDeepLink = true
       m.contentGroup.visible = true
+      enableKidsModeUI(false) '//when deeplinking, exit out of kids mode because we cannot guarantee that the video is kid appropriate so the UI should not make the user think we're still in kids mode
       showDetailScreen(m.top.deepLinkContent)
     else
-      startChannel()
+      startChannel(registryKidsMode)
     end if
   end if
 End Function
@@ -414,9 +437,10 @@ Function onHistoryQueueChange(categoryId)
     ' TODO Bryan: only get the history/queue ids of the categoryIds instead of both every time
     m.authTask = CreateObject("roSGNode", "AuthTask")
     m.authTask.observeFieldScoped("authInfo", "onHistoryQueueRefresh")
+
     m.authTask.functionName = "execInitializeUserData"
     m.authTask.control = "RUN"
-      
+
     setDirtyUserCategories(categoryId)
   end if
 End Function
@@ -431,21 +455,18 @@ Function setDirtyUserCategories(categoryId)
 
   if categoryId <> invalid
     homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-    if homeScreen <> invalid
-      '// this will get the homescreen to display a spinner
-      homeScreen.reloadingContent = true  
-    end if
 
     'this will be an auth request if the user is logged in
     'auth request creation happens in metadataFetchTask
     'auth request will add the userId param
     reqName = m.constants.reqNames.getCategory
-    m.global.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", reqName)
-
+    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer())
   end if
 End Function
 
+
 Function onReloadUserCategoriesResponse(msg)
+  tubiLog("ContentController.onReloadUserCategoriesResponse")
   handledRequest = msg.getData()
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
@@ -458,6 +479,7 @@ Function onReloadUserCategoriesResponse(msg)
   refreshStackedUserScreen(handledRequest.id)
 End Function
 
+
 Function onHistoryQueueRefresh()
   tubiLog("ContentController.onHistoryQueueRefresh")
   m.authTask.unobserveFieldScoped("authInfo")
@@ -465,6 +487,78 @@ Function onHistoryQueueRefresh()
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
   refreshAllDetailScreens()
+End Function
+ 
+Function saveKidsModeToMemory(bTurnedOn)
+  tubiLog("ContentController.saveKidsModeToMemory")
+  if m.kidsModeRequest = invalid
+    m.kidsModeRequest = CreateObject("roSGNode", "AuthTask")
+    m.kidsModeRequest.functionName = "saveKidsModeToMemory"
+  end if
+  m.kidsModeRequest.isKidsMode = bTurnedOn
+  m.kidsModeRequest.control = "RUN"
+End Function
+
+
+' What boolean value should be sent to the backend in terms of kids mode?
+Function shouldKidsModeBeSentToServer()
+  return m.kidsModeEnabled = true and isKidsModeEnabledByParentalControls() = false
+End Function
+
+
+' enable (or disable) the kids mode UI
+Function enableKidsModeUI(bTurnOn = true)
+  TubiLog("ContentController.enableKidsModeUI")
+  if m.kidsModeFeatureOn = true
+    if bTurnOn = true
+      theme = m.constants.ui.themes.kidsMode
+      m.global.theme = theme
+    else
+      theme = m.constants.ui.themes.default
+      m.global.theme = theme
+    end if
+    m.kidsModeEnabled = bTurnOn 
+    m.backgroundGroup.kidsMode = bTurnOn 
+    setKidsModeInSideNav(bTurnOn)
+    tellScreensIfKidsModeBeSentToServer()
+    m.videoPlayer.kidsMode = bTurnOn
+
+    '//display proper logo
+    if bTurnOn = true
+      m.logoKids.visible = true
+      m.logo.visible = false
+      m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
+    else 
+      m.logoKids.visible = false
+      m.logo.visible = true
+      m.trackingLoggingTask.analyticsAppMode = "DEFAULT_MODE"
+    end if
+  else
+    setKidsModeInSideNav(false)
+  end if
+End Function
+
+
+' Tell some screens of the kidsMode value. This is to ensure that any calls to the backend are sending the proper kids mode state
+' This should be done when a screen is created or when kids mode state changes
+' This only needs to be done for screens that are cached and kidsMode is set upon initiatiation of the screen and never anytime else.
+Function tellScreensIfKidsModeBeSentToServer()
+  bKidsMode = shouldKidsModeBeSentToServer()
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    homeScreen.shouldKidsModeBeSentToServer = bKidsMode
+  end if
+End Function
+
+Function isKidsModeEnabledByParentalControls() as Boolean
+  tubiLog("ContentController.isKidsModeEnabledByParentalControls")
+  bEnabled = false
+  if m.authInfo <> invalid and m.authInfo.parentalrating <> invalid
+    if m.authInfo.parentalrating < 2
+      bEnabled = true
+    end if
+  end if
+  return bEnabled
 End Function
 
 
@@ -478,15 +572,17 @@ Function refreshAllDetailScreens()
   end for
 End Function
 
+
 Function refreshStackedUserScreen(sScreenID)
   ' Tell the screen associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0 
   for i=0 to m.screenStack.getChildCount()-1
     screen = m.screenStack.getChild(i)
-    if screen.content <> invalid and screen.content.getChildCount() > 0 and screen.content.getChild(0).id  = sScreenID
+    if screen <> invalid and screen.content <> invalid and screen.content.getChildCount() > 0 and screen.content.getChild(0).id  = sScreenID
       screen.content.getChild(0).validUntil = 0
     end if
   end for
 End Function
+
 
 '''''''''''''''''''
 ' onCloseModal
@@ -499,12 +595,22 @@ Function onCloseModal()
 End Function
 
 
-Function startChannel()
+' @registryKidsMode: boolean, the persisted value for kids mode set in the registry
+Function startChannel(registryKidsMode = false)
   tubiLog("ContentController.startChannel")
+  if getExperimentValue("RokuNamespace", "roku_kids_mode") <> "on"
+    m.kidsModeFeatureOn = false   'Should the kids Mode feature be visible to the use?
+    registryKidsMode = false
+  end if
   m.contentGroup.visible = true
   m.appLoadStopwatch.mark()
-  showHomeScreen(m.constants, m.global.authInfo)
   focusSideNavOption(m.constants.ui.sideNavIds.home)
+  if isKidsModeEnabledByParentalControls() = true or registryKidsMode = true
+    enableKidsModeUI(true)
+  else
+    enableKidsModeUI(false)
+  end if
+  showHomeScreen(m.constants, m.global.authInfo)
 End Function
 
 
@@ -679,6 +785,14 @@ Function onChannelBackgroundChange(msg)
   }
 End Function
 
+Function displayDefaultBackground()
+  TubiLog("ContentController.displayDefaultBackground")
+  m.backgroundGroup.backgroundInfo = {
+    type: getBackgroundtype([m.defaultBackgroundUri])
+    uriList: [m.defaultBackgroundUri]
+  }
+End Function
+
 
 
 ' onFirstPosterLoaded
@@ -689,7 +803,7 @@ Function onFirstPosterLoaded()
   loadTime = m.appLoadStopwatch.TotalMilliseconds()
 
   'send tracking event for initial home page load
-  m.global.trackingLoggingTask.trackEvent = {
+  m.trackingLoggingTask.trackEvent = {
     type: "page_load"
     values: {
       pageOneof: m.Tracking.getAnalyticsPage("home_page", {})  'a valid page type (see PageLoadEvent in events.protos)

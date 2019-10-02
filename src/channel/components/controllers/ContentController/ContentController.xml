@@ -57,6 +57,9 @@
       <field id="deepLinkContent" type="node" />
       <field id="deepLinkTrigger" type="boolean" alwaysNotify="true" />
       <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
+      <!-- metadataFetchTask pusts results on this field -->
+      <field id="searchResponse" type="assocarray" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
       <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->
@@ -91,13 +94,24 @@
           id="SideNav"
           translation="[-66,0]"
           width="438"/>
-        <Poster
-          id="tubiLogo"
-          height="45"
-          width="103"
-          opacity="0.5"
-          uri="pkg:/images/logo-white-large.png"
-          translation="[1732,60]" />
+        <Group 
+          id="logoGroup">
+          <Poster
+            id="tubiLogo"
+            height="45"
+            width="103"
+            uri="pkg:/images/logo-white-large.png"
+            opacity="0.5"
+            translation="[1732,60]"/>
+          <Poster
+            id="tubiKidsLogo"
+            height="45"
+            width="209"
+            uri="pkg:/images/logo-kids-white-large.png"
+            translation="[1626,60]"
+            opacity="1.0"
+            visible="false"/>
+        </Group>
       </Group>
 
       <!-- Services -->

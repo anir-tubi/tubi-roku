@@ -81,12 +81,18 @@ Function onGridContentSelected(msg)
 End Function
 
 
-Function onRefreshGridSignal(msg)
-  gridScreen = msg.getRoSGNode()
+Function refreshGridScreen(gridScreen)
   m.refreshingChannelGridCache = true
   gridScreen.isLoading = true
   getGridDataFromServer(gridScreen)
 End Function
+
+
+Function onRefreshGridSignal(msg)
+  gridScreen = msg.getRoSGNode()
+  refreshGridScreen(gridScreen)
+End Function
+
 
 Function getGridDataFromServer(screen)
   tubiLog("ChannelGridScreenHelpers.getGridDataFromServer")
@@ -99,6 +105,7 @@ Function getGridDataFromServer(screen)
     screen.task.cancelRequest = true
   else
     task = CreateObject("roSGNode", "ChannelsCategoriesMetadataTask")
+    task.kidsMode = shouldKidsModeBeSentToServer()
     task.displayChannels = screen.displayChannels
     screen.addField("task", "node", false)
     screen.task = task
@@ -135,10 +142,11 @@ Function onGridContentError(msg)
   ' Screen is created/pushed in showChannelScreen, since there is no content, remove it.
   ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
   ' sent in the case of an error.
-  popScreen(false)
   screen = tearDownChannelGridTask(task)
   
-  if screen <> invalid
+  if screen <> invalid and (screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen)
+    popScreen(false)
+
     'delete the screen from the screen cache so that the next time the user attempts to load the page, the page will be loaded
     'from scratch again. Otherwise an empty page will load and content will never be fetched.
     deleteFromScreenCache(screen.id)

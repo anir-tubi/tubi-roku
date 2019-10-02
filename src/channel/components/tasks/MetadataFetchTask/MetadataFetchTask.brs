@@ -122,15 +122,17 @@ Function beginRequest(metadataRequest) As Void
   ' If there is no auth info, a regular request will be created below
   httpRequest = invalid
   if metadataRequest.name = m.constants.reqNames.getHomescreen
-    httpRequest = m.CmsApi.homeScreenReq(m.constants.performance.categoryGridList.initialBlockSize)
+    httpRequest = m.CmsApi.homeScreenReq(m.constants.performance.categoryGridList.initialBlockSize, metadataRequest.kidsMode )
   else if metadataRequest.name = m.constants.reqNames.getCategory or metadataRequest.name = m.constants.reqNames.getSearchDefault
     categoryId = metadataRequest.id
     limit = m.constants.performance.categoryGridList.finalBlockSize
     name = metadataRequest.name
-    httpRequest = m.CmsApi.categoryReq(categoryId, limit, name)
+    kidsMode = metadataRequest.kidsMode 
+    httpRequest = m.CmsApi.categoryReq(categoryId, limit, name, kidsMode)
   else if metadataRequest.name = m.constants.reqNames.searchAPI
     limit = m.constants.performance.categoryGridList.finalBlockSize
-    httpRequest = m.CmsApi.searchReq(metadataRequest.searchText, limit)
+    kidsMode = metadataRequest.kidsMode 
+    httpRequest = m.CmsApi.searchReq(metadataRequest.searchText, limit, kidsMode)
   end if
 
   if httpRequest = invalid then

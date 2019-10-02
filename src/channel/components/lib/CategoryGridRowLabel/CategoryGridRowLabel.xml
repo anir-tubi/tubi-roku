@@ -31,8 +31,7 @@
         id="FocusIndex"
         text=""
         height="63"
-        horizAlign="right"
-        color="0xFF501AFF" >
+        horizAlign="right">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-SemiBold.ttf"
