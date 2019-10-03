@@ -106,16 +106,7 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     'update detail screen state via the input interface
     detailScreen.title = content.title
     detailScreen.genres = content.genres
-
-    if content.hasTrailer = true
-      if getExperimentValue("RokuNamespace", "roku_trailers") = "on"
-        detailScreen.hasTrailer = content.hasTrailer
-      else
-        detailScreen.hasTrailer = false
-      end if
-    else
-      detailScreen.hasTrailer = false
-    end if
+    detailScreen.hasTrailer = content.hasTrailer
 
     bookmark = m.global.bookmarkIds.findNode(content.id)
     history = m.global.historyIds.findNode(content.id)

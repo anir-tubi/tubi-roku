@@ -12,11 +12,6 @@ Function init()
   ' used to keep track of if the grid has focus or not, onGridFocusChange fires every time any focus changes including
   ' scrolling between tiles.
   m.gridIsFocused = false
-
-  m.categoryGridExperiment = false
-  if getExperimentValue("RokuNamespace", "roku_category_grid") = "on"
-    m.categoryGridExperiment = true
-  end if
 End Function
 
 
@@ -90,23 +85,21 @@ End Function
 
 
 Function onFocusPercentChange(msg)
-  if m.categoryGridExperiment = true
-    focusPercent = msg.getData()
-    m.poster.opacity = m._.max(focusPercent, 0.5)
-  end if
+  focusPercent = msg.getData()
+  m.poster.opacity = m._.max(focusPercent, 0.5)
 End Function
 
 
 Function onGridFocusChange()
-  if m.categoryGridExperiment = true
-    if m.top.gridHasFocus = false and m.gridIsFocused = true 'grid is losing focus
+  if m.top.gridHasFocus = false and m.gridIsFocused = true 'grid is losing focus
+    if m.poster.opacity > 0.5
       fade(m.poster, "out", 0.4, 0, 0.5)
-      m.gridIsFocused = false
-    else if m.top.gridHasFocus = true
-      if m.gridIsFocused = false and m.top.itemHasFocus = true 'grid is regaining focus
-        fade(m.poster, "in", 0.4, 0)
-      end if
-      m.gridIsFocused = true
     end if
+    m.gridIsFocused = false
+  else if m.top.gridHasFocus = true
+    if m.gridIsFocused = false and m.top.itemHasFocus = true 'grid is regaining focus
+      fade(m.poster, "in", 0.4, 0)
+    end if
+    m.gridIsFocused = true
   end if
 End Function
