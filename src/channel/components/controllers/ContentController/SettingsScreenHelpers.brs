@@ -224,11 +224,7 @@ Function refreshScreenAfterParentalChanges()
 End Function
 
 
-<<<<<<< HEAD
 Function onParentalSettingComplete(msg)
-=======
-function onParentalSettingComplete(msg)
->>>>>>> master
   tubiLog("SettingsScreenHelper.onParentalSettingComplete")
   task = msg.GetRoSGNode()
   result = msg.GetData()
