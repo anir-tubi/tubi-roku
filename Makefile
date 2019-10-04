@@ -52,6 +52,8 @@ RSYNC_EXCLUDE= \
   --exclude 'UnitTestFramework.brs' \
   --exclude 'Test_*.xml'
 REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
+  --include 'source/Constants.brs' \
+  --include 'source/Settings.brs' \
   --include 'source/lib' \
   --include 'source/lib/**' \
   --include 'source/3rdparty' \
@@ -78,6 +80,8 @@ RSYNC_EXCLUDE= \
   --exclude '.DS_Store' \
   --exclude '*.md'
 REMOTE_LOAD_RSYNC_INCLUDE=--include 'source' \
+  --include 'source/Constants.brs' \
+  --include 'source/Settings.brs' \
   --include 'source/lib' \
   --include 'source/lib/**' \
   --include 'source/3rdparty' \
@@ -124,17 +128,18 @@ rsync:
 
 gen:
 	@$(TOOL_CLI) create-settings $(ROKU_PROFILE) $(TARGET_DIR)/$(SETTING_FILE)
+	@$(TOOL_CLI) create-settings $(ROKU_PROFILE) $(TARGET_REMOTE_DIR)/$(SETTING_FILE)
 	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_DIR)/$(MANIFEST_FILE) $(ORIGINAL_MANIFEST_NAME)
 	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_REMOTE_DIR)/$(MANIFEST_FILE) $(REMOTE_LOAD_NAME_MANIFEST_NAME)
 	@$(TOOL_CLI) create-hotpatch $(ROKU_PROFILE)
 	@touch $(TARGET_REMOTE_DIR)/source/main.brs
 
 stage: set-build
-  ifeq ($(ROKU_PROFILE), staging)
-		@echo "Uploading components and hotpatches to s3 staging."
-		@aws s3 cp $(BUILD_DIR)/$(VERSIONED_REMOTE_LOAD_PKG) $(S3_STAGING_ADDR)/$(S3_COMPONENTS_DIR)/$(VERSIONED_REMOTE_LOAD_PKG)
-		@aws s3 cp $(BUILD_HOTPATCH_DIR)/$(VERSIONED_HOTPATCH) $(S3_STAGING_ADDR)/$(VERSIONED_HOTPATCH)
-  endif
+ifeq ($(ROKU_PROFILE), staging)
+	@echo "Uploading components and hotpatches to s3 staging."
+	@aws s3 cp $(BUILD_DIR)/$(VERSIONED_REMOTE_LOAD_PKG) $(S3_STAGING_ADDR)/$(S3_COMPONENTS_DIR)/$(VERSIONED_REMOTE_LOAD_PKG)
+	@aws s3 cp $(BUILD_HOTPATCH_DIR)/$(VERSIONED_HOTPATCH) $(S3_STAGING_ADDR)/$(VERSIONED_HOTPATCH)
+endif
 
 set-build:
 BUILD_VERSION?=$$($(TOOL_CLI) get-build-tag false false)
@@ -159,11 +164,9 @@ install: env build pkg-components stage
 	@$(MAKE) -j2 dev host
 
 pkg-components: set-build
-ifneq ($(ROKU_PROFILE), dev)
 	@echo "Signing $(VERSIONED_REMOTE_LOAD_ZIP) on host $(ROKU_DEV_TARGET)"
 	@$(TOOL_CLI) upload $(BUILD_DIR)/$(VERSIONED_REMOTE_LOAD_ZIP) $(ROKU_DEV_TARGET) $(DEV_PASSWORD)
 	@$(TOOL_CLI) sign-package $(ROKU_DEV_TARGET) $(DEV_PASSWORD) $(PKG_PASSWORD) $(VERSIONED_REMOTE_LOAD_NAME) $(BUILD_DIR)
-endif
 
 pkg: pkg-components
 	@echo "Signing $(VERSIONED_TARGET) on host $(ROKU_DEV_TARGET)"

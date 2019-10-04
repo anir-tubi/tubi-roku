@@ -12,10 +12,10 @@ End Function
 Function testCase_tubiExperiments_initSuccess()
   constants = getConstants()
   request = TubiRequest()
-  experiments = TubiExperiments(request, constants)
+  experiments = TubiExperiments(constants)
   experiments.getNamespaces = testHelper_tubiExperiments_mockGetNamespaces
   result = m.assertInvalid(constants.experiments.info)
-  experiments.init()
+  experiments.init(request)
   result += m.assertNotInvalid(constants.experiments.info)
   return result
 End Function
@@ -23,11 +23,11 @@ End Function
 Function testCase_tubiExperiments_initFailed()
   constants = getConstants()
   request = TubiRequest()
-  experiments = TubiExperiments(request, constants)
+  experiments = TubiExperiments(constants)
   experiments.getNamespaces = testHelper_tubiExperiments_mockGetInvalidNamespaces
   result = ""
   result += m.assertInvalid(constants.experiments.info)
-  experiments.init()
+  experiments.init(request)
   result += m.assertInvalid(constants.experiments.info)
   ' We don't want to crash if init() failed, just use defaults if available, otherwise return 'invalid' for the value
   value = experiments.getExperimentValue("UserNamespace", "preroll_at_90")
@@ -41,10 +41,10 @@ End Function
 Function testCase_tubiExperiments_getExperimentValueValid()
   constants = getConstants()
   request = TubiRequest()
-  experiments = TubiExperiments(request, constants)
+  experiments = TubiExperiments(constants)
   experiments.getNamespaces = testHelper_tubiExperiments_mockGetNamespaces
   result = ""
-  experiments.init()
+  experiments.init(request)
   value = experiments.getExperimentValue("UserNamespace", "preroll_at_90")
   result += m.assertNotInvalid(value)
   result += m.assertTrue(value.DoesExist("experimentvalue"))
@@ -56,7 +56,7 @@ End Function
 Function testCase_tubiExperiments_getExperimentValueDefault()
   constants = getConstants()
   request = TubiRequest()
-  experiments = TubiExperiments(request, constants)
+  experiments = TubiExperiments(constants)
   experiments.getNamespaces = testHelper_tubiExperiments_mockGetNamespaces
   experiments.defaultValues = {
     UserNamespace: {
@@ -64,7 +64,7 @@ Function testCase_tubiExperiments_getExperimentValueDefault()
     }   
   }
   result = ""
-  experiments.init()
+  experiments.init(request)
   value = experiments.getExperimentValue("UserNamespace", "roku_test_experiment")
   result += m.assertNotInvalid(value)
   result += m.assertTrue(value.DoesExist("experimentvalue"))
@@ -76,10 +76,10 @@ End Function
 Function testCase_tubiExperiments_getExperimentValueInvalid()
   constants = getConstants()
   request = TubiRequest()
-  experiments = TubiExperiments(request, constants)
+  experiments = TubiExperiments(constants)
   experiments.getNamespaces = testHelper_tubiExperiments_mockGetNamespaces
   result = ""
-  experiments.init()
+  experiments.init(request)
   value = experiments.getExperimentValue("UserNamespace", "roku_missing_experiment")
   result += m.assertNotInvalid(value)
   result += m.assertTrue(value.DoesExist("experimentvalue"))

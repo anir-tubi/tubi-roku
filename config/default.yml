@@ -4,14 +4,9 @@ settings:
   contentType: "hls"
   shortAppName: "tubitv"
   platformName: "roku"
-  adLoadingBackgroundColor: "#222223"
-  adLoadingFontColor: "#EBEBEB"
-  loadingImageUrl: "pkg://images/tubi-ad-loading-336x201.png"
-  hotPatchUrl: "https://cdn.adrise.tv/hotpatches/roku/{{versionMinorDotted}}.brs"
   remoteComponentsHost: "https://cdn.adrise.tv/hotpatches/roku/components"
   remoteComponentsExtension: "pkg"
   migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"
-  allowAfterHours: true
 
 manifest:
   title: "Tubi"
@@ -36,4 +31,10 @@ component_library_manifest:
   bs_libs_required: roku_ads_lib
   requires_widevine_drm: 1
   requires_widevine_version: "1.0"
+  hidden: 1
+
+starter_library_manifest:
+  title: "Tubi Starter Library"
+  subtitle: "Startup components"
+  sg_component_libs_provided: "TubiStarterLibrary"
   hidden: 1

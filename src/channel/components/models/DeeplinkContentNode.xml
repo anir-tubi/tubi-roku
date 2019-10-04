@@ -21,7 +21,10 @@
     <!-- where the deeplink will resume from -->
     <field id="nowPos" type="int" />
 
-    <!-- movie, episode, series season as dictated by roku's deeplink api-->
+    <!-- movie, episode, series, season as dictated by roku's deeplink api-->
     <field id="deeplinkType" type="string" />
+
+    <!-- the device id of the source device in the case of "casting" from iOS -->
+    <field id="sourceDeviceId" type="string" />
   </interface>
 </component>

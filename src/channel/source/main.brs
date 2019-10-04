@@ -1,213 +1,268 @@
 'The Main function serves to run any remote config and experiment API calls and then choose the appropriate UI
-Function Main(startupArgs as Dynamic)
+Function Main(startupArgs)
+  ' this version of constants will be the constants that are part of the submitted build (or the side loaded build)
+  ' and only exist in the main brightscript thread.
+  ' constants will be reset in remote components for scene graph
   constants = getConstants()
   request = TubiRequest()
-  requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
-  translate = TubiMetadataTranslate(constants)
-  tracking = TubiTracking(constants, request, auth)
-  nodeHelpers = TubiNodeHelpers()
-  bookmarks = TubiBookmarks(request, auth, constants, nodeHelpers)
   log = TubiLogger(constants, request, auth)
-
-  'run remote config
   externalConfig = TubiExternalConfig(request, constants)
-  externalConfig.init() 'sets external config values on constants
-
-  settings = getSettings()
+  experiments = TubiExperiments(constants)
 
   if startupArgs.ComponentTest <> invalid and startupArgs.ComponentTest <> ""
     ' This will block indefinitely
     ComponentTest(startupArgs.ComponentTest)
   end if
 
-  ' Set up the global settings.  SceneGraph will receive a clone object, not a reference.
-  ' Sources used in both BRS & SG threads will use:
-  '     m.global.settings
-  '     m.global.manifest
-  '     m.global.theme
-  '
-  m.global = {} ' important syntactically to keep the settings at m.global.settings, whether
-                ' used from the main Brightscript thread or the SceneGraph thread
-  
-  'set up all experiments
-  experiments = TubiExperiments(request, constants)
-  experiments.init() 'sets experiment values on constants
+  externalConfigValues = externalConfig.init()
+  experimentValues = experiments.init(request)
 
-  m.global.utils = {
-    constants: constants
-    request: request
-    requestQueue: requestQueue
-    tracking: tracking
-    auth: auth
-    bookmarks: bookmarks
-    nodeHelpers: nodeHelpers
-    experiments: experiments
-    log: log
-  }
-
-  m.global.channel = TubiChannel(m.global.utils)
-
-  ' apply hotpatch to main brightscript thread
-  ' this also verifies startup network connectivity
-
-  if constants.useHotpatch <> false
-    hotpatchResult = HotpatchWithRetries(settings.hotPatchUrl)
-    if hotpatchResult.valid <> true then
-      hotpatchResult.delete("valid")
-      errorMessage = {
-        message: "Hotpatch failed to load"
-        url: settings.hotPatchUrl
-      }
-      errorMessage.append(hotpatchResult)
-      hotpatchErrorPort = CreateObject("roMessagePort")
-      errorQ = requestQueue.create(hotpatchErrorPort)
-      log.exception("error", errorMessage)
-      showErrorDialog()
-      return -1 ' exit the app on error.  scene graph exits anyway once
-                ' we destroy a Scene and try to create it again.
-    end if
-  end if
-
-  m.global.channel.runChannel(startupArgs)
+  logCrashesOnStartup(startupArgs, log, constants)
+  runChannel(startupArgs, constants, log, externalConfigValues, experimentValues)
 End Function
 
 
-
-Function HotpatchWithRetries(hotPatchUrl)
-  maxRetries = 5
-  backoffFactor = 1.5
-  initialBackoff = 1000 'ms
-  pause = initialBackoff
-  retries = 0
-  hotpatchResult = Hotpatch(hotPatchUrl)
-  while hotpatchResult.valid <> true and retries < maxRetries
-    retries += 1
-    pause = pause * backoffFactor
-    sleep(pause)
-    print "Retrying Hotpatch: attempt="; retries+1; " pause="; pause
-    hotpatchResult = Hotpatch(hotPatchUrl)
-  end while
-  return hotpatchResult
-End Function
-
-''''''''''''''
-' Hotpatch
-'
-' Download .brs code from a hotpatch URL and execute it 
-'
-' return codes:
-'  0 patch applied, or no patch available
-' -1 network error downloading patch file (not 404)
-'
-Function Hotpatch(hotPatchUrl) As Object
-  if len(hotPatchUrl) > 5
-    port = CreateObject("roMessagePort")
-    transfer = CreateObject("roUrlTransfer")
-    transfer.SetMessagePort(port)
-    transfer.setUrl(hotPatchUrl)
-    if Left(UCase(hotPatchUrl), 5) = "HTTPS"
-      transfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
-    end if
-    transfer.AsyncGetToString()
-    msg = wait(10000, transfer.GetMessagePort())
-
-    hotpatchResult = {
-      valid: true
-    }
-    if type(msg) = "roUrlEvent"
-      if msg.GetResponseCode() = 200 'all good, server responded back with a hotpatch file
-        evalString = msg.GetString()
-
-        ' Eval the downloaded script
-        if len(evalString) > 10
-          errCode = eval(evalString)
-          if Type(errCode) = "Integer"
-            if errCode=252
-              print "(hp len: " + str(len(evalString)) + ")"
-            else
-              print "evalError "; errCode
-              hotpatchResult.valid = false
-              hotpatchResult.evalErr = errCode
-            end if
-          else if type(errCode) = "roList"
-            print "evalError "
-            for each error in errCode
-              print error
-            end for
-            hotpatchResult.valid = false
-            if errCode[0] <> invalid and errCode[0].errNo <> invalid
-              hotpatchResult.evalErr = errCode[0].errNo
-            else
-              hotpatchResult.evalErr = -1
-            end if
-          end if
-        end if
-
-      else if msg.GetResponseCode() > 0 'server responded with 403 error or similar - couldn't find the file but server up
-        print "No file at hotpatch location"
-        hotpatchResult.valid = false
-        hotpatchResult.resErr = msg.GetResponseCode()
-      
-      else
-        ' some network failure
-        print "Network error downloading hotpatch file"
-        print msg.getFailureReason()
-        hotpatchResult.valid = false
-        hotpatchResult.networkErr = msg.getFailureReason()
-      end if
-    else if msg = invalid
-      'no response back from hotpatch server - either server completely down or more likely user's internet is not connected
-      print "Timeout downloading hotpatch file"
-      hotpatchResult.valid = false
-      hotpatchResult.networkErr = "no response"
-    end if
-  end if
-
-  return hotpatchResult
-End Function
-
-
-Function showErrorDialog()
-  screen = CreateObject("roSGScreen")
+Function runChannel(startupArgs, constants, log, externalConfigValues, experimentValues) As Void
+  ' Load scene graph
   port = CreateObject("roMessagePort")
-  screen.setMessagePort(port)
+  input = CreateObject("roInput")
+  input.SetMessagePort(port)
+  screen = CreateObject("roSGScreen")
+  screen.SetMessagePort(port)
+  controller = invalid
+
+  ' start the scene graph UI 
+  tubiScene = screen.CreateScene("TubiScene")
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
   sgGlobal.addField("theme", "assocarray", false)
 
+  'setting constants here is just to get the scene up and running.
+  'Global constants will be overwritten with constants pulled from starterController that are the most recent version of constants
+  sgGlobal.setField("constants", constants)
+  screen.show()
 
-  ' make sure there are constants on the global utils
-  ' as they are needed for the error message
-  if m.global <> invalid
-    if m.global.utils <> invalid
-      if m.global.utils.constants = invalid
-        m.global.utils.constants = getConstants()
-      end if
-    else
-      m.global.utils = {
-        constants: getConstants()
-      }
-    end if
-  else
-    m.global = {
-      utils: {
-        constants: getConstants()
-      }
-    }
+  'run SceneGraph tests if in test mode
+  if constants.settings.mode = "test"
+    Runner = TestRunner()
+    Runner.SetTestsDirectory("pkg:/source/tests")
+    Runner.logger.SetVerbosity(2)
+    Runner.Run()
+    return
   end if
 
-  sgGlobal.constants = m.global.utils.constants
-  sgGlobal.theme = sgGlobal.constants.ui.themes.default
+  'this is the packaged constants - the submitted constants
+  if constants.starterComponents <> false
+    retries = 0
+    maxRetries = 5
+    backoffFactor = 1.5
+    initialBackoff = 1000 'ms
+    pause = initialBackoff
+
+    tubiLog("attempting to load TubiStarterLibrary")
+    starterLibrary = tubiScene.findNode("TubiStarterLibrary")
+    starterLibrary.observeField("loadStatus", port)
+    libraryBeingFetched = starterLibrary
+    componentsLoaded = false
+    starterLibrary.uri = constants.settings.starterComponentsUrl ' kicks off fetch of starter components
+    componentTimer = CreateObject("roTimespan")
+  else
+    'only expect this to happen when side loading/testing
+    constants.experiments.info = experimentValues
+    constants.externalConfig.info = externalConfigValues
+    sgGlobal.setField("constants", constants)
+    sgGlobal.setField("theme", constants.ui.themes.default)
+    controller = loadPackagedComponents(tubiScene, port, startupArgs)
+    componentsLoaded = true
+    componentTimer = invalid
+  end if
+
+  while true
+    msg = wait(200, port)
+    msgType = type(msg)
+
+    if msgType = "roInputEvent"
+      if controller <> invalid and msg.GetInfo() <> invalid
+        inputInfo = msg.GetInfo()
+        if inputInfo.type = invalid
+          'deeplink info doesn't have a "type" field, so we add one in order to easily differentiate input behavior later
+          inputInfo.type = "deeplink"
+        end if
+        controller.roInputInfo = inputInfo
+      end if
+    else if msgType = "roSGScreenEvent"
+      print "got a screen event "; msg.isScreenClosed()
+      if msg.isScreenClosed()
+        return
+      end if
+
+    else if msgType = "roSGNodeEvent"
+      tubiLog("main() got roSGNodeEvent for " + msg.GetField())
+      if msg.GetField() = "exitApp"
+        if msg.GetData() = true
+          return
+        end if
+      else if msg.GetField() = "loadStatus"
+        'starter components or remote components load status update
+        if msg.getData() = "ready"
+          if msg.GetRoSGNode().id = "TubiStarterLibrary"
+            starterController = tubiScene.createChild("TubiStarterLibrary:StarterController")
+            starterController.observeField("useRemoteComponents", port)
+            starterController.observeField("remoteComponentsUrl", port)
+            starterController.externalConfigValues = externalConfigValues
+            starterController.experimentValues = experimentValues
+            starterController.remoteComponents = constants.remoteComponents
+            starterController.setField("getUrl", true)
+            retries = 0
+            pause = initialBackoff
+          else if msg.GetRoSGNode().id = "TubiRemoteLibrary"
+            componentsLoaded = true
+            controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
+            controller.id = "ContentController"
+            controller.setField("externalConfigValues", externalConfigValues)
+            controller.setField("experimentValues", experimentValues)
+            controller.observeField("exitApp", port)
+            controller.startupArgs = startupArgs
+          end if
+        else if msg.getData() = "loading"
+          print msg.GetRoSGNode().id + " status is loading"
+        else if msg.getData() = "failed"
+          if retries < maxRetries
+            retries += 1
+            componentLibrary = msg.GetRoSGNode()
+            print componentLibrary.id; " failed to load due to API error, attempting retry #"; retries
+            pause = pause * backoffFactor
+            sleep(pause)
+            resetComponentLibrary(componentLibrary, tubiScene, port)
+          else
+            showComponentsFailedToLoadError(msg, log, screen, constants)
+          end if
+        end if
+      else if msg.GetField() = "useRemoteComponents"
+        'starter components may indicate not to use remote components
+        if msg.getData() = false
+          tubiLog("using packaged components")
+          starterController = msg.GetRoSGNode()
+          starterController.unobserveField("remoteComponentsUrl")
+          starterController.unobserveField("useRemoteComponents")
+
+          if starterController.newBuildConstants <> invalid
+            sgGlobal.setField("constants", starterController.newBuildConstants)
+            sgGlobal.setField("theme", starterController.newBuildConstants.ui.themes.default)
+          end if
+
+          loadPackagedComponents(tubiScene, port, startupArgs)
+        end if
+      else if msg.GetField() = "remoteComponentsUrl"
+        print "got the remoteComponentsUrl "; msg.getData()
+        'starter components have indicated the url to use for remote components
+        starterController = msg.GetRoSGNode()
+        starterController.unobserveField("remoteComponentsUrl")
+        starterController.unobserveField("useRemoteComponents")
+
+        if starterController.newBuildConstants <> invalid
+          sgGlobal.setField("constants", starterController.newBuildConstants)
+          sgGlobal.setField("theme", starterController.newBuildConstants.ui.themes.default)
+        end if
+        
+        remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
+        libraryBeingFetched = remoteLibrary
+        componentTimer.mark()
+        remoteLibrary.observeField("loadStatus", port)
+        remoteLibrary.uri = msg.getData()
+      end if
+    end if
+
+    ' handle starterComponents and remoteComponents timeouts
+    if componentsLoaded = false and componentTimer <> invalid and componentTimer.totalMilliseconds() > 30000
+    ' if componentsLoaded = false and componentTimer <> invalid and componentTimer.totalMilliseconds() > 3000
+      if retries < maxRetries
+        retries += 1
+        componentTimer.mark()
+        print libraryBeingFetched.id; " failed to load due to timeout, attempting retry #"; retries
+        pause = pause * backoffFactor
+        sleep(pause)
+        resetComponentLibrary(libraryBeingFetched, tubiScene, port)
+      else
+        showComponentsTimedOutError(libraryBeingFetched, log, screen, constants)
+      end if
+    end if
+  end while
+End Function
+
+
+Function loadPackagedComponents(scene, port, startupArgs)
+  controller = scene.createChild("ContentController")
+  controller.id = "ContentController"
+  controller.observeField("exitApp", port)
+  controller.startupArgs = startupArgs
+  return controller
+End Function
+
+
+'removes the componentLibrary from the scene, and creates a new componentLibrary with the same id and same url
+'as the removed componentLibrary. This will kick off a new request to the url for the remote library.
+Function resetComponentLibrary(componentLibrary, scene, port)
+  componentLibrary.unobserveField("loadStatus")
+  componentId = componentLibrary.id
+  componentUri = componentLibrary.uri
+  scene.removeChild(componentLibrary)
+
+  newComponentLibrary = scene.createChild("ComponentLibrary")
+  newComponentLibrary.id = componentId
+  newComponentLibrary.uri = componentUri
+  newComponentLibrary.observeField("loadStatus", port)
+End Function
+
+
+' @library: roSGNode: a ComponentLibrary node, either the TubiStarterLibrary or TubiRemoteLibrary
+Function showComponentsTimedOutError(library, log, screen, constants)
+  libraryId = ""
+  if library <> invalid
+    libraryId = library.id
+  end if
+
+  message = "Fetching " + libraryId + " timed out"
+  print message
+  error = {
+    message: message
+    loadStatus: "timeout"
+    url: library.uri
+  }
+  errorPort = CreateObject("roMessagePort")
+  log.exception("error", error)
+  showStartupErrorDialog(screen, constants)
+End Function
+
+
+Function showComponentsFailedToLoadError(msg, log, screen, constants)
+  print msg.GetRoSGNode().id + " status is failed"
+  error = {
+    message: msg.GetRoSGNode().id + " failed to load"
+    loadStatus: msg.getData()
+    url: msg.GetRoSGNode().uri
+  }
+  errorPort = CreateObject("roMessagePort")
+  log.exception("error", error)
+  showStartupErrorDialog(screen, constants)
+End Function
+
+
+Function showStartupErrorDialog(screen, constants)
+  port = CreateObject("roMessagePort")
+
+  sgGlobal = screen.getGlobalNode()
+  sgGlobal.setField("theme", constants.ui.themes.default)
+
+  scene = screen.GetScene()
+  controller = scene.CreateChild("ErrorController")
 
   errorObj = {}
-  errorObj.contextCode = sgGlobal.constants.errors.context.homeScreen 
-  errorObj.subtypeCode = sgGlobal.constants.errors.subtypes.networkError
-
+  errorObj.contextCode = constants.errors.context.homeScreen 
+  errorObj.subtypeCode = constants.errors.subtypes.networkError
   errorObj.title = "Connection Error"
 
-  controller = screen.CreateScene("ErrorController")
-  screen.show()
   message = "There may be an issue with your network connection, or with Tubi's server. "
   message += "Please check your network connection and try again."
   message += chr(10)
@@ -226,4 +281,26 @@ Function showErrorDialog()
   end while
 
   screen.close()
+End Function
+
+
+Function logCrashesOnStartup(args, log, constants)
+  ' These are reasons we don't care about
+  reasonBlacklist = {
+    "EXIT_UNKNOWN":         "EXIT_UNKNOWN"        ' default exit reason
+    "EXIT_POWER_MODE":      "EXIT_POWER_MODE"
+    "EXIT_DIAL_DELETE":     "EXIT_DIAL_DELETE"
+    "EXIT_IDLE_AUTO_EXIT":  "EXIT_IDLE_AUTO_EXIT"
+  }
+
+  reason = args.lastExitOrTerminationReason
+  if reason <> invalid and reasonBlacklist[reason] = invalid
+    messageInfo = {
+      message: "Crash detected on previous run"
+      reason: reason
+      model: constants.deviceInfo.model
+    }
+    errorPort = CreateObject("roMessagePort")
+    log.exception("warn", messageInfo)
+  end if
 End Function

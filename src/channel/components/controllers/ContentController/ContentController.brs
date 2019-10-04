@@ -2,7 +2,9 @@ Function init()
   tubiLog(" ")
   tubiLog("Init Scenegraph----------------")
   m._ = rodash()
+
   m.constants = m.global.constants
+
   Request = TubiRequest()
   Auth = TubiAuth(m.constants, Request)
   m.NodeHelpers = TubiNodeHelpers()
@@ -18,7 +20,12 @@ Function init()
   end if
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
-  m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
+  m.top.observeFieldScoped("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
+
+  m.deeplinkContent = invalid
+  m.startupArgsReceived = false
+  m.top.observeFieldScoped("startupArgs", "onStartupArgs")
+  m.top.observeFieldScoped("roInputInfo", "onInputInfoReceived")
 
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
@@ -53,7 +60,8 @@ Function init()
   m.global.observeFieldScoped("authInfo", "onAuthInfoChanged")
   m.authInfo = m.global.authInfo '//Local version of m.global.authInfo. This way we are sure we always have access to authInfo
 
-  m.authInfoReceived = false
+  m.authInfoReceived = false    'is the auth info returned from the registry
+  m.authInfoRefreshed = true    'is the auth info refreshed after receiving a deeplink with a refresh token
   m.authTask = CreateObject("roSGNode", "AuthTask")
   m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
   m.authTask.functionName = "execInitializeUserData"
@@ -65,9 +73,6 @@ Function init()
 
   ' For queue and history management from detail screen
   m.userTask = CreateObject("roSGNode", "AuthTask")
-
-  m.top.observeFieldScoped("deepLinkTrigger", "onDeepLinkContentReceived")
-  m.deepLinkEvaluated = false  'indicates if the contentController has recognized that we entered from a deeplink or not
 
   m.logOutTask = m.top.findNode("LogOutTask")
 
@@ -157,6 +162,7 @@ Function onKeyEvent(key As String, press As Boolean)
           ' remove the last screen, probably detail screen,
           ' this should trigger a restart of the app via onScreenStackEmpty()
           popScreen(false)
+          m.deeplinkContent = invalid
           m.enteredFromDeepLink = false
         end if
       else if m.SideNav.opened = false
@@ -395,13 +401,40 @@ End Function
 '''''''''''''''''''''''''
 ' startUserExperience
 '
-' Only once we have a metadata task ready AND the user's login status
-' will we launch the UI
+' We need to gather information from various places. As callbacks fire when these different infos arrive,
+' they all set some state on m and call startUserExperience(). When all the information has arrived, as verified
+' by the first checks in the function, then the function performs it's functionality to start the channel. 
 '
 ' @registryKidsMode: boolean, the persisted value for kids mode set in the registry
 Function startUserExperience(registryKidsMode = false)
   tubiLog("ContentController.startUserExperience")
-  if m.authInfoReceived and m.deepLinkEvaluated then
+
+  if m.authInfoReceived <> true
+    ' checks if the initial auth info has been pulled from the registry
+  else if m.startupArgsReceived <> true
+    ' checks if the startupArgs have been received from main thread
+  else if m.authInfoRefreshed <> true
+    ' checks if auth info has been received after a deeplink from external tubi device (iOS) supplied a refresh token
+    ' if m.authInfoReceived is false, it means that a refresh token has been supplied
+    if m.global.authInfo <> invalid
+      ' we only need to refresh is the user is currently signed out
+      m.authTask = CreateObject("roSGNode", "AuthTask")
+      m.authTask.observeFieldScoped("authInfoRefreshed", "onAuthInfoRefreshed")
+      m.authTask.externalAuthInfo = getExternalAuthInfoFromStartupArgs(m.top.startUpArgs)
+      m.authTask.functionName = "execRefreshAuthInfo"
+      m.authTask.control = "RUN"
+    else
+      ' onAuthInfoRefreshed will update the value of m.authInfoRefreshed to true and re-call startUserExperience()
+      ' which is necessary to proceed past this step if m.authInfoRefreshed was set to false, but the user was already signed in.
+      onAuthInfoRefreshed()
+    end if
+  else
+    ' All of the above checked values are true, so we are ready to start the channel UI
+    m.trackingLoggingTask.trackEvent = {
+      type: "active"
+      values: {}
+    }
+
     ' Since we're ready to start the channel, make sure the loading spinner is hidden
     root = m.top.getScene()
     if root <> invalid
@@ -410,20 +443,194 @@ Function startUserExperience(registryKidsMode = false)
         spinner.visible = false
       end if
     end if
+    
     ' In any of the auth transitions, this spinner might be visible
     m.spinner.visible = false
-    if m.top.deepLinkContent <> invalid then
+    if m.enteredFromDeepLink = true then
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
       ' whether we were logged in or not.
-      m.enteredFromDeepLink = true
       m.contentGroup.visible = true
       enableKidsModeUI(false) '//when deeplinking, exit out of kids mode because we cannot guarantee that the video is kid appropriate so the UI should not make the user think we're still in kids mode
-      showDetailScreen(m.top.deepLinkContent)
+      showDetailScreen(m.deeplinkContent)
     else
       startChannel(registryKidsMode)
+      showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
     end if
   end if
+End Function
+
+
+
+' is triggered when the args that are passed to main, are passed into the SG thread to the contentController.
+' this is one of the pre-requisites to starting the SG user experience.
+Function onStartupArgs()
+  m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs)
+  externalAuthInfo = getExternalAuthInfoFromStartupArgs(m.top.startUpArgs)
+
+  if externalAuthInfo <> invalid
+    m.authInfoRefreshed = false
+  end if
+
+  if m.deeplinkContent <> invalid
+    m.enteredFromDeepLink = true
+  end if
+
+  m.startupArgsReceived = true
+  startUserExperience()
+End Function
+
+
+Function onInputInfoReceived()
+  if m.top.roInputInfo <> invalid
+    inputInfo = m.top.roInputInfo
+
+    if inputInfo.type = "deeplink"
+      m.deeplinkContent = createDeeplinkContentFromStartupArgs(inputInfo)
+      showDetailScreen(m.deeplinkContent)
+    end if
+  end if
+End Function
+
+
+' Parse launch arguments for any deep linking.
+' Returns a DeeplinkContentNode or invalid
+' @args: assocArray, the args passed to main() at startup
+'
+' Feed: http://cms.adrise.com/roku/partnerSearch/xml
+'
+' ARGUMENTS TO ROKU MAIN():
+'
+' Non-deep link args and example values:
+'   splashTime                      - "1600"
+'   instant_on_run_mode             - "foreground"
+'   lastExitOrTerminationReason     - "EXIT_UNKNOWN"
+'
+' Deep link args:
+'   contentId    - string identifier
+'   entry        - 'banner' or omitted for search source
+'   mediaType    - "season", "series", "episode", "movie", "shortform", and "live"
+'   source       - 'meta-search', 'external-control'
+'   entry        - string, custom parameter, used for tracking the source of deeplinks, passed to referred analytics events
+'   deviceId     - string, custome paramater, the device id of the device sending the deeplink (used when mobile "casts" to roku)
+'   resumeTime   - integer, custome paramater, the position from which a deeplink should resume (used when mobile "casts" to roku)
+'   refreshToken - string, custome paramater, a token that can be used to refresh the auth token.
+'                  Is used to transfer login info from a "casting" device to roku (used when mobile "casts" to roku)
+'   userId       - integer, custome paramater, the user id of the user sending the deeplink (used when mobile "casts" to roku)
+Function createDeeplinkContentFromStartupArgs(args)
+  'handle/set up any deep linking that may have occurred
+  if (args.contentId <> invalid)
+    tubiLog("Deep Link detected for content id " + args.contentId)
+
+    content = CreateObject("roSGNode", "DeeplinkContentNode")
+    content.id = args.contentId
+
+    ' default deep link source is search
+    content.source = "search"
+
+    ' if there is a parameter called entry with a value, that is the source of the deep link
+    ' typically entry = banner from the Roku banner ads ('entry' is a custom parameter)
+    ' deep link urls with entry source should look like:
+    ' contentID=18267&entry=banner
+    if args.entry <> invalid
+      content.source = args.entry
+    end if
+
+    ' the device id of the device deeplinking to roku. Might be an iOS or android device that is "casting" to roku.
+    if args.deviceId <> invalid and args.deviceId.unescape() <> ""
+      content.sourceDeviceId = args.deviceId.unescape()
+    end if
+
+    ' set up the resume time if we are deeplinking to a specific point in the video
+    if args.resumeTime <> invalid
+      content.nowPos = args.resumeTime.ToInt()
+    end if
+
+    ' if deep linked from Roku search it's possible that we are deep linking to a series, instead of actual video content
+    ' deep links from search for series should like:
+    ' contentID=335&mediaType=series
+    '
+    ' See full list of mediaType at https://sdkdocs.roku.com/display/sdkdoc/External+Control+Guide
+    if args.mediaType = "series"
+      content.type = "series"
+      content.deeplinkType = "series"
+    else if args.mediaType = "season"
+      content.type = "series"
+      content.deeplinkType = "season"
+    else if args.mediaType = "movie"
+      content.type = "video"
+      content.deeplinkType = "movie"
+    else if args.mediaType = "episode"
+      content.type = "video"
+      content.deeplinkType = "episode"
+    end if
+
+    ' remove any 0s that might be prepended to the content id
+    if content.source = "search"
+      prepend = "0"
+      while prepend = "0"
+        prepend = content.id
+        if prepend = "0"
+          length = content.id.len()
+          content.id = content.id.right(length - 1)
+        end if
+      end while
+    end if
+
+    'see tubitv.atlassian.net/wiki/display/EC/Referrals
+    content.medium = "partnership"
+    if args.medium <> invalid
+      content.medium = args.medium
+    end if
+
+    'see tubitv.atlassian.net/wiki/display/EC/Referrals
+    content.campaign = "default-campaign"
+    if args.campaign <> invalid
+      content.campaign = args.campaign
+    end if
+
+    return content
+  else
+    return invalid
+  end if
+End Function
+
+
+'@args: assocArray, the startupArgs passed into main when the channel starts
+Function getExternalAuthInfoFromStartupArgs(args)
+  ' deeplinks coming from ios or android devices need to be authenticated
+  externalAuthInfo = invalid
+
+  if args.refreshToken <> invalid and args.userId <> invalid and args.deviceId <> invalid and args.entry <> invalid
+    if args.refreshToken.unescape() <> "" and args.userId.unescape() <> "" and args.deviceId.unescape() <> ""
+      if args.entry = "iphone" or args.entry = "ipad" or args.entry = "ios" or args.entry = "android"
+
+        externalAuthInfo = {
+          platform: args.entry
+          externalDeviceId: args.deviceId.unescape()
+          externalRefreshToken: args.refreshToken.unescape()
+          userId: args.userId.unescape()
+        }
+      end if
+    end if
+  end if
+
+  return externalAuthInfo
+End Function
+
+
+' auth info has been added/refreshed after a deeplink from a "casting" device that contained a refreshToken
+Function onAuthInfoRefreshed()
+  tubiLog("ContentController.onAuthInfoRefreshed")
+  if m.authTask <> invalid
+    if m.authTask.authInfo <> invalid
+      m.global.authInfo = m.authTask.authInfoRefreshed
+    end if
+    m.authTask.unobserveFieldScoped("authInfo")
+    m.authTask = invalid
+  end if
+  m.authInfoRefreshed = true
+  startUserExperience()
 End Function
 
 
@@ -736,17 +943,6 @@ Function onNavigateWithinPageInfoChange(msg)
 End Function
 
 
-'''''''''''''''''''''
-' onDeepLinkContentReceived
-'
-' Show the detail screen for the content id that was deeplinked to
-Function onDeepLinkContentReceived()
-  tubiLog("onDeepLinkContentReceived")
-  m.deepLinkEvaluated = true
-  startUserExperience()
-End Function
-
-
 Function homeScreenBackgroundUpdated(msg)
   tubiLog("ContentController.homeScreenBackgroundUpdated")
   homeScreen = msg.getRoSGNode()
@@ -840,6 +1036,31 @@ Function getBackgroundtype(backgroundUriList)
     end if
   end if
   return backgroundType
+End Function
+
+
+' show an upgrade modal if constants says that we should
+Function showUpgradeModal(shouldAlert, trackingLib, trackingTask)
+  if shouldAlert = true
+    title  = "Please update the Tubi channel"
+    message  = "This version of Tubi is no longer supported. "
+    message  += "To update, please exit the Tubi app and go to:"
+    message  += chr(10)
+    message  += chr(10)
+    message  += "Settings > System > System update > Check now"
+    buttons = ["Close"]
+
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "UPGRADE"   'DialogType enum
+        pageOneof: trackingLib.getAnalyticsPage("home_page", {})
+        dialog_action: "SHOW"
+        dialog_sub_type: ""
+      }
+    }
+    showSimpleModal(title, message, buttons, dialogEvent, trackingTask)
+  end if
 End Function
 
 

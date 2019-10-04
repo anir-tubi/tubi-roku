@@ -21,9 +21,7 @@ Function playVideoContent(content As Object, autoplayType As String, position=in
       m.videoPlayer.observeFieldScoped("creditsPosition", "onEpisodeCredits")
       m.videoPlayer.observeFieldScoped("goToNext", "onGoToNext")
       m.videoPlayer.enableAds = true
-      if m.top.deepLinkContent <> invalid
-        m.videoPlayer.deeplinkSource = m.top.deepLinkContent.source
-      end if
+
       ' preload autoplay content;  We don't observe 'error' or 'response' fields
       ' since they will be evaluated at the creditsCuepoint callback
       if m.upNextTask = invalid
@@ -267,7 +265,7 @@ Function returnToDetailScreenFromVideo()
   stopVideoContent(true)
   ' get updated content, to be used to reload or re-populate details screen
   content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex) 'this always returns a video - sometimes an episode
-  m.top.deepLinkContent = invalid
+  m.deepLinkContent = invalid
   if content <> invalid
     if content.isTrailer
       ' Action 5

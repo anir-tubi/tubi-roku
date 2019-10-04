@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - StarterController
+ -
+ - This starter controller's main purpose is to determine which remote component file to load into the channel.
+ -
+ - Please see https://sdkdocs.roku.com/display/sdkdoc/ComponentLibrary for more info on remotely loading scenegraph components 
+ -
+ -
+ -->
+<component name="StarterController" extends="Group">
+
+  <script type="text/brightscript" uri="pkg:/components/starterController/starterController.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Constants.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Settings.brs" />
+  <script type="text/brightscript" uri="pkg:/source/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/TubiExperiments.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+      <!-- triggers the starterController to return a remote components url via the OUTPUT interfaces -->
+      <field id="getUrl" type="boolean" alwaysNotify="true" />
+
+      <!-- experiments AA that are returned from TubiExperiments.init() -->
+      <field id="experimentValues" type="assocArray" />
+
+      <!-- remoteConfig AA that are returned from TubiExternalConfig.init() -->
+      <field id="externalConfigValues" type="assocArray" />
+
+    <!-- OUTPUTS -->
+      <!-- the SceneGraph app will be built using the remote components pkg existing at this url -->
+      <field id="remoteComponentsUrl" type="string"  alwaysNotify="true"/>
+
+      <!-- should be set from Constants.remoteComponents in the main thread - indicates if we want to load remote components -->
+      <field id="useRemoteComponents" type="boolean" alwaysNotify="true" />
+
+      <!-- starter components has the most recent constants, including experiments and external config.
+           make them available to the main thread which can put them on global and inject them into remote components
+       -->
+      <field id="newBuildConstants" type="assocArray" />
+  </interface>
+
+  <children />
+
+</component>

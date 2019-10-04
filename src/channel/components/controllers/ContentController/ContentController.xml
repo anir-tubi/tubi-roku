@@ -31,6 +31,9 @@
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/SignInHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ContentController/ScreenStackHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Settings.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Constants.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
@@ -45,20 +48,18 @@
   
   <interface>
     <!-- INPUTS -->
-      <!-- Show the detail screen for the item indicated
-        -
-        - The node should have 2 fields set:
-        -    id    - the content requested
-        -    type  - the type of content: "series", "video", or "episode"
-        - 2 optional fields should be set if the source is deeplink from another platform (ie. iphone, etc.)
-        -    source  - the device id of the originating device
-        -    nowPos  - the resume time sent along with deeplink
-        -->
-      <field id="deepLinkContent" type="node" />
-      <field id="deepLinkTrigger" type="boolean" alwaysNotify="true" />
+      <!-- the arguments that are passed into the app at startup, as an associative array -->
+      <field id="startupArgs" type="assocarray" />
+
+      <!-- any info that is passed into the channel via roInput/ECP while the channel is running
+           can be deeplinks, transport controls, voice commands, etc. -->
+      <field id="roInputInfo" type="assocarray" />
+
       <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
+
       <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
-      <!-- metadataFetchTask pusts results on this field -->
+
+      <!-- metadataFetchTask puts results on this field -->
       <field id="searchResponse" type="assocarray" alwaysNotify="true"/>
 
     <!-- OUTPUT -->

@@ -26,6 +26,25 @@ Function execInitializeUserData()
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger 
 End Function
 
+
+Function execRefreshAuthInfo()
+  tubiLog("AuthTask.execRefreshAuthInfo")
+  constants = m.global.constants
+  Request = TubiRequest()
+  Auth = TubiAuth(constants, Request)
+  newAuthInfo = invalid
+
+  ' only transfer the refresh token and log the external user in
+  ' if there is no one currently logged in on the roku
+  if m.top.externalAuthInfo <> invalid
+    'this runs synchronously
+    newAuthInfo = Auth.transferRefreshToken(m.top.externalAuthInfo)
+  end if
+
+  m.top.authInfoRefreshed = newAuthInfo
+End Function
+
+
 Function saveKidsModeToMemory()
   tubiLog("AuthTask.saveKidsModeToMemory")
     kidsModeObject = {
@@ -56,6 +75,7 @@ Function execSignOut()
   m.top.history = userCats.newHistory
   m.top.authInfo = invalid
 End Function
+
 
 Function addToQueue()
   tubiLog("AuthTask.addToQueue")
@@ -100,6 +120,7 @@ Function addToQueue()
   tubiLog("EXIT AuthTask.addToQueue")
 End Function
 
+
 Function removeFromQueue()
   tubiLog("AuthTask.removeFromQueue")
   Request = TubiRequest()
@@ -132,6 +153,7 @@ Function removeFromQueue()
   tubiLog("EXIT AuthTask.removeFromQueue")
 End Function
 
+
 Function removeFromHistory()
   tubiLog("AuthTask.removeFromHistory")
   Request = TubiRequest()
@@ -163,6 +185,7 @@ Function removeFromHistory()
   end if
   tubiLog("EXIT AuthTask.removeFromHistory")
 End Function
+
 
 Function updateHistory()
   tubiLog("AuthTask.updateHistory")

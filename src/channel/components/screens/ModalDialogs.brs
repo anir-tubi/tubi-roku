@@ -224,9 +224,9 @@ Function getUserFacingErrorCode(contextCode, subtypeCode, externalCode = "")
   '//The external code is optional, so if there is no external code, then do not include it in the returned code
   sExternalCode = ""
   if externalCode <> invalid 
-    if isstr(externalCode) = true
+    if modal_isstr(externalCode) = true
       sExternalCode = externalCode
-    else if isint(externalCode) = true
+    else if modal_isint(externalCode) = true
       sExternalCode = externalCode.toStr()
     end if
     if sExternalCode = "-1"
@@ -245,7 +245,7 @@ End Function
 ' ::TODO:: this is copied from generalUtils.brs. If/when we make generalUtils available to the general code, then we should link to generalUtils
 'Determine if the given object supports the ifString interface
 '******************************************************
-Function isstr(obj as dynamic) As Boolean
+Function modal_isstr(obj as dynamic) As Boolean
     if obj = invalid return false
     if GetInterface(obj, "ifString") = invalid return false
     return true
@@ -256,7 +256,7 @@ End Function
 ' ::TODO:: this is copied from generalUtils.brs. If/when we make generalUtils available to the general code, then we should link to generalUtils
 'Determine if the given object supports the ifInt interface
 '******************************************************
-Function isint(obj as dynamic) As Boolean
+Function modal_isint(obj as dynamic) As Boolean
     if obj = invalid return false
     if GetInterface(obj, "ifInt") = invalid return false
     return true

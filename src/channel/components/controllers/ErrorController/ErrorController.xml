@@ -3,7 +3,7 @@
  - ErrorController
  -
  -->
-<component name="ErrorController" extends="Scene">
+<component name="ErrorController" extends="Group">
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/controllers/ErrorController/ErrorController.brs" />
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />

@@ -31,13 +31,12 @@
     <Spinner
       id="LoadingSpinner"
       isDisabled="false"
-      visible="false"
+      visible="true"
       width="1920"
       height="1080"/>
 
-    <Timer
-      id="LoadingTimer"
-      duration="3"/>
+    <ComponentLibrary
+      id="TubiStarterLibrary"/>
 
     <ComponentLibrary
       id="TubiRemoteLibrary"/>

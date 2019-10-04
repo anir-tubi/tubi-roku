@@ -45,15 +45,23 @@
 
         <!-- updateParentalSetting -->
         <field id="password" type="string"/>
+
         <field id="parentalSetting" type="integer"/>
+
+        <field id="externalAuthInfo" type="assocarray"/>
 
         <field id="isKidsMode" type="boolean" />
 
       <!-- OUTPUT -->
-        <!-- execInitializeUserData, execSignOut, updateHistory:
+        <!-- execInitializeUserData, execAuthRefresh, execSignOut, updateHistory:
         -        auth info blob from Auth.getAuthInfo(), or invalid if signed out
         -->
         <field id="authInfo" type="assocarray" alwaysNotify="true" />
+
+        <!-- execAuthRefresh:
+        -        auth info blob from Auth.getAuthInfo(), or invalid if signed out
+        -->
+        <field id="authInfoRefreshed" type="assocarray" alwaysNotify="true" />
 
 
         <field id="userInfo" type="assocarray" alwaysNotify="true" />

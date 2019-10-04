@@ -32,7 +32,7 @@ Function showDetailScreen(content)
     ' We expect to overwrite this in populateDetailScreen() which occurs after the full info has been fetched from the /content API
     detailScreen.content = content
 
-    if m.top.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
+    if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
       detailScreen.isLoading = true
     else
       populateDetailScreen(detailScreen, content, true)
@@ -256,13 +256,13 @@ Function onSingleContentResponse(msg) As Void
   afterFn = invalid  ' the Function to execute once we've sorted the detail screen out
   history = m.global.historyIds.findNode(refreshedContent.id)
 
-  if m.enteredFromDeepLink = true and m.top.deepLinkContent <> invalid
-    if history <> invalid and history.nowPos > 0
-     '//Use the history deeplink to resume a deeplinked video 
-      m.top.deepLinkContent.nowPos = history.nowPos
+  if m.deepLinkContent <> invalid
+    if m.deepLinkContent.nowPos = 0 and history <> invalid and history.nowPos > 0
+     ' Use the deeplink content's history to resume a deeplinked video if a resumeTime parameter wasn't sent in as part of the deeplink
+      m.deepLinkContent.nowPos = history.nowPos
     end if
 
-    if m.top.deepLinkContent.deeplinkType = "series" and refreshedContent.type = m.constants.ui.contentTypes.series
+    if m.deepLinkContent.deeplinkType = "series" and refreshedContent.type = m.constants.ui.contentTypes.series
       '  refreshedContent.id:       series id
       '  refreshedContent.seriesId: invalid
       '  refreshedContent.type:     series
@@ -288,8 +288,11 @@ Function onSingleContentResponse(msg) As Void
       else
         refreshedContent.currentEpisodeId = ""
       end if
-      sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
-    else if (m.top.deepLinkContent.deeplinkType = "season" or m.top.deepLinkContent.deeplinkType = "episode" or m.top.deepLinkContent.deeplinkType = "series") and refreshedContent.type = m.constants.ui.contentTypes.video
+
+      if m.enteredFromDeepLink = true
+        sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+      end if
+    else if (m.deepLinkContent.deeplinkType = "season" or m.deepLinkContent.deeplinkType = "episode" or m.deepLinkContent.deeplinkType = "series") and refreshedContent.type = m.constants.ui.contentTypes.video
       '  refreshedContent.id =       episode id
       '  refreshedContent.seriesId = series id
       '  refreshedContent.type =     video
@@ -302,49 +305,60 @@ Function onSingleContentResponse(msg) As Void
       emptySeriesNode.id = refreshedContent.seriesId
       getSingleContentFromServer(detailScreen, emptySeriesNode)
       return
-    else if m.top.deepLinkContent.deeplinkType = "season" and refreshedContent.type = m.constants.ui.contentTypes.series
+    else if m.deepLinkContent.deeplinkType = "season" and refreshedContent.type = m.constants.ui.contentTypes.series
       '  refreshedContent.id =       series id
       '  refreshedContent.seriesId = invalid
       '  refreshedContent.type =     series
       '  m.deepLinkContent.deepLinkType = season
 
       ' we've now received the full series info, so we can build the relevant screens
-      refreshedContent.currentEpisodeId = m.top.deepLinkContent.id
+      refreshedContent.currentEpisodeId = m.deepLinkContent.id
       ' when deeplinkType = "season", deeplinkContent.id should be an episode id. We want to send tracking with the series id.
-      m.top.deepLinkContent.id = refreshedContent.id
+      m.deepLinkContent.id = refreshedContent.id
       afterFn = episodesHelper
-      sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "episodeList", m.Tracking, m.trackingLoggingTask, m.constants)
-    else if m.top.deepLinkContent.deeplinkType = "episode" and refreshedContent.type = m.constants.ui.contentTypes.series
+
+      if m.enteredFromDeepLink = true
+        sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "episodeList", m.Tracking, m.trackingLoggingTask, m.constants)
+      end if
+    else if m.deepLinkContent.deeplinkType = "episode" and refreshedContent.type = m.constants.ui.contentTypes.series
       '  refreshedContent.id =       series id
       '  refreshedContent.seriesId = invalid
       '  refreshedContent.type =     series
       '  m.deepLinkContent.deepLinkType = episode
 
       ' we now have the full series info for episode deeplinks
-      refreshedContent.currentEpisodeId = m.top.deepLinkContent.id
+      refreshedContent.currentEpisodeId = m.deepLinkContent.id
       'determine if we need to resume or play from start the deeplinked episode
-      if m.top.deepLinkContent.nowPos <> invalid and m.top.deepLinkContent.nowPos > 0
+      if m.deepLinkContent.nowPos <> invalid and m.deepLinkContent.nowPos > 0
         episode = getEpisodeContent(refreshedContent)
-        episode.nowPos = m.top.deepLinkContent.nowPos
+        episode.nowPos = m.deepLinkContent.nowPos
         afterFn = resumeHelper
       else
         afterFn = playHelper
       end if
-      sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
-    else if m.top.deepLinkContent.deeplinkType = "movie"
+
+      if m.enteredFromDeepLink = true
+        sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+      end if
+    else if m.deepLinkContent.deeplinkType = "movie"
       'determine if we need to resume or play from start the deeplinked movie
-      if m.top.deepLinkContent.nowPos <> invalid and m.top.deepLinkContent.nowPos > 0
-        refreshedContent.nowPos = m.top.deepLinkContent.nowPos
+      if m.deepLinkContent.nowPos <> invalid and m.deepLinkContent.nowPos > 0
+        refreshedContent.nowPos = m.deepLinkContent.nowPos
         afterFn = resumeHelper
       else
         afterFn = playHelper
       end if
-      sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+
+      if m.enteredFromDeepLink = true
+        sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+      end if
     else
       'start the channel normally in case of issues
       'handle deeplinking tracking when landing on category/home screen
-      m.enteredFromDeepLink = false
-      sendDeeplinkAnalytics(m.top.deepLinkContent, refreshedContent, "home", m.Tracking, m.trackingLoggingTask, m.constants)
+      if m.enteredFromDeepLink = true
+        sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "home", m.Tracking, m.trackingLoggingTask, m.constants)
+        m.enteredFromDeepLink = false
+      end if
       startChannel()
       return
     end if
@@ -416,7 +430,7 @@ Function onSingleContentError(msg)
     m.enteredFromDeepLink = false
     popScreen(false)
     content = getDetailScreenContent(detailScreen)
-    sendDeeplinkAnalytics(m.top.deepLinkContent, content, "home", m.Tracking, m.trackingLoggingTask, m.constants)
+    sendDeeplinkAnalytics(m.deepLinkContent, content, "home", m.Tracking, m.trackingLoggingTask, m.constants)
     startChannel()
   else if m.refreshingDetailCache = true
     m.refreshingDetailCache = false
@@ -858,6 +872,7 @@ Function onPlay(msg)
   playHelper(detailScreen)
 End Function
 
+
 Function playHelper(screen)
   episode = getEpisodeContent(screen.content)
   if episode <> invalid and screen.isLoading <> true then
@@ -874,7 +889,7 @@ Function resumeHelper(detailScreen)
     nowPos = invalid
     ' find the position in global history
     history = m.global.historyIds.findNode(episode.id)
-    if m.top.deepLinkContent = invalid or m.top.deepLinkContent.deepLinkType = "season" or m.top.deepLinkContent.deepLinkType = "series"
+    if m.deepLinkContent = invalid or m.deepLinkContent.deepLinkType = "season" or m.deepLinkContent.deepLinkType = "series"
       if history <> invalid then
         nowPos = history.nowPos
       end if
@@ -889,7 +904,7 @@ End Function
 ' Organizes the information needed to create a "referred" tracking event and sends the information to the trackingTask which will
 ' actually send the event.
 '
-' @deepLinkContent: roSGNode, a content node created by deeplink logic and passed to the content controller via m.top.deeplinkContent
+' @deepLinkContent: roSGNode, a content node created by deeplink logic and passed to the content controller via m.deeplinkContent
 ' @refreshedContent: roSGNode, a content node containing full information from the /content API
 ' @entryPoint: string, indicates where the user will land after the deeplink, can be one of: "detail", "home", "episodeList", "video"
 ' @trackingLib: associativeArray, an instance of TubiTracking()
@@ -901,6 +916,7 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
     campaign: deepLinkContent.campaign
     source: deepLinkContent.source
     medium: deepLinkContent.medium
+    content: deeplinkContent.sourceDeviceId
   }
 
   pageInfo = getDetailScreenAnalyticsPageInfo(refreshedContent, constants)

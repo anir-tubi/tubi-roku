@@ -1,4 +1,5 @@
 Function init()
+  print "init Scene Graph Erorr Controller"
   m.constants = m.global.constants
   m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
   m.trackingLoggingTask.control = "RUN"

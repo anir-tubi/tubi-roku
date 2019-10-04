@@ -10,8 +10,7 @@ Function getExperimentValue(namespaceName as string, parameterName as string)
   end if
 
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
-    request = TubiRequest()
-    experiments = TubiExperiments(request, m.global.constants)
+    experiments = TubiExperiments(m.global.constants)
 
     experimentInfoAndTracking = experiments.getExperimentValue(namespaceName, parameterName)
 

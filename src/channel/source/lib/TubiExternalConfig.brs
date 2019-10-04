@@ -28,6 +28,7 @@ Function tubiExternalConfig_init()
   end if
 
   m.storeConfigs(mergedConfig)
+  return mergedConfig
 End Function
 
 
