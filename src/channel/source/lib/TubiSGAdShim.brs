@@ -33,6 +33,12 @@ End Function
 Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
   tubiLog("TubSGAdShim.Run")
   m.videoPlayerNode = videoPlayerNode
+
+  ' There is the chance for a race condition where m.videoPlayerNode.isCoppaEnabled is set before the adShim has
+  ' a chance to start observing the field, so we grab the initial value here just in case. It can be updated later
+  ' by the observer if necessary.
+  m.ads.isCoppaEnabled = m.videoPlayerNode.isCoppaEnabled
+
   if type(m.videoPlayerNode) <> "roSGNode" or m.videoPlayerNode.subtype() <> "VideoPlayer"
     tubiLog("TubSGAdShim.Run: videoPlayerNode is not component type VideoPlayer")
     return false
