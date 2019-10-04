@@ -237,6 +237,10 @@ Function onVideoPlayerState(msg)
         returnToDetailScreenFromVideo()
       end if
     end if
+  else if state = "playing"
+    if m.deepLinkContent <> invalid
+      fireAppLoadBeacon()  'fires only as necessary (once per session)
+    end if
   end if
 End Function
 
