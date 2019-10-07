@@ -50,6 +50,7 @@ Function showDetailScreen(content)
   end if
 End Function
 
+
 Function onDetailBackgroundChange(msg)
   tubiLog("DetailScreenHelpers.onDetailBackgroundChange")
   detailScreen = msg.getRoSGNode()
@@ -60,6 +61,7 @@ Function onDetailBackgroundChange(msg)
     }
   end if
 End Function
+
 
 Function onDetailScreenChannelSelected(msg)
   detailScreen = msg.getRoSGNode()
@@ -96,7 +98,6 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
   backgroundUriList = [m.defaultBackgroundUri]
-
 
   if type(detailScreen) = "roSGNode" and detailScreen.isSubType("DetailScreen") and type(content) = "roSGNode"
     'hide the spinner
@@ -461,6 +462,7 @@ Function onSingleContentError(msg)
     ]
 
     showErrorModal(modalInfo, getSingleContentFromServerRetry, getSingleContentParams)
+    detailScreen.isLoading = false
 
     sendDetailScreenErrorAnalytics(detailScreen)
   end if
