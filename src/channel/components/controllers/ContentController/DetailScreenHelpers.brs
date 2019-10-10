@@ -247,6 +247,7 @@ Function onSingleContentResponse(msg) As Void
   task = msg.getRoSGNode()
   detailScreen = task.target
   detailScreen.contentFetchError = false
+  detailScreen.task = invalid
 
   task.unobserveField("response")
   task.unobserveField("error")
@@ -417,6 +418,7 @@ Function onSingleContentError(msg)
   error = msg.GetData()
   task = msg.getRoSGNode()
   detailScreen = task.target
+  detailScreen.task = invalid
   tubiLog("DetailScreenHelpers.onSingleContentError")
 
   content = invalid
@@ -853,13 +855,39 @@ End Function
 
 
 '''''''''''
+' shouldPlayDetailVideo
+'
+' Should the incoming content be allowed to play? It will check if there is  valid video URL
+Function shouldPlayDetailVideo(screen) as Boolean
+  bReturn = false
+  task = screen.task
+  content = screen.content
+
+  '//if info has not loaded yet, then the screen will contain a DetailMetadataTask task and will not contain the video URL yet. This function will indicate that a playback button press should be ignored
+  if task <> invalid and task.subType() = "DetailMetadataTask"
+    if content <> invalid and content.url <> invalid and Len(content.url) > 0
+      bReturn = true
+    end if
+  else
+    '//This indicates that the screen is not currently loading metadata so proceed as normal. 
+    '//In this case, we do not want to stop the play button action. If the video URL is invalid in this case, then we want to let the user know this by showing them an error after they click the play button.
+    bReturn = true
+  end if
+
+  return bReturn
+End Function
+
+
+'''''''''''
 ' onResume
 '
 ' Notify the main Brightscript thread to invoke the video player, resuming at the indicated location
 Function onResume(msg)
   tubiLog("ContentController.onResume")
   detailScreen = msg.getRoSGNode()
-  resumeHelper(detailScreen)
+  if shouldPlayDetailVideo(detailScreen) = true
+    resumeHelper(detailScreen)
+  end if
 End Function
 
 
@@ -870,7 +898,9 @@ End Function
 Function onPlay(msg)
   tubiLog("ContentController.onPlay")
   detailScreen = msg.getRoSGNode()
-  playHelper(detailScreen)
+  if shouldPlayDetailVideo(detailScreen) = true
+    playHelper(detailScreen)
+  end if
 End Function
 
 
