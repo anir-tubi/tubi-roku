@@ -131,14 +131,13 @@ gen:
 	@$(TOOL_CLI) create-settings $(ROKU_PROFILE) $(TARGET_REMOTE_DIR)/$(SETTING_FILE)
 	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_DIR)/$(MANIFEST_FILE) $(ORIGINAL_MANIFEST_NAME)
 	@$(TOOL_CLI) create-manifest $(ROKU_PROFILE) $(TARGET_REMOTE_DIR)/$(MANIFEST_FILE) $(REMOTE_LOAD_NAME_MANIFEST_NAME)
-	@$(TOOL_CLI) create-hotpatch $(ROKU_PROFILE)
 	@touch $(TARGET_REMOTE_DIR)/source/main.brs
 
 stage: set-build
 ifeq ($(ROKU_PROFILE), staging)
 	@echo "Uploading components and hotpatches to s3 staging."
 	@aws s3 cp $(BUILD_DIR)/$(VERSIONED_REMOTE_LOAD_PKG) $(S3_STAGING_ADDR)/$(S3_COMPONENTS_DIR)/$(VERSIONED_REMOTE_LOAD_PKG)
-	@aws s3 cp $(BUILD_HOTPATCH_DIR)/$(VERSIONED_HOTPATCH) $(S3_STAGING_ADDR)/$(VERSIONED_HOTPATCH)
+# 	@aws s3 cp $(BUILD_HOTPATCH_DIR)/$(VERSIONED_HOTPATCH) $(S3_STAGING_ADDR)/$(VERSIONED_HOTPATCH)
 endif
 
 set-build:

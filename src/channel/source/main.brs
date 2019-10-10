@@ -60,7 +60,7 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
     initialBackoff = 1000 'ms
     pause = initialBackoff
 
-    tubiLog("attempting to load TubiStarterLibrary")
+    print "attempting to load TubiStarterLibrary "; constants.settings.starterComponentsUrl
     starterLibrary = tubiScene.findNode("TubiStarterLibrary")
     starterLibrary.observeField("loadStatus", port)
     libraryBeingFetched = starterLibrary
@@ -105,6 +105,7 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
         end if
       else if msg.GetField() = "loadStatus"
         'starter components or remote components load status update
+        print "loadStatus = "; msg.getData()
         if msg.getData() = "ready"
           if msg.GetRoSGNode().id = "TubiStarterLibrary"
             starterController = tubiScene.createChild("TubiStarterLibrary:StarterController")
