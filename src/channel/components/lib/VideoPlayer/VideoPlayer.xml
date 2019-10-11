@@ -38,6 +38,10 @@
       <!-- WRITE-ONLY field tells if the video player should change its appearance to be kid friendly or not-->
       <field id="kidsMode" type="boolean" value="false" />
 
+      <!-- WRITE-ONLY field tells if the video player should send thd kidsMode boolean value to the server -->
+      <!-- ::TODO:: all references to this input should be made unnecessary by placing any caqlls to the server to the video helper file.  -->
+      <field id="shouldKidsModeBeSentToServer" type="boolean" value="false" />
+
       <field id="width" alias="VideoNode.width"/>
       <field id="height" alias="VideoNode.height"/>
 

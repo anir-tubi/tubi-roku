@@ -776,6 +776,7 @@ Function tellScreensIfKidsModeBeSentToServer()
   if homeScreen <> invalid
     homeScreen.shouldKidsModeBeSentToServer = bKidsMode
   end if
+  m.videoPlayer.shouldKidsModeBeSentToServer = bKidsMode
 End Function
 
 Function isKidsModeEnabledByParentalControls() as Boolean

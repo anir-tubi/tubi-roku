@@ -126,14 +126,16 @@ Function refreshContent(nowPos)
       requestDetails = {
         contentId: content.id
         getThumbnails: true
+        kidsMode: m.top.shouldKidsModeBeSentToServer
       }
-      runRefreshTask(requestDetails)
+      runRefreshTask(requestDetails)  
       playContent()
     else
       requestDetails = {
         contentId: content.id
         getContent: true
         refresh: true
+        kidsMode: m.top.shouldKidsModeBeSentToServer
       }
 
       ' trailers don't have thumbnails
