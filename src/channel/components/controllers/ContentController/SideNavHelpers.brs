@@ -110,7 +110,6 @@ Function onSideNavItemSelected()
       sDescription = ""
       if itemSelected.turnedOn = true
         '//If the parental control settings are not set to kids, then this action is not limited
-        bNewScreenCalledSuccess = false
         
         if m.kidsModeEnabled = true
           dialogEvent = {
@@ -132,18 +131,15 @@ Function onSideNavItemSelected()
             values: {
               dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "KIDS_MODE" when it is available in protos
               pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
-              dialog_action: "SHOW"
+              dialog_action: "ACCEPT_DELIBERATE"
               dialog_sub_type: "enter-kids-mode"
             }
           }
-
-          sTitle = "Kids"
-          sDescription = "You will only see content rated PG and under until you turn off this setting. For password protected controls please update your parental control preferences in settings."
-          showSimpleModal(sTitle, sDescription, ["Switch to Kids", "Cancel"], dialogEvent, m.trackingLoggingTask, enableKidsModeFromSideNav)
+          m.trackingLoggingTask.trackEvent = dialogEvent
+          enableKidsModeFromSideNav()
         end if
       else 
         if m.kidsModeEnabled = true
-          bNewScreenCalledSuccess = false
 
           dialogEvent = {
             type: "dialog"
