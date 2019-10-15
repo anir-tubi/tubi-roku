@@ -47,7 +47,7 @@
         itemSpacings="[108,148]">
 
       <MarkupList
-        numRows="2"
+        numRows="1"
         id="topItems"
         itemSize="[397, 70]"
         itemSpacing="[0,17]"
@@ -59,16 +59,12 @@
           <SideNavContentNode
             id="profile"
             iconUrl="pkg:/images/sideNavProfile.png"/>
-          <SideNavContentNode
-            id="kidsMode"
-            title="Kids"
-            iconUrl="pkg:/images/sideNavKids.png"/>
         </ContentNode>
       </MarkupList>
 
       <Group>
         <MarkupList
-          numRows="4"
+          numRows="5"
           id="mainItemsSelected"
           itemSize="[397, 70]"
           itemSpacing="[0,17]"
@@ -81,6 +77,8 @@
             <SideNavContentNode
               id="search-select"/>
             <SideNavContentNode
+              id="kidsMode-select"/>
+            <SideNavContentNode
               id="home-select"/>
             <SideNavContentNode
               id="categories-select"/>
@@ -89,7 +87,7 @@
           </ContentNode>
         </MarkupList>
         <MarkupList
-          numRows="4"
+          numRows="5"
           id="mainItems"
           itemSize="[397, 70]"
           itemSpacing="[0,17]"
@@ -103,6 +101,10 @@
               id="search"
               title="Search"
               iconUrl="pkg:/images/sideNavSearch.png"/>
+            <SideNavContentNode
+              id="kidsMode"
+              title="Kids"
+              iconUrl="pkg:/images/sideNavKids.png"/>
             <SideNavContentNode
               id="home"
               title="Home"

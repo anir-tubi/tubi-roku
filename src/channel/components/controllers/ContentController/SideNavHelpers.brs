@@ -162,30 +162,8 @@ Function onSideNavItemSelected()
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.search
       '//display the search
-      if m.kidsModeEnabled = true
-        bNewScreenCalledSuccess = false
-
-        dialogEvent = {
-          type: "dialog"
-          values: {
-            dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "EXIT_KIDS_MODE" when it is available in protos
-            pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
-            dialog_action: "SHOW"
-            dialog_sub_type: "kids-mode-search"
-          }
-        }
-
-        sTitle = "Search Disabled"
-        sDescription = "Please exit Tubi Kids to use this feature."
-        showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
-
-        ' reset the selected item indicator in the side nav to the current screen, since selecting search will set it to search
-        sideNavId = m.constants.ui.screenIdToSideNavId[currentScreenNow.id]
-        updateSideNavSelected(sideNavId)
-      else 
-        showSearchScreen(m.constants)
-        bNewScreenCalledSuccess = true
-      end if
+      showSearchScreen(m.constants)
+      bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.home
       showHomeScreen(m.constants, authInfo)
       bNewScreenCalledSuccess = true

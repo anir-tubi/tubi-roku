@@ -14,8 +14,7 @@ Function init()
   m.sideNavBackground = m.top.findNode("sideNavBackground")
 
   m.profileContent = m.TopContent.findNode("profile")
-  m.kidsModeContent = m.TopContent.findNode("kidsMode")
-  m.searchContent = m.MainContent.findNode("search")
+  m.kidsModeContent = m.MainContent.findNode("kidsMode")
   m.channelsContent = m.MainContent.findNode("channels")
   '// This is the item to focus on when the sidenav opens. This implies that this was the last item (that has an associated screen) selected 
   m.itemSelectedRemembered = invalid
@@ -97,32 +96,32 @@ Function onKidsModeValuesChanged()
     if sIconTitle <> ""
       m.kidsModeContent.title = sIconTitle
       m.kidsModeContent.turnedOn = bEnabled
-      nPreviouslyFocusedIndex = m.topItems.itemFocused
-      m.topItems.content = m.TopContent
-      if m.topItems.hasFocus() = true
+      nPreviouslyFocusedIndex = m.mainItems.itemFocused
+      m.mainItems.content = m.MainContent
+      if m.mainItems.hasFocus() = true
         '// If in focus, then set the focus back to the current item after the content has been reset
-        m.topItems.jumpToItem = nPreviouslyFocusedIndex
+        m.mainItems.jumpToItem = nPreviouslyFocusedIndex
       end if
     end if
     
-    '//::HARDCODE:: this page will disable or enable the search and channel icons based on kids mode = true. This component should not be smart like this but since this is a temporary thing, we can hardcode the component knowing what to do if this confition has been met.
-    m.searchContent.turnedOn = (m.top.kidsModeValues.on <> true)
+    '//::HARDCODE:: this page will disable or enable the channel icon based on kids mode = true. This component should not be smart like this but since this is a temporary thing, we can hardcode the component knowing what to do if this confition has been met.
     m.channelsContent.turnedOn = (m.top.kidsModeValues.on <> true)
     if m.top.kidsModeValues.on = true
       m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
     else
       m.sideNavBackground.uri = ""
     end if
-    nPreviouslyFocusedIndex = m.topItems.itemFocused
-    m.mainItems.content = m.MainContent
-    if m.mainItems.hasFocus() = true
-      '// If in focus, then set the focus back to the current item after the content has been reset
-      m.mainItems.jumpToItem = nPreviouslyFocusedIndex
-    end if
   else
     '//Remove kids mode if on is not true. For right now, don't worry about turning it back on
-    m.TopContent.removeChild(m.kidsModeContent)
-    m.topItems.content = m.TopContent
+    m.MainContent.removeChild(m.kidsModeContent)
+    mainContentKidsModeSelect = m.MainContentSelect.findNode("kidsMode-select")
+    m.MainContentSelect.removeChild(mainContentKidsModeSelect)
+
+    '//::NOTE:: This assumes that featureOn will be set to false at the beginning of the app, so 
+    '//   when that happens, we need to call focusItemInList() to reset the placement of the focus of the m.MainContentSelect list
+    if m.itemSelectedRemembered <> invalid
+      focusItemInList(m.mainItems, m.itemSelectedRemembered.id)
+    end if
   end if
 End Function
 
@@ -219,6 +218,7 @@ Function onItemRequested()
   if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and (m.itemSelectedRemembered = invalid or m.top.itemRequested <> m.itemSelectedRemembered.id)
     '//Go thru the lists and select the option that matches the itemRequested
     nIndexMain = focusItemInList(m.mainItems, m.top.itemRequested)
+
     if nIndexMain < 0
       if focusItemInList(m.bottomItems, m.top.itemRequested) < 0
         focusItemInList(m.topItems, m.top.itemRequested)
