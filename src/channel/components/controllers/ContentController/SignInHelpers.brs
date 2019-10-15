@@ -45,14 +45,13 @@ Function onAuthInfoReceived()
   m.global.historyIds = m.authTask.history
 
   registryKidsMode = false
-  if m.authTask.kidsMode <> invalid
-    registryKidsMode = m.authTask.kidsMode.enabled
+  if m.authTask.kidsMode <> invalid and m.authTask.kidsMode.kidsEnabled <> invalid
+    registryKidsMode = m.authTask.kidsMode.kidsEnabled
   end if
 
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
-
 
   ' Here we notify screens that may exist, though we try to keep context
   '

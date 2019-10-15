@@ -11,7 +11,7 @@ Function showHomeScreen(constants, authInfo)
     homeScreen = CreateObject("roSGNode", "HomeScreen")
     homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-    homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategoriesChanged")
+    homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
     
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("firstPosterLoaded", "onFirstPosterLoaded")
@@ -42,8 +42,8 @@ End Function
 
 
 ' load all category content, including . Series do not have season or episode information though.
-Function onLoadAllCategoriesChanged(msg)
-  tubiLog("HomeScreenHelpers.onLoadAllCategoriesChanged")
+Function onLoadAllCategories(msg)
+  tubiLog("HomeScreenHelpers.onLoadAllCategories")
   homeScreen = msg.getRoSGNode()
   ' This check causes all category fetches to be skipped prior to the field
   ' being set to true.  Then, once true it will reload any time loadCategories() is

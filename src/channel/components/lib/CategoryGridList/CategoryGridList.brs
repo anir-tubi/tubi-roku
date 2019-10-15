@@ -319,6 +319,7 @@ Function onRowItemFocused()
   end if
 End Function
 
+
 '''''''''''''''
 ' onRowListItemDebounce - RowList.rowItemFocus debounce handler
 Function onRowListItemDebounce()
@@ -449,7 +450,6 @@ Function mergeMetadata(fetched)
       if m.RowList.rowItemFocused[1] = -1
         item = 0
       end if
-      m.RowList.jumpToRowItem = [index, item]
     end if
 
     return index

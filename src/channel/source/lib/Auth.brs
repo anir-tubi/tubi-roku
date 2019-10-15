@@ -101,14 +101,22 @@ Function tubiAuth_getKidsMode()
   kidsMode = m.regRead("kidsMode", m.kidsModeRegSection)
   if kidsMode <> invalid
     returnKidsMode = ParseJson(kidsMode)
-  else 
-    '//To future proof the kidsMode variable, we're placing the boolean into an associative array instead of passing it directly - just in case we want to start saving nore info with the on state
-    returnKidsMode = {enabled: false}
+  else
+    'Return a default in case there is nothing in the kidsMode registry section
+    returnKidsMode = {kidsEnabled: false}
   end if
   return returnKidsMode
 End Function
 
-'save the passed value to device memory as the kids mode object
+
+' save the passed value to device memory as the kids mode object
+' To future proof the kidsMode variable, we're placing the boolean into an associative array instead of passing it directly,
+' just in case we want to start saving more info with the on state.
+'
+' @kidsModeObject: assocArray, has the following form:
+'                 {
+'                   kidsenabled: <boolean>
+'                 }
 Function tubiAuth_setKidsMode(kidsModeObject)
     sJson = FormatJson(kidsModeObject)
     m.regWrite("kidsMode", sJson, m.kidsModeRegSection)

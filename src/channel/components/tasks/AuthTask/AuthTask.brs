@@ -2,6 +2,7 @@ Function init()
   m.top.functionName = "execInitializeUserData"
 End Function
 
+
 '''''''''
 ' Synchronously load auth info, followed by loading of user categories (if user is logged in)
 Function execInitializeUserData()
@@ -48,7 +49,7 @@ End Function
 Function saveKidsModeToMemory()
   tubiLog("AuthTask.saveKidsModeToMemory")
     kidsModeObject = {
-      enabled: m.top.isKidsMode
+      kidsEnabled: m.top.isKidsMode
     }
     constants = m.global.constants 'single thread-local reference to avoid thread rendevue
     Request = TubiRequest()
@@ -73,6 +74,7 @@ Function execSignOut()
 
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
+  m.top.kidsMode = Auth.getKidsMode()
   m.top.authInfo = invalid
 End Function
 

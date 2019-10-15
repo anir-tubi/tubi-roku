@@ -88,7 +88,7 @@ End Function
 
 ' Log the user out, update screens
 function onSignOutModalSelected()
-  tubiLog("ContentController.onSignOutModalSelected")
+  tubiLog("SettingsScreenHelpers.onSignOutModalSelected")
   ' flush the screenstack in any case where the user has successfully
   ' gone through the sign-in.  If they 'back' out of it, the screen
   ' stack will stay intact and this function will not be called

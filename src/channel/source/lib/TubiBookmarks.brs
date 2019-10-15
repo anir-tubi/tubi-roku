@@ -378,6 +378,7 @@ function tubiBookmarks_handleUserInfo(userInfo)
   return result
 end function
 
+
 function tubiBookmarks_updateParentalRatingReq(newRating, password)
   authInfo = m.auth.getAuthInfo()
   if authInfo = invalid or authInfo.accessToken = invalid

@@ -14,7 +14,7 @@ Function init()
 
   ' initialize states needed for various parts of kids mode
   m.kidsModeEnabled = false  'is the kids mode UI visible
-  m.kidsModeFeatureOn = false   'Should the kids Mode feature be visible to the use?
+  m.kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
   if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
     m.kidsModeFeatureOn = true
   end if
@@ -57,8 +57,6 @@ Function init()
   '       places that need authInfo don't need to reference m.global.
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid  ' indicates not logged in
-  m.global.observeFieldScoped("authInfo", "onAuthInfoChanged")
-  m.authInfo = m.global.authInfo '//Local version of m.global.authInfo. This way we are sure we always have access to authInfo
 
   m.authInfoReceived = false    'is the auth info returned from the registry
   m.authInfoRefreshed = true    'is the auth info refreshed after receiving a deeplink with a refresh token
@@ -116,13 +114,6 @@ Function init()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
-End Function
-
-
-' Get a local version of m.global.authInfo since using a local variable has been found to be more reliable 
-Function onAuthInfoChanged(msg)
-  tubiLog("ContentController.onAuthInfoChanged")
-  m.authInfo = msg.getData()  'should be m.global.authInfo
 End Function
 
 
@@ -779,11 +770,13 @@ Function tellScreensIfKidsModeBeSentToServer()
   m.videoPlayer.shouldKidsModeBeSentToServer = bKidsMode
 End Function
 
+
 Function isKidsModeEnabledByParentalControls() as Boolean
   tubiLog("ContentController.isKidsModeEnabledByParentalControls")
   bEnabled = false
-  if m.authInfo <> invalid and m.authInfo.parentalrating <> invalid
-    if m.authInfo.parentalrating < 2
+
+  if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
+    if m.global.authInfo.parentalrating < 2
       bEnabled = true
     end if
   end if

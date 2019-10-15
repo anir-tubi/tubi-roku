@@ -253,7 +253,7 @@ Function enableKidsModeFromSideNav(bEnable = true)
   if bEnable = true
     if screen <> invalid and (screen.id = m.constants.ui.screenIds.searchScreen or screen.id = m.constants.ui.screenIds.channelListScreen)
       '//If the current screen is one of the pages that should be disabled during kids mode, then take user to homescreen    
-      showHomeScreen(m.constants, m.authInfo)
+      showHomeScreen(m.constants, m.global.authInfo)
 
       homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
       focusSideNavOption(homeSideNavID)

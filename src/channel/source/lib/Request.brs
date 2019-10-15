@@ -99,7 +99,6 @@ End Function
 '     events will be sent to the roMessagePort provided.
 '
 Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
-
   isRetry = false
   if m.urltransfer <> invalid
     isRetry = true
