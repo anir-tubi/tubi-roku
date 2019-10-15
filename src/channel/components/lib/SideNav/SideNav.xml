@@ -75,9 +75,9 @@
           itemComponentName="SideNavIconComponent">  
           <ContentNode id="MainContent-select" role="content" >
             <SideNavContentNode
-              id="search-select"/>
-            <SideNavContentNode
               id="kidsMode-select"/>
+            <SideNavContentNode
+              id="search-select"/>
             <SideNavContentNode
               id="home-select"/>
             <SideNavContentNode
@@ -98,13 +98,13 @@
           itemComponentName="SideNavIconComponent">  
           <ContentNode id="MainContent" role="content" >
             <SideNavContentNode
-              id="search"
-              title="Search"
-              iconUrl="pkg:/images/sideNavSearch.png"/>
-            <SideNavContentNode
               id="kidsMode"
               title="Kids"
               iconUrl="pkg:/images/sideNavKids.png"/>
+            <SideNavContentNode
+              id="search"
+              title="Search"
+              iconUrl="pkg:/images/sideNavSearch.png"/>
             <SideNavContentNode
               id="home"
               title="Home"
