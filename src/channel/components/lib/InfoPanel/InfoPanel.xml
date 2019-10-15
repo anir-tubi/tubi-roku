@@ -64,7 +64,7 @@
     <field id="maxTitleLines" alias="Title.maxLines"/>
     <field id="numTitleLines" alias="Title.numLines"/>
     <field id="titleFontSize" alias="TitleFont.size"/>
-    <field id="width" type="float" value="875" />
+    <field id="width" type="float" value="1090" />
     <field id="ratingVisible" alias="Rating.visible"/>
 
     <!-- OUTPUTS -->
@@ -95,7 +95,7 @@
           loadDisplayMode="scaleToFit" />
         <Label
           id="Title"
-          width="875"
+          width="1090"
           height="80"
           wrap="true"
           maxLines="1"
@@ -199,7 +199,7 @@
         <Label
           id="Line2"
           opacity="0.5"
-          width="875"
+          width="1090"
           ellipsizeOnBoundary="true">
           <Font
             role="font"
@@ -214,12 +214,12 @@
         <Poster
           id="DescriptionFocusButton"
           uri="pkg:/images/menu-focus-fhd.9.png"
-          width="875"
+          width="1090"
           height="300"
           visible="false"/>
         <Label
           id="Description"
-          width="875"
+          width="1090"
           lineSpacing="16"
           maxLines="5"
           wrap="true"
