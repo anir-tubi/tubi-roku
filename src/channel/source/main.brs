@@ -153,6 +153,7 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
             sgGlobal.setField("theme", starterController.newBuildConstants.ui.themes.default)
           end if
 
+          componentsLoaded = true
           loadPackagedComponents(tubiScene, port, startupArgs)
         end if
       else if msg.GetField() = "remoteComponentsUrl"
@@ -177,7 +178,6 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
 
     ' handle starterComponents and remoteComponents timeouts
     if componentsLoaded = false and componentTimer <> invalid and componentTimer.totalMilliseconds() > 30000
-    ' if componentsLoaded = false and componentTimer <> invalid and componentTimer.totalMilliseconds() > 3000
       if retries < maxRetries
         retries += 1
         componentTimer.mark()
