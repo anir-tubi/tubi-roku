@@ -113,40 +113,46 @@ Function onItemFocused()
     content = category.getChild(item) 'contentNode
     numColumns = m.VideoGrid.numColumns
 
-    ' Update the info panel
-    populateInfoPanel(m.InfoPanel, content, "item")
+    if content <> invalid
+      ' Update the info panel
+      populateInfoPanel(m.InfoPanel, content, "item")
 
 
-    ' Update the background image
-    if type(content.backgrounds) = "roArray" and content.backgrounds.count() > 0
-      m.top.backgroundUriList = content.backgrounds
+      ' Update the background image
+      if type(content.backgrounds) = "roArray" and content.backgrounds.count() > 0
+        m.top.backgroundUriList = content.backgrounds
+      else
+        m.top.backgroundUriList = [m.defaultBackgroundUri]
+      end if
+      if m.contentLoadedAndFocused = true
+        '//Do not send out tracking when the grid is initially loaded. When an item 1st gain focus, this indocates that the grid was just loaded.
+        ' Update the tracking info.
+        trackingPageInfo = createTrackingPageInfo(category)
+        m.top.trackingPageInfo = trackingPageInfo
+
+        ' trigger navigate_within_page events in ContentController
+        col = 1 + (item MOD numColumns)
+        row = 1 + (item \ numColumns)
+
+        m.top.navigateWithinPageInfo = {
+          pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+          componentOneof: m.Tracking.getAnalyticsComponent("category_component", m.oldCategoryComponent)
+          means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+          vertical_location: row '1 based index
+          vertical_location_mode: "INDEX"  'LocationMode enum
+          horizontal_location: col
+          horizontal_location_mode: "INDEX"  'LocationMode enum
+        }
+        
+        m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
+      else
+        m.contentLoadedAndFocused = true
+        m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
+      end if
     else
-      m.top.backgroundUriList = [m.defaultBackgroundUri]
-    end if
-    if m.contentLoadedAndFocused = true
-      '//Do not send out tracking when the grid is initially loaded. When an item 1st gain focus, this indocates that the grid was just loaded.
-      ' Update the tracking info.
-      trackingPageInfo = createTrackingPageInfo(category)
-      m.top.trackingPageInfo = trackingPageInfo
-
-      ' trigger navigate_within_page events in ContentController
-      col = 1 + (item MOD numColumns)
-      row = 1 + (item \ numColumns)
-
-      m.top.navigateWithinPageInfo = {
-        pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
-        componentOneof: m.Tracking.getAnalyticsComponent("category_component", m.oldCategoryComponent)
-        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-        vertical_location: row '1 based index
-        vertical_location_mode: "INDEX"  'LocationMode enum
-        horizontal_location: col
-        horizontal_location_mode: "INDEX"  'LocationMode enum
-      }
-      
-      m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
-    else
-      m.contentLoadedAndFocused = true
-      m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
+      '//if content is not valid, then we should refresh the screen. 
+      '//Most likely what happened is that the content was modified while the screen is off screen: i.e. ContinuedWatching screen no lomnger has any content so refreshing the page will most likely result in a content error.
+      m.top.refreshChannel = true
     end if
   end if
 End Function

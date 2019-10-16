@@ -112,6 +112,9 @@ Function showChannelContentError(msg, bContentEmptyError = false)
     ' Screen is created/pushed in showChannelScreen, since there is no content, remove it.
     ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
     ' sent in the case of an error.
+    ' 
+    ' If topScreen.id does not = the ID of a channelDetailScreen, then we know that the current screen is not being displayed
+    ' So hold off on removing the screen and displaying an error. When the user traverses the navigation stack, then it will eventiually reveal this screen and if there is still no content, then it will display an error then.
     popScreen(false)
     errorCode = getUserFacingErrorCode(m.global.constants.errors.context.channelScreen, m.constants.errors.subtypes.fetchError, errorInfo.code)
 
@@ -135,17 +138,6 @@ Function showChannelContentError(msg, bContentEmptyError = false)
     showErrorModal(modalInfo)
   end if
 
-  loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
-  screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
-
-  modalInfo = {
-    title: sErrorTitle
-    message: getErrorMessage(sErrorMessage, errorCode)
-    openTrackEvent: dialogEvent
-    trackingTask: m.trackingLoggingTask
-  }
-
-  showErrorModal(modalInfo)
   loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
   screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
 

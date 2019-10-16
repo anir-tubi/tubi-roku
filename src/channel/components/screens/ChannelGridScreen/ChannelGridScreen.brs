@@ -155,7 +155,7 @@ End Function
 
 
 Function onItemFocused()
-  tubiLog("ChannelDetailScreen.onItemFocused")
+  tubiLog("ChannelGridScreen.onItemFocused")
   if m.top.content <> invalid
     item = m.ChannelCategoryGrid.itemFocused
     numColumns = m.ChannelCategoryGrid.numColumns
