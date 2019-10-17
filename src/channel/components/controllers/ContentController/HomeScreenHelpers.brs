@@ -82,6 +82,12 @@ Function onHomescreenResponse()
         ' </CategoryContentNode>
         homeScreen.content = m.top.homescreenResponse.convertedMetadata
         homeScreen.contentUpdated = true
+        homeScreen.isLoading = false
+
+        ' don't set focus on the home screen if side nav has focus, for example
+        if homeScreen.isInFocusChain() = true
+          homeScreen.setFocus(true)
+        end if
       else
         ' if we were loading in the background, don't show an error modal
         if homeScreen.isInFocusChain()

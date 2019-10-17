@@ -25,10 +25,10 @@
       <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
       
       <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
-      <field id="content" type="node"/>
+      <field id="content" alias="CategoryGridList.content" />
 
       <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
-      <field id="contentUpdated" type="boolean"  alwaysNotify="true"/>
+      <field id="contentUpdated" alias="CategoryGridList.contentUpdated" />
       
       <!-- hides or shows the loading spinner and removes any existing content on the CategoryGridList! -->
       <field id="isLoading" type="boolean" />

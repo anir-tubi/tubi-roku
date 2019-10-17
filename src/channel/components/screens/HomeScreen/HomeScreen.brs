@@ -20,7 +20,6 @@ Function init()
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.top.observeField("enabled", "onEnableChange")
   m.top.observeField("isLoading", "onLoadingChange")
-  m.top.observeField("contentUpdated", "onCategoryContentUpdated")
 
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -32,6 +31,7 @@ Function init()
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("categoryTotalCounts", "onTotalCountsChange")
+  m.CategoryGridList.observeField("reloadedItemToBeFocused", "onItemToBeFocusedChange")
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
@@ -55,44 +55,8 @@ Function onLoadingChange()
   m.CategoryGridList.visible = bLoaded
   if m.top.isLoading = true
     m.CategoryGridList.content = invalid
-  end if
-  m.InfoPanel.visible = bLoaded
-End Function
-
-
-Function onCategoryContentUpdated()
-  m.InfoPanel.mode = "category"
-  if m.top.content <> invalid
-    populateInfoWithFirstItem(m.top.content)
-  end if
-  m.CategoryGridList.content = m.top.content  ' should be all categories with initial amounts of content in them
-  m.top.isLoading = false
-End Function
-
-
-''''''''''''''''''''''''''''
-' populateInfoWithFirstItem
-'
-' When the content first loads, this is called to ensure the 1st item populates the info panel. 
-' If this function were not called and the homescreen lost focus (i.e. side menu gained focus) then the info panel would be vacant.
-Function populateInfoWithFirstItem(categoryContent)
-  contentId = invalid
-  if categoryContent <> invalid
-    category = categoryContent.getChild(0)
-    if category <> invalid
-      content = category.getChild(0)
-      if content <> invalid
-        contentId = content.id
-      end if
-    end if
-    if contentId <> invalid and contentId <> ""
-      metadataTranslate = TubiMetadataTranslate(m.constants)
-      item = metadataTranslate.getContentFromCategoryJson(category, contentId)
-      populateInfoPanel("item", item)
-      if item <> invalid
-        m.top.backgroundUriList = determineBackgroundImage(item)
-      end if
-    end if
+    emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
+    populateInfoPanel("item", emptyContentNode) 'empties the info panel
   end if
 End Function
 
@@ -285,6 +249,7 @@ Function onGridFocusChange() As Void
   m.gridHasFocus = true
 End Function
 
+
 Function onGridItemSelected() As Void
   tubiLog("HomeScreen.onGridItemSelected")
   if m.top.isLoading <> true
@@ -325,6 +290,12 @@ Function onTotalCountsChange(msg)
   end for
 
   m.CategoryGridList.content = m.top.content
+End Function
+
+
+' Is called when CategoryGridList has content loaded but did not gain focus, so we need to update the infoPanel
+Function onItemToBeFocusedChange()
+  populateInfoPanel("item", m.CategoryGridList.reloadedItemToBeFocused)
 End Function
 
 

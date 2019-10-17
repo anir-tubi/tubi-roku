@@ -5,7 +5,7 @@ Function init()
 
   m.top.observeField("metadataFetchTaskBatch", "onMetadataFetchTaskBatchResponse")
   m.top.observeField("focusedChild", "onComponentFocusChange")
-  m.top.observeField("content", "onContentChange")
+  m.top.observeField("contentUpdated", "onContentChange")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeField("rowItemFocused", "onRowItemFocused")
@@ -36,24 +36,6 @@ Function init()
     m.RowList.itemComponentName = ""
   end if
 
-  ' The content that actually populates the RowList.  Cloned from m.top so that we have a local tree we can modify
-  ' Content should be structured as:
-  ' <CategoryContentNode>
-  '   <CategoryContentNode title="category1" />
-  '     <ContentNode title="item1" />
-  '     <ContentNode title="item2" />
-  '   <CategoryContentNode title="category2" />
-  '     <ContentNode title="item3" />
-  '     <ContentNode title="item4" />
-  '   <CategoryContentNode title="category3" />
-  '   ...
-  ' </CategoryContentNode>
-  m.internalContent = invalid
-
-  ' A stashed reference to m.top.content.  We call observeField on m.top.content so if it changes, we'll need a
-  ' reference to the old value so we can unobserve it.
-  m.lastContent = invalid
-
   if m.constants.deviceInfo.scaledUi = true then
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
@@ -75,71 +57,11 @@ End Function
 '
 Function onComponentFocusChange()
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
-  if m.top.hasFocus() then
-    m.justGainedFocus = true
-    m.RowList.setFocus(true)
-  end if
-End Function
-
-
-Function onContentModify(message)
-  change = message.GetData()
-  tubiLog("CategoryGridList.onContentModify operation = " + change.operation)
-  rowItemFocused = m.RowList.rowItemFocused
-  if change.operation = "insert" or change.operation = "add"
-    ' insert - A child node was inserted at change.index1
-    ' add - A child node was added to the end of the children node tree (at change.index1)
-    if m.top.content <> invalid
-      new = m.top.content.getChild(change.index1).clone(true)
-      ' NOTE!: There is a bug internal to RowList caused by inserting a child content node,
-      ' causing it to create a whole bunch of new components and crash low-end devices.  Here we avoid this
-      ' by removing the content first before manipulating it.  In the end the RowList doesn't destroy
-      ' the rowItemComponent items when content is set to invalid, so this has almost no overhead.
-      m.RowList.content = invalid  ' temporarily
-      m.internalContent.insertChild(new, change.index1)
-      m.RowList.content = m.internalContent
-      ' RowList doesn't update the focus row automatically so we do it here to keep cursor at the same spot
-      if rowItemFocused[0] <> invalid and rowItemFocused[0] <> -1 and change.index1 <= rowItemFocused[0]
-        rowItemFocused[0] = rowItemFocused[0] + 1
-        m.RowList.jumpToRowItem = rowItemFocused
-      end if
+  if m.top.hasFocus()
+    if resolveAbbreviatedContent(m.RowList.rowItemFocused) <> invalid
+      m.justGainedFocus = true
+      m.RowList.setFocus(true)
     end if
-  else if change.operation = "remove"
-    ' remove - A child node was removed from position change.index1, and if change.index2>change.index1, all the children
-    ' nodes between change.index1 and change.index2 inclusive were removed
-    if m.internalContent <> invalid
-      removed = m.internalContent.getChildren(change.index2-change.index1+1, change.index1)
-      m.internalContent.removeChildrenIndex(change.index2-change.index1+1, change.index1)
-      if rowItemFocused[0] <> invalid and rowItemFocused[0] <> -1 and change.index1 < rowItemFocused[0]
-        rowItemFocused[0] = rowItemFocused[0] - 1
-        m.RowList.jumpToRowItem = rowItemFocused
-      end if
-    end if
-  else if change.operation = "set"
-    if m.top.content <> invalid
-      ' The child node at position change.index1 was replaced with a new child node
-      new = m.top.content.getChild(change.index1).clone(true)
-      m.internalContent.replaceChild(new, change.index1)
-      m.Rowlist.content = invalid
-      m.Rowlist.content = m.internalContent
-      m.RowList.jumpToRowItem = rowItemFocused
-    end if
-  else if change.operation = "clear" or change.operation = "setall"
-    ' clear - All the children nodes were removed
-    ' setall - All the children nodes were replaced
-    return onContentChange()  ' reset the entire cache
-  else if change.operation = "move"
-    ' move - The child node at position change.index1 was moved to the new position change.index2
-    m.internalContent.insertChild(m.internalContent.getChild(index1), index2)
-  else if change.operation = "modify"
-    ' modify - A pre-defined content meta-data field of a ContentNode node child at change.index1  was
-    '          changed (only set for ContentNode node children when a pre-defined content meta-data
-    '          field changes)
-    ' NOTE: ignored for CategoryGridList
-  end if
-
-  if rowItemFocused[0] <> invalid
-    loadCategories(rowItemFocused[0])
   end if
 End Function
 
@@ -148,26 +70,24 @@ Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
   if m.top.content = invalid
     m.RowList.content = invalid
-    m.lastContent = invalid
-    m.internalContent = invalid
   ' This is a verbose check that makes sure we only refresh the whole RowList content if the root node is different
-  else if not m.top.content.isSameNode(m.lastContent) or (m.lastContent <> invalid and not m.lastContent.isSameNode(m.top.content)) then
+  else
     ' Setting RowList invalid here will empty the grid.  It will be set after the first batch of
     ' metadata is received.  Setting RowList.content with a few full categories will cause it to prefetch
     ' posters and do a nice fade-in.
     m.RowList.content = invalid
-    if m.lastContent <> invalid then
-      m.lastContent.unobserveField("change")
-    end if
-    m.lastContent = m.top.content
     if m.top.content <> invalid then
-      ' Clone here since we are replacing nodes within the category tree
-      m.internalContent = m.top.content.clone(true)
-      m.RowList.content = m.internalContent
+      m.RowList.content = m.top.content
+
+      itemFocused = [1, 1]
+      if resolveAbbreviatedContent(itemFocused) <> invalid
+        ' set focus for high spec models that already have categories with content from the matrix/homescreen response
+        setRowListFocus()  'only happens if m.top has focus, ie. when the app is launched or signin/signout
+      end if
+
       'At this point, there is a limited set (as defined in constants) of content in each category.
       'loadCategories will get the rest of the content for each category.
       loadCategories(0)
-      m.top.content.observeField("change", "onContentModify")
     end if
   end if
 End Function
@@ -201,7 +121,7 @@ End Function
 ' Load the current category and its adjacent categories
 Function loadCategories(index) As Void
   tubiLog("CategoryGridList.loadCategories")
-  if m.internalContent = invalid or index < 0 then
+  if m.top.content = invalid or index < 0 then
     return
   end if
 
@@ -211,7 +131,7 @@ Function loadCategories(index) As Void
   if windowInfo <> invalid
     'Create requests for each category in the window
     for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
-      category = m.internalContent.getChild(i)
+      category = m.top.content.getChild(i)
       if category <> invalid
         request = invalid
         if category.state = "partial" or category.state = "none"
@@ -236,7 +156,7 @@ End Function
 'Returns an assocArray with the keys: "start", "size"
 '@index: integer, the index of the category within the category grid
 Function getWindowInfo(index)
-  currentCategory = m.internalContent.getChild(index)
+  currentCategory = m.top.content.getChild(index)
   if currentCategory <> invalid
     currentWindowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
     windowSize = m.categoryWindowSize
@@ -267,9 +187,9 @@ End Function
 ' @rowItemIndex is 2D array of [rowindex, itemindex] from RowList.rowItemSelected or m.RowList.rowItemFocused
 Function resolveAbbreviatedContent(rowItemIndex)
   tubiLog("CategoryGridList.resolveAbbreviatedContent")
-  if m.internalContent <> invalid
+  if m.top.content <> invalid and rowItemIndex[0] <> invalid and rowItemIndex[1] <> invalid
     contentId = invalid
-    category = m.internalContent.getChild(rowItemIndex[0])
+    category = m.top.content.getChild(rowItemIndex[0])
     if category <> invalid
       content = category.getChild(rowItemIndex[1])
       if content <> invalid
@@ -288,7 +208,7 @@ End Function
 ' onRowItemSelected - RowList.rowItemSelected event handler, triggered when user presses "OK"
 Function onRowItemSelected()
   tubiLog("CategoryGridList.onRowItemSelected")
-  category = m.internalContent.getChild(m.RowList.rowItemSelected[0])
+  category = m.top.content.getChild(m.RowList.rowItemSelected[0])
   if category <> invalid
     m.top.oldCategoryId = m.top.currCategoryId
     m.top.currCategoryId = category.id
@@ -305,14 +225,13 @@ End Function
 ' onRowItemFocused - RowList.rowItemFocused event handler.  To reduce jank we debounce these events
 Function onRowItemFocused()
   tubiLog("CategoryGridList.onRowItemFocused")
-
   if m.justGainedFocus
     onRowListItemDebounce()
     m.justGainedFocus = false
   else
     m.RowListItemDebounce.control = "start"
     ' immediately update the position counter
-    category = m.internalContent.getChild(m.RowList.rowItemFocused[0])
+    category = m.top.content.getChild(m.RowList.rowItemFocused[0])
     if category <> invalid then
       category.focusIndex = m.RowList.rowItemFocused[1]
     end if
@@ -324,13 +243,17 @@ End Function
 ' onRowListItemDebounce - RowList.rowItemFocus debounce handler
 Function onRowListItemDebounce()
   tubiLog("CategoryGridList.onRowListItemDebounce")
-  category = m.internalContent.getChild(m.RowList.rowItemFocused[0])
-  if category <> invalid
-    m.top.oldCategoryId = m.top.currCategoryId
-    m.top.currCategoryId = category.id
+  if m.top.content <> invalid
+    category = m.top.content.getChild(m.RowList.rowItemFocused[0])
+
+    if category <> invalid
+      m.top.oldCategoryId = m.top.currCategoryId
+      m.top.currCategoryId = category.id
+    end if
   end if
 
   itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
+
   if itemFocused <> invalid
     m.top.oldCursorPosition = m.top.cursorPosition
     m.top.cursorPosition = m.RowList.rowItemFocused
@@ -348,6 +271,7 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
   m.top.firstPosterLoaded = true
 
   responses = message.GetData()
+  shouldInformHomeScreen = false
   removableCategories = {}
   if responses <> invalid
     batchMaxIndex = 0
@@ -358,6 +282,11 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
         'it works but is not best practice
         'categories with index = -1 means they have no content and should be removed
         removableCategories[requestId] = true
+      else if index = 0
+        ' index is 0 for the top most category in the homescreen grid. LimitedUI models do not start out with any
+        ' content in their categories, and we must inform the homescreen that content has arrived so that it may
+        ' populate the info panel
+        shouldInformHomeScreen = true
       end if
       if index > batchMaxIndex
         batchMaxIndex = index
@@ -370,7 +299,15 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
 
     ' Delayed setting of Rowlist content until first batch arrives
     if m.RowList.content = invalid then
-      m.RowList.content = m.internalContent
+      m.RowList.content = m.top.content
+    end if
+
+    ' inform home screen of first content after content has been set on RowList
+    if shouldInformHomeScreen = true
+      ' set focus once we have content to focus on.
+      ' will only affect limitedUI models as high spec models will set focus on m.RowList when m.top gains focus
+      ' because their homescreen response contains content in it, but limiteUI models homescreen responses don't.
+      setRowListFocus()   'only happens if m.top has focus, ie. when the app is launched or signin/signout
     end if
 
     ' free references to the batch so that it can be garbage collected
@@ -378,8 +315,8 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
   end if
 
   counts = []
-  if m.internalContent <> invalid
-    children = m.internalContent.getChildren(m.internalContent.getChildCount(), 0)
+  if m.top.content <> invalid
+    children = m.top.content.getChildren(m.top.content.getChildCount(), 0)
     for each child in children
       if removableCategories[child.id] = true
         counts.push(-1)
@@ -419,8 +356,8 @@ Function mergeMetadata(fetched)
   tubiLog("Received response for request id " + fetched.id)
   index = -1
   categories = invalid
-  if m.internalContent <> invalid
-    categories = m.internalContent.getChildren(m.internalContent.getChildCount(), 0)
+  if m.top.content <> invalid
+    categories = m.top.content.getChildren(m.top.content.getChildCount(), 0)
   end if
   if categories <> invalid and newContent.id <> invalid
     for i=0 to categories.count()-1
@@ -429,7 +366,11 @@ Function mergeMetadata(fetched)
         exit for
       end if
     end for
-    parentCategory = m.internalContent.getChild(index)
+
+    parentCategory = invalid
+    if m.top.content <> invalid
+      parentCategory = m.top.content.getChild(index)
+    end if
 
     ' Check if a response arrives but the cache has been flushed and categories moved, such as adding or removing user categories
     if parentCategory = invalid then
@@ -440,18 +381,7 @@ Function mergeMetadata(fetched)
     newContent.state = "loaded"
 
     'Add the existing preliminarily loaded contents to the newly received contents
-    m.internalContent.replaceChild(newContent, index)
-
-    ' If RowList gets content for a focused row, it doesn't automatically emit rowItemFocused so we manually handle that here
-    if index = m.RowList.rowItemFocused[0] then
-      'in the case of deleting a content from a user cateogry, we want to refocus on the next item in the category
-      item = m.RowList.rowItemFocused[1]
-      'in the case that the focused row was previously empty, make sure we focus on the first item
-      if m.RowList.rowItemFocused[1] = -1
-        item = 0
-      end if
-    end if
-
+    m.top.content.replaceChild(newContent, index)
     return index
   else
     return -1
@@ -498,4 +428,24 @@ Function getFullCategoryId(category)
     end if
   end if
   return categoryId
+End Function
+
+
+' Sets focus on the rowlist, but only if the m.top has focus.
+' This function is called when content has been loaded on the RowList and the RowList is ready to accept focus.
+' In some cases where side nav or other components have focus, we don't want to set focus on the RowList however.
+' Setting focus on RowList triggers an update to itemFocused which Homescreen.brs listens to in order to update
+' the info panel. In the case that we do not want set focus on the RowList, we still need to let Homescreen.brs that
+' that content has loaded so it can update the infoPanel.
+Function setRowListFocus()
+  if m.top.hasFocus()
+    ' Mark the first poster loaded - as this field is not alwaysNotify = true,
+    ' this will only be registered the first time content is received.
+    m.top.firstPosterLoaded = true
+    m.justGainedFocus = true
+    m.RowList.setFocus(true)
+  else
+    topLeftIndex = [0, 0]
+    m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(topLeftIndex)
+  end if
 End Function
