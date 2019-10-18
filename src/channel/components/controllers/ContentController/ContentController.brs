@@ -978,8 +978,6 @@ Function onFirstPosterLoaded()
     model: m.constants.deviceInfo.model
   }
   tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load")   'send info to server
-
-  fireAppLoadBeacon() 'fires only as necessary (once per session)
 End Function
 
 
@@ -1083,14 +1081,4 @@ Function onSendYouboraError()
       "errorCode": m.videoplayer.videoErrorCode.ToStr()
     }
   }
-End Function
-
-
-' fires a beacon which roku uses to determine the app load time only once per session. See:
-' https://developer.roku.com/en-gb/docs/developer-program/performance-guide/measuring-channel-performance.md
-Function fireAppLoadBeacon()
-  if m.appLoadedBeaconFired = false
-    m.appLoadedBeaconFired = true
-    m.top.signalBeacon("AppLaunchComplete")
-  end if
 End Function

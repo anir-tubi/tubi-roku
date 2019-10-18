@@ -443,9 +443,20 @@ Function setRowListFocus()
     ' this will only be registered the first time content is received.
     m.top.firstPosterLoaded = true
     m.justGainedFocus = true
+    fireAppLoadBeacon()
     m.RowList.setFocus(true)
   else
     topLeftIndex = [0, 0]
     m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(topLeftIndex)
+  end if
+End Function
+
+
+' fires a beacon which roku uses to determine the app load time only once per session. See:
+' https://developer.roku.com/en-gb/docs/developer-program/performance-guide/measuring-channel-performance.md
+Function fireAppLoadBeacon()
+  if m.appLoadedBeaconFired = false
+    m.appLoadedBeaconFired = true
+    m.top.signalBeacon("AppLaunchComplete")
   end if
 End Function
