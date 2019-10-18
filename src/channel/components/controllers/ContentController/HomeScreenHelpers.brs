@@ -15,6 +15,7 @@ Function showHomeScreen(constants, authInfo)
     
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("firstPosterLoaded", "onFirstPosterLoaded")
+    homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
     m.top.observeField("homescreenResponse", "onHomescreenResponse")
     
     homeScreen.id = constants.ui.screenIds.homeScreen
@@ -82,7 +83,6 @@ Function onHomescreenResponse()
         ' </CategoryContentNode>
         homeScreen.content = m.top.homescreenResponse.convertedMetadata
         homeScreen.contentUpdated = true
-        homeScreen.isLoading = false
 
         ' don't set focus on the home screen if side nav has focus, for example
         if homeScreen.isInFocusChain() = true
@@ -142,5 +142,11 @@ Function onContentSelected(msg)
   else
     showDetailScreen(content)
   end if
+End Function
+
+
+Function onHomescreenContentReady(msg)
+  homescreen = msg.getRoSGNode()
+  homeScreen.isLoading = false
 End Function
 

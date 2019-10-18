@@ -63,6 +63,9 @@
       <!-- triggered once the first CategoryGridList content is loaded -->
       <field id="firstPosterLoaded" alias="CategoryGridList.firstPosterLoaded"/>
 
+      <!-- content on the homescreen is loaded and spinner can be turned off -->
+      <field id="contentReady" type="boolean" alwaysNotify="true" />
+
       <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
 
       <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />

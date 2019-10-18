@@ -205,6 +205,8 @@ End Function
 ' On grid focus change, update the info panel
 Function onGridFocusChange() As Void
   tubiLog("HomeScreen.onGridFocusChange")
+  m.top.contentReady = true
+
   if not m.CategoryGridList.isInFocusChain() or m.top.isLoading = true then return
 
   oldFocusedContent = m.CategoryGridList.oldItemFocused
@@ -295,6 +297,7 @@ End Function
 
 ' Is called when CategoryGridList has content loaded but did not gain focus, so we need to update the infoPanel
 Function onItemToBeFocusedChange()
+  m.top.contentReady = true
   populateInfoPanel("item", m.CategoryGridList.reloadedItemToBeFocused)
 End Function
 
