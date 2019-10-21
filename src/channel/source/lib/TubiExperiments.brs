@@ -21,6 +21,7 @@ Function TubiExperiments(constants) as Object
       UserNamespace: {
       }
       RokuNamespace: {
+        roku_kids_mode_update: "off"
         roku_kids_mode: "off"
       }
     }
