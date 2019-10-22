@@ -64,6 +64,8 @@ Function playVideoContent(content As Object, autoplayType As String, position=in
     m.videoPlayer.seekPlaylist = [0, localContent.nowPos]
     m.ScreenStack.visible = false
 
+    fireAppLoadBeacon()
+
     ' For position history tracking
     m.updateHistoryTask.historyResult = invalid
     m.updateHistoryTask.content = localContent
@@ -235,10 +237,6 @@ Function onVideoPlayerState(msg)
       else
         returnToDetailScreenFromVideo()
       end if
-    end if
-  else if state = "playing"
-    if m.deepLinkContent <> invalid
-      fireAppLoadBeacon()  'fires only as necessary (once per session)
     end if
   end if
 End Function

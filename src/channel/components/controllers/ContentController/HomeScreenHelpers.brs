@@ -146,6 +146,7 @@ End Function
 
 
 Function onHomescreenContentReady(msg)
+  fireAppLoadBeacon()
   homescreen = msg.getRoSGNode()
   homeScreen.isLoading = false
 End Function
