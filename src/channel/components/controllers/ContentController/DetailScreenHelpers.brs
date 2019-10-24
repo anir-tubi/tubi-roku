@@ -7,6 +7,7 @@ Function showDetailScreen(content)
   tubiLog("DetailScreenHelpers.showDetailScreen")
   if content <> invalid
     detailScreen = CreateObject("roSGNode", "DetailScreen")
+    detailScreen.id = m.constants.ui.screenIds.detailScreen
     detailScreen.trackingLoadStartTime = Uptime(0)
     detailScreen.observeFieldScoped("playSelected", "onPlay")
     detailScreen.observeFieldScoped("resumeSelected", "onResume")

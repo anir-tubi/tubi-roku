@@ -262,6 +262,7 @@ End Function
 '   - Deep link: Exit video player series after autoplay   : 3 - redraw detail screen with existing detail content to preserve related items, updating episode id
 Function returnToDetailScreenFromVideo()
   stopVideoContent(true)
+  curScreen = currentScreen()
   ' get updated content, to be used to reload or re-populate details screen
   content = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex) 'this always returns a video - sometimes an episode
   m.deepLinkContent = invalid
@@ -272,7 +273,13 @@ Function returnToDetailScreenFromVideo()
     else if content.parentType = m.constants.ui.contentTypes.series
       ' Action 3
       currentEpisodeId = content.id
-      content = getDetailScreenContent()
+
+      if curScreen <> invalid and curScreen.id = m.constants.ui.screenIds.episodeScreen
+        content = curScreen.content
+      else
+        content = getDetailScreenContent() 'can be invalid
+      end if
+
       if content <> invalid
         content.currentEpisodeId = currentEpisodeId
       end if
@@ -283,10 +290,25 @@ Function returnToDetailScreenFromVideo()
   end if
 
   'reload or re-populate the screen as necessary
-  curScreen = currentScreen()
   if curScreen <> invalid
-    if curScreen.subType() = "DetailScreen"
-      if curScreen.content <> invalid and curScreen.content.id = content.id
+    if curScreen.id = m.constants.ui.screenIds.detailScreen or curScreen.id = m.constants.ui.screenIds.episodeScreen
+      ' find the detail screen
+      detailScreen = invalid
+      if curScreen.id = m.constants.ui.screenIds.episodeScreen
+        ' update the episode screen if necessary
+        episodeScreen = curScreen
+        episodeScreen.content = content
+        episodeScreen.updateContent = true
+        episodeScreen.episodeToFocus = findEpisode2dIndex(content.currentEpisodeId, content)
+        hiddenScreen = getHiddenScreen(1)
+        if hiddenScreen <> invalid and hiddenScreen.id = m.constants.ui.screenIds.detailScreen
+          detailScreen = hiddenScreen
+        end if
+      else if curScreen.id = m.constants.ui.screenIds.detailScreen
+        detailScreen = curScreen
+      end if
+
+      if detailScreen <> invalid and detailScreen.content <> invalid and detailScreen.content.id = content.id
         '//So the detailed page does not have a refresh issue, pass the local resume number before the backend communicates.
         nResumePoint = m.videoPlayer.historyPosition '//The problem with this is that if the backend comes back with a different number than the local number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video. The local number is 2 seconds and displays the resume button, but the backend determines that 2 seconds is not enough to warrant a resume button and returns 0 as the resume point.
 

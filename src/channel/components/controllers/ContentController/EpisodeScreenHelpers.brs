@@ -11,7 +11,9 @@ End Function
 '@shouldSendAnalytics: boolean, dictates if navigate_to_page and page_load analytics are sent for the episode screen
 Function showEpisodeScreen(content, shouldSendNavigationAnalytics)
   episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
+  episodesScreen.id = m.constants.ui.screenIds.episodeScreen
   episodesScreen.content = content
+  episodesScreen.updateContent = true
   episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")
   episodesScreen.observeFieldScoped("backgroundUriList", "onEpisodeBackgroundChange")
   episodesScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
@@ -55,7 +57,6 @@ Function onEpisodeSelected(msg)
           }
         }
 
-        popScreen(false)
         playVideoContent(content, "none", nowPos)
       end if
     end if

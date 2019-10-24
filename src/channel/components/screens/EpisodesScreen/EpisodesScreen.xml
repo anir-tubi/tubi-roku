@@ -13,9 +13,12 @@
       <!-- Full content of the item to show details for -->
       <field id="content" type="node" />
 
+      <!-- Explicitly tell the content to update by using this field -->
+      <field id="updateContent" type="boolean" alwaysNotify="true" />
+
       <!-- interface to tell the episode screen to focus a specific series episode;
            2d array describing the episode that needs to be focused with [seasonIndex, episodeIndex] -->
-      <field id="episodeToFocus" alias="RowList.jumpToRowItem"/>
+      <field id="episodeToFocus" alias="RowList.jumpToRowItem" />
 
     <!-- OUTPUT -->
       <!-- Set to the content of the episode that was clicked on -->
