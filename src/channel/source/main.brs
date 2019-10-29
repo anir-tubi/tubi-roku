@@ -154,7 +154,7 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
           end if
 
           componentsLoaded = true
-          loadPackagedComponents(tubiScene, port, startupArgs)
+          controller = loadPackagedComponents(tubiScene, port, startupArgs)
         end if
       else if msg.GetField() = "remoteComponentsUrl"
         print "got the remoteComponentsUrl "; msg.getData()
