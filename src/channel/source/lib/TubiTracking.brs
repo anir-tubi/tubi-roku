@@ -509,7 +509,7 @@ Function tubiTracking_getAnalyticsAdAdrise(ctx)
     end if
 
     if isInteractive = true and ad.companionads[0] <> invalid
-      if ad.companionads[0].provider = "innovid_RSG"
+      if ad.companionads[0].provider = "INNOVID"
         adEvent.ad_type = "INNOVID"
       else if ad.companionads[0].provider = "brightline_RSG"
         adEvent.ad_type = "BRIGHTLINE"
@@ -548,7 +548,7 @@ Function tubiTracking_getAnalyticsAdAdriseRainmaker(ctx)
     end if
 
     if isInteractive = true and ad.companionads[0] <> invalid
-      if ad.companionads[0].provider = "innovid_RSG"
+      if ad.companionads[0].provider = "INNOVID"
         adEvent.ad_type = "INNOVID"
       else if ad.companionads[0].provider = "brightline_RSG"
         adEvent.ad_type = "BRIGHTLINE"
