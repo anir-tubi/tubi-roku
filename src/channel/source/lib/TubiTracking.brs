@@ -131,7 +131,7 @@ End Function
 ' Returns a Device message that fulfills the requirement of the "device" field on the ClientEvent message
 ' See protos.analytics.events.protos -> ClientEvent
 ' See protos.analytics.client.protos -> Device
-Function tubiTracking_getAnalyticsDevice(eventValues)
+Function tubiTracking_getAnalyticsDevice(eventValues = invalid)
   device = {
     device_id: m.constants.deviceInfo.deviceId
     manufacturer: "Roku"
@@ -144,7 +144,7 @@ Function tubiTracking_getAnalyticsDevice(eventValues)
     device_width: m.constants.deviceInfo.displayWidth
     advertiser_id: "00000000-0000-0000-0000-000000000000"
   }
-  if m.constants.deviceInfo.isAdIdTrackingDisabled <> true and eventValues.appMode <> "KIDS_MODE"
+  if m.constants.deviceInfo.isAdIdTrackingDisabled <> true and (eventValues = invalid or eventValues.appMode <> "KIDS_MODE")
     device.advertiser_id = m.constants.deviceInfo.deviceAdId
   end if
   return device

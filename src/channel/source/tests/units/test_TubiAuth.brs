@@ -19,6 +19,9 @@ Function TestSuite_TubiAuth()
   this.addTest("transferRefreshToken_403", testCase_tubiAuth_transferRefreshToken_403)
   this.addTest("getFirstVisit", testCase_tubiAuth_getFirstVisit)
   this.addTest("setFirstVisit", testCase_tubiAuth_setFirstVisit)
+  this.addTest("getKidsMode", testCase_tubiAuth_getKidsMode)
+  this.addTest("getDefaultKidsMode", testCase_tubiAuth_getDefaultKidsMode)
+  this.addTest("setKidsMode", testCase_tubiAuth_setKidsMode)
   return this
 End Function
 
@@ -667,5 +670,68 @@ Function testCase_tubiAuth_setFirstVisit()
   registryFirstVisit = auth.regRead("firstVisit", auth.firstVisitRegSection)
   result += m.assertNotInvalid(registryFirstVisit)
   result += m.assertEqual(firstVisit, registryFirstVisit.toInt())
+  return result
+End Function
+
+
+Function testCase_tubiAuth_getKidsMode()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+
+  'use a fake section so not to disturb actual kidsMode info
+  auth.kidsModeRegSection = "testKidsMode"
+
+  'clear out any leftover info in the "testKidsMode" section
+  auth.regDelete("kidsMode", auth.kidsModeRegSection)
+  'set up a fake value that we will attempt to get
+
+  oKidsModeInput = {kidsEnabled:true}
+  auth.regWrite("kidsMode", FormatJson(oKidsModeInput), auth.kidsModeRegSection)
+
+  kidsMode = auth.getKidsMode()
+  
+  result = m.assertNotInvalid(kidsMode)
+  result += m.AssertEqual(kidsMode.kidsEnabled, true)
+  return result
+End Function
+
+Function testCase_tubiAuth_getDefaultKidsMode()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+
+  'use a fake section so not to disturb actual kidsMode info
+  auth.kidsModeRegSection = "testKidsMode"
+
+  'clear out any leftover info in the "testKidsMode" section
+  auth.regDelete("kidsMode", auth.kidsModeRegSection)
+  kidsMode = auth.getKidsMode() 'get kidsMode without setting it so we can get the default value
+  
+  result = m.assertNotInvalid(kidsMode)
+  result += m.AssertEqual(kidsMode.kidsEnabled, false) '//The default value should be false.
+  return result
+End Function
+
+
+Function testCase_tubiAuth_setKidsMode()
+  constants = getConstants()
+  request = TubiRequest()
+  auth = TubiAuth(constants, request)
+
+  'use a fake section so not to disturb actual kidsMode info
+  auth.kidsModeRegSection = "testKidsMode"
+
+  'clear out any leftover info in the "testKidsMode" section
+  auth.regDelete("kidsMode", auth.kidsModeRegSection)
+
+  oKidsModeInput = {kidsEnabled:true}
+  auth.setKidsMode({kidsEnabled:true})
+
+  kidsMode = auth.regRead("kidsMode", auth.kidsModeRegSection)
+  result = m.assertNotInvalid(kidsMode)
+  kidsMode = ParseJson(kidsMode) '//convert JSON string into an object
+  result += m.AssertEqual(kidsMode.kidsEnabled, true)
+  result += m.assertEqual(kidsMode.kidsEnabled, oKidsModeInput.kidsEnabled)
   return result
 End Function

@@ -53,6 +53,7 @@ Function onAuthInfoReceived()
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
 
+
   ' Here we notify screens that may exist, though we try to keep context
   '
   ' Transitions:

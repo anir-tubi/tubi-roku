@@ -31,7 +31,7 @@ End Function
 '@content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
 '     send either the video or the episode as the content, not the parent series
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-function tubiBookmarks_addBookmarkReq(content as Object, bKidsMode as Boolean) as Object
+function tubiBookmarks_addBookmarkReq(content as Object, bKidsMode = false as Boolean) as Object
   bookmarkReq = invalid
   if content <> invalid
     'translate internal content type to UAPI content type
@@ -50,7 +50,7 @@ end function
 'returns a request object that can be used to remove a bookmark from the server
 '@content: can be a content node from scene graph or a content object from the main thread - expect videos/movies or episodes, no series
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-function tubiBookmarks_removeBookmarkReq(content as Object, bKidsMode as Boolean) as Object
+function tubiBookmarks_removeBookmarkReq(content as Object, bKidsMode = false as Boolean) as Object
   bookmarkReq = invalid
   if content <> invalid and content.id <> invalid and content.bookmarkId <> invalid
     bookmarkReq = m.createBookmarksRequest(content.bookmarkId, "delete", "", bKidsMode)
@@ -115,7 +115,7 @@ end function
 ' @content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
 ' @position: position where user left off of video
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-function tubiBookmarks_addHistoryReq(content as Object, position as Integer, bKidsMode as Boolean) as Object
+function tubiBookmarks_addHistoryReq(content as Object, position as Integer, bKidsMode = false as Boolean) as Object
   historyReq = invalid
 
   if content <> invalid
@@ -150,7 +150,7 @@ end function
 'returns a request object that can be used to remove a history from the server
 ' @content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-function tubiBookmarks_removeHistoryReq(content as Object, bKidsMode as Boolean) as Object
+function tubiBookmarks_removeHistoryReq(content as Object, bKidsMode = false as Boolean) as Object
   historyReq = invalid
   if content <> invalid and content.historyId <> invalid then
     historyReq = m.createHistoryRequest(content.historyId, invalid, 0, "delete", "", bKidsMode)

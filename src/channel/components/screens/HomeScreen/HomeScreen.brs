@@ -58,6 +58,8 @@ Function onLoadingChange()
     emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
     populateInfoPanel("item", emptyContentNode) 'empties the info panel
   end if
+  m.CategoryGridList.content = m.top.content  ' should be all categories with initial amounts of content in them
+  m.top.isLoading = false
 End Function
 
 

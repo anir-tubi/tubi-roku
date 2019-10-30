@@ -38,7 +38,7 @@ End Function
 '''''''''''''''''''''''
 ' relatedContentReq()
 '
-Function cmsApi_getRelatedContentRequest(contentId, bKidsMode)
+Function cmsApi_getRelatedContentRequest(contentId, bKidsMode = false)
   url = m.constants_.urls.cms.relatedContent + "/" + contentId + "/related"
   options = m.commonOptions_()
   options.params["isKidsMode"] = bKidsMode
@@ -112,7 +112,7 @@ End Function
 '
 ' @limit: number of items in each category
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-Function cmsApi_getHomeScreenRequest(limit, bKidsMode, expand = 2)
+Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, expand = 2)
   url = m.constants_.urls.matrix.homescreen
   options = m.commonOptions_()
   options.params.expand = expand
@@ -144,7 +144,7 @@ End Function
 ''''''''''''''''''''''
 ' searchreq()
 '
-Function cmsApi_getSearchRequest(searchText, limit, bKidsMode)
+Function cmsApi_getSearchRequest(searchText, limit, bKidsMode = false)
   url = m.constants_.urls.cms.search
   options = m.commonOptions_()
   options.params.search = searchText

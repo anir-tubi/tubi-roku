@@ -57,6 +57,8 @@ Function init()
   '       places that need authInfo don't need to reference m.global.
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid  ' indicates not logged in
+  m.global.observeFieldScoped("authInfo", "onAuthInfoChanged")
+  m.authInfo = m.global.authInfo '//Local version of m.global.authInfo. This way we are sure we always have access to authInfo
 
   m.authInfoReceived = false    'is the auth info returned from the registry
   m.authInfoRefreshed = true    'is the auth info refreshed after receiving a deeplink with a refresh token
