@@ -25,7 +25,8 @@ End Function
 
 ' @sID: string: one of the menu item ids. A list of ids can be found in constants.ui.sideNavIds
 Function focusSideNavOption(sID)
-  m.SideNav.itemRequested = sID
+  '//::TODO:: there should be a check that a valid ID was passed. For right now assume sID is valid and correct.
+  m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav 
 End Function
 
 
@@ -87,7 +88,7 @@ Function onSideNavItemSelected()
   authInfo = m.global.authInfo
   bSameScreen = false
   currentScreenNow = currentScreen()
-  if m.sSideNavCurrentScreen  <> invalid and currentScreenNow <> invalid
+  if m.sSideNavCurrentScreen <> invalid and currentScreenNow <> invalid
     '//check if we are viewing the same screen. If not but sSideNavItemSelectedId is still the same as the input, then user navigated away from root page
     if (m.sSideNavCurrentScreen.subtype() = currentScreenNow.subtype()) then bSameScreen = true
   end if
@@ -246,6 +247,20 @@ Function onKidsModeSettingsCall()
   showSettingsScreen()
 End Function
 
+'@param b: Boolean, Says what the function is. Should the sideNav be set to open? If set to false, then the opposite happens, the side nav closes.
+Function openSideNav(b=true)
+  m.SideNav.opened = b 
+  if b = false
+    topScreen = currentScreen()
+    sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
+    itemSelectedId = m.SideNav.itemSelectedId
+    if itemSelectedId = m.constants.ui.sideNavIds.kidsMode and sideNavId <> invalid
+      '//if the sidenav has been closed and the kidsNav had been last selected; it is currently in focus, 
+      '//   then change the focus to the option relating to the current screen
+      focusSideNavOption(sideNavId)
+    end if
+  end if
+End Function
 
 Function onKidsModeExit()
   enableKidsModeFromSideNav(false)
