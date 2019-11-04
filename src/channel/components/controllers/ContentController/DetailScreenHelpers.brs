@@ -434,6 +434,7 @@ Function onSingleContentError(msg)
     popScreen(false)
     content = getDetailScreenContent(detailScreen)
     sendDeeplinkAnalytics(m.deepLinkContent, content, "home", m.Tracking, m.trackingLoggingTask, m.constants)
+    m.deepLinkContent = invalid
     startChannel()
   else if m.deepLinkContent <> invalid
     ' we are in this block if there is a roInputEvent causing a deeplink (ie. voice control while the channel is open)
