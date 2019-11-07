@@ -24,13 +24,26 @@
   
   <interface>
     <!-- INPUTS -->
-      <field id="pop" type="boolean" alwaysNotify="true" />
+      <!-- add a screen to the top of the stack -->
       <field id="push" type="node" />
+
+      <!-- remove the top-most screen from the stack -->
+      <field id="pop" type="boolean" alwaysNotify="true" />
+
+      <!-- keep the top x screens in the stack, removing all other screens from underneath them -->
+      <field id="shrinkStack" type="integer" alwaysNotify="true" />
+
+      <!-- remove all screens from the stack -->
       <field id="clearStack" type="boolean" alwaysNotify="true" />
+
+      <!-- give focus to the top most screen in the stack -->
       <field id="focusCurrent" type="boolean" alwaysNotify="true" />
 
     <!-- OUTPUT -->
+      <!-- true when there are no screens in the stack -->
       <field id="isEmpty" type="boolean" alwaysNotify="true" />
+
+      <!-- the top most screen in the stack -->
       <field id="current" type="node" />
   </interface>
         

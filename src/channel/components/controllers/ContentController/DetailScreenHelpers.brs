@@ -432,6 +432,13 @@ Function onSingleContentError(msg)
     content = getDetailScreenContent(detailScreen)
     sendDeeplinkAnalytics(m.deepLinkContent, content, "home", m.Tracking, m.trackingLoggingTask, m.constants)
     startChannel()
+  else if m.deepLinkContent <> invalid
+    ' we are in this block if there is a roInputEvent causing a deeplink (ie. voice control while the channel is open)
+    ' In this case we should navigate back to the home page.
+    sendDetailScreenErrorAnalytics(detailScreen)
+    detailScreen = invalid  'release reference to the detailScreen as it is no longer needed
+    m.deepLinkContent = invalid
+    startChannel()
   else if m.refreshingDetailCache = true
     m.refreshingDetailCache = false
   else
@@ -455,15 +462,7 @@ Function onSingleContentError(msg)
 
     showErrorModal(modalInfo, getSingleContentFromServerRetry, getSingleContentParams)
 
-    ' Handle navigate_to_page and page_load tracking for detail screen for error cases
-    if detailScreen <> invalid and detailScreen.contentFetchError = false
-      oldScreen = getHiddenScreen(1)  'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
-      if oldScreen <> invalid
-        screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
-      end if
-      loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000)  'in ms
-      screenTrackingLoad(detailScreen.trackingPageInfo, loadTime, false)
-    end if
+    sendDetailScreenErrorAnalytics(detailScreen)
   end if
 
   if detailScreen <> invalid
@@ -973,6 +972,20 @@ Function sendBookmarkAnalytics(content, operation, trackingLib, trackingTask, co
     type: "bookmark"
     values: bookmarkAnalyticsEvent
   }
+End Function
+
+
+'send the navigateToPage and pageLoad analytics in the case of an error loading the details screen
+Function sendDetailScreenErrorAnalytics(detailScreen)
+  ' Handle navigate_to_page and page_load tracking for detail screen for error cases
+  if detailScreen <> invalid and detailScreen.contentFetchError = false
+    oldScreen = getHiddenScreen(1)  'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
+    if oldScreen <> invalid
+      screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
+    end if
+    loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000)  'in ms
+    screenTrackingLoad(detailScreen.trackingPageInfo, loadTime, false)
+  end if
 End Function
 
 

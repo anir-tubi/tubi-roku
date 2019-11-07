@@ -2,8 +2,9 @@ Function init()
   m.nodeHelpers = TubiNodeHelpers()
   m.top.observeField("pop", "onPop")
   m.top.observeField("push", "onPush")
-  m.top.observeField("focusCurrent", "onSetCurrentFocusCommand")
+  m.top.observeField("shrinkStack", "onShrinkStack")
   m.top.observeField("clearStack", "onClearStack")
+  m.top.observeField("focusCurrent", "onSetCurrentFocusCommand")
 End Function
 
 
@@ -83,6 +84,17 @@ End Function
 Function getCurrent()
   size = m.top.getChildCount()
   return m.top.getChild(size - 1)
+End Function
+
+
+Function onShrinkStack(msg)
+  stack = m.top
+  stackCount = stack.getChildCount()
+  keepAmt = msg.getData()
+  removeAmt = stackCount - keepAmt
+  if keepAmt < stackCount
+    stack.removeChildrenIndex(removeAmt, 0)
+  end if
 End Function
 
 

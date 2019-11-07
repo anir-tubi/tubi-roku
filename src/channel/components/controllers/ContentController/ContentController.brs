@@ -156,25 +156,24 @@ Function onKeyEvent(key As String, press As Boolean)
       return true
     else if key = "back"
       if m.enteredFromDeepLink = true
-        if m.screenStack.getChildCount() > 1
-          popScreen(true)
-        else
-          ' remove the last screen, probably detail screen,
-          ' this should trigger a restart of the app via onScreenStackEmpty()
-          popScreen(false)
-          m.deeplinkContent = invalid
-          m.enteredFromDeepLink = false
-        end if
-      else if m.SideNav.opened = false
+        m.enteredFromDeepLink = false
+      end if
+
+      if m.SideNav.opened = false
         if m.SideNav.visible = true
           displayNavMenu(true)
         else if m.screenStack.getChildCount() > 1
-          popScreen()
+          popScreen(true)
           topScreen = currentScreen()
           sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
           if sideNavId <> invalid
             focusSideNavOption(sideNavId)
           end if
+        else
+          ' remove the last screen, probably detail screen,
+          ' this should trigger a restart of the app via onScreenStackEmpty()
+          popScreen(false)
+          m.deeplinkContent = invalid
         end if
       else if m.SideNav.opened = true
         if m.screenStack.getChildCount() > 1
@@ -486,8 +485,27 @@ Function onInputInfoReceived()
     inputInfo = m.top.roInputInfo
 
     if inputInfo.type = "deeplink"
+      kidsModeAtStart = false
+      if m.kidsModeEnabled = true
+        kidsModeAtStart = true
+      end if
+
+      if kidsModeAtStart = true
+        'turn off kids mode for input deeplinks (ie. voice commands)
+        enableKidsModeUI(false)
+      end if
+
+      resetSideNav(false)
       m.deeplinkContent = createDeeplinkContentFromStartupArgs(inputInfo)
+      stopVideoContent(true)
       showDetailScreen(m.deeplinkContent)
+
+      if kidsModeAtStart = true
+        ' remove all screens except the top most details screen if in kids mode so,
+        ' that when backing out of the details screen, the home screen will be re-populated as expected
+        shrinkScreenStack(1)
+        emptyScreenCache()
+      end if
     end if
   end if
 End Function
@@ -862,6 +880,12 @@ Function deleteFromScreenCache(screenId)
 End Function
 
 
+Function emptyScreenCache()
+  m.screenCache = {}
+  return m.screenCache
+End Function
+
+
 ' This will tell the screen to update its content the next time the screen is displayed 
 ' @sID: string, the ID of the screen whose content should be marked to be refreshed
 Function setContentToRefresh(sID)
@@ -874,63 +898,6 @@ Function setContentToRefresh(sID)
   end if
   return false
 End Function 
-
-
-Function displayNavMenu(shouldTrackComponentInteraction = true)
-  bSideNavOpened = m.SideNav.opened
-  m.SideNav.setFocus(true)
-  if bSideNavOpened = false
-    m.SideNav.opened = true
-    if m.nOriginalSideNavX = invalid
-      m.nOriginalSideNavX = m.SideNav.translation[0] 
-    end if 
-    if m.nOriginalScreenStackX = invalid
-      m.nOriginalScreenStackX = m.ScreenStack.translation[0] 
-    end if
-
-    slideTo(m.SideNav, [0, m.SideNav.translation[1]], .2)
-    slideTo(m.ScreenStack, [m.nOriginalScreenStackX + m.SideNav.width, m.ScreenStack.translation[1]], .2)
-
-    topScreen = currentScreen()
-    if topScreen <> invalid
-      topScreen.enabled = false
-
-      if shouldTrackComponentInteraction = true
-        interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "on")
-        m.trackingLoggingTask.trackEvent = interactionEvent
-      end if
-    end if
-  end if
-End Function
-
-
-Function hideNavMenu(shouldTrackComponentInteraction = true)
-  if m.SideNav.opened = true
-    m.SideNav.opened = false 
-    focusCurrentScreen() '//This will set the current focus back to the screenstack items
-
-    slideTo(m.SideNav, [m.nOriginalSideNavX, m.SideNav.translation[1]], .3)
-    slideTo(m.ScreenStack, [m.nOriginalScreenStackX, m.ScreenStack.translation[1]], .3)
-
-    topScreen = currentScreen()
-    if topScreen <> invalid
-      topScreen.enabled = true
-
-      'set up analytics for unfocusing side nav component
-      pageType = ""
-      pageValues = {}
-      if topScreen.trackingPageInfo <> invalid
-        pageType = topScreen.trackingPageInfo.pageType
-        pageValues = topScreen.trackingPageInfo.pageValues
-      end if
-
-      if shouldTrackComponentInteraction = true
-        interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")
-        m.trackingLoggingTask.trackEvent = interactionEvent
-      end if
-    end if
-  end if
-End Function
 
 
 ' Callback for when a navigateWithinPageInfo has been updated - sends the navigate_within_page event

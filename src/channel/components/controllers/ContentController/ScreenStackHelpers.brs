@@ -132,17 +132,27 @@ Function printScreenStack()
 End Function
 
 
-' Wrapper around the m.screenStack clear interface to handle analytics events
+' Wrapper around the m.screenStack shrink interface which keeps the top x most screens and removes the rest
+' of the screens from underneath them
+Function shrinkScreenStack(keepAmt)
+  tubiLog("ScreenStackHelpers.shrinkScreenStack")
+  m.screenStack.shrinkStack = keepAmt
+End Function
+
+
+' Wrapper around the m.screenStack clear interface which removes all screen in the stack
 Function clearScreenStack()
   tubiLog("ScreenStackHelpers.clearScreenStack")
   m.screenStack.clearStack = true
 End Function
+
 
 ' Callback to fire when m.screenStack is empty - should only happen in the case of deeplinks
 Function onScreenStackEmpty()
   tubiLog("ScreenStackHelpers.onScreenStackEmpty")
   startChannel()
 End Function
+
 
 Function onScreenChange()
   if currentScreen() <> invalid and currentScreen().id <> invalid

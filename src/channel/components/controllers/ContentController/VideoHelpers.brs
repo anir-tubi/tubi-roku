@@ -136,6 +136,7 @@ Function onGoToNext()
   playVideoContent(nextContent, "none") 'TODO: FIND OUT IF THIS COUNTS AS AUTOPLAY?
 End Function
 
+
 ' @nextContent: roSGNode, the content node representing the content that will be played next
 ' @ autoplayType: string, "deliberate" or "automatic", refers to if the up next content was selected or is auto playing
 Function playUpNextContent(nextContent, autoplayType)
@@ -322,7 +323,6 @@ Function stopVideoContent(showScreenStack)
   m.videoPlayer.unobserveFieldScoped("creditsPosition")
   m.videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
   m.videoPlayer.unobserveFieldScoped("goToNext")
-  m.videoPlayer.deeplinkSource = ""
   m.videoPlayer.control = "stop"
   nowPos = m.videoPlayer.historyPosition
 
