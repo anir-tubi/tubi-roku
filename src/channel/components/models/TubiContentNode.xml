@@ -19,6 +19,7 @@
     <field id="introcuepoint" type="int" />
     <field id="creditscuepoint" type="int" />
     <field id="backgrounds" type="stringarray" />
+    <field id="cuepoints" type="array" />
     <field id="slug" type="string" />
     <field id="bookmarkId" type="string" />
     <field id="seriesId" type="string" />

@@ -97,7 +97,7 @@ End Function
 
 Function testCase_tubiTracking_getAnalyticsApp()
   Tracking = testHelper_tubiTracking_createTubiTracking()
-  app = Tracking.getAnalyticsApp()
+  app = Tracking.getAnalyticsApp({appMode: ""})
 
   result = m.assertNotInvalid(app.platform)
   result += m.assertNotInvalid(app.app_version)

@@ -4,7 +4,6 @@ Function TestSuite_TubiAds()
   this = BaseTestSuite()
   this.name = "TubiAdsTestSuite"
   this.addTest("getAdsListViaRoku", testCase_tubiAds_getAdsListViaRoku)
-  this.addTest("parseCuepoints", testCase_tubiAds_parseCuepoints)
   return this
 End Function
 
@@ -73,14 +72,6 @@ Function testCase_tubiAds_getAdsListViaRoku()
   return ""
 End Function
 
-Function testCase_tubiAds_parseCuepoints()
-  cuepointsJson = ReadAsciiFile("pkg:/source/tests/units/cuepoints.json")
-  parsed = ParseJson(cuepointsJson)
-  result = m.assertNotInvalid(parsed)
-  result += m.assertEqual(type(parsed), "roArray")
-  result += m.assertTrue(parsed[3] = 1496)
-  return result
-End Function
 
 ' helper to initialize TubiAds module and stub the request so get ads always returns nothing
 Function testHelper_tubiAds_createTubiAds()

@@ -37,9 +37,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     roAdFramework: roAdFramework
     allAdUnitsList:[]
     totalAdBreakAds: 0
-    midrolls : []
     commercialDuration : 0
-    lastAdFailed: false
     adPlaybackPos: 0
     isInteracting: false
     _: rodash()
@@ -47,15 +45,12 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
 
     ' public
     reset: tubiAds_reset
-    getCuePointsReq: tubiAds_getCuepointsReq
-    parseCuePoints: tubiAds_parseCuepoints
     getAdsListViaRoku: tubiAds_getAdsListViaRoku
     hasAds: tubiAds_hasAds
     showCommercialBreakViaRoku: tubiAds_showCommercialBreakViaRoku
     cacheAdsList: tubiAds_cacheAdsList
     getCachedAdsList: tubiAds_getCachedAdsList
     getResumingPlayAds: tubiAds_getResumingPlayAds
-    getCommaDelimitedMidrolls: tubiAds_getCommaDelimitedMidrolls
     populateUrlAdrise: tubiAds_populateUrlAdrise
     populateUrlRainmaker: tubiAds_populateUrlRainmaker
     adBufferingCallback: tubiAds_adBufferingCallback
@@ -108,30 +103,10 @@ end function
 ' ----------------------------------------------
 function tubiAds_reset()
   m.allAdUnitsList = []
-  m.midrolls = []
   m.commercialDuration = 0
-  m.lastAdFailed = false
   m.containerNode = invalid
   m.adPlaybackPos = 0
   m.isInteracting = false
-end function
-
-
-' ----------------------------------------------
-' getCommaDelimitedMidrolls
-'
-' create an array of midrolls from a comma delimited string of midrolls - for ex. "100,300,600,850"
-' ----------------------------------------------
-function tubiAds_getCommaDelimitedMidrolls(midrollsString)
-  midrolls = []
-  splitter = CreateObject("roRegex", ",", "")
-  midrollsTimes = splitter.Split(midrollsString)
-  if midrollsTimes.count() > 0
-    for each midroll in midrollsTimes
-      midrolls.push(midroll.toInt())
-    end for
-  end if
-  return midrolls
 end function
 
 
@@ -307,7 +282,7 @@ function tubiAds_getAdsListViaRoku(episode)
 
   'get the url for making the ad call
   url = ""
-  if m.constants.externalConfig.info.rainmaker = true or m.isCoppaEnabled = true
+  if (m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.rainmaker = true) or m.isCoppaEnabled = true
     url = m.populateUrlRainmaker(episode)
   else
     url = m.populateUrlAdrise(episode)
@@ -315,7 +290,7 @@ function tubiAds_getAdsListViaRoku(episode)
 
   'set the url for the Roku Advertising Framework
   m.roAdFramework.setAdUrl(url)
-
+ 
   'get the array of ad units back from the Roku Advertising Framework(RAF)
   'adUnits are called adPods in RAF documentation
   adFetchTimer = CreateObject("roTimeSpan")
@@ -353,28 +328,11 @@ function tubiAds_getAdsListViaRoku(episode)
     m.totalAdBreakAds = currentAdUnitsList[0].ads.count()
 
     for each adUnit in currentAdUnitsList[0].ads
+
       if adUnit.adId <> invalid
         print "AD ID "; adUnit.adId; " "; adUnit.creativeAdId
         
-        'the ad server had no ads to return so sends us just the midroll times'
-        if adUnit.adId = "empty"
-          if m.midrolls.count() = 0 or (m.midrolls.count() = 1 and m.lastAdFailed = true)
-            m.midrolls = [] 'reset the midrolls array in case there was a previous default midroll
-            if adUnit.clickThrough <> invalid
-              ' Rainmaker response returns JSON in the ClickThrough tag, adRise response is a comma delimitted string of cuepoints
-              adInfo = ParseJson(adUnit.clickThrough)
-              if type(adInf) = "roAssociativeArray" and type(adInfo.breaks) = "roArray" and adInfo.breaks.count() > 0
-                ' using the Rainmaker response since we were able to parse JSON in the clickThrough field
-                m.midrolls = adInfo.breaks
-              else
-                ' using the adRise ad server still - this "else" block can be removed when moving to Rainmaker is complete
-                m.midrolls = m.getCommaDelimitedMidrolls(adUnit.clickThrough)
-              end if
-            end if
-          end if
-        
-        'if the adUnit contains an ad that needs to use the Roku Ad Framework'
-        else
+        if adUnit.adId <> "empty"
           'if adUnitType is different from the last adUnitType (meaning a new adUnitsListContainer is needed)
           'push the last adUnitsListContainer to m.allAdUnitsList, otherwise we will just add to the last adUnitsListContainer
           'set up the adContainer for roku type if needed
@@ -412,44 +370,12 @@ function tubiAds_getAdsListViaRoku(episode)
             m.commercialDuration = m.commercialDuration + adUnit.duration
           end if 
           
-          'set the midrolls if midrolls haven't already been set by preroll or earlier midroll
-          'midrolls are sent as comma delineated strings in the clickThrough property of the ads being sent
-          if m.midrolls.count() = 0 or (m.midrolls.count() = 1 and m.lastAdFailed = true)
-            m.midrolls = [] 'reset the midrolls array in case there was a previous default midroll
-            if adUnit.clickThrough <> invalid
-              ' Rainmaker response returns JSON in the ClickThrough tag, adRise response is a comma delimitted string of cuepoints
-              adInfo = ParseJson(adUnit.clickThrough)
-              if type(adInfo) = "roAssociativeArray" and type(adInfo.breaks) = "roArray" and adInfo.breaks.count() > 0
-                ' using the Rainmaker response since we were able to parse JSON in the clickThrough field
-                m.midrolls = adInfo.breaks
-              else
-                ' using the adRise ad server still - this "else" block can be removed when moving to Rainmaker is complete
-                m.midrolls = m.getCommaDelimitedMidrolls(adUnit.clickThrough)
-              end if
-            end if
-          end if
         end if
       end if
     end for
 
     m.allAdUnitsList.push(adUnitsListContainer) 'push the last adUnitsListContainer
-    
-    'if no midrolls times were found in any of the ads set the default midroll
-    if m.midrolls.count() = 0 or (m.midrolls.count() = 1 and m.lastAdFailed = true)
-      m.midrolls = [episode.nowpos + 300]
-      m.lastAdFailed = true
-    end if
-  else
-    'no ad units were returned so we need to set the default midroll
-    print "no ad units returned"
-    if m.midrolls.count() = 0 or (m.midrolls.count() = 1 and m.lastAdFailed = true)
-      m.midrolls = [episode.nowpos + 300]
-      m.lastAdFailed = true
-    end if
   end if
-
-  ' print "CURRENT MIDROLLS"
-  ' print m.midrolls
 end function
 
 
@@ -525,43 +451,6 @@ function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   end if
   
   return m.constants.player.playerResults.completed
-end function
-
-
-' ----------------------------------------------
-' getCuepointsReq
-'
-' gets the cuepoints for the passed in episode and attach them to ads object
-' ----------------------------------------------
-function tubiAds_getCuepointsReq(episode)
-  'get the cuepoints synchronously
-  options = {
-    params: {
-      format: "json"
-      pubid: episode.pubId
-      platform: "roku"
-      cid: episode.id
-    }
-  }
-  return m.request.createAsync(m.constants.urls.cuepointsBaseUrl, "getCuePoints", options)
-end function
-
-
-
-' ----------------------------------------------
-' parseCuepoints
-'
-' parse a cuepoints response
-' side effect of setting cuepoints on m.midrolls
-function tubiAds_parseCuepoints(cuepointsReq)
-  if cuepointsReq <> invalid and cuepointsReq.response <> invalid and cuepointsReq.response.data <> invalid
-    cuepoints = ParseJson(cuepointsReq.response.data)
-    if type(cuepoints) = "roArray" and cuepoints.count() > 0
-      m.midrolls = cuepoints
-      return cuepoints
-    end if
-  end if
-  return invalid
 end function
 
 

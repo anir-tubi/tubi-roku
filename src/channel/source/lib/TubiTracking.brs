@@ -448,7 +448,7 @@ End Function
 
 ' Wrapper for choosing the correct ad message constructor while rolling out the new rainmaker ad server
 Function tubiTracking_getAnalyticsAd(ctx)
-  if m.constants.externalConfig.info.rainmaker = true
+  if m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.rainmaker = true
     return m.getAnalyticsAdRainmaker(ctx)
   else
     return m.getAnalyticsAdAdrise(ctx)

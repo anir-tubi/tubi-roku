@@ -124,6 +124,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   'translate all the stuff from the server
   if contentFromServer.title <> invalid then translatedContent.title = contentFromServer.title
+
   if contentFromServer.duration <> invalid then translatedContent.length = contentFromServer.duration
   if contentFromServer.actors <> invalid then translatedContent.actors = contentFromServer.actors 'array of actors
   if contentFromServer.roku_genres <> invalid then translatedContent.rokuGenres = contentFromServer.roku_genres 'array of roku genres
@@ -206,6 +207,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       translatedContent.url = contentFromServer.url
       translatedContent.streamformat = "mp4"
     end if
+  end if
+
+  '//Parse the cuePoints
+  if contentFromServer.monetization <> invalid and contentFromServer.monetization.cue_points <> invalid
+    translatedContent.cuepoints = contentFromServer.monetization.cue_points
   end if
 
   ' DRM encoded streams

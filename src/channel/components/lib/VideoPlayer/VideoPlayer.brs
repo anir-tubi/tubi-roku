@@ -491,6 +491,13 @@ Function playContent()
   m.top.adPosition = 0
   m.VideoState = "play"
   if m.top.enableAds then
+    '//Set the midrolls of the videoplayer now and set the adControl state to preroll
+    if m.Video.content.cuepoints <> invalid
+      m.top.midrolls = m.Video.content.cuepoints
+      for each time in m.top.midrolls
+        print "VideoPlayer: MIDROLL: " ; time
+      end for
+    end if
     ' Start pre-roll fetch
     m.top.adControl = "preroll"
   else
