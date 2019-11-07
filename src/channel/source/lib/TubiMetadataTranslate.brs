@@ -517,12 +517,6 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
   '//::TODO:: have the backend filter and sort categories when they have more bandwidth
   'set up AAs for all categories including any nested categories
 
-  ' set up the channel/category thumbnail values for an experiment
-  inCategoryGridExperiment = false
-  if type(getExperimentValue) = "Function" and getExperimentValue("RokuNamespace", "roku_category_grid") = "on"
-    inCategoryGridExperiment = true
-  end if
-
   for i=0 to containers.count()-1
     container = containers[i]
 
@@ -573,10 +567,8 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
   ' use gradient images that reside on the CDN for category/channel poster images
   for i=0 to homescreenAA.children.count()-1
     categoryAA = homescreenAA.children[i]
-    if inCategoryGridExperiment = true
-      thumbnailNumber = (i MOD 12) + 1
-      categoryAA.thumbnail = m.constants.ui.uris.categoryBackgrounds.urlBase + thumbnailNumber.toStr() + m.constants.ui.uris.categoryBackgrounds.urlEndingExp
-    else if categoryAA.isSpecial <> true
+
+    if categoryAA.isSpecial <> true
       thumbnailNumber = (i MOD 11) + 1
       categoryAA.thumbnail = m.constants.ui.uris.categoryBackgrounds.urlBase + thumbnailNumber.toStr() + m.constants.ui.uris.categoryBackgrounds.urlEnding 
     end if

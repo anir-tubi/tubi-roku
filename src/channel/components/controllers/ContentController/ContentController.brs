@@ -822,15 +822,6 @@ End Function
 ' @registryKidsMode: boolean, the persisted value for kids mode set in the registry
 Function startChannel(registryKidsMode = false)
   tubiLog("ContentController.startChannel")
-
-  ' only enter the experiment if kids mode is allowed (ie. US and Canada)
-  if m.kidsModeFeatureOn = true
-    if getExperimentValue("RokuNamespace", "roku_kids_mode_update") <> "on" and getExperimentValue("RokuNamespace", "roku_kids_mode") <> "on"
-      m.kidsModeFeatureOn = false   'Should the kids Mode feature be visible to the user?
-      registryKidsMode = false
-    end if
-  end if
-
   m.contentGroup.visible = true
   m.appLoadStopwatch.mark()
   focusSideNavOption(m.constants.ui.sideNavIds.home)
