@@ -17,6 +17,12 @@ Function TubiExperiments(constants) as Object
     ' Default values are always used in case of a "control" value or
     ' in the case that the experiment API doesn't return a response with our experiment.
     ' All experiments are required by the backend to have one of the experiment values to be "control"
+    '
+    ' The backend allows for a "resource" assoiciative array where we can place any additional info about the experiement
+    '   i.e. a color scheme, values for multiple parameters, etc.
+    ' Right now this code is not using the resource AA but if it is desired to store valiues on the experiment backend, then we can change this code so it is giving the client this data 
+    ' For more info on on the experiement backend, see: https://github.com/adRise/popper-config
+'//::TODO::popper = get rid of old kidsMode experiments before releasing the popper experiment
     defaultValues: {
       UserNamespace: {
       }
@@ -27,19 +33,22 @@ Function TubiExperiments(constants) as Object
     'public methods
     init: tubiExperiments_init
     getExperimentValue: tubiExperiments_getExperimentValue
+    getExperimentTracking: tubiExperiments_getExperimentTracking
+    getExperimentResource: tubiExperiments_getExperimentResource
 
     'private methods
-    getNamespaces: tubiExperiments_getNamespaces
-    parseNamespace: tubiExperiments_parseNamespace
-    getDefault: tubiExperiments_getDefault
+    getNamespaces: tubiExperiments_getNamespaces_
+    parseNamespace: tubiExperiments_parseNamespace_
+    getDefault: tubiExperiments_getDefault_
+    getExperiment: tubiExperiments_getExperiment_
   }
 End Function
 
 
 ' @reqest: assocArray, a request module as returned by TubiRequest()
 Function tubiExperiments_init(request)
+  '//go through all the exisiting namespaces and call the backend to get the data of existing experiments
   namespaces = m.getNamespaces(request)
-
   allNamespaces = invalid
   
   if namespaces <> invalid
@@ -48,8 +57,10 @@ Function tubiExperiments_init(request)
     for each namespace in namespaces
       parsedNamespace = m.parseNamespace(namespace)
 
-      if parsedNamespace.name <> invalid
-        allNamespaces[parsedNamespace.name] = parsedNamespace
+      if parsedNamespace.namespace <> invalid
+        '//Note: The backend only returns one experiment per namespaces at any one time. 
+        '//If there are multiple experiements under a single namespace, then the backend will choose one for the client to display
+        allNamespaces[parsedNamespace.namespace] = parsedNamespace
       end if
     end for
   end if
@@ -59,158 +70,82 @@ Function tubiExperiments_init(request)
 End Function
 
 
-' Example JSON response from the service:
-'
-'[
-' {
-'   "name": "UserNamespace",
-'   "unit": "deviceId",
-'   "segments": 100,
-'   "default_experiment": "UserDefaults",
-'   "experiment_sequence": [
-'     {
-'       "action": "add",
-'       "definition": "PreRollAt90",
-'       "name": "PreRollAt90.1",
-'       "segments": 10
-'     }
-'   ],
-'   "experiment_definitions": [
-'     {
-'       "name": "PreRollAt90",
-'       "salt": "PreRollAt90",
-'       "assign": "preroll_at_90 = uniformChoice(choices=['0', '90'], unit=deviceId);\n",
-'       "compiled": {
-'         "op": "seq",
-'         "seq": [
-'           {
-'             "op": "set",
-'             "var": "preroll_at_90",
-'             "value": {
-'               "choices": {
-'                 "op": "array",
-'                 "values": [
-'                   "0",
-'                   "90"
-'                 ]
-'               },
-'               "unit": {
-'                 "op": "get",
-'                 "var": "deviceId"
-'               },
-'               "op": "uniformChoice"
-'             }
-'           }
-'         ]
-'       },
-'       "auto_log_exposure": true
-'     },
-'     {
-'       "name": "UserDefaults",
-'       "salt": "UserDefaults",
-'       "assign": "preroll_at_90 = false;\n",
-'       "compiled": {
-'         "op": "seq",
-'         "seq": [
-'           {
-'             "op": "set",
-'             "var": "preroll_at_90",
-'             "value": false
-'           }
-'         ]
-'       },
-'       "auto_log_exposure": false
-'     }
-'   ],
-'   "evaluated_experiment_name": "UserDefaults",
-'   "evaluated_experiment_salt": "UserDefaults",
-'   "evaluated_params": {
-'     "preroll_at_90": false
-'   },
-'   "evaluated_default": true
-' }
-']
-
-'Returns an Array of namespaces from UAPI.
+'Returns an Array of namespaces
 'We expect to return an array containing a single or multiple namespace assocArrays
 Function tubiExperiments_getNamespaces(request)
-  inputs = CreateObject("roAssociativeArray")
-  inputs.SetModeCaseSensitive()
-  inputs.AddReplace("deviceId", m.constants.deviceInfo.deviceId)
-  inputs = FormatJson(inputs)
+  namespaces = m.defaultValues
+  returnNamespaces = invalid
+  url = m.constants.urls.experiments.evaluate + "?request_context.device_id=" + m.constants.deviceInfo.deviceId
 
-  escapeUrlObj = CreateObject("roUrlTransfer")
-  inputs = escapeUrlObj.Escape(inputs)
+  nameSpaceQuery = ""
+  for each namespace in namespaces
+    nameSpaceQuery = nameSpaceQuery + "&namespaces=" + namespace
+  end for
 
-  url = m.constants.urls.datascience.experiment + "?platform=" + m.constants.platform + "&inputs=" + inputs
-
-  expRequest = request.createAsync(url, "getExperiment")
-  res = expRequest.runSynchronous()
-
-  namespaces = invalid
-  if res <> invalid
-    namespaces = ParseJson(res)
+  if Len(nameSpaceQuery) > 0
+    '//if no experiements then do not call backend. Just return invalid return
+    url = url + nameSpaceQuery
+    expRequest = request.createAsync(url, "getExperiment")
+    res = expRequest.runSynchronous()
+    
+    if res <> invalid
+      parsedResults = ParseJson(res)
+      if parsedResults <> invalid and parsedResults.namespace_results <> invalid
+        returnNamespaces = parsedResults.namespace_results
+      end if
+    end if
   end if
 
-  return namespaces   'can return invalid
+  return returnNamespaces   'can return invalid
 End Function
 
 
-
-'Updates the namespace's experiment_definitions field to be an AA so as to be easier to work with later.
-'@namespaces: assocArray, an experiments namespace as returned by UAPI and whose json has been parsed to a Brightscript array of assocArrays
-Function tubiExperiments_parseNamespace(namespace as Object) as Object
-
-  'turn the experiment definitions to an assoc array from an array so grabbing definitions later is easier 
-  newExperimentDefs = {}
-  for each def in namespace.experiment_definitions
-    newExperimentDefs[def.name] = def
-  end for
-
-  namespace.experiment_definitions = newExperimentDefs
-
+'Parses the namespace object returned from the backed so it can be used easier later 
+'@namespaces: assocArray, an experiments namespace as returned by API 
+Function tubiExperiments_parseNamespace_(namespace as Object) as Object
+  'The API returns a resource JSON object that still needs to be parsed into a JSON object
+  if namespace <> invalid and namespace.resource <> invalid
+    namespace.resource = ParseJson(namespace.resource)
+  end if
   return namespace    'can return invalid
 End Function
 
 
-'returns the value from the experiment or a default value along with an object that contains all the info for a user tracking request
-'the tracking object needs a request queue to be added to it, and then it can be sent via TubiTracking().trackUserEvent()
-'
-'@namespaceName: string, the name of the namespace in which we will find the experiment
-'@parameterName: string, the name of the experiment as found in the experiment definition
-Function tubiExperiments_getExperimentValue(namespaceName as string, parameterName as string) as Object
-  allExperiments = m.constants.experiments.info
-
-  experimentValue = invalid
-  experimentDef = invalid
-  experimentName = invalid
+Function tubiExperiments_getExperiment_(namespaceName as string, experimentName as string) as Object
   trackInfo = invalid
+  experimentOriginalValue = invalid
+  experiment = invalid
 
-  namespace = invalid
-  if allExperiments <> invalid
-    namespace = allExperiments[namespaceName]
-  end if
-
-  if namespace <> invalid
-    if namespace.evaluated_params <> invalid
-      experimentValue = namespace.evaluated_params[parameterName]
-      if (type(experimentValue) = "roString" or type(experimentValue) = "String") and experimentValue = "control"
-        experimentValue = m.getDefault(namespaceName, parameterName)
+  allExperiments = m.constants.experiments.info
+  if namespaceName <> invalid and experimentName <> invalid and allExperiments <> invalid
+    possibleExperiment = allExperiments[namespaceName]
+    if possibleExperiment <> invalid and possibleExperiment.experiment_result <> invalid and possibleExperiment.experiment_result.experiment_name <> invalid
+      '//Make sure everything exists before proceeding
+      if possibleExperiment.experiment_result.experiment_name = experimentName
+        '//We found the desired experiment
+        experiment = possibleExperiment
       end if
-    end if
-
-    if namespace.evaluated_experiment_name <> invalid
-      experimentName = namespace.evaluated_experiment_name
-    end if
-
-    if namespace.experiment_definitions <> invalid and experimentName <> invalid
-      'namespace,experiment_definitions has been updated in parseNamespace so it an AA now, not an Array as returned by the API
-      experimentDef = namespace.experiment_definitions[experimentName]
-    end if
+    end if 
   end if
 
-  if experimentValue <> invalid
-    if experimentDef <> invalid and experimentDef.auto_log_exposure = true
+  return experiment
+End Function
+
+
+Function tubiExperiments_getExperimentTracking(namespaceName as string, experimentName as string) as Object
+  treatmentName = invalid
+  trackInfo = invalid
+  saltId = invalid
+
+  experiment = m.getExperiment(namespaceName, experimentName)
+  if experiment <> invalid 
+
+    if experiment.experiment_result <> invalid and experiment.experiment_result.treatment <> invalid
+      treatmentName = experiment.experiment_result.treatment
+      saltId = experiment.experiment_result.segment
+    end if
+
+    if treatmentName <> invalid
       'trackInfo keys can be sent as params to TubiTracking().trackUserEvent(), in order to make a tracking API call
       'trackInfo can be set as an AA on the trackEvent field in the trackingLoggingTask, in order to make a tracking API call
       trackInfo = {
@@ -219,36 +154,72 @@ Function tubiExperiments_getExperimentValue(namespaceName as string, parameterNa
           experiment: {
             namespace: namespaceName
             name: experimentName
-            salt: namespace.evaluated_experiment_salt
-            parameter_name: parameterName
-            parameter_value: namespace.evaluated_params[parameterName]
+            salt: saltId
+            parameter_name: experimentName
+            parameter_value: treatmentName
           }
         }
       }
     end if
-  else
-    experimentValue = m.getDefault(namespaceName, parameterName)
   end if
 
-  return {
-    experimentValue: experimentValue
-    trackInfo: trackInfo
-  }
+  return trackInfo
+End Function
+
+
+Function tubiExperiments_getExperimentValue(namespaceName as string, experimentName as string) as Object
+  experimentValue = invalid
+  treatmentName = invalid
+
+  experiment = m.getExperiment(namespaceName, experimentName)
+  if experiment <> invalid 
+    if experiment.experiment_result <> invalid and experiment.experiment_result.treatment <> invalid
+      treatmentName = experiment.experiment_result.treatment
+    end if
+    
+    if (type(treatmentName) = "roString" or type(treatmentName) = "String") and treatmentName = "control"
+      treatmentName = m.getDefault(namespaceName, experimentName)
+    end if
+  end if
+
+  if treatmentName = invalid
+    experimentValue = m.getDefault(namespaceName, experimentName)
+  else 
+    experimentValue = treatmentName
+  end if
+
+  return experimentValue
+End Function
+
+
+' tubiExperiments_getExperimentResource
+' 
+' Get more info about the experiment. This is an associative array that is defined when the experiment is set up on the popper server
+' The AA can include anything and be formatted in anyway. It depends on how you set up the experiment on the popper server.
+Function tubiExperiments_getExperimentResource(namespaceName as string, experimentName as string) as Object
+  oReturn = invalid
+
+  experiment = m.getExperiment(namespaceName, experimentName)
+  if experiment <> invalid 
+    oReturn = experiment.resource
+  end if
+
+  return oReturn
 End Function
 
 
 'This function gets the appropriate default value from a repository of default values for experiments.
-'If we can't find an experiment from the UAPI server response, we'll go here to get the default value for that experiment
+'If we can't find an experiment from the Popper server response, we'll go here to get the default value for that experiment
 '
 '@namespaceName: string, the name of the namespace in which we will find the experiment
-'@parameterName: string, the name of the experiment as found in the experiment definition
-Function tubiExperiments_getDefault(namespaceName as string, parameterName as string) as Object
-  
+'@experimentName: string, the name of the experiment as found in the experiment definition
+Function tubiExperiments_getDefault_(namespaceName as string, experimentName as string) as Object  
   defaultValue = invalid
-  if m.defaultValues[namespaceName] <> invalid
-    defaultValue = m.defaultValues[namespaceName][parameterName]
+  if namespaceName <> invalid and experimentName <> invalid
+    if m.defaultValues[namespaceName] <> invalid
+      defaultValue = m.defaultValues[namespaceName][experimentName]
+    end if
   end if
 
   return defaultValue
-
 End Function

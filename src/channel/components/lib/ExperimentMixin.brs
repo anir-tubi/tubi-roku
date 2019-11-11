@@ -1,7 +1,42 @@
+' getExperimentResource
+' 
+' Get more info about the experiement
+' Note: the component calling getExperimentValue using the ExperimentMixin, must also
+' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
+Function getExperimentResource(namespaceName as string, parameterName as string)
+  oMoreInfoReturn = invalid
+  
+  if m.global <> invalid and m.global.trackingLoggingTask <> invalid
+    '//if you cannot track task, then do not proceed
+    request = TubiRequest()
+    experiments = TubiExperiments(request, m.global.constants)
+    oMoreInfoReturn = experiments.getExperimentResource(namespaceName, parameterName)
+    sendOutExperimentTracking(namespaceName, parameterName, experiments)
+  end if
+
+  return oMoreInfoReturn
+End Function
+
+
 ' Note: the component calling getExperimentValue using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
 '
 Function getExperimentValue(namespaceName as string, parameterName as string)
+  experimentInfo = invalid
+
+  if m.global <> invalid and m.global.trackingLoggingTask <> invalid
+    '//if you cannot track task, then do not proceed
+    request = TubiRequest()
+    experiments = TubiExperiments(request, m.global.constants)
+    experimentInfo = experiments.getExperimentValue(namespaceName, parameterName)
+    sendOutExperimentTracking(namespaceName, parameterName, experiments)
+  end if
+
+  return experimentInfo
+End Function
+
+
+Function sendOutExperimentTracking(namespaceName as string, parameterName as string, experiments)  
   ' set up a list of experiment parameters that we've already sent exposure events for
   ' this will prevent multiple exposure events per session for the same experiment
   if m.global.exposedExperimentParameters = invalid
@@ -10,21 +45,14 @@ Function getExperimentValue(namespaceName as string, parameterName as string)
   end if
 
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
-    experiments = TubiExperiments(m.global.constants)
+    experimentTracking = experiments.getExperimentTracking(namespaceName, parameterName)
+    if experimentTracking <> invalid and m.global.exposedExperimentParameters[parameterName] <> true
+      m.global.trackingLoggingTask.trackEvent = experimentTracking
 
-    experimentInfoAndTracking = experiments.getExperimentValue(namespaceName, parameterName)
-
-    if experimentInfoAndTracking.trackInfo <> invalid and m.global.exposedExperimentParameters[parameterName] <> true
-      m.global.trackingLoggingTask.trackEvent = experimentInfoAndTracking.trackInfo
-
-      'set the parameter on the globl store
+      'set the parameter on the global store
       exposedExperimentParameters = m.global.exposedExperimentParameters
       exposedExperimentParameters[parameterName] = true
       m.global.exposedExperimentParameters = exposedExperimentParameters
     end if
-
-    return experimentInfoAndTracking.experimentValue
   end if
-
-  return invalid
 End Function

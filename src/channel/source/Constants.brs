@@ -313,8 +313,12 @@ Function getConstants()
     'user event tracking url
     constants.urls.dataScience = {}
       constants.urls.dataScience.urlBase = "https://uapi.adrise.tv/datascience"
-      constants.urls.datascience.experiment = constants.urls.dataScience.urlBase + "/evaluate/namespaces"
       constants.urls.datascience.logging = constants.urls.dataScience.urlBase + "/logging"
+    
+    'Experiments API
+    constants.urls.experiments = {}
+      constants.urls.experiments.baseUrl = "https://popper-engine.production-public.tubi.io/popper/"
+      constants.urls.experiments.evaluate = constants.urls.experiments.baseUrl + "evaluate-namespaces"
 
     constants.urls.analytics = {}
       ' constants.urls.analytics.urlBase = "https://analytics-ingestion.staging-public.tubi.io/analytics-ingestion"
