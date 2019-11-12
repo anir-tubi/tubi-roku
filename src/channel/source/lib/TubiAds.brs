@@ -55,7 +55,8 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     populateUrlRainmaker: tubiAds_populateUrlRainmaker
     adBufferingCallback: tubiAds_adBufferingCallback
     adTrackingCallback: tubiAds_adTrackingCallback
-    isCoppaEnabled: false
+    trackUserEvent: tubiAds_trackUserEvent
+    kidsModeEnabled: false
   }
 end function
 
@@ -217,7 +218,7 @@ function tubiAds_populateUrlRainmaker(episode) As String
     model: m.constants.deviceInfo.model
     app_id: m.constants.settings.shortAppName
     language: m.constants.deviceInfo.language
-    coppa_enabled: m.isCoppaEnabled
+    coppa_enabled: m.kidsModeEnabled
 
     ' the dubug parameter must be set to 1 in order to use the following "limit" parameters for testing
     ' limit_to_campaign_id: 0   'only allow ads with that particular campaign id through the pre-qual filters
@@ -282,7 +283,7 @@ function tubiAds_getAdsListViaRoku(episode)
 
   'get the url for making the ad call
   url = ""
-  if (m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.rainmaker = true) or m.isCoppaEnabled = true
+  if (m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.rainmaker = true) or m.kidsModeEnabled = true
     url = m.populateUrlRainmaker(episode)
   else
     url = m.populateUrlAdrise(episode)
@@ -500,7 +501,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
         start_position: 0
         is_fullscreen: true
       }
-      m.tracking.trackUserEvent("start_ad", startAdEvent, m.requestQueue)
+      m.trackUserEvent("start_ad", startAdEvent, m.requestQueue)
 
       impressionCount = 0
       for i=0 to ctx.ad.tracking.count()-1
@@ -519,7 +520,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
           position: m.adPlaybackPos
           ad_interaction: "CLOSE"
         }
-        m.tracking.trackUserEvent("ad_click", clickAdEvent, m.requestQueue)
+        m.trackUserEvent("ad_click", clickAdEvent, m.requestQueue)
       else
         endPosition = invalid
         if eventType = "Complete"
@@ -541,7 +542,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
           end_position: endPosition * 1000
           reason: "DETECTED"
         }
-        m.tracking.trackUserEvent("finish_ad", finishAdEvent, m.requestQueue)
+        m.trackUserEvent("finish_ad", finishAdEvent, m.requestQueue)
         youboraOptions = m.updateYouboraOptions(m.youboraTask, ctx, impressionCount)
       end if
       m.isInteracting = false
@@ -555,7 +556,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
         position: m.adPlaybackPos
         ad_interaction: "OPEN"
       }
-      m.tracking.trackUserEvent("ad_click", clickAdEvent, m.requestQueue)
+      m.trackUserEvent("ad_click", clickAdEvent, m.requestQueue)
       m.isInteracting = true
     end if
   else
@@ -623,4 +624,17 @@ Function tubiAds_updateYouboraOptions(youboraTask, ctx, impressionCount)
   end if
 
   return youboraOptions
+End Function
+
+
+' Wraps m.tracking.trackUserEvent() but adds the appropriate app mode value
+Function tubiAds_trackUserEvent(eventType="", eventValues=invalid, requestQueue=invalid)
+  if eventValues <> invalid
+    appMode = "DEFAULT_MODE"
+    if m.kidsModeEnabled = true
+      appMode = "KIDS_MODE"
+    end if
+    eventValues.appMode = appMode
+    m.tracking.trackUserEvent(eventType, eventValues, requestQueue)
+  end if
 End Function

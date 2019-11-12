@@ -89,9 +89,6 @@
       <!-- force transport to display or hide -->
       <field id="showTransport" type="boolean" alwaysNotify="true"/>
 
-      <!-- This value is passed to TubiAds via TubiAdShim and controls if PII is passed via ad calls -->
-      <field id="isCoppaEnabled" type="boolean"/>
-
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->

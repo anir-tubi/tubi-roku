@@ -33,18 +33,12 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
   tubiLog("TubSGAdShim.Run")
   m.videoPlayerNode = videoPlayerNode
 
-  ' There is the chance for a race condition where m.videoPlayerNode.isCoppaEnabled is set before the adShim has
-  ' a chance to start observing the field, so we grab the initial value here just in case. It can be updated later
-  ' by the observer if necessary.
-  m.ads.isCoppaEnabled = m.videoPlayerNode.isCoppaEnabled
-
   if type(m.videoPlayerNode) <> "roSGNode" or m.videoPlayerNode.subtype() <> "VideoPlayer"
     tubiLog("TubSGAdShim.Run: videoPlayerNode is not component type VideoPlayer")
     return false
   end if
   port = CreateObject("roMessagePort")
   m.videoPlayerNode.observeField("adControl", port)
-  m.videoplayernode.observeField("isCoppaEnabled", port)
 
   ' Let SceneGraph know that ad shim is ready
   m.videoPlayerNode.adState = "init"
@@ -66,12 +60,11 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
           position = m.videoPlayerNode.adPosition
           tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position))
           print "ad state "; m.videoPlayerNode.adState
+          m.ads.kidsModeEnabled = m.videoPlayerNode.kidsMode
           m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
         else
           m.videoPlayerNode.adState = "noads"  ' if video player content was changed before we got here, return no ads
         end if
-      else if msg.GetField() = "isCoppaEnabled"
-        m.ads.isCoppaEnabled = msg.GetData()
       end if
     end if
   end while

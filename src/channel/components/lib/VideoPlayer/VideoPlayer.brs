@@ -1343,6 +1343,7 @@ End Function
 
 
 Function onKidsModeChange()
+  tubilog("VideoPlayer.onKidsModeChange")
   m.theme = m.global.theme
   updateColors()
   if m.top.kidsMode = false
@@ -1352,8 +1353,6 @@ Function onKidsModeChange()
     m.logo.visible = false
     m.logoKids.visible = true
   end if
-
-  m.top.isCoppaEnabled = m.top.kidsMode
 End Function
 
 
