@@ -225,9 +225,9 @@ Function getConstants()
       constants.thirdParty.youbora.debug = false
       constants.thirdParty.youbora.config = {}
         ' DEVELOPMENT
-        constants.thirdParty.youbora.config.accountCode = "tubitvdev" 'This is the only mandatory param
+        ' constants.thirdParty.youbora.config.accountCode = "tubitvdev" 'This is the only mandatory param
         ' PRODUCTION
-        'constants.thirdParty.youbora.config.accountCode = "tubitv" 'This is the only mandatory param
+        constants.thirdParty.youbora.config.accountCode = "tubitv" 'This is the only mandatory param
 
         constants.thirdParty.youbora.config.expectAds = true
 

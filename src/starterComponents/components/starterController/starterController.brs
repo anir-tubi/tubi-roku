@@ -6,6 +6,13 @@ End Function
 Function onUrlRequest()
   m.constants.externalConfig.info = m.top.externalConfigValues
   m.constants.experiments.info = m.top.experimentValues
+
+  'Handle any remote config updates here:
+  'Let youbora be enabled by the remote config
+  if m.constants.externalConfig.info.youbora_enabled = true
+    m.constants.thirdParty.youbora.enabled = m.constants.externalConfig.info.youbora_enabled
+  end if
+
   m.top.newBuildConstants = m.constants
 
   if m.constants.remoteComponents = false
