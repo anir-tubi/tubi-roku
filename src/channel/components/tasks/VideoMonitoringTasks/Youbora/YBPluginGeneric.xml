@@ -28,5 +28,4 @@
     <script type="text/brightscript" uri="./ViewManager.brs"/>
     <script type="text/brightscript" uri="./Request.brs"/>
     <script type="text/brightscript" uri="./InfoManager.brs"/>
-
 </component>

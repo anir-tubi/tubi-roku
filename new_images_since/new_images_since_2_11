@@ -4,8 +4,5 @@
 # Generated with (and manually filtered for new or changed images): 
 #   git diff --stat 2_7_1:src/channel/images HEAD:src/channel/images/
 
-# Always have to include intermediate directories
-images
-
 # Add images below here like:
 #   images/new-image.png

@@ -8,9 +8,9 @@
  -
  -->
 <component name="BackgroundGroup" extends="Group">
-  <script type="text/brightscript" uri="pkg:/components/lib/BackgroundGroup/BackgroundGroup.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="BackgroundGroup.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   
   <interface>
     <!-- backgrondInfo has the keys "type (string)" and "uriList (array)".

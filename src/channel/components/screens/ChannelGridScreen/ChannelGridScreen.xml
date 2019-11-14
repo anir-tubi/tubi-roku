@@ -7,14 +7,14 @@
  -->
 <component name="ChannelGridScreen" extends="Group">
 
-  <script type="text/brightscript" uri="pkg:/components/screens/ChannelGridScreen/ChannelGridScreen.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="ChannelGridScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
     <!-- INPUT -->

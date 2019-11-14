@@ -6,56 +6,55 @@
  -
  --> 
 <component name="TrackingLoggingTask" extends="Task">
-    <script type="text/brightscript" uri="pkg:/components/tasks/TrackingLoggingTask/TrackingLoggingTask.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Sentry.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
-    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="TrackingLoggingTask.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
 
-    <interface>
-      <!-- INPUT -->
-        <!--
-        -
-        - The trackEvent field should have the following form:
-        - {
-        -   type: string that corresponds to one of the eventTypes found in m.tracking.getAnalyticsEvent()
-        -   values: assocArray with fields that correspond to the fields specified for the eventType in TubiTracking.getAnalyticsEvent()
-        - }
-        -
-        - for more info on trackEvent values, please see:
-        - https://tubitv.atlassian.net/wiki/pages/viewpage.action?spaceKey=EC&title=Analytics+Events
-        -->
-        <field id="trackEvent" type="assocarray" alwaysNotify="true"/>
+  <interface>
+    <!-- INPUT -->
+      <!--
+      -
+      - The trackEvent field should have the following form:
+      - {
+      -   type: string that corresponds to one of the eventTypes found in m.tracking.getAnalyticsEvent()
+      -   values: assocArray with fields that correspond to the fields specified for the eventType in TubiTracking.getAnalyticsEvent()
+      - }
+      -
+      - for more info on trackEvent values, please see:
+      - https://tubitv.atlassian.net/wiki/pages/viewpage.action?spaceKey=EC&title=Analytics+Events
+      -->
+      <field id="trackEvent" type="assocarray" alwaysNotify="true"/>
 
 
-        <!--
-        -
-        - The logMsg field should have the following form:
-        - {
-        -   message: string, the message to be logged
-        -   level: string, the type of debug, must be one of "debug", "error", "info", "warn"
-        -   serverType: string, a string specified as one that is in TubiLogger().logConsts
-        -   subtype: string, a small string used to differentiate log messages
-        - }
-        -
-        -->      
-        <field id="logMsg" type="assocarray" alwaysNotify="true"/>
+      <!--
+      -
+      - The logMsg field should have the following form:
+      - {
+      -   message: string, the message to be logged
+      -   level: string, the type of debug, must be one of "debug", "error", "info", "warn"
+      -   serverType: string, a string specified as one that is in TubiLogger().logConsts
+      -   subtype: string, a small string used to differentiate log messages
+      - }
+      -
+      -->      
+      <field id="logMsg" type="assocarray" alwaysNotify="true"/>
 
-        <!--
-        -
-        - The logException field should have the following form
-        - {
-        -   message: string, the message to be logged
-        -   level: string, the type of debug, must be one of "debug", "error", "info", "warn"
-        - }
-        -
-        -->
-        <field id="logException" type="assocarray" alwaysNotify="true"/>
+      <!--
+      -
+      - The logException field should have the following form
+      - {
+      -   message: string, the message to be logged
+      -   level: string, the type of debug, must be one of "debug", "error", "info", "warn"
+      - }
+      -
+      -->
+      <field id="logException" type="assocarray" alwaysNotify="true"/>
 
-        <!-- indicates the mode of the app and will be passed to all analytics events, ie. KIDS_MODE -->
-        <field id="analyticsAppMode" type="string" value="DEFAULT_MODE"/>
-    </interface>
+      <!-- indicates the mode of the app and will be passed to all analytics events, ie. KIDS_MODE -->
+      <field id="analyticsAppMode" type="string" value="DEFAULT_MODE"/>
+  </interface>
 </component>

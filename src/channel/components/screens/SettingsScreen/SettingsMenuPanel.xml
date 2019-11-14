@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="SettingsMenuPanel" extends="ListPanel" >
-  <script type="text/brightscript" uri="./SettingsMenuPanel.brs"/>
+  <script type="text/brightscript" uri="SettingsMenuPanel.brs"/>
 
   <interface>
     <!-- INPUTS -->

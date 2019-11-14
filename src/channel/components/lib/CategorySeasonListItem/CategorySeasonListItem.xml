@@ -6,8 +6,8 @@
  -
  -->
 <component name="CategorySeasonListItem" extends="Group" >
-  <script type="text/brightscript" uri="pkg:/components/lib/CategorySeasonListItem/CategorySeasonListItem.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="CategorySeasonListItem.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
     <field id="focusPercent" type="float" value="0.0"/>

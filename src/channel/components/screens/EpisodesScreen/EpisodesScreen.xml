@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="EpisodesScreen" extends="Group" initialFocus="Menu" >
 
-  <script type="text/brightscript" uri="pkg:/components/screens/EpisodesScreen/EpisodesScreen.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="EpisodesScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   
   <interface>
     <!-- INPUT -->

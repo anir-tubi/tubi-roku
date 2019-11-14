@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="SignOutPanel" extends="Panel" >
-  <script type="text/brightscript" uri="./SignOutPanel.brs" />
+  <script type="text/brightscript" uri="SignOutPanel.brs" />
 
   <interface>
     <field id="name"   type="string"/>

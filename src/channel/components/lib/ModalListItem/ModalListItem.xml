@@ -6,7 +6,7 @@
  -
  -->
 <component name="ModalListItem" extends="Group" >
-  <script type="text/brightscript" uri="pkg:/components/lib/ModalListItem/ModalListItem.brs" />
+  <script type="text/brightscript" uri="ModalListItem.brs" />
 
   <interface>
     <field id="itemContent" type="node" />

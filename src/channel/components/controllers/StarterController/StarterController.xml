@@ -10,11 +10,11 @@
  -->
 <component name="StarterController" extends="Group">
 
-  <script type="text/brightscript" uri="pkg:/components/starterController/starterController.brs" />
-  <script type="text/brightscript" uri="pkg:/source/Constants.brs" />
-  <script type="text/brightscript" uri="pkg:/source/Settings.brs" />
-  <script type="text/brightscript" uri="pkg:/source/generalUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/source/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="StarterController.brs" />
+  <script type="text/brightscript" uri="../../source/Constants.brs" />
+  <script type="text/brightscript" uri="../../source/Settings.brs" />
+  <script type="text/brightscript" uri="../../source/generalUtils.brs" />
+  <script type="text/brightscript" uri="../../source/TubiExperiments.brs" />
 
   <interface>
     <!-- INPUTS -->

@@ -1,16 +1,20 @@
-' In order to use this dev.yml create a new file called dev.yml in the config directory,
-' using this .example file as a template.
-'
-' dev.yml will overwrite any of the configuration settings in default.yml if the ROKU_PROFILE environment variable is set to "dev"
-'
-' {{hostUri}} will be replaced by the local IP of a server that starts during "make install" so that the various files
-' below will be served from local sources rather than the CDN.
+# In order to use this dev.yml create a new file called dev.yml in the config directory,
+# using this .example file as a template.
+#
+# dev.yml will overwrite any of the configuration settings in default.yml if the ROKU_PROFILE environment variable is set to "dev"
+#
+# {{hostUri}} will be replaced by the local IP of a server that starts during "make install" so that the various files
+# below will be served from local sources rather than the CDN.
 
-' {{versionMinorDotted}} will be replaced with the current version of the channel (ie. 2.5)
+# {{versionMinorDotted}} will be replaced with the current version of the channel (ie. 2.5)
+
+# --------------------------------------------------------------------------------------------
+# ------------ There is no need to copy any of the lines above to dev.yml --------------------
 
 settings:
   mode: "dev"
-  hotPatchUrl: "http://{{hostUri}}/hotpatch/{{versionMinorDotted}}.brs"
-  remoteComponentsHost: "http://{{hostUri}}"
-  remoteComponentsExtension: "pkg"
+  starterComponentsUrl: "http://{{localHostUri}}/tubi_starter_components_{{versionMinorUnderscored}}.{{fileType}}"
+  remoteComponentsUrl: "http://{{localHostUri}}/tubi_remote_components_{{versionUnderscored}}.{{fileType}}"
+  # remoteComponentsExtension will fill in the {{fileType}} template value.
+  remoteComponentsExtension: "zip"
 

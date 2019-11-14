@@ -4,17 +4,16 @@
  -
  -->
 <component name="AdsTask" extends="Task">
-    <script type="text/brightscript" uri="pkg:/components/tasks/AdsTask/AdsTask.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Sentry.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
-    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
-    <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/TubiAds.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/TubiSGAdShim.brs" />
+    <script type="text/brightscript" uri="AdsTask.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+    <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiAds.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiSGAdShim.brs" />
 
     <interface>
       <!-- INPUT -->

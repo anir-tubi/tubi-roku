@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <component name="CategoryGridList" extends="Group">
-  <script type="text/brightscript" uri="pkg:/components/lib/CategoryGridList/CategoryGridList.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="CategoryGridList.brs" />
+  <script type="text/brightscript" uri="../FocusMixin.brs" />
+  <script type="text/brightscript" uri="../../tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="../ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 
 
   <interface>

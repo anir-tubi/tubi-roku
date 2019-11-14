@@ -3,5 +3,5 @@
  - VideoPickerPoster
  -->
 <component name="VideoPickerPoster" extends="FeaturePoster">
-  <script type="text/brightscript" uri="pkg:/components/lib/VideoPickerPoster/VideoPickerPoster.brs" />
+  <script type="text/brightscript" uri="VideoPickerPoster.brs" />
 </component>

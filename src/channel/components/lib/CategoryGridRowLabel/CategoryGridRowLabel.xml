@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="CategoryGridRowLabel" extends="Group">
-  <script type="text/brightscript" uri="pkg:/components/lib/CategoryGridRowLabel/CategoryGridRowLabel.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="CategoryGridRowLabel.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
     <!-- Incoming interface: populate children nodes with content values -->

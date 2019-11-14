@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="DetailScreen" extends="Group" initialFocus="Menu" >
 
-  <script type="text/brightscript" uri="pkg:/components/screens/DetailScreen/DetailScreen.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="DetailScreen.brs" />
+  <script type="text/brightscript" uri="../ModalDialogs.brs" />
+  <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
 
   <interface>
     <!-- INPUTS -->

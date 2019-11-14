@@ -6,14 +6,14 @@
  -
  --> 
 <component name="AuthTask" extends="Task">
-    <script type="text/brightscript" uri="pkg:/components/tasks/AuthTask/AuthTask.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/RequestQueue.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
-    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="AuthTask.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
+    <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
       <!-- INPUT -->

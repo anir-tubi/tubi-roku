@@ -7,7 +7,7 @@
  -->
 <component name="ModalDialogScreen" extends="Group" initialFocus="ButtonList">
 
-  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogScreen/ModalDialogScreen.brs" />
+  <script type="text/brightscript" uri="ModalDialogScreen.brs" />
   
   <interface>
     <!-- INPUT -->

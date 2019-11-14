@@ -6,10 +6,10 @@
  -
  --> 
 <component name="SimpleRequestTask" extends="Task">
-    <script type="text/brightscript" uri="pkg:/components/tasks/SimpleRequestTask/SimpleRequestTask.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="SimpleRequestTask.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+    <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
       <!-- INPUT -->

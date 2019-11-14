@@ -4,12 +4,12 @@
  -
  -->
 <component name="ErrorController" extends="Group">
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="pkg:/components/controllers/ErrorController/ErrorController.brs" />
-  <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="ErrorController.brs" />
+  <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   
   <interface>
     <!--

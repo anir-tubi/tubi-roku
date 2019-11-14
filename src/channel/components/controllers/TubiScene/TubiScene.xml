@@ -17,7 +17,7 @@
  -->
 <component name="TubiScene" extends="Scene">
 
-  <script type="text/brightscript" uri="pkg:/components/controllers/TubiScene/TubiScene.brs" />
+  <script type="text/brightscript" uri="TubiScene.brs" />
 
   <children>
     <Poster

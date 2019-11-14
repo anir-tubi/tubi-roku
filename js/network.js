@@ -20,13 +20,29 @@ exports.keypress = function(key, address, password) {
   });
 };
 
+exports.deeplink = function(rokuAppId, address) {
+  return new Promise((res, rej) => {
+    const url = `http://${address}:8060/launch/${rokuAppId}`;
+    const options = {
+      url,
+      data: {}
+    };
+    request.post(options, (err, response, body) => {
+      if (err) {
+        rej(err);
+      }
+      res(body);
+    });
+  });
+}
+
 /**
- * upload roku pkg to target roku box
- * @param pkgfile roku package file
+ * upload roku zip to target roku box
+ * @param zipPath the file location of the zip to be uploded
  * @param address roku device IP
  * @param password roku dev user password
  */
-exports.uploadPkg = function(pkgfile, address, password) {
+exports.uploadPkg = function(zipPath, address, password) {
   return new Promise((res, rej) => {
     const url =`http://${address}/plugin_install`;
     const auth = {
@@ -34,12 +50,17 @@ exports.uploadPkg = function(pkgfile, address, password) {
       pass: password,
       sendImmediately: false
     };
-
-    const data = {
+    const formData = {
       mysubmit: 'Install',
-      archive: fs.createReadStream(pkgfile)
+      archive: fs.createReadStream(zipPath)
     };
-    request.post({url: url, auth: auth, formData: data}, (err, response, body) => {
+    const options = {
+      url,
+      auth,
+      formData
+    };
+
+    request.post(options, (err, response, body) => {
       const success = !!body ? body.match(/<font color="red">Install Success.<\/font>/) : null
       if (err) {
         rej(err);
@@ -50,15 +71,17 @@ exports.uploadPkg = function(pkgfile, address, password) {
       else if (success === null) {
         let errorMessages = body.match(/<font color="red">([^<]*)/);
         if (errorMessages !== null) {
+          var rejMessage = '';
           errorMessages.shift()
           errorMessages.forEach((message) => {
             console.log(`Device install error: ${message}`);
+            rejMessage = message
           });
         }
         else {
           console.log('Unknown install error');
         }
-        rej('Device install failed');
+        rej(rejMessage);
       }
       else {
         res(body);
@@ -90,7 +113,7 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
       pkg_time: '',
     };
     request.post({url: url, auth: auth, formData: data}, (err, response, body) => {
-      var packages = body.match(/pkgs\/\/([^\"]*)/)
+      var packages = body ? body.match(/pkgs\/\/([^\"]*)/) : '';
       if (err)
         rej(err);
       else if (response.statusCode !== 200)
@@ -132,37 +155,4 @@ exports.autoDiscover = function() {
     });
     ssdp.search('roku:ecp');
   });  
-};
-
-
-/**
- * Host external component library for development
- */
-exports.hostComponents = function(serverPath, port){
-  console.log('SERVER: hostComponents has started on port ' + port);
-
-  if (typeof(port) === 'string'){
-    port = parseInt(port, 10);
-  }
-
-  const server = http.createServer((req, res) => {
-    const nodePath = path.dirname(require.main.filename);
-    const requestPath = require('url').parse(req.url).pathname;
-    const fullPath = `${nodePath}/../${serverPath}${requestPath}`;
-    const stream = fs.createReadStream(fullPath);
-
-    stream
-      .on('open', () => {
-        console.log('SERVER: external component stream has started ' + requestPath);
-      })
-      .on('end', () => {
-        console.log('SERVER: external component stream has ended ' + requestPath);
-      })
-      .on('error', () => {
-        console.log('SERVER: error serving ' + requestPath);
-        res.statusCode = 404;
-        res.end();
-      })
-    stream.pipe(res);
-  }).listen(port);
 };

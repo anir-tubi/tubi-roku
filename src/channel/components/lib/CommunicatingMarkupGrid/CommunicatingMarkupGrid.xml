@@ -7,7 +7,7 @@
  -->
 <component name="CommunicatingMarkupGrid" extends="FilledButtonMarkupGrid">
 
-  <script type="text/brightscript" uri="pkg:/components/lib/CommunicatingMarkupGrid/CommunicatingMarkupGrid.brs" />
+  <script type="text/brightscript" uri="CommunicatingMarkupGrid.brs" />
 
   <interface>
     <!-- OUTPUT -->

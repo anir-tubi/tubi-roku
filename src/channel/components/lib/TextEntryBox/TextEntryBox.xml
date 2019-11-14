@@ -6,8 +6,8 @@
  -
  -->
 <component name="TextEntryBox" extends="Rectangle" >
-  <script type="text/brightscript" uri="pkg:/components/lib/TextEntryBox/TextEntryBox.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="TextEntryBox.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
     <!-- The text to display.  This is not wired up to anything by default -->

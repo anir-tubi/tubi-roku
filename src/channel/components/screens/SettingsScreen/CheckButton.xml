@@ -6,7 +6,7 @@
  -
  -->
 <component name="CheckButton" extends="Group" >
-  <script type="text/brightscript" uri="./CheckButton.brs" />
+  <script type="text/brightscript" uri="CheckButton.brs" />
 
   <interface>
     <!-- Content expected for a KeyboardMenuItem:

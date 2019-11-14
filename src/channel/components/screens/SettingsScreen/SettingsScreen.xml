@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="SettingsScreen" extends="Group" >
-  <script type="text/brightscript" uri="pkg:/components/screens/SettingsScreen/SettingsScreen.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="SettingsScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
 
   <interface>
     <!-- INPUTS -->

@@ -1,10 +1,13 @@
 settings:
+  # Settings are added to constants.settings via getSettings
+  # Any constants that need to be templatized via handlebars should be added via settings
   mode: "production"
   version: "{{versionUnderscored}}"
   contentType: "hls"
   shortAppName: "tubitv"
   platformName: "roku"
-  remoteComponentsHost: "https://cdn.adrise.tv/hotpatches/roku/components"
+  starterComponentsUrl: "https://cdn.adrise.tv/hotpatches/roku/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
+  remoteComponentsUrl: "https://cdn.adrise.tv/hotpatches/roku/components/tubi_remote_components_{{versionUnderscored}}.pkg"
   remoteComponentsExtension: "pkg"
   migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"
 

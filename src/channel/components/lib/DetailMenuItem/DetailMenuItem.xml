@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="DetailMenuItem" extends="Rectangle" >
-  <script type="text/brightscript" uri="pkg:/components/lib/DetailMenuItem/DetailMenuItem.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="DetailMenuItem.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
     <!-- hide the progress bar when focus changes -->

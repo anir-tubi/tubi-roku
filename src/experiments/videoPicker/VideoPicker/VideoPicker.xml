@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="VideoPicker" extends="Group">
-  <script type="text/brightscript" uri="pkg:/components/lib/VideoPicker/VideoPicker.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="VideoPicker.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
     <!--

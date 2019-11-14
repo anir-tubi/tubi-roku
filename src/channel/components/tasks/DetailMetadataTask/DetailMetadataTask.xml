@@ -6,13 +6,13 @@
  -
  --> 
 <component name="DetailMetadataTask" extends="Task">
-    <script type="text/brightscript" uri="pkg:/components/tasks/DetailMetadataTask/DetailMetadataTask.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
-    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="DetailMetadataTask.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/CmsApi.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
+    <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
 
     <interface>
       <!-- INPUT -->

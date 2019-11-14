@@ -8,5 +8,5 @@ component_library_manifest:
   build_version: 0
 starter_library_manifest:
   major_version: 2
-  minor_version: 10
+  minor_version: 11
   build_version: 0

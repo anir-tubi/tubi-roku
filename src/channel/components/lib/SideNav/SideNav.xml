@@ -6,9 +6,9 @@
  - This is the main side navigation of the app
  -->
 <component name="SideNav" extends="Group">
-  <script type="text/brightscript" uri="pkg:/components/lib/SideNav/SideNav.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="SideNav.brs" />
+  <script type="text/brightscript" uri="../AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   
   <interface>
     <!-- INPUTS -->

@@ -4,8 +4,8 @@
  -->
 <component name="FeaturePosterWithProgress" extends="Group">
 
-  <script type="text/brightscript" uri="pkg:/components/lib/FeaturePosterWithProgress/FeaturePosterWithProgress.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="FeaturePosterWithProgress.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   
   <interface>
     <field id="itemContent" alias="FeaturePoster.itemContent"/>

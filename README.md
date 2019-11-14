@@ -35,9 +35,7 @@ $ git clone git@github.com:adRise/project-total-recall.git
 2\. Navigate to the github repo in terminal and then install build tools
 
 ```
-$ cd tools
 $ npm install  # this expect you have node > 4.x installed
-$ cd ..
 ```
 
 3\. Enable developer mode on the Roku device remote control:
@@ -50,11 +48,11 @@ $ cd ..
 When asked to set up a dev password, use "1234" so it's easier for any developer to easily know the password for any device.
 
 
-4\. Set the developer id to "c1e4c3108580bda0bdb8c690284c7d83c6b0a5a7" on your Roku device
+4\. Set the developer id on your Roku device. (You will need to get a pkg, password, and developer id from other roku developers on the team).
 
 * Navigate to the Roku device's IP in your broswer; select Utilities. Take note of the IP address for step #5 when you will set the "ROKU_DEV_TARGET".
-* Upload the pkg file and enter the password and select `Rekey`. (Get both the pkg and password from other roku developers on the team. This password will be used in step #5 to set "PKG_PASSWORD".)
-* Check that you have the proper developer ID by navigating in your web browser to the Roku device's IP and then select Packager
+* Upload the pkg file and enter the password and select `Rekey`. (This password will be used in step #5 to set "PKG_PASSWORD").
+* Check that you have the proper developer ID by navigating in your web browser to the Roku device's IP and then select Packager.
 
 5\. Set the build environment. (The following settings are temporary and setting them must be done everytime you create a new terminal session.)
 
@@ -63,11 +61,12 @@ $ export ROKU_DEV_TARGET=<your-roku-ip>
 $ export DEV_PASSWORD=<dev password set up on Roku device>
 $ export PKG_PASSWORD=<password from the GENKEY utility used for signing packages>
 ```
+Pro tip: add these environment variables to your .bashrc or .bash_profile file
 
 6\. Make a development build, sideload to the device, and attach to the developer console
 
 ```
-$ make install
+$ gulp install
 ```
 
 
@@ -76,9 +75,7 @@ $ make install
 
 1\. Unit tests - run on a sideloaded channel
 
-```
-$ make ROKU_PROFILE=test install
-```
+`$ gulp install --test`
 
 2\. Functional / regression tests - run against staging
 
@@ -89,40 +86,27 @@ $ make ROKU_PROFILE=test install
 3\. If you want to provide someone (i.e. QA) a zip file of the app to [sideload](https://tubitv.atlassian.net/wiki/spaces/EC/pages/879460427/Side+Load+Roku+.zip), you first need to modify temporarily 2 values within the Constants.brs file so it is not trying to load the hotpatch/remote components from the local server:
 
 ```
+constants.starterComponents = false
 constants.remoteComponents = false
-constants.useHotpatch = false
 ```
+
 # Submission Release
 Submission releases are releases that are sent to Roku.
 
 1\. Run unit tests locally
 
-```
-$ make ROKU_PROFILE=test install
-```
+`$ gulp install --test`
 
 2\. Prepare for submission release.
 - Create a new branch based off of master and call it "x_y_branch", where x is the Major Release number and where y is the Minor Release number: i.e. `2_9_branch`.
 
-- Create a new `new_images_since_x_y` file: i.e. `new_images_since_2_9`
-
-- Update the Makefile with the new `new_images_since_x_y` path (3 instances should be updated)
-- Create a new hotpatch for the new version: ie. `2.9.brs`
-
-- Move any necessary logic from the previous version's hotpatch to the new version's hotpatch
-
-  - Ensure you have 2 comment sections in the hotpatch file
-    - "always present"
-
-    - "temporary changes that can be can be deleted unless noted otherwise"
+- Create a new `new_images_since_x_y` file: i.e. `new_images_since_2_9` in the `new_images_since` directory.
 
 - Update version numbers in `config/build.yml`
 
   - Increment `minor_version`
 
   - set `build_version` to `1`
-
-- Update the value of hotPatchUrl in `./config/staging.yml` to reflect the new build version.
 
 - Create a new image to serve as the staging channel launch icon.
 	- Using GIMP or Photoshop or other image editor, modify the `channel-store/channel-store-poster-540x405.png` with some text to identify it as the x_y staging channel.
@@ -132,20 +116,11 @@ $ make ROKU_PROFILE=test install
 - Make a new PR of the `x_y_branch` against master. Once the PR has been merged _DO NOT_ delete the `x_y_branch`, as this will remain the source of truth for what is in production.
 
 3\. Create a staging channel for the minor build
-- Run `make ROKU_PROFILE=staging install`
-
-- Navigate to the `/build` directory, and note the `tubi_x_y_z.zip file`, you will be creating a private Roku channel with this file.
-
-- Create a .pkg file from the `tubi_x_y_z.zip` file found in the `/build` directory.
-  - Navigate to your Roku's IP in a browser, and choose the "Packager" tab.
-
-  - Enter App Name/Version as Tubi Staging x.y and enter the password associated with the Tubi dev key (you may need to get this from a teammate).
-
-  - Select the "Package" button, and download the .pkg file from the link that is created.
+- Run `gulp install --staging`
 
 - In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to create a new private channel.
 
-	- Upload the .pkg file that you downloaded from the browser during the packaging process.
+	- Upload the `tubi_x_y_z.pkg` file from the `/build` directory.
 
 	- Name the channel `Staging x_y`.
 
@@ -174,10 +149,10 @@ $ make ROKU_PROFILE=test install
 	aws_secret_access_key = <<aws_secret_access_key>>
 	```
 
-* Upload the hotpatch and remote components onto the staging AWS server, run:
+* Upload the starter components and remote components onto the staging AWS server, run:
 
 ```
-$ make ROKU_PROFILE=staging install
+$ gulp stage
 ```
 
 5\. Run functional tests against staging
@@ -189,18 +164,18 @@ TBD
 6\. Submit build to Roku
 - Run the following command to increment the build version number, create a new tag for the build,  and output .pkg files that can be submitted to Roku.
 ```
-$ make release
+$ gulp release
 ```
 - In a browser, visit [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to update the "Tubi - Free Movies & TV" channel with the `/build/roku_x_y_z.pkg` file.
 
-7\. Update the hotpatch and remote component files to the CDN
+7\. Update the starter components and remote component files to the CDN
 - Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/). Although it does not matter, traditionally we name the branch "Roku_x_y_z", where "z" is the patch number.
 
 - Copy two files to the CDN repo:
 
   - copy the remote components file (i.e. `build/tubi_remote_components_x_y_z.pkg`) into the folder: hotpatches/roku/components/
 
-  - copy the hotpatch file (i.e. `build/hotpatch/x.y.brs`) into folder: hotpatches/roku/
+  - copy the starter components file (i.e. `build/tubi_starter_components.x.y.pkg`) into folder: hotpatches/roku/starter-components
 
 - Submit a PR to the CDN repo.
 
@@ -231,15 +206,13 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
 Ensure the cherry pick commit names include the name of PR number. This usually is done automaticlly but be aware that we need to have the PR numbers to make it easier later on so we know which PRs have been pushed and which ones have not.
 
-3\. Check each of the cherry picked commits for updates to `Constants.brs` or `TubiChannel.brs`. If any updates have been made to either of these files, copy the changes into `x.y.brs` hotpatch file in the "temporary changes that can be can be deleted unless noted otherwise" section.
+3\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since/new_images_since_x_y` file with the image locations of any new or updated images.
 
-4\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since_x_y` file with the image locations of any new or updated images.
+4\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates.
 
-5\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates.
+5\. Run `gulp bump` in order to increment the version number.
 
-6\. Run `make release` in order to increment the version number.
-
-7\. Deploy to staging
+6\. Deploy to staging
 
 * Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now,
 [https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
@@ -261,17 +234,15 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 	aws_secret_access_key = <<aws_secret_access_key>>
 	```
 
-* Upload the hotpatch and remote components onto the staging AWS server, run:
+* Upload the starter components and remote components onto the staging AWS server, run:
 
-```
-$ make ROKU_PROFILE=staging install
-```
+`$ gulp stage`
 
-8\. Create a CH ticket with any changes that have been made and give to the QA team for manual testing. Once the QA team has signed off on the build...
+7\. Create a CH ticket with any changes that have been made and give to the QA team for manual testing. Once the QA team has signed off on the build...
 
-9\. Run `make release` in order to increment the version number once more (the QA build should not be the same version number as the production build).
+8\. Run `gulp bump` in order to increment the version number once more (the QA build should not be the same version number as the production build).
 
-10\. Ready the release branch for review
+9\. Ready the release branch for review
 
 - Rename the `qa_x_y_z` branch to `release_x_y_z`.
 
@@ -281,16 +252,16 @@ $ make ROKU_PROFILE=staging install
 
 - __DO NOT PROCEED TO THE INFRA SCRIPT STEP UNTIL THIS PR IS APPROVED__
 
-11\. Update the hotpatch and remote component files to the CDN
+10\. Update the hotpatch and remote component files to the CDN
 - Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/). Although it does not matter, traditionally we name the branch "Roku_x_y_z".
 
 - Copy two files to the CDN repo:
 
   - copy the remote components file (i.e. `build/tubi_remote_components_x_y_z.pkg`) into the folder: hotpatches/roku/components/
 
-  - copy the hotpatch file (i.e. `build/hotpatch/x.y.brs`) into folder: hotpatches/roku/
+  - copy the starter components file (i.e. `build/tubi_starter_components_x.y.brs`) into folder: hotpatches/roku/starter-components/
 
-- Submit a PR to the CDN repo. Wait for the approval and merging of the PR before procreeding to the next step
+- Submit a PR to the CDN repo. Wait for the approval and merging of the PR before proceeding to the next step
 
 12\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)

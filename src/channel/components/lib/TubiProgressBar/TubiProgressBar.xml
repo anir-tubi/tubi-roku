@@ -9,7 +9,7 @@
  -
  -->
 <component name="TubiProgressBar" extends="Group" >
-  <script type="text/brightscript" uri="./TubiProgressBar.brs" />
+  <script type="text/brightscript" uri="TubiProgressBar.brs" />
   <interface>
     <!-- INPUT -->
 

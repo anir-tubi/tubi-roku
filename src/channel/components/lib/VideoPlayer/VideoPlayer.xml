@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="VideoPlayer" extends="Group" >
-  <script type="text/brightscript" uri="pkg:/components/lib/VideoPlayer/VideoPlayer.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/VideoPlayer/VideoPlaylist.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
-  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="VideoPlayer.brs" />
+  <script type="text/brightscript" uri="VideoPlaylist.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
 
   <interface>
     <!-- INPUT -->

@@ -6,8 +6,8 @@
  -
  -->
 <component name="SignInButton" extends="Group" >
-  <script type="text/brightscript" uri="pkg:/components/lib/SignInButton/SignInButton.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="SignInButton.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
     <!-- Content expected for a KeyboardMenuItem:

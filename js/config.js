@@ -56,15 +56,28 @@ function formatBuildTag(build, isMinor, isDot) {
  * @returns {*}
  */
 function load(env) {
-  var build = parse(buildProfile);
+  const build = parse(buildProfile);
   const templateValues = {
-    hostUri: `${localIp}:8090`,
+    localHostUri: `${localIp}:8090`,
     versionUnderscored: formatBuildTag(build, false, false),
+    versionMinorUnderscored: formatBuildTag(build, true, false),
     versionMinorDotted: formatBuildTag(build, true, true),
+    fileType: 'pkg' //can be overwritten by the remoteComponentsExtension
   };
-  var data = parse(defaultProfile, templateValues);
-  var envData = parse(env, templateValues);
-  return extend(true, data, envData, build);
+  const defaultData = parse(defaultProfile, templateValues);
+
+  let envData = parse(env, templateValues);
+
+  // Overwrite the dev setting with any template values that might exist in the dev.yml.
+  // For instance, remoteComponentsExtension
+  if (env === "dev") {
+    templateValues.fileType = envData.settings.remoteComponentsExtension;
+    envData = parse(env, templateValues);
+  }
+
+  // Squashes the build, envData, and defaultData objects into a single object.
+  // Overwriting (if necessary) happens in reverse parameter order (ie. build overwrites envData, etc.)
+  return extend(true, defaultData, envData, build);
 }
 
 
@@ -73,14 +86,18 @@ function incrementBuildNumber() {
 
   build.manifest.build_version = build.manifest.build_version + 1
   build.component_library_manifest.build_version = build.manifest.build_version
+  build.starter_library_manifest.build_version = build.manifest.build_version
   const buildPath = path.join(cwd, `${buildProfile}.yml`);
 
-  fs.openAsync(buildPath, 'w').then(fd => {
+  return fs.openAsync(buildPath, 'w')
+  .then(fd => {
     const data = yaml.dump(build);
     return fs.writeAsync(fd, data);
-  }).then(() => {
+  })
+  .then(() => {
     console.log('Incremented the build number to %d.%d.%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version);
-  }).catch(err => {
+  })
+  .catch(err => {
     console.log(err);
   });
 }

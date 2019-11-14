@@ -7,5 +7,5 @@
  -->
 <component name="FilledButtonMarkupGrid" extends="MarkupGrid">
 
-  <script type="text/brightscript" uri="pkg:/components/lib/FilledButtonMarkupGrid/FilledButtonMarkupGrid.brs" />
+  <script type="text/brightscript" uri="FilledButtonMarkupGrid.brs" />
 </component>

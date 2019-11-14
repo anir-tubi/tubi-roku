@@ -24,11 +24,10 @@
  -->
 <component name="InfoPanel" extends="Group">
 
-  <script type="text/brightscript" uri="pkg:/components/lib/InfoPanel/InfoPanel.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-
+  <script type="text/brightscript" uri="InfoPanel.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
     <!-- INPUTS -->

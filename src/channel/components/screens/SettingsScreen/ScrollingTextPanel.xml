@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="ScrollingTextPanel" extends="Panel" >
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="./ScrollingTextPanel.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="ScrollingTextPanel.brs" />
 
   <interface>
     <field id="title" alias="Title.text"/>
