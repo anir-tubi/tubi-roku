@@ -556,8 +556,8 @@ Function tubiTracking_getAnalyticsAdAdriseRainmaker(ctx)
     end if
 
     if ad.adVideoId <> invalid then adEvent.ad_video_id = ad.adVideoId
-    if ad.impressionId <> invalid then ad.impression_id = ad.impressionId
-    if ad.parentId <> invalid then ad.parent_id = ad.parentId
+    if ad.impressionId <> invalid then adEvent.impression_id = ad.impressionId
+    if ad.parentId <> invalid then adEvent.parent_id = ad.parentId
     if ad.duration <> invalid then adEvent.reported_duration = ad.duration * 1000  'ms
     if ctx.adIndex <> invalid then adEvent.index = ctx.adIndex
     if ctx.adCount <> invalid then adEvent.pod_size = ctx.adCount
