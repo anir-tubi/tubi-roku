@@ -389,7 +389,6 @@ Function onSingleContentResponse(msg) As Void
       return
     end if
   end if
-
   populateDetailScreen(detailScreen, refreshedContent)
 
   loadTime = 0
@@ -613,7 +612,7 @@ Function onBookmarked(msg) As Void
     detailScreen.addToQueueTitle = "Add to queue"
     content = getDetailScreenContent(detailScreen)
     
-    responseCode = -1
+    responseCode = -1234
     if addBookmarkResult <> invalid
       responseCode = addBookmarkResult.code
     end if

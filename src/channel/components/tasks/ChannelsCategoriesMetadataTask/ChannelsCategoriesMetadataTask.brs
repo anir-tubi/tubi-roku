@@ -65,7 +65,7 @@ End Function
 ' Helper to populate default values for an error if necessary
 ' @response: assocArray, as delivered by request.handleEvent().response, has keys: code(int), data(str), failReason(str), name(str)
 Function formatError(response = invalid)
-  code = -1
+  code = -1234
   if response <> invalid and response.code <> invalid
     code = response.code
   end if

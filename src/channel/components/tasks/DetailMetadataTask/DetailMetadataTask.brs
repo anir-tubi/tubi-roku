@@ -12,7 +12,7 @@ Function execGetDetailMetadata() As Void
   tubiLog("DetailMetadataTask.execGetDetailMetadata")
   if type(m.top.request) <> "roAssociativeArray" or m.top.request.contentId = invalid
     m.top.error = {
-      code: -1
+      code: -1234
       data: ""
       failReason: "Content was invalid"
     }
@@ -97,7 +97,7 @@ Function execGetDetailMetadata() As Void
         translate.translateRecursive(parsed, updatedContent)
       end if
     else
-      code = -1
+      code = -1235
       failReason = "Result is invalid"
       if contentResult <> invalid 
         if contentResult.response <> invalid
