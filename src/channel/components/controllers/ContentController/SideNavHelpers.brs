@@ -247,6 +247,7 @@ Function onKidsModeSettingsCall()
   showSettingsScreen()
 End Function
 
+
 '@param b: Boolean, Says what the function is. Should the sideNav be set to open? If set to false, then the opposite happens, the side nav closes.
 Function openSideNav(b=true)
   m.SideNav.opened = b 
@@ -307,7 +308,7 @@ Function displayNavMenu(shouldTrackComponentInteraction = true)
   bSideNavOpened = m.SideNav.opened
   m.SideNav.setFocus(true)
   if bSideNavOpened = false
-    m.SideNav.opened = true
+    openSideNav()
     if m.nOriginalSideNavX = invalid
       m.nOriginalSideNavX = m.SideNav.translation[0]
     end if
@@ -333,7 +334,7 @@ End Function
 
 Function hideNavMenu(shouldTrackComponentInteraction = true)
   if m.SideNav.opened = true
-    m.SideNav.opened = false
+    openSideNav(false)
     focusCurrentScreen() '//This will set the current focus back to the screenstack items
 
     slideTo(m.SideNav, [m.nOriginalSideNavX, m.SideNav.translation[1]], .3)
