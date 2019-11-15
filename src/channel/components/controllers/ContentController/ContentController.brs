@@ -892,63 +892,6 @@ Function setContentToRefresh(sID)
 End Function 
 
 
-Function displayNavMenu(shouldTrackComponentInteraction = true)
-  bSideNavOpened = m.SideNav.opened
-  m.SideNav.setFocus(true)
-  if bSideNavOpened = false
-    openSideNav() 
-    if m.nOriginalSideNavX = invalid
-      m.nOriginalSideNavX = m.SideNav.translation[0] 
-    end if 
-    if m.nOriginalScreenStackX = invalid
-      m.nOriginalScreenStackX = m.ScreenStack.translation[0] 
-    end if
-
-    slideTo(m.SideNav, [0, m.SideNav.translation[1]], .2)
-    slideTo(m.ScreenStack, [m.nOriginalScreenStackX + m.SideNav.width, m.ScreenStack.translation[1]], .2)
-
-    topScreen = currentScreen()
-    if topScreen <> invalid
-      topScreen.enabled = false
-
-      if shouldTrackComponentInteraction = true
-        interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "on")
-        m.trackingLoggingTask.trackEvent = interactionEvent
-      end if
-    end if
-  end if
-End Function
-
-
-Function hideNavMenu(shouldTrackComponentInteraction = true)
-  if m.SideNav.opened = true
-    openSideNav(false) 
-    focusCurrentScreen() '//This will set the current focus back to the screenstack items
-
-    slideTo(m.SideNav, [m.nOriginalSideNavX, m.SideNav.translation[1]], .3)
-    slideTo(m.ScreenStack, [m.nOriginalScreenStackX, m.ScreenStack.translation[1]], .3)
-
-    topScreen = currentScreen()
-    if topScreen <> invalid
-      topScreen.enabled = true
-
-      'set up analytics for unfocusing side nav component
-      pageType = ""
-      pageValues = {}
-      if topScreen.trackingPageInfo <> invalid
-        pageType = topScreen.trackingPageInfo.pageType
-        pageValues = topScreen.trackingPageInfo.pageValues
-      end if
-
-      if shouldTrackComponentInteraction = true
-        interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")
-        m.trackingLoggingTask.trackEvent = interactionEvent
-      end if
-    end if
-  end if
-End Function
-
-
 ' Callback for when a navigateWithinPageInfo has been updated - sends the navigate_within_page event
 Function onNavigateWithinPageInfoChange(msg)
   navigateWithinPageInfo = msg.getData()

@@ -72,7 +72,7 @@ End Function
 
 'Returns an Array of namespaces
 'We expect to return an array containing a single or multiple namespace assocArrays
-Function tubiExperiments_getNamespaces(request)
+Function tubiExperiments_getNamespaces_(request)
   namespaces = m.defaultValues
   returnNamespaces = invalid
   url = m.constants.urls.experiments.evaluate + "?request_context.device_id=" + m.constants.deviceInfo.deviceId
