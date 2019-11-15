@@ -340,7 +340,7 @@ function upload(zipPath) {
 function sideLoad(done) {
   const address = options.target;
   const buildTag = getBuildTag(false, false);
-  const zipPath = `/build/tubi_${buildTag}.zip`;
+  const zipPath = `build/tubi_${buildTag}.zip`;
   upload(zipPath)
   .then(
     server({
