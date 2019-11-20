@@ -1,2 +1,3 @@
 settings:
   mode: "test"
+  remoteComponentsExtension: "zip"

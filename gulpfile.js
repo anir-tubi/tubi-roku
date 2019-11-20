@@ -132,13 +132,21 @@ function buildInstalled() {
       '!src/channel/**/.keep',
       '!src/channel/**/.DS_Store',
       '!src/channel/**/*.md',
-      '!src/channel/components/tests/**',
       '!src/channel/components/controllers/StarterController/**',
-      '!src/channel/source/3rdparty/ComponentTestFramework.brs',
       '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs',
+    ];
+
+    let testSources = [
+      '!src/channel/components/tests/**',
+      '!src/channel/source/3rdparty/ComponentTestFramework.brs',
       '!src/channel/source/3rdparty/roku/UnitTestFramework.brs',
       '!src/channel/source/tests/**'
     ];
+
+    // don't include test files if the config is not 'test'
+    if (options.config !== 'test') {
+      sources = [...sources , ...testSources];
+    }
 
     let srcOptions = {
       base: 'src/channel'
@@ -365,7 +373,7 @@ function sideLoad(done) {
     }
   })
   .then(() => {
-    console.log('Dev channel launched.')
+    console.log(`${options.config.toUpperCase()} channel launched.`)
   })
   .catch(err => {
     console.log('sideLoad error: ', err);
@@ -433,7 +441,7 @@ function conditionalPackage(done) {
   let { config } = options
   let { settings } = load(config);
 
-  if (config !== 'dev' || settings.remoteComponentsExtension === 'pkg') {
+  if ((config !== 'dev' && config !== 'test') || settings.remoteComponentsExtension === 'pkg') {
     return packageAll();  //informs gulp that task has completed by returnin a promise
   } else {
     done();  //inform gulp that the task has completed.
@@ -516,6 +524,16 @@ function setStaging(done) {
   }
 }
 
+// force test on options, so we ensure our build is using the test config
+function setTest(done) {
+  if(options) {
+    options.config = 'test';
+    done();
+  } else {
+    done(new Error('setTest: options not found.'));
+  }
+}
+
 
 //send starter components and remote components to AWS S3
 function pushStaging(done) {
@@ -540,9 +558,10 @@ function pushStaging(done) {
 
 
 exports.build = series(clean, buildInstalled, buildStarter, buildRemote);
-exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.sideload = sideLoad;
-exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
-exports.release = series(setProduction, bumpBuild, tagBuild, exports.build, packageAll);
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
 exports.bump = bumpBuild;
+exports.install = series(exports.build, conditionalPackage, sideLoad);
+exports.test = series(setTest, clean, buildInstalled, sideLoad);
+exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
+exports.releases = series(setProduction, bumpBuild, tagBuild, exports.build, packageAll);
