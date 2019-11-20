@@ -540,11 +540,11 @@ Function tubiTracking_getAnalyticsAdAdriseRainmaker(ctx)
 
     if ad.creativeAdId <> invalid
       adEvent.ad_id = ad.creativeAdId
-      adEvent.creative_id = ad.creativeAdId
+      adEvent.creative_id = ad.creativeAdId.toInt()
     end if
 
-    if type(ad.streams) = "roArray" and m.isString(ad.streams[0]) = true
-        adEvent.creative_url = ad.streams[0]   'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
+    if type(ad.streams) = "roArray" and m.isString(ad.streams[0].url) = true
+      adEvent.creative_url = ad.streams[0].url   'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
     end if
 
     if isInteractive = true and ad.companionads[0] <> invalid
