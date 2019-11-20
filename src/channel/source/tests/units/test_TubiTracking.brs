@@ -11,7 +11,8 @@ Function TestSuite_TubiTracking()
   this.addTest("getAnalyticsPage", testCase_tubiTracking_getAnalyticsPage)
   this.addTest("getAnalyticsComponent", testCase_tubiTracking_getAnalyticsComponent)
   this.addTest("getAnalyticsTile", testCase_tubiTracking_getAnalyticsTile)
-  this.addTest("getAnalyticsAd", testCase_tubiTracking_getAnalyticsAd)
+  this.addTest("getAnalyticsAdAdrise", testCase_tubiTracking_getAnalyticsAdAdrise)
+  this.addTest("getAnalyticsAdRainmaker", testCase_tubiTracking_getAnalyticsAdRainmaker)
   this.addTest("populateMessage", testCase_tubiTracking_populateMessage)
   this.addTest("isEmptyValue", testCase_tubiTracking_isEmptyValue)
   this.addTest("isNumeric", testCase_tubiTracking_isNumeric)
@@ -288,7 +289,7 @@ Function testCase_tubiTracking_getAnalyticsTile()
   return result
 End Function
 
-Function testCase_tubiTracking_getAnalyticsAd()
+Function testCase_tubiTracking_getAnalyticsAdAdrise()
   Tracking = testHelper_tubiTracking_createTubiTracking()
 
   creativeId = "3120465"
@@ -341,18 +342,102 @@ Function testCase_tubiTracking_getAnalyticsAd()
     time: 1
   }
 
-  adEvent = Tracking.getAnalyticsAd(ctx)
+  adEvent = Tracking.getAnalyticsAdAdrise(ctx)
 
   result = m.assertNotInvalid(adEvent.ad_type)
   result += m.assertTrue(adEvent.ad_id = ad.adid)
   result += m.assertTrue(adEvent.creative_url = streams[0].url)
-  result += m.assertTrue(adEvent.creative_id = creativeId.toInt())
   result += m.assertTrue(adEvent.reported_duration = ad.duration * 1000)
   result += m.assertTrue(adEvent.impression_id = impressionId)
   ' result += m.assertTrue(adEvent.pod_id = podId)  'commented out until podId is added
   result += m.assertTrue(adEvent.index = ctx.adindex)
   result += m.assertTrue(adEvent.pod_size = ctx.adcount)
 
+  return result
+End Function
+
+Function testCase_tubiTracking_getAnalyticsAdRainmaker()
+  Tracking = testHelper_tubiTracking_createTubiTracking()
+
+  adVideoId = "10001694"
+  streams = [
+    {
+        bitrate: 635
+        height: 240
+        mimetype: "video/mp4"
+        provider: ""
+        url: "http://paella.adrise.tv/020267/" + adVideoId + "/v1101141528-640x360-SD-762k.mp4"
+        width: 320
+    }
+  ]
+
+  parentId = "k2pwCTksUNmYmsrnORPU"
+  impressionId = parentId + "/1"
+  adTracking = [
+    {
+      event: "Impression"
+      time: 0
+      triggered: true
+      url: "https://rainmaker.staging-public.tubi.io/pixel/" + impressionId + "/progress0"
+    }
+  ]
+
+  clickthrough = {
+    breaks: [0.0,512.0,911.0,1423.0,1875.0,2569.0,3175.0,3640.0,4249.0]
+    request_id: parentId
+    impression_id: impressionId
+    ad_video_id: adVideoId
+  }
+
+  ad = {
+    adid: "preroll-1"
+    adserver: "http://rainmaker.staging-public.tubi.io/rev/ROKU?coppa_enabled=false&now_pos=0&model=4400X&video_id=460055&app_id=tubitv&language=en&device_id=63961250-390b-543e-a1d2-7f761b049623&content_type=mp4&opt_out=0&adv_id=d0b0ea57-caa1-5a04-840b-741517492b7a&pub_id=f866e2677ea2f0dff719788e4f7f9195"
+    adtitle: "In-Stream Video"
+    advideoid: adVideoId
+    clickthrough: FormatJson(clickthrough)
+    ' companionads: companionAds
+    creativeadid: "17722"
+    creativeid: ""
+    duration: 30
+    impressionid: impressionId
+    isadvertising: true
+    minbandwidth: 250
+    parentid: parentId
+    programid: "RAF:preroll-1"
+    streamformat: "mp4"
+    streams: streams
+    switchingstrategy: "full-adaptation"
+    tracking: adTracking
+  }
+
+  adInfo = ParseJson(ad.clickthrough)
+  ad.parentid = adInfo.request_id
+  ad.impressionid = adInfo.impression_id
+  ad.advideoid = adInfo.ad_video_id.toStr()
+
+  ctx = {
+    ad: ad
+    adcount: 3
+    adindex: 1
+    adserver: "http://rainmaker.staging-public.tubi.io/rev/ROKU?coppa_enabled=false&now_pos=0&model=4400X&video_id=460055&app_id=tubitv&language=en&device_id=63961250-390b-543e-a1d2-7f761b049623&content_type=mp4&opt_out=0&adv_id=d0b0ea57-caa1-5a04-840b-741517492b7a&pub_id=f866e2677ea2f0dff719788e4f7f9195"
+    duration: 30
+    rendersequence: "preroll"
+    time: 22
+  }
+
+  adEvent = Tracking.getAnalyticsAdRainmaker(ctx)
+
+  result = m.assertNotInvalid(adEvent.ad_type)
+  result += m.assertTrue(adEvent.ad_type = "VAST")
+  result += m.assertTrue(adEvent.ad_id = ad.creativeadid)
+  result += m.assertTrue(adEvent.creative_id = ad.creativeadid.toInt())
+  result += m.assertTrue(adEvent.creative_url = streams[0].url)
+  result += m.assertTrue(adEvent.ad_video_id = ad.adVideoId)
+  result += m.assertTrue(adEvent.impression_id = ad.impressionId)
+  result += m.assertTrue(adEvent.parent_id = ad.parentId)
+  result += m.assertTrue(adEvent.reported_duration = ad.duration * 1000)
+  result += m.assertTrue(adEvent.index = ctx.adindex)
+  result += m.assertTrue(adEvent.pod_size = ctx.adcount)
   return result
 End Function
 

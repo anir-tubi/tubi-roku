@@ -45,6 +45,7 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
 
   'run SceneGraph tests if in test mode
   if constants.settings.mode = "test"
+    sgGlobal.setField("theme", constants.ui.themes.default) 'set theme for testing purposes
     Runner = TestRunner()
     Runner.SetTestsDirectory("pkg:/source/tests")
     Runner.logger.SetVerbosity(2)

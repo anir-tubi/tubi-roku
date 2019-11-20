@@ -98,13 +98,13 @@ End Function
 
 
 ' Mock that the server did not respond, or response was invalid
-Function testHelper_tubiExperiments_mockGetInvalidNamespaces() As Object
+Function testHelper_tubiExperiments_mockGetInvalidNamespaces(request) As Object
   return invalid
 End Function
 
 
 ' Mock experiement response from swagger: 
 ' https://default_server/datascience/evaluate/namespaces?platform=roku&inputs=%7B%22deviceId%22%3A%22AABBCCDDEE%22%7D
-Function testHelper_tubiExperiments_mockGetNamespaces() As Object
+Function testHelper_tubiExperiments_mockGetNamespaces(request) As Object
   return ParseJson("[{""namespace"": ""UserNamespace"",""resource"": ""{\""testParam\"":false}"",""experiment_result"": {""experiment_name"": ""preroll_at_90"",""treatment"": ""off""}}]")
 end Function
