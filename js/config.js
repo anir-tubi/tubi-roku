@@ -95,7 +95,7 @@ function incrementBuildNumber() {
     return fs.writeAsync(fd, data);
   })
   .then(() => {
-    console.log('Incremented the build number to %d.%d.%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version);
+    console.log('Incremented the build number to %d_%d_%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version);
   })
   .catch(err => {
     console.log(err);

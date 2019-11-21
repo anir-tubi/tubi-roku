@@ -484,9 +484,9 @@ function bumpBuild(done) {
   if (verifyGit(done)) {
     return incrementBuildNumber()
     .then(() => {
-      const dottedBuildTag = getBuildTag(false, true);
-      console.log(`Commiting build bump to ${dottedBuildTag}`);
-      shell.exec(`git commit -m "incrementbuild: Bump build number to ${dottedBuildTag}" config/build.yml`, {silent: true});
+      const buildTag = getBuildTag(false, false);
+      console.log(`Commiting build bump to ${buildTag}`);
+      shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
     });
   } else {
     // errors should be handled in verifyGit()
