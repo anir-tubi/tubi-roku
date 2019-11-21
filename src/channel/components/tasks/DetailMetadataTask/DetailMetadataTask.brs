@@ -26,6 +26,7 @@ Function execGetDetailMetadata() As Void
   cms = CmsApi(constants, RequestModule, AuthModule)
   translate = TubiMetadataTranslate(constants)
   port = CreateObject("roMessagePort")
+  deviceInfo = CreateObject("roDeviceInfo")
 
   ' instatiate variables
   contentResult = invalid
@@ -39,7 +40,7 @@ Function execGetDetailMetadata() As Void
   timerStartServerTalk = CreateObject("roTimespan")
   
   '// The maximum number of miliseconds it should take to receive a response from the server
-  nTimeOutMax = 5000
+  nTimeOutMax = 10000
 
   if m.top.request.getContent = true
     tubiLog("DetailMetadataTask getting content for " + m.top.request.contentId)
@@ -103,7 +104,11 @@ Function execGetDetailMetadata() As Void
         if contentResult.response <> invalid
           code = contentResult.response.code
         end if
-      else 
+      else
+        if deviceInfo.GetLinkStatus() = false
+          ' firmware thinks the device is not connected
+          code = -1236
+        end if
         failReason = "Call to server timed out"
       end if
 
