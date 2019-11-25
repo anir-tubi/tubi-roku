@@ -48,6 +48,9 @@
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean"  alwaysNotify="true"/>
 
+      <!-- Acts a circuit breaker in case categories are attempted to be fetched before categories are initially loaded -->
+      <field id="canLoadCategories" type="boolean" />
+
     <!-- OUTPUTS -->
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>

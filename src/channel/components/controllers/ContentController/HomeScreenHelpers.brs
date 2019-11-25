@@ -21,7 +21,8 @@ Function showHomeScreen(constants, authInfo)
     homeScreen.id = constants.ui.screenIds.homeScreen
     homeScreen.signedIn = (authInfo <> invalid)
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
-    homeScreen.loadAllCategories = true
+    homeScreen.canLoadCategories = true
+    fetchHomeScreen(homescreen)
     
     setInScreenCache(homeScreen)
     'this is the first screen so no need for navigate_to_page tracking.
@@ -46,10 +47,15 @@ End Function
 Function onLoadAllCategories(msg)
   tubiLog("HomeScreenHelpers.onLoadAllCategories")
   homeScreen = msg.getRoSGNode()
+  fetchHomeScreen(homeScreen)
+End Function
+
+
+Function fetchHomeScreen(homeScreen)
   ' This check causes all category fetches to be skipped prior to the field
-  ' being set to true.  Then, once true it will reload any time loadCategories() is
+  ' being set to true.  Then, once true categories reload any time fetchHomeScreen() is
   ' called, such as when signedIn field changes.
-  if homeScreen.loadAllCategories = true
+  if homeScreen.canLoadCategories = true
     reqName = m.constants.reqNames.getHomescreen
     '//::TODO:: JHAND - test error here!
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", reqName, invalid, shouldKidsModeBeSentToServer())
@@ -114,7 +120,8 @@ Function retryCategoryList()
   tubiLog("HomeScreenHelpers.retryCategoryList")
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
-    homeScreen.loadAllCategories = true
+    homeScreen.canLoadCategories = true
+    loadAllCategories(homeScreen)
     homeScreen.setFocus(true)
   end if
 End Function
