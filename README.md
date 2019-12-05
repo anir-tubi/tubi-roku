@@ -302,4 +302,4 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 See [CONTRUBUTING.md](CONTRIBUTING.md)
 
-Last updated by: Jack Hand
+Last updated by: Rigo
