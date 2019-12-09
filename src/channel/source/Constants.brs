@@ -4,6 +4,9 @@ Function getConstants()
 
   ' Compile-time generated
   constants.settings = getSettings()
+  
+  mode = constants.settings.mode
+  if mode = invalid then mode = "dev"
 
   ' Device info
   constants.deviceInfo = {}
@@ -280,8 +283,11 @@ Function getConstants()
 
     'contents url
     constants.urls.cms = {}
-      ' constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
-      constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
+      if mode = "dev"
+        constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
+      else
+        constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
+      end if
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
       constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
       constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
@@ -291,16 +297,22 @@ Function getConstants()
 
     'matrix url
     constants.urls.matrix = {}
-      ' constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
-      constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
+      if mode = "dev"
+        constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
+      else
+        constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
+      end if
       constants.urls.matrix.homescreen = constants.urls.matrix.urlBase + "/homescreen"
       constants.urls.matrix.container = constants.urls.matrix.urlBase + "/containers"
       constants.urls.matrix.channel = constants.urls.matrix.urlBase + "/containers" ' + "/:container_id"
 
     'users url
     constants.urls.users = {}
-      ' constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
-      constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
+      if mode = "dev"
+        constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
+      else
+        constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
+      end if
       constants.urls.users.login = constants.urls.users.urlBase + "/login"
       constants.urls.users.refreshToken = constants.urls.users.urlBase + "/login/refresh"
       constants.urls.users.transferToken = constants.urls.users.urlBase + "/login/transfer"
@@ -312,7 +324,11 @@ Function getConstants()
 
     'user event tracking url
     constants.urls.dataScience = {}
-      constants.urls.dataScience.urlBase = "https://uapi.adrise.tv/datascience"
+      if mode = "dev"
+        constants.urls.dataScience.urlBase = "https://uapi.staging-public.tubi.io/datascience"
+      else
+        constants.urls.dataScience.urlBase = "https://uapi.adrise.tv/datascience"
+      end if
       constants.urls.datascience.logging = constants.urls.dataScience.urlBase + "/logging"
     
     'Experiments API
@@ -321,8 +337,11 @@ Function getConstants()
       constants.urls.experiments.evaluate = constants.urls.experiments.baseUrl + "evaluate-namespaces"
 
     constants.urls.analytics = {}
-      ' constants.urls.analytics.urlBase = "https://analytics-ingestion.staging-public.tubi.io/analytics-ingestion"
-      constants.urls.analytics.urlBase = "https://analytics-ingestion.production-public.tubi.io/analytics-ingestion"
+      if mode = "dev"
+        constants.urls.analytics.urlBase = "https://analytics-ingestion.staging-public.tubi.io/analytics-ingestion"
+      else
+        constants.urls.analytics.urlBase = "https://analytics-ingestion.production-public.tubi.io/analytics-ingestion"
+      end if
       constants.urls.analytics.event = constants.urls.analytics.urlBase + "/v2/event"
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
 
