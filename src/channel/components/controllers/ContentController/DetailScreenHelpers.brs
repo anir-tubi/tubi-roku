@@ -108,7 +108,12 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     'update detail screen state via the input interface
     detailScreen.title = content.title
     detailScreen.genres = content.genres
-    detailScreen.hasTrailer = content.hasTrailer
+    
+    hasTrailer = content.hasTrailer
+    if m.global.authInfo = invalid
+      hasTrailer = false
+    end if
+    detailScreen.hasTrailer = hasTrailer
 
     bookmark = m.global.bookmarkIds.findNode(content.id)
     history = m.global.historyIds.findNode(content.id)

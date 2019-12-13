@@ -289,8 +289,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
   
   if contentFromServer.has_trailer = true then translatedContent.hasTrailer = true
-  ' hardcode hasTrailer to false until trailers are re-enabled
-  translatedContent.hasTrailer = false
 
   'if this content is actually just a paginated response, set pagination data
   if contentFromServer.total_count <> invalid then translatedContent.totalCount = contentFromServer.total_count
