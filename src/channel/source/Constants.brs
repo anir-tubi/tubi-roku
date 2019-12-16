@@ -780,6 +780,19 @@ Function getConstants()
         constants.performance.categoryGridList.categoryWindowSize = 10
         constants.performance.categoryGridList.eagerLoad = true
       end if
+      
+      constants.deeplinks = {}
+      constants.deeplinks["homescreen"] = "homescreen"
+      constants.deeplinks["hs-search"] = "search"
+      constants.deeplinks["ad"] = "ad"
+      constants.deeplinks["my-feed"] = "my-feed"
+      constants.deeplinks["external-control"] = "deeplink-test"
+      constants.deeplinks["partner-button"] = "remote-partner-button"
+      constants.deeplinks["other-channel"] = "other-channel"
+      constants.deeplinks["auto-run-dev"] = "sideload"
+      constants.deeplinks["hs-d"] = "feature-free-page"
+      constants.deeplinks["dial"] = "dial"
+      
   return constants  
 end Function
 

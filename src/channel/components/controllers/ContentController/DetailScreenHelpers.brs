@@ -296,9 +296,10 @@ Function onSingleContentResponse(msg) As Void
       else
         refreshedContent.currentEpisodeId = ""
       end if
-
+      
       if m.enteredFromDeepLink = true
         sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+        m.enteredFromDeepLink = false
       end if
     else if (m.deepLinkContent.deeplinkType = "season" or m.deepLinkContent.deeplinkType = "episode" or m.deepLinkContent.deeplinkType = "series") and refreshedContent.type = m.constants.ui.contentTypes.video
       '  refreshedContent.id =       episode id
@@ -327,6 +328,7 @@ Function onSingleContentResponse(msg) As Void
 
       if m.enteredFromDeepLink = true
         sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "episodeList", m.Tracking, m.trackingLoggingTask, m.constants)
+        m.enteredFromDeepLink = false
       end if
     else if m.deepLinkContent.deeplinkType = "episode" and refreshedContent.type = m.constants.ui.contentTypes.series
       '  refreshedContent.id =       series id
@@ -347,6 +349,7 @@ Function onSingleContentResponse(msg) As Void
 
       if m.enteredFromDeepLink = true
         sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+        m.enteredFromDeepLink = false
       end if
     else if m.deepLinkContent.deeplinkType = "movie"
       'determine if we need to resume or play from start the deeplinked movie
@@ -359,6 +362,7 @@ Function onSingleContentResponse(msg) As Void
 
       if m.enteredFromDeepLink = true
         sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+        m.enteredFromDeepLink = false
       end if
     else
       'start the channel normally in case of issues

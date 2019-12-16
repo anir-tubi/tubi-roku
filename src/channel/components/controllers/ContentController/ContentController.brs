@@ -536,8 +536,12 @@ Function createDeeplinkContentFromStartupArgs(args)
     content = CreateObject("roSGNode", "DeeplinkContentNode")
     content.id = args.contentId
 
-    ' default deep link source is search
-    content.source = "search"
+    ' default deep link source is no-source
+    if args.source = invalid or m.constants.deeplinks[args.source] = invalid
+      content.source = "no-source"
+    else
+      content.source = m.constants.deeplinks[args.source]  
+    end if
 
     ' if there is a parameter called entry with a value, that is the source of the deep link
     ' typically entry = banner from the Roku banner ads ('entry' is a custom parameter)
