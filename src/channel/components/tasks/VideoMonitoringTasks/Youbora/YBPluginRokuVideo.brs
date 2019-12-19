@@ -9,20 +9,23 @@ end sub
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.3.4-" + m.pluginName
-
-    ' Object copy to improve performance
-    m.videoplayer = m.top.videoplayer
+    m.pluginVersion = "6.5.3-" + m.pluginName
 
     ' Let's cache the segment used on the bitrate to access less to it
     m.bitrateSegment = invalid
     ' Cache the streamInfo too, to use with throughtput and resource
     m.streamInfo = invalid
-
-    m.videoplayer.ObserveField("state", m.port)
-    m.videoplayer.ObserveField("bufferingStatus", m.port)
+    if m.top.videoplayer <> invalid 
+        m.top.videoplayer.ObserveField("state", m.port)
+        m.top.videoplayer.ObserveField("bufferingStatus", m.port)
+    end if
+    
     'm.top.ObserveField("taskState", m.port)
     m.top.ObserveField("taskState", "_taskListener")
+    m.top.ObserveField("videoPlayer", m.port)
+
+    ' Notify monitoring startup
+    m.top.monitoring = true
 end sub
 
 function onBufferingStatusChanged(bufferStatus) as void
@@ -43,6 +46,7 @@ function onBufferingStatusChanged(bufferStatus) as void
                 m.viewManager.chronoSeek.stop()
 
             else
+                eventHandler("resume")
                 eventHandler("buffering")
             endif
         endif
@@ -58,6 +62,7 @@ sub processPlayerState(newState as String)
         if m.viewManager.isStartSent = false
             eventHandler("play")
         else
+            eventHandler("resume")
             eventHandler("seeking")
         endif
     else if newState = "playing"
@@ -81,18 +86,18 @@ sub processPlayerState(newState as String)
         'Here we check for the control property of the video player
         'and close the view only if it is stop. This avoids sending
         'false stop events.
-        ' if m.videoplayer.control = "stop" AND m.viewManager.isShowingAds = false
+        ' if m.top.videoplayer.control = "stop" AND m.viewManager.isShowingAds = false
         '     'eventHandler("stop")
         ' else
         '     YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
         ' endif
     else if newState = "error"
-        eventHandler("error", {"msg":m.videoplayer.errorMsg, "errorCode":m.videoplayer.errorCode.ToStr()})
+        eventHandler("error", {"msg":m.top.videoplayer.errorMsg, "errorCode":m.top.videoplayer.errorCode.ToStr()})
     else if newState = "paused"
         eventHandler("pause")
     else if newState = "finished"
         m.viewManager.isFinished = true
-        if m.videoplayer.control = "stop"
+        if m.top.videoplayer.control = "stop"
             eventHandler("stop")
         else
             YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
@@ -105,16 +110,24 @@ sub processMessage(msg, port)
 
     mt = type(msg)
     if mt = "roSGNodeEvent"
-
         if msg.getField() = "state" 'Player state
             state = msg.getData()
             processPlayerState(state)
         else if msg.getField() = "bufferingStatus"
             bufferStatus = msg.getData()
             onBufferingStatusChanged(bufferStatus)
+        else if msg.getField() = "videoPlayer"
+            setNewPlayer(["state", "bufferingStatus"])
+            m.top.unobserveFieldScoped("videoPlayer")
         endif
     endif
 
+end sub
+
+sub setNewPlayer(taskFields)
+    for each field in taskFields
+        m.top.videoplayer.ObserveField(field,m.port)
+    end for
 end sub
 
 'Info methods
@@ -125,7 +138,7 @@ function getResource()
 
     if m.contentUrl = invalid
             'Get it from the informed url by the client
-            content = m.videoplayer.content
+            content = m.top.videoplayer.content
             if content <> invalid
                 resource = content.URL
                 m.contentUrl = resource
@@ -139,7 +152,7 @@ function getResource()
 end function
 
 function getMediaDuration()
-    duration = m.videoplayer.duration
+    duration = m.top.videoplayer.duration
 
     if duration = invalid
         duration = 0
@@ -150,14 +163,14 @@ end function
 
 function getPlayhead()
     if m.viewManager.isJoinSent = true
-        return m.videoplayer.position
+        return m.top.videoplayer.position
     else
        return 0
     end if
 end function
 
 function getTitle()
-    content = m.videoplayer.content
+    content = m.top.videoplayer.content
 
     if content <> invalid
         title = content.TITLE
@@ -172,7 +185,7 @@ end function
 function getIsLive()
     'This always returns false, so get rid of one call to a node
     return false
-    ' content = m.videoplayer.content
+    ' content = m.top.videoplayer.content
 
     ' if content <> invalid
     '     live = content.Live
@@ -185,6 +198,7 @@ end function
 
 function getThroughput()
     'This is only for roku >= 7.2
+    m.streamInfo = m.top.videoplayer.streamInfo
     if m.streamInfo <> invalid
         throughput = m.streamInfo.measuredBitrate
     else
@@ -195,7 +209,7 @@ end function
 
 function getBitrate()
     'This is only for HLS and DASH
-    m.bitrateSegment = m.videoplayer.streamingSegment
+    m.bitrateSegment = m.top.videoplayer.streamingSegment
     if m.bitrateSegment <> invalid
         br = m.bitrateSegment.segBitrateBps
     else
@@ -232,5 +246,6 @@ sub _taskListener()
         m.top.videoplayer.unobserveFieldScoped("state")
         m.top.videoplayer.unobserveFieldScoped("bufferingStatus")
         m.contentUrl = invalid
+        m.top.monitoring = false
     end if
 end sub

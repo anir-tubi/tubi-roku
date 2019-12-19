@@ -16,9 +16,18 @@
 
         <!-- Logging flag. Set to true to view Youbora logs -->
         <field id = "logging" type = "boolean" value = "false" />
-        
+
         <!-- Field to emit a youbora adevent -->
         <field id = "adevent" type = "assocarray" />
+
+        <!-- Field to emit a youbora IMA adevent -->
+        <field id = "imaadevent" type = "assocarray" />
+
+        <field id = "session" type = "assocarray" />
+
+        <!-- Determines if the plugin is actively listening for events. (READ-ONLY) -->
+        <field id = "monitoring" type = "boolean" />
+
 
     </interface>
 

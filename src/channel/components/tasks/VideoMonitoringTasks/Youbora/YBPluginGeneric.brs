@@ -9,12 +9,16 @@ sub init()
     m.port = createObject("roMessagePort")
     m.top.observeField("event", m.port)
     m.top.ObserveField("adevent", m.port)
+    m.top.ObserveField("imaadevent", m.port)
     m.top.observeField("options", m.port)
+    m.top.observeField("session", m.port)
 
     'Public methods
     m._requestData = requestData
     m._startPingTimer = startPingTimer
     m._stopPingTimer = stopPingTimer
+    m._startBeatTimer = startBeatTimer
+    m._stopBeatTimer = stopBeatTimer
 
     m.getResource = getResource
     m.getPlayhead = getPlayhead
@@ -36,18 +40,27 @@ sub init()
     m.getAdPlayhead = getAdPlayhead
     m.getAdDuration = getAdDuration
 
+    'Sessions
+
+
+
+    m.sessionStarted = false
+
     m.lastAdPlayhead = 0
 
     m.isStarted = false
     m.isAdStarted = false
+    m.isAdBreakStarted = false
 
     m.adNumber = 0
     m.adPosition = "unknown"
     m.adTitle = invalid
+    m.adBreakNumber = 0
 
     m.eventHandler = eventHandler
 
-    'Fields
+    'Extra to trick beat timer with ping timer
+    m.totalPingTimer = 0
 
 end sub
 
@@ -56,7 +69,7 @@ sub _run()
     YouboraLog("YBPluginGeneric.brs - run")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.3.4-" + m.pluginName
+    m.pluginVersion = "6.5.3-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)
@@ -73,12 +86,17 @@ sub _run()
     m.pingTimer.setFields(pingTimerFields)
     m.pingTimer.ObserveField("fire", m.port)
 
+    m.beatTimer = CreateObject("roSGNode", "Timer")
+    beatTimerFields = { "duration" : 30, "repeat" : true}
+    m.beatTimer.setFields(beatTimerFields)
+    m.beatTimer.ObserveField("fire", m.port)
+
     m.isStarted = false
-    m.isAdStarted = false
+    m.isAdStarted = false    
 
     'Endless loop to listen for events
     while true
-
+    
         msg = wait(0, m.port)
 
         'Delegate call to the specific plugin.
@@ -92,7 +110,18 @@ sub _run()
             if msg.getField() = "event"         'Process event from outside
                 invokeHandler(msg.getData())
             else if msg.getField() = "fire"     'Timer callback
-                m.viewManager.pingCallback()
+                'm.viewManager.pingCallback()
+                if m.pingTimer.control = "stop" OR m.pingTimer.control = "none"
+                    m.viewManager.beatCallback()
+                else
+                    m.viewManager.pingCallback()
+                    if (m.totalPingTimer = 30 OR m.totalPingTimer > 25)
+                        m.viewManager.beatCallback()
+                        m.totalPingTimer = 0
+                    else
+                        m.totalPingTimer = m.totalPingTimer + 5
+                    end if
+                end if
             else if msg.getField() = "options"
                 opt = msg.getData()
                 setOptions(opt)
@@ -101,8 +130,11 @@ sub _run()
                 GetGlobalAA().YouboraLogActive = logEnabled
             else if msg.getField() = "adevent"
                  invokeAdHandler(msg.getData())
+            else if msg.getField() = "imaadevent"
+                 invokeImaAdHandler(msg.getData())
+            else if msg.getField() = "session"
+                onSessionEvent(msg.getData())
             endif
-
         else if (mt = "roUrlEvent") '/data response
             code = msg.GetResponseCode()
             if (code = 200)
@@ -121,6 +153,10 @@ end sub
 sub _stop()
 
     stopMonitoring()
+
+end sub
+
+sub setNewPlayer(taskFields)
 
 end sub
 
@@ -192,11 +228,20 @@ function getPlayerVersion()
 end function
 
 sub startPingTimer()
+    m.beatTimer.control = "stop"
     m.pingTimer.control = "start"
 end sub
 
 sub stopPingTimer()
     m.pingTimer.control = "stop"
+end sub
+
+sub startBeatTimer()
+    m.beatTimer.control = "start"
+end sub
+
+sub stopBeatTimer()
+    m.beatTimer.control = "stop"
 end sub
 
 sub startMonitoring()
@@ -259,6 +304,10 @@ sub eventHandler(event as String, params = Invalid)
         m.viewManager.sendRequest("seekStart", params)
     else if event = "seeked"
         m.viewManager.sendRequest("seekEnd", params)
+    else if event = "event"
+        if m.viewManager.isStartSent = true
+            m.viewManager.sendRequest("videoEvent", params)
+        end if
     else if event = "adPlay"
         if m.viewManager.isInitiated = false AND m.isStarted = false
             m.viewManager.sendRequest("init", params)
@@ -291,6 +340,10 @@ sub eventHandler(event as String, params = Invalid)
             m.viewManager.sendRequest("adInit", params)
             m.viewManager.isAdInitiated = true
         end if
+    else if event = "adQuartile"
+        if m.viewManager.isAdJoinSent = true
+            m.viewManager.sendRequest("adQuartile", params)
+        end if
     else if event = "adStop"
         m.viewManager.sendRequest("adStop", params)
         m.isAdStarted = false
@@ -304,6 +357,24 @@ sub eventHandler(event as String, params = Invalid)
         m.viewManager.sendRequest("adPause", params)
     else if event = "adResume"
         m.viewManager.sendRequest("adResume", params)
+    else if event = "adBreakStart"
+        m.viewManager.sendRequest("adBreakStart", params)
+    else if event = "adBreakStop"
+        m.viewManager.sendRequest("adBreakStop", params)
+    else if event = "sessionStart"
+        if m.sessionStarted = true
+            m.viewManager.sendRequest("sessionNav", params)
+        else
+            m.viewManager.sendRequest("sessionStart", params)
+            m.sessionStarted = true
+        end if
+    else if event = "sessionStop" AND m.sessionStarted = true
+        m.viewManager.sendRequest("sessionStop", params)
+        m.sessionStarted = false
+    else if event = "sessionEvent" AND m.sessionStarted = true
+        m.viewManager.sendRequest("sessionEvent", params)
+    else if event = "videoEvent"
+        m.viewManager.sendRequest("videoEvent", params)
     endif
 
 end sub
@@ -319,40 +390,110 @@ sub invokeHandler(data as Object)
 
 end sub
 
+sub invokeImaAdHandler(data as Object)
+    if type(data) = "roAssociativeArray"
+        invokeAdHandler(convertToRokuAdsEvent(data))
+    endif
+end sub
+
+function convertToRokuAdsEvent(adInfo as Object) as Object
+    rokuAd = {}
+    ad = adInfo.ad
+
+    if (adInfo.event = "PodStart" OR adInfo.event = "PodComplete")
+        rokuAd.type = adInfo.event
+        rokuAd.rendersequence = "midroll"
+        if ad.timeoffset = 0 then rokuAd.rendersequence = "preroll"
+        if ad.timeoffset >= (m.infoManager.getMediaDuration() - ad.duration - 1) then rokuAd.rendersequence = "postroll"
+        rokuAd.adcount = ad.totalads
+    else
+        rokuAd.index = ad.adbreakinfo.adposition
+        rokuAd.time = ad.currenttime
+        rokuAd.rendersequence = "midroll"
+        if ad.adbreakinfo.timeoffset = 0 then rokuAd.rendersequence = "preroll"
+        if ad.adbreakinfo.timeoffset >= (m.infoManager.getMediaDuration() - ad.duration - 1) then rokuAd.rendersequence = "postroll"
+    end if
+
+    if (adInfo.event = "start")
+        m.adNumber = m.adNumber + 1
+        rokuAd.type = "Impression"
+        rokuAd.duration = ad.duration
+        rokuAd.adtitle = ad.adtitle
+        rokuAd.adindex = m.adNumber
+        m.top.imaadevent = {"event":"loaded", "ad":ad} 'completly dummy event that we trigger since there is none
+    else if (adInfo.event = "loaded")
+        rokuAd.type = "Start"
+        rokuAd.duration = ad.duration
+        rokuAd.adtitle = ad.adtitle
+        rokuAd.adindex = m.adNumber
+    else if (adInfo.event = "firstQuartile")
+        rokuAd.type = "FirstQuartile"
+    else if (adInfo.event = "midpoint")
+        rokuAd.type = "Midpoint"
+    else if (adInfo.event = "thirdQuartile")
+        rokuAd.type = "ThirdQuartile"
+    else if (adInfo.event = "complete")
+        rokuAd.type = "Complete"
+    end if
+    return rokuAd
+end function
+
 sub invokeAdHandler(data as Object)
-    adParams = {}
 
-    if data.adindex <> invalid = true
-        adParams["adNumber"] = data.adindex
-    end if
-    if data.ad <> invalid = true and data.ad.adtitle <> invalid = true
-        adParams["adTitle"] = data.ad.adtitle
-    end if
-    if data.time <> invalid
-         m.lastAdPlayhead = data.time
-    end if
+    adParams = {"breakNumber": m.adBreakNumber}
+    adBreakParams = {}
+    adPositions = {"preroll": "pre", "midroll": "mid", "postroll": "post"}
 
-    if data.duration <> invalid
-         adParams["adDuration"] = data.duration
-    end if
-
-    if (m.viewManager.isStartSent = true OR m.viewManager.isInitiated = true) AND m.viewManager.isJoinSent = false
-        adParams["adPosition"] = "pre"
-    else if m.viewManager.isJoinSent = true
-        if m.viewManager.isFinished = true
-            adParams["adPosition"] = "post"
-        else
-            adParams["adPosition"] = "mid"
+    if data.type = "PodStart" OR data.type = "PodComplete"
+        if data.rendersequence <> invalid then adBreakParams["breakPosition"] = adPositions[data.rendersequence]
+        if data.adcount <> invalid then adBreakParams["givenAds"] = data.adcount
+    else
+        if data.adindex <> invalid = true
+            adParams["adNumber"] = data.adindex
         end if
+        if data.ad <> invalid = true and data.ad.adtitle <> invalid = true
+            adParams["adTitle"] = data.ad.adtitle
+        end if
+        if data.time <> invalid
+            m.lastAdPlayhead = data.time
+        end if
+
+        if data.duration <> invalid
+            adParams["adDuration"] = data.duration
+        end if
+
+        if data.rendersequence = invalid
+            if (m.viewManager.isStartSent = true OR m.viewManager.isInitiated = true) AND m.viewManager.isJoinSent = false
+                adParams["adPosition"] = "pre"
+            else if m.viewManager.isJoinSent = true
+                if m.viewManager.isFinished = true
+                    adParams["adPosition"] = "post"
+                else
+                    adParams["adPosition"] = "mid"
+                end if
+            end if
+        else
+            adParams["adPosition"] = adPositions[data.rendersequence]
+        end if
+    end if
+
+    if data.type = "Close"
+        if data.rendersequence <> invalid then adBreakParams["breakPosition"] = adPositions[data.rendersequence]
+        if data.adcount <> invalid then adBreakParams["givenAds"] = data.adcount
     end if
 
     if type(data) = "roAssociativeArray"
         if data.type = "PodStart"
+            m.adBreakNumber = m.adBreakNumber + 1
+            adBreakParams["breakNumber"] = m.adBreakNumber
             if m.viewManager.isStartSent = false
                 invokeHandler({handler: "play"})
             end if
+            invokeHandler({handler: "adBreakStart", params: adBreakParams})
         else if data.type = "PodComplete"
-            if m.viewManager.isFinished = true
+            adBreakParams["breakNumber"] = m.adBreakNumber
+            invokeHandler({handler: "adBreakStop", params: adBreakParams})
+            if m.viewManager.isFinished = true OR adBreakParams["breakPosition"] = "post"
                 invokeHandler({handler: "stop"})
             end if
         else if data.type = "Impression"
@@ -362,10 +503,21 @@ sub invokeAdHandler(data as Object)
             invokeHandler({handler: "adPlay", params: adParams})
         else if data.type = "Start"
             invokeHandler({handler: "adJoin", params: adParams})
+        else if data.type = "FirstQuartile"
+            adParams["quartile"] = "1"
+            invokeHandler({handler: "adQuartile", params: adParams})
+        else if data.type = "Midpoint"
+            adParams["quartile"] = "2"
+            invokeHandler({handler: "adQuartile", params: adParams})
+        else if data.type = "ThirdQuartile"
+            adParams["quartile"] = "3"
+            invokeHandler({handler: "adQuartile", params: adParams})
         else if data.type = "Complete"
             invokeHandler({handler: "adStop", params: adParams})
+            m.lastAdPlayhead = 0
         else if data.type = "Skip"
             adParams.skipped = "true"
+            m.lastAdPlayhead = 0
             invokeHandler({handler: "adStop", params: adParams})
         else if data.type = "Error" AND data.errMsg <> invalid
             if data.errMsg <> invalid
@@ -381,6 +533,8 @@ sub invokeAdHandler(data as Object)
             invokeHandler({handler: "adResume", params:adParams})
         else if data.type = "Close"
             invokeHandler({handler: "adStop", params: adParams})
+            adBreakParams["breakNumber"] = m.adBreakNumber
+            invokeHandler({handler: "adBreakStop", params: adBreakParams})
         end if
     endif
 
@@ -502,3 +656,24 @@ function isExtraMetadataReady()
     end if
     return true
 end function
+
+sub onSessionEvent(sessionEvent as Object)
+    if type(sessionEvent) = "roAssociativeArray"
+        event = sessionEvent.ev
+        params = {}
+        if type(event) = "roString"
+            if event = "start"
+                event = "sessionStart"
+                params = { screeName: sessionEvent.sc, dimensions: sessionEvent.dim }
+            else if event = "stop"
+                event = "sessionStop"
+            else if event = "event"
+                event = "sessionEvent"
+                displayName = sessionEvent.displayName
+                if displayName = invalid then displayName = "event"
+                params = { dimensions: sessionEvent.dim, values: sessionEvent.vals, name: displayName}
+            end if
+            m.eventHandler(event, params)
+        endif
+    endif
+end sub

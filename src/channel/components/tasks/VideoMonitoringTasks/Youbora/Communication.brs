@@ -22,6 +22,8 @@ sub init()
 	m.top.functionName = "_run"
 	m.top.control = "RUN"
 
+	m.sessionStarted = false
+
 end sub
 
 
@@ -175,14 +177,31 @@ sub processRequests()
 			for each req in requestsForCode 'For each pending request for that view code
 
 				req.args.code = viewCode
-
+				req.args["sessionRoot"] = getSessionRoot()
 				if req.host = Invalid or req.host = ""
 					req.host = getHost()
 				endif
 
-				if req.service = "/start"
+				if req.service = "/start" OR req.service = "/init"
 					req.args["youboraId"] = m.youboraId
 				endif
+
+				if req.service = "/start" OR req.service = "/init" OR req.service = "/ping" OR req.service = "/error"
+					req.args["sessionParent"] = getSessionRoot() 'Since we won't have parent we use the same code as root
+				endif
+
+				if (req.service = "/infinity/session/start" OR req.service = "/infinity/session/stop" OR req.service = "/infinity/session/nav" OR req.service = "/infinity/session/event" OR req.service = "/infinity/session/beat")
+					req.args.Delete("code")
+					req.args["sessionId"] = getSessionRoot()
+
+					if req.service = "/infinity/session/start"
+						m.sessionStarted = true
+					endif
+
+					if req.service = "/infinity/session/stop"
+						m.sessionStarted = false
+					endif
+				end if
 
 				req.send()
 
@@ -196,16 +215,16 @@ end sub
 
 function _nextView(liveOrPrefix) as String
 
-	prefix = ""
+	prefix = "U"
 
 	'We don't check boolean type as it may be boxed (roBoolean) or unboxed (Boolean)
-	if liveOrPrefix = true
-		prefix = "L"
-	else if liveOrPrefix = false
-		prefix = "V"
-	else if type(liveOrPrefix) = "string"
-		prefix = liveOrPrefix
-	endif
+	' if liveOrPrefix = true
+	' 	prefix = "L"
+	' else if liveOrPrefix = false
+	' 	prefix = "V"
+	' else if type(liveOrPrefix) = "string"
+	' 	prefix = liveOrPrefix
+	' endif
 
 	m.view = m.view + 1
 	m.prefix = prefix
@@ -221,6 +240,13 @@ function getViewCode() as String
 	else
 		return m.prefix + m.code + "_" + m.view.ToStr()
 	endif
+end function
+
+function getSessionRoot() as String
+	if m.code = Invalid or m.code = ""
+		return "noSessionRoot"
+	end if
+		return m.prefix + m.code
 end function
 
 sub setHost(host as String)

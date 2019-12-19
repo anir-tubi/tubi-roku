@@ -334,6 +334,10 @@ function InfoManager(plugin, options = invalid)
         return m.options["ad.resource"]
     end function
 
+    this.getVideoMetrics = function()
+        return m.options["content.metrics"]
+    end function
+
     'Fields
     this.plugin = plugin
 
@@ -364,7 +368,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("system") = false then outParams["system"] = m.options["accountCode"]
         if outParams.DoesExist("pluginName") = false then outParams["pluginName"] = m.plugin.getPluginName()
         if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
-        if outParams.DoesExist("fingerprint") = false then outParams["fingerprint"] = CreateObject("roDeviceInfo").GetChannelClientId()
+        if outParams.DoesExist("npawFingerprint") = false then outParams["npawFingerprint"] = CreateObject("roDeviceInfo").GetChannelClientId()
     else if requestName = "start" or requestName = "error"
         'Start and Error share most of the params, but error also has error code and error message
         ' Params
@@ -490,7 +494,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.3.4 Roku Adnalyzer"
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.3 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1
@@ -509,6 +513,10 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
+    else if requestName = "adQuartile"
+        if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
+        if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
+        if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
     else if requestName = "adPause"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
@@ -531,6 +539,99 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
+    else if requestName = "sessionStart"
+        if outParams.DoesExist("username") = false
+            if m.options["user.name"] = invalid
+                outParams["username"] = m.options["username"]
+            else
+                outParams["username"] = m.options["user.name"]
+            end if
+        end if
+        if outParams.DoesExist("navContext") = false then outParams["navContext"] = "RokuPlugin"
+        if outParams.DoesExist("pluginName") = false then outParams["pluginName"] = m.plugin.getPluginName()
+        if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
+        if outParams.DoesExist("appName") = false then outParams["appName"] = m.options["app.name"]
+        if outParams.DoesExist("appReleaseVersion") = false then outParams["appReleaseVersion"] = m.options["app.releaseVersion"]
+        nextraparams = 20
+        index = 1
+        while (index <= nextraparams)
+            optionKey = "extraparam." + index.ToStr()
+            paramKey = "param"+index.ToStr()
+            optionCustomDimensionKey = "content.customDimension." + index.ToStr()
+            paramValue = m.options[optionKey]
+            if m.options[optionKey] = invalid then paramValue = m.options[optionCustomDimensionKey]
+            if paramValue <> invalid
+                if outParams.DoesExist(paramKey) = false then outParams[paramKey] = paramValue
+            end if
+            index = index + 1
+        end while
+    else if requestName = "sessionNav"
+        if outParams.DoesExist("username") = false
+            if m.options["user.name"] = invalid
+                outParams["username"] = m.options["username"]
+            else
+                outParams["username"] = m.options["user.name"]
+            end if
+        end if
+        if outParams.DoesExist("navContext") = false then outParams["navContext"] = "RokuPlugin"
+        if outParams.DoesExist("route") = false then outParams["route"] = "Roku"
+    else if requestName = "sessionBeat"
+        ' ──────█▀▄─▄▀▄─▀█▀─█─█─▀─█▀▄─▄▀▀▀─────
+        ' ──────█─█─█─█──█──█▀█─█─█─█─█─▀█─────
+        ' ──────▀─▀──▀───▀──▀─▀─▀─▀─▀──▀▀──────
+        ' ─────────────────────────────────────
+        ' ───────────────▀█▀─▄▀▄───────────────
+        ' ────────────────█──█─█───────────────
+        ' ────────────────▀───▀────────────────
+        ' ─────────────────────────────────────
+        ' ─────█▀▀▄─█▀▀█───█──█─█▀▀─█▀▀█─█▀▀───
+        ' ─────█──█─█──█───█▀▀█─█▀▀─█▄▄▀─█▀▀───
+        ' ─────▀▀▀──▀▀▀▀───▀──▀─▀▀▀─▀─▀▀─▀▀▀───
+        ' ─────────────────────────────────────
+        ' ─────────▄███████████▄▄──────────────
+        ' ──────▄██▀──────────▀▀██▄────────────
+        ' ────▄█▀────────────────▀██───────────
+        ' ──▄█▀────────────────────▀█▄─────────
+        ' ─█▀──██──────────────██───▀██────────
+        ' █▀──────────────────────────██───────
+        ' █──███████████████████───────█───────
+        ' █────────────────────────────█───────
+        ' █────────────────────────────█───────
+        ' █────────────────────────────█───────
+        ' █────────────────────────────█───────
+        ' █────────────────────────────█───────
+        ' █▄───────────────────────────█───────
+        ' ▀█▄─────────────────────────██───────
+        ' ─▀█▄───────────────────────██────────
+        ' ──▀█▄────────────────────▄█▀─────────
+        ' ───▀█▄──────────────────██───────────
+        ' ─────▀█▄──────────────▄█▀────────────
+        ' ───────▀█▄▄▄──────▄▄▄███████▄▄───────
+        ' ────────███████████████───▀██████▄───
+        ' ─────▄███▀▀────────▀███▄──────█─███──
+        ' ───▄███▄─────▄▄▄▄────███────▄▄████▀──
+        ' ─▄███▓▓█─────█▓▓█───████████████▀────
+        ' ─▀▀██▀▀▀▀▀▀▀▀▀▀███████████────█──────
+        ' ────█─▄▄▄▄▄▄▄▄█▀█▓▓─────██────█──────
+        ' ────█─█───────█─█─▓▓────██────█──────
+        ' ────█▄█───────█▄█──▓▓▓▓▓███▄▄▄█──────
+        ' ────────────────────────██──────────
+        ' ────────────────────────██───▄███▄───
+        ' ────────────────────────██─▄██▓▓▓██──
+        ' ───────────────▄██████████─█▓▓▓█▓▓██▄
+        ' ─────────────▄██▀───▀▀███──█▓▓▓██▓▓▓█
+        ' ─▄███████▄──███───▄▄████───██▓▓████▓█
+        ' ▄██▀──▀▀█████████████▀▀─────██▓▓▓▓███
+        ' ██▀─────────██──────────────██▓██▓███
+        ' ██──────────███──────────────█████─██
+        ' ██───────────███──────────────█─██──█
+        ' ██────────────██─────────────────█───
+        ' ██─────────────██────────────────────
+        ' ██─────────────███───────────────────
+        ' ██──────────────███▄▄────────────────
+        ' ███──────────────▀▀███───────────────
+        ' ─███─────────────────────────────────
+        ' ──███────────────────────────────────
     end if
 
     return outParams

@@ -53,5 +53,10 @@ function Chrono() As Object
        m.startTime = newStartTime
     end function
 
+	this.reset = function() as Void
+		m.startTime = Invalid
+		m.stopTime = Invalid	
+	end function
+
 	return this
 end function
