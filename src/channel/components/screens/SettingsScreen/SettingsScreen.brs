@@ -175,7 +175,7 @@ Function CreateAboutPanel()
   textTwo += "https://tubitv.com/support" + Chr(10)
   textTwo += Chr(10)
   textTwo += "Version " + m.global.constants.settings.version.Replace("_",".") + Chr(10)
-  textTwo += "Device ID: " + Right(m.constants.deviceInfo.deviceId, 7) + Chr(10)
+  textTwo += "Short Device ID: " + Right(m.constants.deviceInfo.deviceId, 7) + Chr(32) + Chr(32) + "(press OK to see full Device ID)" + Chr(10)
   textTwo += Chr(10)
   year = CreateObject("roDateTime").GetYear().toStr()
   textTwo += "© " + year + " Tubi, Inc. all rights reserved."
@@ -286,6 +286,8 @@ Function onMenuItemSelected()
     else
       m.top.signInSelected = true
     end if
+  else if buttonContent.id = "AboutButton" 
+    m.top.showDeviceModal = true   
   end if
 End Function
 

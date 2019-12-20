@@ -281,6 +281,15 @@ Function showSignOutModal(dialogEvent, trackingTask, callback = invalid)
   showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback)
 End Function
 
+'''''''''''''''''''''''
+' showInfoModal
+'
+Function showInfoModal(title, message, dialogEvent, trackingTask, callback = invalid)
+  buttons = ["Close"]
+  info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback)
+  showModal(info.modalInfo, info.buttonInfo)
+End Function
+
 
 '''''''''''''''''''''''
 ' showDescriptionModal

@@ -15,6 +15,7 @@ function showSettingsScreen(sFocusID = "")
   m.settingsScreen.observeFieldScoped("parentalSettingSelected", "onParentalSettingSelected")
   m.settingsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   m.settingsScreen.observeFieldScoped("backgroundUriList", "onSettingsBackgroundChange")
+  m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
 
   pushScreen(m.settingsScreen, true, true)
   
@@ -304,4 +305,24 @@ Function onParentalSettingComplete(msg)
       onParentalSettingSelected(msgParentalControls)
     end if
   end if
+End Function
+
+
+Function onShowDeviceModal()
+
+  tubiLog("AboutScreen.showFullDeviceId")
+  
+  deviceId = m.constants.deviceInfo.deviceId
+  pageInfo = m.settingsScreen.trackingPageInfo
+  dialogEvent = {
+    type: "dialog"
+    values: {
+    dialog_type: "INFORMATION"
+    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    dialog_action: "SHOW"
+    dialog_sub_type: "device-id"
+    }
+  }  
+  showInfoModal("Full Device ID", deviceId, dialogEvent, m.trackingLoggingTask)    
+
 End Function

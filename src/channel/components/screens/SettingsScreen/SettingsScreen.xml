@@ -26,6 +26,8 @@
     <!-- OUTPUTS -->
       <!-- triggers for upstream controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
+      
+      <field id="showDeviceModal" type="boolean" alwaysNotify="true" />
 
       <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
       <field id="signInSelected" type="boolean" alwaysNotify="true"/>
