@@ -172,15 +172,18 @@ Function tubihttp_runSynchronous(timeout = 5 as Integer) As Object
       msg = wait(100, msgPort)
       request = m.handleEvent(msg)
 
-      if request <> invalid and request.response <> invalid and request.response.data.len() > 0
-        res = request.response.data
-        exit while
+      if request <> invalid
+        if request.response <> invalid and request.response.data.len() > 0
+          res = request.response.data
+          exit while
+        else if request.response.code < 200 or request.response.code >= 400
+          exit while
+        end if
       end if
 
       if timer.totalMilliseconds() > (timeout * 1000)
         exit while
       end if
-
     end while
   end if
 
