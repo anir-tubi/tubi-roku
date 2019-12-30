@@ -23,6 +23,10 @@ Function showDetailScreen(content)
     detailScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     detailScreen.observeFieldScoped("refreshContent", "onRefreshContentSignal")
     m.refreshingDetailCache = false
+    
+    ' m.actionType variable is used for setting callback function after successful data fetch. 
+    ' setting default value as invalid is to avoid runtime error.
+    m.actionType = invalid
 
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
@@ -35,9 +39,8 @@ Function showDetailScreen(content)
 
     if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
       detailScreen.isLoading = true
-    else
-      populateDetailScreen(detailScreen, content, true)
     end if
+    populateDetailScreen(detailScreen, content, true)
   
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
     getSingleContentFromServer(detailScreen, content)
@@ -243,6 +246,7 @@ End Function
 Function getSingleContentFromServerRetry(params)
   if type(params) = "roArray" and params.count() = 2
     m.refreshingDetailCache = false
+    params[0].isLoading = true
     getSingleContentFromServer(params[0], params[1])
   end if
 End Function
@@ -397,6 +401,11 @@ Function onSingleContentResponse(msg) As Void
       getSingleContentFromServer(detailScreen, emptySeriesNode)
       return
     end if
+    
+    if afterFn = invalid
+      afterFn = m.actionType
+    end if
+    
   end if
   populateDetailScreen(detailScreen, refreshedContent)
 
@@ -502,6 +511,21 @@ Function findEpisode2dIndex(episodeId As String, contentNode As Object)
   return [0,0]
 End Function
 
+' returns episode detail as node, if episode detail not present it returns invalid
+Function getEpisodeDetail(content)
+  if content <> invalid
+    if content.currentEpisodeId <> invalid and content.currentEpisodeId <> ""
+      return content.findNode(content.currentEpisodeId)
+    else
+      season = content.getChild(0)
+      if season <> invalid
+        ' return a default if no match
+        return season.getChild(0)
+      end if
+    end if
+  end if
+  return invalid
+End Function
 
 ' Given a content node that may be a series or a video, return the appropriate video to play.
 ' This may just be returning the video that is passed in (in the case of a movie).
@@ -831,8 +855,15 @@ End Function
 
 Function onEpisodeList(msg)
   tubiLog("ContentController.onEpisodeList")
+  m.actionType = episodesHelper
   detailScreen = msg.getRoSGNode()
-  showEpisodeScreenWithNavigationTracking(detailScreen.content)
+  episodeDetail = getEpisodeDetail(detailScreen.content)
+  if episodeDetail = invalid
+    detailScreen.isLoading = true
+    getSingleContentFromServer(detailScreen, detailScreen.content) 
+  else 
+    showEpisodeScreenWithNavigationTracking(detailScreen.content) 
+  end if
 End Function
 
 
@@ -840,11 +871,10 @@ Function episodesHelper(screen)
   showEpisodeScreenWithoutNavigationTracking(screen.content)
 End Function
 
+Function trailerHelper(screen)
 
-Function onWatchTrailer(msg)
-  tubiLog("ContentController.onWatchTrailer")
-  detailScreen = msg.getRoSGNode()
-  content = getDetailScreenContent(detailScreen)
+  content = screen.content
+
   if content <> invalid then
     trailerContent = CreateObject("roSGNode", "TubiContentNode")
     if content.id <> invalid
@@ -860,43 +890,90 @@ Function onWatchTrailer(msg)
     trailerContent.isTrailer = true
 
     playVideoContent(trailerContent, "none")
-  end if
+  end if        
+
+End Function
+
+Function onWatchTrailer(msg)
+  tubiLog("ContentController.onWatchTrailer")
+  m.actionType = trailerHelper
+  detailScreen = msg.getRoSGNode()
+  content = getDetailScreenContent(detailScreen)
+  if content <> invalid then
+    if isFetchingInProgress(detailScreen) <> true
+      if isPlayable(detailScreen)
+        trailerHelper(detailScreen)      
+      else
+        detailScreen.isLoading = true
+        getSingleContentFromServer(detailScreen, detailScreen.content)
+      end if   
+    end if
+  end if  
+
 End Function
 
 
 '''''''''''
-' shouldPlayDetailVideo
+' isFetchingInProgress
 '
-' Should the incoming content be allowed to play? It will check if there is  valid video URL
-Function shouldPlayDetailVideo(screen) as Boolean
+' Check whether any task running or not
+Function isFetchingInProgress(screen) as Boolean
+
   bReturn = false
   task = screen.task
   content = screen.content
-
-  '//if info has not loaded yet, then the screen will contain a DetailMetadataTask task and will not contain the video URL yet. This function will indicate that a playback button press should be ignored
+  
   if task <> invalid and task.subType() = "DetailMetadataTask"
-    if content <> invalid and content.url <> invalid and Len(content.url) > 0
-      bReturn = true
-    end if
-  else
-    '//This indicates that the screen is not currently loading metadata so proceed as normal. 
-    '//In this case, we do not want to stop the play button action. If the video URL is invalid in this case, then we want to let the user know this by showing them an error after they click the play button.
     bReturn = true
   end if
-
+  
   return bReturn
+
+End Function
+
+
+'''''''''''
+' isPlayable
+'
+' Check whether any url is present for movie and episode detail available for series
+Function isPlayable(screen) as Boolean
+
+  bReturn = false
+  task = screen.task
+  content = screen.content
+  
+  if content <> invalid and content.type <> invalid
+    if content.type = "series"
+      episodeDetail = getEpisodeDetail(screen.content)
+      if episodeDetail <> invalid and episodeDetail.url <> invalid and Len(episodeDetail.url) > 0
+        bReturn = true
+      end if
+    else if content.type = "video" and content.url <> invalid and Len(content.url) > 0
+      bReturn = true
+    end if
+  end if
+  
+  return bReturn
+
 End Function
 
 
 '''''''''''
 ' onResume
 '
-' Notify the main Brightscript thread to invoke the video player, resuming at the indicated location
+' Notify the main Brightscript thread to invoke the video player, resuming at the indicated location if data present
+' if data not present, it invokes content api
 Function onResume(msg)
   tubiLog("ContentController.onResume")
+  m.actionType = resumeHelper
   detailScreen = msg.getRoSGNode()
-  if shouldPlayDetailVideo(detailScreen) = true
-    resumeHelper(detailScreen)
+  if isFetchingInProgress(detailScreen) <> true
+    if isPlayable(detailScreen)
+      resumeHelper(detailScreen)      
+    else
+      detailScreen.isLoading = true
+      getSingleContentFromServer(detailScreen, detailScreen.content)
+    end if   
   end if
 End Function
 
@@ -904,12 +981,19 @@ End Function
 '''''''''''
 ' onPlay
 '
-' Notify the main Brightscript thread to invoke the video player
+' Notify the main Brightscript thread to invoke the video player if data present
+' if data not present, it invokes content api
 Function onPlay(msg)
   tubiLog("ContentController.onPlay")
+  m.actionType = playHelper
   detailScreen = msg.getRoSGNode()
-  if shouldPlayDetailVideo(detailScreen) = true
-    playHelper(detailScreen)
+  if isFetchingInProgress(detailScreen) <> true
+    if isPlayable(detailScreen)
+      playHelper(detailScreen)      
+    else
+      detailScreen.isLoading = true
+      getSingleContentFromServer(detailScreen, detailScreen.content)
+    end if   
   end if
 End Function
 

@@ -251,7 +251,11 @@ Function onIsLoading()
   tubiLog("DetailScreen.onIsLoading")
   m.Info.visible = not m.top.isLoading
   m.Menu.visible = not m.top.isLoading
-  m.RelatedContentGroup.visible = not m.top.isLoading
+  if m.top.relatedContent <> invalid and m.top.relatedContent.getChildCount() > 0
+    m.RelatedContentGroup.visible = not m.top.isLoading
+  else
+    m.RelatedContentGroup.visible = false
+  end if
 End Function
 
 
