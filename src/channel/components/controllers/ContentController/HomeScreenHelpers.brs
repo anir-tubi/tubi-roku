@@ -14,7 +14,6 @@ Function showHomeScreen(constants, authInfo)
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
     
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
-    homeScreen.observeFieldScoped("firstPosterLoaded", "onFirstPosterLoaded")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
     m.top.observeField("homescreenResponse", "onHomescreenResponse")
     

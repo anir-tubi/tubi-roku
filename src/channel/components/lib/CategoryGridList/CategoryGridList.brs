@@ -266,10 +266,6 @@ End Function
 Function onMetadataFetchTaskBatchResponse(message) As Void
   tubiLog("CategoryGridList.onMetadataFetchTaskBatchResponse")
 
-  ' Mark the first poster loaded - as this field is not alwaysNotify = true,
-  ' this will only be registered the first time content is received.
-  m.top.firstPosterLoaded = true
-
   responses = message.GetData()
   shouldInformHomeScreen = false
   removableCategories = {}
@@ -439,9 +435,6 @@ End Function
 ' that content has loaded so it can update the infoPanel.
 Function setRowListFocus()
   if m.top.hasFocus()
-    ' Mark the first poster loaded - as this field is not alwaysNotify = true,
-    ' this will only be registered the first time content is received.
-    m.top.firstPosterLoaded = true
     m.justGainedFocus = true
     m.RowList.setFocus(true)
   else

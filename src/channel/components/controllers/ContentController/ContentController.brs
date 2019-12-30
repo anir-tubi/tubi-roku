@@ -453,7 +453,6 @@ Function startUserExperience(registryKidsMode = false)
 End Function
 
 
-
 ' is triggered when the args that are passed to main, are passed into the SG thread to the contentController.
 ' this is one of the pre-requisites to starting the SG user experience.
 Function onStartupArgs()
@@ -956,14 +955,15 @@ Function displayDefaultBackground()
 End Function
 
 
-
-' onFirstPosterLoaded
+' fireAppLoadTimeEvent
 '
-' Info that the first poster in the first category has bubbled all the way up.
-' Fire off a log to a server so we can track how long it took since the app was started, ie. startChannel() was called
-Function onFirstPosterLoaded()
-  loadTime = m.appLoadStopwatch.TotalMilliseconds()
+' Fire off a log to a server so we can track how long it took since the app was started
+Function fireAppLoadTimeEvent()
 
+  currentTime = Int(Uptime(0))
+  appStartTime = m.top.appStartTime
+  loadTime = currentTime - appStartTime
+  
   'send tracking event for initial home page load
   m.trackingLoggingTask.trackEvent = {
     type: "page_load"
@@ -974,12 +974,12 @@ Function onFirstPosterLoaded()
     }
   }
 
-  tubiLog("ContentController.onFirstPosterLoaded")  'write to console only
   messageInfo = {
     loadtime: loadTime
     model: m.constants.deviceInfo.model
   }
-  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load")   'send info to server
+  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load")   'send info to server  
+
 End Function
 
 
@@ -1091,6 +1091,7 @@ End Function
 Function fireAppLoadBeacon()
   if m.appLoadedBeaconFired = false
     m.appLoadedBeaconFired = true
+    fireAppLoadTimeEvent()
     m.top.signalBeacon("AppLaunchComplete")
   end if
 End Function

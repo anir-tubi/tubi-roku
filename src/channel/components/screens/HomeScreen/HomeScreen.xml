@@ -63,9 +63,6 @@
       <!-- set to the tubi content id of the item which was clicked on -->
       <field id="contentSelected" type="node" alwaysNotify="true"/>
 
-      <!-- triggered once the first CategoryGridList content is loaded -->
-      <field id="firstPosterLoaded" alias="CategoryGridList.firstPosterLoaded"/>
-
       <!-- content on the homescreen is loaded and spinner can be turned off -->
       <field id="contentReady" type="boolean" alwaysNotify="true" />
 

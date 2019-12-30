@@ -75,9 +75,6 @@
 
       <field id="selectedPosition" alias="RowList.rowItemSelected" />
 
-      <!-- first category is loaded - bubbles up to send a logging event indicating how long it took to load the app -->
-      <field id="firstPosterLoaded" type="boolean" value="false" />
-
       <!-- in the case that focus is not being set on the RowList, inform that content is loaded
            and infoPanel should be updated. Typically happens on kids mode toggle.
       -->

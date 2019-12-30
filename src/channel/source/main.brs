@@ -3,6 +3,9 @@ Function Main(startupArgs)
   ' this version of constants will be the constants that are part of the submitted build (or the side loaded build)
   ' and only exist in the main brightscript thread.
   ' constants will be reset in remote components for scene graph
+  
+  m.appStartTime = UpTime(0)
+  
   constants = getConstants()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
@@ -122,9 +125,8 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
             componentsLoaded = true
             controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
             controller.id = "ContentController"
-            controller.setField("externalConfigValues", externalConfigValues)
-            controller.setField("experimentValues", experimentValues)
             controller.observeField("exitApp", port)
+            controller.appStartTime = m.appStartTime
             controller.startupArgs = startupArgs
           end if
         else if msg.getData() = "loading"
@@ -198,6 +200,7 @@ Function loadPackagedComponents(scene, port, startupArgs)
   controller = scene.createChild("ContentController")
   controller.id = "ContentController"
   controller.observeField("exitApp", port)
+  controller.appStartTime = m.appStartTime
   controller.startupArgs = startupArgs
   return controller
 End Function

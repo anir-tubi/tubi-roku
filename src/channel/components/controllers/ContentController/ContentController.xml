@@ -48,6 +48,7 @@
     <!-- INPUTS -->
       <!-- the arguments that are passed into the app at startup, as an associative array -->
       <field id="startupArgs" type="assocarray" />
+      <field id="appStartTime" type="integer" />
 
       <!-- any info that is passed into the channel via roInput/ECP while the channel is running
            can be deeplinks, transport controls, voice commands, etc. -->
