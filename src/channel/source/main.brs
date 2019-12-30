@@ -44,7 +44,13 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
   'setting constants here is just to get the scene up and running.
   'Global constants will be overwritten with constants pulled from starterController that are the most recent version of constants
   sgGlobal.setField("constants", constants)
+
   screen.show()
+
+  'add RALE for dev builds - children can not be added to tubiScene until after screen.show has run
+  if constants <> invalid and constants.settings <> invalid and constants.settings.mode = "dev"
+    tubiScene.createChild("TrackerTask")
+  end if
 
   'run SceneGraph tests if in test mode
   if constants.settings.mode = "test"

@@ -722,7 +722,18 @@ End Sub
 ' @param {object} args - command arguments
 ' @return {object} - response of command. Node data (id, type, fields, layout etc.)
 Sub UIThread_getNodeData(args) as Object
-    return getNodeData(m.currentNode, m.currentPath, Invalid)
+    path = args["path"]
+
+    if path = Invalid then
+        path = m.currentPath
+        node = m.currentNode
+    else
+        root = m.top.getScene()
+        node = RALE_getNodeByPath(root, path)
+        if node = Invalid then return getError("Invalid Path")
+    end if
+
+    return getNodeData(node, path, Invalid)
 End Sub
 
 '=======================
@@ -922,7 +933,7 @@ Sub UIThread_removeField(args) as Object
         owner = setInParentNode(ownerPath, inOwnerField, node)
     end if
 
-    m.logger.debug("Field '" + field + "' of selected node was removed")
+    m.logger.debug("Field '" + FW_AsString(field) + "' of selected node was removed")
     return getFieldList(node)
 End Sub
 
@@ -1213,6 +1224,7 @@ Sub getFieldList(node) as Object
         for i = 0 to count
             id = i.ToStr()
             fieldList[id] = { item: getItemObj(fields[i], i) }
+            fieldList[id].item.id = i
         end for
     else
         keys = fields.keys()
@@ -1693,7 +1705,7 @@ Sub init()
     m.config = RALE_Config()
     m.logger = RALE_Logger(m.config.defaultLogLevel, m.config.logFormat)
     m.sceneBG = m.top.GetScene().getChild(0)
-    m.raleVersion = "1.8.2"
+    m.raleVersion = "2.0.9"
 
     m.logger.info("Roku Advanced Layout Editor v." + m.raleVersion)
 End Sub
@@ -1702,7 +1714,6 @@ End Sub
 Sub tracker()
     appInfo = CreateObject("roAppInfo")
     handlersMap = getCommandMap()
-    if not appInfo.IsDev() then return
 
     RALE_InfoLog("TrackerTask run")
 
@@ -1716,6 +1727,7 @@ Sub tracker()
     inputObj.SetMessagePort(inputPort)
 
     while True
+        raleEnabled = true
         port = 0
         RALE_InfoLog("Waiting on ECP input request")
         msg = wait(0, inputPort)
@@ -1726,9 +1738,17 @@ Sub tracker()
                 if type(info) = "roAssociativeArray" and info.rale <> Invalid then
                     port = FW_AsInteger(info.port)
                 end if
+
+                nonDev = FW_AsBoolean(info.nonDev)
+
+                if not nonDev and not appInfo.IsDev() then
+                    RALE_InfoLog("Disable RALE for non-dev channels")
+                    raleEnabled = false
+                end if
             end if
         end if
-        if port > m.config.minSocketPort and port < m.config.maxSocketPort then
+
+        if raleEnabled and port > m.config.minSocketPort and port < m.config.maxSocketPort then
             socketConnection(addr, messagePort, port, buffer, handlersMap, m.config)
         end if
     end while
