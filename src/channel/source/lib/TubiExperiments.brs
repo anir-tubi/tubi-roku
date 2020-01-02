@@ -18,12 +18,31 @@ Function TubiExperiments(constants) as Object
     ' in the case that the experiment API doesn't return a response with our experiment.
     ' All experiments are required by the backend to have one of the experiment values to be "control"
     '
-    ' The backend allows for a "resource" assoiciative array where we can place any additional info about the experiement
+    'example of how defaultResources should be constructed
+    ' defaultResources = {
+    '   UserNamespace: {
+    '     single_row: {background_color: "00FF12"}
+    '     livetv: {opacity: .6}
+    '   }
+    '   RokuNamespace: {
+    '       background_color: {background_color: "FF0000"}
+    '   }
+    ' }
+    '
+    ' Not all experiements will need a resource assoiciative array where we can place any additional info about the experiement
     '   i.e. a color scheme, values for multiple parameters, etc.
-    ' Right now this code is not using the resource AA but if it is desired to store valiues on the experiment backend, then we can change this code so it is giving the client this data 
+    ' However, when an experiement does require a resource then 
+    ' default resources are used in case a experiment needs a "control" value or
+    ' in the case that the experiment API doesn't return a response with our experiment.
+    '
     ' For more info on on the experiement backend, see: https://github.com/adRise/popper-config
-'//::TODO::popper = get rid of old kidsMode experiments before releasing the popper experiment
     defaultValues: {
+      UserNamespace: {
+      }
+      RokuNamespace: {
+      }
+    }
+    defaultResources: {
       UserNamespace: {
       }
       RokuNamespace: {
@@ -39,7 +58,8 @@ Function TubiExperiments(constants) as Object
     'private methods
     getNamespaces: tubiExperiments_getNamespaces_
     parseNamespace: tubiExperiments_parseNamespace_
-    getDefault: tubiExperiments_getDefault_
+    getDefaultValue: tubiExperiments_getDefaultValue_
+    getDefaultResource: tubiExperiments_getDefaultResource_
     getExperiment: tubiExperiments_getExperiment_
   }
 End Function
@@ -178,12 +198,12 @@ Function tubiExperiments_getExperimentValue(namespaceName as string, experimentN
     end if
     
     if (type(treatmentName) = "roString" or type(treatmentName) = "String") and treatmentName = "control"
-      treatmentName = m.getDefault(namespaceName, experimentName)
+      treatmentName = m.getDefaultValue(namespaceName, experimentName)
     end if
   end if
 
   if treatmentName = invalid
-    experimentValue = m.getDefault(namespaceName, experimentName)
+    experimentValue = m.getDefaultValue(namespaceName, experimentName)
   else 
     experimentValue = treatmentName
   end if
@@ -202,18 +222,39 @@ Function tubiExperiments_getExperimentResource(namespaceName as string, experime
   experiment = m.getExperiment(namespaceName, experimentName)
   if experiment <> invalid 
     oReturn = experiment.resource
+
+    if oReturn = invalid
+      oReturn = m.getDefaultResource(namespaceName, experimentName)
+    end if 
   end if
 
-  return oReturn
+  return oReturn 
 End Function
 
+
+' This function gets the appropriate default resource from a repository of default resources for experiments.
+' If we can't find an experiment from the Popper server response, we'll go here to get the default resource for that experiment.
+' If there is no default resource, then this function can return invalid.
+'
+'@namespaceName: string, the name of the namespace in which we will find the experiment
+'@experimentName: string, the name of the experiment as found in the experiment definition
+Function tubiExperiments_getDefaultResource_(namespaceName as string, experimentName as string) as Object  
+  defaultResource = invalid
+  if namespaceName <> invalid and experimentName <> invalid
+    if m.defaultResources[namespaceName] <> invalid
+      defaultResource = m.defaultResources[namespaceName][experimentName]
+    end if
+  end if
+
+  return defaultResource
+End Function
 
 'This function gets the appropriate default value from a repository of default values for experiments.
 'If we can't find an experiment from the Popper server response, we'll go here to get the default value for that experiment
 '
 '@namespaceName: string, the name of the namespace in which we will find the experiment
 '@experimentName: string, the name of the experiment as found in the experiment definition
-Function tubiExperiments_getDefault_(namespaceName as string, experimentName as string) as Object  
+Function tubiExperiments_getDefaultValue_(namespaceName as string, experimentName as string) as Object  
   defaultValue = invalid
   if namespaceName <> invalid and experimentName <> invalid
     if m.defaultValues[namespaceName] <> invalid
