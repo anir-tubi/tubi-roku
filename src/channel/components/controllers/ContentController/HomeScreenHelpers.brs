@@ -98,8 +98,17 @@ Function onHomescreenResponse()
         if homeScreen.isInFocusChain()
           errorMessage = "Unable to load Tubi home screen."
           errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
-          dialogEvent = getHomescreenDialogAnalyticsEvent("NETWORK_ERROR", errorCode, m.Tracking)
-          
+
+          dialogEvent = {
+            type: "dialog"
+            values: {
+              dialog_type: "NETWORK_ERROR"
+              pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+              dialog_action: "SHOW"
+              dialog_sub_type: errorCode
+            }
+          }
+
           modalInfo = {
             message: getErrorMessage(errorMessage, errorCode)
             openTrackEvent: dialogEvent
