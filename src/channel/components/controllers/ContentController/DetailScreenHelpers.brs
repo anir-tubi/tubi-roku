@@ -27,6 +27,9 @@ Function showDetailScreen(content)
     ' m.actionType variable is used for setting callback function after successful data fetch. 
     ' setting default value as invalid is to avoid runtime error.
     m.actionType = invalid
+    
+    ' m.isScreenLoaded will be changed to true once the metadata is populated
+    m.isScreenLoaded = false
 
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
@@ -37,10 +40,13 @@ Function showDetailScreen(content)
     ' We expect to overwrite this in populateDetailScreen() which occurs after the full info has been fetched from the /content API
     detailScreen.content = content
 
+    ' waiting to populate the details screen for series until after we fetch episode data
     if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
       detailScreen.isLoading = true
+    else
+      populateDetailScreen(detailScreen, content, true)  
     end if
-    populateDetailScreen(detailScreen, content, true)
+    
   
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
     getSingleContentFromServer(detailScreen, content)
@@ -213,6 +219,8 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
   'full content has been returned from the /contents API.
   detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
   detailScreen.content = content
+  
+  m.isScreenLoaded = true
 End Function
 
 
@@ -438,6 +446,10 @@ Function onSingleContentError(msg)
   detailScreen = task.target
   detailScreen.task = invalid
   tubiLog("DetailScreenHelpers.onSingleContentError")
+  
+  if m.isScreenLoaded = false
+    populateDetailScreen(detailScreen, detailScreen.content)
+  end if
 
   content = invalid
   if task.request <> invalid 

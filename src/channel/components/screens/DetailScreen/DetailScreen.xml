@@ -228,6 +228,7 @@
 
       <FilledButtonMarkupGrid
         id="Menu"
+        visible="false"
         translation="[60,656]"
         itemSize="[465,80]"
         itemComponentName="DetailMenuItem"

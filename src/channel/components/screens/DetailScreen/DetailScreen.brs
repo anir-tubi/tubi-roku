@@ -116,6 +116,7 @@ Function onScreenFocusChange()
   end if
 End Function
 
+
 Function onLengthChange()
   tubiLog("DetailScreen.onLengthChange")
   m.ResumeMenuItem.length = m.top.length
@@ -249,8 +250,11 @@ End Function
 
 Function onIsLoading()
   tubiLog("DetailScreen.onIsLoading")
-  m.Info.visible = not m.top.isLoading
-  m.Menu.visible = not m.top.isLoading
+  
+  if m.Menu.visible = false
+    m.Menu.visible = not m.top.isLoading
+  end if
+
   if m.top.relatedContent <> invalid and m.top.relatedContent.getChildCount() > 0
     m.RelatedContentGroup.visible = not m.top.isLoading
   else
