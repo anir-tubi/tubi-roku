@@ -354,6 +354,9 @@ Function onVideoPositionChange()
               m.lastPingTime = m.playerPosition
               trackEvent(playProgressEvent)
             end if
+            
+            ' update history when showing adBreak
+            historyPosition(m.playerPosition)
 
             ' We must stop the video here, not just pause it, in order to release
             ' system resources to the RAF video player
@@ -1097,31 +1100,6 @@ Function handleHopBack(remoteReplayButton)
 End Function
 
 
-'helper function to conclude a hop, skip, or end scrub
-'performs the seek tracking and runs an ad break if told to
-Function handleSeek(position as Float, positionAtJumpStart as Float, shouldAdBreak as Boolean)
-  m.Thumbnail.visible = false
-  ' seek analytics
-  trackEvent({
-    type: "seek"
-    values: {
-      video_id: m.Video.content.id.toInt()
-      from_position: Int(positionAtJumpStart * 1000)
-      to_position: Int(position * 1000)
-    }
-  })
-
-  if shouldAdBreak
-    m.Video.control = "stop"
-    m.top.adPosition = position
-    m.top.adControl = "seek"
-  else
-    m.Video.seek = position 'will load and play the video at the seeked to point
-    m.VideoState = "play"
-  end if
-End Function
-
-
 'handles the functionality for Roku's requirement to skip the video forward or backward while pausing the video.
 'functionality is: pause video, jump 10s forward or back, show the transport
 Function handleSkipVideo(amt, isProgressBarFocused)
@@ -1291,8 +1269,30 @@ Function jumpToPosition(position)
 
   m.PlayPauseButton.uri = m.buttonUris.pause
   m.lastButtonPressPos = position
+  
+  ' update history when seeking
+  historyPosition(m.playerPosition)
+  
+  m.Thumbnail.visible = false
+  ' seek analytics
+  trackEvent({
+    type: "seek"
+    values: {
+      video_id: m.Video.content.id.toInt()
+      from_position: Int(m.positionAtJumpStart * 1000)
+      to_position: Int(position * 1000)
+    }
+  })
 
-  handleSeek(position, m.positionAtJumpStart, shouldAdBreak)
+  if shouldAdBreak
+    m.Video.control = "stop"
+    m.top.adPosition = position
+    m.top.adControl = "seek"
+  else
+    m.Video.seek = position 'will load and play the video at the seeked to point
+    m.VideoState = "play"
+  end if
+
 End Function
 
 
