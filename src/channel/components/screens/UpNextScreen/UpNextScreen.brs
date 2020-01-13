@@ -6,6 +6,7 @@ Function init()
 
   m.top.observeField("content", "onContentChange")
   m.top.observeField("focusedChild", "onComponentFocus")
+  m.top.observeField("stopAutoPlayTimer", "onStopAutoPlayTimer")
 
   m.InfoMovie = m.top.findNode("InfoMovie")
   m.InfoSeries = m.top.findNode("InfoSeries")
@@ -127,6 +128,13 @@ Function onContentChange()
     ' default hide both experiences
     m.MovieGroup.visible = false
     m.SeriesGroup.visible = false
+  end if
+End Function
+
+' this method stops the countdown timer, when deeplinking during autoplay screen
+Function onStopAutoPlayTimer()
+  if m.Timer <> invalid
+    m.Timer.control = "stop"
   end if
 End Function
 

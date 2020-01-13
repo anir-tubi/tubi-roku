@@ -12,6 +12,7 @@
 
       <!-- The video id of the content that is playing when the Up Next UI begins -->
       <field id="videoId" type="string"/>
+      <field id="stopAutoPlayTimer" type="boolean" alwaysNotify="true"/>
 
     <!-- OUTPUTS -->
       <field id="contentFocused" type="node"/>

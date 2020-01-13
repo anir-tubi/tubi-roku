@@ -335,6 +335,9 @@ End Function
 ' Stop the video player and optionally return to the screen stack
 Function stopVideoContent(showScreenStack)
   tubiLog("VideoHelpers.stopVideoContent")
+  if m.upNextScreen <> invalid 
+    m.upNextScreen.stopAutoPlayTimer = true
+  end if
   videoTrackingStop()
   m.videoPlayer.unobserveFieldScoped("backButtonPressed")
   m.videoPlayer.unobserveFieldScoped("state")
