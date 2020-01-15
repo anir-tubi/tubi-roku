@@ -140,7 +140,6 @@
     <Spinner
       id="spinner"
       visible="false"
-      isDisabled="false"
       width="1920"
       height="1080"
       translation="[0,0]"/>

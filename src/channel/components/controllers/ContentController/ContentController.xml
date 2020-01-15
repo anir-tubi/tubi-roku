@@ -139,7 +139,6 @@
         id="ContentControllerSpinner"
         visible="false"
         modal="true"
-        isDisabled="false"
         width="1920"
         height="1080"/>
 

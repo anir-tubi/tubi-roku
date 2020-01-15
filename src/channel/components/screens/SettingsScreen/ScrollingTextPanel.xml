@@ -41,7 +41,6 @@
       <Spinner
         id="Spinner"
         visible="false"
-        isDisabled="false"
         height="717"
         width="1034"
         translation="[0,0]"/>

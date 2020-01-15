@@ -210,7 +210,6 @@
     <Spinner
       id="DetailSpinner"
       visible="false"
-      isDisabled="false"
       width="1920"
       height="1080"
       translation="[0,0]"/>
@@ -253,6 +252,7 @@
           </CategoryGridRowLabel>
           <PosterGrid
             id="RelatedGrid"
+            loadingBitmapUri="pkg:/images/placeholder.jpg"
             itemSize="[1920,300]"
             numRows="1"
             basePosterSize="[210,300]"

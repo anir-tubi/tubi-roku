@@ -129,7 +129,7 @@ Function retryCategoryList()
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
     homeScreen.canLoadCategories = true
-    loadAllCategories(homeScreen)
+    homeScreen.loadAllCategories = true
     homeScreen.setFocus(true)
   end if
 End Function

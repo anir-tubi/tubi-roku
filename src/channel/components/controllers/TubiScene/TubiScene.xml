@@ -30,7 +30,6 @@
     <!-- Show a loading spinner only if it takes more than 3 seconds to load -->
     <Spinner
       id="LoadingSpinner"
-      isDisabled="false"
       visible="true"
       width="1920"
       height="1080"/>

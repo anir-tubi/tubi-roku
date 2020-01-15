@@ -113,7 +113,6 @@
     <Spinner
       id="CategorySpinner"
       visible="true"
-      isDisabled="false"
       width="1920"
       height="1080"/>
 

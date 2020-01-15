@@ -171,6 +171,7 @@
       id="ResultArea">
       <PosterGrid
         id="ResultGrid"
+        loadingBitmapUri = "pkg:/images/placeholder.jpg"
         basePosterSize="[210,300]"
         itemSpacing="[10,10]"
         numColumns="5"
@@ -181,7 +182,6 @@
         id="spinner"
         visible="false"
         modal="true"
-        isDisabled="false"
         text="Updating your results..."
         displayText="true"
         width="1094"

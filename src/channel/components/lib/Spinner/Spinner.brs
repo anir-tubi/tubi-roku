@@ -3,19 +3,11 @@ Function init()
   m.top.opacity = "0.8"
   m.top.observeField("width", "onDimensionsChange")
   m.top.observeField("height", "onDimensionsChange")
-  m.top.observeField("isDisabled", "onIsDisabled")
-  m.top.observeField("displayText", "onIsDisabled")
-End Function
 
-
-'Previously in init()
-Function onIsDisabled()
   ' Non-OpenGL slow devices look really poor with clunky spinner
+  ' https://developer.roku.com/en-gb/docs/specs/hardware.md
   loadingMessage = m.top.findNode("LoadingMessage")
-  ' While we are using the SKD1 version of RAF, the search screen does not repopulate poster images if
-  ' the following spinners are in effect. This should be temporary and full spinner usage should be ok 
-  ' once we move to the SG version of RAF.
-  if m.limitedUi <> true and m.top.isDisabled <> true
+  if m.limitedUi <> true
     m.Animation = m.top.findNode("SpinnerAnimation")
     m.top.observeField("visible", "onVisibilityChange")
     if m.top.visible then
@@ -31,6 +23,7 @@ Function onIsDisabled()
   end if
   onDimensionsChange() '//update the placement of spinners
 End Function
+
 
 Function onVisibilityChange()
   if m.top.visible = true and m.Animation.state <> "running" then
