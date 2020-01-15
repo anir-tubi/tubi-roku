@@ -34,6 +34,8 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
   screen = CreateObject("roSGScreen")
   screen.SetMessagePort(port)
   controller = invalid
+  
+  input.enableTransportEvents()
 
   ' start the scene graph UI 
   tubiScene = screen.CreateScene("TubiScene")
@@ -91,7 +93,7 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
   while true
     msg = wait(200, port)
     msgType = type(msg)
-
+    
     if msgType = "roInputEvent"
       if controller <> invalid and msg.GetInfo() <> invalid
         inputInfo = msg.GetInfo()
@@ -99,7 +101,7 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
           'deeplink info doesn't have a "type" field, so we add one in order to easily differentiate input behavior later
           inputInfo.type = "deeplink"
         end if
-        controller.roInputInfo = inputInfo
+        controller.roInputInfo = inputInfo 
       end if
     else if msgType = "roSGScreenEvent"
       print "got a screen event "; msg.isScreenClosed()
@@ -112,6 +114,15 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
       if msg.GetField() = "exitApp"
         if msg.GetData() = true
           return
+        end if
+      else if msg.GetField() = "transportVoiceResponse"
+        result = msg.getData()
+        response = result.response
+        if response = invalid
+          response = "unhandled"  
+        end if
+        if result.id <> invalid
+          input.EventResponse({id: result.id, status: response})
         end if
       else if msg.GetField() = "loadStatus"
         'starter components or remote components load status update
@@ -132,6 +143,7 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
             controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
             controller.id = "ContentController"
             controller.observeField("exitApp", port)
+            controller.observeField("transportVoiceResponse", port)
             controller.appStartTime = m.appStartTime
             controller.startupArgs = startupArgs
           end if
@@ -206,6 +218,7 @@ Function loadPackagedComponents(scene, port, startupArgs)
   controller = scene.createChild("ContentController")
   controller.id = "ContentController"
   controller.observeField("exitApp", port)
+  controller.observeField("transportVoiceResponse", port)
   controller.appStartTime = m.appStartTime
   controller.startupArgs = startupArgs
   return controller

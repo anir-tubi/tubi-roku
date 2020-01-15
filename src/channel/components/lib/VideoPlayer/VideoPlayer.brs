@@ -48,6 +48,7 @@ Function init()
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.top.observeField("control", "onControlChange")
+  m.top.observeField("transportVoiceRequest", "handleTransportEvent")
   m.top.observeField("playlist", "onPlaylistChange")
   m.top.observeField("seekPlaylist", "onSeekPlaylist")
   m.top.observeField("dock", "onDockedChange")
@@ -509,6 +510,61 @@ Function playContent()
 End Function
 
 
+Function handleTransportEvent()
+
+  inputInfo = m.top.transportVoiceRequest
+  command = ""
+  if inputInfo <> invalid and inputInfo.command <> invalid
+    command = inputInfo.command
+  end if
+  tubiLog("VideoPlayer.handleTransportEvent " + command)
+  
+  response = "success"
+  if command = "play"
+    resumeFromPause(true)
+  else if command = "pause" or command = "stop"
+    pauseVideo(true, true)
+  else if command = "replay"
+    handleHopBack(false, 20)
+  else if command = "startover"
+    goToStart()
+  else if command = "rewind" 
+    handleRewind()
+  else if command = "forward"
+    handleFastForward()
+  else if command = "seek"  
+    direction = ""
+    if inputInfo <> invalid and inputInfo.duration <> invalid and inputInfo.direction <> invalid
+      duration = inputInfo.duration.toInt()
+      direction = inputInfo.direction
+    end if
+    if direction = "forward"
+      seekPosition = m.Video.position + duration
+      if seekPosition > m.Video.duration then
+        response = "success.seek-end"
+      end if
+      handleHopForward(duration)
+    else if direction = "backward"
+      seekPosition = m.Video.position - duration
+      if seekPosition < 0 then
+        response = "success.seek-start"
+      end if
+      handleHopBack(false, duration)
+    else
+      response = "unhandled"  
+    end if
+  else if command = "next" 
+    goToNext()
+  else
+    response = "unhandled"     
+  end if
+  
+  inputInfo.response = response
+  m.top.transportVoiceResponse = inputInfo
+
+End Function
+
+
 Function onControlChange()
   tubiLog("VideoPlayer.onControlChange " + m.top.control)
   if currentPlaylistContent() <> invalid and m.Video.state <> "playing" and m.top.control = "play" then
@@ -551,11 +607,11 @@ Function onKeyEvent(key As String, press As Boolean)
           else if focusButtonId = m.RewindButton.id
             handleRewind()
           else if focusButtonId = m.HopBackButton.id
-            handleHopBack(false)
+            handleHopBack(false, 30)
           else if focusButtonId = m.PlayPauseButton.id
             handlePlayPause()
           else if focusButtonId = m.HopForwardButton.id
-            handleHopForward()
+            handleHopForward(30)
           else if focusButtonId = m.FastForwardButton.id
             handleFastForward()
           else if focusButtonId = m.EndButton.id
@@ -582,7 +638,7 @@ Function onKeyEvent(key As String, press As Boolean)
 
       else if key = "replay"
         if m.HopBackButton.enabled then
-          handleHopBack(true)
+          handleHopBack(true, 20)
         end if
 
       else if key = "options"
@@ -1041,7 +1097,7 @@ End Function
 
 
 'handles HopForward button selection
-Function handleHopForward()
+Function handleHopForward(duration)
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
     setFocusedButton(m.HopForwardButton)
@@ -1057,14 +1113,16 @@ Function handleHopForward()
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
-  hopPosition = m.playerPosition + 30
+  hopPosition = m.playerPosition + duration
   jumpToPosition(hopPosition)
   m.lastPingTime = hopPosition        'used for accurate play_progress accounting
 End Function
 
 
-'handles HopBack button selection
-Function handleHopBack(remoteReplayButton)
+' handles HopBack button selection
+' remoteReplayButton - true/false (true - if replay button on remote is pressed/voice input, false - if replay icon is pressed or seek voice input)
+' duration is seek/skip/replay in seconds.
+Function handleHopBack(remoteReplayButton, duration)
   setFocusedButton(m.HopBackButton)  'necessary because there is a dedicated hop back button on certain roku remotes
 
   if m.VideoState = "ffw" or m.VideoState = "rew"
@@ -1085,9 +1143,9 @@ Function handleHopBack(remoteReplayButton)
     animateTransport("out")
   end if
 
-  hopPosition = m.playerPosition - 30
+  hopPosition = m.playerPosition - duration
   if remoteReplayButton = true
-    hopPosition = m.playerPosition - 20
+    hopPosition = m.playerPosition - duration
     if m.Video.globalCaptionMode = "Instant replay"
       tubilog("Turning on replay captions")
       m.replayCaptionEnd = m.positionAtJumpStart

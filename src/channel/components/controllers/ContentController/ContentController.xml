@@ -45,6 +45,7 @@
   <script type="text/brightscript" uri="../../tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
   
   <interface>
+  
     <!-- INPUTS -->
       <!-- the arguments that are passed into the app at startup, as an associative array -->
       <field id="startupArgs" type="assocarray" />
@@ -60,10 +61,14 @@
 
       <!-- metadataFetchTask puts results on this field -->
       <field id="searchResponse" type="assocarray" alwaysNotify="true"/>
+      
+      <field id="transportVoiceRequest" type="assocarray" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
       <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->
       <field id="exitApp" type="boolean" value="false" />
+      
+      <field id="transportVoiceResponse" alias="VideoPlayer.transportVoiceResponse"/>
 
   </interface>
         

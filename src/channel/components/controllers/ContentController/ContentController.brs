@@ -475,7 +475,7 @@ End Function
 Function onInputInfoReceived()
   if m.top.roInputInfo <> invalid
     inputInfo = m.top.roInputInfo
-
+    
     if inputInfo.type = "deeplink"
       kidsModeAtStart = false
       if m.kidsModeEnabled = true
@@ -497,6 +497,10 @@ Function onInputInfoReceived()
         ' that when backing out of the details screen, the home screen will be re-populated as expected
         shrinkScreenStack(1)
         emptyScreenCache()
+      end if
+    else if inputInfo.type = "transport"
+      if m.videoPlayer.visible
+        m.videoPlayer.transportVoiceRequest = inputInfo
       end if
     end if
   end if

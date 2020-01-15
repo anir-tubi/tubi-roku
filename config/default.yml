@@ -26,6 +26,8 @@ manifest:
   requires_widevine_drm: 1
   requires_widevine_version: "1.0"
   supports_input_launch: 1 
+  supports_etc_seek: 1 
+  supports_etc_next: 1 
   rsg_version: 1.2
 
 component_library_manifest:
