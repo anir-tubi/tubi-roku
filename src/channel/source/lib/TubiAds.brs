@@ -494,6 +494,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
   if eventType <> invalid
     if eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0
       'Impression events fire when ads start, but also when a user begins interacting with an interactive ad
+      m.containerNode.visible = true  '//Display ad
       ctx = m.enhanceCtx(ctx)
       startAdEvent = {
         ad_started: m.tracking.getAnalyticsAd(ctx)
@@ -546,8 +547,6 @@ function tubiAds_adTrackingCallback(eventType, ctx)
         youboraOptions = m.updateYouboraOptions(m.youboraTask, ctx, impressionCount)
       end if
       m.isInteracting = false
-    else if eventType = "Start"
-      m.containerNode.visible = true
     else if eventType = "AcceptInvitation"
       ctx = m.enhanceCtx(ctx)
       clickAdEvent = {
