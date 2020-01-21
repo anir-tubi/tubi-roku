@@ -251,7 +251,10 @@ End Function
 Function onIsLoading()
   tubiLog("DetailScreen.onIsLoading")
   
-  if m.Menu.visible = false
+  ' we only want to remove the menu on the initial loading of series screens.
+  ' In the case of an error, we populate the screen with series metadata (as opposed to episode metadata)
+  ' and we don't want to remove the menu once the screen already has metadata.
+  if m.top.description = ""
     m.Menu.visible = not m.top.isLoading
   end if
 
