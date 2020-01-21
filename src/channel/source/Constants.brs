@@ -138,11 +138,13 @@ Function getConstants()
       scaledUi = false
     end if
 
-    appInfo = CreateObject("roAppInfo")
-    clientVersion = appInfo.GetVersion()
-    majorVersion = appInfo.GetValue("major_version")
-    minorVersion = appInfo.GetValue("minor_version")
-    buildVersion = appInfo.GetValue("build_version")
+    ' get the client version numbers from settings rather than from appInfo, as appInfo contains
+    ' info about the submitted release, but we want to store the version of the remote components.
+    clientVersion = constants.settings.version.Replace("_",".")
+    versionNumbers = constants.settings.version.split("_")
+    majorVersion = versionNumbers[0]
+    minorVersion = versionNumbers[1]
+    buildVersion = versionNumbers[2]
 
     'Use newer APIs over deprecated APIs when appropriate
     deviceInfoRegSection = "deviceinfo"
