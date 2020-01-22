@@ -142,7 +142,7 @@ sub sendRequest(service, args = Invalid)
 	if args = Invalid
 		args = {}
 	endif
-    print "Service: " + service
+    YouboraLog("Service: " + service)
 	'Remove code
 	args.delete("code")
 	

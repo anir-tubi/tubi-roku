@@ -2,7 +2,6 @@
 
 sub init()
 
-    m.global.addFields({YouboraLogActive: true})
     YouboraLog("YBPluginGeneric.brs - init")
     m.top.functionName = "_run"
 
