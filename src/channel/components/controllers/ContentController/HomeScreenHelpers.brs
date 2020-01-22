@@ -58,6 +58,7 @@ Function fetchHomeScreen(homeScreen)
     reqName = m.constants.reqNames.getHomescreen
     '//::TODO:: JHAND - test error here!
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", reqName, invalid, shouldKidsModeBeSentToServer())
+    homeScreen.resetContentAreaValues = true
     setHomeScreenLoading(homeScreen)
   end if
 End Function

@@ -40,6 +40,7 @@ Function TubiExperiments(constants) as Object
       UserNamespace: {
       }
       RokuNamespace: {
+        roku_vitg: "vitg_none"   'other expected values "vitg_small", "vitg_large"
       }
     }
     defaultResources: {
@@ -249,8 +250,9 @@ Function tubiExperiments_getDefaultResource_(namespaceName as string, experiment
   return defaultResource
 End Function
 
-'This function gets the appropriate default value from a repository of default values for experiments.
-'If we can't find an experiment from the Popper server response, we'll go here to get the default value for that experiment
+' This function gets the appropriate default value from a repository of default values for experiments.
+' If we can't find an experiment from the Popper server response, we'll go here to get the default value for that experiment
+' If there is no default value, then this function can return invalid.
 '
 '@namespaceName: string, the name of the namespace in which we will find the experiment
 '@experimentName: string, the name of the experiment as found in the experiment definition

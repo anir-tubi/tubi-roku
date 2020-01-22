@@ -215,11 +215,6 @@ Function getConstants()
     constants.reqNames.getThumbnails = "getThumbnails"
     constants.reqNames.getChannel = "getChannel"
 
-  'the different thumbnail orientations 
-  constants.orientations = {}
-    constants.orientations.landscape = "landscape"
-    constants.orientations.portrait = "portrait"
-
   'Nielsen ID token for integrating with Nielsen DAR
   constants.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
 
@@ -570,6 +565,7 @@ Function getConstants()
       constants.ui.categoryTypes.queue = "queue"
       constants.ui.categoryTypes.regular = "regular"
       constants.ui.categoryTypes.channel = "channel"
+      constants.ui.categoryTypes.preview = "video_preview"
 
     constants.ui.contentTypes = {}
       constants.ui.contentTypes.series = "series"
@@ -650,6 +646,12 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.channelListScreen] = constants.ui.sideNavIds.channels
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings
+
+    constants.ui.gridItemTypes = {}
+      constants.ui.gridItemTypes.portrait = "portrait"
+      constants.ui.gridItemTypes.landscape = "landscape"
+      constants.ui.gridItemTypes.vitg_small = "vitg_small"  'video in the grid
+      constants.ui.gridItemTypes.vitg_large = "vitg_large"  'video in the grid
 
     constants.ui.uris = {}
       'background gradient urls

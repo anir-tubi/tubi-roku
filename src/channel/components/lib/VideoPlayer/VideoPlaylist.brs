@@ -72,6 +72,23 @@ Function onVideoStateChange(msg)
       m.top.errorMsg = "There was an issue with video playback."  'is used in error modal
       m.top.state = state   'triggers error modal in ContentController
     end if
+  else if state = "stopped" and m.VideoState = "play"
+    ' player has stopped (not from an ad break) but internal state hasn't been updated yet, so update it here
+    if m.top.adState = "noads" or m.top.adState = "init"
+      m.VideoState = "stop"
+
+      if m.Video.content <> invalid
+        if m.top.analyticsMode = "trailer"
+          trackEvent({
+            type: "finish_trailer"
+            values: {
+              end_position: Int(m.playerPosition * 1000)
+              video_id: m.Video.content.id.toInt()
+            }
+          })
+        end if
+      end if
+    end if
   end if
 
   ' Loading page visibility
@@ -83,6 +100,7 @@ Function onVideoStateChange(msg)
     m.Loading.visible = true
   end if
 End Function
+
 
 Function advancePlaylist() As Boolean
   tubiLog("VideoPlaylist.advancePlaylist")
@@ -193,7 +211,7 @@ Function onRefreshResponse(msg)
     ' While the refresh content may not hold all the information we need (e.g. isLiveTV), it's
     ' only used for the stream urls and subtitle urls really and should be ok here without merging
     ' fields from the original content.
-    mergedFields = ["isLiveTV", "isTrailer", "title", "nowPos", "parentType", "parentTitle"]
+    mergedFields = ["isTrailer", "title", "nowPos", "parentType", "parentTitle"]
     for each f in mergedFields
       refreshedContent.setField(f, playlistContent.getField(f))
     end for
@@ -271,6 +289,7 @@ Function resetVideoPlayerState(content = invalid)
   if content <> invalid
     updateVideoPlayerState(content)
   end if
+  m.top.adState = "init"
 End Function
 
 
@@ -360,6 +379,7 @@ Function setDrmOnContent(contentNode, index)
   end if
   return false
 End Function
+
 
 Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, streamInfo, errorCode, errorMsg, content)
   errorInfo = {

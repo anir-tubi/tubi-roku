@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="CategoryGridPoster" extends="Group" >
   <script type="text/brightscript" uri="CategoryGridPoster.brs" />
+  <script type="text/brightscript" uri="../AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
+    <field id="itemHasFocus" type="boolean" />
+    <field id="rowListHasFocus" type="boolean" />
+    <field id="focusPercent" type="float" />
+    <!-- rowFocusPercent is needed so that onFocusPercent callback runs when navigationg between rows -->
+    <field id="rowFocusPercent" type="float" />
     <field id="width" alias="Poster.width" />
     <field id="height" alias="Poster.height" />
   </interface>
@@ -12,7 +20,7 @@
   <children>
     <Poster
      id="Poster"
-     loadingBitmapUri = "pkg:/images/placeholder.jpg">
+     loadingBitmapUri="pkg:/images/placeholder.jpg">
       <Rectangle
         id="ResumeProgressBar"
         height="6"
@@ -32,6 +40,5 @@
         uri="pkg:/fonts/Vaud-Medium.ttf"
         size="27" />
     </Label>
-
   </children>
 </component>

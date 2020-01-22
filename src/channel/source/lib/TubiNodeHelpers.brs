@@ -26,6 +26,7 @@ Function tubiNodeHelpers_getChildIndex(parent, child)
   return -1
 End Function
 
+
 ' used to determine the index of the child having childId with respect to the parent
 ' can be used if the parent along with children have been cloned and getChildIndex won't work
 ' returns the index or -1 if the passed in child does not belong to the parent

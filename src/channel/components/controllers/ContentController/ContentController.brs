@@ -522,18 +522,22 @@ End Function
 '   splashTime                      - "1600"
 '   instant_on_run_mode             - "foreground"
 '   lastExitOrTerminationReason     - "EXIT_UNKNOWN"
+'   source                          - 'meta-search', 'external-control'
 '
 ' Deep link args:
 '   contentId    - string identifier
 '   entry        - 'banner' or omitted for search source
 '   mediaType    - "season", "series", "episode", "movie", "shortform", and "live"
-'   source       - 'meta-search', 'external-control'
 '   entry        - string, custom parameter, used for tracking the source of deeplinks, passed to referred analytics events
 '   deviceId     - string, custome paramater, the device id of the device sending the deeplink (used when mobile "casts" to roku)
 '   resumeTime   - integer, custome paramater, the position from which a deeplink should resume (used when mobile "casts" to roku)
 '   refreshToken - string, custome paramater, a token that can be used to refresh the auth token.
 '                  Is used to transfer login info from a "casting" device to roku (used when mobile "casts" to roku)
 '   userId       - integer, custome paramater, the user id of the user sending the deeplink (used when mobile "casts" to roku)
+'
+' deeplinks from iOS look like:
+' http://192.168.20.31:8060/launch/41468?deviceId=E7E674A4%2D25DD%2D4B7A%2DBC67%2DB9AD1BAC7CC5&mediaType=movie&contentID=342067&resumeTime=0&userId=0&entry=iphone
+' http://192.168.20.31:8060/launch/41468?mediaType=episode&entry=iphone&deviceId=E7E674A4%2D25DD%2D4B7A%2DBC67%2DB9AD1BAC7CC5&contentID=456881&userId=0&resumeTime=0
 Function createDeeplinkContentFromStartupArgs(args)
   'handle/set up any deep linking that may have occurred
   if (args.contentId <> invalid)
@@ -985,8 +989,7 @@ Function fireAppLoadTimeEvent()
     loadtime: loadTime
     model: m.constants.deviceInfo.model
   }
-  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load")   'send info to server  
-
+  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load")   'send info to server
 End Function
 
 

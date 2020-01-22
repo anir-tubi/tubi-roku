@@ -2,7 +2,6 @@
 ' formatLengthAsTimestamp
 '
 ' take a float or integer length in seconds, transform to timestamp "HH:MM:SS".
-'TODO(Chris): Move this to common library
 Function formatLengthAsTimestamp(length As Dynamic) As String
   if type(length) = "roFloat" or type(length) = "Double" then length = Int(length)
   if (type(length) = "Integer" or type(length) = "roInteger") and length > 0 then
@@ -21,7 +20,6 @@ End Function
 ' formatLengthAsEnglish
 '
 ' take an integer length in seconds and give it an English descriptions like "1 h 36 min"
-'TODO(Chris): Move this to common library
 Function formatLengthAsEnglish(length As Dynamic) As String
   if type(length) = "roFloat" or type(length) = "Float" or type(length) = "Double" then
     length = Int(length)
@@ -49,8 +47,6 @@ End Function
 ' 
 ' simple left padding of a string with a given character
 ' Example: padString('12345', 8, '0') => '00012345'
-'
-'TODO(Chris): Move this to common library
 Function padString(s As String, width As Integer, c as String)
   result = s.trim()
   while result.len() < width
@@ -72,4 +68,10 @@ Function capitalize(s As String)
   else
     return ""
   end if
+End Function
+
+
+' Helper function to determine if the value is a string
+Function isString(value)
+  return type(value) = "String" or type(value) = "roString"
 End Function

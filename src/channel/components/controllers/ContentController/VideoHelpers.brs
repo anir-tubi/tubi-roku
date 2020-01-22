@@ -366,16 +366,6 @@ Function stopVideoContent(showScreenStack)
   end if
 
   stoppedContent = m.videoPlayer.content
-  if stoppedContent <> invalid and m.videoPlayer.analyticsMode = "trailer"
-    m.trackingLoggingTask.trackEvent = {
-      type: "finish_trailer"
-      values: {
-        video_id: stoppedContent.id.toInt()
-        end_position: nowPos
-        reason: "DETECTED"  'Reason enum
-      }
-    }
-  end if
 
   ' reload history
   onHistoryQueueChange(m.constants.ui.categoryIds.history) 

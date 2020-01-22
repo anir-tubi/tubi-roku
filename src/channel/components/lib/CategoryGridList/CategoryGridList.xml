@@ -101,7 +101,6 @@
       itemSpacing="[0,28]"
       numRows="2"
       rowSpacings="[28]"
-      rowItemSize="[[430,242],[210,300]]"
       rowItemSpacing="[[10,0]]"
       showRowLabel="[true]"
       showRowCounter="[false]"
@@ -109,7 +108,6 @@
       rowFocusAnimationStyle="floatingFocus"
       vertFocusAnimationStyle="fixedFocus"
       focusBitmapUri="pkg:/images/selector-fhd.9.png"/>
-
     <Timer
       id="RowListItemDebounce"
       duration="0.5"/>

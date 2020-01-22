@@ -93,23 +93,23 @@ Function colorChange(target As Object, color As String, duration As Float, delay
 End Function
 
 
-Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 As Float, opacity = -1)
+Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 As Float, endingOpacity = -1)
   animationOptions = {
     duration: duration
     delay: delay
   }
-  if opacity < 0
+  if endingOpacity < 0
     if outOrIn = "out"
       animationOptions.opacity = 0.0
     else if outOrIn = "in"
       animationOptions.opacity = 1.0
     end if
   else
-    '// If the opacity is passed then overwrite the outOrIn string
-    if opacity > 1
-      opacity = 1
+    '// If the ending opacity is passed then overwrite the outOrIn string
+    if endingOpacity > 1
+      endingOpacity = 1
     end if
-    animationOptions.opacity = opacity
+    animationOptions.opacity = endingOpacity
   end if
 
   return animate(target, animationOptions)
@@ -203,6 +203,24 @@ Function animate(target As Object, options as Object) As Object
       animation.removeChild(colorinterpolator)
     end if
 
+    heightInterpolator = animation.findNode("HeightInterpolator-" + target.id)
+    if heightInterpolator = invalid and (options.height <> invalid and target.height <> invalid and options.height <> target.height)
+      heightInterpolator = animation.createChild("FloatFieldInterpolator")
+      heightInterpolator.id = "HeightInterpolator-" + target.id
+      heightInterpolator.fieldToInterp = target.id + ".height"
+    else if heightInterpolator <> invalid and (options.height <> invalid and target.height <> invalid and options.height <> target.height)
+      animation.removeChild(heightInterpolator)
+    end if
+
+    widthInterpolator = animation.findNode("WidthInterpolator-" + target.id)
+    if widthInterpolator = invalid and (options.width <> invalid and target.width <> invalid and options.width <> target.width)
+      widthInterpolator = animation.createChild("FloatFieldInterpolator")
+      widthInterpolator.id = "WidthInterpolator-" + target.id
+      widthInterpolator.fieldToInterp = target.id + ".width"
+    else if widthInterpolator <> invalid and (options.width <> invalid and target.width <> invalid and options.width <> target.width)
+      animation.removeChild(widthInterpolator)
+    end if
+
     ' fake a delay
     totalTime = options.delay + options.duration
     if totalTime = 0.0 then
@@ -248,6 +266,24 @@ Function animate(target As Object, options as Object) As Object
 
       if bAnimate = false
         target.color = options.color
+      end if
+    end if
+
+    if heightInterpolator <> invalid
+      heightInterpolator.key = [0.0, delayTime, 1.0]
+      heightInterpolator.keyValue = [target.height, target.height, options.height]
+
+      if bAnimate = false
+        target.height = options.height
+      end if
+    end if
+
+    if widthInterpolator <> invalid
+      widthInterpolator.key = [0.0, delayTime, 1.0]
+      widthInterpolator.keyValue = [target.width, target.width, options.width]
+
+      if bAnimate = false
+        target.width = options.width
       end if
     end if
 

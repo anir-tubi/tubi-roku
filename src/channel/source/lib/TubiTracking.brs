@@ -324,20 +324,21 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     }
 
     start_trailer: {
-      video_id: -1
+      video_id: -1   'the content id of the trailer
       is_fullscreen: true
+      video_player: ""  'VideoPlayer enum
     }
 
     trailer_play_progress: {
-      video_id: -1
+      video_id: -1   'the content id of the trailer
       position: -1   'ms
       view_time: -1  'ms
+      video_player: ""  'VideoPlayer enum
     }
 
     finish_trailer: {
-      video_id: -1   'the content id of the full length video the trailer represents
+      video_id: -1   'the content id of the trailer
       end_position: -1
-      reason: ""  'Reason enum
     }
 
     start_ad: {

@@ -77,7 +77,29 @@ Function onContentChange()
     ' posters and do a nice fade-in.
     m.RowList.content = invalid
     if m.top.content <> invalid then
+      'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
+      rowItemSize = []
+      rowHeights = []
+      numRows = 2
+      for i=0 to m.top.content.getChildCount()-1
+        category = m.top.content.getChild(i)
+        if category.gridItemType = m.constants.ui.gridItemTypes.portrait
+          rowItemSize.push([210,300])
+          rowHeights.push(364)
+        else if category.gridItemType = m.constants.ui.gridItemTypes.landscape or category.gridItemType = m.constants.ui.gridItemTypes.vitg_small
+          rowItemSize.push([430,242])
+          rowHeights.push(364)
+        else if category.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+          rowItemSize.push([1205,677])
+          rowHeights.push(800)
+          numRows = 3
+        end if
+      end for
+
+      m.RowList.rowItemSize = rowItemSize
+      m.RowList.rowHeights = rowHeights
       m.RowList.content = m.top.content
+      m.RowList.numRows = numRows
 
       itemFocused = [1, 1]
       if resolveAbbreviatedContent(itemFocused) <> invalid

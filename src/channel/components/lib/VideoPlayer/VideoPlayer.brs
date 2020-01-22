@@ -744,7 +744,13 @@ End Function
 
 ' onAdStateChange
 '
-' adState values are: init, fetching, adspending, noads, adsplaying, adsclosed, noads
+' adState values are:
+'   "init": no ad request has yet to be made for this video (adState is reset back to init when video is about to be started)
+'   "fetching": a request has been made to the ad server, awaiting a response
+'   "adspending": an ad response has been returned, the player is waiting to reach the appropriate cuepoint in order to play it
+'   "adsplaying": ads are currently playing - RAF has control
+'   "adsclosed": a user has hit the back button while RAF has control, closing the ad experience
+'   "noads": an ad response has been received but there are no ads in it. Or an ad break has played to completion.
 Function onAdStateChange()
   tubiLog("VideoPlayer.onAdStateChange adState = " + m.top.adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
   if m.top.adState = "init" and m.top.adControl <> ""
@@ -800,6 +806,7 @@ Function trackEvent(event As Object)
   allowedTrailerEvents = {
     "start_trailer": true
     "trailer_play_progress": true
+    "finish_trailer": true
   }
 
   if m.top.analyticsMode <> "trailer" or allowedTrailerEvents[event.type] = true

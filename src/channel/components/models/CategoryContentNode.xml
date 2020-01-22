@@ -21,8 +21,10 @@
     <!-- State of category children: none, loading, partial, loaded -->
     <field id="state" type="string" value="none"/>
 
-    <!-- Should this category use landscape images -->
-    <field id="isLandscape" type="boolean" value="false"/>
+    <!-- One of the gridItemTypes in constants (ie. "portrait", "landscape", "vitg").
+         Indicates which type of content will be shown in this category row.
+     -->
+    <field id="gridItemType" type="string" />
 
     <!-- A logo that will be displayed for channels -->
     <field id="logoUri" type="string" />

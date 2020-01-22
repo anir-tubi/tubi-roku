@@ -35,7 +35,8 @@ Function fetchLoop()
   m.totalConversionTime = 0
 
   ' Ready the translator
-  m.metadataTranslate = TubiMetadataTranslate(m.constants)
+  experiments = TubiExperiments(m.constants)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments)
 
   ' Prepare the auth module
   m.Request = TubiRequest()
@@ -205,7 +206,7 @@ Function handleResponse(message)
           orientation = ""
           bFullData = false
           if handledRequest.context.name = m.constants.reqNames.getSearchDefault
-            orientation = m.constants.orientations.portrait
+            orientation = m.constants.ui.gridItemTypes.portrait
             bFullData = true
           end if
           handledRequest.convertedMetadata = m.metadataTranslate.translateContainer(parsed, handledRequest.response.data, orientation, bFullData)

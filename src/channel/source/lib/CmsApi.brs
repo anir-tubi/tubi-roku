@@ -116,9 +116,10 @@ Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, expand = 2)
   url = m.constants_.urls.matrix.homescreen
   options = m.commonOptions_()
   options.params.expand = expand
-  options.params.includeEmpty = true
+  options.params.["includeEmpty"] = true
   options.params.limit = limit
   options.params["isKidsMode"] = bKidsMode
+  options.params["includeVideoInGrid"] = true
 
   return m.createAuthRequest_(url, m.constants_.reqNames.getHomescreen, options)
 End Function

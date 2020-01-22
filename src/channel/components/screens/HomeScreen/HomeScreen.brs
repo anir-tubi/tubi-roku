@@ -20,6 +20,7 @@ Function init()
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.top.observeField("enabled", "onEnableChange")
   m.top.observeField("isLoading", "onLoadingChange")
+  m.top.observeField("resetContentAreaValues", "onResetContentAreaValues")
 
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -32,6 +33,7 @@ Function init()
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("categoryTotalCounts", "onTotalCountsChange")
   m.CategoryGridList.observeField("reloadedItemToBeFocused", "onItemToBeFocusedChange")
+  m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRowChange")
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
@@ -47,7 +49,19 @@ Function init()
   }
 
   m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
+
+  ' the animation nodes necessary for video in the grid (vitg)
+  m.contentAreaSlideAnimation = invalid
+  m.infoPanelFadeAnimation = invalid
+
+  ' Video in the grid constants
+  m.vitgSlideAmt = 410  'the amount the grid slides up to fit the vitg content item
+  m.vitgMaskOffsetDiff = 436  'the diff in the amount the content area mask is offset in the up direction for vitg
+  m.originalContentAreaTranslation = m.ContentArea.translation
+  m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
+  m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 End Function
+
 
 Function onLoadingChange()
   m.Spinner.visible = m.top.isLoading
@@ -200,6 +214,90 @@ Function onSignedInChange()
 End Function
 
 
+Function onResetContentAreaValues()
+  contractContentAreaForLargeVitg(1.0)
+End Function
+
+
+' fires when the RowList is in the process of scrolling between rows
+Function onCurrFocusRowChange()
+  'the focused row during the scroll as a float (ie. 2.3 is partially between 2nd and 3rd rows)
+  currFocusRow = m.CategoryGridList.currFocusRow
+
+  'the last row that was focused and settled as an integer
+  lastFocusRow = m.CategoryGridList.cursorPosition[0]
+
+  ' There are 4 options when focusing a new category
+  ' 1) Both old and new focused categories are not vitg: do nothing
+  ' 2) Both old and new focused categories are vitg: do nothing
+  ' 3) Old category is vitg, new category is not vitg: shrink the CategoryGridList
+  ' 4) Old category is not vitg, new category is vitg: expand the CategoryGridList
+
+  ' Determine if the category being entered is vitg
+  if currFocusRow > lastFocusRow
+    ' scrolling down
+    rowEnteringFocus = Fix(currFocusRow) + 1
+    rowLosingFocus = Fix(currFocusRow)
+    if rowLosingFocus = currFocusRow
+      'when the scroll completes
+      rowEnteringFocus = Fix(currFocusRow)
+      rowLosingFocus = currFocusRow - 1
+    end if
+    rowPercent = currFocusRow - rowLosingFocus
+  else if currFocusRow < lastFocusRow
+    ' scrolling up
+    rowEnteringFocus = Fix(currFocusRow)
+    rowLosingFocus = Fix(currFocusRow) + 1
+    if rowEnteringFocus = currFocusRow
+      'when the scroll completes
+      rowEnteringFocus = Fix(currFocusRow)
+      rowLosingFocus = currFocusRow + 1
+    end if
+    rowPercent = Abs(currFocusRow - rowLosingFocus)
+  else if currFocusRow = lastFocusRow
+    rowEnteringFocus = lastFocusRow
+    rowLosingFocus = lastFocusRow
+    rowPercent = 1
+  end if
+
+  categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
+  categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
+
+  ' send experiment analytics (exposure event) for large and small vitg.
+  ' calling getExperimentValue() automatically sends the exposure, and limits sending the exposure event to once per session.
+  if categoryEnteringFocus <> invalid
+    if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large or categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_small
+      getExperimentValue("RokuNamespace", "roku_vitg")
+    end if
+  end if
+
+  ' for large format video in the grid, adjust the size of the content grid, and opacity of the info panel as necessary
+  if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+    if m.ContentArea.translation[1] > 143
+      expandContentAreaForLargeVitg(rowPercent)
+    end if
+  else if categoryLosingFocus <> invalid and categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+    contractContentAreaForLargeVitg(rowPercent)
+  end if
+End Function
+
+
+' @rowPercent: float, the percentage that the VITG row is focused
+Function expandContentAreaForLargeVitg(rowPercent)
+  m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.vitgSlideAmt * rowPercent)]
+  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.vitgMaskOffsetDiff * rowPercent)]
+  m.InfoPanel.opacity = 1 - rowPercent
+End Function
+
+
+' @rowPercent: float, the percentage that the non VITG row is focused (ie. 1.0 means VITG is not focused at all)
+Function contractContentAreaForLargeVitg(rowPercent)
+  m.ContentArea.translation = [m.vitgContentAreaTranslation[0], m.vitgContentAreaTranslation[1] + (m.vitgSlideAmt * rowPercent)]
+  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] - (m.vitgMaskOffsetDiff * (1 - rowPercent))]
+  m.InfoPanel.opacity = rowPercent
+End Function
+
+
 '''''''''''''''''''''
 ' onGridFocusChange
 '
@@ -212,6 +310,7 @@ Function onGridFocusChange() As Void
 
   oldFocusedContent = m.CategoryGridList.oldItemFocused
   focusedContent = m.CategoryGridList.itemFocused
+
   if focusedContent <> invalid
     populateInfoPanel("item", focusedContent)
   end if

@@ -51,6 +51,9 @@
       <!-- Acts a circuit breaker in case categories are attempted to be fetched before categories are initially loaded -->
       <field id="canLoadCategories" type="boolean" />
 
+      <!-- Triggers a reset of the ContentArea translation values in the case they were adjusted by VITG -->
+      <field id="resetContentAreaValues" type="boolean" alwaysNotify="true" />
+
     <!-- OUTPUTS -->
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
@@ -159,18 +162,15 @@
       maxTitleLines="2"
       visible="true"/>
 
-    <Group
-      id="CategoryMenuAndGrid">
-      <MaskGroup
-        id="ContentArea"
-        maskUri="pkg:/images/poster-mask.png"
-        maskSize="[0,0]"
-        maskOffset="[1731,317]"
-        translation="[85,553]">
-        <CategoryGridList
-          id="CategoryGridList"/>
-      </MaskGroup>
-    </Group>
+    <MaskGroup
+      id="ContentArea"
+      maskUri="pkg:/images/poster-mask.png"
+      maskSize="[0,0]"
+      maskOffset="[0,317]"
+      translation="[85,553]">
+      <CategoryGridList
+        id="CategoryGridList"/>
+    </MaskGroup>
 
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
     <Timer
