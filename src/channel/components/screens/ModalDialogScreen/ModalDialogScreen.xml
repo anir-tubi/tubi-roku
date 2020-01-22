@@ -25,7 +25,7 @@
 
     <!-- OUTPUT -->
       <!-- Set to the index into the 'buttons' array of a button which was selected -->
-      <field id="buttonSelected" alias="ButtonList.itemSelected"/>
+      <field id="buttonSelected" type="integer" alwaysNotify="true"/>
 
       <!-- set to "options" or "back" if either of those keys are pressed -->
       <field id="exitButton" type="string" alwaysNotify="true"/>

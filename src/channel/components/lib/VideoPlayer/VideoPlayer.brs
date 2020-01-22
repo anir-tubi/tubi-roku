@@ -657,13 +657,17 @@ Function onKeyEvent(key As String, press As Boolean)
 
         else
           'navigate the transport buttons, skipping disabled ones
-          for i=m.focusedButtonIndex-1 to 0 step -1
-            button = m.TransportButtons.getChild(i)
-            if button.enabled then
-              setFocusedButton(button)
-              exit for
-            end if
-          end for
+          if m.focusedButtonIndex = 0
+            return false
+          else
+            for i=m.focusedButtonIndex-1 to 0 step -1
+              button = m.TransportButtons.getChild(i)
+              if button.enabled then
+                setFocusedButton(button)
+                exit for
+              end if
+            end for
+          end if
         end if
 
       else if key = "right"
@@ -676,14 +680,19 @@ Function onKeyEvent(key As String, press As Boolean)
           handleSkipVideo(10, m.progressBarFocused)
 
         else
-          'navigate the transport buttons, skipping disabled ones
-          for i=m.focusedButtonIndex+1 to m.TransportButtons.getChildCount()-1
-            button = m.TransportButtons.getChild(i)
-            if button.enabled then
-              setFocusedButton(button)
-              exit for
-            end if
-          end for
+         
+          if m.focusedButtonIndex = m.TransportButtons.getChildCount()-1
+            return false
+          else
+            'navigate the transport buttons, skipping disabled ones
+            for i=m.focusedButtonIndex+1 to m.TransportButtons.getChildCount()-1
+              button = m.TransportButtons.getChild(i)
+              if button.enabled then
+                setFocusedButton(button)
+                exit for
+              end if
+            end for
+          end if  
         end if
 
       else if key = "up"
@@ -691,6 +700,8 @@ Function onKeyEvent(key As String, press As Boolean)
           showTransport()
         else if m.progressBarFocused = false
           setFocusedButton(m.ProgressBar)
+        else
+          return false
         end if
 
       else if key = "down"
@@ -699,6 +710,8 @@ Function onKeyEvent(key As String, press As Boolean)
         else if m.progressBarFocused = true
           button = m.TransportButtons.getChild(m.focusedButtonIndex)
           setFocusedButton(button)
+        else
+          return false  
         end if
 
       else if key = "back" then

@@ -189,6 +189,9 @@ Function onKeyEvent(key As String, press As Boolean)
       end if
       ' Always consume back button, otherwise it will cause the app to exit
       return true
+    else if key = "OK"
+      '//ensure this keypress is captured so the default Roku positive audio sound is played.
+      return true  
     else 
       '//react to the left/right/up/down keys
       bReacted = false

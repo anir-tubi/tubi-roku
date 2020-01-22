@@ -68,6 +68,9 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the related content already
   ' has focus, not when it gains focus.
   m.relatedHasFocus = false
+  
+  ' isChannelMenuSelected variable is used for handling the channel selection from detail menu
+  m.isChannelMenuSelected = false
 
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
 End Function
@@ -347,7 +350,9 @@ Function onMenuItemSelected()
     else if selection.id = "RemoveHistoryMenuItem"
       m.top.removeFromHistorySelected = true
     else if selection.id = "ChannelMenuItem"
-      m.top.channelSelected = true
+      'on selecting this menu, it is removing the detailScreen from screen stack, so roku negative audio sound is played, 
+      'To play Roku positive audio sound, channelMenuSelected is handled in onKeyEvent.
+      m.isChannelMenuSelected = true
     end if
   end if
 End Function
@@ -456,6 +461,10 @@ Function onKeyEvent(key As String, press As Boolean)
       end if
     end if
     if key = "OK"
+      if m.isChannelMenuSelected = true
+        m.isChannelMenuSelected = false
+        m.top.channelSelected = true
+      end if
       '//ensure this keypress is captured so the default Roku positive audio sound is played.
       return true
     end if
