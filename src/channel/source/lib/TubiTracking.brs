@@ -247,8 +247,6 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       pageOneof: {}  'page navigating from - a valid page type (see NavigateToPageEvent in events.protos)
       componentOneof: {} 'a valid component type (see NavigateToPageEvent in events.protos)
       dest_pageOneof: {} 'page navigating to - a valid page type (see NavigateToPageEvent in events.protos)
-      status: "" 'ActionStatus enum
-      triggerType: "" 'TriggerType enum
     }
 
     navigate_within_page: {

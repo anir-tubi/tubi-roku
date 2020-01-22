@@ -87,8 +87,6 @@ Function screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, tracki
       pageOneof: m.Tracking.getAnalyticsPage(sourcePageType, sourcePageValues)  'page navigating from - a valid page type (see NavigateToPageEvent in events.protos)
       componentOneof: m.Tracking.getAnalyticsComponent(trackingComponentType, trackingComponentValues)
       dest_pageOneof: m.Tracking.getAnalyticsPage(destPageType, destPageValues) 'page navigating to - a valid page type (see NavigateToPageEvent in events.protos)
-      status: "UNKNOWN_ACTION_STATUS" 'ActionStatus enum
-      triggerType: "UNKNOWN" 'TriggerType enum
     }
   }
 End Function
