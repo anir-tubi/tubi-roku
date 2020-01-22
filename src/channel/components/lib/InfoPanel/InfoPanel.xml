@@ -96,9 +96,8 @@
         <Label
           id="Title"
           width="1090"
-          height="80"
           wrap="true"
-          maxLines="1"
+          maxLines="2"
           color="0xFFFFFFFF"
           vertAlign="bottom">
           <Font

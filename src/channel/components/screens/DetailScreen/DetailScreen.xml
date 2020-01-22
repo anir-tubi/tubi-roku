@@ -221,7 +221,7 @@
         id="DetailInfoPanel"
         mode="item"
         translation="[85,123]"
-        maxHeight="498"
+        maxHeight="433"
         maxTitleLines="2"
         visible="true" />
 

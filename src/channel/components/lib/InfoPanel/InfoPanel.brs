@@ -287,6 +287,8 @@ Function onCalculateHeight()
     end if
     m.DescriptionFocusButton.height = m.Description.boundingRect().height + topMargin + bottomMargin
   end if
+  
+  '//::TODO::82024 START: delete the following code to top align infoPanel
   'vertically center the info panel
   offsetY = (m.top.maxHeight - m.Offset.BoundingRect().height) \ 2
   if offsetY > 0
@@ -294,6 +296,7 @@ Function onCalculateHeight()
   else
     m.Offset.translation = [0, 0]
   end if
+  '//::TODO::82024 End
 End Function
 
 

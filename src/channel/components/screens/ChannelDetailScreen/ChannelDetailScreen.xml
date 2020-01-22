@@ -124,12 +124,12 @@
       id="ChannelsInfoPanel"
       mode="category"
       translation="[85,167]"
-      maxHeight="325"
+      maxHeight="355"
       maxTitleLines="2"
       visible="true" />
 
     <Label
-      translation="[85,520]"
+      translation="[85,540]"
       width="1835"
       numLines="2"
       id="pageTitle">
@@ -140,7 +140,7 @@
     </Label>
     <MarkupGrid
       id="ChannelsVideoGrid"
-      translation="[85,584]"
+      translation="[85,594]"
       itemComponentName="CategoryGridPoster"
       itemSize="[210,300]" 
       itemSpacing="[10,28]"

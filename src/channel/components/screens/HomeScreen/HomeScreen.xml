@@ -155,7 +155,7 @@
     <InfoPanel
       id="InfoPanel"
       translation="[85,163]"
-      maxHeight="325"
+      maxHeight="355"
       maxTitleLines="2"
       visible="true"/>
 
