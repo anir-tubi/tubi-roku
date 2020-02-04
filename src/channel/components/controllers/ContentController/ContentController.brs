@@ -503,7 +503,9 @@ Function onInputInfoReceived()
       end if
     else if inputInfo.type = "transport"
       if m.videoPlayer.visible
-        m.videoPlayer.transportVoiceRequest = inputInfo
+        if (m.UpNextScreen = invalid or (m.UpNextScreen <> invalid and m.UpNextScreen.visible = false))
+          m.videoPlayer.transportVoiceRequest = inputInfo
+        end if
       end if
     end if
   end if
