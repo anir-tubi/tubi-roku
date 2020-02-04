@@ -24,8 +24,9 @@ Function showDetailScreen(content)
     detailScreen.observeFieldScoped("refreshContent", "onRefreshContentSignal")
     m.refreshingDetailCache = false
     
-    ' m.actionType variable is used for setting callback function after successful data fetch. 
-    ' setting default value as invalid is to avoid runtime error.
+    ' m.actionType variable is used for setting a callback function after successful a data fetch retry in the case where
+    ' users select a menu button from the detail screen, but the origial data fetch was unsuccessful. In this way,
+    ' the action will happen automatically after the successful retry.
     m.actionType = invalid
     
     ' m.isScreenLoaded will be changed to true once the metadata is populated
@@ -298,7 +299,6 @@ Function onSingleContentResponse(msg) As Void
       ' the episode id is NOT what should be played, rather we are allowed
       ' to choose the most appropriate episode and automatically start playback.
       ' Here we use the history to choose an episode or just default to the first one.
-
       afterFn = playHelper
       if history <> invalid
         refreshedContent.currentEpisodeId = history.currentEpisodeId
@@ -418,6 +418,7 @@ Function onSingleContentResponse(msg) As Void
     if afterFn = invalid
       afterFn = m.actionType
     end if
+    m.actionType = invalid
     
   end if
   populateDetailScreen(detailScreen, refreshedContent)
@@ -872,10 +873,11 @@ End Function
 
 Function onEpisodeList(msg)
   tubiLog("ContentController.onEpisodeList")
-  m.actionType = episodesHelper
   detailScreen = msg.getRoSGNode()
+
   episodeDetail = getEpisodeDetail(detailScreen.content)
   if episodeDetail = invalid
+    m.actionType = episodesHelper
     detailScreen.isLoading = true
     getSingleContentFromServer(detailScreen, detailScreen.content) 
   else 
@@ -913,14 +915,15 @@ End Function
 
 Function onWatchTrailer(msg)
   tubiLog("ContentController.onWatchTrailer")
-  m.actionType = trailerHelper
   detailScreen = msg.getRoSGNode()
+
   content = getDetailScreenContent(detailScreen)
   if content <> invalid then
     if isFetchingInProgress(detailScreen) <> true
-      if isPlayable(detailScreen)
+      if isPlayable(detailScreen) = true
         trailerHelper(detailScreen)      
       else
+        m.actionType = trailerHelper
         detailScreen.isLoading = true
         getSingleContentFromServer(detailScreen, detailScreen.content)
       end if   
@@ -981,12 +984,13 @@ End Function
 ' if data not present, it invokes content api
 Function onResume(msg)
   tubiLog("ContentController.onResume")
-  m.actionType = resumeHelper
   detailScreen = msg.getRoSGNode()
+
   if isFetchingInProgress(detailScreen) <> true
-    if isPlayable(detailScreen)
+    if isPlayable(detailScreen) = true
       resumeHelper(detailScreen)      
     else
+      m.actionType = resumeHelper
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen, detailScreen.content)
     end if   
@@ -1001,12 +1005,13 @@ End Function
 ' if data not present, it invokes content api
 Function onPlay(msg)
   tubiLog("ContentController.onPlay")
-  m.actionType = playHelper
   detailScreen = msg.getRoSGNode()
+
   if isFetchingInProgress(detailScreen) <> true
-    if isPlayable(detailScreen)
+    if isPlayable(detailScreen) = true
       playHelper(detailScreen)      
     else
+      m.actionType = playHelper
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen, detailScreen.content)
     end if   
