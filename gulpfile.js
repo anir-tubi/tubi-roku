@@ -9,6 +9,7 @@ const replace = require('gulp-replace');
 const { server, serverClose } = require('gulp-connect');
 const filter = require('gulp-filter');
 const zip = require('gulp-zip');
+const mergeStream = require('merge-stream');
 const http = require('http');
 const mkdirp = require('mkdirp');
 const request = require('request');
@@ -133,6 +134,7 @@ function buildInstalled() {
       '!src/channel/**/.DS_Store',
       '!src/channel/**/*.md',
       '!src/channel/components/controllers/StarterController/**',
+      '!src/channel/components/tasks/ExperimentsTask/**',
       '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs',
     ];
 
@@ -192,6 +194,14 @@ function buildStarter() {
       base: 'src/channel/components/controllers'
     };
 
+    // include ExperimentsTask in starterComponents
+    let experimentsTaskSrc = [
+      'src/channel/components/tasks/ExperimentsTask/**/*'
+    ];
+    let experimentsTaskSrcOptions = {
+      base: 'src/channel/components/tasks'
+    };
+
     // include Constants in starter components
     let constantsSrc = [
       'src/channel/source/Constants.brs'
@@ -208,25 +218,32 @@ function buildStarter() {
       base: 'src/channel/source/3rdparty/roku/'
     };
 
-    // include TubiExperiments in starterComponents
-    let experimentsSrc = [
-      'src/channel/source/lib/TubiExperiments.brs'
+    // include TubiExperiments, TubiExternalConfig, and Request modules in starterComponents
+    let sourceLibsSrc = [
+      'src/channel/source/lib/Request.brs',
+      'src/channel/source/lib/Log.brs',
+      'src/channel/source/lib/TubiExperiments.brs',
+      'src/channel/source/lib/TubiExternalConfig.brs',
     ];
-    let experimentsSrcOptions = {
+    let sourceLibsSrcOptions = {
       base: 'src/channel/source/lib/'
     };
 
     //move all the necessary starter component files to the build/starter directory
-    let stream = collect(starterControllerSrc, starterControllerSrcOptions)
-      .pipe(dest('build/starter/components/'))
-      .pipe(collect(constantsSrc, constantsSrcOptions))
-      .pipe(dest('build/starter/'))
-      .pipe(collect(genUtilSrc, genUtilSrcOptions))
-      .pipe(dest('build/starter/source'))
-      .pipe(collect(experimentsSrc, experimentsSrcOptions))
-      .pipe(dest('build/starter/source'));
+    let stream = mergeStream(
+      collect(starterControllerSrc, starterControllerSrcOptions)
+        .pipe(dest('build/starter/components/')),
+      collect(experimentsTaskSrc, experimentsTaskSrcOptions)
+        .pipe(dest('build/starter/components/')),
+      collect(constantsSrc, constantsSrcOptions)
+        .pipe(dest('build/starter/')),
+      collect(genUtilSrc, genUtilSrcOptions)
+        .pipe(dest('build/starter/source')),
+      collect(sourceLibsSrc, sourceLibsSrcOptions)
+        .pipe(dest('build/starter/source'))
+    );
 
-    stream.on('end', () => {
+    stream.on('finish', () => {
       res();
     })
   })
@@ -260,6 +277,7 @@ function buildRemote() {
       //make sure not to include the following files
       '!src/channel/components/tests/**',
       '!src/channel/components/controllers/StarterController/**',
+      '!src/channel/components/tasks/ExperimentsTask/**',
       '!src/channel/source/3rdparty/ComponentTestFramework.brs',
       '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs',
       '!src/channel/source/3rdparty/roku/UnitTestFramework.brs',

@@ -15,17 +15,12 @@
   <script type="text/brightscript" uri="../../source/Settings.brs" />
   <script type="text/brightscript" uri="../../source/generalUtils.brs" />
   <script type="text/brightscript" uri="../../source/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../source/TubiExternalConfig.brs" />
 
   <interface>
     <!-- INPUTS -->
       <!-- triggers the starterController to return a remote components url via the OUTPUT interfaces -->
       <field id="getUrl" type="boolean" alwaysNotify="true" />
-
-      <!-- experiments AA that are returned from TubiExperiments.init() -->
-      <field id="experimentValues" type="assocArray" />
-
-      <!-- remoteConfig AA that are returned from TubiExternalConfig.init() -->
-      <field id="externalConfigValues" type="assocArray" />
 
     <!-- OUTPUTS -->
       <!-- the SceneGraph app will be built using the remote components pkg existing at this url -->

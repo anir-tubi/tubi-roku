@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - SimpleRequestTask
+ -
+ - This task makes requests to the experiment and external config APIs, respectively
+ -
+ --> 
+<component name="ExperimentsTask" extends="Task">
+    <script type="text/brightscript" uri="ExperimentsTask.brs" />
+    <script type="text/brightscript" uri="../../../source/Log.brs" />
+    <script type="text/brightscript" uri="../../../source/Request.brs" />
+    <script type="text/brightscript" uri="../../../source/TubiExperiments.brs" />
+    <script type="text/brightscript" uri="../../../source/TubiExternalConfig.brs" />
+
+
+    <interface>
+      <!-- INPUT -->
+        <field id="constants" type="assocArray" />
+
+      <!-- OUTPUT -->
+        <field id="experimentsInfo" type="assocArray" />
+        <field id="externalConfigInfo" type="assocArray" />
+    </interface>
+</component>

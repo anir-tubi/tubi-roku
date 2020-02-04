@@ -10,23 +10,18 @@ Function Main(startupArgs)
   request = TubiRequest()
   auth = TubiAuth(constants, request)
   log = TubiLogger(constants, request, auth)
-  externalConfig = TubiExternalConfig(request, constants)
-  experiments = TubiExperiments(constants)
 
   if startupArgs.ComponentTest <> invalid and startupArgs.ComponentTest <> ""
     ' This will block indefinitely
     ComponentTest(startupArgs.ComponentTest)
   end if
 
-  externalConfigValues = externalConfig.init()
-  experimentValues = experiments.init(request)
-
   logCrashesOnStartup(startupArgs, log, constants)
-  runChannel(startupArgs, constants, log, externalConfigValues, experimentValues)
+  runChannel(startupArgs, constants, log, request)
 End Function
 
 
-Function runChannel(startupArgs, constants, log, externalConfigValues, experimentValues) As Void
+Function runChannel(startupArgs, constants, log, request) As Void
   ' Load scene graph
   port = CreateObject("roMessagePort")
   input = CreateObject("roInput")
@@ -80,9 +75,13 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
     starterLibrary.uri = constants.settings.starterComponentsUrl ' kicks off fetch of starter components
     componentTimer = CreateObject("roTimespan")
   else
-    'only expect this to happen when side loading/testing
-    constants.experiments.info = experimentValues
-    constants.externalConfig.info = externalConfigValues
+    'only expect this else block to happen when side loading/testing
+    'setting experiment values and external config will normally happen in StarterController when using starter components
+    externalConfig = TubiExternalConfig(request, constants)
+    externalConfig.init() 'sets external config values from server on constants
+    experiments = TubiExperiments(constants)
+    experiments.init(request) 'sets experiment values from server on constants
+
     sgGlobal.setField("constants", constants)
     sgGlobal.setField("theme", constants.ui.themes.default)
     controller = loadPackagedComponents(tubiScene, port, startupArgs)
@@ -132,9 +131,6 @@ Function runChannel(startupArgs, constants, log, externalConfigValues, experimen
             starterController = tubiScene.createChild("TubiStarterLibrary:StarterController")
             starterController.observeField("useRemoteComponents", port)
             starterController.observeField("remoteComponentsUrl", port)
-            starterController.externalConfigValues = externalConfigValues
-            starterController.experimentValues = experimentValues
-            starterController.remoteComponents = constants.remoteComponents
             starterController.setField("getUrl", true)
             retries = 0
             pause = initialBackoff

@@ -10,6 +10,8 @@ Function TubiExternalConfig(request as Object, constants as Object) as Object
 
     ' public methods
     init: tubiExternalConfig_init
+    getConfigsRequest: tubiExternalConfig_getConfigsRequest
+    parseConfigs: tubiExternalConfig_parseConfigs
 
     ' private methods
     getConfigs: tubiExternalConfig_getConfigs_
@@ -18,6 +20,7 @@ Function TubiExternalConfig(request as Object, constants as Object) as Object
 End Function
 
 
+' Synchronously requests the configs and places them on constants.
 Function tubiExternalConfig_init()
   configs = m.getConfigs()
 
@@ -27,7 +30,7 @@ Function tubiExternalConfig_init()
     mergedConfig.append(configs)
   end if
 
-  m.storeConfigs(mergedConfig)
+  m.storeConfigs(mergedConfig, m.constants)
   return mergedConfig
 End Function
 
@@ -43,26 +46,39 @@ End Function
 ' }
 '
 Function tubiExternalConfig_getConfigs_()
-  url = m.constants.urls.users.config
-  options = {
-    params: {
-      "device_id": m.constants.deviceInfo.deviceId
-    }
-  }
-
-  configRequest = m.request.createAsync(url, "getExternalConfigs", options)
+  configRequest = m.getConfigsRequest(m.request, m.constants)
   res = configRequest.runSynchronous()
-
-  configs = invalid
-  if res <> invalid
-    configs = ParseJson(res)
-  end if
-
+  configs = m.parseConfigs(res)
   return configs  'can return invalid
 End Function
 
 
 ' @configs: assocArray, configs as sent from the UAPI and json parsed
-Function tubiExternalConfig_storeConfigs_(configs)
-  m.constants.externalConfig.info = configs
+Function tubiExternalConfig_storeConfigs_(configs, constants)
+  constants.externalConfig.info = configs
+  return constants
+End Function
+
+
+
+Function tubiExternalConfig_getConfigsRequest(request, constants)
+  url = constants.urls.users.config
+  options = {
+    params: {
+      "device_id": constants.deviceInfo.deviceId
+    }
+  }
+
+  return request.createAsync(url, "getExternalConfigs", options)
+End Function
+
+
+' @responseData: string, the JSON object returned by req.runSynchrounous() or req.response.data
+Function tubiExternalConfig_parseConfigs(responseData)
+  configs = invalid
+  if responseData <> invalid
+    configs = ParseJson(responseData)
+  end if
+
+  return configs
 End Function
