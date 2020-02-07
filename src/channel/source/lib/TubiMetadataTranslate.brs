@@ -541,31 +541,35 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
     container = containers[i]
 
     if oLimitTypes[container.type] = true
-      categoryAA = m.buildCategoryAA(container, contents, invalid, "", false)
-      if bDisplayChannels = true
-        categoryAA.type = m.contentTypes.channel
-      else 
-        categoryAA.type = m.contentTypes.category
-      end if
-
+      categoryAA = m.buildCategoryAA(container, contents, invalid, "", false)  'categoryAA is invalid if empty container
       if categoryAA <> invalid
-        sID = LCase(categoryAA.id)
-      end if
-      if sID <> m.constants.ui.categoryIds.featured 
-        if sID = m.constants.ui.categoryIds.recommendedForYou
-          catRecommend = categoryAA
-          catRecommend.isSpecial = true
-          catRecommend.thumbnail = m.constants.ui.uris.categoryBackgrounds.recommended
-        else if sID = sID_continue_watching
-          catContinueWatching = categoryAA
-          catContinueWatching.isSpecial = true
-          catContinueWatching.thumbnail = m.constants.ui.uris.categoryBackgrounds.continueWatching
-        else if sID = sID_queue
-          catQueue = categoryAA
-          catQueue.isSpecial = true
-          catQueue.thumbnail = m.constants.ui.uris.categoryBackgrounds.queue
+        if bDisplayChannels = true
+          categoryAA.type = m.contentTypes.channel
         else
-          homescreenAA.children.push(categoryAA)
+          categoryAA.type = m.contentTypes.category
+        end if
+
+        sID = ""
+        if categoryAA.id <> invalid
+          sID = LCase(categoryAA.id)
+        end if
+
+        if sID <> m.constants.ui.categoryIds.featured
+          if sID = m.constants.ui.categoryIds.recommendedForYou
+            catRecommend = categoryAA
+            catRecommend.isSpecial = true
+            catRecommend.thumbnail = m.constants.ui.uris.categoryBackgrounds.recommended
+          else if sID = sID_continue_watching
+            catContinueWatching = categoryAA
+            catContinueWatching.isSpecial = true
+            catContinueWatching.thumbnail = m.constants.ui.uris.categoryBackgrounds.continueWatching
+          else if sID = sID_queue
+            catQueue = categoryAA
+            catQueue.isSpecial = true
+            catQueue.thumbnail = m.constants.ui.uris.categoryBackgrounds.queue
+          else
+            homescreenAA.children.push(categoryAA)
+          end if
         end if
       end if
     end if
