@@ -73,7 +73,7 @@ Function init()
   m.AdsTask.control = "RUN"
 
   'm.VideoState is source of truth for the state of the video player for the UI
-  'possible values are "play", "pause", "rew", "ffw", "stop", "refresh", "skip"
+  'possible values are "play", "pause", "rew", "ffw", "stop", "refresh", "skip", "hop"
   m.VideoState = "stop"
 
   'm.scrubAmt is the 0-based level of scrub speed - current design allows for 0, 1, 2
@@ -763,7 +763,7 @@ Function onAdStateChange()
     ' video playback stopped and should play right away when we get adspending.
     ' pre-roll or resume-roll. Play ads right away
     showAdBreak()
-  else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip") and m.Video.state <> "playing" then
+  else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") and m.Video.state <> "playing" then
     ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
     ' TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
     ' Set the m.Video.control prior to the m.Video.seek to ensure that the video is not started from the beginning even if m.playerPosition <> 0.
@@ -1133,6 +1133,7 @@ Function handleHopForward(duration)
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
+  m.VideoState = "hop"
   hopPosition = m.playerPosition + duration
   jumpToPosition(hopPosition)
   m.lastPingTime = hopPosition        'used for accurate play_progress accounting
@@ -1173,6 +1174,7 @@ Function handleHopBack(remoteReplayButton, duration)
     end if
   end if
 
+  m.VideoState = "hop"
   jumpToPosition(hopPosition)
   m.lastPingTime = hopPosition    'used for accurate play_progress accounting
 End Function
