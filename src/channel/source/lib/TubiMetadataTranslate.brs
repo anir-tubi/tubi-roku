@@ -466,11 +466,21 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   containers = contentToTranslate.containers
   contents = contentToTranslate.contents
 
+  ' userCategoriesPos is used to store the index in the list of categories where the /homescreen API
+  ' placed the userCategories
+  continueWatchingIndex = 4
+  queueIndex = 5
 
   'set up AAs for all categories including any nested categories
   for i=0 to containers.count()-1
     container = containers[i]
     if container.type <> "complex"
+      if container.id = m.constants.ui.categoryIds.history
+        continueWatchingIndex = i
+      else if container.id = m.constants.ui.categoryIds.queue
+        queueIndex = i
+      end if
+
       categoryAA = m.buildCategoryAA(container, contents, invalid, "", false)
       if categoryAA <> invalid
         homescreenAA.children.push(categoryAA)
@@ -488,6 +498,10 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   end for
 
   translated.update(homescreenAA)
+  translated.addField("continueWatchingIndex", "integer", false)
+  translated.addField("queueIndex", "integer", false)
+  translated.continueWatchingIndex = continueWatchingIndex
+  translated.queueIndex = queueIndex
   node_count = 1 + translated.getChildCount()
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
@@ -732,7 +746,8 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
 
     for each child in children
       ' contents[child].valid is "true" or "false" for user categories and is invalid for all other categories.
-      ' For all other categories, assume all contents are valid.
+      ' For all other categories, assume all contents are valid. Valid in this case means, the content is "in window"
+      ' and allowed to be played on the Roku platform
       if contents[child] <> invalid and contents[child].valid <> false
         childIsPushable = true
         fullChild = contents[child]

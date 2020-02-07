@@ -107,35 +107,25 @@ Function onReloadUserCategoriesResponse()
         ' 3) new category doesn't have content (will be invalid), old category does have content - remove old category
         ' 4) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
         if newCategory <> invalid and oldCategory <> invalid
-          'replace old category with new category
+          ' replace old category with new category
           m.top.content.replaceChild(newCategory, m.NodeHelpers.getChildIndex(m.top.content, oldCategory))
         else if newCategory <> invalid and oldCategory = invalid
-          'add new category
-          'if new category is history, put it one before queue, or if queue doens't exist put it in 2nd position
-          'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
+          ' add new category
+          ' add the continue watching or queue category based on the position that they arrive in from the /homescreen API,
+          ' even if they are empty when they are initally received (logic is done in TubiMetadataTranslate.translateHomescreen)
           if newCategory.id = m.constants.ui.categoryIds.history
-            queueIndex = m.NodeHelpers.getChildIndexById(m.top.content, m.constants.ui.categoryIds.queue)
-            insertPos = 1
-            if queueIndex > -1
-              insertPos = queueIndex
-            end if
-            m.top.content.insertChild(newCategory, insertPos)
+            m.top.content.insertChild(newCategory, m.top.content.continueWatchingIndex)
           else if newCategory.id = m.constants.ui.categoryIds.queue
-            historyIndex = m.NodeHelpers.getChildIndexById(m.top.content, m.constants.ui.categoryIds.history)
-            insertPos = 1
-            if historyIndex > -1
-              insertPos = historyIndex + 1
-            end if
-            m.top.content.insertChild(newCategory, insertPos)
+            m.top.content.insertChild(newCategory, m.top.content.queueIndex)
           end if
         else if newCategory = invalid and oldCategory <> invalid
-          'remove old category
+          ' remove old category
           m.top.content.removeChild(oldCategory)
         else if newCategory = invalid and oldCategory = invalid
-          'do nothing
+          ' do nothing
         end if
 
-        'reset the categoryGridList content so the changes display in the RowList
+        ' reset the categoryGridList content so the changes display in the RowList
         categoryContent = m.top.content
         m.CategoryGridList.content = categoryContent
       end if
