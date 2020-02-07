@@ -73,11 +73,11 @@ End Function
 ' @reqest: assocArray, a request module as returned by TubiRequest()
 Function tubiExperiments_init(request)
   '//go through all the exisiting namespaces and call the backend to get the data of existing experiments
-  namespaces = m.getNamespaces(request, m.constants, m.defaultValues)
+  namespaces = m.getNamespaces(request)
   allNamespaces = invalid
   
   if namespaces <> invalid
-    allNamespaces = mapNamespaces(namespaces)
+    allNamespaces = m.mapNamespaces(namespaces)
   end if
 
   m.constants.experiments.info = allNamespaces
@@ -90,11 +90,11 @@ End Function
 ' @reqest: assocArray, a request module as returned by TubiRequest()
 Function tubiExperiments_getNamespaces(request)
   returnNamespaces = invalid
-  req = getNamespaceRequest(request)
+  req = m.getNamespaceRequest(request)
   if req <> invalid
-    res = expRequest.runSynchronous()
+    res = req.runSynchronous()
     if res <> invalid
-      returnNamespaces = handleNamespaceResponse(res)
+      returnNamespaces = m.handleNamespaceResponse(res)
     end if
   end if
 
