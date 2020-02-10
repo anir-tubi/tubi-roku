@@ -235,10 +235,18 @@ Function getConstants()
       constants.thirdParty.sentry.dsn = "https://f8edcfe8baf140b4b91b46dfb8af9a19:acdf43f7c38a47f1ab85583035ff1798@sentry.io/1377102"
 
   'platform is used when communitcating with CMS API
-  constants.platform = "roku"
+  if LCase(constants.deviceInfo.channelStore) = "telstra"
+    constants.platform = "telstra"
+  else
+    constants.platform = "roku"
+  end if
 
   'analyticsPlatform is used when sending analytics events
-  constants.analyticsPlatform = "ROKU"
+  if LCase(constants.deviceInfo.channelStore) = "telstra"
+    constants.analyticsPlatform = "TELSTRA"
+  else
+    constants.analyticsPlatform = "ROKU"
+  end if
 
   'previously found in settings as "shortAppName"
   constants.appName = "tubitv"

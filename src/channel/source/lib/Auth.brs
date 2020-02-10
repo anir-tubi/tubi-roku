@@ -380,7 +380,7 @@ function tubiAuth_requestTokenRefresh_(authInfo, port)
   body = {
     user_id: authInfo.userId
     device_id: m.constants.deviceInfo.deviceId
-    platform: m.constants.settings.platformName
+    platform: m.constants.platform
   }
   bodyJson = FormatJson(body)
 
@@ -414,7 +414,7 @@ Function tubiAuth_requestTokenTransfer_(externalAuthInfo, port)
   body = {
     user_id: externalAuthInfo.userId
     device_id: m.constants.deviceInfo.deviceId
-    platform: m.constants.settings.platformName
+    platform: m.constants.platform
     from_device_id: externalAuthInfo.externalDeviceId
     from_platform: externalAuthInfo.platform
   }
@@ -490,7 +490,7 @@ function tubiAuth_oneTimeLoginMigration()
     body = {
       user_id: oldUserData.token
       device_id: m.constants.deviceInfo.deviceId
-      platform: "roku"
+      platform: m.constants.platform
     }
     bodyJson = FormatJson(body)
     headers = m.getAuthHeaders(migrateToken)

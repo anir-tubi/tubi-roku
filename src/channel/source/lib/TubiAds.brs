@@ -160,7 +160,7 @@ function tubiAds_populateUrlAdrise(episode) As String
 
   'create the url to be used for ad calls'
   params = {
-    "platform": "roku"
+    "platform": m.constants.platform
     "appid": m.constants.settings.shortAppName
     "cid": episode.id
     "nowpos": episode.nowpos.ToStr()
