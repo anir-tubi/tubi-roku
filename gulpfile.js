@@ -41,12 +41,14 @@ const options = {
   devPass: (process.env.ROKU_DEV_PASSWORD || process.env.DEV_PASSWORD || ''),
   pkgPass: (process.env.ROKU_PKG_PASSWORD || process.env.PKG_PASSWORD || ''),
   rekeyPkg: '',
-  port: 8090
+  port: 8090,
+  telnet: process.env.ROKU_DEV_TELNET
 }
 
 // overwrite the config and/or target default options with passed in arguments;
 // for example a -staging argument will set options.config to 'staging'
 const passedArgs = process.argv.slice(2);
+
 
 passedArgs.forEach(arg => {
   const allowedConfigs = {
@@ -55,6 +57,10 @@ passedArgs.forEach(arg => {
     staging: true,
     test: true
   };
+  
+  const allowedTelnetConfigs = {
+    sametab: true,
+  }
 
   // only allow args with a single preceding "-", ie. '--staging'
   if (arg.slice(0, 2) === '--' && arg.charAt(2) !== '-') {
@@ -64,6 +70,8 @@ passedArgs.forEach(arg => {
     // check for one of the config values
     if (allowedConfigs[strippedArg]) {
       options.config = strippedArg;
+    } else if (allowedTelnetConfigs[strippedArg]) { 
+      options.telnet = strippedArg
     } else if(strippedArg.split('.').length === 4) {
       //check if the arg is an IP address
       let ipBlocks = strippedArg.split('.');
@@ -176,7 +184,7 @@ function buildInstalled() {
 
 function buildStarter() {
   const minorBuildTag = getBuildTag(true, false);
-
+  
   let build = new Promise((res, rej) => {
     /* Installed bundle */
     mkdirp.sync(`${process.env.PWD}/build/starter/source`);
@@ -402,6 +410,10 @@ function sideLoad(done) {
   })
   .then(() => {
     console.log(`${options.config.toUpperCase()} channel launched.`)
+    
+    if (options.telnet === 'sametab') {
+      shell.exec(`telnet ${options.target} 8085`,{async: true});
+    }
   })
   .catch(err => {
     console.log('sideLoad error: ', err);
