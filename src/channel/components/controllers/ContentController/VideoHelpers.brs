@@ -130,12 +130,18 @@ End Function
 
 ' This happens if the "next video" button has been pressed on the player transport
 Function onGoToNext()
-  nextContent = m.upNextTask.response.getChild(0)
-  oldContent = m.videoPlayer.content
 
-  nextContent = addSeriesTitle(nextContent, oldContent)
-  stopVideoContent(false)
-  playVideoContent(nextContent, "none") 'TODO: FIND OUT IF THIS COUNTS AS AUTOPLAY?
+  if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.response.getChild(0) <> invalid
+    nextContent = m.upNextTask.response.getChild(0)
+    oldContent = m.videoPlayer.content
+
+    nextContent = addSeriesTitle(nextContent, oldContent)
+    stopVideoContent(false)
+    playVideoContent(nextContent, "none") 'TODO: FIND OUT IF THIS COUNTS AS AUTOPLAY?
+  else
+    returnToDetailScreenFromVideo()
+  end if
+    
 End Function
 
 
