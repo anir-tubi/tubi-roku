@@ -272,7 +272,10 @@ End Function
 
 Function onInactivityTimer()
   now = Uptime(0)
-  if (now - m.lastUserActivity > m.constants.timers.stillWatchingTimeout) and m.videoPlayer.visible = true
+ 
+  stillWatchingTimeout = getExperimentResource("RokuNamespace", "stillWatching").timeout
+  
+  if stillWatchingTimeout > 0 and (now - m.lastUserActivity > stillWatchingTimeout) and m.videoPlayer.visible = true
     if m.inactivityModal = invalid
       ' Don't invoke this during an ad break or while upNext is visible.  Also if it's just been paused leave it.
       if m.videoPlayer.adState <> "adsplaying" and m.videoPlayer.state = "playing" and m.upNextScreen = invalid
@@ -289,7 +292,7 @@ Function onInactivityTimer()
             dialog_type: "STILL_WATCHING"   'DialogType enum
             pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: contentId}) 'TODO: should be video_player_page eventually
             dialog_action: "SHOW"  'Action enum
-            dialog_sub_type: (m.constants.timers.stillWatchingTimeout / 60).toStr() + "-minutes"
+            dialog_sub_type: (stillWatchingTimeout / 60).toStr() + "-minutes"
           }
         }
 
@@ -316,7 +319,7 @@ Function onInactivityTimer()
 
         m.inactivityModal = showModal(modalInfo, modalButtonInfo)
       end if
-    else if (now - m.lastUserActivity - m.constants.timers.stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
+    else if (now - m.lastUserActivity - stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
       closeModal(m.inactivityModal)
       stopInactivityTimer()
       if shouldStopOnStillWatchingTimeout() = true

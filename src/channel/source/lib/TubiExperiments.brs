@@ -47,6 +47,7 @@ Function TubiExperiments(constants) as Object
       UserNamespace: {
       }
       RokuNamespace: {
+        stillWatching : {"timeout" : 0} 'other expected values "10800", "12600"
       }
     }
 
@@ -270,16 +271,12 @@ End Function
 ' Get more info about the experiment. This is an associative array that is defined when the experiment is set up on the popper server
 ' The AA can include anything and be formatted in anyway. It depends on how you set up the experiment on the popper server.
 Function tubiExperiments_getExperimentResource(namespaceName as string, experimentName as string) as Object
-  oReturn = invalid
-
+  
+  oReturn = m.getDefaultResource(namespaceName, experimentName)
   experiment = m.getExperiment(namespaceName, experimentName)
-  if experiment <> invalid 
+  if experiment <> invalid and experiment.resource <> invalid
     oReturn = experiment.resource
-
-    if oReturn = invalid
-      oReturn = m.getDefaultResource(namespaceName, experimentName)
-    end if 
-  end if
+  end if  
 
   return oReturn 
 End Function
