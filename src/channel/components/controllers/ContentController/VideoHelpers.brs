@@ -2,7 +2,7 @@
 ' playVideoContent
 '
 ' Helper function for onResume and onPlay to launch content
-Function playVideoContent(content As Object, autoplayType As String, position=invalid As Dynamic)
+Function playVideoContent(content As Object, autoplayType As String, position=0 As Integer)
   if content <> invalid
     if content.isTrailer
       m.videoPlayer.analyticsMode = "trailer"
@@ -55,9 +55,15 @@ Function playVideoContent(content As Object, autoplayType As String, position=in
     ' Clone the content so we don't have listeners affecting it
     parent = CreateObject("roSGNode", "TubiContentNode")
     localContent = content.clone(false)
-    if position <> invalid
-      localContent.nowPos = position
+    
+    creditsCuepoint = localContent.creditscuepoint
+    videoLength = localContent.length
+    
+    if position >= creditsCuepoint or (videoLength - position) <= 5
+      position = 0
     end if
+    localContent.nowPos = position
+
     parent.appendChild(localContent)
     m.videoPlayer.playlist = parent
     m.videoPlayer.loopPlaylist = false

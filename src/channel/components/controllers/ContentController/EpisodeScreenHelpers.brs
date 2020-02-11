@@ -42,11 +42,12 @@ Function onEpisodeSelected(msg)
       episode = season.getChild(episodesScreen.episodeSelected[1])
       if episode <> invalid then
         content = episode.clone(false)
-        nowPos = invalid
+        nowPos = 0
         ' find the position in global history
         history = m.global.historyIds.findNode(content.id)
         if history <> invalid then
-          content.nowPos = history.nowPos
+          nowPos = history.nowPos
+          content.nowPos = nowPos
         end if
 
         'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event

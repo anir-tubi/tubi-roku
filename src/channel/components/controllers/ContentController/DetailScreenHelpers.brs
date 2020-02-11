@@ -1032,7 +1032,7 @@ End Function
 Function resumeHelper(detailScreen)
   episode = getEpisodeContent(detailScreen.content)
   if episode <> invalid then
-    nowPos = invalid
+    nowPos = 0
     ' find the position in global history
     history = m.global.historyIds.findNode(episode.id)
     if m.deepLinkContent = invalid or m.deepLinkContent.deepLinkType = "season" or m.deepLinkContent.deepLinkType = "series"
