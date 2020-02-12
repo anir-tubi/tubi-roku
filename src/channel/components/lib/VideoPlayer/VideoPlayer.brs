@@ -308,18 +308,22 @@ Function onVideoPositionChange()
   if (m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval) and m.top.adState <> "adspending"
     historyPosition(m.playerPosition)
   end if
-
+  
   if m.top.content <> invalid and m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0
     if m.top.creditsPosition > 0 and m.playerPosition < m.top.content.creditsCuePoint
       '//reset the creditsPosition if the current position is prior to the end credits: i.e. after watching the end credits, the user decided to rewind  before the credits
       m.top.creditsPosition = 0
-    else if (m.top.creditsPosition <= 0 and m.playerPosition >= m.top.content.creditsCuePoint)
-      ' Always fire history here to fix a race condition where the user has
-      ' watched beyond the cuepoint but the title doesn't get removed due
-      ' to no history events triggering after the cuepoint
-      historyPosition(m.playerPosition + 5)
-      m.top.creditsPosition = m.playerPosition
+    else if m.top.creditsPosition <= 0 and m.playerPosition >= m.top.content.creditsCuePoint 
+       ' Always fire history here to fix a race condition where the user has
+       ' watched beyond the cuepoint but the title doesn't get removed due
+       ' to no history events triggering after the cuepoint
+       historyPosition(m.playerPosition + 5)
+       m.top.creditsPosition = m.playerPosition
     end if
+  end if
+  
+  if m.playerPosition + m.constants.player.fetchNextDuration >= m.top.content.creditsCuePoint
+    m.top.fetchNextContent = true
   end if
 
   'Advertisements
@@ -1026,7 +1030,7 @@ Function goToNext()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(true)
   end if
-
+  m.top.playNext = true
   if not advancePlaylist() then
     'the end of the video playback
     m.VideoState = "stop"

@@ -420,6 +420,9 @@ Function getConstants()
 
     'how often the video player records history
     constants.player.historyFrequency = 60
+    
+    ' time to fetch next content before credit cuepoints
+    constants.player.fetchNextDuration = 15    
 
     'the max number of distinct speeds at which the player can scrub (fast forward or rewind), 0 based
     constants.player.maxScrub = 2 

@@ -92,6 +92,8 @@
       <!-- force transport to display or hide -->
       <field id="showTransport" type="boolean" alwaysNotify="true"/>
 
+      <!-- Is used to check whether up next content is fetched or not -->
+      <field id="shouldMakeNextRequest" type="boolean" alwaysNotify="false"/>
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -103,6 +105,9 @@
 
       <!-- Set to true if the "go to end" button was pressed on the transport -->
       <field id="goToNext" type="boolean" value="false" alwaysNotify="true" />
+      
+      <!--  indicates to play the video on upnext callback function -->
+      <field id="playNext" type="boolean" value="false" />      
 
       <field id="state" type="string" />
       
@@ -110,7 +115,10 @@
       
       <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
       <field id="historyPosition" type="integer" value="0" />
-
+      
+      <!-- Is set to true, when required to fetch next content -->
+      <field id="fetchNextContent" type="boolean" alwaysNotify="true"/> 
+      
       <!-- Is set when the credits cuepoint position is reached -->
       <field id="creditsPosition" type="integer" alwaysNotify="false"/>
 

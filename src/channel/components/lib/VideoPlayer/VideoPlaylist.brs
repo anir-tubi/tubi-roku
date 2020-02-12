@@ -282,6 +282,7 @@ End Function
 ' Reset video player state to a basic state
 ' @content: TubiContentNode
 Function resetVideoPlayerState(content = invalid)
+  m.top.playNext = false
   m.LoadingProgressBar.progress = 0
   m.LoadingMessage.text = ""
   cancelReplayCaptions()
