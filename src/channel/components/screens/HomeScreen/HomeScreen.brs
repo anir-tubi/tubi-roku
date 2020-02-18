@@ -256,8 +256,8 @@ Function onCurrFocusRowChange()
   ' send experiment analytics (exposure event) for large and small vitg.
   ' calling getExperimentValue() automatically sends the exposure, and limits sending the exposure event to once per session.
   if categoryEnteringFocus <> invalid
-    if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large or categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_small
-      getExperimentValue("RokuNamespace", "roku_vitg")
+    if categoryEnteringFocus.id = "deep_cuts"
+      getExperimentValue("RokuNamespace", "roku_vitg_2")
     end if
   end if
 

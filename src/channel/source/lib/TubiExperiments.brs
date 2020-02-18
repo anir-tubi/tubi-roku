@@ -41,7 +41,7 @@ Function TubiExperiments(constants) as Object
       UserNamespace: {
       }
       RokuNamespace: {
-        roku_vitg: "vitg_none"   'other expected values "vitg_small", "vitg_large"
+        roku_vitg_2: "vitg_none"   'other expected values "vitg_small", "vitg_large"
       }
       roku: {
       }
