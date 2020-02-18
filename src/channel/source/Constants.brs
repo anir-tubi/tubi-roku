@@ -233,6 +233,22 @@ Function getConstants()
 
     constants.thirdParty.sentry = {}
       constants.thirdParty.sentry.dsn = "https://f8edcfe8baf140b4b91b46dfb8af9a19:acdf43f7c38a47f1ab85583035ff1798@sentry.io/1377102"
+      
+    constants.thirdParty.suiteTest = {}
+      
+      'toggle for using suitest or not. Should only be set to true for testing situations.
+      'for production it should be false  
+      if mode = "dev"
+        constants.thirdParty.suiteTest.enabled = true
+      else
+        constants.thirdParty.suiteTest.enabled = false
+      end if
+  
+      ' app_id of suitest application - can be used for any roku device within same organization. update app_id for using different account.
+      constants.thirdParty.suiteTest.app_id =  "214cab71-b41b-468d-bcbb-f42732b157c4"
+  
+      ' uri of suitest application
+      constants.thirdParty.suiteTest.uri = "http://the.suite.st/app/roku.zip"  
 
   'platform is used when communitcating with CMS API
   if LCase(constants.deviceInfo.channelStore) = "telstra"
