@@ -58,8 +58,18 @@ End Function
 Function onComponentFocusChange()
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
   if m.top.hasFocus()
-    if resolveAbbreviatedContent(m.RowList.rowItemFocused) <> invalid
+
+    rowItemFocused = m.RowList.rowItemFocused
+    if rowItemFocused.count() <> 2
+      '//The rowList has not gained focus yet so use the default upperleft item.
+      rowItemFocused = [0,0]
+    end if 
+    if resolveAbbreviatedContent(rowItemFocused) <> invalid
       m.justGainedFocus = true
+      m.RowList.setFocus(true)
+      'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error. 
+      '   This is especially true when the Rowlist does not have initial focus when the content has loaded.
+      m.RowList.setFocus(false)
       m.RowList.setFocus(true)
     end if
   end if
