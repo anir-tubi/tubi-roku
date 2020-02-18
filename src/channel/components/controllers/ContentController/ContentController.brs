@@ -116,8 +116,13 @@ Function init()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
+  
+  m.stillWatchingTimeout = getExperimentResource("roku", "still_watching_timeout_1", false).timeout
+  if m.stillWatchingTimeout = 0
+     m.stillWatchingTimeout = getExperimentResource("roku", "still_watching_timeout_2", false).timeout
+  end if
+  
 End Function
-
 
 Function displayExitModal(trackingPageInfo)
   dialogEvent = {
@@ -273,14 +278,20 @@ End Function
 Function onInactivityTimer()
   now = Uptime(0)
  
-  stillWatchingTimeout = getExperimentResource("RokuNamespace", "stillWatching").timeout
+  stillWatchingTimeout = m.stillWatchingTimeout
   
   if stillWatchingTimeout > 0 and (now - m.lastUserActivity > stillWatchingTimeout) and m.videoPlayer.visible = true
     if m.inactivityModal = invalid
       ' Don't invoke this during an ad break or while upNext is visible.  Also if it's just been paused leave it.
       if m.videoPlayer.adState <> "adsplaying" and m.videoPlayer.state = "playing" and m.upNextScreen = invalid
         m.videoPlayer.control = "pause"
-
+        
+        ' getExperimentResource is invoked here to fire exposed experiment event when inactivity modal is shown
+        stillWatching = getExperimentResource("roku", "still_watching_timeout_1", true).timeout
+        if stillWatching = 0
+          stillWatching = getExperimentResource("roku", "still_watching_timeout_2", true).timeout
+        end if
+        
         contentId = 0
         if m.videoPlayer.content <> invalid and m.videoPlayer.content.id <> invalid and m.videoPlayer.content.id <> ""
           contentId = m.videoPlayer.content.id.toInt()
