@@ -299,8 +299,8 @@ Function getConstants()
     'ad server url
     ' constants.urls.adsBaseUrl = "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
     constants.urls.adsBaseUrl = "http://ads.adrise.tv/"
-    ' constants.urls.adsBaseUrlRainmaker = "http://rainmaker.staging-public.tubi.io/rev/"
-    constants.urls.adsBaseUrlRainmaker = "http://rainmaker.production-public.tubi.io/rev/"
+    ' constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/rev/"
+    constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/rev/"
 
     'contents url
     constants.urls.cms = {}
