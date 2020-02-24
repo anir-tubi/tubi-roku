@@ -118,9 +118,12 @@ Function onReloadUserCategoriesResponse()
           else if newCategory.id = m.constants.ui.categoryIds.queue
             m.top.content.insertChild(newCategory, m.top.content.queueIndex)
           end if
+
+          m.CategoryGridList.setNewRowHeights = true
         else if newCategory = invalid and oldCategory <> invalid
           ' remove old category
           m.top.content.removeChild(oldCategory)
+          m.CategoryGridList.setNewRowHeights = true
         else if newCategory = invalid and oldCategory = invalid
           ' do nothing
         end if
