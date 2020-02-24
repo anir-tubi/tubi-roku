@@ -117,9 +117,9 @@ Function init()
     trackType: "startApp"
   }
   
-  m.stillWatchingTimeout = getExperimentResource("roku", "still_watching_timeout_1", false).timeout
-  if m.stillWatchingTimeout = 0 'is 0 if not in the still_watching_timeout_1 experiment, 60 if in experiment including control
-     m.stillWatchingTimeout = getExperimentResource("roku", "still_watching_timeout_2", false).timeout
+  m.stillWatchingTimeout = getExperimentResource("roku", "roku_still_watching_timeout_1", false).timeout
+  if m.stillWatchingTimeout = 0 'is 0 if not in the roku_still_watching_timeout_1 experiment, 60 if in experiment including control
+     m.stillWatchingTimeout = getExperimentResource("roku", "roku_still_watching_timeout_2", false).timeout
   end if
   
 End Function
@@ -281,7 +281,7 @@ Function onInactivityTimer()
   stillWatchingTimeout = m.stillWatchingTimeout
   
   if stillWatchingTimeout > 0 and (now - m.lastUserActivity > stillWatchingTimeout) and m.videoPlayer.visible = true
-    if getExperimentValue("roku", "still_watching_timeout_1") = "timeout_12600" or getExperimentValue("roku", "still_watching_timeout_2") = "timeout_10800"
+    if getExperimentValue("roku", "roku_still_watching_timeout_1") = "timeout_12600" or getExperimentValue("roku", "roku_still_watching_timeout_2") = "timeout_10800"
       if m.inactivityModal = invalid
         ' Don't invoke this during an ad break or while upNext is visible.  Also if it's just been paused leave it.
         if m.videoPlayer.adState <> "adsplaying" and m.videoPlayer.state = "playing" and m.upNextScreen = invalid

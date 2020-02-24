@@ -44,8 +44,8 @@ Function TubiExperiments(constants) as Object
         roku_vitg: "vitg_none"   'other expected values "vitg_small", "vitg_large"
       }
       roku: {
-        still_watching_timeout_1: "off"   'other expected value is "timeout_12600"
-        still_watching_timeout_2: "off"   'other expected value is "timeout_10800"
+        roku_still_watching_timeout_1: "off"   'other expected value is "timeout_12600"
+        roku_still_watching_timeout_2: "off"   'other expected value is "timeout_10800"
       }
     }
     defaultResources: {
@@ -54,8 +54,8 @@ Function TubiExperiments(constants) as Object
       RokuNamespace: {
       }
       roku: {
-        still_watching_timeout_1 : {"timeout" : 0},
-        still_watching_timeout_2 : {"timeout" : 0}
+        roku_still_watching_timeout_1 : {"timeout" : 0},
+        roku_still_watching_timeout_2 : {"timeout" : 0}
       }
     }
 
