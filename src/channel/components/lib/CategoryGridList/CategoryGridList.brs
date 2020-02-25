@@ -45,6 +45,9 @@ Function init()
 
   ' suppress debounce if we have just gained focus
   m.justGainedFocus = false
+
+  ' stores an array of the form [y, x], which can be set on RowList.jumpToItem
+  m.itemToJumpTo = invalid
 End Function
 
 
@@ -65,7 +68,13 @@ Function onComponentFocusChange()
       '//The rowList has not gained focus yet so use the default upperleft item.
       rowItemFocused = [0,0]
     end if 
-    if resolveAbbreviatedContent(rowItemFocused) <> invalid
+    
+    if resolveAbbreviatedContent(rowItemFocused) <> invalid or (m.itemToJumpTo <> invalid and resolveAbbreviatedContent(m.itemToJumpTo) <> invalid)
+      if m.itemToJumpTo <> invalid
+        m.RowList.jumpToRowItem = m.itemToJumpTo
+        m.itemToJumpTo = invalid
+      end if
+
       m.justGainedFocus = true
       m.RowList.setFocus(true)
       'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error. 
@@ -107,8 +116,13 @@ End Function
 Function onNewRowHeights()
   setRowHeights()
   ' setting the rowItemSize and/or rowHeights moves the focus indicator back to the origin so
-  ' we need to move the focus back to it's appropriate place
-  m.RowList.jumpToRowItem = m.RowList.rowItemFocused
+  ' we need to move the focus back to it's appropriate place. But we need to check that there is content
+  ' at the location or else the RowList loses focus and can't get it back.
+  if resolveAbbreviatedContent(m.RowList.rowItemFocused) <> invalid
+    m.itemToJumpTo = m.RowList.rowItemFocused
+  else if resolveAbbreviatedContent([m.RowList.rowItemFocused[0] - 1, m.RowList.rowItemFocused[1]]) <> invalid
+    m.itemToJumpTo = [m.RowList.rowItemFocused[0], 0]
+  end if
 End Function
 
 
