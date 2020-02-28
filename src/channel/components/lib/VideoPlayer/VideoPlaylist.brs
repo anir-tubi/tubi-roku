@@ -223,7 +223,6 @@ Function onRefreshResponse(msg)
       refreshedContent.id = refreshedContent.trailerInfo.id
       refreshedContent.subtitleTracks = []
       refreshedContent.subtitleConfig = invalid
-      refreshedContent.id = refreshedContent
     end if
 
     prepareToStartVideo(refreshedContent, 0)
