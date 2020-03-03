@@ -297,6 +297,62 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 
 
+# Experiments
+We may want to see how a new feature will affect the app's metrics from a small group of our users before rolling out the feature to everyone on a given  platform. To do this, we will need to use the popper experiment system to let the app know when an experimental feature should be seen. Below are the details of this process.  
+
+## Setting up the experiment within the Popper Experiment System:
+
+- Set up an experiment JSON file in the popper-config github repo under the namespaces > [NameSpace] > offers. Name the JSON something unique for your experiment: i.e. "roku_trailers.json". Note that we can only have one live experiment per namespace per device? So if we have 4 namespaces, then a max of 4 experiments can be seen on one device. However, in most cases, we will only need to ever have one namespace to contain all of the Roku experiements.
+
+- Each experiment JSON file specifies the number of treatments in a given experiment. For a boolean experiment (A/B test), there will be 2 treatments: on and off ("on" and "control"). Each experiment __must have__ at least one treatment named "control". Other treatments can be named arbitrarily, but typically we use "on" for boolean experiments.
+
+- Each experiment JSON file also specifies the resource associative array associated with each treatment. It is considered best practice to use the values in the resource associative array, rather than using the treatment name to place devices into an experiment experience. A resource associative array is a list of properties that the client code can use during the experiment: i.e. background color. Rather than placing the properties in the client code, we have the option of externalizing the properties in popper so it is easy to make changes in Popper during an experiment without touching the client code.
+
+- Each experiment JSON file also specifies the different time phases of the experiment and when each phase ends. Typically there will be a "qa" phase and a "production" phase.
+
+  Please note that during the "qa" phase, in a response from the Popper API, the experiment name will be prepended with the string "qa.". For example, an experiment with the name `roku_vitg` will be rendered as `qa.roku_vitg` during the qa phase.
+
+- For more infoformation on how to format the experiment JSON files, see the [Popper Config Github repo and its ReadMe file](https://github.com/adRise/popper-config).
+
+
+## Setting up the experiment within the Roku Code:
+- Within TubiExperiments.brs, set up a default experiment resource. Although the popper experiment system can set a default value, we should still set a default resource client-side in case the app cannot communicate to the backend. As previously stated, the resource values provide the code a way to externalize the properties of a given experiment. Locate the defaultResources associative array within the TubiExperiments.brs file and add the default resource associative array within the appropriate namespace.  <br> For example:
+
+	```
+	defaultResources: {
+		RokuNamespace: {
+			roku_trailers: {
+				background: "FF0000FF",
+				delay: 5000
+			}
+      	}
+	}
+	```
+
+- For most experiments, you can stop there. But if you wish to have a default value, then you can set one up. The default value will also be returned by getExperimentValue() when a device is placed into the "control" experiment bucket. To add the default value within the BRS file, you should modify the RokuNamespace associative array within the defaultValues associative array. <br>For example:
+	```
+	defaultValues: {
+		RokuNamespace: {
+			roku_trailers: "off"
+      	}
+	}
+	```
+- After you have set everything up, then you can have your code check which experiment is turned on and display to the user that experiment. To do this, you simply have to add somewhere in your code (where it makes sense) a call to the getExperimentResource() method to check if an experiment has been turned on.  <br> For example:
+	```
+	if getExperimentResource("RokuNamespace", "roku_trailers") = "on"
+		'//Do something to turn on the experiment throughout the app
+	end if
+	```
+- Alternately, you can call the getExperimentResource() method to get the associative array associated with the experiment and do the appropriate things that are particular to your experiment.  <br> For example:
+	```
+	'//Set the background color based on the experiment
+	properties = getExperimentResource("RokuNamespace", "roku_trailers")
+	if properties.background <> invalid
+		m.background.color = properties.background
+	end if
+	```
+- Calling getExperimentValue() to return the experiment treatment name, is also possible, though it is not considered best practice, due to resources having more functionality on the Popper server. For example, by updating the default resource in Popper Config, it is possible to update all devices to a specific experiment experience without changing any client code.
+
 
 # Contributing
 
