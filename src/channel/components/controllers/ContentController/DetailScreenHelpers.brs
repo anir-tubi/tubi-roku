@@ -1033,9 +1033,12 @@ Function resumeHelper(detailScreen)
   episode = getEpisodeContent(detailScreen.content)
   if episode <> invalid then
     nowPos = 0
-    ' find the position in global history
-    history = m.global.historyIds.findNode(episode.id)
-    if m.deepLinkContent = invalid or m.deepLinkContent.deepLinkType = "season" or m.deepLinkContent.deepLinkType = "series"
+    ' using nowPos that was passed in with deeplink, when playback initiated via deeplink
+    if m.deeplinkContent <> invalid and episode.nowPos > 0
+      nowPos = episode.nowPos
+    else
+      ' find the position in global history
+      history = m.global.historyIds.findNode(episode.id)
       if history <> invalid then
         nowPos = history.nowPos
       end if
