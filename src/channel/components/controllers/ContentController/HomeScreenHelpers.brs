@@ -167,3 +167,20 @@ Function onHomescreenContentReady(msg)
   homeScreen.isLoading = false
 End Function
 
+
+' onHomeSuccessResponse
+'
+' this is the callback from Home screen success data
+' @response : ContentNode
+function onHomeSuccessResponse(response)
+
+end function
+
+
+' onHomeErrorResponse
+' 
+' this is the callback from Home screen error data
+' @error : ContentNode
+function onHomeErrorResponse(error)
+
+end function

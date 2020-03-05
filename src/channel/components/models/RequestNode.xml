@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "RequestNode" extends="ContentNode">
+  <interface>
+    <!-- input field is an associative array which contains name, url & options(query params & method) -->
+    <field id="input" type="assocarray" />
+  </interface>
+</component>

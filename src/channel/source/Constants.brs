@@ -294,6 +294,11 @@ Function getConstants()
   '  YY00763924H: true
   '}  
   constants.idsToLog = {}
+  
+  ' api request Types which will be used in GeneralTask for parsing
+  constants.api = {}
+    constants.api.requestTypes = {}
+      constants.api.requestTypes.homeScreen = "getHomeScreen"
 
   constants.urls = {}
     'ad server url

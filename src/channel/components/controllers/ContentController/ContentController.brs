@@ -4,6 +4,13 @@ Function init()
   m._ = rodash()
 
   m.constants = m.global.constants
+  
+  ' initiate GeneralTaskHelper by passing caller context
+  ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskHelper
+  'GeneralTaskHelper(m)
+  ' initiate GeneralTask
+  'm.generalTask = CreateObject("roSGNode", "GeneralTask")
+  'initiateHomeData()
 
   Request = TubiRequest()
   Auth = TubiAuth(m.constants, Request)
@@ -122,6 +129,34 @@ Function init()
      m.stillWatchingTimeout = getExperimentResource("roku", "roku_still_watching_timeout_2", false).timeout
   end if
   
+End Function
+
+
+' initiateHomeData
+
+' constructs requestType, url, params and responseType for api request and invokes makeTaskRequest helper
+Function initiateHomeData()
+
+  requestType = m.constants.api.requestTypes.homeScreen
+  url = "https://uapi.adrise.tv/matrix/homescreen"
+  options = {
+    params: {
+      "user_id" : "46466412",
+      "device_id": "2366ec6e-7e5e-58e4-96e1-da33e5fb0f73",
+      "app_id" : "tubitv",
+      "includeempty" : "true",
+      "isKidsMode" : "false",
+      "expand": "1",
+      "limit": "12",
+      "platform": "roku"
+    },
+    method: "GET"  
+  }
+  responseType = "node"
+  
+  ' all params are mandatory
+  m.makeTaskRequest(requestType, url, options, m.generalTask, onHomeSuccessResponse, onHomeErrorResponse, responseType)
+
 End Function
 
 Function displayExitModal(trackingPageInfo)

@@ -231,6 +231,7 @@ Function tubihttp_handleEvent(message As Object) As Object
 
           else  ' refreshing the auth token failed so just attach the response info and finish
             m.response = {
+              headers: message.GetResponseHeaders()
               code: code
               data: message.GetString()
               failReason: message.GetFailureReason()
@@ -245,6 +246,7 @@ Function tubihttp_handleEvent(message As Object) As Object
         else
           ' Here on success or on retry limit
           m.response = {
+            headers: message.GetResponseHeaders()
             code: code
             data: message.GetString()
             failReason: message.GetFailureReason()

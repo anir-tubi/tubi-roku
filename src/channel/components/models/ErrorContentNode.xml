@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "ErroContentNode" extends="ContentNode">
+  <interface>
+    <field id="code" type="Integer" />
+  </interface>
+</component>
