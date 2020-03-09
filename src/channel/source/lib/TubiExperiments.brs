@@ -55,7 +55,8 @@ Function TubiExperiments(constants) as Object
       }
       roku: {
         roku_still_watching_timeout_1 : {"timeout" : 0},
-        roku_still_watching_timeout_2 : {"timeout" : 0}
+        roku_still_watching_timeout_2 : {"timeout" : 0},
+        roku_kids_mode_persistence : { "enabled" : false }
       }
     }
 
