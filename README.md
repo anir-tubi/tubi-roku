@@ -65,9 +65,7 @@ Pro tip: add these environment variables to your .bashrc or .bash_profile file
 
 6\. Make a development build, sideload to the device, and attach to the developer console
 
-```
-$ gulp install
-```
+`$ gulp install`
 
 
 
@@ -116,7 +114,7 @@ Submission releases are releases that are sent to Roku.
 - Make a new PR of the `x_y_branch` against master. Once the PR has been merged _DO NOT_ delete the `x_y_branch`, as this will remain the source of truth for what is in production.
 
 3\. Create a staging channel for the minor build
-- Run `gulp install --staging`
+- Run `$ gulp install --staging`
 
 - In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to create a new private channel.
 
@@ -129,19 +127,17 @@ Submission releases are releases that are sent to Roku.
 
 4\. Deploy to staging
 
-* Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now,
+- Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now,
 [https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+  - Navigate to your `.aws` directory (typically found at `~/.aws`)
 
-
-* Navigate to your `.aws` directory (typically found at `~/.aws`)
-
-* In the `config` file set the `AWS_DEFAULT_REGION `.
+  - In the `config` file set the `AWS_DEFAULT_REGION `.
 
 	```
 	[default]
 	region = us-west-1
 	```
-* In the `credentials` file, set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+  - In the `credentials` file, set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
 
 	```
 	[default]
@@ -149,11 +145,9 @@ Submission releases are releases that are sent to Roku.
 	aws_secret_access_key = <<aws_secret_access_key>>
 	```
 
-* Upload the starter components and remote components onto the staging AWS server, run:
+  - Upload the starter components and remote components onto the staging AWS server, run:
 
-```
-$ gulp stage
-```
+    `$ gulp stage`
 
 5\. Run functional tests against staging
 
@@ -163,9 +157,9 @@ TBD
 
 6\. Submit build to Roku
 - Run the following command to increment the build version number, create a new tag for the build,  and output .pkg files that can be submitted to Roku.
-```
-$ gulp release
-```
+
+  `$ gulp release`
+
 - In a browser, visit [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to update the "Tubi - Free Movies & TV" channel with the `/build/roku_x_y_z.pkg` file.
 
 7\. Update the starter components and remote component files to the CDN
@@ -181,7 +175,7 @@ $ gulp release
 
 8\. Email Roku Partner Success to let them know the build is in their queue.
 
-9\. Push the tag corresponding to the build that was just pushed to Github `git push origin x_y_z`
+9\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
 
 10\. Create a release on Github
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
@@ -210,23 +204,21 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 4\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates.
 
-5\. Run `gulp bump` in order to increment the version number.
+5\. Run `$ gulp bump` in order to increment the version number.
 
 6\. Deploy to staging
 
-* Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now,
-[https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+- Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now, [https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 
+  - Navigate to your `.aws` directory (typically found at `~/.aws`)
 
-* Navigate to your `.aws` directory (typically found at `~/.aws`)
-
-* In the `config` file set the `AWS_DEFAULT_REGION `.
+  - In the `config` file set the `AWS_DEFAULT_REGION `.
 
 	```
 	[default]
 	region = us-west-1
 	```
-* In the `credentials` file, set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+  - In the `credentials` file, set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
 
 	```
 	[default]
@@ -234,13 +226,14 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 	aws_secret_access_key = <<aws_secret_access_key>>
 	```
 
-* Upload the starter components and remote components onto the staging AWS server, run:
+- Run multifactor authentication for AWS. Typically this means running `$ vauth`
+- Upload the starter components and remote components onto the staging AWS server, run:
 
-`$ gulp stage`
+  `$ gulp stage`
 
 7\. Create a CH ticket with any changes that have been made and give to the QA team for manual testing. Once the QA team has signed off on the build...
 
-8\. Run `gulp bump` in order to increment the version number once more (the QA build should not be the same version number as the production build).
+8\. Run `$ gulp bump` in order to increment the version number once more (the QA build should not be the same version number as the production build).
 
 9\. Ready the release branch for review
 
@@ -266,9 +259,9 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 12\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
 - You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirmements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
-	```
-	pyenv
-	```
+
+  `$ pyenv`
+
 - In terminal, navigate to your adrise_infrastructure repo and run the installation iunstructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure)
 - Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/).
 
@@ -280,7 +273,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - Monitor various metrics for signs of any issues:
 	- [Ad impressions per second](https://app.datadoghq.com/dashboard/ckr-vrw-xh4/ad-server-business-metrics?from_ts=1563412592034&to_ts=1564017392034&live=true&tile_size=m&fullscreen_widget=80673160&fullscreen_section=overview)
 
-14\. Push the tag corresponding to the build that was just pushed to Github `git push origin x_y_z`
+14\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
 
 15\. Create a release on Github
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
