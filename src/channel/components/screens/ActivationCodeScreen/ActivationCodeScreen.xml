@@ -12,19 +12,22 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   
   <interface>
     <!-- INPUT -->
+      <!-- Set to true whenever a new activation code should be called. -->
+      <field id="getActivationCode" type="boolean" value="false" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
       <!-- Set to true if the user has successfully registered -->
       <field id="activationSuccess" type="boolean" value="false" alwaysNotify="true"/>
 
-      <!-- Set to true when the "Skip" button on the error modal is selected -->
-      <field id="skipButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
-
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>
+
+      <!-- If there is an error with the activation code, then set the error type to this field. -->
+      <field id="errorType" type="string" alwaysNotify="true"/>
       
       <!-- Keeps the information used for user tracking - structure looks like:
         {
@@ -49,8 +52,8 @@
     <Group
       id="SimpleRegistrationGroup">
       <Label
+        id="pageHeading"
         translation="[0,296]"
-        text="Visit tubi.tv/activate"
         horizAlign="center"
         width="1920">
         <Font
@@ -60,7 +63,7 @@
       </Label>
 
       <Label
-        text="from a browser on another device and enter the code below"
+        id="pageSubheading"
         translation="[710,387]"
         horizAlign="center"
         wrap="true"

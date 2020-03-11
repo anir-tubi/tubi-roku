@@ -18,12 +18,11 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   
   <interface>
     <!-- INPUTS -->
-      <!-- MetadataFetchTask response for matrix homescreen (all categories and content) -->
-      <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
-      
+    
       <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
       <field id="content" alias="CategoryGridList.content" />
 
@@ -32,6 +31,9 @@
       
       <!-- hides or shows the loading spinner and removes any existing content on the CategoryGridList! -->
       <field id="isLoading" type="boolean" />
+
+      <!-- tells the rowList to refresh because rows have been added/removed and that may affect the look of some rows that have different heights compared to other rows  -->
+      <field id="setNewRowHeights" type="boolean" alias="CategoryGridList.setNewRowHeights" />
 
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
       <field id="signedIn" type="boolean" value="false" />
@@ -127,22 +129,11 @@
         vertAlignment="custom"
         opacity="0.5"
         translation="[85,85]">
-        <Label
-          text="PRESS"
-          vertAlign="center"
-          height="47"
-          translation="[0,2]">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="22" />
-        </Label>
         <Poster
           uri="pkg:/images/back.png"
           width="47"
           height="47"/>
         <Label
-          text="FOR MENU"
           id="callToAction"
           vertAlign="center"
           height="47"

@@ -10,18 +10,14 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   
   <interface>
-    <!--
-      - error = {
-      -   title: ...
-      -   message: ...
-      -   buttonText: ...
-      - }
-      -
-      -->
-    <field id="error" type="assocarray" />
-    
+    <!-- INPUT -->
+    <!-- Display a connection error if this field is set-->
+    <field id="connectionError" type="boolean" alwaysNotify="true"/>
+
+    <!-- OUTPUT -->
     <field id="buttonSelected" type="boolean" alwaysNotify="true"/>
   </interface>
 

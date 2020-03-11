@@ -10,11 +10,18 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUTS -->
       <!-- The mode used by info panel, one of: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
       <field id="mode" type="string" alias="DetailInfoPanel.mode" />
+
+      <!-- The following are the strings associated with this UI element -->
+      <field id="stringQueueButton" type="string"/>
+      <field id="stringNoQueueButton" type="string"/>
+      <field id="stringChannelButton" type="string"/>
+      <field id="stringNoHistoryButton" type="string"/>
 
       <!-- Pass through signal to the info panel that the height/placement should be recalculated -->
       <field id="calculateInfoHeight" type="boolean" alias="DetailInfoPanel.calculateHeight" />
@@ -66,18 +73,6 @@
       <!-- interface for moving the focus on the details screen menu to a specific item-->
       <field id="jumpToItem" type="integer" alias="Menu.jumpToItem" />
 
-      <!-- used to update the text on the addToQueue button -->
-      <field id="addToQueueTitle" type="string" value="Add to queue" alwaysNotify="true" />
-
-      <!-- used to update the text on the removeQueue button -->
-      <field id="removeQueueTitle" type="string" value="Remove from queue" alwaysNotify="true" />
-
-      <!-- used to update the text on the removeHistory button -->
-      <field id="removeHistoryTitle" type="string" value="Remove from history" alwaysNotify="true" />
-
-      <!-- used to update the text on the channel button -->
-      <field id="channelName" type="string" alwaysNotify="true" />
-
       <!-- informs the details screen if the content controller is waiting for a user category update from the server -->
       <field id="isWaitingForServerResponse" type="boolean" value="false" />
 
@@ -97,6 +92,9 @@
       <field id="content" type="node" />
 
     <!-- OUTPUTS -->
+
+      <!-- Should the full description be displayed -->
+      <field id="fullDescriptionSelected" type="boolean" alwaysNotify="true" />
 
       <!-- set to true when the suer selects the 'Resume' menu button -->
       <field id="resumeSelected" type="boolean" alwaysNotify="true" />
@@ -176,35 +174,27 @@
     <!-- All the potential menu items, will be dynamically added or removed based on 'content' -->
     <DetailMenuItemContentNode
       id="ResumeMenuItem"
-      title="Resume" 
       iconUrl="pkg:/images/icon-resume.png"/>
     <DetailMenuItemContentNode
       id="PlayMenuItem"
-      title="Play"
       iconUrl="pkg:/images/icon-play.png" />
     <DetailMenuItemContentNode
       id="EpisodesMenuItem"
-      title="Episodes list"
       iconUrl="pkg:/images/icon-all-episodes.png" />
     <DetailMenuItemContentNode
       id="AddQueueMenuItem"
-      title="Add to queue"
       iconUrl="pkg:/images/icon-add-to-queue.png" />
     <DetailMenuItemContentNode
       id="RemoveQueueMenuItem"
-      title="Remove from queue"
       iconUrl="pkg:/images/icon-remove-from-queue.png" />
     <DetailMenuItemContentNode
       id="RemoveHistoryMenuItem"
-      title="Remove from history"
       iconUrl="pkg:/images/icon-remove-from-history.png" />
     <DetailMenuItemContentNode
       id="ChannelMenuItem"
-      title=""
       iconUrl="pkg:/images/icon-channel.png" />
     <DetailMenuItemContentNode
       id="WatchTrailerMenuItem"
-      title="Watch Trailer"
       iconUrl="pkg:/images/icon-trailer.png" />
   
     <Spinner
@@ -246,8 +236,8 @@
             id="RelatedRowLabel"
             translation="[0,0]">
             <TubiContentNode
-              role="content"
-              title="You Might Also Like"/>
+              id="RelatedRowLabelContent"
+              role="content"/>
           </CategoryGridRowLabel>
           <PosterGrid
             id="RelatedGrid"

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="SignOutPanel" extends="Panel" >
-  <script type="text/brightscript" uri="SignOutPanel.brs" />
 
   <interface>
-    <field id="name"   type="string"/>
     <field id="email"  type="string"/>
+    <field id="title" alias="Title.text" type="string"/>
+    <field id="description" alias="Name.text" type="string"/>
+    <field id="description2" alias="Email.text" type="string"/>
     <field id="offset" alias="Offset.translation"/>
   </interface>
 
@@ -14,8 +15,7 @@
       <Label 
         id="Title"
         height="73"
-        vertAlign="bottom"
-        text="Sign Out">
+        vertAlign="bottom">
         <Font
          role="font"
          uri="pkg:/fonts/Vaud-SemiBold.ttf"

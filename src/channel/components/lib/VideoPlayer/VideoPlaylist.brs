@@ -69,7 +69,7 @@ Function onVideoStateChange(msg)
     ' right after error state occurs.
     m.didAdvanceDrm = advanceDrmOnContent(content)
     if m.didAdvanceDrm <> true and advancePlaylist() <> true
-      m.top.errorMsg = "There was an issue with video playback."  'is used in error modal
+      m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
       m.top.state = state   'triggers error modal in ContentController
     end if
   else if state = "stopped" and m.VideoState = "play"
@@ -223,6 +223,7 @@ Function onRefreshResponse(msg)
       refreshedContent.id = refreshedContent.trailerInfo.id
       refreshedContent.subtitleTracks = []
       refreshedContent.subtitleConfig = invalid
+      refreshedContent.id = refreshedContent
     end if
 
     prepareToStartVideo(refreshedContent, 0)
@@ -237,7 +238,7 @@ Function onRefreshError(msg)
   if m.VideoState = "refresh" or m.VideoState = "pause"
     m.VideoState = "stop"
     if advancePlaylist() <> true
-      m.top.errorMsg = "Could not refresh the content or play next content."
+      m.top.errorMsg = getTranslation("videoPlayer_error_refresh_description")
       m.top.state = "error"
     end if
   end if
@@ -281,7 +282,6 @@ End Function
 ' Reset video player state to a basic state
 ' @content: TubiContentNode
 Function resetVideoPlayerState(content = invalid)
-  m.top.playNext = false
   m.LoadingProgressBar.progress = 0
   m.LoadingMessage.text = ""
   cancelReplayCaptions()

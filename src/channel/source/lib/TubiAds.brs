@@ -244,9 +244,7 @@ function tubiAds_populateUrlRainmaker(episode) As String
     params["user_id"] = authInfo.userId
   end if
 
-  baseUrl = m.constants.urls.adsBaseUrlRainmaker + m.constants.analyticsPlatform
-
-  return m.request.addParamsToUrl(baseUrl, params)
+  return m.request.addParamsToUrl(m.constants.urls.adsBaseUrlRainmaker, params)
 end function
 
 
@@ -284,7 +282,12 @@ function tubiAds_getAdsListViaRoku(episode)
   end if
 
   'get the url for making the ad call
-  url = m.populateUrlRainmaker(episode)
+  url = ""
+  if (m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.rainmaker = true) or m.kidsModeEnabled = true
+    url = m.populateUrlRainmaker(episode)
+  else
+    url = m.populateUrlAdrise(episode)
+  end if
 
   'set the url for the Roku Advertising Framework
   m.roAdFramework.setAdUrl(url)
@@ -410,7 +413,7 @@ function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
           ' loading bar to sit empty and look like nothing is happening.  It will
           ' also trigger the ads messaging to appear.
           m.controlNode.adProgress = 1
-          m.controlNode.loadingMessage = "Your program will begin after these messages…"
+          m.controlNode.displayAdLoadingMessage = true
 
           ' Setting this is REQUIRED in order for setAdBufferRenderCallback to
           ' trigger callbacks.  The empty second argument just suppresses
@@ -424,7 +427,7 @@ function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
           ' This will hide the buffering messaging and reset the progress bar
           ' before the video loading takes over status
           m.controlNode.adProgress = 0
-          m.controlNode.loadingMessage = ""
+          m.controlNode.displayAdLoadingMessage = false
           m.containerNode.visible = false
           m.containerNode = invalid
           m.controlNode = invalid

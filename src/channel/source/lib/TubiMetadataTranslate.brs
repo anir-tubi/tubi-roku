@@ -1017,9 +1017,9 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
 
   if container.type = constants.ui.categoryTypes.preview
     if constants.deviceInfo.limitedUI <> true
-      if m.experiments.getExperimentValue("RokuNamespace", "roku_vitg_2") = "vitg_large"
+      if m.experiments.getExperimentValue("RokuNamespace", "roku_vitg") = "vitg_large"
         gridItemType = constants.ui.gridItemTypes.vitg_large
-      else if m.experiments.getExperimentValue("RokuNamespace", "roku_vitg_2") = "vitg_small"
+      else if m.experiments.getExperimentValue("RokuNamespace", "roku_vitg") = "vitg_small"
         gridItemType = constants.ui.gridItemTypes.vitg_small
       end if
     end if

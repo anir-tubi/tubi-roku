@@ -32,6 +32,7 @@ Function init()
   m.top.observeField("kidsModeEnabled", "onKidsModeEnableChange")
   m.top.observeField("contentUpdated", "onSearchContentChange")
 
+
   m.SearchText.color = m.global.constants.ui.colors.titleHeader
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
@@ -58,8 +59,17 @@ Function init()
   m.bResultsInFocus = false
 
   m.top.screenLevel = m.constants.ui.screenLevels.searchScreen
-
+  setSearchStrings()
   loadSearchResults(true)'//load the default search results
+End Function
+
+
+Function setSearchStrings()
+  BackLabel = m.top.findNode("callToAction")
+  BackLabel.text = getTranslation("goBack_menu")
+  m.sDefaultSearchText = getTranslation("screenSearch_defaultSearch")
+  m.KidsModeMessage.text = getTranslation("screenSearch_kidsWarning")
+  m.spinner.text = getTranslation("screenSearch_loading")
 End Function
 
 
@@ -123,11 +133,7 @@ End Function
 Function displayNoResults()
   m.ResultGrid.visible = false
   m.NoResultsMessage.visible = true
-  message = "We couldn't find results for "
-  message +=  "'" + m.SearchText.text + "'" 
-  message += chr(10) 
-  message += "Please try again"
-  m.NoResultsMessage.text = message
+  m.NoResultsMessage.text = getTranslation("screenSearch_noResults", {term: m.top.searchText})
 End Function
 
 
@@ -165,7 +171,7 @@ Function onSearchContentChange()
   if m.top.content <> invalid and m.top.content.getChildCount() > 0 then
     if m.top.content.isDefaultSearchResults = true
       '//display special text when the default search is displaying 
-      m.SearchText.text = "Search for movies, TV shows, and people"
+      m.SearchText.text = m.sDefaultSearchText
     end if
     m.ResultGrid.visible = true
     m.NoResultsMessage.visible = false

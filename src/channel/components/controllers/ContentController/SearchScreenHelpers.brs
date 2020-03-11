@@ -8,6 +8,7 @@ Function showSearchScreen(constants)
   searchScreen.observeFieldScoped("searchText", "onSearchTextChanged")
   m.top.observeField("searchResponse", "onSearchResultsReceived")
 
+
   searchScreen.id = m.constants.ui.screenIds.searchScreen
   searchScreen.kidsModeEnabled = m.kidsModeEnabled
   searchScreen.backgroundUriList = [m.defaultBackgroundUri]
@@ -15,6 +16,7 @@ Function showSearchScreen(constants)
 
   pushScreen(searchScreen, true, true)
 End Function
+
 
 
 Function onSearchContentSelected(msg)
@@ -51,14 +53,25 @@ Function onSearchTextChanged(msg)
   end if
 End Function
 
+
+Function getSearchScreen()
+  screen = invalid
+  searchScreen = currentScreen()
+  if searchScreen <> invalid and searchScreen.id = m.constants.ui.screenIds.searchScreen
+    screen = searchScreen
+  end if
+  return screen
+End Function
+
+
 '''''''''''''''''''''
 ' onSearchResultsReceived
 '
 ' This is the function to react to the Search API response
 Function onSearchResultsReceived()
   tubiLog("SearchScreenHelpers.onSearchResultsReceived")
-  searchScreen = currentScreen()
-  if searchScreen.id = m.constants.ui.screenIds.searchScreen and searchScreen <> invalid and m.top.searchResponse <> invalid
+  searchScreen = getSearchScreen()
+  if searchScreen <> invalid and m.top.searchResponse <> invalid
     response = m.top.searchResponse.response
     if response.code >= 200 and response.code < 300 then 
       content = m.top.searchResponse.convertedMetadata

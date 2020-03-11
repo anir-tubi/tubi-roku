@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="SettingsMenuPanel" extends="ListPanel" >
   <script type="text/brightscript" uri="SettingsMenuPanel.brs"/>
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUTS -->
-      <field id="signedIn" type="boolean" />
+      <!-- associative array that will indocate if the user is signed in and if so, the aa will contain their info.  -->
+      <field id="signInInfo" type="assocarray" alwaysNotify="true" />
 
     <!-- OUTPUTS -->
       <field id="content" alias="SettingsMenu.content"/>
@@ -26,23 +28,18 @@
         role="content">
         <DetailMenuItemContentNode
           id="ParentalControls"
-          title="Parental Controls"
           iconUrl="pkg:/images/icon-parental.png" />
         <DetailMenuItemContentNode
           id="AboutButton"
-          title="About"
           iconUrl="pkg:/images/icon-about.png" />
         <DetailMenuItemContentNode
           id="PrivacyPolicyButton"
-          title="Privacy Policy"
           iconUrl="pkg:/images/icon-privacy.png" />
         <DetailMenuItemContentNode
           id="TermsOfServiceButton"
-          title="Terms of Service"
           iconUrl="pkg:/images/icon-terms.png" />
         <DetailMenuItemContentNode
           id="SignInOutButton"
-          title="Sign Out"
           iconUrl="pkg:/images/icon-sign-in.png" />
       </ContentNode>
     </MarkupList>

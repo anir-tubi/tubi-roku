@@ -13,6 +13,7 @@ Function showDetailScreen(content)
     detailScreen.observeFieldScoped("resumeSelected", "onResume")
     detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
     detailScreen.observeFieldScoped("episodeListSelected", "onEpisodeList")
+    detailScreen.observeFieldScoped("fullDescriptionSelected", "onDescriptionSelected")
     detailScreen.observeFieldScoped("addToQueueSelected", "onAddToQueueSelected")
     detailScreen.observeFieldScoped("removeFromQueueSelected", "onRemoveFromQueueSelected")
     detailScreen.observeFieldScoped("removeFromHistorySelected", "onRemoveFromHistorySelected")
@@ -35,6 +36,7 @@ Function showDetailScreen(content)
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
     detailScreen.kidsModeEnabled = m.kidsModeEnabled
+    setDetailStrings(detailScreen)
 
     ' Setting the content on the detail screen here prior to getting a response back from server with full info,
     ' so that it may be used for analytics in the case of failing to fetch the full info from the server.
@@ -48,7 +50,6 @@ Function showDetailScreen(content)
       populateDetailScreen(detailScreen, content, true)  
     end if
     
-  
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
     getSingleContentFromServer(detailScreen, content)
   else
@@ -61,6 +62,12 @@ Function showDetailScreen(content)
   end if
 End Function
 
+
+Function setDetailStrings(screen)
+  screen.stringQueueButton = getTranslation("screenDetails_button_queue")
+  screen.stringNoQueueButton = getTranslation("screenDetails_button_NoQueue")
+  screen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
+End Function
 
 Function onDetailBackgroundChange(msg)
   tubiLog("DetailScreenHelpers.onDetailBackgroundChange")
@@ -175,11 +182,11 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     detailScreen.directors = stateSource.directors
     detailScreen.starring = stateSource.actors
 
-    detailScreen.isBookmark = (bookmark <> invalid)
-    detailScreen.isHistory = (history <> invalid)
+    setIsBookmark(detailScreen, (bookmark <> invalid))
+    setIsHistory(detailScreen, (history <> invalid))
     '//::TODO:: HARDCODE:: right now in kids mode, there are no channels showing up, so hardcode it so the channel's button doesn't show
     detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "" and m.kidsModeEnabled = false)
-    detailScreen.channelName = content.channelName
+    detailScreen.stringChannelButton = getTranslation("screenDetails_button_gotoChannel", {channel: content.channelName})
     detailScreen.length = stateSource.length  'needed to compute the resume bar on the resume button
 
     nResumePoint = 0
@@ -193,7 +200,7 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
       '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct
       nResumePoint = nSavedPosition
       if nSavedPosition > 0
-        detailScreen.isHistory = true
+        setIsHistory(detailScreen, true)
       end if
     end if
     detailScreen.resumePoint = nResumePoint
@@ -482,7 +489,7 @@ Function onSingleContentError(msg)
   else if m.refreshingDetailCache = true
     m.refreshingDetailCache = false
   else
-    message = "Could not retrieve content information from server."
+    message = getTranslation("screenDetails_error_getContent_description")
     content = getDetailScreenContent(detailScreen)
   
     ' set up the error modal dialog
@@ -607,12 +614,12 @@ Function onAddToQueue(detailScreen)
     content = getDetailScreenContent(detailScreen)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "sign-in-bookmark", m.Tracking, m.constants)
 
-    title = "Please Sign In"
-    message = "You must be signed in to add a title to your queue."
-    buttons = ["Sign in or Register", "Cancel"]
+    title =  getTranslation("dialog_signIn_title")
+    message = getTranslation("screenDetails_error_addQueue_description")
+    buttons = [getTranslation("screenDetails_error_addQueue_buttonRegister"), getTranslation("dialog_button_cancel")]
     showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
   else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
-    detailScreen.addToQueueTitle = "Adding..."
+    detailScreen.stringQueueButton = getTranslation("screenDetails_button_queueNow")
     userTask = CreateObject("roSGNode", "AuthTask")
     userTask.functionName = "addToQueue"
     userTask.content = detailScreen.content
@@ -661,7 +668,7 @@ Function onBookmarked(msg) As Void
   detailScreen.isWaitingForServerResponse = false
 
   if bookmarkId = invalid or bookmarkId = ""
-    detailScreen.addToQueueTitle = "Add to queue"
+    detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
     content = getDetailScreenContent(detailScreen)
     
     responseCode = -1234
@@ -672,7 +679,7 @@ Function onBookmarked(msg) As Void
     ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.addBookmarkError, responseCode)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", errorCode, m.Tracking, m.constants)
-    message = "Something went wrong while trying to add the content to your queue."
+    message = getTranslation("screenDetails_error_queue_description")
 
     modalInfo = {
       message: getErrorMessage(message, errorCode)
@@ -689,10 +696,27 @@ Function onBookmarked(msg) As Void
   end if
 
   tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
-  detailScreen.isBookmark = true
+  setIsBookmark(detailScreen, true)
 
   sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
   onHistoryQueueChange(m.constants.ui.categoryIds.queue)
+End Function
+
+
+Function setIsBookmark(detailScreen, isBookmark)
+  'reset the value in the case that add to queue button was pressed and the button title is currently "Adding..."
+  detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
+  detailScreen.stringNoQueueButton = getTranslation("screenDetails_button_noQueue")
+
+  detailScreen.isBookmark = isBookmark
+End Function
+
+
+Function setIsHistory(detailScreen, isHistory)
+  'reset the value in the case that remove from history button was pressed and title is currently "Removing..."
+  detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
+
+  detailScreen.isHistory = isHistory
 End Function
 
 
@@ -706,7 +730,7 @@ End Function
 Function onRemoveFromQueue(detailScreen)
   tubiLog("DetailScreenHelpers.onRemoveFromQueue")
   if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
-    detailScreen.removeQueueTitle = "Removing..."
+    detailScreen.stringQueueButton = getTranslation("screenDetails_button_removing")
     userTask = CreateObject("roSGNode", "AuthTask")
     userTask.functionName = "removeFromQueue"
     content = detailScreen.content.clone(false)
@@ -744,11 +768,11 @@ Function onBookmarkRemoved(msg) As Void
 
   if result = invalid or result.response.code <> 204 then
     code = ""
-    message = "Something went wrong while removing the content from your queue."
+    message = getTranslation("screenDetails_error_noQueue_description")
     if result <> invalid
       code = result.response.code
     end if
-    detailScreen.removeQueueTitle = "Remove from queue"
+    detailScreen.stringQueueButton = getTranslation("screenDetails_button_noQueue")
     content = getDetailScreenContent(detailScreen)
 
     ' set up the error modal dialog
@@ -782,7 +806,7 @@ Function onRemoveFromHistory(detailScreen)
     history = m.global.historyIds.findNode(detailScreen.content.id)
     if history <> invalid and history.historyId <> invalid
       content = detailScreen.content.clone(false)
-      detailScreen.removeHistoryTitle = "Removing..."
+      detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_removing")
       content.historyId = history.historyId
       if m.userTask <> invalid
         m.NodeHelpers.unobserveAllScoped(m.userTask)
@@ -822,12 +846,11 @@ Function onHistoryRemoved(msg) As Void
 
   if result = invalid or result.response.code <> 204 then
     code = ""
-    message = "Something went wrong while removing the content from your history."
+    message = getTranslation("screenDetails_error_noHistory_description")
     if result <> invalid
       code = result.response.code
     end if
     content = getDetailScreenContent(detailScreen)
-    detailScreen.removeHistoryTitle = "Remove from history"
 
     ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeHistoryError, code)
@@ -842,8 +865,8 @@ Function onHistoryRemoved(msg) As Void
     showErrorModal(modalInfo, onRemoveFromHistoryRetry, [detailScreen])
     return
   end if
-
-  detailScreen.isHistory = false
+  
+  setIsHistory(detailScreen, false)
   sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask, m.constants)
   onHistoryQueueChange(m.constants.ui.categoryIds.history)
 End Function
@@ -886,6 +909,21 @@ Function onEpisodeList(msg)
 End Function
 
 
+Function onDescriptionSelected(msg)
+  tubiLog("DetailScreenHelper.onDescriptionSelected")
+  detailScreen = msg.getRoSGNode()
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION"  'TODO: Use the "VIDEO_DESCRIPTION" option when it is added to protos
+      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: detailScreen.content.id.toInt()})
+      dialog_action: "SHOW"  'Action enum
+      dialog_sub_type: "video-description"  'max 20 character string
+    }
+  }
+  showDescriptionModal(detailScreen.description, dialogEvent, m.trackingLoggingTask)
+End Function
+
 Function episodesHelper(screen)
   showEpisodeScreenWithoutNavigationTracking(screen.content)
 End Function
@@ -901,7 +939,7 @@ Function trailerHelper(screen)
     end if
 
     if content.title <> invalid
-      trailerContent.title = "Trailer (" + content.title + ")"
+      trailerContent.title = getTranslation("videoPlayer_trailerTitle", {title: content.title})
     end if
 
     trailerContent.streamformat="hls"

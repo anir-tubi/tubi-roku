@@ -3,7 +3,7 @@
 ' Get more info about the experiement
 ' Note: the component calling getExperimentValue using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
-Function getExperimentResource(namespaceName as string, parameterName as string, sendEvent=true as Boolean)
+Function getExperimentResource(namespaceName as string, parameterName as string)
   oMoreInfoReturn = invalid
   
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
@@ -11,9 +11,7 @@ Function getExperimentResource(namespaceName as string, parameterName as string,
     request = TubiRequest()
     experiments = TubiExperiments(m.global.constants)
     oMoreInfoReturn = experiments.getExperimentResource(namespaceName, parameterName)
-    if sendEvent = true
-      sendOutExperimentTracking(namespaceName, parameterName, experiments)
-    end if
+    sendOutExperimentTracking(namespaceName, parameterName, experiments)
   end if
 
   return oMoreInfoReturn
@@ -23,17 +21,15 @@ End Function
 ' Note: the component calling getExperimentValue using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
 '
-Function getExperimentValue(namespaceName as string, parameterName as string, sendEvent=true as Boolean)
+Function getExperimentValue(namespaceName as string, parameterName as string)
   experimentInfo = invalid
-  
+
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
     '//if you cannot track task, then do not proceed
     request = TubiRequest()
     experiments = TubiExperiments(m.global.constants)
     experimentInfo = experiments.getExperimentValue(namespaceName, parameterName)
-    if sendEvent = true
-      sendOutExperimentTracking(namespaceName, parameterName, experiments)
-    end if
+    sendOutExperimentTracking(namespaceName, parameterName, experiments)
   end if
 
   return experimentInfo

@@ -8,6 +8,7 @@
 <component name="Spinner" extends="Group" >
   <script type="text/brightscript" uri="Spinner.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -50,7 +51,6 @@
       <Label
         id="LoadingMessage"
         visible="false"
-        text="Loading..."
         height="66"
         width="66"
         horizAlign="center">

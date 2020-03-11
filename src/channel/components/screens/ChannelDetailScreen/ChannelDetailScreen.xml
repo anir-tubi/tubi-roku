@@ -15,6 +15,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -94,16 +95,6 @@
         vertAlignment="custom"
         opacity="0.5"
         translation="[85,85]">
-        <Label
-          text="PRESS"
-          vertAlign="center"
-          height="47"
-          translation="[0,2]">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="22" />
-        </Label>
         <Poster
           uri="pkg:/images/back.png"
           width="47"

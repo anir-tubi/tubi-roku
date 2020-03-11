@@ -3,12 +3,6 @@
 '
 ' Helper function for onResume and onPlay to launch content
 Function playVideoContent(content As Object, autoplayType As String, position=0 As Integer)
-  
-  m.videoPlayer.shouldMakeNextRequest = true
-  if m.upNextTask <> invalid
-    m.upNextTask.response = invalid
-  end if
-  
   if content <> invalid
     if content.isTrailer
       m.videoPlayer.analyticsMode = "trailer"
@@ -26,9 +20,25 @@ Function playVideoContent(content As Object, autoplayType As String, position=0 
       m.videoPlayer.observeFieldScoped("historyPosition", "onEpisodePosition")
       m.videoPlayer.observeFieldScoped("creditsPosition", "onEpisodeCredits")
       m.videoPlayer.observeFieldScoped("goToNext", "onGoToNext")
-      m.videoPlayer.observeFieldScoped("fetchNextContent", "onFetchNextContent")
       m.videoPlayer.enableAds = true
 
+      ' preload autoplay content;  We don't observe 'error' or 'response' fields
+      ' since they will be evaluated at the creditsCuepoint callback
+      if m.upNextTask = invalid
+        ' m.upNextTask can't just be overwritten, or else it creates two UpNextTasks.
+        ' When m.upNextTask.control = "RUN" happens if it was overwritten, the task's functionName
+        ' actually runs for each of the tasks that had been ever been assigned to m.upNextTask.
+        ' This becomes an issue if a user selects play multiple times.
+        m.upNextTask = CreateObject("roSGNode", "UpNextTask")
+      end if
+      request = {}
+      request.contentId = content.id
+      if m.autoplayContext <> invalid
+        request.categoryId = m.autoplayContext
+      end if
+      request.kidsMode = shouldKidsModeBeSentToServer()
+      m.upNextTask.request = request
+      m.upNextTask.control = "RUN"
     end if
 
     '//Stop the background artwork from transitioning 
@@ -93,8 +103,8 @@ Function onEpisodeCredits()
   tubiLog("VideoHelpers.onEpisodeCredits")
   ' Verify that the UpNextTask has a response and it matches the currently playing content
   currentContent = m.videoPlayer.playlist.getChild(m.videoPlayer.playlistIndex)
-  if m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
-    if m.videoPlayer.creditsPosition > 0 and m.upNextTask.response.getChildCount() > 0
+  if m.videoPlayer.creditsPosition > 0 and m.upNextTask <> invalid and m.upNextTask.response <> invalid and m.upNextTask.request <> invalid and currentContent <> invalid and m.upNextTask.request.contentId = currentContent.id
+    if m.upNextTask.response.getChildCount() > 0
       if m.upNextScreen <> invalid
         m.upNextScreen.unobserveFieldScoped("contentSelected")
         m.upNextScreen.unobserveFieldScoped("backPressed")
@@ -120,8 +130,6 @@ Function onEpisodeCredits()
         }
       }
     end if
-  else
-    m.videoPlayer.creditsPosition = 0   
   end if
 End Function
 
@@ -136,8 +144,6 @@ Function onGoToNext()
     nextContent = addSeriesTitle(nextContent, oldContent)
     stopVideoContent(false)
     playVideoContent(nextContent, "none") 'TODO: FIND OUT IF THIS COUNTS AS AUTOPLAY?
-  else if m.videoPlayer.shouldMakeNextRequest = true
-    onFetchNextContent()
   else
     returnToDetailScreenFromVideo()
   end if
@@ -216,7 +222,7 @@ Function onVideoPlayerState(msg)
   state = msg.GetData()
   if state = "error"
     stopVideoContent(true)
-    errorMessage = m.constants.player.playerResults.failed
+    errorMessage = getTranslations("videoPlayer_error_failed_description")
     if m.videoPlayer.errorMsg <> ""
       errorMessage = m.videoPlayer.errorMsg
     end if
@@ -352,7 +358,6 @@ Function stopVideoContent(showScreenStack)
   m.videoPlayer.unobserveFieldScoped("creditsPosition")
   m.videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
   m.videoPlayer.unobserveFieldScoped("goToNext")
-  m.videoPlayer.unobserveFieldScoped("fetchNextContent")
   m.videoPlayer.control = "stop"
   nowPos = m.videoPlayer.historyPosition
 
@@ -459,53 +464,4 @@ Function addSeriesTitle(content, oldContent)
   end if
 
   return content
-End Function
-
-' this callback gets invoked when the fetchNextContent interface is set
-' this method helps to invoke next autoplay content
-Function onFetchNextContent()
-
-  content = m.videoPlayer.content
-
-  ' preload autoplay content;  We don't observe 'error' or 'response' fields
-  ' since they will be evaluated at the creditsCuepoint callback
-  if m.upNextTask = invalid
-    ' m.upNextTask can't just be overwritten, or else it creates two UpNextTasks.
-    ' When m.upNextTask.control = "RUN" happens if it was overwritten, the task's functionName
-    ' actually runs for each of the tasks that had been ever been assigned to m.upNextTask.
-    ' This becomes an issue if a user selects play multiple times.
-    m.upNextTask = CreateObject("roSGNode", "UpNextTask")
-    m.upNextTask.observeField("response", "onFetchResponseReceived")
-  end if
-  request = {}
-  request.contentId = content.id
-  if m.autoplayContext <> invalid
-    request.categoryId = m.autoplayContext
-  end if
-  
-  mode = "nap"
-  if m.videoPlayer.analyticsMode = "autoplay-automatic"
-    mode = "ap"
-  end if
-  request.mode = mode
-  request.kidsMode = shouldKidsModeBeSentToServer()
-  
-  if m.videoPlayer.shouldMakeNextRequest = true
-    m.videoPlayer.shouldMakeNextRequest = false
-    m.upNextTask.request = request
-    m.upNextTask.control = "RUN" 
-  end if
-
-End Function
-
-' this callback gets invoked once the response output is set in UpNextTask
-' this sets the shouldMakeNextRequest interface as true
-Function onFetchResponseReceived()
-
-  if m.upNextTask <> invalid and m.upNextTask.response <> invalid
-    if m.videoPlayer.playNext = true
-      onGoToNext()
-    end if
-  end if
-
 End Function

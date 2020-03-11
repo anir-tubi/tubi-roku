@@ -28,6 +28,7 @@
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -245,7 +246,6 @@
           vertAlignment="bottom">
           <Label
             id="DirectorTag"
-            text="Directed by"
             opacity="0.5">
             <Font
               role="font"
@@ -262,7 +262,6 @@
               height="2"/>
             <Rectangle 
               opacity="0.0"
-              width="43"
               height="5"/>
           </LayoutGroup>
         </LayoutGroup>
@@ -291,7 +290,6 @@
           vertAlignment="bottom">
           <Label
             id="StarringTag"
-            text="Starring"
             opacity="0.5">
             <Font
               role="font"
@@ -307,7 +305,7 @@
               height="2"/>
             <Rectangle 
               opacity="0.0"
-              width="77"
+              width="1"
               height="5"/>
           </LayoutGroup>
         </LayoutGroup>

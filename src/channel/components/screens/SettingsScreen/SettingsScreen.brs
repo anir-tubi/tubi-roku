@@ -7,7 +7,10 @@ Function init()
 
   m.PanelSet = m.top.findNode("PanelSet")
   m.Title = m.top.findNode("Title")
+  m.Title.text = getTranslation("menu_settings")
   m.NavSection = m.top.findNode("nav")
+  BackLabel = m.top.findNode("callToAction")
+  BackLabel.text = getTranslation("goBack_home")
 
   ' Create the menu
   m.SettingsMenuPanel = CreateSettingsMenuPanel()
@@ -19,10 +22,11 @@ Function init()
   ' event fires for the default menu selection
   m.PanelSet.appendChild(m.SettingsMenuPanel)
   m.top.observeField("focusedChild", "onComponentFocusChange")
-  m.top.observeField("signedIn", "onSignedInChange")
-  m.top.observeField("parentalSettingUpdated", "onSignedInChange")
+  m.top.observeField("parentalSettingUpdated", "onSignInInfoChange")
   m.top.observeField("enabled", "onEnableChange")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
+
+  m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
 
   'set initial tracking values
   m.top.trackingPageInfo = {
@@ -37,12 +41,10 @@ Function init()
 End Function
 
 
-Function onSignedInChange()
-  tubiLog("SettingsScreen.onSignedInChange")
-  m.SettingsMenuPanel.signedIn = m.top.signedIn
-
+Function onSignInInfoChange()
+  m.SettingsMenuPanel.signInInfo = m.top.signInInfo
   ' renew the parental controls panel if it is showing
-  for i=0 to m.PanelSet.getChildCount()-1
+  for i = 0 to m.PanelSet.getChildCount() - 1
     child = m.PanelSet.getChild(i)
     if child.subtype() = "ParentalControlsPanel"
       CreateParentalControlsPanel(child)
@@ -95,11 +97,11 @@ Function onCreateNextPanelIndex()
     else if buttonContent.id = "AboutButton"
       nextPanel = CreateAboutPanel()
     else if buttonContent.id = "PrivacyPolicyButton"
-      nextPanel = CreateLegalPanel("Privacy Policy", m.global.constants.urls.privacyUrl)
+      nextPanel = CreateLegalPanel(buttonContent.title, m.global.constants.urls.privacyUrl)
     else if buttonContent.id = "TermsOfServiceButton"
-      nextPanel = CreateLegalPanel("Terms of Service", m.global.constants.urls.termsOfUseUrl)
+      nextPanel = CreateLegalPanel(buttonContent.title, m.global.constants.urls.termsOfUseUrl)
     else if buttonContent.id = "SignInOutButton"
-      if m.top.signedIn = true
+      if isSignedIn() = true
         nextPanel = CreateSignOutPanel()
       else
         nextPanel = CreateSignInPanel()
@@ -114,13 +116,23 @@ Function onCreateNextPanelIndex()
 End Function
 
 
-Function CreateParentalControlsPanel(existingPanel=invalid)
+Function isSignedIn()
+  bSignedIn = false
+  if m.top.signInInfo <> invalid 
+    bSignedIn = (m.top.signInInfo.signedIn = true)
+  end if
+  return bSignedIn
+End Function
+
+
+Function CreateParentalControlsPanel(existingPanel = invalid)
   if existingPanel = invalid
     pcPanel = CreateObject("roSGNode", "ParentalControlsPanel")
     pcPanel.observeField("itemSelected", "onParentalControlsItemSelected")
   else
     pcPanel = existingPanel
   end if
+
   pcPanel.width = m.rightPanelWidth
   pcPanel.focusable = true
   pcPanel.hasNextPanel = false
@@ -128,7 +140,8 @@ Function CreateParentalControlsPanel(existingPanel=invalid)
   pcPanel.createNextPanelOnItemFocus = false
   pcPanel.selectButtonMovesPanelForward = false
   pcPanel.offset = m.rightPanelOffset
-  if m.top.signedIn = true
+
+  if isSignedIn() = true
     pcPanel.isLoading = true
     requestTask = CreateObject("roSGNode", "AuthTask")
     requestTask.functionName = "execGetUserInfo"
@@ -136,7 +149,7 @@ Function CreateParentalControlsPanel(existingPanel=invalid)
     requestTask.control = "RUN"
     pcPanel.appendChild(requestTask)
   else
-    pcPanel.selectItem = 3  ' default if not signed in
+    pcPanel.selectItem = 3 ' default if not signed in
   end if
   return pcPanel
 End Function
@@ -161,25 +174,20 @@ End Function
 
 Function CreateAboutPanel()
   aboutPanel = CreateObject("roSGNode", "AboutPanel")
-  aboutPanel.titleOne = "About Tubi"
-  textOne = "Tubi is the leading free, premium, video streaming app. We have the largest library of content with over 15,000 movies and television shows with far fewer ads than cable TV."
-  textOne += Chr(10)
-  aboutPanel.textOne = textOne
+  aboutPanel.titleOne = getTranslation("screenSettings_about_title")
+  aboutPanel.textOne = getTranslation("screenSettings_about_description")
+  aboutPanel.titleTwo = getTranslation("screenSettings_about_title2")
 
-  aboutPanel.titleTwo = "Need Help?"
-  textTwo = "Visit http://help.tubitv.com" + Chr(10)
-  textTwo += Chr(10)
-  textTwo += "Email our Support team at support@tubi.tv" + Chr(10)
-  textTwo += Chr(10)
-  textTwo += "Reach us on Facebook, Instagram, Twitter, and on our website at:" + Chr(10)
-  textTwo += "https://tubitv.com/support" + Chr(10)
-  textTwo += Chr(10)
-  textTwo += "Version " + m.global.constants.settings.version.Replace("_",".") + Chr(10)
-  textTwo += "Short Device ID: " + Right(m.constants.deviceInfo.deviceId, 7) + Chr(32) + Chr(32) + "(press OK to see full Device ID)" + Chr(10)
-  textTwo += Chr(10)
-  year = CreateObject("roDateTime").GetYear().toStr()
-  textTwo += "© " + year + " Tubi, Inc. all rights reserved."
-  aboutPanel.textTwo = textTwo
+  sVersion = m.constants.settings.version.Replace("_", ".")
+  sShortDeviceID = Right(m.constants.deviceInfo.deviceId, 7)
+  sYear = CreateObject("roDateTime").GetYear().toStr()
+  dynamicText = { 
+    version: sVersion, 
+    id: sShortDeviceID, 
+    year: sYear
+  }
+  aboutPanel.textTwo = getTranslation("screenSettings_about_description2", dynamicText)
+
   aboutPanel.focusable = false
   aboutPanel.offset = m.rightPanelOffset
   return aboutPanel
@@ -194,7 +202,7 @@ Function CreateSettingsMenuPanel()
   settingsMenuPanel.leftOnly = true
   settingsMenuPanel.createNextPanelOnItemFocus = true
   settingsMenuPanel.selectButtonMovesPanelForward = true
-  settingsMenuPanel.signedIn = m.top.signedIn
+  settingsMenuPanel.signInInfo = m.top.signInInfo
   return settingsMenuPanel
 End Function
 
@@ -237,8 +245,9 @@ End Function
 
 Function CreateSignInPanel()
   panel = CreateObject("roSGNode", "ScrollingTextPanel")
-  panel.title = "Sign In"
-  panel.text = "Sign in to Tubi. Access your Queue and Continue Watching lists across your devices."
+  panel.title = getTranslation("menu_signIn")
+  panel.text = getTranslation("screenSettings_signIn_description")
+
   panel.focusable = false
   panel.offset = m.rightPanelOffset
   return panel
@@ -247,8 +256,27 @@ End Function
 
 Function CreateSignOutPanel()
   panel = CreateObject("roSGNode", "SignOutPanel")
-  panel.name = m.top.name
-  panel.email = m.top.email
+  panel.title = getTranslation("screenSettings_menu_signOut")
+  sName = ""
+  if m.top.signInInfo <> invalid and m.top.signInInfo.name <> invalid
+    sName = m.top.signInInfo.name
+  end if
+
+  if sName <> ""
+    panel.description  = getTranslation("screenSettings_signOut_description", {name: sName})
+  else
+    panel.description  = ""
+  end if
+  sEmail = ""
+  if m.top.signInInfo <> invalid and m.top.signInInfo.email <> invalid
+    sEmail = m.top.signInInfo.email
+  end if
+  if sEmail <> ""
+    panel.description2  = getTranslation("screenSettings_signOut_description2", {email: sEmail})
+  else
+    panel.description2  = ""
+  end if
+
   panel.width = m.rightPanelWidth
   panel.focusable = false
   panel.hasNextPanel = false
@@ -263,17 +291,17 @@ End Function
 Function focusItemInList(list, sID)
   index = -1
   content = list.content
-    index = -1
-    for i = 0 to content.getChildCount() - 1
-      item = content.getChild(i)
-      if item.id = sID 
-        index = i
-        exit for
-      end if
-    end for
-    if index >= 0
-      list.jumpToItem = index
+  index = -1
+  for i = 0 to content.getChildCount() - 1
+    item = content.getChild(i)
+    if item.id = sID
+      index = i
+      exit for
     end if
+  end for
+  if index >= 0
+    list.jumpToItem = index
+  end if
   return index
 End Function
 
@@ -281,13 +309,13 @@ End Function
 Function onMenuItemSelected()
   buttonContent = m.SettingsMenuPanel.content.getChild(m.SettingsMenuPanel.itemSelected)
   if buttonContent.id = "SignInOutButton"
-    if m.top.signedIn = true
+    if isSignedIn() = true
       m.top.signOutSelected = true
     else
       m.top.signInSelected = true
     end if
-  else if buttonContent.id = "AboutButton" 
-    m.top.showDeviceModal = true   
+  else if buttonContent.id = "AboutButton"
+    m.top.showDeviceModal = true
   end if
 End Function
 
@@ -304,9 +332,9 @@ Function onItemRequested()
   if list <> invalid
     if list.itemFocused <> invalid
       buttonContent = list.content.getChild(list.itemFocused)
-      sButtonID = buttonContent.id 
+      sButtonID = buttonContent.id
     end if
-    if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and m.top.itemRequested <> buttonContent.id 
+    if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and m.top.itemRequested <> buttonContent.id
       focusItemInList(list, m.top.itemRequested)
     end if
   end if

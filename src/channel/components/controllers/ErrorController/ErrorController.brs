@@ -6,13 +6,27 @@ Function init()
   Request = TubiRequest()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
-  m.top.observeField("error","showModalDialog")
+  m.top.observeField("connectionError","showConnectionError")
+End Function
+
+Function showConnectionError()
+    errorObj = {}
+    errorObj.contextCode = m.constants.errors.context.homeScreen 
+    errorObj.subtypeCode = m.constants.errors.subtypes.networkError
+    errorObj.title = getTranslation("error_connection_title")
+    errorObj.message = getTranslation("error_connection_description")
+    
+    error = {
+      info: errorObj
+      buttonText: getTranslation("dialog_button_exit")
+    }
+
+    showModalDialog(error)
 End Function
 
 
-Function showModalDialog()
+Function showModalDialog(error)
   tubiLog("ErrorController.showModalDialog")
-  error = m.top.error
   rawErrorObj = error.info
 
   errorCode = getUserFacingErrorCode(rawErrorObj.contextCode, rawErrorObj.subtypeCode, rawErrorObj.externalCode)

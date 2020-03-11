@@ -1,5 +1,4 @@
 Function init()
-  m.trackingLoggingTask = m.global.trackingLoggingTask
   m.constants = m.global.constants
   Request = TubiRequest()
   Auth = TubiAuth(m.constants, Request)
@@ -29,13 +28,14 @@ Function init()
   m.top.observeField("resumePoint", "onResumePointChange")
   m.top.observeField("hasTrailer", "onHasTrailer")
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("addToQueueTitle", "onAddToQueueTitleChange")
-  m.top.observeField("removeQueueTitle", "onRemoveFromQueueTitleChange")
-  m.top.observeField("removeHistoryTitle", "onRemoveFromHistoryTitleChange")
-  m.top.observeField("channelName", "onChannelNameChange")
-  m.top.observeField("channelImage", "onChannelImageChange")
   m.top.observeField("isLoading", "onIsLoading")
   m.top.observeField("kidsModeEnabled", "onKidsModeEnableChange")
+
+  m.top.observeFieldScoped("stringQueueButton", "onStringChange")
+  m.top.observeFieldScoped("stringNoQueueButton", "onStringChange")
+  m.top.observeFieldScoped("stringChannelButton", "onStringChange")
+  m.top.observeFieldScoped("stringNoHistoryButton", "onStringChange")
+
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
   m.top.observeField("relatedContent", "onRelatedContentChange")
   m.RelatedGrid.observeField("itemSelected", "onRelatedContentSelected")
@@ -46,7 +46,7 @@ Function init()
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
   setInitialMenuItems()
   m.focusTarget = m.Menu
-
+  setDetailStrings()
   m.focusAnimationDuration = 0.4
 
   ' modal popup to show full, scrollable description
@@ -76,6 +76,39 @@ Function init()
 End Function
 
 
+Function setDetailStrings()
+  m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
+  m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume")
+  m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes")
+  m.WatchTrailerMenuItem.title = getTranslation("screenDetails_button_trailer")
+  RelatedRowLabelContent = m.top.findNode("RelatedRowLabelContent")
+  RelatedRowLabelContent.title = getTranslation("screenDetails_relatedTitles")
+End Function
+
+
+Function onStringChange(message)
+  sStringField = message.GetField()
+  sText = message.GetData()
+  
+  stringNode = invalid
+
+  if sStringField = "stringQueueButton"
+    stringNode = m.AddQueueMenuItem
+  else if sStringField = "stringNoQueueButton"
+    stringNode = m.RemoveQueueMenuItem
+  else if sStringField = "stringChannelButton"
+    stringNode = m.ChannelMenuItem
+  else if sStringField = "stringNoHistoryButton"
+    stringNode = m.RemoveHistoryMenuItem
+  end if
+
+  if stringNode <> invalid 
+    stringNode.title = sText
+  end if
+
+End Function
+
+
 Function onKidsModeEnableChange()
   if m.top.kidsModeEnabled = true
     m.RelatedContentParentGroup.visible = false
@@ -87,16 +120,7 @@ End Function
 
 Function onDescriptionSelected()
   tubiLog("DetailScreen.onDescriptionSelected")
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "INFORMATION"  'TODO: Use the "VIDEO_DESCRIPTION" option when it is added to protos
-      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: m.top.content.id.toInt()})
-      dialog_action: "SHOW"  'Action enum
-      dialog_sub_type: "video-description"  'max 20 character string
-    }
-  }
-  showDescriptionModal(m.top.description, dialogEvent, m.trackingLoggingTask)
+  m.top.fullDescriptionSelected = true
 End Function
 
 
@@ -143,10 +167,6 @@ End Function
 
 Function onIsBookmark()
   tubiLog("DetailScreen.onIsBookmark")
-  'reset the value in the case that add to queue button was pressed and title is currently "Adding"
-  m.AddQueueMenuItem.title = "Add to queue"
-  m.RemoveQueueMenuItem.title = "Remove from queue"
-  
   menuItems = m.Menu.content
   addQueueIndex = m.NodeHelpers.getChildIndexById(menuItems, m.AddQueueMenuItem.id)
   removeQueueIndex = m.NodeHelpers.getChildIndexById(menuItems, m.RemoveQueueMenuItem.id)
@@ -186,9 +206,6 @@ End Function
 
 Function onIsHistory()
   tubiLog("DetailScreen.onIsHistory")
-  'reset the value in the case that remove from history button was pressed and title is currently "Removing..."
-  m.RemoveHistoryMenuItem.title = "Remove from history"
-
   'if removing from history, remove the resume button
   resumeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
   if not m.top.isHistory
@@ -227,30 +244,6 @@ Function onHasTrailer()
 End Function
 
 
-Function onAddToQueueTitleChange()
-  tubiLog("DetailScreen.onAddToQueueTitleChange")
-  m.AddQueueMenuItem.title = m.top.addToQueueTitle
-End Function
-
-
-Function onRemoveFromQueueTitleChange()
-  tubiLog("DetailScreen.onRemoveFromQueueTitleChange")
-  m.RemoveQueueMenuItem.title = m.top.removeQueueTitle
-End Function
-
-
-Function onRemoveFromHistoryTitleChange()
-  tubiLog("DetailScreen.onRemoveFromHistoryTitleChange")
-  m.RemoveHistoryMenuItem.title = m.top.removeHistoryTitle
-End Function
-
-
-Function onChannelNameChange()
-  tubiLog("DetailScreen.onChannelNameChange")
-  m.ChannelMenuItem.title = "Go to " + m.top.channelName
-End Function
-
-
 Function onIsLoading()
   tubiLog("DetailScreen.onIsLoading")
   
@@ -279,7 +272,6 @@ Function setInitialMenuItems() As Void
   menuItems = CreateObject("roSGNode", "ContentNode")
   menuItems.appendChild(m.PlayMenuItem)
   menuItems.appendChild(m.AddQueueMenuItem)
-  ' m.AddQueueMenuItem.title = "Add to queue"
   m.Menu.content = menuItems
 End Function
 

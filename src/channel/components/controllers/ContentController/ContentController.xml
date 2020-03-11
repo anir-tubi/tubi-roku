@@ -36,6 +36,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/GeneralTaskHelper.brs" />
   <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
@@ -113,7 +114,7 @@
             id="tubiKidsLogo"
             height="45"
             width="209"
-            uri="pkg:/images/logo-kids-white-large.png"
+            uri="pkg:/locale/images/logo-kids-white-large.png"
             translation="[1626,60]"
             opacity="1.0"
             visible="false"/>

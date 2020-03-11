@@ -99,10 +99,10 @@ End Function
 Function showChannelContentError(msg, bContentEmptyError = false)
   tubiLog("ChannelScreenHelpers.onChannelContentError")
   sErrorTitle = ""
-  sErrorMessage = "Could not retrieve channel content."
+  sErrorMessage = getTranslation("error_noGetChannels_description")
   if bContentEmptyError = true
-    sErrorTitle = "Oops!"
-    sErrorMessage = "This page currently does not have any content."
+    sErrorTitle = getTranslation("dialog_errorOops_title")
+    sErrorMessage = getTranslation("error_noContent_description")
   end if 
   errorInfo = msg.getData()
   task = msg.getRoSGNode()

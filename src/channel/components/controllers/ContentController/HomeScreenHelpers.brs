@@ -12,6 +12,8 @@ Function showHomeScreen(constants, authInfo)
     homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
+
+    m.top.observeFieldScoped("reloadUserCategoriesResponse", "onReloadUserCategoriesInHomeScreen")
     
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
@@ -29,6 +31,87 @@ Function showHomeScreen(constants, authInfo)
     pushScreen(homeScreen, false, false)
   end if
 End Function
+
+
+Function onReloadUserCategoriesInHomeScreen(msg)
+  tubiLog("HomeScreenHelpers.onReloadUserCategoriesInHomeScreen")
+  handledRequest = msg.getData()
+
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    if handledRequest.response <> invalid then
+      response = handledRequest.response
+      if response.code >= 200 and response.code < 300 then
+        newCategory = handledRequest.convertedMetadata
+
+        if homeScreen.content <> invalid
+          oldCategory = invalid
+          if newCategory <> invalid and newCategory.id <> invalid
+            oldCategory = homeScreen.content.findNode(newCategory.id)
+          else if handledRequest.context.id <> invalid
+            oldCategory = homeScreen.content.findNode(handledRequest.context.id)
+          end if
+
+          ' there are 4 options here
+          ' 1) new category and old category both have content in them - replace the old with the new
+          ' 2) new category has content, old category doesn't exist - add the new category
+          ' 3) new category doesn't have content (will be invalid), old category does have content - remove old category
+          ' 4) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
+          if newCategory <> invalid and oldCategory <> invalid
+            'replace old category with new category
+            homeScreen.content.replaceChild(newCategory, m.NodeHelpers.getChildIndex(homeScreen.content, oldCategory))
+          else if newCategory <> invalid and oldCategory = invalid
+            'add new category
+            'if new category is history, put it one before queue, or if queue doens't exist put it in 2nd position
+            'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
+
+            if newCategory.id = m.constants.ui.categoryIds.history
+              homeScreen.content.insertChild(newCategory, homeScreen.content.continueWatchingIndex)
+            else if newCategory.id = m.constants.ui.categoryIds.queue
+              homeScreen.content.insertChild(newCategory, homeScreen.content.queueIndex)
+            end if
+
+            homeScreen.setNewRowHeights = true '//In case the rows are of different heights, tell homescreen to refresh to disdplay rows correctly
+          else if newCategory = invalid and oldCategory <> invalid
+            'remove old category
+            homeScreen.content.removeChild(oldCategory)
+            
+            homeScreen.setNewRowHeights = true '//In case the rows are of different heights, tell homescreen to refresh to disdplay rows correctly
+          else if newCategory = invalid and oldCategory = invalid
+            'do nothing
+          end if
+        end if
+
+        '//Stop loading of homescreen which will refresh the screen's content
+        homeScreen.isLoading = false
+      else
+        ' if we were loading in the background, don't show an error modal
+        if homeScreen.isInFocusChain()
+          errorMessage = getTranslation("screenHome_error_fetchCategories_description")
+          errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
+          dialogEvent =  {
+            type: "dialog"
+            values: {
+              dialog_type: "NETWORK_ERROR" 'DialogType enum - TODO: Update this when a "PLAYER_ERROR" value becomes available in protos
+              pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+              dialog_action: "SHOW"
+              dialog_sub_type: errorCode
+            }
+          }
+          
+          modalInfo = {
+            message: getErrorMessage(errorMessage, errorCode)
+            openTrackEvent: dialogEvent
+            trackingTask: m.trackingLoggingTask
+          }
+
+          showErrorModal(modalInfo, onUserCategoriesFailed, invalid, invalid, invalid, [getTranslation("screenHome_error_button_continue")])
+        end if
+      end if
+    end if
+  end if
+End Function
+
 
 
 '//If the homescreen is loading, then display the default background
@@ -97,7 +180,7 @@ Function onHomescreenResponse()
       else
         ' if we were loading in the background, don't show an error modal
         if homeScreen.isInFocusChain()
-          errorMessage = "Unable to load Tubi home screen."
+          errorMessage = getTranslation("screenHome_error_fetchScreenContent_description")
           errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
 
           dialogEvent = {

@@ -100,14 +100,22 @@ End Function
 
 Function onSetCallOfAction()
   sPreviousPage = m.top.callingPage
+  sCallToAction = ""
   if sPreviousPage <> invalid and Len(sPreviousPage) > 0
-    sPreviousPage = "FOR " + UCase(sPreviousPage)
-  else 
-    sPreviousPage = "TO GO BACK"
+    if UCase(sPreviousPage) = UCase(m.constants.ui.terms.categories)
+      sCallToAction = getTranslation("goBack_categories")
+    else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.channels)
+      sCallToAction = getTranslation("goBack_channels")
+    else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.menu)
+      sCallToAction = getTranslation("goBack_menu")
+    end if
+  end if
+  if sCallToAction = ""
+    sCallToAction = getTranslation("goBack_default")
   end if 
 
   callToAction = m.top.findNode("callToAction")
-  callToAction.text = sPreviousPage
+  callToAction.text = sCallToAction
 End Function
 
 

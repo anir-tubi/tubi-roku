@@ -24,6 +24,8 @@ Function init()
   m.GridSeries = m.top.findNode("GridSeries")
   m.GridSeries.observeField("itemFocused", "onSeriesItemFocused")
   m.GridSeries.observeField("itemSelected", "onSeriesItemSelected")
+  BackLabel = m.top.findNode("BackLabel")
+  BackLabel.text = getTranslation("goBack_videoPlayer_upNext")
 
   focusBox = m.top.findNode("FocusBox")
   if m.global.constants.deviceInfo.scaledUi = true then
@@ -86,7 +88,7 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the Up Next content row already
   ' has focus, not when it gains focus.
   m.isUpNextFocused = false
-
+  
   m.top.screenLevel = m.constants.ui.screenLevels.upNextScreen
 End Function
 
@@ -223,7 +225,7 @@ Function onCountdownTimer()
 End Function
 
 Function drawCountdown(labelNode, time)
-  labelNode.text = "Starting in " + stri(time) + " s"
+  labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)}) 
 End Function
 
 Function updateInfoPanel(infoNode, content)

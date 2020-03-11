@@ -5,6 +5,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -58,7 +59,7 @@
         height="47"
         translation="[72,601]"/>
       <Label
-        text="BACK TO DISMISS"
+        id="BackLabel"
         translation="[123,605]"
         height="47"
         vertAlign="center">

@@ -20,6 +20,7 @@ End Function
 ' formatLengthAsEnglish
 '
 ' take an integer length in seconds and give it an English descriptions like "1 h 36 min"
+' ::NOTE:: when calling this function, make sure the calling file is including TubiLanguageTranslate.brs as a dependency 
 Function formatLengthAsEnglish(length As Dynamic) As String
   if type(length) = "roFloat" or type(length) = "Float" or type(length) = "Double" then
     length = Int(length)
@@ -29,12 +30,32 @@ Function formatLengthAsEnglish(length As Dynamic) As String
     minutes = (length mod 3600) \ 60
     seconds = length mod 60
     result = ""
+    sTranslationID = invalid
     if hours = 0 and minutes = 0 then
-      result = stri(seconds).trim() + " sec"
+      '//Display just seconds
+      sTranslationID = "metadata_seconds" 
     else
-      if hours > 0 then result = stri(hours).trim() + " h "
-      result  = result + stri(minutes).trim() + " min"
+      if hours > 0 and minutes > 0
+        '//Display hours and minutes
+        sTranslationID = "metadata_hoursAndMinutes" 
+      else if hours > 0 
+        '//Display just hours
+        sTranslationID = "metadata_hours" 
+      else
+        '//Display just minutes
+        sTranslationID = "metadata_minutes"
+      end if
     end if
+
+    if sTranslationID <> invalid
+      aaParams = {
+        hours: stri(hours).trim(), 
+        minutes: stri(minutes).trim(), 
+        seconds: stri(seconds).trim()
+      }
+      result = getTranslation(sTranslationID, aaParams) 
+    end if
+
     return result
   else
     return ""

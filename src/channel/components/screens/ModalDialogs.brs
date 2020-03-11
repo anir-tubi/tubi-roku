@@ -150,7 +150,7 @@ Function showErrorModal(modalInfo = {}, tryAgainCallback = invalid, tryAgainPara
 
   if tryAgainCallback <> invalid
     if buttons.count() <> 2
-      buttons = ["Try Again", "Close"]
+      buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_close")]
     end if
 
     buttonInfo = [
@@ -169,7 +169,7 @@ Function showErrorModal(modalInfo = {}, tryAgainCallback = invalid, tryAgainPara
     ]
   else
     if buttons.count() <> 1
-      buttons = ["Close"]
+      buttons = [getTranslation("dialog_button_close")]
     end if
 
     buttonInfo = [
@@ -184,13 +184,12 @@ Function showErrorModal(modalInfo = {}, tryAgainCallback = invalid, tryAgainPara
 
   ' set a default error modal title
   if modalInfo.title = invalid or modalInfo.title = ""
-    modalInfo.title = "Something went wrong"
+    modalInfo.title = getTranslation("dialog_defaultError_title")
   end if
 
   ' set a default error modal message (this should never happen in theory)
   if modalInfo.message = invalid or modalInfo.message = ""
-    modalInfo.message = "We're sorry for the inconvenience."
-    modalInfo.message += "For assistance, please contact support@tubi.tv" + Chr(10)
+    modalInfo.message = getTranslation("dialog_defaultError_description") 
   end if
 
   ' use the cancel callback as the backButtonCallback - as the behavior should be the same
@@ -206,9 +205,9 @@ End Function
 ' @pmessage: string, The message to be displayed to the user
 ' @userFacingErrorCode: string, an error code as returned by getUserFacingErrorCode()
 Function getErrorMessage(message = "", userFacingErrorCode = "") as Object
-  errorMessage = "Error: " + userFacingErrorCode + Chr(10)
+  errorMessage = getTranslation("dialog_errorPrefix") + userFacingErrorCode + Chr(10)
   errorMessage += message + Chr(10)
-  errorMessage += "Please contact: support@tubi.tv"
+  errorMessage += getTranslation("dialog_errorMessageContact") 
   return errorMessage
 End Function
 
@@ -264,9 +263,9 @@ End Function
 ' showExitAppModal
 '
 Function showExitAppModal(dialogEvent, trackingTask, callback = invalid)
-  title = "Are You Sure?"
-  message = "Do you really want to exit Tubi?"
-  buttons = ["Exit", "Cancel"]
+  title = getTranslation("dialog_exitApp_title")
+  message = getTranslation("dialog_exitApp_description")
+  buttons = [getTranslation("dialog_button_exit"), getTranslation("dialog_button_cancel")]
   showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback)
 End Function
 
@@ -275,9 +274,9 @@ End Function
 ' showSignOutModal
 '
 Function showSignOutModal(dialogEvent, trackingTask, callback = invalid)
-  title = "Are You Sure?"
-  message = "You are about to sign out of your Tubi account."
-  buttons = ["Sign Out", "Cancel"]
+  title = getTranslation("dialog_signOut_title")
+  message = getTranslation("dialog_signOut_description")
+  buttons = [getTranslation("dialog_signOut_button_ok"), getTranslation("dialog_button_cancel")]
   showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback)
 End Function
 
@@ -285,7 +284,7 @@ End Function
 ' showInfoModal
 '
 Function showInfoModal(title, message, dialogEvent, trackingTask, callback = invalid)
-  buttons = ["Close"]
+  buttons = [getTranslation("dialog_button_close")]
   info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback)
   showModal(info.modalInfo, info.buttonInfo)
 End Function
@@ -295,8 +294,8 @@ End Function
 ' showDescriptionModal
 '
 Function showDescriptionModal(message, dialogEvent, trackingTask, callback = invalid)
-  title = "Full Synopsis"
-  buttons = ["Close"]
+  title = getTranslation("dialog_fullSynopsis_title")
+  buttons = [getTranslation("dialog_button_close")]
   info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback)
   info.modalInfo.scrollable = true
   showModal(info.modalInfo, info.buttonInfo)
@@ -335,8 +334,8 @@ Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, 
   buttonInfo = []
 
   'always create at least one button
-  firstButtonText = "OK"
-  if type(buttons) = "roArray" and type(buttons[0]) = "roString"
+  firstButtonText = getTranslation("dialog_button_ok")
+  if type(buttons) = "roArray" and (type(buttons[0]) = "roString" or type(buttons[0]) = "String")
     firstButtonText = buttons[0]
   end if
   buttonOne = {
@@ -348,7 +347,7 @@ Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, 
   buttonInfo.push(buttonOne)
 
   'second button is optional
-  if type(buttons) = "roArray" and type(buttons[1]) = "roString"
+  if type(buttons) = "roArray" and (type(buttons[1]) = "roString" or type(buttons[1]) = "String")
     buttonTwo = {
       text: buttons[1]
       type: "dismiss"

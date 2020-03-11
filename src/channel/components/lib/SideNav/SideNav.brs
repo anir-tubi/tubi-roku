@@ -2,7 +2,7 @@ Function init()
   m.constants = m.global.constants
   m.theme = m.global.theme
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
-  m.top.observeFieldScoped("userName", "onSignedIn")
+  m.top.observeFieldScoped("stringSignIn", "onSignInChange")
   m.top.observeFieldScoped("kidsModeValues", "onKidsModeValuesChanged")
   m.top.observeFieldScoped("opened", "onOpenedChange")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
@@ -12,6 +12,7 @@ Function init()
   m.MainContentSelect = m.top.findNode("MainContent-select")
   m.TopContent = m.top.findNode("TopContent")
   m.sideNavBackground = m.top.findNode("sideNavBackground")
+  setStrings()
 
   m.profileContent = m.TopContent.findNode("profile")
   m.kidsModeContent = m.MainContent.findNode("kidsMode")
@@ -39,12 +40,37 @@ Function init()
   initList(m.mainItems)
 
   '//Inititate the default view
-  onSignedIn()
   onOpenedChange()
   '//::TODO::SIDENAV set the width of the items of the lists dynamically to the width of m.top.width, plus some spacing
   '//::TODO::SIDENAV - set all references to sideNav IDs to be called from Constants: i.e. m.constants.ui.sideNavIds.home. 
   '//   To do this, set content in brs instead of xml?
 End Function
+
+
+Function setStrings()
+    homeNode = m.top.findNode("home")
+    homeNode.title = getTranslation("menu_home")
+    searchNode = m.top.findNode("search")
+    searchNode.title = getTranslation("menu_search")
+    categoriesNode = m.top.findNode("categories")
+    categoriesNode.title = getTranslation("menu_categories")
+    channelsNode = m.top.findNode("channels")
+    channelsNode.title = getTranslation("menu_channels")
+    settingsNode = m.top.findNode("settings")
+    settingsNode.title = getTranslation("menu_settings")
+    exitNode = m.top.findNode("exit")
+    exitNode.title = getTranslation("menu_exit")
+End Function
+
+
+' SideNav has been told there has been a change to the user's sign in status and that it should change 
+'   how the signin menu item appears by using the passed message data.
+Function onSignInChange(message)
+  if m.profileContent <> invalid
+    m.profileContent.title = m.top.stringSignIn
+  end if
+End Function
+
 
 ' Initialize the passed markupList
 Function initList(list)
@@ -55,9 +81,11 @@ Function initList(list)
   setDrawFocusFeedback(list)
 End Function
 
+
 Function initListDisplay(list)
   list.focusBitmapBlendColor = m.global.theme.focused
 End Function
+
 
 Function onFocusChange()
   if m.top.isInFocusChain() = true
@@ -72,15 +100,7 @@ Function onFocusChange()
   end if
 End Function
 
-Function onSignedIn()
-    sName = "Sign In"
-    if m.top.userName <> ""
-      sName = m.top.userName 
-    end if
 
-    m.profileContent.title = sName
-    m.topItems.content = m.TopContent
-End Function
 
 ' The kids mode has changed, so alter the look of the icon
 Function onKidsModeValuesChanged()
@@ -125,11 +145,13 @@ Function onKidsModeValuesChanged()
   end if
 End Function
 
+
 ' When the list gains/loses focus, then hide or display the focus indicator
 Function onListFocusChange(msg)
   list = msg.getRoSGNode()
   setDrawFocusFeedback(msg.getRoSGNode())
 End Function
+
 
 ' Control whether the focus indiocator is displayed or not based on if the list has focus
 Function setDrawFocusFeedback(list)
@@ -139,6 +161,7 @@ Function setDrawFocusFeedback(list)
     list.drawFocusFeedback = false
   end if 
 End Function
+
 
 ' When the user presses up or down, then change which list has focus
 Function onKeyEvent(key, press)
@@ -170,6 +193,7 @@ Function onKeyEvent(key, press)
   end if
 End Function
 
+
 Function onOpenedChange()
   if m.top.opened = true
     '//display hidden items, profile, settings, exit. Set all buttons to full opacity
@@ -198,9 +222,11 @@ Function onOpenedChange()
   end if
 End Function
 
+
 Function refresh()
   onOpenedChange()
 End Function
+
 
 Function setContentActive(content, bActive = true)
   for i = 0 to content.getChildCount()-1
@@ -213,6 +239,7 @@ Function setContentActive(content, bActive = true)
     end if 
   end for
 End Function
+
 
 Function onItemRequested()
   if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and (m.itemSelectedRemembered = invalid or m.top.itemRequested <> m.itemSelectedRemembered.id)

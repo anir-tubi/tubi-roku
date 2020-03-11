@@ -35,7 +35,7 @@ Function onContentChange()
         m.title.text = m.top.itemContent.title
       else if isVitg(m.top.itemContent, m.gridItemTypes) = true
         setUpVitg()
-      else if categoryContent.title = "Continue Watching"
+      else if categoryContent.id = "continue_watching"
         drawHistoryProgressBar()
       end if
     end if

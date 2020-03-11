@@ -9,12 +9,15 @@
   <script type="text/brightscript" uri="SideNav.brs" />
   <script type="text/brightscript" uri="../AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   
   <interface>
     <!-- INPUTS -->
       <field id="width" type="float"/>
       <field id="opened" value="false" type="boolean"/>
-      <field id="userName" type="string" value="" alwaysNotify="true"/>
+
+      <!-- The following are the strings associated with this UI element that is changed from the helper/controller file -->
+      <field id="stringSignIn" type="string"/>
 
       <!-- this is an asscoiative array that contains a boolean param "grayedOut" to indicate if the kids mode button should be grayed out, and "title" to indocate the label title of the kids mode button. -->
       <field id="kidsModeValues" type="assocarray" value="" alwaysNotify="true"/>
@@ -99,23 +102,18 @@
           <ContentNode id="MainContent" role="content" >
             <SideNavContentNode
               id="kidsMode"
-              title="Kids"
               iconUrl="pkg:/images/sideNavKids.png"/>
             <SideNavContentNode
               id="search"
-              title="Search"
               iconUrl="pkg:/images/sideNavSearch.png"/>
             <SideNavContentNode
               id="home"
-              title="Home"
               iconUrl="pkg:/images/sideNavHome.png"/>
             <SideNavContentNode
               id="categories"
-              title="Categories"
               iconUrl="pkg:/images/sideNavCategories.png"/>
             <SideNavContentNode
               id="channels"
-              title="Channels"
               iconUrl="pkg:/images/sideNavChannels.png"/>
           </ContentNode>
         </MarkupList>
@@ -134,13 +132,11 @@
           <SideNavContentNode
             id="settings"
             fontSize="27"
-            bold="false"
-            title="Settings"/>
+            bold="false"/>
           <SideNavContentNode
             id="exit"
             fontSize="27"
-            bold="false"
-            title="Exit"/>
+            bold="false"/>
         </ContentNode>
       </MarkupList>
 

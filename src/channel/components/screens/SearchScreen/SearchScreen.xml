@@ -9,6 +9,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -71,6 +72,7 @@
 
       <!-- If set to true, allows screens of the same type and same screenLevel to stack on top of each other  -->
       <field id="isStackable" type="boolean" value="false" />
+
   </interface>
   
   <children>
@@ -81,22 +83,11 @@
         vertAlignment="custom"
         opacity="0.5"
         translation="[85,85]">
-        <Label
-          text="PRESS"
-          vertAlign="center"
-          height="47"
-          translation="[0,2]">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="22" />
-        </Label>
         <Poster
           uri="pkg:/images/back.png"
           width="47"
           height="47"/>
         <Label
-          text="FOR MENU"
           id="callToAction"
           vertAlign="center"
           height="47"
@@ -134,7 +125,6 @@
             height="1"/>  
           <Label
             id="KidsModeMessage"
-            text="Switch to Kids for kids safe search results"
             vertAlign="bottom"
             visible="false"
             height="50">
@@ -182,13 +172,11 @@
         id="spinner"
         visible="false"
         modal="true"
-        text="Updating your results..."
         displayText="true"
         width="1094"
         height="575"/>
       <Label
         id="NoResultsMessage"
-        text="No Search Results"
         vertAlign="center"
         horizAlign="center"
         width="1094"

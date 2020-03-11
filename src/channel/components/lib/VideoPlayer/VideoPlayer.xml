@@ -13,6 +13,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
   
@@ -84,6 +85,9 @@
       <!-- Message shown during ad loading and video loading -->
       <field id="loadingMessage" alias="LoadingMessage.text" />
 
+      <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
+      <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true"/>
+
       <!--
         - List of midrolls as time in seconds.  This will be written to by main brightscript thread.
         -->
@@ -92,8 +96,6 @@
       <!-- force transport to display or hide -->
       <field id="showTransport" type="boolean" alwaysNotify="true"/>
 
-      <!-- Is used to check whether up next content is fetched or not -->
-      <field id="shouldMakeNextRequest" type="boolean" alwaysNotify="false"/>
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -105,9 +107,6 @@
 
       <!-- Set to true if the "go to end" button was pressed on the transport -->
       <field id="goToNext" type="boolean" value="false" alwaysNotify="true" />
-      
-      <!--  indicates to play the video on upnext callback function -->
-      <field id="playNext" type="boolean" value="false" />      
 
       <field id="state" type="string" />
       
@@ -115,10 +114,7 @@
       
       <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
       <field id="historyPosition" type="integer" value="0" />
-      
-      <!-- Is set to true, when required to fetch next content -->
-      <field id="fetchNextContent" type="boolean" alwaysNotify="true"/> 
-      
+
       <!-- Is set when the credits cuepoint position is reached -->
       <field id="creditsPosition" type="integer" alwaysNotify="false"/>
 
@@ -180,7 +176,7 @@
           id="tubiKidsLogo"
           width="632"
           height="135"
-          uri="pkg:/images/logo-kids-white-xlarge.png"
+          uri="pkg:/locale/images/logo-kids-white-xlarge.png"
           loadSync="true"
           visible="false"
           translation="[648,382]"/>
@@ -215,55 +211,17 @@
         height="317"
         translation="[0,0]"
         uri="pkg:/images/ads-countdown-gradient.9.png"/>
-      <Poster
-        id="AdHeadsUpCircle"
-        loadWidth="66"
-        width="66"
-        loadHeight="66"
-        height="66"
-        translation="[85,71]"
-        uri="pkg:/images/circle.png"
-        opacity="0.4">
-      </Poster>
       <Label
-        translation="[87,74]"
-        width="66"
+        id="AdHeadsUpText"
+        translation="[85,72]"
         height="66"
         horizAlign="center"
-        vertAlign="center"
-        text="AD">
+        vertAlign="center">
         <Font
           role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="27"/>
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="34"/>
       </Label>
-      <LayoutGroup
-        translation="[131,72]"
-        layoutDirection="horiz">
-        <Label
-          height="66"
-          vertAlign="center"
-          color="0xff501aff"
-          text="   break">
-          <Font
-            id="Vaud34px"
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="34"/>
-        </Label>
-        <Label
-          id="AdHeadsUpText"
-          height="66"
-          vertAlign="center"
-          translation="[131,72]"
-          text="">
-          <Font
-            id="Vaud34px"
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="34"/>
-        </Label>
-      </LayoutGroup>
     </Group>
 
     <Group
@@ -282,7 +240,7 @@
         height="47"
         translation="[822,58]"/>
       <Label
-        text="PRESS BACK TO HIDE"
+        id="BackLabel"
         translation="[870,61]"
         height="47"
         vertAlign="center">

@@ -1,15 +1,13 @@
-function showSettingsScreen(sFocusID = "")
+Function showSettingsScreen(sFocusID = "")
   tubiLog("SettingsScreenHelpers.showSettingsScreen")
   m.settingsScreen = CreateObject("roSGNode", "SettingsScreen")
   m.settingsScreen.id = m.constants.ui.screenIds.settingsScreen
+  setSignInInfo() 
   if m.global.authInfo <> invalid
-    m.settingsScreen.signedIn = true
-    setUserInfo()
+    m.settingsScreen.parentalSettingUpdated = m.global.authInfo.parentalrating
   else
-    m.settingsScreen.signedIn = false
-    m.settingsScreen.parentalSetting = 3  ' Default to most permissive
+    m.settingsScreen.parentalSettingUpdated = 3  ' Default to most permissive
   end if
-  m.settingsScreen.observeFieldScoped("signedIn", "OnSignedIn")
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
   m.settingsScreen.observeFieldScoped("signInSelected", "onSettingsSignInSelected")
   m.settingsScreen.observeFieldScoped("parentalSettingSelected", "onParentalSettingSelected")
@@ -23,29 +21,35 @@ function showSettingsScreen(sFocusID = "")
     '//If a particular settings button should be in focus
     m.settingsScreen.itemRequested = sFocusID
   end if
-end function
+End Function
 
 
-function OnSignedIn()
-  setUserInfo()
-end function
 
+Function setSignInInfo()
+  aaSignIn = {signedIn: false
+    name: invalid
+    email: invalid
+  }
 
-function setUserInfo()
   if m.global.authInfo <> invalid
     authInfo = m.global.authInfo
+    aaSignIn.signedIn = true
+    aaSignIn.email = authInfo.email
+    sName = ""
     if authInfo.firstName <> invalid and authInfo.lastName <> invalid
-      m.settingsScreen.name = authInfo.firstName + " " + authInfo.lastName
+      sName = authInfo.firstName + " " + authInfo.lastName
     else
-      m.settingsScreen.name = authInfo.name
+      sName = authInfo.name
     end if
-    m.settingsScreen.email = authInfo.email
-    m.settingsScreen.parentalSettingUpdated = authInfo.parentalrating
+    
+    aaSignIn.name = sName
   end if
-end function
+
+  m.settingsScreen.signInInfo = aaSignIn
+End Function
 
 
-function setAuthInfoValue(attribute, value) as boolean
+Function setAuthInfoValue(attribute, value) as boolean
   bSuccess = false
   if m.global.authInfo <> invalid
     authInfo = m.global.authInfo
@@ -54,16 +58,16 @@ function setAuthInfoValue(attribute, value) as boolean
     bSuccess = true
   end if
   return bSuccess
-end function
+End Function
 
 
-function getNowSeconds() as integer
+Function getNowSeconds() as integer
   nowDate = CreateObject("roDateTime")
   return nowDate.AsSeconds()
-end function
+End Function
 
 
-function onSettingsSignOutSelected()
+Function onSettingsSignOutSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignOutSelected")
   dialogEvent = {
     type: "dialog"
@@ -75,7 +79,7 @@ function onSettingsSignOutSelected()
     }
   }
   showSignOutModal(dialogEvent, m.trackingLoggingTask, onSignOutModalSelected)
-end function
+End Function
 
 
 Function onSettingsBackgroundChange()
@@ -88,13 +92,13 @@ End Function
 
 
 ' Log the user out, update screens
-function onSignOutModalSelected()
+Function onSignOutModalSelected()
   tubiLog("SettingsScreenHelpers.onSignOutModalSelected")
   ' flush the screenstack in any case where the user has successfully
   ' gone through the sign-in.  If they 'back' out of it, the screen
-  ' stack will stay intact and this function will not be called
+  ' stack will stay intact and this Function will not be called
   clearScreenStack()
-
+  setSignInInfo()
   m.authInfoReceived = false
   if m.authTask <> invalid
     m.authTask.unobserveFieldScoped("onAuthInfoReceived")
@@ -106,17 +110,17 @@ function onSignOutModalSelected()
 
   m.spinner.visible = true
   m.spinner.setFocus(true)
-end function
+End Function
 
 
-function onSettingsSignInSelected()
+Function onSettingsSignInSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignInSelected")
   startSignIn(true)
-end function
+End Function
 
 
 '//When exiting the ConfirmPasswordScreen, make sure some event handlers are no longer listened to
-function onConfirmPasswordScreenVisible(msg)
+Function onConfirmPasswordScreenVisible(msg)
   tubiLog("SettingsScreenHelper.onConfirmPasswordScreenVisible")
   confirmPasswordScreen = msg.getRoSGNode()
   '//if we don't stop listening to this "result" field, then it may cause an error window to appear if/when
@@ -124,13 +128,13 @@ function onConfirmPasswordScreenVisible(msg)
   if confirmPasswordScreen <> invalid and confirmPasswordScreen.visible = false and m.parentalSettingUpdateTask <> invalid
     m.parentalSettingUpdateTask.unobserveField("result")
   end if
-end function
+End Function
 
 
-function onParentalSettingSelected(msg)
+Function onParentalSettingSelected(msg)
   tubiLog("SettingsScreenHelpers.onParentalSettingSelected")
   parentalSetting = msg.GetData()
-  if m.settingsScreen.signedIn = true
+  if m.settingsScreen.signInInfo <> invalid and m.settingsScreen.signInInfo.signedIn = true
     if m.global.authInfo <> invalid and parentalSetting <> m.global.authInfo.parentalrating
       nNowDate = getNowSeconds()
       nSavedSeconds = 0
@@ -143,9 +147,9 @@ function onParentalSettingSelected(msg)
         onPasswordConfirm()
       else
         m.confirmPasswordScreen = CreateObject("roSGNode", "ConfirmPasswordScreen")
-        m.confirmPasswordScreen.message = "Enter your password"
-        m.confirmPasswordScreen.subMessage = "to update parental controls"
-        m.confirmPasswordScreen.buttonText = "Submit"
+        m.confirmPasswordScreen.message = getTranslation("screenSettings_parentalPassword_title")
+        m.confirmPasswordScreen.subMessage = getTranslation("screenSettings_parentalPassword_subtitle")
+        m.confirmPasswordScreen.buttonText = getTranslation("dialog_button_submit")
         m.confirmPasswordScreen.isLoading = false
         m.confirmPasswordScreen.observeField("visible", "onConfirmPasswordScreenVisible")
         m.confirmPasswordScreen.observeField("submitSelected", "onPasswordConfirm")
@@ -164,23 +168,23 @@ function onParentalSettingSelected(msg)
       }
     }
 
-    title = "Please Sign In"
-    message = "You must be signed in to adjust parental controls"
-    buttons = ["Sign in", "Cancel"]
+    title = getTranslation("dialog_signIn_title")
+    message = getTranslation("screenSettings_error_signInParental_description")
+    buttons = [getTranslation("dialog_button_signIn"), getTranslation("dialog_button_cancel")]
     showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
   end if
-end function
+End Function
 
 
-function isConfirmPasswordScreen() as boolean
+Function isConfirmPasswordScreen() as boolean
   '//Is the current screen the confirmPasswordScreen?
   screen = currentScreen()
   b = (m.confirmPasswordScreen <> invalid and m.confirmPasswordScreen.subType() = screen.subType())
   return b
-end function
+End Function
 
 
-function onPasswordConfirm(msg = invalid)
+Function onPasswordConfirm(msg = invalid)
   tubiLog("SettingsScreenHelper.onPasswordConfirm")
   if msg <> invalid
     confirmPasswordScreen = msg.getRoSGNode()
@@ -200,7 +204,7 @@ function onPasswordConfirm(msg = invalid)
   m.parentalSettingUpdateTask.parentalSetting = m.settingsScreen.parentalSettingSelected
   m.parentalSettingUpdateTask.observeField("result", "onParentalSettingComplete")
   m.parentalSettingUpdateTask.control = "RUN"
-end function
+End Function
 
 
 ' After the parental settings have changes then the content of certain screens should be refreshed
@@ -267,15 +271,16 @@ Function onParentalSettingComplete(msg)
     }
 
     parentalSetting = m.settingsScreen.parentalSettingSelected
-    parentalDescription = ""
-    if type(parentalSetting) = "roInt" and m.constants.ui.parentalControls.descriptions[parentalSetting] <> invalid
-      parentalChoice = m.constants.ui.parentalControls.descriptions[parentalSetting]
-      parentalDescription += " to "
-      parentalDescription += parentalChoice
+    sMessageID = ""
+    if type(parentalSetting) = "roInt"
+      sMessageID = "screenSettings_error_parentalChanges_description_group" + parentalSetting.toStr()
+    end if
+    if sMessageID = ""
+      sMessageID = "screenSettings_error_parentalChanges_description_default"
     end if
 
-    title = "Parental Controls Settings Change"
-    message = "Parental controls setting is changed" + parentalDescription + ". Parental controls will be password protected after 5 minutes."
+    title = getTranslation("screenSettings_error_parentalChanges")
+    message = getTranslation(sMessageID)
     showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
   else
     if isConfirmPasswordScreen() = true
@@ -292,9 +297,9 @@ Function onParentalSettingComplete(msg)
         }
       }
 
-      title = "Update Failed"
-      message = "Failed to update parental control settings.  Please try re-entering your password."
-      buttons = ["OK"]
+      title = getTranslation("screenSettings_error_parentalFailedChange_title")
+      message = getTranslation("screenSettings_error_parentalFailedChange_description")
+      buttons = [getTranslation("dialog_button_ok")]
 
       showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
     else if m.global.authInfo.secondsOfSavedPassword <> invalid and m.global.authInfo.secondsOfSavedPassword > 0
@@ -323,6 +328,6 @@ Function onShowDeviceModal()
     dialog_sub_type: "device-id"
     }
   }  
-  showInfoModal("Full Device ID", deviceId, dialogEvent, m.trackingLoggingTask)    
+  showInfoModal(getTranslation("screenSettings_fullDeviceID"), deviceId, dialogEvent, m.trackingLoggingTask)    
 
 End Function

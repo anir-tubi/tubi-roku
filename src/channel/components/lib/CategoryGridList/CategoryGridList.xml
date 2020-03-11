@@ -33,7 +33,7 @@
 
       <!-- set the RowList.rowHeights and RowList.rowItemSize arrays since the category order has changed. -->
       <field id="setNewRowHeights" type="boolean" alwaysNotify="true"/>
-
+      
       <!-- Indicates if that when the server is contacted, it should indcate that the app is in kidsMode. -->
       <field id="shouldKidsModeBeSentToServer" type="boolean"/>
 

@@ -199,6 +199,7 @@ Function getConstants()
     constants.deviceInfo.minorVersion = minorVersion
     constants.deviceInfo.buildVersion = buildVersion
     constants.deviceInfo.language  = di.GetCurrentLocale().Left(2)
+    constants.deviceInfo.locale  = di.GetCurrentLocale()
     constants.deviceInfo.scaledUi = scaledUi
     
 
@@ -233,22 +234,6 @@ Function getConstants()
 
     constants.thirdParty.sentry = {}
       constants.thirdParty.sentry.dsn = "https://f8edcfe8baf140b4b91b46dfb8af9a19:acdf43f7c38a47f1ab85583035ff1798@sentry.io/1377102"
-      
-    constants.thirdParty.suiteTest = {}
-      
-      'toggle for using suitest or not. Should only be set to true for testing situations.
-      'for production it should be false  
-      if mode = "dev"
-        constants.thirdParty.suiteTest.enabled = true
-      else
-        constants.thirdParty.suiteTest.enabled = false
-      end if
-  
-      ' app_id of suitest application - can be used for any roku device within same organization. update app_id for using different account.
-      constants.thirdParty.suiteTest.app_id =  "214cab71-b41b-468d-bcbb-f42732b157c4"
-  
-      ' uri of suitest application
-      constants.thirdParty.suiteTest.uri = "http://the.suite.st/app/roku.zip"  
 
   'platform is used when communitcating with CMS API
   if LCase(constants.deviceInfo.channelStore) = "telstra"
@@ -257,7 +242,7 @@ Function getConstants()
     constants.platform = "roku"
   end if
 
-  'analyticsPlatform is used when sending analytics events and making raimaker ad requests
+  'analyticsPlatform is used when sending analytics events
   if LCase(constants.deviceInfo.channelStore) = "telstra"
     constants.analyticsPlatform = "TELSTRA"
   else
@@ -304,8 +289,8 @@ Function getConstants()
     'ad server url
     ' constants.urls.adsBaseUrl = "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
     constants.urls.adsBaseUrl = "http://ads.adrise.tv/"
-    ' constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/rev/"
-    constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/rev/"
+    ' constants.urls.adsBaseUrlRainmaker = "http://rainmaker.staging-public.tubi.io/rev/ROKU"
+    constants.urls.adsBaseUrlRainmaker = "http://rainmaker.production-public.tubi.io/rev/ROKU"
 
     'contents url
     constants.urls.cms = {}
@@ -441,9 +426,6 @@ Function getConstants()
 
     'how often the video player records history
     constants.player.historyFrequency = 60
-    
-    ' time to fetch next content before credit cuepoints
-    constants.player.fetchNextDuration = 15    
 
     'the max number of distinct speeds at which the player can scrub (fast forward or rewind), 0 based
     constants.player.maxScrub = 2 
@@ -571,17 +553,7 @@ Function getConstants()
     constants.ui.terms = {}
       constants.ui.terms.categories = "Categories"
       constants.ui.terms.channels = "Channels"
-
-      'static - pre defined text used in the side nav
-      constants.ui.terms.sideNav = {}
-        constants.ui.terms.sideNav.kidsModeEnabled = "Exit Kids"
-        constants.ui.terms.sideNav.kidsModeDisabled = "Kids"
-
-    'static - pre defined category names
-    constants.ui.categoryNames = {}
-      constants.ui.categoryNames.topCategory = "Featured"
-      constants.ui.categoryNames.history = "Continue Watching"
-      constants.ui.categoryNames.queue = "Queue"
+      constants.ui.terms.menu = "Menu"
 
     constants.ui.categoryIds = {}
       'these map to matrix api container ids
@@ -768,14 +740,6 @@ Function getConstants()
       constants.ui.fonts.videoOptionsFontType = constants.ui.fonts.openSans.regular
       constants.ui.fonts.seasonFontType = constants.ui.fonts.openSans.regular
       constants.ui.fonts.episodeFontType = constants.ui.fonts.openSans.regular
-
-    constants.ui.parentalControls = {}
-      constants.ui.parentalControls.descriptions = [
-        "Little Kids (G, TV-Y, TV-G)"
-        "Older Kids (PG, TV-PG, TV-Y7)"
-        "Teens (PG-13, TV-14)"
-        "Adults (R, TV-MA, NC-17)"
-      ]
 
     ' Set some performance parementers based on device profile
     constants.performance = {}

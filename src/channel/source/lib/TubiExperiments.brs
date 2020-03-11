@@ -14,7 +14,6 @@ Function TubiExperiments(constants) as Object
     '   }
     ' }
     '
-    ' Every namespace needs to have a default values AA
     ' Default values are always used in case of a "control" value or
     ' in the case that the experiment API doesn't return a response with our experiment.
     ' All experiments are required by the backend to have one of the experiment values to be "control"
@@ -42,10 +41,6 @@ Function TubiExperiments(constants) as Object
       }
       RokuNamespace: {
         roku_vitg: "vitg_none"   'other expected values "vitg_small", "vitg_large"
-      }
-      roku: {
-        roku_still_watching_timeout_1: "off"   'other expected value is "timeout_12600"
-        roku_still_watching_timeout_2: "off"   'other expected value is "timeout_10800"
       }
     }
     defaultResources: {

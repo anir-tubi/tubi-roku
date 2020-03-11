@@ -68,6 +68,9 @@ Function init()
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
 
+  BackLabel = m.top.findNode("BackLabel")
+  BackLabel.text = getTranslation("goBack_videoPlayer_controls")
+
   m.AdsTask = m.top.findNode("AdsTask")
   m.AdsTask.videoPlayerNode = m.top
   m.AdsTask.control = "RUN"
@@ -114,6 +117,7 @@ Function init()
   m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
   m.top.observeField("adState", "onAdStateChange")
   m.top.observeField("adProgress", "onAdProgressChange")
+  m.top.observeField("displayAdLoadingMessage", "onDisplayAdLoadingMessage")
 
   m.lastPingTime = 0
   m.lastSavedPosition = 0
@@ -168,6 +172,7 @@ Function init()
   m.didAdvanceDrm = false
 End Function
 
+
 Function updateColors()
   m.focusedColor = m.theme.focused
   m.ProgressBar.focusColor = m.focusedColor
@@ -176,10 +181,19 @@ Function updateColors()
   m.CCRailOn.blendColor = m.focusedColor
 End Function
 
+
+Function onDisplayAdLoadingMessage()
+  if m.top.displayAdLoadingMessage = true
+    m.LoadingMessage.text = getTranslation("videoPlayer_adLoadingMessage")
+  end if
+End Function
+
+
 Function onAdProgressChange(msg)
   progress = msg.GetData()
   m.LoadingProgressBar.progress = progress
 End Function
+
 
 Function onBufferingStatus(msg)
   status = msg.GetData()
@@ -188,6 +202,7 @@ Function onBufferingStatus(msg)
     m.LoadingProgressBar.progress = status.percentage
   end if
 End Function
+
 
 Function onDockedChange()
   if m.top.dock
@@ -308,22 +323,18 @@ Function onVideoPositionChange()
   if (m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval) and m.top.adState <> "adspending"
     historyPosition(m.playerPosition)
   end if
-  
+
   if m.top.content <> invalid and m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0
     if m.top.creditsPosition > 0 and m.playerPosition < m.top.content.creditsCuePoint
       '//reset the creditsPosition if the current position is prior to the end credits: i.e. after watching the end credits, the user decided to rewind  before the credits
       m.top.creditsPosition = 0
-    else if m.top.creditsPosition <= 0 and m.playerPosition >= m.top.content.creditsCuePoint 
-       ' Always fire history here to fix a race condition where the user has
-       ' watched beyond the cuepoint but the title doesn't get removed due
-       ' to no history events triggering after the cuepoint
-       historyPosition(m.playerPosition + 5)
-       m.top.creditsPosition = m.playerPosition
+    else if (m.top.creditsPosition <= 0 and m.playerPosition >= m.top.content.creditsCuePoint)
+      ' Always fire history here to fix a race condition where the user has
+      ' watched beyond the cuepoint but the title doesn't get removed due
+      ' to no history events triggering after the cuepoint
+      historyPosition(m.playerPosition + 5)
+      m.top.creditsPosition = m.playerPosition
     end if
-  end if
-  
-  if m.playerPosition + m.constants.player.fetchNextDuration >= m.top.content.creditsCuePoint
-    m.top.fetchNextContent = true
   end if
 
   'Advertisements
@@ -343,7 +354,8 @@ Function onVideoPositionChange()
         if m.Overlay.opacity = 0
           ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
           m.AdHeadsUp.visible = true
-          m.AdHeadsUpText.text = " " + Chr(&hb7) + " Starts in " + stri(cuepoint - m.playerPosition).trim() + " s"
+          seconds = stri(cuepoint - m.playerPosition).trim()
+          m.AdHeadsUpText.text = getTranslation("videoPlayer_adHeadsUp", {seconds: seconds})
         end if
       end if
 
@@ -749,7 +761,6 @@ End Function
 ' onAdStateChange
 '
 ' adState values are:
-'   "ready": the ad shim task is ready and listening for updates to the adControl field (should happen once per user session)
 '   "init": no ad request has yet to be made for this video (adState is reset back to init when video is about to be started)
 '   "fetching": a request has been made to the ad server, awaiting a response
 '   "adspending": an ad response has been returned, the player is waiting to reach the appropriate cuepoint in order to play it
@@ -758,14 +769,11 @@ End Function
 '   "noads": an ad response has been received but there are no ads in it. Or an ad break has played to completion.
 Function onAdStateChange()
   tubiLog("VideoPlayer.onAdStateChange adState = " + m.top.adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
-  if m.top.adState = "ready"
-    m.top.adState = "init"
-    if m.top.adControl <> ""
-      ' There is a race condition that can occur during deeplinks such that m.top.adControl can be set before the adShim is listening
-      ' which results in a ad/video loading screen that never loads. Reset the ad control once the ad state is in init if this is the case
-      ' to fix the issue.
-      m.top.adControl = m.top.adControl
-    end if
+  if m.top.adState = "init" and m.top.adControl <> ""
+    ' There is a race condition that can occur during deeplinks such that m.top.adControl can be set before the adShim is listening
+    ' which results in a ad/video loading screen that never loads. Reset the ad control once the ad state is in init if this is the case
+    ' to fix the issue.
+    m.top.adControl = m.top.adControl
   else if m.top.adState = "adspending" and (m.top.adControl = "preroll" or m.top.adControl = "seek") and m.top.enableAds then
     ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
     ' video playback stopped and should play right away when we get adspending.
@@ -791,7 +799,7 @@ Function onAdStateChange()
         }
       })
     else
-      errorMsg = "Video URL is not valid."
+      errorMsg = getTranslation("videoPlayer_error_invalidURL_description")
       m.top.errorMsg = errorMsg
       m.top.state = "error"
       errorInfo = {
@@ -1034,7 +1042,7 @@ Function goToNext()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(true)
   end if
-  m.top.playNext = true
+
   if not advancePlaylist() then
     'the end of the video playback
     m.VideoState = "stop"

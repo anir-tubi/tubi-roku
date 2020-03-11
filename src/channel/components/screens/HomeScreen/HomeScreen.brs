@@ -1,7 +1,6 @@
 Function init()
   tubiLog("HomeScreen.init")
   m._ = rodash()
-  m.NodeHelpers = TubiNodeHelpers()
   m.constants = m.global.constants
   Request = TubiRequest()
   Auth = TubiAuth(m.constants, Request)
@@ -16,7 +15,6 @@ Function init()
   m.Spinner = m.top.findNode("CategorySpinner")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
-  m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
   m.top.observeField("enabled", "onEnableChange")
   m.top.observeField("isLoading", "onLoadingChange")
@@ -48,6 +46,8 @@ Function init()
     pageValues: {}
   }
 
+  BackLabel = m.top.findNode("callToAction")
+  BackLabel.text = getTranslation("goBack_menu")
   m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
 
   ' the animation nodes necessary for video in the grid (vitg)
@@ -81,88 +81,6 @@ Function onEnableChange()
     fade(m.NavSection, "in", 0.3)
   else
     fade(m.NavSection, "out", 0.3)
-  end if
-End Function
-
-
-Function onReloadUserCategoriesResponse()
-  handledRequest = m.top.reloadUserCategoriesResponse
-  tubiLog("HomeScreen.onReloadUserCategoriesResponse")
-  if handledRequest.response <> invalid then
-    response = handledRequest.response
-    if response.code >= 200 and response.code < 300 then
-      newCategory = handledRequest.convertedMetadata
-
-      if m.top.content <> invalid
-        oldCategory = invalid
-        if newCategory <> invalid and newCategory.id <> invalid
-          oldCategory = m.top.content.findNode(newCategory.id)
-        else if handledRequest.context.id <> invalid
-          oldCategory = m.top.content.findNode(handledRequest.context.id)
-        end if
-
-        ' there are 4 options here
-        ' 1) new category and old category both have content in them - replace the old with the new
-        ' 2) new category has content, old category doesn't exist - add the new category
-        ' 3) new category doesn't have content (will be invalid), old category does have content - remove old category
-        ' 4) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
-        if newCategory <> invalid and oldCategory <> invalid
-          ' replace old category with new category
-          m.top.content.replaceChild(newCategory, m.NodeHelpers.getChildIndex(m.top.content, oldCategory))
-        else if newCategory <> invalid and oldCategory = invalid
-          ' add new category
-          ' add the continue watching or queue category based on the position that they arrive in from the /homescreen API,
-          ' even if they are empty when they are initally received (logic is done in TubiMetadataTranslate.translateHomescreen)
-          if newCategory.id = m.constants.ui.categoryIds.history
-            m.top.content.insertChild(newCategory, m.top.content.continueWatchingIndex)
-          else if newCategory.id = m.constants.ui.categoryIds.queue
-            m.top.content.insertChild(newCategory, m.top.content.queueIndex)
-          end if
-
-          m.CategoryGridList.setNewRowHeights = true
-        else if newCategory = invalid and oldCategory <> invalid
-          ' remove old category
-          m.top.content.removeChild(oldCategory)
-          m.CategoryGridList.setNewRowHeights = true
-        else if newCategory = invalid and oldCategory = invalid
-          ' do nothing
-        end if
-
-        ' reset the categoryGridList content so the changes display in the RowList
-        categoryContent = m.top.content
-        m.CategoryGridList.content = categoryContent
-      end if
-
-      m.top.isLoading = false
-
-      ' if m.CategoryGridList.content <> invalid
-      '   ' Make sure any user categories which didn't get newly added are reloaded
-      '   for each userCategory in [m.constants.ui.categoryIds.history, m.constants.ui.categoryIds.queue]
-      '     childNode = m.CategoryGridList.content.findNode(userCategory)
-      '     if childNode <> invalid
-      '       m.CategoryGridList.content.replaceChild(childNode.clone(false), m.NodeHelpers.getChildIndex(m.CategoryGridList.content, childNode))
-      '     end if
-      '   end for
-      ' else
-      '   m.CategoryGridList.content = m.top.content  ' should be all categories with initial amounts of content in them
-      ' end if
-      ' if m.top.isInFocusChain() then m.CategoryGridList.setFocus(true)
-    else
-      ' if we were loading in the background, don't show an error modal
-      if m.top.isInFocusChain()
-        errorMessage = "Unable to load some categories."
-        errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
-        dialogEvent = getHomescreenDialogAnalyticsEvent("NETWORK_ERROR", errorCode, m.Tracking)
-        
-        modalInfo = {
-          message: getErrorMessage(errorMessage, errorCode)
-          openTrackEvent: dialogEvent
-          trackingTask: m.trackingLoggingTask
-        }
-
-        showErrorModal(modalInfo, onUserCategoriesFailed, invalid, invalid, invalid, ["Continue"])
-      end if
-    end if
   end if
 End Function
 
@@ -259,8 +177,8 @@ Function onCurrFocusRowChange()
   ' send experiment analytics (exposure event) for large and small vitg.
   ' calling getExperimentValue() automatically sends the exposure, and limits sending the exposure event to once per session.
   if categoryEnteringFocus <> invalid
-    if categoryEnteringFocus.id = "deep_cuts"
-      getExperimentValue("RokuNamespace", "roku_vitg_2")
+    if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large or categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_small
+      getExperimentValue("RokuNamespace", "roku_vitg")
     end if
   end if
 
@@ -424,19 +342,6 @@ Function populateInfoPanel(mode, contentNode)
 
     m.InfoPanel.calculateHeight = true
   end if
-End Function
-
-
-Function getHomescreenDialogAnalyticsEvent(dialogType, dialogSubtype, trackingLib)
-  return {
-    type: "dialog"
-    values: {
-      dialog_type: dialogType 'DialogType enum - TODO: Update this when a "PLAYER_ERROR" value becomes available in protos
-      pageOneof: trackingLib.getAnalyticsPage("home_page", {})
-      dialog_action: "SHOW"
-      dialog_sub_type: dialogSubtype
-    }
-  }
 End Function
 
 

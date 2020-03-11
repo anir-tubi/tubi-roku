@@ -1,8 +1,0 @@
-# These are images that have been added since the last formal Roku published version of the channel.
-# These are the only images that will be included inside the remote components bundle.
-# 
-# Generated with (and manually filtered for new or changed images): 
-#   git diff --stat 2_7_1:src/channel/images HEAD:src/channel/images/
-
-# Add images below here like:
-#   images/new-image.png

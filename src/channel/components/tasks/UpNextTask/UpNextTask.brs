@@ -25,7 +25,6 @@ Function execGetUpNextContent() As Void
       "app_id": appName
       "platform": platform
       "device_id": constants.deviceInfo.deviceId
-      "mode" : m.top.request.mode
     }
   }
   if m.top.request.userId <> invalid and m.top.request.userId <> ""

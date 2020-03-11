@@ -4,14 +4,16 @@ Function initSideNav()
   m.global.unobserveFieldScoped("authInfo")
   m.global.observeFieldScoped("authInfo", "onSideNavSignedIn")
   m.sSideNavItemSelectedId = invalid
-  m.sSideNavCurrentScreen  = invalid
-  onSideNavSignedIn()
+  m.sSideNavCurrentScreen = invalid
   if m.kidsModeFeatureOn = false
     m.SideNav.kidsModeValues = {
-      on: false, 
+      on: false,
       featureOn: m.kidsModeFeatureOn
     }
   end if
+
+  '//set the SideNav Strings by calling onSideNavSignedIn()
+  onSideNavSignedIn()
 End Function
 
 
@@ -26,7 +28,7 @@ End Function
 ' @sID: string: one of the menu item ids. A list of ids can be found in constants.ui.sideNavIds
 Function focusSideNavOption(sID)
   '//::TODO:: there should be a check that a valid ID was passed. For right now assume sID is valid and correct.
-  m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav 
+  m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav
 End Function
 
 
@@ -39,44 +41,46 @@ End Function
 ' Is the side nav open and in focus
 Function isSideNavActive() as Boolean
   return (m.SideNav.isInFocusChain() = true and m.SideNav.opened = true)
-End Function 
+End Function
 
 
 ' Change the appearance of some side nav elements when the user data has changed
 Function onSideNavSignedIn()
   tubiLog("onSideNavSignedIn")
-  sName = ""
+  sName = getTranslation("menu_signIn")
+
   authInfo = m.global.authInfo
   if authInfo <> invalid
-    sGreeting = "Hi "
+    '//User is signed in
+    sName = ""
     if authInfo.firstName <> invalid
-      sName = sGreeting + authInfo.firstName
+      sName = authInfo.firstName
     else if authInfo.name <> invalid
-      sName = sGreeting + authInfo.name
+      sName = authInfo.name
     end if
+    sName = getTranslation("menu_signedIn", { name: sName })
   end if
-  m.SideNav.userName = sName
+  m.SideNav.stringSignIn = sName
 End Function
 
 
 Function setKidsModeInSideNav(isEnabled = true)
   bLimited = false
   if isEnabled = true
-    sIconTitle = m.constants.ui.terms.sideNav.kidsModeEnabled 
+    sIconTitle = getTranslation("menu_exitKids")
   else
-    sIconTitle = m.constants.ui.terms.sideNav.kidsModeDisabled 
+    sIconTitle = getTranslation("menu_kids")
   end if
-
   if isKidsModeEnabledByParentalControls() = true
     '// the user is set with kids permissions, so instruct the side nav to not allow the kids mode button to do everything it can
     bLimited = true
-    sIconTitle = m.constants.ui.terms.sideNav.kidsModeEnabled 
+    sIconTitle = getTranslation("menu_exitKids")
   end if
-  
+
   m.SideNav.kidsModeValues = {
     featureOn: m.kidsModeFeatureOn,
     on: isEnabled
-    grayedOut: bLimited, 
+    grayedOut: bLimited,
     title: sIconTitle
   }
 End Function
@@ -95,7 +99,7 @@ Function onSideNavItemSelected()
 
   if m.sSideNavItemSelectedId <> itemSelectedId or bSameScreen = false
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
-    bNewScreenCalledSuccess = false 
+    bNewScreenCalledSuccess = false
     if itemSelectedId = m.constants.ui.sideNavIds.profile
       if authInfo = invalid
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
@@ -111,7 +115,8 @@ Function onSideNavItemSelected()
       sDescription = ""
       if itemSelected.turnedOn = true
         '//If the parental control settings are not set to kids, then this action is not limited
-        
+        '// aka this mode is not locked down and can be easily exited without a parent's intervention
+
         if m.kidsModeEnabled = true
           dialogEvent = {
             type: "dialog"
@@ -123,9 +128,10 @@ Function onSideNavItemSelected()
             }
           }
 
-          sTitle = "Exit Kids"
-          sDescription = "Do you have permission from your parents to leave Tubi Kids? If you exit you will see titles rated PG-13 and above."
-          showSimpleModal(sTitle, sDescription, ["Exit Kids", "Cancel"], dialogEvent, m.trackingLoggingTask, onKidsModeExit)
+          sTitle = getTranslation("dialog_kidsExit_title")
+          sDescription = getTranslation("dialog_kidsExit_description")
+          '//::TODO::locale - should we 1st check if there is an error specifc OK/cancel button? If, not then should we get the generic ok/cancel button string?
+          showSimpleModal(sTitle, sDescription, [getTranslation("dialog_kidsExit_button_ok"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, onKidsModeExit)
         else
           dialogEvent = {
             type: "dialog"
@@ -139,8 +145,9 @@ Function onSideNavItemSelected()
           m.trackingLoggingTask.trackEvent = dialogEvent
           enableKidsModeFromSideNav()
         end if
-      else 
+      else
         if m.kidsModeEnabled = true
+          '// this mode is locked down and a child need's a parent's intervention to exit the mode
 
           dialogEvent = {
             type: "dialog"
@@ -152,10 +159,10 @@ Function onSideNavItemSelected()
             }
           }
 
-          sTitle = "Exit Kids"
-          sDescription = "To exit Kids, please update your parental controls in account settings."
-          showSimpleModal(sTitle, sDescription, ["Go To Settings", "Cancel"], dialogEvent, m.trackingLoggingTask, onKidsModeSettingsCall)
-        else 
+          sTitle = getTranslation("dialog_kidsExit_title")
+          sDescription = getTranslation("dialog_kidsExitLimited_description")
+          showSimpleModal(sTitle, sDescription, [getTranslation("dialog_button_settings"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, onKidsModeSettingsCall)
+        else
           '//This use case should never happen. If the user has parental controls set to kids, then that instantly turns on kids mode,
           '//   so there will never be an enter kids mode mode when parental controls is turned to kids.
         end if
@@ -182,19 +189,19 @@ Function onSideNavItemSelected()
           }
         }
 
-        sTitle = "Channels Disabled"
-        sDescription = "Please exit Tubi Kids to use this feature."
+        sTitle = getTranslation("dialog_channelsDisabled_title")
+        sDescription = getTranslation("dialog_channelsDisabled_description")
         showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
 
         ' reset the selected item indicator in the side nav to the current screen, since selecting search will set it to search
         sideNavId = m.constants.ui.screenIdToSideNavId[currentScreenNow.id]
         updateSideNavSelected(sideNavId)
       else
-        showChannelListScreen(m.constants, "MENU")
+        showChannelListScreen(m.constants, m.constants.ui.terms.menu)
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.categories
-      showCategoryListScreen(m.constants, "MENU")
+      showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.settings
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
@@ -213,7 +220,7 @@ Function onSideNavItemSelected()
     if bNewScreenCalledSuccess = true
       hideNavMenu(false)
       m.sSideNavItemSelectedId = itemSelectedId
-      m.sSideNavCurrentScreen  = currentScreen()
+      m.sSideNavCurrentScreen = currentScreen()
     end if
   else
     '//if currentScreen no longer = the screen that
@@ -228,10 +235,10 @@ Function enableKidsModeFromSideNav(bEnable = true)
   enableKidsModeUI(bEnable)
   refreshScreenAfterParentalChanges()
   screen = currentScreen()
-  
+
   if bEnable = true
     if screen <> invalid and (screen.id = m.constants.ui.screenIds.searchScreen or screen.id = m.constants.ui.screenIds.channelListScreen)
-      '//If the current screen is one of the pages that should be disabled during kids mode, then take user to homescreen    
+      '//If the current screen is one of the pages that should be disabled during kids mode, then take user to homescreen
       showHomeScreen(m.constants, m.global.authInfo)
 
       homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
@@ -248,15 +255,15 @@ Function onKidsModeSettingsCall()
 End Function
 
 
-'@param b: Boolean, Says what the function is. Should the sideNav be set to open? If set to false, then the opposite happens, the side nav closes.
-Function openSideNav(b=true)
-  m.SideNav.opened = b 
+'@param b: Boolean, Says what the Function is. Should the sideNav be set to open? If set to false, then the opposite happens, the side nav closes.
+Function openSideNav(b = true)
+  m.SideNav.opened = b
   if b = false
     topScreen = currentScreen()
     sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
     itemSelectedId = m.SideNav.itemSelectedId
     if itemSelectedId = m.constants.ui.sideNavIds.kidsMode and sideNavId <> invalid
-      '//if the sidenav has been closed and the kidsNav had been last selected; it is currently in focus, 
+      '//if the sidenav has been closed and the kidsNav had been last selected; it is currently in focus,
       '//   then change the focus to the option relating to the current screen
       focusSideNavOption(sideNavId)
     end if

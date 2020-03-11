@@ -6,7 +6,6 @@ Function init()
   m.top.observeField("metadataFetchTaskBatch", "onMetadataFetchTaskBatchResponse")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("contentUpdated", "onContentChange")
-  m.top.observeField("setNewRowHeights", "onNewRowHeights")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeField("rowItemFocused", "onRowItemFocused")
@@ -45,9 +44,6 @@ Function init()
 
   ' suppress debounce if we have just gained focus
   m.justGainedFocus = false
-
-  ' stores an array of the form [y, x], which can be set on RowList.jumpToItem
-  m.itemToJumpTo = invalid
 End Function
 
 
@@ -62,24 +58,8 @@ End Function
 Function onComponentFocusChange()
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
   if m.top.hasFocus()
-
-    rowItemFocused = m.RowList.rowItemFocused
-    if rowItemFocused.count() <> 2
-      '//The rowList has not gained focus yet so use the default upperleft item.
-      rowItemFocused = [0,0]
-    end if 
-    
-    if resolveAbbreviatedContent(rowItemFocused) <> invalid or (m.itemToJumpTo <> invalid and resolveAbbreviatedContent(m.itemToJumpTo) <> invalid)
-      if m.itemToJumpTo <> invalid
-        m.RowList.jumpToRowItem = m.itemToJumpTo
-        m.itemToJumpTo = invalid
-      end if
-
+    if resolveAbbreviatedContent(m.RowList.rowItemFocused) <> invalid
       m.justGainedFocus = true
-      m.RowList.setFocus(true)
-      'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error. 
-      '   This is especially true when the Rowlist does not have initial focus when the content has loaded.
-      m.RowList.setFocus(false)
       m.RowList.setFocus(true)
     end if
   end if
@@ -97,7 +77,29 @@ Function onContentChange()
     ' posters and do a nice fade-in.
     m.RowList.content = invalid
     if m.top.content <> invalid then
-      setRowHeights()
+      'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
+      rowItemSize = []
+      rowHeights = []
+      numRows = 2
+      for i=0 to m.top.content.getChildCount()-1
+        category = m.top.content.getChild(i)
+        if category.gridItemType = m.constants.ui.gridItemTypes.portrait
+          rowItemSize.push([210,300])
+          rowHeights.push(364)
+        else if category.gridItemType = m.constants.ui.gridItemTypes.landscape or category.gridItemType = m.constants.ui.gridItemTypes.vitg_small
+          rowItemSize.push([430,242])
+          rowHeights.push(364)
+        else if category.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+          rowItemSize.push([1205,677])
+          rowHeights.push(800)
+          numRows = 3
+        end if
+      end for
+
+      m.RowList.rowItemSize = rowItemSize
+      m.RowList.rowHeights = rowHeights
+      m.RowList.content = m.top.content
+      m.RowList.numRows = numRows
 
       itemFocused = [1, 1]
       if resolveAbbreviatedContent(itemFocused) <> invalid
@@ -110,46 +112,6 @@ Function onContentChange()
       loadCategories(0)
     end if
   end if
-End Function
-
-
-Function onNewRowHeights()
-  setRowHeights()
-  ' setting the rowItemSize and/or rowHeights moves the focus indicator back to the origin so
-  ' we need to move the focus back to it's appropriate place. But we need to check that there is content
-  ' at the location or else the RowList loses focus and can't get it back.
-  if resolveAbbreviatedContent(m.RowList.rowItemFocused) <> invalid
-    m.itemToJumpTo = m.RowList.rowItemFocused
-  else if resolveAbbreviatedContent([m.RowList.rowItemFocused[0] - 1, m.RowList.rowItemFocused[1]]) <> invalid
-    m.itemToJumpTo = [m.RowList.rowItemFocused[0], 0]
-  end if
-End Function
-
-
-Function setRowHeights()
-  'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
-  rowItemSize = []
-  rowHeights = []
-  numRows = 2
-  for i=0 to m.top.content.getChildCount()-1
-    category = m.top.content.getChild(i)
-    if category.gridItemType = m.constants.ui.gridItemTypes.portrait
-      rowItemSize.push([210,300])
-      rowHeights.push(364)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.landscape or category.gridItemType = m.constants.ui.gridItemTypes.vitg_small
-      rowItemSize.push([430,242])
-      rowHeights.push(364)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-      rowItemSize.push([1205,677])
-      rowHeights.push(800)
-      numRows = 3
-    end if
-  end for
-
-  m.RowList.rowItemSize = rowItemSize
-  m.RowList.rowHeights = rowHeights
-  m.RowList.content = m.top.content
-  m.RowList.numRows = numRows
 End Function
 
 

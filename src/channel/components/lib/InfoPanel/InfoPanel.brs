@@ -13,6 +13,8 @@ Function init()
   m.DescriptionGroup = m.top.findNode("DescriptionGroup")
   m.DescriptionFocusButton = m.top.findNode("DescriptionFocusButton")
   m.DescriptionFocusButton.blendColor = m.global.theme.focused
+  m.StarringTag = m.top.findNode("StarringTag")
+  m.DirectorTag = m.top.findNode("DirectorTag")
   m.Director = m.top.findNode("Director")
   m.DirectorGroup = m.top.findNode("DirectorGroup")
   m.StarringGroup = m.top.findNode("StarringGroup")
@@ -47,6 +49,32 @@ Function init()
 
   'set the default title logo state to be no title logo
   m.TitleGroup.removeChild(m.TitleLogo)
+
+  m.StarringTag.width = 0
+  m.DirectorTag.width = 0
+  m.DirectorTag.text = getTranslation("metadata_directed") 
+  m.StarringTag.text = getTranslation("metadata_starring") 
+
+
+  '//Set a line after the directed by and starring text to be right aligned so the values associated with those lines are left aligned
+  nStarringWidth = m.StarringTag.boundingRect().width
+  nDirectorWidth = m.DirectorTag.boundingRect().width
+  nLineMin = 43
+  nMatchDirectorWidth = nStarringWidth - nDirectorWidth
+  nMatchStarringWidth = nDirectorWidth - nStarringWidth
+
+  if nMatchStarringWidth >= 0
+    nMatchDirectorWidth = 0
+  else
+    nMatchStarringWidth = 0
+  end if
+  
+  DirectorRect = m.top.findNode("DirectorRect")
+  StarringRect = m.top.findNode("StarringRect")
+
+  DirectorRect.width = nMatchDirectorWidth + nLineMin
+  StarringRect.width = nMatchStarringWidth + nLineMin
+
 End Function
 
 Function onPosterLoadStatus(msg)
@@ -165,7 +193,11 @@ Function onLineOneDataChange(msg)
     daysRemaining = ((endSeconds - nowSeconds) \ 86400) + 1
     ' BIZ REQ: only titles expiring in the next 2 weeks should display message
     if daysRemaining > 0 and daysRemaining <= 14
-      m.ExpireWarning.text = "Expires in " +  daysRemaining.toStr() + " days"
+      if daysRemaining > 1
+        m.ExpireWarning.text = getTranslation("metadata_expiresIn_plural", {days: daysRemaining.toStr()})    
+      else
+        m.ExpireWarning.text = getTranslation("metadata_expiresIn_singular") 
+      end if
       if m.ExpireWarning.getParent() = invalid
         firstLineGroup.insertChild(m.ExpireWarning, insertIndex)
       end if

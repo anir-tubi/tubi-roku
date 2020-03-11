@@ -15,6 +15,7 @@ Function init()
   m.KeyboardAnimation = m.top.findNode("KeyboardAnimation")
   m.KeyboardInterpolator = m.top.findNode("KeyboardTranslationInterpolator")
 
+
   m.theme = m.global.theme
   m.SubmitButtonFocus.blendColor = m.theme.focused
   m.PasswordButtonFocus.blendColor = m.theme.focused
@@ -61,9 +62,9 @@ End Function
 ' Set the password display button based on the state of the password obfuscation 
 Function setPasswordButtonLabel()
   if m.Keyboard.textEditBox.secureMode = false
-    m.PasswordButtonLabel.text = "Hide Password"
+    m.PasswordButtonLabel.text = getTranslation("screenSettings_parentalPassword_button_hide")
   else
-    m.PasswordButtonLabel.text = "Show Password"
+    m.PasswordButtonLabel.text = getTranslation("screenSettings_parentalPassword_button_show")
   end if
 End Function
 

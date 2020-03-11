@@ -6,10 +6,99 @@ Function startSignIn(skipDisambiguation)
   tubiLog("SignInHelpers.startSignIn")
   activationCodeScreen = CreateObject("roSGNode", "ActivationCodeScreen")
   activationCodeScreen.observeFieldScoped("activationSuccess", "onActivationSuccess")
-  activationCodeScreen.observeFieldScoped("skipButtonPressed", "onActivationSkipped")
-  pushScreen(activationCodeScreen, true, true)
+  activationCodeScreen.observeFieldScoped("errorType", "onRegTaskError")
 
+  ' in the current design, navigating away from the activation page destroys the page
+  ' so it is ok to only get the registration code when the page is created.
+  activationCodeScreen.getActivationCode = true
+
+  pushScreen(activationCodeScreen, true, true)
   displayDefaultBackground()
+End Function
+
+
+Function getActivationCodeScreen()
+  screen = invalid
+  if currentScreen() <> invalid and currentScreen().getSubtype() =  "ActivationCodeScreen"
+    screen = currentScreen()
+  end if
+
+  return screen
+End Function
+
+'''''''''''''''''''''''''
+' onRegTaskError
+'
+' An error was recorded by the registrationCodeTask so let the user know
+Function onRegTaskError(evt)
+
+  sSubtypeCode = ""
+
+  sEventName = evt.getData()
+  if sEventName = "expire"
+    title = getTranslation("dialog_signIn_activationCodeExpired_title")
+    message = getTranslation("dialog_signIn_activationCodeExpired_description")
+    sSubtypeCode = m.constants.errors.subtypes.expireError
+  else if sEventName = "poll"
+    title = getTranslation("error_signIn_connectionError_title")
+    message = getTranslation("error_signIn_connectionError_description")
+    sSubtypeCode = m.constants.errors.subtypes.networkError
+  else if sEventName = "code"
+    title = getTranslation("error_signIn_connectionErrorFetch_title")
+    message = getTranslation("error_signIn_connectionErrorFetch_description")
+    sSubtypeCode = m.constants.errors.subtypes.fetchError
+  else
+    title = getTranslation("error_signIn_activationCodeGeneral_title")
+    message = getTranslation("error_signIn_activationCodeGeneral_description")
+  end if
+  
+  userErrorCode = getUserFacingErrorCode(m.constants.errors.context.activateScreen, sSubtypeCode)
+  
+  authPageValues = {
+    auth_action:  "ACTIVATION"  'Action enum
+  }
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "REGISTRATION"
+      pageOneof: m.Tracking.getAnalyticsPage("auth_page", authPageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: userErrorCode
+    }
+  }
+
+  modalInfo = {
+    title: title
+    message: getErrorMessage(message, userErrorCode)
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+  showErrorModal(modalInfo, onErrorButtonTryAgainPress, invalid, onErrorButtonCancelPress, invalid, [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_skip")])
+End Function
+
+
+'''''''''''''''''''''''''
+' onErrorButtonCancelPress
+'
+' Respond the user selecting the cancel button on the error modal
+Function onErrorButtonCancelPress()
+  screen = getActivationCodeScreen()
+  if screen <> invalid
+    screen.getActivationCode = false
+  end if
+  popScreen(true)
+End Function
+
+
+'''''''''''''''''''''''''
+' onErrorButtonTryAgainPress
+'
+' Respond the user selecting the try again button on the error modal
+Function onErrorButtonTryAgainPress()
+  screen = getActivationCodeScreen()
+  if screen <> invalid
+    screen.getActivationCode = true
+  end if
 End Function
 
 
@@ -122,9 +211,4 @@ Function onAuthInfoReceived()
     end if
     startUserExperience(registryKidsMode)
   end if
-End Function
-
-
-Function onActivationSkipped()
-  popScreen(true)
 End Function

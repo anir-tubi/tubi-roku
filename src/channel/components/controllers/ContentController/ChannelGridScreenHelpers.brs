@@ -136,6 +136,7 @@ End Function
 
 
 Function onGridContentError(msg)
+'//::TODO:: make sure the side nav button returns to previous focus.
   tubiLog("ChannelGridScreenHelpers.onGridContentError")
   errorInfo = msg.getData()
   task = msg.getRoSGNode()
@@ -152,14 +153,12 @@ Function onGridContentError(msg)
     deleteFromScreenCache(screen.id)
 
     sErrorType = m.constants.errors.context.categoriesScreen
-    sErrorContent = LCase(m.global.constants.ui.terms.categories)
+    prelimMessage = getTranslation("screenCategories_error_retrieve_message")
     if screen.displayChannels = true
       sErrorType = m.constants.errors.context.channelsScreen
-      sErrorContent = LCase(m.global.constants.ui.terms.channels)
+      prelimMessage = getTranslation("screenChannels_error_retrieve_message")
     end if
-
     errorCode = getUserFacingErrorCode(sErrorType, m.constants.errors.subtypes.fetchError, errorInfo.code)
-    prelimMessage = "Could not retrieve " + sErrorContent + " content."
 
     dialogEvent = {
       type: "dialog"

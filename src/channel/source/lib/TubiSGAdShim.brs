@@ -41,7 +41,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
   m.videoPlayerNode.observeField("adControl", port)
 
   ' Let SceneGraph know that ad shim is ready
-  m.videoPlayerNode.adState = "ready"
+  m.videoPlayerNode.adState = "init"
 
   while(true)
     msg = wait(0, port)

@@ -123,17 +123,10 @@ Function init()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
-  
-  m.stillWatchingTimeout = getExperimentResource("roku", "roku_still_watching_timeout_1", false).timeout
-  if m.stillWatchingTimeout = 0 'is 0 if not in the roku_still_watching_timeout_1 experiment, 60 if in experiment including control
-     m.stillWatchingTimeout = getExperimentResource("roku", "roku_still_watching_timeout_2", false).timeout
-  end if
-  
 End Function
 
 
 ' initiateHomeData
-
 ' constructs requestType, url, params and responseType for api request and invokes makeTaskRequest helper
 Function initiateHomeData()
 
@@ -158,6 +151,7 @@ Function initiateHomeData()
   m.makeTaskRequest(requestType, url, options, m.generalTask, onHomeSuccessResponse, onHomeErrorResponse, responseType)
 
 End Function
+
 
 Function displayExitModal(trackingPageInfo)
   dialogEvent = {
@@ -313,60 +307,59 @@ End Function
 Function onInactivityTimer()
   now = Uptime(0)
  
-  stillWatchingTimeout = m.stillWatchingTimeout
+  stillWatchingTimeout = getExperimentResource("RokuNamespace", "stillWatching").timeout
   
   if stillWatchingTimeout > 0 and (now - m.lastUserActivity > stillWatchingTimeout) and m.videoPlayer.visible = true
-    if getExperimentValue("roku", "roku_still_watching_timeout_1") = "timeout_12600" or getExperimentValue("roku", "roku_still_watching_timeout_2") = "timeout_10800"
-      if m.inactivityModal = invalid
-        ' Don't invoke this during an ad break or while upNext is visible.  Also if it's just been paused leave it.
-        if m.videoPlayer.adState <> "adsplaying" and m.videoPlayer.state = "playing" and m.upNextScreen = invalid
-          m.videoPlayer.control = "pause"
-          contentId = 0
-          if m.videoPlayer.content <> invalid and m.videoPlayer.content.id <> invalid and m.videoPlayer.content.id <> ""
-            contentId = m.videoPlayer.content.id.toInt()
-          end if
+    if m.inactivityModal = invalid
+      ' Don't invoke this during an ad break or while upNext is visible.  Also if it's just been paused leave it.
+      if m.videoPlayer.adState <> "adsplaying" and m.videoPlayer.state = "playing" and m.upNextScreen = invalid
+        m.videoPlayer.control = "pause"
 
-          dialogEvent = {
-            type: "dialog"
-            values: {
-              dialog_type: "STILL_WATCHING"   'DialogType enum
-              pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: contentId}) 'TODO: should be video_player_page eventually
-              dialog_action: "SHOW"  'Action enum
-              dialog_sub_type: (stillWatchingTimeout / 60).toStr() + "-minutes"
-            }
-          }
-
-          modalInfo = {
-            title: "Are you still watching?"
-            message: ""
-            openTrackEvent: dialogEvent
-            trackingTask: m.trackingLoggingTask
-            backButtonCallback: onInactivityButton
-          }
-
-          modalButtonInfo = [
-            {
-              text: "Yes"
-              type: "accept"
-              callback: onInactivityButton
-            }
-            {
-              text: "No"
-              type: "dismiss"
-              callback: onInactivityClose
-            }
-          ]
-
-          m.inactivityModal = showModal(modalInfo, modalButtonInfo)
+        contentId = 0
+        if m.videoPlayer.content <> invalid and m.videoPlayer.content.id <> invalid and m.videoPlayer.content.id <> ""
+          contentId = m.videoPlayer.content.id.toInt()
         end if
-      else if (now - m.lastUserActivity - stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
-        closeModal(m.inactivityModal)
-        stopInactivityTimer()
-        if shouldStopOnStillWatchingTimeout() = true
-          returnToDetailScreenFromVideo()
-        else
-          m.videoPlayer.control = "resume"
-        end if
+
+        dialogEvent = {
+          type: "dialog"
+          values: {
+            dialog_type: "STILL_WATCHING"   'DialogType enum
+            pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: contentId}) 'TODO: should be video_player_page eventually
+            dialog_action: "SHOW"  'Action enum
+            dialog_sub_type: (stillWatchingTimeout / 60).toStr() + "-minutes"
+          }
+        }
+
+        modalInfo = {
+          title: "Are you still watching?"
+          message: ""
+          openTrackEvent: dialogEvent
+          trackingTask: m.trackingLoggingTask
+          backButtonCallback: onInactivityButton
+        }
+
+        modalButtonInfo = [
+          {
+            text: "Yes"
+            type: "accept"
+            callback: onInactivityButton
+          }
+          {
+            text: "No"
+            type: "dismiss"
+            callback: onInactivityClose
+          }
+        ]
+
+        m.inactivityModal = showModal(modalInfo, modalButtonInfo)
+      end if
+    else if (now - m.lastUserActivity - stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
+      closeModal(m.inactivityModal)
+      stopInactivityTimer()
+      if shouldStopOnStillWatchingTimeout() = true
+        returnToDetailScreenFromVideo()
+      else
+        m.videoPlayer.control = "resume"
       end if
     end if
   end if
@@ -749,10 +742,6 @@ End Function
 Function onReloadUserCategoriesResponse(msg)
   tubiLog("ContentController.onReloadUserCategoriesResponse")
   handledRequest = msg.getData()
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid
-      homeScreen.reloadUserCategoriesResponse = handledRequest  
-  end if
   categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
   if categoryListScreen <> invalid
       categoryListScreen.reloadUserCategoriesResponse = handledRequest  
@@ -1059,13 +1048,10 @@ End Function
 ' show an upgrade modal if constants says that we should
 Function showUpgradeModal(shouldAlert, trackingLib, trackingTask)
   if shouldAlert = true
-    title  = "Please update the Tubi channel"
-    message  = "This version of Tubi is no longer supported. "
-    message  += "To update, please exit the Tubi app and go to:"
-    message  += chr(10)
-    message  += chr(10)
-    message  += "Settings > System > System update > Check now"
-    buttons = ["Close"]
+    title  = getTranslation("dialog_updateVersion_title")
+    message  = getTranslation("dialog_updateVersion_description")
+    
+    buttons = [getTranslation("dialog_button_close")]
 
     dialogEvent = {
       type: "dialog"
