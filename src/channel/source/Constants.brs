@@ -421,11 +421,6 @@ Function getConstants()
     ' Time in seconds after which we force a refresh of the categoryscreen
     constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
 
-    ' Time in seconds how long we pop up the modal to ask the user if they are still watching
-    constants.timers.stillWatchingDismissTimeout = 10 * 60
-    constants.timers.stillWatchingExperimentStart = 1525712400  ' May 7, 10am PDT
-    constants.timers.stillWatchingExperimentEnd = 1525798800  ' May 8, 10am PDT
-
   'constants needed for the video player
   constants.player = {}
 
@@ -454,9 +449,6 @@ Function getConstants()
 
     'the number of seconds before the video player transport autohides during playback
     constants.player.transportAutoHideTime = 5
-
-    constants.player.stillWatchingStopOnTimeout = invalid
-
     constants.player.thumbnailFrequency = 5
 
     'video player returns one of the following

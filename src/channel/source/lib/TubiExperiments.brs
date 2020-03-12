@@ -38,27 +38,14 @@ Function TubiExperiments(constants) as Object
     '
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
     defaultValues: {
-      UserNamespace: {
-      }
-      RokuNamespace: {
-        roku_vitg: "vitg_none"   'other expected values "vitg_small", "vitg_large"
-      }
       roku: {
-        roku_still_watching_timeout_1: "off"   'other expected value is "timeout_12600"
-        roku_still_watching_timeout_2: "off"   'other expected value is "timeout_10800"
       }
       roku2: {
         roku_movies_tv : "off"
       }
     }
     defaultResources: {
-      UserNamespace: {
-      }
-      RokuNamespace: {
-      }
       roku: {
-        roku_still_watching_timeout_1 : {"timeout" : 0},
-        roku_still_watching_timeout_2 : {"timeout" : 0},
         roku_kids_mode_persistence : { "enabled" : false }
       }
       roku2: {
