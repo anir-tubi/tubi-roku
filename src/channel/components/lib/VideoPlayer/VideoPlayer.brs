@@ -328,13 +328,17 @@ Function onVideoPositionChange()
     if m.top.creditsPosition > 0 and m.playerPosition < m.top.content.creditsCuePoint
       '//reset the creditsPosition if the current position is prior to the end credits: i.e. after watching the end credits, the user decided to rewind  before the credits
       m.top.creditsPosition = 0
-    else if (m.top.creditsPosition <= 0 and m.playerPosition >= m.top.content.creditsCuePoint)
-      ' Always fire history here to fix a race condition where the user has
-      ' watched beyond the cuepoint but the title doesn't get removed due
-      ' to no history events triggering after the cuepoint
-      historyPosition(m.playerPosition + 5)
-      m.top.creditsPosition = m.playerPosition
+    else if m.top.creditsPosition <= 0 and m.playerPosition >= m.top.content.creditsCuePoint 
+       ' Always fire history here to fix a race condition where the user has
+       ' watched beyond the cuepoint but the title doesn't get removed due
+       ' to no history events triggering after the cuepoint
+       historyPosition(m.playerPosition + 5)
+       m.top.creditsPosition = m.playerPosition
     end if
+  end if
+
+  if m.playerPosition + m.constants.player.fetchNextDuration >= m.top.content.creditsCuePoint
+    m.top.fetchNextContent = true
   end if
 
   'Advertisements
@@ -761,6 +765,7 @@ End Function
 ' onAdStateChange
 '
 ' adState values are:
+'   "ready": the ad shim task is ready and listening for updates to the adControl field (should happen once per user session)
 '   "init": no ad request has yet to be made for this video (adState is reset back to init when video is about to be started)
 '   "fetching": a request has been made to the ad server, awaiting a response
 '   "adspending": an ad response has been returned, the player is waiting to reach the appropriate cuepoint in order to play it
@@ -769,11 +774,14 @@ End Function
 '   "noads": an ad response has been received but there are no ads in it. Or an ad break has played to completion.
 Function onAdStateChange()
   tubiLog("VideoPlayer.onAdStateChange adState = " + m.top.adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
-  if m.top.adState = "init" and m.top.adControl <> ""
-    ' There is a race condition that can occur during deeplinks such that m.top.adControl can be set before the adShim is listening
-    ' which results in a ad/video loading screen that never loads. Reset the ad control once the ad state is in init if this is the case
-    ' to fix the issue.
-    m.top.adControl = m.top.adControl
+  if m.top.adState = "ready"
+    m.top.adState = "init"
+    if m.top.adControl <> ""
+      ' There is a race condition that can occur during deeplinks such that m.top.adControl can be set before the adShim is listening
+      ' which results in a ad/video loading screen that never loads. Reset the ad control once the ad state is in init if this is the case
+      ' to fix the issue.
+      m.top.adControl = m.top.adControl
+    end if
   else if m.top.adState = "adspending" and (m.top.adControl = "preroll" or m.top.adControl = "seek") and m.top.enableAds then
     ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
     ' video playback stopped and should play right away when we get adspending.
@@ -1042,6 +1050,7 @@ Function goToNext()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(true)
   end if
+  m.top.playNext = true
 
   if not advancePlaylist() then
     'the end of the video playback

@@ -58,8 +58,12 @@
       <field id="roInputInfo" type="assocarray" />
 
       <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="reloadMovieUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="reloadTVUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
 
       <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="moviescreenResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="tvscreenResponse" type="assocarray" alwaysNotify="true"/>
 
       <!-- metadataFetchTask puts results on this field -->
       <field id="searchResponse" type="assocarray" alwaysNotify="true"/>

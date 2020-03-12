@@ -28,6 +28,9 @@
 
       <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" alias="CategoryGridList.contentUpdated" />
+
+      <!-- What kind of content is this homeScreen displaying: movies, tv, normal, etc -->
+      <field id="contentMode" alias="CategoryGridList.contentMode" />
       
       <!-- hides or shows the loading spinner and removes any existing content on the CategoryGridList! -->
       <field id="isLoading" type="boolean" />

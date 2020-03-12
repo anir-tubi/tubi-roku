@@ -15,10 +15,10 @@
     <!-- INPUTS -->
       <field id="width" type="float"/>
       <field id="opened" value="false" type="boolean"/>
-
+      <!-- Should the sideName display the movies/TV menu items? -->
+      <field id="displayMoviesTV" type="boolean" alwaysNotify="true"/>
       <!-- The following are the strings associated with this UI element that is changed from the helper/controller file -->
       <field id="stringSignIn" type="string"/>
-
       <!-- this is an asscoiative array that contains a boolean param "grayedOut" to indicate if the kids mode button should be grayed out, and "title" to indocate the label title of the kids mode button. -->
       <field id="kidsModeValues" type="assocarray" value="" alwaysNotify="true"/>
 
@@ -47,7 +47,7 @@
         id="content"
         layoutDirection="vert"
         translation="[0,60]"
-        itemSpacings="[108,148]">
+        itemSpacings="[50,38]">
 
       <MarkupList
         numRows="1"
@@ -67,7 +67,7 @@
 
       <Group>
         <MarkupList
-          numRows="5"
+          numRows="7"
           id="mainItemsSelected"
           itemSize="[397, 70]"
           itemSpacing="[0,17]"
@@ -84,13 +84,17 @@
             <SideNavContentNode
               id="home-select"/>
             <SideNavContentNode
+              id="movies-select"/>
+            <SideNavContentNode
+              id="tv-select"/>
+            <SideNavContentNode
               id="categories-select"/>
             <SideNavContentNode
               id="channels-select"/>
           </ContentNode>
         </MarkupList>
         <MarkupList
-          numRows="5"
+          numRows="7"
           id="mainItems"
           itemSize="[397, 70]"
           itemSpacing="[0,17]"
@@ -109,6 +113,14 @@
             <SideNavContentNode
               id="home"
               iconUrl="pkg:/images/sideNavHome.png"/>
+            <SideNavContentNode
+              id="movies"
+              title="Movies"
+              iconUrl="pkg:/images/sideNavMovies.png"/>
+            <SideNavContentNode
+              id="tv"
+              title="TV Shows"
+              iconUrl="pkg:/images/sideNavTV.png"/>
             <SideNavContentNode
               id="categories"
               iconUrl="pkg:/images/sideNavCategories.png"/>

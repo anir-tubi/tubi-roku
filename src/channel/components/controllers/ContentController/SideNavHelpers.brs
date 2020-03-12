@@ -11,6 +11,11 @@ Function initSideNav()
       featureOn: m.kidsModeFeatureOn
     }
   end if
+  
+  if getExperimentResource("roku2", "roku_movies_tv").displayMenuItems = false
+    '//Tell the sideName to stop displaying the movies/TV menu items
+    m.SideNav.displayMoviesTV = false
+  end if
 
   '//set the SideNav Strings by calling onSideNavSignedIn()
   onSideNavSignedIn()
@@ -94,7 +99,7 @@ Function onSideNavItemSelected()
   currentScreenNow = currentScreen()
   if m.sSideNavCurrentScreen <> invalid and currentScreenNow <> invalid
     '//check if we are viewing the same screen. If not but sSideNavItemSelectedId is still the same as the input, then user navigated away from root page
-    if (m.sSideNavCurrentScreen.subtype() = currentScreenNow.subtype()) then bSameScreen = true
+    if (m.sSideNavCurrentScreen.subtype() = currentScreenNow.subtype() and m.sSideNavCurrentScreen.id = currentScreenNow.id) then bSameScreen = true
   end if
 
   if m.sSideNavItemSelectedId <> itemSelectedId or bSameScreen = false
@@ -178,24 +183,7 @@ Function onSideNavItemSelected()
     else if itemSelectedId = m.constants.ui.sideNavIds.channels
       if m.kidsModeEnabled = true
         bNewScreenCalledSuccess = false
-
-        dialogEvent = {
-          type: "dialog"
-          values: {
-            dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "EXIT_KIDS_MODE" when it is available in protos
-            pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
-            dialog_action: "SHOW"
-            dialog_sub_type: "kids-mode-channels"
-          }
-        }
-
-        sTitle = getTranslation("dialog_channelsDisabled_title")
-        sDescription = getTranslation("dialog_channelsDisabled_description")
-        showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
-
-        ' reset the selected item indicator in the side nav to the current screen, since selecting search will set it to search
-        sideNavId = m.constants.ui.screenIdToSideNavId[currentScreenNow.id]
-        updateSideNavSelected(sideNavId)
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.channels)
       else
         showChannelListScreen(m.constants, m.constants.ui.terms.menu)
         bNewScreenCalledSuccess = true
@@ -203,6 +191,22 @@ Function onSideNavItemSelected()
     else if itemSelectedId = m.constants.ui.sideNavIds.categories
       showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
       bNewScreenCalledSuccess = true
+    else if itemSelectedId = m.constants.ui.sideNavIds.movies
+      if m.kidsModeEnabled = true
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.movies)
+      else
+        showMoviesScreen()
+        bNewScreenCalledSuccess = true
+      end if
+    else if itemSelectedId = m.constants.ui.sideNavIds.tv
+      if m.kidsModeEnabled = true
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.tv)
+      else
+        showTVScreen()
+        bNewScreenCalledSuccess = true
+      end if
     else if itemSelectedId = m.constants.ui.sideNavIds.settings
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
@@ -230,6 +234,40 @@ Function onSideNavItemSelected()
 End Function
 
 
+Function displayMenuItemDisabled(sMenuItemID)
+  currentScreenNow = currentScreen()
+  sTitle = getTranslation("dialog_errorOops_title")
+  sDialogSubTypeValue = ""
+  if sMenuItemID = m.constants.ui.sideNavIds.channels
+    sTitle = getTranslation("dialog_channelsDisabled_title")
+    sDialogSubTypeValue = "kids-mode-channels"
+  else if sMenuItemID = m.constants.ui.sideNavIds.movies
+    sTitle = getTranslation("dialog_moviesDisabled_title")
+    sDialogSubTypeValue = "kids-mode-movies"
+  else if sMenuItemID = m.constants.ui.sideNavIds.tv
+    sTitle = getTranslation("dialog_tvDisabled_title")
+    sDialogSubTypeValue = "kids-mode-tv"
+  end if
+
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "EXIT_KIDS_MODE" when it is available in protos
+      pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: sDialogSubTypeValue
+    }
+  }
+
+  sDescription = getTranslation("dialog_sideNavItemDisabled_description") 
+  showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
+
+  ' reset the selected item indicator in the side nav to the current screen, since selecting search will set it to search
+  sideNavId = m.constants.ui.screenIdToSideNavId[currentScreenNow.id]
+  updateSideNavSelected(sideNavId)
+End Function
+
+
 Function enableKidsModeFromSideNav(bEnable = true)
   saveKidsModeToMemory(bEnable)
   enableKidsModeUI(bEnable)
@@ -237,8 +275,8 @@ Function enableKidsModeFromSideNav(bEnable = true)
   screen = currentScreen()
 
   if bEnable = true
-    if screen <> invalid and (screen.id = m.constants.ui.screenIds.searchScreen or screen.id = m.constants.ui.screenIds.channelListScreen)
-      '//If the current screen is one of the pages that should be disabled during kids mode, then take user to homescreen
+    if screen <> invalid and (screen.id = m.constants.ui.screenIds.searchScreen or screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.movieScreen or screen.id = m.constants.ui.screenIds.tvScreen)
+      '//If the current screen is one of the pages that should be disabled during kids mode, then take user to homescreen    
       showHomeScreen(m.constants, m.global.authInfo)
 
       homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]

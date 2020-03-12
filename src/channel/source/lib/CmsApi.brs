@@ -104,7 +104,7 @@ End Function
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 '
 Function cmsApi_getChannelsCategoriesScreenRequest(bKidsMode = false)
-  return m.homeScreenReq(0, bKidsMode, 1)
+  return m.homeScreenReq(0, bKidsMode, {}, 1)
 End Function
 
 '''''''''''''''''''''
@@ -112,22 +112,24 @@ End Function
 '
 ' @limit: number of items in each category
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, expand = 2)
-  url = m.constants_.urls.matrix.homescreen
+Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, params = {}, expand = 2)
+  url = m.constants_.urls.matrix.homescreen 
   options = m.commonOptions_()
   options.params.expand = expand
   options.params.["includeEmpty"] = true
   options.params.limit = limit
+  if params <> invalid and params.contentMode <> invalid and params.contentMode <> ""
+    options.params["contentMode"] = params.contentMode
+  end if
   options.params["isKidsMode"] = bKidsMode
   options.params["includeVideoInGrid"] = true
-
   return m.createAuthRequest_(url, m.constants_.reqNames.getHomescreen, options)
 End Function
 
 '''''''''''''''''''''
 ' categoryReq()
 '
-Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode = false)
+Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode = false, params = {})
   url = m.constants_.urls.matrix.container + "/" + categoryId
   if name = invalid
     name = m.constants_.reqNames.getCategory
@@ -136,6 +138,9 @@ Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode 
   options.params.expand = 1
   options.params.cursor = 0
   options.params.limit = limit
+  if params <> invalid and params.contentMode <> invalid and params.contentMode <> ""
+    options.params["contentMode"] = params.contentMode
+  end if
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = true
   return m.createAuthRequest_(url, name, options)

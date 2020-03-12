@@ -123,13 +123,13 @@ Function beginRequest(metadataRequest) As Void
   ' If there is no auth info, a regular request will be created below
   httpRequest = invalid
   if metadataRequest.name = m.constants.reqNames.getHomescreen
-    httpRequest = m.CmsApi.homeScreenReq(m.constants.performance.categoryGridList.initialBlockSize, metadataRequest.kidsMode )
+    httpRequest = m.CmsApi.homeScreenReq(m.constants.performance.categoryGridList.initialBlockSize, metadataRequest.kidsMode, metadataRequest.options )
   else if metadataRequest.name = m.constants.reqNames.getCategory or metadataRequest.name = m.constants.reqNames.getSearchDefault
     categoryId = metadataRequest.id
     limit = m.constants.performance.categoryGridList.finalBlockSize
     name = metadataRequest.name
     kidsMode = metadataRequest.kidsMode 
-    httpRequest = m.CmsApi.categoryReq(categoryId, limit, name, kidsMode)
+    httpRequest = m.CmsApi.categoryReq(categoryId, limit, name, kidsMode, metadataRequest.options)
   else if metadataRequest.name = m.constants.reqNames.searchAPI
     limit = m.constants.performance.categoryGridList.finalBlockSize
     kidsMode = metadataRequest.kidsMode 
@@ -228,7 +228,7 @@ Function handleResponse(message)
         success = handledRequest.context.node.setField(handledRequest.context.field, handledRequest)
         tubiLog("MetadataFetchTask rendezvous duration = " + (m.timespan.TotalMilliseconds() - convert_end_time).toStr())
       else
-        context = handledRequest.context
+        context = handledRequest.context 
         handledRequest.context = invalid  ' to avoid circular reference
         batchResponse = context.batchResponse
         batchResponse[handledRequest.id] = handledRequest

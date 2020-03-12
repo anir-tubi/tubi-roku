@@ -1,9 +1,9 @@
 ' getExperimentResource
 ' 
-' Get more info about the experiement
+' Get more info about the experiment
 ' Note: the component calling getExperimentValue using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
-Function getExperimentResource(namespaceName as string, parameterName as string)
+Function getExperimentResource(namespaceName as string, parameterName as string, sendEvent=true as Boolean)
   oMoreInfoReturn = invalid
   
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
@@ -11,7 +11,9 @@ Function getExperimentResource(namespaceName as string, parameterName as string)
     request = TubiRequest()
     experiments = TubiExperiments(m.global.constants)
     oMoreInfoReturn = experiments.getExperimentResource(namespaceName, parameterName)
-    sendOutExperimentTracking(namespaceName, parameterName, experiments)
+    if sendEvent = true
+      sendOutExperimentTracking(namespaceName, parameterName, experiments)
+    end if
   end if
 
   return oMoreInfoReturn
@@ -21,7 +23,7 @@ End Function
 ' Note: the component calling getExperimentValue using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
 '
-Function getExperimentValue(namespaceName as string, parameterName as string)
+Function getExperimentValue(namespaceName as string, parameterName as string, sendEvent=true as Boolean)
   experimentInfo = invalid
 
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
@@ -29,7 +31,9 @@ Function getExperimentValue(namespaceName as string, parameterName as string)
     request = TubiRequest()
     experiments = TubiExperiments(m.global.constants)
     experimentInfo = experiments.getExperimentValue(namespaceName, parameterName)
-    sendOutExperimentTracking(namespaceName, parameterName, experiments)
+    if sendEvent = true
+      sendOutExperimentTracking(namespaceName, parameterName, experiments)
+    end if
   end if
 
   return experimentInfo

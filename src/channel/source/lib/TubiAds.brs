@@ -244,7 +244,9 @@ function tubiAds_populateUrlRainmaker(episode) As String
     params["user_id"] = authInfo.userId
   end if
 
-  return m.request.addParamsToUrl(m.constants.urls.adsBaseUrlRainmaker, params)
+  baseUrl = m.constants.urls.adsBaseUrlRainmaker + m.constants.analyticsPlatform
+
+  return m.request.addParamsToUrl(baseUrl, params)
 end function
 
 
@@ -282,12 +284,7 @@ function tubiAds_getAdsListViaRoku(episode)
   end if
 
   'get the url for making the ad call
-  url = ""
-  if (m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.rainmaker = true) or m.kidsModeEnabled = true
-    url = m.populateUrlRainmaker(episode)
-  else
-    url = m.populateUrlAdrise(episode)
-  end if
+  url = m.populateUrlRainmaker(episode)
 
   'set the url for the Roku Advertising Framework
   m.roAdFramework.setAdUrl(url)

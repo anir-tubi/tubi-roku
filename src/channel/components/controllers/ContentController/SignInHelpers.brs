@@ -185,8 +185,11 @@ Function onAuthInfoReceived()
   
   setDirtyUserCategories(m.constants.ui.categoryIds.queue)
   setDirtyUserCategories(m.constants.ui.categoryIds.history)
+  setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
+  setContentToRefresh(m.constants.ui.screenIds.movieScreen) 
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+
   refreshAllDetailScreens()
   m.spinner.visible = false
 

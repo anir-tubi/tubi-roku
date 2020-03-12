@@ -235,6 +235,22 @@ Function getConstants()
     constants.thirdParty.sentry = {}
       constants.thirdParty.sentry.dsn = "https://f8edcfe8baf140b4b91b46dfb8af9a19:acdf43f7c38a47f1ab85583035ff1798@sentry.io/1377102"
 
+    constants.thirdParty.suiteTest = {}
+
+      'toggle for using suitest or not. Should only be set to true for testing situations.
+      'for production it should be false  
+      if mode = "dev"
+        constants.thirdParty.suiteTest.enabled = true
+      else
+        constants.thirdParty.suiteTest.enabled = false
+      end if
+
+      ' app_id of suitest application - can be used for any roku device within same organization. update app_id for using different account.
+      constants.thirdParty.suiteTest.app_id =  "214cab71-b41b-468d-bcbb-f42732b157c4"
+
+      ' uri of suitest application
+      constants.thirdParty.suiteTest.uri = "http://the.suite.st/app/roku.zip" 
+
   'platform is used when communitcating with CMS API
   if LCase(constants.deviceInfo.channelStore) = "telstra"
     constants.platform = "telstra"
@@ -242,7 +258,7 @@ Function getConstants()
     constants.platform = "roku"
   end if
 
-  'analyticsPlatform is used when sending analytics events
+  'analyticsPlatform is used when sending analytics events and making raimaker ad requests
   if LCase(constants.deviceInfo.channelStore) = "telstra"
     constants.analyticsPlatform = "TELSTRA"
   else
@@ -289,8 +305,8 @@ Function getConstants()
     'ad server url
     ' constants.urls.adsBaseUrl = "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
     constants.urls.adsBaseUrl = "http://ads.adrise.tv/"
-    ' constants.urls.adsBaseUrlRainmaker = "http://rainmaker.staging-public.tubi.io/rev/ROKU"
-    constants.urls.adsBaseUrlRainmaker = "http://rainmaker.production-public.tubi.io/rev/ROKU"
+    ' constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/rev/"
+    constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/rev/"
 
     'contents url
     constants.urls.cms = {}
@@ -426,6 +442,9 @@ Function getConstants()
 
     'how often the video player records history
     constants.player.historyFrequency = 60
+    
+    ' time to fetch next content before credit cuepoints
+    constants.player.fetchNextDuration = 15  
 
     'the max number of distinct speeds at which the player can scrub (fast forward or rewind), 0 based
     constants.player.maxScrub = 2 
@@ -570,6 +589,10 @@ Function getConstants()
       constants.ui.categoryTypes.channel = "channel"
       constants.ui.categoryTypes.preview = "video_preview"
 
+    constants.ui.contentMode = {}
+      constants.ui.contentMode.movie = "movie"
+      constants.ui.contentMode.tv = "tv"
+
     constants.ui.contentTypes = {}
       constants.ui.contentTypes.series = "series"
       constants.ui.contentTypes.video = "video"
@@ -590,6 +613,8 @@ Function getConstants()
     'but the home screen can not be pushed on top of the search screen.
     constants.ui.screenLevels = {}
       constants.ui.screenLevels.homeScreen = 10
+      constants.ui.screenLevels.movieScreen = 20
+      constants.ui.screenLevels.tvScreen = 20
       constants.ui.screenLevels.channelCategoryGridScreen = 20
       constants.ui.screenLevels.searchScreen = 20
       constants.ui.screenLevels.settingsScreen = 20
@@ -609,6 +634,8 @@ Function getConstants()
       constants.ui.screenIds.channelDetailScreen = "channelDetailScreen"
       constants.ui.screenIds.channelListScreen = "channelListScreen"
       constants.ui.screenIds.categoryListScreen = "categoryListScreen"
+      constants.ui.screenIds.movieScreen = "movieScreen"
+      constants.ui.screenIds.tvScreen = "tvScreen"
       constants.ui.screenIds.detailScreen = "detailScreen"
       constants.ui.screenIds.episodeScreen = "episodeScreen"
       constants.ui.screenIds.activationCodeScreen = "activationCodeScreen"
@@ -619,11 +646,15 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.channelListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
 
     constants.ui.sideNavOpenIds = {}
       constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.channelListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
 
     constants.ui.sideNavIds = {}
@@ -631,6 +662,8 @@ Function getConstants()
       constants.ui.sideNavIds.search = "search"
       constants.ui.sideNavIds.channels = "channels"
       constants.ui.sideNavIds.categories = "categories"
+      constants.ui.sideNavIds.movies = "movies"
+      constants.ui.sideNavIds.tv = "tv"
       constants.ui.sideNavIds.settings = "settings"
       constants.ui.sideNavIds.exit = "exit"
       constants.ui.sideNavIds.profile = "profile"
@@ -641,6 +674,8 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.channelListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
 
     'a map of screenIds to corresponding sideNavIds
     constants.ui.screenIdToSideNavId = {}
@@ -648,6 +683,8 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.searchScreen] = constants.ui.sideNavIds.search
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.channelListScreen] = constants.ui.sideNavIds.channels
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.movieScreen] = constants.ui.sideNavIds.movies
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.tvScreen] = constants.ui.sideNavIds.tv
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings
 
     constants.ui.gridItemTypes = {}

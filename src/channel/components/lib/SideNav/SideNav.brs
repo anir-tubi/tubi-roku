@@ -4,6 +4,7 @@ Function init()
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
   m.top.observeFieldScoped("kidsModeValues", "onKidsModeValuesChanged")
+  m.top.observeFieldScoped("displayMoviesTV", "onMovieTVDisplayChanged")
   m.top.observeFieldScoped("opened", "onOpenedChange")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
   m.top.observeFieldScoped("selectedItemRequested", "onSelectedItemRequested")
@@ -17,6 +18,8 @@ Function init()
   m.profileContent = m.TopContent.findNode("profile")
   m.kidsModeContent = m.MainContent.findNode("kidsMode")
   m.channelsContent = m.MainContent.findNode("channels")
+  m.moviesContent = m.MainContent.findNode("movies")
+  m.tvContent = m.MainContent.findNode("tv")
   '// This is the item to focus on when the sidenav opens. This implies that this was the last item (that has an associated screen) selected 
   m.itemSelectedRemembered = invalid
 
@@ -102,6 +105,29 @@ End Function
 
 
 
+
+' Hide the movies/tv items if this is called
+Function onMovieTVDisplayChanged()
+  
+  if m.top.displayMoviesTV = false
+    '//Remove movies/tv if those items should be hidden. For right now, don't worry about turning it back on
+    mainContentMovies = m.MainContent.findNode("movies")
+    mainContentTV = m.MainContent.findNode("tv")
+    m.MainContent.removeChild(mainContentMovies)
+    m.MainContent.removeChild(mainContentTV)
+
+    mainContentMoviesSelect = m.MainContentSelect.findNode("movies-select")
+    mainContentTVSelect = m.MainContentSelect.findNode("tv-select")
+    m.MainContentSelect.removeChild(mainContentMoviesSelect)
+    m.MainContentSelect.removeChild(mainContentTVSelect)
+    
+    '//Adjust the spacing of the 3 menu lists in the side nav now that 2 menu items have been eliminated.
+    contentLayout = m.top.findNode("content")
+    contentLayout.itemSpacings = [108, 148]
+  end if
+End Function
+
+
 ' The kids mode has changed, so alter the look of the icon
 Function onKidsModeValuesChanged()
   bOn = m.top.kidsModeValues.featureOn <> false
@@ -124,8 +150,10 @@ Function onKidsModeValuesChanged()
       end if
     end if
     
-    '//::HARDCODE:: this page will disable or enable the channel icon based on kids mode = true. This component should not be smart like this but since this is a temporary thing, we can hardcode the component knowing what to do if this confition has been met.
+    '//::HARDCODE:: this page will disable or enable the channel icon based on kids mode = true. This component should not be smart like this but since this is a temporary thing, we can hardcode the component knowing what to do if this condition has been met.
     m.channelsContent.turnedOn = (m.top.kidsModeValues.on <> true)
+    m.moviesContent.turnedOn = (m.top.kidsModeValues.on <> true)
+    m.tvContent.turnedOn = (m.top.kidsModeValues.on <> true)
     if m.top.kidsModeValues.on = true
       m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
     else

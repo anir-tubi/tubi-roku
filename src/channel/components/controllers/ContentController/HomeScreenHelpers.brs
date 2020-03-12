@@ -2,9 +2,13 @@
 '
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 ' @authInfo: assocArray, normally set by m.global.authInfo
-Function showHomeScreen(constants, authInfo)
+' @screenID: string, What kind of homescreen do you wish to make: regular, movies, or TV
+Function showHomeScreen(constants, authInfo, screenID = "")
   tubiLog("HomeScreenHelpers.showHomeScreen")
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if screenID = ""
+    screenID = constants.ui.screenIds.homeScreen
+  end if
+  homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     pushScreen(homeScreen, true, true)
   else
@@ -13,15 +17,27 @@ Function showHomeScreen(constants, authInfo)
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
 
-    m.top.observeFieldScoped("reloadUserCategoriesResponse", "onReloadUserCategoriesInHomeScreen")
+    m.top.observeFieldScoped("reloadMovieUserCategoriesResponse", "onReloadUserCategoriesResponseInMovieScreen")
+    m.top.observeFieldScoped("reloadTVUserCategoriesResponse", "onReloadUserCategoriesResponseInTVScreen")
     
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
     m.top.observeField("homescreenResponse", "onHomescreenResponse")
+    m.top.observeField("moviescreenResponse", "onMoviescreenResponse")
+    m.top.observeField("tvscreenResponse", "onTVscreenResponse")
     
-    homeScreen.id = constants.ui.screenIds.homeScreen
+    homeScreen.id = screenID
     homeScreen.signedIn = (authInfo <> invalid)
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
+    homeScreen.canLoadCategories = true
+    sContentMode = constants.ui.screenIds.homeScreen
+    if homeScreen.id = constants.ui.screenIds.movieScreen
+      sContentMode = constants.ui.contentMode.movie
+    else if homeScreen.id = constants.ui.screenIds.tvScreen
+      sContentMode = constants.ui.contentMode.tv
+    end if
+    homeScreen.contentMode = sContentMode
+
     homeScreen.canLoadCategories = true
     fetchHomeScreen(homescreen)
     
@@ -33,11 +49,35 @@ Function showHomeScreen(constants, authInfo)
 End Function
 
 
-Function onReloadUserCategoriesInHomeScreen(msg)
+Function showMoviesScreen()
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.movieScreen)
+End Function
+
+
+Function showTVScreen()
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.tvScreen)
+End Function
+
+
+Function onReloadUserCategoriesResponseInMovieScreen(msg)
+  onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.movieScreen)
+End Function
+
+
+Function onReloadUserCategoriesResponseInTVScreen(msg)
+  onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.tvScreen)
+End Function
+
+
+Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
   tubiLog("HomeScreenHelpers.onReloadUserCategoriesInHomeScreen")
   handledRequest = msg.getData()
-
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  
+  if screenID = ""
+    screenID = m.constants.ui.screenIds.homeScreen
+  end if
+  homeScreen = getFromScreenCache(screenID)
+  
   if homeScreen <> invalid
     if handledRequest.response <> invalid then
       response = handledRequest.response
@@ -140,7 +180,16 @@ Function fetchHomeScreen(homeScreen)
   if homeScreen.canLoadCategories = true
     reqName = m.constants.reqNames.getHomescreen
     '//::TODO:: JHAND - test error here!
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, "homescreenResponse", reqName, invalid, shouldKidsModeBeSentToServer())
+  
+    responseHandler = "homescreenResponse"
+    params = {contentMode : homeScreen.contentMode}
+    if homeScreen.id = m.constants.ui.screenIds.movieScreen
+      responseHandler = "moviescreenResponse"
+    else if homeScreen.id = m.constants.ui.screenIds.tvScreen
+      responseHandler = "tvscreenResponse"
+    end if
+
+    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, shouldKidsModeBeSentToServer(), params)
     homeScreen.resetContentAreaValues = true
     setHomeScreenLoading(homeScreen)
   end if
@@ -148,14 +197,39 @@ End Function
 
 
 ''''''''''''''''''''''''''''''
+' onMoviescreenResponse
+'
+Function onMoviescreenResponse()
+  respondToHomescreenResponse(m.constants.ui.screenIds.movieScreen, m.top.moviescreenResponse)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onTVscreenResponse
+'
+Function onTVscreenResponse()
+  respondToHomescreenResponse(m.constants.ui.screenIds.TVScreen, m.top.tvscreenResponse)
+End Function
+
+
+
+''''''''''''''''''''''''''''''
 ' onHomescreenResponse
 '
 Function onHomescreenResponse()
+  respondToHomescreenResponse(m.constants.ui.screenIds.homeScreen, m.top.homescreenResponse)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' respondToHomescreenResponse
+'
+Function respondToHomescreenResponse(screenID, rawResponse)
   tubiLog("HomeScreenHelpers.onHomescreenResponse")
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
-    if m.top.homescreenResponse.response <> invalid then
-      response = m.top.homescreenResponse.response
+    if rawResponse.response <> invalid then
+      response = rawResponse.response
       if response.code >= 200 and response.code < 300 then
         ' Content should be structured as:
         ' <CategoryContentNode json={...all contents info...}>
@@ -170,7 +244,7 @@ Function onHomescreenResponse()
         '      ...
         '   </CategoryContentNode>
         ' </CategoryContentNode>
-        homeScreen.content = m.top.homescreenResponse.convertedMetadata
+        homeScreen.content = rawResponse.convertedMetadata
         homeScreen.contentUpdated = true
 
         ' don't set focus on the home screen if side nav has focus, for example
@@ -187,7 +261,7 @@ Function onHomescreenResponse()
             type: "dialog"
             values: {
               dialog_type: "NETWORK_ERROR"
-              pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+              pageOneof: m.Tracking.getAnalyticsPage(homeScreen.trackingPageInfo.pageType, {})
               dialog_action: "SHOW"
               dialog_sub_type: errorCode
             }
@@ -219,25 +293,22 @@ Function retryCategoryList()
 End Function
 
 
-Function sendHomeScreenDialogAnalyticsEvent(dialogType, trackingLib, trackingTask)
-  trackingTask.trackEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: dialogType   'DialogType enum
-      pageOneof: trackingLib.getAnalyticsPage("home_page", {})
-    }
-  }
-End Function
-
 ' Show the detail screen for the selected content
 Function onContentSelected(msg)
   tubiLog("HomeScreenHelpers.onContentSelected")
   content = msg.getData()
   homeScreen = msg.getRoSGNode()
   m.autoplayContext = homeScreen.currCategoryId
-  
+
+  sBackMessage = "HOME"
+  if homeScreen.id = m.constants.ui.screenIds.movieScreen
+    sBackMessage = "MOVIES"
+  else if homeScreen.id = m.constants.ui.screenIds.tvScreen
+    sBackMessage = "TV SHOWS"
+  end if
+
   if content.type = "channel"
-    showChannelScreen(content, "HOME")
+    showChannelScreen(content, sBackMessage)
   else
     showDetailScreen(content)
   end if

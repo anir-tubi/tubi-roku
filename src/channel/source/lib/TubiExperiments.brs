@@ -14,6 +14,7 @@ Function TubiExperiments(constants) as Object
     '   }
     ' }
     '
+    ' Every namespace needs to have a default values AA
     ' Default values are always used in case of a "control" value or
     ' in the case that the experiment API doesn't return a response with our experiment.
     ' All experiments are required by the backend to have one of the experiment values to be "control"
@@ -29,18 +30,25 @@ Function TubiExperiments(constants) as Object
     '   }
     ' }
     '
-    ' Not all experiements will need a resource assoiciative array where we can place any additional info about the experiement
+    ' Not all experiments will need a resource assoiciative array where we can place any additional info about the experiment
     '   i.e. a color scheme, values for multiple parameters, etc.
-    ' However, when an experiement does require a resource then 
+    ' However, when an experiment does require a resource then 
     ' default resources are used in case a experiment needs a "control" value or
     ' in the case that the experiment API doesn't return a response with our experiment.
     '
-    ' For more info on on the experiement backend, see: https://github.com/adRise/popper-config
+    ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
     defaultValues: {
       UserNamespace: {
       }
       RokuNamespace: {
         roku_vitg: "vitg_none"   'other expected values "vitg_small", "vitg_large"
+      }
+      roku: {
+        roku_still_watching_timeout_1: "off"   'other expected value is "timeout_12600"
+        roku_still_watching_timeout_2: "off"   'other expected value is "timeout_10800"
+      }
+      roku2: {
+        roku_movies_tv : "off"
       }
     }
     defaultResources: {
@@ -52,6 +60,9 @@ Function TubiExperiments(constants) as Object
         roku_still_watching_timeout_1 : {"timeout" : 0},
         roku_still_watching_timeout_2 : {"timeout" : 0},
         roku_kids_mode_persistence : { "enabled" : false }
+      }
+      roku2: {
+        roku_movies_tv : {"displayMenuItems" : false}
       }
     }
 
@@ -123,7 +134,7 @@ Function tubiExperiments_getNamespaceRequest(request)
   end for
 
   if Len(nameSpaceQuery) > 0
-    '//if no experiements then do not call create request. Just return invalid
+    '//if no experiments then do not call create request. Just return invalid
     url = url + nameSpaceQuery
     expRequest = request.createAsync(url, "getExperiment")
   end if
@@ -168,7 +179,7 @@ Function tubiExperiments_mapNamespaces(namespaces)
 
     if parsedNamespace.namespace <> invalid
       '//Note: The backend only returns one experiment per namespaces at any one time.
-      '//If there are multiple experiements under a single namespace, then the backend will choose one for the client to display
+      '//If there are multiple experiments under a single namespace, then the backend will choose one for the client to display
       allNamespaces[parsedNamespace.namespace] = parsedNamespace
     end if
   end for

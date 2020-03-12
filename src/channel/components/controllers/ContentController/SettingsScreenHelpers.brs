@@ -214,8 +214,12 @@ Function refreshScreenAfterParentalChanges()
   if homeScreen <> invalid
     homeScreen.loadAllCategories = true
   end if
+
+  setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
+  setContentToRefresh(m.constants.ui.screenIds.movieScreen) 
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen) 
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+
 
   screen = currentScreen()
   if screen <> invalid

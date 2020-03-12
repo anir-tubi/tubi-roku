@@ -223,7 +223,6 @@ Function onRefreshResponse(msg)
       refreshedContent.id = refreshedContent.trailerInfo.id
       refreshedContent.subtitleTracks = []
       refreshedContent.subtitleConfig = invalid
-      refreshedContent.id = refreshedContent
     end if
 
     prepareToStartVideo(refreshedContent, 0)
@@ -282,6 +281,7 @@ End Function
 ' Reset video player state to a basic state
 ' @content: TubiContentNode
 Function resetVideoPlayerState(content = invalid)
+  m.top.playNext = false
   m.LoadingProgressBar.progress = 0
   m.LoadingMessage.text = ""
   cancelReplayCaptions()

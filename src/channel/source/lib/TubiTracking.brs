@@ -660,6 +660,14 @@ Function tubiTracking_getOneOfs()
     i: "i"  'filler because empty fields are removed
   }
 
+  movie_browse_page = {
+    i: "i"  'filler because empty fields are removed
+  }
+
+  series_browse_page = {
+    i: "i"  'filler because empty fields are removed
+  }
+
   category_page = {
     category_slug: ""
   }
@@ -731,6 +739,8 @@ Function tubiTracking_getOneOfs()
     register_page: register_page
     account_page: account_page
     access_menu_page: access_menu_page
+    movie_browse_page: movie_browse_page
+    series_browse_page: series_browse_page
     ' onboarding_page: onboarding_page
     ' landing_page: landing_page
     ' splash_page: splash_page
@@ -755,6 +765,8 @@ Function tubiTracking_getOneOfs()
     dest_register_page: register_page
     dest_account_page: account_page
     dest_access_menu_page: access_menu_page
+    dest_movie_browse_page: movie_browse_page
+    dest_series_browse_page: series_browse_page
     ' dest_onboarding_page: onboarding_page
     ' dest_landing_page: landing_page
     ' dest_splash_page: splash_page
@@ -830,7 +842,9 @@ Function tubiTracking_getSideNavPageMap(constants)
   map = {}
   map[constants.ui.screenIds.homeScreen] = "HOME"
   map[constants.ui.screenIds.channelListScreen] = "CHANNEL"
-  map[constants.ui.screenIds.categoryListScreen] = "GENRE"
+  map[constants.ui.screenIds.categoryListScreen] = "CATEGORIES"
+  map[constants.ui.screenIds.movieScreen] = "MOVIES"
+  map[constants.ui.screenIds.tvScreen] = "SERIES"
   map[constants.ui.screenIds.settingsScreen] = "SETTINGS"
   map[constants.ui.screenIds.searchScreen] = "SEARCH"
   return map

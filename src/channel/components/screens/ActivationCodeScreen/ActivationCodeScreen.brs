@@ -42,6 +42,9 @@ Function init()
   }
   
   m.top.screenLevel = m.constants.ui.screenLevels.activationCodeScreen
+  ' in the current design, navigating away from the activation page destroys the page
+  ' so it is ok to only get the registration code when the page is created.
+  getRegistrationCode()
 End Function
 
 

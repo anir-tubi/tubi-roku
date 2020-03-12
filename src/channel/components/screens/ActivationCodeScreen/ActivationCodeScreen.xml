@@ -22,6 +22,9 @@
     <!-- OUTPUT -->
       <!-- Set to true if the user has successfully registered -->
       <field id="activationSuccess" type="boolean" value="false" alwaysNotify="true"/>
+      
+      <!-- Set to true when the "Skip" button on the error modal is selected -->
+      <field id="skipButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
 
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>

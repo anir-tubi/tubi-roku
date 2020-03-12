@@ -19,6 +19,7 @@ Function init()
   m.top.observeField("enabled", "onEnableChange")
   m.top.observeField("isLoading", "onLoadingChange")
   m.top.observeField("resetContentAreaValues", "onResetContentAreaValues")
+  m.top.observeField("id", "onIDChange")
 
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -32,17 +33,15 @@ Function init()
   m.CategoryGridList.observeField("categoryTotalCounts", "onTotalCountsChange")
   m.CategoryGridList.observeField("reloadedItemToBeFocused", "onItemToBeFocusedChange")
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRowChange")
-
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
-
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasFocus = false
 
   'set initial tracking values
   m.top.trackingPageInfo = {
-    pageType: "home_page"
+    pageType: ""
     pageValues: {}
   }
 
@@ -60,6 +59,24 @@ Function init()
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
+End Function
+
+
+Function onIDChange()
+  '//Set the tracking based on the id of the homescreen
+  '//::NOTE:: id should only be set after the instantiation of the HomeScreen, but before the screen is added to the stack
+  newTrackingPageInfo = m.top.trackingPageInfo
+  if m.top.id = m.constants.ui.screenIds.movieScreen
+    newTrackingPageInfo.pageType = "movie_browse_page"
+    m.top.screenLevel = m.constants.ui.screenLevels.movieScreen
+  else if m.top.id = m.constants.ui.screenIds.tvScreen
+    newTrackingPageInfo.pageType = "series_browse_page"
+    m.top.screenLevel = m.constants.ui.screenLevels.tvScreen
+  else
+    newTrackingPageInfo.pageType = "home_page"
+    m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
+  end if
+  m.top.trackingPageInfo = newTrackingPageInfo
 End Function
 
 
@@ -177,8 +194,8 @@ Function onCurrFocusRowChange()
   ' send experiment analytics (exposure event) for large and small vitg.
   ' calling getExperimentValue() automatically sends the exposure, and limits sending the exposure event to once per session.
   if categoryEnteringFocus <> invalid
-    if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large or categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_small
-      getExperimentValue("RokuNamespace", "roku_vitg")
+    if categoryEnteringFocus.id = "deep_cuts"
+      getExperimentValue("RokuNamespace", "roku_vitg_2")
     end if
   end if
 
@@ -249,7 +266,7 @@ Function onGridFocusChange() As Void
       }
 
       m.top.navigateWithinPageInfo = {
-        pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+        pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, {})
         componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
         means_of_navigation: "BUTTON"  'MeansOfNavigation enum
         vertical_location: newAnalyticsRow

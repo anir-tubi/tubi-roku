@@ -59,6 +59,14 @@ Function runChannel(startupArgs, constants, log, request) As Void
     return
   end if
 
+  suitestLib = invalid
+  if constants.thirdParty.suiteTest.enabled = true
+    suitestLib = CreateObject("roSGNode", "ComponentLibrary")
+    suitestLib.ObserveField("loadStatus", port)
+    suitestLib.id = "suitest"
+    tubiScene.InsertChild(suitestLib, 0)
+  end if
+
   'this is the packaged constants - the submitted constants
   if constants.starterComponents <> false
     retries = 0
@@ -87,6 +95,9 @@ Function runChannel(startupArgs, constants, log, request) As Void
     controller = loadPackagedComponents(tubiScene, port, startupArgs)
     componentsLoaded = true
     componentTimer = invalid
+    if suitestLib <> invalid
+      suitestLib.SetField("uri", constants.thirdParty.suiteTest.uri)
+    end if
   end if
 
   while true
@@ -127,7 +138,10 @@ Function runChannel(startupArgs, constants, log, request) As Void
         'starter components or remote components load status update
         print "loadStatus = "; msg.getData()
         if msg.getData() = "ready"
-          if msg.GetRoSGNode().id = "TubiStarterLibrary"
+          if msg.GetRoSGNode().id = "suitest"
+            suitestIL = CreateObject("roSGNode", "SuitestInstrumentationLib:main")
+            suitestIL.SetField("app_id", constants.thirdParty.suiteTest.app_id)          
+          else if msg.GetRoSGNode().id = "TubiStarterLibrary"
             starterController = tubiScene.createChild("TubiStarterLibrary:StarterController")
             starterController.observeField("useRemoteComponents", port)
             starterController.observeField("remoteComponentsUrl", port)
@@ -142,6 +156,9 @@ Function runChannel(startupArgs, constants, log, request) As Void
             controller.observeField("transportVoiceResponse", port)
             controller.appStartTime = m.appStartTime
             controller.startupArgs = startupArgs
+            if suitestLib <> invalid
+              suitestLib.SetField("uri", constants.thirdParty.suiteTest.uri)
+            end if
           end if
         else if msg.getData() = "loading"
           print msg.GetRoSGNode().id + " status is loading"
@@ -172,6 +189,9 @@ Function runChannel(startupArgs, constants, log, request) As Void
 
           componentsLoaded = true
           controller = loadPackagedComponents(tubiScene, port, startupArgs)
+          if suitestLib <> invalid
+            suitestLib.SetField("uri", constants.thirdParty.suiteTest.uri)
+          end if
         end if
       else if msg.GetField() = "remoteComponentsUrl"
         print "got the remoteComponentsUrl "; msg.getData()

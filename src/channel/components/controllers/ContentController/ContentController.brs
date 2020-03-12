@@ -123,6 +123,12 @@ Function init()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
+
+  m.stillWatchingTimeout = getExperimentResource("roku", "roku_still_watching_timeout_1", false).timeout
+  if m.stillWatchingTimeout = 0 'is 0 if not in the roku_still_watching_timeout_1 experiment, 60 if in experiment including control
+     m.stillWatchingTimeout = getExperimentResource("roku", "roku_still_watching_timeout_2", false).timeout
+  end if
+
 End Function
 
 
@@ -307,59 +313,60 @@ End Function
 Function onInactivityTimer()
   now = Uptime(0)
  
-  stillWatchingTimeout = getExperimentResource("RokuNamespace", "stillWatching").timeout
+  stillWatchingTimeout = m.stillWatchingTimeout
   
   if stillWatchingTimeout > 0 and (now - m.lastUserActivity > stillWatchingTimeout) and m.videoPlayer.visible = true
-    if m.inactivityModal = invalid
-      ' Don't invoke this during an ad break or while upNext is visible.  Also if it's just been paused leave it.
-      if m.videoPlayer.adState <> "adsplaying" and m.videoPlayer.state = "playing" and m.upNextScreen = invalid
-        m.videoPlayer.control = "pause"
+    if getExperimentValue("roku", "roku_still_watching_timeout_1") = "timeout_12600" or getExperimentValue("roku", "roku_still_watching_timeout_2") = "timeout_10800"
+      if m.inactivityModal = invalid
+        ' Don't invoke this during an ad break or while upNext is visible.  Also if it's just been paused leave it.
+        if m.videoPlayer.adState <> "adsplaying" and m.videoPlayer.state = "playing" and m.upNextScreen = invalid
+          m.videoPlayer.control = "pause"
+          contentId = 0
+          if m.videoPlayer.content <> invalid and m.videoPlayer.content.id <> invalid and m.videoPlayer.content.id <> ""
+            contentId = m.videoPlayer.content.id.toInt()
+          end if
 
-        contentId = 0
-        if m.videoPlayer.content <> invalid and m.videoPlayer.content.id <> invalid and m.videoPlayer.content.id <> ""
-          contentId = m.videoPlayer.content.id.toInt()
+          dialogEvent = {
+            type: "dialog"
+            values: {
+              dialog_type: "STILL_WATCHING"   'DialogType enum
+              pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: contentId}) 'TODO: should be video_player_page eventually
+              dialog_action: "SHOW"  'Action enum
+              dialog_sub_type: (stillWatchingTimeout / 60).toStr() + "-minutes"
+            }
+          }
+
+          modalInfo = {
+            title: getTranslation("dialog_stillWatching_title")
+            message: ""
+            openTrackEvent: dialogEvent
+            trackingTask: m.trackingLoggingTask
+            backButtonCallback: onInactivityButton
+          }
+
+          modalButtonInfo = [
+            {
+              text: getTranslation("dialog_button_yes")
+              type: "accept"
+              callback: onInactivityButton
+            }
+            {
+              text: getTranslation("dialog_button_no")
+              type: "dismiss"
+              callback: onInactivityClose
+            }
+          ]
+
+          m.inactivityModal = showModal(modalInfo, modalButtonInfo)
         end if
-
-        dialogEvent = {
-          type: "dialog"
-          values: {
-            dialog_type: "STILL_WATCHING"   'DialogType enum
-            pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: contentId}) 'TODO: should be video_player_page eventually
-            dialog_action: "SHOW"  'Action enum
-            dialog_sub_type: (stillWatchingTimeout / 60).toStr() + "-minutes"
-          }
-        }
-
-        modalInfo = {
-          title: "Are you still watching?"
-          message: ""
-          openTrackEvent: dialogEvent
-          trackingTask: m.trackingLoggingTask
-          backButtonCallback: onInactivityButton
-        }
-
-        modalButtonInfo = [
-          {
-            text: "Yes"
-            type: "accept"
-            callback: onInactivityButton
-          }
-          {
-            text: "No"
-            type: "dismiss"
-            callback: onInactivityClose
-          }
-        ]
-
-        m.inactivityModal = showModal(modalInfo, modalButtonInfo)
-      end if
-    else if (now - m.lastUserActivity - stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
-      closeModal(m.inactivityModal)
-      stopInactivityTimer()
-      if shouldStopOnStillWatchingTimeout() = true
-        returnToDetailScreenFromVideo()
-      else
-        m.videoPlayer.control = "resume"
+      else if (now - m.lastUserActivity - stillWatchingTimeout) > m.constants.timers.stillWatchingDismissTimeout
+        closeModal(m.inactivityModal)
+        stopInactivityTimer()
+        if shouldStopOnStillWatchingTimeout() = true
+          returnToDetailScreenFromVideo()
+        else
+          m.videoPlayer.control = "resume"
+        end if
       end if
     end if
   end if
@@ -735,6 +742,12 @@ Function setDirtyUserCategories(categoryId)
     'auth request will add the userId param
     reqName = m.constants.reqNames.getCategory
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer())
+
+    '//Apply the movie and TV filters
+    optionMovie = {contentMode: m.constants.ui.contentMode.movie}
+    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadMovieUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionMovie)
+    optionTV = {contentMode: m.constants.ui.contentMode.tv}
+    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadTVUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionTV)
   end if
 End Function
 
@@ -742,12 +755,14 @@ End Function
 Function onReloadUserCategoriesResponse(msg)
   tubiLog("ContentController.onReloadUserCategoriesResponse")
   handledRequest = msg.getData()
+  onReloadUserCategoriesInHomeScreen(msg)
   categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
   if categoryListScreen <> invalid
       categoryListScreen.reloadUserCategoriesResponse = handledRequest  
   end if
   refreshStackedUserScreen(handledRequest.id)
 End Function
+
 
 
 Function onHistoryQueueRefresh()
