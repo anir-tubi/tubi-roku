@@ -32,7 +32,7 @@
       <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
 
       <!-- set the RowList.rowHeights and RowList.rowItemSize arrays since the category order has changed. -->
-      <field id="setNewRowHeights" type="boolean" alwaysNotify="true"/>
+      <field id="repopulateContent" type="boolean" alwaysNotify="true"/>
 
       <!-- What kind of filter if any does this list use? For example, "tv", "movies" -->
       <field id="contentMode" value="" type="string"/>

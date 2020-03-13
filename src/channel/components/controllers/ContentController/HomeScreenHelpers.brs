@@ -106,17 +106,26 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
             'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
 
             if newCategory.id = m.constants.ui.categoryIds.history
-              homeScreen.content.insertChild(newCategory, homeScreen.content.continueWatchingIndex)
+            
+              clonedContent = homeScreen.content.clone(true)
+              clonedContent.insertChild(newCategory, homeScreen.content.continueWatchingIndex)
+              homeScreen.content = clonedContent
+            
             else if newCategory.id = m.constants.ui.categoryIds.queue
-              homeScreen.content.insertChild(newCategory, homeScreen.content.queueIndex)
-            end if
 
-            homeScreen.setNewRowHeights = true '//In case the rows are of different heights, tell homescreen to refresh to disdplay rows correctly
+              clonedContent = homeScreen.content.clone(true)
+              clonedContent.insertChild(newCategory, homeScreen.content.queueIndex)
+              homeScreen.content = clonedContent
+                          
+            end if
+            
+            clonedContent = invalid
+            homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
           else if newCategory = invalid and oldCategory <> invalid
             'remove old category
             homeScreen.content.removeChild(oldCategory)
             
-            homeScreen.setNewRowHeights = true '//In case the rows are of different heights, tell homescreen to refresh to disdplay rows correctly
+            homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
           else if newCategory = invalid and oldCategory = invalid
             'do nothing
           end if

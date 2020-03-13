@@ -6,7 +6,7 @@ Function init()
   m.top.observeField("metadataFetchTaskBatch", "onMetadataFetchTaskBatchResponse")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("contentUpdated", "onContentChange")
-  m.top.observeField("setNewRowHeights", "onNewRowHeights")
+  m.top.observeField("repopulateContent", "onRepopulateContent")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeField("rowItemFocused", "onRowItemFocused")
@@ -113,7 +113,9 @@ Function onContentChange()
 End Function
 
 
-Function onNewRowHeights()
+' onRepopulateContent callback gets triggered when adding/removing any row
+' it sets RowHeight and update the focus variable
+Function onRepopulateContent()
   setRowHeights()
   ' setting the rowItemSize and/or rowHeights moves the focus indicator back to the origin so
   ' we need to move the focus back to it's appropriate place. But we need to check that there is content
