@@ -143,8 +143,9 @@ Function onLineOneDataChange(msg)
   data = msg.getData()
   firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
   line1Label = m.TwoLineInfo.findNode("Line1")
+  constants = m.global.constants
+
   text = ""
-  
   if data.releasedate <> invalid and data.releasedate <> "" then
     text = data.releasedate + " "
   end if
@@ -154,6 +155,21 @@ Function onLineOneDataChange(msg)
       text = text + Chr(&hb7) + " "
     end if
     text = text + formatLengthAsEnglish(data.length) + " "
+  end if
+  if data.type <> invalid and data.type = constants.ui.contentTypes.series 
+    ' add 'dot' spacer
+    text = text + Chr(&hb7) + " " 
+
+    if data.seasons <> invalid and data.seasons > 0 
+      if data.seasons = 1
+        text = text + getTranslation("metadata_seasons_singular") + " "
+      else
+        text = text + getTranslation("metadata_seasons_plural", {seasons: data.seasons.toStr()}) + " "
+      end if
+    else 
+      text = text + getTranslation("metadata_series") + " "
+    end if
+
   end if
   line1Label.text = text
 

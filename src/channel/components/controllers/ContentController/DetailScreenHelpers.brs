@@ -116,11 +116,11 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
   backgroundUriList = [m.defaultBackgroundUri]
-
   if type(detailScreen) = "roSGNode" and detailScreen.isSubType("DetailScreen") and type(content) = "roSGNode"
     'hide the spinner
     wasLoading = detailScreen.isLoading
     detailScreen.isLoading = false
+    lineOneData = {}
 
     'update detail screen state via the input interface
     detailScreen.title = content.title
@@ -148,6 +148,8 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
         detailScreen.episodeTitle = episode.title
       end if
 
+      lineOneData.type = m.constants.ui.contentTypes.series  
+      lineOneData.seasons =  content.totalCount
       detailScreen.isSeries = true
       detailScreen.mode = "series"
     else
@@ -161,7 +163,6 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
       stateSource = content
     end if
 
-    lineOneData = {}
     lineOneData.length = stateSource.length
     lineOneData.rating = stateSource.rating
     lineOneData.releaseDate = content.releaseDate

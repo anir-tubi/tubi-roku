@@ -215,6 +215,10 @@ Function populateInfoPanel(infoPanel, content, mode)
   end if
 
   line1Data = {}
+  if content.type = m.constants.ui.contentTypes.series
+    line1Data.type = m.constants.ui.contentTypes.series  
+    ' line1Data.seasons =  '//If available, get the number of seasons and set the value here
+  end if
   if content.releaseDate <> invalid
     line1Data.releaseDate = content.releaseDate
   else

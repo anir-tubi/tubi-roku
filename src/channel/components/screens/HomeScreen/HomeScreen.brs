@@ -346,6 +346,10 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.description = contentNode.description
 
       lineOneData = {}
+      if contentNode.type = m.constants.ui.contentTypes.series
+        lineOneData.type = m.constants.ui.contentTypes.series  
+        ' lineOneData.seasons =  '//If available, get the number of seasons and set the value here
+      end if
       lineOneData.releaseDate = contentNode.releaseDate
       lineOneData.length = contentNode.length
       lineOneData.hasCC = (contentNode.hasSubtitles or not m._.empty(contentNode.subtitleTracks))
