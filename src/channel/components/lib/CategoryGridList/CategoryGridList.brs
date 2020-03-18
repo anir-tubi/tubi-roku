@@ -121,9 +121,25 @@ Function onRepopulateContent()
   ' we need to move the focus back to it's appropriate place. But we need to check that there is content
   ' at the location or else the RowList loses focus and can't get it back.
   if resolveAbbreviatedContent(m.RowList.rowItemFocused) <> invalid
+    ' re-focus the most recently focused content
     m.itemToJumpTo = m.RowList.rowItemFocused
-  else if resolveAbbreviatedContent([m.RowList.rowItemFocused[0] - 1, m.RowList.rowItemFocused[1]]) <> invalid
-    m.itemToJumpTo = [m.RowList.rowItemFocused[0], 0]
+  else if resolveAbbreviatedContent([m.RowList.rowItemFocused[0], 0]) <> invalid
+    ' if there is no content at the most recently focused coordinates, then
+    ' check if there is at least one content in the most recently focused row and focus the last content in the row
+    rowIndex = m.RowList.rowItemFocused[0]
+    lastContentIndex = m.top.content.getChild(rowIndex).getChildCount() - 1
+    m.itemToJumpTo = [rowIndex, lastContentIndex]
+  else
+    ' if there is no content at the most recently focused coordinates, and
+    ' there is no content in the most recently focused row, then
+    ' check if there is any content in each row prior to the most recently focused row
+    ' and focus the first content in that row
+    rowIndex = m.RowList.rowItemFocused[0]
+    while resolveAbbreviatedContent([rowIndex, 0]) = invalid and rowIndex >= 0
+      rowIndex -= 1
+    end while
+
+    m.itemToJumpTo = [rowIndex, 0] ' m.itemToJumpTo might equal [-1, 0] in worst case scenario
   end if
 End Function
 

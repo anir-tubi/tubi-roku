@@ -100,23 +100,19 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
           if newCategory <> invalid and oldCategory <> invalid
             'replace old category with new category
             homeScreen.content.replaceChild(newCategory, m.NodeHelpers.getChildIndex(homeScreen.content, oldCategory))
+            homeScreen.repopulateContent = true
           else if newCategory <> invalid and oldCategory = invalid
             'add new category
             'if new category is history, put it one before queue, or if queue doens't exist put it in 2nd position
             'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
-
             if newCategory.id = m.constants.ui.categoryIds.history
-            
               clonedContent = homeScreen.content.clone(true)
               clonedContent.insertChild(newCategory, homeScreen.content.continueWatchingIndex)
               homeScreen.content = clonedContent
-            
             else if newCategory.id = m.constants.ui.categoryIds.queue
-
               clonedContent = homeScreen.content.clone(true)
               clonedContent.insertChild(newCategory, homeScreen.content.queueIndex)
               homeScreen.content = clonedContent
-                          
             end if
             
             clonedContent = invalid
@@ -124,7 +120,6 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
           else if newCategory = invalid and oldCategory <> invalid
             'remove old category
             homeScreen.content.removeChild(oldCategory)
-            
             homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
           else if newCategory = invalid and oldCategory = invalid
             'do nothing
