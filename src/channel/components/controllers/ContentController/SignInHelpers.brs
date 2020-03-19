@@ -141,8 +141,13 @@ Function onAuthInfoReceived()
   if registryKidsMode = true
     kidsmode = getExperimentResource("roku", "roku_kids_mode_persistence")
     registryKidsMode = kidsmode.enabled
+    
+    if registryKidsMode = false
+      saveKidsModeToMemory(false)
+    end if
+    
   end if
-
+  
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid

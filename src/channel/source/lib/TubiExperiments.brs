@@ -46,7 +46,7 @@ Function TubiExperiments(constants) as Object
     }
     defaultResources: {
       roku: {
-        roku_kids_mode_persistence : { "enabled" : false }
+        roku_kids_mode_persistence : { "enabled" : true }
       }
       roku2: {
         roku_movies_tv : {"displayMenuItems" : false}
