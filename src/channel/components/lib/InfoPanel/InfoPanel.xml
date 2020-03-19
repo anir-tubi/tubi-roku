@@ -178,11 +178,32 @@
             width="56"
             loadDisplayMode="scaleToFit"
             loadSync="true"/>
-          <Poster
+          <Group
             id="Rating"
-            height="36"
-            loadDisplayMode="scaleToFit"
-            loadSync="true"/>
+            visible="false"
+            height="36">
+            <Poster
+              id="RatingBackground"
+              height="36"
+              uri="pkg:/images/ratingBackground.9.png"
+              loadDisplayMode="scaleToFit"
+              loadSync="true"/>
+            <Label
+              id="RatingLabel"
+              height="36"
+              width="0"
+              numLines="1"
+              wrap="false"
+              translation="[0,3]" 
+              horizAlign="center"
+              vertAlign="center"
+              >
+              <Font
+                role="font"
+                uri="pkg:/fonts/Vaud-SemiBold.ttf"
+                size="20" />
+            </Label>
+          </Group>
           <Label
             id="ExpireWarning">
             <Font

@@ -9,6 +9,8 @@ Function init()
   m.TwoLineInfo = m.top.findNode("TwoLineInfo")
   m.ClosedCaptions = m.top.findNode("ClosedCaptionPoster")
   m.Rating = m.top.findNode("Rating")
+  m.RatingBackground = m.Rating.findNode("RatingBackground")
+  m.RatingLabel = m.Rating.findNode("RatingLabel")
   m.Description = m.top.findNode("Description")
   m.DescriptionGroup = m.top.findNode("DescriptionGroup")
   m.DescriptionFocusButton = m.top.findNode("DescriptionFocusButton")
@@ -194,11 +196,18 @@ Function onLineOneDataChange(msg)
       firstLineGroup.insertChild(m.Rating, insertIndex)
     end if
     insertIndex++
-    m.Rating.uri = "pkg:/images/rating-" + Ucase(data.rating) + ".png"
+    m.RatingLabel.width = 0
+    m.RatingLabel.text = Ucase(data.rating)
+
+    nRatingBoundingBoxIncrease = m.RatingLabel.boundingRect().width + 22
+    m.RatingBackground.width = nRatingBoundingBoxIncrease
+    m.RatingLabel.width = nRatingBoundingBoxIncrease
+    m.Rating.visible = true
   else
     if m.Rating.getParent() <> invalid
       firstLineGroup.removeChild(m.Rating)
     end if
+    m.Rating.visible = false
   end if
 
   if data.availabilityEnds <> invalid and data.availabilityEnds <> ""
