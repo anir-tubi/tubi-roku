@@ -173,7 +173,7 @@ Function getConstants()
     else
       constants.deviceInfo.isAdIdTrackingDisabled = di.IsAdIdTrackingDisabled()
     end if
-
+    constants.deviceInfo.uiResolution = UCase(di.GetUiResolution().name)
     constants.deviceInfo.ipAddresses = di.GetIPAddrs() 'array of network interface ip addresses (normally will only contain 1 element)
     constants.deviceInfo.firmwareVersion = firmwareVersion
     constants.deviceInfo.firmwareBuild = firmwareBuild

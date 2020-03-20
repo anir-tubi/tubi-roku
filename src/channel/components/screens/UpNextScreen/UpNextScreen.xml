@@ -55,9 +55,9 @@
       opacity="0.5">
       <Poster
         uri="pkg:/images/back.png"
-        width="47"
+        width="29"
         height="47"
-        translation="[72,601]"/>
+        translation="[81,601]"/>
       <Label
         id="BackLabel"
         translation="[123,605]"

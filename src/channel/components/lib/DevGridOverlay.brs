@@ -14,12 +14,7 @@ Function createGridOverlay(screen, spacingX=10, spacingY=10)
   width = 1920
   height = 1080
 
-
-  'get screen resolutions
-  deviceInfo = CreateObject("roDeviceInfo")
-  uiResolution = deviceInfo.GetUiResolution()
-
-  if uiResolution.name = "FHD"
+  if m.global.constants.deviceInfo.uiResolution = "FHD"
     lineSize = 1
     boldLineSize = 2
   else

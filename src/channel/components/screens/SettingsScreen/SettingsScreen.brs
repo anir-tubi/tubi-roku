@@ -11,6 +11,10 @@ Function init()
   m.NavSection = m.top.findNode("nav")
   BackLabel = m.top.findNode("callToAction")
   BackLabel.text = getTranslation("goBack_home")
+  if m.constants.deviceInfo.uiResolution <> "FHD"
+    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
+    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
+  end if
 
   ' Create the menu
   m.SettingsMenuPanel = CreateSettingsMenuPanel()

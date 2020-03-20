@@ -61,6 +61,12 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.searchScreen
   setSearchStrings()
   loadSearchResults(true)'//load the default search results
+
+  BackLabel = m.top.findNode("callToAction")
+  if m.constants.deviceInfo.uiResolution <> "FHD"
+    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
+    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
+  end if
 End Function
 
 

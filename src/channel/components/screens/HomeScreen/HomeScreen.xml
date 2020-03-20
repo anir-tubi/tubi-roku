@@ -131,10 +131,11 @@
         layoutDirection="horiz"
         vertAlignment="custom"
         opacity="0.5"
+        itemSpacings="[9]"
         translation="[85,85]">
         <Poster
           uri="pkg:/images/back.png"
-          width="47"
+          width="29"
           height="47"/>
         <Label
           id="callToAction"

@@ -47,6 +47,11 @@ Function init()
 
   BackLabel = m.top.findNode("callToAction")
   BackLabel.text = getTranslation("goBack_menu")
+   if m.constants.deviceInfo.uiResolution <> "FHD"
+    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
+    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
+   end if
+
   m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
 
   ' the animation nodes necessary for video in the grid (vitg)

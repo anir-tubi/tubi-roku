@@ -245,9 +245,9 @@
         uri="pkg:/images/playback-gradient-fhd.9.png"/>
       <Poster
         uri="pkg:/images/back.png"
-        width="47"
+        width="29"
         height="47"
-        translation="[822,58]"/>
+        translation="[831,58]"/>
       <Label
         id="BackLabel"
         translation="[870,61]"
