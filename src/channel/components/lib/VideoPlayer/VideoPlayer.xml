@@ -185,7 +185,7 @@
           id="tubiKidsLogo"
           width="632"
           height="135"
-          uri="pkg:/locale/images/logo-kids-white-xlarge.png"
+          uri="pkg:/images/locale/en_US/logo-kids-white-xlarge.png"
           loadSync="true"
           visible="false"
           translation="[648,382]"/>
