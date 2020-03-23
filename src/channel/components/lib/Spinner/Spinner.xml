@@ -13,7 +13,7 @@
   <interface>
     <!-- INPUT -->
       <field id="showBox" alias="SpinnerBox.visible" value="false"/>
-      <field id="showShade" alias="Shade.visible" value="false"/>
+      <field id="showShade" alias="Shade.visible" value="true"/>
       <field id="text"  alias="LoadingMessage.text"/>
       <field id="width" alias="Shade.width"/>
       <field id="height" alias="Shade.height"/>
@@ -27,7 +27,6 @@
     <Rectangle
       id="Shade"
       opacity="0.8"
-      visible="false"
       color="0x191919FF"/>
     <Rectangle
       id="SpinnerBox"

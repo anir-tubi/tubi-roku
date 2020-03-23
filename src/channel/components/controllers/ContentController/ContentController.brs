@@ -1035,3 +1035,13 @@ Function fireAppLoadBeacon()
     m.top.signalBeacon("AppLaunchComplete")
   end if
 End Function
+
+
+' showHideSpinner - shows/hides the loading spinner/text
+' 
+'@visible : boolean - true/false
+function showHideSpinner(visible)
+
+  m.spinner.visible = visible
+
+end function

@@ -128,6 +128,7 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
 
         '//Stop loading of homescreen which will refresh the screen's content
         homeScreen.isLoading = false
+        showHideSpinner(false)
       else
         ' if we were loading in the background, don't show an error modal
         if homeScreen.isInFocusChain()
@@ -162,6 +163,7 @@ End Function
 Function setHomeScreenLoading(homeScreen)
   screen = currentScreen() 
   homeScreen.isLoading = true
+  showHideSpinner(true)
   if screen <> invalid and screen.id = homeScreen.id
     '//Display default background if the hoime screen is the current screen while it is loading
     displayDefaultBackground()
@@ -323,6 +325,7 @@ Function onHomescreenContentReady(msg)
   fireAppLoadBeacon()
   homescreen = msg.getRoSGNode()
   homeScreen.isLoading = false
+  showHideSpinner(false)
 End Function
 
 

@@ -117,14 +117,6 @@
 
   <children>
 
-    <!-- Show a loading spinner only if it takes more than 3 seconds to load -->
-    <Spinner
-      id="CategorySpinner"
-      visible="true"
-      width="1920"
-      height="1080"/>
-
-
     <Group id="nav">
       <LayoutGroup
         id="ScreenNavigationHint"

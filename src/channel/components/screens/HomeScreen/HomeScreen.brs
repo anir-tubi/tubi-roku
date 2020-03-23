@@ -12,7 +12,6 @@ Function init()
   m.HintGroup = m.top.findNode("UpHintGroup")
   fades = m.top.findNode("Fades")
   m.HintGroupFade = fades.findNode("HintGroupFade")
-  m.Spinner = m.top.findNode("CategorySpinner")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
@@ -86,7 +85,6 @@ End Function
 
 
 Function onLoadingChange()
-  m.Spinner.visible = m.top.isLoading
   bLoaded = (m.top.isLoading = false)
   m.CategoryGridList.visible = bLoaded
   if m.top.isLoading = true

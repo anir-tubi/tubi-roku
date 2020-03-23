@@ -172,6 +172,7 @@
       <Spinner
         id="spinner"
         visible="false"
+        showShade="false"
         modal="true"
         displayText="true"
         width="1094"
