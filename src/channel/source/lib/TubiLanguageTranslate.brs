@@ -48,9 +48,9 @@ Function getTranslationBasedOnLocale(sStringID as String, sLocaleID as String) a
     translations = m.global.translationAA[sLocaleID]
   end if
   if translations = invalid   
-    '//The associative array for the passed locale does not exist, so get and parse the file associated with that locale
-    getAndParseTranslation(sLocaleID)
-    '//If the previous line was successful in parsing the translation file, then the translation file associated with the passed locale will now exist on the m.global.translationArray"
+    '//The associative array for the passed locale does not exist, so get the associative arra associated with that locale
+    getTranslationAA(sLocaleID)
+    '//If the previous line was successful in getting the proper AA, then the translation file associated with the passed locale will now exist on the m.global.translationArray"
     if m.global.translationAA <> invalid
       translations = m.global.translationAA[sLocaleID]
     end if
@@ -58,34 +58,206 @@ Function getTranslationBasedOnLocale(sStringID as String, sLocaleID as String) a
 
   if translations <> invalid and translations[sStringID] <> invalid
     sTranslatedString = translations[sStringID]
+    sTranslatedString = sTranslatedString.replace("\n", chr(10))
   end if
 
   return sTranslatedString
 End Function
 
 
-'The getTranslationBasedOnLocale() method calls this function to get the translated file if it has not already 
-'been loaded and then proceeds to parse the file and keep it in memory
+'The getTranslationBasedOnLocale() method calls this function to get the proper associative array if it has not already 
+'been stored into in memory
 '
 '@param sLocaleID: The ID associated with the desired language
-'@return Boolean - Was the language translation file been successfuly parsed? 
-Function getAndParseTranslation(sLocaleID as String) as Boolean
+'@return Boolean - Was the language associative array been successfuly gotten? 
+Function getTranslationAA(sLocaleID as String) as Boolean
   bSuccess = false
-  url = "pkg:/locale/" + sLocaleID + "/translations.json"
-  json = ReadAsciiFile(url)
-  if json <> ""
-    parsed = parseJSON(json)
-    if parsed <> invalid
-      if m.global.translationAA = invalid
-        m.global.addField("translationAA", "assocarray", false)
-        m.global.translationAA = {}
-      end if
+  '//ideally we would store the translation files in separate files but the ReadAsciiFile() function does not work in the remote compomnent package
+  ' url = "pkg:/locale/" + sLocaleID + "/translations.json"
+  ' json = ReadAsciiFile(url)
 
-      copytranslationAA = m.global.translationAA
-      copytranslationAA[sLocaleID] = parsed
-      m.global.translationAA = copytranslationAA
-      bSuccess = true
+  parsed = invalid 
+  '//Go thru all the possible locales that Roku supports to return the proper associative array
+  sLocaleID = LCase(sLocaleID)
+  if sLocaleID = "en_us"
+    parsed = getTranslation_en_US()
+  else if sLocaleID = "es_es"
+  else if sLocaleID = "en_gb"
+  else if sLocaleID = "fr_ca"
+  else if sLocaleID = "de_de"
+  else if sLocaleID = "it_it"
+  else if sLocaleID = "pt_br"
+  end if
+
+  if parsed <> invalid
+    if m.global.translationAA = invalid
+      m.global.addField("translationAA", "assocarray", false)
+      m.global.translationAA = {}
     end if
+
+    copytranslationAA = m.global.translationAA
+    copytranslationAA[sLocaleID] = parsed
+    m.global.translationAA = copytranslationAA
+    bSuccess = true
   end if
   return bSuccess
+End Function
+
+' Return the associative array associated with the enUS locale
+Function getTranslation_en_US()
+  return {
+    "menu_signIn": "Sign In",
+    "menu_signedIn": "Hi {name}",
+    "menu_kids": "Kids",
+    "menu_exitKids": "Exit Kids",
+    "menu_search": "Search",
+    "menu_home": "Home",
+    "menu_categories": "Categories",
+    "menu_channels": "Channels",
+    "menu_settings": "Settings",
+    "menu_exit": "Exit",
+    "loadingIndicator": "Loading...",
+
+    "dialog_errorPrefix": "Error: ",
+    "dialog_defaultError_title": "Something went wrong",
+    "dialog_defaultError_description": "We're sorry for the inconvenience. For assistance, please contact support@tubi.tv \n",
+    "dialog_errorMessageContact": "Please contact: support@tubi.tv",
+    "dialog_button_exit": "Exit",
+    "dialog_button_signIn": "Sign In",
+    "dialog_button_cancel": "Cancel",
+    "dialog_button_submit": "Submit",
+    "dialog_button_tryAgain": "Try Again",
+    "dialog_button_retry": "Retry",
+    "dialog_button_close": "Close",
+    "dialog_button_skip": "Skip",
+    "dialog_button_ok": "OK",
+    "dialog_button_yes": "Yes",
+    "dialog_button_no": "No",
+    "dialog_button_settings": "Go To Settings",
+    "dialog_errorOops_title": "Oops!",
+    "dialog_channelsDisabled_title": "Channels Disabled",
+    "dialog_moviesDisabled_title": "Movies Disabled",
+    "dialog_tvsDisabled_title": "TV Disabled",
+    "dialog_sideNavItemDisabled_description": "Please exit Tubi Kids to use this feature.",
+    "error_connection_title": "Connection Error",
+    "error_connection_description": "There may be an issue with your network connection, or with Tubi's server. Please check your network connection and try again. \n", 
+    "dialog_updateVersion_title": "Please update the Tubi channel",
+    "dialog_fullSynopsis_title": "Full Synopsis",
+    "dialog_updateVersion_description": "This version of Tubi is no longer supported. To update, please exit the Tubi app and go to: \n \n Settings > System > System update > Check now",
+    "dialog_signIn_activationCodeExpired_title": "Activation Code Expired", 
+    "dialog_signIn_activationCodeExpired_description": "We're sorry, but the activation code expired before your device was successfully linked.", 
+    "error_signIn_connectionError_title": "Connection Error During Activation", 
+    "error_signIn_connectionError_description": "We're sorry, but we could not connect with the server to see if you registered your device.", 
+    "error_signIn_connectionErrorFetch_title": "Connection Error During Code Fetch", 
+    "error_signIn_connectionErrorFetch_description": "We're sorry, but there was an error while receiving the code from the server.", 
+    "error_signIn_activationCodeGeneral_title": "Activation Code Error", 
+    "error_signIn_activationCodeGeneral_description": "We're sorry, but an activation code error occurred.", 
+    "dialog_signIn_title": "Please Sign In",
+    "dialog_kidsExit_title": "Exit Kids",
+    "dialog_kidsExit_button_ok": "Exit Kids",
+    "dialog_kidsExit_description": "Do you have permission from your parents to leave Tubi Kids? If you exit you will see titles rated PG-13 and above.",
+    "dialog_kidsExitLimited_description": "To exit Kids, please update your parental controls in account settings.",
+    "dialog_exitApp_title": "Are You Sure?",
+    "dialog_exitApp_description": "Do you really want to exit Tubi?",
+    "error_noGetChannels_description": "Could not retrieve channel content.",
+    "error_noContent_description": "This page currently does not have any content.",
+    "dialog_signOut_title": "Are You Sure?",
+    "dialog_signOut_description": "You are about to sign out of your Tubi account.",
+    "dialog_signOut_button_ok": "Are You Sure?",
+
+    "screenActivationCode_audioGuide": "Activation Code: {code}. Refresh Code",
+    "screenActivationCode_heading": "Visit tubi.tv/activate",
+    "screenActivationCode_subheading": "from a browser on another device and enter the code below",
+    "screenActivationCode_button_refresh": "Refresh Code",
+    "screenSearch_defaultSearch": "Search for movies, TV shows, and people",
+    "screenSearch_kidsWarning": "Switch to Kids for kids safe search results",
+    "screenSearch_loading": "Updating your results...",
+    "screenSearch_noResults": "We couldn't find results for '{term}' \n Please try again",
+    "screenDetails_button_queue": "Add to queue",
+    "screenDetails_button_noQueue": "Remove from queue",
+    "screenDetails_button_noHistory": "Remove from history",
+    "screenDetails_button_queueNow": "Adding...",
+    "screenDetails_button_removing": "Removing...",
+    "screenDetails_button_gotoChannel": "Go to {channel}",
+    "screenDetails_error_addQueue_description": "You must be signed in to add a title to your queue.",
+    "screenDetails_error_addQueue_buttonRegister": "Sign in or Register",
+    "screenDetails_error_getContent_description": "Could not retrieve content information from server.",
+    "screenDetails_error_queue_description": "Something went wrong while trying to add the content to your queue.",
+    "screenDetails_error_noQueue_description": "Something went wrong while removing the content from your queue.",
+    "screenDetails_error_noHistory_description": "Something went wrong while removing the content from your history.",
+    "screenSettings_signIn_description": "Sign in to Tubi. Access your Queue and Continue Watching lists across your devices.",
+    "screenSettings_signOut_description": " You're signed in as {name}",
+    "screenSettings_signOut_description2": " Email: {email}",
+    "screenSettings_fullDeviceID": " Full Device ID",
+    "screenSettings_about_title": " About Tubi",
+    "screenSettings_about_description": "Tubi is the leading free, premium, video streaming app. We have the largest library of content with over 15,000 movies and television shows with far fewer ads than cable TV.",
+    "screenSettings_about_title2": "Need Help?", 
+    "screenSettings_about_description2": "Visit http://help.tubitv.com \n \n Email our Support team at support@tubi.tv \n \n Reach us on Facebook, Instagram, Twitter, and on our website at: \n https://tubitv.com/support \n \n Version {version} \n Short Device ID: {id} (press OK to see full Device ID) \n \n © {year} Tubi, Inc. all rights reserved.", 
+    "screenSettings_menu_parentalControls": "Parental Controls",
+    "screenSettings_parentalControls_group0": "Little Kids (G, TV-Y, TV-G)",
+    "screenSettings_parentalControls_group1": "Older Kids (PG, TV-PG, TV-Y7)",
+    "screenSettings_parentalControls_group2": "Teens (PG-13, TV-14)",
+    "screenSettings_parentalControls_group3": "Adults (R, TV-MA, NC-17)",
+    "screenSettings_parentalControls_instructions": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which movie and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password.",
+    "screenSettings_menu_about": "About",
+    "screenSettings_menu_privacyPolicy": "Privacy Policy",
+    "screenSettings_menu_tos": "Terms of Service",
+    "screenSettings_menu_signOut": "Sign Out",
+    "screenSettings_parentalPassword_title": "Enter your password",
+    "screenSettings_parentalPassword_subtitle": "to update parental controls",
+    "screenSettings_parentalPassword_button_hide": "Hide Password",
+    "screenSettings_parentalPassword_button_show": "Show Password",
+
+    "screenSettings_error_parentalFailedChange_title": "Update Failed",
+    "screenSettings_error_parentalFailedChange_description": "Failed to update parental control settings.  Please try re-entering your password.",
+    "screenSettings_error_parentalChanges": "Parental Controls Settings Change",
+    "screenSettings_error_parentalChanges_description_default": "Parental controls setting has changed. Parental controls will be password protected after 5 minutes.",
+    "screenSettings_error_parentalChanges_description_group0": "Parental controls setting has changed to Little Kids (G, TV-Y, TV-G). Parental controls will be password protected after 5 minutes.",
+    "screenSettings_error_parentalChanges_description_group1": "Parental controls setting has changed to Older Kids (PG, TV-PG, TV-Y7). Parental controls will be password protected after 5 minutes.",
+    "screenSettings_error_parentalChanges_description_group2": "Parental controls setting has changed to Teens (PG-13, TV-14). Parental controls will be password protected after 5 minutes.",
+    "screenSettings_error_parentalChanges_description_group3": "Parental controls setting has changed to Adults (R, TV-MA, NC-17). Parental controls will be password protected after 5 minutes.",
+    "screenSettings_error_signInParental_description": "You must be signed in to adjust parental controls",
+
+
+    "screenChannels_error_retrieve_message": "Could not retrieve channels content.",
+    "screenCategories_error_retrieve_message": "Could not retrieve categories content.",
+
+    "screenHome_error_button_continue": "Continue",
+    "screenHome_error_fetchCategories_description": "Unable to load some categories.",
+    "screenHome_error_fetchScreenContent_description": "Unable to load Tubi home screen.",
+
+    "screenDetails_button_trailer": "Watch Trailer",
+    "screenDetails_button_episodes": "Episodes list",
+    "screenDetails_relatedTitles": "You Might Also Like",
+    "screenDetails_button_play": "Play",
+    "screenDetails_button_resume": "Resume",
+    "metadata_expiresIn_plural": "Expires in {days} days",
+    "metadata_expiresIn_singular": "Expires in 1 day",
+    "metadata_directed": "Directed by",
+    "metadata_starring": "Starring",
+    "metadata_hoursAndMinutes": "{hours} h {minutes} min",
+    "metadata_hours": "{hours} h",
+    "metadata_minutes": "{minutes} min",
+    "metadata_seconds": "{seconds} sec",
+    "metadata_seasons_plural": "{seasons} Seasons",
+    "metadata_seasons_singular": "1 Season",
+    "metadata_series": "Series",
+
+    "screenEndCard_startingIn": "Starting in {seconds} s", 
+    "videoPlayer_trailerTitle": "Trailer ({title})",
+    "videoPlayer_adLoadingMessage": "Your program will begin after these messages...", 
+    "videoPlayer_error_failed_description": "FAILED", 
+    "videoPlayer_error_invalidURL_description": "Video URL is not valid.", 
+    "videoPlayer_error_playback_description": "There was an issue with video playback.", 
+    "videoPlayer_error_refresh_description": "Could not refresh the content or play next content.", 
+    "videoPlayer_adHeadsUp": "AD Break starts in {seconds} s", 
+    
+    "goBack_categories": "PRESS BACK FOR CATEGORIES", 
+    "goBack_channels": "PRESS BACK FOR CHANNELS", 
+    "goBack_default": "PRESS BACK TO GO BACK", 
+    "goBack_videoPlayer_upNext": "BACK TO DISMISS",
+    "goBack_videoPlayer_controls": "PRESS BACK TO HIDE",
+    "goBack_menu": "PRESS BACK FOR MENU", 
+    "goBack_home": "PRESS BACK FOR HOME"
+  }
 End Function
