@@ -3,7 +3,7 @@ Function init()
   m._ = rodash()
   m.constants = m.global.constants
   m.theme = m.global.theme
-  Request = TubiRequest()
+  Request = TubiRequest(m.constants.settings.mode)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   

@@ -15,7 +15,7 @@ Function execGetUpNextContent() As Void
   end if
 
   constants = m.global.constants
-  requestLib = TubiRequest()
+  requestLib = TubiRequest(constants.settings.mode)
   auth = TubiAuth(constants, requestLib)
   appName = constants.settings.shortAppName
   url = constants.urls.cms.upNextContent + "/" + m.top.request.contentId + "/next"

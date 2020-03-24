@@ -3,7 +3,7 @@ Function init()
   m.constants = m.global.constants
   m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
   m.trackingLoggingTask.control = "RUN"
-  Request = TubiRequest()
+  Request = TubiRequest(m.constants.settings.mode)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.top.observeField("connectionError","showConnectionError")

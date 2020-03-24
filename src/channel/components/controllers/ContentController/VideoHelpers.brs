@@ -23,12 +23,16 @@ Function playVideoContent(content As Object, autoplayType As String, position=0 
       else if autoplayType = "deliberate"
         m.videoPlayer.analyticsMode = "autoplay-deliberate"
       end if
+
       m.videoPlayer.observeFieldScoped("historyPosition", "onEpisodePosition")
       m.videoPlayer.observeFieldScoped("creditsPosition", "onEpisodeCredits")
       m.videoPlayer.observeFieldScoped("goToNext", "onGoToNext")
       m.videoPlayer.observeFieldScoped("fetchNextContent", "onFetchNextContent")
-      m.videoPlayer.enableAds = true
 
+      m.videoPlayer.enableAds = true
+      if m.constants.settings.suitest = true or m.constants.settings.noAds = true
+        m.videoPlayer.enableAds = false
+      end if
     end if
 
     '//Stop the background artwork from transitioning 

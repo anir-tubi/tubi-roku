@@ -12,7 +12,7 @@ Function init()
   'm.generalTask = CreateObject("roSGNode", "GeneralTask")
   'initiateHomeData()
 
-  Request = TubiRequest()
+  Request = TubiRequest(m.constants.settings.mode)
   Auth = TubiAuth(m.constants, Request)
   m.NodeHelpers = TubiNodeHelpers()
   m.Bookmarks = TubiBookmarks(Request, Auth, m.constants, m.NodeHelpers)

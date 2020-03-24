@@ -4,9 +4,9 @@ End Function
 
 Function execSignIn() As Void
   tubiLog("SignInTask.execSignIn")
-  constants = m.global.constants 'single thread-local reference to avoid thread rendevue
+  constants = m.global.constants 'single thread-local reference to avoid thread rendezvous
   
-  Request = TubiRequest()
+  Request = TubiRequest(constants.settings.mode)
   Auth = TubiAuth(constants, Request)
 
   ' Get Registration code

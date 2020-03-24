@@ -36,7 +36,7 @@ Function init()
   m.NodeHelpers = TubiNodeHelpers()
   m.constants = m.global.constants
   m.theme = m.global.theme
-  Request = TubiRequest()
+  Request = TubiRequest(m.constants.settings.mode)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.Loading = m.top.findNode("Loading")

@@ -8,7 +8,7 @@ End Function
 Function execInitializeUserData()
   tubiLog("AuthTask.execInitializeUserData")
   constants = m.global.constants
-  Request = TubiRequest()
+  Request = TubiRequest(constants.settings.mode)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
@@ -31,7 +31,7 @@ End Function
 Function execRefreshAuthInfo()
   tubiLog("AuthTask.execRefreshAuthInfo")
   constants = m.global.constants
-  Request = TubiRequest()
+  Request = TubiRequest(constants.settings.mode)
   Auth = TubiAuth(constants, Request)
   newAuthInfo = invalid
 
@@ -52,7 +52,7 @@ Function saveKidsModeToMemory()
       kidsEnabled: m.top.isKidsMode
     }
     constants = m.global.constants 'single thread-local reference to avoid thread rendevue
-    Request = TubiRequest()
+    Request = TubiRequest(constants.settings.mode)
     Auth = TubiAuth(constants, Request)
     Auth.setKidsMode(kidsModeObject)
 End Function
@@ -61,7 +61,7 @@ End Function
 Function execSignOut()
   tubiLog("AuthTask.execSignOut")
   constants = m.global.constants 'single thread-local reference to avoid thread rendevue
-  Request = TubiRequest()
+  Request = TubiRequest(constants.settings.mode)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
 
@@ -81,10 +81,11 @@ End Function
 
 Function addToQueue()
   tubiLog("AuthTask.addToQueue")
-  Request = TubiRequest()
-  Auth = TubiAuth(m.global.constants, Request)
+  constants = m.global.constants
+  Request = TubiRequest(constants.settings.mode)
+  Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
-  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
+  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   request = Bookmarks.addBookmarkReq(m.top.content, m.top.isKidsMode)
   port = CreateObject("roMessagePort")
   if request <> invalid then
@@ -125,10 +126,11 @@ End Function
 
 Function removeFromQueue()
   tubiLog("AuthTask.removeFromQueue")
-  Request = TubiRequest()
-  Auth = TubiAuth(m.global.constants, Request)
+  constants = m.global.constants
+  Request = TubiRequest(constants.settings.mode)
+  Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
-  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
+  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
 
   tubiLog("Removing bookmark id " + m.top.content.bookmarkId + " for content " + m.top.content.id)
   request = Bookmarks.removeBookmarkReq(m.top.content, m.top.isKidsMode)
@@ -158,10 +160,11 @@ End Function
 
 Function removeFromHistory()
   tubiLog("AuthTask.removeFromHistory")
-  Request = TubiRequest()
-  Auth = TubiAuth(m.global.constants, Request)
+  constants = m.global.constants
+  Request = TubiRequest(constants.settings.mode)
+  Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
-  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
+  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
 
   tubiLog("Removing content " + m.top.content.id + " from history")
   request = Bookmarks.removeHistoryReq(m.top.content, m.top.isKidsMode)
@@ -191,10 +194,11 @@ End Function
 
 Function updateHistory()
   tubiLog("AuthTask.updateHistory")
-  Request = TubiRequest()
-  Auth = TubiAuth(m.global.constants, Request)
+  constants = m.global.constants
+  Request = TubiRequest(constants.settings.mode)
+  Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
-  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
+  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
 
   'only do the following if the user is logged in
   if m.top.content <> invalid
@@ -282,10 +286,11 @@ End Function
 
 Function updateParentalSetting()
   tubiLog("AuthTask.updateParentalSetting")
-  Request = TubiRequest()
-  Auth = TubiAuth(m.global.constants, Request)
+  constants = m.global.constants
+  Request = TubiRequest(constants.settings.mode)
+  Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
-  Bookmarks = TubiBookmarks(Request, Auth, m.global.constants, NodeHelpers)
+  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()
 
   'only do the following if the user is logged in
@@ -310,7 +315,7 @@ End Function
 Function execGetUserInfo()
   tubiLog("AuthTask.getUserInfo")
   constants = m.global.constants
-  Request = TubiRequest()
+  Request = TubiRequest(constants.settings.mode)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)

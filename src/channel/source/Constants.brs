@@ -239,30 +239,27 @@ Function getConstants()
 
       'toggle for using suitest or not. Should only be set to true for testing situations.
       'for production it should be false  
-      if mode = "dev"
+      constants.thirdParty.suiteTest.enabled = false
+      if constants.settings.suitest = true
         constants.thirdParty.suiteTest.enabled = true
-      else
-        constants.thirdParty.suiteTest.enabled = false
+  
+        ' app_id of suitest application - can be used for any roku device within same organization. update app_id for using different account.
+        constants.thirdParty.suiteTest.app_id =  "214cab71-b41b-468d-bcbb-f42732b157c4"
+
+        ' uri of suitest application
+        constants.thirdParty.suiteTest.uri = "http://the.suite.st/app/roku.zip" 
       end if
 
-      ' app_id of suitest application - can be used for any roku device within same organization. update app_id for using different account.
-      constants.thirdParty.suiteTest.app_id =  "214cab71-b41b-468d-bcbb-f42732b157c4"
-
-      ' uri of suitest application
-      constants.thirdParty.suiteTest.uri = "http://the.suite.st/app/roku.zip" 
-
   'platform is used when communitcating with CMS API
+  constants.platform = "roku"
   if LCase(constants.deviceInfo.channelStore) = "telstra"
     constants.platform = "telstra"
-  else
-    constants.platform = "roku"
   end if
 
   'analyticsPlatform is used when sending analytics events and making raimaker ad requests
+  constants.analyticsPlatform = "ROKU"
   if LCase(constants.deviceInfo.channelStore) = "telstra"
     constants.analyticsPlatform = "TELSTRA"
-  else
-    constants.analyticsPlatform = "ROKU"
   end if
 
   'previously found in settings as "shortAppName"
@@ -279,11 +276,17 @@ Function getConstants()
   'toggle for using starter components or not. Should only be set to false in testing situations.
   'production should always use starter components!
   constants.starterComponents = true
+  if mode = "qa"
+    constants.starterComponents = false
+  end if
 
   'dictates if the channel should use the remote components (or if false, the installed components)
   'only change to false for production in case of emergencies or side load builds that are not connected to a localhost server,
   'as installed components will likely break after many remote releases.
   constants.remoteComponents = true
+  if mode = "qa"
+    constants.remoteComponents = false
+  end if
 
   ' Should the user be shown the upgrade alert to help them upgrade to the latest version.
   '   Used within the hotpatch after a point release to nudge users to use the latest and
@@ -310,11 +313,8 @@ Function getConstants()
 
     'contents url
     constants.urls.cms = {}
-      if mode = "dev"
-        constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
-      else
-        constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
-      end if
+      ' constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
+      constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
       constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
       constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
@@ -324,22 +324,16 @@ Function getConstants()
 
     'matrix url
     constants.urls.matrix = {}
-      if mode = "dev"
-        constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
-      else
-        constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
-      end if
+      ' constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
+      constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
       constants.urls.matrix.homescreen = constants.urls.matrix.urlBase + "/homescreen"
       constants.urls.matrix.container = constants.urls.matrix.urlBase + "/containers"
       constants.urls.matrix.channel = constants.urls.matrix.urlBase + "/containers" ' + "/:container_id"
 
     'users url
     constants.urls.users = {}
-      if mode = "dev"
-        constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
-      else
-        constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
-      end if
+      ' constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
+      constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
       constants.urls.users.login = constants.urls.users.urlBase + "/login"
       constants.urls.users.refreshToken = constants.urls.users.urlBase + "/login/refresh"
       constants.urls.users.transferToken = constants.urls.users.urlBase + "/login/transfer"
@@ -351,22 +345,23 @@ Function getConstants()
 
     'user event tracking url
     constants.urls.dataScience = {}
-      if mode = "dev"
-        constants.urls.dataScience.urlBase = "https://uapi.staging-public.tubi.io/datascience"
-      else
+      constants.urls.dataScience.urlBase = "https://uapi.staging-public.tubi.io/datascience"
+      if mode = "production"
         constants.urls.dataScience.urlBase = "https://uapi.adrise.tv/datascience"
       end if
       constants.urls.datascience.logging = constants.urls.dataScience.urlBase + "/logging"
     
     'Experiments API
     constants.urls.experiments = {}
-      constants.urls.experiments.baseUrl = "https://popper-engine.production-public.tubi.io/popper/"
+      constants.urls.experiments.baseUrl = "https://popper-engine.staging-public.tubi.io/popper/"
+      if mode = "production"
+        constants.urls.experiments.baseUrl = "https://popper-engine.production-public.tubi.io/popper/"
+      end if
       constants.urls.experiments.evaluate = constants.urls.experiments.baseUrl + "evaluate-namespaces"
 
     constants.urls.analytics = {}
-      if mode = "dev"
-        constants.urls.analytics.urlBase = "https://analytics-ingestion.staging-public.tubi.io/analytics-ingestion"
-      else
+      constants.urls.analytics.urlBase = "https://analytics-ingestion.staging-public.tubi.io/analytics-ingestion"
+      if mode = "production"
         constants.urls.analytics.urlBase = "https://analytics-ingestion.production-public.tubi.io/analytics-ingestion"
       end if
       constants.urls.analytics.event = constants.urls.analytics.urlBase + "/v2/event"

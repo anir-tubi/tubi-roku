@@ -7,7 +7,7 @@ Function Main(startupArgs)
   m.appStartTime = UpTime(0)
   
   constants = getConstants()
-  request = TubiRequest()
+  request = TubiRequest(constants.settings.mode)
   auth = TubiAuth(constants, request)
   log = TubiLogger(constants, request, auth)
 

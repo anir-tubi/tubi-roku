@@ -21,7 +21,7 @@ Function execGetDetailMetadata() As Void
 
   ' request setup
   constants = m.global.constants
-  RequestModule = TubiRequest()
+  RequestModule = TubiRequest(constants.settings.mode)
   AuthModule = TubiAuth(constants, RequestModule)
   cms = CmsApi(constants, RequestModule, AuthModule)
   translate = TubiMetadataTranslate(constants)

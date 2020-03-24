@@ -1,5 +1,6 @@
-Function TubiRequest()
+Function TubiRequest(configMode = "production")
   return {
+    configMode: configMode
     createAsync: createAsyncHTTPRequest
     start: tubihttp_start
     handleEvent: tubihttp_handleEvent
@@ -81,6 +82,7 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     addParamsToUrl_: m.addParamsToUrl
     urltransfer: invalid
     klass: "TubiAsyncHTTPRequest"   ' Just a sentinel for verification by Request Queue
+    configMode: m.configMode
   }
   o.Append(mergedOptions)
   return o
@@ -130,10 +132,13 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   m.urltransfer.setHeaders(m.headers)
   m.urltransfer.setRequest(m.method)
 
-  ' Start the request
+  ' print output for qa to test
+  if m.configMode = "qa" or m.configMode = "staging"
+    tubiLog("sending a " + m.method + " request to " + m.url)
+    print m.body
+  end if
 
-  ' tubiLog("sending a " + m.method + " request to " + m.url)
-  ' print m.body
+  ' Start the request
   if m.method = "POST" or m.method = "PUT" or m.method = "PATCH"
     if m.urltransfer.AsyncPostFromString(m.body) = false
       tubiLog(m.method + " request failed. " + url)
@@ -253,10 +258,13 @@ Function tubihttp_handleEvent(message As Object) As Object
             name: m.name
           }
 
-          ' if Left(m.name, 5) = "track"
-            ' print "received "; code; " for "; m.name
-            ' print m.response.data
-          ' end if
+          ' print response info for qa team
+          if (m.configMode = "qa" or m.configMode = "staging")
+            if Left(m.name, 5) = "track"
+              print "received "; code; " for "; m.name
+              print m.response.data
+            end if
+          end if
 
           m.urltransfer = invalid ' release reference in case this will be reused
           return m

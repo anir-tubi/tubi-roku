@@ -54,6 +54,7 @@ passedArgs.forEach(arg => {
   const allowedConfigs = {
     dev: true,
     production: true,
+    qa: true,
     staging: true,
     test: true
   };
@@ -604,4 +605,4 @@ exports.bump = bumpBuild;
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, buildInstalled, sideLoad);
 exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
-exports.releases = series(setProduction, bumpBuild, tagBuild, exports.build, packageAll);
+exports.release = series(setProduction, bumpBuild, tagBuild, exports.build, packageAll);

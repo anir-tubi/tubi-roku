@@ -14,6 +14,9 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
 
   'turn on debug output for RAF
   roAdFramework.setDebugOutput(false)
+  if constants.settings.mode = "qa" or constants.settings.mode = "staging"
+    roAdFramework.setDebugOutput(true)
+  end if
 
   'a port used for sending logging requests
   adLoggingPort = CreateObject("roMessagePort")

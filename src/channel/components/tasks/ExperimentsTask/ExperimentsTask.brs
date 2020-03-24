@@ -5,7 +5,7 @@ End Function
 
 Function getExperiments()
   port = CreateObject("roMessagePort")
-  request = TubiRequest()
+  request = TubiRequest(m.top.constants.settings.mode)
   externalConfig = TubiExternalConfig(request, m.top.constants)
   experiments = TubiExperiments(m.top.constants)
 

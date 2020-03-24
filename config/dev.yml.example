@@ -1,5 +1,6 @@
 # In order to use this dev.yml create a new file called dev.yml in the config directory,
-# using this .example file as a template.
+# using this .example file as a template. The dev.yml file is ignored by git, and each developer
+# must create and manage their own file.
 #
 # dev.yml will overwrite any of the configuration settings in default.yml if the ROKU_PROFILE environment variable is set to "dev"
 #

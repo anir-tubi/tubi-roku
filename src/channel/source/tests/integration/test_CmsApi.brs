@@ -18,7 +18,7 @@ End Function
 
 Function CmsApiTestSuite_SetUp()
   m.constants = getConstants()
-  m.request = TubiRequest()
+  m.request = TubiRequest(m.constants.settings.mode)
   ' For now, don't test any signed-in users
   m.mockAuth = {
     createAuthRequest: Function(a, b, c)

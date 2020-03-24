@@ -8,8 +8,11 @@ Function getExperimentResource(namespaceName as string, parameterName as string,
   
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
     '//if you cannot track task, then do not proceed
-    request = TubiRequest()
-    experiments = TubiExperiments(m.global.constants)
+    if m.constants = invalid
+      m.constants = m.global.constants
+    end if
+    request = TubiRequest(m.constants.settings.mode)
+    experiments = TubiExperiments(m.constants)
     oMoreInfoReturn = experiments.getExperimentResource(namespaceName, parameterName)
     if sendEvent = true
       sendOutExperimentTracking(namespaceName, parameterName, experiments)
@@ -28,8 +31,11 @@ Function getExperimentValue(namespaceName as string, parameterName as string, se
 
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
     '//if you cannot track task, then do not proceed
-    request = TubiRequest()
-    experiments = TubiExperiments(m.global.constants)
+    if m.constants = invalid
+      m.constants = m.global.constants
+    end if
+    request = TubiRequest(m.constants.settings.mode)
+    experiments = TubiExperiments(m.constants)
     experimentInfo = experiments.getExperimentValue(namespaceName, parameterName)
     if sendEvent = true
       sendOutExperimentTracking(namespaceName, parameterName, experiments)

@@ -260,7 +260,6 @@ sub eventHandler(event as String, params = Invalid)
         m.viewManager.sendRequest("init", params)
     else if event = "play"
         'Remove when finished with delayed start
-        if m.isStarted = false and m.viewManager.isInitiated = false then ?"Play event// TITLE: "; m.infoManager.getTitle(); " RESOURCE: "; m.infoManager.getResource(); " GETISLIVE: "; m.infoManager.getIsLive(); " DURATION: "; m.infoManager.getMediaDuration()
         if (m.infoManager.getTitle() <> Invalid AND m.infoManager.getTitle() <> "") AND (m.infoManager.getResource() <> Invalid AND m.infoManager.getResource() <> "Unknown") AND (m.infoManager.getIsLive() = true OR m.infoManager.getMediaDuration() <> 0) AND m.isStarted = false AND m.isExtraMetadataReady() = true OR (m.isExtraMetadataReady() = true AND m.viewManager.isJoinSent = true)
             m.viewManager.sendRequest("start", params)
             m.isStarted = true

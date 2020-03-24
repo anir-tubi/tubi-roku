@@ -54,20 +54,34 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
 * Upload the pkg file and enter the password and select `Rekey`. (This password will be used in step #5 to set "PKG_PASSWORD").
 * Check that you have the proper developer ID by navigating in your web browser to the Roku device's IP and then select Packager.
 
-5\. Set the build environment. (The following settings are temporary and setting them must be done everytime you create a new terminal session.)
+5\. Set the build environment. (The following settings are temporary and setting them must be done every time you create a new terminal session.)
 
 ```
 $ export ROKU_DEV_TARGET=<your-roku-ip>
 $ export DEV_PASSWORD=<dev password set up on Roku device>
 $ export PKG_PASSWORD=<password from the GENKEY utility used for signing packages>
+$ export ROKU_DEV_TELNET=sametab (optional)
 ```
 Pro tip: add these environment variables to your .bashrc or .bash_profile file
 
-6\. Make a development build, sideload to the device, and attach to the developer console
+6\. Create a `dev.yml` file in your `config` directory. Use the existing `dev.yml.example` file as a template.
+
+7\. Make a development build, sideload to the device, and attach to the developer console
 
 `$ gulp install`
 
+## Using Gulp
+To see a list of gulp commands `$ gulp --tasks`
 
+__The most commonly used Gulp commands__
+* `$ gulp install` - build a zip and side load it to a device (as set by your ROKU_DEV_TARGET)
+* `$ gulp stage` - build a zip using the "staging" config and upload starter components, and remote components to the staging CDN.
+* `$ gulp release` - bump the build number, and build a zip using the "production" config. The starter components and remote components are ready to be udloaded to the production CDN.
+
+__Gulp options__
+* `--<config>` - for example `$ gulp install --staging` will build and install a zip to the targeted device using the "staging" config. There is a .yml file for each accepted config value in the /config directory.
+* ``--<IP>`` - for example `$ gulp install --192.168.42.2` will build and install a zip to the device at the IP "192.168.42.2" instead of the device at "ROKU_DEV_TARGET"
+* `--sametab` - for example `$ gulp install --sametab` will open the 8085 telnet port automatically in the same tab in which the gulp command was run.
 
 # Test
 
@@ -288,6 +302,28 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - Select "Update Release"
 
+
+# Informal QA
+Sometimes a feature is given to the QA team before an official staging build is ready for them to test. This allows the QA team to get an early start on testing the feature and create tickets for the Roku dev team in a quicker manner. In order to create an informal QA build, use the `qa` config:
+
+`$ gulp install --qa`
+
+The build will have the following features:
+- Write the urls of requests that are made to the 8085 telnet console.
+- RAF debug output set to `true` so that RAF output is written to the 8085 debug console.
+- Content APIs are set to production. Analytics ingestion API, and Logging API set to staging.
+- No starter components or remote components are used.
+
+Send the .zip that is created to the appropriate QA team member along with a Club House ticket requesting testing.
+
+# Suitest
+To create a build for Suitest testing, update the `qa.yml` file such that the suitest setting is set to true:
+
+`suitest: true`
+
+Then run:
+
+`$ gulp install --qa`
 
 
 # Experiments

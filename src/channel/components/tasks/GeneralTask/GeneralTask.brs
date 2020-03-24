@@ -14,14 +14,23 @@ End Function
 ' 
 ' this task listens for new request in port and makes api request & response calls 
 Function listen()
-
   tubiLog("GeneralTask.listenloop started")
   
+  ' Guarantee that we have a task thread local copy of constants before proceeding.
+  ' It might be possible that grabbing m.global across the thread boundary could time out or fail
+  while true
+    m.constants = m.global.getField("constants")   ' this should grab a thread-local copy
+    if m.constants <> invalid then
+      exit while
+    end if
+    tubiLog("WARNING: Rendezvous failed for constants in GeneralTask")
+  end while
+
   m.jobQueue = {}
   m.requestTypes = {}
   createParsingCallbacks()
   
-  requestModule = TubiRequest()
+  requestModule = TubiRequest(m.constants.settings.mode)
 
   while (true)
     msg = wait(0, m.port)
