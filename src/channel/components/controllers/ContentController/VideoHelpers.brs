@@ -216,7 +216,7 @@ Function onVideoPlayerState(msg)
   state = msg.GetData()
   if state = "error"
     stopVideoContent(true)
-    errorMessage = getTranslations("videoPlayer_error_failed_description")
+    errorMessage = getTranslation("videoPlayer_error_failed_description")
     if m.videoPlayer.errorMsg <> ""
       errorMessage = m.videoPlayer.errorMsg
     end if
