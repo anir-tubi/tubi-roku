@@ -163,7 +163,7 @@ Function getTranslation_en_US()
     "error_noContent_description": "This page currently does not have any content.",
     "dialog_signOut_title": "Are You Sure?",
     "dialog_signOut_description": "You are about to sign out of your Tubi account.",
-    "dialog_signOut_button_ok": "Are You Sure?",
+    "dialog_signOut_button_ok": "Sign Out",
 
     "screenActivationCode_audioGuide": "Activation Code: {code}. Refresh Code",
     "screenActivationCode_heading": "Visit tubi.tv/activate",
