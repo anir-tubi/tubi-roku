@@ -12,7 +12,7 @@ Function initSideNav()
     }
   end if
   
-  if getExperimentResource("roku2", "roku_movies_tv").display_menu_items = false
+  if getExperimentResource("roku2", "roku_movies_tv", false).displayMenuItems = false
     '//Tell the sideName to stop displaying the movies/TV menu items
     m.SideNav.displayMoviesTV = false
   end if
@@ -353,6 +353,7 @@ Function displayNavMenu(shouldTrackComponentInteraction = true)
   bSideNavOpened = m.SideNav.opened
   m.SideNav.setFocus(true)
   if bSideNavOpened = false
+    getExperimentResource("roku2", "roku_movies_tv") '//Ensure the tracking event is fired if it hasn't already
     openSideNav()
     if m.nOriginalSideNavX = invalid
       m.nOriginalSideNavX = m.SideNav.translation[0]
