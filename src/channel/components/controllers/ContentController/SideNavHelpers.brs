@@ -12,7 +12,7 @@ Function initSideNav()
     }
   end if
   
-  if getExperimentResource("roku2", "roku_movies_tv").displayMenuItems = false
+  if getExperimentResource("roku2", "roku_movies_tv").display_menu_items = false
     '//Tell the sideName to stop displaying the movies/TV menu items
     m.SideNav.displayMoviesTV = false
   end if

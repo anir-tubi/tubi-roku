@@ -49,7 +49,7 @@ Function TubiExperiments(constants) as Object
         roku_kids_mode_persistence : { "enabled" : true }
       }
       roku2: {
-        roku_movies_tv : {"displayMenuItems" : false}
+        roku_movies_tv : {"display_menu_items" : false}
       }
     }
 
