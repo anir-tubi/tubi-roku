@@ -29,6 +29,7 @@
       visible="false"
       width="430"
       height="242"
+      cgms = "3"
       enableUI="false" />
   </children>
 </component>
