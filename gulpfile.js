@@ -144,7 +144,7 @@ function buildInstalled() {
       '!src/channel/**/*.md',
       '!src/channel/components/controllers/StarterController/**',
       '!src/channel/components/tasks/ExperimentsTask/**',
-      '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs',
+      '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs'
     ];
 
     let testSources = [

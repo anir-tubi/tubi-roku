@@ -24,6 +24,21 @@ Function showSettingsScreen(sFocusID = "")
 End Function
 
 
+Function getRatingStrings(nRatingIndex)
+  sRatingsReturn = ""
+  countryCode = m.constants.deviceInfo.channelStore
+  aRatings = m.constants.ui.ratings[countryCode]
+
+  if aRatings = invalid
+    aRatings = m.constants.ui.ratings["US"]
+  end if
+
+  if aRatings <> invalid and aRatings[nRatingIndex] <> invalid
+    sRatingsReturn = aRatings[nRatingIndex]
+  end if
+  return sRatingsReturn 
+End Function
+
 
 Function setSignInInfo()
   aaSignIn = {signedIn: false
@@ -276,15 +291,17 @@ Function onParentalSettingComplete(msg)
 
     parentalSetting = m.settingsScreen.parentalSettingSelected
     sMessageID = ""
+    sRatings = ""
     if type(parentalSetting) = "roInt"
       sMessageID = "screenSettings_error_parentalChanges_description_group" + parentalSetting.toStr()
+      sRatings = getRatingStrings(parentalSetting)
     end if
     if sMessageID = ""
       sMessageID = "screenSettings_error_parentalChanges_description_default"
     end if
 
     title = getTranslation("screenSettings_error_parentalChanges")
-    message = getTranslation(sMessageID)
+    message = getTranslation(sMessageID, {ratings: sRatings})
     showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
   else
     if isConfirmPasswordScreen() = true

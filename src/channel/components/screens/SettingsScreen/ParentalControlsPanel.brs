@@ -1,4 +1,5 @@
 Function init()
+  m.constants = m.global.constants
   m.top.width = 1034
   m.top.focusable = true
   m.top.hasNextPanel = false
@@ -13,7 +14,7 @@ Function init()
   m.Menu.focusBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
   m.Menu.focusBitmapBlendColor = m.global.theme.focused
   m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-fhd.9.png"
-  if m.global.constants.deviceInfo.scaledUi = true
+  if m.constants.deviceInfo.scaledUi = true
     m.Menu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
     m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-hd.9.png"
   end if
@@ -22,6 +23,24 @@ Function init()
   m.Spinner = m.top.findNode("Spinner")
   checkItemHelper(m.top.selectItem)
 End Function
+
+
+
+Function getRatingStrings(nRatingIndex)
+  sRatingsReturn = ""
+  countryCode = m.constants.deviceInfo.channelStore
+  aRatings = m.constants.ui.ratings[countryCode]
+
+  if aRatings = invalid
+    aRatings = m.constants.ui.ratings["US"]
+  end if
+
+  if aRatings <> invalid and aRatings[nRatingIndex] <> invalid
+    sRatingsReturn = aRatings[nRatingIndex]
+  end if
+  return sRatingsReturn 
+End Function
+
 
 Function setParentalControlStrings()
   Title = m.top.findNode("Title")
@@ -32,7 +51,8 @@ Function setParentalControlStrings()
   newContent = m.Menu.content.clone(true)
   for i=0 to newContent.getChildCount()-1
     child = newContent.getChild(i)
-    sText = getTranslation("screenSettings_parentalControls_group" + i.toStr())
+    sRatings = getRatingStrings(i)
+    sText = getTranslation("screenSettings_parentalControls_group" + i.toStr(), {ratings: sRatings})
     child.title = sText
   end for
   m.Menu.content = newContent

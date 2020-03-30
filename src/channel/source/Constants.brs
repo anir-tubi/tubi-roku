@@ -561,6 +561,22 @@ Function getConstants()
       constants.ui.terms.channels = "Channels"
       constants.ui.terms.menu = "Menu"
 
+    '::TEMP:: this is temporary. The ratings for each country will eventually be saved centrally in the backend, but until then save them in the counstants 
+    constants.ui.ratings = {}
+      aUS = []
+      aUS.push("G, TV-Y, TV-G")     '//Group 0, Little Kids
+      aUS.push("PG, TV-PG, TV-Y7")  '//Group 1, Big Kids
+      aUS.push("PG-13, TV-14")      '//Group 2, Teens 
+      aUS.push("R, TV-MA, NC-17")   '//Group 3, Adults
+      constants.ui.ratings["US"] = aUS
+      aMX = []
+      aUS.push("A")      '//Group 0, Little Kids
+      aUS.push("B")       '//Group 1, Big Kids
+      aUS.push("B15")     '//Group 2, Teens 
+      aUS.push("C, D")    '//Group 3, Adults
+      constants.ui.ratings["MX"] = aMX
+
+
     constants.ui.categoryIds = {}
       'these map to matrix api container ids
       constants.ui.categoryIds.history = "continue_watching"
