@@ -188,6 +188,9 @@ Function getConstants()
     constants.deviceInfo.displayWidth = di.GetDisplaySize().w
     constants.deviceInfo.displayHeight = di.GetDisplaySize().h
     constants.deviceInfo.countryCode = di.GetUserCountryCode()
+    if constants.deviceInfo.countryCode <> invalid
+      constants.deviceInfo.countryCode = UCase(constants.deviceInfo.countryCode)
+    end if
     constants.deviceInfo.channelStore = di.GetCountryCode()  'some channel store strings look like country codes
     constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.fastCpu = fastCpu

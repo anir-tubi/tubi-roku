@@ -5,6 +5,7 @@ Function init()
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
   m.top.observeFieldScoped("kidsModeValues", "onKidsModeValuesChanged")
   m.top.observeFieldScoped("displayMoviesTV", "onMovieTVDisplayChanged")
+  m.top.observeFieldScoped("displayChannels", "onChannelsDisplayChanged")
   m.top.observeFieldScoped("opened", "onOpenedChange")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
   m.top.observeFieldScoped("selectedItemRequested", "onSelectedItemRequested")
@@ -29,14 +30,6 @@ Function init()
   m.mainItemsSelected = m.top.findNode("mainItemsSelected")
   m.mainItemsSelected.focusBitmapBlendColor = m.constants.ui.colors.selectedListItem
   m.mainItemsSelected.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
-
-  'remove the channels item if not in the US
-  if m.constants.deviceInfo.countryCode <> "US"
-    mainContentChannels = m.MainContent.findNode("channels")
-    m.MainContent.removeChild(mainContentChannels)
-    mainContentChannelsSelect = m.MainContentSelect.findNode("channels-select")
-    m.MainContentSelect.removeChild(mainContentChannelsSelect)
-  end if
 
   initList(m.topItems)
   initList(m.bottomItems)
@@ -108,7 +101,6 @@ End Function
 
 ' Hide the movies/tv items if this is called
 Function onMovieTVDisplayChanged()
-  
   if m.top.displayMoviesTV = false
     '//Remove movies/tv if those items should be hidden. For right now, don't worry about turning it back on
     mainContentMovies = m.MainContent.findNode("movies")
@@ -124,6 +116,19 @@ Function onMovieTVDisplayChanged()
     '//Adjust the spacing of the 3 menu lists in the side nav now that 2 menu items have been eliminated.
     contentLayout = m.top.findNode("content")
     contentLayout.itemSpacings = [108, 148]
+  end if
+End Function
+
+
+' Hide the Channels item if this is called
+Function onChannelsDisplayChanged()
+  if m.top.displayChannels = false
+    '//Remove Channels if that item should be hidden. For right now, don't worry about turning it back on
+    mainContentChannels = m.MainContent.findNode("channels")
+    m.MainContent.removeChild(mainContentChannels)
+
+    mainContentChannelsSelect = m.MainContentSelect.findNode("channels-select")
+    m.MainContentSelect.removeChild(mainContentChannelsSelect)
   end if
 End Function
 

@@ -16,7 +16,9 @@
       <field id="width" type="float"/>
       <field id="opened" value="false" type="boolean"/>
       <!-- Should the sideName display the movies/TV menu items? -->
-      <field id="displayMoviesTV" type="boolean" alwaysNotify="true"/>
+      <field id="displayMoviesTV" value="true" type="boolean"/>
+      <!-- Should the sideName display the channels menu item? -->
+      <field id="displayChannels" value="true" type="boolean"/>
       <!-- The following are the strings associated with this UI element that is changed from the helper/controller file -->
       <field id="stringSignIn" type="string"/>
       <!-- this is an asscoiative array that contains a boolean param "grayedOut" to indicate if the kids mode button should be grayed out, and "title" to indocate the label title of the kids mode button. -->

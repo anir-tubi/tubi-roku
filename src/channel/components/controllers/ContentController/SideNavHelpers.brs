@@ -5,6 +5,7 @@ Function initSideNav()
   m.global.observeFieldScoped("authInfo", "onSideNavSignedIn")
   m.sSideNavItemSelectedId = invalid
   m.sSideNavCurrentScreen = invalid
+
   if m.kidsModeFeatureOn = false
     m.SideNav.kidsModeValues = {
       on: false,
@@ -12,9 +13,23 @@ Function initSideNav()
     }
   end if
   
-  if getExperimentResource("roku2", "roku_movies_tv", false).displayMenuItems = false
-    '//Tell the sideName to stop displaying the movies/TV menu items
-    m.SideNav.displayMoviesTV = false
+  bFeatureMovieTVAllowed = false
+  if m.constants.deviceInfo.countryCode <> invalid and (m.constants.deviceInfo.countryCode = "US")
+    bFeatureMovieTVAllowed = true
+  end if
+
+  bFeatureChannelsAllowed = false
+  if m.constants.deviceInfo.countryCode <> invalid and (m.constants.deviceInfo.countryCode = "US")
+     bFeatureChannelsAllowed = true
+  end if
+
+  if bFeatureMovieTVAllowed = false or getExperimentResource("roku2", "roku_movies_tv", false).displayMenuItems = false
+    '//Tell the sideNav to stop displaying the movies/TV menu items
+    m.SideNav.displayMoviesTV = false 
+  end if
+  if bFeatureChannelsAllowed = false
+    '//Tell the sideNav to stop displaying the channel menu item
+    m.SideNav.displayChannels = false 
   end if
 
   '//set the SideNav Strings by calling onSideNavSignedIn()
