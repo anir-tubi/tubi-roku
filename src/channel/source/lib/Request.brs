@@ -9,6 +9,7 @@ Function TubiRequest(configMode = "production")
     cancel: tubihttp_cancel
     isHttps: tubihttp_isHttps_
     addParamsToUrl: tubihttp_addParamsToUrl_
+    getLocale: tubihttp_getLocale_
   }
 End Function
 
@@ -54,15 +55,21 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
         mergedOptions.method = "GET"
       end if
     end if
-    if o = "headers" and mergedOptions[o].DoesExist("Content-Type") = false
-      if options.method <> invalid
-        if UCase(options.method) = "POST" or UCase(options.method) = "PUT" or UCase(options.method) = "PATCH"
-          mergedOptions[o].Append({"Content-Type": "application/json"})
+    if o = "headers"
+      if mergedOptions[o].DoesExist("Content-Type") = false
+        if options.method <> invalid
+          if UCase(options.method) = "POST" or UCase(options.method) = "PUT" or UCase(options.method) = "PATCH"
+            mergedOptions[o].Append({"Content-Type": "application/json"})
+          end if
         end if
       end if
+      if mergedOptions[o].DoesExist("Content-Language") = false
+        mergedOptions[o].Append({"Content-Language": m.getLocale()})
+      end if
     end if
+    
   end for
-
+  
   o = {
     ' public
     isHttps: m.isHttps(url) ' boolean, not member function
@@ -317,6 +324,20 @@ Function tubihttp_isHttps_(url As String)
   end if
 End Function
 
+
+'''''''''''''''''''''''
+' tubihttp_getLocale_ - helper function to get the device locale that we should send to the server
+'
+Function tubihttp_getLocale_() as String
+  di = CreateObject("roDeviceInfo")
+  locale = di.GetCurrentLocale()
+  if locale <> invalid 
+    locale = locale.replace("_", "-")
+  else
+    locale = "en-US"
+  end if
+  return locale
+End Function
 
 '''''''''''''''''''''''
 ' addParamsToUrl - helper function to construct the full url
