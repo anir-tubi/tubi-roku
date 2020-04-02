@@ -188,6 +188,10 @@ End Function
 
 
 Function tubiExperiments_getExperiment(namespaceName as string, experimentName as string) as Object
+  if m.constants.settings.mode <> "production"
+    experimentName = "qa." + experimentName
+  end if
+
   trackInfo = invalid
   experimentOriginalValue = invalid
   experiment = invalid
@@ -215,10 +219,15 @@ Function tubiExperiments_getExperimentTracking(namespaceName as string, experime
 
   experiment = m.getExperiment(namespaceName, experimentName)
   if experiment <> invalid 
+    if experiment.experiment_result <> invalid
+      if experiment.experiment_result.treatment <> invalid
+        treatmentName = experiment.experiment_result.treatment
+        saltId = experiment.experiment_result.segment
+      end if
 
-    if experiment.experiment_result <> invalid and experiment.experiment_result.treatment <> invalid
-      treatmentName = experiment.experiment_result.treatment
-      saltId = experiment.experiment_result.segment
+      if experiment.experiment_result.experiment_name <> invalid
+        experimentName = experiment.experiment_result.experiment_name
+      end if
     end if
 
     if treatmentName <> invalid
@@ -244,24 +253,16 @@ End Function
 
 
 Function tubiExperiments_getExperimentValue(namespaceName as string, experimentName as string) as Object
-  experimentValue = invalid
-  treatmentName = invalid
+  experimentValue = m.getDefaultValue(namespaceName, experimentName)
 
   experiment = m.getExperiment(namespaceName, experimentName)
   if experiment <> invalid 
     if experiment.experiment_result <> invalid and experiment.experiment_result.treatment <> invalid
-      treatmentName = experiment.experiment_result.treatment
+      treatment = experiment.experiment_result.treatment
+      if (type(treatment) = "roString" or type(treatment) = "String") and treatment <> "control"
+        experimentValue = treatment
+      end if
     end if
-    
-    if (type(treatmentName) = "roString" or type(treatmentName) = "String") and treatmentName = "control"
-      treatmentName = m.getDefaultValue(namespaceName, experimentName)
-    end if
-  end if
-
-  if treatmentName = invalid
-    experimentValue = m.getDefaultValue(namespaceName, experimentName)
-  else 
-    experimentValue = treatmentName
   end if
 
   return experimentValue
