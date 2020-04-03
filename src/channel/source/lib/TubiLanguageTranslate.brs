@@ -230,7 +230,7 @@ Function getTranslation_en_US()
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
       "message": "Movies Disabled"
     },
-    "dialog_tvsDisabled_title": {
+    "dialog_tvDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
       "message": "TV Disabled"
     },
