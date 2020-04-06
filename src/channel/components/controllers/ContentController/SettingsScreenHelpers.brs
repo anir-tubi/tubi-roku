@@ -272,7 +272,6 @@ Function onParentalSettingComplete(msg)
       '//turn off kids mode (if it is on) when switching to teens and greater
       '// Also, disable the manual version of kids mode if the user had previously enabled kids mode manually
       if m.kidsModeFeatureOn = true
-        saveKidsModeToMemory(false)
         enableKidsModeUI(false)
       end if
     end if

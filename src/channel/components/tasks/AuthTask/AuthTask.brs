@@ -23,7 +23,6 @@ Function execInitializeUserData()
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
   m.top.firstVisit = Auth.getfirstVisit()
-  m.top.kidsMode = Auth.getKidsMode()
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger 
 End Function
 
@@ -46,18 +45,6 @@ Function execRefreshAuthInfo()
 End Function
 
 
-Function saveKidsModeToMemory()
-  tubiLog("AuthTask.saveKidsModeToMemory")
-    kidsModeObject = {
-      kidsEnabled: m.top.isKidsMode
-    }
-    constants = m.global.constants 'single thread-local reference to avoid thread rendevue
-    Request = TubiRequest(constants.settings.mode)
-    Auth = TubiAuth(constants, Request)
-    Auth.setKidsMode(kidsModeObject)
-End Function
-
-
 Function execSignOut()
   tubiLog("AuthTask.execSignOut")
   constants = m.global.constants 'single thread-local reference to avoid thread rendevue
@@ -74,7 +61,6 @@ Function execSignOut()
 
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
-  m.top.kidsMode = Auth.getKidsMode()
   m.top.authInfo = invalid
 End Function
 

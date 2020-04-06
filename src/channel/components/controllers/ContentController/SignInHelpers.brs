@@ -133,21 +133,6 @@ Function onAuthInfoReceived()
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
 
-  registryKidsMode = false
-  if m.authTask.kidsMode <> invalid and m.authTask.kidsMode.kidsEnabled <> invalid
-    registryKidsMode = m.authTask.kidsMode.kidsEnabled
-  end if
-  
-  if registryKidsMode = true
-    kidsmode = getExperimentResource("roku", "roku_kids_mode_persistence")
-    registryKidsMode = kidsmode.enabled
-    
-    if registryKidsMode = false
-      saveKidsModeToMemory(false)
-    end if
-    
-  end if
-  
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
@@ -205,7 +190,7 @@ Function onAuthInfoReceived()
       'expect homeScreen to not be invalid only when a user signs out
       homeScreen.loadAllCategories = true
     end if
-    startUserExperience(registryKidsMode)
+    startUserExperience()
   else if currentScreen() <> invalid and currentScreen().getSubtype() = "DetailScreen"
     ' this happens if a user logs in after attempting to add to queue
     if homeScreen <> invalid
@@ -217,6 +202,6 @@ Function onAuthInfoReceived()
     if homeScreen <> invalid
       homeScreen.loadAllCategories = true
     end if
-    startUserExperience(registryKidsMode)
+    startUserExperience()
   end if
 End Function

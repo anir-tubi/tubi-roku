@@ -327,8 +327,7 @@ End Function
 ' they all set some state on m and call startUserExperience(). When all the information has arrived, as verified
 ' by the first checks in the function, then the function performs it's functionality to start the channel. 
 '
-' @registryKidsMode: boolean, the persisted value for kids mode set in the registry
-Function startUserExperience(registryKidsMode = false)
+Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
 
   if m.authInfoReceived <> true
@@ -376,7 +375,7 @@ Function startUserExperience(registryKidsMode = false)
       enableKidsModeUI(false) '//when deeplinking, exit out of kids mode because we cannot guarantee that the video is kid appropriate so the UI should not make the user think we're still in kids mode
       showDetailScreen(m.deeplinkContent)
     else
-      startChannel(registryKidsMode)
+      startChannel()
       showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
     end if
   end if
@@ -656,16 +655,6 @@ Function onHistoryQueueRefresh()
   m.global.historyIds = m.authTask.history
   refreshAllDetailScreens()
 End Function
- 
-Function saveKidsModeToMemory(bTurnedOn)
-  tubiLog("ContentController.saveKidsModeToMemory")
-  if m.kidsModeRequest = invalid
-    m.kidsModeRequest = CreateObject("roSGNode", "AuthTask")
-    m.kidsModeRequest.functionName = "saveKidsModeToMemory"
-  end if
-  m.kidsModeRequest.isKidsMode = bTurnedOn
-  m.kidsModeRequest.control = "RUN"
-End Function
 
 
 ' What boolean value should be sent to the backend in terms of kids mode?
@@ -766,13 +755,12 @@ Function onCloseModal()
 End Function
 
 
-' @registryKidsMode: boolean, the persisted value for kids mode set in the registry
-Function startChannel(registryKidsMode = false)
+Function startChannel()
   tubiLog("ContentController.startChannel")
   m.contentGroup.visible = true
   m.appLoadStopwatch.mark()
   focusSideNavOption(m.constants.ui.sideNavIds.home)
-  if isKidsModeEnabledByParentalControls() = true or registryKidsMode = true
+  if isKidsModeEnabledByParentalControls() = true
     enableKidsModeUI(true)
   else
     enableKidsModeUI(false)

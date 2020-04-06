@@ -69,9 +69,6 @@
         <!-- number of days since the unix epoch when the device first opened Tubi -->
         <field id="firstVisit" type="integer" />
 
-        <!-- An Associative array related to user preferences to kids mode -->
-        <field id="kidsMode" type="assocarray" />
-
         <!-- execInitializeUserData, execSignOut:
         -        BookmarkContentNode tree of bookmarks
         -->

@@ -284,7 +284,6 @@ End Function
 
 
 Function enableKidsModeFromSideNav(bEnable = true)
-  saveKidsModeToMemory(bEnable)
   enableKidsModeUI(bEnable)
   refreshScreenAfterParentalChanges()
   screen = currentScreen()
