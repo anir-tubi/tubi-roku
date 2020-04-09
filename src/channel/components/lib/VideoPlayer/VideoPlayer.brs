@@ -129,6 +129,17 @@ Function init()
   m.adHeadsUpTime = 10
   m.adBreakAdvance = 0.5
 
+  ' m.seekReferenceQueue is used to record the playback positions to which m.Video.seek is set.
+  ' Context: setting a value on m.Video.seek will cause the onVideoPositionChange() callback to fire.
+  ' We do not want playProgressEvents to fire from onVideoPositionChange() if the callback occurs due to a seek,
+  ' so we check if the postion associated with the onVideoPositionChange() callback is at the 0 index of 
+  ' m.seekReferenceQueue, and if it is, we know that the callback is firing due to seek. We use a "queue" to protect
+  ' against the edge case / race condition that multiple seek events may occur prior to the onVideoPositionChange()
+  ' callback being run for the first seek event. If we used a single value instead of the queue, in the event of the 
+  ' previously described edge case, the value would be changed by the 2nd seek event prior to the onVideoPositionChange()
+  ' callback referencing the value, which would lead to badly formed playProgressEvents.
+  m.seekReferenceQueue = []
+
   ' checking m.recentCuepointFetch and m.recentCuepoint prevents multiple ad calls and multiple tracking events
   ' for a single cuepoint if the position callback happens at 10.2 and 10.7 for instance
   m.recentCuepointFetch = 0
@@ -299,7 +310,12 @@ End Function
 Function onVideoPositionChange()
   tubiLog("VideoPlayer.onVideoPositionChange position = " + m.playerPosition.toStr())
 
-  updatePlayerPosition()
+  updatePlayerPosition()  'updates m.playerPosition with m.Video.position
+
+  playProgressOk = true
+  if positionInSeekReferenceQueue(m.playerPosition, m.seekReferenceQueue) = true 'updates m.seekReferenceQueue as neccessary
+    playProgressOk = false
+  end if
 
   ' Auto hide transport
   if m.VideoState = "play" and m.HUD.opacity = 1 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
@@ -312,7 +328,7 @@ Function onVideoPositionChange()
   end if
 
   ' Analytics
-  if m.playerPosition >= m.lastPingTime + m.analyticsInterval then
+  if m.playerPosition >= m.lastPingTime + m.analyticsInterval and playProgressOk = true
     playProgressEvent = getPlayProgressEvent()
     if playProgressEvent <> invalid
       m.lastPingTime = m.playerPosition
@@ -376,8 +392,11 @@ Function onVideoPositionChange()
             ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
             playProgressEvent = getPlayProgressEvent()
             if playProgressEvent <> invalid
-              m.lastPingTime = m.playerPosition
               trackEvent(playProgressEvent)
+
+              ' set m.lastPingTime here to prevent an extra playProgressEvent if a user backs out of the ads
+              ' thereby triggering backButtonExit() which also sends a playProgressEvent.
+              m.lastPingTime = m.playerPosition
             end if
             
             ' update history when showing adBreak
@@ -455,14 +474,13 @@ End Function
 Function playContent()
   tubilog("VideoPlayer.playContent")
   if m.Video.content.nowPos <> invalid then
-    m.Video.seek = m.Video.content.nowPos
     m.playerPosition = m.Video.content.nowPos
     m.lastSavedPosition = m.Video.content.nowPos
     m.lastPingTime = m.Video.content.nowPos
     m.lastButtonPressPos = m.Video.content.nowPos
+    m.seekReferenceQueue.push(m.Video.content.nowPos)
+    m.Video.seek = m.Video.content.nowPos
   else
-    m.lastPingTime = 0
-    m.lastSavedPosition = 0
     m.lastButtonPressPos = 0
   end if
 
@@ -470,6 +488,9 @@ Function playContent()
   m.top.midrolls = []
   m.recentCuepointFetch = 0
   m.recentCuepoint = 0
+
+  ' reset the seekReferenceQueue
+  m.seekReferenceQueue = []
     
   'start_video user event analytics
   if m.top.analyticsMode = "trailer"
@@ -800,6 +821,7 @@ Function onAdStateChange()
     ' Unfortunately, this order of play before seek causes a device crash if the content url is not a valid video url.
     if m.Video.content.url <> invalid and m.Video.content.url <> ""
       m.top.setFocus(true)
+      m.seekReferenceQueue.push(m.playerPosition)
       m.VideoState = "play"
       m.Video.control = "play"
       m.Video.seek = m.playerPosition
@@ -935,7 +957,6 @@ Function resumeFromSkip()
     m.Video.control = "resume"
     m.VideoState = "play"
   end if
-  m.lastPingTime = m.playerPosition
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
 End Function
@@ -1006,7 +1027,6 @@ Function endScrub(shouldJump = false)
   m.ScrubTimer.control = "stop"
   m.ScrubTimer.unobserveField("fire")
   ' Reset periodic event trackers
-  m.lastPingTime = m.playerPosition
 
   animateTransport("out")
   resetTransportButtons()
@@ -1032,7 +1052,11 @@ End Function
 'handles StartButton selection
 'moves the player to the 0:00:00 position
 Function goToStart()
-  m.positionAtJumpStart = m.playerPosition
+  'only set positionAtJumpStart if it hasn't been set by other seek types
+  if m.VideoState = "play" or m.VideoState = "pause"
+    m.positionAtJumpStart = m.playerPosition
+  end if
+
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
     setFocusedButton(m.StartButton)
@@ -1043,7 +1067,6 @@ Function goToStart()
     end if
   end if
   m.playerPosition = 0
-  m.lastPingTime = m.playerPosition
   jumpToPosition(m.playerPosition)
 End Function
 
@@ -1054,14 +1077,16 @@ Function goToNext()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(true)
   end if
+
   m.top.playNext = true
 
   if not advancePlaylist() then
-    'the end of the video playback
-    m.VideoState = "stop"
+    ' the end of the video playback
+    ' m.VideoState will be updated by onVideoStateChange
     m.Video.control = "stop"
     m.top.goToNext = true
   end if
+
   animateTransport("out")
   resetTransportButtons()
 End Function
@@ -1165,7 +1190,6 @@ Function handleHopForward(duration)
   m.VideoState = "hop"
   hopPosition = m.playerPosition + duration
   jumpToPosition(hopPosition)
-  m.lastPingTime = hopPosition        'used for accurate play_progress accounting
 End Function
 
 
@@ -1205,7 +1229,6 @@ Function handleHopBack(remoteReplayButton, duration)
 
   m.VideoState = "hop"
   jumpToPosition(hopPosition)
-  m.lastPingTime = hopPosition    'used for accurate play_progress accounting
 End Function
 
 
@@ -1213,7 +1236,6 @@ End Function
 'functionality is: pause video, jump 10s forward or back, show the transport
 Function handleSkipVideo(amt, isProgressBarFocused)
   'handle the first skip press
-  print "m.VideoState "; m.VideoState
   if m.VideoState <> "skip"
     m.Video.control = "pause"
     m.PlayPauseButton.uri = m.buttonUris.play
@@ -1380,7 +1402,7 @@ Function jumpToPosition(position)
   m.lastButtonPressPos = position
   
   ' update history when seeking
-  historyPosition(m.playerPosition)
+  historyPosition(m.positionAtJumpStart)
   
   m.Thumbnail.visible = false
   ' seek analytics
@@ -1398,10 +1420,12 @@ Function jumpToPosition(position)
     m.top.adPosition = position
     m.top.adControl = "seek"
   else
+    m.seekReferenceQueue.push(position)
     m.Video.seek = position 'will load and play the video at the seeked to point
     m.VideoState = "play"
   end if
 
+  return position
 End Function
 
 
@@ -1475,10 +1499,10 @@ Function onShowTransport()
 End Function
 
 
-' Play progress events should occur (and m.lastPingTime should be set!) at the following instances
-' a user watches for 10s (pauses should not set m.lastPingTime)
+' Play progress events should occur at the following instances
+' a user watches for 10s
 ' an ad break starts
-' a user begins a "seek" functionality (skip 10s, hop 30s, ff/rew)
+' a user begins a "seek" functionality (skip 10s, hop 30s, ff/rew, jump to beginning)
 ' a user selects to "jump to next video"
 Function getPlayProgressEvent()
   playProgressEvent = invalid
@@ -1564,4 +1588,30 @@ End Function
 ' Returns true if the position is between (target - window) and the target
 Function isInWindow(position, target, window)
   return (position >= (target - window) and position < target)
+End Function
+
+
+' This function potentially modifies seekReferenceQueue if the position is found in the seekReferenceQueue
+' @position: float, check if this value exists in the seekReferenceQueue
+' @seekReferenceQueue: array, m.seekReferenceQueue
+Function positionInSeekReferenceQueue(position, seekReferenceQueue)
+  ' iterate the seekReferenceQueue until we find an index that contains the position.
+  ' Once we find that position, remove all indexes up to and including the index that contains the position.
+
+  ' This iteration is done to account for a potential edge case where there are seeks in the seekReferenceQueue that
+  ' do not have this function called on them, so we clean out the queue when a seek position is successfully found
+  ' in the queue.
+  for i=0 to seekReferenceQueue.count() - 1
+    if seekReferenceQueue[i] = position
+      j = 0
+      while j <= i
+        seekReferenceQueue.shift()
+        j += 1
+      end while
+
+      return true
+    end if
+  end for
+
+  return false
 End Function

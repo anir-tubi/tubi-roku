@@ -57,6 +57,11 @@ Function onVideoStateChange(msg)
       m.didAdvanceDrm = false
       playContent()
     else if advancePlaylist() <> true
+      ' the video reached the end
+      playProgressEvent = getPlayProgressEvent()
+      if playProgressEvent <> invalid
+        trackEvent(playProgressEvent)
+      end if
       m.top.state = state
     end if
   else if state = "error"
@@ -86,9 +91,20 @@ Function onVideoStateChange(msg)
               video_id: m.Video.content.id.toInt()
             }
           })
+        else
+          ' the video has been stopped, send a final playProgressEvent
+          playProgressEvent = getPlayProgressEvent()
+          if playProgressEvent <> invalid
+            trackEvent(playProgressEvent)
+          end if
         end if
       end if
     end if
+  else if state = "playing" and m.VideoState <> "pause"
+    ' reset the last ping time to the position at which video playback is starting or re-starting (after a seek)
+    ' in order to avoid race conditions in which the video position might update while the handle logic is being completed.
+    m.lastPingTime = m.Video.position
+    m.lastSavedPosition = m.lastSavedPosition
   end if
 
   ' Loading page visibility
