@@ -28,7 +28,7 @@ End Function
 
 Function getRatingStrings(nRatingIndex)
   sRatingsReturn = ""
-  countryCode = m.constants.deviceInfo.channelStore
+  countryCode = m.constants.deviceInfo.countryCode
   aRatings = m.constants.ui.ratings[countryCode]
 
   if aRatings = invalid

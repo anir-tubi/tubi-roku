@@ -573,10 +573,10 @@ Function getConstants()
       aUS.push("R, TV-MA, NC-17")   '//Group 3, Adults
       constants.ui.ratings["US"] = aUS
       aMX = []
-      aUS.push("A")      '//Group 0, Little Kids
-      aUS.push("B")       '//Group 1, Big Kids
-      aUS.push("B15")     '//Group 2, Teens 
-      aUS.push("C, D")    '//Group 3, Adults
+      aMX.push("A")      '//Group 0, Little Kids
+      aMX.push("B")       '//Group 1, Big Kids
+      aMX.push("B15")     '//Group 2, Teens 
+      aMX.push("C, D")    '//Group 3, Adults
       constants.ui.ratings["MX"] = aMX
 
 

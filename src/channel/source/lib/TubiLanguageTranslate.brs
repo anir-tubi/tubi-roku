@@ -456,7 +456,7 @@ Function getTranslation_en_US()
     },
     "screenSettings_parentalControls_group0": {
       "description": "Group 0 of the parental controls",
-      "message": "Little Kids ({ratings}F)"
+      "message": "Little Kids ({ratings})"
     },
     "screenSettings_parentalControls_group1": {
       "description": "Group 1 of the parental controls",
