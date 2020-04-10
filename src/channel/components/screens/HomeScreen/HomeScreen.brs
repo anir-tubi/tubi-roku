@@ -52,6 +52,10 @@ Function init()
    end if
 
   m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
+  
+  ' lastFocusPosition holds the state of currFocusRow the last time onCurrFocusRow() occurred.
+  ' It is reset to -1 at the conclusion of a grid scroll animation.
+  m.lastFocusPosition = -1
 
   ' the animation nodes necessary for video in the grid (vitg)
   m.contentAreaSlideAnimation = invalid
@@ -158,12 +162,51 @@ Function onCurrFocusRowChange()
   'the last row that was focused and settled as an integer
   lastFocusRow = m.CategoryGridList.cursorPosition[0]
 
+  scrollDirection = ""
+  if m.lastFocusPosition >= 0
+    if currFocusRow > m.lastFocusPosition
+      scrollDirection = "down"
+    else if currFocusRow < m.lastFocusPosition
+      scrollDirection = "up"
+    end if
+  else
+    ' this is the first time onCurrFocusRowChange has run during this grid scroll animation so we can
+    ' use lastFocusRow as a reference for finding the scroll direction.
+    if currFocusRow > lastFocusRow
+      scrollDirection = "down"
+    else if currFocusRow < lastFocusRow
+      scrollDirection = "up"
+    end if
+  end if
+
+
+  ' If a user quickly presses the up and down buttons quickly, before the
+  ' rowList can set rowList.rowItemFocused, we need to correct lastFocusRow to be accurate
+  if m.lastFocusPosition >= 0
+    if currFocusRow > m.lastFocusPosition and scrollDirection = "up"
+      ' currFocusRow > lastFocusRow indicates the user is scrolling down, but if scrollDirection = "up"
+      ' it indicates a user did a down/up fast button press, so we need to update lastFocusRow
+      lastFocusRow += 1
+    else if currFocusRow < m.lastFocusPosition and scrollDirection = "down"
+      ' currFocusRow > lastFocusRow indicates the user is scrolling up, but if scrollDirection = "down"
+      ' it indicates a user did a up/down fast button press, so we need to update lastFocusRow
+      lastFocusRow -= 1
+    else if currFocusRow = lastFocusRow
+      ' currFocusRow = lastFocusRow indicates the user concluded an up/down or down/up fast button press
+      ' and we need to update lastFocusRow
+      if scrollDirection = "up"
+        lastFocusRow += 1
+      else if scrollDirection = "down"
+        lastFocusRow -= 1
+      end if
+    end if
+  end if
+
   ' There are 4 options when focusing a new category
   ' 1) Both old and new focused categories are not vitg: do nothing
   ' 2) Both old and new focused categories are vitg: do nothing
   ' 3) Old category is vitg, new category is not vitg: shrink the CategoryGridList
   ' 4) Old category is not vitg, new category is vitg: expand the CategoryGridList
-
   ' Determine if the category being entered is vitg
   if currFocusRow > lastFocusRow
     ' scrolling down
@@ -186,29 +229,44 @@ Function onCurrFocusRowChange()
     end if
     rowPercent = Abs(currFocusRow - rowLosingFocus)
   else if currFocusRow = lastFocusRow
-    rowEnteringFocus = lastFocusRow
+    ' this block should never happen since lastFocus is updated above in the case where there is a fast scroll
+    rowEnteringFocus = Fix(currFocusRow)
     rowLosingFocus = lastFocusRow
     rowPercent = 1
   end if
 
   categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
   categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
+  
+  if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+    ' send experiment analytics (exposure event) for large and small vitg.
+    ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
+    getExperimentResource("roku", "roku_vitg_large")
 
-  ' send experiment analytics (exposure event) for large and small vitg.
-  ' calling getExperimentValue() automatically sends the exposure, and limits sending the exposure event to once per session.
-  if categoryEnteringFocus <> invalid
-    if categoryEnteringFocus.id = "deep_cuts"
-      getExperimentValue("RokuNamespace", "roku_vitg_2")
+    ' update contentArea translation, only when VITG gain focus
+    expandContentAreaForLargeVitg(rowPercent)
+  else if categoryLosingFocus <> invalid and categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+    ' update contentArea translation, only when VITG lose focus
+    contractContentAreaForLargeVitg(rowPercent)
+  else if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType <> m.constants.ui.gridItemTypes.vitg_large
+    if categoryLosingFocus <> invalid and categoryLosingFocus.gridItemType <> m.constants.ui.gridItemTypes.vitg_large
+      ' In the case of fast scrolling many rows of the grid, across the large vitg row, the category grid list may
+      ' not finish it's translation animation as the focus leaves the vitg row. We correct for that as the focus scolls
+      ' through non video in the grid rows.
+      if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
+        translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.vitgSlideAmt
+
+        if rowPercent > (1 - translationDiffPercent)
+          contractContentAreaForLargeVitg(rowPercent)
+        end if
+      end if
     end if
   end if
-
-  ' for large format video in the grid, adjust the size of the content grid, and opacity of the info panel as necessary
-  if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-    if m.ContentArea.translation[1] > 143
-      expandContentAreaForLargeVitg(rowPercent)
-    end if
-  else if categoryLosingFocus <> invalid and categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-    contractContentAreaForLargeVitg(rowPercent)
+  
+  ' update m.lastFocusPositioin or reset if we've concluded the scroll animation
+  m.lastFocusPosition = currFocusRow
+  if rowPercent = 1
+    m.lastFocusPosition = -1
   end if
 End Function
 

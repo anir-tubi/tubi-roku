@@ -143,6 +143,7 @@ Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode 
   end if
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = true
+  options.params["includeVideoInGrid"] = true
   return m.createAuthRequest_(url, name, options)
 End Function
 

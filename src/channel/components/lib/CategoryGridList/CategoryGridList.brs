@@ -476,7 +476,9 @@ Function getWholeCategoryRequest(category As Object, field="wholeCategoryRespons
     if categoryId <> invalid
       tubiLog("CategoryGridList.fetch whole: Asking MetadataFetchTask for " + categoryId)
        
-      params = {contentMode : m.top.contentMode}
+      params = {
+        contentMode: m.top.contentMode
+      }
       return m.metadataFetchTaskDTO.createRequest(categoryId, m.top, field, m.constants.reqNames.getCategory, invalid, m.top.shouldKidsModeBeSentToServer, params)
     end if
   end if

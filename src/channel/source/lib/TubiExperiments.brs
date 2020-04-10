@@ -41,14 +41,15 @@ Function TubiExperiments(constants) as Object
       roku: {
       }
       roku2: {
-        roku_movies_tv : "off"
+        roku_movies_tv: "off"
       }
     }
     defaultResources: {
       roku: {
+        roku_vitg_large : {"enabled": false}
       }
       roku2: {
-        roku_movies_tv : {"display_menu_items" : false}
+        roku_movies_tv : {"display_menu_items": false}
       }
     }
 
