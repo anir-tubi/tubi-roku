@@ -114,7 +114,7 @@ End Function
 
 
 ' onRepopulateContent callback gets triggered when adding/removing any row
-' it sets RowHeight and update the focus variable
+' it sets RowHeight and jumps the focus to a specified content.
 Function onRepopulateContent()
   setRowHeights()
   ' setting the rowItemSize and/or rowHeights moves the focus indicator back to the origin so
@@ -134,7 +134,11 @@ Function onRepopulateContent()
     ' there is no content in the most recently focused row, then
     ' check if there is any content in each row prior to the most recently focused row
     ' and focus the first content in that row
-    rowIndex = m.RowList.rowItemFocused[0]
+    rowIndex = 0
+    if m.RowList.rowItemFocused[0] <> invalid
+      rowIndex = m.RowList.rowItemFocused[0]
+    end if
+
     while resolveAbbreviatedContent([rowIndex, 0]) = invalid and rowIndex >= 0
       rowIndex -= 1
     end while
