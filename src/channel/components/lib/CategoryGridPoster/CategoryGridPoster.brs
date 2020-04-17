@@ -168,6 +168,13 @@ Function setUpVitg()
 
   m.title.visible = true
   m.title.text = title
+  
+  ' It is possible when fast scrolling to the VITG row, that the item can gain focus before setUpVitg() runs.
+  ' since itemHasFocus is true in this case, the callback onItemFocus won't get triggered. so manually calling handleLocalFocusChange to start trailer
+  if m.top.itemHasFocus = true
+    handleLocalFocusChange(m.top.itemHasFocus)
+  end if
+    
 End Function
 
 
