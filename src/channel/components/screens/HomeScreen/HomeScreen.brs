@@ -237,12 +237,14 @@ Function onCurrFocusRowChange()
 
   categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
   categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
-  
-  if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+
+  if categoryEnteringFocus <> invalid and categoryEnteringFocus.id = "deep_cuts"
     ' send experiment analytics (exposure event) for large and small vitg.
     ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
     getExperimentResource("roku", "roku_vitg_large")
+  end if
 
+  if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
     ' update contentArea translation, only when VITG gain focus
     expandContentAreaForLargeVitg(rowPercent)
   else if categoryLosingFocus <> invalid and categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
