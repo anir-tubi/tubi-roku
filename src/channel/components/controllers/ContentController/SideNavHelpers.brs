@@ -23,10 +23,11 @@ Function initSideNav()
      bFeatureChannelsAllowed = true
   end if
 
-  if bFeatureMovieTVAllowed = false or getExperimentResource("roku2", "roku_movies_tv", false).displayMenuItems = false
+  if bFeatureMovieTVAllowed = false
     '//Tell the sideNav to stop displaying the movies/TV menu items
     m.SideNav.displayMoviesTV = false 
   end if
+
   if bFeatureChannelsAllowed = false
     '//Tell the sideNav to stop displaying the channel menu item
     m.SideNav.displayChannels = false 
@@ -367,7 +368,6 @@ Function displayNavMenu(shouldTrackComponentInteraction = true)
   bSideNavOpened = m.SideNav.opened
   m.SideNav.setFocus(true)
   if bSideNavOpened = false
-    getExperimentResource("roku2", "roku_movies_tv") '//Ensure the tracking event is fired if it hasn't already
     openSideNav()
     if m.nOriginalSideNavX = invalid
       m.nOriginalSideNavX = m.SideNav.translation[0]
