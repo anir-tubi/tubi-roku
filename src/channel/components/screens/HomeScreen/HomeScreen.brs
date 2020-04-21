@@ -238,7 +238,7 @@ Function onCurrFocusRowChange()
   categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
   categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
 
-  if categoryEnteringFocus <> invalid and categoryEnteringFocus.id = "deep_cuts"
+  if categoryEnteringFocus <> invalid and categoryEnteringFocus.id = "deep_cuts" and m.constants.deviceInfo.limitedUI <> true
     ' send experiment analytics (exposure event) for large and small vitg.
     ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
     getExperimentResource("roku", "roku_vitg_large")
