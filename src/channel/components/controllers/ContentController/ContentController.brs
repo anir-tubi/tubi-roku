@@ -365,6 +365,8 @@ Function startUserExperience()
       end if
     end if
     
+    sendHdcpLog()
+    
     ' In any of the auth transitions, this spinner might be visible
     m.spinner.visible = false
     if m.enteredFromDeepLink = true then
@@ -379,6 +381,23 @@ Function startUserExperience()
       showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
     end if
   end if
+End Function
+
+
+' sendHdcpLog will check HDCP link and send hdcp-version to logging API
+Function sendHdcpLog()
+
+  hdmiStatus = CreateObject("roHdmiStatus")
+  
+  if hdmiStatus <> invalid
+    hdcpVersion = hdmiStatus.GetHdcpVersion()
+    isActive = hdmiStatus.IsHdcpActive(hdcpVersion)
+    if isActive = false
+      hdcpVersion = "none"
+    end if
+    tubiLog(hdcpVersion, "info", "clientInfo", "hdcp-version")   'send info to server
+  end if  
+
 End Function
 
 
