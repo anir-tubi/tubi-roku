@@ -19,6 +19,9 @@
       <!-- interface to tell the episode screen to focus a specific series episode;
            2d array describing the episode that needs to be focused with [seasonIndex, episodeIndex] -->
       <field id="episodeToFocus" alias="RowList.jumpToRowItem" />
+      
+      <!-- shouldFocusWhenPushed will be set true once animation logo is finished during app launch -->
+      <field id="shouldFocusWhenPushed" type="boolean" value="true"/>      
 
     <!-- OUTPUT -->
       <!-- Set to the content of the episode that was clicked on -->

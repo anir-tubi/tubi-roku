@@ -2,6 +2,8 @@ Function init()
   tubiLog(" ")
   tubiLog("Init Scenegraph----------------")
   m._ = rodash()
+  
+  m.contentControllerBGGroup = m.top.findNode("contentControllerBGGroup")
 
   m.constants = m.global.constants
   
@@ -33,6 +35,7 @@ Function init()
   m.startupArgsReceived = false
   m.top.observeFieldScoped("startupArgs", "onStartupArgs")
   m.top.observeFieldScoped("roInputInfo", "onInputInfoReceived")
+  m.top.observeFieldScoped("animationLogoCompleted", "onAnimationLogoCompleted")
 
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
@@ -105,7 +108,7 @@ Function init()
   m.inactivityTimer = m.top.findNode("InactivityTimer")
   m.inactivityTimer.observeFieldScoped("fire", "onInactivityTimer")
   m.inactivityTimer.control = "start"
-
+  
   m.appLoadStopwatch = CreateObject("roTimespan")
 
   ' Set to the category id when content is launched from category screen,
@@ -125,6 +128,20 @@ Function init()
   }
 End Function
 
+
+' onAnimationLogoCompleted callback will be triggered once the launch animation logo got finished
+Function onAnimationLogoCompleted()
+
+  currentScreen = currentScreen()
+  if currentScreen <> invalid and currentScreen.isInFocusChain() = false
+    currentScreen.setFocus(true)
+    if currentScreen.id = "detailScreen" and m.detailScreenAfterFn <> invalid
+      m.detailScreenAfterFn(currentScreen)
+      m.detailScreenAfterFn = invalid
+    end if    
+  end if
+
+End Function
 
 ' initiateHomeData
 ' constructs requestType, url, params and responseType for api request and invokes makeTaskRequest helper
@@ -177,8 +194,7 @@ Function onKeyEvent(key As String, press As Boolean)
     m.lastUserActivity = Uptime(0)
   end if
   if press then
-    ' for autohide support, bring the UI back on any keypress
-    if m.screenStack.opacity < 1.0 and type(unAutohide) = "Function"
+    if m.screenStack.opacity < 1.0 and type(unAutohide) = "Function" ' for autohide support, bring the UI back on any keypress
       unAutohide()
       return true
     else if key = "back"
@@ -368,7 +384,7 @@ Function startUserExperience()
     sendHdcpLog()
     
     ' In any of the auth transitions, this spinner might be visible
-    m.spinner.visible = false
+    'm.spinner.visible = false
     if m.enteredFromDeepLink = true then
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it

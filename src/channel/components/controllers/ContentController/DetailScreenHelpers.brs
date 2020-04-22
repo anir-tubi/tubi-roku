@@ -5,10 +5,12 @@
 ' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
 Function showDetailScreen(content)
   tubiLog("DetailScreenHelpers.showDetailScreen")
+  
   if content <> invalid
     detailScreen = CreateObject("roSGNode", "DetailScreen")
     detailScreen.id = m.constants.ui.screenIds.detailScreen
     detailScreen.trackingLoadStartTime = Uptime(0)
+    detailScreen.shouldFocusWhenPushed = m.top.animationLogoCompleted
     detailScreen.observeFieldScoped("playSelected", "onPlay")
     detailScreen.observeFieldScoped("resumeSelected", "onResume")
     detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
@@ -30,6 +32,9 @@ Function showDetailScreen(content)
     ' the action will happen automatically after the successful retry.
     m.actionType = invalid
     
+    ' detailScreenAfterFn callback which will be triggered after fetching data from backend
+    m.detailScreenAfterFn = invalid
+
     ' m.isScreenLoaded will be changed to true once the metadata is populated
     m.isScreenLoaded = false
 
@@ -61,7 +66,6 @@ Function showDetailScreen(content)
     tubiLog(message, "warn", "clientWarn", "showdetailscreen-invalid-content")
   end if
 End Function
-
 
 Function setDetailStrings(screen)
   screen.stringQueueButton = getTranslation("screenDetails_button_queue")
@@ -429,6 +433,7 @@ Function onSingleContentResponse(msg) As Void
     m.actionType = invalid
     
   end if
+  
   populateDetailScreen(detailScreen, refreshedContent)
 
   loadTime = 0
@@ -447,10 +452,16 @@ Function onSingleContentResponse(msg) As Void
   if m.refreshingDetailCache = true
     m.refreshingDetailCache = false
   end if
-
-  if afterFn <> invalid
-    afterFn(detailScreen)
+  
+  ' making sure the app launch animation logo is completed before invoking playHelper/resumeHelper
+  if m.top.animationLogoCompleted = true or afterFn = episodesHelper
+    if afterFn <> invalid
+      afterFn(detailScreen)
+    end if
+  else
+    m.detailScreenAfterFn = afterFn    
   end if
+
 End Function
 
 

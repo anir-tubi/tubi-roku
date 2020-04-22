@@ -58,6 +58,9 @@
 
       <!-- Triggers a reset of the ContentArea translation values in the case they were adjusted by VITG -->
       <field id="resetContentAreaValues" type="boolean" alwaysNotify="true" />
+      
+      <!-- shouldFocusWhenPushed will be set true once animation logo is finished during app launch -->
+      <field id="shouldFocusWhenPushed" type="boolean" value="true"/>
 
     <!-- OUTPUTS -->
       <!-- will be used to change the background images on the content controller -->
@@ -163,7 +166,7 @@
     <Timer
       id="CategoryRefreshTimer"
       repeat="true"/>
-
+      
     <Animation
       id="Fades">
       <!-- keyValues here are in relation to CategorGridList.currFocusRow when less than 1.0 -->

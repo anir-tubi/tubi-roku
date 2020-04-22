@@ -37,7 +37,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
   sgGlobal.addField("theme", "assocarray", false)
-
+  
   'setting constants here is just to get the scene up and running.
   'Global constants will be overwritten with constants pulled from starterController that are the most recent version of constants
   sgGlobal.setField("constants", constants)
@@ -46,7 +46,9 @@ Function runChannel(startupArgs, constants, log, request) As Void
 
   'add RALE for dev builds - children can not be added to tubiScene until after screen.show has run
   if constants <> invalid and constants.settings <> invalid and constants.settings.mode = "dev"
-    tubiScene.createChild("TrackerTask")
+    childCount = tubiScene.getChildCount()
+    tracker = CreateObject("roSGNode", "TrackerTask")
+    tubiScene.insertChild(tracker, childCount-1)
   end if
 
   'run SceneGraph tests if in test mode
@@ -142,20 +144,23 @@ Function runChannel(startupArgs, constants, log, request) As Void
             suitestIL = CreateObject("roSGNode", "SuitestInstrumentationLib:main")
             suitestIL.SetField("app_id", constants.thirdParty.suiteTest.app_id)          
           else if msg.GetRoSGNode().id = "TubiStarterLibrary"
-            starterController = tubiScene.createChild("TubiStarterLibrary:StarterController")
+            childCount = tubiScene.getChildCount()
+            starterController = CreateObject("roSGNode", "TubiStarterLibrary:StarterController")
             starterController.observeField("useRemoteComponents", port)
             starterController.observeField("remoteComponentsUrl", port)
             starterController.setField("getUrl", true)
+            tubiScene.insertChild(starterController, childCount-1)
             retries = 0
             pause = initialBackoff
           else if msg.GetRoSGNode().id = "TubiRemoteLibrary"
             componentsLoaded = true
-            controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
+            controller = CreateObject("roSGNode", "TubiRemoteLibrary:ContentController")
             controller.id = "ContentController"
             controller.observeField("exitApp", port)
             controller.observeField("transportVoiceResponse", port)
             controller.appStartTime = m.appStartTime
             controller.startupArgs = startupArgs
+            tubiScene.appendChild(controller)
             if suitestLib <> invalid
               suitestLib.SetField("uri", constants.thirdParty.suiteTest.uri)
             end if
@@ -231,12 +236,13 @@ End Function
 
 
 Function loadPackagedComponents(scene, port, startupArgs)
-  controller = scene.createChild("ContentController")
+  controller = CreateObject("roSGNode", "ContentController")
   controller.id = "ContentController"
   controller.observeField("exitApp", port)
   controller.observeField("transportVoiceResponse", port)
   controller.appStartTime = m.appStartTime
   controller.startupArgs = startupArgs
+  scene.appendChild(controller)
   return controller
 End Function
 

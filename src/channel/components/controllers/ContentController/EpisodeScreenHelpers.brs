@@ -12,6 +12,7 @@ End Function
 Function showEpisodeScreen(content, shouldSendNavigationAnalytics)
   episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
   episodesScreen.id = m.constants.ui.screenIds.episodeScreen
+  episodesScreen.shouldFocusWhenPushed = m.top.animationLogoCompleted
   episodesScreen.content = content
   episodesScreen.updateContent = true
   episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")

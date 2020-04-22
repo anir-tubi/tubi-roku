@@ -71,7 +71,9 @@ Function onPush(msg)
 
     m.top.appendChild(newChild)
     m.top.current = newChild
-    newChild.setFocus(true)
+    if newChild.shouldFocusWhenPushed <> false
+      newChild.setFocus(true)
+    end if
     newChild.visible = true
 
     if oldCurrent <> invalid and oldCurrent.isSameNode(newChild) = false

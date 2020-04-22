@@ -69,6 +69,9 @@
       <field id="searchResponse" type="assocarray" alwaysNotify="true"/>
       
       <field id="transportVoiceRequest" type="assocarray" alwaysNotify="true"/>
+      
+      <!-- animationLogoCompleted will be set true once animation logo is finished during app launch -->
+      <field id="animationLogoCompleted" type="boolean"/>
 
     <!-- OUTPUT -->
       <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->
@@ -79,6 +82,11 @@
   </interface>
         
     <children>
+    
+     <Group
+      id="contentControllerBGGroup"
+      opacity="0.0">
+
       <!--
         - This hides the loading screen that was in place by the Scene
         - before remote components have loaded
@@ -139,15 +147,32 @@
        id="InactivityTimer"
        duration="10"
        repeat="true"/>
+     
+     <!-- DetailScreenLoadTimer is a timer used to check whether startup animation logo is finished playing -->    
+     <Timer
+       id="DetailScreenLoadTimer"
+       duration="0.5"
+       repeat="true"/>  
 
       <!-- Spinner primarily for sign-in/sign-out transitions -->
       <Spinner
         id="ContentControllerSpinner"
-        visible="false"
+        visible="true"
         modal="true"
         width="1920"
         height="1080"/>
-
+        
+   </Group>   
+   
+   <!--  <Animation
+      id="bgAnimation" easeFunction="linear" duration="1">
+      <FloatFieldInterpolator
+        id="fadeIn"
+        fieldToInterp="bg.opacity"
+        key="[0.0,1.0]"
+        keyValue="[0.0,1.0]"/>
+    </Animation>      --> 
+        
     </children>
 
 </component>

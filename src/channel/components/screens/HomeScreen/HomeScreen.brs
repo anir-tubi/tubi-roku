@@ -19,12 +19,12 @@ Function init()
   m.top.observeField("isLoading", "onLoadingChange")
   m.top.observeField("resetContentAreaValues", "onResetContentAreaValues")
   m.top.observeField("id", "onIDChange")
-
+  
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
   m.CategoryRefreshTimer.observeField("fire", "onCategoryRefreshTimer")
   m.CategoryRefreshTimer.control = "start"
-
+  
   'Content area
   m.CategoryGridList = m.top.findNode("CategoryGridList")
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
@@ -126,8 +126,8 @@ End Function
 Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus()
-    m.CategoryGridList.setFocus(true)
     m.gridHasFocus = true
+    m.CategoryGridList.setFocus(true)
     if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
       m.top.loadAllCategories = true
     end if

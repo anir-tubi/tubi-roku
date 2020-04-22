@@ -388,6 +388,9 @@ Function getConstants()
     'channels logo image urls
     constants.urls.channelLogoBrandedPrefix = "https://cdn.adrise.tv/image/channels/"
     constants.urls.channelLogoBrandedSuffix = "/logo_center.png"
+    
+    ' animationLogo Url which plays during app launch
+    constants.urls.animationLogo = "https://cdn.adrise.tv/video/roku/animation_logo.mp4"
 
   'http request types
   constants.reqTypes = {}

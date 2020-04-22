@@ -145,6 +145,7 @@ Function animate(target As Object, options as Object) As Object
     if options.duration = invalid then options.duration = 2.0
     if options.delay = invalid then options.delay = 0
     if options.easeFunction = invalid then options.easeFunction = "inOutCubic"
+    if options.allowOnLowSpecDevices = invalid then options.allowOnLowSpecDevices = false
 
     tubiLog("animate target = " + target.id)
     animationId = "GeneralAnimation-" + target.id
@@ -152,10 +153,18 @@ Function animate(target As Object, options as Object) As Object
     bAnimate = true
     ' if low-spec device, then instantly change to target option rather than using animation
     if m.global.constants.deviceInfo.limitedUi = true then
-      tubiLog("Do not animate due to being a low-spec device, " + target.id)
-      bAnimate = false
+      
+      ' hardcoding easeFunction=linear for better performance in lower-end even if allowOnLowSpecDevices=true
+      options.easeFunction = "linear"
+      
+      if options.allowOnLowSpecDevices = false
+        tubiLog("Do not animate due to being a low-spec device, " + target.id)
+        bAnimate = false
+      end if
+      
     end if
-
+    
+    
     ' Reuse an existing animation if available
     animation = m.top.findNode(animationId)
     if animation = invalid then
