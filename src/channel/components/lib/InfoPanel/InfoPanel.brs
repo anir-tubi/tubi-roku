@@ -199,7 +199,7 @@ Function onLineOneDataChange(msg)
     m.RatingLabel.width = 0
     m.RatingLabel.text = Ucase(data.rating)
 
-    nRatingBoundingBoxIncrease = m.RatingLabel.boundingRect().width + 22
+    nRatingBoundingBoxIncrease = m.RatingLabel.boundingRect().width + 24
     m.RatingBackground.width = nRatingBoundingBoxIncrease
     m.RatingLabel.width = nRatingBoundingBoxIncrease
     m.Rating.visible = true
