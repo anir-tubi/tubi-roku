@@ -128,7 +128,7 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
 
         '//Stop loading of homescreen which will refresh the screen's content
         homeScreen.isLoading = false
-        showHideSpinner(true)
+        showHideSpinner(false)
       else
         ' if we were loading in the background, don't show an error modal
         if homeScreen.isInFocusChain()
