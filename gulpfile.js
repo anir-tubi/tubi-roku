@@ -17,10 +17,14 @@ const shell = require('shelljs');
 // Uncomment the next line if there are connection issues to the Roku device
 // const requestDebug = require('request-debug')(request);
 
+
 //Importing old build functions
 const {load, getBuildTag, incrementBuildNumber} = require('./js/config');
 const {createManifest, createSettings} = require('./js/build');
 const {keypress, deeplink, uploadPkg, signPkg} = require('./js/network');
+
+//Functions to upload and download static string translations  
+const {downloadTranslations, uploadTranslations} = require('./js/translate');
 
 // provide a custom error so as to not get a full stack trace which will be misleading
 // in the case that the error is not with the code, but rather with git or aws or something else.
@@ -591,7 +595,7 @@ function pushStaging(done) {
   }
 
   if (!pushResult.stderr) {
-    done()
+    done();
   } else {
     done(new NoStackError(`AWS S3 error: Hint - check valet auth.`));
   }
@@ -606,3 +610,7 @@ exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, buildInstalled, sideLoad);
 exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
 exports.release = series(setProduction, bumpBuild, tagBuild, exports.build, packageAll);
+
+//command lines related to the crowdin language translations
+exports.upload_translations = uploadTranslations;
+exports.download_translations = downloadTranslations;

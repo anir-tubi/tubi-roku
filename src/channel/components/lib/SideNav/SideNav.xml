@@ -117,11 +117,9 @@
               iconUrl="pkg:/images/sideNavHome.png"/>
             <SideNavContentNode
               id="movies"
-              title="Movies"
               iconUrl="pkg:/images/sideNavMovies.png"/>
             <SideNavContentNode
               id="tv"
-              title="TV Shows"
               iconUrl="pkg:/images/sideNavTV.png"/>
             <SideNavContentNode
               id="categories"

@@ -31,6 +31,14 @@
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the channels screen.",
     "message": "Channels"
   },
+  "menu_movies": {
+    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the movies screen.",
+    "message": "Movies"
+  },
+  "menu_tv": {
+    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
+    "message": "TV Shows"
+  },
   "menu_settings": {
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
     "message": "Settings"
@@ -120,7 +128,7 @@
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
     "message": "Movies Disabled"
   },
-  "dialog_tvsDisabled_title": {
+  "dialog_tvDisabled_title": {
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
     "message": "TV Disabled"
   },
@@ -194,7 +202,7 @@
   },
   "dialog_kidsExit_description": {
     "description": "description of a dialog window that describes what will happen after the user exits kids mode",
-    "message": "Do you have permission from your parents to leave Tubi Kids? If you exit you will see titles rated PG-13 and above."
+    "message": "Do you have permission from your parents to leave Tubi Kids? If you exit you will see titles that are not suitable for children."
   },
   "dialog_kidsExitLimited_description": {
     "description": "description of a dialog window that describes what the user should do to exit kids mode",
