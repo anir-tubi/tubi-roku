@@ -247,11 +247,11 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 7\. Create a CH ticket with any changes that have been made and give to the QA team for manual testing. Once the QA team has signed off on the build...
 
-8\. Run `$ gulp bump` in order to increment the version number once more (the QA build should not be the same version number as the production build).
+8\. Rename the `qa_x_y_z` branch to `release_x_y_z`.
 
-9\. Ready the release branch for review
+9\. Run `$ gulp release`. This will increment the version number once more (the QA build should not be the same version number as the production build) and install a new build using the "production" config, to create the .pkgs needed to update the production build.
 
-- Rename the `qa_x_y_z` branch to `release_x_y_z`.
+10\. Ready the release branch for review
 
 - Push the `release_x_y_z` branch to Github.
 
@@ -259,7 +259,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - __DO NOT PROCEED TO THE INFRA SCRIPT STEP UNTIL THIS PR IS APPROVED__
 
-10\. Update the hotpatch and remote component files to the CDN
+11\. Update the hotpatch and remote component files to the CDN
 - Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/). Although it does not matter, traditionally we name the branch "Roku_x_y_z".
 
 - Copy two files to the CDN repo:
