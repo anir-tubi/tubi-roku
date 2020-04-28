@@ -378,8 +378,8 @@ Function getConstants()
     constants.urls.cuepointsBaseUrl = "https://ads.adrise.tv/cue-points/"
 
     'privacy statement text
-    constants.urls.privacyUrl = "https://cdn.adrise.tv/legal/TubiTVPrivacyPolicy.txt"
-    constants.urls.termsOfUseUrl = "https://cdn.adrise.tv/legal/TubiTVTermsOfUse.txt"
+    constants.urls.privacyUrl = "https://legal-asset.tubi.tv/privacy-policy.txt"
+    constants.urls.termsOfUseUrl = "https://legal-asset.tubi.tv/terms-of-use.txt"
 
     'channels poster image urls
     constants.urls.channelPosterUnbranded = "https://cdn.adrise.tv/image/roku_support_images/channel-poster-generic.png"
