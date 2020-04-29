@@ -347,7 +347,7 @@
   }, 
   "screenSettings_about_description2": {
     "description": "The 2nd description on the about screen",
-    "message": "Visit http://help.tubitv.com \n \n Email our Support team at support@tubi.tv \n \n Reach us on Facebook, Instagram, Twitter, and on our website at: \n https://tubitv.com/support \n \n Version {version} \n Short Device ID: {id} (press OK to see full Device ID) \n \n © {year} Tubi, Inc. all rights reserved."
+    "message": "Visit {helpURL} \n \n Email our Support team at support@tubi.tv \n \n Reach us on Facebook, Instagram, Twitter, and on our website at: \n {supportURL} \n \n Version {version} \n Short Device ID: {id} (press OK to see full Device ID) \n \n © {year} Tubi, Inc. all rights reserved."
   }, 
   "screenSettings_menu_parentalControls": {
     "description": "The label for the parental controls",
@@ -591,5 +591,18 @@
   "goBack_home": {
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "PRESS BACK FOR HOME"
+  },
+  "channel_name": {
+    "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+    "message": "Tubi - Free Movies & TV"
+  },
+  "channel_description": {
+    "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+    "message": "Enjoy the largest library of popular movies and TV shows, all for free!"
+  },
+  "channel_webDescription": {
+    "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
+    "message": "Watch thousands of hit movies and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer ads than regular TV. Tubi is the largest free streaming service featuring award-winning movies and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favorites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!"
+
   }
 }

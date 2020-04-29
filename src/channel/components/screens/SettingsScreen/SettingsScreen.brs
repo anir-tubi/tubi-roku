@@ -188,8 +188,11 @@ Function CreateAboutPanel()
   dynamicText = { 
     version: sVersion, 
     id: sShortDeviceID, 
+    helpURL: "http://help.tubitv.com", 
+    support: "https://tubitv.com/support", 
     year: sYear
   }
+
   aboutPanel.textTwo = getTranslation("screenSettings_about_description2", dynamicText)
 
   aboutPanel.focusable = false
