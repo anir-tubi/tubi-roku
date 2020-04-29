@@ -33,6 +33,7 @@ manifest:
   supports_etc_seek: 1 
   supports_etc_next: 1 
   rsg_version: 1.2
+  confirm_partner_button: 1
 
 component_library_manifest:
   title: "Tubi Component Library"
@@ -43,6 +44,7 @@ component_library_manifest:
   requires_widevine_version: "1.0"
   hidden: 1
   rsg_version: 1.2
+  confirm_partner_button: 1
 
 starter_library_manifest:
   title: "Tubi Starter Library"
@@ -50,3 +52,4 @@ starter_library_manifest:
   sg_component_libs_provided: "TubiStarterLibrary"
   hidden: 1
   rsg_version: 1.2
+  confirm_partner_button: 1
