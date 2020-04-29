@@ -143,6 +143,22 @@ function writeLocaleDataToBRS_sync(sLocale, localeData) {
   if(localeData !== undefined && localeData !== "") {
     var fileTranslationCode = 'src/channel/source/lib/TubiLanguageTranslate.brs';
 
+    // add appropriate indentation to localeData and remove any empty lines
+    const localeDataLines = localeData.split('\n');
+    const localDataLinesIndented = localeDataLines.reduce((acc, line, index) => {
+      if (index === 0) {
+        acc.push(line);
+        return acc;
+      } else if (line.trim() === '') {
+        return acc
+      } else {
+        let newLine = `  ${line}`.trimEnd()
+        acc.push(newLine);
+        return acc;
+      }
+    }, []);
+    localeData = localDataLinesIndented.join('\n');
+
     var data = fs.readFileSync(fileTranslationCode, 'utf-8');
     sLocale = sLocale.replace("-", "_");
     var sFunctionName = `getTranslation_${sLocale}`;
@@ -150,11 +166,7 @@ function writeLocaleDataToBRS_sync(sLocale, localeData) {
     var sEndFunction = "End Function";
 
     var newValue = ""
-    // var sNewString = sStartFunction + "\nreturn " + localeData + "\n" + sEndFunction
-    // var sNewString = `${sStartFunction}
-    // return ${localeData}
-    // ${sEndFunction}`
-    var sNewString = `${sStartFunction} \n return ${localeData} \n ${sEndFunction}`
+    var sNewString = `${sStartFunction}\n  return ${localeData}\n${sEndFunction}`
 
     if (data.indexOf(sStartFunction) >= 0) {
       //If the locale function exists, then update the function with the new translations
