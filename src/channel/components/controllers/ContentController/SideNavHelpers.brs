@@ -194,7 +194,7 @@ Function onSideNavItemSelected()
       showSearchScreen(m.constants)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.home
-      showHomeScreen(m.constants, authInfo, true)
+      showHomeScreen(m.constants, authInfo)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.channels
       if m.kidsModeEnabled = true
