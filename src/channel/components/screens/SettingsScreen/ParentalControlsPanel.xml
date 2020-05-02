@@ -52,7 +52,7 @@
         itemSpacing="[0,8]"
         itemComponentName="CheckButton"
         vertFocusAnimationStyle="floatingFocus"
-        translation="[0,347]">
+        translation="[25,347]">
         <ContentNode
           id="SettingsMenuContent"
           role="content">

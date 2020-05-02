@@ -57,10 +57,10 @@
         uri="pkg:/images/back.png"
         width="29"
         height="47"
-        translation="[81,601]"/>
+        translation="[81,576]"/>
       <Label
         id="BackLabel"
-        translation="[123,605]"
+        translation="[123,580]"
         height="47"
         vertAlign="center">
         <Font

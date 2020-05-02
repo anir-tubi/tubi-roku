@@ -48,14 +48,30 @@ Function setParentalControlStrings()
   Instructions = m.top.findNode("Instructions")
   Instructions.text = getTranslation("screenSettings_parentalControls_instructions")
 
+  nWidestWidth = 0
   newContent = m.Menu.content.clone(true)
   for i=0 to newContent.getChildCount()-1
     child = newContent.getChild(i)
     sRatings = getRatingStrings(i)
     sText = getTranslation("screenSettings_parentalControls_group" + i.toStr(), {ratings: sRatings})
     child.title = sText
-  end for
+
+    '//Temporarily create checkbuttons for each button text to find the largest width necessary for the set of buttons, 
+    '//   in order to determine how wide m.Menu should be.
+    '//   Different languages may make the text wider than usual so we need to ensure the button displays the full text
+    checkBtn = CreateObject("roSGNode", "CheckButton")
+    btnContent =  CreateObject("roSGNode", "CheckButtonContentNode") 
+    btnContent.title = sText 
+    checkBtn.itemContent = btnContent 
+    if checkBtn.calculatedWidth > nWidestWidth 
+      nWidestWidth = checkBtn.calculatedWidth
+    end if
+    checkBtn = invalid
+  end for 
+  m.Menu.itemSize = [nWidestWidth, m.Menu.itemSize[1]]
+
   m.Menu.content = newContent
+
 End Function
 
 

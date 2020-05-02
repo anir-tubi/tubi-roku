@@ -14,32 +14,41 @@
      - title - The label text
      -
      -->
-    <field id="itemContent" type="node" />
+    <!-- INPUT-->
+    <field id="itemContent" type="node"/>
     <field id="content" type="node" />
-    <field id="width" alias="Text.width" />
-    <field id="height" alias="Text.height" />
+    <field id="width" type="float"/>
+    <field id="height" type="float"/>
+
+    <!-- OUTPUT-->
+    <field id="calculatedWidth" type="float"/>
   </interface>
 
   <children>
-    <Label
-      id="Text"
-      text=""
-      width="480"
-      height="80"
-      horizAlign="left"
-      vertAlign="center"
-      translation="[19,1]">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="33" />
-    </Label>
-    <Poster
-      id="Check"
-      width="20"
-      height="16"
-      uri="pkg:/images/check.png"
-      visible="false"
-      translation="[511,28]"/>
+    <LayoutGroup
+      id="BtnLayout"
+      translation="[30,40]"
+      itemSpacings="[40]"
+      vertAlignment="center"
+      horizAlignment="left"
+      layoutDirection="horiz">
+      <Poster
+        id="Check"
+        width="20"
+        height="16"
+        uri="pkg:/images/check.png"
+        visible="false"/>
+      <Label
+        id="Text"
+        text=""
+        height="80"
+        horizAlign="left"
+        vertAlign="center">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="33" />
+      </Label>
+      </LayoutGroup>
   </children>
 </component>
