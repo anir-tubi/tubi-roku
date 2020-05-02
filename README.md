@@ -255,7 +255,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - Push the `release_x_y_z` branch to Github.
 
-- Make a PR to the `x_y_branch`.
+- Make a PR to the `x_y_branch`. Make sure you do not make the PR to master.
 
 - __DO NOT PROCEED TO THE INFRA SCRIPT STEP UNTIL THIS PR IS APPROVED__
 
@@ -276,7 +276,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   `$ pyenv`
 
-- In terminal, navigate to your adrise_infrastructure repo and run the installation iunstructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure)
+- If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure)
 - Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/).
 
 13\. Verify the release
@@ -298,7 +298,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - Update the "Release Title" to be either Submission Release or Remote Release depending on the type of release.
 
-- Add the changes that were included in the release to the "Describe this release" description text box, with each change ending in a period, and on it's own line.
+- Add the changes that were included in the release to the "Describe this release" description text box, with each change ending in a period, and on it's own line. Do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
 - Select "Update Release"
 
