@@ -21,8 +21,8 @@
       <field id="episodeToFocus" alias="RowList.jumpToRowItem" />
       
       <!-- shouldFocusWhenPushed will be set true once animation logo is finished during app launch -->
-      <field id="shouldFocusWhenPushed" type="boolean" value="true"/>      
-
+      <field id="shouldFocusWhenPushed" type="boolean" value="true"/>       
+      
     <!-- OUTPUT -->
       <!-- Set to the content of the episode that was clicked on -->
       <!-- mirrors RowList.rowItemSelected, but EpisodeScreen interjects before sending it to the ContentController -->

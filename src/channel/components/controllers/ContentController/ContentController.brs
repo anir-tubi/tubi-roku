@@ -3,8 +3,6 @@ Function init()
   tubiLog("Init Scenegraph----------------")
   m._ = rodash()
   
-  m.contentControllerBGGroup = m.top.findNode("contentControllerBGGroup")
-
   m.constants = m.global.constants
   
   ' initiate GeneralTaskHelper by passing caller context
@@ -36,6 +34,8 @@ Function init()
   m.top.observeFieldScoped("startupArgs", "onStartupArgs")
   m.top.observeFieldScoped("roInputInfo", "onInputInfoReceived")
   m.top.observeFieldScoped("animationLogoCompleted", "onAnimationLogoCompleted")
+  
+  m.top.observeField("fadeInRemoteComponent", "onFadeInRemoteComponent")
 
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
@@ -49,6 +49,7 @@ Function init()
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.constants.ui.colors.backgroundColor
 
+  m.uiGroup = m.top.findNode("uiGroup")
   m.contentGroup = m.top.findNode("ContentGroup")
 
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
@@ -1073,3 +1074,37 @@ function showHideSpinner(visible)
   m.spinner.visible = visible
 
 end function
+
+
+Function onFadeInRemoteComponent()
+
+  fadeInUiGroup = customFadeIn(m.uiGroup, 2, 0)
+  fadeInUiGroup.observeField("state", "onUiGroupFadeStateChange")
+
+End Function
+
+
+Function onUiGroupFadeStateChange(msg)
+
+  animationState = msg.getData()
+  fadeInUiGroup = msg.getRoSGNode()
+  if animationState = "stopped"
+    fadeInUiGroup.unobserveField("state")
+    m.top.removeStartUpScreens = true
+  end if
+  
+End Function
+
+
+Function customFadeIn(target, duration, delay)
+
+  animationOptions = {
+    easeFunction: "inCubic"
+    opacity: 1
+    duration: duration
+    delay: delay
+    allowOnLowSpecDevices: true
+  }
+  return animate(target, animationOptions)
+  
+End Function

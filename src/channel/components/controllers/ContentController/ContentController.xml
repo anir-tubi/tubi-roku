@@ -72,19 +72,25 @@
       
       <!-- animationLogoCompleted will be set true once animation logo is finished during app launch -->
       <field id="animationLogoCompleted" type="boolean"/>
-
+      
+      <!-- fadeInRemoteComponent is used to fadeIn the ContentController screen -->
+      <field id="fadeInRemoteComponent" type="boolean"/>      
+      
     <!-- OUTPUT -->
       <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->
       <field id="exitApp" type="boolean" value="false" />
       
       <field id="transportVoiceResponse" alias="VideoPlayer.transportVoiceResponse"/>
+      
+      <!-- removeStartUpScreens is used to remove the StartUpScreens(animationLogo) -->
+      <field id="removeStartUpScreens" type="boolean" />  
 
   </interface>
         
     <children>
     
      <Group
-      id="contentControllerBGGroup"
+      id="uiGroup"
       opacity="0.0">
 
       <!--
@@ -164,15 +170,6 @@
         
    </Group>   
    
-   <!--  <Animation
-      id="bgAnimation" easeFunction="linear" duration="1">
-      <FloatFieldInterpolator
-        id="fadeIn"
-        fieldToInterp="bg.opacity"
-        key="[0.0,1.0]"
-        keyValue="[0.0,1.0]"/>
-    </Animation>      --> 
-        
     </children>
 
 </component>

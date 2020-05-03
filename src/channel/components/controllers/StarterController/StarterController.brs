@@ -1,5 +1,8 @@
 Function init()
   m.constants = getConstants()
+  
+  processAnimationLogo()
+  
   m.hasExperiments = false
   m.hasRemoteConfigs = false
   m.experimentsTask = m.top.createChild("ExperimentsTask")
@@ -16,12 +19,13 @@ Function onUrlRequest()
   if m.top.getUrl = true and m.hasExperiments = true and m.hasRemoteConfigs = true
     'Handle any remote config updates here:
     'Let youbora be enabled by the remote config
+    
     if m.constants.externalConfig.info.youbora_enabled = true
       m.constants.thirdParty.youbora.enabled = m.constants.externalConfig.info.youbora_enabled
     end if
 
     m.top.newBuildConstants = m.constants
-
+    
     if m.constants.remoteComponents = false
       m.top.useRemoteComponents = m.constants.remoteComponents
     else
@@ -48,6 +52,7 @@ Function onUrlRequest()
       print "remoteComponentsUrl "; remoteComponentsUrl
       m.top.remoteComponentsUrl = remoteComponentsUrl
     end if
+    
   end if
 End Function
 
@@ -63,4 +68,170 @@ Function onExternalConfigInfoReturned(msg)
   m.constants.externalConfig.info = msg.getData()
   m.hasRemoteConfigs = true
   onUrlRequest()
+End Function
+
+Function processAnimationLogo()
+
+  ' bufferingCompleted tells whether buffering reached 33% or more
+  m.bufferingCompleted = false
+  
+  appInfo = createObject("roAppInfo")
+  initialSplashScreenDuration = Val(appInfo.getValue("splash_min_time")) / 1000
+  
+  ' minimum seconds the custom splash poster is displayed
+  m.splashScreenMin = initialSplashScreenDuration + 0
+  
+  ' maximum seconds the custom splash poster is displayed
+  m.splashScreenMax = initialSplashScreenDuration + 3
+  
+  ' customSplashTimerCount is number of timer the timer event got fired
+  m.customSplashTimerCount = 0
+  
+  ' videoPlayed helps to set animationLogoCompleted=true to ContentController
+  m.videoPlayed = false
+  
+  m.top.observeField("removeStartUpScreens", "onRemoveStartUpScreens")
+  
+  m.startupScreens = m.top.findNode("startupScreens")
+  
+  m.animationLogo = m.top.findNode("animationLogo")
+  
+  m.customSplashTimer = m.top.findNode("customSplashTimer")
+  m.customSplashTimer.ObserveField("fire","onCustomSplashTimerFired")
+  m.customSplashTimer.control = "start"  
+  
+  videoContent = createObject("RoSGNode", "ContentNode")
+  videoContent.url = m.constants.urls.animationLogo
+  videoContent.title = "AnimationLogo"
+  videoContent.streamformat = "mp4"
+  
+  m.animationLogo = m.top.findNode("animationLogo")
+  m.animationLogo.content = videoContent
+  m.animationLogo.observeField("bufferingStatus", "onBufferingStatus")
+  m.animationLogo.observeField("position", "onPositionChange")
+  m.animationLogo.observeField("state", "onAnimationLogoChange")
+  m.animationLogo.control = "prebuffer"
+  
+End Function
+
+
+' onPositionChange callback triggered every 0.5s of animationLogo playback
+Function onPositionChange(msg)
+
+  position = msg.GetData()
+  duration = m.animationLogo.duration
+  ' fading the video once the animation part is completed in video [currently animation ends 1s before video ends]
+  remaining = duration - position
+
+  if remaining <= 0.5
+    m.animationLogo.unobserveField("position")
+    customFadeOut(m.startupScreens, 1, 0)
+  end if
+
+End Function
+
+
+Function playAnimationLogo()
+
+  if m.bufferingCompleted = true and m.customSplashTimerCount >= m.splashScreenMin 
+    m.top.fadeOutCustomSplash = true
+    customFadeIn(m.startupScreens, 1, 0)
+    m.videoPlayed = true
+    m.animationLogo.control = "play"
+  end if
+  
+End Function
+
+
+' onBufferingStatus callback triggered on every videoplayer buffering percent
+Function onBufferingStatus(msg)
+
+  buffering = msg.GetData()
+  if buffering <> invalid and buffering.percentage >= 33
+    m.animationLogo.unobserveField("bufferingStatus")
+    m.bufferingCompleted = true
+    playAnimationLogo()
+  end if
+
+End Function
+
+
+Function stopAnimationLogo()
+
+  m.top.fadeOutCustomSplash = true
+  m.videoPlayed = true
+  m.animationLogo.control = "stop"
+  
+End Function
+
+
+' onCustomSplashTimerFired fired on every second after customSplashTimer started
+Function onCustomSplashTimerFired()
+
+  m.customSplashTimerCount = m.customSplashTimerCount + 0.5
+  if m.customSplashTimerCount >= m.splashScreenMax
+    ' after reaching splashScreenMax time, manually stopping animationLogo if state is stopped or buffering
+    m.customSplashTimer.unobserveField("fire")
+    m.customSplashTimer.control = "stop"
+    if m.animationLogo.state <> "playing"
+      stopAnimationLogo()
+    end if
+  else if m.videoPlayed = false
+    ' will only play if video has pre buffered and m.splashScreenMin has been surpassed
+    playAnimationLogo()
+  end if
+  
+End Function
+
+
+' onAnimationLogoChange callback triggered  when video state changes
+Function onAnimationLogoChange(msg)
+
+  state = msg.GetData()
+  if (state = "finished" or state = "stopped") and m.videoPlayed = true
+    m.top.fadeInRemoteComponent = true
+  end if
+
+End Function
+
+
+' onRemoveStartUpScreens is used to remove animationLogo node
+Function onRemoveStartUpScreens()
+
+  m.animationLogo.visible = false
+  m.top.removeChild(m.animationLogo)
+  m.animationLogo = invalid
+
+  m.startupScreens.visible = false
+  m.top.removeChild(m.startupScreens)
+  m.startupScreens = invalid  
+
+End Function
+
+
+Function customFadeIn(target, duration, delay)
+
+  animationOptions = {
+    easeFunction: "inCubic"
+    opacity: 1
+    duration: duration
+    delay: delay
+    allowOnLowSpecDevices: true
+  }
+  return animate(target, animationOptions)
+  
+End Function
+
+
+Function customFadeOut(target, duration, delay)
+
+  animationOptions = {
+    easeFunction: "inCubic"
+    opacity: 0
+    duration: duration
+    delay: delay
+    allowOnLowSpecDevices: true
+  }
+  return animate(target, animationOptions)
+  
 End Function

@@ -20,51 +20,36 @@
   <script type="text/brightscript" uri="TubiScene.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  
+  <interface>
+  
+    <!-- fadeOutCustomSplash is used to fadeOut the CustomSplashPoster -->
+    <field id="fadeOutCustomSplash" type="boolean"/>
+    
+    <!-- fadeOutSpinner is used to fadeOut the TubiSceneSpinner -->
+    <field id="fadeOutSpinner" type="boolean"/>    
+    
+  </interface>
 
   <children>
 
-    <!-- Show a loading spinner only if it takes more than 3 seconds to load -->
-      
     <ComponentLibrary
       id="TubiStarterLibrary"/>
 
     <ComponentLibrary
       id="TubiRemoteLibrary"/>
-    
-    <!-- startupScreens is the combination of poster and video which is shown before HomeScreen -->
-    <Group id="startupScreens">
-    
-      <!-- animationLogo is the startup video played right after customSplashPoster is shown -->  
-      <Video
-        id="animationLogo"
-        width="1920"
-        height="1080"
-        translation="[0,0]"
-        enableUI="false"
-        enableTrickPlay="false"
-        visible="true" />
-    
-      <!-- customSplashTimer is used to show/hide the customSplashPoster -->
-      <Timer
-        id="customSplashTimer"
-        duration="0.5"
-        repeat="true" />
-      
-      <!-- customSplashPoster will be displayed after splash screen for min 1s and max 3s depends on animationLogo  -->  
-      <Poster
-        id="customSplashPoster"
-        width="1920"
-        height="1080"
-        visible="true" />  
-    </Group>
-    
-    <Spinner
+   
+   <Spinner
       id="TubiSceneSpinner"
-      opacity="0"
       width="1920"
       height="1080"/>
       
+    <Poster
+        id="customSplashPoster"
+        width="1920"
+        height="1080"
+        visible="true" /> 
+        
   </children>
 
 </component>
-

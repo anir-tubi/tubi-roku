@@ -241,6 +241,14 @@ function buildStarter() {
     let sourceLibsSrcOptions = {
       base: 'src/channel/source/lib/'
     };
+    
+    // include AnimationMixin in starterComponents
+    let componentLibSrc = [
+      'src/channel/components/lib/AnimationMixin.brs',
+    ];
+    let componentLibSrcOptions = {
+      base: 'src/channel/components/lib/'
+    };    
 
     //move all the necessary starter component files to the build/starter directory
     let stream = mergeStream(
@@ -253,7 +261,9 @@ function buildStarter() {
       collect(genUtilSrc, genUtilSrcOptions)
         .pipe(dest('build/starter/source')),
       collect(sourceLibsSrc, sourceLibsSrcOptions)
-        .pipe(dest('build/starter/source'))
+        .pipe(dest('build/starter/source')),
+      collect(componentLibSrc, componentLibSrcOptions)
+        .pipe(dest('build/starter/source'))        
     );
 
     stream.on('finish', () => {

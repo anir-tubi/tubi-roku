@@ -37,7 +37,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
   sgGlobal.addField("theme", "assocarray", false)
-  
+
   'setting constants here is just to get the scene up and running.
   'Global constants will be overwritten with constants pulled from starterController that are the most recent version of constants
   sgGlobal.setField("constants", constants)
@@ -46,9 +46,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
 
   'add RALE for dev builds - children can not be added to tubiScene until after screen.show has run
   if constants <> invalid and constants.settings <> invalid and constants.settings.mode = "dev"
-    childCount = tubiScene.getChildCount()
-    tracker = CreateObject("roSGNode", "TrackerTask")
-    tubiScene.insertChild(tracker, childCount-1)
+    tubiScene.createChild("TrackerTask")
   end if
 
   'run SceneGraph tests if in test mode
@@ -144,23 +142,33 @@ Function runChannel(startupArgs, constants, log, request) As Void
             suitestIL = CreateObject("roSGNode", "SuitestInstrumentationLib:main")
             suitestIL.SetField("app_id", constants.thirdParty.suiteTest.app_id)          
           else if msg.GetRoSGNode().id = "TubiStarterLibrary"
-            childCount = tubiScene.getChildCount()
-            starterController = CreateObject("roSGNode", "TubiStarterLibrary:StarterController")
+            starterController = tubiScene.createChild("TubiStarterLibrary:StarterController")
+            starterController.id = "StarterController"
             starterController.observeField("useRemoteComponents", port)
             starterController.observeField("remoteComponentsUrl", port)
+            starterController.observeField("fadeOutCustomSplash", port)
+            starterController.observeField("fadeInRemoteComponent", port)
             starterController.setField("getUrl", true)
-            tubiScene.insertChild(starterController, childCount-1)
             retries = 0
             pause = initialBackoff
           else if msg.GetRoSGNode().id = "TubiRemoteLibrary"
             componentsLoaded = true
-            controller = CreateObject("roSGNode", "TubiRemoteLibrary:ContentController")
+            controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
             controller.id = "ContentController"
             controller.observeField("exitApp", port)
             controller.observeField("transportVoiceResponse", port)
+            controller.observeField("removeStartUpScreens", port)
             controller.appStartTime = m.appStartTime
             controller.startupArgs = startupArgs
-            tubiScene.appendChild(controller)
+            
+            starterController = tubiScene.findNode("StarterController")
+            if starterController <> invalid and starterController.fadeInRemoteComponent = true
+              starterController.unobserveField("fadeInRemoteComponent")
+              tubiScene.fadeOutSpinner = true  
+              controller.fadeInRemoteComponent = true    
+              controller.animationLogoCompleted = true
+            end if
+            
             if suitestLib <> invalid
               suitestLib.SetField("uri", constants.thirdParty.suiteTest.uri)
             end if
@@ -215,6 +223,24 @@ Function runChannel(startupArgs, constants, log, request) As Void
         componentTimer.mark()
         remoteLibrary.observeField("loadStatus", port)
         remoteLibrary.uri = msg.getData()
+      else if msg.GetField() = "fadeOutCustomSplash" 
+        starterController = msg.GetRoSGNode()
+        starterController.unobserveField("fadeOutCustomSplash")
+        tubiScene.fadeOutCustomSplash = true
+      else if msg.GetField() = "fadeInRemoteComponent" 
+        starterController = msg.GetRoSGNode()
+        starterController.unobserveField("fadeInRemoteComponent")
+        contentController = tubiScene.findNode("ContentController")
+        if contentController <> invalid
+          tubiScene.fadeOutSpinner = true 
+          contentController.fadeInRemoteComponent = true    
+          contentController.animationLogoCompleted = true
+        end if
+      else if msg.GetField() = "removeStartUpScreens" 
+        contentController = msg.GetRoSGNode()
+        contentController.unobserveField("removeStartUpScreens")
+        starterController = tubiScene.findNode("StarterController")
+        starterController.removeStartUpScreens = true
       end if
     end if
 
@@ -236,13 +262,13 @@ End Function
 
 
 Function loadPackagedComponents(scene, port, startupArgs)
-  controller = CreateObject("roSGNode", "ContentController")
+  controller = scene.createChild("ContentController")
   controller.id = "ContentController"
   controller.observeField("exitApp", port)
   controller.observeField("transportVoiceResponse", port)
+  controller.observeField("removeStartUpScreens", port)
   controller.appStartTime = m.appStartTime
   controller.startupArgs = startupArgs
-  scene.appendChild(controller)
   return controller
 End Function
 
