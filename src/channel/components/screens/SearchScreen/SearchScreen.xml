@@ -128,6 +128,7 @@
             id="KidsModeMessage"
             vertAlign="bottom"
             visible="false"
+            width="550"
             height="50">
               <Font
                 role="font"

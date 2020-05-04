@@ -258,7 +258,7 @@
     "message": "Search for movies, TV shows, and people"
   },
   "screenSearch_kidsWarning": {
-    "description": "More directions on the search screen to suggest switching to kids mode",
+    "description": "More directions on the search screen to suggest switching to kids mode.  Should be limited to be around 40 characters or fewer.",
     "message": "Switch to Kids for kids safe search results"
   },
   "screenSearch_loading": {
@@ -347,7 +347,7 @@
   }, 
   "screenSettings_about_description2": {
     "description": "The 2nd description on the about screen",
-    "message": "Visit {helpURL} \n \n Email our Support team at support@tubi.tv \n \n Reach us on Facebook, Instagram, Twitter, and on our website at: \n {supportURL} \n \n Version {version} \n Short Device ID: {id} (press OK to see full Device ID) \n \n © {year} Tubi, Inc. all rights reserved."
+    "message": "Visit {help_url} \n \n Email our Support team at support@tubi.tv \n \n Reach us on Facebook, Instagram, Twitter, and on our website at: \n {support_url} \n \n Version {version} \n Short Device ID: {id} (press OK to see full Device ID) \n \n © {year} Tubi, Inc. all rights reserved."
   }, 
   "screenSettings_menu_parentalControls": {
     "description": "The label for the parental controls",

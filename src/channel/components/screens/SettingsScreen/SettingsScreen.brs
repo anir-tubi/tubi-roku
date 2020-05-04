@@ -188,8 +188,8 @@ Function CreateAboutPanel()
   dynamicText = { 
     version: sVersion, 
     id: sShortDeviceID, 
-    helpURL: "http://help.tubitv.com", 
-    support: "https://tubitv.com/support", 
+    help_url: "http://help.tubitv.com", 
+    support_url: "https://tubitv.com/support", 
     year: sYear
   }
 

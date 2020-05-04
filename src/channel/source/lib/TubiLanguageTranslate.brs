@@ -109,619 +109,1206 @@ End Function
 '//en_US.json file located in the locale folder and upload the json file to the crowdin to be translated.
 
 ' Return the associative array associated with the enUS locale
-Function getTranslation_en_US() 
- return {
-  "menu_signIn": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into app.",
-    "message": "Sign In"
-  },
-  "menu_signedIn": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Shows that the user is signed in.", 
-    "message": "Hi {name}"
-  },
-  "menu_kids": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into kids mode.",
-    "message": "Kids"
-  },
-  "menu_exitKids": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to exit kids mode.",
-    "message": "Exit Kids"
-  },
-  "menu_search": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the search screen.",
-    "message": "Search"
-  },
-  "menu_home": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
-    "message": "Home"
-  },
-  "menu_categories": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the categories screen.",
-    "message": "Categories"
-  },
-  "menu_channels": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the channels screen.",
-    "message": "Channels"
-  },
-  "menu_movies": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the movies screen.",
-    "message": "Movies"
-  },
-  "menu_tv": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
-    "message": "TV Shows"
-  },
-  "menu_settings": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
-    "message": "Settings"
-  },
-  "menu_exit": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to exit the app.",
-    "message": "Exit"
-  },
-  "loadingIndicator": {
-    "description": "When something is loading, this text appears so the user knows something is loading.",
-    "message": "Loading..."
-  },
-
-  "dialog_errorPrefix": {
-    "description": "When the user is displayed an error, this is the prefix of the error ID that is presented to them: i.e. Error 101",
-    "message": "Error: "
-  },
-  "dialog_defaultError_title": {
-    "description": "The default title of a popup error dialog",
-    "message": "Something went wrong"
-  },
-  "dialog_defaultError_description": {
-    "description": "The default message of a popup error dialog",
-    "message": "We're sorry for the inconvenience. For assistance, please contact support@tubi.tv \n"
-  },
-  "dialog_errorMessageContact": {
-    "description": "The contact info displayed in an error dialog",
-    "message": "Please contact: support@tubi.tv"
-  },
-  "dialog_button_exit": {
-    "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
-    "message": "Exit" 
-  },
-  "dialog_button_signIn": {
-    "description": "The label of the button in a dialog window that allows the user to sign into the app.",
-    "message": "Sign In"
-  },
-  "dialog_button_cancel": {
-    "description": "Label of a dialog button to cancel out of the dialog",
-    "message": "Cancel"
-  },
-  "dialog_button_submit": {
-    "description": "Label of the dialog button to submit what the window is asking it to do.",
-    "message": "Submit"
-  },
-  "dialog_button_tryAgain": {
-    "description": "Label of the dialog button to try again what the app had attempted to do.",
-    "message": "Try Again"
-  },
-  "dialog_button_retry": {
-    "description": "Label of the dialog button to retry what the app had attempted to do.",
-    "message": "Retry"
-  },
-  "dialog_button_close": {
-    "description": "Label of the dialog button to close the dialog window",
-    "message": "Close"
-  },
-  "dialog_button_skip": {
-    "description": "Label of the dialog button to skip what is being asked",
-    "message": "Skip"
-  },
-  "dialog_button_ok": {
-    "description": "Label of the dialog button to confirm the action the dialog is asking",
-    "message": "OK"
-  },
-  "dialog_button_yes": {
-    "description": "Label of the dialog button to confirm the action the dialog is asking",
-    "message": "Yes"
-  },
-  "dialog_button_no": {
-    "description": "Label of the dialog button to deny the action the dialog is asking",
-    "message": "No"
-  },
-  "dialog_button_settings": {
-    "description": "Label of the dialog button to cause the app to go to the settings screen.",
-    "message": "Go To Settings"
-  },
-  "dialog_errorOops_title": {
-    "description": "A general error title for an error dialog window",
-    "message": "Oops!" 
-  },
-  "dialog_channelsDisabled_title": {
-    "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
-    "message": "Channels Disabled"
-  },
-  "dialog_moviesDisabled_title": {
-    "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
-    "message": "Movies Disabled"
-  },
-  "dialog_tvDisabled_title": {
-    "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
-    "message": "TV Disabled"
-  },
-  "dialog_sideNavItemDisabled_description": {
-    "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",
-    "message": "Please exit Tubi Kids to use this feature."
-  },
-  "error_connection_title": {
-    "description": "title of error window when there is a connection error",
-    "message": "Connection Error"
-  },
-  "error_connection_description": {
-    "description": "description of error window when there is a connection error",
-    "message": "There may be an issue with your network connection, or with Tubi's server. Please check your network connection and try again. \n"
-  }, 
-  "dialog_updateVersion_title": {
-    "description": "title of a dialog window that is shown when the user has an older version of the app",
-    "message": "Please update the Tubi channel"
-  },
-  "dialog_updateVersion_description": {
-    "description": "message of a dialog window that is shown when the user has an older version of the app",
-    "message": "This version of Tubi is no longer supported. To update, please exit the Tubi app and go to: \n \n Settings > System > System update > Check now"
-  },
-  "dialog_fullSynopsis_title": {
-    "description": "title of a dialog window that shows the full desciption of a video item",
-    "message": "Full Synopsis"
-  },
-  "dialog_signIn_activationCodeExpired_title": {
-    "description": "title of the error window when the activation code has expired",
-    "message": "Activation Code Expired"
-  }, 
-  "dialog_signIn_activationCodeExpired_description": {
-    "description": "description of the error window when the activation code has expired",
-    "message": "We're sorry, but the activation code expired before your device was successfully linked."
-  }, 
-  "error_signIn_connectionError_title": {
-    "description": "title of the error window when there is a connection error",
-    "message": "Connection Error During Activation"
-  }, 
-  "error_signIn_connectionError_description": {
-    "description": "description of the error window when there is a connection error",
-    "message": "We're sorry, but we could not connect with the server to see if you registered your device."
-  }, 
-  "error_signIn_connectionErrorFetch_title": {
-    "description": "title of the error window when there is a connection error during fetching the code",
-    "message": "Connection Error During Code Fetch"
-  }, 
-  "error_signIn_connectionErrorFetch_description": {
-    "description": "description of the error window when there is a connection error during fetching the code",
-    "message": "We're sorry, but there was an error while receiving the code from the server."
-  }, 
-  "error_signIn_activationCodeGeneral_title": {
-    "description": "title of the error window when there is a general activation code error",
-    "message": "Activation Code Error"
-  }, 
-  "error_signIn_activationCodeGeneral_description": {
-    "description": "description of the error window when there is a general activation code error",
-    "message": "We're sorry, but an activation code error occurred."
-  }, 
-  "dialog_signIn_title": {
-    "description": "title of a dialog window when it asks the user to sign in",
-    "message": "Please Sign In"
-  },
-  "dialog_kidsExit_title": {
-    "description": "title of a dialog window when the user is attempting to exit kids Mode",
-    "message": "Exit Kids"
-  },
-  "dialog_kidsExit_button_ok": {
-    "description": "label of a dialog window button that will confirm app should exit kids mode",
-    "message": "Exit Kids"
-  },
-  "dialog_kidsExit_description": {
-    "description": "description of a dialog window that describes what will happen after the user exits kids mode",
-    "message": "Do you have permission from your parents to leave Tubi Kids? If you exit you will see titles that are not suitable for children."
-  },
-  "dialog_kidsExitLimited_description": {
-    "description": "description of a dialog window that describes what the user should do to exit kids mode",
-    "message": "To exit Kids, please update your parental controls in account settings."
-  },
-  "dialog_exitApp_title": {
-    "description": "Title of ther dialog window that asks the user if they want to exit the app",
-    "message": "Are You Sure?"
-  },
-  "dialog_exitApp_description": {
-    "description": "description of ther dialog window that asks the user if they want to exit the app",
-    "message": "Do you really want to exit Tubi?"
-  },
-  "error_noGetChannels_description": {
-    "description": "description of the error dialog when channel content could not get received from the server.",
-    "message": "Could not retrieve channel content."
-  },
-  "error_noContent_description": {
-    "description": "description of the error dialog when there was no content to be gathered from the server.",
-    "message": "This page currently does not have any content."
-  },
-  "dialog_signOut_title": {
-    "description": "Title of the dialog window that asks the user if they want to sign out of the app",
-    "message": "Are You Sure?"
-  },
-  "dialog_signOut_description": {
-    "description": "description of the dialog window that asks the user if they want to sign out of the app",
-    "message": "You are about to sign out of your Tubi account."
-  },
-  "dialog_signOut_button_ok": {
-    "description": "label of the confirmation button of the dialog window that asks the user if they want to sign out of the app",
-    "message": "Sign Out"
-  },
-
-  "screenActivationCode_audioGuide": {
-    "description": "Display the activation code to people who cannot see.",
-    "message": "Activation Code: {code}. Refresh Code"
-  },
-  "screenActivationCode_heading": {
-    "description": "Title on the activation code screen",
-    "message": "Visit tubi.tv/activate"
-  },
-  "screenActivationCode_subheading": {
-    "description": "Subtitle on the activation code screen",
-    "message": "from a browser on another device and enter the code below"
-  },
-  "screenActivationCode_button_refresh": {
-    "description": "Label of the button that will provide a new activation code",
-    "message": "Refresh Code" 
-  },
-  "screenSearch_defaultSearch": {
-    "description": "Directions on the search page",
-    "message": "Search for movies, TV shows, and people"
-  },
-  "screenSearch_kidsWarning": {
-    "description": "More directions on the search screen to suggest switching to kids mode",
-    "message": "Switch to Kids for kids safe search results"
-  },
-  "screenSearch_loading": {
-    "description": "The label of the loading indictor on the search screen",
-    "message": "Updating your results..."
-  },
-  "screenSearch_noResults": {
-    "description": "onscreeen message when there are no search results.",
-    "message": "We couldn't find results for '{term}' \n Please try again"
-  },
-  "screenDetails_button_queue": {
-    "description": "label of the button that will add the video title to the user's list",
-    "message": "Add to queue"
-  },
-  "screenDetails_button_noQueue": {
-    "description": "label of the button that will remove the video title from the user's list",
-    "message": "Remove from queue"
-  },
-  "screenDetails_button_noHistory": {
-    "description": "label of the button that will remove the video title from the user's viewing history",
-    "message": "Remove from history"
-  },
-  "screenDetails_button_queueNow": {
-    "description": "label of the button when the user has clicked the button and the video title is being added to the user's list",
-    "message": "Adding..."
-  },
-  "screenDetails_button_removing": {
-    "description": "label of the button when the user has clicked the button and the video title is being removed from the user's list or viewing history",
-    "message": "Removing..."
-  },
-  "screenDetails_button_gotoChannel": {
-    "description": "Label of the button that will take the user to the channel associated with the current video title",
-    "message": "Go to {channel}"
-  },
-  "screenDetails_error_addQueue_description": {
-    "description": "Description of the warning dialog when user is attempting to add an item to their liost but are not signed in",
-    "message": "You must be signed in to add a title to your queue."
-  },
-  "screenDetails_error_addQueue_buttonRegister": {
-    "description": "Label of button to sign in/register",
-    "message": "Sign in or Register"
-  },
-  "screenDetails_error_getContent_description": {
-    "description": "Description of error when app is not able to get content.",
-    "message": "Could not retrieve content information from server."
-  },
-  "screenDetails_error_queue_description": {
-    "description": "Error message when video is not added to the user's list.",
-    "message": "Something went wrong while trying to add the content to your queue."
-  },
-  "screenDetails_error_noQueue_description": {
-    "description": "Error message when video is not removed from the user's list.",
-    "message": "Something went wrong while removing the content from your queue."
-  },
-  "screenDetails_error_noHistory_description": {
-    "description": "Error message when video is not removed from the user's viewing history.",
-    "message": "Something went wrong while removing the content from your history."
-  },
-  "screenSettings_signIn_description": {
-    "description": "Directions for the signin page",
-    "message": "Sign in to Tubi. Access your Queue and Continue Watching lists across your devices."
-  },
-  "screenSettings_signOut_description": {
-    "description": "Description on SignIn page when user is signed in",
-    "message": " You're signed in as {name}"
-  },
-  "screenSettings_signOut_description2": {
-    "description": "More details on the SignIn page when user is signed in",
-    "message": " Email: {email}"
-  },
-  "screenSettings_fullDeviceID": {
-    "description": "Text proceeding the full device ID",
-    "message": " Full Device ID"
-  },
-  "screenSettings_about_title": {
-    "description": "The title of the about screen",
-    "message": " About Tubi"
-  },
-  "screenSettings_about_description": {
-    "description": "The description on the about screen",
-    "message": "Tubi is the leading free, premium, video streaming app. We have the largest library of content with over 15,000 movies and television shows with far fewer ads than cable TV."
-  },
-  "screenSettings_about_title2": {
-    "description": "The subtitle on the about screen",
-    "message": "Need Help?"
-  }, 
-  "screenSettings_about_description2": {
-    "description": "The 2nd description on the about screen",
-    "message": "Visit {helpURL} \n \n Email our Support team at support@tubi.tv \n \n Reach us on Facebook, Instagram, Twitter, and on our website at: \n {supportURL} \n \n Version {version} \n Short Device ID: {id} (press OK to see full Device ID) \n \n © {year} Tubi, Inc. all rights reserved."
-  }, 
-  "screenSettings_menu_parentalControls": {
-    "description": "The label for the parental controls",
-    "message": "Parental Controls"
-  },
-  "screenSettings_parentalControls_group0": {
-    "description": "Group 0 of the parental controls",
-    "message": "Little Kids ({ratings}F)"
-  },
-  "screenSettings_parentalControls_group1": {
-    "description": "Group 1 of the parental controls",
-    "message": "Older Kids ({ratings})"
-  },
-  "screenSettings_parentalControls_group2": {
-    "description": "Group 2 of the parental controls",
-    "message": "Teens ({ratings})"
-  },
-  "screenSettings_parentalControls_group3": {
-    "description": "Group 3 of the parental controls",
-    "message": "Adults ({ratings})"
-  },
-  "screenSettings_parentalControls_instructions": {
-    "description": "Description of the parental controls screen",
-    "message": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which movie and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password."
-  },
-  "screenSettings_menu_about": {
-    "description": "A menu Item for the Settings screen",
-    "message": "About"
-  },
-  "screenSettings_menu_privacyPolicy": {
-    "description": "A menu Item for the Settings screen",
-    "message": "Privacy Policy"
-  },
-  "screenSettings_menu_tos": {
-    "description": "A menu Item for the Settings screen",
-    "message": "Terms of Service"
-  },
-  "screenSettings_menu_signOut": {
-    "description": "A menu Item for the Settings screen",
-    "message": "Sign Out"
-  },
-  "screenSettings_parentalPassword_title": {
-    "description": "Directions for signed out users who attempt to change the parental controls",
-    "message": "Enter your password"
-  },
-  "screenSettings_parentalPassword_subtitle": {
-    "description": "Directions 2nd line for signed out users who attempt to change the parental controls",
-    "message": "to update parental controls"
-  },
-  "screenSettings_parentalPassword_button_hide": {
-    "description": "Label of button on the password entry screen to hide the password",
-    "message": "Hide Password"
-  },
-  "screenSettings_parentalPassword_button_show": {
-    "description": "Label of button on the password entry screen to display the password",
-    "message": "Show Password"
-  },
-
-  "screenSettings_error_parentalFailedChange_title": {
-    "description": "title of error screen when parental controls failed to update",
-    "message": "Update Failed"
-  },
-  "screenSettings_error_parentalFailedChange_description": {
-    "description": "description of error screen when parental controls failed to update",
-    "message": "Failed to update parental control settings.  Please try re-entering your password."
-  },
-  "screenSettings_error_parentalChanges": {
-    "description": "title of dialog message when parental controls has changed",
-    "message": "Parental Controls Settings Change"
-  },
-  "screenSettings_error_parentalChanges_description_default": {
-    "description": "description of dialog message when parental controls has changed",
-    "message": "Parental controls setting has changed. Parental controls will be password protected after 5 minutes."
-  },
-  "screenSettings_error_parentalChanges_description_group0": {
-    "description": "Success message when parental controls has changed to group 0",
-    "message": "Parental controls setting has changed to Little Kids ({ratings}}). Parental controls will be password protected after 5 minutes."
-  },
-  "screenSettings_error_parentalChanges_description_group1": {
-    "description": "Success message when parental controls has changed to group 1",
-    "message": "Parental controls setting has changed to Older Kids ({ratings}). Parental controls will be password protected after 5 minutes."
-  },
-  "screenSettings_error_parentalChanges_description_group2": {
-    "description": "Success message when parental controls has changed to group 2",
-    "message": "Parental controls setting has changed to Teens ({ratings}). Parental controls will be password protected after 5 minutes."
-  },
-  "screenSettings_error_parentalChanges_description_group3": {
-    "description": "Success message when parental controls has changed to group 3",
-    "message": "Parental controls setting has changed to Adults ({ratings}). Parental controls will be password protected after 5 minutes."
-  },
-  "screenSettings_error_signInParental_description": {
-    "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
-    "message": "You must be signed in to adjust parental controls"
-  },
-
-
-  "screenChannels_error_retrieve_message": {
-    "description": "Onscreen message to indicate channel content could not be gathered",
-    "message": "Could not retrieve channels content."
-  },
-  "screenCategories_error_retrieve_message": {
-    "description": "Onscreen message to indicate categories content could not be gathered",
-    "message": "Could not retrieve categories content."
-  },
-
-  "screenHome_error_button_continue": {
-    "description": "Label of a button to continue",
-    "message": "Continue"
-  },
-  "screenHome_error_fetchCategories_description": {
-    "description": "Onscreen message to indicate categories content could not be loaded",
-    "message": "Unable to load some categories."
-  },
-  "screenHome_error_fetchScreenContent_description": {
-    "description": "Onscreen message to indicate home content could not be loaded",
-    "message": "Unable to load Tubi home screen."
-  },
-
-  "screenDetails_button_trailer": {
-    "description": "Label of button to allow users to watch a preview of the current video title",
-    "message": "Watch Trailer"
-  },
-  "screenDetails_button_episodes": {
-    "description": "Label of button to allow users to display the list of episodes/seasons of the current video title",
-    "message": "Episodes list" 
-  },
-  "screenDetails_relatedTitles": {
-    "description": "Label of button to allow users to view other video titles related to the current video title",
-    "message": "You Might Also Like"
-  },
-  "screenDetails_button_play": {
-    "description": "Label of button to allow users to play the current video title",
-    "message": "Play"
-  },
-  "screenDetails_button_resume": {
-    "description": "Label of button to allow users to resume the current video title",
-    "message": "Resume"
-  },
-  "metadata_expiresIn_plural": {
-    "description": "label to indicate how long the user have to watch a video",
-    "message": "Expires in {days} days"
-  },
-  "metadata_expiresIn_singular": {
-    "description": "label to indicate the user has excatly 1 day to watch a video",
-    "message": "Expires in 1 day"
-  },
-  "metadata_directed": {
-    "description": "metadata label to indicate the directors of the current video title",
-    "message": "Directed by"
-  },
-  "metadata_starring": {
-    "description": "metadata label to indicate the actors of the current video title",
-    "message": "Starring"
-  },
-  "metadata_hoursAndMinutes": {
-    "description": "a duration listed in hours and minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "{hours} h {minutes} min"
-  },
-  "metadata_hours": {
-    "description": "a duration listed in hours (abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "{hours} h"
-  },
-  "metadata_minutes": {
-    "description": "a duration listed in minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "{minutes} min"
-  },
-  "metadata_seconds": {
-    "description": "a duration listed in seconds (abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "{seconds} sec" 
-  },
-  "metadata_seasons_plural": {
-    "description": "Label of how many seasons of the current TV title",
-    "message": "{seasons} Seasons"
-  },
-  "metadata_seasons_singular": {
-    "description": "Label for when the current TV title has excatly one season",
-    "message": "1 Season"
-  },
-  "metadata_series": {
-    "description": "Label to indicate a title is a TV series",
-    "message": "Series"
-  },
-
-  "screenEndCard_startingIn": {
-    "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "Starting in {seconds} s"
-  }, 
-  "videoPlayer_trailerTitle": {
-    "description": "Label for the video preview associated with the current video title",
-    "message": "Trailer ({title})"
-  },
-  "videoPlayer_adLoadingMessage": {
-    "description": "Message to indicate ads will play before playing video content",
-    "message": "Your program will begin after these messages..."
-  }, 
-  "videoPlayer_error_failed_description": {
-    "description": "label for error messages to indicate 'failed'",
-    "message": "FAILED"
-  }, 
-  "videoPlayer_error_invalidURL_description": {
-    "description": "Error message to indicate that the video URL is invalid.",
-    "message": "Video URL is not valid."
-  }, 
-  "videoPlayer_error_playback_description": {
-    "description": "Error message when video could not play",
-    "message": "There was an issue with video playback."
-  }, 
-  "videoPlayer_error_refresh_description": {
-    "description": "Error message when next video could not be played",
-    "message": "Could not refresh the content or play next content."
-  }, 
-  "videoPlayer_adHeadsUp": {
-    "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "AD Break starts in {seconds} s"
-  }, 
-  
-  "goBack_categories": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK FOR CATEGORIES"
-  }, 
-  "goBack_channels": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK FOR CHANNELS"
-  }, 
-  "goBack_default": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK TO GO BACK"
-  }, 
-  "goBack_videoPlayer_upNext": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "BACK TO DISMISS"
-  },
-  "goBack_videoPlayer_controls": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK TO HIDE"
-  },
-  "goBack_menu": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK FOR MENU"
-  }, 
-  "goBack_home": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK FOR HOME"
-  },
-  "channel_name": {
-    "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
-    "message": "Tubi - Free Movies & TV"
-  },
-  "channel_description": {
-    "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
-    "message": "Enjoy the largest library of popular movies and TV shows, all for free!"
-  },
-  "channel_webDescription": {
-    "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
-    "message": "Watch thousands of hit movies and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer ads than regular TV. Tubi is the largest free streaming service featuring award-winning movies and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favorites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!"
-
+Function getTranslation_en_US()
+  return {
+    "menu_signIn": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into app.",
+      "message": "Sign In"
+    },
+    "menu_signedIn": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Shows that the user is signed in.",
+      "message": "Hi {name}"
+    },
+    "menu_kids": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into kids mode.",
+      "message": "Kids"
+    },
+    "menu_exitKids": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to exit kids mode.",
+      "message": "Exit Kids"
+    },
+    "menu_search": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the search screen.",
+      "message": "Search"
+    },
+    "menu_home": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Home"
+    },
+    "menu_categories": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the categories screen.",
+      "message": "Categories"
+    },
+    "menu_channels": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the channels screen.",
+      "message": "Channels"
+    },
+    "menu_movies": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the movies screen.",
+      "message": "Movies"
+    },
+    "menu_tv": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
+      "message": "TV Shows"
+    },
+    "menu_settings": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
+      "message": "Settings"
+    },
+    "menu_exit": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to exit the app.",
+      "message": "Exit"
+    },
+    "loadingIndicator": {
+      "description": "When something is loading, this text appears so the user knows something is loading.",
+      "message": "Loading..."
+    },
+    "dialog_errorPrefix": {
+      "description": "When the user is displayed an error, this is the prefix of the error ID that is presented to them: i.e. Error 101",
+      "message": "Error: "
+    },
+    "dialog_defaultError_title": {
+      "description": "The default title of a popup error dialog",
+      "message": "Something went wrong"
+    },
+    "dialog_defaultError_description": {
+      "description": "The default message of a popup error dialog",
+      "message": "We're sorry for the inconvenience. For assistance, please contact support@tubi.tv \n"
+    },
+    "dialog_errorMessageContact": {
+      "description": "The contact info displayed in an error dialog",
+      "message": "Please contact: support@tubi.tv"
+    },
+    "dialog_button_exit": {
+      "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
+      "message": "Exit"
+    },
+    "dialog_button_signIn": {
+      "description": "The label of the button in a dialog window that allows the user to sign into the app.",
+      "message": "Sign In"
+    },
+    "dialog_button_cancel": {
+      "description": "Label of a dialog button to cancel out of the dialog",
+      "message": "Cancel"
+    },
+    "dialog_button_submit": {
+      "description": "Label of the dialog button to submit what the window is asking it to do.",
+      "message": "Submit"
+    },
+    "dialog_button_tryAgain": {
+      "description": "Label of the dialog button to try again what the app had attempted to do.",
+      "message": "Try Again"
+    },
+    "dialog_button_retry": {
+      "description": "Label of the dialog button to retry what the app had attempted to do.",
+      "message": "Retry"
+    },
+    "dialog_button_close": {
+      "description": "Label of the dialog button to close the dialog window",
+      "message": "Close"
+    },
+    "dialog_button_skip": {
+      "description": "Label of the dialog button to skip what is being asked",
+      "message": "Skip"
+    },
+    "dialog_button_ok": {
+      "description": "Label of the dialog button to confirm the action the dialog is asking",
+      "message": "OK"
+    },
+    "dialog_button_yes": {
+      "description": "Label of the dialog button to confirm the action the dialog is asking",
+      "message": "Yes"
+    },
+    "dialog_button_no": {
+      "description": "Label of the dialog button to deny the action the dialog is asking",
+      "message": "No"
+    },
+    "dialog_button_settings": {
+      "description": "Label of the dialog button to cause the app to go to the settings screen.",
+      "message": "Go To Settings"
+    },
+    "dialog_errorOops_title": {
+      "description": "A general error title for an error dialog window",
+      "message": "Oops!"
+    },
+    "dialog_channelsDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
+      "message": "Channels Disabled"
+    },
+    "dialog_moviesDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
+      "message": "Movies Disabled"
+    },
+    "dialog_tvDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
+      "message": "TV Disabled"
+    },
+    "dialog_sideNavItemDisabled_description": {
+      "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",
+      "message": "Please exit Tubi Kids to use this feature."
+    },
+    "error_connection_title": {
+      "description": "title of error window when there is a connection error",
+      "message": "Connection Error"
+    },
+    "error_connection_description": {
+      "description": "description of error window when there is a connection error",
+      "message": "There may be an issue with your network connection, or with Tubi's server. Please check your network connection and try again. \n"
+    },
+    "dialog_updateVersion_title": {
+      "description": "title of a dialog window that is shown when the user has an older version of the app",
+      "message": "Please update the Tubi channel"
+    },
+    "dialog_updateVersion_description": {
+      "description": "message of a dialog window that is shown when the user has an older version of the app",
+      "message": "This version of Tubi is no longer supported. To update, please exit the Tubi app and go to: \n \n Settings > System > System update > Check now"
+    },
+    "dialog_fullSynopsis_title": {
+      "description": "title of a dialog window that shows the full desciption of a video item",
+      "message": "Full Synopsis"
+    },
+    "dialog_signIn_activationCodeExpired_title": {
+      "description": "title of the error window when the activation code has expired",
+      "message": "Activation Code Expired"
+    },
+    "dialog_signIn_activationCodeExpired_description": {
+      "description": "description of the error window when the activation code has expired",
+      "message": "We're sorry, but the activation code expired before your device was successfully linked."
+    },
+    "error_signIn_connectionError_title": {
+      "description": "title of the error window when there is a connection error",
+      "message": "Connection Error During Activation"
+    },
+    "error_signIn_connectionError_description": {
+      "description": "description of the error window when there is a connection error",
+      "message": "We're sorry, but we could not connect with the server to see if you registered your device."
+    },
+    "error_signIn_connectionErrorFetch_title": {
+      "description": "title of the error window when there is a connection error during fetching the code",
+      "message": "Connection Error During Code Fetch"
+    },
+    "error_signIn_connectionErrorFetch_description": {
+      "description": "description of the error window when there is a connection error during fetching the code",
+      "message": "We're sorry, but there was an error while receiving the code from the server."
+    },
+    "error_signIn_activationCodeGeneral_title": {
+      "description": "title of the error window when there is a general activation code error",
+      "message": "Activation Code Error"
+    },
+    "error_signIn_activationCodeGeneral_description": {
+      "description": "description of the error window when there is a general activation code error",
+      "message": "We're sorry, but an activation code error occurred."
+    },
+    "dialog_signIn_title": {
+      "description": "title of a dialog window when it asks the user to sign in",
+      "message": "Please Sign In"
+    },
+    "dialog_kidsExit_title": {
+      "description": "title of a dialog window when the user is attempting to exit kids Mode",
+      "message": "Exit Kids"
+    },
+    "dialog_kidsExit_button_ok": {
+      "description": "label of a dialog window button that will confirm app should exit kids mode",
+      "message": "Exit Kids"
+    },
+    "dialog_kidsExit_description": {
+      "description": "description of a dialog window that describes what will happen after the user exits kids mode",
+      "message": "Do you have permission from your parents to leave Tubi Kids? If you exit you will see titles that are not suitable for children."
+    },
+    "dialog_kidsExitLimited_description": {
+      "description": "description of a dialog window that describes what the user should do to exit kids mode",
+      "message": "To exit Kids, please update your parental controls in account settings."
+    },
+    "dialog_exitApp_title": {
+      "description": "Title of ther dialog window that asks the user if they want to exit the app",
+      "message": "Are You Sure?"
+    },
+    "dialog_exitApp_description": {
+      "description": "description of ther dialog window that asks the user if they want to exit the app",
+      "message": "Do you really want to exit Tubi?"
+    },
+    "error_noGetChannels_description": {
+      "description": "description of the error dialog when channel content could not get received from the server.",
+      "message": "Could not retrieve channel content."
+    },
+    "error_noContent_description": {
+      "description": "description of the error dialog when there was no content to be gathered from the server.",
+      "message": "This page currently does not have any content."
+    },
+    "dialog_signOut_title": {
+      "description": "Title of the dialog window that asks the user if they want to sign out of the app",
+      "message": "Are You Sure?"
+    },
+    "dialog_signOut_description": {
+      "description": "description of the dialog window that asks the user if they want to sign out of the app",
+      "message": "You are about to sign out of your Tubi account."
+    },
+    "dialog_signOut_button_ok": {
+      "description": "label of the confirmation button of the dialog window that asks the user if they want to sign out of the app",
+      "message": "Sign Out"
+    },
+    "screenActivationCode_audioGuide": {
+      "description": "Display the activation code to people who cannot see.",
+      "message": "Activation Code: {code}. Refresh Code"
+    },
+    "screenActivationCode_heading": {
+      "description": "Title on the activation code screen",
+      "message": "Visit tubi.tv/activate"
+    },
+    "screenActivationCode_subheading": {
+      "description": "Subtitle on the activation code screen",
+      "message": "from a browser on another device and enter the code below"
+    },
+    "screenActivationCode_button_refresh": {
+      "description": "Label of the button that will provide a new activation code",
+      "message": "Refresh Code"
+    },
+    "screenSearch_defaultSearch": {
+      "description": "Directions on the search page",
+      "message": "Search for movies, TV shows, and people"
+    },
+    "screenSearch_kidsWarning": {
+      "description": "More directions on the search screen to suggest switching to kids mode",
+      "message": "Switch to Kids for kids safe search results"
+    },
+    "screenSearch_loading": {
+      "description": "The label of the loading indictor on the search screen",
+      "message": "Updating your results..."
+    },
+    "screenSearch_noResults": {
+      "description": "onscreeen message when there are no search results.",
+      "message": "We couldn't find results for '{term}' \n Please try again"
+    },
+    "screenDetails_button_queue": {
+      "description": "label of the button that will add the video title to the user's list",
+      "message": "Add to queue"
+    },
+    "screenDetails_button_noQueue": {
+      "description": "label of the button that will remove the video title from the user's list",
+      "message": "Remove from queue"
+    },
+    "screenDetails_button_noHistory": {
+      "description": "label of the button that will remove the video title from the user's viewing history",
+      "message": "Remove from history"
+    },
+    "screenDetails_button_queueNow": {
+      "description": "label of the button when the user has clicked the button and the video title is being added to the user's list",
+      "message": "Adding..."
+    },
+    "screenDetails_button_removing": {
+      "description": "label of the button when the user has clicked the button and the video title is being removed from the user's list or viewing history",
+      "message": "Removing..."
+    },
+    "screenDetails_button_gotoChannel": {
+      "description": "Label of the button that will take the user to the channel associated with the current video title",
+      "message": "Go to {channel}"
+    },
+    "screenDetails_error_addQueue_description": {
+      "description": "Description of the warning dialog when user is attempting to add an item to their liost but are not signed in",
+      "message": "You must be signed in to add a title to your queue."
+    },
+    "screenDetails_error_addQueue_buttonRegister": {
+      "description": "Label of button to sign in/register",
+      "message": "Sign in or Register"
+    },
+    "screenDetails_error_getContent_description": {
+      "description": "Description of error when app is not able to get content.",
+      "message": "Could not retrieve content information from server."
+    },
+    "screenDetails_error_queue_description": {
+      "description": "Error message when video is not added to the user's list.",
+      "message": "Something went wrong while trying to add the content to your queue."
+    },
+    "screenDetails_error_noQueue_description": {
+      "description": "Error message when video is not removed from the user's list.",
+      "message": "Something went wrong while removing the content from your queue."
+    },
+    "screenDetails_error_noHistory_description": {
+      "description": "Error message when video is not removed from the user's viewing history.",
+      "message": "Something went wrong while removing the content from your history."
+    },
+    "screenSettings_signIn_description": {
+      "description": "Directions for the signin page",
+      "message": "Sign in to Tubi. Access your Queue and Continue Watching lists across your devices."
+    },
+    "screenSettings_signOut_description": {
+      "description": "Description on SignIn page when user is signed in",
+      "message": " You're signed in as {name}"
+    },
+    "screenSettings_signOut_description2": {
+      "description": "More details on the SignIn page when user is signed in",
+      "message": " Email: {email}"
+    },
+    "screenSettings_fullDeviceID": {
+      "description": "Text proceeding the full device ID",
+      "message": " Full Device ID"
+    },
+    "screenSettings_about_title": {
+      "description": "The title of the about screen",
+      "message": " About Tubi"
+    },
+    "screenSettings_about_description": {
+      "description": "The description on the about screen",
+      "message": "Tubi is the leading free, premium, video streaming app. We have the largest library of content with over 15,000 movies and television shows with far fewer ads than cable TV."
+    },
+    "screenSettings_about_title2": {
+      "description": "The subtitle on the about screen",
+      "message": "Need Help?"
+    },
+    "screenSettings_about_description2": {
+      "description": "The 2nd description on the about screen",
+      "message": "Visit {help_url} \n \n Email our Support team at support@tubi.tv \n \n Reach us on Facebook, Instagram, Twitter, and on our website at: \n {support_url} \n \n Version {version} \n Short Device ID: {id} (press OK to see full Device ID) \n \n © {year} Tubi, Inc. all rights reserved."
+    },
+    "screenSettings_menu_parentalControls": {
+      "description": "The label for the parental controls",
+      "message": "Parental Controls"
+    },
+    "screenSettings_parentalControls_group0": {
+      "description": "Group 0 of the parental controls",
+      "message": "Little Kids ({ratings})"
+    },
+    "screenSettings_parentalControls_group1": {
+      "description": "Group 1 of the parental controls",
+      "message": "Older Kids ({ratings})"
+    },
+    "screenSettings_parentalControls_group2": {
+      "description": "Group 2 of the parental controls",
+      "message": "Teens ({ratings})"
+    },
+    "screenSettings_parentalControls_group3": {
+      "description": "Group 3 of the parental controls",
+      "message": "Adults ({ratings})"
+    },
+    "screenSettings_parentalControls_instructions": {
+      "description": "Description of the parental controls screen",
+      "message": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which movie and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password."
+    },
+    "screenSettings_menu_about": {
+      "description": "A menu Item for the Settings screen",
+      "message": "About"
+    },
+    "screenSettings_menu_privacyPolicy": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Privacy Policy"
+    },
+    "screenSettings_menu_tos": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Terms of Service"
+    },
+    "screenSettings_menu_signOut": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Sign Out"
+    },
+    "screenSettings_parentalPassword_title": {
+      "description": "Directions for signed out users who attempt to change the parental controls",
+      "message": "Enter your password"
+    },
+    "screenSettings_parentalPassword_subtitle": {
+      "description": "Directions 2nd line for signed out users who attempt to change the parental controls",
+      "message": "to update parental controls"
+    },
+    "screenSettings_parentalPassword_button_hide": {
+      "description": "Label of button on the password entry screen to hide the password",
+      "message": "Hide Password"
+    },
+    "screenSettings_parentalPassword_button_show": {
+      "description": "Label of button on the password entry screen to display the password",
+      "message": "Show Password"
+    },
+    "screenSettings_error_parentalFailedChange_title": {
+      "description": "title of error screen when parental controls failed to update",
+      "message": "Update Failed"
+    },
+    "screenSettings_error_parentalFailedChange_description": {
+      "description": "description of error screen when parental controls failed to update",
+      "message": "Failed to update parental control settings.  Please try re-entering your password."
+    },
+    "screenSettings_error_parentalChanges": {
+      "description": "title of dialog message when parental controls has changed",
+      "message": "Parental Controls Settings Change"
+    },
+    "screenSettings_error_parentalChanges_description_default": {
+      "description": "description of dialog message when parental controls has changed",
+      "message": "Parental controls setting has changed. Parental controls will be password protected after 5 minutes."
+    },
+    "screenSettings_error_parentalChanges_description_group0": {
+      "description": "Success message when parental controls has changed to group 0",
+      "message": "Parental controls setting has changed to Little Kids ({ratings}}). Parental controls will be password protected after 5 minutes."
+    },
+    "screenSettings_error_parentalChanges_description_group1": {
+      "description": "Success message when parental controls has changed to group 1",
+      "message": "Parental controls setting has changed to Older Kids ({ratings}). Parental controls will be password protected after 5 minutes."
+    },
+    "screenSettings_error_parentalChanges_description_group2": {
+      "description": "Success message when parental controls has changed to group 2",
+      "message": "Parental controls setting has changed to Teens ({ratings}). Parental controls will be password protected after 5 minutes."
+    },
+    "screenSettings_error_parentalChanges_description_group3": {
+      "description": "Success message when parental controls has changed to group 3",
+      "message": "Parental controls setting has changed to Adults ({ratings}). Parental controls will be password protected after 5 minutes."
+    },
+    "screenSettings_error_signInParental_description": {
+      "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
+      "message": "You must be signed in to adjust parental controls"
+    },
+    "screenChannels_error_retrieve_message": {
+      "description": "Onscreen message to indicate channel content could not be gathered",
+      "message": "Could not retrieve channels content."
+    },
+    "screenCategories_error_retrieve_message": {
+      "description": "Onscreen message to indicate categories content could not be gathered",
+      "message": "Could not retrieve categories content."
+    },
+    "screenHome_error_button_continue": {
+      "description": "Label of a button to continue",
+      "message": "Continue"
+    },
+    "screenHome_error_fetchCategories_description": {
+      "description": "Onscreen message to indicate categories content could not be loaded",
+      "message": "Unable to load some categories."
+    },
+    "screenHome_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate home content could not be loaded",
+      "message": "Unable to load Tubi home screen."
+    },
+    "screenDetails_button_trailer": {
+      "description": "Label of button to allow users to watch a preview of the current video title",
+      "message": "Watch Trailer"
+    },
+    "screenDetails_button_episodes": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title",
+      "message": "Episodes list"
+    },
+    "screenDetails_relatedTitles": {
+      "description": "Label of button to allow users to view other video titles related to the current video title",
+      "message": "You Might Also Like"
+    },
+    "screenDetails_button_play": {
+      "description": "Label of button to allow users to play the current video title",
+      "message": "Play"
+    },
+    "screenDetails_button_resume": {
+      "description": "Label of button to allow users to resume the current video title",
+      "message": "Resume"
+    },
+    "metadata_expiresIn_plural": {
+      "description": "label to indicate how long the user have to watch a video",
+      "message": "Expires in {days} days"
+    },
+    "metadata_expiresIn_singular": {
+      "description": "label to indicate the user has excatly 1 day to watch a video",
+      "message": "Expires in 1 day"
+    },
+    "metadata_directed": {
+      "description": "metadata label to indicate the directors of the current video title",
+      "message": "Directed by"
+    },
+    "metadata_starring": {
+      "description": "metadata label to indicate the actors of the current video title",
+      "message": "Starring"
+    },
+    "metadata_hoursAndMinutes": {
+      "description": "a duration listed in hours and minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{hours} h {minutes} min"
+    },
+    "metadata_hours": {
+      "description": "a duration listed in hours (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{hours} h"
+    },
+    "metadata_minutes": {
+      "description": "a duration listed in minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{minutes} min"
+    },
+    "metadata_seconds": {
+      "description": "a duration listed in seconds (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{seconds} sec"
+    },
+    "metadata_seasons_plural": {
+      "description": "Label of how many seasons of the current TV title",
+      "message": "{seasons} Seasons"
+    },
+    "metadata_seasons_singular": {
+      "description": "Label for when the current TV title has excatly one season",
+      "message": "1 Season"
+    },
+    "metadata_series": {
+      "description": "Label to indicate a title is a TV series",
+      "message": "Series"
+    },
+    "screenEndCard_startingIn": {
+      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Starting in {seconds} s"
+    },
+    "videoPlayer_trailerTitle": {
+      "description": "Label for the video preview associated with the current video title",
+      "message": "Trailer ({title})"
+    },
+    "videoPlayer_adLoadingMessage": {
+      "description": "Message to indicate ads will play before playing video content",
+      "message": "Your program will begin after these messages..."
+    },
+    "videoPlayer_error_failed_description": {
+      "description": "label for error messages to indicate 'failed'",
+      "message": "FAILED"
+    },
+    "videoPlayer_error_invalidURL_description": {
+      "description": "Error message to indicate that the video URL is invalid.",
+      "message": "Video URL is not valid."
+    },
+    "videoPlayer_error_playback_description": {
+      "description": "Error message when video could not play",
+      "message": "There was an issue with video playback."
+    },
+    "videoPlayer_error_refresh_description": {
+      "description": "Error message when next video could not be played",
+      "message": "Could not refresh the content or play next content."
+    },
+    "videoPlayer_adHeadsUp": {
+      "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "AD Break starts in {seconds} s"
+    },
+    "goBack_categories": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESS BACK FOR CATEGORIES"
+    },
+    "goBack_channels": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESS BACK FOR CHANNELS"
+    },
+    "goBack_default": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESS BACK TO GO BACK"
+    },
+    "goBack_videoPlayer_upNext": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "BACK TO DISMISS"
+    },
+    "goBack_videoPlayer_controls": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESS BACK TO HIDE"
+    },
+    "goBack_menu": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESS BACK FOR MENU"
+    },
+    "goBack_home": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESS BACK FOR HOME"
+    },
+    "channel_name": {
+      "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+      "message": "Tubi - Free Movies & TV"
+    },
+    "channel_description": {
+      "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+      "message": "Enjoy the largest library of popular movies and TV shows, all for free!"
+    },
+    "channel_webDescription": {
+      "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
+      "message": "Watch thousands of hit movies and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer ads than regular TV. Tubi is the largest free streaming service featuring award-winning movies and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favorites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!"
+    }
   }
-} 
- End Function
+End Function
 
 
 ' Return the associative array associated with the esMX locale
 Function getTranslation_es_MX()
-  return invalid
+  return {
+    "menu_signIn": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into app.",
+      "message": "Iniciar sesión"
+    },
+    "menu_signedIn": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Shows that the user is signed in.",
+      "message": "Hola {name}"
+    },
+    "menu_kids": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into kids mode.",
+      "message": "Niños"
+    },
+    "menu_exitKids": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to exit kids mode.",
+      "message": "Salir Niños"
+    },
+    "menu_search": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the search screen.",
+      "message": "Buscar"
+    },
+    "menu_home": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Inicio"
+    },
+    "menu_categories": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the categories screen.",
+      "message": "Categorías"
+    },
+    "menu_channels": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the channels screen.",
+      "message": "Canales"
+    },
+    "menu_movies": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the movies screen.",
+      "message": "Películas"
+    },
+    "menu_tv": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
+      "message": "Series"
+    },
+    "menu_settings": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
+      "message": "Configuración"
+    },
+    "menu_exit": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to exit the app.",
+      "message": "Salir"
+    },
+    "loadingIndicator": {
+      "description": "When something is loading, this text appears so the user knows something is loading.",
+      "message": "Cargando..."
+    },
+    "dialog_errorPrefix": {
+      "description": "When the user is displayed an error, this is the prefix of the error ID that is presented to them: i.e. Error 101",
+      "message": "Error: "
+    },
+    "dialog_defaultError_title": {
+      "description": "The default title of a popup error dialog",
+      "message": "Algo salió mal"
+    },
+    "dialog_defaultError_description": {
+      "description": "The default message of a popup error dialog",
+      "message": "Disculpa la molestia. Para obtener ayuda, ponte en contacto con support@tubi.tv\n"
+    },
+    "dialog_errorMessageContact": {
+      "description": "The contact info displayed in an error dialog",
+      "message": "Por favor, ponte en contacto con: support@tubi.tv"
+    },
+    "dialog_button_exit": {
+      "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
+      "message": "Salir"
+    },
+    "dialog_button_signIn": {
+      "description": "The label of the button in a dialog window that allows the user to sign into the app.",
+      "message": "Iniciar sesión"
+    },
+    "dialog_button_cancel": {
+      "description": "Label of a dialog button to cancel out of the dialog",
+      "message": "Cancelar"
+    },
+    "dialog_button_submit": {
+      "description": "Label of the dialog button to submit what the window is asking it to do.",
+      "message": "Enviar"
+    },
+    "dialog_button_tryAgain": {
+      "description": "Label of the dialog button to try again what the app had attempted to do.",
+      "message": "Inténtalo de nuevo"
+    },
+    "dialog_button_retry": {
+      "description": "Label of the dialog button to retry what the app had attempted to do.",
+      "message": "Reintentar"
+    },
+    "dialog_button_close": {
+      "description": "Label of the dialog button to close the dialog window",
+      "message": "Cerrar"
+    },
+    "dialog_button_skip": {
+      "description": "Label of the dialog button to skip what is being asked",
+      "message": "Saltar"
+    },
+    "dialog_button_ok": {
+      "description": "Label of the dialog button to confirm the action the dialog is asking",
+      "message": "OK"
+    },
+    "dialog_button_yes": {
+      "description": "Label of the dialog button to confirm the action the dialog is asking",
+      "message": "Sí"
+    },
+    "dialog_button_no": {
+      "description": "Label of the dialog button to deny the action the dialog is asking",
+      "message": "No"
+    },
+    "dialog_button_settings": {
+      "description": "Label of the dialog button to cause the app to go to the settings screen.",
+      "message": "Ir a configuración"
+    },
+    "dialog_errorOops_title": {
+      "description": "A general error title for an error dialog window",
+      "message": "¡Uy!"
+    },
+    "dialog_channelsDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
+      "message": "Canales desactivados"
+    },
+    "dialog_moviesDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
+      "message": "Películas desactivadas"
+    },
+    "dialog_tvDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
+      "message": "Televisión desactivada"
+    },
+    "dialog_sideNavItemDisabled_description": {
+      "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",
+      "message": "Por favor, sal de Tubi Niños para usar esta función."
+    },
+    "error_connection_title": {
+      "description": "title of error window when there is a connection error",
+      "message": "Error de conexión"
+    },
+    "error_connection_description": {
+      "description": "description of error window when there is a connection error",
+      "message": "Puede haber un problema con tu conexión de red, o con el servidor de Tubi. Por favor, comprueba tu conexión de red e inténtalo de nuevo.\n"
+    },
+    "dialog_updateVersion_title": {
+      "description": "title of a dialog window that is shown when the user has an older version of the app",
+      "message": "Por favor, actualiza el canal de Tubi"
+    },
+    "dialog_updateVersion_description": {
+      "description": "message of a dialog window that is shown when the user has an older version of the app",
+      "message": "Esta versión de Tubi ya no es compatible. Para actualizar, sal de la aplicación Tubi y ve a:\n\nConfiguración> Sistema> Actualización del sistema> Verificar ahora"
+    },
+    "dialog_fullSynopsis_title": {
+      "description": "title of a dialog window that shows the full desciption of a video item",
+      "message": "Sinopsis completa"
+    },
+    "dialog_signIn_activationCodeExpired_title": {
+      "description": "title of the error window when the activation code has expired",
+      "message": "Código de activación caducado"
+    },
+    "dialog_signIn_activationCodeExpired_description": {
+      "description": "description of the error window when the activation code has expired",
+      "message": "Lo sentimos, pero el código de activación caducó antes de que tu dispositivo se vinculará correctamente."
+    },
+    "error_signIn_connectionError_title": {
+      "description": "title of the error window when there is a connection error",
+      "message": "Error de conexión durante la activación"
+    },
+    "error_signIn_connectionError_description": {
+      "description": "description of the error window when there is a connection error",
+      "message": "Lo sentimos, pero no pudimos conectarnos con el servidor para ver si registraste tu dispositivo."
+    },
+    "error_signIn_connectionErrorFetch_title": {
+      "description": "title of the error window when there is a connection error during fetching the code",
+      "message": "Error de conexión durante la recuperación de código"
+    },
+    "error_signIn_connectionErrorFetch_description": {
+      "description": "description of the error window when there is a connection error during fetching the code",
+      "message": "Lo sentimos, pero hubo un error al recibir el código del servidor."
+    },
+    "error_signIn_activationCodeGeneral_title": {
+      "description": "title of the error window when there is a general activation code error",
+      "message": "Error de código de activación"
+    },
+    "error_signIn_activationCodeGeneral_description": {
+      "description": "description of the error window when there is a general activation code error",
+      "message": "Lo sentimos, pero ocurrió un error en el código de activación."
+    },
+    "dialog_signIn_title": {
+      "description": "title of a dialog window when it asks the user to sign in",
+      "message": "Por favor, inicia sesión"
+    },
+    "dialog_kidsExit_title": {
+      "description": "title of a dialog window when the user is attempting to exit kids Mode",
+      "message": "Salir Niños"
+    },
+    "dialog_kidsExit_button_ok": {
+      "description": "label of a dialog window button that will confirm app should exit kids mode",
+      "message": "Salir Niños"
+    },
+    "dialog_kidsExit_description": {
+      "description": "description of a dialog window that describes what will happen after the user exits kids mode",
+      "message": "¿Tienes el permiso de tus padres para salir de Tubi Niños? Si sales, verás contenido que no es apropiado para niños."
+    },
+    "dialog_kidsExitLimited_description": {
+      "description": "description of a dialog window that describes what the user should do to exit kids mode",
+      "message": "Para salir de Niños, actualiza los controles parentales en la configuración de la cuenta."
+    },
+    "dialog_exitApp_title": {
+      "description": "Title of ther dialog window that asks the user if they want to exit the app",
+      "message": "¿Estás seguro?"
+    },
+    "dialog_exitApp_description": {
+      "description": "description of ther dialog window that asks the user if they want to exit the app",
+      "message": "¿Seguro que quieres salir de Tubi?"
+    },
+    "error_noGetChannels_description": {
+      "description": "description of the error dialog when channel content could not get received from the server.",
+      "message": "No se pudo recuperar el contenido del canal."
+    },
+    "error_noContent_description": {
+      "description": "description of the error dialog when there was no content to be gathered from the server.",
+      "message": "Esta página actualmente no tiene ningún contenido."
+    },
+    "dialog_signOut_title": {
+      "description": "Title of the dialog window that asks the user if they want to sign out of the app",
+      "message": "¿Estás seguro?"
+    },
+    "dialog_signOut_description": {
+      "description": "description of the dialog window that asks the user if they want to sign out of the app",
+      "message": "Estás a punto de cerrar sesión en tu cuenta de Tubi."
+    },
+    "dialog_signOut_button_ok": {
+      "description": "label of the confirmation button of the dialog window that asks the user if they want to sign out of the app",
+      "message": "Cerrar sesión"
+    },
+    "screenActivationCode_audioGuide": {
+      "description": "Display the activation code to people who cannot see.",
+      "message": "Código de activación: {code}. Actualizar código"
+    },
+    "screenActivationCode_heading": {
+      "description": "Title on the activation code screen",
+      "message": "Visita tubi.tv/activate"
+    },
+    "screenActivationCode_subheading": {
+      "description": "Subtitle on the activation code screen",
+      "message": "desde un navegador en otro dispositivo e ingresa el código a continuación"
+    },
+    "screenActivationCode_button_refresh": {
+      "description": "Label of the button that will provide a new activation code",
+      "message": "Actualizar código"
+    },
+    "screenSearch_defaultSearch": {
+      "description": "Directions on the search page",
+      "message": "Busca películas, programas de televisión y personas"
+    },
+    "screenSearch_kidsWarning": {
+      "description": "More directions on the search screen to suggest switching to kids mode",
+      "message": "Cambiar a Niños para resultados seguros"
+    },
+    "screenSearch_loading": {
+      "description": "The label of the loading indictor on the search screen",
+      "message": "Actualizando tus resultados..."
+    },
+    "screenSearch_noResults": {
+      "description": "onscreeen message when there are no search results.",
+      "message": "No pudimos encontrar resultados para '{term}'\n Inténtalo de nuevo"
+    },
+    "screenDetails_button_queue": {
+      "description": "label of the button that will add the video title to the user's list",
+      "message": "Agregar a tu lista"
+    },
+    "screenDetails_button_noQueue": {
+      "description": "label of the button that will remove the video title from the user's list",
+      "message": "Eliminar de tu lista"
+    },
+    "screenDetails_button_noHistory": {
+      "description": "label of the button that will remove the video title from the user's viewing history",
+      "message": "Eliminar del historial"
+    },
+    "screenDetails_button_queueNow": {
+      "description": "label of the button when the user has clicked the button and the video title is being added to the user's list",
+      "message": "Agregando..."
+    },
+    "screenDetails_button_removing": {
+      "description": "label of the button when the user has clicked the button and the video title is being removed from the user's list or viewing history",
+      "message": "Eliminando..."
+    },
+    "screenDetails_button_gotoChannel": {
+      "description": "Label of the button that will take the user to the channel associated with the current video title",
+      "message": "Ir a {channel}"
+    },
+    "screenDetails_error_addQueue_description": {
+      "description": "Description of the warning dialog when user is attempting to add an item to their liost but are not signed in",
+      "message": "Debes iniciar sesión para agregar un título a tu lista.\n"
+    },
+    "screenDetails_error_addQueue_buttonRegister": {
+      "description": "Label of button to sign in/register",
+      "message": "Iniciar sesión o registrarse"
+    },
+    "screenDetails_error_getContent_description": {
+      "description": "Description of error when app is not able to get content.",
+      "message": "No se pudo recuperar la información del contenido del servidor."
+    },
+    "screenDetails_error_queue_description": {
+      "description": "Error message when video is not added to the user's list.",
+      "message": "Algo salió mal mientras se intentaba agregar el contenido a tu lista."
+    },
+    "screenDetails_error_noQueue_description": {
+      "description": "Error message when video is not removed from the user's list.",
+      "message": "Algo salió mal al eliminar el contenido de tu lista.\n"
+    },
+    "screenDetails_error_noHistory_description": {
+      "description": "Error message when video is not removed from the user's viewing history.",
+      "message": "Algo salió mal al eliminar el contenido de tu historial."
+    },
+    "screenSettings_signIn_description": {
+      "description": "Directions for the signin page",
+      "message": "Inicia sesión en Tubi. Accede a Mi lista y Seguir viendo en tus dispositivos."
+    },
+    "screenSettings_signOut_description": {
+      "description": "Description on SignIn page when user is signed in",
+      "message": " Has iniciado sesión como {name}"
+    },
+    "screenSettings_signOut_description2": {
+      "description": "More details on the SignIn page when user is signed in",
+      "message": " Correo electrónico: {email}"
+    },
+    "screenSettings_fullDeviceID": {
+      "description": "Text proceeding the full device ID",
+      "message": " ID de dispositivo completo"
+    },
+    "screenSettings_about_title": {
+      "description": "The title of the about screen",
+      "message": " Acerca de Tubi"
+    },
+    "screenSettings_about_description": {
+      "description": "The description on the about screen",
+      "message": "Tubi es la aplicación más grande de series y películas gratuitas. Tenemos un catálogo de contenido con más de 15,000 películas y programas de televisión con muchos menos anuncios que la televisión por cable."
+    },
+    "screenSettings_about_title2": {
+      "description": "The subtitle on the about screen",
+      "message": "¿Necesitas ayuda?"
+    },
+    "screenSettings_about_description2": {
+      "description": "The 2nd description on the about screen",
+      "message": "Visita {help_url}\n\nEnvía un correo electrónico a nuestro equipo de soporte a support@tubi.tv\n\nPonte en contacto con nosotros en Facebook, Instagram, Twitter y en nuestra página web: \n{support_url} \n\nVersión {version}\nID de dispositivo corto: {id} (presione OK para ver el ID de dispositivo completo)\n\n© {year} Tubi, Inc. todos los derechos reservados."
+    },
+    "screenSettings_menu_parentalControls": {
+      "description": "The label for the parental controls",
+      "message": "Controles parentales"
+    },
+    "screenSettings_parentalControls_group0": {
+      "description": "Group 0 of the parental controls",
+      "message": "Niños pequeños ({ratings})"
+    },
+    "screenSettings_parentalControls_group1": {
+      "description": "Group 1 of the parental controls",
+      "message": "Niños mayores ({ratings})"
+    },
+    "screenSettings_parentalControls_group2": {
+      "description": "Group 2 of the parental controls",
+      "message": "Adolescentes ({ratings})"
+    },
+    "screenSettings_parentalControls_group3": {
+      "description": "Group 3 of the parental controls",
+      "message": "Adultos ({ratings})"
+    },
+    "screenSettings_parentalControls_instructions": {
+      "description": "Description of the parental controls screen",
+      "message": "Selecciona la edad de visualización adecuada para Tubi. Tu selección determinará qué clasificaciones de películas y programas puedes ver en la aplicación. Si se modifica esta selección, pediremos que ingreses la contraseña de tu cuenta."
+    },
+    "screenSettings_menu_about": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Acerca de"
+    },
+    "screenSettings_menu_privacyPolicy": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Política de privacidad"
+    },
+    "screenSettings_menu_tos": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Términos de servicio"
+    },
+    "screenSettings_menu_signOut": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Cerrar sesión"
+    },
+    "screenSettings_parentalPassword_title": {
+      "description": "Directions for signed out users who attempt to change the parental controls",
+      "message": "Ingresa tu contraseña"
+    },
+    "screenSettings_parentalPassword_subtitle": {
+      "description": "Directions 2nd line for signed out users who attempt to change the parental controls",
+      "message": "para actualizar los controles parentales"
+    },
+    "screenSettings_parentalPassword_button_hide": {
+      "description": "Label of button on the password entry screen to hide the password",
+      "message": "Ocultar contraseña"
+    },
+    "screenSettings_parentalPassword_button_show": {
+      "description": "Label of button on the password entry screen to display the password",
+      "message": "Mostrar contraseña"
+    },
+    "screenSettings_error_parentalFailedChange_title": {
+      "description": "title of error screen when parental controls failed to update",
+      "message": "Actualización ha fallado"
+    },
+    "screenSettings_error_parentalFailedChange_description": {
+      "description": "description of error screen when parental controls failed to update",
+      "message": "Error al actualizar la configuración del control parental. Por favor, intenta volver a ingresar tu contraseña."
+    },
+    "screenSettings_error_parentalChanges": {
+      "description": "title of dialog message when parental controls has changed",
+      "message": "Cambio de configuración de controles parentales"
+    },
+    "screenSettings_error_parentalChanges_description_default": {
+      "description": "description of dialog message when parental controls has changed",
+      "message": "La configuración del control parental ha cambiado. Los controles parentales estarán protegidos con contraseña después de 5 minutos."
+    },
+    "screenSettings_error_parentalChanges_description_group0": {
+      "description": "Success message when parental controls has changed to group 0",
+      "message": "La configuración del control parental ha cambiado a Niños pequeños ({ratings}}). Los controles parentales estarán protegidos con contraseña después de 5 minutos."
+    },
+    "screenSettings_error_parentalChanges_description_group1": {
+      "description": "Success message when parental controls has changed to group 1",
+      "message": "La configuración del control parental ha cambiado a Niños mayores ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos."
+    },
+    "screenSettings_error_parentalChanges_description_group2": {
+      "description": "Success message when parental controls has changed to group 2",
+      "message": "La configuración del control parental ha cambiado a Adolescentes ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos."
+    },
+    "screenSettings_error_parentalChanges_description_group3": {
+      "description": "Success message when parental controls has changed to group 3",
+      "message": "La configuración del control parental ha cambiado a Adultos ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos."
+    },
+    "screenSettings_error_signInParental_description": {
+      "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
+      "message": "Debes iniciar sesión para ajustar los controles parentales"
+    },
+    "screenChannels_error_retrieve_message": {
+      "description": "Onscreen message to indicate channel content could not be gathered",
+      "message": "No se pudo recuperar el contenido de los canales."
+    },
+    "screenCategories_error_retrieve_message": {
+      "description": "Onscreen message to indicate categories content could not be gathered",
+      "message": "No se pudo recuperar el contenido de las categorías."
+    },
+    "screenHome_error_button_continue": {
+      "description": "Label of a button to continue",
+      "message": "Continuar"
+    },
+    "screenHome_error_fetchCategories_description": {
+      "description": "Onscreen message to indicate categories content could not be loaded",
+      "message": "No se pueden cargar algunas categorías."
+    },
+    "screenHome_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate home content could not be loaded",
+      "message": "No se puede cargar la pantalla de inicio de Tubi."
+    },
+    "screenDetails_button_trailer": {
+      "description": "Label of button to allow users to watch a preview of the current video title",
+      "message": "Ver tráiler"
+    },
+    "screenDetails_button_episodes": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title",
+      "message": "Lista de episodios"
+    },
+    "screenDetails_relatedTitles": {
+      "description": "Label of button to allow users to view other video titles related to the current video title",
+      "message": "Puede que también te guste"
+    },
+    "screenDetails_button_play": {
+      "description": "Label of button to allow users to play the current video title",
+      "message": "Ver"
+    },
+    "screenDetails_button_resume": {
+      "description": "Label of button to allow users to resume the current video title",
+      "message": "Reanudar"
+    },
+    "metadata_expiresIn_plural": {
+      "description": "label to indicate how long the user have to watch a video",
+      "message": "Caduca en {days} días"
+    },
+    "metadata_expiresIn_singular": {
+      "description": "label to indicate the user has excatly 1 day to watch a video",
+      "message": "Caduca en 1 día"
+    },
+    "metadata_directed": {
+      "description": "metadata label to indicate the directors of the current video title",
+      "message": "Dirigido por"
+    },
+    "metadata_starring": {
+      "description": "metadata label to indicate the actors of the current video title",
+      "message": "Protagonizado por"
+    },
+    "metadata_hoursAndMinutes": {
+      "description": "a duration listed in hours and minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{hours} h {minutes} min"
+    },
+    "metadata_hours": {
+      "description": "a duration listed in hours (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{hours} h"
+    },
+    "metadata_minutes": {
+      "description": "a duration listed in minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{minutes} min"
+    },
+    "metadata_seconds": {
+      "description": "a duration listed in seconds (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{seconds} sec"
+    },
+    "metadata_seasons_plural": {
+      "description": "Label of how many seasons of the current TV title",
+      "message": "{seasons} Temporadas"
+    },
+    "metadata_seasons_singular": {
+      "description": "Label for when the current TV title has excatly one season",
+      "message": "1 Temporada"
+    },
+    "metadata_series": {
+      "description": "Label to indicate a title is a TV series",
+      "message": "Series"
+    },
+    "screenEndCard_startingIn": {
+      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Comenzando en {seconds} s"
+    },
+    "videoPlayer_trailerTitle": {
+      "description": "Label for the video preview associated with the current video title",
+      "message": "Traíler ({title})"
+    },
+    "videoPlayer_adLoadingMessage": {
+      "description": "Message to indicate ads will play before playing video content",
+      "message": "Tu programa comenzará después de estos mensajes..."
+    },
+    "videoPlayer_error_failed_description": {
+      "description": "label for error messages to indicate 'failed'",
+      "message": "HA FALLADO"
+    },
+    "videoPlayer_error_invalidURL_description": {
+      "description": "Error message to indicate that the video URL is invalid.",
+      "message": "El URL del vídeo no es válido."
+    },
+    "videoPlayer_error_playback_description": {
+      "description": "Error message when video could not play",
+      "message": "Hubo un problema con la reproducción del video."
+    },
+    "videoPlayer_error_refresh_description": {
+      "description": "Error message when next video could not be played",
+      "message": "No se pudo actualizar ni reproducir el siguiente contenido."
+    },
+    "videoPlayer_adHeadsUp": {
+      "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Pausa publicitaria comienza en {seconds} s"
+    },
+    "goBack_categories": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESIONA REGRESAR PARA VOLVER A LAS CATEGORÍAS\n"
+    },
+    "goBack_channels": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESIONA REGRESAR PARA VOLVER A LOS CANALES"
+    },
+    "goBack_default": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESIONA REGRESAR PARA REGRESAR"
+    },
+    "goBack_videoPlayer_upNext": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "REGRESA PARA DESCARTAR"
+    },
+    "goBack_videoPlayer_controls": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESIONA REGRESAR PARA ESCONDER"
+    },
+    "goBack_menu": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESIONA REGRESAR PARA VOLVER AL MENÚ"
+    },
+    "goBack_home": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESIONA REGRESAR PARA VOLVER A INICIO"
+    },
+    "channel_name": {
+      "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+      "message": "Tubi - Películas y Series Gratis"
+    },
+    "channel_description": {
+      "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+      "message": "Disfruta de la mayor selección de películas y programas de televisión populares, ¡todo gratis!"
+    },
+    "channel_webDescription": {
+      "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
+      "message": "Ve miles de películas y series totalmente gratis. En Tubi puedes ver contenido 100% legal y de forma ilimitada. No se requiere tarjeta de crédito o suscripción. Solo tienes que descargar la aplicación, elige lo que quieras ver en donde tu quieras y disfruta del contenido con menos anuncios que la televisión. Tubi es el servicio más grande de streaming gratis que ofrece películas y series de televisión premiadas. Tenemos algo para todos: Comedias, dramas, familiares, clásicas, dramas coreanos, anime y más. ¡Descárga hoy y empieza a transmitir entretenimiento gratis!\n"
+    }
+  }
 End Function
