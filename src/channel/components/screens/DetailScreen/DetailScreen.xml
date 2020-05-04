@@ -11,6 +11,9 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -199,7 +202,15 @@
     <DetailMenuItemContentNode
       id="WatchTrailerMenuItem"
       iconUrl="pkg:/images/icon-trailer.png" />
-  
+
+    <Poster
+      id="leftCheveron"
+      visible="false"
+      uri="pkg:/images/left-chevron.png"
+      width="15"
+      height="27"
+      translation="[85,496]"/>
+      
     <Spinner
       id="DetailSpinner"
       visible="false"

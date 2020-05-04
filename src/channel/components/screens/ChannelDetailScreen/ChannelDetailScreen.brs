@@ -40,6 +40,19 @@ Function init()
   end if
 
   m.top.screenLevel = m.constants.ui.screenLevels.channelDetailScreen
+  
+  if getExperimentResource("roku2", "roku_safe_area").enabled = true
+    m.leftCheveron = m.top.findNode("leftCheveron")
+    m.leftCheveron.visible = true
+    m.VideoGrid.itemSpacing = [29,28]
+    m.VideoGrid.numColumns = 7
+
+    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
+    m.ScreenNavigationHint.translation = [192,85] 
+    m.InfoPanel.translation = [192,167] 
+    m.PageTitle.translation = [192,540]
+    m.VideoGrid.translation = [192,594]
+  end if
 End Function
 
 Function onThemeChange()

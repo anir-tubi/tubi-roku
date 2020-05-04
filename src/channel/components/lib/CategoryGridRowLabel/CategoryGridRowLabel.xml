@@ -3,6 +3,10 @@
   <script type="text/brightscript" uri="CategoryGridRowLabel.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+
   <interface>
     <!-- Incoming interface: populate children nodes with content values -->
     <field id="content" type="node"/>
@@ -21,7 +25,6 @@
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="34" />
     </Label>
-    
     <LayoutGroup
       id="CategoryCount"
       layoutDirection="horiz"

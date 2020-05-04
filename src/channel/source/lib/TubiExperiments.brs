@@ -45,6 +45,9 @@ Function TubiExperiments(constants) as Object
       roku: {
         roku_vitg_large : {"enabled": false}
       }
+      roku2: {
+        roku_safe_area : {"enabled": false}
+      }
     }
 
     'public methods

@@ -6,6 +6,13 @@ Function init()
   m.top.observeField("content", "onContentChange")
   m.FocusIndex.color = m.global.theme.focused
   m.global.observeField("theme", "onThemeChange")
+
+
+  if getExperimentResource("roku2", "roku_safe_area").enabled = true
+    m.CategoryCount = m.top.findNode("CategoryCount")
+    m.CategoryCount.translation = [1646,0]
+  end if
+
 End Function
 
 Function onThemeChange()
