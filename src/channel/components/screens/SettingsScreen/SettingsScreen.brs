@@ -169,7 +169,6 @@ Function onParentalSettingsReceived(msg)
 
       if userInfo <> invalid
         panel.selectItem = userInfo.parentalrating
-        m.top.remoteParentalSetting = userInfo.parentalrating
       end if
     end if
   end if
