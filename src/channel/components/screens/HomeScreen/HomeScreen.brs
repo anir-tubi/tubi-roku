@@ -61,20 +61,12 @@ Function init()
   m.contentAreaSlideAnimation = invalid
   m.infoPanelFadeAnimation = invalid
 
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
-    m.ScreenNavigationHint.translation = [192,85]
-    m.InfoPanel.translation = [192,163]
-    m.ContentArea.translation = [192,553]
-  end if
-
   ' Video in the grid constants
   m.vitgSlideAmt = 410  'the amount the grid slides up to fit the vitg content item
   m.vitgMaskOffsetDiff = 436  'the diff in the amount the content area mask is offset in the up direction for vitg
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
-
 End Function
 
 

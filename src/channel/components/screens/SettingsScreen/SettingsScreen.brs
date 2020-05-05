@@ -42,14 +42,6 @@ Function init()
 
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
-
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.PanelSet.translation = [170,414]
-    m.rightPaneloffset = [110,-199]
-    m.Title.translation = [192,230]
-    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
-    m.ScreenNavigationHint.translation = [192,85]
-  end if
 End Function
 
 

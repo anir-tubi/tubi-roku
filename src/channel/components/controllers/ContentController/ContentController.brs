@@ -128,10 +128,6 @@ Function init()
   ' holds state so we don't fire the app load beacon more than once
   m.appLoadedBeaconFired = false
 
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.SideNav.translation = [-32,0]
-  end if
-
   initVideoTracking()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"

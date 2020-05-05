@@ -35,12 +35,6 @@ Function init()
   m.listIsFocused = false
 
   m.top.screenLevel = m.constants.ui.screenLevels.episodeScreen
-
-
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.Info.translation = [192,61]
-    m.RowList.translation = [192,552]
-  end if 
 End Function
 
 
@@ -239,19 +233,10 @@ End Function
 Function focusGrid()
   m.RowList.setFocus(true)
   if m.global.constants.deviceInfo.limitedUi
-
-    if getExperimentResource("roku2", "roku_safe_area").enabled = true
-      m.RowList.translation = [192,m.RowList.translation[1]]
-    else 
-      m.RowList.translation = [85,m.RowList.translation[1]]
-    end if
+    m.RowList.translation = [85,m.RowList.translation[1]]
     m.Menu.translation = [-425,m.Menu.translation[1]]
   else
-    if getExperimentResource("roku2", "roku_safe_area").enabled = true
-      slideTo(m.RowList, [192,m.RowList.translation[1]], 0.5)
-    else 
-      slideTo(m.RowList, [85,m.RowList.translation[1]], 0.5)
-    end if
+    slideTo(m.RowList, [85,m.RowList.translation[1]], 0.5)
     slideTo(m.Menu, [-425,m.Menu.translation[1]], 0.5)
   end if
 End Function
@@ -265,18 +250,10 @@ Function focusMenu()
   m.Menu.setFocus(true)
   if m.global.constants.deviceInfo.limitedUi
     m.RowList.translation = [525,m.RowList.translation[1]]
-    if getExperimentResource("roku2", "roku_safe_area").enabled = true
-      m.Menu.translation = [172,m.Menu.translation[1]]
-    else 
-      m.Menu.translation = [65,m.Menu.translation[1]]
-    end if
+    m.Menu.translation = [65,m.Menu.translation[1]]
   else
     slideTo(m.RowList, [525,m.RowList.translation[1]], 0.5)
-    if getExperimentResource("roku2", "roku_safe_area").enabled = true
-      slideTo(m.Menu, [172,m.Menu.translation[1]], 0.5)
-    else 
-      slideTo(m.Menu, [65,m.Menu.translation[1]], 0.5)
-    end if
+    slideTo(m.Menu, [65,m.Menu.translation[1]], 0.5)
   end if
 End Function
 

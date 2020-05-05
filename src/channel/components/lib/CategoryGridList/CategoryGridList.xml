@@ -10,7 +10,6 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
-  
   <script type="text/brightscript" uri="../ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 

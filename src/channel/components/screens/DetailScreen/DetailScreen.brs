@@ -73,14 +73,6 @@ Function init()
   m.isChannelMenuSelected = false
 
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
-
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.leftCheveron = m.top.findNode("leftCheveron")
-    m.leftCheveron.visible = true
-    m.Info.translation = [192,123]
-    m.Menu.translation = [167,656]
-    m.RelatedContentGroup.translation = [192,945]
-  end if
 End Function
 
 

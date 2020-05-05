@@ -8,9 +8,6 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
-  
   <interface>
     <!-- INPUT -->
       <!-- Full content of the item to show details for -->

@@ -17,9 +17,6 @@
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
-
   <interface>
     <!-- INPUT -->
       <!-- content should be a container content node with a single channel content node filled with multiple item content nodes -->
@@ -115,15 +112,6 @@
         </Label>
       </LayoutGroup>
     </Group>
-
-    <Poster
-      id="leftCheveron"
-      visible="false"
-      uri="pkg:/images/left-chevron.png"
-      width="15"
-      height="27"
-      translation="[85,496]"/>
-
     <InfoPanel
       id="ChannelsInfoPanel"
       mode="category"

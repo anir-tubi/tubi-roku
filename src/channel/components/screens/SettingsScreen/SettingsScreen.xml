@@ -7,9 +7,6 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 
   <interface>
     <!-- INPUTS -->
