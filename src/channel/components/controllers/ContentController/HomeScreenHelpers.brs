@@ -18,28 +18,30 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
 
-    m.top.observeFieldScoped("reloadMovieUserCategoriesResponse", "onReloadUserCategoriesResponseInMovieScreen")
-    m.top.observeFieldScoped("reloadTVUserCategoriesResponse", "onReloadUserCategoriesResponseInTVScreen")
     
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
-    m.top.observeField("homescreenResponse", "onHomescreenResponse")
-    m.top.observeField("moviescreenResponse", "onMoviescreenResponse")
-    m.top.observeField("tvscreenResponse", "onTVscreenResponse")
-    
+
+    sContentMode = constants.ui.screenIds.homeScreen
+    if screenID = constants.ui.screenIds.homeScreen
+      m.top.observeField("homescreenResponse", "onHomescreenResponse")
+    else if screenID = constants.ui.screenIds.movieScreen
+      m.top.observeField("moviescreenResponse", "onMoviescreenResponse")
+      sContentMode = constants.ui.contentMode.movie
+      m.top.observeFieldScoped("reloadMovieUserCategoriesResponse", "onReloadUserCategoriesResponseInMovieScreen")
+    else if screenID = constants.ui.screenIds.tvScreen
+      sContentMode = constants.ui.contentMode.tv
+      m.top.observeField("tvscreenResponse", "onTVscreenResponse")
+      m.top.observeFieldScoped("reloadTVUserCategoriesResponse", "onReloadUserCategoriesResponseInTVScreen")
+    end if 
+    homeScreen.contentMode = sContentMode
+
     homeScreen.id = screenID
     homeScreen.signedIn = (authInfo <> invalid)
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
     homeScreen.canLoadCategories = true
-    sContentMode = constants.ui.screenIds.homeScreen
-    if homeScreen.id = constants.ui.screenIds.movieScreen
-      sContentMode = constants.ui.contentMode.movie
-    else if homeScreen.id = constants.ui.screenIds.tvScreen
-      sContentMode = constants.ui.contentMode.tv
-    end if
-    homeScreen.contentMode = sContentMode
-
     homeScreen.canLoadCategories = true
+
     fetchHomeScreen(homescreen)
     
     setInScreenCache(homeScreen)

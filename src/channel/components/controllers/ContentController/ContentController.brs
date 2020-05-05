@@ -658,7 +658,8 @@ Function setDirtyUserCategories(categoryId)
   tubiLog("ContentController.setDirtyUserCategories")
 
   if categoryId <> invalid
-    homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+    movieScreen = getFromScreenCache(m.constants.ui.screenIds.movieScreen)
+    tvScreen = getFromScreenCache(m.constants.ui.screenIds.tvScreen)
 
     'this will be an auth request if the user is logged in
     'auth request creation happens in metadataFetchTask
@@ -666,11 +667,15 @@ Function setDirtyUserCategories(categoryId)
     reqName = m.constants.reqNames.getCategory
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer())
 
-    '//Apply the movie and TV filters
-    optionMovie = {contentMode: m.constants.ui.contentMode.movie}
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadMovieUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionMovie)
-    optionTV = {contentMode: m.constants.ui.contentMode.tv}
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadTVUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionTV)
+    '//Apply the movie and TV filters if those screens exist
+    if movieScreen <> invalid
+      optionMovie = {contentMode: m.constants.ui.contentMode.movie}
+      m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadMovieUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionMovie)
+    end if
+    if tvScreen <> invalid
+      optionTV = {contentMode: m.constants.ui.contentMode.tv}
+      m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadTVUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionTV)
+    end if
   end if
 End Function
 
@@ -683,7 +688,7 @@ Function onReloadUserCategoriesResponse(msg)
   if categoryListScreen <> invalid
       categoryListScreen.reloadUserCategoriesResponse = handledRequest  
   end if
-  refreshStackedUserScreen(handledRequest.id)
+  refreshStackedUserScreenWithChangedCategory(handledRequest.id)
 End Function
 
 
@@ -774,11 +779,12 @@ Function refreshAllDetailScreens()
 End Function
 
 
-Function refreshStackedUserScreen(sScreenID)
-  ' Tell the screen associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0 
+' Content for a category has been updated. ANy screen that is displaying this category should be updated.
+Function refreshStackedUserScreenWithChangedCategory(sCategoryID)
+  ' Tell the screen that contains the categroy associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0 
   for i=0 to m.screenStack.getChildCount()-1
     screen = m.screenStack.getChild(i)
-    if screen <> invalid and screen.content <> invalid and screen.content.getChildCount() > 0 and screen.content.getChild(0).id  = sScreenID
+    if screen <> invalid and screen.content <> invalid and screen.content.getChildCount() > 0 and screen.content.getChild(0).id  = sCategoryID
       screen.content.getChild(0).validUntil = 0
     end if
   end for
