@@ -70,11 +70,8 @@
       
       <field id="transportVoiceRequest" type="assocarray" alwaysNotify="true"/>
       
-      <!-- animationLogoCompleted will be set true once animation logo is finished during app launch -->
-      <field id="animationLogoCompleted" type="boolean"/>
-      
-      <!-- fadeInRemoteComponent is used to fadeIn the ContentController screen -->
-      <field id="fadeInRemoteComponent" type="boolean"/>      
+      <!-- fadeInContentController will be set true once animation logo is finished during app launch -->
+      <field id="fadeInContentController" type="boolean"/>
       
     <!-- OUTPUT -->
       <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->

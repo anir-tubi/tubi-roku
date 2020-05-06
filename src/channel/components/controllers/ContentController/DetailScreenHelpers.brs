@@ -10,7 +10,7 @@ Function showDetailScreen(content)
     detailScreen = CreateObject("roSGNode", "DetailScreen")
     detailScreen.id = m.constants.ui.screenIds.detailScreen
     detailScreen.trackingLoadStartTime = Uptime(0)
-    detailScreen.shouldFocusWhenPushed = m.top.animationLogoCompleted
+    detailScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     detailScreen.observeFieldScoped("playSelected", "onPlay")
     detailScreen.observeFieldScoped("resumeSelected", "onResume")
     detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
@@ -454,7 +454,7 @@ Function onSingleContentResponse(msg) As Void
   end if
   
   ' making sure the app launch animation logo is completed before invoking playHelper/resumeHelper
-  if m.top.animationLogoCompleted = true or afterFn = episodesHelper
+  if m.top.fadeInContentController = true or afterFn = episodesHelper
     if afterFn <> invalid
       afterFn(detailScreen)
     end if

@@ -162,11 +162,10 @@ Function runChannel(startupArgs, constants, log, request) As Void
             controller.startupArgs = startupArgs
             
             starterController = tubiScene.findNode("StarterController")
-            if starterController <> invalid and starterController.fadeInRemoteComponent = true
+            if starterController <> invalid and starterController.fadeInRemoteComponent = true and controller.fadeInContentController <> true
               starterController.unobserveField("fadeInRemoteComponent")
               tubiScene.fadeOutSpinner = true  
-              controller.fadeInRemoteComponent = true    
-              controller.animationLogoCompleted = true
+              controller.fadeInContentController = true
             end if
             
             if suitestLib <> invalid
@@ -223,18 +222,17 @@ Function runChannel(startupArgs, constants, log, request) As Void
         componentTimer.mark()
         remoteLibrary.observeField("loadStatus", port)
         remoteLibrary.uri = msg.getData()
-      else if msg.GetField() = "fadeOutCustomSplash" 
+      else if msg.GetField() = "fadeOutCustomSplash"
         starterController = msg.GetRoSGNode()
         starterController.unobserveField("fadeOutCustomSplash")
         tubiScene.fadeOutCustomSplash = true
       else if msg.GetField() = "fadeInRemoteComponent" 
         starterController = msg.GetRoSGNode()
-        starterController.unobserveField("fadeInRemoteComponent")
         contentController = tubiScene.findNode("ContentController")
-        if contentController <> invalid
+        if contentController <> invalid and contentController.fadeInContentController <> true
+          starterController.unobserveField("fadeInRemoteComponent")
           tubiScene.fadeOutSpinner = true 
-          contentController.fadeInRemoteComponent = true    
-          contentController.animationLogoCompleted = true
+          contentController.fadeInContentController = true
         end if
       else if msg.GetField() = "removeStartUpScreens" 
         contentController = msg.GetRoSGNode()

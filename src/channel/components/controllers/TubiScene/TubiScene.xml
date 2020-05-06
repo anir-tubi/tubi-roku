@@ -25,7 +25,7 @@
   
     <!-- fadeOutCustomSplash is used to fadeOut the CustomSplashPoster -->
     <field id="fadeOutCustomSplash" type="boolean"/>
-    
+
     <!-- fadeOutSpinner is used to fadeOut the TubiSceneSpinner -->
     <field id="fadeOutSpinner" type="boolean"/>    
     
@@ -38,12 +38,13 @@
 
     <ComponentLibrary
       id="TubiRemoteLibrary"/>
-   
+
    <Spinner
       id="TubiSceneSpinner"
       width="1920"
+      opacity="0"
       height="1080"/>
-      
+   
     <Poster
         id="customSplashPoster"
         width="1920"

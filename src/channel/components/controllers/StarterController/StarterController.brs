@@ -87,7 +87,7 @@ Function processAnimationLogo()
   ' customSplashTimerCount is number of timer the timer event got fired
   m.customSplashTimerCount = 0
   
-  ' videoPlayed helps to set animationLogoCompleted=true to ContentController
+  ' videoPlayed helps to set fadeInRemoteComponent=true
   m.videoPlayed = false
   
   m.top.observeField("removeStartUpScreens", "onRemoveStartUpScreens")

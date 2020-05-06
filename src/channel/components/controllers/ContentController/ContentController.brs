@@ -33,10 +33,8 @@ Function init()
   m.startupArgsReceived = false
   m.top.observeFieldScoped("startupArgs", "onStartupArgs")
   m.top.observeFieldScoped("roInputInfo", "onInputInfoReceived")
-  m.top.observeFieldScoped("animationLogoCompleted", "onAnimationLogoCompleted")
+  m.top.observeFieldScoped("fadeInContentController", "onFadeInContentController")
   
-  m.top.observeField("fadeInRemoteComponent", "onFadeInRemoteComponent")
-
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
   m.global.addField("metadataFetchTask", "node", false)
@@ -135,8 +133,11 @@ Function init()
 End Function
 
 
-' onAnimationLogoCompleted callback will be triggered once the launch animation logo got finished
-Function onAnimationLogoCompleted()
+' onFadeInContentController callback will be triggered once the launch animation logo got finished
+Function onFadeInContentController()
+
+  fadeInUiGroup = customFadeIn(m.uiGroup, 2, 0.5)
+  fadeInUiGroup.observeField("state", "onUiGroupFadeStateChange")
 
   currentScreen = currentScreen()
   if currentScreen <> invalid and currentScreen.isInFocusChain() = false
@@ -1080,14 +1081,6 @@ function showHideSpinner(visible)
   m.spinner.visible = visible
 
 end function
-
-
-Function onFadeInRemoteComponent()
-
-  fadeInUiGroup = customFadeIn(m.uiGroup, 2, 0)
-  fadeInUiGroup.observeField("state", "onUiGroupFadeStateChange")
-
-End Function
 
 
 Function onUiGroupFadeStateChange(msg)

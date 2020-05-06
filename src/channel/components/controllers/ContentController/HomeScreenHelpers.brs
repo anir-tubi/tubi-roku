@@ -13,7 +13,7 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     pushScreen(homeScreen, true, true)
   else
     homeScreen = CreateObject("roSGNode", "HomeScreen")
-    homeScreen.shouldFocusWhenPushed = m.top.animationLogoCompleted
+    homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
@@ -130,7 +130,6 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
 
         '//Stop loading of homescreen which will refresh the screen's content
         homeScreen.isLoading = false
-        showHideSpinner(false)
       else
         ' if we were loading in the background, don't show an error modal
         if homeScreen.isInFocusChain()
