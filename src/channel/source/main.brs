@@ -93,6 +93,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
     sgGlobal.setField("constants", constants)
     sgGlobal.setField("theme", constants.ui.themes.default)
     controller = loadPackagedComponents(tubiScene, port, startupArgs)
+    controller.fadeInContentController = true
     componentsLoaded = true
     componentTimer = invalid
     if suitestLib <> invalid
@@ -238,7 +239,10 @@ Function runChannel(startupArgs, constants, log, request) As Void
         contentController = msg.GetRoSGNode()
         contentController.unobserveField("removeStartUpScreens")
         starterController = tubiScene.findNode("StarterController")
-        starterController.removeStartUpScreens = true
+        tubiScene.fadeOutCustomSplash = true
+        if starterController <> invalid
+          starterController.removeStartUpScreens = true
+        end if
       end if
     end if
 
