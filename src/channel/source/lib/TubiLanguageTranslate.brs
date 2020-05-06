@@ -81,7 +81,7 @@ Function getTranslationAA(sLocaleID as String) as Boolean
   if sLocaleID = "en_us"
     parsed = getTranslation_en_US()
   else if sLocaleID = "es_es"
-    parsed = getTranslation_es_MX()
+    ' parsed = getTranslation_es_MX()
   else if sLocaleID = "en_gb"
   else if sLocaleID = "fr_ca"
   else if sLocaleID = "de_de"

@@ -56,9 +56,9 @@ Function init()
   m.top.observeField("kidsMode", "onKidsModeChange")
   m.logo = m.top.findNode("tubiLogo")
   m.logoKids = m.top.findNode("tubiKidsLogo")
-  if m.constants.deviceInfo.language = "es"
-    m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-xlarge.png"
-  end if
+  ' if m.constants.deviceInfo.language = "es"
+  '   m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-xlarge.png"
+  ' end if
 
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
