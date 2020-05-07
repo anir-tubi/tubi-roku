@@ -29,6 +29,11 @@ End Function
 Function getRatingStrings(nRatingIndex)
   sRatingsReturn = ""
   countryCode = m.constants.deviceInfo.countryCode
+  if m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.country <> invalid
+    countryCode = m.constants.externalConfig.info.country
+  end if
+  countryCode = UCase(countryCode)
+
   aRatings = m.constants.ui.ratings[countryCode]
 
   if aRatings = invalid
