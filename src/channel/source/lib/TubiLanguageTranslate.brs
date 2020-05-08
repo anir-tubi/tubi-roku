@@ -711,6 +711,7 @@ Function getTranslation_en_US()
 End Function
 
 
+' ::NOTE:: do not directly modify this function. Modify the strings found in Crowdin and then run the gulp download command described in the repo's readMe file.
 ' Return the associative array associated with the esMX locale
 Function getTranslation_es_MX()
   return {
@@ -836,15 +837,15 @@ Function getTranslation_es_MX()
     },
     "dialog_channelsDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
-      "message": "Canales desactivados"
+      "message": "Canales desactivado"
     },
     "dialog_moviesDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
-      "message": "Películas desactivadas"
+      "message": "Películas desactivado"
     },
     "dialog_tvDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
-      "message": "Televisión desactivada"
+      "message": "Series desactivado"
     },
     "dialog_sideNavItemDisabled_description": {
       "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",
