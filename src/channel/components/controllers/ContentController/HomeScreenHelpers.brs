@@ -10,6 +10,8 @@ Function showHomeScreen(constants, authInfo, screenID = "")
   end if
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
+    ' this is required for setting focus to homescreen after activation/signout
+    homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController 
     pushScreen(homeScreen, true, true)
   else
     homeScreen = CreateObject("roSGNode", "HomeScreen")
