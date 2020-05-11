@@ -241,7 +241,7 @@ Function onCurrFocusRowChange()
   if categoryEnteringFocus <> invalid and categoryEnteringFocus.id = "deep_cuts" and m.constants.deviceInfo.limitedUI <> true
     ' send experiment analytics (exposure event) for large and small vitg.
     ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
-    getExperimentResource("roku", "roku_vitg_large")
+    ' getExperimentResource("roku", "roku_vitg_large")
   end if
 
   if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large

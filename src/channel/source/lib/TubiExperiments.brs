@@ -45,7 +45,6 @@ Function TubiExperiments(constants) as Object
     }
     defaultResources: {
       roku: {
-        roku_vitg_large : {"enabled": false}
       }
       roku2: {
         roku_animation_logo : {"enabled" : false}
