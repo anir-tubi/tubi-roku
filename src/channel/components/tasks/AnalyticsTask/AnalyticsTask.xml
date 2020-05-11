@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - AnalyticsTask
+ -
+ - This task makes requests to the analytics API
+ -
+ --> 
+<component name="AnalyticsTask" extends="Task">
+
+    <script type="text/brightscript" uri="AnalyticsTask.brs" />
+    <script type="text/brightscript" uri="../../../source/Log.brs" />
+    <script type="text/brightscript" uri="../../../source/Request.brs" />
+    <script type="text/brightscript" uri="../../../source/Auth.brs" />
+    <script type="text/brightscript" uri="../../../source/TubiTracking.brs" />
+    
+    <interface>
+      <!-- INPUT -->
+        <field id="constants" type="assocArray" />
+        <field id="experimentTracking" type="assocArray" />
+    </interface>  
+      
+</component>

@@ -148,6 +148,7 @@ function buildInstalled() {
       '!src/channel/**/*.md',
       '!src/channel/components/controllers/StarterController/**',
       '!src/channel/components/tasks/ExperimentsTask/**',
+      '!src/channel/components/tasks/AnalyticsTask/**',
       '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs'
     ];
 
@@ -214,6 +215,15 @@ function buildStarter() {
     let experimentsTaskSrcOptions = {
       base: 'src/channel/components/tasks'
     };
+    
+    // REMOVE ANALYTICSTASK AND ITS REFERENCES ONCE THE SOUNDID EXPERIMENT IS DONE
+    // include AnalyticsTask in starterComponents
+    let analyticsTaskSrc = [
+      'src/channel/components/tasks/AnalyticsTask/**/*'
+    ];
+    let analyticsTaskSrcOptions = {
+      base: 'src/channel/components/tasks'
+    };    
 
     // include Constants in starter components
     let constantsSrc = [
@@ -237,6 +247,8 @@ function buildStarter() {
       'src/channel/source/lib/Log.brs',
       'src/channel/source/lib/TubiExperiments.brs',
       'src/channel/source/lib/TubiExternalConfig.brs',
+      'src/channel/source/lib/TubiTracking.brs',
+      'src/channel/source/lib/Auth.brs',
     ];
     let sourceLibsSrcOptions = {
       base: 'src/channel/source/lib/'
@@ -256,6 +268,8 @@ function buildStarter() {
         .pipe(dest('build/starter/components/')),
       collect(experimentsTaskSrc, experimentsTaskSrcOptions)
         .pipe(dest('build/starter/components/')),
+      collect(analyticsTaskSrc, analyticsTaskSrcOptions)
+        .pipe(dest('build/starter/components/')),        
       collect(constantsSrc, constantsSrcOptions)
         .pipe(dest('build/starter/')),
       collect(genUtilSrc, genUtilSrcOptions)
@@ -301,6 +315,7 @@ function buildRemote() {
       '!src/channel/components/tests/**',
       '!src/channel/components/controllers/StarterController/**',
       '!src/channel/components/tasks/ExperimentsTask/**',
+      '!src/channel/components/tasks/AnalyticsTask/**',
       '!src/channel/source/3rdparty/ComponentTestFramework.brs',
       '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs',
       '!src/channel/source/3rdparty/roku/UnitTestFramework.brs',
