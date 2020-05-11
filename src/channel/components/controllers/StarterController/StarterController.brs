@@ -135,7 +135,6 @@ Function playAnimationLogo()
 
   if m.bufferingCompleted = true and m.customSplashTimerCount >= m.splashScreenMin 
     m.top.fadeOutCustomSplash = true
-    customFadeIn(m.startupScreens, 1, 0)
     m.videoPlayed = true
     m.animationLogo.control = "play"
   end if
@@ -144,11 +143,20 @@ End Function
 
 
 ' onBufferingStatus callback triggered on every videoplayer buffering percent
+' When the buffering percentage reaches 33%, we call playAnimationLogo() will sets the animationLogo
+' video node control to play. The buffering percent will only go above 33% if control is set to play.
+' Then, once the buffering percentage has reached 99% we fade in the video player as part of the
+' m.startupScreens group.
 Function onBufferingStatus(msg)
 
   buffering = msg.GetData()
-  if buffering <> invalid and buffering.percentage >= 33
+  ' we are fadingIn startupScreens(VideoNode) only when the buffering percent is >= 99% 
+  ' this is to avoid black(videoNode) screen appearing before the video starts playing especially on slow internet connection
+  if buffering <> invalid and buffering.percentage >= 99
     m.animationLogo.unobserveField("bufferingStatus")
+    customFadeIn(m.startupScreens, 0.5, 0)
+  ' starting the playback when the buffering percent is >= 33%
+  else if buffering <> invalid and buffering.percentage >= 33 and m.bufferingCompleted = false  
     m.bufferingCompleted = true
     playAnimationLogo()
   end if
