@@ -1013,7 +1013,7 @@ Function getTranslation_es_MX()
     },
     "screenDetails_error_addQueue_buttonRegister": {
       "description": "Label of button to sign in/register",
-      "message": "Iniciar sesión o registrarse"
+      "message": "Entra o Regístrate"
     },
     "screenDetails_error_getContent_description": {
       "description": "Description of error when app is not able to get content.",
