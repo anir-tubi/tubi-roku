@@ -1,7 +1,7 @@
 Function init()
   m.constants = getConstants()
 
-  m.animationLogoEnabled = false
+  m.animationLogoEnabled = invalid
   
   processAnimationLogo()
   
@@ -62,7 +62,7 @@ End Function
 Function onExperimentsInfoReturned(msg)
   m.constants.experiments.info = msg.getData()
   m.experiments = TubiExperiments(m.constants)
-  m.animationLogoEnabled = m.experiments.getExperimentResource("roku2", "roku_animation_logo").enabled
+  m.animationLogoEnabled = m.experiments.getExperimentResource("roku2", "roku_animation_logo").roku_animation_logo
   m.hasExperiments = true
   onUrlRequest()
 End Function
@@ -137,10 +137,12 @@ End Function
 
 Function playAnimationLogo()
 
-  if m.animationLogoEnabled and m.bufferingCompleted = true and m.customSplashTimerCount >= m.splashScreenMin 
+  if m.animationLogoEnabled = true and m.bufferingCompleted = true and m.customSplashTimerCount >= m.splashScreenMin 
     m.top.fadeOutCustomSplash = true
     m.videoPlayed = true
     m.animationLogo.control = "play"
+    sendExposureEvent()
+  else if m.animationLogoEnabled = false
     sendExposureEvent()
   end if
   
@@ -149,14 +151,18 @@ End Function
 
 Function sendExposureEvent()
 
-  experimentTracking = m.experiments.getExperimentTracking("roku2", "roku_animation_logo")
+  if m.exposureSent <> true
+    experimentTracking = m.experiments.getExperimentTracking("roku2", "roku_animation_logo")
 
-  if experimentTracking <> invalid and experimentTracking.type <> invalid
-    m.analyticsTask = m.top.createChild("AnalyticsTask")
-    m.analyticsTask.experimentTracking = experimentTracking
-    m.analyticsTask.constants = m.constants
-    m.analyticsTask.control = "RUN"
-  end if  
+    if experimentTracking <> invalid and experimentTracking.type <> invalid
+      m.analyticsTask = m.top.createChild("AnalyticsTask")
+      m.analyticsTask.experimentTracking = experimentTracking
+      m.analyticsTask.constants = m.constants
+      m.analyticsTask.control = "RUN"
+    end if
+
+    m.exposureSent = true
+  end if
     
 End Function
 

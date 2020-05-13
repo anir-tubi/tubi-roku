@@ -47,7 +47,7 @@ Function TubiExperiments(constants) as Object
       roku: {
       }
       roku2: {
-        roku_animation_logo : {"enabled" : false}
+        roku_animation_logo : {"roku_animation_logo" : false}
       }
     }
 
