@@ -368,7 +368,7 @@ Function getTranslation_en_US()
       "message": "Search for movies, TV shows, and people"
     },
     "screenSearch_kidsWarning": {
-      "description": "More directions on the search screen to suggest switching to kids mode",
+      "description": "More directions on the search screen to suggest switching to kids mode.  Should be limited to be around 40 characters or fewer.",
       "message": "Switch to Kids for kids safe search results"
     },
     "screenSearch_loading": {
@@ -381,11 +381,11 @@ Function getTranslation_en_US()
     },
     "screenDetails_button_queue": {
       "description": "label of the button that will add the video title to the user's list",
-      "message": "Add to queue"
+      "message": "Add to My List"
     },
     "screenDetails_button_noQueue": {
       "description": "label of the button that will remove the video title from the user's list",
-      "message": "Remove from queue"
+      "message": "Remove from My List"
     },
     "screenDetails_button_noHistory": {
       "description": "label of the button that will remove the video title from the user's viewing history",
@@ -405,7 +405,7 @@ Function getTranslation_en_US()
     },
     "screenDetails_error_addQueue_description": {
       "description": "Description of the warning dialog when user is attempting to add an item to their liost but are not signed in",
-      "message": "You must be signed in to add a title to your queue."
+      "message": "You must be signed in to add a title to your list."
     },
     "screenDetails_error_addQueue_buttonRegister": {
       "description": "Label of button to sign in/register",
@@ -417,11 +417,11 @@ Function getTranslation_en_US()
     },
     "screenDetails_error_queue_description": {
       "description": "Error message when video is not added to the user's list.",
-      "message": "Something went wrong while trying to add the content to your queue."
+      "message": "Something went wrong while trying to add the content to your list."
     },
     "screenDetails_error_noQueue_description": {
       "description": "Error message when video is not removed from the user's list.",
-      "message": "Something went wrong while removing the content from your queue."
+      "message": "Something went wrong while removing the content from your list."
     },
     "screenDetails_error_noHistory_description": {
       "description": "Error message when video is not removed from the user's viewing history.",
@@ -429,7 +429,7 @@ Function getTranslation_en_US()
     },
     "screenSettings_signIn_description": {
       "description": "Directions for the signin page",
-      "message": "Sign in to Tubi. Access your Queue and Continue Watching lists across your devices."
+      "message": "Sign in to Tubi. Access My List and Continue Watching lists across your devices."
     },
     "screenSettings_signOut_description": {
       "description": "Description on SignIn page when user is signed in",
