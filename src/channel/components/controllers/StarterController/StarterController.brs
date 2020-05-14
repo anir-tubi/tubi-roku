@@ -70,6 +70,10 @@ End Function
 
 Function onExternalConfigInfoReturned(msg)
   m.constants.externalConfig.info = msg.getData()
+  if m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.country <> invalid
+    m.constants.deviceInfo.countryCode = UCase(m.constants.externalConfig.info.country)
+  end if
+
   m.hasRemoteConfigs = true
   onUrlRequest()
 End Function

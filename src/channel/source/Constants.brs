@@ -187,10 +187,13 @@ Function getConstants()
     constants.deviceInfo.displaySize = di.GetDisplaySize()
     constants.deviceInfo.displayWidth = di.GetDisplaySize().w
     constants.deviceInfo.displayHeight = di.GetDisplaySize().h
-    constants.deviceInfo.countryCode = di.GetUserCountryCode()
-    if constants.deviceInfo.countryCode <> invalid
-      constants.deviceInfo.countryCode = UCase(constants.deviceInfo.countryCode)
+    constants.deviceInfo.rokuCountryCode = di.GetUserCountryCode()
+    if constants.deviceInfo.rokuCountryCode <> invalid
+      'rokuCountryCode will be used for the value of countryCode, unless it is overriden by externalConfig.info.country. 
+      'Keep a record of the otiginal rokuCountryCode value in case we ever need to know the non-overwritten value.
+      constants.deviceInfo.rokuCountryCode = UCase(constants.deviceInfo.rokuCountryCode)
     end if
+    constants.deviceInfo.countryCode = constants.deviceInfo.rokuCountryCode
     constants.deviceInfo.channelStore = di.GetCountryCode()  'some channel store strings look like country codes
     constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.fastCpu = fastCpu
