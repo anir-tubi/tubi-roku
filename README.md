@@ -387,21 +387,27 @@ We may want to see how a new feature will affect the app's metrics from a small 
 The app stores all of its static text for various languages centrally. If you need to make a change, you should follow the below procedures.
 
 If you need to make a change or addition to the American English text
-- Modify the file /translations/en-US.json 
+- Create a new branch and modify the file /translations/en-US.json 
 
-- Then run the following command line within the project's root folder, where "KEY" is the key used for our crowdin account: 
+- Then run the following command line within the project's root folder: 
+	```
+  gulp update_local_translations
+  ```
+  This will modify the TubiLanguageTranslate.brs to include the new English text 
+
+- Once your branch has been merged into master, then run the following command line within the project's root folder to upload your approved changes to the Crowdin server. "KEY" is the key used for our crowdin account. 
 	```
   gulp upload_translations --crowdinKey "KEY"
   ```
-- This will do two things:
-  - Modify the TubiLanguageTranslate.brs to include the new English text
+  This upload command will do two things:
+  - Modify the TubiLanguageTranslate.brs to include the new English text (just in case you skipped the previous step).
 
   - Upload the new change to the Crowdin server so the change can be recorded and our translators can work on obtaining translations for the new change.
 
 If you need to make a change to text that is not the default English, then log into [Crowdin](https://crowdin.com/project/tubiapps) and adjust the translation. Then you will need to follow the directions on how to update the app with the latest translations.
 
 
-If you need to get the latest translations from the Crowdin servers, then run the below command line within the project's root folder, where "KEY" is the key used for our crowdin account. This will modify the TubiLanguageTranslate.brs to contain all the translations available within Crowdin.
+If you need to get the latest translations from the Crowdin servers, then create a new GIT branch and run the below command line within the project's root folder, where "KEY" is the key used for our crowdin account. This will modify the TubiLanguageTranslate.brs to contain all the translations available within Crowdin. You later need to create a PR to start the process of getting the new translations merged to the master branch.
   
   ```
   gulp download_translations --crowdinKey "KEY"

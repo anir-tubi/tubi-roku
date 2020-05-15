@@ -24,7 +24,7 @@ const {createManifest, createSettings} = require('./js/build');
 const {keypress, deeplink, uploadPkg, signPkg} = require('./js/network');
 
 //Functions to upload and download static string translations  
-const {downloadTranslations, uploadTranslations} = require('./js/translate');
+const {downloadTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
 
 // provide a custom error so as to not get a full stack trace which will be misleading
 // in the case that the error is not with the code, but rather with git or aws or something else.
@@ -637,5 +637,6 @@ exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
 exports.release = series(setProduction, bumpBuild, tagBuild, exports.build, packageAll);
 
 //command lines related to the crowdin language translations
-exports.upload_translations = uploadTranslations;
+exports.update_local_translations = updateLocalTranslations;
+exports.upload_translations = series(updateLocalTranslations, uploadTranslations);
 exports.download_translations = downloadTranslations;

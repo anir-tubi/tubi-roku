@@ -14,6 +14,9 @@ const crowdinConfig = {
   "crowdinBaseDirectory": "roku"  
 }
 
+const _sLocalTranslationFilename = "translations/en-US.json";
+const _sLocalTranslationFilePath = `${process.cwd()}/${_sLocalTranslationFilename}`
+
 // fetch command line arguments and replace params in crowdinConfig. Right now it just replaces the "crowdinKey"
 // @Source: https://www.sitepoint.com/pass-parameters-gulp-tasks/
 const arg = (argList => {
@@ -257,35 +260,36 @@ function makeGetRequest(options) {
   });
 }
 
+//update the English strings within the translation BRS file with the latest version of the US English locale file
+exports.updateLocalTranslations = function(done) {
+  //update the BRS file with the American English file before uploading to Crowdin
+  console.log("Updating the BRS file with the latest version found in: ", _sLocalTranslationFilePath)
+  const localeData = fs.readFileSync(_sLocalTranslationFilePath, 'utf-8');
+  writeLocaleDataToBRS_sync("en-US", localeData);
+
+  console.log('\nFINISHED UPDATING THE ENGLISH STRINGS IN THE BRS FILE WITH THE LOCAL ENGLISH TRANSLATION FILE');
+  
+  done();  //inform gulp that the task has completed.
+}
 
 //upload the latest version of the US English locale file to crowdin
-exports.uploadTranslations = async function () {
+exports.uploadTranslations = async function() {
   if(crowdinConfig.crowdinKey !== undefined && crowdinConfig.crowdinKey !== ""){
-    console.log('START UPDATING THE SOURCE TRANSLATION FILE TO CROWDIN');
-    const sFileName = "translations/en-US.json";
-    const filePath = `${process.cwd()}/${sFileName}` 
-
-
-    //update the BRS file with the American English file before uploading to Crowdin
-    console.log("Updating the BRS file with the latest version found in: ", filePath)
-    const localeData = fs.readFileSync(filePath, 'utf-8');
-    writeLocaleDataToBRS_sync("en-US", localeData);
-
-    const crowdinPath = `${crowdinConfig.crowdinBaseDirectory}/${sFileName}`;
-    const updateFileResponse = await updateFilesRequest(filePath, crowdinPath);
+    const crowdinPath = `${crowdinConfig.crowdinBaseDirectory}/${_sLocalTranslationFilename}`;
+    const updateFileResponse = await updateFilesRequest(_sLocalTranslationFilePath, crowdinPath);
     if (updateFileResponse.success) {
       console.log('\nSUCCESS! FINISHED UPLOADING THE TRANSLATION FILE TO CROWDIN');
     } else {
       console.log('\nERROR UPLOADING THE TRANSLATION FILE TO CROWDIN \n', updateFileResponse.error)
     }
   } else {
-    console.log('COULD NOT DOWNLOAD TRANSLATIONS. MISSING CROWDIN KEY EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_KEY) OR COMMAND LINE PARAMETER');
+    console.log('MISSING CROWDIN KEY EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_KEY) OR COMMAND LINE PARAMETER');
   }
 }
 
 
 //Main function that initiates the download of any locale translation files from crowdlin
-exports.downloadTranslations = async function () {
+exports.downloadTranslations = async function() {
   if(crowdinConfig.crowdinKey !== undefined && crowdinConfig.crowdinKey !== ""){
     console.log('START DOWNLOADING TRANSLATIONS FROM CROWDIN');
     const buildResponse = await triggerCrowdinBuild();
