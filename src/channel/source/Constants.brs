@@ -148,15 +148,13 @@ Function getConstants()
 
     'Use newer APIs over deprecated APIs when appropriate
     deviceInfoRegSection = "deviceinfo"
-    if FindMemberFunction(di, "GetDeviceUniqueId") <> invalid and firmwareVersion < 9.1 and di.GetDeviceUniqueId() <> "000000000000"
-      constants.deviceInfo.deviceId = di.GetDeviceUniqueId()
-      RegWrite("deviceId", constants.deviceInfo.deviceId, deviceInfoRegSection)
-    else if FindMemberFunction(di, "GetChannelClientId") <> invalid
+    if FindMemberFunction(di, "GetChannelClientId") <> invalid
       storedDeviceId = RegRead("deviceId", deviceInfoRegSection)
       if storedDeviceId <> invalid and storedDeviceId <> "000000000000"
         constants.deviceInfo.deviceId = storedDeviceId
       else
         constants.deviceInfo.deviceId = di.GetChannelClientId()
+        RegWrite("deviceId", constants.deviceInfo.deviceId, deviceInfoRegSection)
       end if
     else
       constants.deviceInfo.deviceId = "noid"

@@ -191,7 +191,7 @@ else if FindMemberFunction(di, "GetClientTrackingId") <> invalid
 uniqueId = di.GetClientTrackingId()
 else if FindMemberFunction(di, "GetPublisherId") <> invalid
 uniqueId = di.GetPublisherId()
-else if FindMemberFunction(di, "GetDeviceUniqueId") <> invalid
+else if FindMemberFunction(di, "GetChannelClientId") <> invalid
 uniqueId = di.GetPublisherId()
 else
 uniqueId = ""
