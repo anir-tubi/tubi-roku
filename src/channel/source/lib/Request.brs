@@ -63,8 +63,8 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
           end if
         end if
       end if
-      if mergedOptions[o].DoesExist("Content-Language") = false
-        mergedOptions[o].Append({"Content-Language": m.getLocale()})
+      if mergedOptions[o].DoesExist("Accept-Language") = false
+        mergedOptions[o].Append({"Accept-Language": m.getLocale()})
       end if
     end if
     
