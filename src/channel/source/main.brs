@@ -52,10 +52,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
   'run SceneGraph tests if in test mode
   if constants.settings.mode = "test"
     sgGlobal.setField("theme", constants.ui.themes.default) 'set theme for testing purposes
-    Runner = TestRunner()
-    Runner.SetTestsDirectory("pkg:/source/tests")
-    Runner.logger.SetVerbosity(2)
-    Runner.Run()
+    if (type(Rooibos__Init) = "Function") then Rooibos__Init()
     return
   end if
 

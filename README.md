@@ -85,7 +85,17 @@ __Gulp options__
 
 # Test
 
-1\. Unit tests - run on a sideloaded channel
+1\. Unit tests - run on a sideloaded channel using the Rooibos test framework.
+
+For more info on setting up tests in Rooibos, please see:
+
+https://github.com/georgejecook/rooibos/blob/master/docs/index.md#creating-test-suites
+
+For API documentation (ie. what asserts can be run), please see:
+
+https://georgejecook.github.io/rooibos/
+
+To run unit tests, run the following command:
 
 `$ gulp install --test`
 
@@ -387,15 +397,15 @@ We may want to see how a new feature will affect the app's metrics from a small 
 The app stores all of its static text for various languages centrally. If you need to make a change, you should follow the below procedures.
 
 If you need to make a change or addition to the American English text
-- Create a new branch and modify the file /translations/en-US.json 
+- Create a new branch and modify the file /translations/en-US.json
 
-- Then run the following command line within the project's root folder: 
+- Then run the following command line within the project's root folder:
 	```
   gulp update_local_translations
   ```
-  This will modify the TubiLanguageTranslate.brs to include the new English text 
+  This will modify the TubiLanguageTranslate.brs to include the new English text
 
-- Once your branch has been merged into master, then run the following command line within the project's root folder to upload your approved changes to the Crowdin server. "KEY" is the key used for our crowdin account. 
+- Once your branch has been merged into master, then run the following command line within the project's root folder to upload your approved changes to the Crowdin server. "KEY" is the key used for our crowdin account.
 	```
   gulp upload_translations --crowdinKey "KEY"
   ```
@@ -408,7 +418,7 @@ If you need to make a change to text that is not the default English, then log i
 
 
 If you need to get the latest translations from the Crowdin servers, then create a new GIT branch and run the below command line within the project's root folder, where "KEY" is the key used for our crowdin account. This will modify the TubiLanguageTranslate.brs to contain all the translations available within Crowdin. You later need to create a PR to start the process of getting the new translations merged to the master branch.
-  
+
   ```
   gulp download_translations --crowdinKey "KEY"
   ```

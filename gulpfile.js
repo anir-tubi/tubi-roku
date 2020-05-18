@@ -14,6 +14,7 @@ const http = require('http');
 const mkdirp = require('mkdirp');
 const request = require('request');
 const shell = require('shelljs');
+const { RooibosProcessor, createProcessorConfig, ProcessorConfig } = require('rooibos-cli');
 // Uncomment the next line if there are connection issues to the Roku device
 // const requestDebug = require('request-debug')(request);
 
@@ -149,14 +150,12 @@ function buildInstalled() {
       '!src/channel/components/controllers/StarterController/**',
       '!src/channel/components/tasks/ExperimentsTask/**',
       '!src/channel/components/tasks/AnalyticsTask/**',
-      '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs'
     ];
 
     let testSources = [
       '!src/channel/components/tests/**',
-      '!src/channel/source/3rdparty/ComponentTestFramework.brs',
-      '!src/channel/source/3rdparty/roku/UnitTestFramework.brs',
-      '!src/channel/source/tests/**'
+      '!src/channel/source/tests/**',
+      '!src/channel/source/rooibosFunctionMap.brs'
     ];
 
     // don't include test files if the config is not 'test'
@@ -594,6 +593,7 @@ function setStaging(done) {
   }
 }
 
+
 // force test on options, so we ensure our build is using the test config
 function setTest(done) {
   if(options) {
@@ -602,6 +602,23 @@ function setTest(done) {
   } else {
     done(new Error('setTest: options not found.'));
   }
+}
+
+
+async function preprocessTests() {
+  const configSettings = {
+    projectPath: "./src/channel",
+    testsFilePattern: [
+      "**/tests/**/*.brs",
+      "!**/rooibosDist.brs",
+      "!**/rooibosFunctionMap.brs",
+      "!**/TestsScene.brs"
+    ]
+  };
+
+  const config = createProcessorConfig(configSettings);
+  const processor = new RooibosProcessor(config);
+  await processor.processFiles();
 }
 
 
@@ -632,7 +649,7 @@ exports.sideload = sideLoad;
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
 exports.bump = bumpBuild;
 exports.install = series(exports.build, conditionalPackage, sideLoad);
-exports.test = series(setTest, clean, buildInstalled, sideLoad);
+exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
 exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
 exports.release = series(setProduction, bumpBuild, tagBuild, exports.build, packageAll);
 

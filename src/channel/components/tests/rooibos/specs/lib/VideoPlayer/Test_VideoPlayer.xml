@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="Test_VideoPlayer" extends="VideoPlayer">
+  <interface>
+    <function name="TestFramework__RunNodeTests"/>
+  </interface>
+  <script type="text/brightscript" uri="../../../../rooibos/specs/lib/VideoPlayer/Test_VideoPlayer_VideoErrorHelpers.brs" />
+  <script type="text/brightscript" uri="../../../../rooibos/specs/lib/VideoPlayer/Test_VideoPlayer_Cuepoints.brs" />
+  <script type="text/brightscript" uri="../../../../rooibos/specs/lib/VideoPlayer/Test_VideoPlayer_VideoPlayerHelpers.brs" />
+</component>
