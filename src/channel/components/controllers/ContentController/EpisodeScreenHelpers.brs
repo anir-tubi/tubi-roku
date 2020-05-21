@@ -43,23 +43,29 @@ Function onEpisodeSelected(msg)
       episode = season.getChild(episodesScreen.episodeSelected[1])
       if episode <> invalid then
         content = episode.clone(false)
-        nowPos = 0
-        ' find the position in global history
-        history = m.global.historyIds.findNode(content.id)
-        if history <> invalid then
-          nowPos = history.nowPos
-          content.nowPos = nowPos
-        end if
+        bMature = isMatureRating(content)
+        if m.global.authInfo = invalid and bMature = true
+          '//if user is a guest and is trying to play content geared for only adults, then ask them to register
+          displayMaturePlayWarning("mature-episode", episodesScreen.trackingPageInfo)
+        else
+          nowPos = 0
+          ' find the position in global history
+          history = m.global.historyIds.findNode(content.id)
+          if history <> invalid then
+            nowPos = history.nowPos
+            content.nowPos = nowPos
+          end if
 
-        'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
-        episodesScreen.trackingComponentInfo = {
-          componentType: "episode_video_list_component"
-          componentValues: {
-            content_tile: m.Tracking.getAnalyticsTile(episode, episodesScreen.episodeSelected[1])
+          'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
+          episodesScreen.trackingComponentInfo = {
+            componentType: "episode_video_list_component"
+            componentValues: {
+              content_tile: m.Tracking.getAnalyticsTile(episode, episodesScreen.episodeSelected[1])
+            }
           }
-        }
 
-        playVideoContent(content, "none", nowPos)
+          playVideoContent(content, "none", nowPos)
+        end if
       end if
     end if
   end if

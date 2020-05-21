@@ -191,6 +191,49 @@ Function displayExitModal(trackingPageInfo)
 End Function
 
 
+
+'Display a warning that the user needs to be registered in order to see certain content
+'@param dialogSubtype: String, Indicate to analytics how this function is being called so it is easier to track things.
+'@param pageInfo: assocArray, this will populate the analytic event's pageOneof property
+Function displayMaturePlayWarning(dialogSubtype, pageInfo)
+  dialogEvent = getDialogAnalyticEvent("SIGNIN_REQUIRED", dialogSubtype, pageInfo)
+
+  title =  getTranslation("error_matureContent_title")
+  message = getTranslation("error_mustBeSignedIn_description")
+  buttons = [getTranslation("screenDetails_error_buttonRegister"), getTranslation("dialog_button_cancel")]
+  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
+End Function
+
+
+' Organizes the information needed to create a "dialog" tracking event and returns the created event AA
+'
+' @param dialogType: string, one of the valid operations as defined in events.protos -> DialogEvent -> enum DialogType
+' @param dialogSubtype: string, a string limited to 20 characters, used to distinguish different dialogs from each other
+' @param pageInfo: assocArray, this will populate the analytic event's pageOneof property
+Function getDialogAnalyticEvent(dialogType, dialogSubtype, pageInfo)
+  dialogAnalyticsEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: dialogType 'DialogType enum
+      dialog_action: "SHOW"
+      dialog_sub_type: dialogSubtype
+    }
+  }
+
+  if pageInfo <> invalid
+    dialogAnalyticsEvent.values.pageOneof = m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+  end if
+
+  return dialogAnalyticsEvent
+End Function
+
+
+' handles the response of a user who has been presented a sign in modal
+Function onSignInModalButtonSelected()
+  startSignIn(true)
+End Function
+
+
 '''''''''''''''''''''''
 ' onKeyEvent
 '

@@ -568,7 +568,6 @@ Function getConstants()
       constants.ui.terms.channels = "Channels"
       constants.ui.terms.menu = "Menu"
 
-    '::TEMP:: this is temporary. The ratings for each country will eventually be saved centrally in the backend, but until then save them in the counstants 
     constants.ui.ratings = {}
       aUS = []
       aUS.push("G, TV-Y, TV-G")     '//Group 0, Little Kids
@@ -583,6 +582,12 @@ Function getConstants()
       aMX.push("C, D")    '//Group 3, Adults
       constants.ui.ratings["MX"] = aMX
 
+    'what ratings are highly mature and should be treated differently? May not be applicable to all countries.
+    constants.ui.matureRatings = {}
+      aMX = []
+      aMX.push("D")
+      constants.ui.matureRatings["MX"] = aMX
+      
 
     constants.ui.categoryIds = {}
       'these map to matrix api container ids

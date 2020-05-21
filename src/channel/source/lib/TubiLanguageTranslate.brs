@@ -335,6 +335,14 @@ Function getTranslation_en_US()
       "description": "description of the error dialog when there was no content to be gathered from the server.",
       "message": "This page currently does not have any content."
     },
+    "error_mustBeSignedIn_description": {
+      "description": "Description of the warning dialog when user needs to be signed in to view a video.",
+      "message": "To watch this video for free, please sign in or register."
+    },
+    "error_matureContent_title": {
+      "description": "Title of the dialog window when user attempts to play mature content but they need to be sigfned in first",
+      "message": "Mature Content"
+    },
     "dialog_signOut_title": {
       "description": "Title of the dialog window that asks the user if they want to sign out of the app",
       "message": "Are You Sure?"
@@ -407,7 +415,7 @@ Function getTranslation_en_US()
       "description": "Description of the warning dialog when user is attempting to add an item to their liost but are not signed in",
       "message": "You must be signed in to add a title to your list."
     },
-    "screenDetails_error_addQueue_buttonRegister": {
+    "screenDetails_error_buttonRegister": {
       "description": "Label of button to sign in/register",
       "message": "Sign in or Register"
     },
@@ -1011,7 +1019,7 @@ Function getTranslation_es_MX()
       "description": "Description of the warning dialog when user is attempting to add an item to their liost but are not signed in",
       "message": "Debes iniciar sesión para agregar un título a tu lista.\n"
     },
-    "screenDetails_error_addQueue_buttonRegister": {
+    "screenDetails_error_buttonRegister": {
       "description": "Label of button to sign in/register",
       "message": "Entra o Regístrate"
     },

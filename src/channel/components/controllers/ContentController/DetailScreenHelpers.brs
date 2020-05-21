@@ -506,7 +506,7 @@ Function onSingleContentError(msg)
   
     ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.fetchError, error.code)
-    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "NETWORK_ERROR", errorCode, m.Tracking, m.constants)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "NETWORK_ERROR", errorCode, m.constants)
 
     modalInfo = {
       message: getErrorMessage(message, errorCode)
@@ -624,11 +624,11 @@ Function onAddToQueue(detailScreen)
   tubiLog("DetailScreenHelpers.onAddToQueue")
   if m.global.authInfo = invalid
     content = getDetailScreenContent(detailScreen)
-    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "sign-in-bookmark", m.Tracking, m.constants)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "sign-in-bookmark", m.constants)
 
     title =  getTranslation("dialog_signIn_title")
     message = getTranslation("screenDetails_error_addQueue_description")
-    buttons = [getTranslation("screenDetails_error_addQueue_buttonRegister"), getTranslation("dialog_button_cancel")]
+    buttons = [getTranslation("screenDetails_error_buttonRegister"), getTranslation("dialog_button_cancel")]
     showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
   else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
     detailScreen.stringQueueButton = getTranslation("screenDetails_button_queueNow")
@@ -652,12 +652,6 @@ Function onAddToQueueRetry(params)
   if type(params) = "roArray" and params.count() = 1
     onAddToQueue(params[0])
   end if
-End Function
-
-
-' handles the response of a user who has been presented a sign in modal on the details screen
-Function onSignInModalButtonSelected()
-  startSignIn(true)
 End Function
 
 
@@ -690,7 +684,7 @@ Function onBookmarked(msg) As Void
 
     ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.addBookmarkError, responseCode)
-    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", errorCode, m.Tracking, m.constants)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", errorCode, m.constants)
     message = getTranslation("screenDetails_error_queue_description")
 
     modalInfo = {
@@ -789,7 +783,7 @@ Function onBookmarkRemoved(msg) As Void
 
     ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeBookmarkError, code)
-    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_QUEUE", errorCode, m.Tracking, m.constants)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_QUEUE", errorCode, m.constants)
 
     modalInfo = {
       message: getErrorMessage(message, errorCode)
@@ -866,7 +860,7 @@ Function onHistoryRemoved(msg) As Void
 
     ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeHistoryError, code)
-    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_HISTORY", errorCode, m.Tracking, m.constants)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_HISTORY", errorCode, m.constants)
 
     modalInfo = {
       message: getErrorMessage(message, errorCode)
@@ -940,25 +934,32 @@ Function episodesHelper(screen)
   showEpisodeScreenWithoutNavigationTracking(screen.content)
 End Function
 
-Function trailerHelper(screen)
 
+Function trailerHelper(screen) 
   content = screen.content
 
   if content <> invalid then
-    trailerContent = CreateObject("roSGNode", "TubiContentNode")
-    if content.id <> invalid
-      trailerContent.id = content.id
+    bMature = isMatureRating(content)
+    if m.global.authInfo = invalid and bMature = true
+      '//if user is a guest and is trying to play content geared for only adults, then ask them to register 
+      dialogSubtype = "mature-trailer"
+      displayDetailScreenMaturePlayWarning(content, dialogSubtype)
+    else
+      trailerContent = CreateObject("roSGNode", "TubiContentNode")
+      if content.id <> invalid
+        trailerContent.id = content.id
+      end if
+
+      if content.title <> invalid
+        trailerContent.title = getTranslation("videoPlayer_trailerTitle", {title: content.title})
+      end if
+
+      trailerContent.streamformat="hls"
+      trailerContent.nowPos = 0
+      trailerContent.isTrailer = true
+
+      playVideoContent(trailerContent, "none")
     end if
-
-    if content.title <> invalid
-      trailerContent.title = getTranslation("videoPlayer_trailerTitle", {title: content.title})
-    end if
-
-    trailerContent.streamformat="hls"
-    trailerContent.nowPos = 0
-    trailerContent.isTrailer = true
-
-    playVideoContent(trailerContent, "none")
   end if        
 
 End Function
@@ -1043,7 +1044,7 @@ Function onResume(msg)
       m.actionType = resumeHelper
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen, detailScreen.content)
-    end if   
+    end if 
   end if
 End Function
 
@@ -1064,15 +1065,53 @@ Function onPlay(msg)
       m.actionType = playHelper
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen, detailScreen.content)
-    end if   
+    end if
   end if
+End Function
+
+
+'Is the rating of the content in the passed screen set for mature audience? 
+Function isMatureRating(content)
+  if content <> invalid and content.rating <> invalid
+    sRating = UCase(content.rating)
+    aRatings = m.constants.ui.matureRatings[m.constants.deviceInfo.countryCode]
+    if aRatings <> invalid and aRatings.Count() > 0
+      for i=0 to aRatings.Count()-1
+        if sRating = aRatings[i]
+          return true
+        end if
+      end for
+    end if
+  end if
+
+  return false
+End Function
+
+
+'Display a warning that the user needs to be registered in order to see certain content
+'@param content, the video details
+'@param dialogSubtype: String, Indicate to analytics how this function is being called so it is easier to track things.
+Function displayDetailScreenMaturePlayWarning(content, dialogSubtype)
+  pageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
+  displayMaturePlayWarning(dialogSubtype, pageInfo)
 End Function
 
 
 Function playHelper(screen)
   episode = getEpisodeContent(screen.content)
   if episode <> invalid and screen.isLoading <> true then
-    playVideoContent(episode, "none", 0)
+    bMature = isMatureRating(episode)
+    if m.global.authInfo = invalid and bMature = true
+      '//if user is a guest and is trying to play content geared for only adults, then ask them to register 
+      dialogSubtype = "mature-play"
+      if m.deepLinkContent <> invalid
+        '//this is a deeplink so, indicate that the warning originatated from a deeplink
+        dialogSubtype = "mature-play-deep"
+      end if
+      displayDetailScreenMaturePlayWarning(episode, dialogSubtype)
+    else
+      playVideoContent(episode, "none", 0)
+    end if
   else
     tubiLog("ERROR: Play selected but content is invalid")
   end if
@@ -1082,18 +1121,29 @@ End Function
 Function resumeHelper(detailScreen)
   episode = getEpisodeContent(detailScreen.content)
   if episode <> invalid then
-    nowPos = 0
-    ' using nowPos that was passed in with deeplink, when playback initiated via deeplink
-    if m.deeplinkContent <> invalid and episode.nowPos > 0
-      nowPos = episode.nowPos
-    else
-      ' find the position in global history
-      history = m.global.historyIds.findNode(episode.id)
-      if history <> invalid then
-        nowPos = history.nowPos
+    bMature = isMatureRating(episode)
+    if m.global.authInfo = invalid and bMature = true
+      '//if user is a guest and is trying to play content geared for only adults, then ask them to register dialogSubtype = "mature-play"
+      dialogSubtype = "mature-resume"
+      if m.deepLinkContent <> invalid
+        '//this is a deeplink so, indicate that the warning originatated from a deeplink
+        dialogSubtype = "mature-resume-deep"
       end if
+      displayDetailScreenMaturePlayWarning(episode, dialogSubtype)
+    else
+      nowPos = 0
+      ' using nowPos that was passed in with deeplink, when playback initiated via deeplink
+      if m.deeplinkContent <> invalid and episode.nowPos > 0
+        nowPos = episode.nowPos
+      else
+        ' find the position in global history
+        history = m.global.historyIds.findNode(episode.id)
+        if history <> invalid then
+          nowPos = history.nowPos
+        end if
+      end if
+      playVideoContent(episode, "none", nowPos)
     end if
-    playVideoContent(episode, "none", nowPos)
   else
     tubiLog("ERROR: Resume selected but content is invalid")
   end if
@@ -1194,22 +1244,13 @@ End Function
 ' @content: roSGNode, the content that is residing on the details page content field, can be a movie or series
 ' @dialogType: string, one of the valid operations as defined in events.protos -> DialogEvent -> enum DialogType
 ' @dialogSubtype: string, a string limited to 20 characters, used to distinguish different dialogs from each other
-' @trackingLib: associativeArray, an instance of TubiTracking()
 ' @constants: assocArray, an instance of m.constants
-Function getDetailScreenDialogAnalyticEvent(content, dialogType, dialogSubtype, trackingLib, constants)
-  dialogAnalyticsEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: dialogType 'DialogType enum
-      dialog_action: "SHOW"
-      dialog_sub_type: dialogSubtype
-    }
-  }
-
+Function getDetailScreenDialogAnalyticEvent(content, dialogType, dialogSubtype, constants)
   if type(content) = "roSGNode" and content.isSubtype("ContentNode") = true
     pageInfo = getDetailScreenAnalyticsPageInfo(content, constants)
-    dialogAnalyticsEvent.values.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
   end if
+
+  dialogAnalyticsEvent = getDialogAnalyticEvent(dialogType, dialogSubtype, pageInfo)
 
   return dialogAnalyticsEvent
 End Function
