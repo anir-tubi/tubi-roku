@@ -131,14 +131,7 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     detailScreen.genres = content.genres
 
     if content.hasTrailer = true
-      if content.isVitg = true or m.global.authInfo <> invalid
-        ' isVitg is not natively a field of TubiContentNode, but is injected when parsing the content from JSON
-        ' in tubiMetadataTranslate_getContentFromCategoryJson().
-        ' Therefore it will not be present when populating with detail meta data from the /cms/content API.
-        ' But we want to show the trailer button if isVitg was present in the content pulled from the category JSON,
-        ' which gets overwritten when populateDetailScreen() is called upon receiving metadata from the cms/content API.
-        detailScreen.hasTrailer = true
-      end if
+      detailScreen.hasTrailer = true
     end if
 
     bookmark = m.global.bookmarkIds.findNode(content.id)
