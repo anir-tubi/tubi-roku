@@ -66,7 +66,7 @@
   },
   "dialog_errorMessageContact": {
     "description": "The contact info displayed in an error dialog",
-    "message": "Please contact: support@tubi.tv"
+    "message": "Please email support@tubi.tv if this keeps happening."
   },
   "dialog_button_exit": {
     "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
@@ -79,6 +79,10 @@
   "dialog_button_cancel": {
     "description": "Label of a dialog button to cancel out of the dialog",
     "message": "Cancel"
+  },
+  "dialog_button_continue": {
+    "description": "Label of a dialog button to continue to the next step that the dialog is saying",
+    "message": "Continue"
   },
   "dialog_button_submit": {
     "description": "Label of the dialog button to submit what the window is asking it to do.",
@@ -301,25 +305,29 @@
     "description": "Label of the button that will take the user to the channel associated with the current video title",
     "message": "Go to {channel}"
   },
-  "screenDetails_error_addQueue_description": {
-    "description": "Description of the warning dialog when user is attempting to add an item to their liost but are not signed in",
-    "message": "You must be signed in to add a title to your list."
+  "screenDetails_error_addQueue_title": {
+    "description": "Title of the warning dialog when user is attempting to add an item to their list but are not signed in",
+    "message": "Account needed"
   },
-  "screenDetails_error_buttonRegister": {
-    "description": "Label of button to sign in/register",
-    "message": "Sign in or Register"
+  "screenDetails_error_addQueue_description": {
+    "description": "Description of the warning dialog when user is attempting to add an item to their list but are not signed in",
+    "message": "Sign in or register for a Tubi account to add this video to your list."
   },
   "screenDetails_error_getContent_description": {
     "description": "Description of error when app is not able to get content.",
     "message": "Could not retrieve content information from server."
   },
+  "error_tryAgain_title": {
+    "description": "Error message when the user has the option to try the operation again.",
+    "message": "Let’s try that again"
+  },
   "screenDetails_error_queue_description": {
     "description": "Error message when video is not added to the user's list.",
-    "message": "Something went wrong while trying to add the content to your list."
+    "message": "We’re not sure what happened but something went wrong when trying to add this video to your list."
   },
   "screenDetails_error_noQueue_description": {
     "description": "Error message when video is not removed from the user's list.",
-    "message": "Something went wrong while removing the content from your list."
+    "message": "We’re not sure what happened but something went wrong when trying to remove this from your list."
   },
   "screenDetails_error_noHistory_description": {
     "description": "Error message when video is not removed from the user's viewing history.",
@@ -327,7 +335,7 @@
   },
   "screenSettings_signIn_description": {
     "description": "Directions for the signin page",
-    "message": "Sign in to Tubi. Access My List and Continue Watching lists across your devices."
+    "message": "Sign in to your Tubi account on your computer or phone to see your saved TV shows and movies on My List, continue watching where you left off and get personal recommendations synced across your phone, television, tablet or computer."
   },
   "screenSettings_signOut_description": {
     "description": "Description on SignIn page when user is signed in",
@@ -397,6 +405,10 @@
     "description": "A menu Item for the Settings screen",
     "message": "Sign Out"
   },
+  "screenSettings_signInPanel_title": {
+    "description": "The title of the Sign In Panel of the Settings screen",
+    "message": "You’re not signed in yet"
+  },
   "screenSettings_parentalPassword_title": {
     "description": "Directions for signed out users who attempt to change the parental controls",
     "message": "Enter your password"
@@ -459,11 +471,6 @@
   "screenCategories_error_retrieve_message": {
     "description": "Onscreen message to indicate categories content could not be gathered",
     "message": "Could not retrieve categories content."
-  },
-
-  "screenHome_error_button_continue": {
-    "description": "Label of a button to continue",
-    "message": "Continue"
   },
   "screenHome_error_fetchCategories_description": {
     "description": "Onscreen message to indicate categories content could not be loaded",

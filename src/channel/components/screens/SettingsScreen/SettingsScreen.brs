@@ -251,7 +251,7 @@ End Function
 
 Function CreateSignInPanel()
   panel = CreateObject("roSGNode", "ScrollingTextPanel")
-  panel.title = getTranslation("menu_signIn")
+  panel.title = getTranslation("screenSettings_signInPanel_title")
   panel.text = getTranslation("screenSettings_signIn_description")
 
   panel.focusable = false

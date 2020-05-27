@@ -153,7 +153,7 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
             trackingTask: m.trackingLoggingTask
           }
 
-          showErrorModal(modalInfo, onUserCategoriesFailed, invalid, invalid, invalid, [getTranslation("screenHome_error_button_continue")])
+          showErrorModal(modalInfo, onUserCategoriesFailed, invalid, invalid, invalid, [getTranslation("dialog_button_continue")])
         end if
       end if
     end if

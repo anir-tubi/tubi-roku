@@ -619,9 +619,9 @@ Function onAddToQueue(detailScreen)
     content = getDetailScreenContent(detailScreen)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "sign-in-bookmark", m.constants)
 
-    title =  getTranslation("dialog_signIn_title")
+    title =  getTranslation("screenDetails_error_addQueue_title")
     message = getTranslation("screenDetails_error_addQueue_description")
-    buttons = [getTranslation("screenDetails_error_buttonRegister"), getTranslation("dialog_button_cancel")]
+    buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_cancel")]
     showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
   else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
     detailScreen.stringQueueButton = getTranslation("screenDetails_button_queueNow")
@@ -665,7 +665,6 @@ Function onBookmarked(msg) As Void
   task.unobserveFieldScoped("addBookmarkResult")
   detailScreen.task = invalid
   detailScreen.isWaitingForServerResponse = false
-
   if bookmarkId = invalid or bookmarkId = ""
     detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
     content = getDetailScreenContent(detailScreen)
@@ -679,8 +678,10 @@ Function onBookmarked(msg) As Void
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.addBookmarkError, responseCode)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", errorCode, m.constants)
     message = getTranslation("screenDetails_error_queue_description")
+    title = getTranslation("error_tryAgain_title")
 
     modalInfo = {
+      title: title
       message: getErrorMessage(message, errorCode)
       openTrackEvent: dialogEvent
       trackingTask: m.trackingLoggingTask
@@ -777,8 +778,10 @@ Function onBookmarkRemoved(msg) As Void
     ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeBookmarkError, code)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_QUEUE", errorCode, m.constants)
+    title = getTranslation("error_tryAgain_title")
 
     modalInfo = {
+      title: title
       message: getErrorMessage(message, errorCode)
       openTrackEvent: dialogEvent
       trackingTask: m.trackingLoggingTask

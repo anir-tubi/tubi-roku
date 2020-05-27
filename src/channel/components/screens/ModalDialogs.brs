@@ -205,9 +205,9 @@ End Function
 ' @pmessage: string, The message to be displayed to the user
 ' @userFacingErrorCode: string, an error code as returned by getUserFacingErrorCode()
 Function getErrorMessage(message = "", userFacingErrorCode = "") as Object
-  errorMessage = getTranslation("dialog_errorPrefix") + userFacingErrorCode + Chr(10)
-  errorMessage += message + Chr(10)
-  errorMessage += getTranslation("dialog_errorMessageContact") 
+  errorMessage = message + Chr(10)
+  errorMessage += getTranslation("dialog_errorMessageContact") + Chr(10)
+  errorMessage += getTranslation("dialog_errorPrefix") + userFacingErrorCode
   return errorMessage
 End Function
 
