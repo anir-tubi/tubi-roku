@@ -81,7 +81,7 @@ Function getTranslationAA(sLocaleID as String) as Boolean
   if sLocaleID = "en_us"
     parsed = getTranslation_en_US()
   else if sLocaleID = "es_es"
-    ' parsed = getTranslation_es_MX()
+    parsed = getTranslation_es_MX()
   else if sLocaleID = "en_gb"
   else if sLocaleID = "fr_ca"
   else if sLocaleID = "de_de"
@@ -257,7 +257,7 @@ Function getTranslation_en_US()
     },
     "error_connection_description": {
       "description": "description of error window when there is a connection error",
-      "message": "There may be an issue with your network connection, or with Tubi's server. Please check your network connection and try again. \n"
+      "message": "There may be an issue with your network connection, or with Tubi's server. Please check your network connection and try again. "
     },
     "dialog_updateVersion_title": {
       "description": "title of a dialog window that is shown when the user has an older version of the app",
@@ -793,11 +793,11 @@ Function getTranslation_es_MX()
     },
     "dialog_defaultError_description": {
       "description": "The default message of a popup error dialog",
-      "message": "Disculpa la molestia. Para obtener ayuda, ponte en contacto con support@tubi.tv\n"
+      "message": "Disculpa la molestia. Para obtener ayuda, ponte en contacto con support@tubi.tv"
     },
     "dialog_errorMessageContact": {
       "description": "The contact info displayed in an error dialog",
-      "message": "Por favor, ponte en contacto con: support@tubi.tv"
+      "message": "Por favor, ponte en contacto con: support@tubi.tv si esto sigue sucediendo."
     },
     "dialog_button_exit": {
       "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
@@ -810,6 +810,10 @@ Function getTranslation_es_MX()
     "dialog_button_cancel": {
       "description": "Label of a dialog button to cancel out of the dialog",
       "message": "Cancelar"
+    },
+    "dialog_button_continue": {
+      "description": "Label of a dialog button to continue to the next step that the dialog is saying",
+      "message": "Continuar"
     },
     "dialog_button_submit": {
       "description": "Label of the dialog button to submit what the window is asking it to do.",
@@ -873,7 +877,7 @@ Function getTranslation_es_MX()
     },
     "error_connection_description": {
       "description": "description of error window when there is a connection error",
-      "message": "Puede haber un problema con tu conexión de red, o con el servidor de Tubi. Por favor, comprueba tu conexión de red e inténtalo de nuevo.\n"
+      "message": "Puede haber un problema con tu conexión de red, o con el servidor de Tubi. Por favor, comprueba tu conexión de red e inténtalo de nuevo."
     },
     "dialog_updateVersion_title": {
       "description": "title of a dialog window that is shown when the user has an older version of the app",
@@ -955,6 +959,14 @@ Function getTranslation_es_MX()
       "description": "description of the error dialog when there was no content to be gathered from the server.",
       "message": "Esta página actualmente no tiene ningún contenido."
     },
+    "error_mustBeSignedIn_description": {
+      "description": "Description of the warning dialog when user needs to be signed in to view a video.",
+      "message": "Para ver este video gratis, por favor, regístrate o inicia sesión."
+    },
+    "error_matureContent_title": {
+      "description": "Title of the dialog window when user attempts to play mature content but they need to be sigfned in first",
+      "message": "Contenido adulto"
+    },
     "dialog_signOut_title": {
       "description": "Title of the dialog window that asks the user if they want to sign out of the app",
       "message": "¿Estás seguro?"
@@ -988,7 +1000,7 @@ Function getTranslation_es_MX()
       "message": "Busca películas, programas de televisión y personas"
     },
     "screenSearch_kidsWarning": {
-      "description": "More directions on the search screen to suggest switching to kids mode",
+      "description": "More directions on the search screen to suggest switching to kids mode.  Should be limited to be around 40 characters or fewer.",
       "message": "Cambiar a Niños para resultados seguros"
     },
     "screenSearch_loading": {
@@ -1001,11 +1013,11 @@ Function getTranslation_es_MX()
     },
     "screenDetails_button_queue": {
       "description": "label of the button that will add the video title to the user's list",
-      "message": "Agregar a tu lista"
+      "message": "Agregar a Mi lista"
     },
     "screenDetails_button_noQueue": {
       "description": "label of the button that will remove the video title from the user's list",
-      "message": "Eliminar de tu lista"
+      "message": "Eliminar de Mi lista"
     },
     "screenDetails_button_noHistory": {
       "description": "label of the button that will remove the video title from the user's viewing history",
@@ -1023,17 +1035,21 @@ Function getTranslation_es_MX()
       "description": "Label of the button that will take the user to the channel associated with the current video title",
       "message": "Ir a {channel}"
     },
-    "screenDetails_error_addQueue_description": {
-      "description": "Description of the warning dialog when user is attempting to add an item to their liost but are not signed in",
-      "message": "Debes iniciar sesión para agregar un título a tu lista.\n"
+    "screenDetails_error_addQueue_title": {
+      "description": "Title of the warning dialog when user is attempting to add an item to their list but are not signed in",
+      "message": "Se necesita cuenta"
     },
-    "screenDetails_error_buttonRegister": {
-      "description": "Label of button to sign in/register",
-      "message": "Entra o Regístrate"
+    "screenDetails_error_addQueue_description": {
+      "description": "Description of the warning dialog when user is attempting to add an item to their list but are not signed in",
+      "message": "Debes iniciar sesión para agregar un título a tu lista."
     },
     "screenDetails_error_getContent_description": {
       "description": "Description of error when app is not able to get content.",
       "message": "No se pudo recuperar la información del contenido del servidor."
+    },
+    "error_tryAgain_title": {
+      "description": "Error message when the user has the option to try the operation again.",
+      "message": "Intentémoslo de nuevo"
     },
     "screenDetails_error_queue_description": {
       "description": "Error message when video is not added to the user's list.",
@@ -1041,7 +1057,7 @@ Function getTranslation_es_MX()
     },
     "screenDetails_error_noQueue_description": {
       "description": "Error message when video is not removed from the user's list.",
-      "message": "Algo salió mal al eliminar el contenido de tu lista.\n"
+      "message": "Algo salió mal al eliminar el contenido de tu lista."
     },
     "screenDetails_error_noHistory_description": {
       "description": "Error message when video is not removed from the user's viewing history.",
@@ -1049,7 +1065,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_signIn_description": {
       "description": "Directions for the signin page",
-      "message": "Inicia sesión en Tubi. Accede a Mi lista y Seguir viendo en tus dispositivos."
+      "message": "Inicia sesión en tu cuenta de Tubi en tu computadora o dispositivo móvil para ver las series y películas guardadas en Mi lista, continuar viendo desde donde te quedaste, recibir recomendaciones personalizadas en sincronización con tu dispositivo móvil, televisor, tableta o computadora."
     },
     "screenSettings_signOut_description": {
       "description": "Description on SignIn page when user is signed in",
@@ -1119,6 +1135,10 @@ Function getTranslation_es_MX()
       "description": "A menu Item for the Settings screen",
       "message": "Cerrar sesión"
     },
+    "screenSettings_signInPanel_title": {
+      "description": "The title of the Sign In Panel of the Settings screen",
+      "message": "No has iniciado sesión"
+    },
     "screenSettings_parentalPassword_title": {
       "description": "Directions for signed out users who attempt to change the parental controls",
       "message": "Ingresa tu contraseña"
@@ -1178,10 +1198,6 @@ Function getTranslation_es_MX()
     "screenCategories_error_retrieve_message": {
       "description": "Onscreen message to indicate categories content could not be gathered",
       "message": "No se pudo recuperar el contenido de las categorías."
-    },
-    "screenHome_error_button_continue": {
-      "description": "Label of a button to continue",
-      "message": "Continuar"
     },
     "screenHome_error_fetchCategories_description": {
       "description": "Onscreen message to indicate categories content could not be loaded",
@@ -1289,7 +1305,7 @@ Function getTranslation_es_MX()
     },
     "goBack_categories": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA REGRESAR PARA VOLVER A LAS CATEGORÍAS\n"
+      "message": "PRESIONA REGRESAR PARA VOLVER A LAS CATEGORÍAS"
     },
     "goBack_channels": {
       "description": "Navigational instructions to users on what the back button does on the current page",
@@ -1325,7 +1341,7 @@ Function getTranslation_es_MX()
     },
     "channel_webDescription": {
       "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
-      "message": "Ve miles de películas y series totalmente gratis. En Tubi puedes ver contenido 100% legal y de forma ilimitada. No se requiere tarjeta de crédito o suscripción. Solo tienes que descargar la aplicación, elige lo que quieras ver en donde tu quieras y disfruta del contenido con menos anuncios que la televisión. Tubi es el servicio más grande de streaming gratis que ofrece películas y series de televisión premiadas. Tenemos algo para todos: Comedias, dramas, familiares, clásicas, dramas coreanos, anime y más. ¡Descárga hoy y empieza a transmitir entretenimiento gratis!\n"
+      "message": "Ve miles de películas y series totalmente gratis. En Tubi puedes ver contenido 100% legal y de forma ilimitada. No se requiere tarjeta de crédito o suscripción. Solo tienes que descargar la aplicación, elige lo que quieras ver en donde tu quieras y disfruta del contenido con menos anuncios que la televisión. Tubi es el servicio más grande de streaming gratis que ofrece películas y series de televisión premiadas. Tenemos algo para todos: Comedias, dramas, familiares, clásicas, dramas coreanos, anime y más. ¡Descárga hoy y empieza a transmitir entretenimiento gratis!"
     }
   }
 End Function

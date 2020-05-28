@@ -54,11 +54,11 @@ Function init()
   m.logoGroup = m.top.findNode("logoGroup")
   m.logo = m.logoGroup.findNode("tubiLogo")
   m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
-  ' if m.constants.deviceInfo.language = "es"
-  '   m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-large.png"
-  '   m.logoKids.width = 259
-  '   m.logoKids.translation = [1576,m.logoKids.translation[1]]
-  ' end if
+  if m.constants.deviceInfo.language = "es"
+    m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-large.png"
+    m.logoKids.width = 259
+    m.logoKids.translation = [1576,m.logoKids.translation[1]]
+  end if
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
   
   ' Global state
