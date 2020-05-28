@@ -8,10 +8,6 @@ Function startSignIn(skipDisambiguation)
   activationCodeScreen.observeFieldScoped("activationSuccess", "onActivationSuccess")
   activationCodeScreen.observeFieldScoped("errorType", "onRegTaskError")
 
-  ' in the current design, navigating away from the activation page destroys the page
-  ' so it is ok to only get the registration code when the page is created.
-  activationCodeScreen.getActivationCode = true
-
   pushScreen(activationCodeScreen, true, true)
   displayDefaultBackground()
 End Function
