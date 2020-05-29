@@ -200,7 +200,7 @@ Function displayMaturePlayWarning(dialogSubtype, pageInfo)
 
   title =  getTranslation("error_matureContent_title")
   message = getTranslation("error_mustBeSignedIn_description")
-  buttons = [getTranslation("screenDetails_error_buttonRegister"), getTranslation("dialog_button_cancel")]
+  buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_cancel")]
   showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
 End Function
 
