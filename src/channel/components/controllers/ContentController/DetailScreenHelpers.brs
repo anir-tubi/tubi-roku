@@ -620,7 +620,11 @@ Function onAddToQueue(detailScreen)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "sign-in-bookmark", m.constants)
 
     title =  getTranslation("screenDetails_error_addQueue_title")
-    message = getTranslation("screenDetails_error_addQueue_description")
+    if content.type = m.constants.ui.contentTypes.series
+      message = getTranslation("screenDetails_error_addQueueSeries_description")
+    else
+      message = getTranslation("screenDetails_error_addQueueMovie_description")
+    end if
     buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_cancel")]
     showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
   else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
@@ -677,7 +681,11 @@ Function onBookmarked(msg) As Void
     ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.addBookmarkError, responseCode)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", errorCode, m.constants)
-    message = getTranslation("screenDetails_error_queue_description")
+    if content.type = m.constants.ui.contentTypes.series
+      message = getTranslation("screenDetails_error_queueSeries_description")
+    else
+      message = getTranslation("screenDetails_error_queueMovie_description")
+    end if
     title = getTranslation("error_tryAgain_title")
 
     modalInfo = {
@@ -768,12 +776,18 @@ Function onBookmarkRemoved(msg) As Void
 
   if result = invalid or result.response.code <> 204 then
     code = ""
-    message = getTranslation("screenDetails_error_noQueue_description")
+    content = getDetailScreenContent(detailScreen)
+    
+    if content.type = m.constants.ui.contentTypes.series
+      message = getTranslation("screenDetails_error_noQueueSeries_description")
+    else
+      message = getTranslation("screenDetails_error_noQueueMovie_description")
+    end if
+
     if result <> invalid
       code = result.response.code
     end if
     detailScreen.stringQueueButton = getTranslation("screenDetails_button_noQueue")
-    content = getDetailScreenContent(detailScreen)
 
     ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeBookmarkError, code)

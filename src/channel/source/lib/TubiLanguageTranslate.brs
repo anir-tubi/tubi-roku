@@ -257,7 +257,7 @@ Function getTranslation_en_US()
     },
     "error_connection_description": {
       "description": "description of error window when there is a connection error",
-      "message": "There may be an issue with your network connection, or with Tubi's server. Please check your network connection and try again. "
+      "message": "There may be an issue with your network connection, or with Tubi's server. Please check your network connection and try again. \n"
     },
     "dialog_updateVersion_title": {
       "description": "title of a dialog window that is shown when the user has an older version of the app",
@@ -419,9 +419,13 @@ Function getTranslation_en_US()
       "description": "Title of the warning dialog when user is attempting to add an item to their list but are not signed in",
       "message": "Account needed"
     },
-    "screenDetails_error_addQueue_description": {
-      "description": "Description of the warning dialog when user is attempting to add an item to their list but are not signed in",
-      "message": "Sign in or register for a Tubi account to add this video to your list."
+    "screenDetails_error_addQueueMovie_description": {
+      "description": "Description of the warning dialog when user is attempting to add a movie to their list but are not signed in",
+      "message": "Sign in or register for a Tubi account to add this movie to your list."
+    },
+    "screenDetails_error_addQueueSeries_description": {
+      "description": "Description of the warning dialog when user is attempting to add a TV show/series to their list but are not signed in",
+      "message": "Sign in or register for a Tubi account to add this TV show to your list."
     },
     "screenDetails_error_getContent_description": {
       "description": "Description of error when app is not able to get content.",
@@ -431,13 +435,21 @@ Function getTranslation_en_US()
       "description": "Error message when the user has the option to try the operation again.",
       "message": "Let’s try that again"
     },
-    "screenDetails_error_queue_description": {
-      "description": "Error message when video is not added to the user's list.",
-      "message": "We’re not sure what happened but something went wrong when trying to add this video to your list."
+    "screenDetails_error_queueMovie_description": {
+      "description": "Error message when a movie is not added to the user's list.",
+      "message": "We’re not sure what happened but something went wrong when trying to add this movie to your list."
     },
-    "screenDetails_error_noQueue_description": {
-      "description": "Error message when video is not removed from the user's list.",
-      "message": "We’re not sure what happened but something went wrong when trying to remove this from your list."
+    "screenDetails_error_queueSeries_description": {
+      "description": "Error message when a tv show/series is not added to the user's list.",
+      "message": "We’re not sure what happened but something went wrong when trying to add this TV show to your list."
+    },
+    "screenDetails_error_noQueueMovie_description": {
+      "description": "Error message when a movie is not removed from the user's list.",
+      "message": "We’re not sure what happened but something went wrong when trying to remove this movie from your list."
+    },
+    "screenDetails_error_noQueueSeries_description": {
+      "description": "Error message when a tv show/series is not removed from the user's list.",
+      "message": "We’re not sure what happened but something went wrong when trying to remove this TV show from your list."
     },
     "screenDetails_error_noHistory_description": {
       "description": "Error message when video is not removed from the user's viewing history.",
