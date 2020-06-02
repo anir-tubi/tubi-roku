@@ -1051,9 +1051,13 @@ Function getTranslation_es_MX()
       "description": "Title of the warning dialog when user is attempting to add an item to their list but are not signed in",
       "message": "Se necesita cuenta"
     },
-    "screenDetails_error_addQueue_description": {
-      "description": "Description of the warning dialog when user is attempting to add an item to their list but are not signed in",
-      "message": "Debes iniciar sesión para agregar un título a tu lista."
+    "screenDetails_error_addQueueMovie_description": {
+      "description": "Description of the warning dialog when user is attempting to add a movie to their list but are not signed in",
+      "message": "Inicia sesión o regístrate en Tubi para agregar esta película a tu lista."
+    },
+    "screenDetails_error_addQueueSeries_description": {
+      "description": "Description of the warning dialog when user is attempting to add a TV show/series to their list but are not signed in",
+      "message": "Inicia sesión o regístrate en Tubi para agregar esta serie a tu lista."
     },
     "screenDetails_error_getContent_description": {
       "description": "Description of error when app is not able to get content.",
@@ -1063,13 +1067,21 @@ Function getTranslation_es_MX()
       "description": "Error message when the user has the option to try the operation again.",
       "message": "Intentémoslo de nuevo"
     },
-    "screenDetails_error_queue_description": {
-      "description": "Error message when video is not added to the user's list.",
-      "message": "Algo salió mal mientras se intentaba agregar el contenido a tu lista."
+    "screenDetails_error_queueMovie_description": {
+      "description": "Error message when a movie is not added to the user's list.",
+      "message": "No estamos seguros de lo que pasó, pero algo salió mal al tratar de agregar esta película a tu lista."
     },
-    "screenDetails_error_noQueue_description": {
-      "description": "Error message when video is not removed from the user's list.",
-      "message": "Algo salió mal al eliminar el contenido de tu lista."
+    "screenDetails_error_queueSeries_description": {
+      "description": "Error message when a tv show/series is not added to the user's list.",
+      "message": "No estamos seguros de lo que pasó, pero algo salió mal al tratar de agregar esta serie a tu lista."
+    },
+    "screenDetails_error_noQueueMovie_description": {
+      "description": "Error message when a movie is not removed from the user's list.",
+      "message": "No estamos seguros de lo que pasó, pero algo salió mal al tratar de eliminar esta película de tu lista."
+    },
+    "screenDetails_error_noQueueSeries_description": {
+      "description": "Error message when a tv show/series is not removed from the user's list.",
+      "message": "No estamos seguros de lo que pasó, pero algo salió mal al tratar de eliminar esta serie de tu lista."
     },
     "screenDetails_error_noHistory_description": {
       "description": "Error message when video is not removed from the user's viewing history.",
