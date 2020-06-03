@@ -1,3 +1,11 @@
+' Tell the code to clear the translations. It is necessary to call this when the remote compontents is called and there
+' are new strings that are contained in the remote components. 
+Function clearTranslations()
+  if m.global.translationAA <> invalid
+    m.global.translationAA = invalid
+  end if
+End Function
+
 'Pass the ID associated with the ID to get the translated string
 ' Note: the component calling getTranslation() must 
 ' have pkg:/source/lib/TubiLanguageTranslate.brs added as a script

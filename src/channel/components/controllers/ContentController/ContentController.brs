@@ -4,7 +4,9 @@ Function init()
   m._ = rodash()
   
   m.constants = m.global.constants
-  
+  '//When ContentController initializes, clear all trandslations in case this is contained in a remote component. 
+  clearTranslations()
+
   ' initiate GeneralTaskHelper by passing caller context
   ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskHelper
   'GeneralTaskHelper(m)
