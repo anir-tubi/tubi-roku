@@ -62,7 +62,7 @@ End Function
 Function onExperimentsInfoReturned(msg)
   m.constants.experiments.info = msg.getData()
   m.experiments = TubiExperiments(m.constants)
-  m.animationLogoEnabled = m.experiments.getExperimentResource("roku", "roku_soundId").roku_soundId
+  m.animationLogoEnabled = m.experiments.getExperimentResource("roku", "roku_sound_id").roku_sound_id
   m.hasExperiments = true
   onUrlRequest()
 End Function
@@ -156,7 +156,7 @@ End Function
 Function sendExposureEvent()
 
   if m.exposureSent <> true
-    experimentTracking = m.experiments.getExperimentTracking("roku", "roku_soundId")
+    experimentTracking = m.experiments.getExperimentTracking("roku", "roku_sound_id")
 
     if experimentTracking <> invalid and experimentTracking.type <> invalid
       m.analyticsTask = m.top.createChild("AnalyticsTask")
