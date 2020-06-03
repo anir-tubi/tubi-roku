@@ -686,10 +686,16 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
   updateMetadata = {}
   if type(container) = "roAssociativeArray" and type(contents) = "roAssociativeArray"
     ' the metadata for the category
+    sTitle = container.title
+    if container.id = m.constants.ui.categoryIds.queue 
+      '//::HARDCODE:: this is a temporary hardcode until the backend is ready to play My List Instead of Queue as the title
+      sTitle = "My List"
+    end if
+
     updateMetadata = {
       id: container.id
       slug: container.slug
-      title: container.title
+      title: sTitle
       description: container.description
       totalCount: 0
       offset: m.constants.performance.categoryGridList.initialBlockSize
@@ -963,9 +969,14 @@ Function tubiMetadataTranslate_translateChannel(contentToTranslate)
   fetchedAt = m.fetchedAtTimestamp()
   node_count = 0
   container = contentToTranslate.container
+  sTitle = container.title
+  if container.id = m.constants.ui.categoryIds.queue 
+    '//::HARDCODE:: this is a temporary hardcode until the backend is ready to play My List Instead of Queue as the title
+    sTitle = "My List"
+  end if
   if container <> invalid
     translated.id = container.id
-    translated.title = container.title
+    translated.title = sTitle
     translated.description = container.description
     translated.offset = 0
     translated.json = ""
