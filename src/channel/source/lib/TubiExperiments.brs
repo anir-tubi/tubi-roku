@@ -45,9 +45,9 @@ Function TubiExperiments(constants) as Object
     }
     defaultResources: {
       roku: {
+        roku_soundId : {"roku_soundId" : false}
       }
       roku2: {
-        roku_animation_logo : {"roku_animation_logo" : false}
       }
     }
 

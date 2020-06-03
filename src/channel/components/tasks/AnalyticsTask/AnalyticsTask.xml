@@ -17,6 +17,8 @@
       <!-- INPUT -->
         <field id="constants" type="assocArray" />
         <field id="experimentTracking" type="assocArray" />
+     <!-- OUTPUT -->
+        <field id="analyticsResponse" type="boolean" />   
     </interface>  
       
 </component>
