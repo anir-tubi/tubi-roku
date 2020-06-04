@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="Test_VideoPlayer" extends="VideoPlayer">
   <interface>
-    <function name="TestFramework__RunNodeTests"/>
+    <function name="Rooibos_RunNodeTests" />
   </interface>
-  <script type="text/brightscript" uri="../../../../rooibos/specs/lib/VideoPlayer/Test_VideoPlayer_VideoErrorHelpers.brs" />
-  <script type="text/brightscript" uri="../../../../rooibos/specs/lib/VideoPlayer/Test_VideoPlayer_Cuepoints.brs" />
-  <script type="text/brightscript" uri="../../../../rooibos/specs/lib/VideoPlayer/Test_VideoPlayer_VideoPlayerHelpers.brs" />
+  <script type="text/brightscript" uri="VideoPlayer_VideoErrorHelpersUnitTests.brs" />
+  <script type="text/brightscript" uri="VideoPlayer_VideoPlayerCuepointsUnitTests.brs" />
+  <script type="text/brightscript" uri="VideoPlayer_VideoPlayerHelpersUnitTests.brs" />
+  <script type="text/brightscript" uri="../../../../../../source/rooibosFunctionMap.brs" />
+  <script type="text/brightscript" uri="../../../../../../source/tests/rooibos/rooibosDist.brs" />
 </component>

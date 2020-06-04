@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="ChannelDetailScreenTest" extends="ChannelDetailScreen">
+  <interface>
+    <function name="Rooibos_RunNodeTests" />
+  </interface>
+
+  <script type="text/brightscript" uri="ChannelDetailScreen_UnitTests.brs" />
+  <script type="text/brightscript" uri="../../../../../../source/rooibosFunctionMap.brs" />
+  <script type="text/brightscript" uri="../../../../../../source/tests/rooibos/rooibosDist.brs" />
+</component>

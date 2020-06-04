@@ -2,7 +2,7 @@
 
 '@Setup
 Function StringUtilsSetup()
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -28,6 +28,7 @@ Function stringUtils_padString_test()
   m.AssertEqual(padString("bbb", 7, "0123"), "0123bbb")
   m.AssertEqual(padString("bbb", 8, "0123"), "30123bbb")
 End Function
+
 
 
 '@Test formatLengthAsTimestamp unit tests

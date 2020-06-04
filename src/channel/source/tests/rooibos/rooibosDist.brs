@@ -1,6 +1,6 @@
 '/**
 ' * rooibos - simple, flexible, fun brightscript test framework for roku scenegraph apps
-' * @version v3.4.3
+' * @version v3.6.1
 ' * @link https://github.com/georgejecook/rooibos#readme
 ' * @license MIT
 ' */
@@ -20,7 +20,7 @@ end function
   }
 end function
  function RBS_BTS_BaseTestSuite_Fail(msg = "Error") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   m.currentResult.AddResult(msg)
   return m.GetLegacyCompatibleReturnValue(false)
 end function
@@ -39,26 +39,25 @@ end function
     end if
   end if
 end function
- function RBS_BTS_BaseTestSuite_AssertFalse(expr , msg = "Expression evaluates to true") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertFalse(expr, msg = "Expression evaluates to true") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if not  rbs_cmn_IsBoolean(expr) or expr
-    m.currentResult.AddResult(msg)
     return m.fail(msg)
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertTrue(expr , msg = "Expression evaluates to false") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
-  if not  rbs_cmn_IsBoolean(expr) or not expr then
+ function RBS_BTS_BaseTestSuite_AssertTrue(expr, msg = "Expression evaluates to false")
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
+  if not  rbs_cmn_IsBoolean(expr) or not expr
     m.currentResult.AddResult(msg)
     return m.GetLegacyCompatibleReturnValue(false)
   end if
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertEqual(first , second , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertEqual(first, second, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if not m.eqValues(first, second)
     if msg = ""
       first_as_string =  rbs_cmn_AsString(first)
@@ -71,8 +70,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertLike(first , second , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertLike(first, second, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if first <> second
     if msg = ""
       first_as_string =  rbs_cmn_AsString(first)
@@ -85,8 +84,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNotEqual(first , second , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNotEqual(first, second, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if m.eqValues(first, second)
     if msg = ""
       first_as_string =  rbs_cmn_AsString(first)
@@ -99,8 +98,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertInvalid(value , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertInvalid(value, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if value <> invalid
     if msg = ""
       expr_as_string =  rbs_cmn_AsString(value)
@@ -112,8 +111,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNotInvalid(value , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNotInvalid(value, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if value = invalid
     if msg = ""
       expr_as_string =  rbs_cmn_AsString(value)
@@ -125,8 +124,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertAAHasKey(array , key , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertAAHasKey(array, key, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if  rbs_cmn_IsAssociativeArray(array)
     if not array.DoesExist(key)
       if msg = ""
@@ -143,8 +142,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertAANotHasKey(array , key , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertAANotHasKey(array, key, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if  rbs_cmn_IsAssociativeArray(array)
     if array.DoesExist(key)
       if msg = ""
@@ -161,8 +160,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertAAHasKeys(array , keys , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertAAHasKeys(array, keys, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if  rbs_cmn_IsAssociativeArray(array) and  rbs_cmn_IsArray(keys)
     for each key in keys
       if not array.DoesExist(key)
@@ -181,8 +180,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertAANotHasKeys(array , keys , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertAANotHasKeys(array, keys, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if  rbs_cmn_IsAssociativeArray(array) and  rbs_cmn_IsArray(keys)
     for each key in keys
       if array.DoesExist(key)
@@ -201,8 +200,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertArrayContains(array , value , key = invalid , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertArrayContains(array, value, key = invalid, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if  rbs_cmn_IsAssociativeArray(array) or  rbs_cmn_IsArray(array)
     if not  rbs_cmn_ArrayContains(array, value, key)
       msg = "Array doesn't have the '" +  rbs_cmn_AsString(value) + "' value."
@@ -217,8 +216,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertArrayContainsAAs(array , values , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertArrayContainsAAs(array, values, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if not  rbs_cmn_IsArray(values)
     msg = "values to search for are not an Array."
     m.currentResult.AddResult(msg)
@@ -263,8 +262,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertArrayNotContains(array , value , key = invalid , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertArrayNotContains(array, value, key = invalid, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if  rbs_cmn_IsAssociativeArray(array) or  rbs_cmn_IsArray(array)
     if  rbs_cmn_ArrayContains(array, value, key)
       msg = "Array has the '" +  rbs_cmn_AsString(value) + "' value."
@@ -279,8 +278,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertArrayContainsSubset(array , subset , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertArrayContainsSubset(array, subset, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if (rbs_cmn_IsAssociativeArray(array) and  rbs_cmn_IsAssociativeArray(subset)) or (rbs_cmn_IsArray(array) and  rbs_cmn_IsArray(subset))
     isAA =  rbs_cmn_IsAssociativeArray(subset)
     for each item in subset
@@ -304,8 +303,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertArrayNotContainsSubset(array , subset , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertArrayNotContainsSubset(array, subset, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if (rbs_cmn_IsAssociativeArray(array) and  rbs_cmn_IsAssociativeArray(subset)) or (rbs_cmn_IsArray(array) and  rbs_cmn_IsArray(subset))
     isAA =  rbs_cmn_IsAssociativeArray(subset)
     for each item in subset
@@ -329,8 +328,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertArrayCount(array , count , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertArrayCount(array, count, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if  rbs_cmn_IsAssociativeArray(array) or  rbs_cmn_IsArray(array)
     if array.Count() <> count
       msg = "Array items count " +  rbs_cmn_AsString(array.Count()) + " <> " +  rbs_cmn_AsString(count) + "."
@@ -345,8 +344,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertArrayNotCount(array , count , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertArrayNotCount(array, count, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if  rbs_cmn_IsAssociativeArray(array) or  rbs_cmn_IsArray(array)
     if array.Count() = count
       msg = "Array items count = " +  rbs_cmn_AsString(count) + "."
@@ -361,8 +360,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertEmpty(item , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertEmpty(item, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if  rbs_cmn_IsAssociativeArray(item) or  rbs_cmn_IsArray(item)
     if item.Count() > 0
       msg = "Array is not empty."
@@ -383,8 +382,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNotEmpty(item , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNotEmpty(item, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if  rbs_cmn_IsAssociativeArray(item) or  rbs_cmn_IsArray(item)
     if item.Count() = 0
       msg = "Array is empty."
@@ -405,8 +404,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertArrayContainsOnlyValuesOfType(array , typeStr , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertArrayContainsOnlyValuesOfType(array, typeStr, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if typeStr <> "String" and typeStr <> "Integer" and typeStr <> "Boolean" and typeStr <> "Array" and typeStr <> "AssociativeArray"
     msg = "Type must be Boolean, String, Array, Integer, or AssociativeArray"
     m.currentResult.AddResult(msg)
@@ -471,8 +470,8 @@ end function
     return invalid
   end if
 end function
- function RBS_BTS_BaseTestSuite_AssertType(value , typeStr , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertType(value, typeStr, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(value) <> typeStr
     if msg = ""
       expr_as_string =  rbs_cmn_AsString(value)
@@ -484,8 +483,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertSubType(value , typeStr , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertSubType(value, typeStr, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(value) <> "roSGNode"
     if msg = ""
       expr_as_string =  rbs_cmn_AsString(value)
@@ -504,7 +503,7 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_EqValues(Value1 , Value2) as dynamic
+ function RBS_BTS_BaseTestSuite_EqValues(Value1, Value2) as dynamic
   val1Type = type(Value1)
   val2Type = type(Value2)
   if val1Type = "<uninitialized>" or val2Type = "<uninitialized>" or val1Type = "" or val2Type = ""
@@ -549,7 +548,7 @@ end function
     end if
   end if
 end function
- function RBS_BTS_BaseTestSuite_EqAssocArray(Value1 , Value2) as dynamic
+ function RBS_BTS_BaseTestSuite_EqAssocArray(Value1, Value2) as dynamic
   l1 = Value1.Count()
   l2 = Value2.Count()
   if not l1 = l2
@@ -571,7 +570,7 @@ end function
     return true
   end if
 end function
- function RBS_BTS_BaseTestSuite_EqArray(Value1 , Value2) as dynamic
+ function RBS_BTS_BaseTestSuite_EqArray(Value1, Value2) as dynamic
   if not (rbs_cmn_IsArray(Value1)) or not  rbs_cmn_IsArray(Value2) then return false
   l1 = Value1.Count()
   l2 = Value2.Count()
@@ -588,8 +587,8 @@ end function
     return true
   end if
 end function
- function RBS_BTS_BaseTestSuite_AssertNodeCount(node , count , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNodeCount(node, count, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if node.getChildCount() <> count
       msg = "node items count <> " +  rbs_cmn_AsString(count) + ". Received " +  rbs_cmn_AsString(node.getChildCount())
@@ -604,8 +603,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNodeNotCount(node , count , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNodeNotCount(node, count, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if node.getChildCount() = count
       msg = "node items count = " +  rbs_cmn_AsString(count) + "."
@@ -620,8 +619,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNodeEmpty(node , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNodeEmpty(node, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if node.getChildCount() > 0
       msg = "node is not empty."
@@ -632,8 +631,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNodeNotEmpty(node , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNodeNotEmpty(node, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if node.Count() = 0
       msg = "Array is empty."
@@ -644,8 +643,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNodeContains(node , value , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNodeContains(node, value, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if not  rbs_cmn_NodeContains(node, value)
       msg = "Node doesn't have the '" +  rbs_cmn_AsString(value) + "' value."
@@ -660,8 +659,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNodeContainsOnly(node , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNodeContainsOnly(node, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if not  rbs_cmn_NodeContains(node, value)
       msg = "Node doesn't have the '" +  rbs_cmn_AsString(value) + "' value."
@@ -680,8 +679,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNodeNotContains(node , value , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNodeNotContains(node, value, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if type(node) = "roSGNode"
     if  rbs_cmn_NodeContains(node, value)
       msg = "Node has the '" +  rbs_cmn_AsString(value) + "' value."
@@ -696,8 +695,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNodeContainsFields(node , subset , ignoredFields = invalid, msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNodeContainsFields(node, subset, ignoredFields = invalid, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if (type(node) = "roSGNode" and  rbs_cmn_IsAssociativeArray(subset)) or (type(node) = "roSGNode" and  rbs_cmn_IsArray(subset))
     isAA =  rbs_cmn_IsAssociativeArray(subset)
     isIgnoredFields =  rbs_cmn_IsArray(ignoredFields)
@@ -724,8 +723,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertNodeNotContainsFields(node , subset , msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertNodeNotContainsFields(node, subset, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if (type(node) = "roSGNode" and  rbs_cmn_IsAssociativeArray(subset)) or (type(node) = "roSGNode" and  rbs_cmn_IsArray(subset))
     isAA =  rbs_cmn_IsAssociativeArray(subset)
     for each item in subset
@@ -749,8 +748,8 @@ end function
   m.currentResult.AddResult("")
   return m.GetLegacyCompatibleReturnValue(true)
 end function
- function RBS_BTS_BaseTestSuite_AssertAAContainsSubset(array , subset , ignoredFields = invalid, msg = "") as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+ function RBS_BTS_BaseTestSuite_AssertAAContainsSubset(array, subset, ignoredFields = invalid, msg = "") as dynamic
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   if (rbs_cmn_IsAssociativeArray(array) and  rbs_cmn_IsAssociativeArray(subset))
     isAA =  rbs_cmn_IsAssociativeArray(subset)
     isIgnoredFields =  rbs_cmn_IsArray(ignoredFields)
@@ -840,20 +839,22 @@ end function
 end function
  function RBS_BTS_BaseTestSuite_Mock(target, methodName, expectedInvocations = 1, expectedArgs = invalid, returnValue = invalid, allowNonExistingMethods = false, lineNumber = -1) as object
   if not  rbs_cmn_IsAssociativeArray(target)
-    m.Fail("mock args: target was not an AA")
+    methodName = ""
+    m.MockFail(lineNumber, "", "mock args: target was not an AA")
   else if not  rbs_cmn_IsString(methodName)
-    m.Fail("mock args: methodName was not a string")
+    methodName = ""
+    m.MockFail(lineNumber, "", "mock args: methodName was not a string")
   else if not  rbs_cmn_IsNumber(expectedInvocations)
-    m.Fail("mock args: expectedInvocations was not an int")
+    m.MockFail(lineNumber, methodName, "mock args: expectedInvocations was not an int")
   else if not  rbs_cmn_IsArray(expectedArgs) and  rbs_cmn_IsValid(expectedArgs)
-    m.Fail("mock args: expectedArgs was not invalid or an array of args")
+    m.MockFail(lineNumber, methodName, "mock args: expectedArgs was not invalid or an array of args")
   else if  rbs_cmn_IsUndefined(expectedArgs)
-    m.Fail("mock args: expectedArgs undefined")
+    m.MockFail(lineNumber, methodName, "mock args: expectedArgs undefined")
   else if  rbs_cmn_IsUndefined(returnValue)
-    m.Fail("mock args: returnValue undefined")
+    m.MockFail(lineNumber, methodName, "mock args: returnValue undefined")
   end if
   if m.currentResult.isFail
-    ? "ERROR: "; m.currentResult.messages[m.currentResult.currentAssertIndex - 1]
+    ? "ERROR! Cannot create MOCK. method " ; methodName ;" " str(lineNumber) ; " "; m.currentResult.messages.peek()
     return {}
   end if
   if (m.mocks = invalid)
@@ -1056,7 +1057,7 @@ end function
   m.stubs = invalid
 end function
  function RBS_BTS_BaseTestSuite_MockFail(lineNumber, methodName, message) as dynamic
-  if (m.currentResult.isFail) then return m.GetLegacyCompatibleReturnValue(false) ' skip test we already failed
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
   m.currentResult.AddMockResult(lineNumber, "mock failure on '" + methodName + "' : " + message)
   return m.GetLegacyCompatibleReturnValue(false)
 end function
@@ -1250,6 +1251,35 @@ end function
   if result = invalid then return default
   return result
 end function
+function RBS_BTS_BaseTestSuite_waitForField(target, fieldName, delay = 500, maxAttempts = 10)
+  attempts = 0
+  if target = invalid
+    return false
+  end if
+  initialValue = target[fieldName]
+  while target[fieldName] = initialValue
+    port = CreateObject("roMessagePort")
+    wait(delay, port)
+    attempts++
+    if attempts = maxAttempts
+      return false
+    end if
+    ? "waiting for signal field '" ; fieldName "' - " ; attempts
+  end while
+  return true
+end function
+ function RBS_BTS_BaseTestSuite_AssertAsyncField(target, fieldName, delay = 500, maxAttempts = 10)
+  if m.currentResult.isFail then return m.GetLegacyCompatibleReturnValue(false)
+  if target = invalid
+    m.fail("Target was invalid")
+  end if
+  result = m.waitForField(target, fieldName, delay, maxAttempts)
+  if not result
+    return m.fail("Timeout waiting for targetField " + fieldName + " to be set on target")
+  end if
+  m.currentResult.AddResult("")
+  return m.GetLegacyCompatibleReturnValue(true)
+end function
       function __BaseTestSuite_builder()
       instance = {}
       BaseTestSuite_instance = {
@@ -1344,6 +1374,8 @@ end function
         MockCallback24: RBS_BTS_BaseTestSuite_MockCallback24
         pathAsArray_: RBS_BTS_BaseTestSuite_pathAsArray_
         g: RBS_BTS_BaseTestSuite_g
+        waitForField: RBS_BTS_BaseTestSuite_waitForField
+        AssertAsyncField: RBS_BTS_BaseTestSuite_AssertAsyncField
         Name: "BaseTestSuite"
         invalidValue: "#ROIBOS#INVALID_VALUE" ' special value used in mock arguments
         ignoreValue: "#ROIBOS#IGNORE_VALUE" ' special value used in mock arguments
@@ -1778,6 +1810,22 @@ end function
 function RBS_MATCH_anyNodeMatcher(value)
   return  rbs_cmn_isSGNode(value)
 end function
+function Rooibos_RunNodeTests(args) as object
+  ? " RUNNING NODE TESTS"
+  totalStatObj =  rbs_stats_CreateTotalStatistic()
+  rooibos_testrunner_RunItGroups(args.metaTestSuite, totalStatObj, args.testUtilsDecoratorMethodName, args.config, args.runtimeConfig, m)
+  return totalStatObj
+end function
+function Rooibos_CreateTestNode(nodeType) as object
+  node = createObject("roSGNode", nodeType)
+  if (type(node) = "roSGNode" and node.subType() = nodeType)
+    m.top.AppendChild(node)
+    return node
+  else
+    ? " Error creating test node of type " ; nodeType
+    return invalid
+  end if
+end function
 function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = invalid, testSceneName = invalid, nodeContext = invalid) as void
   args = {}
   if createObject("roAPPInfo").IsDev() <> true then
@@ -1809,7 +1857,7 @@ function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = in
   ? "#TEST START : ###" ; testId ; "###"
   args.testScene = scene
   args.global = m.global
-  rooibosVersion = "3.4.3"
+  rooibosVersion = "3.6.1"
   requiredRooibosPreprocessorVersion = "1.0.0"
   if not  rbs_cmn_isFunction(RBSFM_getPreprocessorVersion)
     versionError = "You are using a rooibos-preprocessor (i.e. rooibos-cli) version older than 1.0.0 - please update to " + requiredRooibosPreprocessorVersion
@@ -1827,14 +1875,26 @@ function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = in
     ? "# tests parsed with rooibosC version: " ; RBSFM_getPreprocessorVersion()
     ? "######################################################"
     ? ""
-    runner =     TestRunner(args)
-    runner.Run()
+    if scene.hasField("isReadyToStartTests") and scene.isReadyToStartTests = false
+      ? "The scene is not ready yet - waiting for it to set isReadyToStartTests to true"
+      scene.observeField("isReadyToStartTests", m.port)
+    else
+      ? "scene is ready; running tests now"
+      runner =     TestRunner(args)
+      runner.Run()
+    end if
     while(true)
       msg = wait(0, m.port)
       msgType = type(msg)
       if msgType = "roSGScreenEvent"
         if msg.isScreenClosed()
           return
+        end if
+      else if msgType = "roSGNodeEvent"
+        if msg.getField() = "isReadyToStartTests" and msg.getData() = true
+          ? "scene is ready; running tests now"
+          runner =     TestRunner(args)
+          runner.Run()
         end if
       end if
     end while
@@ -2315,7 +2375,11 @@ end function
           "runtimeConfig": m.runtimeConfig
         }
         nodeStatResults = node.callFunc("Rooibos_RunNodeTests", args)
+        if nodeStatResults <> invalid
   rbs_stats_MergeTotalStatistic(totalStatObj, nodeStatResults)
+        else
+          ? " ERROR! The node "; nodeType; " did not return stats from the Rooibos_RunNodeTests method. This usually means you are not importing rooibosDist.brs, or rooibosFunctionMap.brs. Please refer to : https://github.com/georgejecook/rooibos/blob/master/docs/index.md#testing-scenegraph-nodes"
+        end if
         m.testScene.RemoveChild(node)
       else
         ? " ERROR!! - could not create node required to execute tests for " ; metaTestSuite.name
@@ -2521,22 +2585,6 @@ end sub
   ut.SetUrl("http://localhost:8060/keypress/Home")
   ut.PostFromString("")
 end sub
-function Rooibos_TestRunner_RunNodeTests(args) as object
-  ? " RUNNING NODE TESTS"
-  totalStatObj =  rbs_stats_CreateTotalStatistic()
-  m.RunItGroups(args.metaTestSuite, totalStatObj, args.testUtilsDecoratorMethodName, args.config, args.runtimeConfig, m)
-  return totalStatObj
-end function
-function Rooibos_TestRunner_CreateTestNode(nodeType) as object
-  node = createObject("roSGNode", nodeType)
-  if (type(node) = "roSGNode" and node.subType() = nodeType)
-    m.top.AppendChild(node)
-    return node
-  else
-    ? " Error creating test node of type " ; nodeType
-    return invalid
-  end if
-end function
       function __TestRunner_builder()
       instance = {}
       TestRunner_instance = {
@@ -2545,8 +2593,6 @@ end function
         RunItGroups: Rooibos_TestRunner_RunItGroups
         RunTestCases: Rooibos_TestRunner_RunTestCases
         SendHomeKeypress: Rooibos_TestRunner_SendHomeKeypress
-        RunNodeTests: Rooibos_TestRunner_RunNodeTests
-        CreateTestNode: Rooibos_TestRunner_CreateTestNode
          __TestRunner: Rooibos_TestRunner_new
       }
       instance.append(TestRunner_instance)

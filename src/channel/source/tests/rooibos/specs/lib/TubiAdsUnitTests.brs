@@ -1,17 +1,21 @@
+'@TestSuite [TubiAds] TubiAds.brs 
 Library "Roku_Ads.brs"
 
-Function TestSuite_TubiAds()
-  this = BaseTestSuite()
-  this.name = "TubiAdsTestSuite"
-  this.addTest("getAdsListViaRoku", testCase_tubiAds_getAdsListViaRoku)
-  return this
+
+'@Setup
+Function TubiAdsSetup()
 End Function
 
-'''''''''''''''''''''''''
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'@It tests functions in TubiAds.brs
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 ' TESTED WITH RAF 2.0314 on firmware 8.0.0-4128-04
-'''''''''''''''''''''''''
-Function testCase_tubiAds_getAdsListViaRoku()
-  ads = testHelper_tubiAds_createTubiAds()
+
+'@Test getAdsListViaRoku failure unit tests
+Function tubiAds_getAdsListViaRoku_failure_test()
+  ads = testHelper_tubiAds_createTubiAds_test()
   episodeTemplate = {
     "title": "Fake Episode"
     "length": 1000
@@ -22,28 +26,28 @@ Function testCase_tubiAds_getAdsListViaRoku()
   }
 
   ' test default flow
-  ads.getAdsListViaRoku(episodeTemplate)
+  m.assertInvalid(ads.getAdsListViaRoku(episodeTemplate))
 
   ' test RAF.setContentLength
   episodeWithoutLength = {}
   episodeWithoutLength.append(episodeTemplate)
   episodeWithoutLength.delete("length")
-  ads.getAdsListViaRoku(episodeWithoutLength)
+  m.assertInvalid(ads.getAdsListViaRoku(episodeWithoutLength))
 
   ' test RAF.setContentGenre
   episodeWithGenres = {}
   episodeWithGenres.append(episodeTemplate)
   episodeWithGenres.delete("rokuGenres")
-  ads.getAdsListViaRoku(episodeWithGenres)
+  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres))
   ' empty genres
   episodeWithGenres["rokuGenres"] = []
-  ads.getAdsListViaRoku(episodeWithGenres)
+  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres))
   ' non-kids genres
   episodeWithGenres["rokuGenres"] = ["Comedy", "Drama"]
-  ads.getAdsListViaRoku(episodeWithGenres)
+  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres))
   ' kids genres
   episodeWithGenres["rokuGenres"] = ["Children", "Drama"]
-  ads.getAdsListViaRoku(episodeWithGenres)
+  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres))
 
   ' test RAF.setContentId
   episodeIds = {}
@@ -51,30 +55,30 @@ Function testCase_tubiAds_getAdsListViaRoku()
   ' no series info
   episodeIds.delete("isParentSeries")
   episodeIds.delete("parentTitle")
-  ads.getAdsListViaRoku(episodeIds)
+  m.assertInvalid(ads.getAdsListViaRoku(episodeIds))
   ' missing only parent title
   episodeIds["isParentSeries"] = true
   episodeIds.delete("parentTitle")
-  ads.getAdsListViaRoku(episodeIds)
+  m.assertInvalid(ads.getAdsListViaRoku(episodeIds))
   ' missing only isParentSeries
   episodeIds.delete("isParentSeries")
   episodeIds["parentTitle"] = "Fake Parent"
-  ads.getAdsListViaRoku(episodeIds)
+  m.assertInvalid(ads.getAdsListViaRoku(episodeIds))
   ' valid series
   episodeIds["isParentSeries"] = true
   episodeIds["parentTitle"] = "Fake Parent"
-  ads.getAdsListViaRoku(episodeIds)
+  m.assertInvalid(ads.getAdsListViaRoku(episodeIds))
   ' invalid series and missing title fallback
   episodeIds.delete("isParentSeries")
   episodeIds.delete("parentTitle")
   episodeIds.delete("title")
-  ads.getAdsListViaRoku(episodeIds)
-  return ""
+  m.assertInvalid(ads.getAdsListViaRoku(episodeIds))
+  
 End Function
 
 
 ' helper to initialize TubiAds module and stub the request so get ads always returns nothing
-Function testHelper_tubiAds_createTubiAds()
+Function testHelper_tubiAds_createTubiAds_test()
   constants = getConstants()
   request = TubiRequest()
   requestQueue = TubiRequestQueue()

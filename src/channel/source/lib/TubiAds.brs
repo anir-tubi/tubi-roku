@@ -376,6 +376,9 @@ function tubiAds_getAdsListViaRoku(episode)
     end for
 
     m.allAdUnitsList.push(adUnitsListContainer) 'push the last adUnitsListContainer
+    return m.allAdUnitsList
+  else
+    return invalid
   end if
 end function
 

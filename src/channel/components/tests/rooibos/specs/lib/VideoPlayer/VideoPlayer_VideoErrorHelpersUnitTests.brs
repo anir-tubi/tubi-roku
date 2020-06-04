@@ -1,36 +1,10 @@
-'###
-' Testing a set of helper functions that work with formatting video playback error messages
-'###
+'@SGNode Test_VideoPlayer
+'@TestSuite [VideoErrorHelpers] VideoErrorHelpers in VideoPlayer.brs
 
-'The initializing test suite Function name must begin with the string "TestSuite_"
-Function TestSuite_VideoPlayer_VideoErrorHelpers() as Object
-  ' Inherit your test suite from BaseTestSuite
-  this = BaseTestSuite()
-  
-  ' Test suite name for log statistics
-  this.Name = "TestSuite_VideoPlayer_VideoErrorHelpers"
-  
-  ' Add tests to suite's tests collection
-  ' Test cases should return the assert value
-  this.addTest("TestCase_getPlaybackErrorInfo", TestCase_getPlaybackErrorInfo)
-  this.addTest("TestCase_getPlaybackErrorInfo_Position0", TestCase_getPlaybackErrorInfo_Position0)
-  this.addTest("TestCase_getPlaybackErrorInfo_Error3", TestCase_getPlaybackErrorInfo_Error3)
-  this.addTest("TestCase_getPlaybackErrorInfo_Error3_Position0", TestCase_getPlaybackErrorInfo_Error3_Position0)
-  
-  this.addTest("TestCase_removeExcessUrl", TestCase_removeExcessUrl)
-  
-  return this
-End Function
-
-
-' Setup doesn't work as explained in the docs (as of 5/28/18) (for SG tests at least).
-' The context is not the same as when the test cases run.
-' So, using m. to set up values is not possible.
-'
-' Also, set up functions not instantiated in the inital test suite set up can not be named
-' "TestSuite_xxxx" unless they return an empty string.
-Function VideoErrorHelpers_SetUp()
+'@Setup
+Function VideoErrorsSetup()
   mockedInfo = {}
+
   'mock a video node's stream info
   mockedInfo.streamInfo = {
     isResume: true
@@ -80,12 +54,18 @@ Function VideoErrorHelpers_SetUp()
   'mock a buffer totalMilliseconds() time
   mockedInfo.bufferMs = 2957
 
-  return mockedInfo
-End Function
+  m.mockedInfo = mockedInfo
+End function
 
 
-Function TestCase_getPlaybackErrorInfo()
-  mi = VideoErrorHelpers_SetUp()
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'@It tests video error helpers in VideoPlayer.brs
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+'@Test getPlaybackErrorInfo unit test
+Function videoHelpers_getPlaybackErrorInfo_test()
+  mi = m.mockedInfo
   correctErrorInfo = {
     video_id: mi.content.id
     video_url: removeExcessUrl(mi.streamInfo.streamUrl)
@@ -97,12 +77,13 @@ Function TestCase_getPlaybackErrorInfo()
     error_message: mi.errorMsg5
   }
   errorInfo = getPlaybackErrorInfo(437, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode5, mi.errorMsg5, mi.content)
-  return m.assertEqual(errorInfo, correctErrorInfo)
+  m.AssertEqual(errorInfo, correctErrorInfo)
 End Function
 
 
-Function TestCase_getPlaybackErrorInfo_Position0()
-  mi = VideoErrorHelpers_SetUp()
+'@Test getPlaybackErrorInfo Position 0 unit test
+Function videoHelpers_getPlaybackErrorInfo_Position0()
+  mi = m.mockedInfo
   correctErrorInfo = {
     video_id: mi.content.id
     video_url: removeExcessUrl(mi.content.url)
@@ -110,12 +91,13 @@ Function TestCase_getPlaybackErrorInfo_Position0()
     error_message: mi.errorMsg5
   }
   errorInfo = getPlaybackErrorInfo(0, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode5, mi.errorMsg5, mi.content)
-  return m.assertEqual(errorInfo, correctErrorInfo)
+  m.AssertEqual(errorInfo, correctErrorInfo)
 End Function
 
 
-Function TestCase_getPlaybackErrorInfo_Error3()
-  mi = VideoErrorHelpers_SetUp()
+'@Test getPlaybackErrorInfo Error3 unit test
+Function videoHelpers_getPlaybackErrorInfo_Error3()
+  mi = m.mockedInfo
   correctErrorInfo = {
     video_id: mi.content.id
     video_url: removeExcessUrl(mi.streamInfo.streamUrl)
@@ -126,12 +108,13 @@ Function TestCase_getPlaybackErrorInfo_Error3()
     error_message: mi.alteredErrorMsg3
   }
   errorInfo = getPlaybackErrorInfo(437, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode3, mi.errorMsg3, mi.content)
-  return m.assertEqual(errorInfo, correctErrorInfo)
+  m.AssertEqual(errorInfo, correctErrorInfo)
 End Function
 
 
-Function TestCase_getPlaybackErrorInfo_Error3_Position0()
-  mi = VideoErrorHelpers_SetUp()
+'@Test getPlaybackErrorInfo Error3 Position0 unit test
+Function videoHelpers_getPlaybackErrorInfo_Error3_Position0()
+  mi = m.mockedInfo
   correctErrorInfo = {
     video_id: mi.content.id
     video_url: removeExcessUrl(mi.content.url)
@@ -139,12 +122,13 @@ Function TestCase_getPlaybackErrorInfo_Error3_Position0()
     error_message: mi.alteredErrorMsg3
   }
   errorInfo = getPlaybackErrorInfo(0, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode3, mi.errorMsg3, mi.content)
-  return m.assertEqual(errorInfo, correctErrorInfo)
+  m.AssertEqual(errorInfo, correctErrorInfo)
 End Function
 
 
-Function TestCase_removeExcessUrl()
+'@Test removeExcessUrl unit test
+Function videoHelpers_removeExcessUrl()
   url = "http://c13.adrise.tv/v2/sources/content-owners/mgm/389496/v20179270205-,577,877,1189,1581,2176,k.mp4.m3u8?WkuQ8Q_G9-5DOf4_xiCDbIE4b7yEuIg5P1ieENFOvRmVjNGf07mQjEhIYQaFHSURKMZaMTmIPzLyoVywCEQFjn7sc4s"
   shortUrl = "http://c13.adrise.tv/v2/sources/content-owners/mgm/389496/v20179270205-,577,877,1189,1581,2176,k.mp4.m3u8"
-  return m.assertEqual(removeExcessUrl(url), shortUrl)
+  m.AssertEqual(removeExcessUrl(url), shortUrl)
 End Function
