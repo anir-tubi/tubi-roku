@@ -1028,11 +1028,11 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
 
   if container.type = constants.ui.categoryTypes.preview
     if constants.deviceInfo.limitedUI <> true
-      ' if m.experiments.getExperimentResource("roku", "roku_vitg_large").enabled = true
-        ' gridItemType = constants.ui.gridItemTypes.vitg_large
+      if m.experiments.getExperimentResource("rokunamespace", "roku_vitg_3").enabled = true
+        gridItemType = constants.ui.gridItemTypes.vitg_large
       ' else if m.experiments.getExperimentValue("RokuNamespace", "roku_vitg_2") = "vitg_small"
         ' gridItemType = constants.ui.gridItemTypes.vitg_small
-      ' end if
+      end if
     end if
   else if container.id = constants.ui.categoryIds.featured and orientation <> constants.ui.gridItemTypes.portrait
     gridItemType = constants.ui.gridItemTypes.landscape

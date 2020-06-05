@@ -42,6 +42,8 @@ Function TubiExperiments(constants) as Object
       }
       roku2: {
       }
+      rokunamespace: {
+      }      
     }
     defaultResources: {
       roku: {
@@ -49,6 +51,9 @@ Function TubiExperiments(constants) as Object
       }
       roku2: {
       }
+      rokunamespace: {
+        roku_vitg_3 : {"enabled" : false}
+      }      
     }
 
     'public methods
