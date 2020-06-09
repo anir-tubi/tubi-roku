@@ -52,7 +52,7 @@ Function showDetailScreen(content)
     if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
       detailScreen.isLoading = true
     else
-      populateDetailScreen(detailScreen, content, true)  
+      populateDetailScreen(detailScreen, content, true, -1, true)  
     end if
     
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
@@ -115,8 +115,12 @@ End Function
 ' populateDetailScreen
 '
 'Populates the detail screen's state from a content node
-'@content: tubiContentNode
-Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSavedPosition = -1)
+'@param detailScreen, the detail screeen to refresh
+'@param content: tubiContentNode, the content of the screen
+'@param resetButtonIndex: Boolean
+'@param nSavedPosition: integer, The number representing the resume point of the video
+'@param bNewData: Boolean, Is this the first time the content has been loaded to the detailScreen? If it hasn't beeen the 1st time, then some things do not need to happen.
+Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSavedPosition = -1, bNewData=false)
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
   backgroundUriList = [m.defaultBackgroundUri]
@@ -205,8 +209,10 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
 
     'tell the detail screen/info panel to vertically center the info panel
     detailScreen.calculateInfoHeight = true
-
-    detailScreen.relatedContent = content.relatedContent
+    if bNewData = true
+      '//Only change the related content if it's newly loaded data
+      detailScreen.relatedContent = content.relatedContent
+    end if
 
     if wasLoading or resetButtonIndex
       detailScreen.jumpToItem = 0
@@ -426,8 +432,7 @@ Function onSingleContentResponse(msg) As Void
     m.actionType = invalid
     
   end if
-  
-  populateDetailScreen(detailScreen, refreshedContent)
+  populateDetailScreen(detailScreen, refreshedContent, false, -1, true)  
 
   loadTime = 0
   if refreshedContent.type = m.constants.ui.contentTypes.series
