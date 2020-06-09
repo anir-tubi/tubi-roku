@@ -446,7 +446,11 @@ Function onRetryPlayerError()
   ' try to resume the video from the last checkpoint
   screen = currentScreen()
   if screen.isSubtype("DetailScreen") = true
-    resumeHelper(screen)
+     if screen.watchTrailerSelected = true
+       trailerHelper(screen)
+     else
+       resumeHelper(screen)
+     end if
   end if
 End Function
 
