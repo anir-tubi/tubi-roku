@@ -1,8 +1,6 @@
 Function init()
   m.constants = getConstants()
 
-  m.animationLogoEnabled = invalid
-  
   processAnimationLogo()
   
   m.hasExperiments = false
@@ -62,7 +60,6 @@ End Function
 Function onExperimentsInfoReturned(msg)
   m.constants.experiments.info = msg.getData()
   m.experiments = TubiExperiments(m.constants)
-  m.animationLogoEnabled = m.experiments.getExperimentResource("roku", "roku_sound_id").roku_sound_id
   m.hasExperiments = true
   onUrlRequest()
 End Function
@@ -141,39 +138,12 @@ End Function
 
 Function playAnimationLogo()
 
-  if m.animationLogoEnabled = true and m.bufferingCompleted = true and m.customSplashTimerCount >= m.splashScreenMin 
+  if m.bufferingCompleted = true and m.customSplashTimerCount >= m.splashScreenMin 
     m.top.fadeOutCustomSplash = true
     m.videoPlayed = true
     m.animationLogo.control = "play"
-    sendExposureEvent()
-  else if m.animationLogoEnabled = false
-    sendExposureEvent()
   end if
   
-End Function
-
-
-Function sendExposureEvent()
-
-  if m.exposureSent <> true
-    experimentTracking = m.experiments.getExperimentTracking("roku", "roku_sound_id")
-
-    if experimentTracking <> invalid and experimentTracking.type <> invalid
-      m.analyticsTask = m.top.createChild("AnalyticsTask")
-      m.analyticsTask.experimentTracking = experimentTracking
-      m.analyticsTask.constants = m.constants
-      m.analyticsTask.observeField("analyticsResponse", "onAnalyticsResponse")
-      m.analyticsTask.control = "RUN"
-    end if
-
-    m.exposureSent = true
-  end if
-    
-End Function
-
-
-Function onAnalyticsResponse()
-
 End Function
 
 
