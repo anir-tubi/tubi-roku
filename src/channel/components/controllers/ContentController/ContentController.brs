@@ -341,7 +341,6 @@ End Function
 
 
 Function onInactivityTimer()
-  now = Uptime(0)
   ' don't do anything in this function for now
   ' but leave inactivity timer functionality in case it's needed in the future.
 End Function
