@@ -1,9 +1,9 @@
 ' Wrapper around the m.screenStack push interface to handle analytics events
 ' Push a screen on to the stack, allowing the back button to retrace steps
-Function pushScreen(screen As Object, sendNavigateEvents = true as Boolean, sendLoadingEvents = true as Boolean)
-  tubiLog("ScreenStackHelpers.pushScreen")
+Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEvents = true)
+  tubiLog("ScreenStackHelpers.pushScreen " + screen.id)
   current = m.screenStack.current
-  
+
   'handle user tracking for navigating to screen
   if sendNavigateEvents = true and current <> invalid
     screenTrackingNavigate(current.trackingPageInfo, screen.trackingPageInfo, current.trackingComponentInfo)
@@ -17,23 +17,47 @@ Function pushScreen(screen As Object, sendNavigateEvents = true as Boolean, send
   m.screenStack.push = screen
 End Function
 
+
 ' Tells the screen stack to focus onto the current screen
 Function focusCurrentScreen()
   m.screenStack.focusCurrent = true
 End Function
 
+
 ' Wrapper around the m.screenStack push interface to handle analytics events
 ' Remove the top-most screen of the stack, making the previous screen visible
-Function popScreen(sendTrackingEvents = true as Boolean)
+'
+' @sendNavigateEvents: boolean, don't send NavigateToPage analytics events. This might be useful in the 
+'                               case where a page fails to load but the page was already added to the screen
+'                               stack, and now the screen must be removed from screen stack, but the user did
+'                               not purposefully navigate back
+' @sendLoadingEvents: boolean, don't send PageLoad analytics event when removing the screen from the stack.
+'                              This might be useful in the case where the screen below the screen being popped
+'                              must be created and the PageLoad event should be fired once it is fully loaded.
+'                              An example of this is when the user signs out.
+Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
   tubiLog("ScreenStackHelpers.popScreen")
   toBePopped = currentScreen()
   topHidden = getHiddenScreen(1)
 
-  if sendTrackingEvents = true and topHidden <> invalid
-    if toBePopped <> invalid
-      screenTrackingNavigate(toBePopped.trackingPageInfo, topHidden.trackingPageInfo)
-    end if
-    
+  ' If the screen to be popped is the only screen, it will leave an empty screen stack.
+  ' In the case of an empty screen stack, we will build a home page. From an analytics standpoint
+  ' this is like navigating from the screen to be popped to the homescreen. So, create a fake
+  ' home screen for analytics purposes.
+  if topHidden = invalid
+    topHidden = {
+      trackingPageInfo: {
+        pageType: "home_page"
+        pageValues: {}
+      }
+    }
+  end if
+
+  if sendNavigateEvents = true and topHidden <> invalid and toBePopped <> invalid
+    screenTrackingNavigate(toBePopped.trackingPageInfo, topHidden.trackingPageInfo)
+  end if
+  
+  if sendLoadingEvents = true and topHidden <> invalid
     screenTrackingLoad(topHidden.trackingPageInfo)
   end if
 
@@ -47,7 +71,6 @@ Function getHiddenScreen(depth = 1)
   screenCount = m.screenStack.getChildCount()
   return m.screenStack.getChild(screenCount - depth - 1)
 End Function
-
 
 
 ' Wrapper for getting the current screen field from the screen stack.
@@ -125,7 +148,7 @@ End Function
 Function printScreenStack()
   for i=0 to m.screenStack.getChildCount()-1
     screen = m.ScreenStack.getChild(i)
-    print "stack["; i; "]: "; screen.subtype(); " id = "; screen.id
+    print "stack["; i;"]: "; screen.subtype(); " id = "; screen.id
   end for
 End Function
 

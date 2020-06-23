@@ -4,15 +4,15 @@ Function init()
   m._ = rodash()
   
   m.constants = m.global.constants
+  
+  m.generalTask = CreateObject("roSGNode", "GeneralTask")  ' initiate GeneralTask
+  ' Initiate GeneralTaskModule by passing caller context.
+  ' Calling GeneralTaskModule() will append methods to the local m.
+  ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.
+  GeneralTaskModule(m, m.generalTask)
+
   '//When ContentController initializes, clear all trandslations in case this is contained in a remote component. 
   clearTranslations()
-
-  ' initiate GeneralTaskHelper by passing caller context
-  ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskHelper
-  'GeneralTaskHelper(m)
-  ' initiate GeneralTask
-  'm.generalTask = CreateObject("roSGNode", "GeneralTask")
-  'initiateHomeData()
 
   Request = TubiRequest(m.constants.settings.mode)
   Auth = TubiAuth(m.constants, Request)
@@ -20,6 +20,7 @@ Function init()
   m.Bookmarks = TubiBookmarks(Request, Auth, m.constants, m.NodeHelpers)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
+  m.cmsApi = CmsApi(m.constants, Request, Auth)
 
   ' initialize states needed for various parts of kids mode
   m.kidsModeEnabled = false  'is the kids mode UI visible
@@ -74,7 +75,6 @@ Function init()
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid  ' indicates not logged in
   m.global.observeFieldScoped("authInfo", "onAuthInfoChanged")
-  m.authInfo = m.global.authInfo '//Local version of m.global.authInfo. This way we are sure we always have access to authInfo
 
   m.authInfoReceived = false    'is the auth info returned from the registry
   m.authInfoRefreshed = true    'is the auth info refreshed after receiving a deeplink with a refresh token
@@ -92,7 +92,20 @@ Function init()
 
   m.logOutTask = m.top.findNode("LogOutTask")
 
-  m.enteredFromDeepLink = false 'used to determine back button behavior in screen stack
+  ' indicates if we are building the app in a deep link state
+  ' is set to true when a deeplink occurs, and set back to false after the deeplink has been handled
+  ' (for example the video has been backed out of, or there was an error fetching deeplink metadata)
+  m.enteredFromDeepLink = false
+
+  ' indicates if we are in the process of handling an input event deeplink.
+  m.handlingDeeplinkInputEvent = false
+
+  ' used to save the current screen's trackingPageInfo when we received a deeplink roInputEvent, so that when
+  ' we add the video player to the screen stack, we know what screen was being navigated from.
+  ' This is needed because when a roInput deeplink event is observed, we create a new details screen for
+  ' the content. But, if at that point in time, a video player screen is the top most screen in the screen
+  ' stack, it will be removed and we won't be able to send a proper NavigateToPageEvent.
+  m.currentPageInfoAtDeeplinkInputEvent = invalid
 
   m.screenStack = m.top.findNode("ScreenStack")
   m.screenStack.observeFieldScoped("isEmpty", "onScreenStackEmpty")
@@ -103,12 +116,7 @@ Function init()
 
   m.SideNav = m.top.findNode("SideNav")
   initSideNav()
-
-  m.videoPlayer = m.top.findNode("VideoPlayer")
-  m.videoPlayer.observeFieldScoped("visible", "onVideoPlayerVisibleChange")
   
-  m.autohideTimer = m.top.findNode("AutohideTimer")
-  m.autohideTimer.observeFieldScoped("fire", "onAutohide")
   m.spinner = m.top.findNode("ContentControllerSpinner")
 
   m.inactivityTimer = m.top.findNode("InactivityTimer")
@@ -127,8 +135,11 @@ Function init()
 
   ' holds state so we don't fire the app load beacon more than once
   m.appLoadedBeaconFired = false
+  
+  ' holds state so we don't fire the intial home screen PageLoad analytics more than once
+  ' Initial page load can be at app launch, or after a deep link
+  m.initialHomeScreenLoadFired = false
 
-  initVideoTracking()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
@@ -149,32 +160,6 @@ Function onFadeInContentController()
       m.detailScreenAfterFn = invalid
     end if    
   end if
-
-End Function
-
-' initiateHomeData
-' constructs requestType, url, params and responseType for api request and invokes makeTaskRequest helper
-Function initiateHomeData()
-
-  requestType = m.constants.api.requestTypes.homeScreen
-  url = "https://uapi.adrise.tv/matrix/homescreen"
-  options = {
-    params: {
-      "user_id" : "46466412",
-      "device_id": "2366ec6e-7e5e-58e4-96e1-da33e5fb0f73",
-      "app_id" : "tubitv",
-      "includeempty" : "true",
-      "isKidsMode" : "false",
-      "expand": "1",
-      "limit": "12",
-      "platform": "roku"
-    },
-    method: "GET"  
-  }
-  responseType = "node"
-  
-  ' all params are mandatory
-  m.makeTaskRequest(requestType, url, options, m.generalTask, onHomeSuccessResponse, onHomeErrorResponse, responseType)
 
 End Function
 
@@ -246,10 +231,8 @@ Function onKeyEvent(key As String, press As Boolean)
     m.lastUserActivity = Uptime(0)
   end if
   if press then
-    if m.screenStack.opacity < 1.0 and type(unAutohide) = "Function" ' for autohide support, bring the UI back on any keypress
-      unAutohide()
-      return true
-    else if key = "back"
+    ' for autohide support, bring the UI back on any keypress
+    if key = "back"
       if m.enteredFromDeepLink = true
         m.enteredFromDeepLink = false
       end if
@@ -258,7 +241,7 @@ Function onKeyEvent(key As String, press As Boolean)
         if m.SideNav.visible = true
           displayNavMenu(true)
         else if m.screenStack.getChildCount() > 1
-          popScreen(true)
+          popScreen(true, true)
           topScreen = currentScreen()
           sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
           if sideNavId <> invalid
@@ -267,7 +250,11 @@ Function onKeyEvent(key As String, press As Boolean)
         else
           ' remove the last screen, probably detail screen,
           ' this should trigger a restart of the app via onScreenStackEmpty()
-          popScreen(false)
+          ' PageLoad event will be sent by fireAppLoadBeacon() when home page finishes loading
+          popScreen(true, false)
+          ' reset appStartTime so that the home screen load event will have the correct loadTime value
+          ' which will be set in fireAppLoadBeacon()
+          m.top.appStartTime = Int(Uptime(0))
           m.deeplinkContent = invalid
         end if
       else if m.SideNav.opened = true
@@ -275,7 +262,7 @@ Function onKeyEvent(key As String, press As Boolean)
           '//Most likely this condition only happens when user is on the homescreen
           '//::TODO::SIDENAV - add the condition when the count() = 1 but the screen is not the homescreen. 
           '//     Show display homescreen. This happens for root activation screen.
-          popScreen()
+          popScreen(true, true)
           topScreen = currentScreen()
           sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
           if sideNavId <> invalid
@@ -318,9 +305,7 @@ End Function
 Function onComponentFocus()
   tubiLog("ContentController.onComponentFocus")
   if m.top.isInFocusChain() and m.top.hasFocus()
-    if m.videoPlayer.visible = true
-      m.videoPlayer.setFocus(true)
-    else if m.SideNav.opened = true
+    if m.SideNav.opened = true
       displayNavMenu()
     else if currentScreen() <> invalid
       currentScreen().setFocus(true)
@@ -329,8 +314,10 @@ Function onComponentFocus()
 End Function
 
 
-Function onVideoPlayerVisibleChange()
-  if m.videoPlayer.visible = true
+Function onVideoPlayerVisibleChange(msg)
+  tubiLog("ContentController.onVideoPlayerVisibleChange")
+  videoPlayerVisible = msg.getData()
+  if videoPlayerVisible = true
     m.SideNav.visible = false
     m.logoGroup.visible = false
   else
@@ -352,38 +339,6 @@ End Function
 ' handles the response of a user who has been presented an exit app modal
 Function onExitAppModalButtonSelected()
   m.top.exitApp = true
-End Function
-
-
-Function onAutohide()
-  tubiLog("ContentController.onAutohide")
-  fadeTime = 3.0  ' default
-  if m.autohideTimer.fadeTime <> invalid
-    fadeTime = m.autohideTimer.fadeTime
-  end if
-
-  m.autohideAnimation = fade(m.screenStack, "out", fadeTime)
-
-  if m.autohideTimer.focusVideo = invalid or m.autohideTimer.focusVideo = true
-    'the user has entered the video player auto initialize experience
-    m.videoPlayer.setFocus(true)
-    m.videoPlayer.observeFieldScoped("backButtonPressed", "unAutohide")
-    m.videoPlayer.showTransport = true
-  else
-    m.top.setFocus(true)  'key presses go to the screen stack
-  end if
-End Function
-
-
-Function unAutohide()
-  tubiLog("ContentController.unAutohide")
-  if m.autohideAnimation <> invalid then m.autohideAnimation.control = "stop"
-
-  m.screenStack.visible = true
-  m.autohideAnimation = fade(m.screenStack, "in", 0.5)
-  currentScreen().setFocus(true)
-  m.videoPlayer.enableAds = false
-  m.videoPlayer.showTransport = false
 End Function
 
 
@@ -442,7 +397,7 @@ Function startUserExperience()
       ' whether we were logged in or not.
       m.contentGroup.visible = true
       enableKidsModeUI(false) '//when deeplinking, exit out of kids mode because we cannot guarantee that the video is kid appropriate so the UI should not make the user think we're still in kids mode
-      showDetailScreen(m.deeplinkContent)
+      showDetailScreen(m.deeplinkContent, false)
     else
       startChannel()
       showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
@@ -503,21 +458,35 @@ Function onInputInfoReceived()
       end if
 
       resetSideNav(false)
-      m.deeplinkContent = createDeeplinkContentFromStartupArgs(inputInfo)
-      stopVideoContent(true)
-      showDetailScreen(m.deeplinkContent)
+      videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+      stopVideoContent(videoPlayer) 'sets m.handlingDeeplinkInputEvent = false and m.deeplinkContent = invalid
 
       if kidsModeAtStart = true
-        ' remove all screens except the top most details screen if in kids mode so,
-        ' that when backing out of the details screen, the home screen will be re-populated as expected
-        shrinkScreenStack(1)
+        ' remove all screens if in kids mode so that when backing out of the details screen,
+        ' the home screen will be re-populated as expected
+        shrinkScreenStack(0)
         emptyScreenCache()
       end if
+
+      ' the following values will be used to save state and will be used in the process that
+      ' is kicked off by showDetailScreen to load the detail screen and video player screen
+      m.deeplinkContent = createDeeplinkContentFromStartupArgs(inputInfo)
+      m.handlingDeeplinkInputEvent = true
+
+      currentScreen = currentScreen()
+      if currentScreen <> invalid
+        m.currentPageInfoAtDeeplinkInputEvent = currentScreen.trackingPageInfo
+      end if
+
+      showDetailScreen(m.deeplinkContent, false)
     else if inputInfo.type = "transport"
-      if m.videoPlayer.visible
-        if (m.UpNextScreen = invalid or (m.UpNextScreen <> invalid and m.UpNextScreen.visible = false))
-          m.videoPlayer.transportVoiceRequest = inputInfo
-        end if
+      videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+      if videoPlayer <> invalid
+        videoPlayer.transportVoiceRequest = inputInfo
+      else
+        transportVoiceResponse = m.top.transportVoiceRequest
+        transportVoiceResponse.response = "unhandled"
+        m.top.transportVoiceResponse = transportVoiceResponse
       end if
     end if
   end if
@@ -769,7 +738,6 @@ Function enableKidsModeUI(bTurnOn = true)
     m.backgroundGroup.kidsMode = bTurnOn 
     setKidsModeInSideNav(bTurnOn)
     tellScreensIfKidsModeBeSentToServer()
-    m.videoPlayer.kidsMode = bTurnOn
 
     '//display proper logo
     if bTurnOn = true
@@ -796,7 +764,6 @@ Function tellScreensIfKidsModeBeSentToServer()
   if homeScreen <> invalid
     homeScreen.shouldKidsModeBeSentToServer = bKidsMode
   end if
-  m.videoPlayer.shouldKidsModeBeSentToServer = bKidsMode
 End Function
 
 
@@ -842,7 +809,7 @@ End Function
 ' Dismiss a modal dialog
 Function onCloseModal()
   tubiLog("ContentController.onCloseAbout")
-  popScreen(true)
+  popScreen(true, true)
   m.aboutScreen = invalid
 End Function
 
@@ -982,22 +949,7 @@ End Function
 ' fireAppLoadTimeEvent
 '
 ' Fire off a log to a server so we can track how long it took since the app was started
-Function fireAppLoadTimeEvent()
-
-  currentTime = Int(Uptime(0))
-  appStartTime = m.top.appStartTime
-  loadTime = currentTime - appStartTime
-  
-  'send tracking event for initial home page load
-  m.trackingLoggingTask.trackEvent = {
-    type: "page_load"
-    values: {
-      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})  'a valid page type (see PageLoadEvent in events.protos)
-      load_time: loadTime
-      status: "SUCCESS"  'ActionStatus enum
-    }
-  }
-
+Function fireAppLoadTimeEvent(loadTime)
   messageInfo = {
     loadtime: loadTime
     model: m.constants.deviceInfo.model
@@ -1045,74 +997,33 @@ Function showUpgradeModal(shouldAlert, trackingLib, trackingTask)
 End Function
 
 
-Function initVideoTracking()
-  if m.constants.thirdParty.youbora.enabled = true
-    m.videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
-    m.youboraTask = m.top.createChild("YBPluginRokuVideo")
-    m.youboraTask.id = "Youbora"
-    m.youboraTask.options = m.constants.thirdParty.youbora.config
-    m.youboraTask.videoplayer = m.videoPlayer.findNode("VideoNode")
-    m.global.addFields({YouboraLogActive: m.constants.thirdParty.youbora.debug})
-    m.youboraTask.control = "RUN"
-  end if
-End Function
-
-
-Function onVideoTrackingStart()
-  ' Youbora events
-  if m.constants.thirdParty.youbora.enabled = true
-    youboraConfig = m.constants.thirdParty.youbora.config
-
-    if m.videoPlayer.content <> invalid
-      youboraConfig["extraparam.1"] = m.videoPlayer.content.id
-      youboraConfig["content.id"] = m.videoplayer.content.id
-      youboraConfig.drm = m.videoplayer.content.drmType
-      youboraConfig.tvShow = Mid(m.videoplayer.content.parentId, 2)
-    end if
-
-    if m.global.authInfo <> invalid
-      youboraConfig.username = m.global.authInfo.userId
-    end if
-
-    youboraConfig["content.transactionCode"] = m.constants.deviceInfo.deviceId
-    youboraConfig["device.model"] = m.constants.deviceInfo.model
-    youboraConfig["app.releaseVersion"] = m.constants.settings.version
-
-    m.youboraTask.options = youboraConfig
-    m.youboraTask.event = {handler:"play"}
-  end if
-End Function
-
-
-Function videoTrackingStop()
-  if m.constants.thirdParty.youbora.enabled = true
-    m.youboraTask.event = {handler:"stop"}
-  end if
-End Function
-
-
-' We observe the VideoNode state change and when the state = "error", the call back chain of events
-' eventually sets VideoNode.control = "stop". Due to an idiosyncracy in Roku behavior, this prevents
-' the Youbora plugin from observing the error state on the video node, and so, we must manually trigger
-' the Youbora plugin with the error info.
-Function onSendYouboraError()
-  m.youboraTask.event = {
-    handler: "error"
-    params: {
-      "msg": m.videoplayer.videoErrorMsg,
-      "errorCode": m.videoplayer.videoErrorCode.ToStr()
-    }
-  }
-End Function
-
-
 ' fires a beacon which roku uses to determine the app load time only once per session. See:
 ' https://developer.roku.com/en-gb/docs/developer-program/performance-guide/measuring-channel-performance.md
+' 
+' also fires a home screen page load event when the home screen is created due to no screens on the stack
+' (this would happen in the case of deep links)
 Function fireAppLoadBeacon()
+  currentTime = Int(Uptime(0))
+  loadTime = currentTime - m.top.appStartTime
+
   if m.appLoadedBeaconFired = false
     m.appLoadedBeaconFired = true
-    fireAppLoadTimeEvent()
+    fireAppLoadTimeEvent(loadTime)
     m.top.signalBeacon("AppLaunchComplete")
+  end if
+
+  'send tracking event for initial home page load
+  currentScreen = currentScreen()
+  if m.initialHomeScreenLoadFired = false and currentScreen.id = m.constants.ui.screenIds.homeScreen
+    m.trackingLoggingTask.trackEvent = {
+      type: "page_load"
+      values: {
+        pageOneof: m.Tracking.getAnalyticsPage("home_page", {})  'a valid page type (see PageLoadEvent in events.protos)
+        load_time: loadTime
+        status: "SUCCESS"  'ActionStatus enum
+      }
+    }
+    m.initialHomeScreenLoadFired = true
   end if
 End Function
 

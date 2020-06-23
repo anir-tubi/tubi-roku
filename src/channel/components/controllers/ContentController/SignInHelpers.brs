@@ -82,7 +82,7 @@ Function onErrorButtonCancelPress()
   if screen <> invalid
     screen.getActivationCode = false
   end if
-  popScreen(true)
+  popScreen(true, true)
 End Function
 
 
@@ -158,7 +158,7 @@ Function onAuthInfoReceived()
 
   'remove the activation code screen since it is no longer necessary
   if currentScreen() <> invalid and currentScreen().getSubtype() =  "ActivationCodeScreen"
-    popScreen(true)
+    popScreen(true, true)
 
     screen = currentScreen()
     if screen <> invalid

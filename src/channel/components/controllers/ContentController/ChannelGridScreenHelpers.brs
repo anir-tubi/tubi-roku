@@ -147,7 +147,7 @@ Function onGridContentError(msg)
   screen = tearDownChannelGridTask(task)
   
   if screen <> invalid and (screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen)
-    popScreen(false)
+    popScreen(false, false)
 
     'delete the screen from the screen cache so that the next time the user attempts to load the page, the page will be loaded
     'from scratch again. Otherwise an empty page will load and content will never be fetched.

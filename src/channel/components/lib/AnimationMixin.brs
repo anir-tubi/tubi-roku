@@ -252,10 +252,12 @@ Function animate(target As Object, options as Object) As Object
       ' BUG: For some reason, keyValue cannot be set with the following line.  The firmware complains
       '      about a type mismatch.  Hence the verbose line below that which seems overly pedantic.
       '      slideinterpolator.keyValue = [origin, origin, destination]
-      slideinterpolator.keyValue = [[options.origin[0], options.origin[1]], [options.origin[0], options.origin[1]], [options.destination[0], options.destination[1]]]
+      if options.destination <> invalid
+        slideinterpolator.keyValue = [[options.origin[0], options.origin[1]], [options.origin[0], options.origin[1]], [options.destination[0], options.destination[1]]]
 
-      if bAnimate = false
-        target.translation = [options.destination[0], options.destination[1]]
+        if bAnimate = false
+          target.translation = [options.destination[0], options.destination[1]]
+        end if
       end if
     end if
 

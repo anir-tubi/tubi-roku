@@ -23,7 +23,7 @@ Function onSearchContentSelected(msg)
   tubiLog("SearchScreenHelpers.onSearchContentSelected")
   m.autoplayContext = invalid
   searchScreen = msg.getRoSGNode()
-  showDetailScreen(searchScreen.contentSelected)
+  showDetailScreen(searchScreen.contentSelected, true)
 End Function
 
 

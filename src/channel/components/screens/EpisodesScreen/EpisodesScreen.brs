@@ -43,6 +43,7 @@ Function onScreenFocusChange()
   if m.top.hasFocus() then
     'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error
     m.RowList.setFocus(true)
+    m.gridIsFocused = false
     m.RowList.setFocus(false)
     m.gridIsFocused = false
     m.RowList.setFocus(true)
@@ -95,7 +96,7 @@ Function onEpisodeFocused()
 
     ' trigger navigate_within_page events in ContentController
     rowItem = m.RowList.rowItemFocused
-    if m.gridIsFocused = true
+    if m.gridIsFocused = true and (rowItem[0] <> m.oldRowItemFocused[0] or rowItem[1] <> m.oldRowItemFocused[1])
       row = m.RowList.rowItemFocused[0] + 1
       col = m.RowList.rowItemFocused[1] + 1
 
@@ -231,7 +232,10 @@ End Function
 ' focusGrid
 '
 Function focusGrid()
-  m.RowList.setFocus(true)
+  if m.Rowlist.isInFocusChain() <> true
+    m.RowList.setFocus(true)
+  end if
+
   if m.global.constants.deviceInfo.limitedUi
     m.RowList.translation = [85,m.RowList.translation[1]]
     m.Menu.translation = [-425,m.Menu.translation[1]]

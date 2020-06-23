@@ -4,20 +4,27 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
-  m.top.observeField("content", "onContentChange")
+  m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("focusedChild", "onComponentFocus")
+  m.top.observeField("show", "onShow")
+  m.top.observeField("hide", "onHide")
   m.top.observeField("stopAutoPlayTimer", "onStopAutoPlayTimer")
+  m.top.observeField("resetContent", "onResetContent")
+  m.top.observeField("unfocus", "onUnfocus")
 
+  m.UpNextUI = m.top.findNode("UpNextUI")
+  m.UpNextUI.observeField("opacity", "onUpNextUIOpacityChange")
+  m.UpNextGradient = m.top.findNode("UpNextGradient")
   m.InfoMovie = m.top.findNode("InfoMovie")
   m.InfoSeries = m.top.findNode("InfoSeries")
-  m.Timer = m.top.findNode("CountdownTimer")
+  m.Timer = m.top.findNode("UpNextCountdownTimer")
   m.CountdownMovie = m.top.findNode("CountdownLabelMovie")
   m.CountdownMovie.color =  m.global.theme.highlightedText
   m.CountdownSeries = m.top.findNode("CountdownLabelSeries")
   m.CountdownSeries.color =  m.global.theme.highlightedText
   m.Timer.observeField("fire", "onCountdownTimer")
-  m.MovieGroup = m.top.findNode("MovieGroup")
-  m.SeriesGroup = m.top.findNode("SeriesGroup")
+  m.MovieGroup = m.top.findNode("UpNextMovieGroup")
+  m.SeriesGroup = m.top.findNode("UpNextSeriesGroup")
   m.GridMovie = m.top.findNode("GridMovie")
   m.GridMovie.observeField("itemFocused", "onMovieItemFocused")
   m.GridMovie.observeField("itemSelected", "onMovieItemSelected")
@@ -36,8 +43,9 @@ Function init()
     focusBox.uri = "pkg:/images/selector-hd.9.png"
     m.GridSeries.focusBitmapUri = "pkg:/images/selector-hd.9.png"
     focusBoxMargin = 4
-    gradient = m.top.findNode("Gradient")
-    gradient.uri = "pkg:/images/up-next-gradient-hd.9.png"
+    if m.UpNextGradient <> invalid
+      m.UpNextGradient.uri = "pkg:/images/up-next-gradient-hd.9.png"
+    end if
   else
     focusBoxMargin = 6
   end if
@@ -92,9 +100,8 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the Up Next content row already
   ' has focus, not when it gains focus.
   m.isUpNextFocused = false
-  
-  m.top.screenLevel = m.constants.ui.screenLevels.upNextScreen
 End Function
+
 
 Function onComponentFocus()
   if m.top.hasFocus()
@@ -107,6 +114,15 @@ Function onComponentFocus()
     m.isUpNextFocused = false
   end if
 End Function
+
+
+Function onResetContent()
+  m.top.content = invalid
+  m.top.contentFocused = invalid
+  m.top.contentSelected = invalid
+  m.top.autoplayMode = "none"
+End Function
+
 
 Function onContentChange()
   tubiLog("UpNextScreen.onContentChange")
@@ -129,7 +145,6 @@ Function onContentChange()
       drawCountdown(m.CountdownMovie, m.timeRemaining)
       updateInfoPanel(m.InfoMovie, m.GridMovie.content.getChild(0))
     end if
-    m.Timer.control = "start"
   else
     ' default hide both experiences
     m.MovieGroup.visible = false
@@ -137,27 +152,34 @@ Function onContentChange()
   end if
 End Function
 
+
 ' this method stops the countdown timer, when deeplinking during autoplay screen
 Function onStopAutoPlayTimer()
   if m.Timer <> invalid
-    m.Timer.control = "stop"
+    stopTimer()
   end if
 End Function
 
+
 Function onKeyEvent(key, press)
   tubiLog("UpNextScreen.onKeyEvent")
+  ' pass through back presses, but consume all other button presses
   if press and key = "back"
-    m.Timer.control = "stop"
-    m.top.backPressed = true
+    stopTimer()
+    return false
+  else
+    return true
   end if
   return false
 End Function
 
-Function onMovieItemFocused()
+
+Function onMovieItemFocused(msg)
   tubiLog("UpNextScreen.onMovieItemFocused")
-  itemFocusedHelper(m.GridMovie, m.InfoMovie)  'updates m.top.contentFocused
-  col = m.GridMovie.itemFocused + 1  '1 based index
+  itemFocused = m.GridMovie.itemFocused
+  col = itemFocused + 1  '1 based index
   row = 1
+  itemFocusedHelper(m.GridMovie, m.InfoMovie)  'updates m.top.contentFocused
 
   'Set the navigateWithinPageInfo value which will pass through to ContentController via videoHelpers.brs
   'to fire a navigate_within_page analytics event.
@@ -181,10 +203,13 @@ Function onMovieItemFocused()
   m.isUpNextFocused = true
 End Function
 
+
 Function onMovieItemSelected()
   tubiLog("UpNextScreen.onMovieItemSelected")
+  m.top.autoplayMode = "deliberate"
   m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemSelected)
 End Function
+
 
 Function itemFocusedHelper(grid, info)
   if grid.content <> invalid
@@ -192,33 +217,38 @@ Function itemFocusedHelper(grid, info)
     if content <> invalid
       updateInfoPanel(info, content)
       m.top.contentFocused = content
+      m.top.itemFocused = grid.itemFocused
       ' reset countdown while user is interacting
       m.timeRemaining = m.global.constants.player.upNextCountdown
     end if
   end if
 End Function
 
+
 Function onSeriesItemFocused()
   tubiLog("UpNextScreen.onSeriesItemFocused")
   itemFocusedHelper(m.GridSeries, m.InfoSeries)
 End Function
 
+
 Function onSeriesItemSelected()
   tubiLog("UpNextScreen.onSeriesItemSelected")
+  m.top.autoplayMode = "deliberate"
   m.top.contentSelected = m.GridSeries.content.getChild(m.GridSeries.itemSelected)
 End Function
+
 
 Function onCountdownTimer()
   tubiLog("UpNextScreen.onCountdownTimer")
   m.timeRemaining = m.timeRemaining - 1
   if m.timeRemaining = 0
-    m.top.timeout = true
+    m.top.autoplayMode = "automatic"
     if m.MovieGroup.visible
       m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemFocused)
     else
       m.top.contentSelected = m.GridSeries.content.getChild(0)
     end if
-    m.Timer.control = "stop"
+    stopTimer()
   else
     if m.MovieGroup.visible
       drawCountdown(m.CountdownMovie, m.timeRemaining)
@@ -228,9 +258,11 @@ Function onCountdownTimer()
   end if
 End Function
 
+
 Function drawCountdown(labelNode, time)
   labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)}) 
 End Function
+
 
 Function updateInfoPanel(infoNode, content)
   infoNode.title = content.title
@@ -251,4 +283,51 @@ Function updateInfoPanel(infoNode, content)
 
   ' always have to do this
   infoNode.calculateHeight = true
+End Function
+
+
+Function onShow()
+  tubiLog("UpNext.onShow")
+
+  ' reset the countdown timer prior to fading in the up next content so that
+  ' the timer doesn't flash an old time from the previous time the up next UI was visible.
+  if m.MovieGroup.visible
+    drawCountdown(m.CountdownMovie, m.timeRemaining)
+  else
+    drawCountdown(m.CountdownSeries, m.timeRemaining)
+  end if
+
+  fade(m.UpNextGradient, "in", 1.0)
+  slideFade(m.UpNextUI, "right", "in", 1.0)
+  m.Timer.control = "start"
+End Function
+
+
+Function onHide()
+  tubiLog("UpNext.onHide")
+  fade(m.UpNextGradient, "out", 0.75)
+  fade(m.UpNextUI, "out", 0.75)
+  m.isUpNextFocused = false
+  m.GridMovie.jumpToItem = 0
+End Function
+
+
+' typically setting focus to false is not a good pattern, but it seems to be necessary
+' in order to remove the focus from these components when the UpNext component is a child
+' of the video player.
+Function onUnfocus()
+  tubiLog("UpNext.onUnfocus")
+  m.GridMovie.setFocus(false)
+  m.GridSeries.setFocus(false)
+End Function
+
+
+Function onUpNextUIOpacityChange()
+  m.top.opacity = m.UpNextUI.opacity
+End Function
+
+
+Function stopTimer()
+  m.Timer.control = "stop"
+  m.timeRemaining = m.constants.player.upNextCountdown
 End Function

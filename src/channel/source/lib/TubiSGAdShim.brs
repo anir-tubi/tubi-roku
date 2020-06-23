@@ -33,7 +33,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
   tubiLog("TubSGAdShim.Run")
   m.videoPlayerNode = videoPlayerNode
 
-  if type(m.videoPlayerNode) <> "roSGNode" or m.videoPlayerNode.subtype() <> "VideoPlayer"
+  if type(m.videoPlayerNode) <> "roSGNode" or m.videoPlayerNode.subtype() <> "VideoPlayerScreen"
     tubiLog("TubSGAdShim.Run: videoPlayerNode is not component type VideoPlayer")
     return false
   end if

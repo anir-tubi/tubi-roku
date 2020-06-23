@@ -319,7 +319,7 @@ Function onContentSelected(msg)
   if content.type = "channel"
     showChannelScreen(content, sBackMessage)
   else
-    showDetailScreen(content)
+    showDetailScreen(content, true)
   end if
 End Function
 

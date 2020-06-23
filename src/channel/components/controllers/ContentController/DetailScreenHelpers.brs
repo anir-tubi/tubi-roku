@@ -3,7 +3,9 @@
 ' showDetailScreen
 '
 ' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
-Function showDetailScreen(content)
+' @sendTrackingOnResponse: boolean, set to true if the content needs to be fetched and NavigateToPageEvent and 
+'                                   PlayProgressEvent analytics should be sent after fetching info from the backend.
+Function showDetailScreen(content, sendTrackingOnResponse = true)
   tubiLog("DetailScreenHelpers.showDetailScreen")
   
   if content <> invalid
@@ -25,7 +27,6 @@ Function showDetailScreen(content)
     detailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
     detailScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     detailScreen.observeFieldScoped("refreshContent", "onRefreshContentSignal")
-    m.refreshingDetailCache = false
     
     ' m.actionType variable is used for setting a callback function after successful a data fetch retry in the case where
     ' users select a menu button from the detail screen, but the origial data fetch was unsuccessful. In this way,
@@ -56,7 +57,7 @@ Function showDetailScreen(content)
     end if
     
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
-    getSingleContentFromServer(detailScreen, content)
+    getSingleContentFromServer(detailScreen, content, sendTrackingOnResponse)
   else
     ' TODO: Refer to logs to determine if it's necessary to show a modal in this instance informing the user to press the back
     ' back button. We shouldn't end up with an invalid content, but as of 11/25/18 there are crash logs
@@ -106,8 +107,7 @@ End Function
 'detail screen has told us that the content or related content is out of cache window, so refresh
 Function onRefreshContentSignal(msg)
   detailScreen = msg.getRoSGNode()
-  m.refreshingDetailCache = true
-  getSingleContentFromServer(detailScreen, detailScreen.content)
+  getSingleContentFromServer(detailScreen, detailScreen.content, false)
 End Function
 
 
@@ -115,11 +115,11 @@ End Function
 ' populateDetailScreen
 '
 'Populates the detail screen's state from a content node
-'@param detailScreen, the detail screeen to refresh
-'@param content: tubiContentNode, the content of the screen
-'@param resetButtonIndex: Boolean
-'@param nSavedPosition: integer, The number representing the resume point of the video
-'@param bNewData: Boolean, Is this the first time the content has been loaded to the detailScreen? If it hasn't beeen the 1st time, then some things do not need to happen.
+'@detailScreen, roSGNode, a DetailScreen component to be populated
+'@content: tubiContentNode, the content of the screen
+'@resetButtonIndex: boolean, if true, focus the first button in the menu
+'@nSavedPosition: integer, The number representing the resume point of the video
+'@bNewData: boolean, Is this the first time the content has been loaded to the detailScreen? If it hasn't beeen the 1st time, then some things do not need to happen.
 Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSavedPosition = -1, bNewData=false)
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
@@ -197,6 +197,7 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     else if content.type = m.constants.ui.contentTypes.video and history <> invalid and history.nowPos > 0
       nResumePoint = history.nowPos
     end if
+
     if nSavedPosition >= 0
       '//If the saved position is passed as greater than 0 than use that number instead.
       '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct
@@ -243,16 +244,28 @@ End Function
 
 '@screen: roSGNode, a detail screen node
 '@content: roSGNode, a TubiContentNode
-Function getSingleContentFromServer(screen, content)
+'@callbackName: string, indicates if NavigateToPage and PageLoadTracking should occur when the response is received
+Function getSingleContentFromServer(screen, content, trackOnResponse)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
-  if content <> invalid then
+  if content <> invalid
     request = {
       contentId: content.id
-      getRelated: true
+      getRelated: false
       kidsMode: shouldKidsModeBeSentToServer()
       getContent: true
-      content: content
     }
+
+    ' get related (You May Also Like) content along with metadata for the content
+    if content.relatedContent = invalid
+      request.getRelated = true
+    end if
+
+    callbackName = "onSingleContentResponseWithTracking"
+    errorCallbackName = "onSingleContentErrorWithTracking"
+    if trackOnResponse = false
+      callbackName = "onSingleContentResponseWithoutTracking"
+      errorCallbackName = "onSingleContentErrorWithoutTracking"
+    end if
 
     refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
     refreshTask.request = request
@@ -260,25 +273,36 @@ Function getSingleContentFromServer(screen, content)
     refreshTask.target = screen
     screen.addField("task", "node", false)
     screen.task = refreshTask
-    refreshTask.observeField("response", "onSingleContentResponse")
-    refreshTask.observeField("error", "onSingleContentError")
+    refreshTask.observeField("response", callbackName)
+    refreshTask.observeField("error", errorCallbackName)
     refreshTask.control = "RUN"
   end if
 End Function
 
+
 'wrapper around getSingleContentFromServer for use as a callback in the error modal
 '@params: 2 index array containing params that should be passed to getSingleContentFromServer()
 Function getSingleContentFromServerRetry(params)
-  if type(params) = "roArray" and params.count() = 2
-    m.refreshingDetailCache = false
+  if type(params) = "roArray" and params.count() = 3
     params[0].isLoading = true
-    getSingleContentFromServer(params[0], params[1])
+    getSingleContentFromServer(params[0], params[1], params[2])
   end if
 End Function
 
 
-Function onSingleContentResponse(msg) As Void
-  tubiLog("DetailScreenHelpers.onSingleContentResponse")
+Function onSingleContentResponseWithTracking(msg)
+  handleSingleContentResponse(msg, true)
+End Function
+
+
+Function onSingleContentResponseWithoutTracking(msg)
+  handleSingleContentResponse(msg, false)
+End Function
+
+
+' @withTracking: boolean, indicates if NavigateToPage and PageLoad events should be triggered from this function
+Function handleSingleContentResponse(msg, sendTracking = true) As Void
+  tubiLog("DetailScreenHelpers.handleSingleContentResponse")
   task = msg.getRoSGNode()
   detailScreen = task.target
   detailScreen.contentFetchError = false
@@ -326,8 +350,8 @@ Function onSingleContentResponse(msg) As Void
       end if
       
       if m.enteredFromDeepLink = true
+        ' m.enteredFromDeepLink will be set to false when the video is played
         sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
-        m.enteredFromDeepLink = false
       end if
     else if (m.deepLinkContent.deeplinkType = "season" or m.deepLinkContent.deeplinkType = "episode" or m.deepLinkContent.deeplinkType = "series") and refreshedContent.type = m.constants.ui.contentTypes.video
       '  refreshedContent.id =       episode id
@@ -340,7 +364,7 @@ Function onSingleContentResponse(msg) As Void
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
       emptySeriesNode.type = m.constants.ui.contentTypes.series
       emptySeriesNode.id = refreshedContent.seriesId
-      getSingleContentFromServer(detailScreen, emptySeriesNode)
+      getSingleContentFromServer(detailScreen, emptySeriesNode, false)
       return
     else if m.deepLinkContent.deeplinkType = "season" and refreshedContent.type = m.constants.ui.contentTypes.series
       '  refreshedContent.id =       series id
@@ -376,8 +400,8 @@ Function onSingleContentResponse(msg) As Void
       end if
 
       if m.enteredFromDeepLink = true
+        ' m.enteredFromDeepLink will be set to false when the video is played
         sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
-        m.enteredFromDeepLink = false
       end if
     else if m.deepLinkContent.deeplinkType = "movie"
       'determine if we need to resume or play from start the deeplinked movie
@@ -389,8 +413,8 @@ Function onSingleContentResponse(msg) As Void
       end if
 
       if m.enteredFromDeepLink = true
+        ' m.enteredFromDeepLink will be set to false when the video is played
         sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
-        m.enteredFromDeepLink = false
       end if
     else
       'start the channel normally in case of issues
@@ -422,7 +446,7 @@ Function onSingleContentResponse(msg) As Void
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
       emptySeriesNode.type = m.constants.ui.contentTypes.series
       emptySeriesNode.id = refreshedContent.seriesId
-      getSingleContentFromServer(detailScreen, emptySeriesNode)
+      getSingleContentFromServer(detailScreen, emptySeriesNode, sendTracking)
       return
     end if
     
@@ -439,7 +463,7 @@ Function onSingleContentResponse(msg) As Void
     loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000)  'in ms
   end if
 
-  if m.enteredFromDeepLink = false and m.refreshingDetailCache = false
+  if sendTracking = true
     oldScreen = getHiddenScreen(1)  'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
     if oldScreen <> invalid
       screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
@@ -447,10 +471,6 @@ Function onSingleContentResponse(msg) As Void
     screenTrackingLoad(detailScreen.trackingPageInfo, loadTime)
   end if
 
-  if m.refreshingDetailCache = true
-    m.refreshingDetailCache = false
-  end if
-  
   ' making sure the app launch animation logo is completed before invoking playHelper/resumeHelper
   if m.top.fadeInContentController = true or afterFn = episodesHelper
     if afterFn <> invalid
@@ -459,11 +479,21 @@ Function onSingleContentResponse(msg) As Void
   else
     m.detailScreenAfterFn = afterFn    
   end if
-
 End Function
 
 
-Function onSingleContentError(msg)
+Function onSingleContentErrorWithTracking(msg)
+  handleSingleContentError(msg, true)
+End Function
+
+
+Function onSingleContentErrorWithoutTracking(msg)
+  handleSingleContentError(msg, false)
+End Function
+
+
+' @trackOnResponse: boolean, if the retry is succesful, should NavigateToPage and PageLoad tracking occur
+Function handleSingleContentError(msg, trackOnResponse)
   error = msg.GetData()
   task = msg.getRoSGNode()
   detailScreen = task.target
@@ -484,7 +514,7 @@ Function onSingleContentError(msg)
   ' Roku requires that errors are not shown for invalid content ids when deep linking
   if m.enteredFromDeepLink = true
     m.enteredFromDeepLink = false
-    popScreen(false)
+    popScreen(false, false)
     content = getDetailScreenContent(detailScreen)
     sendDeeplinkAnalytics(m.deepLinkContent, content, "home", m.Tracking, m.trackingLoggingTask, m.constants)
     m.deepLinkContent = invalid
@@ -496,8 +526,6 @@ Function onSingleContentError(msg)
     detailScreen = invalid  'release reference to the detailScreen as it is no longer needed
     m.deepLinkContent = invalid
     startChannel()
-  else if m.refreshingDetailCache = true
-    m.refreshingDetailCache = false
   else
     message = getTranslation("screenDetails_error_getContent_description")
     content = getDetailScreenContent(detailScreen)
@@ -512,9 +540,15 @@ Function onSingleContentError(msg)
       trackingTask: m.trackingLoggingTask
     }
 
+    callbackName = "onSingleContentResponseWithTracking"
+    if trackOnResponse = false
+      callbackName = "onSingleContentResponseWithoutTracking"
+    end if
+
     getSingleContentParams = [
       detailScreen
       content
+      callbackName
     ]
 
     showErrorModal(modalInfo, getSingleContentFromServerRetry, getSingleContentParams)
@@ -545,6 +579,7 @@ Function findEpisode2dIndex(episodeId As String, contentNode As Object)
   end if
   return [0,0]
 End Function
+
 
 ' returns episode detail as node, if episode detail not present it returns invalid
 Function getEpisodeDetail(content)
@@ -600,7 +635,7 @@ End Function
 ' Helper to deduce the content, video or episode, to play or resume
 Function getDetailScreenContent(screen = invalid)
   if screen = invalid
-    screen = currentScreen()
+    screen = getTopDetailScreenFromStack()
   end if
 
   if screen <> invalid and screen.subType() = "DetailScreen" and screen.content <> invalid
@@ -608,6 +643,25 @@ Function getDetailScreenContent(screen = invalid)
   else
     return invalid
   end if
+End Function
+
+
+Function getTopDetailScreenFromStack()
+  detailScreen = invalid
+  screenStackDepth = 1
+  while detailScreen = invalid
+    hiddenScreen = getHiddenScreen(screenStackDepth)
+    if hiddenScreen = invalid
+      ' we are outside of the screen stack depth so there are no more hidden screens
+      exit while
+    else if hiddenScreen.id = m.constants.ui.screenIds.detailScreen
+      detailScreen = hiddenScreen
+    else
+      screenStackDepth += 1
+    end if
+  end while
+
+  return detailScreen
 End Function
 
 
@@ -897,7 +951,7 @@ Function onRelatedContentSelected(msg)
   detailScreen = msg.getRoSGNode()
   content = detailScreen.content.relatedContent.getChild(detailScreen.relatedContentSelected)
   if content <> invalid
-    showDetailScreen(content)
+    showDetailScreen(content, true)
   end if
 End Function
 
@@ -909,8 +963,6 @@ End Function
 Function onDetailBackPressed()
   ' TODO(Chris): This is in terrible need of refactor. We shouldn't be calling this directly
   ' but we have to invoke the "empty stack" logic at this point.
-
-  m.refreshingDetailCache = false
   onKeyEvent("back", true)
 End Function
 
@@ -923,7 +975,7 @@ Function onEpisodeList(msg)
   if episodeDetail = invalid
     m.actionType = episodesHelper
     detailScreen.isLoading = true
-    getSingleContentFromServer(detailScreen, detailScreen.content) 
+    getSingleContentFromServer(detailScreen, detailScreen.content, false) 
   else 
     showEpisodeScreenWithNavigationTracking(detailScreen.content) 
   end if
@@ -945,12 +997,13 @@ Function onDescriptionSelected(msg)
   showDescriptionModal(detailScreen.description, dialogEvent, m.trackingLoggingTask)
 End Function
 
+
 Function episodesHelper(screen)
   showEpisodeScreenWithoutNavigationTracking(screen.content)
 End Function
 
 
-Function trailerHelper(screen) 
+Function trailerHelper(screen)
   content = screen.content
 
   if content <> invalid then
@@ -969,18 +1022,25 @@ Function trailerHelper(screen)
         trailerContent.title = getTranslation("videoPlayer_trailerTitle", {title: content.title})
       end if
 
-      trailerContent.streamformat="hls"
+      trailerContent.streamformat = "hls"
       trailerContent.nowPos = 0
       trailerContent.isTrailer = true
+
+      if content.hasTrailer and content.trailerInfo <> invalid and content.trailerInfo.url <> invalid
+        trailerContent.url = content.trailerInfo.url
+        trailerContent.id = content.trailerInfo.id
+        trailerContent.subtitleTracks = []
+        trailerContent.subtitleConfig = invalid
+      end if
 
       playVideoContent(trailerContent, "none")
     end if
   end if        
-
 End Function
 
+
 Function onWatchTrailer(msg)
-  tubiLog("ContentController.onWatchTrailer")
+  tubiLog("DetailScreenHelpers.onWatchTrailer")
   detailScreen = msg.getRoSGNode()
 
   content = getDetailScreenContent(detailScreen)
@@ -991,11 +1051,10 @@ Function onWatchTrailer(msg)
       else
         m.actionType = trailerHelper
         detailScreen.isLoading = true
-        getSingleContentFromServer(detailScreen, detailScreen.content)
+        getSingleContentFromServer(detailScreen, detailScreen.content, false)
       end if   
     end if
   end if  
-
 End Function
 
 
@@ -1014,7 +1073,6 @@ Function isFetchingInProgress(screen) as Boolean
   end if
   
   return bReturn
-
 End Function
 
 
@@ -1032,10 +1090,14 @@ Function isPlayable(screen) as Boolean
     if content.type = "series"
       episodeDetail = getEpisodeDetail(screen.content)
       if episodeDetail <> invalid and episodeDetail.url <> invalid and Len(episodeDetail.url) > 0
-        bReturn = true
+        if episodeDetail.validUntil <> invalid and episodeDetail.validUntil >= UpTime(0)
+          bReturn = true
+        end if
       end if
     else if content.type = "video" and content.url <> invalid and Len(content.url) > 0
-      bReturn = true
+      if content.validUntil <> invalid and content.validUntil >= UpTime(0)
+        bReturn = true
+      end if
     end if
   end if
   
@@ -1058,8 +1120,8 @@ Function onResume(msg)
     else
       m.actionType = resumeHelper
       detailScreen.isLoading = true
-      getSingleContentFromServer(detailScreen, detailScreen.content)
-    end if 
+      getSingleContentFromServer(detailScreen, detailScreen.content, false)
+    end if   
   end if
 End Function
 
@@ -1079,8 +1141,8 @@ Function onPlay(msg)
     else
       m.actionType = playHelper
       detailScreen.isLoading = true
-      getSingleContentFromServer(detailScreen, detailScreen.content)
-    end if
+      getSingleContentFromServer(detailScreen, detailScreen.content, false)
+    end if   
   end if
 End Function
 

@@ -685,6 +685,10 @@ Function tubiTracking_getOneOfs()
     video_id: -1
   }
 
+  video_player_page = {
+    video_id: -1
+  }
+
   series_detail_page = {
     series_id: -1
   }
@@ -731,6 +735,7 @@ Function tubiTracking_getOneOfs()
     category_list_page: category_list_page
     channel_list_page: channel_list_page
     video_page: video_page
+    video_player_page: video_player_page
     series_detail_page: series_detail_page
     episode_video_list_page: episode_video_list_page
     search_page: search_page
@@ -757,6 +762,7 @@ Function tubiTracking_getOneOfs()
     dest_category_list_page: category_list_page
     dest_channel_list_page: channel_list_page
     dest_video_page: video_page
+    dest_video_player_page: video_player_page
     dest_series_detail_page: series_detail_page
     dest_episode_video_list_page: episode_video_list_page
     dest_search_page: search_page

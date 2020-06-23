@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<component name="VideoPlayer" extends="Group" >
-  <script type="text/brightscript" uri="VideoPlayer.brs" />
-  <script type="text/brightscript" uri="VideoPlaylist.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  <script type="text/brightscript" uri="../AnimationMixin.brs" />
-  <script type="text/brightscript" uri="../ExperimentMixin.brs" />
+<component name="VideoPlayerScreen" extends="BaseScreen" >
+  <script type="text/brightscript" uri="VideoPlayerScreen.brs" />
+  <script type="text/brightscript" uri="VideoTransportHandling.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
@@ -18,15 +17,17 @@
   <interface>
   
     <!-- INPUT -->
-      <!-- the playlist parent content node -->
-      <field id="playlist" type="node" />
-      <field id="playlistIndex" type="integer" value="-1"/>
-      <field id="seekPlaylist" type="intarray" value="-1" alwaysNotify="true"/>
-      <field id="loopPlaylist" type="boolean" value="false"/>
-
       <!-- Alias fields for the video node -->
-      <field id="content" alias="VideoNode.content"/>
       <field id="position" alias="VideoNode.position"/>
+      <field id="width" alias="VideoNode.width"/>
+      <field id="height" alias="VideoNode.height"/>
+
+      <!-- New content has been added to the video player -->
+      <field id="content" type="node"/>
+      <field id="updateContent" type="boolean" alwaysNotify="true"/>
+      <field id="sprites" type="node"/>
+      <field id="upNextContent" alias="UpNext.content"/>
+      <field id="upNextUpdateContent" alias="UpNext.updateContent"/>
 
       <!-- Only support play and stop for simple external interface -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>
@@ -36,18 +37,8 @@
       <!-- interval in seconds for sending position data to the tracking server -->
       <field id="analyticsInterval" type="integer" value="0"/>
 
-      <!-- WRITE-ONLY field which hides overlay and transport.  This is not a persistent state -->
-      <field id="dock" type="boolean" value="false" alwaysNotify="true"/>
-
       <!-- WRITE-ONLY field tells if the video player should change its appearance to be kid friendly or not-->
       <field id="kidsMode" type="boolean" value="false" />
-
-      <!-- WRITE-ONLY field tells if the video player should send thd kidsMode boolean value to the server -->
-      <!-- ::TODO:: all references to this input should be made unnecessary by placing any caqlls to the server to the video helper file.  -->
-      <field id="shouldKidsModeBeSentToServer" type="boolean" value="false" />
-
-      <field id="width" alias="VideoNode.width"/>
-      <field id="height" alias="VideoNode.height"/>
 
       <!-- Enable/disable ads breaks.  This can be changed during playback in order to
         -  postpone midrolls when there is an overlay (e.g. EPG) that the user is
@@ -93,12 +84,6 @@
         -->
       <field id="midrolls" type="intarray" value="[]" />
 
-      <!-- force transport to display or hide -->
-      <field id="showTransport" type="boolean" alwaysNotify="true"/>
-
-      <!-- Is used to check whether up next content is fetched or not -->
-      <field id="shouldMakeNextRequest" type="boolean" alwaysNotify="false"/>
-
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -108,27 +93,16 @@
       <!-- Set to true if the skip trailer button was pressed -->
       <field id="skipTrailer" type="boolean" value="false" alwaysNotify="true" />
 
-      <!-- Set to true if the "go to end" button was pressed on the transport -->
-      <field id="goToNext" type="boolean" value="false" alwaysNotify="true" />
-
-      <!--  indicates to play the video on upnext callback function -->
-      <field id="playNext" type="boolean" value="false" />     
+      <!-- Set to true if the "go to end" button was pressed on the transport,
+           acts as an event and holds state, so must be reset -->
+      <field id="goToNext" type="boolean" value="false" alwaysNotify="true" />    
 
       <field id="state" type="string" />
       
       <field id="transportVoiceResponse" type="assocarray" alwaysNotify="true"/>
       
       <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
-      <field id="historyPosition" type="integer" value="0" />
-
-      <!-- Is set to true, when required to fetch next content -->
-      <field id="fetchNextContent" type="boolean" alwaysNotify="true"/> 
-
-      <!-- Is set when the credits cuepoint position is reached -->
-      <field id="creditsPosition" type="integer" alwaysNotify="false"/>
-
-      <!-- READ-ONLY field which indicates the current state of the player with respect to being docked -->
-      <field id="isDocked" type="boolean" value="false" />
+      <field id="historyPosition" type="integer" value="0" /> 
 
       <!-- field for communicating playback position to the ad shim -->
       <field id="adPosition" type="int" />
@@ -143,6 +117,22 @@
 
       <!-- Error code as told by the video node  -->
       <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
+
+      <!-- Pass through Up Next component events to video helper -->
+      <field id="upNextNavigateWithinPageInfo" alias="UpNext.navigateWithinPageInfo" />
+
+      <!-- Used to set the autoplay_deliberate and autoplay_automatic analytics values
+           for PlayProgressEvents and StartVideoEvents. Allowed values are "automatic", "deliberate" and "none"
+           -->
+      <field id="autoplayMode" type="string" />
+
+      <!-- Autoplay this content when this field is set -->
+      <field id="upNextContentToAutoplay" type="node" />
+
+      <!-- Is set to true when the creditsCuepoint has been reached or surpassed.
+           Fires every time that Video.position updates and position is >= to the creditsCuepoint
+       -->
+      <field id="upNextCuepointReached" type="boolean" alwaysNotify="true"/>
 
       <!-- We observe the VideoNode state change and when the state = "error", the call back chain of events
            eventually sets VideoNode.control = "stop". Due to an idiosyncracy in Roku behavior, this prevents
@@ -442,12 +432,16 @@
 
       </Group>  <!-- Transport -->
     </Group>  <!-- HUD -->
+
+    <UpNext
+      id="UpNext"
+      opacity="0.0" />
     
     <!-- RAF needs a parent group with no other elements, otherwise it will use
       - the Group dimensions set by the other children and not scale appropriately.
       -->
     <Group
-      id="RAFAdContainer"/>
+      id="RAFAdContainer" />
 
     <AdsTask
       id="AdsTask" />

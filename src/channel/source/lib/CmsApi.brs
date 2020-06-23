@@ -16,6 +16,7 @@ Function CmsApi(constants, request, auth)
     upNextContentReq: cmsApi_getUpNextContentRequest
     singleContentReq: cmsApi_getSingleContentRequest
     thumbnailsReq: cmsApi_getThumbnailsRequest
+    thumbnailsReqInfo: cmsApi_getThumbnailsRequestInfo
     channelReq: cmsApi_getChannelRequest
     homeScreenReq: cmsApi_getHomeScreenRequest
     channelsCategoriesScreenReq: cmsApi_getChannelsCategoriesScreenRequest
@@ -81,6 +82,17 @@ Function cmsApi_getThumbnailsRequest(contentId)
   options = m.commonOptions_()
   options.params.type = "5x"
   return m.request_.createAsync(url, m.constants_.reqNames.getThumbnails, options)
+End Function
+
+
+Function cmsApi_getThumbnailsRequestInfo(contentId)
+  url = m.constants_.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
+  options = m.commonOptions_()
+  options.params.type = "5x"
+  return {
+    url: url
+    options: options
+  }
 End Function
 
 

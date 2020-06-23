@@ -37,7 +37,8 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/GeneralTaskHelper.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/GeneralTaskModule.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/CmsApi.brs" />
   <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
@@ -50,12 +51,12 @@
   
     <!-- INPUTS -->
       <!-- the arguments that are passed into the app at startup, as an associative array -->
-      <field id="startupArgs" type="assocarray" />
-      <field id="appStartTime" type="integer" />
+      <field id="startupArgs" type="assocarray"/>
+      <field id="appStartTime" type="integer"/>
 
       <!-- any info that is passed into the channel via roInput/ECP while the channel is running
            can be deeplinks, transport controls, voice commands, etc. -->
-      <field id="roInputInfo" type="assocarray" />
+      <field id="roInputInfo" type="assocarray"/>
 
       <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
       <field id="reloadMovieUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
@@ -74,10 +75,10 @@
       <field id="fadeInContentController" type="boolean"/>
       
     <!-- OUTPUT -->
-      <!-- Main thread listens for this (in the ad shim) and will exit the app if set to true-->
-      <field id="exitApp" type="boolean" value="false" />
+      <!-- Main thread listens for this and will exit the app if set to true-->
+      <field id="exitApp" type="boolean" value="false"/>
       
-      <field id="transportVoiceResponse" alias="VideoPlayer.transportVoiceResponse"/>
+      <field id="transportVoiceResponse" type="assocarray"/>
       
       <!-- removeStartUpScreens is used to remove the StartUpScreens(animationLogo) -->
       <field id="removeStartUpScreens" type="boolean" />  
@@ -107,9 +108,6 @@
         <!--Handles the background images -->
         <BackgroundGroup
           id="BackgroundGroup"/>
-        <VideoPlayer
-          id="VideoPlayer"
-          visible="false"/>
         <ScreenStack
           id="ScreenStack"/>
         <SideNav
@@ -142,9 +140,6 @@
 
       <TrackingLoggingTask
         id="TrackingLoggingTask"/>
-
-      <Timer
-       id="AutohideTimer"/>
 
       <Timer
        id="InactivityTimer"

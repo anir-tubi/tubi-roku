@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Also referred to as Autoplay UI -->
+<component name="UpNext" extends="Group">
+  <script type="text/brightscript" uri="UpNext.brs" />
+  <script type="text/brightscript" uri="../AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+      <field id="content" type="node"/>
+      <field id="updateContent" type="boolean" alwaysNotify="true"/>
+
+      <!-- The video id of the content that is playing when the Up Next UI begins -->
+      <field id="videoId" type="string"/>
+      <field id="stopAutoPlayTimer" type="boolean" alwaysNotify="true"/>
+
+      <!-- show or hide the UpNext component -->
+      <field id="show" type="boolean" alwaysNotify="true"/>
+      <field id="hide" type="boolean" alwaysNotify="true"/>
+
+      <!-- reset the content for new video playback -->
+      <field id="resetContent" type="boolean" alwaysNotify="true"/>
+
+      <!-- unfocus the focused components -->
+      <field id="unfocus" type="boolean" alwaysNotify="true"/>
+
+    <!-- OUTPUTS -->
+      <field id="contentFocused" type="node"/>
+      <field id="contentSelected" type="node" alwaysNotify="true"/>
+      <field id="itemFocused" type="integer" />
+      
+      <!-- acceptable strings are "automatic" if the timer expires or "deliberate" if the an item is selected-->
+      <field id="autoplayMode" type="string" />
+
+      <!-- Holds the information needed to populate a navigate_witin_page event. This will
+           be observed by the contentController via videoHelpers
+           which will be responsible for sending navigate_within_page events.
+      -->
+      <field id="navigateWithinPageInfo" type="assocarray"/>
+  </interface>  
+
+  <children>
+    <Timer
+      id="UpNextCountdownTimer"
+      duration="1.0"
+      repeat="true"/>
+    <Poster
+      id="UpNextGradient"
+      width="1920"
+      height="1080"
+      translation="[0,0]"
+      opacity="0.0"
+      uri="pkg:/images/up-next-gradient-fhd.9.png"/>
+    <Group
+      id="UpNextUI"
+      opacity="0.0">
+      <Group
+        id="UpNextBackGroup"
+        opacity="0.5">
+        <Poster
+          uri="pkg:/images/back.png"
+          width="29"
+          height="47"
+          translation="[81,576]"/>
+        <Label
+          id="BackLabel"
+          translation="[123,580]"
+          height="47"
+          vertAlign="center">
+          <Font
+            id="Vaud22px"
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+      </Group>
+      <!-- Movies shows a navigable grid with a few suggestions -->
+      <Group
+        id="UpNextMovieGroup"
+        visible="false">
+        <TargetList
+          id="GridMovie"
+          itemComponentName="UpNextPoster"
+          showTargetRects="false"
+          advanceKey="right"
+          reverseKey="left"
+          translation="[0,688]"/>
+        <Poster
+          id="FocusBox"
+          uri="pkg:/images/selector-fhd.9.png"/>
+        <Label
+          id="CountdownLabelMovie"
+          translation="[354,638]"
+          height="46">
+          <Font
+           role="font"
+           uri="pkg:/fonts/Vaud-SemiBold.ttf"
+           size="34" />
+        </Label>
+        <InfoPanel
+          id="InfoMovie"
+          mode="item"
+          width="992"
+          maxHeight="313"
+          maxTitleLines="3"
+          titleFontSize="67"
+          translation="[354,691]"/>
+      </Group>
+      <!-- Series shows a single poster for the next episode in the same series -->
+      <Group
+        id="UpNextSeriesGroup"
+        visible="false">
+        <MarkupGrid
+          id="GridSeries"
+          itemComponentName="UpNextPoster"
+          itemSize="[430,242]"
+          focusBitmapUri="pkg:/images/selector-fhd.9.png"
+          numColumns="1"
+          numRows="1"
+          translation="[85,688]" />
+        <Label
+          id="CountdownLabelSeries"
+          translation="[573,598]"
+          height="46">
+          <Font
+           role="font"
+           uri="pkg:/fonts/Vaud-SemiBold.ttf"
+           size="34" />
+        </Label>
+        <InfoPanel
+          id="InfoSeries"
+          mode="item"
+          width="875"
+          maxHeight="397"
+          maxTitleLines="3"
+          titleFontSize="67"
+          translation="[574,650]"/>
+      </Group>
+    </Group>
+  </children>
+</component>

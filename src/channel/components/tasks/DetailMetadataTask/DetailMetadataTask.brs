@@ -54,12 +54,6 @@ Function execGetDetailMetadata() As Void
     relatedReq.start(port)
   end if
 
-  if m.top.request.getThumbnails = true
-    tubiLog("DetailMetadataTask getting sprites for " + m.top.request.contentId)
-    thumbnailsReq = cms.thumbnailsReq(m.top.request.contentId)
-    thumbnailsReq.start(port)
-  end if
-
   ' Wait for all responses
   while true
     msg = wait(100, port)
@@ -69,9 +63,6 @@ Function execGetDetailMetadata() As Void
     end if
     if relatedReq <> invalid and relatedResult = invalid
       relatedResult = relatedReq.handleEvent(msg)
-    end if
-    if thumbnailsReq <> invalid and thumbnailsResult = invalid
-      thumbnailsResult = thumbnailsReq.handleEvent(msg)
     end if
     if (contentReq = invalid or contentResult <> invalid) and (relatedReq = invalid or relatedResult <> invalid) and (thumbnailsReq = invalid or thumbnailsResult <> invalid)
       exit while
@@ -135,25 +126,6 @@ Function execGetDetailMetadata() As Void
     else
       tubiLog("DetailMetadataTask did not get valid response for related content.")
     end if
-  end if
-
-  if thumbnailsReq <> invalid
-    spritesContentNode = invalid
-    if thumbnailsResult <> invalid and thumbnailsResult.response <> invalid and success(thumbnailsResult.response.code)
-      parsed = ParseJSON(thumbnailsResult.response.data)
-      if parsed = invalid then
-        tubiLog("DetailMetadataTask failed to parse JSON response")
-      else
-        spritesContentNode = CreateObject("roSGNode", "TubiContentNode")
-        spritesContentNode.id = m.top.request.contentId
-        spritesContentNode.thumbnailUrls = parsed.sprites
-        spritesContentNode.thumbnailSpan = parsed.count_per_sprite
-        spritesContentNode.thumbnailSize = [parsed.frame_width, parsed.height]
-      end if
-    else
-      tubiLog("DetailMetadataTask did not get a valid response for thumbnails/sprites")
-    end if
-    m.top.thumbnailsResponse = spritesContentNode
   end if
 
   if updatedContent <> invalid

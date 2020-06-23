@@ -258,7 +258,7 @@ Function onParentalSettingComplete(msg)
     setAuthInfoValue("parentalrating", m.settingsScreen.parentalSettingSelected)
     if isConfirmPasswordScreen() = true
       '//If ConfirmPasswordScreen visible, then pop the Screen and save the password
-      popScreen() ' remove the ConfirmPasswordScreen
+      popScreen(true, true) ' remove the ConfirmPasswordScreen
 
       setAuthInfoValue("passwordText", m.parentalSettingUpdateTask.password)
       setAuthInfoValue("secondsOfSavedPassword", getNowSeconds())

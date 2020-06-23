@@ -23,7 +23,7 @@ End Function
 ' returns error ContentNode
 Function parseHomescreenError(error as Object) as Dynamic
 
-  eContentNode = CreateObject("roSGNode", "ErroContentNode")
+  eContentNode = CreateObject("roSGNode", "ErrorContentNode")
 
   if error <> invalid 
     if error.code <> invalid

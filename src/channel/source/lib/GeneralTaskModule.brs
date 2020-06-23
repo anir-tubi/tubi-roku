@@ -1,15 +1,16 @@
-' GeneralTaskHelper 
+' GeneralTaskModule 
 '
 ' module for creating RequestNode and interacting with GeneralTask 
 ' @context : m variable of caller context is passed as param
 ' module will be appended back to caller context (because some of the private methods are going to accessed using caller context)
-Function GeneralTaskHelper(context)
+Function GeneralTaskModule(context, generalTask)
 
   module = {
     ' public
-    makeTaskRequest: generalTask_makeTaskRequest
+    makeRequest: generalTask_makeRequest
     
     ' private
+    generalTask: generalTask
     generalTaskCallbacks: {} 
     getGeneralTaskSuccessCallback: generalTask_getSuccessCallback
     getGeneralTaskErrorCallback: generalTask_getErrorCallback
@@ -17,7 +18,7 @@ Function GeneralTaskHelper(context)
     storeGeneralTaskCallbacks: generalTask_storeCallbacks
   }
   
-  ' required - this loop helps to check the GeneralTaskHelper methods/properties with context methods/properties
+  ' required - this loop helps to check the GeneralTaskModule methods/properties with context methods/properties
   for each key in module
     if context.DoesExist(key)
        print ""
@@ -34,17 +35,16 @@ Function GeneralTaskHelper(context)
 End Function  
 
 
-' generalTask_makeTaskRequest
+' generalTask_makeRequest
 '
 ' public method, which dynamically creates RequestNode with response & error fields and sets request field of Task Node
-' @name : String, name of the request api
+' @requestType : String, name of the request api, for example "getHomescreen". Can be found in constants.reqNames
 ' @url : String, url of the request api
-' @options : AA, options will have query params, method(request method)
-' @task : Task, GeneralTask created instance
-' @successCallback : Function, sucess callback method name
-' @errorCallback : Function, error callback method name
-' @responseType : String, type of the response (eg. node/AA/string etc)
-Function generalTask_makeTaskRequest(requestType, url, options, task, successCallback, errorCallback, responseType)
+' @options : AA, options as expected by TubiRequest().createAsync. (For example: method, params, body, headers)
+' @successCallback : Function, the function that the render thread will run upon receiving a successful response
+' @errorCallback : Function, the function that the render thread will run upon receiving an error response
+' @responseType : String, type of the response data, corresponds to a valid roSGNode field type (eg. "node"/"assocarray"/"string"/"boolean" etc)
+Function generalTask_makeRequest(requestType, url, options, successCallback, errorCallback, responseType)
 
   roDeviceInfo = CreateObject("roDeviceInfo")
   randomId = roDeviceInfo.GetRandomUUID()
@@ -55,13 +55,13 @@ Function generalTask_makeTaskRequest(requestType, url, options, task, successCal
   requestNode.addField("response", responseType, false)
   requestNode.observeField("response", "successCallbackWrapper")
 
-  requestNode.addField("error", "node", false)
+  requestNode.addField("error", "assocarray", false)
   requestNode.observeField("error", "errorCallbackWrapper")
   
   m.storeGeneralTaskCallbacks(requestNode, successCallback, errorCallback)
   
   requestNode.input = {"requestType" : requestType, "url" : url, "options" : options}
-  task.request = requestNode
+  m.generalTask.request = requestNode
   
   return requestNode
 
@@ -93,7 +93,10 @@ Function errorCallbackWrapper(msg)
   error = requestNode.error
   m.unobserveGeneralTaskFields(requestNode)
   callback = m.getGeneralTaskErrorCallback(requestNode)
-  callback(error)  
+
+  if callback <> invalid
+    callback(error)
+  end if
 
 End Function
 

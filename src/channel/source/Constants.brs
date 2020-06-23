@@ -207,7 +207,7 @@ Function getConstants()
     constants.deviceInfo.scaledUi = scaledUi
     
 
-  'the names of the registry memory sections that will save bookmark and previously viewed info
+  'names given to different request types for identification purposes (for example in the General Task)
   constants.reqNames = {}
     constants.reqNames.searchAPI = "searchAPI"
     constants.reqNames.getHomescreen = "getHomescreen"
@@ -303,11 +303,6 @@ Function getConstants()
   '}  
   constants.idsToLog = {}
   
-  ' api request Types which will be used in GeneralTask for parsing
-  constants.api = {}
-    constants.api.requestTypes = {}
-      constants.api.requestTypes.homeScreen = "getHomeScreen"
-
   constants.urls = {}
     'ad server url
     ' constants.urls.adsBaseUrl = "http://ads.adrise1.tv/" 'use to avoid getting ads during testing
@@ -637,8 +632,8 @@ Function getConstants()
       constants.ui.screenLevels.channelDetailScreen = 40
       constants.ui.screenLevels.detailScreen = 50
       constants.ui.screenLevels.episodeScreen = 50
+      constants.ui.screenLevels.videoPlayerScreen = 60
       constants.ui.screenLevels.activationCodeScreen = 100
-      constants.ui.screenLevels.upNextScreen = 100
       constants.ui.screenLevels.modalDialogScreen = 1000
 
     constants.ui.screenIds = {}
@@ -656,6 +651,7 @@ Function getConstants()
       constants.ui.screenIds.activationCodeScreen = "activationCodeScreen"
       constants.ui.screenIds.upNextScreen = "upNextScreen"
       constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"
+      constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
@@ -663,6 +659,8 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.videoPlayerScreen] = true
 
     constants.ui.sideNavOpenIds = {}
       constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true
@@ -683,14 +681,6 @@ Function getConstants()
       constants.ui.sideNavIds.exit = "exit"
       constants.ui.sideNavIds.profile = "profile"
       constants.ui.sideNavIds.kidsMode = "kidsMode"
-
-    constants.ui.cacheableScreenIds = {}
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.channelListScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
 
     'a map of screenIds to corresponding sideNavIds
     constants.ui.screenIdToSideNavId = {}

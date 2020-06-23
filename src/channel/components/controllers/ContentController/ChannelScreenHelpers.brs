@@ -25,7 +25,7 @@ End Function
 Function onChannelContentSelected(msg)
   tubiLog("ChannelScreenHelpers.onChannelContentSelected")
   channelScreen = msg.getRoSGNode()
-  showDetailScreen(channelScreen.contentSelected)
+  showDetailScreen(channelScreen.contentSelected, true)
 End Function
 
 
@@ -115,7 +115,7 @@ Function showChannelContentError(msg, bContentEmptyError = false)
     ' 
     ' If topScreen.id does not = the ID of a channelDetailScreen, then we know that the current screen is not being displayed
     ' So hold off on removing the screen and displaying an error. When the user traverses the navigation stack, then it will eventiually reveal this screen and if there is still no content, then it will display an error then.
-    popScreen(false)
+    popScreen(false, false)
     errorCode = getUserFacingErrorCode(m.global.constants.errors.context.channelScreen, m.constants.errors.subtypes.fetchError, errorInfo.code)
 
     dialogEvent = {

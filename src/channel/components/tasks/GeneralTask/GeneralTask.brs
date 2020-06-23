@@ -31,6 +31,7 @@ Function listen()
   createParsingCallbacks()
   
   requestModule = TubiRequest(m.constants.settings.mode)
+  authModule = TubiAuth(m.constants, requestModule)
 
   while (true)
     msg = wait(0, m.port)
@@ -39,7 +40,7 @@ Function listen()
       
         requestNode = msg.getData()
         if (requestNode.response = invalid and requestNode.error = invalid)
-          makeApiRequest(requestNode, requestModule)
+          makeApiRequest(requestNode, requestModule, authModule)
         end if
         
       end if
@@ -57,12 +58,18 @@ End Function
 ' add new assocarray (api requestType key & value) into m.requestTypes to handle new api parsing
 Function createParsingCallbacks()
 
-  m.requestTypes = {
-    "getHomeScreen": {
-      "parseSuccess": parseHomescreenSuccess
-      "parseError": parseHomescreenError
-    }
-  }  
+  m.requestTypes = {}
+
+  ' sprites
+  m.requestTypes[m.constants.reqNames.getThumbnails] = {
+    parseSuccess: parseVideoScreenSpritesSuccess
+  }
+
+  ' up next / autoplay
+  m.requestTypes[m.constants.reqNames.getUpNextContent] = {
+    parseSuccess: parseVideoScreenUpNextSuccess
+    parseError: parseVideoScreenUpNextError
+  }
 
 End Function
 
@@ -71,14 +78,18 @@ End Function
 ' 
 ' this method creates TubiRequest Object and start the api request
 ' @requestNode : roSGNode, requestNode is ContentNode
-' @requestModule : AA, requestModule is TubiRequest Object
-Function makeApiRequest(requestNode as Object, requestModule as Object) as Boolean
-
+' @requestModule : AA, requestModule is TubiRequest() Object
+' @authModule : AA, authModule is TubiAuth() Object
+Function makeApiRequest(requestNode, requestModule, authModule) as Boolean
   requestType = requestNode.input.requestType
   url = requestNode.input.url
   options = requestNode.input.options
   
-  tubiReq = requestModule.createAsync(url, requestType, options) 
+  ' m.auth.createAuthRequest() returns invalid if the user is not logged in
+  tubiReq = authModule.createAuthRequest(url, requestType, options)
+  if tubiReq = invalid
+    tubiReq = requestModule.createAsync(url, requestType, options)
+  end if
   reqSent = tubiReq.start(m.port)
   
   urlTransfer = tubiReq.urlTransfer
@@ -97,7 +108,7 @@ End Function
 '
 ' it does basic parsing the api response and send to appropriate parsing callbacks for further parsing, and send back the parsed data to the response field.
 ' @msg : roUrlEvent, response object from api
-Function processResponse(msg as Object)
+Function processResponse(msg)
 
     id = stri(msg.GetSourceIdentity()).trim()
     job = m.jobQueue[id]
@@ -127,9 +138,23 @@ Function processResponse(msg as Object)
           
         else
           
+          ' end result of parsedResponse type may vary depending on API response format
           parsedResponse = result.response
+          responseHeaders = result.response.headers
+          if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
+            parsedResponse = parseJson(result.response.data)
+          end if
+
           parserCallback = callbackTypes.parseError
-          job.requestNode.error = parserCallback(parsedResponse) 
+
+
+
+          ' some requests might not require error handling, and therefore may not have a parseError callback
+          if parserCallback <> invalid
+            job.requestNode.error = parserCallback(parsedResponse)
+          else
+            job.requestNode.error = invalid
+          end if
                    
         end if 
       

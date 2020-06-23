@@ -55,7 +55,7 @@ Function fetchLoop()
   while true
     msg = wait(0, m.port)
     if type(msg) = "roSGNodeEvent" then
-      tubiLog("Received roSGNodeEvent for field " + msg.GetField())
+      tubiLog("MetadataFetchRequest received roSGNodeEvent for field: '" + msg.GetField() + "'")
       if msg.GetField() = "request" then
         beginRequest(msg.GetData())
       else if msg.GetField() = "batchRequest" then

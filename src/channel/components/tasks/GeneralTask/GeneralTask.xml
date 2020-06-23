@@ -7,9 +7,10 @@
  --> 
 <component name="GeneralTask" extends="Task">
     <script type="text/brightscript" uri="GeneralTask.brs" />
+    <script type="text/brightscript" uri="Parsers/HomeScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/VideoScreenParsers.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
-    <script type="text/brightscript" uri="../../../source/lib/GeneralTaskParser.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
