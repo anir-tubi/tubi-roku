@@ -120,9 +120,9 @@ Function registrationLoop() As Void
             else
               'we got a polling response but either no json attached or no value for the status key
               tubiLog("Bad response polling reg code status")
-              trackRegistrationFailure(bad-response-status)
               pollFailureCount = pollFailureCount + 1
               if pollFailureCount >= maxConsecPollFailures
+                trackRegistrationFailure("bad-response-status")
                 m.top.error = "poll"
                 return
               else
