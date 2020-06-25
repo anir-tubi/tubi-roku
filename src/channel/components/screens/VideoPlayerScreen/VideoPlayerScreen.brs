@@ -143,7 +143,7 @@ Function init()
   ' m.seekReferenceQueue is used to record the playback positions to which m.Video.seek is set.
   ' Context: setting a value on m.Video.seek will cause the onVideoPositionChange() callback to fire.
   ' We do not want playProgressEvents to fire from onVideoPositionChange() if the callback occurs due to a seek,
-  ' so we check if the postion associated with the onVideoPositionChange() callback is at the 0 index of 
+  ' so we check if the position associated with the onVideoPositionChange() callback is at the 0 index of 
   ' m.seekReferenceQueue, and if it is, we know that the callback is firing due to seek. We use a "queue" to protect
   ' against the edge case / race condition that multiple seek events may occur prior to the onVideoPositionChange()
   ' callback being run for the first seek event. If we used a single value instead of the queue, in the event of the 
@@ -817,7 +817,21 @@ End Function
 
 ' Helper function to prevent historyPosition being sent during  trailers
 Function historyPosition(position)
-  if m.top.analyticsMode = "normal" or m.top.analyticsMode = "autoplay-automatic" or m.top.analyticsMode = "autoplay-deliberate" then
+  if m.top.analyticsMode = "normal" or m.top.analyticsMode = "autoplay-automatic" or m.top.analyticsMode = "autoplay-deliberate"
+    ' round the position up/down based on 0.5 rule.
+    ' this is necessary since isAtPosition() is returning true if the decimal is greater than 0.5.
+    ' If we do not round here, and a user exits the video player during ad playback, the history would be
+    ' stored always rounding down, but the ad check is done while rounding up over 0.5. So, if a user then
+    ' resumes playback, the ad call sends the position as 1 second less than the midroll cuepoint, and
+    ' no ads are returned, when they should be returned.
+    wholeNum = Int(position)
+    remainder = position - wholeNum
+    if remainder >= 0.5
+      position = wholeNum + 1
+    else
+      position = wholeNum
+    end if
+
     m.top.historyPosition = Int(position)
     m.lastSavedPosition = position
   end if
