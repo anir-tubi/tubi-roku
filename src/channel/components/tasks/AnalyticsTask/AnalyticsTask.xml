@@ -2,12 +2,14 @@
 <!--
  - AnalyticsTask
  -
- - This task makes requests to the analytics API
+ - This task makes requests to the analytics API and can be included in Starter Component Package
+ - To add it in Starter Component package, include AnalyticsTask.xml & AnalyticsTask.rs in buildStarter function of gulpfile.js
  -
  --> 
 <component name="AnalyticsTask" extends="Task">
 
     <script type="text/brightscript" uri="AnalyticsTask.brs" />
+    
     <script type="text/brightscript" uri="../../../source/Log.brs" />
     <script type="text/brightscript" uri="../../../source/Request.brs" />
     <script type="text/brightscript" uri="../../../source/Auth.brs" />

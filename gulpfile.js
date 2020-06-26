@@ -215,15 +215,6 @@ function buildStarter() {
       base: 'src/channel/components/tasks'
     };
     
-    // REMOVE ANALYTICSTASK AND ITS REFERENCES ONCE THE SOUNDID EXPERIMENT IS DONE
-    // include AnalyticsTask in starterComponents
-    let analyticsTaskSrc = [
-      'src/channel/components/tasks/AnalyticsTask/**/*'
-    ];
-    let analyticsTaskSrcOptions = {
-      base: 'src/channel/components/tasks'
-    };    
-
     // include Constants in starter components
     let constantsSrc = [
       'src/channel/source/Constants.brs'
@@ -267,8 +258,6 @@ function buildStarter() {
         .pipe(dest('build/starter/components/')),
       collect(experimentsTaskSrc, experimentsTaskSrcOptions)
         .pipe(dest('build/starter/components/')),
-      collect(analyticsTaskSrc, analyticsTaskSrcOptions)
-        .pipe(dest('build/starter/components/')),        
       collect(constantsSrc, constantsSrcOptions)
         .pipe(dest('build/starter/')),
       collect(genUtilSrc, genUtilSrcOptions)
