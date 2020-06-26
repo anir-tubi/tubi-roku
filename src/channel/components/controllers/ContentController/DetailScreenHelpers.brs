@@ -53,7 +53,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true)
     if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
       detailScreen.isLoading = true
     else
-      populateDetailScreen(detailScreen, content, true, -1, true)  
+      populateDetailScreen(detailScreen, content, true)  
     end if
     
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
@@ -119,7 +119,6 @@ End Function
 '@content: tubiContentNode, the content of the screen
 '@resetButtonIndex: boolean, if true, focus the first button in the menu
 '@nSavedPosition: integer, The number representing the resume point of the video
-'@bNewData: boolean, Is this the first time the content has been loaded to the detailScreen? If it hasn't beeen the 1st time, then some things do not need to happen.
 Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSavedPosition = -1, bNewData=false)
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
@@ -213,8 +212,9 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
 
     'tell the detail screen/info panel to vertically center the info panel
     detailScreen.calculateInfoHeight = true
-    if bNewData = true
-      '//Only change the related content if it's newly loaded data
+
+    if detailScreen.relatedContent = invalid
+      '//Only change the related content if it hasn't alreeady been loaded. If we try to reload the related content, then the thunbnails may not display due to (porobably) a firmware issue
       detailScreen.relatedContent = content.relatedContent
     end if
 
@@ -459,7 +459,7 @@ Function handleSingleContentResponse(msg, sendTracking = true) As Void
     m.actionType = invalid
     
   end if
-  populateDetailScreen(detailScreen, refreshedContent, false, -1, true)  
+  populateDetailScreen(detailScreen, refreshedContent)  
 
   loadTime = 0
   if refreshedContent.type = m.constants.ui.contentTypes.series
