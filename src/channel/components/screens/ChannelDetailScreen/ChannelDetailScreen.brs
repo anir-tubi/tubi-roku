@@ -254,6 +254,10 @@ Function populateInfoPanel(infoPanel, content, mode)
   else
     line1Data.partnerLogoUri = ""
   end if
+  if content.availabilityEnds <> invalid
+    line1Data.availabilityEnds = content.availabilityEnds
+  end if
+  
   infoPanel.lineOneData = line1Data
 
   if content.genres <> invalid

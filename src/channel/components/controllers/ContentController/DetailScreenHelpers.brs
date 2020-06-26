@@ -177,7 +177,10 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     end if
     if content.availabilityEnds <> invalid
       lineOneData.availabilityEnds = content.availabilityEnds
+    else if episode <> invalid and episode.availabilityEnds <> invalid
+      lineOneData.availabilityEnds = episode.availabilityEnds
     end if
+
     detailScreen.lineOneData = lineOneData
 
     detailScreen.description = stateSource.description

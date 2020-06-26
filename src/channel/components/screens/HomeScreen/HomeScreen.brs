@@ -410,6 +410,9 @@ Function populateInfoPanel(mode, contentNode)
       lineOneData.releaseDate = contentNode.releaseDate
       lineOneData.length = contentNode.length
       lineOneData.hasCC = (contentNode.hasSubtitles or not m._.empty(contentNode.subtitleTracks))
+      if contentNode.availabilityEnds <> invalid
+        lineOneData.availabilityEnds = contentNode.availabilityEnds
+      end if
       lineOneData.rating = contentNode.rating
       lineOneData.partnerLogoUri = contentNode.inlineLogoUri
 

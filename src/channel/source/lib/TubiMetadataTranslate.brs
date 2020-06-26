@@ -127,7 +127,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   'translate all the stuff from the server
   if contentFromServer.title <> invalid then translatedContent.title = contentFromServer.title
-
   if contentFromServer.duration <> invalid then translatedContent.length = contentFromServer.duration
   if contentFromServer.actors <> invalid then translatedContent.actors = contentFromServer.actors 'array of actors
   if contentFromServer.roku_genres <> invalid then translatedContent.rokuGenres = contentFromServer.roku_genres 'array of roku genres
@@ -819,10 +818,6 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
                 childIsPushable = true
               end if
             end if
-          end if
-
-          if fullChild.tags <> invalid
-            childAA.categories = fullChild.tags
           end if
 
           if fullChild.year <> invalid

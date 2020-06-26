@@ -60,8 +60,9 @@ Function channelDetailScreen_populateInfoPanelItem_test()
     partnerLogoUri: content.inlineLogoUri
     rating: content.rating
     releaseDate: content.releaseDate
+    availabilityEnds: content.availabilityEnds
   }
-
+  
   emptyInfoPanel = CreateObject("roSGNode", "InfoPanel")
   populatedInfoPanel = populateInfoPanel(emptyInfoPanel, content, "item")
 
@@ -86,6 +87,7 @@ Function channelDetailScreen_populateInfoPanelChannel_test()
     partnerLogoUri: content.inlineLogoUri
     rating: content.rating
     releaseDate: content.releaseDate
+    availabilityEnds: content.availabilityEnds
   }
 
   emptyInfoPanel = CreateObject("roSGNode", "InfoPanel")
