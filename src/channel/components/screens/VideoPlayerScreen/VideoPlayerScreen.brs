@@ -964,7 +964,24 @@ Function advanceDrmOnContent(contentNode)
       end if
     end for
   end if
-  return setDrmOnContent(contentNode, nextIndex)
+
+  if setDrmOnContent(contentNode, nextIndex) = true
+    nextResource = contentNode.videoResources[nextIndex]
+
+    fallbackInfo = {
+      failed_url: removeExcessUrl(resource.url)
+      failed_drm: resource.type
+      fallback_url: removeExcessUrl(nextResource.url)
+      fallback_drm: nextResource.type
+      model: m.constants.deviceInfo.model
+    }
+
+    ' log that we fell back to the next playback option after playback failed due to DRM
+    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "drm-fallback")
+    return true
+  else
+    return false
+  end if
 End Function
 
 
