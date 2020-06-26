@@ -274,7 +274,11 @@ End Function
 Function resumeFromPause(shouldSendAnalytics)
   animateTransport("out")
 
-  if m.playerPosition <> m.Video.position
+  ' when pausing the video, due to a firmware regression the Video.position can update
+  ' an additional time after pausing, but m.playerPosition will not update after pausing leading the
+  ' two values to be out of sync. If the difference is less than 1 second, treat it as if the 
+  ' m.playerPosition and m.Video.positions are equal.
+  if m.playerPosition <> m.Video.position and Abs(m.playerPosition - m.Video.position) > 1
     jumpToPosition(m.playerPosition)
   else
     m.Video.control = "resume"
@@ -299,7 +303,12 @@ End Function
 Function resumeFromSkip()
   tubiLog("VideoTransportHandling.resumeFromSkip")
   animateTransport("out")
-  if m.playerPosition <> m.Video.position
+
+  ' when pausing the video in order to implement the 10s skip, due to a firmware regression,
+  ' the Video.position can update an additional time after pausing, but m.playerPosition will
+  ' not update after pausing leading the two values to be out of sync. If the difference is less
+  ' than 1 second, treat it as if the m.playerPosition and m.Video.positions are equal.
+  if m.playerPosition <> m.Video.position and Abs(m.playerPosition - m.Video.position) > 1
     jumpToPosition(m.playerPosition)
   else
     m.Video.control = "resume"

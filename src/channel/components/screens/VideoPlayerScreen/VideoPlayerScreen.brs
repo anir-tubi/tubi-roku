@@ -448,7 +448,10 @@ End Function
 Function onVideoPositionChange()
   tubiLog("VideoPlayer.onVideoPositionChange position = " + m.playerPosition.toStr())
 
-  updatePlayerPosition()  'updates m.playerPosition with m.Video.position
+  ' protects against video positions being updated after we've told the player to pause
+  if m.VideoState = "play"
+    updatePlayerPosition()  'updates m.playerPosition with m.Video.position
+  end if
 
   playProgressOk = true
   if positionInSeekReferenceQueue(m.playerPosition, m.seekReferenceQueue) = true 'updates m.seekReferenceQueue as neccessary
