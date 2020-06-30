@@ -167,6 +167,7 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     lineOneData.rating = stateSource.rating
     lineOneData.releaseDate = content.releaseDate
     lineOneData.partnerLogoUri = content.inlineLogoUri
+
     if episode <> invalid and (episode.hasSubtitles = true or not m._.empty(episode.subtitleTracks))
       lineOneData.hasCC = true
     else if content <> invalid and content.type = m.constants.ui.contentTypes.video and (content.hasSubtitles = true or not m._.empty(content.subtitleTracks))
@@ -174,7 +175,8 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
     else
       lineOneData.hasCC = false
     end if
-    if content.availabilityEnds <> invalid
+
+    if content.availabilityEnds <> invalid and content.availabilityEnds <> ""
       lineOneData.availabilityEnds = content.availabilityEnds
     else if episode <> invalid and episode.availabilityEnds <> invalid
       lineOneData.availabilityEnds = episode.availabilityEnds
