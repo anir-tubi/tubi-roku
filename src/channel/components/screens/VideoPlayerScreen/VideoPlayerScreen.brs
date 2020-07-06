@@ -303,8 +303,7 @@ End Function
 
 Function onContentChange(msg) As Void
   tubiLog("VideoPlayer.onContentChange")
-  m.VideoState = "stop"
-  m.Video.control = "stop"
+  stopVideo("onContentChange")
 
   if m.top.content <> invalid
     'set page tracking values for analytics
@@ -330,8 +329,8 @@ Function onControlChange()
 
   else if m.top.control = "stop" then
     cancelReplayCaptions()
-    m.VideoState = "stop"
-    m.Video.control = "stop"
+    stopVideo("onControlChange")
+
     m.UpNext.stopAutoPlayTimer = true
 
     'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed
@@ -378,7 +377,6 @@ Function onVideoStateChange(msg)
         end if
       end if
 
-      m.VideoState = "stop"
       ' setting the m.top.state field to finished triggers autoplay content to start
       ' we don't want that trigger to fire if the up next component is still visible
       if m.UpNext.opacity = 0
@@ -399,11 +397,9 @@ Function onVideoStateChange(msg)
       m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
       m.top.state = state   'triggers error modal in ContentController
     end if
-  else if state = "stopped" and m.VideoState = "play"
-    ' player has stopped (not from an ad break) but internal state hasn't been updated yet, so update it here
+  else if state = "stopped" and m.VideoState = "stop"
+    ' player has stopped (not due to an ad break)
     if m.top.adState = "noads" or m.top.adState = "init"
-      m.VideoState = "stop"
-
       if m.Video.content <> invalid
         ' the video has been stopped, send a final playProgressEvent
         playProgressEvent = getPlayProgressEvent()
@@ -874,6 +870,7 @@ End Function
 
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads
 Function showAdBreak()
+  ' leave m.VideoState = "play" because from the component's perspective video is still playing
   m.Video.control = "stop"
   closeCCDialog()  ' if dialog is showing, it's awkward to have it still show after ad break
 
@@ -905,6 +902,18 @@ Function resetVideoPlayerState(content = invalid)
   m.top.upNextContentToAutoplay = invalid
   m.shouldShowUpNext = true
   m.UpNext.resetContent = true
+End Function
+
+
+Function stopVideo(source)
+  tubilog("VideoPlayer.stopVideo " + source)
+  m.VideoState = "stop"
+
+  ' add check so that onVideoStateChange doesn't get called
+  ' if the video is already in a non playing state.
+  if m.Video.state <> "stopped" and m.Video.state <> "finished"
+    m.Video.control = "stop"
+  end if
 End Function
 
 

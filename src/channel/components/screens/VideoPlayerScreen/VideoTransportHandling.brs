@@ -359,8 +359,7 @@ Function goToNext()
     endScrub(true)
   end if
 
-  ' m.VideoState will be updated by onVideoStateChange
-  m.Video.control = "stop"
+  stopVideo("goToNext")
   m.top.goToNext = true
 
   animateTransport("out")
@@ -742,6 +741,7 @@ Function jumpToPosition(position)
   })
 
   if shouldAdBreak
+    ' leave m.VideoState = "play" because from the component's perspective video is still playing
     m.Video.control = "stop"
     m.top.adPosition = position
     m.top.adControl = "seek"
