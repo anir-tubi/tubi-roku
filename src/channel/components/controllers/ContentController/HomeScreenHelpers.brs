@@ -348,3 +348,12 @@ end function
 function onHomeErrorResponse(error)
 
 end function
+
+
+Function onUserCategoriesFailed()
+  tubiLog("HomescreenHelpers.onUserCategoriesFailed")
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid and homeScreen.content = invalid
+    fetchHomeScreen(homeScreen)
+  end if
+End Function

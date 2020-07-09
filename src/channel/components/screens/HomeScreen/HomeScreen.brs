@@ -109,14 +109,6 @@ Function onEnableChange()
 End Function
 
 
-Function onUserCategoriesFailed()
-  tubiLog("Homescreen.onUserCategoriesFailed")
-  if m.top.content = invalid
-    m.top.loadAllCategories = true
-  end if
-End Function
-
-
 ''''''''''''''''''''
 ' onScreenFocusChange
 '
