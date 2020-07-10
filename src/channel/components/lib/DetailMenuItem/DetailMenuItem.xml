@@ -4,9 +4,11 @@
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
+    <!-- INPUTS -->
+
     <!-- hide the progress bar when focus changes -->
     <field id="focusPercent" alias="ResumeProgressBar.opacity" value="0.0"/>
-    
+
     <!-- Content expected for a DetailMenuItem:
      -
      - title - The label text
@@ -16,6 +18,19 @@
      -
      -->
     <field id="itemContent" type="node" />
+
+
+    <!-- OUTPUTS -->
+    <!-- The width of the DetailsMenuText as calculated by boundingRect().width -->
+    <field id="calculatedTextWidth" type="integer"/>
+
+    <!-- The padding from the left side of the item to the text. This is a fixed number as found in
+         the x component of the DetailsMenuText translation -->
+    <field id="leftTextPadding" type="integer"/>
+
+    <!-- The minimum padding from the right side of the item to the text -->
+    <field id="rightTextPadding" type="integer" value="20"/>
+
   </interface>
   
   <children>

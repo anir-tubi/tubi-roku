@@ -6,6 +6,7 @@ Function init()
   m.NodeHelpers = TubiNodeHelpers()
   m.Info = m.top.findNode("DetailInfoPanel")
   m.Menu = m.top.findNode("Menu")
+  m.defaultMenuWidth = m.Menu.itemSize[0]
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
   m.PlayMenuItem = m.top.findNode("PlayMenuItem")
   m.EpisodesMenuItem = m.top.findNode("EpisodesMenuItem")
@@ -104,6 +105,19 @@ Function onStringChange(message)
 
   if stringNode <> invalid 
     stringNode.title = sText
+
+    ' Adjust the width of the menu if the Channel name is too long for the default width
+    if sStringField = "stringChannelButton"
+      tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
+      tempChannelMenuItem.itemContent = m.ChannelMenuItem
+
+      potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
+      if potentialWidth > m.defaultMenuWidth
+        m.Menu.itemSize = [potentialWidth, m.Menu.itemSize[1]]
+      end if
+
+      tempChannelMenuItem = invalid
+    end if
   end if
 
 End Function
