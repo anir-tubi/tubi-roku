@@ -4,8 +4,17 @@ Function init()
   m.FocusIndex = m.top.findNode("FocusIndex")
   m.CategoryName = m.top.findNode("CategoryName")
   m.top.observeField("content", "onContentChange")
-  m.FocusIndex.color = m.global.theme.focused
-  m.global.observeField("theme", "onThemeChange")
+
+  ' trying to access m.global can sometimes/rarely time out creating a run time error if we
+  ' try to access m.global.theme directly, so use GlobalMixin.getThemeFromGlobal() which retries if issues arise.
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.FocusIndex.color = theme.focused
+  end if
+
+  if m.global <> invalid
+    m.global.observeField("theme", "onThemeChange")
+  end if
 End Function
 
 Function onThemeChange()

@@ -327,15 +327,30 @@ Function showStartupErrorDialog(screen, constants)
   sgGlobal.setField("theme", constants.ui.themes.default)
 
   scene = screen.GetScene()
-  controller = scene.CreateChild("ErrorController")
-  controller.observeField("buttonSelected", port)
-  controller.connectionError = true
 
-  while(true)
-    msg = wait(0, port)
-    msgType = type(msg)
-    if msgType <> invalid then exit while
+  ' the following while loop is necessary because roku crash logs indicate that
+  ' scene.CreateChild("ErrorController") can unexplicably return invalid at times.
+  controllerCreated = false
+  attempts = 0
+  while controllerCreated = false and attempts < 100
+    controller = scene.CreateChild("ErrorController")
+
+    if controller <> invalid
+      controller.observeField("buttonSelected", port)
+      controller.connectionError = true
+      controllerCreated = true
+    end if
+
+    attempts += 1
   end while
+
+  if controllerCreated = true
+    while(true)
+      msg = wait(0, port)
+      msgType = type(msg)
+      if msgType <> invalid then exit while
+    end while
+  end if
 
   screen.close()
 End Function

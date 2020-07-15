@@ -2,7 +2,7 @@
 <component name="BaseScreen" extends="Group">
 
   <script type="text/brightscript" uri="BaseScreen.brs" />
-  <script type="text/brightscript" uri="../../lib/ConstantsMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 

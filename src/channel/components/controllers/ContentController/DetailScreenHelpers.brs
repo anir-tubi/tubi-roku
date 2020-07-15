@@ -249,7 +249,7 @@ End Function
 
 '@screen: roSGNode, a detail screen node
 '@content: roSGNode, a TubiContentNode
-'@callbackName: string, indicates if NavigateToPage and PageLoadTracking should occur when the response is received
+'@trackOnResponse: boolean, indicates if NavigateToPage and PageLoadTracking should occur when the response is received
 Function getSingleContentFromServer(screen, content, trackOnResponse)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
   if content <> invalid
@@ -545,15 +545,10 @@ Function handleSingleContentError(msg, trackOnResponse)
       trackingTask: m.trackingLoggingTask
     }
 
-    callbackName = "onSingleContentResponseWithTracking"
-    if trackOnResponse = false
-      callbackName = "onSingleContentResponseWithoutTracking"
-    end if
-
     getSingleContentParams = [
       detailScreen
       content
-      callbackName
+      trackOnResponse
     ]
 
     showErrorModal(modalInfo, getSingleContentFromServerRetry, getSingleContentParams)
@@ -954,7 +949,12 @@ End Function
 
 Function onRelatedContentSelected(msg)
   detailScreen = msg.getRoSGNode()
-  content = detailScreen.content.relatedContent.getChild(detailScreen.relatedContentSelected)
+
+  content = invalid
+  if detailScreen <> invalid and detailScreen.content <> invalid and detailScreen.content.relatedContent <> invalid
+    content = detailScreen.content.relatedContent.getChild(detailScreen.relatedContentSelected)
+  end if
+
   if content <> invalid
     showDetailScreen(content, true)
   end if
