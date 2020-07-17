@@ -32,11 +32,6 @@ Function init()
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
 
-   ' if low-spec device, use the native poster nodes rather than custom components
-  if m.constants.deviceInfo.limitedUi then
-    m.RowList.itemComponentName = ""
-  end if
-
   if m.constants.deviceInfo.scaledUi = true then
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
@@ -155,7 +150,10 @@ Function setRowHeights()
   numRows = 2
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
-    if category.gridItemType = m.constants.ui.gridItemTypes.portrait
+    if category.gridItemType = m.constants.ui.gridItemTypes.utility
+      rowItemSize.push([282,300])
+      rowHeights.push(364)
+    else if category.gridItemType = m.constants.ui.gridItemTypes.portrait
       rowItemSize.push([210,300])
       rowHeights.push(364)
     else if category.gridItemType = m.constants.ui.gridItemTypes.landscape or category.gridItemType = m.constants.ui.gridItemTypes.vitg_small
@@ -226,7 +224,7 @@ Function loadCategories(index) As Void
         end if
       end if
     end for
-
+    
     if requests.count() > 0 then
       m.global.metadataFetchTask.batchRequest = m.metadataFetchTaskDTO.createBatchRequest(m.top, "metadataFetchTaskBatch", requests)
     end if
@@ -254,7 +252,7 @@ Function getWindowInfo(index)
       nextBatchIndex = (m.categoryWindowSize \ 2)
       windowStart = ((index + m.categoryWindowSize - (nextBatchIndex)) \ (m.categoryWindowSize)) * m.categoryWindowSize
     end if
-
+    
     return {
       start: windowStart
       size: windowSize
@@ -430,6 +428,7 @@ Function mergeMetadata(fetched)
   else
     return -1
   end if
+  
 
   tubiLog("Received response for request id " + fetched.id)
   index = -1

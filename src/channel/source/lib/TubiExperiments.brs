@@ -43,7 +43,9 @@ Function TubiExperiments(constants) as Object
       roku2: {
       }
       rokunamespace: {
-      }      
+      }  
+      roku_utility_row : {
+      }
     }
     defaultResources: {
       roku: {
@@ -51,7 +53,10 @@ Function TubiExperiments(constants) as Object
       roku2: {
       }
       rokunamespace: {
-      }      
+      }
+      roku_utility_row : {
+        roku_utility_row_v1 : {"has_utility_row" : false, "position" : 4}
+      }
     }
 
     'public methods

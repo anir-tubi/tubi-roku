@@ -197,6 +197,7 @@ Function handleResponse(message)
       tubiLog("MetadataFetchTask request duration = " + (request_end_time - handledRequest.context.request_start_time).toStr())
 
       parsed = ParseJSON(handledRequest.response.data)
+      
       if parsed = invalid then
         tubiLog("MetadataFetchTask failed to parse JSON response")
       else

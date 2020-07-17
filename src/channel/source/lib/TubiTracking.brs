@@ -20,7 +20,7 @@ Function TubiTracking (constants, request, auth)
     getAnalyticsAd: tubiTracking_getAnalyticsAd
     getAnalyticsAdAdrise: tubiTracking_getAnalyticsAdAdrise
     getAnalyticsAdRainmaker: tubiTracking_getAnalyticsAdAdriseRainmaker
-
+    
     populateMessage: tubiTracking_populateMessage
     isEmptyValue: tubiTracking_isEmptyValue
     isNumeric: tubiTracking_isNumeric
@@ -421,27 +421,38 @@ Function tubiTracking_getAnalyticsComponent(componentType, componentValues)
 End Function
 
 
-' Build the structure for a ContentTile message
+' Build the structure for a ContentTile/UtilityTile message
 Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
-  contentTile = invalid
+  tile = invalid
+  
   if contentNode <> invalid
-    contentTile = {}
+    tile = {}
 
-    contentId = contentNode.id
-    if contentNode.type = m.constants.ui.contentTypes.series
-      if Left(contentNode.id, 1) = "0"
-        contentId = Mid(contentNode.id, 2)
+    ' UtilityTile is used for utility row items
+    if contentNode.type = m.constants.ui.categoryTypes.utility
+    
+      tile.id = contentNode.id
+      
+    else ' ContentTile is used for non-utility row items
+    
+      contentId = contentNode.id
+      if contentNode.type = m.constants.ui.contentTypes.series
+        if Left(contentNode.id, 1) = "0"
+          contentId = Mid(contentNode.id, 2)
+        end if
+        tile.series_id = contentId.toInt()
+      else if contentNode.type = m.constants.ui.contentTypes.video
+        tile.video_id = contentId.toInt()
       end if
-      contentTile.series_id = contentId.toInt()
-    else if contentNode.type = m.constants.ui.contentTypes.video
-      contentTile.video_id = contentId.toInt()
+
+      tile.col = colPos
+      tile.row = rowPos 
+           
     end if
 
-    contentTile.col = colPos
-    contentTile.row = rowPos
   end if
 
-  return contentTile
+  return tile
 End Function
 
 
@@ -804,6 +815,7 @@ Function tubiTracking_getOneOfs()
       category_row: -1   ' 1 based index
       category_col: -1   ' 1 based index
       content_tile: {}  ' ContentTile message - optional
+      utility_tile: {}  ' UtilityTile message - optional
     }
 
     ' sub_category_component: {   'Does not currently exist in roku UI

@@ -312,7 +312,7 @@ Function getConstants()
 
     'contents url
     constants.urls.cms = {}
-      ' constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
+      'constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
       constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
       constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
@@ -323,7 +323,7 @@ Function getConstants()
 
     'matrix url
     constants.urls.matrix = {}
-      ' constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
+      'constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
       constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
       constants.urls.matrix.homescreen = constants.urls.matrix.urlBase + "/homescreen"
       constants.urls.matrix.container = constants.urls.matrix.urlBase + "/containers"
@@ -331,7 +331,7 @@ Function getConstants()
 
     'users url
     constants.urls.users = {}
-      ' constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
+      'constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
       constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
       constants.urls.users.login = constants.urls.users.urlBase + "/login"
       constants.urls.users.refreshToken = constants.urls.users.urlBase + "/login/refresh"
@@ -598,6 +598,7 @@ Function getConstants()
       constants.ui.categoryTypes.regular = "regular"
       constants.ui.categoryTypes.channel = "channel"
       constants.ui.categoryTypes.preview = "video_preview"
+      constants.ui.categoryTypes.utility = "utility"
 
     constants.ui.contentMode = {}
       constants.ui.contentMode.movie = "movie"
@@ -610,6 +611,7 @@ Function getConstants()
       constants.ui.contentTypes.season = "season"
       constants.ui.contentTypes.category = "category"
       constants.ui.contentTypes.channel = "channel"
+      constants.ui.contentTypes.utility = "utility"
 
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
@@ -681,6 +683,14 @@ Function getConstants()
       constants.ui.sideNavIds.exit = "exit"
       constants.ui.sideNavIds.profile = "profile"
       constants.ui.sideNavIds.kidsMode = "kidsMode"
+      
+    constants.ui.utilityIds = {}
+      constants.ui.utilityIds.movies = "u_movies"
+      constants.ui.utilityIds.tv = "u_tvshows"
+      constants.ui.utilityIds.kidsMode = "u_kids"
+      constants.ui.utilityIds.search = "u_search"
+      constants.ui.utilityIds.channels = "u_channels"
+      constants.ui.utilityIds.categories = "u_categories"
 
     'a map of screenIds to corresponding sideNavIds
     constants.ui.screenIdToSideNavId = {}
@@ -697,6 +707,7 @@ Function getConstants()
       constants.ui.gridItemTypes.landscape = "landscape"
       constants.ui.gridItemTypes.vitg_small = "vitg_small"  'video in the grid
       constants.ui.gridItemTypes.vitg_large = "vitg_large"  'video in the grid
+      constants.ui.gridItemTypes.utility = "utility"
 
     constants.ui.uris = {}
       'background gradient urls

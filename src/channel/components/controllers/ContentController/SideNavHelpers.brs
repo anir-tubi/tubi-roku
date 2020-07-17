@@ -142,7 +142,7 @@ Function onSideNavItemSelected()
           dialogEvent = {
             type: "dialog"
             values: {
-              dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "KIDS_MODE" when it is available in protos
+              dialog_type: "EXIT_KIDS_MODE"
               pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
               dialog_action: "SHOW"
               dialog_sub_type: "exit-kids-mode"
@@ -157,7 +157,7 @@ Function onSideNavItemSelected()
           dialogEvent = {
             type: "dialog"
             values: {
-              dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "KIDS_MODE" when it is available in protos
+              dialog_type: "ENTER_KIDS_MODE"
               pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
               dialog_action: "ACCEPT_DELIBERATE"
               dialog_sub_type: "enter-kids-mode"
@@ -173,7 +173,7 @@ Function onSideNavItemSelected()
           dialogEvent = {
             type: "dialog"
             values: {
-              dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "EXIT_KIDS_MODE" when it is available in protos
+              dialog_type: "EXIT_KIDS_MODE"
               pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
               dialog_action: "SHOW"
               dialog_sub_type: "exit-kids-parental"

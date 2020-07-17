@@ -59,7 +59,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   typeVar = "type"
   if contentFromServer[typeVar] <> invalid
-    if contentFromServer[typeVar] = "c"
+    if contentFromServer[typeVar] = "u"
+      translatedContent[typeVar] = m.contentTypes.utility
+    else if contentFromServer[typeVar] = "c"
       translatedContent[typeVar] = m.contentTypes.category
     else if contentFromServer[typeVar] = "v" or contentFromServer[typeVar] = "clip"
       translatedContent[typeVar] = m.contentTypes.video
@@ -191,6 +193,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.posterarts <> invalid and type(contentFromServer.posterarts) = "roArray" and contentFromServer.posterarts.count() > 0
     translatedContent.portrait = contentFromServer.posterarts[0]
     translatedContent.HDGRIDPOSTERURL = contentFromServer.posterarts[0]
+    ' HDPOSTERURL is an active image which is used in utility row
+    if translatedContent.type = m.constants.ui.gridItemTypes.utility
+      translatedContent.HDPOSTERURL = contentFromServer.posterarts[1]
+    end if
   end if
 
   if contentFromServer.backgrounds <> invalid and type(contentFromServer.backgrounds) = "roArray" and contentFromServer.backgrounds.count() > 0
@@ -656,9 +662,10 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   portrait = m.constants.ui.gridItemTypes.portrait
   vitg_small = m.constants.ui.gridItemTypes.vitg_small
   vitg_large = m.constants.ui.gridItemTypes.vitg_large
+  utility = m.constants.ui.gridItemTypes.utility
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
 
-  if gridItemType = landscape or gridItemType = vitg_small or gridItemType = vitg_large
+  if gridItemType = landscape or gridItemType = vitg_small or gridItemType = vitg_large or gridItemType = utility
     for i = 0 to translated.getChildCount()-1
       child = translated.getChild(i)
       child.addField("gridItemType", "string", false)
@@ -765,7 +772,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
         if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_small or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
           sType = "VitgContentNode"
         end if
-
+        
         childAA = {
           id: fullChild.id
           title: fullChild.title
@@ -775,7 +782,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
         }
 
         bLandscape = false
-        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.portrait
+        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.portrait or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.utility
           bLandscape = false
         else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.landscape and fullChild.hero_images <> invalid
           bLandscape = true
@@ -793,6 +800,10 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           childAA.hdgridposterurl = fullChild.hero_images[0]
         else if fullChild.posterarts <> invalid then
           childAA.hdgridposterurl = fullChild.posterarts[0]
+          ' HDPOSTERURL is an active image which is used in utility row
+          if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.utility
+            childAA.HDPOSTERURL = fullChild.posterarts[1]
+          end if
         end if
 
         'add the trailer url to vitg content items - don't include vitg content if there is no trailer
@@ -873,7 +884,7 @@ Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
   contentsIdentifier =  Chr(34) + "contents" + Chr(34) + ":{"
   safetyEject = false
   contentsIdentifierPos = Instr(1, fullJson, contentsIdentifier)
-
+  
   'make sure the content key exists exactly once in the JSON string
   if contentsIdentifierPos > 0 and Instr(contentsIdentifierPos + 1, fullJson, contentsIdentifier) < 1
     contentsStartPos = contentsIdentifierPos + contentsIdentifier.len() - 1
@@ -1020,14 +1031,15 @@ End Function
 ' returns: string, one of the gridItemTypes as found in m.constants.ui.gridItemTypes
 Function tubiMetadataTranslate_getGridItemType(container, orientation, constants)
   gridItemType = constants.ui.gridItemTypes.portrait
-
   if container.type = constants.ui.categoryTypes.preview
     if constants.deviceInfo.limitedUI <> true
       gridItemType = constants.ui.gridItemTypes.vitg_large
     end if
   else if container.id = constants.ui.categoryIds.featured and orientation <> constants.ui.gridItemTypes.portrait
     gridItemType = constants.ui.gridItemTypes.landscape
+  else if container.type = constants.ui.categoryTypes.utility
+    gridItemType = constants.ui.gridItemTypes.utility  
   end if
-
+  
   return gridItemType
 End Function

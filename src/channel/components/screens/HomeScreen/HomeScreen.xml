@@ -62,6 +62,12 @@
       <!-- shouldFocusWhenPushed will be set true once animation logo is finished during app launch -->
       <field id="shouldFocusWhenPushed" type="boolean" value="true"/>
       
+      <!-- parentalRating will be set based on global parentalRating updation -->
+      <field id="parentalRating" type="integer" value="3"/>
+      
+      <!-- kidsModeFeatureOn will be set based device countryCode -->
+      <field id="kidsModeFeatureOn" type="boolean" />      
+
     <!-- OUTPUTS -->
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>

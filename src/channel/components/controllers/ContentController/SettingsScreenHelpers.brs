@@ -228,6 +228,9 @@ Function refreshScreenAfterParentalChanges()
   tubiLog("SettingsScreenHelpers.refreshScreenAfterParentalChanges")
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
+    if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
+      homeScreen.parentalRating = m.global.authInfo.parentalrating
+    end if
     homeScreen.loadAllCategories = true
   end if
 

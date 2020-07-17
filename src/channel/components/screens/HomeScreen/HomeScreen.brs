@@ -67,6 +67,15 @@ Function init()
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
+
+  ' utility row position experiment
+  ' decreasing the position value by 1 in order to use it as index
+  m.utilityRowPosition = getExperimentResource("roku_utility_row", "roku_utility_row_v1", false).position - 1
+  
+  if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
+    m.top.parentalRating = m.global.authInfo.parentalrating
+  end if
+  
 End Function
 
 
@@ -230,6 +239,13 @@ Function onCurrFocusRowChange()
   categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
   categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
 
+  ' send experiment analytics (exposure event) only when
+  ' parentalRating is Adult and kidsModeFeatureOn is check for countryCode = US or CA and focused row matches with experiment resource position for both variant and control.
+  if rowEnteringFocus = m.utilityRowPosition and m.top.parentalRating > 2 and m.top.kidsModeFeatureOn = true
+    ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.  
+    getExperimentResource("roku_utility_row", "roku_utility_row_v1")
+  end if
+
   if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
     ' update contentArea translation, only when VITG gain focus
     expandContentAreaForLargeVitg(rowPercent)
@@ -287,9 +303,13 @@ Function onGridFocusChange() As Void
 
   oldFocusedContent = m.CategoryGridList.oldItemFocused
   focusedContent = m.CategoryGridList.itemFocused
-
+  
   if focusedContent <> invalid
-    populateInfoPanel("item", focusedContent)
+    if focusedContent.type = m.constants.ui.categoryTypes.utility
+      populateInfoPanel("utility", focusedContent)
+    else
+      populateInfoPanel("item", focusedContent)
+    end if
   end if
 
   ' If focus is on an empty category, leave the background as is.  This helps avoid
@@ -303,16 +323,21 @@ Function onGridFocusChange() As Void
   oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
   newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 1
   newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
-
+  
   if m.gridHasFocus = true and oldAnalyticsRow > 0 and oldAnalyticsCol > 0
     if oldAnalyticsRow <> newAnalyticsRow or oldAnalyticsCol <> newAnalyticsCol
-      categoryComponentInfo = {
-        category_slug: m.CategoryGridList.oldCategoryId
-        category_row: oldAnalyticsRow
-        'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
-        'and the current design only has one row per category
-        content_tile: m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
-      }
+      
+      categoryComponentInfo = {}
+      categoryComponentInfo["category_slug"] = m.CategoryGridList.oldCategoryId
+      categoryComponentInfo["category_row"] = oldAnalyticsRow
+      'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
+      'and the current design only has one row per category
+      tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
+      if oldFocusedContent.type = m.constants.ui.categoryTypes.utility
+        categoryComponentInfo["utility_tile"] = tile
+      else
+        categoryComponentInfo["content_tile"] = tile 
+      end if  
 
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, {})
@@ -333,15 +358,22 @@ Function onGridItemSelected() As Void
   tubiLog("HomeScreen.onGridItemSelected")
   if m.top.isLoading <> true
     selectedItem = m.CategoryGridList.itemSelected
-
+    
+    componentValues = {}
+    componentValues["category_slug"] = m.top.currCategoryId
+    componentValues["category_row"] = m.top.selectedPosition[0] + 1  'all analytics are 1 based
+    tile = m.Tracking.getAnalyticsTile(selectedItem, m.top.selectedPosition[1] + 1)
+    
+    if selectedItem.type = m.constants.ui.categoryTypes.utility
+      componentValues["utility_tile"] = tile
+    else
+      componentValues["content_tile"] = tile 
+    end if
+    
     ' Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
     m.top.trackingComponentInfo = {
       componentType: "category_component"
-      componentValues: {
-        category_slug: m.top.currCategoryId
-        category_row: m.top.selectedPosition[0] + 1  'all analytics are 1 based
-        content_tile: m.Tracking.getAnalyticsTile(selectedItem, m.top.selectedPosition[1] + 1)
-      }
+      componentValues: componentValues
     }
 
     ' Content controller observes contentSelected to populate/push the detail screen
@@ -411,6 +443,10 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.lineOneData = lineOneData
       m.InfoPanel.titleLogoUri = contentNode.titleLogoUri
       m.InfoPanel.genres = contentNode.genres
+    else if mode = "utility"
+      m.InfoPanel.mode = "utility"
+      m.InfoPanel.title = contentNode.title
+      m.InfoPanel.description = contentNode.description
     end if
 
     m.InfoPanel.calculateHeight = true

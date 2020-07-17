@@ -403,6 +403,10 @@ Function onModeChange()
     m.Offset.appendChild(m.Episode)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [26, 25, 15]
+  else if m.top.mode = "utility" then
+    m.Offset.appendChild(m.TitleGroup)
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.Offset.itemSpacings = [15]  
   end if
 End Function
 

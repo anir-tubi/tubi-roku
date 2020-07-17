@@ -1,6 +1,7 @@
 Function init()
   m._ = rodash()
   m.poster = m.top.findNode("Poster")
+  
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.top.observeField("itemContent", "onContentChange")
   m.resumeMargin = 4  'inset of resume bar
@@ -10,6 +11,7 @@ Function init()
     landscape: "landscape"
     vitg_small: "vitg_small"
     vitg_large: "vitg_large"
+    utility: "utility"
   }
 End Function
 
@@ -25,7 +27,14 @@ Function onContentChange()
   ' next line shouldn't be necessary but is added in order to try and quell crashes as reported by roku crash logs
   if m.resumeProgressBar = invalid then m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.resumeProgressBar.visible = false
-
+  
+  ' settings utilityRowPosters Group visibility false to avoid image caching issue.
+  if m.utilityRowPosters <> invalid
+    m.utilityRowPosters.visible = false
+  end if
+  ' settings poster visibility true to avoid image caching issue. if it is not set to true, seeing some blank posters
+  m.poster.visible = true
+ 
   if m.top.itemContent <> invalid then
     m.poster.uri = m.top.itemContent.hdgridposterurl
     categoryContent = m.top.itemContent.getParent()
@@ -35,6 +44,10 @@ Function onContentChange()
         m.title.text = m.top.itemContent.title
       else if isVitg(m.top.itemContent, m.gridItemTypes) = true
         setUpVitg()
+      else if m.top.itemContent.gridItemType = m.gridItemTypes.utility
+        m.poster.visible = false
+        setUpUtility()
+        setUpUtilityObservers()
       else if categoryContent.id = "continue_watching"
         drawHistoryProgressBar()
       end if
@@ -141,10 +154,10 @@ End Function
 
 
 Function setUpVitg()
+  m.top.observeField("rowFocusPercent", "onRowFocusPercentChange")
   m.top.observeField("itemHasFocus", "onItemFocus")
   m.top.observeField("rowListHasFocus", "onRowListHasFocus")
   m.top.observeField("focusPercent", "onFocusPercentChange")
-  m.top.observeField("rowFocusPercent", "onRowFocusPercentChange")
   m.posterFadeTime = 0.5
 
   ' On various models, and due to long press horizontal scrolling, we cannot always count on
@@ -249,4 +262,91 @@ Function isVitg(itemContent, gridItemTypes)
     isVitg = true
   end if
   return isVitg
+End Function
+
+
+' creates inactive & active poster nodes to show/hide the poster in utility row
+Function setUpUtility()
+
+   m.utilityRowPosters = m.top.createChild("Group")
+
+   inActivePoster = CreateObject("roSGNode", "Poster")
+   inActivePoster.id = "inActivePoster"
+   inActivePoster.height = 300
+   inActivePoster.width = 282
+   inActivePoster.loadingBitmapUri = "pkg:/images/placeholder.jpg"
+   inActivePoster.uri = m.top.itemContent.hdgridposterurl
+   inActivePoster.opacity = 1
+   m.utilityRowPosters.appendChild(inActivePoster)
+
+   activePoster = CreateObject("roSGNode", "Poster")
+   activePoster.id = "activePoster"
+   activePoster.height = 300
+   activePoster.width = 282
+   activePoster.loadingBitmapUri = "pkg:/images/placeholder.jpg"
+   activePoster.uri = m.top.itemContent.HDPOSTERURL
+   activePoster.opacity = 0
+   m.utilityRowPosters.appendChild(activePoster)
+   
+   m.inActivePoster = inActivePoster
+   m.activePoster = activePoster
+   
+   m.utilityRowPosters.visible = true
+   
+   if m.utilityLocalFocus = invalid
+     m.utilityLocalFocus = false
+   end if
+   
+   m.utilityPosterFadeTime = 0.25
+
+End Function
+
+
+Function setUpUtilityObservers()
+  m.top.observeField("itemHasFocus", "onUtilityItemFocus")
+  m.top.observeField("rowListHasFocus", "onUtilityRowListHasFocus")
+  m.top.observeField("focusPercent", "onUtilityFocusPercentChange")
+End Function
+
+
+' handleUtilityLocalFocusChange is used to fadeIn & fadeOut the active & inactive posters when item gains/loses focus
+Function handleUtilityLocalFocusChange(newLocalFocus)
+
+  if m.utilityLocalFocus = false and newLocalFocus = true
+    fade(m.inActivePoster, "out", m.utilityPosterFadeTime)
+    fade(m.activePoster, "in", m.utilityPosterFadeTime)
+  else if m.utilityLocalFocus = true and newLocalFocus = false
+    fade(m.activePoster, "out", m.utilityPosterFadeTime)
+    fade(m.inActivePoster, "in", m.utilityPosterFadeTime)
+  end if
+
+  m.utilityLocalFocus = newLocalFocus
+  
+End Function
+
+
+Function onUtilityItemFocus()
+
+  handleUtilityLocalFocusChange(m.top.itemHasFocus)
+
+End Function
+
+
+Function onUtilityRowListHasFocus()
+  
+  if m.top.rowListHasFocus = false
+    handleUtilityLocalFocusChange(false)
+  end if
+  
+End Function
+
+
+Function onUtilityFocusPercentChange()
+  
+  if m.top.focusPercent < 1.0 and m.utilityLocalFocus = true
+    handleUtilityLocalFocusChange(false)
+  else if m.top.focusPercent = 1.0 and m.utilityLocalFocus = false and m.top.rowListHasFocus = true
+    handleUtilityLocalFocusChange(true)
+  end if  
+  
 End Function
