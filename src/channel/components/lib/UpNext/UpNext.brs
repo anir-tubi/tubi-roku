@@ -244,9 +244,21 @@ Function onCountdownTimer()
   if m.timeRemaining = 0
     m.top.autoplayMode = "automatic"
     if m.MovieGroup.visible
-      m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemFocused)
+      if m.GridMovie.content <> invalid
+        m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemFocused)
+      else
+        ' if contentSelected is invalid, it is handled by the callback in VideoHelpers
+        ' via VideoPlayerScreen.onUpNextContentSelected
+        m.top.contentSelected = invalid
+      end if
     else
-      m.top.contentSelected = m.GridSeries.content.getChild(0)
+      if m.GridSeries.content <> invalid
+        m.top.contentSelected = m.GridSeries.content.getChild(0)
+      else
+        ' if contentSelected is invalid, it is handled by the callback in VideoHelpers
+        ' via VideoPlayerScreen.onUpNextContentSelected
+        m.top.contentSelected = invalid
+      end if
     end if
     stopTimer()
   else
