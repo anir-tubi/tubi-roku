@@ -229,18 +229,20 @@ Function onVideoPlayerState(msg)
     state = msg.GetData()
     if state = "error"
       stopVideoContent(videoPlayer)
-      errorMessage = getTranslation("videoPlayer_error_failed_description")
-      if videoPlayer.errorMsg <> ""
-        errorMessage = videoPlayer.errorMsg
-      end if
       videoPlayer.errorMsg = ""
-      showPlayerError(errorMessage, videoPlayer.videoErrorCode)
       videoPlayer.sprites = invalid
 
       currentScreen = currentScreen()
       if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
         popScreen(true, true)
       end if
+
+      '//adding the onscreen error should happen after the popScreen() call so that the error modal keeps the focus
+      errorMessage = getTranslation("videoPlayer_error_failed_description")
+      if videoPlayer.errorMsg <> ""
+        errorMessage = videoPlayer.errorMsg
+      end if
+      showPlayerError(errorMessage, videoPlayer.videoErrorCode)
     else if state = "finished"
       finishedContent = videoPlayer.content
       if finishedContent.isTrailer
