@@ -34,7 +34,8 @@ Function drawItemCount()
   if cursorIndex = invalid or cursorIndex = -1 then
     cursorIndex = 0
   end if
-  if m.top.content.getChildCount() > 0
+  ' show rowcounter except for utility rows
+  if m.top.content.getChildCount() > 0 and m.top.content.gridItemType <> "utility"
     m.ItemCount.text = " " + Chr(&hb7) + " " + stri(m.top.content.getChildCount()).trim()
     m.FocusIndex.text = stri(cursorIndex + 1).trim()
   else 
