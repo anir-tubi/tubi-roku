@@ -70,7 +70,7 @@ Function init()
 
   ' utility row position experiment
   ' decreasing the position value by 1 in order to use it as index
-  m.utilityRowPosition = getExperimentResource("roku_utility_row", "roku_utility_row_v1", false).position - 1
+  m.utilityRowPosition = getExperimentResource("roku_utility_v2", "roku_utility_position_v2", false).position - 1
   
   if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
     m.top.parentalRating = m.global.authInfo.parentalrating
@@ -243,7 +243,7 @@ Function onCurrFocusRowChange()
   ' parentalRating is Adult and kidsModeFeatureOn is check for countryCode = US or CA and focused row matches with experiment resource position for both variant and control.
   if rowEnteringFocus = m.utilityRowPosition and m.top.parentalRating > 2 and m.top.kidsModeFeatureOn = true
     ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.  
-    getExperimentResource("roku_utility_row", "roku_utility_row_v1")
+    getExperimentResource("roku_utility_v2", "roku_utility_position_v2")
   end if
 
   if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large

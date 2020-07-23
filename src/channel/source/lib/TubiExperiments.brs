@@ -46,6 +46,8 @@ Function TubiExperiments(constants) as Object
       }  
       roku_utility_row : {
       }
+      roku_utility_v2 : {
+      }      
     }
     defaultResources: {
       roku: {
@@ -57,6 +59,9 @@ Function TubiExperiments(constants) as Object
       roku_utility_row : {
         roku_utility_row_v1 : {"has_utility_row" : false, "position" : 4}
       }
+      roku_utility_v2 : {
+        roku_utility_position_v2 : {"has_utility_row" : false, "position" : 6}
+      }      
     }
 
     'public methods
