@@ -276,7 +276,7 @@ Function setUpUtility()
    inActivePoster.width = 282
    inActivePoster.loadingBitmapUri = "pkg:/images/placeholder.jpg"
    inActivePoster.uri = m.top.itemContent.hdgridposterurl
-   inActivePoster.opacity = 1
+   inActivePoster.opacity = 0.64
    m.utilityRowPosters.appendChild(inActivePoster)
 
    activePoster = CreateObject("roSGNode", "Poster")
@@ -317,7 +317,7 @@ Function handleUtilityLocalFocusChange(newLocalFocus)
     fade(m.activePoster, "in", m.utilityPosterFadeTime)
   else if m.utilityLocalFocus = true and newLocalFocus = false
     fade(m.activePoster, "out", m.utilityPosterFadeTime)
-    fade(m.inActivePoster, "in", m.utilityPosterFadeTime)
+    fade(m.inActivePoster, "in", m.utilityPosterFadeTime, 0, 0.64)
   end if
 
   m.utilityLocalFocus = newLocalFocus
