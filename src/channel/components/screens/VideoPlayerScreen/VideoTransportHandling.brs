@@ -689,6 +689,10 @@ Function updateScrubTime()
   else if m.VideoState = "ffw"
   '//Ensure scrub can't go past the timer for the UpNext Overlay
     nMaxScrub = m.Video.duration - m.global.constants.player.upNextCountdown - 5
+    if nMaxScrub < 0
+      nMaxScrub = m.Video.duration
+    end if
+
     if m.playerPosition + scrubTime > nMaxScrub 
       m.playerPosition = nMaxScrub
     else
@@ -747,7 +751,7 @@ Function jumpToPosition(position)
     m.top.adControl = "seek"
   else
     m.seekReferenceQueue.push(position)
-    m.Video.seek = position 'will load and play the video at the seeked to point
+    seekToPosition(position) 'will load and play the video at the seeked to point
     m.VideoState = "play"
   end if
 

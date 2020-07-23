@@ -1220,7 +1220,7 @@ Function resumeHelper(detailScreen)
       else
         ' find the position in global history
         history = m.global.historyIds.findNode(episode.id)
-        if history <> invalid then
+        if history <> invalid and history.nowPos > 0
           nowPos = history.nowPos
         end if
       end if

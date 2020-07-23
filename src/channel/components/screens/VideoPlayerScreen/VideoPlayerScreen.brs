@@ -211,16 +211,6 @@ End Function
 
 Function playContent()
   tubilog("VideoPlayer.playContent")
-  if m.Video.content.nowPos <> invalid then
-    m.playerPosition = m.Video.content.nowPos
-    m.lastSavedPosition = m.Video.content.nowPos
-    m.lastPingTime = m.Video.content.nowPos
-    m.lastButtonPressPos = m.Video.content.nowPos
-    m.seekReferenceQueue.push(m.Video.content.nowPos)
-    m.Video.seek = m.Video.content.nowPos
-  else
-    m.lastButtonPressPos = 0
-  end if
 
   ' Always reset ad state when we first start playback.  Preroll fetch will populate midrolls list
   m.top.midrolls = []
@@ -229,6 +219,17 @@ Function playContent()
 
   ' reset the seekReferenceQueue
   m.seekReferenceQueue = []
+
+  if m.Video.content.nowPos <> invalid and m.Video.content.nowPos >= 0
+    m.playerPosition = m.Video.content.nowPos
+    m.lastSavedPosition = m.Video.content.nowPos
+    m.lastPingTime = m.Video.content.nowPos
+    m.lastButtonPressPos = m.Video.content.nowPos
+    m.seekReferenceQueue.push(m.Video.content.nowPos)
+    seekToPosition(m.Video.content.nowPos)
+  else
+    m.lastButtonPressPos = 0
+  end if
 
   'start_video user event analytics
   if m.top.analyticsMode = "trailer"
@@ -442,7 +443,7 @@ End Function
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
 Function onVideoPositionChange()
-  tubiLog("VideoPlayer.onVideoPositionChange position = " + m.playerPosition.toStr())
+  tubiLog("VideoPlayer.onVideoPositionChange position = " + m.Video.position.toStr())
 
   ' protects against video positions being updated after we've told the player to pause
   if m.VideoState = "play"
@@ -614,7 +615,7 @@ Function onAdStateChange()
       m.seekReferenceQueue.push(m.playerPosition)
       m.VideoState = "play"
       m.Video.control = "play"
-      m.Video.seek = m.playerPosition
+      seekToPosition(m.playerPosition)
       trackEvent({
         type: "resume_after_break"
         values: {
@@ -914,6 +915,19 @@ Function stopVideo(source)
   if m.Video.state <> "stopped" and m.Video.state <> "finished"
     m.Video.control = "stop"
   end if
+End Function
+
+
+' wrapper around setting a value on m.Video.seek to protect against trying to seek to negative
+' values. Seeking to negative values will lead m.Video.seek field to equal 1.844674407371e+16 which
+' may or may not cause weird behavior
+' @position: integer, the playback position to seek to
+Function seekToPosition(position)
+  if position < 0
+    position = 0
+  end if
+
+  m.Video.seek = position
 End Function
 
 
