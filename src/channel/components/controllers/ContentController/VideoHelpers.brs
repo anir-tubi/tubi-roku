@@ -665,16 +665,18 @@ Function onUpNextResponse(upNextContent)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
   if videoPlayer <> invalid
-    if m.receivedGoToNextPressed = true
-      firstUpNextItem = upNextContent.getChild(0)
-      if firstUpNextItem <> invalid
-        playUpNextContent(firstUpNextItem, "none")
-      else
-        returnToDetailScreenFromVideo()
+    if upNextContent <> invalid
+      if m.receivedGoToNextPressed = true
+        firstUpNextItem = upNextContent.getChild(0)
+        if firstUpNextItem <> invalid
+          playUpNextContent(firstUpNextItem, "none")
+        else
+          returnToDetailScreenFromVideo()
+        end if
+      else if upNextContent.getChildCount() > 0
+        videoPlayer.upNextContent = upNextContent
+        videoPlayer.upNextUpdateContent = true
       end if
-    else
-      videoPlayer.upNextContent = upNextContent
-      videoPlayer.upNextUpdateContent = true
     end if
   else
     returnToDetailScreenFromVideo()
