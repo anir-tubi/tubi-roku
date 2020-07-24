@@ -428,6 +428,7 @@ Function handleSingleContentResponse(msg, sendTracking = true) As Void
         sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "home", m.Tracking, m.trackingLoggingTask, m.constants)
         m.enteredFromDeepLink = false
       end if
+      m.deepLinkContent = invalid
       startChannel()
       return
     end if
