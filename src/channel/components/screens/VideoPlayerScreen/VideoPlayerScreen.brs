@@ -1000,6 +1000,7 @@ Function advanceDrmOnContent(contentNode)
       fallback_url: removeExcessUrl(nextResource.url)
       fallback_drm: nextResource.type
       model: m.constants.deviceInfo.model
+      video_id: contentNode.id
     }
 
     ' log that we fell back to the next playback option after playback failed due to DRM
