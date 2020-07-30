@@ -177,6 +177,10 @@ Function updatePlayerPosition(amt=0)
     m.playerPosition = m._.min(m.playerPosition + amt, m.Video.duration - 5)
   else if amt < 0
     m.playerPosition = m._.max(m.playerPosition + amt, 0)
+  else if m.Video.position < 0
+    m.playerPosition = 0
+  else if m.Video.position > m.Video.duration
+    m.playerPosition = m.Video.duration
   else
     m.playerPosition = m.Video.position
   end if
@@ -679,21 +683,25 @@ Function updateScrubTime()
   timeSinceLastMark = m.scrubTimespan.totalMilliseconds() / 1000
   scrubTime = timeSinceLastMark * m.scrubMultipliers[m.scrubAmt]
 
+  '//Ensure scrub can't go past the timer for the UpNext Overlay
+  nMaxScrub = m.Video.duration - m.global.constants.player.upNextCountdown - 5
+  if nMaxScrub < 0
+    nMaxScrub = m.Video.duration
+  end if
+
   if m.VideoState = "rew"
     if m.playerPosition - scrubTime < 0
       m.playerPosition = 0
+    else if m.playerPosition - scrubTime > nMaxScrub
+      m.playerPosition = nMaxScrub
     else
       m.playerPosition = Int(m.playerPosition - scrubTime)
     end if
 
   else if m.VideoState = "ffw"
-  '//Ensure scrub can't go past the timer for the UpNext Overlay
-    nMaxScrub = m.Video.duration - m.global.constants.player.upNextCountdown - 5
-    if nMaxScrub < 0
-      nMaxScrub = m.Video.duration
-    end if
-
-    if m.playerPosition + scrubTime > nMaxScrub 
+    if m.playerPosition + scrubTime < 0
+      m.playerPosition = 0
+    else if m.playerPosition + scrubTime > nMaxScrub
       m.playerPosition = nMaxScrub
     else
       m.playerPosition = Int(m.playerPosition + scrubTime)
