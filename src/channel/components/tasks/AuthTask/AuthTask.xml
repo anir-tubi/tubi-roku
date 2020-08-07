@@ -11,6 +11,7 @@
     <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
     <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
@@ -65,6 +66,8 @@
 
 
         <field id="userInfo" type="assocarray" alwaysNotify="true" />
+        
+        <field id="skipLandingScreen" type="Boolean" value="true"/>
 
         <!-- number of days since the unix epoch when the device first opened Tubi -->
         <field id="firstVisit" type="integer" />

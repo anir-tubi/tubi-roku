@@ -48,9 +48,14 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     fetchHomeScreen(homescreen)
     
     setInScreenCache(homeScreen)
-    'this is the first screen so no need for navigate_to_page tracking.
-    'page_load tracking will happen when content is received.
-    pushScreen(homeScreen, false, false)
+    
+    if m.screenStack.getChildCount() > 0
+      pushScreen(homeScreen, true, true)
+    else    
+      'this is the first screen so no need for navigate_to_page tracking.
+      'page_load tracking will happen when content is received.
+      pushScreen(homeScreen, false, false)
+    end if
   end if
 End Function
 

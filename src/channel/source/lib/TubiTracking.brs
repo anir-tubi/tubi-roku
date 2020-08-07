@@ -699,7 +699,7 @@ Function tubiTracking_getOneOfs()
   video_player_page = {
     video_id: -1
   }
-
+  
   series_detail_page = {
     series_id: -1
   }
@@ -731,8 +731,13 @@ Function tubiTracking_getOneOfs()
 
   access_menu_page = {}
 
-  ' onboarding_page = {}   'not currently used
-  ' landing_page = {}    'not currently used
+  onboarding_page = {
+    page_sequence: -1
+    name: ""
+  }
+  
+  landing_page = {}
+  
   ' splash_page = {}   'not currently used
   ' forget_page = {}   'not currently used
 
@@ -757,8 +762,8 @@ Function tubiTracking_getOneOfs()
     access_menu_page: access_menu_page
     movie_browse_page: movie_browse_page
     series_browse_page: series_browse_page
-    ' onboarding_page: onboarding_page
-    ' landing_page: landing_page
+    onboarding_page: onboarding_page
+    landing_page: landing_page
     ' splash_page: splash_page
     ' forget_page: forget_page
   }
@@ -784,8 +789,8 @@ Function tubiTracking_getOneOfs()
     dest_access_menu_page: access_menu_page
     dest_movie_browse_page: movie_browse_page
     dest_series_browse_page: series_browse_page
-    ' dest_onboarding_page: onboarding_page
-    ' dest_landing_page: landing_page
+    dest_onboarding_page: onboarding_page
+    dest_landing_page: landing_page
     ' dest_splash_page: splash_page
     ' dest_forget_page: forget_page
   }

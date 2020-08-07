@@ -47,10 +47,11 @@ Function TubiExperiments(constants) as Object
       roku_utility_row : {
       }
       roku_utility_v2 : {
-      }      
+      } 
     }
     defaultResources: {
       roku: {
+        roku_onboarding_registration : { enabled : false }
       }
       roku2: {
       }

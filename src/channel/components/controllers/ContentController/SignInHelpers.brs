@@ -2,7 +2,10 @@
 ' startSignIn
 '
 ' Defer to the sign-in controller for sign in experience
-Function startSignIn(skipDisambiguation)
+Function startSignIn(skipOnBoarding)
+
+  m.skipOnBoardingScreen = skipOnBoarding  
+
   tubiLog("SignInHelpers.startSignIn")
   activationCodeScreen = CreateObject("roSGNode", "ActivationCodeScreen")
   activationCodeScreen.observeFieldScoped("activationSuccess", "onActivationSuccess")
@@ -129,10 +132,11 @@ Function onAuthInfoReceived()
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
 
+  m.skipLandingScreen = m.authTask.skipLandingScreen
+
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
-
 
   ' Here we notify screens that may exist, though we try to keep context
   '

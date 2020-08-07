@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - UnlimitedScreen
+ -->
+<component name="UnlimitedScreen" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="UnlimitedScreen.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+
+  <interface>
+
+    <!-- OUTPUT -->
+    
+      <!-- Set to true if the user presses Next button and corresponding callback gets invoked -->
+      <field id="nextButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
+      
+      <!-- Set to true if the user presses Skip button and corresponding callback gets invoked -->
+      <field id="skipButtonPressed" type="boolean" value="false" alwaysNotify="true"/> 
+      
+  </interface>
+
+  <children>
+  
+    <Poster
+      id="onBoardingBackground"
+      width="1920"
+      height="1080"
+      uri="pkg:/images/onBoarding_background.jpg"
+      translation="[0,0]"/>
+
+    <LayoutGroup
+      id="ScreenNavigationHint"
+      layoutDirection="horiz"
+      vertAlignment="custom"
+      opacity="0.5"
+      itemSpacings="[9]"
+      translation="[120,72]">
+      <Poster
+        uri="pkg:/images/back.png"
+        width="29"
+        height="47"/>
+      <Label
+        id="callToAction"
+        vertAlign="center"
+        height="47"
+        translation="[0,2]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="21" />
+      </Label>
+    </LayoutGroup> 
+        
+    <Poster
+      id="tubiLogo"
+      height="45"
+      width="103"
+      uri="pkg:/images/logo-white-large.png"
+      translation="[1732,60]"/>
+      
+    <DotCarousel 
+      dotIndex="0" 
+      totalDots="3"/>    
+      
+    <LayoutGroup
+      id="labelButtonGroup"
+      translation="[120,462]"
+      layoutDirection="vert"
+      vertAlignment="top"
+      itemSpacings="[18,48]">
+
+      <Label
+        id="pageHeading"
+        horizAlign="left"
+        wrap="true"
+        numLines="2"
+        width="750">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="84" />
+      </Label> 
+      
+      <Label
+        id="pageDescription"
+        horizAlign="left"
+        wrap="true"
+        numLines="2"        
+        width="550">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="27" />
+      </Label>
+      
+      <CommunicatingMarkupGrid
+        id="buttonList"
+        itemSize="[487,84]"
+        itemComponentName="SignInButton"
+        itemSpacing="[0,6]"
+        numRows="3"
+        numColumns="1"
+        vertFocusAnimationStyle="floatingFocus"/>                   
+        
+    </LayoutGroup>    
+  
+  </children>
+</component>

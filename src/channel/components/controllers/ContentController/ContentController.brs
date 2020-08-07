@@ -3,6 +3,14 @@ Function init()
   tubiLog("Init Scenegraph----------------")
   m._ = rodash()
   
+  ' sentStartUpEvents variable used for sending active event, hdcp info
+  m.sentStartUpEvents = false
+  
+  ' skipLandingScreen variable is used to show/hide the landing screens. This variable is set to true/false based on user loggedin(or not) and lastOnBoardingVisit registry (TubiAuth)
+  m.skipLandingScreen = true
+  ' skipOnBoardingScreen variable is used to show/hide the onBoarding screens. This variable is set to true/false based on user loggedin(or not) and lastOnBoardingVisit registry (TubiAuth)
+  m.skipOnBoardingScreen = true
+
   m.constants = m.global.constants
   
   m.generalTask = CreateObject("roSGNode", "GeneralTask")  ' initiate GeneralTask
@@ -82,7 +90,7 @@ Function init()
   m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
   m.authTask.functionName = "execInitializeUserData"
   m.authTask.control = "RUN"
-
+     
   ' history updates during video playback
   m.updateHistoryTask = CreateObject("roSGNode", "AuthTask")
   m.updateHistoryTask.functionName = "updateHistory"
@@ -304,7 +312,7 @@ End Function
 
 Function onComponentFocus()
   tubiLog("ContentController.onComponentFocus")
-  if m.top.isInFocusChain() and m.top.hasFocus()
+  if m.top.isInFocusChain() and m.top.hasFocus() 
     if m.SideNav.opened = true
       displayNavMenu()
     else if currentScreen() <> invalid
@@ -373,22 +381,25 @@ Function startUserExperience()
     end if
   else
     ' All of the above checked values are true, so we are ready to start the channel UI
-    m.trackingLoggingTask.trackEvent = {
-      type: "active"
-      values: {}
-    }
+    
+    if m.sentStartUpEvents = false
+      m.sentStartUpEvents = true
+      m.trackingLoggingTask.trackEvent = {
+        type: "active"
+        values: {}
+      }
 
-    ' Since we're ready to start the channel, make sure the loading spinner is hidden
-    root = m.top.getScene()
-    if root <> invalid
-      spinner = root.findNode("LoadingSpinner")
-      if spinner <> invalid then
-        spinner.visible = false
+      ' Since we're ready to start the channel, make sure the loading spinner is hidden
+      root = m.top.getScene()
+      if root <> invalid
+        spinner = root.findNode("LoadingSpinner")
+        if spinner <> invalid then
+          spinner.visible = false
+        end if
       end if
+      sendHdcpLog() 
     end if
-    
-    sendHdcpLog()
-    
+
     ' In any of the auth transitions, this spinner might be visible
     'm.spinner.visible = false
     if m.enteredFromDeepLink = true then
@@ -398,10 +409,22 @@ Function startUserExperience()
       m.contentGroup.visible = true
       enableKidsModeUI(false) '//when deeplinking, exit out of kids mode because we cannot guarantee that the video is kid appropriate so the UI should not make the user think we're still in kids mode
       showDetailScreen(m.deeplinkContent, false)
+    else if m.skipLandingScreen = false and m.global.authInfo = invalid
+      ' display landingScreen only if skipLandingScreen is false and user is not loggedin
+      m.contentGroup.visible = true
+      m.skipLandingScreen = true
+      ' sending experiment exposure event for roku_onboarding_registration
+      getExperimentResource("roku", "roku_onboarding_registration")
+      showLandingScreen()
+    else if m.skipOnBoardingScreen = false and m.global.authInfo <> invalid
+      ' display onBoarding screens only if the user is signedIn and previous screen was through Landing/Activation
+      m.skipOnBoardingScreen = true
+      showOnBoardingUnlimitedScreen()      
     else
       startChannel()
-      showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
+      showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary      
     end if
+    
   end if
 End Function
 
@@ -825,6 +848,7 @@ Function startChannel()
     enableKidsModeUI(false)
   end if
   showHomeScreen(m.constants, m.global.authInfo)
+  shrinkScreenStack(1)
 End Function
 
 

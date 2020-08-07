@@ -387,6 +387,8 @@ Function getConstants()
     
     ' animationLogo Url which plays during app launch
     constants.urls.animationLogo = "https://cdn.adrise.tv/video/roku/animation_logo.mp4"
+    ' Landing Screen background image
+    constants.urls.landingBackground = "https://cdn.adrise.tv/image/roku_support_images/landingBackground.jpg"
 
   'http request types
   constants.reqTypes = {}
@@ -636,6 +638,10 @@ Function getConstants()
       constants.ui.screenLevels.episodeScreen = 50
       constants.ui.screenLevels.videoPlayerScreen = 60
       constants.ui.screenLevels.activationCodeScreen = 100
+      constants.ui.screenLevels.landingScreen = 99
+      constants.ui.screenLevels.unlimitedScreen = 110
+      constants.ui.screenLevels.costNothingScreen = 111
+      constants.ui.screenLevels.availableDeviceScreen = 112
       constants.ui.screenLevels.modalDialogScreen = 1000
 
     constants.ui.screenIds = {}
@@ -651,6 +657,10 @@ Function getConstants()
       constants.ui.screenIds.detailScreen = "detailScreen"
       constants.ui.screenIds.episodeScreen = "episodeScreen"
       constants.ui.screenIds.activationCodeScreen = "activationCodeScreen"
+      constants.ui.screenIds.landingScreen = "landingScreen"
+      constants.ui.screenIds.unlimitedScreen = "unlimitedScreen"
+      constants.ui.screenIds.costNothingScreen = "costNothingScreen"
+      constants.ui.screenIds.availableDeviceScreen = "availableDeviceScreen"
       constants.ui.screenIds.upNextScreen = "upNextScreen"
       constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
@@ -671,6 +681,11 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
+   
+   constants.ui.pageSequence = {}   
+      constants.ui.pageSequence.unlimitedScreen = 0
+      constants.ui.pageSequence.costNothingScreen = 1
+      constants.ui.pageSequence.availableDeviceScreen = 2
 
     constants.ui.sideNavIds = {}
       constants.ui.sideNavIds.home = "home"

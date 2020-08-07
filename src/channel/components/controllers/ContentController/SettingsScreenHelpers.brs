@@ -116,6 +116,10 @@ Function onSignOutModalSelected()
   clearScreenStack()
   setSignInInfo()
   m.authInfoReceived = false
+  ' setting skipLandingScreen as true to avoid showing landingscreen when user signout
+  m.skipLandingScreen = true
+  ' setting skipOnBoardingScreen as true to avoid showing onBoardingscreen when user signout
+  m.skipOnBoardingScreen = true
   if m.authTask <> invalid
     m.authTask.unobserveFieldScoped("onAuthInfoReceived")
   end if

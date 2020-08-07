@@ -742,6 +742,62 @@ Function getTranslation_en_US()
     "channel_webDescription": {
       "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
       "message": "Watch thousands of hit movies and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer ads than regular TV. Tubi is the largest free streaming service featuring award-winning movies and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favorites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!"
+    },
+    "onBoarding_landingScreen_registration": {
+      "description": "",
+      "message": "Free TV\nFree Movies\nFree Registration"
+    },
+    "onBoarding_onBoarding_landingScreen_info": {
+      "description": "",
+      "message": "Discover a new way to watch all the content you love. Always free, 100% legal, and no subscription required."
+    },
+    "onBoarding_register_button": {
+      "description": "",
+      "message": "Register for Tubi"
+    },
+    "onBoarding_guest_button": {
+      "description": "",
+      "message": "Continue as Guest"
+    },
+    "onBoarding_unlimitedScreen_heading": {
+      "description": "",
+      "message": "Unlimited movies, shows and more"
+    },
+    "onBoarding_unlimitedScreen_description": {
+      "description": "",
+      "message": "Over 20,000 of your favorite movies and shows for free."
+    },
+    "onBoarding_next_button": {
+      "description": "",
+      "message": "Next"
+    },
+    "onBoarding_skip_button": {
+      "description": "",
+      "message": "Skip"
+    },
+    "onBoarding_costScreen_heading": {
+      "description": "",
+      "message": "It won't cost you a thing"
+    },
+    "onBoarding_costScreen_description": {
+      "description": "",
+      "message": "3X the content of Netflix, fewer ads than cable, none of the cost. Free forever."
+    },
+    "onBoarding_devices_heading": {
+      "description": "",
+      "message": "Available on all your devices"
+    },
+    "onBoarding_devices_description": {
+      "description": "",
+      "message": "Watch on your phone, television, tablet or computer."
+    },
+    "onBoarding_startWatching_button": {
+      "description": "",
+      "message": "Start Watching"
+    },
+    "onBoarding_back_button": {
+      "description": "",
+      "message": "Back"
     }
   }
 End Function

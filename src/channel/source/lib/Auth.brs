@@ -4,6 +4,7 @@ Function TubiAuth(constants, request)
   return {
     authRegSection: "auth"
     firstVisitRegSection: "visit"
+    onBoardingRegSection: "onBoarding"
     
     constants: constants
     request: request
@@ -19,6 +20,7 @@ Function TubiAuth(constants, request)
     transferRefreshToken: tubiAuth_transferRefreshToken
     getAuthHeaders: tubiAuth_getAuthHeaders
     createAuthRequest: tubiAuth_createAuthRequest
+    skipLandingScreen: tubiAuth_skipLandingScreen
 
     'private methods
     saveAuthInfo: tubiAuth_saveAuthInfo_
@@ -29,6 +31,7 @@ Function TubiAuth(constants, request)
     handleRefreshResponse: tubiAuth_handleRefreshResponse_
     updateAuthInfo: tubiAuth_updateAuthInfo_
     formatAuthInfoFromServer: tubiAuth_formatAuthInfoFromServer_
+    setLastOnBoardingVisit: tubiAuth_setLastOnBoardingVisit_
     
     regRead: tubiAuth_regRead_
     regReadAll: tubiAuth_regReadAll_
@@ -89,6 +92,38 @@ Function tubiAuth_setFirstVisit()
   daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
   m.regWrite("firstVisit", daysFromEpoch.toStr(), m.firstVisitRegSection)
   return daysFromEpoch
+End Function
+
+
+' checks device registry for lastOnBoardingVisit value, if none exists, set today's value as the lastOnBoardingVisit value.
+' returns false, if there is no stored lastOnBoardingVisit value or if the stored value is 30 days less than today
+' or returns true, if the stored value is less than 30 days with today
+Function tubiAuth_skipLandingScreen()
+
+  skiplanding = true
+  
+  dateTime = CreateObject("roDateTime")
+  secondsFromEpoch = dateTime.AsSeconds()
+  daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
+  
+  lastOnBoardingVisit = m.regRead("lastOnBoardingVisit", m.onBoardingRegSection)
+  
+  if lastOnBoardingVisit = invalid
+    m.setLastOnBoardingVisit(daysFromEpoch)
+    skiplanding = false
+  else if (daysFromEpoch - lastOnBoardingVisit.ToInt()) > 30  
+    m.setLastOnBoardingVisit(daysFromEpoch)
+    skiplanding = false  
+  end if
+  
+  return skiplanding
+
+End Function
+
+
+' writes today's value in lastOnBoardingVisit device registry
+Function tubiAuth_setLastOnBoardingVisit_(daysFromEpoch)
+  m.regWrite("lastOnBoardingVisit", daysFromEpoch.toStr(), m.onBoardingRegSection)
 End Function
 
 

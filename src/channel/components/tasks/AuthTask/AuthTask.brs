@@ -13,15 +13,25 @@ Function execInitializeUserData()
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()
+  experiments = TubiExperiments(constants)
 
   userCats = getInitalUserCategories(Bookmarks, true, true, true)
   ' enhance the auth tokens with the user profile information
   if authInfo <> invalid and userCats.userInfo <> invalid
     authInfo.append(userCats.userInfo)
   end if
-
+  
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
+  
+  ' skip landing/onBoarding screens, if the roku_onboarding_registration experiment is disabled 
+  onBoardingRegistrationEnabled = experiments.getExperimentResource("roku", "roku_onboarding_registration").enabled
+  if onBoardingRegistrationEnabled = true
+    m.top.skipLandingScreen = Auth.skipLandingScreen()
+  else
+    m.top.skipLandingScreen = true
+  end if
+  
   m.top.firstVisit = Auth.getfirstVisit()
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger 
 End Function
