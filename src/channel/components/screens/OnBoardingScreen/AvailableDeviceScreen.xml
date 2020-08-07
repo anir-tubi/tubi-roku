@@ -72,7 +72,7 @@
         horizAlign="left"
         wrap="true"
         numLines="2"        
-        width="700">
+        width="810">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Bold.ttf"
@@ -84,7 +84,7 @@
         horizAlign="left"
         wrap="true"
         numLines="2"
-        width="580">
+        width="570">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"

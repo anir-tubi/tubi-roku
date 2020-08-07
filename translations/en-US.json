@@ -674,11 +674,11 @@
   },  
   "onBoarding_devices_heading": {
     "description": "",
-    "message": "Available on all your devices"
+    "message": "Available on all\nyour devices"
   }, 
   "onBoarding_devices_description": {
     "description": "",
-    "message": "Watch on your phone, television, tablet or computer."
+    "message": "Watch on your phone, television, tablet\nor computer."
   }, 
   "onBoarding_startWatching_button": {
     "description": "",
