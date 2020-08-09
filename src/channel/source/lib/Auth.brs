@@ -21,6 +21,7 @@ Function TubiAuth(constants, request)
     getAuthHeaders: tubiAuth_getAuthHeaders
     createAuthRequest: tubiAuth_createAuthRequest
     skipLandingScreen: tubiAuth_skipLandingScreen
+    deleteLastOnBoarding: tubiAuth_deleteLastOnBoarding_
 
     'private methods
     saveAuthInfo: tubiAuth_saveAuthInfo_
@@ -334,6 +335,13 @@ function tubiAuth_deleteAuthInfo_()
   authSection.flush()
 end function
 
+
+' Deletes the onBoarding Registry section
+function tubiAuth_deleteLastOnBoarding_()
+  onBoardingSection = CreateObject("roRegistry")
+  onBoardingSection.delete(m.onBoardingRegSection)
+  onBoardingSection.flush()
+end function
 
 'should only be called by getAuthInfo
 'returns true if expired and false if not expired
