@@ -445,10 +445,10 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
         tile.video_id = contentId.toInt()
       end if
 
-      tile.col = colPos
-      tile.row = rowPos 
-           
     end if
+    
+    tile.col = colPos
+    tile.row = rowPos    
 
   end if
 
