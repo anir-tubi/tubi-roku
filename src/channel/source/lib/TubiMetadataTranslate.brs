@@ -654,7 +654,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     node_count = 1 + translated.getChildCount()
   end if
 
-  ' Store the gridItemType as necessary (only for landscape and vitg). 
+  ' Store the gridItemType as necessary (only for landscape, vitg, and utility). 
   ' We do it here manually, after creating the child nodes, to avoid having to define
   ' a custom content node which have proven to be much slower to instantiate.
   ' Could use some testing though.

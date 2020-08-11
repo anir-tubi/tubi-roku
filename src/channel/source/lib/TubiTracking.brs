@@ -863,13 +863,16 @@ End Function
 
 Function tubiTracking_getSideNavPageMap(constants)
   map = {}
-  map[constants.ui.screenIds.homeScreen] = "HOME"
-  map[constants.ui.screenIds.channelListScreen] = "CHANNEL"
-  map[constants.ui.screenIds.categoryListScreen] = "CATEGORIES"
-  map[constants.ui.screenIds.movieScreen] = "MOVIES"
-  map[constants.ui.screenIds.tvScreen] = "SERIES"
-  map[constants.ui.screenIds.settingsScreen] = "SETTINGS"
-  map[constants.ui.screenIds.searchScreen] = "SEARCH"
+  map[constants.ui.sideNavIds.home] = "HOME"
+  map[constants.ui.sideNavIds.channels] = "CHANNEL"
+  map[constants.ui.sideNavIds.categories] = "CATEGORIES"
+  map[constants.ui.sideNavIds.movies] = "MOVIES"
+  map[constants.ui.sideNavIds.tv] = "SERIES"
+  map[constants.ui.sideNavIds.settings] = "SETTINGS"
+  map[constants.ui.sideNavIds.search] = "SEARCH"
+  map[constants.ui.sideNavIds.exit] = "EXIT"
+  map[constants.ui.sideNavIds.kidsMode] = "KIDS"
+  map[constants.ui.sideNavIds.profile] = "ACCOUNT"
   return map
 End Function
 

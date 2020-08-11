@@ -121,6 +121,17 @@ Function onSideNavItemSelected()
   if m.sSideNavItemSelectedId <> itemSelectedId or bSameScreen = false
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
     bNewScreenCalledSuccess = false
+
+    ' set appropriate analytics component on the page being navigated from so NavigateToPageEvent
+    ' contains all the requisite information
+    sideNavComponentValues = {
+      left_nav_section: m.Tracking.sideNavPageMap[itemSelectedId]
+    }
+    currentScreenNow.trackingComponentInfo = {
+      componentType: "left_side_nav_component"
+      componentValues: sideNavComponentValues
+    }
+
     if itemSelectedId = m.constants.ui.sideNavIds.profile
       if authInfo = invalid
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
@@ -340,8 +351,9 @@ Function getSideNavInteractionEvent(screen, trackingLib, offOrOn)
     pageType = screen.trackingPageInfo.pageType
     pageValues = screen.trackingPageInfo.pageValues
 
+    focusedSideNavId = m.constants.ui.screenIdToSideNavId[screen.id]
     leftSideNavComponent = {
-      left_nav_section: trackingLib.sideNavPageMap[screen.id]
+      left_nav_section: trackingLib.sideNavPageMap[focusedSideNavId]
     }
 
     toggle = ""
