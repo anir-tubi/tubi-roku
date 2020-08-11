@@ -133,6 +133,7 @@ Function onAuthInfoReceived()
   m.global.historyIds = m.authTask.history
 
   m.skipLandingScreen = m.authTask.skipLandingScreen
+  m.sendOnBoardingControlEvent = m.authTask.sendOnBoardingControlEvent
 
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")

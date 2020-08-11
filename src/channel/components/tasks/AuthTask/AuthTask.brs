@@ -28,8 +28,10 @@ Function execInitializeUserData()
   onBoardingRegistrationEnabled = experiments.getExperimentResource("roku", "roku_onboarding_registration").enabled
   if onBoardingRegistrationEnabled = true
     m.top.skipLandingScreen = Auth.skipLandingScreen()
+    m.top.sendOnBoardingControlEvent = false
   else
     m.top.skipLandingScreen = true
+    m.top.sendOnBoardingControlEvent = Auth.sendOnBoardingControlEvent()
   end if
   
   m.top.firstVisit = Auth.getfirstVisit()
@@ -64,6 +66,7 @@ Function execSignOut()
 
   Auth.logout()
   Auth.deleteLastOnBoarding()
+  Auth.deleteLastOnBoardingControlEvent()
 
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()

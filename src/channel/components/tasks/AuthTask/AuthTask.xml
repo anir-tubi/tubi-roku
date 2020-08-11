@@ -68,6 +68,8 @@
         <field id="userInfo" type="assocarray" alwaysNotify="true" />
         
         <field id="skipLandingScreen" type="Boolean" value="true"/>
+        
+        <field id="sendOnBoardingControlEvent" type="Boolean" value="false"/>
 
         <!-- number of days since the unix epoch when the device first opened Tubi -->
         <field id="firstVisit" type="integer" />

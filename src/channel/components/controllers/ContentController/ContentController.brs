@@ -5,7 +5,9 @@ Function init()
   
   ' sentStartUpEvents variable used for sending active event, hdcp info
   m.sentStartUpEvents = false
-  
+
+  ' TODO Remove sendOnBoardingControlEvent and its references once the OnBoarding experiment is done
+  m.sendOnBoardingControlEvent = false
   ' skipLandingScreen variable is used to show/hide the landing screens. This variable is set to true/false based on user loggedin(or not) and lastOnBoardingVisit registry (TubiAuth)
   m.skipLandingScreen = true
   ' skipOnBoardingScreen variable is used to show/hide the onBoarding screens. This variable is set to true/false based on user loggedin(or not) and lastOnBoardingVisit registry (TubiAuth)
@@ -421,6 +423,10 @@ Function startUserExperience()
       m.skipOnBoardingScreen = true
       showOnBoardingUnlimitedScreen()      
     else
+      ' sending control experiment control event for roku_onboarding_registration
+      if m.sendOnBoardingControlEvent = true
+        getExperimentResource("roku", "roku_onboarding_registration")
+      end if
       startChannel()
       showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary      
     end if
