@@ -26,12 +26,14 @@ Function execInitializeUserData()
   
   ' skip landing/onBoarding screens, if the roku_onboarding_registration experiment is disabled 
   onBoardingRegistrationEnabled = experiments.getExperimentResource("roku", "roku_onboarding_registration").enabled
-  if onBoardingRegistrationEnabled = true
-    m.top.skipLandingScreen = Auth.skipLandingScreen()
-    m.top.sendOnBoardingControlEvent = false
-  else
-    m.top.skipLandingScreen = true
-    m.top.sendOnBoardingControlEvent = Auth.sendOnBoardingControlEvent()
+  if constants.deviceInfo.countryCode <> invalid and constants.deviceInfo.countryCode = "US"
+    if onBoardingRegistrationEnabled = true
+      m.top.skipLandingScreen = Auth.skipLandingScreen()
+      m.top.sendOnBoardingControlEvent = false
+    else
+      m.top.skipLandingScreen = true
+      m.top.sendOnBoardingControlEvent = Auth.sendOnBoardingControlEvent()
+    end if
   end if
   
   m.top.firstVisit = Auth.getfirstVisit()
