@@ -424,7 +424,7 @@ Function startUserExperience()
       showOnBoardingUnlimitedScreen()      
     else
       ' sending control experiment control event for roku_onboarding_registration
-      if m.sendOnBoardingControlEvent = true
+      if m.sendOnBoardingControlEvent = true and m.global.authInfo = invalid
         getExperimentResource("roku", "roku_onboarding_registration")
       end if
       startChannel()
