@@ -57,6 +57,8 @@ Function onSetCallOfAction()
       sCallToAction = getTranslation("goBack_channels")
     else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.menu)
       sCallToAction = getTranslation("goBack_menu")
+    else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.home)
+      sCallToAction = getTranslation("goBack_home")  
     end if
   end if
   if sCallToAction = ""

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "UtilityContentNode" extends="ContentNode">
+  <interface>
+       <!-- One of the gridItemTypes in constants (ie. "portrait", "landscape", "vitg", "utility").
+         Indicates which type of content will be shown in this category row.
+     -->
+    <field id="gridItemType" type="string" />
+
+  </interface>
+</component>

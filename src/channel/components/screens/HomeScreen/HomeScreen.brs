@@ -61,6 +61,8 @@ Function init()
   m.contentAreaSlideAnimation = invalid
   m.infoPanelFadeAnimation = invalid
 
+  m.utilityMaskOffsetDiff = -100  'the diff in the amount the content area mask is offset in the up direction for utility
+  
   ' Video in the grid constants
   m.vitgSlideAmt = 410  'the amount the grid slides up to fit the vitg content item
   m.vitgMaskOffsetDiff = 436  'the diff in the amount the content area mask is offset in the up direction for vitg
@@ -69,8 +71,12 @@ Function init()
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 
   ' utility row position experiment
-  ' decreasing the position value by 1 in order to use it as index
-  m.utilityRowPosition = getExperimentResource("roku_utility_v2", "roku_utility_position_v2", false).position - 1
+  m.utilityRowPosition = -2
+  experimentInfo = getExperimentResource("roku_discovery_v1", "roku_discovery_row_v1", false)
+  if experimentInfo <> invalid and experimentInfo.position
+    ' decreasing the position value by 1 in order to use it as index
+    m.utilityRowPosition = experimentInfo.position - 1
+  end if
   
   if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
     m.top.parentalRating = m.global.authInfo.parentalrating
@@ -240,13 +246,33 @@ Function onCurrFocusRowChange()
   categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
 
   ' send experiment analytics (exposure event) only when
-  ' parentalRating is Adult and kidsModeFeatureOn is check for countryCode = US or CA and focused row matches with experiment resource position for both variant and control.
-  if rowEnteringFocus = m.utilityRowPosition and m.top.parentalRating > 2 and m.top.kidsModeFeatureOn = true
-    ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.  
-    getExperimentResource("roku_utility_v2", "roku_utility_position_v2")
+  ' currentScreen is homescreen and parentalRating is Adult and kidsModeFeatureOn is check for countryCode = US or CA
+  if m.top.id = "homeScreen" and m.top.parentalRating > 2 and m.top.kidsModeFeatureOn = true
+    ' Hiding the focus rectangle when the focus is on Utility row
+    if rowEnteringFocus = m.utilityRowPosition
+      m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/tab_component_alt_fhd.9.png"
+      if m.constants.deviceInfo.scaledUi = true then
+        m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/tab_component_alt_hd.9.png"
+      end if
+      m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = false
+    else
+      m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-fhd.9.png"
+      m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true 
+    end if
+    ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
+    if rowEnteringFocus = 1 ' sending exposure event when the 2nd row gains focus
+      getExperimentResource("roku_discovery_v1", "roku_discovery_row_v1")
+    end if
+  else
+    m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-fhd.9.png"
+    m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true
   end if
 
-  if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+  if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.utility
+    expandMaskOffsetForUtility(rowPercent)
+  else if categoryLosingFocus <> invalid and categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.utility
+    contractMaskOffsetForUtility(rowPercent)
+  else if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
     ' update contentArea translation, only when VITG gain focus
     expandContentAreaForLargeVitg(rowPercent)
   else if categoryLosingFocus <> invalid and categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
@@ -275,11 +301,23 @@ Function onCurrFocusRowChange()
 End Function
 
 
+' @rowPercent: float, the percentage that the Utility row is focused
+Function expandMaskOffsetForUtility(rowPercent)
+  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.utilityMaskOffsetDiff * rowPercent)]
+End Function
+
+
 ' @rowPercent: float, the percentage that the VITG row is focused
 Function expandContentAreaForLargeVitg(rowPercent)
   m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.vitgSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.vitgMaskOffsetDiff * rowPercent)]
   m.InfoPanel.opacity = 1 - rowPercent
+End Function
+
+
+' @rowPercent: float, the percentage that the non utility row is focused (ie. 1.0 means utility is not focused at all)
+Function contractMaskOffsetForUtility(rowPercent)
+  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] - (m.utilityMaskOffsetDiff * (1 - rowPercent))]
 End Function
 
 

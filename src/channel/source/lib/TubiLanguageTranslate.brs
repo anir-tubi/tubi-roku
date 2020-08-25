@@ -798,6 +798,14 @@ Function getTranslation_en_US()
     "onBoarding_back_button": {
       "description": "",
       "message": "Back"
+    },
+    "utility_movies_description": {
+      "description": "This will be displayed on Info panel when the Movies item (from utility row) gains focus",
+      "message": "Movie magic starts here with thousands of nostalgic favorites and recent box office hits. New movies added monthly, no movie ticket required."
+    },
+    "utility_tvshows_description": {
+      "description": "This will be displayed on Info panel when the TVShows item (from utility row) gains focus",
+      "message": "Tune in to thousands of binge worthy TV shows, docuseries and reality TV. New shows added monthly, you’ll never run out."
     }
   }
 End Function

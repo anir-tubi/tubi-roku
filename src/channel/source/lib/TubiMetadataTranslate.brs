@@ -19,6 +19,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     setTotalCount: tubiMetadataTranslate_setTotalCount
     getContentsJson: tubiMetadataTranslate_getContentsJson
     buildCategoryAA: tubiMetadataTranslate_buildCategoryAA
+    buildUtilityCategoryAA: tubiMetadataTranslate_buildUtilityCategoryAA
     generateChannelPosterUrl: tubiMetadataTranslate_generateChannelPosterUrl
     fetchedAtTimestamp: tubiMetadataTranslate_fetchedAtTimestamp
     getGridItemType: tubiMetadataTranslate_getGridItemType
@@ -51,10 +52,10 @@ End Function
 ' This is a recursive Function that does the heavy lifting for translateContentFromServer
 'this is a recursive Function that does the heavy lifting for translateContentFromServer
 Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object) as integer
-  if contentFromServer = invalid then return 0
+  if contentFromServer = invalid or type(contentFromServer) <> "roAssociativeArray" then return 0
 
   count = 1
-
+  
   if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
 
   typeVar = "type"
@@ -454,7 +455,8 @@ End Function
 '   </CategoryContentNode>
 ' </CategoryContentNode>
 '
-Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
+'//::TODO:: Remove the contentMode & authInfo parameters once we have API support
+Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homeScreen", authInfo=invalid) As Object
   translated = CreateObject("roSGNode", "CategoryContentNode")
   homescreenAA = {
     id: ""
@@ -475,6 +477,32 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
   ' placed the userCategories
   continueWatchingIndex = 4
   queueIndex = 5
+  
+  '//::TODO:: Remove the kidsModeFeatureOn check once we have API support  
+  m.kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
+  if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
+    m.kidsModeFeatureOn = true
+  end if  
+
+  '//::TODO:: Remove the parentalRating check once we have API support    
+  m.parentalRating = 3
+  if authInfo <> invalid
+    m.parentalRating = authInfo.parentalRating
+  end if
+  
+  ' utility row position experiment
+  utilityRowPosition = -2 ' setting default as negative to avoid insertion if the experiment is control group
+  m.experimentInfo = m.experiments.getExperimentResource("roku_discovery_v1", "roku_discovery_row_v1")
+  if m.experimentInfo <> invalid
+  ' decreasing the position value by 1 in order to use it as index  
+    utilityRowPosition = m.experimentInfo.position - 1
+  end if
+  
+  ' include utility row only in homescreen when kidsmodefeature is ON and parentalRating is set to Adult
+  includeUtilityRow = false
+  if m.kidsModeFeatureOn = true and contentMode = "homeScreen" and m.parentalRating > 2
+    includeUtilityRow = true
+  end if  
 
   'set up AAs for all categories including any nested categories
   for i=0 to containers.count()-1
@@ -484,6 +512,16 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate) As Object
         continueWatchingIndex = i
       else if container.id = m.constants.ui.categoryIds.queue
         queueIndex = i
+      end if
+      
+      ' inserting utilityRow in specific position based on experiment result
+      '//::TODO:: Remove this section once we have API support 
+      if includeUtilityRow = true and i = utilityRowPosition
+        categoryAA = m.buildUtilityCategoryAA(containers)
+        if categoryAA <> invalid
+          homescreenAA.children.push(categoryAA)
+        end if 
+        categoryAA = invalid
       end if
 
       categoryAA = m.buildCategoryAA(container, contents, invalid, "", false)
@@ -967,6 +1005,93 @@ Function tubiMetadataTranslate_translate(contentToTranslate) As Object
   m.setTotalCount(translated)
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
+End Function
+
+
+'//::TODO:: Remove this function and references once we have API support
+Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
+
+  updateMetadata = {
+    id: "utility"
+    slug: "utility"
+    title: ""
+    description: ""
+    totalCount: 0
+    offset: m.constants.performance.categoryGridList.initialBlockSize
+    validUntil: 0
+    json: ""
+    state: "full"
+    gridItemType: m.constants.ui.gridItemTypes.utility
+    type: m.contentTypes.utility
+  }
+
+  jsonAA = {}
+  validCount = 0
+  children = []
+    
+  children.append(containers)
+  children.SortBy("title")
+  
+  updateMetadata.children = []
+
+  sType = "UtilityContentNode"
+  
+  if m.experimentInfo <> invalid
+    if m.experimentInfo.has_tvshows = true
+      childAA = {
+        id: "u_tvshows"
+        title: getTranslation("menu_tv")
+        description: getTranslation("utility_tvshows_description")
+        subtype: sType
+        gridItemType : "utility"
+      }
+      childAA.type = "u"
+      jsonAA[childAA.id] = childAA
+      validCount += 1
+      updateMetadata.children.push(childAA)
+    end if
+    
+    if m.experimentInfo.has_movies = true
+      childAA = {
+        id: "u_movies"
+        title: getTranslation("menu_movies")
+        description: getTranslation("utility_movies_description")
+        subtype: sType
+        gridItemType : "utility"
+      }
+      childAA.type = "u"
+      jsonAA[childAA.id] = childAA
+      validCount += 1
+      updateMetadata.children.push(childAA)
+    end if    
+  end if
+
+  for each child in children
+    
+    if m.constants.ui.categoryList.Lookup(child.id) <> invalid
+      childAA = {
+        id: child.id
+        title: child.title
+        description: child.description
+        subtype: sType
+        gridItemType : "utility"
+      }
+      child.type = "u"
+      jsonAA[childAA.id] = child
+      validCount += 1
+      updateMetadata.children.push(childAA)
+    end if
+    
+  end for
+  
+  if validCount = 0
+    return invalid
+  end if
+
+  updateMetadata.totalCount = validCount
+  updateMetadata.json = FormatJSON(jsonAA)
+
+  return updateMetadata
 End Function
 
 

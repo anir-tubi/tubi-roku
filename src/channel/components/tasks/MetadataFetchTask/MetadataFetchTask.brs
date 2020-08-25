@@ -40,7 +40,7 @@ Function fetchLoop()
 
   ' Prepare the auth module
   m.Request = TubiRequest(m.constants.settings.mode)
-  m.Auth = TubiAuth(m.constants, m.Request)
+  m.Auth = TubiAuth(m.constants, m.Request)  
   m.CmsApi = CmsApi(m.constants, m.Request, m.Auth)
   m.NodeHelpers = TubiNodeHelpers()
   m.Bookmarks = TubiBookmarks(m.Request, m.Auth, m.constants, m.NodeHelpers)
@@ -212,7 +212,9 @@ Function handleResponse(message)
           end if
           handledRequest.convertedMetadata = m.metadataTranslate.translateContainer(parsed, handledRequest.response.data, orientation, bFullData)
         else if handledRequest.context.name = m.constants.reqNames.getHomescreen
-          handledRequest.convertedMetadata = m.metadataTranslate.translateHomescreen(parsed)
+          contentMode = handledRequest.params.contentMode
+          authInfo = m.global.authInfo
+          handledRequest.convertedMetadata = m.metadataTranslate.translateHomescreen(parsed, contentMode, authInfo)
         else
           ' I believe that search is the only other entry point here
           handledRequest.convertedMetadata = m.metadataTranslate.translate(parsed)

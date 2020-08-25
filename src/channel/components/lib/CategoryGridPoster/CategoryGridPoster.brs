@@ -265,39 +265,42 @@ Function isVitg(itemContent, gridItemTypes)
 End Function
 
 
-' creates inactive & active poster nodes to show/hide the poster in utility row
+' creates utilityPoster & Label to show in utility row
 Function setUpUtility()
 
    m.utilityRowPosters = m.top.createChild("Group")
-
-   inActivePoster = CreateObject("roSGNode", "Poster")
-   inActivePoster.id = "inActivePoster"
-   inActivePoster.height = 300
-   inActivePoster.width = 282
-   inActivePoster.loadingBitmapUri = "pkg:/images/placeholder.jpg"
-   inActivePoster.uri = m.top.itemContent.hdgridposterurl
-   inActivePoster.opacity = 0.64
-   m.utilityRowPosters.appendChild(inActivePoster)
-
-   activePoster = CreateObject("roSGNode", "Poster")
-   activePoster.id = "activePoster"
-   activePoster.height = 300
-   activePoster.width = 282
-   activePoster.loadingBitmapUri = "pkg:/images/placeholder.jpg"
-   activePoster.uri = m.top.itemContent.HDPOSTERURL
-   activePoster.opacity = 0
-   m.utilityRowPosters.appendChild(activePoster)
    
-   m.inActivePoster = inActivePoster
-   m.activePoster = activePoster
+   labelFont = CreateObject("roSGNode", "Font")
+   labelFont.uri = "pkg:/fonts/Vaud-Bold.ttf"
+   labelFont.size = 24
+
+   utilityPoster = CreateObject("roSGNode", "Poster")
+   utilityPoster.id = "utilityPoster"
+   utilityPoster.width = 324
+   utilityPoster.height = 84
+   utilityPoster.uri = "pkg:/images/tab_component.png"
+   utilityPoster.blendColor = "0x9699A329"
+   
+   label = CreateObject("roSGNode", "Label")
+   label.id = "label"
+   label.translation = [40,0]
+   label.width = 250
+   label.height = 84
+   label.horizAlign = "center"
+   label.vertAlign = "center"
+   label.text = m.top.itemContent.title
+   label.font = labelFont
+   
+   utilityPoster.appendChild(label)
+   m.utilityRowPosters.appendChild(utilityPoster)
+   
+   m.utilityPoster = utilityPoster
    
    m.utilityRowPosters.visible = true
    
    if m.utilityLocalFocus = invalid
      m.utilityLocalFocus = false
    end if
-   
-   m.utilityPosterFadeTime = 0.25
 
 End Function
 
@@ -309,15 +312,15 @@ Function setUpUtilityObservers()
 End Function
 
 
-' handleUtilityLocalFocusChange is used to fadeIn & fadeOut the active & inactive posters when item gains/loses focus
+' handleUtilityLocalFocusChange is used to change the posterUri & blendColor when item gains/loses focus
 Function handleUtilityLocalFocusChange(newLocalFocus)
 
   if m.utilityLocalFocus = false and newLocalFocus = true
-    fade(m.inActivePoster, "out", m.utilityPosterFadeTime)
-    fade(m.activePoster, "in", m.utilityPosterFadeTime)
+    m.utilityPoster.uri = ""
+    m.utilityPoster.blendColor = "0xFF501AFF"
   else if m.utilityLocalFocus = true and newLocalFocus = false
-    fade(m.activePoster, "out", m.utilityPosterFadeTime)
-    fade(m.inActivePoster, "in", m.utilityPosterFadeTime, 0, 0.64)
+    m.utilityPoster.uri = "pkg:/images/tab_component.png"
+    m.utilityPoster.blendColor = "0x9699A329"
   end if
 
   m.utilityLocalFocus = newLocalFocus

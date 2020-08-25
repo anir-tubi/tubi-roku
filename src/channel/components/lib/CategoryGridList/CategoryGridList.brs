@@ -147,27 +147,33 @@ Function setRowHeights()
   'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
   rowItemSize = []
   rowHeights = []
+  showRowLabel = []
   numRows = 2
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
     if category.gridItemType = m.constants.ui.gridItemTypes.utility
-      rowItemSize.push([282,300])
-      rowHeights.push(364)
+      rowItemSize.push([324,84])
+      rowHeights.push(130)
+      showRowLabel.push(false)
     else if category.gridItemType = m.constants.ui.gridItemTypes.portrait
       rowItemSize.push([210,300])
       rowHeights.push(364)
+      showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.landscape or category.gridItemType = m.constants.ui.gridItemTypes.vitg_small
       rowItemSize.push([430,242])
       rowHeights.push(364)
+      showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.vitg_large
       rowItemSize.push([1205,677])
       rowHeights.push(800)
+      showRowLabel.push(true)
       numRows = 3
     end if
   end for
 
   m.RowList.rowItemSize = rowItemSize
   m.RowList.rowHeights = rowHeights
+  m.RowList.showRowLabel = showRowLabel
   m.RowList.content = m.top.content
   m.RowList.numRows = numRows
 End Function
@@ -333,7 +339,6 @@ Function onRowListItemDebounce()
   end if
 
   itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
-
   if itemFocused <> invalid
     m.top.oldCursorPosition = m.top.cursorPosition
     m.top.cursorPosition = m.RowList.rowItemFocused

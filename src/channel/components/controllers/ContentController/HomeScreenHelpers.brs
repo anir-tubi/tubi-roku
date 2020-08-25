@@ -362,33 +362,14 @@ Function onUtilityItemSelected(content)
   itemSelectedId = content.id
   currentScreenNow = currentScreen()
 
-  if itemSelectedId = m.constants.ui.utilityIds.kidsMode
-    dialogEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "ENTER_KIDS_MODE"
-        pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
-        dialog_action: "ACCEPT_DELIBERATE"
-        dialog_sub_type: "enter-kids-mode"
-      }
-    }
-    m.trackingLoggingTask.trackEvent = dialogEvent
-    enableKidsModeFromSideNav()    
-  else if itemSelectedId = m.constants.ui.utilityIds.search
-      showSearchScreen(m.constants)
-      m.SideNav.itemRequested = m.constants.ui.sideNavIds.search
-  else if itemSelectedId = m.constants.ui.utilityIds.channels
-      showChannelListScreen(m.constants, m.constants.ui.terms.menu)
-      m.SideNav.itemRequested = m.constants.ui.sideNavIds.channels
-  else if itemSelectedId = m.constants.ui.utilityIds.categories
-      showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
-      m.SideNav.itemRequested = m.constants.ui.sideNavIds.categories
-  else if itemSelectedId = m.constants.ui.utilityIds.movies
-      showMoviesScreen()
-      m.SideNav.itemRequested = m.constants.ui.sideNavIds.movies
+  if itemSelectedId = m.constants.ui.utilityIds.movies
+    showMoviesScreen()
+    m.SideNav.itemRequested = m.constants.ui.sideNavIds.movies
   else if itemSelectedId = m.constants.ui.utilityIds.tv
-      showTVScreen()
-      m.SideNav.itemRequested = m.constants.ui.sideNavIds.tv
+    showTVScreen()
+    m.SideNav.itemRequested = m.constants.ui.sideNavIds.tv
+  else
+    showChannelScreen(content, "HOME")  
   end if
 End Function  
 
