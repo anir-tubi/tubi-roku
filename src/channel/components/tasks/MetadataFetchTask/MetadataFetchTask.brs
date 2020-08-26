@@ -214,7 +214,8 @@ Function handleResponse(message)
         else if handledRequest.context.name = m.constants.reqNames.getHomescreen
           contentMode = handledRequest.params.contentMode
           authInfo = m.global.authInfo
-          handledRequest.convertedMetadata = m.metadataTranslate.translateHomescreen(parsed, contentMode, authInfo)
+          isKidsModeEnabled = handledRequest.params.isKidsMode
+          handledRequest.convertedMetadata = m.metadataTranslate.translateHomescreen(parsed, contentMode, authInfo, isKidsModeEnabled)
         else
           ' I believe that search is the only other entry point here
           handledRequest.convertedMetadata = m.metadataTranslate.translate(parsed)
