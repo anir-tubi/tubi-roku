@@ -510,8 +510,18 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     if container.type <> "complex"
       if container.id = m.constants.ui.categoryIds.history
         continueWatchingIndex = i
+        ' increasing the utilityRowPosition by 1 if the ContinueWatching has no children
+        '//::TODO:: Remove this section once we have API support
+        if container.children.Count() = 0
+          utilityRowPosition = utilityRowPosition + 1
+        end if
       else if container.id = m.constants.ui.categoryIds.queue
         queueIndex = i
+        ' increasing the utilityRowPosition by 1 if the MyList/Queue has no children
+        '//::TODO:: Remove this section once we have API support
+        if container.children.Count() = 0
+          utilityRowPosition = utilityRowPosition + 1
+        end if
       end if
       
       ' inserting utilityRow in specific position based on experiment result
