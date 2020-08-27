@@ -125,7 +125,7 @@ Function onEpisodePosition()
   if videoPlayer <> invalid
     ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
     history = m.global.historyIds.findNode(m.updateHistoryTask.content.id)
-    if history <> invalid or videoPlayer.historyPosition > m.constants.player.historyFrequency
+    if history <> invalid or videoPlayer.historyPosition >= m.constants.player.historyFrequency
       ' Only run a new task if the previous task is done.  Priority of resume states is
       ' pretty low and we don't mind losing a few.
       if m.updateHistoryTask.state <> "RUN"   

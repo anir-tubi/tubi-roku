@@ -1069,6 +1069,11 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
   for each child in children
     
     if m.constants.ui.categoryList.Lookup(child.id) <> invalid
+    
+      if child.id = "continue_watching"
+        child.id = "u_" + child.id
+      end if
+    
       childAA = {
         id: child.id
         title: child.title
