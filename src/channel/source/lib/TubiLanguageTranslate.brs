@@ -1441,11 +1441,11 @@ Function getTranslation_es_MX()
     },
     "onBoarding_landingScreen_registration": {
       "description": "",
-      "message": "TV gratis\nPelículas gratis\nRegistración gratis"
+      "message": "TV gratis\nPelículas gratis\nRegistro gratis"
     },
     "onBoarding_onBoarding_landingScreen_info": {
       "description": "",
-      "message": "Descubre una nueva forma de ver todo el material que te gusta. Siempre gratis, 100% legal, y no requiere suscripción."
+      "message": "Descubre una nueva forma de ver todo el contenido que te gusta. Siempre gratis, 100% legal y no requiere suscripción."
     },
     "onBoarding_register_button": {
       "description": "",
@@ -1485,7 +1485,7 @@ Function getTranslation_es_MX()
     },
     "onBoarding_devices_description": {
       "description": "",
-      "message": "Disfrútalo en tu teléfono, televisión, tableta o computadora."
+      "message": "Ver en tu teléfono, televisión, tableta o computadora."
     },
     "onBoarding_startWatching_button": {
       "description": "",
@@ -1494,6 +1494,14 @@ Function getTranslation_es_MX()
     "onBoarding_back_button": {
       "description": "",
       "message": "Regresar"
+    },
+    "utility_movies_description": {
+      "description": "This will be displayed on Info panel when the Movies item (from utility row) gains focus",
+      "message": "La magia del cine comienza aquí con miles de títulos favoritos nostálgicos y éxitos recientes de taquilla. Nuevas películas agregadas mensualmente, no se requiere boleto de cine."
+    },
+    "utility_tvshows_description": {
+      "description": "This will be displayed on Info panel when the TVShows item (from utility row) gains focus",
+      "message": "Sintonice miles de series de televisión dignos de atracón, docuseries y reality TV. Nuevas series añadidos mensualmente, nunca te quedarás sin algo que ver."
     }
   }
 End Function

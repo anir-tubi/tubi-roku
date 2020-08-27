@@ -1040,8 +1040,8 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
     if m.experimentInfo.has_tvshows = true
       childAA = {
         id: "u_tvshows"
-        title: getTranslation("menu_tv")
-        description: getTranslation("utility_tvshows_description")
+        title: "TV Shows"
+        description: "Tune in to thousands of binge worthy TV shows, docuseries and reality TV. New shows added monthly, you’ll never run out."
         subtype: sType
         gridItemType : "utility"
       }
@@ -1054,8 +1054,8 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
     if m.experimentInfo.has_movies = true
       childAA = {
         id: "u_movies"
-        title: getTranslation("menu_movies")
-        description: getTranslation("utility_movies_description")
+        title: "Movies"
+        description: "Movie magic starts here with thousands of nostalgic favorites and recent box office hits. New movies added monthly, no movie ticket required."
         subtype: sType
         gridItemType : "utility"
       }
