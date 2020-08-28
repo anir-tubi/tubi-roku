@@ -1079,7 +1079,10 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
   for each child in children
     
     if m.constants.ui.categoryList.Lookup(child.id) <> invalid
-    
+
+      ' TODO: FIND A BETTER WAY TO SOLVE THE u_continue_watching issue
+      ' We artificially prepend a "u_" to the category id so that when doing a .findNode(), the
+      ' continue_watching category and continue watching pill have a unique ids.
       if child.id = "continue_watching"
         child.id = "u_" + child.id
       end if

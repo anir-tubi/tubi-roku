@@ -44,7 +44,12 @@ Function getChannelFromServer(screen, content)
   tubiLog("ChannelScreenHelpers.getChannelFromServer")
   channelTask = CreateObject("roSGNode", "ChannelMetadataTask")
   channelTask.kidsMode = shouldKidsModeBeSentToServer()
-  channelTask.channelId = content.id
+  contentId = content.id
+  ' TODO: FIND A BETTER WAY TO SOLVE THE u_continue_watching issue
+  if content.id = "u_continue_watching"
+    contentId = "continue_watching"
+  end if
+  channelTask.channelId = contentId
   screen.addField("task", "node", false)
   screen.task = channelTask
   channelTask.addField("target", "node", false)
