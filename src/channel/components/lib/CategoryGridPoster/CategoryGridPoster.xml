@@ -19,27 +19,32 @@
   </interface>
 
   <children>
-    <Poster
-     id="Poster"
-     loadingBitmapUri="pkg:/images/placeholder.jpg">
-      <Rectangle
-        id="ResumeProgressBar"
-        height="6"
-        width="0"
-        visible="false"/>
-    </Poster>
-    <Label
-      id="Title"
-      color="0xFFFFFFFF"
-      width="410"
-      height="35"
-      vertAlign="top"
-      translation="[0,256]"
-      visible="false">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="27" />
-    </Label>
+
+  <LayoutGroup
+    id="posterLayout"
+    layoutDirection="vert"
+    itemSpacings="[14]">
+      <Poster
+      id="Poster"
+      loadingBitmapUri="pkg:/images/placeholder.jpg">
+        <Rectangle
+          id="ResumeProgressBar"
+          height="6"
+          width="0"
+          visible="false"/>
+      </Poster>
+      <Label
+        id="Title"
+        color="0xFFFFFFFF"
+        width="410"
+        height="35"
+        vertAlign="top"
+        visible="false">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="27" />
+      </Label>
+    </LayoutGroup>
   </children>
 </component>

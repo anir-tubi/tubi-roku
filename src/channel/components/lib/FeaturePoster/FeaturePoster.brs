@@ -2,6 +2,7 @@ Function init()
   m.Background = m.top.findNode("Background")
   m.Title = m.top.findNode("Title")
   m.top.observeField("itemContent", "onContentChange")
+  m.top.observeField("width", "onWidthChange")
 End Function
 
 
@@ -19,4 +20,9 @@ Function onContentChange()
     end if
     m.Title.text = m.top.itemContent.title
   end if
+End Function
+
+
+Function onWidthChange()
+  m.Title.width = m.top.width - 20
 End Function

@@ -40,6 +40,7 @@ Function init()
   '//::TODO::SIDENAV set the width of the items of the lists dynamically to the width of m.top.width, plus some spacing
   '//::TODO::SIDENAV - set all references to sideNav IDs to be called from Constants: i.e. m.constants.ui.sideNavIds.home. 
   '//   To do this, set content in brs instead of xml?
+
 End Function
 
 

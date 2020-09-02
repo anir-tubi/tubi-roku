@@ -354,6 +354,24 @@ We may want to see how a new feature will affect the app's metrics from a small 
 - For more infoformation on how to format the experiment JSON files, see the [Popper Config Github repo and its ReadMe file](https://github.com/adRise/popper-config).
 
 
+## Deploying an experiment on Popper Staging:
+- Before you can deploy to staging, you need to ensure your ssh config file has been updated with the ip addresses and hostname info of the popper staging location. This info can be found under "[popper-engine-roku]" in the [staging inventory](https://github.com/adRise/adrise_infrastructure/blob/master/inventory/staging/staging#L317). 
+
+- Please follow the [SSH Access Instructions](https://github.com/adRise/adrise_infrastructure#ssh-access) while using the popper info from the previous step to set up your SSH Config file. Below is an example of what is added to the .ssh/config file. (Note: on the Mac, the ssh config file is located in [user]/.ssh/config, where "user" is the username on your mac.)
+
+  ```
+  Host popper-engine-roku-01 172.30.27.29
+   User ubuntu
+   Hostname 172.30.27.29
+   IdentityFile ~/.ssh/adrise_aws_ohio_staging.pem
+   ProxyCommand ssh -A -q -W %h:%p bastion-staging-1
+  ```
+  - where the "IdentityFile" is the PEM file you set up for the staging server as described in the SSH Access Instructions, 
+  - where the "host" and "hostname" (the IP address) are the popper staging info gathered from the previous step
+
+- Once you have set up your ssh config file, you can now follow the directions on how to deploy your JSON popper configuration changes, see [[How to deploy to staging instructions](https://github.com/adRise/larnaca/tree/master/popper-engine#how-to-deploy-to-staging)]
+
+
 ## Setting up the experiment within the Roku Code:
 - Within TubiExperiments.brs, set up a default experiment resource. Although the popper experiment system can set a default value, we should still set a default resource client-side in case the app cannot communicate to the backend. As previously stated, the resource values provide the code a way to externalize the properties of a given experiment. Locate the defaultResources associative array within the TubiExperiments.brs file and add the default resource associative array within the appropriate namespace.  <br> For example:
 

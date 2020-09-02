@@ -150,6 +150,11 @@ Function init()
   ' Initial page load can be at app launch, or after a deep link
   m.initialHomeScreenLoadFired = false
 
+  if getExperimentResource("roku2", "roku_safe_area").enabled = true
+    m.SideNav.translation = [-32,0]
+    m.SideNav.width = 338
+  end if
+  
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }

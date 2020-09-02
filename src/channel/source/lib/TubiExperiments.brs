@@ -52,10 +52,12 @@ Function TubiExperiments(constants) as Object
       }
     }
     defaultResources: {
+    '//::TODO::SafeZone - set these experiments back to false when done with testing
       roku: {
         roku_onboarding_registration : { enabled : false }
       }
       roku2: {
+        roku_safe_area : {"enabled": false}
       }
       rokunamespace: {
       }

@@ -8,6 +8,9 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  
   <interface>
     <!-- INPUT -->
       <!-- Full content of the item to show details for -->
@@ -30,6 +33,7 @@
 
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true" /> 
+      <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
 
       <!-- Keeps the information used for user tracking - structure looks like:
         {
@@ -75,9 +79,17 @@
       mode="detail"
       visible="true" />
     
+    <Poster
+      id="leftCheveron"
+      visible="false"
+      uri="pkg:/images/left-chevron.png"
+      width="15"
+      height="27"
+      translation="[85,496]"/>
+      
     <CommunicatingMarkupGrid
       id="EpisodeMenu"
-      translation="[-425, 616]"
+      translation="[-425, 603]"
       itemSize="[425,80]"
       itemSpacing="[0,8]"
       numRows="5"

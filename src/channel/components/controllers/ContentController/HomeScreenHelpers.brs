@@ -195,13 +195,19 @@ Function fetchHomeScreen(homeScreen)
   if homeScreen.canLoadCategories = true
     reqName = m.constants.reqNames.getHomescreen
     '//::TODO:: JHAND - test error here!
-  
+   
     responseHandler = "homescreenResponse"
     params = {contentMode : homeScreen.contentMode}
     if homeScreen.id = m.constants.ui.screenIds.movieScreen
       responseHandler = "moviescreenResponse"
     else if homeScreen.id = m.constants.ui.screenIds.tvScreen
       responseHandler = "tvscreenResponse"
+    end if
+
+    if getExperimentResource("roku2", "roku_safe_area").enabled = true
+      params.posterSize = m.constants.ui.imageSizes.poster
+      params.landscapeSize = m.constants.ui.imageSizes.landscape
+      params.largeVitgSize = m.constants.ui.imageSizes.largeVITG
     end if
 
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, shouldKidsModeBeSentToServer(), params)

@@ -174,7 +174,6 @@ Function setUpVitg()
 
   title = m.top.itemContent.title
   if m.top.itemContent.gridItemType = "vitg_large"
-    m.title.translation = [0, 692]
     m.title.width = 1205
     title = title + " (" + m.top.itemContent.releaseDate + ") " + Chr(&hb7) + " " + formatLengthAsEnglish(m.top.itemContent.length)
   end if

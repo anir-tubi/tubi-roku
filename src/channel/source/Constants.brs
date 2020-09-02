@@ -310,6 +310,7 @@ Function getConstants()
     ' constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/rev/"
     constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/rev/"
 
+
     'contents url
     constants.urls.cms = {}
       'constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
@@ -704,6 +705,16 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.videoPlayerScreen] = true
+
+    constants.ui.imageSizes = {}
+      'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
+      constants.ui.imageSizes.poster = [198,282]
+        
+      'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
+      constants.ui.imageSizes.landscape= [408,231]
+
+      'Sizes of landscape VITG that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
+      constants.ui.imageSizes.largeVITG = [1248,701]
 
     constants.ui.sideNavOpenIds = {}
       constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true

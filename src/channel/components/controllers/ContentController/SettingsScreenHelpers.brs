@@ -14,6 +14,7 @@ Function showSettingsScreen(sFocusID = "")
   m.settingsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   m.settingsScreen.observeFieldScoped("backgroundUriList", "onSettingsBackgroundChange")
   m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
+  m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
 
   pushScreen(m.settingsScreen, true, true)
   
@@ -358,4 +359,10 @@ Function onShowDeviceModal()
   }  
   showInfoModal(getTranslation("screenSettings_fullDeviceID"), deviceId, dialogEvent, m.trackingLoggingTask)    
 
+End Function
+
+
+Function onSettingsBackPressed()
+  onKeyEvent("back", true)
+  onKeyEvent("back", false)
 End Function

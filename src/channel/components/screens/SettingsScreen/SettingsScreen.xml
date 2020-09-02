@@ -7,6 +7,9 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -28,6 +31,7 @@
       
       <field id="showDeviceModal" type="boolean" alwaysNotify="true" />
 
+      <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
       <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
       <field id="signInSelected" type="boolean" alwaysNotify="true"/>
       <field id="parentalSettingSelected" type="integer" alwaysNotify="true"/>
@@ -94,6 +98,14 @@
         </Label>
       </LayoutGroup>
     </Group>
+
+    <Poster
+      id="leftCheveron"
+      visible="false"
+      uri="pkg:/images/left-chevron.png"
+      width="15"
+      height="27"
+      translation="[85,496]"/>
 
     <PanelSet
       id="PanelSet"

@@ -39,8 +39,11 @@ Function onSearchTextChanged(msg)
   bSearchNonDefaultResults = (searchText <> invalid and Len(searchText) > 0)
   m.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, searchScreen, "searchResponse")
 
+  options = {}
+  options.posterSize = searchScreen.posterSize
+
   if bSearchNonDefaultResults = true
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", m.constants.reqNames.searchAPI, searchText, shouldKidsModeBeSentToServer())
+    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", m.constants.reqNames.searchAPI, searchText, shouldKidsModeBeSentToServer(), options)
     m.trackingLoggingTask.trackEvent = {
       type: "search"
       values: {
@@ -49,7 +52,7 @@ Function onSearchTextChanged(msg)
       }
     }
   else 
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("featured", m.top, "searchResponse", m.constants.reqNames.getSearchDefault, invalid, shouldKidsModeBeSentToServer())
+    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("featured", m.top, "searchResponse", m.constants.reqNames.getSearchDefault, invalid, shouldKidsModeBeSentToServer(), options)
   end if
 End Function
 
@@ -75,7 +78,9 @@ Function onSearchResultsReceived()
     response = m.top.searchResponse.response
     if response.code >= 200 and response.code < 300 then 
       content = m.top.searchResponse.convertedMetadata
-      content.isDefaultSearchResults = (response.name = m.constants.reqNames.getSearchDefault)
+      if content <> invalid
+        content.isDefaultSearchResults = (response.name = m.constants.reqNames.getSearchDefault)
+      end if
       searchScreen.content = content
     else
       searchScreen.content = invalid

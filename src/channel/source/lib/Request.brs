@@ -28,7 +28,6 @@ End Function
 '               headers - assoc array of headers and their values
 '
 Function createAsyncHTTPRequest(url as String, name = "" as String, options={} as Object) as Object
-
   deviceInfo = CreateObject("roDeviceInfo")
 
   ' sanitize

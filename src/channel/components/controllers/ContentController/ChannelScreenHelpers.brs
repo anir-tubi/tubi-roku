@@ -6,6 +6,7 @@ Function showChannelScreen(content, sPageSource = "")
   channelScreen.observeFieldScoped("backgroundUriList", "onChannelBackgroundChange")
   channelScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   channelScreen.observeFieldScoped("refreshChannel", "onRefreshChannelSignal")
+  channelScreen.observeFieldScoped("backButtonPressed", "onChannelScreenBackPressed")
   channelScreen.id = m.constants.ui.screenIds.channelDetailScreen
   channelScreen.isLoading = true
 
@@ -148,4 +149,9 @@ Function showChannelContentError(msg, bContentEmptyError = false)
 
   task.unobserveField("response")
   task.unobserveField("error")
+End Function
+
+
+Function onChannelScreenBackPressed()
+  onKeyEvent("back", true)
 End Function

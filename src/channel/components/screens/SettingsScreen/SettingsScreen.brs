@@ -42,6 +42,19 @@ Function init()
 
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
+  
+  m.bLeftButtonActsLikeBackButton = false
+  if getExperimentResource("roku2", "roku_safe_area").enabled = true
+    m.leftCheveron = m.top.findNode("leftCheveron")
+    m.leftCheveron.visible = true
+    m.bLeftButtonActsLikeBackButton = true
+    m.PanelSet.translation = [148,414]
+    m.rightPaneloffset = [86,-199]
+    m.Title.translation = [168,230]
+    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
+    m.ScreenNavigationHint.translation = [168,85]
+  end if
+
 End Function
 
 
@@ -343,5 +356,19 @@ Function onItemRequested()
     if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and m.top.itemRequested <> buttonContent.id
       focusItemInList(list, m.top.itemRequested)
     end if
+  end if
+End Function
+
+
+Function onKeyEvent(key, press)
+  if press = true
+    if key = "left"
+      if m.bLeftButtonActsLikeBackButton = true
+        m.top.backButtonPressed = true
+        return true
+      end if
+    end if
+
+    return false
   end if
 End Function

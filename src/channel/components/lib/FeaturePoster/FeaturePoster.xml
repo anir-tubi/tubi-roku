@@ -10,10 +10,11 @@
   <interface>
     <field id="itemContent" type="node" />
     
-    <!-- these are ignored but here for compatibility -->
+    <!-- index ignored but here for compatibility -->
     <field id="index" type="integer" />
-    <field id="width" type="float" />
-    <field id="height" type="float" />
+
+    <field id="width" alias="Background.width" />
+    <field id="height" alias="Background.height" />
 
     <!-- used so the FeaturePoster load state can be identified at the same level as a regular poster -->
     <field id="loadStatus" type="string"  alias="Background.loadStatus"/>

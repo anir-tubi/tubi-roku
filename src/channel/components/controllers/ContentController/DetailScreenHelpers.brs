@@ -970,6 +970,7 @@ Function onDetailBackPressed()
   ' TODO(Chris): This is in terrible need of refactor. We shouldn't be calling this directly
   ' but we have to invoke the "empty stack" logic at this point.
   onKeyEvent("back", true)
+  onKeyEvent("back", false)
 End Function
 
 

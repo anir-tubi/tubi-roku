@@ -4,6 +4,10 @@
   <script type="text/brightscript" uri="../GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+
   <interface>
     <!-- Incoming interface: populate children nodes with content values -->
     <field id="content" type="node"/>
@@ -12,17 +16,16 @@
   <children>
     <Label
       id="CategoryName"
-      height="63"
+      height="49"
       width="1000"
       translation="[0,0]"
       color="0xFFFFFFFF"
       opacity="1.0">
       <Font
         role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
         size="34" />
     </Label>
-    
     <LayoutGroup
       id="CategoryCount"
       layoutDirection="horiz"
@@ -32,7 +35,6 @@
         id="FocusIndex"
         text=""
         height="63"
-        color="0xFFFFFFFF"
         horizAlign="right">
         <Font
           role="font"

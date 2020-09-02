@@ -35,6 +35,23 @@ Function init()
   m.listIsFocused = false
 
   m.top.screenLevel = m.constants.ui.screenLevels.episodeScreen
+
+
+  m.bLeftButtonActsLikeBackButton = false
+  if getExperimentResource("roku2", "roku_safe_area").enabled = true
+    m.leftCheveron = m.top.findNode("leftCheveron")
+    m.leftCheveron.visible = true
+    m.bLeftButtonActsLikeBackButton = true
+    m.Info.translation = [168,61]
+    m.RowList.translation = [168,593]
+    m.RowList.rowItemSize = m.constants.ui.imageSizes.landscape
+    m.RowList.rowItemSpacing = [[12,0]]
+    m.Rowlist.itemSize = [m.rowList.itemSize[0], m.constants.ui.imageSizes.landscape[1] + 115] '291
+    m.Menu.translation = [-425, 643]
+    m.Menu.numRows = 4
+  else
+    m.RowList.rowItemSize = [[430,242]]
+  end if 
 End Function
 
 
@@ -213,6 +230,9 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     else if (key = "left") and m.RowList.isInFocusChain() then
       focusMenu()
       return true
+    else if (key = "left") and m.bLeftButtonActsLikeBackButton = true then
+      m.top.backButtonPressed = true
+      return true
     end if
   end if
 
@@ -237,10 +257,19 @@ Function focusGrid()
   end if
 
   if m.global.constants.deviceInfo.limitedUi
-    m.RowList.translation = [85,m.RowList.translation[1]]
-    m.Menu.translation = [-425,m.Menu.translation[1]]
+
+    if getExperimentResource("roku2", "roku_safe_area").enabled = true
+      m.RowList.translation = [168, m.RowList.translation[1]]
+    else 
+      m.RowList.translation = [85, m.RowList.translation[1]]
+    end if
+    m.Menu.translation = [-425, m.Menu.translation[1]]
   else
-    slideTo(m.RowList, [85,m.RowList.translation[1]], 0.5)
+    if getExperimentResource("roku2", "roku_safe_area").enabled = true
+      slideTo(m.RowList, [168, m.RowList.translation[1]], 0.5)
+    else 
+      slideTo(m.RowList, [85,m.RowList.translation[1]], 0.5)
+    end if
     slideTo(m.Menu, [-425,m.Menu.translation[1]], 0.5)
   end if
 End Function
@@ -253,11 +282,22 @@ Function focusMenu()
   m.Menu.animateToItem = m.RowList.currFocusRow
   m.Menu.setFocus(true)
   if m.global.constants.deviceInfo.limitedUi
-    m.RowList.translation = [525,m.RowList.translation[1]]
-    m.Menu.translation = [65,m.Menu.translation[1]]
+    if getExperimentResource("roku2", "roku_safe_area").enabled = true
+      m.Menu.translation = [148, m.Menu.translation[1]]
+      m.RowList.translation = [590, m.RowList.translation[1]]
+    else 
+      m.Menu.translation = [65,m.Menu.translation[1]]
+      m.RowList.translation = [525, m.RowList.translation[1]]
+    end if
   else
-    slideTo(m.RowList, [525,m.RowList.translation[1]], 0.5)
-    slideTo(m.Menu, [65,m.Menu.translation[1]], 0.5)
+    slideTo(m.RowList, [590,m.RowList.translation[1]], 0.5)
+    if getExperimentResource("roku2", "roku_safe_area").enabled = true
+      slideTo(m.Menu, [148, m.Menu.translation[1]], 0.5)
+      slideTo(m.RowList, [590,m.RowList.translation[1]], 0.5)
+    else 
+      slideTo(m.Menu, [65,m.Menu.translation[1]], 0.5)
+      slideTo(m.RowList, [525,m.RowList.translation[1]], 0.5)
+    end if
   end if
 End Function
 

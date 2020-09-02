@@ -20,7 +20,13 @@ Function execGetChannelMetadata() As Void
   AuthModule = TubiAuth(constants, RequestModule)
   cms = CmsApi(constants, RequestModule, AuthModule)
   translate = TubiMetadataTranslate(constants)
-  channelReq = cms.channelReq(m.top.channelId, constants.performance.categoryGridList.finalBlockSize, m.top.kidsMode)
+  
+  params = {}
+  if getExperimentResource("roku2", "roku_safe_area").enabled = true
+    params.posterSize = constants.ui.imageSizes.poster
+  end if
+
+  channelReq = cms.channelReq(m.top.channelId, constants.performance.categoryGridList.finalBlockSize, m.top.kidsMode, params )
   channel = channelReq.runSynchronous()
 
   ' Parse results

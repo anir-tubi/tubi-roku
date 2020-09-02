@@ -18,6 +18,7 @@ Function showEpisodeScreen(content, shouldSendNavigationAnalytics)
   episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")
   episodesScreen.observeFieldScoped("backgroundUriList", "onEpisodeBackgroundChange")
   episodesScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+  episodesScreen.observeFieldScoped("backButtonPressed", "onEpisodeBackPressed")
   if episodesScreen.content <> invalid and episodesScreen.content.id <> invalid
     contentId = Mid(episodesScreen.content.id, 2)  ' trim leading "0" off series id
 
@@ -69,4 +70,10 @@ Function onEpisodeSelected(msg)
       end if
     end if
   end if
+End Function
+
+
+Function onEpisodeBackPressed()
+  onKeyEvent("back", true)
+  onKeyEvent("back", false)
 End Function

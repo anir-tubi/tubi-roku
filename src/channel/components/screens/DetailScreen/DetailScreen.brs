@@ -74,6 +74,20 @@ Function init()
   m.isChannelMenuSelected = false
 
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
+
+  m.bLeftButtonActsLikeBackButton = false
+  if getExperimentResource("roku2", "roku_safe_area").enabled = true
+    m.leftCheveron = m.top.findNode("leftCheveron")
+    m.bLeftButtonActsLikeBackButton = true
+    m.leftCheveron.visible = true
+    m.Info.translation = [168,123]
+    m.Menu.translation = [143,656]
+    m.RelatedContentGroup.translation = [168,945]
+
+    posterSize = m.constants.ui.imageSizes.poster
+    m.RelatedGrid.itemSize = posterSize
+    m.RelatedGrid.itemSpacing = [12,12]
+  end if
 End Function
 
 
@@ -441,7 +455,7 @@ End Function
 Function onKeyEvent(key As String, press As Boolean)
   tubiLog("DetailScreen.onKeyEvent key = " + key)
   if press then
-    if key = "back"
+    if key = "back" or (key = "left" and m.bLeftButtonActsLikeBackButton = true)
       if not m.top.isWaitingForServerResponse
         m.top.backButtonPressed = true
       end if

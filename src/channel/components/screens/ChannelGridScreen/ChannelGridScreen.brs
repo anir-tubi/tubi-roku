@@ -37,6 +37,15 @@ Function init()
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
+
+  if getExperimentResource("roku2", "roku_safe_area").enabled = true
+    m.ChannelCategoryGrid.itemSize = [407,230]
+    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
+    m.ScreenNavigationHint.translation = [168,85]
+    m.ChannelCategoryGrid.translation = [168,208]
+    m.ChannelCategoryGrid.itemSpacing = [12,30]
+  end if
+
 End Function
 
 

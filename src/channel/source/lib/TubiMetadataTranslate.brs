@@ -24,6 +24,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     fetchedAtTimestamp: tubiMetadataTranslate_fetchedAtTimestamp
     getGridItemType: tubiMetadataTranslate_getGridItemType
     experiments: experiments
+    getThumbnailImage: tubiMetadataTranslate_getThumbnailImage
   }
 End Function
 
@@ -43,6 +44,51 @@ Function tubiMetadataTranslate_setTotalCount(metadata As Object)
   if metadata.totalCount = -1 and metadata.getChildCount() <> 0 then
     metadata.totalCount = metadata.getChildCount()
   end if
+End Function
+
+
+'''''''''''''''''''''
+' getThumbnailImage
+'
+' Get the thumbnail URL that should be used to set the ContentNode's HDGRIDPOSTERURL property
+Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "")
+  canvasImages = contentFromServer.images
+  sThumbnailURL = ""
+  if gridType = ""
+    gridType = m.constants.ui.gridItemTypes.portrait
+  end if
+
+  if gridType = m.constants.ui.gridItemTypes.portrait
+    if canvasImages <> invalid and canvasImages.poster_tb <> invalid and canvasImages.poster_tb <> "" 
+      '//A custom portrait size was requested, use this image instead of the default image
+      sThumbnailURL = canvasImages.poster_tb
+    else if contentFromServer.posterarts <> invalid and type(contentFromServer.posterarts) = "roArray" and contentFromServer.posterarts.count() > 0
+      sThumbnailURL = contentFromServer.posterarts[0]
+    end if
+  else if gridType = m.constants.ui.gridItemTypes.landscape
+    if canvasImages <> invalid and canvasImages.landscape_tb <> invalid and canvasImages.landscape_tb <> "" 
+      '//A custom landscape size was requested, use this image instead of the default image
+      
+      sThumbnailURL = canvasImages.landscape_tb
+    else if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
+      sThumbnailURL = contentFromServer.hero_images[0]
+    else if contentFromServer.thumbnails <> invalid and type(contentFromServer.thumbnails) = "roArray" and contentFromServer.thumbnails.count() > 0
+      sThumbnailURL = contentFromServer.thumbnails[0]
+    end if
+  else if gridType = m.constants.ui.gridItemTypes.vitg_large
+    if canvasImages <> invalid and canvasImages.vitg_tb <> invalid and canvasImages.vitg_tb <> "" 
+      '//A custom vitg size was requested, use this image instead of the default image
+      sThumbnailURL = canvasImages.vitg_tb
+    else if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
+      if contentFromServer.hero_images.count() >= 2
+        '//::TEMP:: The Tupian image server will not return the resized image yet in the proper place, so look for the resized image in the old image array, but at a different index placement than the usual index location 
+        sThumbnailURL = contentFromServer.hero_images[1]
+      else 
+        sThumbnailURL = contentFromServer.hero_images[0]
+      end if
+    end if
+  end if
+  return sThumbnailURL
 End Function
 
 
@@ -184,20 +230,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       translatedContent.creditsCuepoint = 0
     end if
   end if
-
-  if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
-    translatedContent.landscape = contentFromServer.hero_images[0]
-  else if contentFromServer.thumbnails <> invalid and type(contentFromServer.thumbnails) = "roArray" and contentFromServer.thumbnails.count() > 0
-    translatedContent.landscape = contentFromServer.thumbnails[0]
-  end if
-
-  if contentFromServer.posterarts <> invalid and type(contentFromServer.posterarts) = "roArray" and contentFromServer.posterarts.count() > 0
-    translatedContent.portrait = contentFromServer.posterarts[0]
-    translatedContent.HDGRIDPOSTERURL = contentFromServer.posterarts[0]
-    ' HDPOSTERURL is an active image which is used in utility row
-    if translatedContent.type = m.constants.ui.gridItemTypes.utility
-      translatedContent.HDPOSTERURL = contentFromServer.posterarts[1]
-    end if
+ 
+  translatedContent.landscape  = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)  
+  sPortraitURL = m.getThumbnailImage(contentFromServer)
+  if sPortraitURL <> ""
+    translatedContent.portrait = sPortraitURL
+    translatedContent.HDGRIDPOSTERURL = sPortraitURL
   end if
 
   if contentFromServer.backgrounds <> invalid and type(contentFromServer.backgrounds) = "roArray" and contentFromServer.backgrounds.count() > 0
@@ -683,10 +721,10 @@ End Function
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
 Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false) As Object
-  translated = CreateObject("roSGNode", "CategoryContentNode")
+  translated = CreateObject("roSGNode", "CategoryContentNode") 
   container = contentToTranslate.container
   contents = contentToTranslate.contents
-  contentsJson = m.getContentsJson(contentToTranslate, fullJson)
+  contentsJson = m.getContentsJson(contentToTranslate, fullJson) 
 
   node_count = 0
   categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData)
@@ -844,6 +882,19 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           childAA.backgrounds = m.dedupeBackgrounds(fullChild.backgrounds)
         end if
 
+        gridType = ""
+        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.portrait
+          gridType = m.constants.ui.gridItemTypes.portrait
+        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.landscape
+          gridType = m.constants.ui.gridItemTypes.landscape
+        else if container.id = m.constants.ui.categoryIds.featured
+          gridType = m.constants.ui.gridItemTypes.landscape
+        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_small
+          gridType = m.constants.ui.gridItemTypes.landscape
+        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+          gridType = m.constants.ui.gridItemTypes.vitg_large
+        end if
+
         if bLandscape = true then
           childAA.hdgridposterurl = fullChild.hero_images[0]
         else if fullChild.posterarts <> invalid then
@@ -853,6 +904,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
             childAA.HDPOSTERURL = fullChild.posterarts[1]
           end if
         end if
+        childAA.hdgridposterurl = m.getThumbnailImage(fullChild, gridType)
 
         'add the trailer url to vitg content items - don't include vitg content if there is no trailer
         if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_small or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large

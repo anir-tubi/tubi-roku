@@ -10,6 +10,9 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -39,6 +42,9 @@
         }
       -->
       <field id="trackingPageInfo" type="assocarray" />
+
+      <!-- Tell the screen's helper the necessary poster size that the screen needs to gather. -->
+      <field id="posterSize" type="array" />
 
       <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
         {
@@ -143,7 +149,7 @@
         </MiniKeyboard>
       </LayoutGroup>
       <!-- Live text entry box with a non-blinking "cursor" -->
-      <Label
+      <Label  
         id="SearchText"
         vertAlign="center"
         width="1114"

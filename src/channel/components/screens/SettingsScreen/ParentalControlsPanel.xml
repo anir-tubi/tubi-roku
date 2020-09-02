@@ -35,7 +35,7 @@
 
       <Label 
         id="Instructions"
-        width="1090"
+        width="890"
         wrap="true"
         vertAlign="bottom"
         translation="[25,143]">

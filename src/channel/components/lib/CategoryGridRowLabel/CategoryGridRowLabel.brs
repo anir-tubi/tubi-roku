@@ -15,6 +15,13 @@ Function init()
   if m.global <> invalid
     m.global.observeField("theme", "onThemeChange")
   end if
+
+  if getExperimentResource("roku2", "roku_safe_area").enabled = true
+    m.CategoryCount = m.top.findNode("CategoryCount")
+    m.CategoryCount.translation = [1668,0]
+    m.FocusIndex.height = 49
+    m.ItemCount.height = 49
+  end if
 End Function
 
 Function onThemeChange()
