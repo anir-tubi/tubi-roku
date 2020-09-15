@@ -213,7 +213,7 @@ end function
 function tubiAds_populateUrlRainmaker(episode) As String
   'create the url to be used for ad calls'
   params = {
-    video_id: episode.id
+    content_id: episode.id
     pub_id: episode.pubId
     now_pos: episode.nowpos.ToStr()
     content_type: m.adContentType
