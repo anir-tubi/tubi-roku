@@ -9,6 +9,9 @@ Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEven
     screenTrackingNavigate(current.trackingPageInfo, screen.trackingPageInfo, current.trackingComponentInfo)
   end if
   
+  ' setAnalyticsMode should be triggered before sending pageload event
+  setAnalyticsMode()
+  
   'handle user tracking for loading screen
   if sendLoadingEvents = true
     screenTrackingLoad(screen.trackingPageInfo)
@@ -57,11 +60,28 @@ Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
     screenTrackingNavigate(toBePopped.trackingPageInfo, topHidden.trackingPageInfo)
   end if
   
+  ' setAnalyticsMode should be triggered before sending pageload event
+  setAnalyticsMode()
+  
   if sendLoadingEvents = true and topHidden <> invalid
     screenTrackingLoad(topHidden.trackingPageInfo)
   end if
 
   m.screenStack.pop = true
+End Function
+
+
+' setting analyticsAppMode value which will be used while sending analytics event
+Function setAnalyticsMode()
+
+  if m.latinoModeEnabled = true
+    m.trackingLoggingTask.analyticsAppMode = "LATINO_MODE"
+  else if m.kidsModeEnabled = true
+    m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
+  else
+    m.trackingLoggingTask.analyticsAppMode = "DEFAULT_MODE"  
+  end if
+
 End Function
 
 

@@ -501,6 +501,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     title: ""
     validUntil: 0
     children: []    'categories
+    sponsor: invalid
   }
   if contentToTranslate.valid_duration <> invalid
     homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
@@ -510,6 +511,12 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
 
   containers = contentToTranslate.containers
   contents = contentToTranslate.contents
+  sponsor = contentToTranslate.sponsor
+  
+  ' setting sponsor field only for latino mode
+  if contentMode = m.constants.ui.contentMode.latino and sponsor <> invalid
+    homescreenAA.sponsor = sponsor
+  end if
 
   ' userCategoriesPos is used to store the index in the list of categories where the /homescreen API
   ' placed the userCategories
@@ -524,7 +531,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
 
   '//::TODO:: Remove the parentalRating check once we have API support    
   m.parentalRating = 3
-  if authInfo <> invalid
+  if authInfo <> invalid and authInfo.parentalRating <> invalid
     m.parentalRating = authInfo.parentalRating
   end if
   
@@ -572,14 +579,14 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         categoryAA = invalid
       end if
 
-      categoryAA = m.buildCategoryAA(container, contents, invalid, "", false)
+      categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode)
       if categoryAA <> invalid
         homescreenAA.children.push(categoryAA)
       end if
     else
       for j=0 to container.children.count()-1
         nestedContainer = container.children[j]
-        categoryAA = m.buildCategoryAA(nestedContainer, contents, invalid, "", false)
+        categoryAA = m.buildCategoryAA(nestedContainer, contents, invalid, "", false, contentMode)
         if categoryAA <> invalid
           categoryAA.parentId = container.id
           homescreenAA.children.push(categoryAA)
@@ -720,14 +727,14 @@ End Function
 ' 1) Use ContentNode instead of TubiContentNode for item contents
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
-Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false) As Object
-  translated = CreateObject("roSGNode", "CategoryContentNode") 
+Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen") As Object
+  translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
   contents = contentToTranslate.contents
   contentsJson = m.getContentsJson(contentToTranslate, fullJson) 
 
   node_count = 0
-  categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData)
+  categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode)
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
     return invalid
   end if
@@ -774,14 +781,16 @@ End Function
 ' @bFullData: boolean, Should the full data be parsed and passed to the video children?
 '
 ' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson=invalid, sOrientation = "", bFullData = false)
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson=invalid, sOrientation = "", bFullData = false, contentMode="homeScreen")
   updateMetadata = {}
   if type(container) = "roAssociativeArray" and type(contents) = "roAssociativeArray"
     ' the metadata for the category
     sTitle = container.title
     if container.id = m.constants.ui.categoryIds.queue 
       '//::HARDCODE:: this is a temporary hardcode until the backend is ready to play My List Instead of Queue as the title
-      sTitle = "My List"
+      if contentMode <> m.constants.ui.contentMode.latino
+        sTitle = "My List"
+      end if
     end if
 
     updateMetadata = {

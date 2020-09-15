@@ -60,7 +60,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
           position = m.videoPlayerNode.adPosition
           tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position))
           print "ad state "; m.videoPlayerNode.adState
-          m.ads.kidsModeEnabled = m.videoPlayerNode.kidsMode
+          m.ads.appMode = m.videoPlayerNode.appMode
           m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
         else
           m.videoPlayerNode.adState = "noads"  ' if video player content was changed before we got here, return no ads

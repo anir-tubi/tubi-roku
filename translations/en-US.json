@@ -128,6 +128,10 @@
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
     "message": "Channels Disabled"
   },
+  "dialog_espanolDisabled_title": {
+    "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
+    "message": "Español Disabled"
+  },  
   "dialog_moviesDisabled_title": {
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
     "message": "Movies Disabled"
@@ -140,6 +144,10 @@
     "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",
     "message": "Please exit Tubi Kids to use this feature."
   },
+  "dialog_sideNavItemDisabled_Parental_description": {
+    "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled due to parental set to Teens",
+    "message": "Please turn off parental controls to use this feature."
+  },  
   "error_connection_title": {
     "description": "title of error window when there is a connection error",
     "message": "Connection Error"

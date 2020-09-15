@@ -210,7 +210,8 @@ Function handleResponse(message)
             orientation = m.constants.ui.gridItemTypes.portrait
             bFullData = true
           end if
-          handledRequest.convertedMetadata = m.metadataTranslate.translateContainer(parsed, handledRequest.response.data, orientation, bFullData)
+          contentMode = handledRequest.params.contentMode
+          handledRequest.convertedMetadata = m.metadataTranslate.translateContainer(parsed, handledRequest.response.data, orientation, bFullData, contentMode)
         else if handledRequest.context.name = m.constants.reqNames.getHomescreen
           contentMode = handledRequest.params.contentMode
           authInfo = m.global.authInfo

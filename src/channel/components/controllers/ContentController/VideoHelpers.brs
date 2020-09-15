@@ -31,7 +31,13 @@ Function playVideoContent(content, autoplayType, position=0)
   ' indicates we should immediately autoplay the next video
   m.receivedGoToNextPressed = false
 
-  videoPlayer.kidsMode = m.kidsModeEnabled
+  if m.kidsModeEnabled = true
+    videoPlayer.appMode = "KIDS_MODE"
+  else if m.latinoModeEnabled = true
+    videoPlayer.appMode = "LATINO_MODE"
+  else
+    videoPlayer.appMode = "DEFAULT_MODE"
+  end if  
 
   if content <> invalid
     if content.isTrailer

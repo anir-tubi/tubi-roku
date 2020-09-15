@@ -108,6 +108,9 @@ Function onIDChange()
   else if m.top.id = m.constants.ui.screenIds.tvScreen
     newTrackingPageInfo.pageType = "series_browse_page"
     m.top.screenLevel = m.constants.ui.screenLevels.tvScreen
+  else if m.top.id = m.constants.ui.screenIds.espanolScreen
+    newTrackingPageInfo.pageType = "home_page"
+    m.top.screenLevel = m.constants.ui.screenLevels.espanolScreen    
   else
     newTrackingPageInfo.pageType = "home_page"
     m.top.screenLevel = m.constants.ui.screenLevels.homeScreen

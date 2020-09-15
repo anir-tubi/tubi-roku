@@ -247,6 +247,10 @@ Function getTranslation_en_US()
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
       "message": "Channels Disabled"
     },
+    "dialog_espanolDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
+      "message": "Español Disabled"
+    },
     "dialog_moviesDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
       "message": "Movies Disabled"
@@ -258,6 +262,10 @@ Function getTranslation_en_US()
     "dialog_sideNavItemDisabled_description": {
       "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",
       "message": "Please exit Tubi Kids to use this feature."
+    },
+    "dialog_sideNavItemDisabled_Parental_description": {
+      "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled due to parental set to Teens",
+      "message": "Please turn off parental controls to use this feature."
     },
     "error_connection_title": {
       "description": "title of error window when there is a connection error",
@@ -943,6 +951,10 @@ Function getTranslation_es_MX()
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
       "message": "Canales desactivado"
     },
+    "dialog_espanolDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
+      "message": "Español desactivado"
+    },
     "dialog_moviesDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
       "message": "Películas desactivado"
@@ -954,6 +966,10 @@ Function getTranslation_es_MX()
     "dialog_sideNavItemDisabled_description": {
       "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",
       "message": "Por favor, sal de Tubi Niños para usar esta función."
+    },
+    "dialog_sideNavItemDisabled_Parental_description": {
+      "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled due to parental set to Teens",
+      "message": "Por favor, desactiva el control parental para utilizar esta función."
     },
     "error_connection_title": {
       "description": "title of error window when there is a connection error",

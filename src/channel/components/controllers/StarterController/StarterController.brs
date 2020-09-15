@@ -67,7 +67,7 @@ End Function
 
 Function onExternalConfigInfoReturned(msg)
   m.constants.externalConfig.info = msg.getData()
-  if m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.country <> invalid
+  if m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.country <> invalid and m.constants.externalConfig.info.country <> ""
     m.constants.deviceInfo.countryCode = UCase(m.constants.externalConfig.info.country)
   end if
 

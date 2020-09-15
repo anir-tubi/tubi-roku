@@ -59,7 +59,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     adBufferingCallback: tubiAds_adBufferingCallback
     adTrackingCallback: tubiAds_adTrackingCallback
     trackUserEvent: tubiAds_trackUserEvent
-    kidsModeEnabled: false
+    appMode: "DEFAULT_MODE"
   }
 end function
 
@@ -221,7 +221,8 @@ function tubiAds_populateUrlRainmaker(episode) As String
     model: m.constants.deviceInfo.model
     app_id: m.constants.settings.shortAppName
     language: m.constants.deviceInfo.language
-    coppa_enabled: m.kidsModeEnabled
+    coppa_enabled: (m.appMode = "KIDS_MODE")
+    app_mode: m.appMode
 
     ' the dubug parameter must be set to 1 in order to use the following "limit" parameters for testing
     ' limit_to_campaign_id: 0   'only allow ads with that particular campaign id through the pre-qual filters
@@ -632,11 +633,7 @@ End Function
 ' Wraps m.tracking.trackUserEvent() but adds the appropriate app mode value
 Function tubiAds_trackUserEvent(eventType="", eventValues=invalid, requestQueue=invalid)
   if eventValues <> invalid
-    appMode = "DEFAULT_MODE"
-    if m.kidsModeEnabled = true
-      appMode = "KIDS_MODE"
-    end if
-    eventValues.appMode = appMode
+    eventValues.appMode = m.appMode
     m.tracking.trackUserEvent(eventType, eventValues, requestQueue)
   end if
 End Function

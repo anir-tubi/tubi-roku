@@ -38,6 +38,7 @@ Function init()
   if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
     m.kidsModeFeatureOn = true
   end if
+  m.latinoModeEnabled = false
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeFieldScoped("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
@@ -67,6 +68,13 @@ Function init()
   m.logoGroup = m.top.findNode("logoGroup")
   m.logo = m.logoGroup.findNode("tubiLogo")
   m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
+  m.logoEspanol = m.logoGroup.findNode("tubiEspanolLogo")
+  
+  ' sponsorGroup will be shown only for Espanol screen
+  m.sponsorGroup = m.top.findNode("sponsorGroup")
+  m.sponsorPrefixText = m.sponsorGroup.findNode("sponsorPrefixText")
+  m.sponsorLogo = m.sponsorGroup.findNode("sponsorLogo")
+  
   if m.constants.deviceInfo.language = "es"
     m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-large.png"
     m.logoKids.width = 259
@@ -708,6 +716,7 @@ Function setDirtyUserCategories(categoryId)
   if categoryId <> invalid
     movieScreen = getFromScreenCache(m.constants.ui.screenIds.movieScreen)
     tvScreen = getFromScreenCache(m.constants.ui.screenIds.tvScreen)
+    espanolScreen = getFromScreenCache(m.constants.ui.screenIds.espanolScreen)
 
     'this will be an auth request if the user is logged in
     'auth request creation happens in metadataFetchTask
@@ -715,7 +724,7 @@ Function setDirtyUserCategories(categoryId)
     reqName = m.constants.reqNames.getCategory
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer())
 
-    '//Apply the movie and TV filters if those screens exist
+    '//Apply the movie, TV, and Espanol filters if those screens exist
     if movieScreen <> invalid
       optionMovie = {contentMode: m.constants.ui.contentMode.movie}
       m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadMovieUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionMovie)
@@ -724,6 +733,10 @@ Function setDirtyUserCategories(categoryId)
       optionTV = {contentMode: m.constants.ui.contentMode.tv}
       m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadTVUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionTV)
     end if
+    if espanolScreen <> invalid
+      optionEspanol = {contentMode: m.constants.ui.contentMode.latino}
+      m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadEspanolUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionEspanol)
+    end if    
   end if
 End Function
 
@@ -777,11 +790,9 @@ Function enableKidsModeUI(bTurnOn = true)
     if bTurnOn = true
       m.logoKids.visible = true
       m.logo.visible = false
-      m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
     else 
       m.logoKids.visible = false
       m.logo.visible = true
-      m.trackingLoggingTask.analyticsAppMode = "DEFAULT_MODE"
     end if
   else
     setKidsModeInSideNav(false)
@@ -801,6 +812,104 @@ Function tellScreensIfKidsModeBeSentToServer()
 End Function
 
 
+Function showTubiLogo()
+
+  m.logo.visible = true
+
+End Function
+
+
+Function hideTubiLogo()
+
+  m.logo.visible = false
+
+End Function
+
+
+Function showKidsLogo()
+
+  m.logoKids.visible = true
+
+End Function
+
+
+Function hideKidsLogo()
+
+  m.logoKids.visible = false
+
+End Function
+
+
+Function showEspanolLogo()
+
+  m.logoEspanol.visible = true
+
+End Function
+
+
+Function hideEspanolLogo()
+
+  m.logoEspanol.visible = false
+
+End Function
+
+
+Function showSponsorGroup()
+
+  m.sponsorGroup.visible = true
+
+End Function
+
+
+Function hideSponsorGroup()
+
+  m.sponsorGroup.visible = false
+
+End Function
+
+
+Function showLogo()
+
+  if isKidsModeEnabledByParentalControls() = true or m.kidsModeEnabled = true 
+    hideTubiLogo()
+    hideEspanolLogo()
+    hideSponsorGroup()
+    showKidsLogo()
+  else if m.latinoModeEnabled = true
+    hideTubiLogo()
+    hideKidsLogo()
+    showEspanolLogo()
+    showSponsorGroup()
+  else
+    hideKidsLogo()
+    hideEspanolLogo()
+    hideSponsorGroup()
+    showTubiLogo()
+  end if
+
+End Function
+
+
+' set sponsorLogo & sponsorPrefixText based on matrix response
+Function setSponsorDetails(metadata)
+
+  prefix_text = invalid
+  sponsorLogo = invalid
+  
+  sponsor = metadata.sponsor
+  if sponsor <> invalid
+    prefix_text = sponsor.prefix_text
+    sponsorLogo = sponsor.logo
+  end if
+  
+  if prefix_text <> invalid and sponsorLogo <> invalid
+    m.sponsorPrefixText.text = UCase(prefix_text)
+    m.sponsorLogo.uri = sponsorLogo
+  end if
+  
+End Function
+
+
 Function isKidsModeEnabledByParentalControls() as Boolean
   tubiLog("ContentController.isKidsModeEnabledByParentalControls")
   bEnabled = false
@@ -808,6 +917,21 @@ Function isKidsModeEnabledByParentalControls() as Boolean
   if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
     if m.global.authInfo.parentalrating < 2
       bEnabled = true
+    end if
+  end if
+  return bEnabled
+End Function
+
+
+Function isAdultModeEnabledByParentalControl() as Boolean
+  tubiLog("ContentController.isAdultModeEnabledByParentalControl")
+  bEnabled = true
+  
+  if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
+    if m.global.authInfo.parentalrating = 3
+      bEnabled = true
+    else
+      bEnabled = false
     end if
   end if
   return bEnabled

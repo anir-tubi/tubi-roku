@@ -42,6 +42,9 @@
 
     <!-- if UpTime(0) > validUntil, then refetch metadata for this container/category -->
     <field id="validUntil" type="integer"/>
+    
+    <!-- sponsor is associative array with fields logo & prefix_text -->
+    <field id="sponsor" type="assocarray"/>
 
   </interface>
 </component>

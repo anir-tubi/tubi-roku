@@ -4,6 +4,7 @@ Function init()
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
   m.top.observeFieldScoped("kidsModeValues", "onKidsModeValuesChanged")
+  m.top.observeFieldScoped("displayEspanol", "onEspanolDisplayChanged")
   m.top.observeFieldScoped("displayMoviesTV", "onMovieTVDisplayChanged")
   m.top.observeFieldScoped("displayChannels", "onChannelsDisplayChanged")
   m.top.observeFieldScoped("opened", "onOpenedChange")
@@ -17,6 +18,7 @@ Function init()
   setStrings()
 
   m.profileContent = m.TopContent.findNode("profile")
+  m.espanolContent = m.MainContent.findNode("espanol")
   m.kidsModeContent = m.MainContent.findNode("kidsMode")
   m.channelsContent = m.MainContent.findNode("channels")
   m.moviesContent = m.MainContent.findNode("movies")
@@ -61,6 +63,8 @@ Function setStrings()
     settingsNode.title = getTranslation("menu_settings")
     exitNode = m.top.findNode("exit")
     exitNode.title = getTranslation("menu_exit")
+    espanolNode = m.top.findNode("espanol")
+    espanolNode.title = "Español"    
 End Function
 
 
@@ -102,6 +106,18 @@ Function onFocusChange()
 End Function
 
 
+' Hide the espanol item if this is called
+Function onEspanolDisplayChanged()
+  if m.top.displayEspanol = false
+    '//Remove espanol if those items should be hidden. For right now, don't worry about turning it back on
+    mainContentEspanol = m.MainContent.findNode("espanol")
+    m.MainContent.removeChild(mainContentEspanol)
+
+    mainContentEspanolSelect = m.MainContentSelect.findNode("espanol-select")
+    m.MainContentSelect.removeChild(mainContentEspanolSelect)
+
+  end if
+End Function
 
 
 ' Hide the movies/tv items if this is called
@@ -164,6 +180,11 @@ Function onKidsModeValuesChanged()
     m.channelsContent.turnedOn = (m.top.kidsModeValues.on <> true)
     m.moviesContent.turnedOn = (m.top.kidsModeValues.on <> true)
     m.tvContent.turnedOn = (m.top.kidsModeValues.on <> true)
+    if (m.top.kidsModeValues.on <> true and m.top.kidsModeValues.isAdultModeEnabledByParentalControl = true)
+      m.espanolContent.turnedOn = true
+    else
+      m.espanolContent.turnedOn = false
+    end if
     if m.top.kidsModeValues.on = true
       m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
     else

@@ -35,6 +35,10 @@ Function showHomeScreen(constants, authInfo, screenID = "")
       sContentMode = constants.ui.contentMode.tv
       m.top.observeField("tvscreenResponse", "onTVscreenResponse")
       m.top.observeFieldScoped("reloadTVUserCategoriesResponse", "onReloadUserCategoriesResponseInTVScreen")
+    else if screenID = constants.ui.screenIds.espanolScreen
+      m.top.observeField("espanolscreenResponse", "onEspanolscreenResponse")
+      sContentMode = constants.ui.contentMode.latino
+      m.top.observeFieldScoped("reloadEspanolUserCategoriesResponse", "onReloadUserCategoriesResponseInEspanolScreen")
     end if 
     homeScreen.contentMode = sContentMode
 
@@ -59,6 +63,12 @@ Function showHomeScreen(constants, authInfo, screenID = "")
   end if
 End Function
 
+
+Function showEspanolScreen()
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.espanolScreen)
+End Function
+
+
 Function showMoviesScreen()
   showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.movieScreen)
 End Function
@@ -66,6 +76,11 @@ End Function
 
 Function showTVScreen()
   showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.tvScreen)
+End Function
+
+
+Function onReloadUserCategoriesResponseInEspanolScreen(msg)
+  onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.espanolScreen)
 End Function
 
 
@@ -202,6 +217,8 @@ Function fetchHomeScreen(homeScreen)
       responseHandler = "moviescreenResponse"
     else if homeScreen.id = m.constants.ui.screenIds.tvScreen
       responseHandler = "tvscreenResponse"
+    else if homeScreen.id = m.constants.ui.screenIds.espanolScreen 
+      responseHandler = "espanolscreenResponse" 
     end if
 
     if getExperimentResource("roku2", "roku_safe_area").enabled = true
@@ -214,6 +231,14 @@ Function fetchHomeScreen(homeScreen)
     homeScreen.resetContentAreaValues = true
     setHomeScreenLoading(homeScreen)
   end if
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onEspanolscreenResponse
+'
+Function onEspanolscreenResponse()
+  respondToHomescreenResponse(m.constants.ui.screenIds.espanolScreen, m.top.espanolscreenResponse)
 End Function
 
 
@@ -265,6 +290,12 @@ Function respondToHomescreenResponse(screenID, rawResponse)
         '      ...
         '   </CategoryContentNode>
         ' </CategoryContentNode>
+        
+        ' set sponsor details only for Espanol screen
+        if screenID = m.constants.ui.screenIds.espanolScreen
+          setSponsorDetails(rawResponse.convertedMetadata)
+        end if
+        
         homeScreen.content = rawResponse.convertedMetadata
         homeScreen.contentUpdated = true
 
@@ -321,15 +352,8 @@ Function onContentSelected(msg)
   homeScreen = msg.getRoSGNode()
   m.autoplayContext = homeScreen.currCategoryId
 
-  sBackMessage = "HOME"
-  if homeScreen.id = m.constants.ui.screenIds.movieScreen
-    sBackMessage = "MOVIES"
-  else if homeScreen.id = m.constants.ui.screenIds.tvScreen
-    sBackMessage = "TV SHOWS"
-  end if
-
   if content.type = "channel"
-    showChannelScreen(content, sBackMessage)
+    showChannelScreen(content, "HOME")
   else if content.type = "utility"
     onUtilityItemSelected(content)
   else

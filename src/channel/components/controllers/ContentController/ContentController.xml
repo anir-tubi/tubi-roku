@@ -62,10 +62,12 @@
       <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
       <field id="reloadMovieUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
       <field id="reloadTVUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="reloadEspanolUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
 
       <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
       <field id="moviescreenResponse" type="assocarray" alwaysNotify="true"/>
       <field id="tvscreenResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="espanolscreenResponse" type="assocarray" alwaysNotify="true"/>
 
       <!-- metadataFetchTask puts results on this field -->
       <field id="searchResponse" type="assocarray" alwaysNotify="true"/>
@@ -132,6 +134,39 @@
             translation="[1626,60]"
             opacity="1.0"
             visible="false"/>
+          <Poster
+            id="tubiEspanolLogo"
+            height="78"
+            width="322"
+            uri="pkg:/images/logo-espanol-white-large.png"
+            translation="[1512,42]"
+            opacity="1.0"
+            visible="false"/>
+          <LayoutGroup
+            id="sponsorGroup"
+            layoutDirection="horiz"
+            vertAlignment="custom"
+            itemSpacings="[2]"
+            visible="false"
+            translation="[1512,120]">
+            <Label
+              id="sponsorPrefixText"
+              height="14"
+              width="195"
+              color="0x9699A3"
+              opacity="0.64"
+              translation="[0,18]">
+              <Font
+                role="font"
+                uri="pkg:/fonts/Vaud-Bold.ttf"
+                size="19" />
+            </Label>         
+            <Poster
+              id="sponsorLogo"
+              opacity="1.0"
+              height="52"
+              width="125"/>        
+          </LayoutGroup>                       
         </Group>
       </Group>
 

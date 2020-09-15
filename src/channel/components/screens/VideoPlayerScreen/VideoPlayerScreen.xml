@@ -37,8 +37,8 @@
       <!-- interval in seconds for sending position data to the tracking server -->
       <field id="analyticsInterval" type="integer" value="0"/>
 
-      <!-- WRITE-ONLY field tells if the video player should change its appearance to be kid friendly or not-->
-      <field id="kidsMode" type="boolean" value="false" />
+      <!-- WRITE-ONLY field tells if the video player should change its appearance to be kid friendly or not and same will be used for sending in AdServer-->
+      <field id="appMode" type="string" value="DEFAULT_MODE" />
 
       <!-- Enable/disable ads breaks.  This can be changed during playback in order to
         -  postpone midrolls when there is an overlay (e.g. EPG) that the user is

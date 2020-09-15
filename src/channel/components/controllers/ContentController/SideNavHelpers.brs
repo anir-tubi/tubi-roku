@@ -10,25 +10,16 @@ Function initSideNav()
     m.SideNav.kidsModeValues = {
       on: false,
       featureOn: m.kidsModeFeatureOn
+      isAdultModeEnabledByParentalControl: isAdultModeEnabledByParentalControl()
     }
   end if
   
-  bFeatureMovieTVAllowed = false
-  if m.constants.deviceInfo.countryCode <> invalid and (m.constants.deviceInfo.countryCode = "US")
-    bFeatureMovieTVAllowed = true
-  end if
-
-  bFeatureChannelsAllowed = false
-  if m.constants.deviceInfo.countryCode <> invalid and (m.constants.deviceInfo.countryCode = "US")
-     bFeatureChannelsAllowed = true
-  end if
-
-  if bFeatureMovieTVAllowed = false
+  ' display Espanol, TV, Movies menu items only if the countryCode is US
+  if m.constants.deviceInfo.countryCode <> "US"
+    '//Tell the sideNav to stop displaying the Espanol menu item
+    m.SideNav.displayEspanol = false  
     '//Tell the sideNav to stop displaying the movies/TV menu items
     m.SideNav.displayMoviesTV = false 
-  end if
-
-  if bFeatureChannelsAllowed = false
     '//Tell the sideNav to stop displaying the channel menu item
     m.SideNav.displayChannels = false 
   end if
@@ -49,6 +40,10 @@ End Function
 ' @sID: string: one of the menu item ids. A list of ids can be found in constants.ui.sideNavIds
 Function focusSideNavOption(sID)
   '//::TODO:: there should be a check that a valid ID was passed. For right now assume sID is valid and correct.
+  if sID <> invalid and sID = "home"
+    m.latinoModeEnabled = false
+    showLogo()
+  end if
   m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav
 End Function
 
@@ -103,6 +98,7 @@ Function setKidsModeInSideNav(isEnabled = true)
     on: isEnabled
     grayedOut: bLimited,
     title: sIconTitle
+    isAdultModeEnabledByParentalControl: isAdultModeEnabledByParentalControl()
   }
 End Function
 
@@ -121,6 +117,8 @@ Function onSideNavItemSelected()
   if m.sSideNavItemSelectedId <> itemSelectedId or bSameScreen = false
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
     bNewScreenCalledSuccess = false
+    
+    m.latinoModeEnabled = false
 
     ' set appropriate analytics component on the page being navigated from so NavigateToPageEvent
     ' contains all the requisite information
@@ -133,6 +131,7 @@ Function onSideNavItemSelected()
     }
 
     if itemSelectedId = m.constants.ui.sideNavIds.profile
+      showLogo()
       if authInfo = invalid
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
         startSignIn(true)
@@ -143,6 +142,7 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.kidsMode
+      showLogo()
       sTitle = ""
       sDescription = ""
       if itemSelected.turnedOn = true
@@ -201,10 +201,12 @@ Function onSideNavItemSelected()
 
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.search
+      showLogo()
       '//display the search
       showSearchScreen(m.constants)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.home
+      showLogo()
       showHomeScreen(m.constants, authInfo)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.channels
@@ -212,10 +214,12 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.channels)
       else
+        showLogo()
         showChannelListScreen(m.constants, m.constants.ui.terms.menu)
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.categories
+      showLogo()
       showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.movies
@@ -223,6 +227,7 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.movies)
       else
+        showLogo()
         showMoviesScreen()
         bNewScreenCalledSuccess = true
       end if
@@ -231,10 +236,25 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.tv)
       else
+        showLogo()
         showTVScreen()
         bNewScreenCalledSuccess = true
       end if
+    else if itemSelectedId = m.constants.ui.sideNavIds.espanol
+      if m.kidsModeEnabled = true
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.espanol)
+      else if isAdultModeEnabledByParentalControl() = false
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.espanol, "teens")        
+      else
+        m.latinoModeEnabled = true
+        showLogo()
+        showEspanolScreen()
+        bNewScreenCalledSuccess = true
+      end if      
     else if itemSelectedId = m.constants.ui.sideNavIds.settings
+      showLogo()
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
         '//ensure the homescreen is enabled again since when the user backs out of the settings page, he will be returned to the home screen
@@ -261,7 +281,7 @@ Function onSideNavItemSelected()
 End Function
 
 
-Function displayMenuItemDisabled(sMenuItemID)
+Function displayMenuItemDisabled(sMenuItemID, parental="")
   currentScreenNow = currentScreen()
   sTitle = getTranslation("dialog_errorOops_title")
   sDialogSubTypeValue = ""
@@ -274,19 +294,26 @@ Function displayMenuItemDisabled(sMenuItemID)
   else if sMenuItemID = m.constants.ui.sideNavIds.tv
     sTitle = getTranslation("dialog_tvDisabled_title")
     sDialogSubTypeValue = "kids-mode-tv"
+  else if sMenuItemID = m.constants.ui.sideNavIds.espanol
+    sTitle = getTranslation("dialog_espanolDisabled_title")
+    sDialogSubTypeValue = "kids-mode-espanol"    
   end if
 
   dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "EXIT_KIDS_MODE" when it is available in protos
+      dialog_type: "EXIT_KIDS_MODE"
       pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
       dialog_action: "SHOW"
       dialog_sub_type: sDialogSubTypeValue
     }
   }
 
-  sDescription = getTranslation("dialog_sideNavItemDisabled_description") 
+  if parental = "teens"
+    sDescription = getTranslation("dialog_sideNavItemDisabled_Parental_description") 
+  else
+    sDescription = getTranslation("dialog_sideNavItemDisabled_description") 
+  end if
   showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
 
   ' reset the selected item indicator in the side nav to the current screen, since selecting search will set it to search
@@ -301,7 +328,7 @@ Function enableKidsModeFromSideNav(bEnable = true)
   screen = currentScreen()
 
   if bEnable = true
-    if screen <> invalid and (screen.id = m.constants.ui.screenIds.searchScreen or screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.movieScreen or screen.id = m.constants.ui.screenIds.tvScreen)
+    if screen <> invalid and (screen.id = m.constants.ui.screenIds.searchScreen or screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.movieScreen or screen.id = m.constants.ui.screenIds.tvScreen or screen.id = m.constants.ui.screenIds.espanolScreen)
       '//If the current screen is one of the pages that should be disabled during kids mode, then take user to homescreen    
       showHomeScreen(m.constants, m.global.authInfo)
 
