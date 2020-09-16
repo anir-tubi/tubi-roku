@@ -652,9 +652,8 @@ Function getExternalAuthInfoFromStartupArgs(args)
   externalAuthInfo = invalid
 
   if args.refreshToken <> invalid and args.userId <> invalid and args.deviceId <> invalid and args.entry <> invalid
-    if args.refreshToken.unescape() <> "" and args.userId.unescape() <> "" and args.deviceId.unescape() <> ""
-      if args.entry = "iphone" or args.entry = "ipad" or args.entry = "ios" or args.entry = "android"
-
+    if args.refreshToken.unescape() <> "" and args.userId.unescape() <> "" and args.userId.unescape() <> "0" and args.deviceId.unescape() <> ""
+      if Lcase(args.entry) = "iphone" or Lcase(args.entry) = "ipad" or Lcase(args.entry) = "ios" or Lcase(args.entry) = "android"
         externalAuthInfo = {
           platform: args.entry
           externalDeviceId: args.deviceId.unescape()

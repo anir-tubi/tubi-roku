@@ -231,6 +231,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       campaign: ""
       source: ""
       medium: ""
+      source_device_id: "" 'The source_device_id field is used to store device id of ios or android devices that deeplink to roku.
       content: ""   ' This is not the content deep linked to, but is intended to store promotional copy related to the deeplink.
                     ' The content field is also co-opted to store device ids of ios or android devices that deeplink to roku.
       pageOneof: {}  'a valid page type (see ReferredEvent in events.protos)

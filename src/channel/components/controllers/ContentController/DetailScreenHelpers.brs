@@ -1249,7 +1249,7 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
     campaign: deepLinkContent.campaign
     source: deepLinkContent.source
     medium: deepLinkContent.medium
-    content: deeplinkContent.sourceDeviceId
+    source_device_id: deeplinkContent.sourceDeviceId
   }
 
   pageInfo = getDetailScreenAnalyticsPageInfo(refreshedContent, constants)
