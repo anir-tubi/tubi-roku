@@ -384,6 +384,7 @@ Function onVideoStateChange(msg)
         m.top.state = state
       end if
 
+      m.VideoState = "stop"
     end if
   else if state = "error"
     content = m.Video.content
