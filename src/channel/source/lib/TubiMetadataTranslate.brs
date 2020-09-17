@@ -1144,12 +1144,13 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
       ' TODO: FIND A BETTER WAY TO SOLVE THE u_continue_watching issue
       ' We artificially prepend a "u_" to the category id so that when doing a .findNode(), the
       ' continue_watching category and continue watching pill have a unique ids.
+      childId = child.id
       if child.id = "continue_watching"
-        child.id = "u_" + child.id
+        childId = "u_" + child.id
       end if
     
       childAA = {
-        id: child.id
+        id: childId
         title: child.title
         description: child.description
         subtype: sType
