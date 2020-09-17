@@ -537,7 +537,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
   
   ' utility row position experiment
   utilityRowPosition = -2 ' setting default as negative to avoid insertion if the experiment is control group
-  m.experimentInfo = m.experiments.getExperimentResource("roku_discovery_v1", "roku_discovery_row_v1")
+  m.experimentInfo = m.experiments.getExperimentResource("roku_discovery_v2", "roku_discovery_row_v2")
   if m.experimentInfo <> invalid
   ' decreasing the position value by 1 in order to use it as index  
     utilityRowPosition = m.experimentInfo.position - 1

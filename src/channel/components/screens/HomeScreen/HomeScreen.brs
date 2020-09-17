@@ -85,7 +85,7 @@ Function init()
 
   ' utility row position experiment
   m.utilityRowPosition = -2
-  experimentInfo = getExperimentResource("roku_discovery_v1", "roku_discovery_row_v1", false)
+  experimentInfo = getExperimentResource("roku_discovery_v2", "roku_discovery_row_v2", false)
   if experimentInfo <> invalid and experimentInfo.position
     ' decreasing the position value by 1 in order to use it as index
     m.utilityRowPosition = experimentInfo.position - 1
@@ -277,7 +277,7 @@ Function onCurrFocusRowChange()
     end if
     ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
     if rowEnteringFocus = 1 ' sending exposure event when the 2nd row gains focus
-      getExperimentResource("roku_discovery_v1", "roku_discovery_row_v1")
+      getExperimentResource("roku_discovery_v2", "roku_discovery_row_v2")
     end if
   else
     m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-fhd.9.png"

@@ -48,8 +48,8 @@ Function TubiExperiments(constants) as Object
       }
       roku_utility_v2 : {
       } 
-      roku_discovery_v1 : {
-      }
+      roku_discovery_v2 : {
+      }      
     }
     defaultResources: {
     '//::TODO::SafeZone - set these experiments back to false when done with testing
@@ -67,9 +67,9 @@ Function TubiExperiments(constants) as Object
       roku_utility_v2 : {
         roku_utility_position_v2 : {"has_utility_row" : false, "position" : 8}
       }  
-      roku_discovery_v1 : {
-        roku_discovery_row_v1 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}
-      }          
+      roku_discovery_v2 : {
+        roku_discovery_row_v2 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}
+      }               
     }
 
     'public methods
