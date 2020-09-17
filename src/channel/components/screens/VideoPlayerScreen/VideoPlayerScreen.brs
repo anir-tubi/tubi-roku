@@ -302,9 +302,9 @@ Function updateColors()
 End Function
 
 
-Function onContentChange(msg) As Void
+Function onContentChange() As Void
   tubiLog("VideoPlayer.onContentChange")
-  stopVideo("onContentChange")
+  stopVideo()
 
   if m.top.content <> invalid
     'set page tracking values for analytics
@@ -330,7 +330,7 @@ Function onControlChange()
 
   else if m.top.control = "stop" then
     cancelReplayCaptions()
-    stopVideo("onControlChange")
+    stopVideo()
 
     m.UpNext.stopAutoPlayTimer = true
 
@@ -907,8 +907,8 @@ Function resetVideoPlayerState(content = invalid)
 End Function
 
 
-Function stopVideo(source)
-  tubilog("VideoPlayer.stopVideo " + source)
+Function stopVideo()
+  tubilog("VideoPlayer.stopVideo")
   m.VideoState = "stop"
 
   ' add check so that onVideoStateChange doesn't get called

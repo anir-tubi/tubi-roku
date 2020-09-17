@@ -15,6 +15,7 @@ Function CmsApi(constants, request, auth)
     ' public
     relatedContentReq: cmsApi_getRelatedContentRequest
     upNextContentReq: cmsApi_getUpNextContentRequest
+    getUpNextContentRequestInfo: cmsApi_getUpNextContentRequestInfo
     singleContentReq: cmsApi_getSingleContentRequest
     thumbnailsReq: cmsApi_getThumbnailsRequest
     thumbnailsReqInfo: cmsApi_getThumbnailsRequestInfo
@@ -45,6 +46,7 @@ Function cmsApi_getRelatedContentRequest(contentId, bKidsMode = false, params = 
 
   options = m.commonOptions_()
   options.params["isKidsMode"] = bKidsMode
+  options.params["video_resources"] = m.constants_.player.drmOrder
 
   '//update options.params based on the passed in params AA
   m.setImageParams_(params, options.params)
@@ -56,6 +58,9 @@ End Function
 '''''''''''''''''''''''
 ' upNextContentReq()
 '
+' TODO: This function is only used in CmsApiIntegrationTests.brs currently.
+'       Update the integration test to use the GeneralTask and cmsApi_getUpNextContentRequestInfo()
+'       and then delete this function.
 Function cmsApi_getUpNextContentRequest(contentId, categoryId=invalid)
   url = m.constants_.urls.cms.upNextContent + "/" + contentId + "/next"
   
@@ -64,6 +69,24 @@ Function cmsApi_getUpNextContentRequest(contentId, categoryId=invalid)
     options.params.container_id = categoryId
   end if
   return m.createAuthRequest_(url, m.constants_.reqNames.getUpNextContent, options)
+End Function
+
+
+Function cmsApi_getUpNextContentRequestInfo(contentId, params)
+  url = m.constants_.urls.cms.upNextContent + "/" + contentId + "/next"
+  options = m.commonOptions_()
+  options.params["video_resources"] = m.constants_.player.drmOrder
+
+  for each param in params
+    if params[param] <> invalid
+      options.params[param] = params[param]
+    end if
+  end for
+
+  return {
+    url: url
+    options: options
+  }
 End Function
 
 

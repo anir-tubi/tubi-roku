@@ -637,28 +637,20 @@ End Function
 Function fetchUpNextContent(videoPlayer)
   if videoPlayer <> invalid and videoPlayer.content <> invalid and videoPlayer.content.id.Len() > 0
     requestType = m.constants.reqNames.getUpNextContent
-    url = m.constants.urls.cms.upNextContent + "/" + videoPlayer.content.id + "/next"
-    options = {
-      params: {
-        "app_id": m.constants.settings.shortAppName
-        "platform": m.constants.platform
-        "device_id": m.constants.deviceInfo.deviceId
-        "isKidsMode": shouldKidsModeBeSentToServer()
-        "mode": "nap"
-      }
+
+    endpointSpecificParams = {
+      isKidsMode: shouldKidsModeBeSentToServer()
+      container_id: m.autoplayContext
+      mode: "nap"
     }
 
-    if m.autoplayContext <> invalid
-      options.params["container_id"] = m.autoplayContext
-    end if
-
-    if m.global.authInfo <> invalid and m.global.authInfo.userId <> invalid
-      options.params["user_id"] = m.global.authInfo.userId
-    end if
-
     if videoPlayer.analyticsMode = "autoplay-automatic"
-      options.params.mode = "ap"
+      endpointSpecificParams.mode = "ap"
     end if
+
+    upNextReqInfo = m.cmsApi.getUpNextContentRequestInfo(videoPlayer.content.id, endpointSpecificParams)
+    url = upNextReqInfo.url
+    options = upNextReqInfo.options
 
     return m.makeRequest(requestType, url, options, onUpNextResponse, onUpNextError, "node")
   end if

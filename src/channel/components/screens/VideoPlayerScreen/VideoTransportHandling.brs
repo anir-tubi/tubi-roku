@@ -363,7 +363,7 @@ Function goToNext()
     endScrub(true)
   end if
 
-  stopVideo("goToNext")
+  stopVideo()
   m.top.goToNext = true
 
   animateTransport("out")
