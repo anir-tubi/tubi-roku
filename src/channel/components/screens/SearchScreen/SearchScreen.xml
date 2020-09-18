@@ -22,13 +22,13 @@
       <field id="content" type="node"/>
 
       <!-- The helper class will call this when the new content is ready to be displayed on the screen. -->
-      <field id="contentUpdated" type="boolean"  alwaysNotify="true"/>
+      <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
 
       <!-- If the screen is not enabled, then user should not be able to select anything -->
-      <field id="enabled" type="boolean"  alwaysNotify="true"/>
+      <field id="enabled" type="boolean" alwaysNotify="true"/>
       
       <!-- Change the UI based on the value of this field. -->
-      <field id="kidsModeEnabled" value="false" type="boolean" />
+      <field id="kidsModeEnabled" value="false" type="boolean"/>
 
 
     <!-- OUTPUT -->
@@ -42,9 +42,6 @@
         }
       -->
       <field id="trackingPageInfo" type="assocarray" />
-
-      <!-- Tell the screen's helper the necessary poster size that the screen needs to gather. -->
-      <field id="posterSize" type="array" />
 
       <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
         {
@@ -89,7 +86,7 @@
         vertAlignment="custom"
         opacity="0.5"
         itemSpacings="[9]"
-        translation="[85,85]">
+        translation="[168,85]">
         <Poster
           uri="pkg:/images/back.png"
           width="29"
@@ -108,11 +105,11 @@
     </Group>
     <LayoutGroup
         id="content"
-        translation="[65,160]"
+        translation="[148,158]"
         layoutDirection="horiz"
         vertAlignment="top"
         horizAlignment="left"
-        itemSpacings="[95]">
+        itemSpacings="[67]">
       <LayoutGroup
           id="leftSide"
           layoutDirection="vert"
@@ -133,7 +130,6 @@
           <Label
             id="KidsModeMessage"
             vertAlign="bottom"
-            visible="false"
             width="550"
             height="50">
               <Font
@@ -165,13 +161,13 @@
     <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus, 
     the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
     <Group
-      translation="[745,248]"
+      translation="[798, 244]"
       id="ResultArea">
       <PosterGrid
         id="ResultGrid"
         loadingBitmapUri = "pkg:/images/placeholder.jpg"
-        basePosterSize="[210,300]"
-        itemSpacing="[10,10]"
+        basePosterSize="[198,282]"
+        itemSpacing="[12,12]"
         numColumns="5"
         numRows="3"
         vertFocusAnimationStyle="fixedFocus"

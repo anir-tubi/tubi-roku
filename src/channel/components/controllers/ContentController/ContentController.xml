@@ -115,8 +115,8 @@
           id="ScreenStack"/>
         <SideNav
           id="SideNav"
-          translation="[-66,0]"
-          width="438"/>
+          translation="[-32,0]"
+          width="338"/>
         <Group 
           id="logoGroup">
           <Poster

@@ -66,7 +66,7 @@
     <Label 
       id="Title"
       height="73"
-      translation="[85,230]">
+      translation="[168,230]">
       <Font
        role="font"
        uri="pkg:/fonts/Vaud-SemiBold.ttf"
@@ -81,7 +81,7 @@
         vertAlignment="custom"
         opacity="0.5"
         itemSpacings="[9]"
-        translation="[85,85]">
+        translation="[168,85]">
         <Poster
           uri="pkg:/images/back.png"
           width="29"
@@ -101,7 +101,6 @@
 
     <Poster
       id="leftCheveron"
-      visible="false"
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"
@@ -111,6 +110,6 @@
       id="PanelSet"
       width="1920"
       height="550"
-      translation="[60,414]"/>
+      translation="[148,414]"/>
   </children>
 </component>

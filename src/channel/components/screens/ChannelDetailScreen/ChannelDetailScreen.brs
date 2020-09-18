@@ -41,24 +41,9 @@ Function init()
 
   m.top.screenLevel = m.constants.ui.screenLevels.channelDetailScreen
   
-  m.bLeftButtonActsLikeBackButton = false
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.leftCheveron = m.top.findNode("leftCheveron")
-    m.leftCheveron.visible = true
-    m.bLeftButtonActsLikeBackButton = true
-    m.VideoGrid.itemSpacing = [29,28]
-
-    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
-    m.ScreenNavigationHint.translation = [168,85] 
-    m.InfoPanel.translation = [168,167] 
-    m.PageTitle.translation = [168,540]
-    m.VideoGrid.translation = [168,594]
-
-    posterSize = m.constants.ui.imageSizes.poster
-    m.VideoGrid.itemSize = posterSize
-    m.VideoGrid.itemSpacing = [12,12]
-    
-  end if
+  m.bLeftButtonActsLikeBackButton = true
+  posterSize = m.constants.ui.imageSizes.poster
+  m.VideoGrid.itemSize = posterSize
 End Function
 
 Function onThemeChange()

@@ -22,9 +22,7 @@ Function execGetChannelMetadata() As Void
   translate = TubiMetadataTranslate(constants)
   
   params = {}
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    params.posterSize = constants.ui.imageSizes.poster
-  end if
+  params.posterSize = constants.ui.imageSizes.posterSize
 
   channelReq = cms.channelReq(m.top.channelId, constants.performance.categoryGridList.finalBlockSize, m.top.kidsMode, params )
   channel = channelReq.runSynchronous()

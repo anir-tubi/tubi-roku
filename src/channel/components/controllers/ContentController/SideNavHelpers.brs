@@ -416,12 +416,7 @@ Function displayNavMenu(shouldTrackComponentInteraction = true)
     end if
 
     slideTo(m.SideNav, [0, m.SideNav.translation[1]], .2)
-
-    if getExperimentResource("roku2", "roku_safe_area").enabled = true
-      slideTo(m.ScreenStack, [m.nOriginalScreenStackX + m.SideNav.width, m.ScreenStack.translation[1]], .2)
-    else 
-      slideTo(m.ScreenStack, [m.nOriginalScreenStackX + m.SideNav.width, m.ScreenStack.translation[1]], .2)
-    end if
+    slideTo(m.ScreenStack, [m.nOriginalScreenStackX + m.SideNav.width, m.ScreenStack.translation[1]], .2)
 
     topScreen = currentScreen()
     if topScreen <> invalid

@@ -46,9 +46,7 @@ Function execGetDetailMetadata() As Void
     tubiLog("DetailMetadataTask getting content for " + m.top.request.contentId)
 
     params = {}
-    if getExperimentResource("roku2", "roku_safe_area").enabled = true
-      params.landscapeSize = constants.ui.imageSizes.landscape
-    end if
+    params.landscapeSize = constants.ui.imageSizes.landscapeSize
 
     contentReq = cms.singleContentReq(m.top.request.contentId, true, m.top.request.kidsMode, params)
     contentReq.start(port)
@@ -57,9 +55,7 @@ Function execGetDetailMetadata() As Void
   if m.top.request.getRelated = true
     tubiLog("DetailMetadataTask getting related (you may also like) for " + m.top.request.contentId)
     params = {}
-    if getExperimentResource("roku2", "roku_safe_area").enabled = true
-      params.posterSize = constants.ui.imageSizes.poster
-    end if
+    params.posterSize = constants.ui.imageSizes.poster
 
     relatedReq = cms.relatedContentReq(m.top.request.contentId, m.top.request.kidsMode, params)
     relatedReq.start(port)

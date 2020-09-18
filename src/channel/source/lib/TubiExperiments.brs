@@ -57,7 +57,6 @@ Function TubiExperiments(constants) as Object
         roku_onboarding_registration : { enabled : false }
       }
       roku2: {
-        roku_safe_area : {"enabled": false}
       }
       rokunamespace: {
       }

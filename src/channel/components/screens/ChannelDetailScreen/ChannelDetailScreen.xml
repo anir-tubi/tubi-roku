@@ -100,7 +100,7 @@
         vertAlignment="custom"
         opacity="0.5"
         itemSpacings="[9]"
-        translation="[85,85]">
+        translation="[168,85]">
         <Poster
           uri="pkg:/images/back.png"
           width="29"
@@ -120,7 +120,6 @@
 
     <Poster
       id="leftCheveron"
-      visible="false"
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"
@@ -129,13 +128,13 @@
     <InfoPanel
       id="ChannelsInfoPanel"
       mode="category"
-      translation="[85,167]"
+      translation="[168,167]"
       maxHeight="355"
       maxTitleLines="2"
       visible="true" />
 
     <Label
-      translation="[85,540]"
+      translation="[168,540]"
       width="1835"
       numLines="2"
       id="pageTitle">
@@ -146,10 +145,10 @@
     </Label>
     <MarkupGrid
       id="ChannelsVideoGrid"
-      translation="[85,594]"
+      translation="[168,594]"
       itemComponentName="CategoryGridPoster"
-      itemSize="[210,300]" 
-      itemSpacing="[10,28]"
+      itemSize="[198,282]" 
+      itemSpacing="[12,12]"
       numRows="2"   
       numColumns="8"
       fadeFocusFeedbackWhenAutoScrolling="true"

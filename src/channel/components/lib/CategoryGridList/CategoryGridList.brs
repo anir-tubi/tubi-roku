@@ -32,10 +32,6 @@ Function init()
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
 
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.RowList.rowItemSpacing="[[12,0]]"
-  end if
-
   if m.constants.deviceInfo.scaledUi = true then
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
@@ -160,41 +156,26 @@ Function setRowHeights()
       rowHeights.push(130)
       showRowLabel.push(false)
     else if category.gridItemType = m.constants.ui.gridItemTypes.portrait
-      if getExperimentResource("roku2", "roku_safe_area").enabled = true
-        posterWidth = m.constants.ui.imageSizes.poster[0]
-        posterHeight = m.constants.ui.imageSizes.poster[1]
-        rowHeightAdjustment = 64
-      else
-        posterWidth = 210
-        posterHeight = 300
-        rowHeightAdjustment = 64
-      end if
+      posterWidth = m.constants.ui.imageSizes.poster[0]
+      posterHeight = m.constants.ui.imageSizes.poster[1]
+      rowHeightAdjustment = 64
+      
       rowItemSize.push([posterWidth, posterHeight])
       rowHeights.push(posterHeight + rowHeightAdjustment)
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.landscape or category.gridItemType = m.constants.ui.gridItemTypes.vitg_small
-      if getExperimentResource("roku2", "roku_safe_area").enabled = true
-        posterWidth = m.constants.ui.imageSizes.landscape[0]
-        posterHeight = m.constants.ui.imageSizes.landscape[1]
-        rowHeightAdjustment = 115
-      else
-        posterWidth = 430
-        posterHeight = 242
-        rowHeightAdjustment = 122
-      end if
+      posterWidth = m.constants.ui.imageSizes.landscape[0]
+      posterHeight = m.constants.ui.imageSizes.landscape[1]
+      rowHeightAdjustment = 115
+
       rowItemSize.push([posterWidth,posterHeight])
       rowHeights.push(posterHeight + rowHeightAdjustment)
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-      if getExperimentResource("roku2", "roku_safe_area").enabled = true
-        posterWidth = m.constants.ui.imageSizes.largeVITG[0]
-        posterHeight = m.constants.ui.imageSizes.largeVITG[1]
-        rowHeightAdjustment = 85
-      else
-        posterWidth = 1205
-        posterHeight = 677
-        rowHeightAdjustment = 123
-      end if
+      posterWidth = m.constants.ui.imageSizes.largeVITG[0]
+      posterHeight = m.constants.ui.imageSizes.largeVITG[1]
+      rowHeightAdjustment = 85
+
       rowItemSize.push([posterWidth,posterHeight])
       rowHeights.push(posterHeight + rowHeightAdjustment)
       showRowLabel.push(true)
@@ -203,11 +184,7 @@ Function setRowHeights()
   end for
 
   '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.RowList.itemSize = [1776,364]
-  else
-    m.RowList.itemSize = [1835,364]
-  end if
+  m.RowList.itemSize = [1776,364]
   m.RowList.rowItemSize = rowItemSize
   m.RowList.rowHeights = rowHeights
   m.RowList.showRowLabel = showRowLabel
@@ -524,11 +501,9 @@ Function getWholeCategoryRequest(category As Object, field="wholeCategoryRespons
         contentMode: m.top.contentMode
       }
 
-      if getExperimentResource("roku2", "roku_safe_area").enabled = true
-        params.posterSize = m.constants.ui.imageSizes.poster
-        params.landscapeSize = m.constants.ui.imageSizes.landscape
-        params.largeVitgSize = m.constants.ui.imageSizes.largeVITG
-      end if
+      params.posterSize = m.constants.ui.imageSizes.poster
+      params.landscapeSize = m.constants.ui.imageSizes.landscape
+      params.largeVitgSize = m.constants.ui.imageSizes.largeVITG
       return m.metadataFetchTaskDTO.createRequest(categoryId, m.top, field, m.constants.reqNames.getCategory, invalid, m.top.shouldKidsModeBeSentToServer, params)
     end if
   end if

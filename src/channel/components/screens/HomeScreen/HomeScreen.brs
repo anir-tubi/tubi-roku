@@ -65,23 +65,11 @@ Function init()
   m.utilityMaskOffsetDiff = -100  'the diff in the amount the content area mask is offset in the up direction for utility
   
   ' Video in the grid constants
-  m.vitgSlideAmt = 410  'the amount the grid slides up to fit the vitg content item
-  m.vitgMaskOffsetDiff = 436  'the diff in the amount the content area mask is offset in the up direction for vitg
+  m.vitgSlideAmt = 440  'the amount the grid slides up to fit the vitg content item
+  m.vitgMaskOffsetDiff = 466  'the diff in the amount the content area mask is offset in the up direction for vitg
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
-
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
-    m.ScreenNavigationHint.translation = [168,78]
-    m.InfoPanel.translation = [168,163]
-    m.ContentArea.translation = [168,592]
-    m.vitgSlideAmt = 440  'the amount the grid slides up to fit the vitg content item
-    m.vitgMaskOffsetDiff = 466  'the diff in the amount the content area mask is offset in the up direction for vitg
-    m.originalContentAreaTranslation = m.ContentArea.translation
-    m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
-    m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
-  end if
 
   ' utility row position experiment
   m.utilityRowPosition = -2

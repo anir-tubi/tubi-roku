@@ -221,11 +221,9 @@ Function fetchHomeScreen(homeScreen)
       responseHandler = "espanolscreenResponse" 
     end if
 
-    if getExperimentResource("roku2", "roku_safe_area").enabled = true
-      params.posterSize = m.constants.ui.imageSizes.poster
-      params.landscapeSize = m.constants.ui.imageSizes.landscape
-      params.largeVitgSize = m.constants.ui.imageSizes.largeVITG
-    end if
+    params.posterSize = m.constants.ui.imageSizes.poster
+    params.landscapeSize = m.constants.ui.imageSizes.landscape
+    params.largeVitgSize = m.constants.ui.imageSizes.largeVITG
 
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, shouldKidsModeBeSentToServer(), params)
     homeScreen.resetContentAreaValues = true

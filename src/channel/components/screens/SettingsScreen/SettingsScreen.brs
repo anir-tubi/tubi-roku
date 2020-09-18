@@ -3,7 +3,7 @@ Function init()
 
   m.leftPanelWidth = 420
   m.rightPanelWidth = 1034
-  m.rightPaneloffset = [220,-199]
+  m.rightPaneloffset = [86,-199]
 
   m.PanelSet = m.top.findNode("PanelSet")
   m.Title = m.top.findNode("Title")
@@ -42,18 +42,6 @@ Function init()
 
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
-  
-  m.bLeftButtonActsLikeBackButton = false
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.leftCheveron = m.top.findNode("leftCheveron")
-    m.leftCheveron.visible = true
-    m.bLeftButtonActsLikeBackButton = true
-    m.PanelSet.translation = [148,414]
-    m.rightPaneloffset = [86,-199]
-    m.Title.translation = [168,230]
-    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
-    m.ScreenNavigationHint.translation = [168,85]
-  end if
 
 End Function
 
@@ -363,10 +351,8 @@ End Function
 Function onKeyEvent(key, press)
   if press = true
     if key = "left"
-      if m.bLeftButtonActsLikeBackButton = true
-        m.top.backButtonPressed = true
-        return true
-      end if
+      m.top.backButtonPressed = true
+      return true
     end if
 
     return false

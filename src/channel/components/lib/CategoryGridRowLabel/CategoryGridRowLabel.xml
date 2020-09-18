@@ -30,11 +30,11 @@
       id="CategoryCount"
       layoutDirection="horiz"
       horizAlignment="right"
-      translation="[1755,0]">
+      translation="[1668,0]">
       <Label
         id="FocusIndex"
         text=""
-        height="63"
+        height="49"
         horizAlign="right">
         <Font
           role="font"
@@ -44,7 +44,7 @@
       <Label
         id="ItemCount"
         text=""
-        height="63"
+        height="49"
         horizAlign="right">
         <Font
           role="font"

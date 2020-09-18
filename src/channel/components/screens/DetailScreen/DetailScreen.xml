@@ -205,7 +205,6 @@
 
     <Poster
       id="leftCheveron"
-      visible="false"
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"
@@ -224,14 +223,14 @@
       <InfoPanel
         id="DetailInfoPanel"
         mode="item"
-        translation="[85,123]"
+        translation="[168,123]"
         maxHeight="433"
         maxTitleLines="2"
         visible="true" />
 
       <FilledButtonMarkupGrid
         id="Menu"
-        translation="[60,656]"
+        translation="[143,656]"
         itemSize="[465,80]"
         itemComponentName="DetailMenuItem"
         itemSpacing="[0,8]"
@@ -243,7 +242,7 @@
         id="RelatedContentParentGroup">
         <Group
           id="RelatedContentGroup"
-          translation="[85,945]"
+          translation="[168,945]"
           visible="false"
           opacity="0.2">
           <CategoryGridRowLabel
@@ -256,10 +255,10 @@
           <PosterGrid
             id="RelatedGrid"
             loadingBitmapUri="pkg:/images/placeholder.jpg"
-            itemSize="[1920,300]"
+            itemSize="[1920,282]"
             numRows="1"
-            basePosterSize="[210,300]"
-            itemSpacing="[10,0]"
+            basePosterSize="[198,282]"
+            itemSpacing="[12,12]"
             fadeFocusFeedbackWhenAutoScrolling="true"
             horizFocusAnimationStyle="fixedFocus"
             focusBitmapUri="pkg:/images/selector-fhd.9.png"

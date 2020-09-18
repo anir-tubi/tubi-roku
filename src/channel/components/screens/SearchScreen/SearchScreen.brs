@@ -68,21 +68,6 @@ Function init()
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
 
-
-  if getExperimentResource("roku2", "roku_safe_area").enabled = true
-    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
-    m.ScreenNavigationHint.translation = [168,85]
-    m.content = m.top.findNode("content")
-    m.content.translation = [148,158]
-    m.content.itemSpacings = [67]
-    m.ResultArea = m.top.findNode("ResultArea")
-    m.ResultArea.translation = [798, 244]
-    m.ResultArea.itemSpacing = [12,12]
-
-    posterSize = m.constants.ui.imageSizes.poster
-    m.ResultGrid.basePosterSize = [posterSize[0], posterSize[1]]
-    m.top.posterSize = posterSize
-  end if
 End Function
 
 

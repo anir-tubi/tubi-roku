@@ -18,12 +18,12 @@
   <children> 
     <Poster
       id="Icon"
-      translation="[85, 0]"
+      translation="[102, 0]"
       loadSync="true" 
       width="40"
       height="40"/>
     <Label
-      translation="[145, 4]"
+      translation="[162, 4]"
       id="Label"
       vertAlign="center"
       color="0xFFFFFFFF"

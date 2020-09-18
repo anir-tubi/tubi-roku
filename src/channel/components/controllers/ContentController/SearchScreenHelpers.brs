@@ -40,7 +40,7 @@ Function onSearchTextChanged(msg)
   m.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, searchScreen, "searchResponse")
 
   options = {}
-  options.posterSize = searchScreen.posterSize
+  options.posterSize = m.constants.ui.imageSizes.poster
 
   if bSearchNonDefaultResults = true
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", m.constants.reqNames.searchAPI, searchText, shouldKidsModeBeSentToServer(), options)

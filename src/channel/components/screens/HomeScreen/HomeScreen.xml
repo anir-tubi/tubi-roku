@@ -135,7 +135,7 @@
         vertAlignment="custom"
         opacity="0.5"
         itemSpacings="[9]"
-        translation="[85,85]">
+        translation="[168,78]">
         <Poster
           uri="pkg:/images/back.png"
           width="29"
@@ -155,7 +155,7 @@
 
     <InfoPanel
       id="InfoPanel"
-      translation="[85,163]"
+      translation="[168,163]"
       maxHeight="355"
       maxTitleLines="2"
       visible="true"/>
@@ -165,7 +165,7 @@
       maskUri="pkg:/images/poster-mask.png"
       maskSize="[0,0]"
       maskOffset="[0,317]"
-      translation="[85,553]">
+      translation="[168,592]">
       <CategoryGridList
         id="CategoryGridList"/>
     </MaskGroup>
