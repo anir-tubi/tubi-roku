@@ -378,13 +378,14 @@ Function onVideoStateChange(msg)
         end if
       end if
 
+      m.VideoState = "stop"
+
       ' setting the m.top.state field to finished triggers autoplay content to start
       ' we don't want that trigger to fire if the up next component is still visible
       if m.UpNext.opacity = 0
         m.top.state = state
       end if
 
-      m.VideoState = "stop"
     end if
   else if state = "error"
     content = m.Video.content
