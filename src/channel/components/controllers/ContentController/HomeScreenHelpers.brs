@@ -187,8 +187,9 @@ End Function
 Function setHomeScreenLoading(homeScreen)
   screen = currentScreen() 
   homeScreen.isLoading = true
+  '//checking screen for invalid, to show the loading spinner when user sign outs
   '//Display default background and spinner only if the home screen is the current screen while it is loading
-  if screen <> invalid and screen.id = homeScreen.id
+  if screen = invalid or screen.id = homeScreen.id
     showHideSpinner(true)
     displayDefaultBackground()
   end if
