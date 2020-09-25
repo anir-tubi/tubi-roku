@@ -19,3 +19,6 @@ settings:
   # remoteComponentsExtension will fill in the {{fileType}} template value.
   remoteComponentsExtension: "zip"
 
+  # The following can be used to make debugging less painful
+  noAds: true
+  numContainers: 10

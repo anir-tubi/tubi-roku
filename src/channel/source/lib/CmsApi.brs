@@ -3,7 +3,7 @@
 Function CmsApi(constants, request, auth)
   return {
     ' dependencies
-    constants_: constants
+    constants: constants
     request_: request
     auth_: auth
 
@@ -27,12 +27,13 @@ Function CmsApi(constants, request, auth)
   }
 End Function
 
+
 Function cmsApi_commonOptions_()
   return {
     params: {
-      "app_id": m.constants_.settings.shortAppName
-      "platform": m.constants_.platform
-      "device_id": m.constants_.deviceInfo.deviceId
+      "app_id": m.constants.settings.shortAppName
+      "platform": m.constants.platform
+      "device_id": m.constants.deviceInfo.deviceId
     }
   }
 End Function
@@ -42,16 +43,16 @@ End Function
 ' relatedContentReq()
 '
 Function cmsApi_getRelatedContentRequest(contentId, bKidsMode = false, params = {})
-  url = m.constants_.urls.cms.relatedContent + "/" + contentId + "/related"
+  url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
 
   options = m.commonOptions_()
   options.params["isKidsMode"] = bKidsMode
-  options.params["video_resources"] = m.constants_.player.drmOrder
+  options.params["video_resources"] = m.constants.player.drmOrder
 
   '//update options.params based on the passed in params AA
   m.setImageParams_(params, options.params)
 
-  return m.createAuthRequest_(url, m.constants_.reqNames.getRelatedContent, options)
+  return m.createAuthRequest_(url, m.constants.reqNames.getRelatedContent, options)
 End Function
 
 
@@ -62,20 +63,20 @@ End Function
 '       Update the integration test to use the GeneralTask and cmsApi_getUpNextContentRequestInfo()
 '       and then delete this function.
 Function cmsApi_getUpNextContentRequest(contentId, categoryId=invalid)
-  url = m.constants_.urls.cms.upNextContent + "/" + contentId + "/next"
+  url = m.constants.urls.cms.upNextContent + "/" + contentId + "/next"
   
   options = m.commonOptions_()
   if categoryId <> invalid and categoryId <> ""
     options.params.container_id = categoryId
   end if
-  return m.createAuthRequest_(url, m.constants_.reqNames.getUpNextContent, options)
+  return m.createAuthRequest_(url, m.constants.reqNames.getUpNextContent, options)
 End Function
 
 
 Function cmsApi_getUpNextContentRequestInfo(contentId, params)
-  url = m.constants_.urls.cms.upNextContent + "/" + contentId + "/next"
+  url = m.constants.urls.cms.upNextContent + "/" + contentId + "/next"
   options = m.commonOptions_()
-  options.params["video_resources"] = m.constants_.player.drmOrder
+  options.params["video_resources"] = m.constants.player.drmOrder
 
   for each param in params
     if params[param] <> invalid
@@ -94,18 +95,18 @@ End Function
 ' singleContentReq()
 '
 Function cmsApi_getSingleContentRequest(contentId, includeChannels=false, bKidsMode = false, params = invalid)
-  url = m.constants_.urls.cms.singleContent
+  url = m.constants.urls.cms.singleContent
 
   options = m.commonOptions_()
   options.params.content_id = contentId
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
-  options.params["video_resources"] = m.constants_.player.drmOrder
+  options.params["video_resources"] = m.constants.player.drmOrder
 
   '//update options.params based on the passed in params AA
   m.setImageParams_(params, options.params)
 
-  return m.createAuthRequest_(url, m.constants_.reqNames.getSingleContent, options)
+  return m.createAuthRequest_(url, m.constants.reqNames.getSingleContent, options)
 End Function
 
 
@@ -113,16 +114,16 @@ End Function
 ' thumbnailsReq()
 '
 Function cmsApi_getThumbnailsRequest(contentId)
-  url = m.constants_.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
+  url = m.constants.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
   
   options = m.commonOptions_()
   options.params.type = "5x"
-  return m.request_.createAsync(url, m.constants_.reqNames.getThumbnails, options)
+  return m.request_.createAsync(url, m.constants.reqNames.getThumbnails, options)
 End Function
 
 
 Function cmsApi_getThumbnailsRequestInfo(contentId)
-  url = m.constants_.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
+  url = m.constants.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
   options = m.commonOptions_()
   options.params.type = "5x"
   return {
@@ -136,7 +137,7 @@ End Function
 ' channelReq()
 '
 Function cmsApi_getChannelRequest(channelId, limit, bKidsMode = false, params = {})
-  url = m.constants_.urls.matrix.channel + "/" + channelId
+  url = m.constants.urls.matrix.channel + "/" + channelId
   
   options = m.commonOptions_()
   options.params.expand = 1
@@ -148,7 +149,7 @@ Function cmsApi_getChannelRequest(channelId, limit, bKidsMode = false, params = 
   '//update options.params based on the passed in params AA
   m.setImageParams_(params, options.params)
   
-  return m.createAuthRequest_(url, m.constants_.reqNames.getChannel, options)
+  return m.createAuthRequest_(url, m.constants.reqNames.getChannel, options)
 End Function
 
 
@@ -166,7 +167,7 @@ End Function
 ' @limit: number of items in each category
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, params = {}, expand = 2)
-  url = m.constants_.urls.matrix.homescreen 
+  url = m.constants.urls.matrix.homescreen 
   
   options = m.commonOptions_()
   options.params.expand = expand
@@ -181,17 +182,22 @@ Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, params = {}, expa
   end if
   options.params["isKidsMode"] = bKidsMode
   options.params["includeVideoInGrid"] = true
-  return m.createAuthRequest_(url, m.constants_.reqNames.getHomescreen, options)
+
+  if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
+    options.params["groupSize"] = m.constants.settings.numContainers
+  end if
+  
+  return m.createAuthRequest_(url, m.constants.reqNames.getHomescreen, options)
 End Function
 
 '''''''''''''''''''''
 ' categoryReq()
 '
 Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode = false, params = {})
-  url = m.constants_.urls.matrix.container + "/" + categoryId
+  url = m.constants.urls.matrix.container + "/" + categoryId
   
   if name = invalid
-    name = m.constants_.reqNames.getCategory
+    name = m.constants.reqNames.getCategory
   end if
   options = m.commonOptions_()
   options.params.expand = 1
@@ -217,7 +223,7 @@ End Function
 ' searchreq()
 '
 Function cmsApi_getSearchRequest(searchText, limit, bKidsMode = false, params = {})
-  url = m.constants_.urls.cms.search
+  url = m.constants.urls.cms.search
   
   options = m.commonOptions_()
 
@@ -225,7 +231,7 @@ Function cmsApi_getSearchRequest(searchText, limit, bKidsMode = false, params = 
   m.setImageParams_(params, options.params)
   options.params.search = searchText
   options.params["isKidsMode"] = bKidsMode
-  return m.createAuthRequest_(url, m.constants_.reqNames.searchAPI, options)
+  return m.createAuthRequest_(url, m.constants.reqNames.searchAPI, options)
 End Function
 
 
