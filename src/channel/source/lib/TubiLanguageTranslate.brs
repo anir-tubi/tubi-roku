@@ -959,6 +959,10 @@ Function getTranslation_es_MX()
       "description": "Label of the dialog button to confirm the action the dialog is asking",
       "message": "OK"
     },
+    "dialog_button_off": {
+      "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
+      "message": "Apagado"
+    },
     "dialog_button_yes": {
       "description": "Label of the dialog button to confirm the action the dialog is asking",
       "message": "Sí"
@@ -1347,6 +1351,10 @@ Function getTranslation_es_MX()
       "description": "Onscreen message to indicate home content could not be loaded",
       "message": "No se puede cargar la pantalla de inicio de Tubi."
     },
+    "channelGuide_error_fetchContent_description": {
+      "description": "Onscreen message to indicate channel Guide content could not be loaded",
+      "message": "No se puede cargar el guía de canales."
+    },
     "screenDetails_button_trailer": {
       "description": "Label of button to allow users to watch a preview of the current video title",
       "message": "Ver tráiler"
@@ -1366,6 +1374,10 @@ Function getTranslation_es_MX()
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
       "message": "Reanudar"
+    },
+    "metadata_fullscreen_countdown_plural": {
+      "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
+      "message": "Pantalla completa en {seconds} s"
     },
     "metadata_expiresIn_plural": {
       "description": "label to indicate how long the user have to watch a video",
@@ -1442,6 +1454,22 @@ Function getTranslation_es_MX()
     "videoPlayer_adHeadsUp": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Pausa publicitaria comienza en {seconds} s"
+    },
+    "linearVideoPlayer_buttonBack": {
+      "description": "Label of a Button to go back",
+      "message": "Atrás"
+    },
+    "linearVideoPlayer_buttonCaptions": {
+      "description": "Label of a Button to display the closed captions",
+      "message": "Subtítulos"
+    },
+    "linearVideoPlayer_buttonGuide": {
+      "description": "Label of a Button to view the channel guide",
+      "message": "Guía"
+    },
+    "linearVideoPlayer_channelGuideTitle": {
+      "description": "The title displayed above a list of live news channels",
+      "message": "Guía de Canales"
     },
     "goBack_categories": {
       "description": "Navigational instructions to users on what the back button does on the current page",
@@ -1545,7 +1573,7 @@ Function getTranslation_es_MX()
     },
     "utility_tvshows_description": {
       "description": "This will be displayed on Info panel when the TVShows item (from utility row) gains focus",
-      "message": "Sintonice miles de series de televisión dignos de atracón, docuseries y reality TV. Nuevas series añadidos mensualmente, nunca te quedarás sin algo que ver."
+      "message": "Sintoniza miles de series de televisión dignos de ver, documentales y reality TV. Nuevos capítulos añadidos mensualmente, nunca te quedarás sin ver algo."
     }
   }
 End Function

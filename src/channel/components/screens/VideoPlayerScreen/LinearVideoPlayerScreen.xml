@@ -158,9 +158,9 @@
       <Poster
         id="HUDIcon"
         opacity="0"
-        width="61"
-        height="61"
-        translation="[930,60]"/>
+        width="120"
+        height="120"
+        translation="[900,60]"/>
       <Group
         id="HUD"
         visible="true"

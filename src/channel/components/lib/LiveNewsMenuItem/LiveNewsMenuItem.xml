@@ -34,9 +34,9 @@
 
     <Poster
      id="Icon"
-     width="61"
-     height="61"
-     translation="[19,30]" 
+     width="64"
+     height="64"
+     translation="[28,28]" 
      loadSync="true"/>
 
     <Label
