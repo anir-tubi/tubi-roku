@@ -5,6 +5,12 @@ Function parseVideoScreenSpritesSuccess(parsedResponse)
     spritesContentNode.id = parsedResponse.id
     spritesContentNode.thumbnailUrls = parsedResponse.sprites
     spritesContentNode.thumbnailSpan = parsedResponse.count_per_sprite
+    if parsedResponse.rows <> invalid
+      spritesContentNode.thumbnailRows = parsedResponse.rows
+    end if
+    if parsedResponse.columns <> invalid
+      spritesContentNode.thumbnailColumns = parsedResponse.columns
+    end if
     spritesContentNode.thumbnailSize = [parsedResponse.frame_width, parsedResponse.height]
   end if
 

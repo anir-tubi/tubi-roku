@@ -114,10 +114,12 @@ End Function
 ' thumbnailsReq()
 '
 Function cmsApi_getThumbnailsRequest(contentId)
+  '//This function is only being used in a unit test. Should ensure this and cmsApi_getThumbnailsRequestInfo() ar kept in sync 
   url = m.constants.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
   
   options = m.commonOptions_()
   options.params.type = "5x"
+  options.params.max_width = m.constants.deviceInfo.displayWidth
   return m.request_.createAsync(url, m.constants.reqNames.getThumbnails, options)
 End Function
 
@@ -126,6 +128,7 @@ Function cmsApi_getThumbnailsRequestInfo(contentId)
   url = m.constants.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
   options = m.commonOptions_()
   options.params.type = "5x"
+  options.params.max_width = m.constants.deviceInfo.displayWidth
   return {
     url: url
     options: options

@@ -872,7 +872,7 @@ End Function
 
 Function showThumbnail()
   tubiLog("videoTransportHandling.showThumbnail")
-  if m.Thumbnail.spriteUrls <> invalid and m.Thumbnail.spriteUrls.count() > 0 and m.constants.deviceInfo.limitedUi = false
+  if m.Thumbnail.spriteUrls <> invalid and m.Thumbnail.spriteUrls.count() > 0
     m.Thumbnail.visible = true
   else
     m.Thumbnail.visible = false

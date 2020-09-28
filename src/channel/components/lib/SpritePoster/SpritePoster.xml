@@ -7,8 +7,13 @@
       <field id="spriteUrls" type="stringarray"/>
       <!-- number of sprites per sprite page -->
       <field id="numSprites" type="integer"/>
-      <field id="spriteSheetWidth" type="float" value="0.0"/>
-      <field id="spriteSheetHeight" type="float" value="0.0"/>
+      <!-- The width of the thumbnails image as returned by the API -->
+      <field id="thumbnailWidth" type="float" value="0.0"/>
+      <!-- The height of the thumbnails image as returned by the API -->
+      <field id="thumbnailHeight" type="float" value="0.0"/>
+
+      <field id="rows" type="integer" value="1"/>
+      <field id="columns" type="integer" value="-1" />
 
       <!-- Sprite dimensions to be applied to incoming file -->
       <field id="width" type="float" />

@@ -702,19 +702,17 @@ Function onSpritesReceived(msg)
     ' sprites are reset to invalid when video playback stops. Don't log when that happens because
     ' it's confusing when reading the logs.
     tubiLog("VideoPlayer.onSpritesReceived")
-
-    if thumbnailsInfo.thumbnailUrls <> invalid and thumbnailsInfo.thumbnailUrls.count() > 0 and m.constants.deviceInfo.limitedUi = false
+ 
+    if thumbnailsInfo.thumbnailUrls <> invalid and thumbnailsInfo.thumbnailUrls.count() > 0
       m.Thumbnail.numSprites = thumbnailsInfo.thumbnailSpan
-      ' This should bring the 4400px image width down below the 4kx4k texture size limit
-      ' which would otherwise cause the images to fail to load.
-      ' scaleFactor needs to be ~0.4 to show on non 4k capable devices
-      scaleFactor = 0.75
-      m.Thumbnail.spriteSheetWidth = thumbnailsInfo.thumbnailSize[0] * thumbnailsInfo.thumbnailSpan * scaleFactor
-      m.Thumbnail.spriteSheetHeight = thumbnailsInfo.thumbnailSize[1] * scaleFactor
+      m.Thumbnail.rows = thumbnailsInfo.thumbnailRows
+      m.Thumbnail.columns = thumbnailsInfo.thumbnailColumns
       m.Thumbnail.spriteUrls = thumbnailsInfo.thumbnailUrls
       m.Thumbnail.jumpToSprite = 0
       ' Always keep height of thumbnail the same, varying the width if necessary
       thumbnailAspect = thumbnailsInfo.thumbnailSize[0] / thumbnailsInfo.thumbnailSize[1]
+      m.Thumbnail.thumbnailWidth = thumbnailsInfo.thumbnailSize[0]
+      m.Thumbnail.thumbnailHeight = thumbnailsInfo.thumbnailSize[1]
       m.Thumbnail.width = m.Thumbnail.height * thumbnailAspect
       m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
       m.Thumbnail.translation = [m.thumbnailMinXOffset, m.thumbnailMaxYOffset - m.Thumbnail.height]

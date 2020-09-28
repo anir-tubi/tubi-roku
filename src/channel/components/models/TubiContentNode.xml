@@ -55,6 +55,8 @@
     <field id="thumbnailUrls" type="stringarray" />
     <field id="thumbnailSpan" type="integer" />
     <field id="thumbnailSize" type="intarray"/>
+    <field id="thumbnailRows" type="integer"/>
+    <field id="thumbnailColumns" type="integer"/>
 
     <!-- channels feature -->
     <field id="inlineLogoUri" type="string" />

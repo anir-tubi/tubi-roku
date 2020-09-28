@@ -230,7 +230,7 @@ Function onThumbnailsResponse(msg)
   m.Thumbnail.visible = false   ' always start with thumbnail invisible, then show it when scrubbing
 
   if thumbnailsInfo <> invalid
-    if thumbnailsInfo.thumbnailUrls <> invalid and thumbnailsInfo.thumbnailUrls.count() > 0 and m.constants.deviceInfo.limitedUi = false
+    if thumbnailsInfo.thumbnailUrls <> invalid and thumbnailsInfo.thumbnailUrls.count() > 0
       m.Thumbnail.numSprites = thumbnailsInfo.thumbnailSpan
       ' This should bring the 4400px image width down below the 4kx4k texture size limit
       ' which would otherwise cause the images to fail to load.
