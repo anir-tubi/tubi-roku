@@ -101,9 +101,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer = invalid or type(contentFromServer) <> "roAssociativeArray" then return 0
 
   count = 1
-  
-  if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
 
+  if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
   typeVar = "type"
   if contentFromServer[typeVar] <> invalid
     if contentFromServer[typeVar] = "u"
@@ -122,6 +121,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       if translatedContent.id <> "" then translatedContent.id = "0" + translatedContent.id
     else if contentFromServer[typeVar] = "channel"
       translatedContent[typeVar] = m.contentTypes.channel
+    else if contentFromServer[typeVar] = "l"
+      translatedContent[typeVar] = m.contentTypes.linear
     end if
   end if
 
@@ -136,7 +137,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   parentWhiteList = {}
   parentWhiteList[m.constants.ui.contentTypes.series] = true
   parentWhiteList[m.constants.ui.contentTypes.season] = true
-
+  
   if parent <> invalid and parent.type <> invalid and parentWhiteList.DoesExist(parent.type) then
     if parent.parentId <> invalid and parent.parentId <> "" then
       translatedContent.parentId = parent.parentId
@@ -274,7 +275,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
         if video.manifest.duration <> invalid then resource.length = video.manifest.duration
       end if
 
-      if video.type = m.constants.player.drmTypes.dashWidevine
+      if video.type = m.constants.player.drmTypes.dashWidevine 
         resource.type = m.constants.player.drmTypes.dashWidevine
         resource.streamFormat = "dash"
         if video.license_server <> invalid
@@ -322,10 +323,32 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
         description: subtitle.lang
         trackname: subtitle.url
       })
-    end for
+    end for 
     translatedContent.subtitleTracks = subtitleTracks
     ' This is needed to make subtitles work on Roku 3 (and other models... 3900, 3800, etc.)
     translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles[0].url}
+  end if
+
+  ' linear
+  if translatedContent[typeVar] = m.contentTypes.linear and translatedContent.hasSubtitles = true
+    '//::TODO::LiveNews::HARDCODE:: - The following code is a hardcoded. 
+    '//   The backend needs to let us know what captions are available and what channel the track is on.
+    '//   In the meantime, backend is setting the has_subtitles field to true if the stream has at least 1 caption. We will assume during MVP of the live news launch that the caption in the 1st caption channel is English.
+    '//   For future versions, backend will provide the language and channel location.
+    '//   MAYBE, in a future Roku firmware update, captions will be known. However, we currently do not know when or if any future update will have this ability. 
+    subtitleTracks = []
+    subtitleTracks.push({
+        language: "eng"
+        description: "English"
+        trackname: "eia608/CC1"
+      })
+    translatedContent.subtitleTracks = subtitleTracks
+    translatedContent.subtitleConfig = {TrackName: "eia608/CC1"}
+  end if
+  if translatedContent[typeVar] = m.contentTypes.linear 
+    if contentFromServer.thumbnails <> invalid
+      translatedContent.inlineLogoUri = contentFromServer.thumbnails[0]
+    end if
   end if
 
   ' trailers
@@ -494,7 +517,7 @@ End Function
 ' </CategoryContentNode>
 '
 '//::TODO:: Remove the contentMode, authInfo & isKidsModeEnabled parameters once we have API support
-Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homeScreen", authInfo=invalid, isKidsModeEnabled=false) As Object
+Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homeScreen", authInfo=invalid, isKidsModeEnabled=false, bFullData = false) As Object
   translated = CreateObject("roSGNode", "CategoryContentNode")
   homescreenAA = {
     id: ""
@@ -579,14 +602,14 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         categoryAA = invalid
       end if
 
-      categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode)
+      categoryAA = m.buildCategoryAA(container, contents, invalid, "", bFullData, contentMode)
       if categoryAA <> invalid
         homescreenAA.children.push(categoryAA)
       end if
     else
       for j=0 to container.children.count()-1
         nestedContainer = container.children[j]
-        categoryAA = m.buildCategoryAA(nestedContainer, contents, invalid, "", false, contentMode)
+        categoryAA = m.buildCategoryAA(nestedContainer, contents, invalid, "", bFullData, contentMode)
         if categoryAA <> invalid
           categoryAA.parentId = container.id
           homescreenAA.children.push(categoryAA)
@@ -739,15 +762,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     return invalid
   end if
 
-  if type(categoryMetadata) = "roAssociativeArray"
-    ' buildCategoryAA always returns AA.state = "partial",
-    ' but any single category request should be considered fully loaded
-    categoryMetadata.state = "loaded"
-    translated.update(categoryMetadata)
-    node_count = 1 + translated.getChildCount()
-  end if
-
-  ' Store the gridItemType as necessary (only for landscape, vitg, and utility). 
+  ' Store the gridItemType as necessary (only for landscape, linear, vitg, and utility). 
   ' We do it here manually, after creating the child nodes, to avoid having to define
   ' a custom content node which have proven to be much slower to instantiate.
   ' Could use some testing though.
@@ -756,9 +771,23 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   vitg_small = m.constants.ui.gridItemTypes.vitg_small
   vitg_large = m.constants.ui.gridItemTypes.vitg_large
   utility = m.constants.ui.gridItemTypes.utility
+  linear = m.constants.ui.gridItemTypes.linear
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
 
-  if gridItemType = landscape or gridItemType = vitg_small or gridItemType = vitg_large or gridItemType = utility
+  '//::HARDCODE:: If the container type includes live news, then mark this as "new". evebtually we will remove the new tag
+  if gridItemType = linear
+    categoryMetadata.new = true
+  end if
+
+  if type(categoryMetadata) = "roAssociativeArray"
+    ' buildCategoryAA always returns AA.state = "partial",
+    ' but any single category request should be considered fully loaded
+    categoryMetadata.state = "loaded"
+    translated.update(categoryMetadata)
+    node_count = 1 + translated.getChildCount()
+  end if
+
+  if gridItemType = landscape or gridItemType = vitg_small or gridItemType = vitg_large or gridItemType = utility or gridItemType = linear
     for i = 0 to translated.getChildCount()-1
       child = translated.getChild(i)
       child.addField("gridItemType", "string", false)
@@ -792,7 +821,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
         sTitle = "My List"
       end if
     end if
-
+ 
     updateMetadata = {
       id: container.id
       slug: container.slug
@@ -805,6 +834,11 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       state: "partial"
       gridItemType: m.getGridItemType(container, sOrientation, m.constants)
     }
+    
+    '//::HARDCODE:: If the container type includes live news, then mark this as "new". eventually we will remove the new tag
+    if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.linear
+      updateMetadata.new = true
+    end if
 
     if container.thumbnail <> invalid
       updateMetadata.thumbnail = container.thumbnail
@@ -887,7 +921,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           bLandscape = true
         end if
 
-        if bfullData = true and fullChild.backgrounds <> invalid and type(fullChild.backgrounds) = "roArray" and fullChild.backgrounds.count() > 0
+        if bFullData = true and fullChild.backgrounds <> invalid and type(fullChild.backgrounds) = "roArray" and fullChild.backgrounds.count() > 0
           childAA.backgrounds = m.dedupeBackgrounds(fullChild.backgrounds)
         end if
 
@@ -914,6 +948,10 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           end if
         end if
         childAA.hdgridposterurl = m.getThumbnailImage(fullChild, gridType)
+
+        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.linear and fullChild.thumbnails <> invalid
+          childAA.inlineLogoUri = fullChild.thumbnails[0]
+        end if
 
         'add the trailer url to vitg content items - don't include vitg content if there is no trailer
         if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_small or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
@@ -944,12 +982,18 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
             childAA.releaseDate = fullChild.year.toStr()
           end if
         end if
+        
+        sFullChildID = fullChild.id
+        if Type(fullChild.id) = "Integer"
+          '//in case the ID is an integer, change it to a string.
+          sFullChildID = fullChild.id.toStr()
+        end if
+        childAA.id = sFullChildID
 
         ' normalize ids for series, should always be zero-prefixed
         if fullChild.type = "s" or fullChild.type = "a"
-          childAA.id = "0" + fullChild.id
+          childAA.id = "0" + sFullChildID
         end if
-
         if childIsPushable = true
           jsonAA[childAA.id] = fullChild
         end if
@@ -1180,12 +1224,12 @@ Function tubiMetadataTranslate_translateChannel(contentToTranslate)
   fetchedAt = m.fetchedAtTimestamp()
   node_count = 0
   container = contentToTranslate.container
-  sTitle = container.title
-  if container.id = m.constants.ui.categoryIds.queue 
-    '//::HARDCODE:: this is a temporary hardcode until the backend is ready to play My List Instead of Queue as the title
-    sTitle = "My List"
-  end if
   if container <> invalid
+    sTitle = container.title
+    if container.id = m.constants.ui.categoryIds.queue 
+      '//::HARDCODE:: this is a temporary hardcode until the backend is ready to play My List Instead of Queue as the title
+      sTitle = "My List"
+    end if
     translated.id = container.id
     translated.title = sTitle
     translated.description = container.description
@@ -1240,6 +1284,8 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     if constants.deviceInfo.limitedUI <> true
       gridItemType = constants.ui.gridItemTypes.vitg_large
     end if
+  else if container.type = constants.ui.categoryTypes.linear
+    gridItemType = constants.ui.gridItemTypes.linear  
   else if container.id = constants.ui.categoryIds.featured and orientation <> constants.ui.gridItemTypes.portrait
     gridItemType = constants.ui.gridItemTypes.landscape
   else if container.type = constants.ui.categoryTypes.utility

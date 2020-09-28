@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="LiveNewsMenuItem" extends="Group">
+  <script type="text/brightscript" uri="LiveNewsMenuItem.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+
+    <!-- Content expected for a LiveNewsMenuItem:
+     -
+     - title - The label text
+     - iconUrl - The icon uri
+     -
+     -->
+    <field id="itemContent" type="node" />
+    <field id="itemHasFocus" type="boolean" />
+
+  </interface>
+  
+  <children>
+    <Poster
+     id="Bground"
+     uri="pkg:/images/channelguideRow-inactive.png"
+     width="507"
+     height="120"
+     loadSync="true"/>
+    <Poster
+     id="Bground_active"
+     uri="pkg:/images/channelguideRow-active.png"
+     width="507"
+     height="120"
+     visible="false"
+     loadSync="true"/>
+
+    <Poster
+     id="Icon"
+     width="61"
+     height="61"
+     translation="[19,30]" 
+     loadSync="true"/>
+
+    <Label
+     id="MenuText"
+     translation="[135,0]" 
+     vertAlign="center"
+     horizAlign="left" 
+     ellipsizeOnBoundary="true"
+     width="352"
+     height="120">
+      <Font
+       role="font"
+       uri="pkg:/fonts/Vaud-SemiBold.ttf"
+       size="33" />
+    </Label>
+  </children>
+</component>

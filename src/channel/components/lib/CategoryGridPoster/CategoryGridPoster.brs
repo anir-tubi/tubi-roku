@@ -9,6 +9,7 @@ Function init()
   m.gridItemTypes = {
     portrait: "portrait"
     landscape: "landscape"
+    linear: "linear"
     vitg_small: "vitg_small"
     vitg_large: "vitg_large"
     utility: "utility"

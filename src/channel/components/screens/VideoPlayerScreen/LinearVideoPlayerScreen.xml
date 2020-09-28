@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="LinearVideoPlayerScreen" extends="BaseScreen" >
+  <script type="text/brightscript" uri="LinearVideoPlayerScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
+
+  <interface>
+  
+    <!-- INPUT -->
+      <!-- Alias fields for the video node -->
+      <field id="position" alias="VideoNode.position"/>
+      <field id="width" alias="VideoNode.width"/>
+      <field id="height" alias="VideoNode.height"/>
+
+      <!-- New content has been added to the video player -->
+      <field id="content" type="node"/>
+      <field id="updateContent" type="boolean" alwaysNotify="true"/>
+      <!-- content that is used to display a channel guide overliad the video player -->
+      <field id="channelsContent" type="node"/>
+
+      <!-- Fields to pass through to AdsSSAITask -->
+      <field id="pollUrl" alias="AdsSSAITask.pollUrl" />
+
+      <!-- Indicator that the outside would like the overlay transports to be closed -->
+      <field id="closeTransport" type="boolean" alwaysNotify="true"/>
+
+      <!-- Is video player currently in fullscreen? -->
+      <field id="fullscreen" type="boolean" value="false"/>
+
+      <!-- Only support play and stop for simple external interface -->
+      <field id="control" type="string" value="none" alwaysNotify="true"/>
+      
+      <field id="transportVoiceRequest" type="assocarray" alwaysNotify="true"/>
+      
+      <!-- interval in seconds for sending position data to the tracking server -->
+      <field id="analyticsInterval" type="integer" value="0"/>
+
+      <!-- State that lets the player know how it is being used, so it can determine
+        -  how it should do tracking.
+        -  Allowed modes are:
+        -  'normal'
+        -  'trailer'
+        -  'autoplay'
+        -->
+      <field id="analyticsMode" type="string" value="normal" />
+
+      <!-- Message shown during ad loading and video loading -->
+      <field id="loadingMessage" alias="LoadingMessage.text" />
+
+      <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
+      <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true"/>
+
+
+    <!-- OUTPUT -->
+      <!-- Set to true if the back button was pressed while the video player has focus -->
+      <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
+      <!-- Set when the video player needs to display the channels listing -->
+      <field id="refreshChannels" type="boolean" alwaysNotify="true" />
+      <!-- If true, then the player is currently playing the channel guide -->
+      <field id="displayingChannelGuide" type="boolean" />
+
+      <field id="state" type="string" />
+      
+      <field id="transportVoiceResponse" type="assocarray" alwaysNotify="true"/>
+
+      <!--When the user selects a new channel from the channel guide, this field is set-->
+      <field id="channelSelected" type="node" alwaysNotify="true"/>
+
+      <!-- Error message to be displayed to the user -->
+      <field id="errorMsg" type="string" />
+
+      <!-- Error message as told by the video node  -->
+      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />   
+
+      <!-- Error code as told by the video node  -->
+      <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
+
+      <!-- We observe the VideoNode state change and when the state = "error", the call back chain of events
+           eventually sets VideoNode.control = "stop". Due to an idiosyncracy in Roku behavior, this prevents
+           the Youbora plugin from observing the error state on the video node, and so, we must manually trigger
+           the Youbora plugin with the error info. The content controller observes this field and sends error info to Youbora.
+      -->
+      <field id="sendYouboraError" type="boolean" alwaysNotify="true" />
+      <field id="sendVideoTrackingStart" type="boolean" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <Video
+      id="VideoNode"
+      width="1920"
+      height="1080"
+      translation="[0,0]"
+      enableUI="false"
+      cgms = "3"
+      enableTrickPlay="false"
+      notificationInterval="0.5"
+      visible="true" />
+
+    <Group
+      id="Loading"
+      visible="false">
+      <Rectangle
+        id="LoadingBackground"
+        color="0x000000FF"
+        width="1920"
+        height="1080"/>
+      <Group
+        id="logoGroup">
+        <Poster
+          id="tubiLogo"
+          width="309"
+          height="135"
+          uri="pkg:/images/logo-white-xlarge.png"
+          loadSync="true"
+          translation="[810,382]"/>
+        </Group>
+      <Label
+        id="LoadingMessage"
+        height="64"
+        width="1920"
+        horizAlign="center"
+        vertAlign="center"
+        translation="[0,606]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="32"/>
+      </Label>
+      <TubiProgressBar
+        id="LoadingProgressBar"
+        width="750"
+        progress="50"
+        trackColor="0xFFFFFF14"
+        translation="[584,696]"/>
+    </Group>
+
+    <Group
+      id="VideoOverlay"
+      opacity="0.0">
+    </Group>
+    
+    <Group
+      id="Overlay1stScreen">
+      <Poster
+        id="TransportGradient"
+        width="1920"
+        height="1080"
+        translation="[0,0]"
+        opacity="0.0"
+        uri="pkg:/images/playback-gradient-fhd.9.png"/>
+      <Poster
+        id="HUDIcon"
+        opacity="0"
+        width="61"
+        height="61"
+        translation="[930,60]"/>
+      <Group
+        id="HUD"
+        visible="true"
+        opacity="0.0" >
+        
+        <Group
+          id="Transport"
+          opacity="1.0">
+
+          <!-- Transport buttons - Transport buttons must be in the order they appear on the screen (from left to right) -->
+          <Group
+            id="TransportButtons" >
+            <LayoutGroup
+              id="ButtonsGroup"
+              layoutDirection="horiz"
+              vertAlignment="center"
+              horizAlignment="center"
+              translation="[960,990]"  
+              itemSpacings="[20]">
+              <IconButton
+                id="ButtonBack"
+                icon="left"/>
+              <IconButton
+                id="ButtonCaptions"
+                icon="up"/>
+              <IconButton
+                id="ButtonChannels"
+                icon="right"/>
+            </LayoutGroup>
+          </Group>
+        </Group>  <!-- Transport -->
+      </Group>  <!-- HUD -->
+    </Group>
+
+    <!-- The following are pages that display upon a selection of a button-->
+    <Group
+      id="Overlay2ndScreen">
+        <ChannelGuide
+          id="channelsGuideGroup"
+          opacity="0"/>
+
+        <!--::TODO::LiveNews - the closed captioning group should be its own component. Do this for v1. -->
+        <Group
+          id="closedCaptioningGroup"
+          opacity="0">
+          <Poster
+            width="1920"
+            height="1080"
+            uri="pkg:/images/gradientBground-closedCaptioning.png"/>
+          <IconButton
+            id="cc_close_btn"
+            translation="[891,865]"
+            icon="down"/>
+          <RowList
+            id="closedCaptioningButtonListBackground"
+            translation="[960,947]"
+            numRows="1"
+            showRowLabel="[false]"
+            itemSize="[1835,72]"
+            showRowCounter="[false]"
+            rowItemSize="[[225,72]]"
+            rowItemSpacing="[[18,0]]"
+            fadeFocusFeedbackWhenAutoScrolling="true"
+            drawFocusFeedbackOnTop="true"
+            focusBitmapUri="pkg://images/menu-focus-fhd.9.png"
+            itemComponentName="LiveNewsCaptioningMenuItem"
+            rowFocusAnimationStyle="floatingFocus"/>
+          <RowList
+            visible="true"
+            id="closedCaptioningButtonList"
+            translation="[960,947]"
+            numRows="1"
+            showRowLabel="[false]"
+            itemSize="[1835,72]"
+            showRowCounter="[false]"
+            rowItemSize="[[225,72]]"
+            rowItemSpacing="[[18,0]]"
+            drawFocusFeedback="false"
+            itemComponentName="LiveNewsCaptioningMenuItem"
+            rowFocusAnimationStyle="floatingFocus"/>
+        </Group>
+    </Group>
+
+    <AdsSSAITask
+      id="AdsSSAITask" />
+
+  </children>
+</component>

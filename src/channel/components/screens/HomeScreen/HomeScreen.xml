@@ -65,6 +65,9 @@
       
       <!-- parentalRating will be set based on global parentalRating updation -->
       <field id="parentalRating" type="integer" value="3"/>
+
+      <!-- The number that is used as how many more seconds until the linear video player will be going fullscreen -->
+      <field id="fullscreenCountdown" type="integer"/>
       
       <!-- kidsModeFeatureOn will be set based device countryCode -->
       <field id="kidsModeFeatureOn" type="boolean" />      
@@ -80,6 +83,9 @@
 
       <!-- set to the tubi content id of the item which was clicked on -->
       <field id="contentSelected" type="node" alwaysNotify="true"/>
+
+      <!-- set to the tubi content of the item which was focused on -->
+      <field id="contentFocused" type="node" alwaysNotify="true"/>
 
       <!-- content on the homescreen is loaded and spinner can be turned off -->
       <field id="contentReady" type="boolean" alwaysNotify="true" />

@@ -14,6 +14,7 @@
     <field id="posterTranslation" alias="BackgroundPoster.translation" />
     <field id="posterOpacity" alias="BackgroundPoster.opacity" />
     <field id="topRightTransitionInControl" alias="TopRightTransitionIn.control" />
+    <field id="linearTransitionInControl" alias="LinearTransitionIn.control" />
     <field id="fullScreenTransitionInControl" alias="FullScreenTransitionIn.control" />
     <field id="fadeInControl" alias="FadeIn.control" />
     <field id="fadeOutControl" alias="FadeOut.control" />
@@ -48,6 +49,31 @@
         id="ShrinkHeightInterpolator"
         key="[0.0,1.0]"
         keyValue="[1091, 909]"
+        fieldToInterp="BackgroundPoster.height" />
+      <FloatFieldInterpolator
+        id="FadeInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[0, 1]"
+        fieldToInterp="BackgroundPoster.opacity" />
+    </Animation>
+    <Animation
+      id="LinearTransitionIn"
+      duration="0.9"
+      easeFunction="inOutCubic">
+      <Vector2DFieldInterpolator
+        id="TranslationInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[[543, -121],[657,0]]"
+        fieldToInterp="BackgroundPoster.translation" />
+      <FloatFieldInterpolator
+        id="ShrinkWidthInterpolator"
+        key="[0.0,1.0]"
+        keyValue="[1615, 1263]"
+        fieldToInterp="BackgroundPoster.width" />
+      <FloatFieldInterpolator
+        id="ShrinkHeightInterpolatonr"
+        key="[0.0,1.0]"
+        keyValue="[909, 710]"
         fieldToInterp="BackgroundPoster.height" />
       <FloatFieldInterpolator
         id="FadeInterpolator"

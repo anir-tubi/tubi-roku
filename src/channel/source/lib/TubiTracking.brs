@@ -292,6 +292,21 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       from_autoplay_automatic: false
     }
 
+    start_live_video: {
+      video_id: -1
+      current_cdn: ""   'not possible for Roku client
+      has_subtitles: false  'the video player will show subtititles at start
+      video_resource_url: ""
+      video_resource_type: ""
+      video_player: ""
+    }
+
+    live_play_progress: {
+      video_id: -1
+      view_time: -1  'ms
+      video_player: ""
+    }
+
     seek: {
       video_id: -1
       from_position: -1  'ms
@@ -360,7 +375,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       ad_finished: {} 'Ad
       video_id: -1
       end_position: -1
-      reason: {} 'Reason enum
+      exit_type: "" 'ExitType enum
     }
 
     dialog: {
@@ -428,7 +443,6 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
   
   if contentNode <> invalid
     tile = {}
-
     ' UtilityTile is used for utility row items
     if contentNode.type = m.constants.ui.categoryTypes.utility
     
@@ -549,10 +563,6 @@ Function tubiTracking_getAnalyticsAdAdriseRainmaker(ctx)
       isInteractive = true
     end if
 
-    if ad.creativeAdId <> invalid
-      adEvent.ad_id = ad.creativeAdId
-      adEvent.creative_id = ad.creativeAdId.toInt()
-    end if
 
     if type(ad.streams) = "roArray" and m.isString(ad.streams[0].url) = true
       adEvent.creative_url = ad.streams[0].url   'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
@@ -566,9 +576,10 @@ Function tubiTracking_getAnalyticsAdAdriseRainmaker(ctx)
       end if
     end if
 
+    if ad.creativeAdId <> invalid then adEvent.ad_id = ad.creativeAdId
+    if ad.creativeId <> invalid then adEvent.creative_id = ad.creativeId.toInt()
     if ad.adVideoId <> invalid then adEvent.ad_video_id = ad.adVideoId
-    if ad.impressionId <> invalid then adEvent.impression_id = ad.impressionId
-    if ad.parentId <> invalid then adEvent.parent_id = ad.parentId
+    if ad.adId <> invalid then adEvent.parent_id = ad.adId
     if ad.duration <> invalid then adEvent.reported_duration = ad.duration * 1000  'ms
     if ctx.adIndex <> invalid then adEvent.index = ctx.adIndex
     if ctx.adCount <> invalid then adEvent.pod_size = ctx.adCount

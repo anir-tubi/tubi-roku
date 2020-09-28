@@ -19,6 +19,7 @@ Function init()
   m.top.observeField("isLoading", "onLoadingChange")
   m.top.observeField("resetContentAreaValues", "onResetContentAreaValues")
   m.top.observeField("id", "onIDChange")
+  m.top.observeField("fullscreenCountdown", "onFullscreenCountdown")
   
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -67,8 +68,11 @@ Function init()
   ' Video in the grid constants
   m.vitgSlideAmt = 440  'the amount the grid slides up to fit the vitg content item
   m.vitgMaskOffsetDiff = 466  'the diff in the amount the content area mask is offset in the up direction for vitg
+  m.linearSlideAmt = -86  'the amount the grid slides up to fit the linear content item
+  m.linearMaskOffsetDiff = -70  'the diff in the amount the content area mask is offset in the up direction for the linear news container
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
+  m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt]
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 
   ' utility row position experiment
@@ -272,28 +276,46 @@ Function onCurrFocusRowChange()
     m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true
   end if
 
-  if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.utility
-    expandMaskOffsetForUtility(rowPercent)
-  else if categoryLosingFocus <> invalid and categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.utility
-    contractMaskOffsetForUtility(rowPercent)
-  else if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-    ' update contentArea translation, only when VITG gain focus
-    expandContentAreaForLargeVitg(rowPercent)
-  else if categoryLosingFocus <> invalid and categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-    ' update contentArea translation, only when VITG lose focus
-    contractContentAreaForLargeVitg(rowPercent)
-  else if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType <> m.constants.ui.gridItemTypes.vitg_large
-    if categoryLosingFocus <> invalid and categoryLosingFocus.gridItemType <> m.constants.ui.gridItemTypes.vitg_large
-      ' In the case of fast scrolling many rows of the grid, across the large vitg row, the category grid list may
-      ' not finish it's translation animation as the focus leaves the vitg row. We correct for that as the focus scolls
-      ' through non video in the grid rows.
-      if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
-        translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.vitgSlideAmt
+  if categoryEnteringFocus <> invalid
+      if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.utility
+        expandMaskOffsetForUtility(rowPercent)
+      else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+        ' update contentArea translation, only when VITG gain focus
+        expandContentAreaForLargeVitg(rowPercent)
+      else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
+        ' update contentArea translation, only when linear gain focus
+        expandContentAreaForLinear(rowPercent)
+      else
+        ' In the case of fast scrolling many rows of the grid, across the large vitg or linear rows, the category grid list may
+        ' not finish it's translation animation as the focus leaves the vitg or linear rows. We correct for that as the focus scolls
+        ' through non video in the grid rows.
+        if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
+          if categoryLosingFocus <> invalid
+            if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+              translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.vitgSlideAmt
 
-        if rowPercent > (1 - translationDiffPercent)
-          contractContentAreaForLargeVitg(rowPercent)
+              if rowPercent > (1 - translationDiffPercent)
+                contractContentAreaForLargeVitg(rowPercent)
+              end if
+            else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.linear
+              translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.linearSlideAmt
+
+              if rowPercent > (1 - translationDiffPercent)
+                contractContentAreaForLinear(rowPercent)
+              end if
+            end if
+          end if
         end if
       end if
+  else if categoryLosingFocus <> invalid
+    if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.utility
+      contractMaskOffsetForUtility(rowPercent)
+    else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+      ' update contentArea translation, only when VITG lose focus
+      contractContentAreaForLargeVitg(rowPercent)
+    else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.linear
+      ' update contentArea translation, only when Linear lose focus
+      contractContentAreaForLinear(rowPercent)
     end if
   end if
   
@@ -333,6 +355,18 @@ Function contractContentAreaForLargeVitg(rowPercent)
 End Function
 
 
+Function expandContentAreaForLinear(rowPercent)
+  m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.linearSlideAmt * rowPercent)]
+  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.linearMaskOffsetDiff * rowPercent)]
+End Function
+
+
+Function contractContentAreaForLinear(rowPercent)
+  m.ContentArea.translation = [m.linearContentAreaTranslation[0], m.linearContentAreaTranslation[1] + (m.linearSlideAmt * rowPercent)]
+  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] - (m.linearMaskOffsetDiff * (1 - rowPercent))]
+End Function
+
+
 '''''''''''''''''''''
 ' onGridFocusChange
 '
@@ -345,15 +379,18 @@ Function onGridFocusChange() As Void
 
   oldFocusedContent = m.CategoryGridList.oldItemFocused
   focusedContent = m.CategoryGridList.itemFocused
-  
+  m.top.contentFocused = focusedContent
+
   if focusedContent <> invalid
     if focusedContent.type = m.constants.ui.categoryTypes.utility
       populateInfoPanel("utility", focusedContent)
+    else if focusedContent.type = m.constants.ui.categoryTypes.linear
+      populateInfoPanel("linear", focusedContent)
     else
       populateInfoPanel("item", focusedContent)
     end if
   end if
-
+ 
   ' If focus is on an empty category, leave the background as is.  This helps avoid
   ' background jank and keeps CPU usage down while categories are being fetched.
   if focusedContent <> invalid
@@ -463,6 +500,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.titleLogoUri = contentNode.logoUri
+      m.InfoPanel.width = 1140
     else if mode = "item"
       m.InfoPanel.mode = "item"
       m.InfoPanel.title = contentNode.title
@@ -485,16 +523,26 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.lineOneData = lineOneData
       m.InfoPanel.titleLogoUri = contentNode.titleLogoUri
       m.InfoPanel.genres = contentNode.genres
+      m.InfoPanel.width = 1140
     else if mode = "utility"
       m.InfoPanel.mode = "utility"
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
+      m.InfoPanel.width = 1140
+    else if mode = "linear"
+      m.InfoPanel.mode = "linear"
+      m.InfoPanel.title = contentNode.title
+      m.InfoPanel.description = contentNode.description
+      m.InfoPanel.width = 650
     end if
-
     m.InfoPanel.calculateHeight = true
   end if
 End Function
 
+
+Function onFullscreenCountdown()
+  m.InfoPanel.fullscreenCountdown = m.top.fullscreenCountdown 
+End Function
 
 Function onCategoryRefreshTimer()
   tubiLog("HomeScreen.onCategoryRefreshTimer")

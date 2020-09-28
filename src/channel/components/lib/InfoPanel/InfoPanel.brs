@@ -2,6 +2,7 @@ Function init()
   m.nodeHelpers = TubiNodeHelpers()
   m.TitleGroup = m.top.findNode("TitleGroup")
   m.Title = m.top.findNode("Title")
+  m.LiveVideoIndicator = m.top.findNode("LiveVideoIndicator")
   m.TitleLogo = m.top.findNode("TitleLogo")
   m.Episode = m.top.findNode("Episode")
   m.CategoryDetails = m.top.findNode("CategoryDetails")
@@ -21,6 +22,8 @@ Function init()
   m.DirectorGroup = m.top.findNode("DirectorGroup")
   m.StarringGroup = m.top.findNode("StarringGroup")
   m.Starring = m.top.findNode("Starring")
+  m.PlayerCountdownGroup = m.top.findNode("PlayerCountdownGroup")
+  m.CountdownText = m.top.findNode("CountdownText")
   m.Offset = m.top.findNode("Offset")
   m.PartnerLogo = m.top.findNode("PartnerLogo")
   m.ExpireWarning = m.top.findNode("ExpireWarning")
@@ -37,6 +40,7 @@ Function init()
   m.top.observeField("starring", "onStarringChange")
   m.top.observeField("seasonEpisodeCount", "onSeasonEpisodeCountChange")
   m.top.observeField("categoryContentCount", "onCategoryContentCountChange")
+  m.top.observeField("fullscreenCountdown", "onPlayerCountDownChange")
   m.top.observeField("calculateHeight", "onCalculateHeight")
   m.top.observeField("focusedChild", "onComponentFocus")
   m.PartnerLogo.observeField("loadStatus", "onPosterLoadStatus")
@@ -103,10 +107,14 @@ End Function
 ' setting each width here so that the children don't go beyond the right edge.
 Function onWidthChange()
   tubiLog("InfoPanel.onWidthChange")
-  if m.TitleLogo.visible = true
-    m.Title.width = m.top.width - m.Title.translation[0] - m.TitleGroup.itemSpacings[0] - m.TitleLogo.width - m.TitleLogo.translation[0]
-  else
-    m.Title.width = m.top.width - m.Title.translation[0]
+
+  if m.Title.width <> 0
+    '//if the title is set to 0, then we do not want to make changes to the width of the title
+    if m.TitleLogo.visible = true
+      m.Title.width = m.top.width - m.Title.translation[0] - m.TitleGroup.itemSpacings[0] - m.TitleLogo.width - m.TitleLogo.translation[0]
+    else
+      m.Title.width = m.top.width - m.Title.translation[0]
+    end if
   end if
   m.Episode.width = m.top.width - m.Episode.translation[0]
   categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
@@ -331,6 +339,17 @@ Function onCategoryContentCountChange()
 End Function
 
 
+Function onPlayerCountDownChange()
+  tubiLog("InfoPanel.onPlayerCountDownChange")
+  if m.top.fullscreenCountdown >= 0
+    m.PlayerCountdownGroup.visible = true
+    m.CountdownText.text = getTranslation("metadata_fullscreen_countdown_plural", {seconds: m.top.fullscreenCountdown.toStr()})  
+  else
+    m.PlayerCountdownGroup.visible = false
+  end if
+End Function
+
+
 Function onCalculateHeight()
   tubiLog("InfoPanel.onCalculateHeight")
   topMargin = 15
@@ -407,7 +426,14 @@ Function onModeChange()
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [15]  
+  else if m.top.mode = "linear" then
+    m.Offset.appendChild(m.LiveVideoIndicator)
+    m.Offset.appendChild(m.TitleGroup)
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.Offset.appendChild(m.PlayerCountdownGroup)
+    m.Offset.itemSpacings = [25,15]  
   end if
+  
 End Function
 
 

@@ -57,6 +57,8 @@ Function init()
   m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
   m.global.addField("trackingLoggingTask", "node", false)
   m.global.trackingLoggingTask = m.trackingLoggingTask
+
+  m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
   
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.constants.ui.colors.backgroundColor
@@ -136,10 +138,14 @@ Function init()
   initSideNav()
   
   m.spinner = m.top.findNode("ContentControllerSpinner")
+  m.LinearVideoPlayerSpinner = m.top.findNode("LinearVideoPlayerSpinner")
 
   m.inactivityTimer = m.top.findNode("InactivityTimer")
   m.inactivityTimer.observeFieldScoped("fire", "onInactivityTimer")
   m.inactivityTimer.control = "start"
+
+
+  m.playerFullscreenCountdownTimer = m.top.findNode("PlayerFullscreenCountdownTimer")
   
   m.appLoadStopwatch = CreateObject("roTimespan")
 
@@ -345,6 +351,7 @@ Function onVideoPlayerVisibleChange(msg)
 End Function
 
 
+
 Function onInactivityTimer()
   ' don't do anything in this function for now
   ' but leave inactivity timer functionality in case it's needed in the future.
@@ -521,7 +528,11 @@ Function onInputInfoReceived()
       if videoPlayer <> invalid
         videoPlayer.transportVoiceRequest = inputInfo
       else
-        transportVoiceResponse = m.top.transportVoiceRequest
+        if m.top.transportVoiceRequest <> invalid
+          transportVoiceResponse = m.top.transportVoiceRequest
+        else
+          transportVoiceResponse = {}
+        end if
         transportVoiceResponse.response = "unhandled"
         m.top.transportVoiceResponse = transportVoiceResponse
       end if
@@ -1052,9 +1063,18 @@ End Function
 Function homeScreenBackgroundUpdated(msg)
   tubiLog("ContentController.homeScreenBackgroundUpdated")
   homeScreen = msg.getRoSGNode()
+  setHomeScreenBackground(homeScreen)
+End Function
+
+
+Function setHomeScreenBackground(homeScreen)
   if homeScreen <> invalid and currentScreen() <> invalid and currentScreen().isSubType("HomeScreen")
+    contentType = invalid
+    if homeScreen.contentFocused <> invalid
+      contentType = homeScreen.contentFocused.type
+    end if
     m.backgroundGroup.backgroundInfo = {
-      type: getBackgroundtype(homeScreen.backgroundUriList)
+      type: getBackgroundtype(homeScreen.backgroundUriList, contentType)
       uriList: homeScreen.backgroundUriList
     }
   end if
@@ -1116,10 +1136,13 @@ End Function
 '
 ' Helper function to get the background type depending on if passed in uri list is using the default image
 ' @backgroundUriList, array of uris
-Function getBackgroundtype(backgroundUriList)
+' @contentType, String - depending on the focused on content, it will determine the background type
+Function getBackgroundtype(backgroundUriList, contentType = "")
   if backgroundUriList <> invalid
     if backgroundUriList[0] = m.defaultBackgroundUri
       backgroundType = m.constants.ui.backgroundTypes.fullScreen
+    else if contentType = m.constants.ui.contentTypes.linear
+      backgroundType = m.constants.ui.backgroundTypes.linear
     else
       backgroundType = m.constants.ui.backgroundTypes.topRight
     end if
@@ -1184,11 +1207,11 @@ End Function
 ' showHideSpinner - shows/hides the loading spinner/text
 ' 
 '@visible : boolean - true/false
-function showHideSpinner(visible)
+Function showHideSpinner(visible)
 
   m.spinner.visible = visible
 
-end function
+End Function
 
 
 Function onUiGroupFadeStateChange(msg)

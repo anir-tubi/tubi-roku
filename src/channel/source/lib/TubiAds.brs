@@ -10,7 +10,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   roAdFramework.enableNielsenDAR(true)
 
   'set the Nielsen application id for Tubi TV
-  roAdFramework.setNielsenAppId("PB8C78BDD-9B1B-4020-B4DD-AE7917C0F396")
+  roAdFramework.setNielsenAppId(constants.thirdParty.nielsenToken)
 
   'turn on debug output for RAF
   roAdFramework.setDebugOutput(false)
@@ -56,6 +56,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     getResumingPlayAds: tubiAds_getResumingPlayAds
     populateUrlAdrise: tubiAds_populateUrlAdrise
     populateUrlRainmaker: tubiAds_populateUrlRainmaker
+    getRainmakerParams: tubiAds_getRainmakerParams
     adBufferingCallback: tubiAds_adBufferingCallback
     adTrackingCallback: tubiAds_adTrackingCallback
     trackUserEvent: tubiAds_trackUserEvent
@@ -211,11 +212,26 @@ end function
 ' For API details, please see https://tubitv.atlassian.net/wiki/spaces/EC/pages/863273074/Rainmaker+-+Request+Parameters
 ' ----------------------------------------------
 function tubiAds_populateUrlRainmaker(episode) As String
+  params = m.getRainmakerParams(episode)
+  baseUrl = m.constants.urls.adsBaseUrlRainmaker + m.constants.analyticsPlatform
+
+  return m.request.addParamsToUrl(baseUrl, params)
+end function
+
+
+' returns an assocArray of all parameters that should be sent to rainmaker
+' @content: node, TubiContentNode for a video (movie or episode)
+Function tubiAds_getRainmakerParams(content)
   'create the url to be used for ad calls'
+  nowPos = content.nowpos
+  if nowPos = invalid
+    nowPos = 0
+  end if
+  
   params = {
-    content_id: episode.id
-    pub_id: episode.pubId
-    now_pos: episode.nowpos.ToStr()
+    content_id: content.id
+    pub_id: content.pubId
+    now_pos: content.nowpos.ToStr()
     content_type: m.adContentType
     device_id: m.constants.deviceInfo.deviceId
     model: m.constants.deviceInfo.model
@@ -248,10 +264,8 @@ function tubiAds_populateUrlRainmaker(episode) As String
     params["user_id"] = authInfo.userId
   end if
 
-  baseUrl = m.constants.urls.adsBaseUrlRainmaker + m.constants.analyticsPlatform
-
-  return m.request.addParamsToUrl(baseUrl, params)
-end function
+  return params
+End Function
 
 
 ' ----------------------------------------------
@@ -583,8 +597,6 @@ Function tubiAds_enhanceCtx(ctx)
   if ctx.ad <> invalid and ctx.ad.clickThrough <> invalid
     adInfo = ParseJson(ctx.ad.clickThrough)
     if type(adInfo) = "roAssociativeArray"
-      ctx.ad.parentId = adInfo.request_id
-      ctx.ad.impressionId = adInfo.impression_id
       if adInfo.ad_video_id <> invalid
         ctx.ad.adVideoId = adInfo.ad_video_id.toStr()
       end if

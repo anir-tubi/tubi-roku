@@ -19,10 +19,13 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
+    homeScreen.observeFieldScoped("contentFocused", "onHomeScreenContentFocused")
+    homeScreen.observeFieldScoped("focusedChild", "onHomeScreenFocusChanged")
 
     
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
+    m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
     sContentMode = constants.ui.screenIds.homeScreen
     if screenID = constants.ui.screenIds.homeScreen
@@ -161,7 +164,7 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
           dialogEvent =  {
             type: "dialog"
             values: {
-              dialog_type: "NETWORK_ERROR" 'DialogType enum - TODO: Update this when a "PLAYER_ERROR" value becomes available in protos
+              dialog_type: "PLAYER_ERROR"
               pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
               dialog_action: "SHOW"
               dialog_sub_type: errorCode
@@ -344,6 +347,103 @@ Function retryCategoryList()
 End Function
 
 
+Function onHomeScreenFocusChanged(msg)
+  tubiLog("HomeScreenHelpers.onHomeScreenFocusChanged")
+  homeScreen = msg.getRoSGNode()
+  if homeScreen.isInFocusChain() = false
+    '//If the homescreen loses focus, then stop the linear video player in case it is playing
+    stopCountdownTimer()
+    if currentScreen() = invalid or currentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+      '//If the video player has gained focus, then don't stop it.
+      stopAndHideLinearVideoPlayer()
+    end if
+  end if
+End Function
+
+
+'// when a new item is focused on, then do something
+Function onHomeScreenContentFocused(msg)
+  tubiLog("HomeScreenHelpers.onHomeScreenContentFocused")
+  focusedContent = msg.getData()
+  homeScreen = msg.getRoSGNode()
+
+  if focusedContent <> invalid
+    stopCountdownTimer()
+    if focusedContent.type = m.constants.ui.categoryTypes.linear
+      '//Send experiment exposure event if this is the 1st time the user has focused on the live news row
+      getExperimentResource("roku_live_video_v1", "roku_live_news_v1")
+      
+      bPlayVideo = true
+      linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+      if linearVideoPlayer <> invalid and linearVideoPlayer.content <> invalid 
+        if linearVideoPlayer.content.id = focusedContent.id and linearVideoPlayer.state = "playing"
+          '//No need to play the video. It already is playing the video
+          bPlayVideo = false
+        end if
+      end if
+      if bPlayVideo = true
+        '//If player is currently not playing the current content, then display background and tell player to load and play the video associated with the focused item
+        m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
+        playLinearVideoContent(focusedContent)
+      else 
+        startCountdownTimer()
+        m.backgroundGroup.posterVisible = false
+      end if
+    else 
+      stopAndHideLinearVideoPlayer()
+    end if
+  end if
+End Function
+
+
+Function onFullscreenCountdown()
+  tubiLog("HomeScreenHelpers.onFullscreenCountdown")
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    nCurrentCount = homeScreen.fullscreenCountdown
+    nNewCount = nCurrentCount - 1
+    homeScreen.fullscreenCountdown = nNewCount
+    if nNewCount <= 0
+      selectLinearContent(homeScreen.contentFocused)
+    end if
+  end if
+End Function
+
+
+' Select the Linear content that is currently focused
+Function selectLinearContent(content)
+  tubiLog("HomeScreenHelpers.selectLinearContent()") 
+
+  '//stop timer and tell player to go fullscreen   
+  stopCountdownTimer()
+  if content <> invalid and content.type = m.constants.ui.contentTypes.linear
+    playLinearVideoContent(content, false)
+  end if
+End Function
+
+
+Function stopCountdownTimer()
+  tubiLog("HomeScreenHelpers.stopCountdownTimer")  
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    homeScreen.fullscreenCountdown = -1
+  end if
+  m.playerFullscreenCountdownTimer.control = "stop"
+End Function
+
+
+Function startCountdownTimer()
+  tubiLog("HomeScreenHelpers.stopCountdownTimer")  
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    stopCountdownTimer()
+    '//Start/reset timer to play video in fullscreen after a few seconds
+    homeScreen.fullscreenCountdown =  m.constants.timers.linearFullscreenTimeout
+    m.playerFullscreenCountdownTimer.control = "start"
+  end if
+End Function
+
+
 ' Show the detail screen for the selected content
 Function onContentSelected(msg)
   tubiLog("HomeScreenHelpers.onContentSelected")
@@ -355,6 +455,8 @@ Function onContentSelected(msg)
     showChannelScreen(content, "HOME")
   else if content.type = "utility"
     onUtilityItemSelected(content)
+  else if content.type = m.constants.ui.contentTypes.linear
+    selectLinearContent(content)
   else
     showDetailScreen(content, true)
   end if

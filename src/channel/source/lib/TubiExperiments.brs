@@ -44,6 +44,8 @@ Function TubiExperiments(constants) as Object
       }
       rokunamespace: {
       }  
+      roku_live_video_v1: {
+      }
       roku_utility_row : {
       }
       roku_utility_v2 : {
@@ -60,6 +62,9 @@ Function TubiExperiments(constants) as Object
       }
       rokunamespace: {
       }
+      roku_live_video_v1: {
+        roku_live_news_v1 : {"has_live_news" : false}
+      }
       roku_utility_row : {
         roku_utility_row_v1 : {"has_utility_row" : false, "position" : 4}
       }
@@ -70,6 +75,7 @@ Function TubiExperiments(constants) as Object
         roku_discovery_row_v2 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}
       }               
     }
+    
 
     'public methods
     init: tubiExperiments_init

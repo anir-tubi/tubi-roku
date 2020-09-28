@@ -219,12 +219,13 @@ Function getConstants()
     constants.reqNames.getRelatedContent = "getRelatedContent"
     constants.reqNames.getThumbnails = "getThumbnails"
     constants.reqNames.getChannel = "getChannel"
-
-  'Nielsen ID token for integrating with Nielsen DAR
-  constants.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
+    constants.reqNames.getSSAIAds = "getSSAIAds"
+    constants.reqNames.getLiveManifest = "getLiveManifest"
 
   constants.thirdParty = {}
-    constants.thirdParty.nielsenToken = "PC60BD376-8551-4688-BEF4-E8B45A39D4C7"
+    'Nielsen ID token for integrating with Nielsen DAR via RAF
+    constants.thirdParty.nielsenToken = "PB8C78BDD-9B1B-4020-B4DD-AE7917C0F396"
+
     constants.thirdParty.youbora = {}
       constants.thirdParty.youbora.enabled = false
       constants.thirdParty.youbora.debug = false
@@ -421,6 +422,9 @@ Function getConstants()
     ' Time in seconds after which we force a refresh of the categoryscreen
     constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
 
+    ' Time in seconds after which the linear video player goes fullscreen
+    constants.timers.linearFullscreenTimeout = 10
+
   'constants needed for the video player
   constants.player = {}
 
@@ -524,6 +528,8 @@ Function getConstants()
     constants.cacheTimes.homescreen = 6 * 60 * 60 ' Time in seconds after which the category screen's cache is not valid
 
   'This will store the error codes that are needed to be displayed to the user. 
+  'Review the following page to see the list of error codes that are used across platforms:
+  'https://tubitv.atlassian.net/wiki/spaces/EC/pages/798359880/User+Facing+Error+Codes 
   constants.errors = {}
 
   '//Where does the error happen?
@@ -538,7 +544,7 @@ Function getConstants()
   constants.errors.context.activateScreen = "8"
   constants.errors.context.channelsScreen = "9"
   constants.errors.context.categoriesScreen = "10"
-  constants.errors.context.kidsMode = "11"
+  constants.errors.context.linearPlayerScreen = "11"
 
   '//What is the actual error?
   constants.errors.subtypes = {}
@@ -631,6 +637,7 @@ Function getConstants()
       constants.ui.categoryTypes.queue = "queue"
       constants.ui.categoryTypes.regular = "regular"
       constants.ui.categoryTypes.channel = "channel"
+      constants.ui.categoryTypes.linear = "linear"
       constants.ui.categoryTypes.preview = "video_preview"
       constants.ui.categoryTypes.utility = "utility"
 
@@ -647,10 +654,12 @@ Function getConstants()
       constants.ui.contentTypes.category = "category"
       constants.ui.contentTypes.channel = "channel"
       constants.ui.contentTypes.utility = "utility"
+      constants.ui.contentTypes.linear = "linear"
 
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
       constants.ui.backgroundTypes.topRight = "topright"
+      constants.ui.backgroundTypes.linear = "linear"
       constants.ui.backgroundTypes.feature = "feature"
 
     'Screen levels dictate the hierarchy of the app and prevent scenarios where users can get into infinite screen loops.
@@ -671,6 +680,7 @@ Function getConstants()
       constants.ui.screenLevels.detailScreen = 50
       constants.ui.screenLevels.episodeScreen = 50
       constants.ui.screenLevels.videoPlayerScreen = 60
+      constants.ui.screenLevels.linearVideoPlayerScreen = 60
       constants.ui.screenLevels.activationCodeScreen = 100
       constants.ui.screenLevels.landingScreen = 99
       constants.ui.screenLevels.unlimitedScreen = 110
@@ -699,6 +709,7 @@ Function getConstants()
       constants.ui.screenIds.upNextScreen = "upNextScreen"
       constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
+      constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
@@ -709,6 +720,7 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.videoPlayerScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.linearVideoPlayerScreen] = true
 
     constants.ui.imageSizes = {}
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
@@ -719,6 +731,13 @@ Function getConstants()
 
       'Sizes of landscape VITG that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.largeVITG = [1248,701]
+
+      'Sizes of the linear background and minmized linear video player
+      constants.ui.imageSizes.linearVideoPlayer_minimizedDimension = [1263,710]
+
+    constants.ui.imageTranslations = {}
+      'Location of the linear background and minmized linear video player
+      constants.ui.imageTranslations.linearVideoPlayer_minimizedTranslation = [657,0]
 
     constants.ui.sideNavOpenIds = {}
       constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true
@@ -769,6 +788,7 @@ Function getConstants()
     constants.ui.gridItemTypes = {}
       constants.ui.gridItemTypes.portrait = "portrait"
       constants.ui.gridItemTypes.landscape = "landscape"
+      constants.ui.gridItemTypes.linear = "linear"
       constants.ui.gridItemTypes.vitg_small = "vitg_small"  'video in the grid
       constants.ui.gridItemTypes.vitg_large = "vitg_large"  'video in the grid
       constants.ui.gridItemTypes.utility = "utility"

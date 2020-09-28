@@ -227,6 +227,10 @@ Function getTranslation_en_US()
       "description": "Label of the dialog button to confirm the action the dialog is asking",
       "message": "OK"
     },
+    "dialog_button_off": {
+      "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
+      "message": "Off"
+    },
     "dialog_button_yes": {
       "description": "Label of the dialog button to confirm the action the dialog is asking",
       "message": "Yes"
@@ -615,6 +619,10 @@ Function getTranslation_en_US()
       "description": "Onscreen message to indicate home content could not be loaded",
       "message": "Unable to load Tubi home screen."
     },
+    "channelGuide_error_fetchContent_description": {
+      "description": "Onscreen message to indicate channel Guide content could not be loaded",
+      "message": "Unable to load the Channel Guide."
+    },
     "screenDetails_button_trailer": {
       "description": "Label of button to allow users to watch a preview of the current video title",
       "message": "Watch Trailer"
@@ -634,6 +642,10 @@ Function getTranslation_en_US()
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
       "message": "Resume"
+    },
+    "metadata_fullscreen_countdown_plural": {
+      "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
+      "message": "Fullscreen in {seconds} sec"
     },
     "metadata_expiresIn_plural": {
       "description": "label to indicate how long the user have to watch a video",
@@ -710,6 +722,22 @@ Function getTranslation_en_US()
     "videoPlayer_adHeadsUp": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "AD Break starts in {seconds} s"
+    },
+    "linearVideoPlayer_buttonBack": {
+      "description": "Label of a Button to go back",
+      "message": "Back"
+    },
+    "linearVideoPlayer_buttonCaptions": {
+      "description": "Label of a Button to display the closed captions",
+      "message": "Captions"
+    },
+    "linearVideoPlayer_buttonGuide": {
+      "description": "Label of a Button to view the channel guide",
+      "message": "Guide"
+    },
+    "linearVideoPlayer_channelGuideTitle": {
+      "description": "The title displayed above a list of live news channels",
+      "message": "Channel Guide"
     },
     "goBack_categories": {
       "description": "Navigational instructions to users on what the back button does on the current page",

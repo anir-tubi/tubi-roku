@@ -14,11 +14,18 @@
   </interface>
   
   <children>
+    <Poster
+      id="newIcon"
+      loadSync="true"
+      width="71"
+      height="37"
+      visible="false"
+      uri="pkg:/images/icon-new.png"/>
     <Label
       id="CategoryName"
-      height="49"
+      height="59"
       width="1000"
-      translation="[0,0]"
+      translation="[0,5]"
       color="0xFFFFFFFF"
       opacity="1.0">
       <Font
@@ -34,7 +41,7 @@
       <Label
         id="FocusIndex"
         text=""
-        height="49"
+        height="59"
         horizAlign="right">
         <Font
           role="font"
@@ -44,7 +51,7 @@
       <Label
         id="ItemCount"
         text=""
-        height="49"
+        height="59"
         horizAlign="right">
         <Font
           role="font"

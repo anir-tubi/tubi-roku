@@ -164,6 +164,7 @@ Function cmsApi_getChannelsCategoriesScreenRequest(bKidsMode = false)
   return m.homeScreenReq(0, bKidsMode, {}, 1)
 End Function
 
+
 '''''''''''''''''''''
 ' homeScreenReq()
 '
@@ -178,7 +179,16 @@ Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, params = {}, expa
   '//update options.params based on the passed in params AA
   m.setImageParams_(params, options.params)
 
+  if getExperimentResource("roku_live_video_v1", "roku_live_news_v1", false).has_live_news = true
+    '//request and display live news if the experiement calls for it.
+    if options.headers = invalid
+      options.headers = {}
+    end if
+    options.headers.["x-tubi-inject-live-news"] = "true"
+  end if
+  
   options.params["includeEmpty"] = true
+  
   options.params.limit = limit
   if params <> invalid and params.contentMode <> invalid and params.contentMode <> ""
     options.params["contentMode"] = params.contentMode

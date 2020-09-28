@@ -3,6 +3,8 @@ Function init()
   m.top.opacity = "0.8"
   m.top.observeField("width", "onDimensionsChange")
   m.top.observeField("height", "onDimensionsChange")
+  m.top.observeField("horizAlign", "onDimensionsChange")
+  m.top.observeField("vertAlign", "onDimensionsChange")
 
   ' Non-OpenGL slow devices look really poor with clunky spinner
   ' https://developer.roku.com/en-gb/docs/specs/hardware.md
@@ -50,10 +52,19 @@ Function onDimensionsChange()
   ' max size 66x66 for spinner graphic
   spinner = m.top.findNode("SpinnerPoster")
   message = m.top.findNode("LoadingMessage")
+  message.horizAlign = m.top.horizAlign
   
-  rectMessage = calculateRect(m.top.width * .6, 66)
+  rectMessage = calculateRect(m.top.width * .6, 30)
   message.width = rectMessage.width
+
+  '//center is the default value for the message
   nMessageX = (m.top.width - rectMessage.width) / 2 '//ensure the message is center - assuming the text of the message is centered aligned
+  if m.top.horizAlign = "right"
+    nMessageX = m.top.width - rectMessage.width
+  else if m.top.horizAlign = "left"
+    nMessageX = 0
+  end if
+  
   message.height = rectMessage.height
   if spinner.visible
     rect = calculateRect(66, 66)
@@ -71,26 +82,43 @@ Function onDimensionsChange()
       spinner.translation = [rect.x, rect.y]
     end if
   else
-    message.translation = [nMessageX, rectMessage.y]
+    '//center is the default value for the message
+    nMessageY = rectMessage.y '//ensure the message is center - assumes the text of the message is centered aligned by default
+    if m.top.vertAlign = "bottom"
+      nMessageY = m.top.height - rectMessage.height
+    else if m.top.vertAlign = "top"
+      nMessageY = 0
+    end if
+    message.translation = [nMessageX, nMessageY]
   end if
-End Function
-
-
-' Get a bounding rect of a centered square with boundary of max size 'max'. If the max is greater
-' than the total size of this Spinner component, the component size is used
-Function calculateRect(maxWidth, maxHeight)
+  End Function
+  
+  
+  ' Get a bounding rect of a square with boundary of max size 'max'. Alignment should be dictated by the vertAlign and horizAlign values.
+  ' If the max is greater than the total size of this Spinner component, the component size is used
+  Function calculateRect(maxWidth, maxHeight)
   if m.top.width < maxWidth
     x = 0
     width = m.top.width
   else
-    x = (m.top.width - maxWidth) / 2
+    x = (m.top.width - maxWidth) / 2  '//center is the default value
+    if m.top.horizAlign = "right"
+      x = m.top.width - maxWidth
+    else if m.top.horizAlign = "left"
+      x = 0
+    end if
     width = maxWidth
   end if
   if m.top.height < maxHeight
     y = 0
     height = m.top.height
   else
-    y = (m.top.height - maxHeight) / 2
+    y = (m.top.height - maxHeight) / 2  '//center is the default value
+    if m.top.vertAlign = "bottom"
+      y = m.top.height - maxHeight
+    else if m.top.vertAlign = "top"
+      y = 0
+    end if
     height = maxHeight
   end if
   return { x: x, y: y, width: width, height: height }

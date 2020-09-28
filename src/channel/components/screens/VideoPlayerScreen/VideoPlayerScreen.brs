@@ -950,12 +950,12 @@ Function updateVideoPlayerState(content) as Void
     episodeTitle.text = ""
   end if
 
-  'there are no subtitles so grey out the captions button
+  'there are no subtitles so gray out the captions button
   if content.subtitleTracks = invalid or content.subtitleTracks.count() = 0
     m.TransportButtons.removeChild(m.ClosedCaption)
     m.ClosedCaptionDisabled.visible = true
 
-  'there are subtitles, so check if captions button has been greyed out previously
+  'there are subtitles, so check if captions button has been grayed out previously
   else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.ClosedCaption) < 0
     m.TransportButtons.appendChild(m.ClosedCaption)
     m.ClosedCaptionDisabled.visible = false

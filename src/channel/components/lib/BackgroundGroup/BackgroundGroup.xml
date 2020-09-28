@@ -11,14 +11,18 @@
   <script type="text/brightscript" uri="BackgroundGroup.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />  
   
   <interface>
+    <!-- INPUT -->
     <!-- backgrondInfo has the keys "type (string)" and "uriList (array)".
-         type can be "topright", "fullscreen"
+         type can be "topright", "fullscreen", "linear"
          uriList is an array of background image uris
     -->
     <field id="backgroundInfo" type="assocarray" />
     <field id="kidsMode" type="boolean" />
+    <!--Tell the Background Group to hide or display the poster artwork-->
+    <field id="posterVisible" type="boolean" value="true" />
   </interface>
 
   <children>
@@ -26,20 +30,34 @@
       id="background"
       width="1920"
       height="1080"/>
-    <BackgroundPosterGroup
-      id="Poster1"
-      posterOpacity="0.0" />
-    <BackgroundPosterGroup
-      id="Poster2"
-      posterOpacity="1.0"
-      uri="pkg:/images/art-blur-background.png" />
-    <BackgroundGradientGroup
-      id="FullScreenGradient"
-      uri="pkg:/images/detail-gradient-25.png"
-      gradientOpacity="1.0"/>
-    <BackgroundGradientGroup
-      id="TopRightGradient"
-      uri="pkg:/images/home-gradient-25.png"
-      gradientOpacity="0.0"/>
+    <Group
+      id="PosterGroup">
+      <BackgroundPosterGroup
+        id="Poster1"
+        posterOpacity="0.0" />
+      <BackgroundPosterGroup
+        id="Poster2"
+        posterOpacity="1.0"
+        uri="pkg:/images/art-blur-background.png" />
+    </Group>
+    <Group
+      id="GradientGroup">
+      <BackgroundGradientGroup
+        id="FullScreenGradient"
+        uri="pkg:/images/detail-gradient-25.png"
+        gradientOpacity="1.0"/>
+      <BackgroundGradientGroup
+        id="TopRightGradient"
+        uri="pkg:/images/home-gradient-25.png"
+        gradientOpacity="0.0"/>
+      <BackgroundGradientGroup
+        id="LinearGradient1"
+        uri="pkg:/images/horizGradientStrip.png"
+        gradientOpacity="0.0"/>
+      <BackgroundGradientGroup
+        id="LinearGradient2"
+        uri="pkg:/images/vertGradientStrip.png"
+        gradientOpacity="0.0"/>
+    </Group>
   </children>
 </component>

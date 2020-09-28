@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - AdsTask
+ -
+ -->
+<component name="AdsSSAITask" extends="Task">
+    <script type="text/brightscript" uri="AdsSSAITask.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiAds.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/YoSpaceId3s.brs" />
+    <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+
+    <interface>
+      <!-- INPUT -->
+        <field id="pollUrl" type="string" />
+        <field id="videoPosition" type="float" />
+        <field id="id3Tags" type="assocarray" />
+        <field id="content" type="node" />
+        <field id="updateContent" type="boolean" />
+        <field id="videoIsFullscreen" type="boolean" />
+        <field id="exit" type="boolean" />
+
+      <!-- OUTPUT -->
+        <field id="videoResourcesWithAdParams" type="array" />
+        <field id="isPlayingAds" type="boolean" value="false" />
+        <field id="isPlayingAdFiller" type="boolean" value="false" />
+    </interface>
+</component>

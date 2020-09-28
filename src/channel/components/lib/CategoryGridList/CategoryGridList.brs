@@ -163,6 +163,10 @@ Function setRowHeights()
       rowItemSize.push([posterWidth, posterHeight])
       rowHeights.push(posterHeight + rowHeightAdjustment)
       showRowLabel.push(true)
+    else if category.gridItemType = m.constants.ui.gridItemTypes.linear
+      rowItemSize.push([408,138])
+      rowHeights.push(250)
+      showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.landscape or category.gridItemType = m.constants.ui.gridItemTypes.vitg_small
       posterWidth = m.constants.ui.imageSizes.landscape[0]
       posterHeight = m.constants.ui.imageSizes.landscape[1]

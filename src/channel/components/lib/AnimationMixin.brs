@@ -80,6 +80,37 @@ End Function
 
 
 '''''''''''''
+' resize
+'
+' animate the width and height of the target simultaneously
+Function resize(target As Object, width As Float, height As Float, duration As Float, delay=0.0 As Float)
+  animationOptions = {
+    duration: duration
+    delay: delay
+    width: width
+    height: height
+  }
+  return animate(target, animationOptions)
+End Function
+
+
+'''''''''''''
+' resizeToLocation
+'
+' animate the width and height of the target while simultaneously animating the translation
+Function resizeToLocation(target As Object, width As Float, height As Float, destination As Object, duration As Float, delay=0.0 As Float)
+  animationOptions = {
+    duration: duration
+    delay: delay
+    width: width
+    height: height
+    destination: destination
+  }
+  return animate(target, animationOptions)
+End Function
+
+
+'''''''''''''
 ' colorSlide
 '
 ' transitions the color of a node
@@ -163,7 +194,11 @@ Function animate(target As Object, options as Object) As Object
       end if
       
     end if
-    
+
+    if options.duration <= 0
+      tubiLog("Do not animate due to duration being 0")
+      bAnimate = false
+    end if
     
     ' Reuse an existing animation if available
     animation = m.top.findNode(animationId)
@@ -217,7 +252,7 @@ Function animate(target As Object, options as Object) As Object
       heightInterpolator = animation.createChild("FloatFieldInterpolator")
       heightInterpolator.id = "HeightInterpolator-" + target.id
       heightInterpolator.fieldToInterp = target.id + ".height"
-    else if heightInterpolator <> invalid and (options.height <> invalid and target.height <> invalid and options.height <> target.height)
+    else if heightInterpolator <> invalid and (options.height = invalid or options.height = target.height)
       animation.removeChild(heightInterpolator)
     end if
 
@@ -226,7 +261,7 @@ Function animate(target As Object, options as Object) As Object
       widthInterpolator = animation.createChild("FloatFieldInterpolator")
       widthInterpolator.id = "WidthInterpolator-" + target.id
       widthInterpolator.fieldToInterp = target.id + ".width"
-    else if widthInterpolator <> invalid and (options.width <> invalid and target.width <> invalid and options.width <> target.width)
+    else if widthInterpolator <> invalid and (options.width = invalid or options.width = target.width)
       animation.removeChild(widthInterpolator)
     end if
 

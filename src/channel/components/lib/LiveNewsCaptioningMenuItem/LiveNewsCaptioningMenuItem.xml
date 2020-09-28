@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="LiveNewsCaptioningMenuItem" extends="Group">
+  <script type="text/brightscript" uri="LiveNewsCaptioningMenuItem.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+
+    <!-- Content expected for a LiveNewsCaptioningMenuItem:
+     -
+     - title - The label text
+     - iconUrl - The icon uri
+     -
+     -->
+    <field id="itemContent" type="node" />
+    <field id="active" type="boolean" />
+    <field id="itemHasFocus" type="boolean" />
+
+  </interface>
+  
+  <children>
+    <Poster
+     id="Bground"
+     uri="pkg://images/menu-focus-fhd.9.png"
+     blendColor="0xF0F1F528"
+     width="225"
+     height="72"
+     visible="false"
+     loadSync="true"/>
+
+    <Label
+     id="MenuText"
+     translation="[36,30]" 
+     vertAlign="top"
+     horizAlign="left" 
+     ellipsizeOnBoundary="true"
+     color="0xFFFFFFFF"
+     width="135"
+     height="72">
+      <Font
+       role="font"
+       uri="pkg:/fonts/Vaud-SemiBold.ttf"
+       size="22" />
+    </Label>
+
+    <Poster
+      id="EnabledIcon"
+      width="36"
+      height="33"
+      translation="[174,21]"
+      uri="pkg:/images/icon-checkmark.png"/>
+
+  </children>
+</component>

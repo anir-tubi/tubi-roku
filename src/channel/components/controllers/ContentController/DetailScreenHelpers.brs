@@ -1040,7 +1040,7 @@ Function trailerHelper(screen)
         trailerContent.subtitleConfig = invalid
       end if
 
-      playVideoContent(trailerContent, "none")
+      playVideoContent(trailerContent)
     end if
   end if        
 End Function
@@ -1194,7 +1194,7 @@ Function playHelper(screen)
       end if
       displayDetailScreenMaturePlayWarning(episode, dialogSubtype)
     else
-      playVideoContent(episode, "none", 0)
+      playVideoContent(episode)
     end if
   else
     tubiLog("ERROR: Play selected but content is invalid")

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="ChannelGuide" extends="Group" >
+  <script type="text/brightscript" uri="ChannelGuide.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <!-- When display is changed, it will perform the operations that ar needed to properly display or hide the guide. -->
+    <field id="display" type="boolean" alwaysNotify="true"/>
+    <field id="content" type="node"/>
+    <!-- contentUpdated will be set when the new content is ready to be displayed on the screen. -->
+    <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
+    <!-- Set the ID that the channel Guide should jump to once "display" is set to true. -->
+    <field id="jumpToID" type="string" alwaysNotify="true"/>
+
+
+    <!-- OUTPUTS -->
+    <field id="itemSelected" type="node" alwaysNotify="true"/>
+    <field id="itemFocused" type="node" alwaysNotify="true"/>
+    <field id="navigateWithinPageInfo" type="assocarray"/>
+    <field id="trackingComponentInfo" type="assocarray"/>
+
+  </interface>
+  
+  <children>
+    <Poster
+      width="1920"
+      height="1080"
+      uri="pkg:/images/gradientBground-channelGuide-vertical.png"/>
+    <IconButton
+      id="ButtonClose"
+      translation="[115,57]"
+      icon="left"/>
+    <Label
+      id="GuideTitle"
+      height="38"
+      color="0xFFFFFFFF"
+      translation="[120,155]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="35"/>
+    </Label>
+    <!-- Spinner to indicate loading of a linear video when it is not fullscreen -->
+    <Spinner
+      id="channelsGuideSpinner"
+      translation="[120,204]"
+      showShade="false"
+      displayText="false"
+      width="266"
+      height="66"
+      horizAlign="left"
+      vertAlign="top"
+      visible="false"/>
+    <MarkupList
+      id="channelsGuide"
+      translation="[120, 204]"
+      numRows="7"
+      itemSize="[507,120]"
+      itemSpacing="[0,6]"
+      drawFocusFeedbackOnTop="false"
+      focusFootprintBitmapUri="pkg:/images/channelguideRow-active.png"
+      focusBitmapUri="pkg:/images/channelguideRow-active.png"
+      itemComponentName="LiveNewsMenuItem"
+      vertFocusAnimationStyle="fixedFocusWrap"/>
+    <Poster
+      width="1920"
+      height="1080"
+      uri="pkg:/images/gradientBground-channelGuide-horizontal.png"/>
+  </children>
+</component>

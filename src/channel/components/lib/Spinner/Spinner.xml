@@ -2,7 +2,7 @@
 <!--
  - Spinner
  -
- - This is a Rectangle with a spinner graphic vertically and horizontally centered
+ - This is a Rectangle with a spinner graphic vertically and horizontally centered by default
  -
  -->
 <component name="Spinner" extends="Group" >
@@ -17,8 +17,12 @@
       <field id="text"  alias="LoadingMessage.text"/>
       <field id="width" alias="Shade.width"/>
       <field id="height" alias="Shade.height"/>
+      <!-- Allowed values currently are: "right", "left", "center" - assumed to be "center" -->
+      <field id="horizAlign" type="String" value="center"/>
+      <!-- Allowed values currently are: "top", "bottom", "center" - assumed to be "center" -->
+      <field id="vertAlign" type="String" value="center"/>
 
-      <!-- if 'modal' is true, keypresses are consumed, otherwise the are ignored -->
+      <!-- if 'modal' is true, keypresses are consumed, otherwise they are ignored -->
       <field id="modal" type="boolean" value="false"/>
       <field id="displayText" type="boolean" alwaysNotify="true"/>
   </interface>
@@ -50,7 +54,7 @@
       <Label
         id="LoadingMessage"
         visible="false"
-        height="66"
+        height="30"
         width="66"
         horizAlign="center">
         <Font

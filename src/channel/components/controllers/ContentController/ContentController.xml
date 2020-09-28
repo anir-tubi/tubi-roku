@@ -27,6 +27,7 @@
   <script type="text/brightscript" uri="EpisodeScreenHelpers.brs" />
   <script type="text/brightscript" uri="SideNavHelpers.brs" />
   <script type="text/brightscript" uri="VideoHelpers.brs" />
+  <script type="text/brightscript" uri="LinearVideoPlayerScreenHelpers.brs" />
   <script type="text/brightscript" uri="SettingsScreenHelpers.brs" />
   <script type="text/brightscript" uri="SignInHelpers.brs" />
   <script type="text/brightscript" uri="ScreenStackHelpers.brs" />
@@ -40,6 +41,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/GeneralTaskModule.brs" />
   <script type="text/brightscript" uri="../../../source/lib/CmsApi.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
@@ -67,6 +69,7 @@
       <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
       <field id="moviescreenResponse" type="assocarray" alwaysNotify="true"/>
       <field id="tvscreenResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="liveNewsChannelGuideResponse" type="assocarray" alwaysNotify="true"/>
       <field id="espanolscreenResponse" type="assocarray" alwaysNotify="true"/>
 
       <!-- metadataFetchTask puts results on this field -->
@@ -108,6 +111,9 @@
       <Group
         id="ContentGroup"
         visible="false">
+        <!--  Group that contains the linear video player when it is not in its fullscreen state -->
+        <Group
+          id="LinearPlayerGroup"/>
         <!--Handles the background images -->
         <BackgroundGroup
           id="BackgroundGroup"/>
@@ -181,6 +187,12 @@
        id="InactivityTimer"
        duration="10"
        repeat="true"/>
+
+      <!-- The timer that is used to countdown when the minimized player goes fullscreen -->
+      <Timer
+       id="PlayerFullscreenCountdownTimer"
+       duration="1"
+       repeat="true"/>
      
      <!-- DetailScreenLoadTimer is a timer used to check whether startup animation logo is finished playing -->    
      <Timer
@@ -195,6 +207,18 @@
         modal="true"
         width="1920"
         height="1080"/>
+        
+      <!-- Spinner to indicate loading of a linear video when it is not fullscreen -->
+      <Spinner
+        id="LinearVideoPlayerSpinner"
+        translation="[1576,660]"
+        showShade="false"
+        displayText="false"
+        width="266"
+        height="66"
+        horizAlign="right"
+        vertAlign="bottom"
+        visible="false"/>
         
    </Group>   
    

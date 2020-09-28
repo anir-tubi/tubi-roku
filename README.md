@@ -351,7 +351,7 @@ We may want to see how a new feature will affect the app's metrics from a small 
 
   Please note that during the "qa" phase, in a response from the Popper API, the experiment name will be prepended with the string "qa.". For example, an experiment with the name `roku_vitg` will be rendered as `qa.roku_vitg` during the qa phase.
 
-- For more infoformation on how to format the experiment JSON files, see the [Popper Config Github repo and its ReadMe file](https://github.com/adRise/popper-config).
+- For more information on how to format the experiment JSON files, see the [Popper Config Github repo and its ReadMe file](https://github.com/adRise/popper-config).
 
 
 ## Deploying an experiment on Popper Staging:

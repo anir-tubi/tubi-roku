@@ -32,3 +32,12 @@ End Function
 Function parseVideoScreenUpNextError(parsedResponse)
   return parsedResponse
 End Function
+
+
+Function parseLiveVideoManifestSuccess(stringResponse)
+  return stringResponse
+End Function
+
+Function parseLiveVideoManifestError(stringResponse)
+  return stringResponse
+End Function

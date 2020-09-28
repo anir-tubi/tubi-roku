@@ -213,10 +213,15 @@ Function handleResponse(message)
           contentMode = handledRequest.params.contentMode
           handledRequest.convertedMetadata = m.metadataTranslate.translateContainer(parsed, handledRequest.response.data, orientation, bFullData, contentMode)
         else if handledRequest.context.name = m.constants.reqNames.getHomescreen
+          bFullData = false
+          if handledRequest.context.options <> invalid and handledRequest.context.options.contentMode <> invalid and handledRequest.context.options.contentMode = "news"
+            '//If this is news, then get the full data so the logo info is available immediately
+            bFullData = true
+          end if
           contentMode = handledRequest.params.contentMode
           authInfo = m.global.authInfo
           isKidsModeEnabled = handledRequest.params.isKidsMode
-          handledRequest.convertedMetadata = m.metadataTranslate.translateHomescreen(parsed, contentMode, authInfo, isKidsModeEnabled)
+          handledRequest.convertedMetadata = m.metadataTranslate.translateHomescreen(parsed, contentMode, authInfo, isKidsModeEnabled, bFullData)
         else
           ' I believe that search is the only other entry point here
           handledRequest.convertedMetadata = m.metadataTranslate.translate(parsed)

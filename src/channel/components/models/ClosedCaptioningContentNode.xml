@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<!-- This node is used with the Live Video Player closed captions implementation -->
+<component name = "ClosedCaptioningContentNode" extends="ContentNode">
+  <interface>
+    <field id="enabled" type="boolean" />
+    <field id="trackname" type="string" />
+    <field id="language_id" type="string" />
+    <field id="language_label" type="string" />
+    <field id="isForeground" type="boolean" />
+  </interface>
+</component>

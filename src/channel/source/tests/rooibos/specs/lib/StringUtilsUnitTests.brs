@@ -60,3 +60,33 @@ Function stringUtils_capitalize_test()
   m.AssertEqual(capitalize("MiXeDcAsE"), "Mixedcase")
   m.AssertEqual(capitalize("12345"), "12345")
 End Function
+
+
+'@Test getUrlParts unit tests
+Function stringUtils_getUrlParts_test()
+  goodUrl = "https://lnc-wttg-fox-aws.tubi.video/some/location/index.m3u8?now_pos=0&model=3600X&video_id=553679&app_id=tubitv&platform=ROKU&app_mode=DEFAULT_MODE&yo.ac=true&user_id=104216&language=en&device_id=5S4629143722&content_type=mp4&opt_out=1&adv_id=e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316"
+  badUrl1 = "https//lnc-wttg-fox-aws.tubi.video/index.m3u8?now_pos=0&model=3600X&video_id=553679&app_id=tubitv&platform=ROKU&app_mode=DEFAULT_MODE&yo.ac=true&user_id=104216&language=en&device_id=5S4629143722&content_type=mp4&opt_out=1&adv_id=e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316"
+  badUrl2 = "https:/lnc-wttg-fox-aws.tubi.video/index.m3u8?now_pos=0&model=3600X&video_id=553679&app_id=tubitv&platform=ROKU&app_mode=DEFAULT_MODE&yo.ac=true&user_id=104216&language=en&device_id=5S4629143722&content_type=mp4&opt_out=1&adv_id=e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316"
+  badUrl3 = ""
+  badUrl4 = 12
+  badUrl5 = "://"
+
+  m.assertInvalid(getUrlParts(badUrl1))
+  m.assertInvalid(getUrlParts(badUrl2))
+  m.assertInvalid(getUrlParts(badUrl3))
+  m.assertInvalid(getUrlParts(badUrl4))
+  m.assertInvalid(getUrlParts(badUrl5))
+
+  urlParts = getUrlParts(goodUrl)
+  m.assertNotInvalid(urlParts)
+  m.assertNotInvalid(urlParts.protocol)
+  m.assertNotInvalid(urlParts.host)
+  m.assertNotInvalid(urlParts.path)
+  m.assertNotInvalid(urlParts.params)
+  m.assertNotInvalid(urlParts.paramsWithSeparator)
+  m.assertEqual(urlParts.protocol, "https://")
+  m.assertEqual(urlParts.host, "lnc-wttg-fox-aws.tubi.video")
+  m.assertEqual(urlParts.path, "/some/location/index.m3u8")
+  m.assertEqual(urlParts.params, "now_pos=0&model=3600X&video_id=553679&app_id=tubitv&platform=ROKU&app_mode=DEFAULT_MODE&yo.ac=true&user_id=104216&language=en&device_id=5S4629143722&content_type=mp4&opt_out=1&adv_id=e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316")
+  m.assertEqual(urlParts.paramsWithSeparator, "?now_pos=0&model=3600X&video_id=553679&app_id=tubitv&platform=ROKU&app_mode=DEFAULT_MODE&yo.ac=true&user_id=104216&language=en&device_id=5S4629143722&content_type=mp4&opt_out=1&adv_id=e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316")
+End Function

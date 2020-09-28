@@ -96,3 +96,54 @@ End Function
 Function isString(value)
   return type(value) = "String" or type(value) = "roString"
 End Function
+
+
+' Helper function that breaks down a url into its component parts
+' @url: string, a url
+' @paramsSeparator: string, a character used to define the start of parameters (typically "?")
+' 
+' returns an AA with the following keys:
+' protocol: "https://"
+' host: "www.tubi.tv"
+' path: "/movies/544337/the_monuments_men"
+' params: "start=true&lang=EN"
+' paramsWithSeparator: "?start=true&lang=EN"
+' or returns invalid if not a url
+Function getUrlParts(url, paramsSeparator = "?")
+  parts = {
+    protocol: ""
+    host: ""
+    path: ""
+    params: ""
+    paramsWithSeparator: ""
+  }
+
+  ' simple checks for valid url
+  if isString(url) = false or Instr(0, url, "://") = 0 or Instr(0, url, "://") = 1
+    return invalid
+  end if
+
+  urlSplit = url.split(paramsSeparator)
+  if urlSplit[1] <> invalid
+    parts.paramsWithSeparator = paramsSeparator + urlSplit[1]
+    parts.params = urlSplit[1]
+  end if
+
+  chunks = urlSplit[0].split("/")
+
+  if chunks[0].Right(1) = ":"
+    parts.protocol = chunks[0] + "//"
+  end if
+  parts.host = chunks[2]
+
+  path = "/"
+  for i = 3 to chunks.count() - 1
+    path += chunks[i]
+    if i < chunks.count() - 1
+      path += "/"
+    end if
+  end for
+  parts.path = path
+
+  return parts
+End Function
