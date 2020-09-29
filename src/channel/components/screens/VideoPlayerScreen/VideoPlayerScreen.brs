@@ -716,6 +716,11 @@ Function onSpritesReceived(msg)
       m.Thumbnail.width = m.Thumbnail.height * thumbnailAspect
       m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
       m.Thumbnail.translation = [m.thumbnailMinXOffset, m.thumbnailMaxYOffset - m.Thumbnail.height]
+    else
+      ' reset the sprites
+      m.Thumbnail.visible = false
+      m.Thumbnail.numSprites = 0
+      m.Thumbnail.spriteUrls = []
     end if
   else
     ' reset the sprites

@@ -66,6 +66,8 @@ function playVideoContent(content, autoplayType = "none", position = 0)
       end if
     end if
 
+    ' by default setting sprites to invalid
+    videoPlayer.sprites = invalid
     ' get sprites / seek preview images
     getSprites(content)
 
@@ -236,7 +238,6 @@ function onVideoPlayerState(msg)
     if state = "error"
       stopVideoContent(videoPlayer)
       videoPlayer.errorMsg = ""
-      videoPlayer.sprites = invalid
 
       currentScreen = currentScreen()
       if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
@@ -270,7 +271,6 @@ function onVideoPlayerState(msg)
         ' there was no autoplay content, so return to details screen
         returnToDetailScreenFromVideo()
       end if
-      videoPlayer.sprites = invalid
     end if
   end if
 end function
