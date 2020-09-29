@@ -388,7 +388,7 @@ Function getConstants()
     constants.urls.channelLogoBrandedSuffix = "/logo_center.png"
     
     ' animationLogo Url which plays during app launch
-    constants.urls.animationLogo = "https://cdn.adrise.tv/video/roku/animation_logo.mp4"
+    constants.urls.animationLogo = "https://cdn.adrise.tv/video/roku/animation_logo_2.mp4"
     ' Landing Screen background image
     constants.urls.landingBackground = "https://cdn.adrise.tv/image/roku_support_images/landingBackground.jpg"
 
