@@ -27,7 +27,7 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
-    sContentMode = constants.ui.screenIds.homeScreen
+    sContentMode = constants.ui.contentMode.homescreen
     if screenID = constants.ui.screenIds.homeScreen
       m.top.observeField("homescreenResponse", "onHomescreenResponse")
     else if screenID = constants.ui.screenIds.movieScreen
@@ -216,7 +216,12 @@ Function fetchHomeScreen(homeScreen)
     '//::TODO:: JHAND - test error here!
    
     responseHandler = "homescreenResponse"
-    params = {contentMode : homeScreen.contentMode}
+    options = {
+      params: {
+        contentMode: homeScreen.contentMode
+      }
+    }
+
     if homeScreen.id = m.constants.ui.screenIds.movieScreen
       responseHandler = "moviescreenResponse"
     else if homeScreen.id = m.constants.ui.screenIds.tvScreen
@@ -225,11 +230,11 @@ Function fetchHomeScreen(homeScreen)
       responseHandler = "espanolscreenResponse" 
     end if
 
-    params.posterSize = m.constants.ui.imageSizes.poster
-    params.landscapeSize = m.constants.ui.imageSizes.landscape
-    params.largeVitgSize = m.constants.ui.imageSizes.largeVITG
+    options.params.posterSize = m.constants.ui.imageSizes.poster
+    options.params.landscapeSize = m.constants.ui.imageSizes.landscape
+    options.params.largeVitgSize = m.constants.ui.imageSizes.largeVITG
 
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, shouldKidsModeBeSentToServer(), params)
+    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, shouldKidsModeBeSentToServer(), options)
     homeScreen.resetContentAreaValues = true
     setHomeScreenLoading(homeScreen)
   end if

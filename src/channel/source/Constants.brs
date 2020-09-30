@@ -630,6 +630,7 @@ Function getConstants()
       constants.ui.categoryIds.queue = "queue"
       constants.ui.categoryIds.featured = "featured"
       constants.ui.categoryIds.recommendedForYou = "recommended_for_you"
+      constants.ui.categoryIds.liveNews = "live_news"
 
     constants.ui.categoryTypes = {}
       'these map to matrix api container types
@@ -642,9 +643,11 @@ Function getConstants()
       constants.ui.categoryTypes.utility = "utility"
 
     constants.ui.contentMode = {}
+      constants.ui.contentMode.homescreen = "homescreen"
       constants.ui.contentMode.latino = "latino"
       constants.ui.contentMode.movie = "movie"
       constants.ui.contentMode.tv = "tv"
+      constants.ui.contentMode.news = "news"
 
     constants.ui.contentTypes = {}
       constants.ui.contentTypes.series = "series"

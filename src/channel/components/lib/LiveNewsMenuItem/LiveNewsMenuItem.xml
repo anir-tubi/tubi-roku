@@ -45,7 +45,7 @@
      vertAlign="center"
      horizAlign="left" 
      ellipsizeOnBoundary="true"
-     width="352"
+     width="387"
      height="120">
       <Font
        role="font"

@@ -170,29 +170,35 @@ End Function
 '
 ' @limit: number of items in each category
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, params = {}, expand = 2)
+' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
+'                 see request.brs for more info
+Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, passedOptions = {}, expand = 2)
   url = m.constants.urls.matrix.homescreen 
   
   options = m.commonOptions_()
   options.params.expand = expand
 
   '//update options.params based on the passed in params AA
-  m.setImageParams_(params, options.params)
+  if passedOptions <> invalid
+    m.setImageParams_(passedOptions.params, options.params)
+  end if
 
-  if getExperimentResource("roku_live_video_v1", "roku_live_news_v1", false).has_live_news = true
-    '//request and display live news if the experiement calls for it.
-    if options.headers = invalid
-      options.headers = {}
-    end if
-    options.headers.["x-tubi-inject-live-news"] = "true"
-  end if
-  
   options.params["includeEmpty"] = true
-  
   options.params.limit = limit
-  if params <> invalid and params.contentMode <> invalid and params.contentMode <> ""
-    options.params["contentMode"] = params.contentMode
+  if passedOptions.params <> invalid and passedOptions.params.contentMode <> invalid and passedOptions.params.contentMode <> ""
+    options.params["contentMode"] = passedOptions.params.contentMode
+
+    if passedOptions.params.contentMode = m.constants.ui.contentMode.news or passedOptions.params.contentMode = m.constants.ui.contentMode.homescreen
+      if getExperimentResource("roku_live_video_v1", "roku_live_news_v1", false).has_live_news = true
+        '//request and display live news if the experiement calls for it.
+        if options.headers = invalid
+          options.headers = {}
+        end if
+        options.headers["x-tubi-inject-live-news"] = "true"
+      end if
+    end if
   end if
+
   options.params["isKidsMode"] = bKidsMode
   options.params["includeVideoInGrid"] = true
 
@@ -220,6 +226,14 @@ Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode 
     if params.contentMode <> invalid and params.contentMode <> ""
       options.params["contentMode"] = params.contentMode
     end if
+  end if
+
+  ' add custom linear content header for linear content
+  if categoryId = m.constants.ui.categoryIds.liveNews
+    if options.headers = invalid
+      options.headers = {}
+    end if
+    options.headers["x-tubi-inject-live-news"] = "true"
   end if
 
   '//update options.params based on the passed in params AA

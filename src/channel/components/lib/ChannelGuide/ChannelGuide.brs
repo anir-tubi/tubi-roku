@@ -16,32 +16,34 @@ Function onChannelGuideContentFocused(msg)
   tubiLog("ChannelGuide.onChannelGuideContentFocused")
   guide = msg.getRoSGNode()
   item = msg.getData()
-  channel = guide.content.getChild(item)
 
-  'Set the navigateWithinPageInfo value which will pass through to ContentController via videoHelpers.brs
-  'to fire a navigate_within_page analytics event.
-  row = item + 1  '1 based index
-  col = 1
-  m.top.navigateWithinPageInfo = {
-    pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: channel.id.toInt()})
-    componentOneof: m.Tracking.getAnalyticsComponent("channel_guide_component", m.lastChannelGuideComponentSelected)
-    means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-    vertical_location: row
-    vertical_location_mode: "INDEX"  'LocationMode enum
-    horizontal_location: col
-    horizontal_location_mode: "INDEX"  'LocationMode enum
-  }
-  contentTile = m.Tracking.getAnalyticsTile(channel, col, row)
-  m.lastChannelGuideComponentSelected = {content_tile: contentTile}
+  if guide <> invalid and guide.content <> invalid
+    channel = guide.content.getChild(item)
 
+    'Set the navigateWithinPageInfo value which will pass through to ContentController via videoHelpers.brs
+    'to fire a navigate_within_page analytics event.
+    row = item + 1  '1 based index
+    col = 1
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: channel.id.toInt()})
+      componentOneof: m.Tracking.getAnalyticsComponent("channel_guide_component", m.lastChannelGuideComponentSelected)
+      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+      vertical_location: row
+      vertical_location_mode: "INDEX"  'LocationMode enum
+      horizontal_location: col
+      horizontal_location_mode: "INDEX"  'LocationMode enum
+    }
+    contentTile = m.Tracking.getAnalyticsTile(channel, col, row)
+    m.lastChannelGuideComponentSelected = {content_tile: contentTile}
 
-  '//The trackingComponentInfo has to be set before setting m.top.itemFocused for analytics reasons
-  m.top.trackingComponentInfo = {
-    componentType: "channel_guide_component"
-    componentValues: m.lastChannelGuideComponentSelected
-  }
+    '//The trackingComponentInfo has to be set before setting m.top.itemFocused for analytics reasons
+    m.top.trackingComponentInfo = {
+      componentType: "channel_guide_component"
+      componentValues: m.lastChannelGuideComponentSelected
+    }
 
-  m.top.itemFocused = channel
+    m.top.itemFocused = channel
+  end if
 End Function
 
 

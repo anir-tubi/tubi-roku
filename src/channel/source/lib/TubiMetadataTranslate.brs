@@ -900,6 +900,8 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
 
         if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_small or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
           sType = "VitgContentNode"
+        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.linear
+          sType = "TubiContentNode"
         end if
         
         childAA = {

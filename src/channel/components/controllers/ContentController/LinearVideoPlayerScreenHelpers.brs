@@ -503,8 +503,13 @@ Function onChannelsRequested()
   tubiLog("LinearVideoPlayerScreenHelpers.onChannelsRequested")
   reqName = m.constants.reqNames.getHomescreen
   responseHandler = "liveNewsChannelGuideResponse"
-  params = {contentMode : "news"}
-  m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, false, params)
+  options = {
+    params: {
+      contentMode: m.constants.ui.contentMode.news
+      limit: 200
+    }
+  }
+  m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, false, options)
 End Function
 
 

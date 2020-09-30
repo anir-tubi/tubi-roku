@@ -118,12 +118,16 @@ Function beginRequest(metadataRequest) As Void
     return
   end if
 
-
   ' if the user is logged in, create an auth request for parental control purposes.
   ' If there is no auth info, a regular request will be created below
   httpRequest = invalid
   if metadataRequest.name = m.constants.reqNames.getHomescreen
-    httpRequest = m.CmsApi.homeScreenReq(m.constants.performance.categoryGridList.initialBlockSize, metadataRequest.kidsMode, metadataRequest.options )
+    limit = m.constants.performance.categoryGridList.initialBlockSize
+    if metadataRequest.options <> invalid and metadataRequest.options.params <> invalid and metadataRequest.options.params.limit <> invalid
+      limit = metadataRequest.options.params.limit
+    end if
+
+    httpRequest = m.CmsApi.homeScreenReq(limit, metadataRequest.kidsMode, metadataRequest.options )
   else if metadataRequest.name = m.constants.reqNames.getCategory or metadataRequest.name = m.constants.reqNames.getSearchDefault
     categoryId = metadataRequest.id
     limit = m.constants.performance.categoryGridList.finalBlockSize
