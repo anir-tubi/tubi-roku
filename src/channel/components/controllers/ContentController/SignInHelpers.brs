@@ -186,24 +186,19 @@ Function onAuthInfoReceived()
   m.spinner.visible = false
 
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if currentScreen() = invalid
-    ' this happens on app start up or when a user signs out
-    if homeScreen <> invalid
-      'expect homeScreen to not be invalid only when a user signs out
-      homeScreen.loadAllCategories = true
-    end if
-    startUserExperience()
-  else if currentScreen() <> invalid and currentScreen().getSubtype() = "DetailScreen"
+  if homeScreen <> invalid
+    'expect homeScreen to not be invalid only when a user signs out
+    homeScreen.loadAllCategories = true
+  end if
+      
+  if currentScreen() <> invalid and currentScreen().getSubtype() = "DetailScreen"
     ' this happens if a user logs in after attempting to add to queue
-    if homeScreen <> invalid
-      homeScreen.loadAllCategories = true
-    end if
     currentScreen().setFocus(true)
+  else if currentScreen() <> invalid and currentScreen().getSubtype() = "SettingsScreen"
+    ' this happens if a user logs in after attempting to update parental controls
+    currentScreen().setFocus(true)    
   else
-    ' this happens when a user signs in from the side nav or settings page
-    if homeScreen <> invalid
-      homeScreen.loadAllCategories = true
-    end if
+    ' this happens when app start up or when a user signs out or user signs in from the side nav or settings page
     startUserExperience()
   end if
 End Function
