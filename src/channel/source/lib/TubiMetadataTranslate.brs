@@ -520,7 +520,7 @@ End Function
 ' </CategoryContentNode>
 '
 '//::TODO:: Remove the contentMode, authInfo & isKidsModeEnabled parameters once we have API support
-Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homeScreen", authInfo=invalid, isKidsModeEnabled=false, bFullData = false) As Object
+Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homescreen", authInfo=invalid, isKidsModeEnabled=false, bFullData = false) As Object
   translated = CreateObject("roSGNode", "CategoryContentNode")
   homescreenAA = {
     id: ""
@@ -571,7 +571,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
   
   ' include utility row only in homescreen when kidsmodefeature is ON and parentalRating is set to Adult and isKidsModeEnabled is false
   includeUtilityRow = false
-  if m.kidsModeFeatureOn = true and contentMode = "homeScreen" and m.parentalRating > 2 and isKidsModeEnabled = false
+  if m.kidsModeFeatureOn = true and contentMode = m.constants.ui.contentMode.homescreen and m.parentalRating > 2 and isKidsModeEnabled = false
     includeUtilityRow = true
   end if  
 
