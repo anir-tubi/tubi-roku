@@ -55,6 +55,7 @@
       <field id="shouldKidsModeBeSentToServer" type="boolean" alias="CategoryGridList.shouldKidsModeBeSentToServer"/>
 
       <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
+      <field id="jumpToRowItemByID" alias="CategoryGridList.jumpToRowItemByID" />
       <field id="jumpToRowItem" alias="CategoryGridList.jumpToRowItem" />
 
       <!-- If the screen is not enabled, then user should not be able to select anything -->

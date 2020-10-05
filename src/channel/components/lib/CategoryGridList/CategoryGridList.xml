@@ -49,6 +49,8 @@
 
       <field id="animateToCategory" alias="RowList.animateToItem"/>
 
+      <!-- An array that should include up to 2 elements, the 1st element is the ID of the content to jump to, the 2nd optional element is the ID of the container within which the content item should be found -->
+      <field id="jumpToRowItemByID" type="array" alwaysNotify="true"/>
       <field id="jumpToRowItem" alias="RowList.jumpToRowItem"/>
 
       <!-- incoming metadata from MetadataFetchTask -->

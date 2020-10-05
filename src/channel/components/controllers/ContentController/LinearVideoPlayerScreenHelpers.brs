@@ -4,7 +4,7 @@
 ' Helper Function for onResume and onPlay to launch content
 ' @content: TubiContentNode, the content to be played
 ' @bMinimized: boolean, Should the player be playing in its minmized state on the homescreen? If false, then it will be at fullscreen.
-Function playLinearVideoContent(content, bMinimized = true)
+Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
   tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
   ' we make changes to the content from this point forward. If we don't clone, those changes will initialize
   ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number
@@ -490,6 +490,10 @@ Function onNewChannelSelected(msg)
       playLinearVideoContent(channel, false)
       newTrackingPageInfo = videoPlayer.trackingPageInfo
       screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo)
+
+      '//Tell the homescreen to focus on the same channel so when the user backs out, the channel that is playing is the same one that is in focus
+      '//   Note: since the video channel guide and the homescreen's live news container are loaded independently from each other, we cannot assume they are in sync 
+      jumpToHomescreenContentByID(channel.id, videoPlayer.content.parentId)
     else
       '//Incorrect data, display an error
       showLinearPlayerError()

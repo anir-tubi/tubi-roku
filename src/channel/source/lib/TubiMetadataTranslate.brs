@@ -416,6 +416,9 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
       fullContent = parsed[contentId]
       translated = CreateObject("roSGNode", "TubiContentNode")
       m.translateRecursive(fullContent, translated)
+      translated.parentId = category.id
+      translated.parentType = category.type
+      translated.parentTitle = category.title
 
       vitg_large = m.constants.ui.gridItemTypes.vitg_large
       vitg_small = m.constants.ui.gridItemTypes.vitg_small

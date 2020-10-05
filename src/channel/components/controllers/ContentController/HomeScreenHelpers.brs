@@ -376,13 +376,28 @@ Function onHomeScreenFocusChanged(msg)
 End Function
 
 
+''''''''''''''''''''''''''''''
+' jumpToHomescreenContentByID
+'
+' Focus on a specific item within the homescreen
+' @sID, String = The ID of the content item that should be in focused
+' sDesiredContainerID, String = If there is a desire for a specific container to be in focuse, then this is the ID of the desired container
+Function jumpToHomescreenContentByID(sID, sDesiredContainerID = "")
+  tubiLog("HomeScreenHelpers.jumpToHomescreenContentByID")
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    homeScreen.jumpToRowItemByID = [sID, sDesiredContainerID]
+  end if
+End Function
+
+
 '// when a new item is focused on, then do something
 Function onHomeScreenContentFocused(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenContentFocused")
   focusedContent = msg.getData()
   homeScreen = msg.getRoSGNode()
 
-  if focusedContent <> invalid
+  if focusedContent <> invalid and (currentScreen() <> invalid or currentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen)
     stopCountdownTimer()
     if focusedContent.type = m.constants.ui.categoryTypes.linear
       '//Send experiment exposure event if this is the 1st time the user has focused on the live news row

@@ -5,6 +5,7 @@ Function init()
 
   m.top.observeField("metadataFetchTaskBatch", "onMetadataFetchTaskBatchResponse")
   m.top.observeField("focusedChild", "onComponentFocusChange")
+  m.top.observeField("jumpToRowItemByID", "onJumpToRowItemByIDChange")
   m.top.observeField("contentUpdated", "onContentChange")
   m.top.observeField("repopulateContent", "onRepopulateContent")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
@@ -48,6 +49,32 @@ End Function
 
 Function onThemeChange()
   m.RowList.focusBitmapBlendColor = m.global.theme.focused
+End Function
+
+
+Function onJumpToRowItemByIDChange()
+  tubiLog("CategoryGridList.onJumpToRowItemByIDChange")
+  if m.top.jumpToRowItemByID <> invalid
+    sContentID = m.top.jumpToRowItemByID[0]
+    sDesiredContainerID = m.top.jumpToRowItemByID[1]
+  end if
+
+  '//Loop thru the containers to find the content item with an ID that matches sContentID and focus on that content item
+  for i=0 to m.RowList.content.getChildCount()-1
+    container = m.RowList.content.getChild(i)
+    sTempContainerID = container.id
+    if sDesiredContainerID = sTempContainerID or sDesiredContainerID = ""
+      for j=0 to container.getChildCount()-1
+        item = container.getChild(j)
+        if item.id = sContentID
+          'focus on the item 
+          m.RowList.jumpToRowItem = [i,j]
+          return true
+        end if
+      end for
+    end if
+  end for
+  return false
 End Function
 
 
