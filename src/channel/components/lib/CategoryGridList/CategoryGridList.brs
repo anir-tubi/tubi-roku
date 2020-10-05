@@ -112,16 +112,37 @@ End Function
 ' it sets RowHeight and jumps the focus to a specified content.
 Function onRepopulateContent()
   setRowHeights()
+  
+  rowItemFocused = m.RowList.rowItemFocused
+  if m.itemToJumpTo <> invalid
+    rowItemFocused = m.itemToJumpTo
+  end if
+  
+  if rowItemFocused = invalid
+    rowItemFocused = [0,0]
+  end if
+  
+  rowAdded = m.top.rowAdded
+  rowRemoved = m.top.rowRemoved
+  
+  ' Resetting rowAdded & rowRemoved
+  m.top.rowAdded = ""
+  m.top.rowRemoved = ""
+  
   ' setting the rowItemSize and/or rowHeights moves the focus indicator back to the origin so
   ' we need to move the focus back to it's appropriate place. But we need to check that there is content
   ' at the location or else the RowList loses focus and can't get it back.
-  if resolveAbbreviatedContent(m.RowList.rowItemFocused) <> invalid
+  if resolveAbbreviatedContent(rowItemFocused) <> invalid
     ' re-focus the most recently focused content
-    m.itemToJumpTo = m.RowList.rowItemFocused
-  else if resolveAbbreviatedContent([m.RowList.rowItemFocused[0], 0]) <> invalid
+    m.itemToJumpTo = rowItemFocused
+  else if resolveAbbreviatedContent([rowItemFocused[0], 0]) <> invalid
     ' if there is no content at the most recently focused coordinates, then
     ' check if there is at least one content in the most recently focused row and focus the last content in the row
-    rowIndex = m.RowList.rowItemFocused[0]
+    rowIndex = 0
+    if rowItemFocused[0] <> invalid
+      rowIndex = rowItemFocused[0]
+    end if
+     
     lastContentIndex = m.top.content.getChild(rowIndex).getChildCount() - 1
     m.itemToJumpTo = [rowIndex, lastContentIndex]
   else
@@ -130,16 +151,40 @@ Function onRepopulateContent()
     ' check if there is any content in each row prior to the most recently focused row
     ' and focus the first content in that row
     rowIndex = 0
-    if m.RowList.rowItemFocused[0] <> invalid
-      rowIndex = m.RowList.rowItemFocused[0]
+    if rowItemFocused[0] <> invalid
+      rowIndex = rowItemFocused[0]
     end if
-
+    
     while resolveAbbreviatedContent([rowIndex, 0]) = invalid and rowIndex >= 0
       rowIndex -= 1
     end while
 
     m.itemToJumpTo = [rowIndex, 0] ' m.itemToJumpTo might equal [-1, 0] in worst case scenario
   end if
+  
+  ' there are 4 options here
+  ' 1) new continue_watching row got inserted, so increment the focus index by 1
+  ' 2) new queue row got inserted, so increment the focus index by 1
+  ' 3) continue_watching row got removed, so decrement the focus index by 1
+  ' 4) queue row got removed, so decrement the focus index by 1
+  if rowAdded = m.constants.ui.categoryIds.history
+    if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
+      m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]
+    end if
+  else if rowAdded = m.constants.ui.categoryIds.queue
+    if rowItemFocused[0] >= m.RowList.content.queueIndex
+      m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]
+    end if
+  else if rowRemoved = m.constants.ui.categoryIds.history 
+    if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
+      m.itemToJumpTo = [m.itemToJumpTo[0] - 1, m.itemToJumpTo[1]]
+    end if
+  else if rowRemoved = m.constants.ui.categoryIds.queue
+    if rowItemFocused[0] >= m.RowList.content.queueIndex
+      m.itemToJumpTo = [m.itemToJumpTo[0] - 1, m.itemToJumpTo[1]]
+    end if         
+  end if  
+  
 End Function
 
 

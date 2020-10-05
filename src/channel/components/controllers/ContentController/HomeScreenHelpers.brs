@@ -119,6 +119,9 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
           else if handledRequest.context.id <> invalid
             oldCategory = homeScreen.content.findNode(handledRequest.context.id)
           end if
+          
+          homeScreen.rowAdded = ""
+          homeScreen.rowRemoved = ""
 
           ' there are 4 options here
           ' 1) new category and old category both have content in them - replace the old with the new
@@ -135,9 +138,11 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
             'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
             if newCategory.id = m.constants.ui.categoryIds.history
               clonedContent = homeScreen.content.clone(true)
+              homeScreen.rowAdded = m.constants.ui.categoryIds.history
               clonedContent.insertChild(newCategory, homeScreen.content.continueWatchingIndex)
               homeScreen.content = clonedContent
             else if newCategory.id = m.constants.ui.categoryIds.queue
+              homeScreen.rowAdded = m.constants.ui.categoryIds.queue
               clonedContent = homeScreen.content.clone(true)
               clonedContent.insertChild(newCategory, homeScreen.content.queueIndex)
               homeScreen.content = clonedContent
@@ -146,6 +151,11 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
             clonedContent = invalid
             homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
           else if newCategory = invalid and oldCategory <> invalid
+            if oldCategory.id = m.constants.ui.categoryIds.history
+              homeScreen.rowRemoved = m.constants.ui.categoryIds.history
+            else if oldCategory.id = m.constants.ui.categoryIds.queue
+              homeScreen.rowRemoved = m.constants.ui.categoryIds.queue            
+            end if
             'remove old category
             homeScreen.content.removeChild(oldCategory)
             homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
