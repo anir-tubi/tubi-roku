@@ -314,8 +314,10 @@ Function getConstants()
 
     'contents url
     constants.urls.cms = {}
-      'constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
       constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
+      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+        constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
+      end if
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
       constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
       constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
@@ -325,16 +327,20 @@ Function getConstants()
 
     'matrix url
     constants.urls.matrix = {}
-      'constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
       constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
+      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+        constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
+      end if
       constants.urls.matrix.homescreen = constants.urls.matrix.urlBase + "/homescreen"
       constants.urls.matrix.container = constants.urls.matrix.urlBase + "/containers"
       constants.urls.matrix.channel = constants.urls.matrix.urlBase + "/containers" ' + "/:container_id"
 
     'users url
     constants.urls.users = {}
-      'constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
       constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
+      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+        constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
+      end if
       constants.urls.users.login = constants.urls.users.urlBase + "/login"
       constants.urls.users.refreshToken = constants.urls.users.urlBase + "/login/refresh"
       constants.urls.users.transferToken = constants.urls.users.urlBase + "/login/transfer"

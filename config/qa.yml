@@ -3,3 +3,4 @@ settings:
   # Any constants that need to be templatized should be added via settings
   mode: "qa"
   suitest: false  #setting to true will result in suitest being loaded and no ads played
+  stagingApis: false  #setting to true will use UAPI staging APIs (matrix, cms, user_device)
