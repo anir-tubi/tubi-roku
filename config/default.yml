@@ -15,7 +15,7 @@ settings:
 
 manifest:
   title: "Tubi"
-  mm_icon_focus_hd: "pkg:/locale/images/channel-icon-hd-336x210.png"
+  mm_icon_focus_hd: "pkg:/locale/images/channel-icon-hd-290x218.png"
   mm_icon_focus_sd: "pkg:/locale/images/channel-icon-sd-246x140.png"
   splash_screen_fhd: "pkg:/images/splash-fhd.jpg"
   splash_screen_hd: "pkg:/images/splash-hd.jpg"
