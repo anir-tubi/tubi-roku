@@ -455,15 +455,17 @@ Function createContentForClosedCaptioning()
     content = createClosedCaptioningNode("off", (not bCaptionsOn))
     row.appendChild(content)
     for each track in availableSubtitleTracks
-      bEnabled = false
-      if bCaptionsOn = true
-        if m.Video.subtitleTrack = track.trackname
-        '//Get the enabled state of language
-          bEnabled = true
+      if track.language = "eng" or track.language = "spa" '//::TODO:: allow for multiple languages. When backend provides more captioning support, then this should be changed 
+        bEnabled = false
+        if bCaptionsOn = true
+          if m.Video.subtitleTrack = track.trackname
+          '//Get the enabled state of language
+            bEnabled = true
+          end if
         end if
+        content = createClosedCaptioningNode(track.language, bEnabled, track.trackname)
+        row.appendChild(content)
       end if
-      content = createClosedCaptioningNode(track.language, bEnabled, track.trackname)
-      row.appendChild(content)
     end for
     m.closedCaptioningButtonList.content = root
 

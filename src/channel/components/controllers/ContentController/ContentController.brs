@@ -504,6 +504,7 @@ Function onInputInfoReceived()
       resetSideNav(false)
       videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
       stopVideoContent(videoPlayer) 'sets m.handlingDeeplinkInputEvent = false and m.deeplinkContent = invalid
+      returnToPreviousScreenFromLinearVideo(false)
 
       if kidsModeAtStart = true
         ' remove all screens if in kids mode so that when backing out of the details screen,
