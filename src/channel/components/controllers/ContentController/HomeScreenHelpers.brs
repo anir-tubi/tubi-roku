@@ -401,7 +401,8 @@ Function onHomeScreenContentFocused(msg)
     stopCountdownTimer()
     if focusedContent.type = m.constants.ui.categoryTypes.linear
       '//Send experiment exposure event if this is the 1st time the user has focused on the live news row
-      getExperimentResource("roku_live_video_v1", "roku_live_news_v1")
+      getExperimentResource("roku_live_video_v1", "roku_live_news_short_v1")
+      getExperimentResource("roku_live_video_v1", "roku_live_news_long_v1")
       
       bPlayVideo = true
       linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
