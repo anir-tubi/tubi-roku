@@ -522,6 +522,14 @@ Function onInputInfoReceived()
       if currentScreen <> invalid
         m.currentPageInfoAtDeeplinkInputEvent = currentScreen.trackingPageInfo
       end if
+      
+      ' close any opened modal/pop-up when deeplinking via roInput
+      for i=0 to m.top.getChildCount()-1
+        screen = m.top.getChild(i)
+        if screen.subType() = "ModalDialogScreen"
+          closeModal(screen, "back")
+        end if
+      end for      
 
       showDetailScreen(m.deeplinkContent, false)
     else if inputInfo.type = "transport"
