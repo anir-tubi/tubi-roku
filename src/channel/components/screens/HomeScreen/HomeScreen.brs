@@ -270,7 +270,12 @@ Function onCurrFocusRowChange()
     ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
     if rowEnteringFocus = 1 ' sending exposure event when the 2nd row gains focus
       getExperimentResource("roku_discovery_v2", "roku_discovery_row_v2")
+    else if rowEnteringFocus = 2
+      '//Send experiment exposure event if this is the 1st time the user has focused on the live news row
+      getExperimentResource("roku_live_video_v1", "roku_live_news_short_v1")
+      getExperimentResource("roku_live_video_v1", "roku_live_news_long_v1")
     end if
+
   else
     m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-fhd.9.png"
     m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true
