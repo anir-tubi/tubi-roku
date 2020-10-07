@@ -676,6 +676,10 @@ End Function
 Function onAddToQueue(detailScreen)
   tubiLog("DetailScreenHelpers.onAddToQueue")
   if m.global.authInfo = invalid
+   
+    ' this will be used to trigger the callback function once the activation is completed via Detail Screen
+    detailScreen.actionAfterActivation = "AddQueueMenuItem"
+  
     content = getDetailScreenContent(detailScreen)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "sign-in-bookmark", m.constants)
 
@@ -761,7 +765,32 @@ Function onBookmarked(msg) As Void
 
     showErrorModal(modalInfo, onAddToQueueRetry, addToQueueRetryParams)
     return
+  else
+  
+    if detailScreen.actionAfterActivation = "AddQueueMenuItem"
+      pageInfo = detailScreen.trackingPageInfo
+      dialogEvent = {
+      type: "dialog"
+        values: {
+        dialog_type: "ADD_TO_QUEUE"
+        pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "add-queue-success"
+        }
+      }  
+      title = "Content"
+      if detailScreen.title <> invalid and detailScreen.title <> ""
+        title = detailScreen.title
+      end if
+      description = title + " has been added to the List"
+      
+      showSimpleModal("Success", description, [], dialogEvent, m.trackingLoggingTask)
+    end if  
+    
   end if
+  
+  ' it resets the actionAfterActivation once the callback method is triggered
+  detailScreen.actionAfterActivation = ""
 
   tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
   setIsBookmark(detailScreen, true)

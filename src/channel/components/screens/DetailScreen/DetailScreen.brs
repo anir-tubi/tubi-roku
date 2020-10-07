@@ -31,6 +31,7 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("isLoading", "onIsLoading")
   m.top.observeField("kidsModeEnabled", "onKidsModeEnableChange")
+  m.top.observeField("activationCompleted", "onActivationCompleted")
 
   m.top.observeFieldScoped("stringQueueButton", "onStringChange")
   m.top.observeFieldScoped("stringNoQueueButton", "onStringChange")
@@ -146,6 +147,7 @@ End Function
 Function onScreenFocusChange()
   tubiLog("DetailScreen.onScreenFocusChange")
   if m.top.hasFocus() then
+   
     m.focusTarget.setFocus(true)
     ' force a background update
     m.top.backgroundUriList = m.top.backgroundUriList
@@ -514,4 +516,17 @@ Function focusInfo()
   if m.top.isInFocusChain()
     m.Info.setFocus(true)
   end if
+End Function
+
+
+' onActivationCompleted will be triggered once the Activation is completed via Detail Screen
+Function onActivationCompleted()
+
+  actionAfterActivation = m.top.actionAfterActivation
+  if actionAfterActivation = invalid or actionAfterActivation = ""
+    m.top.setFocus(true)
+  else if actionAfterActivation = "AddQueueMenuItem"
+    m.top.addToQueueSelected = true
+  end if
+
 End Function

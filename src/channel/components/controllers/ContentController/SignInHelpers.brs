@@ -193,7 +193,11 @@ Function onAuthInfoReceived()
       
   if currentScreen() <> invalid and currentScreen().getSubtype() = "DetailScreen"
     ' this happens if a user logs in after attempting to add to queue
-    currentScreen().setFocus(true)
+    if currentScreen().activationCompleted <> invalid
+      currentScreen().activationCompleted = true
+    else
+      currentScreen().setFocus(true)
+    end if
   else if currentScreen() <> invalid and currentScreen().getSubtype() = "SettingsScreen"
     ' this happens if a user logs in after attempting to update parental controls
     currentScreen().setFocus(true)    
