@@ -591,6 +591,12 @@ function onVideoTrackingStart(msg)
       youboraConfig.username = m.global.authInfo.userId
     end if
 
+    if videoplayer.content.type = m.constants.ui.contentTypes.linear
+      youboraConfig["content.isLive"] = true
+    else 
+      youboraConfig["content.isLive"] = false
+    end if
+
     youboraConfig["content.transactionCode"] = m.constants.deviceInfo.deviceId
     youboraConfig["device.model"] = m.constants.deviceInfo.model
     youboraConfig["app.releaseVersion"] = m.constants.settings.version
