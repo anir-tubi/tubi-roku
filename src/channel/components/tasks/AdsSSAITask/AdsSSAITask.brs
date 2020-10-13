@@ -124,8 +124,9 @@ Function pollForAds(url)
         end for
       end if
     end if
-    m.timeSpan.mark()
   end if
+
+  m.timeSpan.mark()
 End Function
 
 
@@ -163,8 +164,7 @@ Function onTags(msg)
   yospaceIdFromTag = id3s.getId()
 
   if id3s.currentSegment() = 1 and id3s.getType() = "start"
-
-    ' we are at the very beginning of the ad - update ad tracking state
+    ' we are at the very beginning of the ad video - update ad tracking state
     ' but only if there is ad metadata to report on.
     if m.adPod <> invalid and m.adPod.ads <> invalid and m.adPod.ads.count() > 0
       m.top.isPlayingAds = true
@@ -172,6 +172,14 @@ Function onTags(msg)
       ' send "Impression" ad pixels and StartAdEvent analytics
       handleStartAdTracking(yospaceIdFromTag)
     else
+      m.top.isPlayingAdFiller = true
+    end if
+  else if id3s.getType() = "start"
+    ' we are at the start of a segment, but not the start of an ad video
+    if m.adPod = invalid or m.adPod.ads = invalid or m.adPod.ads.count() = 0
+      ' if playing ad filler, we set m.top.isPlayingAdFiller to false when a segment ends regardless if it
+      ' is the end of the ad filler video or not. Therefore we need to set it back to true each time
+      ' a segment starts.
       m.top.isPlayingAdFiller = true
     end if
   else if id3s.getType() = "end" and id3s.currentSegment() = id3s.totalSegments()
