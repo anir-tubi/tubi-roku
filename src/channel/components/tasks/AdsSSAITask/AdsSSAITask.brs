@@ -96,9 +96,16 @@ Function runSSAILoop(constants, ssaiPort)
 End Function
 
 
+' occurs when a new linear channel has been selected by the user.
 Function onPollUrlChange(msg)
   tubiLog("AdsSSAITask.onPollUrlChange")
   pollUrl = msg.getData()
+
+  ' old ad state may persist if a user changes channels in the middel of an ad, so reset ad state
+  ' once we get a new poll url (can be invalid for certain channels that do not have ads yet),
+  ' which indicates a new stream is starting.
+  resetAdState()
+
   if pollUrl <> invalid
     pollForAds(pollUrl)
   end if
@@ -208,6 +215,12 @@ Function onTags(msg)
     if m.adPod <> invalid and m.adPod.ads <> invalid and m.adPod.ads[m.currentAdInPod] <> invalid
       ad = m.adPod.ads[m.currentAdInPod]
       fireMidPixels(ad, m.positionWithinAd, yospaceIdFromTag)
+    else if m.adPod = invalid or m.adPod.ads = invalid or m.adPod.ads.count() = 0
+      ' filler ads can be stopped at the end of any segment, not only when the final segment in the filler
+      ' video concludes. This means we need to set isPlayingAdFiller false after each filler segment ends
+      ' as we don't know if the next segment will be filler video. We will set isPlayingAdFiller back to true
+      ' at the start of the next segment, if it is a filler video segment.
+      m.top.isPlayingAdFiller = false
     end if
   else
     ' At the beginning of the segment, but not the first segment in the add.

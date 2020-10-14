@@ -17,16 +17,29 @@
 
     <interface>
       <!-- INPUT -->
+        <!-- The url used to poll for ad metadata. This is provided in the hls manifest by yospace. -->
         <field id="pollUrl" type="string" />
+
+        <!-- The current position of the video as provided by the video player -->
         <field id="videoPosition" type="float" />
+
+        <!-- id3 tags are metadata included in the stream itself about the current video segment that is playing.
+             These are used by yospace to indicate when ad content or ad filler video is playing.
+        -->
         <field id="id3Tags" type="assocarray" />
+
         <field id="content" type="node" />
         <field id="updateContent" type="boolean" />
         <field id="videoIsFullscreen" type="boolean" />
         <field id="exit" type="boolean" />
 
       <!-- OUTPUT -->
+        <!-- updated video resources with urls that include ad params needed by yospace to fetch ads from
+             rainmaker.
+        -->
         <field id="videoResourcesWithAdParams" type="array" />
+
+        <!-- indicates if the video is currently playing ads as indicated by yospace id3 tags -->
         <field id="isPlayingAds" type="boolean" value="false" />
 
         <!-- due to ad filler behavior isPlayingAdFiller changes values frequently and cannot be
