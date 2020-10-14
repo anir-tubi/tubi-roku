@@ -272,8 +272,8 @@ Function onCurrFocusRowChange()
       getExperimentResource("roku_discovery_v2", "roku_discovery_row_v2")
     else if rowEnteringFocus = 2
       '//Send experiment exposure event if this is the 1st time the user has focused on the live news row
-      getExperimentResource("roku_live_video_v1", "roku_live_news_short_v1")
-      getExperimentResource("roku_live_video_v1", "roku_live_news_long_v1")
+      getExperimentResource("roku_live_video_v1", "roku_live_news_short_v2")
+      getExperimentResource("roku_live_video_v1", "roku_live_news_long_v2")
     end if
 
   else

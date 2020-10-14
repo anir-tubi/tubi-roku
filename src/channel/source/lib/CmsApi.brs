@@ -189,7 +189,7 @@ Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, passedOptions = {
     options.params["contentMode"] = passedOptions.params.contentMode
 
     if passedOptions.params.contentMode = m.constants.ui.contentMode.news or passedOptions.params.contentMode = m.constants.ui.contentMode.homescreen
-      if getExperimentResource("roku_live_video_v1", "roku_live_news_long_v1", false).has_live_news = true or getExperimentResource("roku_live_video_v1", "roku_live_news_short_v1", false).has_live_news = true
+      if getExperimentResource("roku_live_video_v1", "roku_live_news_long_v2", false).has_live_news = true or getExperimentResource("roku_live_video_v1", "roku_live_news_short_v2", false).has_live_news = true
         '//request and display live news if the experiement calls for it.
         if options.headers = invalid
           options.headers = {}
