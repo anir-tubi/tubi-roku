@@ -44,7 +44,7 @@ Function TubiExperiments(constants) as Object
       }
       rokunamespace: {
       }  
-      roku_live_video_v1: {
+      roku_live_video_v2: {
       }
       roku_utility_row : {
       }
@@ -62,7 +62,7 @@ Function TubiExperiments(constants) as Object
       }
       rokunamespace: {
       }
-      roku_live_video_v1: {
+      roku_live_video_v2: {
         roku_live_news_short_v2 : {"has_live_news" : false}
         roku_live_news_long_v2 : {"has_live_news" : false}
       }
