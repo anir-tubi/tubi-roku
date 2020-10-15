@@ -972,7 +972,7 @@ Function refreshAllDetailScreens()
   for i=0 to m.screenStack.getChildCount()-1
     screen = m.screenStack.getChild(i)
     if screen.subType() = "DetailScreen"
-      populateDetailScreen(screen, screen.content, true)
+      populateDetailScreen(screen, screen.content)
     end if
   end for
 End Function

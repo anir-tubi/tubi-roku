@@ -72,7 +72,7 @@
 
       <!-- Indicates if the content has a trailer -->
       <field id="hasTrailer" type="boolean" value="false" />
-
+      
       <!-- interface for moving the focus on the details screen menu to a specific item-->
       <field id="jumpToItem" type="integer" alias="Menu.jumpToItem" />
 

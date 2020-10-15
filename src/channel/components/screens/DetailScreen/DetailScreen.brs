@@ -42,7 +42,6 @@ Function init()
   m.top.observeField("relatedContent", "onRelatedContentChange")
   m.RelatedGrid.observeField("itemSelected", "onRelatedContentSelected")
   m.RelatedGrid.observeField("itemFocused", "onRelatedItemFocused")
-  m.top.observeField("jumpToItem", "onJumpToItem")
   m.Info.observeField("descriptionSelected", "onDescriptionSelected")
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
@@ -75,6 +74,7 @@ Function init()
   m.isChannelMenuSelected = false
 
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
+  
 End Function
 
 
@@ -139,7 +139,15 @@ Function onDescriptionSelected()
 End Function
 
 
-Function onJumpToItem()
+Function jumpToSelectedItem()
+  jumpToItem = 0
+  if m.Menu.content <> invalid
+    jumpToItem = m.Menu.itemSelected
+    if m.Menu.itemSelected >= m.Menu.content.getChildCount()
+      jumpToItem = m.Menu.content.getChildCount()-1
+    end if  
+  end if
+  m.Menu.jumpToItem = jumpToItem
   focusMenu(true)
 End Function
 
@@ -173,11 +181,10 @@ Function onResumePointChange()
 
   m.ResumeMenuItem.playstart = m.top.resumePoint
   if resumeIndex = -1 and m.top.resumePoint > 0
-    menuItems.insertChild(m.ResumeMenuItem, 0)
+    m.Menu.content.insertChild(m.ResumeMenuItem, 0)
   else if resumeIndex > -1 and m.top.resumePoint = 0
-    menuItems.removeChildIndex(resumeIndex)
+    m.Menu.content.removeChildIndex(resumeIndex)
   end if
-  m.Menu.content = menuItems
 End Function
 
 
@@ -192,31 +199,30 @@ Function onIsBookmark()
     'add queue item doesn't exist
       if removeQueueIndex > -1
         'remove queue item does exist so replace remove queue item with add queue item
-        menuItems.removeChildIndex(removeQueueIndex)
-        menuItems.insertChild(m.AddQueueMenuItem, removeQueueIndex)
+        m.Menu.content.removeChildIndex(removeQueueIndex)
+        m.Menu.content.insertChild(m.AddQueueMenuItem, removeQueueIndex)
       else
-        menuItems.appendChild(m.AddQueueMenuItem)
+        m.Menu.content.appendChild(m.AddQueueMenuItem)
       end if
     else if removeQueueIndex > -1
       'both add to queue and remove from queue items exist... this shouldn't happen
-      menuItems.removeChildIndex(removeQueueIndex)
+      m.Menu.content.removeChildIndex(removeQueueIndex)
     end if
   else
     if removeQueueIndex = -1
       'remove queue item doesn't exist
       if addQueueIndex > -1
         'add queue item exists, so replace add queue item with remove queue item
-        menuItems.removeChildIndex(addQueueIndex)
-        menuItems.insertChild(m.RemoveQueueMenuItem, addQueueIndex)
+        m.Menu.content.removeChildIndex(addQueueIndex)
+        m.Menu.content.insertChild(m.RemoveQueueMenuItem, addQueueIndex)
       else
-        menuItems.appendChild(m.RemoveQueueMenuItem)
+        m.Menu.content.appendChild(m.RemoveQueueMenuItem)
       end if
     else if addQueueIndex > -1
       'both add to queue and remove from queue items exist... this shouldn't happen
-      menuItems.removeChildIndex(m.AddQueueMenuItem)
+      m.Menu.content.removeChildIndex(m.AddQueueMenuItem)
     end if
   end if
-  m.Menu.content = menuItems
 End Function
 
 
@@ -308,7 +314,8 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
 
   if add = false and itemIndex > -1
     'menu item exists, so we need to remove it
-    menuItems.removeChildIndex(itemIndex)
+    m.Menu.content.removeChildIndex(itemIndex)
+    jumpToSelectedItem()
   else if add = true and itemIndex = -1
     'we don't have menu item, and need to add one
     'find the previous item index, and insert the Watch Trailer item one index after
@@ -323,13 +330,13 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
     end if
 
     if previousItemIndex > -1
-      menuItems.insertChild(itemToAdd, previousItemIndex + 1)
+      m.Menu.content.insertChild(itemToAdd, previousItemIndex + 1)
     else
-      menuItems.appendChild(itemToAdd)
+      m.Menu.content.appendChild(itemToAdd)
     end if
+    jumpToSelectedItem()
 
   end if
-  m.Menu.content = menuItems
 End Function
 
 
@@ -362,6 +369,7 @@ Function onMenuItemSelected()
       'To play Roku positive audio sound, channelMenuSelected is handled in onKeyEvent.
       m.isChannelMenuSelected = true
     end if
+    
   end if
 End Function
 

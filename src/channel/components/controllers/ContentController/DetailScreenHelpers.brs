@@ -53,7 +53,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true)
     if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
       detailScreen.isLoading = true
     else
-      populateDetailScreen(detailScreen, content, true)  
+      populateDetailScreen(detailScreen, content, true)
     end if
     
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
@@ -117,15 +117,14 @@ End Function
 'Populates the detail screen's state from a content node
 '@detailScreen, roSGNode, a DetailScreen component to be populated
 '@content: tubiContentNode, the content of the screen
-'@resetButtonIndex: boolean, if true, focus the first button in the menu
+'@shouldResetButtonIndex: boolean, helps to reset the focus index of menu items 
 '@nSavedPosition: integer, The number representing the resume point of the video
-Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSavedPosition = -1, bNewData=false)
+Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=false, nSavedPosition = -1, bNewData=false)
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
   backgroundUriList = [m.defaultBackgroundUri]
   if type(detailScreen) = "roSGNode" and detailScreen.isSubType("DetailScreen") and type(content) = "roSGNode"
     'hide the spinner
-    wasLoading = detailScreen.isLoading
     detailScreen.isLoading = false
     lineOneData = {}
 
@@ -220,10 +219,6 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
       detailScreen.relatedContent = content.relatedContent
     end if
 
-    if wasLoading or resetButtonIndex
-      detailScreen.jumpToItem = 0
-    end if
-
     'update the background images for the detail screen
     if content.backgrounds <> invalid and content.backgrounds.count() > 0
       backgroundUriList = content.backgrounds
@@ -242,6 +237,10 @@ Function populateDetailScreen(detailScreen, content, resetButtonIndex=false, nSa
   'full content has been returned from the /contents API.
   detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
   detailScreen.content = content
+  
+  if shouldResetButtonIndex = true
+    detailScreen.jumpToItem = 0
+  end if
   
   m.isScreenLoaded = true
 End Function

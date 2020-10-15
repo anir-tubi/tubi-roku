@@ -339,7 +339,7 @@ function returnToDetailScreenFromVideo()
         ' Still in the same series - possibly autoplayed, or possibly same episode
         ' update some info in the detail screen content and repopulate with that content
         detailContent.currentEpisodeId = videoContent.id
-        populateDetailScreen(detailScreen, detailContent, true, nResumePoint)
+        populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
 
         ' Repopulate the episodes screen if it is the screen under the video player screen in the call stack
         hiddenScreen = getHiddenScreen(1)
@@ -374,7 +374,7 @@ function returnToDetailScreenFromVideo()
         ' Case 1
         ' Returning to the detail screen for the same movie as was started, no autoplay
         ' Just repopulate the detail screen with the same content
-        populateDetailScreen(detailScreen, detailContent, true, nResumePoint)
+        populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
       end if
     end if
   end if
