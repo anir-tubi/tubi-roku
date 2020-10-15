@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<component name="Test_VideoPlayer" extends="VideoPlayer">
+<component name="Test_VideoPlayer" extends="VideoPlayerScreen">
   <interface>
     <function name="Rooibos_RunNodeTests" />
   </interface>

@@ -78,7 +78,10 @@ Function successCallbackWrapper(msg)
   response = requestNode.response
   m.unobserveGeneralTaskFields(requestNode)
   callback = m.getGeneralTaskSuccessCallback(requestNode)
-  callback(response)
+  
+  if callback <> invalid
+    callback(response)
+  end if
 
 End Function
 
@@ -119,7 +122,10 @@ End Function
 ' returns callback method from m.generalTaskCallbacks array and deletes entry.
 Function generalTask_getSuccessCallback(requestNode)
 
-  callback = m.generalTaskCallbacks[requestNode.id].successCallback
+  callback = invalid
+  if m.generalTaskCallbacks[requestNode.id] <> invalid
+    callback = m.generalTaskCallbacks[requestNode.id].successCallback
+  end if
   m.generalTaskCallbacks.delete(requestNode.id)
   return callback
 
@@ -132,7 +138,10 @@ End Function
 ' returns callback method from m.generalTaskCallbacks array and deletes entry.
 Function generalTask_getErrorCallback(requestNode)
 
-  callback = m.generalTaskCallbacks[requestNode.id].errorCallback
+  callback = invalid
+  if m.generalTaskCallbacks[requestNode.id] <> invalid
+    callback = m.generalTaskCallbacks[requestNode.id].errorCallback
+  end if
   m.generalTaskCallbacks.delete(requestNode.id)
   return callback
 
@@ -148,5 +157,6 @@ Function generalTask_storeCallbacks(requestNode, successCallback, errorCallback)
   callbacks.successCallback = successCallback
   callbacks.errorCallback = errorCallback
   m.generalTaskCallbacks[requestNode.id] = callbacks
+  return callbacks
 
 End Function

@@ -15,11 +15,11 @@ Function init()
 
   m.constants = m.global.constants
   
-  m.generalTask = CreateObject("roSGNode", "GeneralTask")  ' initiate GeneralTask
+  generalTask = CreateObject("roSGNode", "GeneralTask")  ' initiate GeneralTask
   ' Initiate GeneralTaskModule by passing caller context.
   ' Calling GeneralTaskModule() will append methods to the local m.
   ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.
-  GeneralTaskModule(m, m.generalTask)
+  GeneralTaskModule(m, generalTask)
 
   '//When ContentController initializes, clear all trandslations in case this is contained in a remote component. 
   clearTranslations()
