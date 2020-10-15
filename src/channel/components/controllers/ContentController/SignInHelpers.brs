@@ -191,16 +191,15 @@ Function onAuthInfoReceived()
     homeScreen.loadAllCategories = true
   end if
       
-  if currentScreen() <> invalid and currentScreen().getSubtype() = "DetailScreen"
-    ' this happens if a user logs in after attempting to add to queue
+  if currentScreen() <> invalid and (currentScreen().getSubtype() = "DetailScreen" or currentScreen().getSubtype() = "SettingsScreen")
+    ' this happens, if a user logs in after attempting to add to queue via detailScreen
+    ' or
+    ' this happens, if a user logs in after attempting to update parental controls/signIn via settingsScreen
     if currentScreen().activationCompleted <> invalid
       currentScreen().activationCompleted = true
     else
       currentScreen().setFocus(true)
     end if
-  else if currentScreen() <> invalid and currentScreen().getSubtype() = "SettingsScreen"
-    ' this happens if a user logs in after attempting to update parental controls
-    currentScreen().setFocus(true)    
   else
     ' this happens when app start up or when a user signs out or user signs in from the side nav or settings page
     startUserExperience()

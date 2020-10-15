@@ -8,6 +8,7 @@ Function showSettingsScreen(sFocusID = "")
   else
     m.settingsScreen.parentalSettingUpdated = 3  ' Default to most permissive
   end if
+  m.settingsScreen.actionAfterActivation = ""
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
   m.settingsScreen.observeFieldScoped("signInSelected", "onSettingsSignInSelected")
   m.settingsScreen.observeFieldScoped("parentalSettingSelected", "onParentalSettingSelected")
@@ -15,6 +16,7 @@ Function showSettingsScreen(sFocusID = "")
   m.settingsScreen.observeFieldScoped("backgroundUriList", "onSettingsBackgroundChange")
   m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
+  m.settingsScreen.observeFieldScoped("activationCompleted", "onActivationCompleted")
 
   pushScreen(m.settingsScreen, true, true)
   
@@ -136,6 +138,7 @@ End Function
 
 Function onSettingsSignInSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignInSelected")
+  m.settingsScreen.actionAfterActivation = ""
   startSignIn(true)
 End Function
 
@@ -156,6 +159,7 @@ Function onParentalSettingSelected(msg)
   tubiLog("SettingsScreenHelpers.onParentalSettingSelected")
   parentalSetting = msg.GetData()
   if m.settingsScreen.signInInfo <> invalid and m.settingsScreen.signInInfo.signedIn = true
+    m.settingsScreen.actionAfterActivation = ""
     if m.global.authInfo <> invalid and parentalSetting <> m.global.authInfo.parentalrating
       nNowDate = getNowSeconds()
       nSavedSeconds = 0
@@ -178,6 +182,7 @@ Function onParentalSettingSelected(msg)
       end if
     end if
   else
+    m.settingsScreen.actionAfterActivation = "ParentalControl"
     pageInfo = m.settingsScreen.trackingPageInfo
     dialogEvent = {
       type: "dialog"
@@ -359,6 +364,20 @@ Function onShowDeviceModal()
     }
   }  
   showInfoModal(getTranslation("screenSettings_fullDeviceID"), deviceId, dialogEvent, m.trackingLoggingTask)    
+
+End Function
+
+
+' onActivationCompleted will be triggered once the Activation is completed via Settings Screen
+Function onActivationCompleted()
+
+  if m.settingsScreen.actionAfterActivation = "ParentalControl"
+    m.settingsScreen.actionAfterActivation = ""
+    setSignInInfo()
+    m.settingsScreen.setFocus(true)
+  else
+    startUserExperience() ' redirect to homescreen
+  end if
 
 End Function
 
