@@ -178,7 +178,22 @@ Function onFadeInContentController()
 
   currentScreen = currentScreen()
   if currentScreen <> invalid and currentScreen.isInFocusChain() = false
-    currentScreen.setFocus(true)
+  
+    ' isUpgradeModalOpened will be true if constants.showUpgradeAlert is true
+    ' focus currentscreen only if the upgradeModal is closed or disabled
+    
+    isUpgradeModalOpened = false
+    for i=0 to m.top.getChildCount()-1
+      screen = m.top.getChild(i)
+      if screen.subType() = "ModalDialogScreen"
+        isUpgradeModalOpened = true
+        exit for
+      end if
+    end for
+    if isUpgradeModalOpened = false
+      currentScreen.setFocus(true)
+    end if
+  
     if currentScreen.id = "detailScreen" and m.detailScreenAfterFn <> invalid
       m.detailScreenAfterFn(currentScreen)
       m.detailScreenAfterFn = invalid
