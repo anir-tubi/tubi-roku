@@ -213,9 +213,7 @@ End Function
 
 
 Function tubiExperiments_getExperiment(namespaceName as string, experimentName as string) as Object
-  if m.constants.settings.mode <> "production"
-    experimentName = "qa." + experimentName
-  end if
+  whitelistedExperimentName = "qa." + experimentName
 
   trackInfo = invalid
   experimentOriginalValue = invalid
@@ -228,6 +226,8 @@ Function tubiExperiments_getExperiment(namespaceName as string, experimentName a
       '//Make sure everything exists before proceeding
       if possibleExperiment.experiment_result.experiment_name = experimentName
         '//We found the desired experiment
+        experiment = possibleExperiment
+      else if possibleExperiment.experiment_result.experiment_name = whitelistedExperimentName
         experiment = possibleExperiment
       end if
     end if 
