@@ -46,12 +46,8 @@ Function TubiExperiments(constants) as Object
       }  
       roku_live_video_v2: {
       }
-      roku_utility_row : {
+      roku_discovery_v3 : {
       }
-      roku_utility_v2 : {
-      } 
-      roku_discovery_v2 : {
-      }      
     }
     defaultResources: {
     '//::TODO::SafeZone - set these experiments back to false when done with testing
@@ -66,14 +62,8 @@ Function TubiExperiments(constants) as Object
         roku_live_news_short_v2 : {"has_live_news" : false}
         roku_live_news_long_v2 : {"has_live_news" : false}
       }
-      roku_utility_row : {
-        roku_utility_row_v1 : {"has_utility_row" : false, "position" : 4}
-      }
-      roku_utility_v2 : {
-        roku_utility_position_v2 : {"has_utility_row" : false, "position" : 8}
-      }  
-      roku_discovery_v2 : {
-        roku_discovery_row_v2 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}
+      roku_discovery_v3 : {
+        roku_discovery_row_v3 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}
       }               
     }
     

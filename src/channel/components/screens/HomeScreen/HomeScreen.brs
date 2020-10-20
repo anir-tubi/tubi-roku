@@ -75,14 +75,6 @@ Function init()
   m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt]
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 
-  ' utility row position experiment
-  m.utilityRowPosition = -2
-  experimentInfo = getExperimentResource("roku_discovery_v2", "roku_discovery_row_v2", false)
-  if experimentInfo <> invalid and experimentInfo.position
-    ' decreasing the position value by 1 in order to use it as index
-    m.utilityRowPosition = experimentInfo.position - 1
-  end if
-  
   if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
     m.top.parentalRating = m.global.authInfo.parentalrating
   end if
@@ -143,6 +135,8 @@ Function onScreenFocusChange()
   if m.top.hasFocus()
     m.gridHasFocus = true
     m.CategoryGridList.setFocus(true)
+    ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
+    getExperimentResource("roku_discovery_v3", "roku_discovery_row_v3")
     if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
       m.top.loadAllCategories = true
     end if
@@ -268,9 +262,7 @@ Function onCurrFocusRowChange()
       m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true 
     end if
     ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
-    if rowEnteringFocus = 1 ' sending exposure event when the 2nd row gains focus
-      getExperimentResource("roku_discovery_v2", "roku_discovery_row_v2")
-    else if rowEnteringFocus = 2
+    if rowEnteringFocus = 2
       '//Send experiment exposure event if this is the 1st time the user has focused on the live news row
       getExperimentResource("roku_live_video_v2", "roku_live_news_short_v2")
       getExperimentResource("roku_live_video_v2", "roku_live_news_long_v2")
