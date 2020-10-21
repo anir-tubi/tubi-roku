@@ -384,6 +384,7 @@ Function getConstants()
     'privacy statement text
     constants.urls.privacyUrl = "https://legal-asset.tubi.tv/privacy-policy.txt"
     constants.urls.termsOfUseUrl = "https://legal-asset.tubi.tv/terms-of-use.txt"
+    constants.urls.doNotSellUrl = "https://legal-asset.tubi.tv/do-not-sell.txt"
 
     'channels poster image urls
     constants.urls.channelPosterUnbranded = "https://cdn.adrise.tv/image/roku_support_images/channel-poster-generic.png"

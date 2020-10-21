@@ -1,5 +1,6 @@
 Function init()
   m.SettingsMenu = m.top.findNode("SettingsMenu")
+  m.SettingsMenuGroup = m.top.findNode("SettingsMenuGroup")
   m.top.list = m.SettingsMenu
 
   m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
@@ -27,6 +28,22 @@ Function setSettingsMenuStrings()
     PrivacyPolicyButton.title = getTranslation("screenSettings_menu_privacyPolicy")
     TermsOfServiceButton =  m.top.findNode("TermsOfServiceButton")
     TermsOfServiceButton.title = getTranslation("screenSettings_menu_tos")
+    if UCase(m.global.constants.deviceInfo.countryCode) = "US"
+      '//We only show the DO Not Sell Policy in the US. It is only applicable to CA residents but we show it to all of US in case CA residents are traveling within the US.
+      DoNotSellPolicyButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
+      DoNotSellPolicyButton.title = getTranslation("screenSettings_menu_doNotSellPolicy")
+      DoNotSellPolicyButton.id = "DoNotSellPolicyButton"
+      DoNotSellPolicyButton.iconUrl ="pkg:/images/icon-dns.png" 
+
+      '//Offet the vertical placement of the list when adding a new list item
+      nYOffset = -1 * (m.SettingsMenu.itemSize[1] + m.SettingsMenu.itemSpacing[1]) 
+      m.SettingsMenuGroup.translation = [0, nYOffset]
+      
+      SettingsMenuContent =  m.top.findNode("SettingsMenuContent")
+      '//::HARDCODE:: hardcode the location of the new many item at the 4th index spot
+      SettingsMenuContent.insertChild(DoNotSellPolicyButton, 4)
+      
+    end if
 End Function
 
 

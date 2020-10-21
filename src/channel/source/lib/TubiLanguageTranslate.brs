@@ -543,6 +543,10 @@ Function getTranslation_en_US()
       "description": "A menu Item for the Settings screen",
       "message": "Terms of Service"
     },
+    "screenSettings_menu_doNotSellPolicy": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Do Not Sell My Info"
+    },
     "screenSettings_menu_signOut": {
       "description": "A menu Item for the Settings screen",
       "message": "Sign Out"

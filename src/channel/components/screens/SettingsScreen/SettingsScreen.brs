@@ -3,7 +3,8 @@ Function init()
 
   m.leftPanelWidth = 420
   m.rightPanelWidth = 1034
-  m.rightPaneloffset = [86,-199]
+  '//The offset sets the right panel to be placed at a different position than the settings menu list
+  m.rightPanelOffset = [86,-199]
 
   m.PanelSet = m.top.findNode("PanelSet")
   m.Title = m.top.findNode("Title")
@@ -102,9 +103,11 @@ Function onCreateNextPanelIndex()
     else if buttonContent.id = "AboutButton"
       nextPanel = CreateAboutPanel()
     else if buttonContent.id = "PrivacyPolicyButton"
-      nextPanel = CreateLegalPanel(buttonContent.title, m.global.constants.urls.privacyUrl)
+      nextPanel = CreateLegalPanel(buttonContent.title, m.constants.urls.privacyUrl)
     else if buttonContent.id = "TermsOfServiceButton"
-      nextPanel = CreateLegalPanel(buttonContent.title, m.global.constants.urls.termsOfUseUrl)
+      nextPanel = CreateLegalPanel(buttonContent.title, m.constants.urls.termsOfUseUrl)
+    else if buttonContent.id = "DoNotSellPolicyButton"
+      nextPanel = CreateLegalPanel(buttonContent.title, m.constants.urls.doNotSellUrl)
     else if buttonContent.id = "SignInOutButton"
       if isSignedIn() = true
         nextPanel = CreateSignOutPanel()

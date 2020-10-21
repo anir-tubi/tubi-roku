@@ -16,32 +16,35 @@
   </interface>
 
   <children>
-    <MarkupList
-      id="SettingsMenu"
-      numRows="12"
-      itemSize="[420,80]"
-      itemSpacing="[0,8]"
-      itemComponentName="DetailMenuItem"
-      vertFocusAnimationStyle="floatingFocus">
-      <ContentNode
-        id="SettingsMenuContent"
-        role="content">
-        <DetailMenuItemContentNode
-          id="ParentalControls"
-          iconUrl="pkg:/images/icon-parental.png" />
-        <DetailMenuItemContentNode
-          id="AboutButton"
-          iconUrl="pkg:/images/icon-about.png" />
-        <DetailMenuItemContentNode
-          id="PrivacyPolicyButton"
-          iconUrl="pkg:/images/icon-privacy.png" />
-        <DetailMenuItemContentNode
-          id="TermsOfServiceButton"
-          iconUrl="pkg:/images/icon-terms.png" />
-        <DetailMenuItemContentNode
-          id="SignInOutButton"
-          iconUrl="pkg:/images/icon-sign-in.png" />
-      </ContentNode>
-    </MarkupList>
+    <Group
+      id="SettingsMenuGroup">
+      <MarkupList
+        id="SettingsMenu"
+        numRows="12"
+        itemSize="[420,80]"
+        itemSpacing="[0,8]"
+        itemComponentName="DetailMenuItem"
+        vertFocusAnimationStyle="floatingFocus">
+        <ContentNode
+          id="SettingsMenuContent"
+          role="content">
+          <DetailMenuItemContentNode
+            id="ParentalControls"
+            iconUrl="pkg:/images/icon-parental.png" />
+          <DetailMenuItemContentNode
+            id="AboutButton"
+            iconUrl="pkg:/images/icon-about.png" />
+          <DetailMenuItemContentNode
+            id="PrivacyPolicyButton"
+            iconUrl="pkg:/images/icon-privacy.png" />
+          <DetailMenuItemContentNode
+            id="TermsOfServiceButton"
+            iconUrl="pkg:/images/icon-terms.png" />
+          <DetailMenuItemContentNode
+            id="SignInOutButton"
+            iconUrl="pkg:/images/icon-sign-in.png" />
+        </ContentNode>
+      </MarkupList>
+    </Group>
   </children>
 </component>
