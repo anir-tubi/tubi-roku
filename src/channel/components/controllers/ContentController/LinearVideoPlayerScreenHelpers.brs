@@ -34,7 +34,6 @@ Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
   end if
   unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer) 
   
-  
   if content <> invalid
     videoPlayer.analyticsMode = "normal"
 
@@ -129,6 +128,11 @@ End Function
 Function getLiveStreamManifest(streamUrl)
   tubiLog("LinearVideoPlayerScreenHelpers.getLiveStreamManifest")
   liveManifestReqType = m.constants.reqNames.getLiveManifest
+
+  if isString(streamUrl)
+    streamUrl = streamUrl.trim()
+  end if
+
   m.makeRequest(liveManifestReqType, streamUrl, invalid, onManifestResponse, onManifestError, "string")
 End Function
 
@@ -212,8 +216,10 @@ End Function
 
 Function constructModifiedLinearVideoUrl(originalUrl, pollUrl)
   modifiedUrl = originalUrl
-  if originalUrl <> invalid and pollUrl <> invalid
+  if isString(originalUrl) and isString(pollUrl)
+    pollUrl = pollUrl.trim()
     pollUrlParts = getUrlParts(pollUrl, ";")
+    originalUrl = originalUrl.trim()
     originalUrlParts = getUrlParts(originalUrl)
     if pollUrlParts <> invalid and originalUrlParts <> invalid
       protocol = pollUrlParts.protocol
