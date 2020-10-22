@@ -12,6 +12,7 @@ Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
   content = content.clone(true)
 
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+  
   bTellPlayerToPlay = true
   if videoPlayer = invalid
     videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
@@ -25,6 +26,11 @@ Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
     videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
     setInScreenCache(videoPlayer)
+  else
+    if videoPlayer.content = invalid or videoPlayer.content.id <> content.id 
+      '//Make sure previous video is stopped and video player is reset before proceeding
+      stopLinearVideoContent(videoPlayer)
+    end if
   end if
   unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer) 
   
