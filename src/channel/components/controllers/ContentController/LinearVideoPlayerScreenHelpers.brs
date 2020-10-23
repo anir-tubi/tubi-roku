@@ -22,6 +22,7 @@ Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
     videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
     videoPlayer.observeFieldScoped("refreshChannels", "onChannelsRequested")
     videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
+    videoPlayer.observeFieldScoped("userDisplayingChannelGuide", "onChannelGuideVisibleStateChangedByUser")
     videoPlayer.observeFieldScoped("channelSelected", "onNewChannelSelected")
     videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
@@ -489,6 +490,41 @@ Function reactToLinearVideoPlayerErrorStateInNonFullscreenState()
 End Function
 
 
+' When the user purposely opens or closes the channel guide (userDisplayingChannelGuide), then this handler will be called.
+Function onChannelGuideVisibleStateChangedByUser(msg)
+  tubiLog("LinearVideoPlayerScreenHelpers.onChannelGuideVisibleStateChangedByUser")
+  bChannelGuideVisible = msg.getData() 
+
+  event = invalid
+  pageType = ""
+  pageValues = {}
+  screen = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+
+  if screen <> invalid and screen.trackingPageInfo <> invalid and screen.trackingComponentInfo <> invalid and screen.trackingComponentInfo.componentValues <> invalid
+    pageType = screen.trackingPageInfo.pageType
+    pageValues = screen.trackingPageInfo.pageValues
+
+    componentInfo = screen.trackingComponentInfo.componentValues
+
+    toggle = ""
+    if bChannelGuideVisible = true
+      toggle = "TOGGLE_ON"
+    else
+      toggle = "TOGGLE_OFF"
+    end if
+
+    event = {
+      type: "component_interaction"
+      values: {
+        pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
+        componentOneof: m.Tracking.getAnalyticsComponent(screen.trackingComponentInfo.componentType, componentInfo)
+        user_interaction: toggle
+      }
+    }
+
+    m.trackingLoggingTask.trackEvent = event
+  end if
+End Function 
 
 ' A new channel is selected from the channel guide. Start playing that new channel
 Function onNewChannelSelected(msg)

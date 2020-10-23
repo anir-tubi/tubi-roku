@@ -784,7 +784,6 @@ End Function
 
 Function displayChannelGuide()
   animateGuide("in")
-  m.top.displayingChannelGuide = true
   bRefreshChannels = true
   if m.top.channelsContent <> invalid
     if shouldRefresh(m.top.channelsContent.getChild(0)) = false  'cacheValidationMixin
@@ -929,6 +928,9 @@ Function displayChannelGuideList(content = invalid)
   end if
   m.channelsGuideGroup.jumpToID = m.top.content.id
   m.channelsGuideGroup.display = true
+
+  m.top.displayingChannelGuide = true
+  m.top.userDisplayingChannelGuide = true
 End Function
 
 
@@ -951,6 +953,10 @@ Function onKeyEvent(key As String, press As Boolean)
     if m.nTransportState = 2
       '//2nd HUD screen is visible
       if key = "back" or (m.closedCaptioningGroup.opacity > 0 and key = "down") or (m.channelsGuideGroup.opacity > 0 and key = "left")
+        if (m.top.displayingChannelGuide = true)
+          '//Report that the user is purposely closing the channel guide
+          m.top.userDisplayingChannelGuide = false
+        end if
         '//Close the 2nd screen
         close2ndScreen()
         animateTransport("in")

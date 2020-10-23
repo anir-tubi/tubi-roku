@@ -456,10 +456,9 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
           contentId = Mid(contentNode.id, 2)
         end if
         tile.series_id = contentId.toInt()
-      else if contentNode.type = m.constants.ui.contentTypes.video
+      else if contentNode.type = m.constants.ui.contentTypes.video or contentNode.type = m.constants.ui.contentTypes.linear 
         tile.video_id = contentId.toInt()
       end if
-
     end if
     
     tile.col = colPos
@@ -825,6 +824,14 @@ Function tubiTracking_getOneOfs()
 
     left_side_nav_component: {
       left_nav_section: ""  ' Section enum
+    }
+    
+    channel_guide_component: {
+      category_slug: ""
+      category_row: -1   ' 1 based index
+      category_col: -1   ' 1 based index
+      content_tile: {}  ' ContentTile message - optional
+      utility_tile: {}  ' UtilityTile message - optional
     }
 
     category_component: {   ' Used for category screen, channel details screen, channel/category grid screen

@@ -34,7 +34,8 @@ Function onChannelGuideContentFocused(msg)
       horizontal_location_mode: "INDEX"  'LocationMode enum
     }
     contentTile = m.Tracking.getAnalyticsTile(channel, col, row)
-    m.lastChannelGuideComponentSelected = {content_tile: contentTile}
+
+    m.lastChannelGuideComponentSelected = {content_tile: contentTile, category_slug: guide.content.slug, category_row: row, category_col: col}
 
     '//The trackingComponentInfo has to be set before setting m.top.itemFocused for analytics reasons
     m.top.trackingComponentInfo = {

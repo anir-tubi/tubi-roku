@@ -65,6 +65,8 @@
       <field id="refreshChannels" type="boolean" alwaysNotify="true" />
       <!-- If true, then the player is currently playing the channel guide -->
       <field id="displayingChannelGuide" type="boolean" />
+      <!-- Has the user purposely told the channel guide to open? -->
+      <field id="userDisplayingChannelGuide" type="boolean"  alwaysNotify="true" />
 
       <field id="state" type="string" />
       

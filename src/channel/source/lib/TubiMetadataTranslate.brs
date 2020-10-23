@@ -1,6 +1,7 @@
 Function TubiMetadataTranslate(constants, experiments = invalid)
   return {
     ' public
+    translateBackendTypeToClientSideType: tubiMetadataTranslate_translateBackendTypeToClientSideType
     translateRecursive: tubiMetadataTranslate_translateRecursive
     getContentFromCategoryJson: tubiMetadataTranslate_getContentFromCategoryJson
     translateRelatedContent: tubiMetadataTranslate_translateRelatedContent
@@ -92,6 +93,34 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
 End Function
 
 
+
+'''''''''''''''''''''
+' translateBackendTypeToClientSideType
+'
+' Translate the backend type into a more readable client side content type
+Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType = "" as String) as String
+  sReturn = ""
+  if sBackendType = "u"
+    sReturn = m.contentTypes.utility
+  else if sBackendType = "c"
+    sReturn = m.contentTypes.category
+  else if sBackendType = "v" or sBackendType = "clip"
+    sReturn = m.contentTypes.video
+  else if sBackendType = "s"
+    sReturn = m.contentTypes.series
+  else if sBackendType = "a"
+    sReturn = m.contentTypes.season
+  else if sBackendType = "channel"
+    sReturn = m.contentTypes.channel
+  else if sBackendType = "l"
+    sReturn = m.contentTypes.linear
+  end if
+
+  return sReturn
+End Function
+
+
+
 '''''''''''''''''''''
 ' translateRecursive
 '
@@ -105,24 +134,15 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
   typeVar = "type"
   if contentFromServer[typeVar] <> invalid
-    if contentFromServer[typeVar] = "u"
-      translatedContent[typeVar] = m.contentTypes.utility
-    else if contentFromServer[typeVar] = "c"
-      translatedContent[typeVar] = m.contentTypes.category
-    else if contentFromServer[typeVar] = "v" or contentFromServer[typeVar] = "clip"
-      translatedContent[typeVar] = m.contentTypes.video
-    else if contentFromServer[typeVar] = "s"
-      translatedContent[typeVar] = m.contentTypes.series
+    sType = m.translateBackendTypeToClientSideType(contentFromServer[typeVar])
+    translatedContent[typeVar] = sType
+
+    if sType = m.contentTypes.series
       ' prefix "0" to series
       if translatedContent.id <> "" then translatedContent.id = "0" + translatedContent.id
-    else if contentFromServer[typeVar] = "a"
-      translatedContent[typeVar] = m.contentTypes.season
+    else if sType = m.contentTypes.season
       ' prefix "0" to series
       if translatedContent.id <> "" then translatedContent.id = "0" + translatedContent.id
-    else if contentFromServer[typeVar] = "channel"
-      translatedContent[typeVar] = m.contentTypes.channel
-    else if contentFromServer[typeVar] = "l"
-      translatedContent[typeVar] = m.contentTypes.linear
     end if
   end if
 
@@ -907,14 +927,17 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           sType = "TubiContentNode"
         end if
         
+
+        sContentType = m.translateBackendTypeToClientSideType(fullChild.type)
         childAA = {
           id: fullChild.id
           title: fullChild.title
           description: fullChild.description
           length: fullChild.duration
           subtype: sType
+          type: sContentType
         }
-
+        
         bLandscape = false
         if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.portrait or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.utility
           bLandscape = false
