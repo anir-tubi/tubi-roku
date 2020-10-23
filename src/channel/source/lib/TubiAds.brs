@@ -239,6 +239,7 @@ Function tubiAds_getRainmakerParams(content)
     language: m.constants.deviceInfo.language
     coppa_enabled: (m.appMode = "KIDS_MODE")
     app_mode: m.appMode
+    client_version: m.constants.deviceInfo.clientVersion
 
     ' the dubug parameter must be set to 1 in order to use the following "limit" parameters for testing
     ' limit_to_campaign_id: 0   'only allow ads with that particular campaign id through the pre-qual filters
