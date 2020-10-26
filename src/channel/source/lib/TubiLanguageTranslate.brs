@@ -1279,6 +1279,10 @@ Function getTranslation_es_MX()
       "description": "A menu Item for the Settings screen",
       "message": "Términos de servicio"
     },
+    "screenSettings_menu_doNotSellPolicy": {
+      "description": "A menu Item for the Settings screen",
+      "message": "No venda mi información"
+    },
     "screenSettings_menu_signOut": {
       "description": "A menu Item for the Settings screen",
       "message": "Cerrar sesión"

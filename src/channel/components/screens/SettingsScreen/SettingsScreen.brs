@@ -1,10 +1,10 @@
 Function init()
   m.constants = m.global.constants
 
-  m.leftPanelWidth = 420
+  m.leftPanelWidth = 470
   m.rightPanelWidth = 1034
   '//The offset sets the right panel to be placed at a different position than the settings menu list
-  m.rightPanelOffset = [86,-199]
+  m.rightPanelOffset = [36,-199]
 
   m.PanelSet = m.top.findNode("PanelSet")
   m.Title = m.top.findNode("Title")
