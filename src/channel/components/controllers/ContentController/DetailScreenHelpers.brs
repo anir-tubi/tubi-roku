@@ -531,7 +531,7 @@ Function handleSingleContentError(msg, trackOnResponse)
     detailScreen = invalid  'release reference to the detailScreen as it is no longer needed
     m.deepLinkContent = invalid
     startChannel()
-  else
+  else if detailScreen.isInFocusChain() = true
     message = getTranslation("screenDetails_error_getContent_description")
     content = getDetailScreenContent(detailScreen)
   
