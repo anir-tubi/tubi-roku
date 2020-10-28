@@ -258,6 +258,15 @@ Function playContent()
     if m.Video.globalCaptionMode = "On" and m.Video.content.hasSubtitles = true
       hasSubtitles = true
     end if
+    
+    resourceType = "VIDEO_RESOURCE_TYPE_UNKNOWN"
+    if m.Video.content.drmType = m.constants.player.drmTypes.dashWidevine
+      resourceType = "VIDEO_RESOURCE_TYPE_DASH_WIDEVINE"
+    else if m.Video.content.drmType = m.constants.player.drmTypes.dashPlayready
+      resourceType = "VIDEO_RESOURCE_TYPE_DASH_PLAYREADY"
+    else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv3
+      resourceType = "VIDEO_RESOURCE_TYPE_HLSV3"
+    end if
 
     trackEvent({
       type: "start_video"
@@ -271,6 +280,9 @@ Function playContent()
         is_fullscreen: isFullScreen
         from_autoplay_deliberate: autoPlayDeliberate
         from_autoplay_automatic: autoPlayAutomatic
+        video_player: "DEFAULT"
+        video_resource_type: resourceType
+        video_resource_url: m.Video.content.URL
       }
     })
   end if
@@ -1127,6 +1139,7 @@ Function getPlayProgressEvent()
         video_id: m.Video.content.id.toInt()
         position: Int(m.playerPosition * 1000)   'ms - without Int(), can return scientific notation, causing API error
         view_time: Int((m.playerPosition - m.lastPingTime) * 1000)   'ms
+        video_player: "DEFAULT"
       }
     }
 

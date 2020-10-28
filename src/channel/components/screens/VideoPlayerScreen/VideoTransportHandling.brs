@@ -268,6 +268,7 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
       values: {
         video_id: m.Video.content.id.toInt()
         pause_state: "PAUSED"
+        video_player: "DEFAULT"
       }
     })
   end if
@@ -294,6 +295,7 @@ Function resumeFromPause(shouldSendAnalytics)
         values: {
           video_id: m.Video.content.id.toInt()
           pause_state: "RESUMED"
+          video_player: "DEFAULT"
         }
       })
     end if
@@ -749,6 +751,7 @@ Function jumpToPosition(position)
       video_id: m.Video.content.id.toInt()
       from_position: Int(m.positionAtJumpStart * 1000)
       to_position: Int(position * 1000)
+      video_player: "DEFAULT"
     }
   })
 

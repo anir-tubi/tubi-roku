@@ -282,6 +282,9 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       is_fullscreen: true
       from_autoplay_deliberate: false 'TODO: Verify that these didn't get turned into an Enum
       from_autoplay_automatic: false
+      video_resource_type: "" ' The type of video resource
+      video_resource_url: "" 'The playable url in video resource
+      video_player: ""  'VideoPlayer enum
     }
 
     play_progress: {
@@ -290,6 +293,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       view_time: -1  'ms
       from_autoplay_deliberate: false
       from_autoplay_automatic: false
+      video_player: ""  'VideoPlayer enum
     }
 
     start_live_video: {
@@ -298,24 +302,26 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       has_subtitles: false  'the video player will show subtititles at start
       video_resource_url: ""
       video_resource_type: ""
-      video_player: ""
+      video_player: ""  'VideoPlayer enum
     }
 
     live_play_progress: {
       video_id: -1
       view_time: -1  'ms
-      video_player: ""
+      video_player: ""  'VideoPlayer enum
     }
 
     seek: {
       video_id: -1
       from_position: -1  'ms
       to_position: -1    'ms
+      video_player: ""  'VideoPlayer enum
     }
 
     pause_toggle: {
       video_id: -1
       pause_state: "" 'PauseState enum
+      video_player: ""  'VideoPlayer enum
     }
 
     subtitles_toggle: {
