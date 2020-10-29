@@ -583,7 +583,17 @@ function onVideoTrackingStart(msg)
     if videoPlayer <> invalid and videoPlayer.content <> invalid
       youboraConfig["extraparam.1"] = videoPlayer.content.id
       youboraConfig["content.id"] = videoplayer.content.id
-      youboraConfig.drm = videoplayer.content.drmType
+      
+      playbackType = videoplayer.content.drmType
+      youboraConfig.playbackType = playbackType
+      
+      if isString(playbackType)
+        playbackTypeArray = playbackType.spilt("_")
+        if playbackTypeArray[1] <> invalid
+          youboraConfig.drm = playbacTypeArray[1]
+        end if
+      end if
+      
       youboraConfig.tvShow = Mid(videoplayer.content.parentId, 2)
     end if
 
