@@ -132,6 +132,12 @@ End Function
 ' See protos.analytics.events.protos -> ClientEvent
 ' See protos.analytics.client.protos -> Device
 Function tubiTracking_getAnalyticsDevice(eventValues = invalid)
+
+  currentLocale = {
+    identifier : m.constants.deviceInfo.locale
+    language : UCase(m.constants.deviceInfo.language)
+  }
+
   device = {
     device_id: m.constants.deviceInfo.deviceId
     manufacturer: "Roku"
@@ -143,6 +149,7 @@ Function tubiTracking_getAnalyticsDevice(eventValues = invalid)
     device_height: m.constants.deviceInfo.displayHeight
     device_width: m.constants.deviceInfo.displayWidth
     advertiser_id: "00000000-0000-0000-0000-000000000000"
+    locale: currentLocale
   }
   if m.constants.deviceInfo.isAdIdTrackingDisabled <> true and (eventValues = invalid or eventValues.appMode <> "KIDS_MODE")
     device.advertiser_id = m.constants.deviceInfo.deviceAdId
@@ -327,7 +334,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     subtitles_toggle: {
       video_id: -1
       toggle_state: ""  'ToggleState enum
-      language: ""  'Language enum
+      language_code: ""  'LanguageCode enum
     }
 
     fullscreen_toggle: {  'Not used by Roku client

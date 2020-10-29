@@ -450,12 +450,12 @@ Function tubiTracking_populateMessage_test()
   messageBase = {
     video_id: -1
     toggle_state: ""  'ToggleState enum
-    language: ""  'Language enum
+    language_code: ""  'Language enum
   }
   messageValues = {
     video_id: 111770
     toggle_state: "ON"  'ToggleState enum
-    language: "EN"  'Language enum
+    language_code: "EN"  'Language enum
   }
 
   'with message base
@@ -471,7 +471,7 @@ Function tubiTracking_populateMessage_test()
   'with empty message values
   messageValues = {
     toggle_state: ""  'ToggleState enum
-    language: "EN"  'Language enum
+    language_code: "EN"  'Language enum
   }
   populatedMessage = Tracking.populateMessage(messageType, messageValues, messageBase)
   m.assertInvalid(populatedMessage.subtitles_toggle.video_id)

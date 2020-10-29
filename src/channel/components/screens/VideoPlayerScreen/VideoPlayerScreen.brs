@@ -698,7 +698,7 @@ Function onCaptionModeChange()
       values: {
         video_id: m.Video.content.id.toInt()
         toggle_state: toggleState  'ToggleState enum
-        language: language  'Language enum
+        language_code: language  'LanguageCode enum
       }
     })
   end if
