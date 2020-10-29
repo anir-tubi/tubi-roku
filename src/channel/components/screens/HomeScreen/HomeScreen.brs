@@ -264,7 +264,6 @@ Function onCurrFocusRowChange()
     ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
     if rowEnteringFocus = 2
       '//Send experiment exposure event if this is the 1st time the user has focused on the live news row
-      getExperimentResource("roku_live_video_v2", "roku_live_news_short_v2")
       getExperimentResource("roku_live_video_v2", "roku_live_news_long_v2")
     end if
 

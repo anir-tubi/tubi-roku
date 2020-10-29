@@ -59,8 +59,7 @@ Function TubiExperiments(constants) as Object
       rokunamespace: {
       }
       roku_live_video_v2: {
-        roku_live_news_short_v2 : {"has_live_news" : false}
-        roku_live_news_long_v2 : {"has_live_news" : false}
+        roku_live_news_long_v2 : {"has_live_news_default" : true}
       }
       roku_discovery_v3 : {
         roku_discovery_row_v3 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}
