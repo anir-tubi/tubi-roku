@@ -120,7 +120,7 @@ Submission releases are releases that are sent to Roku.
 `$ gulp install --test`
 
 2\. Prepare for submission release.
-- Create a new branch based off of master and call it "x_y_branch", where x is the Major Release number and where y is the Minor Release number: i.e. `2_9_branch`.
+- Create a new branch based off of master which will be used to make updates as needed for a submission release. Branch name is not important, but for clarity it can be something like: `updates_for_x_y_submission`, where x is the Major Release number and where y is the Minor Release number: i.e. `updates_for_2_14_submission`.
 
 - Create a new `new_images_since_x_y` file: i.e. `new_images_since_2_9` in the `new_images_since` directory.
 
@@ -128,16 +128,18 @@ Submission releases are releases that are sent to Roku.
 
   - Increment `minor_version`
 
-  - set `build_version` to `1`
+  - set `build_version` to `0`
 
 - Create a new image to serve as the staging channel launch icon.
 	- Using GIMP or Photoshop or other image editor, modify the `channel-store/channel-store-poster-540x405.png` with some text to identify it as the x_y staging channel.
 
 	- Save the modified image as `channel-store/channel-store-poster-staging-540x405.png`, overwriting the old staging channel launch icon.
 
-- Make a new PR of the `x_y_branch` against master. Once the PR has been merged _DO NOT_ delete the `x_y_branch`, as this will remain the source of truth for what is in production.
+- Make a new PR of the `x_y_branch` against master. Once the PR has been merged delete the branch as normal.
 
-3\. Create a staging channel for the minor build
+- Create a new branch off of master named "x_y_branch", where x is the Major Release number and where y is the Minor Release number: i.e. `2_14_branch`. Push this branch to Github. This branch will serve as the source of truth for what is in production until the next submission release.
+
+3\. Create a staging channel for the minor build from the `x_y_branch`
 - Run `$ gulp install --staging`
 
 - In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to create a new private channel.
@@ -255,41 +257,45 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   `$ gulp stage`
 
-7\. Create a CH ticket with any changes that have been made and give to the QA team for manual testing. Once the QA team has signed off on the build...
+7\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Guthub.
 
-8\. Rename the `qa_x_y_z` branch to `release_x_y_z`.
+ 
 
-9\. Run `$ gulp release`. This will increment the version number once more (the QA build should not be the same version number as the production build) and install a new build using the "production" config, to create the .pkgs needed to update the production build.
+8\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build.
 
-10\. Ready the release branch for review
+9\. After QA Sign Off, run `$ gulp release`. This will increment the version number once more (the QA build should not be the same version number as the production build) and install a new build using the "production" config, to create the .pkgs needed to update the production build.
+
+10\. Create a new branch based on the `qa_x_y_z` branch, and name it `release_x_y_z`, where "z" (of the release branch) will match the patch number that was just incremented by the previous step.
+
+11\. Ready the release branch for review
 
 - Push the `release_x_y_z` branch to Github.
 
-- Make a PR to the `x_y_branch`. Make sure you do not make the PR to master.
+- Make a PR to the `x_y_branch` and merge it after approval. Make sure you do not make the PR to master.
 
-- __DO NOT PROCEED TO THE INFRA SCRIPT STEP UNTIL THIS PR IS APPROVED__
-
-11\. Update the hotpatch and remote component files to the CDN
+12\. Update the hotpatch and remote component files to the CDN
 - Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/). Although it does not matter, traditionally we name the branch "Roku_x_y_z".
 
 - Copy two files to the CDN repo:
 
   - copy the remote components file (i.e. `build/tubi_remote_components_x_y_z.pkg`) into the folder: hotpatches/roku/components/
 
-  - copy the starter components file (i.e. `build/tubi_starter_components_x.y.brs`) into folder: hotpatches/roku/starter-components/
+  - copy the starter components file (i.e. `build/tubi_starter_components_x.y.pkg`) into folder: hotpatches/roku/starter-components/
 
 - Submit a PR to the CDN repo. Wait for the approval and merging of the PR before proceeding to the next step
 
-12\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
+- __DO NOT PROCEED TO THE INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
+
+13\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
 - You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirmements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
 
   `$ pyenv`
 
-- If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure)
-- Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/).
+- If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
+- Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/#deploy-to-aws-s3).
 
-13\. Verify the release
+14\. Verify the release
 - Run a smoke test on production checking at minimum:
     - The production channel loads
 		- Video plays
@@ -297,9 +303,9 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - Monitor various metrics for signs of any issues:
 	- [Ad impressions per second](https://app.datadoghq.com/dashboard/ckr-vrw-xh4/ad-server-business-metrics?from_ts=1563412592034&to_ts=1564017392034&live=true&tile_size=m&fullscreen_widget=80673160&fullscreen_section=overview)
 
-14\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
+15\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
 
-15\. Create a release on Github
+16\. Create a release on Github
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
 
@@ -308,7 +314,9 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - Update the "Release Title" to be either Submission Release or Remote Release depending on the type of release.
 
-- Add the changes that were included in the release to the "Describe this release" description text box, with each change ending in a period, and on it's own line. Do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
+- Add the date on which the release was actually deployed (ideally this is the same day as the Github release is being created, but sometimes it might not be).
+
+- Add the changes that were included in the release to the "Describe this release" description text box. As it was mentioned earlier, use the the changes that were submitted to the QA Club House ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
 - Select "Update Release"
 
@@ -355,7 +363,7 @@ We may want to see how a new feature will affect the app's metrics from a small 
 
 
 ## Deploying an experiment on Popper Staging:
-- Before you can deploy to staging, you need to ensure your ssh config file has been updated with the ip addresses and hostname info of the popper staging location. This info can be found under "[popper-engine-roku]" in the [staging inventory](https://github.com/adRise/adrise_infrastructure/blob/master/inventory/staging/staging#L317). 
+- Before you can deploy to staging, you need to ensure your ssh config file has been updated with the ip addresses and hostname info of the popper staging location. This info can be found under "[popper-engine-roku]" in the [staging inventory](https://github.com/adRise/adrise_infrastructure/blob/master/inventory/staging/staging#L317).
 
 - Please follow the [SSH Access Instructions](https://github.com/adRise/adrise_infrastructure#ssh-access) while using the popper info from the previous step to set up your SSH Config file. Below is an example of what is added to the .ssh/config file. (Note: on the Mac, the ssh config file is located in [user]/.ssh/config, where "user" is the username on your mac.)
 
@@ -366,7 +374,7 @@ We may want to see how a new feature will affect the app's metrics from a small 
    IdentityFile ~/.ssh/adrise_aws_ohio_staging.pem
    ProxyCommand ssh -A -q -W %h:%p bastion-staging-1
   ```
-  - where the "IdentityFile" is the PEM file you set up for the staging server as described in the SSH Access Instructions, 
+  - where the "IdentityFile" is the PEM file you set up for the staging server as described in the SSH Access Instructions,
   - where the "host" and "hostname" (the IP address) are the popper staging info gathered from the previous step
 
 - Once you have set up your ssh config file, you can now follow the directions on how to deploy your JSON popper configuration changes, see [[How to deploy to staging instructions](https://github.com/adRise/larnaca/tree/master/popper-engine#how-to-deploy-to-staging)]
