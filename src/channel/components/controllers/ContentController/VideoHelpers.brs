@@ -588,7 +588,7 @@ function onVideoTrackingStart(msg)
       youboraConfig.playbackType = playbackType
       
       if isString(playbackType)
-        playbackTypeArray = playbackType.spilt("_")
+        playbackTypeArray = playbackType.split("_")
         if playbackTypeArray[1] <> invalid
           youboraConfig.drm = playbacTypeArray[1]
         end if
