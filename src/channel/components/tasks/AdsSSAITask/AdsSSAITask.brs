@@ -51,7 +51,7 @@ End Function
 
 
 Function runSSAILoop(constants, ssaiPort)
-  tubiLog("AdsSSAITask.runSSAILoop")
+  tubiLog(m.top.id + ".runSSAILoop")
   m.top.observeField("pollUrl", ssaiPort)
   m.top.observeField("videoPosition", ssaiPort)
   m.top.observeField("id3Tags", ssaiPort)
@@ -98,7 +98,7 @@ End Function
 
 ' occurs when a new linear channel has been selected by the user.
 Function onPollUrlChange(msg)
-  tubiLog("AdsSSAITask.onPollUrlChange")
+  tubiLog(m.top.id + ".onPollUrlChange")
   pollUrl = msg.getData()
 
   ' old ad state may persist if a user changes channels in the middel of an ad, so reset ad state
@@ -236,7 +236,7 @@ End Function
 
 
 Function onContentUpdated(content)
-  tubiLog("AdsSSAITask.onContentUpdated")
+  tubiLog(m.top.id + ".onContentUpdated")
 
   ' add the ad parameters for the content. Back end will forward these parameters to YoSpace
   ' so that YoSpace can have them when YoSpace makes ad requests for SSAI
@@ -250,7 +250,7 @@ Function onContentUpdated(content)
   
   newResource = {}
   
-  if content.videoResources <> invalid 
+  if content <> invalid and content.videoResources <> invalid 
     for each resource in content.videoResources
       if resource.type = m.constants.player.drmTypes.hlsv3
         if resource.url <> invalid

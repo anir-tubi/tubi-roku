@@ -67,9 +67,13 @@ Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
     ' 4) pass the content with the updated stream url to the linear video player
     if m.adsSsaiTask <> invalid
       m.adsSsaiTask.unobserveFieldScoped("videoResourcesWithAdParams")
+      m.adsSsaiTask.exit = true
+      m.adsSsaiTask = invalid
     end if
+
     m.adsSsaiTask = CreateObject("roSGNode", "AdsSSAITask")
     m.adsSsaiTask.id = "tempAdsSsaiTask"
+
     ' adsSsaiTask will update the videoResource url with rainmaker params when it receives content
     m.adsSsaiTask.observeFieldScoped("videoResourcesWithAdParams", "onAdParamsAddedToVideoUrl")
     m.adsSsaiTask.content = content
@@ -142,26 +146,22 @@ Function onAdParamsAddedToVideoUrl(msg)
   adsSsaiTask = msg.getRoSGNode()
   content = adsSsaiTask.content  'this content has the videoResources with the url with the ads params appended to it
   content.videoResources = msg.getData()
+  
+  ' don't completely clean up ads task here because we may use it again in the case where the manifest
+  ' response does not provide an ad poll url
   adsSsaiTask.unobserveFieldScoped("videoResourcesWithAdParams")
-  adsSsaiTask.exit = true
 
-  bError = true
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
-    for each resource in content.videoResources
-      if resource.type = m.constants.player.drmTypes.hlsv3
-        streamUrl = resource.url
-        bError = false
-        videoPlayer.content = content
-        getLiveStreamManifest(streamUrl)
-        exit for
-      end if
-    end for
-  end if
-  
-  if bError = true
-    '//Incorrect data, display an error
-    showLinearPlayerError()
+    streamUrl = getLiveUrlFromResources(content)
+    if streamUrl <> invalid
+      ' store the content on videoPlayer so it can be retrieved after the manifest is fetched
+      videoPlayer.content = content
+      getLiveStreamManifest(streamUrl)
+    else
+      ' no stream url so show an error
+      showLinearPlayerError()
+    end if
   end if
 End Function
 
@@ -174,12 +174,12 @@ Function getLiveStreamManifest(streamUrl)
     streamUrl = streamUrl.trim()
   end if
 
-  m.makeRequest(liveManifestReqType, streamUrl, invalid, onManifestResponse, onManifestError, "string")
+  m.makeRequest(liveManifestReqType, streamUrl, invalid, onLiveStreamManifestResponse, onManifestError, "string")
 End Function
 
 
-Function onManifestResponse(response)
-  tubiLog("LinearVideoPlayerScreenHelpers.onManifestResponse")
+Function onLiveStreamManifestResponse(response)
+  tubiLog("LinearVideoPlayerScreenHelpers.onLiveStreamManifestResponse")
   ' find the analytics url
   ' ("analytics url" is the YoSpace name for the url that will be polled for ad responses)
   pollUrl = invalid
@@ -198,11 +198,6 @@ Function onManifestResponse(response)
     end if
   end for
 
-  ' piece together the modified playback url
-  ' The url that will be used for the video stream must be built from the original url returned by the API
-  ' and from the "analytics url"/ad polling url. For more info, please see:
-  ' https://docs.google.com/document/d/14Ovs4KzV0iwloKtILjSZhQxT2NcGdGCm80MIMvB9EfE
-  originalUrl = invalid
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
   content = invalid
@@ -210,32 +205,77 @@ Function onManifestResponse(response)
     content = videoPlayer.content
   end if
 
-  modifiedUrl = ""
-  if content <> invalid and content.videoResources <> invalid
-    videoResources = content.videoResources
-    newVideoResources = []
+  if pollUrl <> invalid or (pollUrl = invalid and m.constants.ui.liveNewsNoAdsIds[content.id] <> invalid)
+    ' TODO: We do not want to maintain the m.constants.ui.liveNewsNoAdsIds map, so remove
+    ' any references to it after we find out how often this happens, or get
+    ' the backend to inform us of which linear content has ads.
 
-    for each resource in videoResources
-      newResource = resource
+    ' we have a valid poll url or we are not expecting one, so play content
 
-      if resource.type = m.constants.player.drmTypes.hlsv3
-        if resource.url <> invalid
-          originalUrl = resource.url
-          modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
-          newResource.url = modifiedUrl
+    ' piece together the modified playback url
+    ' The url that will be used for the video stream must be built from the original url returned by the API
+    ' and from the "analytics url"/ad polling url. For more info, please see:
+    ' https://docs.google.com/document/d/14Ovs4KzV0iwloKtILjSZhQxT2NcGdGCm80MIMvB9EfE
+    originalUrl = invalid
+
+    modifiedUrl = ""
+    if content <> invalid and content.videoResources <> invalid
+      videoResources = content.videoResources
+      newVideoResources = []
+
+      for each resource in videoResources
+        newResource = resource
+
+        if resource.type = m.constants.player.drmTypes.hlsv3
+          if resource.url <> invalid
+            originalUrl = resource.url
+            modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
+            newResource.url = modifiedUrl
+          end if
         end if
-      end if
 
-      newVideoResources.push(newResource)
-    end for
+        newVideoResources.push(newResource)
+      end for
 
-    content.videoResources = newVideoResources
+      content.videoResources = newVideoResources
+    end if
+
+    videoPlayer.content = content
+    videoPlayer.updateContent = true
+    videoPlayer.pollUrl = pollUrl
+    videoPlayer.control = "play"
+  else if pollUrl = invalid and m.constants.ui.liveNewsNoAdsIds[content.id] = invalid
+    ' TODO: We do not want to maintain the m.constants.ui.liveNewsNoAdsIds map, so remove
+    ' any references to it after we find out how often this happens, or get
+    ' the backend to inform us of which linear content has ads.
+
+    if m.adsSsaiTask.manifestAttempts < 3
+      ' we didn't get a poll url but the content is expected to have ads, so we can retry fetching
+      ' the manifest as long as we are beneath the max retry attempts limit.
+      m.adsSsaiTask.manifestAttempts += 1
+      streamUrl = getLiveUrlFromResources(content)
+      getLiveStreamManifest(streamUrl)
+    else
+      ' we've maxed out the allowed retries but still no poll url, so trigger an
+      ' error via the videoPlayer and log an error.
+      videoPlayer.control = "error"
+
+      streamUrl = ""
+      for each line in lines
+        if line.left(8) = "https://"
+          streamUrl = line
+          exit for
+        end if
+      end for
+
+      logMsg = {
+        content_id: content.id
+        stream_url: streamUrl
+      }
+      logMsg = FormatJson(logMsg)
+      tubiLog(logMsg, "error", "videoLoad", "no-yospace-analytics-url")
+    end if
   end if
-
-  videoPlayer.content = content
-  videoPlayer.updateContent = true
-  videoPlayer.pollUrl = pollUrl
-  videoPlayer.control = "play"
 End Function
 
 
@@ -244,6 +284,7 @@ Function onManifestError(error)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
     if videoPlayer.fullscreen = true
+      code = invalid
       if error <> invalid
         code = error.code
       end if
@@ -273,6 +314,22 @@ Function constructModifiedLinearVideoUrl(originalUrl, pollUrl)
   end if
 
   return modifiedUrl
+End Function
+
+
+Function getLiveUrlFromResources(content)
+  streamUrl = invalid
+
+  if content <> invalid
+    for each resource in content.videoResources
+      if resource.type = m.constants.player.drmTypes.hlsv3
+        streamUrl = resource.url
+        exit for
+      end if
+    end for
+  end if
+
+  return streamUrl
 End Function
 
 
@@ -341,7 +398,6 @@ End Function
 
 
 Function onLinearVideoPlayerStateWhileInMinState(msg)
-  tubiLog("LinearVideoPlayerScreenHelpers.onLinearVideoPlayerStateWhileInMinState")
   videoPlayer = msg.getRoSGNode()
   if videoPlayer <> invalid
     tubiLog("LinearVideoPlayerScreenHelpers.onLinearVideoPlayerStateWhileInMinState state = " + msg.GetData())
@@ -439,6 +495,7 @@ Function stopLinearVideoContent()
     videoTrackingStop() 'stops youbora tracking
     videoPlayer.control = "stop"
   end if
+
   if m.adsSsaiTask <> invalid
     m.adsSsaiTask.unobserveFieldScoped("videoResourcesWithAdParams")
   end if
@@ -498,7 +555,10 @@ End Function
 
 
 Function reactToLinearVideoPlayerErrorStateInNonFullscreenState()
-  '//if player receives error or finished state while minimized, then hide the player
+  tubiLog("LinearVideoPlayerScreenHelpers.reactToLinearVideoPlayerErrorStateInNonFullscreenState")
+  '//if player receives error or finished state while minimized, then hide the player.
+  ' We don't show an error modal when in non full screen mode since users didn't explicitly select
+  ' to start playback. If an error occurs heres, not showing an error modal allows users to continue navigating.
   stopAndHideLinearVideoPlayer()
   homescreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   setHomeScreenBackground(homescreen)

@@ -26,7 +26,7 @@
       <field id="channelsContent" type="node"/>
 
       <!-- Fields to pass through to AdsSSAITask -->
-      <field id="pollUrl" alias="AdsSSAITask.pollUrl" />
+      <field id="pollUrl" alias="PlayerAdsSSAITask.pollUrl" />
 
       <!-- Indicator that the outside would like the overlay transports to be closed -->
       <field id="closeTransport" type="boolean" alwaysNotify="true"/>
@@ -34,7 +34,7 @@
       <!-- Is video player currently in fullscreen? -->
       <field id="fullscreen" type="boolean" value="false"/>
 
-      <!-- Only support play and stop for simple external interface -->
+      <!-- supports "play", "stop", "pause", "resume", "error" -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>
       
       <field id="transportVoiceRequest" type="assocarray" alwaysNotify="true"/>
@@ -247,7 +247,7 @@
     </Group>
 
     <AdsSSAITask
-      id="AdsSSAITask" />
+      id="PlayerAdsSSAITask" />
 
   </children>
 </component>

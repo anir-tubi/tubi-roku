@@ -16,7 +16,7 @@ Function init()
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
   m.Transport = m.top.findNode("Transport")
-  m.AdsSSAITask = m.top.findNode("AdsSSAITask")
+  m.AdsSSAITask = m.top.findNode("PlayerAdsSSAITask")
   m.AdsSSAITask.observeField("isPlayingAds", "onAdChange")
   m.ButtonsGroup = m.top.findNode("ButtonsGroup")
   '//Keep the state of the transport. Is the 1st trasnport page visible? 2nd page? 
@@ -159,7 +159,7 @@ Function onContentChange(msg) As Void
   tubiLog("LineaerVideoPlayerScreen.onContentChange")
   m.top.state = ""
   hideTransport()
-  stopVideo("onContentChange")
+  stopVideo()
  
   if m.top.content <> invalid
     'set page tracking values for analytics
@@ -227,12 +227,15 @@ Function onControlChange()
     end if
 
   else if m.top.control = "stop" then
-    stopVideo("onControlChange")
-
+    stopVideo()
   else if m.top.control = "pause" then
     pauseVideo(false, false)
   else if m.top.control = "resume" and m.Video.state = "paused" then
     resumeFromPause(false)
+  else if m.top.control = "error"
+    stopVideo()
+    m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
+    m.top.state = "error"
   end if
 End Function
 
@@ -557,8 +560,8 @@ Function resetVideoPlayerState(content = invalid)
 End Function
 
 
-Function stopVideo(source)
-  tubiLog("LineaerVideoPlayerScreen.stopVideo " + source)
+Function stopVideo()
+  tubiLog("LineaerVideoPlayerScreen.stopVideo")
   m.VideoState = "stop"
 
   ' add check so that onVideoStateChange doesn't get called

@@ -33,6 +33,11 @@
         <field id="videoIsFullscreen" type="boolean" />
         <field id="exit" type="boolean" />
 
+        <!-- This field is used strictly to hold external state, as there was no other good
+             place to store it. It is not used internal to this task.
+         -->
+        <field id="manifestAttempts" type="integer" value="0" />
+
       <!-- OUTPUT -->
         <!-- updated video resources with urls that include ad params needed by yospace to fetch ads from
              rainmaker.
