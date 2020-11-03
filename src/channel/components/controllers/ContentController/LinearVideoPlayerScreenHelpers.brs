@@ -70,7 +70,10 @@ Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
       m.adsSsaiTask.exit = true
       m.adsSsaiTask = invalid
     end if
-
+    if m.linearManifestRequest <> invalid
+      m.cancelRequest(m.linearManifestRequest)
+      m.linearManifestRequest = invalid
+    end if
     m.adsSsaiTask = CreateObject("roSGNode", "AdsSSAITask")
     m.adsSsaiTask.id = "tempAdsSsaiTask"
 
@@ -174,7 +177,7 @@ Function getLiveStreamManifest(streamUrl)
     streamUrl = streamUrl.trim()
   end if
 
-  m.makeRequest(liveManifestReqType, streamUrl, invalid, onLiveStreamManifestResponse, onManifestError, "string")
+  m.linearManifestRequest = m.makeRequest(liveManifestReqType, streamUrl, invalid, onManifestResponse, onManifestError, "string")
 End Function
 
 
@@ -495,9 +498,13 @@ Function stopLinearVideoContent()
     videoTrackingStop() 'stops youbora tracking
     videoPlayer.control = "stop"
   end if
-
+  '//cancel any asynchronous tasks/requests that may cause the video to play if they are left to continue
   if m.adsSsaiTask <> invalid
     m.adsSsaiTask.unobserveFieldScoped("videoResourcesWithAdParams")
+  end if
+  if m.linearManifestRequest <> invalid
+    m.cancelRequest(m.linearManifestRequest)
+    m.linearManifestRequest = invalid
   end if
 End Function
 

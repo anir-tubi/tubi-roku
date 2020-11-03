@@ -8,6 +8,7 @@ Function GeneralTaskModule(context, generalTask)
   module = {
     ' public
     makeRequest: generalTask_makeRequest
+    cancelRequest: generalTask_cancelRequest
     
     ' private
     generalTask: generalTask
@@ -75,6 +76,7 @@ End Function
 Function successCallbackWrapper(msg)
 
   requestNode = msg.getRoSGNode()
+  requestNode.status = "success"
   response = requestNode.response
   m.unobserveGeneralTaskFields(requestNode)
   callback = m.getGeneralTaskSuccessCallback(requestNode)
@@ -93,6 +95,7 @@ End Function
 Function errorCallbackWrapper(msg)
 
   requestNode = msg.getRoSGNode()
+  requestNode.status = "error"
   error = requestNode.error
   m.unobserveGeneralTaskFields(requestNode)
   callback = m.getGeneralTaskErrorCallback(requestNode)
@@ -101,6 +104,19 @@ Function errorCallbackWrapper(msg)
     callback(error)
   end if
 
+End Function
+
+
+' generalTask_cancelRequest
+' 
+' If the request is no longer needed, then this function will unobserve the relevant fields on the RequestNode and no callbacks will be called. The actual request may still return a response, but we will no longer do anything upon receiving the response.
+' This should only be used as a public function.
+' @requestNode : RequestNode, the node that should be canceled
+Function generalTask_cancelRequest(requestNode)
+  if requestNode <> invalid
+    requestNode.status = "canceled"
+    m.unobserveGeneralTaskFields(requestNode)
+  end if 
 End Function
 
 

@@ -563,7 +563,6 @@ End Function
 Function stopVideo()
   tubiLog("LineaerVideoPlayerScreen.stopVideo")
   m.VideoState = "stop"
-
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
   if m.Video.state <> "stopped" and m.Video.state <> "finished"
