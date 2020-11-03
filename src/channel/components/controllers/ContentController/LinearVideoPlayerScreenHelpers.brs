@@ -27,11 +27,6 @@ Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
     videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
     setInScreenCache(videoPlayer)
-  else
-    if videoPlayer.content = invalid or videoPlayer.content.id <> content.id 
-      '//Make sure previous video is stopped and video player is reset before proceeding
-      stopLinearVideoContent(videoPlayer)
-    end if
   end if
   unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer) 
   
@@ -40,38 +35,24 @@ Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
 
     ' set general observers for all content
     videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
-  
-    if videoPlayer.content <> invalid
-      if videoPlayer.content.id = content.id and videoPlayer.state = "playing"
-        '//If the video player is already playing the current content, then don't tell it to play
-        bTellPlayerToPlay = false
-      end if
-    end if
-    if bTellPlayerToPlay = true
-      videoPlayer.content = content
-      videoPlayer.updateContent = true
-    end if
   end if
 
   ' it's necessary to push the screen after the content has been set on the videoPlayer component,
   ' so NavigateToPage and PageLoad events contain the necessary content id information
   if bMinimized = false 
-    if currentScreen() = invalid or currentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
-      pushScreen(videoPlayer, true, true)
-    end if
-    bAnimate = false
-    if bTellPlayerToPlay = false
-      '//If the video is already playing then animate it view in case it is being displayed on the homscreen in a corner
-      bAnimate = true
-    end if
-    displayLinearVideoPlayerAtFullScreen(bAnimate)
+    maximizeLinearPlayer(content)
   else 
     '//play at minimized state
     showHideLinearVideoPlayerSpinner(true)
     animateLinearVideoPlayerToMinState(0, false)
   end if
 
-  if bTellPlayerToPlay = true
+  if isLinearPlayerPlayingThisContent(content) = false
+    if content <> invalid
+      videoPlayer.content = content
+      videoPlayer.updateContent = true
+    end if
+
     ' this is not the same instance of the task that is used by the linear video player
     ' this is just a temp task to handle adding the params to the video url,
     ' and will be removed later.
@@ -94,6 +75,65 @@ Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
     m.adsSsaiTask.content = content
     m.adsSsaiTask.updateContent = true
   end if
+End Function
+
+
+Function getCurrentLinearContent()
+  content = invalid
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+
+  if videoPlayer <> invalid
+    content = videoPlayer.content
+  end if
+  return content
+End Function
+
+
+' display the linear video player at the max state
+Function maximizeLinearPlayer(content)
+  tubiLog("LinearVideoPlayerScreenHelpers.maximizeLinearPlayer")
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+
+  if videoPlayer <> invalid
+    if currentScreen() = invalid or currentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+      pushScreen(videoPlayer, true, true)
+    end if
+    bAnimate = false
+    if isLinearPlayerPlayingThisContent(content) = true
+      '//If the video is already playing then animate it view in case it is being displayed on the homscreen in a corner
+      bAnimate = true
+    end if
+
+    videoPlayer.unobserveFieldScoped("state")
+    videoPlayer.unobserveFieldScoped("backButtonPressed")
+    videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerState")
+    videoPlayer.observeFieldScoped("backButtonPressed", "onLinearVideoPlayerBackPressed")
+  
+    if videoPlayer.fullscreen = false
+      '//stop the background artwork from transitioning and from displaying while player is in fullscreen
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.linear
+        uriList: []
+      }
+      m.backgroundGroup.posterVisible = true 
+      showHideLinearVideoPlayerSpinner(false)
+      
+      repositionLinearVideoPlayerToMaxState(bAnimate)
+    end if
+
+  end if
+End Function
+
+
+Function isLinearPlayerPlayingThisContent(content)
+  bPlaying = false
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+  if content <> invalid and videoPlayer <> invalid and videoPlayer.content <> invalid
+    if videoPlayer.content.id = content.id and videoPlayer.state = "playing"
+      bPlaying = true
+    end if
+  end if
+  return bPlaying
 End Function
 
 
@@ -251,7 +291,7 @@ Function stopAndHideLinearVideoPlayer()
     '//reset and Hide the loading indicator.
     showHideLinearVideoPlayerSpinner(false)
     m.backgroundGroup.posterVisible = true
-    stopLinearVideoContent(videoPlayer)
+    stopLinearVideoContent()
     unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
     videoPlayer.visible = false
   end if
@@ -390,35 +430,10 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
 End Function
 
 
-
-Function displayLinearVideoPlayerAtFullScreen(bAnimate = false)
-  tubiLog("LinearVideoPlayerScreenHelpers.displayLinearVideoPlayerAtFullScreen")
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  
-  videoPlayer.unobserveFieldScoped("state")
-  videoPlayer.unobserveFieldScoped("backButtonPressed")
-  videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerState")
-  videoPlayer.observeFieldScoped("backButtonPressed", "onLinearVideoPlayerBackPressed")
-
-  if videoPlayer <> invalid and videoPlayer.fullscreen = false
-    '//stop the background artwork from transitioning and from displaying while player is in fullscreen
-    m.backgroundGroup.backgroundInfo = {
-      type: m.constants.ui.backgroundTypes.linear
-      uriList: []
-    }
-    m.backgroundGroup.posterVisible = true 
-    showHideLinearVideoPlayerSpinner(false)
-    
-    repositionLinearVideoPlayerToMaxState(bAnimate)
-  end if
-End Function
-
-
 ' Stop the linear video player
-' @videoPlayer: roSGNode, a LinearVideoPlayerScreen node
-Function stopLinearVideoContent(videoPlayer)
+Function stopLinearVideoContent()
   tubiLog("LinearVideoPlayerScreenHelpers.stopLinearVideoContent")
-
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
     videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
     videoTrackingStop() 'stops youbora tracking
@@ -477,7 +492,7 @@ Function showLinearPlayerError(error_message = "", errorCode = invalid)
     }
 
     showErrorModal(modalInfo, onRetryLinearPlayerError, invalid)
-    stopLinearVideoContent(videoPlayer) '//In case the video is still playing
+    stopLinearVideoContent() '//In case the video is still playing
   end if
 End Function
 
@@ -535,6 +550,7 @@ Function onNewChannelSelected(msg)
     if channel <> invalid and channel.videoResources <> invalid
       oldTrackingPageInfo = videoPlayer.trackingPageInfo
       trackingComponentInfo = videoPlayer.trackingComponentInfo
+      stopLinearVideoContent()
       playLinearVideoContent(channel, false)
       newTrackingPageInfo = videoPlayer.trackingPageInfo
       screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo)
@@ -617,6 +633,7 @@ Function onRetryLinearPlayerError()
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
     content = videoPlayer.content
+    stopLinearVideoContent()
     playLinearVideoContent(content, false)
   end if
 End Function

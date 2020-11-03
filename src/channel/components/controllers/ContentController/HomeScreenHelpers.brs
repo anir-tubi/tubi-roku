@@ -411,6 +411,7 @@ Function onHomeScreenContentFocused(msg)
       if bPlayVideo = true
         '//If player is currently not playing the current content, then display background and tell player to load and play the video associated with the focused item
         m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
+        stopLinearVideoContent()
         playLinearVideoContent(focusedContent)
       else 
         startCountdownTimer()
@@ -444,7 +445,15 @@ Function selectLinearContent(content)
   '//stop timer and tell player to go fullscreen   
   stopCountdownTimer()
   if content <> invalid and content.type = m.constants.ui.contentTypes.linear
-    playLinearVideoContent(content, false)
+    linearContent = getCurrentLinearContent()
+    if linearContent <> invalid and linearContent.id <> invalid and content.id = linearContent.id
+      '//If the user selects the linear content that is already playing, then just maximize it. 
+      maximizeLinearPlayer(content) 
+    else
+      '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content. 
+      stopLinearVideoContent()
+      playLinearVideoContent(content, false)
+    end if
   end if
 End Function
 
