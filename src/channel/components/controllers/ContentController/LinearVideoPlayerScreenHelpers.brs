@@ -177,7 +177,7 @@ Function getLiveStreamManifest(streamUrl)
     streamUrl = streamUrl.trim()
   end if
 
-  m.linearManifestRequest = m.makeRequest(liveManifestReqType, streamUrl, invalid, onManifestResponse, onManifestError, "string")
+  m.linearManifestRequest = m.makeRequest(liveManifestReqType, streamUrl, invalid, onLiveStreamManifestResponse, onManifestError, "string")
 End Function
 
 
