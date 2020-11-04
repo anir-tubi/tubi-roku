@@ -361,13 +361,16 @@ Function trackFullScreen(bFullScreen)
   if bFullScreen = true
     toggleState = "ON"
   end if
-  trackEvent({
-    type: "fullscreen_toggle"
-    values: {
-      video_id: m.top.content.id.toInt()
-      toggle_state: toggleState  'ToggleState enum
-    }
-  })
+
+  if m.top.content <> invalid
+    trackEvent({
+      type: "fullscreen_toggle"
+      values: {
+        video_id: m.top.content.id.toInt()
+        toggle_state: toggleState  'ToggleState enum
+      }
+    })
+  end if
 End Function
 
 

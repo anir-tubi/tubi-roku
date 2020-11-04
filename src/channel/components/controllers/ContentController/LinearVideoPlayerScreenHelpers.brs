@@ -101,7 +101,7 @@ Function maximizeLinearPlayer(content)
   tubiLog("LinearVideoPlayerScreenHelpers.maximizeLinearPlayer")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
-  if videoPlayer <> invalid
+  if videoPlayer <> invalid and videoPlayer.content <> invalid
     if currentScreen() = invalid or currentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
       pushScreen(videoPlayer, true, true)
     end if
