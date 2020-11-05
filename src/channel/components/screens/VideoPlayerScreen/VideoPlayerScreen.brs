@@ -480,11 +480,15 @@ Function onVideoPositionChange()
   end if
 
   ' Analytics
-  if m.playerPosition >= m.lastPingTime + m.analyticsInterval and playProgressOk = true
-    playProgressEvent = getPlayProgressEvent()
-    if playProgressEvent <> invalid
-      m.lastPingTime = m.playerPosition
-      trackEvent(playProgressEvent)
+  if m.VideoState = "play"
+    ' videoPosition can change after the player has been paused (like right button press),
+    ' we do not want to send play progress events in that case.
+    if m.playerPosition >= m.lastPingTime + m.analyticsInterval and playProgressOk = true
+      playProgressEvent = getPlayProgressEvent()
+      if playProgressEvent <> invalid
+        m.lastPingTime = m.playerPosition
+        trackEvent(playProgressEvent)
+      end if
     end if
   end if
 
