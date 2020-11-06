@@ -10,26 +10,112 @@ Function init()
   m.top.observeFieldScoped("opened", "onOpenedChange")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
   m.top.observeFieldScoped("selectedItemRequested", "onSelectedItemRequested")
+  m.top.observeFieldScoped("createMenuItems", "onCreateMenuItems")
   m.BottomContent = m.top.findNode("BottomContent")
   m.MainContent = m.top.findNode("MainContent")
   m.MainContentSelect = m.top.findNode("MainContent-select")
   m.TopContent = m.top.findNode("TopContent")
   m.sideNavBackground = m.top.findNode("sideNavBackground")
+  
+End Function
+
+
+Function setMenuItems(menuItems)
+
+  menuItemCount = menuItems.Count()
+  for i = 0 to menuItemCount-1
+    setMainContentSelect(menuItems[i])
+    setMainContent(menuItems[i])
+  end for
+  
+End Function
+
+
+Function setMainContentSelect(item)
+
+  contentNode = CreateObject("roSGNode", "SideNavContentNode")
+  contentNode.id = item + "-select"
+  m.MainContentSelect.appendChild(contentNode)
+  
+End function
+
+
+Function setMainContent(item)
+
+  contentNode = CreateObject("roSGNode", "SideNavContentNode")
+  contentNode.id = item
+  if item = "kidsMode"
+    contentNode.title = getTranslation("menu_home")
+    contentNode.iconUrl = "pkg:/images/sideNavKids.png"
+    m.kidsModeContent = contentNode
+  else if item = "search"
+    contentNode.title = getTranslation("menu_search")
+    contentNode.iconUrl = "pkg:/images/sideNavSearch.png"
+  else if item = "home"
+    contentNode.title = getTranslation("menu_home")
+    contentNode.iconUrl = "pkg:/images/sideNavHome.png"
+  else if item = "movies"
+    contentNode.title = getTranslation("menu_movies")
+    contentNode.iconUrl = "pkg:/images/sideNavMovies.png"
+    m.moviesContent = contentNode
+  else if item = "tv"
+    contentNode.title = getTranslation("menu_tv")
+    contentNode.iconUrl = "pkg:/images/sideNavTV.png"
+    m.tvContent = contentNode
+  else if item = "espanol"
+    contentNode.title = "Español"
+    contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
+    m.espanolContent = contentNode
+  else if item = "mylist"
+    contentNode.title = getTranslation("menu_mylist")
+    contentNode.iconUrl = "pkg:/images/sideNavMyList.png"    
+  else if item = "categories"
+    contentNode.title = getTranslation("menu_categories")
+    contentNode.iconUrl = "pkg:/images/sideNavCategories.png"
+  else if item = "channels"
+    contentNode.title = getTranslation("menu_channels")
+    contentNode.iconUrl = "pkg:/images/sideNavChannels.png"
+    m.channelsContent = contentNode
+  end if
+  
+  m.MainContent.appendChild(contentNode)
+
+End Function
+
+
+Function onCreateMenuItems()
+
+  m.mainItems = m.top.findNode("mainItems")
+  m.mainItemsSelected = m.top.findNode("mainItemsSelected")
+  
+  menuItems = ["kidsMode", "search", "home", "movies", "tv", "espanol", "categories", "channels"]
+  if m.constants.deviceInfo.countryCode = "US"
+    experimentInfo = getExperimentResource("roku_safenav_ordering", "roku_safenav_ordering_v1", false)
+    if experimentInfo <> invalid
+      if experimentInfo.action = "remove_espanol"
+        menuItems = ["kidsMode", "search", "home", "movies", "tv", "categories", "channels"]
+      else if experimentInfo.action = "insert_espanol_6thPosition"
+        menuItems = ["kidsMode", "search", "home", "movies", "tv", "espanol", "categories", "channels"]
+      else if experimentInfo.action = "remove_espanol_and_insert_myList_5thPosition"
+        menuItems = ["kidsMode", "search", "home", "movies", "tv", "mylist", "categories", "channels"]
+      else if experimentInfo.action = "remove_espanol_and_insert_search_7thPosition"
+        menuItems = ["kidsMode", "home", "movies", "tv", "categories", "channels", "search"]
+      else if experimentInfo.action = "remove_espanol_and_swap_movies_tv"
+        menuItems = ["kidsMode", "search", "home", "tv", "movies", "categories", "channels"]
+      end if
+    end if
+  end if
+  ' Creates roSGNode dynamically
+  setMenuItems(menuItems)  
+  
   setStrings()
 
   m.profileContent = m.TopContent.findNode("profile")
-  m.espanolContent = m.MainContent.findNode("espanol")
-  m.kidsModeContent = m.MainContent.findNode("kidsMode")
-  m.channelsContent = m.MainContent.findNode("channels")
-  m.moviesContent = m.MainContent.findNode("movies")
-  m.tvContent = m.MainContent.findNode("tv")
   '// This is the item to focus on when the sidenav opens. This implies that this was the last item (that has an associated screen) selected 
   m.itemSelectedRemembered = invalid
 
   m.topItems = m.top.findNode("topItems")
   m.bottomItems = m.top.findNode("bottomItems")
-  m.mainItems = m.top.findNode("mainItems")
-  m.mainItemsSelected = m.top.findNode("mainItemsSelected")
   m.mainItemsSelected.focusBitmapBlendColor = m.constants.ui.colors.selectedListItem
   m.mainItemsSelected.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
 
@@ -47,24 +133,10 @@ End Function
 
 
 Function setStrings()
-    homeNode = m.top.findNode("home")
-    homeNode.title = getTranslation("menu_home")
-    searchNode = m.top.findNode("search")
-    searchNode.title = getTranslation("menu_search")
-    categoriesNode = m.top.findNode("categories")
-    categoriesNode.title = getTranslation("menu_categories")
-    moviesNode = m.top.findNode("movies")
-    moviesNode.title = getTranslation("menu_movies")
-    tvNode = m.top.findNode("tv")
-    tvNode.title = getTranslation("menu_tv")
-    channelsNode = m.top.findNode("channels")
-    channelsNode.title = getTranslation("menu_channels")
     settingsNode = m.top.findNode("settings")
     settingsNode.title = getTranslation("menu_settings")
     exitNode = m.top.findNode("exit")
     exitNode.title = getTranslation("menu_exit")
-    espanolNode = m.top.findNode("espanol")
-    espanolNode.title = "Español"    
 End Function
 
 
@@ -181,9 +253,9 @@ Function onKidsModeValuesChanged()
     m.moviesContent.turnedOn = (m.top.kidsModeValues.on <> true)
     m.tvContent.turnedOn = (m.top.kidsModeValues.on <> true)
     if (m.top.kidsModeValues.on <> true and m.top.kidsModeValues.isAdultModeEnabledByParentalControl = true)
-      m.espanolContent.turnedOn = true
+      if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
     else
-      m.espanolContent.turnedOn = false
+      if m.espanolContent <> invalid then m.espanolContent.turnedOn = false
     end if
     if m.top.kidsModeValues.on = true
       m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
@@ -255,6 +327,12 @@ End Function
 
 Function onOpenedChange()
   if m.top.opened = true
+    ' sends exposure event when user opens sidenav
+    ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
+    if m.constants.deviceInfo.countryCode = "US"
+      getExperimentResource("roku_safenav_ordering", "roku_safenav_ordering_v1")
+    end if  
+  
     '//display hidden items, profile, settings, exit. Set all buttons to full opacity
     
     if m.itemSelectedRemembered <> invalid

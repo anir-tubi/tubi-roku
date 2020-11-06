@@ -6,8 +6,10 @@ Function showChannelScreen(content, sPageSource = "")
   channelScreen.observeFieldScoped("backgroundUriList", "onChannelBackgroundChange")
   channelScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   channelScreen.observeFieldScoped("refreshChannel", "onRefreshChannelSignal")
+  channelScreen.observeFieldScoped("signInRequired", "onSignInRequiredModal")
   channelScreen.observeFieldScoped("backButtonPressed", "onChannelScreenBackPressed")
   channelScreen.id = m.constants.ui.screenIds.channelDetailScreen
+  channelScreen.categoryId = content.id
   channelScreen.isLoading = true
 
   channelScreen.trackingPageInfo = {
@@ -18,8 +20,47 @@ Function showChannelScreen(content, sPageSource = "")
   }
 
   displayDefaultBackground()
-  pushScreen(channelScreen, true, false)  ' don't send page load tracking until we resolve channel content
-  getChannelFromServer(channelScreen, content)
+  pushScreen(channelScreen, true, false) ' don't send page load tracking until we resolve channel content
+  
+  authInfo = m.global.authInfo
+  ' make queue API request only if the user loggedIn
+  if authInfo = invalid and content.id = m.constants.ui.categoryIds.queue
+    displaySignInRequiredModal(channelScreen)
+  else
+    getChannelFromServer(channelScreen, content)
+  end if
+  
+End Function
+
+
+Function onSignInRequiredModal(msg)
+
+  tubiLog("ChannelScreenHelpers.onSignInRequiredModal")
+  screen = msg.getRoSGNode()
+  
+  if screen <> invalid and screen.content = invalid
+    displaySignInRequiredModal(screen)
+  end if
+
+End Function
+
+
+Function displaySignInRequiredModal(screen)
+
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "SIGNIN_REQUIRED" 'DialogType enum
+      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "sign-in-mylist"
+    }
+  }
+  title = getTranslation("dialog_whoops_title")
+  message = getTranslation("dialog_mylist_signIn_description")
+  buttons = [getTranslation("dialog_button_register_signIn"), getTranslation("dialog_button_cancel")]
+  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected, removeTopScreen)
+
 End Function
 
 
@@ -65,19 +106,25 @@ Function onChannelContentResponse(msg)
   tubiLog("ChannelScreenHelpers.onChannelContentResponse")
   task = msg.getRoSGNode()
   screen = task.target
-  screen.isLoading = false
-  bError = false
+  bEmptyResponse = false
 
   loadedContent = task.response
   if loadedContent <> invalid and loadedContent.getChildCount() > 0
     '//get the root channnel content
     channel = loadedContent.getChild(0) '//Channel or category 
     if channel.getChildCount() <= 0
-      bError = true
+      bEmptyResponse = true
     end if
   else
-    bError = true
+    bEmptyResponse = true
   end if
+  
+  if bEmptyResponse = true
+    screen.isLoading = true
+  else
+    screen.isLoading = false
+  end if
+  
   screen.content = loadedContent
   screen.shouldLoadContent = true
   task.unobserveField("response")
@@ -90,11 +137,47 @@ Function onChannelContentResponse(msg)
     m.refreshingChannelCache = false
   end if
 
-  if bError = true
-    '//if no content, then display error
-    showChannelContentError(msg, true)
+  if bEmptyResponse = true
+    '//if no content, then display empty modal
+    if task.channelId = m.constants.ui.categoryIds.queue
+      showEmptyContentModal(screen)
+    else
+      showChannelContentError(msg, true)
+    end if
   end if
 End Function
+
+
+Function showEmptyContentModal(screen)
+
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "CONTENT_NOT_FOUND" 'DialogType enum
+      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "mylist-is-empty"
+    }
+  }
+  
+  title = getTranslation("dialog_mylist_empty_title")
+  message = getTranslation("dialog_mylist_empty_description")
+  buttons = [getTranslation("dialog_button_ok")]
+  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, removeTopScreen, removeTopScreen)  
+
+End Function
+
+
+Function removeTopScreen()
+
+  topScreen = currentScreen()
+  popScreen(false, false)
+  topScreen = currentScreen()
+  
+  sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
+  focusSideNavOption(sideNavId)
+
+end Function
 
 
 Function onChannelContentError(msg)

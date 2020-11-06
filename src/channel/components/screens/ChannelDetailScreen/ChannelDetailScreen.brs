@@ -84,15 +84,20 @@ End Function
 
 
 Function onScreenFocusChange()
+
   if m.top.hasFocus() = true
-    m.VideoGrid.setFocus(true)
     if m.top.content <> invalid
+      if m.top.content.getChild(0).getChildCount() > 0
+        m.VideoGrid.setFocus(true)
+      end if
       if shouldRefresh(m.top.content.getChild(0)) = true  'cacheValidationMixin
         m.top.refreshChannel = true
       end if
-    end if
+    end if    
   end if
+  
 End Function
+
 
 Function onLoadContent()
   if m.top.content <> invalid
@@ -103,6 +108,7 @@ Function onLoadContent()
       m.PageTitle.horizAlign = "left"
       m.PageTitle.wrap = false
       m.VideoGrid.content = category
+      m.VideoGrid.setFocus(true)
       m.VideoGrid.visible = true
     end if
     
@@ -118,9 +124,11 @@ Function onIsLoading()
   if m.top.isLoading = true
     m.InfoPanel.visible = false
     m.VideoGrid.visible = false
+    m.PageTitle.visible = false
   else
     m.InfoPanel.visible = true
     m.VideoGrid.visible = true
+    m.PageTitle.visible = true
   end if
 End Function
 
@@ -329,14 +337,26 @@ End Function
 
 
 Function onKeyEvent(key, press)
+
+  handled = false
+
   if press = true
     if key = "left"
       if m.bLeftButtonActsLikeBackButton = true
         m.top.backButtonPressed = true
-        return true
+        handled = true
       end if
     end if
-
-    return false
+  else
+    if key = "back"
+      authInfo = m.global.authInfo
+      ' show SignInRequired modal when guest user presses back from ActivationCode Screen to ChannelDetailScreen
+      if authInfo = invalid
+        m.top.signInRequired = true
+        handled = true
+      end if
+    end if
   end if
+  
+  return handled
 End Function

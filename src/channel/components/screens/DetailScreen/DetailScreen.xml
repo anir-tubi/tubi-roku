@@ -212,7 +212,7 @@
       iconUrl="pkg:/images/icon-trailer.png" />
 
     <Poster
-      id="leftCheveron"
+      id="leftChevron"
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"

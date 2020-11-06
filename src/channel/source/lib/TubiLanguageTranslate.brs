@@ -159,6 +159,10 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
       "message": "TV Shows"
     },
+    "menu_mylist": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
+      "message": "My List"
+    },
     "menu_settings": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
       "message": "Settings"
@@ -846,6 +850,26 @@ Function getTranslation_en_US()
     "utility_tvshows_description": {
       "description": "This will be displayed on Info panel when the TVShows item (from utility row) gains focus",
       "message": "Tune in to thousands of binge worthy TV shows, docuseries and reality TV. New shows added monthly, you’ll never run out."
+    },
+    "dialog_whoops_title": {
+      "description": "A general whoops title for an dialog window",
+      "message": "Whoops!"
+    },
+    "dialog_mylist_signIn_description": {
+      "description": "Dialog description to say the user to signIn to view the My List",
+      "message": "You must be logged in in order to view your list"
+    },
+    "dialog_mylist_empty_title": {
+      "description": "A general empty My list title for an dialog window",
+      "message": "Oh no! Your List is empty"
+    },
+    "dialog_mylist_empty_description": {
+      "description": "Dialog description to say My List is empty",
+      "message": "Find everything you add to My List here. To get started, select a TV Show or Movie and select the Add to My List button."
+    },
+    "dialog_button_register_signIn": {
+      "description": "The label of the button in a dialog window that allows the user to register or signIn",
+      "message": "Sign In or Register"
     }
   }
 End Function
@@ -894,6 +918,10 @@ Function getTranslation_es_MX()
     "menu_tv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
       "message": "Series"
+    },
+    "menu_mylist": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
+      "message": "Mi lista"
     },
     "menu_settings": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
@@ -1582,6 +1610,26 @@ Function getTranslation_es_MX()
     "utility_tvshows_description": {
       "description": "This will be displayed on Info panel when the TVShows item (from utility row) gains focus",
       "message": "Sintoniza miles de series de televisión dignos de ver, documentales y reality TV. Nuevos capítulos añadidos mensualmente, nunca te quedarás sin ver algo."
+    },
+    "dialog_whoops_title": {
+      "description": "A general whoops title for an dialog window",
+      "message": "¡Uy!"
+    },
+    "dialog_mylist_signIn_description": {
+      "description": "Dialog description to say the user to signIn to view the My List",
+      "message": "Debes iniciar sesión para ver Mi lista"
+    },
+    "dialog_mylist_empty_title": {
+      "description": "A general empty My list title for an dialog window",
+      "message": "¡Uy! Tu lista está vacía"
+    },
+    "dialog_mylist_empty_description": {
+      "description": "Dialog description to say My List is empty",
+      "message": "Encuentra todo lo que agregaste a Mi lista aquí. Para empezar, selecciona una serie o película y haz clic en el botón Mi lista.\n"
+    },
+    "dialog_button_register_signIn": {
+      "description": "The label of the button in a dialog window that allows the user to register or signIn",
+      "message": "Inicia sesión o Regístrate"
     }
   }
 End Function

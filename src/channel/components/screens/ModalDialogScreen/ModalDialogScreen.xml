@@ -112,7 +112,7 @@
         <FilledButtonMarkupGrid
           id="ButtonList"
           translation="[0,0]"
-          itemSize="[406,80]"
+          itemSize="[475,80]"
           itemComponentName="ModalListItem"
           itemSpacing="[0,6]"
           numRows="3"

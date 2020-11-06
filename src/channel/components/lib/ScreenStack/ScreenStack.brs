@@ -75,7 +75,7 @@ Function onPush(msg)
       newChild.setFocus(true)
     end if    
     newChild.visible = true
-
+    
     if oldCurrent <> invalid and oldCurrent.isSameNode(newChild) = false
       oldCurrent.visible = false
     end if

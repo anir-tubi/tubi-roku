@@ -37,6 +37,10 @@
       <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
       -->
       <field id="callingPage" type="string"  alwaysNotify="true"/>
+      
+      <!-- categoryId is one of the categories/channels (eg. categories(queue, action etc) or channels(fox, aetv etc))  -->
+      <!-- assigning this value helps to redirect the user to specific category/channel detailscreen once user signedIn via category/channel detailscreen -->
+      <field id="categoryId" type="string"/>
 
     <!-- OUTPUT -->
       <!-- the content node representing the item which was clicked on -->
@@ -48,6 +52,9 @@
       <!-- tells ContentController/ChannelScreenHelpers that the category metadata
            for the channel content is out of the cache window and should be updated -->
       <field id="refreshChannel" type="boolean" alwaysNotify="true" />
+      
+      <!-- tells the ChannelScreenHelper to display SignIn Required modal-->
+      <field id="signInRequired" type="boolean" alwaysNotify="true" />
 
       <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
 
@@ -119,7 +126,7 @@
     </Group>
 
     <Poster
-      id="leftCheveron"
+      id="leftChevron"
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"

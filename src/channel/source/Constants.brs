@@ -798,6 +798,7 @@ Function getConstants()
       constants.ui.sideNavIds.exit = "exit"
       constants.ui.sideNavIds.profile = "profile"
       constants.ui.sideNavIds.kidsMode = "kidsMode"
+      constants.ui.sideNavIds.mylist = "mylist"
       
     constants.ui.utilityIds = {}
       constants.ui.utilityIds.movies = "u_movies"

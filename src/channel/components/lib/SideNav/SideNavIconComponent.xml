@@ -20,8 +20,8 @@
       id="Icon"
       translation="[102, 0]"
       loadSync="true" 
-      width="40"
-      height="40"/>
+      width="36"
+      height="36"/>
     <Label
       translation="[162, 4]"
       id="Label"

@@ -191,15 +191,21 @@ Function onAuthInfoReceived()
     homeScreen.loadAllCategories = true
   end if
       
-  if currentScreen() <> invalid and (currentScreen().getSubtype() = "DetailScreen" or currentScreen().getSubtype() = "SettingsScreen")
+  currentScreen = currentScreen()
+  if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" or currentScreen.getSubtype() = "SettingsScreen")
     ' this happens, if a user logs in after attempting to add to queue via detailScreen
     ' or
     ' this happens, if a user logs in after attempting to update parental controls/signIn via settingsScreen
-    if currentScreen().activationCompleted <> invalid
-      currentScreen().activationCompleted = true
+    if currentScreen.activationCompleted <> invalid
+      currentScreen.activationCompleted = true
     else
-      currentScreen().setFocus(true)
+      currentScreen.setFocus(true)
     end if
+  else if currentScreen <> invalid and currentScreen.id = "channelDetailScreen" and currentScreen.categoryId = m.constants.ui.categoryIds.queue
+    ' this happens when user logs in via channelDetailScreen (queue/mylist)
+    content = CreateObject("roSGNode", "CategoryContentNode")
+    content.id = m.constants.ui.categoryIds.queue
+    getChannelFromServer(currentScreen, content)
   else
     ' this happens when app start up or when a user signs out or user signs in from the side nav or settings page
     startUserExperience()

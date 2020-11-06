@@ -48,7 +48,6 @@ Function showModal(modalInfo, buttonInfo)
     m.top.appendChild(modal)
     modal.visible = true
     modal.setFocus(true)
-
     ' send the show dialog track event
     if modalInfo.openTrackEvent <> invalid and modalInfo.trackingTask <> invalid
       modalInfo.trackingTask.trackEvent = modalInfo.openTrackEvent
@@ -112,7 +111,7 @@ Function closeModal(modal, buttonSelected = invalid)
   modal.unobserveFieldScoped("exitButton")
   m.top.removeChild(modal)
   m.top.setFocus(true)
-
+  
   'run the callback associated with the selected button
   callback = invalid
   callbackParams = invalid
@@ -305,15 +304,18 @@ End Function
 ' Creates a modal dialog with 2 buttons. The expected behavior is that the 2nd button will act as a cancel option for the user
 ' and close the modal without taking any further action. This is just a wrapper around showModal() with simpler paramaters.
 ' 
+' callbacks passed to showSimpleModal cannot take any parameters and if you want to have callbacks with parameters, use showModal()
+'
 ' @title: string, the title of the dialog, displayed in larger font
 ' @message: string, the main message of the dialog to be displayed to the user
 ' @buttons: array of strings (max 2 indexes), a button will be created for each index with the label of the button equal to the index's string.
 '           An empty array will create a single "OK" button by default.
 ' @dialogEvent: assocArray, contains the info necessary to send a dialog open analytics event, has keys: "type" and "values"
 ' @trackingTask: roSGNode, an instance of the trackingLoggingTask - used to send close dialog events when the dialog is closed.
-' @callback: roFunction, a function that will be triggered when the first button is selected
-Function showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid)
-  info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback)
+' @callback: (optional) roFunction, a function that will be triggered when the first button is selected
+' @cancelCallback: (optional) Function will be triggered when the second button is clicked (function will not have any params)        
+Function showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid)
+  info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback, cancelCallback)
   showModal(info.modalInfo, info.buttonInfo)
 End Function
 
@@ -323,12 +325,13 @@ End Function
 ' prior to calling showModal. For example showDescriptionModal() needs to add the scrollable key.
 '
 ' Returns an assocArray with the keys modalInfo and buttonInfo.
-Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback = invalid)
+Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid)
   modalInfo = {
     title: title
     message: message
     openTrackEvent: dialogEvent
     trackingTask: trackingTask
+    backButtonCallback : cancelCallback
   }
 
   buttonInfo = []
@@ -351,7 +354,7 @@ Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, 
     buttonTwo = {
       text: buttons[1]
       type: "dismiss"
-      callback: invalid
+      callback: cancelCallback
       callbackParams: invalid
     }
     buttonInfo.push(buttonTwo)

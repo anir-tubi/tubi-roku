@@ -7,10 +7,13 @@
  -->
 <component name="SideNav" extends="Group">
   <script type="text/brightscript" uri="SideNav.brs" />
+  <script type="text/brightscript" uri="../ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+    
   <interface>
     <!-- INPUTS -->
       <field id="width" type="float"/>
@@ -31,6 +34,8 @@
 
       <field id="selectedItemRequested" type="string" alwaysNotify="true"/>
 
+      <!-- createMenuItems is used to create menu items on side nav, invoked from controller  -->
+      <field id="createMenuItems" type="boolean"/>
 
     <!-- OUTPUT -->
       <!-- The sideNavContentNode for the side nav menu item that was selected. This field should not be observed, as 
@@ -81,22 +86,6 @@
           drawFocusFeedbackOnTop="false"
           itemComponentName="SideNavIconComponent">  
           <ContentNode id="MainContent-select" role="content" >
-            <SideNavContentNode
-              id="kidsMode-select"/>
-            <SideNavContentNode
-              id="search-select"/>
-            <SideNavContentNode
-              id="home-select"/>
-            <SideNavContentNode
-              id="movies-select"/>
-            <SideNavContentNode
-              id="tv-select"/>
-            <SideNavContentNode
-              id="espanol-select"/>              
-            <SideNavContentNode
-              id="categories-select"/>
-            <SideNavContentNode
-              id="channels-select"/>
           </ContentNode>
         </MarkupList>
         <MarkupList
@@ -110,30 +99,6 @@
           drawFocusFeedbackOnTop="false"
           itemComponentName="SideNavIconComponent">  
           <ContentNode id="MainContent" role="content" >
-            <SideNavContentNode
-              id="kidsMode"
-              iconUrl="pkg:/images/sideNavKids.png"/>
-            <SideNavContentNode
-              id="search"
-              iconUrl="pkg:/images/sideNavSearch.png"/>
-            <SideNavContentNode
-              id="home"
-              iconUrl="pkg:/images/sideNavHome.png"/>
-            <SideNavContentNode
-              id="movies"
-              iconUrl="pkg:/images/sideNavMovies.png"/>
-            <SideNavContentNode
-              id="tv"
-              iconUrl="pkg:/images/sideNavTV.png"/>
-            <SideNavContentNode
-              id="espanol"
-              iconUrl="pkg:/images/sideNavEspanol.png"/>              
-            <SideNavContentNode
-              id="categories"
-              iconUrl="pkg:/images/sideNavCategories.png"/>
-            <SideNavContentNode
-              id="channels"
-              iconUrl="pkg:/images/sideNavChannels.png"/>
           </ContentNode>
         </MarkupList>
       </Group>

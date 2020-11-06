@@ -1,4 +1,7 @@
 Function initSideNav()
+
+  m.SideNav.createMenuItems = true
+
   m.SideNav.unobserveFieldScoped("itemSelectedId")
   m.SideNav.observeFieldScoped("itemSelectedId", "onSideNavItemSelected")
   m.global.unobserveFieldScoped("authInfo")
@@ -255,7 +258,14 @@ Function onSideNavItemSelected()
         showLogo()
         showEspanolScreen()
         bNewScreenCalledSuccess = true
-      end if      
+      end if  
+    else if itemSelectedId = m.constants.ui.sideNavIds.mylist
+      hideNavMenu(false)
+      showLogo()
+      contentNode = CreateObject("roSGNode", "CategoryContentNode")
+      contentNode.id = m.constants.ui.categoryIds.queue
+      showChannelScreen(contentNode, "MENU")
+      bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.settings
       showLogo()
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
