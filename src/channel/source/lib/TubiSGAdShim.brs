@@ -154,7 +154,7 @@ Function tubiSGAdShim_preroll(episode As Object, cuepoint As Integer)
 
   'if the user is starting from beginning or resuming on a cue point, show ads
   'attempt to get list of ads and play them for preroll
-  m.ads.getAdsListViaRoku(episode)
+  m.ads.getAdsListViaRoku(episode, cuepoint)
   if m.ads.hasAds(m.ads.allAdUnitsList) = true
     m.videoPlayerNode.adState = "adspending"
   else
@@ -209,7 +209,7 @@ End Function
 Function tubiSGAdShim_resume(episode As Object, cuepoint As Integer)
   m.videoplayernode.adstate = "fetching"
   'NOTE: TubiAds sets resumePlayAdsList on 'm' here
-  if m.ads.getResumingPlayAds(episode, m) then
+  if m.ads.getResumingPlayAds(episode, cuepoint) then
     tubiLog("Setting adState to adspending")
     m.videoPlayerNode.adState = "adspending"
   else

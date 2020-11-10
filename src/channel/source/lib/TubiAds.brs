@@ -54,7 +54,6 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     cacheAdsList: tubiAds_cacheAdsList
     getCachedAdsList: tubiAds_getCachedAdsList
     getResumingPlayAds: tubiAds_getResumingPlayAds
-    populateUrlAdrise: tubiAds_populateUrlAdrise
     populateUrlRainmaker: tubiAds_populateUrlRainmaker
     getRainmakerParams: tubiAds_getRainmakerParams
     adBufferingCallback: tubiAds_adBufferingCallback
@@ -123,18 +122,13 @@ end function
 ' ----------------------------------------------
 function tubiAds_cacheAdsList(episode, breakPos)
   if(m.lastAdsList = invalid or m.lastAdsList.breakPos <> breakPos or m.lastAdsList.cid <> episode.adrise_contentId) 
-    tmp = episode.nowPos
-    episode.nowPos = breakPos
-
-    m.getAdsListViaRoku(episode)
+    m.getAdsListViaRoku(episode, breakPos)
 
     list = invalid
     if m.hasAds(m.allAdUnitsList) = true
       list = m.allAdUnitsList
     end if
 
-    episode.nowPos = tmp
-    
     m.lastAdsList = {
       cid: episode.id
       breakPos: breakPos
@@ -154,65 +148,16 @@ function tubiAds_getCachedAdsList(episode, breakPos)
 end function
 
 
-
-' ----------------------------------------------
-' populateUrlAdrise
-'
-' create the url needed to make ad calls
-' ----------------------------------------------
-function tubiAds_populateUrlAdrise(episode) As String
-
-  'create the url to be used for ad calls'
-  params = {
-    "platform": m.constants.platform
-    "appid": m.constants.settings.shortAppName
-    "cid": episode.id
-    "nowpos": episode.nowpos.ToStr()
-    "model": m.constants.deviceInfo.model
-    "deviceid": m.constants.deviceInfo.deviceId
-    "pubid": episode.pubId
-    "content-type": m.adContentType
-    "roku-v": m.constants.deviceInfo.clientVersion
-    "m-language": m.constants.deviceInfo.language
-    "_": RND(1000000000000).ToStr()
-  }
-
-  ' add Roku Advertiser Id (RIDA) to ad call url
-  if m.constants.deviceInfo.deviceAdId <> invalid
-    params["advid"] = m.constants.deviceInfo.deviceAdId
-  end if
-
-  if m.constants.deviceInfo.isAdIdTrackingDisabled = true
-    params["opt-out"] = "1"
-  else
-    params["opt-out"] = "0"
-  end if
-
-  'add TubiTV user/registration id to ad call url
-  authInfo = m.auth.getAuthInfo()
-  if authInfo <> invalid and authInfo.userId <> invalid
-    params["tubitvid"] = authInfo.userId
-  end if
-
-  'add if Linear/Live TV is on or off to ad call url
-  'TODO: Bryan, uncomment when linear/live tv is added
-  ' if GetGlobalAA().app.linearTV.linearTvOn = true
-  '   params["linear"] = "1"
-  ' end if
-
-  params["sdk"] = "raf_vast"
-  return m.request.addParamsToUrl(m.constants.urls.adsBaseUrl, params)
-end function
-
-
 ' ----------------------------------------------
 ' populateUrlRainmaker
 '
 ' create the url needed to make ad calls using the rainmaker API
 ' For API details, please see https://tubitv.atlassian.net/wiki/spaces/EC/pages/863273074/Rainmaker+-+Request+Parameters
 ' ----------------------------------------------
-function tubiAds_populateUrlRainmaker(episode) As String
-  params = m.getRainmakerParams(episode)
+' @episode: node, TubiContentNode for a video (movie or episode)
+' @breakPos: integer, the preroll or midroll playback position at which the break occurs
+function tubiAds_populateUrlRainmaker(episode, breakPos = 0) As String
+  params = m.getRainmakerParams(episode, breakPos)
   baseUrl = m.constants.urls.adsBaseUrlRainmaker + m.constants.analyticsPlatform
 
   return m.request.addParamsToUrl(baseUrl, params)
@@ -221,17 +166,12 @@ end function
 
 ' returns an assocArray of all parameters that should be sent to rainmaker
 ' @content: node, TubiContentNode for a video (movie or episode)
-Function tubiAds_getRainmakerParams(content)
-  'create the url to be used for ad calls'
-  nowPos = content.nowpos
-  if nowPos = invalid
-    nowPos = 0
-  end if
-  
+' @breakPos: integer, the preroll or midroll playback position at which the break occurs
+Function tubiAds_getRainmakerParams(content, breakPos = 0)
   params = {
     content_id: content.id
     pub_id: content.pubId
-    now_pos: content.nowpos.ToStr()
+    now_pos: breakPos.ToStr()
     content_type: m.adContentType
     device_id: m.constants.deviceInfo.deviceId
     model: m.constants.deviceInfo.model
@@ -270,9 +210,11 @@ End Function
 
 
 ' ----------------------------------------------
-'  m.getAdsListViaRoku(episode)
+'  m.getAdsListViaRoku(episode, breakPos)
 ' ----------------------------------------------
-function tubiAds_getAdsListViaRoku(episode)
+' @episode: node, TubiContentNode for a video (movie or episode)
+' @breakPos: integer, the preroll or midroll playback position at which the break occurs
+function tubiAds_getAdsListViaRoku(episode, breakPos)
   m.allAdUnitsList = []
 
   'set the content length (as stated in RAF documentation for Nielsen functionality)
@@ -303,7 +245,7 @@ function tubiAds_getAdsListViaRoku(episode)
   end if
 
   'get the url for making the ad call
-  url = m.populateUrlRainmaker(episode)
+  url = m.populateUrlRainmaker(episode, breakPos)
 
   'set the url for the Roku Advertising Framework
   m.roAdFramework.setAdUrl(url)
@@ -484,8 +426,9 @@ end function
 ' SIDE EFFECT: updates the resumePlayAdsList property on the player object that is passed in
 ' (expect that the player object will be the main video player for the channel)
 ' ----------------------------------------------
-function tubiAds_getResumingPlayAds(episode, player)
-  m.getAdsListViaRoku(episode)
+function tubiAds_getResumingPlayAds(episode, position)
+  
+  m.getAdsListViaRoku(episode, position)
   return m.hasAds(m.allAdUnitsList)
 end function
 

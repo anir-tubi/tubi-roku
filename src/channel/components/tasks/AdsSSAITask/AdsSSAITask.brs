@@ -240,7 +240,7 @@ Function onContentUpdated(content)
 
   ' add the ad parameters for the content. Back end will forward these parameters to YoSpace
   ' so that YoSpace can have them when YoSpace makes ad requests for SSAI
-  adParams = m.adLib.getRainmakerParams(content)
+  adParams = m.adLib.getRainmakerParams(content, 0)
   adParams.platform = m.constants.analyticsPlatform
   adParams.delete("coppa_enabled")
   
