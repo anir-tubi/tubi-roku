@@ -67,7 +67,7 @@ Function TubiExperiments(constants) as Object
         roku_discovery_row_v3 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}
       } 
       roku_safenav_ordering : {
-        roku_safenav_ordering_v1 : {"action" : "remove_espanol"}
+        roku_safenav_ordering_v1 : {"action" : "no_change"}
       }      
     }
     
