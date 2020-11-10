@@ -35,6 +35,7 @@ Function setMainContentSelect(item)
 
   contentNode = CreateObject("roSGNode", "SideNavContentNode")
   contentNode.id = item + "-select"
+  m[item + "ContentSelect"] = contentNode
   m.MainContentSelect.appendChild(contentNode)
   
 End function
@@ -47,7 +48,6 @@ Function setMainContent(item)
   if item = "kidsMode"
     contentNode.title = getTranslation("menu_home")
     contentNode.iconUrl = "pkg:/images/sideNavKids.png"
-    m.kidsModeContent = contentNode
   else if item = "search"
     contentNode.title = getTranslation("menu_search")
     contentNode.iconUrl = "pkg:/images/sideNavSearch.png"
@@ -57,15 +57,12 @@ Function setMainContent(item)
   else if item = "movies"
     contentNode.title = getTranslation("menu_movies")
     contentNode.iconUrl = "pkg:/images/sideNavMovies.png"
-    m.moviesContent = contentNode
   else if item = "tv"
     contentNode.title = getTranslation("menu_tv")
     contentNode.iconUrl = "pkg:/images/sideNavTV.png"
-    m.tvContent = contentNode
   else if item = "espanol"
     contentNode.title = "Español"
     contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
-    m.espanolContent = contentNode
   else if item = "mylist"
     contentNode.title = getTranslation("menu_mylist")
     contentNode.iconUrl = "pkg:/images/sideNavMyList.png"    
@@ -75,8 +72,8 @@ Function setMainContent(item)
   else if item = "channels"
     contentNode.title = getTranslation("menu_channels")
     contentNode.iconUrl = "pkg:/images/sideNavChannels.png"
-    m.channelsContent = contentNode
   end if
+  m[item + "Content"] = contentNode
   
   m.MainContent.appendChild(contentNode)
 
@@ -182,12 +179,12 @@ End Function
 Function onEspanolDisplayChanged()
   if m.top.displayEspanol = false
     '//Remove espanol if those items should be hidden. For right now, don't worry about turning it back on
-    mainContentEspanol = m.MainContent.findNode("espanol")
-    m.MainContent.removeChild(mainContentEspanol)
-
-    mainContentEspanolSelect = m.MainContentSelect.findNode("espanol-select")
-    m.MainContentSelect.removeChild(mainContentEspanolSelect)
-
+    if m.espanolContent <> invalid
+      m.MainContent.removeChild(m.espanolContent)
+    end if
+    if m.espanolContentSelect <> invalid
+      m.MainContentSelect.removeChild(m.espanolContentSelect)
+    end if
   end if
 End Function
 
@@ -196,15 +193,19 @@ End Function
 Function onMovieTVDisplayChanged()
   if m.top.displayMoviesTV = false
     '//Remove movies/tv if those items should be hidden. For right now, don't worry about turning it back on
-    mainContentMovies = m.MainContent.findNode("movies")
-    mainContentTV = m.MainContent.findNode("tv")
-    m.MainContent.removeChild(mainContentMovies)
-    m.MainContent.removeChild(mainContentTV)
+    if m.moviesContent <> invalid
+      m.MainContent.removeChild(m.moviesContent)
+    end if
+    if m.tvContent <> invalid
+      m.MainContent.removeChild(m.tvContent)
+    end if
 
-    mainContentMoviesSelect = m.MainContentSelect.findNode("movies-select")
-    mainContentTVSelect = m.MainContentSelect.findNode("tv-select")
-    m.MainContentSelect.removeChild(mainContentMoviesSelect)
-    m.MainContentSelect.removeChild(mainContentTVSelect)
+    if m.moviesContentSelect <> invalid
+      m.MainContentSelect.removeChild(m.moviesContentSelect)
+    end if
+    if m.tvContentSelect <> invalid
+      m.MainContentSelect.removeChild(m.tvContentSelect)
+    end if
     
     '//Adjust the spacing of the 3 menu lists in the side nav now that 2 menu items have been eliminated.
     contentLayout = m.top.findNode("content")
@@ -217,11 +218,12 @@ End Function
 Function onChannelsDisplayChanged()
   if m.top.displayChannels = false
     '//Remove Channels if that item should be hidden. For right now, don't worry about turning it back on
-    mainContentChannels = m.MainContent.findNode("channels")
-    m.MainContent.removeChild(mainContentChannels)
-
-    mainContentChannelsSelect = m.MainContentSelect.findNode("channels-select")
-    m.MainContentSelect.removeChild(mainContentChannelsSelect)
+    if m.channelsContent <> invalid
+      m.MainContent.removeChild(m.channelsContent)
+    end if
+    if m.channelsContentSelect <> invalid
+      m.MainContentSelect.removeChild(m.channelsContentSelect)
+    end if
   end if
 End Function
 
@@ -264,9 +266,12 @@ Function onKidsModeValuesChanged()
     end if
   else
     '//Remove kids mode if on is not true. For right now, don't worry about turning it back on
-    m.MainContent.removeChild(m.kidsModeContent)
-    mainContentKidsModeSelect = m.MainContentSelect.findNode("kidsMode-select")
-    m.MainContentSelect.removeChild(mainContentKidsModeSelect)
+    if m.kidsModeContent <> invalid
+      m.MainContent.removeChild(m.kidsModeContent)
+    end if
+    if m.kidsModeContentSelect <> invalid
+      m.MainContentSelect.removeChild(m.kidsModeContentSelect)
+    end if
 
     '//::NOTE:: This assumes that featureOn will be set to false at the beginning of the app, so 
     '//   when that happens, we need to call focusItemInList() to reset the placement of the focus of the m.MainContentSelect list
@@ -453,7 +458,7 @@ Function onItemSelect(msg)
   if list.id = m.mainItems.id
     m.mainItemsSelected.jumpToItem = index
   end if
-  
+
   if m.mainItems.id = list.id
     '//Only allow the middle list items to be remembered as they are the only ones with associated screens while the side nav is still visible 
     m.itemSelectedRemembered = {
@@ -478,5 +483,3 @@ Function onItemFocused(msg)
     index: index
   }
 End Function
-
-
