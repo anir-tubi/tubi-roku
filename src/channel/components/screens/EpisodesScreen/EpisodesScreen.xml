@@ -74,7 +74,7 @@
   <children>
     <InfoPanel
       id="InfoPanel"
-      translation="[168,61]"
+      translation="[168,133]"
       maxHeight="511"
       mode="detail"
       visible="true" />

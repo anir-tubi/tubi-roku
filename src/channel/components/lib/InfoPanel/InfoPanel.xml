@@ -30,6 +30,10 @@
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+
   <interface>
     <!-- INPUTS -->
     <field id="title" alias="Title.text" />
@@ -66,7 +70,7 @@
     <field id="maxTitleLines" alias="Title.maxLines"/>
     <field id="numTitleLines" alias="Title.numLines"/>
     <field id="titleFontSize" alias="TitleFont.size"/>
-    <field id="width" type="float" value="1090" />
+    <field id="width" type="float" value="1140" />
     <field id="ratingVisible" alias="Rating.visible"/>
 
     <!-- OUTPUTS -->
@@ -104,7 +108,7 @@
           loadDisplayMode="scaleToFit" />
         <Label
           id="Title"
-          width="1090"
+          width="1140"
           wrap="true"
           maxLines="2"
           color="0xFFFFFFFF"
@@ -113,7 +117,7 @@
             id="TitleFont"
             role="font"
             uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="67" />
+            size="47" />
         </Label>
       </LayoutGroup>
 
@@ -230,7 +234,7 @@
         <Label
           id="Line2"
           opacity="0.5"
-          width="1090"
+          width="1140"
           ellipsizeOnBoundary="true">
           <Font
             role="font"
@@ -245,12 +249,12 @@
         <Poster
           id="DescriptionFocusButton"
           uri="pkg:/images/menu-focus-fhd.9.png"
-          width="1090"
+          width="1140"
           height="300"
           visible="false"/>
         <Label
           id="Description"
-          width="1090"
+          width="1140"
           lineSpacing="16"
           maxLines="5"
           wrap="true"
@@ -258,6 +262,7 @@
           translation="[25,15]"
           visible="false">
           <Font
+            id="DescriptionFont"
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"
             size="27" />

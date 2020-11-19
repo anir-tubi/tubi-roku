@@ -17,6 +17,11 @@ Function init()
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
 
+  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).is_top_aligned = false 
+    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
+    m.ScreenNavigationHint.translation = [168,85]
+  end if
+
   ' Create the menu
   m.SettingsMenuPanel = CreateSettingsMenuPanel()
   m.SettingsMenuPanel.observeField("createNextPanelIndex", "onCreateNextPanelIndex")

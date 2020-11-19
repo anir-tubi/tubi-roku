@@ -88,7 +88,7 @@
         vertAlignment="custom"
         opacity="0.5"
         itemSpacings="[9]"
-        translation="[168,85]">
+        translation="[168,55]">
         <Poster
           uri="pkg:/images/back.png"
           width="29"

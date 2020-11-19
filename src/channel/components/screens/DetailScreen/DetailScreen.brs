@@ -44,6 +44,10 @@ Function init()
   m.RelatedGrid.observeField("itemFocused", "onRelatedItemFocused")
   m.Info.observeField("descriptionSelected", "onDescriptionSelected")
 
+  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).is_top_aligned = false 
+    m.Info.translation = [168,123]
+  end if
+
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
   setInitialMenuItems()
   m.focusTarget = m.Menu

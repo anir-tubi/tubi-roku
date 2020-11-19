@@ -22,6 +22,11 @@ Function init()
   m.ChannelCategoryGrid.observeField("itemFocused", "onItemFocused")
   m.ChannelCategoryGrid.observeField("itemSelected", "onItemSelected")
 
+  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).is_top_aligned = false 
+    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
+    m.ScreenNavigationHint.translation = [168,85]
+  end if
+
   m.contentLoadedAndFocused = false
   m.top.screenLevel = m.constants.ui.screenLevels.channelCategoryGridScreen
 

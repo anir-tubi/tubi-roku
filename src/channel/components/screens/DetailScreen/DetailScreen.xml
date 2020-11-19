@@ -231,7 +231,7 @@
       <InfoPanel
         id="DetailInfoPanel"
         mode="item"
-        translation="[168,123]"
+        translation="[168,133]"
         maxHeight="433"
         maxTitleLines="2"
         visible="true" />

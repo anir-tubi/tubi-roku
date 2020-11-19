@@ -32,6 +32,10 @@ Function init()
   m.top.observeField("kidsModeEnabled", "onKidsModeEnableChange")
   m.top.observeField("contentUpdated", "onSearchContentChange")
 
+  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).is_top_aligned = false 
+    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
+    m.ScreenNavigationHint.translation = [168,85]
+  end if
 
   m.SearchText.color = m.global.constants.ui.colors.titleHeader
 

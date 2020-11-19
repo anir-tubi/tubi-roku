@@ -20,6 +20,12 @@ Function init()
   m.top.observeField("resetContentAreaValues", "onResetContentAreaValues")
   m.top.observeField("id", "onIDChange")
   m.top.observeField("fullscreenCountdown", "onFullscreenCountdown")
+
+  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).is_top_aligned = false 
+    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
+    m.ScreenNavigationHint.translation = [168,78]
+    m.InfoPanel.translation = [168,163]
+  end if
   
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout

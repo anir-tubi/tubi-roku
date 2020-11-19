@@ -8,6 +8,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -107,7 +108,6 @@
           width="992"
           maxHeight="313"
           maxTitleLines="3"
-          titleFontSize="67"
           translation="[354,691]"/>
       </Group>
       <!-- Series shows a single poster for the next episode in the same series -->
@@ -136,8 +136,7 @@
           mode="item"
           width="875"
           maxHeight="397"
-          maxTitleLines="3"
-          titleFontSize="67"
+          maxTitleLines="2"
           translation="[574,650]"/>
       </Group>
     </Group>

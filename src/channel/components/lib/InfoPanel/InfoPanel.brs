@@ -2,6 +2,15 @@ Function init()
   m.nodeHelpers = TubiNodeHelpers()
   m.TitleGroup = m.top.findNode("TitleGroup")
   m.Title = m.top.findNode("Title")
+
+  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).has_enlarged_title_text = true 
+    m.TitleFont = m.top.findNode("TitleFont")
+    m.TitleFont.size = 67
+  end if
+  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).has_enlarged_description_text = true 
+    m.DescriptionFont = m.top.findNode("DescriptionFont")
+    m.DescriptionFont.size = 32
+  end if
   m.LiveVideoIndicator = m.top.findNode("LiveVideoIndicator")
   m.TitleLogo = m.top.findNode("TitleLogo")
   m.Episode = m.top.findNode("Episode")
@@ -363,16 +372,18 @@ Function onCalculateHeight()
     end if
     m.DescriptionFocusButton.height = m.Description.boundingRect().height + topMargin + bottomMargin
   end if
-  
-  '//::TODO::82024 START: delete the following code to top align infoPanel
-  'vertically center the info panel
-  offsetY = (m.top.maxHeight - m.Offset.BoundingRect().height) \ 2
-  if offsetY > 0
-    m.Offset.translation = [0, offsetY]
-  else
-    m.Offset.translation = [0, 0]
+
+  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).is_top_aligned = false 
+    '//::TODO::82024 START: delete the following code to top align infoPanel
+    'vertically center the info panel
+    offsetY = (m.top.maxHeight - m.Offset.BoundingRect().height) \ 2
+    if offsetY > 0
+      m.Offset.translation = [0, offsetY]
+    else
+      m.Offset.translation = [0, 0]
+    end if
+    '//::TODO::82024 End
   end if
-  '//::TODO::82024 End
 End Function
 
 
@@ -396,22 +407,34 @@ Function onModeChange()
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [42, 15]
+    if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).has_enlarged_title_text = true 
+      m.Offset.itemSpacings = [42, 15]
+    else
+      m.Offset.itemSpacings = [25, 15]
+    end if
   else if m.top.mode = "movie" then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.appendChild(m.DirectorGroup)
     m.Offset.appendChild(m.StarringGroup)
-    m.Offset.itemSpacings = [42, 15, 17, 11]
+    m.Offset.appendChild(m.DirectorGroup)
+    if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).has_enlarged_title_text = true 
+      m.Offset.itemSpacings = [42, 15, 17, 11]
+    else
+      m.Offset.itemSpacings = [25, 15, 17, 11]
+    end if
   else if m.top.mode = "series" then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.appendChild(m.DirectorGroup)
     m.Offset.appendChild(m.StarringGroup)
-    m.Offset.itemSpacings = [26, 25, 15, 17, 11]
+    m.Offset.appendChild(m.DirectorGroup)
+    if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).has_enlarged_title_text = true 
+      m.Offset.itemSpacings = [26, 25, 15, 17, 11]
+    else
+      m.Offset.itemSpacings = [25, 25, 15, 17, 11]
+    end if
   else if m.top.mode = "season" then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.SeasonDetails)
@@ -421,7 +444,11 @@ Function onModeChange()
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
     m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [26, 25, 15]
+    if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).has_enlarged_title_text = true 
+      m.Offset.itemSpacings = [26, 25, 15]
+    else
+      m.Offset.itemSpacings = [25, 18]
+    end if
   else if m.top.mode = "utility" then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.DescriptionGroup)

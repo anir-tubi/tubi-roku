@@ -3,6 +3,7 @@ Function init()
   Request = TubiRequest(m.constants.settings.mode)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m._ = rodash()
 
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("focusedChild", "onComponentFocus")
@@ -278,20 +279,26 @@ End Function
 
 Function updateInfoPanel(infoNode, content)
   infoNode.title = content.title
-  infoNode.description = content.description
-  infoNode.releaseDate = content.releaseDate
   infoNode.genres = content.genres
-  infoNode.length = content.length
-  infoNode.rating = content.rating
+
+
+  lineOneData = {}
+  if content.type = m.constants.ui.contentTypes.series
+    lineOneData.type = m.constants.ui.contentTypes.series 
+  end if
+  lineOneData.releaseDate = content.releaseDate
+  lineOneData.length = content.length
+  lineOneData.hasCC = (content.hasSubtitles or not m._.empty(content.subtitleTracks))
+  if content.availabilityEnds <> invalid
+    lineOneData.availabilityEnds = content.availabilityEnds
+  end if
+  lineOneData.rating = content.rating
+  lineOneData.partnerLogoUri = content.inlineLogoUri
+
+  infoNode.lineOneData = lineOneData
   infoNode.description = content.description
   infoNode.directors = content.directors
   infoNode.starring = content.actors
-
-  if content <> invalid and content.subtitleTracks <> invalid
-    infoNode.hasCC = true
-  else
-    infoNode.hasCC = false
-  end if
 
   ' always have to do this
   infoNode.calculateHeight = true

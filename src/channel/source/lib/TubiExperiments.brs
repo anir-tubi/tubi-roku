@@ -48,6 +48,8 @@ Function TubiExperiments(constants) as Object
       }
       roku_discovery_v3 : {
       }
+      roku_metadata_align : {
+      }
       roku_safenav_ordering : {
       }  
     }
@@ -65,7 +67,10 @@ Function TubiExperiments(constants) as Object
       }
       roku_discovery_v3 : {
         roku_discovery_row_v3 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}
-      } 
+      }     
+      roku_metadata_align : {
+        roku_metadata_align_experiment : {"is_top_aligned" : false, "has_enlarged_description_text": false, "has_enlarged_title_text": true}
+      }  
       roku_safenav_ordering : {
         roku_safenav_ordering_v1 : {"action" : "no_change"}
       }      

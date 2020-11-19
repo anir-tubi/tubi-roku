@@ -107,7 +107,7 @@
         vertAlignment="custom"
         opacity="0.5"
         itemSpacings="[9]"
-        translation="[168,85]">
+        translation="[168,55]">
         <Poster
           uri="pkg:/images/back.png"
           width="29"
@@ -135,7 +135,7 @@
     <InfoPanel
       id="ChannelsInfoPanel"
       mode="category"
-      translation="[168,167]"
+      translation="[168,133]"
       maxHeight="355"
       maxTitleLines="2"
       visible="true" />
