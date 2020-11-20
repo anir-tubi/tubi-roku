@@ -1,4 +1,4 @@
-Function onKeyEvent(key As String, press As Boolean)
+Function onKeyEvent(key As String, press As Boolean) as Boolean
   tubiLog("VideoTransportHandling.onKeyEvent key = " + key + " press: " + press.toStr())
   if press
     m.lastButtonPressPos = m.playerPosition

@@ -264,7 +264,7 @@ End Function
 ' onKeyEvent
 '
 ' Back pressed on detail screen should close it
-Function onKeyEvent(key As String, press As Boolean)
+Function onKeyEvent(key As String, press As Boolean) as Boolean
   tubiLog("ContentController.onKeyEvent key = " + key)
   if m.lastUserActivity <> invalid
     m.lastUserActivity = Uptime(0)

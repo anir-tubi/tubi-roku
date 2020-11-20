@@ -300,7 +300,7 @@ End Function
 
 
 ' When the user presses up or down, then change which list has focus
-Function onKeyEvent(key, press)
+Function onKeyEvent(key, press) as Boolean
   if press = true
     if key = "up"
       if m.mainItems.isInFocusChain() = true

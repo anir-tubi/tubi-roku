@@ -342,7 +342,7 @@ Function getTrackingComponentInfo(itemIndex, numColumns, category, trackingLib)
 End Function
 
 
-Function onKeyEvent(key, press)
+Function onKeyEvent(key, press) as Boolean
 
   handled = false
 

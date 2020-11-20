@@ -69,7 +69,7 @@ Function onButtonSelected()
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean)
+Function onKeyEvent(key As String, press As Boolean) as Boolean
   if press
     return false
   end if

@@ -464,7 +464,7 @@ Function onModeChange()
 End Function
 
 
-Function onKeyEvent(key, press)
+Function onKeyEvent(key, press) as Boolean
   if press and key = "OK"
     m.top.descriptionSelected = true
     return true

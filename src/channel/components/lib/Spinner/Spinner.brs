@@ -125,6 +125,6 @@ Function onDimensionsChange()
 End Function
 
 
-Function onKeyEvent(key, press)
+Function onKeyEvent(key, press) as Boolean
   return m.top.modal
 End Function

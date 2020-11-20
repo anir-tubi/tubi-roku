@@ -162,7 +162,7 @@ Function onStopAutoPlayTimer()
 End Function
 
 
-Function onKeyEvent(key, press)
+Function onKeyEvent(key, press) as Boolean
   tubiLog("UpNextScreen.onKeyEvent")
   ' pass through back presses, but consume all other button presses
   if press and key = "back"

@@ -951,7 +951,7 @@ Function close2ndScreen()
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean)
+Function onKeyEvent(key As String, press As Boolean) as Boolean
   if press and m.top.fullscreen = true
     tubiLog("LinearVideoPlayerScreen.onKeyEvent key = " + key)
     m.lastButtonPressPos = m.playerPosition

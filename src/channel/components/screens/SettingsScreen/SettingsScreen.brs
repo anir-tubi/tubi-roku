@@ -356,7 +356,7 @@ Function onItemRequested()
 End Function
 
 
-Function onKeyEvent(key, press)
+Function onKeyEvent(key, press) as Boolean
   if press = true
     if key = "left"
       m.top.backButtonPressed = true
