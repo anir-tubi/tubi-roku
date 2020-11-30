@@ -147,7 +147,7 @@ Function processResponse(msg)
         end if
 
         parserCallback = callbackTypes.parseSuccess
-        job.requestNode.response = parserCallback(parsedResponse)
+        job.requestNode.response = parserCallback(parsedResponse, responseHeaders)
 
       else
 
@@ -162,7 +162,7 @@ Function processResponse(msg)
 
         ' some requests might not require error handling, and therefore may not have a parseError callback
         if parserCallback <> invalid
-          job.requestNode.error = parserCallback(parsedResponse)
+          job.requestNode.error = parserCallback(parsedResponse, responseHeaders)
         else
           job.requestNode.error = invalid
         end if

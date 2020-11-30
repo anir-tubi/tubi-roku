@@ -3,7 +3,7 @@
 ' this is helper function for parsing home screen success data
 ' @response : AA / invalid
 ' returns success ContentNode
-Function parseHomescreenSuccess(response as Object) as Dynamic
+Function parseHomescreenSuccess(response, responseHeaders) as Dynamic
 
   contentNode = CreateObject("roSGNode", "ContentNode")
   
@@ -21,7 +21,7 @@ End Function
 ' this is helper function for parsing home screen error data
 ' @error : AA / invalid
 ' returns error ContentNode
-Function parseHomescreenError(error as Object) as Dynamic
+Function parseHomescreenError(error, responseHeaders) as Dynamic
 
   eContentNode = CreateObject("roSGNode", "ErrorContentNode")
 

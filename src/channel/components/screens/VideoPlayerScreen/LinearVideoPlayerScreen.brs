@@ -28,6 +28,7 @@ Function init()
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
   m.Video.observeField("timedMetaData", "onId3")
+
   m.Video.timedMetaDataSelectionKeys = ["*"]
   
   m.top.observeField("fullscreen", "onFullScreenChange")

@@ -1,4 +1,4 @@
-Function parseVideoScreenSpritesSuccess(parsedResponse)
+Function parseVideoScreenSpritesSuccess(parsedResponse, responseHeaders)
   spritesContentNode = invalid
   if parsedResponse <> invalid then
     spritesContentNode = CreateObject("roSGNode", "TubiContentNode")
@@ -18,7 +18,7 @@ Function parseVideoScreenSpritesSuccess(parsedResponse)
 End Function
 
 
-Function parseVideoScreenUpNextSuccess(parsedResponse)
+Function parseVideoScreenUpNextSuccess(parsedResponse, responseHeaders)
   translate = TubiMetadataTranslate(m.constants)
   upNextContent = CreateObject("roSGNode", "ContentNode")
   for each content in parsedResponse
@@ -29,15 +29,29 @@ Function parseVideoScreenUpNextSuccess(parsedResponse)
 End Function
 
 
-Function parseVideoScreenUpNextError(parsedResponse)
+Function parseVideoScreenUpNextError(parsedResponse, responseHeaders)
   return parsedResponse
 End Function
 
 
-Function parseLiveVideoManifestSuccess(stringResponse)
+Function parseLiveVideoManifestSuccess(stringResponse, responseHeaders)
+  return {
+    res: stringResponse
+    headers: responseHeaders
+  }
+End Function
+
+
+Function parseLiveVideoManifestError(stringResponse, responseHeaders)
   return stringResponse
 End Function
 
-Function parseLiveVideoManifestError(stringResponse)
+
+Function parseLiveVideoPassThroughSuccess(stringResponse, responseHeaders)
+  return stringResponse
+End Function
+
+
+Function parseLiveVideoPassThroughError(stringResponse, responseHeaders)
   return stringResponse
 End Function

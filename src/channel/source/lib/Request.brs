@@ -22,7 +22,7 @@ End Function
 ' name (optional) - a human readable name for the request, to track in logs
 ' options (optional) - options to tune the behavior of the request
 '         valid Options:
-'               method - HTTP method as string: GET, PUT, POST, PATCH, or DELETE
+'               method - HTTP method as string: GET, PUT, POST, PATCH, DELETE, or OPTIONS
 '               params - assoc array of URL query params
 '               body - PUT or POST body as string
 '               headers - assoc array of headers and their values
@@ -37,6 +37,7 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     DELETE: true
     PUT: true
     PATCH: true
+    OPTIONS: true
   }
   mergedOptions = {
     method: "GET"

@@ -177,106 +177,119 @@ Function getLiveStreamManifest(streamUrl)
     streamUrl = streamUrl.trim()
   end if
 
-  m.linearManifestRequest = m.makeRequest(liveManifestReqType, streamUrl, invalid, onLiveStreamManifestResponse, onManifestError, "string")
+  m.linearManifestRequest = m.makeRequest(liveManifestReqType, streamUrl, invalid, onLiveStreamManifestResponse, onManifestError, "assocarray")
 End Function
 
 
 Function onLiveStreamManifestResponse(response)
   tubiLog("LinearVideoPlayerScreenHelpers.onLiveStreamManifestResponse")
-  ' find the analytics url
-  ' ("analytics url" is the YoSpace name for the url that will be polled for ad responses)
-  pollUrl = invalid
-  lines = response.split(chr(10))
-  for each line in lines
-    if line.Instr("#EXT-X-YOSPACE-ANALYTICS-URL") = 0
-      ' Extract the value of the analytics URL
-      pollUrl = right(line, len(line) - 29)
 
-      ' Strip surrounding quotes characters if present
-      if (left(pollUrl, 1) = chr(34))
-        pollUrl = mid(pollUrl, 2, len(pollUrl) - 2)
+  if response <> invalid and isString(response.res)
+    ' find the analytics url
+    ' ("analytics url" is the YoSpace name for the url that will be polled for ad responses)
+    pollUrl = invalid
+    lines = response.res.split(chr(10))
+    for each line in lines
+      if line.Instr("#EXT-X-YOSPACE-ANALYTICS-URL") = 0
+        ' Extract the value of the analytics URL
+        pollUrl = right(line, len(line) - 29)
+
+        ' Strip surrounding quotes characters if present
+        if (left(pollUrl, 1) = chr(34))
+          pollUrl = mid(pollUrl, 2, len(pollUrl) - 2)
+        end if
+
+        exit for
+      end if
+    end for
+
+    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+
+    content = invalid
+    if videoPlayer.content <> invalid
+      content = videoPlayer.content
+    end if
+
+    if pollUrl <> invalid or (pollUrl = invalid and m.constants.ui.liveNewsNoAdsIds[content.id] <> invalid)
+      ' TODO: We do not want to maintain the m.constants.ui.liveNewsNoAdsIds map, so remove
+      ' any references to it after we find out how often this happens, or get
+      ' the backend to inform us of which linear content has ads.
+
+      ' we have a valid poll url or we are not expecting one, so play content
+
+      ' piece together the modified playback url
+      ' The url that will be used for the video stream must be built from the original url returned by the API
+      ' and from the "analytics url"/ad polling url. For more info, please see:
+      ' https://docs.google.com/document/d/14Ovs4KzV0iwloKtILjSZhQxT2NcGdGCm80MIMvB9EfE
+      originalUrl = invalid
+
+      modifiedUrl = ""
+      if content <> invalid and content.videoResources <> invalid
+        videoResources = content.videoResources
+        newVideoResources = []
+
+        for each resource in videoResources
+          newResource = resource
+          if resource.type = m.constants.player.drmTypes.hlsv3
+            if resource.url <> invalid
+              ' For linear content that is serving ads via YoSpace, the video resource that is used to fetch
+              ' the manifest actually redirects through a Tubi "manifest server" and to a YoSpace server
+              ' to get the manifest response. When reconstructing the YoSpace manifest url to include the
+              ' session id, we need to use the original YoSpace stream url and not the video resource url
+              ' provided by UAPI. We get the original YoSpace stream url from the "location" header since
+              ' it is a redirect.
+              if response.headers <> invalid and response.headers.location <> invalid
+                originalUrl = response.headers.location
+              else 
+                originalUrl = resource.url
+              end if
+
+              modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
+              newResource.url = modifiedUrl
+            end if
+          end if
+
+          newVideoResources.push(newResource)
+        end for
+
+        content.videoResources = newVideoResources
       end if
 
-      exit for
-    end if
-  end for
+      videoPlayer.content = content
+      videoPlayer.updateContent = true
+      videoPlayer.pollUrl = pollUrl
+      videoPlayer.control = "play"
+    else if pollUrl = invalid and m.constants.ui.liveNewsNoAdsIds[content.id] = invalid
+      ' TODO: We do not want to maintain the m.constants.ui.liveNewsNoAdsIds map, so remove
+      ' any references to it after we find out how often this happens, or get
+      ' the backend to inform us of which linear content has ads.
 
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+      if m.adsSsaiTask.manifestAttempts < 3
+        ' we didn't get a poll url but the content is expected to have ads, so we can retry fetching
+        ' the manifest as long as we are beneath the max retry attempts limit.
+        m.adsSsaiTask.manifestAttempts += 1
+        streamUrl = getLiveUrlFromResources(content)
+        getLiveStreamManifest(streamUrl)
+      else
+        ' we've maxed out the allowed retries but still no poll url, so trigger an
+        ' error via the videoPlayer and log an error.
+        videoPlayer.control = "error"
 
-  content = invalid
-  if videoPlayer.content <> invalid
-    content = videoPlayer.content
-  end if
-
-  if pollUrl <> invalid or (pollUrl = invalid and m.constants.ui.liveNewsNoAdsIds[content.id] <> invalid)
-    ' TODO: We do not want to maintain the m.constants.ui.liveNewsNoAdsIds map, so remove
-    ' any references to it after we find out how often this happens, or get
-    ' the backend to inform us of which linear content has ads.
-
-    ' we have a valid poll url or we are not expecting one, so play content
-
-    ' piece together the modified playback url
-    ' The url that will be used for the video stream must be built from the original url returned by the API
-    ' and from the "analytics url"/ad polling url. For more info, please see:
-    ' https://docs.google.com/document/d/14Ovs4KzV0iwloKtILjSZhQxT2NcGdGCm80MIMvB9EfE
-    originalUrl = invalid
-
-    modifiedUrl = ""
-    if content <> invalid and content.videoResources <> invalid
-      videoResources = content.videoResources
-      newVideoResources = []
-
-      for each resource in videoResources
-        newResource = resource
-
-        if resource.type = m.constants.player.drmTypes.hlsv3
-          if resource.url <> invalid
-            originalUrl = resource.url
-            modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
-            newResource.url = modifiedUrl
+        streamUrl = ""
+        for each line in lines
+          if line.left(8) = "https://"
+            streamUrl = line
+            exit for
           end if
-        end if
+        end for
 
-        newVideoResources.push(newResource)
-      end for
-
-      content.videoResources = newVideoResources
-    end if
-
-    videoPlayer.content = content
-    videoPlayer.updateContent = true
-    videoPlayer.pollUrl = pollUrl
-    videoPlayer.control = "play"
-  else if pollUrl = invalid and m.constants.ui.liveNewsNoAdsIds[content.id] = invalid
-    ' TODO: We do not want to maintain the m.constants.ui.liveNewsNoAdsIds map, so remove
-    ' any references to it after we find out how often this happens, or get
-    ' the backend to inform us of which linear content has ads.
-
-    if m.adsSsaiTask.manifestAttempts < 3
-      ' we didn't get a poll url but the content is expected to have ads, so we can retry fetching
-      ' the manifest as long as we are beneath the max retry attempts limit.
-      m.adsSsaiTask.manifestAttempts += 1
-      streamUrl = getLiveUrlFromResources(content)
-      getLiveStreamManifest(streamUrl)
-    else
-      ' we've maxed out the allowed retries but still no poll url, so trigger an
-      ' error via the videoPlayer and log an error.
-      videoPlayer.control = "error"
-
-      streamUrl = ""
-      for each line in lines
-        if line.left(8) = "https://"
-          streamUrl = line
-          exit for
-        end if
-      end for
-
-      logMsg = {
-        content_id: content.id
-        stream_url: streamUrl
-      }
-      logMsg = FormatJson(logMsg)
-      tubiLog(logMsg, "error", "videoLoad", "no-yospace-analytics-url")
+        logMsg = {
+          content_id: content.id
+          stream_url: streamUrl
+        }
+        logMsg = FormatJson(logMsg)
+        tubiLog(logMsg, "error", "videoLoad", "no-yospace-analytics-url")
+      end if
     end if
   end if
 End Function
