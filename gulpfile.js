@@ -167,6 +167,11 @@ function buildInstalled() {
     if (options.config !== 'dev') {
       sources.push('!src/channel/components/controllers/TubiScene/TrackerTask.xml')
     }
+    
+    // don't include SignUp Task if config is not 'qa'
+    if (options.config !== 'qa') {
+      sources.push('!src/channel/components/tasks/SignUpTask/**')
+    }    
 
     let srcOptions = {
       base: 'src/channel'
@@ -314,6 +319,11 @@ function buildRemote() {
     if (options.config !== 'dev') {
       sources.push('!src/channel/components/controllers/TubiScene/TrackerTask.xml')
     }
+    
+    // don't include SignUp Task if config is not 'qa'
+    if (options.config !== 'qa') {
+      sources.push('!src/channel/components/tasks/SignUpTask/**')
+    }    
 
     let srcOptions = {
       base: 'src/channel'

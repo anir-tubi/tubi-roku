@@ -4,3 +4,4 @@ settings:
   mode: "qa"
   suitest: false  #setting to true will result in suitest being loaded and no ads played
   stagingApis: false  #setting to true will use UAPI staging APIs (matrix, cms, user_device)
+  automaticActivation: false  #setting to true will activate/signup the app automatically (if the values of suitest & stagingApis are true)

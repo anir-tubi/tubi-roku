@@ -119,6 +119,15 @@ Function onCodeChange()
       m.Buttons.jumpToItem = m.Buttons.itemFocused
     end if
   end if
+  
+  suitest = m.constants.settings.suitest
+  automaticActivation = m.constants.settings.automaticActivation
+  stagingApis = m.constants.settings.stagingApis
+  
+  if suitest = true and automaticActivation = true and stagingApis = true
+    activateAutomatically()
+  end if  
+  
 End Function
 
 
@@ -164,6 +173,50 @@ Function getRegistrationCode()
   m.RegCodeTask.observeField("response", "onRegistrationResponse")
   m.RegCodeTask.observeField("error", "onRegTaskError")
   m.RegCodeTask.control = "RUN"
+  
+End Function
+
+
+' This function is used only in suitest to activate automatically
+Function activateAutomatically()
+
+  if m.signUpTask <> invalid then
+    m.signUpTask.unobserveField("error")
+  end if
+
+  m.signUpTask = CreateObject("roSGNode", "SignUpTask")
+  ' delay field helps to show activation screen for 10 seconds during automatic activation
+  m.signUpTask.delay = 10000
+  m.signUpTask.requestParams = constructCodeRegisterReqParams()
+  m.signUpTask.observeField("error", "onSignUpError")
+  m.signUpTask.control = "RUN" 
+
+End Function
+
+
+' constructCodeRegisterReqParams is used to construct request params for code register
+Function constructCodeRegisterReqParams()
+
+  dateTime = CreateObject("roDateTime")
+  secondsFromEpoch = dateTime.AsSeconds()
+
+  requestParams = {}
+  requestParams.email = "build_roku_" + secondsFromEpoch.ToStr() + "@tubi.tv"
+  requestParams.password = "111111"
+  requestParams.gender = ""
+  requestParams.first_name = "Automation"
+  requestParams.last_name = "Suitest"
+  requestParams.birthday = ""
+  
+  requestParams.activationCode = m.RegCodeTask.code
+  
+  return requestParams
+
+End Function
+
+
+Function onSignUpError(evt)
+  m.top.errorType = evt.getData()
 End Function
 
 
