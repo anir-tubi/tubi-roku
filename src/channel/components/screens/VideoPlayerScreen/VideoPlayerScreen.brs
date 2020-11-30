@@ -57,6 +57,7 @@ Function init()
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
+  m.Video.observeField("streamingSegment", "onStreamingSegmentChange")
 
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("sprites", "onSpritesReceived")
@@ -1223,4 +1224,14 @@ End Function
 ' from within the VideoPlayer component
 Function onUpNextAutolayModeChange(msg)
   setAutoplayMode(msg.getData())
+End Function
+
+
+Function onStreamingSegmentChange(msg)
+
+  streamingSegment = msg.GetData()
+  if streamingSegment <> invalid and streamingSegment.segBitrateBps <> invalid
+    m.top.segBitrate = streamingSegment.segBitrateBps
+  end if
+
 End Function
