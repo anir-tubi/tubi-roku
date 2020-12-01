@@ -13,11 +13,28 @@ const mergeStream = require('merge-stream');
 const http = require('http');
 const mkdirp = require('mkdirp');
 const request = require('request');
-const shell = require('shelljs');
+const clipboardy = require('clipboardy');
+const prompts = require('prompts');
 const { RooibosProcessor, createProcessorConfig, ProcessorConfig } = require('rooibos-cli');
+const shell = require('shelljs');
+shell.config.silent = true;
 // Uncomment the next line if there are connection issues to the Roku device
 // const requestDebug = require('request-debug')(request);
 
+// Github API wrapper
+const { Octokit } = require('@octokit/rest');
+const octokit = new Octokit({
+  auth: process.env.GITHUB_PAT,
+  userAgent: 'project-total-recall-build-server',
+  baseUrl: 'https://api.github.com'
+});
+
+// constants used for interacting with the github API
+const ghInfo = {
+  owner: 'adRise',
+  rokuRepo: 'project-total-recall',
+  cdnRepo: 'adrise_cdn',
+};
 
 //Importing old build functions
 const {load, getBuildTag, incrementBuildNumber} = require('./js/config');
@@ -526,20 +543,23 @@ function packageAll() {
 
 
 // ensure git exists on the system and that the working directory is clean
-function verifyGit(done) {
-  const shOptions = {
-    silent: true
-  };
+function verifyGit(done, directory = '') {
+  let gitDirectory = '';
+  if (directory) {
+    gitDirectory = `-C ${directory}`;
+  }
 
   if (!shell.which('git')) {
     done(new NoStackError('Git error: git not installed'));
     return false;
-  } else if (shell.exec('git rev-parse --is-inside-work-tree', shOptions).stdout.trim() !== 'true') {
-    done(new NoStackError("Git error: current directory is not part of a git repo"));
+  } else if (shell.exec(`git ${gitDirectory} rev-parse --is-inside-work-tree`
+    ).stdout.trim() !== 'true') {
+    directory = !!directory ? directory : process.cwd();
+    done(new NoStackError(`Git error: current directory (${directory}) is not part of a git repo.`));
     return false;
-  } else if (shell.exec('git status --porcelain', shOptions).stdout) {
-    // console.log('Git error: working directory is dirty - stash or commit your changes');
-    done(new NoStackError('Git error: working directory is dirty - stash or commit your changes'));
+  } else if (shell.exec(`git ${gitDirectory} status --porcelain`).stdout) {
+    directory = !!directory ? directory : process.cwd();
+    done(new NoStackError(`Git error: working directory (${directory}) is dirty - stash or commit your changes before proceeding.`));
     return false;
   } else {
     return true;
@@ -643,6 +663,209 @@ function pushStaging(done) {
 }
 
 
+async function confirmRelease(done) {
+  const msg = 'Are you sure you want to run the release process? This will push branches to Github and create multiple PRs in the appropriate places. (y/n)'
+  const confirmation = await prompts({
+    type: 'confirm',
+    name: 'confirmRelease',
+    message: msg
+  });
+
+  if (!confirmation || !confirmation.confirmRelease) {
+    const errorMsg = 'Release process not confirmed'
+    done(new NoStackError(errorMsg));
+  }
+}
+
+
+// All the steps necessary to push starter and remote components to the CDN and make a PR to the CDN.
+// Additionally make a PR against the production release branch on project-total-recall and copy the
+// urls to the local clipboard.
+async function makeReleasePrs(done) {
+  // Note that git commands will have a code = 0 when there is no error and code > 0 when an error occurred.
+  // Also note that git commands have a stderr output even if the code === 0.
+
+  const minorBuildTag = getBuildTag(true, false);
+  const fullBuildTag = getBuildTag(false, false);
+  const cdnPath = process.env.CDN_GIT_DIRECTORY;
+
+  // check if the environment variable for the path to the CDN repo has been set
+  if (!cdnPath) {
+    const errorMsg = `You did not set a CDN_GIT_DIRECTORY environment variable in your .bash_profile or .bashrc file.`
+    done(new NoStackError(errorMsg));
+  }
+
+  // check that the CDN repo is clean - verifyGit() handles any error messages as necessary
+  verifyGit(done, cdnPath);
+
+  // rename the local branch name so it looks like "release_2_14_34"
+  const releaseBranchName = `release_${fullBuildTag}`
+  console.log(`...Renaming the local branch to ${releaseBranchName}`);
+  const branchRenameRes = shell.exec(`git branch -m ${releaseBranchName}`);
+  if (branchRenameRes.code) {
+    let errorMsg = `Could not rename the local branch to ${releaseBranchName}`;
+    if (pushBranchRes.stderr) {
+      errorMsg = branchRenameRes.stderr
+    }
+    done(new NoStackError(errorMsg));
+  }
+
+  // attempt to checkout master in the CDN repo
+  console.log(`...Checking out master on the local ${ghInfo.cdnRepo} repo`)
+  const checkoutMasterRes = shell.exec(`git -C ${cdnPath} checkout master`).code;
+  if (checkoutMasterRes.code) {
+    let errorMsg = `Could not check out master at ${cdnPath}.`;
+    if (checkoutMasterRes.stderr) {
+      errorMsg = checkoutMasterRes.stderr;
+    }
+    done(new NoStackError(errorMsg));
+  }
+
+  // attempt to pull origin master for the CDN repo
+  console.log(`...Pulling remote master to the local ${ghInfo.cdnRepo} repo`);
+  const pullMasterRes = shell.exec(`git -C ${cdnPath} pull origin master`).code;
+  if (pullMasterRes.code) {
+    let errorMsg = `Could not pull master from origin at ${cdnPath}.`;
+    if (pullMasterRes.stderr) {
+      errorMsg = pullMasterRes.stderr;
+    }
+    done(new NoStackError(errorMsg));
+  }
+
+  // attempt to check out a new branch off master for the CDN repo
+  const cdnBranchName = `roku_${fullBuildTag}`;
+  console.log(`...Creating a new ${cdnBranchName} branch on the local ${ghInfo.cdnRepo} repo`);
+  const checkoutNewBranchRes = shell.exec(`git -C ${cdnPath} checkout -b ${cdnBranchName}`);
+  if (checkoutNewBranchRes.code) {
+    let errorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
+    if (checkoutNewBranchRes.stderr) {
+      errorMsg = `${checkoutNewBranchRes.stderr} at ${cdnPath}`;
+    }
+    done(new NoStackError(errorMsg));
+  }
+
+  const starterComponentsFileName = `tubi_starter_components_${minorBuildTag}.pkg`;
+  const remoteComponentsFileName = `tubi_remote_components_${fullBuildTag}.pkg`;
+
+  const cdnStarterComponentsPath = `${cdnPath}/hotpatches/roku/starter-components/${starterComponentsFileName}`;
+  const cdnRemoteComponentsPath = `${cdnPath}/hotpatches/roku/components/${remoteComponentsFileName}`;
+  
+  const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
+  const localRemoteComponentsPath = `build/tubi_remote_components_${fullBuildTag}.pkg`;
+  
+  // copy the starter components from the /build directory to the CDN repo directory
+  console.log(`...Copying the starter components to the local ${ghInfo.cdnRepo} repo`);
+  const moveStarterComponentsResult = shell.cp(localStarterComponentsPath, cdnStarterComponentsPath);
+  if (moveStarterComponentsResult.stderr) {
+    const errorMsg = `There was an error moving the starter components. You will need to manually copy the starter components and remote components and manually make a PR.
+           Error Message: ${moveStarterComponentsResult.stderr}`;
+    done(new NoStackError(errorMsg));
+  }
+
+  // copy the remote components from the /build directory to the CDN repo directory
+  console.log(`...Copying the remote components to the local ${ghInfo.cdnRepo} repo`);
+  const moveRemoteComponentsRes = shell.cp(localRemoteComponentsPath, cdnRemoteComponentsPath);
+  if (moveRemoteComponentsRes.stderr) {
+    const errorMsg = `There was an error moving the remote components. You will need to manually copy the remote components and manually make a PR.
+           Error Message: ${moveRemoteComponentsRes.stderr}`;
+    done(new NoStackError(errorMsg));
+  }
+
+  // add the updates so they are staged for commit
+  console.log(`...Staging changes for commit on the local ${ghInfo.cdnRepo} repo`);
+  const gitAddRes = shell.exec(`git -C ${cdnPath} add . `);
+  if (gitAddRes.code) {
+    let errorMsg = `Could not run "git add . " on ${cdnPath}`;
+    if (gitAddRes.stderr) {
+      errorMsg = gitAddRes.stderr
+    }
+    done(new NoStackError(errorMsg))
+  }
+
+  // commit the updates to the branch
+  console.log(`...Committing the staged changes on the local ${ghInfo.cdnRepo} repo`);
+  const gitCommitRes = shell.exec(`git -C ${cdnPath} commit -m 'Updating the starter and remote components for ${cdnBranchName}'`);
+  if (gitCommitRes.code) {
+    let errorMsg = `"git commit" failed on ${cdnPath}`;
+    if (gitCommitRes.stderr) {
+      errorMsg = gitCommitRes.stderr;
+    }
+    done(new NoStackError(errorMsg))
+  }
+
+  // push the branch to Github
+  console.log(`...Pushing the local ${cdnBranchName} branch to the remote ${ghInfo.rokuRepo} repo`)
+  const pushCdnBranchRes = shell.exec(`git -C ${cdnPath} push origin ${cdnBranchName}`);
+  if (pushCdnBranchRes.code) {
+    let errorMsg = `Could not push ${cdnBranchName} to origin (Github) at ${cdnPath}`;
+    if (pushCdnBranchRes.stderr) {
+      errorMsg = pushCdnBranchRes.stderr
+    }
+    done(new NoStackError(errorMsg));
+  }
+
+  // make a PR against master on the CDN repo at Github
+  console.log(`...Making a PR on ${ghInfo.cdnRepo} against the remote master branch`);
+  let cdnPrUrl = '';
+  try {
+    const cdnPrRes = await octokit.pulls.create({
+      owner: ghInfo.owner,
+      repo: ghInfo.cdnRepo,
+      title: `Updating start up and remote components for roku ${fullBuildTag}`,
+      head: cdnBranchName,
+      base: 'master'
+    });
+    cdnPrUrl = cdnPrRes.data.html_url;
+  } catch(err) {
+    console.log(err);
+    done(new NoStackError(err));
+  }
+
+  // push the release branch to the project-total-recall repo
+  console.log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
+  const pushReleaseBranchRes = shell.exec(`git push origin ${releaseBranchName}`);
+  if (pushReleaseBranchRes.code) {
+    let errorMsg = `Could not push ${releaseBranchName} to ${ghInfo.rokuRepo} origin (Github)`;
+    if (pushReleaseBranchRes.stderr) {
+      errorMsg = pushReleaseBranchRes.stderr;
+    }
+    done(new NoStackError(errorMsg));
+  }
+
+  // make a PR against the production branch on the project-total-recall repo at Github
+  const prodRokuBranchName = `${minorBuildTag}_branch`;
+  console.log(`...Making a PR from the remote ${releaseBranchName} on ${ghInfo.rokuRepo} against the ${prodRokuBranchName} branch`);  
+  let releasePrUrl = '';
+  try {
+    const releasePrRes = await octokit.pulls.create({
+      owner: ghInfo.owner,
+      repo: ghInfo.rokuRepo,
+      title: `Release ${fullBuildTag}`,
+      head: releaseBranchName,
+      base: prodRokuBranchName
+    });
+    releasePrUrl = releasePrRes.data.html_url;
+  } catch(err) {
+    console.log(err);
+    done(new NoStackError(err));
+  }
+
+  // copy the PR urls to the clipboard
+  if (releasePrUrl && cdnPrUrl) {
+    
+    // multi line string
+    const prUrlsForPasting = `${releasePrUrl}
+${cdnPrUrl}`;
+
+    clipboardy.writeSync(prUrlsForPasting);
+    console.log(`The release PR url and the CDN PR url have been placed on your clipboard. Please share with the team!`)
+  } else {
+    const errorMsg = 'The urls for the release PR and the CDN PR are not available. Please share manually.'
+    done(new NoStackError(errorMsg));
+  }
+}
+
+
 exports.build = series(clean, buildInstalled, buildStarter, buildRemote);
 exports.sideload = sideLoad;
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
@@ -650,7 +873,7 @@ exports.bump = bumpBuild;
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
 exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
-exports.release = series(setProduction, bumpBuild, tagBuild, exports.build, packageAll);
+exports.release = series(confirmRelease, setProduction, bumpBuild, tagBuild, exports.build, packageAll, makeReleasePrs);
 
 //command lines related to the crowdin language translations
 exports.update_local_translations = updateLocalTranslations;

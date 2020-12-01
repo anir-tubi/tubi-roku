@@ -50,23 +50,29 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
 
 4\. Set the developer id on your Roku device. (You will need to get a pkg, password, and developer id from other roku developers on the team).
 
-* Navigate to the Roku device's IP in your broswer; select Utilities. Take note of the IP address for step #5 when you will set the "ROKU_DEV_TARGET".
-* Upload the pkg file and enter the password and select `Rekey`. (This password will be used in step #5 to set "PKG_PASSWORD").
+* Navigate to the Roku device's IP in your broswer; select Utilities. Take note of the IP address for step #6 when you will set the "ROKU_DEV_TARGET".
+* Upload the pkg file and enter the password and select `Rekey`. (This password will be used in step #6 to set "PKG_PASSWORD").
 * Check that you have the proper developer ID by navigating in your web browser to the Roku device's IP and then select Packager.
 
-5\. Set the build environment. (The following settings are temporary and setting them must be done every time you create a new terminal session.)
+5\.Create a Github Peronal Access Token (this access token will be set as an environment variable in step #6):
+
+https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token
+
+6\. Set the build environment. (The following settings are temporary and setting them must be done every time you create a new terminal session.)
 
 ```
-$ export ROKU_DEV_TARGET=<your-roku-ip>
-$ export DEV_PASSWORD=<dev password set up on Roku device>
-$ export PKG_PASSWORD=<password from the GENKEY utility used for signing packages>
-$ export ROKU_DEV_TELNET=sametab (optional)
+$ export ROKU_DEV_TARGET="<your-roku-ip>""
+$ export DEV_PASSWORD="<dev password set up on Roku device>"
+$ export PKG_PASSWORD="<password from the GENKEY utility used for signing packages>"
+$ export CDN_GIT_DIRECTORY="<path to the adrise_cdn repo directory ex: ~/dev/adrise_cdn>"
+$ export GITHUB_PAT="<github personal access token>"
+$ export ROKU_DEV_TELNET="sametab" (optional)
 ```
 Pro tip: add these environment variables to your .bashrc or .bash_profile file
 
-6\. Create a `dev.yml` file in your `config` directory. Use the existing `dev.yml.example` file as a template.
+7\. Create a `dev.yml` file in your `config` directory. Use the existing `dev.yml.example` file as a template.
 
-7\. Make a development build, sideload to the device, and attach to the developer console
+8\. Make a development build, sideload to the device, and attach to the developer console
 
 `$ gulp install`
 
@@ -76,7 +82,7 @@ To see a list of gulp commands `$ gulp --tasks`
 __The most commonly used Gulp commands__
 * `$ gulp install` - build a zip and side load it to a device (as set by your ROKU_DEV_TARGET)
 * `$ gulp stage` - build a zip using the "staging" config and upload starter components, and remote components to the staging CDN.
-* `$ gulp release` - bump the build number, and build a zip using the "production" config. The starter components and remote components are ready to be udloaded to the production CDN.
+* `$ gulp release` - bump the build number, build starter and remote components .pkgs using the "production" config. This command will also make PRs to the CDN repo and this project-total-recall repo on Github.
 
 __Gulp options__
 * `--<config>` - for example `$ gulp install --staging` will build and install a zip to the targeted device using the "staging" config. There is a .yml file for each accepted config value in the /config directory.
@@ -181,29 +187,46 @@ Submission releases are releases that are sent to Roku.
 TBD
 ```
 
-6\. Submit build to Roku
-- Run the following command to increment the build version number, create a new tag for the build,  and output .pkg files that can be submitted to Roku.
+6\. After QA Sign Off, run `$ gulp release`. This will:
+  - increment the version number once more (the QA build should not be the same version number as the production build)
+  - install a new build using the "production" config, to create the .pkgs needed to update the production build.
+  - rename the current branch to `release_x_y_z`.
+  - copy the tubi_starter_components_x_y_z.pkg and tubi_remote_components_x_y_z.pkg files to the local CDN repo.
+  - update the local CDN repo by doing the following:
+    - checking out master
+    - pulling master from origin
+    - creating a new branch called `roku_x_y_z`
+  - push the `roku_x_y_z` branch to origin
+  - make a PR against `master` from the `roku_x_y_z` branch.
+  - push the `release_x_y_z` branch to Github.
+  - make a PR to the `x_y_branch` on Github from the `release_x_y_z` branch.
+  - copy the Github urls for the two PRs made above to the clipboard.
 
-  `$ gulp release`
+    __Note:__ you will need the `CDN_GIT_DIRECTORY` and `GITHUB_PAT` environment variables to be set for `gulp release` to work properly.
 
+    __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Submission Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#submission-release)
+
+7\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
+
+- __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
+
+8\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
+- Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
+- You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirmements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
+
+  `$ pyenv`
+
+- If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
+- Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/#deploy-to-aws-s3).
+
+9\. Submit build to Roku
 - In a browser, visit [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to update the "Tubi - Free Movies & TV" channel with the `/build/roku_x_y_z.pkg` file.
 
-7\. Update the starter components and remote component files to the CDN
-- Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/). Although it does not matter, traditionally we name the branch "Roku_x_y_z", where "z" is the patch number.
+10\. Email Roku Partner Success to let them know the build is in their queue.
 
-- Copy two files to the CDN repo:
+11\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
 
-  - copy the remote components file (i.e. `build/tubi_remote_components_x_y_z.pkg`) into the folder: hotpatches/roku/components/
-
-  - copy the starter components file (i.e. `build/tubi_starter_components.x.y.pkg`) into folder: hotpatches/roku/starter-components
-
-- Submit a PR to the CDN repo.
-
-8\. Email Roku Partner Success to let them know the build is in their queue.
-
-9\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
-
-10\. Create a release on Github
+12\. Create a release on Github
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
 
@@ -217,7 +240,7 @@ TBD
 
 
 # Remote Release
-Remote releases are releases that are not sent to Roku, and updates are made when a device loads the Tubi channel, by downloading the hotpatch and remote component files, which are used to build the channel UI.
+Remote releases are releases that are not sent to Roku, and updates are made when a device loads the Tubi channel, by downloading the starter component and remote component files, which are used to build the channel UI.
 
 1\. Checkout the most recent `x_y_branch` branch, and pull any potential updates from origin. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number.
 
@@ -259,34 +282,33 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 7\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Guthub.
 
- 
-
 8\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build.
 
-9\. After QA Sign Off, run `$ gulp release`. This will increment the version number once more (the QA build should not be the same version number as the production build) and install a new build using the "production" config, to create the .pkgs needed to update the production build.
+9\. After QA Sign Off, run `$ gulp release`. This will:
+  - increment the version number once more (the QA build should not be the same version number as the production build)
+  - install a new build using the "production" config, to create the .pkgs needed to update the production build.
+  - rename the current branch to `release_x_y_z`.
+  - copy the tubi_starter_components_x_y_z.pkg and tubi_remote_components_x_y_z.pkg files to the local CDN repo.
+  - update the local CDN repo by doing the following:
+    - checking out master
+    - pulling master from origin
+    - creating a new branch called `roku_x_y_z`
+  - push the `roku_x_y_z` branch to origin
+  - make a PR against `master` from the `roku_x_y_z` branch.
+  - push the `release_x_y_z` branch to Github.
+  - make a PR to the `x_y_branch` on Github from the `release_x_y_z` branch.
+  - copy the Github urls for the two PRs made above to the clipboard.
 
-10\. Create a new branch based on the `qa_x_y_z` branch, and name it `release_x_y_z`, where "z" (of the release branch) will match the patch number that was just incremented by the previous step.
+  __Note:__ you will need the `CDN_GIT_DIRECTORY` and `GITHUB_PAT` environment variables to be set for `gulp release` to work properly.
 
-11\. Ready the release branch for review
+  __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Remote Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#remote-release)
 
-- Push the `release_x_y_z` branch to Github.
+10\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
 
-- Make a PR to the `x_y_branch` and merge it after approval. Make sure you do not make the PR to master.
+- __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
 
-12\. Update the hotpatch and remote component files to the CDN
-- Create a new branch in the CDN repo [github.com/adRise/adrise_cdn/](https://github.com/adRise/adrise_cdn/). Although it does not matter, traditionally we name the branch "Roku_x_y_z".
 
-- Copy two files to the CDN repo:
-
-  - copy the remote components file (i.e. `build/tubi_remote_components_x_y_z.pkg`) into the folder: hotpatches/roku/components/
-
-  - copy the starter components file (i.e. `build/tubi_starter_components_x.y.pkg`) into folder: hotpatches/roku/starter-components/
-
-- Submit a PR to the CDN repo. Wait for the approval and merging of the PR before proceeding to the next step
-
-- __DO NOT PROCEED TO THE INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
-
-13\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
+11\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
 - You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirmements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
 
@@ -295,7 +317,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
 - Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/#deploy-to-aws-s3).
 
-14\. Verify the release
+12\. Verify the release
 - Run a smoke test on production checking at minimum:
     - The production channel loads
 		- Video plays
@@ -303,9 +325,9 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - Monitor various metrics for signs of any issues:
 	- [Ad impressions per second](https://app.datadoghq.com/dashboard/ckr-vrw-xh4/ad-server-business-metrics?from_ts=1563412592034&to_ts=1564017392034&live=true&tile_size=m&fullscreen_widget=80673160&fullscreen_section=overview)
 
-15\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
+13\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
 
-16\. Create a release on Github
+14\. Create a release on Github
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
 
