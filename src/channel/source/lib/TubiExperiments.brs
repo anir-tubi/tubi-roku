@@ -50,8 +50,6 @@ Function TubiExperiments(constants) as Object
       }
       roku_metadata_align : {
       }
-      roku_safenav_ordering : {
-      }  
     }
     defaultResources: {
     '//::TODO::SafeZone - set these experiments back to false when done with testing
@@ -71,9 +69,6 @@ Function TubiExperiments(constants) as Object
       roku_metadata_align : {
         roku_metadata_align_experiment : {"is_top_aligned" : false, "has_enlarged_description_text": false, "has_enlarged_title_text": true}
       }  
-      roku_safenav_ordering : {
-        roku_safenav_ordering_v1 : {"action" : "no_change"}
-      }      
     }
     
 

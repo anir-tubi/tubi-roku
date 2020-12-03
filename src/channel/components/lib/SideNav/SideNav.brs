@@ -85,23 +85,7 @@ Function onCreateMenuItems()
   m.mainItems = m.top.findNode("mainItems")
   m.mainItemsSelected = m.top.findNode("mainItemsSelected")
   
-  menuItems = ["kidsMode", "search", "home", "movies", "tv", "espanol", "categories", "channels"]
-  if m.constants.deviceInfo.countryCode = "US"
-    experimentInfo = getExperimentResource("roku_safenav_ordering", "roku_safenav_ordering_v1", false)
-    if experimentInfo <> invalid
-      if experimentInfo.action = "remove_espanol"
-        menuItems = ["kidsMode", "search", "home", "movies", "tv", "categories", "channels"]
-      else if experimentInfo.action = "insert_espanol_6thPosition"
-        menuItems = ["kidsMode", "search", "home", "movies", "tv", "espanol", "categories", "channels"]
-      else if experimentInfo.action = "remove_espanol_and_insert_myList_5thPosition"
-        menuItems = ["kidsMode", "search", "home", "movies", "tv", "mylist", "categories", "channels"]
-      else if experimentInfo.action = "remove_espanol_and_insert_search_7thPosition"
-        menuItems = ["kidsMode", "home", "movies", "tv", "categories", "channels", "search"]
-      else if experimentInfo.action = "remove_espanol_and_swap_movies_tv"
-        menuItems = ["kidsMode", "search", "home", "tv", "movies", "categories", "channels"]
-      end if
-    end if
-  end if
+  menuItems = ["kidsMode", "search", "home", "movies", "tv", "mylist", "categories", "channels"]
   ' Creates roSGNode dynamically
   setMenuItems(menuItems)  
   
@@ -332,12 +316,6 @@ End Function
 
 Function onOpenedChange()
   if m.top.opened = true
-    ' sends exposure event when user opens sidenav
-    ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
-    if m.constants.deviceInfo.countryCode = "US"
-      getExperimentResource("roku_safenav_ordering", "roku_safenav_ordering_v1")
-    end if  
-  
     '//display hidden items, profile, settings, exit. Set all buttons to full opacity
     
     if m.itemSelectedRemembered <> invalid
