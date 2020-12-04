@@ -400,7 +400,7 @@ Function startUserExperience()
     ' checks if auth info has been received after a deeplink from external tubi device (iOS) supplied a refresh token
     ' if m.authInfoReceived is false, it means that a refresh token has been supplied
     if m.global.authInfo <> invalid
-      ' we only need to refresh is the user is currently signed out
+      ' we only need to refresh if the user is currently signed out
       m.authTask = CreateObject("roSGNode", "AuthTask")
       m.authTask.observeFieldScoped("authInfoRefreshed", "onAuthInfoRefreshed")
       m.authTask.externalAuthInfo = getExternalAuthInfoFromStartupArgs(m.top.startUpArgs)

@@ -2,6 +2,7 @@
 ' startSignIn
 '
 ' Defer to the sign-in controller for sign in experience
+' @param skipOnBoarding: boolean, Should the OnBoarding be skipped? 
 Function startSignIn(skipOnBoarding)
 
   m.skipOnBoardingScreen = skipOnBoarding  
@@ -161,6 +162,7 @@ Function onAuthInfoReceived()
     end if
   end for
 
+  bJumpToContinueWatching = false
   'remove the activation code screen since it is no longer necessary
   if currentScreen() <> invalid and currentScreen().getSubtype() =  "ActivationCodeScreen"
     popScreen(true, true)
@@ -187,12 +189,12 @@ Function onAuthInfoReceived()
 
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
-    'expect homeScreen to not be invalid only when a user signs out
     homeScreen.loadAllCategories = true
   end if
       
   currentScreen = currentScreen()
   if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" or currentScreen.getSubtype() = "SettingsScreen")
+
     ' this happens, if a user logs in after attempting to add to queue via detailScreen
     ' or
     ' this happens, if a user logs in after attempting to update parental controls/signIn via settingsScreen

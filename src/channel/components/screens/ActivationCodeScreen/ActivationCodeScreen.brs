@@ -68,7 +68,7 @@ Function setButtonContent()
   m.refreshBtnContent = content.createChild("ContentNode")
   m.refreshBtnContent.id = "refresh"
   m.Buttons.translation = [720, m.Buttons.translation[1]]
-  m.Buttons.itemSpacings = [0,0]
+  m.Buttons.itemSpacing = [0,0]
   m.Buttons.content = content
 End Function
 

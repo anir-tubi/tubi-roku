@@ -440,6 +440,10 @@ Function onModeChange()
     m.Offset.appendChild(m.SeasonDetails)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [52, 15]
+  else if m.top.mode = "continue_watching" then
+    m.Offset.appendChild(m.TitleGroup)
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.Offset.itemSpacings = [15] 
   else if m.top.mode = "episode" then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)

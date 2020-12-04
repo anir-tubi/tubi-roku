@@ -46,6 +46,8 @@ Function TubiExperiments(constants) as Object
       }  
       roku_live_video_v2: {
       }
+      roku_continue_watching_signed_out: {
+      }
       roku_discovery_v3 : {
       }
       roku_metadata_align : {
@@ -62,6 +64,9 @@ Function TubiExperiments(constants) as Object
       }
       roku_live_video_v2: {
         roku_live_news_long_v2 : {"has_live_news_default" : true}
+      }
+      roku_continue_watching_signed_out: {
+        roku_continue_watching_signed_out_experiment : {enabled: false, "display_free" : false}
       }
       roku_discovery_v3 : {
         roku_discovery_row_v3 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}

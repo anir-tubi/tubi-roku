@@ -14,6 +14,9 @@ Function onItemContentChange()
     m.DetailsMenuText.text = m.top.itemContent.title
     m.top.calculatedTextWidth = m.DetailsMenuText.boundingRect().width
 
+
+    m.top.calculatedWidth = m.DetailsMenuText.boundingRect().width + m.DetailsMenuText.translation[0]
+
     m.Icon.uri = m.top.itemContent.iconUrl
     if m.top.itemContent.playstart <> invalid and m.top.itemContent.playstart <> 0.0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0.0 then
       showProgressBar(m.top.itemContent.playstart / m.top.itemContent.length)

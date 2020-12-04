@@ -87,10 +87,10 @@ Function onComponentFocusChange()
 
     rowItemFocused = m.RowList.rowItemFocused
     if rowItemFocused.count() <> 2
-      '//The rowList has not gained focus yet so use the default upperleft item.
+      '//The rowList has not gained focus yet so either use the default upperleft item or the 
       rowItemFocused = [0,0]
     end if 
-
+    
     if resolveAbbreviatedContent(rowItemFocused) <> invalid or (m.itemToJumpTo <> invalid and resolveAbbreviatedContent(m.itemToJumpTo) <> invalid)
       if m.itemToJumpTo <> invalid
         m.RowList.jumpToRowItem = m.itemToJumpTo
@@ -215,6 +215,7 @@ Function onRepopulateContent()
 End Function
 
 
+
 Function setRowHeights()
   'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
   rowItemSize = []
@@ -227,6 +228,12 @@ Function setRowHeights()
       rowItemSize.push([324,84])
       rowHeights.push(130)
       showRowLabel.push(false)
+    else if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
+      posterHeight = m.constants.ui.imageSizes.poster[1]
+      rowHeightAdjustment = 64
+      rowItemSize.push([1693, m.constants.ui.imageSizes.poster[1]])
+      rowHeights.push(posterHeight + rowHeightAdjustment)
+      showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.portrait
       posterWidth = m.constants.ui.imageSizes.poster[0]
       posterHeight = m.constants.ui.imageSizes.poster[1]
@@ -400,6 +407,7 @@ End Function
 ' onRowItemFocused - RowList.rowItemFocused event handler.  To reduce jank we debounce these events
 Function onRowItemFocused()
   tubiLog("CategoryGridList.onRowItemFocused")
+
   if m.justGainedFocus
     onRowListItemDebounce()
     m.justGainedFocus = false

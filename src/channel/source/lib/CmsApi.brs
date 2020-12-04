@@ -183,7 +183,8 @@ Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, passedOptions = {
     m.setImageParams_(passedOptions.params, options.params)
   end if
 
-  options.params["includeEmpty"] = true
+  options.params["includeEmptyHistory"] = true
+  options.params["includeEmptyQueue"] = true
   options.params.limit = limit
   if passedOptions.params <> invalid and passedOptions.params.contentMode <> invalid and passedOptions.params.contentMode <> ""
     options.params["contentMode"] = passedOptions.params.contentMode

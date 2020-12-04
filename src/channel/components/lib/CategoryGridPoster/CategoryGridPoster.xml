@@ -20,13 +20,13 @@
 
   <children>
 
-  <LayoutGroup
-    id="posterLayout"
-    layoutDirection="vert"
-    itemSpacings="[14]">
+    <LayoutGroup
+      id="posterLayout"
+      layoutDirection="vert"
+      itemSpacings="[14]">
       <Poster
-      id="Poster"
-      loadingBitmapUri="pkg:/images/placeholder.jpg">
+        id="Poster"
+        loadingBitmapUri="pkg:/images/placeholder.jpg">
         <Rectangle
           id="ResumeProgressBar"
           height="6"

@@ -21,11 +21,13 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     getContentsJson: tubiMetadataTranslate_getContentsJson
     buildCategoryAA: tubiMetadataTranslate_buildCategoryAA
     buildUtilityCategoryAA: tubiMetadataTranslate_buildUtilityCategoryAA
+    buildContinueWatchingSignedOutUserCategoryAA: tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA
     generateChannelPosterUrl: tubiMetadataTranslate_generateChannelPosterUrl
     fetchedAtTimestamp: tubiMetadataTranslate_fetchedAtTimestamp
     getGridItemType: tubiMetadataTranslate_getGridItemType
     experiments: experiments
     getThumbnailImage: tubiMetadataTranslate_getThumbnailImage
+    isUserSignedIn: tubiMetadataTranslate_isUserSignedIn
   }
 End Function
 
@@ -104,6 +106,8 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
     sReturn = m.contentTypes.utility
   else if sBackendType = "c"
     sReturn = m.contentTypes.category
+  else if sBackendType = "cwso"
+    sReturn = m.contentTypes.historySignedOutUser
   else if sBackendType = "v" or sBackendType = "clip"
     sReturn = m.contentTypes.video
   else if sBackendType = "s"
@@ -255,8 +259,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   translatedContent.landscape  = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)  
   sPortraitURL = m.getThumbnailImage(contentFromServer)
   if sPortraitURL <> ""
-    translatedContent.portrait = sPortraitURL
+    translatedContent.portrait = sPortraitURL 
     translatedContent.HDGRIDPOSTERURL = sPortraitURL
+  end if
+  if (translatedContent.HDGRIDPOSTERURL = invalid or translatedContent.HDGRIDPOSTERURL = "") and contentFromServer.HDGRIDPOSTERURL <> invalid
+    '//If the contentFromServer already set HDGRIDPOSTERURL then use that value. 
+    translatedContent.HDGRIDPOSTERURL = contentFromServer.HDGRIDPOSTERURL
   end if
 
   if contentFromServer.backgrounds <> invalid and type(contentFromServer.backgrounds) = "roArray" and contentFromServer.backgrounds.count() > 0
@@ -445,6 +453,8 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
       ' inject the default background for large vitg content items
       if category.gridItemType = vitg_large 
         translated.backgrounds = [m.constants.ui.uris.defaultBackground]
+      else if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser 
+        translated.backgrounds = [m.constants.ui.uris.defaultBackground]
       end if
 
       ' set vitg on the content node so various non item UI components can respond to it (ie. detail screen)
@@ -601,9 +611,9 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     if container.type <> "complex"
       if container.id = m.constants.ui.categoryIds.history
         continueWatchingIndex = i
-        ' increasing the utilityRowPosition by 1 if the ContinueWatching has no children
+        ' increasing the utilityRowPosition by 1 if the ContinueWatching has no children AND the user is signed in (continue watching row is displayed if the user is not signed in regardless)
         '//::TODO:: Remove this section once we have API support
-        if container.children.Count() = 0
+        if container.children.Count() = 0 and (m.isUserSignedIn() = true or getExperimentResource("roku_continue_watching_signed_out", "roku_continue_watching_signed_out_experiment", false).enabled = false)
           utilityRowPosition = utilityRowPosition + 1
         end if
       else if container.id = m.constants.ui.categoryIds.queue
@@ -625,9 +635,17 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         categoryAA = invalid
       end if
 
-      categoryAA = m.buildCategoryAA(container, contents, invalid, "", bFullData, contentMode)
-      if categoryAA <> invalid
-        homescreenAA.children.push(categoryAA)
+      if container.id = m.constants.ui.categoryIds.history and m.isUserSignedIn() = false and getExperimentResource("roku_continue_watching_signed_out", "roku_continue_watching_signed_out_experiment", false).enabled = true
+        '//if experiement is enabled AND if continue watching container while user is signed out, then ensure row is empty except for 1 item that will entice users to sign in
+        categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsModeEnabled)
+        if categoryAA <> invalid
+          homescreenAA.children.push(categoryAA)
+        end if 
+      else
+        categoryAA = m.buildCategoryAA(container, contents, invalid, "", bFullData, contentMode)
+        if categoryAA <> invalid
+          homescreenAA.children.push(categoryAA)
+        end if
       end if
     else
       for j=0 to container.children.count()-1
@@ -908,7 +926,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
     children.append(container.children)
     updateMetadata.children = CreateObject("roArray", children.count(), false)
 
-    for each child in children
+    for each child in children 
       ' contents[child].valid is "true" or "false" for user categories and is invalid for all other categories.
       ' For all other categories, assume all contents are valid. Valid in this case means, the content is "in window"
       ' and allowed to be played on the Roku platform
@@ -1050,6 +1068,17 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
 
   return updateMetadata
 End Function
+
+
+' See if the user is signed in
+Function tubiMetadataTranslate_isUserSignedIn()
+  Request = TubiRequest(m.constants.settings.mode)
+  Auth = TubiAuth(m.constants, Request)
+  authInfo = Auth.getAuthInfo()
+  bUserSignedIn =  (authInfo <> invalid)
+  return bUserSignedIn
+End Function
+
 
 
 ''''''''''''''''''''''
@@ -1243,6 +1272,64 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
   updateMetadata.totalCount = validCount
   updateMetadata.json = FormatJSON(jsonAA)
 
+  return updateMetadata
+End Function
+
+
+Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(container, bKidsMode = false)
+  updateMetadata = {}
+  if container <> invalid
+    updateMetadata = {
+      id: container.id
+      slug: container.slug
+      title: container.title
+      description: container.description
+      totalCount: 0
+      offset: m.constants.performance.categoryGridList.initialBlockSize
+      validUntil: 0
+      json: ""
+      state: "full"
+      gridItemType: m.constants.ui.gridItemTypes.historySignedOutUser
+      type: m.contentTypes.historySignedOutUser
+    }
+
+    jsonAA = {}
+    validCount = 0
+    children = []
+
+    sTitle = getTranslation("metadata_continueWatching_notSignedIn_title")
+    sDescription = ""
+    if getExperimentResource("roku_continue_watching_signed_out", "roku_continue_watching_signed_out_experiment", false).display_free = false
+      sDescription = getTranslation("metadata_continueWatching_notSignedIn_description_experiment1")  
+    else 
+      sDescription = getTranslation("metadata_continueWatching_notSignedIn_description_experiment2")  
+    end if
+
+    childAA = {
+      id: m.constants.ui.contentTypes.historySignedOutUser
+      subtype: "TubiContentNode"
+      type: "cwso"
+      title: sTitle
+      description: sDescription
+      gridItemType: m.constants.ui.gridItemTypes.historySignedOutUser
+    }
+    if bKidsMode = true
+      '//If kids mode is on, then images should be kidsMode versions
+      childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground_kidsMode 
+    else
+      '//Otherwise images should be default versions
+      childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground
+    end if 
+
+    validCount += 1
+    updateMetadata.children = CreateObject("roArray", 1, false)
+    updateMetadata.children.push(childAA)
+    jsonAA[childAA.id] = childAA
+
+    updateMetadata.totalCount = validCount
+    updateMetadata.json = FormatJSON(jsonAA)
+
+  end if
   return updateMetadata
 End Function
 

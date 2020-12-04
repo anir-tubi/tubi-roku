@@ -400,6 +400,9 @@ Function getConstants()
     constants.urls.animationLogo = "https://cdn.adrise.tv/video/roku/animation_logo_2.mp4"
     ' Landing Screen background image
     constants.urls.landingBackground = "https://cdn.adrise.tv/image/roku_support_images/landingBackground.jpg"
+    ' The background images on the continue watching container row when the user is signed out
+    constants.urls.continueWatchingItemBackground = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground.png"
+    constants.urls.continueWatchingItemBackground_kidsMode = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground_kidsMode.png"
 
   'http request types
   constants.reqTypes = {}
@@ -650,6 +653,7 @@ Function getConstants()
       constants.ui.categoryTypes.linear = "linear"
       constants.ui.categoryTypes.preview = "video_preview"
       constants.ui.categoryTypes.utility = "utility"
+      constants.ui.categoryTypes.historySignedOutUser = "continue_watching_signed_Out_User"
 
     constants.ui.contentMode = {}
       constants.ui.contentMode.homescreen = "homescreen"
@@ -667,6 +671,7 @@ Function getConstants()
       constants.ui.contentTypes.channel = "channel"
       constants.ui.contentTypes.utility = "utility"
       constants.ui.contentTypes.linear = "linear"
+      constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_Out_User"
 
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
@@ -828,6 +833,7 @@ Function getConstants()
       constants.ui.gridItemTypes.vitg_small = "vitg_small"  'video in the grid
       constants.ui.gridItemTypes.vitg_large = "vitg_large"  'video in the grid
       constants.ui.gridItemTypes.utility = "utility"
+      constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_Out_User"
 
     constants.ui.uris = {}
       'background gradient urls
@@ -879,10 +885,16 @@ Function getConstants()
       'colors for individual elements - can be made individual or controlled by template colors
       constants.ui.colors.titleHeader = constants.ui.colors.primaryText
       constants.ui.colors.expirationWarning = "0xFF9933FF"
+    
+    'The IDs of the available themes that can be used for the app 
+    constants.ui.themeIDs = {}
+    constants.ui.themeIDs.default = "default"
+    constants.ui.themeIDs.kidsMode = "kidsMode"
 
     'available themes that can be used for the app 
     constants.ui.themes = {}
       constants.ui.themes.default = {
+        id: constants.ui.themeIDs.default
         focused: constants.ui.colors.focused
         highlightedText: constants.ui.colors.highlightcolor
         keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
@@ -890,6 +902,7 @@ Function getConstants()
         scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
       }
       constants.ui.themes.kidsMode = {
+        id: constants.ui.themeIDs.kidsMode
         focused: "0xFEA534FF"
         highlightedText: "0xFEA534FF"
         keyboard_focused_key: "pkg:/images/keyboard_search_focused_key_kidsMode.9.png"

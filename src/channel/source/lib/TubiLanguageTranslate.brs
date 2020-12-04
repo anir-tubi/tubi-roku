@@ -663,6 +663,34 @@ Function getTranslation_en_US()
       "description": "label to indicate the user has excatly 1 day to watch a video",
       "message": "Expires in 1 day"
     },
+    "metadata_continueWatching_notSignedIn_title": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "Sign Up to Save Your Progress"
+    },
+    "metadata_continueWatching_notSignedIn_description_experiment1": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "Pick up right where you left off next time you play a TV Series or a Movie by signing up. It’s easy & 100% free, no subscription needed."
+    },
+    "metadata_continueWatching_notSignedIn_description_experiment2": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "Pick up right where you left off next time you play a TV Series or a Movie. Available upon sign up."
+    },
+    "metadata_continueWatching_notSignedIn_container_description_experiment1": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "TV Shows & Movies progress will be saved here. Available Upon Sign Up."
+    },
+    "metadata_continueWatching_notSignedIn_container_description_experiment2": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "No Subscription  •  No Credit Card  •  Free Forever"
+    },
+    "metadata_continueWatching_notSignedIn_container_button_experiment1": {
+      "description": "button text for when a non registered user focuses on the continue watching container",
+      "message": "I Want to Save My Progress"
+    },
+    "metadata_continueWatching_notSignedIn_container_button_experiment2": {
+      "description": "button text for when a non registered user focuses on the continue watching container",
+      "message": "Sign Up to Save Progress - FREE"
+    },
     "metadata_directed": {
       "description": "metadata label to indicate the directors of the current video title",
       "message": "Directed by"
@@ -692,7 +720,7 @@ Function getTranslation_en_US()
       "message": "{seasons} Seasons"
     },
     "metadata_seasons_singular": {
-      "description": "Label for when the current TV title has excatly one season",
+      "description": "Label for when the current TV title has exactly one season",
       "message": "1 Season"
     },
     "metadata_series": {
@@ -1420,7 +1448,7 @@ Function getTranslation_es_MX()
       "message": "Caduca en {days} días"
     },
     "metadata_expiresIn_singular": {
-      "description": "label to indicate the user has excatly 1 day to watch a video",
+      "description": "label to indicate the user has exactly 1 day to watch a video",
       "message": "Caduca en 1 día"
     },
     "metadata_directed": {
@@ -1452,7 +1480,7 @@ Function getTranslation_es_MX()
       "message": "{seasons} Temporadas"
     },
     "metadata_seasons_singular": {
-      "description": "Label for when the current TV title has excatly one season",
+      "description": "Label for when the current TV title has exactly one season",
       "message": "1 Temporada"
     },
     "metadata_series": {

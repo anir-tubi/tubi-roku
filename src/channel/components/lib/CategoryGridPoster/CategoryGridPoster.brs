@@ -6,6 +6,8 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
   m.resumeMargin = 4  'inset of resume bar
   m.title = m.top.findNode("Title")
+  
+  '//recreate the gridItemTypes from constants so as not to access m.global.constants for every item on the home screen as they are created
   m.gridItemTypes = {
     portrait: "portrait"
     landscape: "landscape"
@@ -13,6 +15,7 @@ Function init()
     vitg_small: "vitg_small"
     vitg_large: "vitg_large"
     utility: "utility"
+    historySignedOutUser: "continue_watching_signed_Out_User"
   }
 End Function
 
@@ -33,12 +36,17 @@ Function onContentChange()
   if m.utilityRowPosters <> invalid
     m.utilityRowPosters.visible = false
   end if
+  ' settings continueWatchingLayout Group visibility false to avoid image caching issue.
+  if m.continueWatchingLayout <> invalid
+    m.continueWatchingLayout.visible = false
+  end if
   ' settings poster visibility true to avoid image caching issue. if it is not set to true, seeing some blank posters
   m.poster.visible = true
  
   if m.top.itemContent <> invalid then
     m.poster.uri = m.top.itemContent.hdgridposterurl
     categoryContent = m.top.itemContent.getParent()
+
     if categoryContent <> invalid then
       if m.top.itemContent.gridItemType = m.gridItemTypes.landscape
         m.title.visible = true
@@ -49,6 +57,8 @@ Function onContentChange()
         m.poster.visible = false
         setUpUtility()
         setUpUtilityObservers()
+      else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
+        setUpSignedOutContinueWatching()
       else if categoryContent.id = "continue_watching"
         drawHistoryProgressBar()
       end if
@@ -262,6 +272,13 @@ Function isVitg(itemContent, gridItemTypes)
     isVitg = true
   end if
   return isVitg
+End Function
+
+
+Function setUpSignedOutContinueWatching()
+  m.continueWatchingLayout = m.top.createChild("ContinueWatchingCategoryGridPoster")
+  m.continueWatchingLayout.translation = [(m.top.width-m.continueWatchingLayout.width)/2, 57]
+  m.continueWatchingLayout.visible = true
 End Function
 
 

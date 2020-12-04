@@ -23,6 +23,8 @@
     <!-- OUTPUTS -->
     <!-- The width of the DetailsMenuText as calculated by boundingRect().width -->
     <field id="calculatedTextWidth" type="integer"/>
+    <!-- The width of the calculatedTextWidth plus the horizontal placement of the text -->
+    <field id="calculatedWidth" type="integer"/>
 
     <!-- The padding from the left side of the item to the text. This is a fixed number as found in
          the x component of the DetailsMenuText translation -->

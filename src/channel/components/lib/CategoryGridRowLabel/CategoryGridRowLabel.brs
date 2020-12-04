@@ -37,7 +37,7 @@ Function onContentChange()
       m.CategoryName.translation = [0, m.CategoryName.translation[1]]
     end if
 
-    if m.top.content.gridItemType = "linear"
+    if m.top.content.gridItemType = "linear" or m.top.content.gridItemType = "continue_watching_signed_Out_User"
       m.CategoryCount.visible = false
     else 
       m.CategoryCount.visible = true

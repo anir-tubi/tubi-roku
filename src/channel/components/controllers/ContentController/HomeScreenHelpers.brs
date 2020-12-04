@@ -320,6 +320,7 @@ Function respondToHomescreenResponse(screenID, rawResponse)
         if homeScreen.isInFocusChain() = true
           homeScreen.setFocus(true)
         end if
+
       else
         ' if we were loading in the background, don't show an error modal
         if homeScreen.isInFocusChain()
@@ -493,6 +494,9 @@ Function onContentSelected(msg)
 
   if content.type = "channel"
     showChannelScreen(content, "HOME")
+  else if content.type = m.constants.ui.contentTypes.historySignedOutUser
+    '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
+    startSignIn(true)
   else if content.type = "utility"
     onUtilityItemSelected(content)
   else if content.type = m.constants.ui.contentTypes.linear

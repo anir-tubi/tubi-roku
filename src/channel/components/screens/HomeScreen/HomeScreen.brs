@@ -253,6 +253,14 @@ Function onCurrFocusRowChange()
   categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
   categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
 
+  '//If the user is not signed in
+  nContinueWatchingIndex = m.CategoryGridList.content.continueWatchingIndex
+  if nContinueWatchingIndex <> invalid and rowEnteringFocus = (nContinueWatchingIndex - 1) and m.global.authInfo = invalid 
+    '//report the continue watching experiment when the continue watching row is peeking and is probably the new row to be in focus. 
+    getExperimentResource("roku_continue_watching_signed_out", "roku_continue_watching_signed_out_experiment", true)
+  end if
+
+
   ' send experiment analytics (exposure event) only when
   ' kidsMode is not enabled and currentScreen is homescreen and parentalRating is Adult and kidsModeFeatureOn is check for countryCode = US or CA
   if m.top.shouldKidsModeBeSentToServer = false and m.top.id = "homeScreen" and m.top.parentalRating > 2 and m.top.kidsModeFeatureOn = true
@@ -388,6 +396,8 @@ Function onGridFocusChange() As Void
       populateInfoPanel("utility", focusedContent)
     else if focusedContent.type = m.constants.ui.categoryTypes.linear
       populateInfoPanel("linear", focusedContent)
+    else if focusedContent.type = m.constants.ui.categoryTypes.historySignedOutUser
+      populateInfoPanel(m.constants.ui.categoryTypes.historySignedOutUser, focusedContent)
     else
       populateInfoPanel("item", focusedContent)
     end if
@@ -528,6 +538,11 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.width = 1140
     else if mode = "utility"
       m.InfoPanel.mode = "utility"
+      m.InfoPanel.title = contentNode.title
+      m.InfoPanel.description = contentNode.description
+      m.InfoPanel.width = 1140
+    else if mode = m.constants.ui.categoryTypes.historySignedOutUser
+      m.InfoPanel.mode = "continue_watching"
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.width = 1140
