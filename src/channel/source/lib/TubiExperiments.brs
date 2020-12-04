@@ -44,8 +44,6 @@ Function TubiExperiments(constants) as Object
       }
       rokunamespace: {
       }  
-      roku_live_video_v2: {
-      }
       roku_continue_watching_signed_out: {
       }
       roku_discovery_v3 : {
@@ -54,16 +52,12 @@ Function TubiExperiments(constants) as Object
       }
     }
     defaultResources: {
-    '//::TODO::SafeZone - set these experiments back to false when done with testing
       roku: {
         roku_onboarding_registration : { enabled : false }
       }
       roku2: {
       }
       rokunamespace: {
-      }
-      roku_live_video_v2: {
-        roku_live_news_long_v2 : {"has_live_news_default" : true}
       }
       roku_continue_watching_signed_out: {
         roku_continue_watching_signed_out_experiment : {enabled: false, "display_free" : false}
