@@ -6,8 +6,8 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   'set to 0 retries - 1 max request, even if there are no ads returned from our server
   roAdFramework.setAdPrefs(false, 1)
   
-  'turn Nielsen DAR on for the Roku Advertising Framework
-  roAdFramework.enableNielsenDAR(true)
+  'turn audience measurement on for the Roku Advertising Framework
+  roAdFramework.enableAdMeasurements(true)
 
   'set the Nielsen application id for Tubi TV
   roAdFramework.setNielsenAppId(constants.thirdParty.nielsenToken)
