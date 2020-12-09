@@ -866,6 +866,169 @@ ${cdnPrUrl}`;
 }
 
 
+async function pushTag(done) {
+  const buildTag = getBuildTag(false, false);
+  console.log(`...Pushing the ${buildTag} tag to origin (Github)`);
+  const pushTagRes = shell.exec(`git push origin ${buildTag}`);
+
+  if (pushTagRes.code) {
+    let errorMsg = `Could not push ${buildTag} tag to origin (Github)`;
+    if (pushTagRes.stderr) {
+      errorMsg = pushTagRes.stderr
+    }
+    done(new NoStackError(errorMsg));
+  }
+}
+
+
+
+async function createGithubRelease(done) {
+  // Prompt if the dev wants to make a release via the CLI (as opposed to Github UI)
+  const {releaseConfirmation} = await prompts({
+    type: 'confirm',
+    name: 'releaseConfirmation',
+    message: 'Do you want to make a Github release now, in the CLI? (y/n)',
+  });
+
+  if (!releaseConfirmation) {
+    const declineMsg = 'Github release not created by choice of dev. Please make a release by going to http://github.com/adRise/project-total-recall/tags';
+    console.log(declineMsg);
+    return done();
+  }
+
+  // Double check that the tag we want to make a release from exists on Github. According to Github API
+  // docs, if we make a release and the tag does not exist, the API will automatically make a tag
+  // based on master. But our release is not based on master. See the following doc links:
+  // https://octokit.github.io/rest.js/v18#repos-create-release
+  // https://octokit.github.io/rest.js/v18#repos-list-tags
+
+  const buildTag = getBuildTag(false, false);
+
+  console.log(`...Double checking that the ${buildTag} tag exists on Github`);
+  const gitLocalTagShaRes = shell.exec(`git rev-parse ${buildTag}`);
+  if (gitLocalTagShaRes.code) {
+    let errorMsg = `Could not get SHA for commit ${buildTag}`;
+    if (gitLocalTagShaRes.stderr) {
+      errorMsg += `\n${gitLocalTagShaRes.stderr}`;
+    }
+    done(new NoStackError(errorMsg));
+  }
+
+  const tagSha = gitLocalTagShaRes.stdout.trim();
+  try {
+    const topTags = await octokit.repos.listTags({
+      owner: ghInfo.owner,
+      repo: ghInfo.rokuRepo
+    });
+
+    let isTagOnGithub = false;
+    for (const tag of topTags.data) {
+      if (tag.name === buildTag && tag.commit.sha === tagSha){
+        isTagOnGithub = true;
+        break;
+      }
+    }
+
+    if (!isTagOnGithub) {
+      const errorMsg = `The ${buildTag} tag is not on Github. Not creating a release here or else Github will make automatically make a tag from master - which will be inaccurate for our purposes.`
+      done(new NoStackError(errorMsg));
+    }
+  } catch(err) {
+    console.log(err);
+    done(new NoStackError(err));
+  }
+
+  const remote = 'Remote Release';
+  const submission = 'Submission Release';
+  const {releaseType, isPreRelease, preReleaseDate} = await prompts([
+    // prompt the dev for the release type to be used as the Release title
+    {
+      type: 'toggle',
+      name: 'releaseType',
+      message: 'Choose a release type (use arrow or tab keys to select)',
+      initial: false,
+      inactive: remote,
+      active: submission,
+      format: (val) => {
+        // format the releaseType value as a remote/submission string instead of boolean
+        return val ? submission : remote;
+      }
+    },
+    // if it's a "Remote Release", prompt if it should be marked as a pre-release
+    {
+      type: (prev) => {
+        // only show this prompt if it's a remote release, as submission releases are assumed
+        // to be pre releases by default.
+        return (prev === remote) ? 'confirm' : null;
+      },
+      name: 'isPreRelease',
+      message: 'Should this release be marked as a pre release? Select no if the release will be deployed today. (y/n)',
+    },
+    // if it's a pre-release, prompt what the release date should be
+    {
+      type: (prev, values) => {
+        return (values.isPreRelease || values.releaseType === submission) ? 'date' : null;
+      },
+      name: 'preReleaseDate',
+      message: 'What date will this release be deployed? (use tab/arrow/number keys to modify date)',
+      mask: 'MM/DD/YYYY',
+      validate: (userDate) => {
+        return userDate > Date.now() ? true : 'Release date must be in the future.';
+      }
+    },
+  ]);
+
+  // prompt the dev for the release notes to be used as the Release body
+  let releaseNotes = preReleaseDate ? preReleaseDate.toLocaleDateString("en-US") : new Date().toLocaleDateString("en-US");  // '12/25/2020'
+
+  while (true) {
+    // multi-line string
+    let releaseNotesState = `Current release notes:\n${releaseNotes}`;
+
+    console.log(releaseNotesState); //this is part of the CLI UI - leave in
+    const {releaseNotesConfirmation, releaseNote} = await prompts([
+      {
+        type: 'confirm',
+        name: 'releaseNotesConfirmation',
+        message: 'Add another release note? (y/n)'
+      },
+      {
+        type: (prev) => {
+          // only show this prompt if user selected yes in previous prompt.
+          // returning null won't show this prompt.
+          return prev ? 'text' : null;
+        },
+        name: 'releaseNote',
+        message: "Please type the next release note: "
+      }
+    ]);
+
+    if (!releaseNotesConfirmation) {
+      break;
+    } else if (releaseNotesConfirmation && releaseNote) {
+      // only add release notes if something was typed
+      releaseNotes += `\n${releaseNote}`;
+    }
+  }
+
+  console.log(`...Creating a release from the ${buildTag} tag on Github`);
+  try {
+    await octokit.repos.createRelease({
+      owner: ghInfo.owner,
+      repo: ghInfo.rokuRepo,
+      tag_name: buildTag,
+      name: releaseType,
+      body: releaseNotes,
+      //mark as pre-release if there is a date associated with the pre release.
+      prerelease: preReleaseDate ? true : false
+    });
+  } catch(err) {
+    console.log(err);
+    done(new NoStackError(err));
+  }
+}
+
+
 exports.build = series(clean, buildInstalled, buildStarter, buildRemote);
 exports.sideload = sideLoad;
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
@@ -873,7 +1036,8 @@ exports.bump = bumpBuild;
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
 exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
-exports.release = series(confirmRelease, setProduction, bumpBuild, tagBuild, exports.build, packageAll, makeReleasePrs);
+exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
+exports.release = series(confirmRelease, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);
 
 //command lines related to the crowdin language translations
 exports.update_local_translations = updateLocalTranslations;

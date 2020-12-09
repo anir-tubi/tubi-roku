@@ -55,8 +55,9 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
 * Check that you have the proper developer ID by navigating in your web browser to the Roku device's IP and then select Packager.
 
 5\.Create a Github Peronal Access Token (this access token will be set as an environment variable in step #6):
-
-https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token
+  - Follow the instructions at https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token
+  - Only select the "repo" scope and "repo" sub scopes.
+  - Copy the token, as you will not be able to see it again once you leave the page.
 
 6\. Set the build environment. (The following settings are temporary and setting them must be done every time you create a new terminal session.)
 
@@ -226,12 +227,12 @@ TBD
 
 11\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
 
-12\. Create a release on Github
+12\. Once the channel update has been released by Roku, create a release on Github
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
 
 - Select "Edit Release"
-
+- If you made a pre-release as part of step #7, uncheck the "This is a pre-release" box and then select "Update Release". You can skip the other sub steps of step #12.
 - Update the "Release Title" to be either Submission Release or Remote Release depending on the type of release.
 
 - Add the changes that were included in the release to the "Describe this release" description text box, with each change ending in a period, and on it's own line.
@@ -298,6 +299,10 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
   - push the `release_x_y_z` branch to Github.
   - make a PR to the `x_y_branch` on Github from the `release_x_y_z` branch.
   - copy the Github urls for the two PRs made above to the clipboard.
+  - create a tag based on the last commit named `x_y_z`
+  - push the tag to Github
+  - prompt you to make a Github release (including adding build notes) in the CLI based on the tag that was just created. __If you choose not to make a release in the CLI, you must do step 14.__
+    - Each build note should be correspond to a change that was submitted as part of the QA Club House ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
   __Note:__ you will need the `CDN_GIT_DIRECTORY` and `GITHUB_PAT` environment variables to be set for `gulp release` to work properly.
 
@@ -327,7 +332,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 13\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
 
-14\. Create a release on Github
+14\. Create a release on Github (only if you did not create a release in the CLI as part of step 9)
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
 
