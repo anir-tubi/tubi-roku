@@ -27,6 +27,9 @@ Function stringUtils_padString_test()
   ' pad string > 1 character
   m.AssertEqual(padString("bbb", 7, "0123"), "0123bbb")
   m.AssertEqual(padString("bbb", 8, "0123"), "30123bbb")
+
+  ' example from function
+  m.AssertEqual(padString("12345", 8, "0"), "00012345")
 End Function
 
 
