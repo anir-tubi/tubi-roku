@@ -42,9 +42,9 @@ exports.deeplink = function(rokuAppId, address) {
  * @param address roku device IP
  * @param password roku dev user password
  */
-exports.uploadPkg = function(zipPath, address, password) {
+exports.uploadPkg = function(zipPath, deviceIp, password) {
   return new Promise((res, rej) => {
-    const url =`http://${address}/plugin_install`;
+    const url = `http://${deviceIp}/plugin_install`;
     const auth = {
       user: 'rokudev',
       pass: password,
@@ -89,6 +89,61 @@ exports.uploadPkg = function(zipPath, address, password) {
     });
   });
 };
+
+
+// @zipPath: string, local path to the zip file that will be converted
+// @deviceIp: string, the ip of the roku device
+// @password: string, the dev password for the roku device
+exports.convertToSquashfs = function(zipPath, deviceIp, password) {
+  return new Promise((res, rej) => {
+    const url = `http://${deviceIp}/plugin_install`;
+
+    const auth = {
+      user: 'rokudev',
+      pass: password,
+      sendImmediately: false
+    };
+
+    const formData = {
+      mysubmit: 'Convert to squashfs',
+      archive: fs.createReadStream(zipPath)
+    };
+    const options = {
+      url,
+      auth,
+      formData
+    };
+
+    request.post(options, (err, response, body) => {
+      const success = !!body ? (body.match(/<font color="red">Install Success.<\/font>/) && body.match(/<font color="red">Conversion succeeded/)) : null
+      if (err) {
+        rej(err);
+      }
+      else if (response.statusCode !== 200) {
+        rej(`HTTP Status code ${response.statusCode}`);
+      }
+      else if (!success) {
+        let errorMessages = body.match(/<font color="red">([^<]*)/);
+        if (errorMessages !== null) {
+          var rejMessage = '';
+          errorMessages.shift()
+          errorMessages.forEach((message) => {
+            console.log(`Squashfs conversion error: ${message}`);
+            rejMessage = message
+          });
+        }
+        else {
+          console.log('Unknown squashfs conversion error');
+        }
+        rej(rejMessage);
+      }
+      else {
+        res(body);
+      }
+    });
+  });
+}
+
 
 /**
  * sign and download pkg from target roku box

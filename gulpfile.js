@@ -39,7 +39,7 @@ const ghInfo = {
 //Importing old build functions
 const {load, getBuildTag, incrementBuildNumber} = require('./js/config');
 const {createManifest, createSettings} = require('./js/build');
-const {keypress, deeplink, uploadPkg, signPkg} = require('./js/network');
+const {keypress, deeplink, uploadPkg, signPkg, convertToSquashfs} = require('./js/network');
 
 //Functions to upload and download static string translations  
 const {downloadTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
@@ -474,11 +474,15 @@ function packageLocal() {
   let appName = `tubi_${buildTag}`;
   return upload(zipPath)
     .then(() => {
-      console.log('Signing %s', zipPath);
+      console.log(`Converting zip to squashfs file for ${zipPath}`);
+      return convertToSquashfs(zipPath, options.target, options.devPass);
+    })
+    .then(() => {
+      console.log(`Signing ${zipPath}`);
       return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build')
     })
     .then(path => {
-      console.log('Signed package at %s.', zipPath);
+      console.log(`Signed package at ${zipPath}`);
     })
     .catch(err => {
       console.log(err);
@@ -492,14 +496,18 @@ function packageStarter() {
   var zipPath = `build/tubi_starter_components_${minorBuildTag}.zip`;
   return upload(zipPath)
     .then(() => {
-      console.log('Signing %s', zipPath);
+      console.log(`Converting zip to squashfs file for ${zipPath}`);
+      return convertToSquashfs(zipPath, options.target, options.devPass);
+    })
+    .then(() => {
+      console.log(`Signing ${zipPath}`);
       return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build')
     })
     .then(path => {
-     console.log("Signed package at %s.", zipPath);
+      console.log(`Signed package at ${zipPath}`);
     })
     .catch(err => {
-     console.log(err);
+      console.log(err);
     });
 }
 
@@ -510,11 +518,15 @@ function packageRemote() {
   let appName = `tubi_remote_components_${buildTag}`;
   return upload(zipPath)
     .then(() => {
-      console.log('Signing %s', zipPath);
+      console.log(`Converting zip to squashfs file for ${zipPath}`);
+      return convertToSquashfs(zipPath, options.target, options.devPass);
+    })
+    .then(() => {
+      console.log(`Signing ${zipPath}`);
       return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build')
     })
     .then(path => {
-      console.log("Signed package at %s.", zipPath);
+      console.log(`Signed package at ${zipPath}`);
     })
     .catch(err => {
       console.log(err);
