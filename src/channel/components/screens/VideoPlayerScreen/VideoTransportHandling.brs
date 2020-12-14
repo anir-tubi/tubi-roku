@@ -185,7 +185,10 @@ Function updatePlayerPosition(amt=0)
     m.playerPosition = m.Video.position
   end if
 
-  updateTransport()
+  ' update transport details only when it is shown 
+  if m.HUD.opacity = 1
+    updateTransport()
+  end if
 End Function
 
 
@@ -260,8 +263,6 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
   m.PlayPauseButton.uri = m.buttonUris.play
   setFocusedButton(m.PlayPauseButton)
   
-  updateTransport()
-
   if shouldSendAnalytics = true
     trackEvent({
       type: "pause_toggle"
@@ -640,7 +641,6 @@ End Function
 Function beginScrub()
   m.Video.control = "pause"
   m.scrubAmt = 0
-  resetTransportButtons()
   m.ScrubTimer.observeField("fire", "updateScrubTime")
   m.ScrubTimer.control = "start"
 
@@ -770,12 +770,15 @@ Function jumpToPosition(position)
 End Function
 
 
-' Set the timestamps and position indicator
+' update the progress bar time & thumbnail on transport UI
 Function updateTransport()
-  'update the position and remaining time text
   updateTransportTimes()
+  updateTransportThumbnail()
+End Function
 
-  'update the position bar width
+
+' update the thumbnail (video preview image)
+Function updateTransportThumbnail()
   if m.Video.duration > 0
     percentComplete = (m.playerPosition / m.Video.duration)
     m.ProgressBar.progress = percentComplete * 100
@@ -796,6 +799,7 @@ Function updateTransport()
 End Function
 
 
+' reset the buttons on transport UI
 Function resetTransportButtons()
   m.SkipTrailerButton.focusState = false
   m.StartButton.focusState = false
@@ -809,9 +813,6 @@ Function resetTransportButtons()
   m.FastForwardButton.focusState = false
   m.EndButton.focusState = false
   m.ClosedCaption.focusState = false
-
-  'also upate the transport timestamps
-  updateTransportTimes()
 End Function
 
 
@@ -846,7 +847,8 @@ End Function
 
 'show transport
 Function showTransport()
-  resetTransportButtons()
+  ' update transport thumbnails before showing the transport UI
+  updateTransport()
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
   m.Transport.opacity = 1.0
@@ -865,6 +867,7 @@ Function animateTransport(direction)
 End Function
 
 
+' update the progress bar time
 Function updateTransportTimes()
   m.ElapsedLabel.text = formatLengthAsTimestamp(m.playerPosition)
   if m.Video.duration <> invalid then

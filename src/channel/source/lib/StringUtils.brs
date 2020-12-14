@@ -67,16 +67,21 @@ End Function
 ' padString
 ' 
 ' simple left padding of a string with a given character
+' input:  @s: String, used to display
+'         @width: Integer, total number of characters returned from this function 
+'         @c: String, will be prepended based on width
+' return: result with padstring with specified width
 ' Example: padString('12345', 8, '0') => '00012345'
 Function padString(s As String, width As Integer, c as String)
   result = s.trim()
-  while result.len() < width
-    difference = width - result.len()
-    result = right(c, difference) + result
-  end while
+  result_length = result.Len()
+  if result_length < width
+    difference = width - result_length
+    prependText = right(String(difference, c), difference)
+    result = prependText + result
+  end if
   return result
 End Function
-
 
 
 ''''''''''
