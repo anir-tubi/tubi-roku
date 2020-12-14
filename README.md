@@ -122,11 +122,13 @@ constants.remoteComponents = false
 # Submission Release
 Submission releases are releases that are sent to Roku.
 
-1\. Run unit tests locally
+1\. Set up the environment variables (listed in the [build step](#build)) as some of the following steps are dependant on these variables.
+
+2\. Run unit tests locally
 
 `$ gulp install --test`
 
-2\. Prepare for submission release.
+3\. Prepare for submission release.
 - Create a new branch based off of master which will be used to make updates as needed for a submission release. Branch name is not important, but for clarity it can be something like: `updates_for_x_y_submission`, where x is the Major Release number and where y is the Minor Release number: i.e. `updates_for_2_14_submission`.
 
 - Create a new `new_images_since_x_y` file: i.e. `new_images_since_2_9` in the `new_images_since` directory.
@@ -146,7 +148,7 @@ Submission releases are releases that are sent to Roku.
 
 - Create a new branch off of master named "x_y_branch", where x is the Major Release number and where y is the Minor Release number: i.e. `2_14_branch`. Push this branch to Github. This branch will serve as the source of truth for what is in production until the next submission release.
 
-3\. Create a staging channel for the minor build from the `x_y_branch`
+4\. Create a staging channel for the minor build from the `x_y_branch`
 - Run `$ gulp install --staging`
 
 - In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to create a new private channel.
@@ -158,7 +160,7 @@ Submission releases are releases that are sent to Roku.
 	- Upload `channel-store/channel-store-poster-staging-540x405.png` as the "Channel Poster".
 
 
-4\. Deploy to staging
+5\. Deploy to staging
 
 - Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now,
 [https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
@@ -182,13 +184,13 @@ Submission releases are releases that are sent to Roku.
 
     `$ gulp stage`
 
-5\. Run functional tests against staging
+6\. Run functional tests against staging
 
 ```
 TBD
 ```
 
-6\. After QA Sign Off, run `$ gulp release`. This will:
+7\. After QA Sign Off, run `$ gulp release`. This will:
   - increment the version number once more (the QA build should not be the same version number as the production build)
   - install a new build using the "production" config, to create the .pkgs needed to update the production build.
   - rename the current branch to `release_x_y_z`.
@@ -203,15 +205,18 @@ TBD
   - make a PR to the `x_y_branch` on Github from the `release_x_y_z` branch.
   - copy the Github urls for the two PRs made above to the clipboard.
 
-    __Note:__ you will need the `CDN_GIT_DIRECTORY` and `GITHUB_PAT` environment variables to be set for `gulp release` to work properly.
 
     __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Submission Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#submission-release)
 
-7\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
+8\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
+
+9\. Merge the new PR in the adrise_cdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
+
+10\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
 
 - __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
 
-8\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
+11\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
 - You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirmements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
 
@@ -220,43 +225,47 @@ TBD
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
 - Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/#deploy-to-aws-s3).
 
-9\. Submit build to Roku
+12\. Submit build to Roku
 - In a browser, visit [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to update the "Tubi - Free Movies & TV" channel with the `/build/roku_x_y_z.pkg` file.
 
-10\. Email Roku Partner Success to let them know the build is in their queue.
+13\. Email Roku Partner Success to let them know the build is in their queue.
 
-11\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
+14\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
 
-12\. Once the channel update has been released by Roku, create a release on Github
+15\. Once the channel update has been released by Roku, create a release on Github
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
 
-- Select "Edit Release"
+- Select "Edit Tag"
 - If you made a pre-release as part of step #7, uncheck the "This is a pre-release" box and then select "Update Release". You can skip the other sub steps of step #12.
-- Update the "Release Title" to be either Submission Release or Remote Release depending on the type of release.
+- Update the "Release Title" to be either "Submission Release" or "Remote Release" depending on the type of release.
 
-- Add the changes that were included in the release to the "Describe this release" description text box, with each change ending in a period, and on it's own line.
+- In the description area, add the date on which the release was actually deployed (ideally this is the same day as the Github release is being created, but sometimes it might not be.
 
-- Select "Update Release"
+- Also within the description area, add the changes that were included in the release to the "Describe this release" description text box. As it was mentioned earlier, use the the changes that were submitted to the QA Club House ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
+
+- Select "Publish Release"
 
 
 # Remote Release
 Remote releases are releases that are not sent to Roku, and updates are made when a device loads the Tubi channel, by downloading the starter component and remote component files, which are used to build the channel UI.
 
-1\. Checkout the most recent `x_y_branch` branch, and pull any potential updates from origin. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number.
+1\. Set up the environment variables (listed in the [build step](#build)) as some of the following steps are dependant on these variables.
 
-2\. Cherry pick any commits from `master` that are to be included in the next release onto the `x_y_branch`.
+2\. Checkout the most recent `x_y_branch` branch, and pull any potential updates from origin. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number.
+
+3\. Cherry pick any commits from `master` that are to be included in the next release onto the `x_y_branch`.
 (See [this page](https://www.previousnext.com.au/blog/intro-cherry-picking-git) for more info info on the cherry pick git command.)
 
 Ensure the cherry pick commit names include the name of PR number. This usually is done automaticlly but be aware that we need to have the PR numbers to make it easier later on so we know which PRs have been pushed and which ones have not.
 
-3\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since/new_images_since_x_y` file with the image locations of any new or updated images.
+4\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since/new_images_since_x_y` file with the image locations of any new or updated images.
 
-4\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates.
+5\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates.
 
-5\. Run `$ gulp bump` in order to increment the version number.
+6\. Run `$ gulp bump` in order to increment the version number.
 
-6\. Deploy to staging
+7\. Deploy to staging
 
 - Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now, [https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 
@@ -276,16 +285,16 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 	aws_secret_access_key = <<aws_secret_access_key>>
 	```
 
-- Run multifactor authentication for AWS. Typically this means running `$ vauth`
+- Run multifactor authentication for AWS. Typically this means running `$ vauth`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
 - Upload the starter components and remote components onto the staging AWS server, run:
 
   `$ gulp stage`
 
-7\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Guthub.
+8\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Guthub.
 
-8\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build.
+9\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build.
 
-9\. After QA Sign Off, run `$ gulp release`. This will:
+10\. After QA Sign Off, run `$ gulp release`. This will:
   - increment the version number once more (the QA build should not be the same version number as the production build)
   - install a new build using the "production" config, to create the .pkgs needed to update the production build.
   - rename the current branch to `release_x_y_z`.
@@ -304,16 +313,19 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
   - prompt you to make a Github release (including adding build notes) in the CLI based on the tag that was just created. __If you choose not to make a release in the CLI, you must do step 14.__
     - Each build note should be correspond to a change that was submitted as part of the QA Club House ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
-  __Note:__ you will need the `CDN_GIT_DIRECTORY` and `GITHUB_PAT` environment variables to be set for `gulp release` to work properly.
-
   __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Remote Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#remote-release)
 
-10\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
+11\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#rokudev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
+
+12\. Merge the new PR in the adrise_cdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
+
+13\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
+
 
 - __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
 
 
-11\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
+14\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
 - You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirmements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
 
@@ -322,7 +334,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
 - Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/#deploy-to-aws-s3).
 
-12\. Verify the release
+15\. Verify the release
 - Run a smoke test on production checking at minimum:
     - The production channel loads
 		- Video plays
@@ -330,22 +342,22 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - Monitor various metrics for signs of any issues:
 	- [Ad impressions per second](https://app.datadoghq.com/dashboard/ckr-vrw-xh4/ad-server-business-metrics?from_ts=1563412592034&to_ts=1564017392034&live=true&tile_size=m&fullscreen_widget=80673160&fullscreen_section=overview)
 
-13\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
+16\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
 
-14\. Create a release on Github (only if you did not create a release in the CLI as part of step 9)
+17\. Create a release on Github (only if you did not create a release in the CLI as part of step 9)
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
 
 
-- Select "Edit Release"
+- Select "Edit Tag"
 
-- Update the "Release Title" to be either Submission Release or Remote Release depending on the type of release.
+- Update the "Release Title" to be either "Submission Release" or "Remote Release" depending on the type of release.
 
-- Add the date on which the release was actually deployed (ideally this is the same day as the Github release is being created, but sometimes it might not be).
+- In the description area, add the date on which the release was actually deployed (ideally this is the same day as the Github release is being created, but sometimes it might not be).
 
-- Add the changes that were included in the release to the "Describe this release" description text box. As it was mentioned earlier, use the the changes that were submitted to the QA Club House ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
+- Also within the description area, add the changes that were included in the release to the "Describe this release" description text box. As it was mentioned earlier, use the the changes that were submitted to the QA Club House ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
-- Select "Update Release"
+- Select "Publish Release"
 
 
 # Informal QA
