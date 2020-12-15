@@ -414,9 +414,11 @@ Function onRowItemFocused()
   else
     m.RowListItemDebounce.control = "start"
     ' immediately update the position counter
-    category = m.top.content.getChild(m.RowList.rowItemFocused[0])
-    if category <> invalid then
-      category.focusIndex = m.RowList.rowItemFocused[1]
+    if m.top.content <> invalid and m.Rowlist <> invalid and m.Rowlist.rowItemFocused <> invalid
+      category = m.top.content.getChild(m.RowList.rowItemFocused[0])
+      if category <> invalid then
+        category.focusIndex = m.RowList.rowItemFocused[1]
+      end if
     end if
   end if
 End Function
