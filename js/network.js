@@ -5,12 +5,13 @@ const fs = require('fs');
 const request = require('request');
 const Rx = require('rx');
 const SSDPClient = require('node-ssdp').Client;
+const log = require('fancy-log');
 
 exports.keypress = function(key, address, password) {
-  console.log("Sending keypress '" + key + "'");
+  log(`Sending keypress '${key}'`);
   return new Promise((res, rej) => {
     const url =`http://${address}:8060/keypress/${key}`;
-    const data = { };
+    const data = {};
     request.post({url: url, formData: data}, (err, response, body) => {
       if (err) {
         rej(err);
@@ -74,12 +75,12 @@ exports.uploadPkg = function(zipPath, deviceIp, password) {
           var rejMessage = '';
           errorMessages.shift()
           errorMessages.forEach((message) => {
-            console.log(`Device install error: ${message}`);
+            log(`Device install error: ${message}`);
             rejMessage = message
           });
         }
         else {
-          console.log('Unknown install error');
+          log('Unknown install error');
         }
         rej(rejMessage);
       }
@@ -128,12 +129,12 @@ exports.convertToSquashfs = function(zipPath, deviceIp, password) {
           var rejMessage = '';
           errorMessages.shift()
           errorMessages.forEach((message) => {
-            console.log(`Squashfs conversion error: ${message}`);
+            log(`Squashfs conversion error: ${message}`);
             rejMessage = message
           });
         }
         else {
-          console.log('Unknown squashfs conversion error');
+          log('Unknown squashfs conversion error');
         }
         rej(rejMessage);
       }
@@ -177,7 +178,7 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
         rej('No downloadable packages found!');
       }
       else {
-        console.log("Got " + body.length + " bytes response");
+        log("Got " + body.length + " bytes response");
         const url = `http://${address}/pkgs/${packages[1]}`;
         const auth = {
           user: 'rokudev',

@@ -10,6 +10,7 @@ const { server, serverClose } = require('gulp-connect');
 const filter = require('gulp-filter');
 const zip = require('gulp-zip');
 const mergeStream = require('merge-stream');
+const log = require('fancy-log');
 const http = require('http');
 const mkdirp = require('mkdirp');
 const request = require('request');
@@ -110,7 +111,7 @@ passedArgs.forEach(arg => {
   }
 });
 
-console.log(`PROFILE = ${options.config}`);
+log(`PROFILE = ${options.config}`);
 
 /* Timeout for any network traffic to the Roku device */
 const deviceTimeout = 15000;
@@ -128,7 +129,7 @@ function clean(done) {
 // returns a pipeable stream
 function collect(sources, srcOptions) {
   sources.map((source) => {
-    console.log(`Adding ${source}`);
+    log(`Adding ${source}`);
   });
   return src(sources, srcOptions)
         .pipe(dedupe())
@@ -360,7 +361,7 @@ function buildRemote() {
       e = e.trim();
       return (!e.startsWith("#") && (e.endsWith("png") || e.endsWith('jpg')));
     });
-    console.log(`Found ${newImages.length} lines in ${newImagesFile}`);
+    log(`Found ${newImages.length} lines in ${newImagesFile}`);
     const imagePathRegex = /pkg:\/[0-9a-zA-Z\.\/\-_]*/g;
 
     // prepare a map of new image file paths to make filtering quicker
@@ -375,7 +376,7 @@ function buildRemote() {
         let replacement = match;
         newImages.forEach(function(newImage) {
           if (match.indexOf(newImage) !== -1) {
-            console.log(`Redirecting ${newImage} to remote components`);
+            log(`Redirecting ${newImage} to remote components`);
             replacement = match.replace('pkg:','libpkg:');
           }
         });
@@ -388,7 +389,7 @@ function buildRemote() {
       .pipe(src('src/channel/images/**/*', srcOptions))
       .pipe(filter(file => {
           if (newImagesMap[file.relative]) {
-            console.log(`Filtering ${file.relative}`);
+            log(`Filtering ${file.relative}`);
           }
           return newImagesMap[file.relative] ? true : false;
       }))
@@ -416,11 +417,11 @@ function upload(zipPath) {
   const password = options.devPass;
   return keypress('home', address, password)
   .then(() => {
-    console.log('Uploading %s to %s using dev password %s...', zipPath, address, password);
+    log(`Uploading ${zipPath} to ${address} using dev password ${password}...`);
     return uploadPkg(zipPath, address, password);
   })
   .then(data => {
-    console.log('Uploaded %s to %s successfully.', zipPath, address);
+    log(`Uploaded ${zipPath} to ${address} successfully.`);
   });
 }
 
@@ -441,95 +442,107 @@ function sideLoad(done) {
   )
   .catch((err) => {
     if (typeof err === 'string' && err.trim() === 'Application Received: Identical to previous version -- not replacing.') {
-      console.log("Build already installed, launching dev channel via deeplink.");
+      log('Build already installed, launching dev channel via deeplink.');
       return deeplink('dev', address);
     } else {
       if (err.errno === 'ENOTFOUND') {
-        console.log('Hint: Double check that ROKU_DEV_TARGET is set.');
+        log('Hint: Double check that ROKU_DEV_TARGET is set.');
       } else if (err.errno === 'EHOSTUNREACH') {
-        console.log('Hint: Double check that you are sending to an available Roku device IP.');
-        console.log(`The IP ${options.target} does not seem to be accessible.`);
+        log('Hint: Double check that you are sending to an available Roku device IP.');
+        log(`The IP ${options.target} does not seem to be accessible.`);
       }
       throw err;
     }
   })
   .then(() => {
-    console.log(`${options.config.toUpperCase()} channel launched.`)
+    log(`${options.config.toUpperCase()} channel launched.`)
     
     if (options.telnet === 'sametab') {
       shell.exec(`telnet ${options.target} 8085`,{async: true});
     }
   })
   .catch(err => {
-    console.log('sideLoad error: ', err);
+    console.log(`sideLoad error: `, err);
     serverClose();
   })
   .then(done());
 }
 
 
-function packageLocal() {
+function packageLocal(done) {
+  log('Starting packageLocal');
   let buildTag = getBuildTag(false, false);
   let zipPath = `build/tubi_${buildTag}.zip`;
   let appName = `tubi_${buildTag}`;
   return upload(zipPath)
     .then(() => {
-      console.log(`Converting zip to squashfs file for ${zipPath}`);
+      log(`Converting zip to squashfs file for ${zipPath}`);
       return convertToSquashfs(zipPath, options.target, options.devPass);
     })
     .then(() => {
-      console.log(`Signing ${zipPath}`);
+      log(`Signing ${zipPath}`);
       return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build')
     })
     .then(path => {
-      console.log(`Signed package at ${zipPath}`);
+      log(`Signed package at ${zipPath}`);
     })
     .catch(err => {
       console.log(err);
+      log('Could not package local components');
+      log('HINT: Make sure you are using the correct Roku device IP.');
+      done(err);
     });
 }
 
 
-function packageStarter() {
+function packageStarter(done) {
+  log('Starting packageStarter');
   let minorBuildTag = getBuildTag(true, false);
   var appName = `tubi_starter_components_${minorBuildTag}`;
   var zipPath = `build/tubi_starter_components_${minorBuildTag}.zip`;
   return upload(zipPath)
     .then(() => {
-      console.log(`Converting zip to squashfs file for ${zipPath}`);
+      log(`Converting zip to squashfs file for ${zipPath}`);
       return convertToSquashfs(zipPath, options.target, options.devPass);
     })
     .then(() => {
-      console.log(`Signing ${zipPath}`);
+      log(`Signing ${zipPath}`);
       return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build')
     })
     .then(path => {
-      console.log(`Signed package at ${zipPath}`);
+      log(`Signed package at ${zipPath}`);
     })
     .catch(err => {
       console.log(err);
+      log('Could not package starter components');
+      log('HINT: Make sure you are using the correct Roku device IP.');
+      done(err);
     });
 }
 
 
-function packageRemote() {
+function packageRemote(done) {
+  log('Starting packageRemote');
   let buildTag = getBuildTag(false, false);
   let zipPath = `build/tubi_remote_components_${buildTag}.zip`;
   let appName = `tubi_remote_components_${buildTag}`;
   return upload(zipPath)
     .then(() => {
-      console.log(`Converting zip to squashfs file for ${zipPath}`);
+      log(`Converting zip to squashfs file for ${zipPath}`);
       return convertToSquashfs(zipPath, options.target, options.devPass);
     })
     .then(() => {
-      console.log(`Signing ${zipPath}`);
+      log(`Signing ${zipPath}`);
       return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build')
     })
     .then(path => {
-      console.log(`Signed package at ${zipPath}`);
+      log(`Signed package at ${zipPath}`);
     })
     .catch(err => {
       console.log(err);
+      log('Could not package remote components');
+      log('HINT: Make sure you are using the correct Roku device IP.');
+      done(err);
     });
 }
 
@@ -539,18 +552,18 @@ function conditionalPackage(done) {
   let { settings } = load(config);
 
   if ((config !== 'dev' && config !== 'test') || settings.remoteComponentsExtension === 'pkg') {
-    return packageAll();  //informs gulp that task has completed by returnin a promise
+    return packageAll(done);  //informs gulp that task has completed by returnin a promise
   } else {
     done();  //inform gulp that the task has completed.
   }
 }
 
 
-function packageAll() {
-  console.log("starting packageAll");
-  return packageStarter()
-  .then(() => packageRemote())
-  .then(() => packageLocal())
+function packageAll(done) {
+  log("starting packageAll");
+  return packageStarter(done)
+  .then(() => packageRemote(done))
+  .then(() => packageLocal(done))
 }
 
 
@@ -585,7 +598,7 @@ function bumpBuild(done) {
     return incrementBuildNumber()
     .then(() => {
       const buildTag = getBuildTag(false, false);
-      console.log(`Commiting build bump to ${buildTag}`);
+      log(`Commiting build bump to ${buildTag}`);
       shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
     });
   } else {
@@ -597,7 +610,7 @@ function bumpBuild(done) {
 // tag the build that will be released
 function tagBuild(done) {
   const buildTag = getBuildTag(false, false);
-  console.log(`Tagging ${buildTag}`);
+  log(`Tagging ${buildTag}`);
   shell.exec(`git tag ${buildTag}`);
   done();
 }
@@ -712,7 +725,7 @@ async function makeReleasePrs(done) {
 
   // rename the local branch name so it looks like "release_2_14_34"
   const releaseBranchName = `release_${fullBuildTag}`
-  console.log(`...Renaming the local branch to ${releaseBranchName}`);
+  log(`...Renaming the local branch to ${releaseBranchName}`);
   const branchRenameRes = shell.exec(`git branch -m ${releaseBranchName}`);
   if (branchRenameRes.code) {
     let errorMsg = `Could not rename the local branch to ${releaseBranchName}`;
@@ -723,7 +736,7 @@ async function makeReleasePrs(done) {
   }
 
   // attempt to checkout master in the CDN repo
-  console.log(`...Checking out master on the local ${ghInfo.cdnRepo} repo`)
+  log(`...Checking out master on the local ${ghInfo.cdnRepo} repo`)
   const checkoutMasterRes = shell.exec(`git -C ${cdnPath} checkout master`).code;
   if (checkoutMasterRes.code) {
     let errorMsg = `Could not check out master at ${cdnPath}.`;
@@ -734,7 +747,7 @@ async function makeReleasePrs(done) {
   }
 
   // attempt to pull origin master for the CDN repo
-  console.log(`...Pulling remote master to the local ${ghInfo.cdnRepo} repo`);
+  log(`...Pulling remote master to the local ${ghInfo.cdnRepo} repo`);
   const pullMasterRes = shell.exec(`git -C ${cdnPath} pull origin master`).code;
   if (pullMasterRes.code) {
     let errorMsg = `Could not pull master from origin at ${cdnPath}.`;
@@ -746,7 +759,7 @@ async function makeReleasePrs(done) {
 
   // attempt to check out a new branch off master for the CDN repo
   const cdnBranchName = `roku_${fullBuildTag}`;
-  console.log(`...Creating a new ${cdnBranchName} branch on the local ${ghInfo.cdnRepo} repo`);
+  log(`...Creating a new ${cdnBranchName} branch on the local ${ghInfo.cdnRepo} repo`);
   const checkoutNewBranchRes = shell.exec(`git -C ${cdnPath} checkout -b ${cdnBranchName}`);
   if (checkoutNewBranchRes.code) {
     let errorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
@@ -766,7 +779,7 @@ async function makeReleasePrs(done) {
   const localRemoteComponentsPath = `build/tubi_remote_components_${fullBuildTag}.pkg`;
   
   // copy the starter components from the /build directory to the CDN repo directory
-  console.log(`...Copying the starter components to the local ${ghInfo.cdnRepo} repo`);
+  log(`...Copying the starter components to the local ${ghInfo.cdnRepo} repo`);
   const moveStarterComponentsResult = shell.cp(localStarterComponentsPath, cdnStarterComponentsPath);
   if (moveStarterComponentsResult.stderr) {
     const errorMsg = `There was an error moving the starter components. You will need to manually copy the starter components and remote components and manually make a PR.
@@ -775,7 +788,7 @@ async function makeReleasePrs(done) {
   }
 
   // copy the remote components from the /build directory to the CDN repo directory
-  console.log(`...Copying the remote components to the local ${ghInfo.cdnRepo} repo`);
+  log(`...Copying the remote components to the local ${ghInfo.cdnRepo} repo`);
   const moveRemoteComponentsRes = shell.cp(localRemoteComponentsPath, cdnRemoteComponentsPath);
   if (moveRemoteComponentsRes.stderr) {
     const errorMsg = `There was an error moving the remote components. You will need to manually copy the remote components and manually make a PR.
@@ -784,7 +797,7 @@ async function makeReleasePrs(done) {
   }
 
   // add the updates so they are staged for commit
-  console.log(`...Staging changes for commit on the local ${ghInfo.cdnRepo} repo`);
+  log(`...Staging changes for commit on the local ${ghInfo.cdnRepo} repo`);
   const gitAddRes = shell.exec(`git -C ${cdnPath} add . `);
   if (gitAddRes.code) {
     let errorMsg = `Could not run "git add . " on ${cdnPath}`;
@@ -795,7 +808,7 @@ async function makeReleasePrs(done) {
   }
 
   // commit the updates to the branch
-  console.log(`...Committing the staged changes on the local ${ghInfo.cdnRepo} repo`);
+  log(`...Committing the staged changes on the local ${ghInfo.cdnRepo} repo`);
   const gitCommitRes = shell.exec(`git -C ${cdnPath} commit -m 'Updating the starter and remote components for ${cdnBranchName}'`);
   if (gitCommitRes.code) {
     let errorMsg = `"git commit" failed on ${cdnPath}`;
@@ -806,7 +819,7 @@ async function makeReleasePrs(done) {
   }
 
   // push the branch to Github
-  console.log(`...Pushing the local ${cdnBranchName} branch to the remote ${ghInfo.rokuRepo} repo`)
+  log(`...Pushing the local ${cdnBranchName} branch to the remote ${ghInfo.rokuRepo} repo`)
   const pushCdnBranchRes = shell.exec(`git -C ${cdnPath} push origin ${cdnBranchName}`);
   if (pushCdnBranchRes.code) {
     let errorMsg = `Could not push ${cdnBranchName} to origin (Github) at ${cdnPath}`;
@@ -817,13 +830,13 @@ async function makeReleasePrs(done) {
   }
 
   // make a PR against master on the CDN repo at Github
-  console.log(`...Making a PR on ${ghInfo.cdnRepo} against the remote master branch`);
+  log(`...Making a PR on ${ghInfo.cdnRepo} against the remote master branch`);
   let cdnPrUrl = '';
   try {
     const cdnPrRes = await octokit.pulls.create({
       owner: ghInfo.owner,
       repo: ghInfo.cdnRepo,
-      title: `Updating start up and remote components for roku ${fullBuildTag}`,
+      title: `Updating starter and remote components for roku ${fullBuildTag}`,
       head: cdnBranchName,
       base: 'master'
     });
@@ -834,7 +847,7 @@ async function makeReleasePrs(done) {
   }
 
   // push the release branch to the project-total-recall repo
-  console.log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
+  log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
   const pushReleaseBranchRes = shell.exec(`git push origin ${releaseBranchName}`);
   if (pushReleaseBranchRes.code) {
     let errorMsg = `Could not push ${releaseBranchName} to ${ghInfo.rokuRepo} origin (Github)`;
@@ -846,7 +859,7 @@ async function makeReleasePrs(done) {
 
   // make a PR against the production branch on the project-total-recall repo at Github
   const prodRokuBranchName = `${minorBuildTag}_branch`;
-  console.log(`...Making a PR from the remote ${releaseBranchName} on ${ghInfo.rokuRepo} against the ${prodRokuBranchName} branch`);  
+  log(`...Making a PR from the remote ${releaseBranchName} on ${ghInfo.rokuRepo} against the ${prodRokuBranchName} branch`);  
   let releasePrUrl = '';
   try {
     const releasePrRes = await octokit.pulls.create({
@@ -870,7 +883,7 @@ async function makeReleasePrs(done) {
 ${cdnPrUrl}`;
 
     clipboardy.writeSync(prUrlsForPasting);
-    console.log(`The release PR url and the CDN PR url have been placed on your clipboard. Please share with the team!`)
+    log(`The release PR url and the CDN PR url have been placed on your clipboard. Please share with the team!`)
   } else {
     const errorMsg = 'The urls for the release PR and the CDN PR are not available. Please share manually.'
     done(new NoStackError(errorMsg));
@@ -880,7 +893,7 @@ ${cdnPrUrl}`;
 
 async function pushTag(done) {
   const buildTag = getBuildTag(false, false);
-  console.log(`...Pushing the ${buildTag} tag to origin (Github)`);
+  log(`...Pushing the ${buildTag} tag to origin (Github)`);
   const pushTagRes = shell.exec(`git push origin ${buildTag}`);
 
   if (pushTagRes.code) {
@@ -904,7 +917,7 @@ async function createGithubRelease(done) {
 
   if (!releaseConfirmation) {
     const declineMsg = 'Github release not created by choice of dev. Please make a release by going to http://github.com/adRise/project-total-recall/tags';
-    console.log(declineMsg);
+    log(declineMsg);
     return done();
   }
 
@@ -916,7 +929,7 @@ async function createGithubRelease(done) {
 
   const buildTag = getBuildTag(false, false);
 
-  console.log(`...Double checking that the ${buildTag} tag exists on Github`);
+  log(`...Double checking that the ${buildTag} tag exists on Github`);
   const gitLocalTagShaRes = shell.exec(`git rev-parse ${buildTag}`);
   if (gitLocalTagShaRes.code) {
     let errorMsg = `Could not get SHA for commit ${buildTag}`;
@@ -997,7 +1010,7 @@ async function createGithubRelease(done) {
     // multi-line string
     let releaseNotesState = `Current release notes:\n${releaseNotes}`;
 
-    console.log(releaseNotesState); //this is part of the CLI UI - leave in
+    log(releaseNotesState); //this is part of the CLI UI - leave in
     const {releaseNotesConfirmation, releaseNote} = await prompts([
       {
         type: 'confirm',
@@ -1023,7 +1036,7 @@ async function createGithubRelease(done) {
     }
   }
 
-  console.log(`...Creating a release from the ${buildTag} tag on Github`);
+  log(`...Creating a release from the ${buildTag} tag on Github`);
   try {
     await octokit.repos.createRelease({
       owner: ghInfo.owner,

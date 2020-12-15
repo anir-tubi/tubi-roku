@@ -21,6 +21,7 @@
     "bluebird": "^3.5.1",
     "clipboardy": "^2.3.0",
     "del": "^5.1.0",
+    "fancy-log": "^1.3.3",
     "gulp": "^4.0.2",
     "gulp-connect": "^5.7.0",
     "gulp-debug-streams": "^3.0.0",

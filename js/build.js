@@ -4,6 +4,7 @@ const bluebird = require('bluebird');
 const { load, getBuildTag } = require('./config');
 const fs = require('fs');
 const path = require('path');
+const log = require('fancy-log');
 
 bluebird.promisifyAll(fs);
 
@@ -22,7 +23,7 @@ function createManifest(env, filename, manifestName) {
     }).join('\n');
     return fs.writeAsync(fd, content);
   }).then(() => {
-    console.log('Generated the file %s.', filename);
+    log('Generated the file %s.', filename);
   }).catch(err => {
     console.log(err);
   })
@@ -55,7 +56,7 @@ function createSettings(env, filename) {
         .map(key => genConfigFunction(key, data[key]));
     return fs.writeAsync(fd, functions.join('\n'));
   }).then(() => {
-    console.log('Generated the file: %s.', filename);
+    log('Generated the file: %s.', filename);
   }).catch(err => {
     console.log(err);
   });
