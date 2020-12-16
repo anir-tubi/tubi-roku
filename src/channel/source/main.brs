@@ -173,7 +173,9 @@ Function runChannel(startupArgs, constants, log, request) As Void
         else if msg.getData() = "loading"
           print msg.GetRoSGNode().id + " status is loading"
         else if msg.getData() = "failed"
-          if retries < maxRetries
+          if msg.GetRoSGNode().id = "suitest"
+            print "Suitest component library failed to download"
+          else if retries < maxRetries
             retries += 1
             componentLibrary = msg.GetRoSGNode()
             print componentLibrary.id; " failed to load due to API error, attempting retry #"; retries
