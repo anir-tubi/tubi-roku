@@ -978,10 +978,9 @@ End Function
 
 Function onRelatedContentSelected(msg)
   detailScreen = msg.getRoSGNode()
-
   content = invalid
-  if detailScreen <> invalid and detailScreen.content <> invalid and detailScreen.content.relatedContent <> invalid
-    content = detailScreen.content.relatedContent.getChild(detailScreen.relatedContentSelected)
+  if detailScreen <> invalid and detailScreen.relatedContent <> invalid
+    content = detailScreen.relatedContent.getChild(detailScreen.relatedContentSelected)
   end if
 
   if content <> invalid
