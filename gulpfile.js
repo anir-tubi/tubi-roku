@@ -551,7 +551,13 @@ function conditionalPackage(done) {
   let { config } = options
   let { settings } = load(config);
 
-  if ((config !== 'dev' && config !== 'test') || settings.remoteComponentsExtension === 'pkg') {
+  const configsNotPkgd = {
+    dev: true,
+    test: true,
+    qa: true
+  };
+
+  if (!configsNotPkgd[config] || settings.remoteComponentsExtension === 'pkg') {
     return packageAll(done);  //informs gulp that task has completed by returnin a promise
   } else {
     done();  //inform gulp that the task has completed.
