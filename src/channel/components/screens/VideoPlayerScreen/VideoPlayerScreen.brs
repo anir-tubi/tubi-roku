@@ -370,6 +370,10 @@ Function onVideoStateChange(msg)
       ' so we wait until the "finished" state is reached to play the next available stream for the video
       ' in order to prevent race conditions due to video player state changing.
       m.didAdvanceDrm = false
+      ' ensure that when the new DRM resource plays, it starts where the previous resource had been playing - if it had been playing 
+      if m.Video.content <> invalid and m.playerPosition >= 0
+        m.Video.content.nowPos = m.playerPosition
+      end if
       playContent()
     else
       ' the video reached the end
