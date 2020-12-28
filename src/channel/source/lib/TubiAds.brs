@@ -217,14 +217,14 @@ End Function
 function tubiAds_getAdsListViaRoku(episode, breakPos)
   m.allAdUnitsList = []
 
-  'set the content length (as stated in RAF documentation for Nielsen functionality)
+  'set the content length (as stated in RAF documentation for general audience measurement)
   if episode.length <> invalid
     m.roAdFramework.setContentLength(int(episode.length))
   else
     m.roAdFramework.setContentLength()
   end if
 
-  'set the content genre (as stated in RAF documentation for Nielsen functionality)
+  'set the content genre (as stated in RAF documentation for general audience measurement)
   if episode.rokuGenres <> invalid and episode.rokuGenres.count() > 0
     isKids = false
     for each genre in episode.rokuGenres
@@ -235,11 +235,9 @@ function tubiAds_getAdsListViaRoku(episode, breakPos)
     m.roAdFramework.setContentGenre("")
   end if
 
-  'set the program id/title (as stated in RAF documentation for Nielsen functionality)
-  if episode.isParentSeries = true and episode.parentTitle <> invalid
-    m.roAdFramework.setContentId(episode.parentTitle)
-  else if episode.title <> invalid
-    m.roAdFramework.setContentId(episode.title)
+  'set the program id/title (as stated in RAF documentation for general audience measurement)
+  if episode.gracenoteId <> invalid
+    m.roAdFramework.setContentId(episode.gracenoteId)
   else
     m.roAdFramework.setContentId("")
   end if

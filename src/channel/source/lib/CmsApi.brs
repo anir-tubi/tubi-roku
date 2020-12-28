@@ -102,6 +102,7 @@ Function cmsApi_getSingleContentRequest(contentId, includeChannels=false, bKidsM
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
   options.params["video_resources"] = m.constants.player.drmOrder
+  options.params["gn_fields"] = "tms_id"  'request the Gracenote id
 
   '//update options.params based on the passed in params AA
   m.setImageParams_(params, options.params)
