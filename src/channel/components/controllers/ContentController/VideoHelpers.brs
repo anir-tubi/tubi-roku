@@ -534,11 +534,15 @@ end function
 
 function getSprites(content)
   if content <> invalid
-    spritesReqType = m.constants.reqNames.getThumbnails
     spritesReqInfo = m.cmsApi.thumbnailsReqInfo(content.id)
-    spritesOptions = spritesReqInfo.options
-    spritesUrl = spritesReqInfo.url
-    m.makeRequest(spritesReqType, spritesUrl, spritesOptions, onSpritesResponse, invalid, "node")
+    m.makeRequest({
+      url: spritesReqInfo.url
+      requestType: m.constants.reqNames.getThumbnails
+      options: spritesReqInfo.options
+      successCallback: onSpritesResponse
+      responseType: "node"
+      silenceCallbackWarnings: true
+    })
   end if
 end function
 
@@ -654,8 +658,6 @@ end function
 ' returns invalid if there is no videoPlayer or valid videoPlayerContent
 function fetchUpNextContent(videoPlayer)
   if videoPlayer <> invalid and videoPlayer.content <> invalid and videoPlayer.content.id.Len() > 0
-    requestType = m.constants.reqNames.getUpNextContent
-
     endpointSpecificParams = {
       isKidsMode: shouldKidsModeBeSentToServer()
       container_id: m.autoplayContext
@@ -667,10 +669,15 @@ function fetchUpNextContent(videoPlayer)
     end if
 
     upNextReqInfo = m.cmsApi.getUpNextContentRequestInfo(videoPlayer.content.id, endpointSpecificParams)
-    url = upNextReqInfo.url
-    options = upNextReqInfo.options
 
-    return m.makeRequest(requestType, url, options, onUpNextResponse, onUpNextError, "node")
+    return m.makeRequest({
+      requestType: m.constants.reqNames.getUpNextContent
+      url: upNextReqInfo.url
+      options: upNextReqInfo.options
+      successCallback: onUpNextResponse
+      errorCallback: onUpNextError
+      responseType: "node"
+    })
   end if
   return invalid
 end function

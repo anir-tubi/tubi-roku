@@ -177,7 +177,13 @@ Function getLiveStreamManifest(streamUrl)
     streamUrl = streamUrl.trim()
   end if
 
-  m.linearManifestRequest = m.makeRequest(liveManifestReqType, streamUrl, invalid, onLiveStreamManifestResponse, onManifestError, "assocarray")
+  m.linearManifestRequest = m.makeRequest({
+    url: streamUrl
+    requestType: liveManifestReqType
+    successCallback: onLiveStreamManifestResponse
+    errorCallback: onManifestError
+    responseType: "assocarray"
+  })
 End Function
 
 

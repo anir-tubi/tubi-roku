@@ -31,7 +31,14 @@ Function generalTaskModule_makeRequest_test()
   errorCallback = onErrorCallbackTest
   responseType = "node"
   
-  requestNode = m.makeRequest(requestType, requestUrl, options, successCallback, errorCallback, responseType)
+  requestNode = m.makeRequest({
+    requestType: requestType
+    url: requestUrl
+    options: options
+    successCallback: successCallback
+    errorCallback: errorCallback
+    responseType: responseType
+  })
   
   m.assertNotInvalid(requestNode)
   

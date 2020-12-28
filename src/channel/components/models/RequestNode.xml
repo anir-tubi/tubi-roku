@@ -2,7 +2,9 @@
 <!-- Extend the ContentNode so we can add some custom fields -->
 <component name="RequestNode" extends="ContentNode">
   <interface>
-    <!-- input field is an associative array which contains name, url & options(query params & method) -->
+    <!-- input field is an associative array containing all the items passed to
+         GeneralTask.makeRequest() except the callbacks.
+    -->
     <field id="input" type="assocarray" />
 
     <!-- The status of the request node: i.e. created, canceled, error, success -->

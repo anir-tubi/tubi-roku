@@ -39,13 +39,33 @@ End Function
 ' generalTask_makeRequest
 '
 ' public method, which dynamically creates RequestNode with response & error fields and sets request field of Task Node
-' @requestType : String, name of the request api, for example "getHomescreen". Can be found in constants.reqNames
-' @url : String, url of the request api
-' @options : AA, options as expected by TubiRequest().createAsync. (For example: method, params, body, headers)
-' @successCallback : Function, the function that the render thread will run upon receiving a successful response
-' @errorCallback : Function, the function that the render thread will run upon receiving an error response
-' @responseType : String, type of the response data, corresponds to a valid roSGNode field type (eg. "node"/"assocarray"/"string"/"boolean" etc)
-Function generalTask_makeRequest(requestType, url, options, successCallback, errorCallback, responseType)
+' @reqInfo: assocArray, contains information needed to make the request. Expected fields:
+'   url (required): String, url of the request api
+'   requestType (required): String, name of the request api, for example "getHomescreen".
+'                           Can be found in constants.reqNames
+'   options: AA, options as expected by TubiRequest().createAsync. (For example: method, params, body, headers)
+'   successCallback: Function, the function that the render thread will run upon receiving a successful response
+'   errorCallback: Function, the function that the render thread will run upon receiving an error response
+'   responseType: String, type of the response data, corresponds to a valid roSGNode field type (eg. "node"/"assocarray"/"string"/"boolean" etc)
+'   silenceCallbackWarnings: boolean, if no callbacks are provided, prevents warning logs to the console
+'                            Use for 'fire and forget' requests like analytics, etc.
+'
+' returns an instance of a RequestNode
+' Function generalTask_makeRequest(requestType, url, options, successCallback, errorCallback, responseType)
+Function generalTask_makeRequest(reqInfo = {})
+  if type(reqInfo) <> "roAssociativeArray"
+    tubiLog("GeneralTask.makeRequest - request info not of valid type, no request made", "warn")
+    return invalid
+  else if isString(reqInfo.url) <> true
+    tubiLog("GeneralTask.makeRequest - no request url found, no request made", "warn")
+    return invalid
+  else if isString(reqInfo.requestType) <> true
+    tubiLog("GeneralTask.makeRequest - no request type found, no request made", "warn")
+    return invalid
+  else if isString(reqInfo.responseType) <> true
+    tubiLog("GeneralTask.makeRequest - no response type found, defaulting to string", "warn")
+    reqInfo.responseType = "string"
+  end if
 
   roDeviceInfo = CreateObject("roDeviceInfo")
   randomId = roDeviceInfo.GetRandomUUID()
@@ -53,19 +73,24 @@ Function generalTask_makeRequest(requestType, url, options, successCallback, err
   requestNode = CreateObject("roSGNode", "RequestNode")
   requestNode.id = randomId
   
-  requestNode.addField("response", responseType, false)
+  requestNode.addField("response", reqInfo.responseType, false)
   requestNode.observeField("response", "successCallbackWrapper")
 
   requestNode.addField("error", "assocarray", false)
   requestNode.observeField("error", "errorCallbackWrapper")
   
+  successCallback = reqInfo.successCallback
+  errorCallback = reqInfo.errorCallback
   m.storeGeneralTaskCallbacks(requestNode, successCallback, errorCallback)
+
+  reqInput = reqInfo
+  reqInput.delete("successCallback")
+  reqInput.delete("errorCallback")
   
-  requestNode.input = {"requestType" : requestType, "url" : url, "options" : options}
+  requestNode.input = reqInput
   m.generalTask.request = requestNode
   
   return requestNode
-
 End Function
 
 
@@ -83,6 +108,12 @@ Function successCallbackWrapper(msg)
   
   if callback <> invalid
     callback(response)
+  else if requestNode.input.silenceCallbackWarnings <> true
+    reqName = "Unknown Request"
+    if requestNode <> invalid and requestNode.input <> invalid and isString(requestNode.input.name)
+      reqName = requestNode.input.name
+    end if
+    tubiLog("No success callback found for request with name " + reqName, "warn")
   end if
 
 End Function
@@ -102,6 +133,12 @@ Function errorCallbackWrapper(msg)
 
   if callback <> invalid
     callback(error)
+  else if requestNode.input.silenceCallbackWarnings <> true
+    reqName = "Unknown Request"
+    if requestNode <> invalid and requestNode.input <> invalid and isString(requestNode.input.name)
+      reqName = requestNode.input.name
+    end if
+    tubiLog("No success callback found for request with name " + reqName, "warn")
   end if
 
 End Function
