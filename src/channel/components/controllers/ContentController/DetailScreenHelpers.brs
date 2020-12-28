@@ -1022,7 +1022,7 @@ Function onDescriptionSelected(msg)
   dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "INFORMATION"  'TODO: Use the "VIDEO_DESCRIPTION" option when it is added to protos
+      dialog_type: "FULL_VIDEO_DESCRIPTION"
       pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: detailScreen.content.id.toInt()})
       dialog_action: "SHOW"  'Action enum
       dialog_sub_type: "video-description"  'max 20 character string
