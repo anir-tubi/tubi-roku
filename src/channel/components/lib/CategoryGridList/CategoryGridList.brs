@@ -194,24 +194,25 @@ Function onRepopulateContent()
   ' 2) new queue row got inserted, so increment the focus index by 1
   ' 3) continue_watching row got removed, so decrement the focus index by 1
   ' 4) queue row got removed, so decrement the focus index by 1
-  if rowAdded = m.constants.ui.categoryIds.history
-    if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
-      m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]
+  if m.Rowlist <> invalid and m.Rowlist.content <> invalid
+    if rowAdded = m.constants.ui.categoryIds.history
+      if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
+        m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]
+      end if
+    else if rowAdded = m.constants.ui.categoryIds.queue
+      if rowItemFocused[0] >= m.RowList.content.queueIndex
+        m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]
+      end if
+    else if rowRemoved = m.constants.ui.categoryIds.history
+      if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
+        m.itemToJumpTo = [m.itemToJumpTo[0] - 1, m.itemToJumpTo[1]]
+      end if
+    else if rowRemoved = m.constants.ui.categoryIds.queue
+      if rowItemFocused[0] >= m.RowList.content.queueIndex
+        m.itemToJumpTo = [m.itemToJumpTo[0] - 1, m.itemToJumpTo[1]]
+      end if
     end if
-  else if rowAdded = m.constants.ui.categoryIds.queue
-    if rowItemFocused[0] >= m.RowList.content.queueIndex
-      m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]
-    end if
-  else if rowRemoved = m.constants.ui.categoryIds.history 
-    if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
-      m.itemToJumpTo = [m.itemToJumpTo[0] - 1, m.itemToJumpTo[1]]
-    end if
-  else if rowRemoved = m.constants.ui.categoryIds.queue
-    if rowItemFocused[0] >= m.RowList.content.queueIndex
-      m.itemToJumpTo = [m.itemToJumpTo[0] - 1, m.itemToJumpTo[1]]
-    end if         
-  end if  
-  
+  end if
 End Function
 
 

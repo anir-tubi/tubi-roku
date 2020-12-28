@@ -462,7 +462,11 @@ End Function
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
 Function onVideoPositionChange()
-  tubiLog("VideoPlayer.onVideoPositionChange position = " + m.Video.position.toStr())
+  positionLog = ""
+  if m.Video <> invalid and m.Video.position <> invalid
+    positionLog = m.Video.position.toStr()
+  end if
+  tubiLog("VideoPlayer.onVideoPositionChange position = " + positionLog)
 
   ' protects against video positions being updated after we've told the player to pause
   if m.VideoState = "play"
