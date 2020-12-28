@@ -36,6 +36,7 @@ Function execAdsSSAITask()
   m.top.isPlayingAdFiller = false
 
   ' used to keep track of which ad in the ad break/pod is currently being played in the stream
+  ' uses a 0 based index
   m.currentAdInPod = -1
 
   ' used to keep track of the playback position within each ad. This is needed because ads can
@@ -56,6 +57,7 @@ Function runSSAILoop(constants, ssaiPort)
   m.top.observeField("videoPosition", ssaiPort)
   m.top.observeField("id3Tags", ssaiPort)
   m.top.observeField("contentUpdated", ssaiPort)
+  m.top.observeField("playbackStopped", ssaiPort)
   m.top.observeField("exit", ssaiPort)
 
   ' in the case that content is set on the task before it is ready, run the content callback
@@ -78,6 +80,8 @@ Function runSSAILoop(constants, ssaiPort)
         onContentUpdated(content)
       else if msg.getField() = "videoIsFullscreen"
         m.videoIsFullscreen = msg.getData()
+      else if msg.getField() = "playbackStopped"
+        onPlaybackStopped()
       else if msg.getField() = "exit"
         ' send ad analytics events if necessary when the user exits playback
         if m.top.isPlayingAds = true
@@ -269,6 +273,34 @@ Function onContentUpdated(content)
   ' set metadata on RAF
   m.raf.setContentGenre("")
   m.raf.setContentId(content.id)
+End Function
+
+
+Function onPlaybackStopped()
+  tubiLog(m.top.id + ".onPlaybackStopped")
+  if m.top.isPlayingAds = true and m.currentAdInPod >= 0
+    ' log the number of impressions not fired for the ad break that is playing
+    ' when the playback stops
+    remainingAds = 0
+    if m.adPod <> invalid and m.adPod.ads <> invalid and m.adPod.ads.count() > 0
+      remainingAds =  m.adPod.ads.count() - (m.currentAdInPod + 1)
+    end if
+
+    if remainingAds > 0
+      contentId = ""
+      if m.top.content <> invalid
+        contentId = m.top.content.id
+      end if
+
+      logMsg = {
+        content_id: contentId
+        expected_missed_impressions: remainingAds
+        ad_poll_url: m.top.pollUrl
+      }
+      logMsg = FormatJson(logMsg)
+      tubiLog(logMsg, "info", "clientInfo", "linear-missed-impressions")
+    end if
+  end if
 End Function
 
 

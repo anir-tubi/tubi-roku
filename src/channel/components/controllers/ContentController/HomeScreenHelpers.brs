@@ -413,8 +413,10 @@ Function onHomeScreenContentFocused(msg)
           bPlayVideo = false
         end if
       end if
+
       if bPlayVideo = true
-        '//If player is currently not playing the current content, then display background and tell player to load and play the video associated with the focused item
+        '//If player is currently not playing the current content, then display background and
+        '//tell player to load and play the video associated with the focused item
         m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
         stopLinearVideoContent()
         playLinearVideoContent(focusedContent)

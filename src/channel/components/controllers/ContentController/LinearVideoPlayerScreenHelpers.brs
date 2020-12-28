@@ -265,6 +265,12 @@ Function onLiveStreamManifestResponse(response)
       ' the backend to inform us of which linear content has ads.
 
       if m.adsSsaiTask.manifestAttempts < 3
+        if m.adsSsaiTask.manifestAttempts = 0
+          ' log the first time there is an issue with not getting back an analytics url
+          ' in the manifest - do not log for each retry
+          logMissingLinearAnalyticsUrl(content, lines)
+        end if
+
         ' we didn't get a poll url but the content is expected to have ads, so we can retry fetching
         ' the manifest as long as we are beneath the max retry attempts limit.
         m.adsSsaiTask.manifestAttempts += 1
@@ -272,26 +278,37 @@ Function onLiveStreamManifestResponse(response)
         getLiveStreamManifest(streamUrl)
       else
         ' we've maxed out the allowed retries but still no poll url, so trigger an
-        ' error via the videoPlayer and log an error.
+        ' error via the videoPlayer.
         videoPlayer.control = "error"
-
-        streamUrl = ""
-        for each line in lines
-          if line.left(8) = "https://"
-            streamUrl = line
-            exit for
-          end if
-        end for
-
-        logMsg = {
-          content_id: content.id
-          stream_url: streamUrl
-        }
-        logMsg = FormatJson(logMsg)
-        tubiLog(logMsg, "error", "videoLoad", "no-yospace-analytics-url")
       end if
     end if
   end if
+End Function
+
+
+' @content: roSGNode, a content node for a single linear content
+' @manifestResponseLines: array, a video manifest response parsed into an array such that each
+'                                line of the response is an array index
+Function logMissingLinearAnalyticsUrl(content, manifestResponseLines)
+  contentId = ""
+  if content <> invalid and isString(content.id)
+    contentId = content.id
+  end if
+
+  streamUrl = ""
+  for each line in lines
+    if line.left(8) = "https://"
+      streamUrl = line
+      exit for
+    end if
+  end for
+
+  logMsg = {
+    content_id: contentId
+    stream_url: streamUrl
+  }
+  logMsg = FormatJson(logMsg)
+  tubiLog(logMsg, "error", "videoLoad", "no-yospace-analytics-url")
 End Function
 
 
@@ -395,7 +412,6 @@ Function repositionLinearVideoPlayerToMaxState(bAnimate)
 End Function
 
 
-
 Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
   '//Add video player to LinearPlayerGroup
 
@@ -474,7 +490,8 @@ Function onLinearVideoPlayerBackPressed()
 End Function
 
 
-' Go back to the main window. Either stop the video or continue playing it. If the video continues to play, then animate it down to the corner of the screen.
+' Go back to the main window. Either stop the video or continue playing it.
+' If the video continues to play, then animate it down to the corner of the screen.
 Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
   tubiLog("LinearVideoPlayerScreenHelpers.returnToPreviousScreenFromLinearVideo")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
@@ -511,10 +528,12 @@ Function stopLinearVideoContent()
     videoTrackingStop() 'stops youbora tracking
     videoPlayer.control = "stop"
   end if
+
   '//cancel any asynchronous tasks/requests that may cause the video to play if they are left to continue
   if m.adsSsaiTask <> invalid
     m.adsSsaiTask.unobserveFieldScoped("videoResourcesWithAdParams")
   end if
+
   if m.linearManifestRequest <> invalid
     m.cancelRequest(m.linearManifestRequest)
     m.linearManifestRequest = invalid

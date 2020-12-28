@@ -228,6 +228,7 @@ Function onControlChange()
     end if
 
   else if m.top.control = "stop" then
+    m.AdsSSAITask.playbackStopped = true
     stopVideo()
   else if m.top.control = "pause" then
     pauseVideo(false, false)

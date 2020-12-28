@@ -33,6 +33,9 @@
         <field id="videoIsFullscreen" type="boolean" />
         <field id="exit" type="boolean" />
 
+        <!-- tells the task that the linear playback has been stopped -->
+        <field id="playbackStopped" type="boolean" alwaysNotify="true" />
+
         <!-- This field is used strictly to hold external state, as there was no other good
              place to store it. It is not used internal to this task.
          -->
