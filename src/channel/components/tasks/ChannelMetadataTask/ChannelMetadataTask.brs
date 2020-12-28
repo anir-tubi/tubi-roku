@@ -21,10 +21,7 @@ Function execGetChannelMetadata() As Void
   cms = CmsApi(constants, RequestModule, AuthModule)
   translate = TubiMetadataTranslate(constants)
   
-  params = {}
-  params.posterSize = constants.ui.imageSizes.posterSize
-
-  channelReq = cms.channelReq(m.top.channelId, constants.performance.categoryGridList.finalBlockSize, m.top.kidsMode, params )
+  channelReq = cms.channelReq(m.top.channelId, constants.performance.categoryGridList.finalBlockSize, m.top.kidsMode)
   channel = channelReq.runSynchronous()
 
   ' Parse results

@@ -240,10 +240,6 @@ Function fetchHomeScreen(homeScreen)
       responseHandler = "espanolscreenResponse" 
     end if
 
-    options.params.posterSize = m.constants.ui.imageSizes.poster
-    options.params.landscapeSize = m.constants.ui.imageSizes.landscape
-    options.params.largeVitgSize = m.constants.ui.imageSizes.largeVITG
-
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, shouldKidsModeBeSentToServer(), options)
     homeScreen.resetContentAreaValues = true
     setHomeScreenLoading(homeScreen)

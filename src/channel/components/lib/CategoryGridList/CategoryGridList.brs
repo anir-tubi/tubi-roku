@@ -584,14 +584,13 @@ Function getWholeCategoryRequest(category As Object, field="wholeCategoryRespons
     if categoryId <> invalid
       tubiLog("CategoryGridList.fetch whole: Asking MetadataFetchTask for " + categoryId)
        
-      params = {
-        contentMode: m.top.contentMode
+      options = {
+        params: {
+          contentMode: m.top.contentMode
+        }
       }
 
-      params.posterSize = m.constants.ui.imageSizes.poster
-      params.landscapeSize = m.constants.ui.imageSizes.landscape
-      params.largeVitgSize = m.constants.ui.imageSizes.largeVITG
-      return m.metadataFetchTaskDTO.createRequest(categoryId, m.top, field, m.constants.reqNames.getCategory, invalid, m.top.shouldKidsModeBeSentToServer, params)
+      return m.metadataFetchTaskDTO.createRequest(categoryId, m.top, field, m.constants.reqNames.getCategory, invalid, m.top.shouldKidsModeBeSentToServer, options)
     end if
   end if
 

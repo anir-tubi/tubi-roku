@@ -7,11 +7,6 @@ Function CmsApi(constants, request, auth)
     request_: request
     auth_: auth
 
-    ' private
-    commonOptions_: cmsApi_commonOptions_
-    createAuthRequest_: cmsApi_createAuthRequest_
-    setImageParams_: cmsApi_setImageParams_
-    
     ' public
     relatedContentReq: cmsApi_getRelatedContentRequest
     upNextContentReq: cmsApi_getUpNextContentRequest
@@ -24,11 +19,19 @@ Function CmsApi(constants, request, auth)
     channelsCategoriesScreenReq: cmsApi_getChannelsCategoriesScreenRequest
     categoryReq: cmsApi_getCategoryRequest
     searchReq: cmsApi_getSearchRequest
+
+    ' private
+    commonOptions: cmsApi_commonOptions
+    createAuthRequest: cmsApi_createAuthRequest
+    setImageParams: cmsApi_setImageParams
+    setTupianPosterParam: cmsApi_setTupianPosterParam
+    setTupianLandscapeParam: cmsApi_setTupianLandscapeParam
+    setTupianLargeVitgParam: cmsApi_setTupianVitgParam
   }
 End Function
 
 
-Function cmsApi_commonOptions_()
+Function cmsApi_commonOptions()
   return {
     params: {
       "app_id": m.constants.settings.shortAppName
@@ -42,17 +45,15 @@ End Function
 '''''''''''''''''''''''
 ' relatedContentReq()
 '
-Function cmsApi_getRelatedContentRequest(contentId, bKidsMode = false, params = {})
+Function cmsApi_getRelatedContentRequest(contentId, bKidsMode = false)
   url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
 
-  options = m.commonOptions_()
+  options = m.commonOptions()
   options.params["isKidsMode"] = bKidsMode
   options.params["video_resources"] = m.constants.player.drmOrder
+  options.params = m.setTupianPosterParam(options.params)
 
-  '//update options.params based on the passed in params AA
-  m.setImageParams_(params, options.params)
-
-  return m.createAuthRequest_(url, m.constants.reqNames.getRelatedContent, options)
+  return m.createAuthRequest(url, m.constants.reqNames.getRelatedContent, options)
 End Function
 
 
@@ -65,17 +66,17 @@ End Function
 Function cmsApi_getUpNextContentRequest(contentId, categoryId=invalid)
   url = m.constants.urls.cms.upNextContent + "/" + contentId + "/next"
   
-  options = m.commonOptions_()
+  options = m.commonOptions()
   if categoryId <> invalid and categoryId <> ""
     options.params.container_id = categoryId
   end if
-  return m.createAuthRequest_(url, m.constants.reqNames.getUpNextContent, options)
+  return m.createAuthRequest(url, m.constants.reqNames.getUpNextContent, options)
 End Function
 
 
 Function cmsApi_getUpNextContentRequestInfo(contentId, params)
   url = m.constants.urls.cms.upNextContent + "/" + contentId + "/next"
-  options = m.commonOptions_()
+  options = m.commonOptions()
   options.params["video_resources"] = m.constants.player.drmOrder
 
   for each param in params
@@ -94,20 +95,18 @@ End Function
 '''''''''''''''''''''''
 ' singleContentReq()
 '
-Function cmsApi_getSingleContentRequest(contentId, includeChannels=false, bKidsMode = false, params = invalid)
+Function cmsApi_getSingleContentRequest(contentId, includeChannels=false, bKidsMode = false)
   url = m.constants.urls.cms.singleContent
 
-  options = m.commonOptions_()
-  options.params.content_id = contentId
+  options = m.commonOptions()
+  options.params["content_id"] = contentId
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
   options.params["video_resources"] = m.constants.player.drmOrder
   options.params["gn_fields"] = "tms_id"  'request the Gracenote id
+  options.params = m.setTupianLandscapeParam(options.params) 'used on episode list screens
 
-  '//update options.params based on the passed in params AA
-  m.setImageParams_(params, options.params)
-
-  return m.createAuthRequest_(url, m.constants.reqNames.getSingleContent, options)
+  return m.createAuthRequest(url, m.constants.reqNames.getSingleContent, options)
 End Function
 
 
@@ -118,7 +117,7 @@ Function cmsApi_getThumbnailsRequest(contentId)
   '//This function is only being used in a unit test. Should ensure this and cmsApi_getThumbnailsRequestInfo() ar kept in sync 
   url = m.constants.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
   
-  options = m.commonOptions_()
+  options = m.commonOptions()
   options.params.type = "5x"
   options.params.max_width = m.constants.deviceInfo.displayWidth
   return m.request_.createAsync(url, m.constants.reqNames.getThumbnails, options)
@@ -127,7 +126,7 @@ End Function
 
 Function cmsApi_getThumbnailsRequestInfo(contentId)
   url = m.constants.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
-  options = m.commonOptions_()
+  options = m.commonOptions()
   options.params.type = "5x"
   options.params.max_width = m.constants.deviceInfo.displayWidth
   return {
@@ -140,20 +139,18 @@ End Function
 '''''''''''''''''''''''
 ' channelReq()
 '
-Function cmsApi_getChannelRequest(channelId, limit, bKidsMode = false, params = {})
+Function cmsApi_getChannelRequest(channelId, limit, bKidsMode = false)
   url = m.constants.urls.matrix.channel + "/" + channelId
   
-  options = m.commonOptions_()
+  options = m.commonOptions()
   options.params.expand = 1
   options.params.cursor = 0
   options.params.limit = limit
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = true
-
-  '//update options.params based on the passed in params AA
-  m.setImageParams_(params, options.params)
+  options.params = m.setTupianPosterParam(options.params)
   
-  return m.createAuthRequest_(url, m.constants.reqNames.getChannel, options)
+  return m.createAuthRequest(url, m.constants.reqNames.getChannel, options)
 End Function
 
 
@@ -176,19 +173,26 @@ End Function
 Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, passedOptions = {}, expand = 2)
   url = m.constants.urls.matrix.homescreen 
   
-  options = m.commonOptions_()
-  options.params.expand = expand
-
-  '//update options.params based on the passed in params AA
-  if passedOptions <> invalid
-    m.setImageParams_(passedOptions.params, options.params)
-  end if
-
+  options = m.commonOptions()
+  options.params["expand"] = expand
   options.params["includeEmptyHistory"] = true
   options.params["includeEmptyQueue"] = true
-  options.params.limit = limit
+  options.params["isKidsMode"] = bKidsMode
+  options.params["includeVideoInGrid"] = true
+  options.params["limit"] = limit
+
   if passedOptions.params <> invalid and passedOptions.params.contentMode <> invalid and passedOptions.params.contentMode <> ""
     options.params["contentMode"] = passedOptions.params.contentMode
+
+    if passedOptions.params.contentMode <> m.constants.ui.contentMode.news
+      ' don't send the Tupian image params for homescreen requests that are contentMode = "news"
+      imageParamTypes = [
+        "poster"
+        "landscape"
+        "large_vitg"
+      ]
+      options.params = m.setImageParams(imageParamTypes, options.params)
+    end if
 
     if passedOptions.params.contentMode = m.constants.ui.contentMode.news or passedOptions.params.contentMode = m.constants.ui.contentMode.homescreen
       '//request and display live news if the experiement calls for it.
@@ -199,34 +203,31 @@ Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, passedOptions = {
     end if
   end if
 
-  options.params["isKidsMode"] = bKidsMode
-  options.params["includeVideoInGrid"] = true
-
   if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
     options.params["groupSize"] = m.constants.settings.numContainers
   end if
   
-  return m.createAuthRequest_(url, m.constants.reqNames.getHomescreen, options)
+  return m.createAuthRequest(url, m.constants.reqNames.getHomescreen, options)
 End Function
+
 
 '''''''''''''''''''''
 ' categoryReq()
 '
-Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode = false, params = {})
+Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode = false, passedOptions = {})
   url = m.constants.urls.matrix.container + "/" + categoryId
   
   if name = invalid
     name = m.constants.reqNames.getCategory
   end if
-  options = m.commonOptions_()
-  options.params.expand = 1
-  options.params.cursor = 0 
-  options.params.limit = limit
-  if params <> invalid 
-    if params.contentMode <> invalid and params.contentMode <> ""
-      options.params["contentMode"] = params.contentMode
-    end if
-  end if
+
+  options = m.commonOptions()
+  options.params["isKidsMode"] = bKidsMode
+  options.params["includeChannels"] = true
+  options.params["includeVideoInGrid"] = true
+  options.params["expand"] = 1
+  options.params["cursor"] = 0
+  options.params["limit"] = limit
 
   ' add custom linear content header for linear content
   if categoryId = m.constants.ui.categoryIds.liveNews
@@ -236,60 +237,90 @@ Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode 
     options.headers["x-tubi-inject-live-news"] = "true"
   end if
 
-  '//update options.params based on the passed in params AA
-  m.setImageParams_(params, options.params)
+  if passedOptions.params <> invalid
+    if passedOptions.params.contentMode <> invalid and passedOptions.params.contentMode <> ""
+      options.params["contentMode"] = passedOptions.params.contentMode
+    end if
+  end if
 
-  options.params["isKidsMode"] = bKidsMode
-  options.params["includeChannels"] = true
-  options.params["includeVideoInGrid"] = true
-  return m.createAuthRequest_(url, name, options)
+  imageParamTypes = [
+    "poster"
+    "landscape"
+    "large_vitg"
+  ]
+  options.params = m.setImageParams(imageParamTypes, options.params)
+
+  return m.createAuthRequest(url, name, options)
 End Function
 
 
 ''''''''''''''''''''''
 ' searchreq()
 '
-Function cmsApi_getSearchRequest(searchText, limit, bKidsMode = false, params = {})
+Function cmsApi_getSearchRequest(searchText, bKidsMode = false)
   url = m.constants.urls.cms.search
-  
-  options = m.commonOptions_()
-
-  '//update options.params based on the passed in params AA
-  m.setImageParams_(params, options.params)
-  options.params.search = searchText
+  options = m.commonOptions()
+  options.params["search"] = searchText
   options.params["isKidsMode"] = bKidsMode
-  return m.createAuthRequest_(url, m.constants.reqNames.searchAPI, options)
+  m.setTupianPosterParam(options.params)
+  return m.createAuthRequest(url, m.constants.reqNames.searchAPI, options)
 End Function
 
 
-'//::TODO::SafeZone - see if this function is necessary or should be changed once the safe zone experiement is done and intergrated with the rest of the code
 ''''''''''''''''''''''
-' setImageParams_()
-' update your options.params (paramsOut) that are found in your request functions of this file 
-' If the input params associative array asks for new sized images, then this function will ask the backend
-' to resize the images according to the parameters within the paramsIn AA.
+' setImageParams()
+' returns the params AA that is passed in with any additional Tupian style image params appended on to it
+' Tupian style image params ask the backend to return images of a specific size.
+' For more info on Tupian image parameters, please see:
+' https://docs.google.com/document/d/1T9qL5otwgjIAEW4pPwvKiq0PxIYEK-ExKrFBYRkx6BY
 '
-' @param paramsIn - this is the raw associative array that is passed to the functions within this file
-' @param paramsOut - this should be the "params" associative array of your requets options assoicative array
-Function cmsApi_setImageParams_(paramsIn, paramsOut)
-  if paramsIn <> invalid 
-    if paramsIn.posterSize <> invalid and paramsIn.posterSize.count() = 2 
-    '//Tell backend to provide a specific sized image
-      paramsOut["images[poster_tb]"] = "w" + paramsIn.posterSize[0].ToStr() + "h" + paramsIn.posterSize[1].ToStr() + "_poster"
+' @imageTypes, array - an array of strings corresponding to which types of images to request from Tupian
+'                      Accepted values are "poster", "landscape", "large_vitg"
+' @existingParams: assocArray, any parameters that have already been defined that need to be added to
+Function cmsApi_setImageParams(imageTypes, existingParams = {})
+  posterSize = m.constants.ui.imageSizes.poster
+  landscapeSize = m.constants.ui.imageSizes.landscape
+  largeVitgSize = m.constants.ui.imageSizes.largeVITG
+
+  for each imageType in imageTypes
+    if imageType = "poster"
+      '//Tell backend to provide a specific sized image
+      existingParams["images[poster_tb]"] = "w" + posterSize[0].ToStr() + "h" + posterSize[1].ToStr() + "_poster"
+    else if imageType = "landscape"
+      existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
+    else if imageType = "large_vitg"
+      existingParams["images[vitg_tb]"] = "w" + largeVitgSize[0].ToStr() + "h" + largeVitgSize[1].ToStr() + "_hero"
     end if
-    if paramsIn.landscapeSize <> invalid and paramsIn.landscapeSize.count() = 2 
-      paramsOut["images[landscape_tb]"] = "w" + paramsIn.landscapeSize[0].ToStr() + "h" + paramsIn.landscapeSize[1].ToStr() + "_hero"
-    end if
-    if paramsIn.largeVitgSize <> invalid and paramsIn.largeVitgSize.count() = 2 
-      paramsOut["images[vitg_tb]"] = "w" + paramsIn.largeVitgSize[0].ToStr() + "h" + paramsIn.largeVitgSize[1].ToStr() + "_hero"
-    end if
-  end if
+  end for
+
+  return existingParams
+End Function
+
+
+' Wrapper around setImageParams for the specific case of only adding a Tupian poster param
+' @existingParams: assocArray, any parameters that have already been defined that need to be added to
+Function cmsApi_setTupianPosterParam(existingParams = {})
+  return m.setImageParams(["poster"], existingParams)
+End Function
+
+
+' Wrapper around setImageParams for the specific case of only adding a Tupian landscape param
+' @existingParams: assocArray, any parameters that have already been defined that need to be added to
+Function cmsApi_setTupianLandscapeParam(existingParams = {})
+  return m.setImageParams(["landscape"], existingParams)
+End Function
+
+
+' Wrapper around setImageParams for the specific case of only adding a Tupian VITG param
+' @existingParams: assocArray, any parameters that have already been defined that need to be added to
+Function cmsApi_setTupianVitgParam(existingParams = {})
+  return m.setImageParams(["large_vitg"], existingParams)
 End Function
 
 
 '''''''''''''''''''''
 ' create an auth request if user is logged in, otherwise use a normal request
-Function cmsApi_createAuthRequest_(url, reqName, options)
+Function cmsApi_createAuthRequest(url, reqName, options)
   request = m.auth_.createAuthRequest(url, reqName, options)
   if request = invalid
     request = m.request_.createAsync(url, reqName, options)

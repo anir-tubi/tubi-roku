@@ -135,9 +135,8 @@ Function beginRequest(metadataRequest) As Void
     kidsMode = metadataRequest.kidsMode 
     httpRequest = m.CmsApi.categoryReq(categoryId, limit, name, kidsMode, metadataRequest.options)
   else if metadataRequest.name = m.constants.reqNames.searchAPI
-    limit = m.constants.performance.categoryGridList.finalBlockSize
     kidsMode = metadataRequest.kidsMode 
-    httpRequest = m.CmsApi.searchReq(metadataRequest.searchText, limit, kidsMode, metadataRequest.options)
+    httpRequest = m.CmsApi.searchReq(metadataRequest.searchText, kidsMode)
   end if
 
   if httpRequest = invalid then
