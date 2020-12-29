@@ -862,9 +862,8 @@ Function onChannelGuideContentChanged()
   tubiLog("LinearVideoPlayerScreen.onChannelGuideContentChanged()")
   if m.nTransportState = 2 and m.channelsGuideGroup.opacity > 0
     if m.top.channelsContent <> invalid and m.top.channelsContent.getChildCount() > 0
-      channelGuideContent = m.top.channelsContent.getChild(0)
       '//Display channel guide 
-      displayChannelGuideList(channelGuideContent)
+      displayChannelGuideList(m.top.channelsContent)
     end if
   end if
 End Function

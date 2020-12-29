@@ -674,15 +674,13 @@ End Function
 ' When the player requests the channels info, then get it and supply it to the video player
 Function onChannelsRequested()
   tubiLog("LinearVideoPlayerScreenHelpers.onChannelsRequested")
-  reqName = m.constants.reqNames.getHomescreen
-  responseHandler = "liveNewsChannelGuideResponse"
-  options = {
-    params: {
-      contentMode: m.constants.ui.contentMode.news
-      limit: 200
-    }
-  }
-  m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, false, options)
+  currentContent = getCurrentLinearContent()
+  if currentContent <> invalid and currentContent.parentId <> invalid
+    responseHandler = "liveNewsChannelGuideResponse"
+    categoryId = currentContent.parentId
+
+    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, responseHandler, m.constants.reqNames.getCategory)
+  end if
 End Function
 
 
