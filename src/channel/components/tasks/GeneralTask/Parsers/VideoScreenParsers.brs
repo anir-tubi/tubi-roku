@@ -1,4 +1,8 @@
-Function parseVideoScreenSpritesSuccess(parsedResponse, responseHeaders)
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseVideoScreenSpritesSuccess(fullResponse, requestNode)
+  parsedResponse = fullResponse.data
   spritesContentNode = invalid
   if parsedResponse <> invalid then
     spritesContentNode = CreateObject("roSGNode", "TubiContentNode")
@@ -18,7 +22,11 @@ Function parseVideoScreenSpritesSuccess(parsedResponse, responseHeaders)
 End Function
 
 
-Function parseVideoScreenUpNextSuccess(parsedResponse, responseHeaders)
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseVideoScreenUpNextSuccess(fullResponse, requestNode)
+  parsedResponse = fullResponse.data
   translate = TubiMetadataTranslate(m.constants)
   upNextContent = CreateObject("roSGNode", "ContentNode")
   for each content in parsedResponse
@@ -29,29 +37,32 @@ Function parseVideoScreenUpNextSuccess(parsedResponse, responseHeaders)
 End Function
 
 
-Function parseVideoScreenUpNextError(parsedResponse, responseHeaders)
-  return parsedResponse
-End Function
-
-
-Function parseLiveVideoManifestSuccess(stringResponse, responseHeaders)
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseVideoScreenUpNextError(fullResponse, requestNode)
   return {
-    res: stringResponse
-    headers: responseHeaders
+    code: fullResponse.code
   }
 End Function
 
 
-Function parseLiveVideoManifestError(stringResponse, responseHeaders)
-  return stringResponse
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseLiveVideoManifestSuccess(fullResponse, requestNode)
+  return {
+    res: fullResponse.data
+    headers: fullResponse.headers
+  }
 End Function
 
 
-Function parseLiveVideoPassThroughSuccess(stringResponse, responseHeaders)
-  return stringResponse
-End Function
-
-
-Function parseLiveVideoPassThroughError(stringResponse, responseHeaders)
-  return stringResponse
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseLiveVideoManifestError(fullResponse, requestNode)
+  return {
+    code: fullResponse.code
+  }
 End Function

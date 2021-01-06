@@ -1,12 +1,7 @@
 'General long running task which handles the api request & response, success and error callbacks
 Function init()
-
-  m.port = createObject("roMessagePort")
-  m.top.observeField("request", m.port)
-  
   m.top.functionName = "listen"
   m.top.control = "run"
-  
 End Function
 
 
@@ -15,18 +10,11 @@ End Function
 ' this task listens for new request in port and makes api request & response calls 
 Function listen()
   tubiLog("GeneralTask.listenloop started")
-  
-  ' Guarantee that we have a task thread local copy of constants before proceeding.
-  ' It might be possible that grabbing m.global across the thread boundary could time out or fail
-  while true
-    m.constants = m.global.getField("constants")   ' this should grab a thread-local copy
-    if m.constants <> invalid then
-      exit while
-    end if
-    tubiLog("WARNING: Rendezvous failed for constants in GeneralTask")
-  end while
+  m.port = createObject("roMessagePort")
+  m.top.observeField("request", m.port)
+  m.constants = getConstantsFromGlobal()
 
-  m.jobQueue = {}
+  m.jobStore = {}
   m.requestTypes = {}
   createParsingCallbacks()
   
@@ -110,7 +98,7 @@ Function makeApiRequest(requestNode, requestModule, authModule) as Boolean
   
   if urlTransfer <> invalid and reqSent = true
     id = stri(urlTransfer.getIdentity()).trim()
-    m.jobQueue[id] = {"requestNode" : requestNode, "tubiReq" : tubiReq}
+    m.jobStore[id] = {"requestNode" : requestNode, "tubiReq" : tubiReq}
   end if
   
   return true
@@ -124,13 +112,12 @@ End Function
 ' @msg : roUrlEvent, response object from api
 Function processResponse(msg)
   id = stri(msg.GetSourceIdentity()).trim()
-  job = m.jobQueue[id]
+  job = m.jobStore[id]
 
   if job <> invalid
 
     callbackTypes = m.requestTypes[job.requestNode.input.requestType]
     result = job.tubiReq.handleEvent(msg)
-    parsedResponse = invalid
 
     if result <> invalid and result.response <> invalid and callbackTypes <> invalid
 
@@ -138,31 +125,29 @@ Function processResponse(msg)
 
       if result.response.code >= 200 and result.response.code < 400
 
+        response = result.response
         if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
-          parsedResponse = parseJson(result.response.data)
+          response.data = parseJson(result.response.data)
         else if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/xml"
-          ' we can write xml parsing functionality here and uncomment above 2 lines
-        else
-          parsedResponse = result.response.data
+          ' we can write xml parsing functionality here if/when necessary
         end if
 
         parserCallback = callbackTypes.parseSuccess
-        job.requestNode.response = parserCallback(parsedResponse, responseHeaders)
+        job.requestNode.response = parserCallback(response, job.requestNode)
 
       else
 
         ' end result of parsedResponse type may vary depending on API response format
-        parsedResponse = result.response
-        responseHeaders = result.response.headers
+        response = result.response
         if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
-          parsedResponse = parseJson(result.response.data)
+          response.data = parseJson(result.response.data)
         end if
 
         parserCallback = callbackTypes.parseError
 
         ' some requests might not require error handling, and therefore may not have a parseError callback
         if parserCallback <> invalid
-          job.requestNode.error = parserCallback(parsedResponse, responseHeaders)
+          job.requestNode.error = parserCallback(response, job.requestNode)
         else
           job.requestNode.error = invalid
         end if

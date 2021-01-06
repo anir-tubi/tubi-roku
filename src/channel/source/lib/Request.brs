@@ -185,7 +185,7 @@ Function tubihttp_runSynchronous(timeout = 5 as Integer) As Object
       request = m.handleEvent(msg)
 
       if request <> invalid
-        if request.response <> invalid and request.response.data.len() > 0
+        if request.response <> invalid and request.response.data <> invalid and request.response.data.len() > 0
           res = request.response.data
           exit while
         else if request.response.code < 200 or request.response.code >= 400
@@ -214,7 +214,7 @@ End Function
 '
 Function tubihttp_handleEvent(message As Object) As Object
   ' perhaps .start() was not called yet
-  if m.urltransfer = invalid then 
+  if m.urltransfer = invalid
     return invalid
   end if
     
@@ -285,6 +285,7 @@ Function tubihttp_handleEvent(message As Object) As Object
   else
     ' ignore other types of events, so this can be used idempotently in a caller's message loop
   end if
+
   return invalid
 End Function
 
