@@ -363,9 +363,6 @@ Function onHomeScreenFocusChanged(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenFocusChanged")
   homeScreen = msg.getRoSGNode()
 
-  '//As soon as the content has been focused, then send out report that the roku_metadata_align is triggered
-  getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment")
-
   if homeScreen.isInFocusChain() = false
     '//If the homescreen loses focus, then stop the linear video player in case it is playing
     stopCountdownTimer()

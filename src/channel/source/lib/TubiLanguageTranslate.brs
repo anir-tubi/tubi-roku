@@ -660,34 +660,22 @@ Function getTranslation_en_US()
       "message": "Expires in {days} days"
     },
     "metadata_expiresIn_singular": {
-      "description": "label to indicate the user has excatly 1 day to watch a video",
+      "description": "label to indicate the user has exactly 1 day to watch a video",
       "message": "Expires in 1 day"
     },
     "metadata_continueWatching_notSignedIn_title": {
       "description": "tells non registered user what they need to do to see the continue watching container",
       "message": "Sign Up to Save Your Progress"
     },
-    "metadata_continueWatching_notSignedIn_description_experiment1": {
-      "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "Pick up right where you left off next time you play a TV Series or a Movie by signing up. It’s easy & 100% free, no subscription needed."
-    },
-    "metadata_continueWatching_notSignedIn_description_experiment2": {
+    "metadata_continueWatching_notSignedIn_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
       "message": "Pick up right where you left off next time you play a TV Series or a Movie. Available upon sign up."
     },
-    "metadata_continueWatching_notSignedIn_container_description_experiment1": {
-      "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "TV Shows & Movies progress will be saved here. Available Upon Sign Up."
-    },
-    "metadata_continueWatching_notSignedIn_container_description_experiment2": {
+    "metadata_continueWatching_notSignedIn_container_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
       "message": "No Subscription  •  No Credit Card  •  Free Forever"
     },
-    "metadata_continueWatching_notSignedIn_container_button_experiment1": {
-      "description": "button text for when a non registered user focuses on the continue watching container",
-      "message": "I Want to Save My Progress"
-    },
-    "metadata_continueWatching_notSignedIn_container_button_experiment2": {
+    "metadata_continueWatching_notSignedIn_container_button": {
       "description": "button text for when a non registered user focuses on the continue watching container",
       "message": "Sign Up to Save Progress - FREE"
     },
@@ -1451,6 +1439,22 @@ Function getTranslation_es_MX()
       "description": "label to indicate the user has exactly 1 day to watch a video",
       "message": "Caduca en 1 día"
     },
+    "metadata_continueWatching_notSignedIn_title": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "Regístrate para guardar tu progreso"
+    },
+    "metadata_continueWatching_notSignedIn_description": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "Continúa justo donde dejaste de ver la próxima vez que veas una serie o película. Disponible al registrarte."
+    },
+    "metadata_continueWatching_notSignedIn_container_description": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "Sin suscripción • Sin tarjeta de crédito • Gratis para siempre"
+    },
+    "metadata_continueWatching_notSignedIn_container_button": {
+      "description": "button text for when a non registered user focuses on the continue watching container",
+      "message": "Regístrate para guardar tu progreso - GRATIS"
+    },
     "metadata_directed": {
       "description": "metadata label to indicate the directors of the current video title",
       "message": "Dirigido por"
@@ -1569,7 +1573,7 @@ Function getTranslation_es_MX()
     },
     "channel_description": {
       "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
-      "message": "Disfruta de la mayor selección de películas y programas de televisión populares, ¡todo gratis!"
+      "message": "¡Disfruta el catálogo más grande de películas y series populares completamente gratis!"
     },
     "channel_webDescription": {
       "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
@@ -1653,7 +1657,7 @@ Function getTranslation_es_MX()
     },
     "dialog_mylist_empty_description": {
       "description": "Dialog description to say My List is empty",
-      "message": "Encuentra todo lo que agregaste a Mi lista aquí. Para empezar, selecciona una serie o película y haz clic en el botón Mi lista.\n"
+      "message": "Encuentra todo lo que agregaste a Mi lista aquí. Para empezar, selecciona una serie o película y haz clic en el botón Mi lista."
     },
     "dialog_button_register_signIn": {
       "description": "The label of the button in a dialog window that allows the user to register or signIn",

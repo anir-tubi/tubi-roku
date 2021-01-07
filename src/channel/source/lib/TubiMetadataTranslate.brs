@@ -619,7 +619,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         continueWatchingIndex = i
         ' increasing the utilityRowPosition by 1 if the ContinueWatching has no children AND the user is signed in (continue watching row is displayed if the user is not signed in regardless)
         '//::TODO:: Remove this section once we have API support
-        if container.children.Count() = 0 and (m.isUserSignedIn() = true or getExperimentResource("roku_continue_watching_signed_out", "roku_continue_watching_signed_out_experiment", false).enabled = false)
+        if container.children.Count() = 0 and (m.isUserSignedIn() = true)
           utilityRowPosition = utilityRowPosition + 1
         end if
       else if container.id = m.constants.ui.categoryIds.queue
@@ -641,7 +641,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         categoryAA = invalid
       end if
 
-      if container.id = m.constants.ui.categoryIds.history and m.isUserSignedIn() = false and getExperimentResource("roku_continue_watching_signed_out", "roku_continue_watching_signed_out_experiment", false).enabled = true
+      if container.id = m.constants.ui.categoryIds.history and m.isUserSignedIn() = false
         '//if experiement is enabled AND if continue watching container while user is signed out, then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsModeEnabled)
         if categoryAA <> invalid
@@ -1304,12 +1304,7 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
     children = []
 
     sTitle = getTranslation("metadata_continueWatching_notSignedIn_title")
-    sDescription = ""
-    if getExperimentResource("roku_continue_watching_signed_out", "roku_continue_watching_signed_out_experiment", false).display_free = false
-      sDescription = getTranslation("metadata_continueWatching_notSignedIn_description_experiment1")  
-    else 
-      sDescription = getTranslation("metadata_continueWatching_notSignedIn_description_experiment2")  
-    end if
+    sDescription = getTranslation("metadata_continueWatching_notSignedIn_description")  
 
     childAA = {
       id: m.constants.ui.contentTypes.historySignedOutUser

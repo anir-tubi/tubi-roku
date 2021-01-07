@@ -43,12 +43,8 @@ Function TubiExperiments(constants) as Object
       roku2: {
       }
       rokunamespace: {
-      }  
-      roku_continue_watching_signed_out: {
       }
       roku_discovery_v3 : {
-      }
-      roku_metadata_align : {
       }
     }
     defaultResources: {
@@ -59,15 +55,9 @@ Function TubiExperiments(constants) as Object
       }
       rokunamespace: {
       }
-      roku_continue_watching_signed_out: {
-        roku_continue_watching_signed_out_experiment : {enabled: false, "display_free" : false}
-      }
       roku_discovery_v3 : {
         roku_discovery_row_v3 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}
-      }     
-      roku_metadata_align : {
-        roku_metadata_align_experiment : {"is_top_aligned" : false, "has_enlarged_description_text": false, "has_enlarged_title_text": true}
-      }  
+      } 
     }
     
 

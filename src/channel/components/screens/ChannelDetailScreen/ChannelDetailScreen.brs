@@ -22,12 +22,6 @@ Function init()
   m.VideoGrid.observeField("itemFocused", "onItemFocused")
   m.VideoGrid.observeField("itemSelected", "onItemSelected")
 
-  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).is_top_aligned = false 
-    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
-    m.ScreenNavigationHint.translation = [168,85]
-    m.InfoPanel.translation = [168,167]
-  end if
-
   ' set initial tracking values
   m.top.trackingPageInfo = createTrackingPageInfo(invalid)
   m.oldCategoryComponent = invalid

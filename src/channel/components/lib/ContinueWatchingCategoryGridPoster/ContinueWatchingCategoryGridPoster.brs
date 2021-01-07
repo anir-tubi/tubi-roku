@@ -5,13 +5,8 @@ Function init()
   m.title = m.top.findNode("Title")
   
 
-  if getExperimentResource("roku_continue_watching_signed_out", "roku_continue_watching_signed_out_experiment", false).display_free = true
-    sTitle = getTranslation("metadata_continueWatching_notSignedIn_container_description_experiment2")
-    sButton = getTranslation("metadata_continueWatching_notSignedIn_container_button_experiment2")
-  else 
-    sTitle = getTranslation("metadata_continueWatching_notSignedIn_container_description_experiment1")
-    sButton = getTranslation("metadata_continueWatching_notSignedIn_container_button_experiment1")
-  end if
+  sTitle = getTranslation("metadata_continueWatching_notSignedIn_container_description")
+  sButton = getTranslation("metadata_continueWatching_notSignedIn_container_button")
   m.title.text = sTitle
 
   m.button = m.top.findNode("button")

@@ -28,10 +28,6 @@ Function init()
     }
   }
 
-  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).is_top_aligned = false 
-    m.Info.translation = [168,61]
-  end if
-
   ' When the screen comes in to focus, onEpisodeFocused() triggers. At this point in time, m.RowList.hasFocus() is true.
   ' m.gridIsFocused can be used to differentiate between onEpisodeFocused() occurring due to the focus changing between
   ' items on the RowList, or due to the RowList gaining focus when focus is given to the EpisodesScreen.

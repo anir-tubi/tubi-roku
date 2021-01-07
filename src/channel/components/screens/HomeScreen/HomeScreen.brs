@@ -20,12 +20,6 @@ Function init()
   m.top.observeField("resetContentAreaValues", "onResetContentAreaValues")
   m.top.observeField("id", "onIDChange")
   m.top.observeField("fullscreenCountdown", "onFullscreenCountdown")
-
-  if getExperimentResource("roku_metadata_align", "roku_metadata_align_experiment", false).is_top_aligned = false 
-    m.ScreenNavigationHint = m.top.findNode("ScreenNavigationHint")
-    m.ScreenNavigationHint.translation = [168,78]
-    m.InfoPanel.translation = [168,163]
-  end if
   
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -252,14 +246,6 @@ Function onCurrFocusRowChange()
 
   categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
   categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
-
-  '//If the user is not signed in
-  nContinueWatchingIndex = m.CategoryGridList.content.continueWatchingIndex
-  if nContinueWatchingIndex <> invalid and rowEnteringFocus = (nContinueWatchingIndex - 1) and m.global.authInfo = invalid 
-    '//report the continue watching experiment when the continue watching row is peeking and is probably the new row to be in focus. 
-    getExperimentResource("roku_continue_watching_signed_out", "roku_continue_watching_signed_out_experiment", true)
-  end if
-
 
   ' send experiment analytics (exposure event) only when
   ' kidsMode is not enabled and currentScreen is homescreen and parentalRating is Adult and kidsModeFeatureOn is check for countryCode = US or CA
