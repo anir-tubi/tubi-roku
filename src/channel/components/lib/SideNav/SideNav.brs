@@ -11,6 +11,7 @@ Function init()
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
   m.top.observeFieldScoped("selectedItemRequested", "onSelectedItemRequested")
   m.top.observeFieldScoped("createMenuItems", "onCreateMenuItems")
+  m.ItemGroups = m.top.findNode("itemGroups")
   m.BottomContent = m.top.findNode("BottomContent")
   m.MainContent = m.top.findNode("MainContent")
   m.MainContentSelect = m.top.findNode("MainContent-select")
@@ -45,33 +46,42 @@ Function setMainContent(item)
 
   contentNode = CreateObject("roSGNode", "SideNavContentNode")
   contentNode.id = item
-  if item = "kidsMode"
-    contentNode.title = getTranslation("menu_home")
+  if item = m.constants.ui.sideNavIds.kidsMode
+    contentNode.title = getTranslation("menu_kids")
     contentNode.iconUrl = "pkg:/images/sideNavKids.png"
-  else if item = "search"
+  else if item = m.constants.ui.sideNavIds.search
     contentNode.title = getTranslation("menu_search")
     contentNode.iconUrl = "pkg:/images/sideNavSearch.png"
-  else if item = "home"
+  else if item = m.constants.ui.sideNavIds.home
     contentNode.title = getTranslation("menu_home")
     contentNode.iconUrl = "pkg:/images/sideNavHome.png"
-  else if item = "movies"
+  else if item = m.constants.ui.sideNavIds.movies
     contentNode.title = getTranslation("menu_movies")
     contentNode.iconUrl = "pkg:/images/sideNavMovies.png"
-  else if item = "tv"
+  else if item = m.constants.ui.sideNavIds.tv
     contentNode.title = getTranslation("menu_tv")
     contentNode.iconUrl = "pkg:/images/sideNavTV.png"
-  else if item = "espanol"
+  else if item = m.constants.ui.sideNavIds.espanol
     contentNode.title = "Español"
     contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
-  else if item = "mylist"
+  else if item = m.constants.ui.sideNavIds.myList
     contentNode.title = getTranslation("menu_mylist")
     contentNode.iconUrl = "pkg:/images/sideNavMyList.png"    
-  else if item = "categories"
+  else if item = m.constants.ui.sideNavIds.categories
     contentNode.title = getTranslation("menu_categories")
     contentNode.iconUrl = "pkg:/images/sideNavCategories.png"
-  else if item = "channels"
+  else if item = m.constants.ui.sideNavIds.channels
     contentNode.title = getTranslation("menu_channels")
     contentNode.iconUrl = "pkg:/images/sideNavChannels.png"
+  else if item = m.constants.ui.sideNavIds.profile
+    contentNode.title = getTranslation("menu_signIn")
+    contentNode.iconUrl = "pkg:/images/sideNavProfile.png"
+  else if item = m.constants.ui.sideNavIds.settings
+    contentNode.title = getTranslation("menu_settings")
+    contentNode.iconUrl = "pkg:/images/sideNavSettings.png"
+  else if item = m.constants.ui.sideNavIds.exit
+    contentNode.title = getTranslation("menu_exit")
+    contentNode.iconUrl = "pkg:/images/sideNavExit.png"
   end if
   m[item + "Content"] = contentNode
   
@@ -85,23 +95,68 @@ Function onCreateMenuItems()
   m.mainItems = m.top.findNode("mainItems")
   m.mainItemsSelected = m.top.findNode("mainItemsSelected")
   
-  menuItems = ["kidsMode", "search", "home", "movies", "tv", "mylist", "categories", "channels"]
+  if getExperimentResource("roku", "roku_sidenav_espanol", true).combined = true
+    menuItems = [
+      m.constants.ui.sideNavIds.profile
+      m.constants.ui.sideNavIds.kidsMode
+      m.constants.ui.sideNavIds.search
+      m.constants.ui.sideNavIds.home
+      m.constants.ui.sideNavIds.movies
+      m.constants.ui.sideNavIds.tv
+      m.constants.ui.sideNavIds.myList
+      m.constants.ui.sideNavIds.categories
+      m.constants.ui.sideNavIds.channels
+      m.constants.ui.sideNavIds.espanol
+      m.constants.ui.sideNavIds.settings
+      m.constants.ui.sideNavIds.exit
+    ]
+  else
+    menuItems = [
+      m.constants.ui.sideNavIds.kidsMode
+      m.constants.ui.sideNavIds.search
+      m.constants.ui.sideNavIds.home
+      m.constants.ui.sideNavIds.movies
+      m.constants.ui.sideNavIds.tv
+      m.constants.ui.sideNavIds.mylist
+      m.constants.ui.sideNavIds.categories
+      m.constants.ui.sideNavIds.channels
+    ]
+  end if
+
   ' Creates roSGNode dynamically
   setMenuItems(menuItems)  
   
   setStrings()
 
-  m.profileContent = m.TopContent.findNode("profile")
   '// This is the item to focus on when the sidenav opens. This implies that this was the last item (that has an associated screen) selected 
   m.itemSelectedRemembered = invalid
 
-  m.topItems = m.top.findNode("topItems")
-  m.bottomItems = m.top.findNode("bottomItems")
   m.mainItemsSelected.focusBitmapBlendColor = m.constants.ui.colors.selectedListItem
   m.mainItemsSelected.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
 
-  initList(m.topItems)
-  initList(m.bottomItems)
+  m.topItems = m.top.findNode("topItems")
+  m.bottomItems = m.top.findNode("bottomItems")
+
+  if getExperimentResource("roku", "roku_sidenav_espanol", false).combined <> true
+    initList(m.topItems)
+    initList(m.bottomItems)
+    m.profileContent = m.TopContent.findNode("profile")
+  else
+    m.itemGroups.removeChild(m.topItems)
+    m.itemGroups.removeChild(m.bottomItems)
+    m.mainItems.numRows = 12
+    m.mainItemsSelected.numRows = 12
+    m.mainItems.itemSpacing = [0,24]
+    m.mainItemsSelected.itemSpacing = [0,24]
+    m.mainItems.itemSize = [397,60]
+    m.mainItemsSelected.itemSize = [397,60]
+    m.itemGroups.translation = [0,40]
+    m.mainItems.wrapDividerBitmapUri = ""
+    m.mainItemsSelected.wrapDividerBitmapUri = ""
+    m.mainItems.wrapDividerHeight = 0
+    m.mainItemsSelected.wrapDividerHeight = 0
+  end if
+
   initList(m.mainItems)
 
   '//Inititate the default view
@@ -169,6 +224,8 @@ Function onEspanolDisplayChanged()
     if m.espanolContentSelect <> invalid
       m.MainContentSelect.removeChild(m.espanolContentSelect)
     end if
+
+    verticallyCenterSideNav()
   end if
 End Function
 
@@ -191,9 +248,7 @@ Function onMovieTVDisplayChanged()
       m.MainContentSelect.removeChild(m.tvContentSelect)
     end if
     
-    '//Adjust the spacing of the 3 menu lists in the side nav now that 2 menu items have been eliminated.
-    contentLayout = m.top.findNode("content")
-    contentLayout.itemSpacings = [108, 148]
+    verticallyCenterSideNav()
   end if
 End Function
 
@@ -208,23 +263,28 @@ Function onChannelsDisplayChanged()
     if m.channelsContentSelect <> invalid
       m.MainContentSelect.removeChild(m.channelsContentSelect)
     end if
+
+    verticallyCenterSideNav()
   end if
 End Function
 
 
-' The kids mode has changed, so alter the look of the icon
+' The kids mode has changed, so alter the look of the menu item
 Function onKidsModeValuesChanged()
-  bOn = m.top.kidsModeValues.featureOn <> false
-  if bOn
-    sIconTitle = m.top.kidsModeValues.title
+  if m.top.kidsModeValues.featureOn = true
+    sItemTitle = m.top.kidsModeValues.title
     bEnabled = (m.top.kidsModeValues.grayedOut = false)
     m.theme = m.global.theme
-    initListDisplay(m.topItems)
-    initListDisplay(m.bottomItems)
+
+    if getExperimentResource("roku", "roku_sidenav_espanol", false).combined <> true
+      initListDisplay(m.topItems)
+      initListDisplay(m.bottomItems)
+    end if
+
     initListDisplay(m.mainItems)
     
-    if sIconTitle <> ""
-      m.kidsModeContent.title = sIconTitle
+    if sItemTitle <> ""
+      m.kidsModeContent.title = sItemTitle
       m.kidsModeContent.turnedOn = bEnabled
       nPreviouslyFocusedIndex = m.mainItems.itemFocused
       m.mainItems.content = m.MainContent
@@ -287,24 +347,28 @@ End Function
 Function onKeyEvent(key, press) as Boolean
   if press = true
     if key = "up"
-      if m.mainItems.isInFocusChain() = true
-        m.topItems.jumpToItem = m.topItems.content.getChildCount() - 1
-        m.topItems.setFocus(true)
-      else if m.bottomItems.isInFocusChain() = true
-        m.mainItems.jumpToItem = m.mainItems.content.getChildCount() - 1
-        m.mainItems.setFocus(true)
-      else if m.topItems.isInFocusChain() = true
-        return false
+      if getExperimentResource("roku", "roku_sidenav_espanol", false).combined <> true
+        if m.mainItems.isInFocusChain() = true
+          m.topItems.jumpToItem = m.topItems.content.getChildCount() - 1
+          m.topItems.setFocus(true)
+        else if m.bottomItems.isInFocusChain() = true
+          m.mainItems.jumpToItem = m.mainItems.content.getChildCount() - 1
+          m.mainItems.setFocus(true)
+        else if m.topItems.isInFocusChain() = true
+          return false
+        end if
       end if
       return true
     else if key = "down"
-      if m.mainItems.isInFocusChain() = true
-        m.bottomItems.jumpToItem = 0
-        m.bottomItems.setFocus(true)
-      else if m.topItems.isInFocusChain() = true
-        m.mainItems.setFocus(true)
-      else if m.bottomItems.isInFocusChain() = true and m.bottomItems.itemFocused >= (m.bottomItems.getChildCount() -1)
-        return false
+      if getExperimentResource("roku", "roku_sidenav_espanol", false).combined <> true
+        if m.mainItems.isInFocusChain() = true
+          m.bottomItems.jumpToItem = 0
+          m.bottomItems.setFocus(true)
+        else if m.topItems.isInFocusChain() = true
+          m.mainItems.setFocus(true)
+        else if m.bottomItems.isInFocusChain() = true and m.bottomItems.itemFocused >= (m.bottomItems.getChildCount() -1)
+          return false
+        end if
       end if
       return true
     end if
@@ -326,14 +390,22 @@ Function onOpenedChange()
     end if
 
     fade(m.sideNavBackground, "in", 0.2)
-    fade(m.bottomItems, "in", 0.2)
+
+    if getExperimentResource("roku", "roku_sidenav_espanol", false).combined <> true
+      fade(m.bottomItems, "in", 0.2)
+    end if
+
     setContentActive(m.TopContent)
     setContentActive(m.MainContent)
     setContentActive(m.BottomContent)
     m.mainItemsSelected.visible = true
   else
     fade(m.sideNavBackground, "out", 0.2)
-    fade(m.bottomItems, "out", 0.2)
+
+    if getExperimentResource("roku", "roku_sidenav_espanol", false).combined <> true
+      fade(m.bottomItems, "out", 0.2)
+    end if
+
     setContentActive(m.TopContent, false)
     setContentActive(m.MainContent, false)
     setContentActive(m.BottomContent, false)
@@ -366,9 +438,11 @@ Function onItemRequested()
     '//Go thru the lists and select the option that matches the itemRequested
     nIndexMain = focusItemInList(m.mainItems, m.top.itemRequested)
 
-    if nIndexMain < 0
-      if focusItemInList(m.bottomItems, m.top.itemRequested) < 0
-        focusItemInList(m.topItems, m.top.itemRequested)
+    if getExperimentResource("roku", "roku_sidenav_espanol", false).combined <> true
+      if nIndexMain < 0
+        if focusItemInList(m.bottomItems, m.top.itemRequested) < 0
+          focusItemInList(m.topItems, m.top.itemRequested)
+        end if
       end if
     end if
   end if
@@ -460,4 +534,14 @@ Function onItemFocused(msg)
     list: list.id
     index: index
   }
+End Function
+
+
+Function verticallyCenterSideNav()
+  boundingRect = m.ItemGroups.boundingRect()
+  sideNavHeight = boundingRect.height
+
+  translationX = m.ItemGroups.translation[0]
+  translationY = (1080 - sideNavHeight) / 2
+  m.ItemGroups.translation = [translationX, translationY]
 End Function

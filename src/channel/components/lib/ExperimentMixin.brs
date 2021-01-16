@@ -3,7 +3,7 @@
 ' Get more info about the experiment
 ' Note: the component calling getExperimentValue using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
-Function getExperimentResource(namespaceName as string, parameterName as string, sendEvent=true as Boolean)
+Function getExperimentResource(namespaceName as string, experimentName as string, sendEvent=true as Boolean)
   oMoreInfoReturn = invalid
   
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
@@ -13,9 +13,9 @@ Function getExperimentResource(namespaceName as string, parameterName as string,
     end if
     request = TubiRequest(m.constants.settings.mode)
     experiments = TubiExperiments(m.constants)
-    oMoreInfoReturn = experiments.getExperimentResource(namespaceName, parameterName)
+    oMoreInfoReturn = experiments.getExperimentResource(namespaceName, experimentName)
     if sendEvent = true
-      sendOutExperimentTracking(namespaceName, parameterName, experiments)
+      sendOutExperimentTracking(namespaceName, experimentName, experiments)
     end if
   end if
 
@@ -26,7 +26,7 @@ End Function
 ' Note: the component calling getExperimentValue using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
 '
-Function getExperimentValue(namespaceName as string, parameterName as string, sendEvent=true as Boolean)
+Function getExperimentValue(namespaceName as string, experimentName as string, sendEvent=true as Boolean)
   experimentInfo = invalid
 
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
@@ -36,9 +36,9 @@ Function getExperimentValue(namespaceName as string, parameterName as string, se
     end if
     request = TubiRequest(m.constants.settings.mode)
     experiments = TubiExperiments(m.constants)
-    experimentInfo = experiments.getExperimentValue(namespaceName, parameterName)
+    experimentInfo = experiments.getExperimentValue(namespaceName, experimentName)
     if sendEvent = true
-      sendOutExperimentTracking(namespaceName, parameterName, experiments)
+      sendOutExperimentTracking(namespaceName, experimentName, experiments)
     end if
   end if
 
@@ -46,7 +46,7 @@ Function getExperimentValue(namespaceName as string, parameterName as string, se
 End Function
 
 
-Function sendOutExperimentTracking(namespaceName as string, parameterName as string, experiments)  
+Function sendOutExperimentTracking(namespaceName as string, experimentName as string, experiments)
   ' set up a list of experiment parameters that we've already sent exposure events for
   ' this will prevent multiple exposure events per session for the same experiment
   if m.global.exposedExperimentParameters = invalid
@@ -55,13 +55,13 @@ Function sendOutExperimentTracking(namespaceName as string, parameterName as str
   end if
 
   if m.global <> invalid and m.global.trackingLoggingTask <> invalid
-    experimentTracking = experiments.getExperimentTracking(namespaceName, parameterName)
-    if experimentTracking <> invalid and m.global.exposedExperimentParameters[parameterName] <> true
+    experimentTracking = experiments.getExperimentTracking(namespaceName, experimentName)
+    if experimentTracking <> invalid and m.global.exposedExperimentParameters[experimentName] <> true
       m.global.trackingLoggingTask.trackEvent = experimentTracking
 
       'set the parameter on the global store
       exposedExperimentParameters = m.global.exposedExperimentParameters
-      exposedExperimentParameters[parameterName] = true
+      exposedExperimentParameters[experimentName] = true
       m.global.exposedExperimentParameters = exposedExperimentParameters
     end if
   end if

@@ -40,20 +40,13 @@ Function TubiExperiments(constants) as Object
     defaultValues: {
       roku: {
       }
-      roku2: {
-      }
-      rokunamespace: {
-      }
       roku_discovery_v3 : {
       }
     }
     defaultResources: {
       roku: {
         roku_onboarding_registration : { enabled : false }
-      }
-      roku2: {
-      }
-      rokunamespace: {
+        roku_sidenav_espanol: {"combined": true}
       }
       roku_discovery_v3 : {
         roku_discovery_row_v3 : {"position" : -2, "has_tvshows" : false, "has_movies" : false}

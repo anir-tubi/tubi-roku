@@ -20,11 +20,11 @@ Function initSideNav()
   ' display Espanol, TV, Movies menu items only if the countryCode is US
   if m.constants.deviceInfo.countryCode <> "US"
     '//Tell the sideNav to stop displaying the Espanol menu item
-    m.SideNav.displayEspanol = false  
+    m.SideNav.displayEspanol = false
     '//Tell the sideNav to stop displaying the movies/TV menu items
-    m.SideNav.displayMoviesTV = false 
+    m.SideNav.displayMoviesTV = false
     '//Tell the sideNav to stop displaying the channel menu item
-    m.SideNav.displayChannels = false 
+    m.SideNav.displayChannels = false
   end if
 
   '//set the SideNav Strings by calling onSideNavSignedIn()
@@ -65,7 +65,7 @@ End Function
 
 ' Change the appearance of some side nav elements when the user data has changed
 Function onSideNavSignedIn()
-  tubiLog("onSideNavSignedIn")
+  tubiLog("SideNavHelpers.onSideNavSignedIn")
   sName = getTranslation("menu_signIn")
 
   authInfo = m.global.authInfo
