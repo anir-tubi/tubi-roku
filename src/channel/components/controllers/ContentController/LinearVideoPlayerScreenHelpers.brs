@@ -302,7 +302,7 @@ Function logMissingLinearAnalyticsUrl(content, manifestResponseLines)
   end if
 
   streamUrl = ""
-  for each line in lines
+  for each line in manifestResponseLines
     if line.left(8) = "https://"
       streamUrl = line
       exit for
