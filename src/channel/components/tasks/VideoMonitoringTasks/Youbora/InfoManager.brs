@@ -19,6 +19,48 @@ function InfoManager(plugin, options = invalid)
         return resource
     end function
 
+    this.getParsedResource = function ()
+        resource = invalid
+
+        if m.options["parse.manifest"] = true
+            resource = m.plugin.getParsedResource()
+        end if
+
+        return resource
+
+    end function
+
+    this.getTransportFormat = function ()
+        format = m.options["content.transportFormat"]
+        if format <> "TS" and format <> "MP4" then
+            format = invalid
+        end if
+
+        if format = invalid and m.options["parse.manifest"] = true
+            resource = m.plugin.getParsedResource()
+            if Instr(1,resource,".ts") > 0 then
+                format = "TS"
+            else if Instr(1,resource,".mp4") + Instr(1,resource,".m4s") > 0 then
+                format = "MP4"
+            end if
+        end if
+
+        return format
+
+    end function
+
+
+    this.getStreamingProtocol = function ()
+        protocol = m.options["content.streamingProtocol"]
+
+        if protocol <> "HDS" and protocol <> "HLS" and protocol <> "MSS"  and protocol <> "DASH" and protocol <> "RTMP" and protocol <> "RTP" and protocol <> "RTSP"
+            protocol = invalid
+        end if
+
+        return protocol
+
+    end function
+
     this.getPlayhead = function()
         playhead = m.plugin.getPlayhead()
 
@@ -77,6 +119,10 @@ function InfoManager(plugin, options = invalid)
         return rendition
     end function
 
+    this.getSubtitles = function()
+        return m.options["content.subtitles"]
+    end function
+
     this.getBitrate = function()
         bitrate = m.plugin.getBitrate()
 
@@ -97,11 +143,27 @@ function InfoManager(plugin, options = invalid)
         return throughput
     end function
 
-    this.getDeviceModel = function ()
+    this.getTotalBytes = function()
+        totalBytes = invalid
+
+        if m.options["content.sendTotalBytes"] = true
+            if m.options["content.totalBytes"] = invalid
+                totalBytes = m.plugin.getTotalBytes()
+            else
+                totalBytes =  m.options["content.totalBytes"]
+            end if
+        else
+
+        end if
+
+        return totalBytes
+    end function
+
+    this.getDeviceModel = function()
         return CreateObject("roDeviceInfo").GetModel()
     end function
 
-    this.getDeviceIdFromHardware = function ()
+    this.getDeviceIdFromHardware = function()
         hardwareModel = CreateObject("roDeviceInfo").GetModel()
 
         'Mapping
@@ -364,6 +426,46 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
     'Now is mandatory for EVERY request
     if outParams.DoesExist("accountCode") = false then outParams["accountCode"] = m.options["accountCode"]
 
+    'For requests that create a view or a session
+    if requestName = "start" or requestName = "error" or requestName = "sessionStart"
+        if outParams.DoesExist("username") = false
+            if m.options["user.name"] = invalid
+                outParams["username"] = m.options["username"]
+            else
+                outParams["username"] = m.options["user.name"]
+            end if
+        end if
+        if outParams.DoesExist("email") = false then outParams["email"] = m.options["user.email"]
+        if outParams.DoesExist("obfuscateIp") = false then outParams["obfuscateIp"] = m.options["user.obfuscateIp"]
+        if outParams.DoesExist("userType") = false
+            if m.options["user.type"] = invalid
+                outParams["userType"] = m.options["userType"]
+            else
+                outParams["userType"] = m.options["user.type"]
+            end if
+        end if
+        if outParams.DoesExist("anonymousUser") = false
+            if m.options["user.anonymousId"] = invalid
+                outParams["anonymousUser"] = m.options["anonymousUser"]
+            else
+                outParams["anonymousUser"] = m.options["user.anonymousId"]
+            end if
+        end if
+        if outParams.DoesExist("deviceId") = false then outParams["deviceId"] = m.options["device.code"]
+        'If no forced deviceId, get it from the device itself
+        if outParams["deviceId"] = invalid
+            outParams["deviceId"] = m.getDeviceIdFromHardware()
+        end if
+        if outParams.DoesExist("deviceInfo") = false then outParams["deviceInfo"] = m.getDeviceInfo()
+        'if outParams.DoesExist("deviceInfo") = false then outParams["deviceInfo"] = {"model":m.getDeviceModel()}
+        'Network
+        if outParams.DoesExist("isp") = false then outParams["isp"] = m.options["network.isp"]
+        if outParams.DoesExist("ip") = false then outParams["ip"] = m.options["network.ip"]
+        'App
+        if outParams.DoesExist("appName") = false then outParams["appName"] = m.options["app.name"]
+        if outParams.DoesExist("appReleaseVersion") = false then outParams["appReleaseVersion"] = m.options["app.releaseVersion"]
+    end if
+
     if requestName = "data"
         if outParams.DoesExist("system") = false then outParams["system"] = m.options["accountCode"]
         if outParams.DoesExist("pluginName") = false then outParams["pluginName"] = m.plugin.getPluginName()
@@ -374,36 +476,17 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         ' Params
         if outParams.DoesExist("system") = false then outParams["system"] = m.options["accountCode"]
         if outParams.DoesExist("player") = false then outParams["player"] = m.plugin.getPluginName()
-        if outParams.DoesExist("username") = false
-            if m.options["user.name"] = invalid
-                outParams["username"] = m.options["username"]
-            else
-                outParams["username"] = m.options["user.name"]
-            end if
-        end if
-        if outParams.DoesExist("email") = false then outParams["email"] = m.options["user.email"]
-        if outParams.DoesExist("obfuscateIp") = false then outParams["obfuscateIp"] = m.options["user.obfuscateIp"]
-        if outParams.DoesExist("userType") = false then outParams["user.type"] = m.options["user.email"]
-        if outParams.DoesExist("anonymousUser") = false
-            if m.options["user.anonymousId"] = invalid
-                outParams["anonymousUser"] = m.options["anonymousUser"]
-            else
-                outParams["anonymousUser"] = m.options["user.anonymousId"]
-            end if
-        end if
+
         if outParams.DoesExist("transactionCode") = false then outParams["transactionCode"] = m.options["content.transactionCode"]
-        if outParams.DoesExist("deviceId") = false then outParams["deviceId"] = m.options["device.code"]
-        'If no forced deviceId, get it from the device itself
-        if outParams["deviceId"] = invalid
-            outParams["deviceId"] = m.getDeviceIdFromHardware()
-        end if
-        if outParams.DoesExist("deviceInfo") = false then outParams["deviceInfo"] = m.getDeviceInfo()
-        'if outParams.DoesExist("deviceInfo") = false then outParams["deviceInfo"] = {"model":m.getDeviceModel()}
+
         'Plugin versioning
         if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
         if outParams.DoesExist("playerVersion") = false then outParams["playerVersion"] = m.plugin.getPlayerVersion()
         'Media
         if outParams.DoesExist("mediaResource") = false then outParams["mediaResource"] = m.getResource()
+        if outParams.DoesExist("parsedResource") = false then outParams["parsedResource"] = m.getParsedResource()
+        if outParams.DoesExist("streamingProtocol") = false then outParams["streamingProtocol"] = m.getStreamingProtocol()
+        if outParams.DoesExist("transportFormat") = false then outParams["transportFormat"] = m.getTransportFormat()
         if outParams.DoesExist("mediaDuration") = false then outParams["mediaDuration"] = m.getMediaDuration()
         if outParams.DoesExist("live") = false then outParams["live"] = m.getIsLive()
         if outParams.DoesExist("rendition") = false then outParams["rendition"] = m.getRendition()
@@ -411,7 +494,6 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("properties") = false then outParams["properties"] = m.options["content.metadata"]
         if outParams.DoesExist("cdn") = false then outParams["cdn"] = m.options["content.cdn"]
         if outParams.DoesExist("program") = false then outParams["program"] = m.options["content.program"]
-
         if outParams.DoesExist("package") = false then outParams["package"] = m.options["content.package"]
         if outParams.DoesExist("saga") = false then outParams["saga"] = m.options["content.saga"]
         if outParams.DoesExist("tvshow") = false then outParams["tvshow"] = m.options["content.tvShow"]
@@ -424,7 +506,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("contentType") = false then outParams["contentType"] = m.options["content.type"]
         if outParams.DoesExist("genre") = false then outParams["genre"] = m.options["content.genre"]
         if outParams.DoesExist("contentLanguage") = false then outParams["contentLanguage"] = m.options["content.language"]
-        if outParams.DoesExist("subtitles") = false then outParams["subtitles"] = m.options["content.subtitles"]
+        if outParams.DoesExist("subtitles") = false then outParams["subtitles"] = m.getSubtitles()
         if outParams.DoesExist("contractedResolution") = false then outParams["contractedResolution"] = m.options["content.contractedResolution"]
         if outParams.DoesExist("cost") = false then outParams["cost"] = m.options["content.cost"]
         if outParams.DoesExist("price") = false then outParams["price"] = m.options["content.price"]
@@ -435,18 +517,12 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("codecSettings") = false then outParams["codecSettings"] = m.options["content.encoding.codecSettings"]
         if outParams.DoesExist("codecProfile") = false then outParams["codecProfile"] = m.options["content.encoding.codecProfile"]
         if outParams.DoesExist("containerFormat") = false then outParams["containerFormat"] = m.options["content.encoding.containerFormat"]
-        'Network
-        if outParams.DoesExist("isp") = false then outParams["isp"] = m.options["network.isp"]
-        if outParams.DoesExist("ip") = false then outParams["ip"] = m.options["network.ip"]
-        'App
-        if outParams.DoesExist("appName") = false then outParams["appName"] = m.options["app.name"]
-        if outParams.DoesExist("appReleaseVersion") = false then outParams["appReleaseVersion"] = m.options["app.releaseVersion"]
         'Extra params
         nextraparams = 20
         index = 1
         while (index <= nextraparams)
             optionKey = "extraparam." + index.ToStr()
-            paramKey = "param"+index.ToStr()
+            paramKey = "param" + index.ToStr()
             optionCustomDimensionKey = "content.customDimension." + index.ToStr()
             paramValue = m.options[optionKey]
             if m.options[optionKey] = invalid then paramValue = m.options[optionCustomDimensionKey]
@@ -464,18 +540,18 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
 
     else if requestName = "join"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
-        if outParams.DoesExist("mediaDuration") = false then outParams["mediaDuration"] = m.getMediaDuration()
     else if requestName = "pause"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
     else if requestName = "resume"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
     else if requestName = "stop"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = "-1"
+        if outParams.DoesExist("totalBytes") = false then outParams["totalBytes"] = m.getTotalBytes()
     else if requestName = "ping"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         if outParams.DoesExist("bitrate") = false then outParams["bitrate"] = m.getBitrate()
         if outParams.DoesExist("throughput") = false then outParams["throughput"] = m.getThroughput()
-
+        if outParams.DoesExist("totalBytes") = false then outParams["totalBytes"] = m.getTotalBytes()
     else if requestName = "bufferEnd"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         'Avoid sending a playhead of 0
@@ -486,21 +562,23 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
     else if requestName = "adStart" or requestName = "adInit"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
-        if outParams.DoesExist("adPosition") = false then outParams["adPosition"] = m.getAdPosition()
+        if outParams.DoesExist("position") = false then outParams["position"] = m.getAdPosition()
         if outParams.DoesExist("adResource") = false then outParams["adResource"] = m.options["ad.resource"]
         if outParams.DoesExist("adCampaign") = false then outParams["adCampaign"] = m.options["ad.campaign"]
         if outParams.DoesExist("adTitle") = false then outParams["adTitle"] = m.options["ad.title"]
+        if outParams.DoesExist("adCreativeId") = false then outParams["adCreativeId"] = m.options["ad.creativeId"]
+        if outParams.DoesExist("adProvider") = false then outParams["adProvider"] = m.options["ad.provider"]
         if outParams.DoesExist("adProperties") = false then outParams["adProperties"] = m.options["ad.metadata"]
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.3 Roku Adnalyzer"
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.11 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1
         while (index <= nextraparams)
             optionKey = "ad.extraparam." + index.ToStr()
-            paramKey = "extraparam"+index.ToStr()
+            paramKey = "extraparam" + index.ToStr()
             optionCustomDimensionKey = "ad.customDimension." + index.ToStr()
             paramValue = m.options[optionKey]
             if m.options[optionKey] = invalid then paramValue = m.options[optionCustomDimensionKey]
@@ -527,11 +605,11 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
-        if outParams.DoesExist("adPosition") = false then outParams["adPosition"] = m.getAdPosition()
+        if outParams.DoesExist("position") = false then outParams["position"] = m.getAdPosition()
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
     else if requestName = "adError"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
-        if outParams.DoesExist("adPosition") = false then outParams["adPosition"] = m.getAdPosition()
+        if outParams.DoesExist("position") = false then outParams["position"] = m.getAdPosition()
         if outParams.DoesExist("adResource") = false then outParams["adResource"] = m.options["ad.resource"]
         if outParams.DoesExist("adCampaign") = false then outParams["adCampaign"] = m.options["ad.campaign"]
         if outParams.DoesExist("adTitle") = false then outParams["adTitle"] = m.options["ad.title"]
@@ -539,24 +617,82 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
-    else if requestName = "sessionStart"
-        if outParams.DoesExist("username") = false
-            if m.options["user.name"] = invalid
-                outParams["username"] = m.options["username"]
-            else
-                outParams["username"] = m.options["user.name"]
+    else if requestName = "adBreakStart"
+        if outParams.DoesExist("givenAds") = false then outParams["givenAds"] = m.options["ad.givenAds"]
+        if outParams.DoesExist("position") = false then outParams["position"] = m.getAdPosition()
+        if outParams.DoesExist("expectedAds") = false
+            if m.options["ad.expectedPattern"] <> invalid
+                if type(m.options["ad.expectedPattern"]) = "roAssociativeArray"
+                    array = CreateObject("roArray", 0, true)
+                    if m.options["ad.expectedPattern"]["pre"] <> invalid
+                        if type(m.options["ad.expectedPattern"]["pre"]) = "roArray"
+                            array.Append(m.options["ad.expectedPattern"]["pre"])
+                        else
+                            YouboraLog("Values inside ad.expectedPattern must be arrays")
+                        end if
+                    end if
+                    if m.options["ad.expectedPattern"]["mid"] <> invalid
+                        if type(m.options["ad.expectedPattern"]["mid"]) = "roArray"
+                            array.Append(m.options["ad.expectedPattern"]["mid"])
+                        else
+                            YouboraLog("Values inside ad.expectedPattern must be arrays")
+                        end if
+                    end if
+                    if m.options["ad.expectedPattern"]["post"] <> invalid
+                        if type(m.options["ad.expectedPattern"]["post"]) = "roArray"
+                            array.Append(m.options["ad.expectedPattern"]["post"])
+                        else
+                            YouboraLog("Values inside ad.expectedPattern must be arrays")
+                        end if
+                    end if
+                    if array[outParams["breakNumber"]] <> invalid
+                        outParams["expectedAds"] = array[outParams["breakNumber"]] 
+                    end if
+                end if
             end if
         end if
+    else if requestName = "adManifest"
+        if outParams.DoesExist("givenBreaks") = false then outParams["givenBreaks"] = m.options["ad.givenBreaks"]
+        if outParams.DoesExist("breaksTime") = false then outParams["breaksTime"] = m.options["ad.breaksTime"]
+        if m.options["ad.expectedBreaks"] <> invalid
+            outParams["expectedBreaks"] = m.options["ad.expectedBreaks"]
+        else if m.options["ad.expectedPattern"] <> invalid
+            if type(m.options["ad.expectedPattern"]) = "roAssociativeArray"
+                length = 0
+                if m.options["ad.expectedPattern"]["pre"] <> invalid
+                    if type(m.options["ad.expectedPattern"]["pre"]) = "roArray"
+                        length = length + m.options["ad.expectedPattern"]["pre"].Count()
+                    else
+                        YouboraLog("Values inside ad.expectedPattern must be arrays")
+                    end if
+                endif
+                if m.options["ad.expectedPattern"]["mid"] <> invalid
+                    if type(m.options["ad.expectedPattern"]["mid"]) = "roArray"
+                        length = length + m.options["ad.expectedPattern"]["mid"].Count()
+                    else
+                        YouboraLog("Values inside ad.expectedPattern must be arrays")
+                    end if
+                endif
+                if m.options["ad.expectedPattern"]["post"] <> invalid
+                    if type(m.options["ad.expectedPattern"]["post"]) = "roArray"
+                        length = length + m.options["ad.expectedPattern"]["post"].Count()
+                    else
+                        YouboraLog("Values inside ad.expectedPattern must be arrays")
+                    end if
+                endif
+                outParams["expectedBreaks"] = length
+            endif
+        endif
+        if outParams.DoesExist("expectedPattern") = false then outParams["expectedPattern"] = m.options["ad.expectedPattern"]
+    else if requestName = "sessionStart"
         if outParams.DoesExist("navContext") = false then outParams["navContext"] = "RokuPlugin"
         if outParams.DoesExist("pluginName") = false then outParams["pluginName"] = m.plugin.getPluginName()
         if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
-        if outParams.DoesExist("appName") = false then outParams["appName"] = m.options["app.name"]
-        if outParams.DoesExist("appReleaseVersion") = false then outParams["appReleaseVersion"] = m.options["app.releaseVersion"]
         nextraparams = 20
         index = 1
         while (index <= nextraparams)
             optionKey = "extraparam." + index.ToStr()
-            paramKey = "param"+index.ToStr()
+            paramKey = "param" + index.ToStr()
             optionCustomDimensionKey = "content.customDimension." + index.ToStr()
             paramValue = m.options[optionKey]
             if m.options[optionKey] = invalid then paramValue = m.options[optionCustomDimensionKey]

@@ -142,7 +142,7 @@ sub sendRequest(service, args = Invalid)
 	if args = Invalid
 		args = {}
 	endif
-    YouboraLog("Service: " + service)
+  YouboraLog("Service: " + service)
 	'Remove code
 	args.delete("code")
 	
@@ -188,6 +188,10 @@ sub processRequests()
 
 				if req.service = "/start" OR req.service = "/init" OR req.service = "/ping" OR req.service = "/error"
 					req.args["sessionParent"] = getSessionRoot() 'Since we won't have parent we use the same code as root
+				endif
+
+				if req.service = "/start" OR req.service = "/init" OR req.service = "/error"
+					req.args["parentId"] = req.args["sessionRoot"]
 				endif
 
 				if (req.service = "/infinity/session/start" OR req.service = "/infinity/session/stop" OR req.service = "/infinity/session/nav" OR req.service = "/infinity/session/event" OR req.service = "/infinity/session/beat")

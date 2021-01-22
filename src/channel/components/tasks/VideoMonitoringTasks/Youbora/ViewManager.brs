@@ -21,6 +21,7 @@ function ViewManager(_infoManager as Object, plugin) As Object
 	this.isAdJoinSent = false
 	this.isAdInitiated = false
 	this.isAdBreakStarted = false
+	this.isAdManifestSent = false
 
 	this.isFinished = false
 
@@ -233,12 +234,18 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 		rendition = m.infoManager.getRendition()
 		metrics = m.infoManager.getVideoMetrics()
+		subtitles = m.infoManager.getSubtitles()
 
 		changedEntities = {}
 
 		if rendition <> Invalid and rendition <> m.lastRendition
 			m.lastRendition = rendition
 			changedEntities["rendition"] = m.lastRendition
+		endif
+
+		if subtitles <> Invalid and subtitles <> m.lastSubtitles
+			m.lastSubtitles = subtitles
+			changedEntities["subtitles"] = m.lastSubtitles
 		endif
 
 		if metrics <> Invalid and CompareAA(metrics, m.lastMetrics) = false
@@ -433,6 +440,11 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
         m.com.request = {service: "/adError", args:params}
         YouboraLog("Request: NQS /adError")
+  else if req = "adManifest" AND m.isAdManifestSent = false
+		m.isAdManifestSent = true
+		params = m.infoManager.getRequestParams("adManifest", params)
+		m.com.request = {service: "/adManifest", args:params}
+		YouboraLog("Request: NQS /adManifest")
 
 	else if req = "adBreakStart" AND m.isAdBreakStarted = false
 		m.isAdBreakStarted = true

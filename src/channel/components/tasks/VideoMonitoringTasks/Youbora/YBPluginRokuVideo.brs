@@ -9,23 +9,30 @@ end sub
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.5.3-" + m.pluginName
+    m.pluginVersion = "6.5.11-" + m.pluginName
 
     ' Let's cache the segment used on the bitrate to access less to it
     m.bitrateSegment = invalid
     ' Cache the streamInfo too, to use with throughtput and resource
     m.streamInfo = invalid
-    if m.top.videoplayer <> invalid 
-        m.top.videoplayer.ObserveField("state", m.port)
-        m.top.videoplayer.ObserveField("bufferingStatus", m.port)
+    ' Summ of all downloaded chunks
+    m.totalBytes = 0
+    ' Last chunk's position, mainly to avoid adding a repeated chunk
+    m.lastChunkSeqNum = -1
+    if m.top.videoplayer <> invalid
+        m.top.videoplayer.observeFieldScoped("state", m.port)
+        m.top.videoplayer.observeFieldScoped("bufferingStatus", m.port)
+        m.top.videoplayer.observeFieldScoped("downloadedSegment", m.port)
+    else
+        m.top.observeFieldScoped("videoplayer", m.port)
     end if
-    
-    'm.top.ObserveField("taskState", m.port)
-    m.top.ObserveField("taskState", "_taskListener")
-    m.top.ObserveField("videoPlayer", m.port)
+
+    m.top.observeFieldScoped("taskState", m.port)
+    'm.top.ObserveField("taskState", "_taskListener")
 
     ' Notify monitoring startup
     m.top.monitoring = true
+    m.needsPlayer = true
 end sub
 
 function onBufferingStatusChanged(bufferStatus) as void
@@ -48,13 +55,13 @@ function onBufferingStatusChanged(bufferStatus) as void
             else
                 eventHandler("resume")
                 eventHandler("buffering")
-            endif
-        endif
-    endif
+            end if
+        end if
+    end if
 
 end function
 
-sub processPlayerState(newState as String)
+sub processPlayerState(newState as string)
 
     YouboraLog("Player state: " + newState)
 
@@ -64,20 +71,20 @@ sub processPlayerState(newState as String)
         else
             eventHandler("resume")
             eventHandler("seeking")
-        endif
+        end if
     else if newState = "playing"
         'if m.viewManager.isStartSent = true
-            if m.viewManager.isJoinSent = false
-                eventHandler("join")
-            else if m.viewManager.isPaused = true
-                eventHandler("resume")
-            endif
+        if m.viewManager.isJoinSent = false
+            eventHandler("join")
+        else if m.viewManager.isPaused = true
+            eventHandler("resume")
+        end if
 
-            if m.viewManager.isBuffering = true
-                eventHandler("buffered")
-            else if m.viewManager.isSeeking = true
-                eventHandler("seeked")
-            endif
+        if m.viewManager.isBuffering = true
+            eventHandler("buffered")
+        else if m.viewManager.isSeeking = true
+            eventHandler("seeked")
+        end if
         'endif
     else if newState = "stopped"
         'Sometimes when playing an HLS Live stream, the Video player
@@ -92,7 +99,18 @@ sub processPlayerState(newState as String)
         '     YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
         ' endif
     else if newState = "error"
-        eventHandler("error", {"msg":m.top.videoplayer.errorMsg, "errorCode":m.top.videoplayer.errorCode.ToStr()})
+        params = { "msg": m.top.videoplayer.errorMsg, "errorCode": m.top.videoplayer.errorCode.ToStr() }
+        if m.top.videoplayer.errorStr <> invalid
+            errormd = m.top.videoplayer.errorStr
+            if m.top.videoplayer.errorinfo <> invalid
+                if m.top.videoplayer.errorInfo.clipid <> invalid then errormd += ",clip_id:" + m.top.videoplayer.errorInfo.clipid.ToStr()
+                if m.top.videoplayer.errorInfo.ignored <> invalid then errormd += ",ignored:" + m.top.videoplayer.errorInfo.ignored.ToStr()
+                if m.top.videoplayer.errorInfo.source <> invalid then errormd += ",source:" + m.top.videoplayer.errorInfo.source
+                if m.top.videoplayer.errorInfo.category <> invalid then errormd += ",category:" + m.top.videoplayer.errorInfo.category
+            end if
+            params["metadata"] = errormd
+        end if
+        eventHandler("error", params)
     else if newState = "paused"
         eventHandler("pause")
     else if newState = "finished"
@@ -101,8 +119,8 @@ sub processPlayerState(newState as String)
             eventHandler("stop")
         else
             YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
-        endif
-    endif
+        end if
+    end if
 end sub
 
 'Overriden parent method
@@ -116,36 +134,62 @@ sub processMessage(msg, port)
         else if msg.getField() = "bufferingStatus"
             bufferStatus = msg.getData()
             onBufferingStatusChanged(bufferStatus)
-        else if msg.getField() = "videoPlayer"
+        else if msg.getField() = "videoplayer" AND m.needsPlayer = true
+            m.needsPlayer = false
+            m.top.unobserveFieldScoped("videoplayer")
             setNewPlayer(["state", "bufferingStatus"])
-            m.top.unobserveFieldScoped("videoPlayer")
-        endif
-    endif
+        else if msg.getField() = "downloadedSegment"
+            downloadedSegment = msg.getData()
+            if downloadedSegment <> invalid
+                if downloadedSegment.Status = 0 AND (downloadedSegment.SegType = 0 OR downloadedSegment.SegType = 1 OR downloadedSegment.SegType = 2) AND m.lastChunkSeqNum <> downloadedSegment.Sequence
+                    m.totalBytes =  m.totalBytes + downloadedSegment.SegSize
+                endif
+            endif
+        else if msg.getField() = "taskState"
+            _taskListener(msg.getData())
+        end if
+    end if
 
 end sub
 
 sub setNewPlayer(taskFields)
-    for each field in taskFields
-        m.top.videoplayer.ObserveField(field,m.port)
-    end for
+    m.top.videoplayer.observeFieldScoped("state", m.port)
+    m.top.videoplayer.observeFieldScoped("bufferingStatus", m.port)
+    m.top.videoplayer.observeFieldScoped("downloadedSegment", m.port)
+    ' for each field in taskFields
+    '     m.top.videoplayer.observeFieldScoped(field, m.port)
+    ' end for
 end sub
 
 'Info methods
 function getResource()
 
-    'stop
     resource = "unknown"
 
     if m.contentUrl = invalid
-            'Get it from the informed url by the client
-            content = m.top.videoplayer.content
-            if content <> invalid
-                resource = content.URL
-                m.contentUrl = resource
-            endif
+        'Get it from the informed url by the client
+        content = m.top.videoplayer.content
+        if content <> invalid
+            resource = content.URL
+            m.contentUrl = resource
+        end if
     else
         resource = m.contentUrl
     end if
+
+    return resource
+
+end function
+
+function getParsedResource()
+
+    resource = invalid
+
+    'This is only for segmented video transports (dash, hls)
+    ssegment = m.top.videoplayer.streamingSegment
+    if ssegment <> invalid
+        resource = ssegment.segUrl
+    endif
 
     return resource
 
@@ -156,7 +200,7 @@ function getMediaDuration()
 
     if duration = invalid
         duration = 0
-    endif
+    end if
 
     return duration
 end function
@@ -165,7 +209,7 @@ function getPlayhead()
     if m.viewManager.isJoinSent = true
         return m.top.videoplayer.position
     else
-       return 0
+        return 0
     end if
 end function
 
@@ -176,7 +220,7 @@ function getTitle()
         title = content.TITLE
     else
         title = invalid
-    endif
+    end if
 
     return title
 
@@ -203,7 +247,7 @@ function getThroughput()
         throughput = m.streamInfo.measuredBitrate
     else
         throughput = invalid
-    endif
+    end if
     return throughput
 end function
 
@@ -214,7 +258,7 @@ function getBitrate()
         br = m.bitrateSegment.segBitrateBps
     else
         br = -1
-    endif
+    end if
     return br
 end function
 
@@ -225,27 +269,44 @@ function getRendition()
         if rendition < 1000
             rendition = rendition.ToStr() + "bps"
         else if rendition < 1000000
-            rendition = (rendition/1000).ToStr() + "Kbps"
+            rendition = (rendition / 1000).ToStr() + "Kbps"
         else
             rendAux = rendition / 1000000.0 'Divide by mega
             rendAux = Cint(rendAux * 100) / 100.0
             rendition = rendAux.ToStr() + "Mbps"
-        endif
+        end if
     else
         rendition = invalid
-    endif
+    end if
     return rendition
+end function
+
+function getTotalBytes()
+    ' downloadedSegment = m.top.videoplayer.downloadedSegment
+    ' if downloadedSegment <> invalid
+    '     ?"download segment";downloadedSegment
+    '     if downloadedSegment.Status = 0 AND (downloadedSegment.SegType = 1 OR downloadedSegment.SegType = 2) AND lastChunkSeqNum <> downloadedSegment.Sequence
+    '         totalBytes = totalBytes + downloadedSegment.SegSize
+    '     endif
+    ' endif
+    return m.totalBytes
 end function
 
 function getPlayerVersion()
     return "Roku-Video"
 end function
 
-sub _taskListener()
-    if m.top.taskState = "stop"
+sub _taskListener(state)
+    if state = "stop"
         m.top.videoplayer.unobserveFieldScoped("state")
         m.top.videoplayer.unobserveFieldScoped("bufferingStatus")
+        m.top.videoplayer.unobserveFieldScoped("downloadedSegment")
+        'm.top.videoplayer = invalid
+        m.needsPlayer = true
+        m.top.observeFieldScoped("videoplayer", m.port)
         m.contentUrl = invalid
         m.top.monitoring = false
+        m.viewManager.isFinished = false
+        m.top.taskState = "" 'This is necessary since if the last reported state has been stop and is reported again it won't get notified, since the value hasn't changed
     end if
 end sub
