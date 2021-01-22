@@ -40,6 +40,7 @@ Function cmsApi_commonOptions()
       "platform": m.constants.platform
       "device_id": m.constants.deviceInfo.deviceId
     }
+    headers: {}
   }
 End Function
 
@@ -255,24 +256,17 @@ Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode 
   end if
 
   options = m.commonOptions()
-  options.params["isKidsMode"] = bKidsMode
-  options.params["includeChannels"] = true
-  options.params["includeVideoInGrid"] = true
-  options.params["expand"] = 1
-  options.params["cursor"] = 0
-  options.params["limit"] = limit
-
-  ' add custom linear content header for linear content
-  if categoryId = m.constants.ui.categoryIds.liveNews
-    if options.headers = invalid
-      options.headers = {}
-    end if
-    options.headers["x-tubi-inject-live-news"] = "true"
-  end if
+  params = options.params
+  params["isKidsMode"] = bKidsMode
+  params["includeChannels"] = true
+  params["includeVideoInGrid"] = true
+  params["expand"] = 1
+  params["cursor"] = 0
+  params["limit"] = limit
 
   if passedOptions.params <> invalid
     if passedOptions.params.contentMode <> invalid and passedOptions.params.contentMode <> ""
-      options.params["contentMode"] = passedOptions.params.contentMode
+      params["contentMode"] = passedOptions.params.contentMode
     end if
   end if
 
@@ -281,7 +275,37 @@ Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode 
     "landscape"
     "large_vitg"
   ]
-  options.params = m.setImageParams(imageParamTypes, options.params)
+  params = m.setImageParams(imageParamTypes, params)
+
+  headers = options.headers
+
+  headers["x-tubi-inject-live-news"] = "false"
+  if passedOptions <> invalid and passedOptions.params <> invalid
+    contentMode = passedOptions.params.contentMode
+
+    if contentMode = m.constants.ui.contentMode.homescreen or contentMode = m.constants.ui.contentMode.news
+      ' add custom linear content header for all homescreen or news category fetches
+      ' per a request from back end team, in order to facilitate better caching.
+      headers["x-tubi-inject-live-news"] = "true"
+    end if
+  end if
+
+  if passedOptions <> invalid
+    if passedOptions.params <> invalid
+      params.append(passedOptions.params)
+    end if
+
+    if passedOptions.headers <> invalid
+      headers.append(passedOptions.headers)
+    end if
+  end if
+
+  if passedOptions <> invalid
+    options.append(passedOptions)
+  end if
+
+  options.params = params
+  options.headers = headers
 
   return m.createAuthRequest(url, name, options)
 End Function
