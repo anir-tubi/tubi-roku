@@ -9,9 +9,11 @@ Function CmsApi(constants, request, auth)
 
     ' public
     relatedContentReq: cmsApi_getRelatedContentRequest
+    relatedContentReqInfo: cmsApi_getRelatedContentRequestInfo
     upNextContentReq: cmsApi_getUpNextContentRequest
     getUpNextContentRequestInfo: cmsApi_getUpNextContentRequestInfo
     singleContentReq: cmsApi_getSingleContentRequest
+    singleContentReqInfo: cmsApi_getSingleContentRequestInfo
     thumbnailsReq: cmsApi_getThumbnailsRequest
     thumbnailsReqInfo: cmsApi_getThumbnailsRequestInfo
     channelReq: cmsApi_getChannelRequest
@@ -54,6 +56,21 @@ Function cmsApi_getRelatedContentRequest(contentId, bKidsMode = false)
   options.params = m.setTupianPosterParam(options.params)
 
   return m.createAuthRequest(url, m.constants.reqNames.getRelatedContent, options)
+End Function
+
+
+Function cmsApi_getRelatedContentRequestInfo(contentId, bKidsMode = false)
+  url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
+
+  options = m.commonOptions()
+  options.params["isKidsMode"] = bKidsMode
+  options.params["video_resources"] = m.constants.player.drmOrder
+  options.params = m.setTupianPosterParam(options.params)
+
+  return {
+    url: url
+    options: options
+  }
 End Function
 
 
@@ -107,6 +124,22 @@ Function cmsApi_getSingleContentRequest(contentId, includeChannels=false, bKidsM
   options.params = m.setTupianLandscapeParam(options.params) 'used on episode list screens
 
   return m.createAuthRequest(url, m.constants.reqNames.getSingleContent, options)
+End Function
+
+
+Function cmsApi_getSingleContentRequestInfo(contentId, includeChannels=false, bKidsMode = false)
+  options = m.commonOptions()
+  options.params["content_id"] = contentId
+  options.params["isKidsMode"] = bKidsMode
+  options.params["includeChannels"] = includeChannels
+  options.params["video_resources"] = m.constants.player.drmOrder
+  options.params["gn_fields"] = "tms_id"  'request the Gracenote id
+  options.params = m.setTupianLandscapeParam(options.params)
+
+  return {
+    url: m.constants.urls.cms.singleContent
+    options: options
+  }
 End Function
 
 

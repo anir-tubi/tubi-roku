@@ -58,6 +58,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true)
     
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
     getSingleContentFromServer(detailScreen, content, sendTrackingOnResponse)
+    getRelatedContent(content)
   else
     ' TODO: Refer to logs to determine if it's necessary to show a modal in this instance informing the user to press the back
     ' back button. We shouldn't end up with an invalid content, but as of 11/25/18 there are crash logs
@@ -68,11 +69,13 @@ Function showDetailScreen(content, sendTrackingOnResponse = true)
   end if
 End Function
 
+
 Function setDetailStrings(screen)
   screen.stringQueueButton = getTranslation("screenDetails_button_queue")
   screen.stringNoQueueButton = getTranslation("screenDetails_button_NoQueue")
   screen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
 End Function
+
 
 Function onDetailBackgroundChange(msg)
   tubiLog("DetailScreenHelpers.onDetailBackgroundChange")
@@ -252,34 +255,22 @@ End Function
 Function getSingleContentFromServer(screen, content, trackOnResponse)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
   if content <> invalid
-    request = {
-      contentId: content.id
-      getRelated: false
-      kidsMode: shouldKidsModeBeSentToServer()
-      getContent: true
-    }
-
-    ' get related (You May Also Like) content along with metadata for the content
-    if content.relatedContent = invalid
-      request.getRelated = true
-    end if
-
-    callbackName = "onSingleContentResponseWithTracking"
-    errorCallbackName = "onSingleContentErrorWithTracking"
+    successCallback = onSingleContentResponseWithTracking
+    errorCallback = onSingleContentErrorWithTracking
     if trackOnResponse = false
-      callbackName = "onSingleContentResponseWithoutTracking"
-      errorCallbackName = "onSingleContentErrorWithoutTracking"
+      successCallback = onSingleContentResponseWithoutTracking
+      errorCallback = onSingleContentErrorWithoutTracking
     end if
 
-    refreshTask = CreateObject("roSGNode", "DetailMetadataTask")
-    refreshTask.request = request
-    refreshTask.addField("target", "node", false)
-    refreshTask.target = screen
-    screen.addField("task", "node", false)
-    screen.task = refreshTask
-    refreshTask.observeField("response", callbackName)
-    refreshTask.observeField("error", errorCallbackName)
-    refreshTask.control = "RUN"
+    singleRequestInfo = m.cmsApi.singleContentReqInfo(content.id, true, shouldKidsModeBeSentToServer())
+    m.makeRequest({
+      url: singleRequestInfo.url
+      requestType: m.constants.reqNames.getSingleContent
+      options: singleRequestInfo.options
+      successCallback: successCallback
+      errorCallback: errorCallback
+      responseType: "node"
+    })
   end if
 End Function
 
@@ -294,241 +285,237 @@ Function getSingleContentFromServerRetry(params)
 End Function
 
 
-Function onSingleContentResponseWithTracking(msg)
-  handleSingleContentResponse(msg, true)
+Function onSingleContentResponseWithTracking(singleContent)
+  handleSingleContentResponse(singleContent, true)
 End Function
 
 
-Function onSingleContentResponseWithoutTracking(msg)
-  handleSingleContentResponse(msg, false)
+Function onSingleContentResponseWithoutTracking(singleContent)
+  handleSingleContentResponse(singleContent, false)
 End Function
 
 
-' @withTracking: boolean, indicates if NavigateToPage and PageLoad events should be triggered from this function
-Function handleSingleContentResponse(msg, sendTracking = true) As Void
+' @refreshedContent: ContentNode, a contentNode for a single piece of content, can be video or series
+' @sendTracking: boolean, indicates if NavigateToPage and PageLoad events should be triggered from this function
+Function handleSingleContentResponse(refreshedContent, sendTracking = true) As Void
   tubiLog("DetailScreenHelpers.handleSingleContentResponse")
-  task = msg.getRoSGNode()
-  detailScreen = task.target
-  detailScreen.contentFetchError = false
-  detailScreen.task = invalid
+  detailScreen = getTopDetailScreenFromStack()
 
-  task.unobserveField("response")
-  task.unobserveField("error")
+  if detailScreen <> invalid and detailScreen.content.id = refreshedContent.id
+    detailScreen.contentFetchError = false
 
-  ' Replace the top of the detail screen content stack with the refreshed content
-  refreshedContent = msg.GetData()
-  oldContent = detailScreen.content
-  afterFn = invalid  ' the Function to execute once we've sorted the detail screen out
-  history = m.global.historyIds.findNode(refreshedContent.id)
+    ' Replace the top of the detail screen content stack with the refreshed content
+    oldContent = detailScreen.content
+    afterFn = invalid  ' the Function to execute once we've sorted the detail screen out
+    history = m.global.historyIds.findNode(refreshedContent.id)
 
-  if m.deepLinkContent <> invalid
-    if m.deepLinkContent.nowPos = 0 and history <> invalid and history.nowPos > 0
-     ' Use the deeplink content's history to resume a deeplinked video if a resumeTime parameter wasn't sent in as part of the deeplink
-      m.deepLinkContent.nowPos = history.nowPos
-    end if
-
-    if m.deepLinkContent.deeplinkType = "series" and refreshedContent.type = m.constants.ui.contentTypes.series
-      '  refreshedContent.id:       series id
-      '  refreshedContent.seriesId: invalid
-      '  refreshedContent.type:     series
-      '  m.deepLinkContent.deepLinkType: series
-
-      ' As of spring 2018 (firmware 8.1), "series" media types are valid and
-      ' will have a content id of an episode, not the series.  Roku states that
-      ' the episode id is NOT what should be played, rather we are allowed
-      ' to choose the most appropriate episode and automatically start playback.
-      ' Here we use the history to choose an episode or just default to the first one.
-      afterFn = playHelper
-      if history <> invalid
-        refreshedContent.currentEpisodeId = history.currentEpisodeId
-        episode = getEpisodeContent(refreshedContent)
-        episodeHistory = invalid
-        if episode <> invalid
-          episodeHistory = m.global.historyIds.findNode(episode.id)
-        end if
-        if episodeHistory <> invalid and episodeHistory.nowPos > 0
-          afterFn = resumeHelper
-        end if
-      else
-        refreshedContent.currentEpisodeId = ""
+    if m.deepLinkContent <> invalid
+      if m.deepLinkContent.nowPos = 0 and history <> invalid and history.nowPos > 0
+       ' Use the deeplink content's history to resume a deeplinked video if a resumeTime parameter wasn't sent in as part of the deeplink
+        m.deepLinkContent.nowPos = history.nowPos
       end if
-      
-      if m.enteredFromDeepLink = true
-        ' m.enteredFromDeepLink will be set to false when the video is played
-        sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
-      end if
-    else if (m.deepLinkContent.deeplinkType = "season" or m.deepLinkContent.deeplinkType = "episode" or m.deepLinkContent.deeplinkType = "series") and refreshedContent.type = m.constants.ui.contentTypes.video
-      '  refreshedContent.id =       episode id
-      '  refreshedContent.seriesId = series id
-      '  refreshedContent.type =     video
-      '  m.deepLinkContent.deepLinkType = season | episode | series
 
-      ' deeplink sent us an episode id, so here, we have full info for an episode, but we need full info for a series
-      ' don't send deeplink analytics here, we will send it once we get the refreshedContent (response from getSingleContentFromServer())
-      emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
-      emptySeriesNode.type = m.constants.ui.contentTypes.series
-      emptySeriesNode.id = refreshedContent.seriesId
-      getSingleContentFromServer(detailScreen, emptySeriesNode, false)
-      return
-    else if m.deepLinkContent.deeplinkType = "season" and refreshedContent.type = m.constants.ui.contentTypes.series
-      '  refreshedContent.id =       series id
-      '  refreshedContent.seriesId = invalid
-      '  refreshedContent.type =     series
-      '  m.deepLinkContent.deepLinkType = season
+      if m.deepLinkContent.deeplinkType = "series" and refreshedContent.type = m.constants.ui.contentTypes.series
+        '  refreshedContent.id:       series id
+        '  refreshedContent.seriesId: invalid
+        '  refreshedContent.type:     series
+        '  m.deepLinkContent.deepLinkType: series
 
-      ' we've now received the full series info, so we can build the relevant screens
-      refreshedContent.currentEpisodeId = m.deepLinkContent.id
-      ' when deeplinkType = "season", deeplinkContent.id should be an episode id. We want to send tracking with the series id.
-      m.deepLinkContent.id = refreshedContent.id
-      afterFn = episodesHelper
-
-      if m.enteredFromDeepLink = true
-        sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "episodeList", m.Tracking, m.trackingLoggingTask, m.constants)
-        m.enteredFromDeepLink = false
-      end if
-    else if m.deepLinkContent.deeplinkType = "episode" and refreshedContent.type = m.constants.ui.contentTypes.series
-      '  refreshedContent.id =       series id
-      '  refreshedContent.seriesId = invalid
-      '  refreshedContent.type =     series
-      '  m.deepLinkContent.deepLinkType = episode
-
-      ' we now have the full series info for episode deeplinks
-      refreshedContent.currentEpisodeId = m.deepLinkContent.id
-      'determine if we need to resume or play from start the deeplinked episode
-      if m.deepLinkContent.nowPos <> invalid and m.deepLinkContent.nowPos > 0
-        episode = getEpisodeContent(refreshedContent)
-        episode.nowPos = m.deepLinkContent.nowPos
-        afterFn = resumeHelper
-      else
+        ' As of spring 2018 (firmware 8.1), "series" media types are valid and
+        ' will have a content id of an episode, not the series.  Roku states that
+        ' the episode id is NOT what should be played, rather we are allowed
+        ' to choose the most appropriate episode and automatically start playback.
+        ' Here we use the history to choose an episode or just default to the first one.
         afterFn = playHelper
-      end if
-
-      if m.enteredFromDeepLink = true
-        ' m.enteredFromDeepLink will be set to false when the video is played
-        sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
-      end if
-    else if m.deepLinkContent.deeplinkType = "movie"
-      'determine if we need to resume or play from start the deeplinked movie
-      if m.deepLinkContent.nowPos <> invalid and m.deepLinkContent.nowPos > 0
-        refreshedContent.nowPos = m.deepLinkContent.nowPos
-        afterFn = resumeHelper
-      else
-        afterFn = playHelper
-      end if
-
-      if m.enteredFromDeepLink = true
-        ' m.enteredFromDeepLink will be set to false when the video is played
-        sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
-      end if
-    else
-      'start the channel normally in case of issues
-      'handle deeplinking tracking when landing on category/home screen
-      if m.enteredFromDeepLink = true
-        sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "home", m.Tracking, m.trackingLoggingTask, m.constants)
-        m.enteredFromDeepLink = false
-      end if
-      m.deepLinkContent = invalid
-      startChannel()
-      return
-    end if
-  else
-    ' Find a default episode to land on, in case no specific episode requested from deep link
-    ' NOTE: If the series is a daily, recurring series then we always want to go to the most recent
-    if refreshedContent.type = m.constants.ui.contentTypes.series and refreshedContent.currentEpisodeId = "" and refreshedContent.isRecurring = false
-      if oldContent <> invalid and oldContent.type = m.constants.ui.contentTypes.video
-        ' a specific episode was requested by id
-        refreshedContent.currentEpisodeId = oldContent.id
-      else
-        ' first see if there was a specific episode id we wanted
         if history <> invalid
           refreshedContent.currentEpisodeId = history.currentEpisodeId
+          episode = getEpisodeContent(refreshedContent)
+          episodeHistory = invalid
+          if episode <> invalid
+            episodeHistory = m.global.historyIds.findNode(episode.id)
+          end if
+          if episodeHistory <> invalid and episodeHistory.nowPos > 0
+            afterFn = resumeHelper
+          end if
         else
           refreshedContent.currentEpisodeId = ""
         end if
+
+        if m.enteredFromDeepLink = true
+          ' m.enteredFromDeepLink will be set to false when the video is played
+          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+        end if
+      else if (m.deepLinkContent.deeplinkType = "season" or m.deepLinkContent.deeplinkType = "episode" or m.deepLinkContent.deeplinkType = "series") and refreshedContent.type = m.constants.ui.contentTypes.video
+        '  refreshedContent.id =       episode id
+        '  refreshedContent.seriesId = series id
+        '  refreshedContent.type =     video
+        '  m.deepLinkContent.deepLinkType = season | episode | series
+
+        ' deeplink sent us an episode id, so here, we have full info for an episode, but we need full info for a series
+        ' don't send deeplink analytics here, we will send it once we get the refreshedContent (response from getSingleContentFromServer())
+        emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
+        emptySeriesNode.type = m.constants.ui.contentTypes.series
+        emptySeriesNode.id = refreshedContent.seriesId
+
+        ' give the detail screen the id of the series instead of the episode, so that when the
+        ' second singleContentResponse lands, the detail screen content id and the new
+        ' refreshed content id will match allowing the check at the top of this function to pass.
+        ' We clone because detailScreen.content is pointing to the same memory as m.deeplinkContent
+        ' at this point and we don't want to update m.deeplinkContent, as the m.deeplinkContent.id
+        ' will be expected to be the episode id when the second singleContentResponse lands.
+        detailScreenContent = detailScreen.content.clone(true)
+        detailScreenContent.id = refreshedContent.parentId
+        detailScreen.content = detailScreenContent
+        getSingleContentFromServer(detailScreen, emptySeriesNode, false)
+        return
+      else if m.deepLinkContent.deeplinkType = "season" and refreshedContent.type = m.constants.ui.contentTypes.series
+        '  refreshedContent.id =       series id
+        '  refreshedContent.seriesId = invalid
+        '  refreshedContent.type =     series
+        '  m.deepLinkContent.deepLinkType = season
+
+        ' we've now received the full series info, so we can build the relevant screens
+        refreshedContent.currentEpisodeId = m.deepLinkContent.id
+        ' when deeplinkType = "season", deeplinkContent.id should be an episode id. We want to send tracking with the series id.
+        m.deepLinkContent.id = refreshedContent.id
+        afterFn = episodesHelper
+
+        if m.enteredFromDeepLink = true
+          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "episodeList", m.Tracking, m.trackingLoggingTask, m.constants)
+          m.enteredFromDeepLink = false
+        end if
+      else if m.deepLinkContent.deeplinkType = "episode" and refreshedContent.type = m.constants.ui.contentTypes.series
+        '  refreshedContent.id =       series id
+        '  refreshedContent.seriesId = invalid
+        '  refreshedContent.type =     series
+        '  m.deepLinkContent.deepLinkType = episode
+
+        ' we now have the full series info for episode deeplinks
+        refreshedContent.currentEpisodeId = m.deepLinkContent.id
+        'determine if we need to resume or play from start the deeplinked episode
+        if m.deepLinkContent.nowPos <> invalid and m.deepLinkContent.nowPos > 0
+          episode = getEpisodeContent(refreshedContent)
+          episode.nowPos = m.deepLinkContent.nowPos
+          afterFn = resumeHelper
+        else
+          afterFn = playHelper
+        end if
+
+        if m.enteredFromDeepLink = true
+          ' m.enteredFromDeepLink will be set to false when the video is played
+          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+        end if
+      else if m.deepLinkContent.deeplinkType = "movie"
+        'determine if we need to resume or play from start the deeplinked movie
+        if m.deepLinkContent.nowPos <> invalid and m.deepLinkContent.nowPos > 0
+          refreshedContent.nowPos = m.deepLinkContent.nowPos
+          afterFn = resumeHelper
+        else
+          afterFn = playHelper
+        end if
+
+        if m.enteredFromDeepLink = true
+          ' m.enteredFromDeepLink will be set to false when the video is played
+          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+        end if
+      else
+        'start the channel normally in case of issues
+        'handle deeplinking tracking when landing on category/home screen
+        if m.enteredFromDeepLink = true
+          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "home", m.Tracking, m.trackingLoggingTask, m.constants)
+          m.enteredFromDeepLink = false
+        end if
+        m.deepLinkContent = invalid
+        startChannel()
+        return
       end if
-    else if refreshedContent.type = m.constants.ui.contentTypes.video and refreshedContent.seriesId <> invalid and refreshedContent.seriesId <> ""
-      ' Case here of having an episode outside of a series (probably from autoplay)
-      emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
-      emptySeriesNode.type = m.constants.ui.contentTypes.series
-      emptySeriesNode.id = refreshedContent.seriesId
-      getSingleContentFromServer(detailScreen, emptySeriesNode, sendTracking)
-      return
-    end if
-    
-    if afterFn = invalid
-      afterFn = m.actionType
-    end if
-    m.actionType = invalid
-    
-  end if
-  populateDetailScreen(detailScreen, refreshedContent)  
+    else
+      ' Find a default episode to land on, in case no specific episode requested from deep link
+      ' NOTE: If the series is a daily, recurring series then we always want to go to the most recent
+      if refreshedContent.type = m.constants.ui.contentTypes.series and refreshedContent.currentEpisodeId = "" and refreshedContent.isRecurring = false
+        if oldContent <> invalid and oldContent.type = m.constants.ui.contentTypes.video
+          ' a specific episode was requested by id
+          refreshedContent.currentEpisodeId = oldContent.id
+        else
+          ' first see if there was a specific episode id we wanted
+          if history <> invalid
+            refreshedContent.currentEpisodeId = history.currentEpisodeId
+          else
+            refreshedContent.currentEpisodeId = ""
+          end if
+        end if
+      else if refreshedContent.type = m.constants.ui.contentTypes.video and refreshedContent.seriesId <> invalid and refreshedContent.seriesId <> ""
+        ' Case here of having an episode outside of a series (probably from autoplay)
+        emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
+        emptySeriesNode.type = m.constants.ui.contentTypes.series
+        emptySeriesNode.id = refreshedContent.seriesId
+        getSingleContentFromServer(detailScreen, emptySeriesNode, sendTracking)
+        return
+      end if
 
-  loadTime = 0
-  if refreshedContent.type = m.constants.ui.contentTypes.series
-    loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000)  'in ms
-  end if
+      if afterFn = invalid
+        afterFn = m.actionType
+      end if
+      m.actionType = invalid
 
-  if sendTracking = true
-    oldScreen = getHiddenScreen(1)  'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
-    if oldScreen <> invalid
-      screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
     end if
-    screenTrackingLoad(detailScreen.trackingPageInfo, loadTime)
-  end if
+    populateDetailScreen(detailScreen, refreshedContent)
 
-  ' making sure the app launch animation logo is completed before invoking playHelper/resumeHelper
-  if m.top.fadeInContentController = true or afterFn = episodesHelper
-    if afterFn <> invalid
-      afterFn(detailScreen)
+    loadTime = 0
+    if refreshedContent.type = m.constants.ui.contentTypes.series
+      loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000)  'in ms
     end if
-  else
-    m.detailScreenAfterFn = afterFn    
+
+    if sendTracking = true
+      oldScreen = getHiddenScreen(1)  'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
+      if oldScreen <> invalid
+        screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
+      end if
+      screenTrackingLoad(detailScreen.trackingPageInfo, loadTime)
+    end if
+
+    ' making sure the app launch animation logo is completed before invoking playHelper/resumeHelper
+    if m.top.fadeInContentController = true or afterFn = episodesHelper
+      if afterFn <> invalid
+        afterFn(detailScreen)
+      end if
+    else
+      m.detailScreenAfterFn = afterFn
+    end if
   end if
 End Function
 
 
-Function onSingleContentErrorWithTracking(msg)
-  handleSingleContentError(msg, true)
+Function onSingleContentErrorWithTracking(error)
+  handleSingleContentError(error, true)
 End Function
 
 
-Function onSingleContentErrorWithoutTracking(msg)
-  handleSingleContentError(msg, false)
+Function onSingleContentErrorWithoutTracking(error)
+  handleSingleContentError(error, false)
 End Function
 
 
 ' @trackOnResponse: boolean, if the retry is succesful, should NavigateToPage and PageLoad tracking occur
-Function handleSingleContentError(msg, trackOnResponse)
-  error = msg.GetData()
-  task = msg.getRoSGNode()
-  detailScreen = task.target
-  detailScreen.task = invalid
-  tubiLog("DetailScreenHelpers.onSingleContentError")
+Function handleSingleContentError(error, trackOnResponse)
+  tubiLog("DetailScreenHelpers.handleSingleContentError")
+  detailScreen = getTopDetailScreenFromStack()
   
   if m.isScreenLoaded = false
     populateDetailScreen(detailScreen, detailScreen.content)
   end if
 
-  content = invalid
-  if task.request <> invalid 
-    content = task.request.content
-  end if
-  task.unobserveField("response")
-  task.unobserveField("error")
-  task = invalid
   ' Roku requires that errors are not shown for invalid content ids when deep linking
   if m.enteredFromDeepLink = true
     m.enteredFromDeepLink = false
-    popScreen(false, false)
     content = getDetailScreenContent(detailScreen)
     sendDeeplinkAnalytics(m.deepLinkContent, content, "home", m.Tracking, m.trackingLoggingTask, m.constants)
     m.deepLinkContent = invalid
-    startChannel()
+    startChannel() 'adds a homescreen and removes all other screens underneath
   else if m.deepLinkContent <> invalid
     ' we are in this block if there is a roInputEvent causing a deeplink (ie. voice control while the channel is open)
     ' In this case we should navigate back to the home page.
     sendDetailScreenErrorAnalytics(detailScreen)
-    detailScreen = invalid  'release reference to the detailScreen as it is no longer needed
     m.deepLinkContent = invalid
     startChannel()
   else if detailScreen.isInFocusChain() = true
@@ -558,7 +545,39 @@ Function handleSingleContentError(msg, trackOnResponse)
   end if
 
   if detailScreen <> invalid
+    ' holds state info about if there was an error in retrieving the content for this page.
+    ' Is used to prevent multiple navigate_to_page and page_load events if a user ties to
+    ' reload content from the error modal.
     detailScreen.contentFetchError = true
+  end if
+End Function
+
+
+Function getRelatedContent(content)
+  ' get related (You May Also Like) content along with metadata for the content
+  ' TODO: write callbacks for handling related content requests success and failure
+  if content <> invalid
+    relatedRequestInfo = m.cmsApi.relatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
+
+    m.makeRequest({
+      url: relatedRequestInfo.url
+      requestType: m.constants.reqNames.getRelatedContent
+      options: relatedRequestInfo.options
+      successCallback: handleRelatedResponse
+      responseType: "node"
+      silenceCallbackWarnings: true
+      contentId: content.id
+    })
+  end if
+End Function
+
+
+Function handleRelatedResponse(relatedContent)
+  detailScreen = getTopDetailScreenFromStack()
+  if detailScreen <> invalid and relatedContent <> invalid
+    if detailScreen.content.id = relatedContent.id
+      detailScreen.relatedContent = relatedContent
+    end if
   end if
 End Function
 
@@ -648,7 +667,7 @@ End Function
 
 Function getTopDetailScreenFromStack()
   detailScreen = invalid
-  screenStackDepth = 1
+  screenStackDepth = 0
   while detailScreen = invalid
     hiddenScreen = getHiddenScreen(screenStackDepth)
     if hiddenScreen = invalid
@@ -988,10 +1007,12 @@ Function onRelatedContentSelected(msg)
   end if
 End Function
 
+
 Function onCloseErrorModal()
   '//exit the detail screen entirely since the content could not be gathered.
   onDetailBackPressed()
 End Function
+
 
 Function onDetailBackPressed()
   ' TODO(Chris): This is in terrible need of refactor. We shouldn't be calling this directly

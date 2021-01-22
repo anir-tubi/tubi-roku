@@ -68,6 +68,16 @@ Function createParsingCallbacks()
     parseError: parseLiveVideoManifestError
   }
 
+  ' single content
+  m.requestTypes[m.constants.reqNames.getSingleContent] = {
+    parseSuccess: parseDetailScreenSingleContentSuccess
+    parseError: parseDetailScreenSingleContentError
+  }
+
+  ' related content
+  m.requestTypes[m.constants.reqNames.getRelatedContent] = {
+    parseSuccess: parseDetailScreenRelatedContentSuccess
+  }
 End Function
 
 
