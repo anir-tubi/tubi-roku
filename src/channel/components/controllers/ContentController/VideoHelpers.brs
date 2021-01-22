@@ -659,17 +659,19 @@ end function
 ' returns invalid if there is no videoPlayer or valid videoPlayerContent
 function fetchUpNextContent(videoPlayer)
   if videoPlayer <> invalid and videoPlayer.content <> invalid and videoPlayer.content.id.Len() > 0
-    endpointSpecificParams = {
-      isKidsMode: shouldKidsModeBeSentToServer()
-      container_id: m.autoplayContext
-      mode: "nap"
+    options = {
+      params: {
+        "isKidsMode": shouldKidsModeBeSentToServer()
+        "container_id": m.autoplayContext
+        "mode": "nap"
+      }
     }
 
     if videoPlayer.analyticsMode = "autoplay-automatic"
-      endpointSpecificParams.mode = "ap"
+      options.params.mode = "ap"
     end if
 
-    upNextReqInfo = m.cmsApi.getUpNextContentRequestInfo(videoPlayer.content.id, endpointSpecificParams)
+    upNextReqInfo = m.cmsApi.upNextContentRequestInfo(videoPlayer.content.id, options)
 
     return m.makeRequest({
       requestType: m.constants.reqNames.getUpNextContent

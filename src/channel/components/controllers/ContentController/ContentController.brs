@@ -756,15 +756,27 @@ Function setDirtyUserCategories(categoryId)
 
     '//Apply the movie, TV, and Espanol filters if those screens exist
     if movieScreen <> invalid
-      optionMovie = {contentMode: m.constants.ui.contentMode.movie}
+      optionMovie = {
+        params: {
+          "contentMode": m.constants.ui.contentMode.movie
+        }
+      }
       m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadMovieUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionMovie)
     end if
     if tvScreen <> invalid
-      optionTV = {contentMode: m.constants.ui.contentMode.tv}
+      optionTV = {
+        params: {
+          "contentMode": m.constants.ui.contentMode.tv
+        }
+      }
       m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadTVUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionTV)
     end if
     if espanolScreen <> invalid
-      optionEspanol = {contentMode: m.constants.ui.contentMode.latino}
+      optionEspanol = {
+        params: {
+          "contentMode": m.constants.ui.contentMode.latino
+        }
+      }
       m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadEspanolUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionEspanol)
     end if    
   end if

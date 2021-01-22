@@ -4,23 +4,23 @@ Function CmsApi(constants, request, auth)
   return {
     ' dependencies
     constants: constants
-    request_: request
-    auth_: auth
+    request: request
+    auth: auth
 
     ' public
-    relatedContentReq: cmsApi_getRelatedContentRequest
     relatedContentReqInfo: cmsApi_getRelatedContentRequestInfo
-    upNextContentReq: cmsApi_getUpNextContentRequest
-    getUpNextContentRequestInfo: cmsApi_getUpNextContentRequestInfo
-    singleContentReq: cmsApi_getSingleContentRequest
+    upNextContentRequestInfo: cmsApi_getUpNextContentRequestInfo
     singleContentReqInfo: cmsApi_getSingleContentRequestInfo
-    thumbnailsReq: cmsApi_getThumbnailsRequest
     thumbnailsReqInfo: cmsApi_getThumbnailsRequestInfo
     channelReq: cmsApi_getChannelRequest
-    homeScreenReq: cmsApi_getHomeScreenRequest
+    channelReqInfo: cmsApi_getChannelRequestInfo
     channelsCategoriesScreenReq: cmsApi_getChannelsCategoriesScreenRequest
+    homeScreenReq: cmsApi_getHomeScreenRequest
+    homeScreenReqInfo: cmsApi_getHomeScreenRequestInfo
     categoryReq: cmsApi_getCategoryRequest
+    categoryReqInfo: cmsApi_getCategoryRequestInfo
     searchReq: cmsApi_getSearchRequest
+    searchReqInfo: cmsApi_getSearchRequestInfo
 
     ' private
     commonOptions: cmsApi_commonOptions
@@ -45,21 +45,6 @@ Function cmsApi_commonOptions()
 End Function
 
 
-'''''''''''''''''''''''
-' relatedContentReq()
-'
-Function cmsApi_getRelatedContentRequest(contentId, bKidsMode = false)
-  url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
-
-  options = m.commonOptions()
-  options.params["isKidsMode"] = bKidsMode
-  options.params["video_resources"] = m.constants.player.drmOrder
-  options.params = m.setTupianPosterParam(options.params)
-
-  return m.createAuthRequest(url, m.constants.reqNames.getRelatedContent, options)
-End Function
-
-
 Function cmsApi_getRelatedContentRequestInfo(contentId, bKidsMode = false)
   url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
 
@@ -75,56 +60,36 @@ Function cmsApi_getRelatedContentRequestInfo(contentId, bKidsMode = false)
 End Function
 
 
-'''''''''''''''''''''''
-' upNextContentReq()
-'
-' TODO: This function is only used in CmsApiIntegrationTests.brs currently.
-'       Update the integration test to use the GeneralTask and cmsApi_getUpNextContentRequestInfo()
-'       and then delete this function.
-Function cmsApi_getUpNextContentRequest(contentId, categoryId=invalid)
-  url = m.constants.urls.cms.upNextContent + "/" + contentId + "/next"
-  
-  options = m.commonOptions()
-  if categoryId <> invalid and categoryId <> ""
-    options.params.container_id = categoryId
-  end if
-  return m.createAuthRequest(url, m.constants.reqNames.getUpNextContent, options)
-End Function
-
-
-Function cmsApi_getUpNextContentRequestInfo(contentId, params)
+' @passedOptions: assocArray, options to be added to the request object as created by Request().createAsync()
+Function cmsApi_getUpNextContentRequestInfo(contentId, passedOptions)
   url = m.constants.urls.cms.upNextContent + "/" + contentId + "/next"
   options = m.commonOptions()
-  options.params["video_resources"] = m.constants.player.drmOrder
+  params = options.params
+  headers = options.headers
 
-  for each param in params
-    if params[param] <> invalid
-      options.params[param] = params[param]
+  params["video_resources"] = m.constants.player.drmOrder
+  params["gn_fields"] = "tms_id"
+
+  if passedOptions <> invalid
+    if passedOptions.params <> invalid
+      params.append(passedOptions.params)
     end if
-  end for
+
+    if passedOptions.headers <> invalid
+      headers.append(passedOptions.headers)
+    end if
+  end if
+
+  if passedOptions <> invalid
+    options.append(passedOptions)
+  end if
+
+  options.params = params
 
   return {
     url: url
     options: options
   }
-End Function
-
-
-'''''''''''''''''''''''
-' singleContentReq()
-'
-Function cmsApi_getSingleContentRequest(contentId, includeChannels=false, bKidsMode = false)
-  url = m.constants.urls.cms.singleContent
-
-  options = m.commonOptions()
-  options.params["content_id"] = contentId
-  options.params["isKidsMode"] = bKidsMode
-  options.params["includeChannels"] = includeChannels
-  options.params["video_resources"] = m.constants.player.drmOrder
-  options.params["gn_fields"] = "tms_id"  'request the Gracenote id
-  options.params = m.setTupianLandscapeParam(options.params) 'used on episode list screens
-
-  return m.createAuthRequest(url, m.constants.reqNames.getSingleContent, options)
 End Function
 
 
@@ -144,25 +109,11 @@ Function cmsApi_getSingleContentRequestInfo(contentId, includeChannels=false, bK
 End Function
 
 
-'''''''''''''''''''''''
-' thumbnailsReq()
-'
-Function cmsApi_getThumbnailsRequest(contentId)
-  '//This function is only being used in a unit test. Should ensure this and cmsApi_getThumbnailsRequestInfo() ar kept in sync 
-  url = m.constants.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
-  
-  options = m.commonOptions()
-  options.params.type = "5x"
-  options.params.max_width = m.constants.deviceInfo.displayWidth
-  return m.request_.createAsync(url, m.constants.reqNames.getThumbnails, options)
-End Function
-
-
 Function cmsApi_getThumbnailsRequestInfo(contentId)
   url = m.constants.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
   options = m.commonOptions()
-  options.params.type = "5x"
-  options.params.max_width = m.constants.deviceInfo.displayWidth
+  options.params["type"] = "5x"
+  options.params["max_width"] = m.constants.deviceInfo.displayWidth
   return {
     url: url
     options: options
@@ -170,21 +121,34 @@ Function cmsApi_getThumbnailsRequestInfo(contentId)
 End Function
 
 
-'''''''''''''''''''''''
-' channelReq()
-'
+' @channelId: string, id of the channel ex: "shout_factory"
+' @limit: int, the max number of contents in the response
+' @bKidsMode: boolean, is the app in kids mode
 Function cmsApi_getChannelRequest(channelId, limit, bKidsMode = false)
+  channelReqInfo = m.channelReqInfo(channelId, limit, bKidsMode)
+  url = channelReqInfo.url
+  options = channelReqInfo.options
+  return m.createAuthRequest(url, m.constants.reqNames.getChannel, options)
+End Function
+
+
+' @channelId: string, id of the channel ex: "shout_factory"
+' @limit: int, the max number of contents in the response
+' @bKidsMode: boolean, is the app in kids mode
+Function cmsApi_getChannelRequestInfo(channelId, limit, bKidsMode = false)
   url = m.constants.urls.matrix.channel + "/" + channelId
   
   options = m.commonOptions()
-  options.params.expand = 1
-  options.params.cursor = 0
-  options.params.limit = limit
+  options.params["cursor"] = 0
+  options.params["limit"] = limit
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = true
   options.params = m.setTupianPosterParam(options.params)
-  
-  return m.createAuthRequest(url, m.constants.reqNames.getChannel, options)
+
+  return {
+    url: url
+    options: options
+  }
 End Function
 
 
@@ -193,76 +157,127 @@ End Function
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 '
 Function cmsApi_getChannelsCategoriesScreenRequest(bKidsMode = false)
-  return m.homeScreenReq(0, bKidsMode, {}, 1)
+  options = {
+    params: {
+      limit: 0
+    }
+  }
+  return m.homeScreenReq(bKidsMode, options)
 End Function
 
 
 '''''''''''''''''''''
 ' homeScreenReq()
 '
-' @limit: number of items in each category
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
-Function cmsApi_getHomeScreenRequest(limit, bKidsMode = false, passedOptions = {}, expand = 2)
-  url = m.constants.urls.matrix.homescreen 
+Function cmsApi_getHomeScreenRequest(bKidsMode = false, passedOptions = {})
+  homeScreenReqInfo = m.homeScreenReqInfo(bKidsMode, passedOptions)
+  url = homeScreenReqInfo.url
+  options = homeScreenReqInfo.options
+  return m.createAuthRequest(url, m.constants.reqNames.getHomescreen, options)
+End Function
+
+
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
+' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
+'                 see request.brs for more info
+Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
+  url = m.constants.urls.matrix.homescreen
   
   options = m.commonOptions()
-  options.params["expand"] = expand
-  options.params["includeEmptyHistory"] = true
-  options.params["includeEmptyQueue"] = true
-  options.params["isKidsMode"] = bKidsMode
-  options.params["includeVideoInGrid"] = true
-  options.params["limit"] = limit
+  params = options.params
+  headers = options.headers
 
-  if passedOptions.params <> invalid and passedOptions.params.contentMode <> invalid and passedOptions.params.contentMode <> ""
-    options.params["contentMode"] = passedOptions.params.contentMode
+  params["includeEmptyHistory"] = true
+  params["includeEmptyQueue"] = true
+  params["isKidsMode"] = bKidsMode
+  params["includeVideoInGrid"] = true
+  params["contentMode"] = m.constants.ui.contentMode.homescreen ' default contentMode
 
-    if passedOptions.params.contentMode <> m.constants.ui.contentMode.news
-      ' don't send the Tupian image params for homescreen requests that are contentMode = "news"
-      imageParamTypes = [
-        "poster"
-        "landscape"
-        "large_vitg"
-      ]
-      options.params = m.setImageParams(imageParamTypes, options.params)
-    end if
+  if passedOptions.params <> invalid and passedOptions.params["contentMode"] <> invalid and passedOptions.params["contentMode"] <> ""
+    ' This will be overwritten by the same value later in this function
+    ' when we append the passedOptions.params to params. We add it here so the default value
+    ' is not used in the following logic, if a value was passed in for "contentMode"
+    params["contentMode"] = passedOptions.params["contentMode"]
+  end if
 
-    if passedOptions.params.contentMode = m.constants.ui.contentMode.news or passedOptions.params.contentMode = m.constants.ui.contentMode.homescreen
-      '//request and display live news if the experiement calls for it.
-      if options.headers = invalid
-        options.headers = {}
-      end if
-      options.headers["x-tubi-inject-live-news"] = "true"
-    end if
+  if params["contentMode"] <> m.constants.ui.contentMode.news
+    ' don't send the Tupian image params for homescreen requests that are contentMode = "news"
+    imageParamTypes = [
+      "poster"
+      "landscape"
+      "large_vitg"
+    ]
+    params = m.setImageParams(imageParamTypes, options.params)
+  end if
+
+  headers["x-tubi-inject-live-news"] = "false"
+  if params["contentMode"] = m.constants.ui.contentMode.news or params["contentMode"] = m.constants.ui.contentMode.homescreen
+    '//request and display live news if the experiement calls for it.
+    headers["x-tubi-inject-live-news"] = "true"
   end if
 
   if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
-    options.params["groupSize"] = m.constants.settings.numContainers
+    params["groupSize"] = m.constants.settings.numContainers
   end if
-  
-  return m.createAuthRequest(url, m.constants.reqNames.getHomescreen, options)
+
+  if passedOptions <> invalid
+    if passedOptions.params <> invalid
+      params.append(passedOptions.params)
+    end if
+
+    if passedOptions.headers <> invalid
+      headers.append(passedOptions.headers)
+    end if
+  end if
+
+  if passedOptions <> invalid
+    options.append(passedOptions)
+  end if
+
+  options.params = params
+  options.headers = headers
+
+  return {
+    url: url
+    options: options
+  }
 End Function
 
 
 '''''''''''''''''''''
 ' categoryReq()
 '
-Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode = false, passedOptions = {})
+Function cmsApi_getCategoryRequest(categoryId, name = invalid, bKidsMode = false, passedOptions = {})
+  categoryReqInfo = m.categoryReqInfo(categoryId, name, bKidsMode, passedOptions)
+  url = categoryReqInfo.url
+  options = categoryReqInfo.options
+  return m.createAuthRequest(url, name, options)
+End Function
+
+
+' @categoryId, string, the UAPI id for the category
+' @name: string, identifier for the type of request (found in constants)
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
+' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
+'                 see request.brs for more info
+Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = false, passedOptions = {})
   url = m.constants.urls.matrix.container + "/" + categoryId
-  
+
   if name = invalid
     name = m.constants.reqNames.getCategory
   end if
 
   options = m.commonOptions()
   params = options.params
+
   params["isKidsMode"] = bKidsMode
   params["includeChannels"] = true
   params["includeVideoInGrid"] = true
-  params["expand"] = 1
   params["cursor"] = 0
-  params["limit"] = limit
+  params["limit"] = m.constants.performance.categoryGridList.finalBlockSize
 
   if passedOptions.params <> invalid
     if passedOptions.params.contentMode <> invalid and passedOptions.params.contentMode <> ""
@@ -307,7 +322,10 @@ Function cmsApi_getCategoryRequest(categoryId, limit, name = invalid, bKidsMode 
   options.params = params
   options.headers = headers
 
-  return m.createAuthRequest(url, name, options)
+  return {
+    url: url
+    options: options
+  }
 End Function
 
 
@@ -315,12 +333,26 @@ End Function
 ' searchreq()
 '
 Function cmsApi_getSearchRequest(searchText, bKidsMode = false)
+  searchReqInfo = m.searchReqInfo(searchText, bKidsMode)
+  url = searchReqInfo.url
+  options = searchReqInfo.options
+  return m.createAuthRequest(url, m.constants.reqNames.searchAPI, options)
+End Function
+
+
+' @searchText: string, the text the user is attempting to search for
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
+Function cmsApi_getSearchRequestInfo(searchText, bKidsMode = false)
   url = m.constants.urls.cms.search
   options = m.commonOptions()
   options.params["search"] = searchText
   options.params["isKidsMode"] = bKidsMode
-  m.setTupianPosterParam(options.params)
-  return m.createAuthRequest(url, m.constants.reqNames.searchAPI, options)
+  options.params = m.setTupianPosterParam(options.params)
+
+  return {
+    url: url
+    options: options
+  }
 End Function
 
 
@@ -378,9 +410,9 @@ End Function
 '''''''''''''''''''''
 ' create an auth request if user is logged in, otherwise use a normal request
 Function cmsApi_createAuthRequest(url, reqName, options)
-  request = m.auth_.createAuthRequest(url, reqName, options)
+  request = m.auth.createAuthRequest(url, reqName, options)
   if request = invalid
-    request = m.request_.createAsync(url, reqName, options)
+    request = m.request.createAsync(url, reqName, options)
   end if
   return request
 End Function

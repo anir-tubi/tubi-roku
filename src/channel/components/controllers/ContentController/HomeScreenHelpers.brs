@@ -228,7 +228,7 @@ Function fetchHomeScreen(homeScreen)
     responseHandler = "homescreenResponse"
     options = {
       params: {
-        contentMode: homeScreen.contentMode
+        "contentMode": homeScreen.contentMode
       }
     }
 

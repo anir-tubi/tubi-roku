@@ -645,11 +645,13 @@ End Function
 Function onChannelsRequested()
   tubiLog("LinearVideoPlayerScreenHelpers.onChannelsRequested")
   currentContent = getCurrentLinearContent()
+  
   if currentContent <> invalid and currentContent.parentId <> invalid
+    reqName = m.constants.reqNames.getCategory
     responseHandler = "liveNewsChannelGuideResponse"
     categoryId = currentContent.parentId
 
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, responseHandler, m.constants.reqNames.getCategory)
+    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, responseHandler, reqName)
   end if
 End Function
 

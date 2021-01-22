@@ -586,7 +586,7 @@ Function getWholeCategoryRequest(category As Object, field="wholeCategoryRespons
        
       options = {
         params: {
-          contentMode: m.top.contentMode
+          "contentMode": m.top.contentMode
         }
       }
 
