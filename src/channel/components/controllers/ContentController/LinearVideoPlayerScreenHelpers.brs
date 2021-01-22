@@ -216,78 +216,48 @@ Function onLiveStreamManifestResponse(response)
       content = videoPlayer.content
     end if
 
-    if pollUrl <> invalid or (pollUrl = invalid and m.constants.ui.liveNewsNoAdsIds[content.id] <> invalid)
-      ' TODO: We do not want to maintain the m.constants.ui.liveNewsNoAdsIds map, so remove
-      ' any references to it after we find out how often this happens, or get
-      ' the backend to inform us of which linear content has ads.
+    ' piece together the modified playback url
+    ' The url that will be used for the video stream must be built from the original url returned by the API
+    ' and from the "analytics url"/ad polling url. For more info, please see:
+    ' https://docs.google.com/document/d/14Ovs4KzV0iwloKtILjSZhQxT2NcGdGCm80MIMvB9EfE
+    originalUrl = invalid
 
-      ' we have a valid poll url or we are not expecting one, so play content
+    modifiedUrl = ""
+    if content <> invalid and content.videoResources <> invalid
+      videoResources = content.videoResources
+      newVideoResources = []
 
-      ' piece together the modified playback url
-      ' The url that will be used for the video stream must be built from the original url returned by the API
-      ' and from the "analytics url"/ad polling url. For more info, please see:
-      ' https://docs.google.com/document/d/14Ovs4KzV0iwloKtILjSZhQxT2NcGdGCm80MIMvB9EfE
-      originalUrl = invalid
-
-      modifiedUrl = ""
-      if content <> invalid and content.videoResources <> invalid
-        videoResources = content.videoResources
-        newVideoResources = []
-
-        for each resource in videoResources
-          newResource = resource
-          if resource.type = m.constants.player.drmTypes.hlsv3
-            if resource.url <> invalid
-              ' For linear content that is serving ads via YoSpace, the video resource that is used to fetch
-              ' the manifest actually redirects through a Tubi "manifest server" and to a YoSpace server
-              ' to get the manifest response. When reconstructing the YoSpace manifest url to include the
-              ' session id, we need to use the original YoSpace stream url and not the video resource url
-              ' provided by UAPI. We get the original YoSpace stream url from the "location" header since
-              ' it is a redirect.
-              if response.headers <> invalid and response.headers.location <> invalid
-                originalUrl = response.headers.location
-              else 
-                originalUrl = resource.url
-              end if
-
-              modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
-              newResource.url = modifiedUrl
+      for each resource in videoResources
+        newResource = resource
+        if resource.type = m.constants.player.drmTypes.hlsv3
+          if resource.url <> invalid
+            ' For linear content that is serving ads via YoSpace, the video resource that is used to fetch
+            ' the manifest actually redirects through a Tubi "manifest server" and to a YoSpace server
+            ' to get the manifest response. When reconstructing the YoSpace manifest url to include the
+            ' session id, we need to use the original YoSpace stream url and not the video resource url
+            ' provided by UAPI. We get the original YoSpace stream url from the "location" header since
+            ' it is a redirect.
+            if response.headers <> invalid and response.headers.location <> invalid
+              originalUrl = response.headers.location
+            else 
+              originalUrl = resource.url
             end if
+
+            modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
+            newResource.url = modifiedUrl
           end if
-
-          newVideoResources.push(newResource)
-        end for
-
-        content.videoResources = newVideoResources
-      end if
-
-      videoPlayer.content = content
-      videoPlayer.updateContent = true
-      videoPlayer.pollUrl = pollUrl
-      videoPlayer.control = "play"
-    else if pollUrl = invalid and m.constants.ui.liveNewsNoAdsIds[content.id] = invalid
-      ' TODO: We do not want to maintain the m.constants.ui.liveNewsNoAdsIds map, so remove
-      ' any references to it after we find out how often this happens, or get
-      ' the backend to inform us of which linear content has ads.
-
-      if m.adsSsaiTask.manifestAttempts < 3
-        if m.adsSsaiTask.manifestAttempts = 0
-          ' log the first time there is an issue with not getting back an analytics url
-          ' in the manifest - do not log for each retry
-          logMissingLinearAnalyticsUrl(content, lines)
         end if
 
-        ' we didn't get a poll url but the content is expected to have ads, so we can retry fetching
-        ' the manifest as long as we are beneath the max retry attempts limit.
-        m.adsSsaiTask.manifestAttempts += 1
-        streamUrl = getLiveUrlFromResources(content)
-        getLiveStreamManifest(streamUrl)
-      else
-        ' we've maxed out the allowed retries but still no poll url, so trigger an
-        ' error via the videoPlayer.
-        videoPlayer.control = "error"
-      end if
+        newVideoResources.push(newResource)
+      end for
+
+      content.videoResources = newVideoResources
     end if
+
+    videoPlayer.content = content
+    videoPlayer.updateContent = true
+    videoPlayer.pollUrl = pollUrl
+    videoPlayer.control = "play"
   end if
 End Function
 

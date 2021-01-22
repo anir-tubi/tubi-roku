@@ -679,29 +679,6 @@ Function getConstants()
       constants.ui.backgroundTypes.linear = "linear"
       constants.ui.backgroundTypes.feature = "feature"
 
-    ' TODO: remove this map when testing is done, or backend provides a noAds field for linear content
-    ' liveNewsNoAdsIds is a map of live news content that is not expected to play ads
-    constants.ui.liveNewsNoAdsIds = {}
-      constants.ui.liveNewsNoAdsIds["555382"] = true 'Fox Soul
-      constants.ui.liveNewsNoAdsIds["555123"] = true 'FOX 29 Philadelphia
-      constants.ui.liveNewsNoAdsIds["555122"] = true 'FOX 13 Tampa Bay'
-      constants.ui.liveNewsNoAdsIds["555121"] = true 'FOX 5 Washington DC
-      constants.ui.liveNewsNoAdsIds["555120"] = true 'FOX 35 Orlando
-      constants.ui.liveNewsNoAdsIds["555119"] = true 'FOX 5 New York
-      constants.ui.liveNewsNoAdsIds["555118"] = true 'FOX 2 Detroit
-      constants.ui.liveNewsNoAdsIds["555117"] = true 'FOX 6 Milwaukee
-      constants.ui.liveNewsNoAdsIds["555116"] = true 'FOX 32 Chicago
-      constants.ui.liveNewsNoAdsIds["555115"] = true 'FOX 5 Atlanta
-      constants.ui.liveNewsNoAdsIds["555114"] = true 'KTVU FOX 2 (San Francisco)
-      constants.ui.liveNewsNoAdsIds["555113"] = true 'FOX 11 Los Angeles
-      constants.ui.liveNewsNoAdsIds["555112"] = true 'FOX 7 Austin
-      constants.ui.liveNewsNoAdsIds["555111"] = true 'FOX 10 Phoenix
-      constants.ui.liveNewsNoAdsIds["555110"] = true 'FOX 26 Houston
-      constants.ui.liveNewsNoAdsIds["555109"] = true 'FOX 9 (Minneapolis-St. Paul)
-      constants.ui.liveNewsNoAdsIds["555108"] = true 'FOX 4 (Dallas-Fort Worth)
-      constants.ui.liveNewsNoAdsIds["555107"] = true 'Q13 FOX (Seattle)
-
-
     'Screen levels dictate the hierarchy of the app and prevent scenarios where users can get into infinite screen loops.
     'Screens cannot be pushed on top of a screen whose screenLevel is greater than theirs.
     'For example, if the home screen is screenLevel = 10, and the search screen is screenLevel = 20,
