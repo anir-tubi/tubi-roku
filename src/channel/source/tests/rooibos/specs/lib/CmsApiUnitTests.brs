@@ -13,7 +13,7 @@ End function
 '@It tests functions in CmsApi.brs
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-'@Only
+
 '@Test unit tests relatedContentReqInfo
 Function cmsApi_relatedContentReqInfo_test()
   infoKeys = [

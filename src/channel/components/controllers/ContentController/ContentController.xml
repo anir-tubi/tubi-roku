@@ -193,6 +193,12 @@
        id="PlayerFullscreenCountdownTimer"
        duration="1"
        repeat="true"/>
+
+      <!-- The timer that is used to check if guests are allowed to see the history of content. -->
+      <Timer
+       id="ResumeAllowedTimer"
+       duration="300"
+       repeat="true"/>
      
      <!-- DetailScreenLoadTimer is a timer used to check whether startup animation logo is finished playing -->    
      <Timer

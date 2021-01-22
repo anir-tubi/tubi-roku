@@ -114,6 +114,7 @@ Function onRefreshContentSignal(msg)
 End Function
 
 
+
 '''''''''''''''''''''
 ' populateDetailScreen
 '
@@ -142,11 +143,36 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     bookmark = m.global.bookmarkIds.findNode(content.id)
     history = m.global.historyIds.findNode(content.id)
 
+    if m.global.authInfo = invalid and history <> invalid
+      if getExperimentResource("roku_local_resume", "roku_local_resume_experiment", true).shows_resume_points_to_guests = true
+        '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
+        '//   because beyond that time we are restricted legally from showing data of signed out users.
+
+        if isGreaterThanGuestResumePeriod(history) = true
+          history = invalid
+        else
+          '//Listen to and start the timer since a guest user has content with history
+          m.resumeAllowedTimer.unobserveFieldScoped("fire")
+          m.resumeAllowedTimer.observeFieldScoped("fire", "onResumeAllowedTimerFired")
+          if m.resumeAllowedTimer.control <> "start"
+            '//There may be multiple detail screens in the stack so the timer may already be started
+            m.resumeAllowedTimer.control = "start"
+          end if
+        end if 
+      else
+        '//The experiment says NOT to display resume points to guest users, so don't display the resume button to guest users 
+        history = invalid
+      end if  
+    end if
+
     episode = getEpisodeContent(content)
     episodeHistory = invalid
     if content.type = m.constants.ui.contentTypes.series
       if episode <> invalid
-        episodeHistory = m.global.historyIds.findNode(episode.id)
+        if history <> invalid
+          '//if there is no history, then there is no episode history either
+          episodeHistory = m.global.historyIds.findNode(episode.id)
+        end if
         detailScreen.episodeTitle = episode.title
       end if
 
@@ -204,7 +230,8 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
       nResumePoint = history.nowPos
     end if
 
-    if nSavedPosition >= 0
+    if nSavedPosition >= 0 and m.global.authInfo <> invalid
+      '//nSavedPosition is only used for signed in users and ignored for guest users.
       '//If the saved position is passed as greater than 0 than use that number instead.
       '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct
       nResumePoint = nSavedPosition
@@ -818,6 +845,60 @@ Function onBookmarked(msg) As Void
 End Function
 
 
+Function isGreaterThanGuestResumePeriod(history)
+  bGreaterThan = false
+  if history <> invalid
+    n24HoursInSeconds = 24 * 60 * 60    '//24hr * 60min/hr * 60sec/min = the period is 1 day/24 hours
+    nowDate = CreateObject("roDateTime")
+    nNowSeconds = nowDate.AsSeconds()
+    bGreaterThan =  ((history.lastSaved + n24HoursInSeconds) < nNowSeconds)
+  end if
+
+  return bGreaterThan
+End Function
+
+
+' Event Handler for when to check if guest user has reached the time limit to see the history of the current video.
+Function onResumeAllowedTimerFired()
+  if m.global.authInfo = invalid
+    detailScreen = invalid
+    screenStackDepth = 0
+    bDetailScreenExistsInStack = false
+
+    '//Go thru the entire stack to find detailScreens
+    while getHiddenScreen(screenStackDepth) <> invalid
+      hiddenScreen = getHiddenScreen(screenStackDepth)
+      if hiddenScreen <> invalid and hiddenScreen.id = m.constants.ui.screenIds.detailScreen
+        detailScreen = hiddenScreen
+        bDetailScreenExistsInStack = true
+        history = m.global.historyIds.findNode(detailScreen.content.id)
+        if history <> invalid
+          '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
+          '//   because beyond that time we are restricted legally from showing data of signed out users.
+    
+          if isGreaterThanGuestResumePeriod(history) = true
+            '//Call populateDetailScreen() which will remove the resume button for any guest users that have content that has history over a day old
+            populateDetailScreen(detailScreen, detailScreen.content) 
+          end if
+        end if
+      end if
+      screenStackDepth += 1
+    end while
+
+    if bDetailScreenExistsInStack = false
+      '//The detail screen is no longer in the stack so no need for the timer anymore
+      m.resumeAllowedTimer.unobserveFieldScoped("fire")
+      m.resumeAllowedTimer.control = "stop"
+    end if
+  else
+    '//User is signed in and is no longer a guest so cancel timer
+    m.resumeAllowedTimer.unobserveFieldScoped("fire")
+    m.resumeAllowedTimer.control = "stop"
+  end if
+
+End Function
+
+
 Function setIsBookmark(detailScreen, isBookmark)
   'reset the value in the case that add to queue button was pressed and the button title is currently "Adding..."
   detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
@@ -1023,7 +1104,7 @@ End Function
 
 
 Function onEpisodeList(msg)
-  tubiLog("ContentController.onEpisodeList")
+  tubiLog("DetailScreenHelper.onEpisodeList")
   detailScreen = msg.getRoSGNode()
 
   episodeDetail = getEpisodeDetail(detailScreen.content)

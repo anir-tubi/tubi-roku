@@ -9,163 +9,165 @@
     '***************************************************
     function RBSFM_getFunctionsForFile(filename)
   map = {
-    "Test_VideoPlayer_Cuepoints":RBSFM_getFunctions_Test_VideoPlayer_Cuepoints 
-    "Test_VideoPlayer_VideoErrorHelpers":RBSFM_getFunctions_Test_VideoPlayer_VideoErrorHelpers 
-    "Test_VideoPlayer_VideoPlayerHelpers":RBSFM_getFunctions_Test_VideoPlayer_VideoPlayerHelpers 
-    "Test_ChannelDetailScreen_Helpers":RBSFM_getFunctions_Test_ChannelDetailScreen_Helpers 
-    "component_SpritePoster":RBSFM_getFunctions_component_SpritePoster 
-    "componentTest_CategoryGridList":RBSFM_getFunctions_componentTest_CategoryGridList 
-    "componentTest_ChannelDetailScreen":RBSFM_getFunctions_componentTest_ChannelDetailScreen 
-    "componentTest_DetailScreen":RBSFM_getFunctions_componentTest_DetailScreen 
-    "componentTest_InfoPanel":RBSFM_getFunctions_componentTest_InfoPanel 
-    "componentTest_SettingsScreen":RBSFM_getFunctions_componentTest_SettingsScreen 
-    "componentTest_TubiProgressBar":RBSFM_getFunctions_componentTest_TubiProgressBar 
-    "componentTest_VideoPlayer":RBSFM_getFunctions_componentTest_VideoPlayer 
-    "test_CmsApi":RBSFM_getFunctions_test_CmsApi 
+    "ChannelDetailScreen_UnitTests":RBSFM_getFunctions_ChannelDetailScreen_UnitTests 
+    "VideoPlayer_VideoErrorHelpersUnitTests":RBSFM_getFunctions_VideoPlayer_VideoErrorHelpersUnitTests 
+    "VideoPlayer_VideoPlayerCuepointsUnitTests":RBSFM_getFunctions_VideoPlayer_VideoPlayerCuepointsUnitTests 
+    "VideoPlayer_VideoPlayerHelpersUnitTests":RBSFM_getFunctions_VideoPlayer_VideoPlayerHelpersUnitTests 
+    "CmsApiIntegrationTests":RBSFM_getFunctions_CmsApiIntegrationTests 
+    "CmsApiUnitTests":RBSFM_getFunctions_CmsApiUnitTests 
+    "GeneralTaskModuleUnitTests":RBSFM_getFunctions_GeneralTaskModuleUnitTests 
+    "RequestQueueUnitTests":RBSFM_getFunctions_RequestQueueUnitTests 
+    "RequestUnitTests":RBSFM_getFunctions_RequestUnitTests 
+    "SentryUnitTests":RBSFM_getFunctions_SentryUnitTests 
+    "SettingsUnitTests":RBSFM_getFunctions_SettingsUnitTests 
     "StringUtilsUnitTests":RBSFM_getFunctions_StringUtilsUnitTests 
-    "test_Request":RBSFM_getFunctions_test_Request 
-    "test_RequestQueue":RBSFM_getFunctions_test_RequestQueue 
-    "test_Sentry":RBSFM_getFunctions_test_Sentry 
-    "test_StringUtils":RBSFM_getFunctions_test_StringUtils 
-    "test_TubiAds":RBSFM_getFunctions_test_TubiAds 
-    "test_TubiAuth":RBSFM_getFunctions_test_TubiAuth 
-    "test_TubiBookmarks":RBSFM_getFunctions_test_TubiBookmarks 
-    "test_TubiExperiments":RBSFM_getFunctions_test_TubiExperiments 
-    "test_TubiExternalConfig":RBSFM_getFunctions_test_TubiExternalConfig 
-    "test_TubiLogger":RBSFM_getFunctions_test_TubiLogger 
-    "test_tubimetadatatranslate":RBSFM_getFunctions_test_tubimetadatatranslate 
-    "test_TubiNodeHelpers":RBSFM_getFunctions_test_TubiNodeHelpers 
-    "test_TubiTracking":RBSFM_getFunctions_test_TubiTracking 
-    "test_Settings":RBSFM_getFunctions_test_Settings 
+    "TubiAdsUnitTests":RBSFM_getFunctions_TubiAdsUnitTests 
+    "TubiAuthUnitTests":RBSFM_getFunctions_TubiAuthUnitTests 
+    "TubiBookmarksUnitTests":RBSFM_getFunctions_TubiBookmarksUnitTests 
+    "TubiExperimentsUnitTests":RBSFM_getFunctions_TubiExperimentsUnitTests 
+    "TubiExternalConfigUnitTests":RBSFM_getFunctions_TubiExternalConfigUnitTests 
+    "TubiLoggerUnitTests":RBSFM_getFunctions_TubiLoggerUnitTests 
+    "TubiMetadataTranslateUnitTests":RBSFM_getFunctions_TubiMetadataTranslateUnitTests 
+    "TubiNodeHelpersUnitTests":RBSFM_getFunctions_TubiNodeHelpersUnitTests 
+    "TubiTrackingUnitTests":RBSFM_getFunctions_TubiTrackingUnitTests 
+    "YoSpaceId3sTest":RBSFM_getFunctions_YoSpaceId3sTest 
   } 
   return map[filename]
 end function
 
-function RBSFM_getFunctions_Test_VideoPlayer_Cuepoints()
+function RBSFM_getFunctions_ChannelDetailScreen_UnitTests()
   return {
-    "TestSuite_VideoPlayer_Cuepoints":TestSuite_VideoPlayer_Cuepoints 
-    "testCase_isInWindow":testCase_isInWindow 
-    "testCase_isAtPosition":testCase_isAtPosition 
+    "channelDetailScreenSetup":channelDetailScreenSetup 
+    "channelDetailScreen_populateInfoPanelItem_test":channelDetailScreen_populateInfoPanelItem_test 
+    "channelDetailScreen_populateInfoPanelChannel_test":channelDetailScreen_populateInfoPanelChannel_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_Test_VideoPlayer_VideoErrorHelpers()
+function RBSFM_getFunctions_VideoPlayer_VideoErrorHelpersUnitTests()
   return {
-    "TestSuite_VideoPlayer_VideoErrorHelpers":TestSuite_VideoPlayer_VideoErrorHelpers 
-    "VideoErrorHelpers_SetUp":VideoErrorHelpers_SetUp 
-    "TestCase_getPlaybackErrorInfo":TestCase_getPlaybackErrorInfo 
-    "TestCase_getPlaybackErrorInfo_Position0":TestCase_getPlaybackErrorInfo_Position0 
-    "TestCase_getPlaybackErrorInfo_Error3":TestCase_getPlaybackErrorInfo_Error3 
-    "TestCase_getPlaybackErrorInfo_Error3_Position0":TestCase_getPlaybackErrorInfo_Error3_Position0 
-    "TestCase_removeExcessUrl":TestCase_removeExcessUrl 
+    "VideoErrorsSetup":VideoErrorsSetup 
+    "videoHelpers_getPlaybackErrorInfo_test":videoHelpers_getPlaybackErrorInfo_test 
+    "videoHelpers_getPlaybackErrorInfo_Position0":videoHelpers_getPlaybackErrorInfo_Position0 
+    "videoHelpers_getPlaybackErrorInfo_Error3":videoHelpers_getPlaybackErrorInfo_Error3 
+    "videoHelpers_getPlaybackErrorInfo_Error3_Position0":videoHelpers_getPlaybackErrorInfo_Error3_Position0 
+    "videoHelpers_removeExcessUrl":videoHelpers_removeExcessUrl 
   } 
 
 end function
 
-function RBSFM_getFunctions_Test_VideoPlayer_VideoPlayerHelpers()
+function RBSFM_getFunctions_VideoPlayer_VideoPlayerCuepointsUnitTests()
   return {
-    "TestSuite_VideoPlayer_VideoPlayerHelpers":TestSuite_VideoPlayer_VideoPlayerHelpers 
-    "TestMock__VideoPlayerHelpers_MockVideoNode":TestMock__VideoPlayerHelpers_MockVideoNode 
-    "TestCase_isActiveVideoState":TestCase_isActiveVideoState 
-    "TestCase_isButtonPressAllowed":TestCase_isButtonPressAllowed 
+    "videoCuepoints_isInWindow_test":videoCuepoints_isInWindow_test 
+    "videoCuepoints_isAtPosition_test":videoCuepoints_isAtPosition_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_Test_ChannelDetailScreen_Helpers()
+function RBSFM_getFunctions_VideoPlayer_VideoPlayerHelpersUnitTests()
   return {
-    "TestSuite_ChannelDetailScreen_Helpers":TestSuite_ChannelDetailScreen_Helpers 
-    "ChannelDetailScreenTestSetup_GetChannel":ChannelDetailScreenTestSetup_GetChannel 
-    "TestCase_populateInfoPanelItem":TestCase_populateInfoPanelItem 
-    "TestCase_populateInfoPanelChannel":TestCase_populateInfoPanelChannel 
+    "VideoPlayerSetup":VideoPlayerSetup 
+    "isActiveVideoState_test":isActiveVideoState_test 
+    "isButtonPressAllowed_test":isButtonPressAllowed_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_component_SpritePoster()
+function RBSFM_getFunctions_CmsApiIntegrationTests()
   return {
-    "componentTest_SpritePoster":componentTest_SpritePoster 
+    "CmsApiIntegrationSetup":CmsApiIntegrationSetup 
+    "cmsApi_channelReq_integration_test":cmsApi_channelReq_integration_test 
+    "cmsApi_homeScreenReq_integration_test":cmsApi_homeScreenReq_integration_test 
+    "cmsApi_categoryReq_integration_test":cmsApi_categoryReq_integration_test 
+    "cmsApi_searchReq_integration_test":cmsApi_searchReq_integration_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_componentTest_CategoryGridList()
+function RBSFM_getFunctions_CmsApiUnitTests()
   return {
-    "componentTest_CategoryGridList":componentTest_CategoryGridList 
+    "CmsApiSetup":CmsApiSetup 
+    "cmsApi_relatedContentReqInfo_test":cmsApi_relatedContentReqInfo_test 
+    "cmsApi_getUpNextContentRequestInfo_test":cmsApi_getUpNextContentRequestInfo_test 
+    "cmsApi_singleContentReqInfo_test":cmsApi_singleContentReqInfo_test 
+    "cmsApi_thumbnailsReqInfo_test":cmsApi_thumbnailsReqInfo_test 
+    "cmsApi_channelReq_test":cmsApi_channelReq_test 
+    "cmsApi_homeScreenReq_test":cmsApi_homeScreenReq_test 
+    "cmsApi_channelsCategoriesScreenReq_test":cmsApi_channelsCategoriesScreenReq_test 
+    "cmsApi_categoryReq_test":cmsApi_categoryReq_test 
+    "cmsApi_searchReq_test":cmsApi_searchReq_test 
+    "cmsApi_commonOptions_test":cmsApi_commonOptions_test 
+    "cmsApi_createAuthRequest_test":cmsApi_createAuthRequest_test 
+    "cmsApi_setImageParams_test":cmsApi_setImageParams_test 
+    "cmsApi_setTupianPosterParam_test":cmsApi_setTupianPosterParam_test 
+    "cmsApi_setTupianLandscapeParam_test":cmsApi_setTupianLandscapeParam_test 
+    "cmsApi_setTupianLargeVitgParam_test":cmsApi_setTupianLargeVitgParam_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_componentTest_ChannelDetailScreen()
+function RBSFM_getFunctions_GeneralTaskModuleUnitTests()
   return {
-    "componentTest_ChannelDetailScreen":componentTest_ChannelDetailScreen 
+    "GeneralTaskModuleSetup":GeneralTaskModuleSetup 
+    "generalTaskModule_makeRequest_test":generalTaskModule_makeRequest_test 
+    "generalTaskModule_getGeneralTaskSuccessCallback_test":generalTaskModule_getGeneralTaskSuccessCallback_test 
+    "generalTaskModule_getGeneralTaskErrorCallback_test":generalTaskModule_getGeneralTaskErrorCallback_test 
+    "generalTaskModule_storeGeneralTaskCallbacks_test":generalTaskModule_storeGeneralTaskCallbacks_test 
+    "onSuccessCallbackTest":onSuccessCallbackTest 
+    "onErrorCallbackTest":onErrorCallbackTest 
   } 
 
 end function
 
-function RBSFM_getFunctions_componentTest_DetailScreen()
+function RBSFM_getFunctions_RequestQueueUnitTests()
   return {
-    "componentTest_DetailScreen_AddQueue_History_Channel":componentTest_DetailScreen_AddQueue_History_Channel 
+    "TubiRequestQueueSetup":TubiRequestQueueSetup 
+    "tubiRequestQueue_BeforeEach":tubiRequestQueue_BeforeEach 
+    "tubiRequestQueue_create_test":tubiRequestQueue_create_test 
+    "tubiRequestQueue_pushRequest_test":tubiRequestQueue_pushRequest_test 
+    "tubiRequestQueue_cancelRequest_test":tubiRequestQueue_cancelRequest_test 
+    "tubiRequestQueue_clear_test":tubiRequestQueue_clear_test 
+    "tubiRequestQueue_maxSize_test":tubiRequestQueue_maxSize_test 
+    "tubiRequestQueue_handleEvent_test":tubiRequestQueue_handleEvent_test 
+    "tubiRequestQueue_timeout_test":tubiRequestQueue_timeout_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_componentTest_InfoPanel()
+function RBSFM_getFunctions_RequestUnitTests()
   return {
-    "componentTest_InfoPanel_movieMode":componentTest_InfoPanel_movieMode 
-    "componentTest_InfoPanel_seriesMode":componentTest_InfoPanel_seriesMode 
-    "componentTest_InfoPanel_categoryMode":componentTest_InfoPanel_categoryMode 
-    "componentTest_InfoPanel_categoryScreen_itemMode":componentTest_InfoPanel_categoryScreen_itemMode 
+    "RequestSetup":RequestSetup 
+    "request_createAsync_test":request_createAsync_test 
+    "request_startWithPort_test":request_startWithPort_test 
+    "request_startWithUrlTransfer_test":request_startWithUrlTransfer_test 
+    "request_cancel_test":request_cancel_test 
+    "request_handleEvent_test":request_handleEvent_test 
+    "request_addParamsToUrlAsModuleFunction_test":request_addParamsToUrlAsModuleFunction_test 
+    "request_addParamsToUrl_test":request_addParamsToUrl_test 
+    "request_isHttps_test":request_isHttps_test 
+    "request_methods_test":request_methods_test 
+    "request_createTestServer_testHelper":request_createTestServer_testHelper 
   } 
 
 end function
 
-function RBSFM_getFunctions_componentTest_SettingsScreen()
+function RBSFM_getFunctions_SentryUnitTests()
   return {
-    "componentTest_SettingsScreen":componentTest_SettingsScreen 
+    "SentrySetup":SentrySetup 
+    "sentry_constructor_test":sentry_constructor_test 
+    "tsentry_parseDsn_test":tsentry_parseDsn_test 
+    "sentry_deepAppend_test":sentry_deepAppend_test 
+    "sentry_captureMessage_test":sentry_captureMessage_test 
+    "sentry_getUrl_test":sentry_getUrl_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_componentTest_TubiProgressBar()
+function RBSFM_getFunctions_SettingsUnitTests()
   return {
-    "componentTestHelper_ProgressBar":componentTestHelper_ProgressBar 
-    "componentTest_ProgressBar_0":componentTest_ProgressBar_0 
-    "componentTest_ProgressBar_0_1":componentTest_ProgressBar_0_1 
-    "componentTest_ProgressBar_25":componentTest_ProgressBar_25 
-    "componentTest_ProgressBar_50":componentTest_ProgressBar_50 
-    "componentTest_ProgressBar_75":componentTest_ProgressBar_75 
-    "componentTest_ProgressBar_100":componentTest_ProgressBar_100 
-    "componentTest_ProgressBar_99":componentTest_ProgressBar_99 
-    "componentTest_ProgressBar_150":componentTest_ProgressBar_150 
-    "componentTest_ProgressBar_less_50":componentTest_ProgressBar_less_50 
-    "componentTest_ProgressBar_width_0":componentTest_ProgressBar_width_0 
-  } 
-
-end function
-
-function RBSFM_getFunctions_componentTest_VideoPlayer()
-  return {
-    "componentTest_VideoPlayer":componentTest_VideoPlayer 
-  } 
-
-end function
-
-function RBSFM_getFunctions_test_CmsApi()
-  return {
-    "TestSuite_CmsApi":TestSuite_CmsApi 
-    "CmsApiTestSuite_SetUp":CmsApiTestSuite_SetUp 
-    "testCase_cmsApi_singleContentReq":testCase_cmsApi_singleContentReq 
-    "testCase_cmsApi_singleContentReq_withChannels":testCase_cmsApi_singleContentReq_withChannels 
-    "testCase_cmsApi_upNextContentReq":testCase_cmsApi_upNextContentReq 
-    "testCase_cmsApi_upNextContentReq_withContainer":testCase_cmsApi_upNextContentReq_withContainer 
-    "testCase_cmsApi_relatedContentReq":testCase_cmsApi_relatedContentReq 
-    "testCase_cmsApi_thumbnailsReq":testCase_cmsApi_thumbnailsReq 
-    "testCase_cmsApi_channelReq":testCase_cmsApi_channelReq 
-    "testCase_cmsApi_homeScreenReq":testCase_cmsApi_homeScreenReq 
-    "testCase_cmsApi_categoryReq":testCase_cmsApi_categoryReq 
-    "testCase_cmsApi_searchReq":testCase_cmsApi_searchReq 
+    "SettingsSetup":SettingsSetup 
+    "settings_getSettings_test":settings_getSettings_test 
+    "settings_getManifest_test":settings_getManifest_test 
   } 
 
 end function
@@ -177,264 +179,217 @@ function RBSFM_getFunctions_StringUtilsUnitTests()
     "stringUtils_formatLengthAsTimestamp_test":stringUtils_formatLengthAsTimestamp_test 
     "stringUtils_formatLengthAsEnglish_test":stringUtils_formatLengthAsEnglish_test 
     "stringUtils_capitalize_test":stringUtils_capitalize_test 
+    "stringUtils_getUrlParts_test":stringUtils_getUrlParts_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_test_Request()
+function RBSFM_getFunctions_TubiAdsUnitTests()
   return {
-    "TestSuite_Request":TestSuite_Request 
-    "testCase_request_createAsync":testCase_request_createAsync 
-    "testCase_request_startWithPort":testCase_request_startWithPort 
-    "testCase_request_startWithUrlTransfer":testCase_request_startWithUrlTransfer 
-    "testCase_request_cancel":testCase_request_cancel 
-    "testCase_request_handleEvent":testCase_request_handleEvent 
-    "testCase_request_addParamsToUrlAsModuleFunction":testCase_request_addParamsToUrlAsModuleFunction 
-    "testCase_request_addParamsToUrl":testCase_request_addParamsToUrl 
-    "testCase_request_isHttps":testCase_request_isHttps 
-    "testCase_request_methods":testCase_request_methods 
-    "testHelper_request_createTestServer":testHelper_request_createTestServer 
+    "TubiAdsSetup":TubiAdsSetup 
+    "tubiAds_getAdsListViaRoku_failure_test":tubiAds_getAdsListViaRoku_failure_test 
+    "testHelper_tubiAds_createTubiAds_test":testHelper_tubiAds_createTubiAds_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_test_RequestQueue()
+function RBSFM_getFunctions_TubiAuthUnitTests()
   return {
-    "TestSuite_TubiRequestQueue":TestSuite_TubiRequestQueue 
-    "testCase_tubiRequestQueue_create":testCase_tubiRequestQueue_create 
-    "testCase_tubiRequestQueue_pushRequest":testCase_tubiRequestQueue_pushRequest 
-    "testCase_tubiRequestQueue_cancelRequest":testCase_tubiRequestQueue_cancelRequest 
-    "testCase_tubiRequestQueue_clear":testCase_tubiRequestQueue_clear 
-    "testCase_tubiRequestQueue_maxSize":testCase_tubiRequestQueue_maxSize 
-    "testCase_tubiRequestQueue_handleEvent":testCase_tubiRequestQueue_handleEvent 
-    "testCase_tubiRequestQueue_timeout":testCase_tubiRequestQueue_timeout 
+    "TubiAuthSetup":TubiAuthSetup 
+    "tubiAuth_refreshAuthToken_test":tubiAuth_refreshAuthToken_test 
+    "tubiAuth_refreshAuthToken_failed_test":tubiAuth_refreshAuthToken_failed_test 
+    "tubiAuth_refreshAuthToken_403_test":tubiAuth_refreshAuthToken_403_test 
+    "tubiAuth_formatAuthInfoFromServer_test":tubiAuth_formatAuthInfoFromServer_test 
+    "tubiAuth_checkIfAuthExpired_test":tubiAuth_checkIfAuthExpired_test 
+    "tubiAuth_updateAuthInfo_test":tubiAuth_updateAuthInfo_test 
+    "tubiAuth_getAuthHeaders_test":tubiAuth_getAuthHeaders_test 
+    "tubiAuth_saveAuthInfo_test":tubiAuth_saveAuthInfo_test 
+    "tubiAuth_deleteAuthInfo_test":tubiAuth_deleteAuthInfo_test 
+    "tubiAuth_requestTokenRefresh_test":tubiAuth_requestTokenRefresh_test 
+    "tubiAuth_requestTokenTransfer_test":tubiAuth_requestTokenTransfer_test 
+    "tubiAuth_handleRefreshResponse_test":tubiAuth_handleRefreshResponse_test 
+    "tubiAuth_handleRefreshResponse_403":tubiAuth_handleRefreshResponse_403 
+    "tubiAuth_createAuthRequest_test":tubiAuth_createAuthRequest_test 
+    "tubiAuth_transferRefreshToken_test":tubiAuth_transferRefreshToken_test 
+    "tubiAuth_transferRefreshToken_failed_test":tubiAuth_transferRefreshToken_failed_test 
+    "tubiAuth_transferRefreshToken_403_test":tubiAuth_transferRefreshToken_403_test 
+    "tubiAuth_createMetadataFetchTaskServer_testHelper":tubiAuth_createMetadataFetchTaskServer_testHelper 
+    "tubiAuth_visit_BeforeEach":tubiAuth_visit_BeforeEach 
+    "tubiAuth_getFirstVisit_test":tubiAuth_getFirstVisit_test 
+    "tubiAuth_setFirstVisit_test":tubiAuth_setFirstVisit_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_test_Sentry()
+function RBSFM_getFunctions_TubiBookmarksUnitTests()
   return {
-    "TestSuite_Sentry":TestSuite_Sentry 
-    "testCase_sentry_constructor":testCase_sentry_constructor 
-    "testCase_sentry_parseDsn":testCase_sentry_parseDsn 
-    "testCase_sentry_deepAppend":testCase_sentry_deepAppend 
-    "testCase_sentry_captureMessage":testCase_sentry_captureMessage 
-    "testCase_sentry_getUrl":testCase_sentry_getUrl 
+    "TubiBookmarksSetup":TubiBookmarksSetup 
+    "tubiBookmarks_mockAuth_Unauthorized_testHelper":tubiBookmarks_mockAuth_Unauthorized_testHelper 
+    "tubiBookmarks_mockAuth_Authorized_testHelper":tubiBookmarks_mockAuth_Authorized_testHelper 
+    "tubiBookmarks_addBookmarkReqUnauthorized_test":tubiBookmarks_addBookmarkReqUnauthorized_test 
+    "tubiBookmarks_addBookmarkReqMovie_test":tubiBookmarks_addBookmarkReqMovie_test 
+    "tubiBookmarks_addBookmarkReqSeries_test":tubiBookmarks_addBookmarkReqSeries_test 
+    "tubiBookmarks_addBookmarkReqEpisodeWithParent_test":tubiBookmarks_addBookmarkReqEpisodeWithParent_test 
+    "tubiBookmarks_removeBookmarkReq_test":tubiBookmarks_removeBookmarkReq_test 
+    "tubiBookmarks_removeBookmarkLocallySuccessful_test":tubiBookmarks_removeBookmarkLocallySuccessful_test 
+    "tubiBookmarks_addBookmarkLocallySuccessful_test":tubiBookmarks_addBookmarkLocallySuccessful_test 
+    "tubiBookmarks_addBookmarkLocallySuccessfulForEpisode_test":tubiBookmarks_addBookmarkLocallySuccessfulForEpisode_test 
+    "tubiBookmarks_addHistoryReqVideo_test":tubiBookmarks_addHistoryReqVideo_test 
+    "tubiBookmarks_addHistoryReqEpisodeWithParent_test":tubiBookmarks_addHistoryReqEpisodeWithParent_test 
+    "tubiBookmarks_addHistoryReqEpisodeWithoutParent_test":tubiBookmarks_addHistoryReqEpisodeWithoutParent_test 
+    "tubiBookmarks_addHistoryReqSeries_test":tubiBookmarks_addHistoryReqSeries_test 
+    "tubiBookmarks_getInitialBookmarksReqSignedOut_test":tubiBookmarks_getInitialBookmarksReqSignedOut_test 
+    "tubiBookmarks_getInitialBookmarksReqSignedIn_test":tubiBookmarks_getInitialBookmarksReqSignedIn_test 
+    "tubiBookmarks_getInitialHistoryReqSignedOut_test":tubiBookmarks_getInitialHistoryReqSignedOut_test 
+    "tubiBookmarks_getInitialHistoryReqSignedIn_test":tubiBookmarks_getInitialHistoryReqSignedIn_test 
+    "tubiBookmarks_handleInitialBookmarks_test":tubiBookmarks_handleInitialBookmarks_test 
+    "tubiBookmarks_handleInitialHistory_test":tubiBookmarks_handleInitialHistory_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_test_StringUtils()
+function RBSFM_getFunctions_TubiExperimentsUnitTests()
   return {
-    "TestSuite_StringUtils":TestSuite_StringUtils 
-    "testCase_stringUtils_padString":testCase_stringUtils_padString 
-    "testCase_stringUtils_FormatLengthAsTimestamp":testCase_stringUtils_FormatLengthAsTimestamp 
-    "testCase_stringUtils_formatLengthAsEnglish":testCase_stringUtils_formatLengthAsEnglish 
-    "testCase_stringUtils_capitalize":testCase_stringUtils_capitalize 
+    "TubiExperimentsSetup":TubiExperimentsSetup 
+    "tubiExperiments_mockGetNamespaces_testHelper":tubiExperiments_mockGetNamespaces_testHelper 
+    "tubiExperiments_initSuccess_test":tubiExperiments_initSuccess_test 
+    "tubiExperiments_getExperimentValueValid_test":tubiExperiments_getExperimentValueValid_test 
+    "tubiExperiments_getExperimentValueDefault_test":tubiExperiments_getExperimentValueDefault_test 
+    "tubiExperiments_getExperimentValueInvalid_test":tubiExperiments_getExperimentValueInvalid_test 
+    "tubiExperiments_mockGetInvalidNamespaces_testHelper":tubiExperiments_mockGetInvalidNamespaces_testHelper 
+    "tubiExperiments_updateNamespaces":tubiExperiments_updateNamespaces 
+    "tubiExperiments_initFailed_test":tubiExperiments_initFailed_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_test_TubiAds()
+function RBSFM_getFunctions_TubiExternalConfigUnitTests()
   return {
-    "TestSuite_TubiAds":TestSuite_TubiAds 
-    "testCase_tubiAds_getAdsListViaRoku":testCase_tubiAds_getAdsListViaRoku 
-    "testHelper_tubiAds_createTubiAds":testHelper_tubiAds_createTubiAds 
+    "TubiExternalConfigSetup":TubiExternalConfigSetup 
+    "tubiExternalConfig_mockGetInvalidConfigs_testHelper":tubiExternalConfig_mockGetInvalidConfigs_testHelper 
+    "tubiExternalConfig_mockGetConfigs_testHelper":tubiExternalConfig_mockGetConfigs_testHelper 
+    "tubiExternalConfig_config":tubiExternalConfig_config 
+    "tubiExternalConfig_initSuccess_test":tubiExternalConfig_initSuccess_test 
+    "tubiExternalConfig_initDefaults_test":tubiExternalConfig_initDefaults_test 
+    "tubiExternalConfig_initFailed_test":tubiExternalConfig_initFailed_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_test_TubiAuth()
+function RBSFM_getFunctions_TubiLoggerUnitTests()
   return {
-    "TestSuite_TubiAuth":TestSuite_TubiAuth 
-    "testCase_tubiAuth_refreshAuthToken":testCase_tubiAuth_refreshAuthToken 
-    "testCase_tubiAuth_refreshAuthToken_failed":testCase_tubiAuth_refreshAuthToken_failed 
-    "testCase_tubiAuth_refreshAuthToken_403":testCase_tubiAuth_refreshAuthToken_403 
-    "testCase_tubiAuth_formatAuthInfoFromServer":testCase_tubiAuth_formatAuthInfoFromServer 
-    "testCase_tubiAuth_checkIfAuthExpired":testCase_tubiAuth_checkIfAuthExpired 
-    "testCase_tubiAuth_updateAuthInfo":testCase_tubiAuth_updateAuthInfo 
-    "testCase_tubiAuth_getAuthHeaders":testCase_tubiAuth_getAuthHeaders 
-    "testCase_tubiAuth_saveAuthInfo":testCase_tubiAuth_saveAuthInfo 
-    "testCase_tubiAuth_deleteAuthInfo":testCase_tubiAuth_deleteAuthInfo 
-    "testCase_tubiAuth_requestTokenRefresh":testCase_tubiAuth_requestTokenRefresh 
-    "testCase_tubiAuth_requestTokenTransfer":testCase_tubiAuth_requestTokenTransfer 
-    "testCase_tubiAuth_handleRefreshResponse":testCase_tubiAuth_handleRefreshResponse 
-    "testCase_tubiAuth_handleRefreshResponse_403":testCase_tubiAuth_handleRefreshResponse_403 
-    "testCase_tubiAuth_createAuthRequest":testCase_tubiAuth_createAuthRequest 
-    "testCase_tubiAuth_transferRefreshToken":testCase_tubiAuth_transferRefreshToken 
-    "testCase_tubiAuth_transferRefreshToken_failed":testCase_tubiAuth_transferRefreshToken_failed 
-    "testCase_tubiAuth_transferRefreshToken_403":testCase_tubiAuth_transferRefreshToken_403 
-    "testHelper_tubiAuth_createMetadataFetchTaskServer":testHelper_tubiAuth_createMetadataFetchTaskServer 
-    "testCase_tubiAuth_getFirstVisit":testCase_tubiAuth_getFirstVisit 
-    "testCase_tubiAuth_setFirstVisit":testCase_tubiAuth_setFirstVisit 
-    "testCase_tubiAuth_getKidsMode":testCase_tubiAuth_getKidsMode 
-    "testCase_tubiAuth_getDefaultKidsMode":testCase_tubiAuth_getDefaultKidsMode 
-    "testCase_tubiAuth_setKidsMode":testCase_tubiAuth_setKidsMode 
+    "TubiLoggerSetup":TubiLoggerSetup 
+    "tubiLogger_getLogPrintout_test":tubiLogger_getLogPrintout_test 
+    "tubiLogger_buildLogInfo_test":tubiLogger_buildLogInfo_test 
+    "tubiLogger_getLoggingRequest_test":tubiLogger_getLoggingRequest_test 
+    "tubiLogger_sendLogging_test":tubiLogger_sendLogging_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_test_TubiBookmarks()
+function RBSFM_getFunctions_TubiMetadataTranslateUnitTests()
   return {
-    "TestSuite_TubiBookmarks":TestSuite_TubiBookmarks 
-    "testHelper_tubiBookmarks_mockAuth_Unauthorized":testHelper_tubiBookmarks_mockAuth_Unauthorized 
-    "testHelper_tubiBookmarks_mockAuth_Authorized":testHelper_tubiBookmarks_mockAuth_Authorized 
-    "testCase_tubiBookmarks_addBookmarkReqUnauthorized":testCase_tubiBookmarks_addBookmarkReqUnauthorized 
-    "testCase_tubiBookmarks_addBookmarkReqMovie":testCase_tubiBookmarks_addBookmarkReqMovie 
-    "testCase_tubiBookmarks_addBookmarkReqSeries":testCase_tubiBookmarks_addBookmarkReqSeries 
-    "testCase_tubiBookmarks_addBookmarkReqEpisodeWithParent":testCase_tubiBookmarks_addBookmarkReqEpisodeWithParent 
-    "testCase_tubiBookmarks_removeBookmarkReq":testCase_tubiBookmarks_removeBookmarkReq 
-    "testCase_tubiBookmarks_addHistoryReqVideo":testCase_tubiBookmarks_addHistoryReqVideo 
-    "testCase_tubiBookmarks_addHistoryReqEpisodeWithParent":testCase_tubiBookmarks_addHistoryReqEpisodeWithParent 
-    "testCase_tubiBookmarks_addHistoryReqEpisodeWithoutParent":testCase_tubiBookmarks_addHistoryReqEpisodeWithoutParent 
-    "testCase_tubiBookmarks_addHistoryReqSeries":testCase_tubiBookmarks_addHistoryReqSeries 
-    "testCase_tubiBookmarks_getInitialBookmarksReqSignedOut":testCase_tubiBookmarks_getInitialBookmarksReqSignedOut 
-    "testCase_tubiBookmarks_getInitialBookmarksReqSignedIn":testCase_tubiBookmarks_getInitialBookmarksReqSignedIn 
-    "testCase_tubiBookmarks_getInitialHistoryReqSignedOut":testCase_tubiBookmarks_getInitialHistoryReqSignedOut 
-    "testCase_tubiBookmarks_getInitialHistoryReqSignedOutGuestHistoryEnabled":testCase_tubiBookmarks_getInitialHistoryReqSignedOutGuestHistoryEnabled 
-    "testCase_tubiBookmarks_getInitialHistoryReqSignedIn":testCase_tubiBookmarks_getInitialHistoryReqSignedIn 
-    "testCase_tubiBookmarks_handleInitialBookmarks":testCase_tubiBookmarks_handleInitialBookmarks 
-    "testCase_tubiBookmarks_handleInitialHistory":testCase_tubiBookmarks_handleInitialHistory 
+    "TubiMetadataTranslateSetup":TubiMetadataTranslateSetup 
+    "tubiMetadataTranslate_translateRecursive_testTranslateTypes_test":tubiMetadataTranslate_translateRecursive_testTranslateTypes_test 
+    "tubiMetadataTranslate_translateRecursive_testParentTypes_test":tubiMetadataTranslate_translateRecursive_testParentTypes_test 
+    "tubiMetadataTranslate_translateRecursive_testCreditsCuepoints_test":tubiMetadataTranslate_translateRecursive_testCreditsCuepoints_test 
+    "tubiMetadataTranslate_translateRecursive_channel_test":tubiMetadataTranslate_translateRecursive_channel_test 
+    "tubiMetadataTranslate_translateRecursive_series_test":tubiMetadataTranslate_translateRecursive_series_test 
+    "tubiMetadataTranslate_translateRecursive_videoResources_test":tubiMetadataTranslate_translateRecursive_videoResources_test 
+    "tubiMetadataTranslate_translateContainer_category_test":tubiMetadataTranslate_translateContainer_category_test 
+    "tubiMetadataTranslate_translateContainer_channel_test":tubiMetadataTranslate_translateContainer_channel_test 
+    "tubiMetadataTranslate_translateHomescreen_test":tubiMetadataTranslate_translateHomescreen_test 
+    "tubiMetadataTranslate_translate_test":tubiMetadataTranslate_translate_test 
+    "tubiMetadataTranslate_translateChannel_test":tubiMetadataTranslate_translateChannel_test 
+    "tubiMetadataTranslate_getContentFromCategoryJson_test":tubiMetadataTranslate_getContentFromCategoryJson_test 
+    "tubiMetadataTranslate_generateChannelPosterUrl_test":tubiMetadataTranslate_generateChannelPosterUrl_test 
+    "tubiMetadataTranslate_generateChannelPosterUrl_unbranded_test":tubiMetadataTranslate_generateChannelPosterUrl_unbranded_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_test_TubiExperiments()
+function RBSFM_getFunctions_TubiNodeHelpersUnitTests()
   return {
-    "TestSuite_TubiExperiments":TestSuite_TubiExperiments 
-    "testCase_tubiExperiments_initSuccess":testCase_tubiExperiments_initSuccess 
-    "testCase_tubiExperiments_initFailed":testCase_tubiExperiments_initFailed 
-    "testCase_tubiExperiments_getExperimentValueValid":testCase_tubiExperiments_getExperimentValueValid 
-    "testCase_tubiExperiments_getExperimentValueDefault":testCase_tubiExperiments_getExperimentValueDefault 
-    "testCase_tubiExperiments_getExperimentValueInvalid":testCase_tubiExperiments_getExperimentValueInvalid 
-    "testHelper_tubiExperiments_mockGetInvalidNamespaces":testHelper_tubiExperiments_mockGetInvalidNamespaces 
-    "testHelper_tubiExperiments_mockGetNamespaces":testHelper_tubiExperiments_mockGetNamespaces 
+    "TubiNodeHelpersSetup":TubiNodeHelpersSetup 
+    "tubiNodeHelpers_BeforeEach":tubiNodeHelpers_BeforeEach 
+    "tubiNodeHelpers_getChildIndex_test":tubiNodeHelpers_getChildIndex_test 
+    "tubiNodeHelpers_getChildIndexById_test":tubiNodeHelpers_getChildIndexById_test 
+    "tubiNodeHelpers_convertNodesToIdsAA_test":tubiNodeHelpers_convertNodesToIdsAA_test 
+    "tubiNodeHelpers_immutableInsertChild_test":tubiNodeHelpers_immutableInsertChild_test 
+    "tubiNodeHelpers_immutableInsertChildAlreadyExists_test":tubiNodeHelpers_immutableInsertChildAlreadyExists_test 
+    "tubiNodeHelpers_immutableRemoveChildIndex_test":tubiNodeHelpers_immutableRemoveChildIndex_test 
+    "tubiNodeHelpers_immutableRemoveChild_test":tubiNodeHelpers_immutableRemoveChild_test 
+    "tubiNodeHelpers_immutableRemoveChildren_test":tubiNodeHelpers_immutableRemoveChildren_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_test_TubiExternalConfig()
+function RBSFM_getFunctions_TubiTrackingUnitTests()
   return {
-    "TestSuite_TubiExternalConfig":TestSuite_TubiExternalConfig 
-    "testCase_tubiExternalConfig_initSuccess":testCase_tubiExternalConfig_initSuccess 
-    "testCase_tubiExternalConfig_initDefaults":testCase_tubiExternalConfig_initDefaults 
-    "testCase_tubiExternalConfig_initFailed":testCase_tubiExternalConfig_initFailed 
-    "testHelper_tubiExternalConfig_mockGetInvalidConfigs":testHelper_tubiExternalConfig_mockGetInvalidConfigs 
-    "testHelper_tubiExternalConfig_mockGetConfigs":testHelper_tubiExternalConfig_mockGetConfigs 
+    "TubiTrackingSetup":TubiTrackingSetup 
+    "tubiTracking_createTubiTracking_testHelper":tubiTracking_createTubiTracking_testHelper 
+    "tubiTracking_getAnalyticsRequestIdempotency_test":tubiTracking_getAnalyticsRequestIdempotency_test 
+    "tubiTracking_getAnalyticsTimestamp_test":tubiTracking_getAnalyticsTimestamp_test 
+    "tubiTracking_getAnalyticsUser_test":tubiTracking_getAnalyticsUser_test 
+    "tubiTracking_getAnalyticsDevice_test":tubiTracking_getAnalyticsDevice_test 
+    "tubiTracking_getAnalyticsApp_test":tubiTracking_getAnalyticsApp_test 
+    "tubiTracking_getAnalyticsConnection_test":tubiTracking_getAnalyticsConnection_test 
+    "tubiTracking_getAnalyticsEvent_test":tubiTracking_getAnalyticsEvent_test 
+    "tubiTracking_getAnalyticsPage_test":tubiTracking_getAnalyticsPage_test 
+    "tubiTracking_getAnalyticsComponent_test":tubiTracking_getAnalyticsComponent_test 
+    "tubiTracking_getAnalyticsTile_test":tubiTracking_getAnalyticsTile_test 
+    "tubiTracking_getAnalyticsAdAdrise_test":tubiTracking_getAnalyticsAdAdrise_test 
+    "tubiTracking_getAnalyticsAdRainmaker_test":tubiTracking_getAnalyticsAdRainmaker_test 
+    "tubiTracking_populateMessage_test":tubiTracking_populateMessage_test 
+    "tubiTracking_isEmptyValue_test":tubiTracking_isEmptyValue_test 
+    "tubiTracking_isNumeric_test":tubiTracking_isNumeric_test 
   } 
 
 end function
 
-function RBSFM_getFunctions_test_TubiLogger()
+function RBSFM_getFunctions_YoSpaceId3sTest()
   return {
-    "TestSuite_TubiLogger":TestSuite_TubiLogger 
-    "testCase_tubiLogger_getLogPrintout":testCase_tubiLogger_getLogPrintout 
-    "testCase_tubiLogger_buildLogInfo":testCase_tubiLogger_buildLogInfo 
-    "testCase_tubiLogger_getLoggingRequest":testCase_tubiLogger_getLoggingRequest 
-    "testCase_tubiLogger_sendLogging":testCase_tubiLogger_sendLogging 
-  } 
-
-end function
-
-function RBSFM_getFunctions_test_tubimetadatatranslate()
-  return {
-    "TestSuite_TubiMetadataTranslate":TestSuite_TubiMetadataTranslate 
-    "TubiMetadataTranslateTestSuite_SetUp":TubiMetadataTranslateTestSuite_SetUp 
-    "testCase_tubiMetadataTranslate_translateRecursive_testTranslateTypes":testCase_tubiMetadataTranslate_translateRecursive_testTranslateTypes 
-    "testCase_tubiMetadataTranslate_translateRecursive_testParentTypes":testCase_tubiMetadataTranslate_translateRecursive_testParentTypes 
-    "testCase_tubiMetadataTranslate_translateRecursive_testCreditsCuepoints":testCase_tubiMetadataTranslate_translateRecursive_testCreditsCuepoints 
-    "testCase_tubiMetadataTranslate_translateRecursive_channel":testCase_tubiMetadataTranslate_translateRecursive_channel 
-    "testCase_tubiMetadataTranslate_translateRecursive_series":testCase_tubiMetadataTranslate_translateRecursive_series 
-    "testCase_tubiMetadataTranslate_translateRecursive_videoResources":testCase_tubiMetadataTranslate_translateRecursive_videoResources 
-    "testCase_tubiMetadataTranslate_translateContainer_category":testCase_tubiMetadataTranslate_translateContainer_category 
-    "testCase_tubiMetadataTranslate_translateContainer_channel":testCase_tubiMetadataTranslate_translateContainer_channel 
-    "testCase_tubiMetadataTranslate_translateHomescreen":testCase_tubiMetadataTranslate_translateHomescreen 
-    "testCase_tubiMetadataTranslate_translate":testCase_tubiMetadataTranslate_translate 
-    "testCase_tubiMetadataTranslate_translateChannel":testCase_tubiMetadataTranslate_translateChannel 
-    "testCase_tubiMetadataTranslate_getContentFromCategoryJson":testCase_tubiMetadataTranslate_getContentFromCategoryJson 
-    "testCase_tubiMetadataTranslate_generateChannelPosterUrl":testCase_tubiMetadataTranslate_generateChannelPosterUrl 
-    "testCase_tubiMetadataTranslate_generateChannelPosterUrl_unbranded":testCase_tubiMetadataTranslate_generateChannelPosterUrl_unbranded 
-  } 
-
-end function
-
-function RBSFM_getFunctions_test_TubiNodeHelpers()
-  return {
-    "TestSuite_TubiNodeHelpers":TestSuite_TubiNodeHelpers 
-    "testCase_tubiNodeHelpers_getChildIndex":testCase_tubiNodeHelpers_getChildIndex 
-    "testCase_tubiNodeHelpers_getChildIndexById":testCase_tubiNodeHelpers_getChildIndexById 
-    "testCase_tubiNodeHelpers_convertNodesToIdsAA":testCase_tubiNodeHelpers_convertNodesToIdsAA 
-    "testCase_tubiNodeHelpers_immutableInsertChild":testCase_tubiNodeHelpers_immutableInsertChild 
-    "testCase_tubiNodeHelpers_immutableInsertChildAlreadyExists":testCase_tubiNodeHelpers_immutableInsertChildAlreadyExists 
-    "testCase_tubiNodeHelpers_immutableRemoveChildIndex":testCase_tubiNodeHelpers_immutableRemoveChildIndex 
-    "testCase_tubiNodeHelpers_immutableRemoveChild":testCase_tubiNodeHelpers_immutableRemoveChild 
-    "testCase_tubiNodeHelpers_immutableRemoveChildren":testCase_tubiNodeHelpers_immutableRemoveChildren 
-  } 
-
-end function
-
-function RBSFM_getFunctions_test_TubiTracking()
-  return {
-    "TestSuite_TubiTracking":TestSuite_TubiTracking 
-    "testHelper_tubiTracking_createTubiTracking":testHelper_tubiTracking_createTubiTracking 
-    "testCase_tubiTracking_getAnalyticsRequestIdempotency":testCase_tubiTracking_getAnalyticsRequestIdempotency 
-    "testCase_tubiTracking_getAnalyticsTimestamp":testCase_tubiTracking_getAnalyticsTimestamp 
-    "testCase_tubiTracking_getAnalyticsUser":testCase_tubiTracking_getAnalyticsUser 
-    "testCase_tubiTracking_getAnalyticsDevice":testCase_tubiTracking_getAnalyticsDevice 
-    "testCase_tubiTracking_getAnalyticsApp":testCase_tubiTracking_getAnalyticsApp 
-    "testCase_tubiTracking_getAnalyticsConnection":testCase_tubiTracking_getAnalyticsConnection 
-    "testCase_tubiTracking_getAnalyticsEvent":testCase_tubiTracking_getAnalyticsEvent 
-    "testCase_tubiTracking_getAnalyticsPage":testCase_tubiTracking_getAnalyticsPage 
-    "testCase_tubiTracking_getAnalyticsComponent":testCase_tubiTracking_getAnalyticsComponent 
-    "testCase_tubiTracking_getAnalyticsTile":testCase_tubiTracking_getAnalyticsTile 
-    "testCase_tubiTracking_getAnalyticsAdAdrise":testCase_tubiTracking_getAnalyticsAdAdrise 
-    "testCase_tubiTracking_getAnalyticsAdRainmaker":testCase_tubiTracking_getAnalyticsAdRainmaker 
-    "testCase_tubiTracking_populateMessage":testCase_tubiTracking_populateMessage 
-    "testCase_tubiTracking_isEmptyValue":testCase_tubiTracking_isEmptyValue 
-    "testCase_tubiTracking_isNumeric":testCase_tubiTracking_isNumeric 
-  } 
-
-end function
-
-function RBSFM_getFunctions_test_Settings()
-  return {
-    "TestSuite_Settings":TestSuite_Settings 
-    "testCase_settings_getSettings":testCase_settings_getSettings 
-    "testCase_settings_getManifest":testCase_settings_getManifest 
+    "YoSpaceId3sSetup":YoSpaceId3sSetup 
+    "YoSpaceId3s_beforeEach":YoSpaceId3s_beforeEach 
+    "yoSpaceIds_setTag_start_test":yoSpaceIds_setTag_start_test 
+    "yoSpaceIds_setTag_mid_test":yoSpaceIds_setTag_mid_test 
+    "yoSpaceIds_setTag_end_test":yoSpaceIds_setTag_end_test 
+    "yoSpaceIds_getTag_test":yoSpaceIds_getTag_test 
+    "yoSpaceIds_getAllTags_test":yoSpaceIds_getAllTags_test 
+    "yoSpaceIds_getId_test":yoSpaceIds_getId_test 
+    "yoSpaceIds_getType_test":yoSpaceIds_getType_test 
+    "yoSpaceIds_getPosition_test":yoSpaceIds_getPosition_test 
+    "yoSpaceIds_currentSegment_test":yoSpaceIds_currentSegment_test 
+    "yoSpaceIds_totalSegments_test":yoSpaceIds_totalSegments_test 
+    "yoSpaceIds_clearTags_test":yoSpaceIds_clearTags_test 
   } 
 
 end function
 
 function RBSFM_getFilenames()
   return [
-    "Test_VideoPlayer_Cuepoints", 
-    "Test_VideoPlayer_VideoErrorHelpers", 
-    "Test_VideoPlayer_VideoPlayerHelpers", 
-    "Test_ChannelDetailScreen_Helpers", 
-    "component_SpritePoster", 
-    "componentTest_CategoryGridList", 
-    "componentTest_ChannelDetailScreen", 
-    "componentTest_DetailScreen", 
-    "componentTest_InfoPanel", 
-    "componentTest_SettingsScreen", 
-    "componentTest_TubiProgressBar", 
-    "componentTest_VideoPlayer", 
-    "test_CmsApi", 
+    "ChannelDetailScreen_UnitTests", 
+    "VideoPlayer_VideoErrorHelpersUnitTests", 
+    "VideoPlayer_VideoPlayerCuepointsUnitTests", 
+    "VideoPlayer_VideoPlayerHelpersUnitTests", 
+    "CmsApiIntegrationTests", 
+    "CmsApiUnitTests", 
+    "GeneralTaskModuleUnitTests", 
+    "RequestQueueUnitTests", 
+    "RequestUnitTests", 
+    "SentryUnitTests", 
+    "SettingsUnitTests", 
     "StringUtilsUnitTests", 
-    "test_Request", 
-    "test_RequestQueue", 
-    "test_Sentry", 
-    "test_StringUtils", 
-    "test_TubiAds", 
-    "test_TubiAuth", 
-    "test_TubiBookmarks", 
-    "test_TubiExperiments", 
-    "test_TubiExternalConfig", 
-    "test_TubiLogger", 
-    "test_tubimetadatatranslate", 
-    "test_TubiNodeHelpers", 
-    "test_TubiTracking", 
-    "test_Settings", 
+    "TubiAdsUnitTests", 
+    "TubiAuthUnitTests", 
+    "TubiBookmarksUnitTests", 
+    "TubiExperimentsUnitTests", 
+    "TubiExternalConfigUnitTests", 
+    "TubiLoggerUnitTests", 
+    "TubiMetadataTranslateUnitTests", 
+    "TubiNodeHelpersUnitTests", 
+    "TubiTrackingUnitTests", 
+    "YoSpaceId3sTest", 
   ] 
 end function
 
@@ -447,14 +402,14 @@ end function
           "logLevel": 2
           "showOnlyFailures": false
           "printLcov": false
-          "rooibosPreprocessorVersion": 1.3.0
+          "rooibosPreprocessorVersion": "1.4.0"
           "port": Invalid
           }
     end function
     
 
     function RBSFM_getPreprocessorVersion()
-        return "1.3.0"
+        return "1.4.0"
     end function
     
 
@@ -467,58 +422,28 @@ end function
         return [
         
 {
-      name: "[StringUtils] StringUtils.brs"
-      filePath: "source/tests/rooibos/specs/lib/StringUtilsUnitTests.brs"
+      name: "[YoSpaceId3s] YoSpaceId3s.brs "
+      filePath: "source/tests/rooibos/specs/lib/YoSpaceId3sTest.brs"
       valid: true
       hasFailures: false
       hasSoloTests: false
       hasIgnoredTests: false
-      hasSoloGroups: false
-      isSolo: false
+      hasSoloGroups: true
+      isSolo: true
       isIgnored: false
       itGroups: [
       {
         testCases: [
         {
           isSolo: false
-          funcName: "stringUtils_padString_test"
+          funcName: "yoSpaceIds_setTag_start_test"
           isIgnored: false
           isParamTest: false
-          name: "padString unit tests"
-          lineNumber: 14
-          paramLineNumber: 0
-          assertIndex: 5
-          assertLineNumberMap: {"0":18,"1":22,"2":25,"3":28,"4":29}
-          rawParams: []
-          paramTestIndex: 0
-          expectedNumberOfParams: 0
-          isParamsValid: true
-        },
-        {
-          isSolo: false
-          funcName: "stringUtils_formatLengthAsTimestamp_test"
-          isIgnored: false
-          isParamTest: false
-          name: "formatLengthAsTimestamp unit tests"
-          lineNumber: 34
-          paramLineNumber: 0
-          assertIndex: 4
-          assertLineNumberMap: {"0":35,"1":36,"2":39,"3":40}
-          rawParams: []
-          paramTestIndex: 0
-          expectedNumberOfParams: 0
-          isParamsValid: true
-        },
-        {
-          isSolo: false
-          funcName: "stringUtils_formatLengthAsEnglish_test"
-          isIgnored: false
-          isParamTest: false
-          name: "formatLengthAsEnglish unit tests"
+          name: "setTag start id3 unit tests"
           lineNumber: 46
           paramLineNumber: 0
-          assertIndex: 5
-          assertLineNumberMap: {"0":47,"1":48,"2":49,"3":50,"4":51}
+          assertIndex: 15
+          assertLineNumberMap: {"0":49,"1":50,"2":51,"3":55,"4":56,"5":60,"6":61,"7":62,"8":63,"9":67,"10":69,"11":71,"12":75,"13":76,"14":80}
           rawParams: []
           paramTestIndex: 0
           expectedNumberOfParams: 0
@@ -526,14 +451,149 @@ end function
         },
         {
           isSolo: false
-          funcName: "stringUtils_capitalize_test"
+          funcName: "yoSpaceIds_setTag_mid_test"
           isIgnored: false
           isParamTest: false
-          name: "capitalize unit tests"
-          lineNumber: 56
+          name: "setTag mid id3 unit tests"
+          lineNumber: 85
           paramLineNumber: 0
-          assertIndex: 4
-          assertLineNumberMap: {"0":57,"1":58,"2":59,"3":60}
+          assertIndex: 6
+          assertLineNumberMap: {"0":87,"1":88,"2":90,"3":91,"4":93,"5":94}
+          rawParams: []
+          paramTestIndex: 0
+          expectedNumberOfParams: 0
+          isParamsValid: true
+        },
+        {
+          isSolo: false
+          funcName: "yoSpaceIds_setTag_end_test"
+          isIgnored: false
+          isParamTest: false
+          name: "setTag end id3 unit tests"
+          lineNumber: 99
+          paramLineNumber: 0
+          assertIndex: 6
+          assertLineNumberMap: {"0":101,"1":102,"2":104,"3":105,"4":107,"5":108}
+          rawParams: []
+          paramTestIndex: 0
+          expectedNumberOfParams: 0
+          isParamsValid: true
+        },
+        {
+          isSolo: false
+          funcName: "yoSpaceIds_getTag_test"
+          isIgnored: false
+          isParamTest: false
+          name: "getTag unit tests"
+          lineNumber: 113
+          paramLineNumber: 0
+          assertIndex: 5
+          assertLineNumberMap: {"0":120,"1":121,"2":122,"3":123,"4":124}
+          rawParams: []
+          paramTestIndex: 0
+          expectedNumberOfParams: 0
+          isParamsValid: true
+        },
+        {
+          isSolo: false
+          funcName: "yoSpaceIds_getAllTags_test"
+          isIgnored: false
+          isParamTest: false
+          name: "getAllTags unit tests"
+          lineNumber: 129
+          paramLineNumber: 0
+          assertIndex: 1
+          assertLineNumberMap: {"0":132}
+          rawParams: []
+          paramTestIndex: 0
+          expectedNumberOfParams: 0
+          isParamsValid: true
+        },
+        {
+          isSolo: false
+          funcName: "yoSpaceIds_getId_test"
+          isIgnored: false
+          isParamTest: false
+          name: "getId unit tests"
+          lineNumber: 137
+          paramLineNumber: 0
+          assertIndex: 1
+          assertLineNumberMap: {"0":140}
+          rawParams: []
+          paramTestIndex: 0
+          expectedNumberOfParams: 0
+          isParamsValid: true
+        },
+        {
+          isSolo: false
+          funcName: "yoSpaceIds_getType_test"
+          isIgnored: false
+          isParamTest: false
+          name: "getType unit tests"
+          lineNumber: 145
+          paramLineNumber: 0
+          assertIndex: 3
+          assertLineNumberMap: {"0":148,"1":152,"2":156}
+          rawParams: []
+          paramTestIndex: 0
+          expectedNumberOfParams: 0
+          isParamsValid: true
+        },
+        {
+          isSolo: false
+          funcName: "yoSpaceIds_getPosition_test"
+          isIgnored: false
+          isParamTest: false
+          name: "getPosition unit tests"
+          lineNumber: 161
+          paramLineNumber: 0
+          assertIndex: 1
+          assertLineNumberMap: {"0":164}
+          rawParams: []
+          paramTestIndex: 0
+          expectedNumberOfParams: 0
+          isParamsValid: true
+        },
+        {
+          isSolo: false
+          funcName: "yoSpaceIds_currentSegment_test"
+          isIgnored: false
+          isParamTest: false
+          name: "currentSegment unit tests"
+          lineNumber: 169
+          paramLineNumber: 0
+          assertIndex: 1
+          assertLineNumberMap: {"0":172}
+          rawParams: []
+          paramTestIndex: 0
+          expectedNumberOfParams: 0
+          isParamsValid: true
+        },
+        {
+          isSolo: false
+          funcName: "yoSpaceIds_totalSegments_test"
+          isIgnored: false
+          isParamTest: false
+          name: "totalSegments unit tests"
+          lineNumber: 177
+          paramLineNumber: 0
+          assertIndex: 1
+          assertLineNumberMap: {"0":180}
+          rawParams: []
+          paramTestIndex: 0
+          expectedNumberOfParams: 0
+          isParamsValid: true
+        },
+        {
+          isSolo: false
+          funcName: "yoSpaceIds_clearTags_test"
+          isIgnored: false
+          isParamTest: false
+          name: "clearTags unit tests"
+          lineNumber: 185
+          paramLineNumber: 0
+          assertIndex: 5
+          assertLineNumberMap: {"0":188,"1":189,"2":190,"3":191,"4":192}
           rawParams: []
           paramTestIndex: 0
           expectedNumberOfParams: 0
@@ -541,23 +601,23 @@ end function
         }]
         ignoredTestCases: []
         soloTestCases: []
-        filename: "StringUtilsUnitTests"
-        setupFunctionName: "StringUtilsSetup"
+        filename: "YoSpaceId3sTest"
+        setupFunctionName: "YoSpaceId3sSetup"
         tearDownFunctionName: ""
-        beforeEachFunctionName: ""
+        beforeEachFunctionName: "YoSpaceId3s_beforeEach"
         afterEachFunctionName: ""
-        isSolo: false
+        isSolo: true
         isLegacy: false
         isIgnored: false
         hasSoloTests: false
-        name: "tests functions in StringUtils.brs"
+        name: "tests functions in YoSpaceId3s.js"
       }]
-      setupFunctionName: "StringUtilsSetup"
+      setupFunctionName: "YoSpaceId3sSetup"
       tearDownFunctionName: ""
       isNodeTest: false
       isLegacy: false
       nodeTestFileName: ""
-      beforeEachFunctionName: ""
+      beforeEachFunctionName: "YoSpaceId3s_beforeEach"
       afterEachFunctionName: ""
     },
 

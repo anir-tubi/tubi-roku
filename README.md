@@ -402,6 +402,8 @@ We may want to see how a new feature will affect the app's metrics from a small 
 
 
 ## Deploying an experiment on Popper Staging:
+- Run the `$ vauth` command
+
 - Before you can deploy to staging, you need to ensure your ssh config file has been updated with the ip addresses and hostname info of the popper staging location. This info can be found under "[popper-engine-roku]" in the [staging inventory](https://github.com/adRise/adrise_infrastructure/blob/master/inventory/staging/staging#L317).
 
 - Please follow the [SSH Access Instructions](https://github.com/adRise/adrise_infrastructure#ssh-access) while using the popper info from the previous step to set up your SSH Config file. Below is an example of what is added to the .ssh/config file. (Note: on the Mac, the ssh config file is located in [user]/.ssh/config, where "user" is the username on your mac.)
@@ -416,7 +418,7 @@ We may want to see how a new feature will affect the app's metrics from a small 
   - where the "IdentityFile" is the PEM file you set up for the staging server as described in the SSH Access Instructions,
   - where the "host" and "hostname" (the IP address) are the popper staging info gathered from the previous step
 
-- Once you have set up your ssh config file, you can now follow the directions on how to deploy your JSON popper configuration changes, see [[How to deploy to staging instructions](https://github.com/adRise/larnaca/tree/master/popper-engine#how-to-deploy-to-staging)]
+- Once you have set up your ssh config file, you can now follow the directions on how to deploy your JSON popper configuration changes, see [[How to deploy to staging instructions](https://github.com/adRise/popper-config/blob/master/doc/Deployment.md#how-to-deploy-to-staging)]
 
 
 ## Setting up the experiment within the Roku Code:

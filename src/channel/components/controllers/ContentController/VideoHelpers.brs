@@ -345,6 +345,7 @@ function returnToDetailScreenFromVideo()
         ' Repopulate the episodes screen if it is the screen under the video player screen in the call stack
         hiddenScreen = getHiddenScreen(1)
         if hiddenScreen.id = m.constants.ui.screenIds.episodeScreen
+          '//::TODO:: ensure signed in users see the episode screen progress bars when coming back from video player.
           episodesScreen = hiddenScreen
           episodesScreen.content = detailContent
           episodesScreen.updateContent = true
@@ -360,7 +361,7 @@ function returnToDetailScreenFromVideo()
         ' Movie autoplayed into another movie.
         ' The above id check is not expected to pass, as we populate the detail screen with the autoplayed
         ' content when autoplay playback occurs (up next ui or go to next button pressed).
-        ' In the case that something went wrong with the fetch repopulate the detail screen with the.
+        ' In the case that something went wrong with the fetch repopulate the detail screen with the
         ' video player content. Even though the upNext API, which provided the video player with the movie
         ' metadata, provides all the info needed to populate the details screen, it does not provide the
         ' related content. So, populate the detail screen for an immediate re-render, and then re-fetch

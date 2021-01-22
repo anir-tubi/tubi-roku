@@ -167,29 +167,46 @@ Function removeFromHistory()
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
+  
+  if m.global.authInfo <> invalid
+    '//Remove the resume position history for signed in users
 
-  tubiLog("Removing content " + m.top.content.id + " from history")
-  request = Bookmarks.removeHistoryReq(m.top.content, m.top.isKidsMode)
-  port = CreateObject("roMessagePort")
-  if request <> invalid then
-    request.start(port)
-    while true
-      msg = wait(0, port)
-      result = request.handleEvent(msg)
-      if result <> invalid then
-        if result.response.code >= 200 and result.response.code < 300
-          tubiLog("removeHistoryReq received " + result.response.code.toStr())
-        else
-          tubiLog("removeBookmark failed")
+    tubiLog("Removing content " + m.top.content.id + " from history")
+    request = Bookmarks.removeHistoryReq(m.top.content, m.top.isKidsMode)
+    port = CreateObject("roMessagePort")
+    if request <> invalid then
+      request.start(port)
+      while true
+        msg = wait(0, port)
+        result = request.handleEvent(msg)
+        if result <> invalid then
+          if result.response.code >= 200 and result.response.code < 300
+            tubiLog("removeHistoryReq received " + result.response.code.toStr())
+          else
+            tubiLog("removeBookmark failed")
+          end if
+          m.top.result = result
+          exit while
         end if
-        m.top.result = result
-        exit while
-      end if
-    end while
+      end while
+    else
+      tubiLog("removeHistoryReq returned invalid")
+      m.top.result = invalid
+    end if
   else
-    tubiLog("removeHistoryReq returned invalid")
-    m.top.result = invalid
-  end if
+    '//Remove the resume position history for signed out users
+    Bookmarks.removeHistoryLocally(m.top.content, m.global)
+
+    tubiLog("User is signed out so removeHistoryReq is returning a successful response for locally removed history")
+    '//removing the history locally should mimic the return of a backend call to remove history
+    '//   this is so the calling code doesn't have to keep track if thr user is signed in or not. 
+    result = {
+      response: {
+        code: 204
+      }
+    }
+    m.top.result = result
+  end if 
   tubiLog("EXIT AuthTask.removeFromHistory")
 End Function
 
@@ -202,28 +219,34 @@ Function updateHistory()
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
 
-  'only do the following if the user is logged in
   if m.top.content <> invalid
     tubiLog("Adding content " + m.top.content.id + " from history at position " + stri(m.top.nowPos))
-    newHistoryReq = Bookmarks.addHistoryReq(m.top.content, m.top.nowPos, m.top.isKidsMode)
-    if newHistoryReq <> invalid
-      result = newHistoryReq.runSynchronous()  ' timeout default is 5 seconds
-      historyResult = {}
+    if m.global.authInfo <> invalid
+      '//if the user is signed in, then save the playback history to the backend.
+      newHistoryReq = Bookmarks.addHistoryReq(m.top.content, m.top.nowPos, m.top.isKidsMode)
+      if newHistoryReq <> invalid
+        result = newHistoryReq.runSynchronous()  ' timeout default is 5 seconds
+        historyResult = {}
 
-      if result <> invalid then
-        parsedResp = parseJson(result)
+        if result <> invalid then
+          parsedResp = parseJson(result)
 
-        'check if we have the response for a history API call
-        if parsedResp <> invalid and parsedResp.id <> invalid
-          if parsedResp.episodes <> invalid and type(parsedResp.episodes) = "roArray" and parsedResp.episodes.count() > 0
-            historyResult.historyId = parsedResp.episodes[0].id
-            historyResult.parentHistoryId = parsedResp.id
-          else
-            historyResult.historyId = parsedResp.id
+          'check if we have the response for a history API call
+          if parsedResp <> invalid and parsedResp.id <> invalid
+            if parsedResp.episodes <> invalid and type(parsedResp.episodes) = "roArray" and parsedResp.episodes.count() > 0
+              historyResult.historyId = parsedResp.episodes[0].id
+              historyResult.parentHistoryId = parsedResp.id
+            else
+              historyResult.historyId = parsedResp.id
+            end if
           end if
         end if
+        m.top.historyResult = historyResult  ' with result
       end if
-      m.top.historyResult = historyResult  ' with result
+    else
+      '//if user is signed out, then save the playback history locally
+      Bookmarks.addHistoryLocally(m.top.content, m.top.nowPos, m.global)
+
     end if
     tubiLog("EXIT AuthTask.updateHistory")
   end if

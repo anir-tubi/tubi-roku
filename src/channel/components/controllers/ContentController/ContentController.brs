@@ -146,6 +146,7 @@ Function init()
 
 
   m.playerFullscreenCountdownTimer = m.top.findNode("PlayerFullscreenCountdownTimer")
+  m.resumeAllowedTimer = m.top.findNode("ResumeAllowedTimer")
   
   m.appLoadStopwatch = CreateObject("roTimespan")
 
@@ -719,7 +720,7 @@ End Function
 ' @categoryId: string, the categoryId/containerId of the category we will refresh
 Function onHistoryQueueChange(categoryId)
   tubiLog("ContentController.onHistoryQueueChange")
-  if m.global.authInfo <> invalid or m.constants.ui.users.guestHistory = true
+  if m.global.authInfo <> invalid
     if m.authTask <> invalid
       m.authTask.unobserveFieldScoped("authInfo")
     end if

@@ -19,7 +19,7 @@ Function TubiBookmarksSetup()
   m.seriesContent = CreateObject("roSGNode", "TubiContentNode")
   m.seriesContent.type = "series"
 
-End function
+End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -109,6 +109,68 @@ Function tubiBookmarks_removeBookmarkReq_test()
 End Function
 
 
+'@Test a successful attempt at calling removeHistoryLocally unit test
+Function tubiBookmarks_removeBookmarkLocallySuccessful_test()
+  BM = m.authorizedBM
+  content = m.videoContent
+  content.id = "321221"
+  content.title = "We Are Young"
+  globalObj = {}
+  globalObj.historyIds = CreateObject("roSGNode", "HistoryContentNode")
+
+  nPositionToSave = 300
+  BM.addHistoryLocally(content, nPositionToSave, globalObj)
+  historyNode = globalObj.historyIds.findNode(content.id)
+  '//1) Test that the content has been successfully been added
+  m.assertEqual(historyNode.nowPos, nPositionToSave)
+
+
+  BM.removeHistoryLocally(content, globalObj)
+  historyNode = globalObj.historyIds.findNode(content.id)
+  '//2) The content should have been successfully been removed, so history should be invalid
+  m.assertInvalid(historyNode)
+End Function
+
+
+'@Test addHistoryLocally unit tests
+Function tubiBookmarks_addBookmarkLocallySuccessful_test()
+  BM = m.authorizedBM
+  content = m.videoContent
+  content.id = "321221"
+  content.title = "We Are Young"
+  globalObj = {}
+  globalObj.historyIds = CreateObject("roSGNode", "HistoryContentNode")
+  nPositionToSave = 300
+  BM.addHistoryLocally(content, nPositionToSave, globalObj)
+
+  historyNode = globalObj.historyIds.findNode(content.id)
+  '//The content should have been successfully been added, so history should be valid
+  m.assertNotInvalid(historyNode)
+  m.assertEqual(historyNode.nowPos, nPositionToSave)
+End Function
+
+
+'@Test addHistoryLocally unit tests for an episode
+Function tubiBookmarks_addBookmarkLocallySuccessfulForEpisode_test()
+  BM = m.authorizedBM
+  content = m.seriesContent
+  content.id = "302800"
+  content.title = "S02:E05 - You, I'll Be Following"
+  content.parentId = "01079"
+  content.parentType = BM.constants.uapiContentTypes.series
+
+  globalObj = {}
+  globalObj.historyIds = CreateObject("roSGNode", "HistoryContentNode")
+  nPositionToSave = 300
+  BM.addHistoryLocally(content, nPositionToSave, globalObj)
+
+  historyNode = globalObj.historyIds.findNode(content.id)
+  '//The content should have been successfully been added, so history should be valid
+  m.assertNotInvalid(historyNode)
+  m.assertEqual(historyNode.nowPos, nPositionToSave)
+End Function
+
+
 '@Test addHistoryReqVideo unit tests
 Function tubiBookmarks_addHistoryReqVideo_test()
   BM = m.authorizedBM
@@ -174,7 +236,6 @@ End Function
 '@Test getInitialHistoryReqSignedOut unit tests
 Function tubiBookmarks_getInitialHistoryReqSignedOut_test()
   constants = getConstants()
-  constants.ui.users.guestHistory = false
   REQUEST = TubiRequest()
   AUTH = tubiBookmarks_mockAuth_Unauthorized_testHelper(constants, REQUEST)
   NODEHELPERS = TubiNodeHelpers()
@@ -183,18 +244,6 @@ Function tubiBookmarks_getInitialHistoryReqSignedOut_test()
   m.assertInvalid(req)
 End Function
 
-
-'@Test getInitialHistoryReqSignedOutGuestHistoryEnabled unit tests
-Function tubiBookmarks_getInitialHistoryReqSignedOutGuestHistoryEnabled_test()
-  constants = getConstants()
-  constants.ui.users.guestHistory = true
-  REQUEST = TubiRequest()
-  AUTH = tubiBookmarks_mockAuth_Unauthorized_testHelper(constants, REQUEST)
-  NODEHELPERS = TubiNodeHelpers()
-  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
-  req = BM.getInitialHistoryReq("1234")
-  m.assertNotInvalid(req)
-End Function
 
 
 '@Test getInitialHistoryReqSignedIn unit tests

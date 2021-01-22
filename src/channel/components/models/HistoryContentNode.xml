@@ -6,5 +6,6 @@
     <field id="nowPos" type="int" />
     <field id="historyId" type="string" />
     <field id="currentEpisodeId" type="string" />
+    <field id="lastSaved" type="int" />
   </interface>
 </component>

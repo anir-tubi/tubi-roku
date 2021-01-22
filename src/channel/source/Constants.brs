@@ -574,10 +574,6 @@ Function getConstants()
   'UI properties that should be passed into the scene graph
   constants.ui = {}
 
-    'constants for user specific functionality
-    constants.ui.users = {}
-      constants.ui.users.guestHistory = true
-
     'static - pre defined text used in the app
     constants.ui.terms = {}
       constants.ui.terms.categories = "Categories"
