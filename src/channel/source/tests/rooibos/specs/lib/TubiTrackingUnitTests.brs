@@ -398,7 +398,7 @@ Function tubiTracking_getAnalyticsAdRainmaker_test()
     clickthrough: FormatJson(clickthrough)
     ' companionads: companionAds
     creativeadid: "17722"
-    creativeid: ""
+    creativeid: "28697"
     duration: 30
     impressionid: impressionId
     isadvertising: true
@@ -431,11 +431,9 @@ Function tubiTracking_getAnalyticsAdRainmaker_test()
   m.assertNotInvalid(adEvent.ad_type)
   m.assertTrue(adEvent.ad_type = "VAST")
   m.assertTrue(adEvent.ad_id = ad.creativeadid)
-  m.assertTrue(adEvent.creative_id = ad.creativeadid.toInt())
+  m.assertTrue(adEvent.creative_id = ad.creativeId.toInt())
   m.assertTrue(adEvent.creative_url = streams[0].url)
   m.assertTrue(adEvent.ad_video_id = ad.adVideoId)
-  m.assertTrue(adEvent.impression_id = ad.impressionId)
-  m.assertTrue(adEvent.parent_id = ad.parentId)
   m.assertTrue(adEvent.reported_duration = ad.duration * 1000)
   m.assertTrue(adEvent.index = ctx.adindex)
   m.assertTrue(adEvent.pod_size = ctx.adcount)

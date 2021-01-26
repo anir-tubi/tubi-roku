@@ -36,7 +36,7 @@ Function YoSpaceId3s_beforeEach()
   m.id3s = yoSpaceId3s()
 End Function
 
-'@Only
+
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '@It tests functions in YoSpaceId3s.js
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

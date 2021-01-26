@@ -26,28 +26,28 @@ Function tubiAds_getAdsListViaRoku_failure_test()
   }
 
   ' test default flow
-  m.assertInvalid(ads.getAdsListViaRoku(episodeTemplate))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeTemplate, 0))
 
   ' test RAF.setContentLength
   episodeWithoutLength = {}
   episodeWithoutLength.append(episodeTemplate)
   episodeWithoutLength.delete("length")
-  m.assertInvalid(ads.getAdsListViaRoku(episodeWithoutLength))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeWithoutLength, 0))
 
   ' test RAF.setContentGenre
   episodeWithGenres = {}
   episodeWithGenres.append(episodeTemplate)
   episodeWithGenres.delete("rokuGenres")
-  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres, 0))
   ' empty genres
   episodeWithGenres["rokuGenres"] = []
-  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres, 0))
   ' non-kids genres
   episodeWithGenres["rokuGenres"] = ["Comedy", "Drama"]
-  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres, 0))
   ' kids genres
   episodeWithGenres["rokuGenres"] = ["Children", "Drama"]
-  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres, 0))
 
   ' test RAF.setContentId
   episodeIds = {}
@@ -55,24 +55,24 @@ Function tubiAds_getAdsListViaRoku_failure_test()
   ' no series info
   episodeIds.delete("isParentSeries")
   episodeIds.delete("parentTitle")
-  m.assertInvalid(ads.getAdsListViaRoku(episodeIds))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeIds, 0))
   ' missing only parent title
   episodeIds["isParentSeries"] = true
   episodeIds.delete("parentTitle")
-  m.assertInvalid(ads.getAdsListViaRoku(episodeIds))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeIds, 0))
   ' missing only isParentSeries
   episodeIds.delete("isParentSeries")
   episodeIds["parentTitle"] = "Fake Parent"
-  m.assertInvalid(ads.getAdsListViaRoku(episodeIds))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeIds, 0))
   ' valid series
   episodeIds["isParentSeries"] = true
   episodeIds["parentTitle"] = "Fake Parent"
-  m.assertInvalid(ads.getAdsListViaRoku(episodeIds))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeIds, 0))
   ' invalid series and missing title fallback
   episodeIds.delete("isParentSeries")
   episodeIds.delete("parentTitle")
   episodeIds.delete("title")
-  m.assertInvalid(ads.getAdsListViaRoku(episodeIds))
+  m.assertInvalid(ads.getAdsListViaRoku(episodeIds, 0))
   
 End Function
 

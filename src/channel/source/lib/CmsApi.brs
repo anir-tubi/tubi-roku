@@ -28,7 +28,7 @@ Function CmsApi(constants, request, auth)
     setImageParams: cmsApi_setImageParams
     setTupianPosterParam: cmsApi_setTupianPosterParam
     setTupianLandscapeParam: cmsApi_setTupianLandscapeParam
-    setTupianLargeVitgParam: cmsApi_setTupianVitgParam
+    setTupianLargeVitgParam: cmsApi_setTupianLargeVitgParam
   }
 End Function
 
@@ -402,7 +402,7 @@ End Function
 
 ' Wrapper around setImageParams for the specific case of only adding a Tupian VITG param
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
-Function cmsApi_setTupianVitgParam(existingParams = {})
+Function cmsApi_setTupianLargeVitgParam(existingParams = {})
   return m.setImageParams(["large_vitg"], existingParams)
 End Function
 

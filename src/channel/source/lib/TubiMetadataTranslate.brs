@@ -599,10 +599,13 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
   
   ' utility row position experiment
   utilityRowPosition = -2 ' setting default as negative to avoid insertion if the experiment is control group
-  m.experimentInfo = m.experiments.getExperimentResource("roku_discovery_v3", "roku_discovery_row_v3")
-  if m.experimentInfo <> invalid
-  ' decreasing the position value by 1 in order to use it as index  
-    utilityRowPosition = m.experimentInfo.position - 1
+
+  if m.experiments <> invalid
+    m.experimentInfo = m.experiments.getExperimentResource("roku_discovery_v3", "roku_discovery_row_v3")
+    if m.experimentInfo <> invalid
+    ' decreasing the position value by 1 in order to use it as index
+      utilityRowPosition = m.experimentInfo.position - 1
+    end if
   end if
   
   ' include utility row only in homescreen when kidsmodefeature is ON and parentalRating is set to Adult and isKidsModeEnabled is false
