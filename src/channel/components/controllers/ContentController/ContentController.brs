@@ -31,6 +31,7 @@ Function init()
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
   m.cmsApi = CmsApi(m.constants, Request, Auth)
+  m.userDeviceApi = UserDeviceApi(m.constants, Request, Auth)
 
   ' initialize states needed for various parts of kids mode
   m.kidsModeEnabled = false  'is the kids mode UI visible

@@ -886,6 +886,94 @@ Function getTranslation_en_US()
     "dialog_button_register_signIn": {
       "description": "The label of the button in a dialog window that allows the user to register or signIn",
       "message": "Sign In or Register"
+    },
+    "signIn_screen_heading": {
+      "description": "Title on the signIn screen",
+      "message": "Sign In to Access Your Account"
+    },
+    "signIn_screen_enter_password": {
+      "description": "enter password text",
+      "message": "Enter your Tubi password"
+    },
+    "forgot_password_text": {
+      "description": "forgot password text",
+      "message": "Forgot password?"
+    },
+    "forgot_password_link": {
+      "description": "forgot password link",
+      "message": "Go to tubi.tv/forgot to reset"
+    },
+    "terms_of_use_text": {
+      "description": "terms of use button text",
+      "message": "Terms of Use"
+    },
+    "privacy_policy_text": {
+      "description": "privacy policy button text",
+      "message": "Privacy Policy"
+    },
+    "do_not_sell_my_info_text": {
+      "description": "do not sell my info button text",
+      "message": "Do Not Sell My Info"
+    },
+    "signIn_password_hint": {
+      "description": "hint shown on signIn password textbox",
+      "message": "password"
+    },
+    "signUp_password_hint": {
+      "description": "hint shown on signUp password textbox",
+      "message": "set a password"
+    },
+    "signUp_screen_heading": {
+      "description": "Title on the signUp screen",
+      "message": "Sign Up for a New Account"
+    },
+    "signUp_screen_password_validation": {
+      "description": "sign up screen password validation text",
+      "message": "Press OK on your remote and set a new password"
+    },
+    "already_having_account_text": {
+      "description": "already having account text",
+      "message": "Already have an account?"
+    },
+    "password_length_validation": {
+      "description": "password length validation",
+      "message": "Password must be 6-30 characters long"
+    },
+    "invalid_password_title": {
+      "description": "invalid password title on modal",
+      "message": "Invalid Password"
+    },
+    "enter_password_dialog_description": {
+      "description": "enter password dialog description",
+      "message": "Please enter your Tubi password for the account"
+    },
+    "re-enter_password_button": {
+      "description": "re-enter password button text on modal",
+      "message": "Re-enter Password"
+    },
+    "existing_account_found": {
+      "description": "existing tubi account found modal heading",
+      "message": "Existing Tubi Account Found"
+    },
+    "existing_account_found_title": {
+      "description": "existing tubi account found modal heading",
+      "message": "Existing Tubi Account Found"
+    },
+    "existing_account_found_description": {
+      "description": "existing tubi account found modal description",
+      "message": "is linked to an existing Tubi account. Please Sign in to continue."
+    },
+    "could_not_verify_email": {
+      "description": "could not verify your email modal description",
+      "message": "Could not verify your email"
+    },
+    "goBack_signIn": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESS BACK FOR SIGNIN"
+    },
+    "goBack_signUp": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESS BACK FOR SIGNUP"
     }
   }
 End Function
@@ -1662,6 +1750,82 @@ Function getTranslation_es_MX()
     "dialog_button_register_signIn": {
       "description": "The label of the button in a dialog window that allows the user to register or signIn",
       "message": "Inicia sesión o Regístrate"
+    },
+    "signIn_screen_heading": {
+      "description": "Title on the signIn screen",
+      "message": "Iniciar sesión para acceder tu cuenta"
+    },
+    "signIn_screen_enter_password": {
+      "description": "enter password text",
+      "message": "Ingresa tu contraseña de Tubi"
+    },
+    "forgot_password_text": {
+      "description": "forgot password text",
+      "message": "¿Olvidaste tu contraseña?"
+    },
+    "forgot_password_link": {
+      "description": "forgot password link",
+      "message": "Ir a tubi.tv/forgot para restablecer"
+    },
+    "terms_of_use_text": {
+      "description": "terms of use button text",
+      "message": "Términos de uso"
+    },
+    "privacy_policy_text": {
+      "description": "privacy policy button text",
+      "message": "Política de privacidad"
+    },
+    "do_not_sell_my_info_text": {
+      "description": "do not sell my info button text",
+      "message": "No venda mi información"
+    },
+    "signIn_password_hint": {
+      "description": "hint shown on signIn password textbox",
+      "message": "contraseña"
+    },
+    "signUp_password_hint": {
+      "description": "hint shown on signUp password textbox",
+      "message": "establecer una contraseña"
+    },
+    "signUp_screen_heading": {
+      "description": "Title on the signUp screen",
+      "message": "Regístrate para una cuenta nueva"
+    },
+    "signUp_screen_password_validation": {
+      "description": "sign up screen password validation text",
+      "message": "Presiona OK en tu control y establece una contraseña nueva"
+    },
+    "already_having_account_text": {
+      "description": "already having account text",
+      "message": "¿Ya tienes una cuenta?"
+    },
+    "password_length_validation": {
+      "description": "password length validation",
+      "message": "Contraseña debe ser de 6-30 caracteres"
+    },
+    "invalid_password_title": {
+      "description": "invalid password title on modal",
+      "message": "Contraseña incorrecta"
+    },
+    "enter_password_dialog_description": {
+      "description": "enter password dialog description",
+      "message": "Por favor, ingresa la contraseña para tu cuenta de Tubi"
+    },
+    "re-enter_password_button": {
+      "description": "re-enter password button text on modal",
+      "message": "Ingresa tu contraseña"
+    },
+    "existing_account_found": {
+      "description": "existing tubi account found modal heading",
+      "message": "Cuenta de Tubi ya existe"
+    },
+    "existing_account_found_title": {
+      "description": "existing tubi account found modal heading",
+      "message": "Cuenta de Tubi ya existe"
+    },
+    "existing_account_found_description": {
+      "description": "existing tubi account found modal description",
+      "message": "está vinculado a una cuenta existente de Tubi. Por favor, inicia sesión para continuar."
     }
   }
 End Function

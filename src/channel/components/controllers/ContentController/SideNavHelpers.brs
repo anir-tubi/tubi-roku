@@ -114,7 +114,7 @@ Function onSideNavItemSelected()
   currentScreenNow = currentScreen()
   if m.sSideNavCurrentScreen <> invalid and currentScreenNow <> invalid
     '//check if we are viewing the same screen. If not but sSideNavItemSelectedId is still the same as the input, then user navigated away from root page
-    if (m.sSideNavCurrentScreen.subtype() = currentScreenNow.subtype() and m.sSideNavCurrentScreen.id = currentScreenNow.id) then bSameScreen = true
+    if (m.sSideNavCurrentScreen.subtype() = currentScreenNow.subtype() and m.sSideNavCurrentScreen.id = currentScreenNow.id and itemSelectedId <> m.constants.ui.sideNavIds.profile) then bSameScreen = true
   end if
 
   if m.sSideNavItemSelectedId <> itemSelectedId or bSameScreen = false

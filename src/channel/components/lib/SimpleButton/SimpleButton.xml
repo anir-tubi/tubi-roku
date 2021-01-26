@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - CustomButton
+ -
+ - This component is used for all 480x80 buttons within the sign-in flow.
+ -
+ -->
+<component name="SimpleButton" extends="Group" >
+  <script type="text/brightscript" uri="SimpleButton.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+
+  <interface>
+  
+    <!-- INPUTS -->
+      <field id="color" type="String" value="0x9699A3"/>
+      <field id="width" type="Integer" alias="buttonBG.width"/>
+      <field id="text" type="String" />
+      <field id="unfocusedBackgroundOpacity" type="String" value="0.17"/>
+    
+    <!-- OUTPUTS -->
+      <field id="selected" type="boolean" alwaysNotify="true" />
+    
+  </interface>
+
+  <children>
+    <Poster
+      id="buttonBG"
+      height="80"
+      uri="pkg:/images/menu-focus-fhd.9.png"
+      translation="[0,0]"/>    
+    <Label
+      id="label"
+      opacity="1.0"
+      height="80"
+      horizAlign="center"
+      vertAlign="center">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="33" />
+    </Label>
+  </children>
+</component>

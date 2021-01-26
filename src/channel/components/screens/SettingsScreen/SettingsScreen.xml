@@ -15,6 +15,10 @@
     <!-- INPUTS -->
 
       <field id="parentalSettingUpdated" type="boolean" alwaysNotify="true"/>
+      
+      <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
+      -->
+      <field id="callingPage" type="string"  alwaysNotify="true"/>      
 
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean"  alwaysNotify="true"/>

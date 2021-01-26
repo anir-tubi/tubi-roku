@@ -41,6 +41,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/GeneralTaskModule.brs" />
   <script type="text/brightscript" uri="../../../source/lib/CmsApi.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/UserDeviceApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />

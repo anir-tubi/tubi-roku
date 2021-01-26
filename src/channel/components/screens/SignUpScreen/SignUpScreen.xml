@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - SignUpScreen
+ -->
+<component name="SignUpScreen" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="SignUpScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs"/>
+  <script type="text/brightscript" uri="../ModalDialogs.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  
+  <interface>
+  
+    <!-- INPUT -->
+    
+      <!-- roku account's email address  -->
+      <field id="username" type="string" alias="email.text"/>
+      
+      <!-- retrySignUp will be triggered when user selects TryAgain from SignUp failure modal  -->
+      <field id="retrySignUp" type="boolean" alwaysNotify="true"/>      
+
+    <!-- OUTPUT -->
+    
+      <!-- signUpSelected is triggered when user selects continue button, which redirects to HomeScreen/DetailScreen -->
+      <field id="signUpSelected" type="assocarray" alwaysNotify="true"/>
+    
+      <!-- signInSelected is set to true when user selects signIn button, which redirects to Activation Screen -->
+      <field id="signInSelected" type="boolean" alwaysNotify="true"/>
+      
+      <!-- staticPageSelected is triggered when user selects ToS/PP/DoNotSell button, which redirects to Settings Page -->
+      <field id="staticPageSelected" type="String" alwaysNotify="true"/>
+      
+  </interface>
+
+  <children>
+  
+    <LayoutGroup 
+      id="signUpLayout"
+      translation="[0, 155]"
+      layoutDirection="vert"
+      vertAlignment="custom"
+      horizAlignment="custom"
+      itemSpacings="[30, 40, 15, 15, 20, 90, 120]">
+      <Label
+        id="pageHeading"
+        horizAlign="center"
+        width="1920">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="72" />
+      </Label>
+      
+      <Label
+        id="pageSubheading"
+        horizAlign="center"
+        width="1920">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="33"/>
+      </Label>
+      
+      <Group 
+        translation="[645,0]">
+        <Rectangle
+          id="emailBackground"
+          width="630"
+          height="84"
+          opacity="0.17"
+          color="0x9699A3"/>
+        <Label
+          id="email"
+          horizAlign="left"
+          width="600"
+          height="84"
+          translation="[20,0]"
+          vertAlign="center">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27" />
+        </Label>
+      </Group>
+
+      <LayoutGroup
+        id="passwordGroup"
+        translation="[643,0]"
+        layoutDirection="horiz"
+        horizAlignment="custom"
+        vertAlignment="custom"
+        itemSpacings="[14]">
+        <TextEntryBox
+          id="password"
+          boxWidth="630"
+          boxHeight="84"
+          passwordMode="true"/>
+        <Poster
+          id="checkmark_circle"
+          width="45"
+          height="45"
+          translation="[0, 18]"
+          visible="false"
+          uri="pkg:/images/checkmark_circle.png"/>
+      </LayoutGroup>    
+        
+      <Label
+        id="passwordValidationMsg"
+        translation="[670,0]"
+        color="0xEB9C00"
+        width="600">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="24" />
+      </Label>
+      
+      <SimpleButton
+        translation="[756,0]"
+        id="continueBtn"
+        color="0x9699A3"
+        width="408"/>
+      
+      <LayoutGroup 
+        id="existingAccLayout"
+        layoutDirection="horiz"
+        vertAlignment="custom"
+        translation="[741,0]"
+        itemSpacings="[12]">
+        
+        <Label
+          id="existingAccLabel"
+          horizAlign="center">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="24" />
+        </Label>
+        
+        <SimpleButton
+          id="signInBtn"
+          color="0x9699A3"
+          translation="[0,-30]"
+          width="127"/>       
+        
+      </LayoutGroup>
+      
+      <ButtonGroup 
+        id="staticPageLinkGroup"
+        layoutDirection="horiz"
+        horizAlignment="center"
+        translation="[960,0]"
+        vertAlignment="custom"
+        itemSpacings="[96]">
+
+        <SimpleButton
+          id="termsBtn"
+          color="0x10141F"
+          unfocusedBackgroundOpacity="0"/>
+          
+        <SimpleButton
+          id="ppBtn"
+          color="0x10141F"
+          unfocusedBackgroundOpacity="0"/>
+          
+        <SimpleButton
+          id="donotsellMyInfoBtn"
+          color="0x10141F"
+          unfocusedBackgroundOpacity="0"/>           
+        
+      </ButtonGroup>                    
+    
+    </LayoutGroup>
+    
+    <Group 
+      id="keyboardGrp" 
+      translation="[0,1080]">
+    
+      <Rectangle
+        id="keyboardBackground"
+        color="0x10141F"
+        width="1920"
+        height="600"/>
+    
+      <LayoutGroup 
+        layoutDirection="vert"
+        horizAlignment="custom"
+        vertAlignment="custom"
+        translation="[250, 20]"
+        itemSpacings="[20]">
+        
+        <Keyboard 
+          id="Keyboard"/>
+          
+            <ButtonGroup 
+              id="buttonGroup"
+              layoutDirection="horiz"
+              itemSpacings="[35]"
+              translation="[12,0]">
+
+              <SimpleButton
+                id="back"
+                color="0xF0F1F5"
+                width="180"/>
+        
+              <SimpleButton
+                id="continue"
+                color="0xF0F1F5"
+                width="633"/>
+              
+              <SimpleButton
+                id="showHidePassword"
+                color="0xF0F1F5"
+                width="490"/>
+            
+            </ButtonGroup>
+        
+      </LayoutGroup>
+      
+    </Group>
+  
+  </children>
+</component>

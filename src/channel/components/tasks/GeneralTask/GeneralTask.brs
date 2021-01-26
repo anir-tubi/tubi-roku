@@ -68,6 +68,24 @@ Function createParsingCallbacks()
     parseError: parseLiveVideoManifestError
   }
 
+  ' email exists
+  m.requestTypes[m.constants.reqNames.emailExists] = {
+    parseSuccess: parseEmailExistsSuccess
+    parseError: parseEmailExistsError
+  }  
+  
+  ' signup
+  m.requestTypes[m.constants.reqNames.signUp] = {
+    parseSuccess: parseSignUpSuccess
+    parseError: parseSignUpError
+  }  
+  
+  ' signin
+  m.requestTypes[m.constants.reqNames.signIn] = {
+    parseSuccess: parseSignInSuccess
+    parseError: parseSignInError
+  }
+
   ' single content
   m.requestTypes[m.constants.reqNames.getSingleContent] = {
     parseSuccess: parseDetailScreenSingleContentSuccess

@@ -1,14 +1,95 @@
 Function init()
+
+  m.border = m.top.findNode("border")
+  m.rectBG = m.top.findNode("rectBG")
+  
+  m.rectBG.color = "0x9699A3"
+  m.rectBG.opacity = 0.17
+
   m.Text = m.top.findNode("Text")
+  m.Text.text = m.top.hint
+  
+  m.Text.color = "0x585B66"
+  m.Text.opacity = 0.4
+  
+  m.top.observeField("boxWidth", "onBoxWidth")
+  m.top.observeField("boxHeight", "onBoxHeight")
+  
   m.top.observeField("hint", "formatTextBox")
   m.top.observeField("text", "formatTextBox")
-  m.top.width = 480
-  m.top.height = 80
 
-  ' character to mask the password with.  Chr(&hb7) is dot, but it's very skinny in
-  ' the font we currently use
   m.passwordPlaceholder = "*"
+  m.top.observeField("focusedChild", "onScreenFocusChange")
+  m.top.observeField("highlight", "onHighlight")
+  m.top.observeField("passwordMode", "onPasswordModeChange")
+  
 End Function
+
+
+Function onBoxWidth()
+
+  m.rectBG.width = m.top.boxWidth
+  m.border.width = m.top.boxWidth + 8
+
+End Function
+
+
+Function onBoxHeight()
+
+  m.rectBG.height = m.top.boxHeight
+  m.border.height = m.top.boxHeight + 8
+
+End Function
+
+
+Function onHighlight()
+
+  if m.top.highlight = true
+    
+    m.rectBG.color = "0xFFFFFF"
+    m.rectBG.opacity = 0.8
+    m.Text.color = "0x1C1F29"
+    
+    if m.top.text = invalid or m.top.text = "" then
+      m.Text.text = m.top.hint
+      m.Text.opacity = 0.4
+    else
+      m.Text.opacity = 1.0
+    end if  
+  else
+    
+    m.rectBG.color = "0x9699A3"
+    m.rectBG.opacity = 0.17
+    
+    if m.top.text = invalid or m.top.text = "" then
+      m.Text.color = "0x585B66"
+      m.Text.opacity = 0.4
+    else
+      m.Text.color = "0xFFFFFF"
+      m.Text.opacity = 1.0    
+    end if  
+  end if
+
+End Function
+
+
+Function onScreenFocusChange()
+  tubiLog("TextEntryBox.onScreenFocusChange")
+  
+  if m.top.hasFocus() then
+  
+    m.border.visible = true
+    if m.top.text <> invalid and m.top.text <> "" then
+      onPasswordModeChange()
+    end if  
+    m.top.highlight = true 
+    
+  else  
+    m.border.visible = false
+  end if
+  
+End Function
+
 
 ''''''''''''''''
 ' formatTextBox
@@ -23,19 +104,12 @@ Function formatTextBox()
 
   if m.top.text = invalid or m.top.text = "" then
     m.Text.text = m.top.hint
+    m.Text.opacity = 0.4
   else
-    if m.top.passwordMode = true then
-      passwordText = ""
-      for i=0 to m.top.text.len()-2
-        passwordText = passwordText + m.passwordPlaceholder
-      end for
-      passwordText = passwordText + Right(m.top.text, 1)
-      m.Text.text = passwordText
-    else
-      m.Text.text = m.top.text
-    end if
+    m.Text.opacity = 1.0
+    onPasswordModeChange()
   end if
-
+  
   textRect = m.Text.localBoundingRect()
   safetyWidth = 400   'Arbitrarily chosen, smaller than 428 max width
   if textRect.width > safetyWidth then
@@ -47,4 +121,39 @@ Function formatTextBox()
       end if
     end while
   end if
+End Function
+
+
+Function onPasswordModeChange()
+  if m.top.passwordMode = true then
+    passwordText = ""
+    for i=0 to m.top.text.len()-1
+      passwordText = passwordText + m.passwordPlaceholder
+    end for
+    if passwordText = ""
+      m.Text.text = m.top.hint
+    else
+      m.Text.text = passwordText
+    end if
+  else
+    if m.top.text = ""
+      m.Text.text = m.top.hint
+    else
+      m.Text.text = m.top.text
+    end if
+  end if
+End Function
+
+
+Function onKeyEvent(key As String, press As Boolean) as Boolean
+
+  tubiLog("TextEntryBox.onKeyEvent key = " + key)
+  if press then
+    if key = "OK"
+      m.top.selected = true
+      return true
+    end if
+  end if
+
+  return false
 End Function

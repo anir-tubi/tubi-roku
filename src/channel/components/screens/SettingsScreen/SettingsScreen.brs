@@ -10,11 +10,10 @@ Function init()
   m.Title = m.top.findNode("Title")
   m.Title.text = getTranslation("menu_settings")
   m.NavSection = m.top.findNode("nav")
-  BackLabel = m.top.findNode("callToAction")
-  BackLabel.text = getTranslation("goBack_home")
+  m.BackLabel = m.top.findNode("callToAction")
   if m.constants.deviceInfo.uiResolution <> "FHD"
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
-    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
+    m.BackLabel.translation = [m.BackLabel.translation[0], m.BackLabel.translation[1] + 3]
   end if
 
   ' Create the menu
@@ -30,6 +29,7 @@ Function init()
   m.top.observeField("parentalSettingUpdated", "onSignInInfoChange")
   m.top.observeField("enabled", "onEnableChange")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
+  m.top.observeFieldScoped("callingPage", "onSetCallOfAction")
 
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
 
@@ -44,6 +44,24 @@ Function init()
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
 
+End Function
+
+
+' callback sets the back label based on callingPage
+Function onSetCallOfAction()
+  sPreviousPage = m.top.callingPage
+  sCallToAction = ""
+  if sPreviousPage <> invalid and Len(sPreviousPage) > 0
+    if UCase(sPreviousPage) = UCase(m.constants.ui.screenIds.signUpScreen)
+      sCallToAction = getTranslation("goBack_signUp")
+    else if UCase(sPreviousPage) = UCase(m.constants.ui.screenIds.signInScreen)
+      sCallToAction = getTranslation("goBack_signIn")
+    end if
+  end if
+  if sCallToAction = ""
+    sCallToAction = getTranslation("goBack_home")
+  end if 
+  m.BackLabel.text = sCallToAction
 End Function
 
 

@@ -75,5 +75,6 @@
 
     <!-- if UpTime(0) > validUntil, then refetch metadata for this content -->
     <field id="validUntil" type="integer"/>
+    
   </interface>
 </component>

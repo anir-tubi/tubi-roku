@@ -5,41 +5,55 @@
  - This component is used for all 480x80 buttons within the sign-in flow.
  -
  -->
-<component name="TextEntryBox" extends="Rectangle" >
+<component name="TextEntryBox" extends="Group" >
   <script type="text/brightscript" uri="TextEntryBox.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
-    <!-- The text to display.  This is not wired up to anything by default -->
-    <field id="text" type="string" value=""/>
+  
+    <!-- INPUTS -->
+  
+      <!-- The text to display.  This is not wired up to anything by default -->
+      <field id="text" type="string"/>
     
-    <!-- Hint text to display when 'text' is empty -->
-    <field id="hint" type="string" value=""/>
+      <!-- Hint text to display when 'text' is empty -->
+      <field id="hint" type="string"/>
     
-    <!-- Text attributes, not applied to 'hint' -->
-    <field id="textColor" alias="Text.color" />
-    <field id="textOpacity" alias="Text.opacity" />
+      <!-- Text attributes, not applied to 'hint' -->
+      <field id="boxWidth" type="Integer"/>
+      <field id="boxHeight" type="Integer"/>
     
-    <!-- Password mode will only display the last character entered -->
-    <field id="passwordMode" type="boolean" value="false" />
+      <!-- Password mode will only display the last character entered -->
+      <field id="passwordMode" type="boolean" value="false" />
+      
+      <!-- highlight field can be used to highlight the textbox even the focus is not in this component-->
+      <field id="highlight" type="boolean" value="false"/>
+      
+    <!-- OUTPUTS -->
+      <field id="selected" type="boolean" alwaysNotify="true" />      
+    
   </interface>
 
   <children>
+    <Rectangle
+      id="border"
+      color="0xFF501AFF"
+      translation="[-4,-4]"/>
+    <Rectangle
+      id="rectBG"/>
     <Label
       id="Text"
-      text=""
       height="80"
       horizAlign="left"
       vertAlign="center"
-      clippingRect="[0,0,428,80]"
-      translation="[26,0]"
+      translation="[26,3]"
       width="0"
       numLines="1"
       maxLines="1">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="33" />
+        size="27" />
     </Label>
   </children>
 </component>

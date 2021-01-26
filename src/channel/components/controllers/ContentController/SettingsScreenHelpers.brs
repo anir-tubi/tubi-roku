@@ -1,7 +1,11 @@
-Function showSettingsScreen(sFocusID = "")
+'@sFocusID : string, the item which will be opened in settings screen
+'@screenLevel : integer, this helps for screen hierarchy when pushing the screen in stack 
+'@sPageSource : string, this helps from where settings screen page is called
+Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   tubiLog("SettingsScreenHelpers.showSettingsScreen")
   m.settingsScreen = CreateObject("roSGNode", "SettingsScreen")
   m.settingsScreen.id = m.constants.ui.screenIds.settingsScreen
+  m.settingsScreen.callingPage = sPageSource
   setSignInInfo() 
   if m.global.authInfo <> invalid
     m.settingsScreen.parentalSettingUpdated = m.global.authInfo.parentalrating
@@ -17,6 +21,10 @@ Function showSettingsScreen(sFocusID = "")
   m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
   m.settingsScreen.observeFieldScoped("activationCompleted", "onActivationCompleted")
+  
+  if screenLevel <> 0
+    m.settingsScreen.screenLevel = screenLevel
+  end if
 
   pushScreen(m.settingsScreen, true, true)
   

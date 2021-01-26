@@ -221,6 +221,9 @@ Function getConstants()
     constants.reqNames.getChannel = "getChannel"
     constants.reqNames.getSSAIAds = "getSSAIAds"
     constants.reqNames.getLiveManifest = "getLiveManifest"
+    constants.reqNames.emailExists = "emailExists"
+    constants.reqNames.signUp = "signUp"
+    constants.reqNames.signIn = "signIn"
 
   constants.thirdParty = {}
     'Nielsen ID token for integrating with Nielsen DAR via RAF
@@ -311,7 +314,14 @@ Function getConstants()
     ' constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/rev/"
     constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/rev/"
 
-
+    constants.urls.account = {}
+      constants.urls.account.urlBase = "https://account.production-public.tubi.io"
+      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+        constants.urls.account.urlBase = "https://account.staging-public.tubi.io"
+      end if
+      constants.urls.account.emailExists = constants.urls.account.urlBase + "/user/email_available"
+      constants.urls.account.login = constants.urls.account.urlBase + "/user/login"
+      
     'contents url
     constants.urls.cms = {}
       constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
@@ -681,6 +691,7 @@ Function getConstants()
     'the search screen can be pushed on top of the home screen,
     'but the home screen can not be pushed on top of the search screen.
     constants.ui.screenLevels = {}
+      ' NOTE : screen level 150 is RESERVED for settings screen when going via signup/signin screen
       constants.ui.screenLevels.homeScreen = 10
       constants.ui.screenLevels.espanolScreen = 20
       constants.ui.screenLevels.movieScreen = 20
@@ -694,8 +705,10 @@ Function getConstants()
       constants.ui.screenLevels.episodeScreen = 50
       constants.ui.screenLevels.videoPlayerScreen = 60
       constants.ui.screenLevels.linearVideoPlayerScreen = 60
+      constants.ui.screenLevels.signUpScreen = 90
+      constants.ui.screenLevels.signInScreen = 90
+      constants.ui.screenLevels.landingScreen = 99      
       constants.ui.screenLevels.activationCodeScreen = 100
-      constants.ui.screenLevels.landingScreen = 99
       constants.ui.screenLevels.unlimitedScreen = 110
       constants.ui.screenLevels.costNothingScreen = 111
       constants.ui.screenLevels.availableDeviceScreen = 112
@@ -715,6 +728,8 @@ Function getConstants()
       constants.ui.screenIds.detailScreen = "detailScreen"
       constants.ui.screenIds.episodeScreen = "episodeScreen"
       constants.ui.screenIds.activationCodeScreen = "activationCodeScreen"
+      constants.ui.screenIds.signUpScreen = "signUpScreen"
+      constants.ui.screenIds.signInScreen = "signInScreen"
       constants.ui.screenIds.landingScreen = "landingScreen"
       constants.ui.screenIds.unlimitedScreen = "unlimitedScreen"
       constants.ui.screenIds.costNothingScreen = "costNothingScreen"
@@ -734,6 +749,8 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.videoPlayerScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.linearVideoPlayerScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.signUpScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.signInScreen] = true
 
     constants.ui.imageSizes = {}
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
