@@ -6,6 +6,7 @@ Function init()
   m.CategoryCount = m.top.findNode("CategoryCount")
   m.newIcon = m.top.findNode("newIcon")
   m.top.observeField("content", "onContentChange")
+  m.top.observeField("currentIndex", "onIndexChange")
 
   ' trying to access m.global can sometimes/rarely time out creating a run time error if we
   ' try to access m.global.theme directly, so use GlobalMixin.getThemeFromGlobal() which retries if issues arise.
@@ -59,4 +60,13 @@ Function drawItemCount()
     m.ItemCount.text = ""
     m.FocusIndex.text = ""
   endif
+End Function
+
+
+Function onIndexChange(msg)
+  tubiLog("CategoryGridRowLabel.onIndexChange")
+  focusIndex = msg.GetData()
+  if focusIndex >= 0
+    m.FocusIndex.text = stri(focusIndex + 1).trim()
+  end if
 End Function

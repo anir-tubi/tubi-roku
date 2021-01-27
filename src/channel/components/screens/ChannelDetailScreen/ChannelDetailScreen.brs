@@ -10,7 +10,7 @@ Function init()
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
-  m.PageTitle = m.top.findNode("pageTitle")
+  m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
   m.VideoGrid = m.top.findNode("ChannelsVideoGrid")
   m.NavSection = m.top.findNode("nav")
 
@@ -104,9 +104,7 @@ Function onLoadContent()
     category = m.top.content.getChild(0)
     m.contentLoadedAndFocused = false
     if category.getChildCount() > 0
-      m.PageTitle.text = category.title
-      m.PageTitle.horizAlign = "left"
-      m.PageTitle.wrap = false
+      m.PageTitleAndCounter.content = category
       m.VideoGrid.content = category
       m.VideoGrid.setFocus(true)
       m.VideoGrid.visible = true
@@ -124,11 +122,11 @@ Function onIsLoading()
   if m.top.isLoading = true
     m.InfoPanel.visible = false
     m.VideoGrid.visible = false
-    m.PageTitle.visible = false
+    m.PageTitleAndCounter.visible = false
   else
     m.InfoPanel.visible = true
     m.VideoGrid.visible = true
-    m.PageTitle.visible = true
+    m.PageTitleAndCounter.visible = true
   end if
 End Function
 
@@ -145,6 +143,7 @@ Function onItemFocused()
       ' Update the info panel
       populateInfoPanel(m.InfoPanel, content, "item")
 
+      m.PageTitleAndCounter.currentIndex = item
 
       ' Update the background image
       if type(content.backgrounds) = "roArray" and content.backgrounds.count() > 0

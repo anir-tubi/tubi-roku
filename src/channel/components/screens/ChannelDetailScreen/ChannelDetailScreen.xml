@@ -140,16 +140,10 @@
       maxTitleLines="2"
       visible="true" />
 
-    <Label
+    <CategoryGridRowLabel
       translation="[168,540]"
       width="1835"
-      numLines="2"
-      id="pageTitle">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="34" />
-    </Label>
+      id="pageTitleAndCounter"/>
     <MarkupGrid
       id="ChannelsVideoGrid"
       translation="[168,594]"

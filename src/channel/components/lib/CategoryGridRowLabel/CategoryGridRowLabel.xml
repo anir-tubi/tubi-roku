@@ -9,8 +9,14 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 
   <interface>
-    <!-- Incoming interface: populate children nodes with content values -->
-    <field id="content" type="node"/>
+    <!-- INPUTS -->
+      <!-- Incoming interface: populate children nodes with content values -->
+      <field id="content" type="node"/>
+      
+      <!-- The number of the focus/current index. 
+        ::NOTE::If the component is set as the rowTitleComponentName of a RowList, 
+        then the focusIndex is set automatically and the currentindex field does nt need to be set. -->
+      <field id="currentindex" type="integer"/>
   </interface>
   
   <children>
