@@ -34,14 +34,16 @@ End Function
 
 
 Function cmsApi_commonOptions()
-  return {
+  headers = m.constants.headers.json
+  options = {
     params: {
       "app_id": m.constants.settings.shortAppName
       "platform": m.constants.platform
       "device_id": m.constants.deviceInfo.deviceId
     }
-    headers: {}
+    headers: headers
   }
+  return options
 End Function
 
 
@@ -216,7 +218,10 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
   headers["x-tubi-inject-live-news"] = "false"
   if params["contentMode"] = m.constants.ui.contentMode.news or params["contentMode"] = m.constants.ui.contentMode.homescreen
     '//request and display live news if the experiement calls for it.
-    headers["x-tubi-inject-live-news"] = "true"
+
+    if bKidsMode = false
+      headers["x-tubi-inject-live-news"] = "true"
+    end if
   end if
 
   if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
@@ -299,9 +304,11 @@ Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = f
     contentMode = passedOptions.params.contentMode
 
     if contentMode = m.constants.ui.contentMode.homescreen or contentMode = m.constants.ui.contentMode.news
-      ' add custom linear content header for all homescreen or news category fetches
-      ' per a request from back end team, in order to facilitate better caching.
-      headers["x-tubi-inject-live-news"] = "true"
+      if bKidsMode = false
+        ' add custom linear content header for all homescreen or news category fetches
+        ' per a request from back end team, in order to facilitate better caching.
+        headers["x-tubi-inject-live-news"] = "true"
+      end if
     end if
   end if
 

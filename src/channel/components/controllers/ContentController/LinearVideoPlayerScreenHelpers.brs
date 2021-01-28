@@ -651,7 +651,12 @@ Function onChannelsRequested()
     responseHandler = "liveNewsChannelGuideResponse"
     categoryId = currentContent.parentId
 
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, responseHandler, reqName)
+    options = {
+      params: {
+        "contentMode": m.constants.ui.contentMode.news
+      }
+    }
+    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, responseHandler, reqName, invalid, false, options)
   end if
 End Function
 

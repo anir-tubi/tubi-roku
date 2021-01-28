@@ -709,6 +709,7 @@ Function cmsApi_commonOptions_test()
   m.assertEqual(commonOptions.params.app_id, appId)
   m.assertEqual(commonOptions.params.platform, platform)
   m.assertEqual(commonOptions.params.device_id, deviceId)
+  m.assertEqual(commonOptions.headers["Content-Type"], "application/json")
 End Function
 
 
