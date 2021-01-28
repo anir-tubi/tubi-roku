@@ -560,6 +560,11 @@ Function onAuthInfoReceived()
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
 
+  ' if a user has just signed in, the default behavior is turn off kids mode UI
+  ' if kids mode UI should be visible due to parenal controls, it will be turned on
+  ' subsequently (most likely by startChannel())
+  enableKidsModeUI(false)
+
   ' Here we notify screens that may exist, though we try to keep context
   '
   ' Transitions:

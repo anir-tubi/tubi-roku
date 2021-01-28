@@ -34,7 +34,11 @@ End Function
 
 
 Function cmsApi_commonOptions()
-  headers = m.constants.headers.json
+  headers = {}
+  ' appending in this style is neccessary to prevent m.constants.headers.json from being
+  ' mutated by potential later appends, since assoc arrays are passed by reference.
+  headers.append(m.constants.headers.json)
+
   options = {
     params: {
       "app_id": m.constants.settings.shortAppName

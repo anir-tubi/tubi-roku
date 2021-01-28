@@ -50,7 +50,6 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     homeScreen.kidsModeFeatureOn = m.kidsModeFeatureOn
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
     homeScreen.canLoadCategories = true
-    homeScreen.canLoadCategories = true
 
     fetchHomeScreen(homescreen)
     
