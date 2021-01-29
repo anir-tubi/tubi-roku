@@ -1826,6 +1826,18 @@ Function getTranslation_es_MX()
     "existing_account_found_description": {
       "description": "existing tubi account found modal description",
       "message": "está vinculado a una cuenta existente de Tubi. Por favor, inicia sesión para continuar."
+    },
+    "could_not_verify_email": {
+      "description": "could not verify your email modal description",
+      "message": "No pudimos verificar tu correo electrónico"
+    },
+    "goBack_signIn": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESIONA REGRESAR PARA VOLVER A INICIAR SESIÓN"
+    },
+    "goBack_signUp": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "PRESIONA REGRESAR PARA REGISTRARTE"
     }
   }
 End Function
