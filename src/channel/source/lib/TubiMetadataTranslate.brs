@@ -320,6 +320,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
           if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
             resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
           end if
+
+          if video.license_server.hdcp_version <> invalid
+            resource.hdcpVersion = video.license_server.hdcp_version
+          end if
         end if
       else if video.type = m.constants.player.drmTypes.dashPlayReady
         resource.type = m.constants.player.drmTypes.dashPlayReady
@@ -329,6 +333,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
           resource.encodingKey = video.license_server.url
           if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
             resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+          end if
+
+          if video.license_server.hdcp_version <> invalid
+            resource.hdcpVersion = video.license_server.hdcp_version
           end if
         end if
       else if video.type = m.constants.player.drmTypes.hlsv3

@@ -1014,7 +1014,7 @@ Function advanceDrmOnContent(contentNode)
   if contentNode.drmType <> ""
     for i=0 to contentNode.videoResources.count()-1
       resource = contentNode.videoResources[i]
-      if contentNode.drmType = resource.type
+      if contentNode.drmType = resource.type and contentNode.hdcpVersion = resource.hdcpVersion
         nextIndex = i + 1
         exit for
       end if
@@ -1062,6 +1062,7 @@ Function setDrmOnContent(contentNode, index)
     contentNode.length = resource.length
     contentNode.streamFormat = resource.streamFormat
     contentNode.drmType = resource.type
+    contentNode.hdcpVersion = resource.hdcpVersion
 
     ' set DRM scheme specific fields
     if resource.type = m.constants.player.drmTypes.dashWidevine

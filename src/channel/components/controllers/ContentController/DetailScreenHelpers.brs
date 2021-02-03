@@ -1268,7 +1268,7 @@ End Function
 ' Notify the main Brightscript thread to invoke the video player if data present
 ' if data not present, it invokes content api
 Function onPlay(msg)
-  tubiLog("ContentController.onPlay")
+  tubiLog("DetailScreenHelpers.onPlay")
   detailScreen = msg.getRoSGNode()
 
   if isFetchingInProgress(detailScreen) <> true
