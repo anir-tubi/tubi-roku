@@ -911,7 +911,6 @@ End Function
 Function setIsHistory(detailScreen, isHistory)
   'reset the value in the case that remove from history button was pressed and title is currently "Removing..."
   detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
-
   detailScreen.isHistory = isHistory
 End Function
 
@@ -926,21 +925,23 @@ End Function
 Function onRemoveFromQueue(detailScreen)
   tubiLog("DetailScreenHelpers.onRemoveFromQueue")
   if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
-    detailScreen.stringQueueButton = getTranslation("screenDetails_button_removing")
-    userTask = CreateObject("roSGNode", "AuthTask")
-    userTask.functionName = "removeFromQueue"
     content = detailScreen.content.clone(false)
     bookmark = m.global.bookmarkIds.findNode(content.id)
-    content.bookmarkId = bookmark.bookmarkId
-    userTask.content = content
-    userTask.isKidsMode = shouldKidsModeBeSentToServer()
-    userTask.addField("target", "node", false)
-    userTask.target = detailScreen
-    detailScreen.addField("task", "node", false)
-    detailScreen.task = userTask
-    userTask.observeFieldScoped("result", "onBookmarkRemoved")
-    userTask.control = "RUN"
-    detailScreen.isWaitingForServerResponse = true
+    if bookmark <> invalid
+      detailScreen.stringQueueButton = getTranslation("screenDetails_button_removing")
+      userTask = CreateObject("roSGNode", "AuthTask")
+      userTask.functionName = "removeFromQueue"
+      content.bookmarkId = bookmark.bookmarkId
+      userTask.content = content
+      userTask.isKidsMode = shouldKidsModeBeSentToServer()
+      userTask.addField("target", "node", false)
+      userTask.target = detailScreen
+      detailScreen.addField("task", "node", false)
+      detailScreen.task = userTask
+      userTask.observeFieldScoped("result", "onBookmarkRemoved")
+      userTask.control = "RUN"
+      detailScreen.isWaitingForServerResponse = true
+    end if
   end if
 End Function
 

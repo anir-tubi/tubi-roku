@@ -4,8 +4,12 @@ Function init()
   m.DetailsMenuText = m.top.findNode("DetailsMenuText")
   m.top.leftTextPadding = m.DetailsMenuText.translation[0]
   m.Progress = m.top.findNode("ResumeProgressBar")
-  m.top.color = m.global.constants.ui.colors.transparent
-  m.Progress.color = m.global.constants.ui.colors.focusedText
+
+  constants = getConstantsFromGlobal()
+  if constants <> invalid
+    m.top.color = constants.ui.colors.transparent
+    m.Progress.color = constants.ui.colors.focusedText
+  end if
 End Function
 
 Function onItemContentChange()

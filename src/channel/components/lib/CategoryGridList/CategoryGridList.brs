@@ -194,7 +194,7 @@ Function onRepopulateContent()
   ' 2) new queue row got inserted, so increment the focus index by 1
   ' 3) continue_watching row got removed, so decrement the focus index by 1
   ' 4) queue row got removed, so decrement the focus index by 1
-  if m.Rowlist <> invalid and m.Rowlist.content <> invalid
+  if m.Rowlist <> invalid and m.Rowlist.content <> invalid and rowItemFocused[0] <> invalid
     if rowAdded = m.constants.ui.categoryIds.history
       if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
         m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]

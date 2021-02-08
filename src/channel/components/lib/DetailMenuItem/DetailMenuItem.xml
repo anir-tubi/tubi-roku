@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <component name="DetailMenuItem" extends="Rectangle" >
   <script type="text/brightscript" uri="DetailMenuItem.brs" />
+  <script type="text/brightscript" uri="../GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>

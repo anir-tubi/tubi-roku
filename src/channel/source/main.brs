@@ -5,7 +5,7 @@ Function Main(startupArgs)
   ' constants will be reset in remote components for scene graph
   
   m.appStartTime = UpTime(0)
-  
+
   constants = getConstants()
   request = TubiRequest(constants.settings.mode)
   auth = TubiAuth(constants, request)
@@ -29,7 +29,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
   screen = CreateObject("roSGScreen")
   screen.SetMessagePort(port)
   controller = invalid
-  
+
   input.enableTransportEvents()
 
   ' start the scene graph UI 
@@ -101,7 +101,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
   while true
     msg = wait(200, port)
     msgType = type(msg)
-    
+
     if msgType = "roInputEvent"
       if controller <> invalid and msg.GetInfo() <> invalid
         inputInfo = msg.GetInfo()
@@ -141,33 +141,43 @@ Function runChannel(startupArgs, constants, log, request) As Void
             suitestIL.SetField("app_id", constants.thirdParty.suiteTest.app_id)          
           else if msg.GetRoSGNode().id = "TubiStarterLibrary"
             starterController = tubiScene.createChild("TubiStarterLibrary:StarterController")
-            starterController.id = "StarterController"
-            starterController.observeField("useRemoteComponents", port)
-            starterController.observeField("remoteComponentsUrl", port)
-            starterController.observeField("fadeOutCustomSplash", port)
-            starterController.observeField("fadeInRemoteComponent", port)
-            starterController.setField("getUrl", true)
-            retries = 0
-            pause = initialBackoff
+            if starterController <> invalid
+              starterController.id = "StarterController"
+              starterController.observeField("useRemoteComponents", port)
+              starterController.observeField("remoteComponentsUrl", port)
+              starterController.observeField("fadeOutCustomSplash", port)
+              starterController.observeField("fadeInRemoteComponent", port)
+              starterController.setField("getUrl", true)
+              retries = 0
+              pause = initialBackoff
+            else
+              showComponentsFailedToLoadError(msg, log, screen, constants)
+              exit while
+            end if
           else if msg.GetRoSGNode().id = "TubiRemoteLibrary"
             componentsLoaded = true
             controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
-            controller.id = "ContentController"
-            controller.observeField("exitApp", port)
-            controller.observeField("transportVoiceResponse", port)
-            controller.observeField("removeStartUpScreens", port)
-            controller.appStartTime = m.appStartTime
-            controller.startupArgs = startupArgs
-            
-            starterController = tubiScene.findNode("StarterController")
-            if starterController <> invalid and starterController.fadeInRemoteComponent = true and controller.fadeInContentController <> true
-              starterController.unobserveField("fadeInRemoteComponent")
-              tubiScene.fadeOutSpinner = true  
-              controller.fadeInContentController = true
-            end if
-            
-            if suitestLib <> invalid
-              suitestLib.SetField("uri", constants.thirdParty.suiteTest.uri)
+            if controller <> invalid
+              controller.id = "ContentController"
+              controller.observeField("exitApp", port)
+              controller.observeField("transportVoiceResponse", port)
+              controller.observeField("removeStartUpScreens", port)
+              controller.appStartTime = m.appStartTime
+              controller.startupArgs = startupArgs
+
+              starterController = tubiScene.findNode("StarterController")
+              if starterController <> invalid and starterController.fadeInRemoteComponent = true and controller.fadeInContentController <> true
+                starterController.unobserveField("fadeInRemoteComponent")
+                tubiScene.fadeOutSpinner = true
+                controller.fadeInContentController = true
+              end if
+
+              if suitestLib <> invalid
+                suitestLib.SetField("uri", constants.thirdParty.suiteTest.uri)
+              end if
+            else
+              showComponentsFailedToLoadError(msg, log, screen, constants)
+              exit while
             end if
           end if
         else if msg.getData() = "loading"
@@ -216,7 +226,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
           sgGlobal.setField("constants", starterController.newBuildConstants)
           sgGlobal.setField("theme", starterController.newBuildConstants.ui.themes.default)
         end if
-        
+
         remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
         libraryBeingFetched = remoteLibrary
         componentTimer.mark()
