@@ -140,7 +140,7 @@ Function tubiTracking_getAnalyticsDevice(eventValues = invalid)
 
   device = {
     device_id: m.constants.deviceInfo.deviceId
-    manufacturer: "Roku"
+    manufacturer: m.constants.deviceInfo.vendorName
     model: m.constants.deviceInfo.model
     os: "Roku OS"
     os_version: m.constants.deviceInfo.firmwareVersion.toStr()

@@ -178,6 +178,7 @@ Function getConstants()
     constants.deviceInfo.userAgent = "Roku/DVP-" + firmwareVersionMajor.toStr() + "." + firmwareVersionMinor.toStr() + " (" + firmware + ")"
     constants.deviceInfo.userAgentModel = "Roku/DVP-" + firmwareVersionMajor.toStr() + "." + firmwareVersionMinor.toStr() + " (" + firmware + ") " + di.GetModel() 
     constants.deviceInfo.model = di.GetModel()
+    constants.deviceInfo.vendorName = di.GetModelDetails().VendorName
     constants.deviceInfo.definition = definition
     constants.deviceInfo.displayType = di.GetDisplayType()
     constants.deviceInfo.displayMode = di.GetDisplayMode()
