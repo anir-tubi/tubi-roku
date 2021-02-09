@@ -46,7 +46,7 @@ Function init()
   m.keyboard.focusBitmapUri = m.theme.keyboard_focused_key
   
   m.back = m.top.findNode("back")
-  m.back.text = getTranslation("onBoarding_back_button")
+  m.back.text = getTranslation("linearVideoPlayer_buttonBack")
   m.back.observeFieldScoped("selected", "onBackButtonSelected")
   
   m.showHidePassword = m.top.findNode("showHidePassword")

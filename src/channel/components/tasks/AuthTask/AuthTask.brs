@@ -13,7 +13,6 @@ Function execInitializeUserData()
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()
-  experiments = TubiExperiments(constants)
 
   userCats = getInitalUserCategories(Bookmarks, true, true, true)
   ' enhance the auth tokens with the user profile information
@@ -23,18 +22,6 @@ Function execInitializeUserData()
   
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
-  
-  ' skip landing/onBoarding screens, if the roku_onboarding_registration experiment is disabled 
-  onBoardingRegistrationEnabled = experiments.getExperimentResource("roku", "roku_onboarding_registration").enabled
-  if constants.deviceInfo.countryCode <> invalid and constants.deviceInfo.countryCode = "US"
-    if onBoardingRegistrationEnabled = true
-      m.top.skipLandingScreen = Auth.skipLandingScreen()
-      m.top.sendOnBoardingControlEvent = false
-    else
-      m.top.skipLandingScreen = true
-      m.top.sendOnBoardingControlEvent = Auth.sendOnBoardingControlEvent()
-    end if
-  end if
   
   m.top.firstVisit = Auth.getfirstVisit()
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger 
@@ -67,8 +54,6 @@ Function execSignOut()
   NodeHelpers = TubiNodeHelpers()
 
   Auth.logout()
-  Auth.deleteLastOnBoarding()
-  Auth.deleteLastOnBoardingControlEvent()
 
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()

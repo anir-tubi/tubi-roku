@@ -137,7 +137,7 @@ Function onSideNavItemSelected()
       showLogo()
       if authInfo = invalid
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
-        startSignIn(true)
+        startSignIn()
         bNewScreenCalledSuccess = true
       else
         '//Bring user to the settings page and select the signout option

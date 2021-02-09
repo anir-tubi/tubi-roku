@@ -31,7 +31,6 @@
   <script type="text/brightscript" uri="SettingsScreenHelpers.brs" />
   <script type="text/brightscript" uri="SignInHelpers.brs" />
   <script type="text/brightscript" uri="ScreenStackHelpers.brs" />
-  <script type="text/brightscript" uri="OnBoardingHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />

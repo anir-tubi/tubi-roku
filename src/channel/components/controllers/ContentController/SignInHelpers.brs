@@ -2,10 +2,8 @@
 ' startSignIn
 '
 ' Defer to the sign-in controller for sign in experience
-' @param skipOnBoarding: boolean, Should the OnBoarding be skipped? 
-Function startSignIn(skipOnBoarding)
+Function startSignIn()
 
-  m.skipOnBoardingScreen = skipOnBoarding 
   tubiLog("SignInHelpers.startSignIn")
   
   if getExperimentResource("roku2", "roku_email_prefill").enabled = true
@@ -552,9 +550,6 @@ Function onAuthInfoReceived()
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
-
-  m.skipLandingScreen = m.authTask.skipLandingScreen
-  m.sendOnBoardingControlEvent = m.authTask.sendOnBoardingControlEvent
 
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")

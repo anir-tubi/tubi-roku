@@ -803,62 +803,6 @@ Function getTranslation_en_US()
       "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
       "message": "Watch thousands of hit movies and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer ads than regular TV. Tubi is the largest free streaming service featuring award-winning movies and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favorites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!"
     },
-    "onBoarding_landingScreen_registration": {
-      "description": "",
-      "message": "Free TV\nFree Movies\nFree Registration"
-    },
-    "onBoarding_onBoarding_landingScreen_info": {
-      "description": "",
-      "message": "Discover a new way to watch all the content you love. Always free, 100% legal, and no subscription required."
-    },
-    "onBoarding_register_button": {
-      "description": "",
-      "message": "Register for Tubi"
-    },
-    "onBoarding_guest_button": {
-      "description": "",
-      "message": "Continue as Guest"
-    },
-    "onBoarding_unlimitedScreen_heading": {
-      "description": "",
-      "message": "Unlimited movies, shows and more"
-    },
-    "onBoarding_unlimitedScreen_description": {
-      "description": "",
-      "message": "Over 20,000 of your favorite movies and shows for free."
-    },
-    "onBoarding_next_button": {
-      "description": "",
-      "message": "Next"
-    },
-    "onBoarding_skip_button": {
-      "description": "",
-      "message": "Skip"
-    },
-    "onBoarding_costScreen_heading": {
-      "description": "",
-      "message": "It won't cost you a thing"
-    },
-    "onBoarding_costScreen_description": {
-      "description": "",
-      "message": "3X the content of Netflix, fewer ads than cable, none of the cost. Free forever."
-    },
-    "onBoarding_devices_heading": {
-      "description": "",
-      "message": "Available on all\nyour devices"
-    },
-    "onBoarding_devices_description": {
-      "description": "",
-      "message": "Watch on your phone, television, tablet\nor computer."
-    },
-    "onBoarding_startWatching_button": {
-      "description": "",
-      "message": "Start Watching"
-    },
-    "onBoarding_back_button": {
-      "description": "",
-      "message": "Back"
-    },
     "utility_movies_description": {
       "description": "This will be displayed on Info panel when the Movies item (from utility row) gains focus",
       "message": "Movie magic starts here with thousands of nostalgic favorites and recent box office hits. New movies added monthly, no movie ticket required."
@@ -1666,62 +1610,6 @@ Function getTranslation_es_MX()
     "channel_webDescription": {
       "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
       "message": "Ve miles de películas y series totalmente gratis. En Tubi puedes ver contenido 100% legal y de forma ilimitada. No se requiere tarjeta de crédito o suscripción. Solo tienes que descargar la aplicación, elige lo que quieras ver en donde tu quieras y disfruta del contenido con menos anuncios que la televisión. Tubi es el servicio más grande de streaming gratis que ofrece películas y series de televisión premiadas. Tenemos algo para todos: Comedias, dramas, familiares, clásicas, dramas coreanos, anime y más. ¡Descárga hoy y empieza a transmitir entretenimiento gratis!"
-    },
-    "onBoarding_landingScreen_registration": {
-      "description": "",
-      "message": "TV gratis\nPelículas gratis\nRegistro gratis"
-    },
-    "onBoarding_onBoarding_landingScreen_info": {
-      "description": "",
-      "message": "Descubre una nueva forma de ver todo el contenido que te gusta. Siempre gratis, 100% legal y no requiere suscripción."
-    },
-    "onBoarding_register_button": {
-      "description": "",
-      "message": "Regístrate en Tubi"
-    },
-    "onBoarding_guest_button": {
-      "description": "",
-      "message": "Continuar como invitado"
-    },
-    "onBoarding_unlimitedScreen_heading": {
-      "description": "",
-      "message": "Películas, series y más ilimitados"
-    },
-    "onBoarding_unlimitedScreen_description": {
-      "description": "",
-      "message": "Más de 20,000 de tus películas y programas favoritos gratis."
-    },
-    "onBoarding_next_button": {
-      "description": "",
-      "message": "Siguiente"
-    },
-    "onBoarding_skip_button": {
-      "description": "",
-      "message": "Saltar"
-    },
-    "onBoarding_costScreen_heading": {
-      "description": "",
-      "message": "No te costará nada"
-    },
-    "onBoarding_costScreen_description": {
-      "description": "",
-      "message": "3x el contenido que Netflix, menos anuncios que el cable, ninguno de los costos. Totalmente gratis."
-    },
-    "onBoarding_devices_heading": {
-      "description": "",
-      "message": "Disponible en todos tus dispositivos"
-    },
-    "onBoarding_devices_description": {
-      "description": "",
-      "message": "Ver en tu teléfono, televisión, tableta o computadora."
-    },
-    "onBoarding_startWatching_button": {
-      "description": "",
-      "message": "Comienza a ver"
-    },
-    "onBoarding_back_button": {
-      "description": "",
-      "message": "Regresar"
     },
     "utility_movies_description": {
       "description": "This will be displayed on Info panel when the Movies item (from utility row) gains focus",

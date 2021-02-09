@@ -54,14 +54,9 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     fetchHomeScreen(homescreen)
     
     setInScreenCache(homeScreen)
-    
-    if m.screenStack.getChildCount() > 0
-      pushScreen(homeScreen, true, true)
-    else    
-      'this is the first screen so no need for navigate_to_page tracking.
-      'page_load tracking will happen when content is received.
-      pushScreen(homeScreen, false, false)
-    end if
+    'this is the first screen so no need for navigate_to_page tracking.
+    'page_load tracking will happen when content is received.
+    pushScreen(homeScreen, false, false)    
   end if
 End Function
 
@@ -490,7 +485,7 @@ Function onContentSelected(msg)
     showChannelScreen(content, "HOME")
   else if content.type = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
-    startSignIn(true)
+    startSignIn()
   else if content.type = "utility"
     onUtilityItemSelected(content)
   else if content.type = m.constants.ui.contentTypes.linear

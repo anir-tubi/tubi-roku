@@ -49,7 +49,6 @@ Function TubiExperiments(constants) as Object
     }
     defaultResources: {
       roku: {
-        roku_onboarding_registration : { enabled : false }
         roku_sidenav_espanol: {"combined": true}
       }
       roku2: {

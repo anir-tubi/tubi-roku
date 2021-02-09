@@ -3,16 +3,6 @@ Function init()
   tubiLog("Init Scenegraph----------------")
   m._ = rodash()
   
-  ' sentStartUpEvents variable used for sending active event, hdcp info
-  m.sentStartUpEvents = false
-
-  ' TODO Remove sendOnBoardingControlEvent and its references once the OnBoarding experiment is done
-  m.sendOnBoardingControlEvent = false
-  ' skipLandingScreen variable is used to show/hide the landing screens. This variable is set to true/false based on user loggedin(or not) and lastOnBoardingVisit registry (TubiAuth)
-  m.skipLandingScreen = true
-  ' skipOnBoardingScreen variable is used to show/hide the onBoarding screens. This variable is set to true/false based on user loggedin(or not) and lastOnBoardingVisit registry (TubiAuth)
-  m.skipOnBoardingScreen = true
-
   m.constants = m.global.constants
   
   generalTask = CreateObject("roSGNode", "GeneralTask")  ' initiate GeneralTask
@@ -258,7 +248,7 @@ End Function
 
 ' handles the response of a user who has been presented a sign in modal
 Function onSignInModalButtonSelected()
-  startSignIn(true)
+  startSignIn()
 End Function
 
 
@@ -416,23 +406,20 @@ Function startUserExperience()
   else
     ' All of the above checked values are true, so we are ready to start the channel UI
     
-    if m.sentStartUpEvents = false
-      m.sentStartUpEvents = true
-      m.trackingLoggingTask.trackEvent = {
-        type: "active"
-        values: {}
-      }
+    m.trackingLoggingTask.trackEvent = {
+      type: "active"
+      values: {}
+    }
 
-      ' Since we're ready to start the channel, make sure the loading spinner is hidden
-      root = m.top.getScene()
-      if root <> invalid
-        spinner = root.findNode("LoadingSpinner")
-        if spinner <> invalid then
-          spinner.visible = false
-        end if
+    ' Since we're ready to start the channel, make sure the loading spinner is hidden
+    root = m.top.getScene()
+    if root <> invalid
+      spinner = root.findNode("LoadingSpinner")
+      if spinner <> invalid then
+        spinner.visible = false
       end if
-      sendHdcpLog() 
     end if
+    sendHdcpLog() 
 
     ' In any of the auth transitions, this spinner might be visible
     'm.spinner.visible = false
@@ -443,22 +430,7 @@ Function startUserExperience()
       m.contentGroup.visible = true
       enableKidsModeUI(false) '//when deeplinking, exit out of kids mode because we cannot guarantee that the video is kid appropriate so the UI should not make the user think we're still in kids mode
       showDetailScreen(m.deeplinkContent, false)
-    else if m.skipLandingScreen = false and m.global.authInfo = invalid
-      ' display landingScreen only if skipLandingScreen is false and user is not loggedin
-      m.contentGroup.visible = true
-      m.skipLandingScreen = true
-      ' sending experiment exposure event for roku_onboarding_registration
-      getExperimentResource("roku", "roku_onboarding_registration")
-      showLandingScreen()
-    else if m.skipOnBoardingScreen = false and m.global.authInfo <> invalid
-      ' display onBoarding screens only if the user is signedIn and previous screen was through Landing/Activation
-      m.skipOnBoardingScreen = true
-      showOnBoardingUnlimitedScreen()      
     else
-      ' sending control experiment control event for roku_onboarding_registration
-      if m.sendOnBoardingControlEvent = true and m.global.authInfo = invalid
-        getExperimentResource("roku", "roku_onboarding_registration")
-      end if
       startChannel()
       showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary      
     end if
@@ -1026,7 +998,6 @@ Function startChannel()
     enableKidsModeUI(false)
   end if
   showHomeScreen(m.constants, m.global.authInfo)
-  shrinkScreenStack(1)
 End Function
 
 
