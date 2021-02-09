@@ -671,6 +671,10 @@ function fetchUpNextContent(videoPlayer)
       options.params.mode = "ap"
     end if
 
+    if m.autoplayContext = invalid
+      options.params.delete("container_id")
+    end if
+
     upNextReqInfo = m.cmsApi.upNextContentRequestInfo(videoPlayer.content.id, options)
 
     return m.makeRequest({
