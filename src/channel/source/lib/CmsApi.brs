@@ -228,10 +228,6 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
     end if
   end if
 
-  if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
-    params["groupSize"] = m.constants.settings.numContainers
-  end if
-
   if passedOptions <> invalid
     if passedOptions.params <> invalid
       params.append(passedOptions.params)
