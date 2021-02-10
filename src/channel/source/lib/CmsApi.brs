@@ -74,7 +74,6 @@ Function cmsApi_getUpNextContentRequestInfo(contentId, passedOptions)
   headers = options.headers
 
   params["video_resources"] = m.constants.player.drmOrder
-  params["gn_fields"] = "tms_id"
 
   if passedOptions <> invalid
     if passedOptions.params <> invalid
@@ -105,7 +104,6 @@ Function cmsApi_getSingleContentRequestInfo(contentId, includeChannels=false, bK
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
   options.params["video_resources"] = m.constants.player.drmOrder
-  options.params["gn_fields"] = "tms_id"  'request the Gracenote id
   options.params = m.setTupianLandscapeParam(options.params)
 
   return {

@@ -30,7 +30,9 @@
     <field id="hasTrailer" type="boolean" value="false" />
     <field id="trailerInfo" type="assocarray" />
     <field id="deeplinkType" type="string" />
-    <field id="gracenoteId" type="string" />
+
+    <!-- text to display for a category whose content is empty -->
+    <field id="placeholderText" type="string" />
     
     <!-- these will come in for paginated responses -->
     <field id="totalCount" type="int" value="-1"/>

@@ -255,12 +255,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       translatedContent.creditsCuepoint = 0
     end if
   end if
-
-  if contentFromServer.gn_fields <> invalid
-    if contentFromServer.gn_fields.tms_id <> invalid
-      translatedContent.gracenoteId = contentFromServer.gn_fields.tms_id
-    end if
-  end if
  
   translatedContent.landscape  = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)  
   sPortraitURL = m.getThumbnailImage(contentFromServer)
