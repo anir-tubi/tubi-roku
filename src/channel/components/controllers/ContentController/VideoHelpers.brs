@@ -62,7 +62,7 @@ function playVideoContent(content, autoplayType = "none", position = 0)
       videoPlayer.observeFieldScoped("segBitrate", "onSegBitrateChange")
 
       videoPlayer.enableAds = true
-      if m.constants.settings.suitest = true or m.constants.settings.noAds = true
+      if m.constants.settings.noAds = true
         videoPlayer.enableAds = false
       end if
     end if
