@@ -38,14 +38,11 @@ Function TubiExperiments(constants) as Object
     '
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
     defaultValues: {
-      roku: {
-      }
-      roku2: {
-      }
-      roku_discovery_v3 : {
-      }
-      roku_local_resume: {
-      }
+      roku: {}
+      roku2: {}
+      roku_discovery_v3 : {}
+      roku_local_resume: {}
+      roku_limit_containers: {}
     }
     defaultResources: {
       roku: {
