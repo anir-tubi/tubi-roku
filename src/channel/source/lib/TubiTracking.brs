@@ -114,7 +114,7 @@ Function tubiTracking_getAnalyticsUser()
   authInfo = m.auth.getAuthInfo()
   if authInfo <> invalid and m.isString(authInfo.userId) = true
     userId = authInfo.userId.toInt()
-    authType = "CODE"
+    authType = authInfo.authType
   else
     userId = 0
     authType = "NOT_AUTHED"

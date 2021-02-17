@@ -23,6 +23,7 @@ End Function
 'side effects... overwrites the old authInfo in the registry with the new authInfo
 Function parseSignUpSuccess(fullResponse, requestNode)
   parsedResponse = fullResponse.data
+  parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
   requestModule = TubiRequest(m.constants.settings.mode)
   authModule = TubiAuth(m.constants, requestModule)
   authModule.handleRegistration(parsedResponse)
@@ -47,6 +48,7 @@ End Function
 'side effects... overwrites the old authInfo in the registry with the new authInfo
 Function parseSignInSuccess(fullResponse, requestNode)
   parsedResponse = fullResponse.data
+  parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
   requestModule = TubiRequest(m.constants.settings.mode)
   authModule = TubiAuth(m.constants, requestModule)
   authModule.handleRegistration(parsedResponse)

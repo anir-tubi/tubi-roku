@@ -99,6 +99,7 @@ Function registrationLoop() As Void
               if parsed.status = "registered" then   ' status may be "pending" or "registered"
                 auth = TubiAuth(constants, Request)
                 ' persist the registration information before we notify the scene graph
+                parsed.authType = "CODE"
                 auth.handleRegistration(parsed)
                 m.top.response = parsed
                 m.global.trackingLoggingTask.trackEvent = {
@@ -168,7 +169,7 @@ Function trackRegistrationFailure(message)
     type: "account"
     values: {
       manip: "REGISTER_DEVICE"
-      current: "UNKNOWN"
+      current: ""
       user_type: "UNKNOWN_USER_TYPE"
       status: "FAIL"
       linked: ""

@@ -275,8 +275,8 @@ Function onSignUpResponse(response)
   m.trackingLoggingTask.trackEvent = {
     type: "account"
     values: {
-      manip: "REGISTER_DEVICE"
-      current: ""
+      manip: "SIGNUP"
+      current: "EMAIL"
       user_type: "UNKNOWN_USER_TYPE"
       status: "SUCCESS"
       linked: ""     
@@ -295,9 +295,9 @@ Function onSignUpError(error)
   accountEvent = {
     type: "account"
     values: {
-      manip: "REGISTER_DEVICE"
+      manip: "SIGNUP"
       message: "signup-failed"
-      current: ""
+      current: "EMAIL"
       user_type: "UNKNOWN_USER_TYPE"
       status: "FAIL"
       linked: ""     
@@ -372,9 +372,9 @@ Function onSignInResponse(response)
   m.trackingLoggingTask.trackEvent = {
     type: "account"
     values: {
-      manip: "REGISTER_DEVICE"
-      current: ""
-      user_type: "UNKNOWN_USER_TYPE"
+      manip: "SIGNIN"
+      current: "EMAIL"
+      user_type: "EXISTING_USER"
       status: "SUCCESS"
       linked: ""     
     }
@@ -391,10 +391,10 @@ Function onSignInError(error)
   accountEvent = {
     type: "account"
     values: {
-      manip: "REGISTER_DEVICE"
+      manip: "SIGNIN"
       status: "FAIL"
       message: "invalid_password"
-      current: ""
+      current: "EMAIL"
       user_type: "UNKNOWN_USER_TYPE"
       linked: ""
     }

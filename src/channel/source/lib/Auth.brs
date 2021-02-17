@@ -13,7 +13,6 @@ Function TubiAuth(constants, request)
     getFirstVisit: tubiAuth_getFirstVisit
     setFirstVisit: tubiAuth_setFirstVisit
     handleRegistration: tubiAuth_handleRegistration
-    oneTimeLoginMigration: tubiAuth_oneTimeLoginMigration
     logout: tubiAuth_deleteAuthInfo_
     refreshAuthToken: tubiAuth_refreshAuthToken
     transferRefreshToken: tubiAuth_transferRefreshToken
@@ -34,11 +33,6 @@ Function TubiAuth(constants, request)
     regReadAll: tubiAuth_regReadAll_
     regWrite: tubiAuth_regWrite_
     regDelete: tubiAuth_regDelete_
-
-    'used for old logins, should not be used except in oneTimeLoginMigration
-    getUserData: tubiAuth_getUserData_
-    deleteUserData: tubiAuth_deleteUserData_
-    userDataFromString: tubiAuth_userDataFromString_
   }
 End Function
 
@@ -49,6 +43,7 @@ End Function
 '   accessToken: someAccessToken(String)
 '   expireTime: numberOfSecondsUntilExpires(Integer)
 '   userId: userId(Integer as String)
+'   authType: analyticsAuthType(String)
 '}
 function tubiAuth_getAuthInfo()
   authInfo = m.regReadAll(m.authRegSection) 'returns empty assocArray if nothing in the auth registry
@@ -99,6 +94,7 @@ End Function
 '   accessToken: someAccessToken(String)
 '   expireTime: numberOfSecondsUntilExpires(Integer as String)
 '   userId: userId(Integer as String)
+'   authType: analyticsAuthType(String)
 '}
 
 '@serverAuthInfo: assocArray of auth info as received from the server
@@ -119,6 +115,7 @@ End Function
 '   accessToken: someAccessToken(String)
 '   expireTime: numberOfSecondsUntilExpires(Integer or Integer as String)
 '   userId: userId(Integer as String)
+'   authType: analyticsAuthType(String)
 '}
 '@timeout: integer, the max amount of time to wait for a response from the server in seconds
 '
@@ -138,6 +135,18 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
       if newAccess <> invalid
         if newAccess.access_token <> invalid
           newAuthInfo = m.updateAuthInfo(newAccess, authInfo)
+
+          ' prior to saving authType as part of the authInfo in the registry, the only possible
+          ' authType for analytics was "CODE" which was hard coded in the analytics module.
+          ' At this point in the code, it's possible that the previously saved authInfo does
+          ' not have an authType, so we default to "CODE". Over time the number of devices
+          ' that enter this if block should drop to 0 as newly signed in/activated users save
+          ' the authType in the registry, and older users add the "CODE" authType as they
+          ' refresh their token.
+          if authInfo.authType = invalid
+            newAuthInfo.authType = "CODE"
+          end if
+
           newAuthInfo = m.saveAuthInfo(newAuthInfo) 'returns invalid if not saved to the registry
         else
           ' Be careful to only do this if the service rejected suth refresh.  We don't
@@ -280,6 +289,7 @@ end function
 '   accessToken: someAccessToken(String)
 '   expireTime: numberOfSecondsUntilExpires(Integer as String)
 '   userId: userId(Integer as String)
+'   authType: analyticsAuthType(String)
 '}
 function tubiAuth_saveAuthInfo_(authInfo)
   if authInfo <> invalid and authInfo.refreshToken <> invalid and authInfo.accessToken <> invalid and authInfo.expireTime <> invalid  and (type(authInfo.expireTime) = "String" or type(authInfo.expireTime) = "roString") and authInfo.userId <> invalid
@@ -307,6 +317,7 @@ end function
 '   accessToken: someAccessToken(String)
 '   expireTime: numberOfSecondsUntilExpires(Integer)
 '   userId: userId(Integer as String)
+'   authType: analyticsAuthType(String)
 '}
 function tubiAuth_checkIfAuthExpired_(authInfo)
   isExpired = true
@@ -409,7 +420,7 @@ End Function
 
 
 '@refreshRequest: assocArray, a reqest object as created by tubiRequest().createAsyncHTTPRequest()
-function tubiAuth_handleRefreshResponse_(msg, refreshRequest)
+Function tubiAuth_handleRefreshResponse_(msg, refreshRequest)
   newAccess = invalid
 
   responseInfo = refreshRequest.handleEvent(msg)
@@ -424,12 +435,12 @@ function tubiAuth_handleRefreshResponse_(msg, refreshRequest)
   end if
 
   return newAccess
-end function
+End Function
 
 
 'used when getting back a response from the server after a successful registration.
 'We need to format the information to match what we store in the registry
-function tubiAuth_formatAuthInfoFromServer_(serverAuthInfo)
+Function tubiAuth_formatAuthInfoFromServer_(serverAuthInfo)
   clock = CreateObject("roDateTime")
   secondsToNow = clock.AsSeconds()
   authInfo = {}
@@ -441,95 +452,9 @@ function tubiAuth_formatAuthInfoFromServer_(serverAuthInfo)
   if serverAuthInfo.first_name <> invalid then authInfo.fn = serverAuthInfo.first_name
   if serverAuthInfo.last_name <> invalid then authInfo.ln = serverAuthInfo.last_name
   if serverAuthInfo.name <> invalid then authInfo.name = serverAuthInfo.name
+  if serverAuthInfo.authType <> invalid then authInfo.authType = serverAuthInfo.authType
 
   return authInfo
-end function
-
-
-'checks if old registration data exists in the registry (device memory)
-'if so, get a new auth info set and delete the old registration data
-function tubiAuth_oneTimeLoginMigration()
-  migratePort = CreateObject("roMessagePort")
-
-  authInfo = {}
-  oldUserData = m.getUserData()
-  if oldUserData <> invalid and oldUserData.token <> invalid and oldUserData.token.len() > 0 'token is the userId
-    
-    migrateToken = m.constants.settings.migrateToken
-    body = {
-      user_id: oldUserData.token
-      device_id: m.constants.deviceInfo.deviceId
-      platform: m.constants.platform
-    }
-    bodyJson = FormatJson(body)
-    headers = m.getAuthHeaders(migrateToken)
-    ' m.sendAsyncRequest(url, migratePort, "oneTimeLoginMigration", "POST", true, bodyJson, headers)
-
-    reqOptions = {
-      method: "POST"
-      body: body
-      headers: headers
-    }
-
-    newMigrationReq = m.request.createAsync(m.constants.urls.users.migrateLogin, "oneTimeLoginMigration", reqOptions)
-    reqSent = newMigrationReq.start(migratePort)
-
-    if reqSent = true
-      authInfo = invalid
-      
-      while true
-        msg = wait(0, migratePort)
-        
-        responseInfo = newMigrationReq.handleEvent(msg)
-
-        if responseInfo <> invalid and responseInfo.response <> invalid and responseInfo.response.data <> invalid and responseInfo.response.data.len() > 0
-          newAccess = ParseJson(responseInfo.response.data)
-
-          if newAccess.refresh_token <> invalid
-            'since we now have new auth info, save it to memory and delete the old login info
-
-            'format and save the auth info returned from the server
-            authInfo = m.handleRegistration(newAccess)
-
-            if authInfo <> invalid
-              m.deleteUserData()
-            end if
-
-          end if
-        end if
-      end while
-    end if
-  end if
-
-  return authInfo
-end function
-
-
-'gets the old user data - only necessary for doing one time login registration syncs
-Function tubiAuth_getUserData_()
-  str = m.regRead("userdata")
-  if(str <> invalid)
-    return m.userDataFromString(str)
-  end if
-  return invalid
-End Function
-
-
-'deletes the old user data - only necessary for doing one time login registration syncs
-Function tubiAuth_deleteUserData_()
-    m.regDelete("userdata")
-End Function
-
-
-'parses the old user data as stored in the registry into an assocArray - only needed for doing one time login registration syncs
-Function tubiAuth_userDataFromString_(str)
-  r = CreateObject("roRegex", ",", "")
-  a = r.Split(str)
-  num = a.count()
-  if(num > 2)
-    return {token: a[0], fn: a[1], ln: a[2]}
-  end if
-  return invalid
 End Function
 
 
