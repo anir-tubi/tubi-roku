@@ -67,8 +67,16 @@ End Function
 
 Function onExternalConfigInfoReturned(msg)
   m.constants.externalConfig.info = msg.getData()
-  if m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.country <> invalid and m.constants.externalConfig.info.country <> ""
-    m.constants.deviceInfo.countryCode = UCase(m.constants.externalConfig.info.country)
+  if m.constants.externalConfig.info <> invalid
+    if m.constants.externalConfig.info.country <> invalid and m.constants.externalConfig.info.country <> ""
+      m.constants.deviceInfo.countryCode = UCase(m.constants.externalConfig.info.country)
+    end if
+    if m.constants.externalConfig.info.vzero_drm = true
+      if m.constants.player <> invalid and m.constants.player.drmTypes <> invalid
+        m.constants.player.drmTypes.dashWidevine = "dash_widevine_psshv0"
+        m.constants.player.drmTypes.dashPlayready = "dash_playready_psshv0"
+      end if
+    end if
   end if
 
   m.hasRemoteConfigs = true
