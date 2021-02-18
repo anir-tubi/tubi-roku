@@ -704,6 +704,7 @@ Function getConstants()
       constants.ui.screenLevels.episodeScreen = 50
       constants.ui.screenLevels.videoPlayerScreen = 60
       constants.ui.screenLevels.linearVideoPlayerScreen = 60
+      constants.ui.screenLevels.activationCodeScreen = 90
       constants.ui.screenLevels.signUpScreen = 90
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.modalDialogScreen = 1000

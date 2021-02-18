@@ -17,7 +17,7 @@ End Function
 
 ' showRFIScreen is used to display the Request For Information modal
 Function showRFIScreen()
-
+  tubiLog("SignInHelpers.showRFIScreen")
   currentScreen = currentScreen()
 
   dialogEvent = {
@@ -43,7 +43,7 @@ End Function
 
 ' onUserData is the callback triggered when ChannelStore returns userData
 Function onUserData()
- 
+  tubiLog("SignInHelpers.onUserData")
   currentScreen = currentScreen()
   m.billing.unobserveFieldScoped("userData")
   
