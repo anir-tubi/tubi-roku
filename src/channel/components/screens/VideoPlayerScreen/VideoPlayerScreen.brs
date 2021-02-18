@@ -288,7 +288,6 @@ Function playContent()
     })
   end if
 
-  m.top.adPosition = 0
   m.VideoState = "play"
   if m.top.enableAds then
     '//Set the midrolls of the videoplayer now and set the adControl state to preroll
@@ -926,7 +925,10 @@ Function resetVideoPlayerState(content = invalid)
   m.LoadingMessage.text = ""
   cancelReplayCaptions()
   m.AdHeadsUp.visible = false
+  m.top.adPosition = 0
+
   if content <> invalid
+    m.top.adPosition = content.nowPos
     updateVideoPlayerState(content)
   end if
   m.top.adState = "init"
