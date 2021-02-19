@@ -108,7 +108,7 @@
           height="45"
           translation="[0, 18]"
           visible="false"
-          uri="pkg:/images/checkmark_circle_white.png"/>
+          uri="pkg:/images/checkmark_circle.png"/>
       </LayoutGroup>    
 
       <Label
