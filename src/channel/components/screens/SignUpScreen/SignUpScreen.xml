@@ -37,7 +37,7 @@
   </interface>
 
   <children>
-  
+
     <LayoutGroup 
       id="signUpLayout"
       translation="[0, 155]"
@@ -47,6 +47,7 @@
       itemSpacings="[30, 40, 15, 15, 20, 90, 120]">
       <Label
         id="pageHeading"
+        color="0xFFFFFF"
         horizAlign="center"
         width="1920">
         <Font
@@ -54,9 +55,10 @@
           uri="pkg:/fonts/Vaud-Bold.ttf"
           size="72" />
       </Label>
-      
+
       <Label
         id="pageSubheading"
+        color="0xFFFFFF"
         horizAlign="center"
         width="1920">
         <Font
@@ -64,7 +66,7 @@
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="33"/>
       </Label>
-      
+
       <Group 
         translation="[645,0]">
         <Rectangle
@@ -75,6 +77,7 @@
           color="0x9699A3"/>
         <Label
           id="email"
+          color="0xFFFFFF"
           horizAlign="left"
           width="600"
           height="84"
@@ -105,9 +108,9 @@
           height="45"
           translation="[0, 18]"
           visible="false"
-          uri="pkg:/images/checkmark_circle.png"/>
+          uri="pkg:/images/checkmark_circle_white.png"/>
       </LayoutGroup>    
-        
+
       <Label
         id="passwordValidationMsg"
         translation="[670,0]"
@@ -116,36 +119,35 @@
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="24" />
+          size="27" />
       </Label>
-      
+
       <SimpleButton
         translation="[756,0]"
         id="continueBtn"
         color="0x9699A3"
         width="408"/>
-      
+
       <LayoutGroup 
         id="existingAccLayout"
         layoutDirection="horiz"
         vertAlignment="custom"
         translation="[741,0]"
         itemSpacings="[12]">
-        
+
         <Label
           id="existingAccLabel"
           horizAlign="center">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="24" />
+            size="27" />
         </Label>
-        
+
         <SimpleButton
           id="signInBtn"
           color="0x9699A3"
-          translation="[0,-30]"
-          width="127"/>       
+          translation="[0,-30]"/>
         
       </LayoutGroup>
       
@@ -161,41 +163,41 @@
           id="termsBtn"
           color="0x10141F"
           unfocusedBackgroundOpacity="0"/>
-          
+
         <SimpleButton
           id="ppBtn"
           color="0x10141F"
           unfocusedBackgroundOpacity="0"/>
-          
+
         <SimpleButton
           id="donotsellMyInfoBtn"
           color="0x10141F"
           unfocusedBackgroundOpacity="0"/>           
-        
+
       </ButtonGroup>                    
-    
+
     </LayoutGroup>
-    
+
     <Group 
       id="keyboardGrp" 
       translation="[0,1080]">
-    
+
       <Rectangle
         id="keyboardBackground"
         color="0x10141F"
         width="1920"
         height="600"/>
-    
+
       <LayoutGroup 
         layoutDirection="vert"
         horizAlignment="custom"
         vertAlignment="custom"
         translation="[250, 20]"
         itemSpacings="[20]">
-        
+
         <Keyboard 
           id="Keyboard"/>
-          
+
             <ButtonGroup 
               id="buttonGroup"
               layoutDirection="horiz"
@@ -206,22 +208,22 @@
                 id="back"
                 color="0xF0F1F5"
                 width="180"/>
-        
+
               <SimpleButton
                 id="continue"
                 color="0xF0F1F5"
                 width="633"/>
-              
+
               <SimpleButton
                 id="showHidePassword"
                 color="0xF0F1F5"
                 width="490"/>
-            
+
             </ButtonGroup>
-        
+
       </LayoutGroup>
-      
+
     </Group>
-  
+
   </children>
 </component>

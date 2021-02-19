@@ -30,6 +30,7 @@
       translation="[0,0]"/>    
     <Label
       id="label"
+      color="0xFFFFFF"
       opacity="1.0"
       height="80"
       horizAlign="center"

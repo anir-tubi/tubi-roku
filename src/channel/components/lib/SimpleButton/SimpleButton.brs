@@ -17,7 +17,7 @@ Function onTextChanged()
   m.label.text = m.top.text
   
   if m.top.width = 0
-    width = m.label.boundingRect().width + 20
+    width = m.label.boundingRect().width + 60
     m.buttonBG.width = width
     m.label.width = width
   else

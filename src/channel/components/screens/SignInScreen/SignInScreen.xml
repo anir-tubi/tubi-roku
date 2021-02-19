@@ -33,7 +33,7 @@
   </interface>
 
   <children>
-  
+
     <LayoutGroup 
       id="signUpLayout"
       translation="[0, 170]"
@@ -43,6 +43,7 @@
       itemSpacings="[75, 17, 17, 20, 90, 130]">
       <Label
         id="pageHeading"
+        color="0xFFFFFF"
         horizAlign="center"
         width="1920">
         <Font
@@ -50,7 +51,7 @@
           uri="pkg:/fonts/Vaud-Bold.ttf"
           size="72" />
       </Label>
-      
+
       <Group 
         translation="[645,0]">
         <Rectangle
@@ -94,7 +95,7 @@
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="24" />
+          size="27" />
       </Label>
       
       <SimpleButton
@@ -112,19 +113,21 @@
         itemSpacings="[12]">
         
         <Label
-          id="existingAccLabel">
+          id="existingAccLabel"
+          color="#FFFFFF">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="24" />
+            size="27" />
         </Label>
         
         <Label
-          id="forgotPasswordLink">
+          id="forgotPasswordLink"
+          color="#FFFFFF">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="24" />
+            size="27" />
         </Label>
         
       </LayoutGroup>
@@ -153,30 +156,30 @@
           unfocusedBackgroundOpacity="0"/>            
         
       </ButtonGroup>                    
-    
+
     </LayoutGroup>
-    
+
     <Group 
       id="keyboardGrp" 
       translation="[0,1080]">
-    
+
       <Rectangle
         id="keyboardBackground"
         color="0x10141F"
         opacity="1.0"
         width="1920"
         height="600"/>
-    
+
       <LayoutGroup 
         layoutDirection="vert"
         horizAlignment="custom"
         vertAlignment="custom"
         translation="[250, 20]"
         itemSpacings="[20]">
-        
+
         <Keyboard 
           id="Keyboard"/>
-          
+
             <ButtonGroup 
               id="buttonGroup"
               layoutDirection="horiz"
@@ -187,22 +190,22 @@
                 id="back"
                 color="0xF0F1F5"
                 width="180"/>
-        
+
               <SimpleButton
                 id="continue"
                 color="0xF0F1F5"
                 width="633"/>
-              
+
               <SimpleButton
                 id="showHidePassword"
                 color="0xF0F1F5"
                 width="490"/>
-            
+
             </ButtonGroup>
-        
+
       </LayoutGroup>
-      
+
     </Group>
-  
+
   </children>
 </component>

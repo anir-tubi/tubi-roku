@@ -216,14 +216,14 @@ End Function
 
 Function showKeyboard()
 
-  slideTo(m.keyboardGrp, [0,550], 1.0)
+  slideTo(m.keyboardGrp, [0,550], 0.65)
   
 End Function
 
 
 Function hideKeyboard()
 
-  slideTo(m.keyboardGrp, [0,1080], 1.0) 
+  slideTo(m.keyboardGrp, [0,1080], 0.65)
   
 End Function
 

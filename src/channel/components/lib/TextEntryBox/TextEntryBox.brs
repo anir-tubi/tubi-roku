@@ -1,8 +1,9 @@
 Function init()
 
   m.border = m.top.findNode("border")
+  m.border.color = m.global.theme.focused
+
   m.rectBG = m.top.findNode("rectBG")
-  
   m.rectBG.color = "0x9699A3"
   m.rectBG.opacity = 0.17
 
