@@ -1001,6 +1001,12 @@ Function startChannel()
 End Function
 
 
+' simply wraps startChannel - function name is less confusing when a user signs in or out
+Function restartChannel()
+  startChannel()
+End Function
+
+
 ' a setter for the screen cache - can overwrite screens in the cache if the passed in screen has
 ' the same id as a screen already existing in the screen cache
 '

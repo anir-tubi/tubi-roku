@@ -581,20 +581,6 @@ Function onAuthInfoReceived()
       screen.signedIn = (m.global.authInfo <> invalid)
     end if
   end for
-
-  bJumpToContinueWatching = false
-  'remove the activation code screen since it is no longer necessary
-  if currentScreen() <> invalid and currentScreen().getSubtype() =  "ActivationCodeScreen"
-    popScreen(true, true)
-
-    screen = currentScreen()
-    if screen <> invalid
-      m.backgroundGroup.backgroundInfo = {
-        type: getBackgroundtype(screen.backgroundUriList)
-        uriList: screen.backgroundUriList
-      }
-    end if
-  end if
   
   setDirtyUserCategories(m.constants.ui.categoryIds.queue)
   setDirtyUserCategories(m.constants.ui.categoryIds.history)
@@ -613,17 +599,11 @@ Function onAuthInfoReceived()
   end if
       
   currentScreen = currentScreen()
-  ' remove current screen from stack, if the current screen is signInScreen or signUpScreen
-  if currentScreen <> invalid and (currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
-    popScreen(true, true)
-    currentScreen = currentScreen()
-  end if
-  
   if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" or currentScreen.getSubtype() = "SettingsScreen")
-
-    ' this happens, if a user logs in after attempting to add to queue via detailScreen
-    ' or
-    ' this happens, if a user logs in after attempting to update parental controls/signIn via settingsScreen
+    ' this happens in the following scenarios: 
+    ' 1) a user logs in after attempting to add to queue via detailScreen
+    ' 2) a user logs in after attempting to update parental controls
+    ' 3) a user logs in after selecting "Sign In" via settingsScreen
     if currentScreen.activationCompleted <> invalid
       currentScreen.activationCompleted = true
     else
@@ -635,7 +615,7 @@ Function onAuthInfoReceived()
     content.id = m.constants.ui.categoryIds.queue
     getChannelFromServer(currentScreen, content)
   else
-    ' this happens when app start up or when a user signs out or user signs in from the side nav or settings page
-    startUserExperience()
+    ' this happens when app start up or when a user signs out or user signs in from the side nav
+    restartChannel()
   end if
 End Function

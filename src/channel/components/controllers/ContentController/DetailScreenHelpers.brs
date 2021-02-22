@@ -538,13 +538,13 @@ Function handleSingleContentError(error, trackOnResponse)
     content = getDetailScreenContent(detailScreen)
     sendDeeplinkAnalytics(m.deepLinkContent, content, "home", m.Tracking, m.trackingLoggingTask, m.constants)
     m.deepLinkContent = invalid
-    startChannel() 'adds a homescreen and removes all other screens underneath
+    startChannel() 'adds a homescreen which will remove all other screens underneath
   else if m.deepLinkContent <> invalid
     ' we are in this block if there is a roInputEvent causing a deeplink (ie. voice control while the channel is open)
     ' In this case we should navigate back to the home page.
     sendDetailScreenErrorAnalytics(detailScreen)
     m.deepLinkContent = invalid
-    startChannel()
+    restartChannel()
   else if detailScreen.isInFocusChain() = true
     message = getTranslation("screenDetails_error_getContent_description")
     content = getDetailScreenContent(detailScreen)

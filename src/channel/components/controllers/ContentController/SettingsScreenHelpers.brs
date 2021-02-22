@@ -374,13 +374,14 @@ End Function
 
 ' onActivationCompleted will be triggered once the Activation is completed via Settings Screen
 Function onActivationCompleted()
+  tubiLog("SettingsScreenHelpers.onActivationCompleted")
 
   if m.settingsScreen.actionAfterActivation = "ParentalControl"
     m.settingsScreen.actionAfterActivation = ""
     setSignInInfo()
     m.settingsScreen.setFocus(true)
   else
-    startUserExperience() ' redirect to homescreen
+    restartChannel() ' redirect to homescreen
   end if
 
 End Function
