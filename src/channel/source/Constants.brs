@@ -162,15 +162,12 @@ Function getConstants()
 
     if FindMemberFunction(di, "GetRIDA") <> invalid
       constants.deviceInfo.deviceAdId = di.GetRIDA()
-    else
-      constants.deviceInfo.deviceAdId = di.GetAdvertisingId()
     end if
 
     if FindMemberFunction(di, "IsRIDADisabled") <> invalid
       constants.deviceInfo.isAdIdTrackingDisabled = di.IsRIDADisabled()
-    else
-      constants.deviceInfo.isAdIdTrackingDisabled = di.IsAdIdTrackingDisabled()
     end if
+
     constants.deviceInfo.uiResolution = UCase(di.GetUiResolution().name)
     constants.deviceInfo.ipAddresses = di.GetIPAddrs() 'array of network interface ip addresses (normally will only contain 1 element)
     constants.deviceInfo.firmwareVersion = firmwareVersion

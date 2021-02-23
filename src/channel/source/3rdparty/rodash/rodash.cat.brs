@@ -1,4 +1,4 @@
-' VERSION: rodash 0.3.0
+' VERSION: rodash 0.3.3
 ' LICENSE: Permission is hereby granted, free of charge, to any person obtaining
 ' LICENSE: a copy of this software and associated documentation files (the
 ' LICENSE: "Software"), to deal in the Software without restriction, including
@@ -187,26 +187,18 @@ ai = CreateObject("roAppInfo")
 di = CreateObject("roDeviceInfo")
 if FindMemberFunction(di, "GetChannelClientId") <> invalid
 uniqueId = di.GetChannelClientId()
-else if FindMemberFunction(di, "GetClientTrackingId") <> invalid
-uniqueId = di.GetClientTrackingId()
 else if FindMemberFunction(di, "GetPublisherId") <> invalid
-uniqueId = di.GetPublisherId()
-else if FindMemberFunction(di, "GetChannelClientId") <> invalid
 uniqueId = di.GetPublisherId()
 else
 uniqueId = ""
 end if
 if FindMemberFunction(di, "GetRIDA") <> invalid
 adId = di.GetRIDA()
-else if FindMemberFunction(di, "GetAdvertisingId") <> invalid
-adId = di.GetAdvertisingId()
 else
 adId = ""
 end if
 if FindMemberFunction(di, "IsRIDADisabled") <> invalid
 tracking = di.IsRIDADisabled()
-else if FindMemberFunction(di, "IsAdIdTrackingDisabled") <> invalid
-tracking = di.IsAdIdTrackingDisabled()
 else 
 tracking = false
 end if
@@ -248,7 +240,7 @@ features: {
 }
 locale: di.GetCurrentLocale()
 country: di.GetCountryCode()
-drm: di.GetDrmInfo()
+drm: drmInfo
 displayType: di.GetDisplayType()
 displayMode: di.GetDisplayMode()
 displayAspectRatio: di.GetDisplayAspectRatio()
@@ -331,25 +323,25 @@ end if
 end if
 return false
 End Function
-Function rodash_get_(aa, path, default=invalid)
-if aa = invalid or type(aa) <> "roAssociativeArray" then return default
+Function rodash_get_(array, path, default=invalid)
+if array = invalid or not (type(array) = "roAssociativeArray" or type(array) = "roArray") then return default
 segments = m.pathAsArray_(path)
 if segments = invalid then return default
 result = invalid
 while segments.count() > 0
 key = segments.shift()
-if not aa.doesExist(key)
+value = array[key]
+if value = invalid
 exit while
 end if
-value = aa.lookup(key)
 if segments.count() = 0
 result = value
 exit while
 end if
-if value = invalid or type(value) <> "roAssociativeArray"
+if not (type(value) = "roAssociativeArray" or type(value) = "roArray")
 exit while
 end if
-aa = value
+array = value
 end while
 if result = invalid then return default
 return result
