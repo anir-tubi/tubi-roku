@@ -58,10 +58,12 @@ Function onEpisodeSelected(msg)
           end if
 
           'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
+          col = episodesScreen.episodeSelected[1] + 1
+          row = episodesScreen.episodeSelected[0] + 1
           episodesScreen.trackingComponentInfo = {
             componentType: "episode_video_list_component"
             componentValues: {
-              content_tile: m.Tracking.getAnalyticsTile(episode, episodesScreen.episodeSelected[1])
+              content_tile: m.Tracking.getAnalyticsTile(episode, col, row)
             }
           }
 
