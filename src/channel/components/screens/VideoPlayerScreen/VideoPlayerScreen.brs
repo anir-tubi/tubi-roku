@@ -1016,9 +1016,15 @@ Function advanceDrmOnContent(contentNode)
   if contentNode.drmType <> ""
     for i=0 to contentNode.videoResources.count()-1
       resource = contentNode.videoResources[i]
-      if contentNode.drmType = resource.type and contentNode.hdcpVersion = resource.hdcpVersion
-        nextIndex = i + 1
-        exit for
+
+      if contentNode.drmType = resource.type
+        ' hlsv3 resources doesn't have the hdcpVersion AA property.
+        ' Some widevine and playready content falls back from resources with hdcpVersion=hdcp_v1
+        ' to resources with hdcpVersion=hdcp_v2
+        if resource.hdcpVersion = invalid or resource.hdcpVersion = contentNode.hdcpVersion
+          nextIndex = i + 1
+          exit for
+        end if
       end if
     end for
   end if
