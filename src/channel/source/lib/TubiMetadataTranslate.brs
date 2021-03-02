@@ -62,26 +62,25 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
   end if
 
   if gridType = m.constants.ui.gridItemTypes.portrait
-    if canvasImages <> invalid and canvasImages.poster_tb <> invalid and canvasImages.poster_tb <> "" 
+    if canvasImages <> invalid and type(canvasImages.poster_tb) = "roArray" and canvasImages.poster_tb[0] <> invalid and canvasImages.poster_tb[0] <> ""
       '//A custom portrait size was requested, use this image instead of the default image
-      sThumbnailURL = canvasImages.poster_tb
+      sThumbnailURL = canvasImages.poster_tb[0]
     else if contentFromServer.posterarts <> invalid and type(contentFromServer.posterarts) = "roArray" and contentFromServer.posterarts.count() > 0
       sThumbnailURL = contentFromServer.posterarts[0]
     end if
   else if gridType = m.constants.ui.gridItemTypes.landscape
-    if canvasImages <> invalid and canvasImages.landscape_tb <> invalid and canvasImages.landscape_tb <> "" 
+    if canvasImages <> invalid and type(canvasImages.landscape_tb) = "roArray" and canvasImages.landscape_tb[0] <> invalid and canvasImages.landscape_tb[0] <> ""
       '//A custom landscape size was requested, use this image instead of the default image
-      
-      sThumbnailURL = canvasImages.landscape_tb
+      sThumbnailURL = canvasImages.landscape_tb[0]
     else if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
       sThumbnailURL = contentFromServer.hero_images[0]
     else if contentFromServer.thumbnails <> invalid and type(contentFromServer.thumbnails) = "roArray" and contentFromServer.thumbnails.count() > 0
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
   else if gridType = m.constants.ui.gridItemTypes.vitg_large
-    if canvasImages <> invalid and canvasImages.vitg_tb <> invalid and canvasImages.vitg_tb <> "" 
+    if canvasImages <> invalid and type(canvasImages.vitg_tb) = "roArray" and canvasImages.vitg_tb[0] <> invalid and canvasImages.vitg_tb[0] <> ""
       '//A custom vitg size was requested, use this image instead of the default image
-      sThumbnailURL = canvasImages.vitg_tb
+      sThumbnailURL = canvasImages.vitg_tb[0]
     else if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
       if contentFromServer.hero_images.count() >= 2
         '//::TEMP:: The Tupian image server will not return the resized image yet in the proper place, so look for the resized image in the old image array, but at a different index placement than the usual index location 
