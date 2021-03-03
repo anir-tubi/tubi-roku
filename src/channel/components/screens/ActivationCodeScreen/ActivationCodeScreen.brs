@@ -203,10 +203,10 @@ Function constructCodeRegisterReqParams()
   requestParams = {}
   requestParams.email = "build_roku_" + secondsFromEpoch.ToStr() + "@tubi.tv"
   requestParams.password = "111111"
-  requestParams.gender = ""
+  requestParams.gender = "Male"
   requestParams.first_name = "Automation"
   requestParams.last_name = "Suitest"
-  requestParams.birthday = ""
+  requestParams.birthday = "2000-01-01"
   
   requestParams.activationCode = m.RegCodeTask.code
   
