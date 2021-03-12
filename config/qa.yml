@@ -2,7 +2,7 @@ settings:
   # Settings are added to constants.settings via getSettings
   # Any constants that need to be templatized should be added via settings
   mode: "qa"
-  suitest: false  #setting to true will result in suitest being loaded and no ads played
+  suitest: false  #setting to true will result in suitest being loaded
   noAds: false  #setting to true will prevent ads from being requested from rainmaker
   stagingApis: false  #setting to true will use UAPI staging APIs (matrix, cms, user_device)
   automaticActivation: false  #setting to true will activate/signup the app automatically (if the values of suitest & stagingApis are true)
