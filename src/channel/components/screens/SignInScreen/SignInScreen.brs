@@ -256,7 +256,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           values: {
             manip: "SIGNIN"
             current: "EMAIL"
-            user_type: "UNKNOWN_USER_TYPE"
             status: "FAIL"
             message: "user-cancel"
           }

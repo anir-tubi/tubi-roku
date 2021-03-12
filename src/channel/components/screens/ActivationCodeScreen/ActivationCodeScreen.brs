@@ -232,11 +232,8 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         type: "account"
         values: {
           manip: "REGISTER_DEVICE"
-          current: ""
-          user_type: "UNKNOWN_USER_TYPE"
           status: "FAIL"
           message: "user-cancel"
-          linked: ""
         }
       }
       return false

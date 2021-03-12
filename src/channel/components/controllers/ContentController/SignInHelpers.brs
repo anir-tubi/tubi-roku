@@ -122,11 +122,9 @@ Function onEmailExistsError(error)
     type: "account"
     values: {
       manip: "REGISTER_DEVICE"
+      current: "EMAIL"
       message: "email-exists-error"
-      current: ""
-      user_type: "UNKNOWN_USER_TYPE"
       status: "FAIL"
-      linked: ""
     }
   }
   m.trackingLoggingTask.trackEvent = accountEvent
@@ -277,9 +275,7 @@ Function onSignUpResponse(response)
     values: {
       manip: "SIGNUP"
       current: "EMAIL"
-      user_type: "UNKNOWN_USER_TYPE"
       status: "SUCCESS"
-      linked: ""     
     }
   }
   onActivationSuccess()
@@ -298,9 +294,7 @@ Function onSignUpError(error)
       manip: "SIGNUP"
       message: "signup-failed"
       current: "EMAIL"
-      user_type: "UNKNOWN_USER_TYPE"
       status: "FAIL"
-      linked: ""     
     }
   }
   
@@ -374,9 +368,7 @@ Function onSignInResponse(response)
     values: {
       manip: "SIGNIN"
       current: "EMAIL"
-      user_type: "EXISTING_USER"
       status: "SUCCESS"
-      linked: ""     
     }
   }
   onActivationSuccess()
@@ -395,8 +387,6 @@ Function onSignInError(error)
       status: "FAIL"
       message: "invalid_password"
       current: "EMAIL"
-      user_type: "UNKNOWN_USER_TYPE"
-      linked: ""
     }
   }
   
