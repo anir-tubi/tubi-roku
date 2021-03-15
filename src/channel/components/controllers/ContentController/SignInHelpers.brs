@@ -609,3 +609,20 @@ Function onAuthInfoReceived()
     restartChannel()
   end if
 End Function
+
+
+' Is called only at app startup
+Function onStartupAuthInfoReceived()
+  tubiLog("SignInHelpers.onStartupAuthInfoReceived")
+  ' AuthInfo may be invalid if authTask failed to log the user in
+  m.global.authInfo = m.authTask.authInfo
+  ' These will be empty parent nodes (no children) if user is not authenticated
+  m.global.bookmarkIds = m.authTask.bookmarks
+  m.global.historyIds = m.authTask.history
+
+  m.authInfoReceived = true
+  m.authTask.unobserveFieldScoped("authInfo")
+  m.authTask = invalid
+
+  startUserExperience()
+End Function

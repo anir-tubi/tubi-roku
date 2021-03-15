@@ -90,7 +90,7 @@ Function init()
   m.authInfoReceived = false    'is the auth info returned from the registry
   m.authInfoRefreshed = true    'is the auth info refreshed after receiving a deeplink with a refresh token
   m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
+  m.authTask.observeFieldScoped("authInfo", "onStartupAuthInfoReceived")
   m.authTask.functionName = "execInitializeUserData"
   m.authTask.control = "RUN"
      
@@ -414,15 +414,15 @@ Function startUserExperience()
     ' Since we're ready to start the channel, make sure the loading spinner is hidden
     root = m.top.getScene()
     if root <> invalid
-      spinner = root.findNode("LoadingSpinner")
-      if spinner <> invalid then
-        spinner.visible = false
+      sceneSpinner = root.findNode("LoadingSpinner")
+      if sceneSpinner <> invalid then
+        sceneSpinner.visible = false 'the spinner in the scene component
       end if
     end if
+
+    m.spinner.visible = false ' the spinner in the contentController component
     sendHdcpLog() 
 
-    ' In any of the auth transitions, this spinner might be visible
-    'm.spinner.visible = false
     if m.enteredFromDeepLink = true then
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
