@@ -39,7 +39,6 @@ Function TubiExperiments(constants) as Object
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
     defaultValues: {
       roku: {}
-      roku2: {}
       roku_discovery_v3 : {}
       roku_local_resume: {}
       roku_limit_containers: {}
@@ -47,9 +46,6 @@ Function TubiExperiments(constants) as Object
     defaultResources: {
       roku: {
         roku_sidenav_espanol: {"combined": true}
-      }
-      roku2: {
-        roku_email_prefill: {enabled : false}
       }
       roku_discovery_v3: {
         roku_discovery_row_v3: {"position" : -2, "has_tvshows" : false, "has_movies" : false}

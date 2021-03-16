@@ -9,11 +9,7 @@ Function startSignIn(callbackAfterSignIn=invalid)
   
   m.callbackAfterSignIn = callbackAfterSignIn
   
-  if getExperimentResource("roku2", "roku_email_prefill").enabled = true
-    showRFIScreen()
-  else
-    showActivationScreen() 
-  end if
+  showRFIScreen()
 
 End Function
 
