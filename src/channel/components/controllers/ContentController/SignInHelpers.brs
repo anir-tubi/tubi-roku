@@ -2,9 +2,12 @@
 ' startSignIn
 '
 ' Defer to the sign-in controller for sign in experience
-Function startSignIn()
+' @callbackAfterSignIn: function, the function to run after the signIn process is complete.
+Function startSignIn(callbackAfterSignIn=invalid)
 
   tubiLog("SignInHelpers.startSignIn")
+  
+  m.callbackAfterSignIn = callbackAfterSignIn
   
   if getExperimentResource("roku2", "roku_email_prefill").enabled = true
     showRFIScreen()
@@ -19,7 +22,7 @@ End Function
 Function showRFIScreen()
   tubiLog("SignInHelpers.showRFIScreen")
   currentScreen = currentScreen()
-
+  
   dialogEvent = {
     type: "dialog"
     values: {
@@ -515,6 +518,7 @@ End Function
 '
 ' The sign-in flow has ended, do what comes next
 Function onActivationSuccess()
+
   tubiLog("SignInHelpers.onActivationSuccess")
  ' retrieve the credentials on the AuthTask before starting the UI. This reduces jank.
   m.authInfoReceived = false
@@ -522,12 +526,21 @@ Function onActivationSuccess()
     m.authTask.unobserveFieldScoped("authInfo")
   end if
   m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
+  
+  callbackStr = convertFunctionToString(m.callbackAfterSignIn)
+  if callbackStr <> ""
+    m.authTask.observeFieldScoped("authInfo", callbackStr)
+  else
+    m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
+  end if
+  
+  m.callbackAfterSignIn = invalid ' setting to invalid to avoid callbacks
+  
   m.authTask.functionName = "execInitializeUserData"
   m.authTask.control = "RUN"
   m.spinner.visible = true
   m.spinner.setFocus(true)
-
+  
   'we remove the activation screen after auth info has been received
 End Function
 
@@ -589,7 +602,12 @@ Function onAuthInfoReceived()
   end if
       
   currentScreen = currentScreen()
-  if currentScreen <> invalid and (currentScreen.getSubtype() = "DetailScreen" or currentScreen.getSubtype() = "SettingsScreen")
+  if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
+    popScreen(true, true)
+    currentScreen = currentScreen()
+  end if
+    
+  if currentScreen <> invalid and (currentScreen.getSubtype() = "SettingsScreen")
     ' this happens in the following scenarios: 
     ' 1) a user logs in after attempting to add to queue via detailScreen
     ' 2) a user logs in after attempting to update parental controls
@@ -625,4 +643,33 @@ Function onStartupAuthInfoReceived()
   m.authTask = invalid
 
   startUserExperience()
+End Function
+
+
+' onQueueAfterSignIn - occurs after activation success via AddtoMyList
+Function onQueueAfterSignIn()
+  tubiLog("SignInHelpers.onQueueAfterSignIn")
+  ' AuthInfo may be invalid if authTask failed to log the user in
+  m.global.authInfo = m.authTask.authInfo
+  ' These will be empty parent nodes (no children) if user is not authenticated
+  m.global.bookmarkIds = m.authTask.bookmarks
+  m.global.historyIds = m.authTask.history
+
+  m.authTask.unobserveFieldScoped("authInfo")
+  m.authTask = invalid
+
+  currentScreen = currentScreen()
+  if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
+    popScreen(true, true)
+    currentScreen = currentScreen()
+  end if
+  
+  m.spinner.visible = false
+
+  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
+    onAddToQueue(currentScreen, onBookmarkedAfterSignIn)
+  else
+    restartChannel()
+  end if
+  
 End Function

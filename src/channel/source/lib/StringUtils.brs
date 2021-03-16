@@ -152,3 +152,16 @@ Function getUrlParts(url, paramsSeparator = "?")
 
   return parts
 End Function
+
+
+' The function whose name we want to extract
+' @func: function, the function whose name we want to extract
+Function convertFunctionToString(func)
+
+  functionStr = ""
+  if type(func) = "roFunction" or type(func) = "Function"
+    functionStr = func.ToStr().Replace("Function: ","")
+  end if
+  return functionStr  
+
+End Function

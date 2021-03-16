@@ -97,14 +97,6 @@
       <!-- shouldFocusWhenPushed will be set true once animation logo is finished during app launch -->
       <field id="shouldFocusWhenPushed" type="boolean" value="true"/>
       
-      <!-- activationCompleted is accessed from SignInhelper once the activation is successful -->
-      <field id="activationCompleted" type="boolean" value="false"/>
-      
-      <!-- actionAfterActivation value will be set when user tried any action before signIn/activation  
-          this helps to do callback once the activation is completed
-      -->
-      <field id="actionAfterActivation" type="string"/>
-      
     <!-- OUTPUTS -->
 
       <!-- Should the full description be displayed -->

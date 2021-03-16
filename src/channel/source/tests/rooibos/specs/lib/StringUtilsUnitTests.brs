@@ -93,3 +93,17 @@ Function stringUtils_getUrlParts_test()
   m.assertEqual(urlParts.params, "now_pos=0&model=3600X&video_id=553679&app_id=tubitv&platform=ROKU&app_mode=DEFAULT_MODE&yo.ac=true&user_id=104216&language=en&device_id=5S4629143722&content_type=mp4&opt_out=1&adv_id=e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316")
   m.assertEqual(urlParts.paramsWithSeparator, "?now_pos=0&model=3600X&video_id=553679&app_id=tubitv&platform=ROKU&app_mode=DEFAULT_MODE&yo.ac=true&user_id=104216&language=en&device_id=5S4629143722&content_type=mp4&opt_out=1&adv_id=e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316")
 End Function
+
+
+'@Test convertFunctionToString unit tests
+Function stringUtils_convertFunctionToString_test()
+
+  functionStr = convertFunctionToString(onBookmarkedAfterSignIn)
+  m.assertNotInvalid(functionStr)
+  m.assertEqual(LCASE(functionStr), LCASE("onBookmarkedAfterSignIn"))
+
+  functionStr = convertFunctionToString("onBookmarkedAfterSignIn")
+  m.assertNotInvalid(functionStr)
+  m.assertEqual(functionStr, "")  
+  
+End Function
