@@ -654,6 +654,13 @@ Function onQueueAfterSignIn()
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
 
+  ' setContentToRefresh is not required for homescreen as we are  fetching homescreen content right after adding into queue
+  setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
+  setContentToRefresh(m.constants.ui.screenIds.movieScreen) 
+  setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
+  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+
   currentScreen = currentScreen()
   if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
     popScreen(true, true)

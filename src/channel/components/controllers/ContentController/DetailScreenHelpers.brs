@@ -888,7 +888,8 @@ Function onBookmarkedAfterSignIn(msg) As Void
     setIsBookmark(detailScreen, true)
   
     sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
-    onHistoryQueueChange(m.constants.ui.categoryIds.queue)     
+    onHistoryQueueChange(m.constants.ui.categoryIds.queue)   
+    setDirtyUserCategories(m.constants.ui.categoryIds.history)  
     
   end if
 
