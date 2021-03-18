@@ -9,7 +9,7 @@ Function startSignIn(callbackAfterSignIn=invalid)
   
   m.callbackAfterSignIn = callbackAfterSignIn
   
-  showRFIScreen()
+  showActivationScreen()
 
 End Function
 
