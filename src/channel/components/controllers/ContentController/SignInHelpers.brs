@@ -603,17 +603,7 @@ Function onAuthInfoReceived()
     currentScreen = currentScreen()
   end if
     
-  if currentScreen <> invalid and (currentScreen.getSubtype() = "SettingsScreen")
-    ' this happens in the following scenarios: 
-    ' 1) a user logs in after attempting to add to queue via detailScreen
-    ' 2) a user logs in after attempting to update parental controls
-    ' 3) a user logs in after selecting "Sign In" via settingsScreen
-    if currentScreen.activationCompleted <> invalid
-      currentScreen.activationCompleted = true
-    else
-      currentScreen.setFocus(true)
-    end if
-  else if currentScreen <> invalid and currentScreen.id = "channelDetailScreen" and currentScreen.categoryId = m.constants.ui.categoryIds.queue
+  if currentScreen <> invalid and currentScreen.id = "channelDetailScreen" and currentScreen.categoryId = m.constants.ui.categoryIds.queue
     ' this happens when user logs in via channelDetailScreen (queue/mylist)
     content = CreateObject("roSGNode", "CategoryContentNode")
     content.id = m.constants.ui.categoryIds.queue
@@ -671,6 +661,41 @@ Function onQueueAfterSignIn()
 
   if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
     onAddToQueue(currentScreen, onBookmarkedAfterSignIn)
+  else
+    restartChannel()
+  end if
+  
+End Function
+
+
+' onParentalControlAfterSignIn - occurs after activation success via Parental Control
+Function onParentalControlAfterSignIn()
+  tubiLog("SignInHelpers.onParentalControlAfterSignIn")
+  ' AuthInfo may be invalid if authTask failed to log the user in
+  m.global.authInfo = m.authTask.authInfo
+  ' These will be empty parent nodes (no children) if user is not authenticated
+  m.global.bookmarkIds = m.authTask.bookmarks
+  m.global.historyIds = m.authTask.history
+
+  m.authTask.unobserveFieldScoped("authInfo")
+  m.authTask = invalid
+
+  currentScreen = currentScreen()
+  if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
+    popScreen(true, true)
+    currentScreen = currentScreen()
+  end if
+  
+  m.spinner.visible = false
+
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    homeScreen.loadAllCategories = true
+  end if
+
+  if currentScreen <> invalid and currentScreen.getSubtype() = "SettingsScreen"
+    setSignInInfo()
+    currentScreen.setFocus(true)
   else
     restartChannel()
   end if

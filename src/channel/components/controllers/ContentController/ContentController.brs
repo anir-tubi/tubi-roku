@@ -252,6 +252,12 @@ Function onSignInModalButtonSelected()
 End Function
 
 
+' triggered when signIn button is selected while updating Parental Control
+Function onSignInModalSelectedViaParentalControl()
+  startSignIn(onParentalControlAfterSignIn)
+End Function
+
+
 '''''''''''''''''''''''
 ' onKeyEvent
 '

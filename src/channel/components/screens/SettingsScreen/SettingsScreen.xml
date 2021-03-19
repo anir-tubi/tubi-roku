@@ -28,9 +28,6 @@
       <!-- associative array that will indocate if the user is signed in and if so, the aa will contain their info.  -->
       <field id="signInInfo" type="assocarray" alwaysNotify="true" />
 
-      <!-- activationCompleted is accessed from SignInhelper once the activation is successful -->
-      <field id="activationCompleted" type="boolean" value="false"/>
-      
       <!-- actionAfterActivation value will be set when user tried any action before signIn/activation  
           this helps to do callback once the activation is completed
       -->

@@ -20,7 +20,6 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.observeFieldScoped("backgroundUriList", "onSettingsBackgroundChange")
   m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
-  m.settingsScreen.observeFieldScoped("activationCompleted", "onActivationCompleted")
   
   if screenLevel <> 0
     m.settingsScreen.screenLevel = screenLevel
@@ -201,7 +200,7 @@ Function onParentalSettingSelected(msg)
     title = getTranslation("dialog_signIn_title")
     message = getTranslation("screenSettings_error_signInParental_description")
     buttons = [getTranslation("dialog_button_signIn"), getTranslation("dialog_button_cancel")]
-    showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
+    showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalSelectedViaParentalControl)
   end if
 End Function
 
@@ -368,21 +367,6 @@ Function onShowDeviceModal()
     }
   }  
   showInfoModal(getTranslation("screenSettings_fullDeviceID"), deviceId, dialogEvent, m.trackingLoggingTask)    
-
-End Function
-
-
-' onActivationCompleted will be triggered once the Activation is completed via Settings Screen
-Function onActivationCompleted()
-  tubiLog("SettingsScreenHelpers.onActivationCompleted")
-
-  if m.settingsScreen.actionAfterActivation = "ParentalControl"
-    m.settingsScreen.actionAfterActivation = ""
-    setSignInInfo()
-    m.settingsScreen.setFocus(true)
-  else
-    restartChannel() ' redirect to homescreen
-  end if
 
 End Function
 
