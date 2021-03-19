@@ -54,7 +54,7 @@ Function TubiExperiments(constants) as Object
         roku_local_resume_experiment: {"shows_resume_points_to_guests" : true}
       }
       roku_limit_containers: {
-        roku_limit_containers_v1: {"num_containers": -1}
+        roku_limit_containers_v2: {"num_containers": -1}
       }
     }
     

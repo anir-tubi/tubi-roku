@@ -230,7 +230,7 @@ Function fetchHomeScreen(homeScreen)
     if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
       options.params["groupSize"] = m.constants.settings.numContainers
     else
-      options.params["groupSize"] = getExperimentResource("roku_limit_containers", "roku_limit_containers_v1").num_containers
+      options.params["groupSize"] = getExperimentResource("roku_limit_containers", "roku_limit_containers_v2").num_containers
     end if
 
     if homeScreen.id = m.constants.ui.screenIds.movieScreen
