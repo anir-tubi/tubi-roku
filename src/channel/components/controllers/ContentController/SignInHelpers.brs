@@ -527,7 +527,7 @@ Function onActivationSuccess()
   if callbackStr <> ""
     m.authTask.observeFieldScoped("authInfo", callbackStr)
   else
-    m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
+    m.authTask.observeFieldScoped("authInfo", "onSideNavSignInSelected")
   end if
   
   m.callbackAfterSignIn = invalid ' setting to invalid to avoid callbacks
@@ -541,9 +541,9 @@ Function onActivationSuccess()
 End Function
 
 
-' Auth Info refreshed. Occurs at app start up and occurs when a user signs in or out.
-Function onAuthInfoReceived()
-  tubiLog("SignInHelpers.onAuthInfoReceived")
+' onSideNavSignInSelected occurs when a user signs out or user signs in from the side nav or from settings side nav
+Function onSideNavSignInSelected()
+  tubiLog("SignInHelpers.onSideNavSignInSelected")
   ' AuthInfo may be invalid if authTask failed to log the user in
   m.global.authInfo = m.authTask.authInfo
   ' These will be empty parent nodes (no children) if user is not authenticated
@@ -567,20 +567,12 @@ Function onAuthInfoReceived()
   '
   '  Auth listeners:
   '    HomeScreen/CategoryScreen - load categories which are filtered by user auth
-  '    SearchScreen - results (may be) filtered by user auth
   '
   '  Bookmark/Queue listeners
   '    HomeScreen/CategoryScreen - user categories will be dirty
   '    DetailScreen - just history/bookmarks
   '    EpisodeScreen - history
 
-  for i=0 to m.ScreenStack.getChildCount()-1
-    screen = m.ScreenStack.getChild(i)
-    if screen.hasField("signedIn")
-      screen.signedIn = (m.global.authInfo <> invalid)
-    end if
-  end for
-  
   setDirtyUserCategories(m.constants.ui.categoryIds.queue)
   setDirtyUserCategories(m.constants.ui.categoryIds.history)
   setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
@@ -590,28 +582,15 @@ Function onAuthInfoReceived()
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
 
   refreshAllDetailScreens()
-  m.spinner.visible = false
 
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
     homeScreen.loadAllCategories = true
   end if
       
-  currentScreen = currentScreen()
-  if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
-    popScreen(true, true)
-    currentScreen = currentScreen()
-  end if
-    
-  if currentScreen <> invalid and currentScreen.id = "channelDetailScreen" and currentScreen.categoryId = m.constants.ui.categoryIds.queue
-    ' this happens when user logs in via channelDetailScreen (queue/mylist)
-    content = CreateObject("roSGNode", "CategoryContentNode")
-    content.id = m.constants.ui.categoryIds.queue
-    getChannelFromServer(currentScreen, content)
-  else
-    ' this happens when app start up or when a user signs out or user signs in from the side nav
-    restartChannel()
-  end if
+  ' this happens when a user signs out or user signs in from the side nav or from settings side nav
+  restartChannel()
+  
 End Function
 
 

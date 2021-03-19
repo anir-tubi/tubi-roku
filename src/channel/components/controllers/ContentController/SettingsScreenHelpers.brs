@@ -127,10 +127,10 @@ Function onSignOutModalSelected()
   setSignInInfo()
   m.authInfoReceived = false
   if m.authTask <> invalid
-    m.authTask.unobserveFieldScoped("onAuthInfoReceived")
+    m.authTask.unobserveFieldScoped("authInfo")
   end if
   m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onAuthInfoReceived")
+  m.authTask.observeFieldScoped("authInfo", "onSideNavSignInSelected")
   m.authTask.functionName = "execSignOut"
   m.authTask.control = "RUN"
 
