@@ -59,7 +59,7 @@ Function displaySignInRequiredModal(screen)
   title = getTranslation("dialog_whoops_title")
   message = getTranslation("dialog_mylist_signIn_description")
   buttons = [getTranslation("dialog_button_register_signIn"), getTranslation("dialog_button_cancel")]
-  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected, removeTopScreen)
+  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalSelectedViaSideNavMyList, removeTopScreen)
 
 End Function
 

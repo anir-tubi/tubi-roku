@@ -246,6 +246,12 @@ Function getDialogAnalyticEvent(dialogType, dialogSubtype, pageInfo)
 End Function
 
 
+' triggered when signIn button is selected when opening MyList from Sidenav
+Function onSignInModalSelectedViaSideNavMyList()
+  startSignIn(onSideNavMyListAfterSignIn)
+End Function
+
+
 ' handles the response of a user who has been presented a sign in modal
 Function onSignInModalButtonSelected()
   startSignIn()
