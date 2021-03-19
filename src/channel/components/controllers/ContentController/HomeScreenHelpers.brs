@@ -492,7 +492,7 @@ Function onContentSelected(msg)
     showChannelScreen(content, "HOME")
   else if content.type = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
-    startSignIn()
+    startSignIn(onCWRowAfterSignIn)
   else if content.type = "utility"
     onUtilityItemSelected(content)
   else if content.type = m.constants.ui.contentTypes.linear

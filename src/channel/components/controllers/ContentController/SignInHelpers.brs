@@ -640,9 +640,36 @@ Function onQueueAfterSignIn()
 
   if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
     onAddToQueue(currentScreen, onBookmarkedAfterSignIn)
-  else
-    restartChannel()
   end if
+  
+End Function
+
+
+' onCWRowAfterSignIn - occurs after activation success via CWRow on homescreen
+Function onCWRowAfterSignIn()
+  tubiLog("SignInHelpers.onCWRowAfterSignIn")
+  ' AuthInfo may be invalid if authTask failed to log the user in
+  m.global.authInfo = m.authTask.authInfo
+  ' These will be empty parent nodes (no children) if user is not authenticated
+  m.global.bookmarkIds = m.authTask.bookmarks
+  m.global.historyIds = m.authTask.history
+
+  m.authTask.unobserveFieldScoped("authInfo")
+  m.authTask = invalid
+
+  ' setContentToRefresh is not required for homescreen as we are fetching homescreen content below
+  setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
+  setContentToRefresh(m.constants.ui.screenIds.movieScreen) 
+  setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
+  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    homeScreen.loadAllCategories = true
+  end if
+
+  restartChannel()
   
 End Function
 
@@ -666,6 +693,13 @@ Function onParentalControlAfterSignIn()
   end if
   
   m.spinner.visible = false
+  
+  ' setContentToRefresh is not required for homescreen as we are fetching homescreen content below
+  setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
+  setContentToRefresh(m.constants.ui.screenIds.movieScreen) 
+  setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
+  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)  
 
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
@@ -675,8 +709,6 @@ Function onParentalControlAfterSignIn()
   if currentScreen <> invalid and currentScreen.getSubtype() = "SettingsScreen"
     setSignInInfo()
     currentScreen.setFocus(true)
-  else
-    restartChannel()
   end if
   
 End Function
