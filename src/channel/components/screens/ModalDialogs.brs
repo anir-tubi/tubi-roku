@@ -72,6 +72,7 @@ Function closeModal(modal, buttonSelected = invalid)
   trackEvent = invalid
   trackingTask = invalid
   backButtonCallback = invalid
+  backButtonCallbackParams = invalid
 
   if m.tempModal <> invalid
     buttonInfo = m.tempModal.buttonInfo
@@ -80,6 +81,7 @@ Function closeModal(modal, buttonSelected = invalid)
       trackEvent = m.tempModal.modalInfo.openTrackEvent
       trackingTask = m.tempModal.modalInfo.trackingTask
       backButtonCallback = m.tempModal.modalInfo.backButtonCallback
+      backButtonCallbackParams = m.tempModal.modalInfo.backButtonCallbackParams
     end if
     
     m.tempModal = invalid
@@ -119,6 +121,9 @@ Function closeModal(modal, buttonSelected = invalid)
     if buttonSelected = "back"
       if backButtonCallback <> invalid
         callback = backButtonCallback
+        if backButtonCallbackParams <> invalid
+          callbackParams = backButtonCallbackParams
+        end if 
       end if
     end if
   else if buttonInfo <> invalid and buttonSelected <> invalid and buttonInfo[buttonSelected] <> invalid
@@ -193,6 +198,8 @@ Function showErrorModal(modalInfo = {}, tryAgainCallback = invalid, tryAgainPara
 
   ' use the cancel callback as the backButtonCallback - as the behavior should be the same
   modalInfo.backButtonCallback = cancelCallback
+  ' use the cancel callback params as the backButtonCallbackParams - as the params should also be the same
+  modalInfo.backButtonCallbackParams = cancelParams
 
   showModal(modalInfo, buttonInfo)
 End Function

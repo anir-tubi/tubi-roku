@@ -61,25 +61,34 @@
            can be deeplinks, transport controls, voice commands, etc. -->
       <field id="roInputInfo" type="assocarray"/>
 
-      <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
-      <field id="reloadMovieUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
-      <field id="reloadTVUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
-      <field id="reloadEspanolUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="reloadUserCategoriesResponse" type="assocarray"/>
+      <field id="reloadMovieUserCategoriesResponse" type="assocarray"/>
+      <field id="reloadTVUserCategoriesResponse" type="assocarray"/>
+      <field id="reloadNewsUserCategoriesResponse" type="assocarray"/>
+      <field id="reloadEspanolUserCategoriesResponse" type="assocarray"/>
 
-      <field id="homescreenResponse" type="assocarray" alwaysNotify="true"/>
-      <field id="moviescreenResponse" type="assocarray" alwaysNotify="true"/>
-      <field id="tvscreenResponse" type="assocarray" alwaysNotify="true"/>
-      <field id="liveNewsChannelGuideResponse" type="assocarray" alwaysNotify="true"/>
-      <field id="espanolscreenResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="homescreenResponse" type="assocarray"/>
+      <field id="moviescreenResponse" type="assocarray"/>
+      <field id="tvscreenResponse" type="assocarray"/>
+      <field id="liveNewsChannelGuideResponse" type="assocarray"/>
+      <field id="espanolscreenResponse" type="assocarray"/>
+      <field id="newsScreenResponse" type="assocarray"/>
 
       <!-- metadataFetchTask puts results on this field -->
-      <field id="searchResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="searchResponse" type="assocarray"/>
       
-      <field id="transportVoiceRequest" type="assocarray" alwaysNotify="true"/>
+      <field id="transportVoiceRequest" type="assocarray"/>
       
       <!-- fadeInContentController will be set true once animation logo is finished during app launch -->
       <field id="fadeInContentController" type="boolean"/>
-      
+
+      <!-- Holds the information needed to populate a navigate_witin_page event. This info is usually set elsewhere by screens and 
+           observed by their helpers, but in rare cases, ContentController can set this associative array, which 
+           will be responsible for sending navigate_within_page events.
+           See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA
+      -->
+    <field id="navigateWithinPageInfo" type="assocarray"/>
+
     <!-- OUTPUT -->
       <!-- Main thread listens for this and will exit the app if set to true-->
       <field id="exitApp" type="boolean" value="false"/>

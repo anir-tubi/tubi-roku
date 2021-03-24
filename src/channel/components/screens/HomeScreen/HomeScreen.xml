@@ -36,6 +36,9 @@
       <!-- hides or shows the loading spinner and removes any existing content on the CategoryGridList! -->
       <field id="isLoading" type="boolean" />
 
+      <!-- should the top nav be displayed? -->
+      <field id="enableTopNav" type="boolean"/>
+
       <!-- tells the rowList to re-populate the content because rows have been added/removed and that may affect the look of some rows that have different heights compared to other rows  -->
       <field id="repopulateContent" type="boolean" alias="CategoryGridList.repopulateContent" />
       
@@ -77,7 +80,10 @@
       <field id="fullscreenCountdown" type="integer"/>
       
       <!-- kidsModeFeatureOn will be set based device countryCode -->
-      <field id="kidsModeFeatureOn" type="boolean" />      
+      <field id="kidsModeFeatureOn" type="boolean" />    
+
+      <!-- The outside world telling the screen to focus onto the top nav -->
+      <field id="focusOnTopNav" type="boolean" alwaysNotify="true"/>
 
     <!-- OUTPUTS -->
       <!-- will be used to change the background images on the content controller -->
@@ -88,11 +94,14 @@
            fields have been set (e.g. signedIn) -->
       <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
 
-      <!-- set to the tubi content id of the item which was clicked on -->
-      <field id="contentSelected" type="node" alwaysNotify="true"/>
+      <!-- set to the tubi content id of the CategoryGridList item which was clicked on -->
+      <field id="contentSelected" type="node"/>
+
+      <!-- set to the tubi content id of the topNav item which was clicked on -->
+      <field id="topNavItemSelected" type="node" alwaysNotify="true"/>
 
       <!-- set to the tubi content of the item which was focused on -->
-      <field id="contentFocused" type="node" alwaysNotify="true"/>
+      <field id="contentFocused" type="node"/>
 
       <!-- content on the homescreen is loaded and spinner can be turned off -->
       <field id="contentReady" type="boolean" alwaysNotify="true" />
@@ -102,6 +111,10 @@
       <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
 
       <field id="selectedPosition" alias="CategoryGridList.selectedPosition" />
+
+      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
+      -->
+      <field id="trackingLoadStartTime" type="integer" />
 
       <!-- Keeps the information used for user tracking - structure looks like:
         {
@@ -137,6 +150,9 @@
 
       <!-- If set to true, allows screens of the same type and same screenLevel to stack on top of each other  -->
       <field id="isStackable" type="boolean" value="false" />
+
+      <!-- Is the screen focused on the top nav? -->
+      <field id="topNavHasFocus" type="boolean" value="false" />
   </interface>
 
   <children>
@@ -165,6 +181,10 @@
         </Label>
       </LayoutGroup>
     </Group>
+
+    <TopNav id="topNav"
+      visible="false"
+      translation="[168,48]"/>
 
     <InfoPanel
       id="InfoPanel"

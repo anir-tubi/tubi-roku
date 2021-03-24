@@ -8,6 +8,7 @@ Function init()
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.ContentArea = m.top.findNode("ContentArea")
   m.NavSection = m.top.findNode("nav")
+  m.TopNav = m.top.findNode("TopNav")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.HintGroup = m.top.findNode("UpHintGroup")
   fades = m.top.findNode("Fades")
@@ -20,6 +21,11 @@ Function init()
   m.top.observeField("resetContentAreaValues", "onResetContentAreaValues")
   m.top.observeField("id", "onIDChange")
   m.top.observeField("fullscreenCountdown", "onFullscreenCountdown")
+  m.top.observeField("enableTopNav", "onTopNavEnableChange")
+  m.top.observeField("focusOnTopNav", "onFocusOnTopNavChanged")
+  m.TopNav.observeField("selected", "onTopNavSelection")
+  m.TopNav.observeField("focusedChild", "onTopNavFocusChange")
+  m.TopNav.observeFieldScoped("navigateWithinPageInfo", "onTopNavNavigateWithinPageInfoChange")
   
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -78,7 +84,57 @@ Function init()
   if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
     m.top.parentalRating = m.global.authInfo.parentalrating
   end if
-  
+
+End Function
+
+
+Function onTopNavEnableChange()
+'//::NOTE:: getExperimentResource() is called here to trigger experiment call for the 1st time
+if m.top.enableTopNav = true and getExperimentResource("roku_top_nav", "roku_top_nav_experiment").enabled = true
+    '//::TODO::TopNav - During the topnav experiment, change some layout things. Post experiment, this should still be present since not all regions (and kids mode) have the topnav
+    m.InfoPanel.translation = [m.InfoPanel.translation[0], 180]
+    m.NavSection.visible = false
+    m.TopNav.visible = true
+  else
+    m.InfoPanel.translation = [m.InfoPanel.translation[0], 133]
+    m.NavSection.visible = true
+    m.TopNav.visible = false
+  end if 
+End Function
+
+
+' The top nav has changed selection, so change the contentSelected so the helper can change things accordingly
+Function onTopNavSelection()
+  tubiLog("HomeScreen.onTopNavSelection")
+  '//Set trackingComponentInfo before setting contentSelected so the proper selected analytics is tracked within the screenStack
+  m.top.trackingComponentInfo = m.TopNav.trackingComponentInfo
+  m.top.topNavItemSelected = m.TopNav.selected
+End function
+
+
+' reset the top nav back to the category that is associated with this homeScreen: i.e. MovieScreen associated with Movies Top Nav item.
+Function resetTopNavSelection()
+  tubiLog("HomeScreen.resetTopNavSelection")
+  if m.top.id <> invalid
+    sTopNavID = ""
+    if m.top.id = m.constants.ui.screenIds.homeScreen
+      sTopNavID = m.constants.ui.sideNavIds.home
+    else if m.top.id = m.constants.ui.screenIds.movieScreen
+      sTopNavID = m.constants.ui.sideNavIds.movies
+    else if m.top.id = m.constants.ui.screenIds.tvScreen
+      sTopNavID = m.constants.ui.sideNavIds.tv
+    else if m.top.id = m.constants.ui.screenIds.espanolScreen
+      sTopNavID = m.constants.ui.sideNavIds.espanol
+    else if m.top.id = m.constants.ui.screenIds.newsScreen
+      sTopNavID = m.constants.ui.sideNavIds.news
+    end if
+
+    if sTopNavID <> ""
+      m.TopNav.jumpToID = sTopNavID
+    end if
+  end if
+
+  m.TopNav.containerTrackingPageInfo = m.top.trackingPageInfo
 End Function
 
 
@@ -93,13 +149,17 @@ Function onIDChange()
     newTrackingPageInfo.pageType = "series_browse_page"
     m.top.screenLevel = m.constants.ui.screenLevels.tvScreen
   else if m.top.id = m.constants.ui.screenIds.espanolScreen
-    newTrackingPageInfo.pageType = "home_page"
+    newTrackingPageInfo.pageType = "latino_browse_page"
     m.top.screenLevel = m.constants.ui.screenLevels.espanolScreen    
+  else if m.top.id = m.constants.ui.screenIds.newsScreen
+    newTrackingPageInfo.pageType = "news_browse_page"
+    m.top.screenLevel = m.constants.ui.screenLevels.newsScreen    
   else
     newTrackingPageInfo.pageType = "home_page"
     m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
   end if
   m.top.trackingPageInfo = newTrackingPageInfo
+  resetTopNavSelection()
 End Function
 
 
@@ -124,6 +184,11 @@ Function onEnableChange()
 End Function
 
 
+Function onTopNavFocusChange()
+  setTopNavFarAwayStatus() '//::NOTE:: this is also called at onGridFocusChange(), but calling it here ensures the UI change happens when the topNav loses Focus
+End function
+
+
 ''''''''''''''''''''
 ' onScreenFocusChange
 '
@@ -132,16 +197,23 @@ End Function
 ' being shown.
 Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
-  if m.top.hasFocus()
+  if m.top.hasFocus() = true
     m.gridHasFocus = true
     m.CategoryGridList.setFocus(true)
+    m.CategoryGridList.opacity = 1
+    m.InfoPanel.opacity = 1
     ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
     getExperimentResource("roku_discovery_v3", "roku_discovery_row_v3")
     if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
       m.top.loadAllCategories = true
     end if
   else if m.top.isInFocusChain() = false
-    m.gridHasFocus = false
+    m.gridHasFocus = false 
+    m.top.topNavHasFocus = false
+    '//If loses focus, then reset back to default topNav selection for this instance of the homescreen
+    resetTopNavSelection()
+    m.CategoryGridList.opacity = 1
+    m.InfoPanel.opacity = 1
   end if
 End Function
 
@@ -161,6 +233,20 @@ End Function
 Function onResetContentAreaValues()
   contractContentAreaForLargeVitg(1.0)
 End Function
+
+
+' Determine how far away the topNav is from the focus in the CategoryGridList
+Function setTopNavFarAwayStatus()
+  if m.TopNav.visible = true
+    currFocusRow = m.CategoryGridList.currFocusRow
+    if currFocusRow >= 2 and (m.TopNav.hasFocus() = false and m.TopNav.isInFocusChain() = false)
+      m.TopNav.farAwayFromFocus = true
+    else 
+      m.TopNav.farAwayFromFocus = false
+    end if 
+  end if
+End function
+
 
 
 ' fires when the RowList is in the process of scrolling between rows
@@ -187,6 +273,8 @@ Function onCurrFocusRowChange()
       scrollDirection = "up"
     end if
   end if
+  
+  setTopNavFarAwayStatus() '//::NOTE:: this is also called at onTopNavFocusChange(), but calling it here is faster when navigating up and down the m.CategoryGridList rows
 
 
   ' If a user quickly presses the up and down buttons quickly, before the
@@ -309,7 +397,7 @@ Function onCurrFocusRowChange()
     end if
   end if
   
-  ' update m.lastFocusPositioin or reset if we've concluded the scroll animation
+  ' update m.lastFocusPosition or reset if we've concluded the scroll animation
   m.lastFocusPosition = currFocusRow
   if rowPercent = 1
     m.lastFocusPosition = -1
@@ -357,20 +445,7 @@ Function contractContentAreaForLinear(rowPercent)
 End Function
 
 
-'''''''''''''''''''''
-' onGridFocusChange
-'
-' On grid focus change, update the info panel
-Function onGridFocusChange() As Void
-  tubiLog("HomeScreen.onGridFocusChange")
-  m.top.contentReady = true
-
-  if not m.CategoryGridList.isInFocusChain() or m.top.isLoading = true then return
-
-  oldFocusedContent = m.CategoryGridList.oldItemFocused
-  focusedContent = m.CategoryGridList.itemFocused
-  m.top.contentFocused = focusedContent
-
+Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     if focusedContent.type = m.constants.ui.categoryTypes.utility
       populateInfoPanel("utility", focusedContent)
@@ -382,12 +457,31 @@ Function onGridFocusChange() As Void
       populateInfoPanel("item", focusedContent)
     end if
   end if
- 
+
   ' If focus is on an empty category, leave the background as is.  This helps avoid
   ' background jank and keeps CPU usage down while categories are being fetched.
   if focusedContent <> invalid
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
   end if
+End Function
+
+
+'''''''''''''''''''''
+' onGridFocusChange
+'
+' On grid focus change, update the info panel
+Function onGridFocusChange() As Void
+  tubiLog("HomeScreen.onGridFocusChange")
+  m.top.contentReady = true
+
+  '//if the screen is loading or if the grid is not in focus or the topnav is not in focus, then exit out of this function
+  if not (m.TopNav.isInFocusChain() = true or m.CategoryGridList.isInFocusChain()) or m.top.isLoading = true then return
+
+  oldFocusedContent = m.CategoryGridList.oldItemFocused
+  focusedContent = m.CategoryGridList.itemFocused
+  m.top.contentFocused = focusedContent
+
+  populateInfoPanelByContent(focusedContent)
 
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + 1
@@ -422,6 +516,12 @@ Function onGridFocusChange() As Void
     end if
   end if
   m.gridHasFocus = true
+End Function
+
+
+' The top nav will dispatch a navigateWithinPageInfo event which needs to be re-dispatched to the HomescreenHelpers
+Function onTopNavNavigateWithinPageInfoChange()
+  m.top.navigateWithinPageInfo = m.TopNav.navigateWithinPageInfo
 End Function
 
 
@@ -477,8 +577,8 @@ End Function
 
 ' Is called when CategoryGridList has content loaded but did not gain focus, so we need to update the infoPanel
 Function onItemToBeFocusedChange()
-  m.top.contentReady = true
-  populateInfoPanel("item", m.CategoryGridList.reloadedItemToBeFocused)
+  m.top.contentReady = true 
+  populateInfoPanelByContent(m.CategoryGridList.reloadedItemToBeFocused)
 End Function
 
 
@@ -541,6 +641,7 @@ Function onFullscreenCountdown()
   m.InfoPanel.fullscreenCountdown = m.top.fullscreenCountdown 
 End Function
 
+
 Function onCategoryRefreshTimer()
   tubiLog("HomeScreen.onCategoryRefreshTimer")
   m.top.loadAllCategories = true
@@ -553,4 +654,55 @@ Function determineBackgroundImage(focusedContent)
   else
     return [m.defaultBackgroundUri]
   end if
+End Function
+
+
+Function setFocusOntoTopNav()
+  m.gridHasFocus = false
+  m.top.topNavHasFocus = true
+  m.TopNav.setFocus(true)
+  m.CategoryGridList.opacity = .4
+  m.InfoPanel.opacity = .4
+End Function
+
+
+Function setFocusOnCategoryGrid()
+  m.gridHasFocus = true
+  m.top.topNavHasFocus = false
+  m.CategoryGridList.setFocus(true)
+  m.CategoryGridList.opacity = 1
+  m.InfoPanel.opacity = 1
+End Function
+
+
+' When the outside world tells you to focus on the topnav. This is used when, for example, when the user uses the BACK button to go from a top nav option to the 1st top nav option and select the 1st top nav option.
+Function onFocusOnTopNavChanged()
+  if m.top.focusOnTopNav = true
+    setFocusOntoTopNav()
+  else
+    setFocusOnCategoryGrid()
+  end if
+End Function
+
+
+Function onKeyEvent(key, press) as Boolean
+  if press
+    if m.top.enableTopNav = true 
+      if key = "back" and m.TopNav.isInFocusChain() = false
+        if getExperimentResource("roku_top_nav", "roku_top_nav_experiment", false).to_top_of_page_upon_back = true
+          '//If the top nav experiment is set to jump to top of the rowList upon focusing of topNav
+          m.CategoryGridList.jumpToRowItem = [0,0]
+        end if
+        setFocusOntoTopNav()
+        return true
+      else if key = "up" and m.TopNav.isInFocusChain() = false and m.CategoryGridList.currFocusRow = 0
+        setFocusOntoTopNav()
+        return true
+      else if key = "down" and m.TopNav.isInFocusChain() = true
+        setFocusOnCategoryGrid()
+        return true
+      end if
+    end if
+  end if
+  return false
 End Function

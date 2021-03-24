@@ -1,6 +1,11 @@
 Function init()
   m.constants = m.global.constants
   m.theme = m.global.theme
+
+  Request = TubiRequest(m.constants.settings.mode)
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
+
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
   m.top.observeFieldScoped("kidsModeValues", "onKidsModeValuesChanged")
@@ -411,6 +416,7 @@ Function onOpenedChange()
     setContentActive(m.BottomContent, false)
     m.mainItemsSelected.visible = false
     m.listItemSelected = invalid
+    m.oldSideNavFocusedButton = invalid
   end if
 End Function
 
@@ -481,8 +487,10 @@ Function focusItemInList(list, sID)
       index: index
     }
 
+    item = list.content.getChild(index)
+    m.top.itemCurrentId = item.id
+
     if m.mainItems.id = list.id
-      item = list.content.getChild(index)
       m.itemSelectedRemembered = {
         id: item.id,
         list: list.id
@@ -511,6 +519,7 @@ Function onItemSelect(msg)
     m.mainItemsSelected.jumpToItem = index
   end if
 
+  m.top.itemCurrentId = item.id
   if m.mainItems.id = list.id
     '//Only allow the middle list items to be remembered as they are the only ones with associated screens while the side nav is still visible 
     m.itemSelectedRemembered = {
@@ -529,6 +538,24 @@ End Function
 Function onItemFocused(msg)
   list = msg.getRoSGNode()
   index = list.itemSelected
+
+  itemFocused = list.itemFocused
+  item = list.content.getChild(itemFocused)
+
+  ' trigger navigate_within_page events in ContentController
+  pageType = m.Tracking.sideNavPageMap[item.id]
+
+  if m.oldSideNavFocusedButton <> invalid
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(pageType, {})
+      componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component", m.oldSideNavFocusedButton)
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+    }
+  end if
+  m.oldSideNavFocusedButton = {
+    left_nav_section: pagetype
+  }
+
 
   m.listItemSelected = {
     list: list.id

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="TopNav" extends="Group" >
+  <script type="text/brightscript" uri="TopNav.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+
+  <interface>
+    <!--INPUT-->
+      <!-- The id of the item in the rowlist that the rowlist should select -->
+      <field id="jumpToID" type="string" alwaysNotify="true"/>
+      <!-- Indicate if the topNav is far from the focus and should have a different look. -->
+      <field id="farAwayFromFocus" type="boolean"/>
+
+      <!-- The trackingPageInfo of the page that the top Nav is contained on, which will be used to report analytics -->
+      <field id="containerTrackingPageInfo" type="assocarray" alwaysNotify="true"/>
+
+    <!--OUTPUT-->
+      <field id="selected" type="node" alwaysNotify="true"/>
+      <field id="trackingComponentInfo" type="assocarray"/>
+      <field id="navigateWithinPageInfo" type="assocarray"/>
+  </interface>
+  <children> 
+    
+    <Group
+      id="farAwayFromFocusIndicator"
+      opacity="0"
+      translation="[-8,18]">
+      <Poster
+        uri="pkg:/images/up-arrow.png"
+        width="47"
+        height="47"
+        opacity=".64"/>
+      </Group>
+    <Group
+      id="TopNavMenuBgroundParent">
+      <Poster
+        id="TopNavMenuBground"
+        width="900"
+        height="84"
+        uri="pkg:/images/menu-focus-fhd.9.png"/>
+    </Group>
+    <MarkupGrid
+      id="TopNavMenu"
+      translation="[12,12]"
+      rowHeights="[60]"
+      itemSize="[150, 60]"
+      itemSpacing="[0, 0]"
+      numColumns="5"
+      numRows="1"
+      focusBitmapUri="pkg://images/menu-focus-fhd.9.png"
+      drawFocusFeedbackOnTop="false"
+      itemComponentName="TopNavItem"/>  
+  </children>
+</component>

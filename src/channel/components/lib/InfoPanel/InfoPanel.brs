@@ -377,7 +377,7 @@ Function onModeChange()
     m.Offset.removeChildIndex(0)
   end while
 
-  if m.top.mode= "category" then
+  if m.top.mode = "category" then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.CategoryDetails)
     m.Offset.appendChild(m.DescriptionGroup)

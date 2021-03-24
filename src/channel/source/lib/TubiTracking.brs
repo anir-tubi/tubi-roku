@@ -433,6 +433,7 @@ End Function
 ' Build the structure for the various page types that belong to some of the events
 Function tubiTracking_getAnalyticsPage(pageType, pageValues)
   pageBase = m.allOneofs.pageOneof[pageType]
+
   if pageBase = invalid
     pageBase = m.allOneofs.dest_pageOneof[pageType]
   end if
@@ -698,8 +699,16 @@ Function tubiTracking_getOneOfs()
   movie_browse_page = {
     i: "i"  'filler because empty fields are removed
   }
-
+ 
   series_browse_page = {
+    i: "i"  'filler because empty fields are removed
+  }
+  
+  news_browse_page = {
+    i: "i"  'filler because empty fields are removed
+  }
+
+  latino_browse_page = {
     i: "i"  'filler because empty fields are removed
   }
 
@@ -784,8 +793,10 @@ Function tubiTracking_getOneOfs()
     register_page: register_page
     account_page: account_page
     access_menu_page: access_menu_page
-    movie_browse_page: movie_browse_page
+    movie_browse_page: movie_browse_page 
     series_browse_page: series_browse_page
+    news_browse_page: news_browse_page 
+    latino_browse_page: latino_browse_page
     onboarding_page: onboarding_page
     landing_page: landing_page
     ' splash_page: splash_page
@@ -813,6 +824,8 @@ Function tubiTracking_getOneOfs()
     dest_access_menu_page: access_menu_page
     dest_movie_browse_page: movie_browse_page
     dest_series_browse_page: series_browse_page
+    dest_news_browse_page: news_browse_page 
+    dest_latino_browse_page: latino_browse_page
     dest_onboarding_page: onboarding_page
     dest_landing_page: landing_page
     ' dest_splash_page: splash_page
@@ -837,6 +850,10 @@ Function tubiTracking_getOneOfs()
 
     left_side_nav_component: {
       left_nav_section: ""  ' Section enum
+    }
+
+    top_nav_component: {
+      top_nav_section: ""  ' Section enum
     }
     
     channel_guide_component: {
@@ -899,6 +916,7 @@ Function tubiTracking_getSideNavPageMap(constants)
   map[constants.ui.sideNavIds.channels] = "CHANNEL"
   map[constants.ui.sideNavIds.categories] = "CATEGORIES"
   map[constants.ui.sideNavIds.movies] = "MOVIES"
+  map[constants.ui.sideNavIds.news] = "NEWS"
   map[constants.ui.sideNavIds.tv] = "SERIES"
   map[constants.ui.sideNavIds.espanol] = "ESPANOL"
   map[constants.ui.sideNavIds.mylist] = "QUEUE"

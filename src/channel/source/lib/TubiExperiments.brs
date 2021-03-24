@@ -42,6 +42,7 @@ Function TubiExperiments(constants) as Object
       roku_discovery_v3 : {}
       roku_local_resume: {}
       roku_limit_containers: {}
+      roku_top_nav: {}
     }
     defaultResources: {
       roku: {
@@ -56,6 +57,9 @@ Function TubiExperiments(constants) as Object
       roku_limit_containers: {
         roku_limit_containers_v2: {"num_containers": -1}
       }
+      roku_top_nav : {
+        roku_top_nav_experiment : {"enabled" : false, "to_top_of_page_upon_back": false, "espanolPlacement": "side-nav"}
+      } 
     }
     
 

@@ -31,7 +31,7 @@
 
     <!-- OUTPUTS -->
       <field id="contentFocused" type="node"/>
-      <field id="contentSelected" type="node" alwaysNotify="true"/>
+      <field id="contentSelected" type="node"/>
       <field id="itemFocused" type="integer" />
       
       <!-- acceptable strings are "automatic" if the timer expires or "deliberate" if the an item is selected-->

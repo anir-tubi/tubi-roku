@@ -33,7 +33,7 @@
 
     <!-- OUTPUT -->
       <!-- set to the tubi content id of the item which was clicked on -->
-      <field id="contentSelected" type="node" alwaysNotify="true"/>
+      <field id="contentSelected" type="node"/>
 
       <!-- Keeps the information used for user tracking - structure looks like:
         {

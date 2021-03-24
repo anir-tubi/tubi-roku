@@ -139,6 +139,10 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the search screen.",
       "message": "Search"
     },
+    "menu_recommended": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Recommended"
+    },
     "menu_home": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Home"
@@ -158,6 +162,10 @@ Function getTranslation_en_US()
     "menu_tv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
       "message": "TV Shows"
+    },
+    "menu_news": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the news screen.",
+      "message": "News"
     },
     "menu_mylist": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
@@ -947,6 +955,10 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the search screen.",
       "message": "Buscar"
     },
+    "menu_recommended": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Recomendado"
+    },
     "menu_home": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Inicio"
@@ -966,6 +978,10 @@ Function getTranslation_es_MX()
     "menu_tv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
       "message": "Series"
+    },
+    "menu_news": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the news screen.",
+      "message": "Noticias"
     },
     "menu_mylist": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",

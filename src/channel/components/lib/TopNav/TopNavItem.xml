@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="TopNavItem" extends="Group" >
+  <script type="text/brightscript" uri="TopNavItem.brs" />
+  <script type="text/brightscript" uri="../AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+
+  <interface>
+    <field id="itemHasFocus" type="boolean" />
+    <field id="gridHasFocus" type="boolean" />
+    <field id="focusPercent" type="float" />
+    <field id="itemContent" type="node" />
+    <field id="height" type="float"/>
+    <field id="width" type="float"/>
+
+    <field id="boundingRect" type="assocarray"/>
+  </interface>
+  <children> 
+    <Label
+      id="Label"
+      translation="[36, 23]"
+      height="36"
+      width="150">
+      <Font
+          id="Font"
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="20" />
+    </Label>
+    <Label
+      id="LabelSelectedFocus"
+      translation="[36, 23]"
+      opacity="0"
+      visible="false"
+      height="36"
+      width="150">
+      <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="20" />
+    </Label>
+  </children>
+</component>

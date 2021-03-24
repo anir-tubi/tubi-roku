@@ -57,6 +57,8 @@
       <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
       <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true"/>
 
+      <!-- The id of the screen associated with this screen. Used to keep a record of the previous (home) screen with which has a close association: i.e. the linear screen is displayed as a minmized version on the previous screen. In the future, th previous screen may be other screens like the search screen, which may not necessarilly have a close association with this linear screen -->
+      <field id="associatedScreenID" type="string" value="" />
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -73,7 +75,7 @@
       <field id="transportVoiceResponse" type="assocarray" alwaysNotify="true"/>
 
       <!--When the user selects a new channel from the channel guide, this field is set-->
-      <field id="channelSelected" type="node" alwaysNotify="true"/>
+      <field id="channelSelected" type="node"/>
 
       <!-- Error message to be displayed to the user -->
       <field id="errorMsg" type="string" />

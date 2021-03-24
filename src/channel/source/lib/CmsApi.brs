@@ -207,7 +207,7 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
     params["contentMode"] = passedOptions.params["contentMode"]
   end if
 
-  if params["contentMode"] <> m.constants.ui.contentMode.news
+  if params["contentMode"] <> m.constants.ui.contentMode.news and params["contentMode"] <> m.constants.ui.contentMode.linear
     ' don't send the Tupian image params for homescreen requests that are contentMode = "news"
     imageParamTypes = [
       "poster"
@@ -219,7 +219,6 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
 
   headers["x-tubi-inject-live-news"] = "false"
   if params["contentMode"] = m.constants.ui.contentMode.news or params["contentMode"] = m.constants.ui.contentMode.homescreen
-    '//request and display live news if the experiement calls for it.
 
     if bKidsMode = false
       headers["x-tubi-inject-live-news"] = "true"

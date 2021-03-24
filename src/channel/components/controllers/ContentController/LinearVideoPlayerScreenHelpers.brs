@@ -4,7 +4,8 @@
 ' Helper Function for onResume and onPlay to launch content
 ' @content: TubiContentNode, the content to be played
 ' @bMinimized: boolean, Should the player be playing in its minmized state on the homescreen? If false, then it will be at fullscreen.
-Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
+' @sAssociatedScreenID: String, Often times the screen right before the linear video player screen is displayed has a close association. Keep a record of the ID associated with the associated screen. 
+Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "")
   tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
   ' we make changes to the content from this point forward. If we don't clone, those changes will initialize
   ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number
@@ -29,6 +30,7 @@ Function playLinearVideoContent(content, bMinimized = true, sContainerID = "")
     setInScreenCache(videoPlayer)
   end if
   unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer) 
+  videoPlayer.associatedScreenID = sAssociatedScreenID
   
   if content <> invalid
     videoPlayer.analyticsMode = "normal"
@@ -626,13 +628,19 @@ Function onNewChannelSelected(msg)
       oldTrackingPageInfo = videoPlayer.trackingPageInfo
       trackingComponentInfo = videoPlayer.trackingComponentInfo
       stopLinearVideoContent()
-      playLinearVideoContent(channel, false)
+      playLinearVideoContent(channel, false, videoPlayer.associatedScreenID)
       newTrackingPageInfo = videoPlayer.trackingPageInfo
       screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo)
 
-      '//Tell the homescreen to focus on the same channel so when the user backs out, the channel that is playing is the same one that is in focus
-      '//   Note: since the video channel guide and the homescreen's live news container are loaded independently from each other, we cannot assume they are in sync 
-      jumpToHomescreenContentByID(channel.id, videoPlayer.content.parentId)
+      if videoPlayer.associatedScreenID <> invalid and videoPlayer.associatedScreenID <> ""
+        '//Tell the homescreen to focus on the same channel so when the user backs out, the channel that is playing is the same one that is in focus
+        '//   Note: since the video channel guide and the homescreen's live news container are loaded independently from each other, we cannot assume they are in sync 
+        sContainerID = ""
+        if videoPlayer.associatedScreenID = m.constants.ui.screenIds.homeScreen
+          sContainerID = videoPlayer.content.parentId
+        end if
+        jumpToHomescreenContentByID(channel.id, sContainerID, videoPlayer.associatedScreenID) 
+      end if
     else
       '//Incorrect data, display an error
       showLinearPlayerError()
@@ -648,8 +656,8 @@ Function onChannelsRequested()
   
   if currentContent <> invalid and currentContent.parentId <> invalid
     reqName = m.constants.reqNames.getCategory
-    responseHandler = "liveNewsChannelGuideResponse"
-    categoryId = currentContent.parentId
+    responseHandler = "liveNewsChannelGuideResponse" 
+    categoryId = m.constants.ui.categoryIds.liveNews '//::HARDCODED:: for when the associated screen to the linear video player is homescreen, this variable is equal to currentContent.parentId, but for when the associated screen is newsScreen, it must use this liveNews constant 
 
     options = {
       params: {
@@ -714,6 +722,6 @@ Function onRetryLinearPlayerError()
   if videoPlayer <> invalid
     content = videoPlayer.content
     stopLinearVideoContent()
-    playLinearVideoContent(content, false)
+    playLinearVideoContent(content, false, videoPlayer.associatedScreenID)
   end if
 End Function

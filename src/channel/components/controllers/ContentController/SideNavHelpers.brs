@@ -2,10 +2,10 @@ Function initSideNav()
 
   m.SideNav.createMenuItems = true
 
-  m.SideNav.unobserveFieldScoped("itemSelectedId")
   m.SideNav.observeFieldScoped("itemSelectedId", "onSideNavItemSelected")
-  m.global.unobserveFieldScoped("authInfo")
   m.global.observeFieldScoped("authInfo", "onSideNavSignedIn")
+  m.SideNav.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+
   m.sSideNavItemSelectedId = invalid
   m.sSideNavCurrentScreen = invalid
 
@@ -25,6 +25,14 @@ Function initSideNav()
     m.SideNav.displayMoviesTV = false
     '//Tell the sideNav to stop displaying the channel menu item
     m.SideNav.displayChannels = false
+  end if
+
+  ' stop displaying some side nav items if the top nav is being displayed
+  if isTopNavHomeScreenEnabled() = true
+    '//Tell the sideNav to stop displaying the Espanol menu item
+    ' m.SideNav.displayEspanol = false
+    '//Tell the sideNav to stop displaying the movies/TV menu items
+    m.SideNav.displayMoviesTV = false
   end if
 
   '//set the SideNav Strings by calling onSideNavSignedIn()
@@ -124,7 +132,7 @@ Function onSideNavItemSelected()
     m.latinoModeEnabled = false
 
     ' set appropriate analytics component on the page being navigated from so NavigateToPageEvent
-    ' contains all the requisite information
+    ' contains all the requisite information -  NOTE: this analytic does not get reported when the user presses the sideNav button associated with the current screen
     sideNavComponentValues = {
       left_nav_section: m.Tracking.sideNavPageMap[itemSelectedId]
     }
@@ -210,7 +218,19 @@ Function onSideNavItemSelected()
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.home
       showLogo()
-      showHomeScreen(m.constants, authInfo)
+      topScreen = currentScreen()
+      if isTopNavHomeScreenEnabled() = false
+        ' if the topnav (experiment) is not enabled, then check if the current screen is not the home screen before proceeding
+        '//::TODO::TopNav - get rid of this part of the IF condition once the topnav experiment is successful and complete.
+        if topScreen.id <> m.constants.ui.screenIds.homeScreen
+          '//if this is the homescreen, then just close the sidenav. no need to call showHomeScreen()
+          showHomeScreen(m.constants, authInfo) 
+        end if
+      else if isCurrentScreenHomeScreen() = false or topScreen.id = m.constants.ui.screenIds.espanolScreen
+        '//Don't open the homescreen if the current screen is already a homescreen type. Just need to close the side nav.
+        '//::TODO::TopNav - for now, exclude the espanol screen because the spanish screen is still in the side nav for now.
+        showHomeScreen(m.constants, authInfo) 
+      end if
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.channels
       if m.kidsModeEnabled = true
@@ -341,13 +361,20 @@ Function enableKidsModeFromSideNav(bEnable = true)
   screen = currentScreen()
 
   if bEnable = true
-    if screen <> invalid and (screen.id = m.constants.ui.screenIds.searchScreen or screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.movieScreen or screen.id = m.constants.ui.screenIds.tvScreen or screen.id = m.constants.ui.screenIds.espanolScreen)
+    if screen <> invalid and (screen.id = m.constants.ui.screenIds.searchScreen or screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.movieScreen or screen.id = m.constants.ui.screenIds.tvScreen or screen.id = m.constants.ui.screenIds.espanolScreen or screen.id = m.constants.ui.screenIds.newsScreen)
       '//If the current screen is one of the pages that should be disabled during kids mode, then take user to homescreen    
-      showHomeScreen(m.constants, m.global.authInfo)
+      showDefaultHomeScreen()
 
       homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
       focusSideNavOption(homeSideNavID)
     end if
+  end if
+
+  screen = currentScreen()
+  if screen.id = m.constants.ui.screenIds.homeScreen = true
+    '//If current screen is the homescreen, then ensure the topNav is at the correct visible state and the screen is still set to not be enabled
+    screen.enableTopNav = isTopNavHomeScreenEnabled()
+    screen.enabled = false
   end if
 End Function
 
@@ -362,7 +389,7 @@ End Function
 '@param b: Boolean, Says what the Function is. Should the sideNav be set to open? If set to false, then the opposite happens, the side nav closes.
 Function openSideNav(b = true)
   m.SideNav.opened = b
-  if b = false
+  if b = false 
     topScreen = currentScreen()
     sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
     itemSelectedId = m.SideNav.itemSelectedId
@@ -391,7 +418,7 @@ Function getSideNavInteractionEvent(screen, trackingLib, offOrOn)
     pageType = screen.trackingPageInfo.pageType
     pageValues = screen.trackingPageInfo.pageValues
 
-    focusedSideNavId = m.constants.ui.screenIdToSideNavId[screen.id]
+    focusedSideNavId = m.SideNav.itemCurrentId
     leftSideNavComponent = {
       left_nav_section: trackingLib.sideNavPageMap[focusedSideNavId]
     }
@@ -414,6 +441,7 @@ Function getSideNavInteractionEvent(screen, trackingLib, offOrOn)
   end if
   return event
 End Function
+
 
 
 Function displayNavMenu(shouldTrackComponentInteraction = true)

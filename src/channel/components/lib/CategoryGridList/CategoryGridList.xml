@@ -77,7 +77,7 @@
 
 
     <!-- OUTPUT -->
-      <field id="itemSelected" type="node" alwaysNotify="true"/>
+      <field id="itemSelected" type="node"/>
 
       <field id="itemFocused" type="node" />
 

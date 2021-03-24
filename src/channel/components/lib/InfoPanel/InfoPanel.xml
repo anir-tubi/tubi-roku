@@ -192,8 +192,7 @@
             loadSync="true"/>
           <Group
             id="Rating"
-            visible="false"
-            height="36">
+            visible="false">
             <Poster
               id="RatingBackground"
               height="36"

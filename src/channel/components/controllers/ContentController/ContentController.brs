@@ -39,6 +39,7 @@ Function init()
   m.top.observeFieldScoped("startupArgs", "onStartupArgs")
   m.top.observeFieldScoped("roInputInfo", "onInputInfoReceived")
   m.top.observeFieldScoped("fadeInContentController", "onFadeInContentController")
+  m.top.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
@@ -152,10 +153,6 @@ Function init()
   ' holds state so we don't fire the app load beacon more than once
   m.appLoadedBeaconFired = false
   
-  ' holds state so we don't fire the intial home screen PageLoad analytics more than once
-  ' Initial page load can be at app launch, or after a deep link
-  m.initialHomeScreenLoadFired = false
-  
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
@@ -264,6 +261,29 @@ Function onSignInModalSelectedViaParentalControl()
 End Function
 
 
+' Call this function when the left or back buttons are pressed and the side nav should be opened.
+' @param means_of_navigation: string, is this the left button or the back button. Valid strings include "BUTTON_LEFT" or "BUTTON_BACK"
+Function openSideNavFromButton(means_of_navigation)
+  if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and currentScreen().topNavHasFocus = true 
+    '//If Top nav is in focus, then report an anaytic event that user is opening the sidenav by pressing the back button and coming from the top nav 
+    currentScreen = currentScreen()
+    trackingPageInfo = currentScreen.trackingPageInfo
+    focusedNavId = m.constants.ui.screenIdToSideNavId[currentScreen.id]
+    navComponent = {
+      top_nav_section: m.Tracking.sideNavPageMap[focusedNavId]
+      dest_component_type: "left_side_nav_component"
+      left_nav_section: m.Tracking.sideNavPageMap[focusedNavId]
+    }
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
+      means_of_navigation: means_of_navigation  'MeansOfNavigation enum
+    }
+  end if
+  displayNavMenu(true)
+End Function
+
+
 '''''''''''''''''''''''
 ' onKeyEvent
 '
@@ -281,8 +301,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       end if
 
       if m.SideNav.opened = false
-        if m.SideNav.visible = true
-          displayNavMenu(true)
+        if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and currentScreen().topNavHasFocus = true and currentScreen().id <> m.constants.ui.screenIds.homeScreen
+          '//A homescreen is being displayed but it is not the default homescreen and the top nav is in focus. Should go back to the default homescreen.
+          goToFirstTopNavOptionFromAnotherTopNavOption()
+        else if m.SideNav.visible = true
+          openSideNavFromButton("BUTTON_BACK")
         else if m.screenStack.getChildCount() > 1
           popScreen(true, true)
           topScreen = currentScreen()
@@ -330,7 +353,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       if key = "left" and m.screenStack.isInFocusChain() = true
         if m.sideNav.visible = true
           '//The LEFT Key has been pressed, now display menu and focus on menu
-          displayNavMenu(true)
+          openSideNavFromButton("BUTTON_LEFT")
           bReacted = true
         end if
       else if (key = "right" or key = "left") and isSideNavActive() = true
@@ -721,6 +744,13 @@ Function onHistoryQueueChange(categoryId)
 End Function
 
 
+' is the home screen's top nav enabled
+Function isTopNavHomeScreenEnabled()
+  bReturn = (getExperimentResource("roku_top_nav", "roku_top_nav_experiment", false).enabled = true and m.constants.deviceInfo.countryCode <> invalid and UCase(m.constants.deviceInfo.countryCode) = "US" and m.kidsModeEnabled = false)
+  return bReturn
+End Function
+
+
 ''''''''''''''''''''''''''''
 ' setDirtyUserCategories
 '
@@ -732,6 +762,7 @@ Function setDirtyUserCategories(categoryId)
     movieScreen = getFromScreenCache(m.constants.ui.screenIds.movieScreen)
     tvScreen = getFromScreenCache(m.constants.ui.screenIds.tvScreen)
     espanolScreen = getFromScreenCache(m.constants.ui.screenIds.espanolScreen)
+    newsScreen = getFromScreenCache(m.constants.ui.screenIds.newsScreen)
 
     'this will be an auth request if the user is logged in
     'auth request creation happens in metadataFetchTask
@@ -763,7 +794,15 @@ Function setDirtyUserCategories(categoryId)
         }
       }
       m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadEspanolUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionEspanol)
-    end if    
+    end if 
+    if newsScreen <> invalid
+      optionNews = {
+        params: {
+          "contentMode": m.constants.ui.contentMode.linear
+        }
+      }
+      m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadNewsUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionNews)
+    end if 
   end if
 End Function
 
@@ -1009,7 +1048,7 @@ Function startChannel()
   else
     enableKidsModeUI(false)
   end if
-  showHomeScreen(m.constants, m.global.authInfo)
+  showDefaultHomeScreen()
 End Function
 
 
@@ -1057,6 +1096,23 @@ Function deleteFromScreenCache(screenId)
 End Function
 
 
+' Destroy the screen (from cache) that is associated with the passeed sScreenID param. 
+' If the screen is the current screen, then go back to the previous screen
+' @sScreenID: String, The ID associated with the screen to be destroyed
+Function destroyScreen(sScreenID)
+  if sScreenID <> invalid and sScreenID <> ""
+    currentScreen = currentScreen()
+    deleteFromScreenCache(sScreenID)
+
+    '//Take user to previous screen
+    if currentScreen.id = sScreenID
+      popScreen(true, false)
+    end if
+
+  end if 
+End Function
+
+
 Function emptyScreenCache()
   m.screenCache = {}
   return m.screenCache
@@ -1094,8 +1150,16 @@ Function homeScreenBackgroundUpdated(msg)
 End Function
 
 
+' Is the current screen a home screen?
+Function isCurrentScreenHomeScreen()
+  bReturn = currentScreen() <> invalid and currentScreen().isSubType("HomeScreen")
+  return bReturn
+End Function
+
+
+
 Function setHomeScreenBackground(homeScreen)
-  if homeScreen <> invalid and currentScreen() <> invalid and currentScreen().isSubType("HomeScreen")
+  if homeScreen <> invalid and isCurrentScreenHomeScreen() = true
     contentType = invalid
     if homeScreen.contentFocused <> invalid
       contentType = homeScreen.contentFocused.type
@@ -1215,19 +1279,6 @@ Function fireAppLoadBeacon()
     m.top.signalBeacon("AppLaunchComplete")
   end if
 
-  'send tracking event for initial home page load
-  currentScreen = currentScreen()
-  if m.initialHomeScreenLoadFired = false and currentScreen.id = m.constants.ui.screenIds.homeScreen
-    m.trackingLoggingTask.trackEvent = {
-      type: "page_load"
-      values: {
-        pageOneof: m.Tracking.getAnalyticsPage("home_page", {})  'a valid page type (see PageLoadEvent in events.protos)
-        load_time: loadTime
-        status: "SUCCESS"  'ActionStatus enum
-      }
-    }
-    m.initialHomeScreenLoadFired = true
-  end if
 End Function
 
 

@@ -44,7 +44,7 @@
 
     <!-- OUTPUT -->
       <!-- the content node representing the item which was clicked on -->
-      <field id="contentSelected" type="node" alwaysNotify="true"/>
+      <field id="contentSelected" type="node"/>
 
       <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true"/>

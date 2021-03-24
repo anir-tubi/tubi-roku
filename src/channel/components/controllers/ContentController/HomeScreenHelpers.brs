@@ -12,6 +12,8 @@ Function showHomeScreen(constants, authInfo, screenID = "")
   if homeScreen <> invalid
     ' this is required for setting focus to homescreen after activation/signout
     homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController 
+
+    '//when calling pushScreen() for a cached home screen, then report navigate_to_page and page_load events immediately 
     pushScreen(homeScreen, true, true)
   else
     homeScreen = CreateObject("roSGNode", "HomeScreen")
@@ -24,7 +26,8 @@ Function showHomeScreen(constants, authInfo, screenID = "")
 
     
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
-    homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
+    homeScreen.observeFieldScoped("topNavItemSelected", "onTopNavItemSelected")
+    m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
     sContentMode = constants.ui.contentMode.homescreen
@@ -42,6 +45,10 @@ Function showHomeScreen(constants, authInfo, screenID = "")
       m.top.observeField("espanolscreenResponse", "onEspanolscreenResponse")
       sContentMode = constants.ui.contentMode.latino
       m.top.observeFieldScoped("reloadEspanolUserCategoriesResponse", "onReloadUserCategoriesResponseInEspanolScreen")
+    else if screenID = constants.ui.screenIds.newsScreen
+      m.top.observeField("newsScreenResponse", "onNewsScreenResponse")
+      sContentMode = constants.ui.contentMode.linear
+      m.top.observeFieldScoped("reloadNewsUserCategoriesResponse", "onReloadUserCategoriesResponseInNewsScreen")
     end if 
     homeScreen.contentMode = sContentMode
 
@@ -54,10 +61,22 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     fetchHomeScreen(homescreen)
     
     setInScreenCache(homeScreen)
-    'this is the first screen so no need for navigate_to_page tracking.
-    'page_load tracking will happen when content is received.
-    pushScreen(homeScreen, false, false)    
+    bNavigate_to_Page = true
+    if screenID = constants.ui.screenIds.homeScreen
+      'the homescreen is the first screen so no need for navigate_to_page tracking.
+      bNavigate_to_Page = false
+    end if 
+    'page_load tracking will happen when content is received and displayed when onHomescreenContentReady() is called.
+    pushScreen(homeScreen, bNavigate_to_Page, false)    
   end if
+
+  '// Unobserve and then reobserve the topNavHasFocus field. Do this because sometimes, this field is unoberserved at other points in the code. 
+  homeScreen.unobserveFieldScoped("topNavHasFocus")
+  homeScreen.observeFieldScoped("topNavHasFocus", "onHomeScreeenTopNavFocused")
+
+  '//Everytime the homescreen is called, set the enableTopNav param as it may always change (i.e. kidsMode)
+  '//For now, the top nav will not be displayed on the espanolScreen
+  homeScreen.enableTopNav = isTopNavHomeScreenEnabled() and screenID <> constants.ui.screenIds.espanolScreen
 End Function
 
 
@@ -76,8 +95,24 @@ Function showTVScreen()
 End Function
 
 
+Function showNewsScreen()
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.newsScreen)
+End Function
+
+
+Function showDefaultHomeScreen()
+  showHomeScreen(m.constants, m.global.authInfo)
+End Function
+
+
+
 Function onReloadUserCategoriesResponseInEspanolScreen(msg)
   onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.espanolScreen)
+End Function
+
+
+Function onReloadUserCategoriesResponseInNewsScreen(msg)
+  onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.newsScreen)
 End Function
 
 
@@ -181,7 +216,7 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
             trackingTask: m.trackingLoggingTask
           }
 
-          showErrorModal(modalInfo, onUserCategoriesFailed, invalid, invalid, invalid, [getTranslation("dialog_button_continue")])
+          showErrorModal(modalInfo, onUserCategoriesFailed, screenID, invalid, invalid, [getTranslation("dialog_button_continue")])
         end if
       end if
     end if
@@ -217,15 +252,17 @@ Function fetchHomeScreen(homeScreen)
   ' called, such as when signedIn field changes.
   if homeScreen.canLoadCategories = true
     reqName = m.constants.reqNames.getHomescreen
-    '//::TODO:: JHAND - test error here!
    
+    homeScreen.trackingLoadStartTime = UpTime(0)
+    homeScreen.unobserveFieldScoped("contentReady")
+    homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
+
     responseHandler = "homescreenResponse"
     options = {
       params: {
         "contentMode": homeScreen.contentMode
       }
     }
-
 
     if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
       options.params["groupSize"] = m.constants.settings.numContainers
@@ -239,12 +276,22 @@ Function fetchHomeScreen(homeScreen)
       responseHandler = "tvscreenResponse"
     else if homeScreen.id = m.constants.ui.screenIds.espanolScreen 
       responseHandler = "espanolscreenResponse" 
+    else if homeScreen.id = m.constants.ui.screenIds.newsScreen 
+      responseHandler = "newsScreenResponse" 
     end if
 
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, shouldKidsModeBeSentToServer(), options)
     homeScreen.resetContentAreaValues = true
     setHomeScreenLoading(homeScreen)
   end if
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onNewsScreenResponse
+'
+Function onNewsScreenResponse()
+  respondToHomescreenResponse(m.constants.ui.screenIds.newsScreen, m.top.newsScreenResponse)
 End Function
 
 
@@ -319,6 +366,7 @@ Function respondToHomescreenResponse(screenID, rawResponse)
         end if
 
       else
+        homeScreen.unobserveFieldScoped("contentReady")
         ' if we were loading in the background, don't show an error modal
         if homeScreen.isInFocusChain()
           errorMessage = getTranslation("screenHome_error_fetchScreenContent_description")
@@ -340,8 +388,18 @@ Function respondToHomescreenResponse(screenID, rawResponse)
             trackingTask: m.trackingLoggingTask
           }
 
-          showErrorModal(modalInfo, retryCategoryList, invalid, retryCategoryList, invalid)
+          fnCancelFunction = retryCategoryList
+          cancelParams = screenID
+          if screenID <> m.constants.ui.screenIds.homeScreen
+            '//it might be true there is no where to go to if the content of the main homescreen fails to load, but 
+            '// if the content of a different homescreen type fails to load, then destroy the current homescreen and (based on screen stack logic) take user back to the previous screen  
+            fnCancelFunction = destroyScreen
+          end if
+          showErrorModal(modalInfo, retryCategoryList, screenID, fnCancelFunction, cancelParams)
         end if
+
+        loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
+        screenTrackingLoad(homeScreen.trackingPageInfo, loadTime, false)
       end if
     end if
   end if
@@ -349,9 +407,9 @@ End Function
 
 
 ' We retry in the cancel or retry cases, since there is nowhere else to go
-Function retryCategoryList()
-  tubiLog("HomeScreenHelpers.retryCategoryList")
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+Function retryCategoryList(screenID)
+  tubiLog("HomeScreenHelpers.retryCategoryList") 
+  homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     homeScreen.canLoadCategories = true
     homeScreen.loadAllCategories = true
@@ -364,8 +422,8 @@ Function onHomeScreenFocusChanged(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenFocusChanged")
   homeScreen = msg.getRoSGNode()
 
-  if homeScreen.isInFocusChain() = false
-    '//If the homescreen loses focus, then stop the linear video player in case it is playing
+  if homeScreen.isInFocusChain() = false or homeScreen.topNavHasFocus = true
+    '//If the homescreen loses focus or the top nav is in focus, then stop the linear video player in case it is playing
     stopCountdownTimer()
     if currentScreen() = invalid or currentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
       '//If the video player has gained focus, then don't stop it.
@@ -380,10 +438,14 @@ End Function
 '
 ' Focus on a specific item within the homescreen
 ' @sID, String = The ID of the content item that should be in focused
-' sDesiredContainerID, String = If there is a desire for a specific container to be in focuse, then this is the ID of the desired container
-Function jumpToHomescreenContentByID(sID, sDesiredContainerID = "")
+' @sDesiredContainerID, String = If there is a desire for a specific container to be in focuse, then this is the ID of the desired container
+' @sHomeScreenID, String = the ID of homescreen that should jump to the content associated with the sID 
+Function jumpToHomescreenContentByID(sID, sDesiredContainerID = "", sHomeScreenID = "")
   tubiLog("HomeScreenHelpers.jumpToHomescreenContentByID")
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if sHomeScreenID = ""
+    sHomeScreenID = m.constants.ui.screenIds.homeScreen
+  end if
+  homeScreen = getFromScreenCache(sHomeScreenID)
   if homeScreen <> invalid
     homeScreen.jumpToRowItemByID = [sID, sDesiredContainerID]
   end if
@@ -413,7 +475,7 @@ Function onHomeScreenContentFocused(msg)
         '//tell player to load and play the video associated with the focused item
         m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
         stopLinearVideoContent()
-        playLinearVideoContent(focusedContent)
+        playLinearVideoContent(focusedContent, true, homeScreen.id)
       else 
         startCountdownTimer()
         m.backgroundGroup.posterVisible = false
@@ -425,10 +487,52 @@ Function onHomeScreenContentFocused(msg)
 End Function
 
 
+Function goToFirstTopNavOptionFromAnotherTopNavOption()
+  currentScreen = currentScreen()
+  if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and currentScreen().topNavHasFocus = true and currentScreen().id <> m.constants.ui.screenIds.homeScreen
+    currentScreen.unobserveFieldScoped("topNavHasFocus")
+    
+    showDefaultHomeScreen()
+
+    '//When going to the first top nav item and going to the default home screen, ensure the the top nav is selected, but we do not wish to report the analytics that the topnav toggles off and then back on
+    homeScreen = currentScreen()
+    homeScreen.unobserveFieldScoped("topNavHasFocus")
+    homeScreen.focusOnTopNav = true
+    homeScreen.observeFieldScoped("topNavHasFocus", "onHomeScreeenTopNavFocused")
+  end if
+End Function
+
+' When the top nav gains or loses focus, then send analytics
+Function onHomeScreeenTopNavFocused(msg)  
+  bTopNavFocused = msg.getData()
+  screen = msg.getRoSGNode()
+  if bTopNavFocused = true
+    user_interaction = "TOGGLE_ON"
+  else
+    user_interaction = "TOGGLE_OFF"
+  end if 
+
+  focusedNavId = m.constants.ui.screenIdToSideNavId[screen.id]
+  navComponent = {
+    top_nav_section: m.Tracking.sideNavPageMap[focusedNavId]
+  }
+
+  event = { 
+    type: "component_interaction"
+    values: {
+      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pagetype, screen.trackingPageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
+      user_interaction: user_interaction
+    }
+  }
+  m.trackingLoggingTask.trackEvent = event
+End Function
+
+
 Function onFullscreenCountdown()
   tubiLog("HomeScreenHelpers.onFullscreenCountdown")
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid
+  homeScreen = currentScreen()
+  if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.newsScreen)
     nCurrentCount = homeScreen.fullscreenCountdown
     nNewCount = nCurrentCount - 1
     homeScreen.fullscreenCountdown = nNewCount
@@ -442,6 +546,7 @@ End Function
 ' Select the Linear content that is currently focused
 Function selectLinearContent(content)
   tubiLog("HomeScreenHelpers.selectLinearContent()") 
+  homeScreen = currentScreen()
 
   '//stop timer and tell player to go fullscreen   
   stopCountdownTimer()
@@ -453,7 +558,7 @@ Function selectLinearContent(content)
     else
       '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content. 
       stopLinearVideoContent()
-      playLinearVideoContent(content, false)
+      playLinearVideoContent(content, false, homeScreen.id)
     end if
   end if
 End Function
@@ -465,18 +570,68 @@ Function stopCountdownTimer()
   if homeScreen <> invalid
     homeScreen.fullscreenCountdown = -1
   end if
+  newsScreen = getFromScreenCache(m.constants.ui.screenIds.newsScreen)
+  if newsScreen <> invalid
+    newsScreen.fullscreenCountdown = -1
+  end if
   m.playerFullscreenCountdownTimer.control = "stop"
 End Function
 
 
 Function startCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")  
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid
+  homeScreen = currentScreen()
+  if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.newsScreen)
     stopCountdownTimer()
     '//Start/reset timer to play video in fullscreen after a few seconds
     homeScreen.fullscreenCountdown =  m.constants.timers.linearFullscreenTimeout
     m.playerFullscreenCountdownTimer.control = "start"
+  end if
+End Function
+
+
+Function onTopNavItemSelected(msg)
+  tubiLog("HomeScreenHelpers.onTopNavItemSelected")
+  content = msg.getData()
+  homeScreen = msg.getRoSGNode()
+
+  '//Dispatch a selection component_interaction analytic event when a top nav item is selected
+  navComponent = {
+    top_nav_section: m.Tracking.sideNavPageMap[content.id]
+  }
+  event = { 
+    type: "component_interaction"
+    values: {
+      pageOneof: m.Tracking.getAnalyticsPage(homeScreen.trackingPageInfo.pagetype, homeScreen.trackingPageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
+      user_interaction: "CONFIRM"
+    }
+  }
+  m.trackingLoggingTask.trackEvent = event
+
+  '//When selecting an item from the top nav, make sure to stop listening to the focusing or unfocusing of the topNav. The TOGGLE_ON/TOGGLE_OFF event should not fire even immediately after the selection of a topNav item
+  homeScreen.unobserveFieldScoped("topNavHasFocus")
+  if homeScreen.id <> content.id
+    if content.id = m.constants.ui.sideNavIds.movies
+      showMoviesScreen()
+    else if content.id = m.constants.ui.sideNavIds.tv
+      showTVScreen()
+    else if content.id = m.constants.ui.sideNavIds.home
+      showDefaultHomeScreen()
+    else if content.id = m.constants.ui.sideNavIds.espanol
+      showEspanolScreen()
+    else if content.id = m.constants.ui.sideNavIds.news
+      showNewsScreen()
+    end if
+  else
+    '//If the user selected a top nav item that is associated with the current screen, then simply close the top nav
+    homeScreen.focusOnTopNav = false
+    '//Don't forget to listen to the "topNavHasFocus" since in this use case, the code does not open a new screen and reach showHomeScreen() which is where it resets and listens to the that field again
+    homeScreen.observeFieldScoped("topNavHasFocus", "onHomeScreeenTopNavFocused")
+  end if
+  currentScreen = currentScreen()
+  if currentScreen.id <> homeScreen.id
+    homeScreen.jumpToRowItem = [0,0] '//reset original homescreen so it is set back to the origin content item.
   end if
 End Function
 
@@ -504,10 +659,17 @@ End Function
 
 
 Function onHomescreenContentReady(msg)
+  tubiLog("HomescreenHelpers.onHomescreenContentReady ")
   fireAppLoadBeacon()
   homescreen = msg.getRoSGNode()
+  homeScreen.unobserveFieldScoped("contentReady")
   homeScreen.isLoading = false
   showHideSpinner(false)
+
+
+  '//Report the page_load analytics
+  loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
+  screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
 End Function
 
 
@@ -515,18 +677,18 @@ End Function
 '
 ' this is the callback from Home screen success data
 ' @response : ContentNode
-function onHomeSuccessResponse(response)
+Function onHomeSuccessResponse(response)
 
-end function
+End Function
 
 
 ' onHomeErrorResponse
 ' 
 ' this is the callback from Home screen error data
 ' @error : ContentNode
-function onHomeErrorResponse(error)
+Function onHomeErrorResponse(error)
 
-end function
+End Function
 
 
 Function onUtilityItemSelected(content)
@@ -545,9 +707,9 @@ Function onUtilityItemSelected(content)
 End Function  
 
 
-Function onUserCategoriesFailed()
+Function onUserCategoriesFailed(screenID)
   tubiLog("HomescreenHelpers.onUserCategoriesFailed")
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid and homeScreen.content = invalid
     fetchHomeScreen(homeScreen)
   end if

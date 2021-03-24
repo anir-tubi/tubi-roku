@@ -45,7 +45,7 @@
       
     <!-- OUTPUT -->
       <!-- the content node representing the item which was clicked on -->
-      <field id="contentSelected" type="node" alwaysNotify="true"/>
+      <field id="contentSelected" type="node"/>
 
 
       <!-- Holds the "level" of the screen relative to other screens.
