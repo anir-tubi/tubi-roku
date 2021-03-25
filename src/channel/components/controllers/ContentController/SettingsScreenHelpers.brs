@@ -7,11 +7,6 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.id = m.constants.ui.screenIds.settingsScreen
   m.settingsScreen.callingPage = sPageSource
   setSignInInfo() 
-  if m.global.authInfo <> invalid
-    m.settingsScreen.parentalSettingUpdated = m.global.authInfo.parentalrating
-  else
-    m.settingsScreen.parentalSettingUpdated = 3  ' Default to most permissive
-  end if
   m.settingsScreen.actionAfterActivation = ""
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
   m.settingsScreen.observeFieldScoped("signInSelected", "onSettingsSignInSelected")
