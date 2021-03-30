@@ -746,7 +746,7 @@ End Function
 
 ' is the home screen's top nav enabled
 Function isTopNavHomeScreenEnabled()
-  bReturn = (getExperimentResource("roku_top_nav", "roku_top_nav_experiment", false).enabled = true and m.constants.deviceInfo.countryCode <> invalid and UCase(m.constants.deviceInfo.countryCode) = "US" and m.kidsModeEnabled = false)
+  bReturn = (getExperimentResource("roku_top_nav", "roku_top_nav_experiment", true).enabled = true and m.constants.deviceInfo.countryCode <> invalid and UCase(m.constants.deviceInfo.countryCode) = "US" and m.kidsModeEnabled = false)
   return bReturn
 End Function
 

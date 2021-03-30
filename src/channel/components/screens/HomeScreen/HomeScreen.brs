@@ -89,8 +89,7 @@ End Function
 
 
 Function onTopNavEnableChange()
-'//::NOTE:: getExperimentResource() is called here to trigger experiment call for the 1st time
-if m.top.enableTopNav = true and getExperimentResource("roku_top_nav", "roku_top_nav_experiment").enabled = true
+  if m.top.enableTopNav = true
     '//::TODO::TopNav - During the topnav experiment, change some layout things. Post experiment, this should still be present since not all regions (and kids mode) have the topnav
     m.InfoPanel.translation = [m.InfoPanel.translation[0], 180]
     m.NavSection.visible = false
@@ -239,7 +238,7 @@ End Function
 Function setTopNavFarAwayStatus()
   if m.TopNav.visible = true
     currFocusRow = m.CategoryGridList.currFocusRow
-    if currFocusRow >= 2 and (m.TopNav.hasFocus() = false and m.TopNav.isInFocusChain() = false)
+    if currFocusRow >= 1 and (m.TopNav.hasFocus() = false and m.TopNav.isInFocusChain() = false)
       m.TopNav.farAwayFromFocus = true
     else 
       m.TopNav.farAwayFromFocus = false

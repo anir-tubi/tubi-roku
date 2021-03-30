@@ -58,7 +58,7 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
     homeScreen.canLoadCategories = true
 
-    fetchHomeScreen(homescreen)
+    refreshHomescreen(homescreen)
     
     setInScreenCache(homeScreen)
     bNavigate_to_Page = true
@@ -74,9 +74,6 @@ Function showHomeScreen(constants, authInfo, screenID = "")
   homeScreen.unobserveFieldScoped("topNavHasFocus")
   homeScreen.observeFieldScoped("topNavHasFocus", "onHomeScreeenTopNavFocused")
 
-  '//Everytime the homescreen is called, set the enableTopNav param as it may always change (i.e. kidsMode)
-  '//For now, the top nav will not be displayed on the espanolScreen
-  homeScreen.enableTopNav = isTopNavHomeScreenEnabled() and screenID <> constants.ui.screenIds.espanolScreen
 End Function
 
 
@@ -242,7 +239,16 @@ End Function
 Function onLoadAllCategories(msg)
   tubiLog("HomeScreenHelpers.onLoadAllCategories")
   homeScreen = msg.getRoSGNode()
-  fetchHomeScreen(homeScreen)
+  refreshHomescreen(homeScreen)
+End Function
+
+
+'//Refresh the content and the enabling of the top nav of the home screen
+Function refreshHomescreen(homescreen)
+  '//::TODO::TopNav - For now, the top nav will not be displayed on the espanolScreen
+  '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
+  homeScreen.enableTopNav = isTopNavHomeScreenEnabled() and homeScreen.id <> m.constants.ui.screenIds.espanolScreen
+  fetchHomescreen(homescreen)
 End Function
 
 
@@ -711,6 +717,6 @@ Function onUserCategoriesFailed(screenID)
   tubiLog("HomescreenHelpers.onUserCategoriesFailed")
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid and homeScreen.content = invalid
-    fetchHomeScreen(homeScreen)
+    refreshHomescreen(homeScreen)
   end if
 End Function
