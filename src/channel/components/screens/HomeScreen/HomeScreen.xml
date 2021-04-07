@@ -54,8 +54,13 @@
       <!-- show/hide the category menu -->
       <field id="categoryMenuVisible" type="boolean"/>
 
-      <!-- Indicates if that when the server is contacted, it should indcate that the app is in kidsMode. -->
+      <!-- should the topNav refresh? -->
+      <field id="refreshTopNav" type="boolean" value="false" alias="TopNav.refresh"/>
+
+      <!-- Indicates if that when the server is contacted, it should indicate that the app is in kidsMode. -->
       <field id="shouldKidsModeBeSentToServer" type="boolean" alias="CategoryGridList.shouldKidsModeBeSentToServer"/>
+      
+      <field id="isNewsAllowedInTopNav" type="boolean" alias="TopNav.isNewsAllowed"/>
 
       <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
       <field id="jumpToRowItemByID" alias="CategoryGridList.jumpToRowItemByID" />
@@ -186,12 +191,14 @@
       visible="false"
       translation="[168,48]"/>
 
-    <InfoPanel
-      id="InfoPanel"
-      translation="[168,133]"
-      maxHeight="355"
-      maxTitleLines="2"
-      visible="true"/>
+    <Group
+      id="InfoPanelParent">
+      <InfoPanel
+        id="InfoPanel"
+        translation="[168,133]"
+        maxHeight="355"
+        maxTitleLines="2"/>
+    </Group>
 
     <MaskGroup
       id="ContentArea"

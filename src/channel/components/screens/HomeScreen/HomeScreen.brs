@@ -10,6 +10,7 @@ Function init()
   m.NavSection = m.top.findNode("nav")
   m.TopNav = m.top.findNode("TopNav")
   m.InfoPanel = m.top.findNode("InfoPanel")
+  m.InfoPanelParent = m.top.findNode("InfoPanelParent")
   m.HintGroup = m.top.findNode("UpHintGroup")
   fades = m.top.findNode("Fades")
   m.HintGroupFade = fades.findNode("HintGroupFade")
@@ -23,15 +24,16 @@ Function init()
   m.top.observeField("fullscreenCountdown", "onFullscreenCountdown")
   m.top.observeField("enableTopNav", "onTopNavEnableChange")
   m.top.observeField("focusOnTopNav", "onFocusOnTopNavChanged")
+  m.top.observeField("shouldKidsModeBeSentToServer", "onStrictKidsModeChanged")
   m.TopNav.observeField("selected", "onTopNavSelection")
   m.TopNav.observeField("focusedChild", "onTopNavFocusChange")
   m.TopNav.observeFieldScoped("navigateWithinPageInfo", "onTopNavNavigateWithinPageInfoChange")
-  
+
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
   m.CategoryRefreshTimer.observeField("fire", "onCategoryRefreshTimer")
   m.CategoryRefreshTimer.control = "start"
-  
+
   'Content area
   m.CategoryGridList = m.top.findNode("CategoryGridList")
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
@@ -53,13 +55,13 @@ Function init()
 
   BackLabel = m.top.findNode("callToAction")
   BackLabel.text = getTranslation("goBack_menu")
-   if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
+  if m.constants.deviceInfo.uiResolution <> "FHD"
+    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
-   end if
+  end if
 
   m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
-  
+
   ' lastFocusPosition holds the state of currFocusRow the last time onCurrFocusRow() occurred.
   ' It is reset to -1 at the conclusion of a grid scroll animation.
   m.lastFocusPosition = -1
@@ -69,13 +71,13 @@ Function init()
   m.infoPanelFadeAnimation = invalid
 
 
-  m.utilityMaskOffsetDiff = -100  'the diff in the amount the content area mask is offset in the up direction for utility
-  
+  m.utilityMaskOffsetDiff = -100 'the diff in the amount the content area mask is offset in the up direction for utility
+
   ' Video in the grid constants
-  m.vitgSlideAmt = 440  'the amount the grid slides up to fit the vitg content item
-  m.vitgMaskOffsetDiff = 466  'the diff in the amount the content area mask is offset in the up direction for vitg
-  m.linearSlideAmt = -86  'the amount the grid slides up to fit the linear content item
-  m.linearMaskOffsetDiff = -70  'the diff in the amount the content area mask is offset in the up direction for the linear news container
+  m.vitgSlideAmt = 440 'the amount the grid slides up to fit the vitg content item
+  m.vitgMaskOffsetDiff = 466 'the diff in the amount the content area mask is offset in the up direction for vitg
+  m.linearSlideAmt = -86 'the amount the grid slides up to fit the linear content item
+  m.linearMaskOffsetDiff = -70 'the diff in the amount the content area mask is offset in the up direction for the linear news container
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
   m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt]
@@ -98,7 +100,7 @@ Function onTopNavEnableChange()
     m.InfoPanel.translation = [m.InfoPanel.translation[0], 133]
     m.NavSection.visible = true
     m.TopNav.visible = false
-  end if 
+  end if
 End Function
 
 
@@ -108,12 +110,14 @@ Function onTopNavSelection()
   '//Set trackingComponentInfo before setting contentSelected so the proper selected analytics is tracked within the screenStack
   m.top.trackingComponentInfo = m.TopNav.trackingComponentInfo
   m.top.topNavItemSelected = m.TopNav.selected
-End function
+End Function
 
 
 ' reset the top nav back to the category that is associated with this homeScreen: i.e. MovieScreen associated with Movies Top Nav item.
 Function resetTopNavSelection()
   tubiLog("HomeScreen.resetTopNavSelection")
+  m.TopNav.refresh = true
+
   if m.top.id <> invalid
     sTopNavID = ""
     if m.top.id = m.constants.ui.screenIds.homeScreen
@@ -149,10 +153,10 @@ Function onIDChange()
     m.top.screenLevel = m.constants.ui.screenLevels.tvScreen
   else if m.top.id = m.constants.ui.screenIds.espanolScreen
     newTrackingPageInfo.pageType = "latino_browse_page"
-    m.top.screenLevel = m.constants.ui.screenLevels.espanolScreen    
+    m.top.screenLevel = m.constants.ui.screenLevels.espanolScreen
   else if m.top.id = m.constants.ui.screenIds.newsScreen
     newTrackingPageInfo.pageType = "news_browse_page"
-    m.top.screenLevel = m.constants.ui.screenLevels.newsScreen    
+    m.top.screenLevel = m.constants.ui.screenLevels.newsScreen
   else
     newTrackingPageInfo.pageType = "home_page"
     m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
@@ -170,7 +174,7 @@ Function onLoadingChange()
     emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
     populateInfoPanel("item", emptyContentNode) 'empties the info panel
   end if
-  m.CategoryGridList.content = m.top.content  ' should be all categories with initial amounts of content in them
+  m.CategoryGridList.content = m.top.content ' should be all categories with initial amounts of content in them
 End Function
 
 
@@ -185,7 +189,7 @@ End Function
 
 Function onTopNavFocusChange()
   setTopNavFarAwayStatus() '//::NOTE:: this is also called at onGridFocusChange(), but calling it here ensures the UI change happens when the topNav loses Focus
-End function
+End Function
 
 
 ''''''''''''''''''''
@@ -200,19 +204,19 @@ Function onScreenFocusChange()
     m.gridHasFocus = true
     m.CategoryGridList.setFocus(true)
     m.CategoryGridList.opacity = 1
-    m.InfoPanel.opacity = 1
+    m.InfoPanelParent.opacity = 1
     ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
     getExperimentResource("roku_discovery_v3", "roku_discovery_row_v3")
     if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
       m.top.loadAllCategories = true
     end if
   else if m.top.isInFocusChain() = false
-    m.gridHasFocus = false 
+    m.gridHasFocus = false
     m.top.topNavHasFocus = false
     '//If loses focus, then reset back to default topNav selection for this instance of the homescreen
     resetTopNavSelection()
     m.CategoryGridList.opacity = 1
-    m.InfoPanel.opacity = 1
+    m.InfoPanelParent.opacity = 1
   end if
 End Function
 
@@ -220,7 +224,7 @@ End Function
 '''''''''''''''''''''''''''
 ' onSignedInChange
 '
-' When signed in/out changes, we need to reload all categories to 
+' When signed in/out changes, we need to reload all categories to
 ' reflect changes in parental controls between guest and signed-in
 ' users
 Function onSignedInChange()
@@ -240,11 +244,11 @@ Function setTopNavFarAwayStatus()
     currFocusRow = m.CategoryGridList.currFocusRow
     if currFocusRow >= 1 and (m.TopNav.hasFocus() = false and m.TopNav.isInFocusChain() = false)
       m.TopNav.farAwayFromFocus = true
-    else 
+    else
       m.TopNav.farAwayFromFocus = false
-    end if 
+    end if
   end if
-End function
+End Function
 
 
 
@@ -272,7 +276,7 @@ Function onCurrFocusRowChange()
       scrollDirection = "up"
     end if
   end if
-  
+
   setTopNavFarAwayStatus() '//::NOTE:: this is also called at onTopNavFocusChange(), but calling it here is faster when navigating up and down the m.CategoryGridList rows
 
 
@@ -346,7 +350,7 @@ Function onCurrFocusRowChange()
       m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = false
     else
       m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-fhd.9.png"
-      m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true 
+      m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true
     end if
   else
     m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-fhd.9.png"
@@ -354,36 +358,36 @@ Function onCurrFocusRowChange()
   end if
 
   if categoryEnteringFocus <> invalid
-      if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.utility
-        expandMaskOffsetForUtility(rowPercent)
-      else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-        ' update contentArea translation, only when VITG gain focus
-        expandContentAreaForLargeVitg(rowPercent)
-      else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
-        ' update contentArea translation, only when linear gain focus
-        expandContentAreaForLinear(rowPercent)
-      else
-        ' In the case of fast scrolling many rows of the grid, across the large vitg or linear rows, the category grid list may
-        ' not finish it's translation animation as the focus leaves the vitg or linear rows. We correct for that as the focus scolls
-        ' through non video in the grid rows.
-        if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
-          if categoryLosingFocus <> invalid
-            if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-              translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.vitgSlideAmt
+    if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.utility
+      expandMaskOffsetForUtility(rowPercent)
+    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+      ' update contentArea translation, only when VITG gain focus
+      expandContentAreaForLargeVitg(rowPercent)
+    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
+      ' update contentArea translation, only when linear gain focus
+      expandContentAreaForLinear(rowPercent)
+    else
+      ' In the case of fast scrolling many rows of the grid, across the large vitg or linear rows, the category grid list may
+      ' not finish it's translation animation as the focus leaves the vitg or linear rows. We correct for that as the focus scolls
+      ' through non video in the grid rows.
+      if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
+        if categoryLosingFocus <> invalid
+          if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+            translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.vitgSlideAmt
 
-              if rowPercent > (1 - translationDiffPercent)
-                contractContentAreaForLargeVitg(rowPercent)
-              end if
-            else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.linear
-              translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.linearSlideAmt
+            if rowPercent > (1 - translationDiffPercent)
+              contractContentAreaForLargeVitg(rowPercent)
+            end if
+          else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.linear
+            translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.linearSlideAmt
 
-              if rowPercent > (1 - translationDiffPercent)
-                contractContentAreaForLinear(rowPercent)
-              end if
+            if rowPercent > (1 - translationDiffPercent)
+              contractContentAreaForLinear(rowPercent)
             end if
           end if
         end if
       end if
+    end if
   else if categoryLosingFocus <> invalid
     if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.utility
       contractMaskOffsetForUtility(rowPercent)
@@ -395,7 +399,7 @@ Function onCurrFocusRowChange()
       contractContentAreaForLinear(rowPercent)
     end if
   end if
-  
+
   ' update m.lastFocusPosition or reset if we've concluded the scroll animation
   m.lastFocusPosition = currFocusRow
   if rowPercent = 1
@@ -469,7 +473,7 @@ End Function
 ' onGridFocusChange
 '
 ' On grid focus change, update the info panel
-Function onGridFocusChange() As Void
+Function onGridFocusChange() as void
   tubiLog("HomeScreen.onGridFocusChange")
   m.top.contentReady = true
 
@@ -487,10 +491,10 @@ Function onGridFocusChange() As Void
   oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
   newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 1
   newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
-  
+
   if m.gridHasFocus = true and oldAnalyticsRow > 0 and oldAnalyticsCol > 0
     if oldAnalyticsRow <> newAnalyticsRow or oldAnalyticsCol <> newAnalyticsCol
-      
+
       categoryComponentInfo = {}
       categoryComponentInfo["category_slug"] = m.CategoryGridList.oldCategoryId
       categoryComponentInfo["category_row"] = oldAnalyticsRow
@@ -500,17 +504,17 @@ Function onGridFocusChange() As Void
       if oldFocusedContent.type = m.constants.ui.categoryTypes.utility
         categoryComponentInfo["utility_tile"] = tile
       else
-        categoryComponentInfo["content_tile"] = tile 
-      end if  
+        categoryComponentInfo["content_tile"] = tile
+      end if
 
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, {})
         componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
-        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+        means_of_navigation: "BUTTON" 'MeansOfNavigation enum
         vertical_location: newAnalyticsRow
-        vertical_location_mode: "INDEX"  'LocationMode enum
+        vertical_location_mode: "INDEX" 'LocationMode enum
         horizontal_location: newAnalyticsCol
-        horizontal_location_mode: "INDEX"  'LocationMode enum
+        horizontal_location_mode: "INDEX" 'LocationMode enum
       }
     end if
   end if
@@ -524,22 +528,22 @@ Function onTopNavNavigateWithinPageInfoChange()
 End Function
 
 
-Function onGridItemSelected() As Void
+Function onGridItemSelected() as void
   tubiLog("HomeScreen.onGridItemSelected")
   if m.top.isLoading <> true
     selectedItem = m.CategoryGridList.itemSelected
-    
+
     componentValues = {}
     componentValues["category_slug"] = m.top.currCategoryId
-    componentValues["category_row"] = m.top.selectedPosition[0] + 1  'all analytics are 1 based
+    componentValues["category_row"] = m.top.selectedPosition[0] + 1 'all analytics are 1 based
     tile = m.Tracking.getAnalyticsTile(selectedItem, m.top.selectedPosition[1] + 1)
-    
+
     if selectedItem.type = m.constants.ui.categoryTypes.utility
       componentValues["utility_tile"] = tile
     else
-      componentValues["content_tile"] = tile 
+      componentValues["content_tile"] = tile
     end if
-    
+
     ' Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
     m.top.trackingComponentInfo = {
       componentType: "category_component"
@@ -547,7 +551,7 @@ Function onGridItemSelected() As Void
     }
 
     ' Content controller observes contentSelected to populate/push the detail screen
-    if selectedItem <> invalid then 
+    if selectedItem <> invalid then
       m.top.contentSelected = selectedItem
       m.gridHasFocus = false
       m.listHasFocus = false
@@ -560,7 +564,7 @@ Function onTotalCountsChange(msg)
   tubiLog("HomeScreen.onTotalCountsChange")
   totalCountInfo = msg.getData()
 
-  for i=totalCountInfo.count()-1 to 0 Step -1
+  for i = totalCountInfo.count() - 1 to 0 step -1
     categoryInList = m.top.content.getChild(i)
     categoryInList.totalCount = totalCountInfo[i]
 
@@ -576,7 +580,7 @@ End Function
 
 ' Is called when CategoryGridList has content loaded but did not gain focus, so we need to update the infoPanel
 Function onItemToBeFocusedChange()
-  m.top.contentReady = true 
+  m.top.contentReady = true
   populateInfoPanelByContent(m.CategoryGridList.reloadedItemToBeFocused)
 End Function
 
@@ -599,7 +603,7 @@ Function populateInfoPanel(mode, contentNode)
 
       lineOneData = {}
       if contentNode.type = m.constants.ui.contentTypes.series
-        lineOneData.type = m.constants.ui.contentTypes.series  
+        lineOneData.type = m.constants.ui.contentTypes.series
         ' lineOneData.seasons =  '//If available, get the number of seasons and set the value here
       end if
       lineOneData.releaseDate = contentNode.releaseDate
@@ -637,7 +641,7 @@ End Function
 
 
 Function onFullscreenCountdown()
-  m.InfoPanel.fullscreenCountdown = m.top.fullscreenCountdown 
+  m.InfoPanel.fullscreenCountdown = m.top.fullscreenCountdown
 End Function
 
 
@@ -649,7 +653,7 @@ End Function
 
 Function determineBackgroundImage(focusedContent)
   if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0
-   return focusedContent.backgrounds
+    return focusedContent.backgrounds
   else
     return [m.defaultBackgroundUri]
   end if
@@ -661,7 +665,7 @@ Function setFocusOntoTopNav()
   m.top.topNavHasFocus = true
   m.TopNav.setFocus(true)
   m.CategoryGridList.opacity = .4
-  m.InfoPanel.opacity = .4
+  m.InfoPanelParent.opacity = .4
 End Function
 
 
@@ -670,7 +674,7 @@ Function setFocusOnCategoryGrid()
   m.top.topNavHasFocus = false
   m.CategoryGridList.setFocus(true)
   m.CategoryGridList.opacity = 1
-  m.InfoPanel.opacity = 1
+  m.InfoPanelParent.opacity = 1
 End Function
 
 
@@ -684,13 +688,13 @@ Function onFocusOnTopNavChanged()
 End Function
 
 
-Function onKeyEvent(key, press) as Boolean
+Function onKeyEvent(key, press) as boolean
   if press
-    if m.top.enableTopNav = true 
+    if m.top.enableTopNav = true
       if key = "back" and m.TopNav.isInFocusChain() = false
         if getExperimentResource("roku_top_nav", "roku_top_nav_experiment", false).to_top_of_page_upon_back = true
           '//If the top nav experiment is set to jump to top of the rowList upon focusing of topNav
-          m.CategoryGridList.jumpToRowItem = [0,0]
+          m.CategoryGridList.jumpToRowItem = [0, 0]
         end if
         setFocusOntoTopNav()
         return true

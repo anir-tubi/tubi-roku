@@ -10,33 +10,11 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
-  rowNode = CreateObject("roSGNode", "ContentNode")
-  nMenuItemSpacing = m.Menu.columnSpacings[0]
-  nMenuOutsideSpacing = m.Menu.translation[0]
-  aItemWidths = []
-  nBgroundWidth = nMenuOutsideSpacing
-  nButtonPadding = 2 '::HARDCODED:: this is the total horizontal padding of the buttons to ensure MenuBground is the proper width. Since this cannot be determined easily programatically, we afre hardcoding the number here. 
-  setMainContent(m.constants.ui.sideNavIds.home, rowNode, aItemWidths)
-  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(0)
-  setMainContent(m.constants.ui.sideNavIds.movies, rowNode, aItemWidths) 
-  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(1)
-  setMainContent(m.constants.ui.sideNavIds.tv, rowNode, aItemWidths)
-  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(2)
-  setMainContent(m.constants.ui.sideNavIds.news, rowNode, aItemWidths)
-  ' nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(3)
-  ' setMainContent(m.constants.ui.sideNavIds.espanol, rowNode, aItemWidths)
-
-  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + nMenuOutsideSpacing
-
-  m.MenuBground.width = nBgroundWidth
-
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("jumpToID", "onJumpIDChange")
   m.top.observeFieldScoped("farAwayFromFocus", "onFarAwayFromFocusChange")
-  m.Menu.columnWidths = aItemWidths
-  m.Menu.itemSize = [nBgroundWidth, m.Menu.itemSize[1]]
+  m.top.observeFieldScoped("refresh", "onRefreshChange")
 
-  m.Menu.content = rowNode
   m.Menu.numRows = 1
   m.Menu.focusBitmapBlendColor = m.global.theme.focused
 
@@ -49,6 +27,43 @@ Function init()
   m.Menu.observeField("itemFocused", "onItemFocused")
   setFocusVisualProperties() ' initialize the focus look of the topNav
 End Function
+
+
+Function onRefreshChange()
+  if m.top.refresh = true
+    draw()
+  end if
+End Function
+
+
+' Draw the navigational items in the top nav. Do not call this in the init() function as it may slow the app down as the content is loading
+Function draw()
+  rowNode = CreateObject("roSGNode", "ContentNode")
+  nMenuOutsideSpacing = m.Menu.translation[0]
+  aItemWidths = []
+  nBgroundWidth = nMenuOutsideSpacing
+  nButtonPadding = 2 '::HARDCODED:: this is the total horizontal padding of the buttons to ensure MenuBground is the proper width. Since this cannot be determined easily programatically, we afre hardcoding the number here. 
+  setMainContent(m.constants.ui.sideNavIds.home, rowNode, aItemWidths)
+  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(0)
+  setMainContent(m.constants.ui.sideNavIds.movies, rowNode, aItemWidths) 
+  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(1)
+  setMainContent(m.constants.ui.sideNavIds.tv, rowNode, aItemWidths)
+  if m.top.isNewsAllowed = true
+    nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(2)
+    setMainContent(m.constants.ui.sideNavIds.news, rowNode, aItemWidths)
+  end if
+  ' nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(3)
+  ' setMainContent(m.constants.ui.sideNavIds.espanol, rowNode, aItemWidths)
+
+  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + nMenuOutsideSpacing
+
+  m.MenuBground.width = nBgroundWidth
+
+  m.Menu.columnWidths = aItemWidths
+  m.Menu.itemSize = [nBgroundWidth, m.Menu.itemSize[1]]
+  m.Menu.content = rowNode
+End Function
+
 
 
 ' Get the column spacing (to the right) for the column number that is passed
@@ -145,29 +160,33 @@ Function onItemFocused()
   navigateWithinPageInfo = {
     pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
   }
+
+  row = 1
+  col = 1 + itemFocused
+  navigateWithinPageInfo.vertical_location = row '1 based index
+  navigateWithinPageInfo.vertical_location_mode = "INDEX"  'LocationMode enum
+  navigateWithinPageInfo.horizontal_location = col
+  navigateWithinPageInfo.horizontal_location_mode =  "INDEX"  'LocationMode enum
+  
+  focusedID = m.Tracking.sideNavPageMap[item.id]
+  newTopNavFocusedButton = {
+    top_nav_section: focusedID
+  }
+
   if m.oldTopNavFocusedButton <> invalid
     '//If oldTopNavFocusedButton exists, then the user is focusing from another topNav section
-    row = 1
-    col = 1 + itemFocused
     navigateWithinPageInfo.means_of_navigation = "SCROLL"
-    navigateWithinPageInfo.vertical_location= row '1 based index
-    navigateWithinPageInfo.vertical_location_mode = "INDEX"  'LocationMode enum
-    navigateWithinPageInfo.horizontal_location = col
-    navigateWithinPageInfo.horizontal_location_mode =  "INDEX"  'LocationMode enum
     navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", m.oldTopNavFocusedButton)
   else
-    '//If oldTopNavFocusedButton exists, then the user got to the top nav from a button press
+    '//If oldTopNavFocusedButton does not exist, then the user got to the top nav from a button press
     navigateWithinPageInfo.means_of_navigation = "BUTTON"
-    navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", {})
+    navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", newTopNavFocusedButton)
   end if
 
   m.top.navigateWithinPageInfo = navigateWithinPageInfo
 
   '//set oldTopNavFocusedButton 
-  focusedID = m.Tracking.sideNavPageMap[item.id]
-  m.oldTopNavFocusedButton = {
-    top_nav_section: focusedID
-  }
+  m.oldTopNavFocusedButton = newTopNavFocusedButton
 
 End Function
 
@@ -177,19 +196,26 @@ Function onJumpIDChange()
   if m.top.jumpToID <> invalid and m.top.jumpToID <> ""
     nJumpToItem = -1
     content = m.Menu.content
-    for i=0 to content.getChildCount()-1
-      child = content.getChild(i)
-      if m.top.jumpToID = child.id
-        child.selected = true
-        nJumpToItem = i
-      else 
-        child.selected = false
-      end if
-    end for
+    if content = invalid 
+      draw()
+    end if
 
-    if nJumpToItem >= 0
-      '//Jump to the item with the same ID that is associated with m.top.jumpToID
-      m.Menu.jumpToItem = nJumpToItem
+    content = m.Menu.content
+    if content <> invalid
+      for i=0 to content.getChildCount()-1
+        child = content.getChild(i)
+        if m.top.jumpToID = child.id
+          child.selected = true
+          nJumpToItem = i
+        else 
+          child.selected = false
+        end if
+      end for
+
+      if nJumpToItem >= 0
+        '//Jump to the item with the same ID that is associated with m.top.jumpToID
+        m.Menu.jumpToItem = nJumpToItem
+      end if
     end if
   end if
 End Function

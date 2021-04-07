@@ -16,6 +16,7 @@ Function TubiTracking (constants, request, auth)
     getAnalyticsEvent: tubiTracking_getAnalyticsEvent
     getAnalyticsPage: tubiTracking_getAnalyticsPage
     getAnalyticsComponent: tubiTracking_getAnalyticsComponent
+    getAnalyticsDestinationComponent: tubiTracking_getAnalyticsDestinationComponent
     getAnalyticsTile: tubiTracking_getAnalyticsTile
     getAnalyticsAd: tubiTracking_getAnalyticsAd
     getAnalyticsAdAdrise: tubiTracking_getAnalyticsAdAdrise
@@ -265,6 +266,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       vertical_location_mode: ""  'LocationMode enum
       horizontal_location: -1
       horizontal_location_mode: ""  'LocationMode enum
+      dest_componentOneof: {}  '(see dest_component in events.protos to see possible values. Right now it is just referring to top and side navigations )
     }
 
     bookmark: {
@@ -445,6 +447,15 @@ End Function
 Function tubiTracking_getAnalyticsComponent(componentType, componentValues)
   'see tubiTracking_getOneOfs() for a list of all available analytics component messages
   componentTypes = m.allOneofs.componentOneof
+  componentBase = componentTypes[componentType]
+  component = m.populateMessage(componentType, componentValues, componentBase)
+  return component
+End Function
+
+
+Function tubiTracking_getAnalyticsDestinationComponent(componentType, componentValues)
+  'see tubiTracking_getOneOfs() for a list of all available analytics component messages
+  componentTypes = m.allOneofs.dest_componentOneof
   componentBase = componentTypes[componentType]
   component = m.populateMessage(componentType, componentValues, componentBase)
   return component
@@ -768,6 +779,14 @@ Function tubiTracking_getOneOfs()
     page_sequence: -1
     name: ""
   }
+
+  section_leftNav = {
+    left_nav_section: ""  ' Section enum
+  }
+
+  section_topNav = {
+    top_nav_section: ""  ' Section enum
+  }
   
   landing_page = {}
   
@@ -832,6 +851,15 @@ Function tubiTracking_getOneOfs()
     ' dest_forget_page: forget_page
   }
 
+
+
+
+  dest_componentOneof = {
+    dest_left_side_nav_component: section_leftNav
+
+    dest_top_nav_component: section_topNav
+  }
+
   ' At some point we may need to split the component "Oneof" like we did with the page and dest_page "Oneof"
   ' but for now this is sufficient
   componentOneof = {
@@ -848,13 +876,9 @@ Function tubiTracking_getOneOfs()
       generic_component_type: ""  ' GenericComponentType enum
     }
 
-    left_side_nav_component: {
-      left_nav_section: ""  ' Section enum
-    }
+    left_side_nav_component: section_leftNav
 
-    top_nav_component: {
-      top_nav_section: ""  ' Section enum
-    }
+    top_nav_component: section_topNav
     
     channel_guide_component: {
       category_slug: ""
@@ -904,6 +928,7 @@ Function tubiTracking_getOneOfs()
   return {
     pageOneof: pageOneof
     dest_pageOneof: dest_pageOneof
+    dest_componentOneof: dest_componentOneof
     componentOneof: componentOneof
     contentOneof: contentOneof
   }

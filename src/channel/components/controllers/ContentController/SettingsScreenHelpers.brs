@@ -248,6 +248,11 @@ Function refreshScreenAfterParentalChanges()
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen) 
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
 
+  if isTopNavHomeScreenEnabled() = true
+    '//go thru the stack and tell any homescreens to update their topNavs
+    refreshAllHomeScreenTopNav()
+  end if
+
 
   screen = currentScreen()
   if screen <> invalid

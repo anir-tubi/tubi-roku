@@ -52,11 +52,12 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     end if 
     homeScreen.contentMode = sContentMode
 
-    homeScreen.id = screenID
+    homeScreen.isNewsAllowedInTopNav = isAdultModeEnabledByParentalControl() 
+    homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
     homeScreen.signedIn = (authInfo <> invalid)
     homeScreen.kidsModeFeatureOn = m.kidsModeFeatureOn
-    homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
     homeScreen.canLoadCategories = true
+    homeScreen.id = screenID
 
     refreshHomescreen(homescreen)
     
