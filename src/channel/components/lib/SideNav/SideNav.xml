@@ -51,7 +51,8 @@
       <!-- The id of the menu item that is associated with a screen that is currently active/visible. -->
       <field id="itemCurrentId" type="string" alwaysNotify="true"/>
 
-
+      <!-- The focused position of the current menu list. -->
+      <field id="focusedPosition" type="integer"/>
 
       <!-- Holds the information needed to populate a navigate_witin_page event. This will
            be observed by the SideNavHelper, which will subsequently pass it to the contentController

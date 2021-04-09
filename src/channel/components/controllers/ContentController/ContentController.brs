@@ -262,32 +262,34 @@ End Function
 
 
 ' Call this function when the left or back buttons are pressed and the side nav should be opened.
-' @param means_of_navigation: string, is this the left button or the back button. Valid strings include "BUTTON_LEFT" or "BUTTON_BACK"
-Function openSideNavFromButton(means_of_navigation)
+Function openSideNavFromButton()
   currentScreen = currentScreen()
   if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and currentScreen <> invalid and currentScreen.topNavHasFocus = true 
     '//If Top nav is in focus, then report an anaytic event that user is opening the sidenav by pressing the back button and coming from the top nav 
     trackingPageInfo = currentScreen.trackingPageInfo
     focusedNavId = m.constants.ui.screenIdToSideNavId[currentScreen.id]
+    buttonID = m.Tracking.sideNavPageMap[focusedNavId]
+
+    '//Both the side and top navs should have the same HOME button ID
     destComponent = {
-      left_nav_section: m.Tracking.sideNavPageMap[focusedNavId]
+      left_nav_section: buttonID
+    }    
+    component = {
+      top_nav_section: buttonID
     }
 
-    row = -1
-    col = -1
     pageOneof = {}
-    componentOneof = {}
     if currentScreen.navigateWithinPageInfo <> invalid
-      row = currentScreen.navigateWithinPageInfo.vertical_location
-      col = currentScreen.navigateWithinPageInfo.horizontal_location
       pageOneof = currentScreen.navigateWithinPageInfo.pageOneof
-      componentOneof = currentScreen.navigateWithinPageInfo.componentOneof
     end if
+
+    row = m.SideNav.focusedPosition + 1
+    col = 1
 
     m.top.navigateWithinPageInfo = {
       pageOneof: pageOneof
-      componentOneof: componentOneof
-      means_of_navigation: means_of_navigation  'MeansOfNavigation enum
+      componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", component)
+      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
       dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_left_side_nav_component", destComponent)
       vertical_location: row  '//The row location of the top nav
       vertical_location_mode: "INDEX"  'LocationMode enum
@@ -321,7 +323,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           '//A homescreen is being displayed but it is not the default homescreen and the top nav is in focus. Should go back to the default homescreen.
           goToFirstTopNavOptionFromAnotherTopNavOption()
         else if m.SideNav.visible = true
-          openSideNavFromButton("BUTTON_BACK")
+          openSideNavFromButton() '//"BUTTON_BACK"
         else if m.screenStack.getChildCount() > 1
           popScreen(true, true)
           topScreen = currentScreen()
@@ -369,7 +371,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       if key = "left" and m.screenStack.isInFocusChain() = true
         if m.sideNav.visible = true
           '//The LEFT Key has been pressed, now display menu and focus on menu
-          openSideNavFromButton("BUTTON_LEFT")
+          openSideNavFromButton() '//"BUTTON_LEFT"
           bReacted = true
         end if
       else if (key = "right" or key = "left") and isSideNavActive() = true

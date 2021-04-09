@@ -602,19 +602,22 @@ Function onTopNavItemSelected(msg)
   content = msg.getData()
   homeScreen = msg.getRoSGNode()
 
-  '//Dispatch a selection component_interaction analytic event when a top nav item is selected
-  navComponent = {
-    top_nav_section: m.Tracking.sideNavPageMap[content.id]
-  }
-  event = { 
-    type: "component_interaction"
-    values: {
-      pageOneof: m.Tracking.getAnalyticsPage(homeScreen.trackingPageInfo.pagetype, homeScreen.trackingPageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
-      user_interaction: "CONFIRM"
+  if homeScreen.trackingPageInfo <> invalid
+    '//Dispatch a selection component_interaction analytic event when a top nav item is selected
+    navComponent = {
+      top_nav_section: m.Tracking.sideNavPageMap[content.id]
     }
-  }
-  m.trackingLoggingTask.trackEvent = event
+    pageOneof = m.Tracking.getAnalyticsPage(homeScreen.trackingPageInfo.pagetype, homeScreen.trackingPageInfo.pageValues)
+    event = { 
+      type: "component_interaction"
+      values: {
+        pageOneof: pageOneof
+        componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
+        user_interaction: "CONFIRM"
+      }
+    }
+    m.trackingLoggingTask.trackEvent = event
+  end if
 
   '//When selecting an item from the top nav, make sure to stop listening to the focusing or unfocusing of the topNav. The TOGGLE_ON/TOGGLE_OFF event should not fire even immediately after the selection of a topNav item
   homeScreen.unobserveFieldScoped("topNavHasFocus")

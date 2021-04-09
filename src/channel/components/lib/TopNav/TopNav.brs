@@ -16,7 +16,6 @@ Function init()
   m.top.observeFieldScoped("refresh", "onRefreshChange")
 
   m.Menu.numRows = 1
-  m.Menu.focusBitmapBlendColor = m.global.theme.focused
 
   if m.constants <> invalid and m.constants.deviceInfo.scaledUi = true
     m.Menu.focusBitmapUri = "pkg://images/menu-focus-hd.9.png"
@@ -38,6 +37,7 @@ End Function
 
 ' Draw the navigational items in the top nav. Do not call this in the init() function as it may slow the app down as the content is loading
 Function draw()
+  m.Menu.focusBitmapBlendColor = m.global.theme.focused
   rowNode = CreateObject("roSGNode", "ContentNode")
   nMenuOutsideSpacing = m.Menu.translation[0]
   aItemWidths = []
@@ -179,8 +179,8 @@ Function onItemFocused()
     navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", m.oldTopNavFocusedButton)
   else
     '//If oldTopNavFocusedButton does not exist, then the user got to the top nav from a button press
+    navigateWithinPageInfo.dest_componentOneof = m.Tracking.getAnalyticsDestinationComponent("dest_top_nav_component", newTopNavFocusedButton)
     navigateWithinPageInfo.means_of_navigation = "BUTTON"
-    navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", newTopNavFocusedButton)
   end if
 
   m.top.navigateWithinPageInfo = navigateWithinPageInfo

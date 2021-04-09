@@ -89,6 +89,8 @@
       <field id="oldCursorPosition" type="vector2d" value="[-1,-1]"/>
 
       <field id="selectedPosition" alias="RowList.rowItemSelected" />
+      
+      <field id="focusedPosition" alias="RowList.rowItemFocused" />
 
       <!-- in the case that focus is not being set on the RowList, inform that content is loaded
            and infoPanel should be updated. Typically happens on kids mode toggle.

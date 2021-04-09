@@ -9,6 +9,7 @@ Function init()
   m.ContentArea = m.top.findNode("ContentArea")
   m.NavSection = m.top.findNode("nav")
   m.TopNav = m.top.findNode("TopNav")
+  m.topNavBG = m.top.findNode("topNavBG")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.InfoPanelParent = m.top.findNode("InfoPanelParent")
   m.HintGroup = m.top.findNode("UpHintGroup")
@@ -96,10 +97,12 @@ Function onTopNavEnableChange()
     m.InfoPanel.translation = [m.InfoPanel.translation[0], 180]
     m.NavSection.visible = false
     m.TopNav.visible = true
+    m.topNavBG.visible = true
   else
     m.InfoPanel.translation = [m.InfoPanel.translation[0], 133]
     m.NavSection.visible = true
     m.TopNav.visible = false
+    m.topNavBG.visible = false
   end if
 End Function
 
@@ -524,31 +527,26 @@ End Function
 
 ' The top nav will dispatch a navigateWithinPageInfo event which needs to be re-dispatched to the HomescreenHelpers
 Function onTopNavNavigateWithinPageInfoChange()
-  m.top.navigateWithinPageInfo = m.TopNav.navigateWithinPageInfo
+  navigateWithinPageInfo = m.TopNav.navigateWithinPageInfo
+  if navigateWithinPageInfo <> invalid and navigateWithinPageInfo.means_of_navigation = "BUTTON"
+    '//The navigateWithinPageInfo is caused by the user going from the video CategoryGridList to the Top Nav. 
+    '//Before navigateWithinPageInfo is communicated to the outside helper, add info about the CategoryGridList    
+    categoryComponentInfo = getTrackingComponentInfoOfCategoryGridList(m.CategoryGridList.itemFocused, m.CategoryGridList.focusedPosition)
+
+    if categoryComponentInfo <> invalid and categoryComponentInfo.componentValues <> invalid
+      navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo.componentValues)
+    end if
+  end if 
+  m.top.navigateWithinPageInfo = navigateWithinPageInfo
 End Function
 
 
 Function onGridItemSelected() as void
   tubiLog("HomeScreen.onGridItemSelected")
   if m.top.isLoading <> true
+
     selectedItem = m.CategoryGridList.itemSelected
-
-    componentValues = {}
-    componentValues["category_slug"] = m.top.currCategoryId
-    componentValues["category_row"] = m.top.selectedPosition[0] + 1 'all analytics are 1 based
-    tile = m.Tracking.getAnalyticsTile(selectedItem, m.top.selectedPosition[1] + 1)
-
-    if selectedItem.type = m.constants.ui.categoryTypes.utility
-      componentValues["utility_tile"] = tile
-    else
-      componentValues["content_tile"] = tile
-    end if
-
-    ' Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
-    m.top.trackingComponentInfo = {
-      componentType: "category_component"
-      componentValues: componentValues
-    }
+    m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(selectedItem, m.top.selectedPosition)
 
     ' Content controller observes contentSelected to populate/push the detail screen
     if selectedItem <> invalid then
@@ -557,6 +555,31 @@ Function onGridItemSelected() as void
       m.listHasFocus = false
     end if
   end if
+End Function
+
+
+Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
+  trackingComponentInfo = {}
+  if gridItem <> invalid and itemPosition <> invalid and itemPosition.Count() = 2
+    componentValues = {}
+    componentValues["category_slug"] = m.top.currCategoryId
+    componentValues["category_row"] = itemPosition[0] + 1 'all analytics are 1 based
+    tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
+
+    if gridItem.type = m.constants.ui.categoryTypes.utility
+      componentValues["utility_tile"] = tile
+    else
+      componentValues["content_tile"] = tile
+    end if
+
+    ' Set the tracking component of the gridItem that was passed so it can be accessed as part of the navigateToPage event
+    trackingComponentInfo = {
+      componentType: "category_component"
+      componentValues: componentValues
+    }
+  end if
+
+  return trackingComponentInfo
 End Function
 
 

@@ -479,6 +479,7 @@ Function focusItemInList(list, sID)
   index = getIndexByID(list, sID)
   if index >= 0
     list.jumpToItem = index
+    m.top.focusedPosition = index
     if list.id = m.mainItems.id
       m.mainItemsSelected.jumpToItem = index
     end if
@@ -561,6 +562,7 @@ Function onItemFocused(msg)
     list: list.id
     index: index
   }
+  m.top.focusedPosition = itemFocused
 End Function
 
 
