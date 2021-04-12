@@ -715,11 +715,12 @@ Function onKeyEvent(key, press) as boolean
   if press
     if m.top.enableTopNav = true
       if key = "back" and m.TopNav.isInFocusChain() = false
+        setFocusOntoTopNav()
         if getExperimentResource("roku_top_nav", "roku_top_nav_experiment", false).to_top_of_page_upon_back = true
-          '//If the top nav experiment is set to jump to top of the rowList upon focusing of topNav
+          '//If the top nav experiment is set to jump to top of the rowList upon focusing of topNav.
+          '// Do this after the focus is changed to the top nav to ensure any analytics registers the state of the CategoryGridList before topNav gains focus
           m.CategoryGridList.jumpToRowItem = [0, 0]
         end if
-        setFocusOntoTopNav()
         return true
       else if key = "up" and m.TopNav.isInFocusChain() = false and m.CategoryGridList.currFocusRow = 0
         setFocusOntoTopNav()
