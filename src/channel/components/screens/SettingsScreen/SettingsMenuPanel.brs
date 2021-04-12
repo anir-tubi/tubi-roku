@@ -14,8 +14,14 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocus")
 
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
+  m.global.observeField("theme", "onThemeChange")
 
   setSettingsMenuStrings()
+End Function
+
+
+Function onThemeChange()
+  m.SettingsMenu.focusBitmapBlendColor = m.global.theme.focused
 End Function
 
 
