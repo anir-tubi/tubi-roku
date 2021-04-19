@@ -545,16 +545,23 @@ Function onItemFocused(msg)
 
   ' trigger navigate_within_page events in ContentController
   pageType = m.Tracking.sideNavPageMap[item.id]
-
+  
   if m.oldSideNavFocusedButton <> invalid
+
+    row = itemFocused + 1
+    col = 1
     m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(pageType, {})
       componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component", m.oldSideNavFocusedButton)
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum 
+
+      vertical_location: row  '//The row location of the side nav
+      vertical_location_mode: "INDEX"  'LocationMode enum
+      horizontal_location: col  '//The column location of the side nav
+      horizontal_location_mode: "INDEX"  'LocationMode enum
     }
   end if
   m.oldSideNavFocusedButton = {
-    left_nav_section: pagetype
+    left_nav_section: pageType
   }
 
 

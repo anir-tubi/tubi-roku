@@ -4,7 +4,7 @@ Function initSideNav()
 
   m.SideNav.observeFieldScoped("itemSelectedId", "onSideNavItemSelected")
   m.global.observeFieldScoped("authInfo", "onSideNavSignedIn")
-  m.SideNav.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+  m.SideNav.observeFieldScoped("navigateWithinPageInfo", "onSideNavNavigateWithinPageInfoChanged")
 
   m.sSideNavItemSelectedId = invalid
   m.sSideNavCurrentScreen = invalid
@@ -88,6 +88,18 @@ Function onSideNavSignedIn()
     sName = getTranslation("menu_signedIn", { name: sName })
   end if
   m.SideNav.stringSignIn = sName
+End Function
+
+
+' Add the current screen's pageOneof info to the sideNav's navigateWithinPageInfo before sending the navigateWithinPageInfo analytic
+Function onSideNavNavigateWithinPageInfoChanged()
+  navigateWithinPageInfo = m.SideNav.navigateWithinPageInfo
+  currentScreen = currentScreen()
+
+  if currentScreen <> invalid and currentScreen.trackingPageInfo <> invalid  
+    navigateWithinPageInfo.pageOneof = m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+    sendNavigateWithinPageInfo(navigateWithinPageInfo)
+  end if
 End Function
 
 

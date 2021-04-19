@@ -1166,10 +1166,17 @@ End Function
 ' Callback for when a navigateWithinPageInfo has been updated - sends the navigate_within_page event
 Function onNavigateWithinPageInfoChange(msg)
   navigateWithinPageInfo = msg.getData()
-  m.trackingLoggingTask.trackEvent = {
-    type: "navigate_within_page"
-    values: navigateWithinPageInfo
-  }
+  sendNavigateWithinPageInfo(navigateWithinPageInfo)
+End Function
+
+
+Function sendNavigateWithinPageInfo(navigateWithinPageInfo)
+  if navigateWithinPageInfo <> invalid
+    m.trackingLoggingTask.trackEvent = {
+      type: "navigate_within_page"
+      values: navigateWithinPageInfo
+    }
+  end if
 End Function
 
 

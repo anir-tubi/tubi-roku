@@ -164,6 +164,7 @@ Function onIDChange()
     newTrackingPageInfo.pageType = "home_page"
     m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
   end if
+
   m.top.trackingPageInfo = newTrackingPageInfo
   resetTopNavSelection()
 End Function
@@ -511,7 +512,7 @@ Function onGridFocusChange() as void
       end if
 
       m.top.navigateWithinPageInfo = {
-        pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, {})
+        pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
         componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
         means_of_navigation: "BUTTON" 'MeansOfNavigation enum
         vertical_location: newAnalyticsRow
