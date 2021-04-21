@@ -37,8 +37,8 @@ Function onUrlRequest()
       ' experiment example: 
       ' request = TubiRequest(m.constants.settings.mode)
       ' experiments = TubiExperiments(m.constants)
-      ' sideNav = m.experiments.getExperimentValue("RokuNamespace", "roku_side_nav")
-      ' if sideNav = "on"
+      ' sideNavEnabled = m.experiments.getExperimentResource("RokuNamespace", "roku_side_nav").enabled
+      ' if sideNavEnabled = true
       '   remoteComponentsUrl = "someUrl"
       ' else
       '   remoteComponentsUrl = "someOtherUrl"

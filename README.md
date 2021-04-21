@@ -327,7 +327,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 14\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
-- You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirmements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
+- You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
 
   `$ pyenv`
 
@@ -422,7 +422,7 @@ We may want to see how a new feature will affect the app's metrics from a small 
 
 
 ## Setting up the experiment within the Roku Code:
-- Within TubiExperiments.brs, set up a default experiment resource. Although the popper experiment system can set a default value, we should still set a default resource client-side in case the app cannot communicate to the backend. As previously stated, the resource values provide the code a way to externalize the properties of a given experiment. Locate the defaultResources associative array within the TubiExperiments.brs file and add the default resource associative array within the appropriate namespace.  <br> For example:
+- Within TubiExperiments.brs, set up a default experiment resource. Although the Popper experiment system can set a default value, we should still set a default resource client-side in case the app cannot communicate to the backend. Additionally, when the experiment ends, Popper will cease to provide a resource for the experiment, so the default resource will be used as a fallback. As previously stated, the resource values provide the code a way to externalize the properties of a given experiment. Locate the defaultResources associative array within the TubiExperiments.brs file and add the default resource associative array within the appropriate namespace.  <br> For example:
 
 	```
 	defaultResources: {
@@ -430,22 +430,15 @@ We may want to see how a new feature will affect the app's metrics from a small 
 			roku_trailers: {
 				background: "FF0000FF",
 				delay: 5000
+        on: false
 			}
       	}
 	}
 	```
 
-- For most experiments, you can stop there. But if you wish to have a default value, then you can set one up. The default value will also be returned by getExperimentValue() when a device is placed into the "control" experiment bucket. To add the default value within the BRS file, you should modify the RokuNamespace associative array within the defaultValues associative array. <br>For example:
-	```
-	defaultValues: {
-		RokuNamespace: {
-			roku_trailers: "off"
-      	}
-	}
-	```
 - After you have set everything up, then you can have your code check which experiment is turned on and display to the user that experiment. To do this, you simply have to add somewhere in your code (where it makes sense) a call to the getExperimentResource() method to check if an experiment has been turned on.  <br> For example:
 	```
-	if getExperimentResource("RokuNamespace", "roku_trailers") = "on"
+	if getExperimentResource("RokuNamespace", "roku_trailers").on = true
 		'//Do something to turn on the experiment throughout the app
 	end if
 	```
@@ -457,7 +450,7 @@ We may want to see how a new feature will affect the app's metrics from a small 
 		m.background.color = properties.background
 	end if
 	```
-- Calling getExperimentValue() to return the experiment treatment name, is also possible, though it is not considered best practice, due to resources having more functionality on the Popper server. For example, by updating the default resource in Popper Config, it is possible to update all devices to a specific experiment experience without changing any client code.
+By updating the default resource in Popper Config, it is possible to update all devices to a specific experiment experience without changing any client code.
 
 
 ## Updating the static text (translations) in app

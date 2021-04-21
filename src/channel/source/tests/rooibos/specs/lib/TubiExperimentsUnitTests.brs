@@ -32,47 +32,25 @@ Function tubiExperiments_initSuccess_test()
 End Function
 
 
-'@Test getExperimentValueValid unit tests
-Function tubiExperiments_getExperimentValueValid_test()
+'@Test getExperimentResourceValid unit tests
+Function tubiExperiments_getExperimentResourceValid_test()
   experiments = m.experiments
   experiments.init(m.request)
-  value = experiments.getExperimentValue("UserNamespace", "preroll_at_90")
   trackinfo = experiments.getExperimentTracking("UserNamespace", "preroll_at_90")
   moreinfo = experiments.getExperimentResource("UserNamespace", "preroll_at_90")
-  m.assertNotInvalid(value)
   m.assertNotInvalid(trackinfo)
   m.assertNotInvalid(moreinfo)
   m.assertNotInvalid(moreinfo.testParam)
   m.assertFalse(moreinfo.testParam)
-  m.assertEqual(value, "off")
 End Function
 
 
-'// This test case will not be found in the "backend" so the default will be used.
-'@Test getExperimentValueDefault unit tests
-Function tubiExperiments_getExperimentValueDefault_test()
-  experiments = m.experiments
-  experiments.defaultValues = {
-    UserNamespace: {
-      roku_test_experiment: true
-    }   
-  }
-  experiments.init(m.request)
-  value = experiments.getExperimentValue("UserNamespace", "roku_test_experiment")
-  trackinfo = experiments.getExperimentTracking("UserNamespace", "roku_test_experiment")
-  m.assertNotInvalid(value)
-  m.assertTrue(value)
-End Function
-
-
-'@Test getExperimentValueInvalid unit tests
-Function tubiExperiments_getExperimentValueInvalid_test()
+'@Test getExperimentResourceInvalid unit tests
+Function tubiExperiments_getExperimentResourceInvalid_test()
   experiments = m.experiments
   experiments.init(m.request)
-  value = experiments.getExperimentValue("UserNamespace", "roku_missing_experiment")
   trackinfo = experiments.getExperimentTracking("UserNamespace", "roku_missing_experiment")
   moreinfo = experiments.getExperimentResource("UserNamespace", "roku_missing_experiment")
-  m.assertInvalid(value)
   m.assertInvalid(trackinfo)
   m.assertInvalid(moreinfo)
 End Function
@@ -104,11 +82,9 @@ Function tubiExperiments_initFailed_test()
   experiments.init(m.request)
   m.assertInvalid(m.constants.experiments.info)
   ' We don't want to crash if init() failed, just use defaults if available, otherwise return 'invalid' for the value
-  value = experiments.getExperimentValue("UserNamespace", "preroll_at_90")
   trackinfo = experiments.getExperimentTracking("UserNamespace", "preroll_at_90")
   moreinfo = experiments.getExperimentResource("UserNamespace", "preroll_at_90")
 
-  m.assertInvalid(value)
   m.assertInvalid(trackinfo)
   m.assertInvalid(moreinfo)
 End Function

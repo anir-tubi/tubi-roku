@@ -3,21 +3,9 @@ Function TubiExperiments(constants) as Object
   return {
     constants: constants
 
-    'example of how defaultValues should be constructed
-    ' defaultValues = {
-    '   UserNamespace: {
-    '     single_row: false
-    '     livetv: false
-    '   }
-    '   RokuNamespace: {
-    '       background_color: "00FF12"
-    '   }
-    ' }
-    '
-    ' Every namespace needs to have a default values AA
-    ' Default values are always used in case of a "control" value or
-    ' in the case that the experiment API doesn't return a response with our experiment.
-    ' All experiments are required by the backend to have one of the experiment values to be "control"
+    ' Every namespace needs to have a default resource AA
+    ' Default resources are always used in case that the experiment API doesn't return a response
+    ' with our experiment.
     '
     'example of how defaultResources should be constructed
     ' defaultResources = {
@@ -30,21 +18,7 @@ Function TubiExperiments(constants) as Object
     '   }
     ' }
     '
-    ' Not all experiments will need a resource assoiciative array where we can place any additional info about the experiment
-    '   i.e. a color scheme, values for multiple parameters, etc.
-    ' However, when an experiment does require a resource then 
-    ' default resources are used in case a experiment needs a "control" value or
-    ' in the case that the experiment API doesn't return a response with our experiment.
-    '
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
-    defaultValues: {
-      roku: {}
-      roku_discovery_v3 : {}
-      roku_local_resume: {}
-      roku_limit_containers: {}
-      roku_top_nav: {}
-      roku_coppa: {}
-    }
     defaultResources: {
       roku: {
         roku_sidenav_espanol: {"combined": true}
@@ -66,10 +40,8 @@ Function TubiExperiments(constants) as Object
       }
     }
     
-
     'public methods
     init: tubiExperiments_init
-    getExperimentValue: tubiExperiments_getExperimentValue
     getExperimentTracking: tubiExperiments_getExperimentTracking
     getExperimentResource: tubiExperiments_getExperimentResource
     getNamespaceRequest: tubiExperiments_getNamespaceRequest
@@ -78,7 +50,6 @@ Function TubiExperiments(constants) as Object
     'private methods
     getNamespaces: tubiExperiments_getNamespaces
     parseNamespace: tubiExperiments_parseNamespace
-    getDefaultValue: tubiExperiments_getDefaultValue
     getDefaultResource: tubiExperiments_getDefaultResource
     getExperiment: tubiExperiments_getExperiment
     handleNamespaceResponse: tubiExperiments_handleNamespaceResponse
@@ -121,11 +92,9 @@ End Function
 
 ' returns a request object that can be run asynchronously or synchronously - but may return invalid
 ' @reqest: assocArray, a request module as returned by TubiRequest()
-' @constants: assocArray, m.constants
-' @defaultValues: assocArray, m.defaultValues
 Function tubiExperiments_getNamespaceRequest(request)
   expRequest = invalid
-  namespaces = m.defaultValues
+  namespaces = m.defaultResources
   returnNamespaces = invalid
   url = m.constants.urls.experiments.evaluate + "?request_context.device_id=" + m.constants.deviceInfo.deviceId
 
@@ -266,23 +235,6 @@ Function tubiExperiments_getExperimentTracking(namespaceName as string, experime
 End Function
 
 
-Function tubiExperiments_getExperimentValue(namespaceName as string, experimentName as string) as Object
-  experimentValue = m.getDefaultValue(namespaceName, experimentName)
-
-  experiment = m.getExperiment(namespaceName, experimentName)
-  if experiment <> invalid 
-    if experiment.experiment_result <> invalid and experiment.experiment_result.treatment <> invalid
-      treatment = experiment.experiment_result.treatment
-      if (type(treatment) = "roString" or type(treatment) = "String") and treatment <> "control"
-        experimentValue = treatment
-      end if
-    end if
-  end if
-
-  return experimentValue
-End Function
-
-
 ' tubiExperiments_getExperimentResource
 ' 
 ' Get more info about the experiment. This is an associative array that is defined when the experiment is set up on the popper server
@@ -314,21 +266,4 @@ Function tubiExperiments_getDefaultResource(namespaceName as string, experimentN
   end if
 
   return defaultResource
-End Function
-
-' This function gets the appropriate default value from a repository of default values for experiments.
-' If we can't find an experiment from the Popper server response, we'll go here to get the default value for that experiment
-' If there is no default value, then this function can return invalid.
-'
-'@namespaceName: string, the name of the namespace in which we will find the experiment
-'@experimentName: string, the name of the experiment as found in the experiment definition
-Function tubiExperiments_getDefaultValue(namespaceName as string, experimentName as string) as Object  
-  defaultValue = invalid
-  if namespaceName <> invalid and experimentName <> invalid
-    if m.defaultValues[namespaceName] <> invalid
-      defaultValue = m.defaultValues[namespaceName][experimentName]
-    end if
-  end if
-
-  return defaultValue
 End Function
