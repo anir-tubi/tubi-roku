@@ -31,9 +31,9 @@ function playVideoContent(content, autoplayType = "none", position = 0)
   ' indicates we should immediately autoplay the next video
   m.receivedGoToNextPressed = false
 
-  if m.kidsModeEnabled = true
+  if isKidsUIOn() = true
     videoPlayer.appMode = "KIDS_MODE"
-  else if m.latinoModeEnabled = true
+  else if m.uiMode = m.constants.ui.modes.latino
     videoPlayer.appMode = "LATINO_MODE"
   else
     videoPlayer.appMode = "DEFAULT_MODE"
@@ -104,7 +104,7 @@ function playVideoContent(content, autoplayType = "none", position = 0)
 
   ' it's necessary to push the screen after the content has been set on the videoPlayer component,
   ' so NavigateToPage and PageLoad events contain the necessary content id information
-  if currentScreen() = invalid or currentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
+  if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
     if m.enteredFromDeepLink = true
       pushScreen(videoPlayer, false, true)
     else if m.handlingDeeplinkInputEvent = true
@@ -240,7 +240,7 @@ function onVideoPlayerState(msg)
       stopVideoContent(videoPlayer)
       videoPlayer.errorMsg = ""
 
-      currentScreen = currentScreen()
+      currentScreen = getCurrentScreen()
       if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
         popScreen(true, true)
       end if
@@ -382,7 +382,7 @@ function returnToDetailScreenFromVideo()
   end if
 
   ' remove the video player screen to reveal the details screen (or episodes list screen)
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
     popScreen(true, true)
   end if
@@ -507,7 +507,7 @@ end function
 
 function onRetryPlayerError()
   ' try to resume the video from the last checkpoint
-  screen = currentScreen()
+  screen = getCurrentScreen()
   if screen.isSubtype("DetailScreen") = true
     if screen.watchTrailerSelected = true
       trailerHelper(screen)

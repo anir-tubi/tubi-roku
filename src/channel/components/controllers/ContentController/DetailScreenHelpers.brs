@@ -41,7 +41,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true)
 
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
-    detailScreen.kidsModeEnabled = m.kidsModeEnabled
+
     setDetailStrings(detailScreen)
 
     ' Setting the content on the detail screen here prior to getting a response back from server with full info,
@@ -132,6 +132,14 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     detailScreen.isLoading = false
     lineOneData = {}
 
+    ' don't show related content if the user is in any of the kids modes
+    detailScreen.showRelated = not isKidsUIOn()
+
+    ' don't allow add to/remove from my list if the user is age gated
+    if m.uiMode = m.constants.ui.modes.kidsAgeGate
+      detailScreen.disableBookmarks = true
+    end if
+
     'update detail screen state via the input interface
     detailScreen.title = content.title
     detailScreen.genres = content.genres
@@ -218,8 +226,9 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
 
     setIsBookmark(detailScreen, (bookmark <> invalid))
     setIsHistory(detailScreen, (history <> invalid))
-    '//::TODO:: HARDCODE:: right now in kids mode, there are no channels showing up, so hardcode it so the channel's button doesn't show
-    detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "" and m.kidsModeEnabled = false)
+
+    '//right now in kids mode, there are no channels showing up, so hardcode it so the channel's button doesn't show
+    detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "" and isKidsUIOn() = false)
     detailScreen.stringChannelButton = getTranslation("screenDetails_button_gotoChannel", {channel: content.channelName})
     detailScreen.length = stateSource.length  'needed to compute the resume bar on the resume button
 
@@ -528,7 +537,7 @@ Function handleSingleContentError(error, trackOnResponse)
   tubiLog("DetailScreenHelpers.handleSingleContentError")
   detailScreen = getTopDetailScreenFromStack()
   
-  if m.isScreenLoaded = false
+  if detailScreen <> invalid and m.isScreenLoaded = false
     populateDetailScreen(detailScreen, detailScreen.content)
   end if
 
@@ -544,8 +553,28 @@ Function handleSingleContentError(error, trackOnResponse)
     ' In this case we should navigate back to the home page.
     sendDetailScreenErrorAnalytics(detailScreen)
     m.deepLinkContent = invalid
-    restartChannel()
-  else if detailScreen.isInFocusChain() = true
+    startChannel()
+
+    ' dialog must be presented after startChannel() is run. StartChannel() will remove all screens except
+    ' the homescreen. So, once the dialog is exited, focus is given back to the home screen. If focus
+    ' were to be given back to the details screen, an unnecessary request to refresh the content metadata
+    ' would occur due to shouldRefresh() being called from DetailScreen.onScreenFocusChange and returning true.
+    currentScreen = getCurrentScreen()
+    if currentScreen <> invalid
+      title = getTranslation("dialog_errorOops_title")
+      message = getTranslation("screenDetails_error_getContent_description")
+      dialogEvent = {
+        type: "dialog"
+        values: {
+          dialog_type: "RESTRICTED_CONTENT" 'DialogType enum
+          pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+          dialog_action: "SHOW"
+          dialog_sub_type: "input-deeplink"
+        }
+      }
+      showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+    end if
+  else if detailScreen <> invalid and detailScreen.isInFocusChain() = true
     message = getTranslation("screenDetails_error_getContent_description")
     content = getDetailScreenContent(detailScreen)
   
@@ -582,8 +611,8 @@ End Function
 
 Function getRelatedContent(content)
   ' get related (You May Also Like) content along with metadata for the content
-  ' TODO: write callbacks for handling related content requests success and failure
-  if content <> invalid
+  ' (but not if in any of the kids modes, since it won't be displayed)
+  if content <> invalid and isKidsUIOn() = false
     relatedRequestInfo = m.cmsApi.relatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
 
     m.makeRequest({

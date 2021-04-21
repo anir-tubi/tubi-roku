@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - NumberPad is key pad with numbers from 1 through 9 in 3 rows, and a fourth row
+ - containing 0 and a button with a back icon
+ -->
+<component name="NumberPad" extends="Group">
+
+  <script type="text/brightscript" uri="NumberPad.brs" />
+  
+  <interface>
+    <!-- OUTPUT -->
+      <!-- the number on the number pad that was selected, as a string (ie. "1"), or "back" -->
+      <field id="buttonSelected" type="string" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+    <Rowlist
+      id="NumberPadBackgroundRowlist" />
+    <Rowlist
+      id="NumberPadForegroundRowlist" />
+  </children>
+</component>

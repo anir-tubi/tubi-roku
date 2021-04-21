@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - NumberPadGridItem is used to populate the NumberPad component
+ -->
+<component name="NumberPadGridItem" extends="Group">
+
+  <script type="text/brightscript" uri="NumberPadGridItem.brs" />
+  
+  <interface>
+    <!-- INPUT -->
+      <field id="itemContent" type="node" />
+      <field id="itemHasFocus" type="boolean" alwaysNotify="true" />
+      <field id="focusPercent" type="float" />
+      <field id="gridHasFocus" type="boolean" />
+  </interface>
+
+  <children>
+    <Rectangle
+      id="NumberPadGridItemBg"
+      color="0x9699A3"
+      opacity="0.16"
+      width="159"
+      height="96" />
+    <Label
+      id="NumberPadGridItemFgLabel"
+      color="0xFFFFFF"
+      horizAlign="center"
+      vertAlign="center"
+      visible="true"
+      width="159"
+      height="96"
+      translation="[0,6]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="48"/>
+      </Label>
+    <Poster
+      id="NumberPadGridItemFgPoster"
+      uri="pkg://images/icon-delete.png"
+      translation="[105,36]"
+      visible="false" />
+  </children>
+</component>

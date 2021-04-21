@@ -10,7 +10,7 @@ Function showSearchScreen(constants)
 
 
   searchScreen.id = m.constants.ui.screenIds.searchScreen
-  searchScreen.kidsModeEnabled = m.kidsModeEnabled
+  searchScreen.kidsModeEnabled = isKidsUIOn()
   searchScreen.backgroundUriList = [m.defaultBackgroundUri]
   searchScreen.searchText = "" '//Set searchText to "" to initiate the search screen and load the default "search results"
 
@@ -56,7 +56,7 @@ End Function
 
 Function getSearchScreen()
   screen = invalid
-  searchScreen = currentScreen()
+  searchScreen = getCurrentScreen()
   if searchScreen <> invalid and searchScreen.id = m.constants.ui.screenIds.searchScreen
     screen = searchScreen
   end if

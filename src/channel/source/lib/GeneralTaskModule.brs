@@ -50,6 +50,11 @@ End Function
 '   silenceCallbackWarnings: boolean, if no callbacks are provided, prevents warning logs to the console
 '                            Use for 'fire and forget' requests like analytics, etc.
 '
+'   Additional custom fields can be added to @reqInfo which will in turn be appended to the returned
+'   RequestNode. The GeneralTask parser functions will have access to the RequestNode, allowing
+'   information to be passed from the original makeRequest call, all the way through to callbacks.
+'   In this way, the callbacks can have some context about what happened to trigger them.
+'
 ' returns an instance of a RequestNode
 ' Function generalTask_makeRequest(requestType, url, options, successCallback, errorCallback, responseType)
 Function generalTask_makeRequest(reqInfo = {})
@@ -72,8 +77,13 @@ Function generalTask_makeRequest(reqInfo = {})
 
   requestNode = CreateObject("roSGNode", "RequestNode")
   requestNode.id = randomId
+
+  successResponseType = reqInfo.responseType
+  if reqInfo.successCallback = invalid
+    successResponseType = "assocarray"
+  end if
   
-  requestNode.addField("response", reqInfo.responseType, false)
+  requestNode.addField("response", successResponseType, true)
   requestNode.observeField("response", "successCallbackWrapper")
 
   requestNode.addField("error", "assocarray", false)
@@ -138,7 +148,7 @@ Function errorCallbackWrapper(msg)
     if requestNode <> invalid and requestNode.input <> invalid and isString(requestNode.input.name)
       reqName = requestNode.input.name
     end if
-    tubiLog("No success callback found for request with name " + reqName, "warn")
+    tubiLog("No error callback found for request with name " + reqName, "warn")
   end if
 
 End Function

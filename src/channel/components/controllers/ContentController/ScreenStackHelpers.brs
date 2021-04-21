@@ -8,10 +8,7 @@ Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEven
   if sendNavigateEvents = true and current <> invalid
     screenTrackingNavigate(current.trackingPageInfo, screen.trackingPageInfo, current.trackingComponentInfo)
   end if
-  
-  ' setAnalyticsMode should be triggered before sending pageload event
-  setAnalyticsMode()
-  
+
   'handle user tracking for loading screen
   if sendLoadingEvents = true
     screenTrackingLoad(screen.trackingPageInfo)
@@ -40,7 +37,7 @@ End Function
 '                              An example of this is when the user signs out.
 Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
   tubiLog("ScreenStackHelpers.popScreen")
-  toBePopped = currentScreen()
+  toBePopped = getCurrentScreen()
   topHidden = getHiddenScreen(1)
 
   ' If the screen to be popped is the only screen, it will leave an empty screen stack.
@@ -59,10 +56,7 @@ Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
   if sendNavigateEvents = true and topHidden <> invalid and toBePopped <> invalid
     screenTrackingNavigate(toBePopped.trackingPageInfo, topHidden.trackingPageInfo)
   end if
-  
-  ' setAnalyticsMode should be triggered before sending pageload event
-  setAnalyticsMode()
-  
+
   if sendLoadingEvents = true and topHidden <> invalid
     screenTrackingLoad(topHidden.trackingPageInfo)
   end if
@@ -71,21 +65,7 @@ Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
 End Function
 
 
-' setting analyticsAppMode value which will be used while sending analytics event
-Function setAnalyticsMode()
-
-  if m.latinoModeEnabled = true
-    m.trackingLoggingTask.analyticsAppMode = "LATINO_MODE"
-  else if m.kidsModeEnabled = true
-    m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
-  else
-    m.trackingLoggingTask.analyticsAppMode = "DEFAULT_MODE"  
-  end if
-
-End Function
-
-
-' Get a screen at any depth in the stack. Depth of 0 is the top most screen (aka currentScreen())
+' Get a screen at any depth in the stack. Depth of 0 is the top most screen (aka getCurrentScreen())
 ' May return invalid if depth greater than the number of screens in the screen stack.
 Function getHiddenScreen(depth = 1)
   screenCount = m.screenStack.getChildCount()
@@ -94,9 +74,7 @@ End Function
 
 
 ' Wrapper for getting the current screen field from the screen stack.
-' This is mostly used for legacy reasons because currentScreen() exists in a lot of places in the code before
-' screen stack functionality was refactored.
-Function currentScreen()
+Function getCurrentScreen()
   return m.screenStack.current
 End Function
 
@@ -188,6 +166,13 @@ Function clearScreenStack()
 End Function
 
 
+' Wrapper around m.screenStack.getChildCount() to find out how many screens are currently in the stack
+Function getScreenStackSize()
+  tubiLog("ScreenStackHelpers.getScreenStackSize")
+  return m.screenStack.getChildCount()
+End Function
+
+
 ' Callback to fire when m.screenStack is empty - should only happen in the case of deeplinks
 Function onScreenStackEmpty()
   tubiLog("ScreenStackHelpers.onScreenStackEmpty")
@@ -196,8 +181,8 @@ End Function
 
 
 Function onScreenChange()
-  if currentScreen() <> invalid and currentScreen().id <> invalid
-    bSideNavVisible = (m.constants.ui.sideNavOpenIds[currentScreen().id] = true)
+  if getCurrentScreen() <> invalid and getCurrentScreen().id <> invalid
+    bSideNavVisible = (m.constants.ui.sideNavOpenIds[getCurrentScreen().id] = true)
     m.sideNav.visible = bSideNavVisible   
   end if
 End Function

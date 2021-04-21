@@ -4,7 +4,6 @@ Function init()
   m.top.focusable = true
   m.top.hasNextPanel = false
   m.top.leftOnly = false
-  m.top.createNextPanelOnItemFocus = false
   m.top.selectButtonMovesPanelForward = true
   m.top.observeField("focusedChild", "onComponentFocus")
   m.top.observeField("selectItem", "onSelectItem")

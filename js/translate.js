@@ -3,6 +3,7 @@ const FormData = require('form-data');
 const unzipper = require('unzipper');
 const path = require('path');
 const https = require('https');
+const log = require('fancy-log');
 /* Allow the crowdinKey to be driven from an environment variable or thru command line param.
    Environment variables are set on options, along with any parameters passed in
    to the gulp command line call.
@@ -173,7 +174,7 @@ function writeLocaleDataToBRS_sync(sLocale, localeData) {
 
     if (data.indexOf(sStartFunction) >= 0) {
       //If the locale function exists, then update the function with the new translations
-      console.log(`Found ${sLocale} locale function. Now replace it within the BRS file: '${fileTranslationCode}'`);
+      log(`Found ${sLocale} locale function. Now replace it within the BRS file: '${fileTranslationCode}'`);
       var re = new RegExp(escapeRegExp(sStartFunction) + "[\\s\\S]*?" + sEndFunction, "i");
       newValue = data.replace(re, sNewString);
     } else {
@@ -263,11 +264,12 @@ function makeGetRequest(options) {
 //update the English strings within the translation BRS file with the latest version of the US English locale file
 exports.updateLocalTranslations = function(done) {
   //update the BRS file with the American English file before uploading to Crowdin
-  console.log("Updating the BRS file with the latest version found in: ", _sLocalTranslationFilePath)
+  log("Updating the BRS file with the latest version found in: ", _sLocalTranslationFilePath)
   const localeData = fs.readFileSync(_sLocalTranslationFilePath, 'utf-8');
   writeLocaleDataToBRS_sync("en-US", localeData);
 
-  console.log('\nFINISHED UPDATING THE ENGLISH STRINGS IN THE BRS FILE WITH THE LOCAL ENGLISH TRANSLATION FILE');
+  log('');
+  log('FINISHED UPDATING THE ENGLISH STRINGS IN THE BRS FILE WITH THE LOCAL ENGLISH TRANSLATION FILE');
   
   done();  //inform gulp that the task has completed.
 }

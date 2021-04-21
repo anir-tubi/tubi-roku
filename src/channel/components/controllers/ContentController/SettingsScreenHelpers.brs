@@ -6,7 +6,8 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen = CreateObject("roSGNode", "SettingsScreen")
   m.settingsScreen.id = m.constants.ui.screenIds.settingsScreen
   m.settingsScreen.callingPage = sPageSource
-  setSignInInfo() 
+  m.settingsScreen.uiMode = m.uiMode
+  setSettingsScreenSignInInfo()
   m.settingsScreen.actionAfterActivation = ""
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
   m.settingsScreen.observeFieldScoped("signInSelected", "onSettingsSignInSelected")
@@ -46,7 +47,7 @@ Function getRatingStrings(nRatingIndex)
 End Function
 
 
-Function setSignInInfo()
+Function setSettingsScreenSignInInfo()
   aaSignIn = {signedIn: false
     name: invalid
     email: invalid
@@ -112,20 +113,16 @@ Function onSettingsBackgroundChange()
 End Function
 
 
-' Log the user out, update screens
+' Log the user out
 Function onSignOutModalSelected()
   tubiLog("SettingsScreenHelpers.onSignOutModalSelected")
-  ' flush the screenstack in any case where the user has successfully
-  ' gone through the sign-in.  If they 'back' out of it, the screen
-  ' stack will stay intact and this Function will not be called
-  clearScreenStack()
-  setSignInInfo()
+  setSettingsScreenSignInInfo()
   m.authInfoReceived = false
   if m.authTask <> invalid
     m.authTask.unobserveFieldScoped("authInfo")
   end if
   m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onSideNavSignInSelected")
+  m.authTask.observeFieldScoped("authInfo", "onSideNavSignInCompleted")
   m.authTask.functionName = "execSignOut"
   m.authTask.control = "RUN"
 
@@ -202,7 +199,7 @@ End Function
 
 Function isConfirmPasswordScreen() as boolean
   '//Is the current screen the confirmPasswordScreen?
-  screen = currentScreen()
+  screen = getCurrentScreen()
   b = (m.confirmPasswordScreen <> invalid and m.confirmPasswordScreen.subType() = screen.subType())
   return b
 End Function
@@ -232,6 +229,7 @@ End Function
 
 
 ' After the parental settings have changes then the content of certain screens should be refreshed
+' Also used after kids mode is enabled or disabled
 Function refreshScreenAfterParentalChanges()
   tubiLog("SettingsScreenHelpers.refreshScreenAfterParentalChanges")
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
@@ -254,10 +252,10 @@ Function refreshScreenAfterParentalChanges()
   end if
 
 
-  screen = currentScreen()
+  screen = getCurrentScreen()
   if screen <> invalid
     if screen.id = m.constants.ui.screenIds.searchScreen
-      screen.kidsModeEnabled = m.kidsModeEnabled
+      screen.kidsModeEnabled = isKidsUIOn()
       screen.signedIn = true
     else if screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen
       refreshGridScreen(screen)
@@ -285,12 +283,12 @@ Function onParentalSettingComplete(msg)
     end if
 
     if m.settingsScreen.parentalSettingSelected < 2
-      enableKidsModeUI(true)
+      setUiMode(m.constants.ui.modes.kidsParental)
     else
       '//turn off kids mode (if it is on) when switching to teens and greater
       '// Also, disable the manual version of kids mode if the user had previously enabled kids mode manually
-      if m.kidsModeFeatureOn = true
-        enableKidsModeUI(false)
+      if isKidsUIOn() = true
+        setUiMode(m.constants.ui.modes.standard)
       end if
     end if
 

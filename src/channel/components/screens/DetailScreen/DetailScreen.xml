@@ -29,8 +29,6 @@
       <!-- Pass through signal to the info panel that the height/placement should be recalculated -->
       <field id="calculateInfoHeight" type="boolean" alias="DetailInfoPanel.calculateHeight" />
 
-      <field id="kidsModeEnabled" type="boolean"  />
-
       <!-- The title displayed on the info panel -->
       <field id="title" type="string" alias="DetailInfoPanel.title" />
 
@@ -81,6 +79,12 @@
 
       <!-- hides or shows the loading spinner. Play/Resume button presses are not honored when isLoading = true -->
       <field id="isLoading" type="boolean" alias="DetailSpinner.visible" />
+
+      <!-- Show/hide the related content (You May Also Like) -->
+      <field id="showRelated" type="boolean" alias="RelatedContentParentGroup.visible" />
+
+      <!-- Setting to true disallows the Add to My List and Remove from My List buttons from being shown -->
+      <field id="disableBookmarks" type="boolean" />
 
       <!-- holds state info about if there was an error in retrieving the content for this page.
            Is used to prevent multiple navigate_to_page and page_load events if a user retries to load content from the error modal.

@@ -186,7 +186,7 @@ Function getConstants()
     constants.deviceInfo.rokuCountryCode = di.GetUserCountryCode()
     if constants.deviceInfo.rokuCountryCode <> invalid
       'rokuCountryCode will be used for the value of countryCode, unless it is overriden by externalConfig.info.country. 
-      'Keep a record of the otiginal rokuCountryCode value in case we ever need to know the non-overwritten value.
+      'Keep a record of the original rokuCountryCode value in case we ever need to know the non-overwritten value.
       constants.deviceInfo.rokuCountryCode = UCase(constants.deviceInfo.rokuCountryCode)
     end if
     constants.deviceInfo.countryCode = constants.deviceInfo.rokuCountryCode
@@ -222,6 +222,9 @@ Function getConstants()
     constants.reqNames.emailExists = "emailExists"
     constants.reqNames.signUp = "signUp"
     constants.reqNames.signIn = "signIn"
+    constants.reqNames.deviceRegister = "deviceRegister" 'verify age
+    constants.reqNames.checkBirthdayInfo = "checkBirthdayInfo" 'verify age
+    constants.reqNames.patchUserSettings = "patchUserSettings"
 
   constants.thirdParty = {}
     'Nielsen ID token for integrating with Nielsen DAR via RAF
@@ -311,14 +314,6 @@ Function getConstants()
     constants.urls.adsBaseUrl = "http://ads.adrise.tv/"
     ' constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/rev/"
     constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/rev/"
-
-    constants.urls.account = {}
-      constants.urls.account.urlBase = "https://account.production-public.tubi.io"
-      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
-        constants.urls.account.urlBase = "https://account.staging-public.tubi.io"
-      end if
-      constants.urls.account.emailExists = constants.urls.account.urlBase + "/user/email_available"
-      constants.urls.account.login = constants.urls.account.urlBase + "/user/login"
       
     'contents url
     constants.urls.cms = {}
@@ -359,6 +354,18 @@ Function getConstants()
       constants.urls.users.history = constants.urls.users.urlBase + "/histories"
       constants.urls.users.config = constants.urls.users.urlBase + "/config/" + constants.platform
       constants.urls.users.settings = constants.urls.users.urlBase + "/users" ' + "/:id/settings"
+      constants.urls.users.codeStatus = constants.urls.users.urlBase + "/code/status"
+
+    ' account urls
+    constants.urls.account = {}
+      constants.urls.account.urlBase = "https://account.production-public.tubi.io"
+      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+        constants.urls.account.urlBase = "https://account.staging-public.tubi.io"
+      end if
+      constants.urls.account.emailExists = constants.urls.account.urlBase + "/user/email_available"
+      constants.urls.account.login = constants.urls.account.urlBase + "/user/login"
+      constants.urls.account.checkBirthday = constants.urls.account.urlBase + "/user/check_birthday_info"
+      constants.urls.account.deviceRegister = constants.urls.account.urlBase + "/device/register"
 
     'user event tracking url
     constants.urls.dataScience = {}
@@ -416,6 +423,7 @@ Function getConstants()
     constants.reqTypes.post = "POST"
     constants.reqTypes.put = "PUT"
     constants.reqTypes.del = "DELETE"
+    constants.reqTypes.patch = "PATCH"
 
   'common http request headers
   constants.headers = {}
@@ -580,6 +588,9 @@ Function getConstants()
   'UI properties that should be passed into the scene graph
   constants.ui = {}
 
+    constants.ui.ages = {}
+      constants.ui.ages.ageGate = 13
+
     'static - pre defined text used in the app
     constants.ui.terms = {}
       constants.ui.terms.categories = "Categories"
@@ -682,6 +693,13 @@ Function getConstants()
       constants.ui.backgroundTypes.linear = "linear"
       constants.ui.backgroundTypes.feature = "feature"
 
+    constants.ui.modes = {}
+      constants.ui.modes.standard = "standard"
+      constants.ui.modes.kids = "kids"  'the "normal" kids mode, when a user selects kids from the side nav
+      constants.ui.modes.kidsParental = "kidsParental"  'kids mode when a user has little kids or older kids selected via parental controls
+      constants.ui.modes.kidsAgeGate = "kidsAgeGate"  'a limited version of kids mode that a user sees if they fail the COPPA age gate
+      constants.ui.modes.latino = "latino"
+
     'Screen levels dictate the hierarchy of the app and prevent scenarios where users can get into infinite screen loops.
     'Screens cannot be pushed on top of a screen whose screenLevel is greater than theirs.
     'For example, if the home screen is screenLevel = 10, and the search screen is screenLevel = 20,
@@ -706,6 +724,7 @@ Function getConstants()
       constants.ui.screenLevels.activationCodeScreen = 90
       constants.ui.screenLevels.signUpScreen = 90
       constants.ui.screenLevels.signInScreen = 90
+      constants.ui.screenLevels.ageGateScreen = 300
       constants.ui.screenLevels.modalDialogScreen = 1000
 
     constants.ui.screenIds = {}
@@ -729,6 +748,7 @@ Function getConstants()
       constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
+      constants.ui.screenIds.ageVerificationScreen = "ageVerificationScreen"
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true

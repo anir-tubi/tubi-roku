@@ -27,10 +27,16 @@
   <script type="text/brightscript" uri="EpisodeScreenHelpers.brs" />
   <script type="text/brightscript" uri="SideNavHelpers.brs" />
   <script type="text/brightscript" uri="VideoHelpers.brs" />
-  <script type="text/brightscript" uri="LinearVideoPlayerScreenHelpers.brs" />
   <script type="text/brightscript" uri="SettingsScreenHelpers.brs" />
   <script type="text/brightscript" uri="SignInHelpers.brs" />
   <script type="text/brightscript" uri="ScreenStackHelpers.brs" />
+  <script type="text/brightscript" uri="LinearVideoPlayerScreenHelpers.brs" />
+  <script type="text/brightscript" uri="AgeVerificationScreenHelpers.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/FieldMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
+  <script type="text/brightscript" uri="../../tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
@@ -42,13 +48,9 @@
   <script type="text/brightscript" uri="../../../source/lib/CmsApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/UserDeviceApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
-  <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
-  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
-  <script type="text/brightscript" uri="../../tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
   
   <interface>
   
@@ -157,31 +159,6 @@
             translation="[1512,42]"
             opacity="1.0"
             visible="false"/>
-          <LayoutGroup
-            id="sponsorGroup"
-            layoutDirection="horiz"
-            vertAlignment="custom"
-            itemSpacings="[2]"
-            visible="false"
-            translation="[1512,120]">
-            <Label
-              id="sponsorPrefixText"
-              height="14"
-              width="195"
-              color="0x9699A3"
-              opacity="0.64"
-              translation="[0,18]">
-              <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-Bold.ttf"
-                size="19" />
-            </Label>         
-            <Poster
-              id="sponsorLogo"
-              opacity="1.0"
-              height="52"
-              width="125"/>        
-          </LayoutGroup>                       
         </Group>
       </Group>
 

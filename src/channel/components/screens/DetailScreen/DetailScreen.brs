@@ -30,7 +30,7 @@ Function init()
   m.top.observeField("hasTrailer", "onHasTrailer")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("isLoading", "onIsLoading")
-  m.top.observeField("kidsModeEnabled", "onKidsModeEnableChange")
+  m.top.observeField("disableBookmarks", "onDisableBookmarksChange")
 
   m.top.observeFieldScoped("stringQueueButton", "onStringChange")
   m.top.observeFieldScoped("stringNoQueueButton", "onStringChange")
@@ -59,6 +59,7 @@ Function init()
       video_id: 0
     }
   }
+
   if m.constants.deviceInfo.scaledUi = true then
     m.RelatedGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
@@ -123,15 +124,6 @@ Function onStringChange(message)
 End Function
 
 
-Function onKidsModeEnableChange()
-  if m.top.kidsModeEnabled = true
-    m.RelatedContentParentGroup.visible = false
-  else
-    m.RelatedContentParentGroup.visible = true
-  end if
-End Function
-
-
 Function onDescriptionSelected()
   tubiLog("DetailScreen.onDescriptionSelected")
   m.top.fullDescriptionSelected = true
@@ -193,33 +185,35 @@ Function onIsBookmark()
   addQueueIndex = m.NodeHelpers.getChildIndexById(menuItems, m.AddQueueMenuItem.id)
   removeQueueIndex = m.NodeHelpers.getChildIndexById(menuItems, m.RemoveQueueMenuItem.id)
 
-  if m.top.isBookmark = false
-    if addQueueIndex = -1
-    'add queue item doesn't exist
-      if removeQueueIndex > -1
-        'remove queue item does exist so replace remove queue item with add queue item
+  if m.top.disableBookmarks = false
+    if m.top.isBookmark = false
+      if addQueueIndex = -1
+      'add queue item doesn't exist
+        if removeQueueIndex > -1
+          'remove queue item does exist so replace remove queue item with add queue item
+          m.Menu.content.removeChildIndex(removeQueueIndex)
+          m.Menu.content.insertChild(m.AddQueueMenuItem, removeQueueIndex)
+        else
+          m.Menu.content.appendChild(m.AddQueueMenuItem)
+        end if
+      else if removeQueueIndex > -1
+        'both add to queue and remove from queue items exist... this shouldn't happen
         m.Menu.content.removeChildIndex(removeQueueIndex)
-        m.Menu.content.insertChild(m.AddQueueMenuItem, removeQueueIndex)
-      else
-        m.Menu.content.appendChild(m.AddQueueMenuItem)
       end if
-    else if removeQueueIndex > -1
-      'both add to queue and remove from queue items exist... this shouldn't happen
-      m.Menu.content.removeChildIndex(removeQueueIndex)
-    end if
-  else
-    if removeQueueIndex = -1
-      'remove queue item doesn't exist
-      if addQueueIndex > -1
-        'add queue item exists, so replace add queue item with remove queue item
-        m.Menu.content.removeChildIndex(addQueueIndex)
-        m.Menu.content.insertChild(m.RemoveQueueMenuItem, addQueueIndex)
-      else
-        m.Menu.content.appendChild(m.RemoveQueueMenuItem)
+    else
+      if removeQueueIndex = -1
+        'remove queue item doesn't exist
+        if addQueueIndex > -1
+          'add queue item exists, so replace add queue item with remove queue item
+          m.Menu.content.removeChildIndex(addQueueIndex)
+          m.Menu.content.insertChild(m.RemoveQueueMenuItem, addQueueIndex)
+        else
+          m.Menu.content.appendChild(m.RemoveQueueMenuItem)
+        end if
+      else if addQueueIndex > -1
+        'both add to queue and remove from queue items exist... this shouldn't happen
+        m.Menu.content.removeChildIndex(m.AddQueueMenuItem)
       end if
-    else if addQueueIndex > -1
-      'both add to queue and remove from queue items exist... this shouldn't happen
-      m.Menu.content.removeChildIndex(m.AddQueueMenuItem)
     end if
   end if
 End Function
@@ -279,6 +273,24 @@ Function onIsLoading()
     m.RelatedContentGroup.visible = not m.top.isLoading
   else
     m.RelatedContentGroup.visible = false
+  end if
+End Function
+
+
+Function onDisableBookmarksChange()
+  if m.top.disableBookmarks = true
+    ' remove any Add to My List or Remove from My List items that might be showing
+    menuItems = m.Menu.content
+    addQueueIndex = m.NodeHelpers.getChildIndexById(menuItems, m.AddQueueMenuItem.id)
+    removeQueueIndex = m.NodeHelpers.getChildIndexById(menuItems, m.RemoveQueueMenuItem.id)
+
+    if addQueueIndex > -1
+      m.Menu.content.removeChildIndex(addQueueIndex)
+    end if
+
+    if removeQueueIndex > -1
+      m.Menu.content.removeChildIndex(removeQueueIndex)
+    end if
   end if
 End Function
 

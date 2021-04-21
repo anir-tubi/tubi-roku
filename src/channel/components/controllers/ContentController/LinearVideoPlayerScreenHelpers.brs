@@ -104,7 +104,7 @@ Function maximizeLinearPlayer(content)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
   if videoPlayer <> invalid and videoPlayer.content <> invalid
-    if currentScreen() = invalid or currentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+    if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
       pushScreen(videoPlayer, true, true)
     end if
     bAnimate = false
@@ -483,7 +483,7 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
     end if
   end if
 
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
     if bContinueToPlay = true
       popScreen(true, true)

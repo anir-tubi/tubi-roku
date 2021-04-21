@@ -1,4 +1,5 @@
 Function init()
+  m.constants = m.global.constants
   m.SettingsMenu = m.top.findNode("SettingsMenu")
   m.SettingsMenuGroup = m.top.findNode("SettingsMenuGroup")
   m.top.list = m.SettingsMenu
@@ -6,7 +7,7 @@ Function init()
   m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
   m.SettingsMenu.focusBitmapBlendColor = m.global.theme.focused
   m.SettingsMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-fhd.9.png"
-  if m.global.constants.deviceInfo.scaledUi = true
+  if m.constants.deviceInfo.scaledUi = true
     m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
     m.SettingsMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-hd.9.png"
   end if
@@ -14,9 +15,16 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocus")
 
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
+  m.top.observeFieldScoped("uiMode", "onUiModeChange")
   m.global.observeField("theme", "onThemeChange")
 
   setSettingsMenuStrings()
+
+  if UCase(m.constants.deviceInfo.countryCode) <> "US"
+    removeDoNotSellButton()
+  end if
+
+  resetSettingsMenuVerticalPosition()
 End Function
 
 
@@ -26,30 +34,16 @@ End Function
 
 
 Function setSettingsMenuStrings()
-    ParentalControls =  m.top.findNode("ParentalControls")
-    ParentalControls.title = getTranslation("screenSettings_menu_parentalControls")
+    ParentalControlsButton =  m.top.findNode("ParentalControlsButton")
+    ParentalControlsButton.title = getTranslation("screenSettings_menu_parentalControls")
     AboutButton =  m.top.findNode("AboutButton")
     AboutButton.title = getTranslation("screenSettings_menu_about")
     PrivacyPolicyButton =  m.top.findNode("PrivacyPolicyButton")
     PrivacyPolicyButton.title = getTranslation("screenSettings_menu_privacyPolicy")
     TermsOfServiceButton =  m.top.findNode("TermsOfServiceButton")
     TermsOfServiceButton.title = getTranslation("screenSettings_menu_tos")
-    if UCase(m.global.constants.deviceInfo.countryCode) = "US"
-      '//We only show the DO Not Sell Policy in the US. It is only applicable to CA residents but we show it to all of US in case CA residents are traveling within the US.
-      DoNotSellPolicyButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
-      DoNotSellPolicyButton.title = getTranslation("screenSettings_menu_doNotSellPolicy")
-      DoNotSellPolicyButton.id = "DoNotSellPolicyButton"
-      DoNotSellPolicyButton.iconUrl ="pkg:/images/icon-dns.png" 
-
-      '//Offet the vertical placement of the list when adding a new list item
-      nYOffset = -1 * (m.SettingsMenu.itemSize[1] + m.SettingsMenu.itemSpacing[1]) 
-      m.SettingsMenuGroup.translation = [0, nYOffset]
-      
-      SettingsMenuContent =  m.top.findNode("SettingsMenuContent")
-      '//::HARDCODE:: hardcode the location of the new many item at the 4th index spot
-      SettingsMenuContent.insertChild(DoNotSellPolicyButton, 4)
-      
-    end if
+    DoNotSellPolicyButton = m.top.findNode("DoNotSellPolicyButton")
+    DoNotSellPolicyButton.title = getTranslation("screenSettings_menu_doNotSellPolicy")
 End Function
 
 
@@ -74,4 +68,48 @@ Function onComponentFocus()
   else
     m.top.opacity = 0.3
   end if
+End Function
+
+
+Function onUiModeChange(msg)
+  uiMode = msg.getData()
+  if uiMode = m.constants.ui.modes.kidsAgeGate
+    removeParentalButton()
+    removeSignInButton()
+    resetSettingsMenuVerticalPosition()
+  end if
+End Function
+
+
+Function removeParentalButton()
+  parentalControlsButton = m.top.findNode("ParentalControlsButton")
+  removeButton(parentalControlsButton)
+End Function
+
+
+Function removeSignInButton()
+  signInOutButton = m.top.findNode("SignInOutButton")
+  removeButton(SignInOutButton)
+End Function
+
+
+Function removeDoNotSellButton()
+  doNotSellPolicyButton = m.top.findNode("DoNotSellPolicyButton")
+  removeButton(DoNotSellPolicyButton)
+End Function
+
+
+' @button: roSGNode, a DetailMenuItemContentNode used to create the buttons in the settings menu
+Function removeButton(button)
+  m.SettingsMenu.content.removeChild(button)
+End Function
+
+
+Function resetSettingsMenuVerticalPosition()
+  ' the default translation is [0, 0] and the default positioning on the page is due to the
+  ' translation in SettingsScreen.PanelSet.translation, which assumes 5 items in the settings menu.
+  ' We need to adjust the vertical translation if there are more or less than 5 items in the settings menu.
+  numButtons = m.SettingsMenu.content.getChildCount()
+  ytrans = (5 - numButtons) * (m.SettingsMenu.itemSize[1] + m.SettingsMenu.itemSpacing[1])
+  m.SettingsMenuGroup.translation = [0, ytrans]
 End Function

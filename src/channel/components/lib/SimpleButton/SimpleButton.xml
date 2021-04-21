@@ -34,7 +34,8 @@
       opacity="1.0"
       height="80"
       horizAlign="center"
-      vertAlign="center">
+      vertAlign="center"
+      translation="[0,6]">
       <Font
         role="font"
         uri="pkg:/fonts/Vaud-SemiBold.ttf"

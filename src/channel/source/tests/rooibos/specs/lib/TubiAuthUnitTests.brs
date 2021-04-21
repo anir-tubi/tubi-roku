@@ -14,7 +14,7 @@ Function TubiAuthSetup()
   }
   
   m.oldAuthInfo = {
-    expireTime: 123456
+    expireTime: "123456"
     accessToken: "Some555Other666String777"
     refreshToken: "Some111Refresh999String000"
     userId: "6735"
@@ -33,6 +33,8 @@ Function TubiAuthSetup()
     access_token: "abcdefgHIJKKV1QiLCJhbGciOiJIUzI1NiJ9"
     refresh_token: "LMNOPquestuvJKV1QiLCJhbGciOiJIUzI1NiJ9"
     expires_in: 1209600
+    authType: "EMAIL"
+    has_age: true
   }  
     
   ' mocks
@@ -133,6 +135,12 @@ Function tubiAuth_formatAuthInfoFromServer_test()
   m.assertEqual(authInfo.refreshToken, serverAuthInfo.refresh_token)
   m.assertNotInvalid(authInfo.expireTime)
   m.assertEqual(authInfo.expireTime, expireCheck)
+
+  m.assertNotInvalid(authInfo.authType)
+  m.assertEqual(authInfo.authType, serverAuthInfo.authType)
+
+  m.assertNotInvalid(authInfo.hasAge)
+  m.assertEqual(authInfo.hasAge, serverAuthInfo.has_age.toStr())
 End Function
 
 
@@ -280,6 +288,58 @@ Function tubiAuth_deleteAuthInfo_test()
     authInfoStillExists = true
   end if
   m.assertFalse(authInfoStillExists)
+End Function
+
+
+'@Test updateAuthInfoWithAge unit tests
+Function tubiAuth_updateAuthInfoWithAge_test()
+  auth = m.auth
+  hasAge = true
+
+  ' test when there is an existing authInfo in the registry
+  dateTime = CreateObject("roDateTime")
+  timeInSecs = dateTime.asSeconds() + 100
+  authInfo = {
+    expireTime: timeInSecs.toStr()
+    accessToken: "Some555Other666String777"
+    refreshToken: "Some111Refresh999String000"
+    userId: "6735"
+  }
+
+  ' save auth info as a precursor to the test - updateAuthInfo() expects an authInfo to exist
+  ' in the registry. To be deleted at end of this test function.
+  auth.authRegSection = "testauth"
+  auth.saveAuthInfo(authInfo)
+
+  newAuthInfo = auth.updateAuthInfoWithAge(hasAge)
+  savedAuthInfo = auth.getAuthInfo()
+
+  m.assertNotInvalid(newAuthInfo)
+  m.assertAAHasKeys(newAuthInfo, [
+    "expireTime"
+    "accessToken"
+    "refreshToken"
+    "userId"
+    "hasAge"
+  ])
+  m.assertEqual(newAuthInfo.hasAge, true)
+
+  m.assertNotInvalid(savedAuthInfo)
+  m.assertAAHasKeys(savedAuthInfo, [
+    "expireTime"
+    "accessToken"
+    "refreshToken"
+    "userId"
+    "hasAge"
+  ])
+  m.assertEqual(savedAuthInfo.hasAge, true)
+
+  ' remove the test auth registry
+  auth.deleteAuthInfo()
+
+  ' test when there is no authInfo in the registry (guest user)
+  newAuthInfo = auth.updateAuthInfoWithAge(hasAge)
+  m.assertInvalid(newAuthInfo)
 End Function
 
 
@@ -551,7 +611,7 @@ End Function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-'@It visit functions in Auth.brs
+'@It tests visit functions in Auth.brs
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -562,9 +622,7 @@ Function tubiAuth_visit_BeforeEach() as void
   
   'use a fake section so not to disturb actual first visit info
   m.tubiAuth.firstVisitRegSection = "testVisit"
-  'clear out any leftover info in the "testVisit" section
-  m.tubiAuth.regDelete("firstVisit", m.tubiAuth.firstVisitRegSection)
-    
+
 End Function
 
 
@@ -575,7 +633,7 @@ Function tubiAuth_getFirstVisit_test()
   m.tubiAuth.regWrite("firstVisit", "56789", m.tubiAuth.firstVisitRegSection)
   firstVisit = m.tubiAuth.getFirstVisit()
   m.AssertEqual(firstVisit, 56789)
-  
+
 End Function
 
 
@@ -591,4 +649,130 @@ Function tubiAuth_setFirstVisit_test()
   m.assertNotInvalid(registryFirstVisit)
   m.assertEqual(firstVisit, registryFirstVisit.toInt())
   
+End Function
+
+
+'@AfterEach
+Function tubiAuth_visit_AfterEach() as void
+  'clear out any leftover info in the "testVisit" section
+  m.tubiAuth.regDelete("firstVisit", m.tubiAuth.firstVisitRegSection)
+End Function
+
+
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'@It tests hasAge functions in Auth.brs
+'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+'@BeforeEach
+Function tubiAuth_hasAge_BeforeEach() as void
+  m.tubiAuth = m.auth
+
+  'use a fake section so not to disturb actual first visit info
+  m.tubiAuth.guestUserHasAgeRegSection = "testHasAge"
+End Function
+
+
+'@Test getHasAge unit tests
+Function tubiAuth_getHasAge_test()
+  'stub a value into the registry that we will attempt to get for not expired
+  dateTime = CreateObject("roDateTime")
+  nowTime = dateTime.AsSeconds()
+  hasAgeStored = {
+    expireTime: nowTime + 500
+    hasAge: true
+  }
+  hasAgeStored = FormatJSON(hasAgeStored)
+  m.tubiAuth.regWrite("ageInfo", hasAgeStored, m.tubiAuth.guestUserHasAgeRegSection)
+
+  hasAgeInfo = m.tubiAuth.getGuestUserHasAgeInfo()
+
+  m.AssertNotInvalid(hasAgeInfo)
+  m.AssertEqual(hasAgeInfo.hasAge, true)
+  m.AssertEqual(hasAgeInfo.expired, false)
+
+  'stub a value into the registry that we will attempt to get for expired
+  hasAgeStored = {
+    expireTime: nowTime - 500
+    hasAge: true
+  }
+  hasAgeStored = FormatJSON(hasAgeStored)
+  m.tubiAuth.regWrite("ageInfo", hasAgeStored, m.tubiAuth.guestUserHasAgeRegSection)
+
+  hasAgeInfo = m.tubiAuth.getGuestUserHasAgeInfo()
+
+  m.AssertNotInvalid(hasAgeInfo)
+  m.AssertEqual(hasAgeInfo.hasAge, true)
+  m.AssertEqual(hasAgeInfo.expired, true)
+
+  ' test when there is no hasAge information in the registry
+  m.tubiAuth.regDelete("ageInfo", m.tubiAuth.guestUserHasAgeRegSection)
+
+  hasAgeInfo = m.tubiAuth.getGuestUserHasAgeInfo()
+
+  m.AssertNotInvalid(hasAgeInfo)
+  m.AssertEqual(hasAgeInfo.hasAge, false)
+  m.AssertEqual(hasAgeInfo.expired, true)
+End Function
+
+
+'@Test setHasAge unit tests
+Function tubiAuth_setHasAge_test()
+  dateTime = CreateObject("roDateTime")
+  nowTime = dateTime.AsSeconds()
+
+  ' test when hasAge param is true
+    ' test what is returned by the function is correct
+  hasAgeInfo = m.tubiAuth.setGuestUserHasAgeInfo(true)
+  m.assertNotInvalid(hasAgeInfo)
+  m.assertTrue(hasAgeInfo.hasAge)
+  m.assertType(hasAgeInfo.expireTime, "roInteger")
+  m.assertTrue(hasAgeInfo.expireTime >= nowTime)
+
+    'test what has been saved to the registry is correct
+  registryHasAgeInfo = m.tubiAuth.regRead("ageInfo", m.tubiAuth.guestUserHasAgeRegSection)
+  registryHasAgeInfo = ParseJson(registryHasAgeInfo)
+  m.assertNotInvalid(registryHasAgeInfo)
+  m.assertType(hasAgeInfo.expireTime, "roInteger")
+  m.assertTrue(hasAgeInfo.expireTime >= nowTime)
+  m.assertTrue(registryHasAgeInfo.hasAge)
+
+  ' test when hasAge param is false
+    ' test what is returned by the function is correct
+  hasAgeInfo = m.tubiAuth.setGuestUserHasAgeInfo(false)
+  m.assertNotInvalid(hasAgeInfo)
+  m.assertFalse(hasAgeInfo.hasAge)
+  m.assertType(hasAgeInfo.expireTime, "roInteger")
+  m.assertTrue(hasAgeInfo.expireTime >= nowTime)
+
+    'test what has been saved to the registry is correct
+  registryHasAgeInfo = m.tubiAuth.regRead("ageInfo", m.tubiAuth.guestUserHasAgeRegSection)
+  registryHasAgeInfo = ParseJson(registryHasAgeInfo)
+  m.assertNotInvalid(registryHasAgeInfo)
+  m.assertType(hasAgeInfo.expireTime, "roInteger")
+  m.assertTrue(hasAgeInfo.expireTime >= nowTime)
+  m.assertFalse(registryHasAgeInfo.hasAge)
+
+  ' test when hasAge param is not boolean
+    ' test what is returned by the function is correct
+  hasAgeInfo = m.tubiAuth.setGuestUserHasAgeInfo("notBool")
+  m.assertNotInvalid(hasAgeInfo)
+  m.assertFalse(hasAgeInfo.hasAge)
+  m.assertType(hasAgeInfo.expireTime, "roInteger")
+  m.assertTrue(hasAgeInfo.expireTime >= nowTime)
+
+    'test what has been saved to the registry is correct
+  registryHasAgeInfo = m.tubiAuth.regRead("ageInfo", m.tubiAuth.guestUserHasAgeRegSection)
+  registryHasAgeInfo = ParseJson(registryHasAgeInfo)
+  m.assertNotInvalid(registryHasAgeInfo)
+  m.assertType(hasAgeInfo.expireTime, "roInteger")
+  m.assertTrue(hasAgeInfo.expireTime >= nowTime)
+  m.assertFalse(registryHasAgeInfo.hasAge)
+End Function
+
+
+'@AfterEach
+Function tubiAuth_hasAge_AfterEach() as void
+  'clear out any leftover info in the "testHasAge" section
+  m.tubiAuth.regDelete("ageInfo", m.tubiAuth.guestUserHasAgeRegSection)
 End Function

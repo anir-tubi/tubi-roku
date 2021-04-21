@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - Age verification screen allows user to enter a birthdate to confirm their age.
+ - Age calculation and confirmation happens on the backend and is handled by 
+ - AgeVerificationHelpers.brs
+ -->
+<component name="AgeVerificationScreen" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="AgeVerificationScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  
+  <interface>
+  
+    <!-- OUTPUT -->
+    
+      <!-- event that occurs when a user selects the Start Watching button -->
+      <field id="ageSubmitted" type="boolean" alias="AgeVerificationStartButton.selected"/>
+    
+      <!-- event that occurs when a user selects the back button -->
+      <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
+
+      <!-- the birthdate that the user has submitted. Should be in the form "YYYY-MM-DD" -->
+      <field id="birthdate" type="string" />
+
+  </interface>
+
+  <children>
+    <Group
+      id="AgeVerificationPageText">
+      <Label
+        id="AgeVerificationPageHeader"
+        color="0xFFFFFF"
+        horizAlign="left"
+        width="1668"
+        translation="[126,231]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="72" />
+      </Label>
+      <Label
+        id="AgeVerificationPageSubHeader"
+        color="0xF0F1F5"
+        opacity="0.8"
+        horizAlign="left"
+        width="1668"
+        translation="[126,315]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="33" />
+      </Label>
+    </Group>
+    <Group
+      id="AgeVerificationNumberPadGroup"
+      translation="[126,402]">
+      <NumberPad
+        id="AgeVerificationNumberPad"        
+        />
+      <SimpleButton
+        translation="[0,434]"
+        id="AgeVerificationStartButton"
+        color="0x9699A3"
+        width="489"/>
+    </Group>
+    <Group
+      id="AgeVericationDateInfo"
+      translation="[906,504]">
+      <LayoutGroup
+        id="AgeVerificationUserDate"
+        layoutDirection="horiz"
+        itemSpacings="[12]">
+        <Rectangle
+          width="198">
+          <Poster
+            id="AgeVerificationMonthBg"
+            uri="pkg:/images/menu-focus-fhd.9.png"
+            width="198"
+            height="144"
+            opacity="1.0"/>
+          <Label
+            id="AgeVerificationMonthEntryBack"
+            color="0xFFFFFF"
+            width="198"
+            height="144"
+            horizAlign="center"
+            vertAlign="center"
+            opacity="0.64"
+            translation="[0,9]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="84"/>
+          </Label>
+          <Label
+            id="AgeVerificationMonthEntryFront"
+            color="0x000000"
+            width="198"
+            height="144"
+            horizAlign="center"
+            vertAlign="center"
+            opacity="1.0"
+            translation="[0,9]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="84"/>
+          </Label>
+          <Label
+            id="AgeVerificationMonth"
+            color="0xFFFFFF"
+            width="198"
+            horizAlign="center"
+            opacity="0.4"
+            translation="[0,168]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="33"/>
+          </Label>
+        </Rectangle>
+        <Rectangle
+          width="30">
+          <Label
+            text="/"
+            color="0xFFFFFF"
+            width="33"
+            height="144"
+            horizAlign="center"
+            vertAlign="center"
+            opacity="0.64"
+            translation="[0,9]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="84"/>
+          </Label>
+        </Rectangle>
+        <Rectangle
+          width="198">
+          <Poster
+            id="AgeVerificationDayBg"
+            uri="pkg:/images/menu-focus-fhd.9.png"
+            width="198"
+            height="144"
+            opacity="0.0"/>
+          <Label
+            id="AgeVerificationDayEntryBack"
+            color="0xFFFFFF"
+            width="198"
+            height="144"
+            horizAlign="center"
+            vertAlign="center"
+            opacity="0.64"
+            translation="[0,9]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="84"/>
+          </Label>
+          <Label
+            id="AgeVerificationDayEntryFront"
+            color="0x000000"
+            width="198"
+            height="144"
+            horizAlign="center"
+            vertAlign="center"
+            opacity="0"
+            translation="[0,9]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="84"/>
+          </Label>
+          <Label
+            id="AgeVerificationDay"
+            color="0xFFFFFF"
+            width="198"
+            horizAlign="center"
+            opacity="0.4"
+            translation="[0,168]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="33"/>
+          </Label>
+        </Rectangle>
+        <Rectangle
+          width="30">
+          <Label
+            text="/"
+            color="0xFFFFFF"
+            width="33"
+            height="144"
+            horizAlign="center"
+            vertAlign="center"
+            opacity="0.64"
+            translation="[0,9]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="84"/>
+          </Label>
+        </Rectangle>
+        <Rectangle
+          width="267">
+          <Poster
+            id="AgeVerificationYearBg"
+            uri="pkg:/images/menu-focus-fhd.9.png"
+            width="267"
+            height="144"
+            opacity="0.0"/>
+          <Label
+            id="AgeVerificationYearEntryBack"
+            color="0xFFFFFF"
+            width="267"
+            height="144"
+            horizAlign="center"
+            vertAlign="center"
+            opacity="0.64"
+            translation="[0,9]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="84"/>
+          </Label>
+          <Label
+            id="AgeVerificationYearEntryFront"
+            color="0x000000"
+            width="267"
+            height="144"
+            horizAlign="center"
+            vertAlign="center"
+            opacity="0"
+            translation="[0,9]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="84"/>
+          </Label>
+          <Label
+            id="AgeVerificationYear"
+            color="0xFFFFFF"
+            width="267"
+            horizAlign="center"
+            opacity="0.4"
+            translation="[0,168]">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="33"/>
+          </Label>
+        </Rectangle>
+      </LayoutGroup>
+    </Group>
+    <Label
+      id="AgeVericationDateTip"
+      translation="[0,759]"
+      color="0xFFFFFF"
+      horizAlign="center"
+      opacity="0.64">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="27" />
+    </Label>
+    <Label
+      id="AgeVericationErrorPrompt"
+      translation="[0,804]"
+      color="0xEB9C00"
+      horizAlign="center"
+      visible="false">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="27" />
+    </Label>
+  </children>
+</component>

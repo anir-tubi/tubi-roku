@@ -14,10 +14,16 @@ Function execInitializeUserData()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()
 
-  userCats = getInitalUserCategories(Bookmarks, true, true, true)
+  userCats = getInitialUserCategories(Bookmarks, true, true, true)
   ' enhance the auth tokens with the user profile information
   if authInfo <> invalid and userCats.userInfo <> invalid
-    authInfo.append(userCats.userInfo)
+    tempAuthInfo = userCats.userInfo
+    tempAuthInfo.append(authInfo)
+    authInfo = tempAuthInfo
+  end if
+
+  if authInfo = invalid
+    m.top.guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
   end if
   
   m.top.bookmarks = userCats.newBookmarks
@@ -58,7 +64,7 @@ Function execSignOut()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()
 
-  userCats = getInitalUserCategories(Bookmarks, true, false, false)
+  userCats = getInitialUserCategories(Bookmarks, true, false, false)
 
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
@@ -238,7 +244,7 @@ Function updateHistory()
 End Function
 
 
-Function getInitalUserCategories(Bookmarks, getHistory=true, getBookmarks=false, getUserInfo=false)
+Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false, getUserInfo=false)
   queuePort = CreateObject("roMessagePort")
   queue = TubiRequestQueue().create(queuePort)
   localBookmarkReqId = "bookmark"
@@ -331,7 +337,7 @@ Function execGetUserInfo()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()
 
-  result = getInitalUserCategories(Bookmarks, false, false, true)
+  result = getInitialUserCategories(Bookmarks, false, false, true)
   if result <> invalid and result.userInfo <> invalid
     ' Just in case settings have changed, refresh the auth token
     Auth.refreshAuthToken(authInfo, 5)

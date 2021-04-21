@@ -355,6 +355,14 @@ Function getTranslation_en_US()
       "description": "description of a dialog window that describes what the user should do to exit kids mode",
       "message": "To exit Kids, please update your parental controls in account settings."
     },
+    "dialog_kidsWelcome_title": {
+      "description": "A message welcoming the user to Tubi Kids",
+      "message": "Welcome to Tubi Kids"
+    },
+    "dialog_kidsWelcomeAgeGate_description": {
+      "description": "A description informing users they are only eligible to view Tubi in kids mode",
+      "message": "You are only eligible to view Tubi Kids at this time."
+    },
     "dialog_exitApp_title": {
       "description": "Title of ther dialog window that asks the user if they want to exit the app",
       "message": "Are You Sure?"
@@ -390,6 +398,10 @@ Function getTranslation_en_US()
     "dialog_signOut_button_ok": {
       "description": "label of the confirmation button of the dialog window that asks the user if they want to sign out of the app",
       "message": "Sign Out"
+    },
+    "error_check_birthdate_description": {
+      "description": "message letting the user know that they were not able to be signed in",
+      "message": "There was an issue when trying to sign you in. Please enter the channel and sign in again."
     },
     "screenActivationCode_audioGuide": {
       "description": "Display the activation code to people who cannot see.",
@@ -658,6 +670,54 @@ Function getTranslation_en_US()
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
       "message": "Resume"
+    },
+    "screenAgeVerification_network_issue": {
+      "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
+      "message": "Could not successfully send your birthdate to our servers."
+    },
+    "screenAgeVerification_header": {
+      "description": "A header message to let users know the value of sharing their birth date with Tubi",
+      "message": "Tubi is better when we know you."
+    },
+    "screenAgeVerification_sub_header": {
+      "description": "A sub header message to direct users to enter their birth date",
+      "message": "Enter your date of birth for a customized experience."
+    },
+    "screenAgeVerification_keypad_button": {
+      "description": "A message on the button below the birth date keypad that users should select once done inserting their birth date",
+      "message": "Start Watching"
+    },
+    "screenAgeVerification_month": {
+      "description": "A label explaining that the 2 digits above the label signify the month that was input by the user",
+      "message": "Month"
+    },
+    "screenAgeVerification_mm": {
+      "description": "A label showing that the user should enter 2 digits for their birthdate month",
+      "message": "MM"
+    },
+    "screenAgeVerification_day": {
+      "description": "A label explaining that the 2 digits above the label signify the day that was input by the user",
+      "message": "Day"
+    },
+    "screenAgeVerification_dd": {
+      "description": "A label showing that the user should enter 2 digits for their birthdate day",
+      "message": "DD"
+    },
+    "screenAgeVerification_year": {
+      "description": "A label explaining that the 4 digits above the label signify the year that was input by the user",
+      "message": "Year"
+    },
+    "screenAgeVerification_yyyy": {
+      "description": "A label showing that the user should enter four digits for their birthdate year",
+      "message": "YYYY"
+    },
+    "screenAgeVerification_tip": {
+      "description": "A tip about how to enter the birth date",
+      "message": "Tip: If your DOB is January 1, 2000, then enter 01/01/2000"
+    },
+    "screenAgeVerification_error_prompt": {
+      "description": "A message informing the user that they entered a date that is not valid",
+      "message": "It looks like you entered the wrong information."
     },
     "metadata_fullscreen_countdown_plural": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",

@@ -288,6 +288,92 @@ Function tubiTracking_getAnalyticsTile_test()
 End Function
 
 
+'@Test getAnalyticsSelector unit tests
+Function tubiTracking_getAnalyticsSelector_test()
+  Tracking = m.Tracking
+
+  ' test string selector
+  stringSelectorValues = {
+    options: "red, blue, pink, yellow"
+    selections: [2]
+    string_selector_type: "GENERIC_SURVEY" 'StringSelectorComponent.type enum
+    sub_type: "favorite-color"
+  }
+  stringSelector = Tracking.getAnalyticsSelector("string_selector", stringSelectorValues)
+
+  m.assertNotInvalid(stringSelector)
+  m.assertNotInvalid(stringSelector.string_selector)
+  m.assertNotInvalid(stringSelector.string_selector.options)
+  m.assertEqual(stringSelector.string_selector.options, "red, blue, pink, yellow")
+  m.assertNotInvalid(stringSelector.string_selector.selections)
+  m.assertEqual(stringSelector.string_selector.selections[0], 2)
+  m.assertNotInvalid(stringSelector.string_selector.string_selector_type)
+  m.assertEqual(stringSelector.string_selector.string_selector_type, "GENERIC_SURVEY")
+  m.assertNotInvalid(stringSelector.string_selector.sub_type)
+  m.assertEqual(stringSelector.string_selector.sub_type, "favorite-color")
+
+  ' test string selector empty selection
+  stringSelectorValues = {
+    options: "red, blue, pink, yellow"
+    selections: []
+    string_selector_type: "GENERIC_SURVEY" 'StringSelectorComponent.type enum
+    sub_type: "favorite-color"
+  }
+  stringSelector = Tracking.getAnalyticsSelector("string_selector", stringSelectorValues)
+
+  m.assertNotInvalid(stringSelector)
+  m.assertNotInvalid(stringSelector.string_selector)
+  m.assertNotInvalid(stringSelector.string_selector.options)
+  m.assertEqual(stringSelector.string_selector.options, "red, blue, pink, yellow")
+  m.assertNotInvalid(stringSelector.string_selector.selections)
+  m.assertEqual(stringSelector.string_selector.selections.count(), 0)
+  m.assertNotInvalid(stringSelector.string_selector.string_selector_type)
+  m.assertEqual(stringSelector.string_selector.string_selector_type, "GENERIC_SURVEY")
+  m.assertNotInvalid(stringSelector.string_selector.sub_type)
+  m.assertEqual(stringSelector.string_selector.sub_type, "favorite-color")
+
+  ' test content selector
+  tile1 = {
+    video_id: 34567
+    row: 1
+    col: 1
+  }
+  tile2 = {
+    video_id: 34568
+    row: 1
+    col: 2
+  }
+  tile3 = {
+    video_id: 34569
+    row: 1
+    col: 3
+  }
+  contentSelectorValues = {
+    tiles: [tile1, tile2, tile3]
+    selections: [1, 3]
+  }
+  contentSelector = Tracking.getAnalyticsSelector("content_selector", contentSelectorValues)
+
+  m.assertNotInvalid(contentSelector)
+  m.assertNotInvalid(contentSelector.content_selector)
+  m.assertNotInvalid(contentSelector.content_selector.tiles)
+  m.assertEqual(contentSelector.content_selector.tiles.count(), 3)
+  m.assertEqual(contentSelector.content_selector.tiles[0].video_id, 34567)
+  m.assertEqual(contentSelector.content_selector.tiles[1].video_id, 34568)
+  m.assertEqual(contentSelector.content_selector.tiles[2].video_id, 34569)
+  m.assertEqual(contentSelector.content_selector.tiles[0].row, 1)
+  m.assertEqual(contentSelector.content_selector.tiles[1].row, 1)
+  m.assertEqual(contentSelector.content_selector.tiles[2].row, 1)
+  m.assertEqual(contentSelector.content_selector.tiles[0].col, 1)
+  m.assertEqual(contentSelector.content_selector.tiles[1].col, 2)
+  m.assertEqual(contentSelector.content_selector.tiles[2].col, 3)
+  m.assertNotInvalid(contentSelector.content_selector.selections)
+  m.assertEqual(contentSelector.content_selector.selections.count(), 2)
+  m.assertEqual(contentSelector.content_selector.selections[0], 1)
+  m.assertEqual(contentSelector.content_selector.selections[1], 3)
+End Function
+
+
 '@Test getAnalyticsAdAdrise unit tests
 Function tubiTracking_getAnalyticsAdAdrise_test()
   Tracking = m.Tracking

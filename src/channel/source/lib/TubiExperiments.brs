@@ -43,6 +43,7 @@ Function TubiExperiments(constants) as Object
       roku_local_resume: {}
       roku_limit_containers: {}
       roku_top_nav: {}
+      roku_coppa: {}
     }
     defaultResources: {
       roku: {
@@ -59,7 +60,10 @@ Function TubiExperiments(constants) as Object
       }
       roku_top_nav : {
         roku_top_nav_experiment : {"enabled" : false, "to_top_of_page_upon_back": false, "espanolPlacement": "side-nav"}
-      } 
+      }
+      roku_coppa: {
+        roku_coppa_v1: {"enabled": false}
+      }
     }
     
 

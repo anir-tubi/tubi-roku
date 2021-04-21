@@ -136,7 +136,7 @@ Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 
       animationOptions.opacity = 1.0
     end if
   else
-    '// If the ending opacity is passed then overwrite the outOrIn string
+    '// If the ending opacity is passed then overwrite the value set by the outOrIn string
     if endingOpacity > 1
       endingOpacity = 1
     end if

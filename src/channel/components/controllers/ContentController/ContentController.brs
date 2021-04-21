@@ -1,5 +1,5 @@
 Function init()
-  tubiLog(" ")
+  tubiLog("")
   tubiLog("Init Scenegraph----------------")
   m._ = rodash()
   
@@ -21,15 +21,54 @@ Function init()
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
   m.cmsApi = CmsApi(m.constants, Request, Auth)
-  m.userDeviceApi = UserDeviceApi(m.constants, Request, Auth)
+  m.userDeviceApi = UserDeviceApi(m.constants)
+
+  m.background = m.top.findNode("ContentBackground")
+  m.background.color = m.constants.ui.colors.backgroundColor
+
+  m.uiGroup = m.top.findNode("uiGroup")
+  m.contentGroup = m.top.findNode("ContentGroup")
+  m.SideNav = m.top.findNode("SideNav")
+  m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
+  m.backgroundGroup = m.top.findNode("BackgroundGroup")
+  m.logoGroup = m.top.findNode("logoGroup")
+  m.logo = m.logoGroup.findNode("tubiLogo")
+  m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
+  m.logoEspanol = m.logoGroup.findNode("tubiEspanolLogo")
+  m.spinner = m.top.findNode("ContentControllerSpinner")
+  m.LinearVideoPlayerSpinner = m.top.findNode("LinearVideoPlayerSpinner")
+  m.playerFullscreenCountdownTimer = m.top.findNode("PlayerFullscreenCountdownTimer")
+  m.resumeAllowedTimer = m.top.findNode("ResumeAllowedTimer")
+
+  m.screenStack = m.top.findNode("ScreenStack")
+  m.screenStack.observeFieldScoped("isEmpty", "onScreenStackEmpty")
+  m.screenStack.observeFieldScoped("current", "onScreenChange")
+
+  ' the screen cache holds the top level screens in memory so they are not recreated and reloaded unecessarily
+  m.screenCache = {}
+
+  ' Set up global services
+  m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
+  m.global.addField("metadataFetchTask", "node", false)
+  m.global.metadataFetchTask = m.metadataFetchTask
+
+  m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
+  m.global.addField("trackingLoggingTask", "node", false)
+  m.global.trackingLoggingTask = m.trackingLoggingTask
+
+  ' initSideNav must run after m.global.trackingLoggingTask is set in case there are any experiments
+  ' within the side nav component that rely on trackingLoggingTask to send exposure events.
+  initSideNav()
 
   ' initialize states needed for various parts of kids mode
-  m.kidsModeEnabled = false  'is the kids mode UI visible
   m.kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
   if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
     m.kidsModeFeatureOn = true
   end if
-  m.latinoModeEnabled = false
+
+  ' TODO: Once MetadataFetchTask functionality is refactored to use the GeneralTask remove uiMode from m.global
+  m.global.addField("uiMode", "string", false)
+  setUiMode(m.constants.ui.modes.standard)
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeFieldScoped("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
@@ -40,34 +79,6 @@ Function init()
   m.top.observeFieldScoped("roInputInfo", "onInputInfoReceived")
   m.top.observeFieldScoped("fadeInContentController", "onFadeInContentController")
   m.top.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-  
-  ' Set up global services
-  m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
-  m.global.addField("metadataFetchTask", "node", false)
-  m.global.metadataFetchTask = m.metadataFetchTask
-
-  m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
-  m.global.addField("trackingLoggingTask", "node", false)
-  m.global.trackingLoggingTask = m.trackingLoggingTask
-
-  m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
-  
-  m.background = m.top.findNode("ContentBackground")
-  m.background.color = m.constants.ui.colors.backgroundColor
-
-  m.uiGroup = m.top.findNode("uiGroup")
-  m.contentGroup = m.top.findNode("ContentGroup")
-
-  m.backgroundGroup = m.top.findNode("BackgroundGroup")
-  m.logoGroup = m.top.findNode("logoGroup")
-  m.logo = m.logoGroup.findNode("tubiLogo")
-  m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
-  m.logoEspanol = m.logoGroup.findNode("tubiEspanolLogo")
-  
-  ' sponsorGroup will be shown only for Espanol screen
-  m.sponsorGroup = m.top.findNode("sponsorGroup")
-  m.sponsorPrefixText = m.sponsorGroup.findNode("sponsorPrefixText")
-  m.sponsorLogo = m.sponsorGroup.findNode("sponsorLogo")
   
   if m.constants.deviceInfo.language = "es"
     m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-large.png"
@@ -82,19 +93,17 @@ Function init()
   m.global.addField("historyIds", "node", false)
   m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
 
-  ' NOTE: global authInfo is mostly a formality since TubiAuth currently reads values from the registry, so
-  '       places that need authInfo don't need to reference m.global.
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid  ' indicates not logged in
-  m.global.observeFieldScoped("authInfo", "onAuthInfoChanged")
 
   m.authInfoReceived = false    'is the auth info returned from the registry
   m.authInfoRefreshed = true    'is the auth info refreshed after receiving a deeplink with a refresh token
+  m.ageVerificationComplete = false   'has the user verified their age?
   m.authTask = CreateObject("roSGNode", "AuthTask")
   m.authTask.observeFieldScoped("authInfo", "onStartupAuthInfoReceived")
   m.authTask.functionName = "execInitializeUserData"
   m.authTask.control = "RUN"
-     
+
   ' history updates during video playback
   m.updateHistoryTask = CreateObject("roSGNode", "AuthTask")
   m.updateHistoryTask.functionName = "updateHistory"
@@ -119,28 +128,9 @@ Function init()
   ' stack, it will be removed and we won't be able to send a proper NavigateToPageEvent.
   m.currentPageInfoAtDeeplinkInputEvent = invalid
 
-  m.screenStack = m.top.findNode("ScreenStack")
-  m.screenStack.observeFieldScoped("isEmpty", "onScreenStackEmpty")
-  m.screenStack.observeFieldScoped("current", "onScreenChange")
-
-  ' the screen cache holds the top level screens in memory so they are not recreated and reloaded unecessarily
-  m.screenCache = {}
-
-  m.SideNav = m.top.findNode("SideNav")
-  initSideNav()
-  
-  m.spinner = m.top.findNode("ContentControllerSpinner")
-  m.LinearVideoPlayerSpinner = m.top.findNode("LinearVideoPlayerSpinner")
-
   m.inactivityTimer = m.top.findNode("InactivityTimer")
   m.inactivityTimer.observeFieldScoped("fire", "onInactivityTimer")
   m.inactivityTimer.control = "start"
-
-
-  m.playerFullscreenCountdownTimer = m.top.findNode("PlayerFullscreenCountdownTimer")
-  m.resumeAllowedTimer = m.top.findNode("ResumeAllowedTimer")
-  
-  m.appLoadStopwatch = CreateObject("roTimespan")
 
   ' Set to the category id when content is launched from category screen,
   ' or set to invalid elsewhere
@@ -161,15 +151,15 @@ End Function
 
 ' onFadeInContentController callback will be triggered once the launch animation logo got finished
 Function onFadeInContentController()
-
+  tubiLog("ContentController.onFadeInContentController")
   fadeInUiGroup = customFadeIn(m.uiGroup, 2, 0.5)
   fadeInUiGroup.observeField("state", "onUiGroupFadeStateChange")
 
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.isInFocusChain() = false
   
     ' isUpgradeModalOpened will be true if constants.showUpgradeAlert is true
-    ' focus currentscreen only if the upgradeModal is closed or disabled
+    ' focus currentScreen only if the upgradeModal is closed or disabled
     
     isUpgradeModalOpened = false
     for i=0 to m.top.getChildCount()-1
@@ -263,9 +253,9 @@ End Function
 
 ' Call this function when the left or back buttons are pressed and the side nav should be opened.
 Function openSideNavFromButton()
-  currentScreen = currentScreen()
-  if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and currentScreen <> invalid and currentScreen.topNavHasFocus = true 
-    '//If Top nav is in focus, then report an anaytic event that user is opening the sidenav by pressing the back button and coming from the top nav 
+  currentScreen = getCurrentScreen()
+  if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and currentScreen <> invalid and currentScreen.topNavHasFocus = true
+    '//If Top nav is in focus, then report an anaytic event that user is opening the sidenav by pressing the back button and coming from the top nav
     trackingPageInfo = currentScreen.trackingPageInfo
     focusedNavId = m.constants.ui.screenIdToSideNavId[currentScreen.id]
     buttonID = m.Tracking.sideNavPageMap[focusedNavId]
@@ -319,15 +309,27 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       end if
 
       if m.SideNav.opened = false
-        if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and currentScreen().topNavHasFocus = true and currentScreen().id <> m.constants.ui.screenIds.homeScreen
+        if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and getCurrentScreen().topNavHasFocus = true and getCurrentScreen().id <> m.constants.ui.screenIds.homeScreen
           '//A homescreen is being displayed but it is not the default homescreen and the top nav is in focus. Should go back to the default homescreen.
           goToFirstTopNavOptionFromAnotherTopNavOption()
         else if m.SideNav.visible = true
           openSideNavFromButton() '//"BUTTON_BACK"
         else if m.screenStack.getChildCount() > 1
+          oldTopScreen = getCurrentScreen()
+          if oldTopScreen.id = m.constants.ui.screenIds.espanolScreen
+            ' exiting the espanol experience, so update the uiMode which will be referenced
+            ' in subsequent function calls in order to display the correct UI.
+            setUiMode(m.constants.ui.modes.standard)
+          end if
+
           popScreen(true, true)
-          topScreen = currentScreen()
-          sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
+
+          newTopScreen = getCurrentScreen()
+          if newTopScreen.id = m.constants.ui.screenIds.espanolScreen
+            setUiMode(m.constants.ui.modes.latino)
+          end if
+
+          sideNavId = m.constants.ui.screenIdToSideNavId[newTopScreen.id]
           if sideNavId <> invalid
             focusSideNavOption(sideNavId)
           end if
@@ -342,13 +344,19 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           m.deeplinkContent = invalid
         end if
       else if m.SideNav.opened = true
+        ' Side nav is opened, so pop the screen on back button press to reveal the screen below.
+        ' The screen below will always be the home screen, if the side nav is open.
         if m.screenStack.getChildCount() > 1
-          '//Most likely this condition only happens when user is on the homescreen
-          '//::TODO::SIDENAV - add the condition when the count() = 1 but the screen is not the homescreen. 
-          '//     Show display homescreen. This happens for root activation screen.
+          oldTopScreen = getCurrentScreen()
+          if oldTopScreen.id = m.constants.ui.screenIds.espanolScreen
+            ' exiting the espanol experience, so update the uiMode which will be referenced
+            ' in subsequent function calls in order to display the correct UI.
+            setUiMode(m.constants.ui.modes.standard)
+          end if
+
           popScreen(true, true)
-          topScreen = currentScreen()
-          sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
+          newTopScreen = getCurrentScreen()
+          sideNavId = m.constants.ui.screenIdToSideNavId[newTopScreen.id]
           if sideNavId <> invalid
             focusSideNavOption(sideNavId)
             m.SideNav.setFocus(true)
@@ -356,7 +364,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             hideNavMenu(false)
           end if
         else
-          topScreen = currentScreen()
+          topScreen = getCurrentScreen()
           displayExitModal(topScreen.trackingPageInfo)
         end if
       end if
@@ -391,8 +399,8 @@ Function onComponentFocus()
   if m.top.isInFocusChain() and m.top.hasFocus() 
     if m.SideNav.opened = true
       displayNavMenu()
-    else if currentScreen() <> invalid
-      currentScreen().setFocus(true)
+    else if getCurrentScreen() <> invalid
+      getCurrentScreen().setFocus(true)
     end if
   end if
 End Function
@@ -456,13 +464,45 @@ Function startUserExperience()
       ' which is necessary to proceed past this step if m.authInfoRefreshed was set to false, but the user was already signed in.
       onAuthInfoRefreshed()
     end if
+  else if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1").enabled = true and m.ageVerificationComplete <> true
+    ' check if we have age information for the user
+    if m.global.authInfo <> invalid
+      if m.global.authInfo.hasAge <> true
+        ' the user is a signed in user who has not been age verified, we should:
+        ' 1) check if the backend has an age for the user
+        ' 2) if not, show the age verification screen
+        ' 3) upon getting a valid birthdate for the user, PATCH the user record on the backend
+        checkBirthdayInfo = m.userDeviceApi.checkBirthdayInfo(m.global.authInfo.userId)
+        m.makeRequest({
+          url: checkBirthdayInfo.url
+          requestType: m.constants.reqNames.checkBirthdayInfo
+          options: checkBirthdayInfo.options
+          successCallback: onBirthdayCheckSuccess
+          errorCallback: onBirthdayCheckError
+          responseType: "assocarray"
+        })
+      else
+        ' the user is a signed in user who has been age verfied, so set m.ageVerificationComplete = true
+        ' and recursively call this function so we can move past the m.ageVerificationComplete check
+        m.ageVerificationComplete = true
+        startUserExperience()
+      end if
+    else if m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.expired = false
+      ' the user is a guest user for whom we have previously stored hasAge info, and whose hasAge info
+      ' has not yet expired, so set m.ageVerificationComplete = true and recursively call this
+      ' function so we can move past the m.ageVerificationComplete check.
+      m.ageVerificationComplete = true
+      startUserExperience()
+    else
+      ' the user is a guest user who has not been age verified or whose hasAge info has expired,
+      ' so show the age verification screen.
+      showContentGroup()
+      m.spinner.visible = false
+      showAgeVerificationScreenAtStartup()
+    end if
   else
     ' All of the above checked values are true, so we are ready to start the channel UI
-    
-    m.trackingLoggingTask.trackEvent = {
-      type: "active"
-      values: {}
-    }
+    showContentGroup()
 
     ' Since we're ready to start the channel, make sure the loading spinner is hidden
     root = m.top.getScene()
@@ -480,8 +520,7 @@ Function startUserExperience()
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
       ' whether we were logged in or not.
-      m.contentGroup.visible = true
-      enableKidsModeUI(false) '//when deeplinking, exit out of kids mode because we cannot guarantee that the video is kid appropriate so the UI should not make the user think we're still in kids mode
+      setUiModeFromState()
       showDetailScreen(m.deeplinkContent, false)
     else
       startChannel()
@@ -533,24 +572,21 @@ Function onInputInfoReceived()
     inputInfo = m.top.roInputInfo
     
     if inputInfo.type = "deeplink"
-      kidsModeAtStart = false
-      if m.kidsModeEnabled = true
-        kidsModeAtStart = true
-      end if
-
-      if kidsModeAtStart = true
-        'turn off kids mode for input deeplinks (ie. voice commands)
-        enableKidsModeUI(false)
-      end if
-
       resetSideNav(false)
       videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
       stopVideoContent(videoPlayer) 'sets m.handlingDeeplinkInputEvent = false and m.deeplinkContent = invalid
       returnToPreviousScreenFromLinearVideo(false)
 
-      if kidsModeAtStart = true
+      if m.uiMode = m.constants.ui.modes.kids
+        ' turn off kids mode for input deeplinks (ie. voice commands)
+        ' Normal kids mode allows users to exit kids mode, so treat voice command deeplink as if
+        ' user is exiting kids mode.
+        ' Keeping the "kidsAgeGate" and "kidsParental" uiModes will prevent voice command deeplinks
+        ' from being successful unless the content is kids content.
+        setUiMode(m.constants.ui.modes.standard)
+
         ' remove all screens if in kids mode so that when backing out of the details screen,
-        ' the home screen will be re-populated as expected
+        ' the home screen will be re-populated as expected to the standard UI.
         shrinkScreenStack(0)
         emptyScreenCache()
       end if
@@ -560,7 +596,7 @@ Function onInputInfoReceived()
       m.deeplinkContent = createDeeplinkContentFromStartupArgs(inputInfo)
       m.handlingDeeplinkInputEvent = true
 
-      currentScreen = currentScreen()
+      currentScreen = getCurrentScreen()
       if currentScreen <> invalid
         m.currentPageInfoAtDeeplinkInputEvent = currentScreen.trackingPageInfo
       end if
@@ -764,7 +800,16 @@ End Function
 
 ' is the home screen's top nav enabled
 Function isTopNavHomeScreenEnabled()
-  bReturn = (getExperimentResource("roku_top_nav", "roku_top_nav_experiment", true).enabled = true and m.constants.deviceInfo.countryCode <> invalid and UCase(m.constants.deviceInfo.countryCode) = "US" and m.kidsModeEnabled = false)
+  bReturn = false
+
+  if getExperimentResource("roku_top_nav", "roku_top_nav_experiment", false).enabled = true
+    if m.constants.deviceInfo.countryCode <> invalid and UCase(m.constants.deviceInfo.countryCode) = "US"
+      if isKidsUIOn() = false
+        bReturn = true
+      end if
+    end if
+  end if
+
   return bReturn
 End Function
 
@@ -837,7 +882,6 @@ Function onReloadUserCategoriesResponse(msg)
 End Function
 
 
-
 Function onHistoryQueueRefresh()
   tubiLog("ContentController.onHistoryQueueRefresh")
   m.authTask.unobserveFieldScoped("authInfo")
@@ -848,39 +892,110 @@ Function onHistoryQueueRefresh()
 End Function
 
 
-' What boolean value should be sent to the backend in terms of kids mode?
-Function shouldKidsModeBeSentToServer()
-  return m.kidsModeEnabled = true and isKidsModeEnabledByParentalControls() = false
+' @mode: string, one of the modes at constants.ui.modes
+Function setUiMode(mode)
+  TubiLog("ContentController.setUiMode: " + mode)
+  if mode = m.constants.ui.modes.standard
+    'standard
+    m.uiMode = mode
+
+    ' must set global thme prior to setting m.sideNav.uiMode, since the sideNav update
+    ' depends on the global theme.
+    if m.global.theme = invalid or m.global.theme.id <> m.constants.ui.themeIDs.default
+      m.global.theme = m.constants.ui.themes.default
+    end if
+
+    m.sideNav.uiMode = mode
+    m.backgroundGroup.kidsMode = false
+    m.trackingLoggingTask.analyticsAppMode = "DEFAULT_MODE"
+
+    hideKidsLogo()
+    hideEspanolLogo()
+    showTubiLogo()
+  else if mode = m.constants.ui.modes.kids
+    'kids
+    if m.kidsModeFeatureOn
+      m.uiMode = mode
+      setCommonKidsModeElements()
+      m.sideNav.uiMode = mode
+    end if
+  else if mode = m.constants.ui.modes.kidsAgeGate
+    'kids mode due to age gating
+    if m.kidsModeFeatureOn
+      m.uiMode = mode
+      setCommonKidsModeElements()
+      m.sideNav.uiMode = mode
+    end if
+  else if mode = m.constants.ui.modes.kidsParental
+    ' kids mode due to parental controls
+    if m.kidsModeFeatureOn
+      m.uiMode = mode
+      setCommonKidsModeElements()
+      m.sideNav.uiMode = mode
+    end if
+  else if mode = m.constants.ui.modes.latino
+    'latino
+    m.uiMode = mode
+    if m.global.theme = invalid or m.global.theme.id <> m.constants.ui.themeIDs.default
+      m.global.theme = m.constants.ui.themes.default
+    end if
+    m.sideNav.uiMode = mode
+    m.backgroundGroup.kidsMode = false
+    m.trackingLoggingTask.analyticsAppMode = "LATINO_MODE"
+    hideTubiLogo()
+    hideKidsLogo()
+    showEspanolLogo()
+  end if
+
+  ' How to access uiMode:
+  ' m.uiMode can be accessed directly in the controller context;
+  ' screens and child components of screens should have uiMode passed down to them from the controller context;
+  ' GeneralTask parsers can have uiMode passed as a custom field on the AA passed to makeRequest()
+  ' Until MetadataFetch task can be replaced by the GeneralTask, MetadataFetchTask must access uiMode via a global
+  m.global.uiMode = m.uiMode
+
+  tellScreensIfKidsModeBeSentToServer()
 End Function
 
 
-' enable (or disable) the kids mode UI
-Function enableKidsModeUI(bTurnOn = true)
-  TubiLog("ContentController.enableKidsModeUI")
-  if m.kidsModeFeatureOn = true
-    if bTurnOn = true
-      theme = m.constants.ui.themes.kidsMode
-      m.global.theme = theme
-    else
-      theme = m.constants.ui.themes.default
-      m.global.theme = theme
-    end if
-    m.kidsModeEnabled = bTurnOn 
-    m.backgroundGroup.kidsMode = bTurnOn 
-    setKidsModeInSideNav(bTurnOn)
-    tellScreensIfKidsModeBeSentToServer()
-
-    '//display proper logo
-    if bTurnOn = true
-      m.logoKids.visible = true
-      m.logo.visible = false
-    else 
-      m.logoKids.visible = false
-      m.logo.visible = true
-    end if
+Function setUiModeFromState()
+  if m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.hasAge = false
+    setUiMode(m.constants.ui.modes.kidsAgeGate)
+  else if isKidsModeEnabledByParentalControls() = true
+    setUiMode(m.constants.ui.modes.kidsParental)
   else
-    setKidsModeInSideNav(false)
+    setUiMode(m.constants.ui.modes.standard)
   end if
+End Function
+
+
+' a helper function to update the UI to a "kids mode" and which should only be
+' called from within setUiMode()
+Function setCommonKidsModeElements()
+  if m.kidsModeFeatureOn
+    if m.global.theme = invalid or m.global.theme.id <> m.constants.ui.themeIDs.kidsMode
+      m.global.theme = m.constants.ui.themes.kidsMode
+    end if
+
+    hideTubiLogo()
+    hideEspanolLogo()
+    showKidsLogo()
+    m.backgroundGroup.kidsMode = true
+    m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
+    tellScreensIfKidsModeBeSentToServer()      
+  end if
+End Function
+
+
+' What boolean value should be sent to the UAPI backend in terms of kids mode?
+Function shouldKidsModeBeSentToServer()
+  if m.uiMode = m.constants.ui.modes.kids and isKidsModeEnabledByParentalControls() = false
+    return true
+  else if m.uiMode = m.constants.ui.modes.kidsAgeGate
+    return true
+  end if
+
+  return false
 End Function
 
 
@@ -893,6 +1008,14 @@ Function tellScreensIfKidsModeBeSentToServer()
   if homeScreen <> invalid
     homeScreen.shouldKidsModeBeSentToServer = bKidsMode
   end if
+End Function
+
+
+Function isKidsUIOn()
+  if m.uiMode = m.constants.ui.modes.kids or m.uiMode = m.constants.ui.modes.kidsAgeGate or m.uiMode = m.constants.ui.modes.kidsParental
+    return true
+  end if
+  return false
 End Function
 
 
@@ -938,62 +1061,6 @@ Function hideEspanolLogo()
 End Function
 
 
-Function showSponsorGroup()
-
-  m.sponsorGroup.visible = true
-
-End Function
-
-
-Function hideSponsorGroup()
-
-  m.sponsorGroup.visible = false
-
-End Function
-
-
-Function showLogo()
-
-  if isKidsModeEnabledByParentalControls() = true or m.kidsModeEnabled = true 
-    hideTubiLogo()
-    hideEspanolLogo()
-    hideSponsorGroup()
-    showKidsLogo()
-  else if m.latinoModeEnabled = true
-    hideTubiLogo()
-    hideKidsLogo()
-    showEspanolLogo()
-    showSponsorGroup()
-  else
-    hideKidsLogo()
-    hideEspanolLogo()
-    hideSponsorGroup()
-    showTubiLogo()
-  end if
-
-End Function
-
-
-' set sponsorLogo & sponsorPrefixText based on matrix response
-Function setSponsorDetails(metadata)
-
-  prefix_text = invalid
-  sponsorLogo = invalid
-  
-  sponsor = metadata.sponsor
-  if sponsor <> invalid
-    prefix_text = sponsor.prefix_text
-    sponsorLogo = sponsor.logo
-  end if
-  
-  if prefix_text <> invalid and sponsorLogo <> invalid
-    m.sponsorPrefixText.text = UCase(prefix_text)
-    m.sponsorLogo.uri = sponsorLogo
-  end if
-  
-End Function
-
-
 Function isKidsModeEnabledByParentalControls() as Boolean
   tubiLog("ContentController.isKidsModeEnabledByParentalControls")
   bEnabled = false
@@ -1007,8 +1074,8 @@ Function isKidsModeEnabledByParentalControls() as Boolean
 End Function
 
 
-Function isAdultModeEnabledByParentalControl() as Boolean
-  tubiLog("ContentController.isAdultModeEnabledByParentalControl")
+Function isParentalControlsAdultLevel() as Boolean
+  tubiLog("ContentController.isParentalControlsAdultLevel")
   bEnabled = true
   
   if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
@@ -1038,7 +1105,7 @@ Function refreshAllHomeScreenTopNav()
   for i=0 to m.screenStack.getChildCount()-1
     screen = m.screenStack.getChild(i)
     if screen.subType() = "HomeScreen"
-      screen.isNewsAllowedInTopNav = isAdultModeEnabledByParentalControl() 
+      screen.isNewsAllowedInTopNav = isParentalControlsAdultLevel() 
       screen.refreshTopNav = true
     end if
   end for
@@ -1068,22 +1135,50 @@ Function onCloseModal()
 End Function
 
 
+' Makes the contentGroup (including the screen stack) on the screen visible which indicates the user
+' has started the channel, so also send the ActiveEvent.
+' Should only happen once per channel launch
+Function showContentGroup()
+  if m.contentGroup.visible = false
+    m.contentGroup.visible = true
+    m.trackingLoggingTask.trackEvent = {
+      type: "active"
+      values: {}
+    }
+    ' send the top nav experiment exposure event
+    getExperimentResource("roku_top_nav", "roku_top_nav_experiment", true)
+  end if
+End Function
+
+
 Function startChannel()
   tubiLog("ContentController.startChannel")
-  m.contentGroup.visible = true
-  m.appLoadStopwatch.mark()
+  setUiModeFromState()
   focusSideNavOption(m.constants.ui.sideNavIds.home)
-  if isKidsModeEnabledByParentalControls() = true
-    enableKidsModeUI(true)
-  else
-    enableKidsModeUI(false)
-  end if
   showDefaultHomeScreen()
 End Function
 
 
-' simply wraps startChannel - function name is less confusing when a user signs in or out
+' wraps startChannel but forces an age gate if the user is signed out
 Function restartChannel()
+  tubiLog("ContentController.restartChannel")
+  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true and m.global.authInfo = invalid
+    ' if user has just signed out, then show the age gate screen
+    showAgeVerificationScreenAtInteraction()
+    showHideSpinner(false)
+  else
+    startChannel()
+  end if
+End Function
+
+
+Function restartChannelAfterAgeVerification()
+  tubiLog("ContentController.restartChannelAfterAgeVerification")
+  homescreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homescreen <> invalid
+    homescreen.loadAllCategories = true
+  end if
+
   startChannel()
 End Function
 
@@ -1119,9 +1214,16 @@ End Function
 '
 ' @screenId: string, the id of the screen that is to be removed
 Function deleteFromScreenCache(screenId)
-  if type(screenId) = "String" or type(screenId) = "roString"
+  if isString(screenId) = true
+    screen = getFromScreenCache(screenId)
+
+    if screen <> invalid
+      unobserveAllFieldsScoped(screen)
+    end if
+
     return m.screenCache.delete(screenId)
   end if
+
   return false
 End Function
 
@@ -1130,8 +1232,8 @@ End Function
 ' If the screen is the current screen, then go back to the previous screen
 ' @sScreenID: String, The ID associated with the screen to be destroyed
 Function destroyScreen(sScreenID)
-  if sScreenID <> invalid and sScreenID <> ""
-    currentScreen = currentScreen()
+  if isString(sScreenID) = true and sScreenID <> ""
+    currentScreen = getCurrentScreen()
     deleteFromScreenCache(sScreenID)
 
     '//Take user to previous screen
@@ -1144,6 +1246,11 @@ End Function
 
 
 Function emptyScreenCache()
+  for each screenId in m.screenCache
+    screen = getFromScreenCache(screenId)
+    unobserveAllFieldsScoped(screen)
+  end for
+
   m.screenCache = {}
   return m.screenCache
 End Function
@@ -1161,6 +1268,29 @@ Function setContentToRefresh(sID)
   end if
   return false
 End Function 
+
+
+' @shouldRefreshHomescreen: boolean, do no refresh homescreen if set to false
+Function setContentToRefreshAllPersonalizedScreens(shouldRefreshHomescreen = true)
+  if shouldRefreshHomescreen = true
+    homescreenId = m.constants.ui.screenIds.homeScreen
+    homescreen = getFromScreenCache(homescreenId)
+
+    ' set the homescreen content to refresh immediately if it's the top screen or if it's not
+    ' the top screen, so that it can load in the background and be ready for consumption when
+    ' the user next lands on the homescreen
+    if homescreen <> invalid
+      homescreen.loadAllCategories = true
+    end if
+  end if
+
+  ' set the content of other screens to refresh once they gain focus
+  setContentToRefresh(m.constants.ui.screenIds.tvScreen)
+  setContentToRefresh(m.constants.ui.screenIds.movieScreen)
+  setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
+  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+End Function
 
 
 ' Callback for when a navigateWithinPageInfo has been updated - sends the navigate_within_page event
@@ -1189,7 +1319,7 @@ End Function
 
 ' Is the current screen a home screen?
 Function isCurrentScreenHomeScreen()
-  bReturn = currentScreen() <> invalid and currentScreen().isSubType("HomeScreen")
+  bReturn = getCurrentScreen() <> invalid and getCurrentScreen().isSubType("HomeScreen")
   return bReturn
 End Function
 
@@ -1352,4 +1482,9 @@ Function customFadeIn(target, duration, delay)
   }
   return animate(target, animationOptions)
   
+End Function
+
+
+Function isDeviceInUSorCA()
+  return (m.constants.deviceInfo.countryCode = "US" or m.constants.deviceInfo.countryCode = "CA")
 End Function

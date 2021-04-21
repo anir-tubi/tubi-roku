@@ -79,10 +79,10 @@ Function newBackgroundSet()
 
   for i=0 to m.aCurrentBackgroundInfo.uriList.count()-1
     '//Modify the default background so the correct default background is used depending on the kids mode state
-    if m.top.kidsMode = true and m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground 
-      m.aCurrentBackgroundInfo.uriList[i]  = m.blurredDefaultBackground_kidsMode 
+    if m.top.kidsMode = true and m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground
+      m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground_kidsMode
     else if m.top.kidsMode = false and m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground_kidsMode 
-      m.aCurrentBackgroundInfo.uriList[i]  = m.blurredDefaultBackground 
+      m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground
     end if 
   end for
 

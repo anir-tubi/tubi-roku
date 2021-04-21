@@ -53,8 +53,8 @@ End Function
 
 Function onKeyEvent(key As String, press As Boolean) as Boolean
 
-  tubiLog("SimpleButton.onKeyEvent key = " + key)
   if press then
+    tubiLog("SimpleButton.onKeyEvent key = " + key)
     if key = "OK"
       m.top.selected = true
       return true

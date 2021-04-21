@@ -162,6 +162,6 @@ Function convertFunctionToString(func)
   if type(func) = "roFunction" or type(func) = "Function"
     functionStr = func.ToStr().Replace("Function: ","")
   end if
-  return functionStr  
+  return functionStr
 
 End Function

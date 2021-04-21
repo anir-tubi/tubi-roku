@@ -27,7 +27,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     getGridItemType: tubiMetadataTranslate_getGridItemType
     experiments: experiments
     getThumbnailImage: tubiMetadataTranslate_getThumbnailImage
-    isUserSignedIn: tubiMetadataTranslate_isUserSignedIn
   }
 End Function
 
@@ -556,16 +555,22 @@ End Function
 '   </CategoryContentNode>
 ' </CategoryContentNode>
 '
-'//::TODO:: Remove the contentMode, authInfo & isKidsModeEnabled parameters once we have API support
-Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homescreen", authInfo=invalid, isKidsModeEnabled=false, bFullData = false) As Object
+'//::TODO:: Remove the contentMode, authInfo & isKidsMode parameters once we have API support
+'
+' @contentToTranslate: AA, json parsed response from the matrix/homescreen endpoint
+' @contentMode: string, the value of the contentMode parameter as sent as part of the matrix/homescreen request
+' @authInfo: AA, auth info as returned by Auth.getAuthInfo()
+' @isKidsMode: boolean, the value of the isKidsMode parameter as sent as part of the matrix/homescreen request
+' @uiMode: string, one of the allowed values from constants.ui.modes
+Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homescreen", authInfo=invalid, isKidsMode=false, uiMode="standard") As Object
   translated = CreateObject("roSGNode", "CategoryContentNode")
   homescreenAA = {
     id: ""
     title: ""
     validUntil: 0
     children: []    'categories
-    sponsor: invalid
   }
+
   if contentToTranslate.valid_duration <> invalid
     homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
   else
@@ -574,12 +579,6 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
 
   containers = contentToTranslate.containers
   contents = contentToTranslate.contents
-  sponsor = contentToTranslate.sponsor
-  
-  ' setting sponsor field only for latino mode
-  if contentMode = m.constants.ui.contentMode.latino and sponsor <> invalid
-    homescreenAA.sponsor = sponsor
-  end if
 
   ' userCategoriesPos is used to store the index in the list of categories where the /homescreen API
   ' placed the userCategories
@@ -587,15 +586,15 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
   queueIndex = 5
   
   '//::TODO:: Remove the kidsModeFeatureOn check once we have API support  
-  m.kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
+  kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
   if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
-    m.kidsModeFeatureOn = true
+    kidsModeFeatureOn = true
   end if  
 
   '//::TODO:: Remove the parentalRating check once we have API support    
-  m.parentalRating = 3
+  parentalRating = 3
   if authInfo <> invalid and authInfo.parentalRating <> invalid
-    m.parentalRating = authInfo.parentalRating
+    parentalRating = authInfo.parentalRating
   end if
   
   ' utility row position experiment
@@ -609,63 +608,55 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     end if
   end if
   
-  ' include utility row only in homescreen when kidsmodefeature is ON and parentalRating is set to Adult and isKidsModeEnabled is false
+  ' include utility row only in homescreen when kidsmode feature is ON (available to users) and
+  ' parentalRating is set to Adult and isKidsMode is false
   includeUtilityRow = false
-  if m.kidsModeFeatureOn = true and contentMode = m.constants.ui.contentMode.homescreen and m.parentalRating > 2 and isKidsModeEnabled = false
+  if kidsModeFeatureOn = true and contentMode = m.constants.ui.contentMode.homescreen and parentalRating > 2 and isKidsMode = false
     includeUtilityRow = true
   end if  
 
-  'set up AAs for all categories including any nested categories
+  'set up AAs for all categories
   for i=0 to containers.count()-1
     container = containers[i]
-    if container.type <> "complex"
-      if container.id = m.constants.ui.categoryIds.history
-        continueWatchingIndex = i
-        ' increasing the utilityRowPosition by 1 if the ContinueWatching has no children AND the user is signed in (continue watching row is displayed if the user is not signed in regardless)
-        '//::TODO:: Remove this section once we have API support
-        if container.children.Count() = 0 and (m.isUserSignedIn() = true)
-          utilityRowPosition = utilityRowPosition + 1
-        end if
-      else if container.id = m.constants.ui.categoryIds.queue
-        queueIndex = i
-        ' increasing the utilityRowPosition by 1 if the MyList/Queue has no children
-        '//::TODO:: Remove this section once we have API support
-        if container.children.Count() = 0
-          utilityRowPosition = utilityRowPosition + 1
-        end if
+    if container.id = m.constants.ui.categoryIds.history
+      continueWatchingIndex = i
+      ' increasing the utilityRowPosition by 1 if the ContinueWatching has no children AND the user
+      ' is signed in (continue watching row is displayed if the user is not signed in regardless).
+      '//::TODO:: Remove this section once we have API support
+      if container.children.Count() = 0 and (authInfo <> invalid or uiMode = m.constants.ui.modes.kidsAgeGate)
+        utilityRowPosition = utilityRowPosition + 1
       end if
-      
-      ' inserting utilityRow in specific position based on experiment result
-      '//::TODO:: Remove this section once we have API support 
-      if includeUtilityRow = true and i = utilityRowPosition
-        categoryAA = m.buildUtilityCategoryAA(containers)
-        if categoryAA <> invalid
-          homescreenAA.children.push(categoryAA)
-        end if 
-        categoryAA = invalid
+    else if container.id = m.constants.ui.categoryIds.queue
+      queueIndex = i
+      ' increasing the utilityRowPosition by 1 if the MyList/Queue has no children
+      '//::TODO:: Remove this section once we have API support
+      if container.children.Count() = 0
+        utilityRowPosition = utilityRowPosition + 1
       end if
+    end if
 
-      if container.id = m.constants.ui.categoryIds.history and m.isUserSignedIn() = false
-        '//if experiement is enabled AND if continue watching container while user is signed out, then ensure row is empty except for 1 item that will entice users to sign in
-        categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsModeEnabled)
-        if categoryAA <> invalid
-          homescreenAA.children.push(categoryAA)
-        end if 
-      else
-        categoryAA = m.buildCategoryAA(container, contents, invalid, "", bFullData, contentMode)
-        if categoryAA <> invalid
-          homescreenAA.children.push(categoryAA)
-        end if
+    ' inserting utilityRow in specific position based on experiment result
+    '//::TODO:: Remove this section once we have API support
+    if includeUtilityRow = true and i = utilityRowPosition
+      categoryAA = m.buildUtilityCategoryAA(containers)
+      if categoryAA <> invalid
+        homescreenAA.children.push(categoryAA)
+      end if
+      categoryAA = invalid
+    end if
+
+    if container.id = m.constants.ui.categoryIds.history and authInfo = invalid and uiMode <> m.constants.ui.modes.kidsAgeGate
+      '//if continue watching container while user is signed out,
+      ' then ensure row is empty except for 1 item that will entice users to sign in
+      categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
+      if categoryAA <> invalid
+        homescreenAA.children.push(categoryAA)
       end if
     else
-      for j=0 to container.children.count()-1
-        nestedContainer = container.children[j]
-        categoryAA = m.buildCategoryAA(nestedContainer, contents, invalid, "", bFullData, contentMode)
-        if categoryAA <> invalid
-          categoryAA.parentId = container.id
-          homescreenAA.children.push(categoryAA)
-        end if
-      end for
+      categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode)
+      if categoryAA <> invalid
+        homescreenAA.children.push(categoryAA)
+      end if
     end if
   end for
 
@@ -1078,17 +1069,6 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
 
   return updateMetadata
 End Function
-
-
-' See if the user is signed in
-Function tubiMetadataTranslate_isUserSignedIn()
-  Request = TubiRequest(m.constants.settings.mode)
-  Auth = TubiAuth(m.constants, Request)
-  authInfo = Auth.getAuthInfo()
-  bUserSignedIn =  (authInfo <> invalid)
-  return bUserSignedIn
-End Function
-
 
 
 ''''''''''''''''''''''

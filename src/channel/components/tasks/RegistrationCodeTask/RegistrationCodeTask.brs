@@ -73,7 +73,7 @@ Function registrationLoop() As Void
   while timespan.TotalSeconds() < m.top.expiration
     sleep(m.top.frequency)
     tubiLog("Polling registration status")
-    url = constants.urls.users.urlBase + "/code/status"
+    url = constants.urls.users.codeStatus
     params = {
       activation_token: activation_token
       platform: constants.platform  

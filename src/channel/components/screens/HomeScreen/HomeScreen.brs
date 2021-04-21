@@ -25,10 +25,10 @@ Function init()
   m.top.observeField("fullscreenCountdown", "onFullscreenCountdown")
   m.top.observeField("enableTopNav", "onTopNavEnableChange")
   m.top.observeField("focusOnTopNav", "onFocusOnTopNavChanged")
-  m.top.observeField("shouldKidsModeBeSentToServer", "onStrictKidsModeChanged")
+
   m.TopNav.observeField("selected", "onTopNavSelection")
   m.TopNav.observeField("focusedChild", "onTopNavFocusChange")
-  m.TopNav.observeFieldScoped("navigateWithinPageInfo", "onTopNavNavigateWithinPageInfoChange")
+  m.TopNav.observeField("navigateWithinPageInfo", "onTopNavNavigateWithinPageInfoChange")
 
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout

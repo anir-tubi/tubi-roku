@@ -29,7 +29,6 @@ Function listen()
 
         'reset the request field so no changes to the requestNode cause the following logic to run again 
         m.top.request = invalid
-
         if requestNode <> invalid and isEmptyField(requestNode.response) and isEmptyField(requestNode.error)
           makeApiRequest(requestNode, requestModule, authModule)
         end if
@@ -84,6 +83,18 @@ Function createParsingCallbacks()
   m.requestTypes[m.constants.reqNames.signIn] = {
     parseSuccess: parseSignInSuccess
     parseError: parseSignInError
+  }
+
+  ' device register (check age)
+  m.requestTypes[m.constants.reqNames.deviceRegister] = {
+    parseSuccess: parseAgeVerificationScreenDeviceRegistrationSuccess
+    parseError: parseAgeVerificationScreenDeviceRegistrationError
+  }
+
+  ' check birthday (check if birthday exists for logged in user)
+  m.requestTypes[m.constants.reqNames.checkBirthdayInfo] = {
+    parseSuccess: parseAgeVerificationScreenCheckBirthdaySuccess
+    parseError: parseAgeVerificationScreenCheckBirthdayError
   }
 
   ' single content
@@ -153,29 +164,36 @@ Function processResponse(msg)
 
       if result.response.code >= 200 and result.response.code < 400
 
-        response = result.response
+        responseFromServer = result.response
         if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
-          response.data = parseJson(result.response.data)
+          responseFromServer.data = parseJson(result.response.data)
         else if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/xml"
           ' we can write xml parsing functionality here if/when necessary
         end if
 
         parserCallback = callbackTypes.parseSuccess
-        job.requestNode.response = parserCallback(response, job.requestNode)
+
+        ' some requests may not require handling of the response and and therefore may not
+        ' have a parseSuccess callback.
+        if parserCallback <> invalid
+          job.requestNode.response = parserCallback(responseFromServer, job.requestNode)
+        else
+          job.requestNode.response = invalid
+        end if
 
       else
 
         ' end result of parsedResponse type may vary depending on API response format
-        response = result.response
+        responseFromServer = result.response
         if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
-          response.data = parseJson(result.response.data)
+          responseFromServer.data = parseJson(result.response.data)
         end if
 
         parserCallback = callbackTypes.parseError
 
         ' some requests might not require error handling, and therefore may not have a parseError callback
         if parserCallback <> invalid
-          job.requestNode.error = parserCallback(response, job.requestNode)
+          job.requestNode.error = parserCallback(responseFromServer, job.requestNode)
         else
           job.requestNode.error = invalid
         end if
@@ -199,6 +217,8 @@ Function isEmptyField(fieldValue)
   else if type(fieldValue) = "roSGNode" and fieldValue.getChildCount() = 0
     fieldIsEmpty = true
   else if (type(fieldValue) = "String" or type(fieldValue) = "roString") and fieldValue = ""
+    fieldIsEmpty = true
+  else if (type(fieldValue) = "Integer" or type(fieldValue) = "roInt" or type(fieldValue) = "roInteger") and fieldValue = 0
     fieldIsEmpty = true
   end if
 

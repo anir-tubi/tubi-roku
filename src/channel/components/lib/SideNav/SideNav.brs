@@ -1,18 +1,20 @@
 Function init()
   m.constants = m.global.constants
-  m.theme = m.global.theme
-
   Request = TubiRequest(m.constants.settings.mode)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
-  m.top.observeFieldScoped("kidsModeValues", "onKidsModeValuesChanged")
   m.top.observeFieldScoped("displayEspanol", "onEspanolDisplayChanged")
   m.top.observeFieldScoped("displayMoviesTV", "onMovieTVDisplayChanged")
   m.top.observeFieldScoped("displayChannels", "onChannelsDisplayChanged")
-  m.top.observeFieldScoped("opened", "onOpenedChange")
+  m.top.observeFieldScoped("displaySignIn", "onSignInDisplayChanged")
+  m.top.observeFieldScoped("displayKids", "onKidsDisplayChanged")
+  m.top.observeFieldScoped("espanolItemTurnedOn", "onEspanolItemTurnedOnChanged")
+  m.top.observeFieldScoped("kidsItemTurnedOn", "onKidsItemTurnedOnChanged")
+  m.top.observeFieldScoped("uiMode", "onUiModeChanged")
+  m.top.observeFieldScoped("opened", "onOpenedChanged")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
   m.top.observeFieldScoped("selectedItemRequested", "onSelectedItemRequested")
   m.top.observeFieldScoped("createMenuItems", "onCreateMenuItems")
@@ -165,7 +167,7 @@ Function onCreateMenuItems()
   initList(m.mainItems)
 
   '//Inititate the default view
-  onOpenedChange()
+  onOpenedChanged()
   '//::TODO::SIDENAV set the width of the items of the lists dynamically to the width of m.top.width, plus some spacing
   '//::TODO::SIDENAV - set all references to sideNav IDs to be called from Constants: i.e. m.constants.ui.sideNavIds.home. 
   '//   To do this, set content in brs instead of xml?
@@ -195,13 +197,15 @@ Function initList(list)
   list.observeFieldScoped("itemSelected", "onItemSelect")
   list.observeFieldScoped("focusedChild", "onListFocusChange")
   list.observeFieldScoped("itemFocused", "onItemFocused")
-  initListDisplay(list)
+  setListFocusedBlendColor(list)
   setDrawFocusFeedback(list)
 End Function
 
 
-Function initListDisplay(list)
-  list.focusBitmapBlendColor = m.global.theme.focused
+Function setListFocusedBlendColor(list)
+  if list <> invalid
+    list.focusBitmapBlendColor = m.global.theme.focused
+  end if
 End Function
 
 
@@ -223,13 +227,7 @@ End Function
 Function onEspanolDisplayChanged()
   if m.top.displayEspanol = false
     '//Remove espanol if those items should be hidden. For right now, don't worry about turning it back on
-    if m.espanolContent <> invalid
-      m.MainContent.removeChild(m.espanolContent)
-    end if
-    if m.espanolContentSelect <> invalid
-      m.MainContentSelect.removeChild(m.espanolContentSelect)
-    end if
-
+    removeEspanol()
     verticallyCenterSideNav()
   end if
 End Function
@@ -238,21 +236,10 @@ End Function
 ' Hide the movies/tv items if this is called
 Function onMovieTVDisplayChanged()
   if m.top.displayMoviesTV = false
-    '//Remove movies/tv if those items should be hidden. For right now, don't worry about turning it back on
-    if m.moviesContent <> invalid
-      m.MainContent.removeChild(m.moviesContent)
-    end if
-    if m.tvContent <> invalid
-      m.MainContent.removeChild(m.tvContent)
-    end if
-
-    if m.moviesContentSelect <> invalid
-      m.MainContentSelect.removeChild(m.moviesContentSelect)
-    end if
-    if m.tvContentSelect <> invalid
-      m.MainContentSelect.removeChild(m.tvContentSelect)
-    end if
-    
+    ' Remove movies/tv if those items should be hidden.
+    ' For right now, don't worry about turning it back on.
+    removeMovies()
+    removeTv()
     verticallyCenterSideNav()
   end if
 End Function
@@ -262,71 +249,170 @@ End Function
 Function onChannelsDisplayChanged()
   if m.top.displayChannels = false
     '//Remove Channels if that item should be hidden. For right now, don't worry about turning it back on
-    if m.channelsContent <> invalid
-      m.MainContent.removeChild(m.channelsContent)
-    end if
-    if m.channelsContentSelect <> invalid
-      m.MainContentSelect.removeChild(m.channelsContentSelect)
-    end if
-
+    removeChannels()
     verticallyCenterSideNav()
   end if
 End Function
 
 
-' The kids mode has changed, so alter the look of the menu item
-Function onKidsModeValuesChanged()
-  if m.top.kidsModeValues.featureOn = true
-    sItemTitle = m.top.kidsModeValues.title
-    bEnabled = (m.top.kidsModeValues.grayedOut = false)
-    m.theme = m.global.theme
+' Hide the Channels item if this is called
+Function onSignInDisplayChanged()
+  if m.top.displaySignIn = false
+    ' Remove Sign In if that item should be hidden.
+    ' For right now, don't worry about turning it back on.
+    removeProfile()
+    verticallyCenterSideNav()
+  end if
+End Function
 
-    if getExperimentResource("roku", "roku_sidenav_espanol", false).combined <> true
-      initListDisplay(m.topItems)
-      initListDisplay(m.bottomItems)
-    end if
 
-    initListDisplay(m.mainItems)
-    
-    if sItemTitle <> ""
-      m.kidsModeContent.title = sItemTitle
-      m.kidsModeContent.turnedOn = bEnabled
-      nPreviouslyFocusedIndex = m.mainItems.itemFocused
-      m.mainItems.content = m.MainContent
-      if m.mainItems.hasFocus() = true
-        '// If in focus, then set the focus back to the current item after the content has been reset
-        m.mainItems.jumpToItem = nPreviouslyFocusedIndex
-      end if
-    end if
-    
-    '//::HARDCODE:: this page will disable or enable the channel icon based on kids mode = true. This component should not be smart like this but since this is a temporary thing, we can hardcode the component knowing what to do if this condition has been met.
-    m.channelsContent.turnedOn = (m.top.kidsModeValues.on <> true)
-    m.moviesContent.turnedOn = (m.top.kidsModeValues.on <> true)
-    m.tvContent.turnedOn = (m.top.kidsModeValues.on <> true)
-    if (m.top.kidsModeValues.on <> true and m.top.kidsModeValues.isAdultModeEnabledByParentalControl = true)
-      if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
-    else
-      if m.espanolContent <> invalid then m.espanolContent.turnedOn = false
-    end if
-    if m.top.kidsModeValues.on = true
-      m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
-    else
-      m.sideNavBackground.uri = ""
-    end if
-  else
-    '//Remove kids mode if on is not true. For right now, don't worry about turning it back on
-    if m.kidsModeContent <> invalid
-      m.MainContent.removeChild(m.kidsModeContent)
-    end if
-    if m.kidsModeContentSelect <> invalid
-      m.MainContentSelect.removeChild(m.kidsModeContentSelect)
-    end if
+Function onKidsDisplayChanged()
+  if m.top.displayKids = false
+    ' Remove Kids if that item should be hidden.
+    ' For right now, don't worry about turning it back on.
+    removeKids()
+    verticallyCenterSideNav()
+  end if
+End Function
 
-    '//::NOTE:: This assumes that featureOn will be set to false at the beginning of the app, so 
-    '//   when that happens, we need to call focusItemInList() to reset the placement of the focus of the m.MainContentSelect list
-    if m.itemSelectedRemembered <> invalid
-      focusItemInList(m.mainItems, m.itemSelectedRemembered.id)
-    end if
+
+Function onEspanolItemTurnedOnChanged()
+  if m.espanolContent <> invalid
+    m.espanolContent.turnedOn = m.top.espanolTurnedOn
+  end if
+End Function
+
+
+Function onKidsItemTurnedOnChanged()
+  if m.kidsModeContent <> invalid
+    m.kidsModeContent.turnedOn = m.top.kidsItemTurnedOn
+  end if
+End Function
+
+
+Function onUiModeChanged()
+  if m.top.uiMode = m.constants.ui.modes.kids
+    ' kids
+    setCommonSideNavKidsValues()
+  else if m.top.uiMode = m.constants.ui.modes.kidsParental
+    ' kids mode due to parental controls
+    setCommonSideNavKidsValues()
+    m.top.kidsItemTurnedOn = false
+  else if m.top.uiMode = m.constants.ui.modes.kidsAgeGate
+    ' kids mode due to age gating
+    removeProfile()
+    removeKids()
+    removeMovies()
+    removeTv()
+    removeChannels()
+    removeEspanol()
+    removeMyList()
+    verticallyCenterSideNav()
+    m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
+  else if m.top.uiMode = m.constants.ui.modes.latino
+    ' latino - nothing should change
+    if m.channelsContent <> invalid then m.channelsContent.turnedOn = true
+    if m.moviesContent <> invalid then m.moviesContent.turnedOn = true
+    if m.tvContent <> invalid then m.tvContent.turnedOn = true
+    if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
+    if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_kids")
+    m.sideNavBackground.uri = ""
+  else if m.top.uiMode = m.constants.ui.modes.standard
+    ' standard
+    if m.channelsContent <> invalid then m.channelsContent.turnedOn = true
+    if m.moviesContent <> invalid then m.moviesContent.turnedOn = true
+    if m.tvContent <> invalid then m.tvContent.turnedOn = true
+    if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
+    if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_kids")
+    m.sideNavBackground.uri = ""
+  end if
+
+  ' change the color of the focus indicator(s) as necessary
+  setListFocusedBlendColor(m.mainItems)
+  if getExperimentResource("roku", "roku_sidenav_espanol", false).combined <> true
+    setListFocusedBlendColor(m.topItems)
+    setListFocusedBlendColor(m.bottomItems)
+  end if
+End Function
+
+
+Function setCommonSideNavKidsValues()
+  if m.channelsContent <> invalid then m.channelsContent.turnedOn = false
+  if m.moviesContent <> invalid then m.moviesContent.turnedOn = false
+  if m.tvContent <> invalid then m.tvContent.turnedOn = false
+  if m.espanolContent <> invalid then m.espanolContent.turnedOn = false
+  if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_exitKids")
+  m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
+End Function
+
+
+Function removeProfile()
+  if m.profileContent <> invalid
+    m.MainContent.removeChild(m.profileContent)
+    m.TopContent.removeChild(m.profileContent)
+  end if
+  if m.profileContentSelect <> invalid
+    m.MainContentSelect.removeChild(m.profileContentSelect)
+  end if
+End Function
+
+
+Function removeKids()
+  if m.kidsModeContent <> invalid
+    m.MainContent.removeChild(m.kidsModeContent)
+  end if
+  if m.kidsModeContentSelect <> invalid
+    m.MainContentSelect.removeChild(m.kidsModeContentSelect)
+  end if
+End Function
+
+
+Function removeMovies()
+  if m.moviesContent <> invalid
+    m.MainContent.removeChild(m.moviesContent)
+  end if
+  if m.moviesContentSelect <> invalid
+    m.MainContentSelect.removeChild(m.moviesContentSelect)
+  end if
+End Function
+
+
+Function removeTv()
+  if m.tvContent <> invalid
+    m.MainContent.removeChild(m.tvContent)
+  end if
+  if m.tvContentSelect <> invalid
+    m.MainContentSelect.removeChild(m.tvContentSelect)
+  end if
+End Function
+
+
+Function removeChannels()
+  if m.channelsContent <> invalid
+    m.MainContent.removeChild(m.channelsContent)
+  end if
+  if m.channelsContentSelect <> invalid
+    m.MainContentSelect.removeChild(m.channelsContentSelect)
+  end if
+End Function
+
+
+Function removeEspanol()
+  if m.espanolContent <> invalid
+    m.MainContent.removeChild(m.espanolContent)
+  end if
+  if m.espanolContentSelect <> invalid
+    m.MainContentSelect.removeChild(m.espanolContentSelect)
+  end if
+End Function
+
+
+Function removeMyList()
+  if m.myListContent <> invalid
+    m.MainContent.removeChild(m.myListContent)
+  end if
+  if m.myListContentSelect <> invalid
+    m.MainContentSelect.removeChild(m.myListContentSelect)
   end if
 End Function
 
@@ -383,7 +469,7 @@ Function onKeyEvent(key, press) as Boolean
 End Function
 
 
-Function onOpenedChange()
+Function onOpenedChanged()
   if m.top.opened = true
     '//display hidden items, profile, settings, exit. Set all buttons to full opacity
     
@@ -422,7 +508,7 @@ End Function
 
 
 Function refresh()
-  onOpenedChange()
+  onOpenedChanged()
 End Function
 
 

@@ -17,7 +17,7 @@ End Function
 ' showRFIScreen is used to display the Request For Information modal
 Function showRFIScreen()
   tubiLog("SignInHelpers.showRFIScreen")
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   
   dialogEvent = {
     type: "dialog"
@@ -43,7 +43,7 @@ End Function
 ' onUserData is the callback triggered when ChannelStore returns userData
 Function onUserData()
   tubiLog("SignInHelpers.onUserData")
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   m.billing.unobserveFieldScoped("userData")
   
   if m.billing.userData <> invalid
@@ -128,7 +128,7 @@ Function onEmailExistsError(error)
   }
   m.trackingLoggingTask.trackEvent = accountEvent
   
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   dialogEvent = {
     type: "dialog"
     values: {
@@ -149,7 +149,7 @@ End Function
 
 Function showExistingAccountFoundModal(email)
 
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   dialogEvent = {
     type: "dialog"
     values: {
@@ -176,7 +176,7 @@ Function showActivationScreen()
   activationCodeScreen.observeFieldScoped("activationSuccess", "onActivationSuccess")
   activationCodeScreen.observeFieldScoped("errorType", "onRegTaskError")
   pushScreen(activationCodeScreen, true, true)
-  m.sSideNavCurrentScreen = currentScreen()
+  m.sSideNavCurrentScreen = getCurrentScreen()
   displayDefaultBackground()
   
 End Function
@@ -192,7 +192,7 @@ Function showSignInScreen()
   signInScreen.observeFieldScoped("signInSelected", "onSignInSelected")
   signInScreen.observeFieldScoped("staticPageSelected", "onStaticPageSelected")
   pushScreen(signInScreen, true, true)
-  m.sSideNavCurrentScreen = currentScreen()
+  m.sSideNavCurrentScreen = getCurrentScreen()
   displayDefaultBackground()
 
 End Function
@@ -209,7 +209,7 @@ Function showSignUpScreen(email)
   signUpScreen.observeFieldScoped("signInSelected", "showActivationScreen")
   signUpScreen.observeFieldScoped("staticPageSelected", "onStaticPageSelected")
   pushScreen(signUpScreen, true, true)
-  m.sSideNavCurrentScreen = currentScreen()
+  m.sSideNavCurrentScreen = getCurrentScreen()
   displayDefaultBackground()
 
 End Function
@@ -220,7 +220,7 @@ Function onStaticPageSelected(evt)
 
   staticPageSelected = evt.getData()
   ' sending static page name(ToS/PP/DoNotSellMyInfo) & screen level
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   pageSource = ""
   if currentScreen <> invalid and currentScreen.getSubtype() = "SignUpScreen"
     pageSource = m.constants.ui.screenIds.signUpScreen
@@ -299,7 +299,7 @@ Function onSignUpError(error)
   
   m.trackingLoggingTask.trackEvent = accountEvent
   
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   dialogEvent = {
     type: "dialog"
     values: {
@@ -320,7 +320,7 @@ End Function
 
 Function retrySignUp()
 
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.getSubtype() =  "SignUpScreen"
     currentScreen.retrySignUp = true
   end if
@@ -391,7 +391,7 @@ Function onSignInError(error)
   
   m.trackingLoggingTask.trackEvent = accountEvent
 
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   dialogEvent = {
     type: "dialog"
     values: {
@@ -415,7 +415,7 @@ End Function
 ' onReEnterPasswordSelected callback is triggered when user selects Re-Enter password button on invalid password modal
 Function onReEnterPasswordSelected()
 
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.getSubtype() =  "SignInScreen"
     currentScreen.resetFocus = true
   end if
@@ -425,8 +425,9 @@ End Function
 
 Function getActivationCodeScreen()
   screen = invalid
-  if currentScreen() <> invalid and currentScreen().getSubtype() =  "ActivationCodeScreen"
-    screen = currentScreen()
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid and currentScreen.getSubtype() =  "ActivationCodeScreen"
+    screen = currentScreen
   end if
 
   return screen
@@ -527,7 +528,7 @@ Function onActivationSuccess()
   if callbackStr <> ""
     m.authTask.observeFieldScoped("authInfo", callbackStr)
   else
-    m.authTask.observeFieldScoped("authInfo", "onSideNavSignInSelected")
+    m.authTask.observeFieldScoped("authInfo", "onSideNavSignInCompleted")
   end if
   
   m.callbackAfterSignIn = invalid ' setting to invalid to avoid callbacks
@@ -541,11 +542,12 @@ Function onActivationSuccess()
 End Function
 
 
-' onSideNavSignInSelected occurs when a user signs out or user signs in from the side nav or from settings side nav
-Function onSideNavSignInSelected()
-  tubiLog("SignInHelpers.onSideNavSignInSelected")
+' onSideNavSignInCompleted occurs when a user signs out or user signs in from the side nav or from settings side nav
+Function onSideNavSignInCompleted()
+  tubiLog("SignInHelpers.onSideNavSignInCompleted")
   ' AuthInfo may be invalid if authTask failed to log the user in
-  m.global.authInfo = m.authTask.authInfo
+  authInfo = m.authTask.authInfo
+  m.global.authInfo = authInfo
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
@@ -557,7 +559,7 @@ Function onSideNavSignInSelected()
   ' if a user has just signed in, the default behavior is turn off kids mode UI
   ' if kids mode UI should be visible due to parenal controls, it will be turned on
   ' subsequently (most likely by startChannel())
-  enableKidsModeUI(false)
+  setUiMode(m.constants.ui.modes.standard)
 
   ' Here we notify screens that may exist, though we try to keep context
   '
@@ -575,18 +577,16 @@ Function onSideNavSignInSelected()
 
   setDirtyUserCategories(m.constants.ui.categoryIds.queue)
   setDirtyUserCategories(m.constants.ui.categoryIds.history)
-  setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.movieScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
-  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
-  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+
+  shouldRefreshHomescreen = true
+  if authInfo = invalid
+    ' don't refresh homescreen if user is signed out, will refresh after the user is age gated
+    shouldRefreshHomescreen = false
+  end if
+  setContentToRefreshAllPersonalizedScreens(shouldRefreshHomescreen)
 
   refreshAllDetailScreens()
-
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid
-    homeScreen.loadAllCategories = true
-  end if
+  setSideNavSignedInItem(authInfo)
       
   ' this happens when a user signs out or user signs in from the side nav or from settings side nav
   restartChannel()
@@ -598,24 +598,34 @@ End Function
 Function onStartupAuthInfoReceived()
   tubiLog("SignInHelpers.onStartupAuthInfoReceived")
   ' AuthInfo may be invalid if authTask failed to log the user in
-  m.global.authInfo = m.authTask.authInfo
+  authInfo = m.authTask.authInfo
+  m.global.authInfo = authInfo
+
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
 
+  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true
+    m.guestUserHasAgeInfo = m.authTask.guestUserHasAgeInfo
+  end if
+
+  m.guestUserHasAgeRetrieved = true
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
+
+  setSideNavSignedInItem(authInfo)
 
   startUserExperience()
 End Function
 
 
-' onQueueAfterSignIn - occurs after activation success via AddtoMyList
+' onQueueAfterSignIn - occurs after activation success via AddtoMyList on Details page
 Function onQueueAfterSignIn()
   tubiLog("SignInHelpers.onQueueAfterSignIn")
   ' AuthInfo may be invalid if authTask failed to log the user in
-  m.global.authInfo = m.authTask.authInfo
+  authInfo = m.authTask.authInfo
+  m.global.authInfo = authInfo
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
@@ -623,25 +633,24 @@ Function onQueueAfterSignIn()
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
 
-  ' setContentToRefresh is not required for homescreen as we are  fetching homescreen content right after adding into queue
-  setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.movieScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
-  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
-  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+  ' setContentToRefresh is not required for homescreen as we are fetching homescreen content
+  ' right after adding into queue when onBookmarkedAfterSignIn() is called.
+  ' We need to enforce that content is added to queue first, before re-fetching the homescreen.
+  setContentToRefreshAllPersonalizedScreens(false)
 
-  currentScreen = currentScreen()
+  m.spinner.visible = false
+
+  currentScreen = getCurrentScreen()
   if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
     popScreen(true, true)
-    currentScreen = currentScreen()
+    currentScreen = getCurrentScreen()
   end if
-  
-  m.spinner.visible = false
 
   if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
     onAddToQueue(currentScreen, onBookmarkedAfterSignIn)
   end if
-  
+
+  setSideNavSignedInItem(authInfo)
 End Function
 
 
@@ -649,7 +658,8 @@ End Function
 Function onCWRowAfterSignIn()
   tubiLog("SignInHelpers.onCWRowAfterSignIn")
   ' AuthInfo may be invalid if authTask failed to log the user in
-  m.global.authInfo = m.authTask.authInfo
+  authInfo = m.authTask.authInfo
+  m.global.authInfo = authInfo
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
@@ -658,19 +668,10 @@ Function onCWRowAfterSignIn()
   m.authTask = invalid
 
   ' setContentToRefresh is not required for homescreen as we are fetching homescreen content below
-  setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.movieScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
-  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
-  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+  setContentToRefreshAllPersonalizedScreens()
 
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid
-    homeScreen.loadAllCategories = true
-  end if
-
+  setSideNavSignedInItem(authInfo)
   restartChannel()
-  
 End Function
 
 
@@ -678,7 +679,8 @@ End Function
 Function onParentalControlAfterSignIn()
   tubiLog("SignInHelpers.onParentalControlAfterSignIn")
   ' AuthInfo may be invalid if authTask failed to log the user in
-  m.global.authInfo = m.authTask.authInfo
+  authInfo = m.authTask.authInfo
+  m.global.authInfo = authInfo
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
@@ -686,28 +688,19 @@ Function onParentalControlAfterSignIn()
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
 
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
     popScreen(true, true)
-    currentScreen = currentScreen()
+    currentScreen = getCurrentScreen()
   end if
   
   m.spinner.visible = false
   
-  ' setContentToRefresh is not required for homescreen as we are fetching homescreen content below
-  setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.movieScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
-  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
-  setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)  
-
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid
-    homeScreen.loadAllCategories = true
-  end if
+  setContentToRefreshAllPersonalizedScreens()
+  setSideNavSignedInItem(authInfo)
 
   if currentScreen <> invalid and currentScreen.getSubtype() = "SettingsScreen"
-    setSignInInfo()
+    setSettingsScreenSignInInfo()
     currentScreen.setFocus(true)
   end if
   
@@ -718,7 +711,8 @@ End Function
 Function onSideNavMyListAfterSignIn()
   tubiLog("SignInHelpers.onSideNavMyListAfterSignIn")
   ' AuthInfo may be invalid if authTask failed to log the user in
-  m.global.authInfo = m.authTask.authInfo
+  authInfo = m.authTask.authInfo
+  m.global.authInfo = authInfo
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
@@ -726,19 +720,24 @@ Function onSideNavMyListAfterSignIn()
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
 
-  currentScreen = currentScreen()
-  if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid and (currentScreen.getSubtype() = "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
     popScreen(true, true)
-    currentScreen = currentScreen()
+    currentScreen = getCurrentScreen()
   end if
   
   m.spinner.visible = false
+
+  setSideNavSignedInItem(authInfo)
 
   if currentScreen <> invalid and currentScreen.id = "channelDetailScreen" and currentScreen.categoryId = m.constants.ui.categoryIds.queue
     ' this happens when user logs in via channelDetailScreen (queue/mylist)
     content = CreateObject("roSGNode", "CategoryContentNode")
     content.id = m.constants.ui.categoryIds.queue
     getChannelFromServer(currentScreen, content)
+    setContentToRefreshAllPersonalizedScreens()
+  else
+    ' don't expect this to happen, keeping here as a fallback mechanism
+    restartChannel()
   end if
-  
 End Function

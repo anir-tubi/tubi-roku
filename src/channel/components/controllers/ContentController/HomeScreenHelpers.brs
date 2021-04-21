@@ -8,14 +8,26 @@ Function showHomeScreen(constants, authInfo, screenID = "")
   if screenID = ""
     screenID = constants.ui.screenIds.homeScreen
   end if
+
   homeScreen = getFromScreenCache(screenID)
+
   if homeScreen <> invalid
     ' this is required for setting focus to homescreen after activation/signout
     homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController 
 
-    '//when calling pushScreen() for a cached home screen, then report navigate_to_page and page_load events immediately 
-    pushScreen(homeScreen, true, true)
+    '//when calling pushScreen() for a cached home screen, then report navigate_to_page and
+    ' page_load events immediately, since there is no content fetching occuring.
+    shouldSendPageLoadEvent = true
+    if homescreen.isLoading = true
+      ' when a user signs in/out, the homescreen may be in the screen cache, however the page may be
+      ' going through the loading process, in which case we will send the PageLoadEvent when the
+      ' homescreen concludes loading, in onHomescreenContentReady().
+      shouldSendPageLoadEvent = false
+      showHideSpinner(true)
+    end if
+    pushScreen(homeScreen, true, shouldSendPageLoadEvent)
   else
+    showHideSpinner(true)
     homeScreen = CreateObject("roSGNode", "HomeScreen")
     homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
@@ -32,27 +44,27 @@ Function showHomeScreen(constants, authInfo, screenID = "")
 
     sContentMode = constants.ui.contentMode.homescreen
     if screenID = constants.ui.screenIds.homeScreen
-      m.top.observeField("homescreenResponse", "onHomescreenResponse")
+      m.top.observeFieldScoped("homescreenResponse", "onHomescreenResponse")
     else if screenID = constants.ui.screenIds.movieScreen
-      m.top.observeField("moviescreenResponse", "onMoviescreenResponse")
+      m.top.observeFieldScoped("moviescreenResponse", "onMoviescreenResponse")
       sContentMode = constants.ui.contentMode.movie
       m.top.observeFieldScoped("reloadMovieUserCategoriesResponse", "onReloadUserCategoriesResponseInMovieScreen")
     else if screenID = constants.ui.screenIds.tvScreen
       sContentMode = constants.ui.contentMode.tv
-      m.top.observeField("tvscreenResponse", "onTVscreenResponse")
+      m.top.observeFieldScoped("tvscreenResponse", "onTVscreenResponse")
       m.top.observeFieldScoped("reloadTVUserCategoriesResponse", "onReloadUserCategoriesResponseInTVScreen")
     else if screenID = constants.ui.screenIds.espanolScreen
-      m.top.observeField("espanolscreenResponse", "onEspanolscreenResponse")
+      m.top.observeFieldScoped("espanolscreenResponse", "onEspanolscreenResponse")
       sContentMode = constants.ui.contentMode.latino
       m.top.observeFieldScoped("reloadEspanolUserCategoriesResponse", "onReloadUserCategoriesResponseInEspanolScreen")
     else if screenID = constants.ui.screenIds.newsScreen
-      m.top.observeField("newsScreenResponse", "onNewsScreenResponse")
+      m.top.observeFieldScoped("newsScreenResponse", "onNewsScreenResponse")
       sContentMode = constants.ui.contentMode.linear
       m.top.observeFieldScoped("reloadNewsUserCategoriesResponse", "onReloadUserCategoriesResponseInNewsScreen")
     end if 
     homeScreen.contentMode = sContentMode
 
-    homeScreen.isNewsAllowedInTopNav = isAdultModeEnabledByParentalControl() 
+    homeScreen.isNewsAllowedInTopNav = isParentalControlsAdultLevel()
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
     homeScreen.signedIn = (authInfo <> invalid)
     homeScreen.kidsModeFeatureOn = m.kidsModeFeatureOn
@@ -62,19 +74,14 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     refreshHomescreen(homescreen)
     
     setInScreenCache(homeScreen)
-    bNavigate_to_Page = true
-    if screenID = constants.ui.screenIds.homeScreen
-      'the homescreen is the first screen so no need for navigate_to_page tracking.
-      bNavigate_to_Page = false
-    end if 
+
     'page_load tracking will happen when content is received and displayed when onHomescreenContentReady() is called.
-    pushScreen(homeScreen, bNavigate_to_Page, false)    
+    pushScreen(homeScreen, true, false)
   end if
 
   '// Unobserve and then reobserve the topNavHasFocus field. Do this because sometimes, this field is unoberserved at other points in the code. 
   homeScreen.unobserveFieldScoped("topNavHasFocus")
   homeScreen.observeFieldScoped("topNavHasFocus", "onHomeScreeenTopNavFocused")
-
 End Function
 
 
@@ -225,7 +232,7 @@ End Function
 
 '//If the homescreen is loading, then display the default background
 Function setHomeScreenLoading(homeScreen)
-  screen = currentScreen() 
+  screen = getCurrentScreen()
   homeScreen.isLoading = true
   '//checking screen for invalid, to show the loading spinner when user sign outs
   '//Display default background and spinner only if the home screen is the current screen while it is loading
@@ -359,11 +366,6 @@ Function respondToHomescreenResponse(screenID, rawResponse)
         '   </CategoryContentNode>
         ' </CategoryContentNode>
         
-        ' set sponsor details only for Espanol screen
-        if screenID = m.constants.ui.screenIds.espanolScreen
-          setSponsorDetails(rawResponse.convertedMetadata)
-        end if
-        
         homeScreen.content = rawResponse.convertedMetadata
         homeScreen.contentUpdated = true
 
@@ -432,7 +434,7 @@ Function onHomeScreenFocusChanged(msg)
   if homeScreen.isInFocusChain() = false or homeScreen.topNavHasFocus = true
     '//If the homescreen loses focus or the top nav is in focus, then stop the linear video player in case it is playing
     stopCountdownTimer()
-    if currentScreen() = invalid or currentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+    if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
       '//If the video player has gained focus, then don't stop it.
       stopAndHideLinearVideoPlayer()
     end if
@@ -465,7 +467,7 @@ Function onHomeScreenContentFocused(msg)
   focusedContent = msg.getData()
   homeScreen = msg.getRoSGNode()
 
-  if focusedContent <> invalid and (currentScreen() <> invalid or currentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen)
+  if focusedContent <> invalid and (getCurrentScreen() <> invalid or getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen)
     stopCountdownTimer()
     if focusedContent.type = m.constants.ui.categoryTypes.linear
       bPlayVideo = true
@@ -495,14 +497,14 @@ End Function
 
 
 Function goToFirstTopNavOptionFromAnotherTopNavOption()
-  currentScreen = currentScreen()
-  if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and currentScreen().topNavHasFocus = true and currentScreen().id <> m.constants.ui.screenIds.homeScreen
+  currentScreen = getCurrentScreen()
+  if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and getCurrentScreen().topNavHasFocus = true and getCurrentScreen().id <> m.constants.ui.screenIds.homeScreen
     currentScreen.unobserveFieldScoped("topNavHasFocus")
     
     showDefaultHomeScreen()
 
     '//When going to the first top nav item and going to the default home screen, ensure the the top nav is selected, but we do not wish to report the analytics that the topnav toggles off and then back on
-    homeScreen = currentScreen()
+    homeScreen = getCurrentScreen()
     homeScreen.unobserveFieldScoped("topNavHasFocus")
     homeScreen.focusOnTopNav = true
     homeScreen.observeFieldScoped("topNavHasFocus", "onHomeScreeenTopNavFocused")
@@ -538,7 +540,7 @@ End Function
 
 Function onFullscreenCountdown()
   tubiLog("HomeScreenHelpers.onFullscreenCountdown")
-  homeScreen = currentScreen()
+  homeScreen = getCurrentScreen()
   if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.newsScreen)
     nCurrentCount = homeScreen.fullscreenCountdown
     nNewCount = nCurrentCount - 1
@@ -553,7 +555,7 @@ End Function
 ' Select the Linear content that is currently focused
 Function selectLinearContent(content)
   tubiLog("HomeScreenHelpers.selectLinearContent()") 
-  homeScreen = currentScreen()
+  homeScreen = getCurrentScreen()
 
   '//stop timer and tell player to go fullscreen   
   stopCountdownTimer()
@@ -587,7 +589,7 @@ End Function
 
 Function startCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")  
-  homeScreen = currentScreen()
+  homeScreen = getCurrentScreen()
   if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.newsScreen)
     stopCountdownTimer()
     '//Start/reset timer to play video in fullscreen after a few seconds
@@ -639,7 +641,7 @@ Function onTopNavItemSelected(msg)
     '//Don't forget to listen to the "topNavHasFocus" since in this use case, the code does not open a new screen and reach showHomeScreen() which is where it resets and listens to the that field again
     homeScreen.observeFieldScoped("topNavHasFocus", "onHomeScreeenTopNavFocused")
   end if
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
   if currentScreen.id <> homeScreen.id
     homeScreen.jumpToRowItem = [0,0] '//reset original homescreen so it is set back to the origin content item.
   end if
@@ -676,34 +678,15 @@ Function onHomescreenContentReady(msg)
   homeScreen.isLoading = false
   showHideSpinner(false)
 
-
   '//Report the page_load analytics
   loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
   screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
 End Function
 
 
-' onHomeSuccessResponse
-'
-' this is the callback from Home screen success data
-' @response : ContentNode
-Function onHomeSuccessResponse(response)
-
-End Function
-
-
-' onHomeErrorResponse
-' 
-' this is the callback from Home screen error data
-' @error : ContentNode
-Function onHomeErrorResponse(error)
-
-End Function
-
-
 Function onUtilityItemSelected(content)
   itemSelectedId = content.id
-  currentScreenNow = currentScreen()
+  currentScreenNow = getCurrentScreen()
 
   if itemSelectedId = m.constants.ui.utilityIds.movies
     showMoviesScreen()

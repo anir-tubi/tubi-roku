@@ -4,6 +4,7 @@ Function TubiAuth(constants, request)
   return {
     authRegSection: "auth"
     firstVisitRegSection: "visit"
+    guestUserHasAgeRegSection: "has_age"
     
     constants: constants
     request: request
@@ -18,6 +19,9 @@ Function TubiAuth(constants, request)
     transferRefreshToken: tubiAuth_transferRefreshToken
     getAuthHeaders: tubiAuth_getAuthHeaders
     createAuthRequest: tubiAuth_createAuthRequest
+    updateAuthInfoWithAge: tubiAuth_updateAuthInfoWithAge
+    getGuestUserHasAgeInfo: tubiAuth_getGuestUserHasAgeInfo
+    setGuestUserHasAgeInfo: tubiAuth_setGuestUserHasAgeInfo
 
     'private methods
     saveAuthInfo: tubiAuth_saveAuthInfo_
@@ -39,11 +43,15 @@ End Function
 
 'returns invalid or an assocArray that looks like the following
 'authInfo = {
-'   refreshToken: someRefreshToken(String)
-'   accessToken: someAccessToken(String)
-'   expireTime: numberOfSecondsUntilExpires(Integer)
-'   userId: userId(Integer as String)
-'   authType: analyticsAuthType(String)
+'  refreshToken: someRefreshToken(String)
+'  accessToken: someAccessToken(String)
+'  expireTime: numberOfSecondsUntilExpires(Integer)
+'  userId: userId(Integer as String)
+'  fn: firstName(String)
+'  ln: lastName(String)
+'  name: name(String)
+'  authType: analyticsAuthType(String)
+'  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 function tubiAuth_getAuthInfo()
   authInfo = m.regReadAll(m.authRegSection) 'returns empty assocArray if nothing in the auth registry
@@ -56,6 +64,14 @@ function tubiAuth_getAuthInfo()
       newAuthInfo = m.refreshAuthToken(authInfo, 3) 'can return invalid
     else
       newAuthInfo = authInfo
+    end if
+  end if
+
+  if type(authInfo.hasAge) = "roString" or type(authInfo.hasAge) = "String"
+    if authInfo.hasAge = "true"
+      authInfo.hasAge = true
+    else if authInfo.hasAge = "false"
+      authInfo.hasAge = false
     end if
   end if
 
@@ -90,13 +106,16 @@ End Function
 'parses auth info from the server and saves it into the registry for further access
 'returns invalid or the authInfo assocArray that was successfully saved into the registry:
 'authInfo = {
-'   refreshToken: someRefreshToken(String)
-'   accessToken: someAccessToken(String)
-'   expireTime: numberOfSecondsUntilExpires(Integer as String)
-'   userId: userId(Integer as String)
-'   authType: analyticsAuthType(String)
+'  refreshToken: someRefreshToken(String)
+'  accessToken: someAccessToken(String)
+'  expireTime: numberOfSecondsUntilExpires(Integer as String)
+'  userId: userId(Integer as String)
+'  fn: firstName(String)
+'  ln: lastName(String)
+'  name: name(String)
+'  authType: analyticsAuthType(String)
+'  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
-
 '@serverAuthInfo: assocArray of auth info as received from the server
 Function tubiAuth_handleRegistration(serverAuthInfo)
   authInfo = m.formatAuthInfoFromServer(serverAuthInfo)
@@ -111,11 +130,15 @@ End Function
 'this is a helper function that wraps tubiAuth_requestTokenRefresh_ and tubiAuth_handleRefreshResponse_
 'this function behaves synchronously and blocks until a response is received or the timeout is reached
 '@authInfo = {
-'   refreshToken: someRefreshToken(String)
-'   accessToken: someAccessToken(String)
-'   expireTime: numberOfSecondsUntilExpires(Integer or Integer as String)
-'   userId: userId(Integer as String)
-'   authType: analyticsAuthType(String)
+'  refreshToken: someRefreshToken(String)
+'  accessToken: someAccessToken(String)
+'  expireTime: numberOfSecondsUntilExpires(Integer as String)
+'  userId: userId(Integer as String)
+'  fn: firstName(String)
+'  ln: lastName(String)
+'  name: name(String)
+'  authType: analyticsAuthType(String)
+'  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 '@timeout: integer, the max amount of time to wait for a response from the server in seconds
 '
@@ -284,17 +307,94 @@ function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
 end function
 
 
+' @hasAge: boolean, backend response field "has_age". True indicates the user has an age
+'                   associated with the account, and the age is >= 13.
+Function tubiAuth_updateAuthInfoWithAge(hasAge)
+  authInfo = m.getAuthInfo()
+  if authInfo <> invalid
+    authInfo.hasAge = hasAge.toStr()
+
+    ' getAuthInfo() returns an int, but saveAuthInfo() expects a string for expire time
+    if type(authInfo.expireTime) = "roInteger" or type(authInfo.expireTime) = "Integer"
+      authInfo.expireTime = authInfo.expireTime.toStr()
+    end if
+  end if
+
+  m.saveAuthInfo(authInfo)
+  return m.getAuthInfo()
+End Function
+
+
+Function tubiAuth_getGuestUserHasAgeInfo()
+  hasAgeStored = m.regRead("ageInfo", m.guestUserHasAgeRegSection)
+  if hasAgeStored <> invalid
+
+    hasAgeStored = ParseJson(hasAgeStored)
+    dateTime = CreateObject("roDateTime")
+    nowTime = dateTime.AsSeconds()
+
+    hasAgeInfo = {
+      hasAge: hasAgeStored.hasAge
+      expired: true
+    }
+
+    if hasAgeStored.expireTime > nowTime
+      hasAgeInfo.expired = false
+    end if
+  else
+    hasAgeInfo = {
+      hasAge: false
+      expired: true
+    }
+  end if
+  return hasAgeInfo
+End Function
+
+
+' @hasAge: boolean, true indicates that the backend has determined that this user is >= 13 years old
+Function tubiAuth_setGuestUserHasAgeInfo(hasAge)
+  if type(hasAge) <> "roBoolean" and type(hasAge) <> "Boolean"
+    hasAge = false
+  end if
+
+  dateTime = CreateObject("roDateTime")
+  nowTime = dateTime.AsSeconds()
+
+  hasAgeStored = {
+    hasAge: hasAge
+    expireTime: nowTime + (24 * 60 * 60) ' 1 day into the future default expire time
+  }
+
+  if hasAge = true
+    'expire time is 60 days into the future if guest users indicate they are over 13 (ie. hasAge = true)
+    hasAgeStored.expireTime = nowTime + (60 * 24 * 60 * 60)
+  end if
+
+  hasAgeStoredJson = FormatJson(hasAgeStored)
+  m.regWrite("ageInfo", hasAgeStoredJson, m.guestUserHasAgeRegSection)
+  return hasAgeStored
+End Function
+
+
 '@authInfo = {
-'   refreshToken: someRefreshToken(String)
-'   accessToken: someAccessToken(String)
-'   expireTime: numberOfSecondsUntilExpires(Integer as String)
-'   userId: userId(Integer as String)
-'   authType: analyticsAuthType(String)
+'  refreshToken: someRefreshToken(String)
+'  accessToken: someAccessToken(String)
+'  expireTime: numberOfSecondsUntilExpires(Integer as String)
+'  userId: userId(Integer as String)
+'  fn: firstName(String)
+'  ln: lastName(String)
+'  name: name(String)
+'  authType: analyticsAuthType(String)
+'  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 function tubiAuth_saveAuthInfo_(authInfo)
   if authInfo <> invalid and authInfo.refreshToken <> invalid and authInfo.accessToken <> invalid and authInfo.expireTime <> invalid  and (type(authInfo.expireTime) = "String" or type(authInfo.expireTime) = "roString") and authInfo.userId <> invalid
     for each key in authInfo
-      m.regWrite(key, authInfo[key], m.authRegSection)
+      value = authInfo[key]
+      if type(value) <> "roString"
+        value = value.toStr()
+      end if
+      m.regWrite(key, value, m.authRegSection)
     end for
   else
     authInfo = invalid
@@ -313,11 +413,15 @@ end function
 'should only be called by getAuthInfo
 'returns true if expired and false if not expired
 '@authInfo = {
-'   refreshToken: someRefreshToken(String)
-'   accessToken: someAccessToken(String)
-'   expireTime: numberOfSecondsUntilExpires(Integer)
-'   userId: userId(Integer as String)
-'   authType: analyticsAuthType(String)
+'  refreshToken: someRefreshToken(String)
+'  accessToken: someAccessToken(String)
+'  expireTime: numberOfSecondsUntilExpires(Integer as String)
+'  userId: userId(Integer as String)
+'  fn: firstName(String)
+'  ln: lastName(String)
+'  name: name(String)
+'  authType: analyticsAuthType(String)
+'  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 function tubiAuth_checkIfAuthExpired_(authInfo)
   isExpired = true
@@ -440,6 +544,17 @@ End Function
 
 'used when getting back a response from the server after a successful registration.
 'We need to format the information to match what we store in the registry
+'returns authInfo = {
+'                     refreshToken: someRefreshToken(String)
+'                     accessToken: someAccessToken(String)
+'                     expireTime: numberOfSecondsUntilExpires(Integer as String)
+'                     userId: userId(Integer as String)
+'                     fn: firstName(String)
+'                     ln: lastName(String)
+'                     name: name(String)
+'                     authType: analyticsAuthType(String)
+'                     has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
+'                   }
 Function tubiAuth_formatAuthInfoFromServer_(serverAuthInfo)
   clock = CreateObject("roDateTime")
   secondsToNow = clock.AsSeconds()
@@ -453,6 +568,7 @@ Function tubiAuth_formatAuthInfoFromServer_(serverAuthInfo)
   if serverAuthInfo.last_name <> invalid then authInfo.ln = serverAuthInfo.last_name
   if serverAuthInfo.name <> invalid then authInfo.name = serverAuthInfo.name
   if serverAuthInfo.authType <> invalid then authInfo.authType = serverAuthInfo.authType
+  if serverAuthInfo.has_age <> invalid then authInfo.hasAge = serverAuthInfo.has_age.toStr()
 
   return authInfo
 End Function

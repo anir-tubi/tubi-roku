@@ -17,6 +17,7 @@ Function TubiTracking (constants, request, auth)
     getAnalyticsPage: tubiTracking_getAnalyticsPage
     getAnalyticsComponent: tubiTracking_getAnalyticsComponent
     getAnalyticsDestinationComponent: tubiTracking_getAnalyticsDestinationComponent
+    getAnalyticsSelector: tubiTracking_getAnalyticsSelector
     getAnalyticsTile: tubiTracking_getAnalyticsTile
     getAnalyticsAd: tubiTracking_getAnalyticsAd
     getAnalyticsAdAdrise: tubiTracking_getAnalyticsAdAdrise
@@ -423,6 +424,12 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       impression_type: {} 'ViewableImpressionType
       contents: {}  'TODO: Figure out what this looks like
     }
+
+    request_for_info: {
+      request_for_info_action: "" 'RequestForInfoAction enum
+      prompt: "" 'optional, describes the question being asked
+      selectorOneOf: {} 'a valid selector component
+    }
   }
 
   eventBase = eventTypes[eventType]
@@ -459,6 +466,21 @@ Function tubiTracking_getAnalyticsDestinationComponent(componentType, componentV
   componentBase = componentTypes[componentType]
   component = m.populateMessage(componentType, componentValues, componentBase)
   return component
+End Function
+
+
+Function tubiTracking_getAnalyticsSelector(selectorType, selectorValues)
+  selectorTypes = m.allOneofs.selectorOneOf
+  selectorBase = selectorTypes[selectorType]
+  selector = m.populateMessage(selectorType, selectorValues, selectorBase)
+
+  ' populate message will remove the "selections" field if it is there are no items in the array.
+  ' Analytics expects an empty array if the user does not select anything, so add the empty array back.
+  if selector[selectorType].selections = invalid
+    selector[selectorType].selections = []
+  end if
+
+  return selector
 End Function
 
 
@@ -789,6 +811,8 @@ Function tubiTracking_getOneOfs()
   }
   
   landing_page = {}
+
+  age_gate_page = {}
   
   ' splash_page = {}   'not currently used
   ' forget_page = {}   'not currently used
@@ -818,6 +842,7 @@ Function tubiTracking_getOneOfs()
     latino_browse_page: latino_browse_page
     onboarding_page: onboarding_page
     landing_page: landing_page
+    age_gate_page: age_gate_page
     ' splash_page: splash_page
     ' forget_page: forget_page
   }
@@ -847,6 +872,7 @@ Function tubiTracking_getOneOfs()
     dest_latino_browse_page: latino_browse_page
     dest_onboarding_page: onboarding_page
     dest_landing_page: landing_page
+    dest_age_gate_page: age_gate_page
     ' dest_splash_page: splash_page
     ' dest_forget_page: forget_page
   }
@@ -925,12 +951,27 @@ Function tubiTracking_getOneOfs()
     video_id: -1
   }
 
+  selectorOneOf = {
+    content_selector: {
+      tiles: []
+      selections: []
+
+    }
+    string_selector: {
+      options: ""
+      selections: []
+      string_selector_type: "" 'StringSelectorComponent.type enum
+      sub_type: ""
+    }
+  }
+
   return {
     pageOneof: pageOneof
     dest_pageOneof: dest_pageOneof
     dest_componentOneof: dest_componentOneof
     componentOneof: componentOneof
     contentOneof: contentOneof
+    selectorOneOf: selectorOneOf
   }
 End Function
 

@@ -32,6 +32,7 @@ Function init()
   m.top.observeFieldScoped("callingPage", "onSetCallOfAction")
 
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
+  m.top.observeFieldScoped("uiMode", "onUiModeChange")
 
   'set initial tracking values
   m.top.trackingPageInfo = {
@@ -43,7 +44,6 @@ Function init()
 
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
-
 End Function
 
 
@@ -74,6 +74,22 @@ Function onSignInInfoChange()
       CreateParentalControlsPanel(child)
     end if
   end for
+End Function
+
+
+Function onUiModeChange(msg)
+  tubiLog("SettingsScreen.onUiModeChange")
+  uiMode = msg.getData()
+  if m.SettingsMenuPanel <> invalid
+    m.SettingsMenuPanel.uiMode = uiMode
+  end if
+
+  ' Changing the UI mode may have caused the top menu item to be removed, but still leaves the right
+  ' panel associated with the menu item that is no longer there.
+  ' Resetting the focus triggers another instance of onCreateNextPanelIndex() to be called which will
+  ' reset the right panel in case the focused menu item is different after changing the uiMode.
+  m.SettingsMenuPanel.setFocus(false)
+  m.SettingsMenuPanel.setFocus(true)
 End Function
 
 
@@ -112,11 +128,25 @@ End Function
 
 
 Function onCreateNextPanelIndex()
+  tubiLog("SettingsScreen.onCreateNextPanelIndex")
   nextIndex = m.SettingsMenuPanel.createNextPanelIndex
   nextPanel = invalid
   buttonContent = m.SettingsMenuPanel.content.getChild(nextIndex)
+  nextPanel = createNextPanel(buttonContent)
+
+  if nextPanel <> invalid
+    m.SettingsMenuPanel.nextPanel = nextPanel
+  end if
+End Function
+
+
+' @buttonContent: roSGnode, ContentNode used to create the items in the Settings menu. Should be one
+'                 of the DetailMenuItemContentNodes in SettingsMenuPanel.SettingsMenu
+Function createNextPanel(buttonContent)
+  nextPanel = invalid
+
   if buttonContent <> invalid
-    if buttonContent.id = "ParentalControls"
+    if buttonContent.id = "ParentalControlsButton"
       nextPanel = CreateParentalControlsPanel()
     else if buttonContent.id = "AboutButton"
       nextPanel = CreateAboutPanel()
@@ -134,11 +164,8 @@ Function onCreateNextPanelIndex()
       end if
     end if
   end if
-  if nextPanel <> invalid
-    m.SettingsMenuPanel.nextPanel = nextPanel
-  else
-    print "next panel is invalid"
-  end if
+
+  return nextPanel
 End Function
 
 
@@ -163,7 +190,6 @@ Function CreateParentalControlsPanel(existingPanel = invalid)
   pcPanel.focusable = true
   pcPanel.hasNextPanel = false
   pcPanel.leftOnly = false
-  pcPanel.createNextPanelOnItemFocus = false
   pcPanel.selectButtonMovesPanelForward = false
   pcPanel.offset = m.rightPanelOffset
 
@@ -230,6 +256,7 @@ Function CreateSettingsMenuPanel()
   settingsMenuPanel.createNextPanelOnItemFocus = true
   settingsMenuPanel.selectButtonMovesPanelForward = true
   settingsMenuPanel.signInInfo = m.top.signInInfo
+  settingsMenuPanel.uiMode = m.top.uiMode
   return settingsMenuPanel
 End Function
 
@@ -241,7 +268,6 @@ Function CreateLegalPanel(title, uri)
   textPanel.focusable = true
   textPanel.hasNextPanel = false
   textPanel.leftOnly = false
-  textPanel.createNextPanelOnItemFocus = false
   textPanel.selectButtonMovesPanelForward = false
   textPanel.offset = m.rightPanelOffset
   textPanel.isLoading = true
@@ -308,7 +334,6 @@ Function CreateSignOutPanel()
   panel.focusable = false
   panel.hasNextPanel = false
   panel.leftOnly = false
-  panel.createNextPanelOnItemFocus = false
   panel.selectButtonMovesPanelForward = false
   panel.offset = m.rightPanelOffset
   return panel

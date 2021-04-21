@@ -1,22 +1,12 @@
 Function initSideNav()
-
-  m.SideNav.createMenuItems = true
-
   m.SideNav.observeFieldScoped("itemSelectedId", "onSideNavItemSelected")
-  m.global.observeFieldScoped("authInfo", "onSideNavSignedIn")
   m.SideNav.observeFieldScoped("navigateWithinPageInfo", "onSideNavNavigateWithinPageInfoChanged")
 
   m.sSideNavItemSelectedId = invalid
   m.sSideNavCurrentScreen = invalid
 
-  if m.kidsModeFeatureOn = false
-    m.SideNav.kidsModeValues = {
-      on: false,
-      featureOn: m.kidsModeFeatureOn
-      isAdultModeEnabledByParentalControl: isAdultModeEnabledByParentalControl()
-    }
-  end if
-  
+  m.SideNav.createMenuItems = true
+
   ' display Espanol, TV, Movies menu items only if the countryCode is US
   if m.constants.deviceInfo.countryCode <> "US"
     '//Tell the sideNav to stop displaying the Espanol menu item
@@ -27,6 +17,19 @@ Function initSideNav()
     m.SideNav.displayChannels = false
   end if
 
+  ' Display the Kids menu items only if the feature is allowed
+  if m.kidsModeFeatureOn <> true
+    m.SideNav.displayKids = false
+  end if
+
+  if isKidsModeEnabledByParentalControls() = true
+    m.SideNav.kidsItemTurnedOn = false
+  end if
+
+  if isParentalControlsAdultLevel() <> true
+    m.SideNav.espanolItemTurnedOn = false
+  end if
+
   ' stop displaying some side nav items if the top nav is being displayed
   if isTopNavHomeScreenEnabled() = true
     '//Tell the sideNav to stop displaying the Espanol menu item
@@ -35,8 +38,8 @@ Function initSideNav()
     m.SideNav.displayMoviesTV = false
   end if
 
-  '//set the SideNav Strings by calling onSideNavSignedIn()
-  onSideNavSignedIn()
+  'set the initial value for the sign in item string
+  setSideNavSignedInItem(m.global.authInfo)
 End Function
 
 
@@ -51,10 +54,6 @@ End Function
 ' @sID: string: one of the menu item ids. A list of ids can be found in constants.ui.sideNavIds
 Function focusSideNavOption(sID)
   '//::TODO:: there should be a check that a valid ID was passed. For right now assume sID is valid and correct.
-  if sID <> invalid and sID = "home"
-    m.latinoModeEnabled = false
-    showLogo()
-  end if
   m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav
 End Function
 
@@ -71,12 +70,12 @@ Function isSideNavActive() as Boolean
 End Function
 
 
-' Change the appearance of some side nav elements when the user data has changed
-Function onSideNavSignedIn()
-  tubiLog("SideNavHelpers.onSideNavSignedIn")
+' Change the appearance of the side nav sign in item when the user data has changed
+' @authInfo: AA, authInfo as stored on m.global.authInfo
+Function setSideNavSignedInItem(authInfo)
+  tubiLog("SideNavHelpers.setSideNavSignedInItem")
   sName = getTranslation("menu_signIn")
 
-  authInfo = m.global.authInfo
   if authInfo <> invalid
     '//User is signed in
     sName = ""
@@ -94,7 +93,7 @@ End Function
 ' Add the current screen's pageOneof info to the sideNav's navigateWithinPageInfo before sending the navigateWithinPageInfo analytic
 Function onSideNavNavigateWithinPageInfoChanged()
   navigateWithinPageInfo = m.SideNav.navigateWithinPageInfo
-  currentScreen = currentScreen()
+  currentScreen = getCurrentScreen()
 
   if currentScreen <> invalid and currentScreen.trackingPageInfo <> invalid  
     navigateWithinPageInfo.pageOneof = m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
@@ -115,14 +114,6 @@ Function setKidsModeInSideNav(isEnabled = true)
     bLimited = true
     sIconTitle = getTranslation("menu_exitKids")
   end if
-
-  m.SideNav.kidsModeValues = {
-    featureOn: m.kidsModeFeatureOn,
-    on: isEnabled
-    grayedOut: bLimited,
-    title: sIconTitle
-    isAdultModeEnabledByParentalControl: isAdultModeEnabledByParentalControl()
-  }
 End Function
 
 
@@ -131,7 +122,7 @@ Function onSideNavItemSelected()
   itemSelected = m.SideNav.itemSelected
   authInfo = m.global.authInfo
   bSameScreen = false
-  currentScreenNow = currentScreen()
+  currentScreenNow = getCurrentScreen()
   if m.sSideNavCurrentScreen <> invalid and currentScreenNow <> invalid
     '//check if we are viewing the same screen. If not but sSideNavItemSelectedId is still the same as the input, then user navigated away from root page
     if (m.sSideNavCurrentScreen.subtype() = currentScreenNow.subtype() and m.sSideNavCurrentScreen.id = currentScreenNow.id and itemSelectedId <> m.constants.ui.sideNavIds.profile) then bSameScreen = true
@@ -141,8 +132,6 @@ Function onSideNavItemSelected()
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
     bNewScreenCalledSuccess = false
     
-    m.latinoModeEnabled = false
-
     ' set appropriate analytics component on the page being navigated from so NavigateToPageEvent
     ' contains all the requisite information -  NOTE: this analytic does not get reported when the user presses the sideNav button associated with the current screen
     sideNavComponentValues = {
@@ -154,7 +143,10 @@ Function onSideNavItemSelected()
     }
 
     if itemSelectedId = m.constants.ui.sideNavIds.profile
-      showLogo()
+      if isKidsUIOn() <> true
+        setUiMode(m.constants.ui.modes.standard)
+      end if
+      
       if authInfo = invalid
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
         startSignIn()
@@ -165,14 +157,13 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.kidsMode
-      showLogo()
       sTitle = ""
       sDescription = ""
       if itemSelected.turnedOn = true
         '//If the parental control settings are not set to kids, then this action is not limited
         '// aka this mode is not locked down and can be easily exited without a parent's intervention
 
-        if m.kidsModeEnabled = true
+        if isKidsUIOn() = true
           dialogEvent = {
             type: "dialog"
             values: {
@@ -186,7 +177,7 @@ Function onSideNavItemSelected()
           sTitle = getTranslation("dialog_kidsExit_title")
           sDescription = getTranslation("dialog_kidsExit_description")
           '//::TODO::locale - should we 1st check if there is an error specifc OK/cancel button? If, not then should we get the generic ok/cancel button string?
-          showSimpleModal(sTitle, sDescription, [getTranslation("dialog_kidsExit_button_ok"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, onKidsModeExit)
+          showSimpleModal(sTitle, sDescription, [getTranslation("dialog_kidsExit_button_ok"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, disableKidsModeFromSideNav)
         else
           dialogEvent = {
             type: "dialog"
@@ -201,7 +192,7 @@ Function onSideNavItemSelected()
           enableKidsModeFromSideNav()
         end if
       else
-        if m.kidsModeEnabled = true
+        if isKidsUIOn() = true
           '// this mode is locked down and a child need's a parent's intervention to exit the mode
 
           dialogEvent = {
@@ -224,13 +215,19 @@ Function onSideNavItemSelected()
 
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.search
-      showLogo()
       '//display the search
+      if isKidsUIOn() <> true
+        setUiMode(m.constants.ui.modes.standard)
+      end if
+
       showSearchScreen(m.constants)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.home
-      showLogo()
-      topScreen = currentScreen()
+      if isKidsUIOn() <> true
+        setUiMode(m.constants.ui.modes.standard)
+      end if
+
+      topScreen = getCurrentScreen()
       if isTopNavHomeScreenEnabled() = false
         ' if the topnav (experiment) is not enabled, then check if the current screen is not the home screen before proceeding
         '//::TODO::TopNav - get rid of this part of the IF condition once the topnav experiment is successful and complete.
@@ -243,63 +240,72 @@ Function onSideNavItemSelected()
         '//::TODO::TopNav - for now, exclude the espanol screen because the spanish screen is still in the side nav for now.
         showHomeScreen(m.constants, authInfo) 
       end if
+
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.channels
-      if m.kidsModeEnabled = true
+      if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.channels)
       else
-        showLogo()
+        setUiMode(m.constants.ui.modes.standard)
         showChannelListScreen(m.constants, m.constants.ui.terms.menu)
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.categories
-      showLogo()
+      if isKidsUIOn() <> true
+        setUiMode(m.constants.ui.modes.standard)
+      end if
+
       showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.movies
-      if m.kidsModeEnabled = true
+      if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.movies)
       else
+        setUiMode(m.constants.ui.modes.standard)
         showHideSpinner(true)
-        showLogo()
         showMoviesScreen()
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.tv
-      if m.kidsModeEnabled = true
+      if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.tv)
       else
+        setUiMode(m.constants.ui.modes.standard)
         showHideSpinner(true)
-        showLogo()
         showTVScreen()
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.espanol
-      if m.kidsModeEnabled = true
+      if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.espanol)
-      else if isAdultModeEnabledByParentalControl() = false
+      else if isParentalControlsAdultLevel() = false
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.espanol, "teens")        
       else
-        m.latinoModeEnabled = true
+        setUiMode(m.constants.ui.modes.latino)
         showHideSpinner(true)
-        showLogo()
         showEspanolScreen()
         bNewScreenCalledSuccess = true
       end if  
     else if itemSelectedId = m.constants.ui.sideNavIds.mylist
       hideNavMenu(false)
-      showLogo()
+      if isKidsUIOn() <> true
+        setUiMode(m.constants.ui.modes.standard)
+      end if
+
       contentNode = CreateObject("roSGNode", "CategoryContentNode")
       contentNode.id = m.constants.ui.categoryIds.queue
       showChannelScreen(contentNode, "MENU")
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.settings
-      showLogo()
+      if isKidsUIOn() <> true
+        setUiMode(m.constants.ui.modes.standard)
+      end if
+
       homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
       if homeScreen <> invalid
         '//ensure the homescreen is enabled again since when the user backs out of the settings page, he will be returned to the home screen
@@ -308,7 +314,7 @@ Function onSideNavItemSelected()
       showSettingsScreen()
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.exit
-      topScreen = currentScreen()
+      topScreen = getCurrentScreen()
       displayExitModal(topScreen.trackingPageInfo)
       bNewScreenCalledSuccess = false
     end if
@@ -316,7 +322,7 @@ Function onSideNavItemSelected()
     if bNewScreenCalledSuccess = true
       hideNavMenu(false)
       m.sSideNavItemSelectedId = itemSelectedId
-      m.sSideNavCurrentScreen = currentScreen()
+      m.sSideNavCurrentScreen = getCurrentScreen()
     end if
   else
     '//if currentScreen no longer = the screen that
@@ -327,7 +333,7 @@ End Function
 
 
 Function displayMenuItemDisabled(sMenuItemID, parental="")
-  currentScreenNow = currentScreen()
+  currentScreenNow = getCurrentScreen()
   sTitle = getTranslation("dialog_errorOops_title")
   sDialogSubTypeValue = ""
   if sMenuItemID = m.constants.ui.sideNavIds.channels
@@ -367,26 +373,46 @@ Function displayMenuItemDisabled(sMenuItemID, parental="")
 End Function
 
 
-Function enableKidsModeFromSideNav(bEnable = true)
-  enableKidsModeUI(bEnable)
+Function enableKidsModeFromSideNav()
+  setUiMode(m.constants.ui.modes.kids)
   refreshScreenAfterParentalChanges()
-  screen = currentScreen()
+  displayDefaultBackground()
 
-  if bEnable = true
-    if screen <> invalid and (screen.id = m.constants.ui.screenIds.searchScreen or screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.movieScreen or screen.id = m.constants.ui.screenIds.tvScreen or screen.id = m.constants.ui.screenIds.espanolScreen or screen.id = m.constants.ui.screenIds.newsScreen)
-      '//If the current screen is one of the pages that should be disabled during kids mode, then take user to homescreen    
-      showDefaultHomeScreen()
+  ' setting up an AA instead of having a very long if statement that checks against each
+  ' of the screen ids below
+  nonAvailableKidsScreens = {}
+  nonAvailableKidsScreens[m.constants.ui.screenIds.searchScreen] = true
+  nonAvailableKidsScreens[m.constants.ui.screenIds.channelListScreen] = true
+  nonAvailableKidsScreens[m.constants.ui.screenIds.movieScreen] = true
+  nonAvailableKidsScreens[m.constants.ui.screenIds.tvScreen] = true
+  nonAvailableKidsScreens[m.constants.ui.screenIds.espanolScreen] = true
 
-      homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
-      focusSideNavOption(homeSideNavID)
-    end if
+  screen = getCurrentScreen()
+  if screen <> invalid and nonAvailableKidsScreens[screen.id] = true
+    '//If the current screen is one of the pages that should be disabled during kids mode,
+    ' then take user to homescreen
+    showDefaultHomeScreen()
+  else if screen.id = m.constants.ui.screenIds.homeScreen = true
+    '//If current screen is already the homescreen, then ensure the topNav is at the correct visible state
+    screen.enableTopNav = isTopNavHomeScreenEnabled()
   end if
 
-  screen = currentScreen()
+  homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
+  focusSideNavOption(homeSideNavID)
+End Function
+
+
+Function disableKidsModeFromSideNav()
+  setUiMode(m.constants.ui.modes.standard)
+  refreshScreenAfterParentalChanges()
+  displayDefaultBackground()
+  homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
+  focusSideNavOption(homeSideNavID)
+  screen = getCurrentScreen()
+
   if screen.id = m.constants.ui.screenIds.homeScreen = true
-    '//If current screen is the homescreen, then ensure the topNav is at the correct visible state and the screen is still set to not be enabled
+    '//If current screen is already the homescreen, then ensure the topNav is at the correct visible state
     screen.enableTopNav = isTopNavHomeScreenEnabled()
-    screen.enabled = false
   end if
 End Function
 
@@ -398,11 +424,11 @@ Function onKidsModeSettingsCall()
 End Function
 
 
-'@param b: Boolean, Says what the Function is. Should the sideNav be set to open? If set to false, then the opposite happens, the side nav closes.
+'@param b: Boolean, setting to true opens the side nav, setting to false closes the side nav.
 Function openSideNav(b = true)
   m.SideNav.opened = b
   if b = false 
-    topScreen = currentScreen()
+    topScreen = getCurrentScreen()
     sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
     itemSelectedId = m.SideNav.itemSelectedId
     if itemSelectedId = m.constants.ui.sideNavIds.kidsMode and sideNavId <> invalid
@@ -411,10 +437,6 @@ Function openSideNav(b = true)
       focusSideNavOption(sideNavId)
     end if
   end if
-End Function
-
-Function onKidsModeExit()
-  enableKidsModeFromSideNav(false)
 End Function
 
 
@@ -471,7 +493,7 @@ Function displayNavMenu(shouldTrackComponentInteraction = true)
     slideTo(m.SideNav, [0, m.SideNav.translation[1]], .2)
     slideTo(m.ScreenStack, [m.nOriginalScreenStackX + m.SideNav.width, m.ScreenStack.translation[1]], .2)
 
-    topScreen = currentScreen()
+    topScreen = getCurrentScreen()
     if topScreen <> invalid
       topScreen.enabled = false
 
@@ -492,7 +514,7 @@ Function hideNavMenu(shouldTrackComponentInteraction = true)
     slideTo(m.SideNav, [m.nOriginalSideNavX, m.SideNav.translation[1]], .3)
     slideTo(m.ScreenStack, [m.nOriginalScreenStackX, m.ScreenStack.translation[1]], .3)
 
-    topScreen = currentScreen()
+    topScreen = getCurrentScreen()
     if topScreen <> invalid
       topScreen.enabled = true
 

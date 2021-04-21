@@ -33,7 +33,7 @@
       <!-- What kind of content is this homeScreen displaying: movies, tv, normal, espanol etc -->
       <field id="contentMode" alias="CategoryGridList.contentMode" />
       
-      <!-- hides or shows the loading spinner and removes any existing content on the CategoryGridList! -->
+      <!-- removes any existing content on the CategoryGridList! -->
       <field id="isLoading" type="boolean" />
 
       <!-- should the top nav be displayed? -->

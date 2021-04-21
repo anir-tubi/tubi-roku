@@ -15,16 +15,17 @@
     <!-- INPUTS -->
 
       <field id="parentalSettingUpdated" type="boolean" alwaysNotify="true"/>
-      
+
       <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
       -->
       <field id="callingPage" type="string"  alwaysNotify="true"/>      
 
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean"  alwaysNotify="true"/>
-      
+
       <!-- The outside can request an item to be selected. The ID of the button. -->
       <field id="itemRequested" type="string" alwaysNotify="true"/>
+
       <!-- associative array that will indocate if the user is signed in and if so, the aa will contain their info.  -->
       <field id="signInInfo" type="assocarray" alwaysNotify="true" />
 
@@ -33,10 +34,13 @@
       -->
       <field id="actionAfterActivation" type="string"/>
 
+      <!-- Allowed values are those in constants.ui.modes -->
+      <field id="uiMode" type="string"/>
+
     <!-- OUTPUTS -->
       <!-- triggers for upstream controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
-      
+
       <field id="showDeviceModal" type="boolean" alwaysNotify="true" />
 
       <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>

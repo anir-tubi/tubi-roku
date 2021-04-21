@@ -170,9 +170,9 @@ End Function
 
 Function removeTopScreen()
 
-  topScreen = currentScreen()
+  topScreen = getCurrentScreen()
   popScreen(false, false)
-  topScreen = currentScreen()
+  topScreen = getCurrentScreen()
   
   sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
   focusSideNavOption(sideNavId)
@@ -196,7 +196,7 @@ Function showChannelContentError(msg, bContentEmptyError = false)
   errorInfo = msg.getData()
   task = msg.getRoSGNode()
   screen = task.target
-  topScreen = currentScreen()
+  topScreen = getCurrentScreen()
   if screen <> invalid and topScreen.id = m.constants.ui.screenIds.channelDetailScreen
     ' Screen is created/pushed in showChannelScreen, since there is no content, remove it.
     ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
