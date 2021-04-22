@@ -633,7 +633,6 @@ Function onItemFocused(msg)
   pageType = m.Tracking.sideNavPageMap[item.id]
   
   if m.oldSideNavFocusedButton <> invalid
-
     row = itemFocused + 1
     col = 1
     m.top.navigateWithinPageInfo = {
@@ -646,11 +645,10 @@ Function onItemFocused(msg)
       horizontal_location_mode: "INDEX"  'LocationMode enum
     }
   end if
+
   m.oldSideNavFocusedButton = {
     left_nav_section: pageType
   }
-
-
   m.listItemSelected = {
     list: list.id
     index: index

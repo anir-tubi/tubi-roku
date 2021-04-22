@@ -56,15 +56,16 @@ Function init()
   m.global.addField("trackingLoggingTask", "node", false)
   m.global.trackingLoggingTask = m.trackingLoggingTask
 
-  ' initSideNav must run after m.global.trackingLoggingTask is set in case there are any experiments
-  ' within the side nav component that rely on trackingLoggingTask to send exposure events.
-  initSideNav()
-
   ' initialize states needed for various parts of kids mode
   m.kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
   if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
     m.kidsModeFeatureOn = true
   end if
+
+  ' initSideNav must run after m.global.trackingLoggingTask is set in case there are any experiments
+  ' within the side nav component that rely on trackingLoggingTask to send exposure events.
+  ' initSideNav relies on m.kidsModeFeatureOn being set, so run after m.kidsModeFeatureOn is set.
+  initSideNav()
 
   ' TODO: Once MetadataFetchTask functionality is refactored to use the GeneralTask remove uiMode from m.global
   m.global.addField("uiMode", "string", false)

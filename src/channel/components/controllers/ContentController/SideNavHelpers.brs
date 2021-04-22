@@ -102,21 +102,6 @@ Function onSideNavNavigateWithinPageInfoChanged()
 End Function
 
 
-Function setKidsModeInSideNav(isEnabled = true)
-  bLimited = false
-  if isEnabled = true
-    sIconTitle = getTranslation("menu_exitKids")
-  else
-    sIconTitle = getTranslation("menu_kids")
-  end if
-  if isKidsModeEnabledByParentalControls() = true
-    '// the user is set with kids permissions, so instruct the side nav to not allow the kids mode button to do everything it can
-    bLimited = true
-    sIconTitle = getTranslation("menu_exitKids")
-  end if
-End Function
-
-
 Function onSideNavItemSelected()
   itemSelectedId = m.SideNav.itemSelectedId
   itemSelected = m.SideNav.itemSelected
