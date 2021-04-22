@@ -24,7 +24,6 @@ Function init()
   m.MainContentSelect = m.top.findNode("MainContent-select")
   m.TopContent = m.top.findNode("TopContent")
   m.sideNavBackground = m.top.findNode("sideNavBackground")
-  
 End Function
 
 
@@ -632,7 +631,7 @@ Function onItemFocused(msg)
   ' trigger navigate_within_page events in ContentController
   pageType = m.Tracking.sideNavPageMap[item.id]
   
-  if m.oldSideNavFocusedButton <> invalid
+  if m.oldSideNavFocusedButton <> invalid and m.oldSideNavFocusedButton.left_nav_section <> pageType
     row = itemFocused + 1
     col = 1
     m.top.navigateWithinPageInfo = {
