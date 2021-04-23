@@ -152,25 +152,20 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     history = m.global.historyIds.findNode(content.id)
 
     if m.global.authInfo = invalid and history <> invalid
-      if getExperimentResource("roku_local_resume", "roku_local_resume_experiment", true).shows_resume_points_to_guests = true
-        '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
-        '//   because beyond that time we are restricted legally from showing data of signed out users.
+      '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
+      '//   because beyond that time we are restricted legally from showing data of signed out users.
 
-        if isGreaterThanGuestResumePeriod(history) = true
-          history = invalid
-        else
-          '//Listen to and start the timer since a guest user has content with history
-          m.resumeAllowedTimer.unobserveFieldScoped("fire")
-          m.resumeAllowedTimer.observeFieldScoped("fire", "onResumeAllowedTimerFired")
-          if m.resumeAllowedTimer.control <> "start"
-            '//There may be multiple detail screens in the stack so the timer may already be started
-            m.resumeAllowedTimer.control = "start"
-          end if
-        end if 
-      else
-        '//The experiment says NOT to display resume points to guest users, so don't display the resume button to guest users 
+      if isGreaterThanGuestResumePeriod(history) = true
         history = invalid
-      end if  
+      else
+        '//Listen to and start the timer since a guest user has content with history
+        m.resumeAllowedTimer.unobserveFieldScoped("fire")
+        m.resumeAllowedTimer.observeFieldScoped("fire", "onResumeAllowedTimerFired")
+        if m.resumeAllowedTimer.control <> "start"
+          '//There may be multiple detail screens in the stack so the timer may already be started
+          m.resumeAllowedTimer.control = "start"
+        end if
+      end if
     end if
 
     episode = getEpisodeContent(content)

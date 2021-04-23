@@ -26,9 +26,6 @@ Function TubiExperiments(constants) as Object
       roku_discovery_v3: {
         roku_discovery_row_v3: {"position" : -2, "has_tvshows" : false, "has_movies" : false}
       }
-      roku_local_resume: {
-        roku_local_resume_experiment: {"shows_resume_points_to_guests" : true}
-      }
       roku_limit_containers: {
         roku_limit_containers_v2: {"num_containers": -1}
       }
