@@ -21,12 +21,19 @@
       <!-- event that occurs when a user selects the back button -->
       <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
 
+      <!-- event that occurs when a user selects the "Why we ask for this info" button -->
+      <field id="whyButtonSelected" type="boolean" alias="AgeVerificationWhyButton.selected"/>
+
       <!-- the birthdate that the user has submitted. Should be in the form "YYYY-MM-DD" -->
       <field id="birthdate" type="string" />
 
   </interface>
 
   <children>
+    <RectangleIconButton
+      id="AgeVerificationWhyButton"
+      iconUri="pkg://images/icon-about.png"
+      translation="[126,60]" />
     <Group
       id="AgeVerificationPageText">
       <Label
@@ -34,7 +41,7 @@
         color="0xFFFFFF"
         horizAlign="left"
         width="1668"
-        translation="[126,231]">
+        translation="[126,204]">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Bold.ttf"
@@ -46,7 +53,7 @@
         opacity="0.8"
         horizAlign="left"
         width="1668"
-        translation="[126,315]">
+        translation="[126,300]">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"
@@ -55,7 +62,7 @@
     </Group>
     <Group
       id="AgeVerificationNumberPadGroup"
-      translation="[126,402]">
+      translation="[126,375]">
       <NumberPad
         id="AgeVerificationNumberPad"        
         />
@@ -67,7 +74,7 @@
     </Group>
     <Group
       id="AgeVericationDateInfo"
-      translation="[906,504]">
+      translation="[894,501]">
       <LayoutGroup
         id="AgeVerificationUserDate"
         layoutDirection="horiz"

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <!--
- - CustomButton
- -
+ - SimpleButton
+ - A simple, stand alone button that changes width based on the length of the text, and
+ - whose color and opacity change based on if it has focus or not.
  - This component is used for all 480x80 buttons within the sign-in flow.
  -
  -->
@@ -15,7 +16,7 @@
       <field id="color" type="String" value="0x9699A3"/>
       <field id="width" type="Integer" alias="buttonBG.width"/>
       <field id="text" type="String" />
-      <field id="unfocusedBackgroundOpacity" type="String" value="0.17"/>
+      <field id="unfocusedBackgroundOpacity" type="float" value="0.17"/>
     
     <!-- OUTPUTS -->
       <field id="selected" type="boolean" alwaysNotify="true" />

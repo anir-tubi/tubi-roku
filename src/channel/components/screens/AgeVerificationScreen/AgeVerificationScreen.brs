@@ -1,5 +1,6 @@
 Function init()
   m.constants = m.global.constants
+  m.WhyButton = m.top.findNode("AgeVerificationWhyButton")
   m.Header = m.top.findNode("AgeVerificationPageHeader")
   m.SubHeader = m.top.findNode("AgeVerificationPageSubHeader")
   m.NumberPad = m.top.findNode("AgeVerificationNumberpad")
@@ -20,6 +21,7 @@ Function init()
   m.Tip = m.top.findNode("AgeVericationDateTip")
   m.Prompt = m.top.findNode("AgeVericationErrorPrompt")
 
+  m.WhyButton.text = getTranslation("dialog_why_ask_age_title")
   m.Header.text = getTranslation("screenAgeVerification_header")
   m.SubHeader.text = getTranslation("screenAgeVerification_sub_header")
   m.StartButton.text = getTranslation("screenAgeVerification_keypad_button")
@@ -54,6 +56,7 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.ageGateScreen
 
   m.top.observeField("focusedChild", "onComponentFocusChanged")
+  m.WhyButton.observeField("selected", "onWhyButtonSelected")
   m.NumberPad.observeField("buttonSelected", "onNumberPadButtonSelected")
 End Function
 
@@ -290,10 +293,18 @@ Function onKeyEvent(key, press) as Boolean
     if key = "back"
       m.top.backButtonPressed = true
     else
-      if key = "down" and m.date.len() = 10 and m.NumberPad.isInFocusChain() = true
-        m.StartButton.setFocus(true)
-      else if key = "up" and m.StartButton.isInFocusChain() = true
-        m.NumberPad.setFocus(true)
+      if key = "down"
+        if m.WhyButton.hasFocus()
+          m.NumberPad.setFocus(true)
+        else if m.date.len() = 10 and m.NumberPad.isInFocusChain() = true
+          m.StartButton.setFocus(true)
+        end if
+      else if key = "up"
+        if m.StartButton.isInFocusChain() = true
+          m.NumberPad.setFocus(true)
+        else if m.NumberPad.isInFocusChain() = true
+          m.WhyButton.setFocus(true)
+        end if
       end if
     end if
   end if

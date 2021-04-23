@@ -184,13 +184,13 @@
               horizAlignment="center"
               translation="[960,990]"  
               itemSpacings="[20]">
-              <IconButton
+              <PillIconButton
                 id="ButtonBack"
                 icon="left"/>
-              <IconButton
+              <PillIconButton
                 id="ButtonCaptions"
                 icon="up"/>
-              <IconButton
+              <PillIconButton
                 id="ButtonChannels"
                 icon="right"/>
             </LayoutGroup>
@@ -214,7 +214,7 @@
             width="1920"
             height="1080"
             uri="pkg:/images/gradientBground-closedCaptioning.png"/>
-          <IconButton
+          <PillIconButton
             id="cc_close_btn"
             translation="[891,865]"
             icon="down"/>

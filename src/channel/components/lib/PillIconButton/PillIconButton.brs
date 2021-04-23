@@ -10,7 +10,8 @@ Function init()
   if m.global.constants.deviceInfo.scaledUi = true
     m.Background.uri = "pkg:/images/live_news_button_hd.9.png"
   end if
-End Function'
+End Function
+
 
 Function onIconChange()
   if m.top.icon <> invalid
@@ -33,7 +34,9 @@ Function onIconChange()
     else if sIconID = "down"
       m.Icon.uri = "pkg:/images/icon-arrow-down.png"
     else if sIconID = "checkmark"
-      m.Icon.uri = "pkg:/images/icon-arrow-checkmark.png"
+      m.Icon.uri = "pkg:/images/icon-checkmark.png"
+    else if sIconID = "about"
+      m.Icon.uri = "pkg:/images/icon-about.png"
     end if
   end if
 End Function

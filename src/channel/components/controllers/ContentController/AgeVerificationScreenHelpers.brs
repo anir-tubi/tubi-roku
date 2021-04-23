@@ -69,7 +69,9 @@ Function showAgeVerificationScreen(ageSubmittedCallback)
   callbackString = convertFunctionToString(ageSubmittedCallback)
   ageVerificationScreen = CreateObject("roSGNode", "AgeVerificationScreen")
   ageVerificationScreen.id = m.constants.ui.screenIds.ageVerificationScreen
+  ageVerificationScreen.backgroundUriList = [m.defaultBackgroundUri]
   ageVerificationScreen.observeFieldScoped("ageSubmitted", callbackString)
+  ageVerificationScreen.observeFieldScoped("whyButtonSelected", "onWhyButtonSelected")
   ageVerificationScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")
   pushScreen(ageVerificationScreen, true, true)
 End Function
@@ -404,4 +406,21 @@ Function onBirthdayCheckError(errorInfo)
       showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask, startUserExperience)
     end if
   end if
+End Function
+
+
+Function onWhyButtonSelected(msg)
+  screen = msg.getRoSGNode()
+  title = getTranslation("dialog_why_ask_age_title")
+  message = getTranslation("dialog_why_ask_age_description")
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "BIRTHDAY"
+      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "why-age-gate"
+    }
+  }
+  showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
 End Function

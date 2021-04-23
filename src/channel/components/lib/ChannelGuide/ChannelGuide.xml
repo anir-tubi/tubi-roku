@@ -31,7 +31,7 @@
       width="1920"
       height="1080"
       uri="pkg:/images/gradientBground-channelGuide-vertical.png"/>
-    <IconButton
+    <PillIconButton
       id="ButtonClose"
       translation="[115,57]"
       icon="left"/>

@@ -676,12 +676,12 @@ Function getTranslation_en_US()
       "message": "Could not successfully send your birthdate to our servers."
     },
     "screenAgeVerification_header": {
-      "description": "A header message to let users know the value of sharing their birth date with Tubi",
-      "message": "Tubi is better when we know you."
+      "description": "A header message to let users know that they must enter their age/date of birth before proceeding",
+      "message": "Age Required"
     },
     "screenAgeVerification_sub_header": {
       "description": "A sub header message to direct users to enter their birth date",
-      "message": "Enter your date of birth for a customized experience."
+      "message": "To continue, please enter your date of birth."
     },
     "screenAgeVerification_keypad_button": {
       "description": "A message on the button below the birth date keypad that users should select once done inserting their birth date",
@@ -898,6 +898,14 @@ Function getTranslation_en_US()
     "dialog_button_register_signIn": {
       "description": "The label of the button in a dialog window that allows the user to register or signIn",
       "message": "Sign In or Register"
+    },
+    "dialog_why_ask_age_title": {
+      "description": "The title of a modal dialog which explains why Tubi is asking for the users birthdate",
+      "message": "Why is Tubi asking for my age?"
+    },
+    "dialog_why_ask_age_description": {
+      "description": "The main message of a modal dialog which explains why Tubi is asking for the users birthdate",
+      "message": "We use date of birth to confirm that you are meeting the age requirements set out in our Terms of Use and to personalize your experience. \n\nRead Terms of Use at: www.tubitv.com/terms \nQuestions? Let us know at: support@tubi.tv"
     },
     "signIn_screen_heading": {
       "description": "Title on the signIn screen",
