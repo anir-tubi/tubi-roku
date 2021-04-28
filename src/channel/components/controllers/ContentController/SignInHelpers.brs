@@ -579,7 +579,7 @@ Function onSideNavSignInCompleted()
   setDirtyUserCategories(m.constants.ui.categoryIds.history)
 
   shouldRefreshHomescreen = true
-  if authInfo = invalid
+  if authInfo = invalid and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true
     ' don't refresh homescreen if user is signed out, will refresh after the user is age gated
     shouldRefreshHomescreen = false
   end if
