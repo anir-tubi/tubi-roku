@@ -44,7 +44,7 @@
       <field id="espanolItemTurnedOn" type="boolean"/>
 
       <!-- Setting to false grays out the kids item making it unselectable -->
-      <field id="kidsItemTurnedOn" type="boolean"/>
+      <field id="kidsItemTurnedOn" value="true" type="boolean"/>
 
       <!-- Allowed values are those in constants.ui.modes -->
       <field id="uiMode" type="string"/>

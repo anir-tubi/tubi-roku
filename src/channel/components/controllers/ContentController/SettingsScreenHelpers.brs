@@ -156,11 +156,13 @@ Function onParentalSettingSelected(msg)
   if m.settingsScreen.signInInfo <> invalid and m.settingsScreen.signInInfo.signedIn = true
     m.settingsScreen.actionAfterActivation = ""
     if m.global.authInfo <> invalid and parentalSetting <> m.global.authInfo.parentalrating
+      ' parental settings have been updated
       nNowDate = getNowSeconds()
       nSavedSeconds = 0
       if m.global.authInfo.secondsOfSavedPassword <> invalid
         nSavedSeconds = m.global.authInfo.secondsOfSavedPassword
       end if
+
       if m.global.authInfo.passwordText <> invalid and (nNowDate - nSavedSeconds) < 300
         tubiLog("SettingsScreenHelpers.onParentalSettingSelected(), use saved password")
         '//if there is a saved password, was it submitted within the last 5 minutes (300 seconds), if so, then use that password
@@ -177,6 +179,7 @@ Function onParentalSettingSelected(msg)
       end if
     end if
   else
+    ' user is signed out, show a modal informing the user they need to sign in to use parental controls
     m.settingsScreen.actionAfterActivation = "ParentalControl"
     pageInfo = m.settingsScreen.trackingPageInfo
     dialogEvent = {

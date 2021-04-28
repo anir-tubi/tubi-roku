@@ -296,7 +296,9 @@ Function onUiModeChanged()
   else if m.top.uiMode = m.constants.ui.modes.kidsParental
     ' kids mode due to parental controls
     setCommonSideNavKidsValues()
-    m.top.kidsItemTurnedOn = false
+    if m.kidsModeContent <> invalid
+      m.kidsModeContent.turnedOn = false
+    end if
   else if m.top.uiMode = m.constants.ui.modes.kidsAgeGate
     ' kids mode due to age gating
     removeProfile()
@@ -322,7 +324,10 @@ Function onUiModeChanged()
     if m.moviesContent <> invalid then m.moviesContent.turnedOn = true
     if m.tvContent <> invalid then m.tvContent.turnedOn = true
     if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
-    if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_kids")
+    if m.kidsModeContent <> invalid
+      m.kidsModeContent.turnedOn = true
+      m.kidsModeContent.title = getTranslation("menu_kids")
+    end if
     m.sideNavBackground.uri = ""
   end if
 
