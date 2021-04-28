@@ -24,7 +24,10 @@ Function showHomeScreen(constants, authInfo, screenID = "")
       ' homescreen concludes loading, in onHomescreenContentReady().
       shouldSendPageLoadEvent = false
       showHideSpinner(true)
+    else
+      showHideSpinner(false)
     end if
+
     pushScreen(homeScreen, true, shouldSendPageLoadEvent)
   else
     showHideSpinner(true)
