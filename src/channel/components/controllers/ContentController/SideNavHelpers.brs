@@ -314,6 +314,14 @@ Function onSideNavItemSelected()
     '//same item was selected, do nothing other than closing the menu
     hideNavMenu(false)
   end if
+
+  '//Dispatch what side nav button was selected. Do this after the app has reacted to the side nav selection and the current screen has had a chance to change based on the side nav selection 
+  topScreen = getCurrentScreen()
+  if topScreen <> invalid
+    interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "confirm")
+
+    m.trackingLoggingTask.trackEvent = interactionEvent
+  end if
 End Function
 
 
@@ -425,10 +433,11 @@ Function openSideNav(b = true)
 End Function
 
 
+
 ' @screen: roSGNode, the current screen
 ' @trackingLib: assocArray, TubiTracking module
-' @offOrOn: string, "off" or "on", dictates the toggle type
-Function getSideNavInteractionEvent(screen, trackingLib, offOrOn)
+' @userInteraction: string, "off" or "on" or "confirm", dictates the user interaction type
+Function getSideNavInteractionEvent(screen, trackingLib, userInteraction)
   event = invalid
   pageType = ""
   pageValues = {}
@@ -437,24 +446,32 @@ Function getSideNavInteractionEvent(screen, trackingLib, offOrOn)
     pageType = screen.trackingPageInfo.pageType
     pageValues = screen.trackingPageInfo.pageValues
 
-    focusedSideNavId = m.SideNav.itemCurrentId
-    leftSideNavComponent = {
-      left_nav_section: trackingLib.sideNavPageMap[focusedSideNavId]
-    }
-
-    toggle = ""
-    if offOrOn = "on"
-      toggle = "TOGGLE_ON"
-    else if offOrOn = "off"
-      toggle = "TOGGLE_OFF"
+    userInteractionValue = ""
+    sideNavId = ""
+    if userInteraction = "on"
+      userInteractionValue = "TOGGLE_ON"
+      sideNavId = m.SideNav.itemCurrentId
+    else if userInteraction = "off"
+      userInteractionValue = "TOGGLE_OFF"
+      sideNavId = m.SideNav.itemCurrentId
+    else if userInteraction = "confirm"
+      userInteractionValue = "CONFIRM"
+      sideNavId = m.SideNav.itemSelectedId
+    else 
+      '//This should never happen as long as userInteraction is set as one of the approved strings
+      return event
     end if
+
+    leftSideNavComponent = {
+      left_nav_section: trackingLib.sideNavPageMap[sideNavId]
+    }
 
     event = {
       type: "component_interaction"
       values: {
         pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
         componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component", leftSideNavComponent)
-        user_interaction: toggle
+        user_interaction: userInteractionValue
       }
     }
   end if
