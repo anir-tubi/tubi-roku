@@ -30,7 +30,7 @@ Function TubiExperiments(constants) as Object
         roku_limit_containers_v2: {"num_containers": -1}
       }
       roku_top_nav : {
-        roku_top_nav_experiment : {"enabled" : false, "to_top_of_page_upon_back": false, "espanolPlacement": "side-nav"}
+        roku_top_nav_experiment : {"enabled" : true, "to_top_of_page_upon_back": false}
       }
       roku_coppa: {
         roku_coppa_v1: {"enabled": false}
