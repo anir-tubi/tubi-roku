@@ -214,6 +214,7 @@ Function onScreenFocusChange()
     if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
       m.top.loadAllCategories = true
     end if
+    m.top.shouldFocusWhenPushed = true
   else if m.top.isInFocusChain() = false
     m.gridHasFocus = false
     m.top.topNavHasFocus = false

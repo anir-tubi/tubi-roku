@@ -8,6 +8,10 @@
 
   <interface>
     <!-- INPUT -->
+      <!-- setting to false prevents the screen stack from setting focus on the screen
+           when it is pushed
+       -->
+      <field id="shouldFocusWhenPushed" type="boolean" value="true"/>
 
     <!-- OUTPUT -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />

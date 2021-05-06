@@ -33,7 +33,6 @@
   <script type="text/brightscript" uri="LinearVideoPlayerScreenHelpers.brs" />
   <script type="text/brightscript" uri="AgeVerificationScreenHelpers.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="../../lib/FieldMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />

@@ -53,6 +53,31 @@ Function tubiNodeHelpers_getChildIndexById_test()
 End Function
 
 
+'@Test getLastChild unit tests
+Function tubiNodeHelpers_getLastChild_test()
+  parent = CreateObject("roSGNode", "Group")
+  
+  ' test if there are no children in the parent
+  invalidLastChild = m.nodeHelpers.getLastChild(parent)
+  m.AssertInvalid(invalidLastChild)
+
+  ' construct children with ids
+  for i=0 to 4
+    child = parent.createChild("ContentNode")
+    child.id = Mid(Str(i), 2)
+    if i = 4
+      fourth = child
+    end if
+  end for
+
+  ' test if we get the last child
+  lastChild = m.nodeHelpers.getLastChild(parent)
+  m.AssertNotInvalid(lastChild)
+  m.AssertEqual(lastChild.id, "4")
+  m.AssertTrue(lastChild.isSameNode(fourth))
+End Function
+
+
 '@Test convertNodesToIdsAA unit tests
 Function tubiNodeHelpers_convertNodesToIdsAA_test()
   for i=0 to 4

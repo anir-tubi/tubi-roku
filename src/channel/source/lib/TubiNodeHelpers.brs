@@ -2,7 +2,9 @@ Function TubiNodeHelpers()
   return {
     getChildIndex: tubiNodeHelpers_getChildIndex
     getChildIndexById: tubiNodeHelpers_getChildIndexById
+    getLastChild: tubiNodeHelpers_getLastChild
     unobserveAllScoped: tubiNodeHelpers_unobserveAllScoped
+    unobserveAll: tubiNodeHelpers_unobserveAll
     convertNodesToIdsAA: tubiNodeHelpers_convertNodesToIdsAA
     immutableInsertChild: tubiNodeHelpers_immutableInsertChild
     immutableRemoveChildren: tubiNodeHelpers_immutableRemoveChildren
@@ -44,12 +46,37 @@ Function tubiNodeHelpers_getChildIndexById(parent, childId)
 End Function
 
 
-' Remove all observers.  This adds safety for when we want to ensure
+' Get the last child of a node. Great for getting a modal from the ContentController.
+' This function only gets first level children (ie. it doesn't look at grand children)
+Function tubiNodeHelpers_getLastChild(parent)
+  childCount = parent.getChildCount()
+
+  lastChild = invalid
+  if childCount > 0
+    lastChild = parent.getChild(childCount - 1)
+  end if
+
+  return lastChild
+End Function
+
+
+' Remove all scoped observers.  This adds safety for when we want to ensure
 ' observer state so we don't do double observation
 Function tubiNodeHelpers_unobserveAllScoped(node)
   if type(node) = "roSGNode"
-    for each f in node.getFields()
-      node.unobserveFieldScoped(f)
+    for each field in node.getFields()
+      node.unobserveFieldScoped(field)
+    end for
+  end if
+End Function
+
+
+' Remove all non scoped observers.  This adds safety for when we want to ensure
+' observer state so we don't do double observation
+Function tubiNodeHelpers_unobserveAll(node)
+  if type(node) = "roSGNode"
+    for each field in node.getFields()
+      node.unobserveField(field)
     end for
   end if
 End Function

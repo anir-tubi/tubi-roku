@@ -14,6 +14,12 @@ Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEven
     screenTrackingLoad(screen.trackingPageInfo)
   end if
 
+  ' don't focus the pushed screen if there is an active modal
+  modal = m.NodeHelpers.getLastChild(m.top)
+  if modal.isSubtype("ModalDialogScreen") and modal.isInFocusChain() = true
+    screen.shouldFocusWhenPushed = false
+  end if
+
   m.screenStack.push = screen
 End Function
 

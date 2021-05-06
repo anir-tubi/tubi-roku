@@ -58,20 +58,21 @@ function tubiAuth_getAuthInfo()
   newAuthInfo = invalid
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
     authInfo.expireTime = authInfo.expireTime.toInt()
+
+    if type(authInfo.hasAge) = "roString" or type(authInfo.hasAge) = "String"
+      if authInfo.hasAge = "true"
+        authInfo.hasAge = true
+      else if authInfo.hasAge = "false"
+        authInfo.hasAge = false
+      end if
+    end if
+
     isExpired = m.checkIfAuthExpired(authInfo)
 
     if isExpired = true
       newAuthInfo = m.refreshAuthToken(authInfo, 3) 'can return invalid
     else
       newAuthInfo = authInfo
-    end if
-  end if
-
-  if type(authInfo.hasAge) = "roString" or type(authInfo.hasAge) = "String"
-    if authInfo.hasAge = "true"
-      authInfo.hasAge = true
-    else if authInfo.hasAge = "false"
-      authInfo.hasAge = false
     end if
   end if
 

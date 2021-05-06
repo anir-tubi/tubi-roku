@@ -1219,7 +1219,7 @@ Function deleteFromScreenCache(screenId)
     screen = getFromScreenCache(screenId)
 
     if screen <> invalid
-      unobserveAllFieldsScoped(screen)
+      m.NodeHelpers.unobserveAllScoped(screen)
     end if
 
     return m.screenCache.delete(screenId)
@@ -1249,7 +1249,7 @@ End Function
 Function emptyScreenCache()
   for each screenId in m.screenCache
     screen = getFromScreenCache(screenId)
-    unobserveAllFieldsScoped(screen)
+    m.NodeHelpers.unobserveAllScoped(screen)
   end for
 
   m.screenCache = {}

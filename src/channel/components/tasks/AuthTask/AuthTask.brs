@@ -18,6 +18,8 @@ Function execInitializeUserData()
   ' enhance the auth tokens with the user profile information
   if authInfo <> invalid and userCats.userInfo <> invalid
     tempAuthInfo = userCats.userInfo
+    ' append the locally stored authInfo onto the newly received user info from the server
+    ' to keep the userId as a string
     tempAuthInfo.append(authInfo)
     authInfo = tempAuthInfo
   end if
