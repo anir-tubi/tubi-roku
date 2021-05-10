@@ -214,6 +214,8 @@ Function updateHistory()
 
   if m.top.content <> invalid
     tubiLog("Adding content " + m.top.content.id + " from history at position " + stri(m.top.nowPos))
+    '//save the playback history locally before backend request to show progressbar on episode screen
+    Bookmarks.addHistoryLocally(m.top.content, m.top.nowPos, m.global)
     if m.global.authInfo <> invalid
       '//if the user is signed in, then save the playback history to the backend.
       newHistoryReq = Bookmarks.addHistoryReq(m.top.content, m.top.nowPos, m.top.isKidsMode)
@@ -236,10 +238,6 @@ Function updateHistory()
         end if
         m.top.historyResult = historyResult  ' with result
       end if
-    else
-      '//if user is signed out, then save the playback history locally
-      Bookmarks.addHistoryLocally(m.top.content, m.top.nowPos, m.global)
-
     end if
     tubiLog("EXIT AuthTask.updateHistory")
   end if

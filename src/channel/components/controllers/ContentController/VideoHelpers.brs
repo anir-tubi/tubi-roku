@@ -187,6 +187,17 @@ function playUpNextContent(nextContent, autoplayType)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
   if videoPlayer <> invalid
+    videoContent = videoPlayer.content
+    if videoContent <> invalid and videoContent.parentType = m.constants.ui.contentTypes.series
+      detailScreen = getTopDetailScreenFromStack() 
+      if detailScreen <> invalid
+        detailContent = detailScreen.content
+        nResumePoint = videoPlayer.historyPosition
+        itemFocused = findEpisode2dIndex(detailContent.currentEpisodeId, detailContent)
+        updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)
+      end if
+    end if
+  
     oldContent = videoPlayer.content
     content = addSeriesTitle(nextContent, oldContent)
     stopVideoContent(videoPlayer)
@@ -341,15 +352,26 @@ function returnToDetailScreenFromVideo()
         ' update some info in the detail screen content and repopulate with that content
         detailContent.currentEpisodeId = videoContent.id
         populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
+        
+        ' For SignedIn user, updates resume point to backend and global variable
+        ' For Guest user, updated the resume point to global variable
+        if m.updateHistoryTask.state <> "RUN"
+          m.updateHistoryTask.nowPos = nResumePoint
+          m.updateHistoryTask.control = "RUN"
+        end if
 
         ' Repopulate the episodes screen if it is the screen under the video player screen in the call stack
         hiddenScreen = getHiddenScreen(1)
         if hiddenScreen.id = m.constants.ui.screenIds.episodeScreen
           '//::TODO:: ensure signed in users see the episode screen progress bars when coming back from video player.
           episodesScreen = hiddenScreen
+          
+          itemFocused = findEpisode2dIndex(detailContent.currentEpisodeId, detailContent)
+          updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)        
+            
           episodesScreen.content = detailContent
           episodesScreen.updateContent = true
-          episodesScreen.episodeToFocus = findEpisode2dIndex(detailContent.currentEpisodeId, detailContent)
+          episodesScreen.episodeToFocus = itemFocused
         end if
       end if
     else if videoContent.isTrailer = true
@@ -764,4 +786,20 @@ Function constructYouboraRendition(segBitrate)
   end if
   return rendition
   
+End Function
+
+
+' updateNowPosForEpisode updates the nowPos field of current episode so that it draws progressbar
+' @detailContent: roSGNode, content node for detail screen
+' @itemFocused: 2D array, currently focused indexes of season/episode
+' @nResumePoint: Integer, history position for current episode
+Function updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)
+
+  season = itemFocused[0]
+  episode = itemFocused[1]
+  childNode = detailContent.getChild(season).getChild(episode)
+  if childNode <> invalid
+    childNode.nowPos = nResumePoint 'updating current episode's nowPos to draw progressbar
+  end if
+          
 End Function

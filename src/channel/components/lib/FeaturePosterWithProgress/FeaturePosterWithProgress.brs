@@ -28,8 +28,7 @@ End Function
 
 Function drawProgressBar()
   history = invalid
-  if m.top.itemContent <> invalid and m.global.authInfo <> invalid then
-    '//Make sure the user is signed in
+  if m.top.itemContent <> invalid
     history = m.global.historyIds.findNode(m.top.itemContent.id)
   end if
 
