@@ -90,7 +90,7 @@ async function processTranslationFiles(directory) {
         //Remove '.json' from the file path to get the locale ID
         sLocale = unZippedFilePath.slice(unZippedFilePath.lastIndexOf('/') + 1, -5);
 
-        console.log('Attempting to write downloaded crowdin translation to: ', destinationPath);
+        log('Attempting to write downloaded crowdin translation to: ', destinationPath);
         fs.accessSync(destinationPath.substring(0, destinationPath.lastIndexOf('/')), fs.constants.F_OK);
         fileBuffer = await file.buffer();
 
@@ -124,11 +124,11 @@ async function writeToFile(path, bufferOrString) {
     writeStream = fs.createWriteStream(destinationPath);
     writeStream.write(bufferOrString);
     writeStream.on('finish', () => {
-      console.log(destinationPath, 'successfully written to.');
+      log(destinationPath, 'successfully written to.');
       resolve();
     });
     writeStream.on('error', (err) => {
-      console.log('Could not write to: ', destinationPath);
+      log('Could not write to: ', destinationPath);
       reject(err);
     });
     writeStream.end('');
@@ -179,7 +179,7 @@ function writeLocaleDataToBRS_sync(sLocale, localeData) {
       newValue = data.replace(re, sNewString);
     } else {
       //If the locale function does not exist, then create a new function with the new translations
-      console.log(`Could not find ${sLocale} locale function. Appending it to the end of the BRS file: '${fileTranslationCode}'`);
+      log(`Could not find ${sLocale} locale function. Appending it to the end of the BRS file: '${fileTranslationCode}'`);
       newValue = `${data}\n\n\n${sNewString}`;
     }
 
@@ -280,12 +280,12 @@ exports.uploadTranslations = async function() {
     const crowdinPath = `${crowdinConfig.crowdinBaseDirectory}/${_sLocalTranslationFilename}`;
     const updateFileResponse = await updateFilesRequest(_sLocalTranslationFilePath, crowdinPath);
     if (updateFileResponse.success) {
-      console.log('\nSUCCESS! FINISHED UPLOADING THE TRANSLATION FILE TO CROWDIN');
+      log('SUCCESS! FINISHED UPLOADING THE TRANSLATION FILE TO CROWDIN');
     } else {
-      console.log('\nERROR UPLOADING THE TRANSLATION FILE TO CROWDIN \n', updateFileResponse.error)
+      log('ERROR UPLOADING THE TRANSLATION FILE TO CROWDIN \n', updateFileResponse.error)
     }
   } else {
-    console.log('MISSING CROWDIN KEY EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_KEY) OR COMMAND LINE PARAMETER');
+    log('MISSING CROWDIN KEY EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_KEY) OR COMMAND LINE PARAMETER');
   }
 }
 
@@ -293,7 +293,7 @@ exports.uploadTranslations = async function() {
 //Main function that initiates the download of any locale translation files from crowdlin
 exports.downloadTranslations = async function() {
   if(crowdinConfig.crowdinKey !== undefined && crowdinConfig.crowdinKey !== ""){
-    console.log('START DOWNLOADING TRANSLATIONS FROM CROWDIN');
+    log('START DOWNLOADING TRANSLATIONS FROM CROWDIN');
     const buildResponse = await triggerCrowdinBuild();
     if (buildResponse.success) {
       const translationsFileBuffer = await getTranslationsZipFile();
@@ -301,10 +301,10 @@ exports.downloadTranslations = async function() {
       const unzippedDirectory = await unzipper.Open.buffer(translationsFileBuffer);
       await processTranslationFiles(unzippedDirectory);
     } else {
-      console.log('Failed to build translations', buildResponse.error);
+      log('Failed to build translations', buildResponse.error);
     }
-    console.log('\nFINISHED DOWNLOAD TRANSLATIONS FROM CROWDIN');
+    log('FINISHED DOWNLOAD TRANSLATIONS FROM CROWDIN');
   } else {
-    console.log('COULD NOT DOWNLOAD TRANSLATIONS. MISSING CROWDIN KEY EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_KEY) OR COMMAND LINE PARAMETER');
+    log('COULD NOT DOWNLOAD TRANSLATIONS. MISSING CROWDIN KEY EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_KEY) OR COMMAND LINE PARAMETER');
   }
 }

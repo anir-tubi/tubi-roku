@@ -1005,7 +1005,7 @@ Function getTranslation_es_MX()
   return {
     "menu_signIn": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into app.",
-      "message": "Iniciar sesión"
+      "message": "Iniciar Sesión"
     },
     "menu_signedIn": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Shows that the user is signed in.",
@@ -1053,7 +1053,7 @@ Function getTranslation_es_MX()
     },
     "menu_mylist": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
-      "message": "Mi lista"
+      "message": "Mi Lista"
     },
     "menu_settings": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
@@ -1089,7 +1089,7 @@ Function getTranslation_es_MX()
     },
     "dialog_button_signIn": {
       "description": "The label of the button in a dialog window that allows the user to sign into the app.",
-      "message": "Iniciar sesión"
+      "message": "Iniciar Sesión"
     },
     "dialog_button_cancel": {
       "description": "Label of a dialog button to cancel out of the dialog",
@@ -1125,7 +1125,7 @@ Function getTranslation_es_MX()
     },
     "dialog_button_off": {
       "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
-      "message": "Apagado"
+      "message": "Apagar"
     },
     "dialog_button_yes": {
       "description": "Label of the dialog button to confirm the action the dialog is asking",
@@ -1150,6 +1150,10 @@ Function getTranslation_es_MX()
     "dialog_espanolDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
       "message": "Español desactivado"
+    },
+    "dialog_newsDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav news menu item but the item has been disabled",
+      "message": "Noticias Desactivadas"
     },
     "dialog_moviesDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
@@ -1189,11 +1193,11 @@ Function getTranslation_es_MX()
     },
     "dialog_signIn_activationCodeExpired_title": {
       "description": "title of the error window when the activation code has expired",
-      "message": "Código de activación caducado"
+      "message": "Código de activación expirado"
     },
     "dialog_signIn_activationCodeExpired_description": {
       "description": "description of the error window when the activation code has expired",
-      "message": "Lo sentimos, pero el código de activación caducó antes de que tu dispositivo se vinculará correctamente."
+      "message": "Lo sentimos, pero el código de activación expiró antes de que tu dispositivo se vinculará correctamente."
     },
     "error_signIn_connectionError_title": {
       "description": "title of the error window when there is a connection error",
@@ -1221,7 +1225,7 @@ Function getTranslation_es_MX()
     },
     "dialog_signIn_title": {
       "description": "title of a dialog window when it asks the user to sign in",
-      "message": "Por favor, inicia sesión"
+      "message": "Por favor, Iniciar Sesión"
     },
     "dialog_kidsExit_title": {
       "description": "title of a dialog window when the user is attempting to exit kids Mode",
@@ -1238,6 +1242,14 @@ Function getTranslation_es_MX()
     "dialog_kidsExitLimited_description": {
       "description": "description of a dialog window that describes what the user should do to exit kids mode",
       "message": "Para salir de Niños, actualiza los controles parentales en la configuración de la cuenta."
+    },
+    "dialog_kidsWelcome_title": {
+      "description": "A message welcoming the user to Tubi Kids",
+      "message": "Bienvenido a Tubi Niños"
+    },
+    "dialog_kidsWelcomeAgeGate_description": {
+      "description": "A description informing users they are only eligible to view Tubi in kids mode",
+      "message": "Solo estas elegible para ver Tubi Niños en este momento."
     },
     "dialog_exitApp_title": {
       "description": "Title of ther dialog window that asks the user if they want to exit the app",
@@ -1273,7 +1285,11 @@ Function getTranslation_es_MX()
     },
     "dialog_signOut_button_ok": {
       "description": "label of the confirmation button of the dialog window that asks the user if they want to sign out of the app",
-      "message": "Cerrar sesión"
+      "message": "Cerrar Sesión"
+    },
+    "error_check_birthdate_description": {
+      "description": "message letting the user know that they were not able to be signed in",
+      "message": "Hubo un error al inciar la sesión. Por favor, ingresa al canal y inicia la sesión de nuevo."
     },
     "screenActivationCode_audioGuide": {
       "description": "Display the activation code to people who cannot see.",
@@ -1293,7 +1309,7 @@ Function getTranslation_es_MX()
     },
     "screenSearch_defaultSearch": {
       "description": "Directions on the search page",
-      "message": "Busca películas, programas de televisión y personas"
+      "message": "Busca películas, series y personas"
     },
     "screenSearch_kidsWarning": {
       "description": "More directions on the search screen to suggest switching to kids mode.  Should be limited to be around 40 characters or fewer.",
@@ -1309,11 +1325,11 @@ Function getTranslation_es_MX()
     },
     "screenDetails_button_queue": {
       "description": "label of the button that will add the video title to the user's list",
-      "message": "Agregar a Mi lista"
+      "message": "Agregar a Mi Lista"
     },
     "screenDetails_button_noQueue": {
       "description": "label of the button that will remove the video title from the user's list",
-      "message": "Eliminar de Mi lista"
+      "message": "Eliminar de Mi Lista"
     },
     "screenDetails_button_noHistory": {
       "description": "label of the button that will remove the video title from the user's viewing history",
@@ -1373,7 +1389,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_signIn_description": {
       "description": "Directions for the signin page",
-      "message": "Inicia sesión en tu cuenta de Tubi en tu computadora o dispositivo móvil para ver las series y películas guardadas en Mi lista, continuar viendo desde donde te quedaste, recibir recomendaciones personalizadas en sincronización con tu dispositivo móvil, televisor, tableta o computadora."
+      "message": "Inicia sesión en tu cuenta de Tubi en tu computadora o dispositivo móvil para ver las series y películas guardadas en Mi Lista, continuar viendo desde donde te quedaste, recibir recomendaciones personalizadas en sincronización con tu dispositivo móvil, televisor, tableta o computadora."
     },
     "screenSettings_signOut_description": {
       "description": "Description on SignIn page when user is signed in",
@@ -1393,7 +1409,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_about_description": {
       "description": "The description on the about screen",
-      "message": "Tubi es la aplicación más grande de series y películas gratuitas. Tenemos un catálogo de contenido con más de 15,000 películas y programas de televisión con muchos menos anuncios que la televisión por cable."
+      "message": "Tubi es la aplicación más grande de series y películas gratuitas. Tenemos un catálogo de contenido con más de 15,000 películas y series con muchos menos anuncios que la televisión por cable."
     },
     "screenSettings_about_title2": {
       "description": "The subtitle on the about screen",
@@ -1401,7 +1417,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_about_description2": {
       "description": "The 2nd description on the about screen",
-      "message": "Visita {help_url}\n\nEnvía un correo electrónico a nuestro equipo de soporte a support@tubi.tv\n\nPonte en contacto con nosotros en Facebook, Instagram, Twitter y en nuestra página web: \n{support_url} \n\nVersión {version}\nID de dispositivo corto: {id} (presione OK para ver el ID de dispositivo completo)\n\n© {year} Tubi, Inc. todos los derechos reservados."
+      "message": "Visita {help_url}\n\nEnvía un correo electrónico a nuestro equipo de apoyo a support@tubi.tv\n\nPonte en contacto con nosotros en Facebook, Instagram, Twitter y en nuestra página web: \n{support_url} \n\nVersión {version}\nID de dispositivo corto: {id} (presiona OK para ver el ID de dispositivo completo)\n\n© {year} Tubi, Inc. todos los derechos reservados."
     },
     "screenSettings_menu_parentalControls": {
       "description": "The label for the parental controls",
@@ -1425,7 +1441,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_parentalControls_instructions": {
       "description": "Description of the parental controls screen",
-      "message": "Selecciona la edad de visualización adecuada para Tubi. Tu selección determinará qué clasificaciones de películas y programas puedes ver en la aplicación. Si se modifica esta selección, pediremos que ingreses la contraseña de tu cuenta."
+      "message": "Elige la edad de visualización adecuada para Tubi. Tu selección determinará qué clasificaciones de películas y programas puedes ver en la aplicación. Si se modifica esta selección, pediremos que ingreses la contraseña de tu cuenta."
     },
     "screenSettings_menu_about": {
       "description": "A menu Item for the Settings screen",
@@ -1469,7 +1485,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_error_parentalFailedChange_title": {
       "description": "title of error screen when parental controls failed to update",
-      "message": "Actualización ha fallado"
+      "message": "Actualización falló"
     },
     "screenSettings_error_parentalFailedChange_description": {
       "description": "description of error screen when parental controls failed to update",
@@ -1513,23 +1529,23 @@ Function getTranslation_es_MX()
     },
     "screenHome_error_fetchCategories_description": {
       "description": "Onscreen message to indicate categories content could not be loaded",
-      "message": "No se pueden cargar algunas categorías."
+      "message": "No se pudo cargar algunas categorías."
     },
     "screenHome_error_fetchScreenContent_description": {
       "description": "Onscreen message to indicate home content could not be loaded",
-      "message": "No se puede cargar la pantalla de inicio de Tubi."
+      "message": "No se pudo cargar la pantalla de inicio de Tubi."
     },
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
-      "message": "No se puede cargar el guía de canales."
+      "message": "No se pudo cargar el guía de canales."
     },
     "screenDetails_button_trailer": {
       "description": "Label of button to allow users to watch a preview of the current video title",
-      "message": "Ver tráiler"
+      "message": "Ver Tráiler"
     },
     "screenDetails_button_episodes": {
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title",
-      "message": "Lista de episodios"
+      "message": "Lista de capítulos"
     },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
@@ -1543,17 +1559,65 @@ Function getTranslation_es_MX()
       "description": "Label of button to allow users to resume the current video title",
       "message": "Reanudar"
     },
+    "screenAgeVerification_network_issue": {
+      "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
+      "message": "No pudimos mandar tu fecha de nacimiento a nuestros servidores con éxito."
+    },
+    "screenAgeVerification_header": {
+      "description": "A header message to let users know that they must enter their age/date of birth before proceeding",
+      "message": "Edad requerida"
+    },
+    "screenAgeVerification_sub_header": {
+      "description": "A sub header message to direct users to enter their birth date",
+      "message": "Para continuar, ingresa tu fecha de nacimiento."
+    },
+    "screenAgeVerification_keypad_button": {
+      "description": "A message on the button below the birth date keypad that users should select once done inserting their birth date",
+      "message": "Comienza a ver"
+    },
+    "screenAgeVerification_month": {
+      "description": "A label explaining that the 2 digits above the label signify the month that was input by the user",
+      "message": "Mes"
+    },
+    "screenAgeVerification_mm": {
+      "description": "A label showing that the user should enter 2 digits for their birthdate month",
+      "message": "MM"
+    },
+    "screenAgeVerification_day": {
+      "description": "A label explaining that the 2 digits above the label signify the day that was input by the user",
+      "message": "Día"
+    },
+    "screenAgeVerification_dd": {
+      "description": "A label showing that the user should enter 2 digits for their birthdate day",
+      "message": "DD"
+    },
+    "screenAgeVerification_year": {
+      "description": "A label explaining that the 4 digits above the label signify the year that was input by the user",
+      "message": "Año"
+    },
+    "screenAgeVerification_yyyy": {
+      "description": "A label showing that the user should enter four digits for their birthdate year",
+      "message": "AAAA"
+    },
+    "screenAgeVerification_tip": {
+      "description": "A tip about how to enter the birth date",
+      "message": "Tip: Si tu fecha de nacimiento es el 1 de enero del 2000, ingresa 01/01/2000"
+    },
+    "screenAgeVerification_error_prompt": {
+      "description": "A message informing the user that they entered a date that is not valid",
+      "message": "Parece que has ingresado la información equivocada."
+    },
     "metadata_fullscreen_countdown_plural": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
       "message": "Pantalla completa en {seconds} s"
     },
     "metadata_expiresIn_plural": {
       "description": "label to indicate how long the user have to watch a video",
-      "message": "Caduca en {days} días"
+      "message": "Expira en {days} días"
     },
     "metadata_expiresIn_singular": {
       "description": "label to indicate the user has exactly 1 day to watch a video",
-      "message": "Caduca en 1 día"
+      "message": "Expira en 1 día"
     },
     "metadata_continueWatching_notSignedIn_title": {
       "description": "tells non registered user what they need to do to see the continue watching container",
@@ -1565,7 +1629,7 @@ Function getTranslation_es_MX()
     },
     "metadata_continueWatching_notSignedIn_container_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "Sin suscripción • Sin tarjeta de crédito • Gratis para siempre"
+      "message": "Sin suscripción • Sin tarjeta de crédito • Gratis siempre"
     },
     "metadata_continueWatching_notSignedIn_container_button": {
       "description": "button text for when a non registered user focuses on the continue watching container",
@@ -1617,7 +1681,7 @@ Function getTranslation_es_MX()
     },
     "videoPlayer_adLoadingMessage": {
       "description": "Message to indicate ads will play before playing video content",
-      "message": "Tu programa comenzará después de estos mensajes..."
+      "message": "Tu título comenzará después de estos mensajes..."
     },
     "videoPlayer_error_failed_description": {
       "description": "label for error messages to indicate 'failed'",
@@ -1657,31 +1721,31 @@ Function getTranslation_es_MX()
     },
     "goBack_categories": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA REGRESAR PARA VOLVER A LAS CATEGORÍAS"
+      "message": "PRESIONA ATRÁS PARA VOLVER A LAS CATEGORÍAS"
     },
     "goBack_channels": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA REGRESAR PARA VOLVER A LOS CANALES"
+      "message": "PRESIONA ATRÁS PARA VOLVER A LOS CANALES"
     },
     "goBack_default": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA REGRESAR PARA REGRESAR"
+      "message": "PRESIONA ATRÁS PARA REGRESAR"
     },
     "goBack_videoPlayer_upNext": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "REGRESA PARA DESCARTAR"
+      "message": "ATRÁS PARA DESCARTAR"
     },
     "goBack_videoPlayer_controls": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA REGRESAR PARA ESCONDER"
+      "message": "PRESIONA ATRÁS PARA ESCONDER"
     },
     "goBack_menu": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA REGRESAR PARA VOLVER AL MENÚ"
+      "message": "PRESIONA ATRÁS PARA VOLVER AL MENÚ"
     },
     "goBack_home": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA REGRESAR PARA VOLVER A INICIO"
+      "message": "PRESIONA ATRÁS PARA VOLVER A INICIO"
     },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
@@ -1689,11 +1753,11 @@ Function getTranslation_es_MX()
     },
     "channel_description": {
       "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
-      "message": "¡Disfruta el catálogo más grande de películas y series populares completamente gratis!"
+      "message": "¡Disfruta el catálogo más grande de películas y series populares completamente Gratis!"
     },
     "channel_webDescription": {
       "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
-      "message": "Ve miles de películas y series totalmente gratis. En Tubi puedes ver contenido 100% legal y de forma ilimitada. No se requiere tarjeta de crédito o suscripción. Solo tienes que descargar la aplicación, elige lo que quieras ver en donde tu quieras y disfruta del contenido con menos anuncios que la televisión. Tubi es el servicio más grande de streaming gratis que ofrece películas y series de televisión premiadas. Tenemos algo para todos: Comedias, dramas, familiares, clásicas, dramas coreanos, anime y más. ¡Descárga hoy y empieza a transmitir entretenimiento gratis!"
+      "message": "Ve miles de películas y series totalmente Gratis. En Tubi puedes ver contenido 100% legal y de forma ilimitada. No se requiere tarjeta de crédito o suscripción. Solo tienes que descargar la aplicación, elige lo que quieras ver en donde tu quieras y disfruta del contenido con menos anuncios que la televisión. Tubi es el servicio más grande de streaming Gratis que ofrece películas y series de televisión premiadas. Tenemos algo para todos: Comedias, dramas, familiares, clásicas, dramas coreanos, anime y más. ¡Descárga hoy y empieza streaming de entretenimiento Gratis!"
     },
     "utility_movies_description": {
       "description": "This will be displayed on Info panel when the Movies item (from utility row) gains focus",
@@ -1701,7 +1765,7 @@ Function getTranslation_es_MX()
     },
     "utility_tvshows_description": {
       "description": "This will be displayed on Info panel when the TVShows item (from utility row) gains focus",
-      "message": "Sintoniza miles de series de televisión dignos de ver, documentales y reality TV. Nuevos capítulos añadidos mensualmente, nunca te quedarás sin ver algo."
+      "message": "Sintoniza miles de series dignos de ver, documentales y reality TV. Nuevos capítulos añadidos mensualmente, nunca te quedarás sin ver algo."
     },
     "dialog_whoops_title": {
       "description": "A general whoops title for an dialog window",
@@ -1709,7 +1773,7 @@ Function getTranslation_es_MX()
     },
     "dialog_mylist_signIn_description": {
       "description": "Dialog description to say the user to signIn to view the My List",
-      "message": "Debes iniciar sesión para ver Mi lista"
+      "message": "Debes iniciar sesión para ver Mi Lista"
     },
     "dialog_mylist_empty_title": {
       "description": "A general empty My list title for an dialog window",
@@ -1717,15 +1781,23 @@ Function getTranslation_es_MX()
     },
     "dialog_mylist_empty_description": {
       "description": "Dialog description to say My List is empty",
-      "message": "Encuentra todo lo que agregaste a Mi lista aquí. Para empezar, selecciona una serie o película y haz clic en el botón Mi lista."
+      "message": "Encuentra todo lo que agregaste a Mi Lista aquí. Para empezar, elige una serie o película y haz clic en el botón Mi Lista."
     },
     "dialog_button_register_signIn": {
       "description": "The label of the button in a dialog window that allows the user to register or signIn",
-      "message": "Inicia sesión o Regístrate"
+      "message": "Iniciar Sesión o Regístrate"
+    },
+    "dialog_why_ask_age_title": {
+      "description": "The title of a modal dialog which explains why Tubi is asking for the users birthdate",
+      "message": "¿Por qué me esta pidiendo Tubi mi edad?"
+    },
+    "dialog_why_ask_age_description": {
+      "description": "The main message of a modal dialog which explains why Tubi is asking for the users birthdate",
+      "message": "Usamos la fecha de nacimiento para confirmar si satisfaces los requerimientos de edad presentados en nuestros Términos de uso y para personalizar tu experiencia.\n\nLee los Términos de uso en: www.tubitv.com/terms\n¿Preguntas? Haznos saber a: support@tubi.tv"
     },
     "signIn_screen_heading": {
       "description": "Title on the signIn screen",
-      "message": "Iniciar sesión para acceder tu cuenta"
+      "message": "Iniciar Sesión para acceder tu cuenta"
     },
     "signIn_screen_enter_password": {
       "description": "enter password text",
@@ -1749,7 +1821,7 @@ Function getTranslation_es_MX()
     },
     "do_not_sell_my_info_text": {
       "description": "do not sell my info button text",
-      "message": "No venda mi información"
+      "message": "No Vendas Mi Información Personal"
     },
     "signIn_password_hint": {
       "description": "hint shown on signIn password textbox",
@@ -1777,7 +1849,7 @@ Function getTranslation_es_MX()
     },
     "invalid_password_title": {
       "description": "invalid password title on modal",
-      "message": "Contraseña incorrecta"
+      "message": "Contraseña inválida"
     },
     "enter_password_dialog_description": {
       "description": "enter password dialog description",
@@ -1805,11 +1877,11 @@ Function getTranslation_es_MX()
     },
     "goBack_signIn": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA REGRESAR PARA VOLVER A INICIAR SESIÓN"
+      "message": "PRESIONA ATRÁS PARA VOLVER A INICIAR SESIÓN"
     },
     "goBack_signUp": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA REGRESAR PARA REGISTRARTE"
+      "message": "PRESIONA ATRÁS PARA REGISTRARTE"
     }
   }
 End Function
