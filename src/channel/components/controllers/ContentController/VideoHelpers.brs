@@ -106,6 +106,13 @@ function playVideoContent(content, autoplayType = "none", position = 0)
   ' so NavigateToPage and PageLoad events contain the necessary content id information
   if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
     if m.enteredFromDeepLink = true
+      ' if the user has been age gated during the deeplink process, a modal will be shown.
+      ' We need to remove the modal so it is not overlaying the video.
+      lastChild = m.NodeHelpers.getLastChild(m.top)
+      if lastChild.isSubtype("ModalDialogScreen") and lastChild.isInFocusChain() = true
+        closeModal(lastChild)
+      end if
+
       pushScreen(videoPlayer, false, true)
     else if m.handlingDeeplinkInputEvent = true
       ' send custom navigateToPage event, since a details screen was added to the screen stack but the user

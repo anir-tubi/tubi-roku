@@ -91,7 +91,9 @@ Function closeModal(modal, buttonSelected = invalid)
   if trackEvent <> invalid and trackEvent.values <> invalid and trackingTask <> invalid
     trackEvent.values.dialog_action = "DISMISS_AUTO"
 
-    if type(buttonSelected) = "String" or type(buttonSelected) = "roString"
+    if buttonSelected = invalid
+      trackEvent.values.dialog_action = "ACCEPT_AUTO"
+    else if type(buttonSelected) = "String" or type(buttonSelected) = "roString"
       if buttonSelected = "back"
         'the user has pressed the back buttons on the remote
         trackEvent.values.dialog_action = "DISMISS_DELIBERATE"
