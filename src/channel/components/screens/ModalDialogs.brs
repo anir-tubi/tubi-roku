@@ -374,3 +374,16 @@ Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, 
     buttonInfo: buttonInfo
   }
 End Function
+
+
+' Helper function to return the top most modal being displayed with respect to the current m.top
+Function getTopModal()
+  for i = m.top.getChildCount()-1 to 0 Step -1
+    child = m.top.getChild(i)
+    if child.isSubtype("ModalDialogScreen")
+      return child
+    end if
+  end for
+
+  return invalid
+End Function

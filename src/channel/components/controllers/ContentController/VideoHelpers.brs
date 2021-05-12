@@ -108,9 +108,9 @@ function playVideoContent(content, autoplayType = "none", position = 0)
     if m.enteredFromDeepLink = true
       ' if the user has been age gated during the deeplink process, a modal will be shown.
       ' We need to remove the modal so it is not overlaying the video.
-      lastChild = m.NodeHelpers.getLastChild(m.top)
-      if lastChild.isSubtype("ModalDialogScreen") and lastChild.isInFocusChain() = true
-        closeModal(lastChild)
+      modal = getTopModal()
+      if modal <> invalid and modal.isSubtype("ModalDialogScreen") and modal.isInFocusChain() = true
+        closeModal(modal)
       end if
 
       pushScreen(videoPlayer, false, true)
