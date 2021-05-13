@@ -259,11 +259,11 @@ Function refreshHomescreen(homescreen)
   '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
   bTopNavAllowed = isTopNavHomeScreenEnabled()
   if homeScreen.id = m.constants.ui.screenIds.espanolScreen
-    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanolInTopNav = false
+    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanol_in_top_nav = false
       bTopNavAllowed = false
     end if
   else if homeScreen.id = m.constants.ui.screenIds.newsScreen
-    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).newsInTopNav = false
+    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).news_in_top_nav = false
       bTopNavAllowed = false
     end if
   end if

@@ -35,11 +35,11 @@ Function initSideNav()
   ' stop displaying some side nav items if the top nav is being displayed
   if isTopNavHomeScreenEnabled() = true
     '//Tell the sideNav to stop displaying the Espanol menu item
-    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanolInTopNav = true
+    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanol_in_top_nav = true
       m.SideNav.displayEspanol = false
     end if
     '//Tell the sideNav to stop displaying the News menu item
-    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).newsInTopNav = true
+    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).news_in_top_nav = true
       m.SideNav.displayNews = false
     end if
     '//Tell the sideNav to stop displaying the movies/TV menu items
@@ -227,7 +227,7 @@ Function onSideNavItemSelected()
           '//if this is the homescreen, then just close the sidenav. no need to call showHomeScreen()
           showHomeScreen(m.constants, authInfo) 
         end if
-      else if isCurrentScreenHomeScreen() = false or (topScreen.id = m.constants.ui.screenIds.espanolScreen and getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanolInTopNav = false) or (topScreen.id = m.constants.ui.screenIds.newsScreen and getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).newsInTopNav = false)
+      else if isCurrentScreenHomeScreen() = false or (topScreen.id = m.constants.ui.screenIds.espanolScreen and getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanol_in_top_nav = false) or (topScreen.id = m.constants.ui.screenIds.newsScreen and getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).news_in_top_nav = false)
         '//Don't open the homescreen if the current screen is already a homescreen type. Just need to close the side nav.
         showHomeScreen(m.constants, authInfo) 
       end if

@@ -54,13 +54,13 @@ Function draw()
   setMainContent(m.constants.ui.sideNavIds.tv, rowNode, aItemWidths)
 
   nCurrentButtonItem = 2
-  if m.top.isNewsAllowed = true and getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).newsInTopNav = true
+  if m.top.isNewsAllowed = true and getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).news_in_top_nav = true
     nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(nCurrentButtonItem)
     setMainContent(m.constants.ui.sideNavIds.news, rowNode, aItemWidths)
     nCurrentButtonItem = nCurrentButtonItem + 1
   end if
 
-  if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanolInTopNav = true
+  if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanol_in_top_nav = true
     nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(nCurrentButtonItem)
     setMainContent(m.constants.ui.sideNavIds.espanol, rowNode, aItemWidths)
   end if

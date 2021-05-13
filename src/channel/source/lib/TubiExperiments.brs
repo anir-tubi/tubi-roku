@@ -27,7 +27,7 @@ Function TubiExperiments(constants) as Object
         roku_limit_containers_v2: {"num_containers": -1}
       }
       roku_top_nav : {
-        roku_top_nav_options_experiment : {"newsInTopNav": true, "espanolInTopNav": false}
+        roku_top_nav_options_experiment : {"news_in_top_nav": true, "espanol_in_top_nav": false}
       }
       roku_coppa: {
         roku_coppa_v1: {"enabled": false}
