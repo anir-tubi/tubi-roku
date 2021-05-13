@@ -20,9 +20,6 @@ Function TubiExperiments(constants) as Object
     '
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
     defaultResources: {
-      roku: {
-        roku_sidenav_espanol: {"combined": true}
-      }
       roku_discovery_v3: {
         roku_discovery_row_v3: {"position" : -2, "has_tvshows" : false, "has_movies" : false}
       }
@@ -30,7 +27,7 @@ Function TubiExperiments(constants) as Object
         roku_limit_containers_v2: {"num_containers": -1}
       }
       roku_top_nav : {
-        roku_top_nav_experiment : {"enabled" : true, "to_top_of_page_upon_back": false}
+        roku_top_nav_options_experiment : {"newsInTopNav": true, "espanolInTopNav": false}
       }
       roku_coppa: {
         roku_coppa_v1: {"enabled": false}

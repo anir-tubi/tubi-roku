@@ -803,11 +803,9 @@ End Function
 Function isTopNavHomeScreenEnabled()
   bReturn = false
 
-  if getExperimentResource("roku_top_nav", "roku_top_nav_experiment", false).enabled = true
-    if m.constants.deviceInfo.countryCode <> invalid and UCase(m.constants.deviceInfo.countryCode) = "US"
-      if isKidsUIOn() = false
-        bReturn = true
-      end if
+  if m.constants.deviceInfo.countryCode <> invalid and UCase(m.constants.deviceInfo.countryCode) = "US"
+    if isKidsUIOn() = false
+      bReturn = true
     end if
   end if
 
@@ -1146,8 +1144,6 @@ Function showContentGroup()
       type: "active"
       values: {}
     }
-    ' send the top nav experiment exposure event
-    getExperimentResource("roku_top_nav", "roku_top_nav_experiment", true)
   end if
 End Function
 

@@ -256,9 +256,19 @@ End Function
 
 '//Refresh the content and the enabling of the top nav of the home screen
 Function refreshHomescreen(homescreen)
-  '//::TODO::TopNav - For now, the top nav will not be displayed on the espanolScreen
   '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
-  homeScreen.enableTopNav = isTopNavHomeScreenEnabled() and homeScreen.id <> m.constants.ui.screenIds.espanolScreen
+  bTopNavAllowed = isTopNavHomeScreenEnabled()
+  if homeScreen.id = m.constants.ui.screenIds.espanolScreen
+    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanolInTopNav = false
+      bTopNavAllowed = false
+    end if
+  else if homeScreen.id = m.constants.ui.screenIds.newsScreen
+    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).newsInTopNav = false
+      bTopNavAllowed = false
+    end if
+  end if
+
+  homeScreen.enableTopNav = bTopNavAllowed
   fetchHomescreen(homescreen)
 End Function
 

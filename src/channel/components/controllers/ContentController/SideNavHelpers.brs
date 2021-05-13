@@ -11,6 +11,8 @@ Function initSideNav()
   if m.constants.deviceInfo.countryCode <> "US"
     '//Tell the sideNav to stop displaying the Espanol menu item
     m.SideNav.displayEspanol = false
+    '//Tell the sideNav to stop displaying the News menu item
+    m.SideNav.displayNews = false
     '//Tell the sideNav to stop displaying the movies/TV menu items
     m.SideNav.displayMoviesTV = false
     '//Tell the sideNav to stop displaying the channel menu item
@@ -25,7 +27,7 @@ Function initSideNav()
   if isKidsModeEnabledByParentalControls() = true
     m.SideNav.kidsItemTurnedOn = false
   end if
-
+  
   if isParentalControlsAdultLevel() <> true
     m.SideNav.espanolItemTurnedOn = false
   end if
@@ -33,7 +35,13 @@ Function initSideNav()
   ' stop displaying some side nav items if the top nav is being displayed
   if isTopNavHomeScreenEnabled() = true
     '//Tell the sideNav to stop displaying the Espanol menu item
-    ' m.SideNav.displayEspanol = false
+    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanolInTopNav = true
+      m.SideNav.displayEspanol = false
+    end if
+    '//Tell the sideNav to stop displaying the News menu item
+    if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).newsInTopNav = true
+      m.SideNav.displayNews = false
+    end if
     '//Tell the sideNav to stop displaying the movies/TV menu items
     m.SideNav.displayMoviesTV = false
   end if
@@ -214,15 +222,13 @@ Function onSideNavItemSelected()
 
       topScreen = getCurrentScreen()
       if isTopNavHomeScreenEnabled() = false
-        ' if the topnav (experiment) is not enabled, then check if the current screen is not the home screen before proceeding
-        '//::TODO::TopNav - get rid of this part of the IF condition once the topnav experiment is successful and complete.
+        ' if the topnav is not enabled, then check if the current screen is not the home screen before proceeding
         if topScreen.id <> m.constants.ui.screenIds.homeScreen
           '//if this is the homescreen, then just close the sidenav. no need to call showHomeScreen()
           showHomeScreen(m.constants, authInfo) 
         end if
-      else if isCurrentScreenHomeScreen() = false or topScreen.id = m.constants.ui.screenIds.espanolScreen
+      else if isCurrentScreenHomeScreen() = false or (topScreen.id = m.constants.ui.screenIds.espanolScreen and getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanolInTopNav = false) or (topScreen.id = m.constants.ui.screenIds.newsScreen and getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).newsInTopNav = false)
         '//Don't open the homescreen if the current screen is already a homescreen type. Just need to close the side nav.
-        '//::TODO::TopNav - for now, exclude the espanol screen because the spanish screen is still in the side nav for now.
         showHomeScreen(m.constants, authInfo) 
       end if
 
@@ -276,6 +282,16 @@ Function onSideNavItemSelected()
         showEspanolScreen()
         bNewScreenCalledSuccess = true
       end if  
+    else if itemSelectedId = m.constants.ui.sideNavIds.news
+      if isKidsUIOn() = true
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.news)
+      else
+        setUiMode(m.constants.ui.modes.standard)
+        showHideSpinner(true)
+        showNewsScreen()
+        bNewScreenCalledSuccess = true
+      end if
     else if itemSelectedId = m.constants.ui.sideNavIds.mylist
       hideNavMenu(false)
       if isKidsUIOn() <> true
@@ -332,6 +348,8 @@ Function displayMenuItemDisabled(sMenuItemID, parental="")
   if sMenuItemID = m.constants.ui.sideNavIds.channels
     sTitle = getTranslation("dialog_channelsDisabled_title")
     sDialogSubTypeValue = "kids-mode-channels"
+'//::TODO:: Because movies, tv shows, espanol, and news are displayed in the top nav, then no need to have code to show a dialog window for these options
+'//         Get rid of this code and any supporting code in this file once it has been determined that top nav is here to stay. Once it has been decided to have the topNav on FireTV 
   else if sMenuItemID = m.constants.ui.sideNavIds.movies
     sTitle = getTranslation("dialog_moviesDisabled_title")
     sDialogSubTypeValue = "kids-mode-movies"
@@ -341,6 +359,9 @@ Function displayMenuItemDisabled(sMenuItemID, parental="")
   else if sMenuItemID = m.constants.ui.sideNavIds.espanol
     sTitle = getTranslation("dialog_espanolDisabled_title")
     sDialogSubTypeValue = "kids-mode-espanol"    
+  else if sMenuItemID = m.constants.ui.sideNavIds.news
+    sTitle = getTranslation("dialog_newsDisabled_title")
+    sDialogSubTypeValue = "kids-mode-news"  
   end if
 
   dialogEvent = {
@@ -379,6 +400,7 @@ Function enableKidsModeFromSideNav()
   nonAvailableKidsScreens[m.constants.ui.screenIds.movieScreen] = true
   nonAvailableKidsScreens[m.constants.ui.screenIds.tvScreen] = true
   nonAvailableKidsScreens[m.constants.ui.screenIds.espanolScreen] = true
+  nonAvailableKidsScreens[m.constants.ui.screenIds.newsScreen] = true
 
   screen = getCurrentScreen()
   if screen <> invalid and nonAvailableKidsScreens[screen.id] = true

@@ -31,6 +31,9 @@
       <!-- Should the sideNav display the Espanol menu item? -->
       <field id="displayEspanol" value="true" type="boolean"/>      
 
+      <!-- Should the sideNav display the News menu item? -->
+      <field id="displayNews" value="true" type="boolean"/>      
+
       <!-- Should the sideNav display the movies/TV menu items? -->
       <field id="displayMoviesTV" value="true" type="boolean"/>
 
@@ -92,22 +95,6 @@
         translation="[0,60]"
         itemSpacings="[1]">
 
-      <MarkupList
-        numRows="1"
-        id="topItems"
-        itemSize="[397, 70]"
-        itemSpacing="[0,17]"
-        vertFocusAnimationStyle="floatingFocus"
-        focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
-        focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
-        itemComponentName="SideNavIconComponent">  
-        <ContentNode id="TopContent" role="content" >
-          <SideNavContentNode
-            id="profile"
-            iconUrl="pkg:/images/sideNavProfile.png"/>
-        </ContentNode>
-      </MarkupList>
-
       <Group>
         <MarkupList
           numRows="8"
@@ -136,27 +123,6 @@
           </ContentNode>
         </MarkupList>
       </Group>
-
-      <MarkupList
-        numRows="2"
-        id="bottomItems"
-        itemSize="[397, 70]"  
-        itemSpacing="[0,17]"
-        vertFocusAnimationStyle="floatingFocus"
-        focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
-        focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
-        itemComponentName="SideNavIconComponent">  
-        <ContentNode id="BottomContent" role="content" >
-          <SideNavContentNode
-            id="settings"
-            fontSize="27"
-            bold="false"/>
-          <SideNavContentNode
-            id="exit"
-            fontSize="27"
-            bold="false"/>
-        </ContentNode>
-      </MarkupList>
 
     </LayoutGroup>
   </children>

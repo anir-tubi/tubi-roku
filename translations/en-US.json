@@ -148,6 +148,10 @@
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
     "message": "Español Disabled"
   },  
+  "dialog_newsDisabled_title": {
+    "description": "Title of a Dialog Window that is shown when the user clicked the sidenav news menu item but the item has been disabled",
+    "message": "News Disabled"
+  }, 
   "dialog_moviesDisabled_title": {
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
     "message": "Movies Disabled"

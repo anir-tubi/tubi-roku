@@ -1,5 +1,9 @@
 Function init()
   tubiLog("TopNav.init")
+  
+  '//As soon as the top nav is initialized, then dispatch the beginning of the experiment. 
+  getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", true)
+  
   m.Menu = m.top.findNode("TopNavMenu")
   m.MenuBground = m.top.findNode("TopNavMenuBground")
   m.MenuBgroundParent = m.top.findNode("TopNavMenuBgroundParent")
@@ -48,12 +52,18 @@ Function draw()
   setMainContent(m.constants.ui.sideNavIds.movies, rowNode, aItemWidths) 
   nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(1)
   setMainContent(m.constants.ui.sideNavIds.tv, rowNode, aItemWidths)
-  if m.top.isNewsAllowed = true
-    nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(2)
+
+  nCurrentButtonItem = 2
+  if m.top.isNewsAllowed = true and getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).newsInTopNav = true
+    nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(nCurrentButtonItem)
     setMainContent(m.constants.ui.sideNavIds.news, rowNode, aItemWidths)
+    nCurrentButtonItem = nCurrentButtonItem + 1
   end if
-  ' nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(3)
-  ' setMainContent(m.constants.ui.sideNavIds.espanol, rowNode, aItemWidths)
+
+  if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanolInTopNav = true
+    nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(nCurrentButtonItem)
+    setMainContent(m.constants.ui.sideNavIds.espanol, rowNode, aItemWidths)
+  end if
 
   nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + nMenuOutsideSpacing
 
