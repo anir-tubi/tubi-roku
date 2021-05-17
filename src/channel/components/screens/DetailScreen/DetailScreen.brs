@@ -147,6 +147,12 @@ Function onScreenFocusChange()
   tubiLog("DetailScreen.onScreenFocusChange")
   if m.top.hasFocus() then
    
+    'After Instant Resume, when pressing back from one detail screen to another detail screen via YMAL 
+    'related content(YMAL) thunbnails are not loading. Resetting relatedContent node fixes the issue.
+    relatedContent = m.top.relatedContent
+    m.top.relatedContent = invalid
+    m.top.relatedContent = relatedContent
+   
     m.focusTarget.setFocus(true)
     ' force a background update
     m.top.backgroundUriList = m.top.backgroundUriList

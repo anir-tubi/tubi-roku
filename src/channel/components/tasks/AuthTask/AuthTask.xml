@@ -68,7 +68,7 @@
 
         <!-- number of days since the unix epoch when the device first opened Tubi -->
         <field id="firstVisit" type="integer" />
-
+        
         <!-- guestUserHasAgeInfo info as returned by Auth.getGuestUserHasAgeInfo -->
         <field id="guestUserHasAgeInfo" type="assocarray" />
 

@@ -233,7 +233,9 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
   ' The eventTypes below act as a source of truth for the varios information to be collected for each event type on the client.
   ' They should be updated as the protobufs spec is updated.
   eventTypes = {
-    active: {}
+    active: {
+      resume: false 'optional
+    }
 
     referred: {
       referred_type: "" 'ReferredType enum

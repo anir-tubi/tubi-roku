@@ -31,6 +31,12 @@
     
   </interface>
 
+  <!-- suspendhandler will be set when app got suspended by pressing Home key or other Channel on remote -->
+  <customization suspendhandler="customSuspend" />
+  
+  <!-- resumehandler will be set when app got resumed after suspended by user -->
+  <customization resumehandler="customResume" />
+
   <children>
 
     <ComponentLibrary

@@ -10,7 +10,7 @@ Function init()
   else
     m.customSplashPoster.uri = "pkg:/images/splash-fhd.jpg"
   end if  
-  
+
   m.top.observeField("fadeOutCustomSplash", "onFadeOutCustomSplash")
   m.top.observeField("fadeOutSpinner", "onFadeOutSpinner")
   
@@ -21,6 +21,32 @@ End Function
 Function onChildrenChange()
   m.top.unobserveField("change")
   ' can consider putting an animated logo video here
+End Function
+
+
+' customSuspend is the callback for suspendhandler customization tag, 
+' will be triggered when user presses Home/Labeled channel key
+Function customSuspend(args)
+
+  m.contentController = m.top.findNode("ContentController") 
+  if m.contentController <> invalid
+    m.contentController.customSuspend = args
+  end if
+    
+End Function
+
+
+' customResume is the callback for resumehandler customization tag, 
+' every app launch, roku firmware checks whether the customSuspend.lastSuspendOrResumeReason has value as "Home", 
+' if exists, then triggers customResume callback to make necessary action
+Function customResume(args)
+
+  if args <> invalid and args.launchParams <> invalid
+    if m.contentController <> invalid
+      m.contentController.customResume = args.launchParams
+    end if
+  end if
+  
 End Function
 
 

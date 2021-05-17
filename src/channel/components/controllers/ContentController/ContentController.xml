@@ -61,6 +61,12 @@
       <!-- any info that is passed into the channel via roInput/ECP while the channel is running
            can be deeplinks, transport controls, voice commands, etc. -->
       <field id="roInputInfo" type="assocarray"/>
+      
+      <!-- customSuspend will be set by scene's suspendhandler callback  -->
+      <field id="customSuspend" type="assocarray" alwaysNotify="true"/>
+      
+      <!-- customResume will be set by scene's resumehandler callback  -->
+      <field id="customResume" type="assocarray" alwaysNotify="true"/>      
 
       <field id="reloadUserCategoriesResponse" type="assocarray"/>
       <field id="reloadMovieUserCategoriesResponse" type="assocarray"/>
@@ -98,6 +104,9 @@
       
       <!-- removeStartUpScreens is used to remove the StartUpScreens(animationLogo) -->
       <field id="removeStartUpScreens" type="boolean" />  
+      
+      <!-- disableInstantResume will be set to true when guest user tries to relaunch the app after 24hours after app got suspended by pressing home or by opening channel on remote -->
+      <field id="disableInstantResume" type="boolean" value="false" alwaysNotify="true"/>
 
   </interface>
         

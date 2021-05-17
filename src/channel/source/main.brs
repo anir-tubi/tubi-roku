@@ -22,6 +22,7 @@ End Function
 
 
 Function runChannel(startupArgs, constants, log, request) As Void
+
   ' Load scene graph
   port = CreateObject("roMessagePort")
   input = CreateObject("roInput")
@@ -123,6 +124,12 @@ Function runChannel(startupArgs, constants, log, request) As Void
         if msg.GetData() = true
           return
         end if
+      else if msg.GetField() = "disableInstantResume"
+        if msg.GetData() = true
+          screen.close() ' destroys the current scene as we need to relaunch the app from beginning 
+          runChannel(startupArgs, constants, log, request)
+          return
+        end if
       else if msg.GetField() = "transportVoiceResponse"
         result = msg.getData()
         response = result.response
@@ -162,6 +169,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
               controller.observeField("exitApp", port)
               controller.observeField("transportVoiceResponse", port)
               controller.observeField("removeStartUpScreens", port)
+              controller.observeField("disableInstantResume", port)
               controller.appStartTime = m.appStartTime
               controller.startupArgs = startupArgs
 
@@ -269,6 +277,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
       end if
     end if
   end while
+
 End Function
 
 
@@ -278,6 +287,7 @@ Function loadPackagedComponents(scene, port, startupArgs)
   controller.observeField("exitApp", port)
   controller.observeField("transportVoiceResponse", port)
   controller.observeField("removeStartUpScreens", port)
+  controller.observeField("disableInstantResume", port)
   controller.appStartTime = m.appStartTime
   controller.startupArgs = startupArgs
   return controller

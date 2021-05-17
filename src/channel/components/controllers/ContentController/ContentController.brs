@@ -5,6 +5,12 @@ Function init()
   
   m.constants = m.global.constants
   
+  ' Timer to find last time the app restarted
+  m.lastAppRestartTimer = CreateObject("roTimespan")
+  
+  ' Timer to find last time the app suspended
+  m.appSuspendTimer = CreateObject("roTimespan")
+  
   generalTask = CreateObject("roSGNode", "GeneralTask")  ' initiate GeneralTask
   ' Initiate GeneralTaskModule by passing caller context.
   ' Calling GeneralTaskModule() will append methods to the local m.
@@ -80,6 +86,9 @@ Function init()
   m.top.observeFieldScoped("roInputInfo", "onInputInfoReceived")
   m.top.observeFieldScoped("fadeInContentController", "onFadeInContentController")
   m.top.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+
+  m.top.observeFieldScoped("customSuspend", "onCustomSuspend")
+  m.top.observeFieldScoped("customResume", "onCustomResume")
   
   if m.constants.deviceInfo.language = "es"
     m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-large.png"
@@ -1485,3 +1494,102 @@ End Function
 Function isDeviceInUSorCA()
   return (m.constants.deviceInfo.countryCode = "US" or m.constants.deviceInfo.countryCode = "CA")
 End Function
+
+
+' onCustomSuspend will be triggered when user presses Home/Labeled channel key
+' Checking appExit reason and starting the appSuspendTimer in order to validate during resumeHandler callback
+Function onCustomSuspend(msg)
+
+  customSuspendArgs = msg.getData()
+  if customSuspendArgs.lastSuspendOrResumeReason = "home"
+    m.appSuspendTimer.Mark()
+    currentScreen = getCurrentScreen()
+    ' if the current screen is videoplayer, remove it from stack and show previous screen from stack
+    if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+      popScreen(false, false)
+    end if    
+  end if
+  
+End Function
+
+
+' onCustomResume will check for guest/loggedIn. 
+' For guest user, 
+' it will check lastAppSuspendInHours, 
+' if the lastAppSuspendInHours is more than 24hours, it removes all screens from stack & destroys scene and relaunches the app from beginning
+' if the lastAppSuspendInHours is equal/less than 24hours, it resumes app where the user left off or suspended.
+' For LoggedIn user,
+' it resumes app where the user left off or suspended.
+' also it restarts app every 4 days to retrieve starter/remote components
+Function onCustomResume(msg)
+
+  customResumeArgs = msg.getData()
+  
+  lastAppSuspendInHours = m.appSuspendTimer.TotalSeconds() / 3600
+  lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 86400
+  
+  if getExperimentResource("roku_instant_resume", "roku_instant_resume_v1", true).enabled = true
+    ' For guest users, 
+    ' if the time between last suspend and current resume is more than 24 hours, disable Instant Resume & relaunch app from scratch
+    ' also every 4 days once the app restarts in order to get starter/remote components
+    if m.global.authInfo = invalid and (lastAppSuspendInHours > 24 or lastAppRestartInDays >=4)
+      restartApp()
+    ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components  
+    else if m.global.authInfo <> invalid and lastAppRestartInDays >= 4
+      restartApp()
+    else
+      resumeApp(customResumeArgs)
+    end if  
+  else
+    restartApp()
+  end if
+  
+End Function  
+
+
+' restarts the app from beginning of the line in order to retrieve starter/remote components
+Function restartApp()
+
+  clearScreenStack()
+  m.top.disableInstantResume = true
+
+End Function
+
+
+' resumes the app where the user left off.
+' @customResumeArgs : roSGNode, the args passed from resumeHandler
+Function resumeApp(customResumeArgs)
+
+  m.deeplinkContent = invalid
+
+  ' handling deeplink
+  if customResumeArgs.contentId <> invalid and customResumeArgs.mediaType <> invalid
+    m.deeplinkContent = createDeeplinkContentFromStartupArgs(customResumeArgs)
+    if m.deeplinkContent <> invalid
+      m.enteredFromDeepLink = true
+      setUiModeFromState()
+      showDetailScreen(m.deeplinkContent, false)        
+    end if
+  end if
+  
+  currentScreen = getCurrentScreen()
+  ' when channel resumes, 
+  ' send page load event here only if the channel is not launched via deeplink
+  ' because the page load event is handled & already happening during deeplink 
+  if m.deeplinkContent = invalid and currentScreen <> invalid
+    screenTrackingLoad(currentScreen.trackingPageInfo)
+  end if
+
+  ' send active event when channel resumes
+  m.trackingLoggingTask.trackEvent = {
+    type: "active"
+    values: {
+      resume: true
+    }
+  }
+
+  ' send AppResumeComplete beacon when channel resumes
+  myScene = m.top.getScene()
+  myScene.signalBeacon("AppResumeComplete")
+
+End Function   

@@ -32,6 +32,9 @@ Function TubiExperiments(constants) as Object
       roku_coppa: {
         roku_coppa_v1: {"enabled": false}
       }
+      roku_instant_resume: {
+        roku_instant_resume_v1: {"enabled": false}
+      }      
     }
     
     'public methods
