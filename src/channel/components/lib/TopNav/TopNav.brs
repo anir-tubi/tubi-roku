@@ -1,9 +1,6 @@
 Function init()
   tubiLog("TopNav.init")
   
-  '//As soon as the top nav is initialized, then dispatch the beginning of the experiment. 
-  getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", true)
-  
   m.Menu = m.top.findNode("TopNavMenu")
   m.MenuBground = m.top.findNode("TopNavMenuBground")
   m.MenuBgroundParent = m.top.findNode("TopNavMenuBgroundParent")

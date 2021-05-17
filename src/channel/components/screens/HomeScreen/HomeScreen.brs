@@ -93,6 +93,9 @@ End Function
 
 Function onTopNavEnableChange()
   if m.top.enableTopNav = true
+    '//As soon as the top nav is set to be enabled, then dispatch the beginning of the experiment. 
+    getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", true)
+    
     m.InfoPanel.translation = [m.InfoPanel.translation[0], 180]
     m.NavSection.visible = false
     m.TopNav.visible = true
