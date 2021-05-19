@@ -1278,6 +1278,7 @@ End Function
 
 ' @shouldRefreshHomescreen: boolean, do no refresh homescreen if set to false
 Function setContentToRefreshAllPersonalizedScreens(shouldRefreshHomescreen = true)
+  tubiLog("ContentController.setContentToRefreshAllPersonalizedScreens")
   if shouldRefreshHomescreen = true
     homescreenId = m.constants.ui.screenIds.homeScreen
     homescreen = getFromScreenCache(homescreenId)

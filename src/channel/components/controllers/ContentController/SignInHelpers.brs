@@ -556,11 +556,9 @@ Function onSideNavSignInCompleted()
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
 
-  ' if a user has just signed in, the default behavior is turn off kids mode UI
-  ' if kids mode UI should be visible due to parenal controls, it will be turned on
-  ' subsequently (most likely by startChannel())
-  setUiMode(m.constants.ui.modes.standard)
-
+  ' set the mode before any changes are done to the UI 
+  setUiModeFromState()
+  
   ' Here we notify screens that may exist, though we try to keep context
   '
   ' Transitions:
