@@ -371,6 +371,11 @@ Function tubiAuth_setGuestUserHasAgeInfo(hasAge)
     hasAgeStored.expireTime = nowTime + (60 * 24 * 60 * 60)
   end if
 
+  ' allow the config to set the expire time for QA purposes
+  if m.constants.settings.mode <> "production" and m.constants.settings.coppaHasAgeDuration <> invalid
+    hasAgeStored.expireTime = nowTime + m.constants.settings.coppaHasAgeDuration
+  end if
+
   hasAgeStoredJson = FormatJson(hasAgeStored)
   m.regWrite("ageInfo", hasAgeStoredJson, m.guestUserHasAgeRegSection)
   return hasAgeStored

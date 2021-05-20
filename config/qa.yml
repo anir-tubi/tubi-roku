@@ -7,3 +7,4 @@ settings:
   stagingApis: false  #setting to true will use UAPI staging APIs (matrix, cms, user_device)
   automaticActivation: false  #setting to true will activate/signup the app automatically (if the values of suitest & stagingApis are true)
   remoteComponentsExtension: "zip" #prevents packages being built for qa builds, as they are not used - makes for faster builds
+  coppaHasAgeDuration: 60 #number of seconds that age information will be stored on the device. Set to 0 to see age gate every time the app is opened.
