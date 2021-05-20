@@ -14,7 +14,7 @@ Function TubiAuth(constants, request)
     getFirstVisit: tubiAuth_getFirstVisit
     setFirstVisit: tubiAuth_setFirstVisit
     handleRegistration: tubiAuth_handleRegistration
-    logout: tubiAuth_deleteAuthInfo_
+    logout: tubiAuth_deleteAuthInfo
     refreshAuthToken: tubiAuth_refreshAuthToken
     transferRefreshToken: tubiAuth_transferRefreshToken
     getAuthHeaders: tubiAuth_getAuthHeaders
@@ -22,21 +22,22 @@ Function TubiAuth(constants, request)
     updateAuthInfoWithAge: tubiAuth_updateAuthInfoWithAge
     getGuestUserHasAgeInfo: tubiAuth_getGuestUserHasAgeInfo
     setGuestUserHasAgeInfo: tubiAuth_setGuestUserHasAgeInfo
+    deleteGuestUserHasAgeInfo: tubiAuth_deleteGuestUserHasAgeInfo
 
     'private methods
-    saveAuthInfo: tubiAuth_saveAuthInfo_
-    deleteAuthInfo: tubiAuth_deleteAuthInfo_
-    checkIfAuthExpired: tubiAuth_checkIfAuthExpired_
-    requestTokenRefresh: tubiAuth_requestTokenRefresh_
-    requestTokenTransfer: tubiAuth_requestTokenTransfer_
-    handleRefreshResponse: tubiAuth_handleRefreshResponse_
-    updateAuthInfo: tubiAuth_updateAuthInfo_
-    formatAuthInfoFromServer: tubiAuth_formatAuthInfoFromServer_
+    saveAuthInfo: tubiAuth_saveAuthInfo
+    deleteAuthInfo: tubiAuth_deleteAuthInfo
+    checkIfAuthExpired: tubiAuth_checkIfAuthExpired
+    requestTokenRefresh: tubiAuth_requestTokenRefresh
+    requestTokenTransfer: tubiAuth_requestTokenTransfer
+    handleRefreshResponse: tubiAuth_handleRefreshResponse
+    updateAuthInfo: tubiAuth_updateAuthInfo
+    formatAuthInfoFromServer: tubiAuth_formatAuthInfoFromServer
     
-    regRead: tubiAuth_regRead_
-    regReadAll: tubiAuth_regReadAll_
-    regWrite: tubiAuth_regWrite_
-    regDelete: tubiAuth_regDelete_
+    regRead: tubiAuth_regRead
+    regReadAll: tubiAuth_regReadAll
+    regWrite: tubiAuth_regWrite
+    regDelete: tubiAuth_regDelete
   }
 End Function
 
@@ -53,7 +54,7 @@ End Function
 '  authType: analyticsAuthType(String)
 '  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
-function tubiAuth_getAuthInfo()
+Function tubiAuth_getAuthInfo()
   authInfo = m.regReadAll(m.authRegSection) 'returns empty assocArray if nothing in the auth registry
   newAuthInfo = invalid
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
@@ -77,7 +78,7 @@ function tubiAuth_getAuthInfo()
   end if
 
   return newAuthInfo  'can return invalid
-end function
+End Function
 
 
 'checks device registry for first visit value, if none exists, set today's value as the first visit value.
@@ -128,8 +129,8 @@ End Function
 
 
 'requests and receives a new auth token from the server
-'this is a helper function that wraps tubiAuth_requestTokenRefresh_ and tubiAuth_handleRefreshResponse_
-'this function behaves synchronously and blocks until a response is received or the timeout is reached
+'this is a helper Function that wraps tubiAuth_requestTokenRefresh_ and tubiAuth_handleRefreshResponse_
+'this Function behaves synchronously and blocks until a response is received or the timeout is reached
 '@authInfo = {
 '  refreshToken: someRefreshToken(String)
 '  accessToken: someAccessToken(String)
@@ -240,7 +241,7 @@ End Function
 
 
 '@authToken can be the server access_token or refresh_token depending on the call being made
-function tubiAuth_getAuthHeaders(authToken)
+Function tubiAuth_getAuthHeaders(authToken)
   if type(authToken) = "String" or type(authToken) = "roString"
     headers = {
       Authorization: "Bearer " + authToken
@@ -251,7 +252,7 @@ function tubiAuth_getAuthHeaders(authToken)
   else
     return invalid
   end if
-end function
+End Function
 
 
 'a wrapper for TubiRequest().createAsync(). Used to create requests that require authorization
@@ -267,7 +268,7 @@ end function
 ' returns a request objects as created by TubiRequest().createAsync() with an additional property(authInfo) 
 '   and additional method(getAuthHeaders) - both are needed in request.handleEvent()
 ' or returns invalid if there is no authInfo in the registry
-function tubiAuth_createAuthRequest(url as String, name = "" as String, options={} as Object) as Object
+Function tubiAuth_createAuthRequest(url as String, name = "" as String, options={} as Object) as Object
   authReq = invalid
   authInfo = m.getAuthInfo()
   if authInfo <> invalid and authInfo.accessToken <> invalid
@@ -305,7 +306,7 @@ function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
   end if
 
   return authReq
-end function
+End Function
 
 
 ' @hasAge: boolean, backend response field "has_age". True indicates the user has an age
@@ -382,6 +383,11 @@ Function tubiAuth_setGuestUserHasAgeInfo(hasAge)
 End Function
 
 
+Function tubiAuth_deleteGuestUserHasAgeInfo()
+  m.regDelete("ageInfo", m.guestUserHasAgeRegSection)
+End Function
+
+
 '@authInfo = {
 '  refreshToken: someRefreshToken(String)
 '  accessToken: someAccessToken(String)
@@ -393,7 +399,7 @@ End Function
 '  authType: analyticsAuthType(String)
 '  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
-function tubiAuth_saveAuthInfo_(authInfo)
+Function tubiAuth_saveAuthInfo(authInfo)
   if authInfo <> invalid and authInfo.refreshToken <> invalid and authInfo.accessToken <> invalid and authInfo.expireTime <> invalid  and (type(authInfo.expireTime) = "String" or type(authInfo.expireTime) = "roString") and authInfo.userId <> invalid
     for each key in authInfo
       value = authInfo[key]
@@ -406,14 +412,14 @@ function tubiAuth_saveAuthInfo_(authInfo)
     authInfo = invalid
   end if
   return authInfo
-end function
+End Function
 
 
-function tubiAuth_deleteAuthInfo_()
+Function tubiAuth_deleteAuthInfo()
   authSection = CreateObject("roRegistry")
   authSection.delete(m.authRegSection)
   authSection.flush()
-end function
+End Function
 
 
 'should only be called by getAuthInfo
@@ -429,7 +435,7 @@ end function
 '  authType: analyticsAuthType(String)
 '  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
-function tubiAuth_checkIfAuthExpired_(authInfo)
+Function tubiAuth_checkIfAuthExpired(authInfo)
   isExpired = true
 
   dateTime = CreateObject("roDateTime")
@@ -440,13 +446,13 @@ function tubiAuth_checkIfAuthExpired_(authInfo)
   end if
 
   return isExpired
-end function
+End Function
 
 
 'returns an authInfo object that is ready to be sent into the registry (expireTime is a string representation of an integer)
 '@newAccess: assocArray, contains the new auth token and expire time as sent from the server during a refresh token action
 '@authInfo: assocArray, authInfo as pulled from the registry with the old auth token and expire time
-function tubiAuth_updateAuthInfo_(newAccess, authInfo)
+Function tubiAuth_updateAuthInfo(newAccess, authInfo)
   updatedAuthInfo = invalid
   
   if newAccess <> invalid and newAccess.expires_in <> invalid and newAccess.access_token <> invalid
@@ -462,11 +468,11 @@ function tubiAuth_updateAuthInfo_(newAccess, authInfo)
   end if
 
   return updatedAuthInfo  
-end function
+End Function
 
 
 'used to get a new auth token when the current auth token has expired
-function tubiAuth_requestTokenRefresh_(authInfo, port)
+Function tubiAuth_requestTokenRefresh(authInfo, port)
   body = {
     user_id: authInfo.userId
     device_id: m.constants.deviceInfo.deviceId
@@ -491,7 +497,7 @@ function tubiAuth_requestTokenRefresh_(authInfo, port)
   end if
 
   return invalid
-end function
+End Function
 
 
 'create/send a request that can be used to obtain a roku refresh token when given a refresh token from a different platfrom (ios, android, etc.)
@@ -500,7 +506,7 @@ end function
 '   externalDeviceId: string of integers, the device id for the originating device
 '   externalRefreshToken: string, the refresh token sent by the originating device
 '   userId: string of integers, the user id sent by the originating device
-Function tubiAuth_requestTokenTransfer_(externalAuthInfo, port)
+Function tubiAuth_requestTokenTransfer(externalAuthInfo, port)
   body = {
     user_id: externalAuthInfo.userId
     device_id: m.constants.deviceInfo.deviceId
@@ -530,7 +536,7 @@ End Function
 
 
 '@refreshRequest: assocArray, a reqest object as created by tubiRequest().createAsyncHTTPRequest()
-Function tubiAuth_handleRefreshResponse_(msg, refreshRequest)
+Function tubiAuth_handleRefreshResponse(msg, refreshRequest)
   newAccess = invalid
 
   responseInfo = refreshRequest.handleEvent(msg)
@@ -561,7 +567,7 @@ End Function
 '                     authType: analyticsAuthType(String)
 '                     has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '                   }
-Function tubiAuth_formatAuthInfoFromServer_(serverAuthInfo)
+Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   clock = CreateObject("roDateTime")
   secondsToNow = clock.AsSeconds()
   authInfo = {}
@@ -582,7 +588,7 @@ End Function
 
 ' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency for any logic that wants to call
 ' auth.getAuthInfo
-Function tubiAuth_regReadAll_(section="")
+Function tubiAuth_regReadAll(section="")
   if section = "" then section = "Default"
   sec = CreateObject("roRegistrySection", section)
   keys = sec.GetKeyList()
@@ -597,7 +603,7 @@ End Function
 
 ' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency for any logic that wants to call
 ' auth.getAuthInfo
-Function tubiAuth_regRead_(key, section=invalid)
+Function tubiAuth_regRead(key, section=invalid)
   if section = invalid then section = "Default"
   sec = CreateObject("roRegistrySection", section)
   if sec.Exists(key) then return sec.Read(key)
@@ -606,7 +612,7 @@ End Function
 
 
 ' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency
-Function tubiAuth_regWrite_(key, val, section=invalid)
+Function tubiAuth_regWrite(key, val, section=invalid)
   if section = invalid then section = "Default"
   sec = CreateObject("roRegistrySection", section)
   sec.Write(key, val)
@@ -615,7 +621,7 @@ End Function
 
 
 ' copied from /source/3rdparty/roku/generalUtils.brs so that it won't need to be added as a dependency
-Function tubiAuth_regDelete_(key, section=invalid)
+Function tubiAuth_regDelete(key, section=invalid)
   if section = invalid then section = "Default"
   sec = CreateObject("roRegistrySection", section)
   sec.Delete(key)

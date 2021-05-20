@@ -62,6 +62,7 @@ Function execSignOut()
   NodeHelpers = TubiNodeHelpers()
 
   Auth.logout()
+  Auth.deleteGuestUserHasAgeInfo()
 
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
   authInfo = Auth.getAuthInfo()

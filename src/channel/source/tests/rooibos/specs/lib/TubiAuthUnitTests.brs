@@ -673,8 +673,8 @@ Function tubiAuth_hasAge_BeforeEach() as void
 End Function
 
 
-'@Test getHasAge unit tests
-Function tubiAuth_getHasAge_test()
+'@Test getGuestUserHasAgeInfo unit tests
+Function tubiAuth_getGuestUserHasAgeInfo_test()
   'stub a value into the registry that we will attempt to get for not expired
   dateTime = CreateObject("roDateTime")
   nowTime = dateTime.AsSeconds()
@@ -716,8 +716,8 @@ Function tubiAuth_getHasAge_test()
 End Function
 
 
-'@Test setHasAge unit tests
-Function tubiAuth_setHasAge_test()
+'@Test setGuestUserHasAgeInfo unit tests
+Function tubiAuth_setGuestUserHasAgeInfo_test()
   dateTime = CreateObject("roDateTime")
   nowTime = dateTime.AsSeconds()
 
@@ -768,6 +768,25 @@ Function tubiAuth_setHasAge_test()
   m.assertType(hasAgeInfo.expireTime, "roInteger")
   m.assertTrue(hasAgeInfo.expireTime >= nowTime)
   m.assertFalse(registryHasAgeInfo.hasAge)
+End Function
+
+
+'@Test deleteGuestUserHasAgeInfo unit tests
+Function tubiAuth_deleteGuestUserHasAgeInfo_test()
+  ' add hasAge info to the device registry
+  m.tubiAuth.setGuestUserHasAgeInfo(true)
+
+  ' verify there is some info in the registry
+  registryHasAgeInfo = m.tubiAuth.regRead("ageInfo", m.tubiAuth.guestUserHasAgeRegSection)
+  registryHasAgeInfo = ParseJson(registryHasAgeInfo)
+  m.assertNotInvalid(registryHasAgeInfo)
+
+  ' remove the info from the registry (testing that this function works properly!)
+  m.tubiAuth.deleteGuestUserHasAgeInfo()
+
+  ' verify that there is no more ageInfo in the registry
+  registryHasAgeInfo = m.tubiAuth.regRead("ageInfo", m.tubiAuth.guestUserHasAgeRegSection)
+  m.assertInvalid(registryHasAgeInfo)
 End Function
 
 
