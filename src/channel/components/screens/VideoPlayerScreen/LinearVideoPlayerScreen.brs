@@ -462,8 +462,9 @@ Function createContentForClosedCaptioning()
     end if
     content = createClosedCaptioningNode("off", (not bCaptionsOn))
     row.appendChild(content)
+    usedLanguage = {} '//make sure only a single language subtitle is displayed and used
     for each track in availableSubtitleTracks
-      if track.language = "eng" or track.language = "spa" '//::TODO:: allow for multiple languages. When backend provides more captioning support, then this should be changed 
+      if (track.language = "eng" or track.language = "spa") and usedLanguage[track.language] = invalid'//::TODO:: allow for multiple languages. When backend provides more captioning support, then this should be changed 
         bEnabled = false
         if bCaptionsOn = true
           if m.Video.subtitleTrack = track.trackname
@@ -471,6 +472,7 @@ Function createContentForClosedCaptioning()
             bEnabled = true
           end if
         end if
+        usedLanguage[track.language] = true
         content = createClosedCaptioningNode(track.language, bEnabled, track.trackname)
         row.appendChild(content)
       end if
