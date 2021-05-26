@@ -1550,6 +1550,9 @@ Function onCustomResume(msg)
     ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components  
     else if m.global.authInfo <> invalid and lastAppRestartInDays >= 4
       restartApp()
+    else if m.guestUserHasAgeInfo = invalid or (m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.expired = true)  
+      ' restart app id if the ageInfo is not present
+      restartApp()
     else
       resumeApp(customResumeArgs)
     end if  
