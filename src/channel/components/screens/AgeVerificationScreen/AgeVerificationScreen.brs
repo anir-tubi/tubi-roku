@@ -102,12 +102,18 @@ Function onNumberPadButtonSelected(msg)
       ' add the leading "0" for the user for Feb - Sep
       m.date += "0" + selected + "-"
       m.Prompt.visible = false
+    else if m.date.len() = 1 and m.date = "1" and selectedInt > 2
+      ' do nothing, don't allow months over 12
+      m.Prompt.visible = true
+    else if m.date.len() = 1 and m.date = "0" and selectedInt = 0
+      ' don't allow months of "00"
+      m.Prompt.visible = true
     else if m.date.len() = 3 and selectedInt > 3
       ' add the leading "0" for dates beyond 30/31
       m.date += "0" + selected + "-"
       m.Prompt.visible = false
-    else if m.date.len() = 1 and m.date = "1" and selectedInt > 2
-      ' do nothing, don't allow months over 12
+    else if m.date.len() = 4 and m.date.Right(1).toInt() = 0 and selectedInt = 0
+      ' don't allow dates of "00"
       m.Prompt.visible = true
     else if m.date.len() = 4 and m.date.Right(1).toInt() = 3 and selectedInt > 1
       ' do nothing, don't allow dates over 31
