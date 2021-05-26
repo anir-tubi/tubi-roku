@@ -1508,6 +1508,12 @@ Function onCustomSuspend(msg)
     ' if the current screen is videoplayer, remove it from stack and show previous screen from stack
     if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
       popScreen(false, false)
+    else
+      ' if the focus is on live news row, stop the playback
+      linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)  
+      if linearVideoPlayer <> invalid
+        linearVideoPlayer.control = "stop"
+      end if
     end if    
   end if
   
@@ -1525,6 +1531,12 @@ End Function
 Function onCustomResume(msg)
 
   customResumeArgs = msg.getData()
+  
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid and currentScreen.id = "linearVideoPlayerScreen"
+    ' if the current screen is linearVideoPlayerScreen, then start the playback
+    currentScreen.control = "play"
+  end if
   
   lastAppSuspendInHours = m.appSuspendTimer.TotalSeconds() / 3600
   lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 86400
