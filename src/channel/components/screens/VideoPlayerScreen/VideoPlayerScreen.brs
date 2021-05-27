@@ -853,15 +853,9 @@ Function historyPosition(position)
     ' stored always rounding down, but the ad check is done while rounding up over 0.5. So, if a user then
     ' resumes playback, the ad call sends the position as 1 second less than the midroll cuepoint, and
     ' no ads are returned, when they should be returned.
-    wholeNum = Int(position)
-    remainder = position - wholeNum
-    if remainder >= 0.5
-      position = wholeNum + 1
-    else
-      position = wholeNum
-    end if
+    position = round(position)
 
-    m.top.historyPosition = Int(position)
+    m.top.historyPosition = position
     m.lastSavedPosition = position
   end if
 End Function
@@ -893,7 +887,6 @@ End Function
 
 'exit the video player due to back button while no transport displaying, or during ad break
 Function backButtonExit()
-  historyPosition(m.playerPosition)
   m.top.backButtonPressed = true
 End Function
 

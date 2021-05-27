@@ -1505,9 +1505,10 @@ Function onCustomSuspend(msg)
   if customSuspendArgs.lastSuspendOrResumeReason = "home"
     m.appSuspendTimer.Mark()
     currentScreen = getCurrentScreen()
-    ' if the current screen is videoplayer, remove it from stack and show previous screen from stack
+    ' if the current screen is videoplayer, return to detail screen so that it will update historyPosition and remove video screen from stack and show previous screen from stack
     if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
-      popScreen(false, false)
+      ' don't send analytics event when user presses "home" button during playback, so sending param as false
+      returnToDetailScreenFromVideo(false)
     else
       ' if the focus is on live news row, stop the playback
       linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)  

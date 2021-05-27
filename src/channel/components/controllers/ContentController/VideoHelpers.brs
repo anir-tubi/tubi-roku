@@ -302,6 +302,7 @@ end function
 
 
 ' Stop the video player and refresh detail screen with the relevant content
+' @sendAnalyticsEvent: boolean, based on this parameter the pageload/navigate event will be fired during popScreen
 '
 ' Use cases:                                                Actions:
 '   - Exit video player movie                                 : 1 - redraw detail screen with existing detail content to update resume position; preserve related items
@@ -314,7 +315,7 @@ end function
 '   - Deep link: exit video player movie after autoplay       : 2 - redraw detail screen with autoplayed content from video player; fetch new related items
 '   - Deep link: Exit video player series                     : 3 - redraw detail screen with existing detail content to updated resume positions; preserve related items
 '   - Deep link: Exit video player series after autoplay      : 4 - redraw detail screen with autoplayed episode metadata, but maintain series content; preserve related items
-function returnToDetailScreenFromVideo()
+function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
   tubiLog("VideoHelpers.returnToDetailScreenFromVideo")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
@@ -327,18 +328,18 @@ function returnToDetailScreenFromVideo()
     videoContent = videoPlayer.content 'always a video, can be movie or episode
     detailContent = detailScreen.content 'can be movie or series
 
+    nResumePoint = round(videoPlayer.position)
+
     ' So the detailed page does not have a refresh issue, pass the local resume number before the backend communicates.
     ' The problem with this is that if the backend comes back with a different number than the local
     ' number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video.
     ' The local number is 2 seconds and displays the resume button, but the backend determines that 2
-    ' seconds is not enough to warrant a resume button and returns 0 as the resume point.
-    nResumePoint = videoPlayer.historyPosition
-
+    ' seconds is not enough to warrant a resume button and returns 0 as the resume point.    
     if nResumePoint < m.constants.player.historyFrequency or (videoContent.creditscuepoint > 0 and nResumePoint > videoContent.creditscuepoint)
       '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0
       nResumePoint = 0
     end if
-
+    
     ' Do the appropriate action based on the cases as described in the Function definition comments
     if videoContent.parentType = m.constants.ui.contentTypes.series
       ' Video player was playing a series episode
@@ -405,6 +406,14 @@ function returnToDetailScreenFromVideo()
         ' Case 1
         ' Returning to the detail screen for the same movie as was started, no autoplay
         ' Just repopulate the detail screen with the same content
+        
+        ' For SignedIn user, updates resume point to backend and global variable
+        ' For Guest user, updated the resume point to global variable
+        if m.updateHistoryTask.state <> "RUN"
+          m.updateHistoryTask.nowPos = nResumePoint
+          m.updateHistoryTask.control = "RUN"
+        end if       
+        
         populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
       end if
     end if
@@ -413,7 +422,11 @@ function returnToDetailScreenFromVideo()
   ' remove the video player screen to reveal the details screen (or episodes list screen)
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
-    popScreen(true, true)
+    if sendAnalyticsEvent = true
+      popScreen(true, true)
+    else
+      popScreen(false, false)
+    end if
   end if
 end function
 
@@ -454,7 +467,7 @@ function stopVideoContent(videoPlayer)
       parentHistoryId = m.updateHistoryTask.historyResult.parentHistoryId
     end if
 
-    nowPos = videoPlayer.historyPosition
+    nowPos = round(videoPlayer.position)
     tubiLog("stopVideoContent: nowPos = " + nowPos.toStr())
     if historyId <> invalid and historyId <> "" then
       tubiLog("stopVideoContent: historyId = " + historyId.toStr())
