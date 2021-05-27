@@ -1511,19 +1511,19 @@ Function onCustomSuspend(msg)
       returnToDetailScreenFromVideo(false)
     else
       ' if the focus is on live news row, stop the playback
-      linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)  
+      linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
       if linearVideoPlayer <> invalid
         linearVideoPlayer.control = "stop"
       end if
-    end if    
+    end if
   end if
-  
+
 End Function
 
 
-' onCustomResume will check for guest/loggedIn. 
-' For guest user, 
-' it will check lastAppSuspendInHours, 
+' onCustomResume will be triggered during Instant Resume
+' For guest user,
+' it will check lastAppSuspendInHours,
 ' if the lastAppSuspendInHours is more than 24hours, it removes all screens from stack & destroys scene and relaunches the app from beginning
 ' if the lastAppSuspendInHours is equal/less than 24hours, it resumes app where the user left off or suspended.
 ' For LoggedIn user,
@@ -1532,36 +1532,41 @@ End Function
 Function onCustomResume(msg)
 
   customResumeArgs = msg.getData()
-  
+
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.id = "linearVideoPlayerScreen"
     ' if the current screen is linearVideoPlayerScreen, then start the playback
     currentScreen.control = "play"
   end if
-  
+
   lastAppSuspendInHours = m.appSuspendTimer.TotalSeconds() / 3600
   lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 86400
-  
+
   if getExperimentResource("roku_instant_resume", "roku_instant_resume_v1", true).enabled = true
-    ' For guest users, 
-    ' if the time between last suspend and current resume is more than 24 hours, disable Instant Resume & relaunch app from scratch
-    ' also every 4 days once the app restarts in order to get starter/remote components
-    if m.global.authInfo = invalid and (lastAppSuspendInHours > 24 or lastAppRestartInDays >=4)
+    Request = TubiRequest(m.constants.settings.mode)
+    Auth = TubiAuth(m.constants, Request)
+    guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
+
+    ' if the device is in US/CA and guestUserHasAgeInfo's expired value is true, then restart the app in order to show coppa age gate
+    if isDeviceInUSorCA() = true and guestUserHasAgeInfo.expired = true
+      m.ageVerificationComplete = false
       restartApp()
-    ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components  
+      ' For guest users,
+      ' if the time between last suspend and current resume is more than 24 hours, disable Instant Resume & relaunch app from scratch
+      ' also every 4 days once the app restarts in order to get starter/remote components
+    else if m.global.authInfo = invalid and (lastAppSuspendInHours > 24 or lastAppRestartInDays >=4)
+      restartApp()
+      ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
     else if m.global.authInfo <> invalid and lastAppRestartInDays >= 4
-      restartApp()
-    else if m.guestUserHasAgeInfo = invalid or (m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.expired = true)  
-      ' restart app id if the ageInfo is not present
       restartApp()
     else
       resumeApp(customResumeArgs)
-    end if  
+    end if
   else
     restartApp()
   end if
-  
-End Function  
+
+End Function
 
 
 ' restarts the app from beginning of the line in order to retrieve starter/remote components
