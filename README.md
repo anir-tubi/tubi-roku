@@ -490,4 +490,4 @@ NOTE: Instead of passing the crowdin key, you can set the crowdin key as system 
 
 See [CONTRUBUTING.md](CONTRIBUTING.md)
 
-Last updated by: Rigo
+Last updated by: Jhansi Lakshmi Medarametla
