@@ -102,27 +102,20 @@ Function onNumberPadButtonSelected(msg)
       ' add the leading "0" for the user for Feb - Sep
       m.date += "0" + selected + "-"
       m.Prompt.visible = false
-    else if m.date.len() = 1 and m.date = "1" and selectedInt > 2
-      ' do nothing, don't allow months over 12
+    else if m.date.len() = 1 and checkValidMonth(m.date + selected) = false
       m.Prompt.visible = true
-    else if m.date.len() = 1 and m.date = "0" and selectedInt = 0
-      ' don't allow months of "00"
-      m.Prompt.visible = true
-    else if m.date.len() = 3 and selectedInt > 3
-      ' add the leading "0" for dates beyond 30/31
+    else if m.date.len() = 3 and ((m.date.Right(2).toInt() = 2 and selectedInt > 2) or selectedInt > 3)
+      ' add the leading "0" for dates beyond 30/31 or beyond 29 in February
       m.date += "0" + selected + "-"
       m.Prompt.visible = false
-    else if m.date.len() = 4 and m.date.Right(1).toInt() = 0 and selectedInt = 0
-      ' don't allow dates of "00"
-      m.Prompt.visible = true
-    else if m.date.len() = 4 and m.date.Right(1).toInt() = 3 and selectedInt > 1
-      ' do nothing, don't allow dates over 31
+    else if m.date.len() = 4 and checkValidMonthDate(m.date, selected) = false
+      ' don't allow dates that don't exist within the month
       m.Prompt.visible = true
     else if m.date.len() = 6 and selectedInt <> 1 and selectedInt <> 2
       ' do nothing, don't allow millenia unless they are 1xxx or 2xxx
       m.Prompt.visible = true
     else if m.date.len() = 7 and m.date.Right(1).toInt() = 1 and selectedInt <> 9
-      ' do nothing, don't allow centuries that are not 19xx
+      ' do nothing, don't allow centuries that are not 19xx if millenium is 1xxx
       m.Prompt.visible = true
     else if m.date.len() = 7 and m.date.Right(1).toInt() = 2 and checkValidCentury(m.date.Right(1).toInt(), selectedInt) = false
       ' do nothing, don't allow centuries greater than the current century if millenium is 2xxx
@@ -130,12 +123,7 @@ Function onNumberPadButtonSelected(msg)
     else if m.date.len() = 8 and m.date.Mid(6, 1).toInt() = 2 and checkValidDecade(m.date.Right(1).toInt(), selectedInt) = false
       ' do nothing, don't allow decades greater than the current decade if millenium is 2xxx
       m.Prompt.visible = true
-    else if m.date.len() = 9 and m.date.Mid(6, 1).toInt() = 2 and checkValidYear(m.date.Right(1).toInt(), selectedInt) = false
-      ' do nothing, don't allow years greater than the current year if millenium is 2xxx
-      m.Prompt.visible = true
-    else if m.date.len() = 9 and m.date.Mid(6, 1).toInt() = 2 and checkValidDate(m.date, selected) = false
-      ' do nothing, don't allow this year if the date is greater than the current date, the year
-      ' is the current year, and millenium is 2xxx
+    else if m.date.len() = 9 and checkValidDate(m.date, selected) = false
       m.Prompt.visible = true
     else if m.date.len() < 10
       ' only add more characters to the date if we don't have the whole date already
@@ -371,29 +359,43 @@ Function checkValidDecade(submittedCentury, submittedDecade)
 End Function
 
 
-' @submittedDecade: integer, single digit representation of century. For the year 2019,
-'                                submittedDecade should be 0.
-' @submittedYear: integer, single digit representation of year. For the year 2019,
-'                             submittedYear should be 9.
-Function checkValidYear(submittedDecade, submittedYear)
-  dateTime = createObject("roDateTime")
-  currentFullYear = dateTime.getYear()
-
-  currentYear = (currentFullYear MOD 10)
-  ' (2021 MOD 10) = 1
-  ' (2019 MOD 10) = 9
-
-  currentDecade = (currentFullYear MOD 100) \ 10 * 10
-
-  if submittedDecade * 10 = currentDecade and submittedYear > currentYear
-    ' only check if the submitted year is greater than current year if the submitted decade
-    ' is equal to the current decade. If the submitted decade is a previous decade, then
-    ' we could expect years of value greater than the current year value. (ie. the 7 in 1987
-    ' is greater than the 1 in 2021 and should be allowed, but 2027 should not be allowed).
+' @submittedMonth: string, month representation as a number (ie. "01" = January, "05" = May, etc.)
+Function checkValidMonth(submittedMonth)
+  if submittedMonth.toInt() > 12 or submittedMonth.toInt() < 1
+    ' don't allow months over 12 or a "00" month
     return false
   end if
 
   return true
+End Function
+
+
+' @submittedMonthDate: string, 2 digit month, 1 digit day, Format should be "MM-D", ie "04-0"
+' @submittedDay: string, single digit representation of last character in a 2 character day. For
+'                          example, if the MM-DD is 12-25, the submittedDay should be "5".
+Function checkValidMonthDate(submittedMonthDate, submittedDay)
+  submittedDateParts = submittedMonthDate.split("-")
+  submittedMonth = submittedDateParts[0]
+  submittedDay = (submittedDateParts[1] + submittedDay).toInt()
+
+  ' months with 31 days
+  longMonths = {}
+  longMonths["1"] = true
+  longMonths["3"] = true
+  longMonths["5"] = true
+  longMonths["7"] = true
+  longMonths["8"] = true
+  longMonths["10"] = true
+  longMonths["12"] = true
+
+  if submittedDay > 31 or submittedDay < 1
+    return false
+  else if submittedDay = 31 and longMonths[submittedMonth] = invalid
+    ' don't allow a user to input 31 for the day if there are less than 31 days in the month (ie. 4/31/00)
+    return false
+  else if submittedMonth = "2" and submittedDay > 29
+    return false
+  end if
 End Function
 
 
@@ -415,18 +417,35 @@ Function checkValidDate(submittedDate, submittedYear)
     currentMonth = dateTime.getMonth()
     currentDay = dateTime.getDayOfMonth()
 
-    if currentYear = submittedYear
+    ' don't allow future years/month/dates
+    if submittedYear > currentYear
+      return false
+    else if currentYear = submittedYear
       if submittedMonth > currentMonth
-        print "we are returning false 1"
         return false
       else if submittedMonth = currentMonth and submittedDay > currentDay
-        print "we are returning false 2"
         return false
       end if
+    end if
+
+    ' don't allow leap year dates if it is not a leap year
+    if submittedMonth = 2 and submittedDay = 29
+      return isLeapYear(submittedYear)
     end if
   else
     return false
   end if
 
+  return true
+End Function
+
+
+' @year: integer, ex: 2000
+Function isLeapYear(year)
+  if year MOD 4 <> 0
+    return false
+  else if year MOD 100 = 0 and year MOD 400 <> 0
+    return false
+  end if
   return true
 End Function
