@@ -48,7 +48,7 @@ $ npm install  # this expect you have node > 4.x installed
 When asked to set up a dev password, use "1234" so it's easier for any developer to easily know the password for any device.
 
 
-4\. Set the developer id on your Roku device. (You will need to get a pkg, password, and developer id from other roku developers on the team).
+4\. Set the developer id on your Roku device. (You will need to get a pkg, password, and developer id from the shared secret "Roku Rekey Info" in LastPass).
 
 * Navigate to the Roku device's IP in your broswer; select Utilities. Take note of the IP address for step #6 when you will set the "ROKU_DEV_TARGET".
 * Upload the pkg file and enter the password and select `Rekey`. (This password will be used in step #6 to set "PKG_PASSWORD").
@@ -59,17 +59,19 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
   - Only select the "repo" scope and "repo" sub scopes.
   - Copy the token, as you will not be able to see it again once you leave the page.
 
-6\. Set the build environment. (The following settings are temporary and setting them must be done every time you create a new terminal session.)
+6\. Set the build environment. Add the following environment variables to the appropriate shell configuration file:
+- .zprofile for ZSH (ZSH is the default shell for new Macs)
+- .bash_profile for BASH on Macs
+- .bashrc for BASH on Linux
 
 ```
-$ export ROKU_DEV_TARGET="<your-roku-ip>""
-$ export DEV_PASSWORD="<dev password set up on Roku device>"
-$ export PKG_PASSWORD="<password from the GENKEY utility used for signing packages>"
-$ export CDN_GIT_DIRECTORY="<path to the adrise_cdn repo directory ex: ~/dev/adrise_cdn>"
-$ export GITHUB_PAT="<github personal access token>"
-$ export ROKU_DEV_TELNET="sametab" (optional)
+export ROKU_DEV_TARGET="<your-roku-ip>""
+export DEV_PASSWORD="<dev password set up on Roku device>"
+export PKG_PASSWORD="<password from the GENKEY utility used for signing packages>"
+export CDN_GIT_DIRECTORY="<path to the adrise_cdn repo directory ex: ~/dev/adrise_cdn>"
+export GITHUB_PAT="<github personal access token>"
+export ROKU_DEV_TELNET="sametab" (optional)
 ```
-Pro tip: add these environment variables to your .bashrc or .bash_profile file
 
 7\. Create a `dev.yml` file in your `config` directory. Use the existing `dev.yml.example` file as a template.
 
