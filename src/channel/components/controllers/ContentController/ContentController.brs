@@ -1531,33 +1531,30 @@ End Function
 ' also it restarts app every 4 days to retrieve starter/remote components
 Function onCustomResume(msg)
 
+  tubiLog("ContentController.onCustomResume")
   customResumeArgs = msg.getData()
 
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.id = "linearVideoPlayerScreen"
-    ' if the current screen is linearVideoPlayerScreen, then start the playback
-    currentScreen.control = "play"
-  end if
 
-  lastAppSuspendInHours = m.appSuspendTimer.TotalSeconds() / 3600
-  lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 86400
+  lastAppSuspendInHours = m.appSuspendTimer.TotalSeconds() / 60 / 60
+  lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
 
   if getExperimentResource("roku_instant_resume", "roku_instant_resume_v1", true).enabled = true
     Request = TubiRequest(m.constants.settings.mode)
     Auth = TubiAuth(m.constants, Request)
     guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
 
-    ' if the device is in US/CA and guestUserHasAgeInfo's expired value is true, then restart the app in order to show coppa age gate
     if isDeviceInUSorCA() = true and guestUserHasAgeInfo.expired = true
+    ' if the device is in US/CA and guestUserHasAgeInfo's expired value is true, then restart the app in order to show coppa age gate
       m.ageVerificationComplete = false
       restartApp()
+    else if m.global.authInfo = invalid and (lastAppSuspendInHours > 24 or lastAppRestartInDays >= 4)
       ' For guest users,
       ' if the time between last suspend and current resume is more than 24 hours, disable Instant Resume & relaunch app from scratch
       ' also every 4 days once the app restarts in order to get starter/remote components
-    else if m.global.authInfo = invalid and (lastAppSuspendInHours > 24 or lastAppRestartInDays >=4)
       restartApp()
-      ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
     else if m.global.authInfo <> invalid and lastAppRestartInDays >= 4
+      ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
       restartApp()
     else
       resumeApp(customResumeArgs)
@@ -1571,7 +1568,7 @@ End Function
 
 ' restarts the app from beginning of the line in order to retrieve starter/remote components
 Function restartApp()
-
+  tubiLog("ContentController.restartApp")
   clearScreenStack()
   m.top.disableInstantResume = true
 
@@ -1589,12 +1586,20 @@ Function resumeApp(customResumeArgs)
     m.deeplinkContent = createDeeplinkContentFromStartupArgs(customResumeArgs)
     if m.deeplinkContent <> invalid
       m.enteredFromDeepLink = true
+      hideNavMenu(false)
+      clearScreenStack()
+      emptyScreenCache()
       setUiModeFromState()
       showDetailScreen(m.deeplinkContent, false)        
     end if
   end if
   
   currentScreen = getCurrentScreen()
+  if currentScreen <> invalid and currentScreen.id = "linearVideoPlayerScreen"
+    ' if the current screen is linearVideoPlayerScreen, then start the playback
+    currentScreen.control = "play"
+  end if
+
   ' when channel resumes, 
   ' send page load event here only if the channel is not launched via deeplink
   ' because the page load event is handled & already happening during deeplink 
