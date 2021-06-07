@@ -1,6 +1,8 @@
 ' ********** Copyright 2016 Nice People At Work.  All Rights Reserved. **********
 
 sub init()
+
+    'm.global.addFields({ YouboraLogActive: true })
     YouboraLog("YBPluginGeneric.brs - init")
     m.top.functionName = "_run"
 
@@ -69,7 +71,7 @@ sub _run()
     YouboraLog("YBPluginGeneric.brs - run")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.5.11-" + m.pluginName
+    m.pluginVersion = "6.5.15-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)

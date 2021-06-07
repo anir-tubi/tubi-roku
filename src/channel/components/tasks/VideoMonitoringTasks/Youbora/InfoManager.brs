@@ -32,7 +32,7 @@ function InfoManager(plugin, options = invalid)
 
     this.getTransportFormat = function ()
         format = m.options["content.transportFormat"]
-        if format <> "TS" and format <> "MP4" then
+        if format <> "TS" and format <> "MP4" and format <> "CMF" then
             format = invalid
         end if
 
@@ -40,6 +40,8 @@ function InfoManager(plugin, options = invalid)
             resource = m.plugin.getParsedResource()
             if Instr(1,resource,".ts") > 0 then
                 format = "TS"
+            else if Instr(1,resource,".cmfv") > 0 then
+                format = "CMF"
             else if Instr(1,resource,".mp4") + Instr(1,resource,".m4s") > 0 then
                 format = "MP4"
             end if
@@ -462,6 +464,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         'Network
         if outParams.DoesExist("isp") = false then outParams["isp"] = m.options["network.isp"]
         if outParams.DoesExist("ip") = false then outParams["ip"] = m.options["network.ip"]
+        if outParams.DoesExist("connectionType") = false then outParams["connectionType"] = m.options["network.connectionType"]
         'App
         if outParams.DoesExist("appName") = false then outParams["appName"] = m.options["app.name"]
         if outParams.DoesExist("appReleaseVersion") = false then outParams["appReleaseVersion"] = m.options["app.releaseVersion"]
@@ -573,7 +576,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.11 Roku Adnalyzer"
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.15 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1

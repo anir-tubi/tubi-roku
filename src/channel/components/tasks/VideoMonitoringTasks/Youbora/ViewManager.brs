@@ -88,7 +88,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
   endif
 
 	if req = "init"
-		if m.isInitiated = false
+		if m.isInitiated = false and m.isStartSent = false then
 			params = m.infoManager.getRequestParams("start", params)
 
 			m.isInitiated = true
