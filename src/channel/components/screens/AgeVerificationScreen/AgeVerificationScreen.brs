@@ -104,7 +104,7 @@ Function onNumberPadButtonSelected(msg)
       m.Prompt.visible = false
     else if m.date.len() = 1 and checkValidMonth(m.date + selected) = false
       m.Prompt.visible = true
-    else if m.date.len() = 3 and ((m.date.Right(2).toInt() = 2 and selectedInt > 2) or selectedInt > 3)
+    else if m.date.len() = 3 and ((m.date.Left(2).toInt() = 2 and selectedInt > 2) or selectedInt > 3)
       ' add the leading "0" for dates beyond 30/31 or beyond 29 in February
       m.date += "0" + selected + "-"
       m.Prompt.visible = false
@@ -380,11 +380,11 @@ Function checkValidMonthDate(submittedMonthDate, submittedDay)
 
   ' months with 31 days
   longMonths = {}
-  longMonths["1"] = true
-  longMonths["3"] = true
-  longMonths["5"] = true
-  longMonths["7"] = true
-  longMonths["8"] = true
+  longMonths["01"] = true
+  longMonths["03"] = true
+  longMonths["05"] = true
+  longMonths["07"] = true
+  longMonths["08"] = true
   longMonths["10"] = true
   longMonths["12"] = true
 
@@ -395,6 +395,8 @@ Function checkValidMonthDate(submittedMonthDate, submittedDay)
     return false
   else if submittedMonth = "2" and submittedDay > 29
     return false
+  else
+    return true
   end if
 End Function
 
