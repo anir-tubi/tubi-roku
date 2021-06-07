@@ -1544,8 +1544,12 @@ Function onCustomResume(msg)
     Auth = TubiAuth(m.constants, Request)
     guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
 
-    if isDeviceInUSorCA() = true and guestUserHasAgeInfo.expired = true
-    ' if the device is in US/CA and guestUserHasAgeInfo's expired value is true, then restart the app in order to show coppa age gate
+    if customResumeArgs.contentId <> invalid and customResumeArgs.mediaType <> invalid
+      ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
+      ' lots of edge cases, so for consistency, restarting the app is easiest.
+      restartApp()
+    else if isDeviceInUSorCA() = true and guestUserHasAgeInfo.expired = true
+      ' if the device is in US/CA and guestUserHasAgeInfo's expired value is true, then restart the app in order to show coppa age gate
       m.ageVerificationComplete = false
       restartApp()
     else if m.global.authInfo = invalid and (lastAppSuspendInHours > 24 or lastAppRestartInDays >= 4)
@@ -1579,21 +1583,9 @@ End Function
 ' @customResumeArgs : roSGNode, the args passed from resumeHandler
 Function resumeApp(customResumeArgs)
 
+  tubiLog("ContentController.resumeApp")
   m.deeplinkContent = invalid
 
-  ' handling deeplink
-  if customResumeArgs.contentId <> invalid and customResumeArgs.mediaType <> invalid
-    m.deeplinkContent = createDeeplinkContentFromStartupArgs(customResumeArgs)
-    if m.deeplinkContent <> invalid
-      m.enteredFromDeepLink = true
-      hideNavMenu(false)
-      clearScreenStack()
-      emptyScreenCache()
-      setUiModeFromState()
-      showDetailScreen(m.deeplinkContent, false)        
-    end if
-  end if
-  
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.id = "linearVideoPlayerScreen"
     ' if the current screen is linearVideoPlayerScreen, then start the playback
