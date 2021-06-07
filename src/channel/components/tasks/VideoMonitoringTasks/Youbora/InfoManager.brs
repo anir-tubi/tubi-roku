@@ -303,7 +303,8 @@ function InfoManager(plugin, options = invalid)
         end if
 
         if m.options["device.osVersion"] = invalid
-            deviceInfo["osVersion"] = CreateObject("roDeviceInfo").GetVersion()
+            osVersion = CreateObject("roDeviceInfo").GetOSVersion()
+            deviceInfo["osVersion"] = osVersion.major + "." + osVersion.minor + "." + osVersion.revision + "." + osVersion.build
         else
             deviceInfo["osVersion"] = m.options["device.osVersion"]
         end if

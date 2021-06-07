@@ -43,7 +43,7 @@ Function Sentry(dsn, attributes=invalid, context=invalid)
       "os": {
         "type": "os"
         "name": "roku"
-        "version": Mid(di.GetVersion(), 3, 4)
+        "version": di.GetOSVersion().major + "." + di.GetOSVersion().minor
       }
       "app": {
         "type": "app"

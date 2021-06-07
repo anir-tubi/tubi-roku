@@ -12,11 +12,7 @@ Function getConstants()
   constants.deviceInfo = {}
     di = CreateObject("roDeviceInfo")
 
-    firmware = di.GetVersion() '034.08E01185A' string
-    firmwareVersion = Val(Mid(firmware, 3, 4)) '4.08'  float
-    firmwareVersionMajor = Val(Mid(firmware, 3, 1))  '4'  integer
-    firmwareVersionMinor = Val(Mid(firmware, 5, 2))  '8'  integer
-    firmwareBuild = Mid(firmware, 9, 4) '01185'  string
+    firmware = di.GetOSVersion() '{build: "4195", major: "10", minor: "0", revision: "0"}' roAssociativeArray
 
     if di.GetDisplayType() = "HDTV"
       definition = "hd"
@@ -97,7 +93,7 @@ Function getConstants()
     }
 
     ' Firmware 8.0.0 added a system dialog for captions on Roku 4
-    if firmwareVersionMajor >= 8
+    if Val(firmware.major) >= 8
       noFirmwareCaptionMenuModels.delete("4400X")
     end if
 
@@ -170,10 +166,10 @@ Function getConstants()
 
     constants.deviceInfo.uiResolution = UCase(di.GetUiResolution().name)
     constants.deviceInfo.ipAddresses = di.GetIPAddrs() 'array of network interface ip addresses (normally will only contain 1 element)
-    constants.deviceInfo.firmwareVersion = firmwareVersion
-    constants.deviceInfo.firmwareBuild = firmwareBuild
-    constants.deviceInfo.userAgent = "Roku/DVP-" + firmwareVersionMajor.toStr() + "." + firmwareVersionMinor.toStr() + " (" + firmware + ")"
-    constants.deviceInfo.userAgentModel = "Roku/DVP-" + firmwareVersionMajor.toStr() + "." + firmwareVersionMinor.toStr() + " (" + firmware + ") " + di.GetModel() 
+    constants.deviceInfo.firmwareVersion = firmware.major + "." +  firmware.minor
+    constants.deviceInfo.firmwareBuild = firmware.build
+    constants.deviceInfo.userAgent = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ")"
+    constants.deviceInfo.userAgentModel = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ") " + di.GetModel()
     constants.deviceInfo.model = di.GetModel()
     constants.deviceInfo.vendorName = di.GetModelDetails().VendorName
     constants.deviceInfo.definition = definition

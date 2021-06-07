@@ -145,7 +145,7 @@ Function tubiTracking_getAnalyticsDevice(eventValues = invalid)
     manufacturer: m.constants.deviceInfo.vendorName
     model: m.constants.deviceInfo.model
     os: "Roku OS"
-    os_version: m.constants.deviceInfo.firmwareVersion.toStr()
+    os_version: m.constants.deviceInfo.firmwareVersion
     user_agent: m.constants.deviceInfo.userAgent
     is_mobile: false
     device_height: m.constants.deviceInfo.displayHeight
