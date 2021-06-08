@@ -21,24 +21,32 @@ Direct Install: [my.roku.com/add/NDDHPHK](https://my.roku.com/add/NDDHPHK)
 
 
 
-
------
-
-# Build
-
+# Getting Started
 1\. Clone repo:
 
 ```
 $ git clone git@github.com:adRise/project-total-recall.git
 ```
+2\. Install Node (and npm)
+https://nodejs.org/en/
 
-2\. Navigate to the github repo in terminal and then install build tools
-
+3\. Install NPX
 ```
-$ npm install  # this expect you have node > 4.x installed
+npm install -g npx
 ```
-
-3\. Enable developer mode on the Roku device remote control:
+4\. Install Gulp CLI
+```
+npm install -g gulp-cli
+```
+5\. Navigate to the project-total-recall directory
+```
+cd project-total-recall
+```
+6\. Install build libraries from npm (make sure node > 4.x is installed)
+```
+npm install
+```
+7\. Enable developer mode on the Roku device remote control:
 
 
 ![](docs/remote.png)
@@ -48,18 +56,18 @@ $ npm install  # this expect you have node > 4.x installed
 When asked to set up a dev password, use "1234" so it's easier for any developer to easily know the password for any device.
 
 
-4\. Set the developer id on your Roku device. (You will need to get a pkg, password, and developer id from the shared secret "Roku Rekey Info" in LastPass).
+8\. Set the developer id on your Roku device. (You will need to get a pkg, password, and developer id from the shared secret "Roku Rekey Info" in LastPass).
 
 * Navigate to the Roku device's IP in your broswer; select Utilities. Take note of the IP address for step #6 when you will set the "ROKU_DEV_TARGET".
 * Upload the pkg file and enter the password and select `Rekey`. (This password will be used in step #6 to set "PKG_PASSWORD").
 * Check that you have the proper developer ID by navigating in your web browser to the Roku device's IP and then select Packager.
 
-5\.Create a Github Peronal Access Token (this access token will be set as an environment variable in step #6):
+9\.Create a Github Peronal Access Token (this access token will be set as an environment variable in step #6):
   - Follow the instructions at https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token
   - Only select the "repo" scope and "repo" sub scopes.
   - Copy the token, as you will not be able to see it again once you leave the page.
 
-6\. Set the build environment. Add the following environment variables to the appropriate shell configuration file:
+10\. Set the build environment. Add the following environment variables to the appropriate shell configuration file:
 - .zprofile for ZSH (ZSH is the default shell for new Macs)
 - .bash_profile for BASH on Macs
 - .bashrc for BASH on Linux
@@ -73,11 +81,14 @@ export GITHUB_PAT="<github personal access token>"
 export ROKU_DEV_TELNET="sametab" (optional)
 ```
 
-7\. Create a `dev.yml` file in your `config` directory. Use the existing `dev.yml.example` file as a template.
+11\. Create a `dev.yml` file in your `config` directory. Use the existing `dev.yml.example` file as a template.
+-----
 
-8\. Make a development build, sideload to the device, and attach to the developer console
-
-`$ gulp install`
+# Build
+Make a development build, sideload to the device, and attach to the developer console
+```
+$ gulp install
+```
 
 ## Using Gulp
 To see a list of gulp commands `$ gulp --tasks`
