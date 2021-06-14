@@ -68,10 +68,10 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
   - Copy the token, as you will not be able to see it again once you leave the page.
 
 10\. Set the build environment. Add the following environment variables to the appropriate shell configuration file:
-- .zprofile for ZSH (ZSH is the default shell for new Macs)
+- .zprofile for ZSH (ZSH is the default shell for new Macs.)
 - .bash_profile for BASH on Macs
 - .bashrc for BASH on Linux
-
+(It might need a restart to take effect.)
 ```
 export ROKU_DEV_TARGET="<your-roku-ip>""
 export DEV_PASSWORD="<dev password set up on Roku device>"
@@ -503,4 +503,4 @@ NOTE: Instead of passing the crowdin key, you can set the crowdin key as system 
 
 See [CONTRUBUTING.md](CONTRIBUTING.md)
 
-Last updated by: Jhansi Lakshmi Medarametla
+Last updated by: Anupama Chandrappa
