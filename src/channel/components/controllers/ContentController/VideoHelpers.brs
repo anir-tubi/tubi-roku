@@ -610,13 +610,15 @@ end function
 function initVideoTracking(videoPlayer)
   if m.constants.thirdParty.youbora.enabled = true
     if videoPlayer <> invalid
-      videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
-      m.youboraTask = m.top.createChild("YBPluginRokuVideo")
-      m.youboraTask.id = "Youbora"
-      m.youboraTask.options = m.constants.thirdParty.youbora.config
+      if m.youboraTask = invalid
+        videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
+        m.youboraTask = m.top.createChild("YBPluginRokuVideo")
+        m.youboraTask.id = "Youbora"
+        m.youboraTask.options = m.constants.thirdParty.youbora.config
+        m.global.addFields({ YouboraLogActive: m.constants.thirdParty.youbora.debug })
+        m.youboraTask.control = "RUN"
+      end if
       m.youboraTask.videoplayer = videoPlayer.findNode("VideoNode")
-      m.global.addFields({ YouboraLogActive: m.constants.thirdParty.youbora.debug })
-      m.youboraTask.control = "RUN"
     end if
   end if
 end function
