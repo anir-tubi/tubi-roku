@@ -199,7 +199,6 @@ Function getConstants()
     constants.deviceInfo.language  = di.GetCurrentLocale().Left(2)
     constants.deviceInfo.locale  = di.GetCurrentLocale()
     constants.deviceInfo.scaledUi = scaledUi
-    
 
   'names given to different request types for identification purposes (for example in the General Task)
   constants.reqNames = {}

@@ -1238,10 +1238,9 @@ End Function
 
 
 Function onStreamingSegmentChange(msg)
-
   streamingSegment = msg.GetData()
-  if streamingSegment <> invalid and streamingSegment.segBitrateBps <> invalid
-    m.top.segBitrate = streamingSegment.segBitrateBps
+  if streamingSegment <> invalid and streamingSegment.segBitrateBps <> invalid and (streamingSegment.segType = invalid or streamingSegment.segType = 2) then
+    m.top.segInfo = streamingSegment
   end if
 
 End Function

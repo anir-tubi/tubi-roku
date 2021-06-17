@@ -130,8 +130,8 @@
       <!-- Autoplay this content when this field is set -->
       <field id="upNextContentToAutoplay" type="node" />
       
-      <!-- segBitrate will be set when streamingSegment of videoNode value changes -->
-      <field id="segBitrate" type="integer"/>      
+      <!-- streamingSegment will be set when streamingSegment of videoNode value changes -->
+      <field id="segInfo" type="assocarray"/>
 
       <!-- Is set to true when the creditsCuepoint has been reached or surpassed.
            Fires every time that Video.position updates and position is >= to the creditsCuepoint

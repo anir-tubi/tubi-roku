@@ -59,7 +59,7 @@ function playVideoContent(content, autoplayType = "none", position = 0)
       videoPlayer.observeFieldScoped("upNextCuepointReached", "onUpNextCuepointReached")
       videoPlayer.observeFieldScoped("upNextContentToAutoplay", "onUpNextContentToAutoplay")
       videoPlayer.observeFieldScoped("upNextNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-      videoPlayer.observeFieldScoped("segBitrate", "onSegBitrateChange")
+      videoPlayer.observeFieldScoped("segInfo", "onSegInfoChange")
 
       videoPlayer.enableAds = true
       if m.constants.settings.noAds = true
@@ -450,7 +450,7 @@ function stopVideoContent(videoPlayer)
     videoPlayer.unobserveFieldScoped("upNextCuepointReached")
     videoPlayer.unobserveFieldScoped("upNextContentToAutoplay")
     videoPlayer.unobserveFieldScoped("upNextNavigateWithinPageInfo")
-    videoPlayer.unobserveFieldScoped("segBitrate")
+    videoPlayer.unobserveFieldScoped("segInfo")
 
     ' reset the deep link state since we've handled it already at this point
     m.deepLinkContent = invalid
@@ -771,13 +771,13 @@ function onTransportVoiceResponse(msg)
 end function
 
 
-' Getting segment bitrate from player and setting to Youbora Options
-Function onSegBitrateChange(msg)
-  segBitrate = msg.getData()
+' Getting segment info from player and setting to Youbora Options
+Function onSegInfoChange(msg)
+  segInfo = msg.getData()
   if m.youboraTask <> invalid
     youboraOptions = m.youboraTask.options
     if youboraOptions <> invalid 
-       rendition = constructYouboraRendition(segBitrate)
+       rendition = constructYouboraRendition(segInfo)
        if rendition <> invalid
          youboraOptions["content.rendition"] = rendition
          m.youboraTask.options = youboraOptions
@@ -789,22 +789,29 @@ End Function
 
 ' This method helps to construct rendition value based on segBitrate & UI resolution
 ' rendition format will be wxh@bitrate
-Function constructYouboraRendition(segBitrate)
-
+Function constructYouboraRendition(segInfo)
   rendition = invalid
-  if segBitrate <> invalid
-    if segBitrate < 1000
-      segBitrate = segBitrate.ToStr() + "bps"
-    else if segBitrate < 1000000
-      segBitrate = (segBitrate/1000).ToStr() + "Kbps"
-    else
-      rendAux = segBitrate / 1000000.0 'Divide by mega
-      rendAux = Cint(rendAux * 100) / 100.0
-      segBitrate = rendAux.ToStr() + "Mbps"
+  if segInfo <> invalid
+    segBitrate = segInfo.segBitrateBps
+    if segBitrate <> invalid
+      if segBitrate < 1000
+        segBitrate = segBitrate.ToStr() + "bps"
+      else if segBitrate < 1000000
+        segBitrate = (segBitrate/1000).ToStr() + "Kbps"
+      else
+        rendAux = segBitrate / 1000000.0 'Divide by mega
+        rendAux = Cint(rendAux * 100) / 100.0
+        segBitrate = rendAux.ToStr() + "Mbps"
+      end if
+      if segInfo.Width <> invalid and segInfo.Height <> invalid then
+        width = segInfo.Width.ToStr()
+        height = segInfo.Height.ToStr()
+      else
+        width = m.constants.deviceInfo.displayWidth.ToStr()
+        height = m.constants.deviceInfo.displayHeight.ToStr()
+      end if
+      rendition = width + "x" + height + chr(64) + segBitrate
     end if
-    width = m.constants.deviceInfo.displayWidth.ToStr()
-    height = m.constants.deviceInfo.displayHeight.ToStr()
-    rendition = width + "x" + height + chr(64) + segBitrate
   end if
   return rendition
   
