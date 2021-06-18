@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="InitialContentScreen" extends="BaseScreen">
+
+  <script type="text/brightscript" uri="InitialContentScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <!-- Tell screen to display into view -->
+      <field id="animateIntoView" type="boolean"/>
+
+
+    <!-- OUTPUT -->
+      <!-- The item that the user selects. Action should be done immediately after hearing a change of this field. -->
+      <field id="actionableItemSelected" type="string"/>
+
+
+  </interface>
+  
+  <children>
+      <Label
+        id="title"
+        vertAlign="center"
+        horizAlign="center"
+        width="1920"
+        height="84"
+        opacity="0"
+        translation="[0,184]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="70" />
+      </Label>
+      <Label
+        id="subtitle"
+        vertAlign="center"
+        horizAlign="center"
+        width="1920"
+        height="42"
+        opacity="0"
+        translation="[0,283]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="27" />
+      </Label>
+
+
+      <Poster
+        id="InitialContentMenuBground"
+        width="1069"
+        height="491"
+        opacity="0"
+        translation="[240,396]"
+        uri="pkg:/images/initial-content-screen-menu-gradient.9.png"/>
+        
+      <Poster
+        id="InitialContentProfileMenuItemBground"
+        visible="false"
+        opacity="0"
+        width="312"
+        height="372"
+        translation="[1032,456]"
+        uri="pkg:/images/initial-content-screen-menu-item-bg.png"/>
+        
+      <MarkupGrid
+        id="InitialContentMenu"
+        translation="[336,456]"
+        rowHeights="[252]"
+        itemSize="[192, 410]"
+        columnSpacings="[36]"
+        numColumns="5"
+        numRows="1"
+        focusBitmapUri="pkg://images/menu-focus-initial-content-screen.png"
+        drawFocusFeedbackOnTop="false"
+        itemComponentName="InitialContentItem"/>  
+
+      <SimpleButton
+        id="skipButton"
+        visible="false"
+        opacity="0"
+        translation="[714,888]"
+        width="490"
+        height="96"
+        color="0x9699a3FF"
+        unfocusedBackgroundOpacity=".16"/>
+
+      <Timer
+       id="FocusDelayTimer"
+       repeat="false"/>
+    </children>
+</component>

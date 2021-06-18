@@ -167,6 +167,10 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the news screen.",
       "message": "News"
     },
+    "menu_movies_and_tv": {
+      "description": "Menu option on the app's navigation, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Movies & TV"
+    },
     "menu_mylist": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
       "message": "My List"
@@ -482,6 +486,18 @@ Function getTranslation_en_US()
     "error_tryAgain_title": {
       "description": "Error message when the user has the option to try the operation again.",
       "message": "Let’s try that again"
+    },
+    "screenInitialContent_title": {
+      "description": "Title of the initial content screen",
+      "message": "What do you want to watch?"
+    },
+    "screenInitialContent_subtitle_signedOut": {
+      "description": "subTitle of the initial content screen when user is signed out",
+      "message": "Pick something to watch or sign in"
+    },
+    "screenInitialContent_subtitle_signedIn": {
+      "description": "subTitle of the initial content screen when user is signed in",
+      "message": "Pick something to watch"
     },
     "screenDetails_error_queueMovie_description": {
       "description": "Error message when a movie is not added to the user's list.",
@@ -1055,6 +1071,10 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the news screen.",
       "message": "Noticias"
     },
+    "menu_movies_and_tv": {
+      "description": "Menu option on the app's navigation, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Películas & Series"
+    },
     "menu_mylist": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
       "message": "Mi Lista"
@@ -1370,6 +1390,18 @@ Function getTranslation_es_MX()
     "error_tryAgain_title": {
       "description": "Error message when the user has the option to try the operation again.",
       "message": "Intentémoslo de nuevo"
+    },
+    "screenInitialContent_title": {
+      "description": "Title of the initial content screen",
+      "message": "¿Qué quieres ver?"
+    },
+    "screenInitialContent_subtitle_signedOut": {
+      "description": "subTitle of the initial content screen when user is signed out",
+      "message": "Elige algo para ver o inicia una sesión"
+    },
+    "screenInitialContent_subtitle_signedIn": {
+      "description": "subTitle of the initial content screen when user is signed in",
+      "message": "Elige algo para ver"
     },
     "screenDetails_error_queueMovie_description": {
       "description": "Error message when a movie is not added to the user's list.",

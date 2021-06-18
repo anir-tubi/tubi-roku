@@ -545,16 +545,7 @@ End Function
 ' onSideNavSignInCompleted occurs when a user signs out or user signs in from the side nav or from settings side nav
 Function onSideNavSignInCompleted()
   tubiLog("SignInHelpers.onSideNavSignInCompleted")
-  ' AuthInfo may be invalid if authTask failed to log the user in
-  authInfo = m.authTask.authInfo
-  m.global.authInfo = authInfo
-  ' These will be empty parent nodes (no children) if user is not authenticated
-  m.global.bookmarkIds = m.authTask.bookmarks
-  m.global.historyIds = m.authTask.history
-
-  m.authInfoReceived = true
-  m.authTask.unobserveFieldScoped("authInfo")
-  m.authTask = invalid
+  authInfo = handleUpdatedAuth()
 
   ' set the mode before any changes are done to the UI 
   setUiModeFromState()
@@ -576,60 +567,77 @@ Function onSideNavSignInCompleted()
   setDirtyUserCategories(m.constants.ui.categoryIds.queue)
   setDirtyUserCategories(m.constants.ui.categoryIds.history)
 
-  shouldRefreshHomescreen = true
-  if authInfo = invalid and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true
-    ' don't refresh homescreen if user is signed out, will refresh after the user is age gated
-    shouldRefreshHomescreen = false
-  end if
-  setContentToRefreshAllPersonalizedScreens(shouldRefreshHomescreen)
+  setContentToRefreshAllPersonalizedScreens()
 
   refreshAllDetailScreens()
   setSideNavSignedInItem(authInfo)
       
   ' this happens when a user signs out or user signs in from the side nav or from settings side nav
   restartChannel()
-  
+
+End Function
+
+
+Function onSignOutCompleted()
+  tubiLog("SignInHelpers.onSignOutCompleted")
+  authInfo = handleUpdatedAuth()
+
+  ' set the mode before any changes are done to the UI
+  setUiMode(m.constants.ui.modes.standard)
+
+  shouldRefreshHomescreen = true
+  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true
+    ' don't refresh homescreen if age gate is in effect, we'll refresh after the age gate
+    shouldRefreshHomescreen = false
+  end if
+  setContentToRefreshAllPersonalizedScreens(shouldRefreshHomescreen)
+
+  setSideNavSignedInItem(authInfo)
+      
+  ' this happens when a user signs out or user signs in from the side nav or from settings side nav
+  restartChannel()
 End Function
 
 
 ' Is called only at app startup
 Function onStartupAuthInfoReceived()
   tubiLog("SignInHelpers.onStartupAuthInfoReceived")
+  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true
+    m.guestUserHasAgeInfo = m.authTask.guestUserHasAgeInfo
+  end if
+  m.guestUserHasAgeRetrieved = true
+  handleUpdatedAuth()
+
+  startUserExperience()
+End Function
+
+
+' These are the basic actions taken after the user has signed in
+' returns the AuthInfo
+Function handleUpdatedAuth()
   ' AuthInfo may be invalid if authTask failed to log the user in
   authInfo = m.authTask.authInfo
+  m.guestUserHasAgeInfo = m.authTask.guestUserHasAgeInfo
   m.global.authInfo = authInfo
 
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
-
-  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true
-    m.guestUserHasAgeInfo = m.authTask.guestUserHasAgeInfo
-  end if
-
-  m.guestUserHasAgeRetrieved = true
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
 
   setSideNavSignedInItem(authInfo)
 
-  startUserExperience()
+  return authInfo
 End Function
+
 
 
 ' onQueueAfterSignIn - occurs after activation success via AddtoMyList on Details page
 Function onQueueAfterSignIn()
   tubiLog("SignInHelpers.onQueueAfterSignIn")
-  ' AuthInfo may be invalid if authTask failed to log the user in
-  authInfo = m.authTask.authInfo
-  m.global.authInfo = authInfo
-  ' These will be empty parent nodes (no children) if user is not authenticated
-  m.global.bookmarkIds = m.authTask.bookmarks
-  m.global.historyIds = m.authTask.history
-
-  m.authTask.unobserveFieldScoped("authInfo")
-  m.authTask = invalid
+  handleUpdatedAuth()
 
   ' setContentToRefresh is not required for homescreen as we are fetching homescreen content
   ' right after adding into queue when onBookmarkedAfterSignIn() is called.
@@ -648,27 +656,16 @@ Function onQueueAfterSignIn()
     onAddToQueue(currentScreen, onBookmarkedAfterSignIn)
   end if
 
-  setSideNavSignedInItem(authInfo)
 End Function
 
 
 ' onCWRowAfterSignIn - occurs after activation success via CWRow on homescreen
 Function onCWRowAfterSignIn()
   tubiLog("SignInHelpers.onCWRowAfterSignIn")
-  ' AuthInfo may be invalid if authTask failed to log the user in
-  authInfo = m.authTask.authInfo
-  m.global.authInfo = authInfo
-  ' These will be empty parent nodes (no children) if user is not authenticated
-  m.global.bookmarkIds = m.authTask.bookmarks
-  m.global.historyIds = m.authTask.history
+  handleUpdatedAuth()
 
-  m.authTask.unobserveFieldScoped("authInfo")
-  m.authTask = invalid
-
-  ' setContentToRefresh is not required for homescreen as we are fetching homescreen content below
   setContentToRefreshAllPersonalizedScreens()
 
-  setSideNavSignedInItem(authInfo)
   restartChannel()
 End Function
 
@@ -676,15 +673,7 @@ End Function
 ' onParentalControlAfterSignIn - occurs after activation success via Parental Control
 Function onParentalControlAfterSignIn()
   tubiLog("SignInHelpers.onParentalControlAfterSignIn")
-  ' AuthInfo may be invalid if authTask failed to log the user in
-  authInfo = m.authTask.authInfo
-  m.global.authInfo = authInfo
-  ' These will be empty parent nodes (no children) if user is not authenticated
-  m.global.bookmarkIds = m.authTask.bookmarks
-  m.global.historyIds = m.authTask.history
-
-  m.authTask.unobserveFieldScoped("authInfo")
-  m.authTask = invalid
+  handleUpdatedAuth()
 
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
@@ -695,7 +684,6 @@ Function onParentalControlAfterSignIn()
   m.spinner.visible = false
   
   setContentToRefreshAllPersonalizedScreens()
-  setSideNavSignedInItem(authInfo)
 
   if currentScreen <> invalid and currentScreen.getSubtype() = "SettingsScreen"
     setSettingsScreenSignInInfo()
@@ -708,15 +696,7 @@ End Function
 ' onSideNavMyListAfterSignIn - occurs after activation success via sidenav MyList
 Function onSideNavMyListAfterSignIn()
   tubiLog("SignInHelpers.onSideNavMyListAfterSignIn")
-  ' AuthInfo may be invalid if authTask failed to log the user in
-  authInfo = m.authTask.authInfo
-  m.global.authInfo = authInfo
-  ' These will be empty parent nodes (no children) if user is not authenticated
-  m.global.bookmarkIds = m.authTask.bookmarks
-  m.global.historyIds = m.authTask.history
-
-  m.authTask.unobserveFieldScoped("authInfo")
-  m.authTask = invalid
+  handleUpdatedAuth()
 
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and (currentScreen.getSubtype() = "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
@@ -725,8 +705,6 @@ Function onSideNavMyListAfterSignIn()
   end if
   
   m.spinner.visible = false
-
-  setSideNavSignedInItem(authInfo)
 
   if currentScreen <> invalid and currentScreen.id = "channelDetailScreen" and currentScreen.categoryId = m.constants.ui.categoryIds.queue
     ' this happens when user logs in via channelDetailScreen (queue/mylist)
@@ -738,4 +716,12 @@ Function onSideNavMyListAfterSignIn()
     ' don't expect this to happen, keeping here as a fallback mechanism
     restartChannel()
   end if
+End Function
+
+
+' After the user clicks on the Sign In Menu item and then signs in, then this function should be called to display the home screen
+Function onSignInAfterInitialContentScreen()
+  handleUpdatedAuth()
+  reloadDefaultHomeScreenContent()
+  showDefaultHomeScreen()
 End Function

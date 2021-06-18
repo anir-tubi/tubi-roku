@@ -65,12 +65,12 @@ Function execSignOut()
   Auth.deleteGuestUserHasAgeInfo()
 
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
-  authInfo = Auth.getAuthInfo()
 
   userCats = getInitialUserCategories(Bookmarks, true, false, false)
 
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
+  m.top.guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
   m.top.authInfo = invalid
 End Function
 

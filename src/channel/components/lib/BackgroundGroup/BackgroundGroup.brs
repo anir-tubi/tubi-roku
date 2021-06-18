@@ -8,10 +8,10 @@ Function init()
   '// The blurred background that we are currently using
   m.blurredDefaultBackground_current = m.blurredDefaultBackground 
 
-  'set background info defaults
+  'set background info defaults; the uriList is invalid at first. Must set the background to properly display background
   m.top.backgroundInfo = {
     type: m.constants.ui.backgroundTypes.fullScreen
-    uriList: [m.blurredDefaultBackground]
+    uriList: []
   }
   '//This is a store that we can use to change the current backgrounds. Like m.lastBackgroundInfo, we can update
   '// this variable and prevent the updateBackground() observer from being triggered. 

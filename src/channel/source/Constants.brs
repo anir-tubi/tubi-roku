@@ -722,6 +722,7 @@ Function getConstants()
       constants.ui.screenLevels.activationCodeScreen = 90
       constants.ui.screenLevels.signUpScreen = 90
       constants.ui.screenLevels.signInScreen = 90
+      constants.ui.screenLevels.initialContentScreen = 299
       constants.ui.screenLevels.ageGateScreen = 300
       constants.ui.screenLevels.modalDialogScreen = 1000
 
@@ -747,6 +748,7 @@ Function getConstants()
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
       constants.ui.screenIds.ageVerificationScreen = "ageVerificationScreen"
+      constants.ui.screenIds.initialContentScreen = "initialContentScreen"
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
@@ -788,6 +790,9 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
+
+    constants.ui.keyIds = {}
+      constants.ui.keyIds.back = "back"
 
     constants.ui.sideNavIds = {}
       constants.ui.sideNavIds.home = "home"

@@ -37,8 +37,7 @@
         posterOpacity="0.0" />
       <BackgroundPosterGroup
         id="Poster2"
-        posterOpacity="1.0"
-        uri="pkg:/images/art-blur-background.png" />
+        posterOpacity="1.0"/>
     </Group>
     <Group
       id="GradientGroup">

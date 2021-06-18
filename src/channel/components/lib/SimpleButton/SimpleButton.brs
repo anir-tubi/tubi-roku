@@ -25,6 +25,14 @@ Function onTextChanged()
     m.buttonBG.width = m.top.width
   end if
 
+  if m.top.height = 0
+    height = m.label.boundingRect().height + 60
+    m.buttonBG.height = height
+    m.label.height = height
+  else
+    m.label.height = m.top.height
+    m.buttonBG.height = m.top.height
+  end if
 End Function
 
 

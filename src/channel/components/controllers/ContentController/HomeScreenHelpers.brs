@@ -113,6 +113,14 @@ Function showDefaultHomeScreen()
 End Function
 
 
+Function reloadDefaultHomeScreenContent()
+  '//If homescreen exists, then reload its content
+  homescreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homescreen <> invalid
+    refreshHomescreen(homescreen)
+  end if
+End Function
+
 
 Function onReloadUserCategoriesResponseInEspanolScreen(msg)
   onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.espanolScreen)
@@ -434,7 +442,7 @@ Function retryCategoryList(screenID)
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     homeScreen.canLoadCategories = true
-    homeScreen.loadAllCategories = true
+    refreshHomescreen(homescreen)
     homeScreen.setFocus(true)
   end if
 End Function

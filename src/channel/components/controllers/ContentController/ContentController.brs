@@ -161,9 +161,9 @@ End Function
 
 ' onFadeInContentController callback will be triggered once the launch animation logo got finished
 Function onFadeInContentController()
-  tubiLog("ContentController.onFadeInContentController")
+  tubiLog("ContentController.onFadeInContentController") 
   fadeInUiGroup = customFadeIn(m.uiGroup, 2, 0.5)
-  fadeInUiGroup.observeField("state", "onUiGroupFadeStateChange")
+  fadeInUiGroup.observeField("state", "onUiGroupFadeStateChange") 
 
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.isInFocusChain() = false
@@ -324,7 +324,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           goToFirstTopNavOptionFromAnotherTopNavOption()
         else if m.SideNav.visible = true
           openSideNavFromButton() '//"BUTTON_BACK"
-        else if m.screenStack.getChildCount() > 1
+        else if m.screenStack.getChildCount() > 1 
           oldTopScreen = getCurrentScreen()
           if oldTopScreen.id = m.constants.ui.screenIds.espanolScreen
             ' exiting the espanol experience, so update the uiMode which will be referenced
@@ -363,7 +363,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             ' in subsequent function calls in order to display the correct UI.
             setUiMode(m.constants.ui.modes.standard)
           end if
-
           popScreen(true, true)
           newTopScreen = getCurrentScreen()
           sideNavId = m.constants.ui.screenIdToSideNavId[newTopScreen.id]
@@ -375,7 +374,20 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           end if
         else
           topScreen = getCurrentScreen()
-          displayExitModal(topScreen.trackingPageInfo)
+          if topScreen.id <> m.constants.ui.screenIds.homeScreen
+            '//make sure the last screen in the stack is the homescreen. 
+            '//If it isn't this this might have happened b/c of coming from a non home screen triggered by the initial content screen.
+            '//pop the screen, which will trigger the stack to load the homescreen by 
+            ' triggering a restart of the app via onScreenStackEmpty()
+            ' PageLoad event will be sent by fireAppLoadBeacon() when home page finishes loading
+            popScreen(true, false)
+            ' reset appStartTime so that the home screen load event will have the correct loadTime value
+            ' which will be set in fireAppLoadBeacon() if the beacon hasn';t fired yet
+            m.top.appStartTime = Int(Uptime(0))
+            m.deeplinkContent = invalid
+          else
+            displayExitModal(topScreen.trackingPageInfo)
+          end if
         end if
       end if
       ' Always consume back button, otherwise it will cause the app to exit
@@ -524,7 +536,7 @@ Function startUserExperience()
     end if
 
     m.spinner.visible = false ' the spinner in the contentController component
-    sendHdcpLog() 
+    sendHdcpLog()
 
     if m.enteredFromDeepLink = true then
       tubiLog("ContentController detected deep link request")
@@ -532,12 +544,28 @@ Function startUserExperience()
       ' whether we were logged in or not.
       setUiModeFromState()
       showDetailScreen(m.deeplinkContent, false)
+    else if shouldDisplayInitialContentScreen() = true
+      ' Display the intitial content screen to the user so they can choose the proper experience. 
+      displayInitialContentScreen()
+      showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary 
     else
       startChannel()
-      showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary      
+      showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary 
     end if
     
   end if
+End Function
+
+
+' Contain the logic to determine if the Initial Content Screen should be displayed.
+Function shouldDisplayInitialContentScreen()
+  bDisplay = false
+  if m.constants.deviceInfo.countryCode = "US" and m.uiMode <> m.constants.ui.modes.kidsAgeGate and m.uiMode <> m.constants.ui.modes.kidsParental and getExperimentResource("roku_initial_content_type_selector_icts", "roku_initial_content_type_selector_icts_v1", true).enabled = true
+    ' Do not display this screen if they are outside of the US or are going to display kids mode
+    ' Also skip this screen if the user is coming from a deeplink
+    bDisplay = true
+  end if
+  return bDisplay
 End Function
 
 
@@ -967,7 +995,8 @@ End Function
 
 
 Function setUiModeFromState()
-  if m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.hasAge = false
+  tubiLog("ContentController.setUiModeFromState")
+  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true and m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.hasAge = false
     setUiMode(m.constants.ui.modes.kidsAgeGate)
   else if isKidsModeEnabledByParentalControls() = true
     setUiMode(m.constants.ui.modes.kidsParental)
@@ -1168,10 +1197,13 @@ End Function
 ' wraps startChannel but forces an age gate if the user is signed out
 Function restartChannel()
   tubiLog("ContentController.restartChannel")
-  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true and m.global.authInfo = invalid
+  authInfo = m.global.authInfo
+  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true and ((authInfo <> invalid and authInfo.hasAge <> true) or (authInfo = invalid and (m.guestUserHasAgeInfo = invalid or m.guestUserHasAgeInfo.hasAge <> true)))
     ' if user has just signed out, then show the age gate screen
     showAgeVerificationScreenAtInteraction()
     showHideSpinner(false)
+  else if shouldDisplayInitialContentScreen() = true
+    displayInitialContentScreen()
   else
     startChannel()
   end if
@@ -1180,12 +1212,8 @@ End Function
 
 Function restartChannelAfterAgeVerification()
   tubiLog("ContentController.restartChannelAfterAgeVerification")
-  homescreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homescreen <> invalid
-    homescreen.loadAllCategories = true
-  end if
-
-  startChannel()
+  reloadDefaultHomeScreenContent()
+  restartChannel()
 End Function
 
 
@@ -1287,7 +1315,7 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefreshHomescreen = tru
     ' the top screen, so that it can load in the background and be ready for consumption when
     ' the user next lands on the homescreen
     if homescreen <> invalid
-      homescreen.loadAllCategories = true
+      refreshHomescreen(homescreen)
     end if
   end if
 

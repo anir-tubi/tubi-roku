@@ -73,6 +73,7 @@ Function showAgeVerificationScreen(ageSubmittedCallback)
   ageVerificationScreen.observeFieldScoped("ageSubmitted", callbackString)
   ageVerificationScreen.observeFieldScoped("whyButtonSelected", "onWhyButtonSelected")
   ageVerificationScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")
+  displayDefaultBackground()
   pushScreen(ageVerificationScreen, true, true)
 End Function
 

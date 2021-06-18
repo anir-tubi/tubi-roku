@@ -5,7 +5,8 @@
 '
 ' @startOrEndLocation - 'above' 'below' 'left' 'right'.  If animating IN, this is start location, otherwise end
 ' @inOrOut - 'in' or 'out'
-Function slideFade(target As Object, startOrEndLocation As String, inOrOut As String, duration=2.0 As Float, delay=0.0 As Float)
+' @translationDifference - how many pixels the target should slide
+Function slideFade(target As Object, startOrEndLocation As String, inOrOut As String, duration=2.0 As Float, delay=0.0 As Float, translationDifference = 100 as Integer)
   animationOptions = {
     duration: duration
     delay: delay
@@ -20,17 +21,17 @@ Function slideFade(target As Object, startOrEndLocation As String, inOrOut As St
   end if
 
   if startOrEndLocation = "right"
-    slideX = target.translation[0] + 100
+    slideX = target.translation[0] + translationDifference
     slideY = target.translation[1]
   else if startOrEndLocation = "left"
-    slideX = target.translation[0] - 100
+    slideX = target.translation[0] - translationDifference
     slideY = target.translation[1]
   else if startOrEndLocation = "above"
     slideX = target.translation[0]
-    slideY = target.translation[1] - 100
+    slideY = target.translation[1] - translationDifference
   else if startOrEndLocation = "below"
     slideX = target.translation[0]
-    slideY = target.translation[1] + 100
+    slideY = target.translation[1] + translationDifference
   else 'no slide
     slideX = target.translation[0]
     slideY = target.translation[1]

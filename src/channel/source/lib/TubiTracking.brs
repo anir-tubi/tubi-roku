@@ -895,11 +895,6 @@ Function tubiTracking_getOneOfs()
     '   category_slug: ""
     ' }
 
-    ' navigation_drawer_component: {  ' Does not currently exist in roku UI
-    '   category_slug: ""
-    '   category_row: 1   '1 based index
-    ' }
-
     generic_component: {   ' Used for components that are not yet defined in protos
       generic_component_type: ""  ' GenericComponentType enum
     }

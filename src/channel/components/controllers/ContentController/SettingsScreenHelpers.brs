@@ -122,7 +122,7 @@ Function onSignOutModalSelected()
     m.authTask.unobserveFieldScoped("authInfo")
   end if
   m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onSideNavSignInCompleted")
+  m.authTask.observeFieldScoped("authInfo", "onSignOutCompleted")
   m.authTask.functionName = "execSignOut"
   m.authTask.control = "RUN"
 
@@ -240,7 +240,7 @@ Function refreshScreenAfterParentalChanges()
     if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
       homeScreen.parentalRating = m.global.authInfo.parentalrating
     end if
-    homeScreen.loadAllCategories = true
+    refreshHomescreen(homescreen)
   end if
 
   setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
