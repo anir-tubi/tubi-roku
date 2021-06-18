@@ -220,6 +220,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.description <> invalid
     translatedContent.description = contentFromServer.description
     translatedContent.longDescription = contentFromServer.description
+
+    ' QA - display content ids UI tests
+    if m.constants.settings.mode = "qa" and m.constants.settings.suitestjs = true
+      translatedContent.description = translatedContent.id + " " + contentFromServer.description
+    end if
   end if
 
   if contentFromServer.directors <> invalid and contentFromServer.directors.count() > 0
@@ -467,6 +472,11 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
       if category.gridItemType = vitg_large or category.gridItemType = vitg_small
         translated.addField("isVitg", "boolean", false)
         translated.isVitg = true
+      end if
+
+      ' QA - inject the category slug into the content description for automated UI testing
+      if m.constants.settings.mode = "qa" and m.constants.settings.suitestjs = true
+        translated.description = category.id + " " + translated.description
       end if
 
       return translated
@@ -897,6 +907,12 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
     end if
 
     updateMetadata.logoUri = container.logo
+
+    ' QA - display category slug on channel/categories list pages for automated UI tests
+    if m.constants.settings.mode = "qa" and m.constants.settings.suitestjs = true
+      updateMetadata.title = container.slug
+      updateMetadata.logoUri = ""
+    end if
 
     if container.valid_duration <> invalid
       updateMetadata.validUntil = Uptime(0) + container.valid_duration

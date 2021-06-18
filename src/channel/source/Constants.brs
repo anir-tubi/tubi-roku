@@ -380,8 +380,11 @@ Function getConstants()
 
     constants.urls.analytics = {}
       constants.urls.analytics.urlBase = "https://analytics-ingestion.staging-public.tubi.io/analytics-ingestion"
+      ' QA analytics proxy server
       if mode = "production"
         constants.urls.analytics.urlBase = "https://analytics-ingestion.production-public.tubi.io/analytics-ingestion"
+      else if mode = "qa" and constants.settings.suitestjs = true
+        constants.urls.analytics.urlBase = "http://ec2-54-193-116-24.us-west-1.compute.amazonaws.com:8080/analytics-ingestion"
       end if
       constants.urls.analytics.event = constants.urls.analytics.urlBase + "/v2/event"
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team

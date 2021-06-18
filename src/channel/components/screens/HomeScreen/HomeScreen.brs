@@ -663,6 +663,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.width = 650
     end if
+
     m.InfoPanel.calculateHeight = true
   end if
 End Function
