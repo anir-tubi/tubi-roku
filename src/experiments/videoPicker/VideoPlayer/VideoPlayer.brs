@@ -253,6 +253,7 @@ Function updateScrubTime()
   else if m.VideoState = "ffw"
   '//Ensure scrub can't go past the timer for the UpNext Overlay
     nMaxScrub = m.Video.duration - m.global.constants.player.upNextCountdown - 5
+    
     if m.playerPosition + scrubTime > nMaxScrub 
       m.playerPosition = nMaxScrub
     else

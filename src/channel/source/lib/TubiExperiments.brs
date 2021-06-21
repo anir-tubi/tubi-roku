@@ -33,7 +33,11 @@ Function TubiExperiments(constants) as Object
       }
       roku_instant_resume: {
         roku_instant_resume_v1: {"enabled": false}
-      }      
+      }  
+      
+      roku_postplayexp_aptimer_5sec: {
+        roku_postplayexp_aptimer_5sec_v1: {"ap_timer": 5}  
+      }    
     }
     
     'public methods
