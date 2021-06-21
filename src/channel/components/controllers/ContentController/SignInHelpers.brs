@@ -586,7 +586,7 @@ Function onSignOutCompleted()
   setUiMode(m.constants.ui.modes.standard)
 
   shouldRefreshHomescreen = true
-  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true
+  if shouldShowAgeGate()
     ' don't refresh homescreen if age gate is in effect, we'll refresh after the age gate
     shouldRefreshHomescreen = false
   end if
@@ -602,7 +602,7 @@ End Function
 ' Is called only at app startup
 Function onStartupAuthInfoReceived()
   tubiLog("SignInHelpers.onStartupAuthInfoReceived")
-  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true
+  if shouldShowAgeGate()
     m.guestUserHasAgeInfo = m.authTask.guestUserHasAgeInfo
   end if
   m.guestUserHasAgeRetrieved = true

@@ -479,7 +479,7 @@ Function startUserExperience()
       ' which is necessary to proceed past this step if m.authInfoRefreshed was set to false, but the user was already signed in.
       onAuthInfoRefreshed()
     end if
-  else if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1").enabled = true and m.ageVerificationComplete <> true
+  else if shouldShowAgeGate() = true and m.ageVerificationComplete <> true
     ' check if we have age information for the user
     if m.global.authInfo <> invalid
       if m.global.authInfo.hasAge <> true
@@ -991,7 +991,7 @@ End Function
 
 Function setUiModeFromState()
   tubiLog("ContentController.setUiModeFromState")
-  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true and m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.hasAge = false
+  if shouldShowAgeGate() = true and m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.hasAge = false
     setUiMode(m.constants.ui.modes.kidsAgeGate)
   else if isKidsModeEnabledByParentalControls() = true
     setUiMode(m.constants.ui.modes.kidsParental)
@@ -1193,7 +1193,7 @@ End Function
 Function restartChannel()
   tubiLog("ContentController.restartChannel")
   authInfo = m.global.authInfo
-  if isDeviceInUSorCA() and getExperimentResource("roku_coppa", "roku_coppa_v1", false).enabled = true and ((authInfo <> invalid and authInfo.hasAge <> true) or (authInfo = invalid and (m.guestUserHasAgeInfo = invalid or m.guestUserHasAgeInfo.hasAge <> true)))
+  if shouldShowAgeGate() and ((authInfo <> invalid and authInfo.hasAge <> true) or (authInfo = invalid and (m.guestUserHasAgeInfo = invalid or m.guestUserHasAgeInfo.hasAge <> true)))
     ' if user has just signed out, then show the age gate screen
     showAgeVerificationScreenAtInteraction()
     showHideSpinner(false)
@@ -1517,6 +1517,17 @@ End Function
 
 Function isDeviceInUSorCA()
   return (m.constants.deviceInfo.countryCode = "US" or m.constants.deviceInfo.countryCode = "CA")
+End Function
+
+
+Function shouldShowAgeGate()
+  if isDeviceInUSorCA() <> true
+    return false
+  else if m.constants.settings.mode <> "production" and m.constants.settings.skipAgeGate = true
+    return false
+  end if
+
+  return true
 End Function
 
 
