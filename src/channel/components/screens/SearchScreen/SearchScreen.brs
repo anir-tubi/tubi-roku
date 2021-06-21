@@ -31,6 +31,7 @@ Function init()
   m.top.observeField("enabled", "onEnableChange")
   m.top.observeField("kidsModeEnabled", "onKidsModeEnableChange")
   m.top.observeField("contentUpdated", "onSearchContentChange")
+  m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
 
   m.SearchText.color = m.global.constants.ui.colors.titleHeader
 
@@ -58,6 +59,7 @@ Function init()
   m.bResultsInFocus = false
 
   m.top.screenLevel = m.constants.ui.screenLevels.searchScreen
+  m.top.handlesTransportVoiceRequests = true
   setSearchStrings()
   loadSearchResults(true)'//load the default search results
 
@@ -151,20 +153,35 @@ Function onResultSelected()
   tubiLog("SearchScreen.onResultSelected")
   if m.ResultGrid.content <> invalid
     selectedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemSelected)
-    m.top.trackingComponentInfo = getTrackingComponentInfo(m.ResultGrid.itemSelected, m.ResultGrid.numColumns, selectedContent, m.Tracking)
-
-    if selectedContent <> invalid
-      m.top.trackingPageInfo = {
-        pageType: "search_page"
-        pageValues: {
-          query: Left(m.Keyboard.text, 256)
-        }
-      }
-      m.top.contentSelected = selectedContent
-      m.gridHasFocus = false
-    end if
+    handleResultSelected(selectedContent, m.ResultGrid.itemSelected)
   end if
 End Function
+
+
+' @content: roSGNode, ContentNode representing the content that was selected by the user
+' @position: integer, the position within the search results grid 
+Function handleResultSelected(content, position)
+  if content <> invalid
+    updateTrackingInfo(content, position)
+    m.top.contentSelected = content
+    m.gridHasFocus = false
+  end if
+End Function
+
+
+Function updateTrackingInfo(content, position)
+  m.top.trackingComponentInfo = getTrackingComponentInfo(position, m.ResultGrid.numColumns, content, m.Tracking)
+
+  if content <> invalid
+    m.top.trackingPageInfo = {
+      pageType: "search_page"
+      pageValues: {
+        query: Left(m.Keyboard.text, 256)
+      }
+    }
+  end if
+End Function
+
 
 '''''''''''''''''''''''
 ' onSearchContentChange
@@ -312,6 +329,9 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       m.gridHasFocus = false
       m.bResultsInFocus = false
       return true
+    else if key = "play"
+      handlePlayInput()
+      return true
     else if key = "back" and m.ResultGrid.isInFocusChain() then
       '//when the user hits BACK, then set the keyboard to focus
       '//jump to left most visible thumbnail in the grid
@@ -327,4 +347,38 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     end if
   end if
   return false
+End Function
+
+
+Function onTransportVoiceRequest(msg)
+  response = "unhandled"
+  inputInfo = msg.getData()
+  command = ""
+  if inputInfo <> invalid and inputInfo.command <> invalid
+    command = inputInfo.command
+  end if
+  tubiLog("SearchScreen.onTransportVoiceRequest " + command)
+
+  if m.ResultGrid.isInFocusChain() = true
+    if command = "play"
+      handlePlayInput()
+      response = "success"
+    else if command = "ok"
+      selectedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
+      handleResultSelected(selectedContent, m.ResultGrid.itemFocused)
+      response = "success"
+    end if
+  end if
+
+  inputInfo.response = response
+  m.top.transportVoiceResponse = inputInfo
+End Function
+
+
+Function handlePlayInput()
+  if m.ResultGrid.isInFocusChain() = true
+    selectedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
+    updateTrackingInfo(selectedContent, m.ResultGrid.itemFocused)
+    m.top.contentToPlay = selectedContent
+  end if
 End Function

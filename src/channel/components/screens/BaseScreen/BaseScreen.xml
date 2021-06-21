@@ -13,7 +13,16 @@
        -->
       <field id="shouldFocusWhenPushed" type="boolean" value="true"/>
 
+      <!-- set to true if the page handles transportVoiceRequests or "input" deeplinks with
+           type = transport
+      -->
+      <field id="handlesTransportVoiceRequests" type="boolean" value="false"/>
+
+      <!-- "input" deeplink information with type = "transport" -->
+      <field id="transportVoiceRequest" type="assocarray" alwaysNotify="true"/>
+
     <!-- OUTPUT -->
+      <!-- will be used to change the background images on the content controller -->
       <field id="backgroundUriList" type="stringarray" alwaysNotify="true" />
 
       <!-- Keeps the information used for user tracking - structure looks like:
@@ -50,6 +59,11 @@
 
       <!-- If set to true, allows screens of the same type and same screenLevel to stack on top of each other  -->
       <field id="isStackable" type="boolean" value="false" />
+
+      <!-- passes information eventually back to firmware to let it know if the "input" deeplink
+           with type = transport was handled
+      -->
+      <field id="transportVoiceResponse" type="assocarray" alwaysNotify="true"/>
   </interface>
   
   <children>

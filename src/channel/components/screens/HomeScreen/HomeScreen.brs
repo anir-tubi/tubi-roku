@@ -25,6 +25,7 @@ Function init()
   m.top.observeField("fullscreenCountdown", "onFullscreenCountdown")
   m.top.observeField("enableTopNav", "onTopNavEnableChange")
   m.top.observeField("focusOnTopNav", "onFocusOnTopNavChanged")
+  m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
 
   m.TopNav.observeField("selected", "onTopNavSelection")
   m.TopNav.observeField("focusedChild", "onTopNavFocusChange")
@@ -53,6 +54,8 @@ Function init()
     pageType: ""
     pageValues: {}
   }
+
+  m.top.handlesTransportVoiceRequests = true
 
   BackLabel = m.top.findNode("callToAction")
   BackLabel.text = getTranslation("goBack_menu")
@@ -548,14 +551,20 @@ End Function
 
 Function onGridItemSelected() as void
   tubiLog("HomeScreen.onGridItemSelected")
-  if m.top.isLoading <> true
+  selectedItem = m.CategoryGridList.itemSelected
+  handleItemSelected(selectedItem, m.top.selectedPosition)
+End Function
 
-    selectedItem = m.CategoryGridList.itemSelected
-    m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(selectedItem, m.top.selectedPosition)
+
+' @item: roSGNode, TubiContentNode with metadata for an item in the grid
+' @position: array, 2d array with [x,y] grid coordinate information
+Function handleItemSelected(item, position)
+  if m.top.isLoading <> true
+    m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(item, position)
 
     ' Content controller observes contentSelected to populate/push the detail screen
-    if selectedItem <> invalid then
-      m.top.contentSelected = selectedItem
+    if item <> invalid then
+      m.top.contentSelected = item
       m.gridHasFocus = false
       m.listHasFocus = false
     end if
@@ -563,6 +572,8 @@ Function onGridItemSelected() as void
 End Function
 
 
+' @gridItem: roSGNode, TubiContentNode with metadata for an item in the grid
+' @itemPosition: array, 2d array with [x,y] grid coordinate information
 Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
   trackingComponentInfo = {}
   if gridItem <> invalid and itemPosition <> invalid and itemPosition.Count() = 2
@@ -731,6 +742,56 @@ Function onKeyEvent(key, press) as boolean
         return true
       end if
     end if
+
+    if key = "play" and m.CategoryGridList.isInFocusChain() = true
+      handlePlayInput()
+      return true
+    end if
   end if
   return false
 End Function
+
+
+Function onTransportVoiceRequest(msg)
+  response = "unhandled"
+  if m.CategoryGridList.isInFocusChain() = true
+    inputInfo = msg.getData()
+    command = ""
+    if inputInfo <> invalid and inputInfo.command <> invalid
+      command = inputInfo.command
+    end if
+    tubiLog("HomeScreen.onTransportVoiceRequest " + command)
+
+    if command = "play"
+      if handlePlayInput() = true
+        response = "success"
+      end if
+    else if command = "ok"
+      handleItemSelected(m.CategoryGridList.itemFocused, m.top.cursorPosition)
+      response = "success"
+    end if
+  end if
+
+  inputInfo.response = response
+  m.top.transportVoiceResponse = inputInfo
+End Function
+
+
+' returns true if action was taken based on the "play" input and false if no action taken
+Function handlePlayInput()
+  if m.top.isLoading <> true
+    itemFocused = m.CategoryGridList.itemFocused
+    positionFocused = m.top.cursorPosition
+    m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
+
+    ' Content controller observes contentSelected to populate/push the detail screen
+    if itemFocused <> invalid and itemFocused.type <> m.constants.ui.contentTypes.linear
+      m.top.contentToPlay = itemFocused
+      m.gridHasFocus = false
+      m.listHasFocus = false
+      return true
+    end if
+  end if
+  return false
+End Function
+

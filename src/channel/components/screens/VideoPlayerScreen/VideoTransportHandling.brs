@@ -5,31 +5,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
     if isButtonPressAllowed(key,  m.VideoState, m.Video)
       if key = "OK"
-        if m.HUD.opacity = 0
-          showTransport()
-        else
-          'do action based on the current focused button
-          focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
-          if focusButtonId = m.SkipTrailerButton.id
-            handleSkipTrailer()
-          else if focusButtonId = m.StartButton.id
-            goToStart()
-          else if focusButtonId = m.RewindButton.id
-            handleRewind()
-          else if focusButtonId = m.HopBackButton.id
-            handleHopBack(false, 30)
-          else if focusButtonId = m.PlayPauseButton.id
-            handlePlayPause()
-          else if focusButtonId = m.HopForwardButton.id
-            handleHopForward(30)
-          else if focusButtonId = m.FastForwardButton.id
-            handleFastForward()
-          else if focusButtonId = m.EndButton.id
-            goToNext()
-          else if focusButtonId = m.ClosedCaption.id
-            handleClosedCaption()
-          end if
-        end if
+        handleOk()
 
       else if key = "play" then
         if m.PlayPauseButton.enabled then
@@ -206,6 +182,8 @@ Function handleTransportVoiceEvent()
     response = "success"
     if command = "play"
       resumeFromPause(true)
+    else if command = "ok"
+      handleOk()
     else if command = "pause" or command = "stop"
       pauseVideo(true, true)
     else if command = "replay"
@@ -242,6 +220,8 @@ Function handleTransportVoiceEvent()
     else
       response = "unhandled"     
     end if
+  else if m.UpNext.isInFocusChain()
+    m.UpNext.command = command
   end if
   
   inputInfo.response = response
@@ -371,6 +351,35 @@ Function goToNext()
 
   animateTransport("out")
   resetTransportButtons()
+End Function
+
+
+Function handleOk()
+  if m.HUD.opacity = 0
+    showTransport()
+  else
+    'do action based on the current focused button
+    focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
+    if focusButtonId = m.SkipTrailerButton.id
+      handleSkipTrailer()
+    else if focusButtonId = m.StartButton.id
+      goToStart()
+    else if focusButtonId = m.RewindButton.id
+      handleRewind()
+    else if focusButtonId = m.HopBackButton.id
+      handleHopBack(false, 30)
+    else if focusButtonId = m.PlayPauseButton.id
+      handlePlayPause()
+    else if focusButtonId = m.HopForwardButton.id
+      handleHopForward(30)
+    else if focusButtonId = m.FastForwardButton.id
+      handleFastForward()
+    else if focusButtonId = m.EndButton.id
+      goToNext()
+    else if focusButtonId = m.ClosedCaption.id
+      handleClosedCaption()
+    end if
+  end if
 End Function
 
 

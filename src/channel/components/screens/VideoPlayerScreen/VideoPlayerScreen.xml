@@ -33,8 +33,6 @@
       <!-- Only support play and stop for simple external interface -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>
       
-      <field id="transportVoiceRequest" type="assocarray" alwaysNotify="true"/>
-      
       <!-- interval in seconds for sending position data to the tracking server -->
       <field id="analyticsInterval" type="integer" value="0"/>
 
@@ -99,8 +97,6 @@
       <field id="goToNext" type="boolean" value="false" alwaysNotify="true" />    
 
       <field id="state" type="string" />
-      
-      <field id="transportVoiceResponse" type="assocarray" alwaysNotify="true"/>
       
       <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
       <field id="historyPosition" type="integer" value="0" /> 

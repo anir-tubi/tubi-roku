@@ -5,7 +5,8 @@
 ' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
 ' @sendTrackingOnResponse: boolean, set to true if the content needs to be fetched and NavigateToPageEvent and 
 '                                   PlayProgressEvent analytics should be sent after fetching info from the backend.
-Function showDetailScreen(content, sendTrackingOnResponse = true)
+' @callback: roFunction, a callback to run upon successful fetching of single content metadata
+Function showDetailScreen(content, sendTrackingOnResponse = true, callback = invalid)
   tubiLog("DetailScreenHelpers.showDetailScreen")
   
   if content <> invalid
@@ -27,6 +28,8 @@ Function showDetailScreen(content, sendTrackingOnResponse = true)
     detailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
     detailScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     detailScreen.observeFieldScoped("refreshContent", "onRefreshContentSignal")
+    detailScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+    detailScreen.observeFieldScoped("relatedContentToPlay", "onContentToPlay")
     
     ' m.actionType variable is used for setting a callback function after successful a data fetch retry in the case where
     ' users select a menu button from the detail screen, but the origial data fetch was unsuccessful. In this way,
@@ -52,12 +55,27 @@ Function showDetailScreen(content, sendTrackingOnResponse = true)
     ' waiting to populate the details screen for series until after we fetch episode data
     if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
       detailScreen.isLoading = true
+    else if callback <> invalid
+      detailScreen.isLoading = true
     else
       populateDetailScreen(detailScreen, content, true)
     end if
     
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
-    getSingleContentFromServer(detailScreen, content, sendTrackingOnResponse)
+
+    ' determine the appropriate fetch callbacks based on the passed in parameters
+    successCallback = onSingleContentResponseWithTracking
+    errorCallback = onSingleContentErrorWithTracking
+    if sendTrackingOnResponse = false
+      successCallback = onSingleContentResponseWithoutTracking
+      errorCallback = onSingleContentErrorWithoutTracking
+    end if
+
+    if callback <> invalid
+      successCallback = callback
+    end if
+
+    getSingleContentFromServer(content, successCallback, errorCallback)
     getRelatedContent(content)
   else
     ' TODO: Refer to logs to determine if it's necessary to show a modal in this instance informing the user to press the back
@@ -110,7 +128,7 @@ End Function
 'detail screen has told us that the content or related content is out of cache window, so refresh
 Function onRefreshContentSignal(msg)
   detailScreen = msg.getRoSGNode()
-  getSingleContentFromServer(detailScreen, detailScreen.content, false)
+  getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
 End Function
 
 
@@ -280,19 +298,12 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
 End Function
 
 
-'@screen: roSGNode, a detail screen node
 '@content: roSGNode, a TubiContentNode
-'@trackOnResponse: boolean, indicates if NavigateToPage and PageLoadTracking should occur when the response is received
-Function getSingleContentFromServer(screen, content, trackOnResponse)
+'@successCallback: roFunction, a callback to be run when the response is successfully returned from the backend
+'@errorCallback: roFunction, a callback to be run when an error occurs while fetching the content from the backend
+Function getSingleContentFromServer(content, successCallback, errorCallback)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
   if content <> invalid
-    successCallback = onSingleContentResponseWithTracking
-    errorCallback = onSingleContentErrorWithTracking
-    if trackOnResponse = false
-      successCallback = onSingleContentResponseWithoutTracking
-      errorCallback = onSingleContentErrorWithoutTracking
-    end if
-
     singleRequestInfo = m.cmsApi.singleContentReqInfo(content.id, true, shouldKidsModeBeSentToServer())
     m.makeRequest({
       url: singleRequestInfo.url
@@ -307,10 +318,10 @@ End Function
 
 
 'wrapper around getSingleContentFromServer for use as a callback in the error modal
-'@params: 2 index array containing params that should be passed to getSingleContentFromServer()
+'@params: 4 index array containing params that should be passed to getSingleContentFromServer()
 Function getSingleContentFromServerRetry(params)
-  if type(params) = "roArray" and params.count() = 3
-    params[0].isLoading = true
+  if type(params) = "roArray" and params.count() = 4
+    params[3].isLoading = true
     getSingleContentFromServer(params[0], params[1], params[2])
   end if
 End Function
@@ -397,7 +408,7 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
         detailScreenContent = detailScreen.content.clone(true)
         detailScreenContent.id = refreshedContent.parentId
         detailScreen.content = detailScreenContent
-        getSingleContentFromServer(detailScreen, emptySeriesNode, false)
+        getSingleContentFromServer(emptySeriesNode, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
         return
       else if m.deepLinkContent.deeplinkType = "season" and refreshedContent.type = m.constants.ui.contentTypes.series
         '  refreshedContent.id =       series id
@@ -480,7 +491,15 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
         emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
         emptySeriesNode.type = m.constants.ui.contentTypes.series
         emptySeriesNode.id = refreshedContent.seriesId
-        getSingleContentFromServer(detailScreen, emptySeriesNode, sendTracking)
+
+        successCallback = onSingleContentResponseWithTracking
+        errorCallback = onSingleContentErrorWithTracking
+        if sendTrackingOnResponse = false
+          successCallback = onSingleContentResponseWithoutTracking
+          errorCallback = onSingleContentErrorWithoutTracking
+        end if
+
+        getSingleContentFromServer(emptySeriesNode, successCallback, errorCallback)
         return
       end if
 
@@ -527,8 +546,9 @@ Function onSingleContentErrorWithoutTracking(error)
 End Function
 
 
-' @trackOnResponse: boolean, if the retry is succesful, should NavigateToPage and PageLoad tracking occur
-Function handleSingleContentError(error, trackOnResponse)
+' @onRetrySuccessCallback: roFunction, a callback to be run when the response is successfully returned from the backend on a retry
+' @onRetryErrorCallback: roFunction, a callback to be run when an error occurs while fetching the content from the backend on a retry
+Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCallback)
   tubiLog("DetailScreenHelpers.handleSingleContentError")
   detailScreen = getTopDetailScreenFromStack()
   
@@ -583,13 +603,14 @@ Function handleSingleContentError(error, trackOnResponse)
       trackingTask: m.trackingLoggingTask
     }
 
-    getSingleContentParams = [
-      detailScreen
+    getSingleContentRetryParams = [
       content
-      trackOnResponse
+      onRetrySuccessCallback
+      onRetryErrorCallback
+      detailScreen
     ]
 
-    showErrorModal(modalInfo, getSingleContentFromServerRetry, getSingleContentParams)
+    showErrorModal(modalInfo, getSingleContentFromServerRetry, getSingleContentRetryParams)
     detailScreen.isLoading = false
 
     sendDetailScreenErrorAnalytics(detailScreen)
@@ -1187,7 +1208,7 @@ Function onEpisodeList(msg)
   if episodeDetail = invalid
     m.actionType = episodesHelper
     detailScreen.isLoading = true
-    getSingleContentFromServer(detailScreen, detailScreen.content, false) 
+    getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
   else 
     showEpisodeScreenWithNavigationTracking(detailScreen.content) 
   end if
@@ -1263,7 +1284,7 @@ Function onWatchTrailer(msg)
       else
         m.actionType = trailerHelper
         detailScreen.isLoading = true
-        getSingleContentFromServer(detailScreen, detailScreen.content, false)
+        getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
       end if   
     end if
   end if  
@@ -1332,7 +1353,7 @@ Function onResume(msg)
     else
       m.actionType = resumeHelper
       detailScreen.isLoading = true
-      getSingleContentFromServer(detailScreen, detailScreen.content, false)
+      getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
     end if   
   end if
 End Function
@@ -1353,7 +1374,7 @@ Function onPlay(msg)
     else
       m.actionType = playHelper
       detailScreen.isLoading = true
-      getSingleContentFromServer(detailScreen, detailScreen.content, false)
+      getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
     end if   
   end if
 End Function
@@ -1410,31 +1431,71 @@ End Function
 Function resumeHelper(detailScreen)
   episode = getEpisodeContent(detailScreen.content)
   if episode <> invalid then
-    bMature = isMatureRating(episode)
-    if m.global.authInfo = invalid and bMature = true
-      '//if user is a guest and is trying to play content geared for only adults, then ask them to register dialogSubtype = "mature-play"
-      dialogSubtype = "mature-resume"
-      if m.deepLinkContent <> invalid
-        '//this is a deeplink so, indicate that the warning originatated from a deeplink
-        dialogSubtype = "mature-resume-deep"
-      end if
-      displayDetailScreenMaturePlayWarning(episode, dialogSubtype)
-    else
-      nowPos = 0
-      ' using nowPos that was passed in with deeplink, when playback initiated via deeplink
-      if m.deeplinkContent <> invalid and episode.nowPos > 0
-        nowPos = episode.nowPos
-      else
-        ' find the position in global history
-        history = m.global.historyIds.findNode(episode.id)
-        if history <> invalid and history.nowPos > 0
-          nowPos = history.nowPos
-        end if
-      end if
+    nowPos = processResume(episode)
+    if nowPos >= 0
       playVideoContent(episode, "none", nowPos)
     end if
   else
     tubiLog("ERROR: Resume selected but content is invalid")
+  end if
+End Function
+
+
+' @episode: roSGNode, ContentNode for a single video. May be a movie or a series episode.
+' 
+' @return: integer, the position from which video playback should resume.
+'                   PLEASE NOTE: A negative value indicates the content should not be played!
+Function processResume(episode)
+  bMature = isMatureRating(episode)
+  nowPos = -1
+  if m.global.authInfo = invalid and bMature = true
+    '//if user is a guest and is trying to play content geared for only adults, then ask them to register dialogSubtype = "mature-play"
+    dialogSubtype = "mature-resume"
+    if m.deepLinkContent <> invalid
+      '//this is a deeplink so, indicate that the warning originatated from a deeplink
+      dialogSubtype = "mature-resume-deep"
+    end if
+    displayDetailScreenMaturePlayWarning(episode, dialogSubtype)
+  else
+    nowPos = 0
+    ' using nowPos that was passed in with deeplink, when playback initiated via deeplink
+    if m.deeplinkContent <> invalid and episode.nowPos > 0
+      nowPos = episode.nowPos
+    else
+      ' find the position in global history
+      history = m.global.historyIds.findNode(episode.id)
+      if history <> invalid and history.nowPos > 0
+        nowPos = history.nowPos
+      end if
+    end if
+  end if
+
+  return nowPos
+End Function
+
+
+' A callback to be used after fetching the single content to immediately begin playback.
+' Used when a user presses the "play" button on the homescreen, for instance. 
+' @refreshedContent: roSGNode, full metadata as received from the cms/content route
+Function skipDetailScreen(refreshedContent)
+  subScreen = getHiddenScreen(1)
+
+  trackingPageInfo = {}
+  trackingComponentInfo = {}
+  if subScreen <> invalid
+    trackingPageInfo = subScreen.trackingPageInfo
+    trackingComponentInfo = subScreen.trackingComponentInfo
+  end if
+  
+  detailScreen = getTopDetailScreenFromStack()
+  populateDetailScreen(detailScreen, refreshedContent)
+
+  episode = getEpisodeContent(detailScreen.content)
+  if episode <> invalid
+    nowPos = processResume(episode)
+    if nowPos >= 0
+      playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo)
+    end if
   end if
 End Function
 

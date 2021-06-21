@@ -37,6 +37,7 @@ Function init()
     pageType: "video_player_page"
     pageValues: {}
   }
+  m.top.handlesTransportVoiceRequests = true
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
   m.theme = m.global.theme

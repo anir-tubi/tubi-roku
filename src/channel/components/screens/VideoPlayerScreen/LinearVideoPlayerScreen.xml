@@ -8,7 +8,6 @@
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
 
   <interface>
@@ -36,8 +35,6 @@
 
       <!-- supports "play", "stop", "pause", "resume", "error" -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>
-      
-      <field id="transportVoiceRequest" type="assocarray" alwaysNotify="true"/>
       
       <!-- interval in seconds for sending position data to the tracking server -->
       <field id="analyticsInterval" type="integer" value="0"/>
@@ -72,8 +69,6 @@
 
       <field id="state" type="string" />
       
-      <field id="transportVoiceResponse" type="assocarray" alwaysNotify="true"/>
-
       <!--When the user selects a new channel from the channel guide, this field is set-->
       <field id="channelSelected" type="node"/>
 

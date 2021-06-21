@@ -6,6 +6,54 @@
 ' @autoplayType: string, valid values are "automatic", "deliberate", or "none"
 ' @position: integer, the position from which to start video playback
 function playVideoContent(content, autoplayType = "none", position = 0)
+  videoPlayer = setupVideoPlayer(content, autoplayType, position)
+
+  if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
+    if m.enteredFromDeepLink = true
+      ' if the user has been age gated during the deeplink process, a modal will be shown.
+      ' We need to remove the modal so it is not overlaying the video.
+      modal = getTopModal()
+      if modal <> invalid and modal.isSubtype("ModalDialogScreen") and modal.isInFocusChain() = true
+        closeModal(modal)
+      end if
+
+      pushScreen(videoPlayer, false, true)
+    else
+      pushScreen(videoPlayer, true, true)
+    end if
+  end if
+
+  videoPlayer.control = "play"
+End Function
+
+
+' Called when a user uses voice controls to play or presses the play button from a content screen,
+' such that the detail screen is "skipped" and the NavigateToPageEvent should contain information
+' about the screen where the navigation occurred and navigating to the video player screen.
+' @content: roSGNode, the content node of the content to be played
+' @nowPos: integer, the position from which the video playback should be resumed
+' @currentTrackingPageInfo: assocArray, trackingPageInfo of the screen being navigated from
+' @trackingComponentInfo: assocArray, trackingPageInfo of the screen being navigated from
+Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrackingPageInfo, trackingComponentInfo = invalid)
+  videoPlayer = setupVideoPlayer(content, "none", nowPos)
+
+  ' send custom navigateToPage event, since a details screen was added to the screen stack but the user
+  ' never saw it, we want to navigate from the screen under the most recently added details screen.
+  screenTrackingNavigate(currentTrackingPageInfo, videoPlayer.trackingPageInfo, trackingComponentInfo)
+
+  if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
+    pushScreen(videoPlayer, false, true)
+  end if
+
+  videoPlayer.control = "play"
+End Function
+
+
+' Helper function for onResume and onPlay to launch content
+' @content: TubiContentNode, the content to be played, can be a movie, episode, or trailer
+' @autoplayType: string, valid values are "automatic", "deliberate", or "none"
+' @position: integer, the position from which to start video playback
+Function setupVideoPlayer(content, autoplayType = "none", position = 0)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
   if videoPlayer = invalid
@@ -102,31 +150,8 @@ function playVideoContent(content, autoplayType = "none", position = 0)
     m.updateHistoryTask.content = content
   end if
 
-  ' it's necessary to push the screen after the content has been set on the videoPlayer component,
-  ' so NavigateToPage and PageLoad events contain the necessary content id information
-  if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
-    if m.enteredFromDeepLink = true
-      ' if the user has been age gated during the deeplink process, a modal will be shown.
-      ' We need to remove the modal so it is not overlaying the video.
-      modal = getTopModal()
-      if modal <> invalid and modal.isSubtype("ModalDialogScreen") and modal.isInFocusChain() = true
-        closeModal(modal)
-      end if
-
-      pushScreen(videoPlayer, false, true)
-    else if m.handlingDeeplinkInputEvent = true
-      ' send custom navigateToPage event, since a details screen was added to the screen stack but the user
-      ' never saw it, we want to navigate from the screen under the most recently added details screen.
-      screenTrackingNavigate(m.currentPageInfoAtDeeplinkInputEvent, videoPlayer.trackingPageInfo)
-      pushScreen(videoPlayer, false, true)
-      m.currentScreenAtDeeplinkInputEvent = invalid
-    else
-      pushScreen(videoPlayer, true, true)
-    end if
-  end if
-
-  videoPlayer.control = "play"
-end function
+  return videoPlayer
+End Function
 
 
 ''''''''''''''''''''''
@@ -226,8 +251,7 @@ function playUpNextContent(nextContent, autoplayType)
       emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
       emptyMovieNode.type = m.constants.ui.contentTypes.video
       emptyMovieNode.id = nextContent.id
-      detailScreen = getTopDetailScreenFromStack()
-      getSingleContentFromServer(detailScreen, emptyMovieNode, false)
+      getSingleContentFromServer(emptyMovieNode, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
     end if
 
     playVideoContent(content, autoplayType)
@@ -350,7 +374,7 @@ function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
         emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
         emptySeriesNode.type = m.constants.ui.contentTypes.series
         emptySeriesNode.id = videoContent.parentId
-        getSingleContentFromServer(detailScreen, emptySeriesNode, false)
+        getSingleContentFromServer(emptySeriesNode, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
 
         ' TODO: repopulate the episode screen if necessary after the fetch for the new series
         ' Currently the upNext API does not autoplay into new series, so this functionality was punted for now.
@@ -401,7 +425,7 @@ function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
         emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
         emptyMovieNode.type = m.constants.ui.contentTypes.video
         emptyMovieNode.id = videoContent.id
-        getSingleContentFromServer(detailScreen, emptyMovieNode, false)
+        getSingleContentFromServer(emptyMovieNode, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
       else
         ' Case 1
         ' Returning to the detail screen for the same movie as was started, no autoplay
@@ -762,12 +786,6 @@ function onUpNextError(errorInfo)
   if m.receivedGoToNextPressed = true
     returnToDetailScreenFromVideo()
   end if
-end function
-
-
-function onTransportVoiceResponse(msg)
-  transportVoiceResponse = msg.getData()
-  m.top.transportVoiceResponse = transportVoiceResponse
 end function
 
 

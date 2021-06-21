@@ -29,6 +29,9 @@
       <!-- unfocus the focused components -->
       <field id="unfocus" type="boolean" alwaysNotify="true"/>
 
+      <!-- allowed values are "play", "ok" -->
+      <field id="command" type="string" alwaysNotify="true"/>
+
     <!-- OUTPUTS -->
       <field id="contentFocused" type="node"/>
       <field id="contentSelected" type="node"/>

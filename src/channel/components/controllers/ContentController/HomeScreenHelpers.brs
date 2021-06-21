@@ -38,10 +38,10 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
     homeScreen.observeFieldScoped("contentFocused", "onHomeScreenContentFocused")
     homeScreen.observeFieldScoped("focusedChild", "onHomeScreenFocusChanged")
-
-    
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
+    homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
     homeScreen.observeFieldScoped("topNavItemSelected", "onTopNavItemSelected")
+    homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
@@ -688,6 +688,12 @@ Function onContentSelected(msg)
   else
     showDetailScreen(content, true)
   end if
+End Function
+
+
+Function onContentToPlay(msg)
+  content = msg.getData()
+  showDetailScreen(content, false, skipDetailScreen)
 End Function
 
 

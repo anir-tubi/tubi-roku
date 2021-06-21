@@ -12,6 +12,7 @@ Function init()
   m.top.observeField("stopAutoPlayTimer", "onStopAutoPlayTimer")
   m.top.observeField("resetContent", "onResetContent")
   m.top.observeField("unfocus", "onUnfocus")
+  m.top.observeField("command", "onCommand")
 
   m.UpNextUI = m.top.findNode("UpNextUI")
   m.UpNextUI.observeField("opacity", "onUpNextUIOpacityChange")
@@ -126,7 +127,7 @@ End Function
 
 
 Function onContentChange()
-  tubiLog("UpNextScreen.onContentChange")
+  tubiLog("UpNext.onContentChange")
   if m.top.content <> invalid and m.top.content.getChildCount() > 0
     firstContent = m.top.content.getChild(0)
     if firstContent.seriesId <> invalid and firstContent.seriesId <> ""
@@ -163,11 +164,20 @@ End Function
 
 
 Function onKeyEvent(key, press) as Boolean
-  tubiLog("UpNextScreen.onKeyEvent")
+  tubiLog("UpNext.onKeyEvent")
   ' pass through back presses, but consume all other button presses
-  if press and key = "back"
-    stopTimer()
-    return false
+  if press
+    if key = "back"
+      stopTimer()
+      return false
+    else if key = "play"
+      if m.MovieGroup.isInFocusChain() = true
+        handleMovieItemSelected(m.GridMovie.itemFocused)
+      else if m.SeriesGroup.isInFocusChain() = true
+        handleSeriesItemSelected(m.GridSeries.itemFocused)
+      end if
+      return true
+    end if
   else
     return true
   end if
@@ -175,8 +185,22 @@ Function onKeyEvent(key, press) as Boolean
 End Function
 
 
+Function onCommand(msg)
+  tubiLog("UpNext.onCommand")
+  command = msg.getData()
+
+  if command = "ok" or command = "play"
+    if m.MovieGroup.isInFocusChain() = true
+      handleMovieItemSelected(m.GridMovie.itemFocused)
+    else if m.SeriesGroup.isInFocusChain() = true
+      handleSeriesItemSelected(m.GridSeries.itemFocused)
+    end if
+  end if
+End Function
+
+
 Function onMovieItemFocused(msg)
-  tubiLog("UpNextScreen.onMovieItemFocused")
+  tubiLog("UpNext.onMovieItemFocused")
   itemFocused = m.GridMovie.itemFocused
   col = itemFocused + 1  '1 based index
   row = 1
@@ -206,9 +230,15 @@ End Function
 
 
 Function onMovieItemSelected()
-  tubiLog("UpNextScreen.onMovieItemSelected")
+  tubiLog("UpNext.onMovieItemSelected")
+  handleMovieItemSelected(m.GridMovie.itemSelected)
+End Function
+
+
+' @position: integer, the position within the row of movie contents displayed
+Function handleMovieItemSelected(position)
   m.top.autoplayMode = "deliberate"
-  m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemSelected)
+  m.top.contentSelected = m.GridMovie.content.getChild(position)
 End Function
 
 
@@ -227,20 +257,25 @@ End Function
 
 
 Function onSeriesItemFocused()
-  tubiLog("UpNextScreen.onSeriesItemFocused")
+  tubiLog("UpNext.onSeriesItemFocused")
   itemFocusedHelper(m.GridSeries, m.InfoSeries)
 End Function
 
 
 Function onSeriesItemSelected()
-  tubiLog("UpNextScreen.onSeriesItemSelected")
+  tubiLog("UpNext.onSeriesItemSelected")
+  handleSeriesItemSelected(m.GridSeries.itemSelected)
+End Function
+
+
+Function handleSeriesItemSelected(position)
   m.top.autoplayMode = "deliberate"
-  m.top.contentSelected = m.GridSeries.content.getChild(m.GridSeries.itemSelected)
+  m.top.contentSelected = m.GridSeries.content.getChild(position)
 End Function
 
 
 Function onCountdownTimer()
-  tubiLog("UpNextScreen.onCountdownTimer")
+  tubiLog("UpNext.onCountdownTimer")
   m.timeRemaining = m.timeRemaining - 1
   if m.timeRemaining = 0
     m.top.autoplayMode = "automatic"

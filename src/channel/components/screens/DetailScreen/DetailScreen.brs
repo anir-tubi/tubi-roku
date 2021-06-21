@@ -31,6 +31,7 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("isLoading", "onIsLoading")
   m.top.observeField("disableBookmarks", "onDisableBookmarksChange")
+  m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
 
   m.top.observeFieldScoped("stringQueueButton", "onStringChange")
   m.top.observeFieldScoped("stringNoQueueButton", "onStringChange")
@@ -74,7 +75,8 @@ Function init()
   m.isChannelMenuSelected = false
 
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
-  
+  m.top.isStackable = true
+  m.top.handlesTransportVoiceRequests = true
 End Function
 
 
@@ -361,32 +363,34 @@ End Function
 ' onMenuItemSelected
 '
 Function onMenuItemSelected()
-  tubiLog("DetailScreen.onMenuItemSelected")
-
   selection = m.Menu.content.getChild(m.Menu.itemSelected)
-  if selection <> invalid then
-    print "Menu item selected: " + selection.title
+  handleMenuItemSelected(selection)
+End Function
 
-    if selection.id = "ResumeMenuItem"
+
+' @itemSelected: roSGNode: ContentNode representing the content that was selected by the user
+Function handleMenuItemSelected(itemSelected)
+  if itemSelected <> invalid then
+    tubiLog("DetailScreen.handleMenuItemSelected" + itemSelected.title)
+    if itemSelected.id = "ResumeMenuItem"
       m.top.resumeSelected = true
-    else if selection.id = "PlayMenuItem"
+    else if itemSelected.id = "PlayMenuItem"
       m.top.playSelected = true
-    else if selection.id = "WatchTrailerMenuItem"
+    else if itemSelected.id = "WatchTrailerMenuItem"
       m.top.watchTrailerSelected = true
-    else if selection.id = "EpisodesMenuItem"
+    else if itemSelected.id = "EpisodesMenuItem"
       m.top.episodeListSelected = true
-    else if selection.id = "AddQueueMenuItem"
+    else if itemSelected.id = "AddQueueMenuItem"
       m.top.addToQueueSelected = true
-    else if selection.id = "RemoveQueueMenuItem"
+    else if itemSelected.id = "RemoveQueueMenuItem"
       m.top.removeFromQueueSelected = true
-    else if selection.id = "RemoveHistoryMenuItem"
+    else if itemSelected.id = "RemoveHistoryMenuItem"
       m.top.removeFromHistorySelected = true
-    else if selection.id = "ChannelMenuItem"
+    else if itemSelected.id = "ChannelMenuItem"
       'on selecting this menu, it is removing the detailScreen from screen stack, so roku negative audio sound is played, 
       'To play Roku positive audio sound, channelMenuSelected is handled in onKeyEvent.
       m.isChannelMenuSelected = true
     end if
-    
   end if
 End Function
 
@@ -407,10 +411,17 @@ End Function
 
 
 Function onRelatedContentSelected()
+  selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemSelected)
+  handleRelatedContentSelected(selectedContent, m.RelatedGrid.itemSelected)
+End Function
+
+
+' @selectedContent: roSGNode, ContentNode that was selected from the RelatedGrid
+' @postion: integer, the horizontal position of the content in the RelatedGrid
+Function handleRelatedContentSelected(selectedContent, position)
   m.relatedHasFocus = false
 
   'set the component info so it can be used in navigate_to_page event
-  selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemSelected)
   col = m.RelatedGrid.itemSelected + 1
   row = 1
   m.top.trackingComponentInfo = {
@@ -420,7 +431,7 @@ Function onRelatedContentSelected()
       }
   }
 
-  m.top.relatedContentSelected = m.RelatedGrid.itemSelected
+  m.top.relatedContentSelected = position
 End Function
 
 
@@ -473,9 +484,8 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         m.top.backButtonPressed = true
       end if
       return true
-    end if
     ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
-    if key = "down"
+    else if key = "down"
       if m.Menu.isInFocusChain() = true and m.RelatedContentParentGroup.visible = true and m.RelatedContentGroup.visible = true then
         focusRelated()
         return true
@@ -483,8 +493,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         focusMenu()
         return true
       end if
-    end if
-    if key = "up"
+    else if key = "up"
       if m.RelatedGrid.isInFocusChain()
         focusMenu()
         return true
@@ -492,13 +501,15 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         focusInfo()
         return true
       end if
-    end if
-    if key = "OK"
+    else if key = "OK"
       if m.isChannelMenuSelected = true
         m.isChannelMenuSelected = false
         m.top.channelSelected = true
       end if
       '//ensure this keypress is captured so the default Roku positive audio sound is played.
+      return true
+    else if key = "play"
+      handlePlayInput()
       return true
     end if
   end if
@@ -540,5 +551,49 @@ Function focusInfo()
   m.focusTarget = m.Info
   if m.top.isInFocusChain()
     m.Info.setFocus(true)
+  end if
+End Function
+
+
+Function onTransportVoiceRequest(msg)
+  inputInfo = msg.getData()
+  command = ""
+  if inputInfo <> invalid and inputInfo.command <> invalid
+    command = inputInfo.command
+  end if
+  tubiLog("DetailScreen.onTransportVoiceRequest " + command)
+
+  response = "unhandled"
+  if command = "play"
+    handlePlayInput()
+    response = "success"
+  else if command = "ok"
+    if m.Menu.isInFocusChain() = true
+      selection = m.Menu.content.getChild(m.Menu.itemFocused)
+      handleMenuItemSelected(selection)
+      response = "success"
+    else if m.RelatedGrid.isInFocusChain() = true
+      selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
+      handleRelatedContentSelected(selectedContent, m.RelatedGrid.itemFocused)
+      response = "success"
+    end if
+  end if
+
+  inputInfo.response = response
+  m.top.transportVoiceResponse = inputInfo
+End Function
+
+
+Function handlePlayInput()
+  itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
+  if itemFocused.id = "PlayMenuItem" and m.Menu.isInFocusChain() = true
+    m.top.playSelected = true
+  else if itemFocused.id = "WatchTrailerMenuItem" and m.Menu.isInFocusChain() = true
+    m.top.watchTrailerSelected = true
+  else if m.RelatedGrid.isInFocusChain() = true
+    selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
+    m.top.relatedContentToPlay = selectedContent
+  else
+    m.top.resumeSelected = true
   end if
 End Function

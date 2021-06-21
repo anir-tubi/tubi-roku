@@ -1146,9 +1146,6 @@ End Function
 ' contentToTranslate should be parsed from JSON before it hits this Function
 Function tubiMetadataTranslate_translate(contentToTranslate) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
-  fetchedAt = m.fetchedAtTimestamp()
-  translated.fetchedAt = fetchedAt  ' This is probably just an ignored object, but we
-  ' should mark it's fetch time for consistency
   node_count = 0
 
   if contentToTranslate <> invalid

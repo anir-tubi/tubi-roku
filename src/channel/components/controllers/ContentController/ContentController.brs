@@ -131,13 +131,6 @@ Function init()
   ' indicates if we are in the process of handling an input event deeplink.
   m.handlingDeeplinkInputEvent = false
 
-  ' used to save the current screen's trackingPageInfo when we received a deeplink roInputEvent, so that when
-  ' we add the video player to the screen stack, we know what screen was being navigated from.
-  ' This is needed because when a roInput deeplink event is observed, we create a new details screen for
-  ' the content. But, if at that point in time, a video player screen is the top most screen in the screen
-  ' stack, it will be removed and we won't be able to send a proper NavigateToPageEvent.
-  m.currentPageInfoAtDeeplinkInputEvent = invalid
-
   m.inactivityTimer = m.top.findNode("InactivityTimer")
   m.inactivityTimer.observeFieldScoped("fire", "onInactivityTimer")
   m.inactivityTimer.control = "start"
@@ -633,11 +626,6 @@ Function onInputInfoReceived()
       ' is kicked off by showDetailScreen to load the detail screen and video player screen
       m.deeplinkContent = createDeeplinkContentFromStartupArgs(inputInfo)
       m.handlingDeeplinkInputEvent = true
-
-      currentScreen = getCurrentScreen()
-      if currentScreen <> invalid
-        m.currentPageInfoAtDeeplinkInputEvent = currentScreen.trackingPageInfo
-      end if
       
       ' close any opened modal/pop-up when deeplinking via roInput
       for i=0 to m.top.getChildCount()-1
@@ -647,11 +635,12 @@ Function onInputInfoReceived()
         end if
       end for      
 
-      showDetailScreen(m.deeplinkContent, false)
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreen)
     else if inputInfo.type = "transport"
-      videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-      if videoPlayer <> invalid
-        videoPlayer.transportVoiceRequest = inputInfo
+      currentScreen = getCurrentScreen()
+
+      if currentScreen <> invalid and currentScreen.hasField("handlesTransportVoiceRequests") and currentScreen.handlesTransportVoiceRequests = true
+        currentScreen.transportVoiceRequest = inputInfo
       else
         if m.top.transportVoiceRequest <> invalid
           transportVoiceResponse = m.top.transportVoiceRequest
@@ -663,6 +652,12 @@ Function onInputInfoReceived()
       end if
     end if
   end if
+End Function
+
+
+Function onTransportVoiceResponse(msg)
+  transportVoiceResponse = msg.getData()
+  m.top.transportVoiceResponse = transportVoiceResponse
 End Function
 
 

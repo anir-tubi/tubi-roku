@@ -8,6 +8,8 @@ Function showChannelScreen(content, sPageSource = "")
   channelScreen.observeFieldScoped("refreshChannel", "onRefreshChannelSignal")
   channelScreen.observeFieldScoped("signInRequired", "onSignInRequiredModal")
   channelScreen.observeFieldScoped("backButtonPressed", "onChannelScreenBackPressed")
+  channelScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+  channelScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
   channelScreen.id = m.constants.ui.screenIds.channelDetailScreen
   channelScreen.categoryId = content.id
   channelScreen.isLoading = true

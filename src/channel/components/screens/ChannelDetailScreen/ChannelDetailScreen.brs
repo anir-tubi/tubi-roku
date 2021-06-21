@@ -19,6 +19,7 @@ Function init()
   m.top.observeField("isLoading", "onIsLoading")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("enabled", "onEnableChange")
+  m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
   m.VideoGrid.observeField("itemFocused", "onItemFocused")
   m.VideoGrid.observeField("itemSelected", "onItemSelected")
 
@@ -40,6 +41,7 @@ Function init()
   end if
 
   m.top.screenLevel = m.constants.ui.screenLevels.channelDetailScreen
+  m.top.handlesTransportVoiceRequests = true
   
   m.bLeftButtonActsLikeBackButton = true
   posterSize = m.constants.ui.imageSizes.poster
@@ -185,12 +187,29 @@ Function onItemFocused()
 End Function
 
 
-Function onItemSelected()
-  item = m.VideoGrid.itemSelected
+Function onItemSelected(msg)
+  itemSelected = msg.getData()
+  handleItemSelected(itemSelected)
+End Function
+
+
+' @itemSelected: integer, the position in the grid
+Function handleItemSelected(itemSelected)
   category = m.top.content.getChild(0)
-  content = category.getChild(item)
+  content = category.getChild(itemSelected)
 
   ' Update the tracking info so that it is ready once the ContentController creates the details page
+  updateTrackingInfo(category, content, itemSelected)
+
+  ' Pass info to ContentController
+  m.top.contentSelected = content
+End Function
+
+
+' @category: roSGNode, contentNode containing info about the category represented on the page
+' @content: roSGNode, contentNode containing info about the content that was selected from the grid
+' @itemSelected: integer, the position in the grid
+Function updateTrackingInfo(category, content, itemSelected)
   m.top.trackingPageInfo = createTrackingPageInfo(category)
 
   categorySlug = ""
@@ -199,8 +218,8 @@ Function onItemSelected()
   end if
 
   numColumns = m.VideoGrid.numColumns
-  col = 1 + (item MOD numColumns)
-  row = 1 + (item \ numColumns)
+  col = 1 + (itemSelected MOD numColumns)
+  row = 1 + (itemSelected \ numColumns)
   'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
   m.top.trackingComponentInfo = {
     componentType: "category_component"
@@ -211,8 +230,6 @@ Function onItemSelected()
     }
   }
   m.contentLoadedAndFocused = false
-  ' Pass info to ContentController
-  m.top.contentSelected = content
 End Function
 
 
@@ -336,7 +353,6 @@ End Function
 
 
 Function onKeyEvent(key, press) as Boolean
-
   handled = false
 
   if press = true
@@ -345,6 +361,9 @@ Function onKeyEvent(key, press) as Boolean
         m.top.backButtonPressed = true
         handled = true
       end if
+    else if key = "play"
+      handlePlayInput()
+      handled = true
     end if
   else
     if key = "back"
@@ -358,4 +377,38 @@ Function onKeyEvent(key, press) as Boolean
   end if
   
   return handled
+End Function
+
+
+Function onTransportVoiceRequest(msg)
+  response = "unhandled"
+  inputInfo = msg.getData()
+  command = ""
+  if inputInfo <> invalid and inputInfo.command <> invalid
+    command = inputInfo.command
+  end if
+  tubiLog("ChannelDetailScreen.onTransportVoiceRequest " + command)
+
+  if m.VideoGrid.isInFocusChain() = true
+    if command = "play"
+      handlePlayInput()
+      response = "success"
+    else if command = "ok"
+      handleItemSelected(m.VideoGrid.itemFocused)
+      response = "success"
+    end if
+  end if
+
+  inputInfo.response = response
+  m.top.transportVoiceResponse = inputInfo
+End Function
+
+
+Function handlePlayInput()
+  if m.VideoGrid.isInFocusChain() = true
+    category = m.top.content.getChild(0)
+    selectedContent = category.getChild(m.VideoGrid.itemFocused)
+    updateTrackingInfo(category, selectedContent, m.VideoGrid.itemFocused)
+    m.top.contentToPlay = selectedContent
+  end if
 End Function

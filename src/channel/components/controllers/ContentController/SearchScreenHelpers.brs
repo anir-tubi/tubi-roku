@@ -6,8 +6,9 @@ Function showSearchScreen(constants)
   searchScreen.observeFieldScoped("backgroundUriList", "onSearchBackgroundChange")
   searchScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   searchScreen.observeFieldScoped("searchText", "onSearchTextChanged")
+  searchScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+  searchScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
   m.top.observeField("searchResponse", "onSearchResultsReceived")
-
 
   searchScreen.id = m.constants.ui.screenIds.searchScreen
   searchScreen.kidsModeEnabled = isKidsUIOn()
