@@ -30,6 +30,7 @@ Function TubiExperiments(constants) as Object
         roku_top_nav_options_experiment : {"news_in_top_nav": true, "espanol_in_top_nav": false}
       }
       roku_initial_content_type_selector_icts: {
+        roku_initial_content_type_selector_icts_v1: {"enabled": false}
       }
       roku_instant_resume: {
         roku_instant_resume_v1: {"enabled": false}
