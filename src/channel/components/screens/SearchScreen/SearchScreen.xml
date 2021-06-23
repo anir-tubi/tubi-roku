@@ -35,7 +35,7 @@
       <!-- set to the contentNode of the search results grid item which was focused when
            the "play" input transport deeplink was triggered
       -->
-      <field id="contentToPlay" type="node"/>
+      <field id="contentToPlay" type="node" alwaysNotify="true"/>
 
       <!-- The current text that the user has entered to search -->
       <field id="searchText" type="string" value="" alwaysNotify="true" />

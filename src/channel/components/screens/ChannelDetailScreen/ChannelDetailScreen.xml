@@ -44,7 +44,7 @@
       <!-- set to the contentNode of the ChannelsVideoGrid content item which was focused when
            the "play" input transport deeplink was triggered
       -->
-      <field id="contentToPlay" type="node"/>
+      <field id="contentToPlay" type="node" alwaysNotify="true"/>
 
       <!-- tells ContentController/ChannelScreenHelpers that the category metadata
            for the channel content is out of the cache window and should be updated -->
