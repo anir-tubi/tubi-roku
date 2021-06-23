@@ -49,19 +49,8 @@ Function draw()
   setMainContent(m.constants.ui.sideNavIds.movies, rowNode, aItemWidths) 
   nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(1)
   setMainContent(m.constants.ui.sideNavIds.tv, rowNode, aItemWidths)
-
-  nCurrentButtonItem = 2
-  if m.top.isNewsAllowed = true and getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).news_in_top_nav = true
-    nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(nCurrentButtonItem)
-    setMainContent(m.constants.ui.sideNavIds.news, rowNode, aItemWidths)
-    nCurrentButtonItem = nCurrentButtonItem + 1
-  end if
-
-  if getExperimentResource("roku_top_nav", "roku_top_nav_options_experiment", false).espanol_in_top_nav = true
-    nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(nCurrentButtonItem)
-    setMainContent(m.constants.ui.sideNavIds.espanol, rowNode, aItemWidths)
-  end if
-
+  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(2)
+  setMainContent(m.constants.ui.sideNavIds.news, rowNode, aItemWidths)
   nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + nMenuOutsideSpacing
 
   m.MenuBground.width = nBgroundWidth
