@@ -19,6 +19,7 @@ Function showEpisodeScreen(content, shouldSendNavigationAnalytics)
   episodesScreen.observeFieldScoped("backgroundUriList", "onEpisodeBackgroundChange")
   episodesScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   episodesScreen.observeFieldScoped("backButtonPressed", "onEpisodeBackPressed")
+  episodesScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
   if episodesScreen.content <> invalid and episodesScreen.content.id <> invalid
     contentId = Mid(episodesScreen.content.id, 2)  ' trim leading "0" off series id
 
