@@ -20,13 +20,6 @@
   </interface>
   
   <children>
-    <Poster
-      id="newIcon"
-      loadSync="true"
-      width="71"
-      height="37"
-      visible="false"
-      uri="pkg:/images/icon-new.png"/>
     <Label
       id="CategoryName"
       height="59"

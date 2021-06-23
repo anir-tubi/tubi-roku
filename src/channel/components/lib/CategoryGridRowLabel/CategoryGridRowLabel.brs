@@ -4,7 +4,6 @@ Function init()
   m.FocusIndex = m.top.findNode("FocusIndex")
   m.CategoryName = m.top.findNode("CategoryName")
   m.CategoryCount = m.top.findNode("CategoryCount")
-  m.newIcon = m.top.findNode("newIcon")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("currentIndex", "onIndexChange")
 
@@ -29,15 +28,6 @@ Function onContentChange()
   if m.top.content <> invalid then
     m.CategoryName.text = m.top.content.title
     drawItemCount()
-    '//Display a NEW icon next to the title if it is marked as being new
-    if m.top.content.new = true
-      m.newIcon.visible = true
-      m.CategoryName.translation = [m.newIcon.width + 10, m.CategoryName.translation[1]]
-    else
-      m.newIcon.visible = false
-      m.CategoryName.translation = [0, m.CategoryName.translation[1]]
-    end if
-
     if m.top.content.gridItemType = "linear" or m.top.content.gridItemType = "continue_watching_signed_Out_User"
       m.CategoryCount.visible = false
     else 

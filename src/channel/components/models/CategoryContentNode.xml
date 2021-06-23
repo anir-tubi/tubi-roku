@@ -9,9 +9,6 @@
     <field id="totalCount" type="int" value="-1"/>
     <field id="offset" type="int" value="0"/>
 
-    <!-- Does the backend want to mark this as a new category to the user?\ -->
-    <field id="new" type="boolean" value="false" />
-
     <!-- json sources for CategoryGridList -->
     <field id="json" type="string" />
 

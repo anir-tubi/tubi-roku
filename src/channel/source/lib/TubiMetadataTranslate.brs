@@ -826,10 +826,6 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   linear = m.constants.ui.gridItemTypes.linear
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
 
-  '//::HARDCODE:: If the container type includes live news, then mark this as "new". evebtually we will remove the new tag
-  if gridItemType = linear
-    categoryMetadata.new = true
-  end if
 
   if type(categoryMetadata) = "roAssociativeArray"
     ' buildCategoryAA always returns AA.state = "partial",
@@ -887,10 +883,6 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       gridItemType: m.getGridItemType(container, sOrientation, m.constants)
     }
     
-    '//::HARDCODE:: If the container type includes live news, then mark this as "new". eventually we will remove the new tag
-    if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.linear
-      updateMetadata.new = true
-    end if
 
     if container.thumbnail <> invalid
       updateMetadata.thumbnail = container.thumbnail
