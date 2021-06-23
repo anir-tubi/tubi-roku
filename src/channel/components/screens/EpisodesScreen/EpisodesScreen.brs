@@ -5,8 +5,11 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.Info = m.top.findNode("InfoPanel")
+
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
+  m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
+
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeField("rowItemSelected", "onEpisodeSelected")
   m.RowList.observeField("rowItemFocused", "onEpisodeFocused")
@@ -27,6 +30,8 @@ Function init()
       series_id: 0
     }
   }
+
+  m.top.handlesTransportVoiceRequests = true
 
   ' When the screen comes in to focus, onEpisodeFocused() triggers. At this point in time, m.RowList.hasFocus() is true.
   ' m.gridIsFocused can be used to differentiate between onEpisodeFocused() occurring due to the focus changing between
@@ -132,8 +137,14 @@ End Function
 
 
 Function onEpisodeSelected()
+  handleEpisodeSelected(m.RowList.rowItemSelected)
+End Function
+
+
+' @itemSelected: Array, 2D array with [row, column] (as outpt from Rowlist.rowitemFocused or .rowItemSelected)
+Function handleEpisodeSelected(itemSelected)
   'set the component info so it can be used in navigate_to_page event
-  episode = getEpisodeContent(m.RowList.rowItemFocused)
+  episode = getEpisodeContent(itemSelected)
   row = m.RowList.rowItemFocused[0] + 1
   col = m.RowList.rowItemFocused[1] + 1
   m.top.trackingComponentInfo = {
@@ -143,7 +154,7 @@ Function onEpisodeSelected()
     }
   }
 
-  m.top.episodeSelected = m.RowList.rowItemSelected
+  m.top.episodeSelected = itemSelected
 End Function
 
 
@@ -207,7 +218,9 @@ End Function
 Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("EpisodesScreen.onKeyEvent" + key)
   if press then
-    if key = "right" and m.Menu.isInFocusChain() then
+    if key = "play" and m.RowList.isInFocusChain() = true
+      handleEpisodeSelected(m.Rowlist.rowItemFocused)
+    else if key = "right" and m.Menu.isInFocusChain() then
       focusGrid()
       return true
     else if (key = "left") and m.RowList.isInFocusChain() then
@@ -220,6 +233,27 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   end if
 
   return false
+End Function
+
+
+Function onTransportVoiceRequest(msg)
+  inputInfo = msg.getData()
+  command = ""
+  if inputInfo <> invalid and inputInfo.command <> invalid
+    command = inputInfo.command
+  end if
+  tubiLog("DetailScreen.onTransportVoiceRequest " + command)
+
+  response = "unhandled"
+  if m.RowList.isInFocusChain()
+    if command = "play" or command = "ok"
+      handleEpisodeSelected(m.Rowlist.rowItemFocused)
+      response = "success"
+    end if
+  end if
+
+  inputInfo.response = response
+  m.top.transportVoiceResponse = inputInfo
 End Function
 
 
