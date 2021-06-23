@@ -754,8 +754,8 @@ End Function
 
 Function onTransportVoiceRequest(msg)
   response = "unhandled"
+  inputInfo = msg.getData()
   if m.CategoryGridList.isInFocusChain() = true
-    inputInfo = msg.getData()
     command = ""
     if inputInfo <> invalid and inputInfo.command <> invalid
       command = inputInfo.command
