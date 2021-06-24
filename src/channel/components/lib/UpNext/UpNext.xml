@@ -34,6 +34,18 @@
       <!-- allowed values are "play", "ok" -->
       <field id="command" type="string" alwaysNotify="true"/>
 
+      <!-- any command value aside from the allowed values.
+        innvalidCommand is used when a "pause" or "stop" voice command has been issued.
+        The onCommand callback will not take any action from a "pause" or "stop" voice command.
+        In addition to a voice command, the firmware will initiate a "play" key press if the user
+        says "pause" or "stop" into the remote, which will trigger an onKeyEvent callback to fire.
+        In this case the presense of invalidCommand is used to determine if a "play" key event
+        is actually a user pressing the "play" button on the remote, or is created by a user saying
+        "pause" or "stop" into the remote. The logic around invalidCommand may break the UI if the
+        firmware makes updates to how it behaves with respect to voice commands.
+       -->
+      <field id="invalidCommand" type="string"/>
+
     <!-- OUTPUTS -->
       <field id="contentFocused" type="node"/>
       <field id="contentSelected" type="node"/>

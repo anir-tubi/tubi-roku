@@ -172,7 +172,7 @@ Function onKeyEvent(key, press) as Boolean
     if key = "back"
       stopTimer()
       return false
-    else if key = "play"
+    else if key = "play" and m.top.invalidCommand = ""
       if m.MovieGroup.isInFocusChain() = true
         handleMovieItemSelected(m.GridMovie.itemFocused)
       else if m.SeriesGroup.isInFocusChain() = true
@@ -180,6 +180,9 @@ Function onKeyEvent(key, press) as Boolean
       end if
     end if
   end if
+
+  'reset the value so as not to block subsequent valid key press events
+  m.top.invalidCommand = ""
 
   return true
 End Function

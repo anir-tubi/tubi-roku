@@ -221,7 +221,12 @@ Function handleTransportVoiceEvent()
       response = "unhandled"     
     end if
   else if m.UpNext.isInFocusChain()
-    m.UpNext.command = command
+    if command = "play" or command = "ok"
+      m.UpNext.command = command
+    else
+      m.UpNext.invalidCommand = command
+      response = "unhandled"
+    end if
   end if
   
   inputInfo.response = response
