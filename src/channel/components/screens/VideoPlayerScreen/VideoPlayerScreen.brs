@@ -346,6 +346,7 @@ Function onControlChange()
     stopVideo()
 
     m.UpNext.stopAutoPlayTimer = true
+    m.UpNext.hide = true
 
     'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed
     if m.top.adState = "fetching" or m.top.adState = "adsPending"

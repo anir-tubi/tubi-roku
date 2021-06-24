@@ -178,12 +178,10 @@ Function onKeyEvent(key, press) as Boolean
       else if m.SeriesGroup.isInFocusChain() = true
         handleSeriesItemSelected(m.GridSeries.itemFocused)
       end if
-      return true
     end if
-  else
-    return true
   end if
-  return false
+
+  return true
 End Function
 
 
