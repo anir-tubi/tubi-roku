@@ -682,6 +682,7 @@ function onVideoTrackingStart(msg)
       youboraConfig["content.isLive"] = false
     end if
 
+    youboraconfig["content.resource"] = videoplayer.content.URL
     youboraConfig["content.transactionCode"] = m.constants.deviceInfo.deviceId
     youboraConfig["device.model"] = m.constants.deviceInfo.model
     youboraConfig["app.releaseVersion"] = m.constants.settings.version
