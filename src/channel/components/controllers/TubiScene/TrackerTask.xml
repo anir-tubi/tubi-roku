@@ -43,8 +43,14 @@
       <function name="UIThread_log"/>
       <function name="UIThread_setLogVerbosity"/>
       <function name="UIThread_setLogFormat"/>
+
+      <function name="UIThread_setRulerLine"/>
+      <function name="UIThread_setRulerLines"/>
+      <function name="UIThread_removeRulerLine"/>
+      <function name="UIThread_removeAllRulerLines"/>
   </interface>
 
+    
     
     
     
@@ -79,6 +85,80 @@ Function RALE_InitConfig() as Object
 
     return this
 End Function
+
+
+' CreateGuides - Selector (live) view class constructor
+' @return {object} - selector (live) view
+Function CreateGuides() as Object
+    this = {}
+    node = CreateObject("roSGNode", "Group")
+    node.addFields({"isExternallyExposed": true})
+    this.node = node
+    this.childMap = {}
+
+    this.setLine = Guides_SetLine
+    this.setRulerLines = Guides_SetRulerLines
+    this.removeLine = Guides_RemoveLine
+    this.removeAllLines = Guides_RemoveAllLines
+
+    this.resolution = m.top.getScene().getField("currentDesignResolution")
+
+    return this
+End Function
+
+Sub Guides_SetLine(id, position, coords)
+    if (m.childMap[id] = invalid) then
+        Guides_AddLine(id, position, coords, m.node, m.childMap)
+    else
+        Guides_UpdatePosition(id, coords, m.childMap)
+    end if
+end Sub
+
+Sub Guides_SetRulerLines(rulerLines)
+    For Each line In rulerLines.Items()
+        Guides_AddLine(line.key, line.value.position, line.value.coords, m.node, m.childMap)
+    End For
+end Sub
+
+Sub Guides_AddLine(id, position, coords, node, childMap) as Object
+    line = CreateObject("roSGNode", "Rectangle")
+    line.setField("id", id)
+    line.setField("color", "#00F8FF")
+    line.addFields({"position": position})
+    Guides_SetLineCoords(line, coords)
+    node.appendChild(line)
+    childMap[id] = line
+end Sub
+
+Sub Guides_UpdatePosition(id, coords, childMap) as Object
+    line = childMap[id]
+    Guides_SetLineCoords(line, coords)
+end Sub
+
+Sub Guides_SetLineCoords(node, coords) as Integer
+    if node.position = "horizontal" then
+            node.setField("translation", [coords.x,0])
+            node.setField("width", 1)
+            node.setField("height", m.resolution.height)
+        end if
+        if node.position = "vertical" then
+            node.setField("translation", [0,coords.y])
+            node.setField("width", m.resolution.width)
+            node.setField("height", 1)
+        end if
+end Sub
+
+Sub Guides_RemoveLine(id)
+    line = m.childMap[id]
+    m.node.removeChild(line)
+    m.childMap[id] = invalid
+end Sub
+
+Sub Guides_RemoveAllLines()
+    childrenList = m.node.getChildren(-1,0)
+    m.node.removeChildren(childrenList)
+    m.childMap = {}
+end Sub
 
 
 ' RALE_Logger - Constructor of Logger class
@@ -253,8 +333,8 @@ end function
 
 ' RALE_Logger__getZeroNumber - Convert number to format "0[number]" if it has less then 2 digits
 ' @param {number} n - number for converting
-' @param {number} to_length -  the nessesary count of digits
-' @return {string} - converted numer format
+' @param {number} to_length -  the necessary count of digits
+' @return {string} - converted number format
 function RALE_Logger__getZeroNumber(n, to_length=2)
     n = str(n).trim()
     if len(n) < to_length
@@ -610,6 +690,12 @@ Sub getCommandMap() as Object
         "setLogVerbosity" : "UIThread_setLogVerbosity",
         "setLogFormat"    : "UIThread_setLogFormat",
         "log"             : "UIThread_log"
+
+        ' Ruler lines commands
+        "setRulerLine"             : "UIThread_setRulerLine",
+        "setRulerLines"            : "UIThread_setRulerLines",
+        "removeRulerLine"          : "UIThread_removeRulerLine",
+        "removeAllRulerLines"      : "UIThread_removeAllRulerLines",
     }
 End Sub
 
@@ -623,7 +709,7 @@ End Sub
 
 ' UIThread_init - RALE "init" command
 ' @param {object} args - command arguments
-' @return {object} - response of command. Contains RALE version
+' @return {object} - response of command. Contains RALE version and session id
 Sub UIThread_init(args) as Object
     root = m.top.GetScene()
 
@@ -638,6 +724,13 @@ Sub UIThread_init(args) as Object
         root.appendChild(m.selectorView)
     end if
 
+    if m.guides = Invalid then
+        m.guides = CreateGuides()
+        root.appendChild(m.guides.node)
+    else
+        UIThread_removeAllRulerLines({})
+    end if
+
     if args.logVerbosity >= 0 then
         UIThread_setLogVerbosity({ level: args.logVerbosity })
     end if
@@ -647,7 +740,7 @@ Sub UIThread_init(args) as Object
     end if
 
     m.logger.info("RALE Initialized")
-    return { raleVersion: m.raleVersion }
+    return { raleVersion: m.raleVersion, sessionid: m.sessionId }
 End Sub
 
 '=======================
@@ -834,6 +927,7 @@ Sub UIThread_addChild(args) as Object
     result = addChild(node, childType, index)
     if result.success = true then
         index = RALE_getNodeIndexByPath(path)
+        setNodeField(result.child, "rale_new_child", true, "boolean")
         return {
             tree: getNodeTree(result.child, index, 50),
             childindex: result.index
@@ -1039,6 +1133,35 @@ Sub UIThread_setBoundingRect(args) as Object
         node.setFields(fields)
     end if
     return node.sceneBoundingRect()
+End Sub
+
+'=======================
+' Layout ruler commands
+'=======================
+' UIThread_setRulerLine - TBD
+Sub UIThread_setRulerLine(args) as Object
+    m.guides.setLine(FW_AsString(args.id), args.position, args.coords)
+    return { success: true }
+End Sub
+
+' UIThread_setRulerLines - TBD
+Sub UIThread_setRulerLines(args) as Object
+    if args.rulerLines.Count() >= 0 then
+        m.guides.setRulerLines(args.rulerLines)
+    end if
+    return { success: true }
+End Sub
+
+' UIThread_removeRulerLine - TBD
+Sub UIThread_removeRulerLine(args) as Object
+    m.guides.removeLine(FW_AsString(args.id))
+    return { success: true }
+End Sub
+
+' UIThread_removeRulerLine - TBD
+Sub UIThread_removeAllRulerLines(args) as Object
+    m.guides.removeAllLines()
+    return { success: true }
 End Sub
 
 '=======================
@@ -1705,7 +1828,8 @@ Sub init()
     m.config = RALE_Config()
     m.logger = RALE_Logger(m.config.defaultLogLevel, m.config.logFormat)
     m.sceneBG = m.top.GetScene().getChild(0)
-    m.raleVersion = "2.0.9"
+    m.raleVersion = "2.2.18"
+    m.sessionId = CreateObject("roDeviceInfo").GetRandomUUID()
 
     m.logger.info("Roku Advanced Layout Editor v." + m.raleVersion)
 End Sub
