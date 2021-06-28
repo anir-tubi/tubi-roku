@@ -167,6 +167,10 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the news screen.",
       "message": "News"
     },
+    "menu_livetv": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
+      "message": "Live TV"
+    },
     "menu_movies_and_tv": {
       "description": "Menu option on the app's navigation, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Movies & TV"
@@ -1070,6 +1074,10 @@ Function getTranslation_es_MX()
     "menu_news": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the news screen.",
       "message": "Noticias"
+    },
+    "menu_livetv": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
+      "message": "TV En Vivo"
     },
     "menu_movies_and_tv": {
       "description": "Menu option on the app's navigation, (length of text should not be too long). Allows the user to display the home screen.",

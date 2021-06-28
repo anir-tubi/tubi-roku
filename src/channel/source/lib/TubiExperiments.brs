@@ -26,6 +26,9 @@ Function TubiExperiments(constants) as Object
       roku_limit_containers: {
         roku_limit_containers_v2: {"num_containers": -1}
       }
+      roku_live_tv_name_experiment: {
+        roku_live_tv_name_experiment_v1: {"enabled": false}
+      }
       roku_initial_content_type_selector_icts: {
         roku_initial_content_type_selector_icts_v1: {"enabled": false}
       }

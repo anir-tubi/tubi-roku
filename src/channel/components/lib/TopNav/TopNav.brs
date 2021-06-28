@@ -98,7 +98,13 @@ Function setMainContent(itemID, parentNode, aItemWidths)
     contentNode.title = getTranslation("menu_tv")
     bSuccess = true
   else if itemID = m.constants.ui.sideNavIds.news
-    contentNode.title = getTranslation("menu_news")
+    if getExperimentResource("roku_live_tv_name_experiment", "roku_live_tv_name_experiment_v1", true).enabled = false
+      '//::TODO:: liveTV - if the experiment is successful, then add a new sideNavIds that corresponds to liveTV. 
+      '//::TODO:: liveTV - if the experiment is successful, are the analytics affected? Do they need to say live_tv instead of news? 
+      contentNode.title = getTranslation("menu_news")
+    else
+      contentNode.title = getTranslation("menu_livetv")
+    end if
     bSuccess = true
   else if itemID = m.constants.ui.sideNavIds.espanol
     contentNode.title = "Español"
