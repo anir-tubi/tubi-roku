@@ -502,18 +502,12 @@ Function startUserExperience()
         m.ageVerificationComplete = true
         startUserExperience()
       end if
-    else if m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.expired = false
-      ' the user is a guest user for whom we have previously stored hasAge info, and whose hasAge info
-      ' has not yet expired, so set m.ageVerificationComplete = true and recursively call this
+    else
+      ' the user is a guest user, and we are not age gating guest users at app launch,
+      ' so set m.ageVerificationComplete = true and recursively call this
       ' function so we can move past the m.ageVerificationComplete check.
       m.ageVerificationComplete = true
       startUserExperience()
-    else
-      ' the user is a guest user who has not been age verified or whose hasAge info has expired,
-      ' so show the age verification screen.
-      showContentGroup()
-      m.spinner.visible = false
-      showAgeVerificationScreenAtStartup()
     end if
   else
     ' All of the above checked values are true, so we are ready to start the channel UI
@@ -1193,11 +1187,8 @@ End Function
 Function restartChannel()
   tubiLog("ContentController.restartChannel")
   authInfo = m.global.authInfo
-  if shouldShowAgeGate() and ((authInfo <> invalid and authInfo.hasAge <> true) or (authInfo = invalid and (m.guestUserHasAgeInfo = invalid or m.guestUserHasAgeInfo.hasAge <> true)))
-    ' if user has just signed out, then show the age gate screen
-    showAgeVerificationScreenAtInteraction()
-    showHideSpinner(false)
-  else if shouldDisplayInitialContentScreen() = true
+  
+  if shouldDisplayInitialContentScreen() = true
     displayInitialContentScreen()
   else
     startChannel()
@@ -1557,9 +1548,9 @@ End Function
 
 ' onCustomResume will be triggered during Instant Resume
 ' For guest user,
-' it will check lastAppSuspendInHours,
-' if the lastAppSuspendInHours is more than 24hours, it removes all screens from stack & destroys scene and relaunches the app from beginning
-' if the lastAppSuspendInHours is equal/less than 24hours, it resumes app where the user left off or suspended.
+' it will check lastAppSuspendInSecs,
+' if the lastAppSuspendInSecs is more than 24hours, it removes all screens from stack & destroys scene and relaunches the app from beginning
+' if the lastAppSuspendInSecs is equal/less than 24hours, it resumes app where the user left off or suspended.
 ' For LoggedIn user,
 ' it resumes app where the user left off or suspended.
 ' also it restarts app every 4 days to retrieve starter/remote components
@@ -1570,7 +1561,7 @@ Function onCustomResume(msg)
 
   currentScreen = getCurrentScreen()
 
-  lastAppSuspendInHours = m.appSuspendTimer.TotalSeconds() / 60 / 60
+  lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
   lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
 
   if getExperimentResource("roku_instant_resume", "roku_instant_resume_v1", true).enabled = true
@@ -1582,14 +1573,10 @@ Function onCustomResume(msg)
       ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
       ' lots of edge cases, so for consistency, restarting the app is easiest.
       restartApp()
-    else if isDeviceInUSorCA() = true and guestUserHasAgeInfo.expired = true
-      ' if the device is in US/CA and guestUserHasAgeInfo's expired value is true, then restart the app in order to show coppa age gate
-      m.ageVerificationComplete = false
-      restartApp()
-    else if m.global.authInfo = invalid and (lastAppSuspendInHours > 24 or lastAppRestartInDays >= 4)
-      ' For guest users,
-      ' if the time between last suspend and current resume is more than 24 hours, disable Instant Resume & relaunch app from scratch
-      ' also every 4 days once the app restarts in order to get starter/remote components
+    else if m.global.authInfo = invalid and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4)
+      ' For guest users, if the time between last suspend and current resume is more than 24 hours, 
+      ' disable Instant Resume & relaunch app from scratch.
+      ' Also every 4 days once the app restarts in order to get starter/remote components
       restartApp()
     else if m.global.authInfo <> invalid and lastAppRestartInDays >= 4
       ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components

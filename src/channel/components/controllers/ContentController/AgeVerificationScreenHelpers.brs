@@ -59,9 +59,18 @@ Function showAgeVerificationScreenAtStartupSignedIn()
 End Function
 
 
+' TODO: Determine if this flow is still relevant after updates to COPPA
+' Occurs when a user signs out
 Function showAgeVerificationScreenAtInteraction()
   tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtInteraction")
   showAgeVerificationScreen(onAgeSubmittedAtInteraction)
+End Function
+
+
+' Occurs after a user signs in, but the user does not have a valid age associated with their account yet.
+Function showAgeVerificationScreenAfterSignIn()
+  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAfterSignIn")
+  showAgeVerificationScreen(onAgeSubmittedAfterSignIn)
 End Function
 
 
@@ -90,6 +99,11 @@ End Function
 
 Function onAgeSubmittedAtInteraction(msg)
   onAgeSubmitted(msg, verifyAgeAtInteraction)
+End Function
+
+
+Function onAgeSubmittedAfterSignIn(msg)
+  onAgeSubmitted(msg, verifyAgeAfterSignIn)
 End Function
 
 
@@ -135,6 +149,11 @@ End Function
 
 Function verifyAgeAtInteraction(birthdate)
   verifyAge(birthdate, onAgeVerifiedAtInteraction, onAgeNotVerifiedAtInteraction)
+End Function
+
+
+Function verifyAgeAfterSignIn(birthdate)
+  verifyAge(birthdate, onAgeVerifiedAfterSignIn, onAgeNotVerifiedAfterSignIn)
 End Function
 
 
@@ -260,6 +279,11 @@ Function onAgeNotVerifiedAtInteraction(err)
 End Function
 
 
+Function onAgeNotVerifiedAfterSignIn(err)
+  onAgeNotVerified(err, verifyAgeAfterSignIn, restartChannelAfterAgeVerification)
+End Function
+
+
 ' @err: assocArray: expected return value from parseAgeVerificationScreenDeviceRegistrationError()
 '                   expected fields are: code and birthdate
 ' @tryAgainCallback: function, the function to be called in case a modal is shown and a user selects try again
@@ -275,6 +299,8 @@ Function onAgeNotVerified(err, tryAgainCallback, continueCallback)
       ' 422: the user is not old enough to use Tubi except in kids mode according to COPPA (US only)
       ' 451: the user is not old enough to use Tubi except in kids mode for some international reasons
       m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(false)
+      Auth.logout()
+      m.global.authInfo = invalid
       continueCallback()
 
       currentScreen = getCurrentScreen()

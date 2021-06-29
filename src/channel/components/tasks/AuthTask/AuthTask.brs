@@ -24,8 +24,17 @@ Function execInitializeUserData()
     authInfo = tempAuthInfo
   end if
 
+  ' guest users who have recently failed the age gate, continue to be locked in Kids mode for the entire
+  ' 24 hour duration. Guest users who have not failed the age gate delete any previous hasAge info which
+  ' ensures that no age gate is shown.
   if authInfo = invalid
-    m.top.guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
+    guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
+    if guestUserHasAgeInfo.expired = true
+      Auth.deleteGuestUserHasAgeInfo()
+      m.top.guestUserHasAgeInfo = invalid
+    else
+      m.top.guestUserHasAgeInfo = guestUserHasAgeInfo
+    end if
   end if
   
   m.top.bookmarks = userCats.newBookmarks
@@ -70,7 +79,7 @@ Function execSignOut()
 
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
-  m.top.guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
+  m.top.guestUserHasAgeInfo = invalid
   m.top.authInfo = invalid
 End Function
 

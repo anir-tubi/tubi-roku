@@ -449,6 +449,15 @@ Function getConstants()
     ' Time in seconds after which the linear video player goes fullscreen
     constants.timers.linearFullscreenTimeout = 10
 
+    ' Time in seconds after which stored hasAge info becomes expired for COPPA
+    constants.timers.coppaFailTimeout = 24 * 60 * 60  ' 1 day
+    constants.timers.coppaPassTimeout = 60 * 24 * 60 * 60  ' 60 days
+
+    ' allow the config to set the expire time for QA purposes
+    if constants.settings.mode <> "production" and constants.settings.coppaHasAgeDuration <> invalid
+      constants.timers.coppaFailTimeout = constants.settings.coppaHasAgeDuration
+    end if
+
   'constants needed for the video player
   constants.player = {}
 
@@ -722,8 +731,8 @@ Function getConstants()
       constants.ui.screenLevels.activationCodeScreen = 90
       constants.ui.screenLevels.signUpScreen = 90
       constants.ui.screenLevels.signInScreen = 90
-      constants.ui.screenLevels.initialContentScreen = 299
-      constants.ui.screenLevels.ageGateScreen = 300
+      constants.ui.screenLevels.ageGateScreen = 90
+      constants.ui.screenLevels.initialContentScreen = 300
       constants.ui.screenLevels.modalDialogScreen = 1000
 
     constants.ui.screenIds = {}

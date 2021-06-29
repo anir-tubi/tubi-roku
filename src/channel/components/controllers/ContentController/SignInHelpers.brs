@@ -522,17 +522,9 @@ Function onActivationSuccess()
   if m.authTask <> invalid
     m.authTask.unobserveFieldScoped("authInfo")
   end if
+
   m.authTask = CreateObject("roSGNode", "AuthTask")
-  
-  callbackStr = convertFunctionToString(m.callbackAfterSignIn)
-  if callbackStr <> ""
-    m.authTask.observeFieldScoped("authInfo", callbackStr)
-  else
-    m.authTask.observeFieldScoped("authInfo", "onSideNavSignInCompleted")
-  end if
-  
-  m.callbackAfterSignIn = invalid ' setting to invalid to avoid callbacks
-  
+  m.authTask.observeFieldScoped("authInfo", "onPostSignInAuthInfoUpdated") 
   m.authTask.functionName = "execInitializeUserData"
   m.authTask.control = "RUN"
   m.spinner.visible = true
@@ -542,10 +534,26 @@ Function onActivationSuccess()
 End Function
 
 
+Function onPostSignInAuthInfoUpdated()
+  tubiLog("SignInHelpers.onPostSignInAuthInfoUpdated")
+  authInfo = handleUpdatedAuth()
+  if shouldShowAgeGate() and authInfo.hasAge <> true
+    m.spinner.visible = false
+    showAgeVerificationScreenAfterSignIn()
+  else if m.callbackAfterSignIn <> invalid
+    callbackAfterSignIn = m.callbackAfterSignIn
+    m.callbackAfterSignIn = invalid ' setting to invalid to avoid callbacks
+    callbackAfterSignIn()
+  else
+    ' this should not happen but restart the channel in case it somehow does
+    restartChannel()
+  end if
+End Function
+
+
 ' onSideNavSignInCompleted occurs when a user signs out or user signs in from the side nav or from settings side nav
 Function onSideNavSignInCompleted()
   tubiLog("SignInHelpers.onSideNavSignInCompleted")
-  authInfo = handleUpdatedAuth()
 
   ' set the mode before any changes are done to the UI 
   setUiModeFromState()
@@ -570,7 +578,7 @@ Function onSideNavSignInCompleted()
   setContentToRefreshAllPersonalizedScreens()
 
   refreshAllDetailScreens()
-  setSideNavSignedInItem(authInfo)
+  setSideNavSignedInItem(m.global.authInfo)
       
   ' this happens when a user signs out or user signs in from the side nav or from settings side nav
   restartChannel()
@@ -585,13 +593,7 @@ Function onSignOutCompleted()
   ' set the mode before any changes are done to the UI
   setUiMode(m.constants.ui.modes.standard)
 
-  shouldRefreshHomescreen = true
-  if shouldShowAgeGate()
-    ' don't refresh homescreen if age gate is in effect, we'll refresh after the age gate
-    shouldRefreshHomescreen = false
-  end if
-  setContentToRefreshAllPersonalizedScreens(shouldRefreshHomescreen)
-
+  setContentToRefreshAllPersonalizedScreens()
   setSideNavSignedInItem(authInfo)
       
   ' this happens when a user signs out or user signs in from the side nav or from settings side nav
@@ -602,12 +604,7 @@ End Function
 ' Is called only at app startup
 Function onStartupAuthInfoReceived()
   tubiLog("SignInHelpers.onStartupAuthInfoReceived")
-  if shouldShowAgeGate()
-    m.guestUserHasAgeInfo = m.authTask.guestUserHasAgeInfo
-  end if
-  m.guestUserHasAgeRetrieved = true
   handleUpdatedAuth()
-
   startUserExperience()
 End Function
 
@@ -617,7 +614,9 @@ End Function
 Function handleUpdatedAuth()
   ' AuthInfo may be invalid if authTask failed to log the user in
   authInfo = m.authTask.authInfo
-  m.guestUserHasAgeInfo = m.authTask.guestUserHasAgeInfo
+  if shouldShowAgeGate()
+    m.guestUserHasAgeInfo = m.authTask.guestUserHasAgeInfo
+  end if
   m.global.authInfo = authInfo
 
   ' These will be empty parent nodes (no children) if user is not authenticated
@@ -637,7 +636,6 @@ End Function
 ' onQueueAfterSignIn - occurs after activation success via AddtoMyList on Details page
 Function onQueueAfterSignIn()
   tubiLog("SignInHelpers.onQueueAfterSignIn")
-  handleUpdatedAuth()
 
   ' setContentToRefresh is not required for homescreen as we are fetching homescreen content
   ' right after adding into queue when onBookmarkedAfterSignIn() is called.
@@ -647,7 +645,7 @@ Function onQueueAfterSignIn()
   m.spinner.visible = false
 
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
+  if currentScreen <> invalid and poppableScreenSubtypes[currentScreen.getSubtype()] = true
     popScreen(true, true)
     currentScreen = getCurrentScreen()
   end if
@@ -662,7 +660,6 @@ End Function
 ' onCWRowAfterSignIn - occurs after activation success via CWRow on homescreen
 Function onCWRowAfterSignIn()
   tubiLog("SignInHelpers.onCWRowAfterSignIn")
-  handleUpdatedAuth()
 
   setContentToRefreshAllPersonalizedScreens()
 
@@ -673,10 +670,16 @@ End Function
 ' onParentalControlAfterSignIn - occurs after activation success via Parental Control
 Function onParentalControlAfterSignIn()
   tubiLog("SignInHelpers.onParentalControlAfterSignIn")
-  handleUpdatedAuth()
+
+  poppableScreenSubtypes = {
+    "ActivationCodeScreen": true
+    "SignInScreen": true
+    "SignUpScreen": true
+    "AgeVerificationScreen": true
+  }
 
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and (currentScreen.getSubtype() =  "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
+  if currentScreen <> invalid and poppableScreenSubtypes[currentScreen.getSubtype()] = true
     popScreen(true, true)
     currentScreen = getCurrentScreen()
   end if
@@ -696,7 +699,6 @@ End Function
 ' onSideNavMyListAfterSignIn - occurs after activation success via sidenav MyList
 Function onSideNavMyListAfterSignIn()
   tubiLog("SignInHelpers.onSideNavMyListAfterSignIn")
-  handleUpdatedAuth()
 
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and (currentScreen.getSubtype() = "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
@@ -721,7 +723,6 @@ End Function
 
 ' After the user clicks on the Sign In Menu item and then signs in, then this function should be called to display the home screen
 Function onSignInAfterInitialContentScreen()
-  handleUpdatedAuth()
   reloadDefaultHomeScreenContent()
   showDefaultHomeScreen()
 End Function

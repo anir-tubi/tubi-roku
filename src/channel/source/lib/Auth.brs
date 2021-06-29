@@ -362,19 +362,15 @@ Function tubiAuth_setGuestUserHasAgeInfo(hasAge)
   dateTime = CreateObject("roDateTime")
   nowTime = dateTime.AsSeconds()
 
+  'set the default expire time (ie. the user failed the age gate)
   hasAgeStored = {
     hasAge: hasAge
-    expireTime: nowTime + (24 * 60 * 60) ' 1 day into the future default expire time
+    expireTime: nowTime + m.constants.timers.coppaFailTimeout
   }
 
   if hasAge = true
-    'expire time is 60 days into the future if guest users indicate they are over 13 (ie. hasAge = true)
-    hasAgeStored.expireTime = nowTime + (60 * 24 * 60 * 60)
-  end if
-
-  ' allow the config to set the expire time for QA purposes
-  if m.constants.settings.mode <> "production" and m.constants.settings.coppaHasAgeDuration <> invalid
-    hasAgeStored.expireTime = nowTime + m.constants.settings.coppaHasAgeDuration
+    ' update with the expire time used if the user passed the age gate
+    hasAgeStored.expireTime = nowTime + m.constants.timers.coppaPassTimeout
   end if
 
   hasAgeStoredJson = FormatJson(hasAgeStored)
