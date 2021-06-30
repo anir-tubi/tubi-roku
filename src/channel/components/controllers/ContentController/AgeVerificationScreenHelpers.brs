@@ -245,6 +245,14 @@ Function onAgeVerifiedAtInteraction(age)
 End Function
 
 
+Function onAgeVerifiedAfterSignIn(age)
+  onAgeVerified(age)
+  callbackAfterSignIn = m.callbackAfterSignIn
+  m.callbackAfterSignIn = invalid ' setting to invalid to avoid future callbacks
+  callbackAfterSignIn()
+End Function
+
+
 ' @age: integer, the age as returned by the backend
 Function onAgeVerified(age)
   tubiLog("AgeVerificationScreen.onAgeVerified")

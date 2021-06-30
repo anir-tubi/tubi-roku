@@ -542,7 +542,7 @@ Function onPostSignInAuthInfoUpdated()
     showAgeVerificationScreenAfterSignIn()
   else if m.callbackAfterSignIn <> invalid
     callbackAfterSignIn = m.callbackAfterSignIn
-    m.callbackAfterSignIn = invalid ' setting to invalid to avoid callbacks
+    m.callbackAfterSignIn = invalid ' setting to invalid to avoid future callbacks
     callbackAfterSignIn()
   else
     ' this should not happen but restart the channel in case it somehow does
@@ -642,13 +642,8 @@ Function onQueueAfterSignIn()
   ' We need to enforce that content is added to queue first, before re-fetching the homescreen.
   setContentToRefreshAllPersonalizedScreens(false)
 
+  currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
-
-  currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and poppableScreenSubtypes[currentScreen.getSubtype()] = true
-    popScreen(true, true)
-    currentScreen = getCurrentScreen()
-  end if
 
   if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
     onAddToQueue(currentScreen, onBookmarkedAfterSignIn)
@@ -671,19 +666,7 @@ End Function
 Function onParentalControlAfterSignIn()
   tubiLog("SignInHelpers.onParentalControlAfterSignIn")
 
-  poppableScreenSubtypes = {
-    "ActivationCodeScreen": true
-    "SignInScreen": true
-    "SignUpScreen": true
-    "AgeVerificationScreen": true
-  }
-
-  currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and poppableScreenSubtypes[currentScreen.getSubtype()] = true
-    popScreen(true, true)
-    currentScreen = getCurrentScreen()
-  end if
-  
+  currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
   
   setContentToRefreshAllPersonalizedScreens()
@@ -700,12 +683,7 @@ End Function
 Function onSideNavMyListAfterSignIn()
   tubiLog("SignInHelpers.onSideNavMyListAfterSignIn")
 
-  currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and (currentScreen.getSubtype() = "ActivationCodeScreen" or currentScreen.getSubtype() = "SignInScreen" or currentScreen.getSubtype() = "SignUpScreen")
-    popScreen(true, true)
-    currentScreen = getCurrentScreen()
-  end if
-  
+  currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
   if currentScreen <> invalid and currentScreen.id = "channelDetailScreen" and currentScreen.categoryId = m.constants.ui.categoryIds.queue
@@ -725,4 +703,22 @@ End Function
 Function onSignInAfterInitialContentScreen()
   reloadDefaultHomeScreenContent()
   showDefaultHomeScreen()
+End Function
+
+
+Function popScreenAfterSignInProcess()
+  poppableScreenSubtypes = {
+    "ActivationCodeScreen": true
+    "SignInScreen": true
+    "SignUpScreen": true
+    "AgeVerificationScreen": true
+  }
+
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid and poppableScreenSubtypes[currentScreen.getSubtype()] = true
+    popScreen(true, true)
+    currentScreen = getCurrentScreen()
+  end if
+
+  return currentScreen
 End Function
