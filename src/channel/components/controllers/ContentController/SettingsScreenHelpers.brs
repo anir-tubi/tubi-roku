@@ -134,7 +134,7 @@ End Function
 Function onSettingsSignInSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignInSelected")
   m.settingsScreen.actionAfterActivation = ""
-  startSignIn()
+  startSignIn(onSideNavSignInCompleted)
 End Function
 
 

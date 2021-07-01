@@ -202,36 +202,7 @@ End Function
 
 Function onAgeVerifiedAtStartupSignedIn(age)
   tubiLog("AgeVerificationScreenHelpers.onAgeVerifiedAtStartupSignedIn")
-  ' For signed up users who didn't have a age associated with their account,
-  ' once they have submitted an age and the age has been verified, we need to
-  ' PATCH their account info with their birthdate
-  birthdate = ""
-  currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.isSubtype("AgeVerificationScreen")
-    birthdate = currentScreen.birthdate
-  end if
-
-  if birthdate.len() = 10 'YYYY-MM-DD
-    options = {
-      body: {
-        birthday: birthdate
-      }
-    }
-
-    authInfo = m.global.authInfo
-    if authInfo <> invalid and authInfo.userId <> invalid
-      patchSettingsInfo = m.userDeviceApi.patchSettingsInfo(authInfo.userId, options)
-
-      m.makeRequest({
-        url: patchSettingsInfo.url
-        requestType: m.constants.reqNames.patchUserSettings
-        options: patchSettingsInfo.options
-        responseType: "assocarray"
-        silenceCallbackWarnings: true
-      })
-    end if
-  end if
-
+  patchSignedInUserAge()
   onAgeVerifiedAtStartup(age)
 End Function
 
@@ -246,6 +217,7 @@ End Function
 
 
 Function onAgeVerifiedAfterSignIn(age)
+  patchSignedInUserAge()
   onAgeVerified(age)
   callbackAfterSignIn = m.callbackAfterSignIn
   m.callbackAfterSignIn = invalid ' setting to invalid to avoid future callbacks
@@ -458,4 +430,37 @@ Function onWhyButtonSelected(msg)
     }
   }
   showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+End Function
+
+
+' For signed up users who didn't have a age associated with their account,
+' once they have submitted an age and the age has been verified, we need to
+' PATCH their account info with their birthdate
+Function patchSignedInUserAge()
+  birthdate = ""
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid and currentScreen.isSubtype("AgeVerificationScreen")
+    birthdate = currentScreen.birthdate
+  end if
+
+  if birthdate.len() = 10 'YYYY-MM-DD
+    options = {
+      body: {
+        birthday: birthdate
+      }
+    }
+
+    authInfo = m.global.authInfo
+    if authInfo <> invalid and authInfo.userId <> invalid
+      patchSettingsInfo = m.userDeviceApi.patchSettingsInfo(authInfo.userId, options)
+
+      m.makeRequest({
+        url: patchSettingsInfo.url
+        requestType: m.constants.reqNames.patchUserSettings
+        options: patchSettingsInfo.options
+        responseType: "assocarray"
+        silenceCallbackWarnings: true
+      })
+    end if
+  end if
 End Function

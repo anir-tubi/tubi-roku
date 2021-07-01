@@ -6,7 +6,12 @@
 Function startSignIn(callbackAfterSignIn=invalid)
 
   tubiLog("SignInHelpers.startSignIn")
-  
+
+  ' setting the default callback that occurs after a user signs in
+  if callbackAfterSignIn = invalid
+    callbackAfterSignIn = onSideNavSignInCompleted
+  end if
+
   m.callbackAfterSignIn = callbackAfterSignIn
   
   showActivationScreen()

@@ -244,7 +244,7 @@ End Function
 
 ' handles the response of a user who has been presented a sign in modal
 Function onSignInModalButtonSelected()
-  startSignIn()
+  startSignIn(onSideNavSignInCompleted)
 End Function
 
 
