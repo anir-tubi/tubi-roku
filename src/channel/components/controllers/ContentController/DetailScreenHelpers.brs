@@ -321,7 +321,9 @@ End Function
 '@params: 4 index array containing params that should be passed to getSingleContentFromServer()
 Function getSingleContentFromServerRetry(params)
   if type(params) = "roArray" and params.count() = 4
-    params[3].isLoading = true
+    if type(params[3]) = "roSGNode" and params[3].subtype() = "DetailScreen"
+      params[3].isLoading = true
+    end if
     getSingleContentFromServer(params[0], params[1], params[2])
   end if
 End Function
@@ -537,12 +539,12 @@ End Function
 
 
 Function onSingleContentErrorWithTracking(error)
-  handleSingleContentError(error, true)
+  handleSingleContentError(error, onSingleContentResponseWithTrackingrue, onSingleContentErrorWithTracking)
 End Function
 
 
 Function onSingleContentErrorWithoutTracking(error)
-  handleSingleContentError(error, false)
+  handleSingleContentError(error, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
 End Function
 
 
