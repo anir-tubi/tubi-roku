@@ -539,7 +539,7 @@ End Function
 
 
 Function onSingleContentErrorWithTracking(error)
-  handleSingleContentError(error, onSingleContentResponseWithTrackingrue, onSingleContentErrorWithTracking)
+  handleSingleContentError(error, onSingleContentResponseWithTracking, onSingleContentErrorWithTracking)
 End Function
 
 
