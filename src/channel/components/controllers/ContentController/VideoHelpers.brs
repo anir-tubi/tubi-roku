@@ -252,7 +252,7 @@ function playUpNextContent(nextContent, autoplayType)
       emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
       emptyMovieNode.type = m.constants.ui.contentTypes.video
       emptyMovieNode.id = nextContent.id
-      getSingleContentFromServer(emptyMovieNode, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
+      getSingleContentFromServer(emptyMovieNode, onAutoplaySingleContentResponse, onSingleContentErrorWithoutTracking)
     end if
 
     playVideoContent(content, autoplayType)

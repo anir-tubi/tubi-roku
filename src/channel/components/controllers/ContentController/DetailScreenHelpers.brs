@@ -132,7 +132,6 @@ Function onRefreshContentSignal(msg)
 End Function
 
 
-
 '''''''''''''''''''''
 ' populateDetailScreen
 '
@@ -650,6 +649,9 @@ Function handleRelatedResponse(relatedContent)
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid and relatedContent <> invalid
     if detailScreen.content.id = relatedContent.id
+      'After AutoPlay or refresh required and when pressing back from Player to detail screen
+      'related content(YMAL) thumbnails are not loading. Resetting relatedContent node fixes the issue.
+      detailScreen.relatedContent = invalid
       detailScreen.relatedContent = relatedContent
     end if
   end if
@@ -1634,4 +1636,13 @@ Function getDetailScreenAnalyticsPageInfo(content, constants)
     end if
   end if
   return pageInfo
+End Function
+
+'make getRelatedContent call after autoplay to display the refreshed YMAL content
+Function onAutoplaySingleContentResponse(refreshedContent)
+  detailScreen = getTopDetailScreenFromStack()
+  if refreshedContent <> invalid
+    populateDetailScreen(detailScreen, refreshedContent)
+    getRelatedContent(refreshedContent)
+  end if
 End Function
