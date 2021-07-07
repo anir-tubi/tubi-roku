@@ -28,6 +28,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, callback = inv
     detailScreen.observeFieldScoped("channelSelected", "onDetailScreenChannelSelected")
     detailScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     detailScreen.observeFieldScoped("refreshContent", "onRefreshContentSignal")
+    detailScreen.observeFieldScoped("refreshRelatedContent", "onRefreshRelatedContentSignal")
     detailScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     detailScreen.observeFieldScoped("relatedContentToPlay", "onContentToPlay")
     
@@ -131,6 +132,12 @@ Function onRefreshContentSignal(msg)
   getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
 End Function
 
+'when the content should be refreshed, make getRelatedContent to display the YMAL in detail screen
+Function onRefreshRelatedContentSignal(msg)
+  detailScreen = msg.getRoSGNode()
+  detailScreen.showRelatedContent = false
+  getRelatedContent(detailScreen.content)
+End Function
 
 '''''''''''''''''''''
 ' populateDetailScreen

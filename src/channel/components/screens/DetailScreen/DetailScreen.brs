@@ -160,9 +160,14 @@ Function onScreenFocusChange()
     m.top.backgroundUriList = m.top.backgroundUriList
 
     'determine if the content should be refreshed
-    if shouldRefresh(m.top.content) = true or shouldRefresh(m.top.relatedContent) = true
+    if shouldRefresh(m.top.content) = true
       m.top.refreshContent = true
     end if
+
+    if shouldRefresh(m.top.relatedContent) = true
+      m.RelatedContentGroup.visible = false
+      m.top.refreshRelatedContent = true
+    end if  
   end if
 End Function
 
