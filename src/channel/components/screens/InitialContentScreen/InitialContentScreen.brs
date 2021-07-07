@@ -26,7 +26,6 @@ Function init()
   m.InitialContentMenu = m.top.findNode("InitialContentMenu")
   m.InitialContentProfileMenuItemBground = m.top.findNode("InitialContentProfileMenuItemBground")
   m.InitialContentMenu.focusBitmapBlendColor = theme.focused
-  m.top.observeFieldScoped("focusedChild", "onFocused")
   m.top.observeFieldScoped("animateIntoView", "onAnimateIntoView")
   m.InitialContentMenu.observeField("itemSelected", "onItemSelected")
   m.InitialContentMenu.observeField("itemFocused", "onItemFocused")
@@ -173,6 +172,7 @@ Function onItemFocused()
       '//::NOTE:: the top_nav_component is used for the navigateWithinPageInfo event of the initial content screen
       ' this triggers a navigate_within_page event in ContentController
       m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
         componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", m.previousFocusedButton)
         means_of_navigation: "SCROLL"  'MeansOfNavigation enum 
       
