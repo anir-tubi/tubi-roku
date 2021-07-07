@@ -243,6 +243,7 @@ function playUpNextContent(nextContent, autoplayType)
       video_id: nextContent.id.toInt()
     }
     screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, videoPlayer.trackingComponentInfo)
+    screenTrackingLoad(newTrackingPageInfo)
 
     ' populate the detail screen with the new content while the video is showing so when the user
     ' exits, it's already populated and there is no visible screen re-render. Assume this is only necessary
