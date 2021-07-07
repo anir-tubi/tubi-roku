@@ -150,9 +150,9 @@ Function onConfirmPasswordScreenVisible(msg)
 End Function
 
 
-Function onParentalSettingSelected(msg)
+Function onParentalSettingSelected()
   tubiLog("SettingsScreenHelpers.onParentalSettingSelected")
-  parentalSetting = msg.GetData()
+  parentalSetting = m.settingsScreen.parentalSettingSelected
   if m.settingsScreen.signInInfo <> invalid and m.settingsScreen.signInInfo.signedIn = true
     m.settingsScreen.actionAfterActivation = ""
     if m.global.authInfo <> invalid and parentalSetting <> m.global.authInfo.parentalrating
@@ -185,7 +185,7 @@ Function onParentalSettingSelected(msg)
     dialogEvent = {
       type: "dialog"
       values: {
-        dialog_type: "INFORMATION" 'DialogType enum  TODO: Change this to a PARENTAL_CONTROLS dialogType once it exists in protos
+        dialog_type: "SIGNIN_REQUIRED"
         pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
         dialog_action: "SHOW"
         dialog_sub_type: "sign-in-parental"
@@ -300,7 +300,7 @@ Function onParentalSettingComplete(msg)
     dialogEvent = {
       type: "dialog"
       values: {
-        dialog_type: "INFORMATION" 'DialogType enum  TODO: change to "PARENTAL_CONTROLS" when it is available in protos
+        dialog_type: "SIGNIN_REQUIRED"
         pageOneof: m.Tracking.getAnalyticsPage(m.settingsScreen.trackingPageInfo.pageType, m.settingsScreen.trackingPageInfo.pageValues)
         dialog_action: "SHOW"
         dialog_sub_type: "parental-updated-" + m.settingsScreen.parentalSettingSelected.toStr()
@@ -329,7 +329,7 @@ Function onParentalSettingComplete(msg)
       dialogEvent = {
         type: "dialog"
         values: {
-          dialog_type: "INFORMATION" 'DialogType enum  TODO: Change this to a PARENTAL_CONTROLS dialogType once it exists in protos
+          dialog_type: "SIGNIN_REQUIRED"
           pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
           dialog_action: "SHOW"
           dialog_sub_type: "parental-controls-failure"

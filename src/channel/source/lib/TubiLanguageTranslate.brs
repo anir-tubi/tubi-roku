@@ -347,6 +347,14 @@ Function getTranslation_en_US()
       "description": "description of the error window when there is a general activation code error",
       "message": "We're sorry, but an activation code error occurred."
     },
+    "dialog_parentalPassword_title": {
+      "description": "title of the dialog window when guest user signs in and still needs to enter his/her password to change the parental controls",
+      "message": "Enter your password"
+    },
+    "dialog_parentalPassword_description": {
+      "description": "description of the dialog window when guest user signs in and still needs to enter his/her password to change the parental controls",
+      "message": "Thank you for signing in. To update the parental controls to your desired setting, please enter your password."
+    },
     "dialog_signIn_title": {
       "description": "title of a dialog window when it asks the user to sign in",
       "message": "Please Sign In"
@@ -1254,6 +1262,14 @@ Function getTranslation_es_MX()
     "error_signIn_activationCodeGeneral_description": {
       "description": "description of the error window when there is a general activation code error",
       "message": "Lo sentimos, pero ocurrió un error en el código de activación."
+    },
+    "dialog_parentalPassword_title": {
+      "description": "title of the dialog window when guest user signs in and still needs to enter his/her password to change the parental controls",
+      "message": "Ingresa tu contraseña"
+    },
+    "dialog_parentalPassword_description": {
+      "description": "description of the dialog window when guest user signs in and still needs to enter his/her password to change the parental controls",
+      "message": "Gracias por registrarse. Para actualizar los controles parentales a tu configuración deseada, ingresa tu contraseña."
     },
     "dialog_signIn_title": {
       "description": "title of a dialog window when it asks the user to sign in",

@@ -679,6 +679,26 @@ Function onParentalControlAfterSignIn()
   if currentScreen <> invalid and currentScreen.getSubtype() = "SettingsScreen"
     setSettingsScreenSignInInfo()
     currentScreen.setFocus(true)
+
+    '//before signing in, the user selected a new parental setting, so take user to parental change screen
+    setUiModeFromState()  '//in case the user cancels out of the confirm password screen, ensure the mode matches with the newly signed in user's saved mode 
+    onParentalSettingSelected()
+
+
+    '//After the user signs in, display a modal so user knows they also need to enter their password to finish changing the parental control settings 
+    sTitle = getTranslation("dialog_parentalPassword_title")
+    sDescription = getTranslation("dialog_parentalPassword_description")
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "SIGNIN_REQUIRED"
+        pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "password-request"
+      }
+    } 
+
+    showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
   end if
   
 End Function

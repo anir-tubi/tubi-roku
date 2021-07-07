@@ -228,6 +228,14 @@
     "description": "description of the error window when there is a general activation code error",
     "message": "We're sorry, but an activation code error occurred."
   },
+  "dialog_parentalPassword_title": {
+    "description": "title of the dialog window when guest user signs in and still needs to enter his/her password to change the parental controls",
+    "message": "Enter your password"
+  },
+  "dialog_parentalPassword_description": {
+    "description": "description of the dialog window when guest user signs in and still needs to enter his/her password to change the parental controls",
+    "message": "Thank you for signing in. To update the parental controls to your desired setting, please enter your password."
+  },
   "dialog_signIn_title": {
     "description": "title of a dialog window when it asks the user to sign in",
     "message": "Please Sign In"
