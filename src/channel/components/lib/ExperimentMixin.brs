@@ -11,7 +11,7 @@ Function getExperimentResource(namespaceName as string, experimentName as string
     if m.constants = invalid
       m.constants = m.global.constants
     end if
-    request = TubiRequest(m.constants.settings.mode)
+    request = TubiRequest(m.constants.settings)
     experiments = TubiExperiments(m.constants)
     oMoreInfoReturn = experiments.getExperimentResource(namespaceName, experimentName)
     if sendEvent = true

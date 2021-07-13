@@ -20,13 +20,13 @@ Function init()
   '//When ContentController initializes, clear all trandslations in case this is contained in a remote component. 
   clearTranslations()
 
-  Request = TubiRequest(m.constants.settings.mode)
-  Auth = TubiAuth(m.constants, Request)
+  m.Request = TubiRequest(m.constants.settings)
+  Auth = TubiAuth(m.constants, m.Request)
   m.NodeHelpers = TubiNodeHelpers()
-  m.Bookmarks = TubiBookmarks(Request, Auth, m.constants, m.NodeHelpers)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.Bookmarks = TubiBookmarks(m.Request, Auth, m.constants, m.NodeHelpers)
+  m.Tracking = TubiTracking(m.constants, m.Request, Auth)
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
-  m.cmsApi = CmsApi(m.constants, Request, Auth)
+  m.cmsApi = CmsApi(m.constants, m.Request, Auth)
   m.userDeviceApi = UserDeviceApi(m.constants)
 
   m.background = m.top.findNode("ContentBackground")
@@ -1565,8 +1565,10 @@ Function onCustomResume(msg)
   lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
 
   if getExperimentResource("roku_instant_resume", "roku_instant_resume_v1", true).enabled = true
-    Request = TubiRequest(m.constants.settings.mode)
-    Auth = TubiAuth(m.constants, Request)
+    if m.Request = invalid 
+      m.Request = TubiRequest(m.constants.settings)
+    end if
+    Auth = TubiAuth(m.constants, m.Request)
     guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
 
     if customResumeArgs.contentId <> invalid and customResumeArgs.mediaType <> invalid

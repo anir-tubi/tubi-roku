@@ -3,7 +3,7 @@
 '@Setup
 Function CmsApiSetup()
   constants = getConstants()
-  request = TubiRequest(constants.settings.mode)
+  request = TubiRequest(constants.settings)
   auth = TubiAuth(constants, request)
   m.cmsApi = CmsApi(constants, request, auth)
 End function

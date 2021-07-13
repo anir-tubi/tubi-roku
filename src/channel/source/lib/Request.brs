@@ -1,6 +1,8 @@
-Function TubiRequest(configMode = "production")
+Function TubiRequest(settings = {mode: "production",CharlesProxyEnabled: false })
   return {
-    configMode: configMode
+    configMode: settings.mode
+    charlesProxyEnabled: settings.charlesProxyEnabled
+    charlesProxyUrl:settings.charlesProxyUrl
     createAsync: createAsyncHTTPRequest
     start: tubihttp_start
     handleEvent: tubihttp_handleEvent
@@ -9,7 +11,10 @@ Function TubiRequest(configMode = "production")
     cancel: tubihttp_cancel
     isHttps: tubihttp_isHttps_
     addParamsToUrl: tubihttp_addParamsToUrl_
-    getLocale: tubihttp_getLocale_
+    getLocale: tubihttp_getLocale_ 
+    passThroughCharlesProxy: tubihttp_passThroughCharlesProxy 
+    removeCharlesProxy: tubihttp_removeCharlesProxy
+
   }
 End Function
 
@@ -69,11 +74,11 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     end if
     
   end for
-  
+
   o = {
     ' public
     isHttps: m.isHttps(url) ' boolean, not member function
-    url: url
+    url: m.passThroughCharlesProxy(url)
     start: m.start
     handleEvent: m.handleEvent
     hasData: m.hasData
@@ -90,6 +95,9 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     urltransfer: invalid
     klass: "TubiAsyncHTTPRequest"   ' Just a sentinel for verification by Request Queue
     configMode: m.configMode
+    charlesProxyEnabled: m.charlesProxyEnabled
+    charlesProxyUrl: m.charlesProxyUrl
+    passThroughCharlesProxy: m.passThroughCharlesProxy
   }
   o.Append(mergedOptions)
   return o
@@ -124,9 +132,10 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   end if
 
   if m.params.Count() > 0  and isRetry = false then
-    fullUrl = m.addParamsToUrl_(m.url, m.params)
-    m.urltransfer.SetUrl(fullUrl)
-    m.url = fullUrl
+    fullUrl = m.addParamsToUrl_(m.url, m.params) 
+    fulProxyUrl = m.passThroughCharlesProxy(fullUrl)
+    m.urltransfer.SetUrl(fulProxyUrl)  
+    m.url = fulProxyUrl
   else
     m.urltransfer.SetUrl(m.url)
   end if
@@ -140,9 +149,14 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   m.urltransfer.setRequest(m.method)
 
   ' print output for qa to test
-  if m.configMode = "qa" or m.configMode = "staging"
-    tubiLog("sending a " + m.method + " request to " + m.url)
+  if m.configMode = "qa" or m.configMode = "staging" 
+    tubiLog("sending a " + m.method + " request to " + m.url)  
     print m.body
+  end if
+
+  if (m.configMode <> "production") and m.charlesProxyEnabled
+    m.urltransfer.enablePeerVerification(false)
+    m.urltransfer.enableHostVerification(false)
   end if
 
   ' Start the request
@@ -388,4 +402,31 @@ Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
 
   return url
 End Function
+
+Function tubihttp_passThroughCharlesProxy(url as String) as string
+  proxyedurl = url
+  if m.charlesProxyEnabled
+    if m.configMode <> "production" and m.charlesProxyUrl <> ""
+      reg_exp = CreateObject("roRegex", "^(http|https)://", "")
+      checkurlAA = reg_exp.Split(url)
+      if checkurlAA[1] <> invalid and Len(checkurlAA[1]) > 0 and url.instr(m.charlesProxyUrl) = -1
+        proxyedurl = m.charlesProxyUrl + "/;;" + url
+      end if
+    end if
+  end if
+  return proxyedurl
+End Function
+
+
+Function tubihttp_removeCharlesProxy(proxyedurl as String) as String
+  returnUrl = proxyedurl
+  if m.charlesProxyEnabled
+    if m.configMode <> "production" and proxyedurl <> "" and m.charlesProxyUrl <> ""
+      proxyAddress = m.charlesProxyUrl + "/;;"
+      returnUrl = proxyedurl.Replace(proxyAddress, "")
+    end if
+  end if
+  return returnUrl
+End Function
+
 

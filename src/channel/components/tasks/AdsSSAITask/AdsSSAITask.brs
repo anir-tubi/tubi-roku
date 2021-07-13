@@ -11,7 +11,7 @@ Function execAdsSSAITask()
 
   'a port used for sending requests
   m.ssaiPort = CreateObject("roMessagePort")
-  m.request = TubiRequest(m.constants.settings.mode)
+  m.request = TubiRequest(m.constants.settings)
   requestQueueLib = TubiRequestQueue()
   m.requestQueue = requestQueueLib.create(m.ssaiPort)
 

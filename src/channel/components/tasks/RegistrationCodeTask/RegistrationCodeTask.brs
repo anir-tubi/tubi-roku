@@ -5,7 +5,7 @@ End Function
 Function registrationLoop() As Void
   tubiLog("RegistrationCodeTask.registrationLoop")
   constants = m.global.constants 'single thread-local reference to avoid thread rendezvous
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   pollFailureCount = 0
   maxConsecPollFailures = m.top.maxConsecPollFailures
   

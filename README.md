@@ -499,6 +499,53 @@ If you need to get the latest translations from the Crowdin servers, then create
 NOTE: Instead of passing the crowdin key, you can set the crowdin key as system environment variable labeled as"ROKU_CROWDIN_KEY". This is actually the prefered way of doing things. Check your system on how to create an environment variable. Also note, that the crowdin key can be gotten either from the company's LastPass Account or through the [Crowdin website](https://crowdin.com/project/tubiapps/settings#api).
 
 
+# Charles Proxy
+
+Roku app integration with Charles proxy. 
+
+  
+
+##  Requirements:
+
+  
+
+--   Both  the computer and the Roku need to be on the same network.
+-- Charles installed (https://www.charlesproxy.com/download/)
+
+##  Charles Setup:
+
+  
+
+--   In the project root there is file called [CharlesRewrites.xml](https://github.com/adRise/project-total-recall/blob/master/CharlesRewrites.xml).  This file is used to import the required rewrites into Charles. 
+
+#### Rewrite
+
+Open the Charles and make a note of local ip address (help->local ip address)
+
+Then go to Tools > Rewrite > Import. From here navigate to the project root and open the  [CharlesRewrites.xml](/docs/CharlesRewrites.xml)
+
+IMP: Now Click on each rewrite rule and change the ip address(192.168.68.57) to local ip address noted above.  ![CharlesRokurewrite](/docs/Charles_roku_rewrite.png)](/docs/Charles_roku_rewrite.png)
+
+(It is also worth noting that if you have changed the port Charles is running on you will need to update the `8888` value to what ever you have configured in Charles.)
+
+#### Settings
+
+ Go to Proxy > Proxy Settings and in the  `HTTP Proxy`  area you will need to turn on the following:
+
+-   `Enable transparent HTTP proxying`
+
+## Roku Setup
+
+Now that Charles is setup and ready to receive requests from your Roku , please insert following in your dev.yml
+```
+charlesProxyUrl: "http://{{localHostAddress}}:8888"
+charlesProxyEnabled: true
+
+
+If set up correctly the first time your Roku sends a request to Charles, Charles will ask you to approve the connection. Just click `Allow` and you should see the traffic in Charles(except Youbora and Santry related traffic).
+
+
+
 # Contributing
 
 See [CONTRUBUTING.md](CONTRIBUTING.md)

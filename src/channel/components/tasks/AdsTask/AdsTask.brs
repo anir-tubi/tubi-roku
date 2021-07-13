@@ -6,7 +6,7 @@ End Function
 
 Function execAdsTask()
   constants = m.global.constants
-  request = TubiRequest(constants.settings.mode)
+  request = TubiRequest(constants.settings)
   requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
   log = TubiLogger(constants, request, auth)

@@ -6,7 +6,7 @@ Function execGetChannelMetadata() As Void
   tubiLog("ChannelsCategoriesMetadataTask.execGetDetailMetadata()")
 
   constants = m.global.constants
-  RequestModule = TubiRequest(constants.settings.mode)
+  RequestModule = TubiRequest(constants.settings)
   AuthModule = TubiAuth(constants, RequestModule)
   cms = CmsApi(constants, RequestModule, AuthModule)
   translate = TubiMetadataTranslate(constants)

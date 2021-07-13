@@ -35,7 +35,7 @@ Function onUrlRequest()
       ' (experiment tracking should not happen here. It should happen when the user encounters the experiment!)
       '-------------------------------------------------------------------------------------'
       ' experiment example: 
-      ' request = TubiRequest(m.constants.settings.mode)
+      ' request = TubiRequest(m.constants.settings)
       ' experiments = TubiExperiments(m.constants)
       ' sideNavEnabled = m.experiments.getExperimentResource("RokuNamespace", "roku_side_nav").enabled
       ' if sideNavEnabled = true

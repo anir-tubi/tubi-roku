@@ -52,13 +52,16 @@ function formatBuildTag(build, isMinor, isDot) {
 /**
  * load configuration. env specific environment will override defaults.
  *
- * @param env: environment, dev, staging, or production
+ * @param options: object with at least the keys 'env' (as "production", "qa", etc.), and "port"
  * @returns {*}
  */
-function load(env) {
+function load(options) {
+  const env = options.config
+  const { port } = options
   const build = parse(buildProfile);
   const templateValues = {
-    localHostUri: `${localIp}:8090`,
+    localHostAddress: `${localIp}`,
+    localHostUri: `${localIp}:${port}`,
     versionUnderscored: formatBuildTag(build, false, false),
     versionMinorUnderscored: formatBuildTag(build, true, false),
     versionMinorDotted: formatBuildTag(build, true, true),

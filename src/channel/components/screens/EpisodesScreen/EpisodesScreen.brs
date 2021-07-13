@@ -1,7 +1,7 @@
 Function init()
   tubiLog("EpisodesScreen.init")
   m.constants = m.global.constants
-  Request = TubiRequest(m.constants.settings.mode)
+  Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.Info = m.top.findNode("InfoPanel")

@@ -5,7 +5,7 @@ Function init()
   m.constants = m.global.constants
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
-  Request = TubiRequest(m.constants.settings.mode)
+  Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 

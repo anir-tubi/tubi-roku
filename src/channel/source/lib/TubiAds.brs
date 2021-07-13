@@ -156,12 +156,12 @@ end function
 ' ----------------------------------------------
 ' @episode: node, TubiContentNode for a video (movie or episode)
 ' @breakPos: integer, the preroll or midroll playback position at which the break occurs
-function tubiAds_populateUrlRainmaker(episode, breakPos = 0) As String
+Function tubiAds_populateUrlRainmaker(episode, breakPos = 0) As String
   params = m.getRainmakerParams(episode, breakPos)
   baseUrl = m.constants.urls.adsBaseUrlRainmaker + m.constants.analyticsPlatform
-
-  return m.request.addParamsToUrl(baseUrl, params)
-end function
+  paramAddedUrl = m.request.addParamsToUrl(baseUrl, params)
+  return m.request.passThroughCharlesProxy(paramAddedUrl)
+End Function
 
 
 ' returns an assocArray of all parameters that should be sent to rainmaker
@@ -249,7 +249,6 @@ function tubiAds_getAdsListViaRoku(episode, breakPos)
 
   'set the url for the Roku Advertising Framework
   m.roAdFramework.setAdUrl(url)
- 
   'get the array of ad units back from the Roku Advertising Framework(RAF)
   'adUnits are called adPods in RAF documentation
   adFetchTimer = CreateObject("roTimeSpan")

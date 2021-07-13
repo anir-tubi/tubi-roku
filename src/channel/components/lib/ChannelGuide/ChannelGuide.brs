@@ -1,6 +1,6 @@
 Function init()
   m.constants = getConstantsFromGlobal()
-  Request = TubiRequest(m.constants.settings.mode)
+  Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 

@@ -24,7 +24,7 @@ End Function
 Function parseSignUpSuccess(fullResponse, requestNode)
   parsedResponse = fullResponse.data
   parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
-  requestModule = TubiRequest(m.constants.settings.mode)
+  requestModule = TubiRequest(m.constants.settings)
   authModule = TubiAuth(m.constants, requestModule)
   authModule.handleRegistration(parsedResponse)
   return parsedResponse
@@ -49,7 +49,7 @@ End Function
 Function parseSignInSuccess(fullResponse, requestNode)
   parsedResponse = fullResponse.data
   parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
-  requestModule = TubiRequest(m.constants.settings.mode)
+  requestModule = TubiRequest(m.constants.settings)
   authModule = TubiAuth(m.constants, requestModule)
   authModule.handleRegistration(parsedResponse)
   return parsedResponse

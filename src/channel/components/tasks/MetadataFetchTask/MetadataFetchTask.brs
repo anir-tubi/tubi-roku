@@ -39,7 +39,7 @@ Function fetchLoop()
   m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments)
 
   ' Prepare the auth module
-  m.Request = TubiRequest(m.constants.settings.mode)
+  m.Request = TubiRequest(m.constants.settings)
   m.Auth = TubiAuth(m.constants, m.Request)  
   m.CmsApi = CmsApi(m.constants, m.Request, m.Auth)
   m.NodeHelpers = TubiNodeHelpers()

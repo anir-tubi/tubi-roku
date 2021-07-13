@@ -8,7 +8,7 @@ End Function
 Function execInitializeUserData()
   tubiLog("AuthTask.execInitializeUserData")
   constants = m.global.constants
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
@@ -48,7 +48,7 @@ End Function
 Function execRefreshAuthInfo()
   tubiLog("AuthTask.execRefreshAuthInfo")
   constants = m.global.constants
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   newAuthInfo = invalid
 
@@ -66,7 +66,7 @@ End Function
 Function execSignOut()
   tubiLog("AuthTask.execSignOut")
   constants = m.global.constants 'single thread-local reference to avoid thread rendevue
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
 
@@ -87,7 +87,7 @@ End Function
 Function addToQueue()
   tubiLog("AuthTask.addToQueue")
   constants = m.global.constants
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
@@ -132,7 +132,7 @@ End Function
 Function removeFromQueue()
   tubiLog("AuthTask.removeFromQueue")
   constants = m.global.constants
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
@@ -166,7 +166,7 @@ End Function
 Function removeFromHistory()
   tubiLog("AuthTask.removeFromHistory")
   constants = m.global.constants
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
@@ -217,7 +217,7 @@ End Function
 Function updateHistory()
   tubiLog("AuthTask.updateHistory")
   constants = m.global.constants
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
@@ -313,7 +313,7 @@ End Function
 Function updateParentalSetting()
   tubiLog("AuthTask.updateParentalSetting")
   constants = m.global.constants
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
@@ -341,7 +341,7 @@ End Function
 Function execGetUserInfo()
   tubiLog("AuthTask.getUserInfo")
   constants = m.global.constants
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)

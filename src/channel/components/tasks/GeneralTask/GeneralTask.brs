@@ -18,7 +18,7 @@ Function listen()
   m.requestTypes = {}
   createParsingCallbacks()
   
-  requestModule = TubiRequest(m.constants.settings.mode)
+  requestModule = TubiRequest(m.constants.settings)
   authModule = TubiAuth(m.constants, requestModule)
 
   while (true)

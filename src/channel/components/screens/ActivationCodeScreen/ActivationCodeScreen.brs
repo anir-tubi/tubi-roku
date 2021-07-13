@@ -1,7 +1,7 @@
 Function init()
   m.trackingLoggingTask = m.global.trackingLoggingTask
   m.constants = m.global.constants
-  Request = TubiRequest(m.constants.settings.mode)
+  Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.top.observeField("focusedChild", "onScreenFocusChange")

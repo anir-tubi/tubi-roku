@@ -12,6 +12,8 @@ settings:
   migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"
   suitest: false
   noAds: false
+  charlesProxyEnabled: false
+  charlesProxyUrl: ""
 
 manifest:
   title: "Tubi"

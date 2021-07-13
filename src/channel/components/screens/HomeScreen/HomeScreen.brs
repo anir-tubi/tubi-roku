@@ -2,7 +2,7 @@ Function init()
   tubiLog("HomeScreen.init")
   m._ = rodash()
   m.constants = m.global.constants
-  Request = TubiRequest(m.constants.settings.mode)
+  Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.trackingLoggingTask = m.global.trackingLoggingTask
   m.Tracking = TubiTracking(m.constants, Request, Auth)

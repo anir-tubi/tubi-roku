@@ -11,13 +11,13 @@ bluebird.promisifyAll(fs);
 /**
  * generate manifest file based on the manifest section
  *
- * @param env: environment, dev, staging, or production
+ * @param options: object with at least the keys 'env' (as "production", "qa", etc.), and "port"
  * @param filename
  * @param manifestName
  */
-function createManifest(env, filename, manifestName) {
+function createManifest(options, filename, manifestName) {
   fs.openAsync(filename, 'w').then(fd => {
-    const data = load(env)[manifestName];
+    const data = load(options)[manifestName];
     const content = Object.keys(data).map(key => {
       return `${key}=${data[key]}`;
     }).join('\n');
@@ -45,11 +45,11 @@ function createManifest(env, filename, manifestName) {
  *   }
  * end Function
  *
- * @param env: environment, dev, staging, or production
+ * @param options: object with at least the keys 'env' (as "production", "qa", etc.), and "port"
  * @param filename: output filename
  */
-function createSettings(env, filename) {
-  const data = load(env);
+function createSettings(options, filename) {
+  const data = load(options);
   fs.openAsync(filename, 'w').then(fd => {
     const functions = Object
         .keys(data)

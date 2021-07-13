@@ -7,7 +7,7 @@ Function execSignUp() As Void
   tubiLog("SignUpTask.execSignUp")
   constants = m.global.constants 'single thread-local reference to avoid thread rendezvous
   
-  Request = TubiRequest(constants.settings.mode)
+  Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   port = CreateObject("roMessagePort")
   

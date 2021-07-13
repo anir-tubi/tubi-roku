@@ -10,7 +10,7 @@ Function sendExposureEvent()
 
   port = CreateObject("roMessagePort")
   
-  m.request = TubiRequest(m.constants.settings.mode)
+  m.request = TubiRequest(m.constants.settings)
   m.auth = TubiAuth(m.constants, m.request)
   m.tracking = TubiTracking(m.constants, m.request, m.auth)
   

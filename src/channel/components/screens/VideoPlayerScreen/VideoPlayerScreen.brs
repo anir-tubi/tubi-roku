@@ -41,7 +41,7 @@ Function init()
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
   m.theme = m.global.theme
-  Request = TubiRequest(m.constants.settings.mode)
+  Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.Loading = m.top.findNode("Loading")

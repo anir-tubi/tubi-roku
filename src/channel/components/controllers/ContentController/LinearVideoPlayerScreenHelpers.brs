@@ -240,13 +240,12 @@ Function onLiveStreamManifestResponse(response)
             ' provided by UAPI. We get the original YoSpace stream url from the "location" header since
             ' it is a redirect.
             if response.headers <> invalid and response.headers.location <> invalid
-              originalUrl = response.headers.location
+              originalUrl = m.request.removeCharlesProxy(response.headers.location) ' Remove Charles proxy appended by Charles rule for clean redirect.
             else 
               originalUrl = resource.url
             end if
-
             modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
-            newResource.url = modifiedUrl
+            newResource.url = m.request.passThroughCharlesProxy(modifiedUrl)
           end if
         end if
 

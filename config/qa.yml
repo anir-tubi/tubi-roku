@@ -14,3 +14,7 @@ settings:
   #Set to 0 to see age gate every time the app is opened.
   #Also controls instant resume timeout for signed out users
   coppaHasAgeDuration: 60
+
+  #To enable the Charles Proxy, set CharlesProxyEnabled true 
+  charlesProxyUrl: "http://{{localHostAddress}}:8888"
+  charlesProxyEnabled: false

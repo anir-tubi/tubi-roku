@@ -230,7 +230,7 @@ Function onAgeVerified(age)
   tubiLog("AgeVerificationScreen.onAgeVerified")
   m.spinner.visible = true
 
-  Request = TubiRequest(m.constants.settings.mode)
+  Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
 
   if m.global.authInfo <> invalid and age >= m.constants.ui.ages.ageGate
@@ -272,7 +272,7 @@ End Function
 Function onAgeNotVerified(err, tryAgainCallback, continueCallback)
   tubiLog("AgeVerificationScreenHelpers.onAgeNotVerified")
   if err <> invalid and err.code <> invalid
-    Request = TubiRequest(m.constants.settings.mode)
+    Request = TubiRequest(m.constants.settings)
     Auth = TubiAuth(m.constants, Request)
     
     if err.code = 422 or err.code = 451
@@ -352,7 +352,7 @@ End Function
 Function onBirthdayCheckSuccess(hasAgeInfo)
   tubiLog("AgeVerificationScreenHelpers.onBirthdayCheckSuccess")
   if hasAgeInfo <> invalid and hasAgeInfo.hasAge = true
-    Request = TubiRequest(m.constants.settings.mode)
+    Request = TubiRequest(m.constants.settings)
     Auth = TubiAuth(m.constants, Request)
     updatedAuthInfo = Auth.updateAuthInfoWithAge(true)
     m.global.authInfo = updatedAuthInfo
@@ -374,7 +374,7 @@ Function onBirthdayCheckError(errorInfo)
   tubiLog("AgeVerificationScreenHelpers.onBirthdayCheckError")
   if errorInfo <> invalid
     code = errorInfo.code
-    Request = TubiRequest(m.constants.settings.mode)
+    Request = TubiRequest(m.constants.settings)
     Auth = TubiAuth(m.constants, Request)
 
     if code = 422 or code = 451

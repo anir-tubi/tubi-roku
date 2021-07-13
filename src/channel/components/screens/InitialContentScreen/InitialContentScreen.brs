@@ -2,7 +2,7 @@ Function init()
   m.constants  = getConstantsFromGlobal()
   theme = getThemeFromGlobal()
   
-  Request = TubiRequest(m.constants.settings.mode)
+  Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 

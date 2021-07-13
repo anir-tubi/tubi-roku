@@ -156,8 +156,8 @@ function buildInstalled() {
   let build = new Promise((res, rej) => {
     /* Installed bundle */
     mkdirp.sync(`${process.env.PWD}/build/local/source`);
-    createSettings(options.config, 'build/local/source/Settings.brs');
-    createManifest(options.config, 'build/local/manifest', 'manifest');
+    createSettings(options, 'build/local/source/Settings.brs');
+    createManifest(options, 'build/local/manifest', 'manifest');
 
     let sources = [
       'src/channel/**/*',
@@ -216,8 +216,8 @@ function buildStarter() {
   let build = new Promise((res, rej) => {
     /* Installed bundle */
     mkdirp.sync(`${process.env.PWD}/build/starter/source`);
-    createSettings(options.config, 'build/starter/source/Settings.brs');
-    createManifest(options.config, 'build/starter/manifest', 'starter_library_manifest');
+    createSettings(options, 'build/starter/source/Settings.brs');
+    createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
 
     // touch the main.brs, can be empty for starter components
     fs.closeSync(fs.openSync('build/starter/source/main.brs', 'w'));
@@ -312,7 +312,7 @@ function buildRemote() {
   let build = new Promise((res, rej) => {
     mkdirp.sync(`${process.env.PWD}/build/remote/source`);
     mkdirp.sync(`${process.env.PWD}/build/remote/images`);
-    createManifest(options.config, 'build/remote/manifest', 'component_library_manifest');
+    createManifest(options, 'build/remote/manifest', 'component_library_manifest');
 
     // touch the main.brs, can be empty for remote components
     fs.closeSync(fs.openSync('build/remote/source/main.brs', 'w'));
@@ -549,7 +549,7 @@ function packageRemote(done) {
 
 function conditionalPackage(done) {
   let { config } = options
-  let { settings } = load(config);
+  let { settings } = load(options);
 
   const configsNotPkgd = {
     dev: true,
