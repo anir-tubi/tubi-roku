@@ -793,20 +793,13 @@ End Function
 
 Function displayChannelGuide()
   animateGuide("in")
-  bRefreshChannels = true
-  if m.top.channelsContent <> invalid
-    if shouldRefresh(m.top.channelsContent.getChild(0)) = false  'cacheValidationMixin
-      bRefreshChannels = false
-    end if
-  end if
 
-  if bRefreshChannels = true
+  if m.top.channelsContent = invalid or shouldRefresh(m.top.channelsContent.getChild(0)) = true
     m.top.refreshChannels = true
     m.channelsGuideGroup.display = false
-  else 
-    '//display the channels guide
+  else
     displayChannelGuideList()
-  end if 
+  end if
 End Function
 
 
