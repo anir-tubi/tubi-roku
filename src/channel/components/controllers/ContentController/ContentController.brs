@@ -1525,14 +1525,16 @@ End Function
 ' onCustomSuspend will be triggered when user presses Home/Labeled channel key
 ' Checking appExit reason and starting the appSuspendTimer in order to validate during resumeHandler callback
 Function onCustomSuspend(msg)
-
+  tubiLog("ContentController.onCustomSuspend")
   customSuspendArgs = msg.getData()
+
   if customSuspendArgs.lastSuspendOrResumeReason = "home"
     m.appSuspendTimer.Mark()
     currentScreen = getCurrentScreen()
     ' if the current screen is videoplayer, return to detail screen so that it will update historyPosition and remove video screen from stack and show previous screen from stack
     if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
       ' don't send analytics event when user presses "home" button during playback, so sending param as false
+      stopVideoContent(currentScreen)
       returnToDetailScreenFromVideo(false)
     else
       ' if the focus is on live news row, stop the playback
@@ -1542,7 +1544,6 @@ Function onCustomSuspend(msg)
       end if
     end if
   end if
-
 End Function
 
 
@@ -1555,41 +1556,47 @@ End Function
 ' it resumes app where the user left off or suspended.
 ' also it restarts app every 4 days to retrieve starter/remote components
 Function onCustomResume(msg)
-
   tubiLog("ContentController.onCustomResume")
-  customResumeArgs = msg.getData()
+  args = msg.getData()
 
-  currentScreen = getCurrentScreen()
+  if args <> invalid
+    if args.lastSuspendOrResumeReason = "home" and args.launchParams <> invalid
+      customResumeArgs = args.launchParams
+      currentScreen = getCurrentScreen()
 
-  lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
-  lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
+      lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
+      lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
 
-  if getExperimentResource("roku_instant_resume", "roku_instant_resume_v1", true).enabled = true
-    if m.Request = invalid 
-      m.Request = TubiRequest(m.constants.settings)
+      if getExperimentResource("roku_instant_resume", "roku_instant_resume_v2", true).enabled = true
+        if m.Request = invalid 
+          m.Request = TubiRequest(m.constants.settings)
+        end if
+        Auth = TubiAuth(m.constants, Request)
+        guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
+
+        if customResumeArgs.contentId <> invalid and customResumeArgs.mediaType <> invalid
+          ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
+          ' lots of edge cases, so for consistency, restarting the app is easiest.
+          restartApp()
+        else if m.global.authInfo = invalid and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4)
+          ' For guest users, if the time between last suspend and current resume is more than 24 hours, 
+          ' disable Instant Resume & relaunch app from scratch.
+          ' Also every 4 days once the app restarts in order to get starter/remote components
+          restartApp()
+        else if m.global.authInfo <> invalid and lastAppRestartInDays >= 4
+          ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
+          restartApp()
+        else
+          resumeApp(customResumeArgs)
+        end if
+      else
+        restartApp()
+      end if
+    else if args.lastSuspendOrResumeReason = "screensaver"
+      ' Do nothing, but leave this as a place holder.
+      ' The app will resume as normal for the screensaver.
     end if
-    Auth = TubiAuth(m.constants, m.Request)
-    guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
-
-    if customResumeArgs.contentId <> invalid and customResumeArgs.mediaType <> invalid
-      ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
-      ' lots of edge cases, so for consistency, restarting the app is easiest.
-      restartApp()
-    else if m.global.authInfo = invalid and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4)
-      ' For guest users, if the time between last suspend and current resume is more than 24 hours, 
-      ' disable Instant Resume & relaunch app from scratch.
-      ' Also every 4 days once the app restarts in order to get starter/remote components
-      restartApp()
-    else if m.global.authInfo <> invalid and lastAppRestartInDays >= 4
-      ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
-      restartApp()
-    else
-      resumeApp(customResumeArgs)
-    end if
-  else
-    restartApp()
   end if
-
 End Function
 
 

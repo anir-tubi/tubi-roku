@@ -344,6 +344,7 @@ Function onControlChange()
   else if m.top.control = "stop" then
     cancelReplayCaptions()
     stopVideo()
+    animateTransport("out")
 
     m.UpNext.stopAutoPlayTimer = true
     m.UpNext.hide = true

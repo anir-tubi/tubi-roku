@@ -41,9 +41,9 @@ End Function
 ' if exists, then triggers customResume callback to make necessary action
 Function customResume(args)
 
-  if args <> invalid and args.launchParams <> invalid
+  if args <> invalid
     if m.contentController <> invalid
-      m.contentController.customResume = args.launchParams
+      m.contentController.customResume = args
     end if
   end if
   
