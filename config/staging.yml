@@ -5,4 +5,3 @@ settings:
   mode: "staging"
   starterComponentsUrl: "https://s3-us-west-1.amazonaws.com/adrise-bryan-playground/roku-staging/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
   remoteComponentsUrl: "https://s3-us-west-1.amazonaws.com/adrise-bryan-playground/roku-staging/components/tubi_remote_components_{{versionUnderscored}}.pkg"
-  
