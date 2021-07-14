@@ -609,7 +609,7 @@ Function startCountdownTimer()
   if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.newsScreen)
     stopCountdownTimer()
     '//Start/reset timer to play video in fullscreen after a few seconds
-    homeScreen.fullscreenCountdown =  m.constants.timers.linearFullscreenTimeout
+    homeScreen.fullscreenCountdown =  getExperimentResource("roku_linear_countdown_timer", "roku_linear_countdown_timer_v1", true).countdown_timer
     m.playerFullscreenCountdownTimer.control = "start"
   end if
 End Function

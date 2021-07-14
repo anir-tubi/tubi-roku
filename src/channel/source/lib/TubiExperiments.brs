@@ -38,7 +38,11 @@ Function TubiExperiments(constants) as Object
       
       roku_postplayexp_aptimer_5sec: {
         roku_postplayexp_aptimer_5sec_v1: {"ap_timer": 30}
-      }    
+      }
+
+      roku_linear_countdown_timer: {
+        roku_linear_countdown_timer_v1: {"countdown_timer": 10}
+      }
     }
     
     'public methods
