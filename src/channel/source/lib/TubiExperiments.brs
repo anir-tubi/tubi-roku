@@ -43,6 +43,10 @@ Function TubiExperiments(constants) as Object
       roku_linear_countdown_timer: {
         roku_linear_countdown_timer_v1: {"countdown_timer": 10}
       }
+
+      roku_horizontal_fixed_focus:{
+        roku_horizontal_fixed_focus_v1: {"enabled": false}
+       }
     }
     
     'public methods

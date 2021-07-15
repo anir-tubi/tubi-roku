@@ -10,6 +10,9 @@ Function init()
   m.top.observeField("repopulateContent", "onRepopulateContent")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
   m.RowList = m.top.findNode("RowList")
+  if getExperimentResource("roku_horizontal_fixed_focus", "roku_horizontal_fixed_focus_v1", true).enabled = true
+    m.RowList.rowFocusAnimationStyle = "fixedFocus"
+  end if
   m.RowList.observeField("rowItemFocused", "onRowItemFocused")
   m.RowList.observeField("rowItemSelected", "onRowItemSelected")
 

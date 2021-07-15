@@ -11,6 +11,9 @@ Function init()
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
 
   m.RowList = m.top.findNode("RowList")
+  if getExperimentResource("roku_horizontal_fixed_focus", "roku_horizontal_fixed_focus_v1", false).enabled = true
+    m.RowList.rowFocusAnimationStyle = "fixedFocus"
+  end if
   m.RowList.observeField("rowItemSelected", "onEpisodeSelected")
   m.RowList.observeField("rowItemFocused", "onEpisodeFocused")
   m.Menu = m.top.findNode("EpisodeMenu")
