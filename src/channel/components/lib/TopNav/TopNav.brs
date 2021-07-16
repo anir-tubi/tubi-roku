@@ -49,8 +49,12 @@ Function draw()
   setMainContent(m.constants.ui.sideNavIds.movies, rowNode, aItemWidths) 
   nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(1)
   setMainContent(m.constants.ui.sideNavIds.tv, rowNode, aItemWidths)
-  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(2)
-  setMainContent(m.constants.ui.sideNavIds.news, rowNode, aItemWidths)
+  
+  if m.top.isNewsAllowed = true
+    nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(2)
+    setMainContent(m.constants.ui.sideNavIds.news, rowNode, aItemWidths)
+  end if
+  
   nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + nMenuOutsideSpacing
 
   m.MenuBground.width = nBgroundWidth
