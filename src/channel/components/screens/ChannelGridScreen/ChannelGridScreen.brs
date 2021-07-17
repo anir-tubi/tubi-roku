@@ -154,6 +154,7 @@ Function onLoadContent()
   if m.top.content <> invalid
     items = m.top.content
     m.contentLoadedAndFocused = false
+    getExperimentResource("roku_channels_list_page", "roku_channels_list_page_v1")
     m.ChannelCategoryGrid.content = items
   end if
 End Function

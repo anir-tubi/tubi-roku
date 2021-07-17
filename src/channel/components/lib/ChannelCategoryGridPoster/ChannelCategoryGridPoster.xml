@@ -4,6 +4,9 @@
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs"/>
+  <script type="text/brightscript" uri="../ExperimentMixin.brs"/>
 
   <interface>
     <field id="itemContent" type="node" />
@@ -15,6 +18,10 @@
   </interface>
 
   <children>
+    <Rectangle
+     id="PosterRect" 
+     opacity="1"
+     color = "0x252A35" />  
     <Poster
      id="Poster"
      opacity="0.5"
