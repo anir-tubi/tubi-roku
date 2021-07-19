@@ -4,6 +4,7 @@
   <script type="text/brightscript" uri="SearchScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
@@ -102,10 +103,6 @@
           </Label>
         </LayoutGroup>
 
-        <MiniKeyboard
-          id="Keyboard"
-          showTextEditBox="false">
-        </MiniKeyboard>
       </LayoutGroup>
       <!-- Live text entry box with a non-blinking "cursor" -->
       <Label  
@@ -120,7 +117,10 @@
         size="43"/>
       </Label>
     </LayoutGroup>
-  
+
+    <DynamicCustomKeyboard
+    id="Keyboard"/>
+    
     <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus, 
     the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
     <Group

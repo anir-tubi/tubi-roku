@@ -13,14 +13,20 @@ Function init()
   m.KidsModeMessage = m.top.findNode("KidsModeMessage")
   m.Keyboard.textEditBox.maxTextLength = 100
 
-  m.keyboard.focusedKeyColor = m.global.constants.ui.colors.keyboardFocusedText
-  m.keyboard.focusBitmapUri = m.theme.keyboard_focused_key
+  m.Keyboard.keyGrid.keyDefinitionUri = "pkg:/components/data/CustomAddressKDF.json"
+  m.keyboard.textEditBox.visible = false
+  m.keyboard.translation = [162, 148]
+
+  m.keyboardPalette = createObject("roSGNode", "RSGPalette")
   m.keyboard.observeField("text", "onKeyboardTextChanged")
+  m.keyboard.textEditBox.observeField("focusedChild", "onTextEditBoxFocused")
 
   m.SearchText = m.top.findNode("SearchText")
   m.ResultGrid = m.top.findNode("ResultGrid")
   m.ResultGrid.observeField("itemSelected", "onResultSelected")
   m.ResultGrid.observeField("itemFocused", "onItemFocused")
+
+  handleKeyboardColors()
   
   m.NoResultsMessage = m.top.findNode("NoResultsMessage")
   m.NoResultsMessage.color = m.constants.ui.colors.primaryText
@@ -42,7 +48,6 @@ Function init()
   if m.constants.deviceInfo.scaledUi = true then
     m.ResultGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
-  m.ResultGrid.focusBitmapBlendColor = m.theme.focused
 
   m.top.backgroundUriList = [m.defaultHeroUri]
 
@@ -104,9 +109,13 @@ Function onScreenFocusChange()
   if m.top.hasFocus() then
     if m.bResultsInFocus = true
       m.ResultGrid.setFocus(true)
+      handleKeyboardVoiceInput(m.bResultsInFocus)
     else
       m.Keyboard.setFocus(true)
+      handleKeyboardVoiceInput(m.bResultsInFocus)
     end if
+  else if m.top.isInFocusChain() = false
+    m.keyboard.textEditBox.voiceEnabled = false
   end if
 End Function
 
@@ -119,6 +128,7 @@ Function onEnableChange()
 End Function
 
 Function onKidsModeEnableChange()
+  handleKeyboardColors()
   if m.top.kidsModeEnabled = true
     m.KidsModeMessage.visible = false
   else
@@ -323,11 +333,13 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       m.ResultGrid.setFocus(true)
       m.gridHasFocus = true 
       m.bResultsInFocus = true
+      handleKeyboardVoiceInput(m.bResultsInFocus)
       return true
     else if key = "left" and m.ResultGrid.isInFocusChain() then
       m.Keyboard.setFocus(true)
       m.gridHasFocus = false
       m.bResultsInFocus = false
+      handleKeyboardVoiceInput(m.bResultsInFocus)
       return true
     else if key = "play"
       handlePlayInput()
@@ -381,4 +393,32 @@ Function handlePlayInput()
     updateTrackingInfo(selectedContent, m.ResultGrid.itemFocused)
     m.top.contentToPlay = selectedContent
   end if
+End Function
+
+
+'@resultFocus : boolean - when the search results is in focus disable the
+'keyboard voice functionality and when keyboard is focused enable
+'the voice functionality
+Function handleKeyboardVoiceInput(resultFocus)
+  if resultFocus = true
+    m.keyboard.textEditBox.voiceEnabled = false
+  else
+    m.keyboard.textEditBox.voiceEnabled = true
+  end if
+End Function
+
+'setting the keyboard colors when swicth from default keyboard to kids mode keyboard
+Function handleKeyboardColors()
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.keyboardPalette.colors = { "FocusColor": theme.focused, "FocusItemColor": m.constants.ui.colors.keyboardFocusedText }
+    m.keyboard.palette = m.keyboardPalette
+    m.ResultGrid.focusBitmapBlendColor = theme.focused
+  end if
+End Function
+
+
+'Handling when app is focusing on an invisible textbox that is built into the keyboard
+Function onTextEditBoxFocused()
+  m.Keyboard.setFocus(true)
 End Function
