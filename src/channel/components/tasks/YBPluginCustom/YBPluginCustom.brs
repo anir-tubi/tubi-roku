@@ -1,5 +1,6 @@
 sub init()
     YouboraLog("YBPluginCustom.brs - init")
+    m.top.observeField("segInfo", "onSegInfoChange")
 end sub
 
 
