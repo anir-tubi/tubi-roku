@@ -1242,7 +1242,9 @@ End Function
 
 Function onStreamingSegmentChange(msg)
   streamingSegment = msg.GetData()
-  if streamingSegment <> invalid and streamingSegment.segBitrateBps <> invalid and (streamingSegment.segType = invalid or streamingSegment.segType = 2) then
+
+  'setting segInfo except for audio
+  if streamingSegment <> invalid and streamingSegment.segBitrateBps <> invalid and (streamingSegment.segType = invalid or streamingSegment.segType = 2 or streamingSegment.segType = 0) then
     m.top.segInfo = streamingSegment
   end if
 
