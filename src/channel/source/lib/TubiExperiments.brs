@@ -33,7 +33,7 @@ Function TubiExperiments(constants) as Object
         roku_initial_content_type_selector_icts_v1: {"enabled": false}
       }
       roku_instant_resume: {
-        roku_instant_resume_v2: {"enabled": false}
+        roku_instant_resume_v2: {"enabled": true}
       }  
       
       roku_postplayexp_aptimer_5sec: {
