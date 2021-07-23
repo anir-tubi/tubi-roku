@@ -3,6 +3,7 @@ Function init()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.lastChannelGuideComponentSelected = invalid '//used to send a navigateWithinPage event
 
   m.channelsGuide = m.top.findNode("channelsGuide")
   m.channelsGuideSpinner = m.top.findNode("channelsGuideSpinner")
@@ -20,19 +21,24 @@ Function onChannelGuideContentFocused(msg)
   if guide <> invalid and guide.content <> invalid
     channel = guide.content.getChild(item)
 
-    'Set the navigateWithinPageInfo value which will pass through to ContentController via videoHelpers.brs
-    'to fire a navigate_within_page analytics event.
     row = item + 1  '1 based index
     col = 1
-    m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: channel.id.toInt()})
-      componentOneof: m.Tracking.getAnalyticsComponent("channel_guide_component", m.lastChannelGuideComponentSelected)
-      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-      vertical_location: row
-      vertical_location_mode: "INDEX"  'LocationMode enum
-      horizontal_location: col
-      horizontal_location_mode: "INDEX"  'LocationMode enum
-    }
+    
+    if m.lastChannelGuideComponentSelected <> invalid
+      'Set the navigateWithinPageInfo value which will pass through to ContentController via videoHelpers.brs
+      'to fire a navigate_within_page analytics event.
+      'but only do so if the channel guide has not just opened. m.lastChannelGuideComponentSelected set to invalid will signify that the channel guide had just opened.
+      m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: channel.id.toInt()})
+        componentOneof: m.Tracking.getAnalyticsComponent("channel_guide_component", m.lastChannelGuideComponentSelected)
+        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+        vertical_location: row
+        vertical_location_mode: "INDEX"  'LocationMode enum
+        horizontal_location: col
+        horizontal_location_mode: "INDEX"  'LocationMode enum
+      }
+    end if
+
     contentTile = m.Tracking.getAnalyticsTile(channel, col, row)
 
     m.lastChannelGuideComponentSelected = {content_tile: contentTile, category_slug: guide.content.slug, category_row: row, category_col: col}
