@@ -735,7 +735,7 @@ async function makeReleasePrs(done) {
   const branchRenameRes = shell.exec(`git branch -m ${releaseBranchName}`);
   if (branchRenameRes.code) {
     let errorMsg = `Could not rename the local branch to ${releaseBranchName}`;
-    if (pushBranchRes.stderr) {
+    if (branchRenameRes.stderr) {
       errorMsg = branchRenameRes.stderr
     }
     done(new NoStackError(errorMsg));
