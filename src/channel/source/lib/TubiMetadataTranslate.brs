@@ -76,6 +76,10 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if contentFromServer.thumbnails <> invalid and type(contentFromServer.thumbnails) = "roArray" and contentFromServer.thumbnails.count() > 0
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
+  else if gridType = m.constants.ui.gridItemTypes.linear
+    if contentFromServer.landscape_images <> invalid and type(contentFromServer.landscape_images) = "roArray" and contentFromServer.landscape_images.count() > 0
+      sThumbnailURL = contentFromServer.landscape_images[0]
+    end if
   else if gridType = m.constants.ui.gridItemTypes.vitg_large
     if canvasImages <> invalid and type(canvasImages.vitg_tb) = "roArray" and canvasImages.vitg_tb[0] <> invalid and canvasImages.vitg_tb[0] <> ""
       '//A custom vitg size was requested, use this image instead of the default image
@@ -991,6 +995,8 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           gridType = m.constants.ui.gridItemTypes.landscape
         else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
           gridType = m.constants.ui.gridItemTypes.vitg_large
+        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.linear
+          gridType = m.constants.ui.gridItemTypes.linear
         end if
 
         if bLandscape = true then
@@ -1007,7 +1013,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
         if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.linear and fullChild.thumbnails <> invalid
           childAA.inlineLogoUri = fullChild.thumbnails[0]
         end if
-
+        
         'add the trailer url to vitg content items - don't include vitg content if there is no trailer
         if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_small or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
           childIsPushable = false
