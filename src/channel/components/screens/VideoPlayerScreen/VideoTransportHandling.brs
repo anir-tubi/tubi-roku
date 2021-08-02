@@ -84,17 +84,24 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         if m.Overlay.opacity = 0
           showTransport()
         else if m.progressBarFocused = false
+          m.SkipIntro.translation = [1570,740]
           setFocusedButton(m.ProgressBar)
+        else if m.progressBarFocused = true and m.SkipIntro <> invalid and m.SkipIntro.content <> invalid and m.SkipIntro.content.getChildCount() > 0
+          m.SkipIntro.setFocus(true)
         else
           return false
         end if
 
       else if key = "down"
         if m.Overlay.opacity = 0
+          m.SkipIntro.translation = [1570,740]
           showTransport()
         else if m.progressBarFocused = true
           button = m.TransportButtons.getChild(m.focusedButtonIndex)
           setFocusedButton(button)
+        else if m.progressBarFocused = false
+          m.SkipIntro.translation = [1570,740]
+          setFocusedButton(m.ProgressBar)
         else
           return false  
         end if
@@ -121,6 +128,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           removeFocusFromUpNext()
         else if m.VideoState = "play"
           if m.HUD.opacity = 0
+            m.SkipIntroItem.title = ""
+            m.SkipIntroItem.iconUrl = ""
+            if m.skipIntro.content <> invalid
+              m.skipIntro.content = invalid
+            end if
             backButtonExit()
           else
             'close the transport
@@ -171,6 +183,16 @@ End Function
 Function handleTransportVoiceEvent()
   inputInfo = m.top.transportVoiceRequest
   command = ""
+
+  if m.skipIntro.content <> invalid and m.SkipIntroItem.title = "Skip Intro" and m.skipIntro.visible = true
+    content = m.top.content
+    if content <> invalid and content.creditsCuePoints <> invalid and content.creditsCuePoints.intro_start > 0
+      if m.playerPosition >= content.creditsCuePoints.intro_start and m.playerPosition <= content.creditsCuePoints.intro_end
+        handleScrubForSkipIntro()
+      end if
+    end if 
+  end if
+
   if inputInfo <> invalid and inputInfo.command <> invalid
     command = inputInfo.command
   end if
@@ -350,7 +372,8 @@ Function goToNext()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(true)
   end if
-
+  m.SkipIntroItem.title = ""
+  m.SkipIntroItem.iconUrl = ""
   stopVideo()
   m.top.goToNext = true
 
@@ -360,12 +383,14 @@ End Function
 
 
 Function handleOk()
-  if m.HUD.opacity = 0
+  if m.HUD.opacity = 0 and m.skipIntro.hasFocus() = false
     showTransport()
   else
     'do action based on the current focused button
     focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
-    if focusButtonId = m.SkipTrailerButton.id
+    if m.skipIntro.hasFocus() = true and m.skipIntro.content <> invalid
+      handleSkipIntro()
+    else if focusButtonId = m.SkipTrailerButton.id
       handleSkipTrailer()
     else if focusButtonId = m.StartButton.id
       goToStart()
@@ -406,6 +431,9 @@ End Function
 
 'handles fast forward key press or FastForward button selection
 Function handleFastForward()
+  'removing SkipIntro when fastforward or rewind
+  handleScrubForSkipIntro()
+
   'begin fast forwarding, but don't need everything in beginScrub()
   if m.VideoState = "rew"
     m.VideoState = "ffw"
@@ -535,6 +563,8 @@ Function handleSkipVideo(amt, isProgressBarFocused)
   if m.VideoState <> "skip"
     m.Video.control = "pause"
     m.PlayPauseButton.uri = m.buttonUris.play
+    'removing SkipIntro when fastforward or rewind
+    handleScrubForSkipIntro()
 
     if m.VideoState <> "rew" and m.VideoState <> "ffw"
       playProgressEvent = getPlayProgressEvent()
@@ -548,7 +578,6 @@ Function handleSkipVideo(amt, isProgressBarFocused)
 
     m.VideoState = "skip"
   end if
-
   if isProgressBarFocused <> true
     showTransport()
     m.PlayPauseButton.uri = m.buttonUris.play
@@ -650,6 +679,40 @@ Function onCCDialogButton()
   end if
 End Function
 
+
+'handles the Skip Intro selection
+Function handleSkipIntro()
+  m.SkipIntro.visible = false
+  m.skipIntro.setFocus(false)
+  setFocusedButton(m.PlayPauseButton)
+  handlingSkipIntroContent()
+  if m.HUD.opacity > 0.0
+    animateTransport("out")
+  end if
+  m.VideoState = "hop"
+  hopPosition = m.top.content.creditsCuePoints.intro_end
+  jumpToPosition(hopPosition)
+End Function
+
+
+'set the content invalid and focus to progressbar when SkipIntro ends or selected
+Function handlingSkipIntroContent()
+if m.SkipIntro <> invalid and m.SkipIntro.content <> invalid and m.SkipIntro.content.getChildCount() > 0
+  m.SkipIntro.content.removeChildIndex(0)
+  m.SkipIntro.content = invalid
+end if
+End Function
+
+
+'
+Function handleScrubForSkipIntro()
+  if m.skipIntro.content <> invalid and m.SkipIntroItem.title = "Skip Intro"
+    m.skipIntro.visible = false
+    m.skipIntro.setFocus(false)
+    m.top.setFocus(true)
+    handlingSkipIntroContent()
+  end if
+End Function
 
 'Perform at start of FF or RW
 Function beginScrub()
@@ -831,6 +894,7 @@ Function resetTransportButtons()
   m.FastForwardButton.focusState = false
   m.EndButton.focusState = false
   m.ClosedCaption.focusState = false
+  handlingSkipIntroContent()
 End Function
 
 
@@ -880,6 +944,9 @@ End Function
 '@direction: string, value may be "out" or "in"
 Function animateTransport(direction)
   tubiLog("VideoTransportHandling.AnimateTransport, direction = " + direction)
+  if m.SkipIntro <> invalid and m.SkipIntro.content <> invalid and m.SkipIntro.translation[1] = 740 and direction = "out"
+      slideTo(m.SkipIntro, [m.SkipIntro.translation[0], m.SkipIntro.translation[1] + 40],  0.6)
+  end if
   slideFade(m.HUD, "below", direction, 0.6)
   fade(m.Overlay, direction, 0.6)
 End Function

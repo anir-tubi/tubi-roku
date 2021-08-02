@@ -30,6 +30,7 @@
     <field id="hasTrailer" type="boolean" value="false" />
     <field id="trailerInfo" type="assocarray" />
     <field id="deeplinkType" type="string" />
+    <field id="creditsCuePoints" type="assocarray" />
 
     <!-- text to display for a category whose content is empty -->
     <field id="placeholderText" type="string" />

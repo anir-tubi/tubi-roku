@@ -244,6 +244,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     end if
   end if
 
+  'adding creditCuePoints for episide to implement SkipIntro feature for episode
+  if contentFromServer <> invalid and contentFromServer.detailed_type = "episode" and contentFromServer.credit_cuepoints <> invalid
+    translatedContent.creditsCuePoints = contentFromServer.credit_cuepoints
+  end if
+
+
   'add default credit cuepoints if missing, or skip it if content is very short
   if translatedContent.creditsCuepoint = 0 and translatedContent.length > m.creditsDuration
     cuepoint = translatedContent.length - m.creditsDuration

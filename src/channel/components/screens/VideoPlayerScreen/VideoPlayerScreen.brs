@@ -53,6 +53,7 @@ Function init()
   m.UpNext.observeField("opacity", "onUpNextOpacityChange")
   m.UpNext.observeField("autoplayMode", "onUpNextAutolayModeChange")
 
+
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
@@ -85,6 +86,9 @@ Function init()
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
+
+  m.SkipIntroItem = m.top.findNode("SkipIntroItem")
+  m.SkipIntro = m.top.findNode("SkipIntro")
 
   BackLabel = m.top.findNode("BackLabel")
   BackLabel.text = getTranslation("goBack_videoPlayer_controls")
@@ -208,6 +212,18 @@ Function init()
 
   ' the video player screen should be false until placed upon the screen stack
   m.top.visible = false
+End Function
+
+
+'set the content for SkipIntro and set title and uri for SkipIntroItem contentNode
+Function setInitialSkipIntroContent() As Void
+  tubiLog("VideoPlayer.setInitialSkipIntroContent")
+  m.SkipIntroItem.title = "Skip Intro"
+  m.SkipIntroItem.iconUrl = "pkg:/images/transport/sgplayer/icon-ffw.png"
+  m.SkipIntro.focusBitmapBlendColor = m.global.theme.focused
+  menuItems = CreateObject("roSGNode", "ContentNode")
+  menuItems.appendChild(m.SkipIntroItem)
+  m.SkipIntro.content = menuItems
 End Function
 
 
@@ -454,6 +470,7 @@ Function onVideoStateChange(msg)
   else
     m.LoadingProgressBar.progress = 0
     m.Loading.visible = true
+    m.skipIntro.visible = false
   end if
 End Function
 
@@ -483,6 +500,10 @@ Function onVideoPositionChange()
   ' Auto hide transport
   if m.VideoState = "play" and m.HUD.opacity = 1 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
     animateTransport("out")
+    'set the focus to SkipIntro when auto hide
+    if m.SkipIntro <> invalid and m.SkipIntro.content <> invalid and m.SkipIntro.content.getChildCount() > 0
+      m.SkipIntro.setFocus(true)
+    end if
   end if
 
   ' Cancel temporary captions
@@ -540,6 +561,25 @@ Function onVideoPositionChange()
     
     if m.playerPosition + m.constants.player.fetchNextDuration >= m.top.content.creditsCuePoint
       m.top.upNextCuepointReached = true
+    end if
+  end if
+  'set the content and focus to SkipIntro
+  content = m.top.content
+  if content <> invalid and content.creditsCuePoints <> invalid and content.creditsCuePoints.intro_start > 0
+    if m.playerPosition >= content.creditsCuePoints.intro_start and m.playerPosition <= content.creditsCuePoints.intro_end
+      if m.SkipIntro <> invalid and m.SkipIntro.content = invalid and m.SkipIntroItem.title <> "Skip Intro" and m.LoadingProgressBar <> invalid and m.LoadingProgressBar.progress = 100 and m.LoadingMessage.text = "" and m.Loading.visible = false and m.top.state = "playing" and m.videoState = "play"
+        setInitialSkipIntroContent()
+        m.SkipIntro.setFocus(true)
+      else if m.SkipIntro.content <> invalid and m.LoadingProgressBar.progress = 100 and m.LoadingMessage.text = "" and m.Loading.visible = false and m.top.state = "playing" and m.videoState = "play"
+          m.SkipIntro.visible = true
+      end if
+    else
+      m.SkipIntro.setFocus(false)
+      m.top.setFocus(true)
+      m.SkipIntro.visible = true
+      if content <> invalid and content.creditsCuePoints <> invalid and m.playerPosition >= content.creditsCuePoints.intro_end
+        handlingSkipIntroContent()
+      end if
     end if
   end if
 

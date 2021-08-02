@@ -155,6 +155,7 @@
       notificationInterval="0.5"
       visible="true" />
 
+
     <Group
       id="Loading"
       visible="false">
@@ -277,7 +278,19 @@
           size="36" />
       </Label>
     </Group>
+
+    <DetailMenuItemContentNode
+      id="SkipIntroItem"/>
     
+    <FilledButtonMarkupGrid
+      id="SkipIntro"
+      translation="[1570,740]"
+      itemSize="[268,80]"
+      itemComponentName="DetailMenuItem"
+      numRows="1"
+      numColumns="1"
+      vertFocusAnimationStyle="floatingFocus"/>
+
     <Group
       id="HUD"
       visible="true"
@@ -289,7 +302,6 @@
         height="192"
         spriteDirection="horiz"
         translation="[238,633]"/>
-      
       <Group
         id="Transport"
         opacity="1.0">
