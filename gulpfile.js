@@ -14,28 +14,12 @@ const log = require('fancy-log');
 const http = require('http');
 const mkdirp = require('mkdirp');
 const request = require('request');
-const clipboardy = require('clipboardy');
 const prompts = require('prompts');
 const { RooibosProcessor, createProcessorConfig, ProcessorConfig } = require('rooibos-cli');
 const shell = require('shelljs');
 shell.config.silent = true;
 // Uncomment the next line if there are connection issues to the Roku device
 // const requestDebug = require('request-debug')(request);
-
-// Github API wrapper
-const { Octokit } = require('@octokit/rest');
-const octokit = new Octokit({
-  auth: process.env.GITHUB_PAT,
-  userAgent: 'project-total-recall-build-server',
-  baseUrl: 'https://api.github.com'
-});
-
-// constants used for interacting with the github API
-const ghInfo = {
-  owner: 'adRise',
-  rokuRepo: 'project-total-recall',
-  cdnRepo: 'adrise_cdn',
-};
 
 //Importing old build functions
 const {load, getBuildTag, incrementBuildNumber} = require('./js/config');
@@ -45,14 +29,11 @@ const {keypress, deeplink, uploadPkg, signPkg, convertToSquashfs} = require('./j
 //Functions to upload and download static string translations  
 const {downloadTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
 
-// provide a custom error so as to not get a full stack trace which will be misleading
-// in the case that the error is not with the code, but rather with git or aws or something else.
-class NoStackError extends Error {
-  constructor(...params) {
-    super(...params);
-    this.stack = this.message;
-  }
-}
+// Importing functions with Git functionality
+const {NoStackError} = require('./js/utilities')
+
+// Importing functions with Git functionality
+const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotInProduction} = require('./js/git');
 
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
@@ -573,31 +554,6 @@ function packageAll(done) {
 }
 
 
-// ensure git exists on the system and that the working directory is clean
-function verifyGit(done, directory = '') {
-  let gitDirectory = '';
-  if (directory) {
-    gitDirectory = `-C ${directory}`;
-  }
-
-  if (!shell.which('git')) {
-    done(new NoStackError('Git error: git not installed'));
-    return false;
-  } else if (shell.exec(`git ${gitDirectory} rev-parse --is-inside-work-tree`
-    ).stdout.trim() !== 'true') {
-    directory = !!directory ? directory : process.cwd();
-    done(new NoStackError(`Git error: current directory (${directory}) is not part of a git repo.`));
-    return false;
-  } else if (shell.exec(`git ${gitDirectory} status --porcelain`).stdout) {
-    directory = !!directory ? directory : process.cwd();
-    done(new NoStackError(`Git error: working directory (${directory}) is dirty - stash or commit your changes before proceeding.`));
-    return false;
-  } else {
-    return true;
-  }
-}
-
-
 // increase the build/patch numbers in config/build.yml
 function bumpBuild(done) {
   if (verifyGit(done)) {
@@ -709,357 +665,6 @@ async function confirmRelease(done) {
 }
 
 
-// All the steps necessary to push starter and remote components to the CDN and make a PR to the CDN.
-// Additionally make a PR against the production release branch on project-total-recall and copy the
-// urls to the local clipboard.
-async function makeReleasePrs(done) {
-  // Note that git commands will have a code = 0 when there is no error and code > 0 when an error occurred.
-  // Also note that git commands have a stderr output even if the code === 0.
-
-  const minorBuildTag = getBuildTag(true, false);
-  const fullBuildTag = getBuildTag(false, false);
-  const cdnPath = process.env.CDN_GIT_DIRECTORY;
-
-  // check if the environment variable for the path to the CDN repo has been set
-  if (!cdnPath) {
-    const errorMsg = `You did not set a CDN_GIT_DIRECTORY environment variable in your .bash_profile or .bashrc file.`
-    done(new NoStackError(errorMsg));
-  }
-
-  // check that the CDN repo is clean - verifyGit() handles any error messages as necessary
-  verifyGit(done, cdnPath);
-
-  // rename the local branch name so it looks like "release_2_14_34"
-  const releaseBranchName = `release_${fullBuildTag}`
-  log(`...Renaming the local branch to ${releaseBranchName}`);
-  const branchRenameRes = shell.exec(`git branch -m ${releaseBranchName}`);
-  if (branchRenameRes.code) {
-    let errorMsg = `Could not rename the local branch to ${releaseBranchName}`;
-    if (branchRenameRes.stderr) {
-      errorMsg = branchRenameRes.stderr
-    }
-    done(new NoStackError(errorMsg));
-  }
-
-  // attempt to checkout master in the CDN repo
-  log(`...Checking out master on the local ${ghInfo.cdnRepo} repo`)
-  const checkoutMasterRes = shell.exec(`git -C ${cdnPath} checkout master`).code;
-  if (checkoutMasterRes.code) {
-    let errorMsg = `Could not check out master at ${cdnPath}.`;
-    if (checkoutMasterRes.stderr) {
-      errorMsg = checkoutMasterRes.stderr;
-    }
-    done(new NoStackError(errorMsg));
-  }
-
-  // attempt to pull origin master for the CDN repo
-  log(`...Pulling remote master to the local ${ghInfo.cdnRepo} repo`);
-  const pullMasterRes = shell.exec(`git -C ${cdnPath} pull origin master`).code;
-  if (pullMasterRes.code) {
-    let errorMsg = `Could not pull master from origin at ${cdnPath}.`;
-    if (pullMasterRes.stderr) {
-      errorMsg = pullMasterRes.stderr;
-    }
-    done(new NoStackError(errorMsg));
-  }
-
-  // attempt to check out a new branch off master for the CDN repo
-  const cdnBranchName = `roku_${fullBuildTag}`;
-  log(`...Creating a new ${cdnBranchName} branch on the local ${ghInfo.cdnRepo} repo`);
-  const checkoutNewBranchRes = shell.exec(`git -C ${cdnPath} checkout -b ${cdnBranchName}`);
-  if (checkoutNewBranchRes.code) {
-    let errorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
-    if (checkoutNewBranchRes.stderr) {
-      errorMsg = `${checkoutNewBranchRes.stderr} at ${cdnPath}`;
-    }
-    done(new NoStackError(errorMsg));
-  }
-
-  const starterComponentsFileName = `tubi_starter_components_${minorBuildTag}.pkg`;
-  const remoteComponentsFileName = `tubi_remote_components_${fullBuildTag}.pkg`;
-
-  const cdnStarterComponentsPath = `${cdnPath}/hotpatches/roku/starter-components/${starterComponentsFileName}`;
-  const cdnRemoteComponentsPath = `${cdnPath}/hotpatches/roku/components/${remoteComponentsFileName}`;
-  
-  const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
-  const localRemoteComponentsPath = `build/tubi_remote_components_${fullBuildTag}.pkg`;
-  
-  // copy the starter components from the /build directory to the CDN repo directory
-  log(`...Copying the starter components to the local ${ghInfo.cdnRepo} repo`);
-  const moveStarterComponentsResult = shell.cp(localStarterComponentsPath, cdnStarterComponentsPath);
-  if (moveStarterComponentsResult.stderr) {
-    const errorMsg = `There was an error moving the starter components. You will need to manually copy the starter components and remote components and manually make a PR.
-           Error Message: ${moveStarterComponentsResult.stderr}`;
-    done(new NoStackError(errorMsg));
-  }
-
-  // copy the remote components from the /build directory to the CDN repo directory
-  log(`...Copying the remote components to the local ${ghInfo.cdnRepo} repo`);
-  const moveRemoteComponentsRes = shell.cp(localRemoteComponentsPath, cdnRemoteComponentsPath);
-  if (moveRemoteComponentsRes.stderr) {
-    const errorMsg = `There was an error moving the remote components. You will need to manually copy the remote components and manually make a PR.
-           Error Message: ${moveRemoteComponentsRes.stderr}`;
-    done(new NoStackError(errorMsg));
-  }
-
-  // add the updates so they are staged for commit
-  log(`...Staging changes for commit on the local ${ghInfo.cdnRepo} repo`);
-  const gitAddRes = shell.exec(`git -C ${cdnPath} add . `);
-  if (gitAddRes.code) {
-    let errorMsg = `Could not run "git add . " on ${cdnPath}`;
-    if (gitAddRes.stderr) {
-      errorMsg = gitAddRes.stderr
-    }
-    done(new NoStackError(errorMsg))
-  }
-
-  // commit the updates to the branch
-  log(`...Committing the staged changes on the local ${ghInfo.cdnRepo} repo`);
-  const gitCommitRes = shell.exec(`git -C ${cdnPath} commit -m 'Updating the starter and remote components for ${cdnBranchName}'`);
-  if (gitCommitRes.code) {
-    let errorMsg = `"git commit" failed on ${cdnPath}`;
-    if (gitCommitRes.stderr) {
-      errorMsg = gitCommitRes.stderr;
-    }
-    done(new NoStackError(errorMsg))
-  }
-
-  // push the branch to Github
-  log(`...Pushing the local ${cdnBranchName} branch to the remote ${ghInfo.rokuRepo} repo`)
-  const pushCdnBranchRes = shell.exec(`git -C ${cdnPath} push origin ${cdnBranchName}`);
-  if (pushCdnBranchRes.code) {
-    let errorMsg = `Could not push ${cdnBranchName} to origin (Github) at ${cdnPath}`;
-    if (pushCdnBranchRes.stderr) {
-      errorMsg = pushCdnBranchRes.stderr
-    }
-    done(new NoStackError(errorMsg));
-  }
-
-  // make a PR against master on the CDN repo at Github
-  log(`...Making a PR on ${ghInfo.cdnRepo} against the remote master branch`);
-  let cdnPrUrl = '';
-  try {
-    const cdnPrRes = await octokit.pulls.create({
-      owner: ghInfo.owner,
-      repo: ghInfo.cdnRepo,
-      title: `Updating starter and remote components for roku ${fullBuildTag}`,
-      head: cdnBranchName,
-      base: 'master'
-    });
-    cdnPrUrl = cdnPrRes.data.html_url;
-  } catch(err) {
-    console.log(err);
-    done(new NoStackError(err));
-  }
-
-  // push the release branch to the project-total-recall repo
-  log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
-  const pushReleaseBranchRes = shell.exec(`git push origin ${releaseBranchName}`);
-  if (pushReleaseBranchRes.code) {
-    let errorMsg = `Could not push ${releaseBranchName} to ${ghInfo.rokuRepo} origin (Github)`;
-    if (pushReleaseBranchRes.stderr) {
-      errorMsg = pushReleaseBranchRes.stderr;
-    }
-    done(new NoStackError(errorMsg));
-  }
-
-  // make a PR against the production branch on the project-total-recall repo at Github
-  const prodRokuBranchName = `${minorBuildTag}_branch`;
-  log(`...Making a PR from the remote ${releaseBranchName} on ${ghInfo.rokuRepo} against the ${prodRokuBranchName} branch`);  
-  let releasePrUrl = '';
-  try {
-    const releasePrRes = await octokit.pulls.create({
-      owner: ghInfo.owner,
-      repo: ghInfo.rokuRepo,
-      title: `Release ${fullBuildTag}`,
-      head: releaseBranchName,
-      base: prodRokuBranchName
-    });
-    releasePrUrl = releasePrRes.data.html_url;
-  } catch(err) {
-    console.log(err);
-    done(new NoStackError(err));
-  }
-
-  // copy the PR urls to the clipboard
-  if (releasePrUrl && cdnPrUrl) {
-    
-    // multi line string
-    const prUrlsForPasting = `${releasePrUrl}
-${cdnPrUrl}`;
-
-    clipboardy.writeSync(prUrlsForPasting);
-    log(`The release PR url and the CDN PR url have been placed on your clipboard. Please share with the team!`)
-  } else {
-    const errorMsg = 'The urls for the release PR and the CDN PR are not available. Please share manually.'
-    done(new NoStackError(errorMsg));
-  }
-}
-
-
-async function pushTag(done) {
-  const buildTag = getBuildTag(false, false);
-  log(`...Pushing the ${buildTag} tag to origin (Github)`);
-  const pushTagRes = shell.exec(`git push origin ${buildTag}`);
-
-  if (pushTagRes.code) {
-    let errorMsg = `Could not push ${buildTag} tag to origin (Github)`;
-    if (pushTagRes.stderr) {
-      errorMsg = pushTagRes.stderr
-    }
-    done(new NoStackError(errorMsg));
-  }
-}
-
-
-
-async function createGithubRelease(done) {
-  // Prompt if the dev wants to make a release via the CLI (as opposed to Github UI)
-  const {releaseConfirmation} = await prompts({
-    type: 'confirm',
-    name: 'releaseConfirmation',
-    message: 'Do you want to make a Github release now, in the CLI? (y/n)',
-  });
-
-  if (!releaseConfirmation) {
-    const declineMsg = 'Github release not created by choice of dev. Please make a release by going to http://github.com/adRise/project-total-recall/tags';
-    log(declineMsg);
-    return done();
-  }
-
-  // Double check that the tag we want to make a release from exists on Github. According to Github API
-  // docs, if we make a release and the tag does not exist, the API will automatically make a tag
-  // based on master. But our release is not based on master. See the following doc links:
-  // https://octokit.github.io/rest.js/v18#repos-create-release
-  // https://octokit.github.io/rest.js/v18#repos-list-tags
-
-  const buildTag = getBuildTag(false, false);
-
-  log(`...Double checking that the ${buildTag} tag exists on Github`);
-  const gitLocalTagShaRes = shell.exec(`git rev-parse ${buildTag}`);
-  if (gitLocalTagShaRes.code) {
-    let errorMsg = `Could not get SHA for commit ${buildTag}`;
-    if (gitLocalTagShaRes.stderr) {
-      errorMsg += `\n${gitLocalTagShaRes.stderr}`;
-    }
-    done(new NoStackError(errorMsg));
-  }
-
-  const tagSha = gitLocalTagShaRes.stdout.trim();
-  try {
-    const topTags = await octokit.repos.listTags({
-      owner: ghInfo.owner,
-      repo: ghInfo.rokuRepo
-    });
-
-    let isTagOnGithub = false;
-    for (const tag of topTags.data) {
-      if (tag.name === buildTag && tag.commit.sha === tagSha){
-        isTagOnGithub = true;
-        break;
-      }
-    }
-
-    if (!isTagOnGithub) {
-      const errorMsg = `The ${buildTag} tag is not on Github. Not creating a release here or else Github will make automatically make a tag from master - which will be inaccurate for our purposes.`
-      done(new NoStackError(errorMsg));
-    }
-  } catch(err) {
-    console.log(err);
-    done(new NoStackError(err));
-  }
-
-  const remote = 'Remote Release';
-  const submission = 'Submission Release';
-  const {releaseType, isPreRelease, preReleaseDate} = await prompts([
-    // prompt the dev for the release type to be used as the Release title
-    {
-      type: 'toggle',
-      name: 'releaseType',
-      message: 'Choose a release type (use arrow or tab keys to select)',
-      initial: false,
-      inactive: remote,
-      active: submission,
-      format: (val) => {
-        // format the releaseType value as a remote/submission string instead of boolean
-        return val ? submission : remote;
-      }
-    },
-    // if it's a "Remote Release", prompt if it should be marked as a pre-release
-    {
-      type: (prev) => {
-        // only show this prompt if it's a remote release, as submission releases are assumed
-        // to be pre releases by default.
-        return (prev === remote) ? 'confirm' : null;
-      },
-      name: 'isPreRelease',
-      message: 'Should this release be marked as a pre release? Select no if the release will be deployed today. (y/n)',
-    },
-    // if it's a pre-release, prompt what the release date should be
-    {
-      type: (prev, values) => {
-        return (values.isPreRelease || values.releaseType === submission) ? 'date' : null;
-      },
-      name: 'preReleaseDate',
-      message: 'What date will this release be deployed? (use tab/arrow/number keys to modify date)',
-      mask: 'MM/DD/YYYY',
-      validate: (userDate) => {
-        return userDate > Date.now() ? true : 'Release date must be in the future.';
-      }
-    },
-  ]);
-
-  // prompt the dev for the release notes to be used as the Release body
-  let releaseNotes = preReleaseDate ? preReleaseDate.toLocaleDateString("en-US") : new Date().toLocaleDateString("en-US");  // '12/25/2020'
-
-  while (true) {
-    // multi-line string
-    let releaseNotesState = `Current release notes:\n${releaseNotes}`;
-
-    log(releaseNotesState); //this is part of the CLI UI - leave in
-    const {releaseNotesConfirmation, releaseNote} = await prompts([
-      {
-        type: 'confirm',
-        name: 'releaseNotesConfirmation',
-        message: 'Add another release note? (y/n)'
-      },
-      {
-        type: (prev) => {
-          // only show this prompt if user selected yes in previous prompt.
-          // returning null won't show this prompt.
-          return prev ? 'text' : null;
-        },
-        name: 'releaseNote',
-        message: "Please type the next release note: "
-      }
-    ]);
-
-    if (!releaseNotesConfirmation) {
-      break;
-    } else if (releaseNotesConfirmation && releaseNote) {
-      // only add release notes if something was typed
-      releaseNotes += `\n${releaseNote}`;
-    }
-  }
-
-  log(`...Creating a release from the ${buildTag} tag on Github`);
-  try {
-    await octokit.repos.createRelease({
-      owner: ghInfo.owner,
-      repo: ghInfo.rokuRepo,
-      tag_name: buildTag,
-      name: releaseType,
-      body: releaseNotes,
-      //mark as pre-release if there is a date associated with the pre release.
-      prerelease: preReleaseDate ? true : false
-    });
-  } catch(err) {
-    console.log(err);
-    done(new NoStackError(err));
-  }
-}
-
-
 exports.build = series(clean, buildInstalled, buildStarter, buildRemote);
 exports.sideload = sideLoad;
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
@@ -1069,6 +674,7 @@ exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad)
 exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
 exports.release = series(confirmRelease, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);
+exports.compare = findCommitsNotInProduction;
 
 //command lines related to the crowdin language translations
 exports.update_local_translations = updateLocalTranslations;

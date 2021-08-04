@@ -125,12 +125,7 @@ To run unit tests, run the following command:
 
 [Smoke tests](docs/tubi_tv_smoke_test.md) should be manually run for each release.
 
-3\. If you want to provide someone (i.e. QA) a zip file of the app to [sideload](https://tubitv.atlassian.net/wiki/spaces/EC/pages/879460427/Side+Load+Roku+.zip), you first need to modify temporarily 2 values within the Constants.brs file so it is not trying to load the hotpatch/remote components from the local server:
-
-```
-constants.starterComponents = false
-constants.remoteComponents = false
-```
+3\. If you want to provide someone (i.e. QA) a zip file of the app to [sideload](https://tubitv.atlassian.net/wiki/spaces/EC/pages/879460427/Side+Load+Roku+.zip), please see the section titled "Informal QA".
 
 # Submission Release
 Submission releases are releases that are sent to Roku.
@@ -263,22 +258,27 @@ TBD
 # Remote Release
 Remote releases are releases that are not sent to Roku, and updates are made when a device loads the Tubi channel, by downloading the starter component and remote component files, which are used to build the channel UI.
 
-1\. Set up the environment variables (listed in the [build step](#build)) as some of the following steps are dependant on these variables.
+1\. Set up the environment variables (listed in the [build step](#build)) if not done already, as some of the following steps are dependent on these variables.
 
-2\. Checkout the most recent `x_y_branch` branch, and pull any potential updates from origin. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number.
+2\. Run `$ gulp compare`. This will do the following:
+  - fetch any commits from remote `master` to local `master`
+  - fetch any commits from the most recent remote `x_y_branch` to the local `x_y_branch`.
+  - Compare the last 200 commits on local `master` with the last 200 commits on the local `x_y_branch`, and print out a list of commits that exist on local `master` but have not yet been cherry picked to the local `x_y_branch`.
 
-3\. Cherry pick any commits from `master` that are to be included in the next release onto the `x_y_branch`.
+3\. Checkout the most recent `x_y_branch` branch. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number.
+
+4\. Cherry pick any commits from local `master` that are to be included in the next release onto the qa branch `qa_x_y_z`.
 (See [this page](https://www.previousnext.com.au/blog/intro-cherry-picking-git) for more info info on the cherry pick git command.)
 
-Ensure the cherry pick commit names include the name of PR number. This usually is done automaticlly but be aware that we need to have the PR numbers to make it easier later on so we know which PRs have been pushed and which ones have not.
+Ensure the cherry pick commit names include the name of PR number. This usually is done automatically but be aware that we need to have the PR numbers to make it easier later on so we know which PRs have been pushed and which ones have not.
 
-4\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since/new_images_since_x_y` file with the image locations of any new or updated images.
+5\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since/new_images_since_x_y` file with the image locations of any new or updated images.
 
-5\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates.
+6\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates.
 
-6\. Run `$ gulp bump` in order to increment the version number.
+7\. Run `$ gulp bump` in order to increment the version number.
 
-7\. Deploy to staging
+8\. Deploy to staging
 
 - Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now, [https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 
@@ -303,11 +303,11 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   `$ gulp stage`
 
-8\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Guthub.
+9\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Guthub.
 
-9\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build.
+10\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build.
 
-10\. After QA Sign Off, run `$ gulp release`. This will:
+11\. After QA Sign Off, run `$ gulp release`. This will:
   - increment the version number once more (the QA build should not be the same version number as the production build)
   - install a new build using the "production" config, to create the .pkgs needed to update the production build.
   - rename the current branch to `release_x_y_z`.
@@ -328,17 +328,17 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Remote Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#remote-release)
 
-11\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#rokudev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
+12\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#rokudev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
 
-12\. Merge the new PR in the adrise_cdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
+13\. Merge the new PR in the adrise_cdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
 
-13\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
+14\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
 
 
 - __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
 
 
-14\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
+15\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
 - You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
 
@@ -347,7 +347,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
 - Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/#deploy-to-aws-s3).
 
-15\. Verify the release
+16\. Verify the release
 - Run a smoke test on production checking at minimum:
     - The production channel loads
 		- Video plays
@@ -355,9 +355,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - Monitor various metrics for signs of any issues:
 	- [Ad impressions per second](https://app.datadoghq.com/dashboard/ckr-vrw-xh4/ad-server-business-metrics?from_ts=1563412592034&to_ts=1564017392034&live=true&tile_size=m&fullscreen_widget=80673160&fullscreen_section=overview)
 
-16\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
-
-17\. Create a release on Github (only if you did not create a release in the CLI as part of step 9)
+17\. Create a release on Github (only if you did not create a release in the CLI as part of step 9). As part of the release script, a tag was automatically created and pushed to Github.
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
 	- [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
 
@@ -501,22 +499,22 @@ NOTE: Instead of passing the crowdin key, you can set the crowdin key as system 
 
 # Charles Proxy
 
-Roku app integration with Charles proxy. 
+Roku app integration with Charles proxy.
 
-  
+
 
 ##  Requirements:
 
-  
+
 
 --   Both  the computer and the Roku need to be on the same network.
 -- Charles installed (https://www.charlesproxy.com/download/)
 
 ##  Charles Setup:
 
-  
 
---   In the project root there is file called [CharlesRewrites.xml](https://github.com/adRise/project-total-recall/blob/master/CharlesRewrites.xml).  This file is used to import the required rewrites into Charles. 
+
+--   In the project root there is file called [CharlesRewrites.xml](https://github.com/adRise/project-total-recall/blob/master/CharlesRewrites.xml).  This file is used to import the required rewrites into Charles.
 
 #### Rewrite
 
