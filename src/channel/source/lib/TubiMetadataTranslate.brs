@@ -286,6 +286,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if contentFromServer.ratings <> invalid and contentFromServer.ratings[0] <> invalid and contentFromServer.ratings[0].value <> invalid
     translatedContent.rating = contentFromServer.ratings[0].value
+    if contentFromServer.ratings[0].descriptors <> invalid and contentFromServer.ratings[0].descriptors.Count() > 0
+      translatedContent.descriptors = contentFromServer.ratings[0].descriptors
+    end if
   end if
 
   if contentFromServer.url <> invalid

@@ -91,11 +91,43 @@ Function onEpisodeFocused()
   if m.RowList.isInFocusChain() then
     episode = getEpisodeContent(m.RowList.rowItemFocused)
     if episode <> invalid then
+    
+      content = m.top.content
+    
       m.Info.mode = "episode"
-      m.Info.title = m.top.content.title
+      m.Info.title = content.title
       m.Info.episodeTitle = episode.title
       m.Info.description = episode.description
-      m.Info.calculateHeight = true
+      
+      lineOneData = {}
+      lineOneData.releaseDate = content.releaseDate
+      lineOneData.length = episode.length
+      
+      if episode <> invalid and (episode.hasSubtitles = true or episode.subtitleTracks.Count() > 0)
+        lineOneData.hasCC = true
+      else if content <> invalid and content.type = m.constants.ui.contentTypes.video and (content.hasSubtitles = true or content.subtitleTracks.Count() > 0)
+        lineOneData.hasCC = true
+      else
+        lineOneData.hasCC = false
+      end if
+      
+      lineOneData.descriptorCode = episode.descriptorCode
+
+      if content.availabilityEnds <> invalid and content.availabilityEnds <> ""
+        lineOneData.availabilityEnds = content.availabilityEnds
+      else if episode <> invalid and episode.availabilityEnds <> invalid
+        lineOneData.availabilityEnds = episode.availabilityEnds
+      end if
+    
+      lineOneData.rating = episode.rating
+      lineOneData.partnerLogoUri = episode.inlineLogoUri
+
+      m.Info.lineOneData = lineOneData
+      m.Info.titleLogoUri = episode.titleLogoUri
+      m.Info.genres = episode.genres
+      m.Info.width = 1140   
+      m.Info.calculateHeight = true   
+      
     end if
     season = m.top.content.getChild(m.RowList.rowItemFocused[0])
     if season <> invalid then

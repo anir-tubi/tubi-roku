@@ -75,6 +75,18 @@ Function init()
   if m.constants.deviceInfo.language = "es"
     m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-xlarge.png"
   end if
+  
+  m.ratingOverlay = m.top.findNode("ratingOverlay")
+  m.ratingGradient = m.top.findNode("ratingGradient")
+  m.ratingBar = m.top.findNode("ratingBar")
+  m.ratedLabel = m.top.findNode("ratedLabel")
+  m.ratedLabel.text = getTranslation("rated_Label")
+  m.ratingBackground = m.top.findNode("ratingBackground")
+  m.ratingLabel = m.top.findNode("ratingLabel")
+  m.descriptorCode = m.top.findNode("descriptorCode")
+  m.descriptorDesc = m.top.findNode("descriptorDesc")  
+  m.ratingOverlayTimer = m.top.findNode("ratingOverlayTimer")
+  m.ratingOverlayTimer.observeField("fire", "hideRatingOverlay")
 
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
@@ -114,6 +126,12 @@ Function init()
   ' the user ended up moving forward or backwards from their original position. Also used for "seek" event tracking.
   m.positionAtJumpStart = -1
   m.playerPosition = 0
+
+  ' ratingInterval is time in seconds which helps to show tv ratings/descriptors on player 
+  m.ratingInterval = 0
+  ' m.showRatings boolean variable is to avoid showing ratingoverlay every time when player state changes from buffering to playing. 
+  ' we want to show only first time when playing state happens & after every ad break & timer. Also we are setting m.showRatings = true after every ad break.
+  m.showRatings = true
 
   m.lastButtonPressPos = 0
   m.transportAutoHideTime = m.constants.player.transportAutoHideTime
@@ -472,6 +490,14 @@ Function onVideoStateChange(msg)
     m.Loading.visible = true
     m.skipIntro.visible = false
   end if
+
+  if state = "playing"
+    if m.showRatings = true and m.ratingOverlay.opacity  = 0.0 and m.AdHeadsUp.visible = false
+      m.showRatings = false
+      showRatingOverlay()
+    end if
+  end if
+
 End Function
 
 
@@ -481,6 +507,7 @@ End Function
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
 Function onVideoPositionChange()
+
   positionLog = ""
   if m.Video <> invalid and m.Video.position <> invalid
     positionLog = m.Video.position.toStr()
@@ -490,6 +517,12 @@ Function onVideoPositionChange()
   ' protects against video positions being updated after we've told the player to pause
   if m.VideoState = "play"
     updatePlayerPosition()  'updates m.playerPosition with m.Video.position
+    m.ratingInterval = m.ratingInterval + m.Video.notificationInterval
+  end if
+
+  ' show the TV Rating/Descriptors every hour
+  if m.ratingInterval  >= (60 * 60) and m.ratingOverlay.opacity = 0.0 and m.AdHeadsUp.visible = false
+    showRatingOverlay()
   end if
 
   playProgressOk = true
@@ -601,6 +634,7 @@ Function onVideoPositionChange()
       ' show the ads countdown if appropriate
       if isInWindow(m.playerPosition, cuepoint, m.adHeadsUpTime) and m.top.adState = "adspending"
         if m.Overlay.opacity = 0
+          m.ratingOverlay.opacity = 0
           ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
           m.AdHeadsUp.visible = true
           seconds = stri(cuepoint - m.playerPosition).trim()
@@ -630,6 +664,7 @@ Function onVideoPositionChange()
             ' We must stop the video here, not just pause it, in order to release
             ' system resources to the RAF video player
             showAdBreak()
+            m.showRatings = true 
           else if m.top.adState = "noads"
             ' when we reach the cuepoint, we find that the last ad call returned no ads
             trackEvent({
@@ -672,6 +707,7 @@ Function onAdStateChange()
     ' video playback stopped and should play right away when we get adspending.
     ' pre-roll or resume-roll. Play ads right away
     showAdBreak()
+    m.showRatings = true 
   else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") and m.Video.state <> "playing" then
     ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
     ' TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
@@ -947,6 +983,7 @@ End Function
 
 ' Helper function that aggregates any tasks that need to be done before playing a new video
 Function prepareToStartVideo(content, drmIndex)
+
   resetVideoPlayerState(content)
   setDrmOnContent(content, drmIndex)
   m.top.content = content  'sends content to video node and makes current content available to contentController
@@ -962,7 +999,10 @@ Function resetVideoPlayerState(content = invalid)
   cancelReplayCaptions()
   m.AdHeadsUp.visible = false
   m.top.adPosition = 0
-
+  
+  m.showRatings = true
+  m.ratingInterval = 0
+  
   if content <> invalid
     m.top.adPosition = content.nowPos
     updateVideoPlayerState(content)
@@ -1003,9 +1043,31 @@ End Function
 ' @content: TubiContentNode
 Function updateVideoPlayerState(content) as Void
   if type(content) <> "roSGNode" then return
-
   ' make the content available to the video node
   m.Video.content = content
+  if content.rating <> invalid and content.rating <> ""
+    
+    m.ratingLabel.width = 0
+    m.ratingLabel.text = Ucase(content.rating)
+    nRatingBoundingBoxIncrease = m.ratingLabel.boundingRect().width + 24
+    m.RatingBackground.width = nRatingBoundingBoxIncrease
+    m.ratingLabel.width = nRatingBoundingBoxIncrease
+
+  end if
+  
+  descriptorCode = content.descriptorCode
+  if descriptorCode <> invalid and descriptorCode<> ""
+    m.descriptorCode.text = UCase(descriptorCode) 
+  end if
+
+  descriptorDescription = content.descriptorDescription
+  ' if the descriptor is not present, reduce the height of rating bar
+  if descriptorDescription <> invalid and descriptorDescription <> ""
+    m.descriptorDesc.text = descriptorDescription
+    m.ratingBar.height = 87
+  else
+    m.ratingBar.height = 45
+  end if
 
   ' add the title and episode title to the overlay
   title = m.Overlay.findNode("VideoOverlayTitle")
@@ -1286,6 +1348,35 @@ Function onStreamingSegmentChange(msg)
   'setting segInfo except for audio
   if streamingSegment <> invalid and streamingSegment.segBitrateBps <> invalid and (streamingSegment.segType = invalid or streamingSegment.segType = 2 or streamingSegment.segType = 0) then
     m.top.segInfo = streamingSegment
+  end if
+
+End Function
+
+
+' showratingOverlay helps to show the rating overlay and start the timer to hide it after certain amount of time.
+Function showRatingOverlay()
+
+  ' fire exposure event when tv ratings is shown on player
+  if getExperimentResource("roku_tvratings_on_player", "roku_tvratings_on_player_v1").enabled = true
+    fade(m.ratingOverlay, "in", 0.6)   
+    if m.Overlay.opacity > 0.0
+      m.ratingOverlay.translation = [0,250]
+    else
+      m.ratingOverlay.translation = [0,0]  
+    end if  
+    m.ratingOverlayTimer.control = "start" 
+  end if     
+
+End Function
+
+
+' hideRatingOverlay helps to hide the rating overlay and reset the rating Interval.
+Function hideRatingOverlay()
+  
+  if m.ratingOverlay.opacity  > 0
+    ' resetting ratingInterval to zero, because we don't want to show the ratingOverlay immediately after hiding
+    m.ratingInterval = 0 
+    fade(m.ratingOverlay, "out", 0.6)  
   end if
 
 End Function

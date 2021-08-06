@@ -334,6 +334,7 @@ Function updateInfoPanel(infoNode, content)
   if content.availabilityEnds <> invalid
     lineOneData.availabilityEnds = content.availabilityEnds
   end if
+  lineOneData.descriptorCode = content.descriptorCode
   lineOneData.rating = content.rating
   lineOneData.partnerLogoUri = content.inlineLogoUri
 

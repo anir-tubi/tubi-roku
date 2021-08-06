@@ -35,7 +35,12 @@ Function TubiExperiments(constants) as Object
       roku_instant_resume: {
         roku_instant_resume_v2: {"enabled": true}
       }  
-      
+      roku_tvratings_on_detail: {
+        roku_tvratings_on_detail_v1: {"enabled": false}
+      } 
+      roku_tvratings_on_player: {
+        roku_tvratings_on_player_v1: {"enabled": false}
+      }     
       roku_postplayexp_aptimer_5sec: {
         roku_postplayexp_aptimer_5sec_v1: {"ap_timer": 30}  
       }  

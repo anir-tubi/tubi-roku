@@ -57,6 +57,7 @@
                                "TV-MA", "TV-PG", "TV-Y", "TV-Y7"  or lowercase
         partnerLogoUri: ""    'The URI used to display the partner/channel logo
         availabilityEnds: "2019-03-31T00:00:00Z"
+        DescriptorCode: "L V"  'This is rating descriptor code for a program'
       }
       Handling these at once is more efficient than handling them all individually
      -->
@@ -217,6 +218,14 @@
                 size="22" />
             </Label>
           </Group>
+          <Label
+            id="DescriptorCode"
+            visible="false">
+            <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Bold.ttf"
+            size="22" />            
+          </Label>          
           <Label
             id="ExpireWarning">
             <Font

@@ -1026,6 +1026,10 @@ Function getTranslation_en_US()
     "goBack_signUp": {
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "PRESS BACK FOR SIGNUP"
+    },
+    "rated_Label": {
+      "description": "Label shown on video player when tv rating/descriptor is shown",
+      "message": "RATED"
     }
   }
 End Function
@@ -1942,6 +1946,10 @@ Function getTranslation_es_MX()
     "goBack_signUp": {
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "PRESIONA ATRÁS PARA REGISTRARTE"
+    },
+    "rated_Label": {
+      "description": "Label shown on video player when tv rating/descriptor is shown",
+      "message": "CALIFICADO"
     }
   }
 End Function

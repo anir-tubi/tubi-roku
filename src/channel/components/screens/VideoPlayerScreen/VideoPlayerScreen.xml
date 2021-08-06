@@ -445,6 +445,80 @@
       </Group>  <!-- Transport -->
     </Group>  <!-- HUD -->
 
+    <Group
+      id="ratingOverlay"
+      translation="[0,0]"
+      opacity="0.0">
+      <Poster
+        id="ratingGradient"
+        width="1164"
+        height="390"
+        translation="[0,0]"
+        uri="pkg:/images/rating_gradient.png"/> 
+      <Rectangle
+        id="ratingBar"
+        translation="[126,55]"
+        color="0xFD4C1D"
+        width="3"
+        height="87"/> 
+      <LayoutGroup
+        id="ratingLayout"
+        layoutDirection="horiz"
+        itemSpacings="[8]"
+        translation="[150,80]"
+        vertAlignment="center">
+        <Label
+          id="ratedLabel">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Bold.ttf"
+            size="22" />
+        </Label>       
+        <Group
+          id="ratingGroup">
+          <Poster
+            id="RatingBackground"
+            height="36"
+            uri="pkg:/images/ratingBackground.9.png"
+            loadSync="true"/>
+          <Label
+            id="ratingLabel"
+            height="36"
+            width="0"
+            opacity="0.8"
+            color="0xFFFFFFFF"
+            numLines="1"
+            wrap="false"
+            translation="[0,3]" 
+            horizAlign="center"
+            vertAlign="center">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="22" />
+          </Label>
+        </Group>
+        <Label
+          id="descriptorCode">
+          <Font
+            id="Vaud22px"
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+      </LayoutGroup>
+      <Label
+        id="descriptorDesc"
+        translation="[153,110]"
+        height="80">
+        <Font
+          id="Vaud22px"
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="22" />
+      </Label>
+    </Group>
+
     <UpNext
       id="UpNext"
       opacity="0.0" />
@@ -462,5 +536,16 @@
       id="ScrubTimer"
       duration="0.25"
       repeat="true" />
+      
+    <Timer
+      id="ratingOverlayTimer"
+      duration="15"
+      repeat="false" />
+
+    <Timer
+      id="screenTime"
+      duration="5"
+      repeat="true" />     
+
   </children>
 </component>

@@ -30,6 +30,13 @@
     <field id="hasTrailer" type="boolean" value="false" />
     <field id="trailerInfo" type="assocarray" />
     <field id="deeplinkType" type="string" />
+    
+    <!-- descriptors are "ratings descriptors", used to display additional information about TV ratings, eg. [{"code": "L","description": "Coarse or crude language"}, {"code": "R","description": "Violence"}] -->
+    <field id="descriptors" type="array" />
+    <!-- descriptorCode value is taken from descriptor array eg. "L V"-->
+    <field id="descriptorCode" type="string" />
+    <!-- descriptorDescription value is taken from descriptor array eg. "Coarse or crude language, Violence"-->
+    <field id="descriptorDescription" type="string" />
     <field id="creditsCuePoints" type="assocarray" />
 
     <!-- text to display for a category whose content is empty -->

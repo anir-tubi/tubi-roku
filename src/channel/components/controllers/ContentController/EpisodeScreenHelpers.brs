@@ -13,6 +13,7 @@ Function showEpisodeScreen(content, shouldSendNavigationAnalytics)
   episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
   episodesScreen.id = m.constants.ui.screenIds.episodeScreen
   episodesScreen.shouldFocusWhenPushed = m.top.fadeInContentController
+  updateAllEpisodesContent(content)
   episodesScreen.content = content
   episodesScreen.updateContent = true
   episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")
@@ -34,6 +35,22 @@ Function showEpisodeScreen(content, shouldSendNavigationAnalytics)
 
   episodesScreen.episodeToFocus = findEpisode2dIndex(content.currentEpisodeId, content)
   pushScreen(episodesScreen, shouldSendNavigationAnalytics, true)
+End Function
+
+
+' updateAllEpisodesContent iterates to all season/episode and invokes setDescriptorCodeAndDescription to update descriptor code & description
+Function updateAllEpisodesContent(content)
+
+  if content <> invalid
+    for i = 0 to content.getChildCount()-1
+      season = content.getChild(i)
+      for j=0 to season.getChildCount()-1
+        episode = season.getChild(j)
+        setDescriptorCodeAndDescription(episode)
+      end for
+    end for
+  end if
+
 End Function
 
 

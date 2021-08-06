@@ -909,5 +909,9 @@
   "goBack_signUp": {
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "PRESS BACK FOR SIGNUP"
-  }           
+  },
+  "rated_Label": {
+    "description": "Label shown on video player when tv rating/descriptor is shown",
+    "message": "RATED"
+  }             
 }

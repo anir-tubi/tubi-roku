@@ -944,11 +944,28 @@ End Function
 '@direction: string, value may be "out" or "in"
 Function animateTransport(direction)
   tubiLog("VideoTransportHandling.AnimateTransport, direction = " + direction)
+  
+  if direction = "in" and m.ratingOverlay.opacity = 1.0
+    if getExperimentResource("roku_tvratings_on_player", "roku_tvratings_on_player_v1",false).enabled = true
+      slideTo(m.ratingOverlay, [0,250], 0.6)
+      fade(m.ratingGradient, "out", 0.2)  
+    end if
+    fade(m.Overlay, direction, 0.6, 0.2)
+  else if direction = "out" and m.ratingOverlay.opacity = 1.0  
+    fade(m.Overlay, direction, 0.6)
+    if getExperimentResource("roku_tvratings_on_player", "roku_tvratings_on_player_v1",false).enabled = true
+      slideTo(m.ratingOverlay, [0,0], 0.6, 0.2)
+      fade(m.ratingGradient, "in", 0.6, 0.6)
+    end if
+  else
+    fade(m.Overlay, direction, 0.6)  
+  end if
+  
   if m.SkipIntro <> invalid and m.SkipIntro.content <> invalid and m.SkipIntro.translation[1] = 740 and direction = "out"
       slideTo(m.SkipIntro, [m.SkipIntro.translation[0], m.SkipIntro.translation[1] + 40],  0.6)
   end if
   slideFade(m.HUD, "below", direction, 0.6)
-  fade(m.Overlay, direction, 0.6)
+  
 End Function
 
 

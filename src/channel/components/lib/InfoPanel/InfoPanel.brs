@@ -12,6 +12,9 @@ Function init()
   m.Rating = m.top.findNode("Rating")
   m.RatingBackground = m.Rating.findNode("RatingBackground")
   m.RatingLabel = m.Rating.findNode("RatingLabel")
+  
+  m.DescriptorCode = m.top.findNode("DescriptorCode")
+  
   m.Description = m.top.findNode("Description")
   m.DescriptionGroup = m.top.findNode("DescriptionGroup")
   m.DescriptionFocusButton = m.top.findNode("DescriptionFocusButton")
@@ -217,6 +220,27 @@ Function onLineOneDataChange(msg)
     end if
     m.Rating.visible = false
   end if
+  
+  if getExperimentResource("roku_tvratings_on_detail", "roku_tvratings_on_detail_v1").enabled = true 
+    
+    descriptorCode = data.descriptorCode
+    
+    if descriptorCode <> invalid and descriptorCode <> ""
+      if m.DescriptorCode.getParent() = invalid
+        firstLineGroup.insertChild(m.DescriptorCode, insertIndex)
+      end if
+      insertIndex++
+
+      m.DescriptorCode.text = UCase(descriptorCode)
+      m.DescriptorCode.visible = true
+    else
+      if m.DescriptorCode.getParent() <> invalid
+        firstLineGroup.removeChild(m.DescriptorCode)
+      end if
+      m.DescriptorCode.visible = false
+    end if 
+    
+  end if  
 
   if data.availabilityEnds <> invalid and data.availabilityEnds <> ""
     datetime = CreateObject("roDateTime")
@@ -414,6 +438,7 @@ Function onModeChange()
   else if m.top.mode = "episode" then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
+    m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [25, 18]
   else if m.top.mode = "utility" then

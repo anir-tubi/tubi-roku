@@ -474,7 +474,7 @@ Function getConstants()
 
     'how often the video player records history
     constants.player.historyFrequency = 60
-    
+
     ' time to fetch next content before credit cuepoints
     constants.player.fetchNextDuration = 15  
 
