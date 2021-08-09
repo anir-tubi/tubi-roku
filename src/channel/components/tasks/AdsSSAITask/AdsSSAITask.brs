@@ -118,7 +118,8 @@ End Function
 
 Function pollForAds(url)
   if m.top.isPlayingAds <> true and m.top.isPlayingAdFiller <> true and url <> invalid and url <> ""
-    m.raf.setAdUrl(url)
+    charlesUrl = m.request.passThroughCharlesProxy(url)
+    m.raf.setAdUrl(charlesUrl)
     adPods = m.raf.getAds()
 
     if adPods <> invalid and adPods.count() > 0
