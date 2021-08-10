@@ -173,8 +173,8 @@ Function updatePlayerPosition(amt=0)
     m.playerPosition = m.Video.position
   end if
 
-  ' update transport details only when it is shown 
-  if m.HUD.opacity = 1
+  ' update transport details only when it is shown
+  if m.HUD.opacity > 0 or amt > 0
     updateTransport()
   end if
 End Function
@@ -578,6 +578,7 @@ Function handleSkipVideo(amt, isProgressBarFocused)
 
     m.VideoState = "skip"
   end if
+
   if isProgressBarFocused <> true
     showTransport()
     m.PlayPauseButton.uri = m.buttonUris.play
@@ -933,9 +934,6 @@ Function showTransport()
   updateTransport()
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
-  m.Transport.opacity = 1.0
-  m.Transport.translation = [0,0]
-  m.TransportGradient.opacity = 1.0
   animateTransport("in")
 End Function
 
