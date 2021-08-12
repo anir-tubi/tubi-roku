@@ -67,7 +67,9 @@ Function tubiExternalConfig_getConfigsRequest(request, constants)
     params: {
       "device_id": constants.deviceInfo.deviceId
     }
+    headers:{}
   }
+  options.headers.append(constants.headers.commonUapi)
 
   return request.createAsync(url, "getExternalConfigs", options)
 End Function

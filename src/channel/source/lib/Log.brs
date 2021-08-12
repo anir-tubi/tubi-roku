@@ -212,8 +212,10 @@ Function tubiLog_getLoggingRequest_(logInfo as Object) as Object
   reqOptions = {
     body: FormatJson(loggingReqBody)
     method: m.constants.reqTypes.post
+    headers: {}
     retries: 0
   }
+  reqOptions.headers.append(m.constants.headers.commonUapi)
   url = m.constants.urls.datascience.logging
 
   loggingRequest = m.request.createAsync(url, "scenegraphLog " + logInfo.level, reqOptions)

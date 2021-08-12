@@ -18,8 +18,10 @@ Function registrationLoop() As Void
   body = FormatJSON(params)
   reqOptions = {
     method: "POST"
-    body: body
+    headers: {}
+    body: body  
   }
+  reqOptions.headers.append(constants.headers.commonUapi)
   regCodeRequest = Request.createAsync(url, "webRegistration", reqOptions)
   
   port = CreateObject("roMessagePort")
@@ -82,8 +84,10 @@ Function registrationLoop() As Void
     body = FormatJSON(params)
     reqOptions = {
       method: "POST"
-      body: body
+      headers: {}
+      body: body     
     }
+    reqOptions.headers.append(constants.headers.commonUapi)
     regCodeStatus = Request.createAsync(url, "webConfirmationPoll", reqOptions)
     regCodeStatus.start(port)
   

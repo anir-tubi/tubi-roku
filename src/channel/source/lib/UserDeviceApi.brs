@@ -20,12 +20,15 @@ End Function
 
 ' returns a set of common params within an options AA that are used by all UAPI endpoints
 Function userDeviceApi_commonOptions()
+  uapiheader = {}
+  uapiheader.append(m.constants.headers.commonUapi)
   return {
     params: {
       "app_id": m.constants.settings.shortAppName
       "platform": m.constants.platform
       "device_id": m.constants.deviceInfo.deviceId
     }
+    headers: uapiheader
   }
 End Function
 
@@ -52,9 +55,12 @@ End Function
 Function userDeviceApi_signUpReqInfo(passedOptions = {})
   url = m.constants.urls.users.signup
   options = {}
+  headers = {}
+  headers.append(m.constants.headers.commonUapi)
   body = FormatJSON(passedOptions.body)
   options["method"] = m.constants.reqTypes.post
   options["body"] = body
+  options["headers"] = headers
   return {
     url: url
     options: options
@@ -69,8 +75,11 @@ Function userDeviceApi_signInReqInfo(passedOptions = {})
   url = m.constants.urls.account.login
   options = {}
   body = FormatJSON(passedOptions.body)
+  headers = {}
+  headers.append(m.constants.headers.commonUapi)
   options["method"] = m.constants.reqTypes.post
   options["body"] = body
+  options["headers"] = headers
   return {
     url: url
     options: options
@@ -91,9 +100,12 @@ Function userDeviceApi_deviceRegisterInfo(birthdate)
     device_id: m.constants.deviceInfo.deviceId
     birthday: birthdate
   }
+  headers = {}
+  headers.append(m.constants.headers.commonUapi)
   body = FormatJSON(body)
   options["method"] = m.constants.reqTypes.post
   options["body"] = body
+  options["headers"] = headers
 
   return {
     url: url
@@ -107,8 +119,10 @@ Function userDeviceApi_checkBirthdayInfo(userId)
 
   options = {
     params: {}
+    headers: {}
   }
   options.params["user_id"] = userId
+  options.headers.append(m.constants.headers.commonUapi)
 
   return {
     url: url
@@ -128,9 +142,10 @@ Function userDeviceApi_patchSettingsInfo(userId, passedOptions)
   if passedOptions <> invalid and type(passedOptions.body) = "roAssociativeArray"
     options["body"] = FormatJSON(passedOptions.body)
   end if
-
+  headers = {}
+  headers.append(m.constants.headers.commonUapi)
   options["method"] = m.constants.reqTypes.patch
-
+  options["headers"] = headers
   return {
     url: url
     options: options

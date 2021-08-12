@@ -31,11 +31,13 @@ Function execSignUp() As Void
   
   reqOptions = {
     method: "POST"
-    body: body
+    headers: {}
+    body: body 
   }
+  reqOptions.headers.append(constants.headers.commonUapi)
   requestObject = Request.createAsync(url, "signup", reqOptions)
   requestObject.start(port)
-  
+
   user_id = invalid
   access_token = invalid
   

@@ -202,6 +202,8 @@ Function tubiAuth_getAuthHeaders_test()
   m.assertEqual(authHeaders["Content-Type"], "application/json")
   m.assertNotInvalid(authHeaders["Authorization"])
   m.assertEqual(authHeaders["Authorization"], "Bearer " + token)
+  m.assertNotInvalid(authHeaders["x-client-platform"])
+  m.assertNotInvalid(authHeaders["x-client-version"])
 End Function
 
 

@@ -247,6 +247,7 @@ Function tubiAuth_getAuthHeaders(authToken)
       Authorization: "Bearer " + authToken
     }
     headers.append(m.constants.headers.json)
+    headers.append(m.constants.headers.commonUapi)
 
     return headers
   else

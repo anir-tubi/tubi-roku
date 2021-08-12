@@ -426,6 +426,11 @@ Function getConstants()
   'common http request headers
   constants.headers = {}
     constants.headers.json = {"Content-Type": "application/json"}
+    constants.headers.platform =  {"x-client-platform": constants.platform}
+    constants.headers.clientVersion = {"x-client-version": constants.deviceInfo.clientVersion}
+    constants.headers.commonUapi = {}
+      constants.headers.commonUapi.append(constants.headers.platform)
+      constants.headers.commonUapi.append(constants.headers.clientVersion)
 
   'content type strings that we might get returned from uapi
   constants.uapiContentTypes = {}
