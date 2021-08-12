@@ -208,22 +208,14 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
     params["contentMode"] = passedOptions.params["contentMode"]
   end if
 
-  if params["contentMode"] <> m.constants.ui.contentMode.news and params["contentMode"] <> m.constants.ui.contentMode.linear
-    ' don't send the Tupian image params for homescreen requests that are contentMode = "news"
+  if params["contentMode"] <> m.constants.ui.contentMode.linear
+    ' don't send the Tupian image params for homescreen requests that are contentMode = "linear"
     imageParamTypes = [
       "poster"
       "landscape"
       "large_vitg"
     ]
     params = m.setImageParams(imageParamTypes, options.params)
-  end if
-
-  headers["x-tubi-inject-live-news"] = "false"
-  if params["contentMode"] = m.constants.ui.contentMode.news or params["contentMode"] = m.constants.ui.contentMode.homescreen
-
-    if bKidsMode = false
-      headers["x-tubi-inject-live-news"] = "true"
-    end if
   end if
 
   if passedOptions <> invalid
@@ -301,7 +293,7 @@ Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = f
   if passedOptions <> invalid and passedOptions.params <> invalid
     contentMode = passedOptions.params.contentMode
 
-    if contentMode = m.constants.ui.contentMode.homescreen or contentMode = m.constants.ui.contentMode.news
+    if contentMode = m.constants.ui.contentMode.homescreen or contentMode = m.constants.ui.contentMode.linear
       if bKidsMode = false
         ' add custom linear content header for all homescreen or news category fetches
         ' per a request from back end team, in order to facilitate better caching.

@@ -195,29 +195,7 @@ Function tubiMetadataTranslate_translateRecursive_videoResources_test()
   content = ReadAsciiFile("pkg:/source/tests/rooibos/units/video_resources.json")
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(ParseJson(content), dest)
-  m.assertNotInvalid(dest.videoResources)
-  m.assertTrue(dest.videoResources.count() = 3)
-
-  for i=0 to 1
-    m.assertNotInvalid(dest.videoResources[i].url)
-    m.assertNotInvalid(dest.videoResources[i].drmHeaders)
-    m.assertEqual(dest.videoResources[0].streamformat, "dash")
-  end for
-
-  'Widevine has drmParams
-  m.assertEqual(dest.videoResources[0].type, "dash_widevine")
-  m.assertNotInvalid(dest.videoResources[0].drmParams)
-
-  'Playready doesn't have drmParams
-  m.assertEqual(dest.videoResources[1].type, "dash_playready")
-  m.assertInvalid(dest.videoResources[1].drmParams)
-
-  'HLS shouldn't have any drm fields
-  m.assertNotInvalid(dest.videoResources[2].url)
-  m.assertInvalid(dest.videoResources[2].drmParams)
-  m.assertInvalid(dest.videoResources[2].drmHeaders)
-  m.assertEqual(dest.videoResources[2].streamformat, "hls")
-
+  ' TODO: test the whole functionality of translate.translateRecursive()
 End Function
 
 
@@ -286,6 +264,34 @@ Function tubiMetadataTranslate_translateChannel_test()
 End Function
 
 
+'@Test translateLinearChannelGuide unit tests
+Function tubiMetadataTranslate_translateLinearChannelGuide_test()
+  linearHomescreenJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/linearHomescreen.json")
+  parsedLinearHomescreen = ParseJson(linearHomescreenJson)
+  translatedChannelGuide = m.translate.translateLinearChannelGuide(parsedLinearHomescreen)
+
+  ' testing the mocked json first, as a foundation for the functional tests
+  m.assertNotInvalid(parsedLinearHomescreen)
+  m.assertNotInvalid(parsedLinearHomescreen.containers)
+  m.assertNotInvalid(parsedLinearHomescreen.contents)
+  m.assertTrue(parsedLinearHomescreen.containers.count() > 1)
+  m.assertTrue(parsedLinearHomescreen.contents.count() > 1)
+
+  ' functional tests
+  m.assertNotInvalid(translatedChannelGuide)
+  m.assertTrue(type(translatedChannelGuide) = "roSGNode")
+
+  concatenatedContainerContentCount = 0
+  for each container in parsedLinearHomescreen.containers
+    if container.children <> invalid
+      concatenatedContainerContentCount += container.children.count()
+    end if
+  end for
+
+  m.assertTrue(translatedChannelGuide.getChildCount() = concatenatedContainerContentCount)
+End Function
+
+
 '@Test getContentFromCategoryJson unit tests
 Function tubiMetadataTranslate_getContentFromCategoryJson_test()
   categoryJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/category.json")
@@ -312,4 +318,45 @@ Function tubiMetadataTranslate_generateChannelPosterUrl_unbranded_test()
   m.assertEqual(posterUrl, m.constants.urls.channelPosterUnbranded)
   posterUrl = m.translate.generateChannelPosterUrl(invalid)
   m.assertEqual(posterUrl, m.constants.urls.channelPosterUnbranded)
+End Function
+
+
+'@Test composeVideoResources unit tests
+Function tubiMetadataTranslate_composeVideoResources_test()
+  content = ParseJson(ReadAsciiFile("pkg:/source/tests/rooibos/units/video_resources.json"))
+  m.assertNotInvalid(content)
+
+  videoResources = m.translate.composeVideoResources(content)
+  m.assertNotInvalid(videoResources)
+
+  ' check the number of resources is accurate
+  m.assertEqual(videoResources.count(), content.video_resources.count())
+
+  for i=0 to 1
+    m.assertNotInvalid(videoResources[i].url)
+    m.assertNotInvalid(videoResources[i].drmHeaders)
+    m.assertNotInvalid(videoResources[i].length)
+    m.assertEqual(videoResources[i].streamformat, "dash")
+  end for
+
+  'Widevine has drmParams
+  m.assertEqual(videoResources[0].type, "dash_widevine")
+  m.assertNotInvalid(videoResources[0].drmParams)
+  m.assertNotInvalid(videoResources[0].drmParams.licenseServerUrl)
+  m.assertEqual(videoResources[0].drmParams.keySystem, "Widevine")
+  m.assertNotInvalid(videoResources[0].drmHeaders)
+
+  'Playready doesn't have drmParams
+  m.assertEqual(videoResources[1].type, "dash_playready")
+  m.assertInvalid(videoResources[1].drmParams)
+  m.assertNotInvalid(videoResources[1].encodingType)
+  m.assertNotInvalid(videoResources[1].encodingKey)
+  m.assertNotInvalid(videoResources[1].drmHeaders)
+
+  'HLS shouldn't have any drm fields
+  m.assertNotInvalid(videoResources[2].url)
+  m.assertNotInvalid(videoResources[2].length)
+  m.assertInvalid(videoResources[2].drmParams)
+  m.assertInvalid(videoResources[2].drmHeaders)
+  m.assertEqual(videoResources[2].streamformat, "hls")
 End Function

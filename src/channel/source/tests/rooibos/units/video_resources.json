@@ -76,7 +76,8 @@
     {
       "type": "dash_widevine",
       "manifest": {
-        "url": "https://s3-us-west-2.amazonaws.com/haofei-playground-public/drm/440105_cenc/index.mpd?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDAzMzQ5NDR9.FxmRmcDKTcl947oIMMgHR9Vue6FICGwu0yq-9iVE_VM"
+        "url": "https://s3-us-west-2.amazonaws.com/haofei-playground-public/drm/440105_cenc/index.mpd?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDAzMzQ5NDR9.FxmRmcDKTcl947oIMMgHR9Vue6FICGwu0yq-9iVE_VM",
+        "duration": 5024
       },
       "license_server": {
         "url": "https://wv-keyos.licensekeyserver.com/",
@@ -87,7 +88,8 @@
     {
       "type": "dash_playready",
       "manifest": {
-        "url": "https://s3-us-west-2.amazonaws.com/haofei-playground-public/drm/440105_cenc/index.mpd?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDA1NzAwNzZ9.3zpQiMAUgy6rKXl2_gKefWhG0_ePd6gV1B-RPPvJ8Dw"
+        "url": "https://s3-us-west-2.amazonaws.com/haofei-playground-public/drm/440105_cenc/index.mpd?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDA1NzAwNzZ9.3zpQiMAUgy6rKXl2_gKefWhG0_ePd6gV1B-RPPvJ8Dw",
+        "duration": 5024
       },
       "license_server": {
         "url": "https://pr-keyos.licensekeyserver.com/core/rightsmanager.asmx",
@@ -98,7 +100,8 @@
     {
       "type": "hlsv3",
       "manifest": {
-        "url": "https://frqj.adrise.tv/c5fab94b-8e9a-4dd9-917a-32326c77c18d/goe0bvrp4a.m3u8?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDA1NzAwNzZ9.3zpQiMAUgy6rKXl2_gKefWhG0_ePd6gV1B-RPPvJ8Dw"
+        "url": "https://frqj.adrise.tv/c5fab94b-8e9a-4dd9-917a-32326c77c18d/goe0bvrp4a.m3u8?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDA1NzAwNzZ9.3zpQiMAUgy6rKXl2_gKefWhG0_ePd6gV1B-RPPvJ8Dw",
+        "duration": 5024
       }
     }
   ]

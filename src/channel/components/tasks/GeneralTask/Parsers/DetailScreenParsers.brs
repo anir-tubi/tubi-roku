@@ -14,22 +14,8 @@ End Function
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseDetailScreenSingleContentError(fullResponse, requestNode)
-  ' default code
-  errCode = -1235
-  
-  if fullResponse <> invalid and fullResponse.code <> invalid
-    ' HTTP or Curl code
-    errCode = fullResponse.code
-  end if
-
-  deviceInfo = CreateObject("roDeviceInfo")
-  if deviceInfo.GetLinkStatus() = false
-    ' firmware thinks the device does not have internet access
-    errCode = -1236
-  end if
-
   return {
-    code: errCode
+    code: getErrorCodeFromResponse(fullResponse)
   }
 End Function
 

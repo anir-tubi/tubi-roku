@@ -79,7 +79,6 @@
       <field id="homescreenResponse" type="assocarray"/>
       <field id="moviescreenResponse" type="assocarray"/>
       <field id="tvscreenResponse" type="assocarray"/>
-      <field id="liveNewsChannelGuideResponse" type="assocarray"/>
       <field id="espanolscreenResponse" type="assocarray"/>
       <field id="newsScreenResponse" type="assocarray"/>
 

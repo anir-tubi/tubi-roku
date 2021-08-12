@@ -220,6 +220,7 @@ Function getConstants()
     constants.reqNames.deviceRegister = "deviceRegister" 'verify age
     constants.reqNames.checkBirthdayInfo = "checkBirthdayInfo" 'verify age
     constants.reqNames.patchUserSettings = "patchUserSettings"
+    constants.reqNames.getChannelGuide = "getChannelGuide"
 
   constants.thirdParty = {}
     'Nielsen ID token for integrating with Nielsen DAR via RAF
@@ -685,7 +686,6 @@ Function getConstants()
       constants.ui.contentMode.latino = "latino"
       constants.ui.contentMode.movie = "movie"
       constants.ui.contentMode.tv = "tv"
-      constants.ui.contentMode.news = "news"
       constants.ui.contentMode.linear = "linear"
 
     constants.ui.contentTypes = {}

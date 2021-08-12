@@ -382,6 +382,7 @@ Function cmsApi_homeScreenReqInfo_test()
       "customParam": "custom_param_value"
     }
     headers: {
+      "x-tubi-inject-live-news": "true"
       "x-custom-header": "custom_header_value"
     }
   }
@@ -439,6 +440,7 @@ Function cmsApi_homeScreenReqInfo_test()
 
   ' with contentMode = "tv"
   passedOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.tv
+  passedOptions.headers["x-tubi-inject-live-news"] = "false"
   homeInfo = m.cmsApi.homeScreenReqInfo(false, passedOptions)
   homeOptions.params["isKidsMode"] = false
   homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.tv
@@ -466,10 +468,11 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])
   m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
 
-  ' with contentMode = "news"
-  passedOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.news
+  ' with contentMode = "linear"
+  passedOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.linear
+  passedOptions.headers["x-tubi-inject-live-news"] = "true"
   homeInfo = m.cmsApi.homeScreenReqInfo(false, passedOptions)
-  homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.news
+  homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.linear
   homeOptions.params.delete("images[landscape_tb]")
   homeOptions.params.delete("images[poster_tb]")
   homeOptions.params.delete("images[vitg_tb]")

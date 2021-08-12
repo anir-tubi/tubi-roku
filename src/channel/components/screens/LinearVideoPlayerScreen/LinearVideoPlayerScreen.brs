@@ -905,14 +905,12 @@ End Function
 
 Function onChannelGuideContentSelected(msg)
   tubiLog("LinearVideoPlayerScreen.onChannelGuideContentSelected")
-  channel = m.channelsGuideGroup.itemSelected
-
+  channel = msg.getData()
   hideTransport()
+
   if channel.id <> m.top.content.id 
     '//if user does not select the channel that is playing, then report the new channel. 
-    '//Call getContentFromCategoryJson() to get full data
-    channelUpdated = m.metadataTranslate.getContentFromCategoryJson(m.channelsGuideGroup.content, channel.id) ' can return invalid
-    m.top.channelSelected = channelUpdated
+    m.top.channelSelected = channel
   end if
 End Function
 

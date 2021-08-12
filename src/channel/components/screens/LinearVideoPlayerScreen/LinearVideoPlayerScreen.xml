@@ -21,6 +21,7 @@
       <!-- New content has been added to the video player -->
       <field id="content" type="node"/>
       <field id="updateContent" type="boolean" alwaysNotify="true"/>
+
       <!-- content that is used to display a channel guide overliad the video player -->
       <field id="channelsContent" type="node"/>
 
@@ -60,10 +61,13 @@
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
-      <!-- Set when the video player needs to display the channels listing -->
+
+      <!-- Set when the video player needs to display the channel guide -->
       <field id="refreshChannels" type="boolean" alwaysNotify="true" />
+
       <!-- If true, then the player is currently playing the channel guide -->
       <field id="displayingChannelGuide" type="boolean" />
+
       <!-- Has the user purposely told the channel guide to open? -->
       <field id="userDisplayingChannelGuide" type="boolean"  alwaysNotify="true" />
 

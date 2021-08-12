@@ -292,7 +292,24 @@ Function fetchHomeScreen(homeScreen)
       params: {
         "contentMode": homeScreen.contentMode
       }
+      headers: {}
     }
+
+    ' setting the x-tubi-inject-live-news header to true includes the live news container on the homescreen.
+    ' This header is temporary and should be removed after the sports experiment concludes.
+    if options.params["contentMode"] = m.constants.ui.contentMode.homescreen and shouldKidsModeBeSentToServer() = false
+      options.headers["x-tubi-inject-live-news"] = "true"
+    end if
+
+    ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
+    ' This header is temporary and should be removed after the sports experiment concludes.
+    if options.params["contentMode"] = m.constants.ui.contentMode.linear or options.params["contentMode"] = m.constants.ui.contentMode.homescreen
+      if getExperimentResource("roku_sports", "roku_sports_v1", true).enabled = true
+        if shouldKidsModeBeSentToServer() = false
+          options.headers["x-tubi-inject-linear"] = "true"
+        end if
+      end if
+    end if
 
     if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
       options.params["groupSize"] = m.constants.settings.numContainers

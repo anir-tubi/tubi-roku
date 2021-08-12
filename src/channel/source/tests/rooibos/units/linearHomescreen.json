@@ -1,0 +1,545 @@
+{
+    "containers": [
+        {
+            "id": "global_news",
+            "type": "linear",
+            "title": "Global News",
+            "description": "Global News Test",
+            "thumbnail": "",
+            "children": [
+                "555130",
+                "560215",
+                "559144"
+            ],
+            "cursor": null,
+            "slug": "global_news",
+            "logo": "",
+            "background": "",
+            "tags": []
+        },
+        {
+            "id": "business_news",
+            "type": "linear",
+            "title": "Business News",
+            "description": "Business News",
+            "thumbnail": "",
+            "children": [
+                "555124",
+                "555126",
+                "571664"
+            ],
+            "cursor": null,
+            "slug": "business_news",
+            "logo": "",
+            "background": "",
+            "tags": []
+        },
+        {
+            "id": "culture_and_entertainment",
+            "type": "linear",
+            "title": "Culture and Entertainment News",
+            "description": "Culture and Entertainment News",
+            "thumbnail": "",
+            "children": [
+                "555382",
+                "557344",
+                "555128"
+            ],
+            "cursor": null,
+            "slug": "culture_and_entertainment",
+            "logo": "",
+            "background": "",
+            "tags": []
+        }
+    ],
+    "contents": {
+        "555130": {
+            "id": "555130",
+            "type": "l",
+            "title": "CBC",
+            "ratings": [
+                {
+                    "system": "tvpg",
+                    "value": "TV-MA",
+                    "code": "TV-MA",
+                    "descriptors": []
+                }
+            ],
+            "actors": [],
+            "directors": [],
+            "tags": [
+                "linear",
+                "live",
+                "news"
+            ],
+            "description": "CBC News is Canada’s source for breaking news that matters to you, delivering stories from your community, across the country, and around the world.",
+            "year": 2020,
+            "posterarts": [
+                "http://canvas-bridge.tubitv.com/U8c9ghqP7cWSIk6_JZUquc9YcCQ=/0x144:1280x576/408x138/smart/img.adrise.tv/792e34b0-e73d-4e03-8c9f-7d0abe55ec26.png"
+            ],
+            "thumbnails": [
+                "http://img-cdn.adrise.tv/a5a848c8-e282-41d1-b7aa-6f0aaa8626aa.png"
+            ],
+            "hero_images": [
+                "http://canvas-bridge.tubitv.com/U8c9ghqP7cWSIk6_JZUquc9YcCQ=/0x144:1280x576/408x138/smart/img.adrise.tv/792e34b0-e73d-4e03-8c9f-7d0abe55ec26.png"
+            ],
+            "landscape_images": [
+                "http://canvas-bridge.tubitv.com/U8c9ghqP7cWSIk6_JZUquc9YcCQ=/0x144:1280x576/408x138/smart/img.adrise.tv/792e34b0-e73d-4e03-8c9f-7d0abe55ec26.png"
+            ],
+            "backgrounds": [
+                "http://canvas-bridge.tubitv.com/6npRlj-AUEEeX-toRQaifYcz3Xc=/1920x1080/smart/img.adrise.tv/f3ccda8d-8e05-4853-b368-b000cb2a2596.png"
+            ],
+            "availability_duration": 31536000,
+            "publisher_id": "7f415c62ec91748ed25581bae3a730e6",
+            "has_trailer": false,
+            "has_subtitle": false,
+            "import_id": "cbc_live_news",
+            "availability_starts": "2020-06-22T00:00:00.000Z",
+            "availability_ends": null,
+            "images": {},
+            "video_resources": [
+                {
+                    "manifest": {
+                        "url": "https://live-news-manifest.tubi.video/live-news-manifest/csm/extlive/tubiprd01,Cloudfront-CBC.m3u8?yo.ap=https://lna.tubi.video/prd-yospace/&yo.t.jt=1000&yo.eb.fb=aHR0cHM6Ly9sbmMtY2JjLnR1YmkudmlkZW8vaGxzL3RvcC1zdG9yaWVzLm0zdTg="
+                    },
+                    "type": "hlsv3"
+                }
+            ],
+            "is_cdc": false
+        },
+        "560215": {
+            "id": "560215",
+            "type": "l",
+            "title": "Estrella News",
+            "ratings": [
+                {
+                    "system": "tvpg",
+                    "value": "TV-MA",
+                    "code": "TV-MA",
+                    "descriptors": []
+                }
+            ],
+            "actors": [],
+            "directors": [],
+            "tags": [
+                "linear",
+                "live",
+                "news"
+            ],
+            "description": "24 Hour Spanish Language News",
+            "year": 2020,
+            "posterarts": [
+                "http://canvas-bridge02.tubitv.com/LcX162CqUy2Jz25TzRCdO8IEYkQ=/0x144:1280x576/408x138/smart/img.adrise.tv/estrella_poster.png"
+            ],
+            "thumbnails": [
+                "http://img-cdn.adrise.tv/estrella_1x1.png"
+            ],
+            "hero_images": [
+                "http://canvas-bridge02.tubitv.com/LcX162CqUy2Jz25TzRCdO8IEYkQ=/0x144:1280x576/408x138/smart/img.adrise.tv/estrella_poster.png"
+            ],
+            "landscape_images": [
+                "http://canvas-bridge02.tubitv.com/LcX162CqUy2Jz25TzRCdO8IEYkQ=/0x144:1280x576/408x138/smart/img.adrise.tv/estrella_poster.png"
+            ],
+            "backgrounds": [
+                "http://canvas-bridge02.tubitv.com/BI-A_Sj5JssE0UslHtTay3qwNfI=/1920x1080/smart/img.adrise.tv/estrella_background.png"
+            ],
+            "availability_duration": 31536000,
+            "publisher_id": "8a96984f11d60c369881f6e323ab2aa1",
+            "has_trailer": false,
+            "has_subtitle": true,
+            "import_id": "estrella_media_live_news",
+            "availability_starts": "2020-06-22T00:00:00.000Z",
+            "availability_ends": null,
+            "images": {},
+            "video_resources": [
+                {
+                    "manifest": {
+                        "url": "https://live-news-manifest.tubi.video/live-news-manifest/csm/extlive/tubiprd01,Cloudfront-Estrella.m3u8?yo.ap=https://lna.tubi.video/prd-yospace/&yo.t.jt=1000&yo.eb.fb=aHR0cHM6Ly9sbmMtZXN0cmVsbGEudHViaS52aWRlby9wbGF5bGlzdC5tM3U4"
+                    },
+                    "type": "hlsv3"
+                }
+            ],
+            "is_cdc": false
+        },
+        "559144": {
+            "id": "559144",
+            "type": "l",
+            "title": "Euronews",
+            "ratings": [
+                {
+                    "system": "tvpg",
+                    "value": "TV-MA",
+                    "code": "TV-MA",
+                    "descriptors": []
+                }
+            ],
+            "actors": [],
+            "directors": [],
+            "tags": [
+                "linear",
+                "live",
+                "news"
+            ],
+            "description": "Euronews is the number one international news channel in Europe. Its mission is to empower people to form their own opinion. Euronews is unapologetically impartial and seeks to offer a diversity of viewpoints.",
+            "year": 2020,
+            "posterarts": [
+                "http://canvas-bridge.tubitv.com/Bbvn0Ualvm8ai_E2IliT6nOfDwA=/0x144:1280x576/408x138/smart/img.adrise.tv/euronews_poster.png"
+            ],
+            "thumbnails": [
+                "http://img-cdn.adrise.tv/euronews_1x1.png"
+            ],
+            "hero_images": [
+                "http://canvas-bridge.tubitv.com/Bbvn0Ualvm8ai_E2IliT6nOfDwA=/0x144:1280x576/408x138/smart/img.adrise.tv/euronews_poster.png"
+            ],
+            "landscape_images": [
+                "http://canvas-bridge.tubitv.com/Bbvn0Ualvm8ai_E2IliT6nOfDwA=/0x144:1280x576/408x138/smart/img.adrise.tv/euronews_poster.png"
+            ],
+            "backgrounds": [
+                "http://canvas-bridge.tubitv.com/v48X3mxYgXR2zlV5HHBXIUN2Wr0=/1920x1080/smart/img.adrise.tv/euronews_background.png"
+            ],
+            "availability_duration": 31536000,
+            "publisher_id": "a55a479596c0d0b1292e83883cafa2ff",
+            "has_trailer": false,
+            "has_subtitle": false,
+            "import_id": "euronews_live_news",
+            "availability_starts": "2020-06-22T00:00:00.000Z",
+            "availability_ends": null,
+            "images": {},
+            "video_resources": [
+                {
+                    "manifest": {
+                        "url": "https://live-news-manifest.tubi.video/live-news-manifest/csm/extlive/tubiprd01,Cloudfront-Euronews.m3u8?yo.ap=https://lna.tubi.video/prd-yospace/&yo.t.jt=1000&yo.eb.fb=aHR0cHM6Ly9sbmMtZXVyb25ld3MudHViaS1zdGFnaW5nLnZpZGVvL2V3bnNhYnJlbl9lbmcubTN1OA=="
+                    },
+                    "type": "hlsv3"
+                }
+            ],
+            "is_cdc": false
+        },
+        "555124": {
+            "id": "555124",
+            "type": "l",
+            "title": "Bloomberg TV",
+            "ratings": [
+                {
+                    "system": "tvpg",
+                    "value": "TV-MA",
+                    "code": "TV-MA",
+                    "descriptors": []
+                }
+            ],
+            "actors": [],
+            "directors": [],
+            "tags": [
+                "linear",
+                "live",
+                "news"
+            ],
+            "description": "Bloomberg Television delivers business and markets news, data, analysis, and video to the world, featuring stories from Businessweek and Bloomberg News.",
+            "year": 2020,
+            "posterarts": [
+                "http://canvas-bridge.tubitv.com/x5f0lnxl_LkNh_Ye5dKqgDQiIjA=/0x144:1280x576/408x138/smart/img.adrise.tv/d37b2938-e270-4df2-b5f6-bb3e36d3b62c.png"
+            ],
+            "thumbnails": [
+                "http://img-cdn.adrise.tv/49c3d9fd-6e24-4091-97df-4d852439460b.png"
+            ],
+            "hero_images": [
+                "http://canvas-bridge.tubitv.com/x5f0lnxl_LkNh_Ye5dKqgDQiIjA=/0x144:1280x576/408x138/smart/img.adrise.tv/d37b2938-e270-4df2-b5f6-bb3e36d3b62c.png"
+            ],
+            "landscape_images": [
+                "http://canvas-bridge.tubitv.com/x5f0lnxl_LkNh_Ye5dKqgDQiIjA=/0x144:1280x576/408x138/smart/img.adrise.tv/d37b2938-e270-4df2-b5f6-bb3e36d3b62c.png"
+            ],
+            "backgrounds": [
+                "http://canvas-bridge.tubitv.com/poAZRQq_4Gk-aGaKdhfGOoJyiyQ=/1920x1080/smart/img.adrise.tv/20b3f331-24b3-4bd5-b868-75563ae9c61d.png"
+            ],
+            "availability_duration": 31536000,
+            "publisher_id": "bf566fa34e54239e78c26db6ef5f977a",
+            "has_trailer": false,
+            "has_subtitle": true,
+            "import_id": "bloomberg_live_news",
+            "availability_starts": "2020-06-22T00:00:00.000Z",
+            "availability_ends": null,
+            "images": {},
+            "video_resources": [
+                {
+                    "manifest": {
+                        "url": "https://live-news-manifest.tubi.video/live-news-manifest/csm/extlive/tubiprd01,Cloudfront-Bloomberg.m3u8?yo.ap=https://lna.tubi.video/prd-yospace/&yo.t.jt=1000&yo.eb.fb=aHR0cHM6Ly9sbmMtYmxvb21iZXJnLnR1YmkudmlkZW8vaGxzL21hbmlmZXN0cy9ibWRfdXNfdGlja2VybGVzcy9tYXN0ZXIubTN1OA=="
+                    },
+                    "type": "hlsv3"
+                }
+            ],
+            "is_cdc": false
+        },
+        "555126": {
+            "id": "555126",
+            "type": "l",
+            "title": "Cheddar News",
+            "ratings": [
+                {
+                    "system": "tvpg",
+                    "value": "TV-MA",
+                    "code": "TV-MA",
+                    "descriptors": []
+                }
+            ],
+            "actors": [],
+            "directors": [],
+            "tags": [
+                "linear",
+                "live",
+                "news"
+            ],
+            "description": "Feed your curiosity about what's next. Watch Cheddar News for live news and original shows that explore the people, ideas and innovations that are shaping your world.",
+            "year": 2020,
+            "posterarts": [
+                "http://canvas-bridge.tubitv.com/Ktp_B3XgxzrsClKZ1U2Ezaa4Tlc=/0x144:1280x576/408x138/smart/img.adrise.tv/821e0525-897c-45f2-a9c5-74c88487c538.png"
+            ],
+            "thumbnails": [
+                "http://img-cdn.adrise.tv/8603a8ab-efe4-4587-9276-f99fc55a8796.png"
+            ],
+            "hero_images": [
+                "http://canvas-bridge.tubitv.com/Ktp_B3XgxzrsClKZ1U2Ezaa4Tlc=/0x144:1280x576/408x138/smart/img.adrise.tv/821e0525-897c-45f2-a9c5-74c88487c538.png"
+            ],
+            "landscape_images": [
+                "http://canvas-bridge.tubitv.com/Ktp_B3XgxzrsClKZ1U2Ezaa4Tlc=/0x144:1280x576/408x138/smart/img.adrise.tv/821e0525-897c-45f2-a9c5-74c88487c538.png"
+            ],
+            "backgrounds": [
+                "http://canvas-bridge.tubitv.com/v4LCfzjP2uhpuzHzl1CCBfcbY_g=/1920x1080/smart/img.adrise.tv/17a32ec4-35d2-4d71-9193-68af12f10c0d.png"
+            ],
+            "availability_duration": 31536000,
+            "publisher_id": "a61acdb669d2fd2484ff64ff7025055a",
+            "has_trailer": false,
+            "has_subtitle": true,
+            "import_id": "altice_live_news",
+            "availability_starts": "2020-06-22T00:00:00.000Z",
+            "availability_ends": null,
+            "images": {},
+            "video_resources": [
+                {
+                    "manifest": {
+                        "url": "https://live-news-manifest.tubi.video/live-news-manifest/csm/extlive/tubiprd01,Cloudfront-Cheddar.m3u8?yo.ap=https://lna.tubi.video/prd-yospace/&yo.t.jt=1000&yo.eb.fb=aHR0cHM6Ly9sbmMtY2hlZGRhci50dWJpLnZpZGVvL2luZGV4Lm0zdTg="
+                    },
+                    "type": "hlsv3"
+                }
+            ],
+            "is_cdc": false
+        },
+        "571664": {
+            "id": "571664",
+            "type": "l",
+            "title": "Bloomberg Quicktake",
+            "ratings": [
+                {
+                    "system": "tvpg",
+                    "value": "TV-MA",
+                    "code": "TV-MA",
+                    "descriptors": []
+                }
+            ],
+            "actors": [],
+            "directors": [],
+            "tags": [
+                "linear",
+                "live",
+                "news"
+            ],
+            "description": "Make sense of today’s biggest stories from the world’s largest newsroom. Watch live global news and go deeper with original shows on business, technology, politics, and culture.",
+            "year": 2020,
+            "posterarts": [
+                "http://canvas-bridge.tubitv.com/nAt_8p66pmGdaEw4gkECctb5qco=/0x215:1920x865/408x138/smart/img.adrise.tv/f9c32c20-8ffc-4ee5-bac6-f1ee8ce741ce.png"
+            ],
+            "thumbnails": [
+                "http://img-cdn.adrise.tv/accfa016-2a08-4ea6-af2e-675423cf04cd.png"
+            ],
+            "hero_images": [
+                "http://canvas-bridge.tubitv.com/nAt_8p66pmGdaEw4gkECctb5qco=/0x215:1920x865/408x138/smart/img.adrise.tv/f9c32c20-8ffc-4ee5-bac6-f1ee8ce741ce.png"
+            ],
+            "landscape_images": [
+                "http://canvas-bridge.tubitv.com/nAt_8p66pmGdaEw4gkECctb5qco=/0x215:1920x865/408x138/smart/img.adrise.tv/f9c32c20-8ffc-4ee5-bac6-f1ee8ce741ce.png"
+            ],
+            "backgrounds": [
+                "http://canvas-bridge.tubitv.com/Fe5ojWx2rzcVz6BZgY950asoICA=/1920x1080/smart/img.adrise.tv/f9c32c20-8ffc-4ee5-bac6-f1ee8ce741ce.png"
+            ],
+            "availability_duration": 31536000,
+            "publisher_id": "bf566fa34e54239e78c26db6ef5f977a",
+            "has_trailer": false,
+            "has_subtitle": true,
+            "import_id": "bloomberg_live_news",
+            "availability_starts": "2020-06-22T00:00:00.000Z",
+            "availability_ends": null,
+            "images": {},
+            "video_resources": [
+                {
+                    "manifest": {
+                        "url": "https://live-news-manifest.tubi.video/live-news-manifest/csm/extlive/tubiprd01,Cloudfront-Quicktake.m3u8?yo.ap=https://lna.tubi.video/prd-yospace/&yo.t.jt=1000&yo.eb.fb=aHR0cHM6Ly9sbmMtcXVpY2t0YWtlLnR1YmkudmlkZW8vaGxzL21hbmlmZXN0cy9xdWlja3Rha2VfbGluZWFyX3VzL21hc3Rlci5tM3U4"
+                    },
+                    "type": "hlsv3"
+                }
+            ],
+            "is_cdc": false
+        },
+        "555382": {
+            "id": "555382",
+            "type": "l",
+            "title": "FOX SOUL",
+            "ratings": [
+                {
+                    "system": "tvpg",
+                    "value": "TV-MA",
+                    "code": "TV-MA",
+                    "descriptors": []
+                }
+            ],
+            "actors": [],
+            "directors": [],
+            "tags": [
+                "linear",
+                "live",
+                "news"
+            ],
+            "description": "FOX SOUL celebrates Black culture and deals with real topics that impact the everyday lives of the Black community through frank, insightful dialogue.",
+            "year": 2020,
+            "posterarts": [
+                "http://canvas-bridge.tubitv.com/1SJ-Mh16uku3SCu_2VIAN9LKubs=/0x144:1280x576/408x138/smart/img.adrise.tv/47e852b3-c3c6-4200-adb2-93f6b1a8e0fd.png"
+            ],
+            "thumbnails": [
+                "http://img-cdn.adrise.tv/2a6c2739-6919-4c58-b075-3aca9a85bff2.png"
+            ],
+            "hero_images": [
+                "http://canvas-bridge.tubitv.com/1SJ-Mh16uku3SCu_2VIAN9LKubs=/0x144:1280x576/408x138/smart/img.adrise.tv/47e852b3-c3c6-4200-adb2-93f6b1a8e0fd.png"
+            ],
+            "landscape_images": [
+                "http://canvas-bridge.tubitv.com/1SJ-Mh16uku3SCu_2VIAN9LKubs=/0x144:1280x576/408x138/smart/img.adrise.tv/47e852b3-c3c6-4200-adb2-93f6b1a8e0fd.png"
+            ],
+            "backgrounds": [
+                "http://canvas-bridge.tubitv.com/O8SqUYfPp11kLeYIcqXauQm1fBs=/1920x1080/smart/img.adrise.tv/ac229941-8357-4231-bb36-73bc417d7bbf.png"
+            ],
+            "availability_duration": 31536000,
+            "publisher_id": "d63dd95bdceec34a93742d9442b7ad1d",
+            "has_trailer": false,
+            "has_subtitle": true,
+            "import_id": "fox_soul_live_news",
+            "availability_starts": "2020-06-22T00:00:00.000Z",
+            "availability_ends": null,
+            "images": {},
+            "video_resources": [
+                {
+                    "manifest": {
+                        "url": "https://live-news-manifest.tubi.video/live-news-manifest/csm/extlive/tubiprd01,Cloudfront-Fox-Soul-SCTE.m3u8?yo.ap=https://lna.tubi.video/prd-yospace/&yo.t.jt=1000&yo.eb.fb=aHR0cHM6Ly9sbmMtZm94LXNvdWwtc2N0ZS50dWJpLnZpZGVvL2luZGV4Lm0zdTg="
+                    },
+                    "type": "hlsv3"
+                }
+            ],
+            "is_cdc": false
+        },
+        "557344": {
+            "id": "557344",
+            "type": "l",
+            "title": "fubo Sports Network",
+            "ratings": [
+                {
+                    "system": "tvpg",
+                    "value": "TV-MA",
+                    "code": "TV-MA",
+                    "descriptors": []
+                }
+            ],
+            "actors": [],
+            "directors": [],
+            "tags": [
+                "linear",
+                "live",
+                "news"
+            ],
+            "description": "fubo Sports Network is a live TV network for passionate sports fans. Watch live events, sports news, exclusive series, sports movies, and more.",
+            "year": 2020,
+            "posterarts": [
+                "http://canvas-bridge.tubitv.com/hBrfLe2ypJPHCW3M5EboRRinGqw=/0x144:1280x576/408x138/smart/img.adrise.tv/fubo_poster.png"
+            ],
+            "thumbnails": [
+                "http://img-cdn.adrise.tv/fubo_300x300.png"
+            ],
+            "hero_images": [
+                "http://canvas-bridge.tubitv.com/hBrfLe2ypJPHCW3M5EboRRinGqw=/0x144:1280x576/408x138/smart/img.adrise.tv/fubo_poster.png"
+            ],
+            "landscape_images": [
+                "http://canvas-bridge.tubitv.com/hBrfLe2ypJPHCW3M5EboRRinGqw=/0x144:1280x576/408x138/smart/img.adrise.tv/fubo_poster.png"
+            ],
+            "backgrounds": [
+                "http://canvas-bridge.tubitv.com/TB9kA9YAXmMCNzjvlEaC4gkUHp8=/1920x1080/smart/img.adrise.tv/fubo_background.png"
+            ],
+            "availability_duration": 31536000,
+            "publisher_id": "671eb77f6fb679dcf72448943ee105e5",
+            "has_trailer": false,
+            "has_subtitle": false,
+            "import_id": "fubotv_live_news",
+            "availability_starts": "2020-06-22T00:00:00.000Z",
+            "availability_ends": null,
+            "images": {},
+            "video_resources": [
+                {
+                    "manifest": {
+                        "url": "https://live-news-manifest.tubi.video/live-news-manifest/csm/extlive/tubiprd01,Cloudfront-Fubo.m3u8?yo.ap=https://lna.tubi.video/prd-yospace/&yo.t.jt=1000&yo.eb.fb=aHR0cHM6Ly9sbmMtZnViby50dWJpLnZpZGVvL21hc3Rlci5tM3U4"
+                    },
+                    "type": "hlsv3"
+                }
+            ],
+            "is_cdc": false
+        },
+        "555128": {
+            "id": "555128",
+            "type": "l",
+            "title": "PeopleTV",
+            "ratings": [
+                {
+                    "system": "tvpg",
+                    "value": "TV-MA",
+                    "code": "TV-MA",
+                    "descriptors": []
+                }
+            ],
+            "actors": [],
+            "directors": [],
+            "tags": [
+                "linear",
+                "live",
+                "news"
+            ],
+            "description": "PeopleTV is the celebrity news and entertainment network powered by the award-winning PEOPLE and Entertainment Weekly newsrooms.",
+            "year": 2020,
+            "posterarts": [
+                "http://canvas-bridge.tubitv.com/EjK5Tl86MeZ7ZW7tfZEeASQBDgA=/0x144:1280x576/408x138/smart/img.adrise.tv/4557f3aa-f9de-4d54-9088-a208674c44df.png"
+            ],
+            "thumbnails": [
+                "http://img-cdn.adrise.tv/912c44a7-b10e-4129-95a6-c4f081f0a074.png"
+            ],
+            "hero_images": [
+                "http://canvas-bridge.tubitv.com/EjK5Tl86MeZ7ZW7tfZEeASQBDgA=/0x144:1280x576/408x138/smart/img.adrise.tv/4557f3aa-f9de-4d54-9088-a208674c44df.png"
+            ],
+            "landscape_images": [
+                "http://canvas-bridge.tubitv.com/EjK5Tl86MeZ7ZW7tfZEeASQBDgA=/0x144:1280x576/408x138/smart/img.adrise.tv/4557f3aa-f9de-4d54-9088-a208674c44df.png"
+            ],
+            "backgrounds": [
+                "http://canvas-bridge.tubitv.com/036Wy1Qjd_rOoyxoUCUnalIHwns=/1920x1080/smart/img.adrise.tv/a34fec3d-051c-405d-b55f-a80e29213ea3.png"
+            ],
+            "availability_duration": 31536000,
+            "publisher_id": "5ae527550bad16436e9f593351a93ee9",
+            "has_trailer": false,
+            "has_subtitle": false,
+            "import_id": "meredith_live_news",
+            "availability_starts": "2020-06-22T00:00:00.000Z",
+            "availability_ends": null,
+            "images": {},
+            "video_resources": [
+                {
+                    "manifest": {
+                        "url": "https://live-news-manifest.tubi.video/live-news-manifest/csm/extlive/tubiprd01,Cloudfront-People-TV.m3u8?yo.ap=https://lna.tubi.video/prd-yospace/&yo.t.jt=1000&yo.eb.fb=aHR0cHM6Ly9sbmMtcGVvcGxlLXR2LnR1YmkudmlkZW8vcGxheWxpc3QubTN1OA=="
+                    },
+                    "type": "hlsv3"
+                }
+            ],
+            "is_cdc": false
+        }
+    },
+    "valid_duration": 21600,
+    "groupCursor": null
+}

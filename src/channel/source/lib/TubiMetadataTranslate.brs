@@ -10,6 +10,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateChannel: tubiMetadataTranslate_translateChannel
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
     translateChannelsCategories: tubiMetadataTranslate_translateChannelsCategories
+    translateLinearChannelGuide: tubiMetadataTranslate_translateLinearChannelGuide
 
     ' private
     constants: constants
@@ -27,6 +28,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     getGridItemType: tubiMetadataTranslate_getGridItemType
     experiments: experiments
     getThumbnailImage: tubiMetadataTranslate_getThumbnailImage
+    composeVideoResources: tubiMetadataTranslate_composeVideoResources
   }
 End Function
 
@@ -307,62 +309,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   ' DRM encoded streams
-  if type(contentFromServer.video_resources) = "roArray" and contentFromServer.video_resources.count() > 0
-    ' Create a "stub" ContentNode with just the DRM-oriented fields populated. This
-    ' will make it easy to merge metadata plus drm info into one actionable
-    ' contentnode for the video player
-    videoResources = []
-    for each video in contentFromServer.video_resources
-      resource = {}
-      if video.manifest <> invalid
-        if video.manifest.url <> invalid then resource.url = video.manifest.url
-        if video.manifest.duration <> invalid then resource.length = video.manifest.duration
-      end if
-
-      if video.type = m.constants.player.drmTypes.dashWidevine 
-        resource.type = m.constants.player.drmTypes.dashWidevine
-        resource.streamFormat = "dash"
-        if video.license_server <> invalid
-          resource.drmParams = {
-            keySystem: "Widevine"
-            licenseServerURL: video.license_server.url
-          }
-          if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
-            resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
-          end if
-
-          if video.license_server.hdcp_version <> invalid
-            resource.hdcpVersion = video.license_server.hdcp_version
-          end if
-        end if
-      else if video.type = m.constants.player.drmTypes.dashPlayReady
-        resource.type = m.constants.player.drmTypes.dashPlayReady
-        resource.streamFormat = "dash"
-        if video.license_server <> invalid
-          resource.encodingType = "PlayReadyLicenseAcquisitionUrl"
-          resource.encodingKey = video.license_server.url
-          if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
-            resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
-          end if
-
-          if video.license_server.hdcp_version <> invalid
-            resource.hdcpVersion = video.license_server.hdcp_version
-          end if
-        end if
-      else if video.type = m.constants.player.drmTypes.hlsv3
-        resource.type = m.constants.player.drmTypes.hlsv3
-        resource.streamFormat = "hls"
-      else
-        ' Don't add unsupported/unknown video resource types
-        resource = invalid
-      end if
-
-      if resource <> invalid
-        videoResources.push(resource)
-      end if
-    end for
-    translatedContent.videoResources = videoResources
-  end if
+  translatedContent.videoResources = m.composeVideoResources(contentFromServer)
 
 
   'take care of any subtitles if they exist - should only happen on videos
@@ -806,6 +753,39 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
 End Function
 
 
+' The linear channel guide UI expects a list of linear contents within a
+' single parent content node. Here, we concatenate each container of the
+' homescreen response into a single "container".
+'
+' @homescreenResponse: assocArray, the AA representation of the matrix/homescreen response
+'
+' @returns: a parent content node containing children content nodes,
+'           each representing a linear channel or invalid on invalid input
+Function tubiMetadataTranslate_translateLinearChannelGuide(homescreenRes)
+  if homescreenRes <> invalid and homescreenRes.containers <> invalid
+    channelsParent = CreateObject("roSGNode", "CategoryContentNode")
+    containers = homescreenRes.containers
+    contents = homescreenRes.contents
+
+    allChannels = {
+      children: []
+      subtype: "TubiContentNode"
+    }
+
+    for each container in containers
+      categoryAA = m.buildCategoryAA(container, contents, invalid, "", true, "linear")
+      allChannels.children.append(categoryAA.children)
+    end for
+
+    channelsParent.update(allChannels)
+
+    return channelsParent
+  else
+    return invalid
+  end if
+End Function
+
+
 ''''''''''''''''''''
 ' translateContainer
 '
@@ -895,7 +875,6 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       state: "partial"
       gridItemType: m.getGridItemType(container, sOrientation, m.constants)
     }
-    
 
     if container.thumbnail <> invalid
       updateMetadata.thumbnail = container.thumbnail
@@ -989,8 +968,14 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           bLandscape = true
         end if
 
-        if bFullData = true and fullChild.backgrounds <> invalid and type(fullChild.backgrounds) = "roArray" and fullChild.backgrounds.count() > 0
-          childAA.backgrounds = m.dedupeBackgrounds(fullChild.backgrounds)
+        if bFullData = true
+          if fullChild.backgrounds <> invalid and type(fullChild.backgrounds) = "roArray" and fullChild.backgrounds.count() > 0
+            childAA.backgrounds = m.dedupeBackgrounds(fullChild.backgrounds)
+          end if
+
+          if fullChild.video_resources <> invalid and type(fullChild.video_resources) = "roArray" and fullChild.video_resources.count() > 0
+            childAA.videoResources = m.composeVideoResources(fullChild)
+          end if
         end if
 
         gridType = ""
@@ -1413,4 +1398,68 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   end if
   
   return gridItemType
+End Function
+
+
+' @contentFromServer: assocArray, AA representation of a single piece of content as
+'                                 returned by various APIs.
+Function tubiMetadataTranslate_composeVideoResources(contentFromServer)
+  videoResources = []
+
+  if type(contentFromServer.video_resources) = "roArray" and contentFromServer.video_resources.count() > 0
+    ' Create a "stub" ContentNode with just the DRM-oriented fields populated. This
+    ' will make it easy to merge metadata plus drm info into one actionable
+    ' contentnode for the video player
+    for each video in contentFromServer.video_resources
+      resource = {}
+      if video.manifest <> invalid
+        if video.manifest.url <> invalid then resource.url = video.manifest.url
+        if video.manifest.duration <> invalid then resource.length = video.manifest.duration
+      end if
+
+      if video.type = m.constants.player.drmTypes.dashWidevine
+        resource.type = m.constants.player.drmTypes.dashWidevine
+        resource.streamFormat = "dash"
+        if video.license_server <> invalid
+          resource.drmParams = {
+            keySystem: "Widevine"
+            licenseServerURL: video.license_server.url
+          }
+          if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
+            resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+          end if
+
+          if video.license_server.hdcp_version <> invalid
+            resource.hdcpVersion = video.license_server.hdcp_version
+          end if
+        end if
+      else if video.type = m.constants.player.drmTypes.dashPlayReady
+        resource.type = m.constants.player.drmTypes.dashPlayReady
+        resource.streamFormat = "dash"
+        if video.license_server <> invalid
+          resource.encodingType = "PlayReadyLicenseAcquisitionUrl"
+          resource.encodingKey = video.license_server.url
+          if video.license_server.auth_header_key <> invalid and video.license_server.auth_header_value <> invalid
+            resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+          end if
+
+          if video.license_server.hdcp_version <> invalid
+            resource.hdcpVersion = video.license_server.hdcp_version
+          end if
+        end if
+      else if video.type = m.constants.player.drmTypes.hlsv3
+        resource.type = m.constants.player.drmTypes.hlsv3
+        resource.streamFormat = "hls"
+      else
+        ' Don't add unsupported/unknown video resource types
+        resource = invalid
+      end if
+
+      if resource <> invalid
+        videoResources.push(resource)
+      end if
+    end for
+  end if
+
+  return videoResources
 End Function
