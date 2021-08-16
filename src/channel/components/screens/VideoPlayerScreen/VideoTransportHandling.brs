@@ -174,7 +174,7 @@ Function updatePlayerPosition(amt=0)
   end if
 
   ' update transport details only when it is shown
-  if m.HUD.opacity > 0 or amt > 0
+  if m.HUD.opacity > 0 or amt <> 0
     updateTransport()
   end if
 End Function
