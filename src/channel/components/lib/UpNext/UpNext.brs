@@ -137,7 +137,7 @@ Function onContentChange()
       singleContent = CreateObject("roSGNode", "ContentNode")
       singleContent.appendChild(firstContent.clone(false))
       m.GridSeries.content = singleContent
-      m.timeRemaining = getExperimentResource("roku_postplayexp_aptimer_5sec", "roku_postplayexp_aptimer_5sec_v1",false).ap_timer
+      m.timeRemaining = getExperimentResource("roku_postplayexp_aptimer_5sec", "roku_postplayexp_aptimer_15sec",false).ap_timer
       drawCountdown(m.CountdownSeries, m.timeRemaining)
       updateInfoPanel(m.InfoSeries, m.GridSeries.content.getChild(0))
     else
@@ -254,7 +254,7 @@ Function itemFocusedHelper(grid, info)
       m.top.itemFocused = grid.itemFocused
       ' reset countdown while user is interacting
       if content.seriesId <> invalid and content.seriesId <> ""
-        m.timeRemaining = getExperimentResource("roku_postplayexp_aptimer_5sec", "roku_postplayexp_aptimer_5sec_v1", false).ap_timer
+        m.timeRemaining = getExperimentResource("roku_postplayexp_aptimer_5sec", "roku_postplayexp_aptimer_15sec", false).ap_timer
       else
         m.timeRemaining = m.constants.player.upNextCountdown
       end if
@@ -356,7 +356,7 @@ Function onShow()
   if m.MovieGroup.visible
     drawCountdown(m.CountdownMovie, m.timeRemaining)
   else
-    getExperimentResource("roku_postplayexp_aptimer_5sec", "roku_postplayexp_aptimer_5sec_v1")
+    getExperimentResource("roku_postplayexp_aptimer_5sec", "roku_postplayexp_aptimer_15sec")
     drawCountdown(m.CountdownSeries, m.timeRemaining)
   end if
 

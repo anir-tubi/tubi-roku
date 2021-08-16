@@ -765,7 +765,7 @@ Function updateScrubTime()
 
   '//Ensure scrub can't go past the timer for the UpNext Overlay
   if m.Video.content.seriesId <> invalid and m.Video.content.seriesId <>""
-    nMaxScrub = m.Video.duration - getExperimentResource("roku_postplayexp_aptimer_5sec", "roku_postplayexp_aptimer_5sec_v1", false).ap_timer - 5
+    nMaxScrub = m.Video.duration - getExperimentResource("roku_postplayexp_aptimer_5sec", "roku_postplayexp_aptimer_15sec", false).ap_timer - 5
   else
     nMaxScrub = m.Video.duration - m.constants.player.upNextCountdown - 5
   end if
