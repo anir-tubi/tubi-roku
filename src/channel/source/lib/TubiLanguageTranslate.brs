@@ -495,6 +495,10 @@ Function getTranslation_en_US()
       "description": "Description of error when app is not able to get content.",
       "message": "Could not retrieve content information from server."
     },
+    "error_deeplink_content": {
+      "description": "Error message when the app can not retrieve the deeplink content.",
+      "message": "The title you're trying to watch is not currently available"
+    },
     "error_tryAgain_title": {
       "description": "Error message when the user has the option to try the operation again.",
       "message": "Let’s try that again"

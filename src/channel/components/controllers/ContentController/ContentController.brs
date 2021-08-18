@@ -576,7 +576,15 @@ End Function
 ' is triggered when the args that are passed to main, are passed into the SG thread to the contentController.
 ' this is one of the pre-requisites to starting the SG user experience.
 Function onStartupArgs()
-  m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs)
+  m.deeplinkContent = invalid 
+  ' TODO: Varify and simplify below logic after 2.17
+  if m.top.startUpArgs <> invalid 
+    if m.top.startUpArgs.launchParams <> invalid
+      m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs.launchParams)
+    else if m.top.startUpArgs.contentID <> invalid
+      m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs)
+    end if
+  end if
   externalAuthInfo = getExternalAuthInfoFromStartupArgs(m.top.startUpArgs)
 
   if externalAuthInfo <> invalid
@@ -1569,7 +1577,7 @@ Function onCustomResume(msg)
   customResumeArgs = invalid
 
   if m.lastSuspendOrResumeReason <> invalid
-    customResumeArgs = args
+    customResumeArgs = args.launchParams
     lastSuspendOrResumeReason = m.lastSuspendOrResumeReason
     m.lastSuspendOrResumeReason = invalid
   else if args <> invalid
@@ -1603,7 +1611,7 @@ Function onCustomResume(msg)
         ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
         restartApp()
       else
-        resumeApp(customResumeArgs)
+        resumeApp()
       end if
     else
       restartApp()
@@ -1625,8 +1633,7 @@ End Function
 
 
 ' resumes the app where the user left off.
-' @customResumeArgs : roSGNode, the args passed from resumeHandler
-Function resumeApp(customResumeArgs)
+Function resumeApp()
 
   tubiLog("ContentController.resumeApp")
   m.deeplinkContent = invalid
