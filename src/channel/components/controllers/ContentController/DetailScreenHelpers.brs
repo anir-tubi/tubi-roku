@@ -606,7 +606,7 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
     startChannel() 'adds a homescreen which will remove all other screens underneath
 
     title = getTranslation("dialog_errorOops_title")
-    message = getTranslation("screenDetails_error_getContent_description")
+    message = getTranslation("error_deeplink_content")
     dialogEvent = {
       type: "dialog"
       values: {
@@ -632,7 +632,7 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
     currentScreen = getCurrentScreen()
     if currentScreen <> invalid
       title = getTranslation("dialog_errorOops_title")
-      message = getTranslation("screenDetails_error_getContent_description")
+      message = getTranslation("error_deeplink_content")
       dialogEvent = {
         type: "dialog"
         values: {

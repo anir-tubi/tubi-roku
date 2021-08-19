@@ -1419,6 +1419,10 @@ Function getTranslation_es_MX()
       "description": "Description of error when app is not able to get content.",
       "message": "No se pudo recuperar la información del contenido del servidor."
     },
+    "error_deeplink_content": {
+      "description": "Error message when the app can not retrieve the deeplink content.",
+      "message": "El título que has elegido no está disponible en este momento"
+    },
     "error_tryAgain_title": {
       "description": "Error message when the user has the option to try the operation again.",
       "message": "Intentémoslo de nuevo"
