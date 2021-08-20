@@ -1425,7 +1425,7 @@ Function getTranslation_es_MX()
     },
     "screenInitialContent_subtitle_signedOut": {
       "description": "subTitle of the initial content screen when user is signed out",
-      "message": "Elige algo para ver o inicia una sesión"
+      "message": "¡Comienza a ver Gratis! ¡Sin iniciar sesión!"
     },
     "screenInitialContent_subtitle_signedIn": {
       "description": "subTitle of the initial content screen when user is signed in",
