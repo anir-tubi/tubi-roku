@@ -163,10 +163,6 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
       "message": "TV Shows"
     },
-    "menu_news": {
-      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the news screen.",
-      "message": "News"
-    },
     "menu_livetv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
       "message": "Live TV"
@@ -275,9 +271,9 @@ Function getTranslation_en_US()
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
       "message": "Español Disabled"
     },
-    "dialog_newsDisabled_title": {
-      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav news menu item but the item has been disabled",
-      "message": "News Disabled"
+    "dialog_liveTVDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav live TVs menu item but the item has been disabled",
+      "message": "Live TV Disabled"
     },
     "dialog_moviesDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
@@ -864,7 +860,7 @@ Function getTranslation_en_US()
       "message": "Guide"
     },
     "linearVideoPlayer_channelGuideTitle": {
-      "description": "The title displayed above a list of live news channels",
+      "description": "The title displayed above a list of live TV channels",
       "message": "Channel Guide"
     },
     "goBack_categories": {
@@ -1087,10 +1083,6 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
       "message": "Series"
     },
-    "menu_news": {
-      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the news screen.",
-      "message": "Noticias"
-    },
     "menu_livetv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
       "message": "TV En Vivo"
@@ -1199,9 +1191,9 @@ Function getTranslation_es_MX()
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
       "message": "Español desactivado"
     },
-    "dialog_newsDisabled_title": {
-      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav news menu item but the item has been disabled",
-      "message": "Noticias Desactivadas"
+    "dialog_liveTVDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav live TVs menu item but the item has been disabled",
+      "message": "TV En Vivo Desactivado"
     },
     "dialog_moviesDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
@@ -1788,7 +1780,7 @@ Function getTranslation_es_MX()
       "message": "Guía"
     },
     "linearVideoPlayer_channelGuideTitle": {
-      "description": "The title displayed above a list of live news channels",
+      "description": "The title displayed above a list of live TV channels",
       "message": "Guía de Canales"
     },
     "goBack_categories": {

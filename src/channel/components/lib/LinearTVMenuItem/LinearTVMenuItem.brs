@@ -21,7 +21,7 @@ End Function
 
 
 Function onItemContentChange()
-  tubiLog("LiveNewsMenuItem.onItemContentChange")
+  tubiLog("LinearTVMenuItem.onItemContentChange")
   if m.top.itemContent <> invalid then
     if m.top.itemContent.title <> invalid
       m.MenuText.text = m.top.itemContent.title

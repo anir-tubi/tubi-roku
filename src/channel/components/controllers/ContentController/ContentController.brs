@@ -858,7 +858,7 @@ Function setDirtyUserCategories(categoryId)
     movieScreen = getFromScreenCache(m.constants.ui.screenIds.movieScreen)
     tvScreen = getFromScreenCache(m.constants.ui.screenIds.tvScreen)
     espanolScreen = getFromScreenCache(m.constants.ui.screenIds.espanolScreen)
-    newsScreen = getFromScreenCache(m.constants.ui.screenIds.newsScreen)
+    linearTVScreen = getFromScreenCache(m.constants.ui.screenIds.linearTVScreen)
 
     'this will be an auth request if the user is logged in
     'auth request creation happens in metadataFetchTask
@@ -890,15 +890,7 @@ Function setDirtyUserCategories(categoryId)
         }
       }
       m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadEspanolUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionEspanol)
-    end if 
-    if newsScreen <> invalid
-      optionNews = {
-        params: {
-          "contentMode": m.constants.ui.contentMode.linear
-        }
-      }
-      m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadNewsUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionNews)
-    end if 
+    end if
   end if
 End Function
 
@@ -1139,7 +1131,7 @@ Function refreshAllHomeScreenTopNav()
   for i=0 to m.screenStack.getChildCount()-1
     screen = m.screenStack.getChild(i)
     if screen.subType() = "HomeScreen"
-      screen.isNewsAllowedInTopNav = isParentalControlsAdultLevel() 
+      screen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() 
       screen.refreshTopNav = true
     end if
   end for
@@ -1549,7 +1541,7 @@ Function onCustomSuspend(msg)
       stopVideoContent(currentScreen)
       returnToDetailScreenFromVideo(false)
     else
-      ' if the focus is on live news row, stop the playback
+      ' if the focus is on live TV row, stop the playback
       linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
       if linearVideoPlayer <> invalid
         linearVideoPlayer.closeTransport = true

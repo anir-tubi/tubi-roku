@@ -50,9 +50,9 @@ Function draw()
   nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(1)
   setMainContent(m.constants.ui.sideNavIds.tv, rowNode, aItemWidths)
   
-  if m.top.isNewsAllowed = true
+  if m.top.isLinearTVAllowed = true
     nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(2)
-    setMainContent(m.constants.ui.sideNavIds.news, rowNode, aItemWidths)
+    setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode, aItemWidths)
   end if
   
   nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + nMenuOutsideSpacing
@@ -101,14 +101,8 @@ Function setMainContent(itemID, parentNode, aItemWidths)
   else if itemID = m.constants.ui.sideNavIds.tv
     contentNode.title = getTranslation("menu_tv")
     bSuccess = true
-  else if itemID = m.constants.ui.sideNavIds.news
-    if getExperimentResource("roku_live_tv_name_experiment", "roku_live_tv_name_experiment_v1", true).enabled = false
-      '//::TODO:: liveTV - if the experiment is successful, then add a new sideNavIds that corresponds to liveTV. 
-      '//::TODO:: liveTV - if the experiment is successful, are the analytics affected? Do they need to say live_tv instead of news? 
-      contentNode.title = getTranslation("menu_news")
-    else
-      contentNode.title = getTranslation("menu_livetv")
-    end if
+  else if itemID = m.constants.ui.sideNavIds.linearTV
+    contentNode.title = getTranslation("menu_livetv")
     bSuccess = true
   else if itemID = m.constants.ui.sideNavIds.espanol
     contentNode.title = "Español"

@@ -60,14 +60,14 @@ Function showHomeScreen(constants, authInfo, screenID = "")
       m.top.observeFieldScoped("espanolscreenResponse", "onEspanolscreenResponse")
       sContentMode = constants.ui.contentMode.latino
       m.top.observeFieldScoped("reloadEspanolUserCategoriesResponse", "onReloadUserCategoriesResponseInEspanolScreen")
-    else if screenID = constants.ui.screenIds.newsScreen
-      m.top.observeFieldScoped("newsScreenResponse", "onNewsScreenResponse")
+    else if screenID = constants.ui.screenIds.linearTVScreen
+      m.top.observeFieldScoped("linearTVScreenResponse", "onLinearTVScreenResponse")
       sContentMode = constants.ui.contentMode.linear
-      m.top.observeFieldScoped("reloadNewsUserCategoriesResponse", "onReloadUserCategoriesResponseInNewsScreen")
+      m.top.observeFieldScoped("reloadLinearTVUserCategoriesResponse", "onReloadUserCategoriesResponseInLinearTVScreen")
     end if 
     homeScreen.contentMode = sContentMode
 
-    homeScreen.isNewsAllowedInTopNav = isParentalControlsAdultLevel()
+    homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel()
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
     homeScreen.signedIn = (authInfo <> invalid)
     homeScreen.kidsModeFeatureOn = m.kidsModeFeatureOn
@@ -103,8 +103,8 @@ Function showTVScreen()
 End Function
 
 
-Function showNewsScreen()
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.newsScreen)
+Function showLinearTVScreen()
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.linearTVScreen)
 End Function
 
 
@@ -127,8 +127,8 @@ Function onReloadUserCategoriesResponseInEspanolScreen(msg)
 End Function
 
 
-Function onReloadUserCategoriesResponseInNewsScreen(msg)
-  onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.newsScreen)
+Function onReloadUserCategoriesResponseInLinearTVScreen(msg)
+  onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.linearTVScreen)
 End Function
 
 
@@ -323,8 +323,8 @@ Function fetchHomeScreen(homeScreen)
       responseHandler = "tvscreenResponse"
     else if homeScreen.id = m.constants.ui.screenIds.espanolScreen 
       responseHandler = "espanolscreenResponse" 
-    else if homeScreen.id = m.constants.ui.screenIds.newsScreen 
-      responseHandler = "newsScreenResponse" 
+    else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen 
+      responseHandler = "linearTVScreenResponse" 
     end if
 
     m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, shouldKidsModeBeSentToServer(), options)
@@ -335,10 +335,10 @@ End Function
 
 
 ''''''''''''''''''''''''''''''
-' onNewsScreenResponse
+' onLinearTVScreenResponse
 '
-Function onNewsScreenResponse()
-  respondToHomescreenResponse(m.constants.ui.screenIds.newsScreen, m.top.newsScreenResponse)
+Function onLinearTVScreenResponse()
+  respondToHomescreenResponse(m.constants.ui.screenIds.linearTVScreen, m.top.linearTVScreenResponse)
 End Function
 
 
@@ -574,7 +574,7 @@ End Function
 Function onFullscreenCountdown()
   tubiLog("HomeScreenHelpers.onFullscreenCountdown")
   homeScreen = getCurrentScreen()
-  if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.newsScreen)
+  if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.linearTVScreen)
     nCurrentCount = homeScreen.fullscreenCountdown
     nNewCount = nCurrentCount - 1
     homeScreen.fullscreenCountdown = nNewCount
@@ -612,9 +612,9 @@ Function stopCountdownTimer()
   if homeScreen <> invalid
     homeScreen.fullscreenCountdown = -1
   end if
-  newsScreen = getFromScreenCache(m.constants.ui.screenIds.newsScreen)
-  if newsScreen <> invalid
-    newsScreen.fullscreenCountdown = -1
+  linearTVScreen = getFromScreenCache(m.constants.ui.screenIds.linearTVScreen)
+  if linearTVScreen <> invalid
+    linearTVScreen.fullscreenCountdown = -1
   end if
   m.playerFullscreenCountdownTimer.control = "stop"
 End Function
@@ -623,7 +623,7 @@ End Function
 Function startCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")  
   homeScreen = getCurrentScreen()
-  if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.newsScreen)
+  if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.linearTVScreen)
     stopCountdownTimer()
     '//Start/reset timer to play video in fullscreen after a few seconds
     homeScreen.fullscreenCountdown =  getExperimentResource("roku_linear_countdown_timer", "roku_linear_countdown_timer_v1", true).countdown_timer
@@ -665,8 +665,8 @@ Function onTopNavItemSelected(msg)
       showDefaultHomeScreen()
     else if content.id = m.constants.ui.sideNavIds.espanol
       showEspanolScreen()
-    else if content.id = m.constants.ui.sideNavIds.news
-      showNewsScreen()
+    else if content.id = m.constants.ui.sideNavIds.linearTV
+      showLinearTVScreen()
     end if
   else
     '//If the user selected a top nav item that is associated with the current screen, then simply close the top nav

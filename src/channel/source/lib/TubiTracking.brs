@@ -979,7 +979,7 @@ Function tubiTracking_getSideNavPageMap(constants)
   map[constants.ui.sideNavIds.channels] = "CHANNEL"
   map[constants.ui.sideNavIds.categories] = "CATEGORIES"
   map[constants.ui.sideNavIds.movies] = "MOVIES"
-  map[constants.ui.sideNavIds.news] = "NEWS"
+  map[constants.ui.sideNavIds.linearTV] = "NEWS"
   map[constants.ui.sideNavIds.tv] = "SERIES"
   map[constants.ui.sideNavIds.espanol] = "ESPANOL"
   map[constants.ui.sideNavIds.mylist] = "QUEUE"

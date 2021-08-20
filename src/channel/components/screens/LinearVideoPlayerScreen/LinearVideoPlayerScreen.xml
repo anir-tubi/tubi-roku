@@ -229,7 +229,7 @@
             fadeFocusFeedbackWhenAutoScrolling="true"
             drawFocusFeedbackOnTop="true"
             focusBitmapUri="pkg://images/menu-focus-fhd.9.png"
-            itemComponentName="LiveNewsCaptioningMenuItem"
+            itemComponentName="LinearTVCaptioningMenuItem"
             rowFocusAnimationStyle="floatingFocus"/>
           <RowList
             visible="true"
@@ -242,7 +242,7 @@
             rowItemSize="[[225,72]]"
             rowItemSpacing="[[18,0]]"
             drawFocusFeedback="false"
-            itemComponentName="LiveNewsCaptioningMenuItem"
+            itemComponentName="LinearTVCaptioningMenuItem"
             rowFocusAnimationStyle="floatingFocus"/>
         </Group>
     </Group>

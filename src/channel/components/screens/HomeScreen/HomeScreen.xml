@@ -58,7 +58,7 @@
       <!-- Indicates if that when the server is contacted, it should indicate that the app is in kidsMode. -->
       <field id="shouldKidsModeBeSentToServer" type="boolean" alias="CategoryGridList.shouldKidsModeBeSentToServer"/>
       
-      <field id="isNewsAllowedInTopNav" type="boolean" alias="TopNav.isNewsAllowed"/>
+      <field id="isLinearTVAllowedInTopNav" type="boolean" alias="TopNav.isLinearTVAllowed"/>
 
       <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
       <field id="jumpToRowItemByID" alias="CategoryGridList.jumpToRowItemByID" />

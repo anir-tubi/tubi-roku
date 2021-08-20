@@ -634,7 +634,7 @@ Function onLinearChannelSelectedFromGuide(msg)
 
       if videoPlayer.associatedScreenID <> invalid and videoPlayer.associatedScreenID <> ""
         '//Tell the homescreen to focus on the same channel so when the user backs out, the channel that is playing is the same one that is in focus
-        '//   Note: since the video channel guide and the homescreen's live news container are loaded independently from each other, we cannot assume they are in sync 
+        '//   Note: since the video channel guide and the homescreen's live TV container are loaded independently from each other, we cannot assume they are in sync 
         sContainerID = ""
         if videoPlayer.associatedScreenID = m.constants.ui.screenIds.homeScreen
           sContainerID = videoPlayer.content.parentId

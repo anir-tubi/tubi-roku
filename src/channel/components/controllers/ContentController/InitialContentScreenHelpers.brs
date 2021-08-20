@@ -81,9 +81,9 @@ End Function
 Function displayFirstContentScreen(sPageID)
   tubiLog("InitialContentScreenHelpers.displayFirstContentScreen")
   sideNavFocus = m.constants.ui.sideNavIds.home
-  if sPageID = m.constants.ui.sideNavIds.news
+  if sPageID = m.constants.ui.sideNavIds.linearTV
     setUiMode(m.constants.ui.modes.standard)
-    showNewsScreen()
+    showLinearTVScreen()
   else if sPageID = m.constants.ui.sideNavIds.kidsMode
     setUiMode(m.constants.ui.modes.kids)
     reloadDefaultHomeScreenContent()

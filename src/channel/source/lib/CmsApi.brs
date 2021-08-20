@@ -295,7 +295,7 @@ Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = f
 
     if contentMode = m.constants.ui.contentMode.homescreen or contentMode = m.constants.ui.contentMode.linear
       if bKidsMode = false
-        ' add custom linear content header for all homescreen or news category fetches
+        ' add custom linear content header for all homescreen or linear TV category fetches
         ' per a request from back end team, in order to facilitate better caching.
         headers["x-tubi-inject-live-news"] = "true"
       end if

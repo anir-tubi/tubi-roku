@@ -11,8 +11,8 @@ Function initSideNav()
   if m.constants.deviceInfo.countryCode <> "US"
     '//Tell the sideNav to stop displaying the Espanol menu item
     m.SideNav.displayEspanol = false
-    '//Tell the sideNav to stop displaying the News menu item
-    m.SideNav.displayNews = false
+    '//Tell the sideNav to stop displaying the Linear TV menu item
+    m.SideNav.displayLinearTV = false
     '//Tell the sideNav to stop displaying the movies/TV menu items
     m.SideNav.displayMoviesTV = false
     '//Tell the sideNav to stop displaying the channel menu item
@@ -34,8 +34,8 @@ Function initSideNav()
 
   ' stop displaying some side nav items if the top nav is being displayed
   if isTopNavHomeScreenEnabled() = true
-    '//Tell the sideNav to stop displaying the News menu item
-    m.SideNav.displayNews = false
+    '//Tell the sideNav to stop displaying the Linear TV menu item
+    m.SideNav.displayLinearTV = false
     '//Tell the sideNav to stop displaying the movies/TV menu items
     m.SideNav.displayMoviesTV = false
   end if
@@ -276,14 +276,14 @@ Function onSideNavItemSelected()
         showEspanolScreen()
         bNewScreenCalledSuccess = true
       end if  
-    else if itemSelectedId = m.constants.ui.sideNavIds.news
+    else if itemSelectedId = m.constants.ui.sideNavIds.linearTV
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.news)
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.linearTV)
       else
         setUiMode(m.constants.ui.modes.standard)
         showHideSpinner(true)
-        showNewsScreen()
+        showLinearTVScreen()
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.mylist
@@ -342,7 +342,7 @@ Function displayMenuItemDisabled(sMenuItemID, parental="")
   if sMenuItemID = m.constants.ui.sideNavIds.channels
     sTitle = getTranslation("dialog_channelsDisabled_title")
     sDialogSubTypeValue = "kids-mode-channels"
-'//::TODO:: Because movies, tv shows, espanol, and news are displayed in the top nav, then no need to have code to show a dialog window for these options
+'//::TODO:: Because movies, tv shows, espanol, and live TV are displayed in the top nav, then no need to have code to show a dialog window for these options
 '//         Get rid of this code and any supporting code in this file once it has been determined that top nav is here to stay. Once it has been decided to have the topNav on FireTV 
   else if sMenuItemID = m.constants.ui.sideNavIds.movies
     sTitle = getTranslation("dialog_moviesDisabled_title")
@@ -353,9 +353,9 @@ Function displayMenuItemDisabled(sMenuItemID, parental="")
   else if sMenuItemID = m.constants.ui.sideNavIds.espanol
     sTitle = getTranslation("dialog_espanolDisabled_title")
     sDialogSubTypeValue = "kids-mode-espanol"    
-  else if sMenuItemID = m.constants.ui.sideNavIds.news
-    sTitle = getTranslation("dialog_newsDisabled_title")
-    sDialogSubTypeValue = "kids-mode-news"  
+  else if sMenuItemID = m.constants.ui.sideNavIds.linearTV
+    sTitle = getTranslation("dialog_liveTVDisabled_title")
+    sDialogSubTypeValue = "kids-mode-livetv"  
   end if
 
   dialogEvent = {
@@ -394,7 +394,7 @@ Function enableKidsModeFromSideNav()
   nonAvailableKidsScreens[m.constants.ui.screenIds.movieScreen] = true
   nonAvailableKidsScreens[m.constants.ui.screenIds.tvScreen] = true
   nonAvailableKidsScreens[m.constants.ui.screenIds.espanolScreen] = true
-  nonAvailableKidsScreens[m.constants.ui.screenIds.newsScreen] = true
+  nonAvailableKidsScreens[m.constants.ui.screenIds.linearTVScreen] = true
 
   screen = getCurrentScreen()
   if screen <> invalid and nonAvailableKidsScreens[screen.id] = true

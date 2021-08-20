@@ -11,7 +11,7 @@ End Function
 
 
 Function onItemContentChange()
-  tubiLog("LiveNewsCaptioningMenuItem.onItemContentChange")
+  tubiLog("LinearTVCaptioningMenuItem.onItemContentChange")
   if m.top.itemContent <> invalid then
     if m.top.itemContent.isForeground = true
       if m.top.itemContent.title <> invalid

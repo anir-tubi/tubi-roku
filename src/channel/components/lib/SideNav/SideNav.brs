@@ -7,7 +7,7 @@ Function init()
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
   m.top.observeFieldScoped("displayEspanol", "onEspanolDisplayChanged")
-  m.top.observeFieldScoped("displayNews", "onNewsDisplayChanged")
+  m.top.observeFieldScoped("displayLinearTV", "onLinearTVDisplayChanged")
   m.top.observeFieldScoped("displayMoviesTV", "onMovieTVDisplayChanged")
   m.top.observeFieldScoped("displayChannels", "onChannelsDisplayChanged")
   m.top.observeFieldScoped("displaySignIn", "onSignInDisplayChanged")
@@ -69,9 +69,9 @@ Function setMainContent(item)
   else if item = m.constants.ui.sideNavIds.espanol
     contentNode.title = "Español"
     contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
-  else if item = m.constants.ui.sideNavIds.news
-    contentNode.title = getTranslation("menu_news")
-    contentNode.iconUrl = "pkg:/images/sideNavNews.png"
+  else if item = m.constants.ui.sideNavIds.linearTV
+    contentNode.title = getTranslation("menu_livetv")
+    contentNode.iconUrl = "pkg:/images/sideNavLinearTV.png"
   else if item = m.constants.ui.sideNavIds.myList
     contentNode.title = getTranslation("menu_mylist")
     contentNode.iconUrl = "pkg:/images/sideNavMyList.png"    
@@ -114,7 +114,7 @@ Function onCreateMenuItems()
     m.constants.ui.sideNavIds.categories
     m.constants.ui.sideNavIds.channels
     m.constants.ui.sideNavIds.espanol
-    m.constants.ui.sideNavIds.news
+    m.constants.ui.sideNavIds.linearTV
     m.constants.ui.sideNavIds.settings
     m.constants.ui.sideNavIds.exit
   ]
@@ -201,11 +201,11 @@ Function onEspanolDisplayChanged()
 End Function
 
 
-' Hide the news item if this is called
-Function onNewsDisplayChanged()
-  if m.top.displayNews = false
-    '//Remove news if those items should be hidden. For right now, don't worry about turning it back on
-    removeNews()
+' Hide the live TV item if this is called
+Function onLinearTVDisplayChanged()
+  if m.top.displayLinearTV = false
+    '//Remove line TV if those items should be hidden. For right now, don't worry about turning it back on
+    removeLinearTV()
     verticallyCenterSideNav()
   end if
 End Function
@@ -286,7 +286,7 @@ Function onUiModeChanged()
     removeTv()
     removeChannels()
     removeEspanol()
-    removeNews()
+    removeLinearTV()
     removeMyList()
     verticallyCenterSideNav()
     m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
@@ -296,7 +296,7 @@ Function onUiModeChanged()
     if m.moviesContent <> invalid then m.moviesContent.turnedOn = true
     if m.tvContent <> invalid then m.tvContent.turnedOn = true
     if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
-    if m.newsContent <> invalid then m.newsContent.turnedOn = true
+    if m.linearTVContent <> invalid then m.linearTVContent.turnedOn = true
     if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_kids")
     m.sideNavBackground.uri = ""
   else if m.top.uiMode = m.constants.ui.modes.standard
@@ -305,7 +305,7 @@ Function onUiModeChanged()
     if m.moviesContent <> invalid then m.moviesContent.turnedOn = true
     if m.tvContent <> invalid then m.tvContent.turnedOn = true
     if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
-    if m.newsContent <> invalid then m.newsContent.turnedOn = true
+    if m.linearTVContent <> invalid then m.linearTVContent.turnedOn = true
     if m.kidsModeContent <> invalid
       m.kidsModeContent.turnedOn = true
       m.kidsModeContent.title = getTranslation("menu_kids")
@@ -323,7 +323,7 @@ Function setCommonSideNavKidsValues()
   if m.moviesContent <> invalid then m.moviesContent.turnedOn = false
   if m.tvContent <> invalid then m.tvContent.turnedOn = false
   if m.espanolContent <> invalid then m.espanolContent.turnedOn = false
-  if m.newsContent <> invalid then m.newsContent.turnedOn = false
+  if m.linearTVContent <> invalid then m.linearTVContent.turnedOn = false
   if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_exitKids")
   m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
 End Function
@@ -389,12 +389,12 @@ Function removeEspanol()
 End Function
 
 
-Function removeNews()
-  if m.newsContent <> invalid
-    m.MainContent.removeChild(m.newsContent)
+Function removeLinearTV()
+  if m.linearTVContent <> invalid
+    m.MainContent.removeChild(m.linearTVContent)
   end if
-  if m.newsContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.newsContentSelect)
+  if m.linearTVContentSelect <> invalid
+    m.MainContentSelect.removeChild(m.linearTVContentSelect)
   end if
 End Function
 

@@ -8,7 +8,7 @@ Function init()
   m.top.observeField("text", "onTextChange")
 
   if m.global.constants.deviceInfo.scaledUi = true
-    m.Background.uri = "pkg:/images/live_news_button_hd.9.png"
+    m.Background.uri = "pkg:/images/live_tv_button_hd.9.png"
   end if
 End Function
 

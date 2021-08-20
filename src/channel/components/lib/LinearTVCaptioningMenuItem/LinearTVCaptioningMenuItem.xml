@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<component name="LiveNewsCaptioningMenuItem" extends="Group">
-  <script type="text/brightscript" uri="LiveNewsCaptioningMenuItem.brs" />
+<component name="LinearTVCaptioningMenuItem" extends="Group">
+  <script type="text/brightscript" uri="LinearTVCaptioningMenuItem.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
     <!-- INPUTS -->
 
-    <!-- Content expected for a LiveNewsCaptioningMenuItem:
+    <!-- Content expected for a LinearTVCaptioningMenuItem:
      -
      - title - The label text
      - iconUrl - The icon uri

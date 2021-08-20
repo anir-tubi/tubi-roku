@@ -17,8 +17,8 @@
       <!-- Indicate if the topNav is far from the focus and should have a different look. -->
       <field id="farAwayFromFocus" type="boolean"/>
 
-      <!-- Should the topNav display the news item. -->
-      <field id="isNewsAllowed" type="boolean" value="true"/>
+      <!-- Should the topNav display the live TV item. -->
+      <field id="isLinearTVAllowed" type="boolean" value="true"/>
 
       <!-- should the topNav refresh? -->
       <field id="refresh" type="boolean" value="false"  alwaysNotify="true"/>

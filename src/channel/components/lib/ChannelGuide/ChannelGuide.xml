@@ -65,7 +65,7 @@
       drawFocusFeedbackOnTop="false"
       focusFootprintBitmapUri="pkg:/images/channelguideRow-active.png"
       focusBitmapUri="pkg:/images/channelguideRow-active.png"
-      itemComponentName="LiveNewsMenuItem"
+      itemComponentName="LinearTVMenuItem"
       vertFocusAnimationStyle="fixedFocusWrap"/>
     <Poster
       width="1920"

@@ -81,7 +81,7 @@ Function init()
   m.vitgSlideAmt = 440 'the amount the grid slides up to fit the vitg content item
   m.vitgMaskOffsetDiff = 466 'the diff in the amount the content area mask is offset in the up direction for vitg
   m.linearSlideAmt = -86 'the amount the grid slides up to fit the linear content item
-  m.linearMaskOffsetDiff = -70 'the diff in the amount the content area mask is offset in the up direction for the linear news container
+  m.linearMaskOffsetDiff = -70 'the diff in the amount the content area mask is offset in the up direction for the linear TV container
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
   m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt]
@@ -134,8 +134,8 @@ Function resetTopNavSelection()
       sTopNavID = m.constants.ui.sideNavIds.tv
     else if m.top.id = m.constants.ui.screenIds.espanolScreen
       sTopNavID = m.constants.ui.sideNavIds.espanol
-    else if m.top.id = m.constants.ui.screenIds.newsScreen
-      sTopNavID = m.constants.ui.sideNavIds.news
+    else if m.top.id = m.constants.ui.screenIds.linearTVScreen
+      sTopNavID = m.constants.ui.sideNavIds.linearTV
     end if
 
     if sTopNavID <> ""
@@ -160,9 +160,9 @@ Function onIDChange()
   else if m.top.id = m.constants.ui.screenIds.espanolScreen
     newTrackingPageInfo.pageType = "latino_browse_page"
     m.top.screenLevel = m.constants.ui.screenLevels.espanolScreen
-  else if m.top.id = m.constants.ui.screenIds.newsScreen
+  else if m.top.id = m.constants.ui.screenIds.linearTVScreen
     newTrackingPageInfo.pageType = "news_browse_page"
-    m.top.screenLevel = m.constants.ui.screenLevels.newsScreen
+    m.top.screenLevel = m.constants.ui.screenLevels.linearTVScreen
   else
     newTrackingPageInfo.pageType = "home_page"
     m.top.screenLevel = m.constants.ui.screenLevels.homeScreen

@@ -45,7 +45,7 @@ Function onAnimateIntoView()
 
   rowNode = CreateObject("roSGNode", "ContentNode")
   setMainContent(m.constants.ui.sideNavIds.home, rowNode)
-  setMainContent(m.constants.ui.sideNavIds.news, rowNode)
+  setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
   setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
   setMainContent(m.constants.ui.sideNavIds.espanol, rowNode)
 
@@ -125,9 +125,9 @@ Function setMainContent(itemID, parentNode)
     contentNode.title = getTranslation("menu_movies_and_tv")
     contentNode.hdgridposterurl = "pkg:/images/icon-movies-large.png"
     bSuccess = true
-  else if itemID = m.constants.ui.sideNavIds.news
-    contentNode.title = getTranslation("menu_news")
-    contentNode.hdgridposterurl = "pkg:/images/icon-news-large.png"
+  else if itemID = m.constants.ui.sideNavIds.linearTV
+    contentNode.title = getTranslation("menu_livetv")
+    contentNode.hdgridposterurl = "pkg:/images/icon-linearTV-large.png"
     bSuccess = true
   else if itemID = m.constants.ui.sideNavIds.kidsMode
     contentNode.title = getTranslation("menu_kids")
