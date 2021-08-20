@@ -133,7 +133,11 @@ End Function
 ' translateRecursive
 '
 ' This is a recursive Function that does the heavy lifting for translateContentFromServer
-'this is a recursive Function that does the heavy lifting for translateContentFromServer
+' This function has the side effect of updating the translatedContent object that is passed in.
+' Pass in an AA as the translatedContent argument if using the .update() function later.
+'
+' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
+' @translatedContent: empty ContentNode or AA that will be populated with content metadata
 Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object) as integer
   if contentFromServer = invalid or type(contentFromServer) <> "roAssociativeArray" then return 0
 
@@ -154,58 +158,61 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     end if
   end if
 
-  'record keeping needed for adding series to bookmarks and previously viewed
+  if type(translatedContent) = "roSGNode"
+    'record keeping needed for adding series to bookmarks and previously viewed
 
-  ' NOTE: getParent() can return invalid due to Rendezvous error.  If it's the root TubiContentNode
-  '       it will by default have a parent of this Task node.  Apparently there is a rendezvous copy
-  '       of the parent task node made when getParent() is called, and that can end up being invalid
-  '       if the primary thread is stuck.
-  '
-  parent = translatedContent.getParent()
-  parentWhiteList = {}
-  parentWhiteList[m.constants.ui.contentTypes.series] = true
-  parentWhiteList[m.constants.ui.contentTypes.season] = true
-  
-  if parent <> invalid and parent.type <> invalid and parentWhiteList.DoesExist(parent.type) then
-    if parent.parentId <> invalid and parent.parentId <> "" then
-      translatedContent.parentId = parent.parentId
-    else
-      translatedContent.parentId = parent.id
-    end if
+    ' NOTE: getParent() can return invalid due to Rendezvous error.  If it's the root TubiContentNode
+    '       it will by default have a parent of this Task node.  Apparently there is a rendezvous copy
+    '       of the parent task node made when getParent() is called, and that can end up being invalid
+    '       if the primary thread is stuck.
+    '
+    parent = translatedContent.getParent()
+    parentWhiteList = {}
+    parentWhiteList[m.constants.ui.contentTypes.series] = true
+    parentWhiteList[m.constants.ui.contentTypes.season] = true
 
-    'this happens on deep link with mediaType = episode
-    if contentFromServer.series_id <> invalid
+    if parent <> invalid and parent.type <> invalid and parentWhiteList.DoesExist(parent.type) then
+      if parent.parentId <> invalid and parent.parentId <> "" then
+        translatedContent.parentId = parent.parentId
+      else
+        translatedContent.parentId = parent.id
+      end if
+
+      'this happens on deep link with mediaType = episode
+      if contentFromServer.series_id <> invalid
+        translatedContent.parentId = "0" + contentFromServer.series_id
+      end if
+
+      if parent.parentType <> invalid and parent.parentType <> "" then
+        translatedContent.parentType = parent.parentType
+      else
+        translatedContent.parentType = parent[typeVar]
+      end if
+
+      if parent.parentTitle <> invalid and parent.parentTitle <> "" then
+        translatedContent.parentTitle = parent.parentTitle
+      else
+        translatedContent.parentTitle = parent.title
+      end if
+
+      if parent.parentHistoryId <> invalid and parent.parentHistoryId <> "" then
+        translatedContent.parentHistoryId = parent.parentHistoryId
+      else if parent.historyId <> invalid and parent.historyId <> ""
+        translatedContent.parentHistoryId = parent.historyId
+      end if
+
+    else if contentFromServer.series_id <> invalid
       translatedContent.parentId = "0" + contentFromServer.series_id
-    end if
 
-    if parent.parentType <> invalid and parent.parentType <> "" then
-      translatedContent.parentType = parent.parentType
     else
-      translatedContent.parentType = parent[typeVar]
+      translatedContent.parentId = invalid
     end if
-
-    if parent.parentTitle <> invalid and parent.parentTitle <> "" then
-      translatedContent.parentTitle = parent.parentTitle
-    else
-      translatedContent.parentTitle = parent.title
-    end if
-
-    if parent.parentHistoryId <> invalid and parent.parentHistoryId <> "" then
-      translatedContent.parentHistoryId = parent.parentHistoryId
-    else if parent.historyId <> invalid and parent.historyId <> ""
-      translatedContent.parentHistoryId = parent.historyId
-    end if
-
-  else if contentFromServer.series_id <> invalid
-    translatedContent.parentId = "0" + contentFromServer.series_id
-
-  else
-    translatedContent.parentId = invalid
   end if
 
   'translate all the stuff from the server
-  if contentFromServer.title <> invalid then translatedContent.title = contentFromServer.title
+  translatedContent.length = 0
   if contentFromServer.duration <> invalid then translatedContent.length = contentFromServer.duration
+  if contentFromServer.title <> invalid then translatedContent.title = contentFromServer.title
   if contentFromServer.actors <> invalid then translatedContent.actors = contentFromServer.actors 'array of actors
   if contentFromServer.roku_genres <> invalid then translatedContent.rokuGenres = contentFromServer.roku_genres 'array of roku genres
   if contentFromServer.tags <> invalid then
@@ -237,6 +244,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.directors = contentFromServer.directors
   end if
 
+  translatedContent.creditsCuepoint = 0
   if contentFromServer.credit_cuepoints <> invalid
     if contentFromServer.credit_cuepoints.prologue <> invalid
       translatedContent.introCuepoint = contentFromServer.credit_cuepoints.prologue
@@ -387,12 +395,21 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       translatedContent.totalCount = contentFromServer.children.count()
     end if
 
-    for each childContent in contentFromServer.children
-      node = translatedContent.createChild("TubiContentNode")
-      ' pass the resolved fetchedAt time so that it doesn't have to be generated again for every child
-      count = count + m.translateRecursive(childContent, node)
-    end for
+    for each childContentFromServer in contentFromServer.children
+      if type(translatedContent) = "roSGNode"
+        translatedChild = translatedContent.createChild("TubiContentNode")
+        count = count + m.translateRecursive(childContentFromServer, translatedChild)
+      else if type(translatedContent) = "roAssociativeArray"
+        translatedChild = CreateObject("roAssociativeArray")
+        count = count + m.translateRecursive(childContentFromServer, translatedChild)
 
+        if translatedContent.children = invalid
+          translatedContent.children = []
+        end if
+
+        translatedContent.children.push(translatedChild)
+      end if
+    end for
   end if
 
   ' return the total number of children converted
@@ -957,6 +974,11 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           type: sContentType
         }
         
+        if bFullData = true
+          'mutates childAA by populating all fields on childAA
+          m.translateRecursive(fullChild, childAA)
+        end if
+
         bLandscape = false
         if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.portrait or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.utility
           bLandscape = false
@@ -968,15 +990,6 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           bLandscape = true
         end if
 
-        if bFullData = true
-          if fullChild.backgrounds <> invalid and type(fullChild.backgrounds) = "roArray" and fullChild.backgrounds.count() > 0
-            childAA.backgrounds = m.dedupeBackgrounds(fullChild.backgrounds)
-          end if
-
-          if fullChild.video_resources <> invalid and type(fullChild.video_resources) = "roArray" and fullChild.video_resources.count() > 0
-            childAA.videoResources = m.composeVideoResources(fullChild)
-          end if
-        end if
 
         gridType = ""
         if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.portrait
