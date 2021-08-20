@@ -27,7 +27,7 @@ Function TubiExperiments(constants) as Object
         roku_limit_containers_v2: {"num_containers": -1}
       }
       roku_initial_content_type_selector_icts: {
-        roku_initial_content_type_selector_icts_v1: {"enabled": false}
+        roku_initial_content_type_selector_icts_v2: {"icts_menu_option": "no_icts"} ' valid values are : "no_icts", "no_signin", "no_espanol", "original_v2"
       }
       roku_instant_resume: {
         roku_instant_resume_v2: {"enabled": true}

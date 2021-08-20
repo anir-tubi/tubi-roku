@@ -95,6 +95,12 @@ Function displayFirstContentScreen(sPageID)
   else if sPageID = m.constants.ui.sideNavIds.profile
     setUiMode(m.constants.ui.modes.standard)
     startSignIn(onSignInAfterInitialContentScreen)
+  else if sPageID = m.constants.ui.sideNavIds.movies
+    setUiMode(m.constants.ui.modes.standard)
+    showMoviesScreen()
+  else if sPageID = m.constants.ui.sideNavIds.tv
+    setUiMode(m.constants.ui.modes.standard)
+    showTVScreen()
   else
     ' send the user to the default home page
     setUiMode(m.constants.ui.modes.standard)

@@ -37,39 +37,59 @@ End Function
 
 ' animate the screen when the page 1st loads 
 Function onAnimateIntoView()
-  nMenuItems = 4
+  
+  rowNode = CreateObject("roSGNode", "ContentNode")
+  menu_treament_option = getExperimentResource("roku_initial_content_type_selector_icts", "roku_initial_content_type_selector_icts_v2", false).icts_menu_option
+  bShowSignInItem = true
+  if menu_treament_option = "no_signin"
+    setMainContent(m.constants.ui.sideNavIds.movies, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.tv, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.espanol, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
+    bShowSignInItem = false 
+  else if menu_treament_option = "no_espanol"
+    setMainContent(m.constants.ui.sideNavIds.movies, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.tv, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
+  else if menu_treament_option = "original_v2"
+    setMainContent(m.constants.ui.sideNavIds.home, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.espanol, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
+  end if
+  numOfMenuItems = rowNode.getChildCount()
   nSpacing = m.InitialContentMenu.columnSpacings[0]
-  aColumnSpacings = [nSpacing,nSpacing,nSpacing]
-  nMenuWidth = m.InitialContentMenu.itemSize[0] * nMenuItems + (nSpacing * (nMenuItems-1))
+  aColumnSpacings = []
+  for i = 1 to numOfMenuItems - 1
+    aColumnSpacings.push(nSpacing)
+  end for
+  nMenuWidth = m.InitialContentMenu.itemSize[0] * numOfMenuItems + (nSpacing * (numOfMenuItems-1))
   nMenuWidthWithoutProfile = nMenuWidth
 
-  rowNode = CreateObject("roSGNode", "ContentNode")
-  setMainContent(m.constants.ui.sideNavIds.home, rowNode)
-  setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
-  setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
-  setMainContent(m.constants.ui.sideNavIds.espanol, rowNode)
-
   m.Title.text = getTranslation("screenInitialContent_title")
-  if m.bSignedInUser = true  
+  if m.bSignedInUser = true
     m.SubTitle.text = getTranslation("screenInitialContent_subtitle_signedIn")
-    '// if signed in, then display skip button
-    m.SkipButton.visible = true
-  else 
-    '// If signed out, then display signIn menu item
+  else
+    m.SubTitle.text = getTranslation("screenInitialContent_subtitle_signedOut")
+  end if
+
+  if bShowSignInItem = true and m.bSignedInUser = false
+    '// If signed out, then display signIn menu item for treatments ICTS_no_espanol , ICTS_original_v2
     '//ensure the sign in button is different spacing
     nProfileSpacingLeft = 120
     nProfileSpacingRight = 60
     aColumnSpacings.push(nProfileSpacingLeft)
     m.InitialContentProfileMenuItemBground.visible = true
     setMainContent(m.constants.ui.sideNavIds.profile, rowNode)
-    nMenuItems = nMenuItems + 1
-    nMenuWidth = nMenuWidth + m.InitialContentMenu.itemSize[0] + nProfileSpacingLeft + nProfileSpacingRight
-    m.SubTitle.text = getTranslation("screenInitialContent_subtitle_signedOut")
+    numOfMenuItems = numOfMenuItems + 1
+    nMenuWidth = nMenuWidth + m.InitialContentMenu.itemSize[0] + nProfileSpacingLeft + nProfileSpacingRight  
   end if
 
   nInitialContentMenuBgroundPadding = 96
   m.InitialContentMenu.columnSpacings = aColumnSpacings
-  m.InitialContentMenu.numColumns = nMenuItems
+  m.InitialContentMenu.numColumns = numOfMenuItems
   m.InitialContentMenu.content = rowNode
   nInitialContentMenuX = (1920 - nMenuWidth)/2
 
@@ -140,6 +160,14 @@ Function setMainContent(itemID, parentNode)
   else if itemID = m.constants.ui.sideNavIds.profile
     contentNode.title = getTranslation("menu_signIn")
     contentNode.hdgridposterurl = "pkg:/images/icon-profile-large.png"
+    bSuccess = true
+  else if itemID = m.constants.ui.sideNavIds.Movies
+    contentNode.title = getTranslation("menu_movies")
+    contentNode.hdgridposterurl = "pkg:/images/sideNavMovies.png"
+    bSuccess = true
+  else if itemID = m.constants.ui.sideNavIds.tv
+    contentNode.title = getTranslation("menu_tv")
+    contentNode.hdgridposterurl = "pkg:/images/sideNavTV.png"
     bSuccess = true
   end if
 

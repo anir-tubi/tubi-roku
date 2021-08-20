@@ -83,7 +83,7 @@
 
       <SimpleButton
         id="skipButton"
-        visible="false"
+        visible="true"
         opacity="0"
         translation="[714,888]"
         width="490"

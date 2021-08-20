@@ -505,7 +505,7 @@ Function getTranslation_en_US()
     },
     "screenInitialContent_subtitle_signedOut": {
       "description": "subTitle of the initial content screen when user is signed out",
-      "message": "Pick something to watch or sign in"
+      "message": "Start watching free! No sign-in required!"
     },
     "screenInitialContent_subtitle_signedIn": {
       "description": "subTitle of the initial content screen when user is signed in",
