@@ -6,6 +6,9 @@
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="../ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
@@ -41,6 +44,7 @@
         vertAlign="top"
         visible="false">
         <Font
+          id="titleFont"
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="27" />

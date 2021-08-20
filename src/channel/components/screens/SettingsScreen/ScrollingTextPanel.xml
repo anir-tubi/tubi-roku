@@ -2,6 +2,9 @@
 <component name="ScrollingTextPanel" extends="Panel" >
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="ScrollingTextPanel.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
 
   <interface>
     <field id="title" alias="Title.text"/>

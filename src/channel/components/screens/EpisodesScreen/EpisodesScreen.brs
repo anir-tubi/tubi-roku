@@ -5,12 +5,19 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.Info = m.top.findNode("InfoPanel")
+  m.RowList = m.top.findNode("RowList")
 
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+    m.Info.translation = [192,133]
+    m.RowList.translation = [192,570]
+    m.top.findNode("leftChevron").translation = [90,528]
+    m.RowList.rowItemSize = [m.constants.ui.safezoneImageSizes.landscape]
+    m.RowList.itemSize = [1835,318]
+  end if
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
 
-  m.RowList = m.top.findNode("RowList")
   if getExperimentResource("roku_horizontal_fixed_focus", "roku_horizontal_fixed_focus_v1", false).enabled = true
     m.RowList.rowFocusAnimationStyle = "fixedFocus"
   end if
@@ -307,13 +314,22 @@ Function focusGrid()
   if m.Rowlist.isInFocusChain() <> true
     m.RowList.setFocus(true)
   end if
-
-  if m.global.constants.deviceInfo.limitedUi
-    m.RowList.translation = [168, m.RowList.translation[1]]
-    m.Menu.translation = [-425, m.Menu.translation[1]]
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+    if m.global.constants.deviceInfo.limitedUi
+      m.RowList.translation = [192, m.RowList.translation[1]]
+      m.Menu.translation = [-450, m.Menu.translation[1]]
+    else
+      slideTo(m.RowList, [192, m.RowList.translation[1]], 0.5)
+      slideTo(m.Menu, [-450, m.Menu.translation[1]], 0.5)
+    end if
   else
-    slideTo(m.RowList, [168, m.RowList.translation[1]], 0.5)
-    slideTo(m.Menu, [-425,m.Menu.translation[1]], 0.5)
+    if m.global.constants.deviceInfo.limitedUi
+      m.RowList.translation = [168, m.RowList.translation[1]]
+      m.Menu.translation = [-425, m.Menu.translation[1]]
+    else
+      slideTo(m.RowList, [168, m.RowList.translation[1]], 0.5)
+      slideTo(m.Menu, [-425, m.Menu.translation[1]], 0.5)
+    end if
   end if
 End Function
 
@@ -324,12 +340,22 @@ End Function
 Function focusMenu()
   m.Menu.animateToItem = m.RowList.currFocusRow
   m.Menu.setFocus(true)
-  if m.global.constants.deviceInfo.limitedUi
-    m.Menu.translation = [148, m.Menu.translation[1]]
-    m.RowList.translation = [590, m.RowList.translation[1]]
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+    if m.global.constants.deviceInfo.limitedUi
+      m.Menu.translation = [192, m.Menu.translation[1]]
+      m.RowList.translation = [634, m.RowList.translation[1]]
+    else
+      slideTo(m.Menu, [192, m.Menu.translation[1]], 0.5)
+      slideTo(m.RowList, [634, m.RowList.translation[1]], 0.5)
+    end if
   else
-    slideTo(m.Menu, [148, m.Menu.translation[1]], 0.5)
-    slideTo(m.RowList, [590,m.RowList.translation[1]], 0.5)
+    if m.global.constants.deviceInfo.limitedUi
+      m.Menu.translation = [148, m.Menu.translation[1]]
+      m.RowList.translation = [590, m.RowList.translation[1]]
+    else
+      slideTo(m.Menu, [148, m.Menu.translation[1]], 0.5)
+      slideTo(m.RowList, [590, m.RowList.translation[1]], 0.5)
+    end if
   end if
 End Function
 

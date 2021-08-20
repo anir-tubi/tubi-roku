@@ -11,7 +11,12 @@ Function init()
 
   m.ChannelCategoryGrid = m.top.findNode("ChannelCategoryGrid")
   m.NavSection = m.top.findNode("nav")
-
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+    m.NavSection.findNode("ScreenNavigationHint").translation = [192,60]
+    m.ChannelCategoryGrid.translation = [192,208]
+    m.ChannelCategoryGrid.itemSpacing = [30,30]
+    m.ChannelCategoryGrid.itemSize = m.constants.ui.safezoneImageSizes.landscape
+  end if
   m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
   m.top.observeField("callingPage", "onSetCallOfAction")
   m.top.observeField("shouldLoadContent", "onLoadContent")
@@ -37,7 +42,7 @@ Function init()
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
-
+  
 End Function
 
 

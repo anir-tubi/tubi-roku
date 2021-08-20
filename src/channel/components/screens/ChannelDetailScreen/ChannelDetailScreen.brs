@@ -13,6 +13,16 @@ Function init()
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
   m.VideoGrid = m.top.findNode("ChannelsVideoGrid")
   m.NavSection = m.top.findNode("nav")
+  posterSize = m.constants.ui.imageSizes.poster
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+    m.InfoPanel.translation = [192,133]
+    m.PageTitleAndCounter.translation = [192,540]
+    m.VideoGrid.translation = [192,600]
+    m.VideoGrid.itemSpacing = [20,12]
+    posterSize = m.constants.ui.safezoneImageSizes.poster
+    m.NavSection.findNode("ScreenNavigationHint").translation = [192,55]
+    m.top.findNode("leftChevron").translation = [90,528]
+  end if
 
   m.top.observeField("callingPage", "onSetCallOfAction")
   m.top.observeField("shouldLoadContent", "onLoadContent")
@@ -44,8 +54,7 @@ Function init()
   m.top.handlesTransportVoiceRequests = true
   
   m.bLeftButtonActsLikeBackButton = true
-  posterSize = m.constants.ui.imageSizes.poster
-  m.VideoGrid.itemSize = posterSize
+  m.VideoGrid.itemSize = posterSize 
 End Function
 
 Function onThemeChange()

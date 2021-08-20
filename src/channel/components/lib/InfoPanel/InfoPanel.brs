@@ -32,6 +32,17 @@ Function init()
   m.ExpireWarning = m.top.findNode("ExpireWarning")
   m.ExpireWarning.color = m.global.constants.ui.colors.expirationWarning
 
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+    m.top.width = 960
+    m.Title.width = 960
+    m.Title.findNode("TitleFont").size = 48
+    m.TwoLineInfo.findNode("Line2").width = 960
+    m.DescriptionFocusButton.width = 960
+    m.DescriptionFocusButton.height = 126
+    m.Description.width = 960
+    m.Description.maxLines = 3
+  end if
+
   m.top.observeField("mode", "onModeChange")
   m.top.observeField("width", "onWidthChange")
 

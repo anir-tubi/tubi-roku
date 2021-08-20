@@ -74,3 +74,23 @@ Function createGridOverlay(screen, spacingX=10, spacingY=10)
   'attach nodes to screen
   screen.appendChild(allLines)
 End Function
+
+Function safeZone(screen as object)
+' This function is provided by ROKU Dev : https://github.com/rokudev/tv-safe-zone-channel
+  if m.global.constants.settings.mode <> "dev"
+    return false
+  end if
+  poster = createObject("roSGNode", "Poster")
+  dev = createObject("roDeviceInfo")
+  AA = dev.getDisplaySize()
+
+  poster.height = AA.h
+  poster.width = AA.w
+  if poster.height = 1080 'if FHD
+    poster.uri = "https://raw.githubusercontent.com/rokudev/safe-zone-channel/master/images/Outline-Safe-Zones-FHD.png"
+  else
+    poster.uri = "https://raw.githubusercontent.com/rokudev/safe-zone-channel/master/images/Outline-Roku-Safe-Zones-HD.png"
+  end if
+
+  screen.appendChild(poster)
+End Function

@@ -29,6 +29,7 @@
       opacity="1.0">
       <Font
         role="font"
+        id="CategoryNameFont"
         uri="pkg:/fonts/Vaud-Bold.ttf"
         size="34" />
     </Label>
