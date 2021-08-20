@@ -324,7 +324,7 @@ Function onVideoPositionChange()
   end if
 
   ' Auto hide transport
-  if m.VideoState = "play" and m.nTransportState > 0 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
+  if m.VideoState = "play" and m.nTransportState > 0 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime and m.channelsGuideGroup.scrollingStatus <> true
     '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the transport
     hideTransport()
   end if
