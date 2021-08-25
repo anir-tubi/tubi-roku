@@ -586,7 +586,7 @@ End Function
 ' this is one of the pre-requisites to starting the SG user experience.
 Function onStartupArgs()
   m.deeplinkContent = invalid 
-  ' TODO: Varify and simplify below logic after 2.17
+  ' TODO: Verify and simplify below logic after 2.17 when startupArgs.launchParams will be available.
   if m.top.startUpArgs <> invalid 
     if m.top.startUpArgs.launchParams <> invalid
       m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs.launchParams)
@@ -1578,10 +1578,11 @@ Function onCustomResume(msg)
   customResumeArgs = invalid
 
   if m.lastSuspendOrResumeReason <> invalid
-    customResumeArgs = args.launchParams
+    customResumeArgs = args
     lastSuspendOrResumeReason = m.lastSuspendOrResumeReason
     m.lastSuspendOrResumeReason = invalid
-  else if args <> invalid
+  end if
+  if args <> invalid and args.launchParams <> invalid
     customResumeArgs = args.launchParams
     lastSuspendOrResumeReason = args.lastSuspendOrResumeReason
   end if
