@@ -750,18 +750,27 @@ End Function
 ' This may just be returning the video that is passed in (in the case of a movie).
 ' @content: roSGNode, a movie or series content node
 Function getEpisodeContent(content)
+  episode = invalid
+
   if content <> invalid
     if content.currentEpisodeId <> invalid and content.currentEpisodeId <> ""
-      return content.findNode(content.currentEpisodeId)
-    else
+      episode = content.findNode(content.currentEpisodeId)
+    end if
+
+    if episode = invalid
       season = content.getChild(0)
       if season <> invalid
         ' return a default if no match
-        return season.getChild(0)
+        episode = season.getChild(0)
       end if
     end if
   end if
-  return content
+
+  if episode <> invalid
+    return episode
+  else
+    return content
+  end if
 End Function
 
 
