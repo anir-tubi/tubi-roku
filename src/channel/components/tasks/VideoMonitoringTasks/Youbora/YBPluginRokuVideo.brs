@@ -9,7 +9,7 @@ end sub
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.5.15-" + m.pluginName
+    m.pluginVersion = "6.5.18-" + m.pluginName
 
     ' Let's cache the segment used on the bitrate to access less to it
     m.bitrateSegment = invalid
@@ -275,6 +275,11 @@ function getRendition()
             rendAux = Cint(rendAux * 100) / 100.0
             rendition = rendAux.ToStr() + "Mbps"
         end if
+        width = m.bitrateSegment.width
+        height = m.bitrateSegment.height
+        if width <> invalid AND height <> invalid AND width <> 0 AND height <> 0
+            rendition = width.ToStr() + "x" + height.ToStr() + "@" + rendition
+        endif
     else
         rendition = invalid
     end if

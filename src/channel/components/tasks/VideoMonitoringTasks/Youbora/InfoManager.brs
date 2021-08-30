@@ -161,86 +161,26 @@ function InfoManager(plugin, options = invalid)
         return totalBytes
     end function
 
-    this.getDeviceModel = function()
-        return CreateObject("roDeviceInfo").GetModel()
-    end function
-
-    this.getDeviceIdFromHardware = function()
-        hardwareModel = CreateObject("roDeviceInfo").GetModel()
-
-        'Mapping
-        models = {
-            'Roku LT
-            "2400X" : "39",
-            "2450X" : "39",
-            "2700X" : "39",
-            'Roku 1
-            "2710X" : "74",
-            'Roku 2
-            "2720X" : "75",
-            "3000X" : "75",
-            "3050X" : "75",
-            "3100X" : "75",
-            "4210X" : "75",
-            'Roku Stick
-            "3600X" : "41",
-            "3800X" : "41",
-            "3810X" : "41",
-            "3400X" : "41",
-            "3420X" : "41",
-            "3500X" : "41",
-            'Roku 3
-            "4200X" : "40",
-            "4230X" : "40",
-            'Roku 4
-            "4400X" : "45",
-            'Roku TV
-            "5000X" : "76",
-            "6000X" : "76",
-            "7000X" : "76",
-            "8000X" : "76",
-            'Roku Express
-            "3700X" : "77",
-            "3710X" : "77",
-            "3900X" : "77",
-            "3910X" : "77",
-            'Roku Premiere
-            "4620X" : "78",
-            "4630X" : "78",
-            'Roku Ultra
-            "4640X" : "79",
-            "4660X" : "79",
-            'Roku SD
-            "N1050" : "72",
-            'Roku HD Classic (Roku HD)
-            "N1000" : "38",
-            "N1100" : "38",
-            'Roku XD
-            "2050X" : "73",
-            "2050N" : "73",
-            "N1101" : "73",
-            "2100X" : "73",
-            "2100N" : "73",
-            'Roku HD
-            "2000C" : "38",
-            "2500X" : "38"
-        }
-
-        if models.DoesExist(hardwareModel)
-            return models[hardwareModel]
-        else
-            return invalid
-        end if
-
-    end function
-
     this.getDeviceInfo = function()
         deviceInfo = {}
         if m.options["device.model"] = invalid
             hardwareModel = CreateObject("roDeviceInfo").GetModel()
-
             'Mapping
             models = {
+                'Roku Smart Soundbar
+                "9100X" : "Roku Smart Soundbar",
+                'Roku Streambar
+                "9102X" : "Roku Streambar"
+                'Roku Ultra LT
+                "4662X" : "Roku Ultra LT",
+                'Roku Streaming Stick+
+                "3810X" : "Roku Streaming Stick+",
+                "3811X" : "Roku Streaming Stick+",
+                '4K Roku TV
+                "7000X" : "4K Roku TV",
+                "A000X" : "4K Roku TV",
+                "C000X" : "4K Roku TV",
+                "C000GB" : "4K Roku TV",
                 'Roku LT
                 "2400X" : "Roku LT",
                 "2450X" : "Roku LT",
@@ -256,7 +196,6 @@ function InfoManager(plugin, options = invalid)
                 'Roku Stick
                 "3600X" : "Roku Stick",
                 "3800X" : "Roku Stick",
-                "3810X" : "Roku Stick",
                 "3400X" : "Roku Stick",
                 "3420X" : "Roku Stick",
                 "3500X" : "Roku Stick",
@@ -268,19 +207,27 @@ function InfoManager(plugin, options = invalid)
                 'Roku TV
                 "5000X" : "Roku TV",
                 "6000X" : "Roku TV",
-                "7000X" : "Roku TV",
                 "8000X" : "Roku TV",
+                "D000X" : "Roku TV",
                 'Roku Express
                 "3700X" : "Roku Express",
                 "3710X" : "Roku Express",
                 "3900X" : "Roku Express",
                 "3910X" : "Roku Express",
+                "3930X" : "Roku Express",
+                'Roku Express+
+                "3931X" : "Roku Express+",
+                'Roku Express 4K
+                "3940X" : "Roku Express 4K",
+                'Roku Express 4K+
+                "3941X" : "Roku Express 4K+",
                 'Roku Premiere
                 "4620X" : "Roku Premiere",
                 "4630X" : "Roku Premiere",
                 'Roku Ultra
                 "4640X" : "Roku Ultra",
                 "4660X" : "Roku Ultra",
+                "4800X" : "Roku Ultra",
                 'Roku SD
                 "N1050" : "Roku SD",
                 'Roku HD Classic (Roku HD)
@@ -298,7 +245,8 @@ function InfoManager(plugin, options = invalid)
             }
 
             if models.DoesExist(hardwareModel)
-                deviceInfo["model"] = models[hardwareModel]
+                deviceInfo["deviceName"] = models[hardwareModel]
+                deviceInfo["model"] = hardwareModel
             end if
         else
             deviceInfo["model"] = m.options["device.model"]
@@ -455,10 +403,6 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
             end if
         end if
         if outParams.DoesExist("deviceId") = false then outParams["deviceId"] = m.options["device.code"]
-        'If no forced deviceId, get it from the device itself
-        if outParams["deviceId"] = invalid
-            outParams["deviceId"] = m.getDeviceIdFromHardware()
-        end if
         if outParams.DoesExist("deviceInfo") = false then outParams["deviceInfo"] = m.getDeviceInfo()
         'if outParams.DoesExist("deviceInfo") = false then outParams["deviceInfo"] = {"model":m.getDeviceModel()}
         'Network
@@ -576,7 +520,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.15 Roku Adnalyzer"
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.18 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1
@@ -692,6 +636,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("navContext") = false then outParams["navContext"] = "RokuPlugin"
         if outParams.DoesExist("pluginName") = false then outParams["pluginName"] = m.plugin.getPluginName()
         if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
+        if outParams.DoesExist("obfuscateIp") = false then outParams["obfuscateIp"] = m.options["user.obfuscateIp"]
         nextraparams = 20
         index = 1
         while (index <= nextraparams)
