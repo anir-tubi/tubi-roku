@@ -118,8 +118,31 @@
       </Label>
     </LayoutGroup>
 
-    <DynamicCustomKeyboard
-    id="Keyboard"/>
+    <LayoutGroup
+      id="searchGroup"
+      translation="[162, 148]"
+      layoutDirection="vert"
+      vertAlignment="top"
+      horizAlignment="left"
+      itemSpacings="[24]">
+      <DynamicCustomKeyboard
+        id="Keyboard"/>
+      <LayoutGroup
+        id="searchHintGroup"
+        layoutDirection="vert"
+        vertAlignment="top"
+        horizAlignment="left"
+        itemSpacings="[5]"
+        visible="false">
+        <Label
+          id="voiceHint">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-SemiBold.ttf"
+              size="27"/>
+        </Label>
+      </LayoutGroup>
+   </LayoutGroup>
     
     <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus, 
     the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->

@@ -30,6 +30,8 @@ Function init()
   m.keyboard.observeField("text", "onKeyboardTextChanged")
   m.keyboard.textEditBox.observeField("focusedChild", "onTextEditBoxFocused")
 
+  m.voiceHint = m.top.findNode("voiceHint")
+  m.searchHintGroup = m.top.findNode("searchHintGroup")
   m.ResultGrid.observeField("itemSelected", "onResultSelected")
   m.ResultGrid.observeField("itemFocused", "onItemFocused")
 
@@ -89,6 +91,8 @@ Function setSearchStrings()
   m.sDefaultSearchText = getTranslation("screenSearch_defaultSearch")
   m.KidsModeMessage.text = getTranslation("screenSearch_kidsWarning")
   m.spinner.text = getTranslation("screenSearch_loading")
+  setVoiceHint()
+  m.searchHintGroup.visible = true
 End Function
 
 
@@ -427,4 +431,82 @@ End Function
 'Handling when app is focusing on an invisible textbox that is built into the keyboard
 Function onTextEditBoxFocused()
   m.Keyboard.setFocus(true)
+End Function
+
+
+'Set the text that tells users that they can use the remote
+'control's microphone button on the search screen. Because
+'the voice hint text can be different widths based on the language,
+'this function will also determine where exactly to place the microphone button,
+'which needs to be placed immediately after the text.
+Function setVoiceHint()
+  hint = getTranslation("search_hint")
+  hintArr = hint.split(" ")
+  m.voiceHint.text = ""
+  'Array of Labels(each item in the array = each label in the layoutgroup)
+  labelListArray = []
+  'Array to determine the number of words in a line
+  sentenceArray = []
+  wordCount = hintArr.count()
+  'width to determine microphone x translation
+  lastLineWidth = 0
+  height = 0
+  labelWidth = m.keyboard.boundingRect().width
+  'Below logic is to handle the custom wrap to add microphone image at the end of the translated text.
+  'splitting the sentence into words by space, we are adding the words 
+  'to the labelListArray until it satisfies the lineWidth. If the width exceeds,
+  'will move the words to the next line. Later each line converted to a label.
+  for i = 0 to wordCount - 1
+    if i = 0
+      m.voiceHint.text = hintArr[i]
+    else
+      m.voiceHint.text = m.voiceHint.text + " " + hintArr[i]
+    end if
+    width = m.voiceHint.boundingRect().width
+    height = m.voiceHint.boundingRect().height
+    'if the total width of combined words is exceeding the line width move to next line
+    'else append to the sentenceArray
+    if width > labelWidth or i = wordCount - 1
+      labelListArray.push(sentenceArray.join(" "))
+      'if it's last word determine the lastline width
+      'else initiate the next line
+      if i = wordCount - 1
+        'if the total width of combined words is exceeding the line width move to next line
+        'else consider it as last line and set the last line width
+        if width > labelWidth
+         labelListArray.push(hintArr[i])
+         m.voiceHint.text = hintArr[i]
+         lastLineWidth = m.voiceHint.boundingRect().width
+        else
+          sentenceArray.push(hintArr[i])
+          labelListArray[labelListArray.count() -1] = sentenceArray.join(" ")
+          lastLineWidth = width
+        end if
+      else
+        sentenceArray = [hintArr[i]]
+        m.voiceHint.text = hintArr[i]
+      end if
+    else
+      sentenceArray.push(hintArr[i])
+    end if
+  end for
+  noOfLines = labelListArray.count()
+  if noOfLines > 0
+    m.voiceHint.text = labelListArray[0]
+    'createLayoutGroup for eachline in labelListArray and ifit's lastline append microphone icon at the end
+    for i = 1 to noOfLines - 1
+      voiceHintLine = m.voiceHint.clone(true)
+      voiceHintLine.id = "voiceHint" + i.toStr()
+      voiceHintLine.text = labelListArray[i]
+      m.searchHintGroup.appendChild(voiceHintLine)
+      if i = noOfLines - 1
+        microphone = voiceHintLine.createChild("Poster")
+        microphone.uri = "pkg:/images/microphone.png"
+        microphone.width = "36"
+        microphone.height = "36"
+        microphone.translation = [lastLineWidth + 3, -5]
+      end if
+    end for
+  end if
+
 End Function
