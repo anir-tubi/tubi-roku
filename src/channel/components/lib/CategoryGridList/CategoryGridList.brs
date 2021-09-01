@@ -305,7 +305,11 @@ Function setRowHeights()
   end for
 
   '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
-  m.RowList.itemSize = [1776,364]
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+    m.RowList.itemSize = [1752,364]
+  else
+    m.RowList.itemSize = [1776,364]
+  end if
   m.RowList.rowItemSize = rowItemSize
   m.RowList.rowHeights = rowHeights
   m.RowList.showRowLabel = showRowLabel
