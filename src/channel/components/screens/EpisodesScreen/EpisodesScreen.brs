@@ -7,7 +7,7 @@ Function init()
   m.Info = m.top.findNode("InfoPanel")
   m.RowList = m.top.findNode("RowList")
 
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.Info.translation = [192,133]
     m.RowList.translation = [192,570]
     m.top.findNode("leftChevron").translation = [90,528]
@@ -314,7 +314,7 @@ Function focusGrid()
   if m.Rowlist.isInFocusChain() <> true
     m.RowList.setFocus(true)
   end if
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     if m.global.constants.deviceInfo.limitedUi
       m.RowList.translation = [192, m.RowList.translation[1]]
       m.Menu.translation = [-450, m.Menu.translation[1]]
@@ -340,7 +340,7 @@ End Function
 Function focusMenu()
   m.Menu.animateToItem = m.RowList.currFocusRow
   m.Menu.setFocus(true)
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     if m.global.constants.deviceInfo.limitedUi
       m.Menu.translation = [192, m.Menu.translation[1]]
       m.RowList.translation = [634, m.RowList.translation[1]]

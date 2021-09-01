@@ -16,7 +16,7 @@ Function init()
   fades = m.top.findNode("Fades")
   m.HintGroupFade = fades.findNode("HintGroupFade")
 
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.NavSection.findNode("ScreenNavigationHint").translation = [192,60]
     m.TopNav.translation = [192,48]
     m.InfoPanel.translation = [192,168]
@@ -92,7 +92,7 @@ Function init()
   m.landscapeMaskOffsetDiff = 0
   m.linearSlideAmt = -86 'the amount the grid slides up to fit the linear content item
   m.linearMaskOffsetDiff = -70 'the diff in the amount the content area mask is offset in the up direction for the linear news container
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.vitgSlideAmt = 326
     m.vitgMaskOffsetDiff = 352
     m.landscapeSlideAmt = -9
@@ -415,7 +415,7 @@ Function onCurrFocusRowChange()
               contractContentAreaForLinear(rowPercent)
             end if
           else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.landscape or categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_small 
-            if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+            if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
               translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.landscapeSlideAmt
 
               if rowPercent > (1 - translationDiffPercent)
@@ -436,7 +436,7 @@ Function onCurrFocusRowChange()
       ' update contentArea translation, only when Linear lose focus
       contractContentAreaForLinear(rowPercent)
     else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.landscape or categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_small 
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         ' update contentArea translation, only when Landscape lose focus
         contractContentAreaForLandscape(rowPercent)
       end if
@@ -675,7 +675,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.titleLogoUri = contentNode.logoUri
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         m.InfoPanel.width = 960
       else
         m.InfoPanel.width = 1140
@@ -702,7 +702,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.lineOneData = lineOneData
       m.InfoPanel.titleLogoUri = contentNode.titleLogoUri
       m.InfoPanel.genres = contentNode.genres
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         m.InfoPanel.width = 960
       else 
         m.InfoPanel.width = 1140
@@ -711,7 +711,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.mode = "utility"
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         m.InfoPanel.width = 960
       else
         m.InfoPanel.width = 1140
@@ -720,7 +720,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.mode = "continue_watching"
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         m.InfoPanel.width = 960
       else
         m.InfoPanel.width = 1140

@@ -77,7 +77,7 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
   m.top.isStackable = true
   m.top.handlesTransportVoiceRequests = true
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.top.findNode("leftChevron").translation = [90,528]
     m.Info.translation = [192,133]
     m.Menu.translation = [167,642]

@@ -14,7 +14,7 @@ Function init()
   m.VideoGrid = m.top.findNode("ChannelsVideoGrid")
   m.NavSection = m.top.findNode("nav")
   posterSize = m.constants.ui.imageSizes.poster
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.InfoPanel.translation = [192,133]
     m.PageTitleAndCounter.translation = [192,540]
     m.VideoGrid.translation = [192,600]

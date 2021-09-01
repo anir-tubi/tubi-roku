@@ -13,7 +13,7 @@ Function init()
   if getExperimentResource("roku_horizontal_fixed_focus", "roku_horizontal_fixed_focus_v1", true).enabled = true
     m.RowList.rowFocusAnimationStyle = "fixedFocus"
   end if
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.RowList.itemSpacing = [0,36]
     m.RowList.rowSpacings = [36]
   end if
@@ -233,7 +233,7 @@ Function setRowHeights()
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
     if category.gridItemType = m.constants.ui.gridItemTypes.utility
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         rowHeights.push(108)
         rowItemSize.push([304,79])
       else
@@ -242,7 +242,7 @@ Function setRowHeights()
       end if
       showRowLabel.push(false)
     else if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         rowHeightAdjustment = 60
         posterHeight = m.constants.ui.safezoneImageSizes.poster[1]
       else
@@ -253,7 +253,7 @@ Function setRowHeights()
       rowHeights.push(posterHeight + rowHeightAdjustment)
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.portrait    
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         posterWidth = m.constants.ui.safezoneImageSizes.poster[0]
         posterHeight = m.constants.ui.safezoneImageSizes.poster[1]
         rowHeightAdjustment = 60
@@ -266,7 +266,7 @@ Function setRowHeights()
       rowHeights.push(posterHeight + rowHeightAdjustment)
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.linear
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         rowItemSize.push(m.constants.ui.safezoneImageSizes.linear)
         rowHeights.push(213)
       else
@@ -275,7 +275,7 @@ Function setRowHeights()
       end if   
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.landscape or category.gridItemType = m.constants.ui.gridItemTypes.vitg_small    
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         posterWidth = m.constants.ui.safezoneImageSizes.landscape[0]
         posterHeight = m.constants.ui.safezoneImageSizes.landscape[1]
         rowHeightAdjustment = 102
@@ -288,7 +288,7 @@ Function setRowHeights()
       rowHeights.push(posterHeight + rowHeightAdjustment)
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.vitg_large   
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         rowHeightAdjustment = 102
         posterWidth = m.constants.ui.safezoneImageSizes.largeVITG[0]
         posterHeight = m.constants.ui.safezoneImageSizes.largeVITG[1]
@@ -305,7 +305,7 @@ Function setRowHeights()
   end for
 
   '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.RowList.itemSize = [1752,364]
   else
     m.RowList.itemSize = [1776,364]

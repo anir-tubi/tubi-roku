@@ -778,7 +778,7 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.signInScreen] = true
 
     constants.ui.imageSizes = {}
-      'This array is associated with experiment roku_safe_zone_v2
+      'This array is associated with experiment roku_safe_zone_restart_v2
       'when we graduate this experiment, safezoneImageSizes should be renamed and take the place of imageSizes
       constants.ui.safezoneImageSizes = {}
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images

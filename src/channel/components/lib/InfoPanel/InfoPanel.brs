@@ -32,7 +32,7 @@ Function init()
   m.ExpireWarning = m.top.findNode("ExpireWarning")
   m.ExpireWarning.color = m.global.constants.ui.colors.expirationWarning
 
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.top.width = 960
     m.Title.width = 960
     m.Title.findNode("TitleFont").size = 48

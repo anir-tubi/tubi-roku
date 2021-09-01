@@ -6,7 +6,7 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("height", "onHeightChange")
   m.top.observeField("active", "onActiveChange")
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.Label.translation = [162, 3]
     m.Icon.translation = [114, 0]
   end if

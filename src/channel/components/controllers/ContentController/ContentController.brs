@@ -96,7 +96,7 @@ Function init()
     m.logoKids.translation = [1576,m.logoKids.translation[1]]
   end if
 
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", true).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", true).enabled = true
     m.logo.translation = [1719,60]
     m.logoKids.translation = [1614,60]
     m.logoEspanol.translation = [1503,60]

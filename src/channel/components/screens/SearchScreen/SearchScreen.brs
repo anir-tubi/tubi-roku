@@ -18,7 +18,7 @@ Function init()
   m.keyboard.translation = [162, 148]
   m.SearchText = m.top.findNode("SearchText")
   m.ResultGrid = m.top.findNode("ResultGrid")
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.keyboard.translation = [192, 148]
     m.NavSection.findNode("ScreenNavigationHint").translation = [192,60]
     m.top.findNode("content").translation = [172,158]

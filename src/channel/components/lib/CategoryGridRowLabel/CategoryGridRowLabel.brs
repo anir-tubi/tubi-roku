@@ -18,7 +18,7 @@ Function init()
     m.global.observeField("theme", "onThemeChange")
   end if
 
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.CategoryName.height = 60
     m.CategoryName.vertAlign = "center"
     m.CategoryName.findNode("CategoryNameFont").size = 36
@@ -45,7 +45,7 @@ Function onContentChange()
     end if
   end if
   if m.top.content.type = "channel"
-    if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+    if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
        m.CategoryCount.translation = [1630,12]
     end if
   end if

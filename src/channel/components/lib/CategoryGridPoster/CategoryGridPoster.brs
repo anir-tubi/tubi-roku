@@ -17,7 +17,7 @@ Function init()
     utility: "utility"
     historySignedOutUser: "continue_watching_signed_Out_User"
   }
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_v2", false).enabled = true
+  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.title.width = 380
     m.title.height = 36
     m.title.vertAlign = "center"
