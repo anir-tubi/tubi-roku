@@ -232,27 +232,23 @@ Function onLineOneDataChange(msg)
     m.Rating.visible = false
   end if
   
-  if getExperimentResource("roku_tvratings_on_detail", "roku_tvratings_on_detail_v1").enabled = true 
+  descriptorCode = data.descriptorCode
     
-    descriptorCode = data.descriptorCode
-    
-    if descriptorCode <> invalid and descriptorCode <> ""
-      if m.DescriptorCode.getParent() = invalid
-        firstLineGroup.insertChild(m.DescriptorCode, insertIndex)
-      end if
-      insertIndex++
+  if descriptorCode <> invalid and descriptorCode <> "" and getExperimentResource("roku_tvratings_on_detail", "roku_tvratings_on_detail_v2").enabled = true
+    if m.DescriptorCode.getParent() = invalid
+      firstLineGroup.insertChild(m.DescriptorCode, insertIndex)
+    end if
+    insertIndex++
 
-      m.DescriptorCode.text = UCase(descriptorCode)
-      m.DescriptorCode.visible = true
-    else
-      if m.DescriptorCode.getParent() <> invalid
-        firstLineGroup.removeChild(m.DescriptorCode)
-      end if
-      m.DescriptorCode.visible = false
-    end if 
+    m.DescriptorCode.text = UCase(descriptorCode)
+    m.DescriptorCode.visible = true
+  else
+    if m.DescriptorCode.getParent() <> invalid
+      firstLineGroup.removeChild(m.DescriptorCode)
+    end if
+    m.DescriptorCode.visible = false
+  end if 
     
-  end if  
-
   if data.availabilityEnds <> invalid and data.availabilityEnds <> ""
     datetime = CreateObject("roDateTime")
     datetime.FromISO8601String(data.availabilityEnds)
