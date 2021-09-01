@@ -1954,6 +1954,10 @@ Function getTranslation_es_MX()
     "rated_Label": {
       "description": "Label shown on video player when tv rating/descriptor is shown",
       "message": "CALIFICADO"
+    },
+    "search_hint": {
+      "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
+      "message": "Para habilitar el control por voz, presiona y mantén"
     }
   }
 End Function
