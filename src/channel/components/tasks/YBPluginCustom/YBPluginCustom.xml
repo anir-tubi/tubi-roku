@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="YBPluginCustom" extends="YBPluginRokuVideo">
+
+    <interface>
+	    <field id = "segInfo" type = "assocArray" />
+    </interface>
+
+    <script type="text/brightscript" uri="./YBPluginCustom.brs"/>
+</component>
