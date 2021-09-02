@@ -264,6 +264,7 @@ End Function
 
 '//Refresh the content and the enabling of the top nav of the home screen
 Function refreshHomescreen(homescreen)
+  tubiLog("HomeScreenHelpers.refreshHomescreen")
   '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
   bTopNavAllowed = isTopNavHomeScreenEnabled()
   if homeScreen.id = m.constants.ui.screenIds.espanolScreen

@@ -149,13 +149,14 @@
     <Group
       translation="[798, 244]"
       id="ResultArea">
-      <PosterGrid
+      <MarkupGrid
         id="ResultGrid"
-        loadingBitmapUri = "pkg:/images/placeholder.jpg"
-        basePosterSize="[198,282]"
+        itemComponentName="CategoryGridPoster"
+        itemSize="[198,282]" 
         itemSpacing="[12,12]"
+        numRows="3"   
         numColumns="5"
-        numRows="3"
+        fadeFocusFeedbackWhenAutoScrolling="true"
         vertFocusAnimationStyle="fixedFocus"
         focusBitmapUri="pkg:/images/selector-fhd.9.png"/>
       <Spinner

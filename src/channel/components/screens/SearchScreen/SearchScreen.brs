@@ -209,7 +209,7 @@ End Function
 ' When the server returns with search content, this function will be called.
 Function onSearchContentChange()
   displayLoading(false)
-  m.ResultGrid.content = invalid '//reset content everytime so in case the new results = previous results, then the contemt can refresh. Without refr4eshing content, then the content may appear blank
+  m.ResultGrid.content = invalid '//reset content everytime so in case the new results = previous results, then the contemt can refresh. Without refreshing content, then the content may appear blank
   m.ResultGrid.content = m.top.content
   if m.top.content <> invalid and m.top.content.getChildCount() > 0 then
     if m.top.content.isDefaultSearchResults = true
