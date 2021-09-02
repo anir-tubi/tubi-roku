@@ -251,8 +251,6 @@ Function getConstants()
         ' app_id of suitest application - can be used for any roku device within same organization. update app_id for using different account.
         constants.thirdParty.suiteTest.app_id =  "214cab71-b41b-468d-bcbb-f42732b157c4"
 
-        ' uri of suitest application
-        constants.thirdParty.suiteTest.uri = "http://the.suite.st/app/roku.zip" 
       end if
 
   'platform is used when communitcating with CMS API

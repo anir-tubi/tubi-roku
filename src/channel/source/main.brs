@@ -57,12 +57,11 @@ Function runChannel(startupArgs, constants, log, request) As Void
     return
   end if
 
-  suitestLib = invalid
-  if constants.thirdParty.suiteTest.enabled = true
-    suitestLib = CreateObject("roSGNode", "ComponentLibrary")
-    suitestLib.ObserveField("loadStatus", port)
-    suitestLib.id = "suitest"
-    tubiScene.InsertChild(suitestLib, 0)
+  ' execute suitest libray only if the mode is qa & suitest attribute enabled in qa config yml
+  if constants.thirdParty.suiteTest.enabled = true and constants.settings.mode = "qa"
+    SuitestLibrary = createObject("roSGNode", "SuitestLibrary")
+    SuitestLibrary.app_id = constants.thirdParty.suiteTest.app_id
+    tubiScene.InsertChild(SuitestLibrary, 0)
   end if
 
   'this is the packaged constants - the submitted constants
@@ -94,9 +93,6 @@ Function runChannel(startupArgs, constants, log, request) As Void
     controller.fadeInContentController = true
     componentsLoaded = true
     componentTimer = invalid
-    if suitestLib <> invalid
-      suitestLib.SetField("uri", constants.thirdParty.suiteTest.uri)
-    end if
   end if
 
   while true
@@ -182,9 +178,6 @@ Function runChannel(startupArgs, constants, log, request) As Void
                 controller.fadeInContentController = true
               end if
 
-              if suitestLib <> invalid
-                suitestLib.SetField("uri", constants.thirdParty.suiteTest.uri)
-              end if
             else
               showComponentsFailedToLoadError(msg, log, screen, constants)
               exit while
@@ -221,9 +214,6 @@ Function runChannel(startupArgs, constants, log, request) As Void
 
           componentsLoaded = true
           controller = loadPackagedComponents(tubiScene, port, startupArgs)
-          if suitestLib <> invalid
-            suitestLib.SetField("uri", constants.thirdParty.suiteTest.uri)
-          end if
         end if
       else if msg.GetField() = "remoteComponentsUrl"
         print "got the remoteComponentsUrl "; msg.getData()

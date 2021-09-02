@@ -139,6 +139,7 @@ function buildInstalled() {
     mkdirp.sync(`${process.env.PWD}/build/local/source`);
     createSettings(options, 'build/local/source/Settings.brs');
     createManifest(options, 'build/local/manifest', 'manifest');
+    let { settings } = load(options);
 
     let sources = [
       'src/channel/**/*',
@@ -166,7 +167,12 @@ function buildInstalled() {
     if (options.config !== 'dev') {
       sources.push('!src/channel/components/controllers/TubiScene/TrackerTask.xml')
     }
-    
+
+    // don't include Suitest files if config is not 'qa' and suitest is not enabled
+    if (options.config !== 'qa' || settings.suitest === false) {
+      sources.push('!src/channel/components/controllers/Suitest/**')
+    }
+
     // don't include SignUp Task if config is not 'qa'
     if (options.config !== 'qa') {
       sources.push('!src/channel/components/tasks/SignUpTask/**')
