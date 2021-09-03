@@ -74,8 +74,7 @@
        -   Assumes there are only 2 possible widths for the CategoryGridList, full width and not full width.
        -->
       <field id="isFullWidth" type="boolean" value="true" />
-
-
+      
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
 
@@ -103,10 +102,6 @@
 
       <field id="oldCategoryId" type="string" />
 
-      <!-- holds an array of integers the indexes represent the category order, and the vaule represents the totalCount of the category.
-           When it is updated, category screen will update the total counts in the category menu
-       -->
-      <field id="categoryTotalCounts" type="intarray"/>
   </interface>
   
   <children>

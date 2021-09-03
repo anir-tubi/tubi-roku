@@ -306,15 +306,18 @@ Function setRowHeights()
 
   '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
   if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.RowList.itemSize = [1752,364]
+    itemSize = [1752,364]
   else
-    m.RowList.itemSize = [1776,364]
+    itemSize = [1776,364]
   end if
-  m.RowList.rowItemSize = rowItemSize
-  m.RowList.rowHeights = rowHeights
-  m.RowList.showRowLabel = showRowLabel
+  m.Rowlist.update({
+    "itemSize" : itemsize,
+    "rowItemSize": rowItemSize,
+    "rowHeights": rowHeights,
+    "showRowLabel": showRowLabel,
+    "numRows": numRows 
+  })
   m.RowList.content = m.top.content
-  m.RowList.numRows = numRows
 End Function
 
 ' animateToCategory doesn't cause rowItemFocused or itemFocused to be triggered unless
@@ -519,6 +522,18 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
       loadCategories(batchMaxIndex+1)
     end if
 
+    if m.top.content <> invalid
+      if removableCategories.count() > 0
+        for i = m.top.content.getChildCount() - 1 to 0 step -1
+          child = m.top.content.getChild(i)
+          if removableCategories[child.id] = true
+            m.top.content.removeChildIndex(i)
+          end if
+        end for
+        setRowHeights()
+      end if
+    end if
+
     ' Delayed setting of Rowlist content until first batch arrives
     if m.RowList.content = invalid then
       m.RowList.content = m.top.content
@@ -535,21 +550,6 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
     ' free references to the batch so that it can be garbage collected
     m.top.metadataFetchTaskBatch = invalid
   end if
-
-  counts = []
-  if m.top.content <> invalid
-    children = m.top.content.getChildren(m.top.content.getChildCount(), 0)
-    for each child in children
-      if removableCategories[child.id] = true
-        counts.push(-1)
-      else if child.totalCount <> invalid
-        counts.push(child.totalCount)
-      else
-        counts.push(0)
-      end if
-    end for
-  end if
-  m.top.categoryTotalCounts = counts
 End Function
 
 

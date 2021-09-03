@@ -48,7 +48,6 @@ Function init()
   m.CategoryGridList = m.top.findNode("CategoryGridList")
   m.CategoryGridList.observeField("itemSelected", "onGridItemSelected")
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
-  m.CategoryGridList.observeField("categoryTotalCounts", "onTotalCountsChange")
   m.CategoryGridList.observeField("reloadedItemToBeFocused", "onItemToBeFocusedChange")
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRowChange")
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
@@ -640,22 +639,7 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
 End Function
 
 
-Function onTotalCountsChange(msg)
-  tubiLog("HomeScreen.onTotalCountsChange")
-  totalCountInfo = msg.getData()
 
-  for i = totalCountInfo.count() - 1 to 0 step -1
-    categoryInList = m.top.content.getChild(i)
-    categoryInList.totalCount = totalCountInfo[i]
-
-    'category has no content, so we delete it here
-    if categoryInList.totalCount = -1
-      m.top.content.removeChildIndex(i)
-    end if
-  end for
-
-  m.CategoryGridList.content = m.top.content
-End Function
 
 
 ' Is called when CategoryGridList has content loaded but did not gain focus, so we need to update the infoPanel
