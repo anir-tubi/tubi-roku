@@ -82,6 +82,7 @@ export ROKU_DEV_TELNET="sametab" (optional)
 ```
 
 11\. Create a `dev.yml` file in your `config` directory. Use the existing `dev.yml.example` file as a template.
+
 -----
 
 # Build
@@ -222,7 +223,7 @@ TBD
 
 10\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
 
-- __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
+- __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THE PR FOR THE adRise_cdn REPO AND THE PR FOR THE project-total-recall REPO ARE APPROVED AND MERGED.__
 
 11\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)

@@ -71,48 +71,43 @@ async function makeReleasePrs(done) {
   // rename the local branch name so it looks like "release_2_14_34"
   const releaseBranchName = `release_${fullBuildTag}`
   log(`...Renaming the local branch to ${releaseBranchName}`);
-  const branchRenameRes = shell.exec(`git branch -m ${releaseBranchName}`);
-  if (branchRenameRes.code) {
-    let errorMsg = `Could not rename the local branch to ${releaseBranchName}`;
-    if (branchRenameRes.stderr) {
-      errorMsg = branchRenameRes.stderr
-    }
-    done(new NoStackError(errorMsg));
-  }
+  const gitRename = `git branch -m ${releaseBranchName}`;
+  const gitRenameErrorMsg = `Could not rename the local branch to ${releaseBranchName}`;
+  execGitCommand(gitRename, gitRenameErrorMsg, done);
 
   // attempt to checkout master in the CDN repo
   log(`...Checking out master on the local ${ghInfo.cdnRepo} repo`)
-  const checkoutMasterRes = shell.exec(`git -C ${cdnPath} checkout master`).code;
-  if (checkoutMasterRes.code) {
-    let errorMsg = `Could not check out master at ${cdnPath}.`;
-    if (checkoutMasterRes.stderr) {
-      errorMsg = checkoutMasterRes.stderr;
-    }
-    done(new NoStackError(errorMsg));
-  }
+  const gitCheckoutMasterCDN = `git -C ${cdnPath} checkout master`;
+  const gitCheckoutMasterCDNErrorMsg = `Could not checkout master on the ${cdnPath}`;
+  execGitCommand(gitCheckoutMasterCDN, gitCheckoutMasterCDNErrorMsg, done);
 
   // attempt to pull origin master for the CDN repo
   log(`...Pulling remote master to the local ${ghInfo.cdnRepo} repo`);
-  const pullMasterRes = shell.exec(`git -C ${cdnPath} pull origin master`).code;
-  if (pullMasterRes.code) {
-    let errorMsg = `Could not pull master from origin at ${cdnPath}.`;
-    if (pullMasterRes.stderr) {
-      errorMsg = pullMasterRes.stderr;
-    }
-    done(new NoStackError(errorMsg));
-  }
+  const gitPullMasterCDN = `git -C ${cdnPath} pull origin master`;
+  const gitPullMasterCDNErrorMsg = `Could not pull master from origin at ${cdnPath}`;
+  execGitCommand(gitPullMasterCDN, gitPullMasterCDNErrorMsg, done);
 
   // attempt to check out a new branch off master for the CDN repo
   const cdnBranchName = `roku_${fullBuildTag}`;
-  log(`...Creating a new ${cdnBranchName} branch on the local ${ghInfo.cdnRepo} repo`);
-  const checkoutNewBranchRes = shell.exec(`git -C ${cdnPath} checkout -b ${cdnBranchName}`);
-  if (checkoutNewBranchRes.code) {
-    let errorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
-    if (checkoutNewBranchRes.stderr) {
-      errorMsg = `${checkoutNewBranchRes.stderr} at ${cdnPath}`;
-    }
-    done(new NoStackError(errorMsg));
+  // check if there is already a branch with the cdnBranchName and delete it if there is
+  log(`...Checking if there already exists a local branch named ${cdnBranchName} on ${cdnPath}`);
+  const gitListCDNBranch = `git -C ${cdnPath} branch --list ${cdnBranchName}`;
+  const gitListCDNBranchErrorMsg = `Could not list the "${cdnBranchName}" at ${cdnPath}`;
+  const gitListRes = execGitCommand(gitListCDNBranch, gitListCDNBranchErrorMsg, done);
+
+  if (gitListRes) {
+    // there exists a branch with the cdnBranchName already, so delete it.
+    // We've already switched to master on `${cdnPath}` earlier in this flow.
+    log(`...Deleting the ${cdnBranchName} on ${cdnPath}`);
+    const gitDeleteCDNBranch = `git -C ${cdnPath} branch -D ${cdnBranchName}`;
+    const gitDeleteCDNBranchErrorMsg = `Could not delete the "${cdnBranchName}" branch at ${cdnPath}`;
+    execGitCommand(gitDeleteCDNBranch, gitDeleteCDNBranchErrorMsg, done);
   }
+
+  log(`...Creating a new ${cdnBranchName} branch on the local ${ghInfo.cdnRepo} repo`);
+  const gitCheckoutNewCDNBranch = `git -C ${cdnPath} checkout -b ${cdnBranchName}`;
+  const gitCheckoutNewCDNBranchErrorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
+  execGitCommand(gitCheckoutNewCDNBranch, gitCheckoutNewCDNBranchErrorMsg, done);
 
   const starterComponentsFileName = `tubi_starter_components_${minorBuildTag}.pkg`;
   const remoteComponentsFileName = `tubi_remote_components_${fullBuildTag}.pkg`;
@@ -143,36 +138,21 @@ async function makeReleasePrs(done) {
 
   // add the updates so they are staged for commit
   log(`...Staging changes for commit on the local ${ghInfo.cdnRepo} repo`);
-  const gitAddRes = shell.exec(`git -C ${cdnPath} add . `);
-  if (gitAddRes.code) {
-    let errorMsg = `Could not run "git add . " on ${cdnPath}`;
-    if (gitAddRes.stderr) {
-      errorMsg = gitAddRes.stderr
-    }
-    done(new NoStackError(errorMsg))
-  }
+  const gitAddCDNBranch = `git -C ${cdnPath} add . `;
+  const gitAddCDNBranchErrorMsg = `Could not run "git add . " on ${cdnPath}`;
+  execGitCommand(gitAddCDNBranch, gitAddCDNBranchErrorMsg, done);
 
   // commit the updates to the branch
   log(`...Committing the staged changes on the local ${ghInfo.cdnRepo} repo`);
-  const gitCommitRes = shell.exec(`git -C ${cdnPath} commit -m 'Updating the starter and remote components for ${cdnBranchName}'`);
-  if (gitCommitRes.code) {
-    let errorMsg = `"git commit" failed on ${cdnPath}`;
-    if (gitCommitRes.stderr) {
-      errorMsg = gitCommitRes.stderr;
-    }
-    done(new NoStackError(errorMsg))
-  }
+  const gitCommitCDNBranch = `git -C ${cdnPath} commit -m 'Updating the starter and remote components for ${cdnBranchName}'`;
+  const gitCommitCDNBranchErrorMsg = `"git commit" failed on ${cdnPath}`;
+  execGitCommand(gitCommitCDNBranch, gitCommitCDNBranchErrorMsg, done);
 
   // push the branch to Github
   log(`...Pushing the local ${cdnBranchName} branch to the remote ${ghInfo.rokuRepo} repo`)
-  const pushCdnBranchRes = shell.exec(`git -C ${cdnPath} push origin ${cdnBranchName}`);
-  if (pushCdnBranchRes.code) {
-    let errorMsg = `Could not push ${cdnBranchName} to origin (Github) at ${cdnPath}`;
-    if (pushCdnBranchRes.stderr) {
-      errorMsg = pushCdnBranchRes.stderr
-    }
-    done(new NoStackError(errorMsg));
-  }
+  const gitPushCDNBranch = `git -C ${cdnPath} push origin ${cdnBranchName}`;
+  const gitPushCDNBranchErrorMsg = `Could not push ${cdnBranchName} to origin (Github) at ${cdnPath}`;
+  execGitCommand(gitPushCDNBranch, gitPushCDNBranchErrorMsg, done);
 
   // make a PR against master on the CDN repo at Github
   log(`...Making a PR on ${ghInfo.cdnRepo} against the remote master branch`);
@@ -193,14 +173,9 @@ async function makeReleasePrs(done) {
 
   // push the release branch to the project-total-recall repo
   log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
-  const pushReleaseBranchRes = shell.exec(`git push origin ${releaseBranchName}`);
-  if (pushReleaseBranchRes.code) {
-    let errorMsg = `Could not push ${releaseBranchName} to ${ghInfo.rokuRepo} origin (Github)`;
-    if (pushReleaseBranchRes.stderr) {
-      errorMsg = pushReleaseBranchRes.stderr;
-    }
-    done(new NoStackError(errorMsg));
-  }
+  const gitPushReleaseBranch = `git push origin ${releaseBranchName}`;
+  const gitPushReleaseBranchErrorMsg = `Could not push ${releaseBranchName} to ${ghInfo.rokuRepo} origin (Github)`;
+  execGitCommand(gitPushReleaseBranch, gitPushReleaseBranchErrorMsg, done);
 
   // make a PR against the production branch on the project-total-recall repo at Github
   const prodRokuBranchName = `${minorBuildTag}_branch`;
@@ -417,9 +392,6 @@ async function findCommitsNotInProduction(done) {
     log(declineMsg);
     return done();
   }
-
-
-
 
   // pull origin production branch
   execGitCommand(`git fetch origin ${prodBranch}:${prodBranch}`, 'Could not fetch the current production branch', done);
