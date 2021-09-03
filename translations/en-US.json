@@ -590,12 +590,12 @@
     "message": "Could not successfully send your birthdate to our servers."
   },
   "screenAgeVerification_header": {
-    "description": "A header message to let users know that they must enter their age/date of birth before proceeding",
-    "message": "Age Required"
+    "description": "A header message welcoming users to Tubi on Age required screen",
+    "message": "Welcome to Tubi, {firstname}"
   },
   "screenAgeVerification_sub_header": {
     "description": "A sub header message to direct users to enter their birth date",
-    "message": "To continue, please enter your date of birth."
+    "message": "To continue, please verify your year of birth"
   },
   "screenAgeVerification_keypad_button": {
     "description": "A message on the button below the birth date keypad that users should select once done inserting their birth date",
@@ -619,7 +619,7 @@
   },
   "screenAgeVerification_year": {
     "description": "A label explaining that the 4 digits above the label signify the year that was input by the user",
-    "message": "Year"
+    "message": "Year of Birth"
   },
   "screenAgeVerification_yyyy": {
     "description": "A label showing that the user should enter four digits for their birthdate year",
@@ -814,17 +814,13 @@
     "description": "The label of the button in a dialog window that allows the user to register or signIn",
     "message": "Sign In or Register"
   },
-  "dialog_why_ask_age_title": {
-    "description": "The title of a modal dialog which explains why Tubi is asking for the users birthdate",
-    "message": "Why is Tubi asking for my age?"
-  },
-  "dialog_why_ask_age_description": {
-    "description": "The main message of a modal dialog which explains why Tubi is asking for the users birthdate",
-    "message": "We use date of birth to confirm that you are meeting the age requirements set out in our Terms of Use and to personalize your experience. \n\nRead Terms of Use at: www.tubitv.com/terms \nQuestions? Let us know at: support@tubi.tv"
+  "why_ask_age_description": {
+    "description": "The main message which explains why Tubi is asking for the users year of birth",
+    "message": "We use this information to confirm that you're meeting the age requirements set out in our Terms of Use and to personalize you experience. Read Terms of Use at: www.tubitv.com/terms Questions? Let us know at: support@tubi.tv"
   },
   "signIn_screen_heading": {
     "description": "Title on the signIn screen",
-    "message": "Sign In to Access Your Account"
+    "message": "Sign In to Your Account"
   },
   "signIn_screen_enter_password": {
     "description": "enter password text",
@@ -913,6 +909,30 @@
   "rated_Label": {
     "description": "Label shown on video player when tv rating/descriptor is shown",
     "message": "RATED"
+  },
+  "invalid_email_title": {
+    "description": "Asking to enter a valid email on Email screen",
+    "message": "Please enter a valid email"
+  },
+  "email_screen_heading": {
+    "description": "Asking to enter a email on Email screen",
+    "message": "Enter Email Address"
+  },
+  "screenAgeVerification_born_year": {
+    "description": "Label to ask user to enter their year of birth",
+    "message": "I was born in"
+  },
+  "new_password_text": {
+    "description": "new password text",
+    "message": "To setup a new password,"
+  },
+  "new_password_link": {
+    "description": "forgot password link",
+    "message": "visit tubi.tv/password"
+  },
+  "signIn_screen_subheading": {
+    "description": "Sub title on the signIn screen",
+    "message": "Your email is already linked to an existing Tubi account"
   },
   "search_hint": {
     "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",

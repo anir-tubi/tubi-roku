@@ -15,6 +15,7 @@ End Function
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseAgeVerificationScreenDeviceRegistrationError(fullResponse, requestNode)
+
   ' default code
   errCode = -1234
   

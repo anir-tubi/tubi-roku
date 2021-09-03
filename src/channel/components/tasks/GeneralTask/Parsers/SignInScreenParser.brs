@@ -3,7 +3,10 @@
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseEmailExistsSuccess(fullResponse, requestNode)
   parsedResponse = fullResponse.data
-  return parsedResponse
+  return {
+    requestInput: requestNode.input
+    parsedResponse: fullResponse.data
+  }
 End Function
 
 
@@ -11,9 +14,10 @@ End Function
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseEmailExistsError(fullResponse, requestNode)
-  return {
-    code: fullResponse.code
-  }
+ return {
+  requestInput: requestNode.input
+  code: fullResponse.code
+}
 End Function
 
 
@@ -61,6 +65,7 @@ End Function
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseSignInError(fullResponse, requestNode)
   return {
+    requestInput: requestNode.input
     code: fullResponse.code
   }
 End Function

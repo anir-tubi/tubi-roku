@@ -8,6 +8,9 @@ Function init()
   
   m.pageHeading = m.top.findNode("pageHeading")
   m.pageHeading.text = getTranslation("signIn_screen_heading")
+
+  m.pageSubHeading = m.top.findNode("pageSubHeading")
+  m.pageSubHeading.text = getTranslation("signIn_screen_subheading")  
   
   m.passwordValidationMsg = m.top.findNode("passwordValidationMsg")
   m.passwordValidationMsg.text = getTranslation("signIn_screen_enter_password")
@@ -16,11 +19,11 @@ Function init()
   m.continueBtn.text = getTranslation("dialog_button_continue")
   m.continueBtn.observeFieldScoped("selected", "onContinueButtonSelected")
   
-  m.existingAccLabel = m.top.findNode("existingAccLabel")
-  m.existingAccLabel.text = getTranslation("forgot_password_text")
+  m.newPasswordLabel = m.top.findNode("newPasswordLabel")
+  m.newPasswordLabel.text = getTranslation("new_password_text")
   
-  m.forgotPasswordLink = m.top.findNode("forgotPasswordLink")
-  m.forgotPasswordLink.text = getTranslation("forgot_password_link")
+  m.newPasswordLink = m.top.findNode("newPasswordLink")
+  m.newPasswordLink.text = getTranslation("new_password_link")
   
   m.termsBtn = m.top.findNode("termsBtn")
   m.termsBtn.text = getTranslation("screenSettings_menu_tos")
@@ -57,6 +60,9 @@ Function init()
   m.password.hint = getTranslation("signIn_password_hint")
   m.password.observeFieldScoped("selected", "onPasswordButtonSelected")
 
+  m.email = m.top.findNode("email")
+  m.email.hint = getTranslation("signIn_email_hint")
+
   'set initial tracking values
   m.top.trackingPageInfo = {
     pageType: "login_page"
@@ -75,6 +81,10 @@ Function onScreenFocusChange()
 
   tubiLog("SignInScreen.onScreenFocusChange")
   if m.top.hasFocus() then
+    ' doing all these to avoid focus color issues
+    m.email.highlight = true
+    m.email.setFocus(false)
+    m.email.highlight = false
     m.password.setFocus(true)
   end if
   
@@ -83,11 +93,14 @@ End Function
 
 Function onContinueButtonSelected(evt)
 
-  buttonSelected = evt.getData()
-  if buttonSelected = true
+  isButtonSelected = evt.getData()
+  if isButtonSelected = true
     updatePasswordValidation()
     if isPasswordValid() = true
-      m.top.signInSelected = {password : m.password.text}
+      m.top.signInSelected = {
+        password : m.password.text, 
+        email : m.email.text
+      }
     end if  
   end if
   
@@ -96,8 +109,8 @@ End Function
 
 Function onTermsButtonSelected(evt)
 
-  buttonSelected = evt.getData()
-  if buttonSelected = true
+  isButtonSelected = evt.getData()
+  if isButtonSelected = true
     m.top.staticPageSelected = "TermsOfServiceButton"
   end if
 
@@ -106,8 +119,8 @@ End Function
 
 Function onPrivacyPolicyButtonSelected(evt)
 
-  buttonSelected = evt.getData()
-  if buttonSelected = true
+  isButtonSelected = evt.getData()
+  if isButtonSelected = true
     m.top.staticPageSelected = "PrivacyPolicyButton"
   end if
 
@@ -116,8 +129,8 @@ End Function
 
 Function onDoNotSellMyInfoButtonSelected(evt)
 
-  buttonSelected = evt.getData()
-  if buttonSelected = true
+  isButtonSelected = evt.getData()
+  if isButtonSelected = true
     m.top.staticPageSelected = "DoNotSellPolicyButton"
   end if
 
@@ -126,8 +139,8 @@ End Function
 
 Function onBackButtonSelected(evt)
 
-  buttonSelected = evt.getData()
-  if buttonSelected = true
+  isButtonSelected = evt.getData()
+  if isButtonSelected = true
     updatePasswordValidation()  
     hideKeyboard()
     m.password.setFocus(true)
@@ -138,7 +151,7 @@ End Function
 
 Function onShowHideButtonSelected(evt)
 
-  buttonSelected = evt.getData()
+  isButtonSelected = evt.getData()
   toggleShowHidePassword()
 
 End Function
@@ -146,8 +159,8 @@ End Function
 
 Function onPasswordButtonSelected(evt)
 
-  buttonSelected = evt.getData()
-  if buttonSelected = true
+  isButtonSelected = evt.getData()
+  if isButtonSelected = true
     resetPasswordValidation()
     showKeyboard()
     m.keyboard.setFocus(true)
@@ -265,7 +278,10 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       
     else if key = "down"
     
-      if m.password.hasFocus() = true
+      if m.email.hasFocus() = true
+        m.email.highlight = false
+        m.password.setFocus(true)
+      else if m.password.hasFocus() = true
         m.password.highlight = false
         m.continueBtn.setFocus(true)
       else if m.continueBtn.hasFocus() = true
@@ -276,7 +292,10 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     
     else if key = "up"
     
-      if m.continueBtn.hasFocus() = true
+      if m.password.hasFocus() = true
+        m.password.highlight = false
+        m.email.setFocus(true)
+      else if m.continueBtn.hasFocus() = true
         m.password.setFocus(true)
       else if m.termsBtn.hasFocus() = true
         m.continueBtn.setFocus(true) 

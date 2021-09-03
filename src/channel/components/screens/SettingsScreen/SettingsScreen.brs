@@ -59,9 +59,7 @@ Function onSetCallOfAction()
   sPreviousPage = m.top.callingPage
   sCallToAction = ""
   if sPreviousPage <> invalid and Len(sPreviousPage) > 0
-    if UCase(sPreviousPage) = UCase(m.constants.ui.screenIds.signUpScreen)
-      sCallToAction = getTranslation("goBack_signUp")
-    else if UCase(sPreviousPage) = UCase(m.constants.ui.screenIds.signInScreen)
+    if UCase(sPreviousPage) = UCase(m.constants.ui.screenIds.signInScreen)
       sCallToAction = getTranslation("goBack_signIn")
     end if
   end if

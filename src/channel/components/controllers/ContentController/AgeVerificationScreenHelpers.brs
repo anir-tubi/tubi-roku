@@ -4,7 +4,18 @@
 ' For example, if we want to update one flow, we don't have to worry about how the changes affect the
 ' other flows. With that in mind, the flows are "diagrammed" below:
 '
-' Flow 1) Guest user, needs age verification at channel launch
+' Flow 1) Needs age verification during SignIn
+'   showAgeVerificationScreenAtSignIn() ->
+'   showAgeVerificationScreen() ->
+'   onAgeSubmittedAtSignIn() ->
+'   verifyAgeAtSignIn() ->
+'   verifyAge() -> one of
+'     onAgeVerifiedAtSignIn() ->
+'       onAgeVerified()
+'     onAgeNotVerifiedAtSignIn() ->
+'       onAgeNotVerified()
+'
+' Flow 2) Signed in user, needs age verification at channel launch if they do not have birthdate
 '   showAgeVerificationScreenAtStartup() ->
 '   showAgeVerificationScreen() ->
 '   onAgeSubmittedAtStartup() ->
@@ -15,75 +26,43 @@
 '     onAgeNotVerifiedAtStartup() ->
 '       onAgeNotVerified()
 '
-' Flow 2) Signed in user, needs age verification at channel launch
-'   showAgeVerificationScreenAtStartupSignedIn() ->
+' Flow 3) Needs age verification during signUp
+'   showAgeVerificationScreenAtSignUp() ->
 '   showAgeVerificationScreen() ->
-'   onAgeSubmittedAtStartupSignedIn() ->
-'   verifyAgeAtStartupSignedIn() ->
-'   verifyAge() -> one of
-'     onAgeVerifiedAtStartupSignedIn() ->
-'       onAgeVerifiedAtStartup()->
-'       onAgeVerified()
-'     onAgeNotVerifiedAtStartupSignedIn() ->
-'       onAgeNotVerified()
-'
-' Flow 3) Guest user, needs age verification after signing out
-'   showAgeVerificationScreenAtInteraction() ->
-'   showAgeVerificationScreen() ->
-'   onAgeSubmittedAtInteraction() ->
-'   verifyAgeAtInteraction() ->
-'   verifyAge() -> one of
-'     onAgeVerifiedAtInteraction() ->
-'       onAgeVerified()
-'     onAgeNotVerifiedAtInteraction() ->
-'       onAgeNotVerified()
-
-
-Function showAgeVerificationScreenAtStartup()
-  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtStartup")
-  showAgeVerificationScreen(onAgeSubmittedAtStartup)
-
-  ' Roku requires a beacon to be fired before and after any user interaction screens prior
-  ' to the home page being shown
-  m.top.signalBeacon("AppDialogInitiate")
-End Function
-
-
-Function showAgeVerificationScreenAtStartupSignedIn()
-  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtStartupSignedIn")
-  showAgeVerificationScreen(onAgeSubmittedAtStartupSignedIn)
-
-  ' Roku requires a beacon to be fired before and after any user interaction screens prior
-  ' to the home page being shown
-  m.top.signalBeacon("AppDialogInitiate")
-End Function
-
-
-' TODO: Determine if this flow is still relevant after updates to COPPA
-' Occurs when a user signs out
-Function showAgeVerificationScreenAtInteraction()
-  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtInteraction")
-  showAgeVerificationScreen(onAgeSubmittedAtInteraction)
-End Function
+'   onAgeSubmittedAtSignUp() ->
+'   verifyAgeAtSignUp()
 
 
 ' Occurs after a user signs in, but the user does not have a valid age associated with their account yet.
-Function showAgeVerificationScreenAfterSignIn()
-  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAfterSignIn")
-  showAgeVerificationScreen(onAgeSubmittedAfterSignIn)
+' @signInInfo: assocarray(email,firstName) default set to invalid. eg - (test@tubi.tv, test)
+Function showAgeVerificationScreenAtSignIn(signInInfo = invalid as object)
+  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtSignIn")
+  showAgeVerificationScreen(onAgeSubmittedAtSignIn, signInInfo)
 End Function
 
 
-Function showAgeVerificationScreen(ageSubmittedCallback)
-  callbackString = convertFunctionToString(ageSubmittedCallback)
-  ageVerificationScreen = CreateObject("roSGNode", "AgeVerificationScreen")
-  ageVerificationScreen.id = m.constants.ui.screenIds.ageVerificationScreen
-  ageVerificationScreen.backgroundUriList = [m.defaultBackgroundUri]
-  ageVerificationScreen.observeFieldScoped("ageSubmitted", callbackString)
-  ageVerificationScreen.observeFieldScoped("whyButtonSelected", "onWhyButtonSelected")
-  ageVerificationScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")
-  displayDefaultBackground()
-  pushScreen(ageVerificationScreen, true, true)
+' Occurs for signedIn user when launching app and user does not have a valid age associated with their account yet.
+' @signInInfo: assocarray(email,firstName) default set to invalid. eg - (test@tubi.tv, test)
+Function showAgeVerificationScreenAtStartup(signInInfo = invalid as object)
+  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtStartup")
+  showAgeVerificationScreen(onAgeSubmittedAtStartUp, signInInfo)
+
+  ' Roku requires a beacon to be fired before and after any user interaction screens prior
+  ' to the home page being shown
+  m.top.signalBeacon("AppDialogInitiate")
+End Function
+
+
+' Occurs during user signs up
+' @signInInfo: assocarray(email,firstName,emailType) default set to invalid. eg - (test@tubi.tv, test, 'manual/pre_fill')
+Function showAgeVerificationScreenAtSignUp(signInInfo = invalid as object)
+  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtSignUp")
+  showAgeVerificationScreen(onAgeSubmittedAtSignUp, signInInfo)
+End Function
+
+
+Function onAgeSubmittedAtSignIn(msg)
+  onAgeSubmitted(msg, verifyAgeAtSignIn)
 End Function
 
 
@@ -92,18 +71,121 @@ Function onAgeSubmittedAtStartup(msg)
 End Function
 
 
-Function onAgeSubmittedAtStartupSignedIn(msg)
-  onAgeSubmitted(msg, verifyAgeAtStartupSignedIn)
+Function onAgeSubmittedAtSignUp(msg)
+  onAgeSubmitted(msg, verifyAgeAtSignup)
 End Function
 
 
-Function onAgeSubmittedAtInteraction(msg)
-  onAgeSubmitted(msg, verifyAgeAtInteraction)
+Function verifyAgeAtSignIn(birthdate)
+  verifyAge(birthdate, onAgeVerifiedAtSignIn, onAgeNotVerifiedAtSignIn)
 End Function
 
 
-Function onAgeSubmittedAfterSignIn(msg)
-  onAgeSubmitted(msg, verifyAgeAfterSignIn)
+Function verifyAgeAtStartup(birthdate)
+  verifyAge(birthdate, onAgeVerifiedAtStartup, onAgeNotVerifiedAtStartup)
+End Function
+
+
+Function verifyAgeAtSignup(signInInfo, birthdate)
+
+  if hasValidSignUpCredentials(birthdate, signInInfo) = true ' triggers when user signs up
+
+    deviceInfo = CreateObject("roDeviceInfo")
+    randomUUID = right(deviceInfo.GetRandomUUID(), 12) ' taking only 12 characters from right since GetRandomUUID() length is more
+
+    usedEmailAsFirstName = false
+    if signInInfo.emailType = "manual"
+      usedEmailAsFirstName = true
+    end if
+
+    options = {}
+    options.body = {
+      platform: m.constants.platform  
+      device_id: m.constants.deviceInfo.deviceId
+      credentials: {
+        email: signInInfo.email
+        password: randomUUID 'used dummy password - user can change it by using forgot password
+        gender: ""
+        first_name: signInInfo.firstName
+        last_name: ""
+        birthday: birthdate
+        email_type: signInInfo.emailType
+        used_email_as_first_name: usedEmailAsFirstName
+      }
+    }
+    
+    requestInfo = m.userDeviceApi.signUpReqInfo(options)
+    m.makeRequest({
+      url: requestInfo.url
+      requestType: m.constants.reqNames.signUp
+      options: requestInfo.options
+      successCallback: onSignUpResponse
+      errorCallback: onSignUpError
+      responseType: "assocarray"
+    })
+  else
+    ' not expected to ever happen, so punt and start the app normally if it does
+    startUserExperienceAsAgeNotVerified()
+  end if
+
+End Function
+
+
+' @age: integer, the age as returned by the backend
+Function onAgeVerifiedAtSignIn(age)
+  tubiLog("AgeVerificationScreenHelpers.onAgeVerifiedAtSignIn")
+  patchSignedInUserAge()
+  onAgeVerified(age)
+  callbackAfterSignIn = m.callbackAfterSignIn
+  m.callbackAfterSignIn = invalid ' setting to invalid to avoid future callbacks
+  callbackAfterSignIn()
+End Function
+
+
+' Functionality that occurs after the age verification screen is shown to the user when
+' starting the app, and the age has been verified by the backend
+' @age: integer, the age as returned by the backend
+Function onAgeVerifiedAtStartup(age)
+  tubiLog("AgeVerificationScreenHelpers.onAgeVerifiedAtStartup")
+  patchSignedInUserAge()
+  onAgeVerified(age)
+  m.ageVerificationComplete = true
+
+  ' Roku requires a beacon to be fired before and after any user interaction screens prior
+  ' to the home page being shown
+  ' Fire for successful age verified at startup.
+  m.top.signalBeacon("AppDialogComplete")
+
+  startUserExperience()
+End Function
+
+
+Function onAgeNotVerifiedAtSignIn(err)
+  onAgeNotVerified(err, verifyAgeAtSignIn, startUserExperienceAsAgeNotVerified)
+End Function
+
+
+Function onAgeNotVerifiedAtStartup(err)
+  onAgeNotVerified(err, verifyAgeAtStartup, startUserExperienceAsAgeNotVerified)
+End Function
+
+
+Function onAgeNotVerifiedAtSignup(err)
+  onAgeNotVerified(err, verifyAgeAtSignup, startUserExperienceAsAgeNotVerified)
+End Function
+
+
+' showAgeVerificationScreen is used to display create AgeVerificationScreen and display
+Function showAgeVerificationScreen(ageSubmittedCallback, signInInfo = invalid as object)
+  callbackString = convertFunctionToString(ageSubmittedCallback)
+  ageVerificationScreen = CreateObject("roSGNode", "AgeVerificationScreen")
+  ageVerificationScreen.id = m.constants.ui.screenIds.ageVerificationScreen
+  ageVerificationScreen.backgroundUriList = [m.defaultBackgroundUri]
+  ageVerificationScreen.signInInfo = signInInfo
+  ageVerificationScreen.observeFieldScoped("ageSubmitted", callbackString)
+  ageVerificationScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")
+  displayDefaultBackground()
+  pushScreen(ageVerificationScreen, true, true)
 End Function
 
 
@@ -113,6 +195,7 @@ Function onAgeSubmitted(msg, verifyAgeCallback)
   tubiLog("AgeVerificationScreenHelpers.onAgeSubmitted")
   ageVerificationScreen = msg.getRoSGNode()
   birthdate = ageVerificationScreen.birthdate
+  signInInfo = ageVerificationScreen.signInInfo
 
   ' send RequestForInfo analytics event
   selectorValues = {
@@ -133,27 +216,15 @@ Function onAgeSubmitted(msg, verifyAgeCallback)
 
   m.trackingLoggingTask.trackEvent = analyticsEvent
 
-  verifyAgeCallback(birthdate)
-End Function
+  if verifyAgeCallback <> invalid and verifyAgeCallback = verifyAgeAtSignup
+    verifyAgeCallback(signInInfo, birthdate)
+  else if verifyAgeCallback <> invalid
+    verifyAgeCallback(birthdate)
+  else
+    ' not expected to ever happen, so punt and start the app normally if it does
+    startUserExperienceAsAgeNotVerified()  
+  end if
 
-
-Function verifyAgeAtStartup(birthdate)
-  verifyAge(birthdate, onAgeVerifiedAtStartup, onAgeNotVerifiedAtStartup)
-End Function
-
-
-Function verifyAgeAtStartupSignedIn(birthdate)
-  verifyAge(birthdate, onAgeVerifiedAtStartupSignedIn, onAgeNotVerifiedAtStartupSignedIn)
-End Function
-
-
-Function verifyAgeAtInteraction(birthdate)
-  verifyAge(birthdate, onAgeVerifiedAtInteraction, onAgeNotVerifiedAtInteraction)
-End Function
-
-
-Function verifyAgeAfterSignIn(birthdate)
-  verifyAge(birthdate, onAgeVerifiedAfterSignIn, onAgeNotVerifiedAfterSignIn)
 End Function
 
 
@@ -165,7 +236,9 @@ End Function
 '                           while attempting to verify the age.
 Function verifyAge(birthdate, successCallback, errorCallback)
   tubiLog("AgeVerificationScreenHelpers.verifyAge")
-  if isString(birthdate) and birthdate <> ""
+
+  if isString(birthdate) and birthdate <> "" 'triggers when signedIn user gives age information
+
     confirmBirthdateRequestInfo = m.UserDeviceApi.deviceRegisterInfo(birthdate)
     m.makeRequest({
       url: confirmBirthdateRequestInfo.url
@@ -176,6 +249,7 @@ Function verifyAge(birthdate, successCallback, errorCallback)
       responseType: "integer"
       birthdate: birthdate  ' custom field to pass through to the callback
     })
+
   else
     ' not expected to ever happen, so punt and start the app normally if it does
     startUserExperienceAsAgeNotVerified()
@@ -183,45 +257,31 @@ Function verifyAge(birthdate, successCallback, errorCallback)
 End Function
 
 
-' Functionality that occurs after the age verification screen is shown to the user when
-' starting the app, and the age has been verified by the backend
-' @age: integer, the age as returned by the backend
-Function onAgeVerifiedAtStartup(age)
-  tubiLog("AgeVerificationScreenHelpers.onAgeVerifiedAtStartup")
-  onAgeVerified(age)
-  m.ageVerificationComplete = true
+' @birthdate: string, birthdate with format "YYYY-MM-DD"
+' @signInInfo: assocarray, it contains email(String), firstname(String), signedIn(boolean), emailType(String) 
+'
+' returns: boolean
+'  
+Function hasValidSignUpCredentials(birthdate, signInInfo)
 
-  ' Roku requires a beacon to be fired before and after any user interaction screens prior
-  ' to the home page being shown
-  ' Fire for successful age verified at startup.
-  m.top.signalBeacon("AppDialogComplete")
+  isValid = false
 
-  startUserExperience()
-End Function
+  email = ""
+  firstName = ""
+  emailType = ""
 
+  if signInInfo <> invalid
+    email = signInInfo.email
+    firstName = signInInfo.firstName
+    emailType = signInInfo.emailType
+  end if
 
-Function onAgeVerifiedAtStartupSignedIn(age)
-  tubiLog("AgeVerificationScreenHelpers.onAgeVerifiedAtStartupSignedIn")
-  patchSignedInUserAge()
-  onAgeVerifiedAtStartup(age)
-End Function
+  if isString(birthdate) and birthdate <> "" and email <> "" and firstName <> "" and emailType <> ""
+    isValid = true
+  end if
 
+  return isValid
 
-' Functionality that occurs after the age verification screen is shown to the user based upon a
-' user interaction (usally sign out), and the age has been verified by the backend
-' @age: integer, the age as returned by the backend
-Function onAgeVerifiedAtInteraction(age)
-  onAgeVerified(age)
-  restartChannelAfterAgeVerification()
-End Function
-
-
-Function onAgeVerifiedAfterSignIn(age)
-  patchSignedInUserAge()
-  onAgeVerified(age)
-  callbackAfterSignIn = m.callbackAfterSignIn
-  m.callbackAfterSignIn = invalid ' setting to invalid to avoid future callbacks
-  callbackAfterSignIn()
 End Function
 
 
@@ -241,26 +301,6 @@ Function onAgeVerified(age)
     ' age verified for guest user, so store age verification
     m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(true)
   end if
-End Function
-
-
-Function onAgeNotVerifiedAtStartup(err)
-  onAgeNotVerified(err, verifyAgeAtStartup, startUserExperienceAsAgeNotVerified)
-End Function
-
-
-Function onAgeNotVerifiedAtStartupSignedIn(err)
-  onAgeNotVerified(err, verifyAgeAtStartupSignedIn, startUserExperienceAsAgeNotVerified)
-End Function
-
-
-Function onAgeNotVerifiedAtInteraction(err)
-  onAgeNotVerified(err, verifyAgeAtInteraction, restartChannelAfterAgeVerification)
-End Function
-
-
-Function onAgeNotVerifiedAfterSignIn(err)
-  onAgeNotVerified(err, verifyAgeAfterSignIn, restartChannelAfterAgeVerification)
 End Function
 
 
@@ -351,6 +391,7 @@ End Function
 
 Function onBirthdayCheckSuccess(hasAgeInfo)
   tubiLog("AgeVerificationScreenHelpers.onBirthdayCheckSuccess")
+  
   if hasAgeInfo <> invalid and hasAgeInfo.hasAge = true
     Request = TubiRequest(m.constants.settings)
     Auth = TubiAuth(m.constants, Request)
@@ -363,9 +404,17 @@ Function onBirthdayCheckSuccess(hasAgeInfo)
 
     startUserExperience()
   else
+
+    signInInfo = {}
+    authInfo = m.global.authInfo
+    if authInfo <> invalid and authInfo.firstname <> invalid
+      signInInfo.email  = authInfo.email
+      signInInfo.firstname = authInfo.firstname
+    end if
+
     showContentGroup()
     m.spinner.visible = false
-    showAgeVerificationScreenAtStartupSignedIn()
+    showAgeVerificationScreenAtStartup(signInInfo)
   end if
 End Function
 
@@ -416,30 +465,13 @@ Function onBirthdayCheckError(errorInfo)
 End Function
 
 
-Function onWhyButtonSelected(msg)
-  screen = msg.getRoSGNode()
-  title = getTranslation("dialog_why_ask_age_title")
-  message = getTranslation("dialog_why_ask_age_description")
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "BIRTHDAY"
-      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "why-age-gate"
-    }
-  }
-  showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
-End Function
-
-
 ' For signed up users who didn't have a age associated with their account,
 ' once they have submitted an age and the age has been verified, we need to
 ' PATCH their account info with their birthdate
 Function patchSignedInUserAge()
   birthdate = ""
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.isSubtype("AgeVerificationScreen")
+  if currentScreen <> invalid and currentScreen.id = "ageVerificationScreen"
     birthdate = currentScreen.birthdate
   end if
 

@@ -274,7 +274,6 @@ Function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
   authInfo = m.getAuthInfo()
   if authInfo <> invalid and authInfo.accessToken <> invalid
     authHeaders = m.getAuthHeaders(authInfo.accessToken)
-
     if authHeaders <> invalid
       if options.headers <> invalid
         options.headers.append(authHeaders)

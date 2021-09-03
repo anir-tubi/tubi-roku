@@ -12,6 +12,34 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   
   <interface>
+
+    <!-- INPUT -->
+
+      <!-- signInInfo field possible values are below 
+      
+        case 1 : signInInfo will have below keys when user signs in, but the user does not have a valid age associated with their account yet.
+          eg. 
+            {  
+              email : "test@tubi.tv",
+              firstName : "test"
+            ) 
+
+        case 2:  signInInfo will have below keys when user signs up
+          eg. 
+            {  
+              email : "test@tubi.tv", 
+              firstName : "test", 
+              emailType : "manual/pre_fill"
+            )
+
+        case 3: signInInfo will have below keys when signedIn user launches app and does not have a valid age associated with their account yet.
+          eg. 
+            {  
+              email : "test@tubi.tv",
+              firstName : "test"
+            ) 
+            -->
+      <field id="signInInfo" type="assocarray"/>
   
     <!-- OUTPUT -->
     
@@ -21,19 +49,12 @@
       <!-- event that occurs when a user selects the back button -->
       <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
 
-      <!-- event that occurs when a user selects the "Why we ask for this info" button -->
-      <field id="whyButtonSelected" type="boolean" alias="AgeVerificationWhyButton.selected"/>
-
       <!-- the birthdate that the user has submitted. Should be in the form "YYYY-MM-DD" -->
       <field id="birthdate" type="string" />
 
   </interface>
 
   <children>
-    <RectangleIconButton
-      id="AgeVerificationWhyButton"
-      iconUri="pkg://images/icon-about.png"
-      translation="[126,60]" />
     <Group
       id="AgeVerificationPageText">
       <Label
@@ -74,143 +95,28 @@
     </Group>
     <Group
       id="AgeVericationDateInfo"
-      translation="[894,501]">
+      translation="[890,496]">
       <LayoutGroup
         id="AgeVerificationUserDate"
         layoutDirection="horiz"
         itemSpacings="[12]">
-        <Rectangle
-          width="198">
-          <Poster
-            id="AgeVerificationMonthBg"
-            uri="pkg:/images/menu-focus-fhd.9.png"
-            width="198"
-            height="144"
-            opacity="1.0"/>
+
           <Label
-            id="AgeVerificationMonthEntryBack"
+            id="AgeVerificationYearText"
             color="0xFFFFFF"
-            width="198"
+            width="426"
             height="144"
             horizAlign="center"
             vertAlign="center"
-            opacity="0.64"
-            translation="[0,9]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="84"/>
-          </Label>
-          <Label
-            id="AgeVerificationMonthEntryFront"
-            color="0x000000"
-            width="198"
-            height="144"
-            horizAlign="center"
-            vertAlign="center"
-            opacity="1.0"
-            translation="[0,9]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="84"/>
-          </Label>
-          <Label
-            id="AgeVerificationMonth"
-            color="0xFFFFFF"
-            width="198"
-            horizAlign="center"
             opacity="0.4"
-            translation="[0,168]">
+            translation="[0,9]">
             <Font
               role="font"
               uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="33"/>
+              size="70"/>
           </Label>
-        </Rectangle>
-        <Rectangle
-          width="30">
-          <Label
-            text="/"
-            color="0xFFFFFF"
-            width="33"
-            height="144"
-            horizAlign="center"
-            vertAlign="center"
-            opacity="0.64"
-            translation="[0,9]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="84"/>
-          </Label>
-        </Rectangle>
-        <Rectangle
-          width="198">
-          <Poster
-            id="AgeVerificationDayBg"
-            uri="pkg:/images/menu-focus-fhd.9.png"
-            width="198"
-            height="144"
-            opacity="0.0"/>
-          <Label
-            id="AgeVerificationDayEntryBack"
-            color="0xFFFFFF"
-            width="198"
-            height="144"
-            horizAlign="center"
-            vertAlign="center"
-            opacity="0.64"
-            translation="[0,9]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="84"/>
-          </Label>
-          <Label
-            id="AgeVerificationDayEntryFront"
-            color="0x000000"
-            width="198"
-            height="144"
-            horizAlign="center"
-            vertAlign="center"
-            opacity="0"
-            translation="[0,9]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="84"/>
-          </Label>
-          <Label
-            id="AgeVerificationDay"
-            color="0xFFFFFF"
-            width="198"
-            horizAlign="center"
-            opacity="0.4"
-            translation="[0,168]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="33"/>
-          </Label>
-        </Rectangle>
-        <Rectangle
-          width="30">
-          <Label
-            text="/"
-            color="0xFFFFFF"
-            width="33"
-            height="144"
-            horizAlign="center"
-            vertAlign="center"
-            opacity="0.64"
-            translation="[0,9]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="84"/>
-          </Label>
-        </Rectangle>
+
+
         <Rectangle
           width="267">
           <Poster
@@ -218,7 +124,7 @@
             uri="pkg:/images/menu-focus-fhd.9.png"
             width="267"
             height="144"
-            opacity="0.0"/>
+            opacity="1.0"/>
           <Label
             id="AgeVerificationYearEntryBack"
             color="0xFFFFFF"
@@ -240,7 +146,7 @@
             height="144"
             horizAlign="center"
             vertAlign="center"
-            opacity="0"
+            opacity="1.0"
             translation="[0,9]">
             <Font
               role="font"
@@ -284,5 +190,18 @@
         uri="pkg:/fonts/Vaud-Medium.ttf"
         size="27" />
     </Label>
+    <Label
+      id="AgeVericationInfoLabel"
+      translation="[126,948]"
+      color="0xFFFFFF"
+      numLines="2"
+      wrap="true"
+      width="1710"
+      vertAlign="center">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="25" />
+    </Label>    
   </children>
 </component>

@@ -468,7 +468,7 @@ End Function
 '
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
-
+  
   if m.authInfoReceived <> true
     ' checks if the initial auth info has been pulled from the registry
   else if m.startupArgsReceived <> true

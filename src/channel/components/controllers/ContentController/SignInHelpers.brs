@@ -14,7 +14,11 @@ Function startSignIn(callbackAfterSignIn=invalid)
 
   m.callbackAfterSignIn = callbackAfterSignIn
   
-  showActivationScreen()
+  if getExperimentResource("roku_email_prefill_login_age_gate", "roku_email_prefill_login_age_gate_v1").enabled = true
+    showRFIScreen()
+  else
+    showActivationScreen()
+  end if
 
 End Function
 
@@ -35,9 +39,8 @@ Function showRFIScreen()
   }
   m.trackingLoggingTask.trackEvent = dialogEvent
 
-  if m.billing = invalid
-    m.billing = CreateObject("roSGNode", "ChannelStore")
-  end if
+  ' RFI screen is showing only if the channelStore node is stored in m variable
+  m.billing = CreateObject("roSGNode", "ChannelStore")
   m.billing.observeFieldScoped("userData", "onUserData")
   m.billing.requestedUserData = "email, firstName, lastName"
   m.billing.command = "getUserData"
@@ -46,12 +49,19 @@ End Function
 
 
 ' onUserData is the callback triggered when ChannelStore returns userData
-Function onUserData()
+Function onUserData(msg)
   tubiLog("SignInHelpers.onUserData")
-  currentScreen = getCurrentScreen()
-  m.billing.unobserveFieldScoped("userData")
+
+  m.billing = invalid ' making m.billing as invalid to avoid using it another places
   
-  if m.billing.userData <> invalid
+  currentScreen = getCurrentScreen()
+
+  billing = msg.getRoSGNode()
+  if billing <> invalid
+    billing.unobserveFieldScoped("userData")
+  end if
+  
+  if billing <> invalid and billing.userData <> invalid
 
     dialogEvent = {
       type: "dialog"
@@ -64,7 +74,12 @@ Function onUserData()
     }
     m.trackingLoggingTask.trackEvent = dialogEvent
     
-    checkEmailExists()
+    email =  billing.userData.email
+    input = {
+      email : email
+      emailType : "pre_fill"
+    }
+    checkEmailExists(input)
 
   else
 
@@ -78,17 +93,52 @@ Function onUserData()
       }
     }
     m.trackingLoggingTask.trackEvent = dialogEvent
-    showActivationScreen()
+    showEmailScreen()
   end if
   
 End Function
 
 
-Function checkEmailExists()
+' onEmailInputContinueSelected callback triggers when user clicks continue button from Email Input screen 
+Function onEmailInputContinueSelected(evt)
+  
+  screen =  evt.getRoSGNode()
+  input = {
+    email : screen.email
+    emailType : "manual"
+  }
+  checkEmailExists(input)
+
+End Function
+
+
+' onEmailInputBackButtonSelected callback triggers when user clicks back button from Email Input screen 
+Function onEmailInputBackButtonSelected(evt)
+
+  m.trackingLoggingTask.trackEvent = {
+    type: "account"
+    values: {
+      manip: "SIGNUP"
+      current: "EMAIL"
+      status: "FAIL"
+      message: "user-cancel"
+    }
+  }
+  popScreen(true, true)
+
+End Function
+
+
+' checkEmailExists function invokes API to check whether email already exits in Tubi 
+' @input : assocarray, will contain email(user's email) & emailType(manual/pre_fill)
+Function checkEmailExists(input)
+
+  email = input.email
+  emailType = input.emailType
 
   options = {}
   options.params = {
-    email: m.billing.userData.email
+    email: input.email
   }
    
   requestInfo = m.userDeviceApi.emailExistsReqInfo(options)
@@ -99,6 +149,8 @@ Function checkEmailExists()
     successCallback: onEmailExistsResponse
     errorCallback: onEmailExistsError
     responseType: "assocarray"
+    email: email
+    emailType : emailType
   })
   
 End Function
@@ -108,19 +160,32 @@ End Function
 ' @response : assocarray, the response of emailExists API in the form of AA
 Function onEmailExistsResponse(response)
 
-  email = m.billing.userData.email
-  if response <> invalid and response.taken = true
-    showExistingAccountFoundModal(email)
-  else
-    showSignUpScreen(email)
+  if response <> invalid
+    parsedresponse = response.parsedresponse
+    requestInput = response.requestInput
+
+    if parsedresponse <> invalid and requestInput <> invalid
+      if parsedresponse.taken = true
+        showSignInScreen(requestInput.email)
+      else
+        m.authInfoReceived = false
+        signUpCredentials = {}
+        signUpCredentials.email =  requestInput.email
+        signUpCredentials.emailType = requestInput.emailType
+        signUpCredentials.firstName = Left(requestInput.email.split("@")[0], 20) ' limiting by 20 characters for the firstname field
+        showAgeVerificationScreenAtSignUp(signUpCredentials)
+      end if
+    end if
   end if
 
 End Function
 
 
 ' onEmailExistsError is the callback triggered when the emailExists API fails
-' @error : roSGNode, the error response of emailExists API in the form of AA
-Function onEmailExistsError(error)
+' @errorResponse : roSGNode, the error response (code, requestInput) of emailExists API in the form of AA
+Function onEmailExistsError(errorResponse)
+
+  requestInput = errorResponse.requestInput
 
   accountEvent = {
     type: "account"
@@ -147,29 +212,16 @@ Function onEmailExistsError(error)
   title =  getTranslation("dialog_defaultError_title")
   message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
   buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
-  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, checkEmailExists)
-
-End Function
-
-
-Function showExistingAccountFoundModal(email)
-
-  currentScreen = getCurrentScreen()
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "ACTIVATION"
-      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "prefill-existing"
+  simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, checkEmailExists)
+  
+  if simpleModalInfo <> invalid and simpleModalInfo.buttonInfo <> invalid and simpleModalInfo.buttonInfo[0] <> invalid
+    simpleModalInfo.buttonInfo[0].callbackParams = {
+      email : requestInput.email, 
+      emailType : requestInput.emailType
     }
-  }
-  title =  getTranslation("existing_account_found_title")
-  message = email + " " + getTranslation("existing_account_found_description")
-  buttons = [getTranslation("dialog_button_signIn")]
-  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, showSignInScreen, invalid)
-  m.sSideNavCurrentScreen = currentScreen
-  displayDefaultBackground()  
+  end if
+  showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
+  
 
 End Function
 
@@ -188,13 +240,14 @@ End Function
 
 
 ' showSignInScreen is used to display signIn screen
-Function showSignInScreen()
-  email = m.billing.userData.email
+' @email : string,  (either taken from roku account or user entered email)
+Function showSignInScreen(email)
 
   signInScreen = CreateObject("roSGNode", "SignInScreen")
   signInScreen.id = m.constants.ui.screenIds.signInScreen
   signInScreen.username = email
   signInScreen.observeFieldScoped("signInSelected", "onSignInSelected")
+  signInScreen.observeFieldScoped("emailSelected", "onSignInScreenEmailSelected")
   signInScreen.observeFieldScoped("staticPageSelected", "onStaticPageSelected")
   pushScreen(signInScreen, true, true)
   m.sSideNavCurrentScreen = getCurrentScreen()
@@ -203,17 +256,22 @@ Function showSignInScreen()
 End Function
 
 
-' showSignUpScreen is used to display signUp screen
-' @email : string, email of the user which is associated on their roku account
-Function showSignUpScreen(email)
+' onSignInScreenEmailSelected callback triggers when user selects the email text box
+Function onSignInScreenEmailSelected()
 
-  signUpScreen = CreateObject("roSGNode", "SignUpScreen")
-  signUpScreen.id = m.constants.ui.screenIds.signUpScreen
-  signUpScreen.username = email
-  signUpScreen.observeFieldScoped("signUpSelected", "onSignUpSelected")
-  signUpScreen.observeFieldScoped("signInSelected", "showActivationScreen")
-  signUpScreen.observeFieldScoped("staticPageSelected", "onStaticPageSelected")
-  pushScreen(signUpScreen, true, true)
+  showEmailScreen()
+
+End Function
+
+
+' showEmailScreen is used to display Email screen for entering new email for signup
+Function showEmailScreen()
+
+  emailScreen = CreateObject("roSGNode", "EmailInputScreen")
+  emailScreen.id = m.constants.ui.screenIds.emailScreen
+  emailScreen.observeFieldScoped("continueSelected", "onEmailInputContinueSelected")
+  emailScreen.observeFieldScoped("backButtonSelected", "onEmailInputBackButtonSelected")
+  pushScreen(emailScreen, true, true)
   m.sSideNavCurrentScreen = getCurrentScreen()
   displayDefaultBackground()
 
@@ -227,46 +285,11 @@ Function onStaticPageSelected(evt)
   ' sending static page name(ToS/PP/DoNotSellMyInfo) & screen level
   currentScreen = getCurrentScreen()
   pageSource = ""
-  if currentScreen <> invalid and currentScreen.getSubtype() = "SignUpScreen"
-    pageSource = m.constants.ui.screenIds.signUpScreen
-  else if currentScreen <> invalid and currentScreen.getSubtype() = "SignInScreen"
+  if currentScreen <> invalid and currentScreen.getSubtype() = "SignInScreen"
     pageSource = m.constants.ui.screenIds.signInScreen
   end if
   showSettingsScreen(staticPageSelected, 150, pageSource)
 
-End Function
-
-
-' onSignUpSelected callback is triggered when user selects continue button on SignUp Screen
-' @evt : roSGNodeEvent, it contains password
-Function onSignUpSelected(evt)
-
-  signUpSelected = evt.getData()
-  
-  options = {}
-  options.body = {
-    platform: m.constants.platform  
-    device_id: m.constants.deviceInfo.deviceId
-    credentials: {
-      email: m.billing.userData.email
-      password: signUpSelected.password
-      gender: ""
-      first_name: m.billing.userData.firstname
-      last_name: m.billing.userData.lastname
-      birthday: ""
-    }
-  }
-  
-  requestInfo = m.userDeviceApi.signUpReqInfo(options)
-  m.makeRequest({
-    url: requestInfo.url
-    requestType: m.constants.reqNames.signUp
-    options: requestInfo.options
-    successCallback: onSignUpResponse
-    errorCallback: onSignUpError
-    responseType: "assocarray"
-  })
-    
 End Function
 
 
@@ -345,7 +368,7 @@ Function onSignInSelected(evt)
     device_id: m.constants.deviceInfo.deviceId
     type: "email"
     credentials: {
-      email: m.billing.userData.email
+      email: signInSelected.email
       password: signInSelected.password
     }
   }
@@ -358,6 +381,8 @@ Function onSignInSelected(evt)
     successCallback: onSignInResponse
     errorCallback: onSignInError
     responseType: "assocarray"
+    email: signInSelected.email
+    emailType : signInSelected.password
   })  
 
 End Function
@@ -381,8 +406,10 @@ End Function
 
 
 ' onSignInError callback is triggered when the sign In is failed
-' @error : assocarray, the error response of signIn API in the form of AA
-Function onSignInError(error)
+' @errorResponse : assocarray, the error response of signIn API in the form of AA
+Function onSignInError(errorResponse)
+
+  requestInput = errorResponse.requestInput
 
   accountEvent = {
     type: "account"
@@ -410,7 +437,7 @@ Function onSignInError(error)
   title =  getTranslation("invalid_password_title")
   invalidPasswordDesc = getTranslation("enter_password_dialog_description")
   forgotPasswordDesc = getTranslation("forgot_password_text") + " " + getTranslation("forgot_password_link")
-  message = invalidPasswordDesc + chr(10) + m.billing.userData.email + chr(10) +  chr(10) + forgotPasswordDesc
+  message = invalidPasswordDesc + chr(10) + requestInput.email + chr(10) +  chr(10) + forgotPasswordDesc
   buttons = [getTranslation("re-enter_password_button")]
   showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onReEnterPasswordSelected, onReEnterPasswordSelected)
 
@@ -542,9 +569,15 @@ End Function
 Function onPostSignInAuthInfoUpdated()
   tubiLog("SignInHelpers.onPostSignInAuthInfoUpdated")
   authInfo = handleUpdatedAuth()
-  if shouldShowAgeGate() and authInfo.hasAge <> true
+  if (shouldShowAgeGate() and authInfo.hasAge <> true)
     m.spinner.visible = false
-    showAgeVerificationScreenAfterSignIn()
+    signInInfo = invalid
+    if authInfo <> invalid
+      signInInfo = {}
+      signInInfo.email  = authInfo.email
+      signInInfo.firstname = authInfo.firstname
+    end if
+    showAgeVerificationScreenAtSignIn(signInInfo)
   else if m.callbackAfterSignIn <> invalid
     callbackAfterSignIn = m.callbackAfterSignIn
     m.callbackAfterSignIn = invalid ' setting to invalid to avoid future callbacks
@@ -736,14 +769,20 @@ Function popScreenAfterSignInProcess()
     "ActivationCodeScreen": true
     "SignInScreen": true
     "SignUpScreen": true
+    "EmailInputScreen": true
     "AgeVerificationScreen": true
   }
 
+  count = m.screenStack.getChildCount()-1
+  for i = count to 0 step -1
+    screen = m.screenStack.getChild(i)
+    if screen <> invalid and poppableScreenSubtypes[screen.getSubtype()] = true
+      popScreen(false, false)
+    else
+      exit for  
+    end if
+  end for
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and poppableScreenSubtypes[currentScreen.getSubtype()] = true
-    popScreen(true, true)
-    currentScreen = getCurrentScreen()
-  end if
 
   return currentScreen
 End Function

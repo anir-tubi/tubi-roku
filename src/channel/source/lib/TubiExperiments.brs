@@ -52,7 +52,11 @@ Function TubiExperiments(constants) as Object
 
       roku_horizontal_fixed_focus: {
         roku_horizontal_fixed_focus_v1: {"enabled": false}
-      }
+       }
+
+       roku_email_prefill_login_age_gate:{
+        roku_email_prefill_login_age_gate_v1: {"enabled": false}
+      }     
       
       roku_safe_zone:{
         roku_safe_zone_restart_v2: {"enabled": false}
@@ -62,7 +66,6 @@ Function TubiExperiments(constants) as Object
         roku_sports_v1: {"enabled": false}
       }
     } 
-    
     
     'public methods
     init: tubiExperiments_init
