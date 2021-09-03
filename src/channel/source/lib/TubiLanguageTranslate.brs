@@ -1050,7 +1050,7 @@ Function getTranslation_en_US()
     "signIn_screen_subheading": {
       "description": "Sub title on the signIn screen",
       "message": "Your email is already linked to an existing Tubi account"
-    }, 
+    },
     "search_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
       "message": "To use your voice enabled remote, press and hold"
@@ -1652,7 +1652,7 @@ Function getTranslation_es_MX()
       "message": "No pudimos mandar tu fecha de nacimiento a nuestros servidores con éxito."
     },
     "screenAgeVerification_header": {
-      "description": "A header message to let users know that they must enter their age/date of birth before proceeding",
+      "description": "A header message welcoming users to Tubi on Age required screen",
       "message": "Edad requerida"
     },
     "screenAgeVerification_sub_header": {
@@ -1875,13 +1875,9 @@ Function getTranslation_es_MX()
       "description": "The label of the button in a dialog window that allows the user to register or signIn",
       "message": "Iniciar Sesión o Regístrate"
     },
-    "dialog_why_ask_age_title": {
-      "description": "The title of a modal dialog which explains why Tubi is asking for the users birthdate",
-      "message": "¿Por qué me esta pidiendo Tubi mi edad?"
-    },
-    "dialog_why_ask_age_description": {
-      "description": "The main message of a modal dialog which explains why Tubi is asking for the users birthdate",
-      "message": "Usamos la fecha de nacimiento para confirmar si satisfaces los requerimientos de edad presentados en nuestros Términos de uso y para personalizar tu experiencia.\n\nLee los Términos de uso en: www.tubitv.com/terms\n¿Preguntas? Haznos saber a: support@tubi.tv"
+    "why_ask_age_description": {
+      "description": "The main message which explains why Tubi is asking for the users year of birth",
+      "message": "Usamos esta información para confirmar si satisfaces los requerimientos de edad presentados en nuestros Términos de uso y para personalizar tu experiencia. Lee los Términos de uso en: www.tubitv.com/terms ¿Preguntas? Haznos saber a: support@tubi.tv"
     },
     "signIn_screen_heading": {
       "description": "Title on the signIn screen",
@@ -1975,9 +1971,33 @@ Function getTranslation_es_MX()
       "description": "Label shown on video player when tv rating/descriptor is shown",
       "message": "CALIFICADO"
     },
+    "invalid_email_title": {
+      "description": "Asking to enter a valid email on Email screen",
+      "message": "Por favor, ingresa un correo electrónico válido"
+    },
+    "email_screen_heading": {
+      "description": "Asking to enter a email on Email screen",
+      "message": "Ingresa Correo Electrónico"
+    },
+    "screenAgeVerification_born_year": {
+      "description": "Label to ask user to enter their year of birth",
+      "message": "Nací en"
+    },
+    "new_password_text": {
+      "description": "new password text",
+      "message": "Para establecer una contraseña nueva,"
+    },
+    "new_password_link": {
+      "description": "forgot password link",
+      "message": "visita tubi.tv/password"
+    },
+    "signIn_screen_subheading": {
+      "description": "Sub title on the signIn screen",
+      "message": "Tu correo electrónico ya está vinculado a una cuenta de Tubi"
+    },
     "search_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
-      "message": "Para habilitar el control por voz, presiona y mantén"
+      "message": "Para habilitar el control de voz, oprime y mantén"
     }
   }
 End Function
