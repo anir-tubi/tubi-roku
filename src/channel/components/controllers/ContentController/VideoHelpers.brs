@@ -131,12 +131,12 @@ Function setupVideoPlayer(content, autoplayType = "none", position = 0)
     videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
     videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
 
-    creditsCuepoint = content.creditscuepoint
-    videoLength = content.length
-
-    if position >= creditsCuepoint or (videoLength - position) <= 5
+    if (content.creditsCuePoints <> invalid and content.creditsCuePoints.postlude <> invalid and position >= content.creditsCuePoints.postlude)
+      position = 0
+    else if content.length - position <= 5
       position = 0
     end if
+
     content.nowPos = position
 
     videoPlayer.content = content
@@ -360,7 +360,7 @@ function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
     ' number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video.
     ' The local number is 2 seconds and displays the resume button, but the backend determines that 2
     ' seconds is not enough to warrant a resume button and returns 0 as the resume point.    
-    if nResumePoint < m.constants.player.historyFrequency or (videoContent.creditscuepoint > 0 and nResumePoint > videoContent.creditscuepoint)
+    if nResumePoint < m.constants.player.historyFrequency or (videoContent.creditsCuePoints <> invalid and videoContent.creditsCuePoints.postlude <> invalid and videoContent.creditsCuePoints.postlude > 0 and nResumePoint > videoContent.creditsCuePoints.postlude)
       '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0
       nResumePoint = 0
     end if

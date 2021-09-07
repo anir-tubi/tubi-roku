@@ -279,17 +279,10 @@
       </Label>
     </Group>
 
-    <DetailMenuItemContentNode
-      id="SkipIntroItem"/>
-    
-    <FilledButtonMarkupGrid
+    <SimpleButton
       id="SkipIntro"
-      translation="[1570,740]"
-      itemSize="[268,80]"
-      itemComponentName="DetailMenuItem"
-      numRows="1"
-      numColumns="1"
-      vertFocusAnimationStyle="floatingFocus"/>
+      color="0x9699A3"
+      visible="false"/>
 
     <Group
       id="HUD"

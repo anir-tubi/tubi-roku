@@ -99,8 +99,25 @@ Function init()
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
 
-  m.SkipIntroItem = m.top.findNode("SkipIntroItem")
   m.SkipIntro = m.top.findNode("SkipIntro")
+  m.SkipIntro.observeField("selected", "onSkipIntroSelected")
+  m.skipIntroUpTranslation = 740
+  m.skipIntroDownTranslation = 840
+
+  skip_button_type = getExperimentResource("roku_skip_intro", "roku_skip_intro_v1", false).skip_button_type
+  if skip_button_type = "transparent"
+    if m.constants.deviceInfo.scaledUi = true
+      m.SkipIntro.uri = "pkg:/images/selector-hd.9.png"
+    else
+      m.SkipIntro.uri = "pkg:/images/selector-fhd.9.png"
+    end if
+  else if skip_button_type = "fill"
+    if m.constants.deviceInfo.scaledUi = true
+      m.SkipIntro.uri = "pkg:/images/menu-focus-hd.9.png"
+    else
+      m.SkipIntro.uri = "pkg:/images/menu-focus-fhd.9.png"
+    end if
+  end if
 
   BackLabel = m.top.findNode("BackLabel")
   BackLabel.text = getTranslation("goBack_videoPlayer_controls")
@@ -233,15 +250,74 @@ Function init()
 End Function
 
 
-'set the content for SkipIntro and set title and uri for SkipIntroItem contentNode
-Function setInitialSkipIntroContent() As Void
-  tubiLog("VideoPlayer.setInitialSkipIntroContent")
-  m.SkipIntroItem.title = "Skip Intro"
-  m.SkipIntroItem.iconUrl = "pkg:/images/transport/sgplayer/icon-ffw.png"
-  m.SkipIntro.focusBitmapBlendColor = m.global.theme.focused
-  menuItems = CreateObject("roSGNode", "ContentNode")
-  menuItems.appendChild(m.SkipIntroItem)
-  m.SkipIntro.content = menuItems
+'set the text for skipIntro button, making it visible and timer to autohide
+'@skipIntroTitle: string, text of the skipIntro button
+'@skipIntroId: string, id of the SkipIntro button
+Function setSkipIntroButtonAndTimer(skipIntroTitle as string, skipIntroId as string) As Void
+  tubiLog("VideoPlayer.setSkipIntroButtonAndTimer")
+  m.skipIntroButtonTimer = m.top.createChild("Timer")
+  m.skipIntroButtonTimer.duration = 10
+  m.skipIntroButtonTimer.repeat = false
+  m.skipIntroButtonTimer.observeField("fire", "autoHideSkipIntroButton")
+  m.skipIntroButtonTimer.control = "start"
+  m.SkipIntro.id = skipIntroId
+  m.SkipIntro.text = skipIntroTitle
+  
+  showSkipIntroButton()
+End Function
+
+
+'Make the skipIntro Button visible and based on transport
+'control visibility, set the translation and focus
+Function showSkipIntroButton()
+  getExperimentResource("roku_skip_intro", "roku_skip_intro_v1", true)
+  if m.HUD.opacity = 1
+    m.SkipIntro.translation = [1610,740]
+  else
+    m.SkipIntro.setFocus(true)
+    m.SkipIntro.translation = [1610,840]
+    m.progressBarFocused = false
+  end if
+  m.SkipIntro.visible = true
+End Function
+
+
+'Removes the skip intro button from the screen and sets focus on the appropriate component
+'@componentToFocus: roSGNode, the component to focus after the skip intro button loses focus.
+'Don't send this parameter if no focus should be set (for instance if the transport is open and has focus)
+Function hideSkipIntroButton(componentToFocus = invalid)
+  m.SkipIntro.visible = false
+  if componentToFocus <> invalid
+    if componentToFocus.isSameNode(m.top) = true
+      m.SkipIntro.setFocus(false)
+    end if
+    componentToFocus.setFocus(true)
+  end if
+End Function
+
+
+'Autohide the SkipIntro button after timer reached and HUD is not visible
+Function autoHideSkipIntroButton()
+  clearSkipIntroTimer()
+  if m.HUD.opacity < 1
+    hideSkipIntroButton(m.top)
+  end if
+End Function
+
+
+Function clearSkipIntroButtonAndTimer()
+  m.skipIntro.id = ""
+  clearSkipIntroTimer()
+  hideSkipIntroButton(m.top)
+End Function
+
+Function clearSkipIntroTimer()
+  if m.skipIntroButtonTimer <> invalid
+    m.skipIntroButtonTimer.control = "stop"
+    m.top.removeChild(m.skipIntroButtonTimer)
+    m.skipIntroButtonTimer.unobserveField("fire")
+    m.skipIntroButtonTimer = invalid
+  end if
 End Function
 
 
@@ -353,6 +429,9 @@ Function onContentChange() As Void
   tubiLog("VideoPlayer.onContentChange")
   stopVideo()
 
+  'Map to store the history whether cuePoints button were shown or not
+  m.cuePointsHistory = {}
+
   if m.top.content <> invalid
     'set page tracking values for analytics
     m.top.trackingPageInfo = {
@@ -377,9 +456,9 @@ Function onControlChange()
 
   else if m.top.control = "stop" then
     cancelReplayCaptions()
+    clearSkipIntroButtonAndTimer()
     stopVideo()
     animateTransport("out")
-
     m.UpNext.stopAutoPlayTimer = true
     m.UpNext.hide = true
 
@@ -488,7 +567,6 @@ Function onVideoStateChange(msg)
   else
     m.LoadingProgressBar.progress = 0
     m.Loading.visible = true
-    m.skipIntro.visible = false
   end if
 
   if state = "playing"
@@ -533,10 +611,6 @@ Function onVideoPositionChange()
   ' Auto hide transport
   if m.VideoState = "play" and m.HUD.opacity = 1 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
     animateTransport("out")
-    'set the focus to SkipIntro when auto hide
-    if m.SkipIntro <> invalid and m.SkipIntro.content <> invalid and m.SkipIntro.content.getChildCount() > 0
-      m.SkipIntro.setFocus(true)
-    end if
   end if
 
   ' Cancel temporary captions
@@ -566,8 +640,9 @@ Function onVideoPositionChange()
   end if
 
   ' Credits Cuepoint / Up Next (Autoplay)
-  if m.top.content <> invalid and m.top.content.creditsCuePoint <> invalid and m.top.content.creditsCuePoint > 0
-    if m.playerPosition >= m.top.content.creditsCuePoint and m.shouldShowUpNext = true
+  content = m.top.content
+  if content <> invalid and content.creditsCuePoints <> invalid and content.creditsCuePoints.postlude <> invalid and content.creditsCuePoints.postlude > 0
+    if m.playerPosition >= content.creditsCuePoints.postlude and m.shouldShowUpNext = true
       ' Always fire history here to fix a race condition where the user has
       ' watched beyond the cuepoint but the title doesn't get removed due
       ' to no history events triggering after the cuepoint
@@ -575,43 +650,55 @@ Function onVideoPositionChange()
        
       if m.UpNext.content <> invalid
         animateTransport("out")
+        clearSkipIntroButtonAndTimer()
         m.UpNext.show = true
         m.UpNext.setFocus(true)
         m.shouldShowUpNext = false
-        if m.top.content.id <> invalid
+        if content.id <> invalid
           trackEvent({
             type: "auto_play"
             values: {
-              video_id: m.top.content.id.toInt()
+              video_id: content.id.toInt()
               auto_play_action: "SHOW" 'AutoPlayAction enum
             }
           })
         end if
       end if
-    else if m.playerPosition < m.top.content.creditsCuePoint
+    else if m.playerPosition < content.creditsCuePoints.postlude
       m.shouldShowUpNext = true
     end if
     
-    if m.playerPosition + m.constants.player.fetchNextDuration >= m.top.content.creditsCuePoint
+    if m.playerPosition + m.constants.player.fetchNextDuration >= content.creditsCuePoints.postlude
       m.top.upNextCuepointReached = true
     end if
   end if
+  
   'set the content and focus to SkipIntro
-  content = m.top.content
-  if content <> invalid and content.creditsCuePoints <> invalid and content.creditsCuePoints.intro_start > 0
-    if m.playerPosition >= content.creditsCuePoints.intro_start and m.playerPosition <= content.creditsCuePoints.intro_end
-      if m.SkipIntro <> invalid and m.SkipIntro.content = invalid and m.SkipIntroItem.title <> "Skip Intro" and m.LoadingProgressBar <> invalid and m.LoadingProgressBar.progress = 100 and m.LoadingMessage.text = "" and m.Loading.visible = false and m.top.state = "playing" and m.videoState = "play"
-        setInitialSkipIntroContent()
-        m.SkipIntro.setFocus(true)
-      else if m.SkipIntro.content <> invalid and m.LoadingProgressBar.progress = 100 and m.LoadingMessage.text = "" and m.Loading.visible = false and m.top.state = "playing" and m.videoState = "play"
-          m.SkipIntro.visible = true
-      end if
-    else
-      m.SkipIntro.setFocus(false)
-      m.top.setFocus(true)
-      m.SkipIntro.visible = true
-      if content <> invalid and content.creditsCuePoints <> invalid and m.playerPosition >= content.creditsCuePoints.intro_end
-        handlingSkipIntroContent()
+  if getExperimentResource("roku_skip_intro", "roku_skip_intro_v1", false).skip_button_type <> "no_button"
+    if content <> invalid and content.creditsCuePoints <> invalid
+      if isSkipIntroCuePointsReached(content.creditsCuePoints)
+        'implement intro
+        if canSkipIntroShown(m.constants.player.skipIntroId.intro, playProgressOk)
+          m.cuePointsHistory[m.constants.player.skipIntroId.intro] = true
+          skipIntroText = getTranslation("skipIntro_Player")
+          setSkipIntroButtonAndTimer(skipIntroText, m.constants.player.skipIntroId.intro)
+        end if
+      else if isSkipRecapCuePointsReached(content.creditsCuePoints)
+        'Implement recap
+        if canSkipIntroShown(m.constants.player.skipIntroId.recap, playProgressOk)
+          m.cuePointsHistory[m.constants.player.skipIntroId.recap] = true
+          skipRecapText = getTranslation("skipRecap_Player")
+          setSkipIntroButtonAndTimer(skipRecapText, m.constants.player.skipIntroId.recap)
+        end if
+      else if isSkipEarlyCreditCuePointsReached(content.creditsCuePoints)
+        'Implement Early credits
+        if canSkipIntroShown(m.constants.player.skipIntroId.earlyCredits, playProgressOk)
+          m.cuePointsHistory[m.constants.player.skipIntroId.earlyCredits] = true
+          skipEarlyCredits = getTranslation("skipEarlyCredits_Player")
+          setSkipIntroButtonAndTimer(skipEarlyCredits, m.constants.player.skipIntroId.earlyCredits)
+        end if
+      else if m.skipIntro.id <> ""
+        clearSkipIntroButtonAndTimer()
       end if
     end if
   end if
@@ -1379,4 +1466,34 @@ Function hideRatingOverlay()
     fade(m.ratingOverlay, "out", 0.6)  
   end if
 
+End Function
+
+
+' This function tells whether the SkipIntro/SkipRecap/SkipEarlyCredits is already shown or not created yet.
+' @skipIntroId: string, id of the SkipIntro/SkipRecap/SkipEarlyCredits button
+' @isPlaying: boolean, videoPosition can change after the player has been paused (like right button press),
+' we do not want to show when it's fastforward/rewind/buffering or already showing/shown
+Function canSkipIntroShown(skipIntroId, isPlaying)
+  return  m.cuePointsHistory[skipIntroId] = invalid and isPlaying = true and m.SkipIntro.visible = false and m.SkipIntro.id <> skipIntroId
+End Function
+
+
+'This function to check Whether the current player position is in between skipIntro cuePoints
+'@creditsCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
+Function isSkipIntroCuePointsReached(creditsCuePoints)
+  return creditsCuePoints.intro_start <> invalid and creditsCuePoints.intro_end <> invalid and creditsCuePoints.intro_start > 0 and m.playerPosition >= creditsCuePoints.intro_start and m.playerPosition <= creditsCuePoints.intro_end
+End Function
+
+
+'This function to check Whether the current player position is in between skipRecap cuePoints
+'@creditsCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
+Function isSkipRecapCuePointsReached(creditsCuePoints)
+  return creditsCuePoints.recap_start <> invalid and creditsCuePoints.recap_end <> invalid and creditsCuePoints.recap_start > 0 and m.playerPosition >= creditsCuePoints.recap_start and m.playerPosition <= creditsCuePoints.recap_end
+End Function
+
+
+'This function to check Whether the current player position is in between skipEarlyCredets cuePoints
+'@creditsCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
+Function isSkipEarlyCreditCuePointsReached(creditsCuePoints)
+  return creditsCuePoints.earlycredits_start <> invalid and creditsCuePoints.earlycredits_end <> invalid and creditsCuePoints.earlycredits_start > 0 and m.playerPosition >= creditsCuePoints.earlycredits_start and m.playerPosition <= creditsCuePoints.earlycredits_end
 End Function

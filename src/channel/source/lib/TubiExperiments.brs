@@ -65,7 +65,10 @@ Function TubiExperiments(constants) as Object
       roku_sports: {
         roku_sports_v1: {"enabled": true}
       }
-    } 
+      roku_skip_intro:{
+        roku_skip_intro_v1: {"skip_button_type": "no_button"} 'valid values are : "no_button", "fill", "transparent"
+       }
+    }
     
     'public methods
     init: tubiExperiments_init

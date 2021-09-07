@@ -84,9 +84,9 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         if m.Overlay.opacity = 0
           showTransport()
         else if m.progressBarFocused = false
-          m.SkipIntro.translation = [1570,740]
           setFocusedButton(m.ProgressBar)
-        else if m.progressBarFocused = true and m.SkipIntro <> invalid and m.SkipIntro.content <> invalid and m.SkipIntro.content.getChildCount() > 0
+        else if m.progressBarFocused = true and m.SkipIntro <> invalid and m.SkipIntro.visible = true
+          m.progressBarFocused = false
           m.SkipIntro.setFocus(true)
         else
           return false
@@ -94,13 +94,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       else if key = "down"
         if m.Overlay.opacity = 0
-          m.SkipIntro.translation = [1570,740]
           showTransport()
         else if m.progressBarFocused = true
           button = m.TransportButtons.getChild(m.focusedButtonIndex)
           setFocusedButton(button)
         else if m.progressBarFocused = false
-          m.SkipIntro.translation = [1570,740]
           setFocusedButton(m.ProgressBar)
         else
           return false  
@@ -128,11 +126,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           removeFocusFromUpNext()
         else if m.VideoState = "play"
           if m.HUD.opacity = 0
-            m.SkipIntroItem.title = ""
-            m.SkipIntroItem.iconUrl = ""
-            if m.skipIntro.content <> invalid
-              m.skipIntro.content = invalid
-            end if
+            clearSkipIntroButtonAndTimer()
             backButtonExit()
           else
             'close the transport
@@ -183,15 +177,6 @@ End Function
 Function handleTransportVoiceEvent()
   inputInfo = m.top.transportVoiceRequest
   command = ""
-
-  if m.skipIntro.content <> invalid and m.SkipIntroItem.title = "Skip Intro" and m.skipIntro.visible = true
-    content = m.top.content
-    if content <> invalid and content.creditsCuePoints <> invalid and content.creditsCuePoints.intro_start > 0
-      if m.playerPosition >= content.creditsCuePoints.intro_start and m.playerPosition <= content.creditsCuePoints.intro_end
-        handleScrubForSkipIntro()
-      end if
-    end if 
-  end if
 
   if inputInfo <> invalid and inputInfo.command <> invalid
     command = inputInfo.command
@@ -286,6 +271,10 @@ End Function
 'Resume play from a paused state
 Function resumeFromPause(shouldSendAnalytics)
   animateTransport("out")
+  'Only hide the button, don't clear the button so that the button will be shown again
+  'if the transport is shown during playback between the intro or other skippable cuepoints'
+  hideSkipIntroButton(m.top)
+  clearSkipIntroTimer()
 
   ' when pausing the video, due to a firmware regression the Video.position can update
   ' an additional time after pausing, but m.playerPosition will not update after pausing leading the
@@ -317,6 +306,10 @@ End Function
 Function resumeFromSkip()
   tubiLog("VideoTransportHandling.resumeFromSkip")
   animateTransport("out")
+  'Only hide the button, don't clear the button so that the button will be shown again
+  'if the transport is shown during playback between the intro or other skippable cuepoints'
+  hideSkipIntroButton(m.top)
+  clearSkipIntroTimer()
 
   ' when pausing the video in order to implement the 10s skip, due to a firmware regression,
   ' the Video.position can update an additional time after pausing, but m.playerPosition will
@@ -361,6 +354,15 @@ Function goToStart()
       trackEvent(playProgressEvent)
     end if
   end if
+
+  'Hiding HUD while buffering
+  if m.HUD.opacity > 0.0
+    animateTransport("out")
+  end if
+  'Only hide the button, don't clear the button so that the button will be shown again
+  'if the transport is shown during playback between the intro or other skippable cuepoints'
+  hideSkipIntroButton(m.top)
+  clearSkipIntroTimer()
   m.playerPosition = 0
   jumpToPosition(m.playerPosition)
 End Function
@@ -372,8 +374,7 @@ Function goToNext()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(true)
   end if
-  m.SkipIntroItem.title = ""
-  m.SkipIntroItem.iconUrl = ""
+  clearSkipIntroButtonAndTimer()
   stopVideo()
   m.top.goToNext = true
 
@@ -388,9 +389,7 @@ Function handleOk()
   else
     'do action based on the current focused button
     focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
-    if m.skipIntro.hasFocus() = true and m.skipIntro.content <> invalid
-      handleSkipIntro()
-    else if focusButtonId = m.SkipTrailerButton.id
+    if focusButtonId = m.SkipTrailerButton.id
       handleSkipTrailer()
     else if focusButtonId = m.StartButton.id
       goToStart()
@@ -431,8 +430,11 @@ End Function
 
 'handles fast forward key press or FastForward button selection
 Function handleFastForward()
-  'removing SkipIntro when fastforward or rewind
-  handleScrubForSkipIntro()
+
+  'Only hide the button, don't clear the button so that the button will be shown again
+  'if the transport is shown during playback between the intro or other skippable cuepoints'
+  hideSkipIntroButton(m.top)
+  clearSkipIntroTimer()
 
   'begin fast forwarding, but don't need everything in beginScrub()
   if m.VideoState = "rew"
@@ -465,6 +467,11 @@ End Function
 
 'handles rewind key press or Rewind button selection
 Function handleRewind()
+  'Only hide the button, don't clear the button so that the button will be shown again
+  'if the transport is shown during playback between the intro or other skippable cuepoints'
+  hideSkipIntroButton(m.top)
+  clearSkipIntroTimer()
+
   'begin rewinding, but don't need everything in beginScrub()
   if m.VideoState = "ffw"
     m.VideoState = "rew"
@@ -511,6 +518,10 @@ Function handleHopForward(duration)
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
+  'Only hide the button, don't clear the button so that the button will be shown again
+  'if the transport is shown during playback between the intro or other skippable cuepoints'
+  hideSkipIntroButton(m.top)
+  clearSkipIntroTimer()
   m.VideoState = "hop"
   hopPosition = m.playerPosition + duration
   jumpToPosition(hopPosition)
@@ -540,6 +551,10 @@ Function handleHopBack(remoteReplayButton, duration)
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
+  'Only hide the button, don't clear the button so that the button will be shown again
+  'if the transport is shown during playback between the intro or other skippable cuepoints'
+  hideSkipIntroButton(m.top)
+  clearSkipIntroTimer()
 
   hopPosition = m.playerPosition - duration
   if remoteReplayButton = true
@@ -563,8 +578,10 @@ Function handleSkipVideo(amt, isProgressBarFocused)
   if m.VideoState <> "skip"
     m.Video.control = "pause"
     m.PlayPauseButton.uri = m.buttonUris.play
-    'removing SkipIntro when fastforward or rewind
-    handleScrubForSkipIntro()
+    'Only hide the button, don't clear the button so that the button will be shown again
+    'if the transport is shown during playback between the intro or other skippable cuepoints'
+    hideSkipIntroButton(m.top)
+    clearSkipIntroTimer()
 
     if m.VideoState <> "rew" and m.VideoState <> "ffw"
       playProgressEvent = getPlayProgressEvent()
@@ -682,38 +699,22 @@ End Function
 
 
 'handles the Skip Intro selection
-Function handleSkipIntro()
-  m.SkipIntro.visible = false
-  m.skipIntro.setFocus(false)
-  setFocusedButton(m.PlayPauseButton)
-  handlingSkipIntroContent()
+Function onSkipIntroSelected()
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
   m.VideoState = "hop"
-  hopPosition = m.top.content.creditsCuePoints.intro_end
-  jumpToPosition(hopPosition)
-End Function
-
-
-'set the content invalid and focus to progressbar when SkipIntro ends or selected
-Function handlingSkipIntroContent()
-if m.SkipIntro <> invalid and m.SkipIntro.content <> invalid and m.SkipIntro.content.getChildCount() > 0
-  m.SkipIntro.content.removeChildIndex(0)
-  m.SkipIntro.content = invalid
-end if
-End Function
-
-
-'
-Function handleScrubForSkipIntro()
-  if m.skipIntro.content <> invalid and m.SkipIntroItem.title = "Skip Intro"
-    m.skipIntro.visible = false
-    m.skipIntro.setFocus(false)
-    m.top.setFocus(true)
-    handlingSkipIntroContent()
+  if m.skipIntro.id = "skipIntro"
+    hopPosition = m.top.content.creditsCuePoints.intro_end
+  else if m.skipIntro.id = "skipRecap"
+    hopPosition = m.top.content.creditsCuePoints.recap_end
+  else if m.skipIntro.id = "skipEarlyCredits"
+    hopPosition = m.top.content.creditsCuePoints.earlycredits_end
   end if
+  jumpToPosition(hopPosition)
+  clearSkipIntroButtonAndTimer()
 End Function
+
 
 'Perform at start of FF or RW
 Function beginScrub()
@@ -895,7 +896,6 @@ Function resetTransportButtons()
   m.FastForwardButton.focusState = false
   m.EndButton.focusState = false
   m.ClosedCaption.focusState = false
-  handlingSkipIntroContent()
 End Function
 
 
@@ -942,7 +942,12 @@ End Function
 '@direction: string, value may be "out" or "in"
 Function animateTransport(direction)
   tubiLog("VideoTransportHandling.AnimateTransport, direction = " + direction)
-  
+
+  'call function to handle the skipIntro button based on the direction
+  if getExperimentResource("roku_skip_intro", "roku_skip_intro_v1", false).skip_button_type <> "no_button"
+    handleSkipIntroButtonOnAnimateTransport(direction)
+  end if
+
   if direction = "in" and m.ratingOverlay.opacity = 1.0
     if getExperimentResource("roku_tvratings_on_player", "roku_tvratings_on_player_v1",false).enabled = true
       slideTo(m.ratingOverlay, [0,250], 0.6)
@@ -958,14 +963,32 @@ Function animateTransport(direction)
   else
     fade(m.Overlay, direction, 0.6)  
   end if
-  
-  if m.SkipIntro <> invalid and m.SkipIntro.content <> invalid and m.SkipIntro.translation[1] = 740 and direction = "out"
-      slideTo(m.SkipIntro, [m.SkipIntro.translation[0], m.SkipIntro.translation[1] + 40],  0.6)
-  end if
+
   slideFade(m.HUD, "below", direction, 0.6)
   
 End Function
 
+
+'@direction: string, value may be "out" or "in"
+Function handleSkipIntroButtonOnAnimateTransport(direction)
+  skipIntroTransLation = m.SkipIntro.translation
+  if direction = "in"
+    if m.skipintro.id <> ""
+      if m.skipintro.visible = false and m.skipIntroButtonTimer = invalid
+        showSkipIntroButton()
+      end if
+      slideTo(m.SkipIntro,[skipIntroTransLation[0], m.skipIntroUpTranslation], 0.6)
+    end if
+  else if direction = "out"
+    if m.skipintro.visible = true and m.skipIntroButtonTimer <> invalid
+      slideTo(m.SkipIntro,[skipIntroTransLation[0], m.skipIntroDownTranslation], 0.6)
+      m.skipintro.setFocus(true)
+    else if m.skipintro.visible = true and m.skipIntroButtonTimer = invalid
+      hideSkipIntroButton()
+    end if
+  end if
+
+End Function
 
 ' update the progress bar time
 Function updateTransportTimes()

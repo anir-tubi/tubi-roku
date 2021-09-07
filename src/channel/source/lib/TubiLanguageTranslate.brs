@@ -1027,6 +1027,18 @@ Function getTranslation_en_US()
       "description": "Label shown on video player when tv rating/descriptor is shown",
       "message": "RATED"
     },
+    "skipIntro_Player":{
+      "description": "Navigational instructions to users to skip the introduction section of the title. Usually the song or the beginning credits",
+      "message": "Skip Intro"
+    },
+    "skipRecap_Player":{
+      "description": "Navigational instructions to users to skip the section where the previous part of the show is recapped",
+      "message": "Skip Recap"
+    },
+    "skipEarlyCredits_Player":{
+      "description": "Navigational instructions to users to skip when the Credits are followed by a scene",
+      "message": "Skip Early Credits"
+    },
     "invalid_email_title": {
       "description": "Asking to enter a valid email on Email screen",
       "message": "Please enter a valid email"

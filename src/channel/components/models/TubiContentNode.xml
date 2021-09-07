@@ -16,8 +16,6 @@
     <field id="language" type="string" />
     <field id="pubid" type="string" />
     <field id="country" type="string" />
-    <field id="introcuepoint" type="int" />
-    <field id="creditscuepoint" type="int" />
     <field id="backgrounds" type="stringarray" />
     <field id="cuepoints" type="array" />
     <field id="slug" type="string" />

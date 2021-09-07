@@ -244,39 +244,37 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.directors = contentFromServer.directors
   end if
 
-  translatedContent.creditsCuepoint = 0
+  creditsCuePoints = {}
   if contentFromServer.credit_cuepoints <> invalid
-    if contentFromServer.credit_cuepoints.prologue <> invalid
-      translatedContent.introCuepoint = contentFromServer.credit_cuepoints.prologue
-    end if
-    if contentFromServer.credit_cuepoints.postlude <> invalid
-      translatedContent.creditsCuepoint = contentFromServer.credit_cuepoints.postlude
-    end if
-  end if
-
   'adding creditCuePoints for episide to implement SkipIntro feature for episode
-  if contentFromServer <> invalid and contentFromServer.detailed_type = "episode" and contentFromServer.credit_cuepoints <> invalid
-    translatedContent.creditsCuePoints = contentFromServer.credit_cuepoints
-  end if
-
-
-  'add default credit cuepoints if missing, or skip it if content is very short
-  if translatedContent.creditsCuepoint = 0 and translatedContent.length > m.creditsDuration
-    cuepoint = translatedContent.length - m.creditsDuration
-    if cuepoint >= 0
-      translatedContent.creditsCuepoint = cuepoint
+    if contentFromServer.detailed_type = "episode"
+      creditsCuePoints = contentFromServer.credit_cuepoints
     end if
-  end if
-
-  ' if credits duration is less than m.creditsDuration, force it to be at least that long
-  if translatedContent.creditsCuepoint > 0 and (translatedContent.length - translatedContent.creditsCuePoint) < m.creditsDuration
-    cuepoint = translatedContent.length - m.creditsDuration
-    if cuePoint >= 0
-      translatedContent.creditsCuepoint = cuepoint
-    else
-      ' if the cuepoint was adjusted, but it ended up being negative
-      translatedContent.creditsCuepoint = 0
+    postlude = 0
+    if contentFromServer.credit_cuepoints.postlude <> invalid
+      postlude = contentFromServer.credit_cuepoints.postlude
     end if
+
+    'add default credit cuepoints if missing, or skip it if content is very short
+    if postlude = 0 and translatedContent.length > m.creditsDuration
+      cuepoint = translatedContent.length - m.creditsDuration
+      if cuepoint >= 0
+        postlude = cuepoint
+      end if
+    end if
+
+    ' if credits duration is less than m.creditsDuration, force it to be at least that long
+    if postlude > 0 and (translatedContent.length - postlude) < m.creditsDuration
+      cuepoint = translatedContent.length - m.creditsDuration
+      if cuePoint >= 0
+        postlude = cuepoint
+      else
+        ' if the cuepoint was adjusted, but it ended up being negative
+        postlude = 0
+      end if
+    end if
+    creditsCuePoints.AddReplace("postlude", postlude)
+    translatedContent.creditsCuePoints = creditsCuePoints
   end if
  
   translatedContent.landscape  = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)  
