@@ -1983,6 +1983,18 @@ Function getTranslation_es_MX()
       "description": "Label shown on video player when tv rating/descriptor is shown",
       "message": "CALIFICADO"
     },
+    "skipIntro_Player": {
+      "description": "Navigational instructions to users to skip the introduction section of the title. Usually the song or the beginning credits",
+      "message": "Saltar Intro"
+    },
+    "skipRecap_Player": {
+      "description": "Navigational instructions to users to skip the section where the previous part of the show is recapped",
+      "message": "Saltar Recapitulación"
+    },
+    "skipEarlyCredits_Player": {
+      "description": "Navigational instructions to users to skip when the Credits are followed by a scene",
+      "message": "Saltar Créditos Iniciales"
+    },
     "invalid_email_title": {
       "description": "Asking to enter a valid email on Email screen",
       "message": "Por favor, ingresa un correo electrónico válido"
