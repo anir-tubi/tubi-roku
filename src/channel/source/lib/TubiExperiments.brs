@@ -63,7 +63,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_sports: {
-        roku_sports_v1: {"enabled": false}
+        roku_sports_v1: {"enabled": true}
       }
     } 
     
