@@ -8,21 +8,30 @@ Function init()
   m.top.observeField("unfocusedBackgroundOpacity", "onOpacityChanged")
 
   m.top.observeField("text", "onTextChanged")
+  m.top.observeField("width", "onWidthChanged")
   
+End Function
+
+
+Function onWidthChanged()
+  m.label.width = m.top.width
+  m.buttonBG.width = m.top.width
 End Function
 
 
 Function onTextChanged()
 
-  m.label.text = m.top.text
-  
+  ' m.label.width should be reset to 0 before the new text is set so the boundingRect().width
+  ' calculation is accurate. Otherwise, boundingRect().width will be the previously set
+  ' m.label.width value
   if m.top.width = 0
+    m.label.width = 0
+    m.label.text = m.top.text
     width = m.label.boundingRect().width + 60
     m.buttonBG.width = width
     m.label.width = width
   else
-    m.label.width = m.top.width
-    m.buttonBG.width = m.top.width
+    m.label.text = m.top.text
   end if
 
   if m.top.height = 0

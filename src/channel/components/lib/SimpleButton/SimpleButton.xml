@@ -14,7 +14,7 @@
   
     <!-- INPUTS -->
       <field id="color" type="String" value="0x9699A3"/>
-      <field id="width" type="Integer" alias="buttonBG.width"/>
+      <field id="width" type="Integer" />
       <field id="height" type="Integer" alias="buttonBG.height"/>
       <field id="uri" type="Integer" alias="buttonBG.uri"/>
       <field id="text" type="String" />

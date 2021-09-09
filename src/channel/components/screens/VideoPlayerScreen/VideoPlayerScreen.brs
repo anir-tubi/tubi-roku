@@ -271,11 +271,12 @@ End Function
 'control visibility, set the translation and focus
 Function showSkipIntroButton()
   getExperimentResource("roku_skip_intro", "roku_skip_intro_v1", true)
+  xPosition = m.top.width - (m.skipintro.boundingRect().width + 60)
   if m.HUD.opacity = 1
-    m.SkipIntro.translation = [1610,740]
+    m.SkipIntro.translation = [xPosition, m.skipIntroUpTranslation]
   else
     m.SkipIntro.setFocus(true)
-    m.SkipIntro.translation = [1610,840]
+    m.SkipIntro.translation = [xPosition, m.skipIntroDownTranslation]
     m.progressBarFocused = false
   end if
   m.SkipIntro.visible = true
@@ -307,6 +308,7 @@ End Function
 
 Function clearSkipIntroButtonAndTimer()
   m.skipIntro.id = ""
+  m.SkipIntro.text = ""
   clearSkipIntroTimer()
   hideSkipIntroButton(m.top)
 End Function
