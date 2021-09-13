@@ -6,6 +6,18 @@ Function init()
 
   m.nLabelXSpacing = m.Label.translation[0]
   m.top.observeField("itemContent", "onItemContentChange")
+  m.is_pill_shaped_top_nav_experiment = false
+  if getExperimentResource("roku_pill_shaped_topnav", "roku_pill_shaped_topnav_v1", false).enabled = true
+    m.underline =  CreateObject("roSGNode","Rectangle")
+    m.underline.id = "underline"
+    m.underline.translation = [36, 40]
+    m.underline.height = 2
+    m.underline.width = 150
+    m.underline.color = "0xFF501AFF" 'Golden gate Orange
+    m.underline.visible="false"
+    m.top.appendChild(m.underline)
+    m.is_pill_shaped_top_nav_experiment = true
+  end if
   m.top.observeField("itemHasFocus", "onItemFocus")
   m.top.observeField("focusPercent", "onFocusPercentChange")
   m.top.observeField("gridHasFocus", "onGridHasFocusChange")
@@ -19,15 +31,27 @@ Function onGridHasFocusChange()
       m.LabelSelectedFocus.visible = true
       if m.top.itemHasFocus = true
         m.LabelSelectedFocus.opacity = 1
+        if m.is_pill_shaped_top_nav_experiment = true
+          m.underline.visible = false
+        end if
       end if
       onItemFocus()
     else
       m.LabelSelectedFocus.opacity = 0
       m.LabelSelectedFocus.visible = false
-      if itemContent.selected = true
-        m.Label.color = "0xFFFFFFFF"
-      else 
-        m.Label.color = "0x9699A3FF"
+      if m.is_pill_shaped_top_nav_experiment = true     
+        m.underline.visible = false
+        if itemContent.selected = true
+          m.Label.color = itemContent.selectedItemColor
+        else
+          m.Label.color = "0xFFFFFFFF"
+        end if
+      else
+        if itemContent.selected = true
+          m.Label.color = "0xFFFFFFFF"
+        else 
+          m.Label.color = "0x9699A3FF"
+        end if
       end if
     end if
   end if
@@ -39,8 +63,15 @@ Function onItemFocus()
   if itemContent <> invalid
     if itemContent.selected = true
       m.Label.color = m.global.theme.focused
+      if m.is_pill_shaped_top_nav_experiment = true
+        m.underline.visible = true
+      end if 
     else 
-      m.Label.color = "0x585B66FF"
+      if m.is_pill_shaped_top_nav_experiment = true
+        m.Label.color = "0xFFFFFFFF"
+      else
+        m.Label.color = "0x585B66FF"
+      end if
     end if
   end if
 End Function
@@ -49,6 +80,9 @@ Function onFocusPercentChange()
   itemContent = m.top.itemContent
   focusPercent = m.top.focusPercent
   m.LabelSelectedFocus.opacity = focusPercent
+  if m.is_pill_shaped_top_nav_experiment = true
+    m.underline.opacity = 1 - focusPercent
+  end if
 End Function
 
 
@@ -67,7 +101,9 @@ Function onItemContentChange()
     m.Label.width = boundingRect.width - m.nLabelXSpacing
     m.LabelSelectedFocus.width = m.Label.width
     m.top.boundingRect = boundingRect
-
+    if m.is_pill_shaped_top_nav_experiment = true
+      m.underline.width = m.Label.width - m.nLabelXSpacing
+    end if
     '//Call the following functions to set the initial look of the component depending on focus, selection and other states
     onItemFocus()
     onGridHasFocusChange()

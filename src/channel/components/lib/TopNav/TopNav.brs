@@ -23,6 +23,22 @@ Function init()
     m.MenuBground.uri = "pkg://images/menu-focus-hd.9.png"
   end if
 
+  if getExperimentResource("roku_pill_shaped_topnav", "roku_pill_shaped_topnav_v1", true).enabled = true
+    m.FarAwayFromFocusIndicator.visible = false
+    m.MenuBground.blendColor = "0x9699A3FF"
+    m.Menu.translation= [12,12]
+    m.Menu.focusFootprintBlendColor = "0xFFFFFFFF"
+    if m.constants <> invalid and m.constants.deviceInfo.scaledUi = true
+      m.Menu.focusBitmapUri = "pkg:/images/pill_top_nav_hd.9.png"
+      m.Menu.focusFootprintBitmapUri="pkg:/images/pill_top_nav_hd.9.png"
+      m.MenuBground.uri = "pkg:/images/tab_component_alt_hd.9.png"
+    else
+      m.Menu.focusBitmapUri = "pkg:/images/pill_top_nav_fhd.9.png"
+      m.Menu.focusFootprintBitmapUri = "pkg:/images/pill_top_nav_fhd.9.png"
+      m.MenuBground.uri = "pkg:/images/tab_component_alt_fhd.9.png"
+    end if
+  end if
+
   m.Menu.observeField("itemSelected", "onItemSelected")
   m.Menu.observeField("itemFocused", "onItemFocused")
   setFocusVisualProperties() ' initialize the focus look of the topNav
@@ -49,13 +65,18 @@ Function draw()
   setMainContent(m.constants.ui.sideNavIds.movies, rowNode, aItemWidths) 
   nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(1)
   setMainContent(m.constants.ui.sideNavIds.tv, rowNode, aItemWidths)
-  
+  lastCoumnSpacing = getColumnSpacing(1)
   if m.top.isLinearTVAllowed = true
     nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(2)
+    lastCoumnSpacing = getColumnSpacing(2)
     setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode, aItemWidths)
   end if
-  
-  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + nMenuOutsideSpacing
+
+  if getExperimentResource("roku_pill_shaped_topnav", "roku_pill_shaped_topnav_v1", false).enabled = true
+    nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nMenuOutsideSpacing -  nButtonPadding - lastCoumnSpacing 'No need of padding for last item and columnspacing
+  else
+    nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + nMenuOutsideSpacing 
+  end if
 
   m.MenuBground.width = nBgroundWidth
 
@@ -110,6 +131,13 @@ Function setMainContent(itemID, parentNode, aItemWidths)
   end if
 
   if bSuccess = true
+    if getExperimentResource("roku_pill_shaped_topnav", "roku_pill_shaped_topnav_v1", false).enabled = true
+      if m.top.farAwayFromFocus = true
+        contentNode.selectedItemColor = "0xFFFFFFFF"
+      else
+        contentNode.selectedItemColor = "0x10141FFF"
+      end if
+    end if
     '//component is a temporary component used to determine the width of the the topNav button
     component = CreateObject("roSGNode", "TopNavItem")
     component.itemContent = contentNode
@@ -224,11 +252,35 @@ End Function
 ' When it is indicated that the topNav is far away from or close to the focus, then make visible adjustments to the top Nav
 Function onFarAwayFromFocusChange()
   if m.top.farAwayFromFocus = true
-    fade(m.FarAwayFromFocusIndicator, "in", .4)
-    fade(m.MenuBgroundParent, "out", .4)
+    if getExperimentResource("roku_pill_shaped_topnav", "roku_pill_shaped_topnav_v1", false).enabled = true
+      m.FarAwayFromFocusIndicator.visible = false
+      m.Menu.focusFootprintBlendColor = "0x585B66"
+      fade(m.Menu, "out", 0.4, 0.0, 0.64) 'fade out the Menu to make labels 64% opacity 
+      if m.Menu.content <> invalid
+        for i = 0 to m.Menu.content.getChildCount()-1
+          child = m.Menu.content.getChild(i)
+          child.selectedItemColor = "0xFFFFFFFF"
+        end for
+      end if 
+    else
+      fade(m.FarAwayFromFocusIndicator, "in", .4)
+      fade(m.MenuBgroundParent, "out", .4)
+    end if
   else
-    fade(m.FarAwayFromFocusIndicator, "out", .4)
-    fade(m.MenuBgroundParent, "in", .4)
+    if getExperimentResource("roku_pill_shaped_topnav", "roku_pill_shaped_topnav_v1", false).enabled = true
+      m.FarAwayFromFocusIndicator.visible = false
+      m.Menu.focusFootprintBlendColor = "0xFFFFFFFF"
+      fade(m.Menu, "in", .4, 0.0, 1) 'fade in the Menu back to white labels. 
+      if m.Menu.content <> invalid
+        for i = 0 to m.Menu.content.getChildCount()-1
+          child = m.Menu.content.getChild(i)
+          child.selectedItemColor = "0x10141FFF"
+        end for
+      end if
+    else
+      fade(m.FarAwayFromFocusIndicator, "out", .4)
+      fade(m.MenuBgroundParent, "in", .4)
+    end if
   end if
 End Function
 
@@ -243,9 +295,14 @@ Function setFocusVisualProperties()
   if m.top.hasFocus() = true
     '// The Top Nav is in focus
     m.top.farAwayFromFocus = false
-    m.Menu.setFocus(true)
-    m.MenuBground.blendColor = "0xF0F1F5FF"
-    m.MenuBground.opacity = 1
+    m.Menu.setFocus(true) 
+    if getExperimentResource("roku_pill_shaped_topnav", "roku_pill_shaped_topnav_v1", false).enabled = true
+      m.MenuBground.blendColor = "0x9699A3FF"
+      m.MenuBground.opacity = 0.16
+    else
+      m.MenuBground.blendColor = "0xF0F1F5FF"
+      m.MenuBground.opacity = 1
+    end if  
   else if m.top.isInFocusChain() = false
     '// The Top Nav is no longer in focus
     m.MenuBground.blendColor = "0x9699A3FF"

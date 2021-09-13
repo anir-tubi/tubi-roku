@@ -141,7 +141,7 @@ Function getTranslation_en_US()
     },
     "menu_recommended": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
-      "message": "Recommended"
+      "message": "For You"
     },
     "menu_home": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",

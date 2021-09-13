@@ -3,6 +3,9 @@
   <script type="text/brightscript" uri="TopNavItem.brs" />
   <script type="text/brightscript" uri="../AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
 
   <interface>
     <field id="itemHasFocus" type="boolean" />
