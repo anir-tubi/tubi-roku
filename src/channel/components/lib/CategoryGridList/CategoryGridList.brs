@@ -10,9 +10,6 @@ Function init()
   m.top.observeField("repopulateContent", "onRepopulateContent")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
   m.RowList = m.top.findNode("RowList")
-  if getExperimentResource("roku_horizontal_fixed_focus", "roku_horizontal_fixed_focus_v1", true).enabled = true
-    m.RowList.rowFocusAnimationStyle = "fixedFocus"
-  end if
   if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.RowList.itemSpacing = [0,36]
     m.RowList.rowSpacings = [36]
