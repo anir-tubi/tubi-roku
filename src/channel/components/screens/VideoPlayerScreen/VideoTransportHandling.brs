@@ -83,7 +83,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       else if key = "up"
         if m.Overlay.opacity = 0
           showTransport()
-        else if m.progressBarFocused = false
+        else if m.progressBarFocused = false and m.SkipIntro.hasFocus() = false
           setFocusedButton(m.ProgressBar)
         else if m.progressBarFocused = true and m.SkipIntro <> invalid and m.SkipIntro.visible = true
           m.progressBarFocused = false
@@ -98,7 +98,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.progressBarFocused = true
           button = m.TransportButtons.getChild(m.focusedButtonIndex)
           setFocusedButton(button)
-        else if m.progressBarFocused = false
+        else if m.skipIntro.hasFocus() = true
           setFocusedButton(m.ProgressBar)
         else
           return false  
