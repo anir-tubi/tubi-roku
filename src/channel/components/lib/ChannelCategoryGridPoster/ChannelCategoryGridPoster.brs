@@ -9,7 +9,6 @@ Function init()
   m.top.observeField("focusPercent", "onFocusPercentChange")
   m.top.observeField("gridHasFocus", "onGridFocusChange")
   m.logo.observeField("loadStatus", "onLogoLoad")
-  m.channelsExperimentEnabled = getExperimentResource("roku_channels_list_page", "roku_channels_list_page_v1", false).enabled = true
   ' used to keep track of if the grid has focus or not, onGridFocusChange fires every time any focus changes including
   ' scrolling between tiles.
   m.gridIsFocused = false
@@ -27,7 +26,7 @@ Function onContentChange(data)
   m.title.visible = false
 
   if m.top.itemContent <> invalid then
-    if m.top.itemContent.isSpecial <> true and m.channelsExperimentEnabled <> true
+    if m.top.itemContent.isSpecial <> true 
       ' Thumbnail images from the matrix/homescreen API are currently 640 x 360.
       ' These textures are too large when displayed in large amounts (over about 12) as occurs on the category list page,
       ' resulting in screen flashes as the background and category posters re-render themselves.
@@ -42,17 +41,9 @@ Function onContentChange(data)
         end if
       end if
     end if
-
-    if m.channelsExperimentEnabled = true then
-      m.posterRect.width = m.top.width
-      m.posterRect.height = m.top.height
-      m.posterRect.visible = true
-      m.poster.visible = false
-    else
-      m.poster.visible = true
-      m.posterRect.visible = false
-      m.poster.uri = m.top.itemContent.thumbnail
-    end if
+    m.poster.visible = true
+    m.posterRect.visible = false
+    m.poster.uri = m.top.itemContent.thumbnail
 
     categoryContent = m.top.itemContent.getParent()
     if categoryContent <> invalid then
@@ -94,18 +85,8 @@ Function displayTitle()
 End Function
 
 
-Function onFocusPercentChange(msg)
-  if m.channelsExperimentEnabled = false
-    focusPercent = msg.getData()
-    m.poster.opacity = m._.max(focusPercent, 0.5)
-  end if
-End Function
-
-
 Function onGridFocusChange()
-  if m.channelsExperimentEnabled = true
-    ' Nothing needs to be done
-  else if m.top.gridHasFocus = false and m.gridIsFocused = true 'grid is losing focus
+  if m.top.gridHasFocus = false and m.gridIsFocused = true 'grid is losing focus
     if m.poster.opacity > 0.5
       fade(m.poster, "out", 0.4, 0, 0.5)
     end if

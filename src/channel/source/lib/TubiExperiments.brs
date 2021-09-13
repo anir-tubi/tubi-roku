@@ -41,10 +41,6 @@ Function TubiExperiments(constants) as Object
       roku_postplayexp_aptimer_5sec: {
         roku_postplayexp_aptimer_15sec: {"ap_timer": 30}  
       }  
-      
-      roku_channels_list_page: {
-        roku_channels_list_page_v1: {"enabled": false}
-      }
 
       roku_linear_countdown_timer: {
         roku_linear_countdown_timer_v1: {"countdown_timer": 10}
