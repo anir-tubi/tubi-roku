@@ -62,7 +62,7 @@ Function TubiExperiments(constants) as Object
       roku_pill_shaped_topnav: {
         roku_pill_shaped_topnav_v1: {"enabled": false}
       }
-    } 
+    
     
       roku_skip_intro:{
         roku_skip_intro_v1: {"skip_button_type": "no_button"} 'valid values are : "no_button", "fill", "transparent"

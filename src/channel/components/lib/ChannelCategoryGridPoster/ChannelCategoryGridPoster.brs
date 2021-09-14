@@ -6,7 +6,6 @@ Function init()
   m.logo = m.top.findNode("Logo")
   m.title = m.top.findNode("Title")
   m.top.observeField("itemContent", "onContentChange")
-  m.top.observeField("focusPercent", "onFocusPercentChange")
   m.top.observeField("gridHasFocus", "onGridFocusChange")
   m.logo.observeField("loadStatus", "onLogoLoad")
   ' used to keep track of if the grid has focus or not, onGridFocusChange fires every time any focus changes including
