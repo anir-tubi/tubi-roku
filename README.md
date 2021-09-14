@@ -118,7 +118,7 @@ https://georgejecook.github.io/rooibos/
 
 To run unit tests, run the following command:
 
-`$ gulp install --test`
+`$ gulp test`
 
 2\. Functional / regression tests - run against staging
 
@@ -135,7 +135,9 @@ Submission releases are releases that are sent to Roku.
 
 2\. Run unit tests locally
 
-`$ gulp install --test`
+`$ gulp test`
+
+Note: If you are adding a new unit test, then you can test only this new unit test. You do this by temporarily adding the "@Only" comment right before a specific unit test before running the above command. 
 
 3\. Prepare for submission release.
 - Create a new branch based off of master which will be used to make updates as needed for a submission release. Branch name is not important, but for clarity it can be something like: `updates_for_x_y_submission`, where x is the Major Release number and where y is the Minor Release number: i.e. `updates_for_2_14_submission`.
