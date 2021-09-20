@@ -1445,16 +1445,13 @@ End Function
 ' showratingOverlay helps to show the rating overlay and start the timer to hide it after certain amount of time.
 Function showRatingOverlay()
 
-  ' fire exposure event when tv ratings is shown on player
-  if getExperimentResource("roku_tvratings_on_player", "roku_tvratings_on_player_v1").enabled = true
-    fade(m.ratingOverlay, "in", 0.6)   
-    if m.Overlay.opacity > 0.0
-      m.ratingOverlay.translation = [0,250]
-    else
-      m.ratingOverlay.translation = [0,0]  
-    end if  
-    m.ratingOverlayTimer.control = "start" 
-  end if     
+  fade(m.ratingOverlay, "in", 0.6)   
+  if m.Overlay.opacity > 0.0
+    m.ratingOverlay.translation = [0,250]
+  else
+    m.ratingOverlay.translation = [0,0]  
+  end if  
+  m.ratingOverlayTimer.control = "start" 
 
 End Function
 

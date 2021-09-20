@@ -949,17 +949,13 @@ Function animateTransport(direction)
   end if
 
   if direction = "in" and m.ratingOverlay.opacity = 1.0
-    if getExperimentResource("roku_tvratings_on_player", "roku_tvratings_on_player_v1",false).enabled = true
-      slideTo(m.ratingOverlay, [0,250], 0.6)
-      fade(m.ratingGradient, "out", 0.2)  
-    end if
+    slideTo(m.ratingOverlay, [0,250], 0.6)
+    fade(m.ratingGradient, "out", 0.2)  
     fade(m.Overlay, direction, 0.6, 0.2)
   else if direction = "out" and m.ratingOverlay.opacity = 1.0  
     fade(m.Overlay, direction, 0.6)
-    if getExperimentResource("roku_tvratings_on_player", "roku_tvratings_on_player_v1",false).enabled = true
-      slideTo(m.ratingOverlay, [0,0], 0.6, 0.2)
-      fade(m.ratingGradient, "in", 0.6, 0.6)
-    end if
+    slideTo(m.ratingOverlay, [0,0], 0.6, 0.2)
+    fade(m.ratingGradient, "in", 0.6, 0.6)
   else
     fade(m.Overlay, direction, 0.6)  
   end if

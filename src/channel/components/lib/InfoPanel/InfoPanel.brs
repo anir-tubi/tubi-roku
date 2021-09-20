@@ -234,7 +234,7 @@ Function onLineOneDataChange(msg)
   
   descriptorCode = data.descriptorCode
     
-  if descriptorCode <> invalid and descriptorCode <> "" and getExperimentResource("roku_tvratings_on_detail", "roku_tvratings_on_detail_v2").enabled = true
+  if descriptorCode <> invalid and descriptorCode <> ""
     if m.DescriptorCode.getParent() = invalid
       firstLineGroup.insertChild(m.DescriptorCode, insertIndex)
     end if
