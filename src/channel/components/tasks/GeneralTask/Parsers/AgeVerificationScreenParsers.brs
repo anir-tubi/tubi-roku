@@ -24,14 +24,9 @@ Function parseAgeVerificationScreenDeviceRegistrationError(fullResponse, request
     errCode = fullResponse.code
   end if
 
-  birthdate = ""
-  if requestNode.input <> invalid and requestNode.input.birthdate <> invalid
-    birthdate = requestNode.input.birthdate
-  end if
-
   return {
     code: errCode
-    birthdate: birthdate
+    requestNode: requestNode
   }
 End Function
 

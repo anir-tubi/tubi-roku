@@ -31,7 +31,7 @@ Function showRFIScreen()
   dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "ACTIVATION"
+      dialog_type: "REGISTRATION"
       pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
       dialog_action: "SHOW"
       dialog_sub_type: "email-prefill"
@@ -66,7 +66,7 @@ Function onUserData(msg)
     dialogEvent = {
       type: "dialog"
       values: {
-        dialog_type: "ACTIVATION"
+        dialog_type: "REGISTRATION"
         pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
         dialog_action: "ACCEPT_DELIBERATE"
         dialog_sub_type: "email-prefill"
@@ -86,7 +86,7 @@ Function onUserData(msg)
     dialogEvent = {
       type: "dialog"
       values: {
-        dialog_type: "ACTIVATION"
+        dialog_type: "REGISTRATION"
         pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
         dialog_action: "DISMISS_DELIBERATE"
         dialog_sub_type: "email-prefill"
@@ -202,7 +202,7 @@ Function onEmailExistsError(errorResponse)
   dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "ACTIVATION"
+      dialog_type: "REGISTRATION"
       pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
       dialog_action: "SHOW"
       dialog_sub_type: "email-exists-error"
@@ -310,52 +310,6 @@ Function onSignUpResponse(response)
 End Function
 
 
-' onSignUpError callback is triggered when the sign up is failed
-' @error : assocarray, the error response of signUp API in the form of AA
-Function onSignUpError(error)
-
-  tubiLog("SignUpHelpers.onSignUpError")
-  accountEvent = {
-    type: "account"
-    values: {
-      manip: "SIGNUP"
-      message: "signup-failed"
-      current: "EMAIL"
-      status: "FAIL"
-    }
-  }
-  
-  m.trackingLoggingTask.trackEvent = accountEvent
-  
-  currentScreen = getCurrentScreen()
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "ACTIVATION"
-      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "signup-failed"
-    }
-  }
-  
-  title =  getTranslation("dialog_defaultError_title")
-  message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
-  buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
-  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, retrySignUp)
-
-End Function
-
-
-Function retrySignUp()
-
-  currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.getSubtype() =  "SignUpScreen"
-    currentScreen.retrySignUp = true
-  end if
-
-End Function
-
-
 ' onSignInSelected callback is triggered when user selects continue button on SignIn Screen
 ' @evt : roSGNodeEvent, it contains password
 Function onSignInSelected(evt)
@@ -427,7 +381,7 @@ Function onSignInError(errorResponse)
   dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "ACTIVATION"
+      dialog_type: "SIGNIN_ERROR"
       pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
       dialog_action: "SHOW"
       dialog_sub_type: "invalid_password"
@@ -495,7 +449,7 @@ Function onRegTaskError(evt)
   userErrorCode = getUserFacingErrorCode(m.constants.errors.context.activateScreen, sSubtypeCode)
   
   authPageValues = {
-    auth_action:  "ACTIVATION"  'Action enum
+    auth_action:  "REGISTER"  'Action enum
   }
   dialogEvent = {
     type: "dialog"

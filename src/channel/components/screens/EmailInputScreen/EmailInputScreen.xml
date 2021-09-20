@@ -14,7 +14,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   
   <interface>
-  
+
     <!-- OUTPUT -->
     
       <!-- continueSelected is triggered when user selects continue button, which checks email exists in database -->

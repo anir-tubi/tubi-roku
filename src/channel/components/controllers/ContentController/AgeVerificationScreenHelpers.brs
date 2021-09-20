@@ -86,6 +86,13 @@ Function verifyAgeAtStartup(birthdate)
 End Function
 
 
+Function verifyAgeAtSignupWrapper(info)
+  signInInfo = info.signInInfo
+  birthdate = info.birthdate
+  verifyAgeAtSignup(signInInfo, birthdate)
+End Function
+
+
 Function verifyAgeAtSignup(signInInfo, birthdate)
 
   if hasValidSignUpCredentials(birthdate, signInInfo) = true ' triggers when user signs up
@@ -120,8 +127,10 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
       requestType: m.constants.reqNames.signUp
       options: requestInfo.options
       successCallback: onSignUpResponse
-      errorCallback: onSignUpError
+      errorCallback: onAgeNotVerifiedAtSignup
       responseType: "assocarray"
+      signInInfo: signInInfo
+      birthdate: birthdate
     })
   else
     ' not expected to ever happen, so punt and start the app normally if it does
@@ -161,17 +170,185 @@ End Function
 
 
 Function onAgeNotVerifiedAtSignIn(err)
-  onAgeNotVerified(err, verifyAgeAtSignIn, startUserExperienceAsAgeNotVerified)
+  if err <> invalid and err.code <> invalid
+    if err.code = 422 or err.code = 451
+      handle_422_451_error(startUserExperienceAsAgeNotVerified) ' happens when user enters age less than 13
+    else
+      handleNetworkError(err, verifyAgeAtSignIn, startUserExperienceAsAgeNotVerified) ' happens when ther is network failure or some backend issue
+    end if
+  end if  
 End Function
 
 
 Function onAgeNotVerifiedAtStartup(err)
-  onAgeNotVerified(err, verifyAgeAtStartup, startUserExperienceAsAgeNotVerified)
+  if err <> invalid and err.code <> invalid
+    if err.code = 422 or err.code = 451
+      handle_422_451_error(startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when user enters age less than 13
+    else
+      handleNetworkError(err, verifyAgeAtStartUp, startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when ther is network failure or some backend issue
+    end if
+  end if
 End Function
 
 
 Function onAgeNotVerifiedAtSignup(err)
-  onAgeNotVerified(err, verifyAgeAtSignup, startUserExperienceAsAgeNotVerified)
+  if err <> invalid and err.code <> invalid
+    if err.code = 422 or err.code = 451
+      handle_422_451_error(startUserExperienceAsAgeNotVerified) ' happens when user enters age less than 13
+    else if err.code = 403
+      handle_403_error() ' happens when user enters invalid email domain
+    else
+      handleNetworkErrorOnSignUp(err) ' happens when ther is network failure or some backend issue
+    end if
+  end if  
+End Function
+
+
+' some network or API issue
+' show generic "oops an error occurred" modal and allow users to retry/cancel
+Function handleNetworkError(err, tryAgainCallback, cancelCallback)
+
+  birthdate = ""
+  if err.requestNode <> invalid and err.requestNode.input <> invalid 
+    inputData = err.requestNode.input
+    if inputData.birthdate <> invalid
+      birthdate = inputData.birthdate
+    end if
+  end if
+
+  screen = getCurrentScreen()
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "NETWORK_ERROR" 'DialogType enum
+      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "age-verification-err"
+    }
+  }
+
+  modalInfo = {
+    message: getTranslation("screenAgeVerification_network_issue")
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+
+  buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
+  showErrorModal(modalInfo, tryAgainCallback, birthdate, cancelCallback, invalid, buttons)
+  
+End Function
+
+
+' some network or API issue
+' show generic "oops an error occurred" modal and allow users to retry/cancel
+Function handleNetworkErrorOnSignUp(err)
+
+  signInInfo = {}
+  birthdate = ""
+
+  if err.requestNode <> invalid and err.requestNode.input <> invalid 
+    inputData = err.requestNode.input
+    if inputData.signInInfo <> invalid
+      signInInfo = inputData.signInInfo
+    end if
+    if inputData.birthdate <> invalid
+      birthdate = inputData.birthdate
+    end if
+  end if
+
+  screen = getCurrentScreen()
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "NETWORK_ERROR" 'DialogType enum
+      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "signup-failed"
+    }
+  }
+
+  modalInfo = {
+    message: getTranslation("screenAgeVerification_network_issue")
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+
+  verifyAgeAtSignupParams = {}
+  verifyAgeAtSignupParams.signInInfo = signInInfo
+  verifyAgeAtSignupParams.birthdate = birthdate
+
+  cancelSignUpButton = getTranslation("dialog_button_cancel") + " " + getTranslation("dialog_button_signUp")
+  buttons = [getTranslation("dialog_button_tryAgain"), cancelSignUpButton]
+
+  showErrorModal(modalInfo, verifyAgeAtSignupWrapper, verifyAgeAtSignupParams, startUserExperienceAsAgeNotVerified, invalid, buttons)
+End Function
+
+
+' triggered when user enters age less than 13 on agegate screen
+Function handle_422_451_error(callback)
+
+  Request = TubiRequest(m.constants.settings)
+  Auth = TubiAuth(m.constants, Request)
+
+  ' 422: the user is not old enough to use Tubi except in kids mode according to COPPA (US only)
+  ' 451: the user is not old enough to use Tubi except in kids mode for some international reasons
+  m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(false)
+  Auth.logout()
+  m.global.authInfo = invalid
+  callback() ' redirecting to kidsMode before showing enterKidsMode modal, so that user will be aware what the experience will be
+
+  currentScreen = getCurrentScreen()
+  if m.uiMode = m.constants.ui.modes.kidsAgeGate
+    title = getTranslation("dialog_kidsWelcome_title")
+    message = getTranslation("dialog_kidsWelcomeAgeGate_description")
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "ENTER_KIDS_MODE" 'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "welcome-age-gate"
+      }
+    }
+    showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+  end if
+
+End Function
+
+
+' this happens during signup flow, if users enters invalid email domain
+Function handle_403_error()
+
+  accountEvent = {
+    type: "account"
+    values: {
+      manip: "SIGNUP"
+      message: "signup-failed"
+      current: "EMAIL"
+      status: "FAIL"
+    }
+  }
+
+  m.trackingLoggingTask.trackEvent = accountEvent
+
+  popScreen(false, false) ' removing ageGate screen as user has to enter valid email 
+
+  currentScreen = getCurrentScreen()
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "SIGNUP_ERROR"
+      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "signup-failed"
+    }
+  }
+
+  title =  getTranslation("dialog_defaultError_title")
+  message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
+  buttons = [getTranslation("dialog_button_ok")]
+  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, invalid)
+
 End Function
 
 
@@ -304,73 +481,8 @@ Function onAgeVerified(age)
 End Function
 
 
-' @err: assocArray: expected return value from parseAgeVerificationScreenDeviceRegistrationError()
-'                   expected fields are: code and birthdate
-' @tryAgainCallback: function, the function to be called in case a modal is shown and a user selects try again
-' @continueCallback: function, the function to be called to either let the user startUserExperience() 
-'                              or restartChannelAfterAgeVerification() as appropriate
-Function onAgeNotVerified(err, tryAgainCallback, continueCallback)
-  tubiLog("AgeVerificationScreenHelpers.onAgeNotVerified")
-  if err <> invalid and err.code <> invalid
-    Request = TubiRequest(m.constants.settings)
-    Auth = TubiAuth(m.constants, Request)
-    
-    if err.code = 422 or err.code = 451
-      ' 422: the user is not old enough to use Tubi except in kids mode according to COPPA (US only)
-      ' 451: the user is not old enough to use Tubi except in kids mode for some international reasons
-      m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(false)
-      Auth.logout()
-      m.global.authInfo = invalid
-      continueCallback()
-
-      currentScreen = getCurrentScreen()
-      if m.uiMode = m.constants.ui.modes.kidsAgeGate
-        title = getTranslation("dialog_kidsWelcome_title")
-        message = getTranslation("dialog_kidsWelcomeAgeGate_description")
-        dialogEvent = {
-          type: "dialog"
-          values: {
-            dialog_type: "ENTER_KIDS_MODE" 'DialogType enum
-            pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-            dialog_action: "SHOW"
-            dialog_sub_type: "welcome-age-gate"
-          }
-        }
-        showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
-      end if
-    else
-      ' some network or API issue
-      ' show generic "oops an error occurred" modal and allow users to retry/cancel
-      screen = getCurrentScreen()
-      if screen.id = m.constants.ui.screenIds.ageVerificationScreen
-        dialogEvent = {
-          type: "dialog"
-          values: {
-            dialog_type: "NETWORK_ERROR" 'DialogType enum
-            pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
-            dialog_action: "SHOW"
-            dialog_sub_type: "age-verification-err"
-          }
-        }
-
-        modalInfo = {
-          message: getTranslation("screenAgeVerification_network_issue")
-          openTrackEvent: dialogEvent
-          trackingTask: m.trackingLoggingTask
-        }
-        
-        buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
-        showErrorModal(modalInfo, tryAgainCallback, err.birthdate, continueCallback, invalid, buttons)
-      else
-        ' it's unexpected to not be on the age verification screen, so punt and just start the app
-        continueCallback()
-      end if
-    end if
-  end if
-End Function
-
-
-Function startUserExperienceAsAgeNotVerified()
+Function startUserExperienceAsAgeNotVerifiedOnStartUp()
+  m.authInfoReceived = true
   m.ageVerificationComplete = true
   m.spinner.visible = true
 
@@ -379,6 +491,14 @@ Function startUserExperienceAsAgeNotVerified()
   ' Fire for not age verified at startup.
   m.top.signalBeacon("AppDialogComplete")
 
+  startUserExperience()
+End Function
+
+
+Function startUserExperienceAsAgeNotVerified()
+  m.authInfoReceived = true
+  m.ageVerificationComplete = true
+  m.spinner.visible = true
   startUserExperience()
 End Function
 

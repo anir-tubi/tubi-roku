@@ -1066,6 +1066,10 @@ Function getTranslation_en_US()
     "search_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
       "message": "To use your voice enabled remote, press and hold"
+    },
+    "dialog_button_signUp": {
+      "description": "The label of the button in a dialog window that allows the user to sign up into the app.",
+      "message": "Sign Up"
     }
   }
 End Function
