@@ -1207,8 +1207,8 @@ End Function
 
 Function restartChannelAfterAgeVerification()
   tubiLog("ContentController.restartChannelAfterAgeVerification")
-  reloadDefaultHomeScreenContent()
   restartChannel()
+  reloadDefaultHomeScreenContent()
 End Function
 
 
