@@ -183,7 +183,7 @@ End Function
 Function onAgeNotVerifiedAtStartup(err)
   if err <> invalid and err.code <> invalid
     if err.code = 422 or err.code = 451
-      handle_422_451_error(restartChannelAfterAgeVerificationOnStartUp) ' happens when user enters age less than 13
+      handle_422_451_error(startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when user enters age less than 13
     else
       handleNetworkError(err, verifyAgeAtStartUp, startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when ther is network failure or some backend issue
     end if
@@ -478,17 +478,6 @@ Function onAgeVerified(age)
     ' age verified for guest user, so store age verification
     m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(true)
   end if
-End Function
-
-
-Function restartChannelAfterAgeVerificationOnStartUp()
-
-  ' Roku requires a beacon to be fired before and after any user interaction screens prior
-  ' to the home page being shown.
-  ' Fire for not age verified at startup.
-  m.top.signalBeacon("AppDialogComplete")
-
-  restartChannelAfterAgeVerification()
 End Function
 
 
