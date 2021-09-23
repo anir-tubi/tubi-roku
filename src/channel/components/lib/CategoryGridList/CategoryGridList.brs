@@ -271,7 +271,7 @@ Function setRowHeights()
         rowHeights.push(250)
       end if   
       showRowLabel.push(true)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.landscape or category.gridItemType = m.constants.ui.gridItemTypes.vitg_small    
+    else if category.gridItemType = m.constants.ui.gridItemTypes.landscape 
       if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         posterWidth = m.constants.ui.safezoneImageSizes.landscape[0]
         posterHeight = m.constants.ui.safezoneImageSizes.landscape[1]

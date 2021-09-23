@@ -152,7 +152,7 @@ Function onItemFocused()
 
     if content <> invalid
       ' Update the info panel
-      populateInfoPanel(m.InfoPanel, content, "item")
+      populateInfoPanel(m.InfoPanel, content, m.constants.ui.infoPanelModes.item)
 
       m.PageTitleAndCounter.currentIndex = item
 

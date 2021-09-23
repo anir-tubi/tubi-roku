@@ -98,7 +98,7 @@ Function onEpisodeFocused()
     
       content = m.top.content
     
-      m.Info.mode = "episode"
+      m.Info.mode = m.constants.ui.infoPanelModes.episode
       m.Info.title = content.title
       m.Info.episodeTitle = episode.title
       m.Info.description = episode.description
@@ -227,7 +227,7 @@ Function setSeasonInfo(season As Integer)
   m.Info.title = seasonContent.title
   m.Info.seasonEpisodeCount = seasonContent.getChildCount()
   m.Info.description = m.top.content.description ' series description
-  m.Info.mode = "season"
+  m.Info.mode = m.constants.ui.infoPanelModes.season
   m.Info.calculateHeight = true
 End Function
 

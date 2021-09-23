@@ -206,10 +206,10 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
       lineOneData.type = m.constants.ui.contentTypes.series  
       lineOneData.seasons =  content.totalCount
       detailScreen.isSeries = true
-      detailScreen.mode = "series"
+      detailScreen.mode = m.constants.ui.infoPanelModes.series 
     else
       detailScreen.isSeries = false
-      detailScreen.mode = "movie"
+      detailScreen.mode = m.constants.ui.infoPanelModes.movie
     end if
 
     if episode <> invalid

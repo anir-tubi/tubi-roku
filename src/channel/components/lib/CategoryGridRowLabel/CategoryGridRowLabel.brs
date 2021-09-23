@@ -38,7 +38,7 @@ Function onContentChange()
   if m.top.content <> invalid then
     m.CategoryName.text = m.top.content.title
     drawItemCount()
-    if m.top.content.gridItemType = "linear" or m.top.content.gridItemType = "continue_watching_signed_Out_User"
+    if m.top.content.gridItemType = "linear" or m.top.content.gridItemType = "continue_watching_signed_out_user"
       m.CategoryCount.visible = false
     else 
       m.CategoryCount.visible = true

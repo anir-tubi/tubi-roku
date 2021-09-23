@@ -12,10 +12,9 @@ Function init()
     portrait: "portrait"
     landscape: "landscape"
     linear: "linear"
-    vitg_small: "vitg_small"
     vitg_large: "vitg_large"
     utility: "utility"
-    historySignedOutUser: "continue_watching_signed_Out_User"
+    historySignedOutUser: "continue_watching_signed_out_user"
   }
   if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.title.width = 380
@@ -275,7 +274,7 @@ End Function
 
 Function isVitg(itemContent, gridItemTypes)
   isVitg = false
-  if itemContent.gridItemType = gridItemTypes.vitg_small or itemContent.gridItemType = gridItemTypes.vitg_large
+  if itemContent.gridItemType = gridItemTypes.vitg_large
     isVitg = true
   end if
   return isVitg

@@ -1,4 +1,6 @@
 Function init()
+  m.constants = getConstantsFromGlobal()
+
   m.nodeHelpers = TubiNodeHelpers()
   m.TitleGroup = m.top.findNode("TitleGroup")
   m.Title = m.top.findNode("Title")
@@ -30,7 +32,7 @@ Function init()
   m.Offset = m.top.findNode("Offset")
   m.PartnerLogo = m.top.findNode("PartnerLogo")
   m.ExpireWarning = m.top.findNode("ExpireWarning")
-  m.ExpireWarning.color = m.global.constants.ui.colors.expirationWarning
+  m.ExpireWarning.color = m.constants.ui.colors.expirationWarning
 
   if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
     m.top.width = 960
@@ -167,7 +169,6 @@ Function onLineOneDataChange(msg)
   data = msg.getData()
   firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
   line1Label = m.TwoLineInfo.findNode("Line1")
-  constants = m.global.constants
 
   text = ""
   if data.releasedate <> invalid and data.releasedate <> "" then
@@ -180,7 +181,7 @@ Function onLineOneDataChange(msg)
     end if
     text = text + formatLengthAsEnglish(data.length) + " "
   end if
-  if data.type <> invalid and data.type = constants.ui.contentTypes.series 
+  if data.type <> invalid and data.type = m.constants.ui.contentTypes.series 
     ' add 'dot' spacer
     text = text + Chr(&hb7) + " " 
 
@@ -407,25 +408,28 @@ Function onModeChange()
   while m.Offset.getChildCount() > 0
     m.Offset.removeChildIndex(0)
   end while
+  constants = m.global.constants
 
-  if m.top.mode = "category" then
+  if m.top.mode = m.constants.ui.infoPanelModes.category then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.CategoryDetails)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [52, 15]
-  else if m.top.mode = "item" then
+  else if m.top.mode = m.constants.ui.infoPanelModes.vitg then
+    m.Offset.itemSpacings = [25, 15]
+  else if m.top.mode = m.constants.ui.infoPanelModes.item then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [25, 15]
-  else if m.top.mode = "movie" then
+  else if m.top.mode = m.constants.ui.infoPanelModes.movie then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.appendChild(m.StarringGroup)
     m.Offset.appendChild(m.DirectorGroup)
     m.Offset.itemSpacings = [25, 15, 17, 11]
-  else if m.top.mode = "series" then
+  else if m.top.mode = m.constants.ui.infoPanelModes.series then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
     m.Offset.appendChild(m.TwoLineInfo)
@@ -433,26 +437,22 @@ Function onModeChange()
     m.Offset.appendChild(m.StarringGroup)
     m.Offset.appendChild(m.DirectorGroup)
     m.Offset.itemSpacings = [25, 25, 15, 17, 11]
-  else if m.top.mode = "season" then
+  else if m.top.mode = m.constants.ui.infoPanelModes.season then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.SeasonDetails)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [52, 15]
-  else if m.top.mode = "continue_watching" then
+  else if m.top.mode = m.constants.ui.infoPanelModes.continue_watching or m.top.mode = m.constants.ui.infoPanelModes.utility then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [15] 
-  else if m.top.mode = "episode" then
+  else if m.top.mode = m.constants.ui.infoPanelModes.episode then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [25, 18]
-  else if m.top.mode = "utility" then
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [15]  
-  else if m.top.mode = "linear" then
+  else if m.top.mode = m.constants.ui.infoPanelModes.linear then
     m.Offset.appendChild(m.LiveVideoIndicator)
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.DescriptionGroup)

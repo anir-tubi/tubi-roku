@@ -435,7 +435,6 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
       translated.parentTitle = category.title
 
       vitg_large = m.constants.ui.gridItemTypes.vitg_large
-      vitg_small = m.constants.ui.gridItemTypes.vitg_small
       ' inject the default background for large vitg content items
       if category.gridItemType = vitg_large 
         translated.backgrounds = [m.constants.ui.uris.defaultBackground]
@@ -444,9 +443,10 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
       end if
 
       ' set vitg on the content node so various non item UI components can respond to it (ie. detail screen)
-      if category.gridItemType = vitg_large or category.gridItemType = vitg_small
+      if category.gridItemType = vitg_large
         translated.addField("isVitg", "boolean", false)
         translated.isVitg = true
+        translated.type = m.constants.ui.categoryTypes.preview
       end if
 
       ' QA - inject the category slug into the content description for automated UI testing
@@ -828,7 +828,6 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   ' Could use some testing though.
   landscape = m.constants.ui.gridItemTypes.landscape
   portrait = m.constants.ui.gridItemTypes.portrait
-  vitg_small = m.constants.ui.gridItemTypes.vitg_small
   vitg_large = m.constants.ui.gridItemTypes.vitg_large
   utility = m.constants.ui.gridItemTypes.utility
   linear = m.constants.ui.gridItemTypes.linear
@@ -843,7 +842,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     node_count = 1 + translated.getChildCount()
   end if
 
-  if gridItemType = landscape or gridItemType = vitg_small or gridItemType = vitg_large or gridItemType = utility or gridItemType = linear
+  if gridItemType = landscape or gridItemType = vitg_large or gridItemType = utility or gridItemType = linear
     for i = 0 to translated.getChildCount()-1
       child = translated.getChild(i)
       child.addField("gridItemType", "string", false)
@@ -955,7 +954,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           sType = "TubiContentNode"
         end if
 
-        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_small or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
           sType = "VitgContentNode"
         else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.linear
           sType = "TubiContentNode"
@@ -984,7 +983,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           bLandscape = true
         else if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid
           bLandscape = true
-        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_small or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
           bLandscape = true
         end if
 
@@ -995,8 +994,6 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
         else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.landscape
           gridType = m.constants.ui.gridItemTypes.landscape
         else if container.id = m.constants.ui.categoryIds.featured
-          gridType = m.constants.ui.gridItemTypes.landscape
-        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_small
           gridType = m.constants.ui.gridItemTypes.landscape
         else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
           gridType = m.constants.ui.gridItemTypes.vitg_large
@@ -1020,7 +1017,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
         end if
         
         'add the trailer url to vitg content items - don't include vitg content if there is no trailer
-        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_small or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
           childIsPushable = false
           if fullChild.has_trailer = true
             if fullChild.trailers <> invalid and type(fullChild.trailers) = "roArray" and fullChild.trailers.count() > 0

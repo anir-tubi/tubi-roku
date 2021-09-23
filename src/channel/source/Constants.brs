@@ -682,7 +682,21 @@ Function getConstants()
       constants.ui.categoryTypes.linear = "linear"
       constants.ui.categoryTypes.preview = "video_preview"
       constants.ui.categoryTypes.utility = "utility"
-      constants.ui.categoryTypes.historySignedOutUser = "continue_watching_signed_Out_User"
+      constants.ui.categoryTypes.historySignedOutUser = "continue_watching_signed_out_user"
+
+
+    constants.ui.infoPanelModes = {}
+      'these map to different InfoPanel modes/types
+      constants.ui.infoPanelModes.vitg = "vitg"
+      constants.ui.infoPanelModes.category = "category"
+      constants.ui.infoPanelModes.item = "item"
+      constants.ui.infoPanelModes.utility = "utility"
+      constants.ui.infoPanelModes.continue_watching = "continue_watching"
+      constants.ui.infoPanelModes.linear = "linear"
+      constants.ui.infoPanelModes.movie = "movie"
+      constants.ui.infoPanelModes.series = "series"
+      constants.ui.infoPanelModes.season = "season"
+      constants.ui.infoPanelModes.episode = "episode"
 
     constants.ui.contentMode = {}
       constants.ui.contentMode.homescreen = "homescreen"
@@ -700,7 +714,7 @@ Function getConstants()
       constants.ui.contentTypes.channel = "channel"
       constants.ui.contentTypes.utility = "utility"
       constants.ui.contentTypes.linear = "linear"
-      constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_Out_User"
+      constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_out_user"
 
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
@@ -863,10 +877,9 @@ Function getConstants()
       constants.ui.gridItemTypes.portrait = "portrait"
       constants.ui.gridItemTypes.landscape = "landscape"
       constants.ui.gridItemTypes.linear = "linear"
-      constants.ui.gridItemTypes.vitg_small = "vitg_small"  'video in the grid
       constants.ui.gridItemTypes.vitg_large = "vitg_large"  'video in the grid
       constants.ui.gridItemTypes.utility = "utility"
-      constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_Out_User"
+      constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"
 
     constants.ui.uris = {}
       'background gradient urls

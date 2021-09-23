@@ -197,7 +197,7 @@ Function onLoadingChange()
   if m.top.isLoading = true
     m.CategoryGridList.content = invalid
     emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
-    populateInfoPanel("item", emptyContentNode) 'empties the info panel
+    populateInfoPanel(m.constants.ui.infoPanelModes.item, emptyContentNode) 'empties the info panel
   end if
   m.CategoryGridList.content = m.top.content ' should be all categories with initial amounts of content in them
 End Function
@@ -413,7 +413,7 @@ Function onCurrFocusRowChange()
             if rowPercent > (1 - translationDiffPercent)
               contractContentAreaForLinear(rowPercent)
             end if
-          else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.landscape or categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_small 
+          else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.landscape
             if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
               translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.landscapeSlideAmt
 
@@ -434,7 +434,7 @@ Function onCurrFocusRowChange()
     else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.linear
       ' update contentArea translation, only when Linear lose focus
       contractContentAreaForLinear(rowPercent)
-    else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.landscape or categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_small 
+    else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.landscape
       if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         ' update contentArea translation, only when Landscape lose focus
         contractContentAreaForLandscape(rowPercent)
@@ -501,14 +501,18 @@ End Function
 
 Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
-    if focusedContent.type = m.constants.ui.categoryTypes.utility
-      populateInfoPanel("utility", focusedContent)
-    else if focusedContent.type = m.constants.ui.categoryTypes.linear
-      populateInfoPanel("linear", focusedContent)
-    else if focusedContent.type = m.constants.ui.categoryTypes.historySignedOutUser
-      populateInfoPanel(m.constants.ui.categoryTypes.historySignedOutUser, focusedContent)
+    sType = focusedContent.type
+
+    if sType = m.constants.ui.categoryTypes.utility
+      populateInfoPanel(m.constants.ui.infoPanelModes.utility, focusedContent)
+    else if sType = m.constants.ui.categoryTypes.linear
+      populateInfoPanel(m.constants.ui.infoPanelModes.linear, focusedContent)
+    else if sType = m.constants.ui.categoryTypes.historySignedOutUser
+      populateInfoPanel(m.constants.ui.infoPanelModes.continue_watching, focusedContent)
+    else if sType = m.constants.ui.categoryTypes.preview
+      populateInfoPanel(m.constants.ui.infoPanelModes.vitg, focusedContent)
     else
-      populateInfoPanel("item", focusedContent)
+      populateInfoPanel(m.constants.ui.infoPanelModes.item, focusedContent)
     end if
   end if
 
@@ -535,7 +539,7 @@ Function onGridFocusChange() as void
   focusedContent = m.CategoryGridList.itemFocused
   m.top.contentFocused = focusedContent
 
-  populateInfoPanelByContent(focusedContent)
+  populateInfoPanelByContent(focusedContent) 
 
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + 1
@@ -649,12 +653,12 @@ Function onItemToBeFocusedChange()
 End Function
 
 
-'@mode: string, one of the valid info panel modes (see InfoPanel.brs for details)
+'@mode: string, one of the valid constants.ui.infoPanelModes info panel modes (see InfoPanel.xml for details)
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
   if contentNode <> invalid
-    if mode = "category"
-      m.InfoPanel.mode = "category"
+    if mode = m.constants.ui.infoPanelModes.category
+      m.InfoPanel.mode = mode
       m.InfoPanel.categoryContentCount = contentNode.totalCount
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
@@ -664,8 +668,10 @@ Function populateInfoPanel(mode, contentNode)
       else
         m.InfoPanel.width = 1140
       end if
-    else if mode = "item"
-      m.InfoPanel.mode = "item"
+    else if mode = m.constants.ui.infoPanelModes.vitg
+      m.InfoPanel.mode = mode
+    else if mode = m.constants.ui.infoPanelModes.item
+      m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
 
@@ -691,8 +697,8 @@ Function populateInfoPanel(mode, contentNode)
       else 
         m.InfoPanel.width = 1140
       end if
-    else if mode = "utility"
-      m.InfoPanel.mode = "utility"
+    else if mode = m.constants.ui.infoPanelModes.utility
+      m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
@@ -700,8 +706,8 @@ Function populateInfoPanel(mode, contentNode)
       else
         m.InfoPanel.width = 1140
       end if
-    else if mode = m.constants.ui.categoryTypes.historySignedOutUser
-      m.InfoPanel.mode = "continue_watching"
+    else if mode = m.constants.ui.infoPanelModes.continue_watching
+      m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
@@ -709,8 +715,8 @@ Function populateInfoPanel(mode, contentNode)
       else
         m.InfoPanel.width = 1140
       end if
-    else if mode = "linear"
-      m.InfoPanel.mode = "linear"
+    else if mode = m.constants.ui.infoPanelModes.linear
+      m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.width = 650
