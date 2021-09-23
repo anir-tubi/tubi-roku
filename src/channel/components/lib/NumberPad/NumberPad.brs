@@ -42,6 +42,8 @@ Function init()
   m.Foreground.observeField("rowItemSelected", "onRowItemSelected")
   m.top.observeField("focusedChild", "onComponentFocusedChange")
 
+  m.top.observeField("moveFocusToDelete", "onMoveFocusToDelete")
+
   foregroundButtons = createForegroundButtons()
   backgroundButtons = createBackgroundButtons()
   m.Foreground.content = foregroundButtons
@@ -50,9 +52,21 @@ End Function
 
 
 Function onComponentFocusedChange()
+
   if m.top.hasFocus() = true
     m.Foreground.setFocus(true)
   end if
+
+End Function
+
+
+Function onMoveFocusToDelete()
+
+  if m.top.moveFocusToDelete = true
+    m.Foreground.jumpToRowItem = [3,1] ' sets the focus to "back/delete" button on numberpad
+    m.Foreground.setFocus(true)
+  end if
+
 End Function
 
 

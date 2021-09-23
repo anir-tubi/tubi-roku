@@ -8,6 +8,11 @@
   <script type="text/brightscript" uri="NumberPad.brs" />
   
   <interface>
+
+    <!-- INPUT -->
+      <!-- moveFocusToDelete is a boolean which helps to set the focus "back/delete" key on numberpad -->
+      <field id="moveFocusToDelete" type="boolean" alwaysNotify="true"/>
+
     <!-- OUTPUT -->
       <!-- the number on the number pad that was selected, as a string (ie. "1"), or "back" -->
       <field id="buttonSelected" type="string" alwaysNotify="true"/>

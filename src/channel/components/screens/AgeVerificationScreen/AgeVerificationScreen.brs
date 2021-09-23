@@ -28,6 +28,9 @@ Function init()
   ' m.date will have the format "12-09-2021"
   m.date = ""
 
+  ' m.warningDisplayedCount helps to track how many time warning message is displayed when user enters year of birth
+  m.warningDisplayedCount = 0
+
   ' Center the tip text and error prompt text on the date info display
   ' need to know the language translation before we can center properly
   centerTips()
@@ -105,17 +108,78 @@ Function onNumberPadButtonSelected(msg)
       ' only add more characters to the date if we don't have the whole date already
       m.date += selected
       m.Prompt.visible = false
-    end if
-  end if
 
-  if m.date.len() = 4
-    m.top.birthdate = m.date + "-01-01"  ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
-    m.StartButton.setFocus(true)
+      if m.date.len() = 4
+        m.top.birthdate = m.date + "-12-31"  ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
+    
+        dateTime = createObject("roDateTime")
+        currentYear = dateTime.getYear()
+    
+        if isUserToddler(m.date, currentYear) = true and m.warningDisplayedCount = 0
+          m.Prompt.text = getTranslation("screenAgeVerification_warning_prompt")
+          m.Prompt.visible = true
+          m.warningDisplayedCount += 1
+          m.NumberPad.moveFocusToDelete = true
+        else if isUserNewBorn(m.date, currentYear) = true or isUserTooOld(m.date, currentYear) = true
+          m.Prompt.text = getTranslation("screenAgeVerification_error_prompt")
+          m.Prompt.visible = true
+          m.NumberPad.moveFocusToDelete = true
+        else
+          m.StartButton.setFocus(true)  
+        end if
+        
+      end if
+
+    else if m.date.len() = 4
+      m.NumberPad.moveFocusToDelete = true
+    end if
+
   end if
 
   refreshDateOnScreen(m.date)
   updateDateDecorations(m.date)
-  ' showErrorTip()
+End Function
+
+
+' isUserToddler checks whether user's age is greater than 1 and less than or equal to 4 (age>1 and age<=4)
+' @date: string, user entered year formatted as YYYY-MM-DD
+' @currentYear: Integer, current year in YYYY format
+Function isUserToddler(date, currentYear)
+
+  if date.toInt() < (currentYear - 1) AND date.toInt() > (currentYear - 4)
+    return true
+  end if
+
+  return false
+
+End Function
+
+
+' isUserNewBorn checks whether user's age is less than or equal to 1 (age <=1)
+' @date: string, user entered year formatted as YYYY-MM-DD
+' @currentYear: Integer, current year in YYYY format
+Function isUserNewBorn(date, currentYear)
+
+  if date.toInt() >= currentYear - 1
+    return true
+  end if
+
+  return false
+
+End Function
+
+
+' isUserTooOld checks whether user's age is greather than 125 (age > 125)
+' @date: string, user entered year formatted as YYYY-MM-DD
+' @currentYear: Integer, current year in YYYY format
+Function isUserTooOld(date, currentYear)
+  
+  if date.toInt() < currentYear - 125
+    return true
+  end if
+
+  return false
+
 End Function
 
 
@@ -135,7 +199,7 @@ Function refreshDateOnScreen(date)
   else if year.len() = 3
     m.YearEntryFront.text = year + m.yearLetter
     m.YearEntryBack.text = year + m.yearLetter
-  else
+  else if year.len() = 4
     m.YearEntryFront.text = year
     m.YearEntryBack.text = year
   end if
@@ -175,7 +239,7 @@ Function onKeyEvent(key, press) as Boolean
       end if
     else
       if key = "down"
-        if m.date.len() = 4 and m.NumberPad.isInFocusChain() = true
+        if m.date.len() = 4 and m.NumberPad.isInFocusChain() = true and m.Prompt.visible = false
           m.StartButton.setFocus(true)
         end if
       else if key = "up"
@@ -255,15 +319,4 @@ Function checkValidYear(submittedYear)
     return true
   end if
 
-End Function
-
-
-' @year: integer, ex: 2000
-Function isLeapYear(year)
-  if year MOD 4 <> 0
-    return false
-  else if year MOD 100 = 0 and year MOD 400 <> 0
-    return false
-  end if
-  return true
 End Function

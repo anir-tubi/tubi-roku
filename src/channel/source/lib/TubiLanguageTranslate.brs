@@ -747,9 +747,13 @@ Function getTranslation_en_US()
       "description": "A tip about how to enter the birth date",
       "message": "Tip: If your DOB is January 1, 2000, then enter 01/01/2000"
     },
-    "screenAgeVerification_error_prompt": {
+    "screenAgeVerification_warning_prompt": {
       "description": "A message informing the user that they entered a date that is not valid",
-      "message": "It looks like you entered the wrong information."
+      "message": "Please be sure the information you entered is correct"
+    },
+    "screenAgeVerification_error_prompt": {
+      "description": "A message informing the user that they entered a date that is not acceptable",
+      "message": "Please enter a valid year of birth"
     },
     "metadata_fullscreen_countdown_plural": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
