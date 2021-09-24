@@ -39,22 +39,20 @@ End Function
 Function onAnimateIntoView()
   
   rowNode = CreateObject("roSGNode", "ContentNode")
-  menu_treament_option = getExperimentResource("roku_initial_content_type_selector_icts", "roku_initial_content_type_selector_icts_v2", false).icts_menu_option
-  bShowSignInItem = true
-  if menu_treament_option = "no_signin"
-    setMainContent(m.constants.ui.sideNavIds.movies, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.tv, rowNode)
+  menuTreamentOption = getExperimentResource("roku_initial_content_type_selector_icts", "roku_initial_content_type_selector_icts_v3", false).icts_menu_option
+
+  if menuTreamentOption = "movies_tv_combined"
+    setMainContent(m.constants.ui.sideNavIds.home, rowNode)
     setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
     setMainContent(m.constants.ui.sideNavIds.espanol, rowNode)
     setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
-    bShowSignInItem = false 
-  else if menu_treament_option = "no_espanol"
+  else if menuTreamentOption = "no_espanol"
+    setMainContent(m.constants.ui.sideNavIds.home, rowNode)
+    setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode) 
+    setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
+  else if menuTreamentOption = "movies_tv_separate"
     setMainContent(m.constants.ui.sideNavIds.movies, rowNode)
     setMainContent(m.constants.ui.sideNavIds.tv, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
-  else if menu_treament_option = "original_v2"
-    setMainContent(m.constants.ui.sideNavIds.home, rowNode)
     setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
     setMainContent(m.constants.ui.sideNavIds.espanol, rowNode)
     setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
@@ -73,18 +71,6 @@ Function onAnimateIntoView()
     m.SubTitle.text = getTranslation("screenInitialContent_subtitle_signedIn")
   else
     m.SubTitle.text = getTranslation("screenInitialContent_subtitle_signedOut")
-  end if
-
-  if bShowSignInItem = true and m.bSignedInUser = false
-    '// If signed out, then display signIn menu item for treatments ICTS_no_espanol , ICTS_original_v2
-    '//ensure the sign in button is different spacing
-    nProfileSpacingLeft = 120
-    nProfileSpacingRight = 60
-    aColumnSpacings.push(nProfileSpacingLeft)
-    m.InitialContentProfileMenuItemBground.visible = true
-    setMainContent(m.constants.ui.sideNavIds.profile, rowNode)
-    numOfMenuItems = numOfMenuItems + 1
-    nMenuWidth = nMenuWidth + m.InitialContentMenu.itemSize[0] + nProfileSpacingLeft + nProfileSpacingRight  
   end if
 
   nInitialContentMenuBgroundPadding = 96
