@@ -19,6 +19,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     allowAfterHours: constants.settings.allowAfterHours
     dedupeBackgrounds: tubiMetadataTranslate_dedupeBackgrounds
     setTotalCount: tubiMetadataTranslate_setTotalCount
+    setSponsorshipInfo: tubiMetadataTranslate_setSponsorshipInfo
     getContentsJson: tubiMetadataTranslate_getContentsJson
     buildCategoryAA: tubiMetadataTranslate_buildCategoryAA
     buildUtilityCategoryAA: tubiMetadataTranslate_buildUtilityCategoryAA
@@ -548,6 +549,7 @@ End Function
 ' @isKidsMode: boolean, the value of the isKidsMode parameter as sent as part of the matrix/homescreen request
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homescreen", authInfo=invalid, isKidsMode=false, uiMode="standard") As Object
+  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateHomescreen()")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   homescreenAA = {
     id: ""
@@ -661,6 +663,7 @@ End Function
 '
 ' Translate a response from matrix/categories or matrix/channels for use in ChannelGridScreen
 Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, bDisplayChannels = true) As Object
+  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateChannelsCategories()")
   sID_queue = m.constants.ui.categoryIds.queue 
   sID_continue_watching = m.constants.ui.categoryIds.history
 
@@ -777,6 +780,7 @@ End Function
 ' @returns: a parent content node containing children content nodes,
 '           each representing a linear channel or invalid on invalid input
 Function tubiMetadataTranslate_translateLinearChannelGuide(homescreenRes)
+  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateLinearChannelGuide()")
   if homescreenRes <> invalid and homescreenRes.containers <> invalid
     channelsParent = CreateObject("roSGNode", "CategoryContentNode")
     containers = homescreenRes.containers
@@ -811,6 +815,7 @@ End Function
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
 Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen") As Object
+  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateContainer()")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
   contents = contentToTranslate.contents
@@ -889,6 +894,9 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       state: "partial"
       gridItemType: m.getGridItemType(container, sOrientation, m.constants)
     }
+
+
+    updateMetadata = m.setSponsorshipInfo(updateMetadata, container.sponsorship)
 
     if container.thumbnail <> invalid
       updateMetadata.thumbnail = container.thumbnail
@@ -1333,7 +1341,9 @@ End Function
 
 
 Function tubiMetadataTranslate_translateChannel(contentToTranslate)
+  tubiLog("TubiMetadataTranslate.tubiMetadataTranslate_translateChannel")
   translated = CreateObject("roSGNode", "CategoryContentNode")
+  updateMetadata = {}
   fetchedAt = m.fetchedAtTimestamp()
   node_count = 0
   container = contentToTranslate.container
@@ -1343,21 +1353,25 @@ Function tubiMetadataTranslate_translateChannel(contentToTranslate)
       '//::HARDCODE:: this is a temporary hardcode until the backend is ready to play My List Instead of Queue as the title
       sTitle = "My List"
     end if
-    translated.id = container.id
-    translated.title = sTitle
-    translated.description = container.description
-    translated.offset = 0
-    translated.json = ""
-    translated.state = "loaded"
-    translated.logoUri = container.logo
-    translated.type = m.contentTypes.channel
-    translated.slug = container.slug
+    updateMetadata.id = container.id
+    updateMetadata.title = sTitle
+    updateMetadata.description = container.description
+    updateMetadata.offset = 0
+    updateMetadata.json = ""
+    updateMetadata.state = "loaded"
+    updateMetadata.logoUri = container.logo
+    updateMetadata.type = m.contentTypes.channel
+    updateMetadata.slug = container.slug
+    
+    updateMetadata = m.setSponsorshipInfo(updateMetadata, container.sponsorship)
 
     if container.valid_duration <> invalid
-      translated.validUntil = Uptime(0) + container.valid_duration
+      updateMetadata.validUntil = Uptime(0) + container.valid_duration
     else
-      translated.validUntil = Uptime(0) + m.constants.cacheTimes.category
+      updateMetadata.validUntil = Uptime(0) + m.constants.cacheTimes.category
     end if
+
+    translated.update(updateMetadata)
 
     for i=0 to container.children.count()-1
       child = contentToTranslate.contents[contentToTranslate.container.children[i]]
@@ -1368,6 +1382,30 @@ Function tubiMetadataTranslate_translateChannel(contentToTranslate)
   m.setTotalCount(translated)
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
+End Function
+
+
+' add sponsorship info, if it exists, to the metadata
+' @metadata: object, The metadata associative array or CategoryContentNode that needs to add the sponsorship info
+' @sponsorshipInfo: assocArray, The associative array that contains the raw data of the sponsor info
+Function tubiMetadataTranslate_setSponsorshipInfo(metadata, sponsorshipInfo)
+  if metadata <> invalid and sponsorshipInfo <> invalid and sponsorshipInfo.spon_exp <> invalid and sponsorshipInfo.image_urls <> invalid then
+    images = sponsorshipInfo.image_urls
+    ' The info AA later becomes of type "TubiSponsorImagesNode" when the update() function is called on the parent contentNode
+    info = {}
+    info.subtype = "TubiSponsorImagesNode" '//when the update() function is called, subtype will ensure this AA is typed to the TubiSponsorImagesNode type
+    info.brandBackground = images.brand_background
+    info.brandColor = images.brand_color
+    info.brandLogo = images.brand_logo
+    info.brandGraphic = images.brand_graphic
+    info.tileBackground = images.tile_background
+    info.pixels = sponsorshipInfo.pixels
+
+    metadata.sponsorImages = info
+    metadata.sponsorExp = sponsorshipInfo.spon_exp 
+  end if
+
+  return metadata
 End Function
 
 

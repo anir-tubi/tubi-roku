@@ -44,6 +44,14 @@
       <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
       
     <!-- OUTPUT -->
+
+      <!-- An array of ContentNodes of the visible items -->
+      <field id="visibleItems" type="array" alwaysNotify="true"/>
+
+
+      <!-- The item in the grid that is in focus -->
+      <field id="itemFocused" type="integer" alwaysNotify="true"/>
+
       <!-- the content node representing the item which was clicked on -->
       <field id="contentSelected" type="node" alwaysNotify="true"/>
 

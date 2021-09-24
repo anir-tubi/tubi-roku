@@ -57,6 +57,9 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
         value = msg.GetData()        
         if m.videoPlayerNode.content <> invalid
           episode = m.videoPlayerNode.content.getFields()  ' clone the content node into a local AA to avoid messing with it
+          '//Place the tracking info into the episode AA variable
+          episode.videoSponsorExposureId = m.videoPlayerNode.videoSponsorExposureId
+
           position = m.videoPlayerNode.adPosition
           tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position))
           print "ad state "; m.videoPlayerNode.adState

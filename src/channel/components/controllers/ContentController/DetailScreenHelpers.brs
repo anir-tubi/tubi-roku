@@ -1248,6 +1248,8 @@ Function onRelatedContentSelected(msg)
   end if
 
   if content <> invalid
+    '//reset videoSponsorExposureId when going to a new detail screen
+    m.videoSponsorExposureId = ""
     showDetailScreen(content, true)
   end if
 End Function

@@ -6,6 +6,7 @@
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs"/>
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../ExperimentMixin.brs"/>
 
   <interface>
@@ -22,11 +23,14 @@
      id="PosterRect" 
      opacity="1"
      color = "0x252A35" />  
-    <Poster
-     id="Poster"
-     opacity="0.5"
-     failedBitmapUri = "pkg:/images/placeholder-featured.jpg"
-     loadingBitmapUri = "pkg:/images/placeholder-featured.jpg" />
+    <Group
+     opacity=".64">
+      <Poster
+      id="Poster"
+      opacity="0.5"
+      failedBitmapUri = "pkg:/images/placeholder-featured.jpg"
+      loadingBitmapUri = "pkg:/images/placeholder-featured.jpg" />
+    </Group>
     <Poster
      id="Logo"
      width="200"
@@ -45,6 +49,27 @@
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="34" />
     </Label>
+    <LayoutGroup
+      id="SponsoredBy"
+      layoutDirection="horiz"
+      itemSpacings="[12]"
+      visible="false">
+      <Label
+        id="SponsoredByText"
+        text=""
+        vertAlign="bottom"
+        opacity=".8"
+        width="0"   
+        height="18">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="18" />
+      </Label>
+      <Poster
+        id="SponsoredByPoster"
+        visible="false"/>
+    </LayoutGroup>
 
   </children>
 </component>

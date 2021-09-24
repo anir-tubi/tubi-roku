@@ -31,6 +31,7 @@ Function init()
 
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.constants.ui.colors.backgroundColor
+  m.SponsorBground = m.top.findNode("SponsorshipBackgroundGroup")
 
   m.uiGroup = m.top.findNode("uiGroup")
   m.contentGroup = m.top.findNode("ContentGroup")
@@ -52,6 +53,12 @@ Function init()
 
   ' the screen cache holds the top level screens in memory so they are not recreated and reloaded unecessarily
   m.screenCache = {}
+
+  ' This is an associative array that keeps track of when pixels are sent out when sponsored containers are displayed. The pixels should only be sent once per page load.
+  m.sentSponsorPixels = {} 
+  
+  ' Keep track of when a user starts a path to watch a video that is contained in a sponsored container. This ID will be passed to rainmaker for an ad request and be used to play a sponsored preroll ad
+  m.videoSponsorExposureId = ""
 
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
@@ -300,6 +307,8 @@ Function openSideNavFromButton()
     }
   end if
 
+  '//reset videoSponsorExposureId when the side nav is opened
+  m.videoSponsorExposureId = ""
   displayNavMenu(true)
 End Function
 
@@ -333,7 +342,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             ' in subsequent function calls in order to display the correct UI.
             setUiMode(m.constants.ui.modes.standard)
           end if
-
+          
           popScreen(true, true)
 
           newTopScreen = getCurrentScreen()
@@ -992,6 +1001,24 @@ Function setUiMode(mode)
 End Function
 
 
+'@aPixelURLs: The array of pixel URLs that log when a sponsored container has been seen
+Function sendSponsorPixels(aPixelURLs)
+  tubiLog("ContentController.sendSponsorPixels")
+  if aPixelURLs <> invalid and aPixelURLs.Count() > 0
+    for each pixelURL in aPixelURLs
+      sNewPixelURL = createCacheBustingURL(pixelURL)
+      tubiLog("ContentController.sendSponsorPixels, pixel URL = " + sNewPixelURL)
+      m.makeRequest({
+        url: sNewPixelURL
+        requestType: m.constants.reqNames.sponsorPixel
+        responseType: "assocarray"
+        silenceCallbackWarnings: true
+      })
+    end for
+  end if
+End Function
+
+
 Function setUiModeFromState()
   tubiLog("ContentController.setUiModeFromState")
   if shouldShowAgeGate() = true and m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.hasAge = false
@@ -1369,6 +1396,18 @@ Function setHomeScreenBackground(homeScreen)
 End Function
 
 
+
+Function onSponsorshipBackgroundChanged(msg)
+  setSponsorshipBackground(msg.getData())
+End Function
+
+
+' @url: string, The URL of the Sponsorship Background
+Function setSponsorshipBackground(url)
+  m.SponsorBground.uri = url
+End Function
+
+
 Function onEpisodeBackgroundChange(msg)
   TubiLog("ContentController.onEpisodeBackgroundChange")
   episodeScreen = msg.getRoSGNode()
@@ -1592,7 +1631,6 @@ Function onCustomResume(msg)
 
     lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
     lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
-
     if getExperimentResource("roku_instant_resume", "roku_instant_resume_v2", true).enabled = true
       if m.Request = invalid 
         m.Request = TubiRequest(m.constants.settings)

@@ -2,6 +2,9 @@
 ' Push a screen on to the stack, allowing the back button to retrace steps
 Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEvents = true)
   tubiLog("ScreenStackHelpers.pushScreen " + screen.id)
+  m.sentSponsorPixels = {} '//refresh this associative array that keeps track of the viewing of the sponsor images. Only send out the sponsor pixels once per page load so refresh upon a loading of a new screen.
+  setSponsorshipBackground("") '//reset the sponsorship background whenever a screen is pushed 
+  
   current = m.screenStack.current
 
   'handle user tracking for navigating to screen
@@ -43,6 +46,9 @@ End Function
 '                              An example of this is when the user signs out.
 Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
   tubiLog("ScreenStackHelpers.popScreen")
+  m.sentSponsorPixels = {} '//refresh this associative array that keeps track of the viewing of the sponsor images. Only send out the sponsor pixels once per page load so refresh upon an unloading of a screen.
+  setSponsorshipBackground("") '//reset the sponsorship background whenever a screen is popped 
+
   toBePopped = getCurrentScreen()
   topHidden = getHiddenScreen(1)
 

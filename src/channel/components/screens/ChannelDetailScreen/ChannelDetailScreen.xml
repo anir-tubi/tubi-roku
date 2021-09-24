@@ -12,6 +12,8 @@
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
@@ -56,6 +58,9 @@
       <field id="signInRequired" type="boolean" alwaysNotify="true" />
 
       <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
+
+      <!-- will be used to change the sponsored background images on the content controller -->
+      <field id="sponsorshipBackground" type="string" alwaysNotify="true" />
 
       <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
            Used when showing a series/episode page
@@ -103,10 +108,8 @@
       maxHeight="355"
       maxTitleLines="2"
       visible="true" />
-
     <CategoryGridRowLabel
       translation="[168,540]"
-      width="1835"
       id="pageTitleAndCounter"/>
     <MarkupGrid
       id="ChannelsVideoGrid"

@@ -92,6 +92,112 @@ Function stringUtils_getUrlParts_test()
   m.assertEqual(urlParts.path, "/some/location/index.m3u8")
   m.assertEqual(urlParts.params, "now_pos=0&model=3600X&video_id=553679&app_id=tubitv&platform=ROKU&app_mode=DEFAULT_MODE&yo.ac=true&user_id=104216&language=en&device_id=5S4629143722&content_type=mp4&opt_out=1&adv_id=e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316")
   m.assertEqual(urlParts.paramsWithSeparator, "?now_pos=0&model=3600X&video_id=553679&app_id=tubitv&platform=ROKU&app_mode=DEFAULT_MODE&yo.ac=true&user_id=104216&language=en&device_id=5S4629143722&content_type=mp4&opt_out=1&adv_id=e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316")
+
+  paramsAA = urlParts.paramsAA
+  m.assertEqual(paramsAA["now_pos"], "0")
+  m.assertEqual(paramsAA["model"], "3600X")
+  m.assertEqual(paramsAA["video_id"], "553679")
+  m.assertEqual(paramsAA["platform"], "ROKU")
+  m.assertEqual(paramsAA["app_mode"], "DEFAULT_MODE")
+  m.assertEqual(paramsAA["yo.ac"], "true")
+  m.assertEqual(paramsAA["user_id"], "104216")
+  m.assertEqual(paramsAA["language"], "en")
+  m.assertEqual(paramsAA["device_id"], "5S4629143722")
+  m.assertEqual(paramsAA["content_type"], "mp4")
+  m.assertEqual(paramsAA["opt_out"], "1")
+  m.assertEqual(paramsAA["adv_id"], "e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316")
+  
+End Function
+
+
+'@Test createCacheBustingURL unit tests
+Function stringUtils_createCacheBustingURL_test()
+  goodUrl1 = "http://www.tubi.tv?cb=1234"
+  goodUrl2 = "http://www.tubi.tv?param1=abc&cb=1234"
+  goodUrl3 = "http://www.tubi.tv"
+  badUrl1 = ""
+  badUrl2 = 12
+  badUrl3 = "://"
+
+  convertedURL_good1 = createCacheBustingURL(goodUrl1)
+  convertedURL_good2 = createCacheBustingURL(goodUrl2)
+  convertedURL_good3 = createCacheBustingURL(goodUrl3)
+  convertedURL_bad1 = createCacheBustingURL(badUrl1)
+  convertedURL_bad2 = createCacheBustingURL(badUrl2)
+  convertedURL_bad3 = createCacheBustingURL(badUrl3)
+
+  '//it is expected the goodUrl1 and goodUrl2 URLs will successfully return a URL with the "cb" param set to something different 
+  m.assertNotInvalid(convertedURL_good1)
+  m.assertNotInvalid(convertedURL_good2)
+  
+  '//make sure the 'cb' value was changed
+  queryObject_good1 = getUrlParts(convertedURL_good1).paramsAA
+  queryObject_good2 = getUrlParts(convertedURL_good2).paramsAA
+
+  sNewValue_good1 = queryObject_good1["cb"]
+  m.assertTrue(isString(sNewValue_good1))
+  m.AssertNotEqual("1234", sNewValue_good1)
+
+  sNewValue_good2 = queryObject_good2["cb"]
+  m.assertTrue(isString(sNewValue_good2))
+  m.AssertNotEqual("1234", sNewValue_good2)
+
+  '//the following URLs do not have the "cb" param so it is expected to return the same "URL" as what was put in 
+  m.assertEqual(goodUrl3, goodUrl3)
+  m.assertEqual(badUrl1, convertedURL_bad1)
+  m.assertEqual(badUrl2, convertedURL_bad2)
+  m.assertEqual(badUrl3, convertedURL_bad3)
+End Function 
+
+
+'@Test replaceURLParameter unit tests
+Function stringUtils_replaceURLParameter_test()
+  goodUrl1 = "http://www.tubi.tv?cb=1234"
+  goodUrl2 = "http://www.tubi.tv?param1=abc&cb=1234"
+  goodUrl3 = "http://www.tubi.tv"
+  badUrl1 = ""
+  badUrl2 = 12
+  badUrl3 = "://"
+
+  convertedURL_good1 = replaceURLParameter(goodUrl1, "cb", "XYZ")
+  convertedURL_good2 = replaceURLParameter(goodUrl2, "cb", "XYZ")
+  convertedURL_good3 = replaceURLParameter(goodUrl3, "cb", "XYZ")
+  convertedURL_bad1 = replaceURLParameter(badUrl1, "cb", "XYZ")
+  convertedURL_bad2 = replaceURLParameter(badUrl2, "cb", "XYZ")
+  convertedURL_bad3 = replaceURLParameter(badUrl3, "cb", "XYZ")
+
+  m.assertNotInvalid(convertedURL_good1)
+  m.assertNotInvalid(convertedURL_good2)
+
+  '//double check that the good URLs contain the new value for the 'cb' param
+  m.assertTrue(convertedURL_good1.Instr("cb=XYZ") >= 0)
+  m.assertTrue(convertedURL_good2.Instr("cb=XYZ") >= 0)
+
+
+  '//the following URLs do not have the "cb" param so it is expected to return the same "URL" as what was put in 
+  m.assertEqual(goodUrl3, goodUrl3)
+  m.assertEqual(badUrl1, convertedURL_bad1)
+  m.assertEqual(badUrl2, convertedURL_bad2)
+  m.assertEqual(badUrl3, convertedURL_bad3)
+End Function
+
+
+'@Test createCacheBusterString unit tests
+Function stringUtils_createCacheBusterString_test()
+  aRandomStrings = {}
+  '//get a number of unique strings from the function and test their uniqueness
+  for i=0 to 20
+    sUnique = createCacheBusterString()
+
+    '//Test that the string is a valid string
+    m.assertTrue(isString(sUnique))
+
+    '//Test the the unique string has not already been created
+    m.assertInvalid(aRandomStrings[sUnique])
+
+    '//Add the unique string to the Associative Array
+    aRandomStrings[sUnique] = true
+  end for
 End Function
 
 

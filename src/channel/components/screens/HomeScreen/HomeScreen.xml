@@ -105,6 +105,9 @@
       <!-- set to the tubi content of the item which was focused on -->
       <field id="contentFocused" type="node"/>
 
+      <!-- set to the tubi content of the new row container (row of contentFocused) which was focused on -->
+      <field id="rowFocused" alias="CategoryGridList.rowFocused"/>
+
       <!-- content on the homescreen is loaded and spinner can be turned off -->
       <field id="contentReady" type="boolean" alwaysNotify="true" />
 
@@ -113,6 +116,9 @@
       <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
 
       <field id="selectedPosition" alias="CategoryGridList.selectedPosition" />
+
+      <!-- will be used to change the sponsored background images on the content controller -->
+      <field id="sponsorshipBackground" type="string" alwaysNotify="true" />
 
       <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.
       -->
@@ -177,6 +183,7 @@
       <CategoryGridList
         id="CategoryGridList"/>
     </MaskGroup>
+
 
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
     <Timer

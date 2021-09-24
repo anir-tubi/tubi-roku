@@ -178,6 +178,10 @@ Function onItemFocused()
   tubiLog("ChannelGridScreen.onItemFocused")
   if m.top.content <> invalid
     item = m.ChannelCategoryGrid.itemFocused
+    m.top.itemFocused = item
+
+    reportVisibleItems()
+
     numColumns = m.ChannelCategoryGrid.numColumns
     category = m.top.content.getChild(item)
     m.top.backgroundUriList = [m.defaultBackgroundUri]
@@ -206,6 +210,32 @@ Function onItemFocused()
     end if
 
     m.contentLoadedAndFocused = true
+  end if
+End Function
+
+
+Function reportVisibleItems()
+  '//When a sponsored container is made visible, then call the pixels
+  if m.top.content <> invalid and m.top.content.getChildCount() > 0
+    itemFocused = m.ChannelCategoryGrid.itemFocused
+    nVisibleNumColumns = m.ChannelCategoryGrid.numColumns
+    nVisibleNumRows = m.ChannelCategoryGrid.numRows - 1
+    rowFocused = Int(itemFocused \ nVisibleNumColumns) '//zero based
+    lowestVisibleItem = rowFocused * nVisibleNumColumns
+    highestVisibleItem = (rowFocused + nVisibleNumRows) * nVisibleNumColumns - 1
+    if (m.top.content.getChildCount() - 1) < highestVisibleItem
+      highestVisibleItem = m.top.content.getChildCount() - 1
+    end if
+
+    aVisibleItems = []
+    '//Using "visibleItems", indicate what items are visible.
+    '//This assumes that the focused item is in the top most visible row
+    for i=lowestVisibleItem to highestVisibleItem 
+      '//for loop to go thru the visible items
+      item = m.top.content.getChild(i)
+      aVisibleItems.push(item)
+    end for
+    m.top.visibleItems = aVisibleItems
   end if
 End Function
 

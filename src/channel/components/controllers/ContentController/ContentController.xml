@@ -137,6 +137,11 @@
         <!--Handles the background images -->
         <BackgroundGroup
           id="BackgroundGroup"/>
+        <!--Handles the background sponsorship images when the current focused item is sponsored-->
+        <SponsorshipBackgroundGroup
+          id="SponsorshipBackgroundGroup"
+          translation="[0,522]"/>
+
         <ScreenStack
           id="ScreenStack"/>
         <SideNav

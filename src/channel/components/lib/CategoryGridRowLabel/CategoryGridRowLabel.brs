@@ -3,6 +3,10 @@ Function init()
   m.ItemCount = m.top.findNode("ItemCount")
   m.FocusIndex = m.top.findNode("FocusIndex")
   m.CategoryName = m.top.findNode("CategoryName")
+  m.SponsorPoster = m.top.findNode("SponsorPoster")
+  m.SponsoredBy = m.top.findNode("SponsoredBy")
+  m.SponsoredByText = m.top.findNode("SponsoredByText")
+  m.SponsoredByPoster = m.top.findNode("SponsoredByPoster")
   m.CategoryCount = m.top.findNode("CategoryCount")
   m.top.observeField("content", "onContentChange")
   m.top.observeField("currentIndex", "onIndexChange")
@@ -19,24 +23,86 @@ Function init()
   end if
 
   if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.CategoryName.height = 60
+    '//::TODO:: if this experiment is a success, please place this and other code like it in the XML rather than in the BRS - when possible.
     m.CategoryName.vertAlign = "center"
-    m.CategoryName.findNode("CategoryNameFont").size = 36
     m.CategoryName.translation = [0,0]
-    m.CategoryCount.findNode("FocusIndex").height = 48
-    m.CategoryCount.findNode("ItemCount").height = 48
     m.CategoryCount.translation = [1572,12]
   end if
+
+  m.originalTranslation_CategoryName = m.CategoryName.translation
+  m.originalTranslation_CategoryCount = m.CategoryCount.translation
 End Function
 
 Function onThemeChange()
   m.FocusIndex.color = m.global.theme.focused
 End Function
 
+
+' Once the poster loads, then resize it with a static height and a variable width according to the dimensions of the recently loaded image
+Function onSponsorPosterLoadStatusChanged(msg)
+  loadStatus = msg.GetData()
+  if loadStatus = "ready"
+    m.SponsoredByPoster.unobserveField("loadStatus")
+    nBoundingHeight = m.SponsoredByPoster.boundingRect().height
+    nBoundingWidth = m.SponsoredByPoster.boundingRect().width
+
+    m.SponsoredByPoster.height = 32
+    nWidth = (nBoundingWidth * m.SponsoredByPoster.height)/nBoundingHeight
+    m.SponsoredByPoster.width = nWidth
+    m.SponsoredByPoster.visible = true
+  end if
+End Function
+
+
+
 Function onContentChange()
   tubiLog("CategoryGridRowLabel.onContentChange")
   if m.top.content <> invalid then
     m.CategoryName.text = m.top.content.title
+
+    '//reset translations back to the original locations
+    m.CategoryName.translation = m.originalTranslation_CategoryName
+    m.CategoryCount.translation = m.originalTranslation_CategoryCount
+
+    if m.top.content.type = "channel"
+      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
+        m.CategoryCount.translation = [1630,12]
+      end if
+    end if
+
+    '//Display Sponsor if there is a sponsor
+    if m.top.content.sponsorImages <> invalid and getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", false).enabled = true
+      '//Move/resize/display elements when there is a sponsor. If no sponsor, then hidden elements will ensure the height of the row label is varied when this component is used as the "rowTitleComponentName" in a rowlist
+      '//Set the Sponsor heights here rather than the XML so it does not affect the height of a non-sponsored row label
+      images = m.top.content.sponsorImages
+      m.SponsoredByText.text = getTranslation("sponsor_brought_by")
+      SponsoredByTextFont = m.top.findNode("SponsoredByTextFont")
+      m.SponsoredByText.height = SponsoredByTextFont.size
+      m.SponsoredByPoster.observeField("loadStatus", "onSponsorPosterLoadStatusChanged")
+      m.SponsorPoster.uri = images.brandGraphic
+      m.SponsorPoster.height = 108
+      m.SponsoredByPoster.uri = images.brandLogo
+      m.SponsorPoster.opacity = 1
+      m.SponsoredBy.opacity = 1
+      m.SponsoredBy.visible = true
+      m.SponsorPoster.visible = true
+      m.CategoryName.translation = [m.SponsoredBy.translation[0], 7]
+      m.CategoryCount.translation = [m.CategoryCount.translation[0], 72]
+      m.SponsoredBy.translation = [m.SponsoredBy.translation[0], 74]
+    else 
+      '//reset the assets in case the label is reused for other container rows that do not have sponsorships
+      m.SponsoredByPoster.unobserveField("loadStatus")
+      m.SponsoredByText.height = 0
+      m.SponsoredBy.visible = false
+      m.SponsorPoster.visible = false
+      m.SponsoredByPoster.visible = false
+      m.SponsorPoster.height = 0
+      m.SponsorPoster.uri = ""
+      m.SponsoredByPoster.uri = ""
+      m.SponsoredByPoster.height = 0
+      m.SponsoredBy.translation = [m.SponsoredBy.translation[0], 0]
+    end if
+
     drawItemCount()
     if m.top.content.gridItemType = "linear" or m.top.content.gridItemType = "continue_watching_signed_out_user"
       m.CategoryCount.visible = false
@@ -44,12 +110,8 @@ Function onContentChange()
       m.CategoryCount.visible = true
     end if
   end if
-  if m.top.content.type = "channel"
-    if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-       m.CategoryCount.translation = [1630,12]
-    end if
-  end if
 End Function
+
 
 Function drawItemCount()
   cursorIndex = m.top.content.focusIndex

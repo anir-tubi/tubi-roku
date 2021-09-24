@@ -7,6 +7,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -15,14 +16,21 @@
       
       <!-- The number of the focus/current index. 
         ::NOTE::If the component is set as the rowTitleComponentName of a RowList, 
-        then the focusIndex is set automatically and the currentindex field does nt need to be set. -->
+        then the focusIndex is set automatically and the currentindex field does not need to be set. -->
       <field id="currentindex" type="integer"/>
   </interface>
   
   <children>
+    <Poster
+      id="SponsorPoster"
+      width="112"
+      height="0"
+      translation="[0,0]"
+      visible="false"
+      opacity="0" />
     <Label
       id="CategoryName"
-      height="59"
+      height="36"
       width="1000"
       translation="[0,5]"
       color="0xFFFFFFFF"
@@ -31,8 +39,34 @@
         role="font"
         id="CategoryNameFont"
         uri="pkg:/fonts/Vaud-Bold.ttf"
-        size="34" />
+        size="36" />
     </Label>
+
+    <LayoutGroup
+      id="SponsoredBy"
+      layoutDirection="horiz"
+      itemSpacings="[12]"
+      visible="false"
+      opacity="0"
+      vertAlignment="center"
+      translation="[124,0]">
+      <Label
+        id="SponsoredByText"
+        text=""
+        vertAlign="center"
+        width="0"
+        height="0"
+        opacity=".64">
+        <Font
+          id="SponsoredByTextFont"
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="24" />
+      </Label>
+      <Poster
+        id="SponsoredByPoster"
+        visible="false"/>
+    </LayoutGroup>
     <LayoutGroup
       id="CategoryCount"
       layoutDirection="horiz"
@@ -41,7 +75,7 @@
       <Label
         id="FocusIndex"
         text=""
-        height="59"
+        height="30"
         horizAlign="right">
         <Font
           role="font"
@@ -51,7 +85,7 @@
       <Label
         id="ItemCount"
         text=""
-        height="59"
+        height="30"
         horizAlign="right">
         <Font
           role="font"

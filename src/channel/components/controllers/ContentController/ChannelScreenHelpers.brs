@@ -4,6 +4,8 @@ Function showChannelScreen(content, sPageSource = "")
   channelScreen.trackingLoadStartTime = UpTime(0)
   channelScreen.observeFieldScoped("contentSelected", "onChannelContentSelected")
   channelScreen.observeFieldScoped("backgroundUriList", "onChannelBackgroundChange")
+  channelScreen.observeFieldScoped("sponsorshipBackground", "onSponsorshipBackgroundChanged")
+  channelScreen.observeFieldScoped("focusedChild", "onChannelScreenFocusChanged")
   channelScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   channelScreen.observeFieldScoped("refreshChannel", "onRefreshChannelSignal")
   channelScreen.observeFieldScoped("signInRequired", "onSignInRequiredModal")
@@ -13,7 +15,7 @@ Function showChannelScreen(content, sPageSource = "")
   channelScreen.id = m.constants.ui.screenIds.channelDetailScreen
   channelScreen.categoryId = content.id
   channelScreen.isLoading = true
-
+  
   channelScreen.trackingPageInfo = {
     pageType: "category_page"
     pageValues: {
@@ -66,9 +68,26 @@ Function displaySignInRequiredModal(screen)
 End Function
 
 
+Function onChannelScreenFocusChanged(msg)
+  channelScreen = msg.getRoSGNode()
+  if channelScreen.isInFocusChain() = true
+
+    '//If the channel Screen regains focus, then ensure the sponsored background is correct. Important when the BACK button is used and the channelScreen has sponsored content.
+    setSponsorshipBackground(channelScreen.sponsorshipBackground)
+  end if
+End Function
+
+
 Function onChannelContentSelected(msg)
   tubiLog("ChannelScreenHelpers.onChannelContentSelected")
   channelScreen = msg.getRoSGNode()
+
+  '//Keep track of the sponsored exposure ID if the selected video is within a sponsored container
+  channel = channelScreen.content.getChild(0)
+  if channel <> invalid and channel.sponsorExp <> invalid
+    m.videoSponsorExposureId = channel.sponsorExp
+  end if
+
   showDetailScreen(channelScreen.contentSelected, true)
 End Function
 
@@ -113,9 +132,19 @@ Function onChannelContentResponse(msg)
   loadedContent = task.response
   if loadedContent <> invalid and loadedContent.getChildCount() > 0
     '//get the root channnel content
-    channel = loadedContent.getChild(0) '//Channel or category 
-    if channel.getChildCount() <= 0
+    channel = loadedContent.getChild(0) '//Channel or category
+    if channel = invalid or channel.getChildCount() <= 0
       bEmptyResponse = true
+    else
+      if (channel.id = "reality_tv" and UCase(m.constants.deviceInfo.countryCode) = "US")
+        '//to properly send the experiment exposure event, we need to hardcode it so it is sent when the reality_tv container is shown. Once the experiment is done, we can get rid of this IF statement
+        getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", true)
+      end if
+      if channel.sponsorImages <> invalid and channel.sponsorImages.pixels <> invalid and channel.sponsorImages.pixels["container_details"] <> invalid
+        '//When a sponsored container is made visible, then call the pixels
+        sponsorPixels = channel.sponsorImages.pixels["container_details"]
+        sendSponsorPixels(sponsorPixels)
+      end if
     end if
   else
     bEmptyResponse = true

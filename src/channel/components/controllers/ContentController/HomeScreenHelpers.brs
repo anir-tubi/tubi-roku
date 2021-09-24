@@ -10,7 +10,6 @@ Function showHomeScreen(constants, authInfo, screenID = "")
   end if
 
   homeScreen = getFromScreenCache(screenID)
-
   if homeScreen <> invalid
     ' this is required for setting focus to homescreen after activation/signout
     homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController 
@@ -34,9 +33,11 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     homeScreen = CreateObject("roSGNode", "HomeScreen")
     homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
+    homeScreen.observeFieldScoped("sponsorshipBackground", "onSponsorshipBackgroundChanged")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
     homeScreen.observeFieldScoped("contentFocused", "onHomeScreenContentFocused")
+    homeScreen.observeFieldScoped("rowFocused", "onHomeScreenRowFocused")
     homeScreen.observeFieldScoped("focusedChild", "onHomeScreenFocusChanged")
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
@@ -238,7 +239,6 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
     end if
   end if
 End Function
-
 
 
 '//If the homescreen is loading, then display the default background
@@ -472,6 +472,9 @@ Function onHomeScreenFocusChanged(msg)
       '//If the video player has gained focus, then don't stop it.
       stopAndHideLinearVideoPlayer()
     end if
+  else
+    '//If the homescreen regains focus, then ensure the sponsored background is correct. Important when the BACK button is used and the homescreen is focused on a sponsored row.
+    setSponsorshipBackground(homeScreen.sponsorshipBackground)
   end if
 End Function
 
@@ -525,6 +528,33 @@ Function onHomeScreenContentFocused(msg)
       end if
     else 
       stopAndHideLinearVideoPlayer()
+    end if
+  end if
+End Function
+
+
+Function onHomeScreenRowFocused(msg)
+  tubiLog("HomeScreenHelpers.onHomeScreenRowFocused")
+  row = msg.getData()
+  if (row <> invalid and row.id = "reality_tv" and UCase(m.constants.deviceInfo.countryCode) = "US")
+    '//to properly send the experiment exposure event, we need to hardcode it so it is sent when the reality_tv container is shown. Once the experiment is done, we can get rid of this IF statement
+    getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", true)
+  end if
+
+  if row <> invalid and row.sponsorImages <> invalid 
+    '//When a sponsored container is made visible, then call the pixels
+    if row.sponsorImages.pixels <> invalid and row.sponsorImages.pixels["homescreen"] <> invalid
+      containerId = row.id 
+      m.videoSponsorExposureId = row.sponsorExp
+      sponsorPixels = row.sponsorImages.pixels["homescreen"]
+      '//Only send sponsor pixels once per page load
+      if m.sentSponsorPixels[containerId] <> true
+        m.sentSponsorPixels[containerId] = true '//set to true when the sponsor image has been seen at least once per page load. This AA will be reset when the homescreen is no longer visible
+        sendSponsorPixels(sponsorPixels)
+      end if
+    else
+      '//reset videoSponsorExposureId when there is no sponsor for the row
+      m.videoSponsorExposureId = ""
     end if
   end if
 End Function
@@ -694,7 +724,7 @@ Function onContentSelected(msg)
   else if content.type = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
     startSignIn(onCWRowAfterSignIn)
-  else if content.type = "utility"
+  else if content.type = m.constants.ui.contentTypes.utility
     onUtilityItemSelected(content)
   else if content.type = m.constants.ui.contentTypes.linear
     selectLinearContent(content)

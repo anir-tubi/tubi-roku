@@ -105,6 +105,7 @@ End Function
 
 ' Helper function that breaks down a url into its component parts
 ' @url: string, a url
+' @paramsAA: AA, An associative array that comntaines the param names as the keys and the corresponding values as strings
 ' @paramsSeparator: string, a character used to define the start of parameters (typically "?")
 ' 
 ' returns an AA with the following keys:
@@ -112,6 +113,7 @@ End Function
 ' host: "www.tubi.tv"
 ' path: "/movies/544337/the_monuments_men"
 ' params: "start=true&lang=EN"
+' paramsAA: "{start:"true", lang: 'EN'}"
 ' paramsWithSeparator: "?start=true&lang=EN"
 ' or returns invalid if not a url
 Function getUrlParts(url, paramsSeparator = "?")
@@ -120,6 +122,7 @@ Function getUrlParts(url, paramsSeparator = "?")
     host: ""
     path: ""
     params: ""
+    paramsAA: {}
     paramsWithSeparator: ""
   }
 
@@ -131,7 +134,17 @@ Function getUrlParts(url, paramsSeparator = "?")
   urlSplit = url.split(paramsSeparator)
   if urlSplit[1] <> invalid
     parts.paramsWithSeparator = paramsSeparator + urlSplit[1]
-    parts.params = urlSplit[1]
+    params = urlSplit[1]
+    parts.params = params
+
+    '//Place the query name/value pairs into a convenient paramsAA AA
+    '//::TODO:: make non-string values so they are not strings: booleans, numbers, etc
+    aQueryNameValuePair = params.Split("&")
+    for each queryPair in aQueryNameValuePair
+      aQueryParamValue = queryPair.Split("=")
+      parts.paramsAA[aQueryParamValue[0]] = aQueryParamValue[1]
+    end for
+
   end if
 
   chunks = urlSplit[0].split("/")
@@ -151,6 +164,53 @@ Function getUrlParts(url, paramsSeparator = "?")
   parts.path = path
 
   return parts
+End Function
+
+
+' Change the URL with a Cache Busting param to have a new value for its cache bustng param
+Function createCacheBustingURL(url)
+  sCacheBuster = createCacheBusterString()
+  return replaceURLParameter(url, "cb", sCacheBuster)
+End Function
+
+
+' Change the param value of the provided param name with the provided value with the provided URL
+' @url: string, The URL to change
+' @paramToReplace: string, The query param name that its value should be changed
+' @replacementValue: string, The value that should be the new value of the provided param 
+Function replaceURLParameter(url, paramToReplace, replacementValue)
+  sReplacementURL = url
+  if isString(url) = true and isString(paramToReplace) = true and isString(replacementValue) = true
+    re = CreateObject("roRegex", "[\\?&]" + paramToReplace + "=([^&#]*)", "i")
+    aMatches = re.Match(url)
+    if aMatches.Count() > 0
+      '//place replacement string into the URL
+      match = aMatches[0]
+      sDelimiter = match.mid(0, 1)
+      sNewParamValuePair = sDelimiter + paramToReplace + "=" + replacementValue
+      sReplacementURL = url.replace(match, sNewParamValuePair)
+    else
+      '// The paramToReplace is not in the URL, do nothing. 
+      '// In the future, we could append the param to the URL. But for right now, it is unnecessary.
+    end if
+  end if
+
+  return sReplacementURL
+End Function
+
+
+' Create a unique string.
+Function createCacheBusterString()
+  dateTime = createObject("roDateTime")
+  seconds = dateTime.AsSeconds()
+  sSeconds = StrI(seconds).trim()
+  nRandom = Rnd(seconds)
+  sRandom = StrI(nRandom).trim()
+  
+  '//The 1st part of the string includes the number of seconds from epoch time, followed by a "-", 
+  '// followed by a random number between 0 to the epoch time number
+  sCacheBuster = sSeconds + "-" + sRandom
+  return sCacheBuster
 End Function
 
 

@@ -5,10 +5,13 @@
 ' @content: TubiContentNode, the content to be played, can be a movie, episode, or trailer
 ' @autoplayType: string, valid values are "automatic", "deliberate", or "none"
 ' @position: integer, the position from which to start video playback
-function playVideoContent(content, autoplayType = "none", position = 0)
+Function playVideoContent(content, autoplayType = "none", position = 0)
+  tubiLog("VideoHelpers.playVideoContent")
   videoPlayer = setupVideoPlayer(content, autoplayType, position)
 
-  if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
+  currentScreen = getCurrentScreen()
+
+  if currentScreen = invalid or currentScreen.id <> m.constants.ui.screenIds.videoPlayerScreen
     if m.enteredFromDeepLink = true
       ' if the user has been age gated during the deeplink process, a modal will be shown.
       ' We need to remove the modal so it is not overlaying the video.
@@ -22,7 +25,9 @@ function playVideoContent(content, autoplayType = "none", position = 0)
       pushScreen(videoPlayer, true, true)
     end if
   end if
-
+  
+  '//send a copy of the videoSponsorExposureId to the videoPlayer
+  videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
   videoPlayer.control = "play"
 End Function
 
@@ -45,6 +50,8 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
     pushScreen(videoPlayer, false, true)
   end if
 
+  '//send a copy of the videoSponsorExposureId to the videoPlayer
+  videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
   videoPlayer.control = "play"
 End Function
 
@@ -159,7 +166,7 @@ End Function
 '
 ' Update the resume position
 ' This function triggers when the video stops as well as when videoPlayer.historyPosition is updated
-function onEpisodePosition()
+Function onEpisodePosition()
   tubiLog("VideoHelpers.onEpisodePosition")
 
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
@@ -175,10 +182,10 @@ function onEpisodePosition()
       end if
     end if
   end if
-end function
+End Function
 
 
-function onGoToNext(msg)
+Function onGoToNext(msg)
   tubiLog("VideoHelpers.onGoToNext")
   goToNext = msg.getData()
   if goToNext = true
@@ -209,14 +216,17 @@ function onGoToNext(msg)
       returnToDetailScreenFromVideo()
     end if
   end if
-end function
+End Function
 
 
 ' @nextContent: roSGNode, the content node representing the content that will be played next
 ' @ autoplayType: string, "deliberate", "automatic" or "none", refers to if the up next content was selected or is auto playing
-function playUpNextContent(nextContent, autoplayType)
+Function playUpNextContent(nextContent, autoplayType)
   tubiLog("VideoHelpers.playUpNextContent")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+  
+  '//reset videoSponsorExposureId when playing a new video that is no longer in the same path as seeing the sponsored artwork
+  m.videoSponsorExposureId = ""
 
   if videoPlayer <> invalid
     videoContent = videoPlayer.content
@@ -257,12 +267,12 @@ function playUpNextContent(nextContent, autoplayType)
 
     playVideoContent(content, autoplayType)
   end if
-end function
+End Function
 
 
 ' Triggered by either a button press or by timer expiration of the up next / autoplay ui
 ' Is also triggered when resetting videoPlayer.upNextContentToAutoplay = invalid prior to video playback.
-function onUpNextContentToAutoplay(msg)
+Function onUpNextContentToAutoplay(msg)
   upNextContentToAutoplay = msg.getData()
 
   if upNextContentToAutoplay <> invalid
@@ -270,10 +280,10 @@ function onUpNextContentToAutoplay(msg)
     videoPlayer = msg.getRoSGNode()
     playUpNextContent(upNextContentToAutoplay, videoPlayer.autoplayMode)
   end if
-end function
+End Function
 
 
-function onVideoPlayerState(msg)
+Function onVideoPlayerState(msg)
   tubiLog("VideoHelpers.onVideoPlayerState")
   videoPlayer = msg.getRoSGNode()
   if videoPlayer <> invalid
@@ -317,13 +327,13 @@ function onVideoPlayerState(msg)
       end if
     end if
   end if
-end function
+End Function
 
 
-function onVideoPlayerBackPressed()
+Function onVideoPlayerBackPressed()
   tubiLog("VideoHelpers.onVideoPlayerBackPressed")
   returnToDetailScreenFromVideo()
-end function
+End Function
 
 
 ' Stop the video player and refresh detail screen with the relevant content
@@ -340,7 +350,7 @@ end function
 '   - Deep link: exit video player movie after autoplay       : 2 - redraw detail screen with autoplayed content from video player; fetch new related items
 '   - Deep link: Exit video player series                     : 3 - redraw detail screen with existing detail content to updated resume positions; preserve related items
 '   - Deep link: Exit video player series after autoplay      : 4 - redraw detail screen with autoplayed episode metadata, but maintain series content; preserve related items
-function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
+Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
   tubiLog("VideoHelpers.returnToDetailScreenFromVideo")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
@@ -453,14 +463,14 @@ function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
       popScreen(false, false)
     end if
   end if
-end function
+End Function
 
 
 ' Stop the video player and optionally remove the video player from the screen stack
 ' @videoPlayer: roSGNode, a VideoPlayerScreen node
 ' removeVideoPlayerFromScreenStack: boolean, indicates if video player screen should be removed from screen stack
 '                                   set to false for autoplay, true to return to detail screen/home screen/etc.
-function stopVideoContent(videoPlayer)
+Function stopVideoContent(videoPlayer)
   tubiLog("VideoHelpers.stopVideoContent")
 
   if videoPlayer <> invalid
@@ -468,6 +478,7 @@ function stopVideoContent(videoPlayer)
 
     videoPlayer.unobserveFieldScoped("backButtonPressed")
     videoPlayer.unobserveFieldScoped("state")
+    videoPlayer.unobserveFieldScoped("adTrackingObject")
     videoPlayer.unobserveFieldScoped("skipTrailer")
     videoPlayer.unobserveFieldScoped("historyPosition")
     videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
@@ -505,12 +516,12 @@ function stopVideoContent(videoPlayer)
     ' reload history
     onHistoryQueueChange(m.constants.ui.categoryIds.history)
   end if
-end function
+End Function
 
 
 ' can fire from videoPlayer.skipTrailer or videoPlayer.goToNext fields
 ' if a trailer is playing.
-function onSkipTrailer(msg)
+Function onSkipTrailer(msg)
   tubiLog("VideoHelpers.onSkipTrailer")
   skipTrailer = msg.getData()
   if skipTrailer
@@ -525,7 +536,7 @@ function onSkipTrailer(msg)
       end if
     end if
   end if
-end function
+End Function
 
 
 '''''''''''''''''''
@@ -533,7 +544,7 @@ end function
 '
 ' @errorMessage: string, an error message that will be displayed to the user
 ' @errorCode: integer, the video player error code (usually a negative number)
-function showPlayerError(errorMessage, errorCode)
+Function showPlayerError(errorMessage, errorCode)
   tubiLog("ContentController.showPlayerError")
 
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
@@ -569,10 +580,10 @@ function showPlayerError(errorMessage, errorCode)
 
     showErrorModal(modalInfo, onRetryPlayerError, invalid)
   end if
-end function
+End Function
 
 
-function onRetryPlayerError()
+Function onRetryPlayerError()
   ' try to resume the video from the last checkpoint
   screen = getCurrentScreen()
   if screen.isSubtype("DetailScreen") = true
@@ -582,13 +593,13 @@ function onRetryPlayerError()
       resumeHelper(screen)
     end if
   end if
-end function
+End Function
 
 
 ' helper function for adding series title metadata to content returned from the up next API.
 ' @content: episode content node with metadata from the up next api
 ' @oldContent: episode content with full metadata, including parentType (usually from the player)
-function addSeriesTitle(content, oldContent)
+Function addSeriesTitle(content, oldContent)
   if content.parentId <> invalid and oldContent.parentId <> invalid
     if oldContent.parentId <> "" and content.parentId = oldContent.parentId
       content.parentType = "series"
@@ -597,10 +608,10 @@ function addSeriesTitle(content, oldContent)
   end if
 
   return content
-end function
+End Function
 
 
-function getSprites(content)
+Function getSprites(content)
   if content <> invalid
     spritesReqInfo = m.cmsApi.thumbnailsReqInfo(content.id)
     m.makeRequest({
@@ -612,27 +623,27 @@ function getSprites(content)
       silenceCallbackWarnings: true
     })
   end if
-end function
+End Function
 
 
-function onSpritesResponse(sprites)
+Function onSpritesResponse(sprites)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
   if videoPlayer <> invalid
     videoPlayer.sprites = sprites
   end if
-end function
+End Function
 
-function onUpNextCuepointReached(msg)
+Function onUpNextCuepointReached(msg)
   videoPlayer = msg.getRoSGNode()
   if m.upNextRequest = invalid
     if videoPlayer.content <> invalid and videoPlayer.content.isTrailer = false
       m.upNextRequest = fetchUpNextContent(videoPlayer)
     end if
   end if
-end function
+End Function
 
 
-function initVideoTracking(videoPlayer)
+Function initVideoTracking(videoPlayer)
   if m.constants.thirdParty.youbora.enabled = true
     if videoPlayer <> invalid
       if m.youboraTask = invalid
@@ -647,10 +658,10 @@ function initVideoTracking(videoPlayer)
       m.youboraTask.segInfo = videoPlayer.segInfo
     end if
   end if
-end function
+End Function
 
 
-function onVideoTrackingStart(msg)
+Function onVideoTrackingStart(msg)
   tubiLog("VideoHelpers.onVideoTrackingStart")
   videoPlayer = msg.getRoSGNode()
   ' Youbora events
@@ -692,21 +703,21 @@ function onVideoTrackingStart(msg)
     m.youboraTask.options = youboraConfig
     m.youboraTask.event = { handler: "play" }
   end if
-end function
+End Function
 
 
-function videoTrackingStop()
+Function videoTrackingStop()
   if m.constants.thirdParty.youbora.enabled = true
     m.youboraTask.event = { handler: "stop" }
   end if
-end function
+End Function
 
 
 ' We observe the VideoNode state change and when the state = "error", the call back chain of events
 ' eventually sets VideoNode.control = "stop". Due to an idiosyncracy in Roku behavior, this prevents
 ' the Youbora plugin from observing the error state on the video node, and so, we must manually trigger
 ' the Youbora plugin with the error info.
-function onSendYouboraError(msg)
+Function onSendYouboraError(msg)
   videoPlayer = msg.getRoSGNode()
   if videoPlayer <> invalid
     m.youboraTask.event = {
@@ -717,7 +728,7 @@ function onSendYouboraError(msg)
       }
     }
   end if
-end function
+End Function
 
 
 ' set up and make the request for Up Next / Autoplay content
@@ -728,7 +739,7 @@ end function
 ' @videoPlayer: roSGNode, the instance of the video player that contains the content for which the
 '                         upNext request will be mad
 ' returns invalid if there is no videoPlayer or valid videoPlayerContent
-function fetchUpNextContent(videoPlayer)
+Function fetchUpNextContent(videoPlayer)
   if videoPlayer <> invalid and videoPlayer.content <> invalid and videoPlayer.content.id.Len() > 0
     options = {
       params: {
@@ -758,10 +769,10 @@ function fetchUpNextContent(videoPlayer)
     })
   end if
   return invalid
-end function
+End Function
 
 
-function onUpNextResponse(upNextContent)
+Function onUpNextResponse(upNextContent)
   tubiLog("VideoHelpers.onUpNextResponse")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
@@ -787,14 +798,14 @@ function onUpNextResponse(upNextContent)
   else
     returnToDetailScreenFromVideo()
   end if
-end function
+End Function
 
 
-function onUpNextError(errorInfo)
+Function onUpNextError(errorInfo)
   if m.receivedGoToNextPressed = true
     returnToDetailScreenFromVideo()
   end if
-end function
+End Function
 
 
 ' Getting segment info from player and setting to Youbora Options

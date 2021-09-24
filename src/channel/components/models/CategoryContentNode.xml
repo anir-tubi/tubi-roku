@@ -42,5 +42,12 @@
 
     <!-- if UpTime(0) > validUntil, then refetch metadata for this container/category -->
     <field id="validUntil" type="integer"/>
+
+    <!-- TubiSponsorImagesNode object that include sponsor images and screen specific pixel info. -->
+    <field id="sponsorImages" type="node"/>
+
+    <!-- Sponsor Exposure ID to send to rainmaker when playing the video. -->
+    <field id="sponsorExp" type="string"/>
+
   </interface>
 </component>

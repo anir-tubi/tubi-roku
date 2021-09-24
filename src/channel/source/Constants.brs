@@ -220,6 +220,7 @@ Function getConstants()
     constants.reqNames.deviceRegister = "deviceRegister" 'verify age
     constants.reqNames.checkBirthdayInfo = "checkBirthdayInfo" 'verify age
     constants.reqNames.patchUserSettings = "patchUserSettings"
+    constants.reqNames.sponsorPixel = "sponsorPixel"
     constants.reqNames.getChannelGuide = "getChannelGuide"
 
   constants.thirdParty = {}

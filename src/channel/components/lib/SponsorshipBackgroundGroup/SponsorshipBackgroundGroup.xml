@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+ - Sponsorship Background
+ -
+ - A group that handles any sponsorship background transitions
+ -->
+<component name="SponsorshipBackgroundGroup" extends="Group">
+  <script type="text/brightscript" uri="SponsorshipBackgroundGroup.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />  
+  
+  <interface>
+    <!-- INPUT -->
+    <field id="uri" type="string" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <Group
+      id="FadingGroup"
+      opacity="0">
+      <Poster
+        id="BackgroundPoster"
+        opacity=".64"
+        width="1920"
+        height="558"/>
+    </Group>
+  </children>
+</component>

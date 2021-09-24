@@ -26,6 +26,9 @@ Function TubiExperiments(constants) as Object
       roku_limit_containers: {
         roku_limit_containers_v2: {"num_containers": -1}
       }
+      roku_sponsor_experiment: {
+        roku_sponsor_experiment_v1: {"enabled": false}
+      }
       roku_initial_content_type_selector_icts: {
         roku_initial_content_type_selector_icts_v3: {"icts_menu_option": "no_icts"} ' valid values are : "no_icts", "movies_tv_combined", "movies_tv_separate", "no_espanol"
       }

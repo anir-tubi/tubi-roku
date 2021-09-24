@@ -188,6 +188,11 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     ' debug: 0    'set to 1 in order to use the "limit" parameters above
   }
 
+  '//send sponored exposure value if the user call this video from a spnsored contaner.
+  if content.videoSponsorExposureId <> invalid and content.videoSponsorExposureId <> ""
+    params["spon_exp"] = content.videoSponsorExposureId
+  end if
+
   ' add Roku Advertiser Id (RIDA) to ad call url
   if m.constants.deviceInfo.deviceAdId <> invalid
     params["adv_id"] = m.constants.deviceInfo.deviceAdId
@@ -453,6 +458,29 @@ function tubiAds_adTrackingCallback(eventType, ctx)
   youboraOptions = invalid
   
   if eventType <> invalid
+    if ctx <> invalid
+      '//make a subset of ctx and set it to m.controlNode.adTrackingObject 
+      adTrackingObject = {}
+      if ctx.adcount <> invalid
+        adTrackingObject.adcount = ctx.adcount
+      end if
+      if ctx.adindex <> invalid
+        adTrackingObject.adindex = ctx.adindex
+      end if
+      if ctx.duration <> invalid
+        adTrackingObject.duration = ctx.duration
+      end if
+      if ctx.rendersequence <> invalid
+        adTrackingObject.rendersequence = ctx.rendersequence
+      end if
+      if ctx.type <> invalid
+        adTrackingObject.type = ctx.type
+      end if
+      if m.controlNode <> invalid
+        m.controlNode.adTrackingObject = adTrackingObject
+      end if
+    end if
+
     if eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0
       'Impression events fire when ads start, but also when a user begins interacting with an interactive ad
       m.containerNode.visible = true  '//Display ad

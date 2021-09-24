@@ -83,10 +83,13 @@ Function init()
 
 
   m.utilityMaskOffsetDiff = -100 'the diff in the amount the content area mask is offset in the up direction for utility
+  
 
   ' Video in the grid constants
   m.vitgSlideAmt = 440 'the amount the grid slides up to fit the vitg content item
   m.vitgMaskOffsetDiff = 466 'the diff in the amount the content area mask is offset in the up direction for vitg
+  m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
+  m.sponsorMaskOffsetDiff = 29 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
   m.landscapeSlideAmt = 0
   m.landscapeMaskOffsetDiff = 0
   m.linearSlideAmt = -86 'the amount the grid slides up to fit the linear content item
@@ -224,7 +227,7 @@ End Function
 ' screen has lost focus, usually due to another screen or dialog
 ' being shown.
 Function onScreenFocusChange()
-  tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
+  tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top)) 
   if m.top.hasFocus() = true
     m.gridHasFocus = true
     m.CategoryGridList.setFocus(true)
@@ -260,7 +263,7 @@ End Function
 
 
 Function onResetContentAreaValues()
-  contractContentAreaForLargeVitg(1.0)
+  contractContentAreaToOriginal(1.0)
 End Function
 
 
@@ -384,6 +387,7 @@ Function onCurrFocusRowChange()
   end if
 
   if categoryEnteringFocus <> invalid
+    sSponsorBackgroundURL = ""
     if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.utility
       expandMaskOffsetForUtility(rowPercent)
     else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
@@ -399,47 +403,27 @@ Function onCurrFocusRowChange()
       ' In the case of fast scrolling many rows of the grid, across the large vitg or linear rows, the category grid list may
       ' not finish it's translation animation as the focus leaves the vitg or linear rows. We correct for that as the focus scolls
       ' through non video in the grid rows.
-      if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
-        if categoryLosingFocus <> invalid
-          if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-            translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.vitgSlideAmt
+      contractContentAreaToOriginal(rowPercent)
+    end if
 
-            if rowPercent > (1 - translationDiffPercent)
-              contractContentAreaForLargeVitg(rowPercent)
-            end if
-          else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.linear
-            translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.linearSlideAmt
-
-            if rowPercent > (1 - translationDiffPercent)
-              contractContentAreaForLinear(rowPercent)
-            end if
-          else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.landscape
-            if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-              translationDiffPercent = (m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]) / m.landscapeSlideAmt
-
-              if rowPercent > (1 - translationDiffPercent)
-                contractContentAreaForLandscape(rowPercent)
-              end if
-            end if
-          end if
-        end if
+    if categoryEnteringFocus.sponsorImages <> invalid
+      '//if the entering row is sponsored, then take into account the extra room that the sponsor artwork takes up in the row header
+      expandContentAreaForSponsorship(rowPercent)
+      if m.constants.deviceInfo.limitedUi = false and categoryEnteringFocus.sponsorImages.brandBackground <> ""
+        sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandBackground
+      else if categoryEnteringFocus.sponsorImages.brandColor <> ""
+        sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandColor
       end if
     end if
+    
+    m.top.sponsorshipBackground = sSponsorBackgroundURL
+
   else if categoryLosingFocus <> invalid
-    if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.utility
-      contractMaskOffsetForUtility(rowPercent)
-    else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-      ' update contentArea translation, only when VITG lose focus
-      contractContentAreaForLargeVitg(rowPercent)
-    else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.linear
-      ' update contentArea translation, only when Linear lose focus
-      contractContentAreaForLinear(rowPercent)
-    else if categoryLosingFocus.gridItemType = m.constants.ui.gridItemTypes.landscape
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        ' update contentArea translation, only when Landscape lose focus
-        contractContentAreaForLandscape(rowPercent)
-      end if
-    end if
+    tubiLog("HomeScreen.onCurrFocusRowChange, elseIf categoryLosingFocus <> invalid ")
+    '//::QUESTION:: When does this elseIF block ever get triggered. If never, then consider getting rid of this block
+    
+    contractContentAreaToOriginal(rowPercent)
+
   end if
 
   ' update m.lastFocusPosition or reset if we've concluded the scroll animation
@@ -450,9 +434,42 @@ Function onCurrFocusRowChange()
 End Function
 
 
+' @rowPercent: float, the percentage that the row is focused
+Function contractContentAreaToOriginal(rowPercent)
+  if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
+    'gradually reset back to original position
+    if rowPercent < .95
+      '//while the rowPercent is less than .75, then gradually shift the visual elements back to default state
+      nDiffContentAreaTranslation_y = m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]
+      nDiffContentAreaMaskOffset_y = m.originalContentAreaMaskOffset[1] - m.ContentArea.maskOffset[1]
+      
+      m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.ContentArea.translation[1] + nDiffContentAreaTranslation_y * rowPercent]
+      m.ContentArea.maskOffset = [m.originalContentAreaMaskOffset[0], m.ContentArea.maskOffset[1] + nDiffContentAreaMaskOffset_y * rowPercent]
+      if m.InfoPanel.opacity < 1 and m.InfoPanel.opacity < rowPercent
+        m.InfoPanel.opacity = rowPercent
+      end if
+    else
+      '//once the rowPercent has reached a certain percent, then immediately set everything back to original numbers to ensure it happens
+      m.ContentArea.translation = m.originalContentAreaTranslation
+      m.ContentArea.maskOffset = m.originalContentAreaMaskOffset
+      m.InfoPanel.opacity = 1
+    end if
+  end if
+End Function
+
+
 ' @rowPercent: float, the percentage that the Utility row is focused
 Function expandMaskOffsetForUtility(rowPercent)
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.utilityMaskOffsetDiff * rowPercent)]
+End Function
+
+
+' Adjust the RowList based on the difference of the normal and sponsored row title heights and relative to where the rowList already is.
+'   So if a gridType already adjusted the rowList's position, then adjust it more but relatibve to where it already had been adjusted.
+' @rowPercent: float, the percentage that the Sponsorship row is focused
+Function expandContentAreaForSponsorship(rowPercent)
+  m.ContentArea.translation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - (m.sponsorSlideAmt  * rowPercent)]
+  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.ContentArea.maskOffset[1] + (m.sponsorMaskOffsetDiff * rowPercent)]   
 End Function
 
 
@@ -464,35 +481,11 @@ Function expandContentAreaForLargeVitg(rowPercent)
 End Function
 
 
-' @rowPercent: float, the percentage that the non utility row is focused (ie. 1.0 means utility is not focused at all)
-Function contractMaskOffsetForUtility(rowPercent)
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] - (m.utilityMaskOffsetDiff * (1 - rowPercent))]
-End Function
-
-
-' @rowPercent: float, the percentage that the non VITG row is focused (ie. 1.0 means VITG is not focused at all)
-Function contractContentAreaForLargeVitg(rowPercent)
-  m.ContentArea.translation = [m.vitgContentAreaTranslation[0], m.vitgContentAreaTranslation[1] + (m.vitgSlideAmt * rowPercent)]
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] - (m.vitgMaskOffsetDiff * (1 - rowPercent))]
-  m.InfoPanel.opacity = rowPercent
-End Function
-
-
 Function expandContentAreaForLinear(rowPercent)
   m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.linearSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.linearMaskOffsetDiff * rowPercent)]
 End Function
 
-
-Function contractContentAreaForLinear(rowPercent)
-  m.ContentArea.translation = [m.linearContentAreaTranslation[0], m.linearContentAreaTranslation[1] + (m.linearSlideAmt * rowPercent)]
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] - (m.linearMaskOffsetDiff * (1 - rowPercent))]
-End Function
-
-Function contractContentAreaForLandscape(rowPercent)
-  m.ContentArea.translation = [m.landscapeAreaTranslation[0], m.landscapeAreaTranslation[1] + (m.landscapeSlideAmt * rowPercent)]
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] - (m.landscapeMaskOffsetDiff * (1 - rowPercent))]
-End Function
 
 Function expandContentAreaForLandscape(rowPercent)
   m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.landscapeSlideAmt * rowPercent)]

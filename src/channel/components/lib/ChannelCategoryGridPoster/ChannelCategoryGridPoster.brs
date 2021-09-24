@@ -5,6 +5,10 @@ Function init()
   m.posterRect = m.top.findNode("PosterRect")
   m.logo = m.top.findNode("Logo")
   m.title = m.top.findNode("Title")
+  m.SponsoredBy = m.top.findNode("SponsoredBy")
+  m.SponsoredByText = m.top.findNode("SponsoredByText")
+  m.SponsoredByPoster = m.top.findNode("SponsoredByPoster")
+
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("gridHasFocus", "onGridFocusChange")
   m.logo.observeField("loadStatus", "onLogoLoad")
@@ -40,9 +44,25 @@ Function onContentChange(data)
         end if
       end if
     end if
+    
+    thumbnail = m.top.itemContent.thumbnail
+    if m.top.itemContent.sponsorImages <> invalid 
+      '//If this tile is sponsored, then display the appropriate images
+      if m.top.itemContent.sponsorImages.tileBackground <> "" 
+        thumbnail = m.top.itemContent.sponsorImages.tileBackground
+      end if
+
+      if m.top.itemContent.sponsorImages.brandLogo <> "" 
+        m.SponsoredBy.visible = true
+        m.SponsoredByText.text = getTranslation("sponsor_brought_by")
+        m.SponsoredByPoster.observeField("loadStatus", "onSponsorPosterLoadStatusChanged")
+        m.SponsoredByPoster.uri = m.top.itemContent.sponsorImages.brandLogo
+      end if
+    end if
+    
     m.poster.visible = true
     m.posterRect.visible = false
-    m.poster.uri = m.top.itemContent.thumbnail
+    m.poster.uri = thumbnail
 
     categoryContent = m.top.itemContent.getParent()
     if categoryContent <> invalid then
@@ -67,6 +87,38 @@ Function setTranslations()
   nYTitle = (m.top.height - m.title.boundingRect().height)/2
   m.title.width = nTitleWidth
   m.title.translation = [nXTitle, nYTitle]
+End Function
+
+
+' Once the poster loads, then resize it with a static height and a variable width according to the dimensions of the recently loaded image
+Function onSponsorPosterLoadStatusChanged(msg)
+  loadStatus = msg.GetData()
+  if loadStatus = "ready"
+    m.SponsoredByPoster.unobserveField("loadStatus")
+    nBoundingHeight = m.SponsoredByPoster.boundingRect().height
+    nBoundingWidth = m.SponsoredByPoster.boundingRect().width
+    
+    nMaxWidth = 150
+    nMaxHeight = 30
+    nHeight = nMaxHeight
+    nWidth = (nBoundingWidth * nHeight)/nBoundingHeight
+    if nWidth > nMaxWidth
+      '//ensure the image isn't too wide
+      nWidth = nMaxWidth
+      nHeight = (nBoundingHeight * nWidth)/nBoundingWidth
+      m.SponsoredByPoster.height = nHeight
+    end if
+
+    m.SponsoredByPoster.height = nHeight
+    m.SponsoredByPoster.width = nWidth
+    m.SponsoredByPoster.visible = true
+
+    '//center sponsor text and icon
+    nSponsorWidth = m.SponsoredByText.boundingRect().width + m.SponsoredBy.itemSpacings[0] + m.SponsoredByPoster.width
+    nXSponsor = (m.top.width - nSponsorWidth)/2
+    nYSponsor = m.top.height * .79
+    m.SponsoredBy.translation = [nXSponsor, nYSponsor]
+  end if
 End Function
 
 

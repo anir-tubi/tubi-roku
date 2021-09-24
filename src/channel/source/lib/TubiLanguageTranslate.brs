@@ -819,6 +819,10 @@ Function getTranslation_en_US()
       "description": "Label to indicate a title is a TV series",
       "message": "Series"
     },
+    "sponsor_brought_by": {
+      "description": "When content is sponsored by an advertizer, then this text proceeds the image of the sponsor. The text and the image should make a complete sentence.",
+      "message": "Brought to you by"
+    },
     "screenEndCard_startingIn": {
       "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Starting in {seconds} s"

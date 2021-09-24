@@ -30,7 +30,7 @@ End Function
 '''''''''''''''''''''
 ' showChannelGridScreen
 '
-' @onstants: assocArray, constants as set in Constants.brs and updated in the hotpatch
+' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 ' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page to let the user know what page they will go to when they click the back button
 ' @bChannel: boolean, Is this a grid page displaying channels? If not, it will be a grid page displaying categories
 ' @screenLevel: integer, Should this screen have a different screenlevel other than its default one?
@@ -52,6 +52,7 @@ Function showChannelGridScreen(constants, sPageSource, bChannel = true, screenLe
   gridScreen.displayChannels = bChannel
   gridScreen.trackingLoadStartTime = UpTime(0)
   gridScreen.observeFieldScoped("contentSelected", "onGridContentSelected")
+  gridScreen.observeFieldScoped("visibleItems", "onVisibleItemsChange")
   gridScreen.observeFieldScoped("backgroundUriList", "onChannelBackgroundChange")
   gridScreen.observeFieldScoped("refreshChannel", "onRefreshGridSignal")
   gridScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
@@ -79,6 +80,32 @@ Function onGridContentSelected(msg)
   end if
   sType = UCase(sType)
   showChannelScreen(gridScreen.contentSelected, sType)
+End Function
+
+
+Function onVisibleItemsChange(msg)
+  tubiLog("ChannelGridScreenHelpers.onVisibleItemsChange")
+  aVisibleContentNodes = msg.getData()
+  if aVisibleContentNodes <> invalid and aVisibleContentNodes.Count() > 0
+    '//Check thru the array of content nodes of the visible items to see if any of the items within those rows
+    '//have sponsorships, and then send out the pixels for those items (if they have not been sent already)
+    for each contentNode in aVisibleContentNodes
+      if (contentNode <> invalid and contentNode.id = "reality_tv" and UCase(m.constants.deviceInfo.countryCode) = "US")
+        '//to properly send the experiment exposure event, we need to hardcode it so it is sent when the reality_tv container is shown. Once the experiment is done, we can get rid of this IF statement
+        getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", true)
+      end if
+      if contentNode <> invalid and contentNode.sponsorImages <> invalid and contentNode.sponsorImages.pixels <> invalid and contentNode.sponsorImages.pixels["container_list"] <> invalid
+        containerId = contentNode.id
+        sponsorPixels = contentNode.sponsorImages.pixels["container_list"]
+        '//Only send sponsor pixels once per page load
+        if m.sentSponsorPixels[containerId] <> true
+          m.sentSponsorPixels[containerId] = true '//set to true when the sponsor image has been seen at least once per page load. This AA will be reset when the homescreen is no longer visible.
+          sendSponsorPixels(sponsorPixels)
+        end if
+      end if
+    end for
+  end if
+
 End Function
 
 
