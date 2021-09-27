@@ -28,6 +28,7 @@ const {keypress, deeplink, uploadPkg, signPkg, convertToSquashfs} = require('./j
 
 //Functions to upload and download static string translations  
 const {downloadTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
+const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
 
 // Importing functions with Git functionality
 const {NoStackError} = require('./js/utilities')
@@ -671,6 +672,7 @@ async function confirmRelease(done) {
 }
 
 
+exports.codeClean = series(listUnusedImages, listUnusedTranslations);
 exports.build = series(clean, buildInstalled, buildStarter, buildRemote);
 exports.sideload = sideLoad;
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
