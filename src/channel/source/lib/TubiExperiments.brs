@@ -49,7 +49,7 @@ Function TubiExperiments(constants) as Object
       }     
       
       roku_safe_zone:{
-        roku_safe_zone_restart_v2: {"enabled": false}
+        roku_safe_zone_restart_v2: {"enabled": true}
       }
 
       roku_sports: {
