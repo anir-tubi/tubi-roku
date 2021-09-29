@@ -295,6 +295,7 @@ Function handle_422_451_error(callback)
   m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(false)
   Auth.logout()
   m.global.authInfo = invalid
+  setUiMode(m.constants.ui.modes.kidsAgeGate) ' setting ui mode to kids Age gate
   callback() ' redirecting to kidsMode before showing enterKidsMode modal, so that user will be aware what the experience will be
 
   currentScreen = getCurrentScreen()
