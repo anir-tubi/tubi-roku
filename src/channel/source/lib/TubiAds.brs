@@ -199,9 +199,9 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
   end if
 
   if m.constants.deviceInfo.isAdIdTrackingDisabled = true
-    params["opt_out"] = "1"
+    params["opt_out"] = "true"
   else
-    params["opt_out"] = "0"
+    params["opt_out"] = "false"
   end if
 
   'add TubiTV user/registration id to ad call url
