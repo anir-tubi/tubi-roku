@@ -19,9 +19,13 @@
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the search screen.",
     "message": "Search"
   },
+  "menu_foryou": {
+    "description": "Menu option on the app's top nav for pullshaped, (length of text should not be too long). Allows the user to display the home screen.",
+    "message": "For You"
+  },
   "menu_recommended": {
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
-    "message": "For You"
+    "message": "Recommended"
   },
   "menu_home": {
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
