@@ -140,7 +140,7 @@ Function getTranslation_en_US()
       "message": "Search"
     },
     "menu_foryou": {
-      "description": "Menu option on the app's top nav for pullshaped, (length of text should not be too long). Allows the user to display the home screen.",
+      "description": "Menu option on the app's top nav for pillshaped, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "For You"
     },
     "menu_recommended": {
@@ -1110,6 +1110,10 @@ Function getTranslation_es_MX()
     "menu_search": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the search screen.",
       "message": "Buscar"
+    },
+    "menu_foryou": {
+      "description": "Menu option on the app's top nav for pillshaped, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Para ti"
     },
     "menu_recommended": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",

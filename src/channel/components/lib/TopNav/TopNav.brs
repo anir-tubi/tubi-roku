@@ -114,11 +114,7 @@ Function setMainContent(itemID, parentNode, aItemWidths)
   bSuccess = false
 
   if itemID = m.constants.ui.sideNavIds.home
-    if getExperimentResource("roku_pill_shaped_topnav", "roku_pill_shaped_topnav_v1", false).enabled = true
-      contentNode.title = getTranslation("menu_foryou")
-    else
-      contentNode.title = getTranslation("menu_recommended")
-    end if
+    contentNode.title = getTranslation("menu_recommended")
     bSuccess = true
   else if itemID = m.constants.ui.sideNavIds.movies
     contentNode.title = getTranslation("menu_movies")
