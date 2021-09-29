@@ -263,12 +263,13 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
 1\. Set up the environment variables (listed in the [build step](#build)) if not done already, as some of the following steps are dependent on these variables.
 
-2\. Run `$ gulp compare`. This will do the following:
+2\. Checkout the most recent `x_y_branch` branch. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number.
+
+3\. Run `$ gulp compare`. This will do the following:
   - fetch any commits from remote `master` to local `master`
   - fetch any commits from the most recent remote `x_y_branch` to the local `x_y_branch`.
   - Compare the last 200 commits on local `master` with the last 200 commits on the local `x_y_branch`, and print out a list of commits that exist on local `master` but have not yet been cherry picked to the local `x_y_branch`.
 
-3\. Checkout the most recent `x_y_branch` branch. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number.
 
 4\. Cherry pick any commits from local `master` that are to be included in the next release onto the qa branch `qa_x_y_z`.
 (See [this page](https://www.previousnext.com.au/blog/intro-cherry-picking-git) for more info info on the cherry pick git command.)
@@ -277,7 +278,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 5\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since/new_images_since_x_y` file with the image locations of any new or updated images.
 
-6\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates.
+6\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates. Push `qa_x_y_z` branch to github.
 
 7\. Run `$ gulp bump` in order to increment the version number.
 
