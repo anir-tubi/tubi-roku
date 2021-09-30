@@ -104,7 +104,7 @@ Function init()
   m.skipIntroUpTranslation = 740
   m.skipIntroDownTranslation = 840
 
-  skip_button_type = getExperimentResource("roku_skip_intro", "roku_skip_intro_v1", false).skip_button_type
+  skip_button_type = getExperimentResource("roku_skip_intro", "roku_skip_intro_v2", false).skip_button_type
   if skip_button_type = "transparent"
     if m.constants.deviceInfo.scaledUi = true
       m.SkipIntro.uri = "pkg:/images/selector-hd.9.png"
@@ -270,7 +270,6 @@ End Function
 'Make the skipIntro Button visible and based on transport
 'control visibility, set the translation and focus
 Function showSkipIntroButton()
-  getExperimentResource("roku_skip_intro", "roku_skip_intro_v1", true)
   xPosition = m.top.width - (m.skipintro.boundingRect().width + 60)
   if m.HUD.opacity = 1
     m.SkipIntro.translation = [xPosition, m.skipIntroUpTranslation]
@@ -675,24 +674,23 @@ Function onVideoPositionChange()
     end if
   end if
   
-  'set the content and focus to SkipIntro
-  if getExperimentResource("roku_skip_intro", "roku_skip_intro_v1", false).skip_button_type <> "no_button"
+  'set the content, focus to SkipIntro and send exposure event when Skip Intro/recap/early credit cue points available
     if content <> invalid and content.creditsCuePoints <> invalid
-      if isSkipIntroCuePointsReached(content.creditsCuePoints)
+      if isSkipIntroCuePointsReached(content.creditsCuePoints) and getExperimentResource("roku_skip_intro", "roku_skip_intro_v2", true).skip_button_type <> "no_button"
         'implement intro
         if canSkipIntroShown(m.constants.player.skipIntroId.intro, playProgressOk)
           m.cuePointsHistory[m.constants.player.skipIntroId.intro] = true
           skipIntroText = getTranslation("skipIntro_Player")
           setSkipIntroButtonAndTimer(skipIntroText, m.constants.player.skipIntroId.intro)
         end if
-      else if isSkipRecapCuePointsReached(content.creditsCuePoints)
+      else if isSkipRecapCuePointsReached(content.creditsCuePoints) and getExperimentResource("roku_skip_intro", "roku_skip_intro_v2", true).skip_button_type <> "no_button"
         'Implement recap
         if canSkipIntroShown(m.constants.player.skipIntroId.recap, playProgressOk)
           m.cuePointsHistory[m.constants.player.skipIntroId.recap] = true
           skipRecapText = getTranslation("skipRecap_Player")
           setSkipIntroButtonAndTimer(skipRecapText, m.constants.player.skipIntroId.recap)
         end if
-      else if isSkipEarlyCreditCuePointsReached(content.creditsCuePoints)
+      else if isSkipEarlyCreditCuePointsReached(content.creditsCuePoints) and getExperimentResource("roku_skip_intro", "roku_skip_intro_v2", true).skip_button_type <> "no_button"
         'Implement Early credits
         if canSkipIntroShown(m.constants.player.skipIntroId.earlyCredits, playProgressOk)
           m.cuePointsHistory[m.constants.player.skipIntroId.earlyCredits] = true
@@ -703,7 +701,6 @@ Function onVideoPositionChange()
         clearSkipIntroButtonAndTimer()
       end if
     end if
-  end if
 
 
   'Advertisements

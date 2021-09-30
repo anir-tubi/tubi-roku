@@ -62,7 +62,7 @@ Function TubiExperiments(constants) as Object
     
     
       roku_skip_intro:{
-        roku_skip_intro_v1: {"skip_button_type": "no_button"} 'valid values are : "no_button", "fill", "transparent"
+        roku_skip_intro_v2: {"skip_button_type": "no_button"} 'valid values are : "no_button", "fill", "transparent"
       }
     }
     
