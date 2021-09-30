@@ -1685,11 +1685,11 @@ Function getTranslation_es_MX()
     },
     "screenAgeVerification_header": {
       "description": "A header message welcoming users to Tubi on Age required screen",
-      "message": "Edad requerida"
+      "message": "Bienvenido a Tubi, {firstname}"
     },
     "screenAgeVerification_sub_header": {
       "description": "A sub header message to direct users to enter their birth date",
-      "message": "Para continuar, ingresa tu fecha de nacimiento."
+      "message": "Para continuar, por favor confirma tu año de nacimiento"
     },
     "screenAgeVerification_keypad_button": {
       "description": "A message on the button below the birth date keypad that users should select once done inserting their birth date",
@@ -1713,7 +1713,7 @@ Function getTranslation_es_MX()
     },
     "screenAgeVerification_year": {
       "description": "A label explaining that the 4 digits above the label signify the year that was input by the user",
-      "message": "Año"
+      "message": "Año de Nacimiento"
     },
     "screenAgeVerification_yyyy": {
       "description": "A label showing that the user should enter four digits for their birthdate year",
@@ -1723,9 +1723,13 @@ Function getTranslation_es_MX()
       "description": "A tip about how to enter the birth date",
       "message": "Tip: Si tu fecha de nacimiento es el 1 de enero del 2000, ingresa 01/01/2000"
     },
-    "screenAgeVerification_error_prompt": {
+    "screenAgeVerification_warning_prompt": {
       "description": "A message informing the user that they entered a date that is not valid",
-      "message": "Parece que has ingresado la información equivocada."
+      "message": "Por favor, asegúrate de que la información que ingresaste sea correcta"
+    },
+    "screenAgeVerification_error_prompt": {
+      "description": "A message informing the user that they entered a date that is not acceptable",
+      "message": "Por favor, ingresa un año de nacimiento válido"
     },
     "metadata_fullscreen_countdown_plural": {
       "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
@@ -1790,6 +1794,10 @@ Function getTranslation_es_MX()
     "metadata_series": {
       "description": "Label to indicate a title is a TV series",
       "message": "Series"
+    },
+    "sponsor_brought_by": {
+      "description": "When content is sponsored by an advertizer, then this text proceeds the image of the sponsor. The text and the image should make a complete sentence.",
+      "message": "Traído a ti por"
     },
     "screenEndCard_startingIn": {
       "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
@@ -2042,6 +2050,10 @@ Function getTranslation_es_MX()
     "search_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
       "message": "Para habilitar el control de voz, oprime y mantén"
+    },
+    "dialog_button_signUp": {
+      "description": "The label of the button in a dialog window that allows the user to sign up into the app.",
+      "message": "Inscríbete"
     }
   }
 End Function

@@ -118,17 +118,17 @@
 
 
         <Rectangle
-          width="267">
+          width="300">
           <Poster
             id="AgeVerificationYearBg"
             uri="pkg:/images/menu-focus-fhd.9.png"
-            width="267"
+            width="300"
             height="144"
             opacity="1.0"/>
           <Label
             id="AgeVerificationYearEntryBack"
             color="0xFFFFFF"
-            width="267"
+            width="300"
             height="144"
             horizAlign="center"
             vertAlign="center"
@@ -142,7 +142,7 @@
           <Label
             id="AgeVerificationYearEntryFront"
             color="0x000000"
-            width="267"
+            width="300"
             height="144"
             horizAlign="center"
             vertAlign="center"
@@ -156,7 +156,7 @@
           <Label
             id="AgeVerificationYear"
             color="0xFFFFFF"
-            width="267"
+            width="300"
             horizAlign="center"
             opacity="0.4"
             translation="[0,168]">
@@ -168,17 +168,6 @@
         </Rectangle>
       </LayoutGroup>
     </Group>
-    <Label
-      id="AgeVericationDateTip"
-      translation="[0,759]"
-      color="0xFFFFFF"
-      horizAlign="center"
-      opacity="0.64">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="27" />
-    </Label>
     <Label
       id="AgeVericationErrorPrompt"
       translation="[0,804]"
