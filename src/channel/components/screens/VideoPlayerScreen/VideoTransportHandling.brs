@@ -944,7 +944,7 @@ Function animateTransport(direction)
   tubiLog("VideoTransportHandling.AnimateTransport, direction = " + direction)
 
   'call function to handle the skipIntro button based on the direction
-  if getExperimentResource("roku_skip_intro", "roku_skip_intro_v1", false).skip_button_type <> "no_button"
+  if getExperimentResource("roku_skip_intro", "roku_skip_intro_v2", false).skip_button_type <> "no_button"
     handleSkipIntroButtonOnAnimateTransport(direction)
   end if
 
