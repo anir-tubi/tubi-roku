@@ -648,6 +648,8 @@ End Function
 Function onCWRowAfterSignIn()
   tubiLog("SignInHelpers.onCWRowAfterSignIn")
 
+  setUiModeFromState()
+
   setContentToRefreshAllPersonalizedScreens()
 
   restartChannel()

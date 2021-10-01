@@ -543,11 +543,12 @@ Function startUserExperience()
     m.spinner.visible = false ' the spinner in the contentController component
     sendHdcpLog()
 
+    setUiModeFromState()
+
     if m.enteredFromDeepLink = true then
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
       ' whether we were logged in or not.
-      setUiModeFromState()
       showDetailScreen(m.deeplinkContent, false)
     else if shouldDisplayInitialContentScreen() = true
       ' Display the intitial content screen to the user so they can choose the proper experience. 
@@ -1213,7 +1214,6 @@ End Function
 
 Function startChannel()
   tubiLog("ContentController.startChannel")
-  setUiModeFromState()
   focusSideNavOption(m.constants.ui.sideNavIds.home)
   showDefaultHomeScreen()
 End Function
@@ -1223,7 +1223,7 @@ End Function
 Function restartChannel()
   tubiLog("ContentController.restartChannel")
   authInfo = m.global.authInfo
-  
+
   if shouldDisplayInitialContentScreen() = true
     displayInitialContentScreen()
   else
