@@ -90,47 +90,53 @@ Function processResponse(msg)
     callbackTypes = m.requestTypes[job.requestNode.input.requestType]
     result = job.tubiReq.handleEvent(msg)
 
-    if result <> invalid and result.response <> invalid and callbackTypes <> invalid
+    if result <> invalid and result.response <> invalid 
 
-      responseHeaders = result.response.headers
+      if callbackTypes <> invalid
 
-      if result.response.code >= 200 and result.response.code < 400
+        responseHeaders = result.response.headers
 
-        responseFromServer = result.response
-        if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
-          responseFromServer.data = parseJson(result.response.data)
-        else if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/xml"
-          ' we can write xml parsing functionality here if/when necessary
-        end if
+        if result.response.code >= 200 and result.response.code < 400
 
-        parserCallback = callbackTypes.parseSuccess
+          responseFromServer = result.response
+          if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
+            responseFromServer.data = parseJson(result.response.data)
+          else if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/xml"
+            ' we can write xml parsing functionality here if/when necessary
+          end if
 
-        ' some requests may not require handling of the response and and therefore may not
-        ' have a parseSuccess callback.
-        if parserCallback <> invalid
-          job.requestNode.response = parserCallback(responseFromServer, job.requestNode)
+          parserCallback = callbackTypes.parseSuccess
+
+          ' some requests may not require handling of the response and and therefore may not
+          ' have a parseSuccess callback.
+          if parserCallback <> invalid
+            job.requestNode.response = parserCallback(responseFromServer, job.requestNode)
+          else
+            job.requestNode.response = invalid
+          end if
+
         else
-          job.requestNode.response = invalid
-        end if
 
-      else
+          ' end result of parsedResponse type may vary depending on API response format
+          responseFromServer = result.response
+          if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
+            responseFromServer.data = parseJson(result.response.data)
+          end if
 
-        ' end result of parsedResponse type may vary depending on API response format
-        responseFromServer = result.response
-        if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
-          responseFromServer.data = parseJson(result.response.data)
-        end if
+          parserCallback = callbackTypes.parseError
 
-        parserCallback = callbackTypes.parseError
+          ' some requests might not require error handling, and therefore may not have a parseError callback
+          if parserCallback <> invalid
+            job.requestNode.error = parserCallback(responseFromServer, job.requestNode)
+          else
+            job.requestNode.error = invalid
+          end if
 
-        ' some requests might not require error handling, and therefore may not have a parseError callback
-        if parserCallback <> invalid
-          job.requestNode.error = parserCallback(responseFromServer, job.requestNode)
-        else
-          job.requestNode.error = invalid
         end if
 
       end if
+
+      m.jobStore.delete(id) ' delete the job from assocarray after the response is sent to avoid memory leak 
 
     end if
 
