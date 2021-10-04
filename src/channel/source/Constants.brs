@@ -817,7 +817,7 @@ Function getConstants()
 
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.linear = [408,138]
-      constants.ui.safezoneImageSizes.linear = [384,114]
+      constants.ui.safezoneImageSizes.linear = [384,144]
      
       'Sizes of the linear background and minmized linear video player
       constants.ui.imageSizes.linearVideoPlayer_minimizedDimension = [1263,710]

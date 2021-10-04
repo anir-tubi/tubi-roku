@@ -267,7 +267,7 @@ Function setRowHeights()
     else if category.gridItemType = m.constants.ui.gridItemTypes.linear
       if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
         rowItemSize.push(m.constants.ui.safezoneImageSizes.linear)
-        rowHeight = 193
+        rowHeight = 230
       else
         rowItemSize.push(m.constants.ui.imageSizes.linear)
         rowHeight = 230
