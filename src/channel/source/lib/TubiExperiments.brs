@@ -45,7 +45,7 @@ Function TubiExperiments(constants) as Object
 
 
        roku_email_prefill_login_age_gate:{
-        roku_email_prefill_login_age_gate_v1: {"enabled": false}
+        roku_email_prefill_login_age_gate_v1: {"enabled": true}
       }     
       
       roku_safe_zone:{
