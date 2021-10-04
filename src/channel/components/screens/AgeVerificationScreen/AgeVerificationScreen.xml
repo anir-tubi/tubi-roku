@@ -172,6 +172,7 @@
       id="AgeVericationErrorPrompt"
       translation="[0,804]"
       color="0xEB9C00"
+      width="1000"
       horizAlign="center"
       visible="false">
       <Font
