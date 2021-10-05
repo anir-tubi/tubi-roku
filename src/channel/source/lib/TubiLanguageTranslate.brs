@@ -231,10 +231,6 @@ Function getTranslation_en_US()
       "description": "Label of the dialog button to try again what the app had attempted to do.",
       "message": "Try Again"
     },
-    "dialog_button_retry": {
-      "description": "Label of the dialog button to retry what the app had attempted to do.",
-      "message": "Retry"
-    },
     "dialog_button_close": {
       "description": "Label of the dialog button to close the dialog window",
       "message": "Close"
@@ -250,14 +246,6 @@ Function getTranslation_en_US()
     "dialog_button_off": {
       "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
       "message": "Off"
-    },
-    "dialog_button_yes": {
-      "description": "Label of the dialog button to confirm the action the dialog is asking",
-      "message": "Yes"
-    },
-    "dialog_button_no": {
-      "description": "Label of the dialog button to deny the action the dialog is asking",
-      "message": "No"
     },
     "dialog_button_settings": {
       "description": "Label of the dialog button to cause the app to go to the settings screen.",
@@ -647,22 +635,6 @@ Function getTranslation_en_US()
       "description": "description of dialog message when parental controls has changed",
       "message": "Parental controls setting has changed. Parental controls will be password protected after 5 minutes."
     },
-    "screenSettings_error_parentalChanges_description_group0": {
-      "description": "Success message when parental controls has changed to group 0",
-      "message": "Parental controls setting has changed to Little Kids ({ratings}}). Parental controls will be password protected after 5 minutes."
-    },
-    "screenSettings_error_parentalChanges_description_group1": {
-      "description": "Success message when parental controls has changed to group 1",
-      "message": "Parental controls setting has changed to Older Kids ({ratings}). Parental controls will be password protected after 5 minutes."
-    },
-    "screenSettings_error_parentalChanges_description_group2": {
-      "description": "Success message when parental controls has changed to group 2",
-      "message": "Parental controls setting has changed to Teens ({ratings}). Parental controls will be password protected after 5 minutes."
-    },
-    "screenSettings_error_parentalChanges_description_group3": {
-      "description": "Success message when parental controls has changed to group 3",
-      "message": "Parental controls setting has changed to Adults ({ratings}). Parental controls will be password protected after 5 minutes."
-    },
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
       "message": "You must be signed in to adjust parental controls"
@@ -723,22 +695,6 @@ Function getTranslation_en_US()
       "description": "A message on the button below the birth date keypad that users should select once done inserting their birth date",
       "message": "Start Watching"
     },
-    "screenAgeVerification_month": {
-      "description": "A label explaining that the 2 digits above the label signify the month that was input by the user",
-      "message": "Month"
-    },
-    "screenAgeVerification_mm": {
-      "description": "A label showing that the user should enter 2 digits for their birthdate month",
-      "message": "MM"
-    },
-    "screenAgeVerification_day": {
-      "description": "A label explaining that the 2 digits above the label signify the day that was input by the user",
-      "message": "Day"
-    },
-    "screenAgeVerification_dd": {
-      "description": "A label showing that the user should enter 2 digits for their birthdate day",
-      "message": "DD"
-    },
     "screenAgeVerification_year": {
       "description": "A label explaining that the 4 digits above the label signify the year that was input by the user",
       "message": "Year of Birth"
@@ -746,10 +702,6 @@ Function getTranslation_en_US()
     "screenAgeVerification_yyyy": {
       "description": "A label showing that the user should enter four digits for their birthdate year",
       "message": "YYYY"
-    },
-    "screenAgeVerification_tip": {
-      "description": "A tip about how to enter the birth date",
-      "message": "Tip: If your DOB is January 1, 2000, then enter 01/01/2000"
     },
     "screenAgeVerification_warning_prompt": {
       "description": "A message informing the user that they entered a date that is not valid",
@@ -851,10 +803,6 @@ Function getTranslation_en_US()
       "description": "Error message when video could not play",
       "message": "There was an issue with video playback."
     },
-    "videoPlayer_error_refresh_description": {
-      "description": "Error message when next video could not be played",
-      "message": "Could not refresh the content or play next content."
-    },
     "videoPlayer_adHeadsUp": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "AD Break starts in {seconds} s"
@@ -915,14 +863,6 @@ Function getTranslation_en_US()
       "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
       "message": "Watch thousands of hit movies and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer ads than regular TV. Tubi is the largest free streaming service featuring award-winning movies and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favorites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!"
     },
-    "utility_movies_description": {
-      "description": "This will be displayed on Info panel when the Movies item (from utility row) gains focus",
-      "message": "Movie magic starts here with thousands of nostalgic favorites and recent box office hits. New movies added monthly, no movie ticket required."
-    },
-    "utility_tvshows_description": {
-      "description": "This will be displayed on Info panel when the TVShows item (from utility row) gains focus",
-      "message": "Tune in to thousands of binge worthy TV shows, docuseries and reality TV. New shows added monthly, you’ll never run out."
-    },
     "dialog_whoops_title": {
       "description": "A general whoops title for an dialog window",
       "message": "Whoops!"
@@ -963,18 +903,6 @@ Function getTranslation_en_US()
       "description": "forgot password link",
       "message": "Go to tubi.tv/forgot to reset"
     },
-    "terms_of_use_text": {
-      "description": "terms of use button text",
-      "message": "Terms of Use"
-    },
-    "privacy_policy_text": {
-      "description": "privacy policy button text",
-      "message": "Privacy Policy"
-    },
-    "do_not_sell_my_info_text": {
-      "description": "do not sell my info button text",
-      "message": "Do Not Sell My Info"
-    },
     "signIn_password_hint": {
       "description": "hint shown on signIn password textbox",
       "message": "password"
@@ -1011,18 +939,6 @@ Function getTranslation_en_US()
       "description": "re-enter password button text on modal",
       "message": "Re-enter Password"
     },
-    "existing_account_found": {
-      "description": "existing tubi account found modal heading",
-      "message": "Existing Tubi Account Found"
-    },
-    "existing_account_found_title": {
-      "description": "existing tubi account found modal heading",
-      "message": "Existing Tubi Account Found"
-    },
-    "existing_account_found_description": {
-      "description": "existing tubi account found modal description",
-      "message": "is linked to an existing Tubi account. Please Sign in to continue."
-    },
     "could_not_verify_email": {
       "description": "could not verify your email modal description",
       "message": "Could not verify your email"
@@ -1030,10 +946,6 @@ Function getTranslation_en_US()
     "goBack_signIn": {
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "PRESS BACK FOR SIGNIN"
-    },
-    "goBack_signUp": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESS BACK FOR SIGNUP"
     },
     "rated_Label": {
       "description": "Label shown on video player when tv rating/descriptor is shown",
@@ -1203,10 +1115,6 @@ Function getTranslation_es_MX()
       "description": "Label of the dialog button to try again what the app had attempted to do.",
       "message": "Inténtalo de nuevo"
     },
-    "dialog_button_retry": {
-      "description": "Label of the dialog button to retry what the app had attempted to do.",
-      "message": "Reintentar"
-    },
     "dialog_button_close": {
       "description": "Label of the dialog button to close the dialog window",
       "message": "Cerrar"
@@ -1222,14 +1130,6 @@ Function getTranslation_es_MX()
     "dialog_button_off": {
       "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
       "message": "Apagar"
-    },
-    "dialog_button_yes": {
-      "description": "Label of the dialog button to confirm the action the dialog is asking",
-      "message": "Sí"
-    },
-    "dialog_button_no": {
-      "description": "Label of the dialog button to deny the action the dialog is asking",
-      "message": "No"
     },
     "dialog_button_settings": {
       "description": "Label of the dialog button to cause the app to go to the settings screen.",
@@ -1543,21 +1443,21 @@ Function getTranslation_es_MX()
       "description": "The label for the parental controls",
       "message": "Controles parentales"
     },
-    "screenSettings_parentalControls_group0": {
-      "description": "Group 0 of the parental controls",
-      "message": "Niños pequeños ({ratings})"
+    "screenSettings_error_parentalChanges_description_group0": {
+      "description": "Success message when parental controls has changed to group 0",
+      "message": "Parental controls setting has changed to Little Kids ({ratings}}). Parental controls will be password protected after 5 minutes."
     },
-    "screenSettings_parentalControls_group1": {
-      "description": "Group 1 of the parental controls",
-      "message": "Niños mayores ({ratings})"
+    "screenSettings_error_parentalChanges_description_group1": {
+      "description": "Success message when parental controls has changed to group 1",
+      "message": "Parental controls setting has changed to Older Kids ({ratings}). Parental controls will be password protected after 5 minutes."
     },
-    "screenSettings_parentalControls_group2": {
-      "description": "Group 2 of the parental controls",
-      "message": "Adolescentes ({ratings})"
+    "screenSettings_error_parentalChanges_description_group2": {
+      "description": "Success message when parental controls has changed to group 2",
+      "message": "Parental controls setting has changed to Teens ({ratings}). Parental controls will be password protected after 5 minutes."
     },
-    "screenSettings_parentalControls_group3": {
-      "description": "Group 3 of the parental controls",
-      "message": "Adultos ({ratings})"
+    "screenSettings_error_parentalChanges_description_group3": {
+      "description": "Success message when parental controls has changed to group 3",
+      "message": "Parental controls setting has changed to Adults ({ratings}). Parental controls will be password protected after 5 minutes."
     },
     "screenSettings_parentalControls_instructions": {
       "description": "Description of the parental controls screen",
@@ -1619,22 +1519,6 @@ Function getTranslation_es_MX()
       "description": "description of dialog message when parental controls has changed",
       "message": "La configuración del control parental ha cambiado. Los controles parentales estarán protegidos con contraseña después de 5 minutos."
     },
-    "screenSettings_error_parentalChanges_description_group0": {
-      "description": "Success message when parental controls has changed to group 0",
-      "message": "La configuración del control parental ha cambiado a Niños pequeños ({ratings}}). Los controles parentales estarán protegidos con contraseña después de 5 minutos."
-    },
-    "screenSettings_error_parentalChanges_description_group1": {
-      "description": "Success message when parental controls has changed to group 1",
-      "message": "La configuración del control parental ha cambiado a Niños mayores ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos."
-    },
-    "screenSettings_error_parentalChanges_description_group2": {
-      "description": "Success message when parental controls has changed to group 2",
-      "message": "La configuración del control parental ha cambiado a Adolescentes ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos."
-    },
-    "screenSettings_error_parentalChanges_description_group3": {
-      "description": "Success message when parental controls has changed to group 3",
-      "message": "La configuración del control parental ha cambiado a Adultos ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos."
-    },
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
       "message": "Debes iniciar sesión para ajustar los controles parentales"
@@ -1694,22 +1578,6 @@ Function getTranslation_es_MX()
     "screenAgeVerification_keypad_button": {
       "description": "A message on the button below the birth date keypad that users should select once done inserting their birth date",
       "message": "Comienza a ver"
-    },
-    "screenAgeVerification_month": {
-      "description": "A label explaining that the 2 digits above the label signify the month that was input by the user",
-      "message": "Mes"
-    },
-    "screenAgeVerification_mm": {
-      "description": "A label showing that the user should enter 2 digits for their birthdate month",
-      "message": "MM"
-    },
-    "screenAgeVerification_day": {
-      "description": "A label explaining that the 2 digits above the label signify the day that was input by the user",
-      "message": "Día"
-    },
-    "screenAgeVerification_dd": {
-      "description": "A label showing that the user should enter 2 digits for their birthdate day",
-      "message": "DD"
     },
     "screenAgeVerification_year": {
       "description": "A label explaining that the 4 digits above the label signify the year that was input by the user",
@@ -1823,10 +1691,6 @@ Function getTranslation_es_MX()
       "description": "Error message when video could not play",
       "message": "Hubo un problema con la reproducción del video."
     },
-    "videoPlayer_error_refresh_description": {
-      "description": "Error message when next video could not be played",
-      "message": "No se pudo actualizar ni reproducir el siguiente contenido."
-    },
     "videoPlayer_adHeadsUp": {
       "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Pausa publicitaria comienza en {seconds} s"
@@ -1879,22 +1743,6 @@ Function getTranslation_es_MX()
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
       "message": "Tubi - Películas y Series Gratis"
     },
-    "channel_description": {
-      "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
-      "message": "¡Disfruta el catálogo más grande de películas y series populares completamente Gratis!"
-    },
-    "channel_webDescription": {
-      "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
-      "message": "Ve miles de películas y series totalmente Gratis. En Tubi puedes ver contenido 100% legal y de forma ilimitada. No se requiere tarjeta de crédito o suscripción. Solo tienes que descargar la aplicación, elige lo que quieras ver en donde tu quieras y disfruta del contenido con menos anuncios que la televisión. Tubi es el servicio más grande de streaming Gratis que ofrece películas y series de televisión premiadas. Tenemos algo para todos: Comedias, dramas, familiares, clásicas, dramas coreanos, anime y más. ¡Descárga hoy y empieza streaming de entretenimiento Gratis!"
-    },
-    "utility_movies_description": {
-      "description": "This will be displayed on Info panel when the Movies item (from utility row) gains focus",
-      "message": "La magia del cine comienza aquí con miles de títulos favoritos nostálgicos y éxitos recientes de taquilla. Nuevas películas agregadas mensualmente, no se requiere boleto de cine."
-    },
-    "utility_tvshows_description": {
-      "description": "This will be displayed on Info panel when the TVShows item (from utility row) gains focus",
-      "message": "Sintoniza miles de series dignos de ver, documentales y reality TV. Nuevos capítulos añadidos mensualmente, nunca te quedarás sin ver algo."
-    },
     "dialog_whoops_title": {
       "description": "A general whoops title for an dialog window",
       "message": "¡Uy!"
@@ -1935,18 +1783,6 @@ Function getTranslation_es_MX()
       "description": "forgot password link",
       "message": "Ir a tubi.tv/forgot para restablecer"
     },
-    "terms_of_use_text": {
-      "description": "terms of use button text",
-      "message": "Términos de uso"
-    },
-    "privacy_policy_text": {
-      "description": "privacy policy button text",
-      "message": "Política de privacidad"
-    },
-    "do_not_sell_my_info_text": {
-      "description": "do not sell my info button text",
-      "message": "No Vendas Mi Información Personal"
-    },
     "signIn_password_hint": {
       "description": "hint shown on signIn password textbox",
       "message": "contraseña"
@@ -1983,18 +1819,6 @@ Function getTranslation_es_MX()
       "description": "re-enter password button text on modal",
       "message": "Ingresa tu contraseña"
     },
-    "existing_account_found": {
-      "description": "existing tubi account found modal heading",
-      "message": "Cuenta de Tubi ya existe"
-    },
-    "existing_account_found_title": {
-      "description": "existing tubi account found modal heading",
-      "message": "Cuenta de Tubi ya existe"
-    },
-    "existing_account_found_description": {
-      "description": "existing tubi account found modal description",
-      "message": "está vinculado a una cuenta existente de Tubi. Por favor, inicia sesión para continuar."
-    },
     "could_not_verify_email": {
       "description": "could not verify your email modal description",
       "message": "No pudimos verificar tu correo electrónico"
@@ -2002,10 +1826,6 @@ Function getTranslation_es_MX()
     "goBack_signIn": {
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "PRESIONA ATRÁS PARA VOLVER A INICIAR SESIÓN"
-    },
-    "goBack_signUp": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA ATRÁS PARA REGISTRARTE"
     },
     "rated_Label": {
       "description": "Label shown on video player when tv rating/descriptor is shown",
