@@ -18,3 +18,8 @@ settings:
   #To enable the Charles Proxy, set CharlesProxyEnabled true 
   charlesProxyUrl: "http://{{localHostAddress}}:8888"
   charlesProxyEnabled: false
+
+  bs_const:
+    #By default nothing will be printed to debug console.(port : 8085 )
+    #To enable console debuglogs, set consoleLoggingEnabled to true
+    consoleLoggingEnabled: true

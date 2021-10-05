@@ -61,8 +61,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
           episode.videoSponsorExposureId = m.videoPlayerNode.videoSponsorExposureId
 
           position = m.videoPlayerNode.adPosition
-          tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position))
-          print "ad state "; m.videoPlayerNode.adState
+          tubiLog("TubiSGAdShim: adControl = " + value + " position = " + stri(position) + "ad state " + m.videoPlayerNode.adState)
           m.ads.appMode = m.videoPlayerNode.appMode
           m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
         else

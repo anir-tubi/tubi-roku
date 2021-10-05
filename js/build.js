@@ -18,16 +18,26 @@ bluebird.promisifyAll(fs);
 function createManifest(options, filename, manifestName) {
   fs.openAsync(filename, 'w').then(fd => {
     const data = load(options)[manifestName];
-    const content = Object.keys(data).map(key => {
-      return `${key}=${data[key]}`;
-    }).join('\n');
+
+    // reduce the array so as to not include manifest keys that don't have a value.
+    // This can happen if no bs_consts are defined.
+    var content = Object.keys(data).reduce((accumulatedValue, key) => {
+      if (data[key]) {
+        accumulatedValue.push(`${key}=${data[key]}`);
+        return accumulatedValue;
+      } else {
+        return accumulatedValue;
+      }
+    }, []).join('\n');
+
     return fs.writeAsync(fd, content);
   }).then(() => {
-    log('Generated the file %s.', filename);
+    log(`Generated the file ${filename}`);
   }).catch(err => {
     console.log(err);
   })
 }
+
 
 /**
  * generate a roku setting script from build configuration

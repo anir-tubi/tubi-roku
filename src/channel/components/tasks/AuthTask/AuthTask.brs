@@ -223,7 +223,7 @@ Function updateHistory()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
 
   if m.top.content <> invalid
-    tubiLog("Adding content " + m.top.content.id + " from history at position " + stri(m.top.nowPos))
+   'tubiLog("Adding content " + AnyToStringButNotInvalid(m.top.content.id) + " from history at position " + AnyToStringButNotInvalid(m.top.nowPos))
     '//save the playback history locally before backend request to show progressbar on episode screen
     Bookmarks.addHistoryLocally(m.top.content, m.top.nowPos, m.global)
     if m.global.authInfo <> invalid
@@ -293,7 +293,7 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
     msg = wait(0, queuePort)
     handledReq = queue.handleEvent(msg)
     if handledReq <> invalid
-      print "*** execInitializeUserData: "; handledReq.localId; " returned "; handledReq.response.code
+      'tubilog("*** execInitializeUserData: " + AnyToStringButNotInvalid(handledReq.localId) + " returned " + AnyToStringButNotInvalid(handledReq.response.code))
       if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
         if handledReq.localId = localBookmarkReqId
           userCategories.newBookmarks = Bookmarks.handleInitialBookmarks(handledReq.response.data)

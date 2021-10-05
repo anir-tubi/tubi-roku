@@ -175,9 +175,13 @@ end function
 'returns invalid if the log was only printed to the console
 function tubiLog_sendLogging_(logInfo as Object, queue as Object)
   if logInfo <> invalid and logInfo.count() > 0
-    'print all log messages to console
-    if logInfo.message <> ""
-      print m.getLogPrintout(logInfo.level, logInfo.subtype, logInfo.message)
+    if logInfo.message <> "" and m.constants <> invalid
+      ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
+     ' if m.constants.settings.consoleLoggingEnabled = true 
+#if consoleLoggingEnabled
+        print m.getLogPrintout(logInfo.level, logInfo.subtype, logInfo.message)
+#end if
+     ' end if
 
       if logInfo["type"] <> invalid and logInfo.level <> "" and logInfo.subtype <> "" and queue <> invalid
         'don't send debug or info statements unless the user id is in m.constants.idsToLog
@@ -275,32 +279,31 @@ End Function
 ' @serverTypeName: string, (semi optional - required for sending log to server), a string that must exist in one of the server types in logConsts, (required by logging API)
 ' @subtype: string, (optional), a small string used to differentiate log messages (required by logging API)
 Function tubiLog_helper(logType, message="" as Dynamic, level="debug" as String, serverTypeName="" as String, subtype="" as String) as Void
-  if level <> "error" and level <> "info" and level <> "warn"
-    level = "debug"
-  end if
+  if message <> invalid and message <> ""
 
-  if logType = "exception"
-    field = "logException"
-  else
-    field = "logMsg"
-  end if
-
-  if message <> invalid
-    if serverTypeName = ""
-      'if we can't send this to the server anyways, no need to involve the trackingLogging task, so just print to the console
+#if consoleLoggingEnabled 
       print tubiLog_getLogPrintout_(level, subtype, message)
+#end if
+    ' if serverTypeName is non empty , involve the tracker task which will send log if
+    ' deviceId exists in constants.idsToLog
+    if serverTypeName <> "" and m.global <> invalid and m.global.trackingLoggingTask <> invalid
 
-    else if m.global <> invalid and  m.global.trackingLoggingTask <> invalid
+      if level <> "error" and level <> "info" and level <> "warn"
+        level = "debug"
+      end if
+
+      if logType = "exception"
+        field = "logException"
+      else
+        field = "logMsg"
+      end if
+
       m.global.trackingLoggingTask[field] = {
         message: message
         serverTypeName: serverTypeName
         subtype: subtype
         level: level
       }
-    
-    else
-      'if the trackingLoggingTask is not ready, just print to the console
-      print tubiLog_getLogPrintout_(level, subtype, message)
     end if
   end if
 End Function

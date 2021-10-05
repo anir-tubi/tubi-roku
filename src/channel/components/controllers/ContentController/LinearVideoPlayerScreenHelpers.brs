@@ -262,33 +262,6 @@ Function onLiveStreamManifestResponse(response)
   end if
 End Function
 
-
-' @content: roSGNode, a content node for a single linear content
-' @manifestResponseLines: array, a video manifest response parsed into an array such that each
-'                                line of the response is an array index
-Function logMissingLinearAnalyticsUrl(content, manifestResponseLines)
-  contentId = ""
-  if content <> invalid and isString(content.id)
-    contentId = content.id
-  end if
-
-  streamUrl = ""
-  for each line in manifestResponseLines
-    if line.left(8) = "https://"
-      streamUrl = line
-      exit for
-    end if
-  end for
-
-  logMsg = {
-    content_id: contentId
-    stream_url: streamUrl
-  }
-  logMsg = FormatJson(logMsg)
-  tubiLog(logMsg, "error", "videoLoad", "no-yospace-analytics-url")
-End Function
-
-
 Function onManifestError(error)
   tubiLog("LinearVideoPlayerScreenHelpers.onManifestError")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)

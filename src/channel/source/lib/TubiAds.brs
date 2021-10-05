@@ -293,7 +293,9 @@ function tubiAds_getAdsListViaRoku(episode, breakPos)
     for each adUnit in currentAdUnitsList[0].ads
 
       if adUnit.adId <> invalid
-        print "AD ID "; adUnit.adId; " "; adUnit.creativeAdId
+        if m.constants.settings.mode = "qa" or m.constants.settings.mode = "staging"
+          print "AD ID "; adUnit.adId; " "; adUnit.creativeAdId
+        end if
         
         if adUnit.adId <> "empty"
           'if adUnitType is different from the last adUnitType (meaning a new adUnitsListContainer is needed)
@@ -397,17 +399,8 @@ function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
           m.containerNode = invalid
           m.controlNode = invalid
 
-          '#####
-          ' WORKAROUND FOR RAF MEMORY LEAK, still present in RAF 1.9
-          if m.roadframework.mediator <> invalid and m.roadframework.mediator.util <> invalid and m.roadframework.mediator.util.xfers <> invalid then
-            print "**** CLEARING " + stri(m.roadframework.mediator.util.xfers.count()) + " XFERS FROM RAF"
-            m.roadframework.mediator.util.xfers = []
-          end if
-          '#####
-
-
           if isCompleted = false
-            print "RAF ads not completed"
+            tubilog("RAF ads not completed")
             return m.constants.player.playerResults.closed
           end if
           currentAdPosition = currentAdPosition + adUnitsListContainer.adUnitsList.count()

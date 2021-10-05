@@ -26,3 +26,8 @@ settings:
   #To enable the Charles Proxy, set CharlesProxyEnabled true
   charlesProxyUrl: "http://{{localHostAddress}}:8888"
   charlesProxyEnabled: false
+
+  # any settings config values under bs_consts below will overwrite
+  # bs_consts values set in the various manifests in default.yml
+  bs_const:
+    consoleLoggingEnabled: true

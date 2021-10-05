@@ -406,7 +406,7 @@ Function playContent()
     if m.Video.content.cuepoints <> invalid
       m.top.midrolls = m.Video.content.cuepoints
       for each time in m.top.midrolls
-        print "VideoPlayer: MIDROLL: " ; time
+        tubilog("VideoPlayer: MIDROLL: " + strI(time))
       end for
     end if
     ' Start pre-roll fetch

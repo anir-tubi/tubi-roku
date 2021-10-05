@@ -12,8 +12,16 @@ settings:
   migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"
   suitest: false
   noAds: false
+  # NEVER CHANGE THESE VALUES FOR PRODUCTION
+  # charlesProxyEnabled should be false and charlesProxyUrl set to empty string.
+  # follow exact format for bs_const: "consoleLoggingEnabled=false"
   charlesProxyEnabled: false
   charlesProxyUrl: ""
+
+  # Any configs added to the bs_const setting will be included in the various manifest
+  # configurations via the handlebars templates
+  bs_const:
+    consoleLoggingEnabled: false
 
 manifest:
   title: "Tubi"
@@ -38,6 +46,7 @@ manifest:
   confirm_partner_button: 1
   sdk_instant_resume: 1
   run_as_process: 1
+  bs_const: {{bsConst}}
 
 component_library_manifest:
   title: "Tubi Component Library"
@@ -49,6 +58,7 @@ component_library_manifest:
   hidden: 1
   rsg_version: 1.2
   confirm_partner_button: 1
+  bs_const: {{bsConst}}
 
 starter_library_manifest:
   title: "Tubi Starter Library"
@@ -57,3 +67,4 @@ starter_library_manifest:
   hidden: 1
   rsg_version: 1.2
   confirm_partner_button: 1
+  bs_const: {{bsConst}}
