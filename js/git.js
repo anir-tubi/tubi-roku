@@ -186,6 +186,7 @@ async function makeReleasePrs(done) {
       owner: ghInfo.owner,
       repo: ghInfo.rokuRepo,
       title: `Release ${fullBuildTag}`,
+      body: 'Verify: The last commit in this PR is a build bump. If the last commit in this PR is not a build bump, the release needs to be run again. Any other commit that is not a build bump, including a merge, indicates a commit has been included that was not included in the package that was built and sent to the CDN.',
       head: releaseBranchName,
       base: prodRokuBranchName
     });
