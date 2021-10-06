@@ -6,8 +6,10 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   'set to 0 retries - 1 max request, even if there are no ads returned from our server
   roAdFramework.setAdPrefs(false, 1)
   
-  'turn audience measurement on for the Roku Advertising Framework
-  roAdFramework.enableAdMeasurements(true)
+  'turn on Nielsen DAR API for the Roku Advertising Framework
+  'this is mutually exclusive with Roku's own Global Audience Measurement API,
+  'meaning only one audience measurement API can run at a time.
+  roAdFramework.enableNielsenDAR(true)
 
   'set the Nielsen application id for Tubi TV
   roAdFramework.setNielsenAppId(constants.thirdParty.nielsenToken)
@@ -222,32 +224,25 @@ End Function
 function tubiAds_getAdsListViaRoku(episode, breakPos)
   m.allAdUnitsList = []
 
-  'set the content length (as stated in RAF documentation for Nielsen functionality)
-  if episode.length <> invalid
-    m.roAdFramework.setContentLength(int(episode.length))
-  else
-    m.roAdFramework.setContentLength()
+  nielsenGenres = "" 'nielsenGenres may be set as an array of strigs later
+  nielsenProgramId = ""
+
+  if episode.isCdc = false or m.auth.getAuthInfo() <> invalid
+    'set the content genre (as stated in RAF documentation for Nielsen functionality)
+    if episode.rokuGenres <> invalid and episode.rokuGenres.count() > 0
+      nielsenGenres = episode.rokuGenres
+    end if
+
+    'set the program id/title (as stated in RAF documentation for Nielsen functionality)
+    if episode.parentType = m.constants.ui.contentTypes.series and episode.parentTitle <> invalid
+      nielsenProgramId = episode.parentTitle
+    else if episode.title <> invalid
+      nielsenProgramId = episode.title
+    end if
   end if
 
-  'set the content genre (as stated in RAF documentation for Nielsen functionality)
-  if episode.rokuGenres <> invalid and episode.rokuGenres.count() > 0
-    isKids = false
-    for each genre in episode.rokuGenres
-      if genre = "Children" then isKids = true
-    end for
-    m.roAdFramework.setContentGenre(episode.rokuGenres, isKids)
-  else
-    m.roAdFramework.setContentGenre("")
-  end if
-
-  'set the program id/title (as stated in RAF documentation for Nielsen functionality)
-  if episode.isParentSeries = true and episode.parentTitle <> invalid
-    m.roAdFramework.setContentId(episode.parentTitle)
-  else if episode.title <> invalid
-    m.roAdFramework.setContentId(episode.title)
-  else
-    m.roAdFramework.setContentId("")
-  end if
+  m.roAdFramework.setNielsenGenre(nielsenGenres)
+  m.roAdFramework.setNielsenProgramId(nielsenProgramId)
 
   'get the url for making the ad call
   url = m.populateUrlRainmaker(episode, breakPos)

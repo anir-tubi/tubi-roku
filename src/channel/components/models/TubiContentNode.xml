@@ -28,6 +28,9 @@
     <field id="hasTrailer" type="boolean" value="false" />
     <field id="trailerInfo" type="assocarray" />
     <field id="deeplinkType" type="string" />
+
+    <!-- true if the content is child directed content (CDC) -->
+    <field id="isCdc" type="boolean" />
     
     <!-- descriptors are "ratings descriptors", used to display additional information about TV ratings, eg. [{"code": "L","description": "Coarse or crude language"}, {"code": "R","description": "Violence"}] -->
     <field id="descriptors" type="array" />

@@ -230,6 +230,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
   if contentFromServer.series_id <> invalid then translatedContent.seriesId = "0" + contentFromServer.series_id
   if contentFromServer.liveTvChannelType <> invalid then translatedContent.liveTvChannelType = contentFromServer.liveTvChannelType
+  if contentFromServer.is_cdc <> invalid then translatedContent.isCdc = contentFromServer.is_cdc
 
   if contentFromServer.description <> invalid
     translatedContent.description = contentFromServer.description
