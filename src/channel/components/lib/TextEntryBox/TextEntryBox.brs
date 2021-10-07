@@ -11,7 +11,7 @@ Function init()
   m.Text.text = m.top.hint
   
   m.Text.color = "0x585B66"
-  m.Text.opacity = 0.4
+  m.Text.opacity = 0.7
   
   m.top.observeField("boxWidth", "onBoxWidth")
   m.top.observeField("boxHeight", "onBoxHeight")
@@ -53,7 +53,7 @@ Function onHighlight()
     
     if m.top.text = invalid or m.top.text = "" then
       m.Text.text = m.top.hint
-      m.Text.opacity = 0.4
+      m.Text.opacity = 0.7
     else
       m.Text.opacity = 1.0
     end if  
@@ -64,7 +64,7 @@ Function onHighlight()
     
     if m.top.text = invalid or m.top.text = "" then
       m.Text.color = "0x585B66"
-      m.Text.opacity = 0.4
+      m.Text.opacity = 0.7
     else
       m.Text.color = "0xFFFFFF"
       m.Text.opacity = 1.0    
@@ -78,15 +78,14 @@ Function onScreenFocusChange()
   tubiLog("TextEntryBox.onScreenFocusChange")
   
   if m.top.hasFocus() then
-  
     m.border.visible = true
     if m.top.text <> invalid and m.top.text <> "" then
       onPasswordModeChange()
     end if  
     m.top.highlight = true 
-    
   else  
     m.border.visible = false
+    m.top.highlight = false 
   end if
   
 End Function
@@ -105,9 +104,10 @@ Function formatTextBox()
 
   if m.top.text = invalid or m.top.text = "" then
     m.Text.text = m.top.hint
-    m.Text.opacity = 0.4
+    m.Text.opacity = 0.7
   else
     m.Text.opacity = 1.0
+    m.Text.color = "0xFFFFFF"
     onPasswordModeChange()
   end if
   

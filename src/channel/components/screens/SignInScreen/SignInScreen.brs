@@ -81,11 +81,11 @@ Function onScreenFocusChange()
 
   tubiLog("SignInScreen.onScreenFocusChange")
   if m.top.hasFocus() then
-    ' doing all these to avoid focus color issues
-    m.email.highlight = true
-    m.email.setFocus(false)
-    m.email.highlight = false
-    m.password.setFocus(true)
+    if m.email.text = "" 'if email field is empty when screen gains focus, then setting focus to email field
+      m.email.setFocus(true)
+    else
+      m.password.setFocus(true)
+    end if
   end if
   
 End Function
@@ -279,10 +279,8 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     else if key = "down"
     
       if m.email.hasFocus() = true
-        m.email.highlight = false
         m.password.setFocus(true)
       else if m.password.hasFocus() = true
-        m.password.highlight = false
         m.continueBtn.setFocus(true)
       else if m.continueBtn.hasFocus() = true
         m.termsBtn.setFocus(true) 
@@ -293,7 +291,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     else if key = "up"
     
       if m.password.hasFocus() = true
-        m.password.highlight = false
         m.email.setFocus(true)
       else if m.continueBtn.hasFocus() = true
         m.password.setFocus(true)
