@@ -23,14 +23,11 @@
      id="PosterRect" 
      opacity="1"
      color = "0x252A35" />  
-    <Group
-     opacity=".64">
-      <Poster
-      id="Poster"
-      opacity="0.5"
-      failedBitmapUri = "pkg:/images/placeholder-featured.jpg"
-      loadingBitmapUri = "pkg:/images/placeholder-featured.jpg" />
-    </Group>
+     <Poster
+        opacity=".64"
+        id="Poster"
+        failedBitmapUri = "pkg:/images/placeholder-featured.jpg"
+        loadingBitmapUri = "pkg:/images/placeholder-featured.jpg" />
     <Poster
      id="Logo"
      width="200"

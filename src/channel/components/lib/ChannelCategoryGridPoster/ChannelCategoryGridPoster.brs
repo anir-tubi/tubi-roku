@@ -10,7 +10,6 @@ Function init()
   m.SponsoredByPoster = m.top.findNode("SponsoredByPoster")
 
   m.top.observeField("itemContent", "onContentChange")
-  m.top.observeField("gridHasFocus", "onGridFocusChange")
   m.logo.observeField("loadStatus", "onLogoLoad")
   ' used to keep track of if the grid has focus or not, onGridFocusChange fires every time any focus changes including
   ' scrolling between tiles.
@@ -44,8 +43,8 @@ Function onContentChange(data)
         end if
       end if
     end if
-    
-    thumbnail = m.top.itemContent.thumbnail
+      
+    thumbnail = invalid
     if m.top.itemContent.sponsorImages <> invalid 
       '//If this tile is sponsored, then display the appropriate images
       if m.top.itemContent.sponsorImages.tileBackground <> "" 
@@ -59,10 +58,16 @@ Function onContentChange(data)
         m.SponsoredByPoster.uri = m.top.itemContent.sponsorImages.brandLogo
       end if
     end if
-    
-    m.poster.visible = true
-    m.posterRect.visible = false
-    m.poster.uri = thumbnail
+    if thumbnail <> invalid
+      m.poster.visible = true
+      m.posterRect.visible = false
+      m.poster.uri = thumbnail
+    else
+      m.posterRect.width = m.top.width
+      m.posterRect.height = m.top.height
+      m.posterRect.visible = true
+      m.poster.visible = false
+    end if
 
     categoryContent = m.top.itemContent.getParent()
     if categoryContent <> invalid then
@@ -133,19 +138,4 @@ End Function
 Function displayTitle()
   m.title.visible = true
   m.title.text = m.top.itemContent.title
-End Function
-
-
-Function onGridFocusChange()
-  if m.top.gridHasFocus = false and m.gridIsFocused = true 'grid is losing focus
-    if m.poster.opacity > 0.5
-      fade(m.poster, "out", 0.4, 0, 0.5)
-    end if
-    m.gridIsFocused = false
-  else if m.top.gridHasFocus = true
-    if m.gridIsFocused = false and m.top.itemHasFocus = true 'grid is regaining focus
-      fade(m.poster, "in", 0.4, 0)
-    end if
-    m.gridIsFocused = true
-  end if
 End Function
