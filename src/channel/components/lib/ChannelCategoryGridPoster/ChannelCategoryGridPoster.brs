@@ -26,6 +26,7 @@ Function onContentChange(data)
 
   ' set some defaults
   m.title.visible = false
+  m.SponsoredBy.visible = false
 
   if m.top.itemContent <> invalid then
     if m.top.itemContent.isSpecial <> true 
