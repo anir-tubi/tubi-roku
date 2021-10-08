@@ -87,7 +87,7 @@ End Function
 '
 Function onComponentFocusChange()
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
-  if m.top.hasFocus()
+  if m.top.hasFocus() = true
 
     rowItemFocused = m.RowList.rowItemFocused
     if rowItemFocused.count() <> 2
@@ -107,6 +107,7 @@ Function onComponentFocusChange()
       '   This is especially true when the Rowlist does not have initial focus when the content has loaded.
       m.RowList.setFocus(false)
       m.RowList.setFocus(true)
+
     end if
   end if
 End Function
@@ -457,8 +458,7 @@ End Function
 ' onRowItemFocused - RowList.rowItemFocused event handler.  To reduce jank we debounce/delay these events
 Function onRowItemFocused()
   tubiLog("CategoryGridList.onRowItemFocused")
-
-  if m.justGainedFocus
+  if m.justGainedFocus = true
     onRowListItemDebounce()
     m.justGainedFocus = false
   else
