@@ -20,18 +20,18 @@
 
   <children>
     <Rectangle
-     id="PosterRect" 
-     opacity="1"
-     color = "0x252A35" />  
-     <Poster
-        opacity=".64"
-        id="Poster"
-        failedBitmapUri = "pkg:/images/placeholder-featured.jpg"
-        loadingBitmapUri = "pkg:/images/placeholder-featured.jpg" />
+      id="PosterRect"
+      opacity="0.16"
+      color = "0x9699A3" />
     <Poster
-     id="Logo"
-     width="200"
-     height="80" />
+      opacity=".64"
+      id="Poster"
+      failedBitmapUri = "pkg:/images/placeholder-featured.jpg"
+      loadingBitmapUri = "pkg:/images/placeholder-featured.jpg" />
+    <Poster
+      id="Logo"
+      width="200"
+      height="80" />
     <Label
       id="Title"
       numLines="2"

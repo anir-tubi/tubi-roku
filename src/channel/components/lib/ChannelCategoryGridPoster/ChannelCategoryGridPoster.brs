@@ -29,22 +29,6 @@ Function onContentChange(data)
   m.SponsoredBy.visible = false
 
   if m.top.itemContent <> invalid then
-    if m.top.itemContent.isSpecial <> true 
-      ' Thumbnail images from the matrix/homescreen API are currently 640 x 360.
-      ' These textures are too large when displayed in large amounts (over about 12) as occurs on the category list page,
-      ' resulting in screen flashes as the background and category posters re-render themselves.
-      ' Resampling the images to the size as they are meant to be displayed (430 x 242) uses less texture memory and prevents
-      ' flashing of images up to at least 48 category posters.
-      if m.constants.deviceInfo.limitedUi = true or m.constants.deviceInfo.lowVram = true
-        urlBaseLength = Len(m.constants.ui.uris.categoryBackgrounds.urlBase)
-        if type(m.top.itemContent.thumbnail) = "roString" and Left(m.top.itemContent.thumbnail, urlBaseLength) <> m.constants.ui.uris.categoryBackgrounds.urlBase
-          m.poster.loadWidth = 430
-          m.poster.loadHeight = 242
-          m.poster.loadDisplayMode = "scaleToZoom"
-        end if
-      end if
-    end if
-      
     thumbnail = invalid
     if m.top.itemContent.sponsorImages <> invalid 
       '//If this tile is sponsored, then display the appropriate images
