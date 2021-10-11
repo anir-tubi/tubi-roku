@@ -20,8 +20,6 @@ Function TubiTracking (constants, request, auth)
     getAnalyticsSelector: tubiTracking_getAnalyticsSelector
     getAnalyticsTile: tubiTracking_getAnalyticsTile
     getAnalyticsAd: tubiTracking_getAnalyticsAd
-    getAnalyticsAdAdrise: tubiTracking_getAnalyticsAdAdrise
-    getAnalyticsAdRainmaker: tubiTracking_getAnalyticsAdAdriseRainmaker
     
     populateMessage: tubiTracking_populateMessage
     isEmptyValue: tubiTracking_isEmptyValue
@@ -519,18 +517,9 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
 End Function
 
 
-' Wrapper for choosing the correct ad message constructor while rolling out the new rainmaker ad server
+' Build the structure for an ad message based on info collected from Rainmaker ad server
+' @ctx: AA, the ctx passed to TubiAds.adTrackingCallback
 Function tubiTracking_getAnalyticsAd(ctx)
-  if m.constants.externalConfig.info <> invalid and m.constants.externalConfig.info.rainmaker = true
-    return m.getAnalyticsAdRainmaker(ctx)
-  else
-    return m.getAnalyticsAdAdrise(ctx)
-  end if
-End Function
-
-
-' Build the structure for an ad message when using the old adrise ad server
-Function tubiTracking_getAnalyticsAdAdrise(ctx)
   adEvent = {
     ad_type: "VAST"    'adType enum
     ' advertiser_id: ""   'not currently available
@@ -544,76 +533,14 @@ Function tubiTracking_getAnalyticsAdAdrise(ctx)
       isInteractive = true
     end if
 
-    if ad.adId <> invalid then adEvent.ad_id = ad.adId
 
     if type(ad.streams) = "roArray" and ad.streams[0] <> invalid
-      adVideoUrl = ad.streams[0].url
-      if m.isString(adVideoUrl) = true
-        adEvent.creative_url = adVideoUrl         'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
-
-        if isInteractive = false
-          'interactive ads use external urls that don't contain our ad_video_id.
-          adVideoUrlSplits = adVideoUrl.split("/")
-          adEvent.ad_video_id = adVideoUrlSplits[4] ' expect ad_video_id to be of the form 3256277
-        end if
+      if m.isString(ad.streams[0].url) = true
+        adEvent.creative_url = ad.streams[0].url   'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
       end if
-    end if
-
-    if ad.duration <> invalid then adEvent.reported_duration = ad.duration * 1000  'ms
-
-    ' extract the impression_id and pod_id from the adrise impression url
-    if type(ad.tracking) = "roArray"
-      for i=0 to ad.tracking.count()-1
-        if ad.tracking[i].event = "Impression" and m.isString(ad.tracking[i].url) = true
-          impressionUrl = ad.tracking[i].url
-          if impressionUrl.Left(20) = "http://ads.adrise.tv"
-            idPos = impressionUrl.Instr("id=")
-            if idPos >= 0
-              impressionId = impressionUrl.Mid(idPos + 3)   'expect impressionId to be of the form "20181011234631-glJvr-0-0"
-              impressionIdSplits = impressionId.split("-")
-              parentId = impressionIdSplits[0] + "-" + impressionIdSplits[1]                 'expect parentId to be of the form "20181011234631-glJvr"
-              adEvent.impression_id = impressionId
-              adEvent.parent_id = parentId  'protos requires this to be an int, but it should be a string. Returns 500, until fixed in protos, if included.
-            end if
-            exit for
-          end if
-        end if
-      end for
-    end if
-
-    if isInteractive = true and ad.companionads[0] <> invalid
-      if ad.companionads[0].provider = "INNOVID"
-        adEvent.ad_type = "INNOVID"
-      else if ad.companionads[0].provider = "brightline_RSG"
-        adEvent.ad_type = "BRIGHTLINE"
+      if m.isString(ad.streams[0].id) = true
+        adEvent.ad_video_id = ad.streams[0].id
       end if
-    end if
-
-    if ctx.adIndex <> invalid then adEvent.index = ctx.adIndex
-    if ctx.adCount <> invalid then adEvent.pod_size = ctx.adCount
-  end if
-  return adEvent
-End Function
-
-
-' Build the structure for an ad message using the new rainmaker ad server
-Function tubiTracking_getAnalyticsAdAdriseRainmaker(ctx)
-  adEvent = {
-    ad_type: "VAST"    'adType enum
-    ' advertiser_id: ""   'not currently available
-    ' vendor_id: ""       'not currently available
-    ' creative_duration: 0  'not currently available
-  }
-  if ctx <> invalid and ctx.ad <> invalid
-    ad = ctx.ad
-    isInteractive = false
-    if type(ad.companionads) = "roArray" and ad.companionads.count() > 0
-      isInteractive = true
-    end if
-
-
-    if type(ad.streams) = "roArray" and m.isString(ad.streams[0].url) = true
-      adEvent.creative_url = ad.streams[0].url   'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
     end if
 
     if isInteractive = true and ad.companionads[0] <> invalid
@@ -626,7 +553,6 @@ Function tubiTracking_getAnalyticsAdAdriseRainmaker(ctx)
 
     if ad.creativeAdId <> invalid then adEvent.ad_id = ad.creativeAdId
     if ad.creativeId <> invalid then adEvent.creative_id = ad.creativeId.toInt()
-    if ad.adVideoId <> invalid then adEvent.ad_video_id = ad.adVideoId
     if ad.adId <> invalid then adEvent.parent_id = ad.adId
     if ad.duration <> invalid then adEvent.reported_duration = ad.duration * 1000  'ms
     if ctx.adIndex <> invalid then adEvent.index = ctx.adIndex

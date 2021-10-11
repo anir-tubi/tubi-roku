@@ -36,7 +36,6 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     tracking: tracking
 
     ' private
-    enhanceCtx: tubiAds_enhanceCtx
     updateYouboraOptions: tubiAds_updateYouboraOptions
     requestQueue: requestQueue.create(adLoggingPort)
     roAdFramework: roAdFramework
@@ -472,7 +471,6 @@ function tubiAds_adTrackingCallback(eventType, ctx)
     if eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0
       'Impression events fire when ads start, but also when a user begins interacting with an interactive ad
       m.containerNode.visible = true  '//Display ad
-      ctx = m.enhanceCtx(ctx)
       startAdEvent = {
         ad_started: m.tracking.getAnalyticsAd(ctx)
         video_id: m.controlNode.content.id.toInt()
@@ -491,7 +489,6 @@ function tubiAds_adTrackingCallback(eventType, ctx)
     else if eventType = "Complete" or eventType = "Close"
       'Close events fire when a user backs out of an ad, or when a user backs out of the interactive portion of an ad
       if eventType = "Close" and m.isInteracting = true
-        ctx = m.enhanceCtx(ctx)
         clickAdEvent = {
           ad_clicked: m.tracking.getAnalyticsAd(ctx)
           video_id: m.controlNode.content.id.toInt()
@@ -513,7 +510,6 @@ function tubiAds_adTrackingCallback(eventType, ctx)
           endPosition = 0
         end if
 
-        ctx = m.enhanceCtx(ctx)
         finishAdEvent = {
           ad_finished: m.tracking.getAnalyticsAd(ctx)
           video_id: m.controlNode.content.id.toInt()
@@ -525,7 +521,6 @@ function tubiAds_adTrackingCallback(eventType, ctx)
       end if
       m.isInteracting = false
     else if eventType = "AcceptInvitation"
-      ctx = m.enhanceCtx(ctx)
       clickAdEvent = {
         ad_clicked: m.tracking.getAnalyticsAd(ctx)
         video_id: m.controlNode.content.id.toInt()
@@ -549,21 +544,6 @@ function tubiAds_adTrackingCallback(eventType, ctx)
     m.youboraTask.adevent = ctx
   end if
 end function
-
-
-Function tubiAds_enhanceCtx(ctx)
-  ' enhance for analytics
-  if ctx.ad <> invalid and ctx.ad.clickThrough <> invalid
-    adInfo = ParseJson(ctx.ad.clickThrough)
-    if type(adInfo) = "roAssociativeArray"
-      if adInfo.ad_video_id <> invalid
-        ctx.ad.adVideoId = adInfo.ad_video_id.toStr()
-      end if
-    end if
-  end if
-
-  return ctx
-End Function
 
 
 Function tubiAds_updateYouboraOptions(youboraTask, ctx, impressionCount)

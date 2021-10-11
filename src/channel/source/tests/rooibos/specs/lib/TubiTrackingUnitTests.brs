@@ -374,76 +374,8 @@ Function tubiTracking_getAnalyticsSelector_test()
 End Function
 
 
-'@Test getAnalyticsAdAdrise unit tests
-Function tubiTracking_getAnalyticsAdAdrise_test()
-  Tracking = m.Tracking
-
-  creativeId = "3120465"
-  streams = [
-    {
-      bitrate: 400
-      height: 240
-      mimetype: "application/x-mpegurl"
-      provider: ""
-      url: "http://paella.adrise.tv/002268/" + creativeId + "/v0912161820-,426x240-SD-351,640x360-SD-708,640x360-SD-1082,640x360-SD-1395,k.mp4.m3u8"
-      width: 320
-    }
-  ]
-
-  podId = "KtbUw-0-0"
-  impressionId = "20190111231000-" + podId
-  adTracking = [
-    {
-      event: "Impression"
-      time: 0
-      triggered: true
-      url: "http://ads.adrise.tv/track/view.php?id=" + impressionId
-    }
-  ]
-
-  ad = {
-    adid: "2508"
-    adserver: "http://ads.adrise.tv/?roku-v=2.6.1&appid=tubitv&deviceid=YY00G1976937&_=1378200017&model=4400X&m-language=en&content-type=hls&sdk=raf_vast&platform=roku&advid=d0b0ea57-caa1-5a04-840b-741517492b7a&opt-out=0&pubid=96f09f7ca1a637174ba81505fac4bb6d&nowpos=0&cid=418448"
-    adtitle: ""
-    clickthrough: "0,405,827,1303,1760,2073,2389,2852,3259,3812,4400,4716,5085"
-    ' companionads: []
-    creativeadid: ""
-    creativeid: ""
-    duration: 15
-    isadvertising: true
-    minbandwidth: 250
-    programid: "RAF:2508"
-    streamformat: "hls"
-    streams: streams
-    switchingstrategy: "full-adaptation"
-    tracking: adTracking
-  }
-  ctx = {
-    ad: ad
-    adcount: 3
-    adindex: 1
-    adserver: "http://ads.adrise.tv/?roku-v=2.6.1&appid=tubitv&deviceid=YY00G1976937&_=514576113&model=4400X&m-language=en&content-type=hls&sdk=raf_vast&platform=roku&advid=d0b0ea57-caa1-5a04-840b-741517492b7a&opt-out=0&pubid=96f09f7ca1a637174ba81505fac4bb6d&nowpos=0&cid=418448"
-    duration: 17
-    rendersequence: "preroll"
-    time: 1
-  }
-
-  adEvent = Tracking.getAnalyticsAdAdrise(ctx)
-
-  m.assertNotInvalid(adEvent.ad_type)
-  m.assertTrue(adEvent.ad_id = ad.adid)
-  m.assertTrue(adEvent.creative_url = streams[0].url)
-  m.assertTrue(adEvent.reported_duration = ad.duration * 1000)
-  m.assertTrue(adEvent.impression_id = impressionId)
-  'm.assertTrue(adEvent.pod_id = podId)  'commented out until podId is added
-  m.assertTrue(adEvent.index = ctx.adindex)
-  m.assertTrue(adEvent.pod_size = ctx.adcount)
-
-End Function
-
-
-'@Test getAnalyticsAdRainmaker unit tests
-Function tubiTracking_getAnalyticsAdRainmaker_test()
+'@Test getAnalyticsAd unit tests
+Function tubiTracking_getAnalyticsAd_test()
   Tracking = m.Tracking
 
   adVideoId = "10001694"
@@ -455,6 +387,7 @@ Function tubiTracking_getAnalyticsAdRainmaker_test()
         provider: ""
         url: "http://paella.adrise.tv/020267/" + adVideoId + "/v1101141528-640x360-SD-762k.mp4"
         width: 320
+        id: adVideoId
     }
   ]
 
@@ -512,7 +445,7 @@ Function tubiTracking_getAnalyticsAdRainmaker_test()
     time: 22
   }
 
-  adEvent = Tracking.getAnalyticsAdRainmaker(ctx)
+  adEvent = Tracking.getAnalyticsAd(ctx)
 
   m.assertNotInvalid(adEvent.ad_type)
   m.assertTrue(adEvent.ad_type = "VAST")
