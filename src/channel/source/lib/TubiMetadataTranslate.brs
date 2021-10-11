@@ -202,6 +202,14 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
         translatedContent.parentHistoryId = parent.historyId
       end if
 
+      ' episodes may not be marked as CDC (Child Directed Content) even if the parent series is,
+      ' so make sure all episodes are marked as CDC.
+      if parent.isCdc <> false
+        translatedContent.isCdc = parent.isCdc
+      else if contentFromServer.is_cdc <> invalid
+        translatedContent.isCdc = contentFromServer.is_cdc
+      end if
+
     else if contentFromServer.series_id <> invalid
       translatedContent.parentId = "0" + contentFromServer.series_id
 
@@ -230,7 +238,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
   if contentFromServer.series_id <> invalid then translatedContent.seriesId = "0" + contentFromServer.series_id
   if contentFromServer.liveTvChannelType <> invalid then translatedContent.liveTvChannelType = contentFromServer.liveTvChannelType
-  if contentFromServer.is_cdc <> invalid then translatedContent.isCdc = contentFromServer.is_cdc
+
+  ' in case isCdc was already set from the parent above, don't overwrite
+  if translatedContent.isCdc <> true and contentFromServer.is_cdc <> invalid
+    translatedContent.isCdc = contentFromServer.is_cdc
+  end if
 
   if contentFromServer.description <> invalid
     translatedContent.description = contentFromServer.description
