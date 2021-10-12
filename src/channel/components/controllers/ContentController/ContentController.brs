@@ -1007,10 +1007,9 @@ Function sendSponsorPixels(aPixelURLs)
   tubiLog("ContentController.sendSponsorPixels")
   if aPixelURLs <> invalid and aPixelURLs.Count() > 0
     for each pixelURL in aPixelURLs
-      sNewPixelURL = createCacheBustingURL(pixelURL)
-      tubiLog("ContentController.sendSponsorPixels, pixel URL = " + sNewPixelURL)
+      newPixelURL = createCacheBustingURL(pixelURL)
       m.makeRequest({
-        url: sNewPixelURL
+        url: newPixelURL
         requestType: m.constants.reqNames.sponsorPixel
         responseType: "assocarray"
         silenceCallbackWarnings: true
