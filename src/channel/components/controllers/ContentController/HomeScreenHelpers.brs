@@ -297,7 +297,7 @@ Function fetchHomeScreen(homeScreen)
     }
 
     ' setting the x-tubi-inject-live-news header to true includes the live news container on the homescreen.
-    ' This header is temporary and should be removed after the sports experiment concludes.
+    ' This header is temporary and should be removed after the backend no longer requires it.
     if options.params["contentMode"] = m.constants.ui.contentMode.homescreen and shouldKidsModeBeSentToServer() = false
       options.headers["x-tubi-inject-live-news"] = "true"
     end if
@@ -305,10 +305,8 @@ Function fetchHomeScreen(homeScreen)
     ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
     ' This header is temporary and should be removed after the sports experiment concludes.
     if options.params["contentMode"] = m.constants.ui.contentMode.linear or options.params["contentMode"] = m.constants.ui.contentMode.homescreen
-      if getExperimentResource("roku_sports", "roku_sports_v1", true).enabled = true
-        if shouldKidsModeBeSentToServer() = false
-          options.headers["x-tubi-inject-linear"] = "true"
-        end if
+      if shouldKidsModeBeSentToServer() = false
+        options.headers["x-tubi-inject-linear"] = "true"
       end if
     end if
 

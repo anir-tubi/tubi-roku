@@ -51,11 +51,6 @@ Function TubiExperiments(constants) as Object
       roku_safe_zone:{
         roku_safe_zone_restart_v2: {"enabled": true}
       }
-
-      roku_sports: {
-        roku_sports_v1: {"enabled": true}
-      }
-      
       roku_pill_shaped_topnav: {
         roku_pill_shaped_topnav_v1: {"enabled": false}
       }
