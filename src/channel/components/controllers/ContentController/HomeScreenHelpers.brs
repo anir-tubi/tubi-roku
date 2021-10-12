@@ -543,20 +543,17 @@ Function checkForSponsorPixels(rowFocused)
       getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", true)
     end if
 
-    if rowFocused.sponsorImages <> invalid 
+    '//reset videoSponsorExposureId before checking if there is a sponsor for the row
+    m.videoSponsorExposureId = ""
+    if rowFocused.sponsorImages <> invalid and rowFocused.sponsorImages.pixels <> invalid and rowFocused.sponsorImages.pixels["homescreen"] <> invalid    
       '//When a sponsored container is made visible, then call the pixels
-      if rowFocused.sponsorImages.pixels <> invalid and rowFocused.sponsorImages.pixels["homescreen"] <> invalid
-        containerId = rowFocused.id 
-        m.videoSponsorExposureId = rowFocused.sponsorExp
-        sponsorPixels = rowFocused.sponsorImages.pixels["homescreen"]
-        '//Only send sponsor pixels once per page load
-        if m.sentSponsorPixels[containerId] <> true
-          m.sentSponsorPixels[containerId] = true '//set to true when the sponsor image has been seen at least once per page load. This AA will be reset when the homescreen is no longer visible
-          sendSponsorPixels(sponsorPixels)
-        end if
-      else
-        '//reset videoSponsorExposureId when there is no sponsor for the row
-        m.videoSponsorExposureId = ""
+      containerId = rowFocused.id 
+      m.videoSponsorExposureId = rowFocused.sponsorExp
+      sponsorPixels = rowFocused.sponsorImages.pixels["homescreen"]
+      '//Only send sponsor pixels once per page load
+      if m.sentSponsorPixels[containerId] <> true
+        m.sentSponsorPixels[containerId] = true '//set to true when the sponsor image has been seen at least once per page load. This AA will be reset when the homescreen is no longer visible
+        sendSponsorPixels(sponsorPixels)
       end if
     end if
   end if
