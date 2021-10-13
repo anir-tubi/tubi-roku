@@ -1,9 +1,6 @@
 Function init()
   m.Background = m.top.findNode("Background")
   m.Title = m.top.findNode("Title")
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.Title.translation = [0,237]
-  end if
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("width", "onWidthChange")
 End Function

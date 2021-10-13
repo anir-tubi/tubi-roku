@@ -30,7 +30,7 @@
 
         <ScrollableText
           id="Text"
-          height="717"
+          height="615"
           width="1034"
           translation="[0,130]"
           scrollbarThumbBitmapUri="pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png">

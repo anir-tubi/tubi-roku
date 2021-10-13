@@ -178,7 +178,7 @@
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"
-      translation="[85,496]"/>
+      translation="[90,528]"/>
       
     <Spinner
       id="DetailSpinner"
@@ -193,14 +193,14 @@
       <InfoPanel
         id="DetailInfoPanel"
         mode="item"
-        translation="[168,133]"
+        translation="[192,133]"
         maxHeight="433"
         maxTitleLines="2"
         visible="true" />
 
       <FilledButtonMarkupGrid
         id="Menu"
-        translation="[143,656]"
+        translation="[167,642]"
         itemSize="[465,80]"
         itemComponentName="DetailMenuItem"
         itemSpacing="[0,8]"
@@ -212,7 +212,7 @@
         id="RelatedContentParentGroup">
         <Group
           id="RelatedContentGroup"
-          translation="[168,945]"
+          translation="[192,921]"
           visible="false"
           opacity="0.2">
           <CategoryGridRowLabel
@@ -225,9 +225,9 @@
           <PosterGrid
             id="RelatedGrid"
             loadingBitmapUri="pkg:/images/placeholder.jpg"
-            itemSize="[1920,282]"
+            itemSize="[1920,267]"
             numRows="1"
-            basePosterSize="[198,282]"
+            basePosterSize="[186,267]"
             itemSpacing="[12,12]"
             fadeFocusFeedbackWhenAutoScrolling="true"
             horizFocusAnimationStyle="fixedFocus"
@@ -239,7 +239,7 @@
             wrap="false"
             maxLines="1"
             color="0xFFFFFFFF"
-            translation="[0,386]">
+            translation="[0,366]">
             <Font
               role="font"
               uri="pkg:/fonts/Vaud-Medium.ttf"

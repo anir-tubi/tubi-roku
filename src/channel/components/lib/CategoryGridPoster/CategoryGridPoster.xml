@@ -26,7 +26,7 @@
     <LayoutGroup
       id="posterLayout"
       layoutDirection="vert"
-      itemSpacings="[14]">
+      itemSpacings="[6]">
       <Poster
         id="Poster"
         loadingBitmapUri="pkg:/images/placeholder.jpg">
@@ -39,15 +39,15 @@
       <Label
         id="Title"
         color="0xFFFFFFFF"
-        width="410"
-        height="35"
-        vertAlign="top"
+        width="380"
+        height="36"
+        vertAlign="center"
         visible="false">
         <Font
           id="titleFont"
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="27" />
+          size="24" />
       </Label>
     </LayoutGroup>
   </children>

@@ -16,13 +16,6 @@ Function init()
     utility: "utility"
     historySignedOutUser: "continue_watching_signed_out_user"
   }
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.title.width = 380
-    m.title.height = 36
-    m.title.vertAlign = "center"
-    m.title.findNode("titleFont").size = 24
-    m.top.findNode("posterLayout").itemSpacings = [6]
-  end if 
 End Function
 
 

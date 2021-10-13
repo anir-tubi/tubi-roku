@@ -4,9 +4,6 @@ Function init()
   m.ContentGroup = m.top.findNode("ContentGroup")
   m.Spinner = m.top.findNode("Spinner")
   m.Text = m.top.findNode("Text")
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.Text.height = 615
-  end if
   m.theme = m.global.theme
 
   m.Text.scrollbarTrackBitmapUri = "pkg:/does-not-exist.png" ' Setting this to an empty string or invalid will cause

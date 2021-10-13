@@ -110,7 +110,7 @@
         vertAlignment="custom"
         opacity="0.5"
         itemSpacings="[9]"
-        translation="[168,55]">
+        translation="[192,60]">
         <Poster
           uri="pkg:/images/back.png"
           width="29"
@@ -130,10 +130,10 @@
 
     <MarkupGrid
       id="ChannelCategoryGrid"
-      translation="[168,208]"
+      translation="[192,208]"
       itemComponentName="ChannelCategoryGridPoster"
-      itemSize="[407,230]" 
-      itemSpacing="[12,30]"
+      itemSize="[384,216]" 
+      itemSpacing="[30,30]"
       numRows="4"   
       numColumns="4"
       fadeFocusFeedbackWhenAutoScrolling="true"

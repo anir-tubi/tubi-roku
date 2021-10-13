@@ -15,14 +15,6 @@ Function init()
   m.HintGroup = m.top.findNode("UpHintGroup")
   fades = m.top.findNode("Fades")
   m.HintGroupFade = fades.findNode("HintGroupFade")
-
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.NavSection.findNode("ScreenNavigationHint").translation = [192,60]
-    m.TopNav.translation = [192,48]
-    m.InfoPanel.translation = [192,168]
-    m.InfoPanel.maxHeight = 354
-    m.ContentArea.translation = [192,561]
-  end if
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
@@ -81,28 +73,16 @@ Function init()
   m.contentAreaSlideAnimation = invalid
   m.infoPanelFadeAnimation = invalid
 
-
   m.utilityMaskOffsetDiff = -100 'the diff in the amount the content area mask is offset in the up direction for utility
   
 
   ' Video in the grid constants
-  m.vitgSlideAmt = 440 'the amount the grid slides up to fit the vitg content item
-  m.vitgMaskOffsetDiff = 466 'the diff in the amount the content area mask is offset in the up direction for vitg
+  m.vitgSlideAmt = 326 'the amount the grid slides up to fit the vitg content item
+  m.vitgMaskOffsetDiff = 352 'the diff in the amount the content area mask is offset in the up direction for vitg
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
   m.sponsorMaskOffsetDiff = 29 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
-  m.landscapeSlideAmt = 0
-  m.landscapeMaskOffsetDiff = 0
-  m.linearSlideAmt = -86 'the amount the grid slides up to fit the linear content item
-  m.linearMaskOffsetDiff = -70 'the diff in the amount the content area mask is offset in the up direction for the linear news container
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.vitgSlideAmt = 326
-    m.vitgMaskOffsetDiff = 352
-    m.landscapeSlideAmt = -9
-    m.landscapeMaskOffsetDiff = -4
-    m.linearSlideAmt = -115 
-    m.linearMaskOffsetDiff = -99
-    m.landscapeAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.landscapeSlideAmt]
-  end if
+  m.linearSlideAmt = -115 'the amount the grid slides up to fit the linear content item
+  m.linearMaskOffsetDiff = -99 'the diff in the amount the content area mask is offset in the up direction for the linear news container
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
   m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt] 
@@ -396,9 +376,6 @@ Function onCurrFocusRowChange()
     else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
       ' update contentArea translation, only when linear gain focus
       expandContentAreaForLinear(rowPercent)
-    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.landscape 
-      ' update contentArea translation, only when Landscape gain focus
-      expandContentAreaForLandscape(rowPercent)
     else
       ' In the case of fast scrolling many rows of the grid, across the large vitg or linear rows, the category grid list may
       ' not finish it's translation animation as the focus leaves the vitg or linear rows. We correct for that as the focus scolls
@@ -484,12 +461,6 @@ End Function
 Function expandContentAreaForLinear(rowPercent)
   m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.linearSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.linearMaskOffsetDiff * rowPercent)]
-End Function
-
-
-Function expandContentAreaForLandscape(rowPercent)
-  m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.landscapeSlideAmt * rowPercent)]
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.landscapeMaskOffsetDiff * rowPercent)]
 End Function
 
 Function populateInfoPanelByContent(focusedContent)
@@ -656,11 +627,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.titleLogoUri = contentNode.logoUri
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        m.InfoPanel.width = 960
-      else
-        m.InfoPanel.width = 1140
-      end if
+      m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.vitg
       m.InfoPanel.mode = mode
     else if mode = m.constants.ui.infoPanelModes.item
@@ -685,29 +652,17 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.lineOneData = lineOneData
       m.InfoPanel.titleLogoUri = contentNode.titleLogoUri
       m.InfoPanel.genres = contentNode.genres
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        m.InfoPanel.width = 960
-      else 
-        m.InfoPanel.width = 1140
-      end if
+      m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.utility
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        m.InfoPanel.width = 960
-      else
-        m.InfoPanel.width = 1140
-      end if
+      m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.continue_watching
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        m.InfoPanel.width = 960
-      else
-        m.InfoPanel.width = 1140
-      end if
+      m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.linear
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title

@@ -15,17 +15,9 @@ Function init()
 
   m.Keyboard.keyGrid.keyDefinitionUri = "pkg:/components/data/CustomAddressKDF.json"
   m.keyboard.textEditBox.visible = false
-  m.keyboard.translation = [162, 148]
+  m.keyboard.translation = [192, 148]
   m.SearchText = m.top.findNode("SearchText")
   m.ResultGrid = m.top.findNode("ResultGrid")
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.keyboard.translation = [192, 148]
-    m.NavSection.findNode("ScreenNavigationHint").translation = [192,60]
-    m.top.findNode("content").translation = [172,158]
-    m.top.findNode("content").itemSpacings = [96]
-    m.ResultGrid.basePosterSize = [m.constants.ui.safezoneImageSizes.poster[0], m.constants.ui.safezoneImageSizes.poster[1]]
-    m.top.findNode("ResultArea").translation = [843, 240]
-  end if
   m.keyboardPalette = createObject("roSGNode", "RSGPalette")
   m.keyboard.observeField("text", "onKeyboardTextChanged")
   m.keyboard.textEditBox.observeField("focusedChild", "onTextEditBoxFocused")

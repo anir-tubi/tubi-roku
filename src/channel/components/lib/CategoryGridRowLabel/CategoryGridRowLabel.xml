@@ -32,7 +32,7 @@
       id="CategoryName"
       height="36"
       width="1000"
-      translation="[0,5]"
+      vertAlign="center"
       color="0xFFFFFFFF"
       opacity="1.0">
       <Font
@@ -71,7 +71,7 @@
       id="CategoryCount"
       layoutDirection="horiz"
       horizAlignment="right"
-      translation="[1668,0]">
+      translation="[1572,12]">
       <Label
         id="FocusIndex"
         text=""

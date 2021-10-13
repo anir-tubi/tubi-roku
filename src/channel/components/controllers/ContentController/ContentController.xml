@@ -156,13 +156,13 @@
             width="103"
             uri="pkg:/images/logo-white-large.png"
             opacity="0.5"
-            translation="[1732,60]"/>
+            translation="[1719,60]"/>
           <Poster
             id="tubiKidsLogo"
             height="45"
             width="209"
             uri="pkg:/images/locale/en_US/logo-kids-white-large.png"
-            translation="[1626,60]"
+            translation="[1614,60]"
             opacity="1.0"
             visible="false"/>
           <Poster
@@ -170,7 +170,7 @@
             height="78"
             width="322"
             uri="pkg:/images/logo-espanol-white-large.png"
-            translation="[1512,42]"
+            translation="[1503,60]"
             opacity="1.0"
             visible="false"/>
         </Group>

@@ -22,13 +22,6 @@ Function init()
     m.global.observeField("theme", "onThemeChange")
   end if
 
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    '//::TODO:: if this experiment is a success, please place this and other code like it in the XML rather than in the BRS - when possible.
-    m.CategoryName.vertAlign = "center"
-    m.CategoryName.translation = [0,0]
-    m.CategoryCount.translation = [1572,12]
-  end if
-
   m.originalTranslation_CategoryName = m.CategoryName.translation
   m.originalTranslation_CategoryCount = m.CategoryCount.translation
 End Function
@@ -65,9 +58,7 @@ Function onContentChange()
     m.CategoryCount.translation = m.originalTranslation_CategoryCount
 
     if m.top.content.type = "channel"
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        m.CategoryCount.translation = [1630,12]
-      end if
+      m.CategoryCount.translation = [1630,12]
     end if
 
     '//Display Sponsor if there is a sponsor

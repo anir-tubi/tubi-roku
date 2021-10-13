@@ -50,7 +50,7 @@
         vertAlignment="custom"
         opacity="0.5"
         itemSpacings="[9]"
-        translation="[168,55]">
+        translation="[192,60]">
         <Poster
           uri="pkg:/images/back.png"
           width="29"
@@ -69,11 +69,11 @@
     </Group>
     <LayoutGroup
         id="content"
-        translation="[148,158]"
+        translation="[172,158]"
         layoutDirection="horiz"
         vertAlignment="top"
         horizAlignment="left"
-        itemSpacings="[67]">
+        itemSpacings="[96]">
       <LayoutGroup
           id="leftSide"
           layoutDirection="vert"
@@ -147,7 +147,7 @@
     <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus, 
     the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
     <Group
-      translation="[798, 244]"
+      translation="[843, 240]"
       id="ResultArea">
       <MarkupGrid
         id="ResultGrid"

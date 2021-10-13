@@ -10,10 +10,6 @@ Function init()
   m.top.observeField("repopulateContent", "onRepopulateContent")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
   m.RowList = m.top.findNode("RowList")
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.RowList.itemSpacing = [0,36]
-    m.RowList.rowSpacings = [36]
-  end if
   m.RowList.observeField("rowItemFocused", "onRowItemFocused")
   m.RowList.observeField("rowItemSelected", "onRowItemSelected")
 
@@ -233,70 +229,37 @@ Function setRowHeights()
     rowHeight = 0
     rowHeightAdjustment = 0
     if category.gridItemType = m.constants.ui.gridItemTypes.utility
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        rowItemSize.push([304,79])
-        rowHeight = 108
-      else
-        rowItemSize.push([324,84])
-        rowHeight = 130
-      end if
+      rowItemSize.push([304,79])
+      rowHeight = 108
       showRowLabel.push(false)
     else if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        rowHeightAdjustment = 80
-        posterHeight = m.constants.ui.safezoneImageSizes.poster[1]
-      else
-        posterHeight = m.constants.ui.imageSizes.poster[1]
-        rowHeightAdjustment = 84
-      end if
+      rowHeightAdjustment = 80
+      posterHeight = m.constants.ui.imageSizes.poster[1]
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.portrait    
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        posterWidth = m.constants.ui.safezoneImageSizes.poster[0]
-        posterHeight = m.constants.ui.safezoneImageSizes.poster[1]
-        rowHeightAdjustment = 80
-      else
-        posterWidth = m.constants.ui.imageSizes.poster[0]
-        posterHeight = m.constants.ui.imageSizes.poster[1]
-        rowHeightAdjustment = 84
-      end if
+      posterWidth = m.constants.ui.imageSizes.poster[0]
+      posterHeight = m.constants.ui.imageSizes.poster[1]
+      rowHeightAdjustment = 80
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.linear
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        rowItemSize.push(m.constants.ui.safezoneImageSizes.linear)
-        rowHeight = 230
-      else
-        rowItemSize.push(m.constants.ui.imageSizes.linear)
-        rowHeight = 230
-      end if   
+      rowItemSize.push(m.constants.ui.imageSizes.linear)
+      rowHeight = 230  
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.landscape 
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        posterWidth = m.constants.ui.safezoneImageSizes.landscape[0]
-        posterHeight = m.constants.ui.safezoneImageSizes.landscape[1]
-        rowHeightAdjustment = 122
-      else
-        posterWidth = m.constants.ui.imageSizes.landscape[0]
-        posterHeight = m.constants.ui.imageSizes.landscape[1]
-        rowHeightAdjustment = 135
-      end if  
+      posterWidth = m.constants.ui.imageSizes.landscape[0]
+      posterHeight = m.constants.ui.imageSizes.landscape[1]
+      rowHeightAdjustment = 122
       rowItemSize.push([posterWidth,posterHeight])
       rowHeight = posterHeight
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.vitg_large   
-      if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-        rowHeightAdjustment = 122
-        posterWidth = m.constants.ui.safezoneImageSizes.largeVITG[0]
-        posterHeight = m.constants.ui.safezoneImageSizes.largeVITG[1]
-      else
-        posterWidth = m.constants.ui.imageSizes.largeVITG[0]
-        posterHeight = m.constants.ui.imageSizes.largeVITG[1]
-        rowHeightAdjustment = 105
-      end if
+      rowHeightAdjustment = 122
+      posterWidth = m.constants.ui.imageSizes.largeVITG[0]
+      posterHeight = m.constants.ui.imageSizes.largeVITG[1]
       rowItemSize.push([posterWidth,posterHeight])
       rowHeight = posterHeight
       showRowLabel.push(true)
@@ -311,11 +274,7 @@ Function setRowHeights()
   end for
 
   '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    itemSize = [1752,364]
-  else
-    itemSize = [1776,364]
-  end if
+  itemSize = [1752,364]
   m.Rowlist.update({
     "itemSize" : itemsize,
     "rowItemSize": rowItemSize,

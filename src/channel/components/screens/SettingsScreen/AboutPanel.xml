@@ -26,7 +26,7 @@
         <Label
           id="TextOne"
           height="353"
-          width="1034"
+          width="1026"
           wrap="true"
           translation="[0,120]">
           <Font
@@ -47,7 +47,7 @@
         <Label
           id="TextTwo"
           height="500"
-          width="1034"
+          width="1026"
           wrap="true"
           translation="[0,354]">
           <Font

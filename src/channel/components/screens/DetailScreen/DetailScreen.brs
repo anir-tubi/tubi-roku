@@ -77,16 +77,6 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
   m.top.isStackable = true
   m.top.handlesTransportVoiceRequests = true
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.top.findNode("leftChevron").translation = [90,528]
-    m.Info.translation = [192,133]
-    m.Menu.translation = [167,642]
-    m.RelatedContentGroup.translation = [192,921]
-    m.RelatedGrid.itemSize = [1920,m.constants.ui.safezoneImageSizes.poster[1]]
-    m.RelatedGrid.basePosterSize = m.constants.ui.safezoneImageSizes.poster
-    m.RelatedTitle.translation = [0,366]
-  end if
- 
 End Function
 
 

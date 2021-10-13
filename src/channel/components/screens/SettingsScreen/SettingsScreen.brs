@@ -25,12 +25,6 @@ Function init()
   ' This must happen after the pane is all set up so that the createNextPanelIndex
   ' event fires for the default menu selection
   m.PanelSet.appendChild(m.SettingsMenuPanel)
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    m.top.findNode("leftChevron").translation = [90,528]
-    m.PanelSet.translation = [160,414]
-    m.NavSection.findNode("ScreenNavigationHint").translation = [192,60]
-    m.Title.translation = [192,230]
-  end if
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("parentalSettingUpdated", "onSignInInfoChange")
   m.top.observeField("enabled", "onEnableChange")
@@ -232,10 +226,6 @@ Function CreateAboutPanel()
   aboutPanel.titleOne = getTranslation("screenSettings_about_title")
   aboutPanel.textOne = getTranslation("screenSettings_about_description")
   aboutPanel.titleTwo = getTranslation("screenSettings_about_title2")
-  if getExperimentResource("roku_safe_zone", "roku_safe_zone_restart_v2", false).enabled = true
-    aboutPanel.findNode("textOne").width = 1026
-    aboutPanel.findNode("titleTwo").width = 1026
-  end if
 
   sVersion = m.constants.settings.version.Replace("_", ".")
   sShortDeviceID = Right(m.constants.deviceInfo.deviceId, 7)

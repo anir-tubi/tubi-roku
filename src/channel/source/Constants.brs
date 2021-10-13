@@ -800,24 +800,18 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.signInScreen] = true
 
     constants.ui.imageSizes = {}
-      'This array is associated with experiment roku_safe_zone_restart_v2
-      'when we graduate this experiment, safezoneImageSizes should be renamed and take the place of imageSizes
-      constants.ui.safezoneImageSizes = {}
+      
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.poster = [198,282]
-      constants.ui.safezoneImageSizes.poster = [186,267]
+      constants.ui.imageSizes.poster = [186,267]
         
       'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.landscape= [408,231]
-      constants.ui.safezoneImageSizes.landscape = [384,216]
+      constants.ui.imageSizes.landscape= [384,216]
 
       'Sizes of landscape VITG that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.largeVITG = [1248,701]
-      constants.ui.safezoneImageSizes.largeVITG = [980, 552]
+      constants.ui.imageSizes.largeVITG = [980, 552]
 
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.linear = [408,138]
-      constants.ui.safezoneImageSizes.linear = [384,144]
+      constants.ui.imageSizes.linear = [384,144]
      
       'Sizes of the linear background and minmized linear video player
       constants.ui.imageSizes.linearVideoPlayer_minimizedDimension = [1263,710]

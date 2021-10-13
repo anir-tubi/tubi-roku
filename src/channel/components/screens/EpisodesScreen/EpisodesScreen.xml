@@ -32,7 +32,7 @@
   <children>
     <InfoPanel
       id="InfoPanel"
-      translation="[168,133]"
+      translation="[192,133]"
       maxHeight="511"
       mode="detail"
       visible="true" />
@@ -42,7 +42,7 @@
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"
-      translation="[85,496]"/>
+      translation="[90,528]"/>
       
     <CommunicatingMarkupGrid
       id="EpisodeMenu"
@@ -56,14 +56,14 @@
 
     <RowList
       id="RowList"
-      translation="[168,593]"
+      translation="[192,570]"
       itemComponentName="FeaturePosterWithProgress"
       rowTitleComponentName="CategoryGridRowLabel"
-      itemSize="[1835,346]"
+      itemSize="[1835,318]"
       itemSpacing="[0,28]"
       numRows="2"
       rowSpacings="[28]"
-      rowItemSize="[[408,231]]"
+      rowItemSize="[[384,216]]"
       rowItemSpacing="[[12,0]]"
       showRowLabel="[true]"
       showRowCounter="[false]"

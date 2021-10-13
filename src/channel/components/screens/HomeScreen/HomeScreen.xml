@@ -143,7 +143,7 @@
         vertAlignment="custom"
         opacity="0.5"
         itemSpacings="[9]"
-        translation="[168,55]">
+        translation="[192,60]">
         <Poster
           uri="pkg:/images/back.png"
           width="29"
@@ -163,14 +163,14 @@
 
     <TopNav id="topNav"
       visible="false"
-      translation="[168,48]"/>
+      translation="[192,48]"/>
 
     <Group
       id="InfoPanelParent">
       <InfoPanel
         id="InfoPanel"
-        translation="[168,133]"
-        maxHeight="355"
+        translation="[192,168]"
+        maxHeight="354"
         maxTitleLines="2"/>
     </Group>
 
@@ -179,7 +179,7 @@
       maskUri="pkg:/images/poster-mask.png"
       maskSize="[0,0]"
       maskOffset="[0,317]"
-      translation="[168,592]">
+      translation="[192,561]">
       <CategoryGridList
         id="CategoryGridList"/>
     </MaskGroup>
