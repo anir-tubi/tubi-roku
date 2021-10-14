@@ -356,7 +356,7 @@ Function onShow()
   if m.MovieGroup.visible
     drawCountdown(m.CountdownMovie, m.timeRemaining)
   else
-    getExperimentResource("roku_postplayexp_aptimer_5sec", "roku_postplayexp_aptimer_15sec")
+    getExperimentResource("roku_postplayexp_aptimer_5sec", "roku_postplayexp_aptimer_10sec")
     drawCountdown(m.CountdownSeries, m.timeRemaining)
   end if
 
