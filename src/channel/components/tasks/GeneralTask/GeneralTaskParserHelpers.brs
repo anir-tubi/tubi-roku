@@ -69,6 +69,12 @@ Function createParsingCallbacks()
     parseSuccess: parseChannelGuideFetchSuccess
     parseError: parseChannelGuideFetchError
   }
+
+  ' history
+  m.requestTypes[m.constants.reqNames.postUserHistory] = {
+    parseSuccess: parseHistorySuccess
+  }
+
 End Function
 
 

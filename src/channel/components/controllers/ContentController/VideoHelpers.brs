@@ -152,9 +152,6 @@ Function setupVideoPlayer(content, autoplayType = "none", position = 0)
     ' necessary in the case of deeplinks - only fires once per session
     fireAppLoadBeacon()
 
-    ' For position history tracking
-    m.updateHistoryTask.historyResult = invalid
-    m.updateHistoryTask.content = content
   end if
 
   return videoPlayer
@@ -172,16 +169,66 @@ Function onEpisodePosition()
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
   if videoPlayer <> invalid
     ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
-    history = m.global.historyIds.findNode(m.updateHistoryTask.content.id)
-    if history <> invalid or videoPlayer.historyPosition >= m.constants.player.historyFrequency
-      ' Only run a new task if the previous task is done.  Priority of resume states is
-      ' pretty low and we don't mind losing a few.
-      if m.updateHistoryTask.state <> "RUN"
-        m.updateHistoryTask.nowPos = videoPlayer.historyPosition
-        m.updateHistoryTask.control = "RUN"
-      end if
+    if videoPlayer.historyPosition >= m.constants.player.historyFrequency
+      videoContent = videoPlayer.content
+      nowPos = videoPlayer.historyPosition
+      updateHistory(videoContent, nowPos)
     end if
   end if
+End Function
+
+
+''''''''''''''''''''''
+' updateHistory
+'
+' triggers backend API to bookmark video position
+Function updateHistory(content, nowPos)
+
+  authInfo = m.global.authInfo 
+
+  if authInfo <> invalid and content["type"] = m.constants.ui.contentTypes.video
+
+    bKidsMode = shouldKidsModeBeSentToServer()
+    postUserHistory = m.Bookmarks.addHistoryReq(content, nowPos, bKidsMode)
+    m.makeRequest({
+      url: postUserHistory.url
+      requestType: m.constants.reqNames.postUserHistory
+      options: postUserHistory.options
+      successCallback: onHistorySuccess
+      responseType: "assocarray"
+      silenceCallbackWarnings: true
+    })
+
+  end if 
+
+End Function
+
+
+' onHistorySuccess
+'
+' triggers once the API responds for bookmark API 
+Function onHistorySuccess(parsedResponse)
+
+  historyResult = {}
+  if parsedResponse <> invalid and parsedResponse.id <> invalid
+    if parsedResponse.episodes <> invalid and type(parsedResponse.episodes) = "roArray" and parsedResponse.episodes.count() > 0
+      historyResult.historyId = parsedResponse.episodes[0].id
+      historyResult.parentHistoryId = parsedResponse.id
+    else
+      historyResult.historyId = parsedResponse.id
+    end if
+  end if
+
+End Function
+
+
+' updateHistoryLocally
+'
+' updates the history locally for signedIn user & guest user
+Function updateHistoryLocally(content as Object, position as Integer)
+
+  m.Bookmarks.addHistoryLocally(content, position, m.global)
+
 End Function
 
 
@@ -396,12 +443,10 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
         detailContent.currentEpisodeId = videoContent.id
         populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
         
-        ' For SignedIn user, updates resume point to backend and global variable
-        ' For Guest user, updated the resume point to global variable
-        if m.updateHistoryTask.state <> "RUN"
-          m.updateHistoryTask.nowPos = nResumePoint
-          m.updateHistoryTask.control = "RUN"
-        end if
+        ' For SignedIn/guest user, update resume point to global variable
+        updateHistoryLocally(videoContent, nResumePoint)
+        ' For SignedIn user, update resume point to backend
+        updateHistory(videoContent, nResumePoint)
 
         ' Repopulate the episodes screen if it is the screen under the video player screen in the call stack
         hiddenScreen = getHiddenScreen(1)
@@ -442,12 +487,10 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
         ' Returning to the detail screen for the same movie as was started, no autoplay
         ' Just repopulate the detail screen with the same content
         
-        ' For SignedIn user, updates resume point to backend and global variable
-        ' For Guest user, updated the resume point to global variable
-        if m.updateHistoryTask.state <> "RUN"
-          m.updateHistoryTask.nowPos = nResumePoint
-          m.updateHistoryTask.control = "RUN"
-        end if       
+        ' For SignedIn/guest user, update resume point to global variable
+        updateHistoryLocally(videoContent, nResumePoint)
+        ' For SignedIn user, update resume point to backend
+        updateHistory(videoContent, nResumePoint)
         
         populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
       end if
@@ -495,23 +538,6 @@ Function stopVideoContent(videoPlayer)
     m.handlingDeeplinkInputEvent = false
 
     videoPlayer.control = "stop"
-
-    historyId = invalid
-    parentHistoryId = invalid
-    if m.updateHistoryTask.historyResult <> invalid
-      historyId = m.updateHistoryTask.historyResult.historyId
-      parentHistoryId = m.updateHistoryTask.historyResult.parentHistoryId
-    end if
-
-    nowPos = round(videoPlayer.position)
-    tubiLog("stopVideoContent: nowPos = " + nowPos.toStr())
-    if historyId <> invalid and historyId <> "" then
-      tubiLog("stopVideoContent: historyId = " + historyId.toStr())
-    end if
-
-    if parentHistoryId <> invalid and parentHistoryId <> "" then
-      tubiLog("stopVideoContent: parentHistoryId = " + parentHistoryId.toStr())
-    end if
 
     ' reload history
     onHistoryQueueChange(m.constants.ui.categoryIds.history)

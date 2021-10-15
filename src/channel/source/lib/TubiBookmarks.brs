@@ -10,7 +10,7 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     'public methods
     addBookmarkReq: tubiBookmarks_addBookmarkReq
     removeBookmarkReq: tubiBookmarks_removeBookmarkReq
-    addHistoryReq: tubiBookmarks_addHistoryReq
+    addHistoryReq: tubiBookmarks_getAddHistoryRequestInfo
     addHistoryLocally: tubiBookmarks_addHistoryLocally
     removeHistoryReq: tubiBookmarks_removeHistoryReq
     removeHistoryLocally: tubiBookmarks_removeHistoryLocally
@@ -25,6 +25,22 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     'private methods
     createBookmarksRequest: tubiBookmarks_createBookmarksRequest_
     createHistoryRequest: tubiBookmarks_createHistoryRequest_
+    commonOptions: tubiBookmarks_commonOptions
+  }
+End Function
+
+
+' returns a set of common params within an options AA that are used by all UAPI endpoints
+Function tubiBookmarks_commonOptions()
+  uapiheader = {}
+  uapiheader.append(m.constants.headers.commonUapi)
+  return {
+    params: {
+      "app_id": m.constants.settings.shortAppName
+      "platform": m.constants.platform
+      "device_id": m.constants.deviceInfo.deviceId
+    }
+    headers: uapiheader
   }
 End Function
 
@@ -162,41 +178,55 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
 End Function
 
 
-'returns a request object that can be used to add a history to the server
-' @content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
-' @position: position where user left off of video
-' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-Function tubiBookmarks_addHistoryReq(content as Object, position as Integer, bKidsMode = false as Boolean) as Object
-  historyReq = invalid
+' @content: roSGNode, content of Video Player
+' @nowPos : integer, video position in seconds
+' @bKidsMode : boolean, kids mode can be true/false
+'
+' returns url & options for making API request
+'
+Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Integer, bKidsMode = false as Boolean) as Object
 
-  if content <> invalid
-    idToServe = content.id
-    parentId = content.parentId
+  authInfo = m.auth.getAuthInfo()
 
-    if content["type"] = m.constants.ui.contentTypes.video
-      contentType = m.constants.uapiContentTypes.movie
+  url = m.constants.urls.users.history
 
-      'set the parentId to an intenger or invalid as needed (expect to receive it as a string which is not compatible with API)
-      if type(parentId) = "string" or type(parentId) = "roString"
-        if parentId.len() = 0
-          parentId = invalid    'is ok if parentId is invalid (ie. for movies)
-        else
-          parentId = parentId.toInt()          
-          contentType = m.constants.uapiContentTypes.episode
-        end if
-      end if
+  body = {
+    content_id: content.id
+    position: nowPos
+    device_id: m.constants.deviceInfo.deviceId
+    user_id: authInfo.userid.toInt()
+  }  
 
+  contentType = m.constants.uapiContentTypes.movie
+  parentId = content.parentId
+
+  'set the parentId to an integer or invalid as needed (expect to receive it as a string which is not compatible with API)
+  if type(parentId) = "string" or type(parentId) = "roString"
+    if parentId.len() = 0
+      body.parent_id = invalid    'is ok if parentId is invalid (ie. for movies)
     else
-      ' can't have history for a series, only episodes and movies
-      return invalid
+      body.parent_id = parentId.toInt()          
+      contentType = m.constants.uapiContentTypes.episode
     end if
-
-    historyReq = m.createHistoryRequest(idToServe, parentId, position, "add", contentType, bKidsMode)
+  else if type(parentId) = "integer" or type(parentId) = "roInt"  
+    body.parent_id = parentId
+  else
+    body.parent_id = invalid  
   end if
 
-  return historyReq
-End Function
+  body.content_type = contentType
+  
+  options = m.commonOptions()
+  options.params["isKidsMode"] = bKidsMode
+  options["body"] = FormatJSON(body)
+  options["method"] = m.constants.reqTypes.post
 
+  return {
+    url: url
+    options: options
+  }
+
+End Function
 
 
 'returns a request object that can be used to remove a history from the server

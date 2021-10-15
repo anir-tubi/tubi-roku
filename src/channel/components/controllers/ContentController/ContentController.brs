@@ -121,10 +121,6 @@ Function init()
   m.authTask.functionName = "execInitializeUserData"
   m.authTask.control = "RUN"
 
-  ' history updates during video playback
-  m.updateHistoryTask = CreateObject("roSGNode", "AuthTask")
-  m.updateHistoryTask.functionName = "updateHistory"
-
   ' For queue and history management from detail screen
   m.userTask = CreateObject("roSGNode", "AuthTask")
 

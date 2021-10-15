@@ -222,6 +222,7 @@ Function getConstants()
     constants.reqNames.patchUserSettings = "patchUserSettings"
     constants.reqNames.sponsorPixel = "sponsorPixel"
     constants.reqNames.getChannelGuide = "getChannelGuide"
+    constants.reqNames.postUserHistory = "postUserHistory"
 
   constants.thirdParty = {}
     'Nielsen ID token for integrating with Nielsen DAR via RAF

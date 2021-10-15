@@ -214,46 +214,6 @@ Function removeFromHistory()
 End Function
 
 
-Function updateHistory()
-  tubiLog("AuthTask.updateHistory")
-  constants = m.global.constants
-  Request = TubiRequest(constants.settings)
-  Auth = TubiAuth(constants, Request)
-  NodeHelpers = TubiNodeHelpers()
-  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers)
-
-  if m.top.content <> invalid
-   'tubiLog("Adding content " + AnyToStringButNotInvalid(m.top.content.id) + " from history at position " + AnyToStringButNotInvalid(m.top.nowPos))
-    '//save the playback history locally before backend request to show progressbar on episode screen
-    Bookmarks.addHistoryLocally(m.top.content, m.top.nowPos, m.global)
-    if m.global.authInfo <> invalid
-      '//if the user is signed in, then save the playback history to the backend.
-      newHistoryReq = Bookmarks.addHistoryReq(m.top.content, m.top.nowPos, m.top.isKidsMode)
-      if newHistoryReq <> invalid
-        result = newHistoryReq.runSynchronous()  ' timeout default is 5 seconds
-        historyResult = {}
-
-        if result <> invalid then
-          parsedResp = parseJson(result)
-
-          'check if we have the response for a history API call
-          if parsedResp <> invalid and parsedResp.id <> invalid
-            if parsedResp.episodes <> invalid and type(parsedResp.episodes) = "roArray" and parsedResp.episodes.count() > 0
-              historyResult.historyId = parsedResp.episodes[0].id
-              historyResult.parentHistoryId = parsedResp.id
-            else
-              historyResult.historyId = parsedResp.id
-            end if
-          end if
-        end if
-        m.top.historyResult = historyResult  ' with result
-      end if
-    end if
-    tubiLog("EXIT AuthTask.updateHistory")
-  end if
-End Function
-
-
 Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false, getUserInfo=false)
   queuePort = CreateObject("roMessagePort")
   queue = TubiRequestQueue().create(queuePort)
