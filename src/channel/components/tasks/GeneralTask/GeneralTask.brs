@@ -50,30 +50,36 @@ End Function
 ' @authModule : AA, authModule is TubiAuth() Object
 Function makeApiRequest(requestNode, requestModule, authModule) as Boolean
   tubiLog("GeneralTask.makeApiRequest")
-  requestType = requestNode.input.requestType
-  url = requestNode.input.url
+  input = requestNode.input 'grab a local copy of inputs to prevent subsequent rendezvous's
 
-  options = requestNode.input.options
-  if options = invalid
-    options = {}
+  if input <> invalid
+    requestType = input.requestType
+    url = input.url
+
+    options = input.options
+    if options = invalid
+      options = {}
+    end if
+
+    ' m.auth.createAuthRequest() returns invalid if the user is not logged in
+    tubiReq = authModule.createAuthRequest(url, requestType, options)
+    if tubiReq = invalid
+      tubiReq = requestModule.createAsync(url, requestType, options)
+    end if
+    reqSent = tubiReq.start(m.port)
+
+    urlTransfer = tubiReq.urlTransfer
+
+    if urlTransfer <> invalid and reqSent = true
+      id = stri(urlTransfer.getIdentity()).trim()
+      m.jobStore[id] = {"requestNode" : requestNode, "tubiReq" : tubiReq}
+    end if
+
+    return true
+  else
+    return false
   end if
-  
-  ' m.auth.createAuthRequest() returns invalid if the user is not logged in
-  tubiReq = authModule.createAuthRequest(url, requestType, options)
-  if tubiReq = invalid
-    tubiReq = requestModule.createAsync(url, requestType, options)
-  end if
-  reqSent = tubiReq.start(m.port)
-  
-  urlTransfer = tubiReq.urlTransfer
-  
-  if urlTransfer <> invalid and reqSent = true
-    id = stri(urlTransfer.getIdentity()).trim()
-    m.jobStore[id] = {"requestNode" : requestNode, "tubiReq" : tubiReq}
-  end if
-  
-  return true
-  
+
 End Function
 
 

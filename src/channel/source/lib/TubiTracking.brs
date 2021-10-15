@@ -901,19 +901,22 @@ End Function
 
 Function tubiTracking_getSideNavPageMap(constants)
   map = {}
-  map[constants.ui.sideNavIds.home] = "HOME"
-  map[constants.ui.sideNavIds.channels] = "CHANNEL"
-  map[constants.ui.sideNavIds.categories] = "CATEGORIES"
-  map[constants.ui.sideNavIds.movies] = "MOVIES"
-  map[constants.ui.sideNavIds.linearTV] = "NEWS"
-  map[constants.ui.sideNavIds.tv] = "SERIES"
-  map[constants.ui.sideNavIds.espanol] = "ESPANOL"
-  map[constants.ui.sideNavIds.mylist] = "QUEUE"
-  map[constants.ui.sideNavIds.settings] = "SETTINGS"
-  map[constants.ui.sideNavIds.search] = "SEARCH"
-  map[constants.ui.sideNavIds.exit] = "EXIT"
-  map[constants.ui.sideNavIds.kidsMode] = "KIDS"
-  map[constants.ui.sideNavIds.profile] = "ACCOUNT"
+  if constants <> invalid and constants.ui <> invalid and constants.ui.sideNavIds <> invalid
+    sideNavIds = constants.ui.sideNavIds
+    if sideNavIds.home <> invalid then map[sideNavIds.home] = "HOME"
+    if sideNavIds.channels <> invalid then map[sideNavIds.channels] = "CHANNEL"
+    if sideNavIds.categories <> invalid then map[sideNavIds.categories] = "CATEGORIES"
+    if sideNavIds.movies <> invalid then map[sideNavIds.movies] = "MOVIES"
+    if sideNavIds.linearTV <> invalid then map[sideNavIds.linearTV] = "NEWS"
+    if sideNavIds.tv <> invalid then map[sideNavIds.tv] = "SERIES"
+    if sideNavIds.espanol <> invalid then map[sideNavIds.espanol] = "ESPANOL"
+    if sideNavIds.mylist <> invalid then map[sideNavIds.mylist] = "QUEUE"
+    if sideNavIds.settings <> invalid then map[sideNavIds.settings] = "SETTINGS"
+    if sideNavIds.search <> invalid then map[sideNavIds.search] = "SEARCH"
+    if sideNavIds.exit <> invalid then map[sideNavIds.exit] = "EXIT"
+    if sideNavIds.kidsMode <> invalid then map[sideNavIds.kidsMode] = "KIDS"
+    if sideNavIds.profile <> invalid then map[sideNavIds.profile] = "ACCOUNT"
+  end if
   return map
 End Function
 

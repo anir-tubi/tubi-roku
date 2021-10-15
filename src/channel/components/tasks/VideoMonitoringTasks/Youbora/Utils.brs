@@ -11,8 +11,10 @@ function currentMillis() as LongInteger
 end function
 
 sub YouboraLog(message as String)
-
-	if m.global.YouboraLogActive = true
+    if m.YouboraLogActive = invalid
+        m.YouboraLogActive = m.global.YouboraLogActive
+    end if
+	if m.YouboraLogActive = true
 		print message
 	endif
 end sub

@@ -1435,7 +1435,6 @@ Function onStreamingSegmentChange(msg)
   if streamingSegment <> invalid and streamingSegment.segBitrateBps <> invalid and (streamingSegment.segType = invalid or streamingSegment.segType = 2 or streamingSegment.segType = 0) then
     m.top.segInfo = streamingSegment
   end if
-
 End Function
 
 

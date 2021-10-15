@@ -6,7 +6,8 @@
 Function getExperimentResource(namespaceName as string, experimentName as string, sendEvent=true as Boolean)
   oMoreInfoReturn = invalid
   
-  if m.global <> invalid and m.global.trackingLoggingTask <> invalid
+  localGlobal = m.global
+  if localGlobal <> invalid and localGlobal.trackingLoggingTask <> invalid
     '//if you cannot track task, then do not proceed
     if m.constants = invalid
       m.constants = m.global.constants
@@ -31,13 +32,14 @@ Function sendOutExperimentTracking(namespaceName as string, experimentName as st
     m.global.exposedExperimentParameters = {}
   end if
 
-  if m.global <> invalid and m.global.trackingLoggingTask <> invalid
+  localGlobal = m.global
+  if localGlobal <> invalid and localGlobal.trackingLoggingTask <> invalid
     experimentTracking = experiments.getExperimentTracking(namespaceName, experimentName)
-    if experimentTracking <> invalid and m.global.exposedExperimentParameters[experimentName] <> true
-      m.global.trackingLoggingTask.trackEvent = experimentTracking
+    if experimentTracking <> invalid and localGlobal.exposedExperimentParameters[experimentName] <> true
+      localGlobal.trackingLoggingTask.trackEvent = experimentTracking
 
       'set the parameter on the global store
-      exposedExperimentParameters = m.global.exposedExperimentParameters
+      exposedExperimentParameters = localGlobal.exposedExperimentParameters
       exposedExperimentParameters[experimentName] = true
       m.global.exposedExperimentParameters = exposedExperimentParameters
     end if

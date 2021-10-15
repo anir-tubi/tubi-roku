@@ -134,10 +134,6 @@ Function init()
   ' indicates if we are in the process of handling an input event deeplink.
   m.handlingDeeplinkInputEvent = false
 
-  m.inactivityTimer = m.top.findNode("InactivityTimer")
-  m.inactivityTimer.observeFieldScoped("fire", "onInactivityTimer")
-  m.inactivityTimer.control = "start"
-
   ' Set to the category id when content is launched from category screen,
   ' or set to invalid elsewhere
   m.autoplayContext = invalid
@@ -436,13 +432,6 @@ Function onVideoPlayerVisibleChange(msg)
     m.SideNav.visible = true
     m.logoGroup.visible = true
   end if 
-End Function
-
-
-
-Function onInactivityTimer()
-  ' don't do anything in this function for now
-  ' but leave inactivity timer functionality in case it's needed in the future.
 End Function
 
 
@@ -1006,6 +995,10 @@ Function sendSponsorPixels(aPixelURLs)
 End Function
 
 
+' setUIModeFromState should only be used when we don't know what the uiMode should be.
+' Typically this should only be when a signed in user has opened the app (don't know if they
+' should be in age gated kids mode or parental controls kids mode) or when a user completes the
+' sign in process (don't know if the user should be in parental control kids mode).
 Function setUiModeFromState()
   tubiLog("ContentController.setUiModeFromState")
   if shouldShowAgeGate() = true and m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.hasAge = false
@@ -1367,7 +1360,6 @@ Function isCurrentScreenHomeScreen()
 End Function
 
 
-
 Function setHomeScreenBackground(homeScreen)
   if homeScreen <> invalid and isCurrentScreenHomeScreen() = true
     contentType = invalid
@@ -1380,7 +1372,6 @@ Function setHomeScreenBackground(homeScreen)
     }
   end if
 End Function
-
 
 
 Function onSponsorshipBackgroundChanged(msg)

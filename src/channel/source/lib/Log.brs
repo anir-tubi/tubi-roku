@@ -176,12 +176,11 @@ end function
 function tubiLog_sendLogging_(logInfo as Object, queue as Object)
   if logInfo <> invalid and logInfo.count() > 0
     if logInfo.message <> "" and m.constants <> invalid
+
       ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
-     ' if m.constants.settings.consoleLoggingEnabled = true 
 #if consoleLoggingEnabled
         print m.getLogPrintout(logInfo.level, logInfo.subtype, logInfo.message)
 #end if
-     ' end if
 
       if logInfo["type"] <> invalid and logInfo.level <> "" and logInfo.subtype <> "" and queue <> invalid
         'don't send debug or info statements unless the user id is in m.constants.idsToLog
@@ -284,6 +283,7 @@ Function tubiLog_helper(logType, message="" as Dynamic, level="debug" as String,
 #if consoleLoggingEnabled 
       print tubiLog_getLogPrintout_(level, subtype, message)
 #end if
+
     ' if serverTypeName is non empty , involve the tracker task which will send log if
     ' deviceId exists in constants.idsToLog
     if serverTypeName <> "" and m.global <> invalid and m.global.trackingLoggingTask <> invalid

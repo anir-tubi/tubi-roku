@@ -183,11 +183,6 @@
       <TrackingLoggingTask
         id="TrackingLoggingTask"/>
 
-      <Timer
-       id="InactivityTimer"
-       duration="10"
-       repeat="true"/>
-
       <!-- The timer that is used to countdown when the minimized player goes fullscreen -->
       <Timer
        id="PlayerFullscreenCountdownTimer"

@@ -5,13 +5,14 @@ End Function
 
 Function getExperiments()
   port = CreateObject("roMessagePort")
-  request = TubiRequest(m.top.constants.settings)
-  externalConfig = TubiExternalConfig(request, m.top.constants)
-  experiments = TubiExperiments(m.top.constants)
+  constants = m.top.constants
+  request = TubiRequest(constants.settings)
+  externalConfig = TubiExternalConfig(request, constants)
+  experiments = TubiExperiments(constants)
 
   experimentsReq = experiments.getNamespaceRequest(request)
   experimentsReq.start(port)
-  externalConfigReq = externalConfig.getConfigsRequest(request, m.top.constants)
+  externalConfigReq = externalConfig.getConfigsRequest(request, constants)
   externalConfigReq.start(port)
 
   while true

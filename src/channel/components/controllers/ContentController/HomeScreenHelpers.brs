@@ -579,6 +579,7 @@ Function goToFirstTopNavOptionFromAnotherTopNavOption()
   end if
 End Function
 
+
 ' When the top nav gains or loses focus, then send analytics
 Function onHomeScreeenTopNavFocused(msg)  
   bTopNavFocused = msg.getData()
