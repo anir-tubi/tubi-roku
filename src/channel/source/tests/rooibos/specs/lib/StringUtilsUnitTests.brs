@@ -213,3 +213,24 @@ Function stringUtils_convertFunctionToString_test()
   m.assertEqual(functionStr, "")  
   
 End Function
+
+
+'@Test isNonEmptyString unit tests
+Function stringUtils_isNonEmptyString_test()
+  testValue1 = 12 'test a simple non string
+  isString1 = isNonEmptyString(testValue1)
+
+  testValue2 = {} 'test an object non string
+  isString2 = isNonEmptyString(testValue2)
+
+  testValue3 = "" 'test an empty string
+  isString3 = isNonEmptyString(testValue3)
+
+  testValue4 = "someString" 'test a non empty string
+  isString4 = isNonEmptyString(testValue4)
+
+  m.assertFalse(isString1)
+  m.assertFalse(isString2)
+  m.assertFalse(isString3)
+  m.assertTrue(isString4)
+End Function

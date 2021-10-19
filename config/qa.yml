@@ -2,18 +2,29 @@ settings:
   # Settings are added to constants.settings via getSettings
   # Any constants that need to be templatized should be added via settings
   mode: "qa"
-  suitest: false  #setting to true will result in suitest being loaded
-  suitestjs: false #setting to true will use analytics proxy server and display category slugs and content id in UI
   noAds: false  #setting to true will prevent ads from being requested from rainmaker
   stagingApis: false  #setting to true will use UAPI staging APIs (matrix, cms, user_device)
-  automaticActivation: false  #setting to true will activate/signup the app automatically (if the values of suitest & stagingApis are true)
   remoteComponentsExtension: "zip" #prevents packages being built for qa builds, as they are not used - makes for faster builds
   skipAgeGate: false #setting to true will prevent the COPPA age gate screen from appearing
+
+  #setting to true will result in suitest being loaded
+  suitest: true
+
+  #setting to true will use analytics proxy server and display category slugs and content id in UI
+  suitestjs: false
+
+  # setting to true will activate/signup the app automatically with a generated email and username
+  # (if the values of suitest & stagingApis are also true)
+  automaticActivation: true
 
   #number of seconds that age information will be stored on the device.
   #Set to 0 to see age gate every time the app is opened.
   #Also controls instant resume timeout for signed out users
   coppaHasAgeDuration: 60
+
+  # email/password values will be used to automatically sign a user in when "sign in" is selected
+  email: ""
+  password: ""
 
   #To enable the Charles Proxy, set CharlesProxyEnabled true 
   charlesProxyUrl: "http://{{localHostAddress}}:8888"

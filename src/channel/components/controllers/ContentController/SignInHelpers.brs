@@ -26,25 +26,39 @@ End Function
 ' showRFIScreen is used to display the Request For Information modal
 Function showRFIScreen()
   tubiLog("SignInHelpers.showRFIScreen")
-  currentScreen = getCurrentScreen()
-  
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "REGISTRATION"
-      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: "email-prefill"
-    }
-  }
-  m.trackingLoggingTask.trackEvent = dialogEvent
 
-  ' RFI screen is showing only if the channelStore node is stored in m variable
-  m.billing = CreateObject("roSGNode", "ChannelStore")
-  m.billing.observeFieldScoped("userData", "onUserData")
-  m.billing.requestedUserData = "email, firstName, lastName"
-  m.billing.command = "getUserData"
-  
+  suitest = m.constants.settings.suitest
+  automaticActivation = m.constants.settings.automaticActivation
+  stagingApis = m.constants.settings.stagingApis
+  settingsEmail = m.constants.settings.email
+  settingsPassword = m.constants.settings.password
+  mode = m.constants.settings.mode
+
+  if mode <> "production" and isNonEmptyString(settingsEmail) = true and isNonEmptyString(settingsPassword) = true
+    signUserIn(settingsEmail, settingsPassword)
+  else if mode <> "production" and suitest = true and automaticActivation = true and stagingApis = true
+    signUserUpForQAAutomation()
+  else
+    ' This is the path expected to be taken in production
+    currentScreen = getCurrentScreen()
+
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "REGISTRATION"
+        pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "email-prefill"
+      }
+    }
+    m.trackingLoggingTask.trackEvent = dialogEvent
+
+    ' RFI screen is showing only if the channelStore node is stored in m variable
+    m.billing = CreateObject("roSGNode", "ChannelStore")
+    m.billing.observeFieldScoped("userData", "onUserData")
+    m.billing.requestedUserData = "email, firstName, lastName"
+    m.billing.command = "getUserData"
+  end if
 End Function
 
 
@@ -313,17 +327,23 @@ End Function
 ' onSignInSelected callback is triggered when user selects continue button on SignIn Screen
 ' @evt : roSGNodeEvent, it contains password
 Function onSignInSelected(evt)
-
+  tubiLog("SignInHelpers.onSignInSelected")
   signInSelected = evt.getData()
-  
+  email = signInSelected.email
+  password = signInSelected.password
+  signUserIn(email, password)
+End Function
+
+
+Function signUserIn(email, password)
   options = {}
   options.body = {
     platform: m.constants.platform  
     device_id: m.constants.deviceInfo.deviceId
     type: "email"
     credentials: {
-      email: signInSelected.email
-      password: signInSelected.password
+      email: email
+      password: password
     }
   }
   
@@ -335,10 +355,9 @@ Function onSignInSelected(evt)
     successCallback: onSignInResponse
     errorCallback: onSignInError
     responseType: "assocarray"
-    email: signInSelected.email
-    emailType : signInSelected.password
+    email: email
+    emailType : password
   })  
-
 End Function
 
 
@@ -741,4 +760,19 @@ Function popScreenAfterSignInProcess()
   currentScreen = getCurrentScreen()
 
   return currentScreen
+End Function
+
+
+Function signUserUpForQAAutomation()
+  m.authInfoReceived = false
+  dateTime = CreateObject("roDateTime")
+  secondsFromEpoch = dateTime.AsSeconds()
+
+  signInInfo = {
+    email: "build_roku_" + secondsFromEpoch.ToStr() + "@tubi.tv"
+    emailType: "manual"
+    firstName:  "Automation"
+  }
+  birthdate = "2000-01-01"
+  verifyAgeAtSignup(signInInfo, birthdate)
 End Function

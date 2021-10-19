@@ -225,3 +225,12 @@ Function convertFunctionToString(func)
   return functionStr
 
 End Function
+
+
+' @str: string, the value to be checked for being a string and not being an empty string
+Function isNonEmptyString(str)
+  if isString(str) and str <> ""
+    return true
+  end if
+  return false
+End Function
