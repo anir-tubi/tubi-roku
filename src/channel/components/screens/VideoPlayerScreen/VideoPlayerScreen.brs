@@ -708,9 +708,10 @@ Function onVideoPositionChange()
       m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
  
       ' attempt to fetch midroll ads before actual cuepoint
-      isCuepointPrefetchTimeReached = m.midrolls[strI(m.playerPosition + m.adPrefetchTime)]
+      potentialCuepoint = m.playerPosition + m.adPrefetchTime
+      isCuepointPrefetchTimeReached = m.midrolls[strI(potentialCuepoint)]
       if isCuepointPrefetchTimeReached = true and m.UpNext.opacity = 0
-        m.top.adPosition = cuepoint
+        m.top.adPosition = potentialCuepoint
         m.top.adControl = "midroll"
       end if
 
