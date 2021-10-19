@@ -58,7 +58,7 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
 
 8\. Set the developer id on your Roku device. (You will need to get a pkg, password, and developer id from the shared secret "Roku Rekey Info" in LastPass).
 
-* Navigate to the Roku device's IP in your broswer; select Utilities. Take note of the IP address for step #6 when you will set the "ROKU_DEV_TARGET".
+* Navigate to the Roku device's IP in your browser; select Utilities. Take note of the IP address for step #6 when you will set the "ROKU_DEV_TARGET".
 * Upload the pkg file and enter the password and select `Rekey`. (This password will be used in step #6 to set "PKG_PASSWORD").
 * Check that you have the proper developer ID by navigating in your web browser to the Roku device's IP and then select Packager.
 
@@ -131,13 +131,13 @@ To run unit tests, run the following command:
 # Submission Release
 Submission releases are releases that are sent to Roku.
 
-1\. Set up the environment variables (listed in the [build step](#build)) as some of the following steps are dependant on these variables.
+1\. Set up the environment variables (listed in the [build step](#build)) as some of the following steps are dependent on these variables.
 
 2\. Run unit tests locally
 
 `$ gulp test`
 
-Note: If you are adding a new unit test, then you can test only this new unit test. You do this by temporarily adding the "@Only" comment right before a specific unit test before running the above command. 
+Note: If you are adding a new unit test, then you can test only this new unit test. You do this by temporarily adding the "@Only" comment right before a specific unit test before running the above command.
 
 3\. Prepare for submission release.
 - Create a new branch based off of master which will be used to make updates as needed for a submission release. Branch name is not important, but for clarity it can be something like: `updates_for_x_y_submission`, where x is the Major Release number and where y is the Minor Release number: i.e. `updates_for_2_14_submission`.
@@ -307,7 +307,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   `$ gulp stage`
 
-9\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Guthub.
+9\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Github.
 
 10\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build.
 
@@ -419,7 +419,7 @@ We may want to see how a new feature will affect the app's metrics from a small 
 ## Deploying an experiment on Popper Staging:
 - Run the `$ vauth` command
 
-- Before you can deploy to staging, you need to ensure your ssh config file has been updated with the ip addresses and hostname info of the popper staging location. This info can be found under "[popper-engine-roku]" in the [staging inventory](https://github.com/adRise/adrise_infrastructure/blob/master/inventory/staging/staging#L317).
+- Before you can deploy to staging, you need to ensure your ssh config file has been updated with the IP addresses and hostname info of the popper staging location. This info can be found under "[popper-engine-roku]" in the [staging inventory](https://github.com/adRise/adrise_infrastructure/blob/master/inventory/staging/staging#L317).
 
 - Please follow the [SSH Access Instructions](https://github.com/adRise/adrise_infrastructure#ssh-access) while using the popper info from the previous step to set up your SSH Config file. Below is an example of what is added to the .ssh/config file. (Note: on the Mac, the ssh config file is located in [user]/.ssh/config, where "user" is the username on your mac.)
 
@@ -480,7 +480,7 @@ If you need to make a change or addition to the American English text
   ```
   This will modify the TubiLanguageTranslate.brs to include the new English text
 
-- Once your branch has been merged into master, then run the following command line within the project's root folder to upload your approved changes to the Crowdin server. "KEY" is the key used for our crowdin account.
+- Once your branch has been merged into master, then run the following command line within the project's root folder to upload your approved changes to the Crowdin server. "KEY" is the key used for our Crowdin account.
 	```
   gulp upload_translations --crowdinKey "KEY"
   ```
@@ -492,13 +492,13 @@ If you need to make a change or addition to the American English text
 If you need to make a change to text that is not the default English, then log into [Crowdin](https://crowdin.com/project/tubiapps) and adjust the translation. Then you will need to follow the directions on how to update the app with the latest translations.
 
 
-If you need to get the latest translations from the Crowdin servers, then create a new GIT branch and run the below command line within the project's root folder, where "KEY" is the key used for our crowdin account. This will modify the TubiLanguageTranslate.brs to contain all the translations available within Crowdin. You later need to create a PR to start the process of getting the new translations merged to the master branch.
+If you need to get the latest translations from the Crowdin servers, then create a new GIT branch and run the below command line within the project's root folder, where "KEY" is the key used for our Crowdin account. This will modify the TubiLanguageTranslate.brs to contain all the translations available within Crowdin. You later need to create a PR to start the process of getting the new translations merged to the master branch.
 
   ```
   gulp download_translations --crowdinKey "KEY"
   ```
 
-NOTE: Instead of passing the crowdin key, you can set the crowdin key as system environment variable labeled as"ROKU_CROWDIN_KEY". This is actually the prefered way of doing things. Check your system on how to create an environment variable. Also note, that the crowdin key can be gotten either from the company's LastPass Account or through the [Crowdin website](https://crowdin.com/project/tubiapps/settings#api).
+NOTE: Instead of passing the crowdin key, you can set the crowdin key as system environment variable labeled as"ROKU_CROWDIN_KEY". This is actually the preferred way of doing things. Check your system on how to create an environment variable. Also note, that the Crowdin key can be gotten either from the company's LastPass Account or through the [Crowdin website](https://crowdin.com/project/tubiapps/settings#api).
 
 
 # Charles Proxy
@@ -542,6 +542,7 @@ Now that Charles is setup and ready to receive requests from your Roku , please 
 ```
 charlesProxyUrl: "http://{{localHostAddress}}:8888"
 charlesProxyEnabled: true
+```
 
 
 If set up correctly the first time your Roku sends a request to Charles, Charles will ask you to approve the connection. Just click `Allow` and you should see the traffic in Charles(except Youbora and Santry related traffic).
@@ -551,5 +552,7 @@ If set up correctly the first time your Roku sends a request to Charles, Charles
 # Contributing
 
 See [CONTRUBUTING.md](CONTRIBUTING.md)
+#### PR Reviews
+Please see [Roku PR Review Considerations](https://docs.google.com/spreadsheets/d/12cwrRYG2EAShU0YJV_xyaTPWGPZUIA0ySYbUm2NqmcA/edit#gid=0) for ideas about what to consider while doing PRs. Please note, these are minimum considerations and not intended to be an exhaustive check list for doing pR reviews.
 
 Last updated by: Anupama Chandrappa
