@@ -177,9 +177,9 @@ Function init()
 
   m.lastPingTime = 0
   m.lastSavedPosition = 0
-  m.adPrefetchTime = 15
-  m.adHeadsUpTime = 10
-  m.adBreakAdvance = 0.5
+  m.adPrefetchTime = 15 ' adPrefetchTime is used to help to prefetch the ad before the actual cuepoint
+  m.adHeadsUpTime = 10 ' adHeadsUpTime helps to decide how long we need to show the AdHeadsup
+  m.midrolls = {} ' midrolls holds all cuepoints from API response
 
   ' m.seekReferenceQueue is used to record the playback positions to which m.Video.seek is set.
   ' Context: setting a value on m.Video.seek will cause the onVideoPositionChange() callback to fire.
@@ -191,11 +191,6 @@ Function init()
   ' previously described edge case, the value would be changed by the 2nd seek event prior to the onVideoPositionChange()
   ' callback referencing the value, which would lead to badly formed playProgressEvents.
   m.seekReferenceQueue = []
-
-  ' checking m.recentCuepointFetch and m.recentCuepoint prevents multiple ad calls and multiple tracking events
-  ' for a single cuepoint if the position callback happens at 10.2 and 10.7 for instance
-  m.recentCuepointFetch = 0
-  m.recentCuepoint = 0
 
   m.analyticsInterval = m.constants.player.pingFrequency
   m.historyInterval = m.constants.player.historyFrequency
@@ -325,95 +320,100 @@ End Function
 Function playContent()
   tubilog("VideoPlayer.playContent")
 
-  ' Always reset ad state when we first start playback.  Preroll fetch will populate midrolls list
-  m.top.midrolls = []
-  m.recentCuepointFetch = 0
-  m.recentCuepoint = 0
+  if m.Video.content <> invalid
 
-  ' reset the seekReferenceQueue
-  m.seekReferenceQueue = []
+    ' Always reset ad state when we first start playback.  Preroll fetch will populate midrolls list
+    m.midrolls = {}
 
-  if m.Video.content.nowPos <> invalid and m.Video.content.nowPos >= 0
-    m.playerPosition = m.Video.content.nowPos
-    m.lastSavedPosition = m.Video.content.nowPos
-    m.lastPingTime = m.Video.content.nowPos
-    m.lastButtonPressPos = m.Video.content.nowPos
-    m.seekReferenceQueue.push(m.Video.content.nowPos)
-    seekToPosition(m.Video.content.nowPos)
-  else
-    m.lastButtonPressPos = 0
+    ' reset the seekReferenceQueue
+    m.seekReferenceQueue = []
+
+    if m.Video.content.nowPos <> invalid and m.Video.content.nowPos >= 0
+      m.playerPosition = m.Video.content.nowPos
+      m.lastSavedPosition = m.Video.content.nowPos
+      m.lastPingTime = m.Video.content.nowPos
+      m.lastButtonPressPos = m.Video.content.nowPos
+      m.seekReferenceQueue.push(m.Video.content.nowPos)
+      seekToPosition(m.Video.content.nowPos)
+    else
+      m.lastButtonPressPos = 0
+    end if
+
+    'start_video user event analytics
+    if m.top.analyticsMode = "trailer"
+      'set up tracking for trailer
+      trackEvent({
+        type: "start_trailer"
+        values: {
+          video_id: m.Video.content.id.toInt()
+          is_fullscreen: true
+        }
+      })
+    else
+      'set up tracking for normal playback
+      autoPlayAutomatic = false
+      autoPlayDeliberate = false
+      isLiveTv = false
+      isFullScreen = true
+      isEmbedded = false
+      if m.top.analyticsMode = "autoplay-automatic"
+        autoPlayAutomatic = true
+      else if m.top.analyticsMode = "autoplay-deliberate"
+        autoPlayDeliberate = true
+      end if
+
+      hasSubtitles = false
+      if m.Video.globalCaptionMode = "On" and m.Video.content.hasSubtitles = true
+        hasSubtitles = true
+      end if
+      
+      resourceType = "VIDEO_RESOURCE_TYPE_UNKNOWN"
+      if m.Video.content.drmType = m.constants.player.drmTypes.dashWidevine
+        resourceType = "VIDEO_RESOURCE_TYPE_DASH_WIDEVINE"
+      else if m.Video.content.drmType = m.constants.player.drmTypes.dashPlayready
+        resourceType = "VIDEO_RESOURCE_TYPE_DASH_PLAYREADY"
+      else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv3
+        resourceType = "VIDEO_RESOURCE_TYPE_HLSV3"
+      end if
+
+      trackEvent({
+        type: "start_video"
+        values: {
+          video_id: m.Video.content.id.toInt()
+          start_position: Int(m.playerPosition * 1000)
+          current_cdn: ""   'not possible for Roku client
+          has_subtitles: hasSubtitles  'the video player will show subtititles at start
+          is_livetv: isLiveTv
+          is_embedded: isEmbedded
+          is_fullscreen: isFullScreen
+          from_autoplay_deliberate: autoPlayDeliberate
+          from_autoplay_automatic: autoPlayAutomatic
+          video_player: "DEFAULT"
+          video_resource_type: resourceType
+          video_resource_url: m.Video.content.URL
+        }
+      })
+    end if
+
+    m.VideoState = "play"
+    if m.top.enableAds = true then
+      '//Set the midrolls of the videoplayer now and set the adControl state to preroll
+      cuepoints = m.Video.content.cuepoints
+      if cuepoints <> invalid
+        ' Iterating all cuepoints and storing it in assocarray, so that we don't want to iterate on every position change(notificationInterval) of video.
+        for each cuepoint in cuepoints
+          tubilog("VideoPlayer: MIDROLL: " + strI(cuepoint))
+          m.midrolls[strI(cuepoint)] = true
+        end for
+      end if    
+      ' Start pre-roll fetch
+      m.top.adControl = "preroll"
+    else
+      m.Video.control = "play"
+    end if
+
   end if
 
-  'start_video user event analytics
-  if m.top.analyticsMode = "trailer"
-    'set up tracking for trailer
-    trackEvent({
-      type: "start_trailer"
-      values: {
-        video_id: m.Video.content.id.toInt()
-        is_fullscreen: true
-      }
-    })
-  else
-    'set up tracking for normal playback
-    autoPlayAutomatic = false
-    autoPlayDeliberate = false
-    isLiveTv = false
-    isFullScreen = true
-    isEmbedded = false
-    if m.top.analyticsMode = "autoplay-automatic"
-      autoPlayAutomatic = true
-    else if m.top.analyticsMode = "autoplay-deliberate"
-      autoPlayDeliberate = true
-    end if
-
-    hasSubtitles = false
-    if m.Video.globalCaptionMode = "On" and m.Video.content.hasSubtitles = true
-      hasSubtitles = true
-    end if
-    
-    resourceType = "VIDEO_RESOURCE_TYPE_UNKNOWN"
-    if m.Video.content.drmType = m.constants.player.drmTypes.dashWidevine
-      resourceType = "VIDEO_RESOURCE_TYPE_DASH_WIDEVINE"
-    else if m.Video.content.drmType = m.constants.player.drmTypes.dashPlayready
-      resourceType = "VIDEO_RESOURCE_TYPE_DASH_PLAYREADY"
-    else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv3
-      resourceType = "VIDEO_RESOURCE_TYPE_HLSV3"
-    end if
-
-    trackEvent({
-      type: "start_video"
-      values: {
-        video_id: m.Video.content.id.toInt()
-        start_position: Int(m.playerPosition * 1000)
-        current_cdn: ""   'not possible for Roku client
-        has_subtitles: hasSubtitles  'the video player will show subtititles at start
-        is_livetv: isLiveTv
-        is_embedded: isEmbedded
-        is_fullscreen: isFullScreen
-        from_autoplay_deliberate: autoPlayDeliberate
-        from_autoplay_automatic: autoPlayAutomatic
-        video_player: "DEFAULT"
-        video_resource_type: resourceType
-        video_resource_url: m.Video.content.URL
-      }
-    })
-  end if
-
-  m.VideoState = "play"
-  if m.top.enableAds then
-    '//Set the midrolls of the videoplayer now and set the adControl state to preroll
-    if m.Video.content.cuepoints <> invalid
-      m.top.midrolls = m.Video.content.cuepoints
-      for each time in m.top.midrolls
-        tubiLog("VideoPlayer: MIDROLL: " + strI(time))
-      end for
-    end if
-    ' Start pre-roll fetch
-    m.top.adControl = "preroll"
-  else
-    m.Video.control = "play"
-  end if
 End Function
 
 
@@ -702,69 +702,79 @@ Function onVideoPositionChange()
       end if
     end if
 
+    'Advertisements
+    if m.top.enableAds = true and m.midrolls.count() > 0 then
 
-  'Advertisements
-  if m.top.enableAds and m.top.midrolls <> invalid and m.top.midrolls.count() > 0 then
-    m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
-    for each cuepoint in m.top.midrolls
-
-      ' attempt to fetch midroll ads
-      if isAtPosition(m.playerPosition, cuepoint - m.adPrefetchTime) and m.UpNext.opacity = 0
-        if cuepoint - m.adPrefetchTime <> m.recentCuepointFetch
-          m.recentCuepointFetch = cuepoint - m.adPrefetchTime
-          m.top.adPosition = cuepoint
-          m.top.adControl = "midroll"
-        end if
+      m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
+ 
+      ' attempt to fetch midroll ads before actual cuepoint
+      isCuepointPrefetchTimeReached = m.midrolls[strI(m.playerPosition + m.adPrefetchTime)]
+      if isCuepointPrefetchTimeReached = true and m.UpNext.opacity = 0
+        m.top.adPosition = cuepoint
+        m.top.adControl = "midroll"
       end if
 
-      ' show the ads countdown if appropriate
-      if isInWindow(m.playerPosition, cuepoint, m.adHeadsUpTime) and m.top.adState = "adspending"
+      ' show the ads countdown if appropriate (show if ads are available and within adHeadsUpTime)
+      adPosition = m.top.adPosition
+      if m.top.adState = "adspending" and isInWindow(m.playerPosition, adPosition, m.adHeadsUpTime) = true
         if m.Overlay.opacity = 0
-          m.ratingOverlay.opacity = 0
           ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
-          m.AdHeadsUp.visible = true
-          seconds = stri(cuepoint - m.playerPosition).trim()
-          m.AdHeadsUpText.text = getTranslation("videoPlayer_adHeadsUp", {seconds: seconds})
+          m.ratingOverlay.opacity = 0
+          showAdHeadUpText(adPosition)
         end if
       end if
 
-      ' Fire up the midroll
-      if cuepoint > 0 and isAtPosition(m.playerPosition, cuepoint - m.adBreakAdvance) and m.UpNext.opacity = 0
-        if cuepoint <> m.recentCuepoint
-          m.AdHeadsUp.visible = false
-          m.recentCuepoint = cuepoint
-          if m.top.adState = "adspending" then
-            ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
-            playProgressEvent = getPlayProgressEvent()
-            if playProgressEvent <> invalid
-              trackEvent(playProgressEvent)
-
-              ' set m.lastPingTime here to prevent an extra playProgressEvent if a user backs out of the ads
-              ' thereby triggering backButtonExit() which also sends a playProgressEvent.
-              m.lastPingTime = m.playerPosition
-            end if
-            
-            ' update history when showing adBreak
-            historyPosition(m.playerPosition)
-
-            ' We must stop the video here, not just pause it, in order to release
-            ' system resources to the RAF video player
-            showAdBreak()
-            m.showRatings = true 
-          else if m.top.adState = "noads"
-            ' when we reach the cuepoint, we find that the last ad call returned no ads
-            trackEvent({
-              type: "resume_after_break"
-              values: {
-                video_id: m.Video.content.id.toInt()
-                position: Int(m.playerPosition * 1000)  'without Int(), can return scientific notation, causing API error
-              }
-            })
+      ' check midroll and fire if any
+      isCuepointReached = m.midrolls[strI(m.playerPosition)]
+      if isCuepointReached = true and m.UpNext.opacity = 0
+        m.AdHeadsUp.visible = false
+        if m.top.adState = "adspending" then
+          ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
+          playProgressEvent = getPlayProgressEvent()
+          if playProgressEvent <> invalid
+            trackEvent(playProgressEvent)
+    
+            ' set m.lastPingTime here to prevent an extra playProgressEvent if a user backs out of the ads
+            ' thereby triggering backButtonExit() which also sends a playProgressEvent.
+            m.lastPingTime = m.playerPosition
           end if
+          
+          ' update history when showing adBreak
+          historyPosition(m.playerPosition)
+    
+          ' We must stop the video here, not just pause it, in order to release
+          ' system resources to the RAF video player
+          showAdBreak()
+          m.showRatings = true 
+        else if m.top.adState = "noads"
+          ' when we reach the cuepoint, we find that the last ad call returned no ads
+          trackEvent({
+            type: "resume_after_break"
+            values: {
+              video_id: m.Video.content.id.toInt()
+              position: Int(m.playerPosition * 1000)  'without Int(), can return scientific notation, causing API error
+            }
+          })
         end if
       end if
-    end for
-  end if
+
+    end if
+    
+End Function
+
+
+Function showAdHeadUpText(cuepoint)
+
+  m.AdHeadsUp.visible = true
+  seconds = stri(cuepoint - m.playerPosition).trim()
+  m.AdHeadsUpText.text = getTranslation("videoPlayer_adHeadsUp", {seconds: seconds})
+
+End Function
+
+
+' Returns true if the position is between (target - window) and the target
+Function isInWindow(position, target, window)
+  return (position >= (target - window) and position < target)
 End Function
 
 
@@ -788,7 +798,7 @@ Function onAdStateChange()
       ' to fix the issue.
       m.top.adControl = m.top.adControl
     end if
-  else if m.top.adState = "adspending" and (m.top.adControl = "preroll" or m.top.adControl = "seek") and m.top.enableAds then
+  else if m.top.adState = "adspending" and (m.top.adControl = "preroll" or m.top.adControl = "seek") and m.top.enableAds = true then
     ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
     ' video playback stopped and should play right away when we get adspending.
     ' pre-roll or resume-roll. Play ads right away
@@ -1365,18 +1375,6 @@ Function getPlayProgressEvent()
   end if
 
   return playProgressEvent
-End Function
-
-
-' Returns true if the position is between the target and target+notificationInterval
-Function isAtPosition(position, target)
-  return (position >= target and position <= target + m.Video.notificationInterval)
-End Function
-
-
-' Returns true if the position is between (target - window) and the target
-Function isInWindow(position, target, window)
-  return (position >= (target - window) and position < target)
 End Function
 
 

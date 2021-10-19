@@ -16,3 +16,29 @@ Function round(value)
   return Int(value)
   
 End Function
+
+
+' roundUp function is used to round the value up
+' eg. if the value is 3.1, then it rounds to 4
+' @value : float, the value we want to round up
+' returns value as Integer
+Function roundUp(value)
+  
+  if value = 0
+    return Int(value)
+  else
+    return Int(value) + 1
+  end if
+  
+End Function
+
+
+' roundDown function is used to round the value down
+' eg. if the value is 3.9, then it rounds to 3
+' @value : float, the value we want to round down
+' returns value as Integer
+Function roundDown(value)
+
+  return Int(value)
+  
+End Function

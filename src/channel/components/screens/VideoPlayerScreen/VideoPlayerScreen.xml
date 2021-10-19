@@ -88,11 +88,6 @@
       <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
       <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true"/>
 
-      <!--
-        - List of midrolls as time in seconds.  This will be written to by main brightscript thread.
-        -->
-      <field id="midrolls" type="intarray" value="[]" />
-
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -162,7 +157,7 @@
       enableUI="false"
       cgms = "3"
       enableTrickPlay="false"
-      notificationInterval="0.5"
+      notificationInterval="1"
       visible="true" />
 
 

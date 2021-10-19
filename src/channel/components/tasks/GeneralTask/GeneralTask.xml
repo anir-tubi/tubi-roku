@@ -17,6 +17,7 @@
     <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
 
