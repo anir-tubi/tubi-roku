@@ -1153,18 +1153,23 @@ Function updateVideoPlayerState(content) as Void
   end if
   
   descriptorCode = content.descriptorCode
-  if descriptorCode <> invalid and descriptorCode<> ""
-    m.descriptorCode.text = UCase(descriptorCode) 
+  sDescriptorCodeText = ""
+  if descriptorCode <> invalid and descriptorCode <> ""
+    sDescriptorCodeText = UCase(descriptorCode) 
   end if
+  m.descriptorCode.text = sDescriptorCodeText
+
 
   descriptorDescription = content.descriptorDescription
+  sDescriptorDescText = ""
   ' if the descriptor is not present, reduce the height of rating bar
   if descriptorDescription <> invalid and descriptorDescription <> ""
-    m.descriptorDesc.text = descriptorDescription
+    sDescriptorDescText = descriptorDescription
     m.ratingBar.height = 87
   else
     m.ratingBar.height = 45
   end if
+  m.descriptorDesc.text = sDescriptorDescText
 
   ' add the title and episode title to the overlay
   title = m.Overlay.findNode("VideoOverlayTitle")
