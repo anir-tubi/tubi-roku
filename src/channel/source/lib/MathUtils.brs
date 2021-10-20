@@ -20,25 +20,43 @@ End Function
 
 ' roundUp function is used to round the value up
 ' eg. if the value is 3.1, then it rounds to 4
-' @value : float, the value we want to round up
+' @value : float/double/integer, the value we want to round up
+' if the value is not in above type, it will return 0
+' if the value is negative, it will roundup (eg. for -2.5, it will return -2)
 ' returns value as Integer
 Function roundUp(value)
-  
-  if value = 0
-    return Int(value)
-  else
-    return Int(value) + 1
+
+  result = 0
+  valueType = type(value)
+  if valueType = "roFloat" or valueType = "Float" or valueType= "roDouble" or valueType= "Double"
+    if value <> 0 
+      result = Int(value) + 1
+    end if
+  else if valueType = "roInteger" or valueType = "roInt" or valueType = "Integer"  
+    result = value
   end if
+  return result
   
 End Function
 
 
-' roundDown function is used to round the value down
+' roundDown function is used to round the value down,
 ' eg. if the value is 3.9, then it rounds to 3
-' @value : float, the value we want to round down
+' @value : float/double/integer, the value we want to round down
+' if the value is not in above type, it will return 0
+' if the value is negative, it will rounddown (eg. for -2.5, it will return -3)
 ' returns value as Integer
 Function roundDown(value)
 
-  return Int(value)
+  result = 0
+  valueType = type(value)
+  if valueType = "roFloat" or valueType = "Float" or valueType= "roDouble" or valueType= "Double"
+    if value <> 0 
+      result = Int(value)
+    end if
+  else if valueType = "roInteger" or valueType = "roInt" or valueType = "Integer"  
+    result = value
+  end if
+  return result
   
 End Function

@@ -290,11 +290,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
     ' Rounding the value to down for all the end creditcuepoints
 
-    if postlude <> invalid and postlude > 0
-      postlude = roundDown(postlude)
-    end if  
-    creditsCuePoints.AddReplace("postlude", postlude)  
-  
     earlycredits_end = creditsCuePoints.earlycredits_end
     if earlycredits_end <> invalid and earlycredits_end > 0
       creditsCuePoints.AddReplace("earlycredits_end", roundDown(earlycredits_end))
@@ -311,6 +306,16 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     end if
 
     ' Rounding the value to up for all the start creditcuepoints
+
+    if postlude <> invalid and postlude > 0
+      postlude = roundUp(postlude)
+    end if  
+    creditsCuePoints.AddReplace("postlude", postlude)    
+
+    prelogue = creditsCuePoints.prelogue
+    if prelogue <> invalid
+      creditsCuePoints.AddReplace("prelogue", roundUp(prelogue))
+    end if
 
     earlycredits_start = creditsCuePoints.earlycredits_start
     if earlycredits_start <> invalid and earlycredits_start > 0
