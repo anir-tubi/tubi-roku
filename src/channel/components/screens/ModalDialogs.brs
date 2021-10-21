@@ -322,7 +322,7 @@ End Function
 ' @dialogEvent: assocArray, contains the info necessary to send a dialog open analytics event, has keys: "type" and "values"
 ' @trackingTask: roSGNode, an instance of the trackingLoggingTask - used to send close dialog events when the dialog is closed.
 ' @callback: (optional) roFunction, a function that will be triggered when the first button is selected
-' @cancelCallback: (optional) Function will be triggered when the second button is clicked (function will not have any params)        
+' @cancelCallback: (optional) Function will be triggered when the second button is clicked (function will not have any params)
 Function showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid)
   info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback, cancelCallback)
   showModal(info.modalInfo, info.buttonInfo)

@@ -441,6 +441,22 @@
     "description": "The label for the parental controls",
     "message": "Parental Controls"
   },
+  "screenSettings_parentalControls_group0": {
+    "description": "Group 0 of the parental controls",
+    "message": "Little Kids ({ratings})"
+  },
+  "screenSettings_parentalControls_group1": {
+    "description": "Group 1 of the parental controls",
+    "message": "Older Kids ({ratings})"
+  },
+  "screenSettings_parentalControls_group2": {
+    "description": "Group 2 of the parental controls",
+    "message": "Teens ({ratings})"
+  },
+  "screenSettings_parentalControls_group3": {
+    "description": "Group 3 of the parental controls",
+    "message": "Adults ({ratings})"
+  },
   "screenSettings_parentalControls_instructions": {
     "description": "Description of the parental controls screen",
     "message": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which movie and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password."
@@ -471,11 +487,11 @@
   },
   "screenSettings_parentalPassword_title": {
     "description": "Directions for signed out users who attempt to change the parental controls",
-    "message": "Enter your password"
+    "message": "Enter Password to update"
   },
   "screenSettings_parentalPassword_subtitle": {
     "description": "Directions 2nd line for signed out users who attempt to change the parental controls",
-    "message": "to update parental controls"
+    "message": "parental controls"
   },
   "screenSettings_parentalPassword_button_hide": {
     "description": "Label of button on the password entry screen to hide the password",
@@ -721,6 +737,14 @@
     "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
     "message": "Tubi - Free Movies & TV"
   },
+  "channel_description": {
+    "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+    "message": "Enjoy the largest library of popular movies and TV shows, all for free!"
+  },
+  "channel_webDescription": {
+    "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
+    "message": "Watch thousands of hit movies and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer ads than regular TV. Tubi is the largest free streaming service featuring award-winning movies and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favorites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!"
+  },
   "dialog_whoops_title": {
     "description": "A general whoops title for an dialog window",
     "message": "Whoops!" 
@@ -852,5 +876,29 @@
   "dialog_button_signUp": {
     "description": "The label of the button in a dialog window that allows the user to sign up into the app.",
     "message": "Sign Up"
-  }           
+  },
+  "screenSettings_parentalPassword_setup_new_password": {
+    "description": "Directions for users who attempt to change the parental controls",
+    "message": "To setup a new password"
+  },
+  "screenSettings_parentalPassword_visit_link": {
+    "description": "Directions for users to setup the new password",
+    "message": "visit tubi.tv/password"
+  },
+  "screenSettings_parentalPassword_visit_webBrowser": {
+    "description": "Directions for users to setup the new password on browser",
+    "message": "1. Please visit tubi.tv/password on a web browser"
+  },
+  "screenSettings_parentalPassword_email": {
+    "description": "Directions to the user to enter his/her email to setup new password",
+    "message": "2. Enter the email "
+  },
+  "screenSettings_parentalPassword_set_new_Password": {
+    "description": "Directions to the user about email notification to setup new password",
+    "message": "3. We’ll send you instructions to set a new password"
+  },
+  "screenSettings_parentalPassword_know_my_Password": {
+    "description": "Directions to the user to enter his/her password if they know their password",
+    "message": "I know my password. Let's go."
+  }
 }

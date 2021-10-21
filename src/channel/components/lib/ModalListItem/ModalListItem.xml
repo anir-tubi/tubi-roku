@@ -10,8 +10,9 @@
 
   <interface>
     <field id="itemContent" type="node" />
-    <field id="width" type="float" value="406.0" />
+    <field id="width" type="float" alias = "buttonText.width" />
     <field id="height" type="float" value="80.0" />
+    <field id="calculatedWidth" type="float"/>
   </interface>
   
   <children>
@@ -19,7 +20,6 @@
       id="buttonText" 
       horizAlign="left"
       vertAlign="center"
-      width="390"
       height="79"
       translation="[44,1]"
       opacity="1.0"

@@ -605,11 +605,11 @@ Function getTranslation_en_US()
     },
     "screenSettings_parentalPassword_title": {
       "description": "Directions for signed out users who attempt to change the parental controls",
-      "message": "Enter your password"
+      "message": "Enter Password to update"
     },
     "screenSettings_parentalPassword_subtitle": {
       "description": "Directions 2nd line for signed out users who attempt to change the parental controls",
-      "message": "to update parental controls"
+      "message": "parental controls"
     },
     "screenSettings_parentalPassword_button_hide": {
       "description": "Label of button on the password entry screen to hide the password",
@@ -994,6 +994,30 @@ Function getTranslation_en_US()
     "dialog_button_signUp": {
       "description": "The label of the button in a dialog window that allows the user to sign up into the app.",
       "message": "Sign Up"
+    },
+    "screenSettings_parentalPassword_setup_new_password": {
+      "description": "Directions for users who attempt to change the parental controls",
+      "message": "To setup a new password"
+    },
+    "screenSettings_parentalPassword_visit_link": {
+      "description": "Directions for users to setup the new password",
+      "message": "visit tubi.tv/password"
+    },
+    "screenSettings_parentalPassword_visit_webBrowser": {
+      "description": "Directions for users to setup the new password on browser",
+      "message": "1. Please visit tubi.tv/password on a web browser"
+    },
+    "screenSettings_parentalPassword_email": {
+      "description": "Directions to the user to enter his/her email to setup new password",
+      "message": "2. Enter the email "
+    },
+    "screenSettings_parentalPassword_set_new_Password": {
+      "description": "Directions to the user about email notification to setup new password",
+      "message": "3. We’ll send you instructions to set a new password"
+    },
+    "screenSettings_parentalPassword_know_my_Password": {
+      "description": "Directions to the user to enter his/her password if they know their password",
+      "message": "I know my password. Let's go."
     }
   }
 End Function

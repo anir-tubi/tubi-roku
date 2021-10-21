@@ -151,53 +151,9 @@
 
     </LayoutGroup>
 
-    <Group 
-      id="keyboardGrp" 
-      translation="[0,1080]">
-
-      <Rectangle
-        id="keyboardBackground"
-        color="0x10141F"
-        opacity="1.0"
-        width="1920"
-        height="600"/>
-
-      <LayoutGroup 
-        layoutDirection="vert"
-        horizAlignment="custom"
-        vertAlignment="custom"
-        translation="[250, 20]"
-        itemSpacings="[20]">
-
-        <Keyboard 
-          id="Keyboard"/>
-
-            <ButtonGroup 
-              id="buttonGroup"
-              layoutDirection="horiz"
-              itemSpacings="[35]"
-              translation="[12,0]">
-
-              <SimpleButton
-                id="back"
-                color="0xF0F1F5"
-                width="180"/>
-
-              <SimpleButton
-                id="continue"
-                color="0xF0F1F5"
-                width="633"/>
-
-              <SimpleButton
-                id="showHidePassword"
-                color="0xF0F1F5"
-                width="490"/>
-
-            </ButtonGroup>
-
-      </LayoutGroup>
-
-    </Group>
+        <PasswordEntryKeyboard 
+          id="passwordEntryKeyboard"
+          translation="[0,1080]"/>
 
   </children>
 </component>

@@ -26,11 +26,25 @@ Function formatDialog()
     m.ButtonList.content = invalid
   else
     newContent = CreateObject("roSGNode", "ContentNode")
+    nWidestWidth = 0
     for each b in m.top.buttons
-      button = newContent.createChild("ContentNode")      
+      button = newContent.createChild("ContentNode")
       button.title = b
       button.id = b
+      '//   Temporarily create ModalListItem for each button text to find the largest width necessary for the set of buttons, 
+      '//   in order to determine how wide m.ButtonList should be.
+      '//   Different languages may make the text wider than usual so we need to ensure the button displays the full text
+      listItem = CreateObject("roSGNode", "ModalListItem")
+      listContent =  CreateObject("roSGNode", "ContentNode") 
+      listContent.title = b 
+      listItem.itemContent = listContent
+
+      if listItem.calculatedWidth > nWidestWidth 
+        nWidestWidth = listItem.calculatedWidth
+      end if
+      listItem = invalid
     end for
+    m.ButtonList.itemSize = [nWidestWidth, m.ButtonList.itemSize[1]]
     m.ButtonList.content = newContent
   end if
 
