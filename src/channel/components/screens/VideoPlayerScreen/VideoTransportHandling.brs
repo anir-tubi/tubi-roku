@@ -634,6 +634,7 @@ Function showCCDialog()
       pauseVideo(false, false)
     end if
     m.ccDialog = CreateObject("roSGNode", "ModalDialogScreen")
+    m.ccDialog.id = "ccDialog"
     m.ccDialog.title = "Closed Caption/Audio Configuration"
     buttons = getCCButtons()
     m.ccDialog.buttons = buttons

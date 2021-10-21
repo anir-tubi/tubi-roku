@@ -18,6 +18,7 @@ Function init()
   m.Title = m.top.findNode("title")
   m.SubTitle = m.top.findNode("subtitle")
 
+  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
 
   m.SkipButton = m.top.findNode("skipButton")
   m.SkipButton.text = getTranslation("dialog_button_skip")

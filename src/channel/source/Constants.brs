@@ -7,7 +7,7 @@ Function getConstants()
   
   mode = constants.settings.mode
   if mode = invalid then mode = "dev"
-
+  
   ' Device info
   constants.deviceInfo = {}
     di = CreateObject("roDeviceInfo")
@@ -266,6 +266,17 @@ Function getConstants()
   if LCase(constants.deviceInfo.channelStore) = "telstra"
     constants.analyticsPlatform = "TELSTRA"
   end if
+  
+  'Types of actions for modal dialogs.
+  ' "restartApp" - will clear screen stack and restarts the app from beginning.
+  ' "closeDialog" - user attention modal(signout modal, app exit modal etc), we are closing the modal and resume the app
+  ' "startChannel" - will bring the user to the default homescreen
+  ' "resumeChannel" -  will bring the user to where they left off
+  constants.instantResumeActions = {}
+  constants.instantResumeActions.closeDialog = "closeDialog"
+  constants.instantResumeActions.startChannel = "startChannel"
+  constants.instantResumeActions.restartApp = "restartApp"
+  constants.instantResumeActions.resumeChannel = "resumeChannel"
 
   'previously found in settings as "shortAppName"
   constants.appName = "tubitv"
@@ -294,7 +305,7 @@ Function getConstants()
   end if
 
   ' Should the user be shown the upgrade alert to help them upgrade to the latest version.
-  '   Used within the hotpatch after a point release to nudge users to use the latest and
+  '   Used within the hotpatch after a point release to nudge users to use the latest app
   constants.showUpgradeAlert = false
 
   'a list of device ids that will send debug and info logs to the logging API - this will be populated by hotpatch
@@ -746,7 +757,7 @@ Function getConstants()
       constants.ui.screenLevels.channelCategoryGridScreen = 20
       constants.ui.screenLevels.searchScreen = 20
       constants.ui.screenLevels.settingsScreen = 20
-      constants.ui.screenLevels.comfirmPasswordScreen = 40
+      constants.ui.screenLevels.confirmPasswordScreen = 40
       constants.ui.screenLevels.channelDetailScreen = 40
       constants.ui.screenLevels.detailScreen = 50
       constants.ui.screenLevels.episodeScreen = 50
@@ -764,7 +775,7 @@ Function getConstants()
       constants.ui.screenIds.homeScreen = "homeScreen"
       constants.ui.screenIds.searchScreen = "searchScreen"
       constants.ui.screenIds.settingsScreen = "settingsScreen"
-      constants.ui.screenIds.comfirmPasswordScreen = "comfirmPasswordScreen"
+      constants.ui.screenIds.confirmPasswordScreen = "confirmPasswordScreen"
       constants.ui.screenIds.channelDetailScreen = "channelDetailScreen"
       constants.ui.screenIds.channelListScreen = "channelListScreen"
       constants.ui.screenIds.categoryListScreen = "categoryListScreen"

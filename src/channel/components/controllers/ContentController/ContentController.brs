@@ -208,7 +208,7 @@ Function displayMaturePlayWarning(dialogSubtype, pageInfo)
   title =  getTranslation("error_matureContent_title")
   message = getTranslation("error_mustBeSignedIn_description")
   buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_cancel")]
-  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
 End Function
 
 
@@ -1573,6 +1573,20 @@ Function onCustomSuspend(msg)
         linearVideoPlayer.control = "stop"
       end if
     end if
+    'Modals with type errorDialog should made invisible and app should restarted on app relaunch.
+    'Modals with type actionDialog should be closed and app should resume from the current screen
+    modal = getTopModal()
+    if modal <> invalid
+      if modal.instantResumeAction = m.constants.instantResumeActions.restartApp
+        'making visible = false to avoid showing error modal while app on relaunch
+        modal.visible = false
+      else if modal.instantResumeAction = m.constants.instantResumeActions.closeDialog or modal.instantResumeAction = m.constants.instantResumeActions.startChannel
+        closeModal(modal)
+        if currentScreen <> invalid
+          currentScreen.setFocus(true)
+        end if
+      end if
+    end if
   end if
 End Function
 
@@ -1628,7 +1642,44 @@ Function onCustomResume(msg)
         ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
         restartApp()
       else
-        resumeApp()
+        'Removes the RFIScreen
+        if m.billing <> invalid
+          m.billing.unobserveFieldScoped("userData")
+          m.billing = invalid
+        end if 
+        modal = getTopModal()
+        ' Modal gets removed/hidden based on the instantResumeAction when the app was suspended.
+        ' Modals that inform a user about an action have instantResumeAction = "closeDialog" and are
+        ' removed while suspending the app. Modals that display errors have instantResumeActions of
+        ' "restartApp" for which we set visibility to false in customSuspend and then restart the app
+        ' during onCustomResume. Screens that have instantResumeAction of "startChannel" return the
+        ' user to the homescreen during onCustomResume.
+        ' Functionality that requires the app to restart is given precedence over functionality that
+        ' starts the channel or resumes the app.
+
+        if modal <> invalid
+          if modal.instantResumeAction = m.constants.instantResumeActions.restartApp
+            restartApp()
+          else if modal.instantResumeAction = m.constants.instantResumeActions.startChannel
+           'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
+            startChannel()
+          end if
+        else if currentScreen <> invalid
+          if currentScreen.instantResumeAction = m.constants.instantResumeActions.restartApp
+            restartApp()
+          else if (lastAppSuspendInSecs >= 1200 and currentScreen.id = m.constants.ui.screenIds.settingsScreen)
+            'user is on the settings page and returns to the app after 20 or more minutes then retun to the homescreen
+            startChannel()
+          else if currentScreen.instantResumeAction = m.constants.instantResumeActions.startChannel
+            'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
+            startChannel()
+          else
+            resumeApp()
+          end if
+        else
+          'Unknown state, backup solution to restart app.
+          restartApp()
+        end if
       end if
     else
       restartApp()

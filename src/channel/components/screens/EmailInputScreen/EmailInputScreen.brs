@@ -24,6 +24,8 @@ Function init()
   m.continue.text = getTranslation("dialog_button_continue")
   m.continue.observeFieldScoped("selected", "onContinueButtonSelected")
   
+  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
+
   'set initial tracking values
   m.top.trackingPageInfo = {
     pageType: "register_page"

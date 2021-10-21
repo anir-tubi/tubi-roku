@@ -616,7 +616,7 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
         dialog_sub_type: "launch-deeplink"
       }
     }
-    showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+    showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
 
   else if m.deepLinkContent <> invalid
     ' we are in this block if there is a roInputEvent causing a deeplink (ie. voice control while the channel is open)
@@ -642,7 +642,7 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
           dialog_sub_type: "input-deeplink"
         }
       }
-      showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+      showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
     end if
   else if detailScreen <> invalid and detailScreen.isInFocusChain() = true
     message = getTranslation("screenDetails_error_getContent_description")
@@ -846,7 +846,7 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
         message = getTranslation("screenDetails_error_addQueueMovie_description")
       end if
       buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_cancel")]
-      showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, addToQueueSignInSelected, invalid)
+      showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, addToQueueSignInSelected)
     else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
       detailScreen.stringQueueButton = getTranslation("screenDetails_button_queueNow")
       userTask = CreateObject("roSGNode", "AuthTask")
@@ -988,7 +988,7 @@ Function onBookmarkedAfterSignIn(msg) As Void
     end if
     description = title + " has been added to the List"
     
-    showSimpleModal("Success", description, [], dialogEvent, m.trackingLoggingTask)
+    showSimpleInstantResumableModal("Success", description, [], dialogEvent, m.trackingLoggingTask)
     
     ' re-fetch homescreen content when user signedIn
     homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)

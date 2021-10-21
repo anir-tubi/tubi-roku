@@ -49,6 +49,9 @@
 
       <!-- If set to true, allows screens of the same type and same screenLevel to stack on top of each other  -->
       <field id="isStackable" type="boolean" value="false" />
+
+      <!-- Holds the information of how to handle when the screen is active after instant resume. Valid values are restartApp, startChannel and "resumeChannel" -->
+      <field id="instantResumeAction" type="string" value="restartApp" />
   </interface>
 
   <children>

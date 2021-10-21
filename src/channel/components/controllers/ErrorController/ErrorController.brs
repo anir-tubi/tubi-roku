@@ -47,6 +47,7 @@ Function showModalDialog(error)
     openTrackEvent: dialogEvent
     trackingTask: m.trackingLoggingTask
     backButtonCallback: onCloseError
+    modalId : m.constants.instantResumeActions.restartApp
   }
 
   buttonInfo = [

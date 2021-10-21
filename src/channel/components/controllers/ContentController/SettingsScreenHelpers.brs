@@ -214,7 +214,7 @@ Function onParentalSettingSelected()
     title = getTranslation("dialog_signIn_title")
     message = getTranslation("screenSettings_error_signInParental_description")
     buttons = [getTranslation("dialog_button_signIn"), getTranslation("dialog_button_cancel")]
-    showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalSelectedViaParentalControl)
+    showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalSelectedViaParentalControl)
   end if
 End Function
 
@@ -341,7 +341,7 @@ Function onParentalSettingComplete(msg)
 
     title = getTranslation("screenSettings_error_parentalChanges")
     message = getTranslation(sMessageID, {ratings: sRatings})
-    showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+    showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
   else
     if isConfirmPasswordScreen() = true
       setAuthInfoValue("secondsOfSavedPassword", 0)
@@ -361,7 +361,7 @@ Function onParentalSettingComplete(msg)
       message = getTranslation("screenSettings_error_parentalFailedChange_description")
       buttons = [getTranslation("dialog_button_ok")]
 
-      showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
+      showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
     else if m.global.authInfo.secondsOfSavedPassword <> invalid and m.global.authInfo.secondsOfSavedPassword > 0
       '//if not showing ConfirmPasswordScreen and showing parentalControls panel AND this came from a saved password,
       '//   then display the ConfirmPasswordScreen instead of error message

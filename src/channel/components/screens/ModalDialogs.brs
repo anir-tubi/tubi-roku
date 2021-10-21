@@ -30,6 +30,7 @@ Function showModal(modalInfo, buttonInfo)
     modal.title = modalInfo.title
     modal.message = modalInfo.message
     modal.scrollable = modalInfo.scrollable
+    modal.instantResumeAction = modalInfo.instantResumeAction
 
     m.tempModal = {
       buttonInfo: buttonInfo
@@ -202,6 +203,7 @@ Function showErrorModal(modalInfo = {}, tryAgainCallback = invalid, tryAgainPara
   modalInfo.backButtonCallback = cancelCallback
   ' use the cancel callback params as the backButtonCallbackParams - as the params should also be the same
   modalInfo.backButtonCallbackParams = cancelParams
+  modalInfo.instantResumeAction = m.constants.instantResumeActions.restartApp
 
   showModal(modalInfo, buttonInfo)
 End Function
@@ -274,7 +276,7 @@ Function showExitAppModal(dialogEvent, trackingTask, callback = invalid)
   title = getTranslation("dialog_exitApp_title")
   message = getTranslation("dialog_exitApp_description")
   buttons = [getTranslation("dialog_button_exit"), getTranslation("dialog_button_cancel")]
-  showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback)
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callback)
 End Function
 
 
@@ -285,7 +287,7 @@ Function showSignOutModal(dialogEvent, trackingTask, callback = invalid)
   title = getTranslation("dialog_signOut_title")
   message = getTranslation("dialog_signOut_description")
   buttons = [getTranslation("dialog_signOut_button_ok"), getTranslation("dialog_button_cancel")]
-  showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback)
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callback)
 End Function
 
 '''''''''''''''''''''''
@@ -294,6 +296,7 @@ End Function
 Function showInfoModal(title, message, dialogEvent, trackingTask, callback = invalid)
   buttons = [getTranslation("dialog_button_close")]
   info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback)
+  info.modalInfo.instantResumeAction = m.constants.instantResumeActions.closeDialog
   showModal(info.modalInfo, info.buttonInfo)
 End Function
 
@@ -306,6 +309,7 @@ Function showDescriptionModal(message, dialogEvent, trackingTask, callback = inv
   buttons = [getTranslation("dialog_button_close")]
   info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback)
   info.modalInfo.scrollable = true
+  info.modalInfo.instantResumeAction = m.constants.instantResumeActions.closeDialog
   showModal(info.modalInfo, info.buttonInfo)
 End Function
 
@@ -323,9 +327,27 @@ End Function
 ' @trackingTask: roSGNode, an instance of the trackingLoggingTask - used to send close dialog events when the dialog is closed.
 ' @callback: (optional) roFunction, a function that will be triggered when the first button is selected
 ' @cancelCallback: (optional) Function will be triggered when the second button is clicked (function will not have any params)
-Function showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid)
-  info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback, cancelCallback)
+' @instantResumeAction: string, provides the information on what action should take for error and action modals.
+Function showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid, instantResumeAction = "")
+  info = getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback, cancelCallback, instantResumeAction)
   showModal(info.modalInfo, info.buttonInfo)
+End Function
+
+
+'Wrapper function to simplemodal with customization of instantResumeAction = "closeDialog"
+
+'use this modal when we are trying to pass "closeDialog" as parameter and this is used when modals are not instant resumable.
+
+'@title: string, the title of the dialog, displayed in larger font
+' @message: string, the main message of the dialog to be displayed to the user
+' @buttons: array of strings (max 2 indexes), a button will be created for each index with the label of the button equal to the index's string.
+'           An empty array will create a single "OK" button by default.
+' @dialogEvent: assocArray, contains the info necessary to send a dialog open analytics event, has keys: "type" and "values"
+' @trackingTask: roSGNode, an instance of the trackingLoggingTask - used to send close dialog events when the dialog is closed.
+' @callback: (optional) roFunction, a function that will be triggered when the first button is selected
+' @cancelCallback: (optional) Function will be triggered when the second button is clicked (function will not have any params) 
+Function showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid)
+  showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback, cancelCallback, m.constants.instantResumeActions.closeDialog)
 End Function
 
 
@@ -334,13 +356,14 @@ End Function
 ' prior to calling showModal. For example showDescriptionModal() needs to add the scrollable key.
 '
 ' Returns an assocArray with the keys modalInfo and buttonInfo.
-Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid)
+Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid, instantResumeAction = "")
   modalInfo = {
     title: title
     message: message
     openTrackEvent: dialogEvent
     trackingTask: trackingTask
     backButtonCallback : cancelCallback
+    instantResumeAction : instantResumeAction
   }
 
   buttonInfo = []

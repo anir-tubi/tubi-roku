@@ -40,6 +40,9 @@
       <!-- If set to true, allows screens of the same type and same screenLevel to stack on top of each other  -->
       <field id="isStackable" type="boolean" value="false" />
 
+      <!-- Holds the information about what action should take when modal shown while resume after suspending -->
+       <field id="instantResumeAction" type="string" />
+
   </interface>
 
   <children>

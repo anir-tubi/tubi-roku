@@ -48,6 +48,8 @@ Function init()
   m.email = m.top.findNode("email")
   m.email.hint = getTranslation("signIn_email_hint")
 
+  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
+
   'set initial tracking values
   m.top.trackingPageInfo = {
     pageType: "login_page"

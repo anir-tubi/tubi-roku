@@ -63,7 +63,7 @@ Function displaySignInRequiredModal(screen)
   title = getTranslation("dialog_whoops_title")
   message = getTranslation("dialog_mylist_signIn_description")
   buttons = [getTranslation("dialog_button_register_signIn"), getTranslation("dialog_button_cancel")]
-  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalSelectedViaSideNavMyList, removeTopScreen)
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalSelectedViaSideNavMyList, removeTopScreen)
 
 End Function
 
@@ -194,7 +194,7 @@ Function showEmptyContentModal(screen)
   title = getTranslation("dialog_mylist_empty_title")
   message = getTranslation("dialog_mylist_empty_description")
   buttons = [getTranslation("dialog_button_ok")]
-  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, removeTopScreen, removeTopScreen)  
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, removeTopScreen, removeTopScreen)
 
 End Function
 

@@ -164,7 +164,7 @@ Function onSideNavItemSelected()
           sTitle = getTranslation("dialog_kidsExit_title")
           sDescription = getTranslation("dialog_kidsExit_description")
           '//::TODO::locale - should we 1st check if there is an error specifc OK/cancel button? If, not then should we get the generic ok/cancel button string?
-          showSimpleModal(sTitle, sDescription, [getTranslation("dialog_kidsExit_button_ok"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, disableKidsModeFromSideNav)
+          showSimpleInstantResumableModal(sTitle, sDescription, [getTranslation("dialog_kidsExit_button_ok"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, disableKidsModeFromSideNav)
         else
           dialogEvent = {
             type: "dialog"
@@ -194,7 +194,7 @@ Function onSideNavItemSelected()
 
           sTitle = getTranslation("dialog_kidsExit_title")
           sDescription = getTranslation("dialog_kidsExitLimited_description")
-          showSimpleModal(sTitle, sDescription, [getTranslation("dialog_button_settings"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, onKidsModeSettingsCall)
+          showSimpleInstantResumableModal(sTitle, sDescription, [getTranslation("dialog_button_settings"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, onKidsModeSettingsCall)
         else
           '//This use case should never happen. If the user has parental controls set to kids, then that instantly turns on kids mode,
           '//   so there will never be an enter kids mode mode when parental controls is turned to kids.
@@ -373,7 +373,7 @@ Function displayMenuItemDisabled(sMenuItemID, parental="")
   else
     sDescription = getTranslation("dialog_sideNavItemDisabled_description") 
   end if
-  showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
+  showSimpleInstantResumableModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
 
   ' reset the selected item indicator in the side nav to the current screen, since selecting search will set it to search
   sideNavId = m.constants.ui.screenIdToSideNavId[currentScreenNow.id]

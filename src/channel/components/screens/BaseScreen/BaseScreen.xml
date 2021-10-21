@@ -64,6 +64,10 @@
            with type = transport was handled
       -->
       <field id="transportVoiceResponse" type="assocarray" alwaysNotify="true"/>
+
+      <!-- Holds the information of how to handle when the screen is active after instant resume.
+           Action will be taken when instantResumeAction values are "restartApp", "startChannel" and resumeChannel. -->
+      <field id="instantResumeAction" type="string" value="resumeChannel"/>
   </interface>
   
   <children>

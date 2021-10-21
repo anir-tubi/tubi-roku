@@ -226,7 +226,7 @@ Function onEmailExistsError(errorResponse)
   title =  getTranslation("dialog_defaultError_title")
   message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
   buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
-  simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, checkEmailExists)
+  simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, checkEmailExists, m.constants.instantResumeActions.restartApp)
   
   if simpleModalInfo <> invalid and simpleModalInfo.buttonInfo <> invalid and simpleModalInfo.buttonInfo[0] <> invalid
     simpleModalInfo.buttonInfo[0].callbackParams = {
@@ -244,6 +244,7 @@ End Function
 Function showActivationScreen()
 
   activationCodeScreen = CreateObject("roSGNode", "ActivationCodeScreen")
+  activationCodeScreen.id = m.constants.ui.screenIds.activationCodeScreen
   activationCodeScreen.observeFieldScoped("activationSuccess", "onActivationSuccess")
   activationCodeScreen.observeFieldScoped("errorType", "onRegTaskError")
   pushScreen(activationCodeScreen, true, true)
@@ -705,7 +706,6 @@ Function onParentalControlAfterSignIn()
         dialog_sub_type: "password-request"
       }
     } 
-
     showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
   end if
   

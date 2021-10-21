@@ -16,7 +16,7 @@ Function init()
     }
   }
 
-  m.top.screenLevel = m.constants.ui.screenLevels.comfirmPasswordScreen
+  m.top.screenLevel = m.constants.ui.screenLevels.confirmPasswordScreen
 End Function
 
 
