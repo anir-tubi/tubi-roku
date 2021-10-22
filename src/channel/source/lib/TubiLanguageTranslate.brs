@@ -561,19 +561,23 @@ Function getTranslation_en_US()
     },
     "screenSettings_parentalControls_group0": {
       "description": "Group 0 of the parental controls",
-      "message": "Little Kids ({ratings})"
+      "message": "Little Kids ({ratings})",
+      "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group1": {
       "description": "Group 1 of the parental controls",
-      "message": "Older Kids ({ratings})"
+      "message": "Older Kids ({ratings})",
+      "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group2": {
       "description": "Group 2 of the parental controls",
-      "message": "Teens ({ratings})"
+      "message": "Teens ({ratings})",
+      "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group3": {
       "description": "Group 3 of the parental controls",
-      "message": "Adults ({ratings})"
+      "message": "Adults ({ratings})",
+      "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_instructions": {
       "description": "Description of the parental controls screen",
@@ -634,6 +638,26 @@ Function getTranslation_en_US()
     "screenSettings_error_parentalChanges_description_default": {
       "description": "description of dialog message when parental controls has changed",
       "message": "Parental controls setting has changed. Parental controls will be password protected after 5 minutes."
+    },
+    "screenSettings_error_parentalChanges_description_group0": {
+      "description": "Success message when parental controls has changed to group 0",
+      "message": "Parental controls setting has changed to Little Kids ({ratings}}). Parental controls will be password protected after 5 minutes.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_parentalChanges_description_group1": {
+      "description": "Success message when parental controls has changed to group 1",
+      "message": "Parental controls setting has changed to Older Kids ({ratings}). Parental controls will be password protected after 5 minutes.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_parentalChanges_description_group2": {
+      "description": "Success message when parental controls has changed to group 2",
+      "message": "Parental controls setting has changed to Teens ({ratings}). Parental controls will be password protected after 5 minutes.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_parentalChanges_description_group3": {
+      "description": "Success message when parental controls has changed to group 3",
+      "message": "Parental controls setting has changed to Adults ({ratings}). Parental controls will be password protected after 5 minutes.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
@@ -857,11 +881,13 @@ Function getTranslation_en_US()
     },
     "channel_description": {
       "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
-      "message": "Enjoy the largest library of popular movies and TV shows, all for free!"
+      "message": "Enjoy the largest library of popular movies and TV shows, all for free!",
+      "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
     },
     "channel_webDescription": {
       "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
-      "message": "Watch thousands of hit movies and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer ads than regular TV. Tubi is the largest free streaming service featuring award-winning movies and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favorites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!"
+      "message": "Watch thousands of hit movies and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer ads than regular TV. Tubi is the largest free streaming service featuring award-winning movies and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favorites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!",
+      "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
     },
     "dialog_whoops_title": {
       "description": "A general whoops title for an dialog window",
@@ -1467,21 +1493,25 @@ Function getTranslation_es_MX()
       "description": "The label for the parental controls",
       "message": "Controles parentales"
     },
-    "screenSettings_error_parentalChanges_description_group0": {
-      "description": "Success message when parental controls has changed to group 0",
-      "message": "Parental controls setting has changed to Little Kids ({ratings}}). Parental controls will be password protected after 5 minutes."
+    "screenSettings_parentalControls_group0": {
+      "description": "Group 0 of the parental controls",
+      "message": "Niños pequeños ({ratings})",
+      "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
-    "screenSettings_error_parentalChanges_description_group1": {
-      "description": "Success message when parental controls has changed to group 1",
-      "message": "Parental controls setting has changed to Older Kids ({ratings}). Parental controls will be password protected after 5 minutes."
+    "screenSettings_parentalControls_group1": {
+      "description": "Group 1 of the parental controls",
+      "message": "Niños mayores ({ratings})",
+      "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
-    "screenSettings_error_parentalChanges_description_group2": {
-      "description": "Success message when parental controls has changed to group 2",
-      "message": "Parental controls setting has changed to Teens ({ratings}). Parental controls will be password protected after 5 minutes."
+    "screenSettings_parentalControls_group2": {
+      "description": "Group 2 of the parental controls",
+      "message": "Adolescentes ({ratings})",
+      "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
-    "screenSettings_error_parentalChanges_description_group3": {
-      "description": "Success message when parental controls has changed to group 3",
-      "message": "Parental controls setting has changed to Adults ({ratings}). Parental controls will be password protected after 5 minutes."
+    "screenSettings_parentalControls_group3": {
+      "description": "Group 3 of the parental controls",
+      "message": "Adultos ({ratings})",
+      "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_instructions": {
       "description": "Description of the parental controls screen",
@@ -1542,6 +1572,26 @@ Function getTranslation_es_MX()
     "screenSettings_error_parentalChanges_description_default": {
       "description": "description of dialog message when parental controls has changed",
       "message": "La configuración del control parental ha cambiado. Los controles parentales estarán protegidos con contraseña después de 5 minutos."
+    },
+    "screenSettings_error_parentalChanges_description_group0": {
+      "description": "Success message when parental controls has changed to group 0",
+      "message": "La configuración del Control Parental ha cambiado a Niños pequeños ({ratings}}). Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_parentalChanges_description_group1": {
+      "description": "Success message when parental controls has changed to group 1",
+      "message": "La configuración del Control Parental ha cambiado a Niños mayores ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_parentalChanges_description_group2": {
+      "description": "Success message when parental controls has changed to group 2",
+      "message": "La configuración del Control Parental ha cambiado a Adolescentes ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_parentalChanges_description_group3": {
+      "description": "Success message when parental controls has changed to group 3",
+      "message": "La configuración del Control Parental ha cambiado a Adultos ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
@@ -1610,10 +1660,6 @@ Function getTranslation_es_MX()
     "screenAgeVerification_yyyy": {
       "description": "A label showing that the user should enter four digits for their birthdate year",
       "message": "AAAA"
-    },
-    "screenAgeVerification_tip": {
-      "description": "A tip about how to enter the birth date",
-      "message": "Tip: Si tu fecha de nacimiento es el 1 de enero del 2000, ingresa 01/01/2000"
     },
     "screenAgeVerification_warning_prompt": {
       "description": "A message informing the user that they entered a date that is not valid",
@@ -1766,6 +1812,16 @@ Function getTranslation_es_MX()
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
       "message": "Tubi - Películas y Series Gratis"
+    },
+    "channel_description": {
+      "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+      "message": "¡Disfruta del catálogo más grande de películas y series populares completamente Gratis!",
+      "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
+    },
+    "channel_webDescription": {
+      "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
+      "message": "Ve miles de películas y series totalmente Gratis. En Tubi puedes ver contenido 100% legal y de forma ilimitada. No se requiere tarjeta de crédito o suscripción. Solo tienes que descargar la aplicación, elige lo que quieras ver en dónde tú quieras y disfruta del contenido con menos anuncios que el cable. Tubi es el servicio más grande de streaming Gratis que ofrece películas y series de televisión premiadas. Tenemos algo para todos: Comedias, dramas, familiares, clásicas, dramas coreanos, anime y más. ¡Descarga hoy y empieza el streaming de entretenimiento Gratis!",
+      "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
     },
     "dialog_whoops_title": {
       "description": "A general whoops title for an dialog window",
