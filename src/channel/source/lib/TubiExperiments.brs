@@ -52,7 +52,7 @@ Function TubiExperiments(constants) as Object
       }
       
       roku_pill_shaped_topnav: {
-        roku_pill_shaped_topnav_v1: {"enabled": false}
+        roku_pill_shaped_topnav_v1: {"enabled": true}
       }
     
       roku_skip_intro:{
