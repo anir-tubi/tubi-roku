@@ -1573,7 +1573,7 @@ Function onCustomSuspend(msg)
         linearVideoPlayer.control = "stop"
       end if
     end if
-    if getExperimentResource("instant_resume_tweak", "instant_resume_tweak_v1", false).enabled = true
+    if getExperimentResource("roku_instant_resume_tweak", "roku_instant_resume_tweak_v1", false).enabled = true
       'Modals with type errorDialog should made invisible and app should restarted on app relaunch.
       'Modals with type actionDialog should be closed and app should resume from the current screen
       modal = getTopModal()
@@ -1644,7 +1644,7 @@ Function onCustomResume(msg)
         ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
         restartApp()
       else
-        if getExperimentResource("instant_resume_tweak", "instant_resume_tweak_v1", true).enabled = true
+        if getExperimentResource("roku_instant_resume_tweak", "roku_instant_resume_tweak_v1", true).enabled = true
           'Removes the RFIScreen
           if m.billing <> invalid
             m.billing.unobserveFieldScoped("userData")

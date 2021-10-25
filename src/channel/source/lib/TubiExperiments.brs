@@ -59,8 +59,8 @@ Function TubiExperiments(constants) as Object
         roku_skip_intro_v2: {"skip_button_type": "no_button"} 'valid values are : "no_button", "fill", "transparent"
       }
 
-      instant_resume_tweak: {
-        instant_resume_tweak_v1: {"enabled": false}
+      roku_instant_resume_tweak: {
+        roku_instant_resume_tweak_v1: {"enabled": false}
       }
     }
     
