@@ -1954,6 +1954,30 @@ Function getTranslation_es_MX()
     "dialog_button_signUp": {
       "description": "The label of the button in a dialog window that allows the user to sign up into the app.",
       "message": "Inscríbete"
+    },
+    "screenSettings_parentalPassword_setup_new_password": {
+      "description": "Directions for users who attempt to change the parental controls",
+      "message": "Para crear una contraseña nueva"
+    },
+    "screenSettings_parentalPassword_visit_link": {
+      "description": "Directions for users to setup the new password",
+      "message": "visita tubi.tv/password"
+    },
+    "screenSettings_parentalPassword_visit_webBrowser": {
+      "description": "Directions for users to setup the new password on browser",
+      "message": "1. Por favor visita tubi.tv/password en un navegador de web"
+    },
+    "screenSettings_parentalPassword_email": {
+      "description": "Directions to the user to enter his/her email to setup new password",
+      "message": "2. Ingresa el correo electrónico "
+    },
+    "screenSettings_parentalPassword_set_new_Password": {
+      "description": "Directions to the user about email notification to setup new password",
+      "message": "3. Te enviaremos instrucciones para crear una contraseña nueva"
+    },
+    "screenSettings_parentalPassword_know_my_Password": {
+      "description": "Directions to the user to enter his/her password if they know their password",
+      "message": "Yo se mi contraseña. Vamos."
     }
   }
 End Function
