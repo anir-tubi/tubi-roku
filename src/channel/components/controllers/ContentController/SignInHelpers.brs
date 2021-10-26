@@ -413,7 +413,7 @@ Function onSignInError(errorResponse)
   forgotPasswordDesc = getTranslation("forgot_password_text") + " " + getTranslation("forgot_password_link")
   message = invalidPasswordDesc + chr(10) + requestInput.email + chr(10) +  chr(10) + forgotPasswordDesc
   buttons = [getTranslation("re-enter_password_button")]
-  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onReEnterPasswordSelected, onReEnterPasswordSelected)
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onReEnterPasswordSelected, onReEnterPasswordSelected)
 
 End Function
 
