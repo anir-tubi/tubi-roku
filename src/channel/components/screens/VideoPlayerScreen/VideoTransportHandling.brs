@@ -704,6 +704,7 @@ Function onSkipIntroSelected()
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
+  m.positionAtJumpStart = m.playerPosition
   m.VideoState = "hop"
   if m.skipIntro.id = "skipIntro"
     hopPosition = m.top.content.creditsCuePoints.intro_end
