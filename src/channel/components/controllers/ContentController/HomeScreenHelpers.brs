@@ -536,11 +536,6 @@ End Function
 '//Check the focused row if it is a sponsored container and if so, possibly send out the pixels
 Function checkForSponsorPixels(rowFocused)
   if rowFocused <> invalid 
-    if (rowFocused.id = "reality_tv" and UCase(m.constants.deviceInfo.countryCode) = "US")
-      '//to properly send the experiment exposure event, we need to hardcode it so it is sent when the reality_tv container is shown. Once the experiment is done, we can get rid of this IF statement
-      getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", true)
-    end if
-
     '//reset videoSponsorExposureId before checking if there is a sponsor for the row
     m.videoSponsorExposureId = ""
     if rowFocused.sponsorImages <> invalid and rowFocused.sponsorImages.pixels <> invalid and rowFocused.sponsorImages.pixels["homescreen"] <> invalid    

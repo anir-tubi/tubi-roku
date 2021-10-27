@@ -107,7 +107,7 @@ Function onLoadContent()
     category = m.top.content.getChild(0)
     m.contentLoadedAndFocused = false
     if category.getChildCount() > 0
-      if getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", false).enabled = true and category.sponsorImages <> invalid
+      if category.sponsorImages <> invalid
         '//check in photoshop and re-adjust postions
         m.PageTitleAndCounter.translation = [m.PageTitleAndCounter.translation[0], 518]
         m.VideoGrid.translation = [m.VideoGrid.translation[0], 627]

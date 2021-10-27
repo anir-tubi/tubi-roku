@@ -62,7 +62,7 @@ Function onContentChange()
     end if
 
     '//Display Sponsor if there is a sponsor
-    if m.top.content.sponsorImages <> invalid and getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", false).enabled = true
+    if m.top.content.sponsorImages <> invalid
       '//Move/resize/display elements when there is a sponsor. If no sponsor, then hidden elements will ensure the height of the row label is varied when this component is used as the "rowTitleComponentName" in a rowlist
       '//Set the Sponsor heights here rather than the XML so it does not affect the height of a non-sponsored row label
       images = m.top.content.sponsorImages

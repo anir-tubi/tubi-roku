@@ -149,10 +149,7 @@ Function cmsApi_getChannelRequestInfo(channelId, limit, bKidsMode = false)
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = true
   options.params = m.setTupianPosterParam(options.params)
-
-  if (getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", false).enabled = true  and UCase(m.constants.deviceInfo.countryCode) = "US")
-    options.headers["Accept-Version"] = "6.0.0"
-  end if
+  options.headers["Accept-Version"] = "6.0.0"
 
   return {
     url: url
@@ -198,9 +195,7 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
   options = m.commonOptions()
   params = options.params
   headers = options.headers
-  if (getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", false).enabled = true  and UCase(m.constants.deviceInfo.countryCode) = "US")
-    headers["Accept-Version"] = "6.0.0"
-  end if
+  headers["Accept-Version"] = "6.0.0"
 
   params["includeEmptyHistory"] = true
   params["includeEmptyQueue"] = true
@@ -294,10 +289,7 @@ Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = f
   params = m.setImageParams(imageParamTypes, params)
 
   headers = options.headers
-
-  if (getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", false).enabled = true  and UCase(m.constants.deviceInfo.countryCode) = "US")
-    headers["Accept-Version"] = "6.0.0"
-  end if
+  headers["Accept-Version"] = "6.0.0"
 
   headers["x-tubi-inject-live-news"] = "false"
   if passedOptions <> invalid and passedOptions.params <> invalid

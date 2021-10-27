@@ -136,10 +136,6 @@ Function onChannelContentResponse(msg)
     if channel = invalid or channel.getChildCount() <= 0
       bEmptyResponse = true
     else
-      if (channel.id = "reality_tv" and UCase(m.constants.deviceInfo.countryCode) = "US")
-        '//to properly send the experiment exposure event, we need to hardcode it so it is sent when the reality_tv container is shown. Once the experiment is done, we can get rid of this IF statement
-        getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", true)
-      end if
       if channel.sponsorImages <> invalid and channel.sponsorImages.pixels <> invalid and channel.sponsorImages.pixels["container_details"] <> invalid
         '//When a sponsored container is made visible, then call the pixels
         sponsorPixels = channel.sponsorImages.pixels["container_details"]

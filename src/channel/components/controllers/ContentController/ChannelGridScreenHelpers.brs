@@ -90,10 +90,6 @@ Function onVisibleItemsChange(msg)
     '//Check thru the array of content nodes of the visible items to see if any of the items within those rows
     '//have sponsorships, and then send out the pixels for those items (if they have not been sent already)
     for each contentNode in aVisibleContentNodes
-      if (contentNode <> invalid and contentNode.id = "reality_tv" and UCase(m.constants.deviceInfo.countryCode) = "US")
-        '//to properly send the experiment exposure event, we need to hardcode it so it is sent when the reality_tv container is shown. Once the experiment is done, we can get rid of this IF statement
-        getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", true)
-      end if
       if contentNode <> invalid and contentNode.sponsorImages <> invalid and contentNode.sponsorImages.pixels <> invalid and contentNode.sponsorImages.pixels["container_list"] <> invalid
         containerId = contentNode.id
         sponsorPixels = contentNode.sponsorImages.pixels["container_list"]

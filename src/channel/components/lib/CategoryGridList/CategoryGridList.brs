@@ -266,7 +266,7 @@ Function setRowHeights()
       numRows = 3
     end if
     
-    if getExperimentResource("roku_sponsor_experiment", "roku_sponsor_experiment_v1", false).enabled = true and category.sponsorImages <> invalid
+    if category.sponsorImages <> invalid
       '//if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
       rowHeightAdjustment = rowHeightAdjustment + 32
     end if
