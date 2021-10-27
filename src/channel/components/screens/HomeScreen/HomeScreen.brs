@@ -210,6 +210,8 @@ Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top)) 
   if m.top.hasFocus() = true
     m.gridHasFocus = true
+    ' TODO : Following line needs root cause analysis and fix.  Currently, this line is a hack to fix focus issue when homescreen has been recreated after user changes PC. Check item.selectedItemColor. 
+    m.topNav.setFocus(false)
     m.CategoryGridList.setFocus(true)
     m.CategoryGridList.opacity = 1
     m.InfoPanelParent.opacity = 1
