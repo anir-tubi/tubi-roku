@@ -44,7 +44,11 @@ Function formatDialog()
       end if
       listItem = invalid
     end for
-    m.ButtonList.itemSize = [nWidestWidth, m.ButtonList.itemSize[1]]
+    'Keeping the default width of 475 for each button and if the text length is greater than 475 then we are 
+    'determining the width based on the text length.
+    if nWidestWidth > m.ButtonList.itemSize[0]
+      m.ButtonList.itemSize = [nWidestWidth, m.ButtonList.itemSize[1]]
+    end if
     m.ButtonList.content = newContent
   end if
 
