@@ -32,17 +32,6 @@
       <field id="navigateWithinPageInfo" type="assocarray"/>
   </interface>
   <children> 
-    
-    <Group
-      id="farAwayFromFocusIndicator"
-      opacity="0"
-      translation="[-8,18]">
-      <Poster
-        uri="pkg:/images/up-arrow.png"
-        width="47"
-        height="47"
-        opacity=".64"/>
-      </Group>
     <Group
       id="TopNavMenuBgroundParent">
       <Poster
