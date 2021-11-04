@@ -820,7 +820,7 @@ Function getConstants()
       constants.ui.imageSizes.landscape= [384,216]
 
       'Sizes of landscape VITG that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.largeVITG = [980, 552]
+      constants.ui.imageSizes.largeVITG = [981,552]
 
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.linear = [384,144]
