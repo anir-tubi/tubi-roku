@@ -772,6 +772,7 @@ Function signUserUpForQAAutomation()
     email: "build_roku_" + secondsFromEpoch.ToStr() + "@tubi.tv"
     emailType: "manual"
     firstName:  "Automation"
+    automation: true ' setting automation as true, so password will be set to 111111 during signup
   }
   birthdate = "2000-01-01"
   verifyAgeAtSignup(signInInfo, birthdate)

@@ -98,7 +98,14 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
   if hasValidSignUpCredentials(birthdate, signInInfo) = true ' triggers when user signs up
 
     deviceInfo = CreateObject("roDeviceInfo")
-    randomUUID = right(deviceInfo.GetRandomUUID(), 12) ' taking only 12 characters from right since GetRandomUUID() length is more
+
+    mode = m.constants.settings.mode
+
+    if signInInfo.automation = true or mode = "qa"
+      password = "111111" 'this password will be used during automation signup or when api is pointed to staging
+    else  
+      password = right(deviceInfo.GetRandomUUID(), 12) ' taking only 12 characters from right since GetRandomUUID() length is more
+    end if
 
     usedEmailAsFirstName = false
     if signInInfo.emailType = "manual"
@@ -111,7 +118,7 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
       device_id: m.constants.deviceInfo.deviceId
       credentials: {
         email: signInInfo.email
-        password: randomUUID 'used dummy password - user can change it by using forgot password
+        password: password 'used dummy password - user can change it by using forgot password
         gender: ""
         first_name: signInInfo.firstName
         last_name: ""
