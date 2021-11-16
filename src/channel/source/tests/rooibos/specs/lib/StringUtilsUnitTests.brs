@@ -194,3 +194,4 @@ Function stringUtils_isNonEmptyString_test()
   m.assertFalse(isString3)
   m.assertTrue(isString4)
 End Function
+
