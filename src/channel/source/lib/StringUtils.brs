@@ -167,13 +167,6 @@ Function getUrlParts(url, paramsSeparator = "?")
 End Function
 
 
-' Change the URL with a Cache Busting param to have a new value for its cache bustng param
-Function createCacheBustingURL(url)
-  sCacheBuster = createCacheBusterString()
-  return replaceURLParameter(url, "cb", sCacheBuster)
-End Function
-
-
 ' Change the param value of the provided param name with the provided value with the provided URL
 ' @url: string, The URL to change
 ' @paramToReplace: string, The query param name that its value should be changed

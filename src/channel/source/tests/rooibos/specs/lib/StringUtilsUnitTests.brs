@@ -110,46 +110,6 @@ Function stringUtils_getUrlParts_test()
 End Function
 
 
-'@Test createCacheBustingURL unit tests
-Function stringUtils_createCacheBustingURL_test()
-  goodUrl1 = "http://www.tubi.tv?cb=1234"
-  goodUrl2 = "http://www.tubi.tv?param1=abc&cb=1234"
-  goodUrl3 = "http://www.tubi.tv"
-  badUrl1 = ""
-  badUrl2 = 12
-  badUrl3 = "://"
-
-  convertedURL_good1 = createCacheBustingURL(goodUrl1)
-  convertedURL_good2 = createCacheBustingURL(goodUrl2)
-  convertedURL_good3 = createCacheBustingURL(goodUrl3)
-  convertedURL_bad1 = createCacheBustingURL(badUrl1)
-  convertedURL_bad2 = createCacheBustingURL(badUrl2)
-  convertedURL_bad3 = createCacheBustingURL(badUrl3)
-
-  '//it is expected the goodUrl1 and goodUrl2 URLs will successfully return a URL with the "cb" param set to something different 
-  m.assertNotInvalid(convertedURL_good1)
-  m.assertNotInvalid(convertedURL_good2)
-  
-  '//make sure the 'cb' value was changed
-  queryObject_good1 = getUrlParts(convertedURL_good1).paramsAA
-  queryObject_good2 = getUrlParts(convertedURL_good2).paramsAA
-
-  sNewValue_good1 = queryObject_good1["cb"]
-  m.assertTrue(isString(sNewValue_good1))
-  m.AssertNotEqual("1234", sNewValue_good1)
-
-  sNewValue_good2 = queryObject_good2["cb"]
-  m.assertTrue(isString(sNewValue_good2))
-  m.AssertNotEqual("1234", sNewValue_good2)
-
-  '//the following URLs do not have the "cb" param so it is expected to return the same "URL" as what was put in 
-  m.assertEqual(goodUrl3, goodUrl3)
-  m.assertEqual(badUrl1, convertedURL_bad1)
-  m.assertEqual(badUrl2, convertedURL_bad2)
-  m.assertEqual(badUrl3, convertedURL_bad3)
-End Function 
-
-
 '@Test replaceURLParameter unit tests
 Function stringUtils_replaceURLParameter_test()
   goodUrl1 = "http://www.tubi.tv?cb=1234"

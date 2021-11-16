@@ -983,7 +983,13 @@ Function sendSponsorPixels(aPixelURLs)
   tubiLog("ContentController.sendSponsorPixels")
   if aPixelURLs <> invalid and aPixelURLs.Count() > 0
     for each pixelURL in aPixelURLs
-      newPixelURL = createCacheBustingURL(pixelURL)
+
+      '//the sStringToReplace is the agreed upon string that the backend will set to the param that is used for cachebusting.
+      '//a cache busting string must be created within the Roku client and replace the sStringToReplace.
+      sStringToReplace = "(ADRISE:CB)"
+      sCacheBuster = createCacheBusterString()
+      newPixelURL = pixelURL.replace(sStringToReplace, sCacheBuster)
+
       m.makeRequest({
         url: newPixelURL
         requestType: m.constants.reqNames.sponsorPixel
