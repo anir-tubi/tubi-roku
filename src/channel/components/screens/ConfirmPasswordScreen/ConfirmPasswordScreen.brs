@@ -1,5 +1,5 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   
   m.password = m.top.findNode("password")
   m.password.hint = getTranslation("signIn_password_hint")
@@ -27,6 +27,10 @@ Function onScreenFocusChange()
   tubiLog("ConfirmPasswordScreen.onScreenFocusChange")
   if m.top.hasFocus()
     m.Keyboard.setFocus(true)
+    if m.constants.settings.mode <> "production" and m.constants.settings.password <> invalid
+      m.keyboard.text = m.constants.settings.password
+      m.password.text = m.constants.settings.password
+    end if
   end if
 End Function
 
