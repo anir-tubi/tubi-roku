@@ -3,6 +3,6 @@
 <component name = "TopNavContentNode" extends="ContentNode">
   <interface>
     <field id="selected" type="boolean" value="false"/>
-    <field id="selectedItemColor" type="string"/>
+    <field id="selectedItemColor" type="color"/>
   </interface>
 </component>

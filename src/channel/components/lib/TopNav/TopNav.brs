@@ -1,22 +1,32 @@
 Function init()
   tubiLog("TopNav.init")
-  
+
   m.Menu = m.top.findNode("TopNavMenu")
   m.MenuBground = m.top.findNode("TopNavMenuBground")
-  m.MenuBgroundParent = m.top.findNode("TopNavMenuBgroundParent")
-  m.constants = m.global.constants
 
+  m.constants = getConstantsFromGlobal()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
+  m.colors = {
+    white: m.constants.ui.colors.unfocused
+    lightGray: "0x9699A3FF"
+    darkGray: "0x10141FFF"
+    orange: m.constants.ui.colors.highlightedText
+  }
+
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("jumpToID", "onJumpIDChange")
-  m.top.observeFieldScoped("farAwayFromFocus", "onFarAwayFromFocusChange")
-  m.top.observeFieldScoped("refresh", "onRefreshChange")
+  m.top.observeFieldScoped("uiState", "onUiStateChange")
+  m.top.observeFieldScoped("contentUpdated", "onContentUpdated")
+  m.top.observeFieldScoped("selectedId", "onSelectedIdChange")
 
-  m.MenuBground.blendColor = "0x9699A3FF"
-  m.Menu.focusFootprintBlendColor = "0xFFFFFFFF"
+  m.Menu.numRows = 1
+  m.MenuBground.blendColor = m.colors.lightGray
+  m.Menu.translation= [12,12]
+  m.Menu.focusFootprintBlendColor = m.colors.white
+
   if m.constants <> invalid and m.constants.deviceInfo.scaledUi = true
     m.Menu.focusBitmapUri = "pkg:/images/pill_top_nav_hd.9.png"
     m.Menu.focusFootprintBitmapUri="pkg:/images/pill_top_nav_hd.9.png"
@@ -27,47 +37,73 @@ Function init()
     m.MenuBground.uri = "pkg:/images/tab_component_alt_fhd.9.png"
   end if
 
-  m.Menu.observeField("itemSelected", "onItemSelected")
-  m.Menu.observeField("itemFocused", "onItemFocused")
-  setFocusVisualProperties() ' initialize the focus look of the topNav
-End Function
+  m.Menu.observeFieldScoped("itemSelected", "onItemSelected")
+  m.Menu.observeFieldScoped("itemFocused", "onItemFocused")
 
-
-Function onRefreshChange()
-  if m.top.refresh = true
-    draw()
-  end if
+  ' local state to determine if a menu item gained focus due to a user navigating to a
+  ' top nav item with the remote, or due to the app programatically setting m.Menu.jumpToItem.
+  ' We don't want to send analytics events for focuses due to setting m.Menu.jumpToItem.
+  m.isJumping = false
 End Function
 
 
 ' Draw the navigational items in the top nav. Do not call this in the init() function as it may slow the app down as the content is loading
-Function draw()
-  m.Menu.focusBitmapBlendColor = m.global.theme.focused
-  rowNode = CreateObject("roSGNode", "ContentNode")
+Function onContentUpdated()
+  tubiLog("TopNav.onContentUpdated")
+  theme = getThemeFromGlobal()
+  m.Menu.focusBitmapBlendColor = theme.focused
+
+  ' HARDCODED:: nButtonPadding is the total horizontal padding of the buttons to ensure 
+  ' MenuBground is the proper width. Since this cannot be determined easily programatically, 
+  ' we are hardcoding the number here. 
+  nButtonPadding = 2
   nMenuOutsideSpacing = m.Menu.translation[0]
   aItemWidths = []
   nBgroundWidth = nMenuOutsideSpacing
-  nButtonPadding = 2 '::HARDCODED:: this is the total horizontal padding of the buttons to ensure MenuBground is the proper width. Since this cannot be determined easily programatically, we afre hardcoding the number here. 
-  setMainContent(m.constants.ui.sideNavIds.home, rowNode, aItemWidths)
-  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(0)
-  setMainContent(m.constants.ui.sideNavIds.movies, rowNode, aItemWidths) 
-  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(1)
-  setMainContent(m.constants.ui.sideNavIds.tv, rowNode, aItemWidths)
-  lastCoumnSpacing = getColumnSpacing(1)
-  if m.top.isLinearTVAllowed = true
-    nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(2)
-    lastCoumnSpacing = getColumnSpacing(2)
-    setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode, aItemWidths)
+  nMenuItems = m.top.content.getChildCount()
+
+  selectedWasSet = false
+  for i = 0 to nMenuItems - 1
+    menuItem = m.top.content.getChild(i)
+
+    if menuItem.id = m.top.selectedId
+      menuItem.selected = true
+      selectedWasSet = true
+      m.top.selectedIndex = i
+    end if
+
+    if m.top.uiState = "unfocusedFar"
+      menuItem.selectedItemColor = m.colors.white
+    else if m.top.uiState = "unfocusedNear"
+      menuItem.selectedItemColor = m.colors.darkGray
+    else if m.top.uiState = "focused"
+      menuItem.selectedItemColor = m.colors.orange
+    end if
+
+    itemWidth = getItemWidth(menuItem)
+    aItemWidths.push(itemWidth)
+
+    if i <= nMenuItems - 2 'Do not append the pad for last button
+      nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(i)
+    end if
+  end for
+
+  ' if no item was set as the selected item, default to first item
+  if selectedWasSet = false
+    firstItem = m.top.content.getChild(0)
+    firstItem.selected = true
+    m.top.selectedIndex = 0
   end if
+
+  lastCoumnSpacing = getColumnSpacing(i)
 
   nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nMenuOutsideSpacing -  nButtonPadding - lastCoumnSpacing 'No need of padding for last item and columnspacing
   m.MenuBground.width = nBgroundWidth
 
   m.Menu.columnWidths = aItemWidths
   m.Menu.itemSize = [nBgroundWidth, m.Menu.itemSize[1]]
-  m.Menu.content = rowNode
+  m.Menu.content = m.top.content
 End Function
-
 
 
 ' Get the column spacing (to the right) for the column number that is passed
@@ -87,142 +123,144 @@ Function getColumnSpacing(nColumn)
 End Function
 
 
-' Set the ContentNode of one topNav button and add it to the passed parentNode
-' @itemID - string, The ID of the propsed top nav button 
-' @parentNode - The node to which the new button info will be added
-' @aItemWidths - array, An array that is used to keep track of the width of the new top nav button
-Function setMainContent(itemID, parentNode, aItemWidths)
-  contentNode = CreateObject("roSGNode", "TopNavContentNode")
-  contentNode.id = itemID
-  bSuccess = false
+' get the width of the content item as it would display in the top nav
+' @contentItem: roSGNode, the contentNode that we want the width of
+Function getItemWidth(contentItem)
+  '//component is a temporary component used to determine the width of the the topNav button
+  component = CreateObject("roSGNode", "TopNavItem")
+  component.itemContent = contentItem
+  itemWidth = component.boundingRect.width
 
-  if itemID = m.constants.ui.sideNavIds.home
-    contentNode.title = getTranslation("menu_foryou")
-    bSuccess = true
-  else if itemID = m.constants.ui.sideNavIds.movies
-    contentNode.title = getTranslation("menu_movies")
-    bSuccess = true
-  else if itemID = m.constants.ui.sideNavIds.tv
-    contentNode.title = getTranslation("menu_tv")
-    bSuccess = true
-  else if itemID = m.constants.ui.sideNavIds.linearTV
-    contentNode.title = getTranslation("menu_livetv")
-    bSuccess = true
-  else if itemID = m.constants.ui.sideNavIds.espanol
-    contentNode.title = "Español"
-    bSuccess = true
-  end if
+  ' Component is no longer needed. In an attempt to to get component to get garbage collected
+  ' remove its content, which is being used after this function
+  component.itemContent = invalid
 
-  if bSuccess = true
-    if m.top.farAwayFromFocus = true
-      contentNode.selectedItemColor = "0xFFFFFFFF"
-    else
-      contentNode.selectedItemColor = "0x10141FFF"
-    end if
-    '//component is a temporary component used to determine the width of the the topNav button
-    component = CreateObject("roSGNode", "TopNavItem")
-    component.itemContent = contentNode
-    aItemWidths.push(component.boundingRect.width)
-    parentNode.appendChild(contentNode)
-
-    component.itemContent = invalid '//Component is no longer needed. In an attempt to to get component to get garbage collected remove its content, which is being used after this function
-  end if
-
+  return itemWidth
 End Function
 
 
 Function onItemSelected()
   tubiLog("TopNav.onItemSelected")
-  selected = m.Menu.content.getChild(m.Menu.itemSelected)
+  menuItem = m.Menu.content.getChild(m.Menu.itemSelected)
 
+  if menuItem <> invalid
+    if m.top.doesSelectionNavigate = false
+      ' update which item looks like it is selected,
+      ' no need to jumpToID since the item is already focused
+      updateSelectedItem(menuItem.id)
+    else
+      ' jump the focus back to the default item so the top nav is in the default state
+      ' when the page containing this top nav is navigated to again.
+      selectedItemId = getSelectedItemId()
+      if selectedItemId <> ""
+        jumpToID(selectedItemId)
+      end if
+    end if
 
-  ' when the screen stacker changes the page, it will use trackingComponentInfo to dispatch a ‘NavigateToPageEvent' 
-  selectedID = m.Tracking.sideNavPageMap[selected.id]
-  values = {
-    top_nav_section: selectedID
-  }
-  m.top.trackingComponentInfo = {
-    componentType: "top_nav_component"
-    componentValues: values
-  }
+    ' when the screen stacker changes the page, it will use trackingComponentInfo to dispatch
+    ' a 'NavigateToPageEvent'
+    selectedSection = m.Tracking.sideNavPageMap[menuItem.id]
+    values = {
+      top_nav_section: selectedSection
+    }
+    m.top.trackingComponentInfo = {
+      componentType: "top_nav_component"
+      componentValues: values
+    }
 
-  m.top.selected = selected
+    m.top.selected = menuItem
+
+    ' set to invalid so any changes that might occur to the menuItem node don't re-trigger callbacks
+    m.top.selected = invalid
+  end if
 End Function 
 
 
 Function onItemFocused()
   tubiLog("TopNav.onItemFocused")
   '//When the user focuses on the top nav, then trigger a navigate_within_page event in ContentController
-  
-  itemFocused = m.Menu.itemFocused
-  item = m.Menu.content.getChild(m.Menu.itemFocused)
+  if m.isJumping <> true and m.top.handlingFocusFromOtherTopNavBackButton <> true
+    itemFocused = m.Menu.itemFocused
+    item = m.Menu.content.getChild(m.Menu.itemFocused)
 
-  pageType = ""
-  if m.top.containerTrackingPageInfo <> invalid and m.top.containerTrackingPageInfo.pagetype <> invalid
-    pageType = m.top.containerTrackingPageInfo.pagetype
-  end if
-  pageValues = {}
-  if m.top.containerTrackingPageInfo <> invalid and m.top.containerTrackingPageInfo.pageValues <> invalid
-    pageValues = m.top.containerTrackingPageInfo.pageValues
-  end if
+    pageType = ""
+    if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pagetype <> invalid
+      pageType = m.top.trackingPageInfo.pagetype
+    end if
 
-  navigateWithinPageInfo = {
-    pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
-  }
+    pageValues = {}
+    if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pageValues <> invalid
+      pageValues = m.top.trackingPageInfo.pageValues
+    end if
 
-  row = 1
-  col = 1 + itemFocused
-  navigateWithinPageInfo.vertical_location = row '1 based index
-  navigateWithinPageInfo.vertical_location_mode = "INDEX"  'LocationMode enum
-  navigateWithinPageInfo.horizontal_location = col
-  navigateWithinPageInfo.horizontal_location_mode =  "INDEX"  'LocationMode enum
-  
-  focusedID = m.Tracking.sideNavPageMap[item.id]
-  newTopNavFocusedButton = {
-    top_nav_section: focusedID
-  }
+    navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
+    }
 
-  if m.oldTopNavFocusedButton <> invalid
-    '//If oldTopNavFocusedButton exists, then the user is focusing from another topNav section
-    navigateWithinPageInfo.means_of_navigation = "SCROLL"
-    navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", m.oldTopNavFocusedButton)
+    row = 1
+    col = 1 + itemFocused
+    navigateWithinPageInfo.vertical_location = row '1 based index
+    navigateWithinPageInfo.vertical_location_mode = "INDEX"  'LocationMode enum
+    navigateWithinPageInfo.horizontal_location = col
+    navigateWithinPageInfo.horizontal_location_mode =  "INDEX"  'LocationMode enum
+
+    focusedID = m.Tracking.sideNavPageMap[item.id]
+    newTopNavFocusedButton = {
+      top_nav_section: focusedID
+    }
+
+    if m.oldTopNavFocusedButton <> invalid and m.oldTopNavFocusedButton.top_nav_section <> newTopNavFocusedButton.top_nav_section
+      ' If oldTopNavFocusedButton exists and is not the same as the newTopNavFocusedButton,
+      ' then the user is focusing from another topNav section
+      navigateWithinPageInfo.means_of_navigation = "SCROLL"
+      navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", m.oldTopNavFocusedButton)
+      m.top.navigateWithinPageInfo = navigateWithinPageInfo
+      m.oldTopNavFocusedButton = newTopNavFocusedButton
+    else if m.oldTopNavFocusedButton = invalid
+      '//If oldTopNavFocusedButton does not exist, then the user got to the top nav from a button press
+      navigateWithinPageInfo.means_of_navigation = "BUTTON"
+      navigateWithinPageInfo.dest_componentOneof = m.Tracking.getAnalyticsDestinationComponent("dest_top_nav_component", newTopNavFocusedButton)
+      m.top.navigateWithinPageInfo = navigateWithinPageInfo
+      m.oldTopNavFocusedButton = newTopNavFocusedButton
+    else
+      ' the old and new buttons are the same, indicating no navigating is actually happening,
+      ' so don't send any NavigateWithinPageEvents
+    end if
   else
-    '//If oldTopNavFocusedButton does not exist, then the user got to the top nav from a button press
-    navigateWithinPageInfo.dest_componentOneof = m.Tracking.getAnalyticsDestinationComponent("dest_top_nav_component", newTopNavFocusedButton)
-    navigateWithinPageInfo.means_of_navigation = "BUTTON"
+    m.isJumping = false
+    m.top.handlingFocusFromOtherTopNavBackButton = false
   end if
-
-  m.top.navigateWithinPageInfo = navigateWithinPageInfo
-
-  '//set oldTopNavFocusedButton 
-  m.oldTopNavFocusedButton = newTopNavFocusedButton
-
 End Function
 
 
-Function onJumpIDChange()
+Function onJumpIDChange(msg)
   tubiLog("TopNav.onJumpIDChange")
-  if m.top.jumpToID <> invalid and m.top.jumpToID <> ""
-    nJumpToItem = -1
-    content = m.Menu.content
-    if content = invalid 
-      draw()
-    end if
+  id = msg.getData()
 
+  if id <> invalid and id <> ""
+    jumpToId(id)
+  end if
+End Function
+
+
+' @id: string, the id for the top nav item to be jumped to
+Function jumpToId(id)
+  nJumpToItem = -1
+
+  if isNonEmptyString(id)
     content = m.Menu.content
     if content <> invalid
       for i=0 to content.getChildCount()-1
         child = content.getChild(i)
-        if m.top.jumpToID = child.id
-          child.selected = true
+        if id = child.id
           nJumpToItem = i
-        else 
-          child.selected = false
+          exit for
         end if
       end for
 
       if nJumpToItem >= 0
         '//Jump to the item with the same ID that is associated with m.top.jumpToID
+        m.isJumping = true
         m.Menu.jumpToItem = nJumpToItem
       end if
     end if
@@ -230,49 +268,155 @@ Function onJumpIDChange()
 End Function
 
 
-' When it is indicated that the topNav is far away from or close to the focus, then make visible adjustments to the top Nav
-Function onFarAwayFromFocusChange()
-  if m.top.farAwayFromFocus = true
-    m.Menu.focusFootprintBlendColor = "0x585B66"
-    fade(m.Menu, "out", 0.4, 0.0, 0.64) 'fade out the Menu to make labels 64% opacity
-    if m.Menu.content <> invalid
-      for i = 0 to m.Menu.content.getChildCount() - 1
-        child = m.Menu.content.getChild(i)
-        child.selectedItemColor = "0xFFFFFFFF"
-      end for
-    end if
-  else
-    m.Menu.focusFootprintBlendColor = "0xFFFFFFFF"
-    fade(m.Menu, "in", .4, 0.0, 1) 'fade in the Menu back to white labels.
-    if m.Menu.content <> invalid
-      for i = 0 to m.Menu.content.getChildCount() - 1
-        child = m.Menu.content.getChild(i)
-        child.selectedItemColor = "0x10141FFF"
-      end for
-    end if
-  end if
-End Function
-
-
 Function onFocusChange()
   tubiLog("TopNav.onFocusChange")
-  setFocusVisualProperties()
+  if m.top.hasFocus()
+    m.oldTopNavFocusedButton = invalid
+    m.Menu.setFocus(true)
+  end if
 End Function
 
 
-Function setFocusVisualProperties()
-  if m.top.hasFocus() = true
-    '// The Top Nav is in focus
-    m.top.farAwayFromFocus = false
-    m.Menu.setFocus(true) 
-    m.MenuBground.blendColor = "0x9699A3FF"
-    m.MenuBground.opacity = 0.16 
-  else if m.top.isInFocusChain() = false
-    '// The Top Nav is no longer in focus
-    m.MenuBground.blendColor = "0x9699A3FF"
-    m.MenuBground.opacity = .16
+Function onUiStateChange(msg)
+  tubiLog("TopNav.onUiStateChange")
+  uiState = msg.getData()
+  setUiState(uiState)
+End Function
 
-    onJumpIDChange()
-    m.oldTopNavFocusedButton = invalid
+
+Function setUiState(uiState)
+  tubiLog("TopNav.setUiState")
+  if isNonEmptyString(uiState)
+    if uiState = "focused"
+      setFocusedVisuals()
+    else if uiState = "unfocusedNear"
+      setUnfocusedNearVisuals()
+    else if uiState = "unfocusedFar"
+      setUnfocusedFarVisuals()
+    end if
   end if
+
+  selectedItemId = getSelectedItemId()
+  if selectedItemId <> ""
+    jumpToID(selectedItemId)
+  end if
+End Function
+
+
+Function setFocusedVisuals()
+  tubiLog("TopNav.setFocusedVisuals")
+  m.MenuBground.blendColor = m.colors.lightGray
+  m.MenuBground.opacity = 0.16
+  m.Menu.focusFootprintBlendColor = m.colors.orange
+  setSelectedItemColorOnMenuItems(m.colors.orange)
+
+  ' account for any animations that may be in process on the menu
+  stopAnimation(m.menuFade)
+
+  'fade in the Menu back to fully opaque white labels.
+  m.menuFade = fade(m.Menu, "in", .4, 0.0, 1)
+End Function
+
+
+Function setUnfocusedNearVisuals()
+  tubiLog("TopNav.setUnfocusedNearVisuals")
+  m.MenuBground.blendColor = m.colors.lightGray
+  m.MenuBground.opacity = .16
+  m.Menu.focusFootprintBlendColor = m.colors.white
+  setSelectedItemColorOnMenuItems(m.colors.darkGray)
+
+  ' account for any animations that may be in process on the menu
+  stopAnimation(m.menuFade)
+
+  'fade in the Menu back to fully opaque white labels.
+  m.menuFade = fade(m.Menu, "in", .4, 0.0, 1)
+End Function
+
+
+Function setUnfocusedFarVisuals()
+  tubiLog("TopNav.setUnfocusedFarVisuals")
+  m.MenuBground.blendColor = m.colors.lightGray
+  m.MenuBground.opacity = .16
+  m.Menu.focusFootprintBlendColor = "0x585B66FF"
+
+  ' account for any animations that may be in process on the menu
+  stopAnimation(m.menuFade)
+
+  ' fade out the Menu to make labels 64% opacity (give a gray look)
+  m.menuFade = fade(m.Menu, "out", 0.4, 0.0, 0.64)
+
+  setSelectedItemColorOnMenuItems("0xFFFFFFFF")
+End Function
+
+
+' @color: string: color represented like "0xFFFFFFFF"
+Function setSelectedItemColorOnMenuItems(color)
+  content = m.Menu.content
+  if content <> invalid
+    selectedItemId = getSelectedItemId()
+    for i = 0 to content.getChildCount() - 1
+      child = content.getChild(i)
+      child.selectedItemColor = color
+    end for
+  end if
+End Function
+
+
+Function onSelectedIdChange(msg)
+  selectedId = msg.getData()
+  if isNonEmptyString(selectedId)
+    m.top.id = m.top.id + "-" + selectedId
+  end if
+  updateSelectedItem(selectedId)
+End Function
+
+
+' updates which item in the top nav should be treated as selected
+Function updateSelectedItem(itemId)
+  if isNonEmptyString(itemId) and m.Menu.content <> invalid
+    for i = 0 to m.Menu.content.getChildCount() -1
+      menuItem = m.Menu.content.getChild(i)
+      if menuItem.id = itemId
+        menuItem.selected = true
+        m.top.selectedIndex = i
+      else
+        menuItem.selected = false
+      end if
+    end for
+  end if
+End Function
+
+
+' returns the first menu item with .selected = true.
+' Theoretically, there should only ever be exactly one menu item with .selected = true at any given time.
+Function getSelectedItemId()
+  if m.Menu.content <> invalid
+    for i = 0 to m.Menu.content.getChildCount() -1
+      menuItem = m.Menu.content.getChild(i)
+      if menuItem.selected = true
+        return menuItem.id
+      end if
+    end for
+  end if
+  return ""
+End Function
+
+
+Function onKeyEvent(key, press) as Boolean
+  tubiLog("TopNav.onKeyEvent")
+  if press = true
+    if key = "back"
+      selectedItemId = getSelectedItemId()
+      if m.Menu.content <> invalid
+        firstChild = m.Menu.content.getChild(0)
+        if firstChild <> invalid and selectedItemId <> firstChild.id
+          ' only set backItemSelected if the currently selected item is not the first item
+          m.top.backItemSelected = firstChild
+          m.top.backItemSelected = invalid
+          return true
+        end if
+      end if
+    end if
+  end if
+  return false
 End Function

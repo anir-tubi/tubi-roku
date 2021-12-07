@@ -374,3 +374,18 @@ Function finishAnimation(target as Object) as Boolean
 
   return false
 End Function
+
+
+' Helper function to stop an animation. Usually used in case we want to start an animation
+' on a UI component that is still running an animation (in which case we should stop it before
+' starting the new animation)
+'
+' @animation: roSGNode, an Animation node (usually retuned by animate() in this mixin)
+Function stopAnimation(animation)
+  if type(animation) = "roSGNode" and animation.isSubType("AnimationBase")
+    if animation.state <> "stopped"
+      animation.control = "stop"
+    end if
+  end if
+  return animation
+End Function

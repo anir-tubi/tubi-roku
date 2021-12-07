@@ -993,7 +993,7 @@ Function onBookmarkedAfterSignIn(msg) As Void
     ' re-fetch homescreen content when user signedIn
     homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
     if homeScreen <> invalid
-      refreshHomescreen(homescreen)
+      fetchHomescreen(homescreen)
     end if
     
     tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)

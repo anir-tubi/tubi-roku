@@ -27,18 +27,22 @@
 
       <!-- Keeps the information used for user tracking - structure looks like:
         {
-          pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
-          pageValues: {}          'an assoc array with key/values that match the pageType as found in tubiTracking_getAnalyticsPage()
+          pageType: "video_page"  corresponds to one of the page types in
+                                  tubiTracking_getAnalyticsPage() which mirrors the protos repo.
+          pageValues: {}          an assoc array with key/values that match the pageType as found in
+                                  tubiTracking_getAnalyticsPage().
         }
       -->
       <field id="trackingPageInfo" type="assocarray" />
 
       <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
         {
-          componentType: "category_component"    ' Corresponds to one of the page types in tubiTracking_getAnalyticsComponent() 
-                                                 ' which mirrors the protos repo.
-          componentValues: {}                    ' An assoc array with key/values that match the componentType as found in
-                                                 ' tubiTracking_getAnalyticsComponent().
+          componentType: "category_component"    Corresponds to one of the page types in
+                                                 tubiTracking_getAnalyticsComponent() 
+                                                 which mirrors the protos repo.
+          componentValues: {}                    An assoc array with key/values that match the
+                                                 componentType as found in
+                                                 tubiTracking_getAnalyticsComponent().
         }
       -->
       <field id="trackingComponentInfo" type="assocarray" />

@@ -1,20 +1,17 @@
 Function init()
   tubiLog("TopNavItem.init() ")
-  m.Label = m.top.findNode("Label")
-  m.LabelSelectedFocus = m.top.findNode("LabelSelectedFocus")
-  m.LabelSelectedFocus.color = "0xFFFFFFFF"
+  m.Underline = m.top.findNode("Underline")
 
-  m.nLabelXSpacing = m.Label.translation[0]
+  ' TopLabel is the main label that is always visible but fades
+  ' out to reveal the BottomLabel when scrolling away from the selected menu item.
+  m.TopLabel = m.top.findNode("TopLabel")
+  m.BottomLabel = m.top.findNode("BottomLabel")
+
+  m.BottomLabel.color = "0x10141FFF"
+  m.nLabelXSpacing = m.TopLabel.translation[0]
+  m.handledInitialItemContent = false
+
   m.top.observeField("itemContent", "onItemContentChange")
-  m.underline =  CreateObject("roSGNode","Rectangle")
-  m.underline.id = "underline"
-  m.underline.translation = [36, 40]
-  m.underline.height = 2
-  m.underline.width = 150
-  m.underline.color = "0xFF501AFF" 'Golden gate Orange
-  m.underline.visible="false"
-  m.top.appendChild(m.underline)
-  m.top.observeField("itemHasFocus", "onItemFocus")
   m.top.observeField("focusPercent", "onFocusPercentChange")
   m.top.observeField("gridHasFocus", "onGridHasFocusChange")
 End Function
@@ -23,45 +20,44 @@ End Function
 Function onGridHasFocusChange()
   itemContent = m.top.itemContent
   if itemContent <> invalid
-    if m.top.gridHasFocus = true
-      m.LabelSelectedFocus.visible = true
-      if m.top.itemHasFocus = true
-        m.LabelSelectedFocus.opacity = 1
-        m.underline.visible = false
-      end if
-      onItemFocus()
-    else
-      m.LabelSelectedFocus.opacity = 0
-      m.LabelSelectedFocus.visible = false    
-      m.underline.visible = false
-      if itemContent.selected = true
-        m.Label.color = itemContent.selectedItemColor
-      else
-        m.Label.color = "0xFFFFFFFF"
-      end if
-      
-    end if
+    setItemUI(itemContent)
   end if
 End Function
 
 
-Function onItemFocus()
-  itemContent = m.top.itemContent
-  if itemContent <> invalid
+' @itemContent: roSGNode, TopNavContentNode used to create the list item
+Function setItemUI(itemContent)
+  if m.top.gridHasFocus = true
+    m.TopLabel.color = "0xFFFFFFFF"
+    m.TopLabel.opacity = 1.0
+    m.Underline.opacity = 0
+    m.BottomLabel.opacity = 0
+
     if itemContent.selected = true
-      m.Label.color = m.global.theme.focused
-      m.underline.visible = true
-    else 
-      m.Label.color = "0xFFFFFFFF"
+      m.BottomLabel.color = itemContent.selectedItemColor
+      m.BottomLabel.opacity = 1.0
+    end if
+  else
+    m.TopLabel.color = "0xFFFFFFFF"
+    m.TopLabel.opacity = 1.0
+    m.BottomLabel.opacity = 0
+    m.Underline.opacity = 0
+
+    if itemContent.selected = true
+      m.TopLabel.color = itemContent.selectedItemColor
     end if
   end if
 End Function
+
 
 Function onFocusPercentChange()
   itemContent = m.top.itemContent
   focusPercent = m.top.focusPercent
-  m.LabelSelectedFocus.opacity = focusPercent
-  m.underline.opacity = 1 - focusPercent
+
+  if itemContent.selected = true
+    m.TopLabel.opacity = focusPercent
+    m.Underline.opacity = 1 - focusPercent
+  end if
 End Function
 
 
@@ -69,20 +65,24 @@ End Function
 Function onItemContentChange()
   itemContent = m.top.itemContent
   if itemContent <> invalid
-    m.Label.width = 0
-    m.LabelSelectedFocus.width = 0
-    m.Label.text = itemContent.title
-    m.LabelSelectedFocus.text = itemContent.title
-    '//Ensure the width the button varies depending on the width of the label
-    boundingRect = {}
-    boundingRect.width = m.Label.boundingRect().width + (m.nLabelXSpacing * 2)
-    boundingRect.height = m.Label.height
-    m.Label.width = boundingRect.width - m.nLabelXSpacing
-    m.LabelSelectedFocus.width = m.Label.width
-    m.top.boundingRect = boundingRect
-    m.underline.width = m.Label.width - m.nLabelXSpacing
-    '//Call the following functions to set the initial look of the component depending on focus, selection and other states
-    onItemFocus()
-    onGridHasFocusChange()
+    if itemContent.title <> m.TopLabel.text
+      ' only handles setting text and width if the text has changed
+      m.TopLabel.width = 0
+      m.BottomLabel.width = 0
+      m.TopLabel.text = itemContent.title
+      m.BottomLabel.text = itemContent.title
+
+      '//Ensure the width the button varies depending on the width of the label
+      boundingRect = {}
+      boundingRect.width = m.TopLabel.boundingRect().width + (m.nLabelXSpacing * 2)
+      boundingRect.height = m.TopLabel.height
+      m.TopLabel.width = boundingRect.width - m.nLabelXSpacing
+      m.BottomLabel.width = m.TopLabel.width
+      m.top.boundingRect = boundingRect
+      m.underline.width = m.TopLabel.width - m.nLabelXSpacing
+    end if
+
+    ' setting the selectedItemColor is expected to occur every time the selectedItemColor is updated
+    setItemUI(itemContent)
   end if
 End Function

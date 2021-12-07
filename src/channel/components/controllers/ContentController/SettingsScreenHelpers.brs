@@ -261,7 +261,7 @@ Function refreshScreenAfterParentalChanges()
     if authInfo <> invalid and authInfo.parentalrating <> invalid
       homeScreen.parentalRating = authInfo.parentalrating
     end if
-    refreshHomescreen(homescreen)
+    fetchHomescreen(homescreen)
   end if
 
   setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
@@ -270,11 +270,7 @@ Function refreshScreenAfterParentalChanges()
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen) 
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
 
-  if isTopNavHomeScreenEnabled() = true
-    '//go thru the stack and tell any homescreens to update their topNavs
-    refreshAllHomeScreenTopNav()
-  end if
-
+  refreshAllHomeScreenTopNav()
 
   screen = getCurrentScreen()
   if screen <> invalid

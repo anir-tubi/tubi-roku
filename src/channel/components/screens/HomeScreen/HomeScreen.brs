@@ -4,7 +4,6 @@ Function init()
   m.constants = m.global.constants
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
-  m.trackingLoggingTask = m.global.trackingLoggingTask
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.ContentArea = m.top.findNode("ContentArea")
   m.NavSection = m.top.findNode("nav")
@@ -23,12 +22,12 @@ Function init()
   m.top.observeField("resetContentAreaValues", "onResetContentAreaValues")
   m.top.observeField("id", "onIDChange")
   m.top.observeField("fullscreenCountdown", "onFullscreenCountdown")
-  m.top.observeField("enableTopNav", "onTopNavEnableChange")
-  m.top.observeField("focusOnTopNav", "onFocusOnTopNavChanged")
+  m.top.observeField("enableTopNav", "onEnableTopNavChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
+  m.top.observeField("refreshTopNav", "onRefreshTopNav")
 
   m.TopNav.observeField("selected", "onTopNavSelection")
-  m.TopNav.observeField("focusedChild", "onTopNavFocusChange")
+  m.TopNav.observeField("backItemSelected", "onTopNavBackItemSelected")
   m.TopNav.observeField("navigateWithinPageInfo", "onTopNavNavigateWithinPageInfoChange")
 
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
@@ -42,17 +41,20 @@ Function init()
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("reloadedItemToBeFocused", "onItemToBeFocusedChange")
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRowChange")
+  m.CategoryGridList.observeField("rowFocused", "onRowFocused")
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
   m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
-  m.gridHasFocus = false
+  m.gridHasGainedInitialFocus = false
 
   'set initial tracking values
   m.top.trackingPageInfo = {
     pageType: ""
     pageValues: {}
   }
+
+  m.topnav.doesSelectionNavigate = true
 
   m.top.handlesTransportVoiceRequests = true
 
@@ -69,13 +71,8 @@ Function init()
   ' It is reset to -1 at the conclusion of a grid scroll animation.
   m.lastFocusPosition = -1
 
-  ' the animation nodes necessary for video in the grid (vitg)
-  m.contentAreaSlideAnimation = invalid
-  m.infoPanelFadeAnimation = invalid
-
   m.utilityMaskOffsetDiff = -100 'the diff in the amount the content area mask is offset in the up direction for utility
   
-
   ' Video in the grid constants
   m.vitgSlideAmt = 326 'the amount the grid slides up to fit the vitg content item
   m.vitgMaskOffsetDiff = 352 'the diff in the amount the content area mask is offset in the up direction for vitg
@@ -95,8 +92,8 @@ Function init()
 End Function
 
 
-Function onTopNavEnableChange()
-  tubiLog("HomeScreen.onTopNavEnableChange")
+Function onEnableTopNavChange()
+  tubiLog("HomeScreen.onEnableTopNavChange")
   if m.top.enableTopNav = true    
     m.InfoPanel.translation = [m.InfoPanel.translation[0], 180]
     m.NavSection.visible = false
@@ -120,31 +117,58 @@ Function onTopNavSelection()
 End Function
 
 
-' reset the top nav back to the category that is associated with this homeScreen: i.e. MovieScreen associated with Movies Top Nav item.
-Function resetTopNavSelection()
-  tubiLog("HomeScreen.resetTopNavSelection")
-  m.TopNav.refresh = true
+Function onRefreshTopNav()
+  tubiLog("Homescreen.onRefreshTopNav")
+  includeLinearTV = m.top.isLinearTVAllowedInTopNav
+  m.topNav.content = generateTopNavContentItems(includeLinearTV)
+  m.topNav.contentUpdated = true
+  m.TopNav.uiState = "unfocusedNear"
+End Function
 
-  if m.top.id <> invalid
-    sTopNavID = ""
-    if m.top.id = m.constants.ui.screenIds.homeScreen
-      sTopNavID = m.constants.ui.sideNavIds.home
-    else if m.top.id = m.constants.ui.screenIds.movieScreen
-      sTopNavID = m.constants.ui.sideNavIds.movies
-    else if m.top.id = m.constants.ui.screenIds.tvScreen
-      sTopNavID = m.constants.ui.sideNavIds.tv
-    else if m.top.id = m.constants.ui.screenIds.espanolScreen
-      sTopNavID = m.constants.ui.sideNavIds.espanol
-    else if m.top.id = m.constants.ui.screenIds.linearTVScreen
-      sTopNavID = m.constants.ui.sideNavIds.linearTV
-    end if
 
-    if sTopNavID <> ""
-      m.TopNav.jumpToID = sTopNavID
-    end if
+' The top nav has changed selection, so change the contentSelected so the helper can change things accordingly
+Function onTopNavBackItemSelected()
+  tubiLog("HomeScreen.onTopNavBackItemSelected")
+
+  '//Set trackingComponentInfo before setting contentSelected so the proper selected analytics is tracked within the screenStack
+  if m.TopNav.backItemSelected <> invalid
+    m.top.trackingComponentInfo = m.TopNav.trackingComponentInfo
   end if
 
-  m.TopNav.containerTrackingPageInfo = m.top.trackingPageInfo
+  ' so that any adjustments to the menu item don't trigger callbacks. We want m.top.topNavbackItemSelected
+  ' to also be set to invalid for the same reason.
+  m.top.topNavbackItemSelected = m.TopNav.backItemSelected
+End Function
+
+
+' @includeLinearTV: boolean, true if a linear TV item should be included
+Function generateTopNavContentItems(includeLinearTV = false)
+  menuItemIds = [
+    m.constants.ui.sideNavIds.home
+    m.constants.ui.sideNavIds.movies
+    m.constants.ui.sideNavIds.tv
+  ]
+  if includeLinearTV = true
+    menuItemIds.push(m.constants.ui.sideNavIds.linearTV)
+  end if
+
+  parent = CreateObject("roSGNode", "ContentNode")
+  for each id in menuItemIds
+    item = parent.createChild("TopNavContentNode")
+    item.id = id
+
+    if id = m.constants.ui.sideNavIds.home
+      item.title = getTranslation("menu_foryou")
+    else if id = m.constants.ui.sideNavIds.movies
+      item.title = getTranslation("menu_movies")
+    else if id = m.constants.ui.sideNavIds.tv
+      item.title = getTranslation("menu_tv")
+    else if id = m.constants.ui.sideNavIds.linearTV
+      item.title = getTranslation("menu_livetv")
+    end if
+  end for
+
+  return parent
 End Function
 
 
@@ -170,7 +194,7 @@ Function onIDChange()
   end if
 
   m.top.trackingPageInfo = newTrackingPageInfo
-  resetTopNavSelection()
+  m.topNav.trackingPageInfo = newTrackingPageInfo
 End Function
 
 
@@ -195,11 +219,6 @@ Function onEnableChange()
 End Function
 
 
-Function onTopNavFocusChange()
-  setTopNavFarAwayStatus() '//::NOTE:: this is also called at onGridFocusChange(), but calling it here ensures the UI change happens when the topNav loses Focus
-End Function
-
-
 ''''''''''''''''''''
 ' onScreenFocusChange
 '
@@ -207,27 +226,25 @@ End Function
 ' screen has lost focus, usually due to another screen or dialog
 ' being shown.
 Function onScreenFocusChange()
-  tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top)) 
+  tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
   if m.top.hasFocus() = true
-    m.gridHasFocus = true
-    ' TODO : Following line needs root cause analysis and fix.  Currently, this line is a hack to fix focus issue when homescreen has been recreated after user changes PC. Check item.selectedItemColor. 
-    m.topNav.setFocus(false)
-    m.CategoryGridList.setFocus(true)
-    m.CategoryGridList.opacity = 1
-    m.InfoPanelParent.opacity = 1
-    ' calling getExperimentResource() automatically sends the exposure, and limits sending the exposure event to once per session.
-    getExperimentResource("roku_discovery_v3", "roku_discovery_row_v3")
     if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
       m.top.loadAllCategories = true
     end if
+
+    if m.top.componentToFocus = m.constants.ui.homescreen.focusItems.topNav
+      setFocusOntoTopNav(false)
+      if m.top.contentFocused <> invalid
+        m.top.backgroundUriList = determineBackgroundImage(m.top.contentFocused)
+      end if
+    else
+      setFocusOnCategoryGrid()
+    end if
+
+    ' reset the default value
+    m.top.componentToFocus = m.constants.ui.homescreen.focusItems.contentGrid
+
     m.top.shouldFocusWhenPushed = true
-  else if m.top.isInFocusChain() = false
-    m.gridHasFocus = false
-    m.top.topNavHasFocus = false
-    '//If loses focus, then reset back to default topNav selection for this instance of the homescreen
-    resetTopNavSelection()
-    m.CategoryGridList.opacity = 1
-    m.InfoPanelParent.opacity = 1
   end if
 End Function
 
@@ -250,17 +267,33 @@ End Function
 
 
 ' Determine how far away the topNav is from the focus in the CategoryGridList
-Function setTopNavFarAwayStatus()
-  if m.TopNav.visible = true
-    currFocusRow = m.CategoryGridList.currFocusRow
-    if currFocusRow >= 1 and (m.TopNav.hasFocus() = false and m.TopNav.isInFocusChain() = false)
-      m.TopNav.farAwayFromFocus = true
-    else
-      m.TopNav.farAwayFromFocus = false
+'@row: integer, the row of the categoryGridList that is gaining focus
+Function setTopNavFarAwayStatus(row)
+  if m.TopNav.visible = true and (m.TopNav.hasFocus() = false and m.TopNav.isInFocusChain() = false)
+    setTopNavUi(row)
+  end if
+End Function
+
+
+' A new row has been focused in the CategoryGridList
+Function onRowFocused(msg)
+  row = msg.getData()
+  if row <> invalid
+    if isSponsoredRow(row) = true
+      m.top.sponsoredRowFocused = true
     end if
   end if
 End Function
 
+
+' @row: roSGNode, a CategoryContentNode
+Function isSponsoredRow(row)
+  if row.sponsorImages <> invalid and row.sponsorImages.pixels <> invalid and row.sponsorImages.pixels["homescreen"] <> invalid
+    return true
+  end if
+
+  return false
+End Function
 
 
 ' fires when the RowList is in the process of scrolling between rows
@@ -287,9 +320,6 @@ Function onCurrFocusRowChange()
       scrollDirection = "up"
     end if
   end if
-
-  setTopNavFarAwayStatus() '//::NOTE:: this is also called at onTopNavFocusChange(), but calling it here is faster when navigating up and down the m.CategoryGridList rows
-
 
   ' If a user quickly presses the up and down buttons quickly, before the
   ' rowList can set rowList.rowItemFocused, we need to correct lastFocusRow to be accurate
@@ -345,6 +375,8 @@ Function onCurrFocusRowChange()
     rowLosingFocus = lastFocusRow
     rowPercent = 1
   end if
+
+  setTopNavFarAwayStatus(rowEnteringFocus)
 
   categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
   categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
@@ -465,6 +497,7 @@ Function expandContentAreaForLinear(rowPercent)
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.linearMaskOffsetDiff * rowPercent)]
 End Function
 
+
 Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     sType = focusedContent.type
@@ -499,11 +532,20 @@ Function onGridFocusChange() as void
   m.top.contentReady = true
 
   '//if the screen is loading or if the grid is not in focus or the topnav is not in focus, then exit out of this function
-  if not (m.TopNav.isInFocusChain() = true or m.CategoryGridList.isInFocusChain()) or m.top.isLoading = true then return
+  if not (m.TopNav.isInFocusChain() = true or m.CategoryGridList.isInFocusChain() = true) or m.top.isLoading = true
+    return
+  end if
 
   oldFocusedContent = m.CategoryGridList.oldItemFocused
   focusedContent = m.CategoryGridList.itemFocused
-  m.top.contentFocused = focusedContent
+
+  if focusedContent <> invalid
+    if focusedContent.type <> m.constants.ui.gridItemTypes.linear
+      m.top.stopLinearVideoPlayer = true
+    end if
+
+    m.top.contentFocused = focusedContent
+  end if
 
   populateInfoPanelByContent(focusedContent) 
 
@@ -513,7 +555,7 @@ Function onGridFocusChange() as void
   newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 1
   newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
 
-  if m.gridHasFocus = true and oldAnalyticsRow > 0 and oldAnalyticsCol > 0
+  if m.gridHasGainedInitialFocus = true and oldAnalyticsRow > 0 and oldAnalyticsCol > 0
     if oldAnalyticsRow <> newAnalyticsRow or oldAnalyticsCol <> newAnalyticsCol
 
       categoryComponentInfo = {}
@@ -539,12 +581,13 @@ Function onGridFocusChange() as void
       }
     end if
   end if
-  m.gridHasFocus = true
+  m.gridHasGainedInitialFocus = true
 End Function
 
 
 ' The top nav will dispatch a navigateWithinPageInfo event which needs to be re-dispatched to the HomescreenHelpers
 Function onTopNavNavigateWithinPageInfoChange()
+  tubiLog("Homescreen.onTopNavNavigateWithinPageInfoChange")
   navigateWithinPageInfo = m.TopNav.navigateWithinPageInfo
   if navigateWithinPageInfo <> invalid and navigateWithinPageInfo.means_of_navigation = "BUTTON"
     '//The navigateWithinPageInfo is caused by the user going from the video CategoryGridList to the Top Nav. 
@@ -575,8 +618,6 @@ Function handleItemSelected(item, position)
     ' Content controller observes contentSelected to populate/push the detail screen
     if item <> invalid then
       m.top.contentSelected = item
-      m.gridHasFocus = false
-      m.listHasFocus = false
     end if
   end if
 End Function
@@ -607,9 +648,6 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
 
   return trackingComponentInfo
 End Function
-
-
-
 
 
 ' Is called when CategoryGridList has content loaded but did not gain focus, so we need to update the infoPanel
@@ -697,30 +735,81 @@ Function determineBackgroundImage(focusedContent)
 End Function
 
 
-Function setFocusOntoTopNav()
-  m.gridHasFocus = false
-  m.top.topNavHasFocus = true
+' @isToggle: boolean, true if the user is toggling focus to the top nav from a different component.
+'                     false if the user is focusing the default top nav option by pressing back
+'                     while focused on the top nav of another page
+Function setFocusOntoTopNav(isToggle)
+  tubiLog("Homescreen.setFocusOntoTopNav")
+  if isToggle = true
+    ' only send top nav toggle event if the top nav is gaining focus from the category grid list.
+    ' Do not set top nav toggle event if the top nav is gaining focus from another page.
+    m.top.topNavToggled = true
+  else
+    m.TopNav.handlingFocusFromOtherTopNavBackButton = true
+  end if
+
+  m.top.stopLinearVideoPlayer = true
+
+  ' is necessary to set the uiState before the focus, so the topNav itemContents
+  ' can have the appropriate color values set once they react to the focus change
+  m.TopNav.uiState = "focused"
   m.TopNav.setFocus(true)
-  m.CategoryGridList.opacity = .4
-  m.InfoPanelParent.opacity = .4
+
+  fadeOutContentArea()
+End Function
+
+
+' This function does not check for focus. Any checks needed to determine if top nav has
+' focus or not should be done prior to calling this function.
+'
+' @focusRowIndex: integer, the 0 based index of the row that is focused
+Function setTopNavUi(focusRowIndex)
+  if focusRowIndex = 0
+    m.topNav.uiState = "unfocusedNear"
+  else
+    m.topNav.uiState = "unfocusedFar"
+  end if
 End Function
 
 
 Function setFocusOnCategoryGrid()
-  m.gridHasFocus = true
-  m.top.topNavHasFocus = false
+  tubiLog("Homescreen.setFocusOnCategoryGrid" + m.top.id)
+  if m.topNav.isInFocusChain()
+    ' only send top nav toggle event if the top nav is losing focus
+    m.top.topNavToggled = false
+  end if
+
+  ' is necessary to set the uiState before the focus, so the topNav itemContents
+  ' can have the appropriate color values set once they react to the focus change
+  setTopNavUi(m.CategoryGridList.currFocusRow)
+
+  fadeInContentArea()
   m.CategoryGridList.setFocus(true)
-  m.CategoryGridList.opacity = 1
-  m.InfoPanelParent.opacity = 1
 End Function
 
 
-' When the outside world tells you to focus on the topnav. This is used when, for example, when the user uses the BACK button to go from a top nav option to the 1st top nav option and select the 1st top nav option.
-Function onFocusOnTopNavChanged()
-  if m.top.focusOnTopNav = true
-    setFocusOntoTopNav()
-  else
-    setFocusOnCategoryGrid()
+Function fadeInContentArea()
+  stopAnimation(m.gridFade)
+  if m.CategoryGridList.opacity < 1
+    m.gridFade = fade(m.CategoryGridList, "in", .4, 0.0, 1)
+  end if
+
+  stopAnimation(m.infoPanelFade)
+  if m.InfoPanelParent.opacity < 1
+    m.infoPanelFade = fade(m.InfoPanelParent, "in", .4, 0.0, 1)
+  end if
+End Function
+
+
+Function fadeOutContentArea()
+  stopAnimation(m.gridFade)
+  if m.CategoryGridList.opacity > 0
+    m.gridFade = fade(m.CategoryGridList, "out", .4, 0.0, 0.4)
+  end if
+
+  stopAnimation(m.infoPanelFade)
+  if m.InfoPanelParent.opacity > 0
+    m.infoPanelFade = fade(m.InfoPanelParent, "out", .4, 0.0, 0.4)
   end if
 End Function
 
@@ -728,15 +817,50 @@ End Function
 Function onKeyEvent(key, press) as boolean
   if press
     if m.top.enableTopNav = true
-      if key = "back" and m.TopNav.isInFocusChain() = false
-        setFocusOntoTopNav()
-        return true
+      if key = "back"
+        if m.TopNav.isInFocusChain() = false
+          setFocusOntoTopNav(true)
+          return true
+        else
+          if m.TopNav.selectedIndex = 0
+            ' first item in top nav has focus, prepare for the side nav to gain focus
+            m.top.topNavToggled = false
+            m.top.navigatedAwayFromTopNav = true
+
+            setTopNavUi(m.categoryGridList.currFocusRow)
+            fadeInContentArea()
+
+            ' return false so contentController screen stack can use the back button press
+            ' to focus on the side nav
+            return false
+          else
+            m.top.topNavItemSelected = m.TopNav.content.getChild(0)
+
+            ' return false so contentController can use the back button press to trigger
+            ' screen stack functionality
+            return false
+          end if
+        end if
       else if key = "up" and m.TopNav.isInFocusChain() = false and m.CategoryGridList.currFocusRow = 0
-        setFocusOntoTopNav()
+        setFocusOntoTopNav(true)
         return true
       else if key = "down" and m.TopNav.isInFocusChain() = true
         setFocusOnCategoryGrid()
         return true
+      else if key = "left"
+        ' navigating to the side nav
+        m.top.stopLinearVideoPlayer = true
+
+        if m.TopNav.isInFocusChain() = true
+          ' navigating to the side nav from the top nav specifically
+          m.top.topNavToggled = false
+          m.top.navigatedAwayFromTopNav = true
+
+          setTopNavUi(m.categoryGridList.currFocusRow)
+          fadeInContentArea()
+
+          return false
+        end if
       end if
     end if
 
@@ -784,8 +908,6 @@ Function handlePlayInput()
     ' Content controller observes contentSelected to populate/push the detail screen
     if itemFocused <> invalid and itemFocused.type <> m.constants.ui.contentTypes.linear
       m.top.contentToPlay = itemFocused
-      m.gridHasFocus = false
-      m.listHasFocus = false
       return true
     end if
   end if

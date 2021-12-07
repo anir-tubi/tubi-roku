@@ -980,6 +980,11 @@ Function getConstants()
       constants.ui.fonts.seasonFontType = constants.ui.fonts.openSans.regular
       constants.ui.fonts.episodeFontType = constants.ui.fonts.openSans.regular
 
+    constants.ui.homescreen = {}
+      constants.ui.homescreen.focusItems = {}
+        constants.ui.homescreen.focusItems.topNav = "topNav"
+        constants.ui.homescreen.focusItems.contentGrid = "contentGrid"
+
     ' Set some performance parementers based on device profile
     constants.performance = {}
       constants.performance.categoryGridList = {}

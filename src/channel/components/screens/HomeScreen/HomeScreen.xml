@@ -35,7 +35,7 @@
       <field id="isLoading" type="boolean" />
 
       <!-- should the top nav be displayed? -->
-      <field id="enableTopNav" type="boolean"/>
+      <field id="enableTopNav" type="boolean" />
 
       <!-- tells the rowList to re-populate the content because rows have been added/removed and that may affect the look of some rows that have different heights compared to other rows  -->
       <field id="repopulateContent" type="boolean" alias="CategoryGridList.repopulateContent" />
@@ -53,12 +53,15 @@
       <field id="categoryMenuVisible" type="boolean"/>
 
       <!-- should the topNav refresh? -->
-      <field id="refreshTopNav" type="boolean" value="false" alias="TopNav.refresh"/>
+      <field id="refreshTopNav" type="boolean" alwaysNotify="true" />
+
+      <!-- the id that top nav should treat as selected from a UI perspective -->
+      <field id="topNavSelectedId" type="string" alias="topNav.selectedId" />
 
       <!-- Indicates if that when the server is contacted, it should indicate that the app is in kidsMode. -->
       <field id="shouldKidsModeBeSentToServer" type="boolean" alias="CategoryGridList.shouldKidsModeBeSentToServer"/>
       
-      <field id="isLinearTVAllowedInTopNav" type="boolean" alias="TopNav.isLinearTVAllowed"/>
+      <field id="isLinearTVAllowedInTopNav" type="boolean"/>
 
       <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
       <field id="jumpToRowItemByID" alias="CategoryGridList.jumpToRowItemByID" />
@@ -82,8 +85,9 @@
       <!-- kidsModeFeatureOn will be set based device countryCode -->
       <field id="kidsModeFeatureOn" type="boolean" />    
 
-      <!-- The outside world telling the screen to focus onto the top nav -->
-      <field id="focusOnTopNav" type="boolean" alwaysNotify="true"/>
+      <!-- Used to control which component gains focus when the focusedChild callback runs.
+           Accepted values are in constants.ui.homescreen.focusItems -->
+      <field id="componentToFocus" type="string" />
 
     <!-- OUTPUTS -->
       <!-- Trigger the content to be loaded.  This field is used to delay
@@ -99,8 +103,11 @@
       -->
       <field id="contentToPlay" type="node"/>
 
-      <!-- set to the tubi content id of the topNav item which was clicked on -->
+      <!-- set to the content node of the topNav item which was clicked on -->
       <field id="topNavItemSelected" type="node" alwaysNotify="true"/>
+
+      <!-- set to the content node of the first item in the top nav since the back button was pressed -->
+      <field id="topNavBackItemSelected" type="node" alwaysNotify="true"/>
 
       <!-- set to the tubi content of the item which was focused on -->
       <field id="contentFocused" type="node"/>
@@ -117,6 +124,13 @@
 
       <field id="selectedPosition" alias="CategoryGridList.selectedPosition" />
 
+      <!-- Communicates that the homescreen has focused on a sponsored container/category/row.
+      This may happen when the homescreen/categoryGridList is regaining focus, or it may
+      happen when a user navigates through the grid until they focus on a sponsored row.
+      Use a boolean instead of the actual node so that any changes to the node don't trigger
+      additional callbacks unexpectedly. -->
+      <field id="sponsoredRowFocused" type="boolean" alwaysNotify="true" />
+
       <!-- will be used to change the sponsored background images on the content controller -->
       <field id="sponsorshipBackground" type="string" alwaysNotify="true" />
 
@@ -124,8 +138,16 @@
       -->
       <field id="trackingLoadStartTime" type="integer" />
 
-      <!-- Is the screen focused on the top nav? -->
-      <field id="topNavHasFocus" type="boolean" value="false" />
+      <!-- Indicates that a ComponentInteractionEvent should be fired because the TopNav
+      has been toggled on or off -->
+      <field id="topNavToggled" type="boolean" value="false" alwaysNotify="true"/>
+
+      <!-- Indicates that the user is pressing back or left from the top nav (with the assumed
+      intention to navigate to the side nav, but homescreen doesn't know about side nav) -->
+      <field id="navigatedAwayFromTopNav" type="boolean" alwaysNotify="true" />
+
+      <!-- Communicates to the parent that the linear video player should be stopped -->
+      <field id="stopLinearVideoPlayer" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -161,7 +183,8 @@
       </LayoutGroup>
     </Group>
 
-    <TopNav id="topNav"
+    <TopNav
+      id="topNav"
       visible="false"
       translation="[192,48]"/>
 

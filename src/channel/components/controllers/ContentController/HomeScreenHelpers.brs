@@ -3,7 +3,8 @@
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 ' @authInfo: assocArray, normally set by m.global.authInfo
 ' @screenID: string, What kind of homescreen do you wish to make: regular, movies, or TV
-Function showHomeScreen(constants, authInfo, screenID = "")
+' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
+Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "")
   tubiLog("HomeScreenHelpers.showHomeScreen")
   if screenID = ""
     screenID = constants.ui.screenIds.homeScreen
@@ -27,6 +28,15 @@ Function showHomeScreen(constants, authInfo, screenID = "")
       showHideSpinner(false)
     end if
 
+    refreshHomescreenTopNav(homescreen)
+
+    ' set which component to focus on once the screen gains focus
+    if componentToFocus = m.constants.ui.homescreen.focusItems.topNav
+      homescreen.componentToFocus = m.constants.ui.homescreen.focusItems.topNav
+    else
+      homescreen.componentToFocus = m.constants.ui.homescreen.focusItems.contentGrid
+    end if
+
     pushScreen(homeScreen, true, shouldSendPageLoadEvent)
   else
     showHideSpinner(true)
@@ -37,24 +47,30 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
     homeScreen.observeFieldScoped("contentFocused", "onHomeScreenContentFocused")
-    homeScreen.observeFieldScoped("rowFocused", "onHomeScreenRowFocused")
-    homeScreen.observeFieldScoped("focusedChild", "onHomeScreenFocusChanged")
     homeScreen.observeFieldScoped("contentSelected", "onContentSelected")
     homeScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
     homeScreen.observeFieldScoped("topNavItemSelected", "onTopNavItemSelected")
+    homeScreen.observeFieldScoped("topNavBackItemSelected", "onTopNavBackItemSelected")
     homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+    homeScreen.observeFieldScoped("topNavToggled", "onScreenTopNavToggled")
+    homeScreen.observeFieldScoped("navigatedAwayFromTopNav", "onNavigatedFromTopNavToSideNav")
+    homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
+    homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomescreenSponsoredRowFocused")
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
     sContentMode = constants.ui.contentMode.homescreen
     if screenID = constants.ui.screenIds.homeScreen
       m.top.observeFieldScoped("homescreenResponse", "onHomescreenResponse")
+      homescreen.topNavSelectedId = constants.ui.sideNavIds.home
     else if screenID = constants.ui.screenIds.movieScreen
       m.top.observeFieldScoped("moviescreenResponse", "onMoviescreenResponse")
       sContentMode = constants.ui.contentMode.movie
+      homescreen.topNavSelectedId = constants.ui.sideNavIds.movies
       m.top.observeFieldScoped("reloadMovieUserCategoriesResponse", "onReloadUserCategoriesResponseInMovieScreen")
     else if screenID = constants.ui.screenIds.tvScreen
       sContentMode = constants.ui.contentMode.tv
+      homescreen.topNavSelectedId = constants.ui.sideNavIds.tv
       m.top.observeFieldScoped("tvscreenResponse", "onTVscreenResponse")
       m.top.observeFieldScoped("reloadTVUserCategoriesResponse", "onReloadUserCategoriesResponseInTVScreen")
     else if screenID = constants.ui.screenIds.espanolScreen
@@ -64,53 +80,63 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     else if screenID = constants.ui.screenIds.linearTVScreen
       m.top.observeFieldScoped("linearTVScreenResponse", "onLinearTVScreenResponse")
       sContentMode = constants.ui.contentMode.linear
+      homescreen.topNavSelectedId = constants.ui.sideNavIds.linearTV
       m.top.observeFieldScoped("reloadLinearTVUserCategoriesResponse", "onReloadUserCategoriesResponseInLinearTVScreen")
     end if 
-    homeScreen.contentMode = sContentMode
 
-    homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel()
+    homeScreen.contentMode = sContentMode
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
     homeScreen.signedIn = (authInfo <> invalid)
     homeScreen.kidsModeFeatureOn = m.kidsModeFeatureOn
     homeScreen.canLoadCategories = true
     homeScreen.id = screenID
 
-    refreshHomescreen(homescreen)
-    
+    refreshHomescreenTopNav(homescreen)
+    fetchHomescreen(homeScreen)
     setInScreenCache(homeScreen)
+
+    ' set which component to focus on once the screen gains focus
+    if componentToFocus = m.constants.ui.homescreen.focusItems.topNav
+      homescreen.componentToFocus = m.constants.ui.homescreen.focusItems.topNav
+    else
+      homescreen.componentToFocus = m.constants.ui.homescreen.focusItems.contentGrid
+    end if
 
     'page_load tracking will happen when content is received and displayed when onHomescreenContentReady() is called.
     pushScreen(homeScreen, true, false)
   end if
 
-  '// Unobserve and then reobserve the topNavHasFocus field. Do this because sometimes, this field is unoberserved at other points in the code. 
-  homeScreen.unobserveFieldScoped("topNavHasFocus")
-  homeScreen.observeFieldScoped("topNavHasFocus", "onHomeScreeenTopNavFocused")
+  return homescreen
 End Function
 
 
-Function showEspanolScreen()
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.espanolScreen)
+' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
+Function showEspanolScreen(componentToFocus = "")
+  return showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.espanolScreen, componentToFocus)
 End Function
 
 
-Function showMoviesScreen()
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.movieScreen)
+' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
+Function showMoviesScreen(componentToFocus = "")
+  return showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.movieScreen, componentToFocus)
 End Function
 
 
-Function showTVScreen()
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.tvScreen)
+' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
+Function showTVScreen(componentToFocus = "")
+  return showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.tvScreen, componentToFocus)
 End Function
 
 
-Function showLinearTVScreen()
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.linearTVScreen)
+' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
+Function showLinearTVScreen(componentToFocus = "")
+  return showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.linearTVScreen, componentToFocus)
 End Function
 
 
-Function showDefaultHomeScreen()
-  showHomeScreen(m.constants, m.global.authInfo)
+' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
+Function showDefaultHomeScreen(componentToFocus = "")
+  return showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.homeScreen, componentToFocus )
 End Function
 
 
@@ -118,7 +144,7 @@ Function reloadDefaultHomeScreenContent()
   '//If homescreen exists, then reload its content
   homescreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homescreen <> invalid
-    refreshHomescreen(homescreen)
+    fetchHomescreen(homescreen)
   end if
 End Function
 
@@ -241,6 +267,49 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
 End Function
 
 
+' @homescreen: roSGNode, a Homescreen component
+Function refreshHomescreenTopNav(homescreen)
+  refreshNeeded = setEnableTopNavOnHomescreen(homeScreen)
+
+  if refreshNeeded = true
+    homescreen.refreshTopNav = true
+  end if
+End Function
+
+
+' sets the appropriate values for the 'isLinearTVAllowedInTopNav' and 'enableTopNav' fields in
+' the passed in homescreen
+' @homescreen: roSGNode, a Homescreen component
+' 
+' @returns: boolean, true if the value on either the isLinearTVAllowedInTopNav or enableTopNav is
+'           changing, indicating that the top nav items should be regenerated/refreshed
+Function setEnableTopNavOnHomescreen(homescreen)
+  tubiLog("HomeScreenControllers.setEnableTopNavOnHomescreen")
+  refreshNeeded = false
+
+  if homescreen <> invalid
+    if homescreen.isLinearTVAllowedInTopNav <> isParentalControlsAdultLevel()
+      homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel()
+      refreshNeeded = true
+    end if
+
+    '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
+    bTopNavAllowed = isTopNavHomeScreenEnabled()
+    if homeScreen.id = m.constants.ui.screenIds.espanolScreen
+      '//espanol is not in the topNav
+      bTopNavAllowed = false
+    end if
+
+    if homescreen.enableTopNav <> bTopNavAllowed
+      homeScreen.enableTopNav = bTopNavAllowed
+      refreshNeeded = true
+    end if
+  end if
+
+  return refreshNeeded
+End Function
+
+
 '//If the homescreen is loading, then display the default background
 Function setHomeScreenLoading(homeScreen)
   screen = getCurrentScreen()
@@ -258,22 +327,7 @@ End Function
 Function onLoadAllCategories(msg)
   tubiLog("HomeScreenHelpers.onLoadAllCategories")
   homeScreen = msg.getRoSGNode()
-  refreshHomescreen(homeScreen)
-End Function
-
-
-'//Refresh the content and the enabling of the top nav of the home screen
-Function refreshHomescreen(homescreen)
-  tubiLog("HomeScreenHelpers.refreshHomescreen")
-  '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
-  bTopNavAllowed = isTopNavHomeScreenEnabled()
-  if homeScreen.id = m.constants.ui.screenIds.espanolScreen
-    '//espanol is not in the topNav
-    bTopNavAllowed = false
-  end if
-
-  homeScreen.enableTopNav = bTopNavAllowed
-  fetchHomescreen(homescreen)
+  fetchHomescreen(homeScreen)
 End Function
 
 
@@ -453,28 +507,39 @@ Function retryCategoryList(screenID)
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     homeScreen.canLoadCategories = true
-    refreshHomescreen(homescreen)
+    fetchHomescreen(homescreen)
     homeScreen.setFocus(true)
   end if
 End Function
 
 
-Function onHomeScreenFocusChanged(msg)
-  tubiLog("HomeScreenHelpers.onHomeScreenFocusChanged")
-  homeScreen = msg.getRoSGNode()
-
-  if homeScreen.isInFocusChain() = false or homeScreen.topNavHasFocus = true
-    '//If the homescreen loses focus or the top nav is in focus, then stop the linear video player in case it is playing
+Function onStopLinearVideoPlayer(msg)
+  tubiLog("HomescreenHelpers.onStopLinearVideoPlayer")
+  shouldStop = msg.getData()
+  if shouldStop = true
     stopCountdownTimer()
+
+    ' Check if the video player has not gone to full screen before stopping.
+    ' This is never expected to happen, but might be possible in the case of a race condition.
     if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
-      '//If the video player has gained focus, then don't stop it.
       stopAndHideLinearVideoPlayer()
     end if
-  else
-    checkForSponsorPixels(homeScreen.rowFocused)
+  end if
+End Function
 
-    '//If the homescreen regains focus, then ensure the sponsored background is correct. Important when the BACK button is used and the homescreen is focused on a sponsored row.
-    setSponsorshipBackground(homeScreen.sponsorshipBackground)
+
+' the homescreen has communicated that a sponsored row has been focused
+Function onHomescreenSponsoredRowFocused(msg)
+  isSponsoredRowFocused = msg.getData()
+  if isSponsoredRowFocused = true
+    homeScreen = msg.getRoSGNode()
+    if homescreen <> invalid
+      row = homescreen.rowFocused
+      if row <> invalid
+        manageHomescreenSponsorPixels(row)
+        setSponsorshipBackground(homescreen.sponsorshipBackground)
+      end if
+    end if
   end if
 End Function
 
@@ -534,71 +599,21 @@ End Function
 
 
 '//Check the focused row if it is a sponsored container and if so, possibly send out the pixels
-Function checkForSponsorPixels(rowFocused)
+' @rowFocused: roSGNode, a CategoryContentNode
+Function manageHomescreenSponsorPixels(rowFocused)
   if rowFocused <> invalid 
-    '//reset videoSponsorExposureId before checking if there is a sponsor for the row
     m.videoSponsorExposureId = ""
-    if rowFocused.sponsorImages <> invalid and rowFocused.sponsorImages.pixels <> invalid and rowFocused.sponsorImages.pixels["homescreen"] <> invalid    
-      '//When a sponsored container is made visible, then call the pixels
-      containerId = rowFocused.id 
-      m.videoSponsorExposureId = rowFocused.sponsorExp
-      sponsorPixels = rowFocused.sponsorImages.pixels["homescreen"]
-      '//Only send sponsor pixels once per page load
-      if m.sentSponsorPixels[containerId] <> true
-        m.sentSponsorPixels[containerId] = true '//set to true when the sponsor image has been seen at least once per page load. This AA will be reset when the homescreen is no longer visible
-        sendSponsorPixels(sponsorPixels)
-      end if
+    '//When a sponsored container is made visible, then call the pixels
+    containerId = rowFocused.id 
+    m.videoSponsorExposureId = rowFocused.sponsorExp
+    sponsorPixels = rowFocused.sponsorImages.pixels["homescreen"]
+
+    '//Only send sponsor pixels once per page load
+    if m.sentSponsorPixels[containerId] <> true
+      m.sentSponsorPixels[containerId] = true '//set to true when the sponsor image has been seen at least once per page load. This AA will be reset when the homescreen is no longer visible
+      sendSponsorPixels(sponsorPixels)
     end if
   end if
-End Function
-
-
-Function onHomeScreenRowFocused(msg)
-  tubiLog("HomeScreenHelpers.onHomeScreenRowFocused")
-  checkForSponsorPixels(msg.getData())
-End Function
-
-
-Function goToFirstTopNavOptionFromAnotherTopNavOption()
-  currentScreen = getCurrentScreen()
-  if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and getCurrentScreen().topNavHasFocus = true and getCurrentScreen().id <> m.constants.ui.screenIds.homeScreen
-    currentScreen.unobserveFieldScoped("topNavHasFocus")
-    
-    showDefaultHomeScreen()
-
-    '//When going to the first top nav item and going to the default home screen, ensure the the top nav is selected, but we do not wish to report the analytics that the topnav toggles off and then back on
-    homeScreen = getCurrentScreen()
-    homeScreen.unobserveFieldScoped("topNavHasFocus")
-    homeScreen.focusOnTopNav = true
-    homeScreen.observeFieldScoped("topNavHasFocus", "onHomeScreeenTopNavFocused")
-  end if
-End Function
-
-
-' When the top nav gains or loses focus, then send analytics
-Function onHomeScreeenTopNavFocused(msg)  
-  bTopNavFocused = msg.getData()
-  screen = msg.getRoSGNode()
-  if bTopNavFocused = true
-    user_interaction = "TOGGLE_ON"
-  else
-    user_interaction = "TOGGLE_OFF"
-  end if 
-
-  focusedNavId = m.constants.ui.screenIdToSideNavId[screen.id]
-  navComponent = {
-    top_nav_section: m.Tracking.sideNavPageMap[focusedNavId]
-  }
-
-  event = { 
-    type: "component_interaction"
-    values: {
-      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pagetype, screen.trackingPageInfo.pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
-      user_interaction: user_interaction
-    }
-  }
-  m.trackingLoggingTask.trackEvent = event
 End Function
 
 
@@ -663,54 +678,6 @@ Function startCountdownTimer()
 End Function
 
 
-Function onTopNavItemSelected(msg)
-  tubiLog("HomeScreenHelpers.onTopNavItemSelected")
-  content = msg.getData()
-  homeScreen = msg.getRoSGNode()
-
-  if homeScreen.trackingPageInfo <> invalid
-    '//Dispatch a selection component_interaction analytic event when a top nav item is selected
-    navComponent = {
-      top_nav_section: m.Tracking.sideNavPageMap[content.id]
-    }
-    pageOneof = m.Tracking.getAnalyticsPage(homeScreen.trackingPageInfo.pagetype, homeScreen.trackingPageInfo.pageValues)
-    event = { 
-      type: "component_interaction"
-      values: {
-        pageOneof: pageOneof
-        componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
-        user_interaction: "CONFIRM"
-      }
-    }
-    m.trackingLoggingTask.trackEvent = event
-  end if
-
-  '//When selecting an item from the top nav, make sure to stop listening to the focusing or unfocusing of the topNav. The TOGGLE_ON/TOGGLE_OFF event should not fire even immediately after the selection of a topNav item
-  homeScreen.unobserveFieldScoped("topNavHasFocus")
-  if homeScreen.id <> content.id
-    if content.id = m.constants.ui.sideNavIds.movies
-      showMoviesScreen()
-    else if content.id = m.constants.ui.sideNavIds.tv
-      showTVScreen()
-    else if content.id = m.constants.ui.sideNavIds.home
-      showDefaultHomeScreen()
-    else if content.id = m.constants.ui.sideNavIds.espanol
-      showEspanolScreen()
-    else if content.id = m.constants.ui.sideNavIds.linearTV
-      showLinearTVScreen()
-    end if
-  else
-    '//If the user selected a top nav item that is associated with the current screen, then simply close the top nav
-    homeScreen.focusOnTopNav = false
-    '//Don't forget to listen to the "topNavHasFocus" since in this use case, the code does not open a new screen and reach showHomeScreen() which is where it resets and listens to the that field again
-    homeScreen.observeFieldScoped("topNavHasFocus", "onHomeScreeenTopNavFocused")
-  end if
-  currentScreen = getCurrentScreen()
-  if currentScreen.id <> homeScreen.id
-    homeScreen.jumpToRowItem = [0,0] '//reset original homescreen so it is set back to the origin content item.
-  end if
-End Function
-
 
 ' Show the detail screen for the selected content
 Function onContentSelected(msg)
@@ -774,6 +741,6 @@ Function onUserCategoriesFailed(screenID)
   tubiLog("HomescreenHelpers.onUserCategoriesFailed")
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid and homeScreen.content = invalid
-    refreshHomescreen(homeScreen)
+    fetchHomescreen(homeScreen)
   end if
 End Function

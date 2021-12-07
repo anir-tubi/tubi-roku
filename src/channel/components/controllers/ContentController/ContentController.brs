@@ -255,41 +255,6 @@ End Function
 
 ' Call this function when the left or back buttons are pressed and the side nav should be opened.
 Function openSideNavFromButton()
-  currentScreen = getCurrentScreen()
-  if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and currentScreen <> invalid and currentScreen.topNavHasFocus = true
-    '//If Top nav is in focus, then report an anaytic event that user is opening the sidenav by pressing the back button and coming from the top nav
-    trackingPageInfo = currentScreen.trackingPageInfo
-    focusedNavId = m.constants.ui.screenIdToSideNavId[currentScreen.id]
-    buttonID = m.Tracking.sideNavPageMap[focusedNavId]
-
-    '//Both the side and top navs should have the same HOME button ID
-    destComponent = {
-      left_nav_section: buttonID
-    }    
-    component = {
-      top_nav_section: buttonID
-    }
-
-    pageOneof = {}
-    if currentScreen.navigateWithinPageInfo <> invalid
-      pageOneof = currentScreen.navigateWithinPageInfo.pageOneof
-    end if
-
-    row = m.SideNav.focusedPosition + 1
-    col = 1
-
-    m.top.navigateWithinPageInfo = {
-      pageOneof: pageOneof
-      componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", component)
-      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-      dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_left_side_nav_component", destComponent)
-      vertical_location: row  '//The row location of the top nav
-      vertical_location_mode: "INDEX"  'LocationMode enum
-      horizontal_location: col  '//The column location of the top nav
-      horizontal_location_mode: "INDEX"  'LocationMode enum
-    }
-  end if
-
   '//reset videoSponsorExposureId when the side nav is opened
   m.videoSponsorExposureId = ""
   displayNavMenu(true)
@@ -313,10 +278,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       end if
 
       if m.SideNav.opened = false
-        if isCurrentScreenHomeScreen() = true and isTopNavHomeScreenEnabled() = true and getCurrentScreen().topNavHasFocus = true and getCurrentScreen().id <> m.constants.ui.screenIds.homeScreen
-          '//A homescreen is being displayed but it is not the default homescreen and the top nav is in focus. Should go back to the default homescreen.
-          goToFirstTopNavOptionFromAnotherTopNavOption()
-        else if m.SideNav.visible = true
+        if m.SideNav.visible = true
           openSideNavFromButton() '//"BUTTON_BACK"
         else if m.screenStack.getChildCount() > 1 
           oldTopScreen = getCurrentScreen()
@@ -828,18 +790,6 @@ Function onHistoryQueueChange(categoryId)
 End Function
 
 
-' is the home screen's top nav enabled
-Function isTopNavHomeScreenEnabled()
-  bReturn = false
-
-  if m.constants.deviceInfo.countryCode <> invalid and UCase(m.constants.deviceInfo.countryCode) = "US"
-    if isKidsUIOn() = false
-      bReturn = true
-    end if
-  end if
-
-  return bReturn
-End Function
 
 
 ''''''''''''''''''''''''''''
@@ -1150,18 +1100,6 @@ Function refreshAllDetailScreens()
 End Function
 
 
-Function refreshAllHomeScreenTopNav()
-  ' Refresh all home screens so their top navs are properly being displayed
-  for i=0 to m.screenStack.getChildCount()-1
-    screen = m.screenStack.getChild(i)
-    if screen.subType() = "HomeScreen"
-      screen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() 
-      screen.refreshTopNav = true
-    end if
-  end for
-End Function
-
-
 ' Content for a category has been updated. ANy screen that is displaying this category should be updated.
 Function refreshStackedUserScreenWithChangedCategory(sCategoryID)
   ' Tell the screen that contains the categroy associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0 
@@ -1313,10 +1251,10 @@ Function setContentToRefresh(sID)
 End Function 
 
 
-' @shouldRefreshHomescreen: boolean, do no refresh homescreen if set to false
-Function setContentToRefreshAllPersonalizedScreens(shouldRefreshHomescreen = true)
+' @shouldRefetchHomescreen: boolean, do not refresh homescreen if set to false
+Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = true)
   tubiLog("ContentController.setContentToRefreshAllPersonalizedScreens")
-  if shouldRefreshHomescreen = true
+  if shouldRefetchHomescreen = true
     homescreenId = m.constants.ui.screenIds.homeScreen
     homescreen = getFromScreenCache(homescreenId)
 
@@ -1324,7 +1262,7 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefreshHomescreen = tru
     ' the top screen, so that it can load in the background and be ready for consumption when
     ' the user next lands on the homescreen
     if homescreen <> invalid
-      refreshHomescreen(homescreen)
+      fetchHomescreen(homescreen)
     end if
   end if
 

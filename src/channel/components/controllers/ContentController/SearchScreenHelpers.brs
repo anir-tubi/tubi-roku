@@ -16,6 +16,7 @@ Function showSearchScreen(constants)
   searchScreen.searchText = "" '//Set searchText to "" to initiate the search screen and load the default "search results"
 
   pushScreen(searchScreen, true, true)
+  return searchScreen
 End Function
 
 

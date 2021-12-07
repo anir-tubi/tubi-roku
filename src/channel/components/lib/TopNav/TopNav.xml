@@ -6,32 +6,74 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="../AnimationMixin.brs" />
   <script type="text/brightscript" uri="../ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 
   <interface>
     <!--INPUT-->
       <!-- The id of the item in the rowlist that the rowlist should select -->
       <field id="jumpToID" type="string" alwaysNotify="true"/>
-      <!-- Indicate if the topNav is far from the focus and should have a different look. -->
-      <field id="farAwayFromFocus" type="boolean"/>
 
       <!-- Should the topNav display the live TV item. -->
       <field id="isLinearTVAllowed" type="boolean" value="true"/>
 
-      <!-- should the topNav refresh? -->
-      <field id="refresh" type="boolean" value="false"  alwaysNotify="true"/>
+      <!-- Differentiates between two modes. If set to true, it is expected that selecting an
+           item navigates the user to a new page (ex. Homescreen). 
+           If set to false it is expected that selecting an item updates the UI on the current screen. -->
+      <field id="doesSelectionNavigate" type="boolean" />
 
-      <!-- The trackingPageInfo of the page that the top Nav is contained on, which will be used to report analytics -->
-      <field id="containerTrackingPageInfo" type="assocarray" alwaysNotify="true"/>
+      <!-- The id for the item that will have the visual properties of a selected item.
+           This field is solely meant to allow the TopNav parent to pass an id for an item which should
+           have the "selected" UI. This field is not meant to be maintained as state. The menu item
+           which has the "selected" UI may be updated within TopNav, in which case this field is
+           not expected to be updated
+           NOTE: selectedId SHOULD BE SET BEFORE SETTING THE contentUPdated FIELD -->
+      <field id="selectedId" type="string" alwaysNotify="true" />
+
+      <!-- The trackingPageInfo of the page that the top Nav is contained on, which will be used to report analytics when users navigate the top nav -->
+      <field id="trackingPageInfo" type="assocarray" alwaysNotify="true"/>
+
+      <!-- Content nodes -->
+      <field id="content" type="node" />
+
+      <!-- Trigger to update the menu items -->
+      <field id="contentUpdated" type="boolean" alwaysNotify="true" />
+
+      <!-- Used to decouple focus state from UI state since there are 3 ui states and only
+           2 focus states. Acceptable values are "focused", "unfocusedNear", "unfocusedFar", where
+           "unfocusedClose" indicates that the focus is near the top nav component (ie. 1st row of
+           the home grid) and "unfocusedFar" indicates that the focus is far from the top nav
+           component (ie. 2nd or greater row of the homegrid) -->
+      <field id="uiState" type="string" value="unfocusedNear" />
+
+      <!-- If the top nav has focus, and a back button press navigates to the default top nav item,
+           then there should be no NavigateWithinPageEvent. This field indicates if we are currently
+           in the process of handling the focus callbacks that occur based on the back button press,
+           in order to know if we should send a NavigateWithinPageEvent. -->
+      <field id="handlingFocusFromOtherTopNavBackButton" type="boolean" />
 
     <!--OUTPUT-->
       <field id="selected" type="node" alwaysNotify="true"/>
+
+      <!-- The menu item that a user is navigating to when they press "back" -->
+      <field id="backItemSelected" type="node" alwaysNotify="true"/>
+
+      <!-- holds state of which item in the top nav currently is considered "selected" -->
+      <field id="selectedIndex" type="integer" />
       <field id="trackingComponentInfo" type="assocarray"/>
       <field id="navigateWithinPageInfo" type="assocarray"/>
   </interface>
+
   <children> 
+    <Poster
+      id="TopNavMenuBground"
+      width="900"
+      height="84"
+      uri="pkg:/images/menu-focus-fhd.9.png"/>
+
     <Group
       id="TopNavMenuBgroundParent">
       <Poster
@@ -40,6 +82,7 @@
         height="84"
         uri="pkg:/images/menu-focus-fhd.9.png"/>
     </Group>
+
     <MarkupGrid
       id="TopNavMenu"
       translation="[12,12]"
