@@ -106,37 +106,36 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     pushScreen(homeScreen, true, false)
   end if
 
-  return homescreen
 End Function
 
 
 ' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
 Function showEspanolScreen(componentToFocus = "")
-  return showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.espanolScreen, componentToFocus)
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.espanolScreen, componentToFocus)
 End Function
 
 
 ' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
 Function showMoviesScreen(componentToFocus = "")
-  return showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.movieScreen, componentToFocus)
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.movieScreen, componentToFocus)
 End Function
 
 
 ' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
 Function showTVScreen(componentToFocus = "")
-  return showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.tvScreen, componentToFocus)
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.tvScreen, componentToFocus)
 End Function
 
 
 ' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
 Function showLinearTVScreen(componentToFocus = "")
-  return showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.linearTVScreen, componentToFocus)
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.linearTVScreen, componentToFocus)
 End Function
 
 
 ' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
 Function showDefaultHomeScreen(componentToFocus = "")
-  return showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.homeScreen, componentToFocus )
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.homeScreen, componentToFocus )
 End Function
 
 

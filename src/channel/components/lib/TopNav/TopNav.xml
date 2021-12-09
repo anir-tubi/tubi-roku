@@ -74,15 +74,6 @@
       height="84"
       uri="pkg:/images/menu-focus-fhd.9.png"/>
 
-    <Group
-      id="TopNavMenuBgroundParent">
-      <Poster
-        id="TopNavMenuBground"
-        width="900"
-        height="84"
-        uri="pkg:/images/menu-focus-fhd.9.png"/>
-    </Group>
-
     <MarkupGrid
       id="TopNavMenu"
       translation="[12,12]"
