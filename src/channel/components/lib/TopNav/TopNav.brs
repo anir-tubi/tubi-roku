@@ -24,17 +24,13 @@ Function init()
 
   m.Menu.numRows = 1
   m.MenuBground.blendColor = m.colors.lightGray
-  m.Menu.translation= [12,12]
+  m.Menu.translation = [12,12]
   m.Menu.focusFootprintBlendColor = m.colors.white
 
   if m.constants <> invalid and m.constants.deviceInfo.scaledUi = true
     m.Menu.focusBitmapUri = "pkg:/images/pill_top_nav_hd.9.png"
     m.Menu.focusFootprintBitmapUri="pkg:/images/pill_top_nav_hd.9.png"
     m.MenuBground.uri = "pkg:/images/tab_component_alt_hd.9.png"
-  else
-    m.Menu.focusBitmapUri = "pkg:/images/pill_top_nav_fhd.9.png"
-    m.Menu.focusFootprintBitmapUri = "pkg:/images/pill_top_nav_fhd.9.png"
-    m.MenuBground.uri = "pkg:/images/tab_component_alt_fhd.9.png"
   end if
 
   m.Menu.observeFieldScoped("itemSelected", "onItemSelected")
@@ -305,8 +301,6 @@ End Function
 
 Function setFocusedVisuals()
   tubiLog("TopNav.setFocusedVisuals")
-  m.MenuBground.blendColor = m.colors.lightGray
-  m.MenuBground.opacity = 0.16
   m.Menu.focusFootprintBlendColor = m.colors.orange
   setSelectedItemColorOnMenuItems(m.colors.orange)
 
@@ -320,8 +314,6 @@ End Function
 
 Function setUnfocusedNearVisuals()
   tubiLog("TopNav.setUnfocusedNearVisuals")
-  m.MenuBground.blendColor = m.colors.lightGray
-  m.MenuBground.opacity = .16
   m.Menu.focusFootprintBlendColor = m.colors.white
   setSelectedItemColorOnMenuItems(m.colors.darkGray)
 
@@ -335,8 +327,6 @@ End Function
 
 Function setUnfocusedFarVisuals()
   tubiLog("TopNav.setUnfocusedFarVisuals")
-  m.MenuBground.blendColor = m.colors.lightGray
-  m.MenuBground.opacity = .16
   m.Menu.focusFootprintBlendColor = "0x585B66FF"
 
   ' account for any animations that may be in process on the menu

@@ -72,7 +72,8 @@
       id="TopNavMenuBground"
       width="900"
       height="84"
-      uri="pkg:/images/menu-focus-fhd.9.png"/>
+      opacity="0.16"
+      uri="pkg:/images/tab_component_alt_fhd.9.png"/>
 
     <MarkupGrid
       id="TopNavMenu"
@@ -82,7 +83,8 @@
       itemSpacing="[0, 0]"
       numColumns="5"
       numRows="1"
-      focusBitmapUri="pkg://images/menu-focus-fhd.9.png"
+      focusBitmapUri="pkg:/images/pill_top_nav_fhd.9.png"
+      focusFootprintBitmapUri="pkg:/images/pill_top_nav_fhd.9.png"
       drawFocusFeedbackOnTop="false"
       itemComponentName="TopNavItem"/>  
   </children>
