@@ -12,12 +12,23 @@ Function TubiBookmarksSetup()
   
   authorized = tubiBookmarks_mockAuth_Authorized_testHelper(constants, request)
   m.authorizedBM = TubiBookmarks(request, authorized, constants, nodeHelpers)
-  
+
   m.videoContent = CreateObject("roSGNode", "TubiContentNode")
   m.videoContent.type = "video"
+
+  m.movieContent = CreateObject("roSGNode", "TubiContentNode")
+  m.movieContent.type = "movie"
   
   m.seriesContent = CreateObject("roSGNode", "TubiContentNode")
   m.seriesContent.type = "series"
+
+  m.episodeContent = CreateObject("roSGNode", "TubiContentNode")
+  m.episodeContent.type = "episode"  
+
+  m.historyUrl = constants.urls.users.history
+  m.deviceId = constants.deviceInfo.deviceId
+  m.appName = constants.appName
+  m.platform = constants.platform
 
 End Function
 
@@ -45,7 +56,7 @@ Function tubiBookmarks_mockAuth_Authorized_testHelper(constants, request)
         accessToken: "1617181920212223242526"
         refreshToken: "123456789101112131415"
         expireTime: 1472745278
-        userId: "TubiBookmarksTest"
+        userId: "121212"
       }
     End Function
   return auth
@@ -171,49 +182,161 @@ Function tubiBookmarks_addBookmarkLocallySuccessfulForEpisode_test()
 End Function
 
 
-'@Test addHistoryReqVideo unit tests
-Function tubiBookmarks_addHistoryReqVideo_test()
+'@Test addHistoryReqVideo_ParentIdAsInvalid unit tests
+Function tubiBookmarks_addHistoryReqVideo_ParentIdAsInvalid_test()
   BM = m.authorizedBM
-  content = m.videoContent
+  content = m.movieContent
   content.id = "321221"
   content.title = "We Are Young"
+  content.parentId = invalid
   req = BM.addHistoryReq(content, 1478)
+
   m.assertNotInvalid(req)
+  m.assertNotInvalid(req.url)
+  m.assertEqual(m.historyUrl, req.url)
+
+  options = req.options
+  m.assertNotInvalid(options)
+
+  body = ParseJson(options.body)
+  m.assertEqual(content.id, body.content_id)
+  m.assertEqual(content.type, body.content_type)
+  m.assertEqual(m.deviceId, body.device_id)
+  m.assertInvalid(body.parent_id)
+
+  userId = BM.auth.getAuthInfo().userid
+  m.assertEqual(userId.toInt(), body.user_id)  
+  m.assertEqual(1478, body["position"])
+
+  headers = options.headers
+
+  m.assertEqual(headers["x-client-version"], "2.16.0")
+  m.assertEqual(headers["x-client-platform"], "roku")
+
+  m.assertEqual(options.params.device_id, m.deviceId)
+  m.assertEqual(options.params.app_id, m.appName)
+  m.assertEqual(options.params.isKidsMode, false)
+  m.assertEqual(options.params.platform, m.platform)
+
 End Function
 
 
-'@Test addHistoryReqEpisodeWithParent unit tests
-Function tubiBookmarks_addHistoryReqEpisodeWithParent_test()
+'@Test addHistoryReqVideo_ParentIdAsEmpty unit tests
+Function tubiBookmarks_addHistoryReqVideo_ParentIdAsEmpty_test()
   BM = m.authorizedBM
-  content = m.videoContent
+  content = m.movieContent
+  content.id = "321221"
+  content.title = "We Are Young"
+  content.parentId = ""
+  req = BM.addHistoryReq(content, 1478)
+
+  m.assertNotInvalid(req)
+  m.assertNotInvalid(req.url)
+  m.assertEqual(m.historyUrl, req.url)
+
+  options = req.options
+  m.assertNotInvalid(options)
+
+  body = ParseJson(options.body)
+  m.assertEqual(content.id, body.content_id)
+  m.assertEqual(content.type, body.content_type)
+  m.assertEqual(m.deviceId, body.device_id)
+  m.assertInvalid(body.parent_id)
+
+  userId = BM.auth.getAuthInfo().userid
+  m.assertEqual(userId.toInt(), body.user_id)  
+  m.assertEqual(1478, body["position"])
+
+  headers = options.headers
+
+  m.assertEqual(headers["x-client-version"], "2.16.0")
+  m.assertEqual(headers["x-client-platform"], "roku")
+
+  m.assertEqual(options.params.device_id, m.deviceId)
+  m.assertEqual(options.params.app_id, m.appName)
+  m.assertEqual(options.params.isKidsMode, false)
+  m.assertEqual(options.params.platform, m.platform)
+
+End Function
+
+
+'@Test addHistoryReqEpisodeParentIdAsString unit tests
+Function tubiBookmarks_addHistoryReqEpisodeParentIdAsString_test()
+  BM = m.authorizedBM
+  content = m.episodeContent
   content.id = "302800"
   content.title = "S02:E05 - You, I'll Be Following"
   content.parentId = "1079"
+
   req = BM.addHistoryReq(content, 1478)
+  
   m.assertNotInvalid(req)
+  m.assertNotInvalid(req.url)
+  m.assertEqual(m.historyUrl, req.url)
+
+  options = req.options
+  m.assertNotInvalid(options)
+
+  body = ParseJson(options.body)
+  m.assertEqual(content.id, body.content_id)
+  m.assertEqual(content.type, body.content_type)
+  m.assertEqual(m.deviceId, body.device_id)
+
+  m.assertEqual(1079, body.parent_id)
+
+  userId = BM.auth.getAuthInfo().userid
+  m.assertEqual(userId.toInt(), body.user_id)  
+  m.assertEqual(1478, body["position"])
+
+  headers = options.headers
+
+  m.assertEqual(headers["x-client-version"], "2.16.0")
+  m.assertEqual(headers["x-client-platform"], "roku")
+
+  m.assertEqual(options.params.device_id, m.deviceId)
+  m.assertEqual(options.params.app_id, m.appName)
+  m.assertEqual(options.params.isKidsMode, false)
+  m.assertEqual(options.params.platform, m.platform)
 End Function
 
 
-' For now, episodes without a parent reference will get sent to the server.  TODO(Chris): Check that server allows this
-'@Test addHistoryReqEpisodeWithoutParent unit tests
-Function tubiBookmarks_addHistoryReqEpisodeWithoutParent_test()
+'@Test addHistoryReqEpisodeParentIdAsInteger unit tests
+Function tubiBookmarks_addHistoryReqEpisodeParentIdAsInteger_test()
   BM = m.authorizedBM
-  content = m.videoContent
+  content = m.episodeContent
   content.id = "302800"
   content.title = "S02:E05 - You, I'll Be Following"
+  content.parentId = 1079
+
   req = BM.addHistoryReq(content, 1478)
+  
   m.assertNotInvalid(req)
-End Function
+  m.assertNotInvalid(req.url)
+  m.assertEqual(m.historyUrl, req.url)
 
+  options = req.options
+  m.assertNotInvalid(options)
 
-'@Test addHistoryReqSeries unit tests
-Function tubiBookmarks_addHistoryReqSeries_test()
-  BM = m.authorizedBM
-  content = m.seriesContent
-  content.id = "1079"
-  content.title = "S02:E05 - You, I'll Be Following"
-  req = BM.addHistoryReq(content, 1478)
-  m.assertInvalid(req)
+  body = ParseJson(options.body)
+  m.assertEqual(content.id, body.content_id)
+  m.assertEqual(content.type, body.content_type)
+  m.assertEqual(m.deviceId, body.device_id)
+
+  m.assertEqual(1079, body.parent_id)
+
+  userId = BM.auth.getAuthInfo().userid
+  m.assertEqual(userId.toInt(), body.user_id)  
+  m.assertEqual(1478, body["position"])
+
+  headers = options.headers
+
+  m.assertEqual(headers["x-client-version"], "2.16.0")
+  m.assertEqual(headers["x-client-platform"], "roku")
+
+  m.assertEqual(options.params.device_id, m.deviceId)
+  m.assertEqual(options.params.app_id, m.appName)
+  m.assertEqual(options.params.isKidsMode, false)
+  m.assertEqual(options.params.platform, m.platform)
 End Function
 
 

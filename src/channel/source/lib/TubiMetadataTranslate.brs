@@ -259,37 +259,36 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   creditsCuePoints = {}
+  postlude = 0
   if contentFromServer.credit_cuepoints <> invalid
   'adding creditCuePoints for episide to implement SkipIntro feature for episode
     if contentFromServer.detailed_type = "episode"
       creditsCuePoints = contentFromServer.credit_cuepoints
     end if
-    postlude = 0
     if contentFromServer.credit_cuepoints.postlude <> invalid
       postlude = contentFromServer.credit_cuepoints.postlude
     end if
+  end if
 
-    'add default credit cuepoints if missing, or skip it if content is very short
-    if postlude = 0 and translatedContent.length > m.creditsDuration
-      cuepoint = translatedContent.length - m.creditsDuration
-      if cuepoint >= 0
-        postlude = cuepoint
-      end if
+  'add default credit cuepoints if missing, or skip it if content is very short
+  if postlude = 0 and translatedContent.length > m.creditsDuration
+    cuepoint = translatedContent.length - m.creditsDuration
+    if cuepoint >= 0
+      postlude = cuepoint
     end if
+  end if
 
-    ' if credits duration is less than m.creditsDuration, force it to be at least that long
-    if postlude > 0 and (translatedContent.length - postlude) < m.creditsDuration
-      cuepoint = translatedContent.length - m.creditsDuration
-      if cuePoint >= 0
-        postlude = cuepoint
-      else
-        ' if the cuepoint was adjusted, but it ended up being negative
-        postlude = 0
-      end if
+  ' if credits duration is less than m.creditsDuration, force it to be at least that long
+  if postlude > 0 and (translatedContent.length - postlude) < m.creditsDuration
+    cuepoint = translatedContent.length - m.creditsDuration
+    if cuePoint >= 0
+      postlude = cuepoint
+    else
+      ' if the cuepoint was adjusted, but it ended up being negative
+      postlude = 0
     end if
 
     ' Rounding the value to down for all the end creditcuepoints
-
     earlycredits_end = creditsCuePoints.earlycredits_end
     if earlycredits_end <> invalid and earlycredits_end > 0
       creditsCuePoints.AddReplace("earlycredits_end", roundDown(earlycredits_end))
@@ -306,11 +305,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     end if
 
     ' Rounding the value to up for all the start creditcuepoints
-
     if postlude <> invalid and postlude > 0
       postlude = roundUp(postlude)
     end if  
-    creditsCuePoints.AddReplace("postlude", postlude)    
 
     prelogue = creditsCuePoints.prelogue
     if prelogue <> invalid
@@ -332,8 +329,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       creditsCuePoints.AddReplace("recap_start", roundUp(recap_start))
     end if
     
-    translatedContent.creditsCuePoints = creditsCuePoints
   end if
+
+  creditsCuePoints.AddReplace("postlude", postlude)
+  translatedContent.creditsCuePoints = creditsCuePoints
  
   translatedContent.landscape  = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)  
   sPortraitURL = m.getThumbnailImage(contentFromServer)
@@ -341,6 +340,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.portrait = sPortraitURL 
     translatedContent.HDGRIDPOSTERURL = sPortraitURL
   end if
+
   if (translatedContent.HDGRIDPOSTERURL = invalid or translatedContent.HDGRIDPOSTERURL = "") and contentFromServer.HDGRIDPOSTERURL <> invalid
     '//If the contentFromServer already set HDGRIDPOSTERURL then use that value. 
     translatedContent.HDGRIDPOSTERURL = contentFromServer.HDGRIDPOSTERURL

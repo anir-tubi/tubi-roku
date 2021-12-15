@@ -19,16 +19,3 @@ Function videoCuepoints_isInWindow_test()
   m.AssertTrue(isInWindow(46.739, 60, 15))
   m.AssertFalse(isInWindow(44.739, 60, 15))
 End Function
-
-
-'@Test isAtPosition unit test
-Function videoCuepoints_isAtPosition_test()
-  ' way outside
-  m.AssertFalse(isAtPosition(1.72, 90))
-  ' borderline
-  m.AssertFalse(isAtPosition(90.72, 90))
-  m.AssertTrue(isAtPosition(90.22, 90))
-  ' only hits if >=
-  m.AssertFalse(isAtPosition(89.72, 90))
-End Function
-

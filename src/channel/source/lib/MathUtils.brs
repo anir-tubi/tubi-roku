@@ -25,18 +25,20 @@ End Function
 ' if the value is negative, it will roundup (eg. for -2.5, it will return -2)
 ' returns value as Integer
 Function roundUp(value)
-
   result = 0
   valueType = type(value)
+
   if valueType = "roFloat" or valueType = "Float" or valueType= "roDouble" or valueType= "Double"
-    if value <> 0 
+    if FIX(value) <> value
       result = Int(value) + 1
+    else
+      result = Int(value)
     end if
   else if valueType = "roInteger" or valueType = "roInt" or valueType = "Integer"  
     result = value
   end if
+
   return result
-  
 End Function
 
 

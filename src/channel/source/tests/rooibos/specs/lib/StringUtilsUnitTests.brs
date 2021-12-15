@@ -105,7 +105,8 @@ Function stringUtils_getUrlParts_test()
   m.assertEqual(paramsAA["device_id"], "5S4629143722")
   m.assertEqual(paramsAA["content_type"], "mp4")
   m.assertEqual(paramsAA["opt_out"], "1")
-  m.assertEqual(paramsAA["adv_id"], "e85365f8-e632-510f-bd8a-6352696879ca&pub_id=0a2ada522f8db273c200b95eee98d316")
+  m.assertEqual(paramsAA["pub_id"], "0a2ada522f8db273c200b95eee98d316")
+  m.assertEqual(paramsAA["adv_id"], "e85365f8-e632-510f-bd8a-6352696879ca")
   
 End Function
 

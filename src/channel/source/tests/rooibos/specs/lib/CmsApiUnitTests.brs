@@ -93,7 +93,6 @@ Function cmsApi_getUpNextContentRequestInfo_test()
     "platform"
     "device_id"
     "custom_param"
-    "gn_fields"
   ]
 
   upNextUrl = m.cmsApi.constants.urls.cms.upNextContent + "/123456/next"
@@ -103,7 +102,6 @@ Function cmsApi_getUpNextContentRequestInfo_test()
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "video_resources": m.cmsApi.constants.player.drmOrder
-      "gn_fields": "tms_id"
       "custom_param": 42
     }
   }
@@ -123,7 +121,6 @@ Function cmsApi_getUpNextContentRequestInfo_test()
   m.assertEqual(upNextInfo.options.params["platform"], upNextOptions.params["platform"])
   m.assertEqual(upNextInfo.options.params["device_id"], upNextOptions.params["device_id"])
   m.assertEqual(upNextInfo.options.params["video_resources"], upNextOptions.params["video_resources"])
-  m.assertEqual(upNextInfo.options.params["gn_fields"], upNextOptions.params["gn_fields"])
   m.assertEqual(upNextInfo.options.params["custom_param"], upNextOptions.params["custom_param"])
 End Function
 
@@ -143,7 +140,6 @@ Function cmsApi_singleContentReqInfo_test()
     "isKidsMode"
     "includeChannels"
     "video_resources"
-    "gn_fields"
     "images[landscape_tb]"
   ]
 
@@ -157,7 +153,6 @@ Function cmsApi_singleContentReqInfo_test()
       "isKidsMode": false
       "includeChannels": true
       "video_resources": m.cmsApi.constants.player.drmOrder
-      "gn_fields": "tms_id"
       "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_hero"
     }
   }
@@ -176,7 +171,6 @@ Function cmsApi_singleContentReqInfo_test()
   m.assertEqual(singleContentInfo.options.params["isKidsMode"], singleContentOptions.params["isKidsMode"])
   m.assertEqual(singleContentInfo.options.params["includeChannels"], singleContentOptions.params["includeChannels"])
   m.assertEqual(singleContentInfo.options.params["video_resources"], singleContentOptions.params["video_resources"])
-  m.assertEqual(singleContentInfo.options.params["gn_fields"], singleContentOptions.params["gn_fields"])
   m.assertEqual(singleContentInfo.options.params["images[landscape_tb]"], singleContentOptions.params["images[landscape_tb]"])
 
   ' include channels, with kids mode
@@ -195,7 +189,6 @@ Function cmsApi_singleContentReqInfo_test()
   m.assertEqual(singleContentInfo.options.params["isKidsMode"], singleContentOptions.params["isKidsMode"])
   m.assertEqual(singleContentInfo.options.params["includeChannels"], singleContentOptions.params["includeChannels"])
   m.assertEqual(singleContentInfo.options.params["video_resources"], singleContentOptions.params["video_resources"])
-  m.assertEqual(singleContentInfo.options.params["gn_fields"], singleContentOptions.params["gn_fields"])
   m.assertEqual(singleContentInfo.options.params["images[landscape_tb]"], singleContentOptions.params["images[landscape_tb]"])
 
   ' don't include channels, with kids mode
@@ -215,7 +208,6 @@ Function cmsApi_singleContentReqInfo_test()
   m.assertEqual(singleContentInfo.options.params["isKidsMode"], singleContentOptions.params["isKidsMode"])
   m.assertEqual(singleContentInfo.options.params["includeChannels"], singleContentOptions.params["includeChannels"])
   m.assertEqual(singleContentInfo.options.params["video_resources"], singleContentOptions.params["video_resources"])
-  m.assertEqual(singleContentInfo.options.params["gn_fields"], singleContentOptions.params["gn_fields"])
   m.assertEqual(singleContentInfo.options.params["images[landscape_tb]"], singleContentOptions.params["images[landscape_tb]"])
 End Function
 
@@ -601,6 +593,7 @@ Function cmsApi_categoryReqInfo_test()
 
   ' with kids mode
   categoryOptions.params["isKidsMode"] = true
+  categoryOptions.headers["x-tubi-inject-live-news"] = "false"
   categoryInfo = m.cmsApi.categoryReqInfo("my_category", name, true, passedOptions)
 
   m.assertEqual(categoryInfo.count(), 2)
@@ -852,9 +845,9 @@ End Function
 
 '@Test unit tests setImageParams
 Function cmsApi_setImageParams_test()
-  posterParam = "w198h282_poster"
-  landscapeParam = "w408h231_hero"
-  vitgParam = "w1248h701_hero"
+  posterParam = "w186h267_poster"
+  landscapeParam = "w384h216_hero"
+  vitgParam = "w981h552_hero"
 
   ' test add poster only
   existingParams = {
@@ -936,7 +929,7 @@ End Function
 
 '@Test unit tests setTupianPosterParam
 Function cmsApi_setTupianPosterParam_test()
-  posterParam = "w198h282_poster"
+  posterParam = "w186h267_poster"
 
   existingParams = {
     userid: "1234"
@@ -959,7 +952,7 @@ End Function
 
 '@Test unit tests setTupianLandscapeParam
 Function cmsApi_setTupianLandscapeParam_test()
-  landscapeParam = "w408h231_hero"
+  landscapeParam = "w384h216_hero"
 
   existingParams = {
     userid: "1234"
@@ -979,7 +972,7 @@ End Function
 
 '@Test unit tests setTupianLargeVitgParam
 Function cmsApi_setTupianLargeVitgParam_test()
-  vitgParam = "w1248h701_hero"
+  vitgParam = "w981h552_hero"
 
   existingParams = {
     userid: "1234"

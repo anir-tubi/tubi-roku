@@ -210,6 +210,7 @@ Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Int
     end if
   else if type(parentId) = "integer" or type(parentId) = "roInt"  
     body.parent_id = parentId
+    contentType = m.constants.uapiContentTypes.episode
   else
     body.parent_id = invalid  
   end if

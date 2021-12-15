@@ -4,23 +4,18 @@
 ' Note: the component calling getExperimentResource using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
 Function getExperimentResource(namespaceName as string, experimentName as string, sendEvent=true as Boolean)
-  oMoreInfoReturn = invalid
-  
-  localGlobal = m.global
-  if localGlobal <> invalid and localGlobal.trackingLoggingTask <> invalid
-    '//if you cannot track task, then do not proceed
-    if m.constants = invalid
-      m.constants = m.global.constants
-    end if
-    request = TubiRequest(m.constants.settings)
-    experiments = TubiExperiments(m.constants)
-    oMoreInfoReturn = experiments.getExperimentResource(namespaceName, experimentName)
-    if sendEvent = true
-      sendOutExperimentTracking(namespaceName, experimentName, experiments)
-    end if
+  if m.constants = invalid
+    m.constants = m.global.constants
+  end if
+  request = TubiRequest(m.constants.settings)
+  experiments = TubiExperiments(m.constants)
+  resource = experiments.getExperimentResource(namespaceName, experimentName)
+
+  if sendEvent = true and resource <> invalid
+    sendOutExperimentTracking(namespaceName, experimentName, experiments)
   end if
 
-  return oMoreInfoReturn
+  return resource
 End Function
 
 

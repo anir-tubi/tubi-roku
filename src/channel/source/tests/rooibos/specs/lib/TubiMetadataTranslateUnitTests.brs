@@ -157,7 +157,7 @@ Function tubiMetadataTranslate_translateRecursive_testCreditsCuepoints_test()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   m.assertTrue(dest.length = 3)
-  m.assertTrue(dest.creditsCuepoint = 0)
+  m.assertTrue(dest.creditsCuePoints.postlude = 0)
 End Function
 
 
@@ -236,9 +236,9 @@ Function tubiMetadataTranslate_translateHomescreen_test()
   fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateHomescreen(ParseJson(homeJson))
   m.assertNotInvalid(translated)
-  m.assertTrue(translated.getChildCount() = 48)
-  m.assertTrue(translated.getChild(0).id = "featured")
-  m.assertTrue(translated.getChild(0).getChildCount() = 1)
+  m.assertEqual(translated.getChildCount(), 10)
+  m.assertEqual(translated.getChild(0).id, "featured")
+  m.assertEqual(translated.getChild(0).getChildCount(), 8)
 End Function
 
 

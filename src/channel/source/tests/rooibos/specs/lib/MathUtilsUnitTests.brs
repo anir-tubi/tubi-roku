@@ -47,6 +47,7 @@ Function mathUtils_round_up_test()
   ' roundUp value test with value 0
   roundedPosition = roundUp(0)
   m.AssertEqual(roundedPosition, 0)
+  m.AssertTrue(isInt(roundedPosition))
   
   ' roundUp value test with value 0.1
   roundedPosition = roundUp(0.1)
@@ -60,17 +61,21 @@ Function mathUtils_round_up_test()
   roundedPosition = roundUp(1)
   m.AssertEqual(roundedPosition, 1)
 
+  ' roundUp value test with value 2.0
+  roundedPosition = roundUp(2.0)
+  m.AssertEqual(roundedPosition, 2)
+
   ' roundUp value test with value -2.5
   roundedPosition = roundUp(-2.5)
   m.AssertEqual(roundedPosition, -2)
 
   ' roundUp value test with value "2.5"
   roundedPosition = roundUp("2.5")
-  m.AssertEqual(roundedPosition, 0)  
+  m.AssertEqual(roundedPosition, 0)
 
-  ' roundUp value test with value [3.5
+  ' roundUp value test with value [3.5]
   roundedPosition = roundUp([3.5])
-  m.AssertEqual(roundedPosition, 0) 
+  m.AssertEqual(roundedPosition, 0)
     
 End Function
 
