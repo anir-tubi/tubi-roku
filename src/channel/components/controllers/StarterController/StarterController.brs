@@ -71,20 +71,6 @@ Function onExternalConfigInfoReturned(msg)
     if m.constants.externalConfig.info.country <> invalid and m.constants.externalConfig.info.country <> ""
       m.constants.deviceInfo.countryCode = UCase(m.constants.externalConfig.info.country)
     end if
-    if m.constants.externalConfig.info.vzero_drm = true
-      if m.constants.player <> invalid and m.constants.player.drmTypes <> invalid
-        m.constants.player.drmTypes.dashWidevine = "dash_widevine_psshv0"
-        m.constants.player.drmTypes.dashPlayready = "dash_playready_psshv0"
-
-        ' it's necessary to reset the drmOrder after adjusting the drmTypes or the drmOrder that was
-        ' included in the submitted package's constants will continue to be used.
-        m.constants.player.drmOrder = [
-          m.constants.player.drmTypes.dashWidevine
-          m.constants.player.drmTypes.dashPlayready
-          m.constants.player.drmTypes.hlsv3
-        ]
-      end if
-    end if
   end if
 
   m.hasRemoteConfigs = true

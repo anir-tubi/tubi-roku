@@ -565,8 +565,8 @@ Function getConstants()
 
       ' Drm types/schemes, as named and supported by UAPI
       constants.player.drmTypes = {}
-      constants.player.drmTypes.dashWidevine = "dash_widevine"
-      constants.player.drmTypes.dashPlayready = "dash_playready"
+      constants.player.drmTypes.dashWidevine = "dash_widevine_psshv0"
+      constants.player.drmTypes.dashPlayready = "dash_playready_psshv0"
       constants.player.drmTypes.hlsv3 = "hlsv3"
 
       ' Supported schemes, in order of preference
