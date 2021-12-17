@@ -423,7 +423,7 @@ Function startUserExperience()
   else if m.authInfoRefreshed <> true
     ' checks if auth info has been received after a deeplink from external tubi device (iOS) supplied a refresh token
     ' if m.authInfoReceived is false, it means that a refresh token has been supplied
-    if m.global.authInfo <> invalid
+    if m.global.authInfo = invalid
       ' we only need to refresh if the user is currently signed out
       m.authTask = CreateObject("roSGNode", "AuthTask")
       m.authTask.observeFieldScoped("authInfoRefreshed", "onAuthInfoRefreshed")
@@ -535,7 +535,7 @@ End Function
 Function onStartupArgs()
   m.deeplinkContent = invalid 
   ' TODO: Verify and simplify below logic after 2.17 when startupArgs.launchParams will be available.
-  if m.top.startUpArgs <> invalid 
+  if m.top.startUpArgs <> invalid
     if m.top.startUpArgs.launchParams <> invalid
       m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs.launchParams)
     else if m.top.startUpArgs.contentID <> invalid
@@ -757,7 +757,7 @@ End Function
 Function onAuthInfoRefreshed()
   tubiLog("ContentController.onAuthInfoRefreshed")
   if m.authTask <> invalid
-    if m.authTask.authInfo <> invalid
+    if m.authTask.authInfoRefreshed <> invalid
       m.global.authInfo = m.authTask.authInfoRefreshed
     end if
     m.authTask.unobserveFieldScoped("authInfo")

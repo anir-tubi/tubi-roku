@@ -52,10 +52,10 @@
       height="1080"/>
    
     <Poster
-        id="customSplashPoster"
-        width="1920"
-        height="1080"
-        visible="true" /> 
+      id="customSplashPoster"
+      width="1920"
+      height="1080"
+      visible="true" />
         
   </children>
 
