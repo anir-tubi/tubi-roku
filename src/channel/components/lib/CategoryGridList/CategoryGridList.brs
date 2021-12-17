@@ -452,9 +452,7 @@ Function onRowListItemDebounce()
     m.top.cursorPosition = m.RowList.rowItemFocused
     m.top.oldItemFocused = m.top.itemFocused
     m.top.itemFocused = itemFocused
-    if m.top.oldCursorPosition[0] <> m.top.cursorPosition[0]
-      m.top.rowFocused = m.top.content.getChild(m.RowList.rowItemFocused[0])
-    end if
+    m.top.rowFocused = m.top.content.getChild(m.RowList.rowItemFocused[0])
   end if
 End Function
 
