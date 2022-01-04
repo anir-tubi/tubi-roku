@@ -1,10 +1,14 @@
 Function init()
-  m.constants = m.global.constants
   m.top.drawFocusFeedbackOnTop = false
-  m.top.focusBitmapUri = "pkg://images/menu-focus-fhd.9.png" 
-  m.top.focusBitmapBlendColor = m.global.theme.focused
+  m.top.focusBitmapUri = "pkg://images/menu-focus-fhd.9.png"
 
-  if m.constants <> invalid and m.constants.deviceInfo.scaledUi = true
+  constants = getConstantsFromGlobal()
+  if constants <> invalid and constants.deviceInfo.scaledUi = true
     m.top.focusBitmapUri = "pkg://images/menu-focus-hd.9.png"
+  end if
+
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.top.focusBitmapBlendColor = theme.focused
   end if
 End Function

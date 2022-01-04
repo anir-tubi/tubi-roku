@@ -400,15 +400,17 @@ End Function
 ' onRowItemSelected - RowList.rowItemSelected event handler, triggered when user presses "OK"
 Function onRowItemSelected()
   tubiLog("CategoryGridList.onRowItemSelected")
-  category = m.top.content.getChild(m.RowList.rowItemSelected[0])
-  if category <> invalid
-    m.top.oldCategoryId = m.top.currCategoryId
-    m.top.currCategoryId = category.id
-  end if
+  if m.top.content <> invalid 'should not be necessary but crash reports show that it is.
+    category = m.top.content.getChild(m.RowList.rowItemSelected[0])
+    if category <> invalid
+      m.top.oldCategoryId = m.top.currCategoryId
+      m.top.currCategoryId = category.id
+    end if
 
-  itemSelected = resolveAbbreviatedContent(m.RowList.rowItemSelected)
-  if itemSelected <> invalid
-    m.top.itemSelected = itemSelected
+    itemSelected = resolveAbbreviatedContent(m.RowList.rowItemSelected)
+    if itemSelected <> invalid
+      m.top.itemSelected = itemSelected
+    end if
   end if
 End Function
 

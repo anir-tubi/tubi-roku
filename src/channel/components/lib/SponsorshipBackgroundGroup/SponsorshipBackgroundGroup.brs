@@ -17,7 +17,9 @@ Function onURIChange()
     if sCurrentBground <> "" and m.FadingGroup.opacity > 0
       '//fade out the existing background. When the fadeOut animation is complete then fade in the new url
       m.animationFadeOut = fade(m.FadingGroup, "out", .25)
-      m.animationFadeOut.observeFieldScoped("state", "onAnimationStateChange")
+      if m.animationFadeOut <> invalid
+        m.animationFadeOut.observeFieldScoped("state", "onAnimationStateChange")
+      end if
     else
       '//if no existing background, then fade new background
       fadeInBackground()

@@ -409,30 +409,41 @@ End Function
 Function tubiBookmarks_handleInitialHistory(initialHistory)
   historyIds = CreateObject("roSGNode", "HistoryContentNode")
   parsedInitialHistory = ParseJson(initialHistory)
+
   if parsedInitialHistory <> invalid then
     for each history in parsedInitialHistory.items
       child = historyIds.createChild("HistoryContentNode")
-      child.id =         history.content_id.toStr()
+      child.id = history.content_id.toStr()
       nowDate = CreateObject("roDateTime")
       if history.content_type = m.constants.uapiContentTypes.movie
-        child.historyId =  history.id
-        child.nowPos =     history.position
-        child.type =       m.constants.ui.contentTypes.video
+        child.historyId = history.id
+        child.nowPos = history.position
+        child.type = m.constants.ui.contentTypes.video
       else if history.content_type = m.constants.uapiContentTypes.series
-        child.id =                 "0" + child.id
-        child.currentEpisodeId =   history.episodes[history.position].content_id.toStr()
-        child.historyId =          history.id
-        child.type =               m.constants.ui.contentTypes.series
+        child.id = "0" + child.id
+        child.historyId = history.id
+        child.type = m.constants.ui.contentTypes.series
+
+        if history.episodes <> invalid and history.position <> invalid and history.episodes[history.position] <> invalid
+          currentEpisode = history.episodes[history.position]
+          if currentEpisode.content_id <> invalid
+            child.currentEpisodeId = history.episodes[history.position].content_id.toStr()
+          end if
+        end if
+
         for each episode in history.episodes
-          grandchild = child.createChild("HistoryContentNode")
-          grandchild.id = episode.content_id.toStr()
-          grandchild.historyId = episode.id
-          grandchild.nowPos = episode.position
-          grandchild.type = m.constants.ui.contentTypes.video
+          if episode.content_id <> invalid
+            grandchild = child.createChild("HistoryContentNode")
+            grandchild.id = episode.content_id.toStr()
+            grandchild.historyId = episode.id
+            grandchild.nowPos = episode.position
+            grandchild.type = m.constants.ui.contentTypes.video
+          end if
         end for
       end if
     end for
   end if
+
   return historyIds
 End Function
 

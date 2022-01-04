@@ -1,5 +1,11 @@
 Function init()
-  m.limitedUi = m.global.constants.deviceInfo.limitedUi
+  m.limitedUi = true
+
+  constants = getConstantsFromGlobal()
+  if constants <> invalid
+    m.limitedUi = constants.deviceInfo.limitedUi
+  end if
+
   m.top.opacity = "0.8"
   m.top.observeField("width", "onDimensionsChange")
   m.top.observeField("height", "onDimensionsChange")

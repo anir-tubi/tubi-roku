@@ -126,7 +126,11 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
     m.urltransfer = urltransfer_or_messageport
   else if type(urltransfer_or_messageport) = "roMessagePort" then
     m.urltransfer = CreateObject("roURLTransfer")
-    m.urltransfer.SetPort(urltransfer_or_messageport)
+    if m.urltransfer <> invalid
+      m.urltransfer.SetPort(urltransfer_or_messageport)
+    else
+      return false
+    end if
   else
     return false
   end if

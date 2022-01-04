@@ -89,9 +89,14 @@ End Function
 
 Function onPosterLoadStatus(msg)
   poster = msg.getRoSGNode()
-  if poster.loadStatus = "ready"
+  if poster <> invalid and poster.loadStatus = "ready"
     ' set width based on aspect ratio
-    poster.width = (poster.bitmapWidth / poster.bitmapHeight) * poster.height
+    if poster.bitmapHeight > 0 'prevent divide by 0'
+      poster.width = (poster.bitmapWidth / poster.bitmapHeight) * poster.height
+      poster.visible = true
+    else
+      poster.visible = false
+    end if
   end if
 End Function
 

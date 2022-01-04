@@ -378,8 +378,12 @@ Function onCurrFocusRowChange()
 
   setTopNavFarAwayStatus(rowEnteringFocus)
 
-  categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
-  categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
+  categoryEnteringFocus = invalid
+  categoryLosingFocus = invalid
+  if m.CategoryGridList.content <> invalid
+    categoryEnteringFocus = m.CategoryGridList.content.getChild(rowEnteringFocus) 'TubiCategoryNode
+    categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
+  end if
 
   ' send experiment analytics (exposure event) only when
   ' kidsMode is not enabled and currentScreen is homescreen and parentalRating is Adult and kidsModeFeatureOn is check for countryCode = US or CA

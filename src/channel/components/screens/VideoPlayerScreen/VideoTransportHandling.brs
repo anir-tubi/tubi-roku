@@ -706,6 +706,8 @@ Function onSkipIntroSelected()
   end if
   m.positionAtJumpStart = m.playerPosition
   m.VideoState = "hop"
+
+  hopPosition = -1
   if m.skipIntro.id = "skipIntro"
     hopPosition = m.top.content.creditsCuePoints.intro_end
   else if m.skipIntro.id = "skipRecap"
@@ -713,7 +715,11 @@ Function onSkipIntroSelected()
   else if m.skipIntro.id = "skipEarlyCredits"
     hopPosition = m.top.content.creditsCuePoints.earlycredits_end
   end if
-  jumpToPosition(hopPosition)
+
+  if hopPosition > 0
+    jumpToPosition(hopPosition)
+  end if
+
   clearSkipIntroButtonAndTimer()
 End Function
 

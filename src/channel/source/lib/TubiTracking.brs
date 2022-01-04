@@ -441,13 +441,17 @@ End Function
 
 ' Build the structure for the various page types that belong to some of the events
 Function tubiTracking_getAnalyticsPage(pageType, pageValues)
-  pageBase = m.allOneofs.pageOneof[pageType]
+  if m.isString(pageType)
+    pageBase = m.allOneofs.pageOneof[pageType]
 
-  if pageBase = invalid
-    pageBase = m.allOneofs.dest_pageOneof[pageType]
+    if pageBase = invalid
+      pageBase = m.allOneofs.dest_pageOneof[pageType]
+    end if
+    page = m.populateMessage(pageType, pageValues, pageBase)
+    return page
+  else
+    return {}
   end if
-  page = m.populateMessage(pageType, pageValues, pageBase)
-  return page
 End Function
 
 

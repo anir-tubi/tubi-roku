@@ -44,7 +44,10 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
 
   ' send custom navigateToPage event, since a details screen was added to the screen stack but the user
   ' never saw it, we want to navigate from the screen under the most recently added details screen.
-  screenTrackingNavigate(currentTrackingPageInfo, videoPlayer.trackingPageInfo, trackingComponentInfo)
+  if currentTrackingPageInfo <> invalid and isNonEmptyString(currentTrackingPageInfo.pageType)
+    ' but only send the navigateToPage event if there is a page to navigate from
+    screenTrackingNavigate(currentTrackingPageInfo, videoPlayer.trackingPageInfo, trackingComponentInfo)
+  end if
 
   if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
     pushScreen(videoPlayer, false, true)
@@ -888,11 +891,15 @@ End Function
 ' @nResumePoint: Integer, history position for current episode
 Function updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)
 
-  season = itemFocused[0]
-  episode = itemFocused[1]
-  childNode = detailContent.getChild(season).getChild(episode)
-  if childNode <> invalid
-    childNode.nowPos = nResumePoint 'updating current episode's nowPos to draw progressbar
+  seasonIndex = itemFocused[0]
+  episodeIndex = itemFocused[1]
+
+  season = detailContent.getChild(seasonIndex)
+  if season <> invalid
+    episode = season.getChild(episodeIndex)
+    if episode <> invalid
+      episode.nowPos = nResumePoint 'updating current episode's nowPos to draw progressbar
+    end if
   end if
           
 End Function

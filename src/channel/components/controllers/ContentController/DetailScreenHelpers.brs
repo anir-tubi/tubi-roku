@@ -284,9 +284,10 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     if content.backgrounds <> invalid and content.backgrounds.count() > 0
       backgroundUriList = content.backgrounds
     end if
+
+    detailScreen.backgroundUriList = backgroundUriList
   end if
 
-  detailScreen.backgroundUriList = backgroundUriList
   m.backgroundGroup.backgroundInfo = {
     type: m.constants.ui.backgroundTypes.fullScreen
     uriList: backgroundUriList
@@ -1704,6 +1705,7 @@ Function getDetailScreenAnalyticsPageInfo(content, constants)
   end if
   return pageInfo
 End Function
+
 
 'make getRelatedContent call after autoplay to display the refreshed YMAL content
 Function onAutoplaySingleContentResponse(refreshedContent)
