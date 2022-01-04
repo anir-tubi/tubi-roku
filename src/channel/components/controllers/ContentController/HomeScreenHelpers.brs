@@ -733,7 +733,7 @@ Function onUtilityItemSelected(content)
   else
     showChannelScreen(content, "HOME")  
   end if
-End Function  
+End Function
 
 
 Function onUserCategoriesFailed(screenID)

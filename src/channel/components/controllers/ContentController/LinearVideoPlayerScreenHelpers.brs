@@ -6,83 +6,83 @@
 ' @bMinimized: boolean, Should the player be playing in its minmized state on the homescreen? If false, then it will be at fullscreen.
 ' @sAssociatedScreenID: String, Often times the screen right before the linear video player screen is displayed has a close association. Keep a record of the ID associated with the associated screen. 
 Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "")
-  tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
-  ' we make changes to the content from this point forward. If we don't clone, those changes will initialize
-  ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number
-  ' of fields that are being observed (for instance: HomeScreen.contentFocused)
-  content = content.clone(true)
-
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  
-  bTellPlayerToPlay = true
-  if videoPlayer = invalid
-    videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
-    videoPlayer.id = m.constants.ui.screenIds.linearVideoPlayerScreen
-    ' onVideoPlayerVisibleChange exists in ContentController
-    videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
-    videoPlayer.observeFieldScoped("refreshChannels", "onChannelsRequested")
-    videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
-    videoPlayer.observeFieldScoped("userDisplayingChannelGuide", "onChannelGuideVisibleStateChangedByUser")
-    videoPlayer.observeFieldScoped("channelSelected", "onLinearChannelSelectedFromGuide")
-    videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-    initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
-    setInScreenCache(videoPlayer)
-  end if
-
-  unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer) 
-  videoPlayer.associatedScreenID = sAssociatedScreenID
-  
   if content <> invalid
+    tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
+
+    ' we make changes to the content from this point forward. If we don't clone, those changes will initialize
+    ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number
+    ' of fields that are being observed (for instance: HomeScreen.contentFocused)
+    clonedContent = content.clone(true)
+
+    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+
+    bTellPlayerToPlay = true
+    if videoPlayer = invalid
+      videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
+      videoPlayer.id = m.constants.ui.screenIds.linearVideoPlayerScreen
+      ' onVideoPlayerVisibleChange exists in ContentController
+      videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
+      videoPlayer.observeFieldScoped("refreshChannels", "onChannelsRequested")
+      videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
+      videoPlayer.observeFieldScoped("userDisplayingChannelGuide", "onChannelGuideVisibleStateChangedByUser")
+      videoPlayer.observeFieldScoped("channelSelected", "onLinearChannelSelectedFromGuide")
+      videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+      initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
+      setInScreenCache(videoPlayer)
+    end if
+
+    unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
+    videoPlayer.associatedScreenID = sAssociatedScreenID
+
     videoPlayer.analyticsMode = "normal"
 
     ' set general observers for all content
     videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
-  end if
 
-  ' it's necessary to push the screen after the content has been set on the videoPlayer component,
-  ' so NavigateToPage and PageLoad events contain the necessary content id information
-  if bMinimized = false 
-    maximizeLinearPlayer(content)
-  else 
-    '//play at minimized state
-    showHideLinearVideoPlayerSpinner(true)
-    animateLinearVideoPlayerToMinState(0, false)
-  end if
+    ' it's necessary to push the screen after the content has been set on the videoPlayer component,
+    ' so NavigateToPage and PageLoad events contain the necessary content id information
+    if bMinimized = false
+      maximizeLinearPlayer(clonedContent)
+    else
+      '//play at minimized state
+      showHideLinearVideoPlayerSpinner(true)
+      animateLinearVideoPlayerToMinState(0, false)
+    end if
 
-  if isLinearPlayerPlayingThisContent(content) = false
-    if content <> invalid
-      videoPlayer.content = content
+    if isLinearPlayerPlayingThisContent(clonedContent) = false
+      videoPlayer.originalContent = content
+      videoPlayer.content = clonedContent
       videoPlayer.updateContent = true
-    end if
 
-    ' this is not the same instance of the task that is used by the linear video player
-    ' this is just a temp task to handle adding the params to the video url,
-    ' and will be removed later.
-    ' Setting content on the adsSsaiTask will set a series of asynchronous events in action that need
-    ' to occur in order to prepare the linear stream:
-    ' 1) add the rainmaker parameters to the stream url - YoSpace will make calls to rainmaker in order to
-    '    to stitch the ads and needs the rainmaker parameters to make the rainamaker requests
-    ' 2) fetch the response from the hls manifest and parse out the YoSpace "analtyics url" which is the url
-    '    that will be used to poll for ads
-    ' 3) compose the final stream url from the "analytics url" and the original stream url found in the
-    '    matrix/homescreen response
-    ' 4) pass the content with the updated stream url to the linear video player
-    if m.adsSsaiTask <> invalid
-      m.adsSsaiTask.unobserveFieldScoped("videoResourcesWithAdParams")
-      m.adsSsaiTask.exit = true
-      m.adsSsaiTask = invalid
-    end if
-    if m.linearManifestRequest <> invalid
-      m.cancelRequest(m.linearManifestRequest)
-      m.linearManifestRequest = invalid
-    end if
-    m.adsSsaiTask = CreateObject("roSGNode", "AdsSSAITask")
-    m.adsSsaiTask.id = "tempAdsSsaiTask"
+      ' this is not the same instance of the task that is used by the linear video player
+      ' this is just a temp task to handle adding the params to the video url,
+      ' and will be removed later.
+      ' Setting content on the adsSsaiTask will set a series of asynchronous events in action that need
+      ' to occur in order to prepare the linear stream:
+      ' 1) add the rainmaker parameters to the stream url - YoSpace will make calls to rainmaker in order to
+      '    to stitch the ads and needs the rainmaker parameters to make the rainamaker requests
+      ' 2) fetch the response from the hls manifest and parse out the YoSpace "analtyics url" which is the url
+      '    that will be used to poll for ads
+      ' 3) compose the final stream url from the "analytics url" and the original stream url found in the
+      '    matrix/homescreen response
+      ' 4) pass the content with the updated stream url to the linear video player
+      if m.adsSsaiTask <> invalid
+        m.adsSsaiTask.unobserveFieldScoped("videoResourcesWithAdParams")
+        m.adsSsaiTask.exit = true
+        m.adsSsaiTask = invalid
+      end if
+      if m.linearManifestRequest <> invalid
+        m.cancelRequest(m.linearManifestRequest)
+        m.linearManifestRequest = invalid
+      end if
+      m.adsSsaiTask = CreateObject("roSGNode", "AdsSSAITask")
+      m.adsSsaiTask.id = "tempAdsSsaiTask"
 
-    ' adsSsaiTask will update the videoResource url with rainmaker params when it receives content
-    m.adsSsaiTask.observeFieldScoped("videoResourcesWithAdParams", "onAdParamsAddedToVideoUrl")
-    m.adsSsaiTask.content = content
-    m.adsSsaiTask.updateContent = true
+      ' adsSsaiTask will update the videoResource url with rainmaker params when it receives content
+      m.adsSsaiTask.observeFieldScoped("videoResourcesWithAdParams", "onAdParamsAddedToVideoUrl")
+      m.adsSsaiTask.content = clonedContent
+      m.adsSsaiTask.updateContent = true
+    end if
   end if
 End Function
 

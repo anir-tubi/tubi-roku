@@ -18,7 +18,13 @@
       <field id="width" alias="VideoNode.width"/>
       <field id="height" alias="VideoNode.height"/>
 
-      <!-- New content has been added to the video player -->
+      <!-- originalContent stores the content as it is returned from CCS services. It used
+           as a store, in case the linear video player needs to be restarted. -->
+      <field id="originalContent" type="node"/>
+
+      <!-- content stores a clone of originalContent that has had the stream manifest url updated
+           with yospace parameters. This is the content node that will be used to play the video
+           in the UI. -->
       <field id="content" type="node"/>
       <field id="updateContent" type="boolean" alwaysNotify="true"/>
 

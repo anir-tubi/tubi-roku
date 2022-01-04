@@ -1660,8 +1660,11 @@ Function resumeApp()
 
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.id = "linearVideoPlayerScreen"
-    ' if the current screen is linearVideoPlayerScreen, then start the playback
-    currentScreen.control = "play"
+    ' if the current screen is linearVideoPlayerScreen, then re-start the playback.
+    ' We restart to make sure that the proper video start time is included in the manifest
+    associatedScreenId = currentScreen.associatedScreenId
+    originalLinearContent = currentScreen.originalContent
+    playLinearVideoContent(originalLinearContent, false, associatedScreenId)
   end if
 
   ' when channel resumes, 
