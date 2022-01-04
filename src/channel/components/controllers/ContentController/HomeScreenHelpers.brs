@@ -52,36 +52,29 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("topNavItemSelected", "onTopNavItemSelected")
     homeScreen.observeFieldScoped("topNavBackItemSelected", "onTopNavBackItemSelected")
     homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+    homeScreen.observeFieldScoped("loadCategoriesIndex", "onLoadCategoriesIndex")
     homeScreen.observeFieldScoped("topNavToggled", "onScreenTopNavToggled")
     homeScreen.observeFieldScoped("navigatedAwayFromTopNav", "onNavigatedFromTopNavToSideNav")
     homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomescreenSponsoredRowFocused")
+
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
     sContentMode = constants.ui.contentMode.homescreen
     if screenID = constants.ui.screenIds.homeScreen
-      m.top.observeFieldScoped("homescreenResponse", "onHomescreenResponse")
       homescreen.topNavSelectedId = constants.ui.sideNavIds.home
     else if screenID = constants.ui.screenIds.movieScreen
-      m.top.observeFieldScoped("moviescreenResponse", "onMoviescreenResponse")
       sContentMode = constants.ui.contentMode.movie
       homescreen.topNavSelectedId = constants.ui.sideNavIds.movies
-      m.top.observeFieldScoped("reloadMovieUserCategoriesResponse", "onReloadUserCategoriesResponseInMovieScreen")
     else if screenID = constants.ui.screenIds.tvScreen
       sContentMode = constants.ui.contentMode.tv
       homescreen.topNavSelectedId = constants.ui.sideNavIds.tv
-      m.top.observeFieldScoped("tvscreenResponse", "onTVscreenResponse")
-      m.top.observeFieldScoped("reloadTVUserCategoriesResponse", "onReloadUserCategoriesResponseInTVScreen")
     else if screenID = constants.ui.screenIds.espanolScreen
-      m.top.observeFieldScoped("espanolscreenResponse", "onEspanolscreenResponse")
       sContentMode = constants.ui.contentMode.latino
-      m.top.observeFieldScoped("reloadEspanolUserCategoriesResponse", "onReloadUserCategoriesResponseInEspanolScreen")
     else if screenID = constants.ui.screenIds.linearTVScreen
-      m.top.observeFieldScoped("linearTVScreenResponse", "onLinearTVScreenResponse")
       sContentMode = constants.ui.contentMode.linear
       homescreen.topNavSelectedId = constants.ui.sideNavIds.linearTV
-      m.top.observeFieldScoped("reloadLinearTVUserCategoriesResponse", "onReloadUserCategoriesResponseInLinearTVScreen")
     end if 
 
     homeScreen.contentMode = sContentMode
@@ -104,6 +97,61 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
 
     'page_load tracking will happen when content is received and displayed when onHomescreenContentReady() is called.
     pushScreen(homeScreen, true, false)
+  end if
+
+End Function
+
+
+Function homeBatchResponse(response)
+
+  screenID = m.constants.ui.screenIds.homeScreen
+  homeScreen = getFromScreenCache(screenID)
+  if homeScreen <> invalid
+    homeScreen.batchResponse = response
+  end if
+
+End Function
+
+
+Function movieBatchResponse(response)
+
+  screenID = m.constants.ui.screenIds.movieScreen
+  homeScreen = getFromScreenCache(screenID)
+  if homeScreen <> invalid
+    homeScreen.batchResponse = response
+  end if
+
+End Function
+
+
+Function tvBatchResponse(response)
+
+  screenID = m.constants.ui.screenIds.tvScreen
+  homeScreen = getFromScreenCache(screenID)
+  if homeScreen <> invalid
+    homeScreen.batchResponse = response
+  end if
+
+End Function
+
+
+Function espanolBatchResponse(response)
+
+  screenID = m.constants.ui.screenIds.espanolScreen
+  homeScreen = getFromScreenCache(screenID)
+  if homeScreen <> invalid
+    homeScreen.batchResponse = response
+  end if
+
+End Function
+
+
+Function LinearTVBatchResponse(response)
+
+  screenID = m.constants.ui.screenIds.linearTVScreen
+  homeScreen = getFromScreenCache(screenID)
+  if homeScreen <> invalid
+    homeScreen.batchResponse = response
   end if
 
 End Function
@@ -148,29 +196,30 @@ Function reloadDefaultHomeScreenContent()
 End Function
 
 
-Function onReloadUserCategoriesResponseInEspanolScreen(msg)
-  onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.espanolScreen)
+Function onReloadUserCategoriesResponseInEspanolScreen(response)
+  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.espanolScreen)
 End Function
 
 
-Function onReloadUserCategoriesResponseInLinearTVScreen(msg)
-  onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.linearTVScreen)
+Function onReloadUserCategoriesResponseInLinearTVScreen(response)
+  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.linearTVScreen)
 End Function
 
 
-Function onReloadUserCategoriesResponseInMovieScreen(msg)
-  onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.movieScreen)
+Function onReloadUserCategoriesResponseInMovieScreen(response)
+  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.movieScreen)
 End Function
 
 
-Function onReloadUserCategoriesResponseInTVScreen(msg)
-  onReloadUserCategoriesInHomeScreen(msg, m.constants.ui.screenIds.tvScreen)
+Function onReloadUserCategoriesResponseInTVScreen(response)
+  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.tvScreen)
 End Function
 
 
-Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
+' @response: roSGNode, a ContentNode representing a container/category, may have no children
+' @screenId: string, the id of the specific home page as found in m.constants.ui.screenIds
+Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
   tubiLog("HomeScreenHelpers.onReloadUserCategoriesInHomeScreen")
-  handledRequest = msg.getData()
   
   if screenID = ""
     screenID = m.constants.ui.screenIds.homeScreen
@@ -178,89 +227,120 @@ Function onReloadUserCategoriesInHomeScreen(msg, screenID = "")
   homeScreen = getFromScreenCache(screenID)
   
   if homeScreen <> invalid
-    if handledRequest.response <> invalid then
-      response = handledRequest.response
-      if response.code >= 200 and response.code < 300 then
-        newCategory = handledRequest.convertedMetadata
+    if homeScreen.content <> invalid
+      newCategory = invalid
+      oldCategory = invalid
 
-        if homeScreen.content <> invalid
-          oldCategory = invalid
-          if newCategory <> invalid and newCategory.id <> invalid
-            oldCategory = homeScreen.content.findNode(newCategory.id)
-          else if handledRequest.context.id <> invalid
-            oldCategory = homeScreen.content.findNode(handledRequest.context.id)
-          end if
-          
-          homeScreen.rowAdded = ""
-          homeScreen.rowRemoved = ""
-
-          ' there are 4 options here
-          ' 1) new category and old category both have content in them - replace the old with the new
-          ' 2) new category has content, old category doesn't exist - add the new category
-          ' 3) new category doesn't have content (will be invalid), old category does have content - remove old category
-          ' 4) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
-          if newCategory <> invalid and oldCategory <> invalid
-            'replace old category with new category
-            homeScreen.content.replaceChild(newCategory, m.NodeHelpers.getChildIndex(homeScreen.content, oldCategory))
-            homeScreen.repopulateContent = true
-          else if newCategory <> invalid and oldCategory = invalid
-            'add new category
-            'if new category is history, put it one before queue, or if queue doens't exist put it in 2nd position
-            'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
-            if newCategory.id = m.constants.ui.categoryIds.history
-              clonedContent = homeScreen.content.clone(true)
-              homeScreen.rowAdded = m.constants.ui.categoryIds.history
-              clonedContent.insertChild(newCategory, homeScreen.content.continueWatchingIndex)
-              homeScreen.content = clonedContent
-            else if newCategory.id = m.constants.ui.categoryIds.queue
-              homeScreen.rowAdded = m.constants.ui.categoryIds.queue
-              clonedContent = homeScreen.content.clone(true)
-              clonedContent.insertChild(newCategory, homeScreen.content.queueIndex)
-              homeScreen.content = clonedContent
-            end if
-            
-            clonedContent = invalid
-            homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
-          else if newCategory = invalid and oldCategory <> invalid
-            if oldCategory.id = m.constants.ui.categoryIds.history
-              homeScreen.rowRemoved = m.constants.ui.categoryIds.history
-            else if oldCategory.id = m.constants.ui.categoryIds.queue
-              homeScreen.rowRemoved = m.constants.ui.categoryIds.queue            
-            end if
-            'remove old category
-            homeScreen.content.removeChild(oldCategory)
-            homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
-          else if newCategory = invalid and oldCategory = invalid
-            'do nothing
-          end if
+      if type(response) = "roSGNode"
+        if response.getChildCount() > 0
+          newCategory = response
         end if
 
-        '//Stop loading of homescreen which will refresh the screen's content
-        homeScreen.isLoading = false
-      else
-        ' if we were loading in the background, don't show an error modal
-        if homeScreen.isInFocusChain()
-          errorMessage = getTranslation("screenHome_error_fetchCategories_description")
-          errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
-          dialogEvent =  {
-            type: "dialog"
-            values: {
-              dialog_type: "PLAYER_ERROR"
-              pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
-              dialog_action: "SHOW"
-              dialog_sub_type: errorCode
-            }
-          }
-          
-          modalInfo = {
-            message: getErrorMessage(errorMessage, errorCode)
-            openTrackEvent: dialogEvent
-            trackingTask: m.trackingLoggingTask
-          }
-
-          showErrorModal(modalInfo, onUserCategoriesFailed, screenID, invalid, invalid, [getTranslation("dialog_button_continue")])
-        end if
+        oldCategory = homeScreen.content.findNode(response.id)
       end if
+
+      homeScreen.rowAdded = ""
+      homeScreen.rowRemoved = ""
+
+      ' there are 4 options here
+      ' 1) new category and old category both have content in them - replace the old with the new
+      ' 2) new category has content, old category doesn't exist - add the new category
+      ' 3) new category doesn't have content (will be invalid), old category does have content - remove old category
+      ' 4) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
+      if newCategory <> invalid and oldCategory <> invalid
+        'replace old category with new category
+        homeScreen.content.replaceChild(newCategory, m.NodeHelpers.getChildIndex(homeScreen.content, oldCategory))
+        homeScreen.repopulateContent = true
+      else if newCategory <> invalid and oldCategory = invalid
+        'add new category
+        'if new category is history, put it one before queue, or if queue doens't exist put it in 2nd position
+        'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
+        if newCategory.id = m.constants.ui.categoryIds.history
+          clonedContent = homeScreen.content.clone(true)
+          homeScreen.rowAdded = m.constants.ui.categoryIds.history
+          clonedContent.insertChild(newCategory, homeScreen.content.continueWatchingIndex)
+          homeScreen.content = clonedContent
+        else if newCategory.id = m.constants.ui.categoryIds.queue
+          homeScreen.rowAdded = m.constants.ui.categoryIds.queue
+          clonedContent = homeScreen.content.clone(true)
+          clonedContent.insertChild(newCategory, homeScreen.content.queueIndex)
+          homeScreen.content = clonedContent
+        end if
+
+        clonedContent = invalid
+        homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
+      else if newCategory = invalid and oldCategory <> invalid
+        if oldCategory.id = m.constants.ui.categoryIds.history
+          homeScreen.rowRemoved = m.constants.ui.categoryIds.history
+        else if oldCategory.id = m.constants.ui.categoryIds.queue
+          homeScreen.rowRemoved = m.constants.ui.categoryIds.queue
+        end if
+
+        'remove old category
+        homeScreen.content.removeChild(oldCategory)
+        homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
+      else if newCategory = invalid and oldCategory = invalid
+        'do nothing
+      end if
+    end if
+
+    '//Stop loading of homescreen which will refresh the screen's content
+    homeScreen.isLoading = false
+  end if
+End Function
+
+
+Function onErrorReloadUserCategoriesInEspanolScreen(response)
+  onErrorReloadUserCategories(response, m.constants.ui.screenIds.espanolScreen)
+End Function
+
+
+Function onErrorReloadUserCategoriesInLinearTVScreen(response)
+  onErrorReloadUserCategories(response, m.constants.ui.screenIds.linearTVScreen)
+End Function
+
+
+Function onErrorReloadUserCategoriesInMovieScreen(response)
+  onErrorReloadUserCategories(response, m.constants.ui.screenIds.movieScreen)
+End Function
+
+
+Function onErrorReloadUserCategoriesInTVScreen(response)
+  onErrorReloadUserCategories(response, m.constants.ui.screenIds.tvScreen)
+End Function
+
+
+Function onErrorReloadUserCategories(response, screenID = "")
+  tubiLog("HomeScreenHelpers.onErrorReloadUserCategories")
+  handledRequest = response
+
+  if screenID = ""
+    screenID = m.constants.ui.screenIds.homeScreen
+  end if
+  homeScreen = getFromScreenCache(screenID)
+
+  if homeScreen <> invalid and response <> invalid
+    ' if we were loading in the background, don't show an error modal
+    if homeScreen.isInFocusChain()
+      errorMessage = getTranslation("screenHome_error_fetchCategories_description")
+      errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
+      dialogEvent =  {
+        type: "dialog"
+        values: {
+          dialog_type: "PLAYER_ERROR"
+          pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+          dialog_action: "SHOW"
+          dialog_sub_type: errorCode
+        }
+      }
+
+      modalInfo = {
+        message: getErrorMessage(errorMessage, errorCode)
+        openTrackEvent: dialogEvent
+        trackingTask: m.trackingLoggingTask
+      }
+
+      showErrorModal(modalInfo, onUserCategoriesFailed, screenID, invalid, invalid, [getTranslation("dialog_button_continue")])
     end if
   end if
 End Function
@@ -341,13 +421,30 @@ Function fetchHomeScreen(homeScreen)
     homeScreen.unobserveFieldScoped("contentReady")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
 
-    responseHandler = "homescreenResponse"
+    sucessHandler = onHomescreenSuccessResponse
+    errorHandler = onHomescreenErrorResponse
+    if homeScreen.id = m.constants.ui.screenIds.movieScreen
+      sucessHandler = onMoviescreenSuccessResponse
+      errorHandler = onMoviescreenErrorResponse
+    else if homeScreen.id = m.constants.ui.screenIds.tvScreen
+      sucessHandler = onTVscreenSuccessResponse
+      errorHandler = onTVscreenErrorResponse
+    else if homeScreen.id = m.constants.ui.screenIds.espanolScreen 
+      sucessHandler = onEspanolscreenSuccessResponse 
+      errorHandler = onEspanolscreenErrorResponse
+    else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen 
+      sucessHandler = onLinearTVScreenSuccessResponse
+      errorHandler = onLinearTVScreenErrorResponse
+    end if
+
     options = {
       params: {
         "contentMode": homeScreen.contentMode
       }
       headers: {}
     }
+
+    isKidsMode = shouldKidsModeBeSentToServer()
 
     ' setting the x-tubi-inject-live-news header to true includes the live news container on the homescreen.
     ' This header is temporary and should be removed after the backend no longer requires it.
@@ -358,7 +455,7 @@ Function fetchHomeScreen(homeScreen)
     ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
     ' This header is temporary and should be removed after the sports experiment concludes.
     if options.params["contentMode"] = m.constants.ui.contentMode.linear or options.params["contentMode"] = m.constants.ui.contentMode.homescreen
-      if shouldKidsModeBeSentToServer() = false
+      if isKidsMode = false
         options.headers["x-tubi-inject-linear"] = "true"
       end if
     end if
@@ -369,17 +466,20 @@ Function fetchHomeScreen(homeScreen)
       options.params["groupSize"] = getExperimentResource("roku_limit_containers", "roku_limit_containers_v2").num_containers
     end if
 
-    if homeScreen.id = m.constants.ui.screenIds.movieScreen
-      responseHandler = "moviescreenResponse"
-    else if homeScreen.id = m.constants.ui.screenIds.tvScreen
-      responseHandler = "tvscreenResponse"
-    else if homeScreen.id = m.constants.ui.screenIds.espanolScreen 
-      responseHandler = "espanolscreenResponse" 
-    else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen 
-      responseHandler = "linearTVScreenResponse" 
-    end if
+    options.params["limit"] = m.constants.performance.categoryGridList.initialBlockSize
 
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("homescreen", m.top, responseHandler, reqName, invalid, shouldKidsModeBeSentToServer(), options)
+    homeScreenReqInfo = m.CmsApi.homeScreenReqInfo(isKidsMode, options)
+    m.makeRequest({
+      url: homeScreenReqInfo.url
+      requestType: reqName
+      options: homeScreenReqInfo.options
+      successCallback: sucessHandler
+      errorCallback: errorHandler
+      responseType: "node"
+      authInfo: m.global.authInfo 
+      uiMode: m.uiMode
+    })
+
     homeScreen.resetContentAreaValues = true
     setHomeScreenLoading(homeScreen)
   end if
@@ -387,116 +487,163 @@ End Function
 
 
 ''''''''''''''''''''''''''''''
-' onLinearTVScreenResponse
+' onLinearTVScreenSuccessResponse
 '
-Function onLinearTVScreenResponse()
-  respondToHomescreenResponse(m.constants.ui.screenIds.linearTVScreen, m.top.linearTVScreenResponse)
+Function onLinearTVScreenSuccessResponse(response)
+  respondToHomescreenSuccessResponse(m.constants.ui.screenIds.linearTVScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
-' onEspanolscreenResponse
+' onEspanolscreenSuccessResponse
 '
-Function onEspanolscreenResponse()
-  respondToHomescreenResponse(m.constants.ui.screenIds.espanolScreen, m.top.espanolscreenResponse)
+Function onEspanolscreenSuccessResponse(response)
+  respondToHomescreenSuccessResponse(m.constants.ui.screenIds.espanolScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
-' onMoviescreenResponse
+' onMoviescreenSuccessResponse
 '
-Function onMoviescreenResponse()
-  respondToHomescreenResponse(m.constants.ui.screenIds.movieScreen, m.top.moviescreenResponse)
+Function onMoviescreenSuccessResponse(response)
+  respondToHomescreenSuccessResponse(m.constants.ui.screenIds.movieScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
-' onTVscreenResponse
+' onTVscreenSuccessResponse
 '
-Function onTVscreenResponse()
-  respondToHomescreenResponse(m.constants.ui.screenIds.TVScreen, m.top.tvscreenResponse)
-End Function
-
-
-
-''''''''''''''''''''''''''''''
-' onHomescreenResponse
-'
-Function onHomescreenResponse()
-  respondToHomescreenResponse(m.constants.ui.screenIds.homeScreen, m.top.homescreenResponse)
+Function onTVscreenSuccessResponse(response)
+  respondToHomescreenSuccessResponse(m.constants.ui.screenIds.TVScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
-' respondToHomescreenResponse
+' onHomescreenSuccessResponse
 '
-Function respondToHomescreenResponse(screenID, rawResponse)
-  tubiLog("HomeScreenHelpers.onHomescreenResponse")
+Function onHomescreenSuccessResponse(response)
+  respondToHomescreenSuccessResponse(m.constants.ui.screenIds.homeScreen, response)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' respondToHomescreenSuccessResponse
+'
+Function respondToHomescreenSuccessResponse(screenID, rawResponse)
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
-    if rawResponse.response <> invalid then
-      response = rawResponse.response
-      if response.code >= 200 and response.code < 300 then
-        ' Content should be structured as:
-        ' <CategoryContentNode json={...all contents info...}>
-        '   <CategoryContentNode id="featured">
-        '     <ContentNode id="37108" />
-        '     <ContentNode id="337825" />
-        '      ...
-        '   </CategoryContentNode>
-        '   <CategoryContentNode id="most_popular" />
-        '     <ContentNode id="346629" />
-        '     <ContentNode id="407698" />
-        '      ...
-        '   </CategoryContentNode>
-        ' </CategoryContentNode>
-        
-        homeScreen.content = rawResponse.convertedMetadata
-        homeScreen.contentUpdated = true
+    ' Content should be structured as:
+    ' <CategoryContentNode json={...all contents info...}>
+    '   <CategoryContentNode id="featured">
+    '     <ContentNode id="37108" />
+    '     <ContentNode id="337825" />
+    '      ...
+    '   </CategoryContentNode>
+    '   <CategoryContentNode id="most_popular" />
+    '     <ContentNode id="346629" />
+    '     <ContentNode id="407698" />
+    '      ...
+    '   </CategoryContentNode>
+    ' </CategoryContentNode>
+    
+    homeScreen.content = rawResponse
+    homeScreen.contentUpdated = true
 
-        ' don't set focus on the home screen if side nav has focus, for example
-        if homeScreen.isInFocusChain() = true
-          homeScreen.setFocus(true)
-        end if
-
-      else
-        homeScreen.unobserveFieldScoped("contentReady")
-        ' if we were loading in the background, don't show an error modal
-        if homeScreen.isInFocusChain()
-          errorMessage = getTranslation("screenHome_error_fetchScreenContent_description")
-          errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
-
-          dialogEvent = {
-            type: "dialog"
-            values: {
-              dialog_type: "NETWORK_ERROR"
-              pageOneof: m.Tracking.getAnalyticsPage(homeScreen.trackingPageInfo.pageType, {})
-              dialog_action: "SHOW"
-              dialog_sub_type: errorCode
-            }
-          }
-
-          modalInfo = {
-            message: getErrorMessage(errorMessage, errorCode)
-            openTrackEvent: dialogEvent
-            trackingTask: m.trackingLoggingTask
-          }
-
-          fnCancelFunction = retryCategoryList
-          cancelParams = screenID
-          if screenID <> m.constants.ui.screenIds.homeScreen
-            '//it might be true there is no where to go to if the content of the main homescreen fails to load, but 
-            '// if the content of a different homescreen type fails to load, then destroy the current homescreen and (based on screen stack logic) take user back to the previous screen  
-            fnCancelFunction = destroyScreen
-          end if
-          showErrorModal(modalInfo, retryCategoryList, screenID, fnCancelFunction, cancelParams)
-        end if
-
-        loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
-        screenTrackingLoad(homeScreen.trackingPageInfo, loadTime, false)
-      end if
+    ' don't set focus on the home screen if side nav has focus, for example
+    if homeScreen.isInFocusChain() = true
+      homeScreen.setFocus(true)
     end if
+
+    loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
+    screenTrackingLoad(homeScreen.trackingPageInfo, loadTime, false)
   end if
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onLinearTVScreenErrorResponse
+'
+Function onLinearTVScreenErrorResponse(response)
+  respondToHomescreenErrorResponse(m.constants.ui.screenIds.linearTVScreen, response)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onEspanolscreenErrorResponse
+'
+Function onEspanolscreenErrorResponse(response)
+  respondToHomescreenErrorResponse(m.constants.ui.screenIds.espanolScreen, response)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onMoviescreenErrorResponse
+'
+Function onMoviescreenErrorResponse(response)
+  respondToHomescreenErrorResponse(m.constants.ui.screenIds.movieScreen, response)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onTVscreenErrorResponse
+'
+Function onTVscreenErrorResponse(response)
+  respondToHomescreenErrorResponse(m.constants.ui.screenIds.TVScreen, response)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onHomescreenSuccessResponse
+'
+Function onHomescreenErrorResponse(response)
+  respondToHomescreenErrorResponse(m.constants.ui.screenIds.homeScreen, response)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' respondToHomescreenErrorResponse
+'
+Function respondToHomescreenErrorResponse(screenID, rawResponse)
+
+  homeScreen = getFromScreenCache(screenID)
+  if homeScreen <> invalid
+    response = rawResponse'.response
+    homeScreen.unobserveFieldScoped("contentReady")
+    ' if we were loading in the background, don't show an error modal
+    if homeScreen.isInFocusChain()
+      errorMessage = getTranslation("screenHome_error_fetchScreenContent_description")
+      errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
+
+      dialogEvent = {
+        type: "dialog"
+        values: {
+          dialog_type: "NETWORK_ERROR"
+          pageOneof: m.Tracking.getAnalyticsPage(homeScreen.trackingPageInfo.pageType, {})
+          dialog_action: "SHOW"
+          dialog_sub_type: errorCode
+        }
+      }
+
+      modalInfo = {
+        message: getErrorMessage(errorMessage, errorCode)
+        openTrackEvent: dialogEvent
+        trackingTask: m.trackingLoggingTask
+      }
+
+      fnCancelFunction = retryCategoryList
+      cancelParams = screenID
+      if screenID <> m.constants.ui.screenIds.homeScreen
+        '//it might be true there is no where to go to if the content of the main homescreen fails to load, but 
+        '// if the content of a different homescreen type fails to load, then destroy the current homescreen and (based on screen stack logic) take user back to the previous screen  
+        fnCancelFunction = destroyScreen
+      end if
+      showErrorModal(modalInfo, retryCategoryList, screenID, fnCancelFunction, cancelParams)
+    end if
+
+    loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
+    screenTrackingLoad(homeScreen.trackingPageInfo, loadTime, false)
+  end if
+
 End Function
 
 
@@ -742,4 +889,39 @@ Function onUserCategoriesFailed(screenID)
   if homeScreen <> invalid and homeScreen.content = invalid
     fetchHomescreen(homeScreen)
   end if
+End Function
+
+
+' load category content
+Function onLoadCategoriesIndex(msg)
+  tubiLog("HomeScreenHelpers.onLoadCategoriesIndex")
+  homeScreen = msg.getRoSGNode()
+  index = msg.getData()
+
+  if homeScreen = invalid or homeScreen.content = invalid or index < 0
+    return false
+  end if
+
+  batchResponseHandler = homeBatchResponse
+  if homeScreen.id = m.constants.ui.screenIds.movieScreen
+    batchResponseHandler = movieBatchResponse
+  else if homeScreen.id = m.constants.ui.screenIds.tvScreen
+    batchResponseHandler = tvBatchResponse
+  else if homeScreen.id = m.constants.ui.screenIds.espanolScreen 
+    batchResponseHandler = espanolBatchResponse 
+  else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen 
+    batchResponseHandler = linearTVBatchResponse
+  end if
+
+  isKidsMode = shouldKidsModeBeSentToServer()
+  batchRequests = m.cmsApi.createHomeScreenBatchReqInfo(homeScreen, index, isKidsMode)
+
+  if batchRequests <> invalid
+    m.makeBatchRequest({
+      requests: batchRequests 
+      responseType: "node"
+      successCallback: batchResponseHandler
+    })
+  end if
+
 End Function

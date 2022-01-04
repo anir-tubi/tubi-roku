@@ -37,7 +37,6 @@
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
-  <script type="text/brightscript" uri="../../tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
@@ -46,6 +45,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/GeneralTaskModule.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/ApiUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/CmsApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/UserDeviceApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
@@ -83,7 +83,6 @@
       <field id="espanolscreenResponse" type="assocarray"/>
       <field id="linearTVScreenResponse" type="assocarray"/>
 
-      <!-- metadataFetchTask puts results on this field -->
       <field id="searchResponse" type="assocarray"/>
       
       <field id="transportVoiceRequest" type="assocarray"/>
@@ -178,8 +177,6 @@
       </Group>
 
       <!-- Services -->
-      <MetadataFetchTask
-        id="MetadataFetchTask"/>
 
       <TrackingLoggingTask
         id="TrackingLoggingTask"/>

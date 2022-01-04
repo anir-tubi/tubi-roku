@@ -21,7 +21,7 @@ Function parseVideoScreenSpritesSuccess(fullResponse, requestNode)
   return spritesContentNode
 End Function
 
-
+   
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request

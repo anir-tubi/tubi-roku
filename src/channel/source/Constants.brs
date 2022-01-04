@@ -202,7 +202,7 @@ Function getConstants()
 
   'names given to different request types for identification purposes (for example in the General Task)
   constants.reqNames = {}
-    constants.reqNames.searchAPI = "searchAPI"
+    constants.reqNames.getSearchScreen = "getSearchScreen"
     constants.reqNames.getHomescreen = "getHomescreen"
     constants.reqNames.getChannelsCategories = "getChannelsCategories"
     constants.reqNames.getSearchDefault = "getSearchDefault"
@@ -223,6 +223,29 @@ Function getConstants()
     constants.reqNames.sponsorPixel = "sponsorPixel"
     constants.reqNames.getChannelGuide = "getChannelGuide"
     constants.reqNames.postUserHistory = "postUserHistory"
+    constants.reqNames.getQueue = "getQueue"
+    constants.reqNames.refreshToken = "refreshToken"
+    constants.reqNames.transferToken = "transferToken"
+
+    ' a list of reqnames that the general task should expect to handle 403 errors for
+    constants.reqNames.acceptsTubiAuth = {}
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getQueue] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.patchUserSettings] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.checkBirthdayInfo] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchScreen] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getHomescreen] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannelsCategories] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchDefault] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategory] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getSingleContent] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getUpNextContent] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getRelatedContent] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getThumbnails] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannel] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.emailExists] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannelGuide] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
 
   constants.thirdParty = {}
     'Nielsen ID token for integrating with Nielsen DAR via RAF

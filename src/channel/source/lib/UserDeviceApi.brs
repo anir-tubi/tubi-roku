@@ -1,6 +1,7 @@
 ' Thin wrapper for the old UAPI user_device requests and the new account API requests
-Function UserDeviceApi(constants)
-  return {
+Function UserDeviceApi(constants, apiUtils)
+  
+  defaultValues = {
     ' dependencies
     constants: constants
 
@@ -12,24 +13,13 @@ Function UserDeviceApi(constants)
     checkBirthdayInfo: userDeviceApi_checkBirthdayInfo
     patchSettingsInfo: userDeviceApi_patchSettingsInfo
 
-    ' private
-    commonOptions: userDeviceApi_commonOptions
   }
-End Function
 
+  userDeviceApi = {}
+  userDeviceApi.append(apiUtils)
+  userDeviceApi.append(defaultValues)
+  return userDeviceApi
 
-' returns a set of common params within an options AA that are used by all UAPI endpoints
-Function userDeviceApi_commonOptions()
-  uapiheader = {}
-  uapiheader.append(m.constants.headers.commonUapi)
-  return {
-    params: {
-      "app_id": m.constants.settings.shortAppName
-      "platform": m.constants.platform
-      "device_id": m.constants.deviceInfo.deviceId
-    }
-    headers: uapiheader
-  }
 End Function
 
 
@@ -38,7 +28,7 @@ End Function
 '
 Function userDeviceApi_emailExistsReqInfo(passedOptions = {})
   url = m.constants.urls.account.emailExists
-  options = m.commonOptions()
+  options = m.getCommonOptions()
   if passedOptions.params <> invalid
     options.params["email"] = passedOptions.params.email
   end if

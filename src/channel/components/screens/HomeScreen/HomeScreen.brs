@@ -42,9 +42,9 @@ Function init()
   m.CategoryGridList.observeField("reloadedItemToBeFocused", "onItemToBeFocusedChange")
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRowChange")
   m.CategoryGridList.observeField("rowFocused", "onRowFocused")
+
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
-  m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
 
@@ -917,4 +917,3 @@ Function handlePlayInput()
   end if
   return false
 End Function
-

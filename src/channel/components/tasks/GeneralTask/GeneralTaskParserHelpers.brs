@@ -75,6 +75,30 @@ Function createParsingCallbacks()
     parseSuccess: parseHistorySuccess
   }
 
+  ' homescreen
+  m.requestTypes[m.constants.reqNames.getHomescreen] = {
+    parseSuccess: parseHomeScreenContentSuccess
+    parseError: parseHomeScreenContentError
+  }
+
+  ' category
+  m.requestTypes[m.constants.reqNames.getCategory] = {
+    parseSuccess: parseCategoryContentSuccess
+    parseError: parseCategoryContentError
+  }
+  
+  ' getSearchScreen
+  m.requestTypes[m.constants.reqNames.getSearchScreen] = {
+    parseSuccess: parseSearchAPISuccess
+    parseError: parseSearchAPIError
+  }
+
+  ' search default
+  m.requestTypes[m.constants.reqNames.getSearchDefault] = {
+    parseSuccess: parseDefaultSearchSuccess
+    parseError: parseDefaultSearchError
+  }
+
 End Function
 
 

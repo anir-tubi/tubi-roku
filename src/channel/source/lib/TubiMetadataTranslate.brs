@@ -881,7 +881,8 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   node_count = 0
   categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode)
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
-    return invalid
+    translated.id = container.id
+    return translated
   end if
 
   ' Store the gridItemType as necessary (only for landscape, linear, vitg, and utility). 
@@ -1164,6 +1165,7 @@ Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
   'Doing string operations to isolate the contents portion of the JSON matrix response is ~4x faster than re-formatting the JSON
   contentsIdentifier =  Chr(34) + "contents" + Chr(34) + ":{"
   safetyEject = false
+
   contentsIdentifierPos = Instr(1, fullJson, contentsIdentifier)
   
   'make sure the content key exists exactly once in the JSON string

@@ -8,7 +8,8 @@ Function execGetChannelMetadata() As Void
   constants = m.global.constants
   RequestModule = TubiRequest(constants.settings)
   AuthModule = TubiAuth(constants, RequestModule)
-  cms = CmsApi(constants, RequestModule, AuthModule)
+  apiUtils = ApiUtils(constants)
+  cms = CmsApi(constants, RequestModule, AuthModule, apiUtils)
   translate = TubiMetadataTranslate(constants)
   request = cms.channelsCategoriesScreenReq(m.top.kidsMode)
   port = CreateObject("roMessagePort")

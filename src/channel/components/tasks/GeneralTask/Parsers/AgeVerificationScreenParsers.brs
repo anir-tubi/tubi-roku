@@ -2,6 +2,7 @@
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseAgeVerificationScreenDeviceRegistrationSuccess(fullResponse, requestNode)
+
   age = -1
   parsedResponse = fullResponse.data
   if parsedResponse <> invalid and parsedResponse.age <> invalid
@@ -31,6 +32,9 @@ Function parseAgeVerificationScreenDeviceRegistrationError(fullResponse, request
 End Function
 
 
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseAgeVerificationScreenCheckBirthdaySuccess(fullResponse, requestNode)
   parsedResponse = fullResponse.data
 
@@ -43,6 +47,9 @@ Function parseAgeVerificationScreenCheckBirthdaySuccess(fullResponse, requestNod
 End Function
 
 
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseAgeVerificationScreenCheckBirthdayError(fullResponse, requestNode)
   errCode = -1234
   if fullResponse <> invalid and fullResponse.code <> invalid

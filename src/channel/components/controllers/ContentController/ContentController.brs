@@ -23,11 +23,11 @@ Function init()
   m.Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, m.Request)
   m.NodeHelpers = TubiNodeHelpers()
-  m.Bookmarks = TubiBookmarks(m.Request, Auth, m.constants, m.NodeHelpers)
+  apiUtils = ApiUtils(m.constants)
+  m.Bookmarks = TubiBookmarks(m.Request, Auth, m.constants, m.NodeHelpers, apiUtils)
   m.Tracking = TubiTracking(m.constants, m.Request, Auth)
-  m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
-  m.cmsApi = CmsApi(m.constants, m.Request, Auth)
-  m.userDeviceApi = UserDeviceApi(m.constants)
+  m.cmsApi = CmsApi(m.constants, m.Request, Auth, apiUtils)
+  m.userDeviceApi = UserDeviceApi(m.constants, apiUtils)
 
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.constants.ui.colors.backgroundColor
@@ -85,7 +85,6 @@ Function init()
   setUiMode(m.constants.ui.modes.standard)
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
-  m.top.observeFieldScoped("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
 
   m.deeplinkContent = invalid
   m.startupArgsReceived = false
@@ -148,6 +147,7 @@ Function init()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
+
 End Function
 
 
@@ -805,11 +805,29 @@ Function setDirtyUserCategories(categoryId)
     espanolScreen = getFromScreenCache(m.constants.ui.screenIds.espanolScreen)
     linearTVScreen = getFromScreenCache(m.constants.ui.screenIds.linearTVScreen)
 
+    isKidsMode = shouldKidsModeBeSentToServer()
+
     'this will be an auth request if the user is logged in
     'auth request creation happens in metadataFetchTask
     'auth request will add the userId param
     reqName = m.constants.reqNames.getCategory
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer())
+
+    options = {
+      params: {
+        "contentMode": m.constants.ui.contentMode.homescreen
+      }
+    }
+    categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, reqName, isKidsMode, options)
+
+    m.makeRequest({
+      url: categoryReqInfo.url
+      requestType: reqName
+      options: categoryReqInfo.options
+      successCallback: onReloadUserCategoriesResponse
+      errorCallback: onErrorReloadUserCategories
+      responseType: "node"
+      id: categoryId
+    })
 
     '//Apply the movie, TV, and Espanol filters if those screens exist
     if movieScreen <> invalid
@@ -818,37 +836,79 @@ Function setDirtyUserCategories(categoryId)
           "contentMode": m.constants.ui.contentMode.movie
         }
       }
-      m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadMovieUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionMovie)
+
+      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, optionMovie)
+
+      m.makeRequest({
+        url: categoryReqInfo.url
+        requestType: reqName
+        options: categoryReqInfo.options
+        successCallback: onReloadUserCategoriesResponseInMovieScreen
+        errorCallback: onErrorReloadUserCategoriesInMovieScreen
+        responseType: "node"
+        id: categoryId
+      })
     end if
+
     if tvScreen <> invalid
       optionTV = {
         params: {
           "contentMode": m.constants.ui.contentMode.tv
         }
       }
-      m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadTVUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionTV)
+
+      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, optionTV)
+
+      m.makeRequest({
+        url: categoryReqInfo.url
+        requestType: reqName
+        options: categoryReqInfo.options
+        successCallback: onReloadUserCategoriesResponseInTVScreen
+        errorCallback: onErrorReloadUserCategoriesInTVScreen
+        responseType: "node"
+        id: categoryId
+      })
     end if
+
     if espanolScreen <> invalid
       optionEspanol = {
         params: {
           "contentMode": m.constants.ui.contentMode.latino
         }
       }
-      m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest(categoryId, m.top, "reloadEspanolUserCategoriesResponse", reqName, invalid, shouldKidsModeBeSentToServer(), optionEspanol)
+
+      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, optionEspanol)
+
+      m.makeRequest({
+        url: categoryReqInfo.url
+        requestType: reqName
+        options: categoryReqInfo.options
+        successCallback: onReloadUserCategoriesResponseInEspanolScreen
+        errorCallback: onErrorReloadUserCategoriesInEspanolScreen
+        responseType: "node"
+        id: categoryId
+      })
     end if
   end if
 End Function
 
 
-Function onReloadUserCategoriesResponse(msg)
+Function onReloadUserCategoriesResponse(handledRequest)
   tubiLog("ContentController.onReloadUserCategoriesResponse")
-  handledRequest = msg.getData()
-  onReloadUserCategoriesInHomeScreen(msg)
+
+  ' update the main home screen with the updated user category
+  onReloadUserCategoriesInHomeScreen(handledRequest)
+
+  ' inform the category list screen of the udpated user category
   categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
   if categoryListScreen <> invalid
-      categoryListScreen.reloadUserCategoriesResponse = handledRequest  
+    categoryListScreen.reloadUserCategoriesResponse = handledRequest  
   end if
-  refreshStackedUserScreenWithChangedCategory(handledRequest.id)
+
+  ' inform the category details screen for the specific user category of the update user category content
+  if handledRequest <> invalid
+    refreshStackedUserScreenWithChangedCategory(handledRequest.id)
+  end if
 End Function
 
 

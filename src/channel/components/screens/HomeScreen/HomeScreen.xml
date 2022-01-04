@@ -4,7 +4,6 @@
 
   <script type="text/brightscript" uri="HomeScreen.brs" />
   <script type="text/brightscript" uri="../ModalDialogs.brs" />
-  <script type="text/brightscript" uri="../../tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../lib/FocusMixin.brs" />
@@ -12,6 +11,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/ApiUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
@@ -89,11 +89,19 @@
            Accepted values are in constants.ui.homescreen.focusItems -->
       <field id="componentToFocus" type="string" />
 
+      <!-- incoming metadata from GeneralTask
+           type is node, so that it takes less time to send data from one file to another file when comparing to assocarray
+       -->
+      <field id="batchResponse" type="node" alias="CategoryGridList.categoryResponseInBatch" />
+
     <!-- OUTPUTS -->
       <!-- Trigger the content to be loaded.  This field is used to delay
            the initial category content loading until after the stateful
            fields have been set (e.g. signedIn) -->
       <field id="loadAllCategories" type="boolean" value="false" alwaysNotify="true"/>
+
+      <!-- Communicates an index to use as a starting point for fetch a batch of categories -->
+      <field id="loadCategoriesIndex" type="integer" alias="CategoryGridList.loadCategoriesIndex"/>
 
       <!-- set to the contentNode of the CategoryGridList item which was clicked on -->
       <field id="contentSelected" type="node"/>

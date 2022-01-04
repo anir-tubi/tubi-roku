@@ -3,10 +3,7 @@
 <component name="CategoryGridList" extends="Group">
   <script type="text/brightscript" uri="CategoryGridList.brs" />
   <script type="text/brightscript" uri="../FocusMixin.brs" />
-  <script type="text/brightscript" uri="../../tasks/MetadataFetchTask/MetadataFetchTaskDTO.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
@@ -53,8 +50,10 @@
       <field id="jumpToRowItemByID" type="array" alwaysNotify="true"/>
       <field id="jumpToRowItem" alias="RowList.jumpToRowItem"/>
 
-      <!-- incoming metadata from MetadataFetchTask -->
-      <field id="metadataFetchTaskBatch" type="assocarray" />
+      <!-- incoming metadata from GeneralTask
+               type is node, so that it takes less time to send data from one file to another file when comparing to assocarray
+           -->
+      <field id="categoryResponseInBatch" type="node" />
 
       <!-- incoming metadata from MetadataFetchTask for single categories (non batched). These are currently not used. -->
       <field id="remainingInCategoryResponse" type="assocarray" />
@@ -104,6 +103,8 @@
       <field id="currCategoryId" type="string" />
 
       <field id="oldCategoryId" type="string" />
+
+      <field id="loadCategoriesIndex" type="integer" alwaysNotify="true" />
 
   </interface>
   

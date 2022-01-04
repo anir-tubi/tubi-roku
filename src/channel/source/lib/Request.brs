@@ -1,3 +1,6 @@
+' TubiRequest is used for tubi specific http requests
+' the functions inside this module will be more specific to tubi
+' TubiRequest is deprecated and any new logic should use Request with the goal of eventually removing TubiRequest.
 Function TubiRequest(settings = {mode: "production",CharlesProxyEnabled: false })
   return {
     configMode: settings.mode
@@ -5,7 +8,7 @@ Function TubiRequest(settings = {mode: "production",CharlesProxyEnabled: false }
     charlesProxyUrl:settings.charlesProxyUrl
     createAsync: createAsyncHTTPRequest
     start: tubihttp_start
-    handleEvent: tubihttp_handleEvent
+    handleEvent: tubi_handleHttpEvent
     hasData: tubihttp_hasData
     runSynchronous: tubihttp_runSynchronous
     cancel: tubihttp_cancel
@@ -14,10 +17,17 @@ Function TubiRequest(settings = {mode: "production",CharlesProxyEnabled: false }
     getLocale: tubihttp_getLocale_ 
     passThroughCharlesProxy: tubihttp_passThroughCharlesProxy 
     removeCharlesProxy: tubihttp_removeCharlesProxy
-
   }
 End Function
 
+
+' Request is used for general http requests
+' the functions inside this module is more generic and can be used other endpoints
+Function Request(settings = {mode: "production",CharlesProxyEnabled: false})
+  request = TubiRequest(settings)
+  request.handleEvent = tubi_handleHttpEventv2
+  return request
+End Function
 
 
 ''''''''''''''''''''''''
@@ -144,6 +154,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
     m.urltransfer.SetUrl(m.url)
   end if
 
+
   m.urltransfer.EnableEncodings(true)
   if m.isHttps then
     m.urltransfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
@@ -223,14 +234,14 @@ End Function
 
 
 '''''''''''''''''''''''
-' handleEvent - ingest a received message.  If the message is not
+' tubi_handleHttpEvent - ingest a received message.  If the message is not
 '               relevant to this request, return invalid.  If there is a
 '               response available, it is returned. Requests will be
 '               retried on failures.
 '
 ' message - the roUrlEvent received on the caller's roMessagePort
 '
-Function tubihttp_handleEvent(message As Object) As Object
+Function tubi_handleHttpEvent(message As Object) As Object
   ' perhaps .start() was not called yet
   if m.urltransfer = invalid
     return invalid
@@ -434,3 +445,61 @@ Function tubihttp_removeCharlesProxy(proxyedurl as String) as String
 End Function
 
 
+'''''''''''''''''''''''
+' tubi_handleHttpEventv2 - ingest a received message.  If the message is not
+'               relevant to this request, return invalid.  If there is a
+'               response available, it is returned. Requests will be
+'               retried on failures.
+'
+' message - the roUrlEvent received on the caller's roMessagePort
+'
+Function tubi_handleHttpEventv2(message As Object) As Object
+  ' perhaps .start() was not called yet
+  if m.urltransfer = invalid
+    return invalid
+  end if
+    
+  ' handle retries
+  if type(message) = "roUrlEvent" then
+    if message.GetSourceIdentity() = m.urltransfer.GetIdentity() then
+      if message.GetInt() = 1 then 
+        ' 1. Check success or failure?
+        code = message.GetResponseCode()
+
+        if code = 403 or (code >= 200 and code < 400) or m.retries = 0
+          ' Here on success or on retry limit or auth token was not valid
+          m.response = {
+            headers: message.GetResponseHeaders()
+            code: code
+            data: message.GetString()
+            failReason: message.GetFailureReason()
+            name: m.name
+          }
+
+          ' print response info for qa team
+          if (m.configMode = "qa" or m.configMode = "staging")
+            if Left(m.name, 5) = "track"
+              print "received "; code; " for "; m.name
+              print m.response.data
+            end if
+          end if
+
+          m.urltransfer = invalid ' release reference in case this will be reused
+          return m
+        else
+          m.retries = m.retries - 1    
+          m.start(m.urltransfer) ' fire off the request again            
+        end if
+
+      else
+        ' only 1 is valid?  Here for future-proofing
+      end if
+    else
+      ' some other request is served by the same message port?  Ignore it
+    end if
+  else
+    ' ignore other types of events, so this can be used idempotently in a caller's message loop
+  end if
+
+  return invalid
+End Function

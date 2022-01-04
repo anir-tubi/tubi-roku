@@ -11,6 +11,7 @@ Function TubiNodeHelpers()
     immutableRemoveChildIndex: tubiNodeHelpers_immutableRemoveChildIndex
     immutableRemoveChild: tubiNodeHelpers_immutableRemoveChild
     synchronizeChildren: tubiNodeHelpers_synchronizeChildren
+    getArrayInterfaceTypes: tubiNodeHelpers_getArrayInterfaceTypes
   }
 End Function
 
@@ -189,4 +190,20 @@ Function tubiNodeHelpers_synchronizeChildren(truth, lies)
       lies.insertChild(a.clone(false), i)
     end if
   end for
+End Function
+
+
+' returns an AA of all the interface types that are arrays (not including a single vector2D)
+Function tubiNodeHelpers_getArrayInterfaceTypes()
+  return {
+    "floatarray": true
+    "intarray": true
+    "boolarray": true
+    "stringarray": true
+    "vector2darray": true
+    "colorarray": true
+    "timearray": true
+    "nodearray": true
+    "array": true
+  }
 End Function

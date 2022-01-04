@@ -21,7 +21,7 @@ End Function
 
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
-'                            .data value converted from JSON to Array already
+'                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseDetailScreenRelatedContentSuccess(fullResponse, requestNode)
   translate = TubiMetadataTranslate(m.constants)

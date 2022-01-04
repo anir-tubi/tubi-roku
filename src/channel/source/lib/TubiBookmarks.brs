@@ -1,7 +1,8 @@
 'a set of helper functions that facilitate sending and receiving "Continue Watching"/history and "My Queue"/bookmarks
 'info to the server (UAPI at the time of writing this comment)
-Function TubiBookmarks(request as Object, auth as Object, constants as Object, nodeHelpers as Object) as Object
-  return {
+Function TubiBookmarks(request as Object, auth as Object, constants as Object, nodeHelpers as Object, apiUtils as Object) as Object
+  
+  defaultValues = {
     request: request
     auth: auth
     constants: constants
@@ -25,23 +26,13 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     'private methods
     createBookmarksRequest: tubiBookmarks_createBookmarksRequest_
     createHistoryRequest: tubiBookmarks_createHistoryRequest_
-    commonOptions: tubiBookmarks_commonOptions
   }
-End Function
 
+  tubiBookmarks = {}
+  tubiBookmarks.append(apiUtils)
+  tubiBookmarks.append(defaultValues)
+  return tubiBookmarks
 
-' returns a set of common params within an options AA that are used by all UAPI endpoints
-Function tubiBookmarks_commonOptions()
-  uapiheader = {}
-  uapiheader.append(m.constants.headers.commonUapi)
-  return {
-    params: {
-      "app_id": m.constants.settings.shortAppName
-      "platform": m.constants.platform
-      "device_id": m.constants.deviceInfo.deviceId
-    }
-    headers: uapiheader
-  }
 End Function
 
 
@@ -217,7 +208,7 @@ Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Int
 
   body.content_type = contentType
   
-  options = m.commonOptions()
+  options = m.getCommonOptions()
   options.params["isKidsMode"] = bKidsMode
   options["body"] = FormatJSON(body)
   options["method"] = m.constants.reqTypes.post

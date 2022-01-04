@@ -5,7 +5,8 @@ Function CmsApiSetup()
   constants = getConstants()
   request = TubiRequest(constants.settings)
   auth = TubiAuth(constants, request)
-  m.cmsApi = CmsApi(constants, request, auth)
+  apiUtils = ApiUtils(constants)
+  m.cmsApi = CmsApi(constants, request, auth, apiUtils)
 End function
 
 
@@ -702,32 +703,6 @@ Function cmsApi_searchReqInfo_test()
   m.assertEqual(searchInfo.options.params["search"], searchOptions.params["search"])
   m.assertEqual(searchInfo.options.params["isKidsMode"], searchOptions.params["isKidsMode"])
   m.assertEqual(searchInfo.options.params["images[poster_tb]"], searchOptions.params["images[poster_tb]"])
-End Function
-
-
-'@Test unit tests commonOptions
-Function cmsApi_commonOptions_test()
-  options = [
-    "headers"
-    "params"
-  ]
-  params = [
-    "app_id"
-    "platform"
-    "device_id"
-  ]
-
-  deviceId = m.cmsApi.constants.deviceInfo.deviceId
-  platform = m.cmsApi.constants.platform
-  appId = m.cmsApi.constants.settings.shortAppName
-
-  commonOptions = m.cmsApi.commonOptions()
-  m.assertAAHasKeys(commonOptions, options)
-  m.assertAAHasKeys(commonOptions.params, params)
-  m.assertEqual(commonOptions.params.app_id, appId)
-  m.assertEqual(commonOptions.params.platform, platform)
-  m.assertEqual(commonOptions.params.device_id, deviceId)
-  m.assertEqual(commonOptions.headers["Content-Type"], "application/json")
 End Function
 
 

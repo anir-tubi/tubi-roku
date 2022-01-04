@@ -11,6 +11,7 @@
     <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
     <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/ApiUtils.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />

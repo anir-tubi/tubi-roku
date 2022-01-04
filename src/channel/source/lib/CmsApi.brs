@@ -1,7 +1,8 @@
 ' Thin wrapper for CMS API requests.  Collected here to facilitate easy
 ' integration tests
-Function CmsApi(constants, request, auth)
-  return {
+Function CmsApi(constants, request, auth, apiUtils)
+
+  defaultValues = {
     ' dependencies
     constants: constants
     request: request
@@ -21,41 +22,29 @@ Function CmsApi(constants, request, auth)
     categoryReqInfo: cmsApi_getCategoryRequestInfo
     searchReq: cmsApi_getSearchRequest
     searchReqInfo: cmsApi_getSearchRequestInfo
+    createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchRequestInfo
 
     ' private
-    commonOptions: cmsApi_commonOptions
     createAuthRequest: cmsApi_createAuthRequest
     setImageParams: cmsApi_setImageParams
     setTupianPosterParam: cmsApi_setTupianPosterParam
     setTupianLandscapeParam: cmsApi_setTupianLandscapeParam
     setTupianLargeVitgParam: cmsApi_setTupianLargeVitgParam
+    getWindowInfo: cmsApi_getWindowInfo
+    getFullCategoryId: cmsApi_getFullCategoryId
   }
-End Function
 
+  cmsApi = {}
+  cmsApi.append(apiUtils)
+  cmsApi.append(defaultValues)
+  return cmsApi
 
-Function cmsApi_commonOptions()
-  headers = {}
-  ' appending in this style is neccessary to prevent m.constants.headers.json from being
-  ' mutated by potential later appends, since assoc arrays are passed by reference.
-  headers.append(m.constants.headers.json)
-  headers.append(m.constants.headers.commonUapi)
-
-  options = {
-    params: {
-      "app_id": m.constants.settings.shortAppName
-      "platform": m.constants.platform
-      "device_id": m.constants.deviceInfo.deviceId
-    }
-    headers: headers
-  }
-  return options
 End Function
 
 
 Function cmsApi_getRelatedContentRequestInfo(contentId, bKidsMode = false)
   url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
-
-  options = m.commonOptions()
+  options = m.getCommonOptions()
   options.params["isKidsMode"] = bKidsMode
   options.params["video_resources"] = m.constants.player.drmOrder
   options.params = m.setTupianPosterParam(options.params)
@@ -70,7 +59,7 @@ End Function
 ' @passedOptions: assocArray, options to be added to the request object as created by Request().createAsync()
 Function cmsApi_getUpNextContentRequestInfo(contentId, passedOptions)
   url = m.constants.urls.cms.upNextContent + "/" + contentId + "/next"
-  options = m.commonOptions()
+  options = m.getCommonOptions()
   params = options.params
   headers = options.headers
 
@@ -100,7 +89,7 @@ End Function
 
 
 Function cmsApi_getSingleContentRequestInfo(contentId, includeChannels=false, bKidsMode = false)
-  options = m.commonOptions()
+  options = m.getCommonOptions()
   options.params["content_id"] = contentId
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
@@ -116,7 +105,7 @@ End Function
 
 Function cmsApi_getThumbnailsRequestInfo(contentId)
   url = m.constants.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
-  options = m.commonOptions()
+  options = m.getCommonOptions()
   options.params["type"] = "5x"
   options.params["max_width"] = m.constants.deviceInfo.displayWidth
   return {
@@ -143,7 +132,7 @@ End Function
 Function cmsApi_getChannelRequestInfo(channelId, limit, bKidsMode = false)
   url = m.constants.urls.matrix.channel + "/" + channelId
   
-  options = m.commonOptions()
+  options = m.getCommonOptions()
   options.params["cursor"] = 0
   options.params["limit"] = limit
   options.params["isKidsMode"] = bKidsMode
@@ -180,8 +169,10 @@ End Function
 '                 see request.brs for more info
 Function cmsApi_getHomeScreenRequest(bKidsMode = false, passedOptions = {})
   homeScreenReqInfo = m.homeScreenReqInfo(bKidsMode, passedOptions)
+  
   url = homeScreenReqInfo.url
   options = homeScreenReqInfo.options
+
   return m.createAuthRequest(url, m.constants.reqNames.getHomescreen, options)
 End Function
 
@@ -192,7 +183,7 @@ End Function
 Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
   url = m.constants.urls.matrix.homescreen
   
-  options = m.commonOptions()
+  options = m.getCommonOptions()
   params = options.params
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
@@ -267,7 +258,7 @@ Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = f
     name = m.constants.reqNames.getCategory
   end if
 
-  options = m.commonOptions()
+  options = m.getCommonOptions()
   params = options.params
   params["isKidsMode"] = bKidsMode
   params["includeChannels"] = true
@@ -322,8 +313,10 @@ Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = f
   options.headers = headers
 
   return {
+    id: categoryId
     url: url
     options: options
+    name: name
   }
 End Function
 
@@ -335,7 +328,7 @@ Function cmsApi_getSearchRequest(searchText, bKidsMode = false)
   searchReqInfo = m.searchReqInfo(searchText, bKidsMode)
   url = searchReqInfo.url
   options = searchReqInfo.options
-  return m.createAuthRequest(url, m.constants.reqNames.searchAPI, options)
+  return m.createAuthRequest(url, m.constants.reqNames.getSearchScreen, options)
 End Function
 
 
@@ -343,7 +336,7 @@ End Function
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 Function cmsApi_getSearchRequestInfo(searchText, bKidsMode = false)
   url = m.constants.urls.cms.search
-  options = m.commonOptions()
+  options = m.getCommonOptions()
   options.params["search"] = searchText
   options.params["isKidsMode"] = bKidsMode
   options.params = m.setTupianPosterParam(options.params)
@@ -416,3 +409,115 @@ Function cmsApi_createAuthRequest(url, reqName, options)
   return request
 End Function
 
+
+' cmsApi_createHomeScreenBatchRequestInfo
+'
+' @homeScreen: roSGNode, homescreen
+' @index: integer
+' @bKidsMode : boolean
+'
+' returns batch requests
+Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = false)
+
+  m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
+
+  reqName = m.constants.reqNames.getCategory
+
+  requests = []
+    'Determine the window start and window size for lazy loading
+  windowInfo = m.getWindowInfo(homeScreen, index)
+  if windowInfo <> invalid
+    'Create requests for each category in the window
+    for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
+      category = homeScreen.content.getChild(i)
+      if category <> invalid
+        categoryReqInfo = invalid
+        if category.state = "partial" or category.state = "none"
+
+          categoryId = m.getFullCategoryId(category)
+
+          if categoryId <> invalid and type(categoryId) = "roString"
+            tubiLog("CategoryGridList.fetch whole: Asking GeneralTask for " + categoryId)
+
+            options = {
+              params: {
+                "contentMode": homeScreen.contentMode 
+              }
+            }
+        
+            categoryReqInfo = m.categoryReqInfo(categoryId, reqName, bKidsMode, options)
+            categoryReqInfo.requestType = reqName
+            categoryReqInfo.responseType = "node"
+            categoryReqInfo.silenceCallbackWarnings = true
+
+          end if
+
+        end if
+        if categoryReqInfo <> invalid then
+          requests.push(categoryReqInfo)
+          category.state = "loading"
+        end if
+      end if
+    end for
+
+  end if
+
+  return requests
+
+End Function
+
+
+
+'Helper function to retrieve the starting index for the window to be loaded, as well as the number of categories in the window
+'
+'@homescreen: roSGNode, the node for homescreen
+'@index: integer, the index of the category within the category grid
+'
+'Returns an assocArray with the keys: "start", "size"
+Function cmsApi_getWindowInfo(homescreen, index)
+
+  currentCategory = homescreen.content.getChild(index)
+  if currentCategory <> invalid
+    currentWindowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
+    windowSize = m.categoryWindowSize
+    if currentCategory.state = "partial" or currentCategory.state = "none"
+      windowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
+      if (index + 1) MOD m.categoryWindowSize = 0
+        ' if the user lands on an empty category that is also the last category in its window,
+        ' add some more categories to the batch in order to fill the "next" category
+        windowSize = m.categoryWindowSize + (m.categoryWindowSize \ 2)
+      end if
+    else
+      ' attempt to load the current window, or next window depending on the index of the current category
+      nextBatchIndex = (m.categoryWindowSize \ 2)
+      windowStart = ((index + m.categoryWindowSize - (nextBatchIndex)) \ (m.categoryWindowSize)) * m.categoryWindowSize
+    end if
+    
+    return {
+      start: windowStart
+      size: windowSize
+    }
+  end if
+  return invalid
+End Function
+
+
+'''''''''''''''''''''
+' cmsApi_getFullCategoryId
+'
+'
+' Helper function to build category ids for nested categories that matrix API can recognize
+' @category: sgNode, a CateogorContentNode
+' if a nested category returns an id in the form of 'parentCat/sub/childCat'
+' if not a nested category, returns the categoryId
+' if there is no categoryId, returns invalid
+Function cmsApi_getFullCategoryId(category)
+  categoryId = invalid
+  if type(category) = "roSGNode" and category.id <> ""
+    categoryId = category.id
+    if category.parentId <> invalid and category.parentId <> ""
+      categoryId = category.parentId + "/sub/" + category.id
+    end if
+  end if
+  return categoryId
+End Function

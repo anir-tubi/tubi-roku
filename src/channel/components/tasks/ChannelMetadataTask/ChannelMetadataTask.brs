@@ -18,7 +18,8 @@ Function execGetChannelMetadata() As Void
   constants = m.global.constants
   RequestModule = TubiRequest(constants.settings)
   AuthModule = TubiAuth(constants, RequestModule)
-  cms = CmsApi(constants, RequestModule, AuthModule)
+  apiUtils = ApiUtils(constants)
+  cms = CmsApi(constants, RequestModule, AuthModule, apiUtils)
   translate = TubiMetadataTranslate(constants)
   
   channelReq = cms.channelReq(m.top.channelId, constants.performance.categoryGridList.finalBlockSize, m.top.kidsMode)

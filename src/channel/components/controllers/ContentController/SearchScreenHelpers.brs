@@ -8,7 +8,6 @@ Function showSearchScreen(constants)
   searchScreen.observeFieldScoped("searchText", "onSearchTextChanged")
   searchScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
   searchScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
-  m.top.observeField("searchResponse", "onSearchResultsReceived")
 
   searchScreen.id = m.constants.ui.screenIds.searchScreen
   searchScreen.kidsModeEnabled = isKidsUIOn()
@@ -39,10 +38,25 @@ Function onSearchTextChanged(msg)
   searchScreen = msg.getRoSGNode()
   searchText = searchScreen.searchText
   bSearchNonDefaultResults = (searchText <> invalid and Len(searchText) > 0)
-  m.metadataFetchTask.cancel = m.metadataFetchTaskDTO.createCancel(invalid, searchScreen, "searchResponse")
 
+  if m.currentSearchScreenRequestNode <> invalid
+    m.cancelRequest(m.currentSearchScreenRequestNode) 
+  end if
+
+  kidsMode = shouldKidsModeBeSentToServer()
+  
   if bSearchNonDefaultResults = true
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("search", m.top, "searchResponse", m.constants.reqNames.searchAPI, searchText, shouldKidsModeBeSentToServer())
+
+    searchReqInfo = m.CmsApi.searchReqInfo(searchText, kidsMode)
+    m.currentSearchScreenRequestNode = m.makeRequest({
+      url: searchReqInfo.url
+      requestType: m.constants.reqNames.getSearchScreen
+      options: searchReqInfo.options
+      successCallback: onSearchSuccessResponse
+      errorCallback: onSearchErrorResponse
+      responseType: "node"
+    }) 
+
     m.trackingLoggingTask.trackEvent = {
       type: "search"
       values: {
@@ -51,7 +65,17 @@ Function onSearchTextChanged(msg)
       }
     }
   else 
-    m.metadataFetchTask.request = m.metadataFetchTaskDTO.createRequest("featured", m.top, "searchResponse", m.constants.reqNames.getSearchDefault, invalid, shouldKidsModeBeSentToServer())
+
+    categoryReqInfo = m.CmsApi.categoryReqInfo(m.constants.ui.categoryIds.featured, m.constants.reqNames.getSearchDefault, kidsMode)
+    m.currentSearchScreenRequestNode = m.makeRequest({
+      url: categoryReqInfo.url
+      requestType: m.constants.reqNames.getSearchDefault
+      options: categoryReqInfo.options
+      successCallback: onSearchDefaultSuccessResponse
+      errorCallback: onSearchDefaultErrorResponse
+      responseType: "node"
+    }) 
+
   end if
 End Function
 
@@ -67,23 +91,58 @@ End Function
 
 
 '''''''''''''''''''''
-' onSearchResultsReceived
+' onSearchSuccessResponse
 '
 ' This is the function to react to the Search API response
-Function onSearchResultsReceived()
-  tubiLog("SearchScreenHelpers.onSearchResultsReceived")
+Function onSearchSuccessResponse(response)
+  tubiLog("SearchScreenHelpers.onSearchSuccessResponse")
   searchScreen = getSearchScreen()
-  if searchScreen <> invalid and m.top.searchResponse <> invalid
-    response = m.top.searchResponse.response
-    if response.code >= 200 and response.code < 300 then 
-      content = m.top.searchResponse.convertedMetadata
-      if content <> invalid
-        content.isDefaultSearchResults = (response.name = m.constants.reqNames.getSearchDefault)
-      end if
-      searchScreen.content = content
-    else
-      searchScreen.content = invalid
-    end if
+  if searchScreen <> invalid and response <> invalid
+    searchScreen.content = response
+    searchScreen.contentUpdated = true
+  end if
+End Function
+
+
+'''''''''''''''''''''
+' onSearchErrorResponse
+'
+' This is the function to react to the Search API error response
+Function onSearchErrorResponse(result)
+  tubiLog("SearchScreenHelpers.onSearchErrorResponse")
+  searchScreen = getSearchScreen()
+  if searchScreen <> invalid and result <> invalid
+    searchScreen.content = invalid
+    searchScreen.contentUpdated = true
+  end if
+End Function
+
+
+
+'''''''''''''''''''''
+' onSearchDefaultSuccessResponse
+'
+' This is the function to react to the Search API response
+Function onSearchDefaultSuccessResponse(response)
+  tubiLog("SearchScreenHelpers.onSearchDefaultSuccessResponse")
+  searchScreen = getSearchScreen()
+  if searchScreen <> invalid and response <> invalid
+    response.isDefaultSearchResults = true
+    searchScreen.content = response
+    searchScreen.contentUpdated = true
+  end if
+End Function
+
+
+'''''''''''''''''''''
+' onSearchDefaultErrorResponse
+'
+' This is the function to react to the Search API error response
+Function onSearchDefaultErrorResponse(result)
+  tubiLog("SearchScreenHelpers.onSearchDefaultErrorResponse")
+  searchScreen = getSearchScreen()
+  if searchScreen <> invalid and result <> invalid
+    searchScreen.content = invalid
     searchScreen.contentUpdated = true
   end if
 End Function

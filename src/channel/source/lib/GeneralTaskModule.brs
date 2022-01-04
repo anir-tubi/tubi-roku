@@ -8,15 +8,19 @@ Function GeneralTaskModule(context, generalTask)
   module = {
     ' public
     makeRequest: generalTask_makeRequest
+    makeBatchRequest: generalTask_makeBatchRequest
     cancelRequest: generalTask_cancelRequest
-    
+
     ' private
     generalTask: generalTask
     generalTaskCallbacks: {} 
+    constructRequestNode: generalTask_constructRequestNode
+    constructBatchRequestNode: generalTask_constructBatchRequestNode
     getGeneralTaskSuccessCallback: generalTask_getSuccessCallback
     getGeneralTaskErrorCallback: generalTask_getErrorCallback
     unobserveGeneralTaskFields: generalTask_unobserveFields
     storeGeneralTaskCallbacks: generalTask_storeCallbacks
+    isValidBatchResponseType: generalTask_isValidBatchResponseType
   }
   
   ' required - this loop helps to check the GeneralTaskModule methods/properties with context methods/properties
@@ -36,7 +40,63 @@ Function GeneralTaskModule(context, generalTask)
 End Function  
 
 
-' generalTask_makeRequest
+' generalTask_constructBatchRequestNode
+'
+' public method, which dynamically creates RequestNode with response & error fields and sets request field of Task Node
+' @batchInfo: assocArray, contains information needed to make the request. Expected fields:
+'   successCallback: Function, the function that the render thread will run upon receiving a successful response
+'   errorCallback: Function, the function that the render thread will run upon receiving an error response
+'   responseType: String, type of the response data, corresponds to a valid roSGNode field type (eg. "node"/"assocarray"/"string"/"boolean" etc)
+'   silenceCallbackWarnings: boolean, if no callbacks are provided, prevents warning logs to the console
+'                            Use for 'fire and forget' requests like analytics, etc.
+'
+'   Additional custom fields can be added to @batchInfo which will in turn be appended to the returned
+'   RequestNode. The GeneralTask parser functions will have access to the RequestNode, allowing
+'   information to be passed from the original makeRequest call, all the way through to callbacks.
+'   In this way, the callbacks can have some context about what happened to trigger them.
+Function generalTask_constructBatchRequestNode(batchInfo = {})
+  
+  if type(batchInfo) <> "roAssociativeArray"
+    tubiLog("GeneralTask.makeRequest - request info not of valid type, no request made", "warn")
+    return invalid
+  else if isString(batchInfo.responseType) <> true
+    tubiLog("GeneralTask.makeRequest - no response type found, defaulting to assocarray", "warn")
+    batchInfo.responseType = "assocarray"
+  end if
+
+  roDeviceInfo = CreateObject("roDeviceInfo")
+  randomId = roDeviceInfo.GetRandomUUID()
+
+  requestNode = CreateObject("roSGNode", "RequestNode")
+  requestNode.id = randomId
+
+  successResponseType = batchInfo.responseType
+  if batchInfo.successCallback = invalid or m.isValidBatchResponseType(successResponseType) <> true
+    successResponseType = "assocarray"
+  end if
+
+  requestNode.addField("response", successResponseType, true)
+  requestNode.observeField("response", "successCallbackWrapper")
+
+  requestNode.addField("error", "assocarray", false)
+  requestNode.observeField("error", "errorCallbackWrapper")
+
+  successCallback = batchInfo.successCallback
+  errorCallback = batchInfo.errorCallback
+  m.storeGeneralTaskCallbacks(requestNode, successCallback, errorCallback)
+
+  reqInput = batchInfo
+  reqInput.delete("successCallback")
+  reqInput.delete("errorCallback")
+
+  requestNode.input = reqInput
+
+  return requestNode
+
+End Function
+
+
+' generalTask_constructRequestNode
 '
 ' public method, which dynamically creates RequestNode with response & error fields and sets request field of Task Node
 ' @reqInfo: assocArray, contains information needed to make the request. Expected fields:
@@ -54,10 +114,8 @@ End Function
 '   RequestNode. The GeneralTask parser functions will have access to the RequestNode, allowing
 '   information to be passed from the original makeRequest call, all the way through to callbacks.
 '   In this way, the callbacks can have some context about what happened to trigger them.
-'
-' returns an instance of a RequestNode
-' Function generalTask_makeRequest(requestType, url, options, successCallback, errorCallback, responseType)
-Function generalTask_makeRequest(reqInfo = {})
+Function generalTask_constructRequestNode(reqInfo = {})
+  
   if type(reqInfo) <> "roAssociativeArray"
     tubiLog("GeneralTask.makeRequest - request info not of valid type, no request made", "warn")
     return invalid
@@ -82,13 +140,13 @@ Function generalTask_makeRequest(reqInfo = {})
   if reqInfo.successCallback = invalid
     successResponseType = "assocarray"
   end if
-  
+
   requestNode.addField("response", successResponseType, true)
   requestNode.observeField("response", "successCallbackWrapper")
 
   requestNode.addField("error", "assocarray", false)
   requestNode.observeField("error", "errorCallbackWrapper")
-  
+
   successCallback = reqInfo.successCallback
   errorCallback = reqInfo.errorCallback
   m.storeGeneralTaskCallbacks(requestNode, successCallback, errorCallback)
@@ -96,11 +154,75 @@ Function generalTask_makeRequest(reqInfo = {})
   reqInput = reqInfo
   reqInput.delete("successCallback")
   reqInput.delete("errorCallback")
-  
+
   requestNode.input = reqInput
-  m.generalTask.request = requestNode
-  
+
   return requestNode
+
+End Function
+
+
+' generalTask_makeRequest
+'
+' public method, which dynamically creates RequestNode with response & error fields and sets request field of Task Node
+' @reqInfo: assocArray, contains information needed to make the request. Expected fields:
+'   url (required): String, url of the request api
+'   requestType (required): String, name of the request api, for example "getHomescreen".
+'                           Can be found in constants.reqNames
+'   options: AA, options as expected by TubiRequest().createAsync. (For example: method, params, body, headers)
+'   successCallback: Function, the function that the render thread will run upon receiving a successful response
+'   errorCallback: Function, the function that the render thread will run upon receiving an error response
+'   responseType: String, type of the response data, corresponds to a valid roSGNode field type (eg. "node"/"assocarray"/"string"/"boolean" etc)
+'   silenceCallbackWarnings: boolean, if no callbacks are provided, prevents warning logs to the console
+'                            Use for 'fire and forget' requests like analytics, etc.
+'
+'   Additional custom fields can be added to @reqInfo which will in turn be appended to the returned
+'   RequestNode. The GeneralTask parser functions will have access to the RequestNode, allowing
+'   information to be passed from the original makeRequest call, all the way through to callbacks.
+'   In this way, the callbacks can have some context about what happened to trigger them.
+'
+Function generalTask_makeRequest(reqInfo = {})
+
+  requestNode = m.constructRequestNode(reqInfo) 
+  if requestNode <> invalid
+    m.generalTask.request = requestNode
+  end if 
+  return requestNode
+
+End Function
+
+
+' generalTask_makeBatchRequest
+'
+' public method, which dynamically creates RequestNode with response & error fields and sets request field of Task Node
+'
+' @batchInfo: assocArray, contains information needed to make the request. Expected fields:
+'   successCallback: Function, the function that the render thread will run upon receiving a successful response
+'   errorCallback: Function, the function that the render thread will run upon receiving an error response
+'   responseType: String, type of the response data, corresponds to a valid roSGNode field type (eg. "node"/"assocarray"/"string"/"boolean" etc)
+'   silenceCallbackWarnings: boolean, if no callbacks are provided, prevents warning logs to the console
+'                            Use for 'fire and forget' requests like analytics, etc.
+'
+' returns the batch node with children request nodes or invalid if the batch node wasn't created.
+Function generalTask_makeBatchRequest(batchInfo = {})
+  batchNode = m.constructBatchRequestNode(batchInfo)
+
+  if batchNode <> invalid
+    requests = batchInfo.requests
+
+    if requests <> invalid
+      for each request in requests
+        requestNode = m.constructRequestNode(request)
+        if requestNode <> invalid
+          batchNode.appendChild(requestNode)
+        end if
+      end for
+    end if
+
+    m.generalTask.batchRequest = batchNode
+  end if
+
+  return batchNode
 End Function
 
 
@@ -115,7 +237,7 @@ Function successCallbackWrapper(msg)
   response = requestNode.response
   m.unobserveGeneralTaskFields(requestNode)
   callback = m.getGeneralTaskSuccessCallback(requestNode)
-  
+
   if callback <> invalid
     callback(response)
   else if requestNode.input.silenceCallbackWarnings <> true
@@ -158,12 +280,15 @@ End Function
 ' 
 ' If the request is no longer needed, then this function will unobserve the relevant fields on the RequestNode and no callbacks will be called. The actual request may still return a response, but we will no longer do anything upon receiving the response.
 ' This should only be used as a public function.
-' @requestNode : RequestNode, the node that should be canceled
+' @requestNode : roSGNode, requestNode to be cancelled
 Function generalTask_cancelRequest(requestNode)
+
   if requestNode <> invalid
     requestNode.status = "canceled"
     m.unobserveGeneralTaskFields(requestNode)
-  end if 
+    m.generalTask.cancel = requestNode
+  end if   
+
 End Function
 
 
@@ -189,6 +314,7 @@ Function generalTask_getSuccessCallback(requestNode)
   if m.generalTaskCallbacks[requestNode.id] <> invalid
     callback = m.generalTaskCallbacks[requestNode.id].successCallback
   end if
+
   m.generalTaskCallbacks.delete(requestNode.id)
   return callback
 
@@ -205,6 +331,7 @@ Function generalTask_getErrorCallback(requestNode)
   if m.generalTaskCallbacks[requestNode.id] <> invalid
     callback = m.generalTaskCallbacks[requestNode.id].errorCallback
   end if
+
   m.generalTaskCallbacks.delete(requestNode.id)
   return callback
 
@@ -222,4 +349,24 @@ Function generalTask_storeCallbacks(requestNode, successCallback, errorCallback)
   m.generalTaskCallbacks[requestNode.id] = callbacks
   return callbacks
 
+End Function
+
+
+' helper function to determine if the successResponseType is valid for a batch response.
+Function generalTask_isValidBatchResponseType(responseType)
+  if type(responseType) = "String" or type(responseType) = "roString"
+    nodeHelpers = m.NodeHelpers
+    if nodeHelpers = invalid and type(TubiNodeHelpers) = "roFunction"
+      nodeHelpers = TubiNodeHelpers()
+    end if
+
+    arrayTypes = nodeHelpers.getArrayInterfaceTypes()
+
+    responseType = Lcase(responseType)
+    if arrayTypes[responseType] <> invalid or responseType = "node" or responseType = "assocarray"
+      return true
+    end if
+  end if
+
+  return false
 End Function

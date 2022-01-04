@@ -8,10 +8,12 @@ Function TubiBookmarksSetup()
   nodeHelpers = TubiNodeHelpers()
 
   unauthorized = tubiBookmarks_mockAuth_Unauthorized_testHelper(constants, request)
-  m.unauthorizedBM = TubiBookmarks(request, unauthorized, constants, nodeHelpers)
+  apiUtils = ApiUtils(constants)
+
+  m.unauthorizedBM = TubiBookmarks(request, unauthorized, constants, nodeHelpers, apiUtils)
   
   authorized = tubiBookmarks_mockAuth_Authorized_testHelper(constants, request)
-  m.authorizedBM = TubiBookmarks(request, authorized, constants, nodeHelpers)
+  m.authorizedBM = TubiBookmarks(request, authorized, constants, nodeHelpers, apiUtils)
 
   m.videoContent = CreateObject("roSGNode", "TubiContentNode")
   m.videoContent.type = "video"
@@ -362,7 +364,8 @@ Function tubiBookmarks_getInitialHistoryReqSignedOut_test()
   REQUEST = TubiRequest()
   AUTH = tubiBookmarks_mockAuth_Unauthorized_testHelper(constants, REQUEST)
   NODEHELPERS = TubiNodeHelpers()
-  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS)
+  apiUtils = ApiUtils(constants)
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS, apiUtils)
   req = BM.getInitialHistoryReq("1234")
   m.assertInvalid(req)
 End Function

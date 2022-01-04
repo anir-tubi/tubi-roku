@@ -1,9 +1,8 @@
 Function init()
   tubiLog("CategoryGridList.init")
   m.constants = m.global.constants
-  m.NodeHelpers = TubiNodeHelpers()
 
-  m.top.observeField("metadataFetchTaskBatch", "onMetadataFetchTaskBatchResponse")
+  m.top.observeField("categoryResponseInBatch", "onCategoryResponseInBatch")
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("jumpToRowItemByID", "onJumpToRowItemByIDChange")
   m.top.observeField("contentUpdated", "onContentChange")
@@ -22,7 +21,6 @@ Function init()
   ' is what focus thresholds trigger a fetch.
   m.initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
   m.finalBlockSize = m.constants.performance.categoryGridList.finalBlockSize
-  m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
   m.eagerLoad = m.constants.performance.categoryGridList.eagerLoad
 
   ' If eager loading, we don't need to listen for row changes
@@ -30,7 +28,6 @@ Function init()
     m.RowList.observeField("itemFocused", "onItemFocused")
   end if
 
-  m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
 
   if m.constants.deviceInfo.scaledUi = true then
@@ -129,8 +126,8 @@ Function onContentChange()
       end if
 
       'At this point, there is a limited set (as defined in constants) of content in each category.
-      'loadCategories will get the rest of the content for each category.
-      loadCategories(0)
+      'loadCategoriesIndex will get the rest of the content for each category.
+      m.top.loadCategoriesIndex = 0
     end if
   end if
 End Function
@@ -296,7 +293,7 @@ End Function
 
 Function onAnimateToCategoryDebounce()
   tubiLog("CategoryGridList.onAnimateToCategoryDebounce")
-  loadCategories(m.top.animateToCategory)
+  m.top.loadCategoriesIndex = m.top.animateToCategory
 End Function
 
 
@@ -306,72 +303,9 @@ End Function
 ' The RowList has changed to a new category row
 Function onItemFocused()
   tubiLog("CategoryGridList.onItemFocused")
-  loadCategories(m.RowList.itemFocused)
+  m.top.loadCategoriesIndex = m.RowList.itemFocused
 End Function
 
-
-' Load the current category and its adjacent categories
-Function loadCategories(index) As Void
-  tubiLog("CategoryGridList.loadCategories")
-  if m.top.content = invalid or index < 0 then
-    return
-  end if
-
-  requests = []
-    'Determine the window start and window size for lazy loading
-  windowInfo = getWindowInfo(index)
-  if windowInfo <> invalid
-    'Create requests for each category in the window
-    for i = windowInfo.start to (windowInfo.start + windowInfo.size)-1
-      category = m.top.content.getChild(i)
-      if category <> invalid
-        request = invalid
-        if category.state = "partial" or category.state = "none"
-          request = getWholeCategoryRequest(category, "")
-          category.state = "loading"
-        end if
-        if request <> invalid then
-          requests.push(request)
-          category.state = "loading"
-        end if
-      end if
-    end for
-    
-    if requests.count() > 0 then
-      m.global.metadataFetchTask.batchRequest = m.metadataFetchTaskDTO.createBatchRequest(m.top, "metadataFetchTaskBatch", requests)
-    end if
-  end if
-End Function
-
-
-'Helper function to retrieve the starting index for the window to be loaded, as well as the number of categories in the window
-'Returns an assocArray with the keys: "start", "size"
-'@index: integer, the index of the category within the category grid
-Function getWindowInfo(index)
-  currentCategory = m.top.content.getChild(index)
-  if currentCategory <> invalid
-    currentWindowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
-    windowSize = m.categoryWindowSize
-    if currentCategory.state = "partial" or currentCategory.state = "none"
-      windowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
-      if (index + 1) MOD m.categoryWindowSize = 0
-        ' if the user lands on an empty category that is also the last category in its window,
-        ' add some more categories to the batch in order to fill the "next" category
-        windowSize = m.categoryWindowSize + (m.categoryWindowSize \ 2)
-      end if
-    else
-      ' attempt to load the current window, or next window depending on the index of the current category
-      nextBatchIndex = (m.categoryWindowSize \ 2)
-      windowStart = ((index + m.categoryWindowSize - (nextBatchIndex)) \ (m.categoryWindowSize)) * m.categoryWindowSize
-    end if
-    
-    return {
-      start: windowStart
-      size: windowSize
-    }
-  end if
-  return invalid
-End Function
 
 ' Resolve and internal ContentNode that's been abbreviated for the CategoryGridList
 ' into a fully parsed TubiContentNode
@@ -459,34 +393,59 @@ Function onRowListItemDebounce()
 End Function
 
 
-Function onMetadataFetchTaskBatchResponse(message) As Void
-  tubiLog("CategoryGridList.onMetadataFetchTaskBatchResponse")
+Function onCategoryResponseInBatch(msg) As Void
+  tubiLog("CategoryGridList.categoryResponseInBatch")
 
-  responses = message.GetData()
+  response = msg.getData()
   shouldInformHomeScreen = false
   removableCategories = {}
-  if responses <> invalid
+
+  if response <> invalid
     batchMaxIndex = 0
-    for each requestId in responses
-      index = mergeMetadata(responses[requestId])
-      if index = -1
-        'we rely on the request id to be the same as the category id here
-        'it works but is not best practice
-        'categories with index = -1 means they have no content and should be removed
-        removableCategories[requestId] = true
-      else if index = 0
-        ' index is 0 for the top most category in the homescreen grid. LimitedUI models do not start out with any
-        ' content in their categories, and we must inform the homescreen that content has arrived so that it may
-        ' populate the info panel
-        shouldInformHomeScreen = true
-      end if
-      if index > batchMaxIndex
-        batchMaxIndex = index
+
+    ' the function mergeMetadata (which is called in the subsequent for loop) calls
+    ' node.replaceChild() which will reparent the node being looped over, thereby reducing
+    ' the number of children nodes in the parent node as the looping is happening.
+    ' In order to work around this, we need to iterate backwards over a set of child node containers/categories.
+    ' But we also want to iterate in the order in which the containers are displayed on the screen,
+    ' so we need to reverse the order of the nodes before iterating over them, 
+    ' such that when iterating from end to beginning, the order is the same as 
+    ' iterating from beginning to end without pre-reversing the nodes.
+    subType = response.subtype()
+    reverseOrder = CreateObject("roSGNode", subtype)
+
+    for i = response.getChildCount() - 1 to 0 step -1
+      ' note: reparenting is quicker than appending
+      response.getChild(i).reparent(reverseOrder, false)
+    end for
+
+
+    for i = reverseOrder.getChildCount() - 1 to 0 step -1
+      content = reverseOrder.getChild(i)
+
+      if content <> invalid
+        categoryId = content.ID
+        index = mergeMetadata(content)
+
+        if index = -1
+          'categories with index = -1 means they have no content and should be removed
+          removableCategories[categoryId] = true
+        else if index = 0
+          ' index is 0 for the top most category in the homescreen grid. LimitedUI models do not start out with any
+          ' content in their categories, and we must inform the homescreen that content has arrived so that it may
+          ' populate the info panel
+          shouldInformHomeScreen = true
+        end if
+
+        if index > batchMaxIndex
+          batchMaxIndex = index
+        end if
+
       end if
     end for
 
     if m.eagerLoad then
-      loadCategories(batchMaxIndex+1)
+      m.top.loadCategoriesIndex = batchMaxIndex + 1
     end if
 
     if m.top.content <> invalid
@@ -515,43 +474,24 @@ Function onMetadataFetchTaskBatchResponse(message) As Void
     end if
 
     ' free references to the batch so that it can be garbage collected
-    m.top.metadataFetchTaskBatch = invalid
+    m.top.categoryResponseInBatch = invalid
   end if
+
 End Function
 
 
-Function mergeMetadata(fetched)
-  ' TODO(Chris): handle this better.  if we set an error it should also be reset when the category is next fetched
-  newContent = invalid
-  response = fetched.response
-  if response.code < 200 or response.code >= 300 then
-    m.top.error = {
-      code: response.code
-      failReason: response.failReason
-    }
-
-    ' Fake an empty response on 400s, which may be due to empty user categories
-    if response.code = 400 then
-      newContent = CreateObject("roSGNode", "TubiContentNode")
-    else
-      return -1
-    end if
-  else if fetched.convertedMetadata <> invalid
-    newContent = fetched.convertedMetadata  'this is a category node filled with content children
-  else
-    return -1
-  end if
-  
-
-  tubiLog("Received response for request id " + fetched.id)
+Function mergeMetadata(fetchedContent)
+  tubiLog("Merging metadata for categoryId: " + fetchedContent.id)
   index = -1
+
   categories = invalid
   if m.top.content <> invalid
     categories = m.top.content.getChildren(m.top.content.getChildCount(), 0)
   end if
-  if categories <> invalid and newContent.id <> invalid
+
+  if categories <> invalid and fetchedContent <> invalid and fetchedContent.id <> invalid
     for i=0 to categories.count()-1
-      if categories[i].id = newContent.id then
+      if categories[i].id = fetchedContent.id then
         index = i
         exit for
       end if
@@ -564,67 +504,18 @@ Function mergeMetadata(fetched)
 
     ' Check if a response arrives but the cache has been flushed and categories moved, such as adding or removing user categories
     if parentCategory = invalid then
-      tubiLog("Ignoring response due to changed index " + fetched.id)
+      tubiLog("Ignoring response due to changed index " + fetchedContent.id)
       return -1
     end if
 
-    newContent.state = "loaded"
+    fetchedContent.state = "loaded"
 
     'Add the existing preliminarily loaded contents to the newly received contents
-    m.top.content.replaceChild(newContent, index)
+    m.top.content.replaceChild(fetchedContent, index)
     return index
   else
     return -1
   end if
-End Function
-
-
-'''''''''''''''''''''
-' getWholeCategoryRequest
-'
-' Returns a request to get all the content for a category - used to refresh categories in their entirety
-Function getWholeCategoryRequest(category As Object, field="wholeCategoryResponse" As String)
-  if category <> invalid and type(category.id) = "roString"
-    categoryId = category.id
-    tubiLog("CategoryGridList.fetch whole " + categoryId)
-
-    categoryId = getFullCategoryId(category)
-    if categoryId <> invalid
-      tubiLog("CategoryGridList.fetch whole: Asking MetadataFetchTask for " + categoryId)
-       
-      options = {
-        params: {
-          "contentMode": m.top.contentMode
-        }
-      }
-
-      return m.metadataFetchTaskDTO.createRequest(categoryId, m.top, field, m.constants.reqNames.getCategory, invalid, m.top.shouldKidsModeBeSentToServer, options)
-    end if
-  end if
-
-  return invalid
-End Function
-
-
-'''''''''''''''''''''
-' getFullCategoryId
-'
-'
-' Helper function to build category ids for nested categories that matrix API can recognize
-' @category: sgNode, a CateogorContentNode
-' if a nested category returns an id in the form of 'parentCat/sub/childCat'
-' if not a nested category, returns the categoryId
-' if there is no categoryId, returns invalid
-Function getFullCategoryId(category)
-  categoryId = invalid
-  if type(category) = "roSGNode" and category.id <> ""
-    categoryId = category.id
-    if category.parentId <> invalid and category.parentId <> ""
-      categoryId = category.parentId + "/sub/" + category.id
-      ' categoryId = categoryId.encodeUriComponent()
-    end if
-  end if
-  return categoryId
 End Function
 
 

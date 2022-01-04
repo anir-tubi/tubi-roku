@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "ResponseNode" extends="ContentNode">
+  <interface>
+    <field id="response" type="assocarray" />
+  </interface>
+</component>

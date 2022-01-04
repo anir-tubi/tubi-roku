@@ -14,10 +14,10 @@ End Function
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseEmailExistsError(fullResponse, requestNode)
- return {
-  requestInput: requestNode.input
-  code: fullResponse.code
-}
+  return {
+    requestInput: requestNode.input
+    code: fullResponse.code
+  }
 End Function
 
 

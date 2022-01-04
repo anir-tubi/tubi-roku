@@ -44,8 +44,6 @@ Function init()
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
 
-  m.metadataFetchTaskDTO = MetadataFetchTaskDTO()
-
   if m.constants.deviceInfo.scaledUi = true then
     m.ResultGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
