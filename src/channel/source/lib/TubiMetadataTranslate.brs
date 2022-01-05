@@ -655,7 +655,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
   ' include utility row only in homescreen when kidsmode feature is ON (available to users) and
   ' parentalRating is set to Adult and isKidsMode is false
   includeUtilityRow = false
-  if kidsModeFeatureOn = true and contentMode = m.constants.ui.contentMode.homescreen and parentalRating > 2 and isKidsMode = false
+  if kidsModeFeatureOn = true and (contentMode = m.constants.ui.contentMode.homescreen or contentMode = "") and parentalRating > 2 and isKidsMode = false
     includeUtilityRow = true
   end if  
 

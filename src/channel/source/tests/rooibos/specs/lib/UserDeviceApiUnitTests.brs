@@ -7,7 +7,6 @@ Function UserDeviceApiSetup()
   m.userDeviceApi = UserDeviceApi(m.constants)
   m.emailExistsUrl = m.constants.urls.account.emailExists
   m.signupUrl = m.constants.urls.users.signup
-  m.loginUrl = m.constants.urls.account.login
   m.deviceRegisterUrl = m.constants.urls.account.deviceRegister
   m.checkBirthdayUrl = m.constants.urls.account.checkBirthday
   m.patchSettingsUrl = m.constants.urls.users.settings

@@ -28,7 +28,7 @@ Function showChannelScreen(content, sPageSource = "")
   
   authInfo = m.global.authInfo
   ' make queue API request only if the user loggedIn
-  if authInfo = invalid and content.id = m.constants.ui.categoryIds.queue
+  if (authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid)) and content.id = m.constants.ui.categoryIds.queue 
     displaySignInRequiredModal(channelScreen)
   else
     getChannelFromServer(channelScreen, content)

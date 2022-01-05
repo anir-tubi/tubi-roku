@@ -227,3 +227,35 @@ Function isNonEmptyString(str)
   end if
   return false
 End Function
+
+
+' buildQueryString is used to contruct the query params in canonical form
+'
+' @params : assocarray where key/value pairs will be turned into a query parameter string
+' 
+' returns query in String like "key1=value1&key2=value2"
+Function buildQueryString(params)
+
+  queryString = ""
+  index = 0
+
+  if params <> invalid
+    for each item in params.Items()
+      paramAdded = false
+
+      if FindMemberFunction(item.value, "toStr") <> invalid
+        queryString = queryString + item.key + "=" + item.value.tostr()
+        paramAdded = true
+      end if
+
+      index = index + 1
+      if index <> params.count() and paramAdded = true
+        queryString = queryString + "&"
+      end if
+
+    end for 
+  end if
+
+  return queryString
+
+End Function

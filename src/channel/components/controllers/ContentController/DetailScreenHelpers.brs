@@ -175,7 +175,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     bookmark = m.global.bookmarkIds.findNode(content.id)
     history = m.global.historyIds.findNode(content.id)
 
-    if m.global.authInfo = invalid and history <> invalid
+    if isLoggedInUser() = false and history <> invalid
       '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
       '//   because beyond that time we are restricted legally from showing data of signed out users.
 
@@ -835,7 +835,7 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
   tubiLog("DetailScreenHelpers.onAddToQueue")
   
   if detailScreen.getSubtype() = "DetailScreen"
-    if m.global.authInfo = invalid
+    if isLoggedInUser() = false
      
       content = getDetailScreenContent(detailScreen)
       dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "sign-in-bookmark", m.constants)
@@ -1024,7 +1024,7 @@ End Function
 
 ' Event Handler for when to check if guest user has reached the time limit to see the history of the current video.
 Function onResumeAllowedTimerFired()
-  if m.global.authInfo = invalid
+  if isLoggedInUser() = false
     detailScreen = invalid
     screenStackDepth = 0
     bDetailScreenExistsInStack = false
@@ -1311,7 +1311,7 @@ Function trailerHelper(screen)
 
   if content <> invalid then
     bMature = isMatureRating(content)
-    if m.global.authInfo = invalid and bMature = true
+    if isLoggedInUser() = false and bMature = true
       '//if user is a guest and is trying to play content geared for only adults, then ask them to register 
       dialogSubtype = "mature-trailer"
       displayDetailScreenMaturePlayWarning(content, dialogSubtype)
@@ -1482,7 +1482,7 @@ Function playHelper(screen)
   if episode <> invalid and screen.isLoading <> true then
     setDescriptorCodeAndDescription(episode)
     bMature = isMatureRating(episode)
-    if m.global.authInfo = invalid and bMature = true
+    if isLoggedInUser() = false and bMature = true
       '//if user is a guest and is trying to play content geared for only adults, then ask them to register 
       dialogSubtype = "mature-play"
       if m.deepLinkContent <> invalid
@@ -1520,7 +1520,7 @@ End Function
 Function processResume(episode)
   bMature = isMatureRating(episode)
   nowPos = -1
-  if m.global.authInfo = invalid and bMature = true
+  if isLoggedInUser() = false and bMature = true
     '//if user is a guest and is trying to play content geared for only adults, then ask them to register dialogSubtype = "mature-play"
     dialogSubtype = "mature-resume"
     if m.deepLinkContent <> invalid

@@ -628,17 +628,34 @@ Function onChannelsRequested()
   currentContent = getCurrentLinearContent()
   
   if currentContent <> invalid and currentContent.parentId <> invalid
-    options = {
-      params: {
+
+    options = {}
+    params = {}
+
+    headers = {
+      ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
+      ' This header is temporary and should be removed once the back end no longer requires it.
+      "x-tubi-inject-linear": "true"
+    }
+
+    if m.endpoint = "matrix"
+
+      params = {
         "contentMode": m.constants.ui.contentMode.linear
         "limit": m.constants.performance.categoryGridList.finalBlockSize
       }
-      headers: {
-        ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
-        ' This header is temporary and should be removed once the back end no longer requires it.
-        "x-tubi-inject-linear": "true"
+
+    else
+
+      params = {
+        "content_mode": m.constants.ui.contentMode.linear
+        "contents_limit": m.constants.performance.categoryGridList.finalBlockSize
       }
-    }
+
+    end if
+
+    options.params = params
+    options.headers = headers
 
     isKids = shouldKidsModeBeSentToServer()
     homescreenRequestInfo = m.cmsApi.homeScreenReqInfo(isKids, options)

@@ -187,9 +187,7 @@ End Function
 ' triggers backend API to bookmark video position
 Function updateHistory(content, nowPos)
 
-  authInfo = m.global.authInfo 
-
-  if authInfo <> invalid and content["type"] = m.constants.ui.contentTypes.video
+  if isLoggedInUser() and content["type"] = m.constants.ui.contentTypes.video
 
     bKidsMode = shouldKidsModeBeSentToServer()
     postUserHistory = m.Bookmarks.addHistoryReq(content, nowPos, bKidsMode)
@@ -714,7 +712,7 @@ Function onVideoTrackingStart(msg)
       youboraConfig.tvShow = Mid(videoplayer.content.parentId, 2)
     end if
 
-    if m.global.authInfo <> invalid
+    if isLoggedInUser() = true
       youboraConfig.username = m.global.authInfo.userId
     end if
 

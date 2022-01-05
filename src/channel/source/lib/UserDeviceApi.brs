@@ -12,7 +12,6 @@ Function UserDeviceApi(constants, apiUtils)
     deviceRegisterInfo: userDeviceApi_deviceRegisterInfo
     checkBirthdayInfo: userDeviceApi_checkBirthdayInfo
     patchSettingsInfo: userDeviceApi_patchSettingsInfo
-
   }
 
   userDeviceApi = {}

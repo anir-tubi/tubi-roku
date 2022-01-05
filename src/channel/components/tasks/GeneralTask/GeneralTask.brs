@@ -49,15 +49,16 @@ Function listen()
   m.jobStore = {}
   m.requestTypes = {}
   createParsingCallbacks()
-
+  
   m.requestModule = Request(m.constants.settings)
   m.auth = TubiAuth(m.constants, m.requestModule)
+  m.authInfo = invalid
 
   while (true)
     msg = wait(0, m.port)
     if type(msg) = "roSGNodeEvent"
       if msg.getField() = "request"
-        
+
         requestNode = msg.getData()
 
         if requestNode <> invalid and isEmptyField(requestNode.response) and isEmptyField(requestNode.error)
@@ -189,7 +190,8 @@ Function processResponse(msg)
     requestNode = job.requestNode
 
     requestInput = requestNode.input
-    callbackTypes = m.requestTypes[requestInput.requestType]
+    requestType = requestInput.requestType
+    callbackTypes = m.requestTypes[requestType]
 
     result = job.tubiReq.handleEvent(msg)
     retries = requestNode.retries
@@ -207,9 +209,14 @@ Function processResponse(msg)
 
           processSuccessResponse(result, callbackTypes, job)
 
-        else if code = 403 and retries > 0
-
-          newAuthInfo = m.auth.refreshAuthToken(m.authInfo, 100)
+        else if (code = 403 or code = 401) and m.constants.reqNames.acceptsTubiAuth[requestType] = true and retries > 0
+          ' request could not be authed by backend so attempt to refresh the auth token and try again
+          timeout = 100
+          if m.authInfo <> invalid and m.authInfo.userId <> invalid
+            newAuthInfo = m.auth.refreshAuthToken(m.authInfo, timeout)
+          else
+            newAuthInfo = m.auth.refreshAnonymousToken(m.authInfo, timeout)
+          end if
 
           if newAuthInfo <> invalid
             pause = pause * backoffFactor
@@ -219,12 +226,9 @@ Function processResponse(msg)
             makeApiRequest(job.requestNode, job.batchNode)
           else
             processErrorReponse(result, callbackTypes, job)
-          end if  
-
+          end if
         else
-
           processErrorReponse(result, callbackTypes, job)
-
         end if
 
         m.jobStore.delete(id) ' delete the job from assocarray after the response is sent to avoid memory leak 
@@ -233,7 +237,6 @@ Function processResponse(msg)
     end if
 
   end if
-
 End Function
 
 

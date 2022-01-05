@@ -24,6 +24,7 @@ Function TubiAuth(constants, request)
     setGuestUserHasAgeInfo: tubiAuth_setGuestUserHasAgeInfo
     deleteGuestUserHasAgeInfo: tubiAuth_deleteGuestUserHasAgeInfo
 
+
     'private methods
     saveAuthInfo: tubiAuth_saveAuthInfo
     deleteAuthInfo: tubiAuth_deleteAuthInfo
@@ -33,7 +34,33 @@ Function TubiAuth(constants, request)
     handleRefreshResponse: tubiAuth_handleRefreshResponse
     updateAuthInfo: tubiAuth_updateAuthInfo
     formatAuthInfoFromServer: tubiAuth_formatAuthInfoFromServer
-    
+
+    fetchAnonymousAuthInfo: tubiAuth_fetchAnonymousAuthInfo
+    fetchAndSaveAnonymousAuthInfo: tubiAuth_fetchAndSaveAnonymousAuthInfo
+    updateAnonymousAuthInfo: tubiAuth_updateAnonymousAuthInfo
+
+    getAnonymousSigningKeyRequest: tubiAuth_getAnonymousSigningKeyRequest
+    handleAnonymousSigningKeyResponse: tubiAuth_handleAnonymousSigningKeyResponse
+
+    getAnonymousTokenRequest: tubiAuth_getAnonymousTokenRequest
+    handleAnonymousTokenResponse: tubiAuth_handleAnonymousTokenResponse
+
+    refreshAnonymousToken: tubiAuth_refreshAnonymousToken
+    getAnonymousRefreshTokenRequest: tubiAuth_getAnonymousRefreshTokenRequest
+    handleAnonymousRefreshTokenResponse: tubiAuth_handleAnonymousRefreshTokenResponse
+
+    createSignature: tubiAuth_createSignature
+    constructCanonicalRequest: tubiAuth_constructCanonicalRequest
+    getAbsolutePath: tubiAuth_getAbsolutePath
+    constructCanonicalQueryString: tubiAuth_constructCanonicalQueryString
+    constructCanonicalHeaders: tubiAuth_constructCanonicalHeaders
+    constructSignedHeaders: tubiAuth_constructSignedHeaders
+    constructHashedPayload: tubiAuth_constructHashedPayload
+    getHash: tubiAuth_getHash
+    createStringtoSignSignature: tubiAuth_createStringtoSignSignature
+    calculateSignature: tubiAuth_calculateSignature
+    getSignedHeaders: tubiAuth_getSignedHeaders
+
     regRead: tubiAuth_regRead
     regReadAll: tubiAuth_regReadAll
     regWrite: tubiAuth_regWrite
@@ -43,6 +70,7 @@ End Function
 
 
 'returns invalid or an assocArray that looks like the following
+' For loggedIn user
 'authInfo = {
 '  refreshToken: someRefreshToken(String)
 '  accessToken: someAccessToken(String)
@@ -53,6 +81,13 @@ End Function
 '  name: name(String)
 '  authType: analyticsAuthType(String)
 '  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
+'}
+'
+' For Guest user
+'authInfo = {
+'  refreshToken: someRefreshToken(String)
+'  accessToken: someAccessToken(String)
+'  expireTime: numberOfSecondsUntilExpires(Integer)
 '}
 Function tubiAuth_getAuthInfo()
   authInfo = m.regReadAll(m.authRegSection) 'returns empty assocArray if nothing in the auth registry
@@ -71,13 +106,354 @@ Function tubiAuth_getAuthInfo()
     isExpired = m.checkIfAuthExpired(authInfo)
 
     if isExpired = true
-      newAuthInfo = m.refreshAuthToken(authInfo, 3) 'can return invalid
+      if authInfo.userId <> invalid
+        newAuthInfo = m.refreshAuthToken(authInfo, 3) 'can return invalid
+      else
+        newAuthInfo = m.refreshAnonymousToken(authInfo, 3) 'can return invalid
+      end if
     else
       newAuthInfo = authInfo
     end if
+  else 
+    newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
   end if
 
   return newAuthInfo  'can return invalid
+End Function
+
+
+' It refreshes the accessToken using refresh Token
+' @authInfo: assocarray, contains accessToken, refreshToken, expireTime
+' @timeout: integer, the max amount of time to wait for a response from the server in seconds
+'
+' returns authInfo = {
+'  refreshToken: someRefreshToken(String)
+'  accessToken: someAccessToken(String)
+'  expireTime: numberOfSecondsUntilExpires(Integer)
+'}
+Function tubiAuth_refreshAnonymousToken(authInfo, timeout)
+  newAuthInfo = invalid
+
+  if authInfo = invalid
+    newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
+  else
+    authPort = CreateObject("roMessagePort")
+    refreshTokenReq = m.getAnonymousRefreshTokenRequest(authInfo)
+
+    if refreshTokenReq.start(authPort) = true
+      timer = CreateObject("roTimespan")
+      while true
+        msg = wait(100, authPort)
+
+        newAccess = m.handleAnonymousRefreshTokenResponse(msg, refreshTokenReq)
+        ' newAccess might be invalid if there was a network error other than 403
+        ' in which case we don't have any new auth info to update and we don't want to
+        ' delete the previous auth info.
+        if newAccess <> invalid
+          if newAccess.access_token <> invalid
+            newAuthInfo = m.updateAnonymousAuthInfo(newAccess, authInfo)
+            newAuthInfo = m.saveAuthInfo(newAuthInfo) 'returns invalid if not saved to the registry
+          else
+            ' Most likely in this block if receiving a 401 when attempting to refresh the anonymous token.
+            ' Be careful to only do this if the service rejected auth refresh.  We don't
+            ' want to delete auth info for transient errors like network down.
+            m.deleteAuthInfo()
+            newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
+          end if
+          exit while
+        end if
+
+        'wait max x secs for a response to refresh the auth token
+        if timer.totalMilliseconds() > (timeout * 1000)
+          exit while
+        end if
+      end while
+    end if
+
+  end if
+
+  return newAuthInfo 'may return invalid
+
+End Function
+
+
+' It creates request object for refreshToken Request
+' @authInfo: assocarray, contains accessToken, refreshToken, expireTime
+'
+' returns AnonymousRefreshToken request object in assocarray
+Function tubiAuth_getAnonymousRefreshTokenRequest(authInfo)
+
+  algorithm = m.constants.anonymous.algorithm
+  dateTime = createObject("roDateTime").ToISOString()
+  dateTimeFormatted = dateTime.replace("-","").replace(":","")
+
+  headers = m.getAuthHeaders(authInfo.refreshToken)
+
+  secretKey = authInfo.secretKey
+
+  body = {}
+  bodyJson = FormatJSON(body)
+
+  tokenReqOptions = {
+    url : m.constants.urls.account.anonymous.refreshToken
+    body: bodyJson
+    headers: headers
+    method: m.constants.reqTypes.post
+    retries: 0
+  }
+  signature = m.createSignature(dateTime, tokenReqOptions, secretKey, algorithm)
+  signedHeaders = m.getSignedHeaders(headers)
+
+  params = {
+    "X-Tubi-Algorithm": algorithm
+    "X-Tubi-SignedHeaders": signedHeaders
+    "X-Tubi-Date": dateTimeFormatted
+    "X-Tubi-Expires": "60"
+    "X-Tubi-Signature" : signature
+  }
+
+  tokenReqOptions["params"] = params
+
+  return m.request.createAsync(m.constants.urls.account.anonymous.refreshToken, "refreshAnonymousToken", tokenReqOptions)
+
+End Function
+
+
+Function tubiAuth_fetchAndSaveAnonymousAuthInfo()
+  authInfo = m.fetchAnonymousAuthInfo()
+  return m.saveAuthInfo(authInfo)
+End Function
+
+
+'returns invalid or an assocArray that looks like the following
+'authInfo = {
+'  refreshToken: someRefreshToken(String)
+'  accessToken: someAccessToken(String)
+'  expireTime: numberOfSecondsUntilExpires(Integer as String)
+'  secretKey: someSecretKey(String)
+'}
+Function tubiAuth_fetchAnonymousAuthInfo()
+
+  authInfo = invalid
+
+  roDeviceInfo = CreateObject("roDeviceInfo")
+  verifier = roDeviceInfo.GetRandomUUID()
+
+  authPort = CreateObject("roMessagePort")
+  timeout = 10
+  anonymousSigningKeyReq = m.getAnonymousSigningKeyRequest(verifier)
+
+  signingKeyResponse = invalid
+  if anonymousSigningKeyReq.start(authPort) = true
+    timer = CreateObject("roTimespan")
+    while true
+      msg = wait(100, authPort)
+      signingKeyResponse = m.handleAnonymousSigningKeyResponse(msg, anonymousSigningKeyReq)
+      if signingKeyResponse <> invalid
+        exit while
+      end if
+      'wait max x secs for a response to refresh the auth token
+      if timer.totalMilliseconds() > (timeout * 1000)
+        exit while
+      end if
+    end while
+  end if
+
+  if signingKeyResponse = invalid or (signingKeyResponse.id = invalid or signingKeyResponse.key = invalid) 
+    return invalid
+  end if
+
+  authPort = CreateObject("roMessagePort")
+  anonymousTokenReq = m.getAnonymousTokenRequest(verifier, signingKeyResponse)
+
+  if anonymousTokenReq.start(authPort) = true
+    timer = CreateObject("roTimespan")
+    while true
+      msg = wait(100, authPort)
+      token = m.handleAnonymousTokenResponse(msg, anonymousTokenReq)
+      if token <> invalid
+        if token.access_token <> invalid and token.refresh_token <> invalid and token.expires_in <> invalid
+          authInfo = m.formatAuthInfoFromServer(token)
+          authInfo["secretKey"] = signingKeyResponse.key ' store secretKey in registry, we need it for refreshing anonymous token
+        end if
+        exit while
+      end if
+      'wait max x secs for a response to refresh the auth token
+      if timer.totalMilliseconds() > (timeout * 1000)
+        exit while
+      end if
+    end while
+  end if
+
+  return authInfo
+
+End Function
+
+
+' It creates request object for anonymous Token
+' @verifier: string, random string used for anonymous token request
+' @response: assocarray, signingKey response {id, key}
+'
+' returns request object used to fetch an anonymous token as returned by Request().createAsync()
+Function tubiAuth_getAnonymousTokenRequest(verifier, response)
+
+  id = response.id
+  secretKey = response.key
+  algorithm = m.constants.anonymous.algorithm
+
+  dateTime = createObject("roDateTime").ToISOString()
+  dateTimeFormatted = dateTime.replace("-","").replace(":","")
+
+  body = {
+    id: id
+    verifier: verifier
+    device_id: m.constants.deviceInfo.deviceId
+    platform: m.constants.platform
+  }
+  bodyJson = FormatJSON(body)
+
+  headers = {}
+  headers.append(m.constants.headers.commonUapi)
+
+  tokenReqInfo = {
+    url : m.constants.urls.account.anonymous.token
+    body: bodyJson
+    headers: headers
+    method: m.constants.reqTypes.post
+  }
+  signature = m.createSignature(dateTime, tokenReqInfo, secretKey, algorithm)
+  signedHeaders = m.getSignedHeaders(headers)
+
+  params = {
+    "X-Tubi-Algorithm": algorithm
+    "X-Tubi-SignedHeaders": signedHeaders
+    "X-Tubi-Date": dateTimeFormatted
+    "X-Tubi-Expires": "60"
+    "X-Tubi-Signature" : signature
+  }
+
+  reqOptions = {
+    method: m.constants.reqTypes.post
+    body: bodyJson
+    headers: headers
+    params: params
+    retries: 0
+  }
+
+  return m.request.createAsync(m.constants.urls.account.anonymous.token, "getAnonymousToken", reqOptions)
+End Function
+
+
+' It creates request object for anonymous signingKey
+' @verifier: string, random string used for anonymous signingKey request
+'
+' returns request object as returned by Request().createAsync()
+Function tubiAuth_getAnonymousSigningKeyRequest(verifier)
+
+  ba1 = CreateObject("roByteArray")
+  ba1.FromAsciiString(verifier)
+  digest = CreateObject("roEVPDigest")
+  digest.Setup("sha256")
+  digest.Update(ba1)
+  hash = digest.Final()
+
+  ' base64 encode the hash
+  ba2 = CreateObject("roByteArray") 
+  ba2.FromHexString(hash)
+  challenge = ba2.ToBase64String().replace("+", "-").replace("/", "_")
+
+  body = {
+    challenge: challenge
+    version: m.constants.deviceInfo.clientVersion
+    platform: m.constants.platform
+    device_id: m.constants.deviceInfo.deviceId
+  }
+  bodyJson = FormatJson(body)
+
+  headers = {}
+  headers.append(m.constants.headers.commonUapi)
+
+  reqOptions = {
+    method: m.constants.reqTypes.post
+    body: bodyJson
+    headers: headers
+    retries: 0
+  }
+
+  return m.request.createAsync(m.constants.urls.account.anonymous.signingKey, "getAnonymousSigningKey", reqOptions)
+End Function
+
+
+' handles anonymous signingKey response
+' @msg: roUrlEvent
+' @anonymousSigningKeyReq: assocarray, a request object as returned by Request().createAsync()
+'                                      and used to make the request to fetch the signing key
+'
+' returns response in assocarray (id, key)
+Function tubiAuth_handleAnonymousSigningKeyResponse(msg, anonymousSigningKeyReq)
+  signingKey = invalid
+
+  responseInfo = anonymousSigningKeyReq.handleEvent(msg)
+
+  if responseInfo <> invalid and responseInfo.response <> invalid and responseInfo.response.data <> invalid
+    code = responseInfo.response.code
+    if code < 200 or code >= 400
+      ' challenge was not valid
+      signingKey = {}
+    else if responseInfo.response.data.len() > 0
+      signingKey = ParseJson(responseInfo.response.data)
+    end if
+  end if
+
+  return signingKey
+End Function
+
+
+' handles anonymous token response
+' @msg: roUrlEvent
+' @anonymousTokenReq: assocarray, a request object as returned by Request().createAsync()
+'                                 and used to make the request to fetch the anonymous auth token
+'
+' returns response in assocarray (accessToken, refreshToken, expires_in)
+Function tubiAuth_handleAnonymousTokenResponse(msg, anonymousTokenReq)
+  anonymousTokenInfo = invalid
+
+  responseInfo = anonymousTokenReq.handleEvent(msg)
+
+  if responseInfo <> invalid and responseInfo.response <> invalid and responseInfo.response.data <> invalid
+    code = responseInfo.response.code
+    if code < 200 or code >= 400
+      ' signing key was not valid
+      anonymousTokenInfo = {}
+    else if responseInfo.response.data.len() > 0
+      anonymousTokenInfo = ParseJson(responseInfo.response.data)
+    end if
+  end if
+
+  return anonymousTokenInfo
+End Function
+
+
+' handles anonymous refresh token response
+' @msg: roUrlEvent
+' @anonymousTokenReq: assocarray
+'
+' returns response in assocarray (accessToken, refreshToken, expires_in), empty AA if 401, or invalid
+Function tubiAuth_handleAnonymousRefreshTokenResponse(msg, anonymousTokenReq)
+  newAccess = invalid
+
+  responseInfo = anonymousTokenReq.handleEvent(msg)
+
+  if responseInfo <> invalid and responseInfo.response <> invalid and responseInfo.response.data <> invalid
+    if responseInfo.response.code = 403
+      ' refresh token was expired
+      newAccess = {}
+    else if responseInfo.response.data.len() > 0
+      newAccess = ParseJson(responseInfo.response.data)
+    end if
+  end if
+
+  return newAccess
 End Function
 
 
@@ -171,7 +547,6 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
           if authInfo.authType = invalid
             newAuthInfo.authType = "CODE"
           end if
-
           newAuthInfo = m.saveAuthInfo(newAuthInfo) 'returns invalid if not saved to the registry
         else
           ' Be careful to only do this if the service rejected suth refresh.  We don't
@@ -272,7 +647,7 @@ End Function
 Function tubiAuth_createAuthRequest(url as String, name = "" as String, options={} as Object) as Object
   authReq = invalid
   authInfo = m.getAuthInfo()
-  if authInfo <> invalid and authInfo.accessToken <> invalid
+  if authInfo <> invalid and authInfo.accessToken <> invalid and authInfo.userId <> invalid
     authHeaders = m.getAuthHeaders(authInfo.accessToken)
     if authHeaders <> invalid
       if options.headers <> invalid
@@ -313,8 +688,13 @@ End Function
 '                   associated with the account, and the age is >= 13.
 Function tubiAuth_updateAuthInfoWithAge(hasAge)
   authInfo = m.getAuthInfo()
+
   if authInfo <> invalid
-    authInfo.hasAge = hasAge.toStr()
+    if authInfo.userId <> invalid
+      ' presence of userId indicates the user is logged in.
+      ' Only save hasAge for a logged in user.
+      authInfo.hasAge = hasAge.toStr()
+    end if
 
     ' getAuthInfo() returns an int, but saveAuthInfo() expects a string for expire time
     if type(authInfo.expireTime) = "roInteger" or type(authInfo.expireTime) = "Integer"
@@ -396,7 +776,7 @@ End Function
 '  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 Function tubiAuth_saveAuthInfo(authInfo)
-  if authInfo <> invalid and authInfo.refreshToken <> invalid and authInfo.accessToken <> invalid and authInfo.expireTime <> invalid  and (type(authInfo.expireTime) = "String" or type(authInfo.expireTime) = "roString") and authInfo.userId <> invalid
+  if authInfo <> invalid and authInfo.refreshToken <> invalid and authInfo.accessToken <> invalid and authInfo.expireTime <> invalid  and (type(authInfo.expireTime) = "String" or type(authInfo.expireTime) = "roString")
     for each key in authInfo
       value = authInfo[key]
       if type(value) <> "roString"
@@ -467,7 +847,34 @@ Function tubiAuth_updateAuthInfo(newAccess, authInfo)
 End Function
 
 
+'returns an authInfo object that is ready to be sent into the registry (expireTime is a string representation of an integer)
+'@newAccess: assocArray, contains the new auth token and expire time as sent from the server during a refresh token action
+'@authInfo: assocArray, authInfo as pulled from the registry with the old auth token and expire time
+Function tubiAuth_updateAnonymousAuthInfo(newAccess, authInfo)
+  updatedAuthInfo = invalid
+  
+  if newAccess <> invalid and newAccess.expires_in <> invalid and newAccess.access_token <> invalid and newAccess.refresh_token <> invalid
+    dateTime = CreateObject("roDateTime")
+    newExpireTime = dateTime.asSeconds() + newAccess.expires_in
+
+    if authInfo <> invalid
+
+      authInfo.expireTime = newExpireTime.ToStr()
+      authInfo.accessToken = newAccess.access_token
+      authInfo.refreshToken = newAccess.refresh_token
+      authInfo.authType = "NOT_AUTHED"
+
+      updatedAuthInfo = authInfo
+    end if
+  end if
+
+  return updatedAuthInfo  
+End Function
+
+
 'used to get a new auth token when the current auth token has expired
+'@authInfo: assocArray, expired authToken
+'@port: roMessagePort
 Function tubiAuth_requestTokenRefresh(authInfo, port)
   body = {
     user_id: authInfo.userId
@@ -622,4 +1029,263 @@ Function tubiAuth_regDelete(key, section=invalid)
   sec = CreateObject("roRegistrySection", section)
   sec.Delete(key)
   sec.Flush()
+End Function
+
+
+' tubiAuth_createSignature
+' Creates a signature to be used for signing requests, as documented by Amazon Signature 4 spec
+' https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
+' The signature will be used when making a request fetch anonymous auth tokens for signed out users.
+'
+' @dateTime : ISO 8601 as String
+' @tokenReqInfo : assocarray, 
+' @secretKey : string, key response of signing_key
+' @algorithm : string, from constants
+'
+' returns signature : string
+'
+Function tubiAuth_createSignature(dateTime, tokenReqInfo, secretKey, algorithm)
+
+  canonicalRequest = m.constructCanonicalRequest(tokenReqInfo)
+
+  hashedCanonicalRequest = m.getHash(canonicalRequest)
+
+  stringToSign = m.createStringtoSignSignature(hashedCanonicalRequest, dateTime, algorithm)
+
+  calculatedSignature = m.calculateSignature(stringToSign, secretKey, dateTime)
+
+  return lcase(calculatedSignature)
+
+End Function
+
+
+' tubiAuth_constructCanonicalRequest
+'
+' @tokenReqInfo : assocarray, 
+'
+' returns canonicalRequest : string
+'
+Function tubiAuth_constructCanonicalRequest(tokenReqInfo)
+
+  method = tokenReqInfo.method
+  absolutePath = m.getAbsolutePath(tokenReqInfo.url)
+  queryString = m.constructCanonicalQueryString(tokenReqInfo.params)
+  canonicalHeader = m.constructCanonicalHeaders(tokenReqInfo.headers)
+  signedHeader = m.constructSignedHeaders(tokenReqInfo.headers)
+  hashedPayload = m.constructHashedPayload(tokenReqInfo.body)
+
+  canonicalRequest = method + chr(10) + absolutePath + chr(10) + queryString + chr(10) + canonicalHeader + chr(10) + signedHeader + chr(10) + hashedPayload
+  return canonicalRequest
+
+End Function
+
+
+' tubiAuth_getAbsolutePath
+'
+' @url : string, api request url
+'
+' returns absolutePath : string
+'
+Function tubiAuth_getAbsolutePath(url)
+
+  absolutePath = getUrlParts(url).path
+  return absolutePath
+
+End Function
+
+
+' tubiAuth_constructCanonicalQueryString
+'
+' @params : assocarray, 
+'
+' returns queryString : string
+'
+Function tubiAuth_constructCanonicalQueryString(params)
+
+  queryString = buildQueryString(params)
+  return queryString
+
+End Function
+
+
+' tubiAuth_constructCanonicalHeaders
+'
+' @headers : assocarray, 
+'
+' returns canonicalHeader : string
+'
+Function tubiAuth_constructCanonicalHeaders(headers)
+
+  canonicalHeader = ""
+  headersCount = headers.count()
+
+  for each item in headers.Items()
+    canonicalHeader = canonicalHeader + lcase(item.key).trim() + ":" + item.value.tostr().trim() + chr(10)
+  end for 
+
+  return canonicalHeader
+
+End Function
+
+
+' tubiAuth_constructSignedHeaders
+'
+' @headers : assocarray, 
+'
+' returns signedHeader : string
+'
+Function tubiAuth_constructSignedHeaders(headers)
+
+  signedHeader = ""
+  index = 0
+  headersCount = headers.count()
+
+  for each item in headers.Items()
+    signedHeader = signedHeader + lcase(item.key).trim()
+    index = index + 1
+    if index <> headersCount
+      signedHeader = signedHeader + ";"
+    end if
+  end for 
+
+  if signedHeader = ""
+    signedHeader = chr(10)
+  end if
+
+  return signedHeader
+
+End Function
+
+
+' tubiAuth_constructHashedPayload
+'
+' @body : string, 
+'
+' returns hashedPayload : string
+'
+Function tubiAuth_constructHashedPayload(body)
+
+  hashedPayload = m.getHash(body)
+  return hashedPayload
+
+End Function
+
+
+' tubiAuth_getHash
+'
+' @text : string,  to be hashed
+'
+' returns hash(lowercase) : string
+'
+Function tubiAuth_getHash(text)
+
+  ba1 = CreateObject("roByteArray")
+  ba1.FromAsciiString(text)
+  digest = CreateObject("roEVPDigest")
+  digest.Setup("sha256")
+  digest.Update(ba1)
+  hash = digest.Final()
+
+  return lcase(hash)
+
+End Function
+
+
+' tubiAuth_createStringtoSignSignature
+'
+' @hashedCanonicalRequest : string
+' @dateTime : roDateTIme
+' @algorithm : string, from constants
+'
+' returns stringToSign : string
+'
+Function tubiAuth_createStringtoSignSignature(hashedCanonicalRequest, dateTime, algorithm)
+
+  dateTimeFormatted = dateTime.replace("-","").replace(":","")
+  stringToSign = algorithm + chr(10) + dateTimeFormatted + chr(10) + hashedCanonicalRequest
+  return stringToSign
+
+End Function
+
+
+' tubiAuth_calculateSignature
+' Takes the component parts needed for constructing a signature and constructs the
+' signature to be used for signing requests, as documented by Amazon Signature 4 spec
+' https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
+' The signature will be used when making a request fetch anonymous auth tokens for signed out users.
+'
+' @stringToSign : string, derived string from hashedcanonicalrequest
+' @secretKey : string, key response of signing_key
+'
+' returns signature : string
+'
+Function tubiAuth_calculateSignature(stringToSign, secretKey, dateTime)
+
+  signature = invalid
+
+  date = dateTime.replace("-","").split("T")[0]
+
+  ba = CreateObject("roByteArray")
+  ba.FromBase64String(secretKey)
+
+  ba1 = CreateObject("roByteArray")
+  ba1.FromAsciiString("TUBI")
+
+  ba1.append(ba)
+
+  hmac = CreateObject("roHMAC")
+
+  if hmac.setup("sha256", ba1) = 0
+    message = CreateObject("roByteArray")
+    message.fromAsciiString(date)
+    kDate = hmac.process(message)
+
+    hmac = CreateObject("roHMAC")
+  
+    if hmac.setup("sha256", kDate) = 0
+      message = CreateObject("roByteArray")
+      message.fromAsciiString("tubi_request")
+      kSigning = hmac.process(message)
+
+      hmac = CreateObject("roHMAC")
+
+      if hmac.setup("sha256", kSigning) = 0
+        message = CreateObject("roByteArray")
+        message.fromAsciiString(stringToSign)
+        signature = hmac.process(message)
+        signature = lcase(signature.ToHexString())
+      end if
+
+    end if  
+  end if
+
+  if signature <> invalid
+    return lcase(signature)
+  end if
+
+  return signature
+
+End Function
+
+
+Function tubiAuth_getSignedHeaders(headers)
+  signedHeaders = ""
+
+  index = 0
+  if headers <> invalid
+    headersCount = headers.count()
+    for each item in headers.Items()
+      index = index + 1
+
+      if FindMemberFunction(item.value, "toStr") <> invalid
+        ' only add headers with values that can be converted to strings
+        signedHeaders = signedHeaders + lcase(item.key).trim()
+        if index <> headersCount
+          signedHeaders = signedHeaders + ";"
+        end if
+      end if
+    end for
+  end if
+
+  return signedHeaders
 End Function

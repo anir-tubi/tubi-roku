@@ -476,7 +476,6 @@ Function onCategoryResponseInBatch(msg) As Void
     ' free references to the batch so that it can be garbage collected
     m.top.categoryResponseInBatch = invalid
   end if
-
 End Function
 
 

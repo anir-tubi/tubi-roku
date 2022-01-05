@@ -19,7 +19,6 @@ Function showSearchScreen(constants)
 End Function
 
 
-
 Function onSearchContentSelected(msg)
   tubiLog("SearchScreenHelpers.onSearchContentSelected")
   m.autoplayContext = invalid
@@ -116,7 +115,6 @@ Function onSearchErrorResponse(result)
     searchScreen.contentUpdated = true
   end if
 End Function
-
 
 
 '''''''''''''''''''''

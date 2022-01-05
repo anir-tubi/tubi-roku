@@ -14,7 +14,8 @@ Function init()
                 }
   }
 
-  m.bSignedInUser = (m.global.authInfo <> invalid)
+  authInfo = m.global.authInfo
+  m.bSignedInUser = (authInfo <> invalid and authInfo.userId <> invalid)
   m.Title = m.top.findNode("title")
   m.SubTitle = m.top.findNode("subtitle")
 

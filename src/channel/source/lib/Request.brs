@@ -466,7 +466,11 @@ Function tubi_handleHttpEventv2(message As Object) As Object
         ' 1. Check success or failure?
         code = message.GetResponseCode()
 
-        if code = 403 or (code >= 200 and code < 400) or m.retries = 0
+        if code = 403 or code = 401 or (code >= 200 and code < 400) or m.retries = 0
+          ' 403 is used by matrix to communicate that the auth token was not valid
+          ' 401 is used by tensor to communicate that the auth token was not valid
+          ' No point in retrying if auth token is not valid
+          '
           ' Here on success or on retry limit or auth token was not valid
           m.response = {
             headers: message.GetResponseHeaders()

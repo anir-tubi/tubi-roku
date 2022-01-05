@@ -232,7 +232,9 @@ End Function
 Function onKeyEvent(key, press) as Boolean
   if press = true
     if key = "back"
-      if m.global.authInfo <> invalid
+      ' check if user is logged in by testing if the authInfo has a userId
+      authInfo = m.global.authInfo
+      if authInfo <> invalid and authInfo.userId <> invalid
         m.top.backButtonPressed = true
       else
         return false  

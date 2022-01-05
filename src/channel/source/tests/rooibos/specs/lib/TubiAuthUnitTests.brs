@@ -45,6 +45,26 @@ Function TubiAuthSetup()
   m.requestTokenTransfer = Function(externalAuthInfo, authPort)
     return {} 
   End Function
+
+  m.requestObjKeys = [
+    "isHttps"
+    "url"
+    "start"
+    "handleEvent"
+    "hasData"
+    "runSynchronous"
+    "cancel"
+    "name"
+    "response"
+    "uuid"
+    "addParamsToUrl_"
+    "urltransfer"
+    "klass"
+    "configMode"
+    "charlesProxyEnabled"
+    "charlesProxyUrl"
+    "passThroughCharlesProxy"
+  ]
   
 End function
 
@@ -233,11 +253,6 @@ Function tubiAuth_saveAuthInfo_test()
     userId: "6738"
   }
   authInfo5 = {
-    expireTime: "123456"
-    accessToken: "Some555Other666String777c"
-    refreshToken: "Some111Refresh999String000z"
-  }
-  authInfo6 = {
     expireTime: 123456
     accessToken: "Some555Other666String777d"
     refreshToken: "Some111Refresh999String000w"
@@ -249,14 +264,12 @@ Function tubiAuth_saveAuthInfo_test()
   authInfo3 = auth.saveAuthInfo(authInfo3) 'invalid?
   authInfo4 = auth.saveAuthInfo(authInfo4) 'invalid?
   authInfo5 = auth.saveAuthInfo(authInfo5) 'invalid?
-  authInfo6 = auth.saveAuthInfo(authInfo6) 'invalid?
   savedAuthInfo = RegReadAll(auth.authRegSection)
   m.assertNotInvalid(authInfo1)
   m.assertInvalid(authInfo2)
   m.assertInvalid(authInfo3)
   m.assertInvalid(authInfo4)
   m.assertInvalid(authInfo5)
-  m.assertInvalid(authInfo6)
   m.assertEqual(savedAuthInfo.expireTime, authInfo1.expireTime)
   m.assertEqual(savedAuthInfo.accessToken, authInfo1.accessToken)
   m.assertEqual(savedAuthInfo.refreshToken, authInfo1.refreshToken)
@@ -341,7 +354,7 @@ Function tubiAuth_updateAuthInfoWithAge_test()
 
   ' test when there is no authInfo in the registry (guest user)
   newAuthInfo = auth.updateAuthInfoWithAge(hasAge)
-  m.assertInvalid(newAuthInfo)
+  m.assertInvalid(newAuthInfo.hasAge)
 End Function
 
 
@@ -796,4 +809,384 @@ End Function
 Function tubiAuth_hasAge_AfterEach() as void
   'clear out any leftover info in the "testHasAge" section
   m.tubiAuth.regDelete("ageInfo", m.tubiAuth.guestUserHasAgeRegSection)
+End Function
+
+
+'@Test createSignature unit tests
+Function tubiAuth_createSignature_test()
+
+  auth = m.auth
+  dateTime = "2021-12-13T22:27:04Z"
+
+  sampleBody = {
+    "device_id":"5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
+    "id":"419f8a8e-b1aa-4763-ac4e-e451ee7358e7",
+    "platform":"roku",
+    "verifier":"846d141f-e75e-4414-9116-b83cda6f9e5f"
+  }
+  bodyJson = FormatJson(sampleBody)
+
+  headers = {
+    "Accept-Language": "en-US"
+    "Content-Type": "application/json"
+    "x-client-platform": "roku"
+    "x-client-version": "2.16.0"
+  }  
+
+  tokenReqInfo = {
+    body: bodyJson
+    headers: headers
+    method: "POST"
+    retries: 0
+    url: "https://account.staging-public.tubi.io/device/anonymous/token"
+  }
+
+  secretKey = "E0/oUbuegEiXkHF7L7QGEA/tMS2HjybWMOb9WoKgwww="
+  algorithm = "TUBI-HMAC-SHA256"
+
+  expected_signature = "e316fa7e1a49730292161f5041859b5455f69f288e542fa53162db638233aa4f"
+  signature = auth.createSignature(dateTime, tokenReqInfo, secretKey, algorithm)
+  m.assertEqual(signature, expected_signature)
+
+End Function
+
+
+'@Test constructCanonicalRequest unit tests
+Function tubiAuth_constructCanonicalRequest_test()
+
+  auth = m.auth
+  sampleBody = {
+    "device_id":"5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
+    "id":"daa3a5ee-d410-414a-8512-20cfe550468b",
+    "platform":"roku",
+    "verifier":"846d141f-e75e-4414-9116-b83cda6f9e5f"
+  }
+  bodyJson = FormatJson(sampleBody)
+
+  headers = {
+    "Accept-Language": "en-US"
+    "Content-Type": "application/json"
+    "x-client-platform": "roku"
+    "x-client-version": "2.16.0"
+  }  
+
+  tokenReqInfo = {
+    body: bodyJson
+    headers: headers
+    method: "POST"
+    retries: 0
+    url: "https://account.staging-public.tubi.io/device/anonymous/token"
+  }
+
+  expected_canonicalRequest = "POST" + chr(10) + "/device/anonymous/token" + chr(10) + "" + chr(10) + "accept-language:en-US" + chr(10) + "content-type:application/json" + chr(10) + "x-client-platform:roku" + chr(10) + "x-client-version:2.16.0" + chr(10) + "" + chr(10) + "accept-language;content-type;x-client-platform;x-client-version" + chr(10) + "9486237d473bb33fe8dbb139bb158c097bc913fa5ed6ec96e615bda168d16352"
+  canonicalRequest = auth.constructCanonicalRequest(tokenReqInfo)
+  m.assertEqual(canonicalRequest, expected_canonicalRequest)
+
+End Function
+
+
+'@Test getAbsolutePath unit tests
+Function tubiAuth_getAbsolutePath_test()
+
+  auth = m.auth
+  url = "https://account.staging-public.tubi.io/device/anonymous/token"
+  expected_absolutePath = "/device/anonymous/token"
+  absolutePath = auth.getAbsolutePath(url)
+  m.assertEqual(absolutePath, expected_absolutePath)
+
+End Function
+
+
+'@Test constructCanonicalQueryString unit tests
+Function tubiAuth_constructCanonicalQueryString_test()
+
+  auth = m.auth
+  params = {
+    "userId": "12345"
+    "platform": "roku"
+  }
+  expected_queryString = "platform=roku&userId=12345"
+  queryString = auth.constructCanonicalQueryString(params)
+  m.assertEqual(queryString, expected_queryString)
+
+End Function
+
+
+'@Test constructCanonicalHeaders unit tests
+Function tubiAuth_constructCanonicalHeaders_test()
+
+  auth = m.auth
+  headers = {
+    "Accept-Language": "en-US"
+    "Content-Type": "application/json"
+    "x-client-platform": "roku"
+    "x-client-version": "2.16.0"
+  }
+  expected_CanonicalHeaders = "accept-language:en-US" + chr(10) + "content-type:application/json" + chr(10) + "x-client-platform:roku" + chr(10) + "x-client-version:2.16.0" + chr(10)
+  canonicalHeaders = auth.constructCanonicalHeaders(headers)
+  m.assertEqual(canonicalHeaders, expected_CanonicalHeaders)
+
+End Function
+
+
+'@Test constructSignedHeaders unit tests
+Function tubiAuth_constructSignedHeaders_test()
+
+  auth = m.auth
+  headers = {
+    "Accept-Language": "en-US"
+    "Content-Type": "application/json"
+    "x-client-platform": "roku"
+    "x-client-version": "2.16.0"
+  }
+  expected_SignedHeaders = "accept-language;content-type;x-client-platform;x-client-version"
+  signedHeaders = auth.constructSignedHeaders(headers)
+  m.assertEqual(signedHeaders, expected_SignedHeaders)
+
+End Function
+
+
+'@Test constructHashedPayload unit tests
+Function tubiAuth_constructHashedPayload_test()
+
+  auth = m.auth  
+  body = {
+    "device_id":"5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
+    "id":"419f8a8e-b1aa-4763-ac4e-e451ee7358e7",
+    "platform":"roku",
+    "verifier":"846d141f-e75e-4414-9116-b83cda6f9e5f"
+  }
+  body = FormatJSON(body)
+  expected_HashedPayload = "7b3e447fd60d2543df79f5af98b2fddd698c1a3f01b5a04287594f7cbab8c5be"
+  hashedPayload = auth.constructHashedPayload(body)
+  m.assertEqual(hashedPayload, expected_HashedPayload)
+
+End Function
+
+
+'@Test getHash unit tests
+Function tubiAuth_getHash_test()
+
+  auth = m.auth
+  text = {
+    "device_id":"5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
+    "id":"419f8a8e-b1aa-4763-ac4e-e451ee7358e7",
+    "platform":"roku",
+    "verifier":"846d141f-e75e-4414-9116-b83cda6f9e5f"
+  }
+  body = FormatJSON(text)
+  expected_hashedValue = "7b3e447fd60d2543df79f5af98b2fddd698c1a3f01b5a04287594f7cbab8c5be"
+  hashedValue = auth.getHash(body)
+  m.assertEqual(hashedValue, expected_hashedValue)
+
+End Function
+
+
+'@Test createStringtoSignSignature unit tests
+Function tubiAuth_createStringtoSignSignature_test()
+
+  auth = m.auth
+  hashedCanonicalRequest = "ef0416b45da57e525cbf22efd414724a4ca8f63486ab7fb2e7f92eedeabac16e"
+  dateTime = "2021-12-14T00:54:02Z"
+  algorithm = "TUBI-HMAC-SHA256"
+  expected_stringToSign = "TUBI-HMAC-SHA256" + chr(10) + "20211214T005402Z" + chr(10) + "ef0416b45da57e525cbf22efd414724a4ca8f63486ab7fb2e7f92eedeabac16e"
+  stringToSign = auth.createStringtoSignSignature(hashedCanonicalRequest, dateTime, algorithm)
+  m.assertEqual(stringToSign, expected_stringToSign)
+
+End Function
+
+
+'@Test calculateSignature unit tests
+Function tubiAuth_calculateSignature_test()
+
+  auth = m.auth
+  stringToSign = "TUBI-HMAC-SHA256" + chr(10) + "20211214T005402Z" + chr(10) + "ef0416b45da57e525cbf22efd414724a4ca8f63486ab7fb2e7f92eedeabac16e"
+  secreyKey = "E0/oUbuegEiXkHF7L7QGEA/tMS2HjybWMOb9WoKgwww="
+  dateTime = "2021-12-14T00:54:02Z"
+  expected_calculatedSignature = "9bc5922f61e216f800229d029c80f8dc2df63310ddfc7c15bfd342a9434262f8"
+  calculatedSignature = auth.calculateSignature(stringToSign, secreyKey, dateTime)
+  m.assertEqual(calculatedSignature, expected_calculatedSignature)
+
+End Function
+
+
+'@Test fetchAnonymousAuthInfo unit tests
+Function tubiAuth_fetchAnonymousAuthInfo_test()
+
+  auth = m.auth
+  anonymousAuthInfo = auth.fetchAnonymousAuthInfo()
+  m.assertNotInvalid(anonymousAuthInfo)
+
+  anonAuthInfoKeys = [
+    "refreshToken"
+    "accessToken"
+    "expireTime"
+    "secretKey"
+  ]
+  m.assertAAHasKeys(anonymousAuthInfo, anonAuthInfoKeys)
+
+  m.assertType(anonymousAuthInfo.refreshToken, "String")
+  m.assertType(anonymousAuthInfo.accessToken, "String")
+  m.assertType(anonymousAuthInfo.expireTime, "String")
+  m.assertType(anonymousAuthInfo.secretKey, "String")
+
+End Function
+
+
+'@Test requestAnonymousSigningKey unit tests
+Function tubiAuth_getAnonymousSigningKeyRequest_test()
+
+  auth = m.auth
+  verifier = "test"
+  signingKeyReq = auth.getAnonymousSigningKeyRequest(verifier)
+  m.assertNotInvalid(signingKeyReq)
+  m.assertAAHasKeys(signingKeyReq, m.requestObjKeys)
+  m.assertEqual(signingKeyReq.method, "POST")
+  m.assertNotInvalid(signingKeyReq.body)
+
+  expectedBodyKeys = [
+    "challenge"
+    "version"
+    "platform"
+    "device_id"
+  ]
+  m.assertAAHasKeys(ParseJson(signingKeyReq.body), expectedBodyKeys)
+
+  m.assertNotInvalid(signingKeyReq.headers)
+  m.assertEqual(signingKeyReq.url, m.constants.urls.account.anonymous.signingKey)
+
+End Function
+
+
+'@Test getAnonymousTokenRequest unit tests
+Function tubiAuth_getAnonymousTokenRequest_test()
+
+  verifier = "1234"
+  response = {
+    id: "d9bfd534-9719-48d8-9f2a-101365092b35"
+    key: "E0/oUbuegEiXkHF7L7QGEA/tMS2HjybWMOb9WoKgwww="
+  }
+
+  auth = m.auth
+  anonymousTokenReq = auth.getAnonymousTokenRequest(verifier, response)
+  m.assertNotInvalid(anonymousTokenReq)
+  m.assertAAHasKeys(anonymousTokenReq, m.requestObjKeys)
+
+  m.assertEqual(anonymousTokenReq.method, "POST")
+  m.assertNotInvalid(anonymousTokenReq.body)
+
+  expectedBodyKeys = [
+    "id"
+    "verifier"
+    "device_id"
+    "platform"
+  ]
+  m.assertAAHasKeys(ParseJson(anonymousTokenReq.body), expectedBodyKeys)
+
+  m.assertNotInvalid(anonymousTokenReq.headers)
+
+  expectedQueryParams = [
+    "X-Tubi-Algorithm"
+    "X-Tubi-SignedHeaders"
+    "X-Tubi-Date"
+    "X-Tubi-Expires"
+    "X-Tubi-Signature"
+  ]
+  m.assertAAHasKeys(anonymousTokenReq.params, expectedQueryParams)
+  m.assertEqual(anonymousTokenReq.url, m.constants.urls.account.anonymous.token)
+
+End Function
+
+
+'@Test getAnonymousRefreshTokenRequest unit tests
+Function tubiAuth_getAnonymousRefreshTokenRequest_test()
+
+  oldAuthInfo = {
+    accesstoken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJKb2tlbiIsImRldmljZV9pZCI6IjVkOWJiM2IzLWRmYWItNTBhZi1hNjVlLTI4ZDI1Y2E0ZDMyYiIsImV4cCI6MTYzOTQ0MzMwMiwiZ2VuZXJhdGlvbiI6ImJkMDNlOGM4LWUxZTgtNGI4OS05OTcwLWEzNmIxM2NjMmU4ZiIsImlhdCI6MTYzOTQ0MzI0MiwiaXNzIjoiVHViaSBBY2NvdW50IFNlcnZpY2UiLCJqdGkiOiIycjA3aHNiMXN0bnE4ZGQzZGcwM2tmNjEiLCJuYmYiOjE2Mzk0NDMyNDIsInBsYXRmb3JtIjoicm9rdSIsInR5cGUiOjUsInV1aWQiOiI0MTlmOGE4ZS1iMWFhLTQ3NjMtYWM0ZS1lNDUxZWU3MzU4ZTcifQ.TG8vqb5p6QLK7D-h2hQ2rzC8CJa9cQjkyrzA2Jl9mi0"
+    expiretime: 1639443302
+    refreshtoken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJKb2tlbiIsImRldmljZV9pZCI6IjVkOWJiM2IzLWRmYWItNTBhZi1hNjVlLTI4ZDI1Y2E0ZDMyYiIsImV4cCI6MTYzOTQ0MzU0MiwiZ2VuZXJhdGlvbiI6ImJkMDNlOGM4LWUxZTgtNGI4OS05OTcwLWEzNmIxM2NjMmU4ZiIsImlhdCI6MTYzOTQ0MzI0MiwiaXNzIjoiVHViaSBBY2NvdW50IFNlcnZpY2UiLCJqdGkiOiIycjA3aHNiMXQ1cjJrZGQzZGcwM2tmODEiLCJuYmYiOjE2Mzk0NDMyNDIsInBsYXRmb3JtIjoicm9rdSIsInR5cGUiOjYsInV1aWQiOiI0MTlmOGE4ZS1iMWFhLTQ3NjMtYWM0ZS1lNDUxZWU3MzU4ZTcifQ.Dszj_pzJ64A79BFT9CiTQXuaqc_D1IE7PY9VtxoeidM"
+    secretKey: "E0/oUbuegEiXkHF7L7QGEA/tMS2HjybWMOb9WoKgwww="
+  }
+
+  auth = m.auth
+  anonymousRefreshTokenReq = auth.getAnonymousRefreshTokenRequest(oldAuthInfo)
+  m.assertNotInvalid(anonymousRefreshTokenReq)
+  m.assertAAHasKeys(anonymousRefreshTokenReq, m.requestObjKeys)
+  m.assertEqual(anonymousRefreshTokenReq.method, "POST")
+  m.assertNotInvalid(anonymousRefreshTokenReq.body)
+  m.assertNotInvalid(anonymousRefreshTokenReq.headers)
+  m.assertEqual(anonymousRefreshTokenReq.headers.Authorization, "Bearer " + oldAuthInfo.refreshtoken)
+
+  expectedQueryParams = [
+    "X-Tubi-Algorithm"
+    "X-Tubi-SignedHeaders"
+    "X-Tubi-Date"
+    "X-Tubi-Expires"
+    "X-Tubi-Signature"
+  ]
+  m.assertAAHasKeys(anonymousRefreshTokenReq.params, expectedQueryParams)
+  m.assertEqual(anonymousRefreshTokenReq.url, m.constants.urls.account.anonymous.refreshToken)
+
+End Function
+
+
+'@Test getSignedHeaders unit tests
+Function tubiAuth_getSignedHeaders_test()
+  ' test no headers
+  headers = {}
+  expectedSignedHeaders = ""
+  signedHeaders = m.auth.getSignedHeaders(headers)
+  m.assertEqual(signedHeaders, expectedSignedHeaders)
+
+  ' test invalid headers
+  headers = invalid
+  expectedSignedHeaders = ""
+  signedHeaders = m.auth.getSignedHeaders(headers)
+  m.assertEqual(signedHeaders, expectedSignedHeaders)
+
+  ' test headers that aren't strings
+  headers = {
+    "TestHeader": 12
+    "TestHeader2": {"not": "valid"}
+    "TestHeader3": "Ok"
+  }
+
+  expectedSignedHeadersAA = {
+    "testheader": true
+    "testheader3": true
+  }
+
+  signedHeaders = m.auth.getSignedHeaders(headers)
+  ' signedHeaders should looks something like (with order not guaranteed):
+  ' "testheader;testheader3"
+  splitSignedHeaders = signedHeaders.split(";")
+  m.assertEqual(splitSignedHeaders.count(), 2)
+  m.assertAAHasKeys(expectedSignedHeadersAA, splitSignedHeaders)
+
+  ' test the happy case
+  headers = {
+    "Content-Type": "application/json"
+    "Authorization": "Bearer someString"
+    "X-Tubi-Signature": "3lkajf9c"
+  }
+  expectedSignedHeadersAA = {
+    "content-type": true
+    "authorization": true
+    "x-tubi-signature": true
+  }
+
+  signedHeaders = m.auth.getSignedHeaders(headers)
+  ' signedHeaders should looks something like (with order not guaranteed):
+  ' "content-type;authorization;x-tubi-signature"
+  splitSignedHeaders = signedHeaders.split(";")
+  m.assertEqual(splitSignedHeaders.count(), 3)
+  m.assertAAHasKeys(expectedSignedHeadersAA, splitSignedHeaders)
+
+  ' test a single header
+  headers = {
+    "Connection": "keep-alive"
+  }
+  expectedSignedHeaders = "connection"
+  signedHeaders = m.auth.getSignedHeaders(headers)
+  m.assertEqual(signedHeaders, expectedSignedHeaders)
 End Function

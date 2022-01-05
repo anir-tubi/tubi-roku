@@ -63,7 +63,7 @@ Function onEpisodeSelected(msg)
       if episode <> invalid then
         content = episode.clone(false)
         bMature = isMatureRating(content)
-        if m.global.authInfo = invalid and bMature = true
+        if isLoggedInUser() = false and bMature = true
           '//if user is a guest and is trying to play content geared for only adults, then ask them to register
           displayMaturePlayWarning("mature-episode", episodesScreen.trackingPageInfo)
         else

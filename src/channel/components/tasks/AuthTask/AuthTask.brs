@@ -15,7 +15,12 @@ Function execInitializeUserData()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtils)
   authInfo = Auth.getAuthInfo()
 
-  userCats = getInitialUserCategories(Bookmarks, true, true, true)
+  getUserInfo = false
+  if isLoggedInUser(authInfo)
+    getUserInfo = true
+  end if
+
+  userCats = getInitialUserCategories(Bookmarks, true, true, getUserInfo)
   ' enhance the auth tokens with the user profile information
   if authInfo <> invalid and userCats.userInfo <> invalid
     tempAuthInfo = userCats.userInfo
@@ -37,7 +42,7 @@ Function execInitializeUserData()
       m.top.guestUserHasAgeInfo = guestUserHasAgeInfo
     end if
   end if
-  
+
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
   
@@ -82,7 +87,7 @@ Function execSignOut()
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
   m.top.guestUserHasAgeInfo = invalid
-  m.top.authInfo = invalid
+  m.top.authInfo = Auth.getAuthInfo()
 End Function
 
 
@@ -176,7 +181,8 @@ Function removeFromHistory()
   apiUtils = ApiUtils(constants)
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtils)
   
-  if m.global.authInfo <> invalid
+  authInfo = auth.getAuthInfo()
+  if isLoggedInUser(authInfo)
     '//Remove the resume position history for signed in users
 
     tubiLog("Removing content " + m.top.content.id + " from history")
@@ -322,4 +328,15 @@ Function execGetUserInfo()
   else
     m.top.userInfo = invalid
   end if
+End Function
+
+
+
+' @authInfo: assocArray, authInfo AA as returned by Auth().getAuthInfo()
+Function isLoggedInUser(authInfo = invalid)
+  if authInfo = invalid
+    authInfo = m.global.authInfo
+  end if
+
+  return (authInfo <> invalid and authInfo.userId <> invalid)
 End Function

@@ -53,7 +53,7 @@ Function setSettingsScreenSignInInfo()
     email: invalid
   }
 
-  if m.global.authInfo <> invalid
+  if isLoggedInUser() = true
     authInfo = m.global.authInfo
     aaSignIn.signedIn = true
     aaSignIn.email = authInfo.email
@@ -73,7 +73,7 @@ End Function
 
 Function setAuthInfoValue(attribute, value) as boolean
   bSuccess = false
-  if m.global.authInfo <> invalid
+  if isLoggedInUser() = true
     authInfo = m.global.authInfo
     authInfo[attribute] = value
     m.global.authInfo = authInfo
@@ -156,7 +156,7 @@ Function onParentalSettingSelected()
   if m.settingsScreen.signInInfo <> invalid and m.settingsScreen.signInInfo.signedIn = true
     m.settingsScreen.actionAfterActivation = ""
     authInfo = m.global.authInfo
-    if authInfo <> invalid and parentalSetting <> authInfo.parentalrating
+    if isLoggedInUser(authInfo) and parentalSetting <> authInfo.parentalrating
       ' parental settings have been updated
       nNowDate = getNowSeconds()
       nSavedSeconds = 0
@@ -258,7 +258,7 @@ Function refreshScreenAfterParentalChanges()
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
     authInfo = m.global.authInfo
-    if authInfo <> invalid and authInfo.parentalrating <> invalid
+    if isLoggedInUser(authInfo) and authInfo.parentalrating <> invalid
       homeScreen.parentalRating = authInfo.parentalrating
     end if
     fetchHomescreen(homescreen)

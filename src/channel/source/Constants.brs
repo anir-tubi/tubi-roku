@@ -247,6 +247,9 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannelGuide] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
 
+  constants.anonymous = {}
+    constants.anonymous.algorithm = "TUBI-HMAC-SHA256"  
+
   constants.thirdParty = {}
     'Nielsen ID token for integrating with Nielsen DAR via RAF
     constants.thirdParty.nielsenToken = "PB8C78BDD-9B1B-4020-B4DD-AE7917C0F396"
@@ -368,6 +371,16 @@ Function getConstants()
       constants.urls.matrix.container = constants.urls.matrix.urlBase + "/containers"
       constants.urls.matrix.channel = constants.urls.matrix.urlBase + "/containers" ' + "/:container_id"
 
+    'tensor url
+    constants.urls.tensor = {}
+      constants.urls.tensor.urlBase = "https://tensor.production-public.tubi.io/api/v1"
+      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+        constants.urls.tensor.urlBase = "https://tensor.staging-public.tubi.io/api/v1"
+      end if
+      constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/homescreen"
+      constants.urls.tensor.container = constants.urls.tensor.urlBase + "/containers"
+      constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/containers"
+      
     'users url
     constants.urls.users = {}
       constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
@@ -396,6 +409,11 @@ Function getConstants()
       constants.urls.account.login = constants.urls.account.urlBase + "/user/login"
       constants.urls.account.checkBirthday = constants.urls.account.urlBase + "/user/check_birthday_info"
       constants.urls.account.deviceRegister = constants.urls.account.urlBase + "/device/register"
+
+      constants.urls.account.anonymous = {}
+      constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
+      constants.urls.account.anonymous.token = constants.urls.account.urlBase + "/device/anonymous/token"
+      constants.urls.account.anonymous.refreshToken = constants.urls.account.urlBase + "/device/anonymous/refresh"
 
     'user event tracking url
     constants.urls.dataScience = {}
@@ -460,12 +478,15 @@ Function getConstants()
 
   'common http request headers
   constants.headers = {}
+    constants.headers.language = {"Accept-Language": "en-US"}
     constants.headers.json = {"Content-Type": "application/json"}
     constants.headers.platform =  {"x-client-platform": constants.platform}
     constants.headers.clientVersion = {"x-client-version": constants.deviceInfo.clientVersion}
     constants.headers.commonUapi = {}
       constants.headers.commonUapi.append(constants.headers.platform)
       constants.headers.commonUapi.append(constants.headers.clientVersion)
+      constants.headers.commonUapi.append(constants.headers.json)
+      constants.headers.commonUapi.append(constants.headers.language)
 
   'content type strings that we might get returned from uapi
   constants.uapiContentTypes = {}

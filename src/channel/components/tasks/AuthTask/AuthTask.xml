@@ -15,6 +15,7 @@
     <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
 
     <interface>
       <!-- INPUT -->

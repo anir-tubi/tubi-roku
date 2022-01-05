@@ -130,14 +130,33 @@ End Function
 ' @limit: int, the max number of contents in the response
 ' @bKidsMode: boolean, is the app in kids mode
 Function cmsApi_getChannelRequestInfo(channelId, limit, bKidsMode = false)
-  url = m.constants.urls.matrix.channel + "/" + channelId
   
-  options = m.getCommonOptions()
-  options.params["cursor"] = 0
-  options.params["limit"] = limit
-  options.params["isKidsMode"] = bKidsMode
-  options.params["includeChannels"] = true
-  options.params = m.setTupianPosterParam(options.params)
+  options = m.getCommonOptions(m.constants)
+
+  endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint
+
+  if endpoint = "matrix"
+
+    url = m.constants.urls.matrix.channel + "/" + channelId
+
+    options.params["cursor"] = 0
+    options.params["limit"] = limit
+    options.params["isKidsMode"] = bKidsMode
+    options.params["includeChannels"] = true
+    options.params = m.setTupianPosterParam(options.params)
+
+  else
+
+    url = m.constants.urls.tensor.channel + "/" + channelId
+
+    options.params["cursor"] = 0
+    options.params["contents_limit"] = limit
+    options.params["is_kids_mode"] = bKidsMode
+    options.params["include_channels"] = true
+    options.params = m.setTupianPosterParam(options.params)
+
+  end if
+
   options.headers["Accept-Version"] = "6.0.0"
 
   return {
@@ -181,34 +200,67 @@ End Function
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
 Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
-  url = m.constants.urls.matrix.homescreen
   
   options = m.getCommonOptions()
   params = options.params
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
 
-  params["includeEmptyHistory"] = true
-  params["includeEmptyQueue"] = true
-  params["isKidsMode"] = bKidsMode
-  params["includeVideoInGrid"] = true
-  params["contentMode"] = m.constants.ui.contentMode.homescreen ' default contentMode
+  endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint
 
-  if passedOptions.params <> invalid and passedOptions.params["contentMode"] <> invalid and passedOptions.params["contentMode"] <> ""
-    ' This will be overwritten by the same value later in this function
-    ' when we append the passedOptions.params to params. We add it here so the default value
-    ' is not used in the following logic, if a value was passed in for "contentMode"
-    params["contentMode"] = passedOptions.params["contentMode"]
-  end if
+  if endpoint = "matrix"
 
-  if params["contentMode"] <> m.constants.ui.contentMode.linear
-    ' don't send the Tupian image params for homescreen requests that are contentMode = "linear"
-    imageParamTypes = [
-      "poster"
-      "landscape"
-      "large_vitg"
-    ]
-    params = m.setImageParams(imageParamTypes, options.params)
+    url = m.constants.urls.matrix.homescreen
+
+    params["includeEmptyHistory"] = true
+    params["includeEmptyQueue"] = true
+    params["isKidsMode"] = bKidsMode
+    params["includeVideoInGrid"] = true
+    params["contentMode"] = m.constants.ui.contentMode.homescreen ' default contentMode
+
+    if passedOptions.params <> invalid and passedOptions.params["contentMode"] <> invalid and passedOptions.params["contentMode"] <> ""
+      ' This will be overwritten by the same value later in this function
+      ' when we append the passedOptions.params to params. We add it here so the default value
+      ' is not used in the following logic, if a value was passed in for "contentMode"
+      params["contentMode"] = passedOptions.params["contentMode"]
+    end if
+
+    if params["contentMode"] <> m.constants.ui.contentMode.linear
+      ' don't send the Tupian image params for homescreen requests that are contentMode = "linear"
+      imageParamTypes = [
+        "poster"
+        "landscape"
+        "large_vitg"
+      ]
+      params = m.setImageParams(imageParamTypes, options.params)
+    end if
+
+  else
+
+    url = m.constants.urls.tensor.homescreen
+
+    params["include_empty_history"] = true
+    params["include_empty_queue"] = true
+    params["is_kids_mode"] = bKidsMode
+    params["content_mode"] = "" ' default contentMode
+
+    if passedOptions.params <> invalid and passedOptions.params["content_mode"] <> invalid and passedOptions.params["content_mode"] <> ""
+      ' This will be overwritten by the same value later in this function
+      ' when we append the passedOptions.params to params. We add it here so the default value
+      ' is not used in the following logic, if a value was passed in for "contentMode"
+      params["content_mode"] = passedOptions.params["content_mode"]
+    end if
+
+    if params["content_mode"] <> m.constants.ui.contentMode.linear
+      ' don't send the Tupian image params for homescreen requests that are contentMode = "linear"
+      imageParamTypes = [
+        "poster"
+        "landscape"
+        "large_vitg"
+      ]
+      params = m.setImageParams(imageParamTypes, options.params)
+    end if
+
   end if
 
   if passedOptions <> invalid
@@ -252,7 +304,6 @@ End Function
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
 Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = false, passedOptions = {})
-  url = m.constants.urls.matrix.container + "/" + categoryId
 
   if name = invalid
     name = m.constants.reqNames.getCategory
@@ -260,39 +311,86 @@ Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = f
 
   options = m.getCommonOptions()
   params = options.params
-  params["isKidsMode"] = bKidsMode
-  params["includeChannels"] = true
-  params["includeVideoInGrid"] = true
-  params["cursor"] = 0
-  params["limit"] = m.constants.performance.categoryGridList.finalBlockSize
 
-  if passedOptions.params <> invalid
-    if passedOptions.params.contentMode <> invalid and passedOptions.params.contentMode <> ""
-      params["contentMode"] = passedOptions.params.contentMode
-    end if
-  end if
+  endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint
 
-  imageParamTypes = [
-    "poster"
-    "landscape"
-    "large_vitg"
-  ]
-  params = m.setImageParams(imageParamTypes, params)
+  if endpoint = "matrix"
 
-  headers = options.headers
-  headers["Accept-Version"] = "6.0.0"
+    url = m.constants.urls.matrix.container + "/" + categoryId
 
-  headers["x-tubi-inject-live-news"] = "false"
-  if passedOptions <> invalid and passedOptions.params <> invalid
-    contentMode = passedOptions.params.contentMode
+    params["isKidsMode"] = bKidsMode
+    params["includeChannels"] = true
+    params["includeVideoInGrid"] = true
+    params["cursor"] = 0
+    params["limit"] = m.constants.performance.categoryGridList.finalBlockSize
 
-    if contentMode = m.constants.ui.contentMode.homescreen or contentMode = m.constants.ui.contentMode.linear
-      if bKidsMode = false
-        ' add custom linear content header for all homescreen or linear TV category fetches
-        ' per a request from back end team, in order to facilitate better caching.
-        headers["x-tubi-inject-live-news"] = "true"
+    if passedOptions.params <> invalid
+      if passedOptions.params.contentMode <> invalid and passedOptions.params.contentMode <> ""
+        params["contentMode"] = passedOptions.params.contentMode
       end if
     end if
+
+    imageParamTypes = [
+      "poster"
+      "landscape"
+      "large_vitg"
+    ]
+    params = m.setImageParams(imageParamTypes, params)
+
+    headers = options.headers
+    headers["Accept-Version"] = "6.0.0"
+    headers["x-tubi-inject-live-news"] = "false"
+
+    if passedOptions <> invalid and passedOptions.params <> invalid
+      contentMode = passedOptions.params.contentMode
+  
+      if contentMode = m.constants.ui.contentMode.homescreen or contentMode = m.constants.ui.contentMode.linear
+        if bKidsMode = false
+          ' add custom linear content header for all homescreen or linear TV category fetches
+          ' per a request from back end team, in order to facilitate better caching.
+          headers["x-tubi-inject-live-news"] = "true"
+        end if
+      end if
+    end if    
+
+  else
+
+    url = m.constants.urls.tensor.container + "/" + categoryId
+
+    params["is_kids_mode"] = bKidsMode
+    params["include_channels"] = true
+    params["cursor"] = 0
+    params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
+
+    if passedOptions.params <> invalid
+      if passedOptions.params.content_mode <> invalid and passedOptions.params.content_mode <> ""
+        params["content_mode"] = passedOptions.params.content_mode
+      end if
+    end if
+
+    imageParamTypes = [
+      "poster"
+      "landscape"
+      "large_vitg"
+    ]
+    params = m.setImageParams(imageParamTypes, params)
+
+    headers = options.headers
+    headers["Accept-Version"] = "6.0.0"
+    headers["x-tubi-inject-live-news"] = "false"
+
+    if passedOptions <> invalid and passedOptions.params <> invalid
+      contentMode = passedOptions.params.content_mode
+  
+      if contentMode = "" or contentMode = m.constants.ui.contentMode.linear
+        if bKidsMode = false
+          ' add custom linear content header for all homescreen or linear TV category fetches
+          ' per a request from back end team, in order to facilitate better caching.
+          headers["x-tubi-inject-live-news"] = "true"
+        end if
+      end if
+    end if
+
   end if
 
   if passedOptions <> invalid

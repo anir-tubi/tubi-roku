@@ -196,3 +196,42 @@ Function stringUtils_isNonEmptyString_test()
   m.assertTrue(isString4)
 End Function
 
+
+'@Test buildQueryString unit tests
+Function stringUtils_buildQueryString_test()
+  ' test happy values
+  params = {
+    "X-Tubi-Algorithm": "TUBI-HMAC-SHA256"
+    "X-Tubi-Date": "20211213T184228Z"
+    "X-Tubi-Expires": "60"
+  }
+  expectedResult = "X-Tubi-Algorithm=TUBI-HMAC-SHA256&X-Tubi-Date=20211213T184228Z&X-Tubi-Expires=60"
+  queryString = buildQueryString(params)
+  m.assertEqual(expectedResult, queryString)
+
+  ' test no params
+  params = {}
+  expectedResult = ""
+  queryString = buildQueryString(params)
+  m.assertEqual(expectedResult, queryString)
+
+  ' test values that are not strings and/or don't convert to string
+  params = {
+    "int": 45
+    "aa": {
+      "does": "notexist"
+    }
+    "string": "test"
+  }
+  expectedResult = "int=45&string=test"
+  queryString = buildQueryString(params)
+  m.assertEqual(expectedResult, queryString)
+
+  ' test a single param
+  params = {
+    "X-Tubi-Expires": "60"
+  }
+  expectedResult = "X-Tubi-Expires=60"
+  queryString = buildQueryString(params)
+  m.assertEqual(expectedResult, queryString)
+End Function

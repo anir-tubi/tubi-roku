@@ -78,7 +78,7 @@ Function setSideNavSignedInItem(authInfo)
   tubiLog("SideNavHelpers.setSideNavSignedInItem")
   sName = getTranslation("menu_signIn")
 
-  if authInfo <> invalid
+  if isLoggedInUser(authInfo)
     '//User is signed in
     sName = ""
     if authInfo.firstName <> invalid
@@ -134,7 +134,7 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
       
-      if authInfo = invalid
+      if authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid)
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
         startSignIn(onSideNavSignInCompleted)
         bNewScreenCalledSuccess = true

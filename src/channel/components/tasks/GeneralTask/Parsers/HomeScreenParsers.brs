@@ -18,6 +18,11 @@ Function parseHomeScreenContentSuccess(fullResponse, requestNode)
     options = input.options
     if options <> invalid and options.params <> invalid
       contentMode = options.params.contentMode
+
+      if contentMode = invalid
+        contentMode = options.params.content_mode
+      end if
+
       isKidsMode = options.params.isKidsMode
     end if
 

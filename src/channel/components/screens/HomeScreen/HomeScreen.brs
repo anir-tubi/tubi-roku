@@ -85,8 +85,10 @@ Function init()
   m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt] 
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 
-  if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
-    m.top.parentalRating = m.global.authInfo.parentalrating
+  authInfo = m.global.authInfo
+
+  if authInfo <> invalid and authInfo.parentalrating <> invalid
+    m.top.parentalRating = authInfo.parentalrating
   end if
 
 End Function

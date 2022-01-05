@@ -421,52 +421,76 @@ Function fetchHomeScreen(homeScreen)
     homeScreen.unobserveFieldScoped("contentReady")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
 
-    sucessHandler = onHomescreenSuccessResponse
-    errorHandler = onHomescreenErrorResponse
+    sucessHandler = onHomeScreenSuccessResponse
+    errorHandler = onHomeScreenErrorResponse
     if homeScreen.id = m.constants.ui.screenIds.movieScreen
-      sucessHandler = onMoviescreenSuccessResponse
-      errorHandler = onMoviescreenErrorResponse
+      sucessHandler = onMovieScreenSuccessResponse
+      errorHandler = onMovieScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.tvScreen
-      sucessHandler = onTVscreenSuccessResponse
-      errorHandler = onTVscreenErrorResponse
-    else if homeScreen.id = m.constants.ui.screenIds.espanolScreen 
-      sucessHandler = onEspanolscreenSuccessResponse 
-      errorHandler = onEspanolscreenErrorResponse
-    else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen 
+      sucessHandler = onTVScreenSuccessResponse
+      errorHandler = onTVScreenErrorResponse
+    else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
+      sucessHandler = onEspanolScreenSuccessResponse
+      errorHandler = onEspanolScreenErrorResponse
+    else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen
       sucessHandler = onLinearTVScreenSuccessResponse
       errorHandler = onLinearTVScreenErrorResponse
     end if
 
-    options = {
-      params: {
-        "contentMode": homeScreen.contentMode
-      }
-      headers: {}
-    }
+    options = {}
+
+    headers = {}
+    params = {}
+
+    isKidsMode = shouldKidsModeBeSentToServer()
+
+    if m.endpoint = "matrix"
+      limitParamName = "limit"
+      contentModeParamName = "contentMode"
+      contentModeParamValue = homeScreen.contentMode
+    else
+      limitParamName = "contents_limit"
+      contentModeParamName = "content_mode"
+
+      ' For tensor API, we need to pass as empty string for homescreen
+      if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+        contentModeParamValue = ""
+      else
+        contentModeParamValue = homeScreen.contentMode
+      end if
+
+    end if
+
+    params[contentModeParamName] = contentModeParamValue
 
     isKidsMode = shouldKidsModeBeSentToServer()
 
     ' setting the x-tubi-inject-live-news header to true includes the live news container on the homescreen.
     ' This header is temporary and should be removed after the backend no longer requires it.
-    if options.params["contentMode"] = m.constants.ui.contentMode.homescreen and shouldKidsModeBeSentToServer() = false
-      options.headers["x-tubi-inject-live-news"] = "true"
+    if homeScreen.contentMode = m.constants.ui.contentMode.homescreen and isKidsMode = false
+      headers["x-tubi-inject-live-news"] = "true"
     end if
 
     ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
     ' This header is temporary and should be removed after the sports experiment concludes.
-    if options.params["contentMode"] = m.constants.ui.contentMode.linear or options.params["contentMode"] = m.constants.ui.contentMode.homescreen
+    if homeScreen.contentMode = m.constants.ui.contentMode.linear or homeScreen.contentMode = m.constants.ui.contentMode.homescreen
       if isKidsMode = false
-        options.headers["x-tubi-inject-linear"] = "true"
+        headers["x-tubi-inject-linear"] = "true"
       end if
     end if
 
     if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
-      options.params["groupSize"] = m.constants.settings.numContainers
-    else
-      options.params["groupSize"] = getExperimentResource("roku_limit_containers", "roku_limit_containers_v2").num_containers
+      if m.endpoint = "matrix"
+        params["groupSize"] = m.constants.settings.numContainers
+      else
+        params["group_size"] = m.constants.settings.numContainers
+      end if
     end if
 
-    options.params["limit"] = m.constants.performance.categoryGridList.initialBlockSize
+    params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize
+
+    options.params = params
+    options.headers = headers
 
     homeScreenReqInfo = m.CmsApi.homeScreenReqInfo(isKidsMode, options)
     m.makeRequest({
@@ -490,46 +514,46 @@ End Function
 ' onLinearTVScreenSuccessResponse
 '
 Function onLinearTVScreenSuccessResponse(response)
-  respondToHomescreenSuccessResponse(m.constants.ui.screenIds.linearTVScreen, response)
+  respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.linearTVScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
 ' onEspanolscreenSuccessResponse
 '
-Function onEspanolscreenSuccessResponse(response)
-  respondToHomescreenSuccessResponse(m.constants.ui.screenIds.espanolScreen, response)
+Function onEspanolScreenSuccessResponse(response)
+  respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.espanolScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
-' onMoviescreenSuccessResponse
+' onMovieScreenSuccessResponse
 '
-Function onMoviescreenSuccessResponse(response)
-  respondToHomescreenSuccessResponse(m.constants.ui.screenIds.movieScreen, response)
+Function onMovieScreenSuccessResponse(response)
+  respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.movieScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
 ' onTVscreenSuccessResponse
 '
-Function onTVscreenSuccessResponse(response)
-  respondToHomescreenSuccessResponse(m.constants.ui.screenIds.TVScreen, response)
+Function onTVScreenSuccessResponse(response)
+  respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.TVScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
-' onHomescreenSuccessResponse
+' onHomeScreenSuccessResponse
 '
-Function onHomescreenSuccessResponse(response)
-  respondToHomescreenSuccessResponse(m.constants.ui.screenIds.homeScreen, response)
+Function onHomeScreenSuccessResponse(response)
+  respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.homeScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
-' respondToHomescreenSuccessResponse
+' respondToHomeScreenSuccessResponse
 '
-Function respondToHomescreenSuccessResponse(screenID, rawResponse)
+Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     ' Content should be structured as:
@@ -564,50 +588,50 @@ End Function
 ' onLinearTVScreenErrorResponse
 '
 Function onLinearTVScreenErrorResponse(response)
-  respondToHomescreenErrorResponse(m.constants.ui.screenIds.linearTVScreen, response)
+  handleHomeScreenErrorResponse(m.constants.ui.screenIds.linearTVScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
 ' onEspanolscreenErrorResponse
 '
-Function onEspanolscreenErrorResponse(response)
-  respondToHomescreenErrorResponse(m.constants.ui.screenIds.espanolScreen, response)
+Function onEspanolScreenErrorResponse(response)
+  handleHomeScreenErrorResponse(m.constants.ui.screenIds.espanolScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
 ' onMoviescreenErrorResponse
 '
-Function onMoviescreenErrorResponse(response)
-  respondToHomescreenErrorResponse(m.constants.ui.screenIds.movieScreen, response)
+Function onMovieScreenErrorResponse(response)
+  handleHomeScreenErrorResponse(m.constants.ui.screenIds.movieScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
 ' onTVscreenErrorResponse
 '
-Function onTVscreenErrorResponse(response)
-  respondToHomescreenErrorResponse(m.constants.ui.screenIds.TVScreen, response)
+Function onTVScreenErrorResponse(response)
+  handleHomeScreenErrorResponse(m.constants.ui.screenIds.TVScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
-' onHomescreenSuccessResponse
+' onHomeScreenSuccessResponse
 '
-Function onHomescreenErrorResponse(response)
-  respondToHomescreenErrorResponse(m.constants.ui.screenIds.homeScreen, response)
+Function onHomeScreenErrorResponse(response)
+  handleHomeScreenErrorResponse(m.constants.ui.screenIds.homeScreen, response)
 End Function
 
 
 ''''''''''''''''''''''''''''''
-' respondToHomescreenErrorResponse
+' handleHomeScreenErrorResponse
 '
-Function respondToHomescreenErrorResponse(screenID, rawResponse)
+Function handleHomeScreenErrorResponse(screenID, response)
 
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
-    response = rawResponse'.response
+
     homeScreen.unobserveFieldScoped("contentReady")
     ' if we were loading in the background, don't show an error modal
     if homeScreen.isInFocusChain()

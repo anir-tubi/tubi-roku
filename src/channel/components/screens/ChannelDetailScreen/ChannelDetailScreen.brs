@@ -385,7 +385,7 @@ Function onKeyEvent(key, press) as Boolean
     if key = "back"
       authInfo = m.global.authInfo
       ' show SignInRequired modal when guest user presses back from ActivationCode Screen to ChannelDetailScreen
-      if authInfo = invalid
+      if authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid)
         m.top.signInRequired = true
         handled = true
       end if

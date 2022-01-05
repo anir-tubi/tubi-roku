@@ -2,15 +2,15 @@ Function init()
   tubiLog("")
   tubiLog("Init Scenegraph----------------")
   m._ = rodash()
-  
+
   m.constants = m.global.constants
-  
+
   ' Timer to find last time the app restarted
   m.lastAppRestartTimer = CreateObject("roTimespan")
-  
+
   ' Timer to find last time the app suspended
   m.appSuspendTimer = CreateObject("roTimespan")
-  
+
   generalTask = CreateObject("roSGNode", "GeneralTask")  ' initiate GeneralTask
   ' Initiate GeneralTaskModule by passing caller context.
   ' Calling GeneralTaskModule() will append methods to the local m.
@@ -111,6 +111,8 @@ Function init()
 
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid  ' indicates not logged in
+
+  m.endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint
 
   m.authInfoReceived = false    'is the auth info returned from the registry
   m.authInfoRefreshed = true    'is the auth info refreshed after receiving a deeplink with a refresh token
@@ -423,7 +425,8 @@ Function startUserExperience()
   else if m.authInfoRefreshed <> true
     ' checks if auth info has been received after a deeplink from external tubi device (iOS) supplied a refresh token
     ' if m.authInfoReceived is false, it means that a refresh token has been supplied
-    if m.global.authInfo = invalid
+    authInfo = m.global.authInfo
+    if authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid)
       ' we only need to refresh if the user is currently signed out
       m.authTask = CreateObject("roSGNode", "AuthTask")
       m.authTask.observeFieldScoped("authInfoRefreshed", "onAuthInfoRefreshed")
@@ -437,13 +440,14 @@ Function startUserExperience()
     end if
   else if shouldShowAgeGate() = true and m.ageVerificationComplete <> true
     ' check if we have age information for the user
-    if m.global.authInfo <> invalid
-      if m.global.authInfo.hasAge <> true
+    if isLoggedInUser() = true
+      authInfo = m.global.authInfo
+      if authInfo.hasAge <> true
         ' the user is a signed in user who has not been age verified, we should:
         ' 1) check if the backend has an age for the user
         ' 2) if not, show the age verification screen
         ' 3) upon getting a valid birthdate for the user, PATCH the user record on the backend
-        checkBirthdayInfo = m.userDeviceApi.checkBirthdayInfo(m.global.authInfo.userId)
+        checkBirthdayInfo = m.userDeviceApi.checkBirthdayInfo(authInfo.userId)
         m.makeRequest({
           url: checkBirthdayInfo.url
           requestType: m.constants.reqNames.checkBirthdayInfo
@@ -774,7 +778,7 @@ End Function
 ' @categoryId: string, the categoryId/containerId of the category we will refresh
 Function onHistoryQueueChange(categoryId)
   tubiLog("ContentController.onHistoryQueueChange")
-  if m.global.authInfo <> invalid
+  if isLoggedInUser() = true
     if m.authTask <> invalid
       m.authTask.unobserveFieldScoped("authInfo")
     end if
@@ -812,12 +816,15 @@ Function setDirtyUserCategories(categoryId)
     'auth request will add the userId param
     reqName = m.constants.reqNames.getCategory
 
-    options = {
-      params: {
-        "contentMode": m.constants.ui.contentMode.homescreen
-      }
-    }
-    categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, reqName, isKidsMode, options)
+    options = {}
+    params = {}
+    if m.endpoint = "matrix"
+      params["contentMode"] = m.constants.ui.contentMode.homescreen
+    else
+      params["content_mode"] = ""
+    end if
+    options.params = params
+    categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, options)
 
     m.makeRequest({
       url: categoryReqInfo.url
@@ -831,11 +838,14 @@ Function setDirtyUserCategories(categoryId)
 
     '//Apply the movie, TV, and Espanol filters if those screens exist
     if movieScreen <> invalid
-      optionMovie = {
-        params: {
-          "contentMode": m.constants.ui.contentMode.movie
-        }
-      }
+      optionMovie = {}
+      movieParams = {}
+      if m.endpoint = "matrix"
+        movieParams["contentMode"] = m.constants.ui.contentMode.movie
+      else
+        movieParams["content_mode"] = m.constants.ui.contentMode.movie
+      end if
+      optionMovie.params = movieParams
 
       categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, optionMovie)
 
@@ -851,11 +861,14 @@ Function setDirtyUserCategories(categoryId)
     end if
 
     if tvScreen <> invalid
-      optionTV = {
-        params: {
-          "contentMode": m.constants.ui.contentMode.tv
-        }
-      }
+      optionTV = {}
+      tvParams = {}
+      if m.endpoint = "matrix"
+        tvParams["contentMode"] = m.constants.ui.contentMode.tv
+      else
+        tvParams["content_mode"] = m.constants.ui.contentMode.tv
+      end if
+      optionTV.params = tvParams
 
       categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, optionTV)
 
@@ -871,11 +884,15 @@ Function setDirtyUserCategories(categoryId)
     end if
 
     if espanolScreen <> invalid
-      optionEspanol = {
-        params: {
-          "contentMode": m.constants.ui.contentMode.latino
-        }
-      }
+      optionEspanol = {}
+      esParams = {}
+
+      if m.endpoint = "matrix"
+        esParams["contentMode"] = m.constants.ui.contentMode.latino
+      else
+        esParams["content_mode"] = m.constants.ui.contentMode.latino
+      end if
+      optionEspanol.params = esParams
 
       categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, optionEspanol)
 
@@ -1125,11 +1142,12 @@ Function isKidsModeEnabledByParentalControls() as Boolean
   tubiLog("ContentController.isKidsModeEnabledByParentalControls")
   bEnabled = false
 
-  if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
-    if m.global.authInfo.parentalrating < 2
+  if isLoggedInUser() = true
+    authInfo = m.global.authInfo
+    if authInfo.parentalrating <> invalid and authInfo.parentalrating < 2
       bEnabled = true
     end if
-  end if
+  end if  
   return bEnabled
 End Function
 
@@ -1138,13 +1156,16 @@ Function isParentalControlsAdultLevel() as Boolean
   tubiLog("ContentController.isParentalControlsAdultLevel")
   bEnabled = true
   
-  if m.global.authInfo <> invalid and m.global.authInfo.parentalrating <> invalid
-    if m.global.authInfo.parentalrating = 3
-      bEnabled = true
-    else
+  if isLoggedInUser() = true 
+    
+    authInfo = m.global.authInfo
+
+    if authInfo.parentalrating = invalid or authInfo.parentalrating <> 3
       bEnabled = false
     end if
+    
   end if
+
   return bEnabled
 End Function
 
@@ -1207,7 +1228,6 @@ End Function
 ' wraps startChannel but forces an age gate if the user is signed out
 Function restartChannel()
   tubiLog("ContentController.restartChannel")
-  authInfo = m.global.authInfo
 
   if shouldDisplayInitialContentScreen() = true
     displayInitialContentScreen()
@@ -1641,12 +1661,12 @@ Function onCustomResume(msg)
         ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
         ' lots of edge cases, so for consistency, restarting the app is easiest.
         restartApp()
-      else if m.global.authInfo = invalid and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4)
+      else if isLoggedInUser() = false and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4)
         ' For guest users, if the time between last suspend and current resume is more than 24 hours, 
         ' disable Instant Resume & relaunch app from scratch.
         ' Also every 4 days once the app restarts in order to get starter/remote components
         restartApp()
-      else if m.global.authInfo <> invalid and lastAppRestartInDays >= 4
+      else if isLoggedInUser() = true and lastAppRestartInDays >= 4
         ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
         restartApp()
       else
@@ -1747,3 +1767,15 @@ Function resumeApp()
   myScene.signalBeacon("AppResumeComplete")
 
 End Function   
+
+
+' @authInfo: assocArray, authInfo AA as returned by Auth().getAuthInfo()
+Function isLoggedInUser(authInfo = invalid)
+  if authInfo = invalid
+    authInfo = m.global.authInfo
+  end if
+
+  return (authInfo <> invalid and authInfo.userId <> invalid)
+End Function
+
+

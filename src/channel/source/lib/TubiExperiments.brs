@@ -23,9 +23,6 @@ Function TubiExperiments(constants) as Object
       roku_discovery_v3: {
         roku_discovery_row_v3: {"position" : -2, "has_tvshows" : false, "has_movies" : false}
       }
-      roku_limit_containers: {
-        roku_limit_containers_v2: {"num_containers": -1}
-      }
       roku_initial_content_type_selector_icts: {
         roku_initial_content_type_selector_icts_v3: {"icts_menu_option": "movies_tv_separate"} ' valid values are : "no_icts", "movies_tv_combined", "movies_tv_separate", "no_espanol"
       }
@@ -54,6 +51,10 @@ Function TubiExperiments(constants) as Object
 
       roku_instant_resume_tweak: {
         roku_instant_resume_tweak_v1: {"enabled": false}
+      }
+
+      roku_homepage_endpoint:{
+        roku_homepage_endpoint_v1: {"endpoint": "matrix"} 'valid values are : "tensor", "matrix"
       }
     }
     

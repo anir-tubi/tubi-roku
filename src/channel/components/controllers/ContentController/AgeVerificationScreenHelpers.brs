@@ -478,11 +478,11 @@ Function onAgeVerified(age)
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
 
-  if m.global.authInfo <> invalid and age >= m.constants.ui.ages.ageGate
+  if isLoggedInUser() and age >= m.constants.ui.ages.ageGate
     ' age verified for logged in user so update auth info
     updatedAuthInfo = Auth.updateAuthInfoWithAge(true)
     m.global.authInfo = updatedAuthInfo
-  else if m.global.authInfo = invalid and age >= m.constants.ui.ages.ageGate
+  else if age >= m.constants.ui.ages.ageGate
     ' age verified for guest user, so store age verification
     m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(true)
   end if
@@ -529,14 +529,13 @@ Function onBirthdayCheckSuccess(hasAgeInfo)
     if updatedAuthInfo.hasAge = true
       m.ageVerificationComplete = true
     end if
-
     startUserExperience()
   else
 
     signInInfo = {}
     authInfo = m.global.authInfo
-    if authInfo <> invalid and authInfo.firstname <> invalid
-      signInInfo.email  = authInfo.email
+    if isLoggedInUser(authInfo) and authInfo.firstname <> invalid
+      signInInfo.email = authInfo.email
       signInInfo.firstname = authInfo.firstname
     end if
 
@@ -611,7 +610,7 @@ Function patchSignedInUserAge()
     }
 
     authInfo = m.global.authInfo
-    if authInfo <> invalid and authInfo.userId <> invalid
+    if isLoggedInUser(authInfo)
       patchSettingsInfo = m.userDeviceApi.patchSettingsInfo(authInfo.userId, options)
 
       m.makeRequest({
