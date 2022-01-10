@@ -131,7 +131,7 @@ End Function
 ' @bKidsMode: boolean, is the app in kids mode
 Function cmsApi_getChannelRequestInfo(channelId, limit, bKidsMode = false)
   
-  options = m.getCommonOptions(m.constants)
+  options = m.getCommonOptions()
 
   endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint
 
@@ -538,11 +538,27 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
             tubiLog("CategoryGridList.fetch whole: Asking GeneralTask for " + categoryId)
 
             options = {
-              params: {
+              params: {}
+            }
+
+            endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint
+            if endpoint = "matrix"
+              contentModeParam = {
                 "contentMode": homeScreen.contentMode 
               }
-            }
+            else if endpoint = "tensor"
+              if homescreen.contentMode = m.constants.ui.contentMode.homescreen
+                contentModeValue = ""
+              else
+                contentModeValue = homeScreen.contentMode
+              end if
+
+              contentModeParam = {
+                "content_mode": contentModeValue
+              }
+            end if
         
+            options.params.append(contentModeParam)
             categoryReqInfo = m.categoryReqInfo(categoryId, reqName, bKidsMode, options)
             categoryReqInfo.requestType = reqName
             categoryReqInfo.responseType = "node"

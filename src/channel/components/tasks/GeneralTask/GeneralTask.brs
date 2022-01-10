@@ -398,24 +398,17 @@ Function processErrorReponse(result, callbackTypes, job)
 
   ' some requests might not require error handling, and therefore may not have a parseError callback
   if parserCallback <> invalid
+    output = parserCallback(result.response, job.requestNode)
 
     ' this block will execute only for batch responses
     if job.batchNode <> invalid and job.batchNode.id <> invalid
-
-      accumulateBatchResponse(job, parserCallback, result)
-  
+      accumulateBatchResponse(job, output)
     else
-
-      output = parserCallback(result.response, job.requestNode)
-      job.requestNode.setField("error", output)
-
+      job.requestNode.error = output
     end if
-
   else
-    
-    job.requestNode.error = invalid
-
-  end if  
+    job.requestNode.response = invalid
+  end if
 
 End function
 
