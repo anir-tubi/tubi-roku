@@ -196,9 +196,6 @@ Function processResponse(msg)
     result = job.tubiReq.handleEvent(msg)
     retries = requestNode.retries
 
-    backoffFactor = requestNode.backoffFactor
-    pause = requestNode.pause
-
     if result <> invalid and result.response <> invalid 
 
       if callbackTypes <> invalid
@@ -209,26 +206,32 @@ Function processResponse(msg)
 
           processSuccessResponse(result, callbackTypes, job)
 
-        else if (code = 403 or code = 401) and m.constants.reqNames.acceptsTubiAuth[requestType] = true and retries > 0
-          ' request could not be authed by backend so attempt to refresh the auth token and try again
-          timeout = 100
-          if m.authInfo <> invalid and m.authInfo.userId <> invalid
-            newAuthInfo = m.auth.refreshAuthToken(m.authInfo, timeout)
-          else
-            newAuthInfo = m.auth.refreshAnonymousToken(m.authInfo, timeout)
-          end if
+        else if (code = 403 or code = 401) and m.constants.reqNames.acceptsTubiAuth[requestType] = true
+          if retries > 0
+            ' request could not be authed by backend so attempt to refresh the auth token and try again
+            timeout = 100
+            if m.authInfo <> invalid and m.authInfo.userId <> invalid
+              newAuthInfo = m.auth.refreshAuthToken(m.authInfo, timeout)
+            else
+              newAuthInfo = m.auth.refreshAnonymousToken(m.authInfo, timeout)
+            end if
 
-          if newAuthInfo <> invalid
-            pause = pause * backoffFactor
-            job.requestNode.retries = retries - 1
-            job.requestNode.pause = pause
-            sleep(pause) ' making some delay for retry request
-            makeApiRequest(job.requestNode, job.batchNode)
+            if newAuthInfo <> invalid
+              handleBackoff(requestNode, retries) 'pause before retry to relieve pressure on the backend
+              makeApiRequest(job.requestNode, job.batchNode)
+            else
+              processErrorReponse(result, callbackTypes, job)
+            end if
           else
             processErrorReponse(result, callbackTypes, job)
           end if
         else
-          processErrorReponse(result, callbackTypes, job)
+          if retries > 0
+            handleBackoff(requestNode, retries) 'pause before retry to relieve pressure on the backend
+            makeApiRequest(job.requestNode, job.batchNode)
+          else
+            processErrorReponse(result, callbackTypes, job)
+          end if
         end if
 
         m.jobStore.delete(id) ' delete the job from assocarray after the response is sent to avoid memory leak 
@@ -433,6 +436,24 @@ Function cancelRequests(requestNode) As Void
     end if
   end for
 
+End Function
+
+
+' Helper function to handle the sleep before retrying a request
+'
+' @requestNode: roSGNode, a request node as created by GeneralTaskModule().constructRequestNode()
+' @retries: integer, the number of remaining retries for a request/request node
+'
+' side effects: updates the retries and pause fields of the passed in requestNode
+Function handleBackoff(requestNode, retries)
+  backoffFactor = requestNode.backoffFactor
+  pause = requestNode.pause
+
+  sleep(pause) ' making some delay for retry request
+
+  pause = pause * backoffFactor
+  requestNode.pause = pause
+  requestNode.retries = retries - 1
 End Function
 
 

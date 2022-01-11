@@ -459,42 +459,30 @@ Function tubi_handleHttpEventv2(message As Object) As Object
     return invalid
   end if
     
-  ' handle retries
   if type(message) = "roUrlEvent" then
     if message.GetSourceIdentity() = m.urltransfer.GetIdentity() then
       if message.GetInt() = 1 then 
         ' 1. Check success or failure?
         code = message.GetResponseCode()
 
-        if code = 403 or code = 401 or (code >= 200 and code < 400) or m.retries = 0
-          ' 403 is used by matrix to communicate that the auth token was not valid
-          ' 401 is used by tensor to communicate that the auth token was not valid
-          ' No point in retrying if auth token is not valid
-          '
-          ' Here on success or on retry limit or auth token was not valid
-          m.response = {
-            headers: message.GetResponseHeaders()
-            code: code
-            data: message.GetString()
-            failReason: message.GetFailureReason()
-            name: m.name
-          }
+        m.response = {
+          headers: message.GetResponseHeaders()
+          code: code
+          data: message.GetString()
+          failReason: message.GetFailureReason()
+          name: m.name
+        }
 
-          ' print response info for qa team
-          if (m.configMode = "qa" or m.configMode = "staging")
-            if Left(m.name, 5) = "track"
-              print "received "; code; " for "; m.name
-              print m.response.data
-            end if
+        ' print response info for qa team
+        if (m.configMode = "qa" or m.configMode = "staging")
+          if Left(m.name, 5) = "track"
+            print "received "; code; " for "; m.name
+            print m.response.data
           end if
-
-          m.urltransfer = invalid ' release reference in case this will be reused
-          return m
-        else
-          m.retries = m.retries - 1    
-          m.start(m.urltransfer) ' fire off the request again            
         end if
 
+        m.urltransfer = invalid ' release reference in case this will be reused
+        return m
       else
         ' only 1 is valid?  Here for future-proofing
       end if

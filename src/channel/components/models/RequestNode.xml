@@ -13,10 +13,10 @@
     <!-- retries field tells how many times the api should retry if is fails -->
     <field id="retries" type="integer" value="3"/>
 
-    <!-- API Retry request will be made after a delay. this delay logic is decided based on backoffFactor & pause fields. -->
-    <field id="backoffFactor" type="float" value="1.5"/>
+    <!-- API Retry request will be made after a delay. this delay logic is decided based on backoffFactor & pause fields. backoffFactor is a multiplier value where total backoff time = backoffFactor * pause. -->
+    <field id="backoffFactor" type="float" value="2.0"/>
 
-    <!-- api retry will happen after a sleep of below mentioned time -->
-    <field id="pause" type="integer" value="1000"/>
+    <!-- api retry will happen after a sleep of below mentioned time in milliseconds -->
+    <field id="pause" type="integer" value="500"/>
   </interface>
 </component>
