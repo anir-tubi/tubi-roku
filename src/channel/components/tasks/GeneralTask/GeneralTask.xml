@@ -17,6 +17,7 @@
     <script type="text/brightscript" uri="Parsers/AgeVerificationScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/LinearVideoScreenParsers.brs" />
     <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+    <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
     <script type="text/brightscript" uri="../../../source/lib/ApiUtils.brs" />
@@ -27,9 +28,10 @@
     <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-
-    <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />    
+
+    <!-- StringUtils needed for Auth.brs -->
+    <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
 
     <interface>
       <field id="request" type="node" />
