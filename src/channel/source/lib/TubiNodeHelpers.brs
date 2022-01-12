@@ -11,6 +11,7 @@ Function TubiNodeHelpers()
     immutableRemoveChildIndex: tubiNodeHelpers_immutableRemoveChildIndex
     immutableRemoveChild: tubiNodeHelpers_immutableRemoveChild
     synchronizeChildren: tubiNodeHelpers_synchronizeChildren
+    countNodes: tubiNodeHelpers_countNodes
     getArrayInterfaceTypes: tubiNodeHelpers_getArrayInterfaceTypes
   }
 End Function
@@ -190,6 +191,38 @@ Function tubiNodeHelpers_synchronizeChildren(truth, lies)
       lies.insertChild(a.clone(false), i)
     end if
   end for
+End Function
+
+
+' @node: roSGNode, a node whose children (including self) will be counted
+' @depth: integer, the number of layers of children to count. For instance, depth of 1 will count
+'         just the passed in node. Depth of 2 will count the passed node and it's immediate children.
+'         Depth of 3 will include the passed node, immediate children, and grandchildren. Etc.
+'         Depth of 0 is the default and will count all nodes at all levels, up to 30 levels. Stack
+'         overflow seems to happen around 75 nodes deep, so leave max depth at 30 so there is plenty
+'         of room to spare.
+' returns the number of children that the passed node has, including the passed node itself.
+' 
+Function tubiNodeHelpers_countNodes(node, depth = 0)
+  nodeCount = 0
+
+  if (type(depth) <> "Integer" and type(depth) <> "roInt") or depth <= 0 or depth > 30
+    depth = 30
+  end if
+
+  if type(node) = "roSGNode"
+    nodeCount = 1
+    depth --
+
+    if depth > 0
+      for i = 0 to node.getChildCount() - 1
+        child = node.getChild(i)
+        nodeCount += m.countNodes(child, depth)
+      end for
+    end if
+  end if
+
+  return nodeCount
 End Function
 
 

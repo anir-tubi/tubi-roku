@@ -609,7 +609,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateHomescreen()")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   homescreenAA = {
-    id: ""
+    id: m.constants.ui.contentIds.homegrid
     title: ""
     validUntil: 0
     children: []    'categories

@@ -52,7 +52,7 @@ Function init()
   m.screenStack.observeFieldScoped("current", "onScreenChange")
 
   ' the screen cache holds the top level screens in memory so they are not recreated and reloaded unecessarily
-  m.screenCache = {}
+  m.cache = TubiCache(m.NodeHelpers, m.constants.ui.cacheableScreenIds, m.constants.ui.permanentlyCachedContentIds)
 
   ' This is an associative array that keeps track of when pixels are sent out when sponsored containers are displayed. The pixels should only be sent once per page load.
   m.sentSponsorPixels = {} 
@@ -1244,48 +1244,31 @@ Function restartChannelAfterAgeVerification()
 End Function
 
 
-' a setter for the screen cache - can overwrite screens in the cache if the passed in screen has
+' a wrapper for the screen cache getter - can overwrite screens in the cache if the passed in screen has
 ' the same id as a screen already existing in the screen cache
 '
 ' @screen: roSGNode, a screen node
 ' returns true or false depending if the screen was successfully set
 Function setInScreenCache(screen)
-  if screen <> invalid and screen.id <> invalid and m.constants.ui.cacheableScreenIds[screen.id] = true
-    m.screenCache[screen.id] = screen
-    return true
-  end if
-  return false
+  return m.cache.setInScreenCache(screen)
 End Function
 
 
-' a getter for the screen cache - getting does not remove the screen from the cache
+' a wrapper for the screen cache setter - getting does not remove the screen from the cache
 '
 ' @screenId: string, the id of the screen that is to be retrieved
 ' returns the screen node or invalid if no screens were found with the passed in id
 Function getFromScreenCache(screenId)
-  if type(screenId) = "String" or type(screenId) = "roString"
-    return m.screenCache[screenId] 
-  end if
-  return invalid
+  return m.cache.getFromScreenCache(screenId)
 End Function
 
 
-' a deleter for the screen cache - we may need to remove screens from the cache in the case of content loading errors
+' a wrapper for the screen cache deleter - we may need to remove screens from the cache in the case of content loading errors
 ' returns true if the screen was successfully deleted, otherwise returns false
 '
 ' @screenId: string, the id of the screen that is to be removed
 Function deleteFromScreenCache(screenId)
-  if isString(screenId) = true
-    screen = getFromScreenCache(screenId)
-
-    if screen <> invalid
-      m.NodeHelpers.unobserveAllScoped(screen)
-    end if
-
-    return m.screenCache.delete(screenId)
-  end if
-
-  return false
+  return m.cache.deleteFromScreenCache(screenId)
 End Function
 
 
@@ -1306,14 +1289,9 @@ Function destroyScreen(sScreenID)
 End Function
 
 
+' a wrapper for emptying the screen cache
 Function emptyScreenCache()
-  for each screenId in m.screenCache
-    screen = getFromScreenCache(screenId)
-    m.NodeHelpers.unobserveAllScoped(screen)
-  end for
-
-  m.screenCache = {}
-  return m.screenCache
+  return m.cache.emptyScreenCache()
 End Function
 
 

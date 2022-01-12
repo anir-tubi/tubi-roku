@@ -617,7 +617,7 @@ End Function
 
 
 ''''''''''''''''''''''''''''''
-' onHomeScreenSuccessResponse
+' onHomeScreenErrorResponse
 '
 Function onHomeScreenErrorResponse(response)
   handleHomeScreenErrorResponse(m.constants.ui.screenIds.homeScreen, response)

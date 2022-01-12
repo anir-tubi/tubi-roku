@@ -2,6 +2,7 @@
 
 '@Setup
 Function TubiNodeHelpersSetup()
+  m.generateNodeTree = tubiNodeHelpersTest_generateNodeTree
 End Function
 
 
@@ -197,6 +198,82 @@ Function tubiNodeHelpers_immutableRemoveChildren_test()
   m.AssertInvalid(clonedParent.findNode(nodesToRemove[0].id))
   m.AssertInvalid(clonedParent.findNode(nodesToRemove[1].id))
   m.AssertInvalid(clonedParent.findNode(nodesToRemove[2].id))
+End Function
+
+
+'@Test countNodes unit tests
+Function tubiNodeHelpers_countNodes_test()
+  ' test passing non node
+  nodeCount = m.nodeHelpers.countNodes(invalid)
+  m.AssertEqual(nodeCount, 0)
+
+  ' test passing negative depth - depth expected to be converted to 30
+  nodes = m.generateNodeTree(3, 3) 'generates 13 nodes
+  nodeCount = m.nodeHelpers.countNodes(nodes, -1)
+  m.AssertEqual(nodeCount, 13)
+
+  ' test non integer depth - depth expected to be converted to 30
+  nodes = m.generateNodeTree(3, 3) 'generates 13 nodes
+  nodeCount = m.nodeHelpers.countNodes(nodes, "12")
+  m.AssertEqual(nodeCount, 13)
+
+  ' test non integer depth with node tree of greater than 30 layers
+  nodes = m.generateNodeTree(33, 1) 'generates 33 nodes
+  nodeCount = m.nodeHelpers.countNodes(nodes, "12")
+  m.AssertEqual(nodeCount, 30)
+
+  ' test passed depth of greater than 30
+  nodes = m.generateNodeTree(33, 1) 'generates 33 nodes
+  nodeCount = m.nodeHelpers.countNodes(nodes, 33)
+  m.AssertEqual(nodeCount, 30)
+
+  ' test node tree depth of greater than 30 with no passed depth
+  nodes = m.generateNodeTree(33, 1) 'generates 33 nodes
+  nodeCount = m.nodeHelpers.countNodes(nodes)
+  m.AssertEqual(nodeCount, 30)
+
+  ' test passed depth which is greater than the number of layers
+  nodes = m.generateNodeTree(16, 1) 'generates 33 nodes
+  nodeCount = m.nodeHelpers.countNodes(nodes, 24)
+  m.AssertEqual(nodeCount, 16)
+
+  ' test parent only node
+  node = CreateObject("roSGNode", "ContentNode")
+  nodeCount = m.nodeHelpers.countNodes(node)
+  m.AssertEqual(nodeCount, 1)
+
+  ' test parent with single child
+  node = CreateObject("roSGNode", "ContentNode")
+  node.createChild("ContentNode")
+  nodeCount = m.nodeHelpers.countNodes(node)
+  m.AssertEqual(nodeCount, 2)
+
+  ' test parent with multiple children and no passed depth
+  nodes = m.generateNodeTree(3, 5) 'generates tree of 3 layers, each non edge node having 5 children
+  nodeCount = m.nodeHelpers.countNodes(nodes)
+  m.AssertEqual(nodeCount, 31)
+
+  nodes = m.generateNodeTree(3, 5) 'generates tree of 3 layers, each non edge node having 5 children
+  nodeCount = m.nodeHelpers.countNodes(nodes)
+  m.AssertEqual(nodeCount, 31)
+End Function
+
+
+' helper function to recursively generate a node tree containing x amount of layers of 
+' ContentNodes with each non leaf/external node containing y children
+' (if x = 1, the root node is also a leaf node, and no children will be added).
+' Total nodes on the tree = Σ (n=0...x-1) (y^(i))
+Function tubiNodeHelpersTest_generateNodeTree(x, y)
+  parent = CreateObject("roSGNode", "ContentNode")
+
+  for i = 0 to y-1
+    if x - 1 > 0
+      child = m.generateNodeTree(x-1, y)
+      parent.appendChild(child)
+    end if
+  end for
+
+  return parent
 End Function
 
 

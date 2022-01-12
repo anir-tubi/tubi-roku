@@ -855,6 +855,14 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.emailInputScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.signInScreen] = true
 
+    ' top level content ids for parent content nodes that don't have a content id from the backend
+    constants.ui.contentIds = {}
+      constants.ui.contentIds.homegrid = "homegrid"
+
+    ' content ids of contents that should not be removed from the content cache
+    constants.ui.permanentlyCachedContentIds = {}
+      constants.ui.permanentlyCachedContentIds[constants.ui.contentIds.homegrid] = true
+
     constants.ui.imageSizes = {}
       
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
