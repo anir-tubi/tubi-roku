@@ -120,54 +120,54 @@ End Function
 
 Function getGridDataFromServer(screen)
   tubiLog("ChannelGridScreenHelpers.getGridDataFromServer")
-  if screen.hasField("task") = true and type(screen.task) = "roSGNode"
-    ' If the screen already has a ChannelsCategoriesMetadataTask attached to it, cancel any potential outstanding requests
-    ' so that we don't have any reference to them floating about when we tear down the task.
-    ' We will tear down the task after the request is canceled in onGridContentCanceled().
-    ' Since we tear down the task on recieving a response or error, we should only hit this condition if
-    ' there is a request in flight.
-    screen.task.cancelRequest = true
-  else
-    task = CreateObject("roSGNode", "ChannelsCategoriesMetadataTask")
-    task.kidsMode = shouldKidsModeBeSentToServer()
-    task.displayChannels = screen.displayChannels
-    screen.addField("task", "node", false)
-    screen.task = task
-    task.addField("target", "node", false)
-    task.target = screen
-    task.observeFieldScoped("response", "onGridContentResponse")
-    task.observeFieldScoped("error", "onGridContentError")
-    task.observeFieldScoped("canceled", "onGridContentCanceled")
-    task.control = "RUN"
+  if screen <> invalid
+    shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
+    categoriesListReqInfo = m.cmsApi.getCategoriesListRequestInfo(shouldKidsModeBeSentToServer)
+
+    m.makeRequest({
+      url: categoriesListReqInfo.url
+      requestType: m.constants.reqNames.getCategoriesListScreen
+      options: categoriesListReqInfo.options
+      successCallback: onCategoriesListSuccess
+      errorCallback: onCategoriesListError
+      responseType: "node"
+      screenId: screen.id
+    })
   end if
 End Function
 
 
-Function onGridContentResponse(msg)
-  tubiLog("ChannelGridScreenHelpers.onGridContentResponse")
-  task = msg.getRoSGNode()
-  screen = task.target
-  screen.isLoading = false
-  screen.content = task.response
-  screen.shouldLoadContent = true
-  tearDownChannelGridTask(task)
+' @response: roSGNode, a contentNode with children for each category or channel
+Function onCategoriesListSuccess(response)
+  tubiLog("ChannelGridScreenHelpers.onCategoriesListSuccess")
 
-  if m.refreshingChannelGridCache <> true
-    loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
-    screenTrackingLoad(screen.trackingPageInfo, loadTime)
+  if response <> invalid
+    screenId = m.constants.ui.screenIds.categoryListScreen
+    if response.id = m.constants.ui.contentIds.channelList
+      screenId = m.constants.ui.screenIds.channelListScreen
+    end if
+
+    screen = getFromScreenCache(screenId)
+
+    if screen <> invalid
+      screen.isLoading = false
+      screen.content = response
+      screen.shouldLoadContent = true
+
+      if m.refreshingChannelGridCache <> true
+        loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
+        screenTrackingLoad(screen.trackingPageInfo, loadTime)
+      end if
+    end if
   end if
 End Function
 
 
-Function onGridContentError(msg)
+Function onCategoriesListError(errorInfo)
 '//::TODO:: make sure the side nav button returns to previous focus.
-  tubiLog("ChannelGridScreenHelpers.onGridContentError")
-  errorInfo = msg.getData()
-  task = msg.getRoSGNode()
-  ' Screen is created/pushed in showChannelScreen, since there is no content, remove it.
-  ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
-  ' sent in the case of an error.
-  screen = tearDownChannelGridTask(task)
+  tubiLog("ChannelGridScreenHelpers.onCategoriesListError")
+
+  screen = getFromScreenCache(errorInfo.screenId)
   
   if screen <> invalid and (screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen)
     popScreen(false, false)
@@ -178,10 +178,12 @@ Function onGridContentError(msg)
 
     sErrorType = m.constants.errors.context.categoriesScreen
     prelimMessage = getTranslation("screenCategories_error_retrieve_message")
+
     if screen.displayChannels = true
       sErrorType = m.constants.errors.context.channelsScreen
       prelimMessage = getTranslation("screenChannels_error_retrieve_message")
     end if
+
     errorCode = getUserFacingErrorCode(sErrorType, m.constants.errors.subtypes.fetchError, errorInfo.code)
 
     dialogEvent = {
@@ -199,38 +201,9 @@ Function onGridContentError(msg)
       openTrackEvent: dialogEvent
       trackingTask: m.trackingLoggingTask
     }
+
     showErrorModal(modalInfo)
     loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
     screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
   end if
-End Function
-
-
-' Callback once the canceled request has been sucessfully canceled
-' Tear down the task, and re-run getGridDataFromServer
-Function onGridContentCanceled(msg)
-  tubiLog("ChannelGridScreenHelpers.onGridContentCanceled")
-  task = msg.getRoSGNode()
-  screen = tearDownChannelGridTask(task)
-  if screen <> invalid
-    getGridDataFromServer(screen)
-  end if
-End Function
-
-
-' @task: roSGNode, a ChannelsCategoriesMetadataTask
-' returns the screen that was attached to the task as a target (presumably the ChannelGridScreen)
-Function tearDownChannelGridTask(task)
-  if task <> invalid
-    task.unobserveFieldScoped("response")
-    task.unobserveFieldScoped("error")
-    task.unobserveFieldScoped("canceled")
-    screen = task.target
-    if screen <> invalid
-      screen.task = invalid
-      task.target = invalid
-      return screen
-    end if
-  end if
-  return invalid
 End Function

@@ -12,6 +12,7 @@
     <script type="text/brightscript" uri="Parsers/SignInScreenParser.brs" />
     <script type="text/brightscript" uri="Parsers/DetailScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/HomeScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/CategoryListScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/SearchScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/AgeVerificationScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/LinearVideoScreenParsers.brs" />

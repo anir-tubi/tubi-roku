@@ -204,7 +204,7 @@ Function getConstants()
   constants.reqNames = {}
     constants.reqNames.getSearchScreen = "getSearchScreen"
     constants.reqNames.getHomescreen = "getHomescreen"
-    constants.reqNames.getChannelsCategories = "getChannelsCategories"
+    constants.reqNames.getCategoriesListScreen = "getCategoriesListScreen"
     constants.reqNames.getSearchDefault = "getSearchDefault"
     constants.reqNames.getCategory = "getCategory"
     constants.reqNames.getSingleContent = "getSingleContent"
@@ -234,7 +234,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.checkBirthdayInfo] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchScreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getHomescreen] = true
-      constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannelsCategories] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategoriesListScreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchDefault] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSingleContent] = true
@@ -858,6 +858,8 @@ Function getConstants()
     ' top level content ids for parent content nodes that don't have a content id from the backend
     constants.ui.contentIds = {}
       constants.ui.contentIds.homegrid = "homegrid"
+      constants.ui.contentIds.categoryList = "categoriesList"
+      constants.ui.contentIds.channelList = "channelsList"
 
     ' content ids of contents that should not be removed from the content cache
     constants.ui.permanentlyCachedContentIds = {}

@@ -99,6 +99,11 @@ Function createParsingCallbacks()
     parseError: parseDefaultSearchError
   }
 
+  m.requestTypes[m.constants.reqNames.getCategoriesListScreen] = {
+    parseSuccess: parseCategoryListSuccess
+    parseError: parseCategoryListError
+  }
+
 End Function
 
 

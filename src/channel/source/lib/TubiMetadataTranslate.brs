@@ -9,7 +9,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateContainer: tubiMetadataTranslate_translateContainer
     translateChannel: tubiMetadataTranslate_translateChannel
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
-    translateChannelsCategories: tubiMetadataTranslate_translateChannelsCategories
+    translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
     translateLinearChannelGuide: tubiMetadataTranslate_translateLinearChannelGuide
 
     ' private
@@ -718,21 +718,24 @@ End Function
 
 
 ''''''''''''''''''''
-' translateChannelsCategories
+' translateCategoriesListScreen
 '
 ' Translate a response from matrix/categories or matrix/channels for use in ChannelGridScreen
-Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, bDisplayChannels = true) As Object
-  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateChannelsCategories()")
+Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate, bDisplayChannels = true) As Object
+  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateCategoriesListScreen()")
   sID_queue = m.constants.ui.categoryIds.queue 
   sID_continue_watching = m.constants.ui.categoryIds.history
 
+  screenContentId = ""
   oLimitTypes = {}
   if bDisplayChannels = true
     oLimitTypes[m.constants.ui.categoryTypes.channel] = true
+    screenContentId = m.constants.ui.contentIds.channelList
   else
     oLimitTypes[m.constants.ui.categoryTypes.regular] = true
     oLimitTypes[m.constants.ui.categoryTypes.history] = true
     oLimitTypes[m.constants.ui.categoryTypes.queue] = true
+    screenContentId = m.constants.ui.contentIds.categoryList
   end if
 
   catRecommend = invalid
@@ -742,11 +745,12 @@ Function tubiMetadataTranslate_translateChannelsCategories(contentToTranslate, b
   '//The following is a modifed version of the tubiMetadataTranslate_translateHomescreen() method
   translated = CreateObject("roSGNode", "CategoryContentNode")
   homescreenAA = {
-    id: ""
+    id: screenContentId
     title: ""
     validUntil: 0
     children: []    'categories
   }
+
   if contentToTranslate.valid_duration <> invalid
     homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
   else

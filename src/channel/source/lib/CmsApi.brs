@@ -15,7 +15,7 @@ Function CmsApi(constants, request, auth, apiUtils)
     thumbnailsReqInfo: cmsApi_getThumbnailsRequestInfo
     channelReq: cmsApi_getChannelRequest
     channelReqInfo: cmsApi_getChannelRequestInfo
-    channelsCategoriesScreenReq: cmsApi_getChannelsCategoriesScreenRequest
+    getCategoriesListRequestInfo: cmsApi_getCategoriesListRequestInfo
     homeScreenReq: cmsApi_getHomeScreenRequest
     homeScreenReqInfo: cmsApi_getHomeScreenRequestInfo
     categoryReq: cmsApi_getCategoryRequest
@@ -167,16 +167,18 @@ End Function
 
 
 '''''''''''''''''''''
-' channelsCategoriesScreenReq()
+' cmsApi_getCategoriesListRequestInfo()
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 '
-Function cmsApi_getChannelsCategoriesScreenRequest(bKidsMode = false)
+Function cmsApi_getCategoriesListRequestInfo(bKidsMode = false)
   options = {
     params: {
       limit: 0
     }
   }
-  return m.homeScreenReq(bKidsMode, options)
+
+
+  return m.homeScreenReqInfo(bKidsMode, options)
 End Function
 
 
