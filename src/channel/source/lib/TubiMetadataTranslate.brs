@@ -607,6 +607,8 @@ End Function
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homescreen", authInfo=invalid, isKidsMode=false, uiMode="standard") As Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateHomescreen()")
+  isLoggedInUser = (authInfo <> invalid and authInfo.userId <> invalid)
+
   translated = CreateObject("roSGNode", "CategoryContentNode")
   homescreenAA = {
     id: m.constants.ui.contentIds.homegrid
@@ -667,7 +669,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       ' increasing the utilityRowPosition by 1 if the ContinueWatching has no children AND the user
       ' is signed in (continue watching row is displayed if the user is not signed in regardless).
       '//::TODO:: Remove this section once we have API support
-      if container.children.Count() = 0 and (authInfo <> invalid or uiMode = m.constants.ui.modes.kidsAgeGate)
+      if container.children.Count() = 0 and (isLoggedInUser = false or uiMode = m.constants.ui.modes.kidsAgeGate)
         utilityRowPosition = utilityRowPosition + 1
       end if
     else if container.id = m.constants.ui.categoryIds.queue
@@ -689,7 +691,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       categoryAA = invalid
     end if
 
-    if container.id = m.constants.ui.categoryIds.history and authInfo = invalid and uiMode <> m.constants.ui.modes.kidsAgeGate
+    if container.id = m.constants.ui.categoryIds.history and isLoggedInUser = false and uiMode <> m.constants.ui.modes.kidsAgeGate
       '//if continue watching container while user is signed out,
       ' then ensure row is empty except for 1 item that will entice users to sign in
       categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)

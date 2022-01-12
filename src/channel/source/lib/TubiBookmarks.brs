@@ -26,6 +26,7 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     'private methods
     createBookmarksRequest: tubiBookmarks_createBookmarksRequest_
     createHistoryRequest: tubiBookmarks_createHistoryRequest_
+    isLoggedInUser: tubiBookmarks_isLoggedInUser
   }
 
   tubiBookmarks = {}
@@ -80,7 +81,7 @@ End Function
 '@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
 Function tubiBookmarks_createBookmarksRequest_(id as String, action as String, contentType = "" as String, bKidsMode = false as Boolean) as Object
   authInfo = m.auth.getAuthInfo()  'from registry
-  if authInfo = invalid or authInfo.accessToken = invalid
+  if m.isLoggedInUser(authInfo) = false
     return invalid
   end if
 
@@ -178,6 +179,9 @@ End Function
 Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Integer, bKidsMode = false as Boolean) as Object
 
   authInfo = m.auth.getAuthInfo()
+  if m.isLoggedInUser(authInfo) = false
+    return invalid
+  end if
 
   url = m.constants.urls.users.history
 
@@ -256,7 +260,7 @@ End Function
 '@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
 Function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, position as Dynamic, action as String, contentType = "" as String, bKidsMode = false as Boolean) as Object
   authInfo = m.auth.getAuthInfo()
-  if authInfo = invalid
+  if m.isLoggedInUser(authInfo) = false
     return invalid
   end if
 
@@ -314,7 +318,7 @@ Function tubiBookmarks_getInitialBookmarksReq(localId) as Object
 
   'if the user is not logged in (aka doesn't have an accessToken in local memory),
   'then don't get any bookmarks
-  if authInfo = invalid or authInfo.accessToken = invalid
+  if m.isLoggedInUser(authInfo) = false
     return invalid
   end if
 
@@ -343,7 +347,7 @@ Function tubiBookmarks_getInitialHistoryReq(localId) as Object
 
   'if the user is not logged in (aka doesn't have an accessToken in local memory),
   'then don't get any history
-  if authInfo = invalid
+  if m.isLoggedInUser(authInfo) = false
     return invalid
   end if
 
@@ -440,7 +444,7 @@ End Function
 
 Function tubiBookmarks_getUserInfoReq()
   authInfo = m.auth.getAuthInfo()
-  if authInfo = invalid or authInfo.accessToken = invalid
+  if m.isLoggedInUser(authInfo) = false
     return invalid
   end if
 
@@ -478,7 +482,7 @@ End Function
 
 Function tubiBookmarks_updateParentalRatingReq(newRating, password)
   authInfo = m.auth.getAuthInfo()
-  if authInfo = invalid or authInfo.accessToken = invalid
+  if m.isLoggedInUser(authInfo) = false
     return invalid
   end if
 
@@ -495,4 +499,9 @@ Function tubiBookmarks_updateParentalRatingReq(newRating, password)
     body: FormatJson(body)
   }
   return m.auth.createAuthRequest(url, "updateParentalRating", options)
+End Function
+
+
+Function tubiBookmarks_isLoggedInUser(authInfo)
+  return (authInfo <> invalid and authInfo.userId <> invalid)
 End Function

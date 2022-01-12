@@ -191,14 +191,17 @@ Function updateHistory(content, nowPos)
 
     bKidsMode = shouldKidsModeBeSentToServer()
     postUserHistory = m.Bookmarks.addHistoryReq(content, nowPos, bKidsMode)
-    m.makeRequest({
-      url: postUserHistory.url
-      requestType: m.constants.reqNames.postUserHistory
-      options: postUserHistory.options
-      successCallback: onHistorySuccess
-      responseType: "assocarray"
-      silenceCallbackWarnings: true
-    })
+
+    if postUserHistory <> invalid
+      m.makeRequest({
+        url: postUserHistory.url
+        requestType: m.constants.reqNames.postUserHistory
+        options: postUserHistory.options
+        successCallback: onHistorySuccess
+        responseType: "assocarray"
+        silenceCallbackWarnings: true
+      })
+    end if
 
   end if 
 
