@@ -676,13 +676,22 @@ End Function
 Function initVideoTracking(videoPlayer)
   if m.constants.thirdParty.youbora.enabled = true
     if videoPlayer <> invalid
+      'If we are switching from VOD to LIVE or LIVE to VOD, latest videoPlayerScreen's 
+      'sendYouboraError should be observed. 
+      videoPlayer.unobserveFieldScoped("sendYouboraError")
+      videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
       if m.youboraTask = invalid
-        videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
         m.youboraTask = m.top.createChild("YBPluginCustom")
         m.youboraTask.id = "Youbora"
         m.youboraTask.options = m.constants.thirdParty.youbora.config
         m.global.addFields({ YouboraLogActive: m.constants.thirdParty.youbora.debug })
         m.youboraTask.control = "RUN"
+      else
+        'Setting m.youboraTask.taskState to "stop" triggers the youboraTask to 
+        'unobserve the VideoPlayer that is currently being observed in the youboraTask, 
+        'which enables it to accept the new videoPlayer node (that will be set below) 
+        'and re-observe the video node attributes.
+        m.youboraTask.taskState = "stop"
       end if
       m.youboraTask.videoplayer = videoPlayer.findNode("VideoNode")
       m.youboraTask.segInfo = videoPlayer.segInfo
