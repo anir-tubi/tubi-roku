@@ -2,8 +2,8 @@
 <!--
  - Channel Detail Screen
  -
- - This is a screen that displays information for a single content "channel".
- -
+ - This is a screen that displays a grid of channels or categories.
+ - It may be casually called a "Category List Screen"
  -->
 <component name="ChannelGridScreen" extends="Group">
 
@@ -41,7 +41,7 @@
       -->
       <field id="callingPage" type="string" />
       
-      <field id="reloadUserCategoriesResponse" type="assocarray" alwaysNotify="true"/>
+      <field id="reloadUserCategoriesResponse" type="node" alwaysNotify="true"/>
       
     <!-- OUTPUT -->
 

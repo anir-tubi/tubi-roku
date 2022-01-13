@@ -46,23 +46,17 @@ End Function
 
 
 Function onReloadUserCategoriesResponse()
-  handledRequest = m.top.reloadUserCategoriesResponse
   tubiLog("ChannelGridScreen.onReloadUserCategoriesResponse")
-  if handledRequest.response <> invalid then
+  newCategory = m.top.reloadUserCategoriesResponse
+
+  if newCategory <> invalid
     bEmpty = true
-    response = handledRequest.response
-    if response.code >= 200 and response.code < 300 then
-      '//this is a successful response
-      newCategory = handledRequest.convertedMetadata
-      if newCategory <> invalid and newCategory.getChildCount() > 0
-        '//this category has content
-        bEmpty = false
-      end if 
+    if newCategory.getChildCount() > 0
+      '//this category has content
+      bEmpty = false
     end if
 
-    '//The ID of the category that was reported to have recently changed
-    sChangedCategoryID = handledRequest.id
-    checkForContentAndRefresh(bEmpty, sChangedCategoryID)
+    checkForContentAndRefresh(bEmpty, newCategory.id)
   end if
 End Function
 
