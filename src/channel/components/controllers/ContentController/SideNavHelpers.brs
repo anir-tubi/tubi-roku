@@ -294,7 +294,7 @@ Function onSideNavItemSelected()
 
       contentNode = CreateObject("roSGNode", "CategoryContentNode")
       contentNode.id = m.constants.ui.categoryIds.queue
-      showChannelScreen(contentNode, "MENU")
+      showCategoryDetailsScreen(contentNode, "MENU")
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.settings
       if isKidsUIOn() <> true

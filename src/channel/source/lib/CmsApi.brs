@@ -13,12 +13,9 @@ Function CmsApi(constants, request, auth, apiUtils)
     upNextContentRequestInfo: cmsApi_getUpNextContentRequestInfo
     singleContentReqInfo: cmsApi_getSingleContentRequestInfo
     thumbnailsReqInfo: cmsApi_getThumbnailsRequestInfo
-    channelReq: cmsApi_getChannelRequest
-    channelReqInfo: cmsApi_getChannelRequestInfo
     getCategoriesListRequestInfo: cmsApi_getCategoriesListRequestInfo
     homeScreenReq: cmsApi_getHomeScreenRequest
     homeScreenReqInfo: cmsApi_getHomeScreenRequestInfo
-    categoryReq: cmsApi_getCategoryRequest
     categoryReqInfo: cmsApi_getCategoryRequestInfo
     searchReq: cmsApi_getSearchRequest
     searchReqInfo: cmsApi_getSearchRequestInfo
@@ -108,57 +105,6 @@ Function cmsApi_getThumbnailsRequestInfo(contentId)
   options = m.getCommonOptions()
   options.params["type"] = "5x"
   options.params["max_width"] = m.constants.deviceInfo.displayWidth
-  return {
-    url: url
-    options: options
-  }
-End Function
-
-
-' @channelId: string, id of the channel ex: "shout_factory"
-' @limit: int, the max number of contents in the response
-' @bKidsMode: boolean, is the app in kids mode
-Function cmsApi_getChannelRequest(channelId, limit, bKidsMode = false)
-  channelReqInfo = m.channelReqInfo(channelId, limit, bKidsMode)
-  url = channelReqInfo.url
-  options = channelReqInfo.options
-  return m.createAuthRequest(url, m.constants.reqNames.getChannel, options)
-End Function
-
-
-' @channelId: string, id of the channel ex: "shout_factory"
-' @limit: int, the max number of contents in the response
-' @bKidsMode: boolean, is the app in kids mode
-Function cmsApi_getChannelRequestInfo(channelId, limit, bKidsMode = false)
-  
-  options = m.getCommonOptions()
-
-  endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint
-
-  if endpoint = "matrix"
-
-    url = m.constants.urls.matrix.channel + "/" + channelId
-
-    options.params["cursor"] = 0
-    options.params["limit"] = limit
-    options.params["isKidsMode"] = bKidsMode
-    options.params["includeChannels"] = true
-    options.params = m.setTupianPosterParam(options.params)
-
-  else
-
-    url = m.constants.urls.tensor.channel + "/" + channelId
-
-    options.params["cursor"] = 0
-    options.params["contents_limit"] = limit
-    options.params["is_kids_mode"] = bKidsMode
-    options.params["include_channels"] = true
-    options.params = m.setTupianPosterParam(options.params)
-
-  end if
-
-  options.headers["Accept-Version"] = "6.0.0"
-
   return {
     url: url
     options: options
@@ -289,28 +235,11 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
 End Function
 
 
-'''''''''''''''''''''
-' categoryReq()
-'
-Function cmsApi_getCategoryRequest(categoryId, name = invalid, bKidsMode = false, passedOptions = {})
-  categoryReqInfo = m.categoryReqInfo(categoryId, name, bKidsMode, passedOptions)
-  url = categoryReqInfo.url
-  options = categoryReqInfo.options
-  return m.createAuthRequest(url, name, options)
-End Function
-
-
 ' @categoryId, string, the UAPI id for the category
-' @name: string, identifier for the type of request (found in constants)
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
-Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = false, passedOptions = {})
-
-  if name = invalid
-    name = m.constants.reqNames.getCategory
-  end if
-
+Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOptions = {})
   options = m.getCommonOptions()
   params = options.params
 
@@ -416,7 +345,6 @@ Function cmsApi_getCategoryRequestInfo(categoryId, name = invalid, bKidsMode = f
     id: categoryId
     url: url
     options: options
-    name: name
   }
 End Function
 
@@ -561,7 +489,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
             end if
         
             options.params.append(contentModeParam)
-            categoryReqInfo = m.categoryReqInfo(categoryId, reqName, bKidsMode, options)
+            categoryReqInfo = m.categoryReqInfo(categoryId, bKidsMode, options)
             categoryReqInfo.requestType = reqName
             categoryReqInfo.responseType = "node"
             categoryReqInfo.silenceCallbackWarnings = true

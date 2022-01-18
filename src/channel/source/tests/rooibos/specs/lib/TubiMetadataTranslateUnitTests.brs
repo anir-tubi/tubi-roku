@@ -251,19 +251,6 @@ Function tubiMetadataTranslate_translate_test()
 End Function
 
 
-'@Test translateChannel unit tests
-Function tubiMetadataTranslate_translateChannel_test()
-  channelJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/channel.json")
-  fetchTime = CreateObject("roDateTime").AsSeconds()
-  translated = m.translate.translateChannel(ParseJson(channelJson))
-  m.assertNotInvalid(translated)
-  m.assertEqual(translated.id, "cbs")
-  m.assertEqual(translated.slug, "cbs")
-  m.assertTrue(translated.totalCount = 95)
-  m.assertTrue(translated.getChildCount() = 95)
-End Function
-
-
 '@Test translateLinearChannelGuide unit tests
 Function tubiMetadataTranslate_translateLinearChannelGuide_test()
   linearHomescreenJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/linearHomescreen.json")

@@ -2,12 +2,14 @@ Function init()
   m._ = rodash()
   '//This var is used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.contentLoadedAndFocused = false
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.experiments = TubiExperiments(m.constants)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
 
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
@@ -42,7 +44,7 @@ Function init()
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
 
-  m.top.screenLevel = m.constants.ui.screenLevels.channelDetailScreen
+  m.top.screenLevel = m.constants.ui.screenLevels.categoryDetailsScreen
   m.top.handlesTransportVoiceRequests = true
   
   m.bLeftButtonActsLikeBackButton = true
@@ -90,10 +92,10 @@ Function onScreenFocusChange()
 
   if m.top.hasFocus() = true
     if m.top.content <> invalid
-      if m.top.content.getChild(0).getChildCount() > 0
+      if m.top.content.getChildCount() > 0
         m.VideoGrid.setFocus(true)
       end if
-      if shouldRefresh(m.top.content.getChild(0)) = true  'cacheValidationMixin
+      if shouldRefresh(m.top.content) = true  'cacheValidationMixin
         m.top.refreshChannel = true
       end if
     end if    
@@ -103,8 +105,9 @@ End Function
 
 
 Function onLoadContent()
+  tubiLog("CategoryDetailsScreen.onLoadContent")
   if m.top.content <> invalid
-    category = m.top.content.getChild(0)
+    category = m.top.content
     m.contentLoadedAndFocused = false
     if category.getChildCount() > 0
       if category.sponsorImages <> invalid
@@ -136,7 +139,7 @@ End Function
 
 
 Function onIsLoading()
-  tubiLog("ChannelDetailScreen.onIsLoading")
+  tubiLog("CategoryDetailsScreen.onIsLoading")
   if m.top.isLoading = true
     m.InfoPanel.visible = false
     m.VideoGrid.visible = false
@@ -150,12 +153,17 @@ End Function
 
 
 Function onItemFocused()
-  tubiLog("ChannelDetailScreen.onItemFocused")
+  tubiLog("CategoryDetailsScreen.onItemFocused")
   if m.top.content <> invalid
     item = m.VideoGrid.itemFocused
-    category = m.top.content.getChild(0) 'contentNode
-    content = category.getChild(item) 'contentNode
-    numColumns = m.VideoGrid.numColumns
+    category = m.top.content 'contentNode
+
+    content = invalid
+    partialContent = category.getChild(item) 'contentNode
+
+    if partialContent <> invalid
+      content = m.metadataTranslate.getContentFromCategoryJson(category, partialContent.id)
+    end if
 
     if content <> invalid
       ' Update the info panel
@@ -169,6 +177,9 @@ Function onItemFocused()
       else
         m.top.backgroundUriList = [m.defaultBackgroundUri]
       end if
+
+      numColumns = m.VideoGrid.numColumns
+
       if m.contentLoadedAndFocused = true
         '//Do not send out tracking when the grid is initially loaded. When an item 1st gain focus, this indocates that the grid was just loaded.
         ' Update the tracking info.
@@ -211,14 +222,16 @@ End Function
 
 ' @itemSelected: integer, the position in the grid
 Function handleItemSelected(itemSelected)
-  category = m.top.content.getChild(0)
+  category = m.top.content
   content = category.getChild(itemSelected)
 
-  ' Update the tracking info so that it is ready once the ContentController creates the details page
-  updateTrackingInfo(category, content, itemSelected)
+  if content <> invalid
+    ' Update the tracking info so that it is ready once the ContentController creates the details page
+    updateTrackingInfo(category, content, itemSelected)
 
-  ' Pass info to ContentController
-  m.top.contentSelected = content
+    ' Pass info to ContentController
+    m.top.contentSelected = content
+  end if
 End Function
 
 
@@ -226,26 +239,28 @@ End Function
 ' @content: roSGNode, contentNode containing info about the content that was selected from the grid
 ' @itemSelected: integer, the position in the grid
 Function updateTrackingInfo(category, content, itemSelected)
-  m.top.trackingPageInfo = createTrackingPageInfo(category)
+  if content <> invalid
+    m.top.trackingPageInfo = createTrackingPageInfo(category)
 
-  categorySlug = ""
-  if category <> invalid
-    categorySlug = category.slug
-  end if
+    categorySlug = ""
+    if category <> invalid
+      categorySlug = category.slug
+    end if
 
-  numColumns = m.VideoGrid.numColumns
-  col = 1 + (itemSelected MOD numColumns)
-  row = 1 + (itemSelected \ numColumns)
-  'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
-  m.top.trackingComponentInfo = {
-    componentType: "category_component"
-    componentValues: {
-      category_slug: categorySlug
-      category_row: 1
-      content_tile: m.Tracking.getAnalyticsTile(content, col, row)
+    numColumns = m.VideoGrid.numColumns
+    col = 1 + (itemSelected MOD numColumns)
+    row = 1 + (itemSelected \ numColumns)
+    'Set the tracking component of the item that was selected so it can be accessed as part of the navigateToPage event
+    m.top.trackingComponentInfo = {
+      componentType: "category_component"
+      componentValues: {
+        category_slug: categorySlug
+        category_row: 1
+        content_tile: m.Tracking.getAnalyticsTile(content, col, row)
+      }
     }
-  }
-  m.contentLoadedAndFocused = false
+    m.contentLoadedAndFocused = false
+  end if
 End Function
 
 
@@ -384,7 +399,7 @@ Function onKeyEvent(key, press) as Boolean
   else
     if key = "back"
       authInfo = m.global.authInfo
-      ' show SignInRequired modal when guest user presses back from ActivationCode Screen to ChannelDetailScreen
+      ' show SignInRequired modal when guest user presses back from ActivationCode Screento CategoryDetailsScreen
       if authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid)
         m.top.signInRequired = true
         handled = true
@@ -403,7 +418,7 @@ Function onTransportVoiceRequest(msg)
   if inputInfo <> invalid and inputInfo.command <> invalid
     command = inputInfo.command
   end if
-  tubiLog("ChannelDetailScreen.onTransportVoiceRequest " + command)
+  tubiLog("CategoryDetailsScreen.onTransportVoiceRequest " + command)
 
   if m.VideoGrid.isInFocusChain() = true
     if command = "play"
@@ -422,7 +437,7 @@ End Function
 
 Function handlePlayInput()
   if m.VideoGrid.isInFocusChain() = true
-    category = m.top.content.getChild(0)
+    category = m.top.content
     selectedContent = category.getChild(m.VideoGrid.itemFocused)
     updateTrackingInfo(category, selectedContent, m.VideoGrid.itemFocused)
     m.top.contentToPlay = selectedContent

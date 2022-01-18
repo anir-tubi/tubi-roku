@@ -153,7 +153,7 @@ End Function
 
 
 Function onIsLoading()
-  tubiLog("ChannelDetailScreen.onIsLoading")
+  tubiLog("ChannelGridScreen.onIsLoading")
   if m.top.isLoading = true
     m.ChannelCategoryGrid.visible = false
   else
@@ -164,6 +164,7 @@ End Function
 
 Function onItemFocused()
   tubiLog("ChannelGridScreen.onItemFocused")
+
   if m.top.content <> invalid
     item = m.ChannelCategoryGrid.itemFocused
     m.top.itemFocused = item

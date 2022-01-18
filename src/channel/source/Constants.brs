@@ -639,7 +639,7 @@ Function getConstants()
   constants.errors.context.playerScreen = "3"
   constants.errors.context.seriesDetailScreen = "4"
   constants.errors.context.episodeScreen = "5"
-  constants.errors.context.channelScreen = "6"
+  constants.errors.context.categoryDetailsScreen = "6"
   constants.errors.context.searchScreen = "7"
   constants.errors.context.activateScreen = "8"
   constants.errors.context.channelsScreen = "9"
@@ -802,7 +802,7 @@ Function getConstants()
       constants.ui.screenLevels.searchScreen = 20
       constants.ui.screenLevels.settingsScreen = 20
       constants.ui.screenLevels.confirmPasswordScreen = 40
-      constants.ui.screenLevels.channelDetailScreen = 40
+      constants.ui.screenLevels.categoryDetailsScreen = 40
       constants.ui.screenLevels.detailScreen = 50
       constants.ui.screenLevels.episodeScreen = 50
       constants.ui.screenLevels.videoPlayerScreen = 60
@@ -820,7 +820,7 @@ Function getConstants()
       constants.ui.screenIds.searchScreen = "searchScreen"
       constants.ui.screenIds.settingsScreen = "settingsScreen"
       constants.ui.screenIds.confirmPasswordScreen = "confirmPasswordScreen"
-      constants.ui.screenIds.channelDetailScreen = "channelDetailScreen"
+      constants.ui.screenIds.categoryDetailsScreen = "categoryDetailsScreen"
       constants.ui.screenIds.channelListScreen = "channelListScreen"
       constants.ui.screenIds.categoryListScreen = "categoryListScreen"
       constants.ui.screenIds.espanolScreen = "espanolScreen"

@@ -19,7 +19,7 @@
 <component name="ContentController" extends="Group">
 
   <script type="text/brightscript" uri="ContentController.brs" />
-  <script type="text/brightscript" uri="ChannelScreenHelpers.brs" />
+  <script type="text/brightscript" uri="CategoryDetailsScreenHelpers.brs" />
   <script type="text/brightscript" uri="ChannelGridScreenHelpers.brs" />
   <script type="text/brightscript" uri="DetailScreenHelpers.brs" />
   <script type="text/brightscript" uri="HomeScreenHelpers.brs" />

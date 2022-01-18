@@ -252,73 +252,6 @@ Function cmsApi_thumbnailsReqInfo_test()
 End Function
 
 
-'@Test unit tests channelReqInfo
-Function cmsApi_channelReqInfo_test()
-  infoKeys = [
-    "url"
-    "options"
-  ]
-  params = [
-    "app_id"
-    "platform"
-    "device_id"
-    "cursor"
-    "limit"
-    "isKidsMode"
-    "includeChannels"
-    "images[poster_tb]"
-  ]
-
-  channelUrl = m.cmsApi.constants.urls.matrix.channel + "/my_channel"
-  channelOptions = {
-    params: {
-      "app_id": m.cmsApi.constants.settings.shortAppName
-      "platform": m.cmsApi.constants.platform
-      "device_id": m.cmsApi.constants.deviceInfo.deviceId
-      "cursor": 0
-      "limit": 54
-      "isKidsMode": false
-      "includeChannels": true
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
-    }
-  }
-
-  ' no kids mode
-  channelInfo = m.cmsApi.channelReqInfo("my_channel", 54, false)
-
-  m.assertEqual(channelInfo.count(), 2)
-  m.assertAAHasKeys(channelInfo, infoKeys)
-  m.assertEqual(channelInfo.url, channelUrl)
-  m.assertAAHasKeys(channelInfo.options.params, params)
-  m.assertEqual(channelInfo.options.params["app_id"], channelOptions.params["app_id"])
-  m.assertEqual(channelInfo.options.params["platform"], channelOptions.params["platform"])
-  m.assertEqual(channelInfo.options.params["device_id"], channelOptions.params["device_id"])
-  m.assertEqual(channelInfo.options.params["cursor"], channelOptions.params["cursor"])
-  m.assertEqual(channelInfo.options.params["limit"], channelOptions.params["limit"])
-  m.assertEqual(channelInfo.options.params["isKidsMode"], channelOptions.params["isKidsMode"])
-  m.assertEqual(channelInfo.options.params["includeChannels"], channelOptions.params["includeChannels"])
-  m.assertEqual(channelInfo.options.params["images[poster_tb]"], channelOptions.params["images[poster_tb]"])
-
-  ' with kids mode
-  channelInfo = m.cmsApi.channelReqInfo("my_channel", 12, true)
-  channelOptions.params["limit"] = 12
-  channelOptions.params["isKidsMode"] = true
-
-  m.assertEqual(channelInfo.count(), 2)
-  m.assertAAHasKeys(channelInfo, infoKeys)
-  m.assertEqual(channelInfo.url, channelUrl)
-  m.assertAAHasKeys(channelInfo.options.params, params)
-  m.assertEqual(channelInfo.options.params["app_id"], channelOptions.params["app_id"])
-  m.assertEqual(channelInfo.options.params["platform"], channelOptions.params["platform"])
-  m.assertEqual(channelInfo.options.params["device_id"], channelOptions.params["device_id"])
-  m.assertEqual(channelInfo.options.params["cursor"], channelOptions.params["cursor"])
-  m.assertEqual(channelInfo.options.params["limit"], channelOptions.params["limit"])
-  m.assertEqual(channelInfo.options.params["isKidsMode"], channelOptions.params["isKidsMode"])
-  m.assertEqual(channelInfo.options.params["includeChannels"], channelOptions.params["includeChannels"])
-  m.assertEqual(channelInfo.options.params["images[poster_tb]"], channelOptions.params["images[poster_tb]"])
-End Function
-
-
 '@Test unit tests homeScreenReqInfo
 Function cmsApi_homeScreenReqInfo_test()
   infoKeys = [
@@ -568,8 +501,7 @@ Function cmsApi_categoryReqInfo_test()
       "x-custom-header": "custom_header_value"
     }
   }
-  name = m.cmsApi.constants.reqNames.getCategory
-  categoryInfo = m.cmsApi.categoryReqInfo("my_category", name, false, passedOptions)
+  categoryInfo = m.cmsApi.categoryReqInfo("my_category", false, passedOptions)
 
   m.assertEqual(categoryInfo.count(), 2)
   m.assertAAHasKeys(categoryInfo, infoKeys)
@@ -595,7 +527,7 @@ Function cmsApi_categoryReqInfo_test()
   ' with kids mode
   categoryOptions.params["isKidsMode"] = true
   categoryOptions.headers["x-tubi-inject-live-news"] = "false"
-  categoryInfo = m.cmsApi.categoryReqInfo("my_category", name, true, passedOptions)
+  categoryInfo = m.cmsApi.categoryReqInfo("my_category", true, passedOptions)
 
   m.assertEqual(categoryInfo.count(), 2)
   m.assertAAHasKeys(categoryInfo, infoKeys)
@@ -623,7 +555,7 @@ Function cmsApi_categoryReqInfo_test()
   categoryOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.latino
   categoryOptions.headers["x-tubi-inject-live-news"] = "false"
   passedOptions.params.contentMode = m.cmsApi.constants.ui.contentMode.latino
-  categoryInfo = m.cmsApi.categoryReqInfo("my_category", name, false, passedOptions)
+  categoryInfo = m.cmsApi.categoryReqInfo("my_category", false, passedOptions)
 
   m.assertEqual(categoryInfo.count(), 2)
   m.assertAAHasKeys(categoryInfo, infoKeys)

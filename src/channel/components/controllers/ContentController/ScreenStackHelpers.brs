@@ -85,6 +85,23 @@ Function getHiddenScreen(depth = 1)
 End Function
 
 
+' iterates over screen stack from top to bottom and returns the first screen found with an id that
+' matches the id of the screen passed in
+' 
+' @screenId: string, the id of the screen that is being searched for
+Function getScreenFromStackById(screenId)
+  for i = m.screenStack.getChildCount() - 1 to 0 step -1
+    screen = m.screenStack.getChild(0)
+
+    if screen.id = screenId
+      return screen
+    end if
+  end for
+
+  return invalid
+End Function
+
+
 ' Wrapper for getting the current screen field from the screen stack.
 Function getCurrentScreen()
   return m.screenStack.current

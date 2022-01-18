@@ -810,10 +810,6 @@ Function setDirtyUserCategories(categoryId)
     linearTVScreen = getFromScreenCache(m.constants.ui.screenIds.linearTVScreen)
 
     isKidsMode = shouldKidsModeBeSentToServer()
-
-    'this will be an auth request if the user is logged in
-    'auth request creation happens in metadataFetchTask
-    'auth request will add the userId param
     reqName = m.constants.reqNames.getCategory
 
     options = {}
@@ -824,7 +820,7 @@ Function setDirtyUserCategories(categoryId)
       params["content_mode"] = ""
     end if
     options.params = params
-    categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, options)
+    categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, options)
 
     m.makeRequest({
       url: categoryReqInfo.url
@@ -847,7 +843,7 @@ Function setDirtyUserCategories(categoryId)
       end if
       optionMovie.params = movieParams
 
-      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, optionMovie)
+      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, optionMovie)
 
       m.makeRequest({
         url: categoryReqInfo.url
@@ -870,7 +866,7 @@ Function setDirtyUserCategories(categoryId)
       end if
       optionTV.params = tvParams
 
-      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, optionTV)
+      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, optionTV)
 
       m.makeRequest({
         url: categoryReqInfo.url
@@ -894,7 +890,7 @@ Function setDirtyUserCategories(categoryId)
       end if
       optionEspanol.params = esParams
 
-      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, m.constants.reqNames.getCategory, isKidsMode, optionEspanol)
+      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, optionEspanol)
 
       m.makeRequest({
         url: categoryReqInfo.url
@@ -1409,12 +1405,12 @@ Function onSearchBackgroundChange(msg)
 End Function
 
 
-Function onChannelBackgroundChange(msg)
-  TubiLog("ContentController.onChannelBackgroundChange")
-  channelScreen = msg.getRoSGNode()
+Function onCategoryScreenBackgroundChange(msg)
+  TubiLog("ContentController.onCategoryScreenBackgroundChange")
+  categoryDetailsScreen = msg.getRoSGNode()
   m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype(channelScreen.backgroundUriList)
-    uriList: channelScreen.backgroundUriList
+    type: getBackgroundtype(categoryDetailsScreen.backgroundUriList)
+    uriList: categoryDetailsScreen.backgroundUriList
   }
 End Function
 

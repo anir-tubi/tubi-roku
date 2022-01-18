@@ -5,23 +5,22 @@
  - This is a screen that displays information for a single content "channel".
  -
  -->
-<component name="ChannelDetailScreen" extends="BaseScreen">
+<component name="CategoryDetailsScreen" extends="BaseScreen">
 
-  <script type="text/brightscript" uri="ChannelDetailScreen.brs" />
+  <script type="text/brightscript" uri="CategoryDetailsScreen.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 
   <interface>
     <!-- INPUT -->
-      <!-- content should be a container content node with a single channel content node filled with multiple item content nodes -->
+      <!-- content should be a single CategoryContentNode representing the channel/category node filled with multiple item content nodes -->
       <field id="content" type="node"/>
 
       <!-- If the screen is not enabled, then user should not be able to select anything -->
@@ -52,7 +51,7 @@
 
       <!-- tells ContentController/ChannelScreenHelpers that the category metadata
            for the channel content is out of the cache window and should be updated -->
-      <field id="refreshChannel" type="boolean" alwaysNotify="true" />
+      <field id="refreshCategoryDetailsScreen" type="boolean" alwaysNotify="true" />
       
       <!-- tells the ChannelScreenHelper to display SignIn Required modal-->
       <field id="signInRequired" type="boolean" alwaysNotify="true" />
@@ -110,7 +109,6 @@
       visible="true" />
     <CategoryGridRowLabel
       translation="[192,540]"
-      width="1835"
       id="pageTitleAndCounter"/>
     <MarkupGrid
       id="ChannelsVideoGrid"

@@ -53,7 +53,7 @@ Function showChannelGridScreen(constants, sPageSource, bChannel = true, screenLe
   gridScreen.trackingLoadStartTime = UpTime(0)
   gridScreen.observeFieldScoped("contentSelected", "onGridContentSelected")
   gridScreen.observeFieldScoped("visibleItems", "onVisibleItemsChange")
-  gridScreen.observeFieldScoped("backgroundUriList", "onChannelBackgroundChange")
+  gridScreen.observeFieldScoped("backgroundUriList", "onCategoryScreenBackgroundChange")
   gridScreen.observeFieldScoped("refreshChannel", "onRefreshGridSignal")
   gridScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   gridScreen.isLoading = true
@@ -79,7 +79,7 @@ Function onGridContentSelected(msg)
     sType = m.constants.ui.terms.categories
   end if
   sType = UCase(sType)
-  showChannelScreen(gridScreen.contentSelected, sType)
+  showCategoryDetailsScreen(gridScreen.contentSelected, sType)
 End Function
 
 

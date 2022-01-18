@@ -719,11 +719,11 @@ Function onSideNavMyListAfterSignIn()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid and currentScreen.id = "channelDetailScreen" and currentScreen.categoryId = m.constants.ui.categoryIds.queue
-    ' this happens when user logs in via channelDetailScreen (queue/mylist)
+  if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.categoryDetailsScreen and currentScreen.categoryId = m.constants.ui.categoryIds.queue
+    ' this happens when user logs in via categoryDetailsScreen (queue/mylist)
     content = CreateObject("roSGNode", "CategoryContentNode")
     content.id = m.constants.ui.categoryIds.queue
-    getChannelFromServer(currentScreen, content)
+    fetchCategoryDetails(currentScreen, content)
     setContentToRefreshAllPersonalizedScreens()
   else
     ' don't expect this to happen, keeping here as a fallback mechanism

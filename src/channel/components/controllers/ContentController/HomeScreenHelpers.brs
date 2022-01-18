@@ -857,7 +857,7 @@ Function onContentSelected(msg)
   m.autoplayContext = homeScreen.currCategoryId
 
   if content.type = "channel"
-    showChannelScreen(content, "HOME")
+    showCategoryDetailsScreen(content, "HOME")
   else if content.type = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
     startSignIn(onCWRowAfterSignIn)
@@ -902,7 +902,7 @@ Function onUtilityItemSelected(content)
     showTVScreen()
     m.SideNav.itemRequested = m.constants.ui.sideNavIds.tv
   else
-    showChannelScreen(content, "HOME")  
+    showCategoryDetailsScreen(content, "HOME")  
   end if
 End Function
 

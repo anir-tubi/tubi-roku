@@ -121,7 +121,7 @@ Function onDetailScreenChannelSelected(msg)
       componentValues: {}
     }
 
-    showChannelScreen(channelNode)
+    showCategoryDetailsScreen(channelNode)
   end if
 End Function
 

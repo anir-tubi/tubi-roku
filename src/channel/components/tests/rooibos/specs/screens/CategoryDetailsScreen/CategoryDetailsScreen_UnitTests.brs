@@ -1,9 +1,9 @@
-'@SGNode ChannelDetailScreenTest
-'@TestSuite [ChannelDetailScreen] ChannelDetailScreen.brs
+'@SGNode CategoryDetailsScreenTest
+'@TestSuite [CategoryDetailsScreen] CategoryDetailsScreen.brs
 
 
 '@Setup
-Function channelDetailScreenSetup()
+Function categoryDetailsScreenSetup()
   channelContent = CreateObject("roSGNode", "TubiContentNode")
   channelContentData = {
     id: "channel_x"
@@ -41,7 +41,7 @@ End Function
 
 
 '@Test populateInfoPanelItem unit test
-Function channelDetailScreen_populateInfoPanelItem_test()
+Function categoryDetailsScreen_populateInfoPanelItem_test()
   content = m.itemContent
   controlInfoPanel = CreateObject("roSGNode", "InfoPanel")
   controlInfoPanel.title = content.title
@@ -72,7 +72,7 @@ End Function
 
 
 '@Test populateInfoPanelChannel unit test
-Function channelDetailScreen_populateInfoPanelChannel_test()
+Function categoryDetailsScreen_populateInfoPanelChannel_test()
   content = m.channelContent
   controlInfoPanel = CreateObject("roSGNode", "InfoPanel")
   controlInfoPanel.title = content.title

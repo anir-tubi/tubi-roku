@@ -7,7 +7,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateRelatedContent: tubiMetadataTranslate_translateRelatedContent
     translate: tubiMetadataTranslate_translate
     translateContainer: tubiMetadataTranslate_translateContainer
-    translateChannel: tubiMetadataTranslate_translateChannel
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
     translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
     translateLinearChannelGuide: tubiMetadataTranslate_translateLinearChannelGuide
@@ -1402,51 +1401,6 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
 
   end if
   return updateMetadata
-End Function
-
-
-Function tubiMetadataTranslate_translateChannel(contentToTranslate)
-  tubiLog("TubiMetadataTranslate.tubiMetadataTranslate_translateChannel")
-  translated = CreateObject("roSGNode", "CategoryContentNode")
-  updateMetadata = {}
-  fetchedAt = m.fetchedAtTimestamp()
-  node_count = 0
-  container = contentToTranslate.container
-  if container <> invalid
-    sTitle = container.title
-    if container.id = m.constants.ui.categoryIds.queue 
-      '//::HARDCODE:: this is a temporary hardcode until the backend is ready to play My List Instead of Queue as the title
-      sTitle = "My List"
-    end if
-    updateMetadata.id = container.id
-    updateMetadata.title = sTitle
-    updateMetadata.description = container.description
-    updateMetadata.offset = 0
-    updateMetadata.json = ""
-    updateMetadata.state = "loaded"
-    updateMetadata.logoUri = container.logo
-    updateMetadata.type = m.contentTypes.channel
-    updateMetadata.slug = container.slug
-    
-    updateMetadata = m.setSponsorshipInfo(updateMetadata, container.sponsorship)
-
-    if container.valid_duration <> invalid
-      updateMetadata.validUntil = Uptime(0) + container.valid_duration
-    else
-      updateMetadata.validUntil = Uptime(0) + m.constants.cacheTimes.category
-    end if
-
-    translated.update(updateMetadata)
-
-    for i=0 to container.children.count()-1
-      child = contentToTranslate.contents[contentToTranslate.container.children[i]]
-      node = translated.createChild("TubiContentNode")
-      node_count += m.translateRecursive(child, node)
-    end for
-  end if
-  m.setTotalCount(translated)
-  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
-  return translated
 End Function
 
 
