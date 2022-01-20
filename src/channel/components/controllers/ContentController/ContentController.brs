@@ -538,14 +538,10 @@ End Function
 ' this is one of the pre-requisites to starting the SG user experience.
 Function onStartupArgs()
   m.deeplinkContent = invalid 
-  ' TODO: Verify and simplify below logic after 2.17 when startupArgs.launchParams will be available.
-  if m.top.startUpArgs <> invalid
-    if m.top.startUpArgs.launchParams <> invalid
-      m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs.launchParams)
-    else if m.top.startUpArgs.contentID <> invalid
-      m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs)
-    end if
+  if m.top.startUpArgs <> invalid and m.top.startUpArgs.contentID <> invalid
+    m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs)
   end if
+
   externalAuthInfo = getExternalAuthInfoFromStartupArgs(m.top.startUpArgs)
 
   if externalAuthInfo <> invalid
@@ -1553,10 +1549,6 @@ Function onCustomSuspend(msg)
   tubiLog("ContentController.onCustomSuspend")
   customSuspendArgs = msg.getData()
 
-  ' TODO: After 2.17 is released, remove this property on m, as it will no longer be needed
-  ' m.lastSuspendOrResumeReason is temporarily needed to detect resuming from screensaver
-  m.lastSuspendOrResumeReason = customSuspendArgs.lastSuspendOrResumeReason
-
   if customSuspendArgs.lastSuspendOrResumeReason = "home"
     m.appSuspendTimer.Mark()
     currentScreen = getCurrentScreen()
@@ -1605,21 +1597,15 @@ Function onCustomResume(msg)
   tubiLog("ContentController.onCustomResume")
   args = msg.getData()
 
-  ' TODO: simplify the logic below by removing m.lastSuspendOrResumeReason after 2.17
   lastSuspendOrResumeReason = invalid
-  customResumeArgs = invalid
+  customResumeLaunchParams = invalid
 
-  if m.lastSuspendOrResumeReason <> invalid
-    customResumeArgs = args
-    lastSuspendOrResumeReason = m.lastSuspendOrResumeReason
-    m.lastSuspendOrResumeReason = invalid
-  end if
-  if args <> invalid and args.launchParams <> invalid
-    customResumeArgs = args.launchParams
+  if args <> invalid
+    customResumeLaunchParams = args.launchParams
     lastSuspendOrResumeReason = args.lastSuspendOrResumeReason
   end if
 
-  if lastSuspendOrResumeReason = "home" and customResumeArgs <> invalid
+  if lastSuspendOrResumeReason = "home" and customResumeLaunchParams <> invalid
     currentScreen = getCurrentScreen()
 
     lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
@@ -1631,7 +1617,7 @@ Function onCustomResume(msg)
       Auth = TubiAuth(m.constants, Request)
       guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
 
-      if customResumeArgs.contentId <> invalid and customResumeArgs.mediaType <> invalid
+      if customResumeLaunchParams.contentId <> invalid and customResumeLaunchParams.mediaType <> invalid
         ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
         ' lots of edge cases, so for consistency, restarting the app is easiest.
         restartApp()

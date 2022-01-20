@@ -141,7 +141,7 @@ Function runChannel(constants, log, request)
       else if msg.GetField() = "disableInstantResume"
         if msg.GetData() = true
           contentController = tubiScene.findNode("ContentController")
-          m.startupArgs = contentController.customResume
+          m.startupArgs = contentController.customResume.launchParams
           screen.close() ' destroys the current scene as we need to relaunch the app from beginning
           return true
         end if
