@@ -1,12 +1,12 @@
 manifest:
   major_version: 2
-  minor_version: 16
+  minor_version: 17
   build_version: 0
 component_library_manifest:
   major_version: 2
-  minor_version: 16
+  minor_version: 17
   build_version: 0
 starter_library_manifest:
   major_version: 2
-  minor_version: 16
+  minor_version: 17
   build_version: 0
