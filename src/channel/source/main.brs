@@ -5,23 +5,43 @@ Function Main(startupArgs)
   ' constants will be reset in remote components for scene graph
   
   m.appStartTime = UpTime(0)
+  m.startupArgs = startupArgs
 
   constants = getConstants()
   request = TubiRequest(constants.settings)
   auth = TubiAuth(constants, request)
   log = TubiLogger(constants, request, auth)
 
-  if startupArgs.ComponentTest <> invalid and startupArgs.ComponentTest <> ""
+  if m.startupArgs.ComponentTest <> invalid and m.startupArgs.ComponentTest <> ""
     ' This will block indefinitely
-    ComponentTest(startupArgs.ComponentTest)
+    ComponentTest(m.startupArgs.ComponentTest)
   end if
 
-  logCrashesOnStartup(startupArgs, log, constants)
-  runChannel(startupArgs, constants, log, request)
+  logCrashesOnStartup(m.startupArgs, log, constants)
+
+  ' permaScreen is a permanent screen that exists even when the screen created by runChannel()
+  ' is closed. The presence of the permaScreen prevents the app from closing if screen.close()
+  ' is called within runChannel(), due to the undocumented and apparent requirement that there
+  ' is always at least one screen that on which .show() has been called and has not been closed.
+  permaScreen = CreateObject("roSGScreen")
+  backgroundScene = permaScreen.CreateScene("BackgroundScene")
+  permaScreen.show()
+
+  while runChannel(constants, log, request) = true
+  end while
 End Function
 
 
-Function runChannel(startupArgs, constants, log, request) As Void
+' @constants: assocArray, constants as returned by getConstants()
+' @log: assocArray, an instance of the log module as returned by TubiLog()
+' @request: assocArray, an instance of the request module as returned by TubiRequest()
+'
+' returns: boolean, true if the app should be restarted, false if the app should be closed
+Function runChannel(constants, log, request)
+
+  startupArgs = {}
+  startupArgs.append(m.startupArgs)
+  m.startupArgs = invalid
 
   ' Load scene graph
   port = CreateObject("roMessagePort")
@@ -54,7 +74,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
   if constants.settings.mode = "test"
     sgGlobal.setField("theme", constants.ui.themes.default) 'set theme for testing purposes
     if (type(Rooibos__Init) = "Function") then Rooibos__Init()
-    return
+    return false
   end if
 
   ' execute suitest libray only if the mode is qa & suitest attribute enabled in qa config yml
@@ -109,24 +129,21 @@ Function runChannel(startupArgs, constants, log, request) As Void
         controller.roInputInfo = inputInfo 
       end if
     else if msgType = "roSGScreenEvent"
-      print "got a screen event "; msg.isScreenClosed()
-      if msg.isScreenClosed()
-        return
-      end if
-
+      ' documentation indicates a roSGSCreenEvent occurs when screen.close() is called, but trial
+      ' and error testing suggests that the roSGScreenEvent never gets fired.
+      ' do nothing for now - closing the screen does not necessarily mean we want to close the app.
     else if msgType = "roSGNodeEvent"
       tubiLog("main() got roSGNodeEvent for " + msg.GetField())
       if msg.GetField() = "exitApp"
         if msg.GetData() = true
-          return
+          return false
         end if
       else if msg.GetField() = "disableInstantResume"
         if msg.GetData() = true
           contentController = tubiScene.findNode("ContentController")
-          resumeArgs = contentController.customResume
-          screen.close() ' destroys the current scene as we need to relaunch the app from beginning 
-          runChannel(resumeArgs, constants, log, request)
-          return
+          m.startupArgs = contentController.customResume
+          screen.close() ' destroys the current scene as we need to relaunch the app from beginning
+          return true
         end if
       else if msg.GetField() = "transportVoiceResponse"
         result = msg.getData()
@@ -156,8 +173,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
               retries = 0
               pause = initialBackoff
             else
-              showComponentsFailedToLoadError(msg, log, screen, constants)
-              exit while
+              return showComponentsFailedToLoadError(msg, log, screen, constants)
             end if
           else if msg.GetRoSGNode().id = "TubiRemoteLibrary"
             componentsLoaded = true
@@ -177,10 +193,8 @@ Function runChannel(startupArgs, constants, log, request) As Void
                 tubiScene.fadeOutSpinner = true
                 controller.fadeInContentController = true
               end if
-
             else
-              showComponentsFailedToLoadError(msg, log, screen, constants)
-              exit while
+              return showComponentsFailedToLoadError(msg, log, screen, constants)
             end if
           end if
         else if msg.getData() = "loading"
@@ -196,7 +210,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
             sleep(pause)
             resetComponentLibrary(componentLibrary, tubiScene, port)
           else
-            showComponentsFailedToLoadError(msg, log, screen, constants)
+            return showComponentsFailedToLoadError(msg, log, screen, constants)
           end if
         end if
       else if msg.GetField() = "useRemoteComponents"
@@ -265,7 +279,7 @@ Function runChannel(startupArgs, constants, log, request) As Void
         sleep(pause)
         resetComponentLibrary(libraryBeingFetched, tubiScene, port)
       else
-        showComponentsTimedOutError(libraryBeingFetched, log, screen, constants)
+        return showComponentsTimedOutError(libraryBeingFetched, log, screen, constants)
       end if
     end if
   end while
@@ -317,7 +331,7 @@ Function showComponentsTimedOutError(library, log, screen, constants)
   }
   errorPort = CreateObject("roMessagePort")
   log.exception("error", error)
-  showStartupErrorDialog(screen, constants)
+  return showStartupErrorDialog(screen, constants)
 End Function
 
 
@@ -330,7 +344,7 @@ Function showComponentsFailedToLoadError(msg, log, screen, constants)
   }
   errorPort = CreateObject("roMessagePort")
   log.exception("error", error)
-  showStartupErrorDialog(screen, constants)
+  return showStartupErrorDialog(screen, constants)
 End Function
 
 
@@ -367,6 +381,7 @@ Function showStartupErrorDialog(screen, constants)
   end if
 
   screen.close()
+  return false
 End Function
 
 

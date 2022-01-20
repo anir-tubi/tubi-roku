@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - BackgroundScene
+ -
+ - BackgroundScene is a scene for the persistent screen whose only purpose is to exist if the instance of
+ - the main screen has to close. The reason BackgroundScene is necessary is because the main thread closes
+ - automatically if there is no screen that is being shown. At times, it may be necessary to close the
+ - main screen and restart it. During this time when the main screen is not being shown, we need another
+ - screen with a scene to be shown so the app doesn't close itself.
+ -
+ -->
+<component name="BackgroundScene" extends="Scene">
+  <children>   
+    <Rectangle
+      id="backgroundBox"
+      width="1920"
+      height="1080"
+      color="0x000000FF"
+      visible="true" />
+  </children>
+</component>
