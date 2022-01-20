@@ -112,7 +112,7 @@ Function init()
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid  ' indicates not logged in
 
-  m.endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint
+  m.endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1", false).endpoint
 
   m.authInfoReceived = false    'is the auth info returned from the registry
   m.authInfoRefreshed = true    'is the auth info refreshed after receiving a deeplink with a refresh token
