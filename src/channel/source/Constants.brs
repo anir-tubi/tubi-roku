@@ -205,6 +205,7 @@ Function getConstants()
     constants.reqNames.getSearchScreen = "getSearchScreen"
     constants.reqNames.getHomescreen = "getHomescreen"
     constants.reqNames.getCategoriesListScreen = "getCategoriesListScreen"
+    constants.reqNames.getCategoryDetailsScreen = "getCategoryDetailsScreen"
     constants.reqNames.getSearchDefault = "getSearchDefault"
     constants.reqNames.getCategory = "getCategory"
     constants.reqNames.getSingleContent = "getSingleContent"
@@ -235,6 +236,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchScreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getHomescreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategoriesListScreen] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategoryDetailsScreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchDefault] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSingleContent] = true

@@ -3,7 +3,8 @@
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseCategoryListSuccess(fullResponse, requestNode)
 
-  translate = TubiMetadataTranslate(m.constants)
+  experiments = TubiExperiments(m.constants)
+  translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
 
   isChannels = false

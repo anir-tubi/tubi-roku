@@ -448,6 +448,20 @@ Function fetchHomeScreen(homeScreen)
       limitParamName = "limit"
       contentModeParamName = "contentMode"
       contentModeParamValue = homeScreen.contentMode
+
+      ' setting the x-tubi-inject-live-news header to true includes the live news container on the homescreen.
+      ' This header is temporary and should be removed after the backend no longer requires it.
+      if homeScreen.contentMode = m.constants.ui.contentMode.homescreen and isKidsMode = false
+        headers["x-tubi-inject-live-news"] = "true"
+      end if
+
+      ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
+      ' This header is temporary and should be removed after the sports experiment concludes.
+      if homeScreen.contentMode = m.constants.ui.contentMode.linear or homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+        if isKidsMode = false
+          headers["x-tubi-inject-linear"] = "true"
+        end if
+      end if
     else
       limitParamName = "contents_limit"
       contentModeParamName = "content_mode"
@@ -464,20 +478,6 @@ Function fetchHomeScreen(homeScreen)
     params[contentModeParamName] = contentModeParamValue
 
     isKidsMode = shouldKidsModeBeSentToServer()
-
-    ' setting the x-tubi-inject-live-news header to true includes the live news container on the homescreen.
-    ' This header is temporary and should be removed after the backend no longer requires it.
-    if homeScreen.contentMode = m.constants.ui.contentMode.homescreen and isKidsMode = false
-      headers["x-tubi-inject-live-news"] = "true"
-    end if
-
-    ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
-    ' This header is temporary and should be removed after the sports experiment concludes.
-    if homeScreen.contentMode = m.constants.ui.contentMode.linear or homeScreen.contentMode = m.constants.ui.contentMode.homescreen
-      if isKidsMode = false
-        headers["x-tubi-inject-linear"] = "true"
-      end if
-    end if
 
     if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
       if m.endpoint = "matrix"

@@ -631,18 +631,19 @@ Function onChannelsRequested()
 
     options = {}
     params = {}
+    headers = {}
 
-    headers = {
-      ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
-      ' This header is temporary and should be removed once the back end no longer requires it.
-      "x-tubi-inject-linear": "true"
-    }
 
     if m.endpoint = "matrix"
 
       params = {
         "contentMode": m.constants.ui.contentMode.linear
         "limit": m.constants.performance.categoryGridList.finalBlockSize
+      }
+      headers = {
+        ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
+        ' This header is temporary and should be removed once the back end no longer requires it.
+        "x-tubi-inject-linear": "true"
       }
 
     else

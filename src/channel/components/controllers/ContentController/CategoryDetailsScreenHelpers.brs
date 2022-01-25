@@ -30,7 +30,7 @@ Function showCategoryDetailsScreen(content, sPageSource = "")
   
   authInfo = m.global.authInfo
   ' make queue API request only if the user loggedIn
-  if (authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid)) and content.id = m.constants.ui.categoryIds.queue 
+  if content.id = m.constants.ui.categoryIds.queue and isLoggedInUser() = false
     displaySignInRequiredModal(categoryDetailsScreen)
   else
     fetchCategoryDetails(categoryDetailsScreen, content)
@@ -137,7 +137,7 @@ Function fetchCategoryDetails(screen, content)
 
     m.makeRequest({
       url: categoryReqInfo.url
-      requestType: m.constants.reqNames.getCategory
+      requestType: m.constants.reqNames.getCategoryDetailsScreen
       options: categoryReqInfo.options
       successCallback: onCategoryDetailResponse
       errorCallback: onCategoryDetailError

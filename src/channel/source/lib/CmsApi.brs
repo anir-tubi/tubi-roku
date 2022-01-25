@@ -118,10 +118,19 @@ End Function
 '
 Function cmsApi_getCategoriesListRequestInfo(bKidsMode = false)
   options = {
-    params: {
-      limit: 0
-    }
+    params: {}
+    headers: {}
   }
+
+  endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint
+
+  if endpoint = "matrix"
+    options.params["limit"] = 0
+  else
+    options.headers["x-tubi-include-browser-list"] = "true"
+    options.params["include_browser_list"] = true
+    options.params["contents_limit"] = 0
+  end if
 
 
   return m.homeScreenReqInfo(bKidsMode, options)
@@ -189,6 +198,8 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
 
     params["include_empty_history"] = true
     params["include_empty_queue"] = true
+    params["include_channels"] = true
+    params["include_sponsorships"] = true
     params["is_kids_mode"] = bKidsMode
     params["content_mode"] = "" ' default contentMode
 

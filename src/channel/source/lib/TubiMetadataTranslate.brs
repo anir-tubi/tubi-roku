@@ -7,6 +7,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateRelatedContent: tubiMetadataTranslate_translateRelatedContent
     translate: tubiMetadataTranslate_translate
     translateContainer: tubiMetadataTranslate_translateContainer
+    translateCategoryDetails: tubiMetadataTranslate_translateCategoryDetails
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
     translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
     translateLinearChannelGuide: tubiMetadataTranslate_translateLinearChannelGuide
@@ -16,17 +17,21 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     contentTypes: constants.ui.contentTypes
     creditsDuration: constants.player.creditsDuration
     allowAfterHours: constants.settings.allowAfterHours
+    experiments: experiments
+
     dedupeBackgrounds: tubiMetadataTranslate_dedupeBackgrounds
     setTotalCount: tubiMetadataTranslate_setTotalCount
     setSponsorshipInfo: tubiMetadataTranslate_setSponsorshipInfo
     getContentsJson: tubiMetadataTranslate_getContentsJson
     buildCategoryAA: tubiMetadataTranslate_buildCategoryAA
+    buildCategoryAAWithPrepend: tubiMetadataTranslate_buildCategoryAAWithPrepend
+    buildCategoryParentInfo: tubiMetadataTranslate_buildCategoryParentInfo
+    buildCategoryChildrenInfo: tubiMetadataTranslate_buildCategoryChildrenInfo
     buildUtilityCategoryAA: tubiMetadataTranslate_buildUtilityCategoryAA
     buildContinueWatchingSignedOutUserCategoryAA: tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA
     generateChannelPosterUrl: tubiMetadataTranslate_generateChannelPosterUrl
     fetchedAtTimestamp: tubiMetadataTranslate_fetchedAtTimestamp
     getGridItemType: tubiMetadataTranslate_getGridItemType
-    experiments: experiments
     getThumbnailImage: tubiMetadataTranslate_getThumbnailImage
     composeVideoResources: tubiMetadataTranslate_composeVideoResources
   }
@@ -374,7 +379,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   ' DRM encoded streams
   translatedContent.videoResources = m.composeVideoResources(contentFromServer)
 
-
   'take care of any subtitles if they exist - should only happen on videos
   if contentFromServer.has_subtitle <> invalid then translatedContent.hasSubtitles = contentFromServer.has_subtitle
   if contentFromServer.subtitles <> invalid and type(contentFromServer.subtitles) = "roArray" and contentFromServer.subtitles.count() > 0
@@ -690,18 +694,19 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       categoryAA = invalid
     end if
 
+    categoryAA = invalid
     if container.id = m.constants.ui.categoryIds.history and isLoggedInUser = false and uiMode <> m.constants.ui.modes.kidsAgeGate
       '//if continue watching container while user is signed out,
       ' then ensure row is empty except for 1 item that will entice users to sign in
       categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
-      if categoryAA <> invalid
-        homescreenAA.children.push(categoryAA)
-      end if
+    else if container.type = m.contentTypes.channel
+      categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode)
     else
       categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode)
-      if categoryAA <> invalid
-        homescreenAA.children.push(categoryAA)
-      end if
+    end if
+
+    if categoryAA <> invalid
+      homescreenAA.children.push(categoryAA)
     end if
   end for
 
@@ -756,8 +761,11 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
     homescreenAA.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
   end if
 
-  containers = contentToTranslate.containers
-  contents = contentToTranslate.contents
+  if m.experiments.getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint = "matrix"
+    containers = contentToTranslate.containers
+  else
+    containers = contentToTranslate.browser_list
+  end if
 
   '//The following code adds a transparency to the thumbnails and for categories, it shifts a few categories to the top of the list
   '//::HARDCODED:: If this is categories, then place few catrgories in the front and get rid of featured
@@ -768,7 +776,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
     container = containers[i]
 
     if oLimitTypes[container.type] = true
-      categoryAA = m.buildCategoryAA(container, contents, invalid, "", false)  'categoryAA is invalid if empty container
+      categoryAA = m.buildCategoryParentInfo(container)  'categoryAA is invalid if empty container
       if categoryAA <> invalid
         if bDisplayChannels = true
           categoryAA.type = m.contentTypes.channel
@@ -877,14 +885,21 @@ End Function
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
 Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen") As Object
-  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateContainer()")
+  tubiLog("TubiMetadataTranslate.translateContainer")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
   contents = contentToTranslate.contents
   contentsJson = m.getContentsJson(contentToTranslate, fullJson) 
 
-  node_count = 0
-  categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode)
+  nodeCount = 0
+
+  categoryMetadata = invalid
+  if container.type = m.contentTypes.channel
+    categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode)
+  else
+    categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode)
+  end if
+
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
     translated.id = container.id
     return translated
@@ -907,7 +922,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     ' but any single category request should be considered fully loaded
     categoryMetadata.state = "loaded"
     translated.update(categoryMetadata)
-    node_count = 1 + translated.getChildCount()
+    nodeCount = 1 + translated.getChildCount()
   end if
 
   if gridItemType = landscape or gridItemType = vitg_large or gridItemType = utility or gridItemType = linear
@@ -918,7 +933,32 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     end for
   end if
 
-  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
+  tubiLog("TranslateMetadata converted " + stri(nodeCount) + " nodes")
+  return translated
+End Function
+
+
+' @contentToTranslate: assocArray, the AA resulting from JSON parsing the /container API response
+' @fullJson: string, the full JSON of the /container API repsonse
+'
+' @returns: roSGNode, a CategoryContentNode with children TubiContentNodes for each content in the container/category
+Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, fullJson)
+  tubiLog("TubiMetadataTranslate.translateCategoryDetails")
+  translated = CreateObject("roSGNode", "CategoryContentNode")
+  container = contentToTranslate.container
+  contents = contentToTranslate.contents
+  contentsJson = m.getContentsJson(contentToTranslate, fullJson)
+
+  sOrientation = m.constants.ui.gridItemTypes.portrait
+  bFullData = true
+  contentMode = m.constants.ui.contentMode.homescreen
+
+  categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode)
+
+  if categoryMetadata <> invalid
+    translated.update(categoryMetadata)
+  end if
+
   return translated
 End Function
 
@@ -931,11 +971,79 @@ End Function
 ' @contentsJson: string, the JSON string of just the contents portion of the matrix API
 ' @sOrientation: string, should the thumbnail be a "portrait" or "landscape" (match against m.constants.ui.gridItemTypes values)
 ' @bFullData: boolean, Should the full data be parsed and passed to the video children?
+' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 '
 ' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson=invalid, sOrientation = "", bFullData = false, contentMode="homeScreen")
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = invalid, sOrientation = "", bFullData = false, contentMode = "homeScreen")
+
+  categoryParent = m.buildCategoryParentInfo(container, contentMode)
+
+  gridItemType = m.getGridItemType(container, sOrientation, m.constants)
+  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData)
+
+  categoryParent.children = categoryChildrenInfo.children
+  categoryParent.json = categoryChildrenInfo.contentsJson
+  categoryParent.gridItemType = gridItemType
+  categoryChildrenCount = categoryParent.children.count()
+
+  ' container.cursor = invalid indicates we are dealing with response JSON
+  ' from matrix/containers/:id or tensor/containers/:id endpoints.
+  ' note: container.cursor = 0 for limitedUI model responses from
+  ' matrix/homescreen or tensor/homescreen endpoints
+
+  if container.cursor = invalid
+    if categoryChildrenCount = 0
+      ' the API returned a container with no valid contents
+      return invalid
+    else if categoryParent.type = m.contentTypes.channel and categoryChildrenCount = 1
+      ' the API returned a container with no valid contents but there happens to be 1 content
+      ' because we inserted a content since it the catgory is a "channel"
+      return invalid
+    end if
+  end if
+
+  categoryParent.totalCount = categoryChildrenCount
+
+  return categoryParent
+End Function
+
+
+Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation = "", bFullData = false, contentMode="homeScreen")
+  categoryAA = invalid
+
+  if container <> invalid and container.children <> invalid
+    'add the channel content to the beginning of the category
+    container.children.Unshift(container.id)
+
+    ' create and add a new content to the contents which hold the container metadata
+    prependContent = {}
+    prependContent.append(container)
+    prependContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
+    prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
+
+    contentsWithPrepend = {}
+    contentsWithPrepend[container.id] = prependContent
+    contentsWithPrepend.append(contents)
+
+    ' force contentsJson to be regenerated with the prepended content in buildCategoryAA()
+    contentsJson = invalid
+
+    categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode)
+  end if
+
+  return categoryAA
+End Function
+
+
+' @container: assocArray, the container/category metadata as returned by the API, not including metadata
+'                         for each child of the container/category
+' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
+'
+' @returns: assocArray, an AA that can be used with node.update() to create a TubiCategoryNode
+Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = "homeScreen")
   updateMetadata = {}
-  if type(container) = "roAssociativeArray" and type(contents) = "roAssociativeArray"
+
+  if type(container) = "roAssociativeArray"
     ' the metadata for the category
     sTitle = container.title
     if container.id = m.constants.ui.categoryIds.queue 
@@ -955,9 +1063,8 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       validUntil: 0
       json: ""
       state: "partial"
-      gridItemType: m.getGridItemType(container, sOrientation, m.constants)
+      gridItemType: ""
     }
-
 
     updateMetadata = m.setSponsorshipInfo(updateMetadata, container.sponsorship)
 
@@ -965,14 +1072,10 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
       updateMetadata.thumbnail = container.thumbnail
     end if
 
-    withPrepend = false
     updateMetadata.type = m.contentTypes.category
 
     if container.type = m.contentTypes.channel
       updateMetadata.type = m.contentTypes.channel
-      if container.children <> invalid and container.children.count() > 0
-        withPrepend = true
-      end if
     end if
 
     updateMetadata.logoUri = container.logo
@@ -988,173 +1091,166 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
     else
       updateMetadata.validUntil = Uptime(0) + m.constants.cacheTimes.category
     end if
-
-    jsonAA = {}
-    validCount = 0
-    children = []
-    
-    'add the channel content to the beginning of the category
-    if withPrepend = true
-      children.push(container.id)
-      ' new content item
-      prependContent = {}
-      prependContent.append(container)
-      prependContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
-      prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
-      ' new category content group
-      prependedContents = {}
-      prependedContents[container.id] = prependContent
-      prependedContents.append(contents)
-      contents = prependedContents
-      contentsJson = invalid  ' force it to be regenerated
-    end if
-
-    children.append(container.children)
-    updateMetadata.children = CreateObject("roArray", children.count(), false)
-
-    for each child in children 
-      ' contents[child].valid is "true" or "false" for user categories and is invalid for all other categories.
-      ' For all other categories, assume all contents are valid. Valid in this case means, the content is "in window"
-      ' and allowed to be played on the Roku platform
-      if contents[child] <> invalid and contents[child].valid <> false
-        childIsPushable = true
-        fullChild = contents[child]
-        sType = "ContentNode"
-        if bFullData = true
-          '//if true then set children to TubiContentNode type so more data is passed to the children
-          sType = "TubiContentNode"
-        end if
-
-        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-          sType = "VitgContentNode"
-        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.linear
-          sType = "TubiContentNode"
-        end if
-        
-
-        sContentType = m.translateBackendTypeToClientSideType(fullChild.type)
-        childAA = {
-          id: fullChild.id
-          title: fullChild.title
-          description: fullChild.description
-          length: fullChild.duration
-          subtype: sType
-          type: sContentType
-        }
-        
-        if bFullData = true
-          'mutates childAA by populating all fields on childAA
-          m.translateRecursive(fullChild, childAA)
-        end if
-
-        bLandscape = false
-        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.portrait or updateMetadata.gridItemType = m.constants.ui.gridItemTypes.utility
-          bLandscape = false
-        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.landscape and fullChild.hero_images <> invalid
-          bLandscape = true
-        else if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid
-          bLandscape = true
-        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-          bLandscape = true
-        end if
-
-
-        gridType = ""
-        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.portrait
-          gridType = m.constants.ui.gridItemTypes.portrait
-        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.landscape
-          gridType = m.constants.ui.gridItemTypes.landscape
-        else if container.id = m.constants.ui.categoryIds.featured
-          gridType = m.constants.ui.gridItemTypes.landscape
-        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-          gridType = m.constants.ui.gridItemTypes.vitg_large
-        else if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.linear
-          gridType = m.constants.ui.gridItemTypes.linear
-        end if
-
-        if bLandscape = true then
-          childAA.hdgridposterurl = fullChild.hero_images[0]
-        else if fullChild.posterarts <> invalid then
-          childAA.hdgridposterurl = fullChild.posterarts[0]
-          ' HDPOSTERURL is an active image which is used in utility row
-          if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.utility
-            childAA.HDPOSTERURL = fullChild.posterarts[1]
-          end if
-        end if
-        childAA.hdgridposterurl = m.getThumbnailImage(fullChild, gridType)
-
-        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.linear and fullChild.thumbnails <> invalid
-          childAA.inlineLogoUri = fullChild.thumbnails[0]
-        end if
-        
-        'add the trailer url to vitg content items - don't include vitg content if there is no trailer
-        if updateMetadata.gridItemType = m.constants.ui.gridItemTypes.vitg_large
-          childIsPushable = false
-          if fullChild.has_trailer = true
-            if fullChild.trailers <> invalid and type(fullChild.trailers) = "roArray" and fullChild.trailers.count() > 0
-              if fullChild.trailers[0] <> invalid and fullChild.trailers[0].url <> invalid and fullChild.trailers[0].url <> ""
-                childAA.url = fullChild.trailers[0].url
-                ' abuse the contentNode fields to add vitg info to the content node
-                ' so that we can continue to use the content node which is created faster than custom nodes
-                if fullChild.trailers[0].duration <> invalid
-                  ' use deprecated playDuration as a store for the trailer duration since we are
-                  ' already using the length field for our content duration
-                  childAA.playDuration = fullChild.trailers[0].duration
-                end if
-
-                if fullChild.trailers[0].id <> invalid
-                  ' use the otherwise unused episodeNumber field as a store for the trailer id
-                  ' so that we have access to the trailer id for trailer analytics
-                  childAA.episodeNumber = fullChild.trailers[0].id
-                end if
-                childIsPushable = true
-              end if
-            end if
-          end if
-
-          if fullChild.year <> invalid
-            childAA.releaseDate = fullChild.year.toStr()
-          end if
-        end if
-        
-        sFullChildID = fullChild.id
-        if Type(fullChild.id) = "Integer"
-          '//in case the ID is an integer, change it to a string.
-          sFullChildID = fullChild.id.toStr()
-        end if
-        childAA.id = sFullChildID
-
-        ' normalize ids for series, should always be zero-prefixed
-        if fullChild.type = "s" or fullChild.type = "a"
-          childAA.id = "0" + sFullChildID
-        end if
-        if childIsPushable = true
-          jsonAA[childAA.id] = fullChild
-        end if
-
-        validCount += 1
-        updateMetadata.children.push(childAA)
-      end if
-    end for
-
-    ' if all the content is out of window, do not return category metadata aa
-    ' container.cursor = 0 for limitedUI matrix/homescreen calls
-    ' container.cursor = invalid for matrix/containers/{id} calls
-    ' if we are getting category from matrix/containers/{id} and it returns no valid content,
-    ' we want to remove that category from the category screen
-    if container.cursor = invalid and validCount = 0
-      return invalid
-    end if
-
-    updateMetadata.totalCount = validCount
-    if contentsJson <> invalid
-      updateMetadata.json = contentsJson
-    else
-      updateMetadata.json = FormatJSON(jsonAA)
-    end if
   end if
 
   return updateMetadata
+End Function
+
+
+' @container: assocArray, the container/category metadata as returned by the API, not including metadata
+'                         for each child of the container/category
+' @contents: assocArray, a map of content metadata as returned by the 'contents' key of API responses.
+'                        Likely will include more contents than exist in the container.
+' @contentsJson: string, the JSON string value for the 'contents' key of the API response. Should be
+'                        the same data as @contents, only in a JSON string
+' @parentGridItemType: string, the gridItemType of the parent container/category
+' @bfullData: boolean, true if each child should contain full metadata, false if children should contain
+'                      a limited set of metadata
+'
+' @returns: assocArray, an AA with keys:
+'                       "children", as an array of AAs containing content metadata
+'                       "contentsJson", a JSON formatted string of contents belonging to the container/category
+Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData)
+  childrenReturn = CreateObject("roArray", 0, false)
+
+  if type(container) = "roAssociativeArray" and type(container.children) = "roArray"
+    childrenReturn = CreateObject("roArray", container.children.count(), false)
+    jsonAA = {}
+
+    if type(contents) = "roAssociativeArray"
+      for each child in container.children
+        ' contents[child].valid is "true" or "false" for user categories and is invalid for all other categories.
+        ' For all other categories, assume all contents are valid. Valid in this case means, the content is "in window"
+        ' and allowed to be played on the Roku platform
+        if contents[child] <> invalid and contents[child].valid <> false
+          childIsPushable = true
+          fullChild = contents[child]
+          sType = "ContentNode"
+          if bFullData = true
+            '//if true then set children to TubiContentNode type so more data is passed to the children
+            sType = "TubiContentNode"
+          end if
+
+          if parentGridItemType = m.constants.ui.gridItemTypes.vitg_large
+            sType = "VitgContentNode"
+          else if parentGridItemType = m.constants.ui.gridItemTypes.linear
+            sType = "TubiContentNode"
+          end if
+
+          sContentType = m.translateBackendTypeToClientSideType(fullChild.type)
+          childAA = {
+            id: fullChild.id
+            title: fullChild.title
+            description: fullChild.description
+            length: fullChild.duration
+            subtype: sType
+            type: sContentType
+          }
+
+          if bFullData = true
+            'mutates childAA by populating all fields on childAA
+            m.translateRecursive(fullChild, childAA)
+          end if
+
+          bLandscape = false
+          if parentGridItemType = m.constants.ui.gridItemTypes.portrait or parentGridItemType = m.constants.ui.gridItemTypes.utility
+            bLandscape = false
+          else if parentGridItemType = m.constants.ui.gridItemTypes.landscape and fullChild.hero_images <> invalid
+            bLandscape = true
+          else if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid
+            bLandscape = true
+          else if parentGridItemType = m.constants.ui.gridItemTypes.vitg_large
+            bLandscape = true
+          end if
+
+          gridType = ""
+          if parentGridItemType = m.constants.ui.gridItemTypes.portrait
+            gridType = m.constants.ui.gridItemTypes.portrait
+          else if parentGridItemType = m.constants.ui.gridItemTypes.landscape
+            gridType = m.constants.ui.gridItemTypes.landscape
+          else if container.id = m.constants.ui.categoryIds.featured
+            gridType = m.constants.ui.gridItemTypes.landscape
+          else if parentGridItemType = m.constants.ui.gridItemTypes.vitg_large
+            gridType = m.constants.ui.gridItemTypes.vitg_large
+          else if parentGridItemType = m.constants.ui.gridItemTypes.linear
+            gridType = m.constants.ui.gridItemTypes.linear
+          end if
+
+          if bLandscape = true then
+            childAA.hdgridposterurl = fullChild.hero_images[0]
+          else if fullChild.posterarts <> invalid then
+            childAA.hdgridposterurl = fullChild.posterarts[0]
+            ' HDPOSTERURL is an active image which is used in utility row
+            if parentGridItemType = m.constants.ui.gridItemTypes.utility
+              childAA.HDPOSTERURL = fullChild.posterarts[1]
+            end if
+          end if
+          childAA.hdgridposterurl = m.getThumbnailImage(fullChild, gridType)
+
+          if parentGridItemType = m.constants.ui.gridItemTypes.linear and fullChild.thumbnails <> invalid
+            childAA.inlineLogoUri = fullChild.thumbnails[0]
+          end if
+
+          'add the trailer url to vitg content items - don't include vitg content if there is no trailer
+          if parentGridItemType = m.constants.ui.gridItemTypes.vitg_large
+            childIsPushable = false
+            if fullChild.has_trailer = true
+              if fullChild.trailers <> invalid and type(fullChild.trailers) = "roArray" and fullChild.trailers.count() > 0
+                if fullChild.trailers[0] <> invalid and fullChild.trailers[0].url <> invalid and fullChild.trailers[0].url <> ""
+                  childAA.url = fullChild.trailers[0].url
+                  ' abuse the contentNode fields to add vitg info to the content node
+                  ' so that we can continue to use the content node which is created faster than custom nodes
+                  if fullChild.trailers[0].duration <> invalid
+                    ' use deprecated playDuration as a store for the trailer duration since we are
+                    ' already using the length field for our content duration
+                    childAA.playDuration = fullChild.trailers[0].duration
+                  end if
+
+                  if fullChild.trailers[0].id <> invalid
+                    ' use the otherwise unused episodeNumber field as a store for the trailer id
+                    ' so that we have access to the trailer id for trailer analytics
+                    childAA.episodeNumber = fullChild.trailers[0].id
+                  end if
+                  childIsPushable = true
+                end if
+              end if
+            end if
+
+            if fullChild.year <> invalid
+              childAA.releaseDate = fullChild.year.toStr()
+            end if
+          end if
+
+          sFullChildID = fullChild.id
+          if Type(fullChild.id) = "Integer"
+            '//in case the ID is an integer, change it to a string.
+            sFullChildID = fullChild.id.toStr()
+          end if
+          childAA.id = sFullChildID
+
+          ' normalize ids for series, should always be zero-prefixed
+          if fullChild.type = "s" or fullChild.type = "a"
+            childAA.id = "0" + sFullChildID
+          end if
+
+          if childIsPushable = true
+            jsonAA[childAA.id] = fullChild
+          end if
+
+          childrenReturn.push(childAA)
+        end if
+      end for
+    end if
+
+    if contentsJson = invalid
+      contentsJson = FormatJSON(jsonAA)
+    end if
+  end if
+
+return {
+  children: childrenReturn
+  contentsJson: contentsJson
+}
 End Function
 
 
