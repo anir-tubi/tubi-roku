@@ -577,9 +577,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     if homeScreen.isInFocusChain() = true
       homeScreen.setFocus(true)
     end if
-
-    loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
-    screenTrackingLoad(homeScreen.trackingPageInfo, loadTime, false)
   end if
 End Function
 
