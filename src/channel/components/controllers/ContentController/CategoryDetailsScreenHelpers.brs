@@ -174,6 +174,12 @@ Function onCategoryDetailResponse(categoryContent)
       else
         showCategoryDetailError(invalid, true)
       end if
+
+      ' After the modal is dismissed, the categoryDetailsScreen is given focus.
+      ' If there is content that is not valid, another request will be made to fetch the content
+      ' for the categoryDetailsScreen. Since we've already established there is no content, we
+      ' can prevent another call from taking place by setting the screen's content to invalid.
+      screen.content = invalid
     end if
 
     if m.refreshingCategoryDetailsCache <> true

@@ -1173,13 +1173,18 @@ Function refreshAllDetailScreens()
 End Function
 
 
-' Content for a category has been updated. ANy screen that is displaying this category should be updated.
+' Content for a category details screen has been updated.
+' Any screen that is displaying this category should be updated.
+' @sCategoryID: string, the category id we are searching for in the stack
 Function refreshStackedUserScreenWithChangedCategory(sCategoryID)
   ' Tell the screen that contains the categroy associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0 
   for i=0 to m.screenStack.getChildCount()-1
     screen = m.screenStack.getChild(i)
-    if screen <> invalid and screen.content <> invalid and screen.content.getChildCount() > 0 and screen.content.getChild(0).id  = sCategoryID
-      screen.content.getChild(0).validUntil = 0
+    if screen <> invalid and screen.isSubType("CategoryDetailsScreen")
+      content = screen.content
+      if content <> invalid and content.id = sCategoryID
+        screen.content.validUntil = 0
+      end if
     end if
   end for
 End Function

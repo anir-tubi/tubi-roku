@@ -96,7 +96,7 @@ Function onScreenFocusChange()
         m.VideoGrid.setFocus(true)
       end if
       if shouldRefresh(m.top.content) = true  'cacheValidationMixin
-        m.top.refreshChannel = true
+        m.top.refreshCategoryDetailsScreen = true
       end if
     end if    
   end if

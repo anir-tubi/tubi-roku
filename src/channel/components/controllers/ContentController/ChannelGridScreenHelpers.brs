@@ -26,7 +26,6 @@ Function showCategoryListScreen(constants, sPageSource)
 End Function
 
 
-
 '''''''''''''''''''''
 ' showChannelGridScreen
 '
