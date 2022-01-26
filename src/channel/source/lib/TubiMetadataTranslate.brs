@@ -957,6 +957,9 @@ Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, full
 
   if categoryMetadata <> invalid
     translated.update(categoryMetadata)
+  else if container <> invalid
+    ' ensure we at least strore the container id, even if there is no content
+    translated.id = container.id
   end if
 
   return translated
