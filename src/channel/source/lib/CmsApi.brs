@@ -126,10 +126,14 @@ Function cmsApi_getCategoriesListRequestInfo(bKidsMode = false)
 
   if endpoint = "matrix"
     options.params["limit"] = 0
+    options.params["includeEmptyHistory"] = "false"
+    options.params["includeEmptyQueue"] = "false"
   else
     options.headers["x-tubi-include-browser-list"] = "true"
     options.params["include_browser_list"] = true
     options.params["contents_limit"] = 0
+    options.params["include_empty_history"] = "false"
+    options.params["include_empty_queue"] = "false"
   end if
 
 
