@@ -528,8 +528,12 @@ Function setRowListFocus()
   if m.top.hasFocus()
     m.justGainedFocus = true
     m.RowList.setFocus(true)
-  else
-    topLeftIndex = [0, 0]
-    m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(topLeftIndex)
+  else 
+    if m.RowList.rowItemFocused <> invalid and m.RowList.rowItemFocused.count() > 0
+      reloadedItemIndex = m.RowList.rowItemFocused
+    else
+      reloadedItemIndex = [0, 0]
+    end if
+    m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(reloadedItemIndex)
   end if
 End Function
