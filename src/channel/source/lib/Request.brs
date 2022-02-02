@@ -255,7 +255,7 @@ Function tubi_handleHttpEvent(message As Object) As Object
         code = message.GetResponseCode()
 
         'server said our auth token was not valid
-        if m.authInfo <> invalid and code = 403 and m.retries > 0
+        if m.authInfo <> invalid and m.authInfo.userId <> invalid and code = 403 and m.retries > 0
           newAuthInfo = m.refreshAuthToken(m.authInfo, 100)
           if newAuthInfo <> invalid
             'replace any necessary new auth info in the headers and try again
