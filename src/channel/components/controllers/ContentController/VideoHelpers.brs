@@ -416,12 +416,13 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
 
     nResumePoint = round(videoPlayer.position)
 
+    isEndReached = (videoContent.creditsCuePoints <> invalid and videoContent.creditsCuePoints.postlude <> invalid and videoContent.creditsCuePoints.postlude > 0 and nResumePoint > videoContent.creditsCuePoints.postlude)
     ' So the detailed page does not have a refresh issue, pass the local resume number before the backend communicates.
     ' The problem with this is that if the backend comes back with a different number than the local
     ' number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video.
     ' The local number is 2 seconds and displays the resume button, but the backend determines that 2
     ' seconds is not enough to warrant a resume button and returns 0 as the resume point.    
-    if nResumePoint < m.constants.player.historyFrequency or (videoContent.creditsCuePoints <> invalid and videoContent.creditsCuePoints.postlude <> invalid and videoContent.creditsCuePoints.postlude > 0 and nResumePoint > videoContent.creditsCuePoints.postlude)
+    if nResumePoint < m.constants.player.historyFrequency or isEndReached = true
       '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0
       nResumePoint = 0
     end if
@@ -447,10 +448,13 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
         detailContent.currentEpisodeId = videoContent.id
         populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
         
-        ' For SignedIn/guest user, update resume point to global variable
-        updateHistoryLocally(videoContent, nResumePoint)
-        ' For SignedIn user, update resume point to backend
-        updateHistory(videoContent, nResumePoint)
+        'updating the history if user has watched more than historyFrequency or postlude reached
+        if nResumePoint > 0 or isEndReached = true
+          ' For SignedIn/guest user, update resume point to global variable
+          updateHistoryLocally(videoContent, nResumePoint)
+          ' For SignedIn user, update resume point to backend
+          updateHistory(videoContent, nResumePoint)
+        end if
 
         ' Repopulate the episodes screen if it is the screen under the video player screen in the call stack
         hiddenScreen = getHiddenScreen(1)
@@ -490,11 +494,13 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
         ' Case 1
         ' Returning to the detail screen for the same movie as was started, no autoplay
         ' Just repopulate the detail screen with the same content
-        
-        ' For SignedIn/guest user, update resume point to global variable
-        updateHistoryLocally(videoContent, nResumePoint)
-        ' For SignedIn user, update resume point to backend
-        updateHistory(videoContent, nResumePoint)
+        'updating the history if user has watched more than historyFrequency or postlude reached
+        if nResumePoint > 0 or isEndReached = true
+          ' For SignedIn/guest user, update resume point to global variable
+          updateHistoryLocally(videoContent, nResumePoint)
+          ' For SignedIn user, update resume point to backend
+          updateHistory(videoContent, nResumePoint)
+        end if
         
         populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
       end if
