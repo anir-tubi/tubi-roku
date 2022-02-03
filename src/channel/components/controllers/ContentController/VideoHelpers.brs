@@ -687,7 +687,7 @@ Function initVideoTracking(videoPlayer)
       videoPlayer.unobserveFieldScoped("sendYouboraError")
       videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
       if m.youboraTask = invalid
-        m.youboraTask = m.top.createChild("YBPluginCustom")
+        m.youboraTask = m.top.createChild("YBPluginRokuVideo")
         m.youboraTask.id = "Youbora"
         m.youboraTask.options = m.constants.thirdParty.youbora.config
         m.global.addFields({ YouboraLogActive: m.constants.thirdParty.youbora.debug })
@@ -700,7 +700,6 @@ Function initVideoTracking(videoPlayer)
         m.youboraTask.taskState = "stop"
       end if
       m.youboraTask.videoplayer = videoPlayer.findNode("VideoNode")
-      m.youboraTask.segInfo = videoPlayer.segInfo
     end if
   end if
 End Function
@@ -863,7 +862,6 @@ Function onSegInfoChange(msg)
        if rendition <> invalid
          youboraOptions["content.rendition"] = rendition
          m.youboraTask.options = youboraOptions
-         m.youboraTask.segInfo = segInfo
        end if
     end if
   end if

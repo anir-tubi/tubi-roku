@@ -2,7 +2,6 @@
 
 sub init()
 
-    'm.global.addFields({ YouboraLogActive: true })
     YouboraLog("YBPluginGeneric.brs - init")
     m.top.functionName = "_run"
 
@@ -39,6 +38,7 @@ sub init()
     'Ads
     m.getAdPosition = getAdPosition
     m.getAdNumber = getAdNumber
+    m.getAdNumberInBreak = getAdNumberInBreak
     m.getAdPlayhead = getAdPlayhead
     m.getAdDuration = getAdDuration
 
@@ -55,6 +55,7 @@ sub init()
     m.isAdBreakStarted = false
 
     m.adNumber = 0
+    m.adNumberInBreak = 0
     m.adPosition = "unknown"
     m.adTitle = invalid
     m.adBreakNumber = 0
@@ -71,7 +72,7 @@ sub _run()
     YouboraLog("YBPluginGeneric.brs - run")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.5.18-" + m.pluginName
+    m.pluginVersion = "6.5.22-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)
@@ -223,6 +224,10 @@ end function
 
 function getAdNumber()
     return invalid
+end function
+
+function getAdNumberInBreak()
+    return m.adNumberInBreak
 end function
 
 function getAdDuration()
@@ -421,6 +426,7 @@ function convertToRokuAdsEvent(adInfo as object) as object
     ad = adInfo.ad
 
     if (adInfo.event = "PodStart" or adInfo.event = "PodComplete")
+        m.adNumberInBreak = 0
         rokuAd.type = adInfo.event
         rokuAd.rendersequence = "midroll"
         if ad.timeoffset = 0 then rokuAd.rendersequence = "preroll"
@@ -436,6 +442,7 @@ function convertToRokuAdsEvent(adInfo as object) as object
 
     if (adInfo.event = "start")
         m.adNumber = m.adNumber + 1
+        m.adNumberInBreak = m.adNumberInBreak + 1
         rokuAd.type = "Impression"
         rokuAd.duration = ad.duration
         rokuAd.adtitle = ad.adtitle

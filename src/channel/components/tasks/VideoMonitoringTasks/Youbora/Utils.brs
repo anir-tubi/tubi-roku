@@ -14,9 +14,9 @@ sub YouboraLog(message as String)
     if m.YouboraLogActive = invalid
         m.YouboraLogActive = m.global.YouboraLogActive
     end if
-	if m.YouboraLogActive = true
-		print message
-	endif
+    if m.YouboraLogActive = true
+        print message
+    endif
 end sub
 
 ' Extracted from https://github.com/Roberto14/CompareAA

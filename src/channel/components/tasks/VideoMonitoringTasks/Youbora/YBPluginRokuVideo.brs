@@ -9,7 +9,7 @@ end sub
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.5.18-" + m.pluginName
+    m.pluginVersion = "6.5.22-" + m.pluginName
 
     ' Let's cache the segment used on the bitrate to access less to it
     m.bitrateSegment = invalid
@@ -254,7 +254,7 @@ end function
 function getBitrate()
     'This is only for HLS and DASH
     m.bitrateSegment = m.top.videoplayer.streamingSegment
-    if m.bitrateSegment <> invalid
+    if m.bitrateSegment <> invalid AND m.bitrateSegment.segType <> 1 'not audio
         br = m.bitrateSegment.segBitrateBps
     else
         br = -1
@@ -264,7 +264,8 @@ end function
 
 function getRendition()
     'This is only for HLS and DASH
-    if m.bitrateSegment <> invalid
+    m.bitrateSegment = m.top.videoplayer.streamingSegment
+    if m.bitrateSegment <> invalid AND m.bitrateSegment.segType <> 1 'not audio
         rendition = m.bitrateSegment.segBitrateBps
         if rendition < 1000
             rendition = rendition.ToStr() + "bps"

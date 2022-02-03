@@ -330,6 +330,15 @@ function InfoManager(plugin, options = invalid)
         return number
     end function
 
+    this.getAdNumberInBreak = function()
+        number = m.plugin.getAdNumberInBreak()
+
+        if number = invalid
+            number = 1
+        end if
+        return number
+    end function
+
     this.getAdDuration = function()
         duration = m.plugin.getAdDuration()
 
@@ -442,7 +451,6 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("properties") = false then outParams["properties"] = m.options["content.metadata"]
         if outParams.DoesExist("cdn") = false then outParams["cdn"] = m.options["content.cdn"]
         if outParams.DoesExist("program") = false then outParams["program"] = m.options["content.program"]
-        if outParams.DoesExist("package") = false then outParams["package"] = m.options["content.package"]
         if outParams.DoesExist("saga") = false then outParams["saga"] = m.options["content.saga"]
         if outParams.DoesExist("tvshow") = false then outParams["tvshow"] = m.options["content.tvShow"]
         if outParams.DoesExist("season") = false then outParams["season"] = m.options["content.season"]
@@ -466,6 +474,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("codecProfile") = false then outParams["codecProfile"] = m.options["content.encoding.codecProfile"]
         if outParams.DoesExist("containerFormat") = false then outParams["containerFormat"] = m.options["content.encoding.containerFormat"]
         'Extra params
+        if outParams.DoesExist("dimensions") = false then outParams["dimensions"] = m.options["content.customDimensions"]
         nextraparams = 20
         index = 1
         while (index <= nextraparams)
@@ -520,7 +529,8 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.18 Roku Adnalyzer"
+        if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.22 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1
@@ -538,10 +548,12 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
     else if requestName = "adJoin"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
+        if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
     else if requestName = "adQuartile"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
+        if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
     else if requestName = "adPause"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
@@ -553,6 +565,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
+        if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
         if outParams.DoesExist("position") = false then outParams["position"] = m.getAdPosition()
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
     else if requestName = "adError"
@@ -565,6 +578,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adDuration") = false then outParams["adDuration"] = m.getAdDuration()
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
+        if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
     else if requestName = "adBreakStart"
         if outParams.DoesExist("givenAds") = false then outParams["givenAds"] = m.options["ad.givenAds"]
         if outParams.DoesExist("position") = false then outParams["position"] = m.getAdPosition()
