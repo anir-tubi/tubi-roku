@@ -250,7 +250,6 @@ Function onSideNavItemSelected()
         displayMenuItemDisabled(m.constants.ui.sideNavIds.movies)
       else
         setUiMode(m.constants.ui.modes.standard)
-        showHideSpinner(true)
         showMoviesScreen()
         bNewScreenCalledSuccess = true
       end if
@@ -260,7 +259,6 @@ Function onSideNavItemSelected()
         displayMenuItemDisabled(m.constants.ui.sideNavIds.tv)
       else
         setUiMode(m.constants.ui.modes.standard)
-        showHideSpinner(true)
         showTVScreen()
         bNewScreenCalledSuccess = true
       end if
@@ -273,7 +271,6 @@ Function onSideNavItemSelected()
         displayMenuItemDisabled(m.constants.ui.sideNavIds.espanol, "teens")        
       else
         setUiMode(m.constants.ui.modes.latino)
-        showHideSpinner(true)
         showEspanolScreen()
         bNewScreenCalledSuccess = true
       end if  
@@ -283,7 +280,6 @@ Function onSideNavItemSelected()
         displayMenuItemDisabled(m.constants.ui.sideNavIds.linearTV)
       else
         setUiMode(m.constants.ui.modes.standard)
-        showHideSpinner(true)
         showLinearTVScreen()
         bNewScreenCalledSuccess = true
       end if
