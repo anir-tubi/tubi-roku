@@ -287,7 +287,6 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.mylist
-      hideNavMenu(false)
       if isKidsUIOn() <> true
         setUiMode(m.constants.ui.modes.standard)
       end if
@@ -315,7 +314,7 @@ Function onSideNavItemSelected()
     end if
 
     if bNewScreenCalledSuccess = true
-      hideNavMenu(false)
+      hideNavMenu(false)  '//Hide side nav AFTER a successful side nav selection so focus moves to the new screen, not the previously focused screen 
       m.sSideNavItemSelectedId = itemSelectedId
       m.sSideNavCurrentScreen = getCurrentScreen()
     end if
