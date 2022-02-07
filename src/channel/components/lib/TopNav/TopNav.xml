@@ -55,6 +55,25 @@
            in order to know if we should send a NavigateWithinPageEvent. -->
       <field id="handlingFocusFromOtherTopNavBackButton" type="boolean" />
 
+      <!-- If the top nav has focus, and a user presses a button (typically the "down" button) to
+           navigate to another UI component in the same page, then there should be no
+           NavigateWithinPageEvent. However, we will need to jump to the appropriate item in the top nav
+           as part of setting the UI based on the top nav no longer having focus, which would trigger a
+           NavigateWithinPage event. This field indicates if we are currently in the process of handling
+           the focus callbacks that occur based on the navigation to a new component, in order to know if
+           we should send a NavigateWithinPageEvent. -->
+      <field id="losingFocusToComponentOnSamePage" type="boolean" />
+
+      <!-- If the top nav has focus, and a user presses the "back" button to move focus to a component
+           outside the page (like the side nav), we will need to jump to the appropriate item in the top
+           nav as part of setting the UI based on the top nav no longer having focus, which would trigger a NavigateWithinPage event. We don't want to send a navigateWithinPageEvent for this jumpToItem
+           focus event (a separate NavigateWithinPageEvent will fire based on moving the focus between
+           components - allowing this event would send 2 NavigateWithinPageEvents. This field indicates
+           if we are currently in the process of handling the focus callbacks that occur based on jumping
+           focus within the top nav for the specific scenario when a user is moving focus to a component
+           not on the same page (like the side nav). -->
+      <field id="losingFocusToExternalComponent" type="boolean" />
+
     <!--OUTPUT-->
       <field id="selected" type="node" alwaysNotify="true"/>
 

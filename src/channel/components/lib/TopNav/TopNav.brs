@@ -36,10 +36,12 @@ Function init()
   m.Menu.observeFieldScoped("itemSelected", "onItemSelected")
   m.Menu.observeFieldScoped("itemFocused", "onItemFocused")
 
-  ' local state to determine if a menu item gained focus due to a user navigating to a
-  ' top nav item with the remote, or due to the app programatically setting m.Menu.jumpToItem.
-  ' We don't want to send analytics events for focuses due to setting m.Menu.jumpToItem.
-  m.isJumping = false
+  ' local state to determine if a menu item was selected, which causes a jumpToItem to
+  ' reset the proper focus on the top nav right before it loses focus (in case a user has
+  ' scrolled off of the default top nav item for the page). The jumpToItem will trigger
+  ' an onItemFocused() callback which will attempt to send a navigateToPage event which we 
+  ' don't want and can prevent by checking this value.
+  m.isResetting = false
 End Function
 
 
@@ -149,6 +151,7 @@ Function onItemSelected()
       ' when the page containing this top nav is navigated to again.
       selectedItemId = getSelectedItemId()
       if selectedItemId <> ""
+        m.isResetting = true
         jumpToID(selectedItemId)
       end if
     end if
@@ -174,57 +177,40 @@ End Function
 
 Function onItemFocused()
   tubiLog("TopNav.onItemFocused")
-  '//When the user focuses on the top nav, then trigger a navigate_within_page event in ContentController
-  if m.isJumping <> true and m.top.handlingFocusFromOtherTopNavBackButton <> true
-    itemFocused = m.Menu.itemFocused
-    item = m.Menu.content.getChild(m.Menu.itemFocused)
+  itemFocused = m.Menu.itemFocused
+  item = m.Menu.content.getChild(m.Menu.itemFocused)
+  focusedID = m.Tracking.sideNavPageMap[item.id]
 
-    pageType = ""
-    if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pagetype <> invalid
-      pageType = m.top.trackingPageInfo.pagetype
-    end if
+  newTopNavFocusedButton = {
+    top_nav_section: focusedID
+  }
 
-    pageValues = {}
-    if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pageValues <> invalid
-      pageValues = m.top.trackingPageInfo.pageValues
-    end if
+  navigateWithinPageInfo = invalid
 
-    navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
-    }
-
-    row = 1
-    col = 1 + itemFocused
-    navigateWithinPageInfo.vertical_location = row '1 based index
-    navigateWithinPageInfo.vertical_location_mode = "INDEX"  'LocationMode enum
-    navigateWithinPageInfo.horizontal_location = col
-    navigateWithinPageInfo.horizontal_location_mode =  "INDEX"  'LocationMode enum
-
-    focusedID = m.Tracking.sideNavPageMap[item.id]
-    newTopNavFocusedButton = {
-      top_nav_section: focusedID
-    }
-
-    if m.oldTopNavFocusedButton <> invalid and m.oldTopNavFocusedButton.top_nav_section <> newTopNavFocusedButton.top_nav_section
-      ' If oldTopNavFocusedButton exists and is not the same as the newTopNavFocusedButton,
-      ' then the user is focusing from another topNav section
-      navigateWithinPageInfo.means_of_navigation = "SCROLL"
-      navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", m.oldTopNavFocusedButton)
-      m.top.navigateWithinPageInfo = navigateWithinPageInfo
-      m.oldTopNavFocusedButton = newTopNavFocusedButton
-    else if m.oldTopNavFocusedButton = invalid
-      '//If oldTopNavFocusedButton does not exist, then the user got to the top nav from a button press
-      navigateWithinPageInfo.means_of_navigation = "BUTTON"
-      navigateWithinPageInfo.dest_componentOneof = m.Tracking.getAnalyticsDestinationComponent("dest_top_nav_component", newTopNavFocusedButton)
-      m.top.navigateWithinPageInfo = navigateWithinPageInfo
-      m.oldTopNavFocusedButton = newTopNavFocusedButton
-    else
-      ' the old and new buttons are the same, indicating no navigating is actually happening,
-      ' so don't send any NavigateWithinPageEvents
-    end if
+  ' set NavigateWithinPageInfo state values as appropriate
+  if m.oldTopNavFocusedButton <> invalid and m.oldTopNavFocusedButton.top_nav_section <> newTopNavFocusedButton.top_nav_section
+    ' If oldTopNavFocusedButton exists and is not the same as the newTopNavFocusedButton,
+    ' then the user is focusing from another topNav section
+    navigateWithinPageInfo = buildNavigateWithinPageInfo(itemFocused, m.top.trackingPageInfo, newTopNavFocusedButton, "scroll_focus")
+  else if m.oldTopNavFocusedButton = invalid
+    '//If oldTopNavFocusedButton does not exist, then the user got to the top nav from a button press
+    navigateWithinPageInfo = buildNavigateWithinPageInfo(itemFocused, m.top.trackingPageInfo, newTopNavFocusedButton, "gain_focus")
   else
-    m.isJumping = false
-    m.top.handlingFocusFromOtherTopNavBackButton = false
+    ' the old and new buttons are the same, indicating no navigating is actually happening,
+    ' so don't send any NavigateWithinPageEvents
+  end if
+
+  '//When the user focuses on the top nav, then trigger a navigate_within_page event in ContentController
+  if m.top.handlingFocusFromOtherTopNavBackButton <> true and m.top.losingFocusToComponentOnSamePage <> true and m.top.losingFocusToExternalComponent <> true and m.isResetting <> true
+    if navigateWithinPageInfo <> invalid
+      m.top.navigateWithinPageInfo = navigateWithinPageInfo
+    end if
+  end if
+
+  m.oldTopNavFocusedButton = newTopNavFocusedButton
+
+  if m.isResetting = true
+    m.isResetting = false
   end if
 End Function
 
@@ -256,7 +242,6 @@ Function jumpToId(id)
 
       if nJumpToItem >= 0
         '//Jump to the item with the same ID that is associated with m.top.jumpToID
-        m.isJumping = true
         m.Menu.jumpToItem = nJumpToItem
       end if
     end if
@@ -409,4 +394,47 @@ Function onKeyEvent(key, press) as Boolean
     end if
   end if
   return false
+End Function
+
+
+' @itemFocused: integer, the index of the focused top nav item, 0 based
+' @trackingPageInfo: assocArray, as found on m.top.trackingPageInfo
+' @newTopNavFocusedButton: assocArray, has single key, value pair such that 
+'                          key = "top_nav_section", value = <<id of the focused menu item>>
+' @focusChange: string, one of the following values, corresponding to the type of focus change
+'                       leading to the NavigateWithinPageEvent. "scroll_focus", "gain_focus"
+'
+' @returns: assocArray, that can be used as the eventValues to build a "navigate_within_page_event"
+'                       with TubiTracking.trackUserEvent()
+Function buildNavigateWithinPageInfo(itemFocused, trackingPageInfo, newTopNavFocusedButton, focusChange)
+  pageType = ""
+  if trackingPageInfo <> invalid and trackingPageInfo.pagetype <> invalid
+    pageType = trackingPageInfo.pagetype
+  end if
+
+  pageValues = {}
+  if trackingPageInfo <> invalid and trackingPageInfo.pageValues <> invalid
+    pageValues = trackingPageInfo.pageValues
+  end if
+
+  navigateWithinPageInfo = {
+    pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
+  }
+
+  row = 1
+  col = 1 + itemFocused
+  navigateWithinPageInfo.vertical_location = row '1 based index
+  navigateWithinPageInfo.vertical_location_mode = "INDEX"  'LocationMode enum
+  navigateWithinPageInfo.horizontal_location = col
+  navigateWithinPageInfo.horizontal_location_mode = "INDEX"  'LocationMode enum
+
+  if focusChange = "scroll_focus"
+    navigateWithinPageInfo.means_of_navigation = "SCROLL"
+    navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", m.oldTopNavFocusedButton)
+  else if focusChange = "gain_focus"
+    navigateWithinPageInfo.means_of_navigation = "BUTTON"
+    navigateWithinPageInfo.dest_componentOneof = m.Tracking.getAnalyticsDestinationComponent("dest_top_nav_component", newTopNavFocusedButton)
+  end if
+
+  return navigateWithinPageInfo
 End Function
