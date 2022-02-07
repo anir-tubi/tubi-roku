@@ -3,12 +3,13 @@
 <component name="CategoryGridList" extends="Group">
   <script type="text/brightscript" uri="CategoryGridList.brs" />
   <script type="text/brightscript" uri="../FocusMixin.brs" />
+  <script type="text/brightscript" uri="../ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
-  
-  <script type="text/brightscript" uri="../ExperimentMixin.brs" />
+  <!-- required by TubiMetadataTranslate.brs -->
+  <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 
   <interface>

@@ -704,8 +704,7 @@ Function onSkipIntroSelected()
   if m.HUD.opacity > 0.0
     animateTransport("out")
   end if
-  m.positionAtJumpStart = m.playerPosition
-  m.VideoState = "hop"
+
 
   hopPosition = -1
   if m.skipIntro.id = "skipIntro"
@@ -717,6 +716,8 @@ Function onSkipIntroSelected()
   end if
 
   if hopPosition > 0
+    m.positionAtJumpStart = m.playerPosition
+    m.VideoState = "hop"
     jumpToPosition(hopPosition)
   end if
 
