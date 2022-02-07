@@ -659,6 +659,7 @@ Function handleHomeScreenErrorResponse(screenID, response)
         fnCancelFunction = destroyScreen
       end if
       showErrorModal(modalInfo, retryCategoryList, screenID, fnCancelFunction, cancelParams)
+      showHideSpinner(false)
     end if
 
     loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms

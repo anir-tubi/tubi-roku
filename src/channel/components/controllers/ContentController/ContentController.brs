@@ -1278,8 +1278,15 @@ Function destroyScreen(sScreenID)
     deleteFromScreenCache(sScreenID)
 
     '//Take user to previous screen
-    if currentScreen.id = sScreenID
+    if currentScreen <> invalid and currentScreen.id = sScreenID
       popScreen(true, false)
+
+      ' focus the side nav selection that corresponds to the new to screen
+      newCurrentScreen = getCurrentScreen()
+      if newCurrentScreen <> invalid
+        sideNavId = m.constants.ui.screenIdToSideNavId[newCurrentScreen.id]
+        focusSideNavOption(sideNavId)
+      end if
     end if
 
   end if 

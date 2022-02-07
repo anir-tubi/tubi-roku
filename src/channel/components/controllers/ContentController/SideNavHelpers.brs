@@ -55,8 +55,9 @@ End Function
 
 ' @sID: string: one of the menu item ids. A list of ids can be found in constants.ui.sideNavIds
 Function focusSideNavOption(sID)
-  '//::TODO:: there should be a check that a valid ID was passed. For right now assume sID is valid and correct.
-  m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav
+  if isNonEmptyString(sID) and m.constants.ui.sideNavIds[sID] <> invalid
+    m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav
+  end if
 End Function
 
 

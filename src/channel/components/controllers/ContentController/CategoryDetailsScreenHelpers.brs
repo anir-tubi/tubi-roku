@@ -193,6 +193,7 @@ End Function
 
 
 Function showEmptyContentModal(screen)
+  tubiLog("CategoryDetailsScreenHelpers.showEmptyContentModal")
 
   dialogEvent = {
     type: "dialog"
@@ -213,15 +214,20 @@ End Function
 
 
 Function removeTopScreen()
-
+  tubiLog("CategoryDetailsScreen.removeTopScreen")
   topScreen = getCurrentScreen()
+
+  ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
+  ' sent at the time of pushing the screen on the stack, so that the load time could be calculated
+  ' and added to the tracking events on successful fetching of the screen contents. In the case of
+  ' an error we do not want events showing navigation back to the original screen if there were no
+  ' events logged showing navigation to the categoryDetailsScreen.
   popScreen(false, false)
   topScreen = getCurrentScreen()
   
   sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
   focusSideNavOption(sideNavId)
-
-end Function
+End Function
 
 
 ' @error: assocArray, with single key/value, "code"/<<error code as integer>>
@@ -238,24 +244,17 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
 
   categoryDetailsScreen = invalid
 
+  ' If topScreen.id does not = the ID of a categoryDetailsScreen, another screen (like the sign in screen)
+  ' has been pushed on top of the categoryDetailsScreen. Hold off on removing the screen and
+  ' displaying an error. When the user traverses back through the navigation stack, the
+  ' categoryDetailsScreen will eventually be revealed and if there is still no content, then 
+  ' an error modal will be displayed.
+  ' popScreen(false, false)
   if topScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
     categoryDetailsScreen = topScreen
 
     ' categoryDetailsScreen is created/pushed in showCategoryDetailsScreen, since there is no content,
-    ' remove it from the stack if it is the top screen.
-    ' Do not send navigation tracking info when popping the screen, as navigation tracking wasn't
-    ' sent at the time of pushing the screen on the stack, so that the load time could be calculated
-    ' and added to the tracking events on successful fetching of the screen contents. In the case of
-    ' an error we do not want events showing navigation back to the original screen if there were no
-    ' events logged showing navigation to the categoryDetailsScreen.
-    ' 
-    ' If topScreen.id does not = the ID of a categoryDetailsScreen, another screen (like the sign in screen)
-    ' has been pushed on top of the categoryDetailsScreen. Hold off on removing the screen and
-    ' displaying an error. When the user traverses back through the navigation stack, the
-    ' categoryDetailsScreen will eventually be revealed and if there is still no content, then 
-    ' an error modal will be displayed.
-    popScreen(false, false)
-
+    ' remove it from the stack will occur after the user closes the modal.
     code = ""
     if error <> invalid and error.code <> invalid
       code = error.code.toStr()
@@ -287,7 +286,7 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
       trackingTask: m.trackingLoggingTask
     }
 
-    showErrorModal(modalInfo)
+    showErrorModal(modalInfo, invalid, invalid, removeTopScreen)
   else
     categoryDetailsScreen = getScreenFromStackById(m.constants.ui.screenIds.categoryDetailsScreen)
   end if

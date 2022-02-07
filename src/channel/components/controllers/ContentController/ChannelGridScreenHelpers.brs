@@ -163,13 +163,12 @@ End Function
 
 
 Function onCategoriesListError(errorInfo)
-'//::TODO:: make sure the side nav button returns to previous focus.
   tubiLog("ChannelGridScreenHelpers.onCategoriesListError")
 
   screen = getFromScreenCache(errorInfo.screenId)
   
   if screen <> invalid and (screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen)
-    popScreen(false, false)
+    'the channelListScreen will be popped from the stack after the user closes the error modal
 
     'delete the screen from the screen cache so that the next time the user attempts to load the page, the page will be loaded
     'from scratch again. Otherwise an empty page will load and content will never be fetched.
@@ -201,7 +200,7 @@ Function onCategoriesListError(errorInfo)
       trackingTask: m.trackingLoggingTask
     }
 
-    showErrorModal(modalInfo)
+    showErrorModal(modalInfo, invalid, invalid, removeTopScreen)
     loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
     screenTrackingLoad(screen.trackingPageInfo, loadTime, false)
   end if
