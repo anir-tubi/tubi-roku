@@ -1122,6 +1122,22 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Recomendado"
     },
+    "menu_epg_all": {
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "message": "Todo"
+    },
+    "menu_epg_sports": {
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "message": "Deportes"
+    },
+    "menu_epg_news": {
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "message": "Noticias"
+    },
+    "epg_starts_at": {
+      "description": "Program time Title when user selects a future program on EPG.",
+      "message": "Comienza en"
+    },
     "menu_home": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Inicio"
@@ -1357,6 +1373,10 @@ Function getTranslation_es_MX()
     "error_noGetChannels_description": {
       "description": "description of the error dialog when channel content could not get received from the server.",
       "message": "No se pudo recuperar el contenido del canal."
+    },
+    "error_noGetChannelGuide_description": {
+      "description": "description of the error dialog when channel guide content could not get received from the server.",
+      "message": "No se pudo recuperar la guía de canales."
     },
     "error_noContent_description": {
       "description": "description of the error dialog when there was no content to be gathered from the server.",
@@ -1654,6 +1674,18 @@ Function getTranslation_es_MX()
       "description": "Onscreen message to indicate home content could not be loaded",
       "message": "No se pudo cargar la pantalla de inicio de Tubi."
     },
+    "screenHome_item_tvguide_title": {
+      "description": "The title of the rowList item for the TV Guide. It should be in title case.",
+      "message": "Guía de TV"
+    },
+    "screenHome_item_tvguide_subtitle": {
+      "description": "The subtitle of the rowList item for the TV Guide. It should be in title case.",
+      "message": "Ver Todos Los Canales"
+    },
+    "epg_minutes_left": {
+      "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
+      "message": "quedan {minutes} m"
+    },
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
       "message": "No se pudo cargar el guía de canales."
@@ -1814,9 +1846,17 @@ Function getTranslation_es_MX()
       "description": "Label of a Button to display the closed captions",
       "message": "Subtítulos"
     },
+    "linearVideoPlayer_buttonCaptions2": {
+      "description": "Label of a Button to display the closed captions",
+      "message": "Subtítulos"
+    },
     "linearVideoPlayer_buttonGuide": {
       "description": "Label of a Button to view the channel guide",
       "message": "Guía"
+    },
+    "linearVideoPlayer_buttonGuide2": {
+      "description": "Label of a Button to view the channel guide",
+      "message": "Guía Completa de TV"
     },
     "linearVideoPlayer_channelGuideTitle": {
       "description": "The title displayed above a list of live TV channels",
@@ -1998,7 +2038,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_parentalPassword_setup_new_password": {
       "description": "Directions for users who attempt to change the parental controls",
-      "message": "Para crear una contraseña nueva"
+      "message": "Para crear una nueva contraseña"
     },
     "screenSettings_parentalPassword_visit_link": {
       "description": "Directions for users to setup the new password",
