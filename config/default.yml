@@ -37,7 +37,8 @@ manifest:
   uri_resolution_autosub: "$$RES$$,sd,hd,fhd"
   requires_widevine_drm: 1
   requires_widevine_version: "1.0"
-  supports_input_launch: 1 
+  supports_input_launch: 1
+  supports_voice_roinput: 1
   supports_etc_seek: 1 
   supports_etc_next: 1 
   splash_min_time: 2000

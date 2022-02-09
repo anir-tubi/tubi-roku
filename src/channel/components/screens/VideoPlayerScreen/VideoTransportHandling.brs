@@ -224,6 +224,14 @@ Function handleTransportVoiceEvent()
       end if
     else if command = "next" 
       goToNext()
+    else if command = "skip"
+      'If the content has an intro/recap/early credits, handle the "skip" command.
+      'otherwise, handle it like a "next" command
+      if isNonEmptyString(m.skipIntro.id)
+        onSkipIntroSelected()
+      else
+        goToNext()
+      end if
     else
       response = "unhandled"     
     end if
