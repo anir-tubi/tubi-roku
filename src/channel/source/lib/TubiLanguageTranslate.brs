@@ -12,7 +12,8 @@ End Function
 '
 '@param sID: The ID associated with the desired translation string
 '@param aDynamicStrings: Optional associated array of param/value pairings that should be used to replace strings in the translation.  
-'       Placement of dynamic strings within a static string translation is used when it may not be known where the dynamic string should be placed within the static string.  For example: "Welcome Jack" vs "Jack Bienvenidos" 
+'       Placement of dynamic strings within a static string translation is used when it may not be known where the dynamic string 
+'       should be placed within the static string.  For example: "Welcome Jack" vs "Jack Bienvenidos" 
 '@return String - The translated string associated with the string ID. If unsuccessful, it will return an empty string.
 Function getTranslation(sID as string, aDynamicStrings = {}) as String
   '//What is the current language
@@ -146,6 +147,22 @@ Function getTranslation_en_US()
     "menu_recommended": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Recommended"
+    },
+    "menu_epg_all":{
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "message": "All"
+    },
+    "menu_epg_sports":{
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "message": "Sports"
+    },
+    "menu_epg_news":{
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "message": "News"
+    },
+    "epg_starts_at": {
+      "description": "Program time Title when user selects a future program on EPG.",
+      "message": "Starts at"
     },
     "menu_home": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
@@ -382,6 +399,10 @@ Function getTranslation_en_US()
     "error_noGetChannels_description": {
       "description": "description of the error dialog when channel content could not get received from the server.",
       "message": "Could not retrieve channel content."
+    },
+    "error_noGetChannelGuide_description": {
+      "description": "description of the error dialog when channel guide content could not get received from the server.",
+      "message": "Could not retrieve channel guide."
     },
     "error_noContent_description": {
       "description": "description of the error dialog when there was no content to be gathered from the server.",
@@ -679,6 +700,18 @@ Function getTranslation_en_US()
       "description": "Onscreen message to indicate home content could not be loaded",
       "message": "Unable to load Tubi home screen."
     },
+    "screenHome_item_tvguide_title": {
+      "description": "The title of the rowList item for the TV Guide. It should be in title case.",
+      "message": "TV Guide"
+    },
+    "screenHome_item_tvguide_subtitle": {
+      "description": "The subtitle of the rowList item for the TV Guide. It should be in title case.",
+      "message": "See All Channels"
+    },
+    "epg_minutes_left": {
+      "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
+      "message": "{minutes}m left"
+    },
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
       "message": "Unable to load the Channel Guide."
@@ -839,9 +872,17 @@ Function getTranslation_en_US()
       "description": "Label of a Button to display the closed captions",
       "message": "Captions"
     },
+    "linearVideoPlayer_buttonCaptions2": {
+      "description": "Label of a Button to display the closed captions",
+      "message": "Subtitles"
+    },
     "linearVideoPlayer_buttonGuide": {
       "description": "Label of a Button to view the channel guide",
       "message": "Guide"
+    },
+    "linearVideoPlayer_buttonGuide2": {
+      "description": "Label of a Button to view the channel guide",
+      "message": "Full TV Guide"
     },
     "linearVideoPlayer_channelGuideTitle": {
       "description": "The title displayed above a list of live TV channels",

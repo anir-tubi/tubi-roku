@@ -18,14 +18,23 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
     bTellPlayerToPlay = true
     if videoPlayer = invalid
-      videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", true).enabled = true
+        videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerNewScreen")
+        '//::TODO:: EPG - when the EPG experiment is graduated, then replace LinearVideoPlayerScreen with LinearVideoPlayerNewScreen: 1) get rid of LinearVideoPlayerScreen, and 2) rename LinearVideoPlayerNewScreen to LinearVideoPlayerScreen
+      else
+        videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
+      end if
       videoPlayer.id = m.constants.ui.screenIds.linearVideoPlayerScreen
       ' onVideoPlayerVisibleChange exists in ContentController
       videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
       videoPlayer.observeFieldScoped("refreshChannels", "onChannelsRequested")
       videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
       videoPlayer.observeFieldScoped("userDisplayingChannelGuide", "onChannelGuideVisibleStateChangedByUser")
-      videoPlayer.observeFieldScoped("channelSelected", "onLinearChannelSelectedFromGuide")
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
+        videoPlayer.observeFieldScoped("channelSelectedUpdated", "onLinearChannelSelectedFromGuide")
+      else
+        videoPlayer.observeFieldScoped("channelSelected", "onLinearChannelSelectedFromGuide")
+      end if
       videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
       initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
       setInScreenCache(videoPlayer)
@@ -38,7 +47,9 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
     ' set general observers for all content
     videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
-
+    if videoPlayer.visible = false
+      videoPlayer.visible = true
+    end if
     ' it's necessary to push the screen after the content has been set on the videoPlayer component,
     ' so NavigateToPage and PageLoad events contain the necessary content id information
     if bMinimized = false
@@ -46,6 +57,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     else
       '//play at minimized state
       showHideLinearVideoPlayerSpinner(true)
+      videoPlayer.loading = true
       animateLinearVideoPlayerToMinState(0, false)
     end if
 
@@ -87,6 +99,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 End Function
 
 
+
 Function getCurrentLinearContent()
   content = invalid
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
@@ -126,10 +139,31 @@ Function maximizeLinearPlayer(content)
       }
       m.backgroundGroup.posterVisible = true 
       showHideLinearVideoPlayerSpinner(false)
-      
+      videoPlayer.loading = false
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
+        getDataForTimeGrid() 
+      end if
       repositionLinearVideoPlayerToMaxState(bAnimate)
     end if
 
+  end if
+End Function
+
+
+Function getDataForTimeGrid()
+  tubilog("LinearVideoPlayerScreenHelpers.getDataForTimeGrid")
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
+    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+    epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
+    if videoPlayer <> invalid
+      if epgChannelList = invalid or (epgChannelList <> invalid and shouldRefresh(epgChannelList.getChild(0)) = true) 'There is no cached contents
+        fetchEPGScreenChannels(videoPlayer)
+      else if epgChannelList <> invalid
+        videoPlayer.timeGridContent = epgChannelList
+        videoPlayer.updateTimeGridContent = true
+        videoPlayer.timeGridContentLoading = false
+      end if
+    end if
   end if
 End Function
 
@@ -142,6 +176,7 @@ Function isLinearPlayerPlayingThisContent(content)
       bPlaying = true
     end if
   end if
+
   return bPlaying
 End Function
 
@@ -325,11 +360,12 @@ End Function
 
 
 Function stopAndHideLinearVideoPlayer()
-  tubiLog("LinearVideoPlayerScreenHelpers.stopAndHideLinearVideoPlayer")  
+  tubiLog("LinearVideoPlayerScreenHelpers.stopAndHideLinearVideoPlayer") 
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
     '//reset and Hide the loading indicator.
     showHideLinearVideoPlayerSpinner(false)
+    videoPlayer.loading = false
     m.backgroundGroup.posterVisible = true
     stopLinearVideoContent()
     unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
@@ -357,6 +393,10 @@ Function repositionLinearVideoPlayerToMaxState(bAnimate)
     if bAnimate = true
       nDuration = .5
     end if 
+
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
+      clearMinimizedLinearPlayerAnimation()
+    end if
     resizeToLocation(videoPlayer, 1920, 1080, [0,0], nDuration)
   end if
 End Function
@@ -365,18 +405,93 @@ End Function
 Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
   '//Add video player to LinearPlayerGroup
 
-  tubiLog("LinearVideoPlayerScreenHelpers.animateLinearVideoPlayerToMinState")  
+  tubiLog("LinearVideoPlayerScreenHelpers.animateLinearVideoPlayerToMinState")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
     videoPlayer.fullscreen = false
     videoPlayer.unobserveFieldScoped("state")
     videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerStateWhileInMinState")
-    m.LinearPlayerGroup.appendChild(videoPlayer)
 
-    resizeToLocation(videoPlayer, m.constants.ui.imageSizes.linearVideoPlayer_minimizedDimension[0], m.constants.ui.imageSizes.linearVideoPlayer_minimizedDimension[1], m.constants.ui.imageTranslations.linearVideoPlayer_minimizedTranslation, nDuration)
+    linearPlayerParentGroup = m.LinearPlayerGroup
+    epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false)
+    if epgExperimentResource.enabled = true
+      currentScreen = getCurrentScreen()
+      if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.homeScreen
+        if epgExperimentResource.update_homescreen = true
+          '//If the current screen is the homescreen, then display the minimized video player over the rowList
+          nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayer_minimizedDimension[0]
+          nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayer_minimizedDimension[1]
+          nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayer_minimizedTranslation
+          linearPlayerParentGroup = m.LinearPlayerGroupAboveScreenStack '//if on the homescreen, then minimized video player should appear above the rowList
+          
+          '//position the LinearCountdownTimer in the right hand corner of the video player.
+          m.LinearCountdownTimer.translation = [nPosition[0] + nWidth - m.LinearCountdownTimer.width - 12, m.LinearCountdownTimer.translation[1]]
+          m.LinearVideoPlayerSpinner.translation = [447, 660]
+        else
+          nWidth = m.constants.ui.imageSizes.linearVideoPlayer_minimizedDimension[0]
+          nHeight = m.constants.ui.imageSizes.linearVideoPlayer_minimizedDimension[1]
+          nPosition = m.constants.ui.imageTranslations.linearVideoPlayer_minimizedTranslation
+          m.LinearVideoPlayerSpinner.translation = [1576, 660]
+        end if
+      else
+        '//then the screen is coming from the EPG Screen
+        nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[0]
+        nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]
+        nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
+        m.LinearVideoPlayerSpinner.translation = [1260, 320]
+      end if
+    else 
+      nWidth = m.constants.ui.imageSizes.linearVideoPlayer_minimizedDimension[0]
+      nHeight = m.constants.ui.imageSizes.linearVideoPlayer_minimizedDimension[1]
+      nPosition = m.constants.ui.imageTranslations.linearVideoPlayer_minimizedTranslation
+    end if
+
+    linearPlayerParentGroup.appendChild(videoPlayer)
+
+    clearMinimizedLinearPlayerAnimation()
+    m.animationMinimizedLinearPlayer = resizeToLocation(videoPlayer, nWidth, nHeight, nPosition, nDuration)
+    if nDuration > 0
+      m.animationMinimizedLinearPlayer.observeField("state", "onLinearPlayerMinimizedComplete")
+    else
+      '//If the animation is instant, then call the animation-complete function immediately 
+      displayLinearPlayerProgrammingDataOnHomescreen()
+    end if
     videoPlayer.visible = bVisible
   end if
 End Function
+
+
+' The player is done getting to the minimized state
+Function onLinearPlayerMinimizedComplete(msg)
+  if msg.getData() = "stopped"
+    displayLinearPlayerProgrammingDataOnHomescreen()
+  end if
+End Function
+
+
+Function clearMinimizedLinearPlayerAnimation()
+  if m.animationMinimizedLinearPlayer <> invalid
+    m.animationMinimizedLinearPlayer.unobserveField("state")
+  end if
+  m.animationMinimizedLinearPlayer = invalid
+End Function
+
+
+' Display the programming data for the video player, but only do this on the homescreen
+Function displayLinearPlayerProgrammingDataOnHomescreen()
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid and currentScreen.subType() = "HomeScreen"
+    clearMinimizedLinearPlayerAnimation()
+    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+    if videoPlayer <> invalid and videoPlayer.state = "playing"
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
+        '//get the info to display in the minmized player info panel
+        fetchEPGChannel(videoPlayer, videoPlayer.content.ID)
+      end if
+    end if
+  end if
+End Function
+
 
 
 Function onLinearVideoPlayerStateWhileInMinState(msg)
@@ -389,9 +504,19 @@ Function onLinearVideoPlayerStateWhileInMinState(msg)
     else if state = "playing"
       '//Once the video player has loaded, then display video player
       showHideLinearVideoPlayerSpinner(false)
+      videoPlayer.loading = false
+
+      displayLinearPlayerProgrammingDataOnHomescreen()
       startCountdownTimer()
       videoPlayer.visible = true
-      m.backgroundGroup.posterVisible = false
+
+      currentScreen = getCurrentScreen()
+      epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false)
+      if (currentScreen <> invalid and isAnEpgScreen(currentScreen) = true) or epgExperimentResource.enabled = false or epgExperimentResource.update_homescreen = false
+        '//if this is the homescreen, then no need to hide the background group. If this is the EPG screen, then we need to hide the poster while the video is playing
+        '//If we are not in the roku_linear_epg_v1 experiment, then we also need to hide the poster.
+        m.backgroundGroup.posterVisible = false
+      end if
     end if
   end if
 End Function
@@ -404,14 +529,21 @@ Function onLinearVideoPlayerVisibleFullscreenChange(msg)
   bVisible = videoPlayer.visible
   bFullScreen = videoPlayer.fullscreen
   if bVisible = true and bFullScreen = false
+    '//Is the video player not in fullscreen but still visible?
     m.SideNav.visible = true
-    m.logoGroup.visible = false
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = false
+      m.logoGroup.visible = false
+    end if
   else if bVisible = false and bFullScreen = false
+    '//Is the video player no longer visible and not in fullscreen? i.e. the news container is no longer in focus
     m.SideNav.visible = true
     m.logoGroup.visible = true
+    m.clock.visible = false
   else
+    '//Is the video player in fullscreen?
     m.SideNav.visible = false
     m.logoGroup.visible = false
+    m.clock.visible = false
   end if 
 End Function
 
@@ -426,6 +558,7 @@ Function onLinearVideoPlayerState(msg)
       showLinearPlayerError(videoPlayer.errorMsg, videoPlayer.videoErrorCode)
     else if state = "playing"
       showHideLinearVideoPlayerSpinner(false)
+      videoPlayer.loading = false
     else if state = "finished"
       '//Assume a finished video stream is an error
       showLinearPlayerError()
@@ -458,11 +591,19 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
     if bContinueToPlay = true
-      popScreen(true, true)
+      ' sports epg screen or news epg screen might not have the contentID. So search for content ID and handle the back logic
+      if currentScreen.associatedScreenID = m.constants.ui.screenIds.newsEPGScreen or currentScreen.associatedScreenID = m.constants.ui.screenIds.sportsEPGScreen  
+        handleBackToEPGScreen(videoPlayer.originalContent, currentScreen.associatedScreenID)
+      else if currentScreen.associatedScreenID = m.constants.ui.screenIds.epgScreen
+        jumpToParentScreenContentByID(videoPlayer.content.id, "", currentScreen.associatedScreenID)
+        popScreen(true, true) 
+      else
+        popScreen(true, true)
+      end if
       '//animate the video player into the corner
       animateLinearVideoPlayerToMinState()
     else
-      ' remove the video player screen to reveal the home screen
+      ' remove the video player screen to reveal the home screen/epg Screen
       popScreen(true, true)
     end if
   end if
@@ -474,9 +615,13 @@ Function stopLinearVideoContent()
   tubiLog("LinearVideoPlayerScreenHelpers.stopLinearVideoContent")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
+    '//reset and Hide the loading indicator.
+    showHideLinearVideoPlayerSpinner(false)
+    videoPlayer.loading = false
     videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
     videoTrackingStop() 'stops youbora tracking
     videoPlayer.control = "stop"
+    videoPlayer.visible = false
   end if
 
   '//cancel any asynchronous tasks/requests that may cause the video to play if they are left to continue
@@ -536,8 +681,14 @@ Function showLinearPlayerError(error_message = "", errorCode = invalid)
       openTrackEvent: dialogEvent
       trackingTask: m.trackingLoggingTask
     }
+    'in case of error retrieving the player content, then stop the countdown timer and stop the video player. That way, focus on stay on the current content but not automatically try to play the error content.
+    screenID = videoPlayer.associatedScreenID
+    if screenID = m.constants.ui.screenIds.epgScreen or screenID = m.constants.ui.screenIds.sportsEPGScreen or screenID = m.constants.ui.screenIds.newsEPGScreen
+      showErrorModal(modalInfo, onRetryLinearPlayerError, invalid, resetEPGScreenContent, invalid)
+    else
+      showErrorModal(modalInfo, onRetryLinearPlayerError, invalid)
+    end if
 
-    showErrorModal(modalInfo, onRetryLinearPlayerError, invalid)
     stopLinearVideoContent() '//In case the video is still playing
   end if
 End Function
@@ -595,24 +746,41 @@ End Function
 Function onLinearChannelSelectedFromGuide(msg)
   tubiLog("LinearVideoPlayerScreenHelpers.onLinearChannelSelectedFromGuide")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  channel = msg.getData() 
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
+    channel = videoPlayer.channelSelected
+  else
+    channel = msg.getData()
+  end if
+  'this flag is used to differenciate whether a channel is always played or only played if it is different than whats already playing.
+  ' In case of EPG we do not want to attempt to play the channel which is already playing full screen.
+  playProvidedChannel = true
   if videoPlayer <> invalid
     if channel <> invalid and channel.videoResources <> invalid
-      oldTrackingPageInfo = videoPlayer.trackingPageInfo
-      trackingComponentInfo = videoPlayer.trackingComponentInfo
-      stopLinearVideoContent()
-      playLinearVideoContent(channel, false, videoPlayer.associatedScreenID)
-      newTrackingPageInfo = videoPlayer.trackingPageInfo
-      screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo)
-
-      if videoPlayer.associatedScreenID <> invalid and videoPlayer.associatedScreenID <> ""
-        '//Tell the homescreen to focus on the same channel so when the user backs out, the channel that is playing is the same one that is in focus
-        '//   Note: since the video channel guide and the homescreen's live TV container are loaded independently from each other, we cannot assume they are in sync 
-        sContainerID = ""
-        if videoPlayer.associatedScreenID = m.constants.ui.screenIds.homeScreen
-          sContainerID = videoPlayer.content.parentId
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
+        if isLinearPlayerPlayingThisContent(channel) = true
+          playProvidedChannel = false
         end if
-        jumpToHomescreenContentByID(channel.id, sContainerID, videoPlayer.associatedScreenID) 
+      end if
+
+      if playProvidedChannel = true
+        oldTrackingPageInfo = videoPlayer.trackingPageInfo
+        trackingComponentInfo = videoPlayer.trackingComponentInfo
+        stopLinearVideoContent()
+        playLinearVideoContent(channel, false, videoPlayer.associatedScreenID)
+        newTrackingPageInfo = videoPlayer.trackingPageInfo
+        screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo)
+
+        if videoPlayer.associatedScreenID <> invalid and videoPlayer.associatedScreenID <> ""
+          '//Tell the homescreen to focus on the same channel so when the user backs out, the channel that is playing is the same one that is in focus
+          '//   Note: since the video channel guide and the homescreen's live TV container are loaded independently from each other, we cannot assume they are in sync
+          sContainerID = ""
+          if videoPlayer.associatedScreenID = m.constants.ui.screenIds.homeScreen
+            sContainerID = videoPlayer.content.parentId
+            jumpToParentScreenContentByID(channel.id, sContainerID, videoPlayer.associatedScreenID)
+          else if videoPlayer.associatedScreenID = m.constants.ui.screenIds.linearTVScreen
+            jumpToParentScreenContentByID(channel.id, sContainerID, videoPlayer.associatedScreenID)
+          end if
+        end if
       end if
     else
       '//Incorrect data, display an error
@@ -728,4 +896,39 @@ Function onRetryLinearPlayerError()
     stopLinearVideoContent()
     playLinearVideoContent(content, false, videoPlayer.associatedScreenID)
   end if
+End Function
+
+
+Function handleBackToEPGScreen(content, screenId)
+  if content <> invalid 
+    contentId = content.id 
+    isContentPresent = doesEpgScreenHaveContent(contentId,screenId)
+    'if Content is not present in sports or news screen, then go back to 'all epg' screen. 
+    if isContentPresent = false
+      jumpToParentScreenContentByID(contentId, "", m.constants.ui.screenIds.EPGScreen)
+      showDefaultEPGScreen()
+    else 
+      ' if content is present, then go back to sports/news screen
+      jumpToParentScreenContentByID(contentId, "", screenId)
+      popScreen(true, true)
+    end if
+  end if
+End Function
+
+
+'searches the contentId in timegrid content of screen with screenId. 
+'@param contentId: string content Id to search
+'@param screenId: string Id of the screen to be searched for timeGridContent
+Function doesEpgScreenHaveContent(contentId, screenId) as boolean
+  screen = getFromScreenCache(screenId)
+  isContentPresent = false
+  if isAnEPGScreen(screen) = true and screen.timeGridContent <> invalid
+    for i = 0 to screen.timeGridContent.getChildCount() - 1
+      if screen.timeGridContent.getChild(i).id = contentId
+        isContentPresent = true
+        exit for
+      end if
+    end for
+  end if
+  return isContentPresent
 End Function

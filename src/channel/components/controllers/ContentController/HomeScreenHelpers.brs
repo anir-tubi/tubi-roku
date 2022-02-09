@@ -52,11 +52,13 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("topNavItemSelected", "onTopNavItemSelected")
     homeScreen.observeFieldScoped("topNavBackItemSelected", "onTopNavBackItemSelected")
     homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+    homeScreen.observeFieldScoped("scrollingstatus", "onScrollingStatusChange")
     homeScreen.observeFieldScoped("loadCategoriesIndex", "onLoadCategoriesIndex")
     homeScreen.observeFieldScoped("topNavToggled", "onScreenTopNavToggled")
     homeScreen.observeFieldScoped("navigatedAwayFromTopNav", "onNavigatedFromTopNavToSideNav")
     homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomescreenSponsoredRowFocused")
+    homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -98,7 +100,6 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     'page_load tracking will happen when content is received and displayed when onHomescreenContentReady() is called.
     pushScreen(homeScreen, true, false)
   end if
-
 End Function
 
 
@@ -368,7 +369,11 @@ Function setEnableTopNavOnHomescreen(homescreen)
 
   if homescreen <> invalid
     if homescreen.isLinearTVAllowedInTopNav <> isParentalControlsAdultLevel()
-      homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel()
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true  
+        homeScreen.isLinearTVAllowedInTopNav = false
+      else 
+        homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel()
+      end if
       refreshNeeded = true
     end if
 
@@ -569,7 +574,7 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
     '      ...
     '   </CategoryContentNode>
     ' </CategoryContentNode>
-    
+
     homeScreen.content = rawResponse
     homeScreen.contentUpdated = true
 
@@ -713,20 +718,20 @@ End Function
 
 
 ''''''''''''''''''''''''''''''
-' jumpToHomescreenContentByID
+' jumpToParentScreenContentByID
 '
-' Focus on a specific item within the homescreen
+' Focus on a specific item within the screen
 ' @sID, String = The ID of the content item that should be in focused
 ' @sDesiredContainerID, String = If there is a desire for a specific container to be in focuse, then this is the ID of the desired container
-' @sHomeScreenID, String = the ID of homescreen that should jump to the content associated with the sID 
-Function jumpToHomescreenContentByID(sID, sDesiredContainerID = "", sHomeScreenID = "")
-  tubiLog("HomeScreenHelpers.jumpToHomescreenContentByID")
-  if sHomeScreenID = ""
-    sHomeScreenID = m.constants.ui.screenIds.homeScreen
+' @ScreenID, String = the ID of screen that should jump to the content associated with the sID. If screenId is missing, homeScreen is assumed.
+Function jumpToParentScreenContentByID(sID, sDesiredContainerID = "", sParentScreenID = "")
+  tubiLog("HomeScreenHelpers.jumpToParentScreenContentByID")
+  if sParentScreenID = ""
+    sParentScreenID = m.constants.ui.screenIds.homeScreen
   end if
-  homeScreen = getFromScreenCache(sHomeScreenID)
-  if homeScreen <> invalid
-    homeScreen.jumpToRowItemByID = [sID, sDesiredContainerID]
+  screen = getFromScreenCache(sParentScreenID)
+  if screen <> invalid
+    screen.jumpToRowItemByID = [sID, sDesiredContainerID]
   end if
 End Function
 
@@ -736,10 +741,33 @@ Function onHomeScreenContentFocused(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenContentFocused")
   focusedContent = msg.getData()
   homeScreen = msg.getRoSGNode()
+  setHomeScreenAfterFocus(focusedContent, homeScreen)
+End Function
 
-  if focusedContent <> invalid and (getCurrentScreen() <> invalid or getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen)
-    stopCountdownTimer()
-    if focusedContent.type = m.constants.ui.categoryTypes.linear
+
+'//when a new column of the rowlist begins to gain partial focus during a horizontal scroll, then do something
+Function onColumnFocusChanged(msg)
+  tubiLog("HomeScreenHelpers.onColumnFocusChanged")
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+  if videoPlayer <> invalid and (videoPlayer.loading = true or videoPlayer.state = "playing")
+    '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
+    stopAndHideLinearVideoPlayer()
+  end if
+End Function
+
+
+' setHomeScreenAfterFocus()
+' This function should be called when a new rowlist item on the homescreen gains focus. 
+' Anything that needs to be set after a focus should be done in this function
+' @param focusedContent, roSGNode - The TubiContentNode of the focused content
+' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
+Function setHomeScreenAfterFocus(focusedContent, homeScreen)
+  if focusedContent <> invalid and getCurrentScreen() <> invalid and getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+    '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that 
+    '//we should stop the countdown timer
+    bStopCountdownTimer = true 
+    epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false)
+    if focusedContent.type = m.constants.ui.categoryTypes.linear and focusedContent.id <> m.constants.ui.contentIds.tvGuide
       bPlayVideo = true
       linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
       if linearVideoPlayer <> invalid and linearVideoPlayer.content <> invalid 
@@ -756,12 +784,31 @@ Function onHomeScreenContentFocused(msg)
         stopLinearVideoContent()
         playLinearVideoContent(focusedContent, true, homeScreen.id)
       else 
+        bStopCountdownTimer = false
         startCountdownTimer()
-        m.backgroundGroup.posterVisible = false
+
+        if epgExperimentResource.enabled = false or epgExperimentResource.update_homescreen = false
+          m.backgroundGroup.posterVisible = false
+        end if
       end if
     else 
       stopAndHideLinearVideoPlayer()
     end if
+
+    if focusedContent.type <> invalid and epgExperimentResource.update_homescreen = true
+      if focusedContent.type = m.constants.ui.categoryTypes.linear 
+        m.clock.visible = true
+        m.logoGroup.visible = false
+      else
+        m.clock.visible = false
+        m.logoGroup.visible = true
+      end if
+    end if
+
+    if bStopCountdownTimer = true
+      stopCountdownTimer()
+    end if
+
   end if
 End Function
 
@@ -785,19 +832,6 @@ Function manageHomescreenSponsorPixels(rowFocused)
 End Function
 
 
-Function onFullscreenCountdown()
-  tubiLog("HomeScreenHelpers.onFullscreenCountdown")
-  homeScreen = getCurrentScreen()
-  if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.linearTVScreen)
-    nCurrentCount = homeScreen.fullscreenCountdown
-    nNewCount = nCurrentCount - 1
-    homeScreen.fullscreenCountdown = nNewCount
-    if nNewCount <= 0
-      selectLinearContent(homeScreen.contentFocused)
-    end if
-  end if
-End Function
-
 
 ' Select the Linear content that is currently focused
 Function selectLinearContent(content)
@@ -807,14 +841,20 @@ Function selectLinearContent(content)
   '//stop timer and tell player to go fullscreen   
   stopCountdownTimer()
   if content <> invalid and content.type = m.constants.ui.contentTypes.linear
-    linearContent = getCurrentLinearContent()
-    if linearContent <> invalid and linearContent.id <> invalid and content.id = linearContent.id
-      '//If the user selects the linear content that is already playing, then just maximize it. 
-      maximizeLinearPlayer(content) 
+    if content.id <> m.constants.ui.contentIds.tvGuide
+      linearContent = getCurrentLinearContent() 
+      if linearContent <> invalid and linearContent.id <> invalid and content.id = linearContent.id
+        '//If the user selects the linear content that is already playing, then just maximize it. 
+        maximizeLinearPlayer(content) 
+      else
+        '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content. 
+        stopLinearVideoContent()
+        playLinearVideoContent(content, false, homeScreen.id)
+      end if
     else
-      '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content. 
-      stopLinearVideoContent()
-      playLinearVideoContent(content, false, homeScreen.id)
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true 
+        showDefaultEPGScreen()
+      end if
     end if
   end if
 End Function
@@ -822,29 +862,78 @@ End Function
 
 Function stopCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")  
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid
-    homeScreen.fullscreenCountdown = -1
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
+    '//hide the countdown timer
+    setPlayerCountDownChange(-1)
+  else
+    homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+    if homeScreen <> invalid
+      homeScreen.fullscreenCountdown = -1
+    end if
+    linearTVScreen = getFromScreenCache(m.constants.ui.screenIds.linearTVScreen)
+    if linearTVScreen <> invalid
+      linearTVScreen.fullscreenCountdown = -1
+    end if
   end if
-  linearTVScreen = getFromScreenCache(m.constants.ui.screenIds.linearTVScreen)
-  if linearTVScreen <> invalid
-    linearTVScreen.fullscreenCountdown = -1
+  epgScreen = getFromScreenCache(m.constants.ui.screenIds.epgScreen)
+  if epgScreen <> invalid
+    epgScreen.fullscreenCountdown = -1
+  end if
+
+  epgScreen = getFromScreenCache(m.constants.ui.screenIds.SportsEPGScreen)
+  if epgScreen <> invalid
+    epgScreen.fullscreenCountdown = -1
+  end if
+
+  epgScreen = getFromScreenCache(m.constants.ui.screenIds.NewsEPGScreen)
+  if epgScreen <> invalid
+    epgScreen.fullscreenCountdown = -1
   end if
   m.playerFullscreenCountdownTimer.control = "stop"
 End Function
 
 
 Function startCountdownTimer()
-  tubiLog("HomeScreenHelpers.stopCountdownTimer")  
-  homeScreen = getCurrentScreen()
-  if homeScreen <> invalid and (homeScreen.id = m.constants.ui.screenIds.homeScreen or homeScreen.id = m.constants.ui.screenIds.linearTVScreen)
+  tubiLog("HomeScreenHelpers.stopCountdownTimer")
+  Screen = getCurrentScreen()
+  if Screen <> invalid and (Screen.id = m.constants.ui.screenIds.homeScreen or Screen.id = m.constants.ui.screenIds.linearTVScreen )
     stopCountdownTimer()
     '//Start/reset timer to play video in fullscreen after a few seconds
-    homeScreen.fullscreenCountdown =  getExperimentResource("roku_linear_countdown_timer", "roku_linear_countdown_timer_v1", true).countdown_timer
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
+      setPlayerCountDownChange(m.constants.timers.linearFullscreenTimeout)
+    else
+      Screen.fullscreenCountdown =  m.constants.timers.linearFullscreenTimeout
+    end if
+    m.playerFullscreenCountdownTimer.control = "start"
+  else if Screen <> invalid and isAnEpgScreen(Screen) = true
+    stopCountdownTimer()
+    Screen.fullscreenCountdown =  m.constants.timers.linearFullscreenTimeout
     m.playerFullscreenCountdownTimer.control = "start"
   end if
 End Function
 
+
+' Display a countdown timer over the minmized linear video player to show how many seconds are left before the player goes fullscreen
+' @param nFullscreenCountdown, Integer - The number of seconds left in the countdown timer. If less than 0, then the timer is hidden.
+Function setPlayerCountDownChange(nFullscreenCountdown)
+  tubiLog("HomeScreenHelpers.setPlayerCountDownChange")
+  m.fullscreenCountdown = nFullscreenCountdown
+  if nFullscreenCountdown >= 0
+    m.LinearCountdownTimer.display = true
+    m.LinearCountdownTimer.seconds = nFullscreenCountdown  
+  else
+    m.LinearCountdownTimer.display = false
+  end if
+End Function
+
+
+Function onScrollingStatusChange(msg)
+  scrollingStatus = msg.getData()
+  '//if in the middle of scrolling, then stop the linear video player (if it is playing)
+  homeScreen = msg.getRoSGNode()
+  focusedContent = homeScreen.focusedChild
+  setHomeScreenAfterFocus(focusedContent, homeScreen)
+End Function
 
 
 ' Show the detail screen for the selected content

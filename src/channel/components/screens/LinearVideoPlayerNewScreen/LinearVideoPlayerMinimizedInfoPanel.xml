@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="LinearVideoPlayerMinimizedInfoPanel" extends="Group" >
+  <script type="text/brightscript" uri="LinearVideoPlayerMinimizedInfoPanel.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+
+  <interface>
+  
+    <!-- INPUT -->
+    <!-- The available params that can be set in this associative array are: channelURI, title1, title2, minutesLeft, time -->
+    <field id="metadata" type="assocarray" alwaysNotify="true"/>
+
+    <!-- OUTPUT -->
+
+  </interface>
+
+  <children>
+    <Rectangle
+      id="background"
+      color="0x10141FFF"
+      width="978"
+      height="108"/>
+    <Rectangle
+      id="programProgressBar"
+      color="0x9699A3FF"
+      opacity=".16"
+      width="0"
+      height="108"/>
+    <Poster
+      id="channelIcon"
+      width="72"
+      height="72"
+      translation="[24,18]"/>
+    <Label
+      id="minutesLeft"
+      height="24"
+      width="380"
+      translation="[120,24]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="24"/>
+    </Label>
+    <Label
+      id="title1"
+      height="30"
+      width="380"
+      translation="[120,60]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="30"/>
+    </Label>
+    <Label
+      id="time"
+      height="24"
+      width="400"
+      horizAlign="right"
+      translation="[554,24]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="24"/>
+    </Label>
+    <Label
+      id="title2"
+      height="30"
+      width="400"
+      horizAlign="right"
+      translation="[554,60]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="30"/>
+    </Label>
+  </children>
+</component>

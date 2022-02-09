@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - Items used in a Channel MarkupGrid (channel Icons) for showing EPG TimeGrid.
+ -->
+<component name="ProgramGuideChannelItem" extends="Group" >
+  <script type="text/brightscript" uri="ProgramGuideChannelItem.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <interface>
+    <field id="itemContent" type="node" />
+
+    <field id="focusPercent" type="float" />
+
+    <field id="rowFocusPercent" type="float" />
+
+  </interface>
+
+  <children>
+    <Poster
+      id="channelPosterBG"
+      height="108"
+      width="186"
+      opacity="1"
+      uri="pkg:/images/ratingBackground.9.png"
+      blendColor="0x10141F"/>
+    
+    <Poster
+      id="ChannelPoster"
+      loadingBitmapUri="pkg:/images/placeholder.jpg"  
+      failedBitmapUri="pkg:/images/logo-white-large.png"
+      opacity="0.24"
+      height="72"
+      width="72"
+      loadheight="72"
+      loadwidth="72"
+      translation="[57,18]"
+      loadDisplayMode="scaleToFit"/>
+  </children>
+</component>

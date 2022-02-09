@@ -13,6 +13,8 @@ Function initSideNav()
     m.SideNav.displayEspanol = false
     '//Tell the sideNav to stop displaying the Linear TV menu item
     m.SideNav.displayLinearTV = false
+    '//Tell the sideNav to stop displaying the LinearEPG item
+    m.SideNav.displayLinearEPG = false
     '//Tell the sideNav to stop displaying the movies/TV menu items
     m.SideNav.displayMoviesTV = false
     '//Tell the sideNav to stop displaying the channel menu item
@@ -30,13 +32,23 @@ Function initSideNav()
   
   if isParentalControlsAdultLevel() <> true
     m.SideNav.espanolItemTurnedOn = false
+    m.SideNav.linearEPGTurnedOn = false
   end if
 
   ' stop displaying some side nav items if the top nav is being displayed
   if isTopNavHomeScreenEnabled() = true
     '//Tell the sideNav to stop displaying the Linear TV menu item
     m.SideNav.displayLinearTV = false
-    '//Tell the sideNav to stop displaying the movies/TV menu items
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true  
+      '//In this experement, top Nav will not linear TV  
+      if isParentalControlsAdultLevel() <> true
+        m.SideNav.displayLinearEPG = false
+      else
+        m.SideNav.displayLinearEPG = true
+      end if
+    else
+      m.SideNav.displayLinearEPG = false
+    end if
     m.SideNav.displayMoviesTV = false
   end if
 
@@ -283,6 +295,22 @@ Function onSideNavItemSelected()
         showLinearTVScreen()
         bNewScreenCalledSuccess = true
       end if
+    else if itemSelectedId = m.constants.ui.sideNavIds.linearEPG
+      if isKidsUIOn() = true
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.linearEPG)
+      else if isParentalControlsAdultLevel() = false
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.linearEPG, "teens")        
+      else
+        topScreen = getCurrentScreen()
+        '//Don't open the EPGScreen if the current screen is already a EPGScreen type (news or sports). Just need to close the side nav.
+        if isAnEPGScreen(topScreen) = false 
+          setUiMode(m.constants.ui.modes.standard)
+          showDefaultEPGScreen()   
+        end if
+        bNewScreenCalledSuccess = true
+      end if
     else if itemSelectedId = m.constants.ui.sideNavIds.mylist
       if isKidsUIOn() <> true
         setUiMode(m.constants.ui.modes.standard)
@@ -351,7 +379,10 @@ Function displayMenuItemDisabled(sMenuItemID, parental="")
     sDialogSubTypeValue = "kids-mode-espanol"    
   else if sMenuItemID = m.constants.ui.sideNavIds.linearTV
     sTitle = getTranslation("dialog_liveTVDisabled_title")
-    sDialogSubTypeValue = "kids-mode-livetv"  
+    sDialogSubTypeValue = "kids-mode-livetv" 
+  else if sMenuItemID = m.constants.ui.sideNavIds.linearEPG
+    sTitle = getTranslation("dialog_liveTVDisabled_title")
+    sDialogSubTypeValue = "kids-mode-epg" 
   end if
 
   dialogEvent = {
@@ -391,7 +422,10 @@ Function enableKidsModeFromSideNav()
   nonAvailableKidsScreens[m.constants.ui.screenIds.tvScreen] = true
   nonAvailableKidsScreens[m.constants.ui.screenIds.espanolScreen] = true
   nonAvailableKidsScreens[m.constants.ui.screenIds.linearTVScreen] = true
-
+  nonAvailableKidsScreens[m.constants.ui.screenIds.EPGScreen] = true
+  nonAvailableKidsScreens[m.constants.ui.screenIds.sportsEPGScreen] = true
+  nonAvailableKidsScreens[m.constants.ui.screenIds.newsEPGScreen] = true
+  
   screen = getCurrentScreen()
   if screen <> invalid and nonAvailableKidsScreens[screen.id] = true
     '//If the current screen is one of the pages that should be disabled during kids mode,

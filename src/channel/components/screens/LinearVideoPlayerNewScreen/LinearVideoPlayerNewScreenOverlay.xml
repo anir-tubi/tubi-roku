@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="LinearVideoPlayerNewScreenOverlay" extends="Group" >
+  <script type="text/brightscript" uri="LinearVideoPlayerNewScreenOverlay.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+
+  <interface>
+  
+    <!-- INPUT -->
+      <!-- Overlay needs to know the current playing video so it can update the EPG. -->
+      <field id="currentLinearVideoContent" type="node" />
+
+      <!--Timegrid content updated in batches-->
+      <field id="timeGridContent" type="node" />
+
+      <!-- Tell the overlay if the content of the EPG component is loading -->
+      <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" />
+
+      <!-- Content might be loading in batch. So render only when timeGridContent is set -->
+      <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" />
+
+      <!-- Tells the overlay to display or hide -->
+      <field id="display" type="boolean" alwaysNotify="true"/>
+
+      <!-- Tells if there should be a delay when displaying the overlay. Set this before setting the "display" field to true. A delay may be needed for example when the player is animating into fullscreen mode and we do not want to show the overlay until the animation is done and the user has had time to view the player w/o an overlay.  -->
+      <field id="displayWithDelay" type="boolean"/>
+
+      <!-- The number of seconds it takes to hide/display the overlay -->
+      <field id="animationDuration" type="float" value=".5"/>
+
+      <!-- The items to be displayed in the the closed captioning menu -->
+      <field id="closedCaptioningItems" type="node"/>
+      
+    <!-- OUTPUT -->
+      <!-- The state of the overlay being visible or not. -->
+      <field id="isDisplaying" type="boolean" value="false"/>
+
+      <!-- Is the content of the EPG component loading? -->
+      <field id="timeGridContentLoadingIndicatorVisible" type="boolean" alias="EPGSpinner.visible" />
+
+      <!-- Tell when the overlay has reacted to a key press-->
+      <field id="reactedToKeyPresss" type="boolean" alwaysNotify="true"/>
+
+      <!-- When the user seledts a closed captioning language, then this will be set and an observer will need to react accordingly to modify the video's subtitleTrack and globalCaptionMode properties-->
+      <field id="closedCaptioningSelectedLanguage" type="string" alwaysNotify="true"/>
+
+      <!--When the user selects a new channel from the epg channel guide, this field is set-->
+      <field id="linearChannelToPlay" type="node"/>
+
+      <!--Since LinearChannelToPlay will get updated everytime minsLeftTimer is run, to protect unwanted trigging of observer, this field is used-->
+      <field id="linearChannelToPlayUpdated" type="boolean" alwaysNotify="true" />
+
+      <field id="okPressed" alias="EPG.okPressed" />
+      
+      <field id="rowItemFocused" alias="EPG.rowItemFocused" />
+
+      <field id="epgScrollingStatus" alias="EPG.scrollingStatus" />
+
+  </interface>
+
+  <children>
+    <Group 
+      opacity="0"
+      id="overlayParent">
+      <Poster
+        id="TransportGradient"
+        width="1920"
+        height="1080"
+        uri="pkg:/images/linearVideoPlayerOverlayBackground.png"/>
+
+      <Clock
+        id="clock"
+        width="93"
+        height="36"
+        translation="[1729,72]"/>
+
+
+      <Group
+        id="overlayContentArea">
+        <LinearOverlaySideNav
+          id="sideNav"
+          visible="false"
+          translation="[87,810]"/>
+          
+        <!-- EPGHorizontalSlide is used to slide the EPG left and right. The EPG component can be slide up and down directly. We need to distinguish between the 2 different slides because slideFade() cannot be used when a different than the origin direction is used.  -->
+        <Group 
+          id="EPGHorizontalSlide"
+          translation="[192,0]">
+
+          <InfoPanel
+            id="infoPanel"
+            visible="false"
+            maxHeight="355"
+            translation="[0,390]"
+            maxTitleLines="3"/>
+
+          <ProgramGuide
+            id="EPG"
+            EPGFullMode="false"
+            EPGChannelPlayMode="playItemOnFocus"
+            translation="[0,644]"/>
+          <Label
+            id="EPGError"
+            translation="[20,809]"
+            visible="false"
+            width="887"
+            height="120">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-SemiBold.ttf"
+              size="33" />
+          </Label>
+          <Spinner
+            id="EPGSpinner"
+            translation="[20,844]"
+            showShade="false"
+            displayText="false"
+            width="66"
+            height="66"
+            horizAlign="right"
+            vertAlign="bottom"
+            visible="true"/>
+        </Group>
+      </Group>
+
+
+
+        <!--::TODO::LiveNews - the closed captioning group should be its own component. Do this for v1. -->
+        <Group
+          id="closedCaptioningGroup"
+          opacity="0">
+          <RowList
+            id="closedCaptioningButtonListBackground"
+            translation="[960,882]"
+            numRows="1"
+            showRowLabel="[false]"
+            itemSize="[1835,72]"
+            showRowCounter="[false]"
+            rowItemSize="[[225,72]]"
+            rowItemSpacing="[[18,0]]"
+            fadeFocusFeedbackWhenAutoScrolling="true"
+            drawFocusFeedbackOnTop="true"
+            focusBitmapUri="pkg://images/menu-focus-fhd.9.png"
+            focusFootprintBitmapUri="pkg://images/menu-focus-fhd.9.png"
+            itemComponentName="LinearTVCaptioningMenuItem"
+            rowFocusAnimationStyle="floatingFocus"/>
+          <RowList
+            visible="true"
+            id="closedCaptioningButtonList"
+            translation="[960,882]"
+            numRows="1"
+            showRowLabel="[false]"
+            itemSize="[1835,72]"
+            showRowCounter="[false]"
+            rowItemSize="[[225,72]]"
+            rowItemSpacing="[[18,0]]"
+            drawFocusFeedback="false"
+            itemComponentName="LinearTVCaptioningMenuItem"
+            rowFocusAnimationStyle="floatingFocus"/>
+        </Group>
+
+    </Group>
+  </children>
+</component>

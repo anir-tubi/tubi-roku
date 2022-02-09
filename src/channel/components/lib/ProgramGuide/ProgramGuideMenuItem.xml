@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - Items used in a Program Grid rowlist (program cards) for showing EPG TimeGrid.
+ -->
+<component name="ProgramGuideMenuItem" extends="Group" >
+  <script type="text/brightscript" uri="ProgramGuideMenuItem.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+
+    <field id="focusPercent" type="float" />
+        
+    <field id="rowFocusPercent" type="float" />
+
+    <field id="index" type="integer" />
+    
+  </interface>
+
+  <children>
+    <Poster
+      id="staticOverlay"
+      height="108"
+      width="291"
+      opacity="1"
+      uri="pkg:/images/timeProgress.png"
+      blendColor="0x9699A3FF"/>
+
+    <Poster
+      id="cellRect"
+      height="108"
+      opacity="1"
+      uri="pkg:/images/ratingBackground.9.png"
+      blendColor="0x1C1F29FF"/>
+
+    <Label
+      id="timeString"
+      translation="[24,16]"
+      height="30"
+      opacity="0.24"
+      color="0x9699A3FF"
+      horizAlign="left"
+      vertAlign="center"
+      maxLines="1"
+      numLines="1"
+      ellipsizeOnBoundary="true">
+      <Font
+        id="timeStringFont"
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="24" />
+    </Label>
+    <Label
+      id="programString"
+      color="0xFFFFFFFF"
+      translation="[24,40]"
+      height="36"
+      opacity="0.24"
+      horizAlign="left"
+      ellipsizeOnBoundary="true"
+      maxLines="1"
+      vertAlign="center">
+      <Font
+        id="titleFont"
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="30" />
+    </Label>   
+  </children>   
+</component>

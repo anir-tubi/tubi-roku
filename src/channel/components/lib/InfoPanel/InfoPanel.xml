@@ -14,6 +14,7 @@
  -    8) 'continue_watching' - shows title and description
  -    9) 'linear' - shows title and description
  -   10) 'vitg' - shows nothng
+ -   11) 'epg' - shows image, title, description, year aired, program timings, cc, ratings, genre and tags
  -
  -
  - The InfoPanel has 6 'regions' whose text are mapped as follows:
@@ -43,6 +44,7 @@
     <!-- INPUTS -->
     <field id="title" alias="Title.text" />
     <field id="titleLogoUri" type="string" />
+    <field id="headerImageUri" type="string" />
     <field id="episodeTitle" alias="Episode.text" />
     <field id="genres" type="stringarray" />
     <field id="description" type="string" />
@@ -88,289 +90,303 @@
 
   <children>
     <LayoutGroup
-      id="Offset"
-      layoutDirection="vert"
-      horizAlignment="custom"
-      translation="[0,0]">
-
+      id="infoPanelGroup"
+      layoutDirection="horiz"
+      horizAlignment="left"
+      translation="[0,0]"
+      itemSpacings="[12]">
       <Poster
-        id="LiveVideoIndicator"
-        uri="pkg:/images/icon-live.png"
-        width="94"
-        height="37"
-        visible="true"/>
+        id="HeaderImage"
+        loadingBitmapUri="pkg:/images/placeholder.jpg"
+        width="186"
+        height="264"
+        visible="false"
+        translation="[0,0]"
+        loadDisplayMode="scaleToFit"/>
         
       <LayoutGroup
-        id="TitleGroup"
-        layoutDirection="horiz"
-        vertAlignment="center"
-        itemSpacings="[20]"
-        addItemSpacingAfterChild="true">
+        id="Offset"
+        layoutDirection="vert"
+        horizAlignment="custom"
+        translation="[0,0]">
+
         <Poster
-          id="TitleLogo"
-          visible="false"
-          height="80"
-          width="80"
-          loadDisplayMode="scaleToFit" />
-        <Label
-          id="Title"
-          width="960"
-          wrap="true"
-          maxLines="2"
-          color="0xFFFFFFFF"
-          vertAlign="bottom">
-          <Font
-            id="TitleFont"
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="48" />  
-        </Label>
-      </LayoutGroup>
-
-
-      <Label
-        id="Episode">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="33" />
-      </Label>
-
-      <LayoutGroup
-        id="CategoryDetails"
-        layoutDirection="vert"
-        itemSpacings="[10]"
-        opacity="0.5"
-        visible="true">
-        <Label
-          id="CategoryLine1">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
-        <!-- This is supposed to say "Updated Wednesday" or some other data we don't have yet.
-        <Label
-          id="CategoryLine2"
-          font="dictionary:Vaud22px"/>
-        -->
-      </LayoutGroup>
-      
-      <LayoutGroup
-        id="SeasonDetails"
-        layoutDirection="vert"
-        itemSpacings="[10]"
-        opacity="0.5"
-        visible="true">
-        <Label
-          id="SeasonLine1">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
-      </LayoutGroup>
-      
-      <LayoutGroup
-        id="TwoLineInfo"
-        layoutDirection="vert"
-        itemSpacings="[8]"
-        visible="true" >
+          id="LiveVideoIndicator"
+          uri="pkg:/images/icon-live.png"
+          width="94"
+          height="37"
+          visible="true"/>
+                
         <LayoutGroup
-          id="FirstLineGroup"
+          id="TitleGroup"
           layoutDirection="horiz"
           vertAlignment="center"
-          itemSpacings="[10]"
+          itemSpacings="[20]"
           addItemSpacingAfterChild="true">
+          <Poster
+            id="TitleLogo"
+            visible="false"
+            height="80"
+            width="80"
+            loadDisplayMode="scaleToFit" />
           <Label
-            id="Line1"
-            opacity="0.5">
+            id="Title"
+            width="1140"
+            wrap="true"
+            maxLines="2"
+            color="0xFFFFFFFF"
+            vertAlign="bottom">
+            <Font
+              id="TitleFont"
+              role="font"
+              uri="pkg:/fonts/Vaud-SemiBold.ttf"
+              size="47" />  
+          </Label>
+        </LayoutGroup>
+
+
+        <Label
+          id="Episode">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="33" />
+        </Label>
+
+        <LayoutGroup
+          id="CategoryDetails"
+          layoutDirection="vert"
+          itemSpacings="[10]"
+          opacity="0.5"
+          visible="true">
+          <Label
+            id="CategoryLine1">
             <Font
               role="font"
               uri="pkg:/fonts/Vaud-Medium.ttf"
               size="27" />
           </Label>
-          <Poster
-            id="ClosedCaptionPoster"
-            height="36"
-            width="56"
-            loadDisplayMode="scaleToFit"
-            loadSync="true"/>
-          <Group
-            id="Rating"
-            visible="false">
-            <Poster
-              id="RatingBackground"
-              height="36"
-              uri="pkg:/images/ratingBackground.9.png"
-              loadDisplayMode="scaleToFit"
-              loadSync="true"/>
+          <!-- This is supposed to say "Updated Wednesday" or some other data we don't have yet.
+          <Label
+            id="CategoryLine2"
+            font="dictionary:Vaud22px"/>
+          -->
+        </LayoutGroup>
+        
+        <LayoutGroup
+          id="SeasonDetails"
+          layoutDirection="vert"
+          itemSpacings="[10]"
+          opacity="0.5"
+          visible="true">
+          <Label
+            id="SeasonLine1">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+        </LayoutGroup>
+        
+        <LayoutGroup
+          id="TwoLineInfo"
+          layoutDirection="vert"
+          itemSpacings="[8]"
+          visible="true" >
+          <LayoutGroup
+            id="FirstLineGroup"
+            layoutDirection="horiz"
+            vertAlignment="center"
+            itemSpacings="[10]"
+            addItemSpacingAfterChild="true">
             <Label
-              id="RatingLabel"
-              height="36"
-              width="0"
-              opacity="0.8"
-              color="0xFFFFFFFF"
-              numLines="1"
-              wrap="false"
-              translation="[0,3]" 
-              horizAlign="center"
-              vertAlign="center"
-              >
+              id="Line1"
+              opacity="0.5">
               <Font
                 role="font"
-                uri="pkg:/fonts/Vaud-Bold.ttf"
-                size="22" />
+                uri="pkg:/fonts/Vaud-Medium.ttf"
+                size="27" />
             </Label>
-          </Group>
+            <Poster
+              id="ClosedCaptionPoster"
+              height="36"
+              width="56"
+              loadDisplayMode="scaleToFit"
+              loadSync="true"/>
+            <Group
+              id="Rating"
+              visible="false">
+              <Poster
+                id="RatingBackground"
+                height="36"
+                uri="pkg:/images/ratingBackground.9.png"
+                loadDisplayMode="scaleToFit"
+                loadSync="true"/>
+              <Label
+                id="RatingLabel"
+                height="36"
+                width="0"
+                opacity="0.8"
+                color="0xFFFFFFFF"
+                numLines="1"
+                wrap="false"
+                translation="[0,3]" 
+                horizAlign="center"
+                vertAlign="center">
+                <Font
+                  role="font"
+                  uri="pkg:/fonts/Vaud-Bold.ttf"
+                  size="22" />
+              </Label>
+            </Group>
+            <Label
+              id="DescriptorCode"
+              visible="false">
+              <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="22" />            
+            </Label>          
+            <Label
+              id="ExpireWarning">
+              <Font
+                role="font"
+                uri="pkg:/fonts/Vaud-Medium.ttf"
+                size="27" />
+            </Label>
+            <Poster
+              id="PartnerLogo"
+              height="36"
+              loadHeight="36"
+              loadDisplayMode="scaleToFit"/>
+          </LayoutGroup>
           <Label
-            id="DescriptorCode"
+            id="Line2"
+            opacity="0.5"
+            width="1140"
+            ellipsizeOnBoundary="true">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+        </LayoutGroup>
+        
+        <Group
+          id="DescriptionGroup"
+          translation="[-25,0]">
+          <Poster
+            id="DescriptionFocusButton"
+            uri="pkg:/images/menu-focus-fhd.9.png"
+            width="1140"
+            height="300"
+            visible="false"/>
+          <Label
+            id="Description"
+            width="1140"
+            lineSpacing="16"
+            maxLines="5"
+            wrap="true"
+            color="0xFFFFFFFF"
+            translation="[25,15]"
             visible="false">
             <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Bold.ttf"
-            size="22" />            
-          </Label>          
-          <Label
-            id="ExpireWarning">
-            <Font
+              id="DescriptionFont"
               role="font"
               uri="pkg:/fonts/Vaud-Medium.ttf"
               size="27" />
           </Label>
-          <Poster
-            id="PartnerLogo"
-            height="36"
-            loadHeight="36"
-            loadDisplayMode="scaleToFit"/>
-        </LayoutGroup>
-        <Label
-          id="Line2"
-          opacity="0.5"
-          width="960"
-          ellipsizeOnBoundary="true">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
-      </LayoutGroup>
-      
-      <Group
-        id="DescriptionGroup"
-        translation="[-25,0]">
-        <Poster
-          id="DescriptionFocusButton"
-          uri="pkg:/images/menu-focus-fhd.9.png"
-          width="960"
-          height="126"
-          visible="false"/>
-        <Label
-          id="Description"
-          width="960"
-          lineSpacing="16"
-          maxLines="3"
-          wrap="true"
-          color="0xFFFFFFFF"
-          translation="[25,15]"
+        </Group>
+          
+        <LayoutGroup
+          id="DirectorGroup"
+          layoutDirection="horiz"
+          vertAlignment="bottom"
+          itemSpacings="[5]"
           visible="false">
-          <Font
-            id="DescriptionFont"
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
-      </Group>
-        
-      <LayoutGroup
-        id="DirectorGroup"
-        layoutDirection="horiz"
-        vertAlignment="bottom"
-        itemSpacings="[5]"
-        visible="false">
-        <LayoutGroup
-          id="DirectorPrefix"
-          layoutDirection="horiz"
-          itemSpacings="[5]"
-          vertAlignment="bottom">
+          <LayoutGroup
+            id="DirectorPrefix"
+            layoutDirection="horiz"
+            itemSpacings="[5]"
+            vertAlignment="bottom">
+            <Label
+              id="DirectorTag"
+              opacity="0.5">
+              <Font
+                role="font"
+                uri="pkg:/fonts/Vaud-Medium.ttf"
+                size="27" />
+            </Label>
+            <!-- this layout group pushes the separator rectangle up 2 pixels -->
+            <LayoutGroup
+              layoutDirection="vert">
+              <Rectangle 
+                id="DirectorRect"
+                opacity="0.2"
+                width="43"
+                height="2"/>
+              <Rectangle 
+                opacity="0.0"
+                height="5"/>
+            </LayoutGroup>
+          </LayoutGroup>
           <Label
-            id="DirectorTag"
-            opacity="0.5">
+            id="Director"
+            color="0xFFFFFFFF"
+            ellipsizeOnBoundary="true"
+            width="710">
             <Font
               role="font"
               uri="pkg:/fonts/Vaud-Medium.ttf"
               size="27" />
           </Label>
-          <!-- this layout group pushes the separator rectangle up 2 pixels -->
-          <LayoutGroup
-            layoutDirection="vert">
-            <Rectangle 
-              id="DirectorRect"
-              opacity="0.2"
-              width="43"
-              height="2"/>
-            <Rectangle 
-              opacity="0.0"
-              height="5"/>
-          </LayoutGroup>
         </LayoutGroup>
-        <Label
-          id="Director"
-          color="0xFFFFFFFF"
-          ellipsizeOnBoundary="true"
-          width="710">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
-      </LayoutGroup>
 
-      <LayoutGroup
-        id="StarringGroup"
-        layoutDirection="horiz"
-        vertAlignment="bottom"
-        itemSpacings="[5]"
-        visible="false" >
         <LayoutGroup
-          id="StarringPrefix"
+          id="StarringGroup"
           layoutDirection="horiz"
+          vertAlignment="bottom"
           itemSpacings="[5]"
-          vertAlignment="bottom">
+          visible="false" >
+          <LayoutGroup
+            id="StarringPrefix"
+            layoutDirection="horiz"
+            itemSpacings="[5]"
+            vertAlignment="bottom">
+            <Label
+              id="StarringTag"
+              opacity="0.5">
+              <Font
+                role="font"
+                uri="pkg:/fonts/Vaud-Medium.ttf"
+                size="27" />
+            </Label>
+            <LayoutGroup
+              layoutDirection="vert">
+              <Rectangle 
+                id="StarringRect"
+                opacity="0.2"
+                width="84"
+                height="2"/>
+              <Rectangle 
+                opacity="0.0"
+                width="1"
+                height="5"/>
+            </LayoutGroup>
+          </LayoutGroup>
           <Label
-            id="StarringTag"
-            opacity="0.5">
+            id="Starring"
+            color="0xFFFFFFFF"
+            ellipsizeOnBoundary="true"
+            width="710">
             <Font
               role="font"
               uri="pkg:/fonts/Vaud-Medium.ttf"
               size="27" />
           </Label>
-          <LayoutGroup
-            layoutDirection="vert">
-            <Rectangle 
-              id="StarringRect"
-              opacity="0.2"
-              width="84"
-              height="2"/>
-            <Rectangle 
-              opacity="0.0"
-              width="1"
-              height="5"/>
-          </LayoutGroup>
         </LayoutGroup>
-        <Label
-          id="Starring"
-          color="0xFFFFFFFF"
-          ellipsizeOnBoundary="true"
-          width="710">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
       </LayoutGroup>
     </LayoutGroup>
-
 
     <LayoutGroup
       id="PlayerCountdownGroup"
@@ -379,22 +395,21 @@
       itemSpacings="[15]"
       opacity=".64"
       visible="false" >
-        <Poster
-          id="FullscreenIcon"
-          uri="pkg:/images/icon-fullscreen.png"
-          width="30"
-          height="26"
-          loadDisplayMode="scaleToFit"
-          loadSync="true"/>
-        <Label
-          id="CountdownText"
-          color="0xFFFFFFFF">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
-      </LayoutGroup>
+      <Poster
+        id="FullscreenIcon"
+        uri="pkg:/images/icon-fullscreen.png"
+        width="30"
+        height="26"
+        loadDisplayMode="scaleToFit"
+        loadSync="true"/>
+      <Label
+        id="CountdownText"
+        color="0xFFFFFFFF">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="27" />
+      </Label>
+    </LayoutGroup>
   </children>
-
 </component>

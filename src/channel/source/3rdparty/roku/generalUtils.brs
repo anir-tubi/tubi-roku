@@ -678,3 +678,4 @@ Function validateParam(param As Object, paramType As String,functionName As Stri
     print "invalid parameter of type "; type(param); " for "; paramType; " in function "; functionName
     return false
 End Function
+

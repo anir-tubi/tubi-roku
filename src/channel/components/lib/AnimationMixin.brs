@@ -144,6 +144,13 @@ Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 
     animationOptions.opacity = endingOpacity
   end if
 
+
+  if animationOptions.opacity = target.opacity
+    '//The desired opacity has already been reached, so no need to animate
+    animationOptions.duration = 0
+    animationOptions.delay = 0
+  end if
+
   return animate(target, animationOptions)
 End Function
 

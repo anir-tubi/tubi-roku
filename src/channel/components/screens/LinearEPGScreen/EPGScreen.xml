@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="EPGScreen" extends="BaseScreen" >
+
+  <script type="text/brightscript" uri="EPGScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <interface>
+    <!-- INPUT -->
+
+    <!--Timegrid content updated in batches-->
+    <field id="timeGridContent" type="node" />
+
+    <!-- Content might be loading in batch. So render only when timeGridContent is set -->
+    <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" />
+
+    <!-- Is the content of the EPG Screen loading? -->
+    <!-- This field is not currently being used by the screen (as the screen uses the loading indicator in ContentController) but is needed to ensure screens that load EPG content use the same interface and this field is part of that interface.-->
+    <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" />
+    
+    <!-- Not Used in EPGScreen. But this field is set in SideNav functions and without interface brightScript will throw error  -->
+    <field id="enabled" type="boolean" alwaysNotify="true"/>
+      
+    <!--  For EPG screen enableTopNav is always true. This interface is used by controller -->
+    <field id="enableTopNav" type="boolean" value="true"/>
+      
+    <!--this field is used to reset the timeGrid linearChannelToPlay field in case of player error-->
+    <field id="resetPlayerContent" type="boolean" alwaysNotify="true"/> 
+
+    <!--The the video and hide the video player--> 
+    <field id="refreshEPGScreenVideoPlay" type="boolean" alwaysNotify="true"/>
+
+    <!-- The number that is used as how many more seconds until the linear video player will be going fullscreen -->
+    <field id="fullscreenCountdown" type="integer" alias="InfoPanel.fullscreenCountdown"/>
+
+    <field id="jumpToRowItem" alias="programGuide.jumpToRowItem" />
+
+    <field id="jumpToRowItemByID" alias="programGuide.jumpToLinearChannelID" />
+
+    <!-- Used to control which component gains focus when the focusedChild callback runs.
+           Accepted values are in constants.ui.homescreen.focusItems -->
+    <field id="componentToFocus" type="string" />
+    
+    <!-- should the topNav refresh? -->
+    <field id="refreshTopNav" type="boolean" alwaysNotify="true" />
+    
+    <!-- the id that top nav should treat as selected from a UI perspective -->
+    <field id="topNavSelectedId" type="string" alias="topNav.selectedId" />
+
+    <!-- OUTPUTS -->
+
+    <field id="epgScreenOkPressed" type="boolean" alwaysNotify="true"/>
+
+    <!--Channel Item Focused-->
+    <field id="linearChannelFocused" type="node" />
+
+    <!--Channel Item to play in EPG video player or linear video player-->
+    <field id="linearChannelToPlay" type="node"/>
+
+    <!-- content on the EPG Screen is loaded and spinner can be turned off -->
+    <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
+
+    <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load.-->
+    <field id="trackingLoadStartTime" type="integer" />
+
+    <!-- Trigger the content to be loaded.   -->
+    <field id="loadAllChannels" type="boolean" value="false" alwaysNotify="true"/>
+
+    <!--observe the scrolling status of program Grid to stop/start count down timer-->
+    <field id="scrollingStatus" type="boolean" alias="programGuide.scrollingStatus" />
+
+    <!-- set to the tubi content id of the topNav item which was clicked on -->
+    <field id="topNavItemSelected" type="node" alwaysNotify="true"/>
+
+    <!-- set to the content node of the first item in the top nav since the back button was pressed -->
+    <field id="topNavBackItemSelected" type="node" alwaysNotify="true"/>
+
+    <!-- Indicates that a ComponentInteractionEvent should be fired because the TopNav
+      has been toggled on or off -->
+    <field id="topNavToggled" type="boolean" value="false" alwaysNotify="true"/>
+
+    <!-- Indicates that the user is pressing back or left from the top nav (with the assumed
+      intention to navigate to the side nav, but homescreen doesn't know about side nav) -->
+    <field id="navigatedAwayFromTopNav" type="boolean" alwaysNotify="true" />
+
+    <!-- Pass through Program Guide component events to EpgScreen helper -->
+    <field id="programGuideNavigateWithinPageInfo" alias="programGuide.navigateWithinPageInfo" />
+
+    <!-- Pass through Program Guide component events to EpgScreen helper -->
+    <field id="programGuidecomponentInteractionInfo" alias="programGuide.componentInteractionInfo" />
+
+  </interface>
+
+  <children>
+    <Poster
+      id="topNavBG"
+      height="250"
+      width="1920"
+      uri="pkg:/images/gradient-topNav.png" />
+
+    <TopNav 
+      id="topNav"
+      translation="[192,48]"/>
+
+    <Group
+      id="infoPanelParent">
+      <InfoPanel
+        id="infoPanel"
+        maxHeight="355"
+        translation="[192,180]"
+        maxTitleLines="2"/>
+    </Group>
+
+    <ProgramGuide
+      id="programGuide"
+      translation="[192,510]"/>
+
+    <Clock
+      id="clock"
+      width="93"
+      height="36"
+      visible="true"
+      translation="[1729,72]"/>
+  
+    <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
+    <Timer
+      id="channelRefreshTimer"
+      repeat="true"/>
+
+  </children>
+</component>

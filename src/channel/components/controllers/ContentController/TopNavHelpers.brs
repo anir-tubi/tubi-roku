@@ -52,12 +52,15 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
     end if
 
     componentToFocus = ""
-    if isFocusRetainedOnTopNav
-      componentToFocus = m.constants.ui.homescreen.focusItems.topNav
+    if isFocusRetainedOnTopNav = true
+      if isAnEpgScreen(screen) = true
+        componentToFocus = m.constants.ui.EPGscreen.focusItems.topNav
+      else
+        componentToFocus = m.constants.ui.homescreen.focusItems.topNav
+      end if
     end if
 
     if m.constants.ui.screenIdToSideNavId[screen.id] <> topNavItem.id
-      newScreen = invalid
       if topNavItem.id = m.constants.ui.sideNavIds.movies
         showMoviesScreen(componentToFocus)
       else if topNavItem.id = m.constants.ui.sideNavIds.tv
@@ -74,6 +77,12 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
         showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
       else if topNavItem.id = m.constants.ui.sideNavIds.search
         showSearchScreen(m.constants)
+      else if topNavItem.id = m.constants.ui.sideNavIds.linearEPG
+        showDefaultEPGScreen(componentToFocus)
+      else if topNavItem.id = m.constants.ui.sideNavIds.news
+        showNewsEPGScreen(componentToFocus)
+      else if topNavItem.id = m.constants.ui.sideNavIds.sports
+        showSportsEPGScreen(componentToFocus)
       end if
     else
       ' If the user selected a top nav item that is associated with the current screen, 
@@ -85,6 +94,10 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
         ' (so screen.isInFocusChain() = true), then screen.setFocus(true) will not
         ' set focus on the screen, which needs to happen for the appropriate focus
         ' logic to occur in the screen.
+        screen.setFocus(false)
+        screen.setFocus(true)
+      else if isAnEpgScreen(screen) = true
+        screen.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
         screen.setFocus(false)
         screen.setFocus(true)
       end if

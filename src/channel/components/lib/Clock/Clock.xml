@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="Clock" extends="Group" >
+  <script type="text/brightscript" uri="Clock.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <!-- When display is changed, it will perform the operations that ar needed to properly display or hide the guide. -->
+    <field id="width" type="float"/>
+    <field id="height" type="float"/>
+
+    <!-- Setting the component's visblity will start or stop the timer, but this allows you to start and stop the timer w/o affecting the visibility. -->
+    <!-- The available values for this field are the same a timer's control: start, stop, none -->
+    <field id="control" type="string"/>
+
+
+    <!-- OUTPUTS -->
+
+  </interface>
+  
+  <children>
+    <Poster
+      id="clockBground"
+      uri="pkg:/images/gradientBground-channelGuide-horizontal.png"/>
+    <Label
+      id="time"
+      height="18"
+      vertAlign="center"
+      horizAlign="center"
+      translation="[0,2]"
+      color="0x000000FF">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="18"/>
+    </Label>
+
+    <Timer
+      id="clockTimer"
+      repeat="true"
+      duration="10"/>
+  </children>
+</component>

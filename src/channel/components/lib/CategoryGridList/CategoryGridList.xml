@@ -100,6 +100,8 @@
       <field id="reloadedItemToBeFocused" type="node" />
 
       <field id="currFocusRow" alias="RowList.currFocusRow" />
+      <field id="currFocusColumn" alias="RowList.currFocusColumn" />
+      <field id="scrollingstatus" alias="RowList.scrollingstatus" />
 
       <field id="currCategoryId" type="string" />
 

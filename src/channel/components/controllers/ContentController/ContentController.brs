@@ -28,6 +28,7 @@ Function init()
   m.Tracking = TubiTracking(m.constants, m.Request, Auth)
   m.cmsApi = CmsApi(m.constants, m.Request, Auth, apiUtils)
   m.userDeviceApi = UserDeviceApi(m.constants, apiUtils)
+  m.tensorapi = TensorApi(m.constants, m.Request, Auth)
 
   m.background = m.top.findNode("ContentBackground")
   m.background.color = m.constants.ui.colors.backgroundColor
@@ -37,11 +38,15 @@ Function init()
   m.contentGroup = m.top.findNode("ContentGroup")
   m.SideNav = m.top.findNode("SideNav")
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
+  m.LinearPlayerGroupAboveScreenStack = m.top.findNode("LinearPlayerGroupAboveScreenStack")
+  m.LinearCountdownTimer = m.top.findNode("LinearCountdownTimer")
+
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
   m.logoGroup = m.top.findNode("logoGroup")
   m.logo = m.logoGroup.findNode("tubiLogo")
   m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
   m.logoEspanol = m.logoGroup.findNode("tubiEspanolLogo")
+  m.clock = m.top.findNode("clock")
   m.spinner = m.top.findNode("ContentControllerSpinner")
   m.LinearVideoPlayerSpinner = m.top.findNode("LinearVideoPlayerSpinner")
   m.playerFullscreenCountdownTimer = m.top.findNode("PlayerFullscreenCountdownTimer")
@@ -150,6 +155,17 @@ Function init()
     trackType: "startApp"
   }
 
+  epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false)
+  if epgExperimentResource.enabled = true
+    if epgExperimentResource.update_homescreen = true
+      m.LinearVideoPlayerSpinner.translation = [447, 660]
+    end if
+
+    'this variable is used to decide when to let the user interact with EPG TimeGrid after content has been either assinged first time or refreshed after validUntil/refetch due to errors.
+    'currently, user is allowed to interact with EPG as soon as first batch is retrived and EPG content has been updated.
+    'Once the LinearVideoplayer integrates with EPGScreen, then we need to revisit the logic of when to let the user interact with EPG TimeGrid due to jumpTO channel requirement and Channel might be fetched to focus on.
+    m.updateEPGTimeGrid = true 
+  end if
 End Function
 
 
@@ -282,8 +298,8 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       if m.SideNav.opened = false
         if m.SideNav.visible = true
           openSideNavFromButton() '//"BUTTON_BACK"
-        else if m.screenStack.getChildCount() > 1 
-          oldTopScreen = getCurrentScreen()
+        else if m.screenStack.getChildCount() > 1  
+          oldTopScreen = getCurrentScreen()    
           if oldTopScreen.id = m.constants.ui.screenIds.espanolScreen
             ' exiting the espanol experience, so update the uiMode which will be referenced
             ' in subsequent function calls in order to display the correct UI.
@@ -1299,6 +1315,19 @@ Function emptyScreenCache()
 End Function
 
 
+'a wrapper for setting a content in cache 
+Function setInContentCache(content)
+  return m.cache.setInContentCache(content)
+End Function
+
+
+'a wrapper for getting a content from cache 
+'@contentId: String, The constants.ui.contentIds associated with content.
+Function getFromContentCache(contentId)
+  return m.cache.getFromContentCache(contentId)
+End Function
+
+
 ' This will tell the screen to update its content the next time the screen is displayed 
 ' @sID: string, the ID of the screen whose content should be marked to be refreshed
 Function setContentToRefresh(sID)
@@ -1334,6 +1363,9 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
+  setContentToRefresh(m.constants.ui.screenIds.epgScreen)
+  setContentToRefresh(m.constants.ui.screenIds.sportsEPGScreen)
+  setContentToRefresh(m.constants.ui.screenIds.newsEPGScreen)
 End Function
 
 
@@ -1354,6 +1386,23 @@ Function sendNavigateWithinPageInfo(navigateWithinPageInfo)
 End Function
 
 
+' Callback for when a componentInteractionInfo has been updated - sends the component_interaction event
+Function onComponentInteractionInfoChange(msg)
+  componentInteractionInfo = msg.getData()
+  sendcomponentInteractionInfo(componentInteractionInfo)
+End Function
+
+
+Function sendcomponentInteractionInfo(componentInteractionInfo)
+  if componentInteractionInfo <> invalid
+    m.trackingLoggingTask.trackEvent = {
+      type: "component_interaction"
+      values: componentInteractionInfo
+    }
+  end if
+End Function
+
+
 Function homeScreenBackgroundUpdated(msg)
   tubiLog("ContentController.homeScreenBackgroundUpdated")
   homeScreen = msg.getRoSGNode()
@@ -1364,6 +1413,13 @@ End Function
 ' Is the current screen a home screen?
 Function isCurrentScreenHomeScreen()
   bReturn = getCurrentScreen() <> invalid and getCurrentScreen().isSubType("HomeScreen")
+  return bReturn
+End Function
+
+
+'Is the current Screen a epg Screen?
+Function isCurrentScreenEPGScreen()
+  bReturn = getCurrentScreen() <> invalid and getCurrentScreen().isSubType("EPGScreen")
   return bReturn
 End Function
 
@@ -1455,6 +1511,9 @@ Function getBackgroundtype(backgroundUriList, contentType = "")
       backgroundType = m.constants.ui.backgroundTypes.fullScreen
     else if contentType = m.constants.ui.contentTypes.linear
       backgroundType = m.constants.ui.backgroundTypes.linear
+    else if contentType = m.constants.ui.contentTypes.epg 
+      backgroundType = m.constants.ui.backgroundTypes.epg
+
     else
       backgroundType = m.constants.ui.backgroundTypes.topRight
     end if
@@ -1738,7 +1797,38 @@ Function resumeApp()
   myScene = m.top.getScene()
   myScene.signalBeacon("AppResumeComplete")
 
-End Function   
+End Function  
+
+
+Function onFullscreenCountdown()
+  tubiLog("ContentController.onFullscreenCountdown")
+  screen = getCurrentScreen()
+  if screen <> invalid 
+    if screen.id = m.constants.ui.screenIds.homeScreen or screen.id = m.constants.ui.screenIds.linearTVScreen 
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
+        nCurrentCount = m.fullscreenCountdown
+        nNewCount = nCurrentCount - 1
+        setPlayerCountDownChange(nNewCount)
+      else
+        nCurrentCount = screen.fullscreenCountdown
+        nNewCount = nCurrentCount - 1
+        screen.fullscreenCountdown = nNewCount
+      end if
+    else if isAnEpgScreen(screen) = true
+      nCurrentCount = Screen.fullscreenCountdown
+      nNewCount = nCurrentCount - 1
+      screen.fullscreenCountdown = nNewCount    
+    end if
+  end if
+ 
+  if nNewCount <= 0
+    if isAnEpgScreen(screen) = true
+      selectLinearContent(Screen.linearChannelToPlay)
+    else
+      selectLinearContent(Screen.contentFocused)
+    end if
+  end if
+End Function
 
 
 ' @authInfo: assocArray, authInfo AA as returned by Auth().getAuthInfo()

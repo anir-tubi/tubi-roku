@@ -3,6 +3,7 @@
 <component name = "TubiContentNode" extends="ContentNode">
   <interface>
     <field id="type" type="string" />
+    <field id="gridItemType" type="string" />
     <field id="parentType" type="string" />
     <field id="parentTitle" type="string" />
     <field id="parentId" type="string" />

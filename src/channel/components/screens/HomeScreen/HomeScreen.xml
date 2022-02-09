@@ -123,6 +123,11 @@
       <!-- set to the tubi content of the new row container (row of contentFocused) which was focused on -->
       <field id="rowFocused" alias="CategoryGridList.rowFocused"/>
 
+      <!-- As the rowlist column changes, even during scrolling, this will get dispatched. During scrolling, each new focused column between the start and end scrolled columns will be dispatched as they begin to gain partial focus.  -->
+      <field id="columnFocused" type="integer" value="-1"/>
+
+      <field id="scrollingstatus" alias="CategoryGridList.scrollingstatus" />
+
       <!-- content on the homescreen is loaded and spinner can be turned off -->
       <field id="contentReady" type="boolean" alwaysNotify="true" />
 

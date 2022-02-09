@@ -70,6 +70,18 @@ Function createParsingCallbacks()
     parseError: parseChannelGuideFetchError
   }
 
+  'epgChannelIds
+  m.requestTypes[m.constants.reqNames.getEPGChannelIds] = {
+    parseSuccess: parseEPGChannelIdsSuccess
+    parseError: parseEPGChannelIdsError
+  }
+
+  'epgProgram
+  m.requestTypes[m.constants.reqNames.getEPGPrograms] = {
+    parseSuccess: parseEPGProgramsSuccess
+    parseError: parseEPGProgramsError
+  }
+  
   ' history
   m.requestTypes[m.constants.reqNames.postUserHistory] = {
     parseSuccess: parseHistorySuccess

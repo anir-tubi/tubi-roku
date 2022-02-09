@@ -347,3 +347,85 @@ Function tubiMetadataTranslate_composeVideoResources_test()
   m.assertInvalid(videoResources[2].drmHeaders)
   m.assertEqual(videoResources[2].streamformat, "hls")
 End Function
+
+
+'@Test translateEPGChannelIds unit tests
+Function tubiMetadataTranslate_translateEPGChannelIds_test()
+  epgChannelIdsJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/epgChannelIds.json")
+  fetchTime = CreateObject("roDateTime").AsSeconds()
+  parsedLinearEPG = ParseJson(epgChannelIdsJson)
+  translated = m.translate.translateEPGChannelIds(parsedLinearEPG)
+  m.assertNotInvalid(translated)
+  m.assertTrue(translated.getChildCount() = 88)
+  m.assertTrue(translated.getChild(0).id = "613683")
+  m.assertTrue(translated.getChild(0).containerName = "Sports on Tubi")
+ 
+End Function
+
+
+'@Test translateEPGPrograms unit tests
+Function tubiMetadataTranslate_translateEPGPrograms_test()
+  'test for valid fields
+  epgProgramsJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/epgProgram.json")
+  fetchTime = CreateObject("roDateTime").AsSeconds()
+  translated = m.translate.translateEPGPrograms(ParseJson(epgProgramsJson))
+  datetimeObj = CreateObject("roDateTime")
+
+  m.assertNotInvalid(translated)
+
+  channelInfo = translated.getchild(0)
+  channelFromJson = ParseJson(epgProgramsJson)
+  channelDescription = channelFromJson.rows[0].description
+  HDSMALLICONURL = channelFromJson.rows[0].images.thumbnail[0]
+
+  m.assertEqual(channelInfo.id, "557344")
+  m.assertEqual(channelInfo.channelName, "fubo Sports Network")
+  m.assertEqual(channelInfo.type, "linear")
+  m.AssertNotEqual(channelInfo.validUntil, 0)
+  m.assertEqual(channelInfo.HDSMALLICONURL, HDSMALLICONURL)
+  m.assertEqual(channelInfo.description, channelDescription)
+  m.assertTrue(channelInfo.backgrounds.count() > 0)
+  m.assertTrue(channelInfo.videoResources.count() > 0)
+  m.assertNotInvalid(channelInfo.hasSubtitles)
+  m.assertNotInvalid(channelInfo.pubId)
+
+
+  program = channelInfo.getchild(0)
+  programInfo = channelFromJson.rows[0].programs[0]
+
+  datetimeObj.FromISO8601String(programInfo.start_time)
+  program_startTime = datetimeObj.asSeconds()
+  datetimeObj.ToLocalTime()
+  start_Time = GetAMPMTimeString(datetimeObj)
+
+  datetimeObj.FromISO8601String(programInfo.end_time)
+  program_endTime= datetimeObj.asSeconds()
+  datetimeObj.ToLocalTime()
+  end_Time = GetAMPMTimeString(datetimeObj)
+
+  hours_of_airing = start_Time + " - " + end_Time
+  
+
+  m.assertEqual(program.id, "557344")
+  m.assertEqual(program.TITLE, "No Chill With Gilbert Arenas")
+  m.assertEqual(program.startTime, program_startTime)
+  m.assertEqual(program.endTime, program_endTime)
+  m.assertEqual(program.hoursOfAiring, hours_of_airing)
+  m.assertEqual(program.description, programInfo.description)
+  m.assertEqual(program.FHDPosterUrl, programInfo.images.poster[0])
+
+  'test for optional fields for program
+
+  epgProgramsJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/epgProgram.json")
+  fetchTime = CreateObject("roDateTime").AsSeconds()
+  translated = m.translate.translateEPGPrograms(ParseJson(epgProgramsJson))
+
+  channelInfo = translated.getchild(0)
+  program = channelInfo.getchild(0)
+
+  m.assertTrue(program.Categories.count() = 0)
+  m.assertEqual(program.Rating, "")
+  m.assertTrue(program.descriptors.count() = 0)
+  m.assertEqual(program.ReleaseDate, "")
+
+End Function

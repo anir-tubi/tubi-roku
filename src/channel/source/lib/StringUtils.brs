@@ -83,6 +83,26 @@ Function padString(s As String, width As Integer, c as String)
   return result
 End Function
 
+''''''''''
+' padStringLeft
+' input:  @originalString: String, used to display
+'         @minLength: Integer, minimum number of characters returned from this function 
+'         @padString: String, will be prepended 
+' return: result with paddedstring with more than minimum width
+'
+' pad the provided string with padString(gernally spaces) to length provided.
+' PadStringLeft differes from padString only when padString + originalstring > minLenth 
+' padStringLeft("bbb", "0123", 8) = "01230123bbb"
+' padString("bbb", 8, "0123") = "30123bbb"
+
+Function padStringLeft(originalString, padString, minLength) as string
+  originalString = originalString.Trim()
+  while originalString.Len() < minLength
+    originalString = padString + originalString
+  end while
+  return originalString
+End Function
+
 
 ''''''''''
 ' capitalize
@@ -216,6 +236,38 @@ Function convertFunctionToString(func)
     functionStr = func.ToStr().Replace("Function: ","")
   end if
   return functionStr
+
+End Function
+
+
+'******************************************************
+'@param {date} dateTime - the date object that is used to get the time
+'@param {boolean} bIncludeSpaceSeparator - Should the time and the "AM" or "PM" strings be separated by a space? 
+'
+'returns AM/PM appended time format
+'******************************************************
+
+Function GetAMPMTimeString(dateTime, bIncludeSpaceSeparator = true) as string
+  if dateTime.GetHours() - 12 >= 0
+    amPM = "PM"
+  else
+    amPM = "AM"
+  end if
+  hourValue = dateTime.getHours() mod 12
+  if hourValue = 0
+    hourValue = "12"
+  else
+    hourValue = StrI(hourValue).Trim()
+  end if
+
+  minuteValue = padStringLeft(dateTime.GetMinutes().toStr(), "0", 2)
+
+  sSpaceSeparator = " "
+  if bIncludeSpaceSeparator = false
+    sSpaceSeparator = ""
+  end if
+
+  return hourValue + ":" + minuteValue + sSpaceSeparator + amPm
 
 End Function
 

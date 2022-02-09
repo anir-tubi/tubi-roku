@@ -4,8 +4,10 @@ Function init()
   m.nodeHelpers = TubiNodeHelpers()
   m.TitleGroup = m.top.findNode("TitleGroup")
   m.Title = m.top.findNode("Title")
+  m.infoPanelGroup = m.top.findNode("infoPanelGroup")
   m.LiveVideoIndicator = m.top.findNode("LiveVideoIndicator")
   m.TitleLogo = m.top.findNode("TitleLogo")
+  m.HeaderImage = m.top.findNode("HeaderImage")
   m.Episode = m.top.findNode("Episode")
   m.CategoryDetails = m.top.findNode("CategoryDetails")
   m.SeasonDetails = m.top.findNode("SeasonDetails")
@@ -37,6 +39,7 @@ Function init()
   m.top.observeField("width", "onWidthChange")
 
   m.top.observeField("titleLogoUri", "onTitleLogoUriChange")
+  m.top.observeField("headerImageUri", "onHeaderImageUriChange")
   m.top.observeField("lineOneData", "onLineOneDataChange")
   m.top.observeField("genres", "onGenresChange")
   m.top.observeField("description", "onDescriptionChange")
@@ -59,6 +62,9 @@ Function init()
 
   'set the default title logo state to be no title logo
   m.TitleGroup.removeChild(m.TitleLogo)
+
+  'Remove LiveVideoIndicator here because otherwise the poster is visible prior to any information being passed to info panel, when we open the app
+  m.offset.removeChild(m.LiveVideoIndicator)
 
   m.StarringTag.width = 0
   m.DirectorTag.width = 0
@@ -156,6 +162,17 @@ Function onTitleLogoUriChange()
   end if
 End Function
 
+Function onHeaderImageUriChange(msg)
+  tubiLog("InfoPanel.onHeaderImageUriChange")
+  if m.top.headerImageUri <> ""
+    m.HeaderImage.uri = m.top.headerImageUri
+    m.infoPanelGroup.insertChild(m.HeaderImage, 0)
+    m.HeaderImage.visible = true
+  else
+    m.infoPanelGroup.removeChild(m.HeaderImage)
+  end if
+End Function
+
 
 Function onLineOneDataChange(msg)
   tubiLog("InfoPanel.onLineOneDataChange")
@@ -174,6 +191,11 @@ Function onLineOneDataChange(msg)
     end if
     text = text + formatLengthAsEnglish(data.length) + " "
   end if
+
+  if data.hoursOfAiring <> invalid and data.hoursOfAiring <> ""
+    text = text + data.hoursOfAiring
+  end if
+  
   if data.type <> invalid and data.type = m.constants.ui.contentTypes.series 
     ' add 'dot' spacer
     text = text + Chr(&hb7) + " " 
@@ -401,7 +423,13 @@ Function onModeChange()
   while m.Offset.getChildCount() > 0
     m.Offset.removeChildIndex(0)
   end while
-  constants = m.global.constants
+  if m.HeaderImage <> invalid
+    m.infoPanelGroup.removeChild(m.HeaderImage)
+  end if
+  'm.PlayerCountdownGroup has been added to parent to accommodate EPG Screen design 
+  if m.PlayerCountdownGroup <> invalid
+    m.top.removeChild(m.PlayerCountdownGroup)
+  end if
 
   if m.top.mode = m.constants.ui.infoPanelModes.category then
     m.Offset.appendChild(m.TitleGroup)
@@ -445,12 +473,22 @@ Function onModeChange()
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [25, 18]
-  else if m.top.mode = m.constants.ui.infoPanelModes.linear then
+  else if m.top.mode = m.constants.ui.infoPanelModes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
+    m.Offset.itemSpacings = [25, 15]
+  else if m.top.mode = m.constants.ui.infoPanelModes.linear
     m.Offset.appendChild(m.LiveVideoIndicator)
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.appendChild(m.PlayerCountdownGroup)
     m.Offset.itemSpacings = [25,15]  
+  else if m.top.mode = m.constants.ui.infoPanelModes.epg
+    m.infoPanelGroup.insertChild(m.HeaderImage,0)
+    m.Offset.appendChild(m.TitleGroup)
+    m.Offset.appendChild(m.TwoLineInfo)
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.top.appendChild(m.PlayerCountdownGroup)
+    m.PlayerCountdownGroup.translation = [1216,-78]
+    m.Offset.itemSpacings = [12,0,12,11]
   end if
   
 End Function

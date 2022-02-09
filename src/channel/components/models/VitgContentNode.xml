@@ -2,6 +2,7 @@
 <!-- Extend the ContentNode so we can add some custom fields -->
 <component name = "VitgContentNode" extends="ContentNode">
   <interface>
+    <field id="gridItemType" type="string" />
     <field id="resumePos" type="int" />
   </interface>
 </component>

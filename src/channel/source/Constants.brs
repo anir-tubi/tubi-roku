@@ -223,6 +223,8 @@ Function getConstants()
     constants.reqNames.patchUserSettings = "patchUserSettings"
     constants.reqNames.sponsorPixel = "sponsorPixel"
     constants.reqNames.getChannelGuide = "getChannelGuide"
+    constants.reqNames.getEPGChannelIds = "getEPGChannelIds"
+    constants.reqNames.getEPGPrograms = "getEPGPrograms"
     constants.reqNames.postUserHistory = "postUserHistory"
     constants.reqNames.getQueue = "getQueue"
     constants.reqNames.refreshToken = "refreshToken"
@@ -375,13 +377,15 @@ Function getConstants()
 
     'tensor url
     constants.urls.tensor = {}
-      constants.urls.tensor.urlBase = "https://tensor.production-public.tubi.io/api/v1"
+      constants.urls.tensor.urlBase = "https://tensor.production-public.tubi.io/api/v1"     
       if constants.settings.mode <> "production" and constants.settings.stagingApis = true
         constants.urls.tensor.urlBase = "https://tensor.staging-public.tubi.io/api/v1"
       end if
       constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/homescreen"
       constants.urls.tensor.container = constants.urls.tensor.urlBase + "/containers"
       constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/containers"
+      constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/epg"
+  
       
     'users url
     constants.urls.users = {}
@@ -469,6 +473,15 @@ Function getConstants()
     ' The background images on the continue watching container row when the user is signed out
     constants.urls.continueWatchingItemBackground = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground.png"
     constants.urls.continueWatchingItemBackground_kidsMode = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground_kidsMode.png"
+
+    
+    'epgProgram url
+    constants.urls.content = {}
+      constants.urls.content.epgProgramContentUrlBase = "https://content.production-public.tubi.io"
+      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+        constants.urls.content.epgProgramContentUrlBase = "https://content.staging-public.tubi.io"
+      end if
+      constants.urls.content.epgProgramContent = constants.urls.content.epgProgramContentUrlBase + "/epg/programming"
 
   'http request types
   constants.reqTypes = {}
@@ -621,6 +634,11 @@ Function getConstants()
         constants.player.drmTypes.dashPlayready
         constants.player.drmTypes.hlsv3
       ]
+  ' constants used for EPG
+  constants.EPGChannelPlayMode = {}
+  constants.EPGChannelPlayMode.playItemOnSelect = "playItemOnSelect"
+  constants.EPGChannelPlayMode.playItemOnFocus = "playItemOnFocus"
+
 
   'Default times for which the caches for different content types are valid.
   'These will normally come from the server, these times stored in constants are backup values.
@@ -628,6 +646,7 @@ Function getConstants()
     constants.cacheTimes.content = 2 * 60 * 60 ' Time in seconds after which an individual piece of content' cache is not valid
     constants.cacheTimes.category = 4 * 60 * 60 ' Time in seconds after which a category's cache is not valid
     constants.cacheTimes.homescreen = 6 * 60 * 60 ' Time in seconds after which the category screen's cache is not valid
+    constants.cacheTimes.epgscreen = 6 * 60 * 60 ' Time in seconds after which the epg screen's cache is not valid
 
   'This will store the error codes that are needed to be displayed to the user. 
   'Review the following page to see the list of error codes that are used across platforms:
@@ -647,6 +666,7 @@ Function getConstants()
   constants.errors.context.channelsScreen = "9"
   constants.errors.context.categoriesScreen = "10"
   constants.errors.context.linearPlayerScreen = "11"
+  constants.errors.context.epgScreen = "12"
 
   '//What is the actual error?
   constants.errors.subtypes = {}
@@ -732,6 +752,7 @@ Function getConstants()
       constants.ui.categoryIds.featured = "featured"
       constants.ui.categoryIds.recommendedForYou = "recommended_for_you"
 
+
     constants.ui.categoryTypes = {}
       'these map to matrix api container types
       constants.ui.categoryTypes.history = "continue_watching"
@@ -756,6 +777,7 @@ Function getConstants()
       constants.ui.infoPanelModes.series = "series"
       constants.ui.infoPanelModes.season = "season"
       constants.ui.infoPanelModes.episode = "episode"
+      constants.ui.infoPanelModes.epg = "epg"
 
     constants.ui.contentMode = {}
       constants.ui.contentMode.homescreen = "homescreen"
@@ -763,6 +785,9 @@ Function getConstants()
       constants.ui.contentMode.movie = "movie"
       constants.ui.contentMode.tv = "tv"
       constants.ui.contentMode.linear = "linear"
+      constants.ui.contentMode.epgScreen = "tubitv_us_linear" 'this valus is used as input query param and value of the param expected is tubitv_us_linear .
+      constants.ui.contentMode.sportsEPGScreen = "tubitv_epg_sports" 'this valus is used as input query param and and value of the param expected is  tubitv_epg_sports .
+      constants.ui.contentMode.newsEPGScreen = "tubitv_epg_news" 'this valus is used as input query param and hence and value of the param expected is tubitv_epg_news .
 
     constants.ui.contentTypes = {}
       constants.ui.contentTypes.series = "series"
@@ -774,12 +799,14 @@ Function getConstants()
       constants.ui.contentTypes.utility = "utility"
       constants.ui.contentTypes.linear = "linear"
       constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_out_user"
+      constants.ui.contentTypes.epg = "epg"
 
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
       constants.ui.backgroundTypes.topRight = "topright"
       constants.ui.backgroundTypes.linear = "linear"
       constants.ui.backgroundTypes.feature = "feature"
+      constants.ui.backgroundTypes.epg = "epg"
 
     constants.ui.modes = {}
       constants.ui.modes.standard = "standard"
@@ -798,6 +825,9 @@ Function getConstants()
       constants.ui.screenLevels.homeScreen = 10
       constants.ui.screenLevels.espanolScreen = 20
       constants.ui.screenLevels.linearTVScreen = 20
+      constants.ui.screenLevels.epgScreen = 20
+      constants.ui.screenLevels.newsepgScreen = 20
+      constants.ui.screenLevels.sportsepgScreen = 20
       constants.ui.screenLevels.movieScreen = 20
       constants.ui.screenLevels.tvScreen = 20
       constants.ui.screenLevels.channelCategoryGridScreen = 20
@@ -834,6 +864,7 @@ Function getConstants()
       constants.ui.screenIds.newsScreen = "newsScreen"
       constants.ui.screenIds.emailInputScreen = "emailInputScreen"
       constants.ui.screenIds.linearTVScreen = "linearTVScreen"
+      constants.ui.screenIds.linearEPGScreen = "linearEPGScreen"
       constants.ui.screenIds.signUpScreen = "signUpScreen"
       constants.ui.screenIds.signInScreen = "signInScreen"
       constants.ui.screenIds.upNextScreen = "upNextScreen"
@@ -842,6 +873,9 @@ Function getConstants()
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
       constants.ui.screenIds.ageVerificationScreen = "ageVerificationScreen"
       constants.ui.screenIds.initialContentScreen = "initialContentScreen"
+      constants.ui.screenIds.epgScreen = "epgScreen"
+      constants.ui.screenIds.sportsEPGScreen = "sportsEPGScreen"
+      constants.ui.screenIds.newsEPGScreen = "newsEPGScreen"
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
@@ -849,6 +883,7 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.linearTVScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.linearEPGScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
@@ -856,12 +891,19 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.linearVideoPlayerScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.emailInputScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.signInScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.epgScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.sportsEPGScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.newsEPGScreen] = true
 
     ' top level content ids for parent content nodes that don't have a content id from the backend
     constants.ui.contentIds = {}
       constants.ui.contentIds.homegrid = "homegrid"
       constants.ui.contentIds.categoryList = "categoriesList"
       constants.ui.contentIds.channelList = "channelsList"
+      constants.ui.contentIds.tvGuide = "tvGuide"
+      constants.ui.contentIds.timeGridContent = "timeGridContent"
+      constants.ui.contentIds.sportsTimeGridContent = "sportsTimeGridContent"
+      constants.ui.contentIds.newsTimeGridContent = "newsTimeGridContent"
 
     ' content ids of contents that should not be removed from the content cache
     constants.ui.permanentlyCachedContentIds = {}
@@ -880,13 +922,18 @@ Function getConstants()
 
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.linear = [384,144]
+      constants.ui.imageSizes.linearExperiment = [978,660]
      
       'Sizes of the linear background and minmized linear video player
       constants.ui.imageSizes.linearVideoPlayer_minimizedDimension = [1263,710]
+      constants.ui.imageSizes.epgLinearVideoPlayer_minimizedDimension = [978,552]
+      constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension = [1120,630]
 
     constants.ui.imageTranslations = {}
       'Location of the linear background and minmized linear video player
       constants.ui.imageTranslations.linearVideoPlayer_minimizedTranslation = [657,0]
+      constants.ui.imageTranslations.epgLinearVideoPlayer_minimizedTranslation = [192,228]
+      constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation = [800,0]
 
     constants.ui.sideNavOpenIds = {}
       constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true
@@ -894,9 +941,12 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.linearTVScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.epgScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.sportsEPGScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.newsEPGScreen] = true
 
     constants.ui.keyIds = {}
       constants.ui.keyIds.back = "back"
@@ -912,9 +962,18 @@ Function getConstants()
       constants.ui.sideNavIds.settings = "settings"
       constants.ui.sideNavIds.exit = "exit"
       constants.ui.sideNavIds.linearTV = "linearTV"
+      constants.ui.sideNavIds.linearEPG = "linearEPG"
       constants.ui.sideNavIds.profile = "profile"
       constants.ui.sideNavIds.kidsMode = "kidsMode"
       constants.ui.sideNavIds.myList = "myList"
+      constants.ui.sideNavIds.sports = "sports"
+      constants.ui.sideNavIds.news = "news"
+      constants.ui.sideNavIds.subtitles = "subtitles"
+      constants.ui.sideNavIds.back = "back"
+
+    constants.ui.linearSideNavIds = {}
+      constants.ui.linearSideNavIds.cc = "cc"
+      constants.ui.linearSideNavIds.epg = "epg"
       
     constants.ui.utilityIds = {}
       constants.ui.utilityIds.movies = "u_movies"
@@ -932,9 +991,12 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.espanolScreen] = constants.ui.sideNavIds.espanol
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.linearTVScreen] = constants.ui.sideNavIds.linearTV
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.epgscreen] = constants.ui.sideNavIds.linearEPG
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.movieScreen] = constants.ui.sideNavIds.movies
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.tvScreen] = constants.ui.sideNavIds.tv
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.sportsEPGScreen] = constants.ui.sideNavIds.sports
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.newsEPGScreen] = constants.ui.sideNavIds.news
 
     constants.ui.gridItemTypes = {}
       constants.ui.gridItemTypes.portrait = "portrait"
@@ -994,6 +1056,11 @@ Function getConstants()
       'colors for individual elements - can be made individual or controlled by template colors
       constants.ui.colors.titleHeader = constants.ui.colors.primaryText
       constants.ui.colors.expirationWarning = "0xFF9933FF"
+
+      'colors for timeGrid
+      constants.ui.colors.futureItemSelected = "0xEB9C00FF"
+      constants.ui.colors.EPGProgramSelected = "0x1C1F29FF"
+      constants.ui.colors.EPGProgramFocused = "0x9699A3FF"
     
     'The IDs of the available themes that can be used for the app 
     constants.ui.themeIDs = {}
@@ -1040,6 +1107,12 @@ Function getConstants()
       constants.ui.homescreen.focusItems = {}
         constants.ui.homescreen.focusItems.topNav = "topNav"
         constants.ui.homescreen.focusItems.contentGrid = "contentGrid"
+
+    constants.ui.epgscreen = {}
+      constants.ui.epgscreen.focusItems = {}
+        constants.ui.epgscreen.focusItems.topNav = "topNav"
+        constants.ui.epgscreen.focusItems.epgTimeGridGrid = "epgTimeGrid"
+  
 
     ' Set some performance parementers based on device profile
     constants.performance = {}

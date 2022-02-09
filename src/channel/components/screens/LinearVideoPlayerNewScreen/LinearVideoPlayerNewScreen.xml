@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="LinearVideoPlayerNewScreen" extends="BaseScreen" >
+  <script type="text/brightscript" uri="LinearVideoPlayerNewScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+
+
+  <interface>
+  
+    <!-- INPUT -->
+      <!-- Alias fields for the video node -->
+      <field id="position" alias="VideoNode.position"/>
+      <field id="width" alias="VideoNode.width"/>
+      <field id="height" alias="VideoNode.height"/>
+
+      <!-- New content has been added to the video player -->
+      <field id="content" type="node"/>
+
+      <field id="updateContent" type="boolean" alwaysNotify="true"/>
+
+      <!-- originalContent stores the content as it is returned from CCS services. It used
+           as a store, in case the linear video player needs to be restarted. -->
+      <field id="originalContent" type="node"/>
+
+      <!--Timegrid content updated in batches-->
+      <field id="timeGridContent" type="node" alias="VideoOverlay.timeGridContent"/>
+
+      <!-- Content might be loading in batch. So render only when timeGridContent is set -->
+      <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" alias="VideoOverlay.updateTimeGridContent"/>
+
+      <!-- Is the content of the EPG component loading? -->
+      <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" alias="VideoOverlay.timeGridContentLoading"/>
+
+      <!-- When the screen asks for timegrid content for a particular channel, then the response will be set to this field. -->
+      <field id="channelTimeGridContent" type="node" alwaysNotify="true"/>
+      
+
+      <!-- content that is used to display a channel guide overliad the video player -->
+      <field id="channelsContent" type="node"/>
+
+      <!-- Fields to pass through to AdsSSAITask -->
+      <field id="pollUrl" alias="PlayerAdsSSAITask.pollUrl" />
+
+      <!-- Indicator that the outside would like the overlay to be closed -->
+      <field id="closeTransport" type="boolean" alwaysNotify="true"/>
+
+      <!-- Should the video player show the programming data. This assumes the player is in minimized state. -->
+      <field id="displayProgrammingData" type="boolean" alwaysNotify="true"/>
+
+      <!-- Is video player currently in fullscreen? -->
+      <field id="fullscreen" type="boolean" value="false" alwaysNotify="true"/>
+
+      <!-- supports "play", "stop", "pause", "resume", "error" -->
+      <field id="control" type="string" value="none" alwaysNotify="true"/>
+      
+      <!-- interval in seconds for sending position data to the tracking server -->
+      <field id="analyticsInterval" type="integer" value="0"/>
+
+      <!-- State that lets the player know how it is being used, so it can determine
+        -  how it should do tracking.
+        -  Allowed modes are:
+        -  'normal'
+        -  'trailer'
+        -  'autoplay'
+        -->
+      <field id="analyticsMode" type="string" value="normal" />
+
+      <!-- Message shown during ad loading and video loading -->
+      <field id="loadingMessage" alias="LoadingMessage.text" />
+
+      <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
+      <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true"/>
+
+      <!-- The id of the screen associated with this screen. Used to keep a record of the previous (home) screen with which has a close association: i.e. the linear screen is displayed as a minmized version on the previous screen. In the future, th previous screen may be other screens like the search screen, which may not necessarilly have a close association with this linear screen -->
+      <field id="associatedScreenID" type="string" value="" />
+
+    <!-- OUTPUT -->
+      <!-- Set to true if the back button was pressed while the video player has focus -->
+      <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
+
+      <!-- Set when the video player needs to display the channel guide -->
+      <field id="refreshChannels" type="boolean" alwaysNotify="true" />
+
+      <!-- If true, then the player is currently playing the channel guide -->
+      <field id="displayingChannelGuide" type="boolean" />
+
+      <!-- Has the user purposely told the channel guide to open? -->
+      <field id="userDisplayingChannelGuide" type="boolean"  alwaysNotify="true" />
+
+      <field id="state" type="string" />
+
+      <!-- Used to store the loading state. It should not be used as an observed field. -->
+      <field id="loading" type="boolean" value="false"/>
+      
+      <!--When the user selects a new channel from the channel guide, this field is set-->
+      <field id="channelSelected" type="node"/>
+
+      <!--Since channelSelected will get updated everytime minsLeftTimer is run, to protect unwanted trigging of observer, this field is used-->
+      <field id="ChannelSelectedUpdated" type="boolean" alwaysNotify="true" />
+
+      <!-- Error message to be displayed to the user -->
+      <field id="errorMsg" type="string" />
+
+      <!-- Error message as told by the video node  -->
+      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />   
+
+      <!-- Error code as told by the video node  -->
+      <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
+
+      <!-- We observe the VideoNode state change and when the state = "error", the call back chain of events
+           eventually sets VideoNode.control = "stop". Due to an idiosyncracy in Roku behavior, this prevents
+           the Youbora plugin from observing the error state on the video node, and so, we must manually trigger
+           the Youbora plugin with the error info. The content controller observes this field and sends error info to Youbora.
+      -->
+      <field id="sendYouboraError" type="boolean" alwaysNotify="true" />
+
+      <field id="sendVideoTrackingStart" type="boolean" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <LinearVideoPlayerMinimizedInfoPanel
+      id="ProgrammingData"
+      opacity="0"
+      translation="[552,0]"/>
+    <Video
+      id="VideoNode"
+      width="1920"
+      height="1080"
+      translation="[0,0]"
+      enableUI="false"
+      cgms = "3"
+      enableTrickPlay="false"
+      notificationInterval="0.5"
+      visible="true" />
+    <Poster
+      id="GradiantOnMinimizedState"
+      width="1920"
+      height="1080"
+      uri="pkg:/images/gradient_linear_minimized_player.png"
+      visible="false"/>
+
+    <Group
+      id="Loading"
+      visible="false">
+      <Rectangle
+        id="LoadingBackground"
+        color="0x000000FF"
+        width="1920"
+        height="1080"/>
+      
+      <Label
+        id="LoadingMessage"
+        height="64"
+        width="1920"
+        horizAlign="center"
+        vertAlign="center"
+        translation="[0,606]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="32"/>
+      </Label>
+      <TubiProgressBar
+        id="LoadingProgressBar"
+        width="750"
+        progress="50"
+        trackColor="0xFFFFFF14"
+        translation="[584,696]"/>
+    </Group>
+
+    <LinearVideoPlayerNewScreenOverlay 
+      id="VideoOverlay"/>
+    
+
+    <AdsSSAITask
+      id="PlayerAdsSSAITask" />
+
+  </children>
+</component>

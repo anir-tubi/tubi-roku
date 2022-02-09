@@ -310,8 +310,8 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_id: -1
       current_cdn: ""   'not possible for Roku client
       has_subtitles: false  'the video player will show subtititles at start
-      video_resource_url: ""
-      video_resource_type: ""
+      video_resource_url: "" 'The playable url in video resource
+      video_resource_type: "" ' The type of video resource
       video_player: ""  'VideoPlayer enum
     }
 
@@ -673,6 +673,10 @@ Function tubiTracking_getOneOfs()
     i: "i"  'filler because empty fields are removed
   }
 
+  sports_browse_page = {
+    i: "i"  'filler because empty fields are removed
+  }
+
   latino_browse_page = {
     i: "i"  'filler because empty fields are removed
   }
@@ -740,6 +744,10 @@ Function tubiTracking_getOneOfs()
 
   section_topNav = {
     top_nav_section: ""  ' Section enum
+  } 
+
+  linear_browse_page = {
+    i: "i"
   }
   
   landing_page = {}
@@ -765,12 +773,14 @@ Function tubiTracking_getOneOfs()
     search_page: search_page
     auth_page: auth_page
     login_page: login_page
+    linear_browse_page: linear_browse_page
     register_page: register_page
     account_page: account_page
     access_menu_page: access_menu_page
     movie_browse_page: movie_browse_page 
     series_browse_page: series_browse_page
-    news_browse_page: news_browse_page 
+    news_browse_page: news_browse_page
+    sports_browse_page: sports_browse_page
     latino_browse_page: latino_browse_page
     onboarding_page: onboarding_page
     landing_page: landing_page
@@ -800,8 +810,10 @@ Function tubiTracking_getOneOfs()
     dest_access_menu_page: access_menu_page
     dest_movie_browse_page: movie_browse_page
     dest_series_browse_page: series_browse_page
-    dest_news_browse_page: news_browse_page 
+    dest_news_browse_page: news_browse_page
+    dest_sports_browse_page: sports_browse_page
     dest_latino_browse_page: latino_browse_page
+    dest_linear_browse_page: linear_browse_page
     dest_onboarding_page: onboarding_page
     dest_landing_page: landing_page
     dest_age_gate_page: age_gate_page
@@ -871,6 +883,10 @@ Function tubiTracking_getOneOfs()
     search_result_component: {
       content_tile: {}  ' ContentTile message
     }
+
+    epg_component: {
+      content_tile: {}  ' ContentTile message
+    }
   }
 
   contentOneof = {
@@ -920,6 +936,11 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.exit <> invalid then map[sideNavIds.exit] = "EXIT"
     if sideNavIds.kidsMode <> invalid then map[sideNavIds.kidsMode] = "KIDS"
     if sideNavIds.profile <> invalid then map[sideNavIds.profile] = "ACCOUNT"
+    if sideNavIds.linearEPG <> invalid then map[sideNavIds.linearEPG] = "LINEAR"
+    if sideNavIds.sports <> invalid then map[sideNavIds.sports] = "SPORTS"
+    if sideNavIds.news <> invalid then map[sideNavIds.news] = "NEWS"
+    if sideNavIds.subtitles <> invalid then map[sideNavIds.subtitles] = "SUBTITLES"
+    if sideNavIds.back <> invalid then map[sideNavIds.back] = "BACK"
   end if
   return map
 End Function

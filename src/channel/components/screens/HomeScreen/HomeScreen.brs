@@ -41,6 +41,7 @@ Function init()
   m.CategoryGridList.observeField("itemFocused", "onGridFocusChange")
   m.CategoryGridList.observeField("reloadedItemToBeFocused", "onItemToBeFocusedChange")
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRowChange")
+  m.CategoryGridList.observeField("currFocusColumn", "onCurrFocusColumnChange")
   m.CategoryGridList.observeField("rowFocused", "onRowFocused")
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
@@ -71,6 +72,9 @@ Function init()
   ' It is reset to -1 at the conclusion of a grid scroll animation.
   m.lastFocusPosition = -1
 
+  ' initilize the currentColumn variable to keep track of the current focused column item. It is used in the helper to stop the linear video player, but it could be used for other things.
+  m.currentColumn = -1
+
   m.utilityMaskOffsetDiff = -100 'the diff in the amount the content area mask is offset in the up direction for utility
   
   ' Video in the grid constants
@@ -78,8 +82,15 @@ Function init()
   m.vitgMaskOffsetDiff = 352 'the diff in the amount the content area mask is offset in the up direction for vitg
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
   m.sponsorMaskOffsetDiff = 29 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
-  m.linearSlideAmt = -115 'the amount the grid slides up to fit the linear content item
-  m.linearMaskOffsetDiff = -99 'the diff in the amount the content area mask is offset in the up direction for the linear news container
+
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
+    m.linearSlideAmt = 385 'the amount the grid slides up to fit the linear content item
+    m.linearMaskOffsetDiff = 280 'the diff in the amount the content area mask is offset in the up direction for the linear news container
+  else
+    m.linearSlideAmt = -115 'the amount the grid slides up to fit the linear content item
+    m.linearMaskOffsetDiff = -99 'the diff in the amount the content area mask is offset in the up direction for the linear news container
+  end if
+
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
   m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt] 
@@ -298,6 +309,19 @@ Function isSponsoredRow(row)
 End Function
 
 
+' When the column changes focus, then report to any observers.
+Function onCurrFocusColumnChange(msg)
+  column = msg.getData()
+  newColumn = Int(column)
+  if newColumn <> invalid and newColumn <> m.currentColumn
+    '//make sure we only report the new column for a whole integer 
+    m.currentColumn = newColumn
+
+    m.top.columnFocused = m.currentColumn
+  end if
+End Function
+
+
 ' fires when the RowList is in the process of scrolling between rows
 Function onCurrFocusRowChange()
   'the focused row during the scroll as a float (ie. 2.3 is partially between 2nd and 3rd rows)
@@ -501,6 +525,9 @@ End Function
 Function expandContentAreaForLinear(rowPercent)
   m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.linearSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.linearMaskOffsetDiff * rowPercent)]
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
+    m.InfoPanel.opacity = 1 - rowPercent
+  end if
 End Function
 
 
@@ -541,21 +568,26 @@ Function onGridFocusChange() as void
   if not (m.TopNav.isInFocusChain() = true or m.CategoryGridList.isInFocusChain() = true) or m.top.isLoading = true
     return
   end if
-
   oldFocusedContent = m.CategoryGridList.oldItemFocused
   focusedContent = m.CategoryGridList.itemFocused
 
-  if focusedContent <> invalid
-    if focusedContent.type <> m.constants.ui.gridItemTypes.linear
-      m.top.stopLinearVideoPlayer = true
+  if m.CategoryGridList.isInFocusChain() = true
+    '//if the CategoryGridList is in focus, then alter the UI. No need to do this for topnav as it may cause the linear video player 
+    '// to start to play when the top nav is in focus because there is a delay of reporting of the focused item by the CategoryGridList
+    if focusedContent <> invalid
+      if focusedContent.type <> m.constants.ui.gridItemTypes.linear
+        m.top.stopLinearVideoPlayer = true
+      end if
+
+      m.top.contentFocused = focusedContent
     end if
 
-    m.top.contentFocused = focusedContent
+    populateInfoPanelByContent(focusedContent) 
   end if
 
-  populateInfoPanelByContent(focusedContent) 
 
-  'Set up the navigateWithinPageInfo to send to ContentController via Homescreen
+
+  'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList or topNav are in focus 
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + 1
   oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
   newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 1
@@ -709,6 +741,8 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.width = 960
+    else if mode = m.constants.ui.infoPanelModes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true 
+      m.InfoPanel.mode = mode
     else if mode = m.constants.ui.infoPanelModes.linear
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
@@ -734,7 +768,11 @@ End Function
 
 Function determineBackgroundImage(focusedContent)
   if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0
-    return focusedContent.backgrounds
+    if focusedContent.type = m.constants.ui.categoryTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
+      return [m.defaultBackgroundUri]
+    else
+      return focusedContent.backgrounds
+    end if
   else
     return [m.defaultBackgroundUri]
   end if

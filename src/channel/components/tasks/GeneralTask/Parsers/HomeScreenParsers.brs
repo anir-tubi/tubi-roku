@@ -3,7 +3,8 @@
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseHomeScreenContentSuccess(fullResponse, requestNode)
 
-  translate = TubiMetadataTranslate(m.constants)
+  experiments = TubiExperiments(m.constants)
+  translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
 
   contentMode = invalid
@@ -52,7 +53,8 @@ End Function
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseCategoryContentSuccess(fullResponse, requestNode)
 
-  translate = TubiMetadataTranslate(m.constants)
+  experiments = TubiExperiments(m.constants)
+  translate = TubiMetadataTranslate(m.constants, experiments)
 
   parsedResponse = fullResponse.data
   fullJson = fullResponse.fullJson

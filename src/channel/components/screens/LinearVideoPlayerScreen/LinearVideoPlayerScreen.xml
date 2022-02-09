@@ -79,6 +79,9 @@
 
       <field id="state" type="string" />
       
+      <!-- Used to store the loading state. It should not be used as an observed field. -->
+      <field id="loading" type="boolean" value="false"/>
+      
       <!--When the user selects a new channel from the channel guide, this field is set-->
       <field id="channelSelected" type="node"/>
 

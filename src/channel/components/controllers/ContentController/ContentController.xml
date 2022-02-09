@@ -24,6 +24,7 @@
   <script type="text/brightscript" uri="DetailScreenHelpers.brs" />
   <script type="text/brightscript" uri="HomeScreenHelpers.brs" />
   <script type="text/brightscript" uri="SearchScreenHelpers.brs" />
+  <script type="text/brightscript" uri="EPGScreenHelpers.brs" />
   <script type="text/brightscript" uri="InitialContentScreenHelpers.brs" />
   <script type="text/brightscript" uri="EpisodeScreenHelpers.brs" />
   <script type="text/brightscript" uri="SideNavHelpers.brs" />
@@ -33,9 +34,11 @@
   <script type="text/brightscript" uri="ScreenStackHelpers.brs" />
   <script type="text/brightscript" uri="LinearVideoPlayerScreenHelpers.brs" />
   <script type="text/brightscript" uri="AgeVerificationScreenHelpers.brs" />
+  <script type="text/brightscript" uri="EPGScreenHelpers.brs" />
   <script type="text/brightscript" uri="TopNavHelpers.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="../../screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
@@ -47,6 +50,7 @@
   <script type="text/brightscript" uri="../../../source/lib/GeneralTaskModule.brs" />
   <script type="text/brightscript" uri="../../../source/lib/ApiUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/CmsApi.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TensorApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/UserDeviceApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
@@ -145,10 +149,25 @@
 
         <ScreenStack
           id="ScreenStack"/>
+        
+        <!--  Group that contains the linear video player when it is not in its fullscreen state, and when the player needs to be above the screen stack layer. -->
+        <Group
+          id="LinearPlayerGroupAboveScreenStack"/>
+
+        <CountdownTimerUI
+          id="LinearCountdownTimer"
+          translation="[946,240]"/>
+
         <SideNav
           id="SideNav"
           translation="[-32,0]"
           width="338"/>
+        <Clock
+          id="clock"
+          width="93"
+          height="36"
+          visible="false"
+          translation="[1729,72]"/>
         <Group 
           id="logoGroup">
           <Poster

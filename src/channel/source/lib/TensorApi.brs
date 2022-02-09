@@ -1,0 +1,74 @@
+
+' Thin wrapper for Tensor API requests.  Collected here to facilitate easy
+' integration tests
+Function TensorApi(constants, request, auth)
+  return {
+    ' dependencies
+    constants: constants
+    request: request
+    auth: auth
+
+    ' public
+    getEPGChannelIdsReqInfo: tensorApi_getEPGChannelIdsReqInfo
+    getEPGProgramReqInfo: tensorApi_getEPGProgramReqInfo
+
+    ' private
+    commonOptions: tensorApi_commonOptions
+  }
+End Function
+
+
+Function tensorApi_commonOptions()
+  headers = {}
+  ' appending in this style is neccessary to prevent m.constants.headers.json from being
+  ' mutated by potential later appends, since assoc arrays are passed by reference.
+  headers.append(m.constants.headers.json)
+  headers.append(m.constants.headers.commonUapi)
+
+  options = {
+    params: {
+      "app_id": m.constants.settings.shortAppName
+      "platform": m.constants.platform
+      "device_id": m.constants.deviceInfo.deviceId
+    }
+    headers: headers
+  }
+  return options
+End Function
+
+
+''''''''''''''''''''''
+'epgChannelIds request
+'
+Function tensorApi_getEPGChannelIdsReqInfo(mode = "")
+  url = m.constants.urls.tensor.epgChannelIds
+
+  options = m.commonOptions()
+  if mode <> invalid and mode <> ""
+    options.params["mode"] = mode
+  end if
+
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+''''''''''''''''''''''
+
+'epgProgram request
+'@contentIds: arrays, the list of channelId's
+Function tensorApi_getEPGProgramReqInfo(contentIds)
+  contentIdsString = contentIds.Join(",")
+ 
+  url = m.constants.urls.content.epgProgramContent
+  options = m.commonOptions()
+  options.params["content_id"] = contentIdsString
+  options.params["lookahead"] = 1
+
+  return {
+    url: url
+    options: options
+  }
+End Function

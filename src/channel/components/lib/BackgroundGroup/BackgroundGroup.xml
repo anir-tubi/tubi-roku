@@ -51,11 +51,11 @@
         gradientOpacity="0.0"/>
       <BackgroundGradientGroup
         id="LinearGradient1"
-        uri="pkg:/images/horizGradientStrip.png"
+        uri="pkg:/images/horizGradientEPG.png"
         gradientOpacity="0.0"/>
       <BackgroundGradientGroup
         id="LinearGradient2"
-        uri="pkg:/images/vertGradientStrip.png"
+        uri="pkg:/images/vertGradientEPG.png"
         gradientOpacity="0.0"/>
     </Group>
   </children>

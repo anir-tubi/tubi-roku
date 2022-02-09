@@ -164,7 +164,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   m.urltransfer.setRequest(m.method)
 
   ' print output for qa to test
-  if m.configMode = "qa" or m.configMode = "staging" 
+  if m.configMode = "qa" or m.configMode = "staging"
     tubiLog("sending a " + m.method + " request to " + m.url)  
     print m.body
   end if

@@ -33,6 +33,29 @@ Function stringUtils_padString_test()
 End Function
 
 
+'@Test padStringLeft unit tests
+Function stringUtils_padStringLeft_test()
+  ' since we use this for transport time, test with time values
+  for i = 0 to 60
+    padded = padStringLeft(stri(i), "0", 2)
+    m.AssertEqual(padded.len(), 2)
+  end for
+
+  ' string already longer than pad length
+  m.AssertEqual(padStringLeft("aaa", "0", 2), "aaa")
+
+  ' empty pad string
+  m.AssertEqual(padStringLeft("bbb", "", 2), "bbb")
+
+  ' pad string > 1 character
+  m.AssertEqual(padStringLeft("bbb", "0123", 7), "0123bbb")
+  m.AssertEqual(padStringLeft("bbb", "0123", 8), "01230123bbb")
+
+  ' example from function
+  m.AssertEqual(padStringLeft("12345", "0", 8), "00012345")
+End Function
+
+
 
 '@Test formatLengthAsTimestamp unit tests
 Function stringUtils_formatLengthAsTimestamp_test()
@@ -173,6 +196,30 @@ Function stringUtils_convertFunctionToString_test()
   m.assertNotInvalid(functionStr)
   m.assertEqual(functionStr, "")  
   
+End Function
+
+
+'@Test GetAMPMTimeString unit tests
+Function stringUtils_GetAMPMTimeString_test()
+  dt = CreateObject("roDateTime")
+  dt.FromSeconds(1635811870)
+  m.AssertEqual(GetAMPMTimeString(dt),"12:11 AM")
+  m.AssertEqual(GetAMPMTimeString(dt, false),"12:11AM")
+
+  dt.fromSeconds(1636171870)
+  m.AssertEqual(GetAMPMTimeString(dt), "4:11 AM")
+  
+  dt.fromSeconds(1636891870)
+  m.AssertEqual(GetAMPMTimeString(dt), "12:11 PM")
+
+  dt.fromSeconds(1635961560)
+  m.AssertEqual(GetAMPMTimeString(dt), "5:46 PM")
+
+  dt.fromSeconds(1635908400)
+  m.AssertEqual(GetAMPMTimeString(dt), "3:00 AM")
+
+  dt.fromSeconds(1635966300)
+  m.AssertEqual(GetAMPMTimeString(dt), "7:05 PM")
 End Function
 
 

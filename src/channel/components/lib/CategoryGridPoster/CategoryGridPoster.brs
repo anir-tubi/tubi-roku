@@ -1,13 +1,21 @@
 Function init()
   m._ = rodash()
+
   m.poster = m.top.findNode("Poster")
+  m.LinearPoster = m.top.findNode("LinearPoster")
   
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.top.observeField("itemContent", "onContentChange")
   m.resumeMargin = 4  'inset of resume bar
   m.title = m.top.findNode("Title")
+  m.LinearTitle = m.top.findNode("LinearTitle")
+  m.LinearSubTitle = m.top.findNode("LinearSubTitle")
+  m.tVGuideNumberChannels = m.top.findNode("TVGuideNumberChannels")
+  m.TVGuideNumberBground = m.top.findNode("TVGuideNumberBground")
+  m.TVGuideNumberBground.blendColor = "0x9699A3FF"
+  m.posterFadeTime = 0.5
   
-  '//recreate the gridItemTypes from constants so as not to access m.global.constants for every item on the home screen as they are created
+  '//recreate the gridItemTypes (itemIDs) from constants so as not to access m.global.constants for every item on the home screen as they are created
   m.gridItemTypes = {
     portrait: "portrait"
     landscape: "landscape"
@@ -15,6 +23,9 @@ Function init()
     vitg_large: "vitg_large"
     utility: "utility"
     historySignedOutUser: "continue_watching_signed_out_user"
+  }
+  m.itemIDs = {
+    tvGuide: "tvGuide"
   }
 End Function
 
@@ -25,7 +36,12 @@ End Function
 ' Update the title and background on 'content' being set
 Function onContentChange()
   ' set some defaults
+  m.LinearPoster.visible = false
   m.title.visible = false
+  m.LinearTitle.visible = false
+  m.LinearSubTitle.visible = false
+  m.tVGuideNumberChannels.visible = false
+  m.poster.opacity = 1
 
   ' next line shouldn't be necessary but is added in order to try and quell crashes as reported by roku crash logs
   if m.resumeProgressBar = invalid then m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
@@ -43,24 +59,31 @@ Function onContentChange()
   m.poster.visible = true
  
   if m.top.itemContent <> invalid then
-    m.poster.uri = m.top.itemContent.hdgridposterurl
     categoryContent = m.top.itemContent.getParent()
 
-    if categoryContent <> invalid then
-      if m.top.itemContent.gridItemType = m.gridItemTypes.landscape
-        m.title.visible = true
-        m.title.text = m.top.itemContent.title
-      else if isVitg(m.top.itemContent, m.gridItemTypes) = true
-        setUpVitg()
-      else if m.top.itemContent.gridItemType = m.gridItemTypes.utility
-        m.poster.visible = false
-        setUpUtility()
-        setUpUtilityObservers()
-      else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
-        setUpSignedOutContinueWatching()
-      else if categoryContent.id = "continue_watching"
-        drawHistoryProgressBar()
+    if categoryContent <> invalid and m.top.itemContent.gridItemType <> invalid then
+      if m.top.itemContent.gridItemType = m.gridItemTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
+        setUpLinear()
+      else
+        m.poster.uri = m.top.itemContent.hdgridposterurl
+        
+        if m.top.itemContent.gridItemType = m.gridItemTypes.landscape
+          m.title.visible = true
+          m.title.text = m.top.itemContent.title
+        else if isVitg(m.top.itemContent, m.gridItemTypes) = true
+          setUpVitg()
+        else if m.top.itemContent.gridItemType = m.gridItemTypes.utility
+          m.poster.visible = false
+          setUpUtility()
+          setUpUtilityObservers()
+        else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
+          setUpSignedOutContinueWatching()
+        else if categoryContent.id = "continue_watching"
+          drawHistoryProgressBar()
+        end if
       end if
+    else
+      m.poster.uri = m.top.itemContent.hdgridposterurl
     end if
   end if
 End Function
@@ -103,46 +126,51 @@ End Function
 
 ' @localFocus: boolean, the state of focus for the itemComponent
 Function handleLocalFocusChange(newLocalFocus)
-  if m.localFocus = false and newLocalFocus = true
-    ' item is gaining focus - create the video player
-    if m.vitg = invalid
-      m.vitg = createVitgVideo()
+  if m.top.itemContent.id <> m.itemIDs.tvGuide
+    if m.localFocus = false and newLocalFocus = true
+      ' item is gaining focus
+      if isVitg(m.top.itemContent, m.gridItemTypes) = true
+        if m.vitg = invalid
+          '// create the video player when the vitig item gains focus
+          m.vitg = createVitgVideo()
+          if m.vitg <> invalid
+            m.vitg.hasFocus = newLocalFocus
+          end if
+        end if
+      else if isLinear(m.top.itemContent, m.gridItemTypes) = true
+        '//if the linear item gains focus, then fade out the poster/background
+        m.fadeOutAnimation = fade(m.poster, "out", m.posterFadeTime)
+      end if
+    else if m.localFocus = true and newLocalFocus = false
+      ' item is losing focus - so fade the poster in (as necessary) and destroy the video player
+      if m.poster.opacity < 1.0
+        ' stop any fade out animations that might be running
+        if m.fadeOutAnimation <> invalid
+          m.fadeOutAnimation.control = "stop"
+        end if
+        
+        ' fade in the poster, but if there is already a fade in animation running, let it run
+        if m.fadeInAnimation = invalid or m.fadeInAnimation.state <> "running"
+          m.fadeInAnimation = fade(m.poster, "in", m.posterFadeTime)
+        end if
+      end if
+
+      ' destroy the video player
       if m.vitg <> invalid
+        ' removing focus before destroying vitg lets finish_trailer events be fired from the vitg node
         m.vitg.hasFocus = newLocalFocus
+        destroyVitgVideo()
       end if
-    end if
-  else if m.localFocus = true and newLocalFocus = false
-    ' item is losing focus - so fade the poster in (as necessary) and destroy the video player
-    if m.poster.opacity < 1.0
-      ' stop any fade out animations that might be running
-      if m.fadeOutAnimation <> invalid
-        m.fadeOutAnimation.control = "stop"
-      end if
-
-      ' fade in the poster, but if there is already a fade in animation running, let it run
-      if m.fadeInAnimation = invalid or m.fadeInAnimation.state <> "running"
-        m.fadeInAnimation = fade(m.poster, "in", m.posterFadeTime)
-      end if
-    end if
-
-    ' destroy the video player
-    if m.vitg <> invalid
-      ' removing focus before destroying vitg lets finish_trailer events be fired from the vitg node
-      m.vitg.hasFocus = newLocalFocus
-      destroyVitgVideo()
     end if
   end if
-
   m.localFocus = newLocalFocus
 End Function
 
 
 Function onRowListHasFocus()
   ' fade the poster in when focusing side nav or leaving the page
-  if isVitg(m.top.itemContent, m.gridItemTypes) = true
-    if m.top.rowListHasFocus = false
-      handleLocalFocusChange(false)
-    end if
+  if m.top.rowListHasFocus = false
+    handleLocalFocusChange(false)
   end if
 End Function
 
@@ -163,12 +191,65 @@ Function onRowFocusPercentChange()
 End Function
 
 
+Function setUpLinear()
+  m.top.observeField("itemHasFocus", "onItemFocus")
+  m.top.observeField("rowListHasFocus", "onRowListHasFocus")
+  m.top.observeField("focusPercent", "onFocusPercentChange")
+
+  ' local focus state; becomes true when focusPercent = 1.0 or itemHasFocus = true
+  ' becomes false when focusPercent < 1.0 or itemFocus = false
+  if m.localFocus = invalid
+    m.localFocus = false
+  end if
+
+  m.LinearPoster.visible = true
+  m.LinearPoster.uri = m.top.itemContent.inlineLogoUri
+  m.LinearPoster.width = 216
+  m.LinearPoster.height = 216
+
+  m.LinearTitle.visible = true
+  m.LinearTitle.width = m.top.width
+  nLinearTitlePlacement = m.top.height - m.LinearTitle.height - 36
+  m.LinearTitle.translation = [0,nLinearTitlePlacement]
+
+
+  if m.top.itemContent.id <> m.itemIDs.tvGuide
+    m.poster.uri = "pkg:/images/gradientBground-linearItem-vertical.png"
+    m.LinearTitle.text = m.top.itemContent.title
+  else 
+    m.poster.uri = "pkg:/images/gradientBground-linearItem-tvGuide.png"
+    '//Note: For the TV Guide item, the title is set to the subtitle component and the subtitle is set to the title component.
+    m.LinearSubTitle.visible = true
+    m.LinearSubTitle.width = m.top.width * .9
+    nLinearSubTitle_X = (m.top.width - m.LinearSubTitle.width)/2
+    m.LinearSubTitle.translation = [nLinearSubTitle_X, m.LinearSubTitle.translation[1]]
+    m.LinearSubTitle.text = m.top.itemContent.title
+    m.LinearTitle.text = getTranslation("screenHome_item_tvguide_subtitle")
+    m.tVGuideNumberChannels.visible = true
+
+    '//Set the X,Y coordinates of the tVGuideNumberChannels component
+    nTVGuideNumberChannels_X = (m.top.width - m.TVGuideNumberBground.width)/2
+    m.tVGuideNumberChannels.translation = [nTVGuideNumberChannels_X,nLinearTitlePlacement]
+
+    '//Set the new Y position for the title text
+    nLinearTitlePlacement = nLinearTitlePlacement - m.TVGuideNumberBground.height - 18 
+    m.LinearTitle.translation = [0, nLinearTitlePlacement]
+  end if
+  m.LinearPoster.translation = [381,198]
+
+  ' It is possible when fast scrolling to the row, that the item can gain focus before setUpLinear() runs.
+  ' since itemHasFocus is true in this case, the callback onItemFocus won't get triggered. so manually calling handleLocalFocusChange
+  if m.top.itemHasFocus = true
+    handleLocalFocusChange(m.top.itemHasFocus)
+  end if
+End Function
+
+
 Function setUpVitg()
   m.top.observeField("rowFocusPercent", "onRowFocusPercentChange")
   m.top.observeField("itemHasFocus", "onItemFocus")
   m.top.observeField("rowListHasFocus", "onRowListHasFocus")
   m.top.observeField("focusPercent", "onFocusPercentChange")
-  m.posterFadeTime = 0.5
 
   ' On various models, and due to long press horizontal scrolling, we cannot always count on
   ' m.top.itemHasFocus and m.top.focusPercent to fire as expected. In order to get around these issues,
@@ -271,6 +352,15 @@ Function isVitg(itemContent, gridItemTypes)
     isVitg = true
   end if
   return isVitg
+End Function
+
+Function isLinear(itemContent, gridItemTypes)
+  bIsLinear = false
+  if itemContent.gridItemType = gridItemTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
+    bIsLinear = true
+  end if
+
+  return bIsLinear
 End Function
 
 

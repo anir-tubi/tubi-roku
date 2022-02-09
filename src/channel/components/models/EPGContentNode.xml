@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name = "EPGContentNode" extends="ContentNode">
+  <interface>
+      
+    <!-- Program start Time in Local time -->
+    <field id="startTime" type="integer" />
+
+    <!-- Program End Time in LocalTime -->
+    <field id="endTime" type="integer" />
+
+    <!--Selected item populated by programGrid itself-->
+    <field id="selected" type="boolean" value="false" />
+
+    <!-- Field to tell whether program has subTitle or not-->
+    <field id="hasSubtitles" type="boolean" />
+
+    <!-- This field is to avoid access global node in program items.
+    Selected Item Attributes has following formats
+    title : is translated text "Starts at"
+    focusedColor : Focused color from constants
+    unFocusedColor: unFocused Color from constants 
+    -->
+    <field id="selectedItemAttributes" type="assocarray" />
+
+    <!--Variable width of the timeGird = duration * 19.5 populated by programGrid itself-->
+    <field id="FHDItemWidth" type="float"/>
+
+    <!--Type of the content linear/movie ect-->
+    <field id="type" type="string" value="linear" />
+
+    <!--InfoPanel Line1 data HoursOfAiring -->
+    <field id="hoursOfAiring" type="string"/>
+
+    <!--InfoPanel Line1 data Subtitles -->
+    <field id="subtitles" type="boolean"/> 
+
+    <field id="descriptors" type="array" />
+
+    <!--NOTE: THE FOLLOWING FIELDS ARE DEFAULT CONTENTNODE FIELDS. CREATED ONLY AFTER INITIALIZATION.
+      These needs to be initialized with "=" or SetFields() or setField(). Otherwise, this field will not exist.
+      Title
+      FHDPosterUrl
+      ShortDescriptionLine1
+      ReleaseDate
+      Rating
+      Categories
+      Description
+      -->
+
+    <!--This is the title goes on to TimeGrid Center and InfoPanel on Focused 
+    <field id="title" type="string" /> -->
+
+
+    <!-- A logo that will be displayed in header / infopanel for EPG program  
+    <field id="FHDPosterUrl" type="string" />-->
+
+    <!--This field shows the time value on Time Grid. Current Time will be in hours and mins(32 mins left) and future time will be in hh:mm (9:00 PM)
+    <field id="ShortDescriptionLine1" type="string" /> -->
+
+    <!--InfoPanel Line1 data year Aired 
+    <field id="ReleaseDate" type="string"/> -->
+
+    <!--InfoPanel Line1 data Ratings.  
+    <field id="Rating" type="string"/> -->
+
+    <!--InfoPanel Line1 data Description. 
+    <field id="Description" type="string"/> -->
+
+    <!--InfoPanel Line2 data ganre.
+    <field id="Categories" type="string" />-->
+
+  </interface>
+</component>

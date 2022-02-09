@@ -11,6 +11,8 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
     translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
     translateLinearChannelGuide: tubiMetadataTranslate_translateLinearChannelGuide
+    translateEPGChannelIds: tubiMetadataTranslate_translateEPGChannelIds
+    translateEPGPrograms: tubiMetadataTranslate_translateEPGPrograms
 
     ' private
     constants: constants
@@ -381,21 +383,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   'take care of any subtitles if they exist - should only happen on videos
   if contentFromServer.has_subtitle <> invalid then translatedContent.hasSubtitles = contentFromServer.has_subtitle
-  if contentFromServer.subtitles <> invalid and type(contentFromServer.subtitles) = "roArray" and contentFromServer.subtitles.count() > 0
-    subtitleTracks = []
-    for each subtitle in contentFromServer.subtitles
-      ' Firmware 8.0+ scene graph native CC dialog
-      subtitleTracks.push({
-        description: subtitle.lang
-        trackname: subtitle.url
-      })
-    end for 
-    translatedContent.subtitleTracks = subtitleTracks
-    ' This is needed to make subtitles work on Roku 3 (and other models... 3900, 3800, etc.)
-    translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles[0].url}
-  end if
 
-  ' linear
+  ' linear subtitles
   if translatedContent[typeVar] = m.contentTypes.linear and translatedContent.hasSubtitles = true
     '//::TODO::LiveNews::HARDCODE:: - The following code is a hardcoded. 
     '//   The backend needs to let us know what captions are available and what channel the track is on.
@@ -410,7 +399,22 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       })
     translatedContent.subtitleTracks = subtitleTracks
     translatedContent.subtitleConfig = {TrackName: "eia608/CC1"}
+  else if contentFromServer.subtitles <> invalid and type(contentFromServer.subtitles) = "roArray" and contentFromServer.subtitles.count() > 0
+    '//subtitles for non-linear video
+    subtitleTracks = []
+    for each subtitle in contentFromServer.subtitles
+      ' Firmware 8.0+ scene graph native CC dialog
+      subtitleTracks.push({
+        description: subtitle.lang
+        trackname: subtitle.url
+      })
+    end for 
+    translatedContent.subtitleTracks = subtitleTracks
+    ' This is needed to make subtitles work on Roku 3 (and other models... 3900, 3800, etc.)
+    translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles[0].url}
   end if
+
+
   if translatedContent[typeVar] = m.contentTypes.linear 
     if contentFromServer.thumbnails <> invalid
       translatedContent.inlineLogoUri = contentFromServer.thumbnails[0]
@@ -928,7 +932,9 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   if gridItemType = landscape or gridItemType = vitg_large or gridItemType = utility or gridItemType = linear
     for i = 0 to translated.getChildCount()-1
       child = translated.getChild(i)
-      child.addField("gridItemType", "string", false)
+      if child.hasField("gridItemType") <> true
+        child.addField("gridItemType", "string", false)
+      end if
       child.gridItemType = gridItemType
     end for
   end if
@@ -980,6 +986,33 @@ End Function
 Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = invalid, sOrientation = "", bFullData = false, contentMode = "homeScreen")
 
   categoryParent = m.buildCategoryParentInfo(container, contentMode)
+  if container.type = m.contentTypes.linear
+    if m.experiments.getExperimentResource("roku_linear_epg", "roku_linear_epg_v1").update_homescreen = true
+      if container.children <> invalid and container.children.count() > 0
+        '//add a TV guide list item to the linear container children
+
+        tvGuideItem = {
+          id: m.constants.ui.contentIds.tvGuide
+          title: getTranslation("screenHome_item_tvguide_title")
+          type: "l"
+          hero_images: ["pkg:/images/gradientBground-linearItem-tvGuide.png"] 
+          thumbnails: ["pkg:/images/icon-tvGuide.png"]
+        }
+        '//add the TV guide content back into the raw JSON
+        if contentsJson <> invalid
+          '//::TODO:: ParseJson and FormatJson are thread blocking actions that can take some time to resolve if there are large amounts 
+          '//   of data to parse/format. We have an optimization in the function tubiMetadataTranslate_getContentsJson that uses string 
+          '//   manipulation methods that are built in to the firmware to extract out the contents object out of the JSON. We could 
+          '//   consider doing something similar to add items to the contentsJSON as well.
+          parsedJsonTvGuide = ParseJson(contentsJson)
+          parsedJsonTvGuide[tvGuideItem.id] = tvGuideItem
+          contentsJson = FormatJSON(parsedJsonTvGuide)
+        end if
+        container.children.push(tvGuideItem.id)
+        contents[tvGuideItem.id] = tvGuideItem
+      end if
+    end if
+  end if
 
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
   categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData)
@@ -1155,17 +1188,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             m.translateRecursive(fullChild, childAA)
           end if
 
-          bLandscape = false
-          if parentGridItemType = m.constants.ui.gridItemTypes.portrait or parentGridItemType = m.constants.ui.gridItemTypes.utility
-            bLandscape = false
-          else if parentGridItemType = m.constants.ui.gridItemTypes.landscape and fullChild.hero_images <> invalid
-            bLandscape = true
-          else if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid
-            bLandscape = true
-          else if parentGridItemType = m.constants.ui.gridItemTypes.vitg_large
-            bLandscape = true
-          end if
-
           gridType = ""
           if parentGridItemType = m.constants.ui.gridItemTypes.portrait
             gridType = m.constants.ui.gridItemTypes.portrait
@@ -1177,6 +1199,21 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             gridType = m.constants.ui.gridItemTypes.vitg_large
           else if parentGridItemType = m.constants.ui.gridItemTypes.linear
             gridType = m.constants.ui.gridItemTypes.linear
+          end if
+          if childAA.type <> "ContentNode"
+            '//if the subtype is not the default ContentNode, then set the gridItemType field
+            childAA.gridItemType = gridType
+          end if
+
+          bLandscape = false
+          if parentGridItemType = m.constants.ui.gridItemTypes.portrait or parentGridItemType = m.constants.ui.gridItemTypes.utility
+            bLandscape = false
+          else if parentGridItemType = m.constants.ui.gridItemTypes.landscape and fullChild.hero_images <> invalid
+            bLandscape = true
+          else if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid
+            bLandscape = true
+          else if parentGridItemType = m.constants.ui.gridItemTypes.vitg_large
+            bLandscape = true
           end if
 
           if bLandscape = true then
@@ -1626,4 +1663,254 @@ Function tubiMetadataTranslate_composeVideoResources(contentFromServer)
   end if
 
   return videoResources
+End Function
+
+
+''''''''''''''''''''''
+' translateEPGChannelIds
+' Translate the initial getEPGChannelIds call
+'
+' @contentToTranslate: roAssocArray, should have a form like:
+'                     all_modes:[
+'                         "tubitv_us_linear"
+'                      ]
+'                     mode: {
+'                        containers: [
+'                           {
+'                             container_slug: "sports_on_tubi",
+'                             name: "Sports on Tubi",
+'                             contents: ["613683", "613761"]
+'                             ...
+'                           }
+'                           {
+'                             container_slug: "national_news",
+'                             name: "National News",
+'                             contents: ["618762", "556174", "555127"]
+'                             ...
+'                           }
+'                        ]
+'                     }
+'
+' Returns a set of content meta data in the form below.
+' The ContentNodes will have a limited set of meta data, just enough to propagate the category grid.
+' The outer most CategoryContentNode's json field will be filled with the contents json
+' <ContentNode json={...all contents info...}>
+'   <ContentNode>
+'      id="613683"
+'      containerName="Sports on Tubi"
+'      ...
+'   </ContentNode>
+'   <ContentNode>
+'      id="619727"
+'      containerName="National News"
+'      ...
+'   </ContentNode>
+'   ...
+' </ContentNode>
+'
+'
+' @contentToTranslate: AA, json parsed response from the epgChannelIds endpoint
+Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, requestorID) As Object
+  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateEPGChannelIds")
+  translated = CreateObject("roSGNode", "ContentNode")
+  translated.addField("requestorID", "string", false)
+  translated.requestorID = requestorID
+  if contentToTranslate.mode <> invalid 
+    if contentToTranslate.mode.id = m.constants.ui.contentMode.epgScreen
+      translated.id = m.constants.ui.contentIds.timeGridContent
+    else if contentToTranslate.mode.id = m.constants.ui.contentMode.sportsEPGScreen
+      translated.id = m.constants.ui.contentIds.sportsTimeGridContent
+    else if contentToTranslate.mode.id = m.constants.ui.contentMode.newsepgScreen
+      translated.id = m.constants.ui.contentIds.newsTimeGridContent
+    end if
+  end if
+  
+  containers = contentToTranslate.mode.containers
+  for i = 0 to containers.count() - 1
+    container = containers[i]
+    containerContents = container.contents
+    for j = 0 to containerContents.count() - 1
+      channelContentNode = translated.createChild("ContentNode")
+      channelContentNode.id = containerContents[j]
+      channelContentNode.addField("containerName", "string", false)
+      channelContentNode.containerName = container.name
+    end for
+  end for
+  return translated
+End Function
+
+
+' @contentToTranslate: AA, json parsed response from the epgProgramming endpoint
+Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requestorID )
+  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateEPGPrograms()")
+  contentNode = CreateObject("roSGNode", "ContentNode")
+  contentNode.addField("requestorID", "string", false)
+  contentNode.requestorID = requestorID
+  
+  ' taking these variables out of for loop for performance
+  unFocusedColor = m.constants.ui.colors.futureItemSelected  '0xEB9C00FF
+  focusedColor = m.constants.ui.colors.EPGProgramFocused '0x9699A3FF
+  selectedAttributeText = getTranslation("epg_starts_at") + " "
+
+  rows = contentToTranslate.rows
+  totalRows = rows.count()
+  for rowIndex = 0 to totalRows - 1
+    channelFromServer = rows[rowIndex]
+    if channelFromServer <> invalid
+      channelNode = contentNode.createChild("TubiContentNode")
+
+      if channelFromServer.content_id <> invalid
+        channelNode.id = channelFromServer.content_id
+      end if
+
+      if channelFromServer.title <> invalid
+        channelNode.channelName = channelFromServer.title
+      end if
+
+      if channelFromServer.images <> invalid and channelFromServer.images.thumbnail <> invalid
+        channelNode.HDSMALLICONURL = channelFromServer.images.thumbnail[0]
+      end if
+
+      channelNode.videoResources = m.composeVideoResources(channelFromServer)
+      channelNode.description = channelFromServer.description
+      channelNode.type = "linear"
+      if contentToTranslate.valid_duration <> invalid
+        channelNode.validUntil = Uptime(0) + contentToTranslate.valid_duration
+      else
+        channelNode.validUntil = UpTime(0) + m.constants.cacheTimes.epgscreen
+      end if
+
+      if channelFromServer.has_subtitle <> invalid
+        channelNode.hasSubtitles = channelFromServer.has_subtitle
+        if channelNode.hasSubtitles = true
+          '//::TODO::LiveNews::HARDCODE:: - The following code is a hardcoded. 
+          '//   The backend needs to let us know what captions are available and what channel the track is on.
+          '//   In the meantime, backend is setting the has_subtitles field to true if the stream has at least 1 caption. We will assume during MVP of the live news launch that the caption in the 1st caption channel is English.
+          '//   For future versions, backend will provide the language and channel location.
+          '//   MAYBE, in a future Roku firmware update, captions will be known. However, we currently do not know when or if any future update will have this ability. 
+          subtitleTracks = []
+          subtitleTracks.push({
+            language: "eng"
+            description: "English"
+            trackname: "eia608/CC1"
+          })
+          channelNode.subtitleTracks = subtitleTracks
+          channelNode.subtitleConfig = {TrackName: "eia608/CC1"}
+        end if
+      end if
+
+      if channelFromServer.publisher_id <> invalid
+        channelNode.pubId = channelFromServer.publisher_id
+      end if
+
+      channelNode.backgrounds = m.dedupeBackgrounds(channelFromServer.images.background)
+
+      programs = channelFromServer.programs
+      programCount = programs.count()
+      if programCount = 0 ' No program avaialble
+        program = channelNode.createChild("EPGContentNode")
+        if channelNode.id <> invalid
+          program.id = channelNode.id
+        end if
+        if channelNode.channelName <> invalid
+          program.title = channelNode.channelName
+        end if
+        program.description = channelNode.description
+        program.FHDItemWidth = 1700
+        if channelFromServer.images <> invalid and channelFromServer.images.poster <> invalid
+          program.FHDPosterUrl = channelFromServer.images.poster[0]
+        end if
+
+      else ' programs available
+        
+        for i=0 to programCount -1
+          program = channelNode.createChild("EPGContentNode")
+          programFromServer = programs[i]
+          if channelNode.id <> invalid
+            program.id = channelNode.id
+          end if
+          program.title = programFromServer.title
+
+          startTime = ""
+          startTimeFromServer = programFromServer.start_time
+          if startTimeFromServer <> invalid and (type(startTimeFromServer) = "String" or type(startTimeFromServer) = "roString") and startTimeFromServer <> ""
+            datetimeObj = CreateObject("roDateTime")
+            datetimeObj.FromISO8601String(startTimeFromServer)
+            datetimeObj.ToLocalTime()
+            program.startTime = datetimeObj.asSeconds()
+            startTime = GetAMPMTimeString(datetimeObj)
+          end if
+
+          endTime = ""
+          endTimeFromServer = programFromServer.end_time
+          if endTimeFromServer <> invalid and (type(endTimeFromServer) = "String" or type(startTimeFromServer) = "roString") and endTimeFromServer <> ""
+            datetimeObjEnd = CreateObject("roDateTime") 'create new dateTime object otherwise local time retured will be wrong.
+            datetimeObjEnd.FromISO8601String(endTimeFromServer)
+            datetimeObjEnd.ToLocalTime()
+            program.endTime = datetimeObjEnd.asSeconds()
+            
+            endTime = GetAMPMTimeString(datetimeObjEnd)
+          end if
+
+          if programFromServer.images <> invalid and programFromServer.images.poster <> invalid and programFromServer.images.poster.count() > 0
+            program.FHDPosterUrl = programFromServer.images.poster[0]
+          else if channelFromServer.images <> invalid and channelFromServer.images.poster <> invalid and channelFromServer.images.poster.count() > 0
+            program.FHDPosterUrl = channelFromServer.images.poster[0]
+          end if
+
+          if programFromServer.has_subtitle <> invalid
+            program.hasSubtitles = programFromServer.has_subtitle
+          end if
+          if programFromServer.year <> invalid
+            program.ReleaseDate = programFromServer.year
+          end if
+
+          if startTime <> "" and endTime <> ""
+            program.hoursOfAiring = startTime + " - " +  endTime
+          end if
+
+          if programFromServer.ratings <> invalid and programFromServer.ratings[0] <> invalid and programFromServer.ratings[0].value <> invalid
+            program.Rating = programFromServer.ratings[0].value
+          end if
+
+          if programFromServer.description <> invalid and programFromServer.description <> ""
+            program.description = programFromServer.description
+          else
+            program.description = channelFromServer.description
+          end if
+
+          if programFromServer.tags <> invalid and programFromServer.tags.Count() > 0
+            program.descriptors = programFromServer.tags
+          end if
+
+          now  = CreateObject("roDateTime")
+          now.ToLocalTime()
+          nowTime = now.asSeconds()
+          
+          if program.startTime <= nowTime and program.endTime > nowTime
+            timeLeft = (program.endTime -  nowTime) / 60
+            program.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(program.endTime - nowTime))}) 
+          else 
+            timeLeft = (program.endTime - program.startTime) / 60
+            program.ShortDescriptionLine1 = startTime 
+          end if
+          'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.
+          program.FHDItemWidth = timeLeft * 19.2
+          
+          if programFromServer.genres <> invalid and programFromServer.genres.count() > 0
+            program.Categories = programFromServer.genres
+          end if
+
+          program.selectedItemAttributes = {
+            "title" : selectedAttributeText ,
+            "unFocusedColor" : unFocusedColor , '0xEB9C00FF
+            "focusedColor" : focusedColor '0x9699A3FF
+          }
+
+        end for
+      end if
+    end if
+  end for
+
+return contentNode
 End Function

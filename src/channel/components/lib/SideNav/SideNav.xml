@@ -32,7 +32,10 @@
       <field id="displayEspanol" value="true" type="boolean"/>      
 
       <!-- Should the sideNav display the Linear TV menu item? -->
-      <field id="displayLinearTV" value="true" type="boolean"/>      
+      <field id="displayLinearTV" value="true" type="boolean"/>  
+
+      <!-- Should the sideNav display the Linear TV menu item? -->
+      <field id="displayLinearEPG" value="true" type="boolean"/>    
 
       <!-- Should the sideNav display the movies/TV menu items? -->
       <field id="displayMoviesTV" value="true" type="boolean"/>
@@ -45,6 +48,9 @@
 
       <!-- Setting to false grays out the espanol item making it unselectable -->
       <field id="espanolItemTurnedOn" type="boolean"/>
+
+      <!-- Setting to false grays out the LiveTV item making it unselectable -->
+      <field id="linearEPGTurnedOn" type="boolean"/>
 
       <!-- Setting to false grays out the kids item making it unselectable -->
       <field id="kidsItemTurnedOn" value="true" type="boolean"/>
