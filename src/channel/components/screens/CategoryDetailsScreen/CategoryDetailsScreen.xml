@@ -17,6 +17,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
 
   <interface>
     <!-- INPUT -->
