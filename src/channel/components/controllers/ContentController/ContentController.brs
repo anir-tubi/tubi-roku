@@ -345,6 +345,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             m.SideNav.setFocus(true)
           else 
             hideNavMenu(false)
+            focusCurrentScreen()
           end if
         else
           topScreen = getCurrentScreen()
@@ -381,6 +382,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       else if (key = "right" or key = "left") and isSideNavActive() = true
         '//The RIGHT Key has been pressed, now hide the menu
         hideNavMenu(true)
+        focusCurrentScreen()
         bReacted = true
       end if
       return bReacted
@@ -819,7 +821,6 @@ Function setDirtyUserCategories(categoryId)
     movieScreen = getFromScreenCache(m.constants.ui.screenIds.movieScreen)
     tvScreen = getFromScreenCache(m.constants.ui.screenIds.tvScreen)
     espanolScreen = getFromScreenCache(m.constants.ui.screenIds.espanolScreen)
-    linearTVScreen = getFromScreenCache(m.constants.ui.screenIds.linearTVScreen)
 
     isKidsMode = shouldKidsModeBeSentToServer()
     reqName = m.constants.reqNames.getCategory

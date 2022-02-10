@@ -248,7 +248,6 @@ Function showActivationScreen()
   activationCodeScreen.observeFieldScoped("activationSuccess", "onActivationSuccess")
   activationCodeScreen.observeFieldScoped("errorType", "onRegTaskError")
   pushScreen(activationCodeScreen, true, true)
-  m.sSideNavCurrentScreen = getCurrentScreen()
   displayDefaultBackground()
   
 End Function
@@ -265,7 +264,6 @@ Function showSignInScreen(email)
   signInScreen.observeFieldScoped("emailSelected", "onSignInScreenEmailSelected")
   signInScreen.observeFieldScoped("staticPageSelected", "onStaticPageSelected")
   pushScreen(signInScreen, true, true)
-  m.sSideNavCurrentScreen = getCurrentScreen()
   displayDefaultBackground()
 
 End Function
@@ -287,7 +285,6 @@ Function showEmailScreen()
   emailScreen.observeFieldScoped("continueSelected", "onEmailInputContinueSelected")
   emailScreen.observeFieldScoped("backButtonSelected", "onEmailInputBackButtonSelected")
   pushScreen(emailScreen, true, true)
-  m.sSideNavCurrentScreen = getCurrentScreen()
   displayDefaultBackground()
 
 End Function

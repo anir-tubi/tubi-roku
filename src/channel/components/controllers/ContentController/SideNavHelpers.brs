@@ -2,9 +2,6 @@ Function initSideNav()
   m.SideNav.observeFieldScoped("itemSelectedId", "onSideNavItemSelected")
   m.SideNav.observeFieldScoped("navigateWithinPageInfo", "onSideNavNavigateWithinPageInfoChanged")
 
-  m.sSideNavItemSelectedId = invalid
-  m.sSideNavCurrentScreen = invalid
-
   m.SideNav.createMenuItems = true
 
   ' display Espanol, TV, Movies menu items only if the countryCode is US
@@ -60,6 +57,7 @@ End Function
 'put the side nav back into a default state (ie. closed and focused on home)
 Function resetSideNav(shouldTrackComponentInteraction = true)
   hideNavMenu(shouldTrackComponentInteraction)
+  focusCurrentScreen()
   homeId = m.constants.ui.sideNavIds.home
   focusSideNavOption(homeId)
 End Function
@@ -118,25 +116,27 @@ End Function
 
 
 Function onSideNavItemSelected()
+  tubiLog("SideNavHelpers.onSideNavItemSelected")
   itemSelectedId = m.SideNav.itemSelectedId
   itemSelected = m.SideNav.itemSelected
   authInfo = m.global.authInfo
-  bSameScreen = false
   currentScreenNow = getCurrentScreen()
-  if m.sSideNavCurrentScreen <> invalid and currentScreenNow <> invalid
-    '//check if we are viewing the same screen. If not but sSideNavItemSelectedId is still the same as the input, then user navigated away from root page
-    if (m.sSideNavCurrentScreen.subtype() = currentScreenNow.subtype() and m.sSideNavCurrentScreen.id = currentScreenNow.id and itemSelectedId <> m.constants.ui.sideNavIds.profile) then bSameScreen = true
-  end if
 
-  if m.sSideNavItemSelectedId <> itemSelectedId or bSameScreen = false
+  ' TODO: Once top nav ids and side nav ids are separated we can directly set the
+  ' screenIdToSideNavId map in constants to point multiple screen ids (home, movies, tv)
+  ' to a single side nav id and we will not need a function like getSideNavIdAssociatedWithScreen()
+  currentScreenSideNavId = getSideNavIdAssociatedWithScreen(currentScreenNow)
+
+  if currentScreenSideNavId <> itemSelectedId
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
     bNewScreenCalledSuccess = false
-    
+
     ' set appropriate analytics component on the page being navigated from so NavigateToPageEvent
     ' contains all the requisite information -  NOTE: this analytic does not get reported when the user presses the sideNav button associated with the current screen
     sideNavComponentValues = {
       left_nav_section: m.Tracking.sideNavPageMap[itemSelectedId]
     }
+
     currentScreenNow.trackingComponentInfo = {
       componentType: "left_side_nav_component"
       componentValues: sideNavComponentValues
@@ -146,7 +146,7 @@ Function onSideNavItemSelected()
       if isKidsUIOn() <> true
         setUiMode(m.constants.ui.modes.standard)
       end if
-      
+
       if authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid)
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
         startSignIn(onSideNavSignInCompleted)
@@ -339,14 +339,13 @@ Function onSideNavItemSelected()
     end if
 
     if bNewScreenCalledSuccess = true
-      hideNavMenu(false)  '//Hide side nav AFTER a successful side nav selection so focus moves to the new screen, not the previously focused screen 
-      m.sSideNavItemSelectedId = itemSelectedId
-      m.sSideNavCurrentScreen = getCurrentScreen()
+      hideNavMenu(false)
     end if
   else
     '//if currentScreen no longer = the screen that
     '//same item was selected, do nothing other than closing the menu
     hideNavMenu(false)
+    focusCurrentScreen()
   end if
 
   '//Dispatch what side nav button was selected. Do this after the app has reacted to the side nav selection and the current screen has had a chance to change based on the side nav selection 
@@ -557,13 +556,13 @@ End Function
 Function hideNavMenu(shouldTrackComponentInteraction = true)
   if m.SideNav.opened = true
     openSideNav(false)
-    focusCurrentScreen() '//This will set the current focus back to the screenstack items
 
     slideTo(m.SideNav, [m.nOriginalSideNavX, m.SideNav.translation[1]], .3)
     slideTo(m.ScreenStack, [m.nOriginalScreenStackX, m.ScreenStack.translation[1]], .3)
 
     topScreen = getCurrentScreen()
-    if topScreen <> invalid
+
+    if shouldTrackComponentInteraction = true and topScreen <> invalid
       topScreen.enabled = true
 
       'set up analytics for unfocusing side nav component
@@ -574,10 +573,41 @@ Function hideNavMenu(shouldTrackComponentInteraction = true)
         pageValues = topScreen.trackingPageInfo.pageValues
       end if
 
-      if shouldTrackComponentInteraction = true
-        interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")
-        m.trackingLoggingTask.trackEvent = interactionEvent
-      end if
+      interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")
+      m.trackingLoggingTask.trackEvent = interactionEvent
     end if
   end if
+End Function
+
+
+' @screen: roSGNode, a screen component, typically extending BaseScreen
+'
+' @returns: string, the side nav id associated with the passed in screen. For instance,
+'                   because of the side nav, home, movies, and tv screens, are all associated with the
+'                   "Home" side nav item. Settings screen is associated with the "Settings" side nav item.
+Function getSideNavIdAssociatedWithScreen(screen)
+  sideNavId = ""
+
+  idsAssociatedWithHome = {}
+  idsAssociatedWithHome[m.constants.ui.screenIds.homeScreen] = true
+  idsAssociatedWithHome[m.constants.ui.screenIds.linearTVScreen] = true
+  idsAssociatedWithHome[m.constants.ui.screenIds.movieScreen] = true
+  idsAssociatedWithHome[m.constants.ui.screenIds.tvScreen] = true
+
+  idsAssociatedWithEpg = {}
+  idsAssociatedWithEpg[m.constants.ui.screenIds.epgScreen] = true
+  idsAssociatedWithEpg[m.constants.ui.screenIds.sportsEPGScreen] = true
+  idsAssociatedWithEpg[m.constants.ui.screenIds.newsEPGScreen] = true
+
+  if screen.id <> invalid
+    if idsAssociatedWithHome[screen.id] <> invalid
+      sideNavId = m.constants.ui.sideNavIds.home
+    else if idsAssociatedWithEpg[screen.id] <> invalid
+      sideNavId = m.constants.ui.sideNavIds.linearEPG
+    else if m.constants.ui.screenIdToSideNavId[screen.id] <> invalid
+      sideNavId = m.constants.ui.screenIdToSideNavId[screen.id]
+    end if
+  end if
+
+  return sideNavId
 End Function
