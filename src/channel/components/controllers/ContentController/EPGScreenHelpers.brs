@@ -138,10 +138,10 @@ End Function
 Function fetchEPGChannel(screen, channelID)
   cachedChannel = invalid
   cachedAllChannels = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
-
-  if cachedAllChannels <> invalid and cachedAllChannels.count() > 0 and shouldRefresh(cachedAllChannels.getChild(0)) = false
+  
+  if cachedAllChannels <> invalid and cachedAllChannels.getChildCount() > 0 and shouldRefresh(cachedAllChannels.getChild(0)) = false
     '//go thru the channels and find the desired channel
-    for i = 0 to cachedAllChannels.count()
+    for i = 0 to cachedAllChannels.getChildCount()
       cachedChannelTemp = cachedAllChannels.getChild(i)
       if cachedChannelTemp.id = channelID
         if shouldRefresh(cachedChannelTemp) = false
@@ -168,8 +168,12 @@ Function fetchEPGChannel(screen, channelID)
     '//The channel data has been cached, so call the success callback immediately. 
     instantResponse = CreateObject("roSGNode", "ContentNode")
     instantResponse.addField("requestorID", "string", false)
-    instantResponse.requestorID = screen.id
-    instantResponse.appendChild(cachedChannel)
+    instantResponse.requestorID = screen.id 
+    '//TODO: Think about better logic of just getting data from Cached Channel. But for now, if we are using contentNode,
+    ' we need to clone the original channel which is present in Cache. Otherwise, just appending/replacing the node will reparent the node and next time
+    'when Cache has been used, it will be missing the channel which was already reparented.
+    clonedCachedChannel = cachedChannel.clone(true) 
+    instantResponse.appendChild(clonedCachedChannel)
     onEPGChannelProgramSuccess(instantResponse, false)
   else
       '//call the API to get new channel data
@@ -251,7 +255,7 @@ Function onEPGProgramSuccess(response)
       if  m.totalNumEPGBatches = 0
         setTimeGridContentLoadingToComplete(screen)
         setInContentCache(screen.timeGridContent)
-
+      
       end if
     end if
   end if
