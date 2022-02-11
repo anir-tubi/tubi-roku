@@ -36,7 +36,7 @@ Function showRFIScreen()
 
   if mode <> "production" and isNonEmptyString(settingsEmail) = true and isNonEmptyString(settingsPassword) = true
     signUserIn(settingsEmail, settingsPassword)
-  else if mode <> "production" and suitest = true and automaticActivation = true and stagingApis = true
+  else if mode <> "production" and suitest = true and automaticActivation = true
     signUserUpForQAAutomation()
   else
     ' This is the path expected to be taken in production
