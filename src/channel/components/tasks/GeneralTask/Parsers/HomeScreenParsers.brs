@@ -41,16 +41,6 @@ End Function
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseHomeScreenContentError(fullResponse, requestNode)
-  return {
-    code: getErrorCodeFromResponse(fullResponse)
-  }
-End Function
-
-
-' @fullResponse: assocArray, as returned by Request.handleEvent, but with
-'                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseCategoryContentSuccess(fullResponse, requestNode)
 
   experiments = TubiExperiments(m.constants)
@@ -76,14 +66,4 @@ Function parseCategoryContentSuccess(fullResponse, requestNode)
   convertedMetadata = translate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode)
   return convertedMetadata  'may return an empty container
 
-End Function
-
-
-' @fullResponse: assocArray, as returned by Request.handleEvent, but with
-'                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseCategoryContentError(fullResponse, requestNode)
-  return {
-    code: getErrorCodeFromResponse(fullResponse)
-  }
 End Function

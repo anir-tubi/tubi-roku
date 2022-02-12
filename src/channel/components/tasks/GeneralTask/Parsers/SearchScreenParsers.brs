@@ -32,35 +32,11 @@ End Function
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseDefaultSearchError(fullResponse, requestNode)
-
-  return {
-    code: getErrorCodeFromResponse(fullResponse)
-  }
-  
-End Function
-
-
-' @fullResponse: assocArray, as returned by Request.handleEvent, but with
-'                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseSearchAPISuccess(fullResponse, requestNode)
 
   metadataTranslate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
   convertedMetadata = metadataTranslate.translate(parsedResponse)
   return convertedMetadata
-
-End Function
-
-
-' @fullResponse: assocArray, as returned by Request.handleEvent, but with
-'                            .data value converted from JSON to AA alreadyy
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseSearchAPIError(fullResponse, requestNode)
-
-  return {
-    code: getErrorCodeFromResponse(fullResponse)
-  }
 
 End Function

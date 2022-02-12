@@ -40,30 +40,10 @@ End Function
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseVideoScreenUpNextError(fullResponse, requestNode)
-  return {
-    code: fullResponse.code
-  }
-End Function
-
-
-' @fullResponse: assocArray, as returned by Request.handleEvent, but with
-'                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseLiveVideoManifestSuccess(fullResponse, requestNode)
   return {
     res: fullResponse.data
     headers: fullResponse.headers
-  }
-End Function
-
-
-' @fullResponse: assocArray, as returned by Request.handleEvent, but with
-'                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseLiveVideoManifestError(fullResponse, requestNode)
-  return {
-    code: fullResponse.code
   }
 End Function
 

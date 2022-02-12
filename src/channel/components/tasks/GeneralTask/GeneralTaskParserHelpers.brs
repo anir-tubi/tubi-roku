@@ -6,6 +6,12 @@ Function createParsingCallbacks()
 
   m.requestTypes = {}
 
+  ' generic requests
+  m.requestTypes[m.constants.reqNames.generic] = {
+    parseSuccess: parseGenericSuccess
+    parseError: parseGenericError
+  }
+
   ' sprites
   m.requestTypes[m.constants.reqNames.getThumbnails] = {
     parseSuccess: parseVideoScreenSpritesSuccess
@@ -14,27 +20,27 @@ Function createParsingCallbacks()
   ' up next / autoplay
   m.requestTypes[m.constants.reqNames.getUpNextContent] = {
     parseSuccess: parseVideoScreenUpNextSuccess
-    parseError: parseVideoScreenUpNextError
+    parseError: parseGenericError
   }
 
   ' live manifest
   m.requestTypes[m.constants.reqNames.getLiveManifest] = {
     parseSuccess: parseLiveVideoManifestSuccess
-    parseError: parseLiveVideoManifestError
+    parseError: parseGenericError
   }
 
   ' email exists
   m.requestTypes[m.constants.reqNames.emailExists] = {
     parseSuccess: parseEmailExistsSuccess
     parseError: parseEmailExistsError
-  }  
-  
+  }
+
   ' signup
   m.requestTypes[m.constants.reqNames.signUp] = {
     parseSuccess: parseSignUpSuccess
     parseError: parseSignUpError
   }  
-  
+
   ' signin
   m.requestTypes[m.constants.reqNames.signIn] = {
     parseSuccess: parseSignInSuccess
@@ -56,7 +62,7 @@ Function createParsingCallbacks()
   ' single content
   m.requestTypes[m.constants.reqNames.getSingleContent] = {
     parseSuccess: parseDetailScreenSingleContentSuccess
-    parseError: parseDetailScreenSingleContentError
+    parseError: parseGenericError
   }
 
   ' related content
@@ -67,7 +73,7 @@ Function createParsingCallbacks()
   ' channel guide
   m.requestTypes[m.constants.reqNames.getChannelGuide] = {
     parseSuccess: parseChannelGuideFetchSuccess
-    parseError: parseChannelGuideFetchError
+    parseError: parseGenericError
   }
 
   'epgChannelIds
@@ -81,7 +87,7 @@ Function createParsingCallbacks()
     parseSuccess: parseEPGProgramsSuccess
     parseError: parseEPGProgramsError
   }
-  
+
   ' history
   m.requestTypes[m.constants.reqNames.postUserHistory] = {
     parseSuccess: parseHistorySuccess
@@ -90,25 +96,25 @@ Function createParsingCallbacks()
   ' homescreen
   m.requestTypes[m.constants.reqNames.getHomescreen] = {
     parseSuccess: parseHomeScreenContentSuccess
-    parseError: parseHomeScreenContentError
+    parseError: parseGenericError
   }
 
   ' category
   m.requestTypes[m.constants.reqNames.getCategory] = {
     parseSuccess: parseCategoryContentSuccess
-    parseError: parseCategoryContentError
+    parseError: parseGenericError
   }
-  
+
   ' getSearchScreen
   m.requestTypes[m.constants.reqNames.getSearchScreen] = {
     parseSuccess: parseSearchAPISuccess
-    parseError: parseSearchAPIError
+    parseError: parseGenericError
   }
 
   ' search default
   m.requestTypes[m.constants.reqNames.getSearchDefault] = {
     parseSuccess: parseDefaultSearchSuccess
-    parseError: parseDefaultSearchError
+    parseError: parseGenericError
   }
 
   ' category list screen
@@ -120,7 +126,7 @@ Function createParsingCallbacks()
   ' category details screen
   m.requestTypes[m.constants.reqNames.getCategoryDetailsScreen] = {
     parseSuccess: parseCategoryDetailsSuccess
-    parseError: parseCategoryDetailsError
+    parseError: parseGenericError
   }
 
 End Function

@@ -13,16 +13,6 @@ End Function
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseDetailScreenSingleContentError(fullResponse, requestNode)
-  return {
-    code: getErrorCodeFromResponse(fullResponse)
-  }
-End Function
-
-
-' @fullResponse: assocArray, as returned by Request.handleEvent, but with
-'                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseDetailScreenRelatedContentSuccess(fullResponse, requestNode)
   translate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data

@@ -229,6 +229,7 @@ Function getConstants()
     constants.reqNames.getQueue = "getQueue"
     constants.reqNames.refreshToken = "refreshToken"
     constants.reqNames.transferToken = "transferToken"
+    constants.reqNames.generic = "generic"
 
     ' a list of reqnames that the general task should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
