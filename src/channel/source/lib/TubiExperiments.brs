@@ -62,7 +62,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_homepage_endpoint:{
-        roku_homepage_endpoint_v1: {"endpoint": "matrix"} 'valid values are : "tensor", "matrix"
+        roku_homepage_endpoint_v1: {"endpoint": "tensor"} 'valid values are : "tensor", "matrix"
       }
     }
     
