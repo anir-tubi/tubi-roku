@@ -22,8 +22,12 @@ Function getTranslation(sID as string, aDynamicStrings = {}) as String
     constants = m.global.constants
   end if
 
-  sLocaleID = constants.deviceInfo.locale
   sDefaultLocaleID = "en_US"
+  sLocaleID = sDefaultLocaleID
+
+  if constants <> invalid
+    sLocaleID = constants.deviceInfo.locale
+  end if
 
   sTranslatedString = getTranslationBasedOnLocale(sID, sLocaleID)
   if sTranslatedString = "" and sLocaleID <> sDefaultLocaleID

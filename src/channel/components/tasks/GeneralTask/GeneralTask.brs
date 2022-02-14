@@ -254,35 +254,48 @@ Function processSuccessResponse(result, callbackTypes, job)
 
   responseFromServer = result.response
   responseHeaders = responseFromServer.headers
+  parsedJson = invalid
 
   if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
     result.response.fullJson = responseFromServer.data
-    result.response.data = parseJson(result.response.data)
+    parsedJson = parseJson(result.response.data)
+
+    if parsedJson <> invalid
+      ' only update result in the case of not an error, so we can pass the original result
+      ' info to processErrorResponse in the case of an error
+      result.response.data = parsedJson
+    end if
   else if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/xml"
     ' we can write xml parsing functionality here if/when necessary
   end if
 
-  parserCallback = callbackTypes.parseSuccess
+  if parsedJson = invalid
+    ' even though we got success response headers, the response could not be parsed from
+    ' JSON/XML, so we should treat it as an error
+    processErrorReponse(result, callbackTypes, job)
+  else
+    parserCallback = callbackTypes.parseSuccess
 
-  ' some requests may not require handling of the response and and therefore may not
-  ' have a parseSuccess callback.
-  if parserCallback <> invalid
+    ' some requests may not require handling of the response and and therefore may not
+    ' have a parseSuccess callback.
+    if parserCallback <> invalid
 
-    output = parserCallback(result.response, job.requestNode)
+      output = parserCallback(result.response, job.requestNode)
 
-    ' this block will execute only for batch responses
-    if job.batchNode <> invalid and job.batchNode.id <> invalid
+      ' this block will execute only for batch responses
+      if job.batchNode <> invalid and job.batchNode.id <> invalid
 
-      accumulateBatchResponse(job, output)
+        accumulateBatchResponse(job, output)
+
+      else
+
+        job.requestNode.response = output
+
+      end if
 
     else
-
-      job.requestNode.response = output
-
+      job.requestNode.response = invalid
     end if
-
-  else
-    job.requestNode.response = invalid
   end if
 
 End Function

@@ -624,103 +624,106 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     children: []    'categories
   }
 
-  if contentToTranslate.valid_duration <> invalid
-    homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
-  else
-    homescreenAA.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
-  end if
-
-  containers = contentToTranslate.containers
-  contents = contentToTranslate.contents
-
-  ' userCategoriesPos is used to store the index in the list of categories where the /homescreen API
-  ' placed the userCategories
-  continueWatchingIndex = 4
-  queueIndex = 5
-  
-  '//::TODO:: Remove the kidsModeFeatureOn check once we have API support  
-  kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
-  if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
-    kidsModeFeatureOn = true
-  end if  
-
-  '//::TODO:: Remove the parentalRating check once we have API support    
-  parentalRating = 3
-  if authInfo <> invalid and authInfo.parentalRating <> invalid
-    parentalRating = authInfo.parentalRating
-  end if
-  
-  ' utility row position experiment
-  utilityRowPosition = -2 ' setting default as negative to avoid insertion if the experiment is control group
-
-  if m.experiments <> invalid
-    m.experimentInfo = m.experiments.getExperimentResource("roku_discovery_v3", "roku_discovery_row_v3")
-    if m.experimentInfo <> invalid
-    ' decreasing the position value by 1 in order to use it as index
-      utilityRowPosition = m.experimentInfo.position - 1
-    end if
-  end if
-  
-  ' include utility row only in homescreen when kidsmode feature is ON (available to users) and
-  ' parentalRating is set to Adult and isKidsMode is false
-  includeUtilityRow = false
-  if kidsModeFeatureOn = true and (contentMode = m.constants.ui.contentMode.homescreen or contentMode = "") and parentalRating > 2 and isKidsMode = false
-    includeUtilityRow = true
-  end if  
-
-  'set up AAs for all categories
-  for i=0 to containers.count()-1
-    container = containers[i]
-    if container.id = m.constants.ui.categoryIds.history
-      continueWatchingIndex = i
-      ' increasing the utilityRowPosition by 1 if the ContinueWatching has no children AND the user
-      ' is signed in (continue watching row is displayed if the user is not signed in regardless).
-      '//::TODO:: Remove this section once we have API support
-      if container.children.Count() = 0 and (isLoggedInUser = false or uiMode = m.constants.ui.modes.kidsAgeGate)
-        utilityRowPosition = utilityRowPosition + 1
-      end if
-    else if container.id = m.constants.ui.categoryIds.queue
-      queueIndex = i
-      ' increasing the utilityRowPosition by 1 if the MyList/Queue has no children
-      '//::TODO:: Remove this section once we have API support
-      if container.children.Count() = 0
-        utilityRowPosition = utilityRowPosition + 1
-      end if
+  if contentToTranslate <> invalid
+    if contentToTranslate.valid_duration <> invalid
+      homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
+    else
+      homescreenAA.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
     end if
 
-    ' inserting utilityRow in specific position based on experiment result
-    '//::TODO:: Remove this section once we have API support
-    if includeUtilityRow = true and i = utilityRowPosition
-      categoryAA = m.buildUtilityCategoryAA(containers)
+    containers = contentToTranslate.containers
+    contents = contentToTranslate.contents
+
+    ' userCategoriesPos is used to store the index in the list of categories where the /homescreen API
+    ' placed the userCategories
+    continueWatchingIndex = 4
+    queueIndex = 5
+    
+    '//::TODO:: Remove the kidsModeFeatureOn check once we have API support  
+    kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
+    if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
+      kidsModeFeatureOn = true
+    end if  
+
+    '//::TODO:: Remove the parentalRating check once we have API support    
+    parentalRating = 3
+    if authInfo <> invalid and authInfo.parentalRating <> invalid
+      parentalRating = authInfo.parentalRating
+    end if
+    
+    ' utility row position experiment
+    utilityRowPosition = -2 ' setting default as negative to avoid insertion if the experiment is control group
+
+    if m.experiments <> invalid
+      m.experimentInfo = m.experiments.getExperimentResource("roku_discovery_v3", "roku_discovery_row_v3")
+      if m.experimentInfo <> invalid
+      ' decreasing the position value by 1 in order to use it as index
+        utilityRowPosition = m.experimentInfo.position - 1
+      end if
+    end if
+    
+    ' include utility row only in homescreen when kidsmode feature is ON (available to users) and
+    ' parentalRating is set to Adult and isKidsMode is false
+    includeUtilityRow = false
+    if kidsModeFeatureOn = true and (contentMode = m.constants.ui.contentMode.homescreen or contentMode = "") and parentalRating > 2 and isKidsMode = false
+      includeUtilityRow = true
+    end if  
+
+    'set up AAs for all categories
+    for i=0 to containers.count()-1
+      container = containers[i]
+      if container.id = m.constants.ui.categoryIds.history
+        continueWatchingIndex = i
+        ' increasing the utilityRowPosition by 1 if the ContinueWatching has no children AND the user
+        ' is signed in (continue watching row is displayed if the user is not signed in regardless).
+        '//::TODO:: Remove this section once we have API support
+        if container.children.Count() = 0 and (isLoggedInUser = false or uiMode = m.constants.ui.modes.kidsAgeGate)
+          utilityRowPosition = utilityRowPosition + 1
+        end if
+      else if container.id = m.constants.ui.categoryIds.queue
+        queueIndex = i
+        ' increasing the utilityRowPosition by 1 if the MyList/Queue has no children
+        '//::TODO:: Remove this section once we have API support
+        if container.children.Count() = 0
+          utilityRowPosition = utilityRowPosition + 1
+        end if
+      end if
+
+      ' inserting utilityRow in specific position based on experiment result
+      '//::TODO:: Remove this section once we have API support
+      if includeUtilityRow = true and i = utilityRowPosition
+        categoryAA = m.buildUtilityCategoryAA(containers)
+        if categoryAA <> invalid
+          homescreenAA.children.push(categoryAA)
+        end if
+        categoryAA = invalid
+      end if
+
+      categoryAA = invalid
+      if container.id = m.constants.ui.categoryIds.history and isLoggedInUser = false and uiMode <> m.constants.ui.modes.kidsAgeGate
+        '//if continue watching container while user is signed out,
+        ' then ensure row is empty except for 1 item that will entice users to sign in
+        categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
+      else if container.type = m.contentTypes.channel
+        categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode)
+      else
+        categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode)
+      end if
+
       if categoryAA <> invalid
         homescreenAA.children.push(categoryAA)
       end if
-      categoryAA = invalid
-    end if
+    end for
 
-    categoryAA = invalid
-    if container.id = m.constants.ui.categoryIds.history and isLoggedInUser = false and uiMode <> m.constants.ui.modes.kidsAgeGate
-      '//if continue watching container while user is signed out,
-      ' then ensure row is empty except for 1 item that will entice users to sign in
-      categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
-    else if container.type = m.contentTypes.channel
-      categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode)
-    else
-      categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode)
-    end if
+    translated.update(homescreenAA)
+    translated.addField("continueWatchingIndex", "integer", false)
+    translated.addField("queueIndex", "integer", false)
+    translated.continueWatchingIndex = continueWatchingIndex
+    translated.queueIndex = queueIndex
+    node_count = 1 + translated.getChildCount()
+    tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
+  end if
 
-    if categoryAA <> invalid
-      homescreenAA.children.push(categoryAA)
-    end if
-  end for
-
-  translated.update(homescreenAA)
-  translated.addField("continueWatchingIndex", "integer", false)
-  translated.addField("queueIndex", "integer", false)
-  translated.continueWatchingIndex = continueWatchingIndex
-  translated.queueIndex = queueIndex
-  node_count = 1 + translated.getChildCount()
-  tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
 End Function
 

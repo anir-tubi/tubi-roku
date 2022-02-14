@@ -137,8 +137,13 @@ Function getErrorCodeFromResponse(fullResponse)
   errCode = -1235
   
   if fullResponse <> invalid and fullResponse.code <> invalid
-    ' HTTP or Curl code
-    errCode = fullResponse.code
+    if fullResponse.code >= 200 or fullResponse.code < 400
+      ' got a valid response code from the server, but there was some other issue with the response
+      errCode = -1237
+    else
+      ' HTTP or Curl code
+      errCode = fullResponse.code
+    end if
   else
     deviceInfo = CreateObject("roDeviceInfo")
     if deviceInfo.GetLinkStatus() = false

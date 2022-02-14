@@ -286,6 +286,17 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     end if
 
     detailScreen.backgroundUriList = backgroundUriList
+
+    'update tracking info - have to set the whole AA, can't update only a portion on the AA field.
+    'it is necessary to update trackingPageInfo here so that the correct pageInfo is stored in the case where a deeplink has an
+    'episode content id, but the detail screen content will ultimately be a series content node. Updating here occurs when the
+    'full content has been returned from the /contents API.
+    detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
+    detailScreen.content = content
+
+    if shouldResetButtonIndex = true
+      detailScreen.jumpToItem = 0
+    end if
   end if
 
   m.backgroundGroup.backgroundInfo = {
@@ -293,17 +304,6 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     uriList: backgroundUriList
   }
 
-  'update tracking info - have to set the whole AA, can't update only a portion on the AA field.
-  'it is necessary to update trackingPageInfo here so that the correct pageInfo is stored in the case where a deeplink has an
-  'episode content id, but the detail screen content will ultimately be a series content node. Updating here occurs when the
-  'full content has been returned from the /contents API.
-  detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
-  detailScreen.content = content
-  
-  if shouldResetButtonIndex = true
-    detailScreen.jumpToItem = 0
-  end if
-  
   m.isScreenLoaded = true
 End Function
 
@@ -536,7 +536,7 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
 
         successCallback = onSingleContentResponseWithTracking
         errorCallback = onSingleContentErrorWithTracking
-        if sendTrackingOnResponse = false
+        if sendTracking = false
           successCallback = onSingleContentResponseWithoutTracking
           errorCallback = onSingleContentErrorWithoutTracking
         end if

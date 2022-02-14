@@ -51,7 +51,7 @@ Function parseCategoryContentSuccess(fullResponse, requestNode)
 
   orientation = ""
   bFullData = false
-  contentMode = invalid
+  contentMode = "homeScreen"
 
   requestInput = requestNode.input
   if requestInput <> invalid and requestInput.options <> invalid

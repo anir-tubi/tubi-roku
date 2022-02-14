@@ -1115,16 +1115,15 @@ End Function
 ' returns canonicalHeader : string
 '
 Function tubiAuth_constructCanonicalHeaders(headers)
-
   canonicalHeader = ""
-  headersCount = headers.count()
 
-  for each item in headers.Items()
-    canonicalHeader = canonicalHeader + lcase(item.key).trim() + ":" + item.value.tostr().trim() + chr(10)
-  end for 
+  if headers <> invalid
+    for each item in headers.Items()
+      canonicalHeader = canonicalHeader + lcase(item.key).trim() + ":" + item.value.tostr().trim() + chr(10)
+    end for
+  end if
 
   return canonicalHeader
-
 End Function
 
 
