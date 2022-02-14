@@ -384,6 +384,14 @@ Function cmsApi_getSearchRequestInfo(searchText, bKidsMode = false)
   options.params["isKidsMode"] = bKidsMode
   options.params = m.setTupianPosterParam(options.params)
 
+  linearSearchExperiementEnabled = getExperimentResource("roku_linear_search", "roku_linear_search_v1", false).enabled = true
+  
+  if bKidsMode = false and linearSearchExperiementEnabled = true
+    headers = options.headers
+    'setting the x-tubi-inject-live-news header to true will enable the linear content available for serach screen from backend
+    headers["x-tubi-inject-live-news"] = "true"
+  end if
+
   return {
     url: url
     options: options

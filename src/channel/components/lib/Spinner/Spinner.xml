@@ -15,6 +15,7 @@
     <!-- INPUT -->
       <field id="showBox" alias="SpinnerBox.visible" value="false"/>
       <field id="showShade" alias="Shade.visible" value="true"/>
+      <field id="showLoadingMessage" alias="LoadingMessage.visible" value="false"/>
       <field id="text"  alias="LoadingMessage.text"/>
       <field id="width" alias="Shade.width"/>
       <field id="height" alias="Shade.height"/>

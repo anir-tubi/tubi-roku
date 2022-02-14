@@ -25,6 +25,8 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
       end if
       videoPlayer.id = m.constants.ui.screenIds.linearVideoPlayerScreen
+      currentScreen = getCurrentScreen()
+
       ' onVideoPlayerVisibleChange exists in ContentController
       videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
       videoPlayer.observeFieldScoped("refreshChannels", "onChannelsRequested")
@@ -52,6 +54,14 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     end if
     ' it's necessary to push the screen after the content has been set on the videoPlayer component,
     ' so NavigateToPage and PageLoad events contain the necessary content id information
+
+    bLinearPlayerPlayingThisContent = isLinearPlayerPlayingThisContent(clonedContent)
+    if bLinearPlayerPlayingThisContent = false
+      videoPlayer.originalContent = content
+      videoPlayer.content = clonedContent
+      videoPlayer.updateContent = true
+    end if
+
     if bMinimized = false
       maximizeLinearPlayer(clonedContent)
     else
@@ -61,11 +71,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       animateLinearVideoPlayerToMinState(0, false)
     end if
 
-    if isLinearPlayerPlayingThisContent(clonedContent) = false
-      videoPlayer.originalContent = content
-      videoPlayer.content = clonedContent
-      videoPlayer.updateContent = true
-
+    if bLinearPlayerPlayingThisContent = false
       ' this is not the same instance of the task that is used by the linear video player
       ' this is just a temp task to handle adding the params to the video url,
       ' and will be removed later.
@@ -596,6 +602,9 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
         handleBackToEPGScreen(videoPlayer.originalContent, currentScreen.associatedScreenID)
       else if currentScreen.associatedScreenID = m.constants.ui.screenIds.epgScreen
         jumpToParentScreenContentByID(videoPlayer.content.id, "", currentScreen.associatedScreenID)
+        popScreen(true, true)
+      else if currentScreen.associatedScreenID = m.constants.ui.screenIds.searchScreen
+        stopAndHideLinearVideoPlayer()
         popScreen(true, true) 
       else
         popScreen(true, true)

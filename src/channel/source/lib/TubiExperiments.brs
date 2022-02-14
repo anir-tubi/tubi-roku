@@ -64,6 +64,10 @@ Function TubiExperiments(constants) as Object
       roku_homepage_endpoint:{
         roku_homepage_endpoint_v1: {"endpoint": "tensor"} 'valid values are : "tensor", "matrix"
       }
+
+      roku_linear_search: {
+        roku_linear_search_v1: {"enabled": false}
+      }
     }
     
     'public methods

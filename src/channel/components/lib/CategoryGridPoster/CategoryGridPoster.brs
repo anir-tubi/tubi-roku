@@ -4,6 +4,7 @@ Function init()
   m.poster = m.top.findNode("Poster")
   m.LinearPoster = m.top.findNode("LinearPoster")
   
+  
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.top.observeField("itemContent", "onContentChange")
   m.resumeMargin = 4  'inset of resume bar
@@ -41,6 +42,15 @@ Function onContentChange()
   m.LinearTitle.visible = false
   m.LinearSubTitle.visible = false
   m.tVGuideNumberChannels.visible = false
+  
+  gradientPoster =  m.poster.findNode("gradientPoster")
+  if gradientPoster <> invalid
+    m.poster.removeChild(gradientPoster)
+    liveIconGroup = m.poster.findNode("liveIconGroup")
+    if liveIconGroup <> invalid
+      gradientPoster.removeChild(liveIconGroup)
+    end if
+  end if
   m.poster.opacity = 1
 
   ' next line shouldn't be necessary but is added in order to try and quell crashes as reported by roku crash logs
@@ -66,7 +76,6 @@ Function onContentChange()
         setUpLinear()
       else
         m.poster.uri = m.top.itemContent.hdgridposterurl
-        
         if m.top.itemContent.gridItemType = m.gridItemTypes.landscape
           m.title.visible = true
           m.title.text = m.top.itemContent.title
@@ -80,6 +89,10 @@ Function onContentChange()
           setUpSignedOutContinueWatching()
         else if categoryContent.id = "continue_watching"
           drawHistoryProgressBar()
+        'm.top.itemContent.gridItemType is not an empty string on the home screen,
+        'and we want this to set Live logo and text just on the search screen.
+        else  if (m.top.itemContent.gridItemType = "" and m.top.itemContent.type = "linear")
+          setLiveIconAndText()
         end if
       end if
     else
@@ -458,4 +471,20 @@ Function onUtilityFocusPercentChange()
     handleUtilityLocalFocusChange(true)
   end if  
   
+End Function
+
+
+Function setLiveIconAndText()
+  tubiLog("SearchScreenGridPoster.setLiveIconAndText")
+  if m.poster <>invalid
+    gradientPoster = m.poster.createChild("Poster")
+    gradientPoster.width = m.poster.width
+    gradientPoster.height = m.poster.height
+    gradientPoster.uri = "pkg:/images/linear_search_gradient_overlay.png"
+    gradientPoster.id = "gradientPoster"
+    livePoster = gradientPoster.createChild("LiveIconGroup")
+    livePoster.id = "liveIconGroup"
+    livePoster.translation = [59, 225]
+    livePoster.shouldAnimate = false
+  end if
 End Function

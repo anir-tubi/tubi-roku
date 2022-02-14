@@ -89,9 +89,10 @@ End Function
 '''''''''''''''''''''''''
 ' displayLoading
 '
-' Display the loading spinner or not
+' Display the loading spinner and loading message based on search results loaded
 Function displayLoading(b = true)
   m.spinner.visible = b
+  m.spinner.showLoadingMessage = b
 End Function
 
 Function onVisible()
@@ -206,6 +207,12 @@ Function onSearchContentChange()
       '//display special text when the default search is displaying 
       m.SearchText.text = m.sDefaultSearchText
     end if
+    for i = 0 to m.ResultGrid.content.getChildCount() -1
+      if m.ResultGrid.content.getChild(i).type = m.constants.ui.contentTypes.linear
+        getExperimentResource("roku_linear_search", "roku_linear_search_v1", true)
+      end if
+      exit for
+    end for
     m.ResultGrid.visible = true
     m.NoResultsMessage.visible = false
   else

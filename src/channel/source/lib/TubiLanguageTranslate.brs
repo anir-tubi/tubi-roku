@@ -468,6 +468,10 @@ Function getTranslation_en_US()
       "description": "onscreeen message when there are no search results.",
       "message": "We couldn't find results for '{term}' \n Please try again"
     },
+    "screenSearch_liveText": {
+      "description": "The label on the search results poster next to the live streaming icon",
+      "message": "Live"
+    },
     "screenDetails_button_queue": {
       "description": "label of the button that will add the video title to the user's list",
       "message": "Add to My List"

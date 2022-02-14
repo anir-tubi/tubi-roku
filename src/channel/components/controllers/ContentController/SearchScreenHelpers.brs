@@ -23,7 +23,15 @@ Function onSearchContentSelected(msg)
   tubiLog("SearchScreenHelpers.onSearchContentSelected")
   m.autoplayContext = invalid
   searchScreen = msg.getRoSGNode()
-  showDetailScreen(searchScreen.contentSelected, true)
+
+  selectedContent = msg.getData()
+  'Launch the full player if it's linear contnet otherwise launch details screen
+  if selectedContent <> invalid and selectedContent.type = "linear" and selectedContent.videoResources.count() > 0 and getExperimentResource("roku_linear_search", "roku_linear_search_v1", true).enabled = true
+    playLinearVideoContent(selectedContent, false, searchScreen.id)
+  else
+    showDetailScreen(searchScreen.contentSelected, true)
+  end if
+
 End Function
 
 
