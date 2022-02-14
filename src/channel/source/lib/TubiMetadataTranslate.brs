@@ -1820,6 +1820,13 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
         if channelFromServer.images <> invalid and channelFromServer.images.poster <> invalid
           program.FHDPosterUrl = channelFromServer.images.poster[0]
         end if
+        if channelFromServer.has_subtitle <> invalid
+          program.hasSubtitles = channelFromServer.has_subtitle
+        end if
+        program.ReleaseDate = "24/7"
+        if channelFromServer.tags <> invalid and channelFromServer.tags.Count() > 0
+          program.descriptors = channelFromServer.tags
+        end if
 
       else ' programs available
         
