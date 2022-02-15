@@ -254,22 +254,41 @@ Function processSuccessResponse(result, callbackTypes, job)
 
   responseFromServer = result.response
   responseHeaders = responseFromServer.headers
-  parsedJson = invalid
+  serializationParseError = false
 
-  if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
-    result.response.fullJson = responseFromServer.data
-    parsedJson = parseJson(result.response.data)
+  if responseHeaders <> invalid
+    if responseHeaders["Content-Type"] = "application/json"
+      fullJson = responseFromServer.data
+      parsedJson = parseJson(responseFromServer.data)
 
-    if parsedJson <> invalid
-      ' only update result in the case of not an error, so we can pass the original result
-      ' info to processErrorResponse in the case of an error
-      result.response.data = parsedJson
+      if parsedJson <> invalid
+        ' only update result in the case of not an error, so we can pass the original result
+        ' info to processErrorResponse in the case of an error
+        result.response.fullJson = fullJson
+        result.response.data = parsedJson
+      else
+        serializationParseError = true
+      end if
+    else if responseHeaders["Content-Type"] = "application/xml"
+      ' we can write xml parsing functionality here if/when necessary
+    else if responseHeaders["Content-Type"] = invalid
+      ' fallback, try parsing JSON in case no responseHeaders were set (most likely an
+      ' ovesight by the backend service)
+      fullJson = responseFromServer.data
+      parsedJson = parseJson(responseFromServer.data)
+
+      if parsedJson <> invalid
+        ' only update result in the case of not an error, so we can pass the original result
+        ' info into the parser function in case of an error.
+        result.response.data = parsedJson
+      end if
+
+      ' don't set serializationParseError = true here, assume that the success parser function
+      ' knows how to handle the original non json response.
     end if
-  else if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/xml"
-    ' we can write xml parsing functionality here if/when necessary
   end if
 
-  if parsedJson = invalid
+  if serializationParseError = true
     ' even though we got success response headers, the response could not be parsed from
     ' JSON/XML, so we should treat it as an error
     processErrorReponse(result, callbackTypes, job)
