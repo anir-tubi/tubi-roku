@@ -4,7 +4,7 @@
 Function parseEPGChannelIdsSuccess(fullResponse, requestNode)
   translate = TubiMetadataTranslate(m.constants)
 
-  parsedResponse = parseJson(fullResponse.data)
+  parsedResponse = fullResponse.data
   epgChannelIdsResponse = translate.translateEPGChannelIds(parsedResponse, requestNode.input.requestorID)
   return epgChannelIdsResponse
 End Function
@@ -26,7 +26,7 @@ End Function
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseEPGProgramsSuccess(fullResponse, requestNode)
   translate = TubiMetadataTranslate(m.constants)
-  parsedResponse = parseJson(fullResponse.data)
+  parsedResponse = fullResponse.data
   epgProgramsResponse = translate.translateEPGPrograms(parsedResponse, requestNode.input.requestorID )
   return epgProgramsResponse
 End Function
