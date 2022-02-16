@@ -257,21 +257,7 @@ Function processSuccessResponse(result, callbackTypes, job)
   serializationParseError = false
 
   if responseHeaders <> invalid
-    if Instr(1, responseHeaders["Content-Type"], "application/json") > 0
-      fullJson = responseFromServer.data
-      parsedJson = parseJson(responseFromServer.data)
-
-      if parsedJson <> invalid
-        ' only update result in the case of not an error, so we can pass the original result
-        ' info to processErrorResponse in the case of an error
-        result.response.fullJson = fullJson
-        result.response.data = parsedJson
-      else
-        serializationParseError = true
-      end if
-    else if Instr(1, responseHeaders["Content-Type"], "application/xml") > 0
-      ' we can write xml parsing functionality here if/when necessary
-    else if responseHeaders["Content-Type"] = invalid
+    if responseHeaders["Content-Type"] = invalid
       ' fallback, try parsing JSON in case no responseHeaders were set (most likely an
       ' ovesight by the backend service)
       fullJson = responseFromServer.data
@@ -285,6 +271,20 @@ Function processSuccessResponse(result, callbackTypes, job)
 
       ' don't set serializationParseError = true here, assume that the success parser function
       ' knows how to handle the original non json response.
+    else if Instr(1, responseHeaders["Content-Type"], "application/json") > 0
+      fullJson = responseFromServer.data
+      parsedJson = parseJson(responseFromServer.data)
+
+      if parsedJson <> invalid
+        ' only update result in the case of not an error, so we can pass the original result
+        ' info to processErrorResponse in the case of an error
+        result.response.fullJson = fullJson
+        result.response.data = parsedJson
+      else
+        serializationParseError = true
+      end if
+    else if Instr(1, responseHeaders["Content-Type"], "application/xml") > 0
+      ' we can write xml parsing functionality here if/when necessary
     end if
   end if
 
