@@ -257,7 +257,7 @@ Function processSuccessResponse(result, callbackTypes, job)
   serializationParseError = false
 
   if responseHeaders <> invalid
-    if responseHeaders["Content-Type"] = "application/json"
+    if Instr(1, responseHeaders["Content-Type"], "application/json") > 0
       fullJson = responseFromServer.data
       parsedJson = parseJson(responseFromServer.data)
 
@@ -269,7 +269,7 @@ Function processSuccessResponse(result, callbackTypes, job)
       else
         serializationParseError = true
       end if
-    else if responseHeaders["Content-Type"] = "application/xml"
+    else if Instr(1, responseHeaders["Content-Type"], "application/xml") > 0
       ' we can write xml parsing functionality here if/when necessary
     else if responseHeaders["Content-Type"] = invalid
       ' fallback, try parsing JSON in case no responseHeaders were set (most likely an
