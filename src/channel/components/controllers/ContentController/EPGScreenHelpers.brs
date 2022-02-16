@@ -29,7 +29,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     else
       epgScreen.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
     end if
-    epgscreen.refreshTopNav = true
+  
     pushScreen(epgScreen, true, shouldSendPageLoadEvent)
   else
     displayDefaultBackground()  ' clear background from previous screens until epgscreen loads
