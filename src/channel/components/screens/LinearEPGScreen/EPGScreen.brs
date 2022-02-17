@@ -155,11 +155,19 @@ Function onLinearChannelToPlay(msg)
   linearChannelupdated = msg.getData()
   if linearChannelupdated = true
     linearChannelToPlay = m.epgTimeGrid.linearChannelToPlay
+
+    col = 1
+    row = 1
+    if m.epgTimeGrid <> invalid and m.epgTimeGrid.rowItemFocused <> invalid and m.epgTimeGrid.rowItemFocused.Count() > 0
+      col = m.epgTimeGrid.rowItemFocused[1] + 1
+      row = m.epgTimeGrid.rowItemFocused[0] + 1
+    end if
+
     if linearChannelToPlay <> invalid
       m.top.trackingComponentInfo = {
         componentType : "epg_component"
         componentValues : {
-          content_tile : m.Tracking.getAnalyticsTile(linearChannelToPlay, m.epgTimeGrid.itemSelected, 2)
+          content_tile : m.Tracking.getAnalyticsTile(linearChannelToPlay, col, row)
         }
       }
 
