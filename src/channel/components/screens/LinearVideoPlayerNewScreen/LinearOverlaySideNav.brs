@@ -15,6 +15,7 @@ Function init()
   m.btnCC_label.text = getTranslation("linearVideoPlayer_buttonCaptions2")
 
   m.top.observeFieldScoped("setOpenState", "onOpenStateChanged")
+  m.top.observeFieldScoped("buttonToFocusID", "onSideNavToFocusChange")
 End Function
 
 
@@ -29,6 +30,16 @@ Function onSideNavFocusChange()
     unFocusSideNavButton(m.btnCC.id)
     focusSideNavButton(m.btnBack.id)
     m.top.focusedButtonID = m.constants.ui.linearSideNavIds.epg
+  end if
+End Function
+
+
+' The outside tells this component which side nav item to focus 
+Function onSideNavToFocusChange()
+  if m.top.buttonToFocusID = m.constants.ui.linearSideNavIds.cc
+    m.sideNav.focusButton = 0
+  else if m.top.buttonToFocusID = m.constants.ui.linearSideNavIds.epg
+    m.sideNav.focusButton = 1 
   end if
 End Function
 
@@ -91,7 +102,6 @@ Function onOpenStateChanged()
   else if m.top.setOpenState = "openedAndInFocus"
     '//make the side nav appear oppened and in focus. Also set the focus onto the sidenav.
     m.sideNav.setFocus(true)
-    m.sideNav.focusButton = 0
     m.btnBack_label.visible = true
     m.btnCC_label.visible = true
   else if m.top.setOpenState = "openedAndNotInFocus"

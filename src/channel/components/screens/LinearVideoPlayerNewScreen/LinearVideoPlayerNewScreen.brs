@@ -746,7 +746,7 @@ End Function
 Function showOverlay(bDelay = false)
   m.lastButtonPressPos = m.playerPosition
   m.VideoOverlay.displayWithDelay = bDelay
-  m.VideoOverlay.animationDuration = .5
+  m.VideoOverlay.animationDuration = .15
   m.VideoOverlay.display = true
 End Function
 

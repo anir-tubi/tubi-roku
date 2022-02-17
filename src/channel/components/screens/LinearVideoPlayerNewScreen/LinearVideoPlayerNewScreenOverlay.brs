@@ -99,7 +99,7 @@ End Function
 
  
 Function onSideNavFocusChange()
-tubiLog("LinearVideoPlayerNewScreenOverlay.onSideNavFocusChange")
+  tubiLog("LinearVideoPlayerNewScreenOverlay.onSideNavFocusChange")
   m.top.reactedToKeyPresss = true
 End Function
 
@@ -370,9 +370,13 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         '//if the EPG has focus and the side nav is visible, then move the focus to the subtitles button
         slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
         m.sideNav.setOpenState = "openedAndInFocus"
+        m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.epg
         bKeyReacted = true
       else if m.closedCaptioningGroup.isInFocusChain() = true
         m.sideNav.setOpenState = "openedAndInFocus"
+        m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.cc
+        hideClosedCaptioningMenu() '//Hide the CC menu and display EPG again
+        slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
         bKeyReacted = true
       end if
     else if key = "right" 
@@ -381,11 +385,14 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         bKeyReacted = true
       else if m.bEPGVisible = false and m.closedCaptioningGroup.isInFocusChain() = false
         displayClosedCaptioningMenu()
+        slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
         bKeyReacted = true
       end if
     else if key = "back"
       if m.closedCaptioningGroup.isInFocusChain() = true
         m.sideNav.setOpenState = "openedAndInFocus"
+        m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.cc
+        hideClosedCaptioningMenu() '//Hide the CC menu and display EPG again
         bKeyReacted = true
       else if m.EPG.isInFocusChain() = false
         goBackToEPGFromSideNav()

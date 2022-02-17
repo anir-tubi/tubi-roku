@@ -10,6 +10,9 @@
     <!-- INPUT -->
       <!-- Tell the side nav how it should appear ("closed", "openedAndInFocus", "openedAndNotInFocus"). When set to "openedAndInFocus", the side nav will gain focus. -->
       <field id="setOpenState" type="string"/>
+      
+      <!-- The ID of the button that should receive focus -->
+      <field id="buttonToFocusID" type="string" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
       <!-- The ID of the button that just receved focus -->

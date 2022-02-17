@@ -37,8 +37,10 @@ Function onMetadataChanged()
 
   if metadata.minutesLeft <> invalid and metadata.minutesLeft >= 0
     m.minutesLeft.text = getTranslation("epg_minutes_left", {minutes: toStr(metadata.minutesLeft)})
+    m.title1.translation = [m.title1.translation[0],60]
   else
     m.minutesLeft.text = ""
+    m.title1.translation = [m.title1.translation[0],45] '//vertically center title if no minutesLeft
   end if
 
   if metadata.title1 <> invalid
