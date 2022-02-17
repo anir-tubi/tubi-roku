@@ -348,10 +348,9 @@ Function onSideNavItemSelected()
     focusCurrentScreen()
   end if
 
-  '//Dispatch what side nav button was selected. Do this after the app has reacted to the side nav selection and the current screen has had a chance to change based on the side nav selection 
-  topScreen = getCurrentScreen()
-  if topScreen <> invalid
-    interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "confirm")
+  '//Dispatch what side nav button was selected. Do this after the app has reacted to the side nav selection and the current screen has had a chance to change based on the side nav selection
+  if currentScreenNow <> invalid
+    interactionEvent = getSideNavInteractionEvent(currentScreenNow, m.Tracking, "confirm")
 
     m.trackingLoggingTask.trackEvent = interactionEvent
   end if
