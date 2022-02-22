@@ -5,11 +5,6 @@ Function init()
   m.time = m.top.findNode("time")
   m.clockTimer = m.top.findNode("clockTimer")
 
-  if m.constants.deviceInfo.scaledUi = true then
-    m.background.uri = "pkg:/images/tab_short_component_alt_hd.9.png"
-  else
-    m.background.uri = "pkg:/images/tab_short_component_alt_fhd.9.png"
-  end if
   m.top.observeField("width", "onWidthChange")
   m.top.observeField("height", "onHeightChange")
   m.top.observeField("visible", "onVisibleChange")

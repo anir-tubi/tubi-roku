@@ -19,7 +19,7 @@ Function onFocusPercentChange()
     m.poster.opacity = 1
     m.posterBg.opacity = 0
   else
-    m.poster.opacity = 0.24
+    m.poster.opacity = 0.45
     m.posterBg.opacity = 1
   end if
 End Function

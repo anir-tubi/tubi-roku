@@ -128,20 +128,20 @@
     <Label
       id="headerText"
       translation="[0,51]"
-      width="600"
-      height="72"
-      opacity="1"
-      color="0xFFFFFFFF"
+      height="36"
+      width="1000" 
       horizAlign="left"
-      vertAlign="top"
+      vertAlign="center"
+      color="0xFFFFFFFF"
+      opacity="1.0"
       maxLines="1"
       numLines="1"
       ellipsizeOnBoundary="true">
       <Font
         id="headerTextFont"
         role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="30" />
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="36" />
     </Label>
 
     <MarkupList

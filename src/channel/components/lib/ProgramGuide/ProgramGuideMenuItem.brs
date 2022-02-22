@@ -28,6 +28,12 @@ Function onContentChange()
       end if
     end if
   end if
+  if m.timeString.text = "" or m.timeString.text = invalid
+    m.programString.translation = [24,36]
+  else
+    m.programString.translation = [24,54]
+  end if
+
 
   if m.top.index = 0 
     m.staticOverlay.opacity = 1
@@ -39,6 +45,7 @@ End Function
 
 Function onFocusPercentChange()
   item = m.top.itemContent
+  ' //TODO : Find better logic to avoid multiple executions of this logic because of focuspercent being float and triggered multiple times.  
   if m.top.focusPercent < 0.5
     if item.selected 
       if item.selectedItemAttributes <> invalid
@@ -48,8 +55,13 @@ Function onFocusPercentChange()
       end if
       item.selected = false
     end if
+    if m.top.rowFocusPercent > 0.9
+      m.cellRect.blendColor = "0x9699A3FF"
+    else
+      m.cellRect.blendColor = "0x1C1F29FF"
+    end if
   else 
-    m.cellRect.blendColor = "0x10141FFF"
+    m.cellRect.blendColor = "0x10141FFF"  
   end if
 End Function
 
@@ -60,8 +72,8 @@ Function onRowFocusPercentChange()
     m.timeString.opacity = 1
     m.cellRect.blendColor = "0x9699A3FF"
   else
-    m.programString.opacity = 0.24
-    m.timeString.opacity = 0.24
+    m.programString.opacity = 0.45
+    m.timeString.opacity = 0.45
     m.cellRect.blendColor = "0x1C1F29FF"
     m.timeString.color = "0x9699A3FF"
   end if

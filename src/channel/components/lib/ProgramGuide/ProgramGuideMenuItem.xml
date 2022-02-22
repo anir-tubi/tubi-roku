@@ -36,9 +36,9 @@
 
     <Label
       id="timeString"
-      translation="[24,16]"
+      translation="[24,18]"
       height="30"
-      opacity="0.24"
+      opacity="0.45"
       color="0x9699A3FF"
       horizAlign="left"
       vertAlign="center"
@@ -54,9 +54,9 @@
     <Label
       id="programString"
       color="0xFFFFFFFF"
-      translation="[24,40]"
+      translation="[24,54]"
       height="36"
-      opacity="0.24"
+      opacity="0.45"
       horizAlign="left"
       ellipsizeOnBoundary="true"
       maxLines="1"

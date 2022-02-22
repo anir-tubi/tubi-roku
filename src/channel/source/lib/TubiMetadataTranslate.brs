@@ -1905,7 +1905,14 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
             program.ShortDescriptionLine1 = startTime 
           end if
           'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.
-          program.FHDItemWidth = timeLeft * 19.2
+          '186 is min width
+          width = timeLeft * 19.2
+          if width < 186 
+            program.FHDItemWidth = 186
+          else
+            program.FHDItemWidth = width
+          end if
+          
           
           if programFromServer.genres <> invalid and programFromServer.genres.count() > 0
             program.Categories = programFromServer.genres

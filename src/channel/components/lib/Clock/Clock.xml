@@ -23,7 +23,7 @@
   <children>
     <Poster
       id="clockBground"
-      uri="pkg:/images/gradientBground-channelGuide-horizontal.png"/>
+      uri="pkg:/images/time-patch.png"/>
     <Label
       id="time"
       height="18"
