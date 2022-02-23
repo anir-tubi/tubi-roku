@@ -163,20 +163,31 @@ End Function
 ' @contentId: string, the id of the content that is to be retrieved
 ' 
 ' returns: roSGNode/invalid, the content node or invalid if no content was found with the passed in id
+'                            or the content node is found to no longer be valid based on the validUntil field.
 ' 
-' side effect: if a content is found in the cache with the passed in contentId, the content
-'              is moved in the cachedOrder, since has been recently accessed.
+' side effects: 1) If a content is found in the cache with the passed in contentId, the content
+'               is moved in the cachedOrder, since has been recently accessed.
+'               2) If a content is found in the cache and has a validUntil field with a value that
+'               is no longer valid, the content is removed from the cache. Content without a validUntil
+'               field is not removed from the cache.
 Function tubiCache_getFromContentCache(contentId)
   if type(contentId) = "String" or type(contentId) = "roString"
     cachedContent = m.contentCache[contentId]
 
     if cachedContent <> invalid
-      ' move the cached content to most recently used status
-      m.addToContentCacheOrder(cachedContent)
+      if cachedContent.validUntil <> invalid and cachedContent.validUntil < UpTime(0)
+        cachedContent = invalid
+        m.deleteFromContentCache(contentId)
+        m.deleteFromContentCacheOrder(contentId)
+      else
+        ' move the cached content to most recently used status
+        m.addToContentCacheOrder(cachedContent)
+      end if
     end if
 
     return cachedContent
   end if
+
   return invalid
 End Function
 

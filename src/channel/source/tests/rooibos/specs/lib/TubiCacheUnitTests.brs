@@ -154,6 +154,8 @@ End Function
 Function tubiCache_getFromContentCache_test()
   content1 = m.generateNodeTree(2, 1) 'creates 2 nodes
   content1.id = "test_content1"
+  content1.addField("validUntil", "integer", false)
+  content1.validUntil = Uptime(0) + 1000
 
   content2 = m.generateNodeTree(2, 1) 'creates 2 nodes
   content2.id = "test_content2"
@@ -175,6 +177,16 @@ Function tubiCache_getFromContentCache_test()
   m.assertTrue(m.cache.contentCacheOrder.count() = 2)
   topCache = m.cache.contentCacheOrder[1]
   m.assertEqual(topCache.id, "test_content1")
+
+  ' check if gets invalid if the content in the cache is no longer valid
+  cachedContent1.validUntil = 0
+  cachedContent1 = m.cache.getFromContentCache("test_content1")
+  m.assertInvalid(cachedContent1)
+
+  ' check if content is returned from the cache if it has no validUntil field
+  cachedContent2 = m.cache.getFromContentCache("test_content2")
+  m.assertNotInvalid(cachedContent2)
+  m.assertTrue(cachedContent2.isSameNode(content2))
 End Function
 
 
