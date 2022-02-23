@@ -117,8 +117,6 @@ Function init()
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid  ' indicates not logged in
 
-  m.endpoint = getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1", false).endpoint
-
   m.authInfoReceived = false    'is the auth info returned from the registry
   m.authInfoRefreshed = true    'is the auth info refreshed after receiving a deeplink with a refresh token
   m.ageVerificationComplete = false   'has the user verified their age?
@@ -827,11 +825,8 @@ Function setDirtyUserCategories(categoryId)
 
     options = {}
     params = {}
-    if m.endpoint = "matrix"
-      params["contentMode"] = m.constants.ui.contentMode.homescreen
-    else
-      params["content_mode"] = ""
-    end if
+    ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
+    params["content_mode"] = ""
     options.params = params
     categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, options)
 
@@ -849,11 +844,7 @@ Function setDirtyUserCategories(categoryId)
     if movieScreen <> invalid
       optionMovie = {}
       movieParams = {}
-      if m.endpoint = "matrix"
-        movieParams["contentMode"] = m.constants.ui.contentMode.movie
-      else
-        movieParams["content_mode"] = m.constants.ui.contentMode.movie
-      end if
+      movieParams["content_mode"] = m.constants.ui.contentMode.movie
       optionMovie.params = movieParams
 
       categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, optionMovie)
@@ -872,11 +863,7 @@ Function setDirtyUserCategories(categoryId)
     if tvScreen <> invalid
       optionTV = {}
       tvParams = {}
-      if m.endpoint = "matrix"
-        tvParams["contentMode"] = m.constants.ui.contentMode.tv
-      else
-        tvParams["content_mode"] = m.constants.ui.contentMode.tv
-      end if
+      tvParams["content_mode"] = m.constants.ui.contentMode.tv
       optionTV.params = tvParams
 
       categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, optionTV)
@@ -896,11 +883,7 @@ Function setDirtyUserCategories(categoryId)
       optionEspanol = {}
       esParams = {}
 
-      if m.endpoint = "matrix"
-        esParams["contentMode"] = m.constants.ui.contentMode.latino
-      else
-        esParams["content_mode"] = m.constants.ui.contentMode.latino
-      end if
+      esParams["content_mode"] = m.constants.ui.contentMode.latino
       optionEspanol.params = esParams
 
       categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, optionEspanol)

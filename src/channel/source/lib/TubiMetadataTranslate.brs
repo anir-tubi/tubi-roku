@@ -768,11 +768,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
     homescreenAA.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
   end if
 
-  if m.experiments.getExperimentResource("roku_homepage_endpoint", "roku_homepage_endpoint_v1").endpoint = "matrix"
-    containers = contentToTranslate.containers
-  else
-    containers = contentToTranslate.browser_list
-  end if
+  containers = contentToTranslate.browser_list
 
   '//The following code adds a transparency to the thumbnails and for categories, it shifts a few categories to the top of the list
   '//::HARDCODED:: If this is categories, then place few catrgories in the front and get rid of featured

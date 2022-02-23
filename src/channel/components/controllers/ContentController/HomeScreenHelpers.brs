@@ -449,35 +449,14 @@ Function fetchHomeScreen(homeScreen)
 
     isKidsMode = shouldKidsModeBeSentToServer()
 
-    if m.endpoint = "matrix"
-      limitParamName = "limit"
-      contentModeParamName = "contentMode"
-      contentModeParamValue = homeScreen.contentMode
+    limitParamName = "contents_limit"
+    contentModeParamName = "content_mode"
 
-      ' setting the x-tubi-inject-live-news header to true includes the live news container on the homescreen.
-      ' This header is temporary and should be removed after the backend no longer requires it.
-      if homeScreen.contentMode = m.constants.ui.contentMode.homescreen and isKidsMode = false
-        headers["x-tubi-inject-live-news"] = "true"
-      end if
-
-      ' setting the x-tubi-inject-linear header to true includes the sports container(s) in responses.
-      ' This header is temporary and should be removed after the sports experiment concludes.
-      if homeScreen.contentMode = m.constants.ui.contentMode.linear or homeScreen.contentMode = m.constants.ui.contentMode.homescreen
-        if isKidsMode = false
-          headers["x-tubi-inject-linear"] = "true"
-        end if
-      end if
+    ' For tensor API, we need to pass as empty string for homescreen
+    if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+      contentModeParamValue = ""
     else
-      limitParamName = "contents_limit"
-      contentModeParamName = "content_mode"
-
-      ' For tensor API, we need to pass as empty string for homescreen
-      if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
-        contentModeParamValue = ""
-      else
-        contentModeParamValue = homeScreen.contentMode
-      end if
-
+      contentModeParamValue = homeScreen.contentMode
     end if
 
     params[contentModeParamName] = contentModeParamValue
@@ -485,11 +464,7 @@ Function fetchHomeScreen(homeScreen)
     isKidsMode = shouldKidsModeBeSentToServer()
 
     if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
-      if m.endpoint = "matrix"
-        params["groupSize"] = m.constants.settings.numContainers
-      else
-        params["group_size"] = m.constants.settings.numContainers
-      end if
+      params["group_size"] = m.constants.settings.numContainers
     end if
 
     params[limitParamName] = m.constants.performance.categoryGridList.initialBlockSize

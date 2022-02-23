@@ -125,11 +125,8 @@ Function fetchCategoryDetails(screen, content)
     options = {}
     params = {}
 
-    if m.endpoint = "matrix"
-      params["contentMode"] = m.constants.ui.contentMode.homescreen
-    else
-      params["content_mode"] = ""
-    end if
+    ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
+    params["content_mode"] = ""
 
     options.params = params
 
