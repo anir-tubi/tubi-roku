@@ -3,7 +3,38 @@ Library "Roku_Ads.brs"
 
 
 '@Setup
-Function TubiAdsSetup()
+Function TubiAds_testSetup()
+  m.constants = getConstants()
+  request = TubiRequest()
+  requestQueue = TubiRequestQueue()
+  auth = TubiAuth(m.constants, request)
+  translate = TubiMetadataTranslate(m.constants)
+  tracking = TubiTracking(m.constants, request, auth)
+  log = TubiLogger(m.constants, request, auth)
+  m.ads = TubiAds(m.constants, log, request, requestQueue, auth, tracking, "mp4")
+  m.adsLimited = TubiAdsLimited(m.constants, auth)
+
+  m.ads.populateUrl = Function(episode)
+    ' deliberately fake so it fails and RAF.getAds() returns invalid
+    return "http://127.0.0.1/"
+  End Function
+End Function
+
+
+'@BeforeEach
+Function TubiAds_testBeforeEach() as void
+  m.stubContent = {
+    id: "12345"
+    pubid: "publisher_id"
+    videoSponsorExposureId: ""
+  }
+
+  m.ads.constants.deviceInfo.isAdIdTrackingDisabled = true
+
+  ' stub logged out user to start with
+  m.ads.auth.getAuthInfo = Function()
+    return {}
+  End Function
 End Function
 
 
@@ -15,7 +46,6 @@ End Function
 
 '@Test getAdsListViaRoku failure unit tests
 Function tubiAds_getAdsListViaRoku_failure_test()
-  ads = testHelper_tubiAds_createTubiAds_test()
   episodeTemplate = {
     "title": "Fake Episode"
     "length": 1000
@@ -26,28 +56,28 @@ Function tubiAds_getAdsListViaRoku_failure_test()
   }
 
   ' test default flow
-  m.assertInvalid(ads.getAdsListViaRoku(episodeTemplate, 0))
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeTemplate, 0))
 
   ' test RAF.setContentLength
   episodeWithoutLength = {}
   episodeWithoutLength.append(episodeTemplate)
   episodeWithoutLength.delete("length")
-  m.assertInvalid(ads.getAdsListViaRoku(episodeWithoutLength, 0))
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeWithoutLength, 0))
 
   ' test RAF.setContentGenre
   episodeWithGenres = {}
   episodeWithGenres.append(episodeTemplate)
   episodeWithGenres.delete("rokuGenres")
-  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres, 0))
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeWithGenres, 0))
   ' empty genres
   episodeWithGenres["rokuGenres"] = []
-  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres, 0))
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeWithGenres, 0))
   ' non-kids genres
   episodeWithGenres["rokuGenres"] = ["Comedy", "Drama"]
-  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres, 0))
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeWithGenres, 0))
   ' kids genres
   episodeWithGenres["rokuGenres"] = ["Children", "Drama"]
-  m.assertInvalid(ads.getAdsListViaRoku(episodeWithGenres, 0))
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeWithGenres, 0))
 
   ' test RAF.setContentId
   episodeIds = {}
@@ -55,43 +85,102 @@ Function tubiAds_getAdsListViaRoku_failure_test()
   ' no series info
   episodeIds.delete("isParentSeries")
   episodeIds.delete("parentTitle")
-  m.assertInvalid(ads.getAdsListViaRoku(episodeIds, 0))
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeIds, 0))
   ' missing only parent title
   episodeIds["isParentSeries"] = true
   episodeIds.delete("parentTitle")
-  m.assertInvalid(ads.getAdsListViaRoku(episodeIds, 0))
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeIds, 0))
   ' missing only isParentSeries
   episodeIds.delete("isParentSeries")
   episodeIds["parentTitle"] = "Fake Parent"
-  m.assertInvalid(ads.getAdsListViaRoku(episodeIds, 0))
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeIds, 0))
   ' valid series
   episodeIds["isParentSeries"] = true
   episodeIds["parentTitle"] = "Fake Parent"
-  m.assertInvalid(ads.getAdsListViaRoku(episodeIds, 0))
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeIds, 0))
   ' invalid series and missing title fallback
   episodeIds.delete("isParentSeries")
   episodeIds.delete("parentTitle")
   episodeIds.delete("title")
-  m.assertInvalid(ads.getAdsListViaRoku(episodeIds, 0))
-  
+  m.assertInvalid(m.ads.getAdsListViaRoku(episodeIds, 0))
 End Function
 
 
-' helper to initialize TubiAds module and stub the request so get ads always returns nothing
-Function testHelper_tubiAds_createTubiAds_test()
-  constants = getConstants()
-  request = TubiRequest()
-  requestQueue = TubiRequestQueue()
-  auth = TubiAuth(constants, request)
-  translate = TubiMetadataTranslate(constants)
-  tracking = TubiTracking(constants, request, auth)
-  log = TubiLogger(constants, request, auth)
+'@Test getRainmakerParams unit tests
+Function tubiAds_getRainmakerParams_test()
+  params = m.ads.getRainmakerParams(m.stubContent, 126)
 
-  port = CreateObject("roMessagePort")
-  ads = TubiAds(constants, log, request, requestQueue, auth, tracking, "hls")
-  ads.populateUrl = Function(episode)
-    ' deliberately fake so it fails and RAF.getAds() returns invalid
-    return "http://127.0.0.1/"
-  end Function
-  return ads
+  m.assertEqual(type(params), "roAssociativeArray")
+  m.assertEqual(params.content_id, "12345")
+  m.assertEqual(params.pub_id, "publisher_id")
+  m.assertEqual(params.now_pos, "126")
+  m.assertEqual(params.content_type, "mp4")
+  m.assertEqual(params.device_id, m.constants.deviceInfo.deviceId)
+  m.assertEqual(params.model, m.constants.deviceInfo.model)
+  m.assertEqual(params.app_id, m.constants.settings.shortAppName)
+  m.assertEqual(params.language, m.constants.deviceInfo.language)
+  m.assertFalse(params.coppa_enabled)
+  m.assertEqual(params.app_mode, "DEFAULT_MODE")
+  m.assertEqual(params.client_version, m.constants.deviceInfo.clientVersion)
+  m.assertInvalid(params.spon_exp) 'spon_exp not added by default
+  m.assertEqual(params.adv_id, m.constants.deviceInfo.deviceAdId)
+  m.assertEqual(params.opt_out, "true")
+  m.assertInvalid(params.user_id)
+
+  ' test non default values
+  m.ads.constants.deviceInfo.isAdIdTrackingDisabled = false
+
+  ' stub logged out user to start with
+  m.ads.auth.getAuthInfo = Function()
+    return {userId: "3333"}
+  End Function
+
+  m.ads.appMode = "KIDS_MODE"
+
+  m.stubContent.videoSponsorExposureId = "toyoda"
+
+  params = m.ads.getRainmakerParams(m.stubContent, 126)
+
+  m.assertEqual(type(params), "roAssociativeArray")
+  m.assertEqual(params.content_id, "12345")
+  m.assertEqual(params.pub_id, "publisher_id")
+  m.assertEqual(params.now_pos, "126")
+  m.assertEqual(params.content_type, "mp4")
+  m.assertEqual(params.device_id, m.constants.deviceInfo.deviceId)
+  m.assertEqual(params.model, m.constants.deviceInfo.model)
+  m.assertEqual(params.app_id, m.constants.settings.shortAppName)
+  m.assertEqual(params.language, m.constants.deviceInfo.language)
+  m.assertTrue(params.coppa_enabled)
+  m.assertEqual(params.app_mode, "KIDS_MODE")
+  m.assertEqual(params.client_version, m.constants.deviceInfo.clientVersion)
+  m.assertEqual(params.spon_exp, "toyoda")
+  m.assertEqual(params.adv_id, m.constants.deviceInfo.deviceAdId)
+  m.assertEqual(params.opt_out, "false")
+  m.assertEqual(params.user_id, "3333")
 End Function
+
+
+'@Test getRainmakerParamsForLinear unit tests
+Function tubiAds_getRainmakerParamsForLinear_test()
+  params = m.adsLimited.getRainmakerParamsForLinear(m.stubContent)
+
+  m.assertEqual(type(params), "roAssociativeArray")
+  m.assertEqual(params.content_id, "12345")
+  m.assertEqual(params.pub_id, "publisher_id")
+  m.assertEqual(params.now_pos, "0")
+  m.assertEqual(params.content_type, "mp4")
+  m.assertEqual(params.device_id, m.constants.deviceInfo.deviceId)
+  m.assertEqual(params.model, m.constants.deviceInfo.model)
+  m.assertEqual(params.app_id, m.constants.settings.shortAppName)
+  m.assertEqual(params.language, m.constants.deviceInfo.language)
+  m.assertInvalid(params.coppa_enabled)
+  m.assertEqual(params.app_mode, "DEFAULT_MODE")
+  m.assertEqual(params.client_version, m.constants.deviceInfo.clientVersion)
+  m.assertInvalid(params.spon_exp) 'spon_exp not added by default
+  m.assertEqual(params.adv_id, m.constants.deviceInfo.deviceAdId)
+  m.assertEqual(params.opt_out, "true")
+  m.assertInvalid(params.user_id)
+  m.assertEqual(params.platform, m.constants.analyticsPlatform)
+  m.assertTrue(params["yo.ac"])
+End Function
+

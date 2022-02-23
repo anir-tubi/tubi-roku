@@ -72,11 +72,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     end if
 
     if bLinearPlayerPlayingThisContent = false
-      ' this is not the same instance of the task that is used by the linear video player
-      ' this is just a temp task to handle adding the params to the video url,
-      ' and will be removed later.
-      ' Setting content on the adsSsaiTask will set a series of asynchronous events in action that need
-      ' to occur in order to prepare the linear stream:
+      ' In order to prepare the linear stream, a number of actions need to be taken
       ' 1) add the rainmaker parameters to the stream url - YoSpace will make calls to rainmaker in order to
       '    to stitch the ads and needs the rainmaker parameters to make the rainamaker requests
       ' 2) fetch the response from the hls manifest and parse out the YoSpace "analtyics url" which is the url
@@ -84,26 +80,50 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       ' 3) compose the final stream url from the "analytics url" and the original stream url found in the
       '    matrix/homescreen response
       ' 4) pass the content with the updated stream url to the linear video player
-      if m.adsSsaiTask <> invalid
-        m.adsSsaiTask.unobserveFieldScoped("videoResourcesWithAdParams")
-        m.adsSsaiTask.exit = true
-        m.adsSsaiTask = invalid
-      end if
-      if m.linearManifestRequest <> invalid
-        m.cancelRequest(m.linearManifestRequest)
-        m.linearManifestRequest = invalid
-      end if
-      m.adsSsaiTask = CreateObject("roSGNode", "AdsSSAITask")
-      m.adsSsaiTask.id = "tempAdsSsaiTask"
 
-      ' adsSsaiTask will update the videoResource url with rainmaker params when it receives content
-      m.adsSsaiTask.observeFieldScoped("videoResourcesWithAdParams", "onAdParamsAddedToVideoUrl")
-      m.adsSsaiTask.content = clonedContent
-      m.adsSsaiTask.updateContent = true
+      ' add ad params to video urls
+      updatedVideoResources = getUpdatedLinearVideoResources(clonedContent)
+      clonedContent.videoResources = updatedVideoResources
+
+      streamUrl = getLiveUrlFromResources(clonedContent)
+      if streamUrl <> invalid
+        ' store the content on videoPlayer so it can be retrieved after the manifest is fetched
+        videoPlayer.content = clonedContent
+        getLiveStreamManifest(streamUrl)
+      else
+        ' no stream url so show an error
+        showLinearPlayerError()
+      end if
     end if
   end if
 End Function
 
+
+Function getUpdatedLinearVideoResources(content)
+  auth = TubiAuth(m.constants, m.Request)
+  adLib = TubiAdsLimited(m.constants, auth)
+
+  ' add the ad parameters for the content. Back end will forward these parameters to YoSpace
+  ' so that YoSpace can have them when YoSpace makes ad requests for SSAI
+  adParams = adLib.getRainmakerParamsForLinear(content)
+
+  newResource = {}
+
+  if content <> invalid and content.videoResources <> invalid
+    for each resource in content.videoResources
+      if resource.type = m.constants.player.drmTypes.hlsv3
+        if resource.url <> invalid
+          newResource = resource
+          newResource.url = m.request.addParamsToUrl(newResource.url, adParams)
+        end if
+        exit for
+      end if
+    end for
+  end if
+
+  ' pass the updated url back through output interface so video helpers can proceed with playing the video
+  return [newResource]
+End Function
 
 
 Function getCurrentLinearContent()
@@ -184,31 +204,6 @@ Function isLinearPlayerPlayingThisContent(content)
   end if
 
   return bPlaying
-End Function
-
-
-Function onAdParamsAddedToVideoUrl(msg)
-  tubiLog("LinearVideoPlayerScreenHelpers.onAdParamsAddedToVideoUrl")
-  adsSsaiTask = msg.getRoSGNode()
-  content = adsSsaiTask.content  'this content has the videoResources with the url with the ads params appended to it
-  content.videoResources = msg.getData()
-  
-  ' don't completely clean up ads task here because we may use it again in the case where the manifest
-  ' response does not provide an ad poll url
-  adsSsaiTask.unobserveFieldScoped("videoResourcesWithAdParams")
-
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  if videoPlayer <> invalid
-    streamUrl = getLiveUrlFromResources(content)
-    if streamUrl <> invalid
-      ' store the content on videoPlayer so it can be retrieved after the manifest is fetched
-      videoPlayer.content = content
-      getLiveStreamManifest(streamUrl)
-    else
-      ' no stream url so show an error
-      showLinearPlayerError()
-    end if
-  end if
 End Function
 
 
@@ -302,6 +297,7 @@ Function onLiveStreamManifestResponse(response)
     videoPlayer.control = "play"
   end if
 End Function
+
 
 Function onManifestError(error)
   tubiLog("LinearVideoPlayerScreenHelpers.onManifestError")

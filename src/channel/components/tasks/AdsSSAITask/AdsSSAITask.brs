@@ -75,9 +75,6 @@ Function runSSAILoop(constants, ssaiPort)
         onVideoPosition(msg)
       else if msg.getField() = "id3Tags"
         onTags(msg)
-      else if msg.getField() = "updateContent"
-        content = m.top.content
-        onContentUpdated(content)
       else if msg.getField() = "videoIsFullscreen"
         m.videoIsFullscreen = msg.getData()
       else if msg.getField() = "playbackStopped"
@@ -237,43 +234,6 @@ Function onTags(msg)
       fireMidPixels(ad, position, yospaceIdFromTag)
     end if
   end if
-End Function
-
-
-Function onContentUpdated(content)
-  tubiLog(m.top.id + ".onContentUpdated")
-
-  ' add the ad parameters for the content. Back end will forward these parameters to YoSpace
-  ' so that YoSpace can have them when YoSpace makes ad requests for SSAI
-  adParams = m.adLib.getRainmakerParams(content, 0)
-  adParams.platform = m.constants.analyticsPlatform
-  adParams.delete("coppa_enabled")
-  
-  ' not needed for rainmaker, but the yo.ac=true parameter informs yospace
-  ' that we are doing client side ad pixel reporting and is necessary
-  adParams["yo.ac"] = true
-  
-  newResource = {}
-  
-  if content <> invalid and content.videoResources <> invalid 
-    for each resource in content.videoResources
-      if resource.type = m.constants.player.drmTypes.hlsv3
-        if resource.url <> invalid
-          newResource = resource
-          newResource.url = m.request.addParamsToUrl(newResource.url, adParams)
-        end if
-        exit for
-      end if
-    end for
-  end if
-
-  ' pass the updated url back through output interface so video helpers can proceed with playing the video
-  newResources = [newResource]
-  m.top.videoResourcesWithAdParams = newResources
-
-  ' set metadata on RAF
-  m.raf.setContentGenre("")
-  m.raf.setContentId(content.id)
 End Function
 
 

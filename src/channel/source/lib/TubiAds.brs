@@ -64,6 +64,22 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   }
 end function
 
+
+' returns a set of ad helper functions that can be used outside of TubiAds without invoking RAF
+Function TubiAdsLimited(constants, auth)
+
+  return {
+    constants: constants
+    auth: auth
+    adContentType: "mp4"
+    appMode: "DEFAULT_MODE"
+
+    getRainmakerParams: tubiAds_getRainmakerParams
+    getRainmakerParamsForLinear: tubiAds_getRainmakerParamsForLinear
+  }
+End Function
+
+
 ' ----------------------------------------------
 '  m.hasAds()
 ' Call to see if an ad preload found some ads to play
@@ -211,6 +227,18 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     params["user_id"] = authInfo.userId
   end if
 
+  return params
+End Function
+
+
+Function tubiAds_getRainmakerParamsForLinear(content)
+  params = m.getRainmakerParams(content, 0)
+  params.platform = m.constants.analyticsPlatform
+  params.delete("coppa_enabled")
+
+  ' not needed for rainmaker, but the yo.ac=true parameter informs yospace
+  ' that we are doing client side ad pixel reporting and is necessary
+  params["yo.ac"] = true
   return params
 End Function
 
