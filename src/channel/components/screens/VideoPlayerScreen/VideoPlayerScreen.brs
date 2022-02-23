@@ -53,7 +53,6 @@ Function init()
   m.UpNext.observeField("opacity", "onUpNextOpacityChange")
   m.UpNext.observeField("autoplayMode", "onUpNextAutolayModeChange")
 
-
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
@@ -180,6 +179,7 @@ Function init()
   m.adPrefetchTime = 15 ' adPrefetchTime is used to help to prefetch the ad before the actual cuepoint
   m.adHeadsUpTime = 10 ' adHeadsUpTime helps to decide how long we need to show the AdHeadsup
   m.midrolls = {} ' midrolls holds all cuepoints from API response
+  m.mostRecentCompletedCuepoint = -1 'used to prevent multiple resume_after_break events from firing
 
   ' m.seekReferenceQueue is used to record the playback positions to which m.Video.seek is set.
   ' Context: setting a value on m.Video.seek will cause the onVideoPositionChange() callback to fire.
@@ -749,13 +749,24 @@ Function onVideoPositionChange()
           m.showRatings = true 
         else if m.top.adState = "noads"
           ' when we reach the cuepoint, we find that the last ad call returned no ads
-          trackEvent({
-            type: "resume_after_break"
-            values: {
-              video_id: m.Video.content.id.toInt()
-              position: Int(m.playerPosition * 1000)  'without Int(), can return scientific notation, causing API error
-            }
-          })
+ 
+          if m.mostRecentCompletedCuepoint <> m.playerPosition
+            ' If ad playback concluded, a resume_after_break event will be fired in onAdStateChange().
+            ' Restarting playback after ads could also trigger this resume_after_break event to fire
+            ' if the player position hits the cuepoint again. We check against m.mostRecentCompletedCuepoint
+            ' to prevent two resume_after_break from firing. We need to send the resume_after_break event
+            ' here if we make a request for ads but no ads are returned and we pass over the cuepoint without
+            ' playing any ads.
+            trackEvent({
+              type: "resume_after_break"
+              values: {
+                video_id: m.Video.content.id.toInt()
+                position: Int(m.playerPosition * 1000)  'without Int(), can return scientific notation, causing API error
+              }
+            })
+          end if
+
+          m.mostRecentCompletedCuepoint = -1
         end if
       end if
 
@@ -808,16 +819,13 @@ Function onAdStateChange()
   else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") and m.Video.state <> "playing" then
     ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
     ' TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
-    ' Set the m.Video.control prior to the m.Video.seek to ensure that the video is not started from the beginning even if m.playerPosition <> 0.
-    ' This is a seeming inconsistency with the firmware and should not neccessarily work this way, but it does.
-    ' Normally we would expect to set the seek prior to setting control to "play"
-    ' Unfortunately, this order of play before seek causes a device crash if the content url is not a valid video url.
     if m.Video.content.url <> invalid and m.Video.content.url <> ""
       m.top.setFocus(true)
       m.seekReferenceQueue.push(m.playerPosition)
+      seekToPosition(m.playerPosition)
       m.VideoState = "play"
       m.Video.control = "play"
-      seekToPosition(m.playerPosition)
+      m.mostRecentCompletedCuepoint = m.playerPosition
       trackEvent({
         type: "resume_after_break"
         values: {
