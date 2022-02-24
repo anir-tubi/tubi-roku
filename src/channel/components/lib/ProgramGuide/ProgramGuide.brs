@@ -71,7 +71,6 @@ Function onProgramGridContentFocused(msg)
     if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pageValues <> invalid
       pageValues = m.top.trackingPageInfo.pageValues
     end if
-
     navigateWithinPageInfo = {
       pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
       componentOneof: m.Tracking.getAnalyticsComponent("epg_component",  {content_tile: contentTile})
@@ -193,6 +192,12 @@ Function onJumpToLinearChannelID()
         if item <> invalid and item.getChildCount() > 0
           program = item.getChild(0)
           m.top.linearChannelFocused = program
+          if m.top.shouldSendComponentInteractionEventOnJumpToLinearChannelId = true
+            m.top.shouldSendComponentInteractionEventOnJumpToLinearChannelId = false
+            rowNum = i + 1
+            colNum = 1
+            setComponentInteractionEventForLiveAndFuturePrograms(program, rowNum, colNum)
+          end if
         end if
         if m.playOnFocusMode = false and m.top.linearChannelToPlay <> invalid and m.top.linearChannelToPlay.id <> item.id
           m.top.linearChannelToPlay = item 'after the jump, set the linearchannelToplay to focused content.
@@ -250,9 +255,17 @@ End Function
 Function onOkPressed()
   tubiLog("ProgramGrid.onOkPressed")
   if m.top.linearChannelFocused <> invalid and isProgramLive(m.top.linearChannelFocused)
+   itemPosition =  m.programGrid.rowItemFocused
     m.top.linearChannelToPlay = m.top.linearChannelFocused.getParent()
     m.top.linearChannelToPlayUpdated = true
     m.top.okPressed = true
+    channelItem = m.programGrid.content.getChild(itemPosition[0])
+    if channelItem <> invalid and channelItem.getChildCount() > 0
+      programItem = channelItem.getChild(itemPosition[1])
+      row = itemPosition[0] + 1
+      col = itemPosition[1] + 1
+      setComponentInteractionEventForLiveAndFuturePrograms(programItem, row, col)
+    end if
   end if
 End Function
 
@@ -291,7 +304,6 @@ Function setComponentInteractionEventForLiveAndFuturePrograms(content, rowNum, c
   if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pageValues <> invalid
     pageValues = m.top.trackingPageInfo.pageValues
   end if
-
   componentInteractionInfo = {
     pageOneof: m.Tracking.getAnalyticsPage(pageType,pageValues)
     componentOneof: m.Tracking.getAnalyticsComponent("epg_component",  componentValues)

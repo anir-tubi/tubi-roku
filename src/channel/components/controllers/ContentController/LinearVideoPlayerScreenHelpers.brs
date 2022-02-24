@@ -34,10 +34,13 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       videoPlayer.observeFieldScoped("userDisplayingChannelGuide", "onChannelGuideVisibleStateChangedByUser")
       if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
         videoPlayer.observeFieldScoped("channelSelectedUpdated", "onLinearChannelSelectedFromGuide")
+        videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+        videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
       else
         videoPlayer.observeFieldScoped("channelSelected", "onLinearChannelSelectedFromGuide")
       end if
       videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+
       initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
       setInScreenCache(videoPlayer)
     end if

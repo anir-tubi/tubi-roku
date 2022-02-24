@@ -126,6 +126,12 @@
       <field id="sendYouboraError" type="boolean" alwaysNotify="true" />
 
       <field id="sendVideoTrackingStart" type="boolean" alwaysNotify="true" />
+
+       <!-- Pass through LinearVideoPlayerOverlay component events to LinearVideoPlayerScreen helper -->
+      <field id="linearOverlayNavigateWithinPageInfo" alias="VideoOverlay.programGuideNavigateWithinPageInfo" />
+
+      <!-- Pass through LinearVideoPlayerOverlay component events to LinearVideoPlayerScreen helper -->
+      <field id="linearOverlayComponentInteractionInfo" alias="VideoOverlay.programGuidecomponentInteractionInfo" />
   </interface>
 
   <children>

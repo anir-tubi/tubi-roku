@@ -58,6 +58,18 @@
 
       <field id="epgScrollingStatus" alias="EPG.scrollingStatus" />
 
+      <!-- Holds the information needed to populate a navigate_witin_page event. This will
+           be observed by the contentController via LinearVideoPlayerScreenHelper
+           which will be responsible for sending navigate_within_page events.
+      -->
+      <field id="programGuideNavigateWithinPageInfo" alias="EPG.navigateWithinPageInfo" />
+
+      <!-- Holds the information needed to populate a component_interaction event. This will
+           be observed by the contentController via LinearVideoPlayerScreenHelper
+           which will be responsible for sending component_interaction events.
+      -->
+      <field id="programGuidecomponentInteractionInfo" alias="EPG.componentInteractionInfo" />
+
   </interface>
 
   <children>

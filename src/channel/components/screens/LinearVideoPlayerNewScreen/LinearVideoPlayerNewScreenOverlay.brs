@@ -21,7 +21,6 @@ Function init()
   m.sideNav.observeFieldScoped("selectedButtonID", "onSideNavSelectChange")
   m.top.observeField("updateTimeGridContent", "onTimeContentChange")
   m.top.observeField("timeGridContentLoading", "onTimeGridContentLoadingChange")
-
    
   '//Closed Captioning Nodes
   m.closedCaptioningGroup = m.top.findNode("closedCaptioningGroup")
@@ -53,7 +52,6 @@ Function onChannelFocused()
   m.top.reactedToKeyPresss = true
   populateInfoPanel(m.EPG.linearChannelFocused)
 End Function
-
 
 
 '@contentNode: program content node
@@ -199,7 +197,7 @@ Function displayOverlay(bDelay = false)
   end if
   m.clock.control = "start"
   m.top.isDisplaying = true
-  jumpEPGToCurrentPlayingVideo()
+  jumpEPGToCurrentPlayingVideo(true)
   m.EPG.setFocus(true)
   nDelaySeconds = 0
   if bDelay = true
@@ -288,10 +286,18 @@ End Function
 
 
 ' Update the EPG so the focused item is that of the playing video.
-Function jumpEPGToCurrentPlayingVideo()
+Function jumpEPGToCurrentPlayingVideo(shouldSendComponentInteractionEvent = false)
   tubiLog("LinearVideoPlayerNewScreenOverlay.jumpEPGToCurrentPlayingVideo")
   if m.top.currentLinearVideoContent <> invalid and m.EPG.contentUpdated = true
     ' second element of the array is not used in case of EPG. So, hardcoded to empty string.
+
+    m.EPG.trackingPageInfo = {
+      pageType: "video_player_page"
+      pageValues: {video_id: m.top.currentLinearVideoContent.id.toInt()}
+    }
+    if shouldSendComponentInteractionEvent = true
+      m.EPG.shouldSendComponentInteractionEventOnJumpToLinearChannelId = true
+    end if
     m.EPG.jumpToLinearChannelID = [m.top.currentLinearVideoContent.id, ""]
   end if
 End Function
