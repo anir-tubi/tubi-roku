@@ -44,7 +44,7 @@ End Function
 
 ' TESTED WITH RAF 2.0314 on firmware 8.0.0-4128-04
 
-'@Test getAdsListViaRoku failure unit tests
+'@Test tubiAds_getAdsListViaRoku failure unit tests
 Function tubiAds_getAdsListViaRoku_failure_test()
   episodeTemplate = {
     "title": "Fake Episode"
@@ -106,7 +106,7 @@ Function tubiAds_getAdsListViaRoku_failure_test()
 End Function
 
 
-'@Test getRainmakerParams unit tests
+'@Test tubiAds_getRainmakerParams unit tests
 Function tubiAds_getRainmakerParams_test()
   params = m.ads.getRainmakerParams(m.stubContent, 126)
 
@@ -122,6 +122,8 @@ Function tubiAds_getRainmakerParams_test()
   m.assertFalse(params.coppa_enabled)
   m.assertEqual(params.app_mode, "DEFAULT_MODE")
   m.assertEqual(params.client_version, m.constants.deviceInfo.clientVersion)
+  m.assertEqual(type(params.nsid), "String")
+  m.assertEqual(params.nsid.len(), 16)
   m.assertInvalid(params.spon_exp) 'spon_exp not added by default
   m.assertEqual(params.adv_id, m.constants.deviceInfo.deviceAdId)
   m.assertEqual(params.opt_out, "true")
@@ -153,6 +155,8 @@ Function tubiAds_getRainmakerParams_test()
   m.assertTrue(params.coppa_enabled)
   m.assertEqual(params.app_mode, "KIDS_MODE")
   m.assertEqual(params.client_version, m.constants.deviceInfo.clientVersion)
+  m.assertEqual(type(params.nsid), "String")
+  m.assertEqual(params.nsid.len(), 16)
   m.assertEqual(params.spon_exp, "toyoda")
   m.assertEqual(params.adv_id, m.constants.deviceInfo.deviceAdId)
   m.assertEqual(params.opt_out, "false")
@@ -160,7 +164,7 @@ Function tubiAds_getRainmakerParams_test()
 End Function
 
 
-'@Test getRainmakerParamsForLinear unit tests
+'@Test tubiAds_getRainmakerParamsForLinear unit tests
 Function tubiAds_getRainmakerParamsForLinear_test()
   params = m.adsLimited.getRainmakerParamsForLinear(m.stubContent)
 
@@ -176,6 +180,7 @@ Function tubiAds_getRainmakerParamsForLinear_test()
   m.assertInvalid(params.coppa_enabled)
   m.assertEqual(params.app_mode, "DEFAULT_MODE")
   m.assertEqual(params.client_version, m.constants.deviceInfo.clientVersion)
+  m.assertInvalid(params.nsid)
   m.assertInvalid(params.spon_exp) 'spon_exp not added by default
   m.assertEqual(params.adv_id, m.constants.deviceInfo.deviceAdId)
   m.assertEqual(params.opt_out, "true")
@@ -184,3 +189,72 @@ Function tubiAds_getRainmakerParamsForLinear_test()
   m.assertTrue(params["yo.ac"])
 End Function
 
+
+'@Test getNielsenPingRequestInfo unit tests
+Function tubiAds_getNielsenPingRequestInfo_test()
+  sessionStart = m.constants.thirdParty.nielsen.pingTypes.sessionStart
+  reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, sessionStart)
+
+  m.assertNotInvalid(reqInfo.url)
+  m.assertNotInvalid(reqInfo.options)
+  m.assertNotInvalid(reqInfo.options.params)
+  m.assertEqual(reqInfo.options.headers["Content-Type"], "text/plain")
+
+  m.assertEqual(reqInfo.options.params.prd, "audit")
+  m.assertEqual(reqInfo.options.params.apid, m.ads.constants.thirdParty.nielsen.pingToken)
+  m.assertEqual(type(reqInfo.options.params.sessionid), "String")
+  m.assertEqual(reqInfo.options.params.sessionid.len(), 16)
+  m.assertEqual(reqInfo.options.params.pingtype, "0")
+  m.assertEqual(reqInfo.options.params.product, "dar")
+  m.assertEqual(type(reqInfo.options.params.createtm), "roInteger")
+  m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
+  m.assertEqual(reqInfo.options.params.uoo, "1")
+
+  ' test with some non default values
+  m.ads.constants.deviceInfo.isAdIdTrackingDisabled = false
+  streamStart = m.constants.thirdParty.nielsen.pingTypes.streamStart
+  reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, streamStart)
+
+  m.assertEqual(reqInfo.options.params.prd, "audit")
+  m.assertEqual(reqInfo.options.params.apid, m.ads.constants.thirdParty.nielsen.pingToken)
+  m.assertEqual(type(reqInfo.options.params.sessionid), "String")
+  m.assertEqual(reqInfo.options.params.sessionid.len(), 16)
+  m.assertEqual(reqInfo.options.params.pingtype, "1")
+  m.assertEqual(reqInfo.options.params.product, "dar")
+  m.assertEqual(type(reqInfo.options.params.createtm), "roInteger")
+  m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
+  m.assertEqual(reqInfo.options.params.uoo, "0")
+
+  sessionEnd = m.constants.thirdParty.nielsen.pingTypes.sessionEnd
+  reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, sessionEnd)
+
+  m.assertEqual(reqInfo.options.params.prd, "audit")
+  m.assertEqual(reqInfo.options.params.apid, m.ads.constants.thirdParty.nielsen.pingToken)
+  m.assertEqual(type(reqInfo.options.params.sessionid), "String")
+  m.assertEqual(reqInfo.options.params.sessionid.len(), 16)
+  m.assertEqual(reqInfo.options.params.pingtype, "2")
+  m.assertEqual(reqInfo.options.params.product, "dar")
+  m.assertEqual(type(reqInfo.options.params.createtm), "roInteger")
+  m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
+  m.assertEqual(reqInfo.options.params.uoo, "0")
+
+  streamEnd = m.constants.thirdParty.nielsen.pingTypes.streamEnd
+  reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, streamEnd)
+
+  m.assertEqual(reqInfo.options.params.prd, "audit")
+  m.assertEqual(reqInfo.options.params.apid, m.ads.constants.thirdParty.nielsen.pingToken)
+  m.assertEqual(type(reqInfo.options.params.sessionid), "String")
+  m.assertEqual(reqInfo.options.params.sessionid.len(), 16)
+  m.assertEqual(reqInfo.options.params.pingtype, "3")
+  m.assertEqual(reqInfo.options.params.product, "dar")
+  m.assertEqual(type(reqInfo.options.params.createtm), "roInteger")
+  m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
+  m.assertEqual(reqInfo.options.params.uoo, "0")
+End Function
+
+
+'@Test tubiAds_getNielsenSessionId unit tests
+Function tubiAds_getNielsenSessionId_test()
+  nielsenSessionId = m.adsLimited.getNielsenSessionId(m.ads.constants)
+  m.assertEqual(nielsenSessionId.len(), 16)
+End Function

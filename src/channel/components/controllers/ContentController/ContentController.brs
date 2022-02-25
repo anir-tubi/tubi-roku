@@ -500,6 +500,7 @@ Function startUserExperience()
 
     m.spinner.visible = false ' the spinner in the contentController component
     sendHdcpLog()
+    sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
 
     setUiModeFromState()
 
@@ -1605,6 +1606,7 @@ Function onCustomSuspend(msg)
   customSuspendArgs = msg.getData()
 
   if customSuspendArgs.lastSuspendOrResumeReason = "home"
+    sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionEnd)
     m.appSuspendTimer.Mark()
     currentScreen = getCurrentScreen()
     ' if the current screen is videoplayer, return to detail screen so that it will update historyPosition and remove video screen from stack and show previous screen from stack
@@ -1705,19 +1707,23 @@ Function onCustomResume(msg)
             if modal.instantResumeAction = m.constants.instantResumeActions.restartApp
               restartApp()
             else if modal.instantResumeAction = m.constants.instantResumeActions.startChannel
-            'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
+              sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
+              'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
               startChannel()
             end if
           else if currentScreen <> invalid
             if currentScreen.instantResumeAction = m.constants.instantResumeActions.restartApp
               restartApp()
             else if (lastAppSuspendInSecs >= 1200 and currentScreen.id = m.constants.ui.screenIds.settingsScreen)
+              sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
               'user is on the settings page and returns to the app after 20 or more minutes then retun to the homescreen
               startChannel()
             else if currentScreen.instantResumeAction = m.constants.instantResumeActions.startChannel
+              sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
               'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
               startChannel()
             else
+              sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
               resumeApp()
             end if
           else
@@ -1725,6 +1731,7 @@ Function onCustomResume(msg)
             restartApp()
           end if
         else
+          sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
           resumeApp()
         end if
       end if
@@ -1825,3 +1832,19 @@ Function isLoggedInUser(authInfo = invalid)
 End Function
 
 
+' Sends a ping request to Nielsen that a session or video playback has started or ended.
+'
+' @pingType: string, one of the following "start_session", "start_stream", "end_session", "end_stream"
+Function sendNielsenPing(pingType)
+  Auth = TubiAuth(m.constants, m.Request)
+  adLib = TubiAdsLimited(m.constants, Auth)
+  nielsenReqInfo = adLib.getNielsenPingRequestInfo(m.constants, pingType)
+
+  m.makeRequest({
+    url: nielsenReqInfo.url
+    requestType: m.constants.reqNames.generic
+    options: nielsenReqInfo.options
+    silenceCallbackWarnings: true
+    responseType: "string"
+  })
+End Function

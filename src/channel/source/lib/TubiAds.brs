@@ -12,7 +12,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   roAdFramework.enableNielsenDAR(true)
 
   'set the Nielsen application id for Tubi TV
-  roAdFramework.setNielsenAppId(constants.thirdParty.nielsenToken)
+  roAdFramework.setNielsenAppId(constants.thirdParty.nielsen.rafToken)
 
   'turn on debug output for RAF
   roAdFramework.setDebugOutput(false)
@@ -24,7 +24,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   adLoggingPort = CreateObject("roMessagePort")
 
   if adContentType <> "hls" and adContentType <> "mp4"
-    adContenType = "mp4"  ' safety fallback
+    adContentType = "mp4"  ' safety fallback
   end if
 
   return {
@@ -60,6 +60,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     adBufferingCallback: tubiAds_adBufferingCallback
     adTrackingCallback: tubiAds_adTrackingCallback
     trackUserEvent: tubiAds_trackUserEvent
+    getNielsenSessionId: tubiAds_getNielsenSessionId
     appMode: "DEFAULT_MODE"
   }
 end function
@@ -76,6 +77,8 @@ Function TubiAdsLimited(constants, auth)
 
     getRainmakerParams: tubiAds_getRainmakerParams
     getRainmakerParamsForLinear: tubiAds_getRainmakerParamsForLinear
+    getNielsenPingRequestInfo: tubiAds_getNielsenPingRequestInfo
+    getNielsenSessionId: tubiAds_getNielsenSessionId
   }
 End Function
 
@@ -197,6 +200,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     coppa_enabled: (m.appMode = "KIDS_MODE")
     app_mode: m.appMode
     client_version: m.constants.deviceInfo.clientVersion
+    nsid: m.getNielsenSessionId(m.constants)
 
     ' the dubug parameter must be set to 1 in order to use the following "limit" parameters for testing
     ' limit_to_campaign_id: 0   'only allow ads with that particular campaign id through the pre-qual filters
@@ -235,6 +239,7 @@ Function tubiAds_getRainmakerParamsForLinear(content)
   params = m.getRainmakerParams(content, 0)
   params.platform = m.constants.analyticsPlatform
   params.delete("coppa_enabled")
+  params.delete("nsid")
 
   ' not needed for rainmaker, but the yo.ac=true parameter informs yospace
   ' that we are doing client side ad pixel reporting and is necessary
@@ -615,4 +620,68 @@ Function tubiAds_trackUserEvent(eventType="", eventValues=invalid, requestQueue=
     eventValues.appMode = m.appMode
     m.tracking.trackUserEvent(eventType, eventValues, requestQueue)
   end if
+End Function
+
+
+' @constants: assocArray, constants as returned by getConstants()
+' @pingType: string, one of the following "start_session", "start_stream", "end_session", "end_stream"
+Function tubiAds_getNielsenPingRequestInfo(constants, pingType)
+  sessionId = m.getNielsenSessionId(constants)
+
+  pingValue = "0" 'default value for "start_session"
+  if pingType = m.constants.thirdParty.nielsen.pingTypes.sessionStart
+    pingValue = "0"
+  else if pingType = m.constants.thirdParty.nielsen.pingTypes.streamStart
+    pingValue = "1"
+  else if pingType = m.constants.thirdParty.nielsen.pingTypes.sessionEnd
+    pingValue = "2"
+  else if pingType = m.constants.thirdParty.nielsen.pingTypes.streamEnd
+    pingValue = "3"
+  end if
+
+  dateTime = CreateObject("roDateTime")
+  nowTime = dateTime.AsSeconds()
+
+  optOut = "1"
+  if constants.deviceInfo.isAdIdTrackingDisabled = false
+    optOut = "0"
+  end if
+
+  options = {
+    params: {
+      prd: "audit"
+      apid: constants.thirdParty.nielsen.pingToken
+      sessionid: sessionId
+      pingtype: pingValue
+      product: "dar"
+      createtm: nowTime
+      devid: constants.deviceInfo.deviceAdId
+      uoo: optOut
+    }
+    headers: {
+      "Content-Type": "text/plain"
+    }
+  }
+
+  return {
+    url: constants.urls.nielsenPing
+    options: options
+  }
+End Function
+
+
+' returns an md5 hash of the device id, RIDA, and firmware level ads info sharing opt in values,
+' truncated to 16 characters.
+Function tubiAds_getNielsenSessionId(constants)
+  toHash = constants.deviceInfo.deviceId + constants.deviceInfo.deviceAdId + constants.deviceInfo.isAdIdTrackingDisabled.toStr()
+
+  ba1 = CreateObject("roByteArray")
+  ba1.FromAsciiString(toHash)
+  digest = CreateObject("roEVPDigest")
+  digest.Setup("md5")
+  
+  hashed = digest.Process(ba1)
+  truncated = Left(hashed, 16)
+
+  return truncated
 End Function

@@ -123,6 +123,8 @@ Function setupVideoPlayer(content, autoplayType = "none", position = 0)
       if m.constants.settings.noAds = true
         videoPlayer.enableAds = false
       end if
+
+      sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.streamStart)
     end if
 
     ' by default setting sprites to invalid
@@ -527,6 +529,7 @@ Function stopVideoContent(videoPlayer)
   tubiLog("VideoHelpers.stopVideoContent")
 
   if videoPlayer <> invalid
+    sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.streamEnd)
     videoTrackingStop() 'stops youbora tracking
 
     videoPlayer.unobserveFieldScoped("backButtonPressed")

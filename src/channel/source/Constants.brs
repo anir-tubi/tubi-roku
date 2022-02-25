@@ -257,7 +257,15 @@ Function getConstants()
 
   constants.thirdParty = {}
     'Nielsen ID token for integrating with Nielsen DAR via RAF
-    constants.thirdParty.nielsenToken = "PB8C78BDD-9B1B-4020-B4DD-AE7917C0F396"
+    constants.thirdParty.nielsen = {}
+      constants.thirdParty.nielsen.rafToken = "PB8C78BDD-9B1B-4020-B4DD-AE7917C0F396"
+      constants.thirdParty.nielsen.pingToken = "PB8C78BDD-9B1B-4020-B4DD-AE7917C0F396"
+
+      constants.thirdParty.nielsen.pingTypes = {}
+        constants.thirdParty.nielsen.pingTypes.sessionStart = "session_start"
+        constants.thirdParty.nielsen.pingTypes.sessionEnd = "session_end"
+        constants.thirdParty.nielsen.pingTypes.streamStart = "stream_start"
+        constants.thirdParty.nielsen.pingTypes.streamEnd = "stream_end"
 
     constants.thirdParty.youbora = {}
       constants.thirdParty.youbora.enabled = false
@@ -387,7 +395,6 @@ Function getConstants()
       constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/containers"
       constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/epg"
   
-      
     'users url
     constants.urls.users = {}
       constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
@@ -475,7 +482,9 @@ Function getConstants()
     constants.urls.continueWatchingItemBackground = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground.png"
     constants.urls.continueWatchingItemBackground_kidsMode = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground_kidsMode.png"
 
-    
+    ' url for pinging Nielsen
+    constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
+
     'epgProgram url
     constants.urls.content = {}
       constants.urls.content.epgProgramContentUrlBase = "https://content.production-public.tubi.io"
