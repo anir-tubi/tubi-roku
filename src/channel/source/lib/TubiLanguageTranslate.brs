@@ -1446,6 +1446,10 @@ Function getTranslation_es_MX()
       "description": "onscreeen message when there are no search results.",
       "message": "No pudimos encontrar resultados para '{term}'\n Inténtalo de nuevo"
     },
+    "screenSearch_liveText": {
+      "description": "The label on the search results poster next to the live streaming icon",
+      "message": "En Vivo"
+    },
     "screenDetails_button_queue": {
       "description": "label of the button that will add the video title to the user's list",
       "message": "Agregar a Mi Lista"
