@@ -109,6 +109,7 @@ End Function
 '   responseType: String, type of the response data, corresponds to a valid roSGNode field type (eg. "node"/"assocarray"/"string"/"boolean" etc)
 '   silenceCallbackWarnings: boolean, if no callbacks are provided, prevents warning logs to the console
 '                            Use for 'fire and forget' requests like analytics, etc.
+'   retries: Integer, overwrites the default number of retries set in RequestNode.xml
 '
 '   Additional custom fields can be added to @reqInfo which will in turn be appended to the returned
 '   RequestNode. The GeneralTask parser functions will have access to the RequestNode, allowing
@@ -139,6 +140,10 @@ Function generalTask_constructRequestNode(reqInfo = {})
   successResponseType = reqInfo.responseType
   if reqInfo.successCallback = invalid
     successResponseType = "assocarray"
+  end if
+
+  if reqInfo.retries <> invalid
+    requestNode.retries = reqInfo.retries
   end if
 
   requestNode.addField("response", successResponseType, true)

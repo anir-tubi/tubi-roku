@@ -192,6 +192,8 @@ End Function
 
 '@Test getNielsenPingRequestInfo unit tests
 Function tubiAds_getNielsenPingRequestInfo_test()
+  content = CreateObject("roSGNode", "TubiContentNode")
+  content.id = "12345"
   sessionStart = m.constants.thirdParty.nielsen.pingTypes.sessionStart
   reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, sessionStart)
 
@@ -207,13 +209,14 @@ Function tubiAds_getNielsenPingRequestInfo_test()
   m.assertEqual(reqInfo.options.params.pingtype, "0")
   m.assertEqual(reqInfo.options.params.product, "dar")
   m.assertEqual(type(reqInfo.options.params.createtm), "roInteger")
+  m.assertInvalid(reqInfo.options.params.streamId)
   m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
   m.assertEqual(reqInfo.options.params.uoo, "1")
 
   ' test with some non default values
   m.ads.constants.deviceInfo.isAdIdTrackingDisabled = false
   streamStart = m.constants.thirdParty.nielsen.pingTypes.streamStart
-  reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, streamStart)
+  reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, streamStart, content)
 
   m.assertEqual(reqInfo.options.params.prd, "audit")
   m.assertEqual(reqInfo.options.params.apid, m.ads.constants.thirdParty.nielsen.pingToken)
@@ -222,6 +225,8 @@ Function tubiAds_getNielsenPingRequestInfo_test()
   m.assertEqual(reqInfo.options.params.pingtype, "1")
   m.assertEqual(reqInfo.options.params.product, "dar")
   m.assertEqual(type(reqInfo.options.params.createtm), "roInteger")
+  m.assertEqual(type(reqInfo.options.params.streamid), "String")
+  m.assertEqual(reqInfo.options.params.streamid.len(), 16)
   m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
   m.assertEqual(reqInfo.options.params.uoo, "0")
 
@@ -235,11 +240,12 @@ Function tubiAds_getNielsenPingRequestInfo_test()
   m.assertEqual(reqInfo.options.params.pingtype, "2")
   m.assertEqual(reqInfo.options.params.product, "dar")
   m.assertEqual(type(reqInfo.options.params.createtm), "roInteger")
+  m.assertInvalid(reqInfo.options.params.streamId)
   m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
   m.assertEqual(reqInfo.options.params.uoo, "0")
 
   streamEnd = m.constants.thirdParty.nielsen.pingTypes.streamEnd
-  reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, streamEnd)
+  reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, streamEnd, content)
 
   m.assertEqual(reqInfo.options.params.prd, "audit")
   m.assertEqual(reqInfo.options.params.apid, m.ads.constants.thirdParty.nielsen.pingToken)
@@ -248,6 +254,8 @@ Function tubiAds_getNielsenPingRequestInfo_test()
   m.assertEqual(reqInfo.options.params.pingtype, "3")
   m.assertEqual(reqInfo.options.params.product, "dar")
   m.assertEqual(type(reqInfo.options.params.createtm), "roInteger")
+  m.assertEqual(type(reqInfo.options.params.streamid), "String")
+  m.assertEqual(reqInfo.options.params.streamid.len(), 16)
   m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
   m.assertEqual(reqInfo.options.params.uoo, "0")
 End Function
@@ -257,4 +265,21 @@ End Function
 Function tubiAds_getNielsenSessionId_test()
   nielsenSessionId = m.adsLimited.getNielsenSessionId(m.ads.constants)
   m.assertEqual(nielsenSessionId.len(), 16)
+End Function
+
+
+'@Test tubiAds_getNielsenStreamId unit tests
+Function tubiAds_getNielsenStreamId_test()
+  content = CreateObject("roSGNode", "TubiContentNode")
+  content.id = "12345"
+
+  nielsenStreamId = m.adsLimited.getNielsenStreamId(m.ads.constants, content)
+  m.assertEqual(nielsenStreamId.len(), 16)
+
+  nielsenStreamId = m.adsLimited.getNielsenStreamId(m.ads.constants, invalid)
+  m.assertEqual(nielsenStreamId.len(), 0)
+
+  content.id = ""
+  nielsenStreamId = m.adsLimited.getNielsenStreamId(m.ads.constants, content)
+  m.assertEqual(nielsenStreamId.len(), 0)
 End Function

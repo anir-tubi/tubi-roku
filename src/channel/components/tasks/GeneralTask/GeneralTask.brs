@@ -420,7 +420,6 @@ End Function
 ' @job : assocarray, it has requestNode, tubiReq, batchnode(invalid for single request, valid for batch request)
 '
 Function processErrorReponse(result, callbackTypes, job)
-
   ' end result of parsedResponse type may vary depending on API response format
   responseFromServer = result.response
   responseHeaders = responseFromServer.headers

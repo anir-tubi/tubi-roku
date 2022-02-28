@@ -61,6 +61,8 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     adTrackingCallback: tubiAds_adTrackingCallback
     trackUserEvent: tubiAds_trackUserEvent
     getNielsenSessionId: tubiAds_getNielsenSessionId
+    getNielsenStreamId: tubiAds_getNielsenStreamId
+    getMd5Hash: tubiAds_getMd5Hash
     appMode: "DEFAULT_MODE"
   }
 end function
@@ -79,6 +81,8 @@ Function TubiAdsLimited(constants, auth)
     getRainmakerParamsForLinear: tubiAds_getRainmakerParamsForLinear
     getNielsenPingRequestInfo: tubiAds_getNielsenPingRequestInfo
     getNielsenSessionId: tubiAds_getNielsenSessionId
+    getNielsenStreamId: tubiAds_getNielsenStreamId
+    getMd5Hash: tubiAds_getMd5Hash
   }
 End Function
 
@@ -625,18 +629,22 @@ End Function
 
 ' @constants: assocArray, constants as returned by getConstants()
 ' @pingType: string, one of the following "start_session", "start_stream", "end_session", "end_stream"
-Function tubiAds_getNielsenPingRequestInfo(constants, pingType)
+' @content: roSGNode, content node - only required for stream start and stream end pings
+Function tubiAds_getNielsenPingRequestInfo(constants, pingType, content = invalid)
   sessionId = m.getNielsenSessionId(constants)
 
   pingValue = "0" 'default value for "start_session"
+  streamId = ""
   if pingType = m.constants.thirdParty.nielsen.pingTypes.sessionStart
     pingValue = "0"
   else if pingType = m.constants.thirdParty.nielsen.pingTypes.streamStart
     pingValue = "1"
+    streamId = m.getNielsenStreamId(constants, content)
   else if pingType = m.constants.thirdParty.nielsen.pingTypes.sessionEnd
     pingValue = "2"
   else if pingType = m.constants.thirdParty.nielsen.pingTypes.streamEnd
     pingValue = "3"
+    streamId = m.getNielsenStreamId(constants, content)
   end if
 
   dateTime = CreateObject("roDateTime")
@@ -663,6 +671,10 @@ Function tubiAds_getNielsenPingRequestInfo(constants, pingType)
     }
   }
 
+  if streamId <> ""
+    options.params.streamid = streamId
+  end if
+
   return {
     url: constants.urls.nielsenPing
     options: options
@@ -674,14 +686,34 @@ End Function
 ' truncated to 16 characters.
 Function tubiAds_getNielsenSessionId(constants)
   toHash = constants.deviceInfo.deviceId + constants.deviceInfo.deviceAdId + constants.deviceInfo.isAdIdTrackingDisabled.toStr()
+  hashed = m.getMd5Hash(toHash)
+  truncated = Left(hashed, 16)
+  return truncated
+End Function
 
+
+' @constants: assocArray, constants as returned by getConstants()
+' @content: roSGNode, a content node with an id
+' @return: string an md5 hash of the device id and content id truncated to 16 characters
+'          or an empty string if we can't get the content id
+Function tubiAds_getNielsenStreamId(constants, content)
+  streamId = ""
+  if content <> invalid and content.id <> ""
+    toHash = constants.deviceInfo.deviceId + content.id
+    hashed = m.getMd5Hash(toHash)
+    streamId = Left(hashed, 16)
+  end if
+
+  return streamId
+End Function
+
+
+' @strToHash: string, the string to be hashed
+' @return: string, an md5 hash of the passed in value
+Function tubiAds_getMd5Hash(strToHash)
   ba1 = CreateObject("roByteArray")
-  ba1.FromAsciiString(toHash)
+  ba1.FromAsciiString(strToHash)
   digest = CreateObject("roEVPDigest")
   digest.Setup("md5")
-  
-  hashed = digest.Process(ba1)
-  truncated = Left(hashed, 16)
-
-  return truncated
+  return digest.Process(ba1)
 End Function

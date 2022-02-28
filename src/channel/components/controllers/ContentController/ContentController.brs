@@ -1835,10 +1835,11 @@ End Function
 ' Sends a ping request to Nielsen that a session or video playback has started or ended.
 '
 ' @pingType: string, one of the following "start_session", "start_stream", "end_session", "end_stream"
-Function sendNielsenPing(pingType)
+' @content: roSGNode, a content node with an id. Only required when pingType = "start_stream" or "end_stream"
+Function sendNielsenPing(pingType, content = invalid)
   Auth = TubiAuth(m.constants, m.Request)
   adLib = TubiAdsLimited(m.constants, Auth)
-  nielsenReqInfo = adLib.getNielsenPingRequestInfo(m.constants, pingType)
+  nielsenReqInfo = adLib.getNielsenPingRequestInfo(m.constants, pingType, content)
 
   m.makeRequest({
     url: nielsenReqInfo.url
@@ -1846,5 +1847,6 @@ Function sendNielsenPing(pingType)
     options: nielsenReqInfo.options
     silenceCallbackWarnings: true
     responseType: "string"
+    retries: 0
   })
 End Function
