@@ -42,8 +42,6 @@
 
     <field id="jumpToRowItemByID" alias="programGuide.jumpToLinearChannelID" />
 
-     <field id="shouldSendComponentInteractionEventOnJumpToLinearChannelId" type="boolean" value="false"/>
-
     <!-- Used to control which component gains focus when the focusedChild callback runs.
            Accepted values are in constants.ui.homescreen.focusItems -->
     <field id="componentToFocus" type="string" />

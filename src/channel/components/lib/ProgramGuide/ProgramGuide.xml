@@ -24,6 +24,9 @@
     <!-- Set the ID that the TimeGrid should jump to when displayed on the linear TV video player. Second element in the array is not used in case of EPG -->
     <field id="jumpToLinearChannelID" type="array" alwaysNotify="true"/>
 
+    <!-- Set to true when EPG overlay present on the fullplayer -->
+    <field id="shouldSendComponentInteractionEventOnJumpToLinearChannelId" type="boolean" value="false"/>
+
     <!--Select the TimeGrid mode. These values are available in constants 'EPGChannelPlayMode'
         1: playItemOnSelect: update the channel that should be playing based on the item being selected
         2: playItemOnFocus: update the channel that should be playing based on the item being focused
