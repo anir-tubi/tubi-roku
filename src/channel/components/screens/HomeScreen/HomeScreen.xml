@@ -128,7 +128,7 @@
       <field id="scrollingstatus" alias="CategoryGridList.scrollingstatus" />
 
       <!-- content on the homescreen is loaded and spinner can be turned off -->
-      <field id="contentReady" type="boolean" alwaysNotify="true" />
+      <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
 
       <field id="cursorPosition" alias="CategoryGridList.cursorPosition" />
 

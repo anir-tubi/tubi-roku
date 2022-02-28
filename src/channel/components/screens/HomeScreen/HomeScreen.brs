@@ -215,11 +215,14 @@ Function onLoadingChange()
   bLoaded = (m.top.isLoading = false)
   m.CategoryGridList.visible = bLoaded
   if m.top.isLoading = true
-    m.CategoryGridList.content = invalid
+    m.top.contentFocused = invalid
+    m.top.contentReady = false
     emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
     populateInfoPanel(m.constants.ui.infoPanelModes.item, emptyContentNode) 'empties the info panel
+    m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
+  else
+      m.CategoryGridList.content = m.top.content ' should be all categories with initial amounts of content in them
   end if
-  m.CategoryGridList.content = m.top.content ' should be all categories with initial amounts of content in them
 End Function
 
 
@@ -562,7 +565,9 @@ End Function
 ' On grid focus change, update the info panel
 Function onGridFocusChange() as void
   tubiLog("HomeScreen.onGridFocusChange")
-  m.top.contentReady = true
+  if m.top.contentReady = false
+    m.top.contentReady = true
+  end if
 
   '//if the screen is loading or if the grid is not in focus or the topnav is not in focus, then exit out of this function
   if not (m.TopNav.isInFocusChain() = true or m.CategoryGridList.isInFocusChain() = true) or m.top.isLoading = true
@@ -690,7 +695,9 @@ End Function
 
 ' Is called when CategoryGridList has content loaded but did not gain focus, so we need to update the infoPanel
 Function onItemToBeFocusedChange()
-  m.top.contentReady = true
+  if m.top.contentReady = false
+    m.top.contentReady = true
+  end if
   populateInfoPanelByContent(m.CategoryGridList.reloadedItemToBeFocused)
 End Function
 

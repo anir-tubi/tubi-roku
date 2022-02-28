@@ -251,7 +251,7 @@ Function onPasswordConfirm(msg = invalid)
 End Function
 
 
-' After the parental settings have changes then the content of certain screens should be refreshed
+' After the parental settings have changed then the content of certain screens should be refreshed
 ' Also used after kids mode is enabled or disabled
 Function refreshScreenAfterParentalChanges()
   tubiLog("SettingsScreenHelpers.refreshScreenAfterParentalChanges")

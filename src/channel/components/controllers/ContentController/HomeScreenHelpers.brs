@@ -940,16 +940,18 @@ End Function
 
 
 Function onHomescreenContentReady(msg)
-  tubiLog("HomescreenHelpers.onHomescreenContentReady ")
-  fireAppLoadBeacon()
+  tubiLog("HomescreenHelpers.onHomescreenContentReady")
   homescreen = msg.getRoSGNode()
-  homeScreen.unobserveFieldScoped("contentReady")
-  homeScreen.isLoading = false
-  showHideSpinner(false)
+  if homescreen.contentReady = true
+    fireAppLoadBeacon()
+    homeScreen.unobserveFieldScoped("contentReady")
+    homeScreen.isLoading = false
+    showHideSpinner(false)
 
-  '//Report the page_load analytics
-  loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
-  screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
+    '//Report the page_load analytics
+    loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
+    screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
+  end if
 End Function
 
 

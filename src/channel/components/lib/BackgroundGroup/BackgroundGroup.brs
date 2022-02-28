@@ -49,15 +49,14 @@ Function onKidsModeChange()
   if m.top.kidsMode = true
     m.fullScreenGradient.uri = m.constants.ui.uris.backgroundFullScreenGradient_kidsMode
     m.topRightGradient.uri = m.constants.ui.uris.backgroundTopRightGradient_kidsMode
-    m.background.uri = m.blurredDefaultBackground_kidsMode
     m.blurredDefaultBackground_current  = m.blurredDefaultBackground_kidsMode
   else
     m.fullScreenGradient.uri = m.constants.ui.uris.backgroundFullScreenGradient
     m.topRightGradient.uri = m.constants.ui.uris.backgroundTopRightGradient
-    m.background.uri = m.blurredDefaultBackground
     m.blurredDefaultBackground_current  = m.blurredDefaultBackground
   end if
-  '//call newBackgroundSet() in case the kids mode change cause the default background is being used and we need to change to appropriate default backround for the current mode.
+  '//call newBackgroundSet() in case the kids mode change cause the default background is being used 
+  '//   and we need to change to appropriate default backround for the current mode.
   newBackgroundSet()
 End Function
 

@@ -109,6 +109,12 @@ Function onContentChange()
   tubiLog("CategoryGridList.onContentChange")
   if m.top.content = invalid
     m.RowList.content = invalid
+    '//reset some values. According to the Roku documentation, these fields should be read only but they seem to be writable.
+    if m.RowList.currFocusColumn <> invalid
+      m.RowList.currFocusColumn = 0
+    end if
+    m.RowList.rowItemFocused = [0,0]
+    m.RowList.currFocusRow = 0
   ' This is a verbose check that makes sure we only refresh the whole RowList content if the root node is different
   else
     ' Setting RowList invalid here will empty the grid.  It will be set after the first batch of
@@ -117,12 +123,6 @@ Function onContentChange()
     m.RowList.content = invalid
     if m.top.content <> invalid then
       setRowHeights()
-
-      itemFocused = [1, 1]
-      if resolveAbbreviatedContent(itemFocused) <> invalid
-        ' set focus for high spec models that already have categories with content from the matrix/homescreen response
-        setRowListFocus()  'only happens if m.top has focus, ie. when the app is launched or signin/signout
-      end if
 
       'At this point, there is a limited set (as defined in constants) of content in each category.
       'loadCategoriesIndex will get the rest of the content for each category.
@@ -535,8 +535,17 @@ Function setRowListFocus()
   if m.top.hasFocus()
     m.justGainedFocus = true
     m.RowList.setFocus(true)
-  else 
-    if m.RowList.rowItemFocused <> invalid and m.RowList.rowItemFocused.count() > 0
+  else
+    if m.RowList.currFocusRow <> invalid and m.RowList.currFocusRow >= 0 and m.RowList.currFocusColumn <> invalid and m.RowList.currFocusColumn >= 0
+      '//If rowList is not in focus and new content is set, then one would think that rowItemFocused should be [0,0] but it isn't, 
+      '//so that is why we use currFocusRow and currFocusColumn - to ensure the proper item is announced  
+      row = Int(m.RowList.currFocusRow)
+      col = Int(m.RowList.currFocusColumn)
+      reloadedItemIndex = [row, col]
+    else if m.RowList.rowItemFocused <> invalid and m.RowList.rowItemFocused.count() > 1
+      '//currFocusColumn is not available in firmware lower than Roku OS 10.5, so use rowItemFocused. It's imperfect, as it 
+      '// may think a different item is focused insteqd of the 1st colum/1st row,
+      '// but it will not display a wrong metadata when the user quickly navigates away from 1st rowItem [0,0] as the content is loading
       reloadedItemIndex = m.RowList.rowItemFocused
     else
       reloadedItemIndex = [0, 0]
