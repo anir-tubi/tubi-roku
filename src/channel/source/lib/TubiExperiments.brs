@@ -25,11 +25,11 @@ Function TubiExperiments(constants) as Object
       }
       '//When enabled = true, the "roku_linear_epg_v1" experiment should have a boolean field labeled "update_homescreen"
       '//   if update_homescreen=false, then the linear row on the homescreen looks identical to the control
-      '//     "update_homescreen": false
+      '//     roku_linear_epg_v1: { "enabled": true, "update_homescreen": false }
       '//   if update_homescreen=true, then the linear row on the homescreen looks includes a new look which also includes EPG data
-      '//     "update_homescreen": true
+      '//     roku_linear_epg_v1: { "enabled": true, "update_homescreen": true }
       roku_linear_epg: {
-        roku_linear_epg_v1: {"enabled": false}
+        roku_linear_epg_v1: { "enabled": false, update_homescreen: false }
       }
       roku_initial_content_type_selector_icts: {
         roku_initial_content_type_selector_icts_v3: {"icts_menu_option": "movies_tv_separate"} ' valid values are : "no_icts", "movies_tv_combined", "movies_tv_separate", "no_espanol"
