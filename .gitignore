@@ -5,3 +5,5 @@ node_modules/*
 config/dev.yml
 package-lock.json
 src/channel/source/rooibosFunctionMap.brs
+out/
+.env

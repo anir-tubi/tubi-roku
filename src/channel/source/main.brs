@@ -3,7 +3,6 @@ Function Main(startupArgs)
   ' this version of constants will be the constants that are part of the submitted build (or the side loaded build)
   ' and only exist in the main brightscript thread.
   ' constants will be reset in remote components for scene graph
-  
   m.appStartTime = UpTime(0)
   m.startupArgs = startupArgs
 
@@ -14,7 +13,7 @@ Function Main(startupArgs)
 
   if m.startupArgs.ComponentTest <> invalid and m.startupArgs.ComponentTest <> ""
     ' This will block indefinitely
-    ComponentTest(m.startupArgs.ComponentTest)
+    ComponentTest(m.startupArgs.ComponentTest) 'bs:disable-line 1001
   end if
 
   logCrashesOnStartup(m.startupArgs, log, constants)
@@ -53,7 +52,7 @@ Function runChannel(constants, log, request)
 
   input.enableTransportEvents()
 
-  ' start the scene graph UI 
+  ' start the scene graph UI
   tubiScene = screen.CreateScene("TubiScene")
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
@@ -73,7 +72,7 @@ Function runChannel(constants, log, request)
   'run SceneGraph tests if in test mode
   if constants.settings.mode = "test"
     sgGlobal.setField("theme", constants.ui.themes.default) 'set theme for testing purposes
-    if (type(Rooibos__Init) = "Function") then Rooibos__Init()
+    if (type(Rooibos__Init) = "Function") then Rooibos__Init() 'bs:disable-line 1001
     return false
   end if
 
@@ -126,7 +125,7 @@ Function runChannel(constants, log, request)
           'deeplink info doesn't have a "type" field, so we add one in order to easily differentiate input behavior later
           inputInfo.type = "deeplink"
         end if
-        controller.roInputInfo = inputInfo 
+        controller.roInputInfo = inputInfo
       end if
     else if msgType = "roSGScreenEvent"
       ' documentation indicates a roSGSCreenEvent occurs when screen.close() is called, but trial
@@ -149,7 +148,7 @@ Function runChannel(constants, log, request)
         result = msg.getData()
         response = result.response
         if response = invalid
-          response = "unhandled"  
+          response = "unhandled"
         end if
         if result.id <> invalid
           input.EventResponse({id: result.id, status: response})
@@ -160,7 +159,7 @@ Function runChannel(constants, log, request)
         if msg.getData() = "ready"
           if msg.GetRoSGNode().id = "suitest"
             suitestIL = CreateObject("roSGNode", "SuitestInstrumentationLib:main")
-            suitestIL.SetField("app_id", constants.thirdParty.suiteTest.app_id)          
+            suitestIL.SetField("app_id", constants.thirdParty.suiteTest.app_id)
           else if msg.GetRoSGNode().id = "TubiStarterLibrary"
             starterController = tubiScene.createChild("TubiStarterLibrary:StarterController")
             if starterController <> invalid
@@ -250,15 +249,15 @@ Function runChannel(constants, log, request)
         starterController = msg.GetRoSGNode()
         starterController.unobserveField("fadeOutCustomSplash")
         tubiScene.fadeOutCustomSplash = true
-      else if msg.GetField() = "fadeInRemoteComponent" 
+      else if msg.GetField() = "fadeInRemoteComponent"
         starterController = msg.GetRoSGNode()
         contentController = tubiScene.findNode("ContentController")
         if contentController <> invalid and contentController.fadeInContentController <> true
           starterController.unobserveField("fadeInRemoteComponent")
-          tubiScene.fadeOutSpinner = true 
+          tubiScene.fadeOutSpinner = true
           contentController.fadeInContentController = true
         end if
-      else if msg.GetField() = "removeStartUpScreens" 
+      else if msg.GetField() = "removeStartUpScreens"
         contentController = msg.GetRoSGNode()
         contentController.unobserveField("removeStartUpScreens")
         starterController = tubiScene.findNode("StarterController")

@@ -1,31 +1,31 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - StarterController
  -
  - This starter controller's main purpose is to determine which remote component file to load into the channel.
  -
- - Please see https://sdkdocs.roku.com/display/sdkdoc/ComponentLibrary for more info on remotely loading scenegraph components 
+ - Please see https://sdkdocs.roku.com/display/sdkdoc/ComponentLibrary for more info on remotely loading scenegraph components
  -
  -
  -->
 <component name="StarterController" extends="Group">
 
   <script type="text/brightscript" uri="StarterController.brs" />
-  <script type="text/brightscript" uri="../../source/Constants.brs" />
-  <script type="text/brightscript" uri="../../source/Settings.brs" />
-  <script type="text/brightscript" uri="../../source/generalUtils.brs" />
-  <script type="text/brightscript" uri="../../source/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="../../source/TubiExternalConfig.brs" />
-  <script type="text/brightscript" uri="../../source/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="../../source/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Constants.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Settings.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExternalConfig.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
 
   <interface>
     <!-- INPUTS -->
       <!-- triggers the starterController to return a remote components url via the OUTPUT interfaces -->
       <field id="getUrl" type="boolean" alwaysNotify="true" />
-      
+
       <!-- removeStartUpScreens is used to remove the StartUpScreens(animationLogo) -->
-      <field id="removeStartUpScreens" type="boolean"/>       
+      <field id="removeStartUpScreens" type="boolean"/>
 
     <!-- OUTPUTS -->
       <!-- the SceneGraph app will be built using the remote components pkg existing at this url -->
@@ -36,10 +36,10 @@
 
       <!-- fadeOutCustomSplash is used to fadeOut the CustomSplashPoster -->
       <field id="fadeOutCustomSplash" type="boolean" />
-      
+
       <!-- fadeInRemoteComponent is used to fadeIn the RemoteComponent -->
       <field id="fadeInRemoteComponent" type="boolean" />
-      
+
       <!-- starter components has the most recent constants, including experiments and external config.
            make them available to the main thread which can put them on global and inject them into remote components
        -->
@@ -51,7 +51,7 @@
     <!-- startupScreens group has video node, which is shown before HomeScreen/Deeplinks -->
     <Group id="startupScreens" opacity="0.0">
 
-      <!-- animationLogo is the startup video played right after customSplashPoster is shown -->  
+      <!-- animationLogo is the startup video played right after customSplashPoster is shown -->
       <Video
         id="animationLogo"
         width="1920"
@@ -67,8 +67,8 @@
         duration="0.5"
         repeat="true" />
 
-    </Group>  
-    
+    </Group>
+
   </children>
 
 </component>

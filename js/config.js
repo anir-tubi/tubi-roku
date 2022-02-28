@@ -1,5 +1,4 @@
 'use strict';
-const bluebird = require('bluebird');
 const extend = require('node.extend');
 const fs = require('fs');
 const path = require('path');
@@ -9,8 +8,6 @@ const templating = require('./templating');
 const cwd = path.join(process.cwd(), 'config');
 const defaultProfile = 'default';
 const buildProfile = 'build';
-
-bluebird.promisifyAll(fs);
 
 /**
  * Parse a yml file, inserting special values. If it does not exist, return {}.
@@ -71,7 +68,7 @@ function load(options) {
   const defaultDataPre = parse(defaultProfile, {});
   const envDataPre = parse(env, {});
   const overWrittenDataPre = extend(true, defaultDataPre, envDataPre, build);
-  
+
   let templateValues = {
     localHostAddress: `${localIp}`,
     localHostUri: `${localIp}:${port}`,
@@ -98,18 +95,9 @@ function incrementBuildNumber() {
   build.component_library_manifest.build_version = build.manifest.build_version
   build.starter_library_manifest.build_version = build.manifest.build_version
   const buildPath = path.join(cwd, `${buildProfile}.yml`);
-
-  return fs.openAsync(buildPath, 'w')
-  .then(fd => {
-    const data = yaml.dump(build);
-    return fs.writeAsync(fd, data);
-  })
-  .then(() => {
-    console.log('Incremented the build number to %d_%d_%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version);
-  })
-  .catch(err => {
-    console.log(err);
-  });
+  const data = yaml.dump(build);
+  fs.writeFileSync(buildPath, data);
+  console.log('Incremented the build number to %d_%d_%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version);
 }
 
 

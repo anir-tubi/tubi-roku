@@ -7,16 +7,14 @@
   <script type="text/brightscript" uri="EmailInputScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs"/>
   <script type="text/brightscript" uri="../ModalDialogs.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  
+
   <interface>
 
     <!-- OUTPUT -->
-    
+
       <!-- continueSelected is triggered when user selects continue button, which checks email exists in database -->
       <field id="continueSelected" type="boolean" alwaysNotify="true"/>
 
@@ -25,12 +23,12 @@
 
      <!-- backButtonSelected is triggered when user selects back button on keyboard-->
       <field id="backButtonSelected" type="integer" alias="back.selected"/>
-    
+
   </interface>
 
   <children>
 
-    <LayoutGroup 
+    <LayoutGroup
       id="emailLayout"
       translation="[0, 290]"
       layoutDirection="vert"
@@ -48,7 +46,7 @@
           size="72" />
       </Label>
 
-      <Group 
+      <Group
         translation="[645,0]">
         <Rectangle
           id="emailBackground"
@@ -85,8 +83,8 @@
 
     </LayoutGroup>
 
-    <Group 
-      id="keyboardGrp" 
+    <Group
+      id="keyboardGrp"
       translation="[0,550]">
 
       <Rectangle
@@ -95,17 +93,17 @@
         width="1920"
         height="600"/>
 
-      <LayoutGroup 
+      <LayoutGroup
         layoutDirection="vert"
         horizAlignment="custom"
         vertAlignment="custom"
         translation="[250, 20]"
         itemSpacings="[20]">
 
-        <Keyboard 
+        <Keyboard
           id="Keyboard"/>
 
-            <ButtonGroup 
+            <ButtonGroup
               id="buttonGroup"
               layoutDirection="horiz"
               itemSpacings="[35]"

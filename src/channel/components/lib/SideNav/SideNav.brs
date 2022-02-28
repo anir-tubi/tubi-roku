@@ -35,7 +35,7 @@ Function setMenuItems(menuItems)
     setMainContentSelect(menuItems[i])
     setMainContent(menuItems[i])
   end for
-  
+
 End Function
 
 
@@ -45,7 +45,7 @@ Function setMainContentSelect(item)
   contentNode.id = item + "-select"
   m[item + "ContentSelect"] = contentNode
   m.MainContentSelect.appendChild(contentNode)
-  
+
 End function
 
 
@@ -76,7 +76,7 @@ Function setMainContent(item)
     contentNode.iconUrl = "pkg:/images/sideNavLinearTV.png"
   else if item = m.constants.ui.sideNavIds.myList
     contentNode.title = getTranslation("menu_mylist")
-    contentNode.iconUrl = "pkg:/images/sideNavMyList.png"    
+    contentNode.iconUrl = "pkg:/images/sideNavMyList.png"
   else if item = m.constants.ui.sideNavIds.categories
     contentNode.title = getTranslation("menu_categories")
     contentNode.iconUrl = "pkg:/images/sideNavCategories.png"
@@ -94,7 +94,7 @@ Function setMainContent(item)
     contentNode.iconUrl = "pkg:/images/sideNavExit.png"
   end if
   m[item + "Content"] = contentNode
-  
+
   m.MainContent.appendChild(contentNode)
 
 End Function
@@ -104,7 +104,7 @@ Function onCreateMenuItems()
 
   m.mainItems = m.top.findNode("mainItems")
   m.mainItemsSelected = m.top.findNode("mainItemsSelected")
-  
+
   if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
     menuItems = [
       m.constants.ui.sideNavIds.profile
@@ -136,12 +136,12 @@ Function onCreateMenuItems()
     m.constants.ui.sideNavIds.settings
     m.constants.ui.sideNavIds.exit
   ]
-  end if  
+  end if
 
   ' Creates roSGNode dynamically
-  setMenuItems(menuItems)  
+  setMenuItems(menuItems)
 
-  '// This is the item to focus on when the sidenav opens. This implies that this was the last item (that has an associated screen) selected 
+  '// This is the item to focus on when the sidenav opens. This implies that this was the last item (that has an associated screen) selected
   m.itemSelectedRemembered = invalid
 
   m.mainItemsSelected.focusBitmapBlendColor = m.constants.ui.colors.selectedListItem
@@ -164,13 +164,13 @@ Function onCreateMenuItems()
   '//Inititate the default view
   onOpenedChanged()
   '//::TODO::SIDENAV set the width of the items of the lists dynamically to the width of m.top.width, plus some spacing
-  '//::TODO::SIDENAV - set all references to sideNav IDs to be called from Constants: i.e. m.constants.ui.sideNavIds.home. 
+  '//::TODO::SIDENAV - set all references to sideNav IDs to be called from Constants: i.e. m.constants.ui.sideNavIds.home.
   '//   To do this, set content in brs instead of xml?
 
 End Function
 
 
-' SideNav has been told there has been a change to the user's sign in status and that it should change 
+' SideNav has been told there has been a change to the user's sign in status and that it should change
 '   how the signin menu item appears by using the passed message data.
 Function onSignInChange(message)
   if m.profileContent <> invalid
@@ -291,7 +291,7 @@ End Function
 
 
 Function onLinearEPGTurnedOnChanged()
-  if mod.linearEPGContent <> invalid
+  if m.linearEPGContent <> invalid
     m.linearEPGContent.turnedOn = m.top.linearEPGTurnedOn
   end if
 End Function
@@ -473,7 +473,7 @@ Function setDrawFocusFeedback(list)
     list.drawFocusFeedback = true
   else
     list.drawFocusFeedback = false
-  end if 
+  end if
 End Function
 
 
@@ -494,7 +494,7 @@ End Function
 Function onOpenedChanged()
   if m.top.opened = true
     '//display hidden items, profile, settings, exit. Set all buttons to full opacity
-    
+
     if m.itemSelectedRemembered <> invalid
       list = m.top.findNode(m.itemSelectedRemembered.list)
       index = getIndexByID(list, m.itemSelectedRemembered.id)
@@ -528,9 +528,9 @@ Function setContentActive(content, bActive = true)
     item.active = bActive
     if(m.itemSelectedRemembered <> invalid and m.itemSelectedRemembered.id = item.id)
       item.selected = true
-    else 
+    else
       item.selected = false
-    end if 
+    end if
   end for
 End Function
 
@@ -554,7 +554,7 @@ Function getIndexByID(list, sID)
   index = -1
   for i = 0 to content.getChildCount() - 1
     item = content.getChild(i)
-    if item.id = sID 
+    if item.id = sID
       index = i
       exit for
     end if
@@ -596,7 +596,7 @@ End Function
 
 Function onItemSelect(msg)
   list = msg.getRoSGNode()
-  '//When an item is selected, then set a field so a Helper can perform the necessary action and close the menu if necessary 
+  '//When an item is selected, then set a field so a Helper can perform the necessary action and close the menu if necessary
   index = list.itemSelected
   item = list.content.getChild(index)
   m.listItemSelected = {
@@ -610,14 +610,14 @@ Function onItemSelect(msg)
 
   m.top.itemCurrentId = item.id
   if m.mainItems.id = list.id
-    '//Only allow the middle list items to be remembered as they are the only ones with associated screens while the side nav is still visible 
+    '//Only allow the middle list items to be remembered as they are the only ones with associated screens while the side nav is still visible
     m.itemSelectedRemembered = {
       list: list.id
       id: item.id
-    } 
+    }
   end if
 
-  'make sure to set itemSelected before itemSelectedId because observers on 
+  'make sure to set itemSelected before itemSelectedId because observers on
   'itemSelectedId will trigger callbacks that require itemSelected to be set already
   m.top.itemSelected = item
   m.top.itemSelectedId = item.id
@@ -633,13 +633,13 @@ Function onItemFocused(msg)
 
   ' trigger navigate_within_page events in ContentController
   pageType = m.Tracking.sideNavPageMap[item.id]
-  
+
   if m.oldSideNavFocusedButton <> invalid and m.oldSideNavFocusedButton.left_nav_section <> pageType
     row = itemFocused + 1
     col = 1
     m.top.navigateWithinPageInfo = {
       componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component", m.oldSideNavFocusedButton)
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum 
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
 
       vertical_location: row  '//The row location of the side nav
       vertical_location_mode: "INDEX"  'LocationMode enum

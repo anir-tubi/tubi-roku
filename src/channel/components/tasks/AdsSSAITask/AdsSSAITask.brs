@@ -46,7 +46,7 @@ Function execAdsSSAITask()
   ' ad pod as returned by raf.getAds()[0]
   ' see https://developer.roku.com/en-gb/docs/developer-program/advertising/integrating-roku-advertising-framework.md#ad-structure
   m.adPod = {}
-  
+
   runSSAILoop(constants, m.ssaiPort)
 End Function
 
@@ -82,10 +82,7 @@ Function runSSAILoop(constants, ssaiPort)
       else if msg.getField() = "exit"
         ' send ad analytics events if necessary when the user exits playback
         if m.top.isPlayingAds = true
-          if m.adPod <> invalid and m.adPod.ads <> invalid and m.adPod.ads[m.currentAdInPod] <> invalid
-            ad = m.adPod.ads[m.currentAdInPod]
-            sendFinishAdAnalytics(ad, "DELIBERATE")
-          end if
+          sendFinishAdAnalytics("DELIBERATE")
         end if
 
         ssaiPort = invalid
@@ -151,7 +148,7 @@ End Function
 
 Function onTags(msg)
   tags = msg.getData()
-  
+
   ' decipher tags
   id3s = yoSpaceId3s()
   if (tags.Count() = 6) then
@@ -164,7 +161,7 @@ Function onTags(msg)
           pair = mid(hex, i, 2)
           parsed = parsed + chr(val(pair, 16))
         end for
-        
+
         id3s.setTag(tag, parsed)
       end if
     end for
@@ -193,7 +190,7 @@ Function onTags(msg)
     end if
   else if id3s.getType() = "end" and id3s.currentSegment() = id3s.totalSegments()
     ' we are at the very end of the ad
-    
+
     ' send "Complete" ad pixels and FinishAdEvent analytics
     handleFinishAdTrackingOnComplete(yospaceIdFromTag)
 
@@ -313,7 +310,7 @@ Function handleStartAdTracking(yospaceIdFromTag)
         type: "Impression"
       }
       m.raf.fireTrackingEvents(ad, ctx)
-    
+
       ' send StartAdEvent tracking
       oneBasedAdIndex = m.currentAdInPod + 1
       analyticsCtx = getAnalyticsCtx(ad, oneBasedAdIndex, m.adPod.ads.count())
@@ -379,7 +376,7 @@ End Function
 ' ctx.ad.streams[0].url
 ' ctx.ad.adVideoId
 ' ctx.ad.duration
-' 
+'
 ' @ad: assocArray, an ad as returned by RAF.getAds()[0].ads[0]
 ' @index: integer, the position of the ad within the ad pod
 ' @podCount: integer, the number of ads within the ad pod

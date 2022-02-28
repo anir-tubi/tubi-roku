@@ -26,7 +26,7 @@ const {load, getBuildTag, incrementBuildNumber} = require('./js/config');
 const {createManifest, createSettings} = require('./js/build');
 const {keypress, deeplink, uploadPkg, signPkg, convertToSquashfs} = require('./js/network');
 
-//Functions to upload and download static string translations  
+//Functions to upload and download static string translations
 const {downloadTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
 const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
 
@@ -63,7 +63,7 @@ passedArgs.forEach(arg => {
     staging: true,
     test: true
   };
-  
+
   const allowedTelnetConfigs = {
     sametab: true,
   }
@@ -72,11 +72,11 @@ passedArgs.forEach(arg => {
   if (arg.slice(0, 2) === '--' && arg.charAt(2) !== '-') {
     // strip any initial "-"
     let strippedArg = arg.slice(2);
- 
+
     // check for one of the config values
     if (allowedConfigs[strippedArg]) {
       options.config = strippedArg;
-    } else if (allowedTelnetConfigs[strippedArg]) { 
+    } else if (allowedTelnetConfigs[strippedArg]) {
       options.telnet = strippedArg
     } else if(strippedArg.split('.').length === 4) {
       //check if the arg is an IP address
@@ -138,8 +138,6 @@ function buildInstalled() {
   let build = new Promise((res, rej) => {
     /* Installed bundle */
     mkdirp.sync(`${process.env.PWD}/build/local/source`);
-    createSettings(options, 'build/local/source/Settings.brs');
-    createManifest(options, 'build/local/manifest', 'manifest');
     let { settings } = load(options);
 
     let sources = [
@@ -161,7 +159,7 @@ function buildInstalled() {
 
     // don't include test files if the config is not 'test'
     if (options.config !== 'test') {
-      sources = [...sources , ...testSources];
+      sources = [...sources, ...testSources];
     }
 
     // don't include RALE files if config is not 'dev'
@@ -177,7 +175,7 @@ function buildInstalled() {
     // don't include SignUp Task if config is not 'qa'
     if (options.config !== 'qa') {
       sources.push('!src/channel/components/tasks/SignUpTask/**')
-    }    
+    }
 
     let srcOptions = {
       base: 'src/channel'
@@ -193,6 +191,8 @@ function buildInstalled() {
 
   return build
     .then(() => {
+      createSettings(options, 'build/local/source/Settings.brs');
+      createManifest(options, 'build/local/manifest', 'manifest');
       return zipAsPromise('build/local/**/*', `tubi_${buildTag}.zip`, 'build/');
     });
 };
@@ -200,12 +200,10 @@ function buildInstalled() {
 
 function buildStarter() {
   const minorBuildTag = getBuildTag(true, false);
-  
+
   let build = new Promise((res, rej) => {
     /* Installed bundle */
     mkdirp.sync(`${process.env.PWD}/build/starter/source`);
-    createSettings(options, 'build/starter/source/Settings.brs');
-    createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
 
     // touch the main.brs, can be empty for starter components
     fs.closeSync(fs.openSync('build/starter/source/main.brs', 'w'));
@@ -215,7 +213,7 @@ function buildStarter() {
       'src/channel/components/controllers/StarterController/**/*',
     ];
     let starterControllerSrcOptions = {
-      base: 'src/channel/components/controllers'
+      base: 'src/channel/components'
     };
 
     // include ExperimentsTask in starterComponents
@@ -223,9 +221,9 @@ function buildStarter() {
       'src/channel/components/tasks/ExperimentsTask/**/*'
     ];
     let experimentsTaskSrcOptions = {
-      base: 'src/channel/components/tasks'
+      base: 'src/channel/components'
     };
-    
+
     // include Constants in starter components
     let constantsSrc = [
       'src/channel/source/Constants.brs'
@@ -239,7 +237,7 @@ function buildStarter() {
       'src/channel/source/3rdparty/roku/generalUtils.brs'
     ];
     let genUtilSrcOptions = {
-      base: 'src/channel/source/3rdparty/roku/'
+      base: 'src/channel/source'
     };
 
     // include TubiExperiments, TubiExternalConfig, and Request modules in starterComponents
@@ -252,16 +250,16 @@ function buildStarter() {
       'src/channel/source/lib/Auth.brs',
     ];
     let sourceLibsSrcOptions = {
-      base: 'src/channel/source/lib/'
+      base: 'src/channel/source'
     };
-    
+
     // include AnimationMixin in starterComponents
     let componentLibSrc = [
       'src/channel/components/lib/AnimationMixin.brs',
     ];
     let componentLibSrcOptions = {
-      base: 'src/channel/components/lib/'
-    };    
+      base: 'src/channel/components'
+    };
 
     //move all the necessary starter component files to the build/starter directory
     let stream = mergeStream(
@@ -276,7 +274,7 @@ function buildStarter() {
       collect(sourceLibsSrc, sourceLibsSrcOptions)
         .pipe(dest('build/starter/source')),
       collect(componentLibSrc, componentLibSrcOptions)
-        .pipe(dest('build/starter/source'))        
+        .pipe(dest('build/starter/components'))
     );
 
     stream.on('finish', () => {
@@ -287,6 +285,8 @@ function buildStarter() {
   // then zip up the starter component files after all the files have been moved
   return build
   .then(() => {
+    createSettings(options, 'build/starter/source/Settings.brs');
+    createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
     return zipAsPromise('build/starter/**/*', `tubi_starter_components_${minorBuildTag}.zip`, 'build/');
   });
 };
@@ -300,7 +300,6 @@ function buildRemote() {
   let build = new Promise((res, rej) => {
     mkdirp.sync(`${process.env.PWD}/build/remote/source`);
     mkdirp.sync(`${process.env.PWD}/build/remote/images`);
-    createManifest(options, 'build/remote/manifest', 'component_library_manifest');
 
     // touch the main.brs, can be empty for remote components
     fs.closeSync(fs.openSync('build/remote/source/main.brs', 'w'));
@@ -320,18 +319,19 @@ function buildRemote() {
       '!src/channel/source/3rdparty/ComponentTestFramework.brs',
       '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs',
       '!src/channel/source/3rdparty/roku/UnitTestFramework.brs',
-      '!src/channel/source/tests/**'
+      '!src/channel/source/tests/**',
+      '!src/channel/source/Settings.brs'
     ];
 
     // don't include RALE files if config is not 'dev'
     if (options.config !== 'dev') {
       sources.push('!src/channel/components/controllers/TubiScene/TrackerTask.xml')
     }
-    
+
     // don't include SignUp Task if config is not 'qa'
     if (options.config !== 'qa') {
       sources.push('!src/channel/components/tasks/SignUpTask/**')
-    }    
+    }
 
     let srcOptions = {
       base: 'src/channel'
@@ -393,6 +393,7 @@ function buildRemote() {
   // zip up the remote components
   return build
   .then(() => {
+    createManifest(options, 'build/remote/manifest', 'component_library_manifest');
     return zipAsPromise('build/remote/**/*', `tubi_remote_components_${buildTag}.zip`, 'build/');
   });
 };
@@ -446,7 +447,7 @@ function sideLoad(done) {
   })
   .then(() => {
     log(`${options.config.toUpperCase()} channel launched.`)
-    
+
     if (options.telnet === 'sametab') {
       shell.exec(`telnet ${options.target} 8085`,{async: true});
     }
@@ -548,7 +549,7 @@ function conditionalPackage(done) {
   };
 
   if (!configsNotPkgd[config] || settings.remoteComponentsExtension === 'pkg') {
-    return packageAll(done);  //informs gulp that task has completed by returnin a promise
+    return packageAll(done);  //informs gulp that task has completed by returning a promise
   } else {
     done();  //inform gulp that the task has completed.
   }
@@ -645,7 +646,7 @@ function pushStaging(done) {
   const s3RemoteComponentsPath = `s3://adrise-bryan-playground/roku-staging/components/tubi_remote_components_${buildTag}.pkg`
   const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
   const s3starterComponentsPath = `s3://adrise-bryan-playground/roku-staging/starter-components/tubi_starter_components_${minorBuildTag}.pkg`
-  
+
   let pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${s3RemoteComponentsPath}`);
   if (!pushResult.stderr) {
     pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${s3starterComponentsPath}`);

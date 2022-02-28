@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="ProgramGuide" extends="Group" >
   <script type="text/brightscript" uri="ProgramGuide.brs" />
   <script type="text/brightscript" uri="../../lib/EPGMixin.brs" />
@@ -10,7 +10,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/tubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -22,7 +22,7 @@
     <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
 
     <!-- Set the ID that the TimeGrid should jump to when displayed on the linear TV video player. Second element in the array is not used in case of EPG -->
-    <field id="jumpToLinearChannelID" type="array" alwaysNotify="true"/> 
+    <field id="jumpToLinearChannelID" type="array" alwaysNotify="true"/>
 
     <!--Select the TimeGrid mode. These values are available in constants 'EPGChannelPlayMode'
         1: playItemOnSelect: update the channel that should be playing based on the item being selected
@@ -55,13 +55,13 @@
 
     <!--Since linearChannelFocused will get updated everytime minsLeftTimer is run, to protect unwanted trigging of observer, this field is used-->
     <field id="linearChannelFocusedUpdated" type="boolean"  alwaysNotify="true"/>
-        
+
     <!-- present the ready node to play -->
     <field id="linearChannelToPlay" type="node" />
 
     <!--Since LinearChannelToPlay will get updated everytime minsLeftTimer is run, to protect unwanted trigging of observer, this field is used-->
     <field id="linearChannelToPlayUpdated" type="boolean" alwaysNotify="true"/>
-       
+
     <!--this field will be used to move the channelGrid when program grid moves-->
     <field id="currFocusRow" alias="ProgramGrid.currFocusRow" />
 
@@ -92,7 +92,7 @@
       height="558"
       uri="pkg:/images/epgBackgroud.png"/>
 
-    <LayoutGroup 
+    <LayoutGroup
       id="backToLive"
       layoutDirection="horiz"
       translation="[12,0]"
@@ -129,7 +129,7 @@
       id="headerText"
       translation="[0,51]"
       height="36"
-      width="1000" 
+      width="1000"
       horizAlign="left"
       vertAlign="center"
       color="0xFFFFFFFF"

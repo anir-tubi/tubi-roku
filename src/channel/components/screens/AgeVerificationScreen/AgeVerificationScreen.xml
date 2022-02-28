@@ -1,51 +1,49 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
  - Age verification screen allows user to enter a birthdate to confirm their age.
- - Age calculation and confirmation happens on the backend and is handled by 
+ - Age calculation and confirmation happens on the backend and is handled by
  - AgeVerificationHelpers.brs
  -->
 <component name="AgeVerificationScreen" extends="BaseScreen">
 
   <script type="text/brightscript" uri="AgeVerificationScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  
+
   <interface>
 
     <!-- INPUT -->
 
-      <!-- signInInfo field possible values are below 
-      
+      <!-- signInInfo field possible values are below
+
         case 1 : signInInfo will have below keys when user signs in, but the user does not have a valid age associated with their account yet.
-          eg. 
-            {  
+          eg.
+            {
               email : "test@tubi.tv",
               firstName : "test"
-            ) 
+            )
 
         case 2:  signInInfo will have below keys when user signs up
-          eg. 
-            {  
-              email : "test@tubi.tv", 
-              firstName : "test", 
+          eg.
+            {
+              email : "test@tubi.tv",
+              firstName : "test",
               emailType : "manual/pre_fill"
             )
 
         case 3: signInInfo will have below keys when signedIn user launches app and does not have a valid age associated with their account yet.
-          eg. 
-            {  
+          eg.
+            {
               email : "test@tubi.tv",
               firstName : "test"
-            ) 
+            )
             -->
       <field id="signInInfo" type="assocarray"/>
-  
+
     <!-- OUTPUT -->
-    
+
       <!-- event that occurs when a user selects the Start Watching button -->
       <field id="ageSubmitted" type="boolean" alias="AgeVerificationStartButton.selected"/>
-    
+
       <!-- event that occurs when a user selects the back button -->
       <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
 
@@ -85,7 +83,7 @@
       id="AgeVerificationNumberPadGroup"
       translation="[126,375]">
       <NumberPad
-        id="AgeVerificationNumberPad"        
+        id="AgeVerificationNumberPad"
         />
       <SimpleButton
         translation="[0,434]"
@@ -192,6 +190,6 @@
         role="font"
         uri="pkg:/fonts/Vaud-Medium.ttf"
         size="25" />
-    </Label>    
+    </Label>
   </children>
 </component>

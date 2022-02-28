@@ -4,7 +4,6 @@
   <script type="text/brightscript" uri="SearchScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
@@ -23,7 +22,7 @@
 
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean" alwaysNotify="true"/>
-      
+
       <!-- Change the UI based on the value of this field. -->
       <field id="kidsModeEnabled" value="false" type="boolean"/>
 
@@ -40,7 +39,7 @@
       <!-- The current text that the user has entered to search -->
       <field id="searchText" type="string" value="" alwaysNotify="true" />
   </interface>
-  
+
   <children>
     <Group id="nav">
       <LayoutGroup
@@ -79,17 +78,17 @@
           itemSpacings="[16]"
           horizAlignment="left"
           vertAlignment="top">
-        
+
 
         <LayoutGroup
           id="kidsModeGroup"
           layoutDirection="horiz">
           <!--KidsModeMessageSpacer used to position the kids-mode text so it left aligns with the keyboard-->
-          <Rectangle 
+          <Rectangle
             id="KidsModeMessageSpacer"
             visible="false"
             width="20"
-            height="1"/>  
+            height="1"/>
           <Label
             id="KidsModeMessage"
             vertAlign="bottom"
@@ -97,14 +96,14 @@
             height="50">
               <Font
                 role="font"
-                uri="pkg:/fonts/Vaud-SemiBold.ttf"     
+                uri="pkg:/fonts/Vaud-SemiBold.ttf"
                 size="27"/>
           </Label>
         </LayoutGroup>
 
       </LayoutGroup>
       <!-- Live text entry box with a non-blinking "cursor" -->
-      <Label  
+      <Label
         id="SearchText"
         vertAlign="center"
         width="1114"
@@ -112,7 +111,7 @@
         <Font
         id="SearchTextFont"
         role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"     
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="43"/>
       </Label>
     </LayoutGroup>
@@ -142,8 +141,8 @@
         </Label>
       </LayoutGroup>
    </LayoutGroup>
-    
-    <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus, 
+
+    <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus,
     the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
     <Group
       translation="[843, 240]"
@@ -151,9 +150,9 @@
       <MarkupGrid
         id="ResultGrid"
         itemComponentName="CategoryGridPoster"
-        itemSize="[198,282]" 
+        itemSize="[198,282]"
         itemSpacing="[12,12]"
-        numRows="3"   
+        numRows="3"
         numColumns="5"
         fadeFocusFeedbackWhenAutoScrolling="true"
         vertFocusAnimationStyle="fixedFocus"

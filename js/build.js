@@ -1,12 +1,8 @@
 'use strict';
 
-const bluebird = require('bluebird');
-const { load, getBuildTag } = require('./config');
+const { load } = require('./config');
 const fs = require('fs');
-const path = require('path');
 const log = require('fancy-log');
-
-bluebird.promisifyAll(fs);
 
 /**
  * generate manifest file based on the manifest section
@@ -16,26 +12,19 @@ bluebird.promisifyAll(fs);
  * @param manifestName
  */
 function createManifest(options, filename, manifestName) {
-  fs.openAsync(filename, 'w').then(fd => {
-    const data = load(options)[manifestName];
-
-    // reduce the array so as to not include manifest keys that don't have a value.
-    // This can happen if no bs_consts are defined.
-    var content = Object.keys(data).reduce((accumulatedValue, key) => {
-      if (data[key]) {
-        accumulatedValue.push(`${key}=${data[key]}`);
-        return accumulatedValue;
-      } else {
-        return accumulatedValue;
-      }
-    }, []).join('\n');
-
-    return fs.writeAsync(fd, content);
-  }).then(() => {
-    log(`Generated the file ${filename}`);
-  }).catch(err => {
-    console.log(err);
-  })
+  const data = load(options)[manifestName];
+  // reduce the array so as to not include manifest keys that don't have a value.
+  // This can happen if no bs_consts are defined.
+  var content = Object.keys(data).reduce((accumulatedValue, key) => {
+    if (data[key]) {
+      accumulatedValue.push(`${key}=${data[key]}`);
+      return accumulatedValue;
+    } else {
+      return accumulatedValue;
+    }
+  }, []).join('\n');
+  fs.writeFileSync(filename, content);
+  log(`Generated the file: ${filename}.`);
 }
 
 
@@ -60,16 +49,9 @@ function createManifest(options, filename, manifestName) {
  */
 function createSettings(options, filename) {
   const data = load(options);
-  fs.openAsync(filename, 'w').then(fd => {
-    const functions = Object
-        .keys(data)
-        .map(key => genConfigFunction(key, data[key]));
-    return fs.writeAsync(fd, functions.join('\n'));
-  }).then(() => {
-    log('Generated the file: %s.', filename);
-  }).catch(err => {
-    console.log(err);
-  });
+  const functions = Object.keys(data).map(key => genConfigFunction(key, data[key]));
+  fs.writeFileSync(filename, functions.join('\n'));
+  log(`Generated the file: ${filename}.`);
 }
 
 

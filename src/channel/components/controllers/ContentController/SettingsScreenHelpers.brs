@@ -1,5 +1,5 @@
 '@sFocusID : string, the item which will be opened in settings screen
-'@screenLevel : integer, this helps for screen hierarchy when pushing the screen in stack 
+'@screenLevel : integer, this helps for screen hierarchy when pushing the screen in stack
 '@sPageSource : string, this helps from where settings screen page is called
 Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   tubiLog("SettingsScreenHelpers.showSettingsScreen")
@@ -16,13 +16,13 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.observeFieldScoped("backgroundUriList", "onSettingsBackgroundChange")
   m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
-  
+
   if screenLevel <> 0
     m.settingsScreen.screenLevel = screenLevel
   end if
 
   pushScreen(m.settingsScreen, true, true)
-  
+
   if sFocusID <> ""
     '//If a particular settings button should be in focus
     m.settingsScreen.itemRequested = sFocusID
@@ -33,7 +33,7 @@ End Function
 Function getRatingStrings(nRatingIndex)
   sRatingsReturn = ""
   countryCode = m.constants.deviceInfo.countryCode
-  
+
   aRatings = m.constants.ui.ratings[countryCode]
 
   if aRatings = invalid
@@ -43,7 +43,7 @@ Function getRatingStrings(nRatingIndex)
   if aRatings <> invalid and aRatings[nRatingIndex] <> invalid
     sRatingsReturn = aRatings[nRatingIndex]
   end if
-  return sRatingsReturn 
+  return sRatingsReturn
 End Function
 
 
@@ -63,7 +63,7 @@ Function setSettingsScreenSignInInfo()
     else
       sName = authInfo.name
     end if
-    
+
     aaSignIn.name = sName
   end if
 
@@ -264,10 +264,10 @@ Function refreshScreenAfterParentalChanges()
     fetchHomescreen(homescreen)
   end if
 
-  setContentToRefresh(m.constants.ui.screenIds.tvScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.movieScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.espanolScreen) 
-  setContentToRefresh(m.constants.ui.screenIds.channelListScreen) 
+  setContentToRefresh(m.constants.ui.screenIds.tvScreen)
+  setContentToRefresh(m.constants.ui.screenIds.movieScreen)
+  setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
+  setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
 
@@ -362,9 +362,8 @@ Function onParentalSettingComplete(msg)
     else if m.global.authInfo.secondsOfSavedPassword <> invalid and m.global.authInfo.secondsOfSavedPassword > 0
       '//if not showing ConfirmPasswordScreen and showing parentalControls panel AND this came from a saved password,
       '//   then display the ConfirmPasswordScreen instead of error message
-      msgParentalControls = m.settingsScreen.parentalSettingSelected
       setAuthInfoValue("secondsOfSavedPassword", 0)
-      onParentalSettingSelected(msgParentalControls)
+      onParentalSettingSelected()
     end if
   end if
 End Function
@@ -373,7 +372,7 @@ End Function
 Function onShowDeviceModal()
 
   tubiLog("AboutScreen.showFullDeviceId")
-  
+
   deviceId = m.constants.deviceInfo.deviceId
   pageInfo = m.settingsScreen.trackingPageInfo
   dialogEvent = {
@@ -384,8 +383,8 @@ Function onShowDeviceModal()
     dialog_action: "SHOW"
     dialog_sub_type: "device-id"
     }
-  }  
-  showInfoModal(getTranslation("screenSettings_fullDeviceID"), deviceId, dialogEvent, m.trackingLoggingTask)    
+  }
+  showInfoModal(getTranslation("screenSettings_fullDeviceID"), deviceId, dialogEvent, m.trackingLoggingTask)
 
 End Function
 

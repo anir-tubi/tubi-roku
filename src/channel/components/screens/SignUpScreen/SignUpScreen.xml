@@ -7,38 +7,36 @@
   <script type="text/brightscript" uri="SignUpScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs"/>
   <script type="text/brightscript" uri="../ModalDialogs.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  
+
   <interface>
-  
+
     <!-- INPUT -->
-    
+
       <!-- roku account's email address  -->
       <field id="username" type="string" alias="email.text"/>
-      
+
       <!-- retrySignUp will be triggered when user selects TryAgain from SignUp failure modal  -->
-      <field id="retrySignUp" type="boolean" alwaysNotify="true"/>      
+      <field id="retrySignUp" type="boolean" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
-    
+
       <!-- signUpSelected is triggered when user selects continue button, which redirects to HomeScreen/DetailScreen -->
       <field id="signUpSelected" type="assocarray" alwaysNotify="true"/>
-    
+
       <!-- signInSelected is set to true when user selects signIn button, which redirects to Activation Screen -->
       <field id="signInSelected" type="boolean" alwaysNotify="true"/>
-      
+
       <!-- staticPageSelected is triggered when user selects ToS/PP/DoNotSell button, which redirects to Settings Page -->
       <field id="staticPageSelected" type="String" alwaysNotify="true"/>
-      
+
   </interface>
 
   <children>
 
-    <LayoutGroup 
+    <LayoutGroup
       id="signUpLayout"
       translation="[0, 155]"
       layoutDirection="vert"
@@ -67,7 +65,7 @@
           size="33"/>
       </Label>
 
-      <Group 
+      <Group
         translation="[645,0]">
         <Rectangle
           id="emailBackground"
@@ -109,7 +107,7 @@
           translation="[0, 18]"
           visible="false"
           uri="pkg:/images/checkmark_circle.png"/>
-      </LayoutGroup>    
+      </LayoutGroup>
 
       <Label
         id="passwordValidationMsg"
@@ -128,7 +126,7 @@
         color="0x9699A3"
         width="408"/>
 
-      <LayoutGroup 
+      <LayoutGroup
         id="existingAccLayout"
         layoutDirection="horiz"
         vertAlignment="custom"
@@ -148,10 +146,10 @@
           id="signInBtn"
           color="0x9699A3"
           translation="[0,-30]"/>
-        
+
       </LayoutGroup>
-      
-      <ButtonGroup 
+
+      <ButtonGroup
         id="staticPageLinkGroup"
         layoutDirection="horiz"
         horizAlignment="center"
@@ -172,14 +170,14 @@
         <SimpleButton
           id="donotsellMyInfoBtn"
           color="0x10141F"
-          unfocusedBackgroundOpacity="0"/>           
+          unfocusedBackgroundOpacity="0"/>
 
-      </ButtonGroup>                    
+      </ButtonGroup>
 
     </LayoutGroup>
 
-    <Group 
-      id="keyboardGrp" 
+    <Group
+      id="keyboardGrp"
       translation="[0,1080]">
 
       <Rectangle
@@ -188,17 +186,17 @@
         width="1920"
         height="600"/>
 
-      <LayoutGroup 
+      <LayoutGroup
         layoutDirection="vert"
         horizAlignment="custom"
         vertAlignment="custom"
         translation="[250, 20]"
         itemSpacings="[20]">
 
-        <Keyboard 
+        <Keyboard
           id="Keyboard"/>
 
-            <ButtonGroup 
+            <ButtonGroup
               id="buttonGroup"
               layoutDirection="horiz"
               itemSpacings="[35]"

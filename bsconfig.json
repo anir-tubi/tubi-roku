@@ -1,0 +1,20 @@
+{
+	"rootDir": "./src/channel",
+	"files": [
+		"manifest",
+		"source/**/*.*",
+		"components/**/*.*",
+		"images/**/*.*",
+		"locale/**/*.*",
+		"fonts/**/*.*",
+		"!source/tests/rooibos/rooibosDist.brs",
+		"!components/controllers/TubiScene/TrackerTask.xml",
+		"!components/tests/**/*.*"
+	],
+	"diagnosticFilters": [{
+		"codes": [1104]
+	}, {
+		"codes": [1013],
+		"src": "components/lib/DevGridOverlay.brs"
+	}]
+}

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="LinearVideoPlayerNewScreen" extends="BaseScreen" >
   <script type="text/brightscript" uri="LinearVideoPlayerNewScreen.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
@@ -11,13 +11,12 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
 
 
   <interface>
-  
+
     <!-- INPUT -->
       <!-- Alias fields for the video node -->
       <field id="position" alias="VideoNode.position"/>
@@ -44,7 +43,7 @@
 
       <!-- When the screen asks for timegrid content for a particular channel, then the response will be set to this field. -->
       <field id="channelTimeGridContent" type="node" alwaysNotify="true"/>
-      
+
 
       <!-- content that is used to display a channel guide overliad the video player -->
       <field id="channelsContent" type="node"/>
@@ -63,7 +62,7 @@
 
       <!-- supports "play", "stop", "pause", "resume", "error" -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>
-      
+
       <!-- interval in seconds for sending position data to the tracking server -->
       <field id="analyticsInterval" type="integer" value="0"/>
 
@@ -102,7 +101,7 @@
 
       <!-- Used to store the loading state. It should not be used as an observed field. -->
       <field id="loading" type="boolean" value="false"/>
-      
+
       <!--When the user selects a new channel from the channel guide, this field is set-->
       <field id="channelSelected" type="node"/>
 
@@ -113,7 +112,7 @@
       <field id="errorMsg" type="string" />
 
       <!-- Error message as told by the video node  -->
-      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />   
+      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />
 
       <!-- Error code as told by the video node  -->
       <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
@@ -164,7 +163,7 @@
         color="0x000000FF"
         width="1920"
         height="1080"/>
-      
+
       <Label
         id="LoadingMessage"
         height="64"
@@ -185,9 +184,9 @@
         translation="[584,696]"/>
     </Group>
 
-    <LinearVideoPlayerNewScreenOverlay 
+    <LinearVideoPlayerNewScreenOverlay
       id="VideoOverlay"/>
-    
+
 
     <AdsSSAITask
       id="PlayerAdsSSAITask" />

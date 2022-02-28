@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="VideoPlayerScreen" extends="BaseScreen" >
   <script type="text/brightscript" uri="VideoPlayerScreen.brs" />
   <script type="text/brightscript" uri="VideoTransportHandling.brs" />
@@ -13,10 +13,9 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
-  
+
     <!-- INPUT -->
       <!-- Alias fields for the video node -->
       <field id="position" alias="VideoNode.position"/>
@@ -33,7 +32,7 @@
 
       <!-- Only support "play" and "stop" for simple external interface -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>
-      
+
       <!-- interval in seconds for sending position data to the tracking server -->
       <field id="analyticsInterval" type="integer" value="0"/>
 
@@ -99,12 +98,12 @@
 
       <!-- Set to true if the "go to end" button was pressed on the transport,
            acts as an event and holds state, so must be reset -->
-      <field id="goToNext" type="boolean" value="false" alwaysNotify="true" />    
+      <field id="goToNext" type="boolean" value="false" alwaysNotify="true" />
 
       <field id="state" type="string" />
-      
+
       <!-- Video position for updates to history. This is only updated at historyFrequency interval -->
-      <field id="historyPosition" type="integer" value="0" /> 
+      <field id="historyPosition" type="integer" value="0" />
 
       <!-- field for communicating playback position to the ad shim -->
       <field id="adPosition" type="int" />
@@ -115,7 +114,7 @@
       <field id="errorMsg" type="string" />
 
       <!-- Error message as told by the video node  -->
-      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />   
+      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />
 
       <!-- Error code as told by the video node  -->
       <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
@@ -130,7 +129,7 @@
 
       <!-- Autoplay this content when this field is set -->
       <field id="upNextContentToAutoplay" type="node" />
-      
+
       <!-- streamingSegment will be set when streamingSegment of videoNode value changes -->
       <field id="segInfo" type="assocarray"/>
 
@@ -293,7 +292,7 @@
       id="HUD"
       visible="true"
       opacity="0.0" >
-      
+
       <SpritePoster
         id="Thumbnail"
         width="342"
@@ -303,7 +302,7 @@
       <Group
         id="Transport"
         opacity="1.0">
-      
+
         <TubiProgressBar
           id="ProgressBar"
           width="1752"
@@ -452,13 +451,13 @@
         width="1164"
         height="390"
         translation="[0,0]"
-        uri="pkg:/images/rating_gradient.png"/> 
+        uri="pkg:/images/rating_gradient.png"/>
       <Rectangle
         id="ratingBar"
         translation="[126,55]"
         color="0xFD4C1D"
         width="3"
-        height="87"/> 
+        height="87"/>
       <LayoutGroup
         id="ratingLayout"
         layoutDirection="horiz"
@@ -471,7 +470,7 @@
             role="font"
             uri="pkg:/fonts/Vaud-Bold.ttf"
             size="22" />
-        </Label>       
+        </Label>
         <Group
           id="ratingGroup">
           <Poster
@@ -487,7 +486,7 @@
             color="0xFFFFFFFF"
             numLines="1"
             wrap="false"
-            translation="[0,3]" 
+            translation="[0,3]"
             horizAlign="center"
             vertAlign="center">
             <Font
@@ -520,7 +519,7 @@
     <UpNext
       id="UpNext"
       opacity="0.0" />
-    
+
     <!-- RAF needs a parent group with no other elements, otherwise it will use
       - the Group dimensions set by the other children and not scale appropriately.
       -->
@@ -534,7 +533,7 @@
       id="ScrubTimer"
       duration="0.25"
       repeat="true" />
-      
+
     <Timer
       id="ratingOverlayTimer"
       duration="15"
@@ -543,7 +542,7 @@
     <Timer
       id="screenTime"
       duration="5"
-      repeat="true" />     
+      repeat="true" />
 
   </children>
 </component>

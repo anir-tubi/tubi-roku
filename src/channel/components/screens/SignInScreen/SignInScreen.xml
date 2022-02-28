@@ -7,37 +7,35 @@
   <script type="text/brightscript" uri="SignInScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs"/>
   <script type="text/brightscript" uri="../ModalDialogs.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  
+
   <interface>
     <!-- INPUT -->
-    
-      <!-- roku account's email address  -->      
+
+      <!-- roku account's email address  -->
       <field id="username" type="string" alias="email.text"/>
-      
+
       <!-- resetFocus will be triggered when user selects back/re-enter password from Invalid Password modal  -->
       <field id="resetFocus" type="boolean" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
-    
+
       <!-- signInSelected is set to true when user selects signIn button, which redirects to Home Screen / Detail Screen -->
       <field id="signInSelected" type="assocarray"/>
-      
+
       <!-- staticPageSelected is triggered when user selects ToS/PP/DoNotSell button, which redirects to Settings Page -->
       <field id="staticPageSelected" type="String" alwaysNotify="true"/>
 
       <!-- emailSelected is triggered when user selects email text box, which redirects to EmailEntry screen to enter different email -->
       <field id="emailSelected" type="boolean" alias="email.selected"/>
-      
+
   </interface>
 
   <children>
 
-    <LayoutGroup 
+    <LayoutGroup
       id="signUpLayout"
       translation="[0, 140]"
       layoutDirection="vert"
@@ -64,7 +62,7 @@
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="30" />
-      </Label>  
+      </Label>
 
       <TextEntryBox
         id="email"
@@ -78,7 +76,7 @@
         boxHeight="84"
         translation="[643,0]"
         passwordMode="true"/>
-        
+
       <Label
         id="passwordValidationMsg"
         translation="[670,0]"
@@ -89,21 +87,21 @@
           uri="pkg:/fonts/Vaud-SemiBold.ttf"
           size="27" />
       </Label>
-      
+
       <SimpleButton
         translation="[756,0]"
         id="continueBtn"
         color="0x9699A3"
         width="408"/>
-      
-      <LayoutGroup 
+
+      <LayoutGroup
         id="existingAccLayout"
         layoutDirection="horiz"
         horizAlignment="center"
         vertAlignment="center"
         translation="[960,0]"
         itemSpacings="[12]">
-        
+
         <Label
           id="newPasswordLabel"
           color="#FFFFFF">
@@ -112,7 +110,7 @@
             uri="pkg:/fonts/Vaud-Medium.ttf"
             size="27" />
         </Label>
-        
+
         <Label
           id="newPasswordLink"
           color="#FFFFFF">
@@ -121,10 +119,10 @@
             uri="pkg:/fonts/Vaud-Medium.ttf"
             size="27" />
         </Label>
-        
+
       </LayoutGroup>
-      
-      <ButtonGroup 
+
+      <ButtonGroup
         id="staticPageLinkGroup"
         layoutDirection="horiz"
         horizAlignment="center"
@@ -136,22 +134,22 @@
           id="termsBtn"
           color="0x10141F"
           unfocusedBackgroundOpacity="0"/>
-          
+
         <SimpleButton
           id="ppBtn"
           color="0x10141F"
           unfocusedBackgroundOpacity="0"/>
-          
+
         <SimpleButton
           id="donotsellMyInfoBtn"
           color="0x10141F"
-          unfocusedBackgroundOpacity="0"/>            
-        
-      </ButtonGroup>                    
+          unfocusedBackgroundOpacity="0"/>
+
+      </ButtonGroup>
 
     </LayoutGroup>
 
-        <PasswordEntryKeyboard 
+        <PasswordEntryKeyboard
           id="passwordEntryKeyboard"
           translation="[0,1080]"/>
 

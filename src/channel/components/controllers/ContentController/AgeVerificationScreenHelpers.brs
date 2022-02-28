@@ -103,7 +103,7 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
 
     if signInInfo.automation = true or mode = "qa"
       password = "111111" 'this password will be used during automation signup or when api is pointed to staging
-    else  
+    else
       password = right(deviceInfo.GetRandomUUID(), 12) ' taking only 12 characters from right since GetRandomUUID() length is more
     end if
 
@@ -114,7 +114,7 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
 
     options = {}
     options.body = {
-      platform: m.constants.platform  
+      platform: m.constants.platform
       device_id: m.constants.deviceInfo.deviceId
       credentials: {
         email: signInInfo.email
@@ -127,7 +127,7 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
         used_email_as_first_name: usedEmailAsFirstName
       }
     }
-    
+
     requestInfo = m.userDeviceApi.signUpReqInfo(options)
     m.makeRequest({
       url: requestInfo.url
@@ -183,7 +183,7 @@ Function onAgeNotVerifiedAtSignIn(err)
     else
       handleNetworkError(err, verifyAgeAtSignIn, startUserExperienceAsAgeNotVerified) ' happens when ther is network failure or some backend issue
     end if
-  end if  
+  end if
 End Function
 
 
@@ -207,7 +207,7 @@ Function onAgeNotVerifiedAtSignup(err)
     else
       handleNetworkErrorOnSignUp(err) ' happens when ther is network failure or some backend issue
     end if
-  end if  
+  end if
 End Function
 
 
@@ -216,7 +216,7 @@ End Function
 Function handleNetworkError(err, tryAgainCallback, cancelCallback)
 
   birthdate = ""
-  if err.requestNode <> invalid and err.requestNode.input <> invalid 
+  if err.requestNode <> invalid and err.requestNode.input <> invalid
     inputData = err.requestNode.input
     if inputData.birthdate <> invalid
       birthdate = inputData.birthdate
@@ -242,7 +242,7 @@ Function handleNetworkError(err, tryAgainCallback, cancelCallback)
 
   buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
   showErrorModal(modalInfo, tryAgainCallback, birthdate, cancelCallback, invalid, buttons)
-  
+
 End Function
 
 
@@ -253,7 +253,7 @@ Function handleNetworkErrorOnSignUp(err)
   signInInfo = {}
   birthdate = ""
 
-  if err.requestNode <> invalid and err.requestNode.input <> invalid 
+  if err.requestNode <> invalid and err.requestNode.input <> invalid
     inputData = err.requestNode.input
     if inputData.signInInfo <> invalid
       signInInfo = inputData.signInInfo
@@ -339,7 +339,7 @@ Function handle_403_error()
 
   m.trackingLoggingTask.trackEvent = accountEvent
 
-  popScreen(false, false) ' removing ageGate screen as user has to enter valid email 
+  popScreen(false, false) ' removing ageGate screen as user has to enter valid email
 
   currentScreen = getCurrentScreen()
   dialogEvent = {
@@ -407,7 +407,7 @@ Function onAgeSubmitted(msg, verifyAgeCallback)
     verifyAgeCallback(birthdate)
   else
     ' not expected to ever happen, so punt and start the app normally if it does
-    startUserExperienceAsAgeNotVerified()  
+    startUserExperienceAsAgeNotVerified()
   end if
 
 End Function
@@ -443,10 +443,10 @@ End Function
 
 
 ' @birthdate: string, birthdate with format "YYYY-MM-DD"
-' @signInInfo: assocarray, it contains email(String), firstname(String), signedIn(boolean), emailType(String) 
+' @signInInfo: assocarray, it contains email(String), firstname(String), signedIn(boolean), emailType(String)
 '
 ' returns: boolean
-'  
+'
 Function hasValidSignUpCredentials(birthdate, signInInfo)
 
   isValid = false
@@ -519,7 +519,7 @@ End Function
 
 Function onBirthdayCheckSuccess(hasAgeInfo)
   tubiLog("AgeVerificationScreenHelpers.onBirthdayCheckSuccess")
-  
+
   if hasAgeInfo <> invalid and hasAgeInfo.hasAge = true
     Request = TubiRequest(m.constants.settings)
     Auth = TubiAuth(m.constants, Request)
@@ -566,7 +566,7 @@ Function onBirthdayCheckError(errorInfo)
       Auth.logout()
       m.global.authInfo = invalid
 
-      userErrorCode = getUserFacingErrorCode(12.toStr(), 100.toStr(), code.toStr())
+      userErrorCode = getUserFacingErrorCode("12", "100", code.toStr())
       message = getTranslation("error_check_birthdate_description")
 
       ' there is no screen on the stack at this point, but the dialog event requires a screen,

@@ -49,7 +49,7 @@ Function TubiLogger(constants, request, auth)
           videoBuffer: "VIDEO:BUFFER"
         }
       }
-    }     
+    }
 
     'public methods
     debug: tubiLog_debug
@@ -109,19 +109,19 @@ end function
 
 function tubiLog_info(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
   logInfo = m.buildLogInfo(message, m.logConsts.info.serverType[serverTypeName], subtype, m.logConsts.info.name)
-  m.sendLogging(logInfo, queue)  
+  m.sendLogging(logInfo, queue)
 end function
 
 
 function tubiLog_error(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
   logInfo = m.buildLogInfo(message, m.logConsts.error.serverType[serverTypeName], subtype, m.logConsts.error.name)
-  m.sendLogging(logInfo, queue)  
+  m.sendLogging(logInfo, queue)
 end function
 
 
 function tubiLog_warn(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
   logInfo = m.buildLogInfo(message, m.logConsts.warn.serverType[serverTypeName], subtype, m.logConsts.warn.name)
-  m.sendLogging(logInfo, queue)  
+  m.sendLogging(logInfo, queue)
 end function
 
 function tubiLog_exception(level as string, message as Object) as Void
@@ -178,7 +178,7 @@ function tubiLog_sendLogging_(logInfo as Object, queue as Object)
     if logInfo.message <> "" and m.constants <> invalid
 
       ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
-#if consoleLoggingEnabled
+#if consoleLoggingEnabled 'bs:disable-line 1090
         print m.getLogPrintout(logInfo.level, logInfo.subtype, logInfo.message)
 #end if
 
@@ -187,7 +187,7 @@ function tubiLog_sendLogging_(logInfo as Object, queue as Object)
         if m.constants.idsToLog.DoesExist(m.constants.deviceInfo.deviceId) or logInfo.level = m.logConsts.warn.name or logInfo.level = m.logConsts.error.name or logInfo.level = m.logConsts.info.name
           loggingRequest = m.getLoggingRequest(logInfo)
           return queue.pushRequest(loggingRequest)
-        end if 
+        end if
       end if
     end if
   end if
@@ -222,7 +222,7 @@ Function tubiLog_getLoggingRequest_(logInfo as Object) as Object
   url = m.constants.urls.datascience.logging
 
   loggingRequest = m.request.createAsync(url, "scenegraphLog " + logInfo.level, reqOptions)
-  
+
   return loggingRequest
 End Function
 
@@ -238,7 +238,7 @@ Function tubiLog_getLogPrintout_(level="" as String, subtype="" as String, messa
     info: "INFO"
     warn: "WARN"
   }
-  
+
   printout = "LOG "
 
   if level <> "" and printLevel[level] <> invalid
@@ -280,7 +280,7 @@ End Function
 Function tubiLog_helper(logType, message="" as Dynamic, level="debug" as String, serverTypeName="" as String, subtype="" as String) as Void
   if message <> invalid and message <> ""
 
-#if consoleLoggingEnabled 
+#if consoleLoggingEnabled 'bs:disable-line 1090
       print tubiLog_getLogPrintout_(level, subtype, message)
 #end if
 
