@@ -222,6 +222,7 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
   params["is_kids_mode"] = bKidsMode
   params["include_channels"] = true
   params["cursor"] = 0
+  params["include_sponsorships"] = true
   params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
 
   if passedOptions.params <> invalid
