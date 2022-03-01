@@ -138,7 +138,7 @@ Function generalTask_constructRequestNode(reqInfo = {})
   requestNode.id = randomId
 
   successResponseType = reqInfo.responseType
-  if reqInfo.successCallback = invalid
+  if successResponseType = invalid
     successResponseType = "assocarray"
   end if
 

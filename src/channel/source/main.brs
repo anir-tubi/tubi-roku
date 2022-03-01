@@ -54,6 +54,7 @@ Function runChannel(constants, log, request)
 
   ' start the scene graph UI
   tubiScene = screen.CreateScene("TubiScene")
+  tubiScene.allowBackgroundTask = true
   sgGlobal = screen.getGlobalNode()
   sgGlobal.addField("constants", "assocarray", false)
   sgGlobal.addField("theme", "assocarray", false)

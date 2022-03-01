@@ -420,6 +420,22 @@ End Function
 '
 ' handles the response of a user who has been presented an exit app modal
 Function onExitAppModalButtonSelected()
+  sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionEnd, invalid, setExitAppWrapper, setExitAppWrapper)
+End Function
+
+
+' setExitWrapper wraps setExitApp() and is used when the app should close after some call to
+' the m.makeRequest() has completed (like sending an end session ping to Nielsen).
+' The @response param is not used but will be set by the generalTaskModule,
+' and as such is necessary.
+'
+' @response: string or assocArray, string if request was succesful, AA if request errored.
+Function setExitAppWrapper(response)
+  setExitApp()
+End Function
+
+
+Function setExitApp()
   m.top.exitApp = true
 End Function
 
@@ -1836,7 +1852,9 @@ End Function
 '
 ' @pingType: string, one of the following "start_session", "start_stream", "end_session", "end_stream"
 ' @content: roSGNode, a content node with an id. Only required when pingType = "start_stream" or "end_stream"
-Function sendNielsenPing(pingType, content = invalid)
+' @successCallback: roFunction, a callback to run after getting a successful network response
+' @errorCallback: roFunction, a callback to run after getting an error network response
+Function sendNielsenPing(pingType, content = invalid, successCallback = invalid, errorCallback = invalid)
   Auth = TubiAuth(m.constants, m.Request)
   adLib = TubiAdsLimited(m.constants, Auth)
   nielsenReqInfo = adLib.getNielsenPingRequestInfo(m.constants, pingType, content)
@@ -1845,6 +1863,8 @@ Function sendNielsenPing(pingType, content = invalid)
     url: nielsenReqInfo.url
     requestType: m.constants.reqNames.generic
     options: nielsenReqInfo.options
+    successCallback: successCallback
+    errorCallback: errorCallback
     silenceCallbackWarnings: true
     responseType: "string"
     retries: 0
