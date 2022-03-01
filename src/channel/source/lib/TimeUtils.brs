@@ -23,12 +23,12 @@ End Function
 
 '******************************************************
 ' This functions converts the seconds into mins.
-' function returns Integer part of result. For exmaple : 60 to 119 seconds will return 1
-' return value is casted to roku intrinsic type 'Integer' which returns the integer part of the number which might not be same as Int()
+' The function returns the given number of seconds converted to minutes rounded up to the nearest minute.
+' For example, passing in 12 would return 1. Passing in 119 would return 2.
 ' @param seconds : integer
 '******************************************************
 Function convertSecondsToMins(seconds As Integer) As Integer 
-    mins = fix(seconds / 60)
-    return mins
+    mins = (seconds / 60) + 1
+    return fix(mins)
 End Function
 

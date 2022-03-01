@@ -36,20 +36,20 @@ Function timeUtils_convertSecondsToMins_test()
   mins = CreateObject("roInt") ' Interface equivalent for intrinsic type 'Integer' which is the return type of function
   mins.setInt(90 / 60)
   totalmins = convertSecondsToMins(90)
-  m.AssertEqual(mins,totalmins)
+  m.AssertEqual(mins+1,totalmins)
 
   mins.setInt(0)
   totalmins = convertSecondsToMins(0)
-  m.AssertEqual(mins, totalmins)
+  m.AssertEqual(mins+1, totalmins)
 
   mins.setInt(123456789 / 60)
   totalmins = convertSecondsToMins(123456789)
-  m.AssertEqual(mins,totalmins)
+  m.AssertEqual(mins+1, totalmins)
 
   
   mins.SetInt(-90/60)
   totalmins = convertSecondsToMins(-90)
-  m.AssertEqual(mins,totalmins)
+  m.AssertEqual(mins+1, totalmins)
    
   
 End Function
