@@ -20,6 +20,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     if videoPlayer = invalid
       if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", true).enabled = true
         videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerNewScreen")
+        videoPlayer.observeFieldScoped("navigateToEPGScreen", "onLinearVideoPlayerRequestingTVGuide")
         '//::TODO:: EPG - when the EPG experiment is graduated, then replace LinearVideoPlayerScreen with LinearVideoPlayerNewScreen: 1) get rid of LinearVideoPlayerScreen, and 2) rename LinearVideoPlayerNewScreen to LinearVideoPlayerScreen
       else
         videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
@@ -102,6 +103,42 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 End Function
 
 
+' The Linear Video Screen has indicated that the EPG Screen should be displayed now.
+Function onLinearVideoPlayerRequestingTVGuide()
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen and currentScreen.content <> invalid
+    if currentScreen.associatedScreenID = m.constants.ui.screenIds.epgScreen
+      '//If the previous screen was the EPGScreen then simply back out of the player using the following function
+      returnToPreviousScreenFromLinearVideo()
+    else
+      '//If the previous screen was not the EPG Screen, then load epg screen and jump to the current playing video
+      channelId = currentScreen.content.id
+
+      showDefaultEPGScreen()
+      epgScreen = getFromScreenCache(m.constants.ui.screenIds.epgScreen)
+      animateLinearVideoPlayerToMinState()
+      
+      cachedAllEPGChannels = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
+      isEPGDataPrecached = (cachedAllEPGChannels <> invalid and cachedAllEPGChannels.getChildCount() > 0 and shouldRefresh(cachedAllEPGChannels.getChild(0)) = false)
+      if isEPGDataPrecached = true
+        '//If the EPG data has not already been cached, then there is no need to try to jumpToRow now. This will happen once the data loads
+        epgScreen.jumpToRowItemByID = [channelId, ""]
+      end if
+
+      '//Focus side nav to EPG option
+      sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.epgScreen]
+      focusSideNavOption(sEPGSideNavID)
+      
+      '//Set EPGScreen background to ensure the epgScreen appears properly: i.e. background gradient is displayed, proper bground is displayed upon sideNav focus
+      m.backgroundGroup.backgroundInfo = {
+        type : m.constants.ui.backgroundTypes.epg
+        uriList : currentScreen.content.backgrounds
+      }
+    end if
+  end if
+End Function
+  
+  
 Function getUpdatedLinearVideoResources(content)
   auth = TubiAuth(m.constants, m.Request)
   adLib = TubiAdsLimited(m.constants, auth)

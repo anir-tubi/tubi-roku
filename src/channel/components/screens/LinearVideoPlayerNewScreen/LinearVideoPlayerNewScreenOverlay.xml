@@ -37,6 +37,9 @@
       <!-- The state of the overlay being visible or not. -->
       <field id="isDisplaying" type="boolean" value="false"/>
 
+      <!-- When this is called, then the helper should display the EPGScreen-->
+      <field id="navigateToEPGScreen" type="boolean" alwaysNotify="true"/>
+
       <!-- Is the content of the EPG component loading? -->
       <field id="timeGridContentLoadingIndicatorVisible" type="boolean" alias="EPGSpinner.visible" />
 

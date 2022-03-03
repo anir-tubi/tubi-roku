@@ -107,7 +107,8 @@ Function onSideNavSelectChange()
   if m.sideNav.selectedButtonID = m.constants.ui.linearSideNavIds.cc
     displayClosedCaptioningMenu()
   else if m.sideNav.selectedButtonID = m.constants.ui.linearSideNavIds.epg
-    goBackToEPGFromSideNav()
+    hideOverlay()
+    m.top.navigateToEPGScreen = true 
   end if
   m.top.reactedToKeyPresss = true
 End Function

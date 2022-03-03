@@ -434,8 +434,8 @@ End Function
 'This function will handle the minimized video player on EPG Screen
 ' refreshEPGScreenVideoPlay = true  - Close the Video player since EPGScreen/EPG component lost focus (sideNav or topNav)
 ' refreshEPGScreenVideoPlay = false, there are two possibilities 
-' 1) epgScreen returning back from full video screen. Keep the video as it is.
-' 2) epgScreen:EPG component is gaining focus from side/topNav. In this case restart the video.
+'   1) epgScreen returning back from full video screen. Keep the video as it is, and make sure the video screen and focused channel are the same.
+'   2) epgScreen:EPG component is gaining focus from side/topNav. In this case restart the video.
 
 Function onRefreshEPGScreenVideoPlay(msg)
   tubiLog("EPGScreenHelpers.onRefreshEPGScreenVideoPlay")
@@ -452,9 +452,17 @@ Function onRefreshEPGScreenVideoPlay(msg)
     stopAndHideLinearVideoPlayer()
   else 'from FullScreen video
     linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+
     changeEPGScreenBackground(epgscreen)
     if linearVideoPlayer <> invalid and linearVideoPlayer.state = "playing"
       m.backgroundGroup.posterVisible = false
+
+      '//if the linear player is playing a video and it does not match with the current focus, then change focus to that of the playing video
+      focusedChannel = epgScreen.linearChannelFocused
+      if focusedChannel <> invalid and focusedChannel.id <> invalid and isLinearPlayerPlayingThisContent(focusedChannel) = false
+        channelId = linearVideoPlayer.content.id
+        epgScreen.jumpToRowItemByID = [channelId, ""]
+      end if
       
       startCountdownTimer()
     else ' from top/side Nav

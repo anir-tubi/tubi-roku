@@ -246,6 +246,7 @@ Function transitionPosters()
       'case 1) uris are the same, backgroundType has changed (ie. moving from category screen to details screen or vice versa)
       'case 2) uris are different, backgroundType is same (ie. scrolling around the category screen)
       'case 3) uris are different, background type has changed (ie. moving from category grid to category list)
+      m.oldPoster.fadeOutControl = "stop"
       m.oldPoster.fadeOutControl = "start"
       m.oldPoster.lastAnimationName = "FadeOut"
 
@@ -295,6 +296,11 @@ Function transitionGradients()
       m.linearGradient2.gradientOpacity = 1.0
     end if
   else
+    '//Stop gradients to allow them to start again
+    m.fullScreenGradient.fadeOutControl = "stop"
+    m.topRightGradient.fadeOutControl = "stop"
+    m.linearGradient1.fadeOutControl = "stop"
+    m.linearGradient2.fadeOutControl = "stop"
     if m.newPoster.uri = m.blurredDefaultBackground_current
       if m.fullScreenGradient.gradientOpacity > 0.0
         m.fullScreenGradient.fadeOutControl = "start"
@@ -436,6 +442,7 @@ End Function
 
 'Choose the correct transition based on the background type and/or presence of the default background uri
 Function startTransitionIn()
+  m.newPoster.fadeInControl = "stop"
   if m.newPoster.uri = m.blurredDefaultBackground_current
     m.newPoster.fadeInControl = "start"
     m.newPoster.lastAnimationName = "FadeIn"

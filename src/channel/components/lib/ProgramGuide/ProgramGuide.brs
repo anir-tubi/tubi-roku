@@ -192,6 +192,9 @@ Function onJumpToLinearChannelID()
         if item <> invalid and item.getChildCount() > 0
           program = item.getChild(0)
           m.top.linearChannelFocused = program
+          '//::TODO:: EPG - why doesn't setting of linearChannelFocusedUpdated trigger EPGScreen.onLinearChannelFocused from calling?
+          m.top.linearChannelFocusedUpdated = true
+          
           if m.top.shouldSendComponentInteractionEventOnJumpToLinearChannelId = true
             m.top.shouldSendComponentInteractionEventOnJumpToLinearChannelId = false
             rowNum = i + 1
@@ -201,6 +204,7 @@ Function onJumpToLinearChannelID()
         end if
         if m.playOnFocusMode = false and m.top.linearChannelToPlay <> invalid and m.top.linearChannelToPlay.id <> item.id
           m.top.linearChannelToPlay = item 'after the jump, set the linearchannelToplay to focused content.
+          m.top.linearChannelToPlayUpdated = true
         end if
         exit for
       end if

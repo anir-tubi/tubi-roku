@@ -102,6 +102,7 @@ Function onLinearChannelFocused(msg)
   if m.epgTimeGrid <> invalid 
     content = m.epgTimeGrid.linearChannelFocused
     if content <> invalid and content.title <> invalid
+      m.top.linearChannelFocused = content
       ' As per EPG requirement: if this is the first time content is focused after EPG started, then start playing the first content.
       ' all the other time, only selected content will get to play.
       if m.firstTime = true
@@ -110,7 +111,7 @@ Function onLinearChannelFocused(msg)
         m.epgTimeGrid.setFocusedToPlay = true
         m.top.refreshEPGScreenVideoPlay = false
       end if
-      populateInfoPanel(content)
+      populateInfoPanel(m.epgTimeGrid.linearChannelFocused)
     end if
   end if
 End Function

@@ -88,6 +88,9 @@
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
 
+      <!-- When this is called, then the helper should display the EPGScreen-->
+      <field id="navigateToEPGScreen" alias="VideoOverlay.navigateToEPGScreen"/>
+
       <!-- Set when the video player needs to display the channel guide -->
       <field id="refreshChannels" type="boolean" alwaysNotify="true" />
 
