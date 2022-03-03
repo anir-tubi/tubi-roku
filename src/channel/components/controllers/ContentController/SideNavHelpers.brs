@@ -410,30 +410,7 @@ Function enableKidsModeFromSideNav()
   setUiMode(m.constants.ui.modes.kids)
   refreshScreenAfterParentalChanges()
   displayDefaultBackground()
-
-  ' setting up an AA instead of having a very long if statement that checks against each
-  ' of the screen ids below
-  nonAvailableKidsScreens = {}
-  nonAvailableKidsScreens[m.constants.ui.screenIds.searchScreen] = true
-  nonAvailableKidsScreens[m.constants.ui.screenIds.channelListScreen] = true
-  nonAvailableKidsScreens[m.constants.ui.screenIds.movieScreen] = true
-  nonAvailableKidsScreens[m.constants.ui.screenIds.tvScreen] = true
-  nonAvailableKidsScreens[m.constants.ui.screenIds.espanolScreen] = true
-  nonAvailableKidsScreens[m.constants.ui.screenIds.linearTVScreen] = true
-  nonAvailableKidsScreens[m.constants.ui.screenIds.EPGScreen] = true
-  nonAvailableKidsScreens[m.constants.ui.screenIds.sportsEPGScreen] = true
-  nonAvailableKidsScreens[m.constants.ui.screenIds.newsEPGScreen] = true
-  
-  screen = getCurrentScreen()
-  if screen <> invalid and nonAvailableKidsScreens[screen.id] = true
-    '//If the current screen is one of the pages that should be disabled during kids mode,
-    ' then take user to homescreen
-    showDefaultHomeScreen()
-  else if screen.id = m.constants.ui.screenIds.homeScreen = true
-    '//If current screen is already the homescreen, then ensure the topNav is at the correct visible state
-    screen.enableTopNav = isTopNavHomeScreenEnabled()
-  end if
-
+  showDefaultHomeScreen()
   homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
   focusSideNavOption(homeSideNavID)
 End Function
@@ -442,15 +419,9 @@ End Function
 Function disableKidsModeFromSideNav()
   setUiMode(m.constants.ui.modes.standard)
   refreshScreenAfterParentalChanges()
-  displayDefaultBackground()
+  showDefaultHomeScreen()
   homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
   focusSideNavOption(homeSideNavID)
-  screen = getCurrentScreen()
-
-  if screen.id = m.constants.ui.screenIds.homeScreen = true
-    '//If current screen is already the homescreen, then ensure the topNav is at the correct visible state
-    screen.enableTopNav = isTopNavHomeScreenEnabled()
-  end if
 End Function
 
 
