@@ -26,7 +26,7 @@ Function onSearchContentSelected(msg)
 
   selectedContent = msg.getData()
   'Launch the full player if it's linear contnet otherwise launch details screen
-  if selectedContent <> invalid and selectedContent.type = "linear" and selectedContent.videoResources.count() > 0 and getExperimentResource("roku_linear_search", "roku_linear_search_v1", true).enabled = true
+  if selectedContent <> invalid and selectedContent.type = "linear" and selectedContent.videoResources.count() > 0
     playLinearVideoContent(selectedContent, false, searchScreen.id)
   else
     showDetailScreen(searchScreen.contentSelected, true)
