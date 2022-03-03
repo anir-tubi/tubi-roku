@@ -636,17 +636,24 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
       ' sports epg screen or news epg screen might not have the contentID. So search for content ID and handle the back logic
       if currentScreen.associatedScreenID = m.constants.ui.screenIds.newsEPGScreen or currentScreen.associatedScreenID = m.constants.ui.screenIds.sportsEPGScreen  
         handleBackToEPGScreen(videoPlayer.originalContent, currentScreen.associatedScreenID)
+
+        '//animate the video player into the corner
+        animateLinearVideoPlayerToMinState()
       else if currentScreen.associatedScreenID = m.constants.ui.screenIds.epgScreen
         jumpToParentScreenContentByID(videoPlayer.content.id, "", currentScreen.associatedScreenID)
         popScreen(true, true)
+
+        '//animate the video player into the corner
+        animateLinearVideoPlayerToMinState()
       else if currentScreen.associatedScreenID = m.constants.ui.screenIds.searchScreen
-        stopAndHideLinearVideoPlayer()
         popScreen(true, true) 
+        stopAndHideLinearVideoPlayer()
       else
         popScreen(true, true)
+
+        '//animate the video player into the corner
+        animateLinearVideoPlayerToMinState()
       end if
-      '//animate the video player into the corner
-      animateLinearVideoPlayerToMinState()
     else
       ' remove the video player screen to reveal the home screen/epg Screen
       popScreen(true, true)
