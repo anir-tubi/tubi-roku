@@ -723,8 +723,7 @@ End Function
 '//when a new column of the rowlist begins to gain partial focus during a horizontal scroll, then do something
 Function onColumnFocusChanged(msg)
   tubiLog("HomeScreenHelpers.onColumnFocusChanged")
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  if videoPlayer <> invalid and (videoPlayer.loading = true or videoPlayer.state = "playing")
+  if isLinearPlayerLoading() = true or isLinearPlayerPlaying() = true
     '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
     stopAndHideLinearVideoPlayer()
   end if
@@ -742,14 +741,13 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
     '//we should stop the countdown timer
     bStopCountdownTimer = true 
     epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false)
-    if focusedContent.type = m.constants.ui.categoryTypes.linear and focusedContent.id <> m.constants.ui.contentIds.tvGuide
+
+    if focusedContent.type = m.constants.ui.categoryTypes.linear and focusedContent.id <> m.constants.ui.contentIds.tvGuide and m.SideNav.opened <> true
       bPlayVideo = true
       linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-      if linearVideoPlayer <> invalid and linearVideoPlayer.content <> invalid 
-        if linearVideoPlayer.content.id = focusedContent.id and linearVideoPlayer.state = "playing"
-          '//No need to play the video. It already is playing the video
-          bPlayVideo = false
-        end if
+      if isLinearPlayerPlayingThisContent(focusedContent) = true
+        '//No need to play the video. It already is playing the video
+        bPlayVideo = false
       end if
 
       if bPlayVideo = true

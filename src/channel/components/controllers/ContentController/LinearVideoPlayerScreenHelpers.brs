@@ -247,6 +247,28 @@ Function isLinearPlayerPlayingThisContent(content)
 End Function
 
 
+Function isLinearPlayerPlaying()
+  bPlaying = false
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+  if videoPlayer <> invalid and videoPlayer.state = "playing"
+    bPlaying = true
+  end if
+
+  return bPlaying
+End Function
+
+
+Function isLinearPlayerLoading()
+  bLoading = false
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+  if videoPlayer <> invalid
+    bLoading = videoPlayer.loading
+  end if
+
+  return bLoading
+End Function
+
+
 Function getLiveStreamManifest(streamUrl)
   tubiLog("LinearVideoPlayerScreenHelpers.getLiveStreamManifest")
   liveManifestReqType = m.constants.reqNames.getLiveManifest
