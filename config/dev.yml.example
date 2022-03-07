@@ -20,8 +20,8 @@ settings:
   remoteComponentsExtension: "zip"
 
   # The following can be used to make debugging less painful
-  noAds: false  'prevents ads from playing
-  numContainers: 10  'limits the number of containers on the homescreen
+  noAds: false  # prevents ads from playing
+  numContainers: 10  # limits the number of containers on the homescreen
 
   # email/password values will be used to automatically sign a user in when "sign in" is selected
   email: ""

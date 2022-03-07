@@ -1,0 +1,42 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [{
+    "type": "brightscript",
+    "request": "launch",
+    "name": "Build & Deploy",
+    "host": "${env:ROKU_DEV_TARGET}",
+    "password": "${env:DEV_PASSWORD}",
+    "envFile": "${workspaceFolder}/.vscode/.env",
+    "preLaunchTask": "gulp-build",
+    "sourceDirs": [
+      "${workspaceFolder}/src/channel/"
+    ],
+    "rootDir": "${workspaceFolder}/build/local/",
+    "files": [
+      "**/*"
+    ],
+    "componentLibrariesPort": 8090,
+    "componentLibraries": [{
+      "rootDir": "${workspaceFolder}/build/starter/",
+      "outFile": "tubi_starter_components_${major_version}_${minor_version}.zip",
+      "files": [
+        "**/*"
+      ],
+      "sourceDirs": [
+        "${workspaceFolder}/src/channel/"
+      ]
+    }, {
+      "rootDir": "${workspaceFolder}/build/remote/",
+      "outFile": "tubi_remote_components_${major_version}_${minor_version}_0.zip",
+      "files": [
+        "**/*"
+      ],
+      "sourceDirs": [
+        "${workspaceFolder}/src/channel/"
+      ]
+    }]
+  }]
+}
