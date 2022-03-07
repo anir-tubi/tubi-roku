@@ -994,7 +994,6 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
           id: m.constants.ui.contentIds.tvGuide
           title: getTranslation("screenHome_item_tvguide_title")
           type: "l"
-          hero_images: ["pkg:/images/gradientBground-linearItem-tvGuide.png"] 
           thumbnails: ["pkg:/images/icon-tvGuide.png"]
         }
         '//add the TV guide content back into the raw JSON

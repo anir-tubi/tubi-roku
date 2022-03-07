@@ -16,7 +16,7 @@ Function init()
   m.TVGuideNumberBground.blendColor = "0x9699A3FF"
   m.posterFadeTime = 0.5
   
-  '//recreate the gridItemTypes (itemIDs) from constants so as not to access m.global.constants for every item on the home screen as they are created
+  '//recreate the gridItemTypes (itemIDs) and uiResolution from constants so as not to access m.global.constants for every item on the home screen as they are created
   m.gridItemTypes = {
     portrait: "portrait"
     landscape: "landscape"
@@ -28,6 +28,8 @@ Function init()
   m.itemIDs = {
     tvGuide: "tvGuide"
   }
+  di = CreateObject("roDeviceInfo")
+  m.uiResolution = UCase(di.GetUiResolution().name)
 End Function
 
 
@@ -230,7 +232,11 @@ Function setUpLinear()
     m.poster.uri = "pkg:/images/gradientBground-linearItem-vertical.png"
     m.LinearTitle.text = m.top.itemContent.title
   else 
-    m.poster.uri = "pkg:/images/gradientBground-linearItem-tvGuide.png"
+    if m.uiResolution <> "FHD"
+      m.poster.uri = "https://cdn.adrise.tv/image/roku_support_images/gradientBground-linearItem-tvGuide_hd.png"
+    else
+      m.poster.uri = "https://cdn.adrise.tv/image/roku_support_images/gradientBground-linearItem-tvGuide_fhd.png"
+    end if
     '//Note: For the TV Guide item, the title is set to the subtitle component and the subtitle is set to the title component.
     m.LinearSubTitle.visible = true
     m.LinearSubTitle.width = m.top.width * .9
