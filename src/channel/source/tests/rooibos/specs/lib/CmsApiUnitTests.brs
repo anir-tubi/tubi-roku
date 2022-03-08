@@ -5,8 +5,8 @@ Function CmsApiSetup()
   constants = getConstants()
   request = TubiRequest(constants.settings)
   auth = TubiAuth(constants, request)
-  apiUtils = ApiUtils(constants)
-  m.cmsApi = CmsApi(constants, request, auth, apiUtils)
+  utils = ApiUtils(constants)
+  m.cmsApi = CmsApi(constants, request, auth, utils)
 End function
 
 

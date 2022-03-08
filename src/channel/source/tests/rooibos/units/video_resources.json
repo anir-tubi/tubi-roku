@@ -74,7 +74,7 @@
   "availability_ends": "2023-12-31T00:00:00.000Z",
   "video_resources": [
     {
-      "type": "dash_widevine",
+      "type": "dash_widevine_psshv0",
       "manifest": {
         "url": "https://s3-us-west-2.amazonaws.com/haofei-playground-public/drm/440105_cenc/index.mpd?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDAzMzQ5NDR9.FxmRmcDKTcl947oIMMgHR9Vue6FICGwu0yq-9iVE_VM",
         "duration": 5024
@@ -86,7 +86,7 @@
       }
     },
     {
-      "type": "dash_playready",
+      "type": "dash_playready_psshv0",
       "manifest": {
         "url": "https://s3-us-west-2.amazonaws.com/haofei-playground-public/drm/440105_cenc/index.mpd?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDA1NzAwNzZ9.3zpQiMAUgy6rKXl2_gKefWhG0_ePd6gV1B-RPPvJ8Dw",
         "duration": 5024

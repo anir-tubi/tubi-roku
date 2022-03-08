@@ -4,7 +4,8 @@
 Function UserDeviceApiSetup()
 
   m.constants = getConstants()
-  m.userDeviceApi = UserDeviceApi(m.constants)
+  utils = ApiUtils(m.constants)
+  m.userDeviceApi = UserDeviceApi(m.constants, utils)
   m.emailExistsUrl = m.constants.urls.account.emailExists
   m.signupUrl = m.constants.urls.users.signup
   m.deviceRegisterUrl = m.constants.urls.account.deviceRegister
@@ -23,27 +24,6 @@ End function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '@It tests functions in UserDeviceApi.brs
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-'@Test commonOptions unit tests
-Function userDeviceApi_commonOptions_test()
-
-  options = m.userDeviceApi.commonOptions()
-  m.assertNotInvalid(options)
-
-  params = options.params
-  m.assertNotInvalid(params)
-
-  m.assertNotInvalid(params.app_id)
-  m.assertEqual(params.app_id, m.app_id)
-
-  m.assertNotInvalid(params.platform)
-  m.assertEqual(params.platform, m.platform)
-
-  m.assertNotInvalid(params.device_id)
-  m.assertEqual(params.device_id, m.device_id)
-
-End Function
 
 
 '@Test emailExistsReqInfo unit tests
