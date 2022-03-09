@@ -514,10 +514,10 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
 
     clearMinimizedLinearPlayerAnimation()
     m.animationMinimizedLinearPlayer = resizeToLocation(videoPlayer, nWidth, nHeight, nPosition, nDuration)
-    if nDuration > 0
+    if nDuration > 0 and m.animationMinimizedLinearPlayer <> invalid
       m.animationMinimizedLinearPlayer.observeField("state", "onLinearPlayerMinimizedComplete")
     else
-      '//If the animation is instant, then call the animation-complete function immediately 
+      '//If the animation is instant (and/or this is on a limited UI device), then call the animation-complete function immediately 
       displayLinearPlayerProgrammingDataOnHomescreen()
     end if
     videoPlayer.visible = bVisible
