@@ -262,10 +262,9 @@ Function cmsApi_homeScreenReqInfo_test()
     "app_id"
     "platform"
     "device_id"
-    "includeEmptyHistory"
-    "includeEmptyQueue"
-    "isKidsMode"
-    "includeVideoInGrid"
+    "include_empty_history"
+    "include_empty_queue"
+    "is_kids_mode"
     "images[landscape_tb]"
     "images[poster_tb]"
     "images[vitg_tb]"
@@ -278,16 +277,15 @@ Function cmsApi_homeScreenReqInfo_test()
     "x-client-version"
   ]
 
-  homeUrl = m.cmsApi.constants.urls.matrix.homescreen
+  homeUrl = m.cmsApi.constants.urls.tensor.homescreen
   homeOptions = {
     params: {
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
-      "includeEmptyHistory": true
-      "includeEmptyQueue": true
-      "isKidsMode": false
-      "includeVideoInGrid": true
+      "include_empty_history": true
+      "include_empty_queue": true
+      "is_kids_mode": false
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
       "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_hero"
       "images[vitg_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeVITG[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeVITG[1].ToStr() + "_hero"
@@ -324,10 +322,9 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
-  m.assertEqual(homeInfo.options.params["includeEmptyHistory"], homeOptions.params["includeEmptyHistory"])
-  m.assertEqual(homeInfo.options.params["includeEmptyQueue"], homeOptions.params["includeEmptyQueue"])
-  m.assertEqual(homeInfo.options.params["isKidsMode"], homeOptions.params["isKidsMode"])
-  m.assertEqual(homeInfo.options.params["includeVideoInGrid"], homeOptions.params["includeVideoInGrid"])
+  m.assertEqual(homeInfo.options.params["include_empty_history"], homeOptions.params["include_empty_history"])
+  m.assertEqual(homeInfo.options.params["include_empty_queue"], homeOptions.params["include_empty_queue"])
+  m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
   m.assertEqual(homeInfo.options.params["images[poster_tb]"], homeOptions.params["images[poster_tb]"])
   m.assertEqual(homeInfo.options.params["images[landscape_tb]"], homeOptions.params["images[landscape_tb]"])
   m.assertEqual(homeInfo.options.params["images[vitg_tb]"], homeOptions.params["images[vitg_tb]"])
@@ -340,7 +337,7 @@ Function cmsApi_homeScreenReqInfo_test()
 
   ' with kids mode and homescreen contentMode
   homeInfo = m.cmsApi.homeScreenReqInfo(true, passedOptions)
-  homeOptions.params["isKidsMode"] = true
+  homeOptions.params["is_kids_mode"] = true
 
   m.assertEqual(homeInfo.count(), 2)
   m.assertAAHasKeys(homeInfo, infoKeys)
@@ -350,10 +347,9 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
-  m.assertEqual(homeInfo.options.params["includeEmptyHistory"], homeOptions.params["includeEmptyHistory"])
-  m.assertEqual(homeInfo.options.params["includeEmptyQueue"], homeOptions.params["includeEmptyQueue"])
-  m.assertEqual(homeInfo.options.params["isKidsMode"], homeOptions.params["isKidsMode"])
-  m.assertEqual(homeInfo.options.params["includeVideoInGrid"], homeOptions.params["includeVideoInGrid"])
+  m.assertEqual(homeInfo.options.params["include_empty_history"], homeOptions.params["include_empty_history"])
+  m.assertEqual(homeInfo.options.params["include_empty_queue"], homeOptions.params["include_empty_queue"])
+  m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
   m.assertEqual(homeInfo.options.params["images[poster_tb]"], homeOptions.params["images[poster_tb]"])
   m.assertEqual(homeInfo.options.params["images[landscape_tb]"], homeOptions.params["images[landscape_tb]"])
   m.assertEqual(homeInfo.options.params["images[vitg_tb]"], homeOptions.params["images[vitg_tb]"])
@@ -368,7 +364,7 @@ Function cmsApi_homeScreenReqInfo_test()
   passedOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.tv
   passedOptions.headers["x-tubi-inject-live-news"] = "false"
   homeInfo = m.cmsApi.homeScreenReqInfo(false, passedOptions)
-  homeOptions.params["isKidsMode"] = false
+  homeOptions.params["is_kids_mode"] = false
   homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.tv
   homeOptions.headers["x-tubi-inject-live-news"] = "false"
 
@@ -380,10 +376,9 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
-  m.assertEqual(homeInfo.options.params["includeEmptyHistory"], homeOptions.params["includeEmptyHistory"])
-  m.assertEqual(homeInfo.options.params["includeEmptyQueue"], homeOptions.params["includeEmptyQueue"])
-  m.assertEqual(homeInfo.options.params["isKidsMode"], homeOptions.params["isKidsMode"])
-  m.assertEqual(homeInfo.options.params["includeVideoInGrid"], homeOptions.params["includeVideoInGrid"])
+  m.assertEqual(homeInfo.options.params["include_empty_history"], homeOptions.params["include_empty_history"])
+  m.assertEqual(homeInfo.options.params["include_empty_queue"], homeOptions.params["include_empty_queue"])
+  m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
   m.assertEqual(homeInfo.options.params["images[poster_tb]"], homeOptions.params["images[poster_tb]"])
   m.assertEqual(homeInfo.options.params["images[landscape_tb]"], homeOptions.params["images[landscape_tb]"])
   m.assertEqual(homeInfo.options.params["images[vitg_tb]"], homeOptions.params["images[vitg_tb]"])
@@ -406,10 +401,9 @@ Function cmsApi_homeScreenReqInfo_test()
     "app_id"
     "platform"
     "device_id"
-    "includeEmptyHistory"
-    "includeEmptyQueue"
-    "isKidsMode"
-    "includeVideoInGrid"
+    "include_empty_history"
+    "include_empty_queue"
+    "is_kids_mode"
   ]
   homeOptions.headers["x-tubi-inject-live-news"] = "true"
   headers = [
@@ -425,10 +419,9 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
   m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
   m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
-  m.assertEqual(homeInfo.options.params["includeEmptyHistory"], homeOptions.params["includeEmptyHistory"])
-  m.assertEqual(homeInfo.options.params["includeEmptyQueue"], homeOptions.params["includeEmptyQueue"])
-  m.assertEqual(homeInfo.options.params["isKidsMode"], homeOptions.params["isKidsMode"])
-  m.assertEqual(homeInfo.options.params["includeVideoInGrid"], homeOptions.params["includeVideoInGrid"])
+  m.assertEqual(homeInfo.options.params["include_empty_history"], homeOptions.params["include_empty_history"])
+  m.assertEqual(homeInfo.options.params["include_empty_queue"], homeOptions.params["include_empty_queue"])
+  m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
   m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
   m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
   m.assertEqual(homeInfo.options.headers["x-tubi-inject-live-news"], homeOptions.headers["x-tubi-inject-live-news"])
@@ -448,11 +441,10 @@ Function cmsApi_categoryReqInfo_test()
     "app_id"
     "platform"
     "device_id"
-    "isKidsMode"
-    "includeChannels"
-    "includeVideoInGrid"
+    "is_kids_mode"
+    "include_channels"
     "cursor"
-    "limit"
+    "contents_limit"
     "images[landscape_tb]"
     "images[poster_tb]"
     "images[vitg_tb]"
@@ -466,17 +458,16 @@ Function cmsApi_categoryReqInfo_test()
     "x-client-version"
   ]
 
-  categoryUrl = m.cmsApi.constants.urls.matrix.channel + "/my_category"
+  categoryUrl = m.cmsApi.constants.urls.tensor.channel + "/my_category"
   categoryOptions = {
     params: {
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
-      "isKidsMode": false
-      "includeChannels": true
-      "includeVideoInGrid": true
+      "is_kids_mode": false
+      "include_channels": true
       "cursor": 0
-      "limit": 19
+      "contents_limit": 19
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
       "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_hero"
       "images[vitg_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeVITG[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeVITG[1].ToStr() + "_hero"
@@ -484,7 +475,7 @@ Function cmsApi_categoryReqInfo_test()
       "customParam": "custom_param_value"
     }
     headers: {
-      "x-tubi-inject-live-news": "true"
+      "x-tubi-inject-live-news": "false"
       "x-custom-header": "custom_header_value"
       "x-client-platform": m.cmsApi.constants.headers.commonUapi["x-client-platform"] 
       "x-client-version": m.cmsApi.constants.headers.commonUapi["x-client-version"]
@@ -503,7 +494,7 @@ Function cmsApi_categoryReqInfo_test()
   }
   categoryInfo = m.cmsApi.categoryReqInfo("my_category", false, passedOptions)
 
-  m.assertEqual(categoryInfo.count(), 2)
+  m.assertEqual(categoryInfo.count(), 3)
   m.assertAAHasKeys(categoryInfo, infoKeys)
   m.assertEqual(categoryInfo.url, categoryUrl)
   m.assertAAHasKeys(categoryInfo.options.params, params)
@@ -511,9 +502,8 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["app_id"], categoryOptions.params["app_id"])
   m.assertEqual(categoryInfo.options.params["platform"], categoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], categoryOptions.params["device_id"])
-  m.assertEqual(categoryInfo.options.params["isKidsMode"], categoryOptions.params["isKidsMode"])
-  m.assertEqual(categoryInfo.options.params["includeChannels"], categoryOptions.params["includeChannels"])
-  m.assertEqual(categoryInfo.options.params["includeVideoInGrid"], categoryOptions.params["includeVideoInGrid"])
+  m.assertEqual(categoryInfo.options.params["is_kids_mode"], categoryOptions.params["is_kids_mode"])
+  m.assertEqual(categoryInfo.options.params["include_channels"], categoryOptions.params["include_channels"])
   m.assertEqual(categoryInfo.options.params["images[poster_tb]"], categoryOptions.params["images[poster_tb]"])
   m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], categoryOptions.params["images[landscape_tb]"])
   m.assertEqual(categoryInfo.options.params["images[vitg_tb]"], categoryOptions.params["images[vitg_tb]"])
@@ -525,11 +515,11 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.headers["x-client-version"], categoryOptions.headers["x-client-version"])
 
   ' with kids mode
-  categoryOptions.params["isKidsMode"] = true
+  categoryOptions.params["is_kids_mode"] = true
   categoryOptions.headers["x-tubi-inject-live-news"] = "false"
   categoryInfo = m.cmsApi.categoryReqInfo("my_category", true, passedOptions)
 
-  m.assertEqual(categoryInfo.count(), 2)
+  m.assertEqual(categoryInfo.count(), 3)
   m.assertAAHasKeys(categoryInfo, infoKeys)
   m.assertEqual(categoryInfo.url, categoryUrl)
   m.assertAAHasKeys(categoryInfo.options.params, params)
@@ -537,9 +527,8 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["app_id"], categoryOptions.params["app_id"])
   m.assertEqual(categoryInfo.options.params["platform"], categoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], categoryOptions.params["device_id"])
-  m.assertEqual(categoryInfo.options.params["isKidsMode"], categoryOptions.params["isKidsMode"])
-  m.assertEqual(categoryInfo.options.params["includeChannels"], categoryOptions.params["includeChannels"])
-  m.assertEqual(categoryInfo.options.params["includeVideoInGrid"], categoryOptions.params["includeVideoInGrid"])
+  m.assertEqual(categoryInfo.options.params["is_kids_mode"], categoryOptions.params["is_kids_mode"])
+  m.assertEqual(categoryInfo.options.params["include_channels"], categoryOptions.params["include_channels"])
   m.assertEqual(categoryInfo.options.params["images[poster_tb]"], categoryOptions.params["images[poster_tb]"])
   m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], categoryOptions.params["images[landscape_tb]"])
   m.assertEqual(categoryInfo.options.params["images[vitg_tb]"], categoryOptions.params["images[vitg_tb]"])
@@ -551,13 +540,13 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.headers["x-client-version"], categoryOptions.headers["x-client-version"])
 
   ' with contentMode not homescreen
-  categoryOptions.params["isKidsMode"] = false
+  categoryOptions.params["is_kids_mode"] = false
   categoryOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.latino
   categoryOptions.headers["x-tubi-inject-live-news"] = "false"
   passedOptions.params.contentMode = m.cmsApi.constants.ui.contentMode.latino
   categoryInfo = m.cmsApi.categoryReqInfo("my_category", false, passedOptions)
 
-  m.assertEqual(categoryInfo.count(), 2)
+  m.assertEqual(categoryInfo.count(), 3)
   m.assertAAHasKeys(categoryInfo, infoKeys)
   m.assertEqual(categoryInfo.url, categoryUrl)
   m.assertAAHasKeys(categoryInfo.options.params, params)
@@ -565,9 +554,8 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["app_id"], categoryOptions.params["app_id"])
   m.assertEqual(categoryInfo.options.params["platform"], categoryOptions.params["platform"])
   m.assertEqual(categoryInfo.options.params["device_id"], categoryOptions.params["device_id"])
-  m.assertEqual(categoryInfo.options.params["isKidsMode"], categoryOptions.params["isKidsMode"])
-  m.assertEqual(categoryInfo.options.params["includeChannels"], categoryOptions.params["includeChannels"])
-  m.assertEqual(categoryInfo.options.params["includeVideoInGrid"], categoryOptions.params["includeVideoInGrid"])
+  m.assertEqual(categoryInfo.options.params["is_kids_mode"], categoryOptions.params["is_kids_mode"])
+  m.assertEqual(categoryInfo.options.params["include_channels"], categoryOptions.params["include_channels"])
   m.assertEqual(categoryInfo.options.params["images[poster_tb]"], categoryOptions.params["images[poster_tb]"])
   m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], categoryOptions.params["images[landscape_tb]"])
   m.assertEqual(categoryInfo.options.params["images[vitg_tb]"], categoryOptions.params["images[vitg_tb]"])

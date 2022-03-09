@@ -212,7 +212,9 @@ Function tubiBookmarks_addHistoryReqVideo_ParentIdAsInvalid_test()
 
   headers = options.headers
 
-  m.assertEqual(headers["x-client-version"], "2.16.0")
+  clientVersion = BM.constants.deviceInfo.clientVersion
+
+  m.assertEqual(headers["x-client-version"], clientVersion)
   m.assertEqual(headers["x-client-platform"], "roku")
 
   m.assertEqual(options.params.device_id, m.deviceId)
@@ -251,7 +253,9 @@ Function tubiBookmarks_addHistoryReqVideo_ParentIdAsEmpty_test()
 
   headers = options.headers
 
-  m.assertEqual(headers["x-client-version"], "2.16.0")
+  clientVersion = BM.constants.deviceInfo.clientVersion
+
+  m.assertEqual(headers["x-client-version"], clientVersion)
   m.assertEqual(headers["x-client-platform"], "roku")
 
   m.assertEqual(options.params.device_id, m.deviceId)
@@ -292,7 +296,9 @@ Function tubiBookmarks_addHistoryReqEpisodeParentIdAsString_test()
 
   headers = options.headers
 
-  m.assertEqual(headers["x-client-version"], "2.16.0")
+  clientVersion = BM.constants.deviceInfo.clientVersion
+
+  m.assertEqual(headers["x-client-version"], clientVersion)
   m.assertEqual(headers["x-client-platform"], "roku")
 
   m.assertEqual(options.params.device_id, m.deviceId)
@@ -332,7 +338,9 @@ Function tubiBookmarks_addHistoryReqEpisodeParentIdAsInteger_test()
 
   headers = options.headers
 
-  m.assertEqual(headers["x-client-version"], "2.16.0")
+  clientVersion = BM.constants.deviceInfo.clientVersion
+
+  m.assertEqual(headers["x-client-version"], clientVersion)
   m.assertEqual(headers["x-client-platform"], "roku")
 
   m.assertEqual(options.params.device_id, m.deviceId)

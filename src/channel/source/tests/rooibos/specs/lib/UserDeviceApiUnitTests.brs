@@ -119,6 +119,8 @@ End Function
 '@Test signInReqInfo unit tests
 Function userDeviceApi_signInReqInfo_test()
 
+  loginUrl = m.constants.urls.account.login
+
   options = {}
   options.body = {
     platform: m.constants.platform  
@@ -132,7 +134,7 @@ Function userDeviceApi_signInReqInfo_test()
   requestInfo = m.userDeviceApi.signInReqInfo(options)
   m.assertNotInvalid(requestInfo)
   m.assertNotInvalid(requestInfo.url)
-  m.assertEqual(requestInfo.url, m.loginUrl)  
+  m.assertEqual(requestInfo.url, loginUrl)  
 
   options = requestInfo.options
   m.assertNotInvalid(options)

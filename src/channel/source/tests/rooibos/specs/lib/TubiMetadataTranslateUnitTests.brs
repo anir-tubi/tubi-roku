@@ -395,17 +395,16 @@ Function tubiMetadataTranslate_translateEPGPrograms_test()
   programInfo = channelFromJson.rows[0].programs[0]
 
   datetimeObj.FromISO8601String(programInfo.start_time)
-  program_startTime = datetimeObj.asSeconds()
   datetimeObj.ToLocalTime()
+  program_startTime = datetimeObj.asSeconds()
   start_Time = GetAMPMTimeString(datetimeObj)
 
   datetimeObj.FromISO8601String(programInfo.end_time)
-  program_endTime= datetimeObj.asSeconds()
   datetimeObj.ToLocalTime()
+  program_endTime= datetimeObj.asSeconds()
   end_Time = GetAMPMTimeString(datetimeObj)
 
   hours_of_airing = start_Time + " - " + end_Time
-  
 
   m.assertEqual(program.id, "557344")
   m.assertEqual(program.TITLE, "No Chill With Gilbert Arenas")
