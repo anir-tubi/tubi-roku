@@ -1,5 +1,8 @@
 Function init()
   m.constants = getConstantsFromGlobal()
+  Request = TubiRequest(m.constants.settings)
+  Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.top.observeFieldScoped("display", "onOverlayDisplayChange")
   m.top.observeFieldScoped("closedCaptioningItems", "onClosedCaptionListUpdated")
   
@@ -104,9 +107,15 @@ End Function
 
 Function onSideNavSelectChange()
   tubilog("LinearVideoPlayerNewScreenOverlay.onSideNavSelectChange")
+  userInteraction = "CONFIRM"
+  selectedLinearSideNavId = ""
   if m.sideNav.selectedButtonID = m.constants.ui.linearSideNavIds.cc
+    selectedLinearSideNavId = m.constants.ui.sideNavIds.subtitles
+    setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
     displayClosedCaptioningMenu()
   else if m.sideNav.selectedButtonID = m.constants.ui.linearSideNavIds.epg
+    selectedLinearSideNavId = m.constants.ui.sideNavIds.back
+    setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
     hideOverlay()
     m.top.navigateToEPGScreen = true 
   end if
@@ -378,6 +387,9 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
         m.sideNav.setOpenState = "openedAndInFocus"
         m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.epg
+        userInteraction = "TOGGLE_ON"
+        selectedLinearSideNavId = getAnalyticsIdFromFocusedSideNavItem()
+        setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
         bKeyReacted = true
       else if m.closedCaptioningGroup.isInFocusChain() = true
         m.sideNav.setOpenState = "openedAndInFocus"
@@ -388,6 +400,9 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       end if
     else if key = "right" 
       if m.bEPGVisible = true and m.EPG.isInFocusChain() = false
+        userInteraction = "TOGGLE_OFF"
+        selectedLinearSideNavId = getAnalyticsIdFromFocusedSideNavItem()
+        setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
         goBackToEPGFromSideNav()
         bKeyReacted = true
       else if m.bEPGVisible = false and m.closedCaptioningGroup.isInFocusChain() = false
@@ -415,4 +430,36 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   end if
 
   return bKeyReacted
+End Function
+
+
+'@userInteraction: string, what type of userIntercation is performed: "Toggle_ON/Toggle_off"
+'@sideNavItemId: string, what item is selected from the linearEPGSideNav in linearOverlay
+Function setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, sideNavItemId)
+  componentValues = {}
+  if sideNavItemId <> invalid
+    componentValues = {
+        left_nav_section: m.Tracking.sideNavPageMap[sideNavItemId]
+      }
+  end if
+  pageValues =  {video_id: m.top.currentLinearVideoContent.id.toInt()}
+
+  componentInteractionInfo = {
+    pageOneof: m.Tracking.getAnalyticsPage("video_player_page", pageValues)
+    componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component",  componentValues)
+    user_interaction: userInteraction
+  }
+
+  m.EPG.componentInteractionInfo = componentInteractionInfo
+End Function
+
+
+Function getAnalyticsIdFromFocusedSideNavItem()
+  selectedLinearSideNavId = ""
+  if m.sideNav.focusedButtonID = m.constants.ui.linearSideNavIds.cc
+    selectedLinearSideNavId = m.constants.ui.sideNavIds.subtitles
+  else if m.sideNav.focusedButtonID = m.constants.ui.linearSideNavIds.epg
+    selectedLinearSideNavId = m.constants.ui.sideNavIds.back
+  end if
+  return selectedLinearSideNavId
 End Function
