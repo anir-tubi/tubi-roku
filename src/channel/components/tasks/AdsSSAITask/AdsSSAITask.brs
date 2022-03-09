@@ -60,11 +60,6 @@ Function runSSAILoop(constants, ssaiPort)
   m.top.observeField("playbackStopped", ssaiPort)
   m.top.observeField("exit", ssaiPort)
 
-  ' in the case that content is set on the task before it is ready, run the content callback
-  if m.top.content <> invalid
-    onContentUpdated(m.top.content)
-  end if
-
   while true
     msg = wait(0, ssaiPort)
 
