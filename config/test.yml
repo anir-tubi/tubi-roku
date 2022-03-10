@@ -1,3 +1,4 @@
 settings:
   mode: "test"
   remoteComponentsExtension: "zip"
+  localHostUri: "http://{{localHostUri}}" 

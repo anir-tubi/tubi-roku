@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<component name="UnitTestNotifier" extends="Group">
+
+  <script type="text/brightscript" uri="UnitTestNotifier.brs" />
+  <script type="text/brightscript" uri="../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../source/lib/GeneralTaskModule.brs" />
+  <script type="text/brightscript" uri="../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../source/lib/StringUtils.brs" />
+  
+  <interface>
+  
+    <!-- INPUTS -->
+
+      <!-- customSuspendUnitTest will be set by scene's suspendhandler callback  -->
+      <field id="customSuspendUnitTest" type="assocarray" alwaysNotify="true"/>
+      
+  </interface>
+
+</component>
+

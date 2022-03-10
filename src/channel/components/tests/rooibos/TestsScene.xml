@@ -4,5 +4,9 @@
     <function name="Rooibos_CreateTestNode" />
   </interface>
 
+    <!-- suspendhandler will be set when app got suspended by pressing Home key (this happens when unit tests are completed) -->
+  <customization suspendhandler="customSuspend" />
+
+  <script type="text/brightscript" uri="TestsScene.brs" />
   <script type="text/brightscript" uri="../../../../source/tests/rooibos/rooibosDist.brs" />
 </component>

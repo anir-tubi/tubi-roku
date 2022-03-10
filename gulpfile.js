@@ -449,6 +449,7 @@ function sideLoad(done) {
     log(`${options.config.toUpperCase()} channel launched.`)
 
     if (options.telnet === 'sametab') {
+      shell.config.silent = false;
       shell.exec(`telnet ${options.target} 8085`,{async: true});
     }
   })
