@@ -15,7 +15,7 @@ Function init()
     m.programGrid.focusBitmapBlendColor = theme.focused
   end if
   m.playOnFocusMode = true
-  m.lastFocused = 0
+  m.lastFocused = -1
   
   m.programGrid.observeFieldScoped("currFocusRow", "onRowFocused")
   m.top.observeFieldScoped("jumpToLinearChannelID", "onJumpToLinearChannelID")
