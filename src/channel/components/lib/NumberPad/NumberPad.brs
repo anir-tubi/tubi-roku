@@ -32,7 +32,7 @@ Function init()
   if m.global.constants.deviceInfo.scaledUi = true
     m.Foreground.focusBitmapUri = "pkg://images/menu-focus-hd.9.png"
   else
-    m.Foreground.focusBitmapUri = "pkg://images/menu-focus-hd.9.png"
+    m.Foreground.focusBitmapUri = "pkg://images/menu-focus-fhd.9.png"
   end if
   m.Foreground.focusBitmapBlendColor = m.global.theme.focused
   m.Foreground.drawFocusFeedbackOnTop = false
@@ -86,7 +86,7 @@ Function createButtons(isForeground = true)
     if i MOD 3 = 0
       row = parent.createChild("ContentNode")
     end if
-    
+
     child = row.createChild("ContentNode")
     child.id = (i + 1).toStr()
 
@@ -124,5 +124,3 @@ Function onRowItemSelected(msg)
     m.top.buttonSelected = item.title
   end if
 End Function
-
-

@@ -8,6 +8,7 @@
 '   showAgeVerificationScreenAtSignIn() ->
 '   showAgeVerificationScreen() ->
 '   onAgeSubmittedAtSignIn() ->
+'   conditionallyConfirmBirthYear() ->
 '   verifyAgeAtSignIn() ->
 '   verifyAge() -> one of
 '     onAgeVerifiedAtSignIn() ->
@@ -19,6 +20,7 @@
 '   showAgeVerificationScreenAtStartup() ->
 '   showAgeVerificationScreen() ->
 '   onAgeSubmittedAtStartup() ->
+'   conditionallyConfirmBirthYear() ->
 '   verifyAgeAtStartup() ->
 '   verifyAge() -> one of
 '     onAgeVerifiedAtStartup() ->
@@ -30,7 +32,22 @@
 '   showAgeVerificationScreenAtSignUp() ->
 '   showAgeVerificationScreen() ->
 '   onAgeSubmittedAtSignUp() ->
+'   conditionallyConfirmBirthYear() ->
 '   verifyAgeAtSignUp()
+'
+' Flow 4) Needs age verification when exiting kids mode
+'   showAgeVerificationScreenAtKidsModeExit() ->
+'   showAgeVerificationScreen() ->
+'   onAgeSubmittedAtKidsModeExit() ->
+'   conditionallyConfirmBirthYear() ->
+'   verifyAgeAtKidsModeExit()
+'
+' Flow 5) Needs age verification when input deeplinking from within kids mode
+'   showAgeVerificationScreenAtInputDeeplink() ->
+'   showAgeVerificationScreen() ->
+'   onAgeSubmittedAtInputDeeplink() ->
+'   conditionallyConfirmBirthYear() ->
+'   verifyAgeAtInputDeeplink()
 
 
 ' Occurs after a user signs in, but the user does not have a valid age associated with their account yet.
@@ -61,23 +78,134 @@ Function showAgeVerificationScreenAtSignUp(signInInfo = invalid as object)
 End Function
 
 
+' Occurs during exiting kids mode
+' @currentUiMode: string current mode we were in before going to age verification screen, one of the values in constants.ui.modes
+Function showAgeVerificationScreenAtKidsModeExit(currentUiMode)
+  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtKidsModeExit")
+  hideNavMenu(false)
+  setUiMode(m.constants.ui.modes.standard)
+  showAgeVerificationScreen(onAgeSubmittedAtKidsModeExit, invalid, currentUiMode)
+End Function
+
+' Occurs during deeplink received while in kids mode
+' @currentUiMode: string current mode we were in before going to age verification screen, one of the values in constants.ui.modes
+Function showAgeVerificationScreenAtInputDeeplink(currentUiMode)
+  tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtKidsModeExit")
+  hideNavMenu(false)
+  setUiMode(m.constants.ui.modes.standard)
+  showAgeVerificationScreen(onAgeSubmittedAtInputDeeplink, invalid, currentUiMode)
+End Function
+
 Function onAgeSubmittedAtSignIn(msg)
-  onAgeSubmitted(msg, verifyAgeAtSignIn)
+  ageVerificationScreen = msg.getRoSGNode()
+  conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeAtSignIn, confirmedBirthYearAtSignIn)
 End Function
 
 
 Function onAgeSubmittedAtStartup(msg)
-  onAgeSubmitted(msg, verifyAgeAtStartup)
+  ageVerificationScreen = msg.getRoSGNode()
+  conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeAtStartup, confirmedBirthYearAtStartup)
 End Function
 
 
 Function onAgeSubmittedAtSignUp(msg)
-  onAgeSubmitted(msg, verifyAgeAtSignup)
+  ageVerificationScreen = msg.getRoSGNode()
+  conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeAtSignup, confirmedBirthYearAtSignUp)
+End Function
+
+
+Function onAgeSubmittedAtKidsModeExit(msg)
+  ageVerificationScreen = msg.getRoSGNode()
+  conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeAtKidsModeExit, confirmedBirthYearAtKidsModeExit)
+End Function
+
+
+Function onAgeSubmittedAtInputDeeplink(msg)
+  ageVerificationScreen = msg.getRoSGNode()
+  conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeAtInputDeeplink, confirmedBirthYearAtInputDeeplink)
+End Function
+
+
+Function conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeCallback, confirmedBirthYearCallback)
+  birthdate = ageVerificationScreen.birthdate
+
+  ' send RequestForInfo analytics event
+  selectorValues = {
+    options: [birthdate]
+    selections: [1]
+    string_selector_type: "BIRTHDAY" 'StringSelectorComponent.type enum
+    sub_type: "age-gate"
+  }
+
+  analyticsEvent = {
+    type: "request_for_info"
+    values: {
+      request_for_info_action: "BIRTHDAY"
+      prompt: "Enter your date of birth"
+      selectorOneOf: m.Tracking.getAnalyticsSelector("string_selector", selectorValues)
+    }
+  }
+
+  m.trackingLoggingTask.trackEvent = analyticsEvent
+
+  birthYear = birthdate.tokenize("-")[0]
+  currentYear = createObject("roDateTime").getYear()
+  if currentYear - birthYear.toInt() > 12 then
+    onAgeSubmitted(verifyAgeCallback)
+  else
+    'Show confirmation
+    title  = getTranslation("dialog_confirmCorrectAge_title", {"birthYear": birthYear})
+    message  = getTranslation("dialog_confirmCorrectAge_description")
+
+    buttons = [
+      getTranslation("dialog_confirmCorrectAge_confirm")
+      getTranslation("dialog_confirmCorrectAge_edit")
+    ]
+
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "BIRTHDAY"   'DialogType enum
+        pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+        dialog_action: "SHOW"
+        dialog_sub_type: "age_confirmation"
+      }
+    }
+    showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, confirmedBirthYearCallback)
+  end if
+End Function
+
+Function confirmedBirthYearAtStartup()
+  onAgeSubmitted(verifyAgeAtStartup)
+End Function
+
+
+Function confirmedBirthYearAtKidsModeExit()
+  onAgeSubmitted(verifyAgeAtKidsModeExit)
+End Function
+
+Function confirmedBirthYearAtInputDeeplink()
+  onAgeSubmitted(verifyAgeAtInputDeeplink)
+End Function
+
+
+Function confirmedBirthYearAtSignUp()
+  onAgeSubmitted(verifyAgeAtSignUp)
 End Function
 
 
 Function verifyAgeAtSignIn(birthdate)
   verifyAge(birthdate, onAgeVerifiedAtSignIn, onAgeNotVerifiedAtSignIn)
+End Function
+
+
+Function verifyAgeAtKidsModeExit(birthdate)
+  verifyAge(birthdate, onAgeVerifiedAtKidsModeExit, onAgeNotVerifiedAtKidsModeExit)
+End Function
+
+
+Function verifyAgeAtInputDeeplink(birthdate)
+  verifyAge(birthdate, onAgeVerifiedAtInputDeeplink, onAgeNotVerifiedAtInputDeeplink)
 End Function
 
 
@@ -158,6 +286,27 @@ Function onAgeVerifiedAtSignIn(age)
 End Function
 
 
+' @age: integer, the age as returned by the backend
+Function onAgeVerifiedAtKidsModeExit(age)
+  tubiLog("AgeVerificationScreenHelpers.onAgeVerifiedAtSignIn")
+  patchSignedInUserAge()
+  onAgeVerified(age)
+  popScreen(true, false)
+  disableKidsModeFromSideNav()
+End Function
+
+' @age: integer, the age as returned by the backend
+Function onAgeVerifiedAtInputDeeplink(age)
+  tubiLog("AgeVerificationScreenHelpers.onAgeVerifiedAtInputDeeplink")
+  patchSignedInUserAge()
+  onAgeVerified(age)
+
+  m.spinner.visible = false
+
+  handleInputDeeplink(m.top.roInputInfo)
+End Function
+
+
 ' Functionality that occurs after the age verification screen is shown to the user when
 ' starting the app, and the age has been verified by the backend
 ' @age: integer, the age as returned by the backend
@@ -181,7 +330,39 @@ Function onAgeNotVerifiedAtSignIn(err)
     if err.code = 422 or err.code = 451
       handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
     else
-      handleNetworkError(err, verifyAgeAtSignIn, startUserExperienceAsAgeNotVerified) ' happens when ther is network failure or some backend issue
+      handleNetworkError(err, verifyAgeAtSignIn, startUserExperienceAsAgeNotVerified) ' happens when there is a network failure or some backend issue
+    end if
+  end if
+End Function
+
+
+Function handle_422_451_errorAtKidsModeExitCallback()
+  popScreen(false, false)
+End Function
+
+Function handle_422_451_errorAtInputDeeplinkCallback()
+  popScreen(false, false)
+End Function
+
+Function onAgeNotVerifiedAtKidsModeExit(err)
+  if err <> invalid and err.code <> invalid
+    if err.code = 422 or err.code = 451
+      ' happens when user enters age less than 13
+      handle_422_451_error(handle_422_451_errorAtKidsModeExitCallback)
+    else
+      handleNetworkError(err, verifyAgeAtKidsModeExit, exitAgeVerificationScreenUnverified) ' happens when there is a network failure or some backend issue
+    end if
+  end if
+End Function
+
+
+Function onAgeNotVerifiedAtInputDeeplink(err)
+  if err <> invalid and err.code <> invalid
+    if err.code = 422 or err.code = 451
+      ' happens when user enters age less than 13
+      handle_422_451_error(handle_422_451_errorAtInputDeeplinkCallback)
+    else
+      handleNetworkError(err, verifyAgeAtInputDeeplink, exitAgeVerificationScreenUnverified) ' happens when there is a network failure or some backend issue
     end if
   end if
 End Function
@@ -192,7 +373,7 @@ Function onAgeNotVerifiedAtStartup(err)
     if err.code = 422 or err.code = 451
       handle_422_451_error(startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when user enters age less than 13
     else
-      handleNetworkError(err, verifyAgeAtStartUp, startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when ther is network failure or some backend issue
+      handleNetworkError(err, verifyAgeAtStartUp, startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when there is a network failure or some backend issue
     end if
   end if
 End Function
@@ -205,7 +386,7 @@ Function onAgeNotVerifiedAtSignup(err)
     else if err.code = 403
       handle_403_error() ' happens when user enters invalid email domain
     else
-      handleNetworkErrorOnSignUp(err) ' happens when ther is network failure or some backend issue
+      handleNetworkErrorOnSignUp(err) ' happens when there is a network failure or some backend issue
     end if
   end if
 End Function
@@ -291,9 +472,8 @@ Function handleNetworkErrorOnSignUp(err)
 End Function
 
 
-' triggered when user enters age less than 13 on agegate screen
+' triggered when user enters age less than 13 on age gate screen
 Function handle_422_451_error(callback)
-
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
 
@@ -306,21 +486,36 @@ Function handle_422_451_error(callback)
   callback() ' redirecting to kidsMode before showing enterKidsMode modal, so that user will be aware what the experience will be
 
   currentScreen = getCurrentScreen()
-  if m.uiMode = m.constants.ui.modes.kidsAgeGate
-    title = getTranslation("dialog_kidsWelcome_title")
-    message = getTranslation("dialog_kidsWelcomeAgeGate_description")
-    dialogEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "ENTER_KIDS_MODE" 'DialogType enum
-        pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-        dialog_action: "SHOW"
-        dialog_sub_type: "welcome-age-gate"
+  if m.uiMode = m.constants.ui.modes.kidsAgeGate then
+    if callback = handle_422_451_errorAtKidsModeExitCallback OR callback = handle_422_451_errorAtInputDeeplinkCallback then
+      title = getTranslation("dialog_cannotExitKidsMode_title")
+      message = getTranslation("dialog_cannotExitKidsMode_description")
+      dialogEvent = {
+        type: "dialog"
+        values: {
+          dialog_type: "EXIT_KIDS_MODE" 'DialogType enum
+          pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+          dialog_action: "SHOW"
+          dialog_sub_type: "cannot_exit_kids"
+        }
       }
-    }
-    showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+      buttons = [getTranslation("dialog_button_close")]
+      showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
+    else
+      title = getTranslation("dialog_kidsWelcome_title")
+      message = getTranslation("dialog_kidsWelcomeAgeGate_description")
+      dialogEvent = {
+        type: "dialog"
+        values: {
+          dialog_type: "ENTER_KIDS_MODE" 'DialogType enum
+          pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+          dialog_action: "SHOW"
+          dialog_sub_type: "welcome-age-gate"
+        }
+      }
+      showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
+    end if
   end if
-
 End Function
 
 
@@ -355,18 +550,22 @@ Function handle_403_error()
   title =  getTranslation("dialog_defaultError_title")
   message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
   buttons = [getTranslation("dialog_button_ok")]
-  showSimpleModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, invalid)
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, invalid)
 
 End Function
 
 
 ' showAgeVerificationScreen is used to display create AgeVerificationScreen and display
-Function showAgeVerificationScreen(ageSubmittedCallback, signInInfo = invalid as object)
+' @ageSubmittedCallback: roFunction that will run after user submits their birth year
+' @ageSubmittedCallback: assocarray used for tracking info later
+' @previousUiMode: string of what uiMode we were in before showing showing the age verification screen so we can put them back in it if they back out, one of the values in constants.ui.modes
+Function showAgeVerificationScreen(ageSubmittedCallback, signInInfo = invalid, previousUiMode = "")
   callbackString = convertFunctionToString(ageSubmittedCallback)
   ageVerificationScreen = CreateObject("roSGNode", "AgeVerificationScreen")
   ageVerificationScreen.id = m.constants.ui.screenIds.ageVerificationScreen
   ageVerificationScreen.backgroundUriList = [m.defaultBackgroundUri]
   ageVerificationScreen.signInInfo = signInInfo
+  ageVerificationScreen.previousUiMode = previousUiMode
   ageVerificationScreen.observeFieldScoped("ageSubmitted", callbackString)
   ageVerificationScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")
   displayDefaultBackground()
@@ -374,32 +573,18 @@ Function showAgeVerificationScreen(ageSubmittedCallback, signInInfo = invalid as
 End Function
 
 
-' @msg: roSGNodeEvent, taken from observing ageVerificationScreen.ageSubmitted
 ' @verifyAgeCallback: function, a wrapper function around verifyAge (ie. verifyAgeAtStartup)
-Function onAgeSubmitted(msg, verifyAgeCallback)
+Function onAgeSubmitted(verifyAgeCallback) as Void
   tubiLog("AgeVerificationScreenHelpers.onAgeSubmitted")
-  ageVerificationScreen = msg.getRoSGNode()
+
+  ageVerificationScreen = getCurrentScreen()
+  if ageVerificationScreen = invalid OR ageVerificationScreen.id <> "ageVerificationScreen" then
+    tubiLog("AgeVerificationScreen could not be found")
+    return
+  end if
+
   birthdate = ageVerificationScreen.birthdate
   signInInfo = ageVerificationScreen.signInInfo
-
-  ' send RequestForInfo analytics event
-  selectorValues = {
-    options: [birthdate]
-    selections: [1]
-    string_selector_type: "BIRTHDAY" 'StringSelectorComponent.type enum
-    sub_type: "age-gate"
-  }
-
-  analyticsEvent = {
-    type: "request_for_info"
-    values: {
-      request_for_info_action: "BIRTHDAY"
-      prompt: "Enter your date of birth"
-      selectorOneOf: m.Tracking.getAnalyticsSelector("string_selector", selectorValues)
-    }
-  }
-
-  m.trackingLoggingTask.trackEvent = analyticsEvent
 
   if verifyAgeCallback <> invalid and verifyAgeCallback = verifyAgeAtSignup
     verifyAgeCallback(signInInfo, birthdate)
@@ -409,7 +594,6 @@ Function onAgeSubmitted(msg, verifyAgeCallback)
     ' not expected to ever happen, so punt and start the app normally if it does
     startUserExperienceAsAgeNotVerified()
   end if
-
 End Function
 
 
@@ -513,7 +697,24 @@ End Function
 
 Function onBackButtonPressed(msg)
   ageVerificationScreen = msg.getRoSGNode()
-  displayExitModal(ageVerificationScreen.trackingPageInfo)
+
+  if isLoggedInUser() = true then
+    displayExitModal(ageVerificationScreen.trackingPageInfo)
+  else
+    exitAgeVerificationScreenUnverified()
+  end if
+End Function
+
+Function exitAgeVerificationScreenUnverified()
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid AND currentScreen.id = "ageVerificationScreen" then
+    uiMode = currentScreen.previousUiMode
+    if uiMode <> "" then
+      setUiMode(uiMode)
+    end if
+  end if
+
+  popScreen(false, false)
 End Function
 
 
@@ -586,7 +787,7 @@ Function onBirthdayCheckError(errorInfo)
       title = getTranslation("dialog_errorOops_title")
       message = getErrorMessage(message, userErrorCode)
 
-      showSimpleModal(title, message, [], dialogEvent, m.trackingLoggingTask, startUserExperience)
+      showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask, startUserExperience)
     end if
   end if
 End Function
@@ -622,4 +823,17 @@ Function patchSignedInUserAge()
       })
     end if
   end if
+End Function
+
+Function needsToShowAgeVerificationScreen()
+  if isLoggedInUser() = true AND m.global.authInfo.hasAge = true then
+    return false
+  else
+    guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
+    ' In the case that the user is logged in but there is no age information associated with the account, hasAge defaults to false.
+    if guestUserHasAgeInfo.hasAge = true and guestUserHasAgeInfo.expired <> true
+      return false
+    end if
+  end if
+  return true
 End Function

@@ -321,7 +321,7 @@ Function getTranslation_en_US()
       "message": "This version of Tubi is no longer supported. To update, please exit the Tubi app and go to: \n \n Settings > System > System update > Check now"
     },
     "dialog_fullSynopsis_title": {
-      "description": "title of a dialog window that shows the full desciption of a video item",
+      "description": "title of a dialog window that shows the full description of a video item",
       "message": "Full Synopsis"
     },
     "dialog_signIn_activationCodeExpired_title": {
@@ -368,6 +368,22 @@ Function getTranslation_en_US()
       "description": "title of a dialog window when it asks the user to sign in",
       "message": "Please Sign In"
     },
+    "dialog_confirmCorrectAge_title": {
+      "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
+      "message": "Were you born in {birthYear}"
+    },
+    "dialog_confirmCorrectAge_description": {
+      "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
+      "message": "Please confirm to continue"
+    },
+    "dialog_confirmCorrectAge_confirm": {
+      "description": "label of a dialog window button that will confirm app user's age is correct",
+      "message": "Yes"
+    },
+    "dialog_confirmCorrectAge_edit": {
+      "description": "label of a dialog window button that will let user edit their age again",
+      "message": "Edit"
+    },
     "dialog_kidsExit_title": {
       "description": "title of a dialog window when the user is attempting to exit kids Mode",
       "message": "Exit Kids"
@@ -392,12 +408,20 @@ Function getTranslation_en_US()
       "description": "A description informing users they are only eligible to view Tubi in kids mode",
       "message": "You are only eligible to view Tubi Kids at this time."
     },
+    "dialog_cannotExitKidsMode_title": {
+      "description": "Title for dialog telling the user they can not exit kids mode",
+      "message": "Cannot Exit Kids Mode"
+    },
+    "dialog_cannotExitKidsMode_description": {
+      "description": "Description for dialog telling the user they can not exit kids mode",
+      "message": "Please try again in 24 hours.\nQuestions? Drop us an email at support@tubi.tv"
+    },
     "dialog_exitApp_title": {
-      "description": "Title of ther dialog window that asks the user if they want to exit the app",
+      "description": "Title of the dialog window that asks the user if they want to exit the app",
       "message": "Are You Sure?"
     },
     "dialog_exitApp_description": {
-      "description": "description of ther dialog window that asks the user if they want to exit the app",
+      "description": "description of the dialog window that asks the user if they want to exit the app",
       "message": "Do you really want to exit Tubi?"
     },
     "error_noGetChannels_description": {
@@ -417,7 +441,7 @@ Function getTranslation_en_US()
       "message": "To watch this video for free, please sign in or register."
     },
     "error_matureContent_title": {
-      "description": "Title of the dialog window when user attempts to play mature content but they need to be sigfned in first",
+      "description": "Title of the dialog window when user attempts to play mature content but they need to be signed in first",
       "message": "Mature Content"
     },
     "dialog_signOut_title": {
@@ -749,8 +773,8 @@ Function getTranslation_en_US()
       "message": "Could not successfully send your birthdate to our servers."
     },
     "screenAgeVerification_header": {
-      "description": "A header message welcoming users to Tubi on Age required screen",
-      "message": "Welcome to Tubi, {firstname}"
+      "description": "A header message on the Age required screen asking them to confirm their age",
+      "message": "Confirm your age*"
     },
     "screenAgeVerification_sub_header": {
       "description": "A sub header message to direct users to enter their birth date",
@@ -960,7 +984,7 @@ Function getTranslation_en_US()
     },
     "why_ask_age_description": {
       "description": "The main message which explains why Tubi is asking for the users year of birth",
-      "message": "We use this information to confirm that you're meeting the age requirements set out in our Terms of Use and to personalize you experience. Read Terms of Use at: www.tubitv.com/terms Questions? Let us know at: support@tubi.tv"
+      "message": "*We use this information to confirm that you're meeting the age requirements set out in our Terms of Use and to personalize you experience. Read Terms of Use at: www.tubitv.com/terms Questions? Let us know at: support@tubi.tv"
     },
     "signIn_screen_heading": {
       "description": "Title on the signIn screen",

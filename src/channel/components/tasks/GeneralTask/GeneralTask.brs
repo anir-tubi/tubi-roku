@@ -6,8 +6,8 @@ End Function
 
 
 ' listen
-' 
-' this task listens for new request in port and makes api request & response calls 
+'
+' this task listens for new request in port and makes api request & response calls
 Function listen()
 
   tubiLog("GeneralTask.listenloop started")
@@ -32,7 +32,7 @@ Function listen()
   ' batch store will look like below after receiving response for a batch
   ' m.batchStore - eg.
        '{
-          '416eb945-81ba-45b8-9cd8-c11056666b43:  '{  
+          '416eb945-81ba-45b8-9cd8-c11056666b43:  '{
                                                     '09a35019-4120-45ef-bd3d-51effcc1340b: <Component: roAssociativeArray>
                                                     '12c696be-b2b1-4617-8b68-20fe912cea9a: <Component: roAssociativeArray>
                                                     '6e32aecc-b2af-41ce-ba23-d02678619fa8: <Component: roAssociativeArray>
@@ -49,7 +49,7 @@ Function listen()
   m.jobStore = {}
   m.requestTypes = {}
   createParsingCallbacks()
-  
+
   m.requestModule = Request(m.constants.settings)
   m.auth = TubiAuth(m.constants, m.requestModule)
   m.authInfo = invalid
@@ -62,44 +62,44 @@ Function listen()
         requestNode = msg.getData()
 
         if requestNode <> invalid and isEmptyField(requestNode.response) and isEmptyField(requestNode.error)
-          m.top.request = invalid 'reset the request field so no changes to the requestNode cause the following logic to run again 
+          m.top.request = invalid 'reset the request field so no changes to the requestNode cause the following logic to run again
           makeApiRequest(requestNode, invalid)
         end if
 
       else if msg.getField() = "batchRequest"
-        
+
         requestNode = msg.getData()
 
         if requestNode <> invalid
-          m.top.batchRequest = invalid 'reset the request field so no changes to the requestNode cause the following logic to run again 
+          m.top.batchRequest = invalid 'reset the request field so no changes to the requestNode cause the following logic to run again
           makeBatchApiRequests(requestNode)
-        end if 
+        end if
 
       else if msg.getField() = "cancel"
 
         requestNode = msg.getData()
-          
-        if requestNode <> invalid
-          m.top.cancel = invalid 'reset the request field so no changes to the requestNode cause the following logic to run again 
-          cancelRequests(requestNode)
-        end if 
 
-      end if       
+        if requestNode <> invalid
+          m.top.cancel = invalid 'reset the request field so no changes to the requestNode cause the following logic to run again
+          cancelRequests(requestNode)
+        end if
+
+      end if
 
     else if type(msg) = "roUrlEvent"
-      processResponse(msg)  
-    end if  
+      processResponse(msg)
+    end if
   end while
 
 End Function
 
 
 ' makeApiRequest
-' 
+'
 ' this method creates TubiRequest Object and start the api request
 ' @requestNode : roSGNode, requestNode is ContentNode
 ' @batchNode : roSGNode, batchNode is TubiRequest() Object for batchRequest. it will be invalid for single request
-Function makeApiRequest(requestNode, batchNode = invalid) as Boolean 
+Function makeApiRequest(requestNode, batchNode = invalid) as Boolean
   requestId = requestNode.id
   input = requestNode.input 'grab a local copy of inputs to prevent subsequent rendezvous's
 
@@ -123,7 +123,7 @@ Function makeApiRequest(requestNode, batchNode = invalid) as Boolean
           options.headers.append(headers)
         end if
       end if
-    end if  
+    end if
 
     tubiReq = m.requestModule.createAsync(url, requestType, options)
     reqSent = tubiReq.start(m.port)
@@ -139,7 +139,7 @@ Function makeApiRequest(requestNode, batchNode = invalid) as Boolean
         batchNode: batchNode
       }
       return true
-    else  
+    else
       return false
     end if
   else
@@ -174,7 +174,7 @@ Function makeBatchApiRequests(batchNode) As Void
     responseAccumulator: batchResponseAccumulator
     responseOrder: batchResponseOrder
   }
-End Function 
+End Function
 
 
 ' processResponse
@@ -196,16 +196,17 @@ Function processResponse(msg)
     result = job.tubiReq.handleEvent(msg)
     retries = requestNode.retries
 
-    if result <> invalid and result.response <> invalid 
+    if result <> invalid and result.response <> invalid
 
       if callbackTypes <> invalid
 
         code = result.response.code
 
         if code >= 200 and code < 400
-
           processSuccessResponse(result, callbackTypes, job)
-
+        else if code = 422 OR code = 451 then
+          ' Response codes returned for an underage user so don't want to run the retry logic
+          processErrorReponse(result, callbackTypes, job)
         else if (code = 403 or code = 401) and m.constants.reqNames.acceptsTubiAuth[requestType] = true
           if retries > 0
             ' request could not be authed by backend so attempt to refresh the auth token and try again
@@ -234,7 +235,7 @@ Function processResponse(msg)
           end if
         end if
 
-        m.jobStore.delete(id) ' delete the job from assocarray after the response is sent to avoid memory leak 
+        m.jobStore.delete(id) ' delete the job from assocarray after the response is sent to avoid memory leak
 
       end if
     end if
@@ -449,7 +450,7 @@ End function
 
 '''''''''''''''''''''''
 ' cancelRequests
-' 
+'
 ' this method cancels the outstanding requests on the same screen
 ' @requestNode : roSGNode, requestNode is ContentNode created at GeneralTaskModule
 Function cancelRequests(requestNode) As Void

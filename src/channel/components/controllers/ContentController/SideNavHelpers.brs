@@ -26,7 +26,7 @@ Function initSideNav()
   if isKidsModeEnabledByParentalControls() = true
     m.SideNav.kidsItemTurnedOn = false
   end if
-  
+
   if isParentalControlsAdultLevel() <> true
     m.SideNav.espanolItemTurnedOn = false
     m.SideNav.linearEPGTurnedOn = false
@@ -36,8 +36,8 @@ Function initSideNav()
   if isTopNavHomeScreenEnabled() = true
     '//Tell the sideNav to stop displaying the Linear TV menu item
     m.SideNav.displayLinearTV = false
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true  
-      '//In this experement, top Nav will not linear TV  
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
+      '//In this experement, top Nav will not linear TV
       if isParentalControlsAdultLevel() <> true
         m.SideNav.displayLinearEPG = false
       else
@@ -108,7 +108,7 @@ Function onSideNavNavigateWithinPageInfoChanged()
   navigateWithinPageInfo = m.SideNav.navigateWithinPageInfo
   currentScreen = getCurrentScreen()
 
-  if currentScreen <> invalid and currentScreen.trackingPageInfo <> invalid  
+  if currentScreen <> invalid and currentScreen.trackingPageInfo <> invalid
     navigateWithinPageInfo.pageOneof = m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
     sendNavigateWithinPageInfo(navigateWithinPageInfo)
   end if
@@ -157,27 +157,28 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.kidsMode
-      sTitle = ""
-      sDescription = ""
       if itemSelected.turnedOn = true
         '//If the parental control settings are not set to kids, then this action is not limited
         '// aka this mode is not locked down and can be easily exited without a parent's intervention
 
         if isKidsUIOn() = true
-          dialogEvent = {
-            type: "dialog"
-            values: {
-              dialog_type: "EXIT_KIDS_MODE"
-              pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
-              dialog_action: "SHOW"
-              dialog_sub_type: "exit-kids-mode"
+          if needsToShowAgeVerificationScreen() = true then
+            showAgeVerificationScreenAtKidsModeExit(m.uiMode)
+          else
+            dialogEvent = {
+              type: "dialog"
+              values: {
+                dialog_type: "EXIT_KIDS_MODE"
+                pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
+                dialog_action: "SHOW"
+                dialog_sub_type: "exit-kids-mode"
+              }
             }
-          }
 
-          sTitle = getTranslation("dialog_kidsExit_title")
-          sDescription = getTranslation("dialog_kidsExit_description")
-          '//::TODO::locale - should we 1st check if there is an error specifc OK/cancel button? If, not then should we get the generic ok/cancel button string?
-          showSimpleInstantResumableModal(sTitle, sDescription, [getTranslation("dialog_kidsExit_button_ok"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, disableKidsModeFromSideNav)
+            sTitle = getTranslation("dialog_kidsExit_title")
+            sDescription = getTranslation("dialog_kidsExit_description")
+            showSimpleInstantResumableModal(sTitle, sDescription, [getTranslation("dialog_kidsExit_button_ok"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, disableKidsModeFromSideNav)
+          end if
         else
           dialogEvent = {
             type: "dialog"
@@ -232,11 +233,11 @@ Function onSideNavItemSelected()
         ' if the topnav is not enabled, then check if the current screen is not the home screen before proceeding
         if topScreen.id <> m.constants.ui.screenIds.homeScreen
           '//if this is the homescreen, then just close the sidenav. no need to call showHomeScreen()
-          showHomeScreen(m.constants, authInfo) 
+          showHomeScreen(m.constants, authInfo)
         end if
       else if isCurrentScreenHomeScreen() = false or topScreen.id = m.constants.ui.screenIds.espanolScreen
         '//Don't open the homescreen if the current screen is already a homescreen type (except the espanol screen since that displays in the side nav). Just need to close the side nav.
-        showHomeScreen(m.constants, authInfo) 
+        showHomeScreen(m.constants, authInfo)
       end if
 
       bNewScreenCalledSuccess = true
@@ -280,12 +281,12 @@ Function onSideNavItemSelected()
         displayMenuItemDisabled(m.constants.ui.sideNavIds.espanol)
       else if isParentalControlsAdultLevel() = false
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.espanol, "teens")        
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.espanol, "teens")
       else
         setUiMode(m.constants.ui.modes.latino)
         showEspanolScreen()
         bNewScreenCalledSuccess = true
-      end if  
+      end if
     else if itemSelectedId = m.constants.ui.sideNavIds.linearTV
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
@@ -301,13 +302,13 @@ Function onSideNavItemSelected()
         displayMenuItemDisabled(m.constants.ui.sideNavIds.linearEPG)
       else if isParentalControlsAdultLevel() = false
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.linearEPG, "teens")        
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.linearEPG, "teens")
       else
         topScreen = getCurrentScreen()
         '//Don't open the EPGScreen if the current screen is already a EPGScreen type (news or sports). Just need to close the side nav.
-        if isAnEPGScreen(topScreen) = false 
+        if isAnEPGScreen(topScreen) = false
           setUiMode(m.constants.ui.modes.standard)
-          showDefaultEPGScreen()   
+          showDefaultEPGScreen()
         end if
         bNewScreenCalledSuccess = true
       end if
@@ -365,7 +366,7 @@ Function displayMenuItemDisabled(sMenuItemID, parental="")
     sTitle = getTranslation("dialog_channelsDisabled_title")
     sDialogSubTypeValue = "kids-mode-channels"
 '//::TODO:: Because movies, tv shows, espanol, and live TV are displayed in the top nav, then no need to have code to show a dialog window for these options
-'//         Get rid of this code and any supporting code in this file once it has been determined that top nav is here to stay. Once it has been decided to have the topNav on FireTV 
+'//         Get rid of this code and any supporting code in this file once it has been determined that top nav is here to stay. Once it has been decided to have the topNav on FireTV
   else if sMenuItemID = m.constants.ui.sideNavIds.movies
     sTitle = getTranslation("dialog_moviesDisabled_title")
     sDialogSubTypeValue = "kids-mode-movies"
@@ -374,13 +375,13 @@ Function displayMenuItemDisabled(sMenuItemID, parental="")
     sDialogSubTypeValue = "kids-mode-tv"
   else if sMenuItemID = m.constants.ui.sideNavIds.espanol
     sTitle = getTranslation("dialog_espanolDisabled_title")
-    sDialogSubTypeValue = "kids-mode-espanol"    
+    sDialogSubTypeValue = "kids-mode-espanol"
   else if sMenuItemID = m.constants.ui.sideNavIds.linearTV
     sTitle = getTranslation("dialog_liveTVDisabled_title")
-    sDialogSubTypeValue = "kids-mode-livetv" 
+    sDialogSubTypeValue = "kids-mode-livetv"
   else if sMenuItemID = m.constants.ui.sideNavIds.linearEPG
     sTitle = getTranslation("dialog_liveTVDisabled_title")
-    sDialogSubTypeValue = "kids-mode-epg" 
+    sDialogSubTypeValue = "kids-mode-epg"
   end if
 
   dialogEvent = {
@@ -394,9 +395,9 @@ Function displayMenuItemDisabled(sMenuItemID, parental="")
   }
 
   if parental = "teens"
-    sDescription = getTranslation("dialog_sideNavItemDisabled_Parental_description") 
+    sDescription = getTranslation("dialog_sideNavItemDisabled_Parental_description")
   else
-    sDescription = getTranslation("dialog_sideNavItemDisabled_description") 
+    sDescription = getTranslation("dialog_sideNavItemDisabled_description")
   end if
   showSimpleInstantResumableModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
 
@@ -435,7 +436,7 @@ End Function
 '@param b: Boolean, setting to true opens the side nav, setting to false closes the side nav.
 Function openSideNav(b = true)
   m.SideNav.opened = b
-  if b = false 
+  if b = false
     topScreen = getCurrentScreen()
     sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
     itemSelectedId = m.SideNav.itemSelectedId
@@ -472,7 +473,7 @@ Function getSideNavInteractionEvent(screen, trackingLib, userInteraction)
     else if userInteraction = "confirm"
       userInteractionValue = "CONFIRM"
       sideNavId = m.SideNav.itemSelectedId
-    else 
+    else
       '//This should never happen as long as userInteraction is set as one of the approved strings
       return event
     end if

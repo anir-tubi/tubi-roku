@@ -17,7 +17,7 @@ Function init()
   ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.
   GeneralTaskModule(m, generalTask)
 
-  '//When ContentController initializes, clear all trandslations in case this is contained in a remote component. 
+  '//When ContentController initializes, clear all trandslations in case this is contained in a remote component.
   clearTranslations()
 
   m.Request = TubiRequest(m.constants.settings)
@@ -60,8 +60,8 @@ Function init()
   m.cache = TubiCache(m.NodeHelpers, m.constants.ui.cacheableScreenIds, m.constants.ui.permanentlyCachedContentIds)
 
   ' This is an associative array that keeps track of when pixels are sent out when sponsored containers are displayed. The pixels should only be sent once per page load.
-  m.sentSponsorPixels = {} 
-  
+  m.sentSponsorPixels = {}
+
   ' Keep track of when a user starts a path to watch a video that is contained in a sponsored container. This ID will be passed to rainmaker for an ad request and be used to play a sponsored preroll ad
   m.videoSponsorExposureId = ""
 
@@ -100,14 +100,14 @@ Function init()
 
   m.top.observeFieldScoped("customSuspend", "onCustomSuspend")
   m.top.observeFieldScoped("customResume", "onCustomResume")
-  
+
   if m.constants.deviceInfo.language = "es"
     m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-large.png"
     m.logoKids.width = 259
     m.logoKids.translation = [1566, m.logoKids.translation[1]]
   end if
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
-  
+
   ' Global state
   m.global.addField("bookmarkIds", "node", false)
   m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
@@ -144,11 +144,9 @@ Function init()
 
   m.lastUserActivity = Uptime(0)  ' arbitrary marker when user last pressed a remote key
 
-  m._ = rodash()
-
   ' holds state so we don't fire the app load beacon more than once
   m.appLoadedBeaconFired = false
-  
+
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
@@ -162,23 +160,23 @@ Function init()
     'this variable is used to decide when to let the user interact with EPG TimeGrid after content has been either assinged first time or refreshed after validUntil/refetch due to errors.
     'currently, user is allowed to interact with EPG as soon as first batch is retrived and EPG content has been updated.
     'Once the LinearVideoplayer integrates with EPGScreen, then we need to revisit the logic of when to let the user interact with EPG TimeGrid due to jumpTO channel requirement and Channel might be fetched to focus on.
-    m.updateEPGTimeGrid = true 
+    m.updateEPGTimeGrid = true
   end if
 End Function
 
 
 ' onFadeInContentController callback will be triggered once the launch animation logo got finished
 Function onFadeInContentController()
-  tubiLog("ContentController.onFadeInContentController") 
+  tubiLog("ContentController.onFadeInContentController")
   fadeInUiGroup = customFadeIn(m.uiGroup, 2, 0.5)
-  fadeInUiGroup.observeField("state", "onUiGroupFadeStateChange") 
+  fadeInUiGroup.observeField("state", "onUiGroupFadeStateChange")
 
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.isInFocusChain() = false
-  
+
     ' isUpgradeModalOpened will be true if constants.showUpgradeAlert is true
     ' focus currentScreen only if the upgradeModal is closed or disabled
-    
+
     isUpgradeModalOpened = false
     for i=0 to m.top.getChildCount()-1
       screen = m.top.getChild(i)
@@ -190,11 +188,11 @@ Function onFadeInContentController()
     if isUpgradeModalOpened = false
       currentScreen.setFocus(true)
     end if
-  
+
     if currentScreen.id = "detailScreen" and m.detailScreenAfterFn <> invalid
       m.detailScreenAfterFn(currentScreen)
       m.detailScreenAfterFn = invalid
-    end if    
+    end if
   end if
 
 End Function
@@ -296,14 +294,14 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       if m.SideNav.opened = false
         if m.SideNav.visible = true
           openSideNavFromButton() '//"BUTTON_BACK"
-        else if m.screenStack.getChildCount() > 1  
-          oldTopScreen = getCurrentScreen()    
+        else if m.screenStack.getChildCount() > 1
+          oldTopScreen = getCurrentScreen()
           if oldTopScreen.id = m.constants.ui.screenIds.espanolScreen
             ' exiting the espanol experience, so update the uiMode which will be referenced
             ' in subsequent function calls in order to display the correct UI.
             setUiMode(m.constants.ui.modes.standard)
           end if
-          
+
           popScreen(true, true)
 
           newTopScreen = getCurrentScreen()
@@ -341,16 +339,16 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           if sideNavId <> invalid
             focusSideNavOption(sideNavId)
             m.SideNav.setFocus(true)
-          else 
+          else
             hideNavMenu(false)
             focusCurrentScreen()
           end if
         else
           topScreen = getCurrentScreen()
           if topScreen.id <> m.constants.ui.screenIds.homeScreen
-            '//make sure the last screen in the stack is the homescreen. 
+            '//make sure the last screen in the stack is the homescreen.
             '//If it isn't this this might have happened b/c of coming from a non home screen triggered by the initial content screen.
-            '//pop the screen, which will trigger the stack to load the homescreen by 
+            '//pop the screen, which will trigger the stack to load the homescreen by
             ' triggering a restart of the app via onScreenStackEmpty()
             ' PageLoad event will be sent by fireAppLoadBeacon() when home page finishes loading
             popScreen(true, false)
@@ -367,8 +365,8 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       return true
     else if key = "OK"
       '//ensure this keypress is captured so the default Roku positive audio sound is played.
-      return true  
-    else 
+      return true
+    else
       '//react to the left/right/up/down keys
       bReacted = false
       if key = "left" and m.screenStack.isInFocusChain() = true
@@ -392,7 +390,7 @@ End Function
 
 Function onComponentFocus()
   tubiLog("ContentController.onComponentFocus")
-  if m.top.isInFocusChain() and m.top.hasFocus() 
+  if m.top.isInFocusChain() and m.top.hasFocus()
     if m.SideNav.opened = true
       displayNavMenu()
     else if getCurrentScreen() <> invalid
@@ -411,7 +409,7 @@ Function onVideoPlayerVisibleChange(msg)
   else
     m.SideNav.visible = true
     m.logoGroup.visible = true
-  end if 
+  end if
 End Function
 
 
@@ -445,11 +443,11 @@ End Function
 '
 ' We need to gather information from various places. As callbacks fire when these different infos arrive,
 ' they all set some state on m and call startUserExperience(). When all the information has arrived, as verified
-' by the first checks in the function, then the function performs it's functionality to start the channel. 
+' by the first checks in the function, then the function performs it's functionality to start the channel.
 '
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
-  
+
   if m.authInfoReceived <> true
     ' checks if the initial auth info has been pulled from the registry
   else if m.startupArgsReceived <> true
@@ -526,14 +524,14 @@ Function startUserExperience()
       ' whether we were logged in or not.
       showDetailScreen(m.deeplinkContent, false)
     else if shouldDisplayInitialContentScreen() = true
-      ' Display the intitial content screen to the user so they can choose the proper experience. 
+      ' Display the intitial content screen to the user so they can choose the proper experience.
       displayInitialContentScreen()
-      showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary 
+      showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
     else
       startChannel()
-      showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary 
+      showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
     end if
-    
+
   end if
 End Function
 
@@ -554,7 +552,7 @@ End Function
 Function sendHdcpLog()
 
   hdmiStatus = CreateObject("roHdmiStatus")
-  
+
   if hdmiStatus <> invalid
     hdcpVersion = hdmiStatus.GetHdcpVersion()
     isActive = hdmiStatus.IsHdcpActive(hdcpVersion)
@@ -562,7 +560,7 @@ Function sendHdcpLog()
       hdcpVersion = "none"
     end if
     tubiLog(hdcpVersion, "info", "clientInfo", "hdcp-version")   'send info to server
-  end if  
+  end if
 
 End Function
 
@@ -570,7 +568,7 @@ End Function
 ' is triggered when the args that are passed to main, are passed into the SG thread to the contentController.
 ' this is one of the pre-requisites to starting the SG user experience.
 Function onStartupArgs()
-  m.deeplinkContent = invalid 
+  m.deeplinkContent = invalid
   if m.top.startUpArgs <> invalid and m.top.startUpArgs.contentID <> invalid
     m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs)
   end if
@@ -591,43 +589,10 @@ End Function
 
 
 Function onInputInfoReceived()
-  if m.top.roInputInfo <> invalid
-    inputInfo = m.top.roInputInfo
-    
+  inputInfo = m.top.roInputInfo
+  if inputInfo <> invalid
     if inputInfo.type = "deeplink"
-      resetSideNav(false)
-      videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-      stopVideoContent(videoPlayer) 'sets m.handlingDeeplinkInputEvent = false and m.deeplinkContent = invalid
-      returnToPreviousScreenFromLinearVideo(false)
-
-      if m.uiMode = m.constants.ui.modes.kids
-        ' turn off kids mode for input deeplinks (ie. voice commands)
-        ' Normal kids mode allows users to exit kids mode, so treat voice command deeplink as if
-        ' user is exiting kids mode.
-        ' Keeping the "kidsAgeGate" and "kidsParental" uiModes will prevent voice command deeplinks
-        ' from being successful unless the content is kids content.
-        setUiMode(m.constants.ui.modes.standard)
-
-        ' remove all screens if in kids mode so that when backing out of the details screen,
-        ' the home screen will be re-populated as expected to the standard UI.
-        shrinkScreenStack(0)
-        emptyScreenCache()
-      end if
-
-      ' the following values will be used to save state and will be used in the process that
-      ' is kicked off by showDetailScreen to load the detail screen and video player screen
-      m.deeplinkContent = createDeeplinkContentFromStartupArgs(inputInfo)
-      m.handlingDeeplinkInputEvent = true
-      
-      ' close any opened modal/pop-up when deeplinking via roInput
-      for i=0 to m.top.getChildCount()-1
-        screen = m.top.getChild(i)
-        if screen.subType() = "ModalDialogScreen"
-          closeModal(screen, "back")
-        end if
-      end for      
-
-      showDetailScreen(m.deeplinkContent, false, skipDetailScreen)
+      handleInputDeeplink(inputInfo)
     else if inputInfo.type = "transport"
       currentScreen = getCurrentScreen()
 
@@ -646,6 +611,46 @@ Function onInputInfoReceived()
   end if
 End Function
 
+Function handleInputDeeplink(inputInfo) as Void
+  resetSideNav(false)
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+  stopVideoContent(videoPlayer) 'sets m.handlingDeeplinkInputEvent = false and m.deeplinkContent = invalid
+  returnToPreviousScreenFromLinearVideo(false)
+
+  if m.uiMode = m.constants.ui.modes.kids
+    if needsToShowAgeVerificationScreen() = true then
+      showAgeVerificationScreenAtInputDeeplink(m.uiMode)
+      return
+    else
+      ' turn off kids mode for input deeplinks (ie. voice commands)
+      ' Normal kids mode allows users to exit kids mode, so treat voice command deeplink as if
+      ' user is exiting kids mode.
+      ' Keeping the "kidsAgeGate" and "kidsParental" uiModes will prevent voice command deeplinks
+      ' from being successful unless the content is kids content.
+      setUiMode(m.constants.ui.modes.standard)
+
+      ' remove all screens if in kids mode so that when backing out of the details screen,
+      ' the home screen will be re-populated as expected to the standard UI.
+      shrinkScreenStack(0)
+      emptyScreenCache()
+    end if
+  end if
+
+  ' the following values will be used to save state and will be used in the process that
+  ' is kicked off by showDetailScreen to load the detail screen and video player screen
+  m.deeplinkContent = createDeeplinkContentFromStartupArgs(inputInfo)
+  m.handlingDeeplinkInputEvent = true
+
+  ' close any opened modal/pop-up when deeplinking via roInput
+  for i=0 to m.top.getChildCount()-1
+    screen = m.top.getChild(i)
+    if screen.subType() = "ModalDialogScreen"
+      closeModal(screen, "back")
+    end if
+  end for
+
+  showDetailScreen(m.deeplinkContent, false, skipDetailScreen)
+End Function
 
 Function onTransportVoiceResponse(msg)
   transportVoiceResponse = msg.getData()
@@ -693,7 +698,7 @@ Function createDeeplinkContentFromStartupArgs(args)
     if args.source = invalid or m.constants.deeplinks[args.source] = invalid
       content.source = "no-source"
     else
-      content.source = m.constants.deeplinks[args.source]  
+      content.source = m.constants.deeplinks[args.source]
     end if
 
     ' if there is a parameter called entry with a value, that is the source of the deep link
@@ -928,7 +933,7 @@ Function onReloadUserCategoriesResponse(handledRequest)
   ' inform the category list screen of the udpated user category
   categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
   if categoryListScreen <> invalid
-    categoryListScreen.reloadUserCategoriesResponse = handledRequest  
+    categoryListScreen.reloadUserCategoriesResponse = handledRequest
   end if
 
   ' inform the category details screen for the specific user category of the update user category content
@@ -1045,8 +1050,15 @@ End Function
 ' sign in process (don't know if the user should be in parental control kids mode).
 Function setUiModeFromState()
   tubiLog("ContentController.setUiModeFromState")
-  if shouldShowAgeGate() = true and m.guestUserHasAgeInfo <> invalid and m.guestUserHasAgeInfo.hasAge = false
-    setUiMode(m.constants.ui.modes.kidsAgeGate)
+  if shouldShowAgeGate() = true then
+    if m.guestUserHasAgeInfo = invalid then
+      m.guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
+    end if
+
+    ' Have to make sure we check expired as well as default state will always have hasAge = false
+    if m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false then
+      setUiMode(m.constants.ui.modes.kidsAgeGate)
+    end if
   else if isKidsModeEnabledByParentalControls() = true
     setUiMode(m.constants.ui.modes.kidsParental)
   else
@@ -1068,7 +1080,7 @@ Function setCommonKidsModeElements()
     showKidsLogo()
     m.backgroundGroup.kidsMode = true
     m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
-    tellScreensIfKidsModeBeSentToServer()      
+    tellScreensIfKidsModeBeSentToServer()
   end if
 End Function
 
@@ -1156,7 +1168,7 @@ Function isKidsModeEnabledByParentalControls() as Boolean
     if authInfo.parentalrating <> invalid and authInfo.parentalrating < 2
       bEnabled = true
     end if
-  end if  
+  end if
   return bEnabled
 End Function
 
@@ -1164,15 +1176,15 @@ End Function
 Function isParentalControlsAdultLevel() as Boolean
   tubiLog("ContentController.isParentalControlsAdultLevel")
   bEnabled = true
-  
-  if isLoggedInUser() = true 
-    
+
+  if isLoggedInUser() = true
+
     authInfo = m.global.authInfo
 
     if authInfo.parentalrating = invalid or authInfo.parentalrating <> 3
       bEnabled = false
     end if
-    
+
   end if
 
   return bEnabled
@@ -1194,7 +1206,7 @@ End Function
 ' Any screen that is displaying this category should be updated.
 ' @sCategoryID: string, the category id we are searching for in the stack
 Function refreshStackedUserScreenWithChangedCategory(sCategoryID)
-  ' Tell the screen that contains the categroy associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0 
+  ' Tell the screen that contains the categroy associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0
   for i=0 to m.screenStack.getChildCount()-1
     screen = m.screenStack.getChild(i)
     if screen <> invalid and screen.isSubType("CategoryDetailsScreen")
@@ -1286,7 +1298,7 @@ Function deleteFromScreenCache(screenId)
 End Function
 
 
-' Destroy the screen (from cache) that is associated with the passeed sScreenID param. 
+' Destroy the screen (from cache) that is associated with the passeed sScreenID param.
 ' If the screen is the current screen, then go back to the previous screen
 ' @sScreenID: String, The ID associated with the screen to be destroyed
 Function destroyScreen(sScreenID)
@@ -1306,7 +1318,7 @@ Function destroyScreen(sScreenID)
       end if
     end if
 
-  end if 
+  end if
 End Function
 
 
@@ -1316,20 +1328,20 @@ Function emptyScreenCache()
 End Function
 
 
-'a wrapper for setting a content in cache 
+'a wrapper for setting a content in cache
 Function setInContentCache(content)
   return m.cache.setInContentCache(content)
 End Function
 
 
-'a wrapper for getting a content from cache 
+'a wrapper for getting a content from cache
 '@contentId: String, The constants.ui.contentIds associated with content.
 Function getFromContentCache(contentId)
   return m.cache.getFromContentCache(contentId)
 End Function
 
 
-' This will tell the screen to update its content the next time the screen is displayed 
+' This will tell the screen to update its content the next time the screen is displayed
 ' @sID: string, the ID of the screen whose content should be marked to be refreshed
 Function setContentToRefresh(sID)
   screen = getFromScreenCache(sID)
@@ -1340,7 +1352,7 @@ Function setContentToRefresh(sID)
     end if
   end if
   return false
-End Function 
+End Function
 
 
 ' @shouldRefetchHomescreen: boolean, do not refresh homescreen if set to false
@@ -1512,7 +1524,7 @@ Function getBackgroundtype(backgroundUriList, contentType = "")
       backgroundType = m.constants.ui.backgroundTypes.fullScreen
     else if contentType = m.constants.ui.contentTypes.linear
       backgroundType = m.constants.ui.backgroundTypes.linear
-    else if contentType = m.constants.ui.contentTypes.epg 
+    else if contentType = m.constants.ui.contentTypes.epg
       backgroundType = m.constants.ui.backgroundTypes.epg
 
     else
@@ -1528,7 +1540,7 @@ Function showUpgradeModal(shouldAlert, trackingLib, trackingTask)
   if shouldAlert = true
     title  = getTranslation("dialog_updateVersion_title")
     message  = getTranslation("dialog_updateVersion_description")
-    
+
     buttons = [getTranslation("dialog_button_close")]
 
     dialogEvent = {
@@ -1547,7 +1559,7 @@ End Function
 
 ' fires a beacon which roku uses to determine the app load time only once per session. See:
 ' https://developer.roku.com/en-gb/docs/developer-program/performance-guide/measuring-channel-performance.md
-' 
+'
 ' also fires a home screen page load event when the home screen is created due to no screens on the stack
 ' (this would happen in the case of deep links)
 Function fireAppLoadBeacon()
@@ -1564,7 +1576,7 @@ End Function
 
 
 ' showHideSpinner - shows/hides the loading spinner/text
-' 
+'
 '@visible : boolean - true/false
 Function showHideSpinner(visible)
 
@@ -1581,7 +1593,7 @@ Function onUiGroupFadeStateChange(msg)
     fadeInUiGroup.unobserveField("state")
     m.top.removeStartUpScreens = true
   end if
-  
+
 End Function
 
 
@@ -1595,7 +1607,7 @@ Function customFadeIn(target, duration, delay)
     allowOnLowSpecDevices: true
   }
   return animate(target, animationOptions)
-  
+
 End Function
 
 
@@ -1684,10 +1696,10 @@ Function onCustomResume(msg)
     lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
     lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
     if getExperimentResource("roku_instant_resume", "roku_instant_resume_v2", true).enabled = true
-      if m.Request = invalid 
+      if m.Request = invalid
         m.Request = TubiRequest(m.constants.settings)
       end if
-      Auth = TubiAuth(m.constants, Request)
+      Auth = TubiAuth(m.constants, m.Request)
       guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
 
       if customResumeLaunchParams.contentId <> invalid and customResumeLaunchParams.mediaType <> invalid
@@ -1695,7 +1707,7 @@ Function onCustomResume(msg)
         ' lots of edge cases, so for consistency, restarting the app is easiest.
         restartApp()
       else if isLoggedInUser() = false and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4)
-        ' For guest users, if the time between last suspend and current resume is more than 24 hours, 
+        ' For guest users, if the time between last suspend and current resume is more than 24 hours,
         ' disable Instant Resume & relaunch app from scratch.
         ' Also every 4 days once the app restarts in order to get starter/remote components
         restartApp()
@@ -1785,9 +1797,9 @@ Function resumeApp()
     playLinearVideoContent(originalLinearContent, false, associatedScreenId)
   end if
 
-  ' when channel resumes, 
+  ' when channel resumes,
   ' send page load event here only if the channel is not launched via deeplink
-  ' because the page load event is handled & already happening during deeplink 
+  ' because the page load event is handled & already happening during deeplink
   if m.deeplinkContent = invalid and currentScreen <> invalid
     screenTrackingLoad(currentScreen.trackingPageInfo)
   end if
@@ -1804,14 +1816,14 @@ Function resumeApp()
   myScene = m.top.getScene()
   myScene.signalBeacon("AppResumeComplete")
 
-End Function  
+End Function
 
 
 Function onFullscreenCountdown()
   tubiLog("ContentController.onFullscreenCountdown")
   screen = getCurrentScreen()
-  if screen <> invalid 
-    if screen.id = m.constants.ui.screenIds.homeScreen or screen.id = m.constants.ui.screenIds.linearTVScreen 
+  if screen <> invalid
+    if screen.id = m.constants.ui.screenIds.homeScreen or screen.id = m.constants.ui.screenIds.linearTVScreen
       if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
         nCurrentCount = m.fullscreenCountdown
         nNewCount = nCurrentCount - 1
@@ -1824,10 +1836,10 @@ Function onFullscreenCountdown()
     else if isAnEpgScreen(screen) = true
       nCurrentCount = Screen.fullscreenCountdown
       nNewCount = nCurrentCount - 1
-      screen.fullscreenCountdown = nNewCount    
+      screen.fullscreenCountdown = nNewCount
     end if
   end if
- 
+
   if nNewCount <= 0
     if isAnEpgScreen(screen) = true
       selectLinearContent(Screen.linearChannelToPlay)

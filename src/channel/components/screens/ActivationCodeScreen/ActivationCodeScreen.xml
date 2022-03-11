@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
  - ActivationCodeScreen
- - 
+ -
  - Present the user with a registration code to register on tubi.tv
  -->
 <component name="ActivationCodeScreen" extends="Group">
 
   <script type="text/brightscript" uri="ActivationCodeScreen.brs" />
-  <script type="text/brightscript" uri="../ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  
+
   <interface>
     <!-- INPUT -->
       <!-- Set to true whenever a new activation code should be called. -->
@@ -22,7 +21,7 @@
     <!-- OUTPUT -->
       <!-- Set to true if the user has successfully registered -->
       <field id="activationSuccess" type="boolean" value="false" alwaysNotify="true"/>
-      
+
       <!-- Set to true when the "Skip" button on the error modal is selected -->
       <field id="skipButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
 
@@ -31,7 +30,7 @@
 
       <!-- If there is an error with the activation code, then set the error type to this field. -->
       <field id="errorType" type="string" alwaysNotify="true"/>
-      
+
       <!-- Keeps the information used for user tracking - structure looks like:
         {
           pageType: "video_page"  'corresponds to one of the page types in tubiTracking_getAnalyticsPage() which mirrors the protos repo
@@ -220,6 +219,6 @@
       itemSpacing="[0,0]"
       numRows="1"
       numColumns="1" />
-          
+
   </children>
 </component>

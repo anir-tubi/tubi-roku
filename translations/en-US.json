@@ -4,7 +4,7 @@
     "message": "Sign In"
   },
   "menu_signedIn": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Shows that the user is signed in.", 
+    "description": "Menu option on the app's side nav, (length of text should not be too long). Shows that the user is signed in.",
     "message": "Hi {name}"
   },
   "menu_kids": {
@@ -74,7 +74,7 @@
   "menu_mylist": {
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
     "message": "My List"
-  },  
+  },
   "menu_settings": {
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
     "message": "Settings"
@@ -106,7 +106,7 @@
   },
   "dialog_button_exit": {
     "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
-    "message": "Exit" 
+    "message": "Exit"
   },
   "dialog_button_signIn": {
     "description": "The label of the button in a dialog window that allows the user to sign into the app.",
@@ -150,7 +150,7 @@
   },
   "dialog_errorOops_title": {
     "description": "A general error title for an error dialog window",
-    "message": "Oops!" 
+    "message": "Oops!"
   },
   "dialog_channelsDisabled_title": {
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
@@ -159,11 +159,11 @@
   "dialog_espanolDisabled_title": {
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
     "message": "Español Disabled"
-  },  
+  },
   "dialog_liveTVDisabled_title": {
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav live TVs menu item but the item has been disabled",
     "message": "Live TV Disabled"
-  }, 
+  },
   "dialog_moviesDisabled_title": {
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
     "message": "Movies Disabled"
@@ -179,7 +179,7 @@
   "dialog_sideNavItemDisabled_Parental_description": {
     "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled due to parental set to Teens",
     "message": "Please turn off parental controls to use this feature."
-  },  
+  },
   "error_connection_title": {
     "description": "title of error window when there is a connection error",
     "message": "Connection Error"
@@ -187,7 +187,7 @@
   "error_connection_description": {
     "description": "description of error window when there is a connection error",
     "message": "There may be an issue with your network connection, or with Tubi's server. Please check your network connection and try again. \n"
-  }, 
+  },
   "dialog_updateVersion_title": {
     "description": "title of a dialog window that is shown when the user has an older version of the app",
     "message": "Please update the Tubi channel"
@@ -197,37 +197,37 @@
     "message": "This version of Tubi is no longer supported. To update, please exit the Tubi app and go to: \n \n Settings > System > System update > Check now"
   },
   "dialog_fullSynopsis_title": {
-    "description": "title of a dialog window that shows the full desciption of a video item",
+    "description": "title of a dialog window that shows the full description of a video item",
     "message": "Full Synopsis"
   },
   "dialog_signIn_activationCodeExpired_title": {
     "description": "title of the error window when the activation code has expired",
     "message": "Activation Code Expired"
-  }, 
+  },
   "dialog_signIn_activationCodeExpired_description": {
     "description": "description of the error window when the activation code has expired",
     "message": "We're sorry, but the activation code expired before your device was successfully linked."
-  }, 
+  },
   "error_signIn_connectionError_title": {
     "description": "title of the error window when there is a connection error",
     "message": "Connection Error During Activation"
-  }, 
+  },
   "error_signIn_connectionError_description": {
     "description": "description of the error window when there is a connection error",
     "message": "We're sorry, but we could not connect with the server to see if you registered your device."
-  }, 
+  },
   "error_signIn_connectionErrorFetch_title": {
     "description": "title of the error window when there is a connection error during fetching the code",
     "message": "Connection Error During Code Fetch"
-  }, 
+  },
   "error_signIn_connectionErrorFetch_description": {
     "description": "description of the error window when there is a connection error during fetching the code",
     "message": "We're sorry, but there was an error while receiving the code from the server."
-  }, 
+  },
   "error_signIn_activationCodeGeneral_title": {
     "description": "title of the error window when there is a general activation code error",
     "message": "Activation Code Error"
-  }, 
+  },
   "error_signIn_activationCodeGeneral_description": {
     "description": "description of the error window when there is a general activation code error",
     "message": "We're sorry, but an activation code error occurred."
@@ -243,6 +243,22 @@
   "dialog_signIn_title": {
     "description": "title of a dialog window when it asks the user to sign in",
     "message": "Please Sign In"
+  },
+  "dialog_confirmCorrectAge_title": {
+    "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
+    "message": "Were you born in {birthYear}"
+  },
+  "dialog_confirmCorrectAge_description": {
+    "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
+    "message": "Please confirm to continue"
+  },
+  "dialog_confirmCorrectAge_confirm": {
+    "description": "label of a dialog window button that will confirm app user's age is correct",
+    "message": "Yes"
+  },
+  "dialog_confirmCorrectAge_edit": {
+    "description": "label of a dialog window button that will let user edit their age again",
+    "message": "Edit"
   },
   "dialog_kidsExit_title": {
     "description": "title of a dialog window when the user is attempting to exit kids Mode",
@@ -268,12 +284,20 @@
     "description": "A description informing users they are only eligible to view Tubi in kids mode",
     "message": "You are only eligible to view Tubi Kids at this time."
   },
+  "dialog_cannotExitKidsMode_title": {
+    "description": "Title for dialog telling the user they can not exit kids mode",
+    "message": "Cannot Exit Kids Mode"
+  },
+  "dialog_cannotExitKidsMode_description": {
+    "description": "Description for dialog telling the user they can not exit kids mode",
+    "message": "Please try again in 24 hours.\nQuestions? Drop us an email at support@tubi.tv"
+  },
   "dialog_exitApp_title": {
-    "description": "Title of ther dialog window that asks the user if they want to exit the app",
+    "description": "Title of the dialog window that asks the user if they want to exit the app",
     "message": "Are You Sure?"
   },
   "dialog_exitApp_description": {
-    "description": "description of ther dialog window that asks the user if they want to exit the app",
+    "description": "description of the dialog window that asks the user if they want to exit the app",
     "message": "Do you really want to exit Tubi?"
   },
   "error_noGetChannels_description": {
@@ -293,7 +317,7 @@
     "message": "To watch this video for free, please sign in or register."
   },
   "error_matureContent_title": {
-    "description": "Title of the dialog window when user attempts to play mature content but they need to be sigfned in first",
+    "description": "Title of the dialog window when user attempts to play mature content but they need to be signed in first",
     "message": "Mature Content"
   },
   "dialog_signOut_title": {
@@ -327,7 +351,7 @@
   },
   "screenActivationCode_button_refresh": {
     "description": "Label of the button that will provide a new activation code",
-    "message": "Refresh Code" 
+    "message": "Refresh Code"
   },
   "screenSearch_defaultSearch": {
     "description": "Directions on the search page",
@@ -456,11 +480,11 @@
   "screenSettings_about_title2": {
     "description": "The subtitle on the about screen",
     "message": "Need Help?"
-  }, 
+  },
   "screenSettings_about_description2": {
     "description": "The 2nd description on the about screen",
     "message": "Visit {help_url} \n \n Email our Support team at support@tubi.tv \n \n Reach us on Facebook, Instagram, Twitter, and on our website at: \n {support_url} \n \n Version {version} \n Short Device ID: {id} (press OK to see full Device ID) \n \n © {year} Tubi, Inc. all rights reserved."
-  }, 
+  },
   "screenSettings_menu_parentalControls": {
     "description": "The label for the parental controls",
     "message": "Parental Controls"
@@ -608,7 +632,7 @@
   },
   "screenDetails_button_episodes": {
     "description": "Label of button to allow users to display the list of episodes/seasons of the current video title",
-    "message": "Episodes list" 
+    "message": "Episodes list"
   },
   "screenDetails_relatedTitles": {
     "description": "Label of button to allow users to view other video titles related to the current video title",
@@ -627,8 +651,8 @@
     "message": "Could not successfully send your birthdate to our servers."
   },
   "screenAgeVerification_header": {
-    "description": "A header message welcoming users to Tubi on Age required screen",
-    "message": "Welcome to Tubi, {firstname}"
+    "description": "A header message on the Age required screen asking them to confirm their age",
+    "message": "Confirm your age*"
   },
   "screenAgeVerification_sub_header": {
     "description": "A sub header message to direct users to enter their birth date",
@@ -704,7 +728,7 @@
   },
   "metadata_seconds": {
     "description": "a duration listed in seconds (abbreviated for brevity and so singular and plural forms are irrelevant)",
-    "message": "{seconds} sec" 
+    "message": "{seconds} sec"
   },
   "metadata_seasons_plural": {
     "description": "Label of how many seasons of the current TV title",
@@ -725,7 +749,7 @@
   "screenEndCard_startingIn": {
     "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
     "message": "Starting in {seconds} s"
-  }, 
+  },
   "videoPlayer_trailerTitle": {
     "description": "Label for the video preview associated with the current video title",
     "message": "Trailer ({title})"
@@ -733,59 +757,59 @@
   "videoPlayer_adLoadingMessage": {
     "description": "Message to indicate ads will play before playing video content",
     "message": "Your program will begin after these messages..."
-  }, 
+  },
   "videoPlayer_error_failed_description": {
     "description": "label for error messages to indicate 'failed'",
     "message": "FAILED"
-  }, 
+  },
   "videoPlayer_error_invalidURL_description": {
     "description": "Error message to indicate that the video URL is invalid.",
     "message": "Video URL is not valid."
-  }, 
+  },
   "videoPlayer_error_playback_description": {
     "description": "Error message when video could not play",
     "message": "There was an issue with video playback."
-  }, 
+  },
   "videoPlayer_adHeadsUp": {
     "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
     "message": "AD Break starts in {seconds} s"
-  }, 
+  },
   "linearVideoPlayer_buttonBack": {
     "description": "Label of a Button to go back",
     "message": "Back"
-  }, 
+  },
   "linearVideoPlayer_buttonCaptions": {
     "description": "Label of a Button to display the closed captions",
     "message": "Captions"
-  }, 
+  },
   "linearVideoPlayer_buttonCaptions2": {
     "description": "Label of a Button to display the closed captions",
     "message": "Subtitles"
-  }, 
+  },
   "linearVideoPlayer_buttonGuide": {
     "description": "Label of a Button to view the channel guide",
     "message": "Guide"
-  }, 
+  },
   "linearVideoPlayer_buttonGuide2": {
     "description": "Label of a Button to view the channel guide",
     "message": "Full TV Guide"
-  }, 
+  },
   "linearVideoPlayer_channelGuideTitle": {
     "description": "The title displayed above a list of live TV channels",
     "message": "Channel Guide"
-  }, 
+  },
   "goBack_categories": {
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "PRESS BACK FOR CATEGORIES"
-  }, 
+  },
   "goBack_channels": {
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "PRESS BACK FOR CHANNELS"
-  }, 
+  },
   "goBack_default": {
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "PRESS BACK TO GO BACK"
-  }, 
+  },
   "goBack_videoPlayer_upNext": {
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "BACK TO DISMISS"
@@ -797,7 +821,7 @@
   "goBack_menu": {
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "PRESS BACK FOR MENU"
-  }, 
+  },
   "goBack_home": {
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "PRESS BACK FOR HOME"
@@ -818,19 +842,19 @@
   },
   "dialog_whoops_title": {
     "description": "A general whoops title for an dialog window",
-    "message": "Whoops!" 
-  }, 
+    "message": "Whoops!"
+  },
   "dialog_mylist_signIn_description": {
     "description": "Dialog description to say the user to signIn to view the My List",
-    "message": "You must be logged in in order to view your list" 
-  }, 
+    "message": "You must be logged in in order to view your list"
+  },
   "dialog_mylist_empty_title": {
     "description": "A general empty My list title for an dialog window",
-    "message": "Oh no! Your List is empty" 
-  }, 
+    "message": "Oh no! Your List is empty"
+  },
   "dialog_mylist_empty_description": {
     "description": "Dialog description to say My List is empty",
-    "message": "Find everything you add to My List here. To get started, select a TV Show or Movie and select the Add to My List button." 
+    "message": "Find everything you add to My List here. To get started, select a TV Show or Movie and select the Add to My List button."
   },
   "dialog_button_register_signIn": {
     "description": "The label of the button in a dialog window that allows the user to register or signIn",
@@ -838,7 +862,7 @@
   },
   "why_ask_age_description": {
     "description": "The main message which explains why Tubi is asking for the users year of birth",
-    "message": "We use this information to confirm that you're meeting the age requirements set out in our Terms of Use and to personalize you experience. Read Terms of Use at: www.tubitv.com/terms Questions? Let us know at: support@tubi.tv"
+    "message": "*We use this information to confirm that you're meeting the age requirements set out in our Terms of Use and to personalize you experience. Read Terms of Use at: www.tubitv.com/terms Questions? Let us know at: support@tubi.tv"
   },
   "signIn_screen_heading": {
     "description": "Title on the signIn screen",
@@ -867,11 +891,11 @@
   "signUp_screen_heading": {
     "description": "Title on the signUp screen",
     "message": "Sign Up for a New Account"
-  }, 
+  },
   "signUp_screen_password_validation": {
     "description": "sign up screen password validation text",
     "message": "Press OK on your remote and set a new password"
-  },  
+  },
   "already_having_account_text": {
     "description": "already having account text",
     "message": "Already have an account?"
@@ -883,7 +907,7 @@
   "invalid_password_title": {
     "description": "invalid password title on modal",
     "message": "Invalid Password"
-  },  
+  },
   "enter_password_dialog_description": {
     "description": "enter password dialog description",
     "message": "Please enter your Tubi password for the account"

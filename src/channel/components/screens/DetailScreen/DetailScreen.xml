@@ -2,7 +2,6 @@
 <component name="DetailScreen" extends="BaseScreen" initialFocus="Menu" >
 
   <script type="text/brightscript" uri="DetailScreen.brs" />
-  <script type="text/brightscript" uri="../ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
@@ -11,7 +10,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
-  
+
   <interface>
     <!-- INPUTS -->
       <!-- The mode used by info panel, one of: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
@@ -67,7 +66,7 @@
 
       <!-- Indicates if the content has a trailer -->
       <field id="hasTrailer" type="boolean" value="false" />
-      
+
       <!-- interface for moving the focus on the details screen menu to a specific item-->
       <field id="jumpToItem" type="integer" alias="Menu.jumpToItem" />
 
@@ -92,7 +91,7 @@
       <field id="relatedContent" alias="RelatedGrid.content" />
 
       <field id="content" type="node" />
-      
+
     <!-- OUTPUTS -->
 
       <!-- Should the full description be displayed -->
@@ -109,10 +108,10 @@
 
       <!-- set to true when the user adds the title to their queue -->
       <field id="addToQueueSelected" type="boolean" alwaysNotify="true" />
-      
+
       <!-- set to true when the user removes the title from their queue -->
       <field id="removeFromQueueSelected" type="boolean" alwaysNotify="true" />
-      
+
       <!-- set to true when the user removes the title from their history -->
       <field id="removeFromHistorySelected" type="boolean" alwaysNotify="true" />
 
@@ -179,14 +178,14 @@
       width="15"
       height="27"
       translation="[90,528]"/>
-      
+
     <Spinner
       id="DetailSpinner"
       visible="false"
       width="1920"
       height="1080"
       translation="[0,0]"/>
-    
+
     <Group
       id="AnimationGroup"
       translation="[0,0]">

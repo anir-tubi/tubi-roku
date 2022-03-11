@@ -39,6 +39,9 @@
             -->
       <field id="signInInfo" type="assocarray"/>
 
+      <!-- The uiMode before we come into this screen as designs call for us to switch the theme to the standard one when displaying this screen but we may need to switch back to the previous mode after we leave this screen -->
+      <field id="previousUiMode" type="string"/>
+
     <!-- OUTPUT -->
 
       <!-- event that occurs when a user selects the Start Watching button -->

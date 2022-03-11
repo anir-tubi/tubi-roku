@@ -3,7 +3,6 @@
 
 
   <script type="text/brightscript" uri="HomeScreen.brs" />
-  <script type="text/brightscript" uri="../ModalDialogs.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../lib/FocusMixin.brs" />

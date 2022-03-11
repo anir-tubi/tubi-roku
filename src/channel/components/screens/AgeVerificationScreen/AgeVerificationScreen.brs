@@ -43,21 +43,8 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.ageGateScreen
 
   m.top.observeField("focusedChild", "onComponentFocusChanged")
-  m.top.observeField("signInInfo", "onSignInInfo")
   m.NumberPad.observeField("buttonSelected", "onNumberPadButtonSelected")
-End Function
-
-
-Function onSignInInfo(msg)
-
-  signInInfo = msg.getData()
-  if signInInfo <> invalid
-    firstname = signInInfo.firstname
-    if firstname <> invalid and firstname <> ""
-      m.Header.text = getTranslation("screenAgeVerification_header", {firstname: firstname})
-    end if
-  end if  
-
+  m.top.observeFieldScoped("ageSubmitted", "onAgeSubmittedChanged")
 End Function
 
 
@@ -111,10 +98,10 @@ Function onNumberPadButtonSelected(msg)
 
       if m.date.len() = 4
         m.top.birthdate = m.date + "-12-31"  ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
-    
+
         dateTime = createObject("roDateTime")
         currentYear = dateTime.getYear()
-    
+
         if isUserToddler(m.date, currentYear) = true and m.warningDisplayedCount = 0
           m.Prompt.text = getTranslation("screenAgeVerification_warning_prompt")
           m.Prompt.visible = true
@@ -125,9 +112,9 @@ Function onNumberPadButtonSelected(msg)
           m.Prompt.visible = true
           m.NumberPad.moveFocusToDelete = true
         else
-          m.StartButton.setFocus(true)  
+          m.StartButton.setFocus(true)
         end if
-        
+
       end if
 
     else if m.date.len() = 4
@@ -138,6 +125,11 @@ Function onNumberPadButtonSelected(msg)
 
   refreshDateOnScreen(m.date)
   updateDateDecorations(m.date)
+End Function
+
+Function onAgeSubmittedChanged()
+  ' Want to reset the date on submit as the only time they will be coming back is if they were confirming their age and likely need to change it
+  refreshDateOnScreen(invalid)
 End Function
 
 
@@ -173,7 +165,7 @@ End Function
 ' @date: string, user entered year formatted as YYYY-MM-DD
 ' @currentYear: Integer, current year in YYYY format
 Function isUserTooOld(date, currentYear)
-  
+
   if date.toInt() < currentYear - 125
     return true
   end if
@@ -232,13 +224,7 @@ End Function
 Function onKeyEvent(key, press) as Boolean
   if press = true
     if key = "back"
-      ' check if user is logged in by testing if the authInfo has a userId
-      authInfo = m.global.authInfo
-      if authInfo <> invalid and authInfo.userId <> invalid
-        m.top.backButtonPressed = true
-      else
-        return false  
-      end if
+      m.top.backButtonPressed = true
     else
       if key = "down"
         if m.date.len() = 4 and m.NumberPad.isInFocusChain() = true and m.Prompt.visible = false
@@ -251,7 +237,7 @@ Function onKeyEvent(key, press) as Boolean
       end if
     end if
   end if
-  
+
   return true
 End Function
 
