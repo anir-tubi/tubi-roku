@@ -198,13 +198,18 @@ Function processResponse(msg)
     if result <> invalid and result.response <> invalid
 
       if callbackTypes <> invalid
+        noRetryErrorCodes = {
+          "404": true  ' content is unavailable, expect it will continue to be unavailable on retry
+          "422": true  ' user is under age with respect to COPPA, will continue to be under age on retry
+          "451": true  ' user is under age internationally, will continue to be under age on retry
+        }
 
         code = result.response.code
 
         if code >= 200 and code < 400
           processSuccessResponse(result, callbackTypes, job)
-        else if code = 422 OR code = 451 then
-          ' Response codes returned for an underage user so don't want to run the retry logic
+        else if noRetryErrorCodes[code.toStr()] = true
+          ' error expected to remain error on retry so don't bother retrying
           processErrorReponse(result, callbackTypes, job)
         else if (code = 403 or code = 401) and m.constants.reqNames.acceptsTubiAuth[requestType] = true
           if retries > 0
