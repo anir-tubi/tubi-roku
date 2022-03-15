@@ -926,7 +926,7 @@ Function getConstants()
       constants.ui.imageSizes.landscape= [384,216]
 
       'Sizes of landscape VITG that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.largeVITG = [981,552]
+      constants.ui.imageSizes.vitg = [981,552]
 
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.linear = [384,144]
@@ -1010,7 +1010,7 @@ Function getConstants()
       constants.ui.gridItemTypes.portrait = "portrait"
       constants.ui.gridItemTypes.landscape = "landscape"
       constants.ui.gridItemTypes.linear = "linear"
-      constants.ui.gridItemTypes.vitg_large = "vitg_large"  'video in the grid
+      constants.ui.gridItemTypes.vitg = "vitg"  'video in the grid
       constants.ui.gridItemTypes.utility = "utility"
       constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"
 

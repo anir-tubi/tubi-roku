@@ -288,7 +288,7 @@ Function cmsApi_homeScreenReqInfo_test()
       "is_kids_mode": false
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
       "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_hero"
-      "images[vitg_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeVITG[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeVITG[1].ToStr() + "_hero"
+      "images[vitg_tb]": "w" + m.cmsApi.constants.ui.imageSizes.vitg[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.vitg[1].ToStr() + "_hero"
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
     }
@@ -470,7 +470,7 @@ Function cmsApi_categoryReqInfo_test()
       "contents_limit": 19
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
       "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_hero"
-      "images[vitg_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeVITG[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeVITG[1].ToStr() + "_hero"
+      "images[vitg_tb]": "w" + m.cmsApi.constants.ui.imageSizes.vitg[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.vitg[1].ToStr() + "_hero"
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
     }
@@ -787,7 +787,7 @@ Function cmsApi_setImageParams_test()
   }
 
   imageTypes = [
-    "large_vitg"
+    "vitg"
   ]
   updatedParams = m.cmsApi.setImageParams(imageTypes, existingParams)
 
@@ -807,7 +807,7 @@ Function cmsApi_setImageParams_test()
   imageTypes = [
     "poster"
     "landscape"
-    "large_vitg"
+    "vitg"
   ]
   updatedParams = m.cmsApi.setImageParams(imageTypes, existingParams)
 
@@ -865,8 +865,8 @@ Function cmsApi_setTupianLandscapeParam_test()
 End Function
 
 
-'@Test unit tests setTupianLargeVitgParam
-Function cmsApi_setTupianLargeVitgParam_test()
+'@Test unit tests setTupianVitgParam
+Function cmsApi_setTupianVitgParam_test()
   vitgParam = "w981h552_hero"
 
   existingParams = {
@@ -874,7 +874,7 @@ Function cmsApi_setTupianLargeVitgParam_test()
     is_existing: true
   }
 
-  updatedParams = m.cmsApi.setTupianLargeVitgParam(existingParams)
+  updatedParams = m.cmsApi.setTupianVitgParam(existingParams)
 
   m.assertNotInvalid(updatedParams.userid)
   m.assertNotInvalid(updatedParams.is_existing)

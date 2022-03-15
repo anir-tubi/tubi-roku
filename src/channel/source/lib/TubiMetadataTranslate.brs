@@ -89,7 +89,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     if contentFromServer.landscape_images <> invalid and type(contentFromServer.landscape_images) = "roArray" and contentFromServer.landscape_images.count() > 0
       sThumbnailURL = contentFromServer.landscape_images[0]
     end if
-  else if gridType = m.constants.ui.gridItemTypes.vitg_large
+  else if gridType = m.constants.ui.gridItemTypes.vitg
     if canvasImages <> invalid and type(canvasImages.vitg_tb) = "roArray" and canvasImages.vitg_tb[0] <> invalid and canvasImages.vitg_tb[0] <> ""
       '//A custom vitg size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.vitg_tb[0]
@@ -499,7 +499,7 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
       translated.parentType = category.type
       translated.parentTitle = category.title
 
-      vitg_large = m.constants.ui.gridItemTypes.vitg_large
+      vitg_large = m.constants.ui.gridItemTypes.vitg
       ' inject the default background for large vitg content items
       if category.gridItemType = vitg_large
         translated.backgrounds = [m.constants.ui.uris.defaultBackground]
@@ -913,7 +913,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   ' a custom content node which have proven to be much slower to instantiate.
   ' Could use some testing though.
   landscape = m.constants.ui.gridItemTypes.landscape
-  vitg_large = m.constants.ui.gridItemTypes.vitg_large
+  vitg_large = m.constants.ui.gridItemTypes.vitg
   utility = m.constants.ui.gridItemTypes.utility
   linear = m.constants.ui.gridItemTypes.linear
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
@@ -1164,7 +1164,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             sType = "TubiContentNode"
           end if
 
-          if parentGridItemType = m.constants.ui.gridItemTypes.vitg_large
+          if parentGridItemType = m.constants.ui.gridItemTypes.vitg
             sType = "VitgContentNode"
           else if parentGridItemType = m.constants.ui.gridItemTypes.linear
             sType = "TubiContentNode"
@@ -1192,8 +1192,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             gridType = m.constants.ui.gridItemTypes.landscape
           else if container.id = m.constants.ui.categoryIds.featured
             gridType = m.constants.ui.gridItemTypes.landscape
-          else if parentGridItemType = m.constants.ui.gridItemTypes.vitg_large
-            gridType = m.constants.ui.gridItemTypes.vitg_large
+          else if parentGridItemType = m.constants.ui.gridItemTypes.vitg
+            gridType = m.constants.ui.gridItemTypes.vitg
           else if parentGridItemType = m.constants.ui.gridItemTypes.linear
             gridType = m.constants.ui.gridItemTypes.linear
           end if
@@ -1209,7 +1209,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             bLandscape = true
           else if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid
             bLandscape = true
-          else if parentGridItemType = m.constants.ui.gridItemTypes.vitg_large
+          else if parentGridItemType = m.constants.ui.gridItemTypes.vitg
             bLandscape = true
           end if
 
@@ -1229,7 +1229,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
 
           'add the trailer url to vitg content items - don't include vitg content if there is no trailer
-          if parentGridItemType = m.constants.ui.gridItemTypes.vitg_large
+          if parentGridItemType = m.constants.ui.gridItemTypes.vitg
             childIsPushable = false
             if fullChild.has_trailer = true
               if fullChild.trailers <> invalid and type(fullChild.trailers) = "roArray" and fullChild.trailers.count() > 0
@@ -1584,7 +1584,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
   gridItemType = constants.ui.gridItemTypes.portrait
   if container.type = constants.ui.categoryTypes.preview
     if constants.deviceInfo.limitedUI <> true
-      gridItemType = constants.ui.gridItemTypes.vitg_large
+      gridItemType = constants.ui.gridItemTypes.vitg
     end if
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = constants.ui.gridItemTypes.linear

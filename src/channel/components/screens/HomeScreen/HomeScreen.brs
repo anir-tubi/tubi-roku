@@ -437,9 +437,9 @@ Function onCurrFocusRowChange()
     sSponsorBackgroundURL = ""
     if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.utility
       expandMaskOffsetForUtility(rowPercent)
-    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg_large
+    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg
       ' update contentArea translation, only when VITG gain focus
-      expandContentAreaForLargeVitg(rowPercent)
+      expandContentAreaForVitg(rowPercent)
     else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
       ' update contentArea translation, only when linear gain focus
       expandContentAreaForLinear(rowPercent)
@@ -518,7 +518,7 @@ End Function
 
 
 ' @rowPercent: float, the percentage that the VITG row is focused
-Function expandContentAreaForLargeVitg(rowPercent)
+Function expandContentAreaForVitg(rowPercent)
   m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.vitgSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.vitgMaskOffsetDiff * rowPercent)]
   m.InfoPanel.opacity = 1 - rowPercent

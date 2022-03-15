@@ -21,7 +21,7 @@ Function init()
     portrait: "portrait"
     landscape: "landscape"
     linear: "linear"
-    vitg_large: "vitg_large"
+    vitg: "vitg"
     utility: "utility"
     historySignedOutUser: "continue_watching_signed_out_user"
   }
@@ -283,7 +283,7 @@ Function setUpVitg()
   m.top.id = m.top.itemContent.title
 
   title = m.top.itemContent.title
-  if m.top.itemContent.gridItemType = "vitg_large"
+  if m.top.itemContent.gridItemType = "vitg"
     m.title.width = 1205
     title = title + " (" + m.top.itemContent.releaseDate + ") " + Chr(&hb7) + " " + formatLengthAsEnglish(m.top.itemContent.length)
   end if
@@ -367,7 +367,7 @@ End Function
 
 Function isVitg(itemContent, gridItemTypes)
   isVitg = false
-  if itemContent.gridItemType = gridItemTypes.vitg_large
+  if itemContent.gridItemType = gridItemTypes.vitg
     isVitg = true
   end if
   return isVitg

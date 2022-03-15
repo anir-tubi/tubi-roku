@@ -260,10 +260,10 @@ Function setRowHeights()
       rowItemSize.push([posterWidth,posterHeight])
       rowHeight = posterHeight
       showRowLabel.push(true)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.vitg_large   
+    else if category.gridItemType = m.constants.ui.gridItemTypes.vitg   
       rowHeightAdjustment = 122
-      posterWidth = m.constants.ui.imageSizes.largeVITG[0]
-      posterHeight = m.constants.ui.imageSizes.largeVITG[1]
+      posterWidth = m.constants.ui.imageSizes.vitg[0]
+      posterHeight = m.constants.ui.imageSizes.vitg[1]
       rowItemSize.push([posterWidth,posterHeight])
       rowHeight = posterHeight
       showRowLabel.push(true)
