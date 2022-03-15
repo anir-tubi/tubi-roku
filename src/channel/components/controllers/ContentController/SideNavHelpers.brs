@@ -165,19 +165,7 @@ Function onSideNavItemSelected()
           if needsToShowAgeVerificationScreen() = true then
             showAgeVerificationScreenAtKidsModeExit(m.uiMode)
           else
-            dialogEvent = {
-              type: "dialog"
-              values: {
-                dialog_type: "EXIT_KIDS_MODE"
-                pageOneof: m.Tracking.getAnalyticsPage(currentScreenNow.trackingPageInfo.pageType, currentScreenNow.trackingPageInfo.pageValues)
-                dialog_action: "SHOW"
-                dialog_sub_type: "exit-kids-mode"
-              }
-            }
-
-            sTitle = getTranslation("dialog_kidsExit_title")
-            sDescription = getTranslation("dialog_kidsExit_description")
-            showSimpleInstantResumableModal(sTitle, sDescription, [getTranslation("dialog_kidsExit_button_ok"), getTranslation("dialog_button_cancel")], dialogEvent, m.trackingLoggingTask, disableKidsModeFromSideNav)
+            disableKidsModeFromSideNav()
           end if
         else
           dialogEvent = {

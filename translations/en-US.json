@@ -268,10 +268,6 @@
     "description": "label of a dialog window button that will confirm app should exit kids mode",
     "message": "Exit Kids"
   },
-  "dialog_kidsExit_description": {
-    "description": "description of a dialog window that describes what will happen after the user exits kids mode",
-    "message": "Do you have permission from your parents to leave Tubi Kids? If you exit you will see titles that are not suitable for children."
-  },
   "dialog_kidsExitLimited_description": {
     "description": "description of a dialog window that describes what the user should do to exit kids mode",
     "message": "To exit Kids, please update your parental controls in account settings."
