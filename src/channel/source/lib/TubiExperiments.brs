@@ -60,6 +60,11 @@ Function TubiExperiments(constants) as Object
       roku_instant_resume_tweak: {
         roku_instant_resume_tweak_v1: {"enabled": false}
       }
+
+      roku_linear_search_ui_update: {
+        roku_linear_search_ui_update_v1: {"enabled": false}
+      }
+      
     }
 
     'public methods

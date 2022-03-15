@@ -5,7 +5,11 @@ Function init()
   m.top.itemSpacings = [6]
   m.liveTitle.text = getTranslation("screenSearch_liveText")
   m.top.observeField("shouldAnimate", "onAnimate")
-  m.posterArray = ["pkg:/images/icon_live_1.png", "pkg:/images/icon_live_2.png", "pkg:/images/icon_live_3.png", "pkg:/images/icon_live_4.png"]
+  m.posterArray = [
+    "pkg:/images/icon_live_1.png",
+    "pkg:/images/icon_live_2.png",
+    "pkg:/images/icon_live_3.png"
+  ]
   m.animateIndex = 0
 End Function
 
@@ -16,7 +20,7 @@ Function onAnimate()
   else
     animateTimer = m.top.createChild("Timer")
     animateTimer.repeat = true
-    animateTimer.duration = 0.25
+    animateTimer.duration = 0.6
     animateTimer.observeField("fire", "onAnimateTimerFired")
     animateTimer.control = "start"
   end if

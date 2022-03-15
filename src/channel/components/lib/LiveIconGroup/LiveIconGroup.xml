@@ -10,7 +10,6 @@
     <children>
       <Poster
         id="LiveAnimateImage"
-        visible="true"
         height="37"
         width="36"
         loadWidth="36"

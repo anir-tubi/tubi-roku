@@ -35,6 +35,8 @@ Function init()
   m.PartnerLogo = m.top.findNode("PartnerLogo")
   m.ExpireWarning = m.top.findNode("ExpireWarning")
   m.ExpireWarning.color = m.constants.ui.colors.expirationWarning
+  m.liveIconGroup = m.top.findNode("liveIconGroup")
+  m.SecondLineGroup = m.top.findNode("SecondLineGroup")
   m.top.observeField("mode", "onModeChange")
   m.top.observeField("width", "onWidthChange")
 
@@ -57,7 +59,7 @@ Function init()
   onWidthChange()
 
   'set the default CC state to be no CC
-'  firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
+  m.firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
 '  firstLineGroup.removeChild(m.ClosedCaptions)
 
   'set the default title logo state to be no title logo
@@ -177,7 +179,11 @@ End Function
 Function onLineOneDataChange(msg)
   tubiLog("InfoPanel.onLineOneDataChange")
   data = msg.getData()
-  firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
+  if m.TwoLineInfo.findNode("FirstLineGroup") <> invalid
+    m.twoLineInfo.removeChild(m.firstLineGroup)
+  end if
+  m.twoLineInfo.insertChild(m.firstLineGroup, 0)
+  firstLineGroup = m.firstLineGroup
   line1Label = m.TwoLineInfo.findNode("Line1")
 
   text = ""
@@ -431,6 +437,10 @@ Function onModeChange()
     m.top.removeChild(m.PlayerCountdownGroup)
   end if
 
+  if m.SecondLineGroup.getChild(0) <> invalid and m.SecondLineGroup.getChild(0).id = "liveIconGroup"
+    m.SecondLineGroup.removeChild(m.liveIconGroup)
+  end if
+
   if m.top.mode = m.constants.ui.infoPanelModes.category then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.CategoryDetails)
@@ -489,6 +499,15 @@ Function onModeChange()
     m.top.appendChild(m.PlayerCountdownGroup)
     m.PlayerCountdownGroup.translation = [1216,-78]
     m.Offset.itemSpacings = [12,0,12,11]
+  else if m.top.mode = m.constants.ui.infoPanelModes.linearsearch
+    m.Offset.appendChild(m.TitleGroup)
+    m.Offset.appendChild(m.TwoLineInfo)
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.Offset.itemSpacings = [25, 15]
+    if m.firstLineGroup <> invalid
+      m.twoLineInfo.removeChild(m.firstLineGroup)
+    end if
+    m.SecondLineGroup.insertChild(m.liveIconGroup, 0)
   end if
 
 End Function

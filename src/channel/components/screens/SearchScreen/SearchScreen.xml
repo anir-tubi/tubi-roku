@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<component name="SearchScreen" extends="BaseScreen" initialFocus="Keyboard">
+<component name="SearchScreen" extends="BaseScreen">
 
   <script type="text/brightscript" uri="SearchScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
@@ -66,83 +66,74 @@
       </LayoutGroup>
     </Group>
     <LayoutGroup
-        id="content"
-        translation="[172,158]"
-        layoutDirection="horiz"
-        vertAlignment="top"
-        horizAlignment="left"
-        itemSpacings="[96]">
-      <LayoutGroup
-          id="leftSide"
-          layoutDirection="vert"
-          itemSpacings="[16]"
-          horizAlignment="left"
-          vertAlignment="top">
-
-
-        <LayoutGroup
-          id="kidsModeGroup"
-          layoutDirection="horiz">
-          <!--KidsModeMessageSpacer used to position the kids-mode text so it left aligns with the keyboard-->
-          <Rectangle
-            id="KidsModeMessageSpacer"
-            visible="false"
-            width="20"
-            height="1"/>
-          <Label
-            id="KidsModeMessage"
-            vertAlign="bottom"
-            width="550"
-            height="50">
-              <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-SemiBold.ttf"
-                size="27"/>
-          </Label>
-        </LayoutGroup>
-
-      </LayoutGroup>
-      <!-- Live text entry box with a non-blinking "cursor" -->
-      <Label
-        id="SearchText"
-        vertAlign="center"
-        width="1114"
-        height="64">
-        <Font
-        id="SearchTextFont"
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="43"/>
-      </Label>
-    </LayoutGroup>
-
-    <LayoutGroup
-      id="searchGroup"
-      translation="[162, 148]"
+      id="leftSide"
       layoutDirection="vert"
-      vertAlignment="top"
+      itemSpacings="[24, 12]"
       horizAlignment="left"
-      itemSpacings="[24]">
-      <DynamicCustomKeyboard
-        id="Keyboard"/>
+      vertAlignment="top"
+      translation="[192,120]">
+      <Label
+        id="searchMenuText"
+        vertAlign="bottom"
+        color="0xFFFFFF"
+        width="550">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="48"/>
+      </Label>
+      <Label
+        id="searchHintText"
+        vertAlign="bottom">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="27"/>
+      </Label>
       <LayoutGroup
-        id="searchHintGroup"
-        layoutDirection="vert"
-        vertAlignment="top"
-        horizAlignment="left"
-        itemSpacings="[5]"
-        visible="false">
+        id="kidsModeGroup"
+        layoutDirection="horiz">
+        <!--KidsModeMessageSpacer used to position the kids-mode text so it left aligns with the keyboard-->
+        <Rectangle
+          id="KidsModeMessageSpacer"
+          visible="false"
+          width="1"
+          height="1"/>
         <Label
-          id="voiceHint">
+          id="KidsModeMessage"
+          vertAlign="top"
+          width="550"
+          height="50">
             <Font
               role="font"
               uri="pkg:/fonts/Vaud-SemiBold.ttf"
               size="27"/>
         </Label>
       </LayoutGroup>
-   </LayoutGroup>
+    </LayoutGroup>
 
-    <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus,
+    <!-- Live text entry box with a non-blinking "cursor" -->
+    <Label  
+      id="SearchText"
+      vertAlign="center"
+      width="1114"
+      height="64">
+      <Font
+        id="SearchTextFont"
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="36"/>
+    </Label>
+      
+    <InfoPanel
+      id="SearchScreenInfoPanel"
+      visible="false"
+      translation="[167,120]"/>
+    <Group
+      id="searchGroup">
+   </Group>
+    
+    <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus, 
     the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
     <Group
       translation="[843, 240]"

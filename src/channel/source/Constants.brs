@@ -786,6 +786,7 @@ Function getConstants()
       constants.ui.infoPanelModes.season = "season"
       constants.ui.infoPanelModes.episode = "episode"
       constants.ui.infoPanelModes.epg = "epg"
+      constants.ui.infoPanelModes.linearsearch = "linear-search"
 
     constants.ui.contentMode = {}
       constants.ui.contentMode.homescreen = "homescreen"

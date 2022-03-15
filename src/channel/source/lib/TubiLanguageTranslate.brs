@@ -476,6 +476,14 @@ Function getTranslation_en_US()
       "description": "Directions on the search page",
       "message": "Search for movies, TV shows, and people"
     },
+    "screenSearch_defaultLinearSearch": {
+      "description": "Directions on the search page",
+      "message": "Search for movies, TV shows, Live TV, and people"
+    },
+    "screenSearch_trendingSearch": {
+      "description": "A header message that shows on top of default search results in search screen",
+      "message": "Trending Searches"
+    },
     "screenSearch_kidsWarning": {
       "description": "More directions on the search screen to suggest switching to kids mode.  Should be limited to be around 40 characters or fewer.",
       "message": "Switch to Kids for kids safe search results"
@@ -487,6 +495,14 @@ Function getTranslation_en_US()
     "screenSearch_noResults": {
       "description": "onscreeen message when there are no search results.",
       "message": "We couldn't find results for '{term}' \n Please try again"
+    },
+    "screenSearch_results": {
+      "description": "message after loading search results.",
+      "message": "Results"
+    },
+    "screenSearch_matchingTitles": {
+      "description": "text after number of search results for searchedString",
+      "message": "titles matching"
     },
     "screenSearch_liveText": {
       "description": "The label on the search results poster next to the live streaming icon",
@@ -1085,6 +1101,10 @@ Function getTranslation_en_US()
     "search_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
       "message": "To use your voice enabled remote, press and hold"
+    },
+    "search_voice_hint": {
+      "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed at the beginning of the sentence.",
+      "message": "To use your voice enabled remote, press and hold microphone button"
     },
     "dialog_button_signUp": {
       "description": "The label of the button in a dialog window that allows the user to sign up into the app.",

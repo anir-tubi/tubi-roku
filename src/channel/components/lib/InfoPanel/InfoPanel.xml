@@ -260,16 +260,26 @@
               loadHeight="36"
               loadDisplayMode="scaleToFit"/>
           </LayoutGroup>
-          <Label
-            id="Line2"
-            opacity="0.5"
-            width="1140"
-            ellipsizeOnBoundary="true">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
-          </Label>
+          <LayoutGroup
+            id="SecondLineGroup"
+            layoutDirection="horiz"
+            vertAlignment="center"
+            itemSpacings="[10]"
+            addItemSpacingAfterChild="true">
+            <LiveIconGroup
+              id="liveIconGroup"
+              shouldAnimate="true" />
+            <Label
+              id="Line2"
+              opacity="0.5"
+              width="1140"
+              ellipsizeOnBoundary="true">
+              <Font
+                role="font"
+                uri="pkg:/fonts/Vaud-Medium.ttf"
+                size="27" />
+            </Label>
+          </LayoutGroup>
         </LayoutGroup>
         
         <Group
