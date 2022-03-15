@@ -76,7 +76,7 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
       else if topNavItem.id = m.constants.ui.sideNavIds.Categories
         showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
       else if topNavItem.id = m.constants.ui.sideNavIds.search
-        showSearchScreen(m.constants)
+        showSearchScreen()
       else if topNavItem.id = m.constants.ui.sideNavIds.linearEPG
         showDefaultEPGScreen(componentToFocus)
       else if topNavItem.id = m.constants.ui.sideNavIds.news
@@ -85,7 +85,7 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
         showSportsEPGScreen(componentToFocus)
       end if
     else
-      ' If the user selected a top nav item that is associated with the current screen, 
+      ' If the user selected a top nav item that is associated with the current screen,
       ' then simply close the top nav
       if screen.subType() = "HomeScreen"
         screen.componentToFocus = m.constants.ui.homescreen.focusItems.contentGrid
@@ -155,7 +155,6 @@ End Function
 
 Function sendTopNavToSideNavNavigationEvent(screen, sidenav)
   if screen <> invalid and sideNav <> invalid
-    trackingPageInfo = screen.trackingPageInfo
     focusedNavId = m.constants.ui.screenIdToSideNavId[screen.id]
     buttonID = m.Tracking.sideNavPageMap[focusedNavId]
 

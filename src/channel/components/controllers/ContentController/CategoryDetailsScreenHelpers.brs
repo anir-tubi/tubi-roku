@@ -15,7 +15,7 @@ Function showCategoryDetailsScreen(content, sPageSource = "")
   categoryDetailsScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
   categoryDetailsScreen.categoryId = content.id
   categoryDetailsScreen.isLoading = true
-  
+
   categoryDetailsScreen.trackingPageInfo = {
     pageType: "category_page"
     pageValues: {
@@ -27,15 +27,14 @@ Function showCategoryDetailsScreen(content, sPageSource = "")
 
   ' don't send page load tracking until category details content is returned from the API
   pushScreen(categoryDetailsScreen, true, false)
-  
-  authInfo = m.global.authInfo
+
   ' make queue API request only if the user loggedIn
   if content.id = m.constants.ui.categoryIds.queue and isLoggedInUser() = false
     displaySignInRequiredModal(categoryDetailsScreen)
   else
-    fetchCategoryDetails(categoryDetailsScreen, content)
+    fetchCategoryDetails(content)
   end if
-  
+
 End Function
 
 
@@ -43,7 +42,7 @@ Function onSignInRequiredModal(msg)
 
   tubiLog("CategoryDetailsScreenHelpers.onSignInRequiredModal")
   screen = msg.getRoSGNode()
-  
+
   if screen <> invalid and screen.content = invalid
     displaySignInRequiredModal(screen)
   end if
@@ -106,12 +105,12 @@ Function onRefreshCategoryDetailsSignal(msg)
   m.refreshingCategoryDetailsCache = true
 
   categoryDetailsScreen.isLoading = true
-  fetchCategoryDetails(categoryDetailsScreen, categoryContent)
+  fetchCategoryDetails(categoryContent)
 End Function
 
 
-' Function fetchCategoryDetails(screen, content)
-Function fetchCategoryDetails(screen, content)
+' @content: roSGNode, CategoryContentNode
+Function fetchCategoryDetails(content)
   tubiLog("CategoryDetailsScreenHelpers.fetchCategoryDetails")
   isKidsMode = shouldKidsModeBeSentToServer()
 
@@ -201,7 +200,7 @@ Function showEmptyContentModal(screen)
       dialog_sub_type: "mylist-is-empty"
     }
   }
-  
+
   title = getTranslation("dialog_mylist_empty_title")
   message = getTranslation("dialog_mylist_empty_description")
   buttons = [getTranslation("dialog_button_ok")]
@@ -221,7 +220,7 @@ Function removeTopScreen()
   ' events logged showing navigation to the categoryDetailsScreen.
   popScreen(false, false)
   topScreen = getCurrentScreen()
-  
+
   sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
   focusSideNavOption(sideNavId)
 End Function
@@ -244,7 +243,7 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
   ' If topScreen.id does not = the ID of a categoryDetailsScreen, another screen (like the sign in screen)
   ' has been pushed on top of the categoryDetailsScreen. Hold off on removing the screen and
   ' displaying an error. When the user traverses back through the navigation stack, the
-  ' categoryDetailsScreen will eventually be revealed and if there is still no content, then 
+  ' categoryDetailsScreen will eventually be revealed and if there is still no content, then
   ' an error modal will be displayed.
   ' popScreen(false, false)
   if topScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
@@ -275,7 +274,7 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
       sErrorTitle = getTranslation("dialog_errorOops_title")
       sErrorMessage = getTranslation("error_noContent_description")
     end if
-    
+
     modalInfo = {
       title: sErrorTitle
       message: getErrorMessage(sErrorMessage, errorCode)

@@ -6,7 +6,7 @@ Function init()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
-  
+
   m.spinner = m.top.findNode("spinner")
   m.NavSection = m.top.findNode("nav")
   m.Keyboard = m.top.findNode("Keyboard")
@@ -28,7 +28,7 @@ Function init()
   m.ResultGrid.observeField("itemFocused", "onItemFocused")
 
   handleKeyboardColors()
-  
+
   m.NoResultsMessage = m.top.findNode("NoResultsMessage")
   m.NoResultsMessage.color = m.constants.ui.colors.primaryText
 
@@ -69,7 +69,7 @@ Function init()
 
   BackLabel = m.top.findNode("callToAction")
   if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
+    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
 End Function
@@ -170,7 +170,7 @@ End Function
 
 
 ' @content: roSGNode, ContentNode representing the content that was selected by the user
-' @position: integer, the position within the search results grid 
+' @position: integer, the position within the search results grid
 Function handleResultSelected(content, position)
   if content <> invalid
     updateTrackingInfo(content, position)
@@ -204,7 +204,7 @@ Function onSearchContentChange()
   m.ResultGrid.content = m.top.content
   if m.top.content <> invalid and m.top.content.getChildCount() > 0 then
     if m.top.content.isDefaultSearchResults = true
-      '//display special text when the default search is displaying 
+      '//display special text when the default search is displaying
       m.SearchText.text = m.sDefaultSearchText
     end if
 
@@ -232,7 +232,7 @@ Function onKeyboardTextChanged()
   m.SearchText.text = LCase(sKeyboardText)
 
   if sKeyboardText <> invalid and sKeyboardText.trim().len() > 0 then
-    loadSearchResults() 
+    loadSearchResults()
   else
     '//if the search text was empty, clear out any existing results and display the default search results
     loadSearchResults(true)
@@ -302,7 +302,7 @@ Function loadSearchResults(bDefaultResults = false)
   tubiLog("SearchScreen.loadSearchResults")
   if bDefaultResults = false
     m.top.searchText = m.Keyboard.text
-  else 
+  else
     m.top.searchText = ""
   end if
 End Function
@@ -333,7 +333,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     ' Only focus on content grid if animation is not in process, and if there is actually content there
     if key = "right" and m.Keyboard.isInFocusChain() and m.ResultGrid.content <> invalid and m.ResultGrid.content.getChildCount() > 0 then
       m.ResultGrid.setFocus(true)
-      m.gridHasFocus = true 
+      m.gridHasFocus = true
       m.bResultsInFocus = true
       handleKeyboardVoiceInput(m.bResultsInFocus)
       return true
@@ -442,10 +442,9 @@ Function setVoiceHint()
   wordCount = hintArr.count()
   'width to determine microphone x translation
   lastLineWidth = 0
-  height = 0
   labelWidth = m.keyboard.boundingRect().width
   'Below logic is to handle the custom wrap to add microphone image at the end of the translated text.
-  'splitting the sentence into words by space, we are adding the words 
+  'splitting the sentence into words by space, we are adding the words
   'to the labelListArray until it satisfies the lineWidth. If the width exceeds,
   'will move the words to the next line. Later each line converted to a label.
   for i = 0 to wordCount - 1
@@ -455,7 +454,6 @@ Function setVoiceHint()
       m.voiceHint.text = m.voiceHint.text + " " + hintArr[i]
     end if
     width = m.voiceHint.boundingRect().width
-    height = m.voiceHint.boundingRect().height
     'if the total width of combined words is exceeding the line width move to next line
     'else append to the sentenceArray
     if width > labelWidth or i = wordCount - 1

@@ -36,7 +36,7 @@ Function init()
   m.top.observeField("pollUrl", "onPollUrlChange")
   m.top.observeField("closeTransport", "hideOverlay")
   m.top.observeField("channelTimeGridContent", "onChannelTimeGridContentChanged")
-  
+
   if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", true).enabled = true
     m.top.observeField("width", "onWidthChange")
     m.top.observeField("height", "onHeightChange")
@@ -97,8 +97,8 @@ Function onVideoOverlayIsDisplayingChanged(msg)
 End Function
 
 
-Function onChannelSelectedToPlayChanged(msg)
-  tubiLog("LineaerVideoPlayerNewScreen.onChannelSelectedToPlayChanged") 
+Function onChannelSelectedToPlayChanged()
+  tubiLog("LineaerVideoPlayerNewScreen.onChannelSelectedToPlayChanged")
   m.top.channelSelected = m.VideoOverlay.linearChannelToPlay
   m.top.ChannelSelectedUpdated = true
 End Function
@@ -148,7 +148,7 @@ Function updateColors()
 End Function
 
 
-Function onContentChange(msg) as void
+Function onContentChange() as void
   tubiLog("LineaerVideoPlayerNewScreen.onContentChange")
   m.top.state = ""
 
@@ -339,12 +339,12 @@ Function onId3(msg)
 End Function
 
 
-Function onFullScreenChange() 
+Function onFullScreenChange()
   if m.top.fullscreen = true
     if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", true).enabled = true
       m.gradiantOnMinimizedState.visible = false
       hideProgrammingData()
-    end if 
+    end if
     if m.top.state = "playing"
       ' // display overlay only if user landed on full screen from homescreen. If user landed here from EPG Screen, then do not show overlay.
       if m.top.associatedScreenID = m.constants.ui.screenIds.homeScreen
@@ -366,8 +366,8 @@ End Function
 Function onWidthChange()
   m.gradiantOnMinimizedState.width = m.top.width
   End Function
-  
-  
+
+
   Function onHeightChange()
   m.gradiantOnMinimizedState.height = m.top.height
 End Function
@@ -768,7 +768,7 @@ Function displayProgrammingData()
   end if
 End Function
 
- 
+
 Function hideProgrammingData()
   m.ProgrammingData.opacity = 0
 End Function
@@ -780,14 +780,14 @@ Function onChannelTimeGridContentChanged()
 End Function
 
 
-' Set the minimized info panel using m.top.channelTimeGridContent 
+' Set the minimized info panel using m.top.channelTimeGridContent
 Function setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
   hideProgrammingData()
 
   if m.top.channelTimeGridContent <> invalid and m.top.content <> invalid and m.top.content.id = m.top.channelTimeGridContent.id
-    'if in minimized state and video playing 
+    'if in minimized state and video playing
     if m.top.fullscreen = false and m.top.state = "playing" and m.top.channelTimeGridContent <> invalid and m.top.channelTimeGridContent.getChildCount() > 0
-      
+
       programData1 = invalid
       programData2 = invalid
       sProgramTitle1 = ""
@@ -822,14 +822,14 @@ Function setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
           end if
 
           if programData2 <> invalid
-            if programData2.title <> invalid and programData2.startTime <> invalid and programData2.startTime > 0 
-              sProgramTitle2 = programData2.title 
+            if programData2.title <> invalid and programData2.startTime <> invalid and programData2.startTime > 0
+              sProgramTitle2 = programData2.title
               sStartTimeProgram2 = programData2.ShortDescriptionLine1
             end if
           end if
         end if
       end if
-      
+
       setMinimizedInfoPanelProgrammingData(sProgramTitle1, sProgramTitle2, nMinutesLeftOfProgram1, nDurationOfProgram1, sStartTimeProgram2)
 
     end if
@@ -842,7 +842,7 @@ End Function
 ' @param program1: String - The title of the 1st program in the lineup
 ' @param program2: String - The title of the 2nd program in the lineup
 ' @param minutesLeft: integer - The Number of minutes before the current program switches to the next program
-' @param currentDuration: integer - The Number of minutes of the duration of the current program 
+' @param currentDuration: integer - The Number of minutes of the duration of the current program
 ' @param time: string - The start time of the 2nd program
 Function setMinimizedInfoPanelProgrammingData(program1 = "", program2 = "", minutesLeft = -1, currentDuration = -1, time = "" )
   metadata = {
@@ -856,7 +856,7 @@ Function setMinimizedInfoPanelProgrammingData(program1 = "", program2 = "", minu
   m.ProgrammingData.metadata = metadata
 
   displayProgrammingData()
-End Function 
+End Function
 
 
 
@@ -902,7 +902,7 @@ End Function
 
 
 ' dismiss the epg when ok is pressed on live program
-Function onOKPressed(msg)
+Function onOKPressed()
   item = m.VideoOverlay.rowItemfocused
   if item <> invalid and item.count() = 2 and item[1] = 0
     hideOverlay()

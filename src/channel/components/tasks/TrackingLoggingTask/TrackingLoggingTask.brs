@@ -42,7 +42,7 @@ Function watchLoop()
         m.analyticsAppMode = msg.GetData()
       end if
     else if type(msg) = "roUrlEvent" then
-      handledRequest = m.queue.handleEvent(msg)
+      m.queue.handleEvent(msg)
     end if
   end while
 End Function
@@ -71,4 +71,3 @@ Function sendSceneGraphException(logInfo)
   'runs the appropriate method (debug, error, etc.) from the logger object and add the log request to the tracking/logging queue
   m.logger.exception(logInfo.level, logInfo.message)
 End Function
-

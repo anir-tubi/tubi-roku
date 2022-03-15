@@ -221,7 +221,7 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
 
-      showSearchScreen(m.constants)
+      showSearchScreen()
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.home
       if isKidsUIOn() <> true
@@ -535,14 +535,6 @@ Function hideNavMenu(shouldTrackComponentInteraction = true)
 
     if shouldTrackComponentInteraction = true and topScreen <> invalid
       topScreen.enabled = true
-
-      'set up analytics for unfocusing side nav component
-      pageType = ""
-      pageValues = {}
-      if topScreen.trackingPageInfo <> invalid
-        pageType = topScreen.trackingPageInfo.pageType
-        pageValues = topScreen.trackingPageInfo.pageValues
-      end if
 
       interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")
       m.trackingLoggingTask.trackEvent = interactionEvent

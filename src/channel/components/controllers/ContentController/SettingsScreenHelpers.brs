@@ -287,7 +287,6 @@ End Function
 
 Function onParentalSettingComplete(msg)
   tubiLog("SettingsScreenHelper.onParentalSettingComplete")
-  task = msg.GetRoSGNode()
   result = msg.GetData()
   m.confirmPasswordScreen.isLoading = false
   if result <> invalid

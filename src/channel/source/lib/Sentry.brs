@@ -86,9 +86,9 @@ End Function
 
 ''''''''''''''''''
 ' parseDsn
-' 
+'
 Function sentry_parseDsn(dsnString)
-  ' See: 
+  ' See:
   '   https://docs.sentry.io/development/sdk-dev/overview/#parsing-the-dsn
   '   https://github.com/getsentry/sentry-javascript/blob/master/packages/core/src/dsn.ts#L7
   '
@@ -110,7 +110,7 @@ End Function
 
 ''''''''''''''''''
 ' getUrl
-' 
+'
 Function sentry_getUrl()
   url = m._dsn.protocol + "://" + m._dsn.host
   if m._dsn.port <> invalid and m._dsn.port <> ""
@@ -123,7 +123,7 @@ End Function
 
 ''''''''''''''''''
 ' severities
-' 
+'
 Function sentry_severities()
   return {
     "fatal":    "fatal"
@@ -139,14 +139,14 @@ End Function
 
 ''''''''''''''''''
 ' captureMessage
-' 
+'
 ' @message - String or Assocarray with a field 'message'.  If assocarray, all
 '            other fields will be captured as extra info.
 Function sentry_captureMessage(message, level="info") as Void
   if type(message) <> "roString" and type(message) <> "String" and type(message) <> "roAssociativeArray"
     return
   end if
-    
+
   ' Default to Info
   if type(level) <> "roString" and type(level) <> "String"
     level = m._SEVERITIES.info
@@ -170,14 +170,14 @@ Function sentry_captureMessage(message, level="info") as Void
   else
     event["message"] = message
   end if
-  
+
   m._sendEvent(event)
 End Function
 
 
 ''''''''''''''''''
 ' sendEvent
-' 
+'
 Function sentry_sendEvent(event)
 
   ' https://docs.sentry.io/development/sdk-dev/overview/#authentication
@@ -196,7 +196,7 @@ Function sentry_sendEvent(event)
     end if
   end for
   authString = "Sentry " + authValues.join(", ")
-  
+
   url = m._getUrl()
 
   port = CreateObject("roMessagePort")
@@ -213,7 +213,7 @@ Function sentry_sendEvent(event)
   urltransfer.RetainBodyOnError(true)
   body = FormatJson(event)
   urltransfer.AsyncPostFromString(body)
-  msg = wait(0, port)
+  wait(0, port)
 End Function
 
 

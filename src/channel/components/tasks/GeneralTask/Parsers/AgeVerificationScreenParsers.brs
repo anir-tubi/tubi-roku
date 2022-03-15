@@ -1,7 +1,7 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseAgeVerificationScreenDeviceRegistrationSuccess(fullResponse, requestNode)
+' @_requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseAgeVerificationScreenDeviceRegistrationSuccess(fullResponse, _requestNode)
 
   age = -1
   parsedResponse = fullResponse.data
@@ -19,7 +19,7 @@ Function parseAgeVerificationScreenDeviceRegistrationError(fullResponse, request
 
   ' default code
   errCode = -1234
-  
+
   if fullResponse <> invalid and fullResponse.code <> invalid
     ' HTTP or Curl code
     errCode = fullResponse.code
@@ -34,8 +34,8 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseAgeVerificationScreenCheckBirthdaySuccess(fullResponse, requestNode)
+' @_requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseAgeVerificationScreenCheckBirthdaySuccess(fullResponse, _requestNode)
   parsedResponse = fullResponse.data
 
   res = {}
@@ -49,8 +49,8 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseAgeVerificationScreenCheckBirthdayError(fullResponse, requestNode)
+' @_requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseAgeVerificationScreenCheckBirthdayError(fullResponse, _requestNode)
   errCode = -1234
   if fullResponse <> invalid and fullResponse.code <> invalid
     ' HTTP or Curl code

@@ -1,7 +1,7 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseDetailScreenSingleContentSuccess(fullResponse, requestNode)
+' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseDetailScreenSingleContentSuccess(fullResponse, _requestNode)
   translate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
   updatedContent = CreateObject("roSGNode", "TubiContentNode")

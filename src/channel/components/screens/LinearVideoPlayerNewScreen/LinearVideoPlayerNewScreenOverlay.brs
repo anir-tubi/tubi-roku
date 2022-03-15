@@ -5,7 +5,7 @@ Function init()
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.top.observeFieldScoped("display", "onOverlayDisplayChange")
   m.top.observeFieldScoped("closedCaptioningItems", "onClosedCaptionListUpdated")
-  
+
   m.OverlayParent = m.top.findNode("OverlayParent")
   m.OverlayContentArea = m.top.findNode("overlayContentArea")
   m.clock = m.top.findNode("clock")
@@ -18,13 +18,13 @@ Function init()
   m.EPGSpinner = m.top.findNode("EPGSpinner")
   m.infoPanel = m.top.findNode("infoPanel")
   m.EPGError = m.top.findNode("EPGError")
-  m.EPGError.text = getTranslation("error_noGetChannelGuide_description") 
+  m.EPGError.text = getTranslation("error_noGetChannelGuide_description")
   m.sideNav = m.top.findNode("sideNav")
   m.sideNav.observeFieldScoped("focusedButtonID", "onSideNavFocusChange")
   m.sideNav.observeFieldScoped("selectedButtonID", "onSideNavSelectChange")
   m.top.observeField("updateTimeGridContent", "onTimeContentChange")
   m.top.observeField("timeGridContentLoading", "onTimeGridContentLoadingChange")
-   
+
   '//Closed Captioning Nodes
   m.closedCaptioningGroup = m.top.findNode("closedCaptioningGroup")
   m.closedCaptioningButtonList = m.top.findNode("closedCaptioningButtonList")
@@ -46,7 +46,7 @@ Function init()
   m.originalEPGTranslation = m.EPGHorizontalSlide.translation
   m.slideOutEPGTranslation = [390, m.EPGHorizontalSlide.translation[1]]
   resetUI(false)
-  m.firstTimeEPGLaunched = true 'm.firstTimeEPGLaunched is a flag to avoid jumping to the content 'currently playing' causing epg to trigger stop video and refetch the channel. 
+  m.firstTimeEPGLaunched = true 'm.firstTimeEPGLaunched is a flag to avoid jumping to the content 'currently playing' causing epg to trigger stop video and refetch the channel.
 End Function
 
 
@@ -91,14 +91,14 @@ Function onLinearChannelToPlayChanged(msg)
       m.top.linearChannelToPlay = selectedChannel
       m.top.linearChannelToPlayUpdated = true
     end if
-  
+
     if m.firstTimeEPGLaunched = true
       m.firstTimeEPGLaunched = false
     end if
   end if
 End Function
 
- 
+
 Function onSideNavFocusChange()
   tubiLog("LinearVideoPlayerNewScreenOverlay.onSideNavFocusChange")
   m.top.reactedToKeyPresss = true
@@ -117,7 +117,7 @@ Function onSideNavSelectChange()
     selectedLinearSideNavId = m.constants.ui.sideNavIds.back
     setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
     hideOverlay()
-    m.top.navigateToEPGScreen = true 
+    m.top.navigateToEPGScreen = true
   end if
   m.top.reactedToKeyPresss = true
 End Function
@@ -136,16 +136,16 @@ End Function
 
 
 
-Function onCCContentFocused(msg)
+Function onCCContentFocused()
   tubiLog("LinearVideoPlayerNewScreenOverlay.onCCContentFocused")
-  '//When the closed captioning layer is focused, make sure to update reactedToKeyPresss so the transport overlay does not automatically hide 
+  '//When the closed captioning layer is focused, make sure to update reactedToKeyPresss so the transport overlay does not automatically hide
   m.top.reactedToKeyPresss = true
 End Function
 
 
 
 Function onCCContentSelected(msg)
-  tubiLog("LinearVideoPlayerNewScreenOverlay.onCCContentSelected") 
+  tubiLog("LinearVideoPlayerNewScreenOverlay.onCCContentSelected")
   list = msg.getRoSGNode()
   item = msg.getData()
 
@@ -190,7 +190,7 @@ Function centerClosedCaptioning()
   nSpacing = m.closedCaptioningButtonList.rowItemSpacing[0][0]
   nItemWidth = m.closedCaptioningButtonList.rowItemSize[0][0]
   nItems = m.closedCaptioningButtonList.content.getChild(0).getChildCount()
-  nListWidth = (nItems * nItemWidth) + ((nItems-1) * nSpacing) 
+  nListWidth = (nItems * nItemWidth) + ((nItems-1) * nSpacing)
 
   nCenterPointX = (1920-nListWidth)/2
   m.closedCaptioningButtonList.translation = [nCenterPointX, m.closedCaptioningButtonList.translation[1]]
@@ -240,21 +240,21 @@ Function hideOverlay()
 End Function
 
 
-Function onDisplayAnimationStopped(msg)
+Function onDisplayAnimationStopped()
   if m.animationDisplay.state = "stopped"
     m.animationDisplay.unobserveField("state")
     m.animationDisplay = invalid
-  end if 
+  end if
 End Function
 
 
-Function onHideAnimationStopped(msg)
+Function onHideAnimationStopped()
   tubiLog("LinearVideoPlayerNewScreenOverlay.hideAnimationStopeed")
   if m.animationHide.state = "stopped"
     m.animationHide.unobserveField("state")
     m.animationHide = invalid
-    resetUI(false) 
-  end if 
+    resetUI(false)
+  end if
 End Function
 
 
@@ -263,7 +263,7 @@ Function onTimeContentChange()
   if m.top.updateTimeGridContent = true
     if m.top.timeGridContent <> invalid
       m.EPG.content = m.top.timeGridContent
-      m.EPG.contentUpdated = true 
+      m.EPG.contentUpdated = true
       m.EPGError.visible = false
       jumpEPGToCurrentPlayingVideo()
     else
@@ -398,7 +398,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
         bKeyReacted = true
       end if
-    else if key = "right" 
+    else if key = "right"
       if m.bEPGVisible = true and m.EPG.isInFocusChain() = false
         userInteraction = "TOGGLE_OFF"
         selectedLinearSideNavId = getAnalyticsIdFromFocusedSideNavItem()

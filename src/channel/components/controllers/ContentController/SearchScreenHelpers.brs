@@ -1,5 +1,5 @@
 ' Show the search screen
-Function showSearchScreen(constants)
+Function showSearchScreen()
   tubiLog("SearchScreenHelpers.onSearchSelected")
   searchScreen = CreateObject("roSGNode", "SearchScreen")
   searchScreen.observeFieldScoped("contentSelected", "onSearchContentSelected")
@@ -47,11 +47,11 @@ Function onSearchTextChanged(msg)
   bSearchNonDefaultResults = (searchText <> invalid and Len(searchText) > 0)
 
   if m.currentSearchScreenRequestNode <> invalid
-    m.cancelRequest(m.currentSearchScreenRequestNode) 
+    m.cancelRequest(m.currentSearchScreenRequestNode)
   end if
 
   kidsMode = shouldKidsModeBeSentToServer()
-  
+
   if bSearchNonDefaultResults = true
 
     searchReqInfo = m.CmsApi.searchReqInfo(searchText, kidsMode)
@@ -62,7 +62,7 @@ Function onSearchTextChanged(msg)
       successCallback: onSearchSuccessResponse
       errorCallback: onSearchErrorResponse
       responseType: "node"
-    }) 
+    })
 
     m.trackingLoggingTask.trackEvent = {
       type: "search"
@@ -71,7 +71,7 @@ Function onSearchTextChanged(msg)
         search_type: "PAGE" 'SearchType enum
       }
     }
-  else 
+  else
 
     categoryReqInfo = m.CmsApi.categoryReqInfo(m.constants.ui.categoryIds.featured, kidsMode)
     m.currentSearchScreenRequestNode = m.makeRequest({
@@ -81,7 +81,7 @@ Function onSearchTextChanged(msg)
       successCallback: onSearchDefaultSuccessResponse
       errorCallback: onSearchDefaultErrorResponse
       responseType: "node"
-    }) 
+    })
 
   end if
 End Function

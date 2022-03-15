@@ -4,7 +4,7 @@
 ' Helper Function for onResume and onPlay to launch content
 ' @content: TubiContentNode, the content to be played
 ' @bMinimized: boolean, Should the player be playing in its minmized state on the homescreen? If false, then it will be at fullscreen.
-' @sAssociatedScreenID: String, Often times the screen right before the linear video player screen is displayed has a close association. Keep a record of the ID associated with the associated screen. 
+' @sAssociatedScreenID: String, Often times the screen right before the linear video player screen is displayed has a close association. Keep a record of the ID associated with the associated screen.
 Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "")
   if content <> invalid
     tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
@@ -16,7 +16,6 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
     videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
-    bTellPlayerToPlay = true
     if videoPlayer = invalid
       if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", true).enabled = true
         videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerNewScreen")
@@ -26,7 +25,6 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
       end if
       videoPlayer.id = m.constants.ui.screenIds.linearVideoPlayerScreen
-      currentScreen = getCurrentScreen()
 
       ' onVideoPlayerVisibleChange exists in ContentController
       videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
@@ -117,7 +115,7 @@ Function onLinearVideoPlayerRequestingTVGuide()
       showDefaultEPGScreen()
       epgScreen = getFromScreenCache(m.constants.ui.screenIds.epgScreen)
       animateLinearVideoPlayerToMinState()
-      
+
       cachedAllEPGChannels = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
       isEPGDataPrecached = (cachedAllEPGChannels <> invalid and cachedAllEPGChannels.getChildCount() > 0 and shouldRefresh(cachedAllEPGChannels.getChild(0)) = false)
       if isEPGDataPrecached = true
@@ -128,7 +126,7 @@ Function onLinearVideoPlayerRequestingTVGuide()
       '//Focus side nav to EPG option
       sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.epgScreen]
       focusSideNavOption(sEPGSideNavID)
-      
+
       '//Set EPGScreen background to ensure the epgScreen appears properly: i.e. background gradient is displayed, proper bground is displayed upon sideNav focus
       m.backgroundGroup.backgroundInfo = {
         type : m.constants.ui.backgroundTypes.epg
@@ -137,8 +135,8 @@ Function onLinearVideoPlayerRequestingTVGuide()
     end if
   end if
 End Function
-  
-  
+
+
 Function getUpdatedLinearVideoResources(content)
   auth = TubiAuth(m.constants, m.Request)
   adLib = TubiAdsLimited(m.constants, auth)
@@ -196,18 +194,18 @@ Function maximizeLinearPlayer(content)
     videoPlayer.unobserveFieldScoped("backButtonPressed")
     videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerState")
     videoPlayer.observeFieldScoped("backButtonPressed", "onLinearVideoPlayerBackPressed")
-  
+
     if videoPlayer.fullscreen = false
       '//stop the background artwork from transitioning and from displaying while player is in fullscreen
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.linear
         uriList: []
       }
-      m.backgroundGroup.posterVisible = true 
+      m.backgroundGroup.posterVisible = true
       showHideLinearVideoPlayerSpinner(false)
       videoPlayer.loading = false
       if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
-        getDataForTimeGrid() 
+        getDataForTimeGrid()
       end if
       repositionLinearVideoPlayerToMaxState(bAnimate)
     end if
@@ -339,7 +337,7 @@ Function onLiveStreamManifestResponse(response)
             ' it is a redirect.
             if response.headers <> invalid and response.headers.location <> invalid
               originalUrl = m.request.removeCharlesProxy(response.headers.location) ' Remove Charles proxy appended by Charles rule for clean redirect.
-            else 
+            else
               originalUrl = resource.url
             end if
             modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
@@ -416,7 +414,7 @@ End Function
 
 
 ' showHideLinearVideoPlayerSpinner - shows/hides the LinearVideoPlayer loading spinner
-' 
+'
 '@visible : boolean - should the spinner be visible
 Function showHideLinearVideoPlayerSpinner(bVisible)
   m.LinearVideoPlayerSpinner.visible = bVisible
@@ -424,7 +422,7 @@ End Function
 
 
 Function stopAndHideLinearVideoPlayer()
-  tubiLog("LinearVideoPlayerScreenHelpers.stopAndHideLinearVideoPlayer") 
+  tubiLog("LinearVideoPlayerScreenHelpers.stopAndHideLinearVideoPlayer")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
     '//reset and Hide the loading indicator.
@@ -439,7 +437,7 @@ End Function
 
 
 Function unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
-  tubiLog("LinearVideoPlayerScreenHelpers.unObserveAllStateDependentLinearVideoPlayerFields") 
+  tubiLog("LinearVideoPlayerScreenHelpers.unObserveAllStateDependentLinearVideoPlayerFields")
   if videoPlayer <> invalid
     videoPlayer.unobserveFieldScoped("backButtonPressed")
     videoPlayer.unobserveFieldScoped("state")
@@ -449,14 +447,14 @@ End Function
 
 
 Function repositionLinearVideoPlayerToMaxState(bAnimate)
-  tubiLog("LinearVideoPlayerScreenHelpers.repositionLinearVideoPlayerToMaxState") 
+  tubiLog("LinearVideoPlayerScreenHelpers.repositionLinearVideoPlayerToMaxState")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
     videoPlayer.fullscreen = true
     nDuration = 0
     if bAnimate = true
       nDuration = .5
-    end if 
+    end if
 
     if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
       clearMinimizedLinearPlayerAnimation()
@@ -487,7 +485,7 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
           nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayer_minimizedDimension[1]
           nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayer_minimizedTranslation
           linearPlayerParentGroup = m.LinearPlayerGroupAboveScreenStack '//if on the homescreen, then minimized video player should appear above the rowList
-          
+
           '//position the LinearCountdownTimer in the right hand corner of the video player.
           m.LinearCountdownTimer.translation = [nPosition[0] + nWidth - m.LinearCountdownTimer.width - 12, m.LinearCountdownTimer.translation[1]]
           m.LinearVideoPlayerSpinner.translation = [447, 660]
@@ -504,7 +502,7 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
         nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
         m.LinearVideoPlayerSpinner.translation = [1260, 320]
       end if
-    else 
+    else
       nWidth = m.constants.ui.imageSizes.linearVideoPlayer_minimizedDimension[0]
       nHeight = m.constants.ui.imageSizes.linearVideoPlayer_minimizedDimension[1]
       nPosition = m.constants.ui.imageTranslations.linearVideoPlayer_minimizedTranslation
@@ -517,7 +515,7 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
     if nDuration > 0 and m.animationMinimizedLinearPlayer <> invalid
       m.animationMinimizedLinearPlayer.observeField("state", "onLinearPlayerMinimizedComplete")
     else
-      '//If the animation is instant (and/or this is on a limited UI device), then call the animation-complete function immediately 
+      '//If the animation is instant (and/or this is on a limited UI device), then call the animation-complete function immediately
       displayLinearPlayerProgrammingDataOnHomescreen()
     end if
     videoPlayer.visible = bVisible
@@ -608,7 +606,7 @@ Function onLinearVideoPlayerVisibleFullscreenChange(msg)
     m.SideNav.visible = false
     m.logoGroup.visible = false
     m.clock.visible = false
-  end if 
+  end if
 End Function
 
 
@@ -656,7 +654,7 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
   if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
     if bContinueToPlay = true
       ' sports epg screen or news epg screen might not have the contentID. So search for content ID and handle the back logic
-      if currentScreen.associatedScreenID = m.constants.ui.screenIds.newsEPGScreen or currentScreen.associatedScreenID = m.constants.ui.screenIds.sportsEPGScreen  
+      if currentScreen.associatedScreenID = m.constants.ui.screenIds.newsEPGScreen or currentScreen.associatedScreenID = m.constants.ui.screenIds.sportsEPGScreen
         handleBackToEPGScreen(videoPlayer.originalContent, currentScreen.associatedScreenID)
 
         '//animate the video player into the corner
@@ -668,7 +666,7 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
         '//animate the video player into the corner
         animateLinearVideoPlayerToMinState()
       else if currentScreen.associatedScreenID = m.constants.ui.screenIds.searchScreen
-        popScreen(true, true) 
+        popScreen(true, true)
         stopAndHideLinearVideoPlayer()
       else
         popScreen(true, true)
@@ -723,7 +721,7 @@ Function showLinearPlayerError(error_message = "", errorCode = invalid)
   if videoPlayer <> invalid
     returnToPreviousScreenFromLinearVideo(false)
     errorMessage = getTranslation("videoPlayer_error_failed_description")
-    if error_message <> invalid and error_message <> "" 
+    if error_message <> invalid and error_message <> ""
       errorMessage = error_message
     end if
 
@@ -782,7 +780,7 @@ End Function
 ' When the user purposely opens or closes the channel guide (userDisplayingChannelGuide), then this handler will be called.
 Function onChannelGuideVisibleStateChangedByUser(msg)
   tubiLog("LinearVideoPlayerScreenHelpers.onChannelGuideVisibleStateChangedByUser")
-  bChannelGuideVisible = msg.getData() 
+  bChannelGuideVisible = msg.getData()
 
   event = invalid
   pageType = ""
@@ -813,7 +811,7 @@ Function onChannelGuideVisibleStateChangedByUser(msg)
 
     m.trackingLoggingTask.trackEvent = event
   end if
-End Function 
+End Function
 
 
 ' A new channel is selected from the channel guide. Start playing that new channel
@@ -868,7 +866,7 @@ End Function
 Function onChannelsRequested()
   tubiLog("LinearVideoPlayerScreenHelpers.onChannelsRequested")
   currentContent = getCurrentLinearContent()
-  
+
   if currentContent <> invalid and currentContent.parentId <> invalid
 
     options = {}
@@ -943,7 +941,7 @@ Function closeLinearVideoPlayerTransport()
   if videoPlayer <> invalid
     videoPlayer.closeTransport = true
   end if
-End Function 
+End Function
 
 
 Function onRetryLinearPlayerError()
@@ -957,14 +955,14 @@ End Function
 
 
 Function handleBackToEPGScreen(content, screenId)
-  if content <> invalid 
-    contentId = content.id 
+  if content <> invalid
+    contentId = content.id
     isContentPresent = doesEpgScreenHaveContent(contentId,screenId)
-    'if Content is not present in sports or news screen, then go back to 'all epg' screen. 
+    'if Content is not present in sports or news screen, then go back to 'all epg' screen.
     if isContentPresent = false
       jumpToParentScreenContentByID(contentId, "", m.constants.ui.screenIds.EPGScreen)
       showDefaultEPGScreen()
-    else 
+    else
       ' if content is present, then go back to sports/news screen
       jumpToParentScreenContentByID(contentId, "", screenId)
       popScreen(true, true)
@@ -973,7 +971,7 @@ Function handleBackToEPGScreen(content, screenId)
 End Function
 
 
-'searches the contentId in timegrid content of screen with screenId. 
+'searches the contentId in timegrid content of screen with screenId.
 '@param contentId: string content Id to search
 '@param screenId: string Id of the screen to be searched for timeGridContent
 Function doesEpgScreenHaveContent(contentId, screenId) as boolean

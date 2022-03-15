@@ -2,7 +2,6 @@
 '                            .data value converted from JSON to AA already
 ' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
 Function parseEmailExistsSuccess(fullResponse, requestNode)
-  parsedResponse = fullResponse.data
   return {
     requestInput: requestNode.input
     parsedResponse: fullResponse.data
@@ -23,9 +22,9 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
 'side effects... overwrites the old authInfo in the registry with the new authInfo
-Function parseSignUpSuccess(fullResponse, requestNode)
+Function parseSignUpSuccess(fullResponse, _requestNode)
   parsedResponse = fullResponse.data
   parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
   requestModule = TubiRequest(m.constants.settings)
@@ -48,9 +47,9 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
 'side effects... overwrites the old authInfo in the registry with the new authInfo
-Function parseSignInSuccess(fullResponse, requestNode)
+Function parseSignInSuccess(fullResponse, _requestNode)
   parsedResponse = fullResponse.data
   parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
   requestModule = TubiRequest(m.constants.settings)

@@ -1,5 +1,5 @@
 ' Show the epg Screen
-' @constants: assocArray, constants as set in Constants.brs 
+' @constants: assocArray, constants as set in Constants.brs
 ' @screenID: string, What kind of epgScreen do you wish to make: regular, movies, or TV
 ' @componentToFocus: string, one of the values in constants.ui.epgscreen.focusItems
 Function showEPGScreen(constants, screenID = "", componentToFocus = "")
@@ -29,7 +29,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     else
       epgScreen.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
     end if
-  
+
     pushScreen(epgScreen, true, shouldSendPageLoadEvent)
   else
     displayDefaultBackground()  ' clear background from previous screens until epgscreen loads
@@ -89,15 +89,15 @@ Function refreshEPGScreen(epgscreen)
     mode = m.constants.ui.contentMode.epgScreen
     epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
     epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
-  else 
+  else
     mode = m.constants.ui.contentMode.epgScreen
     epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
   end if
-  
+
   if epgChannelList = invalid or (epgChannelList <> invalid and shouldRefresh(epgChannelList.getChild(0)) = true)'There is no cached contents
     setEPGScreenLoading(epgScreen)
     fetchEPGScreenChannels(epgScreen, mode)
-  else if epgChannelList <> invalid 
+  else if epgChannelList <> invalid
     epgscreen.timeGridContent = epgChannelList
     setTimeGridContentLoadingToComplete(epgScreen)
   end if
@@ -109,7 +109,7 @@ Function fetchEPGScreenChannels(screen, mode="")
 
   screen.trackingLoadStartTime = UpTime(0)
   m.totalNumEPGBatches = 0
-  
+
   screen.unobserveFieldScoped("contentReady")
   screen.observeFieldScoped("contentReady", "onEPGscreenContentReady")
   fetchEPGChannels(screen, mode)
@@ -138,14 +138,14 @@ End Function
 Function fetchEPGChannel(screen, channelID)
   cachedChannel = invalid
   cachedAllChannels = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
-  
+
   if cachedAllChannels <> invalid and cachedAllChannels.getChildCount() > 0 and shouldRefresh(cachedAllChannels.getChild(0)) = false
     '//go thru the channels and find the desired channel
     for i = 0 to cachedAllChannels.getChildCount()
       cachedChannelTemp = cachedAllChannels.getChild(i)
       if cachedChannelTemp.id = channelID
         if shouldRefresh(cachedChannelTemp) = false
-          '//Just in case the logic to determine the freshness of the AllChannels data is different from the Channel data, 
+          '//Just in case the logic to determine the freshness of the AllChannels data is different from the Channel data,
           '//(at the time of writing this code, the logic should be the same - aka all channels have the same freshness),
           '//we should check to see if channel data within the AllChannels data is fresh.
           cachedChannel = cachedChannelTemp
@@ -155,7 +155,7 @@ Function fetchEPGChannel(screen, channelID)
     end for
   end if
 
-  if cachedChannel = invalid  
+  if cachedChannel = invalid
     '//If the channel data was not found in the AllChannels data, then see if the channel data is available in the cache
     cachedChannelTemp = getFromContentCache(channelID)
     if shouldRefresh(cachedChannel) = false
@@ -165,14 +165,14 @@ Function fetchEPGChannel(screen, channelID)
   end if
 
   if cachedChannel <> invalid
-    '//The channel data has been cached, so call the success callback immediately. 
+    '//The channel data has been cached, so call the success callback immediately.
     instantResponse = CreateObject("roSGNode", "ContentNode")
     instantResponse.addField("requestorID", "string", false)
-    instantResponse.requestorID = screen.id 
+    instantResponse.requestorID = screen.id
     '//TODO: Think about better logic of just getting data from Cached Channel. But for now, if we are using contentNode,
     ' we need to clone the original channel which is present in Cache. Otherwise, just appending/replacing the node will reparent the node and next time
     'when Cache has been used, it will be missing the channel which was already reparented.
-    clonedCachedChannel = cachedChannel.clone(true) 
+    clonedCachedChannel = cachedChannel.clone(true)
     instantResponse.appendChild(clonedCachedChannel)
     onEPGChannelProgramSuccess(instantResponse, false)
   else
@@ -243,39 +243,39 @@ End Function
 '@response: roSGNode, The response contains program info for a set of channel
 Function onEPGProgramSuccess(response)
   tubiLog("EPGScreenHelpers.onEPGProgramSuccess")
-  if response <> invalid 
-    m.totalNumEPGBatches = m.totalNumEPGBatches - 1 'reduce the totalNumEPGBatches 
+  if response <> invalid
+    m.totalNumEPGBatches = m.totalNumEPGBatches - 1 'reduce the totalNumEPGBatches
     screen = getFromScreenCache(response.requestorID)
     if screen = invalid
       screen = getCurrentScreen()
     end if
-    if response.requestorID = screen.id 
+    if response.requestorID = screen.id
       appendOrAddTimeGridNewContents(response, screen)
 
       if  m.totalNumEPGBatches = 0
         setTimeGridContentLoadingToComplete(screen)
         setInContentCache(screen.timeGridContent)
-      
+
       end if
     end if
   end if
 End Function
 
 
-' Successfully loaded the program data of one channel. 
+' Successfully loaded the program data of one channel.
 ' This function is used for fetching the channel's program data for homeScreen.
 Function onEPGChannelProgramSuccess(response, storeInCacheUponSuccess = true)
   tubiLog("EPGScreenHelpers.onEPGChannelProgramSuccess")
-  if response <> invalid 
+  if response <> invalid
     screen = getFromScreenCache(response.requestorID)
     if screen = invalid
       screen = getCurrentScreen()
     end if
-    if response.requestorID = screen.id 
+    if response.requestorID = screen.id
       channelData = response.getChild(0)
       if channelData <> invalid
         if storeInCacheUponSuccess = true
-          bSet = setInContentCache(channelData)
+          setInContentCache(channelData)
         end if
         screen.channelTimeGridContent = channelData
       end if
@@ -288,12 +288,12 @@ End Function
 ' Unsuccessfully loaded the program data of one channel
 Function onEPGChannelProgramError(response)
   tubiLog("EPGScreenHelpers.onEPGChannelProgramError")
-  if response <> invalid 
+  if response <> invalid
     screen = getFromScreenCache(response.requestorID)
     if screen = invalid
       screen = getCurrentScreen()
     end if
-    if response.requestorID = screen.id 
+    if response.requestorID = screen.id
       screen.channelTimeGridContent = invalid
     end if
   end if
@@ -306,11 +306,11 @@ Function onEpgProgramError(response)
   m.totalNumEPGBatches = m.totalNumEPGBatches - 1
   screen = getCurrentScreen()
   'Check if the screen which requested the program info is the current Screen and user not moved away from this Screen. (especially in case of request timeout or slow internet cases)
-  if screen <> invalid and screen.id = response.requestorID and response.contentId <> invalid and screen.timeGridContent <> invalid  
+  if screen <> invalid and screen.id = response.requestorID and response.contentId <> invalid and screen.timeGridContent <> invalid
     'response.contentID will have list of comma separated contentIDs for which the reponse was requested.
     'remove each of the channel Ids from TimeGrid which does not have any channel/program information. Please note that at this point, this node is an empty row on TimeGrid.
     contentIDList = response.contentId.Tokenize(",")
-    for each content in contentIDList      
+    for each content in contentIDList
         i = m.NodeHelpers.getChildIndexById(screen.timeGridContent, content)
         screen.timeGridContent.removeChildIndex(i)
     end for
@@ -320,7 +320,7 @@ Function onEpgProgramError(response)
       screen.timeGridContent.getChild(0).validUntil = 0
     end if
 
-    ' if all the responses for Channel infomation errored out then timeGrid will not have any content. 
+    ' if all the responses for Channel infomation errored out then timeGrid will not have any content.
     if screen.timeGridContent.getChildCount() = 0
       onEPGError(response)
     else if  m.totalNumEPGBatches = 0 ' all the batches are over and there are channels in the list, show whatever has been fetched successfully.
@@ -336,12 +336,12 @@ Function onEpgError(response)
   showHideSpinner(false)
   code = 0
   'check if this error is meant for current Screen.
-  if screen <> invalid and response <> invalid and screen.id = response.requestorID 
+  if screen <> invalid and response <> invalid and screen.id = response.requestorID
     screen.timeGridContent = invalid
     setTimeGridContentLoadingToComplete(screen)
-    
+
     if isAnEpgScreen(screen) = true
-      '//Only display a error modal if this is an EPG Screen. An error message (on a non-EPGScreen) may display in a non-modal way based on 
+      '//Only display a error modal if this is an EPG Screen. An error message (on a non-EPGScreen) may display in a non-modal way based on
       '// both timeGridContent & updateTimeGridContent are invalid
       popScreen(false, false)
 
@@ -350,7 +350,7 @@ Function onEpgError(response)
       deleteFromScreenCache(screen.id)
 
       errorMessage = getTranslation("channelGuide_error_fetchContent_description")
-      
+
       code = response.code
       errorCode = getUserFacingErrorCode(m.constants.errors.context.epgScreen, m.constants.errors.subtypes.fetchError, code)
       dialogEvent = {
@@ -377,17 +377,17 @@ End Function
 
 Function appendOrAddTimeGridNewContents(response, epgScreen)
   tubiLog("EPGScreenHelpers.appendOrAddTimeGridNewContents")
-  
+
   if response <> invalid and epgscreen.timeGridContent <> invalid
     for i = 0 to response.getChildCount() - 1
       if response.getChild(i) <> invalid
         newNode = response.getChild(i).clone(true)
         oldNodeIndex = m.NodeHelpers.getChildIndexById(epgscreen.timeGridContent, newNode.id)
-  
+
         if oldNodeIndex = -1
           epgscreen.timeGridContent.appendChild(newNode)
-        else 
-          if epgscreen.timeGridContent.getChild(oldNodeIndex) <> invalid 
+        else
+          if epgscreen.timeGridContent.getChild(oldNodeIndex) <> invalid
             containerName = epgscreen.timeGridContent.getChild(oldNodeIndex).containerName
             newNode.parentTitle = containerName
           end if
@@ -399,14 +399,14 @@ Function appendOrAddTimeGridNewContents(response, epgScreen)
 End Function
 
 
-Function onEPGScreenOKPressed(msg)
+Function onEPGScreenOKPressed()
   tubiLog("EPGScreenHelpers.onEPGScreenOKPressed")
   currentScreen = getCurrentScreen()
   stopCountdownTimer() 'stop previous counter
-  
+
   if currentScreen <> invalid and isAnEpgScreen(currentScreen)
     contentToPlay = currentScreen.LinearChannelToPlay
-    if contentToPlay <> invalid 
+    if contentToPlay <> invalid
       startPlayVideo = true
       linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
       if linearVideoPlayer <> invalid and linearVideoPlayer.content <> invalid
@@ -415,7 +415,7 @@ Function onEPGScreenOKPressed(msg)
           startPlayVideo = false
         end if
       end if
-    
+
       if startPlayVideo = true
         'If player is currently not playing the current content,
         'tell player to load and play the video associated with the selected item
@@ -433,7 +433,7 @@ End Function
 
 'This function will handle the minimized video player on EPG Screen
 ' refreshEPGScreenVideoPlay = true  - Close the Video player since EPGScreen/EPG component lost focus (sideNav or topNav)
-' refreshEPGScreenVideoPlay = false, there are two possibilities 
+' refreshEPGScreenVideoPlay = false, there are two possibilities
 '   1) epgScreen returning back from full video screen. Keep the video as it is, and make sure the video screen and focused channel are the same.
 '   2) epgScreen:EPG component is gaining focus from side/topNav. In this case restart the video.
 
@@ -463,7 +463,7 @@ Function onRefreshEPGScreenVideoPlay(msg)
         channelId = linearVideoPlayer.content.id
         epgScreen.jumpToRowItemByID = [channelId, ""]
       end if
-      
+
       startCountdownTimer()
     else ' from top/side Nav
       m.backgroundGroup.posterVisible = true
@@ -513,7 +513,7 @@ Function onEPGScrollingStatusChange(msg)
   if scrollingStatus = true
     stopCountdownTimer()
     screen.fullscreenCountdown = -1
-  else if screen.linearChannelToPlay <> invalid 
+  else if screen.linearChannelToPlay <> invalid
     linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
     if linearVideoPlayer <> invalid and linearVideoPlayer.state = "playing"
       startCountdownTimer()
@@ -588,13 +588,13 @@ Function setTimeGridContentLoadingToComplete(screen)
   checkAndFixDuplicates(screen)
   screen.updateTimeGridContent = true
 
-  showHideSpinner(false) 
-  screen.timeGridContentLoading = false 
+  showHideSpinner(false)
+  screen.timeGridContentLoading = false
 End Function
 
 
 
-'This function is cleanup after epgData all been fetched. 
+'This function is cleanup after epgData all been fetched.
 'There might be 3 conditions that we need to handle before rendering.
 'Duplicates - because getChildIndexById() function will return the first place where the channelId appears in parent, the duplicate ChannelId Nodes are left empty.  We need to copy the first channelInfo for duplicate channels Too.
 'Invalids - just for some reason, if there is a invalid node on timeGridConent, we need to remove those(might never happen)
@@ -605,13 +605,13 @@ Function checkAndFixDuplicates(screen)
   if screen.timeGridContent <> invalid and screen.timeGridContent.getchildCount() > 0 'just in case of error and no programs has been retrived
     for i = 0 to screen.timeGridContent.getchildCount() - 1
       itemTobeReplaced = screen.timeGridContent.getChild(i)
-    
-      if itemTobeReplaced = invalid 
+
+      if itemTobeReplaced = invalid
         screen.timeGridContent.removeChildindex(i)
       else if itemTobeReplaced.channelName = invalid or itemTobeReplaced.channelName = ""
         'either channel is duplicate or no channel info available
         dupFound = false
-        
+
         for j = 0 to screen.timeGridContent.getchildCount() - 1
           itemReplace = screen.timeGridContent.getChild(j)
           if itemTobeReplaced.id = itemReplace.id and itemReplace.channelName <> invalid and itemReplace.channelName <> ""

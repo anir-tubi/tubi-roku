@@ -47,11 +47,10 @@ Function execAdsSSAITask()
   ' see https://developer.roku.com/en-gb/docs/developer-program/advertising/integrating-roku-advertising-framework.md#ad-structure
   m.adPod = {}
 
-  runSSAILoop(constants, m.ssaiPort)
+  runSSAILoop(m.ssaiPort)
 End Function
 
-
-Function runSSAILoop(constants, ssaiPort)
+Function runSSAILoop(ssaiPort)
   tubiLog(m.top.id + ".runSSAILoop")
   m.top.observeField("pollUrl", ssaiPort)
   m.top.observeField("videoPosition", ssaiPort)
@@ -67,7 +66,7 @@ Function runSSAILoop(constants, ssaiPort)
       if msg.getField() = "pollUrl"
         onPollUrlChange(msg)
       else if msg.getField() = "videoPosition"
-        onVideoPosition(msg)
+        onVideoPosition()
       else if msg.getField() = "id3Tags"
         onTags(msg)
       else if msg.getField() = "videoIsFullscreen"
@@ -131,9 +130,7 @@ Function pollForAds(url)
 End Function
 
 
-Function onVideoPosition(msg)
-  position = msg.getData()
-
+Function onVideoPosition()
   ' poll for ads if necessary
   if m.timeSpan.totalMilliseconds() >= m.pollFrequency
     pollForAds(m.top.pollUrl)

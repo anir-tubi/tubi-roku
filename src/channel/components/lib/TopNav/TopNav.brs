@@ -39,7 +39,7 @@ Function init()
   ' local state to determine if a menu item was selected, which causes a jumpToItem to
   ' reset the proper focus on the top nav right before it loses focus (in case a user has
   ' scrolled off of the default top nav item for the page). The jumpToItem will trigger
-  ' an onItemFocused() callback which will attempt to send a navigateToPage event which we 
+  ' an onItemFocused() callback which will attempt to send a navigateToPage event which we
   ' don't want and can prevent by checking this value.
   m.isResetting = false
 End Function
@@ -51,9 +51,9 @@ Function onContentUpdated()
   theme = getThemeFromGlobal()
   m.Menu.focusBitmapBlendColor = theme.focused
 
-  ' HARDCODED:: nButtonPadding is the total horizontal padding of the buttons to ensure 
-  ' MenuBground is the proper width. Since this cannot be determined easily programatically, 
-  ' we are hardcoding the number here. 
+  ' HARDCODED:: nButtonPadding is the total horizontal padding of the buttons to ensure
+  ' MenuBground is the proper width. Since this cannot be determined easily programatically,
+  ' we are hardcoding the number here.
   nButtonPadding = 2
   nMenuOutsideSpacing = m.Menu.translation[0]
   aItemWidths = []
@@ -172,7 +172,7 @@ Function onItemSelected()
     ' set to invalid so any changes that might occur to the menuItem node don't re-trigger callbacks
     m.top.selected = invalid
   end if
-End Function 
+End Function
 
 
 Function onItemFocused()
@@ -328,7 +328,6 @@ End Function
 Function setSelectedItemColorOnMenuItems(color)
   content = m.Menu.content
   if content <> invalid
-    selectedItemId = getSelectedItemId()
     for i = 0 to content.getChildCount() - 1
       child = content.getChild(i)
       child.selectedItemColor = color
@@ -399,7 +398,7 @@ End Function
 
 ' @itemFocused: integer, the index of the focused top nav item, 0 based
 ' @trackingPageInfo: assocArray, as found on m.top.trackingPageInfo
-' @newTopNavFocusedButton: assocArray, has single key, value pair such that 
+' @newTopNavFocusedButton: assocArray, has single key, value pair such that
 '                          key = "top_nav_section", value = <<id of the focused menu item>>
 ' @focusChange: string, one of the following values, corresponding to the type of focus change
 '                       leading to the NavigateWithinPageEvent. "scroll_focus", "gain_focus"

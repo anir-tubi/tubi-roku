@@ -59,7 +59,7 @@ Function onDimensionsChange()
   spinner = m.top.findNode("SpinnerPoster")
   message = m.top.findNode("LoadingMessage")
   message.horizAlign = m.top.horizAlign
-  
+
   rectMessage = calculateRect(m.top.width * .6, 30)
   message.width = rectMessage.width
 
@@ -70,7 +70,7 @@ Function onDimensionsChange()
   else if m.top.horizAlign = "left"
     nMessageX = 0
   end if
-  
+
   message.height = rectMessage.height
   if spinner.visible
     rect = calculateRect(66, 66)
@@ -84,7 +84,7 @@ Function onDimensionsChange()
       nSpinnerY = rect.y - nAdditionalMessageHeight / 2
       spinner.translation = [rect.x, nSpinnerY]
       message.translation = [nMessageX, nSpinnerY + nMessageSpacing + spinner.height]
-    else 
+    else
       spinner.translation = [rect.x, rect.y]
     end if
   else
@@ -98,8 +98,8 @@ Function onDimensionsChange()
     message.translation = [nMessageX, nMessageY]
   end if
   End Function
-  
-  
+
+
   ' Get a bounding rect of a square with boundary of max size 'max'. Alignment should be dictated by the vertAlign and horizAlign values.
   ' If the max is greater than the total size of this Spinner component, the component size is used
   Function calculateRect(maxWidth, maxHeight)
@@ -130,7 +130,6 @@ Function onDimensionsChange()
   return { x: x, y: y, width: width, height: height }
 End Function
 
-
-Function onKeyEvent(key, press) as Boolean
+Function onKeyEvent(_key, _press) as Boolean
   return m.top.modal
 End Function

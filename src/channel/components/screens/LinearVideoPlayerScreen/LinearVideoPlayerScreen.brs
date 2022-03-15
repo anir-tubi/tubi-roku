@@ -19,7 +19,7 @@ Function init()
   m.AdsSSAITask = m.top.findNode("PlayerAdsSSAITask")
   m.AdsSSAITask.observeField("isPlayingAds", "onAdChange")
   m.ButtonsGroup = m.top.findNode("ButtonsGroup")
-  '//Keep the state of the transport. Is the 1st trasnport page visible? 2nd page? 
+  '//Keep the state of the transport. Is the 1st trasnport page visible? 2nd page?
   m.nTransportState = 0
 
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
@@ -30,7 +30,7 @@ Function init()
   m.Video.observeField("timedMetaData", "onId3")
 
   m.Video.timedMetaDataSelectionKeys = ["*"]
-  
+
   m.top.observeField("fullscreen", "onFullScreenChange")
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("control", "onControlChange")
@@ -52,7 +52,7 @@ Function init()
   m.channelsGuideGroup.observeFieldScoped("itemFocused", "onChannelGuideContentFocused")
   m.channelsGuideGroup.observeFieldScoped("itemSelected", "onChannelGuideContentSelected")
   m.channelsGuideGroup.observeFieldScoped("trackingComponentInfo", "onChannelGuideAnalyticsChanged")
-   
+
   '//Closed Captioning Nodes
   m.closedCaptioningGroup = m.top.findNode("closedCaptioningGroup")
   m.closedCaptioningButtonList = m.top.findNode("closedCaptioningButtonList")
@@ -156,12 +156,12 @@ Function updateColors()
 End Function
 
 
-Function onContentChange(msg) As Void
+Function onContentChange() As Void
   tubiLog("LineaerVideoPlayerScreen.onContentChange")
   m.top.state = ""
   hideTransport()
   stopVideo()
- 
+
   if m.top.content <> invalid
     'set page tracking values for analytics
     m.top.trackingPageInfo = {
@@ -244,7 +244,7 @@ End Function
 
 'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
-  tubiLog("LineaerVideoPlayerScreen.onVideoStateChange, state = " + msg.GetData()) 
+  tubiLog("LineaerVideoPlayerScreen.onVideoStateChange, state = " + msg.GetData())
   state = msg.GetData()
 
   sPreviousState = m.top.state
@@ -393,7 +393,7 @@ End Function
 
 Function onCaptionModeChange()
   tubiLog("LineaerVideoPlayerScreen.onCaptionModeChange")
-  
+
   hideTransport()
   '//update the closed captions UI. It may look the same but the enabled icon may be different
   createContentForClosedCaptioning()
@@ -455,7 +455,7 @@ Function createContentForClosedCaptioning()
     end if
     root = CreateObject("roSGNode", "ContentNode")
     row = root.createChild("ContentNode")
-    
+
     bCaptionsOn = false
     if m.Video.globalCaptionMode = "On"
       bCaptionsOn = true
@@ -464,7 +464,7 @@ Function createContentForClosedCaptioning()
     row.appendChild(content)
     usedLanguage = {} '//make sure only a single language subtitle is displayed and used
     for each track in availableSubtitleTracks
-      if (track.language = "eng" or track.language = "spa") and usedLanguage[track.language] = invalid'//::TODO:: allow for multiple languages. When backend provides more captioning support, then this should be changed 
+      if (track.language = "eng" or track.language = "spa") and usedLanguage[track.language] = invalid'//::TODO:: allow for multiple languages. When backend provides more captioning support, then this should be changed
         bEnabled = false
         if bCaptionsOn = true
           if m.Video.subtitleTrack = track.trackname
@@ -771,7 +771,7 @@ Function hideTransport()
   m.nTransportState = 0
 End Function
 
-  
+
 'aggregates all the animation for showing/hiding the transport
 '@direction: string, value may be "out" or "in"
 Function animateTransport(direction, nDelay = 0, nDuration = 0.6)
@@ -781,7 +781,7 @@ Function animateTransport(direction, nDelay = 0, nDuration = 0.6)
   fade(m.Overlay1stScreen, direction, nDuration, nDelay)
 End Function
 
-  
+
 'aggregates all the animation for showing/hiding the channel guide
 '@direction: string, value may be "out" or "in"
 Function animateGuide(direction, nDelay = 0, nDuration = 0.6)
@@ -789,7 +789,7 @@ Function animateGuide(direction, nDelay = 0, nDuration = 0.6)
   slideFade(m.channelsGuideGroup, "left", direction, 0.6, nDelay)
   fade(m.Overlay2ndScreen, direction, nDuration, nDelay)
 End Function
-  
+
 
 Function displayChannelGuide()
   animateGuide("in")
@@ -826,11 +826,11 @@ Function displayClosedCaptioning()
     end for
     m.closedCaptioningButtonListBackground.jumpToRowItem = [0, nJumpTo]
   end if
-  
-  animateClosedCaptioning("in") 
+
+  animateClosedCaptioning("in")
 End Function
 
-  
+
 'aggregates all the animation for showing/hiding the closed captioning
 '@direction: string, value may be "out" or "in"
 Function animateClosedCaptioning(direction, nDelay = 0, nDuration = 0.6)
@@ -844,7 +844,7 @@ Function centerClosedCaptioning()
   nSpacing = m.closedCaptioningButtonList.rowItemSpacing[0][0]
   nItemWidth = m.closedCaptioningButtonList.rowItemSize[0][0]
   nItems = m.closedCaptioningButtonList.content.getChild(0).getChildCount()
-  nListWidth = (nItems * nItemWidth) + ((nItems-1) * nSpacing) 
+  nListWidth = (nItems * nItemWidth) + ((nItems-1) * nSpacing)
 
   nCenterPointX = (1920-nListWidth)/2
   m.closedCaptioningButtonList.translation = [nCenterPointX, m.closedCaptioningButtonList.translation[1]]
@@ -857,16 +857,16 @@ Function onChannelGuideContentChanged()
   tubiLog("LinearVideoPlayerScreen.onChannelGuideContentChanged()")
   if m.nTransportState = 2 and m.channelsGuideGroup.opacity > 0
     if m.top.channelsContent <> invalid and m.top.channelsContent.getChildCount() > 0
-      '//Display channel guide 
+      '//Display channel guide
       displayChannelGuideList(m.top.channelsContent)
     end if
   end if
 End Function
 
 
-Function onCCContentFocused(msg)
+Function onCCContentFocused()
   tubiLog("LinearVideoPlayerScreen.onCCContentFocused")
-  '//When the closed captioning layer is focused, make sure to update lastButtonPressPos so the transport overlay does not automatically hide 
+  '//When the closed captioning layer is focused, make sure to update lastButtonPressPos so the transport overlay does not automatically hide
   m.lastButtonPressPos = m.playerPosition
 End Function
 
@@ -896,9 +896,9 @@ Function onChannelGuideNavigateWithChange()
 End function
 
 
-Function onChannelGuideContentFocused(msg)
+Function onChannelGuideContentFocused()
   tubiLog("LinearVideoPlayerScreen.onChannelGuideContentFocused")
-  '//When the guide is focused, make sure to update lastButtonPressPos so the transport overlay does not automatically hide 
+  '//When the guide is focused, make sure to update lastButtonPressPos so the transport overlay does not automatically hide
   m.lastButtonPressPos = m.playerPosition
 End Function
 
@@ -908,8 +908,8 @@ Function onChannelGuideContentSelected(msg)
   channel = msg.getData()
   hideTransport()
 
-  if channel.id <> m.top.content.id 
-    '//if user does not select the channel that is playing, then report the new channel. 
+  if channel.id <> m.top.content.id
+    '//if user does not select the channel that is playing, then report the new channel.
     m.top.channelSelected = channel
   end if
 End Function
@@ -933,14 +933,14 @@ Function displayChannelGuideList(content = invalid)
 End Function
 
 
-Function close2ndScreen() 
+Function close2ndScreen()
   if m.Overlay2ndScreen.opacity > 0
     '//hide all 2nd screens and put focus back on video player
     if m.top.fullscreen = true
       m.Video.setFocus(true)
     end if
     hideChannelGuide()
-    animateClosedCaptioning("out") 
+    animateClosedCaptioning("out")
   end if
 End Function
 
@@ -960,7 +960,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         close2ndScreen()
         animateTransport("in")
         m.nTransportState = 1
-      end if 
+      end if
     else if m.nTransportState = 1
       '//root HUD screen is visible
       if key = "back"
@@ -970,12 +970,12 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       else if key = "left"
         backButtonExit()
       else if key = "right"
-        displayChannelGuide() 
+        displayChannelGuide()
         animateTransport("out")
         m.nTransportState = 2
       else if key = "up" and m.ButtonCaptions.visible = true
         '//If the closed captions option is available, then open that overlay
-        displayClosedCaptioning() 
+        displayClosedCaptioning()
         animateTransport("out")
         m.nTransportState = 2
       end if

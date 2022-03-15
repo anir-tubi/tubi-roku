@@ -140,7 +140,7 @@ End Function
 '                 see request.brs for more info
 Function cmsApi_getHomeScreenRequest(bKidsMode = false, passedOptions = {})
   homeScreenReqInfo = m.homeScreenReqInfo(bKidsMode, passedOptions)
-  
+
   url = homeScreenReqInfo.url
   options = homeScreenReqInfo.options
 
@@ -152,7 +152,7 @@ End Function
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
 Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
-  
+
   options = m.getCommonOptions()
   params = options.params
   headers = options.headers
@@ -298,7 +298,7 @@ Function cmsApi_getSearchRequestInfo(searchText, bKidsMode = false)
   options.params["search"] = searchText
   options.params["isKidsMode"] = bKidsMode
   options.params = m.setTupianPosterParam(options.params)
-  
+
   if bKidsMode = false
     headers = options.headers
     'setting the x-tubi-inject-live-news header to true will enable the linear content available for serach screen from backend
@@ -416,7 +416,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
             contentModeParam = {
               "content_mode": contentModeValue
             }
-        
+
             options.params.append(contentModeParam)
             categoryReqInfo = m.categoryReqInfo(categoryId, bKidsMode, options)
             categoryReqInfo.requestType = reqName
@@ -451,7 +451,6 @@ Function cmsApi_getWindowInfo(homescreen, index)
 
   currentCategory = homescreen.content.getChild(index)
   if currentCategory <> invalid
-    currentWindowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
     windowSize = m.categoryWindowSize
     if currentCategory.state = "partial" or currentCategory.state = "none"
       windowStart = (index \ m.categoryWindowSize) * m.categoryWindowSize
@@ -465,7 +464,7 @@ Function cmsApi_getWindowInfo(homescreen, index)
       nextBatchIndex = (m.categoryWindowSize \ 2)
       windowStart = ((index + m.categoryWindowSize - (nextBatchIndex)) \ (m.categoryWindowSize)) * m.categoryWindowSize
     end if
-    
+
     return {
       start: windowStart
       size: windowSize

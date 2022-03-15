@@ -36,7 +36,7 @@ Function init()
   BackLabel = m.top.findNode("BackLabel")
   BackLabel.text = getTranslation("goBack_videoPlayer_upNext")
   if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
+    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
 
@@ -202,7 +202,7 @@ Function onCommand(msg)
 End Function
 
 
-Function onMovieItemFocused(msg)
+Function onMovieItemFocused()
   tubiLog("UpNext.onMovieItemFocused")
   itemFocused = m.GridMovie.itemFocused
   col = itemFocused + 1  '1 based index
@@ -315,7 +315,7 @@ End Function
 
 
 Function drawCountdown(labelNode, time)
-  labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)}) 
+  labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)})
 End Function
 
 
@@ -326,7 +326,7 @@ Function updateInfoPanel(infoNode, content)
 
   lineOneData = {}
   if content.type = m.constants.ui.contentTypes.series
-    lineOneData.type = m.constants.ui.contentTypes.series 
+    lineOneData.type = m.constants.ui.contentTypes.series
   end if
   lineOneData.releaseDate = content.releaseDate
   lineOneData.length = content.length

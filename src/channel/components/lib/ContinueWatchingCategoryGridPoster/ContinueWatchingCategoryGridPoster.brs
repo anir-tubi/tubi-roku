@@ -28,13 +28,11 @@ Function init()
 End Function
 
 Function setButtonWidthAndAlignment()
-  nTextWidth = m.button.calculatedTextWidth
 
-  nButtonBGWidth = m.buttonBG.width
   nMinSpacing = 80
   if m.button.leftTextPadding > nMinSpacing
     nMinSpacing = m.button.leftTextPadding
-  end if 
+  end if
 
   '//1st ensure the width of the BG is greater than the label
   nEntireWidth = (nMinSpacing - m.button.leftTextPadding) + m.button.calculatedWidth + nMinSpacing
@@ -42,5 +40,5 @@ Function setButtonWidthAndAlignment()
 
   '//2nd ensure the BG and label are center aligned
   m.button.translation = [nMinSpacing - m.button.leftTextPadding, m.button.translation[1]]
-  
+
 End Function

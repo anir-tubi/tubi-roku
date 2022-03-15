@@ -124,7 +124,7 @@ Function onNumberPadButtonSelected(msg)
   end if
 
   refreshDateOnScreen(m.date)
-  updateDateDecorations(m.date)
+  updateDateDecorations()
 End Function
 
 Function onAgeSubmittedChanged()
@@ -198,7 +198,7 @@ Function refreshDateOnScreen(date)
 End Function
 
 
-Function updateDateDecorations(date)
+Function updateDateDecorations()
   decorateYear()
 End Function
 

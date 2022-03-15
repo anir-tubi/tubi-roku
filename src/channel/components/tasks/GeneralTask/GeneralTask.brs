@@ -100,7 +100,6 @@ End Function
 ' @requestNode : roSGNode, requestNode is ContentNode
 ' @batchNode : roSGNode, batchNode is TubiRequest() Object for batchRequest. it will be invalid for single request
 Function makeApiRequest(requestNode, batchNode = invalid) as Boolean
-  requestId = requestNode.id
   input = requestNode.input 'grab a local copy of inputs to prevent subsequent rendezvous's
 
   if input <> invalid

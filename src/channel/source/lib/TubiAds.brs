@@ -5,7 +5,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   'set the preferences for the Roku Advertising Framework so we never use their ad server if our server returns no ads
   'set to 0 retries - 1 max request, even if there are no ads returned from our server
   roAdFramework.setAdPrefs(false, 1)
-  
+
   'turn on Nielsen DAR API for the Roku Advertising Framework
   'this is mutually exclusive with Roku's own Global Audience Measurement API,
   'meaning only one audience measurement API can run at a time.
@@ -145,7 +145,7 @@ end function
 ' we keep the most recently cached ad break at m.lastAdsList
 ' ----------------------------------------------
 function tubiAds_cacheAdsList(episode, breakPos)
-  if(m.lastAdsList = invalid or m.lastAdsList.breakPos <> breakPos or m.lastAdsList.cid <> episode.adrise_contentId) 
+  if(m.lastAdsList = invalid or m.lastAdsList.breakPos <> breakPos or m.lastAdsList.cid <> episode.adrise_contentId)
     m.getAdsListViaRoku(episode, breakPos)
 
     list = invalid
@@ -307,7 +307,7 @@ function tubiAds_getAdsListViaRoku(episode, breakPos)
   'traditional is used if adId of the first ad object in the first ad pod is set equal to 'default'
   if currentAdUnitsList <> invalid and currentAdUnitsList.count() > 0 and currentAdUnitsList[0] <> invalid and currentAdUnitsList[0].ads <> invalid and currentAdUnitsList[0].ads.count() > 0
     adUnitType = "" 'keeps track of what kind adUnitsList/adPod is currently being built by the for loop - can be "adrise" or "roku"
-    
+
     'set up the duration for use by the adRise pre ad splash screen
     if currentAdUnitsList[0].duration <> invalid and currentAdUnitsList[0].duration > 0
         m.commercialDuration = m.commercialDuration + currentAdUnitsList[0].duration
@@ -327,7 +327,7 @@ function tubiAds_getAdsListViaRoku(episode, breakPos)
         if m.constants.settings.mode = "qa" or m.constants.settings.mode = "staging"
           print "AD ID "; adUnit.adId; " "; adUnit.creativeAdId
         end if
-        
+
         if adUnit.adId <> "empty"
           'if adUnitType is different from the last adUnitType (meaning a new adUnitsListContainer is needed)
           'push the last adUnitsListContainer to m.allAdUnitsList, otherwise we will just add to the last adUnitsListContainer
@@ -364,8 +364,8 @@ function tubiAds_getAdsListViaRoku(episode, breakPos)
           'add the duration to m.CommercialDuration for use in adRise pre ad splash screens (in case there are any)
           if currentAdUnitsList[0].duration = invalid or currentAdUnitsList[0].duration <= 0
             m.commercialDuration = m.commercialDuration + adUnit.duration
-          end if 
-          
+          end if
+
         end if
       end if
     end for
@@ -439,7 +439,7 @@ function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
       end if
     end for
   end if
-  
+
   return m.constants.player.playerResults.completed
 end function
 
@@ -455,7 +455,7 @@ end function
 ' (expect that the player object will be the main video player for the channel)
 ' ----------------------------------------------
 function tubiAds_getResumingPlayAds(episode, position)
-  
+
   m.getAdsListViaRoku(episode, position)
   return m.hasAds(m.allAdUnitsList)
 end function
@@ -464,7 +464,7 @@ end function
 ' adBufferingCallback
 '
 ' callback during RAF buffering
-function tubiAds_adBufferingCallback(eventType, ctx)
+function tubiAds_adBufferingCallback(_eventType, ctx)
   if ctx.progress <> invalid
     m.controlNode.adProgress = ctx.progress
   else
@@ -480,10 +480,10 @@ end function
 function tubiAds_adTrackingCallback(eventType, ctx)
   impressionCount = invalid
   youboraOptions = invalid
-  
+
   if eventType <> invalid
     if ctx <> invalid
-      '//make a subset of ctx and set it to m.controlNode.adTrackingObject 
+      '//make a subset of ctx and set it to m.controlNode.adTrackingObject
       adTrackingObject = {}
       if ctx.adcount <> invalid
         adTrackingObject.adcount = ctx.adcount

@@ -625,6 +625,16 @@ charlesProxyEnabled: true
 
 If set up correctly the first time your Roku sends a request to Charles, Charles will ask you to approve the connection. Just click `Allow` and you should see the traffic in Charles(except Youbora and Santry related traffic).
 
+# 11.0 Unused Variables
+
+The spring 2022 11.0 firmware release introduced checking for unused local variables inside of functions. While it is best to remove variables if they're not needed, there are times where this is not the simplest thing to do, especially if there are plans to add more functionality to the function in the future. Roku provides a way to silence these warnings by prepending your variables names with an underscore `_` character. Without this logs like the following will show up in the debug console
+
+```text
+BRIGHTSCRIPT: WARNING: unused variable 'port' in function 'processmessage' in pkg:/components/tasks/VideoMonitoringTasks/Youbora/YBPluginRokuVideo.brs(127)`
+```
+
+When you see these go ahead and either remove the variable or add a leading underscore to silence them to avoid clogging up the debug console.
+
 # Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)

@@ -13,7 +13,7 @@ Function startSignIn(callbackAfterSignIn=invalid)
   end if
 
   m.callbackAfterSignIn = callbackAfterSignIn
-  
+
   if getExperimentResource("roku_email_prefill_login_age_gate", "roku_email_prefill_login_age_gate_v1").enabled = true
     showRFIScreen()
   else
@@ -29,7 +29,6 @@ Function showRFIScreen()
 
   suitest = m.constants.settings.suitest
   automaticActivation = m.constants.settings.automaticActivation
-  stagingApis = m.constants.settings.stagingApis
   settingsEmail = m.constants.settings.email
   settingsPassword = m.constants.settings.password
   mode = m.constants.settings.mode
@@ -67,14 +66,14 @@ Function onUserData(msg)
   tubiLog("SignInHelpers.onUserData")
 
   m.billing = invalid ' making m.billing as invalid to avoid using it another places
-  
+
   currentScreen = getCurrentScreen()
 
   billing = msg.getRoSGNode()
   if billing <> invalid
     billing.unobserveFieldScoped("userData")
   end if
-  
+
   if billing <> invalid and billing.userData <> invalid
 
     dialogEvent = {
@@ -87,7 +86,7 @@ Function onUserData(msg)
       }
     }
     m.trackingLoggingTask.trackEvent = dialogEvent
-    
+
     email =  billing.userData.email
     input = {
       email : email
@@ -109,13 +108,13 @@ Function onUserData(msg)
     m.trackingLoggingTask.trackEvent = dialogEvent
     showEmailScreen()
   end if
-  
+
 End Function
 
 
-' onEmailInputContinueSelected callback triggers when user clicks continue button from Email Input screen 
+' onEmailInputContinueSelected callback triggers when user clicks continue button from Email Input screen
 Function onEmailInputContinueSelected(evt)
-  
+
   screen =  evt.getRoSGNode()
   input = {
     email : screen.email
@@ -126,8 +125,8 @@ Function onEmailInputContinueSelected(evt)
 End Function
 
 
-' onEmailInputBackButtonSelected callback triggers when user clicks back button from Email Input screen 
-Function onEmailInputBackButtonSelected(evt)
+' onEmailInputBackButtonSelected callback triggers when user clicks back button from Email Input screen
+Function onEmailInputBackButtonSelected()
 
   m.trackingLoggingTask.trackEvent = {
     type: "account"
@@ -143,7 +142,7 @@ Function onEmailInputBackButtonSelected(evt)
 End Function
 
 
-' checkEmailExists function invokes API to check whether email already exits in Tubi 
+' checkEmailExists function invokes API to check whether email already exits in Tubi
 ' @input : assocarray, will contain email(user's email) & emailType(manual/pre_fill)
 Function checkEmailExists(input)
 
@@ -154,7 +153,7 @@ Function checkEmailExists(input)
   options.params = {
     email: input.email
   }
-   
+
   requestInfo = m.userDeviceApi.emailExistsReqInfo(options)
   m.makeRequest({
     url: requestInfo.url
@@ -166,7 +165,7 @@ Function checkEmailExists(input)
     email: email
     emailType : emailType
   })
-  
+
 End Function
 
 
@@ -211,7 +210,7 @@ Function onEmailExistsError(errorResponse)
     }
   }
   m.trackingLoggingTask.trackEvent = accountEvent
-  
+
   currentScreen = getCurrentScreen()
   dialogEvent = {
     type: "dialog"
@@ -222,20 +221,20 @@ Function onEmailExistsError(errorResponse)
       dialog_sub_type: "email-exists-error"
     }
   }
-    
+
   title =  getTranslation("dialog_defaultError_title")
   message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
   buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
   simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, checkEmailExists, invalid, m.constants.instantResumeActions.restartApp)
-  
+
   if simpleModalInfo <> invalid and simpleModalInfo.buttonInfo <> invalid and simpleModalInfo.buttonInfo[0] <> invalid
     simpleModalInfo.buttonInfo[0].callbackParams = {
-      email : requestInput.email, 
+      email : requestInput.email,
       emailType : requestInput.emailType
     }
   end if
   showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
-  
+
 
 End Function
 
@@ -249,7 +248,7 @@ Function showActivationScreen()
   activationCodeScreen.observeFieldScoped("errorType", "onRegTaskError")
   pushScreen(activationCodeScreen, true, true)
   displayDefaultBackground()
-  
+
 End Function
 
 
@@ -306,8 +305,8 @@ End Function
 
 
 ' onSignUpResponse callback is triggered when the sign up is success
-' @response : assocarray, the response of signUp API in the form of AA
-Function onSignUpResponse(response)
+' @_response: the response of signUp API in the form of AA
+Function onSignUpResponse(_response)
 
   m.trackingLoggingTask.trackEvent = {
     type: "account"
@@ -336,7 +335,7 @@ End Function
 Function signUserIn(email, password)
   options = {}
   options.body = {
-    platform: m.constants.platform  
+    platform: m.constants.platform
     device_id: m.constants.deviceInfo.deviceId
     type: "email"
     credentials: {
@@ -344,7 +343,7 @@ Function signUserIn(email, password)
       password: password
     }
   }
-  
+
   requestInfo = m.userDeviceApi.signInReqInfo(options)
   m.makeRequest({
     url: requestInfo.url
@@ -355,13 +354,13 @@ Function signUserIn(email, password)
     responseType: "assocarray"
     email: email
     emailType : password
-  })  
+  })
 End Function
 
 
 ' onSignInResponse callback is triggered when the sign In is success
-' @response : assocarray, the response of signIn API in the form of AA
-Function onSignInResponse(response)
+' @_response: assocarray, the response of signIn API in the form of AA
+Function onSignInResponse(_response)
 
   m.trackingLoggingTask.trackEvent = {
     type: "account"
@@ -391,7 +390,7 @@ Function onSignInError(errorResponse)
       current: "EMAIL"
     }
   }
-  
+
   m.trackingLoggingTask.trackEvent = accountEvent
 
   currentScreen = getCurrentScreen()
@@ -462,9 +461,9 @@ Function onRegTaskError(evt)
     title = getTranslation("error_signIn_activationCodeGeneral_title")
     message = getTranslation("error_signIn_activationCodeGeneral_description")
   end if
-  
+
   userErrorCode = getUserFacingErrorCode(m.constants.errors.context.activateScreen, sSubtypeCode)
-  
+
   authPageValues = {
     auth_action:  "REGISTER"  'Action enum
   }
@@ -527,12 +526,12 @@ Function onActivationSuccess()
   end if
 
   m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onPostSignInAuthInfoUpdated") 
+  m.authTask.observeFieldScoped("authInfo", "onPostSignInAuthInfoUpdated")
   m.authTask.functionName = "execInitializeUserData"
   m.authTask.control = "RUN"
   m.spinner.visible = true
   m.spinner.setFocus(true)
-  
+
   'we remove the activation screen after auth info has been received
 End Function
 
@@ -564,9 +563,9 @@ End Function
 Function onSideNavSignInCompleted()
   tubiLog("SignInHelpers.onSideNavSignInCompleted")
 
-  ' set the mode before any changes are done to the UI 
+  ' set the mode before any changes are done to the UI
   setUiModeFromState()
-  
+
   ' Here we notify screens that may exist, though we try to keep context
   '
   ' Transitions:
@@ -588,7 +587,7 @@ Function onSideNavSignInCompleted()
 
   refreshAllDetailScreens()
   setSideNavSignedInItem(m.global.authInfo)
-      
+
   ' this happens when a user signs out or user signs in from the side nav or from settings side nav
   restartChannel()
 
@@ -604,7 +603,7 @@ Function onSignOutCompleted()
 
   setContentToRefreshAllPersonalizedScreens()
   setSideNavSignedInItem(authInfo)
-      
+
   ' this happens when a user signs out or user signs in from the side nav or from settings side nav
   restartChannel()
 End Function
@@ -679,7 +678,7 @@ Function onParentalControlAfterSignIn()
 
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
-  
+
   setContentToRefreshAllPersonalizedScreens()
 
   if currentScreen <> invalid and currentScreen.getSubtype() = "SettingsScreen"
@@ -687,11 +686,11 @@ Function onParentalControlAfterSignIn()
     currentScreen.setFocus(true)
 
     '//before signing in, the user selected a new parental setting, so take user to parental change screen
-    setUiModeFromState()  '//in case the user cancels out of the confirm password screen, ensure the mode matches with the newly signed in user's saved mode 
+    setUiModeFromState()  '//in case the user cancels out of the confirm password screen, ensure the mode matches with the newly signed in user's saved mode
     onParentalSettingSelected()
 
 
-    '//After the user signs in, display a modal so user knows they also need to enter their password to finish changing the parental control settings 
+    '//After the user signs in, display a modal so user knows they also need to enter their password to finish changing the parental control settings
     sTitle = getTranslation("dialog_parentalPassword_title")
     sDescription = getTranslation("dialog_parentalPassword_description")
     dialogEvent = {
@@ -702,10 +701,10 @@ Function onParentalControlAfterSignIn()
         dialog_action: "SHOW"
         dialog_sub_type: "password-request"
       }
-    } 
+    }
     showSimpleModal(sTitle, sDescription, [], dialogEvent, m.trackingLoggingTask)
   end if
-  
+
 End Function
 
 
@@ -720,7 +719,7 @@ Function onSideNavMyListAfterSignIn()
     ' this happens when user logs in via categoryDetailsScreen (queue/mylist)
     content = CreateObject("roSGNode", "CategoryContentNode")
     content.id = m.constants.ui.categoryIds.queue
-    fetchCategoryDetails(currentScreen, content)
+    fetchCategoryDetails(content)
     setContentToRefreshAllPersonalizedScreens()
   else
     ' don't expect this to happen, keeping here as a fallback mechanism
@@ -751,7 +750,7 @@ Function popScreenAfterSignInProcess()
     if screen <> invalid and poppableScreenSubtypes[screen.getSubtype()] = true
       popScreen(false, false)
     else
-      exit for  
+      exit for
     end if
   end for
   currentScreen = getCurrentScreen()

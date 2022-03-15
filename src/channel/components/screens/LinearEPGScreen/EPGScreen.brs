@@ -8,10 +8,10 @@ Function init()
   'infoPanel
   m.infoPanelParent = m.top.findNode("InfoPanelParent")
   m.infoPanel = m.top.findNode("InfoPanel")
-  
+
   'clock
   m.clock = m.top.findNode("clock")
-  
+
   'topNav
   m.topNav = m.top.FindNode("topNav")
   m.topNavBG = m.top.FindNode("topNavBG")
@@ -85,7 +85,7 @@ Function onScreenFocusChange()
     else
       setFocusOnEPGTimeGrid()
     end if
-    
+
     m.top.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
     m.top.shouldFocusWhenPushed = true
 
@@ -97,16 +97,16 @@ Function onScreenFocusChange()
 End Function
 
 
-Function onLinearChannelFocused(msg)
+Function onLinearChannelFocused()
   tubiLog("EPGScreen.onLinearChannelFocused")
-  if m.epgTimeGrid <> invalid 
+  if m.epgTimeGrid <> invalid
     content = m.epgTimeGrid.linearChannelFocused
     if content <> invalid and content.title <> invalid
       m.top.linearChannelFocused = content
       ' As per EPG requirement: if this is the first time content is focused after EPG started, then start playing the first content.
       ' all the other time, only selected content will get to play.
       if m.firstTime = true
-        m.firstTime = false 
+        m.firstTime = false
         'TODO:: check if race condition happens.
         m.epgTimeGrid.setFocusedToPlay = true
         m.top.refreshEPGScreenVideoPlay = false
@@ -227,7 +227,7 @@ End Function
 
 Function handlePlayInput()
   if m.epgTimeGrid.isInFocusChain() = true
-    if m.epgTimeGrid.linearChannelFocused <> invalid 
+    if m.epgTimeGrid.linearChannelFocused <> invalid
       m.epgTimeGrid.setFocusedToPlay = true
       'In EPG case both voice commands "play" and "ok" will play the content in full screen.
       onEPGTimegridOKPressed()
@@ -240,9 +240,9 @@ End Function
 
 Function onKeyEvent(key As string, press As boolean) As boolean
   tubiLog("EPGScreen.onKeyEvent")
-  if press 
-    if m.top.enableTopNav = true 
-      if key = "back" 
+  if press
+    if m.top.enableTopNav = true
+      if key = "back"
         if  m.TopNav.isInFocusChain() = false
         setFocusOntoTopNav(true)
         return true
@@ -481,7 +481,7 @@ Function getTrackingComponentInfoOfEPGGridList(timegridItem, itemPosition)
   end if
 
   return trackingComponentInfo
-End Function  
+End Function
 
 
 Function fadeOutContentArea()

@@ -36,10 +36,10 @@ Function TubiExperiments(constants) as Object
       }
       roku_instant_resume: {
         roku_instant_resume_v2: {"enabled": true}
-      }  
+      }
       roku_postplayexp_aptimer_5sec: {
-        roku_postplayexp_aptimer_10sec: {"ap_timer": 30}  
-      }  
+        roku_postplayexp_aptimer_10sec: {"ap_timer": 30}
+      }
 
       roku_linear_countdown_timer: {
         roku_linear_countdown_timer_v1: {"countdown_timer": 10}
@@ -47,12 +47,12 @@ Function TubiExperiments(constants) as Object
 
       roku_email_prefill_login_age_gate:{
         roku_email_prefill_login_age_gate_v1: {"enabled": true}
-      }     
+      }
 
       roku_sports: {
         roku_sports_v1: {"enabled": true}
       }
-    
+
       roku_skip_intro:{
         roku_skip_intro_v2: {"skip_button_type": "transparent"} 'valid values are : "no_button", "fill", "transparent"
       }
@@ -61,7 +61,7 @@ Function TubiExperiments(constants) as Object
         roku_instant_resume_tweak_v1: {"enabled": false}
       }
     }
-    
+
     'public methods
     init: tubiExperiments_init
     getExperimentTracking: tubiExperiments_getExperimentTracking
@@ -85,7 +85,7 @@ Function tubiExperiments_init(request)
   '//go through all the exisiting namespaces and call the backend to get the data of existing experiments
   namespaces = m.getNamespaces(request)
   allNamespaces = invalid
-  
+
   if namespaces <> invalid
     allNamespaces = m.mapNamespaces(namespaces)
   end if
@@ -117,7 +117,6 @@ End Function
 Function tubiExperiments_getNamespaceRequest(request)
   expRequest = invalid
   namespaces = m.defaultResources
-  returnNamespaces = invalid
   url = m.constants.urls.experiments.evaluate + "?request_context.device_id=" + m.constants.deviceInfo.deviceId
 
   nameSpaceQuery = ""
@@ -181,8 +180,8 @@ End Function
 
 
 
-'Parses the namespace object returned from the backed so it can be used easier later 
-'@namespaces: assocArray, an experiments namespace as returned by API 
+'Parses the namespace object returned from the backed so it can be used easier later
+'@namespaces: assocArray, an experiments namespace as returned by API
 Function tubiExperiments_parseNamespace(namespace as Object) as Object
   'The API returns a resource JSON object that still needs to be parsed into a JSON object
   if namespace <> invalid and namespace.resource <> invalid
@@ -195,8 +194,6 @@ End Function
 Function tubiExperiments_getExperiment(namespaceName as string, experimentName as string) as Object
   whitelistedExperimentName = "qa." + experimentName
 
-  trackInfo = invalid
-  experimentOriginalValue = invalid
   experiment = invalid
 
   allExperiments = m.constants.experiments.info
@@ -210,7 +207,7 @@ Function tubiExperiments_getExperiment(namespaceName as string, experimentName a
       else if possibleExperiment.experiment_result.experiment_name = whitelistedExperimentName
         experiment = possibleExperiment
       end if
-    end if 
+    end if
   end if
 
   return experiment
@@ -223,7 +220,7 @@ Function tubiExperiments_getExperimentTracking(namespaceName as string, experime
   saltId = invalid
 
   experiment = m.getExperiment(namespaceName, experimentName)
-  if experiment <> invalid 
+  if experiment <> invalid
     if experiment.experiment_result <> invalid
       if experiment.experiment_result.treatment <> invalid
         treatmentName = experiment.experiment_result.treatment
@@ -258,18 +255,18 @@ End Function
 
 
 ' tubiExperiments_getExperimentResource
-' 
+'
 ' Get more info about the experiment. This is an associative array that is defined when the experiment is set up on the popper server
 ' The AA can include anything and be formatted in anyway. It depends on how you set up the experiment on the popper server.
 Function tubiExperiments_getExperimentResource(namespaceName as string, experimentName as string) as Object
-  
+
   oReturn = m.getDefaultResource(namespaceName, experimentName)
   experiment = m.getExperiment(namespaceName, experimentName)
   if experiment <> invalid and experiment.resource <> invalid
     oReturn = experiment.resource
-  end if  
+  end if
 
-  return oReturn 
+  return oReturn
 End Function
 
 
@@ -279,7 +276,7 @@ End Function
 '
 '@namespaceName: string, the name of the namespace in which we will find the experiment
 '@experimentName: string, the name of the experiment as found in the experiment definition
-Function tubiExperiments_getDefaultResource(namespaceName as string, experimentName as string) as Object  
+Function tubiExperiments_getDefaultResource(namespaceName as string, experimentName as string) as Object
   defaultResource = invalid
   if namespaceName <> invalid and experimentName <> invalid
     if m.defaultResources[namespaceName] <> invalid

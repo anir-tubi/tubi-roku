@@ -172,7 +172,7 @@ End Function
 
 ' SideNav has been told there has been a change to the user's sign in status and that it should change
 '   how the signin menu item appears by using the passed message data.
-Function onSignInChange(message)
+Function onSignInChange()
   if m.profileContent <> invalid
     m.profileContent.title = m.top.stringSignIn
   end if
@@ -463,7 +463,7 @@ End Function
 ' When the list gains/loses focus, then hide or display the focus indicator
 Function onListFocusChange(msg)
   list = msg.getRoSGNode()
-  setDrawFocusFeedback(msg.getRoSGNode())
+  setDrawFocusFeedback(list)
 End Function
 
 
@@ -538,7 +538,7 @@ End Function
 Function onItemRequested()
   if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and (m.itemSelectedRemembered = invalid or m.top.itemRequested <> m.itemSelectedRemembered.id)
     '//Go thru the lists and select the option that matches the itemRequested
-    nIndexMain = focusItemInList(m.mainItems, m.top.itemRequested)
+    focusItemInList(m.mainItems, m.top.itemRequested)
   end if
 End Function
 

@@ -427,8 +427,8 @@ End Function
 ' The @response param is not used but will be set by the generalTaskModule,
 ' and as such is necessary.
 '
-' @response: string or assocArray, string if request was succesful, AA if request errored.
-Function setExitAppWrapper(response)
+' @_response: string or assocArray, string if request was succesful, AA if request errored.
+Function setExitAppWrapper(_response)
   setExitApp()
 End Function
 
@@ -1699,8 +1699,6 @@ Function onCustomResume(msg)
       if m.Request = invalid
         m.Request = TubiRequest(m.constants.settings)
       end if
-      Auth = TubiAuth(m.constants, m.Request)
-      guestUserHasAgeInfo = Auth.getGuestUserHasAgeInfo()
 
       if customResumeLaunchParams.contentId <> invalid and customResumeLaunchParams.mediaType <> invalid
         ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates

@@ -46,7 +46,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
   while(true)
     msg = wait(0, port)
     msgType = type(msg)
-    
+
     if msgType = "roSGNodeEvent"
       tubiLog("TubiSGAdShim got roSGNodeEvent for " + msg.GetField())
       if msg.GetField() = "exitApp"
@@ -54,7 +54,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
           return true
         end if
       else if msg.GetField() = "adControl"
-        value = msg.GetData()        
+        value = msg.GetData()
         if m.videoPlayerNode.content <> invalid
           episode = m.videoPlayerNode.content.getFields()  ' clone the content node into a local AA to avoid messing with it
           '//Place the tracking info into the episode AA variable
@@ -141,7 +141,7 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
   functionName = stateMachine[state][control]
   tubiLog("TubiSGAdShim: state=" + state + " control=" + control + " function=" + functionName)
   if functionName <> "" then
-    newState = m[functionName](episode, normalizedPosition)
+    m[functionName](episode, normalizedPosition)
   end if
 End Function
 
@@ -167,12 +167,11 @@ End Function
 
 ''''''''''''''''''''
 ' playAds
-'
 ' TODO(Chris): The relevant ads here may be:
 '      a) resume ads set on m.resumePlayAdsList
 '      b) cached ads for non-RAF midrolls in m.videoAdsList
 '      c) cached ads in RAF which it stored internally
-Function tubiSGAdShim_playAds(episode As Object, cuepoint As Integer)
+Function tubiSGAdShim_playAds(_episode As Object, _cuepoint As Integer)
   m.videoPlayerNode.adState = "adsplaying"
 
   adContainer = m.videoPlayerNode.findNode("RAFAdContainer")
@@ -187,7 +186,7 @@ End Function
 
 ''''''''''''''''''
 ' reset
-Function tubiSGAdShim_reset(episode As Object, cuepoint As Integer)
+Function tubiSGAdShim_reset(_episode As Object, _cuepoint As Integer)
   m.ads.reset()
   m.videoPlayerNode.adState = "init"
 End Function
@@ -219,4 +218,3 @@ Function tubiSGAdShim_resume(episode As Object, cuepoint As Integer)
     m.videoPlayerNode.adState = "noads"
   end if
 End Function
-

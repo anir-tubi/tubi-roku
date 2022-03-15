@@ -1,7 +1,7 @@
 'a set of helper functions that facilitate sending and receiving "Continue Watching"/history and "My Queue"/bookmarks
 'info to the server (UAPI at the time of writing this comment)
 Function TubiBookmarks(request as Object, auth as Object, constants as Object, nodeHelpers as Object, apiUtils as Object) as Object
-  
+
   defaultValues = {
     request: request
     auth: auth
@@ -96,7 +96,7 @@ Function tubiBookmarks_createBookmarksRequest_(id as String, action as String, c
       content_type: contentType
     }
     bodyJson = FormatJson(body)
-  
+
   else if action = "delete"
     verb = m.constants.reqTypes.del
     url = url + "/" + id
@@ -116,8 +116,8 @@ Function tubiBookmarks_createBookmarksRequest_(id as String, action as String, c
     options.body = bodyJson
   end if
 
-  bookmarkReq = m.auth.createAuthRequest(url, action+"Bookmark", options)    
-  
+  bookmarkReq = m.auth.createAuthRequest(url, action+"Bookmark", options)
+
   return bookmarkReq
 End Function
 
@@ -154,7 +154,7 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
         childNode.type = content.type
         childNode.historyId = content.id
       end if
-    else 
+    else
       '//else if this movie content
       historyNode = global.historyIds.findNode(content.id)
       if historyNode = invalid
@@ -165,7 +165,7 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
       historyNode.nowPos = position
       historyNode.type = content.type
       historyNode.historyId = content.id
-    end if 
+    end if
   end if
 End Function
 
@@ -190,7 +190,7 @@ Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Int
     position: nowPos
     device_id: m.constants.deviceInfo.deviceId
     user_id: authInfo.userid.toInt()
-  }  
+  }
 
   contentType = m.constants.uapiContentTypes.movie
   parentId = content.parentId
@@ -200,18 +200,18 @@ Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Int
     if parentId.len() = 0
       body.parent_id = invalid    'is ok if parentId is invalid (ie. for movies)
     else
-      body.parent_id = parentId.toInt()          
+      body.parent_id = parentId.toInt()
       contentType = m.constants.uapiContentTypes.episode
     end if
-  else if type(parentId) = "integer" or type(parentId) = "roInt"  
+  else if type(parentId) = "integer" or type(parentId) = "roInt"
     body.parent_id = parentId
     contentType = m.constants.uapiContentTypes.episode
   else
-    body.parent_id = invalid  
+    body.parent_id = invalid
   end if
 
   body.content_type = contentType
-  
+
   options = m.getCommonOptions()
   options.params["isKidsMode"] = bKidsMode
   options["body"] = FormatJSON(body)
@@ -279,7 +279,7 @@ Function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, 
   bodyJson = FormatJson(body)
 
   url = m.constants.urls.users.history
-  
+
   if action = "add"
     verb = m.constants.reqTypes.post
   else if action = "delete"
@@ -384,7 +384,7 @@ Function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
   if parsedInitialBookmarks <> Invalid
     for each bookmark in parsedInitialBookmarks.items
       child = bookmarkIds.createChild("BookmarkContentNode")
-      child.id = bookmark.content_id.toStr() 
+      child.id = bookmark.content_id.toStr()
       child.bookmarkId = bookmark.id
       if bookmark.content_type = m.constants.uapiContentTypes.movie
         child.type = m.constants.ui.contentTypes.video
@@ -409,7 +409,6 @@ Function tubiBookmarks_handleInitialHistory(initialHistory)
     for each history in parsedInitialHistory.items
       child = historyIds.createChild("HistoryContentNode")
       child.id = history.content_id.toStr()
-      nowDate = CreateObject("roDateTime")
       if history.content_type = m.constants.uapiContentTypes.movie
         child.historyId = history.id
         child.nowPos = history.position

@@ -95,9 +95,9 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
       sThumbnailURL = canvasImages.vitg_tb[0]
     else if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
       if contentFromServer.hero_images.count() >= 2
-        '//::TEMP:: The Tupian image server will not return the resized image yet in the proper place, so look for the resized image in the old image array, but at a different index placement than the usual index location 
+        '//::TEMP:: The Tupian image server will not return the resized image yet in the proper place, so look for the resized image in the old image array, but at a different index placement than the usual index location
         sThumbnailURL = contentFromServer.hero_images[1]
-      else 
+      else
         sThumbnailURL = contentFromServer.hero_images[0]
       end if
     end if
@@ -340,15 +340,15 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   creditsCuePoints.AddReplace("postlude", postlude)
   translatedContent.creditsCuePoints = creditsCuePoints
 
-  translatedContent.landscape  = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)  
+  translatedContent.landscape  = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)
   sPortraitURL = m.getThumbnailImage(contentFromServer)
   if sPortraitURL <> ""
-    translatedContent.portrait = sPortraitURL 
+    translatedContent.portrait = sPortraitURL
     translatedContent.HDGRIDPOSTERURL = sPortraitURL
   end if
 
   if (translatedContent.HDGRIDPOSTERURL = invalid or translatedContent.HDGRIDPOSTERURL = "") and contentFromServer.HDGRIDPOSTERURL <> invalid
-    '//If the contentFromServer already set HDGRIDPOSTERURL then use that value. 
+    '//If the contentFromServer already set HDGRIDPOSTERURL then use that value.
     translatedContent.HDGRIDPOSTERURL = contentFromServer.HDGRIDPOSTERURL
   end if
 
@@ -386,11 +386,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   ' linear subtitles
   if translatedContent[typeVar] = m.contentTypes.linear and translatedContent.hasSubtitles = true
-    '//::TODO::LiveNews::HARDCODE:: - The following code is a hardcoded. 
+    '//::TODO::LiveNews::HARDCODE:: - The following code is a hardcoded.
     '//   The backend needs to let us know what captions are available and what channel the track is on.
     '//   In the meantime, backend is setting the has_subtitles field to true if the stream has at least 1 caption. We will assume during MVP of the live news launch that the caption in the 1st caption channel is English.
     '//   For future versions, backend will provide the language and channel location.
-    '//   MAYBE, in a future Roku firmware update, captions will be known. However, we currently do not know when or if any future update will have this ability. 
+    '//   MAYBE, in a future Roku firmware update, captions will be known. However, we currently do not know when or if any future update will have this ability.
     subtitleTracks = []
     subtitleTracks.push({
         language: "eng"
@@ -408,14 +408,14 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
         description: subtitle.lang
         trackname: subtitle.url
       })
-    end for 
+    end for
     translatedContent.subtitleTracks = subtitleTracks
     ' This is needed to make subtitles work on Roku 3 (and other models... 3900, 3800, etc.)
     translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles[0].url}
   end if
 
 
-  if translatedContent[typeVar] = m.contentTypes.linear 
+  if translatedContent[typeVar] = m.contentTypes.linear
     if contentFromServer.thumbnails <> invalid
       translatedContent.inlineLogoUri = contentFromServer.thumbnails[0]
     end if
@@ -427,7 +427,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       translatedContent.trailerInfo = contentFromServer.trailers[0]
     end if
   end if
-  
+
   if contentFromServer.has_trailer = true then translatedContent.hasTrailer = true
 
   'if this content is actually just a paginated response, set pagination data
@@ -501,9 +501,9 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
 
       vitg_large = m.constants.ui.gridItemTypes.vitg_large
       ' inject the default background for large vitg content items
-      if category.gridItemType = vitg_large 
+      if category.gridItemType = vitg_large
         translated.backgrounds = [m.constants.ui.uris.defaultBackground]
-      else if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser 
+      else if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
         translated.backgrounds = [m.constants.ui.uris.defaultBackground]
       end if
 
@@ -638,19 +638,19 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     ' placed the userCategories
     continueWatchingIndex = 4
     queueIndex = 5
-    
-    '//::TODO:: Remove the kidsModeFeatureOn check once we have API support  
+
+    '//::TODO:: Remove the kidsModeFeatureOn check once we have API support
     kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
     if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
       kidsModeFeatureOn = true
-    end if  
+    end if
 
-    '//::TODO:: Remove the parentalRating check once we have API support    
+    '//::TODO:: Remove the parentalRating check once we have API support
     parentalRating = 3
     if authInfo <> invalid and authInfo.parentalRating <> invalid
       parentalRating = authInfo.parentalRating
     end if
-    
+
     ' utility row position experiment
     utilityRowPosition = -2 ' setting default as negative to avoid insertion if the experiment is control group
 
@@ -661,13 +661,13 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         utilityRowPosition = m.experimentInfo.position - 1
       end if
     end if
-    
+
     ' include utility row only in homescreen when kidsmode feature is ON (available to users) and
     ' parentalRating is set to Adult and isKidsMode is false
     includeUtilityRow = false
     if kidsModeFeatureOn = true and (contentMode = m.constants.ui.contentMode.homescreen or contentMode = "") and parentalRating > 2 and isKidsMode = false
       includeUtilityRow = true
-    end if  
+    end if
 
     'set up AAs for all categories
     for i=0 to containers.count()-1
@@ -734,7 +734,7 @@ End Function
 ' Translate a response from matrix/categories or matrix/channels for use in ChannelGridScreen
 Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate, bDisplayChannels = true) As Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateCategoriesListScreen()")
-  sID_queue = m.constants.ui.categoryIds.queue 
+  sID_queue = m.constants.ui.categoryIds.queue
   sID_continue_watching = m.constants.ui.categoryIds.history
 
   screenContentId = ""
@@ -812,7 +812,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
       end if
     end if
   end for
-  
+
   homescreenAA.children.SortBy("title")
 
   '//Move the following items to the front of the list if they exist
@@ -832,7 +832,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
 
     if categoryAA.isSpecial <> true
       thumbnailNumber = (i MOD 11) + 1
-      categoryAA.thumbnail = m.constants.ui.uris.categoryBackgrounds.urlBase + thumbnailNumber.toStr() + m.constants.ui.uris.categoryBackgrounds.urlEnding 
+      categoryAA.thumbnail = m.constants.ui.uris.categoryBackgrounds.urlBase + thumbnailNumber.toStr() + m.constants.ui.uris.categoryBackgrounds.urlEnding
     end if
   end for
 
@@ -892,7 +892,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
   contents = contentToTranslate.contents
-  contentsJson = m.getContentsJson(contentToTranslate, fullJson) 
+  contentsJson = m.getContentsJson(contentToTranslate, fullJson)
 
   nodeCount = 0
 
@@ -908,12 +908,11 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     return translated
   end if
 
-  ' Store the gridItemType as necessary (only for landscape, linear, vitg, and utility). 
+  ' Store the gridItemType as necessary (only for landscape, linear, vitg, and utility).
   ' We do it here manually, after creating the child nodes, to avoid having to define
   ' a custom content node which have proven to be much slower to instantiate.
   ' Could use some testing though.
   landscape = m.constants.ui.gridItemTypes.landscape
-  portrait = m.constants.ui.gridItemTypes.portrait
   vitg_large = m.constants.ui.gridItemTypes.vitg_large
   utility = m.constants.ui.gridItemTypes.utility
   linear = m.constants.ui.gridItemTypes.linear
@@ -998,9 +997,9 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
         }
         '//add the TV guide content back into the raw JSON
         if contentsJson <> invalid
-          '//::TODO:: ParseJson and FormatJson are thread blocking actions that can take some time to resolve if there are large amounts 
-          '//   of data to parse/format. We have an optimization in the function tubiMetadataTranslate_getContentsJson that uses string 
-          '//   manipulation methods that are built in to the firmware to extract out the contents object out of the JSON. We could 
+          '//::TODO:: ParseJson and FormatJson are thread blocking actions that can take some time to resolve if there are large amounts
+          '//   of data to parse/format. We have an optimization in the function tubiMetadataTranslate_getContentsJson that uses string
+          '//   manipulation methods that are built in to the firmware to extract out the contents object out of the JSON. We could
           '//   consider doing something similar to add items to the contentsJSON as well.
           parsedJsonTvGuide = ParseJson(contentsJson)
           parsedJsonTvGuide[tvGuideItem.id] = tvGuideItem
@@ -1080,13 +1079,13 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = 
   if type(container) = "roAssociativeArray"
     ' the metadata for the category
     sTitle = container.title
-    if container.id = m.constants.ui.categoryIds.queue 
+    if container.id = m.constants.ui.categoryIds.queue
       '//::HARDCODE:: this is a temporary hardcode until the backend is ready to play My List Instead of Queue as the title
       if contentMode <> m.constants.ui.contentMode.latino
         sTitle = "My List"
       end if
     end if
- 
+
     updateMetadata = {
       id: container.id
       slug: container.slug
@@ -1306,7 +1305,7 @@ Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
   safetyEject = false
 
   contentsIdentifierPos = Instr(1, fullJson, contentsIdentifier)
-  
+
   'make sure the content key exists exactly once in the JSON string
   if contentsIdentifierPos > 0 and Instr(contentsIdentifierPos + 1, fullJson, contentsIdentifier) < 1
     contentsStartPos = contentsIdentifierPos + contentsIdentifier.len() - 1
@@ -1409,14 +1408,14 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
   jsonAA = {}
   validCount = 0
   children = []
-    
+
   children.append(containers)
   children.SortBy("title")
-  
+
   updateMetadata.children = []
 
   sType = "UtilityContentNode"
-  
+
   if m.experimentInfo <> invalid
     if m.experimentInfo.has_tvshows = true
       childAA = {
@@ -1431,7 +1430,7 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
       validCount += 1
       updateMetadata.children.push(childAA)
     end if
-    
+
     if m.experimentInfo.has_movies = true
       childAA = {
         id: "u_movies"
@@ -1444,11 +1443,11 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
       jsonAA[childAA.id] = childAA
       validCount += 1
       updateMetadata.children.push(childAA)
-    end if    
+    end if
   end if
 
   for each child in children
-    
+
     if m.constants.ui.categoryList.Lookup(child.id) <> invalid
 
       ' TODO: FIND A BETTER WAY TO SOLVE THE u_continue_watching issue
@@ -1458,7 +1457,7 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
       if child.id = "continue_watching"
         childId = "u_" + child.id
       end if
-    
+
       childAA = {
         id: childId
         title: child.title
@@ -1471,9 +1470,9 @@ Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
       validCount += 1
       updateMetadata.children.push(childAA)
     end if
-    
+
   end for
-  
+
   if validCount = 0
     return invalid
   end if
@@ -1504,10 +1503,9 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
 
     jsonAA = {}
     validCount = 0
-    children = []
 
     sTitle = getTranslation("metadata_continueWatching_notSignedIn_title")
-    sDescription = getTranslation("metadata_continueWatching_notSignedIn_description")  
+    sDescription = getTranslation("metadata_continueWatching_notSignedIn_description")
 
     childAA = {
       id: m.constants.ui.contentTypes.historySignedOutUser
@@ -1519,11 +1517,11 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
     }
     if bKidsMode = true
       '//If kids mode is on, then images should be kidsMode versions
-      childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground_kidsMode 
+      childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground_kidsMode
     else
       '//Otherwise images should be default versions
       childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground
-    end if 
+    end if
 
     validCount += 1
     updateMetadata.children = CreateObject("roArray", 1, false)
@@ -1555,7 +1553,7 @@ Function tubiMetadataTranslate_setSponsorshipInfo(metadata, sponsorshipInfo)
     info.pixels = sponsorshipInfo.pixels
 
     metadata.sponsorImages = info
-    metadata.sponsorExp = sponsorshipInfo.spon_exp 
+    metadata.sponsorExp = sponsorshipInfo.spon_exp
   end if
 
   return metadata
@@ -1589,13 +1587,13 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
       gridItemType = constants.ui.gridItemTypes.vitg_large
     end if
   else if container.type = constants.ui.categoryTypes.linear
-    gridItemType = constants.ui.gridItemTypes.linear  
+    gridItemType = constants.ui.gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.featured and orientation <> constants.ui.gridItemTypes.portrait
     gridItemType = constants.ui.gridItemTypes.landscape
   else if container.type = constants.ui.categoryTypes.utility
-    gridItemType = constants.ui.gridItemTypes.utility  
+    gridItemType = constants.ui.gridItemTypes.utility
   end if
-  
+
   return gridItemType
 End Function
 
@@ -1713,7 +1711,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
   translated = CreateObject("roSGNode", "ContentNode")
   translated.addField("requestorID", "string", false)
   translated.requestorID = requestorID
-  if contentToTranslate.mode <> invalid 
+  if contentToTranslate.mode <> invalid
     if contentToTranslate.mode.id = m.constants.ui.contentMode.epgScreen
       translated.id = m.constants.ui.contentIds.timeGridContent
     else if contentToTranslate.mode.id = m.constants.ui.contentMode.sportsEPGScreen
@@ -1722,7 +1720,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
       translated.id = m.constants.ui.contentIds.newsTimeGridContent
     end if
   end if
-  
+
   containers = contentToTranslate.mode.containers
   for i = 0 to containers.count() - 1
     container = containers[i]
@@ -1744,7 +1742,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
   contentNode = CreateObject("roSGNode", "ContentNode")
   contentNode.addField("requestorID", "string", false)
   contentNode.requestorID = requestorID
-  
+
   ' taking these variables out of for loop for performance
   unFocusedColor = m.constants.ui.colors.futureItemSelected  '0xEB9C00FF
   focusedColor = m.constants.ui.colors.EPGProgramFocused '0x9699A3FF
@@ -1781,11 +1779,11 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       if channelFromServer.has_subtitle <> invalid
         channelNode.hasSubtitles = channelFromServer.has_subtitle
         if channelNode.hasSubtitles = true
-          '//::TODO::LiveNews::HARDCODE:: - The following code is a hardcoded. 
+          '//::TODO::LiveNews::HARDCODE:: - The following code is a hardcoded.
           '//   The backend needs to let us know what captions are available and what channel the track is on.
           '//   In the meantime, backend is setting the has_subtitles field to true if the stream has at least 1 caption. We will assume during MVP of the live news launch that the caption in the 1st caption channel is English.
           '//   For future versions, backend will provide the language and channel location.
-          '//   MAYBE, in a future Roku firmware update, captions will be known. However, we currently do not know when or if any future update will have this ability. 
+          '//   MAYBE, in a future Roku firmware update, captions will be known. However, we currently do not know when or if any future update will have this ability.
           subtitleTracks = []
           subtitleTracks.push({
             language: "eng"
@@ -1827,7 +1825,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
         end if
 
       else ' programs available
-        
+
         for i=0 to programCount -1
           program = channelNode.createChild("EPGContentNode")
           programFromServer = programs[i]
@@ -1853,7 +1851,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
             datetimeObjEnd.FromISO8601String(endTimeFromServer)
             datetimeObjEnd.ToLocalTime()
             program.endTime = datetimeObjEnd.asSeconds()
-            
+
             endTime = GetAMPMTimeString(datetimeObjEnd)
           end if
 
@@ -1891,24 +1889,24 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
           now  = CreateObject("roDateTime")
           now.ToLocalTime()
           nowTime = now.asSeconds()
-          
+
           if program.startTime <= nowTime and program.endTime > nowTime
             timeLeft = (program.endTime -  nowTime) / 60
-            program.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(program.endTime - nowTime))}) 
-          else 
+            program.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(program.endTime - nowTime))})
+          else
             timeLeft = (program.endTime - program.startTime) / 60
-            program.ShortDescriptionLine1 = startTime 
+            program.ShortDescriptionLine1 = startTime
           end if
           'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.
           '186 is min width
           width = timeLeft * 19.2
-          if width < 186 
+          if width < 186
             program.FHDItemWidth = 186
           else
             program.FHDItemWidth = width
           end if
-          
-          
+
+
           if programFromServer.genres <> invalid and programFromServer.genres.count() > 0
             program.Categories = programFromServer.genres
           end if

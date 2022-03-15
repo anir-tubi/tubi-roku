@@ -16,9 +16,9 @@ Function init()
   m.Rating = m.top.findNode("Rating")
   m.RatingBackground = m.Rating.findNode("RatingBackground")
   m.RatingLabel = m.Rating.findNode("RatingLabel")
-  
+
   m.DescriptorCode = m.top.findNode("DescriptorCode")
-  
+
   m.Description = m.top.findNode("Description")
   m.DescriptionGroup = m.top.findNode("DescriptionGroup")
   m.DescriptionFocusButton = m.top.findNode("DescriptionFocusButton")
@@ -68,8 +68,8 @@ Function init()
 
   m.StarringTag.width = 0
   m.DirectorTag.width = 0
-  m.DirectorTag.text = getTranslation("metadata_directed") 
-  m.StarringTag.text = getTranslation("metadata_starring") 
+  m.DirectorTag.text = getTranslation("metadata_directed")
+  m.StarringTag.text = getTranslation("metadata_starring")
 
 
   '//Set a line after the directed by and starring text to be right aligned so the values associated with those lines are left aligned
@@ -84,7 +84,7 @@ Function init()
   else
     nMatchStarringWidth = 0
   end if
-  
+
   DirectorRect = m.top.findNode("DirectorRect")
   StarringRect = m.top.findNode("StarringRect")
 
@@ -162,7 +162,7 @@ Function onTitleLogoUriChange()
   end if
 End Function
 
-Function onHeaderImageUriChange(msg)
+Function onHeaderImageUriChange()
   tubiLog("InfoPanel.onHeaderImageUriChange")
   if m.top.headerImageUri <> ""
     m.HeaderImage.uri = m.top.headerImageUri
@@ -186,7 +186,7 @@ Function onLineOneDataChange(msg)
   end if
   if data.length <> invalid and data.length <> 0 then
     ' add 'dot' spacer only if we had a release date
-    if text.len() > 0 then 
+    if text.len() > 0 then
       text = text + Chr(&hb7) + " "
     end if
     text = text + formatLengthAsEnglish(data.length) + " "
@@ -195,18 +195,18 @@ Function onLineOneDataChange(msg)
   if data.hoursOfAiring <> invalid and data.hoursOfAiring <> ""
     text = text + data.hoursOfAiring
   end if
-  
-  if data.type <> invalid and data.type = m.constants.ui.contentTypes.series 
-    ' add 'dot' spacer
-    text = text + Chr(&hb7) + " " 
 
-    if data.seasons <> invalid and data.seasons > 0 
+  if data.type <> invalid and data.type = m.constants.ui.contentTypes.series
+    ' add 'dot' spacer
+    text = text + Chr(&hb7) + " "
+
+    if data.seasons <> invalid and data.seasons > 0
       if data.seasons = 1
         text = text + getTranslation("metadata_seasons_singular") + " "
       else
         text = text + getTranslation("metadata_seasons_plural", {seasons: data.seasons.toStr()}) + " "
       end if
-    else 
+    else
       text = text + getTranslation("metadata_series") + " "
     end if
 
@@ -247,9 +247,9 @@ Function onLineOneDataChange(msg)
     end if
     m.Rating.visible = false
   end if
-  
+
   descriptorCode = data.descriptorCode
-    
+
   if descriptorCode <> invalid and descriptorCode <> ""
     if m.DescriptorCode.getParent() = invalid
       firstLineGroup.insertChild(m.DescriptorCode, insertIndex)
@@ -263,8 +263,8 @@ Function onLineOneDataChange(msg)
       firstLineGroup.removeChild(m.DescriptorCode)
     end if
     m.DescriptorCode.visible = false
-  end if 
-    
+  end if
+
   if data.availabilityEnds <> invalid and data.availabilityEnds <> ""
     datetime = CreateObject("roDateTime")
     datetime.FromISO8601String(data.availabilityEnds)
@@ -274,9 +274,9 @@ Function onLineOneDataChange(msg)
     ' BIZ REQ: only titles expiring in the next 2 weeks should display message
     if daysRemaining > 0 and daysRemaining <= 14
       if daysRemaining > 1
-        m.ExpireWarning.text = getTranslation("metadata_expiresIn_plural", {days: daysRemaining.toStr()})    
+        m.ExpireWarning.text = getTranslation("metadata_expiresIn_plural", {days: daysRemaining.toStr()})
       else
-        m.ExpireWarning.text = getTranslation("metadata_expiresIn_singular") 
+        m.ExpireWarning.text = getTranslation("metadata_expiresIn_singular")
       end if
       if m.ExpireWarning.getParent() = invalid
         firstLineGroup.insertChild(m.ExpireWarning, insertIndex)
@@ -390,7 +390,7 @@ Function onPlayerCountDownChange()
   tubiLog("InfoPanel.onPlayerCountDownChange")
   if m.top.fullscreenCountdown >= 0
     m.PlayerCountdownGroup.visible = true
-    m.CountdownText.text = getTranslation("metadata_fullscreen_countdown_plural", {seconds: m.top.fullscreenCountdown.toStr()})  
+    m.CountdownText.text = getTranslation("metadata_fullscreen_countdown_plural", {seconds: m.top.fullscreenCountdown.toStr()})
   else
     m.PlayerCountdownGroup.visible = false
   end if
@@ -426,7 +426,7 @@ Function onModeChange()
   if m.HeaderImage <> invalid
     m.infoPanelGroup.removeChild(m.HeaderImage)
   end if
-  'm.PlayerCountdownGroup has been added to parent to accommodate EPG Screen design 
+  'm.PlayerCountdownGroup has been added to parent to accommodate EPG Screen design
   if m.PlayerCountdownGroup <> invalid
     m.top.removeChild(m.PlayerCountdownGroup)
   end if
@@ -466,7 +466,7 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.continue_watching or m.top.mode = m.constants.ui.infoPanelModes.utility then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [15] 
+    m.Offset.itemSpacings = [15]
   else if m.top.mode = m.constants.ui.infoPanelModes.episode then
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
@@ -480,7 +480,7 @@ Function onModeChange()
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.appendChild(m.PlayerCountdownGroup)
-    m.Offset.itemSpacings = [25,15]  
+    m.Offset.itemSpacings = [25,15]
   else if m.top.mode = m.constants.ui.infoPanelModes.epg
     m.infoPanelGroup.insertChild(m.HeaderImage,0)
     m.Offset.appendChild(m.TitleGroup)
@@ -490,7 +490,7 @@ Function onModeChange()
     m.PlayerCountdownGroup.translation = [1216,-78]
     m.Offset.itemSpacings = [12,0,12,11]
   end if
-  
+
 End Function
 
 

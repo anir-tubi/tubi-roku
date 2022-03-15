@@ -23,7 +23,7 @@ Function Main(startupArgs)
   ' is called within runChannel(), due to the undocumented and apparent requirement that there
   ' is always at least one screen that on which .show() has been called and has not been closed.
   permaScreen = CreateObject("roSGScreen")
-  backgroundScene = permaScreen.CreateScene("BackgroundScene")
+  permaScreen.CreateScene("BackgroundScene")
   permaScreen.show()
 
   while runChannel(constants, log, request) = true
@@ -329,7 +329,6 @@ Function showComponentsTimedOutError(library, log, screen, constants)
     loadStatus: "timeout"
     url: library.uri
   }
-  errorPort = CreateObject("roMessagePort")
   log.exception("error", error)
   return showStartupErrorDialog(screen, constants)
 End Function
@@ -342,7 +341,6 @@ Function showComponentsFailedToLoadError(msg, log, screen, constants)
     loadStatus: msg.getData()
     url: msg.GetRoSGNode().uri
   }
-  errorPort = CreateObject("roMessagePort")
   log.exception("error", error)
   return showStartupErrorDialog(screen, constants)
 End Function
@@ -401,7 +399,6 @@ Function logCrashesOnStartup(args, log, constants)
       reason: reason
       model: constants.deviceInfo.model
     }
-    errorPort = CreateObject("roMessagePort")
     log.exception("warn", messageInfo)
   end if
 End Function

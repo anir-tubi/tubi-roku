@@ -3,12 +3,12 @@
 ' showDetailScreen
 '
 ' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
-' @sendTrackingOnResponse: boolean, set to true if the content needs to be fetched and NavigateToPageEvent and 
+' @sendTrackingOnResponse: boolean, set to true if the content needs to be fetched and NavigateToPageEvent and
 '                                   PlayProgressEvent analytics should be sent after fetching info from the backend.
 ' @callback: roFunction, a callback to run upon successful fetching of single content metadata
 Function showDetailScreen(content, sendTrackingOnResponse = true, callback = invalid)
   tubiLog("DetailScreenHelpers.showDetailScreen")
-  
+
   if content <> invalid
     detailScreen = CreateObject("roSGNode", "DetailScreen")
     detailScreen.id = m.constants.ui.screenIds.detailScreen
@@ -31,12 +31,12 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, callback = inv
     detailScreen.observeFieldScoped("refreshRelatedContent", "onRefreshRelatedContentSignal")
     detailScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     detailScreen.observeFieldScoped("relatedContentToPlay", "onContentToPlay")
-    
+
     ' m.actionType variable is used for setting a callback function after successful a data fetch retry in the case where
     ' users select a menu button from the detail screen, but the origial data fetch was unsuccessful. In this way,
     ' the action will happen automatically after the successful retry.
     m.actionType = invalid
-    
+
     ' detailScreenAfterFn callback which will be triggered after fetching data from backend
     m.detailScreenAfterFn = invalid
 
@@ -61,7 +61,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, callback = inv
     else
       populateDetailScreen(detailScreen, content, true)
     end if
-    
+
     pushScreen(detailScreen, false, false)  ' don't send tracking until we resolve series episode
 
     ' determine the appropriate fetch callbacks based on the passed in parameters
@@ -82,7 +82,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, callback = inv
     ' TODO: Refer to logs to determine if it's necessary to show a modal in this instance informing the user to press the back
     ' back button. We shouldn't end up with an invalid content, but as of 11/25/18 there are crash logs
     ' that indicate it might be possible that getDetailScreenContent() as called by ContentController.returnToDetailScreenFromVideo()
-    ' may return invalid, which may get passed to this function as the content argument.  
+    ' may return invalid, which may get passed to this function as the content argument.
     message = "DetailScreenHelpers.showDetailScreen, content is invalid"
     tubiLog(message, "warn", "clientWarn", "showdetailscreen-invalid-content")
   end if
@@ -145,9 +145,9 @@ End Function
 'Populates the detail screen's state from a content node
 '@detailScreen, roSGNode, a DetailScreen component to be populated
 '@content: tubiContentNode, the content of the screen
-'@shouldResetButtonIndex: boolean, helps to reset the focus index of menu items 
+'@shouldResetButtonIndex: boolean, helps to reset the focus index of menu items
 '@nSavedPosition: integer, The number representing the resume point of the video
-Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=false, nSavedPosition = -1, bNewData=false)
+Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=false, nSavedPosition = -1)
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
   backgroundUriList = [m.defaultBackgroundUri]
@@ -203,10 +203,10 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
         detailScreen.episodeTitle = episode.title
       end if
 
-      lineOneData.type = m.constants.ui.contentTypes.series  
+      lineOneData.type = m.constants.ui.contentTypes.series
       lineOneData.seasons =  content.totalCount
       detailScreen.isSeries = true
-      detailScreen.mode = m.constants.ui.infoPanelModes.series 
+      detailScreen.mode = m.constants.ui.infoPanelModes.series
     else
       detailScreen.isSeries = false
       detailScreen.mode = m.constants.ui.infoPanelModes.movie
@@ -230,7 +230,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     else
       lineOneData.hasCC = false
     end if
-    
+
     setDescriptorCodeAndDescription(content)
     lineOneData.descriptorCode = content.descriptorCode
 
@@ -308,7 +308,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
 End Function
 
 
-' read the descriptors value from contentNode and set value for descriptorCode and descriptorDescription fields 
+' read the descriptors value from contentNode and set value for descriptorCode and descriptorDescription fields
 Function setDescriptorCodeAndDescription(content)
 
   if content <> invalid
@@ -317,7 +317,7 @@ Function setDescriptorCodeAndDescription(content)
 
       descriptor_code = ""
       descriptor_desc = ""
-      
+
       for i = 0 to descriptors.Count()-1
         if descriptors[i].code <> invalid
           descriptor_code += descriptors[i].code.Trim() + " "
@@ -329,12 +329,12 @@ Function setDescriptorCodeAndDescription(content)
             descriptor_desc += descriptors[i].description.Trim()
           end if
         end if
-      end for 
+      end for
       content.descriptorCode = UCase(descriptor_code)
       content.descriptorDescription = descriptor_desc
     end if
   end if
-  
+
 End Function
 
 
@@ -593,7 +593,7 @@ End Function
 Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCallback)
   tubiLog("DetailScreenHelpers.handleSingleContentError")
   detailScreen = getTopDetailScreenFromStack()
-  
+
   if detailScreen <> invalid and m.isScreenLoaded = false
     populateDetailScreen(detailScreen, detailScreen.content)
   end if
@@ -648,7 +648,7 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
   else if detailScreen <> invalid and detailScreen.isInFocusChain() = true
     message = getTranslation("screenDetails_error_getContent_description")
     content = getDetailScreenContent(detailScreen)
-  
+
     ' set up the error modal dialog
     errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.fetchError, error.code)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "NETWORK_ERROR", errorCode, m.constants)
@@ -780,11 +780,6 @@ End Function
 Function getCurrentEpisode(content)
   episode = invalid
   if content <> invalid and content.type = m.constants.ui.contentTypes.series
-    history = m.global.historyIds.findNode(content.id)
-    detailScreen2dIndex = [0,0]
-    if history <> invalid
-      detailScreen2dIndex = findEpisode2dIndex(history.currentEpisodeId, content)
-    end if
     episode = getEpisodeContent(content)
   end if
   return episode
@@ -833,13 +828,13 @@ End Function
 
 Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
   tubiLog("DetailScreenHelpers.onAddToQueue")
-  
+
   if detailScreen.getSubtype() = "DetailScreen"
     if isLoggedInUser() = false
-     
+
       content = getDetailScreenContent(detailScreen)
       dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "sign-in-bookmark", m.constants)
-  
+
       title =  getTranslation("screenDetails_error_addQueue_title")
       if content.type = m.constants.ui.contentTypes.series
         message = getTranslation("screenDetails_error_addQueueSeries_description")
@@ -885,7 +880,7 @@ End Function
 
 
 ''''''''''''''''''
-' onBookmarked callback gets triggered when signedIn user adds a content to queue via detail screen 
+' onBookmarked callback gets triggered when signedIn user adds a content to queue via detail screen
 Function onBookmarked(msg) As Void
   tubiLog("DetailScreenHelpers.onBookmarked")
   task = msg.getRoSGNode()
@@ -900,18 +895,18 @@ Function onBookmarked(msg) As Void
   task.unobserveFieldScoped("addBookmarkResult")
   detailScreen.task = invalid
   detailScreen.isWaitingForServerResponse = false
-  
+
   if bookmarkId = invalid or bookmarkId = ""
     bookmarkFailed(detailScreen, addBookmarkResult)
     return
   else
-  
+
     tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
     setIsBookmark(detailScreen, true)
-  
+
     sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
-    onHistoryQueueChange(m.constants.ui.categoryIds.queue)     
-    
+    onHistoryQueueChange(m.constants.ui.categoryIds.queue)
+
   end if
 
 End Function
@@ -924,7 +919,7 @@ Function bookmarkFailed(detailScreen, addBookmarkResult)
 
   detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
   content = getDetailScreenContent(detailScreen)
-  
+
   responseCode = -1234
   if addBookmarkResult <> invalid
     responseCode = addBookmarkResult.code
@@ -951,15 +946,15 @@ Function bookmarkFailed(detailScreen, addBookmarkResult)
     detailScreen
   ]
 
-  showErrorModal(modalInfo, onAddToQueueRetry, addToQueueRetryParams)  
+  showErrorModal(modalInfo, onAddToQueueRetry, addToQueueRetryParams)
 
 End Function
 
 
 ''''''''''''''''''
-' onBookmarkedAfterSignIn callback gets triggered when guest user completing signIn process 
+' onBookmarkedAfterSignIn callback gets triggered when guest user completing signIn process
 ' while adding queue via detail screen
-' 
+'
 Function onBookmarkedAfterSignIn(msg) As Void
   tubiLog("DetailScreenHelpers.onBookmarkedAfterSignIn")
   task = msg.getRoSGNode()
@@ -974,36 +969,36 @@ Function onBookmarkedAfterSignIn(msg) As Void
   task.unobserveFieldScoped("addBookmarkResult")
   detailScreen.task = invalid
   detailScreen.isWaitingForServerResponse = false
-  
+
   if bookmarkId = invalid or bookmarkId = ""
     bookmarkFailed(detailScreen, addBookmarkResult)
     return
   else
-  
+
     content = getDetailScreenContent(detailScreen)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "add-queue-success", m.constants)
-    
+
     title = "Content"
     if detailScreen.title <> invalid and detailScreen.title <> ""
       title = detailScreen.title
     end if
     description = title + " has been added to the List"
-    
+
     showSimpleInstantResumableModal("Success", description, [], dialogEvent, m.trackingLoggingTask)
-    
+
     ' re-fetch homescreen content when user signedIn
     homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
     if homeScreen <> invalid
       fetchHomescreen(homescreen)
     end if
-    
+
     tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
     setIsBookmark(detailScreen, true)
-  
+
     sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
-    onHistoryQueueChange(m.constants.ui.categoryIds.queue)   
-    setDirtyUserCategories(m.constants.ui.categoryIds.history)  
-    
+    onHistoryQueueChange(m.constants.ui.categoryIds.queue)
+    setDirtyUserCategories(m.constants.ui.categoryIds.history)
+
   end if
 
 End Function
@@ -1039,10 +1034,10 @@ Function onResumeAllowedTimerFired()
         if history <> invalid
           '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
           '//   because beyond that time we are restricted legally from showing data of signed out users.
-    
+
           if isGreaterThanGuestResumePeriod(history) = true
             '//Call populateDetailScreen() which will remove the resume button for any guest users that have content that has history over a day old
-            populateDetailScreen(detailScreen, detailScreen.content) 
+            populateDetailScreen(detailScreen, detailScreen.content)
           end if
         end if
       end if
@@ -1130,7 +1125,7 @@ Function onBookmarkRemoved(msg) As Void
   if result = invalid or result.response.code <> 204 then
     code = ""
     content = getDetailScreenContent(detailScreen)
-    
+
     if content.type = m.constants.ui.contentTypes.series
       message = getTranslation("screenDetails_error_noQueueSeries_description")
     else
@@ -1234,7 +1229,7 @@ Function onHistoryRemoved(msg) As Void
     showErrorModal(modalInfo, onRemoveFromHistoryRetry, [detailScreen])
     return
   end if
-  
+
   setIsHistory(detailScreen, false)
   sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask, m.constants)
   onHistoryQueueChange(m.constants.ui.categoryIds.history)
@@ -1279,8 +1274,8 @@ Function onEpisodeList(msg)
     m.actionType = episodesHelper
     detailScreen.isLoading = true
     getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
-  else 
-    showEpisodeScreenWithNavigationTracking(detailScreen.content) 
+  else
+    showEpisodeScreenWithNavigationTracking(detailScreen.content)
   end if
 End Function
 
@@ -1312,7 +1307,7 @@ Function trailerHelper(screen)
   if content <> invalid then
     bMature = isMatureRating(content)
     if isLoggedInUser() = false and bMature = true
-      '//if user is a guest and is trying to play content geared for only adults, then ask them to register 
+      '//if user is a guest and is trying to play content geared for only adults, then ask them to register
       dialogSubtype = "mature-trailer"
       displayDetailScreenMaturePlayWarning(content, dialogSubtype)
     else
@@ -1338,7 +1333,7 @@ Function trailerHelper(screen)
 
       playVideoContent(trailerContent)
     end if
-  end if        
+  end if
 End Function
 
 
@@ -1350,14 +1345,14 @@ Function onWatchTrailer(msg)
   if content <> invalid then
     if isFetchingInProgress(detailScreen) <> true
       if isPlayable(detailScreen) = true
-        trailerHelper(detailScreen)      
+        trailerHelper(detailScreen)
       else
         m.actionType = trailerHelper
         detailScreen.isLoading = true
         getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
-      end if   
+      end if
     end if
-  end if  
+  end if
 End Function
 
 
@@ -1369,12 +1364,11 @@ Function isFetchingInProgress(screen) as Boolean
 
   bReturn = false
   task = screen.task
-  content = screen.content
-  
+
   if task <> invalid and task.subType() = "DetailMetadataTask"
     bReturn = true
   end if
-  
+
   return bReturn
 End Function
 
@@ -1386,9 +1380,8 @@ End Function
 Function isPlayable(screen) as Boolean
 
   bReturn = false
-  task = screen.task
   content = screen.content
-  
+
   if content <> invalid and content.type <> invalid
     if content.type = "series"
       episodeDetail = getEpisodeDetail(screen.content)
@@ -1403,7 +1396,7 @@ Function isPlayable(screen) as Boolean
       end if
     end if
   end if
-  
+
   return bReturn
 End Function
 
@@ -1419,12 +1412,12 @@ Function onResume(msg)
 
   if isFetchingInProgress(detailScreen) <> true
     if isPlayable(detailScreen) = true
-      resumeHelper(detailScreen)      
+      resumeHelper(detailScreen)
     else
       m.actionType = resumeHelper
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
-    end if   
+    end if
   end if
 End Function
 
@@ -1440,17 +1433,17 @@ Function onPlay(msg)
 
   if isFetchingInProgress(detailScreen) <> true
     if isPlayable(detailScreen) = true
-      playHelper(detailScreen)      
+      playHelper(detailScreen)
     else
       m.actionType = playHelper
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
-    end if   
+    end if
   end if
 End Function
 
 
-'Is the rating of the content in the passed screen set for mature audience? 
+'Is the rating of the content in the passed screen set for mature audience?
 Function isMatureRating(content)
   if content <> invalid and content.rating <> invalid
     sRating = UCase(content.rating)
@@ -1483,7 +1476,7 @@ Function playHelper(screen)
     setDescriptorCodeAndDescription(episode)
     bMature = isMatureRating(episode)
     if isLoggedInUser() = false and bMature = true
-      '//if user is a guest and is trying to play content geared for only adults, then ask them to register 
+      '//if user is a guest and is trying to play content geared for only adults, then ask them to register
       dialogSubtype = "mature-play"
       if m.deepLinkContent <> invalid
         '//this is a deeplink so, indicate that the warning originatated from a deeplink
@@ -1514,7 +1507,7 @@ End Function
 
 
 ' @episode: roSGNode, ContentNode for a single video. May be a movie or a series episode.
-' 
+'
 ' @return: integer, the position from which video playback should resume.
 '                   PLEASE NOTE: A negative value indicates the content should not be played!
 Function processResume(episode)
@@ -1547,7 +1540,7 @@ End Function
 
 
 ' A callback to be used after fetching the single content to immediately begin playback.
-' Used when a user presses the "play" button on the homescreen, for instance. 
+' Used when a user presses the "play" button on the homescreen, for instance.
 ' @refreshedContent: roSGNode, full metadata as received from the cms/content route
 Function skipDetailScreen(refreshedContent)
   subScreen = getHiddenScreen(1)
@@ -1558,7 +1551,7 @@ Function skipDetailScreen(refreshedContent)
     trackingPageInfo = subScreen.trackingPageInfo
     trackingComponentInfo = subScreen.trackingComponentInfo
   end if
-  
+
   detailScreen = getTopDetailScreenFromStack()
   populateDetailScreen(detailScreen, refreshedContent)
 

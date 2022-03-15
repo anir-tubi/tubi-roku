@@ -13,7 +13,7 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     ' this is required for setting focus to homescreen after activation/signout
-    homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController 
+    homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController
 
     '//when calling pushScreen() for a cached home screen, then report navigate_to_page and
     ' page_load events immediately, since there is no content fetching occuring.
@@ -77,7 +77,7 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     else if screenID = constants.ui.screenIds.linearTVScreen
       sContentMode = constants.ui.contentMode.linear
       homescreen.topNavSelectedId = constants.ui.sideNavIds.linearTV
-    end if 
+    end if
 
     homeScreen.contentMode = sContentMode
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
@@ -221,12 +221,12 @@ End Function
 ' @screenId: string, the id of the specific home page as found in m.constants.ui.screenIds
 Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
   tubiLog("HomeScreenHelpers.onReloadUserCategoriesInHomeScreen")
-  
+
   if screenID = ""
     screenID = m.constants.ui.screenIds.homeScreen
   end if
   homeScreen = getFromScreenCache(screenID)
-  
+
   if homeScreen <> invalid
     if homeScreen.content <> invalid
       newCategory = invalid
@@ -313,7 +313,6 @@ End Function
 
 Function onErrorReloadUserCategories(response, screenID = "")
   tubiLog("HomeScreenHelpers.onErrorReloadUserCategories")
-  handledRequest = response
 
   if screenID = ""
     screenID = m.constants.ui.screenIds.homeScreen
@@ -360,7 +359,7 @@ End Function
 ' sets the appropriate values for the 'isLinearTVAllowedInTopNav' and 'enableTopNav' fields in
 ' the passed in homescreen
 ' @homescreen: roSGNode, a Homescreen component
-' 
+'
 ' @returns: boolean, true if the value on either the isLinearTVAllowedInTopNav or enableTopNav is
 '           changing, indicating that the top nav items should be regenerated/refreshed
 Function setEnableTopNavOnHomescreen(homescreen)
@@ -369,12 +368,12 @@ Function setEnableTopNavOnHomescreen(homescreen)
 
   if homescreen <> invalid
     if homescreen.isLinearTVAllowedInTopNav <> isParentalControlsAdultLevel()
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true  
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
         homeScreen.isLinearTVAllowedInTopNav = false
-      else 
+      else
         homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel()
         refreshNeeded = true
-      end if     
+      end if
     end if
 
     '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
@@ -421,7 +420,7 @@ Function fetchHomeScreen(homeScreen)
   ' called, such as when signedIn field changes.
   if homeScreen.canLoadCategories = true
     reqName = m.constants.reqNames.getHomescreen
-   
+
     homeScreen.trackingLoadStartTime = UpTime(0)
     homeScreen.unobserveFieldScoped("contentReady")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
@@ -480,7 +479,7 @@ Function fetchHomeScreen(homeScreen)
       successCallback: sucessHandler
       errorCallback: errorHandler
       responseType: "node"
-      authInfo: m.global.authInfo 
+      authInfo: m.global.authInfo
       uiMode: m.uiMode
     })
 
@@ -634,8 +633,8 @@ Function handleHomeScreenErrorResponse(screenID, response)
       fnCancelFunction = retryCategoryList
       cancelParams = screenID
       if screenID <> m.constants.ui.screenIds.homeScreen
-        '//it might be true there is no where to go to if the content of the main homescreen fails to load, but 
-        '// if the content of a different homescreen type fails to load, then destroy the current homescreen and (based on screen stack logic) take user back to the previous screen  
+        '//it might be true there is no where to go to if the content of the main homescreen fails to load, but
+        '// if the content of a different homescreen type fails to load, then destroy the current homescreen and (based on screen stack logic) take user back to the previous screen
         fnCancelFunction = destroyScreen
       end if
       showErrorModal(modalInfo, retryCategoryList, screenID, fnCancelFunction, cancelParams)
@@ -651,7 +650,7 @@ End Function
 
 ' We retry in the cancel or retry cases, since there is nowhere else to go
 Function retryCategoryList(screenID)
-  tubiLog("HomeScreenHelpers.retryCategoryList") 
+  tubiLog("HomeScreenHelpers.retryCategoryList")
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     homeScreen.canLoadCategories = true
@@ -721,7 +720,7 @@ End Function
 
 
 '//when a new column of the rowlist begins to gain partial focus during a horizontal scroll, then do something
-Function onColumnFocusChanged(msg)
+Function onColumnFocusChanged()
   tubiLog("HomeScreenHelpers.onColumnFocusChanged")
   if isLinearPlayerLoading() = true or isLinearPlayerPlaying() = true
     '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
@@ -731,20 +730,19 @@ End Function
 
 
 ' setHomeScreenAfterFocus()
-' This function should be called when a new rowlist item on the homescreen gains focus. 
+' This function should be called when a new rowlist item on the homescreen gains focus.
 ' Anything that needs to be set after a focus should be done in this function
 ' @param focusedContent, roSGNode - The TubiContentNode of the focused content
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
 Function setHomeScreenAfterFocus(focusedContent, homeScreen)
   if focusedContent <> invalid and getCurrentScreen() <> invalid and getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
-    '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that 
+    '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
     '//we should stop the countdown timer
-    bStopCountdownTimer = true 
+    bStopCountdownTimer = true
     epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false)
 
     if focusedContent.type = m.constants.ui.categoryTypes.linear and focusedContent.id <> m.constants.ui.contentIds.tvGuide and m.SideNav.opened <> true
       bPlayVideo = true
-      linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
       if isLinearPlayerPlayingThisContent(focusedContent) = true
         '//No need to play the video. It already is playing the video
         bPlayVideo = false
@@ -756,7 +754,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
         stopLinearVideoContent()
         playLinearVideoContent(focusedContent, true, homeScreen.id)
-      else 
+      else
         bStopCountdownTimer = false
         startCountdownTimer()
 
@@ -764,12 +762,12 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
           m.backgroundGroup.posterVisible = false
         end if
       end if
-    else 
+    else
       stopAndHideLinearVideoPlayer()
     end if
 
     if focusedContent.type <> invalid and epgExperimentResource.update_homescreen = true
-      if focusedContent.type = m.constants.ui.categoryTypes.linear 
+      if focusedContent.type = m.constants.ui.categoryTypes.linear
         m.clock.visible = true
         m.logoGroup.visible = false
       else
@@ -789,10 +787,10 @@ End Function
 '//Check the focused row if it is a sponsored container and if so, possibly send out the pixels
 ' @rowFocused: roSGNode, a CategoryContentNode
 Function manageHomescreenSponsorPixels(rowFocused)
-  if rowFocused <> invalid 
+  if rowFocused <> invalid
     m.videoSponsorExposureId = ""
     '//When a sponsored container is made visible, then call the pixels
-    containerId = rowFocused.id 
+    containerId = rowFocused.id
     m.videoSponsorExposureId = rowFocused.sponsorExp
     sponsorPixels = rowFocused.sponsorImages.pixels["homescreen"]
 
@@ -808,24 +806,24 @@ End Function
 
 ' Select the Linear content that is currently focused
 Function selectLinearContent(content)
-  tubiLog("HomeScreenHelpers.selectLinearContent()") 
+  tubiLog("HomeScreenHelpers.selectLinearContent()")
   homeScreen = getCurrentScreen()
 
-  '//stop timer and tell player to go fullscreen   
+  '//stop timer and tell player to go fullscreen
   stopCountdownTimer()
   if content <> invalid and content.type = m.constants.ui.contentTypes.linear
     if content.id <> m.constants.ui.contentIds.tvGuide
-      linearContent = getCurrentLinearContent() 
+      linearContent = getCurrentLinearContent()
       if linearContent <> invalid and linearContent.id <> invalid and content.id = linearContent.id
-        '//If the user selects the linear content that is already playing, then just maximize it. 
-        maximizeLinearPlayer(content) 
+        '//If the user selects the linear content that is already playing, then just maximize it.
+        maximizeLinearPlayer(content)
       else
-        '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content. 
+        '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content.
         stopLinearVideoContent()
         playLinearVideoContent(content, false, homeScreen.id)
       end if
     else
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true 
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
         showDefaultEPGScreen()
       end if
     end if
@@ -834,7 +832,7 @@ End Function
 
 
 Function stopCountdownTimer()
-  tubiLog("HomeScreenHelpers.stopCountdownTimer")  
+  tubiLog("HomeScreenHelpers.stopCountdownTimer")
   if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).update_homescreen = true
     '//hide the countdown timer
     setPlayerCountDownChange(-1)
@@ -893,7 +891,7 @@ Function setPlayerCountDownChange(nFullscreenCountdown)
   m.fullscreenCountdown = nFullscreenCountdown
   if nFullscreenCountdown >= 0
     m.LinearCountdownTimer.display = true
-    m.LinearCountdownTimer.seconds = nFullscreenCountdown  
+    m.LinearCountdownTimer.seconds = nFullscreenCountdown
   else
     m.LinearCountdownTimer.display = false
   end if
@@ -901,7 +899,6 @@ End Function
 
 
 Function onScrollingStatusChange(msg)
-  scrollingStatus = msg.getData()
   '//if in the middle of scrolling, then stop the linear video player (if it is playing)
   homeScreen = msg.getRoSGNode()
   focusedContent = homeScreen.focusedChild
@@ -955,7 +952,6 @@ End Function
 
 Function onUtilityItemSelected(content)
   itemSelectedId = content.id
-  currentScreenNow = getCurrentScreen()
 
   if itemSelectedId = m.constants.ui.utilityIds.movies
     showMoviesScreen()
@@ -964,7 +960,7 @@ Function onUtilityItemSelected(content)
     showTVScreen()
     m.SideNav.itemRequested = m.constants.ui.sideNavIds.tv
   else
-    showCategoryDetailsScreen(content, "HOME")  
+    showCategoryDetailsScreen(content, "HOME")
   end if
 End Function
 
@@ -993,9 +989,9 @@ Function onLoadCategoriesIndex(msg)
     batchResponseHandler = movieBatchResponse
   else if homeScreen.id = m.constants.ui.screenIds.tvScreen
     batchResponseHandler = tvBatchResponse
-  else if homeScreen.id = m.constants.ui.screenIds.espanolScreen 
-    batchResponseHandler = espanolBatchResponse 
-  else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen 
+  else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
+    batchResponseHandler = espanolBatchResponse
+  else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen
     batchResponseHandler = linearTVBatchResponse
   end if
 
@@ -1004,7 +1000,7 @@ Function onLoadCategoriesIndex(msg)
 
   if batchRequests <> invalid
     m.makeBatchRequest({
-      requests: batchRequests 
+      requests: batchRequests
       responseType: "node"
       successCallback: batchResponseHandler
     })

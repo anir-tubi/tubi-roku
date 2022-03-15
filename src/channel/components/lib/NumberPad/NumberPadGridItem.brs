@@ -2,9 +2,8 @@ Function init()
   m.Background = m.top.findNode("NumberPadGridItemBg")
   m.ForegroundLabel = m.top.findNode("NumberPadGridItemFgLabel")
   m.ForegroundPoster = m.top.findNode("NumberPadGridItemFgPoster")
-  
+
   m.top.observeField("itemContent", "onItemContentChange")
-  m.top.observeField("focusPercent", "onFocusPercentChange")
   m.top.observeField("itemHasFocus", "onItemFocusChange")
 End Function
 
@@ -29,14 +28,6 @@ Function onItemContentChange(msg)
   if itemContent.id = "back"
     m.ForegroundLabel.visible = false
     m.ForegroundPoster.visible = true
-  end if
-End Function
-
-
-Function onFocusPercentChange(msg)
-  if m.top.gridHasFocus = true
-    focusPercent = msg.getData()
-    ' m.Background.opacity = (1 - focusPercent) * 0.16
   end if
 End Function
 

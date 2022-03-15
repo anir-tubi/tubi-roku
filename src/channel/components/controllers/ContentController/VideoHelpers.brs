@@ -25,7 +25,7 @@ Function playVideoContent(content, autoplayType = "none", position = 0)
       pushScreen(videoPlayer, true, true)
     end if
   end if
-  
+
   '//send a copy of the videoSponsorExposureId to the videoPlayer
   videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
   videoPlayer.control = "play"
@@ -95,7 +95,7 @@ Function setupVideoPlayer(content, autoplayType = "none", position = 0)
     videoPlayer.appMode = "LATINO_MODE"
   else
     videoPlayer.appMode = "DEFAULT_MODE"
-  end if  
+  end if
 
   if content <> invalid
     if content.isTrailer
@@ -205,14 +205,14 @@ Function updateHistory(content, nowPos)
       })
     end if
 
-  end if 
+  end if
 
 End Function
 
 
 ' onHistorySuccess
 '
-' triggers once the API responds for bookmark API 
+' triggers once the API responds for bookmark API
 Function onHistorySuccess(parsedResponse)
 
   historyResult = {}
@@ -277,14 +277,14 @@ End Function
 Function playUpNextContent(nextContent, autoplayType)
   tubiLog("VideoHelpers.playUpNextContent")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-  
+
   '//reset videoSponsorExposureId when playing a new video that is no longer in the same path as seeing the sponsored artwork
   m.videoSponsorExposureId = ""
 
   if videoPlayer <> invalid
     videoContent = videoPlayer.content
     if videoContent <> invalid and videoContent.parentType = m.constants.ui.contentTypes.series
-      detailScreen = getTopDetailScreenFromStack() 
+      detailScreen = getTopDetailScreenFromStack()
       if detailScreen <> invalid
         detailContent = detailScreen.content
         nResumePoint = videoPlayer.historyPosition
@@ -292,7 +292,7 @@ Function playUpNextContent(nextContent, autoplayType)
         updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)
       end if
     end if
-  
+
     oldContent = videoPlayer.content
     content = addSeriesTitle(nextContent, oldContent)
     stopVideoContent(videoPlayer)
@@ -423,12 +423,12 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
     ' The problem with this is that if the backend comes back with a different number than the local
     ' number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video.
     ' The local number is 2 seconds and displays the resume button, but the backend determines that 2
-    ' seconds is not enough to warrant a resume button and returns 0 as the resume point.    
+    ' seconds is not enough to warrant a resume button and returns 0 as the resume point.
     if nResumePoint < m.constants.player.historyFrequency or isEndReached = true
       '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0
       nResumePoint = 0
     end if
-    
+
     ' Do the appropriate action based on the cases as described in the Function definition comments
     if videoContent.parentType = m.constants.ui.contentTypes.series
       ' Video player was playing a series episode
@@ -449,7 +449,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
         ' update some info in the detail screen content and repopulate with that content
         detailContent.currentEpisodeId = videoContent.id
         populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
-        
+
         'updating the history if user has watched more than historyFrequency or postlude reached
         if nResumePoint > 0 or isEndReached = true
           ' For SignedIn/guest user, update resume point to global variable
@@ -463,10 +463,10 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
         if hiddenScreen.id = m.constants.ui.screenIds.episodeScreen
           '//::TODO:: ensure signed in users see the episode screen progress bars when coming back from video player.
           episodesScreen = hiddenScreen
-          
+
           itemFocused = findEpisode2dIndex(detailContent.currentEpisodeId, detailContent)
-          updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)        
-            
+          updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)
+
           episodesScreen.content = detailContent
           episodesScreen.updateContent = true
           episodesScreen.episodeToFocus = itemFocused
@@ -503,7 +503,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
           ' For SignedIn user, update resume point to backend
           updateHistory(videoContent, nResumePoint)
         end if
-        
+
         populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
       end if
     end if
@@ -686,8 +686,8 @@ End Function
 Function initVideoTracking(videoPlayer)
   if m.constants.thirdParty.youbora.enabled = true
     if videoPlayer <> invalid
-      'If we are switching from VOD to LIVE or LIVE to VOD, latest videoPlayerScreen's 
-      'sendYouboraError should be observed. 
+      'If we are switching from VOD to LIVE or LIVE to VOD, latest videoPlayerScreen's
+      'sendYouboraError should be observed.
       videoPlayer.unobserveFieldScoped("sendYouboraError")
       videoPlayer.observeFieldScoped("sendYouboraError", "onSendYouboraError")
       if m.youboraTask = invalid
@@ -697,9 +697,9 @@ Function initVideoTracking(videoPlayer)
         m.global.addFields({ YouboraLogActive: m.constants.thirdParty.youbora.debug })
         m.youboraTask.control = "RUN"
       else
-        'Setting m.youboraTask.taskState to "stop" triggers the youboraTask to 
-        'unobserve the VideoPlayer that is currently being observed in the youboraTask, 
-        'which enables it to accept the new videoPlayer node (that will be set below) 
+        'Setting m.youboraTask.taskState to "stop" triggers the youboraTask to
+        'unobserve the VideoPlayer that is currently being observed in the youboraTask,
+        'which enables it to accept the new videoPlayer node (that will be set below)
         'and re-observe the video node attributes.
         m.youboraTask.taskState = "stop"
       end if
@@ -719,17 +719,17 @@ Function onVideoTrackingStart(msg)
     if videoPlayer <> invalid and videoPlayer.content <> invalid
       youboraConfig["extraparam.1"] = videoPlayer.content.id
       youboraConfig["content.id"] = videoplayer.content.id
-      
+
       playbackType = videoplayer.content.drmType
       youboraConfig["content.playbackType"] = playbackType
-      
+
       if isString(playbackType)
         playbackTypeArray = playbackType.split("_")
         if playbackTypeArray[1] <> invalid
           youboraConfig["content.drm"] = playbackTypeArray[1]
         end if
       end if
-      
+
       youboraConfig.tvShow = Mid(videoplayer.content.parentId, 2)
     end if
 
@@ -739,7 +739,7 @@ Function onVideoTrackingStart(msg)
 
     if videoplayer.content.type = m.constants.ui.contentTypes.linear
       youboraConfig["content.isLive"] = true
-    else 
+    else
       youboraConfig["content.isLive"] = false
     end if
 
@@ -848,8 +848,7 @@ Function onUpNextResponse(upNextContent)
   end if
 End Function
 
-
-Function onUpNextError(errorInfo)
+Function onUpNextError(_errorInfo)
   if m.receivedGoToNextPressed = true
     returnToDetailScreenFromVideo()
   end if
@@ -861,7 +860,7 @@ Function onSegInfoChange(msg)
   segInfo = msg.getData()
   if m.youboraTask <> invalid
     youboraOptions = m.youboraTask.options
-    if youboraOptions <> invalid 
+    if youboraOptions <> invalid
        rendition = constructYouboraRendition(segInfo)
        if rendition <> invalid
          youboraOptions["content.rendition"] = rendition
@@ -899,7 +898,7 @@ Function constructYouboraRendition(segInfo)
     end if
   end if
   return rendition
-  
+
 End Function
 
 
@@ -919,5 +918,5 @@ Function updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)
       episode.nowPos = nResumePoint 'updating current episode's nowPos to draw progressbar
     end if
   end if
-          
+
 End Function

@@ -1,7 +1,7 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseVideoScreenSpritesSuccess(fullResponse, requestNode)
+' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseVideoScreenSpritesSuccess(fullResponse, _requestNode)
   parsedResponse = fullResponse.data
   spritesContentNode = invalid
   if parsedResponse <> invalid then
@@ -21,11 +21,11 @@ Function parseVideoScreenSpritesSuccess(fullResponse, requestNode)
   return spritesContentNode
 End Function
 
-   
+
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseVideoScreenUpNextSuccess(fullResponse, requestNode)
+' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseVideoScreenUpNextSuccess(fullResponse, _requestNode)
   parsedResponse = fullResponse.data
   translate = TubiMetadataTranslate(m.constants)
   upNextContent = CreateObject("roSGNode", "ContentNode")
@@ -39,8 +39,8 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseLiveVideoManifestSuccess(fullResponse, requestNode)
+' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseLiveVideoManifestSuccess(fullResponse, _requestNode)
   return {
     res: fullResponse.data
     headers: fullResponse.headers
@@ -50,8 +50,8 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseHistorySuccess(fullResponse, requestNode)
+' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseHistorySuccess(fullResponse, _requestNode)
   return {
     parsedResponse: fullResponse.data
   }

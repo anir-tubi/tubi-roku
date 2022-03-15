@@ -1,5 +1,5 @@
 ' getExperimentResource
-' 
+'
 ' Get more info about the experiment
 ' Note: the component calling getExperimentResource using the ExperimentMixin, must also
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
@@ -7,7 +7,6 @@ Function getExperimentResource(namespaceName as string, experimentName as string
   if m.constants = invalid
     m.constants = m.global.constants
   end if
-  request = TubiRequest(m.constants.settings)
   experiments = TubiExperiments(m.constants)
   resource = experiments.getExperimentResource(namespaceName, experimentName)
 

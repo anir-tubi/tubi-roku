@@ -459,7 +459,6 @@ Sub PrintAA(aa as Object)
     else
         cnt = 0
         for each e in aa
-            x = aa[e]
             PrintAny(0, e + ": ", aa[e])
             cnt = cnt + 1
         next
@@ -486,7 +485,6 @@ End Sub
 '******************************************************
 Sub PrintAnyAA(depth As Integer, aa as Object)
     for each e in aa
-        x = aa[e]
         PrintAny(depth, e + ": ", aa[e])
     next
 End Sub
@@ -678,4 +676,3 @@ Function validateParam(param As Object, paramType As String,functionName As Stri
     print "invalid parameter of type "; type(param); " for "; paramType; " in function "; functionName
     return false
 End Function
-

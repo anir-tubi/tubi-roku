@@ -12,7 +12,7 @@ Function init()
   m.NavSection = m.top.findNode("nav")
   m.BackLabel = m.top.findNode("callToAction")
   if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
+    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     m.BackLabel.translation = [m.BackLabel.translation[0], m.BackLabel.translation[1] + 3]
   end if
 
@@ -59,7 +59,7 @@ Function onSetCallOfAction()
   end if
   if sCallToAction = ""
     sCallToAction = getTranslation("goBack_home")
-  end if 
+  end if
   m.BackLabel.text = sCallToAction
 End Function
 
@@ -170,7 +170,7 @@ End Function
 
 Function isSignedIn()
   bSignedIn = false
-  if m.top.signInInfo <> invalid 
+  if m.top.signInInfo <> invalid
     bSignedIn = (m.top.signInInfo.signedIn = true)
   end if
   return bSignedIn
@@ -230,11 +230,11 @@ Function CreateAboutPanel()
   sVersion = m.constants.settings.version.Replace("_", ".")
   sShortDeviceID = Right(m.constants.deviceInfo.deviceId, 7)
   sYear = CreateObject("roDateTime").GetYear().toStr()
-  dynamicText = { 
-    version: sVersion, 
-    id: sShortDeviceID, 
-    help_url: "http://help.tubitv.com", 
-    support_url: "https://tubitv.com/support", 
+  dynamicText = {
+    version: sVersion,
+    id: sShortDeviceID,
+    help_url: "http://help.tubitv.com",
+    support_url: "https://tubitv.com/support",
     year: sYear
   }
 
@@ -378,15 +378,14 @@ End Function
 
 
 Function onItemRequested()
-  sButtonID = ""
   list = m.SettingsMenuPanel.list
   if list <> invalid
     if list.itemFocused <> invalid
       buttonContent = list.content.getChild(list.itemFocused)
-      sButtonID = buttonContent.id
-    end if
-    if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and m.top.itemRequested <> buttonContent.id
-      focusItemInList(list, m.top.itemRequested)
+
+      if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and m.top.itemRequested <> buttonContent.id
+        focusItemInList(list, m.top.itemRequested)
+      end if
     end if
   end if
 End Function
