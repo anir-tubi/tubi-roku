@@ -568,12 +568,11 @@ function packageAll(done) {
 // increase the build/patch numbers in config/build.yml
 function bumpBuild(done) {
   if (verifyGit(done)) {
-    return incrementBuildNumber()
-    .then(() => {
-      const buildTag = getBuildTag(false, false);
-      log(`Commiting build bump to ${buildTag}`);
-      shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
-    });
+    incrementBuildNumber();
+    const buildTag = getBuildTag(false, false);
+    log(`Commiting build bump to ${buildTag}`);
+    shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
+    done();
   } else {
     // errors should be handled in verifyGit()
   }
